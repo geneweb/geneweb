@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.47 2008-01-08 02:08:00 ddr Exp $ *)
+(* $Id: update.ml,v 5.48 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -25,7 +25,7 @@ value infer_death conf birth =
   match birth with
   [ Some (Dgreg d _) ->
       let a = (CheckItem.time_elapsed d conf.today).year in
-      if a > 120 then DeadDontKnowWhen
+      if a > 120 then OfCourseDead
       else if a <= 80 then NotDead
       else DontKnowIfDead
   | _ -> DontKnowIfDead ]

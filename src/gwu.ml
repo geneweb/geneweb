@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.42 2007-02-28 09:29:23 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.43 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -278,6 +278,7 @@ value print_infos oc base is_child csrc cbp p =
         with
         [ (Some _, _) | (_, Some _) -> fprintf oc " ?"
         | _ -> () ]
+    | OfCourseDead -> fprintf oc " od"
     | NotDead -> () ];
     print_if_no_empty oc base "#dp" (get_death_place p);
     print_if_no_empty oc base "#ds" (get_death_src p);

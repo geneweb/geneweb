@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: date.ml,v 5.16 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: date.ml,v 5.17 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 UNDEF OLD;
@@ -453,7 +453,7 @@ value print_dates conf base p =
               if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
             }
             else () ]
-    | DontKnowIfDead | NotDead -> () ];
+    | DontKnowIfDead | NotDead | OfCourseDead -> () ];
     if death_place <> "" then
       Wserver.wprint "%s" (string_of_place conf death_place)
     else ();

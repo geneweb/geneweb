@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.52 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.53 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -126,7 +126,7 @@ value print_differences conf base branches p1 p2 =
              s ^ " " ^ Date.string_of_ondate conf (Adef.date_of_cdate cd)
          | DeadYoung -> transl_nth conf "died young" is
          | DeadDontKnowWhen -> transl_nth conf "died" is
-         | DontKnowIfDead -> "" ]);
+         | DontKnowIfDead | OfCourseDead -> "" ]);
     string_field True (transl conf "death" ^ " / " ^ transl conf "place")
       "death_place" (fun p -> sou base (get_death_place p));
     string_field False (transl conf "burial") "burial"

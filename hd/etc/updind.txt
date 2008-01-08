@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: updind.txt,v 5.13 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 5.14 2008-01-08 11:58:46 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -458,6 +458,8 @@ function changeCalendar(e,v,m,c) {
    >[*died]2...</option>
   <option value="DeadYoung"%if;died_young; selected="selected"%end;
    >[*died young]2</option>
+  <option value="OfCourseDead"%if;of_course_dead; selected="selected"%end;
+   >[*of course dead]</option>
 </select>
 </td>
 <td>

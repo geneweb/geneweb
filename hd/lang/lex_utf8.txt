@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.95 2007-08-17 02:05:32 ddr Exp $
+# $Id: lex_utf8.txt,v 5.96 2008-01-08 11:58:46 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -6464,6 +6464,10 @@ ro: ocupatie
 ru: занятие
 sl: poklic
 sv: yrke
+
+    of course dead
+en: of course dead
+fr: évidemment décédé(e)
 
     of the %s generation
 af: uit die %s geslag
