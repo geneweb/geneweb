@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 5.51 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 5.52 2008-01-08 01:56:37 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -10,6 +10,15 @@ open Gwdb;
 open Hutil;
 open Mutil;
 open Util;
+
+type create_info =
+  Update.create_info ==
+    { ci_birth_date : option date;
+      ci_birth_place : string;
+      ci_death : death;
+      ci_death_date : option date;
+      ci_death_place : string }
+;
 
 value raw_get conf key =
   match p_getenv conf.env key with
@@ -65,7 +74,8 @@ value reconstitute_parent_or_child conf var default_surname =
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
     let dpl = getn conf (var ^ "d") "pl" in
-    (b, bpl, death, d, dpl)
+    {ci_birth_date = b; ci_birth_place = bpl; ci_death = death;
+     ci_death_date = d; ci_death_place = dpl}
   in
   let sex =
     match p_getenv conf.env (var ^ "_sex") with

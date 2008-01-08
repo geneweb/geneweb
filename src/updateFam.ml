@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.21 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.22 2008-01-08 01:56:37 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -9,6 +9,15 @@ open Gwdb;
 open Hutil;
 open TemplAst;
 open Util;
+
+type create_info =
+  Update.create_info ==
+    { ci_birth_date : option date;
+      ci_birth_place : string;
+      ci_death : death;
+      ci_death_date : option date;
+      ci_death_place : string }
+;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
 
@@ -263,69 +272,69 @@ and eval_create c =
   fun
   [ "birth_day" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg dmy Dfrench), _, _, _, _)) ->
+      [ Update.Create _ (Some {ci_birth_date = Some (Dgreg dmy Dfrench)}) ->
           let dmy = Calendar.french_of_gregorian dmy in
           if dmy.day <> 0 then string_of_int dmy.day else ""
-      | Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _, _))
+      | Update.Create _ (Some {ci_birth_date = Some (Dgreg {day = d} _)})
         when d <> 0 ->
           string_of_int d
       | _ -> "" ]
   | "birth_month" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg dmy Dfrench), _, _, _, _)) ->
+      [ Update.Create _ (Some {ci_birth_date = Some (Dgreg dmy Dfrench)}) ->
           let dmy = Calendar.french_of_gregorian dmy in
           if dmy.month <> 0 then short_f_month dmy.month else ""
-      | Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _, _))
+      | Update.Create _ (Some {ci_birth_date = Some (Dgreg {month = m} _)})
         when m <> 0 ->
           string_of_int m
       | _ -> "" ]
   | "birth_place" ->
       match c with
-      [ Update.Create _ (Some (_, pl, _, _, _)) -> quote_escaped pl
+      [ Update.Create _ (Some {ci_birth_place = pl}) -> quote_escaped pl
       | _ -> "" ]
   | "birth_year" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg dmy Dfrench), _, _, _, _)) ->
+      [ Update.Create _ (Some {ci_birth_date = Some (Dgreg dmy Dfrench)}) ->
           let dmy = Calendar.french_of_gregorian dmy in
           add_precision (string_of_int dmy.year) dmy.prec
       | Update.Create _
-        (Some (Some (Dgreg {year = y; prec = p} _), _, _, _, _)) ->
+        (Some {ci_birth_date = Some (Dgreg {year = y; prec = p} _)}) ->
           add_precision (string_of_int y) p
       | _ -> "" ]
   | "death_day" ->
       match c with
       [ Update.Create _ 
-        (Some (_, _, _, Some (Dgreg dmy Dfrench), _)) ->
+          (Some {ci_death_date = Some (Dgreg dmy Dfrench)})
+        ->
           let dmy = Calendar.french_of_gregorian dmy in
           if dmy.day <> 0 then string_of_int dmy.day else ""
-      | Update.Create _ (Some (_, _, _, Some (Dgreg {day = d} _), _))
+      | Update.Create _ (Some {ci_death_date = Some (Dgreg {day = d} _)})
         when d <> 0 ->
           string_of_int d
       | _ -> "" ]
   | "death_month" ->
       match c with
-      [ Update.Create _ 
-        (Some (_, _, _, Some (Dgreg dmy Dfrench), _)) ->
+      [ Update.Create _ (Some {ci_death_date = Some (Dgreg dmy Dfrench)}) ->
           let dmy = Calendar.french_of_gregorian dmy in
           short_f_month dmy.month
-      | Update.Create _ (Some (_, _, _, Some (Dgreg {month = m} _), _))
+      | Update.Create _ (Some {ci_death_date = Some (Dgreg {month = m} _)})
         when m <> 0 ->
           string_of_int m
       | _ -> "" ]
   | "death_place" ->
       match c with
-      [ Update.Create _ (Some (_, _, _, _, pl)) -> quote_escaped pl
+      [ Update.Create _ (Some {ci_death_place = pl}) -> quote_escaped pl
       | _ -> "" ]
   | "death_year" ->
       match c with
-      [ Update.Create _
-        (Some (_, _, _, Some (Dgreg dmy Dfrench), _)) ->
+      [ Update.Create _ (Some {ci_death_date = Some (Dgreg dmy Dfrench)}) ->
           let dmy = Calendar.french_of_gregorian dmy in
           add_precision (string_of_int dmy.year) dmy.prec
       | Update.Create _
-        (Some (_, _, _, Some (Dgreg {year = y; prec = p} _), _)) ->
+          (Some {ci_death_date = Some (Dgreg {year = y; prec = p} _)})
+        ->
           add_precision (string_of_int y) p
-      | Update.Create _ (Some (_, _, death, None, _)) ->
+      | Update.Create _ (Some {ci_death = death; ci_death_date = None}) ->
           match death with
           [ DeadDontKnowWhen -> "+"
           | NotDead -> "-"

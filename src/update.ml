@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.45 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: update.ml,v 5.46 2008-01-08 01:56:37 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -10,7 +10,13 @@ open Hutil;
 open Util;
 
 exception ModErr;
-type create_info = (option date * string * death * option date * string);
+type create_info =
+  { ci_birth_date : option date;
+    ci_birth_place : string;
+    ci_death : death;
+    ci_death_date : option date;
+    ci_death_place : string }
+;
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 
@@ -676,7 +682,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           let empty_string = Gwdb.insert_string base "" in
           let (birth, birth_place, baptism, baptism_place) =
             match info with
-            [ Some (b, bpl, _, _, _) ->
+            [ Some {ci_birth_date = b; ci_birth_place = bpl} ->
                 if String.length bpl >= 2 && String.sub bpl 0 2 = "b/" then
                   (None, "", b, String.sub bpl 2 (String.length bpl - 2))
                 else (b, bpl, None, "")
@@ -684,11 +690,14 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           in
           let (death, death_place) =
             match info with
-            [ Some (_, _, _, Some d, dpl) ->
+            [ Some {ci_death_date = Some d; ci_death_place = dpl} ->
                 (Death Unspecified (Adef.cdate_of_date d), dpl)
-            | Some (_, _, _, None, dpl) when dpl <> "" ->
+            | Some {ci_death_date = None; ci_death_place = dpl}
+              when dpl <> "" ->
                 (DeadDontKnowWhen, dpl)
-            | Some (_, _, (DeadDontKnowWhen | NotDead as dead), None, dpl) ->
+            | Some
+              {ci_death = (DeadDontKnowWhen | NotDead as dead);
+               ci_death_date = None; ci_death_place = dpl} ->
                 (dead, dpl)
             | _ -> (infer_death conf birth, "") ]
           in
