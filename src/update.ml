@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: update.ml,v 5.46 2008-01-08 01:56:37 ddr Exp $ *)
+(* $Id: update.ml,v 5.47 2008-01-08 02:08:00 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -15,7 +15,8 @@ type create_info =
     ci_birth_place : string;
     ci_death : death;
     ci_death_date : option date;
-    ci_death_place : string }
+    ci_death_place : string;
+    ci_public : bool }
 ;
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
@@ -701,6 +702,11 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                 (dead, dpl)
             | _ -> (infer_death conf birth, "") ]
           in
+          let access =
+            match info with
+            [ Some {ci_public = p} -> if p then Public else IfTitles
+            | None -> IfTitles ]
+          in
           let p =
             {first_name = Gwdb.insert_string base f;
              surname = Gwdb.insert_string base s; occ = o;
@@ -708,7 +714,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
              first_names_aliases = []; surnames_aliases = [];
              public_name = empty_string; qualifiers = []; aliases = [];
              titles = []; rparents = []; related = [];
-             occupation = empty_string; sex = sex; access = IfTitles;
+             occupation = empty_string; sex = sex; access = access;
              birth = Adef.codate_of_od birth;
              birth_place = Gwdb.insert_string base birth_place;
              birth_src = empty_string; baptism = Adef.codate_of_od baptism;
