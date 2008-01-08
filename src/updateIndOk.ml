@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 5.73 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 5.74 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -176,6 +176,7 @@ value reconstitute_death conf birth death_place burial burial_place =
   | "DeadYoung" when d = None -> DeadYoung
   | "DontKnowIfDead" when d = None -> DontKnowIfDead
   | "NotDead" -> NotDead
+  | "OfCourseDead" -> OfCourseDead
   | _ ->
       match d with
       [ Some d -> Death dr (Adef.cdate_of_date d)

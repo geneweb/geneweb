@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 5.21 2007-09-05 13:16:45 ddr Exp $ *)
+(* $Id: def.mli,v 5.22 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -42,7 +42,8 @@ type death =
   | Death of death_reason and cdate
   | DeadYoung
   | DeadDontKnowWhen
-  | DontKnowIfDead ]
+  | DontKnowIfDead
+  | OfCourseDead ]
 ;
 
 type burial = [ UnknownBurial | Buried of codate | Cremated of codate ];

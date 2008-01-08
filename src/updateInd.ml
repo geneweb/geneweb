@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 5.14 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: updateInd.ml,v 5.15 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -121,6 +121,7 @@ value rec eval_var conf base env p loc =
   | ["notes"] -> str_val (quote_escaped p.notes)
   | ["occ"] -> str_val (if p.occ <> 0 then string_of_int p.occ else "")
   | ["occupation"] -> str_val (quote_escaped p.occupation)
+  | ["of_course_dead"] -> bool_val (p.death = OfCourseDead)
   | ["public_name"] -> str_val (quote_escaped p.public_name)
   | ["qualifier"] -> eval_string_env "qualifier" env
   | ["relation" :: sl] ->

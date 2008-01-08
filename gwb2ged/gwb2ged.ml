@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 5.28 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 5.29 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -338,7 +338,7 @@ value ged_ind_ev_str base sel oc per =
           fprintf oc "1 DEAT";
           ged_ev_detail oc 2 "" (Some (Adef.date_of_cdate cd)) pl src;
         }
-    | DeadYoung | DeadDontKnowWhen ->
+    | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
         do {
           fprintf oc "1 DEAT"; ged_ev_detail oc 2 "" None pl src;
         }

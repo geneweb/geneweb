@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.9 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.10 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -231,6 +231,7 @@ value get_optional_deathdate l =
   match l with
   [ ["?" :: l'] -> (Some DontKnowIfDead, l')
   | ["mj" :: l'] -> (Some DeadYoung, l')
+  | ["od" :: l'] -> (Some OfCourseDead, l')
   | [x :: l'] ->
       let i = 0 in
       let (dr, i) =
