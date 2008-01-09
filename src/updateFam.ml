@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 5.23 2008-01-08 02:08:00 ddr Exp $ *)
+(* $Id: updateFam.ml,v 5.24 2008-01-09 03:34:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -295,12 +295,15 @@ and eval_create c =
       | _ -> "" ]
   | "birth_year" ->
       match c with
-      [ Update.Create _ (Some {ci_birth_date = Some (Dgreg dmy Dfrench)}) ->
-          let dmy = Calendar.french_of_gregorian dmy in
-          add_precision (string_of_int dmy.year) dmy.prec
-      | Update.Create _
-        (Some {ci_birth_date = Some (Dgreg {year = y; prec = p} _)}) ->
-          add_precision (string_of_int y) p
+      [ Update.Create _ (Some ci) ->
+          match ci.ci_birth_date with
+          [ Some (Dgreg dmy Dfrench) ->
+              let dmy = Calendar.french_of_gregorian dmy in
+              add_precision (string_of_int dmy.year) dmy.prec
+          | Some (Dgreg {year = y; prec = p} _) ->
+              add_precision (string_of_int y) p
+          | Some _ -> ""
+          | None -> if ci.ci_public then "p" else "" ]
       | _ -> "" ]
   | "death_day" ->
       match c with
