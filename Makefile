@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.5 2007-09-12 09:58:44 ddr Exp $
+# $Id: Makefile,v 5.6 2008-01-09 21:16:30 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -34,6 +34,7 @@ opt::
 install:
 	mkdir -p $(PREFIX)/bin
 	cp src/gwc $(PREFIX)/bin/gwc$(EXE)
+	cp src/gwc1 $(PREFIX)/bin/gwc1$(EXE)
 	cp src/gwc2 $(PREFIX)/bin/gwc2$(EXE)
 	cp src/consang $(PREFIX)/bin/consang$(EXE)
 	cp src/gwd $(PREFIX)/bin/gwd$(EXE)
@@ -59,6 +60,7 @@ install:
 
 uninstall:
 	rm -f $(PREFIX)/bin/gwc$(EXE)
+	rm -f $(PREFIX)/bin/gwc1$(EXE)
 	rm -f $(PREFIX)/bin/gwc2$(EXE)
 	rm -f $(PREFIX)/bin/consang$(EXE)
 	rm -f $(PREFIX)/bin/gwd$(EXE)
@@ -118,6 +120,7 @@ classical_distrib:
 	cp CHANGES $(DESTDIR)/CHANGES.txt
 	cp LICENSE $(DESTDIR)/LICENSE.txt
 	cp src/gwc $(DESTDIR)/gwc$(EXE)
+	cp src/gwc1 $(DESTDIR)/gwc1$(EXE)
 	cp src/gwc2 $(DESTDIR)/gwc2$(EXE)
 	cp src/consang $(DESTDIR)/consang$(EXE)
 	cp src/gwd $(DESTDIR)/gwd$(EXE)

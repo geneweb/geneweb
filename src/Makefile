@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.47 2007-09-12 17:04:07 ddr Exp $
+# $Id: Makefile,v 5.48 2008-01-09 21:14:37 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -23,9 +23,10 @@ all:: out
 out:: gwlib.ml
 opt:: gwlib.ml
 
-out:: def.syn.cmo ansel.cmo gwc.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out i18n_check.out
+out:: def.syn.cmo ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out i18n_check.out
 	$(RM) gwc gwc2 consang gwd gwu check_base
-	cp gwc.out gwc
+	cp gwc1.out gwc
+	cp gwc1.out gwc1
 	cp gwc2.out gwc2
 	cp consang.out consang
 	cp gwd.out gwd
@@ -33,9 +34,10 @@ out:: def.syn.cmo ansel.cmo gwc.out gwc2.out consang.out gwd.out gwu.out update_
 	cp update_nldb.out update_nldb
 	cp check_base.out check_base
 
-opt:: def.syn.cmo ansel.cmx gwc.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
+opt:: def.syn.cmo ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	$(RM) gwc consang gwd gwu
-	cp gwc.opt gwc
+	cp gwc1.opt gwc
+	cp gwc1.opt gwc1
 	cp gwc2.opt gwc2
 	cp consang.opt consang
 	cp gwd.opt gwd
@@ -64,7 +66,7 @@ compilation.ml: always
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
 
 clean::
-	$(RM) gwc gwc2 consang gwd gwu update_nldb gwlib.ml
+	$(RM) gwc gwc1 gwc2 consang gwd gwu update_nldb gwlib.ml
 
 gwlib.ml:
 	echo "value prefix =" > gwlib.ml
@@ -73,11 +75,11 @@ gwlib.ml:
 	sed -e 's|\\|/|g' >> gwlib.ml
 	echo ";" >> gwlib.ml
 
-gwc.out: $(GWC_OBJS)
-	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc.out
+gwc1.out: $(GWC_OBJS)
+	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc1.out
 
-gwc.opt: $(GWC_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) $(STATIC) unix.cmxa $(GWC_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwc.opt
+gwc1.opt: $(GWC_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) $(STATIC) unix.cmxa $(GWC_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwc1.opt
 
 gwc2.out: $(GWC2_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC2_OBJS) $(LIBUNIX) -o gwc2.out
