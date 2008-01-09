@@ -1,6 +1,11 @@
 GeneWeb version 5.02
 --------------------
 
+* [09 Jan 2008] Fixed bug in "relationship by marriage" when there
+  are relations with persons of same sex and for languages having
+  differences for the term "spouse" depending on the sex. The term
+  was incorrect (using "husband" instead or "wife" or "wife" instead
+  of "husband").
 * [08 Jan 2008] In death cases, added "of course dead": like "dead don't
   know when", but 1/ inferred when the person is very very old but don't
   have a death date 2/ the text "dead" is no displayed in personal pages.
