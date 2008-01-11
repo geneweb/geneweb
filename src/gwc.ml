@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.56 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.57 2008-01-11 10:13:59 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -888,7 +888,7 @@ value fold_option fsome vnone =
   | None -> vnone ]
 ;
 
-value link gwo_list tmp_dir bdir =
+value link_aux gwo_list tmp_dir bdir =
   let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
   let tmp_per = Filename.concat tmp_dir "gwc_per" in
   let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
@@ -1018,6 +1018,29 @@ value output_particles_file bdir particles = do {
   close_out oc;
 };
 
+value link gwo_list bname = do {
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname
+    else bname ^ ".gwb"
+  in
+  let tmp_dir = Filename.concat "gw_tmp" bdir in
+  try Mutil.mkdir_p tmp_dir with _ -> ();
+  match link_aux gwo_list tmp_dir bdir with
+  [ Some (dsk_base, wiznotes) -> do {
+      Gc.compact ();
+      Outbase.output bdir dsk_base;
+      output_wizard_notes bdir wiznotes;
+      output_command_line bdir;
+      output_particles_file bdir dsk_base.data.particles;
+      try Mutil.remove_dir tmp_dir with _ -> ();
+      try Unix.rmdir "gw_tmp" with _ -> ();
+      True
+    }
+  | None ->
+      False ]
+  }
+;
+
 value separate = ref False;
 value shift = ref 0;
 value files = ref [];
@@ -1094,37 +1117,18 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       }
       else ();
       lock (Mutil.lock_file out_file.val) with
-      [ Accept -> do {
-          let bdir =
-            let bname = out_file.val in
-            if Filename.check_suffix bname ".gwb" then bname
-            else bname ^ ".gwb"
-          in
-          let tmp_dir = Filename.concat "gw_tmp" bdir in
-          try Mutil.mkdir_p tmp_dir with _ -> ();
-          match link (List.rev gwo.val) tmp_dir bdir with
-          [ Some (dsk_base, wiznotes) ->
-              do {
-                Gc.compact ();
-                Outbase.output bdir dsk_base;
-                output_wizard_notes bdir wiznotes;
-                output_command_line bdir;
-                output_particles_file bdir dsk_base.data.particles;
-                try Mutil.remove_dir tmp_dir with _ -> ();
-                try Unix.rmdir "gw_tmp" with _ -> ();
-              }
-          | None -> do {
-              printf "Creation of database failed.\n";
-              flush stdout;
-              exit 2;
-            } ]
-        }
-      | Refuse ->
-          do {
-            printf "Base is locked: cannot write it\n";
-            flush stdout;
-            exit 2
-          } ];
+      [ Accept ->
+          if link (List.rev gwo.val) out_file.val then ()
+          else do {
+            eprintf "*** database not created\n";
+            flush stderr;
+            exit 2;
+          }
+      | Refuse -> do {
+          printf "Base is locked: cannot write it\n";
+          flush stdout;
+          exit 2
+        } ];
     }
     else ();
   }

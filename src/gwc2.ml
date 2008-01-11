@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.59 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.60 2008-01-11 10:13:59 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -841,6 +841,21 @@ value output_particles_file tmp_dir particles = do {
   close_out oc;
 };
 
+value output_command_line bname =
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let oc = open_out (Filename.concat bdir "command.txt") in
+  do {
+    fprintf oc "%s" Sys.argv.(0);
+    for i = 1 to Array.length Sys.argv - 1 do {
+      fprintf oc " %s" Sys.argv.(i)
+    };
+    fprintf oc "\n";
+    close_out oc;
+  }
+;
+
 value link gwo_list bname = do {
   let has_separates = List.exists (fun (_, sep, _) -> sep) gwo_list in
   let bdir =
@@ -1037,25 +1052,11 @@ value link gwo_list bname = do {
     Mutil.remove_dir old_dir;
     try Unix.rmdir tmp_dir with [ Unix.Unix_error _ _ _ -> () ];
     try Unix.rmdir "gw_tmp" with [ Unix.Unix_error _ _ _ -> () ];
+    output_command_line bname;
   }
   else ();
   not gen.g_error;
 };
-
-value output_command_line bname =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
-  let oc = open_out (Filename.concat bdir "command.txt") in
-  do {
-    fprintf oc "%s" Sys.argv.(0);
-    for i = 1 to Array.length Sys.argv - 1 do {
-      fprintf oc " %s" Sys.argv.(i)
-    };
-    fprintf oc "\n";
-    close_out oc;
-  }
-;
 
 value separate = ref False;
 value shift = ref 0;
@@ -1137,12 +1138,11 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       else ();
       lock (Mutil.lock_file out_file.val) with
       [ Accept ->
-          if link (List.rev gwo.val) out_file.val then
-            output_command_line out_file.val
+          if link (List.rev gwo.val) out_file.val then ()
           else do {
             eprintf "*** database not created\n";
             flush stderr;
-            exit 2
+            exit 2;
           }
       | Refuse -> do {
           printf "Base is locked: cannot write it\n";
