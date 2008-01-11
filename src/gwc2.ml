@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.61 2008-01-11 10:19:38 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.62 2008-01-11 10:21:34 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -1048,9 +1048,9 @@ value link gwo_list bname = do {
     try Unix.rmdir tmp_dir with [ Unix.Unix_error _ _ _ -> () ];
     try Unix.rmdir "gw_tmp" with [ Unix.Unix_error _ _ _ -> () ];
     output_command_line bdir;
+    True
   }
-  else ();
-  not gen.g_error;
+  else False
 };
 
 value separate = ref False;
