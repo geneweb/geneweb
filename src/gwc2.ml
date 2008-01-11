@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.62 2008-01-11 10:21:34 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.63 2008-01-11 18:42:09 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -851,11 +851,8 @@ value output_command_line bdir = do {
   close_out oc;
 };
 
-value link gwo_list bname = do {
+value link gwo_list bdir = do {
   let has_separates = List.exists (fun (_, sep, _) -> sep) gwo_list in
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   Mutil.remove_dir tmp_dir;
   try Mutil.mkdir_p tmp_dir with _ -> ();
@@ -1133,7 +1130,11 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       else ();
       lock (Mutil.lock_file out_file.val) with
       [ Accept ->
-          if link (List.rev gwo.val) out_file.val then ()
+          let bdir =
+            if Filename.check_suffix out_file.val ".gwb" then out_file.val
+            else out_file.val ^ ".gwb"
+          in
+          if link (List.rev gwo.val) bdir then ()
           else do {
             eprintf "*** database not created\n";
             flush stderr;
