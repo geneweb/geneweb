@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.58 2008-01-11 10:21:34 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.59 2008-01-11 18:42:09 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1018,11 +1018,7 @@ value output_particles_file bdir particles = do {
   close_out oc;
 };
 
-value link gwo_list bname = do {
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname
-    else bname ^ ".gwb"
-  in
+value link gwo_list bdir = do {
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   try Mutil.mkdir_p tmp_dir with _ -> ();
   match link_aux gwo_list tmp_dir bdir with
@@ -1118,7 +1114,11 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       else ();
       lock (Mutil.lock_file out_file.val) with
       [ Accept ->
-          if link (List.rev gwo.val) out_file.val then ()
+          let bdir =
+            if Filename.check_suffix out_file.val ".gwb" then out_file.val
+            else out_file.val ^ ".gwb"
+          in
+          if link (List.rev gwo.val) bdir then ()
           else do {
             eprintf "*** database not created\n";
             flush stderr;
