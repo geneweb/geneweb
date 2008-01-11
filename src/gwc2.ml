@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.60 2008-01-11 10:13:59 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.61 2008-01-11 10:19:38 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -841,20 +841,15 @@ value output_particles_file tmp_dir particles = do {
   close_out oc;
 };
 
-value output_command_line bname =
-  let bdir =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
+value output_command_line bdir = do {
   let oc = open_out (Filename.concat bdir "command.txt") in
-  do {
-    fprintf oc "%s" Sys.argv.(0);
-    for i = 1 to Array.length Sys.argv - 1 do {
-      fprintf oc " %s" Sys.argv.(i)
-    };
-    fprintf oc "\n";
-    close_out oc;
-  }
-;
+  fprintf oc "%s" Sys.argv.(0);
+  for i = 1 to Array.length Sys.argv - 1 do {
+    fprintf oc " %s" Sys.argv.(i)
+  };
+  fprintf oc "\n";
+  close_out oc;
+};
 
 value link gwo_list bname = do {
   let has_separates = List.exists (fun (_, sep, _) -> sep) gwo_list in
@@ -1052,7 +1047,7 @@ value link gwo_list bname = do {
     Mutil.remove_dir old_dir;
     try Unix.rmdir tmp_dir with [ Unix.Unix_error _ _ _ -> () ];
     try Unix.rmdir "gw_tmp" with [ Unix.Unix_error _ _ _ -> () ];
-    output_command_line bname;
+    output_command_line bdir;
   }
   else ();
   not gen.g_error;

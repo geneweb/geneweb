@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.57 2008-01-11 10:13:59 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.58 2008-01-11 10:21:34 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -1030,10 +1030,10 @@ value link gwo_list bname = do {
       Gc.compact ();
       Outbase.output bdir dsk_base;
       output_wizard_notes bdir wiznotes;
-      output_command_line bdir;
       output_particles_file bdir dsk_base.data.particles;
       try Mutil.remove_dir tmp_dir with _ -> ();
       try Unix.rmdir "gw_tmp" with _ -> ();
+      output_command_line bdir;
       True
     }
   | None ->
