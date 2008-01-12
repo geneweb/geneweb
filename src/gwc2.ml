@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.63 2008-01-11 18:42:09 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.64 2008-01-12 08:23:12 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -790,7 +790,7 @@ value insert_comp_families1 gen run (x, separate, shift) = do {
   let srcfile : string = input_value ic in
   try
     while True do {
-      let fam : syntax_o = input_value ic in
+      let fam : gw_syntax = input_value ic in
       insert_gwo_1 gen srcfile fam
     }
   with
@@ -807,7 +807,7 @@ value insert_comp_families2 gen run (x, separate, shift) = do {
   let _ : string = input_value ic in
   try
     while True do {
-      let fam : syntax_o = input_value ic in
+      let fam : gw_syntax = input_value ic in
       insert_gwo_2 gen fam
     }
   with

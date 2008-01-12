@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 5.10 2008-01-08 11:58:46 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 5.11 2008-01-12 08:23:12 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -9,7 +9,7 @@ type key = { pk_first_name : string; pk_surname : string; pk_occ : int };
 
 type somebody = [ Undefined of key | Defined of gen_person iper string ];
 
-type syntax_o =
+type gw_syntax =
   [ Family of gen_couple somebody and sex and sex and
       list (somebody * sex) and gen_family (gen_person iper string) string and
       gen_descend (gen_person iper string)
@@ -907,7 +907,7 @@ value comp_families x =
         let rec loop line encoding =
           match read_family_1 (ic, encoding) x line with
           [ F_some (family, line) ->
-              do { output_value oc (family : syntax_o); loop line encoding }
+              do { output_value oc (family : gw_syntax); loop line encoding }
           | F_enc_utf_8 ->
               loop (read_line (ic, E_utf_8)) E_utf_8
           | F_none -> ()

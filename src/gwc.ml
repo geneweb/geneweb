@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.59 2008-01-11 18:42:09 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.60 2008-01-12 08:23:12 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Dbdisk;
@@ -698,7 +698,7 @@ value insert_comp_families gen run (x, separate, shift) =
     let src : string = input_value ic in
     try
       while True do {
-        let fam : syntax_o = input_value ic in insert_syntax src gen fam
+        let fam : gw_syntax = input_value ic in insert_syntax src gen fam
       }
     with
     [ End_of_file -> close_in ic ]
