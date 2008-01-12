@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.64 2008-01-12 08:23:12 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.65 2008-01-12 19:23:02 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -30,7 +30,8 @@ type gen =
   { g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
-    g_current_file : mutable string;
+    g_curr_gwo_file : mutable string;
+    g_curr_src_file : mutable string;
     g_error : mutable bool;
     g_error_cnt : mutable int;
     g_warning_cnt : mutable int;
@@ -437,7 +438,7 @@ value find_first_available_occ gen so fn sn =
         gen.g_warning_cnt := gen.g_warning_cnt - 1;
         if gen.g_warning_cnt > 0 then do {
           eprintf "Warning: %s: %s.%d %s renumbered %d\n"
-            gen.g_current_file so.first_name so.occ so.surname occ;
+            gen.g_curr_gwo_file so.first_name so.occ so.surname occ;
           flush stderr;
         }
         else ();
@@ -461,7 +462,7 @@ value insert_person1 gen so = do {
         ignore (key_hashtbl_find gen.g_index_of_key k : iper);
       gen.g_error_cnt := gen.g_error_cnt - 1;
       if gen.g_error_cnt > 0 then do {
-        eprintf "File \"%s\"\n" gen.g_current_file;
+        eprintf "File \"%s\"\n" gen.g_curr_gwo_file;
         eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
           so.surname
       }
@@ -781,39 +782,44 @@ value insert_gwo_2 gen =
   | Wnotes wizid str -> () ]
 ;
 
-value insert_comp_families1 gen run (x, separate, shift) = do {
-  run ();
-  gen.g_current_file := x;
-  gen.g_separate := separate;
-  let ic = open_in_bin x in
-  check_magic x ic;
-  let srcfile : string = input_value ic in
-  try
-    while True do {
-      let fam : gw_syntax = input_value ic in
-      insert_gwo_1 gen srcfile fam
-    }
-  with
-  [ End_of_file -> close_in ic ];
-  gen.g_sep_file_inx := gen.g_sep_file_inx + 1;
-};
-
-value insert_comp_families2 gen run (x, separate, shift) = do {
-  run ();
-  gen.g_current_file := x;
-  gen.g_separate := separate;
-  let ic = open_in_bin x in
-  check_magic x ic;
-  let _ : string = input_value ic in
-  try
-    while True do {
-      let fam : gw_syntax = input_value ic in
-      insert_gwo_2 gen fam
-    }
-  with
-  [ End_of_file -> close_in ic ];
-  gen.g_sep_file_inx := gen.g_sep_file_inx + 1;
-};
+value next_family_fun gen run gwo_list =
+  let ic_opt = ref None in
+  let gwo_list = ref gwo_list in
+  fun () ->
+    loop () where rec loop () =
+      let r =
+        match ic_opt.val with
+        [ Some ic ->
+            match
+              try Some (input_value ic : gw_syntax) with
+              [ End_of_file -> None ]
+            with
+            [ Some fam -> Some fam
+            | None -> do {
+                close_in ic;
+                ic_opt.val := None;
+                gen.g_sep_file_inx := gen.g_sep_file_inx + 1;
+                None
+              } ]
+        | None -> None ]
+      in
+      match r with
+      [ Some fam -> Some fam
+      | None ->
+          match gwo_list.val with
+          [ [(x, separate, shift) :: rest] -> do {
+              run ();
+              gwo_list.val := rest;
+              let ic = open_in_bin x in
+              check_magic x ic;
+              gen.g_curr_src_file := input_value ic;
+              gen.g_curr_gwo_file := x;
+              gen.g_separate := separate;
+              ic_opt.val := Some ic;
+              loop ();
+            }
+          | [] -> None ] ]
+;
 
 value just_comp = ref False;
 value out_file = ref (Filename.concat Filename.current_dir_name "a");
@@ -907,7 +913,8 @@ value link gwo_list bdir = do {
   }
   in
   let gen =
-    {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_current_file = "";
+    {g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
+     g_curr_gwo_file = ""; g_curr_src_file = "";
      g_error = False; g_error_cnt = max_errors + 1;
      g_warning_cnt = max_warnings + 1;
      g_separate = False; g_sep_file_inx = 0;
@@ -947,7 +954,11 @@ value link gwo_list bdir = do {
     }
   in
   gen.g_sep_file_inx := 0;
-  List.iter (insert_comp_families1 gen run) gwo_list;
+  let next_family = next_family_fun gen run gwo_list in
+  loop () where rec loop () =
+    match next_family () with
+    [ Some fam -> do { insert_gwo_1 gen gen.g_curr_src_file fam; loop () }
+    | None -> () ];
 
   if ngwo < 10 || not Mutil.verbose.val then ()
   else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
@@ -974,7 +985,11 @@ value link gwo_list bdir = do {
     }
   in
   gen.g_sep_file_inx := 0;
-  List.iter (insert_comp_families2 gen run) gwo_list;
+  let next_family = next_family_fun gen run gwo_list in
+  loop () where rec loop () =
+    match next_family () with
+    [ Some fam -> do { insert_gwo_2 gen fam; loop () }
+    | None -> () ];
   if ngwo < 10 || not Mutil.verbose.val then ()
   else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
   else ProgrBar.finish ();
