@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: relation.ml,v 5.21 2008-01-09 03:15:10 ddr Exp $ *)
+(* $Id: relation.ml,v 5.22 2008-01-12 01:49:50 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 DEFINE OLD;
@@ -832,18 +832,19 @@ value print_link_name conf base n p1 p2 sol =
         (s, sp1, sp2)
     in
     let s =
-      match pp2 with
-      [ Some _ ->
-          transl_a_of_gr_eq_gen_lev conf
-            (transl_nth conf "the spouse" (index_of_sex (get_sex p2))) s
-      | None -> s ]
+      if sp2 then
+        transl_a_of_gr_eq_gen_lev conf
+          (transl_nth conf "the spouse" (index_of_sex (get_sex p2))) s
+      else s
     in
     let s =
-      match pp1 with
-      [ Some pp1 ->
-          transl_a_of_gr_eq_gen_lev conf s
-            (transl_nth conf "the spouse" (index_of_sex (get_sex pp1)))
-      | None -> s ]
+      if sp1 then
+        match pp1 with
+        [ Some pp1 ->
+            transl_a_of_gr_eq_gen_lev conf s
+              (transl_nth conf "the spouse" (index_of_sex (get_sex pp1)))
+        | None -> s ]
+      else s
     in
     let s1 = "<strong>" ^ std_color conf s ^ "</strong>" in
     let s2 =
