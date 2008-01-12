@@ -119,19 +119,20 @@ gutil.cmx: adef.cmx buff.cmx checkItem.cmx def.cmi gwdb.cmx mutil.cmx \
     name.cmx gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
-    futil.cmi gwcomp.cmo gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
+    futil.cmi gwcomp.cmi gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
     notesLinks.cmi outbase.cmi progrBar.cmi secure.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi \
     futil.cmx gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
     notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
-gwc2.cmo: adef.cmi argl.cmo db2.cmi db2out.cmi def.cmi futil.cmi gwcomp.cmo \
+gwc2.cmo: adef.cmi argl.cmo db2.cmi db2out.cmi def.cmi futil.cmi gwcomp.cmi \
     iochan.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi notesLinks.cmi \
     progrBar.cmi secure.cmi 
 gwc2.cmx: adef.cmx argl.cmx db2.cmx db2out.cmx def.cmi futil.cmx gwcomp.cmx \
     iochan.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx notesLinks.cmx \
     progrBar.cmx secure.cmx 
-gwcomp.cmo: adef.cmi calendar.cmi def.cmi mutil.cmi 
-gwcomp.cmx: adef.cmx calendar.cmx def.cmi mutil.cmx 
+gwcomp.cmo: adef.cmi calendar.cmi def.cmi mutil.cmi gwcomp.cmi 
+gwcomp.cmx: adef.cmx calendar.cmx def.cmi mutil.cmx gwcomp.cmi 
+gwcomp.cmi: def.cmi 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
     gutil.cmi hutil.cmi image.cmo lock.cmi mutil.cmi name.cmi \
     relationLink.cmi request.cmi robot.cmo secure.cmi srcfile.cmi util.cmi \
