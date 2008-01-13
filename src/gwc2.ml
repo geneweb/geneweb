@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.65 2008-01-12 19:23:02 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.66 2008-01-13 06:43:21 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -26,18 +26,22 @@ type file_field 'a =
     valu : 'a -> Obj.t }
 ;
 
+type file_info =
+  { f_curr_src_file : mutable string;
+    f_curr_gwo_file : mutable string;
+    f_separate : mutable bool;
+    f_has_separates : mutable bool;
+    f_sep_file_inx : mutable int }
+;
+
 type gen =
   { g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
-    g_curr_gwo_file : mutable string;
-    g_curr_src_file : mutable string;
+    g_file_info : file_info;
     g_error : mutable bool;
     g_error_cnt : mutable int;
     g_warning_cnt : mutable int;
-    g_separate : mutable bool;
-    g_sep_file_inx : mutable int;
-    g_has_separates : bool;
     g_first_av_occ : Hashtbl.t (Adef.istr * Adef.istr) int;
 
     g_tmp_dir : string;
@@ -45,7 +49,7 @@ type gen =
 
     g_strings : Hashtbl.t string Adef.istr;
     g_index_of_key : Hashtbl.t Db2.key2 iper;
-    g_occ_of_key : array (Hashtbl.t Db2.key2 int);
+    g_occ_of_key : mutable array (Hashtbl.t Db2.key2 int);
     g_person_fields : list (file_field (gen_person iper string));
     g_family_fields : list (file_field family);
     g_person_parents : (Iochan.t * out_channel);
@@ -422,6 +426,18 @@ value empty_person =
 value key_hashtbl_add ht k v = Hashtbl.add ht (Db2.key2_of_key k) v;
 value key_hashtbl_find ht k = Hashtbl.find ht (Db2.key2_of_key k);
 
+value occ_of_key_ht gen = do {
+  let i = gen.g_file_info.f_sep_file_inx in
+  let len = Array.length gen.g_occ_of_key in
+  if i >= len then
+    let new_len = max (i + 1) (2 * len + 1) in
+    gen.g_occ_of_key :=
+      Array.append gen.g_occ_of_key
+        (Array.init (new_len - len) (fun _ -> Hashtbl.create 1))
+  else ();
+  gen.g_occ_of_key.(i)
+};
+
 value find_first_available_occ gen so fn sn =
   let occ =
     try Hashtbl.find gen.g_first_av_occ (fn, sn) with
@@ -438,12 +454,12 @@ value find_first_available_occ gen so fn sn =
         gen.g_warning_cnt := gen.g_warning_cnt - 1;
         if gen.g_warning_cnt > 0 then do {
           eprintf "Warning: %s: %s.%d %s renumbered %d\n"
-            gen.g_curr_gwo_file so.first_name so.occ so.surname occ;
+            gen.g_file_info.f_curr_gwo_file so.first_name so.occ
+            so.surname occ;
           flush stderr;
         }
         else ();
-        key_hashtbl_add gen.g_occ_of_key.(gen.g_sep_file_inx)
-          (fn, sn, so.occ) occ;
+        key_hashtbl_add (occ_of_key_ht gen) (fn, sn, so.occ) occ;
         Hashtbl.replace gen.g_first_av_occ (fn, sn) occ;
         occ;
       } ]
@@ -455,14 +471,13 @@ value insert_person1 gen so = do {
     let sn = unique_key_string gen so.surname in
     let k = (fn, sn, so.occ) in
     try do {
-      if gen.g_separate then
-        ignore
-          (key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx) k : int)
+      if gen.g_file_info.f_separate then
+        ignore (key_hashtbl_find (occ_of_key_ht gen) k : int)
       else
         ignore (key_hashtbl_find gen.g_index_of_key k : iper);
       gen.g_error_cnt := gen.g_error_cnt - 1;
       if gen.g_error_cnt > 0 then do {
-        eprintf "File \"%s\"\n" gen.g_curr_gwo_file;
+        eprintf "File \"%s\"\n" gen.g_file_info.f_curr_gwo_file;
         eprintf "Error: already defined %s.%d %s\n" so.first_name so.occ
           so.surname
       }
@@ -473,7 +488,7 @@ value insert_person1 gen so = do {
     with
     [ Not_found -> do {
         let (k, so) =
-          if gen.g_separate then
+          if gen.g_file_info.f_separate then
             let occ = find_first_available_occ gen so fn sn in
             ((fn, sn, occ), {(so) with occ = occ})
           else (k, so)
@@ -501,7 +516,7 @@ value insert_undefined2 gen key fn sn sex = do {
     key_hashtbl_add gen.g_index_of_key (fn, sn, key.pk_occ)
       (Adef.iper_of_int gen.g_pcnt)
   else ();
-  if gen.g_has_separates then do {
+  if gen.g_file_info.f_has_separates then do {
     gen.g_error_cnt := gen.g_error_cnt - 1;
     if gen.g_error_cnt > 0 then do {
       gen.g_error_cnt := -1;
@@ -546,11 +561,8 @@ value get_person2 gen so sex =
     let fn = unique_key_string gen so.first_name in
     let sn = unique_key_string gen so.surname in
     let occ =
-      if gen.g_separate then
-        try
-          key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx)
-            (fn, sn, so.occ)
-        with
+      if gen.g_file_info.f_separate then
+        try key_hashtbl_find (occ_of_key_ht gen) (fn, sn, so.occ) with
         [ Not_found -> so.occ ]
       else so.occ
     in
@@ -582,11 +594,8 @@ value get_undefined2 gen key sex =
   let fn = unique_key_string gen key.pk_first_name in
   let sn = unique_key_string gen key.pk_surname in
   let occ =
-    if gen.g_separate then
-      try
-        key_hashtbl_find gen.g_occ_of_key.(gen.g_sep_file_inx)
-          (fn, sn, key.pk_occ)
-      with
+    if gen.g_file_info.f_separate then
+      try key_hashtbl_find (occ_of_key_ht gen) (fn, sn, key.pk_occ) with
       [ Not_found -> key.pk_occ ]
     else key.pk_occ
   in
@@ -719,7 +728,7 @@ value insert_rparents2 gen sb sex rl = do {
   Iochan.output_binary_int (fst gen.g_person_rparents) pos;
 };
 
-value insert_bnotes1 gen srcfile notesname str = do {
+value insert_bnotes1 gen notesname str = do {
   let nfname =
     if notesname = "" then "notes"
     else
@@ -743,7 +752,7 @@ value insert_bnotes1 gen srcfile notesname str = do {
         ["base_d"; "notes_of.txt"]
     in
     let oc = open_out fname in
-    fprintf oc "%s\n" srcfile;
+    fprintf oc "%s\n" gen.g_file_info.f_curr_src_file;
     close_out oc;
   }
   else ();
@@ -764,12 +773,12 @@ value insert_wiznotes1 gen wizid str = do {
   write_file_contents fname str;
 };
 
-value insert_gwo_1 gen srcfile =
+value insert_gwo_1 gen =
   fun
   [ Family cpl fs ms witl fam des -> insert_family1 gen cpl fs ms witl fam des
   | Notes key str -> ()
   | Relations sb sex rl -> insert_rparents1 gen sb sex rl
-  | Bnotes nfname str -> insert_bnotes1 gen srcfile nfname str
+  | Bnotes nfname str -> insert_bnotes1 gen nfname str
   | Wnotes wizid str -> insert_wiznotes1 gen wizid str ]
 ;
 
@@ -782,9 +791,24 @@ value insert_gwo_2 gen =
   | Wnotes wizid str -> () ]
 ;
 
-value next_family_fun gen run gwo_list =
+value next_family_fun_templ gwo_list fi = do {
+  let ngwo = List.length gwo_list in
+  let run =
+    if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
+    else if ngwo < 60 then
+      fun () -> do { Printf.eprintf "."; flush stderr; }
+    else do {
+      let bar_cnt = ref 0 in
+      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
+      ProgrBar.empty.val := 'o';
+      ProgrBar.full.val := '*';
+      ProgrBar.start ();
+      run
+    }
+  in
   let ic_opt = ref None in
   let gwo_list = ref gwo_list in
+  fi.f_sep_file_inx := 0;
   fun () ->
     loop () where rec loop () =
       let r =
@@ -798,7 +822,7 @@ value next_family_fun gen run gwo_list =
             | None -> do {
                 close_in ic;
                 ic_opt.val := None;
-                gen.g_sep_file_inx := gen.g_sep_file_inx + 1;
+                fi.f_sep_file_inx := fi.f_sep_file_inx + 1;
                 None
               } ]
         | None -> None ]
@@ -812,14 +836,20 @@ value next_family_fun gen run gwo_list =
               gwo_list.val := rest;
               let ic = open_in_bin x in
               check_magic x ic;
-              gen.g_curr_src_file := input_value ic;
-              gen.g_curr_gwo_file := x;
-              gen.g_separate := separate;
+              fi.f_curr_src_file := input_value ic;
+              fi.f_curr_gwo_file := x;
+              fi.f_separate := separate;
+              fi.f_has_separates := fi.f_has_separates || separate;
               ic_opt.val := Some ic;
               loop ();
             }
-          | [] -> None ] ]
-;
+          | [] -> do {
+              if ngwo < 10 || not Mutil.verbose.val then ()
+              else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
+              else ProgrBar.finish ();
+              None
+            } ] ]
+};
 
 value just_comp = ref False;
 value out_file = ref (Filename.concat Filename.current_dir_name "a");
@@ -857,8 +887,7 @@ value output_command_line bdir = do {
   close_out oc;
 };
 
-value link gwo_list bdir = do {
-  let has_separates = List.exists (fun (_, sep, _) -> sep) gwo_list in
+value link next_family_fun bdir = do {
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   Mutil.remove_dir tmp_dir;
   try Mutil.mkdir_p tmp_dir with _ -> ();
@@ -912,20 +941,20 @@ value link gwo_list bdir = do {
      open_out_bin (Filename.concat d "data"))
   }
   in
+  let fi =
+    {f_curr_src_file = ""; f_curr_gwo_file = ""; f_separate = False;
+     f_has_separates = False; f_sep_file_inx = 0}
+  in
   let gen =
-    {g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
-     g_curr_gwo_file = ""; g_curr_src_file = "";
+    {g_pcnt = 0; g_fcnt = 0; g_scnt = 0; g_file_info = fi;
      g_error = False; g_error_cnt = max_errors + 1;
      g_warning_cnt = max_warnings + 1;
-     g_separate = False; g_sep_file_inx = 0;
-     g_has_separates = has_separates;
      g_first_av_occ = Hashtbl.create 1;
      g_tmp_dir = tmp_dir;
      g_particles = input_particles part_file.val;
      g_strings = Hashtbl.create 1;
      g_index_of_key = Hashtbl.create 1;
-     g_occ_of_key =
-       Array.init (List.length gwo_list) (fun _ -> Hashtbl.create 1);
+     g_occ_of_key = [| |];
      g_person_fields = person_fields;
      g_family_fields = family_fields;
      g_person_parents = person_parents;
@@ -934,65 +963,29 @@ value link gwo_list bdir = do {
      g_person_related = person_related;
      g_person_notes = person_notes}
   in
-  let ngwo = List.length gwo_list in
-  if ngwo >= 10 && Mutil.verbose.val then do {
+  if Mutil.verbose.val then do {
     eprintf "pass 1: creating persons...\n";
     flush stderr
   }
   else ();
-  let run =
-    if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
-    else if ngwo < 60 then
-      fun () -> do { Printf.eprintf "."; flush stderr; }
-    else do {
-      let bar_cnt = ref 0 in
-      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
-      ProgrBar.empty.val := 'o';
-      ProgrBar.full.val := '*';
-      ProgrBar.start ();
-      run
-    }
-  in
-  gen.g_sep_file_inx := 0;
-  let next_family = next_family_fun gen run gwo_list in
+  let next_family = next_family_fun fi in
   loop () where rec loop () =
     match next_family () with
-    [ Some fam -> do { insert_gwo_1 gen gen.g_curr_src_file fam; loop () }
+    [ Some fam -> do { insert_gwo_1 gen fam; loop () }
     | None -> () ];
-
-  if ngwo < 10 || not Mutil.verbose.val then ()
-  else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
-  else ProgrBar.finish ();
 
   Gc.compact ();
 
-  if ngwo >= 10 && Mutil.verbose.val then do {
+  if Mutil.verbose.val then do {
     eprintf "pass 2: creating families...\n";
     flush stderr
   }
   else ();
-  let run =
-    if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
-    else if ngwo < 60 then
-      fun () -> do { Printf.eprintf "."; flush stderr; }
-    else do {
-      let bar_cnt = ref 0 in
-      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
-      ProgrBar.empty.val := 'o';
-      ProgrBar.full.val := '*';
-      ProgrBar.start ();
-      run
-    }
-  in
-  gen.g_sep_file_inx := 0;
-  let next_family = next_family_fun gen run gwo_list in
+  let next_family = next_family_fun fi in
   loop () where rec loop () =
     match next_family () with
     [ Some fam -> do { insert_gwo_2 gen fam; loop () }
     | None -> () ];
-  if ngwo < 10 || not Mutil.verbose.val then ()
-  else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
-  else ProgrBar.finish ();
 
   if gen.g_warning_cnt < 0 then do {
     eprintf "Warning: %d more warnings...\n" (-gen.g_warning_cnt);
@@ -1149,7 +1142,8 @@ The database \"%s\" already exists. Use option -f to overwrite it.
             if Filename.check_suffix out_file.val ".gwb" then out_file.val
             else out_file.val ^ ".gwb"
           in
-          if link (List.rev gwo.val) bdir then ()
+          let next_family_fun = next_family_fun_templ (List.rev gwo.val) in
+          if link next_family_fun bdir then ()
           else do {
             eprintf "*** database not created\n";
             flush stderr;
