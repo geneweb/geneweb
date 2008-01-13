@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb2.ml,v 5.4 2008-01-13 20:53:37 ddr Exp $ *)
+(* $Id: ged2gwb2.ml,v 5.5 2008-01-13 22:26:27 ddr Exp $ *)
 (* Copyright (c) 1998-2008 INRIA *)
 
 open Def;
@@ -2324,7 +2324,10 @@ value make_gwsyntax ((pa, aa, ua), (fa, ca, da), sa, g_bnot) = do {
     let (fath, s1) = somebody_of_person def pa sa (Adef.father cpl) in
     let (moth, s2) = somebody_of_person def pa sa (Adef.mother cpl) in
     let cpl = Adef.couple fath moth in
-    let witn = [] in
+    let witn =
+      List.map (somebody_of_person def pa sa)
+        (Array.to_list fa.(ifam).witnesses)
+    in
     let fam =
       let fam = {(fa.(ifam)) with witnesses = [| |]} in
       Futil.map_family_ps (fun p -> failwith "make_gwsyntax 1")
@@ -2334,6 +2337,23 @@ value make_gwsyntax ((pa, aa, ua), (fa, ca, da), sa, g_bnot) = do {
       Futil.map_descend_p (string_person_of_person pa sa) da.(ifam)
     in
     rev_list.val := [Gwcomp.Family cpl s1 s2 witn fam des :: rev_list.val]
+  };
+  for i = 0 to Array.length pa - 1 do {
+    match pa.(i).rparents with
+    [ [] -> ()
+    | rl ->
+        let (x, sex) = somebody_of_person def pa sa (Adef.iper_of_int i) in
+        let rl =
+          List.map
+            (fun r ->
+               Futil.map_relation_ps
+                 (fun ip ->
+                    let (smbd, _) = somebody_of_person def pa sa ip in
+                    smbd)
+                 (fun i -> sa.(Adef.int_of_istr i)) r)
+            rl
+        in
+        rev_list.val := [Gwcomp.Relations x sex rl :: rev_list.val] ];
   };
   List.rev rev_list.val
 };
