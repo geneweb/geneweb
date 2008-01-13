@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb2.ml,v 5.2 2008-01-13 18:41:33 ddr Exp $ *)
+(* $Id: ged2gwb2.ml,v 5.3 2008-01-13 20:21:28 ddr Exp $ *)
 (* Copyright (c) 1998-2008 INRIA *)
 
 open Def;
@@ -2269,11 +2269,19 @@ value somebody_of_person def pa sa ip =
     Futil.map_person_ps (fun p -> failwith "somebody_of_person")
       (fun i -> sa.(Adef.int_of_istr i)) p
   in
-  let pk =
-    {Gwcomp.pk_first_name = p.first_name; pk_surname = p.surname;
-     pk_occ = p.occ}
+  let somebody =
+    if def.(Adef.int_of_iper ip) then
+      let pk =
+        {Gwcomp.pk_first_name = p.first_name; pk_surname = p.surname;
+         pk_occ = p.occ}
+      in
+      Gwcomp.Undefined pk
+    else do {
+      def.(Adef.int_of_iper ip) := True;
+      Gwcomp.Defined p
+    }
   in
-  Gwcomp.Undefined pk
+  (somebody, p.sex)
 ;
 
 value string_person_of_person pa sa ip =
@@ -2291,15 +2299,15 @@ value make_gwsyntax
   let def = Array.create (Array.length pa) False in
   for ifam = 0 to Array.length fa - 1 do {
     let des = da.(ifam) in
-    for i = 0 to Array.length des.children - 1 do { def.(i) := True };
+    for i = 0 to Array.length des.children - 1 do {
+      def.(Adef.int_of_iper des.children.(i)) := True
+    };
   };
   for ifam = 0 to Array.length fa - 1 do {
     let cpl = ca.(ifam) in
-    let fath = somebody_of_person def pa sa (Adef.father cpl) in
-    let moth = somebody_of_person def pa sa (Adef.mother cpl) in
+    let (fath, s1) = somebody_of_person def pa sa (Adef.father cpl) in
+    let (moth, s2) = somebody_of_person def pa sa (Adef.mother cpl) in
     let cpl = Adef.couple fath moth in
-    let s1 = Male in
-    let s2 = Female in
     let witn = [] in
     let fam =
       let fam = {(fa.(ifam)) with witnesses = [| |]} in
