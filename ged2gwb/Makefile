@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.21 2008-01-13 18:14:24 ddr Exp $
+# $Id: Makefile,v 5.22 2008-01-13 18:42:42 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -20,7 +20,7 @@ opt:: ged2gwb.opt ged2gwb2.opt
 	$(STRIP) ged2gwb ged2gwb2
 
 clean::
-	$(RM) ged2gwb
+	$(RM) ged2gwb ged2gwb2
 
 ged2gwb.out: $(OBJS)
 	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma $(LIBUNIX) -I $(CAMLP5D) gramlib.cma $(OBJS) -o ged2gwb.out
