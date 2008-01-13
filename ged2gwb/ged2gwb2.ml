@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb2.ml,v 5.5 2008-01-13 22:26:27 ddr Exp $ *)
+(* $Id: ged2gwb2.ml,v 5.6 2008-01-13 22:28:49 ddr Exp $ *)
 (* Copyright (c) 1998-2008 INRIA *)
 
 open Def;
@@ -2347,9 +2347,7 @@ value make_gwsyntax ((pa, aa, ua), (fa, ca, da), sa, g_bnot) = do {
           List.map
             (fun r ->
                Futil.map_relation_ps
-                 (fun ip ->
-                    let (smbd, _) = somebody_of_person def pa sa ip in
-                    smbd)
+                 (fun ip -> fst (somebody_of_person def pa sa ip))
                  (fun i -> sa.(Adef.int_of_istr i)) r)
             rl
         in
