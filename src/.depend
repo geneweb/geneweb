@@ -81,6 +81,11 @@ db2disk.cmo: adef.cmi buff.cmo db2.cmi def.cmi iovalue.cmi mutil.cmi \
 db2disk.cmx: adef.cmx buff.cmx db2.cmx def.cmi iovalue.cmx mutil.cmx \
     name.cmx secure.cmx db2disk.cmi 
 db2disk.cmi: adef.cmi def.cmi 
+db2link.cmo: adef.cmi db2.cmi db2out.cmi def.cmi futil.cmi gwcomp.cmi \
+    iochan.cmi iovalue.cmi mutil.cmi name.cmi notesLinks.cmi db2link.cmi 
+db2link.cmx: adef.cmx db2.cmx db2out.cmx def.cmi futil.cmx gwcomp.cmx \
+    iochan.cmx iovalue.cmx mutil.cmx name.cmx notesLinks.cmx db2link.cmi 
+db2link.cmi: gwcomp.cmi 
 db2out.cmo: db2.cmi def.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi \
     progrBar.cmi db2out.cmi 
 db2out.cmx: db2.cmx def.cmi futil.cmx iovalue.cmx mutil.cmx name.cmx \
@@ -124,12 +129,10 @@ gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi \
     futil.cmx gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
     notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
-gwc2.cmo: adef.cmi argl.cmo db2.cmi db2out.cmi def.cmi futil.cmi gwcomp.cmi \
-    iochan.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi notesLinks.cmi \
-    progrBar.cmi secure.cmi 
-gwc2.cmx: adef.cmx argl.cmx db2.cmx db2out.cmx def.cmi futil.cmx gwcomp.cmx \
-    iochan.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx notesLinks.cmx \
-    progrBar.cmx secure.cmx 
+gwc2.cmo: argl.cmo db2link.cmi gwcomp.cmi lock.cmi mutil.cmi progrBar.cmi \
+    secure.cmi 
+gwc2.cmx: argl.cmx db2link.cmx gwcomp.cmx lock.cmx mutil.cmx progrBar.cmx \
+    secure.cmx 
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi mutil.cmi gwcomp.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi mutil.cmx gwcomp.cmi 
 gwcomp.cmi: def.cmi 
