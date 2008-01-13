@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb2.ml,v 5.3 2008-01-13 20:21:28 ddr Exp $ *)
+(* $Id: ged2gwb2.ml,v 5.4 2008-01-13 20:53:37 ddr Exp $ *)
 (* Copyright (c) 1998-2008 INRIA *)
 
 open Def;
@@ -358,6 +358,27 @@ value check_month m =
     flush log_oc.val
   }
   else ()
+;
+
+value warning_month_number_dates () =
+  match month_number_dates.val with
+  [ MonthNumberHappened s ->
+      do {
+        fprintf log_oc.val "
+  Warning: the file holds dates with numbered months (like: 12/05/1912).
+
+  GEDCOM standard *requires* that months in dates be identifiers. The
+  correct form for this example would be 12 MAY 1912 or 5 DEC 1912.
+
+  Consider restarting with option \"-dates_dm\" or \"-dates_md\".
+  Use option -help to see what they do.
+
+  (example found in gedcom: \"%s\")
+"
+          s;
+        flush log_oc.val
+      }
+  | _ -> () ]
 ;
 
 (* Decoding fields *)
@@ -2289,12 +2310,7 @@ value string_person_of_person pa sa ip =
     pa.(Adef.int_of_iper ip)
 ;
 
-value make_gwsyntax
-  (((pa, aa, ua) : (array person * array ascend * array union)),
-   ((fa, ca, da) : (array family * array couple * array descend)),
-   (sa : array string),
-   (g_bnot : string)) :
-    list Gwcomp.gw_syntax = do  {
+value make_gwsyntax ((pa, aa, ua), (fa, ca, da), sa, g_bnot) = do {
   let rev_list = ref [] in
   let def = Array.create (Array.length pa) False in
   for ifam = 0 to Array.length fa - 1 do {
@@ -2471,11 +2487,14 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       exit 2
     }
     else ();
-    let arrays = make_arrays in_file.val in
-    Gc.compact ();
-    let arrays = make_subarrays arrays in
-    flush log_oc.val;
-    let gw_syntax = make_gwsyntax arrays in
+    let gw_syntax = do {
+      let arrays = make_arrays in_file.val in
+      Gc.compact ();
+      let arrays = make_subarrays arrays in
+      flush log_oc.val;
+      make_gwsyntax arrays
+    }
+    in
     lock Mutil.lock_file out_file.val with
     [ Accept ->
         let next_family_fun = next_family_fun_templ gw_syntax in_file.val in
@@ -2491,22 +2510,9 @@ The database \"%s\" already exists. Use option -f to overwrite it.
         exit 2
       } ];
 (*
-    let base = make_base arrays bdir in
     finish_base base arrays;
-    lock Mutil.lock_file out_file.val with
-    [ Accept ->
-        do {
-          Outbase.output out_file.val base;
-          output_command_line out_file.val
-        }
-    | Refuse ->
-        do {
-          printf "Base is locked: cannot write it\n";
-          flush stdout;
-          exit 2
-        } ];
-    warning_month_number_dates ();
 *)
+    warning_month_number_dates ();
     if log_oc.val != stdout then close_out log_oc.val else ()
   }
 ;
