@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb2.ml,v 5.1 2008-01-13 18:14:24 ddr Exp $ *)
+(* $Id: ged2gwb2.ml,v 5.2 2008-01-13 18:41:33 ddr Exp $ *)
 (* Copyright (c) 1998-2008 INRIA *)
 
 open Def;
@@ -2260,18 +2260,25 @@ value make_subarrays (g_per, g_fam, g_str, g_bnot) =
   (persons, families, strings, g_bnot)
 ;
 
-value somebody_of_person pa sa ip =
+(* Converting to Gwcomp.gw_syntax *)
+
+value somebody_of_person def pa sa ip =
   let p = pa.(Adef.int_of_iper ip) in
   let p =
+    let p = {(p) with rparents = []} in
     Futil.map_person_ps (fun p -> failwith "somebody_of_person")
       (fun i -> sa.(Adef.int_of_istr i)) p
   in
-  Gwcomp.Defined p
+  let pk =
+    {Gwcomp.pk_first_name = p.first_name; pk_surname = p.surname;
+     pk_occ = p.occ}
+  in
+  Gwcomp.Undefined pk
 ;
 
 value string_person_of_person pa sa ip =
-  let p = pa.(Adef.int_of_iper ip) in
-  Futil.map_person_ps (fun p -> p) (fun i -> sa.(Adef.int_of_istr i)) p
+  Futil.map_person_ps (fun p -> p) (fun i -> sa.(Adef.int_of_istr i))
+    pa.(Adef.int_of_iper ip)
 ;
 
 value make_gwsyntax
@@ -2281,23 +2288,44 @@ value make_gwsyntax
    (g_bnot : string)) :
     list Gwcomp.gw_syntax = do  {
   let rev_list = ref [] in
-  for ifam = 0 to 0 (* Array.length fa - 1 *) do {
+  let def = Array.create (Array.length pa) False in
+  for ifam = 0 to Array.length fa - 1 do {
+    let des = da.(ifam) in
+    for i = 0 to Array.length des.children - 1 do { def.(i) := True };
+  };
+  for ifam = 0 to Array.length fa - 1 do {
     let cpl = ca.(ifam) in
-    let fath = somebody_of_person pa sa (Adef.father cpl) in
-    let moth = somebody_of_person pa sa (Adef.mother cpl) in
+    let fath = somebody_of_person def pa sa (Adef.father cpl) in
+    let moth = somebody_of_person def pa sa (Adef.mother cpl) in
     let cpl = Adef.couple fath moth in
     let s1 = Male in
     let s2 = Female in
     let witn = [] in
     let fam =
+      let fam = {(fa.(ifam)) with witnesses = [| |]} in
       Futil.map_family_ps (fun p -> failwith "make_gwsyntax 1")
-        (fun i -> sa.(Adef.int_of_istr i)) fa.(ifam)
+        (fun i -> sa.(Adef.int_of_istr i)) fam
     in
-    let des = Futil.map_descend_p (string_person_of_person pa sa) da.(ifam) in
+    let des =
+      Futil.map_descend_p (string_person_of_person pa sa) da.(ifam)
+    in
     rev_list.val := [Gwcomp.Family cpl s1 s2 witn fam des :: rev_list.val]
   };
   List.rev rev_list.val
 };
+
+(* Providing gw_syntax stream *)
+
+value next_family_fun_templ gw_syntax in_file fi = do {
+  fi.Db2link.f_curr_gwo_file := in_file;
+  let gw_syntax = ref gw_syntax in
+  fun () ->
+    match gw_syntax.val with
+    [ [x :: l] -> do { gw_syntax.val := l; Some x }
+    | [] -> None ]
+};
+
+(* Main *)
 
 value set_undefined_death_interval s =
   try
@@ -2319,19 +2347,6 @@ value set_undefined_death_interval s =
   [ Stream.Error _ -> raise (Arg.Bad "bad parameter for -udi")
   | e -> raise e ]
 ;
-
-(* Providing gw_syntax stream *)
-
-value next_family_fun_templ gw_syntax in_file fi = do {
-  fi.Db2link.f_curr_gwo_file := in_file;
-  let gw_syntax = ref gw_syntax in
-  fun () ->
-    match gw_syntax.val with
-    [ [x :: l] -> do { gw_syntax.val := l; Some x }
-    | [] -> None ]
-};
-
-(* Main *)
 
 value out_file = ref "a";
 value speclist =
