@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.61 2008-01-14 12:42:01 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.62 2008-01-14 15:01:47 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp;
@@ -66,6 +66,8 @@ type gen =
     g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
+    g_curr_src_file : mutable string;
+    g_curr_gwo_file : mutable string;
     g_base : cbase;
     g_wiznotes : mutable list (string * string);
     g_patch_p : Hashtbl.t int person;
@@ -926,6 +928,66 @@ value output_command_line bdir = do {
   close_out oc;
 };
 
+value next_family_fun_templ gwo_list gen = do {
+  let ngwo = List.length gwo_list in
+  let run =
+    if ngwo < 10 then fun () -> ()
+    else if ngwo < 60 then
+      fun () -> do { Printf.eprintf "."; flush stderr; }
+    else do {
+      let bar_cnt = ref 0 in
+      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
+      ProgrBar.empty.val := 'o';
+      ProgrBar.full.val := '*';
+      ProgrBar.start ();
+      run
+    }
+  in
+  let ic_opt = ref None in
+  let gwo_list = ref gwo_list in
+  fun () ->
+    loop () where rec loop () =
+      let r =
+        match ic_opt.val with
+        [ Some ic ->
+            match
+              try Some (input_value ic : gw_syntax) with
+              [ End_of_file -> None ]
+            with
+            [ Some fam -> Some fam
+            | None -> do {
+                close_in ic;
+                ic_opt.val := None;
+                None
+              } ]
+        | None -> None ]
+      in
+      match r with
+      [ Some fam -> Some fam
+      | None ->
+          match gwo_list.val with
+          [ [(x, separate, shift) :: rest] -> do {
+              run ();
+              gwo_list.val := rest;
+              let ic = open_in_bin x in
+              check_magic x ic;
+              gen.g_curr_src_file := input_value ic;
+              gen.g_curr_gwo_file := x;
+              gen.g_separate := separate;
+              gen.g_shift := shift;
+              Hashtbl.clear gen.g_local_names;
+              ic_opt.val := Some ic;
+              loop ()
+            }
+          | [] -> do {
+              if ngwo < 10 then ()
+              else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
+              else ProgrBar.finish ();
+              None
+            } ] ]
+};
+
+
 value link gwo_list bdir = do {
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   try Mutil.mkdir_p tmp_dir with _ -> ();
@@ -936,8 +998,8 @@ value link gwo_list bdir = do {
   let gen =
     {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
      g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
-     g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 20011;
-     g_wiznotes = [];
+     g_scnt = 0; g_curr_src_file = ""; g_curr_gwo_file = "";
+     g_base = empty_base; g_patch_p = Hashtbl.create 20011; g_wiznotes = [];
      g_def = [| |]; g_separate = False; g_shift = 0;
      g_first_av_occ = Hashtbl.create 1; g_errored = False;
      g_per_index = open_out_bin tmp_per_index;
@@ -957,24 +1019,11 @@ value link gwo_list bdir = do {
   IFDEF UNIX THEN Sys.remove tmp_per ELSE () END;
   IFDEF UNIX THEN Sys.remove tmp_fam_index ELSE () END;
   IFDEF UNIX THEN Sys.remove tmp_fam ELSE () END;
-  let ngwo = List.length gwo_list in
-  let run =
-    if ngwo < 10 then fun () -> ()
-    else if ngwo < 60 then
-      fun () -> do { Printf.eprintf "."; flush stderr; }
-    else do {
-      let bar_cnt = ref 0 in
-      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
-      ProgrBar.empty.val := 'o';
-      ProgrBar.full.val := '*';
-      ProgrBar.start ();
-      run
-    }
-  in
-  List.iter (insert_comp_families gen run) gwo_list;
-  if ngwo < 10 then ()
-  else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
-  else ProgrBar.finish ();
+  let next_family = next_family_fun_templ gwo_list gen in
+  loop () where rec loop () =
+    match next_family () with
+    [ Some fam -> do { insert_syntax gen.g_curr_src_file gen fam; loop () }
+    | None -> () ];
   close_out gen.g_per_index;
   close_out gen.g_per;
   close_out gen.g_fam_index;
