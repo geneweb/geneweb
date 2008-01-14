@@ -1,10 +1,10 @@
-# $Id: Makefile,v 5.49 2008-01-13 13:31:46 ddr Exp $
+# $Id: Makefile,v 5.50 2008-01-14 16:04:10 ddr Exp $
 
 include ../tools/Makefile.inc
 
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
-GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo gwc.cmo
+GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo db1link.cmo gwc.cmo
 GWC2_OBJS=calendar.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwcomp.cmo argl.cmo lock.cmo progrBar.cmo secure.cmo iochan.cmo futil.cmo db2.cmo db2out.cmo notesLinks.cmo db2link.cmo gwc2.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo progrBar.cmo database.cmo db2.cmo db2disk.cmo db2out.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
 GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo hutil.cmo date.cmo update.cmo wiki.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
