@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.65 2008-01-14 16:28:55 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.66 2008-01-14 16:47:00 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp;
@@ -25,7 +25,7 @@ value check_magic =
 value next_family_fun_templ gwo_list fi = do {
   let ngwo = List.length gwo_list in
   let run =
-    if ngwo < 10 then fun () -> ()
+    if ngwo < 10 || not Mutil.verbose.val then fun () -> ()
     else if ngwo < 60 then
       fun () -> do { Printf.eprintf "."; flush stderr; }
     else do {
@@ -74,7 +74,7 @@ value next_family_fun_templ gwo_list fi = do {
               loop ();
             }
           | [] -> do {
-              if ngwo < 10 then ()
+              if ngwo < 10 || not Mutil.verbose.val then ()
               else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
               else ProgrBar.finish ();
               None
@@ -106,7 +106,9 @@ value speclist =
      <file> Particles file (default = predefined particles)");
    ("-mem", Arg.Set Outbase.save_mem, " Save memory, but slower");
    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
-   ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.")]
+   ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.");
+   ("-q", Arg.Clear Mutil.verbose, " no verbose");
+   ("-v", Arg.Set Mutil.verbose, " verbose")]
 ;
 
 value anonfun x =
@@ -131,6 +133,7 @@ and [options] are:"
 
 value main () =
   do {
+    Mutil.verbose.val := False;
     Argl.parse speclist anonfun errmsg;
     Secure.set_base_dir (Filename.dirname out_file.val);
     let gwo = ref [] in
