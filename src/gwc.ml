@@ -1,12 +1,34 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.60 2008-01-12 08:23:12 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.61 2008-01-14 12:42:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
+
+open Gwcomp;
+open Printf;
+
+value default_source = ref "";
+
+value check_magic =
+  let b = String.create (String.length magic_gwo) in
+  fun fname ic ->
+    do {
+      really_input ic b 0 (String.length b);
+      if b <> magic_gwo then
+        if String.sub magic_gwo 0 4 = String.sub b 0 4 then
+          failwith
+            ("\"" ^ fname ^ "\" is a GeneWeb object file, but not compatible")
+        else
+          failwith
+            ("\"" ^ fname ^
+               "\" is not a GeneWeb object file, or it is a very old version")
+      else ()
+    }
+;
+
+(**)
 
 open Dbdisk;
 open Def;
-open Gwcomp;
 open Mutil;
-open Printf;
 
 type person = dsk_person;
 type ascend = dsk_ascend;
@@ -78,8 +100,6 @@ value set_warning base =
       } ]
 ;
 
-value default_source = ref "";
-
 value poi base i = base.c_persons.(Adef.int_of_iper i);
 value aoi base i = base.c_ascends.(Adef.int_of_iper i);
 value uoi base i = base.c_unions.(Adef.int_of_iper i);
@@ -104,23 +124,6 @@ value input_item_value ic =
 value output_item_value = Iovalue.output;
 value input_item_value = Iovalue.input;
 (**)
-
-value check_magic =
-  let b = String.create (String.length magic_gwo) in
-  fun fname ic ->
-    do {
-      really_input ic b 0 (String.length b);
-      if b <> magic_gwo then
-        if String.sub magic_gwo 0 4 = String.sub b 0 4 then
-          failwith
-            ("\"" ^ fname ^ "\" is a GeneWeb object file, but not compatible")
-        else
-          failwith
-            ("\"" ^ fname ^
-               "\" is not a GeneWeb object file, or it is a very old version")
-      else ()
-    }
-;
 
 value no_string gen = "";
 
@@ -705,12 +708,9 @@ value insert_comp_families gen run (x, separate, shift) =
   }
 ;
 
-value just_comp = ref False;
 value do_check = ref True;
-value out_file = ref (Filename.concat Filename.current_dir_name "a");
-value force = ref False;
-value do_consang = ref False;
 value pr_stats = ref False;
+value do_consang = ref False;
 
 value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;
@@ -888,98 +888,6 @@ value fold_option fsome vnone =
   | None -> vnone ]
 ;
 
-value link_aux gwo_list tmp_dir bdir =
-  let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
-  let tmp_per = Filename.concat tmp_dir "gwc_per" in
-  let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
-  let tmp_fam = Filename.concat tmp_dir "gwc_fam" in
-  do {
-    let gen =
-      {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
-       g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
-       g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 20011;
-       g_wiznotes = [];
-       g_def = [| |]; g_separate = False; g_shift = 0;
-       g_first_av_occ = Hashtbl.create 1; g_errored = False;
-       g_per_index = open_out_bin tmp_per_index;
-       g_per = open_out_bin tmp_per;
-       g_fam_index = open_out_bin tmp_fam_index;
-       g_fam = open_out_bin tmp_fam }
-    in
-    let per_index_ic = open_in_bin tmp_per_index in
-    let per_ic = open_in_bin tmp_per in
-    let fam_index_ic = open_in_bin tmp_fam_index in
-    let fam_ic = open_in_bin tmp_fam in
-    let istr_empty = unique_string gen "" in
-    let istr_quest = unique_string gen "?" in
-    assert (istr_empty = Adef.istr_of_int 0);
-    assert (istr_quest = Adef.istr_of_int 1);
-    IFDEF UNIX THEN Sys.remove tmp_per_index ELSE () END;
-    IFDEF UNIX THEN Sys.remove tmp_per ELSE () END;
-    IFDEF UNIX THEN Sys.remove tmp_fam_index ELSE () END;
-    IFDEF UNIX THEN Sys.remove tmp_fam ELSE () END;
-    let ngwo = List.length gwo_list in
-    let run =
-      if ngwo < 10 then fun () -> ()
-      else if ngwo < 60 then
-        fun () -> do { Printf.eprintf "."; flush stderr; }
-      else do {
-        let bar_cnt = ref 0 in
-        let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
-        ProgrBar.empty.val := 'o';
-        ProgrBar.full.val := '*';
-        ProgrBar.start ();
-        run
-      }
-    in
-    List.iter (insert_comp_families gen run) gwo_list;
-    if ngwo < 10 then ()
-    else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
-    else ProgrBar.finish ();
-    close_out gen.g_per_index;
-    close_out gen.g_per;
-    close_out gen.g_fam_index;
-    close_out gen.g_fam;
-    Hashtbl.clear gen.g_strings;
-    Hashtbl.clear gen.g_names;
-    Hashtbl.clear gen.g_local_names;
-    Gc.compact ();
-    let dsk_base =
-      linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir
-    in
-    Hashtbl.clear gen.g_patch_p;
-    let base = Gwdb.base_of_base1 dsk_base in
-    if do_check.val && gen.g_pcnt > 0 then do {
-      let changed_p (ip, p, o_sex, o_rpar) =
-        let p = Gwdb.dsk_person_of_person p in
-        let p =
-          {(p) with
-           sex = fold_option (fun s -> s) p.sex o_sex;
-           rparents =
-             fold_option
-               (List.map
-                  (Futil.map_relation_ps (fun p -> p)
-                     (fun s -> Adef.istr_of_int 0)))
-               p.rparents o_rpar}
-        in
-        let i = Adef.int_of_iper ip in
-        Hashtbl.replace gen.g_patch_p i p
-      in
-      Check.check_base base (set_error base gen) (set_warning base)
-        (fun i -> gen.g_def.(i)) changed_p pr_stats.val;
-      flush stdout;
-    }
-    else ();
-    if not gen.g_errored then do {
-      if do_consang.val then
-        let _ : option _ = ConsangAll.compute base True False in ()
-        else ();
-      Some (dsk_base, gen.g_wiznotes)
-    }
-    else None;
-  }
-;
-
 value write_file_contents fname text =
   let oc = open_out fname in
   do {
@@ -1002,6 +910,12 @@ value output_wizard_notes bdir wiznotes = do {
   }
 };
 
+value output_particles_file bdir particles = do {
+  let oc = open_out (Filename.concat bdir "particles.txt") in
+  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
+  close_out oc;
+};
+
 value output_command_line bdir = do {
   let oc = open_out (Filename.concat bdir "command.txt") in
   fprintf oc "%s" Sys.argv.(0);
@@ -1012,30 +926,110 @@ value output_command_line bdir = do {
   close_out oc;
 };
 
-value output_particles_file bdir particles = do {
-  let oc = open_out (Filename.concat bdir "particles.txt") in
-  List.iter (fun s -> fprintf oc "%s\n" (Mutil.tr ' ' '_' s)) particles;
-  close_out oc;
-};
-
 value link gwo_list bdir = do {
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   try Mutil.mkdir_p tmp_dir with _ -> ();
-  match link_aux gwo_list tmp_dir bdir with
-  [ Some (dsk_base, wiznotes) -> do {
-      Gc.compact ();
-      Outbase.output bdir dsk_base;
-      output_wizard_notes bdir wiznotes;
-      output_particles_file bdir dsk_base.data.particles;
-      try Mutil.remove_dir tmp_dir with _ -> ();
-      try Unix.rmdir "gw_tmp" with _ -> ();
-      output_command_line bdir;
-      True
+  let tmp_per_index = Filename.concat tmp_dir "gwc_per_index" in
+  let tmp_per = Filename.concat tmp_dir "gwc_per" in
+  let tmp_fam_index = Filename.concat tmp_dir "gwc_fam_index" in
+  let tmp_fam = Filename.concat tmp_dir "gwc_fam" in
+  let gen =
+    {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
+     g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
+     g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 20011;
+     g_wiznotes = [];
+     g_def = [| |]; g_separate = False; g_shift = 0;
+     g_first_av_occ = Hashtbl.create 1; g_errored = False;
+     g_per_index = open_out_bin tmp_per_index;
+     g_per = open_out_bin tmp_per;
+     g_fam_index = open_out_bin tmp_fam_index;
+     g_fam = open_out_bin tmp_fam }
+  in
+  let per_index_ic = open_in_bin tmp_per_index in
+  let per_ic = open_in_bin tmp_per in
+  let fam_index_ic = open_in_bin tmp_fam_index in
+  let fam_ic = open_in_bin tmp_fam in
+  let istr_empty = unique_string gen "" in
+  let istr_quest = unique_string gen "?" in
+  assert (istr_empty = Adef.istr_of_int 0);
+  assert (istr_quest = Adef.istr_of_int 1);
+  IFDEF UNIX THEN Sys.remove tmp_per_index ELSE () END;
+  IFDEF UNIX THEN Sys.remove tmp_per ELSE () END;
+  IFDEF UNIX THEN Sys.remove tmp_fam_index ELSE () END;
+  IFDEF UNIX THEN Sys.remove tmp_fam ELSE () END;
+  let ngwo = List.length gwo_list in
+  let run =
+    if ngwo < 10 then fun () -> ()
+    else if ngwo < 60 then
+      fun () -> do { Printf.eprintf "."; flush stderr; }
+    else do {
+      let bar_cnt = ref 0 in
+      let run () = do { ProgrBar.run bar_cnt.val ngwo; incr bar_cnt } in
+      ProgrBar.empty.val := 'o';
+      ProgrBar.full.val := '*';
+      ProgrBar.start ();
+      run
     }
-  | None ->
-      False ]
+  in
+  List.iter (insert_comp_families gen run) gwo_list;
+  if ngwo < 10 then ()
+  else if ngwo < 60 then do { Printf.eprintf "\n"; flush stderr }
+  else ProgrBar.finish ();
+  close_out gen.g_per_index;
+  close_out gen.g_per;
+  close_out gen.g_fam_index;
+  close_out gen.g_fam;
+  Hashtbl.clear gen.g_strings;
+  Hashtbl.clear gen.g_names;
+  Hashtbl.clear gen.g_local_names;
+  Gc.compact ();
+  let dsk_base =
+    linked_base gen per_index_ic per_ic fam_index_ic fam_ic bdir
+  in
+  Hashtbl.clear gen.g_patch_p;
+  let base = Gwdb.base_of_base1 dsk_base in
+  if do_check.val && gen.g_pcnt > 0 then do {
+    let changed_p (ip, p, o_sex, o_rpar) =
+      let p = Gwdb.dsk_person_of_person p in
+      let p =
+        {(p) with
+         sex = fold_option (fun s -> s) p.sex o_sex;
+         rparents =
+           fold_option
+             (List.map
+                (Futil.map_relation_ps (fun p -> p)
+                   (fun s -> Adef.istr_of_int 0)))
+             p.rparents o_rpar}
+      in
+      let i = Adef.int_of_iper ip in
+      Hashtbl.replace gen.g_patch_p i p
+    in
+    Check.check_base base (set_error base gen) (set_warning base)
+      (fun i -> gen.g_def.(i)) changed_p pr_stats.val;
+    flush stdout;
   }
-;
+  else ();
+  if not gen.g_errored then do {
+    if do_consang.val then
+      let _ : option _ = ConsangAll.compute base True False in ()
+    else ();
+    Gc.compact ();
+    Outbase.output bdir dsk_base;
+    output_wizard_notes bdir gen.g_wiznotes;
+    output_particles_file bdir dsk_base.data.particles;
+    try Mutil.remove_dir tmp_dir with _ -> ();
+    try Unix.rmdir "gw_tmp" with _ -> ();
+    output_command_line bdir;
+    True
+  }
+  else False
+};
+
+(**)
+
+value just_comp = ref False;
+value out_file = ref (Filename.concat Filename.current_dir_name "a");
+value force = ref False;
 
 value separate = ref False;
 value shift = ref 0;
@@ -1089,10 +1083,10 @@ value main () =
     List.iter
       (fun (x, separate, shift) ->
          if Filename.check_suffix x ".gw" then do {
-           try Gwcomp.comp_families x with e ->
-             do {
-               printf "File \"%s\", line %d:\n" x line_cnt.val; raise e
-             };
+           try Gwcomp.comp_families x with e -> do {
+             printf "File \"%s\", line %d:\n" x line_cnt.val;
+             raise e
+           };
            gwo.val := [(x ^ "o", separate, shift) :: gwo.val];
          }
          else if Filename.check_suffix x ".gwo" then
