@@ -73,6 +73,13 @@ date.cmx: adef.cmx buff.cmx calendar.cmx checkItem.cmx config.cmi def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx templ.cmx templAst.cmi \
     templDate.cmx util.cmx ../wserver/wserver.cmx date.cmi 
 date.cmi: config.cmi def.cmi gwdb.cmi 
+db1link.cmo: adef.cmi check.cmi consangAll.cmi dbdisk.cmi def.cmi futil.cmi \
+    gwcomp.cmi gwdb.cmi iovalue.cmi mutil.cmi name.cmi notesLinks.cmi \
+    outbase.cmi db1link.cmi 
+db1link.cmx: adef.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi futil.cmx \
+    gwcomp.cmx gwdb.cmx iovalue.cmx mutil.cmx name.cmx notesLinks.cmx \
+    outbase.cmx db1link.cmi 
+db1link.cmi: def.cmi gwcomp.cmi 
 db2.cmo: adef.cmi db2.cmi 
 db2.cmx: adef.cmx db2.cmi 
 db2.cmi: adef.cmi 
@@ -123,12 +130,10 @@ gutil.cmo: adef.cmi buff.cmo checkItem.cmi def.cmi gwdb.cmi mutil.cmi \
 gutil.cmx: adef.cmx buff.cmx checkItem.cmx def.cmi gwdb.cmx mutil.cmx \
     name.cmx gutil.cmi 
 gutil.cmi: def.cmi gwdb.cmi 
-gwc.cmo: adef.cmi argl.cmo check.cmi consangAll.cmi dbdisk.cmi def.cmi \
-    futil.cmi gwcomp.cmi gwdb.cmi iovalue.cmi lock.cmi mutil.cmi name.cmi \
-    notesLinks.cmi outbase.cmi progrBar.cmi secure.cmi 
-gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx dbdisk.cmi def.cmi \
-    futil.cmx gwcomp.cmx gwdb.cmx iovalue.cmx lock.cmx mutil.cmx name.cmx \
-    notesLinks.cmx outbase.cmx progrBar.cmx secure.cmx 
+gwc.cmo: argl.cmo db1link.cmi gwcomp.cmi lock.cmi mutil.cmi outbase.cmi \
+    progrBar.cmi secure.cmi 
+gwc.cmx: argl.cmx db1link.cmx gwcomp.cmx lock.cmx mutil.cmx outbase.cmx \
+    progrBar.cmx secure.cmx 
 gwc2.cmo: argl.cmo db2link.cmi gwcomp.cmi lock.cmi mutil.cmi progrBar.cmi \
     secure.cmi 
 gwc2.cmx: argl.cmx db2link.cmx gwcomp.cmx lock.cmx mutil.cmx progrBar.cmx \
