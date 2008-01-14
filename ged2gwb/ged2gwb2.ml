@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb2.ml,v 5.6 2008-01-13 22:28:49 ddr Exp $ *)
+(* $Id: ged2gwb2.ml,v 5.7 2008-01-14 03:51:54 ddr Exp $ *)
 (* Copyright (c) 1998-2008 INRIA *)
 
 open Def;
@@ -2283,21 +2283,23 @@ value make_subarrays (g_per, g_fam, g_str, g_bnot) =
 
 (* Converting to Gwcomp.gw_syntax *)
 
+value key_of_person sa p =
+  {Gwcomp.pk_first_name = sa.(Adef.int_of_istr p.first_name);
+   pk_surname = sa.(Adef.int_of_istr p.surname); pk_occ = p.occ}
+;
+
 value somebody_of_person def pa sa ip =
   let p = pa.(Adef.int_of_iper ip) in
-  let p =
-    let p = {(p) with rparents = []} in
-    Futil.map_person_ps (fun p -> failwith "somebody_of_person")
-      (fun i -> sa.(Adef.int_of_istr i)) p
-  in
   let somebody =
     if def.(Adef.int_of_iper ip) then
-      let pk =
-        {Gwcomp.pk_first_name = p.first_name; pk_surname = p.surname;
-         pk_occ = p.occ}
-      in
+      let pk = key_of_person sa p in
       Gwcomp.Undefined pk
     else do {
+      let p = {(p) with rparents = []; related = []; notes = string_empty} in
+      let p =
+        Futil.map_person_ps (fun p -> failwith "somebody_of_person")
+          (fun i -> sa.(Adef.int_of_istr i)) p
+      in
       def.(Adef.int_of_iper ip) := True;
       Gwcomp.Defined p
     }
@@ -2353,6 +2355,16 @@ value make_gwsyntax ((pa, aa, ua), (fa, ca, da), sa, g_bnot) = do {
         in
         rev_list.val := [Gwcomp.Relations x sex rl :: rev_list.val] ];
   };
+  for i = 0 to Array.length pa - 1 do {
+    let p = pa.(i) in
+    let n = sa.(Adef.int_of_istr p.notes) in
+    if n = "" then ()
+    else
+      let pk = key_of_person sa p in
+      rev_list.val := [Gwcomp.Notes pk n :: rev_list.val];
+  };
+  if g_bnot = "" then ()
+  else rev_list.val := [Gwcomp.Bnotes "" g_bnot :: rev_list.val];
   List.rev rev_list.val
 };
 
