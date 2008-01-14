@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 5.64 2008-01-14 16:04:10 ddr Exp $ *)
+(* $Id: gwc.ml,v 5.65 2008-01-14 16:28:55 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp;
@@ -71,7 +71,7 @@ value next_family_fun_templ gwo_list fi = do {
               fi.Db1link.f_shift := shift;
               Hashtbl.clear fi.Db1link.f_local_names;
               ic_opt.val := Some ic;
-              loop ()
+              loop ();
             }
           | [] -> do {
               if ngwo < 10 then ()
