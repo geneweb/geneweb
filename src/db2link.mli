@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: db2link.mli,v 5.1 2008-01-13 13:31:46 ddr Exp $ *)
+(* $Id: db2link.mli,v 5.2 2008-01-15 11:06:04 ddr Exp $ *)
 (* Copyright (c) 2007-2008 INRIA *)
 
 type file_info =
@@ -12,5 +12,8 @@ type file_info =
 
 value particules_file : ref string;
 value do_check : ref bool;
+value do_consang : ref bool;
+value default_source : ref string;
+value pr_stats : ref bool;
 
 value link : (file_info -> unit -> option Gwcomp.gw_syntax) -> string -> bool;
