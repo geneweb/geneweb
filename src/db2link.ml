@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: db2link.ml,v 5.3 2008-01-15 13:02:46 ddr Exp $ *)
+(* $Id: db2link.ml,v 5.4 2008-01-15 17:12:01 ddr Exp $ *)
 (* Copyright (c) 2006-2008 INRIA *)
 
 open Def;
@@ -809,6 +809,42 @@ value output_particles_file tmp_dir particles = do {
   close_out oc;
 };
 
+value set_error base x = do {
+  printf "\nError: ";
+  Check.print_base_error stdout base x;
+};
+
+value set_warning base =
+  fun
+  [ UndefinedSex _ -> ()
+  | x -> do {
+      printf "\nWarning: ";
+      Check.print_base_warning stdout base x;
+    } ]
+;
+
+value fold_option fsome vnone =
+  fun
+  [ Some v -> fsome v
+  | None -> vnone ]
+;
+
+value changed_p (ip, p, o_sex, o_rpar) =
+  let p = Gwdb.dsk_person_of_person p in
+  let _p =
+    {(p) with
+     sex = fold_option (fun s -> s) p.sex o_sex;
+     rparents =
+       fold_option
+         (List.map
+            (Futil.map_relation_ps (fun p -> p)
+               (fun s -> Adef.istr_of_int 0)))
+         p.rparents o_rpar}
+  in
+  let i = Adef.int_of_iper ip in
+  do { Printf.eprintf "person %d not changed\n" i; flush stderr }
+;
+
 value link next_family_fun bdir = do {
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   Mutil.remove_dir tmp_dir;
@@ -975,9 +1011,16 @@ value link next_family_fun bdir = do {
     try Unix.rmdir tmp_dir with [ Unix.Unix_error _ _ _ -> () ];
     try Unix.rmdir "gw_tmp" with [ Unix.Unix_error _ _ _ -> () ];
     output_command_line bdir;
-    if do_consang.val then
+    if do_check.val || do_consang.val then do {
       let base = Gwdb.open_base bdir in
-      let _ : option _ = ConsangAll.compute base True False in ()
+      if do_check.val then
+        Check.check_base base (set_error base) (set_warning base)
+          (fun _ -> True) changed_p pr_stats.val
+      else ();
+      if do_consang.val then
+        let _ : option _ = ConsangAll.compute base True False in ()
+      else ();
+    }
     else ();
     True
   }
