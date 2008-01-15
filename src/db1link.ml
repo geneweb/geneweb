@@ -1,4 +1,4 @@
-(* $Id: db1link.ml,v 5.1 2008-01-14 16:04:10 ddr Exp $ *)
+(* $Id: db1link.ml,v 5.2 2008-01-15 11:06:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp;
@@ -8,6 +8,9 @@ open Def;
 open Mutil;
 
 value default_source = ref "";
+value do_check = ref True;
+value do_consang = ref False;
+value pr_stats = ref False;
 
 type person = dsk_person;
 type ascend = dsk_ascend;
@@ -680,10 +683,6 @@ value insert_syntax fname gen =
   | Bnotes nfname str -> insert_bnotes fname gen nfname str
   | Wnotes wizid str -> insert_wiznote fname gen wizid str ]
 ;
-
-value do_check = ref True;
-value pr_stats = ref False;
-value do_consang = ref False;
 
 value record_access_of tab =
   {load_array () = (); get i = tab.(i); set i v = tab.(i) := v;

@@ -1,11 +1,9 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: gwc2.ml,v 5.67 2008-01-13 13:31:46 ddr Exp $ *)
+(* $Id: gwc2.ml,v 5.68 2008-01-15 11:06:04 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Gwcomp;
 open Printf;
-
-value default_source = ref "";
 
 value check_magic =
   let b = String.create (String.length magic_gwo) in
@@ -88,8 +86,6 @@ value next_family_fun_templ gwo_list fi = do {
 value just_comp = ref False;
 value out_file = ref (Filename.concat Filename.current_dir_name "a");
 value force = ref False;
-value do_consang = ref False;
-value pr_stats = ref False;
 
 value separate = ref False;
 value shift = ref 0;
@@ -100,13 +96,13 @@ value speclist =
    ("-o", Arg.String (fun s -> out_file.val := s),
     "<file> Output database (default: a.gwb)");
    ("-f", Arg.Set force, " Remove database if already existing");
-   ("-stats", Arg.Set pr_stats, "Print statistics");
+   ("-stats", Arg.Set Db2link.pr_stats, "Print statistics");
    ("-nc", Arg.Clear Db2link.do_check, "No consistency check");
-   ("-cg", Arg.Set do_consang, "Compute consanguinity");
+   ("-cg", Arg.Set Db2link.do_consang, "Compute consanguinity");
    ("-sep", Arg.Set separate, " Separate all persons in next file");
    ("-sh", Arg.Int (fun x -> shift.val := x),
     "<int> Shift all persons numbers in next files");
-   ("-ds", Arg.String (fun s -> default_source.val := s), "\
+   ("-ds", Arg.String (fun s -> Db2link.default_source.val := s), "\
      <str> Set the source field for persons and families without source data");
    ("-part", Arg.String (fun s -> Db2link.particules_file.val := s), "\
      <file> Particles file (default = predefined particles)");

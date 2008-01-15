@@ -1,11 +1,16 @@
 (* camlp5r *)
-(* $Id: db2link.ml,v 5.1 2008-01-13 13:31:46 ddr Exp $ *)
+(* $Id: db2link.ml,v 5.2 2008-01-15 11:06:04 ddr Exp $ *)
 (* Copyright (c) 2006-2008 INRIA *)
 
 open Def;
 open Futil;
 open Gwcomp;
 open Printf;
+
+value default_source = ref "";
+value do_check = ref True;
+value do_consang = ref False;
+value pr_stats = ref False;
 
 type file_info =
   { f_curr_src_file : mutable string;
@@ -327,8 +332,6 @@ value insert_gwo_1 gen =
   | Bnotes nfname str -> insert_bnotes1 gen nfname str
   | Wnotes wizid str -> insert_wiznotes1 gen wizid str ]
 ;
-
-value do_check = ref True;
 
 value empty_person =
   {first_name = ""; surname = ""; occ = 0; image = "";
