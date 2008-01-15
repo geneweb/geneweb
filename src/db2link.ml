@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: db2link.ml,v 5.2 2008-01-15 11:06:04 ddr Exp $ *)
+(* $Id: db2link.ml,v 5.3 2008-01-15 13:02:46 ddr Exp $ *)
 (* Copyright (c) 2006-2008 INRIA *)
 
 open Def;
@@ -975,6 +975,10 @@ value link next_family_fun bdir = do {
     try Unix.rmdir tmp_dir with [ Unix.Unix_error _ _ _ -> () ];
     try Unix.rmdir "gw_tmp" with [ Unix.Unix_error _ _ _ -> () ];
     output_command_line bdir;
+    if do_consang.val then
+      let base = Gwdb.open_base bdir in
+      let _ : option _ = ConsangAll.compute base True False in ()
+    else ();
     True
   }
   else False

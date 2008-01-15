@@ -1,10 +1,10 @@
-# $Id: Makefile,v 5.22 2008-01-13 18:42:42 ddr Exp $
+# $Id: Makefile,v 5.23 2008-01-15 13:04:45 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../src
 OBJS=../src/argl.cmo ../src/adef.cmo ../src/iovalue.cmo ../src/buff.cmo ../src/name.cmo ../src/ansel.cmo ../src/mutil.cmo ../src/futil.cmo ../src/dutil.cmo ../src/secure.cmo ../src/btree.cmo ../src/database.cmo ../src/db2.cmo ../src/db2disk.cmo ../src/diff.cmo ../src/outbase.cmo ../src/gwdb.cmo ../src/checkItem.cmo ../src/calendar.cmo ../src/lock.cmo ../src/progrBar.cmo ../src/consang.cmo ../src/consangAll.cmo ../src/check.cmo ged2gwb.cmo
-OBJS2=../src/buff.cmo ../src/argl.cmo ../src/secure.cmo ../src/adef.cmo ../src/iovalue.cmo ../src/name.cmo ../src/mutil.cmo ../src/ansel.cmo ../src/calendar.cmo ../src/iochan.cmo ../src/db2.cmo ../src/progrBar.cmo ../src/futil.cmo ../src/notesLinks.cmo ../src/db2out.cmo ../src/db2link.cmo ../src/lock.cmo ged2gwb2.cmo
+OBJS2=../src/buff.cmo ../src/argl.cmo ../src/secure.cmo ../src/adef.cmo ../src/iovalue.cmo ../src/name.cmo ../src/mutil.cmo ../src/ansel.cmo ../src/calendar.cmo ../src/iochan.cmo ../src/db2.cmo ../src/progrBar.cmo ../src/futil.cmo ../src/notesLinks.cmo ../src/db2out.cmo ../src/db2disk.cmo ../src/dutil.cmo ../src/btree.cmo ../src/database.cmo ../src/gwdb.cmo ../src/consang.cmo ../src/consangAll.cmo ../src/db2link.cmo ../src/lock.cmo ged2gwb2.cmo
 
 all:: out
 
