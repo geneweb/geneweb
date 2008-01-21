@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.43 2008-01-21 13:28:12 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.44 2008-01-21 14:02:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -235,7 +235,8 @@ value effective_mod_merge conf base sp =
       let rel_chil = get_related p2 in
       let p_family = get_family (poi base sp.key_index) in
       let p2_family = get_family p2 in
-      MergeInd.reparent_ind base sp.key_index ip2;
+      let warning _ = () in
+      MergeInd.reparent_ind base warning sp.key_index ip2;
       delete_key base (sou base (get_first_name p2))
         (sou base (get_surname p2)) (get_occ p2);
       let warning _ = () in

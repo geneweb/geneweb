@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 5.54 2008-01-21 13:28:12 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 5.55 2008-01-21 14:02:36 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -290,7 +290,7 @@ value propose_merge_ind conf base branches p1 p2 =
   }
 ;
 
-value reparent_ind base ip1 ip2 =
+value reparent_ind base warning ip1 ip2 =
   let a1 = poi base ip1 in
   let a2 = poi base ip2 in
   match (get_parents a1, get_parents a2) with
@@ -305,12 +305,22 @@ value reparent_ind base ip1 ip2 =
       patch_ascend base ip1 a1;
       patch_descend base ifam des;
     }
+  | (Some ifam, None) -> do {
+      let fam = foi base ifam in
+      let children = get_children fam in
+      match CheckItem.sort_children base children with
+      [ Some (b, a) -> do {
+          let des = gen_descend_of_descend fam in
+          patch_descend base ifam des;
+          warning (ChangedOrderOfChildren ifam fam b a);
+        }
+      | None -> () ]
+    }
   | _ -> () ]
 ;
 
 value effective_merge_ind conf base warning p1 p2 =
   do {
-    reparent_ind base (get_key_index p1) (get_key_index p2);
     let u2 = poi base (get_key_index p2) in
     if Array.length (get_family u2) <> 0 then do {
       for i = 0 to Array.length (get_family u2) - 1 do {
@@ -378,6 +388,7 @@ value effective_merge_ind conf base warning p1 p2 =
          else get_notes p1}
     in
     patch_person base p1.key_index p1;
+    reparent_ind base warning p1.key_index (get_key_index p2);
     delete_key base (sou base (get_first_name p2)) (sou base (get_surname p2))
       (get_occ p2);
     let p2 = UpdateIndOk.effective_del conf base warning p2 in
