@@ -1,5 +1,5 @@
 (* camlp5r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 5.42 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 5.43 2008-01-21 13:28:12 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -238,7 +238,8 @@ value effective_mod_merge conf base sp =
       MergeInd.reparent_ind base sp.key_index ip2;
       delete_key base (sou base (get_first_name p2))
         (sou base (get_surname p2)) (get_occ p2);
-      let p2 = UpdateIndOk.effective_del conf base p2 in
+      let warning _ = () in
+      let p2 = UpdateIndOk.effective_del conf base warning p2 in
       patch_person base p2.key_index p2;
       let u2 = {family = [| |]} in
       patch_union base p2.key_index u2;
