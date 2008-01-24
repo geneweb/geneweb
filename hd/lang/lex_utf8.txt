@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.96 2008-01-08 11:58:46 ddr Exp $
+# $Id: lex_utf8.txt,v 5.97 2008-01-24 08:17:51 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -211,6 +211,7 @@ en: %s access cancelled for that page
 eo: %s aliro ne estas ebla por la paĝo
 es: %s acesso negado para esta página
 et: %s: ligipääs sellele lehele on keelatud
+fi: %s käyttöoikeus peruutettu tuolle sivulle
 fr: accès %s annulé pour cette page
 he: דף זה חסום בפניך. הגישה מוגבלת %s דפים
 it: accesso %s annullato per questa pagina
@@ -2006,6 +2007,7 @@ en: average age at death
 eo: meza aĝo dum la morto
 es: edad promedio de deceso
 et: keskmine eluiga
+fi: keskimääräinen ikä kuollessa
 fr: âge moyen de décès
 he: גיל פטירה ממוצע
 it: età media di morte
@@ -2899,6 +2901,7 @@ en: continued
 eo: continuigo
 es: continúa
 et: jätkub
+fi: jatkuu
 fr: suite
 he: המשך
 it: continua
@@ -3275,6 +3278,7 @@ en: disconnect
 eo: diskonekti
 es: desconectar
 et: logi välja
+fi: yhteyskatko
 fr: déconnecter
 he: התנתק
 it: disconnettersi
@@ -3983,6 +3987,7 @@ en: for the list ordered by the date of the last modification
 eo: por la listo ordita laǔ la dato de la lasta modifigo
 es: para la lista ordenada por fecha de la última modificación
 et: sorteerimaks nimekirja viimase muudatuse tegemise aja järgi
+fi: viimeisen muutospäivän mukaan järjestetylle listalle
 fr: pour la liste par date de dernière modification
 he: לרשימה, ממוינת על פי תאריך עדכון אחרון
 it: per la lista ordinata secondo la data dell'ultima modifica
@@ -6425,6 +6430,7 @@ en: number of living persons:
 eo: nombro de la vivantaj personoj:
 es: número de personas vivas:
 et: elavaid inimesi:
+fi: elossa olevien henkilöiden lukumäärä:
 fr: nombre de personnes vivantes :
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi:
@@ -6467,6 +6473,7 @@ sv: yrke
 
     of course dead
 en: of course dead
+fi: tietenkin kuollut
 fr: évidemment décédé(e)
 
     of the %s generation
@@ -6944,6 +6951,7 @@ en: population pyramid
 eo: laǔaĝa piramido
 es: pirámide de población
 et: rahvastikupüramiid
+fi: väestöpyramidi
 fr: pyramide des âges
 he: פירמידת גילאים
 it: piramide della popolazione
@@ -6965,6 +6973,7 @@ en: possible duplications
 eo: ebla duobligo
 es: posible duplicación
 et: võimalikud duplikaadid
+fi: mahdollisia kaksoiskappaleita
 fr: doublons éventuels
 he: ייתכנו כפילויות
 it: possibile doppione
@@ -7743,6 +7752,7 @@ en: since the last click
 eo: depost la lasta kliko
 es: desde el último click
 et: alates viimasest klõpsust
+fi: viime napsautuksen jälkeen
 fr: depuis le dernier clic
 he: מאז הלחיצה האחרונה
 it: dall'ultimo click
