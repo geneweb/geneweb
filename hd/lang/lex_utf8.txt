@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.97 2008-01-24 08:17:51 ddr Exp $
+# $Id: lex_utf8.txt,v 5.98 2008-01-24 09:43:52 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -6475,6 +6475,8 @@ sv: yrke
 en: of course dead
 fi: tietenkin kuollut
 fr: évidemment décédé(e)
+ru: конечно мёртв(а)
+sv: givetsvis död
 
     of the %s generation
 af: uit die %s geslag
