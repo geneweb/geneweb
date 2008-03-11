@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.101 2008-03-11 08:52:30 ddr Exp $
+# $Id: lex_utf8.txt,v 5.102 2008-03-11 10:15:31 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -222,6 +222,7 @@ pl: dostęp %s anulowany dla tej strony
 pt: acesso %s cancelado para aquela página
 ro: %s acces anulat la această pagină
 ru: доступ %s к этой странице запрещён
+sl: %s nima dostopa do te strani
 sv: %s åtkomst ogiltig för den sidan
 
     %s cousins
@@ -6479,6 +6480,7 @@ fi: tietenkin kuollut
 fr: évidemment décédé(e)
 no: selvfølgelig død
 ru: конечно мёртв(а)
+sl: očitno umrl(/a)
 sv: givetsvis död
 
     of the %s generation
@@ -6989,6 +6991,7 @@ pl: możliwe duplikaty
 pt: eventual duplicidade
 ro: posibile dublete
 ru: возможные дубликаты
+sl: možno podvajanje
 sv: eventuellt dubblett
 
     possibly (date)
