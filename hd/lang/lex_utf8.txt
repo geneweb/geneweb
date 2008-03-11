@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 5.100 2008-03-10 13:10:00 ddr Exp $
+# $Id: lex_utf8.txt,v 5.101 2008-03-11 08:52:30 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -6472,6 +6472,7 @@ sl: poklic
 sv: yrke
 
     of course dead
+bg: разбира се починал
 de: natürlich tot
 en: of course dead
 fi: tietenkin kuollut
