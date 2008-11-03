@@ -88,10 +88,12 @@ db2disk.cmo: adef.cmi buff.cmo db2.cmi def.cmi iovalue.cmi mutil.cmi \
 db2disk.cmx: adef.cmx buff.cmx db2.cmx def.cmi iovalue.cmx mutil.cmx \
     name.cmx secure.cmx db2disk.cmi 
 db2disk.cmi: adef.cmi def.cmi 
-db2link.cmo: adef.cmi db2.cmi db2out.cmi def.cmi futil.cmi gwcomp.cmi \
-    iochan.cmi iovalue.cmi mutil.cmi name.cmi notesLinks.cmi db2link.cmi 
-db2link.cmx: adef.cmx db2.cmx db2out.cmx def.cmi futil.cmx gwcomp.cmx \
-    iochan.cmx iovalue.cmx mutil.cmx name.cmx notesLinks.cmx db2link.cmi 
+db2link.cmo: adef.cmi check.cmi consangAll.cmi db2.cmi db2out.cmi def.cmi \
+    futil.cmi gwcomp.cmi gwdb.cmi iochan.cmi iovalue.cmi mutil.cmi name.cmi \
+    notesLinks.cmi db2link.cmi 
+db2link.cmx: adef.cmx check.cmx consangAll.cmx db2.cmx db2out.cmx def.cmi \
+    futil.cmx gwcomp.cmx gwdb.cmx iochan.cmx iovalue.cmx mutil.cmx name.cmx \
+    notesLinks.cmx db2link.cmi 
 db2link.cmi: gwcomp.cmi 
 db2out.cmo: db2.cmi def.cmi futil.cmi iovalue.cmi mutil.cmi name.cmi \
     progrBar.cmi db2out.cmi 
@@ -403,7 +405,7 @@ wiznotes.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
 wiznotes.cmi: config.cmi gwdb.cmi 
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo
 alln.cmo alln.cmx: pa_html.cmo
-birthDeath.cmo birthDeath.cmx: def.syn.cmo pa_html.cmo
+birthDeath.cmo birthDeath.cmx: def_syn.cmo pa_html.cmo
 birthday.cmo birthday.cmx: pa_html.cmo
 changeChildren.cmo changeChildren.cmx: pa_html.cmo
 cousins.cmo cousins.cmx: pa_html.cmo
@@ -427,7 +429,7 @@ notes.cmo notes.cmx: pa_html.cmo
 place.cmo place.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
-request.cmo request.cmx: def.syn.cmo pa_lock.cmo pa_html.cmo
+request.cmo request.cmx: def_syn.cmo pa_lock.cmo pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_html.cmo
 some.cmo some.cmx: pa_html.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo

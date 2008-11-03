@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 5.27 2007-09-05 13:16:45 ddr Exp $ *)
+(* $Id: check.ml,v 5.28 2008-11-03 15:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -9,9 +9,14 @@ open Printf;
 
 value designation base p =
   let first_name = p_first_name base p in
-  let nom = p_surname base p in
-  Mutil.iso_8859_1_of_utf_8
-    (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ nom)
+  let surname = p_surname base p in
+  let s =
+    Mutil.iso_8859_1_of_utf_8
+      (first_name ^ "." ^ string_of_int (get_occ p) ^ " " ^ surname)
+  in
+  if first_name = "?" || surname = "?" then
+    s ^ " (i=" ^ string_of_int (Adef.int_of_iper (get_key_index p)) ^ ")"
+  else s
 ;
 
 value print_base_error oc base =
