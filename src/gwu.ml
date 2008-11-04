@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 5.43 2008-01-08 11:58:46 ddr Exp $ *)
+(* $Id: gwu.ml,v 5.44 2008-11-04 13:44:04 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -244,7 +244,8 @@ value print_infos oc base is_child csrc cbp p =
         if get_baptism p <> Adef.codate_None then ()
         else
           match get_death p with
-          [ Death _ _ | DeadYoung | DeadDontKnowWhen -> fprintf oc " 0"
+          [ Death _ _ | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
+              fprintf oc " 0"
           | DontKnowIfDead
             when
               not is_child && not (has_infos_not_dates base p) &&
