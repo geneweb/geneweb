@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 5.59 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: gwd.ml,v 5.60 2009-03-10 21:10:29 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -39,8 +39,15 @@ value use_auth_digest_scheme = ref False;
 
 value log_oc () =
   if log_file.val <> "" then
-    try open_out_gen log_flags 0o644 log_file.val with
-    [ Sys_error _ -> do { log_file.val := ""; stderr } ]
+    match
+      try Some (open_out_gen log_flags 0o644 log_file.val) with
+      [ Sys_error _ -> None ]
+    with
+    [ Some oc -> do {
+        Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stderr;
+        oc
+      }
+    | None -> do { log_file.val := ""; stderr } ]
   else stderr
 ;
 
