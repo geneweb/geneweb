@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: db2out.ml,v 5.11 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: db2out.ml,v 5.12 2009-03-10 22:05:46 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
@@ -28,7 +28,7 @@ value output_value_array oc_dat pad compress f = do {
     Iovalue.output oc_dat (pad : 'a);
   };
   Iovalue.size_32.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
-  Iovalue.size_64.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
+  Iovalue.size_64.val := Iovalue.size_64.val - phony_min_size + nb_items.val;
   ignore (Iovalue.patch_output_value_header oc_dat header_pos : int);
   Iovalue.output_block_header oc_dat 0 nb_items.val;
 };
