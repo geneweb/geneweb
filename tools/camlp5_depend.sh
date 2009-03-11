@@ -1,15 +1,16 @@
 #!/bin/sh -e
-# $Id: camlp5_depend.sh,v 5.1 2007-09-12 09:58:44 ddr Exp $
+# $Id: camlp5_depend.sh,v 5.2 2009-03-11 10:56:09 ddr Exp $
 
 FILES=
 DEPARGS=
-for i in $*; do
-    case $i in
-    *.ml*) FILES="$FILES $i";;
-    *) DEPARGS="$DEPARGS $i";;
+while [ "$1" != "" ]; do
+    case $1 in
+    *.ml*) FILES="$FILES $1";;
+    *) DEPARGS="$DEPARGS $1";;
     esac
+    shift
 done
-PR_DEP=$TOP/src/pr_dep.cmo
+PR_DEP="-I $TOP/src pr_dep.cmo"
 
 for FILE in $FILES; do
     head -1 $FILE >/dev/null || exit 1

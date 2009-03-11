@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.6 2008-01-09 21:16:30 ddr Exp $
+# $Id: Makefile,v 5.7 2009-03-11 10:53:30 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -178,10 +178,10 @@ clean::
 	$(RM) -f *~ .#*
 
 clean_mismatch:
-	rm src/pa_lock.cmo src/pa_html.cmo src/def.syn.cmo
+	rm src/pa_lock.cmo src/pa_html.cmo src/def_syn.cmo
 
 depend:
-	cd src; $(MAKE) pr_dep.cmo def.syn.cmo gwlib.ml
+	cd src; $(MAKE) pr_dep.cmo def_syn.cmo gwlib.ml
 	cd src; $(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
 	cd wserver; $(MAKE) depend
 	cd src; $(MAKE) depend
