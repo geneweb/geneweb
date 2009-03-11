@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: image.ml,v 5.7 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: image.ml,v 5.8 2009-03-11 09:22:39 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
@@ -13,7 +13,7 @@ value content cgi t len fname =
     Util.nl ();
     Wserver.wprint "Content-length: %d" len;
     Util.nl ();
-    Wserver.wprint "Content-disposition: attachement; filename=%s"
+    Wserver.wprint "Content-disposition: attachment; filename=%s"
       (Filename.basename fname);
     Util.nl ();
     Util.nl ();
