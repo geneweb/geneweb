@@ -2,12 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta name="robots" content="none">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>install -&gt; http://geneweb.inria.fr/roglo?</title>
 </head>
 <body background="images/gwback.jpg">
 [
 en: The database "%b" has moved to:
-fr: La base de données "%b" se trouve maintenant à l'adresse:
+fr: La base de donnÃ©es "%b" se trouve maintenant Ã  l'adresse:
 ]
 <dl><dt><dd>
 <a href="%t">%t</a>
