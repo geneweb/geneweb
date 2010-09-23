@@ -1,4 +1,4 @@
-(* $Id: db1link.ml,v 5.2 2008-01-15 11:06:04 ddr Exp $ *)
+(* $Id: db1link.ml,v 5.3 2010-09-23 16:56:51 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Gwcomp;
@@ -448,7 +448,7 @@ value insert_person gen so =
          occupation = unique_string gen so.occupation;
          sex = Neuter; access = so.access;
          birth = so.birth; birth_place = unique_string gen so.birth_place;
-         birth_src =  unique_string gen so.birth_src;
+         birth_src = unique_string gen so.birth_src;
          baptism = so.baptism;
          baptism_place = unique_string gen so.baptism_place;
          baptism_src = unique_string gen so.baptism_src;
