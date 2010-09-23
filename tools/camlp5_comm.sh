@@ -1,7 +1,7 @@
 #!/bin/sh
-# $Id: camlp5_comm.sh,v 5.1 2007-09-12 09:58:44 ddr Exp $
+# $Id: camlp5_comm.sh,v 5.2 2010-09-23 17:16:49 ddr Exp $
 
-ARGS1=pa_macro.cmo
+ARGS1="../wserver/pa_macro5.cmo"
 FILE=
 while test "" != "$1"; do
 	case $1 in
