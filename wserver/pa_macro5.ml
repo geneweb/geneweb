@@ -1,5 +1,5 @@
 (* camlp5r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_macro5.ml,v 5.1 2010-09-23 17:16:49 ddr Exp $ *)
+(* $Id: pa_macro5.ml,v 5.2 2011-01-17 13:21:53 ddr Exp $ *)
 (* Copyright (c) INRIA 2007-2010 *)
 
 (*
@@ -357,8 +357,7 @@ value undef x =
 ;
 
 EXTEND
-  GLOBAL: expr patt str_item sig_item constructor_declaration match_case
-    label_declaration;
+  GLOBAL: expr patt str_item sig_item constructor_declaration match_case;
   str_item: FIRST
     [ [ x = str_macro_def ->
           match x with
@@ -449,16 +448,6 @@ EXTEND
           if e then p2 else p1 ] ]
   ;
   constructor_declaration: FIRST
-    [ [ "IFDEF"; e = dexpr; "THEN"; x = SELF; "END" ->
-          if e then x else Grammar.skip_item x
-      | "IFDEF"; e = dexpr; "THEN"; x = SELF; "ELSE"; y = SELF; "END" ->
-          if e then x else y
-      | "IFNDEF"; e = dexpr; "THEN"; x = SELF; "END" ->
-          if e then Grammar.skip_item x else x
-      | "IFNDEF"; e = dexpr; "THEN"; x = SELF; "ELSE"; y = SELF; "END" ->
-          if e then y else x ] ]
-  ;
-  label_declaration: FIRST
     [ [ "IFDEF"; e = dexpr; "THEN"; x = SELF; "END" ->
           if e then x else Grammar.skip_item x
       | "IFDEF"; e = dexpr; "THEN"; x = SELF; "ELSE"; y = SELF; "END" ->
