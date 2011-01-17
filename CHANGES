@@ -1,3 +1,8 @@
+GeneWeb version 5.02.0
+----------------------
+
+* [17 Jan 2011] Fixed compilation problem if using Camlp5 version < 5.12.
+
 GeneWeb version 5.02
 --------------------
 
