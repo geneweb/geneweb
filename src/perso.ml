@@ -802,7 +802,7 @@ value build_surnames_list conf base v p =
   let rec loop lev sosa p surn dp =
     if mark.(Adef.int_of_iper (get_key_index p)) = 0 then ()
     else if lev = v then
-      if conf.hide_names && not (fast_auth_age conf p) then ()
+      if (is_hide_names conf p) && not (fast_auth_age conf p) then ()
       else add_surname sosa p surn dp
     else do {
       mark.(Adef.int_of_iper (get_key_index p)) :=
@@ -1921,7 +1921,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       [ Some ifam -> Array.length (get_children (foi base ifam)) > 1
       | None -> False ]
   | "has_sources" ->
-      if conf.hide_names && not p_auth then False
+      if (is_hide_names conf p) && not p_auth then False
       else if sou base (get_psources p) <> "" then True
       else if
         p_auth &&
@@ -1994,7 +1994,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
             p_surname base (pget conf base (get_father (foi base ifam))) <>
               p_surname base p ]
       in
-      if not p_auth && conf.hide_names then "x x"
+      if not p_auth && (is_hide_names conf p) then "x x"
       else if force_surname then person_text conf base p
       else person_text_no_surn_no_acc_chk conf base p
   | "consanguinity" ->
@@ -2032,12 +2032,12 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       | _ -> raise Not_found ]
   | "father_age_at_birth" -> string_of_parent_age conf base ep get_father
   | "first_name" ->
-      if not p_auth && conf.hide_names then "x" else p_first_name base p
+      if not p_auth && (is_hide_names conf p) then "x" else p_first_name base p
   | "first_name_key" ->
-      if conf.hide_names && not p_auth then ""
+      if (is_hide_names conf p) && not p_auth then ""
       else code_varenv (Name.lower (p_first_name base p))
   | "first_name_key_val" ->
-      if conf.hide_names && not p_auth then ""
+      if (is_hide_names conf p) && not p_auth then ""
       else Name.lower (p_first_name base p)
   | "image" -> if not p_auth then "" else sou base (get_image p)
   | "image_html_url" -> string_of_image_url conf base env ep True
@@ -2213,18 +2213,18 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           string_with_macros conf env s
       | _ -> raise Not_found ]
   | "surname" ->
-      if not p_auth && conf.hide_names then "x" else p_surname base p
+      if not p_auth && (is_hide_names conf p) then "x" else p_surname base p
   | "surname_begin" ->
-      if not p_auth && conf.hide_names then ""
+      if not p_auth && (is_hide_names conf p) then ""
       else surname_begin base (p_surname base p)
   | "surname_end" ->
-      if not p_auth && conf.hide_names then "x"
+      if not p_auth && (is_hide_names conf p) then "x"
       else surname_end base (p_surname base p)
   | "surname_key" ->
-      if conf.hide_names && not p_auth then ""
+      if (is_hide_names conf p) && not p_auth then ""
       else code_varenv (Name.lower (p_surname base p))
   | "surname_key_val" ->
-      if conf.hide_names && not p_auth then ""
+      if (is_hide_names conf p) && not p_auth then ""
       else Name.lower (p_surname base p)
   | "title" -> person_title conf base p
   | _ -> raise Not_found ]
@@ -2281,7 +2281,7 @@ and simple_person_text conf base p p_auth =
     match main_title conf base p with
     [ Some t -> titled_person_text conf base p t
     | None -> person_text conf base p ]
-  else if conf.hide_names then "x x"
+  else if (is_hide_names conf p) then "x x"
   else person_text conf base p
 and string_of_died conf base env p p_auth =
   if p_auth then
@@ -2822,7 +2822,7 @@ value print_foreach conf base print_ast eval_expr =
     let insert typ src srcl = insert_loop (Util.translate_eval typ) src srcl in
     let srcl = [] in
     let srcl =
-      if not conf.hide_names || p_auth then
+      if not (is_hide_names conf p) || p_auth then
         insert (transl_nth conf "person/persons" 0) (get_psources p) srcl
       else srcl
     in

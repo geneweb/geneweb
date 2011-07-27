@@ -233,3 +233,6 @@ value xml_pretty_print : string -> string;
 
 value wprint_in_columns :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;
+
+(* Variable that use also private flag of person *)
+value is_hide_names : config -> person -> bool;
