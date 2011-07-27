@@ -241,6 +241,28 @@ value find_sosa conf base a sosa_ref_l =
   | None -> None ]
 ;
 
+(* ******************************************************************** *)
+(*  [Fonc] p_sosa : config -> base -> person -> Num.t                   *)
+(** [Description] : Recherche si la personne passée en argument a un
+                    numéro de sosa.
+    [Args] :
+      - conf : configuration de la base
+      - base : la base de donnée
+      - a    : la person dont on cherche si elle a un numéro sosa
+    [Retour] :
+      - Num.t : retourne Num.zero si la personne n'a pas de numéro de
+                sosa, et retourne son numéro de sosa sinon
+    [Rem] : Exporté en clair hors de ce module.                         *)
+(* ******************************************************************** *)
+value p_sosa conf base a = 
+  match Util.find_sosa_ref conf base with
+  [ Some p -> 
+    match find_sosa_aux conf base a p with
+    [ Some (q,s) -> q
+    | None -> Num.zero ]
+  | None -> Num.zero ]
+;
+
 value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
   let mark = Array.create (nb_of_persons base) False in
