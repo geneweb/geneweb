@@ -66,7 +66,7 @@ value gen_record conf base changed action =
             | Rnotes (Some num) file -> [| file; string_of_int num |]
             | Rnotes None file -> [| file |] ]
           in
-          let args = Array.append [| comm; conf.user; action |] args in
+          let args = Array.append [| comm; conf.bname; conf.user; action |] args in
           match Unix.fork () with
           [ 0 ->
               if Unix.fork () <> 0 then exit 0
