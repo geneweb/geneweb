@@ -5,8 +5,8 @@ CAMLP5_COMM=TOP=$(TOP) $(TOP)/tools/camlp5_comm.sh
 CAMLP5F=-DUNIX
 CAMLP5D=+camlp5
 LIBUNIX=-cclib -lunix
-OCAMLC=ocamlc.opt -warn-error A
-OCAMLOPT=ocamlopt.opt -warn-error A
+OCAMLC=ocamlc.opt
+OCAMLOPT=ocamlopt.opt
 OCAMLI=
 OCAMLD=
 STRIP=strip

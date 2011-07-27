@@ -9,6 +9,11 @@ open Gwdb;
 open Mutil;
 open Printf;
 
+value is_hide_names conf p = 
+  if conf.hide_names || get_access p = Private then True
+  else False
+;
+
 value sharelib =
   List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
 ;
@@ -603,7 +608,8 @@ value is_public conf base p =
 value accessible_by_key conf base p fn sn =
   conf.access_by_key
   && not (fn = "?" || sn = "?")
-  && (not conf.hide_names || is_public conf base p)
+  && (not (is_hide_names conf p) || is_public conf base p 
+      || conf.friend || conf.wizard)
 ;
 
 value acces_n conf base n x =
@@ -635,7 +641,7 @@ value restricted_txt conf = ".....";
 
 value gen_person_text (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
-  else if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
   else
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
@@ -657,7 +663,7 @@ value gen_person_text (p_first_name, p_surname) conf base p =
 
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
-  else if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
   else
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
@@ -673,7 +679,7 @@ value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
     base p
 =
   if is_hidden p then restricted_txt conf
-  else if check_acc && conf.hide_names && not (fast_auth_age conf p) then
+  else if check_acc && (is_hide_names conf p) && not (fast_auth_age conf p) then
     "x x"
   else
     let s =
@@ -1051,7 +1057,7 @@ value url_no_index conf base =
     [ Some i ->
         if i >= 0 && i < nb_of_persons base then
           let p = pget conf base (Adef.iper_of_int i) in
-          if (conf.hide_names && not (fast_auth_age conf p)) || is_hidden p
+          if ((is_hide_names conf p) && not (fast_auth_age conf p)) || is_hidden p
           then None
           else
             let f = scratch (get_first_name p) in
@@ -1702,7 +1708,7 @@ value parent conf base p a =
   match get_public_name a with
   [ n when sou base n <> "" -> sou base n ^ person_title conf base a
   | _ ->
-      if conf.hide_names && not (fast_auth_age conf a) then "x x"
+      if (is_hide_names conf p) && not (fast_auth_age conf a) then "x x"
       else
         p_first_name base a ^
           (if not (eq_istr (get_surname p) (get_surname a)) then
@@ -1762,7 +1768,7 @@ value specify_homonymous conf base p =
               if Array.length ct > 0 then
                 let enfant = pget conf base ct.(0) in
                 let (child_fn, child_sn) =
-                  if conf.hide_names && not (fast_auth_age conf enfant) then
+                  if (is_hide_names conf p) && not (fast_auth_age conf enfant) then
                     ("x", " x")
                   else
                     (p_first_name base enfant,
@@ -1958,7 +1964,7 @@ value find_person_in_env conf base suff =
           [ Some ip ->
               let p = pget conf base ip in
               if is_hidden p then None
-              else if not conf.hide_names || authorized_age conf base p then
+              else if not (is_hide_names conf p) || authorized_age conf base p then
                 Some p
               else None
           | None -> None ]
