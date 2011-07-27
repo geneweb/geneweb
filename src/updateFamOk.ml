@@ -665,7 +665,7 @@ value is_created_or_already_there ochil_arr nchil schil =
       all linked (not created) new children were already children.
 *)
 
-value need_check_noloop (scpl, sdes, onfs) =
+value need_check_noloop base (scpl, sdes, onfs) =
   if array_exists is_a_link (parent_array scpl) &&
      array_exists is_a_link sdes.children
   then
@@ -685,7 +685,7 @@ value all_checks_family conf base ifam fam cpl des scdo = do {
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
-  if need_check_noloop scdo then
+  if need_check_noloop base scdo then
     Consang.check_noloop_for_person_list base error
       (Array.to_list (Adef.parent_array cpl))
   else ();

@@ -83,6 +83,11 @@ value print_elem conf base is_surname (p, xl) =
     (fun first x ->
        do {
          if not first then Wserver.wprint "</li>\n<li>\n  " else ();
+         let sosa_num = Perso.p_sosa conf base x in
+	 if Num.gt sosa_num Num.zero then
+	   Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
+	     (Util.image_prefix conf) "sosa.gif"
+	 else ();
          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
            Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p)
@@ -331,6 +336,11 @@ value print_branch conf base psn name =
       | _ -> None ]
     in
     print_selection_bullet conf first_select;
+    let sosa_num = Perso.p_sosa conf base p in
+    if Num.gt sosa_num Num.zero then
+      Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
+	(Util.image_prefix conf) "sosa.gif"
+    else ();
     stag "strong" begin
       Wserver.wprint "%s"
         (Util.reference conf base p
@@ -351,6 +361,11 @@ value print_branch conf base psn name =
                  if is_first_level then Wserver.wprint "<br%s>\n" conf.xhs
                  else Wserver.wprint "</dd>\n<dd>\n";
                  print_selection_bullet conf select;
+                 let sosa_num = Perso.p_sosa conf base p in
+		 if Num.gt sosa_num Num.zero then
+		   Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
+		     (Util.image_prefix conf) "sosa.gif"
+		 else ();
                  stag "em" begin
                    Wserver.wprint "%s"
                      (if (is_hide_names conf p) && not (fast_auth_age conf p) 
@@ -366,6 +381,11 @@ value print_branch conf base psn name =
                Wserver.wprint "  &amp;";
                Wserver.wprint "%s\n"
                  (Date.short_marriage_date_text conf base fam p c);
+               let sosa_num = Perso.p_sosa conf base c in
+	       if Num.gt sosa_num Num.zero then
+		 Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
+		   (Util.image_prefix conf) "sosa.gif"
+	       else ();
                stag "strong" begin
                  Wserver.wprint "%s"
                    (reference conf base c
