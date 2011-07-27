@@ -1375,10 +1375,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
   | ["child" :: sl] ->
       match get_env "child" env with
       [ Vind p ->
-          let auth =
-            match get_env "auth" env with
-            [ Vbool True -> authorized_age conf base p
-            | _ -> False ]
+          let auth = authorized_age conf base p
           in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
