@@ -242,11 +242,12 @@ value first_name_print conf base x =
       let iperl = list_uniq (List.sort compare iperl) in
       let pl = List.map (pget conf base) iperl in
       let pl =
-        if conf.hide_names then
-          List.fold_right
-            (fun p pl -> if fast_auth_age conf p then [p :: pl] else pl)
-            pl []
-        else pl
+        List.fold_right
+          (fun p pl -> 
+	    if not (is_hide_names conf p) || (fast_auth_age conf p )
+	    then [p :: pl] 
+	    else pl)
+          pl []
       in
       first_name_print_list conf base x strl pl
   | _ -> select_first_name conf base x list ]
@@ -333,7 +334,7 @@ value print_branch conf base psn name =
     stag "strong" begin
       Wserver.wprint "%s"
         (Util.reference conf base p
-           (if conf.hide_names && not (fast_auth_age conf p) then "x"
+           (if (is_hide_names conf p) && not (fast_auth_age conf p) then "x"
             else if not psn && p_surname base p = name then
               person_text_without_surname conf base p
             else person_text conf base p));
@@ -352,11 +353,11 @@ value print_branch conf base psn name =
                  print_selection_bullet conf select;
                  stag "em" begin
                    Wserver.wprint "%s"
-                     (if conf.hide_names && not (fast_auth_age conf p) then
-                        "x"
-                      else if not psn && p_surname base p = name then
-                        person_text_without_surname conf base p
-                      else person_text conf base p);
+                     (if (is_hide_names conf p) && not (fast_auth_age conf p) 
+		     then "x"
+                     else if not psn && p_surname base p = name then
+                       person_text_without_surname conf base p
+                     else person_text conf base p);
                  end;
                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
                  Wserver.wprint "\n";
@@ -368,9 +369,9 @@ value print_branch conf base psn name =
                stag "strong" begin
                  Wserver.wprint "%s"
                    (reference conf base c
-                      (if conf.hide_names && not (fast_auth_age conf c) then
-                         "x"
-                       else person_text conf base c));
+                      (if (is_hide_names conf c) && not (fast_auth_age conf c) 
+		      then "x"
+                      else person_text conf base c));
                end;
                Wserver.wprint "%s" (Date.short_dates_text conf base c);
                Wserver.wprint "\n";
@@ -712,11 +713,12 @@ value surname_print conf base not_found_fun x =
         List.fold_right (fun ip ipl -> [pget conf base ip :: ipl]) iperl []
       in
       let pl =
-        if conf.hide_names then
-          List.fold_right
-            (fun p pl -> if Util.fast_auth_age conf p then [p :: pl] else pl)
-            pl []
-        else pl
+        List.fold_right
+          (fun p pl -> 
+	    if not (is_hide_names conf p) || (Util.fast_auth_age conf p)
+	    then [p :: pl] 
+	    else pl)
+          pl []
       in
       print_family_alphabetic x conf base pl
   | _ -> 
