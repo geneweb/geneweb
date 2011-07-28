@@ -52,7 +52,7 @@ install:
 	mkdir -p $(LANGDIR)/lang
 	cp hd/lang/*.txt $(LANGDIR)/lang/.
 	mkdir -p $(LANGDIR)/images
-	cp hd/images/*.jpg hd/images/*.png $(LANGDIR)/images/.
+	cp hd/images/*.jpg hd/images/*.png hd/images/*.gif $(LANGDIR)/images/.
 	mkdir -p $(LANGDIR)/etc
 	cp hd/etc/*.txt $(LANGDIR)/etc/.
 	mkdir -p $(MANDIR)
@@ -152,7 +152,7 @@ classical_distrib:
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
 	mkdir $(DESTDIR)/images
-	cp hd/images/*.jpg hd/images/*.png $(DESTDIR)/images/.
+	cp hd/images/*.jpg hd/images/*.png hd/images/*.gif $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc
 	cp hd/etc/*.txt $(DESTDIR)/etc/.
 
