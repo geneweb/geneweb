@@ -84,10 +84,10 @@ value print_elem conf base is_surname (p, xl) =
        do {
          if not first then Wserver.wprint "</li>\n<li>\n  " else ();
          let sosa_num = Perso.p_sosa conf base x in
-	 if Num.gt sosa_num Num.zero then
-	   Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
-	     (Util.image_prefix conf) "sosa.gif"
-	 else ();
+         if Num.gt sosa_num Num.zero then
+           Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
+             (Util.image_prefix conf) "sosa.png"
+         else ();
          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
            Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p)
@@ -249,9 +249,9 @@ value first_name_print conf base x =
       let pl =
         List.fold_right
           (fun p pl -> 
-	    if not (is_hide_names conf p) || (fast_auth_age conf p )
-	    then [p :: pl] 
-	    else pl)
+            if not (is_hide_names conf p) || (fast_auth_age conf p )
+            then [p :: pl] 
+            else pl)
           pl []
       in
       first_name_print_list conf base x strl pl
@@ -339,7 +339,7 @@ value print_branch conf base psn name =
     let sosa_num = Perso.p_sosa conf base p in
     if Num.gt sosa_num Num.zero then
       Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
-	(Util.image_prefix conf) "sosa.gif"
+        (Util.image_prefix conf) "sosa.png"
     else ();
     stag "strong" begin
       Wserver.wprint "%s"
@@ -362,14 +362,14 @@ value print_branch conf base psn name =
                  else Wserver.wprint "</dd>\n<dd>\n";
                  print_selection_bullet conf select;
                  let sosa_num = Perso.p_sosa conf base p in
-		 if Num.gt sosa_num Num.zero then
-		   Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
-		     (Util.image_prefix conf) "sosa.gif"
-		 else ();
+                 if Num.gt sosa_num Num.zero then
+                   Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
+                     (Util.image_prefix conf) "sosa.png"
+                 else ();
                  stag "em" begin
                    Wserver.wprint "%s"
                      (if (is_hide_names conf p) && not (fast_auth_age conf p) 
-		     then "x"
+                     then "x"
                      else if not psn && p_surname base p = name then
                        person_text_without_surname conf base p
                      else person_text conf base p);
@@ -382,10 +382,10 @@ value print_branch conf base psn name =
                Wserver.wprint "%s\n"
                  (Date.short_marriage_date_text conf base fam p c);
                let sosa_num = Perso.p_sosa conf base c in
-	       if Num.gt sosa_num Num.zero then
-		 Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
-		   (Util.image_prefix conf) "sosa.gif"
-	       else ();
+               if Num.gt sosa_num Num.zero then
+                 Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> "
+                   (Util.image_prefix conf) "sosa.png"
+               else ();
                stag "strong" begin
                  Wserver.wprint "%s"
                    (reference conf base c
@@ -735,9 +735,9 @@ value surname_print conf base not_found_fun x =
       let pl =
         List.fold_right
           (fun p pl -> 
-	    if not (is_hide_names conf p) || (Util.fast_auth_age conf p)
-	    then [p :: pl] 
-	    else pl)
+            if not (is_hide_names conf p) || (Util.fast_auth_age conf p)
+            then [p :: pl] 
+            else pl)
           pl []
       in
       print_family_alphabetic x conf base pl
