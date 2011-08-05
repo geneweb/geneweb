@@ -28,7 +28,7 @@
   --></style>
 %base_header;
 </head>
-<body%body_prop;>
+<body>
 %message_to_wizard;
 
 <h1 style="text-align:center" class="highlight">%nn;

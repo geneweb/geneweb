@@ -18,7 +18,7 @@
   </style>
 %base_header;
 </head>
-<body%body_prop;>
+<body>
 %message_to_wizard;
 
 <script type="text/javascript">

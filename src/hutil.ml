@@ -86,11 +86,7 @@ value header_without_http conf title = do {
   </style>\n" (Util.image_prefix conf) conf.highlight;
   Templ.include_hed_trl conf None "hed";
   Wserver.wprint "</head>\n";
-  let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
-    [ Not_found -> "" ]
-  in
-  let s = s ^ Util.body_prop conf in Wserver.wprint "<body%s>" s;
+  Wserver.wprint "<body>";
   Wserver.wprint "\n";
   Util.message_to_wizard conf;
 };

@@ -54,7 +54,7 @@ sv: Genealogi
   </style>
 %base_header;
 </head>
-<body%if;(evar.templ != "random")%body_prop;%end;>
+<body%if;(evar.templ != "random")%end;>
 
 <script type="text/javascript"><!--
   function WorkOnBrowser() {
