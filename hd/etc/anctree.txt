@@ -22,7 +22,7 @@
   --></style>
 %base_header;
 </head>
-<body%body_prop;>
+<body>
 %message_to_wizard;
 
 %define;a_tree_line()
