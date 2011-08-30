@@ -1,0 +1,143 @@
+html 
+{ 
+ background: url('/images/bg_motif.png');
+ font-family: "Arial";
+}
+
+span.highlight 
+{ 
+ font-weight: bold;
+}
+#lang { text-align: center }
+#lang .title { font-size: 80%% }
+#lang .list { width: 100%% }
+#lang a { display: inline }
+#lang .item span { display: none }
+#content .subtitle { text-align: center }
+#form-titles div {float: left; margin-right: 3px;}
+#content fieldset {border: 0;}
+
+h1
+{
+ text-align: center; 
+ color: #303900;
+}
+
+#footer 
+{ 
+ background-color: #e7edb3; 
+}
+
+#user-info 
+{ 
+ float: %right; 
+}
+
+#title 
+{ 
+ padding-top: 1em;
+ text-align: center; 
+ vertical-align: middle; 
+ width: 100%%;
+ background-color: #e7edb3;
+}
+
+#title h1
+{
+ text-align: center; 
+ color: #303900;
+}
+
+#logo 
+{
+ float: left;
+}
+
+#acces 
+{
+ float: right; 
+ width: 156px; 
+ border: solid 2px #6f8301;
+}
+
+#acces h3 
+{
+ text-align: left; 
+ background-color: #6f8301; 
+ color: white; 
+ margin: 0;
+}
+
+#search 
+{
+ width: 750px; 
+ border: solid 2px #6f8301;
+ text-align: left; 
+ align: center;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+#search h3 
+{
+ margin: 0; 
+ text-align: left; 
+ background-color: #6f8301; 
+ color: white;
+}
+
+#search form
+{
+ margin-top: 10px;
+ margin-left: 10px;
+}
+
+#options 
+{
+ width: 750px; 
+ border: solid 2px #6f8301;
+ text-align: left; 
+ overflow: auto;
+ align: center;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+#options h3 
+{
+ margin: 0; 
+ text-align: left; 
+ background-color: #6f8301; 
+ color: white;
+}
+
+#navigation 
+{
+ width: 750px; 
+ border: solid 2px #6f8301;
+ text-align: left; 
+ overflow: auto;
+ align: center;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+#navigation h3 
+{
+ text-align: left; 
+ background-color: #6f8301; 
+ color: white; 
+ margin: 0;
+}
+
+#list_left
+{
+ width: 45%; 
+ float: left;
+}
+
+#list_right
+{
+ width: 45%; 
+ float: right;
+}

@@ -155,6 +155,8 @@ classical_distrib:
 	cp hd/images/*.jpg hd/images/*.png $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc
 	cp hd/etc/*.txt $(DESTDIR)/etc/.
+	mkdir $(DESTDIR)/css
+	cp hd/css/*.css $(DESTDIR)/css/.
 
 windows_files:
 	@for i in distribution/*.txt distribution/gw/*.txt; do \
