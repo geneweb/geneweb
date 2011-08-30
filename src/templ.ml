@@ -1477,6 +1477,7 @@ and print_simple_variable conf base_opt =
   [ "base_header" -> include_hed_trl conf base_opt "hed"
   | "base_trailer" -> include_hed_trl conf base_opt "trl"
   | "body_prop" -> print_body_prop conf
+  | "css_prop" -> print_css_prop conf
   | "copyright" -> print_copyright conf
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
