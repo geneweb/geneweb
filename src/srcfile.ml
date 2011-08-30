@@ -231,6 +231,12 @@ value macro conf base =
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
         (Num.of_int r.welcome_cnt)
+  | 'C' ->
+      let s =
+        try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
+        [ Not_found -> "" ]
+      in
+      s ^ css_prop conf
   | 'd' -> string_of_start_date conf
   | 'D' -> (count conf).start_date
   | 'e' -> conf.charset

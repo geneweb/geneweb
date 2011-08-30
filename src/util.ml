@@ -1017,6 +1017,15 @@ value default_body_prop conf =
   " style=\"" ^ style ^ "\""
 ;
 
+value css_prop conf =
+  try
+    match List.assoc "css_prop" conf.base_env with
+    [ "" -> "default.css"
+    | s -> s ^ ".css" ]
+  with
+  [ Not_found -> "default.css" ]
+;
+
 value body_prop conf =
   try
     match List.assoc "body_prop" conf.base_env with

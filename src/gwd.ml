@@ -22,6 +22,7 @@ value default_lang = ref "fr";
 value setup_link = ref False;
 value choose_browser_lang = ref False;
 value images_dir = ref "";
+value css_dir = ref "";
 value log_file = ref "";
 value log_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
@@ -1531,6 +1532,58 @@ value image_request cgi script_name env =
       else False ]
 ;
 
+value content_css cgi =
+  do {
+  if not cgi then Wserver.http "" else ();
+  Wserver.wprint "Content-type: text/css";
+  Util.nl ();
+  Util.nl ();
+  Wserver.wflush ();
+  }
+;
+
+value css_file_name str =
+  let fname1 =
+    List.fold_right Filename.concat [Secure.base_dir (); "css"] str
+  in
+  if Sys.file_exists fname1 then fname1
+  else search_in_lang_path (Filename.concat "css" str)
+;
+
+value print_css_file cgi fname =
+  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let buf = String.create 1024 in
+      let len = in_channel_length ic in
+      do {
+        content_css cgi;
+        let rec loop len =
+          if len = 0 then ()
+          else do {
+            let olen = min (String.length buf) len in
+            really_input ic buf 0 olen;
+            Wserver.wprint "%s" (String.sub buf 0 olen);
+            loop (len - olen)
+          }
+        in
+        loop len;
+        close_in ic;
+      }
+  | None -> () ]
+;
+
+value css_request cgi script_name =
+  let s = script_name in
+  if Util.start_with s 0 "css/" then
+    let i = String.length "css/" in
+    let fname = String.sub s i (String.length s - i) in
+    let fname = Filename.basename fname in
+    let fname = css_file_name fname in
+    let _ = print_css_file cgi fname in
+    True
+  else False 
+;
+
 value strip_quotes s =
   let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
   let i1 =
@@ -1630,7 +1683,8 @@ value connection cgi (addr, request) script_name contents =
       else
         try
           let (contents, env) = build_env request contents in
-          if image_request cgi script_name env then ()
+          if image_request cgi script_name env || css_request cgi script_name
+          then ()
           else
             conf_and_connection cgi from (addr, request) script_name contents
               env
