@@ -74,16 +74,9 @@ value header_without_http conf title = do {
   Wserver.wprint
     "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
     conf.xhs;
-  Wserver.wprint "  \
-  <style type=\"text/css\">
-    html { background:url('%s/gwback.jpg') }
-    .highlight { color: %s; font-weight: bold }
-    .found { color: black; background-color: #afa;font-weight:bold }
-    hr { border: 0; border-bottom: 1px solid }
-    a.date { text-decoration: none; color: black }
-    div.summary ul { padding-left: 0; list-style-type: none }
-    div.summary ul ul { padding-left: 1.618em }
-  </style>\n" (Util.image_prefix conf) conf.highlight;
+  Wserver.wprint 
+    "  <link rel=\"stylesheet\" type=\"text/css\" href=\"css/%s\" />\n"
+    (Util.css_prop conf);
   Templ.include_hed_trl conf None "hed";
   Wserver.wprint "</head>\n";
   Wserver.wprint "<body>";
@@ -134,18 +127,13 @@ value rheader conf title = do {
 
 value gen_trailer with_logo conf = do {
   if not with_logo then ()
-  else
-    Wserver.wprint "\
-<div>
-<a href=\"%s\"><img src=\"%s/gwlogo.png\"
- alt=\"...\" width=\"64\" height=\"72\" style=\"border:0;float:%s\"%s></a>
-<br%s>
-</div>
-" (Util.commd conf) (Util.image_prefix conf) conf.right
-    conf.xhs conf.xhs;
+  else Wserver.wprint "</body>\n" ;
+  Wserver.wprint "<br />\n";
+  Wserver.wprint "<div id=\"footer\">\n" ;
   Templ.print_copyright conf;
+  Wserver.wprint "</div>\n" ;
   Templ.include_hed_trl conf None "trl";
-  Wserver.wprint "</body>\n</html>\n";
+  Wserver.wprint "</html>\n";
 };
 
 value trailer = gen_trailer True;
