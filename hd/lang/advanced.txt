@@ -6,7 +6,7 @@
   <!--meta http-equiv="Content-Type" content="text/html; charset=%e"-->
   <title>[*advanced request]</title>
 %j</head>
-<body%b>
+<body>
 
 <center><h1><font color=%i>[*advanced request]</font></h1></center>
 
