@@ -16,10 +16,7 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
-  <style type="text/css">
-    html { background:url('%image_prefix;/gwback.jpg') }
-    .highlight { color: %highlight;; font-weight: bold }
-  </style>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
 <body>
@@ -152,7 +149,7 @@ function changeCalendar(e,v,m,c) {
 </script>
 
 %define;date(xlab,xvar,xdate)
-  <table border="1">
+  <table border="1" width=700px>
     <tr>
       <td>xlab</td>
       <td>
@@ -189,7 +186,7 @@ function changeCalendar(e,v,m,c) {
       </td>
     </tr>
   </table>
-  <table border="1">
+  <table border="1" width=700px>
     <tr>
       <td>[*calendar/calendars]0
         <select name="xvar_cal" onchange=%nn;
@@ -231,7 +228,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;source(xvar,xx)
-  <table border="1">
+  <table border="1" width=700px>
     <tr>
       <td><label for="xvar_src">[*source/sources]0</label></td>
       <td><input name="xvar_src" size="40" maxlength="200"%sp;
@@ -277,14 +274,14 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;parent(xcnt,xx)
-  <table border="1">
+  <table border="1" width=700px>
     <tr>
       <td><label for="paxcnt_fn">[*first name/first names]0</label></td>
       <td>
-        <input name="paxcnt_fn" size="23" maxlength="200"%sp;
+        <input name="paxcnt_fn" size="40" maxlength="200"%sp;
          value="%xx.first_name;" id="paxcnt_fn"%/>
       </td>
-      <td align="%right;"><label for="paxcnt_occ">[*number]</label></td>
+      <td><label for="paxcnt_occ">[*number]</label></td>
       <td>
         <input name="paxcnt_occ" size="5" maxlength="8" value="%xx.occ;"%sp;
          id="paxcnt_occ"%/>
@@ -305,8 +302,6 @@ function changeCalendar(e,v,m,c) {
          value="%xx.surname" id="paxcnt_sn"%/>
       </td>
     </tr>
-  </table>
-  <table border="1">
     <tr>
       %apply;birth("paxcnt","xx","true")
     </tr>
@@ -398,7 +393,7 @@ function changeCalendar(e,v,m,c) {
  checked="checked"%end;%/>[*no mention]
 </label>
 </p>
-<table border="1">
+<table border="1" width=700px>
   <tr>
     <td><label for="marr_place">[*place]</label></td>
     <td>
@@ -421,11 +416,11 @@ function changeCalendar(e,v,m,c) {
 </table>
 
 %foreach;witness;
-  <table border="1">
+  <table border="1" width=700px>
     <tr>
       <td><label for="witn%cnt;_fn">[*first name/first names]0</label></td>
       <td>
-        <input name="witn%cnt;_fn" size="23" maxlength="200"%sp;
+        <input name="witn%cnt;_fn" size="40" maxlength="200"%sp;
          value="%witness.first_name;" id="witn%cnt;_fn"%/>
       </td>
       <td align="%right;"><label for="witn%cnt;_occ">[*number]</label></td>
@@ -487,7 +482,7 @@ function changeCalendar(e,v,m,c) {
 
 <h4><label for="comment">[*comment]</label></h4>
 
-<table border="1">
+<table border="1" width=700px>
   <tr>
     <td><input name="comment" size="50" maxlength="200"%sp;
      value="%comment;" id="comment"%/></td>
@@ -613,10 +608,12 @@ function changeCalendar(e,v,m,c) {
 </p>
 </form>
 
-<div><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:%right;"%/></a><br%/>
-</div>
+</body>
+
+<div id="footer">
 %copyright;
 %base_trailer;
-</body>
+</div>
+
+
 </html>

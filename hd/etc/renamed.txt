@@ -2,9 +2,11 @@
 <head>
   <meta name="robots" content="none">
   <!--meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"-->
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>%o -&gt; %e</title>
 </head>
-<body background="%km=IM;v=/gwback.jpg">
+<body background="%km=IM;v=/bg_motif.png">
 <h1>%o -&gt; %e</h1>
 
 The database "%o" has been renamed "%e".

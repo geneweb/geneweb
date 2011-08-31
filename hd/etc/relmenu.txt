@@ -10,12 +10,7 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <style type="text/css">
-    html { background:url('%image_prefix;/gwback.jpg') }
-    .highlight { color: %highlight;; font-weight: bold }
-    hr { border: 0; border-bottom: 1px solid }
-    a.date { text-decoration: none; color: black }
-  </style>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
 <body>
@@ -146,43 +141,56 @@
   %end;
 %end;
 </ul>
-<table border="%border;" width="90%%">
+<table border="%border;" width="100%%"><tr><td align="center">
+<table border="%border;">
 <tr>
-  <td align="%right;">
+  <td align="%left;">
     <label>
       [*long display]
       <input type="checkbox" name="long" value="on"%/>
     </label>
   </td>
-  <td align="%right;">
+  <td align="%left;">
     <label>
       [*image/images]1
       <input type="checkbox" name="image" value="on"%/>
     </label>
   </td>
+  <td align="%left;">
+    <label>
+      <input type="radio" name="et" value="A" checked="checked"%/>
+      [*ancestors]
+    </label>
+  </td>
 </tr>
 <tr>
-  <td align="%right;">
+  <td align="%left;">
     <label>
       [*include spouses]
       <input type="checkbox" name="spouse" value="on"%/>
     </label>
   </td>
-  <td align="%right;">
+  <td align="%left;">
     <label>
       [*cancel GeneWeb links]
       <input type="checkbox" name="cgl" value="on"%/>
     </label>
   </td>
+  <td align="%left;">
+    <label>
+      <input type="radio" name="et" value="M"%/>
+      [*relationships by marriage]
+    </label>
+  </td>
 </tr>
 <tr>
-  <td align="%right;">
+  <td align="%left;">
     <label>
       [*border]
       <input name="bd" size="1" maxlength="2" value="0"%/>
     </label>
   </td>
-  <td align="%right;">
+  <td align="%left;">
     <table><tr><td>[*color]</td>
     <td>
       <input type="radio" name="color" value="" checked="checked"%/>
@@ -207,33 +215,14 @@
     </td>
     </tr></table>
   </td>
-</tr>
-<tr>
-  <td align="%right;">&nbsp;</td>
-  <td align="%right;">&nbsp;</td>
-</tr>
-<tr align="%left;">
-  <td align="center" colspan="2">
-    <table border="%border;" cellspacing="0" cellpadding="0"><tr>
-      <td align="%left;">
-        <label>
-          <input type="radio" name="et" value="A" checked="checked"%/>
-          [*ancestors]
-        </label>
-      </td></tr><tr><td align="%left;">
-        <label>
-          <input type="radio" name="et" value="M"%/>
-          [*relationships by marriage]
-        </label>
-      </td></tr><tr><td align="%left;">
-        <label>
-          <input type="radio" name="et" value="S"%/>
-          [*shortest path]
-        </label>
-      </td>
-    </tr></table>
+  <td align="%left;">
+    <label>
+      <input type="radio" name="et" value="S"%/>
+      [*shortest path]
+    </label>
   </td>
 </tr>
+
 <tr align="%left;">
   <td align="center" colspan="2">
     <input type="submit" value="Ok"%/>
@@ -241,12 +230,12 @@
 </tr>
 </table>
 </form>
-<div>
-<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
-<br%/>
-</div>
+
+</body>
+
+<div id="footer">
 %copyright;
 %base_trailer;
-</body>
+</div>
+
 </html>

@@ -12,10 +12,7 @@
       [*modify::person/persons]0 # %index;
     %else;[*add::person/persons]0%end;
   </title>
-  <style type="text/css">
-    html { background:url('%image_prefix;/gwback.jpg') }
-    .highlight { color: %highlight;; font-weight: bold }
-  </style>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
 <body>
@@ -153,7 +150,7 @@ function changeCalendar(e,v,m,c) {
 </script>
 
 %define;date(xlab,xvar,xdt,xcond)
-  <table border="1">
+  <table border="1" width=700px>
   <tr>
   <td>xlab</td>
   <td>
@@ -186,7 +183,7 @@ function changeCalendar(e,v,m,c) {
   </td>
   </tr>
   </table>
-  <table border="1">
+  <table border="1" width=700px>
   <tr>
   <td>[*calendar/calendars]0
   <select name="xvar_cal"%sp;
@@ -225,7 +222,7 @@ function changeCalendar(e,v,m,c) {
   </table>
 %end;
 %define;source(xx)
-  <table border="1">
+  <table border="1" width=700px>
   <tr>
   <td><label for="xx_src">[*source/sources]0</label></td>
   <td>
@@ -275,11 +272,11 @@ function changeCalendar(e,v,m,c) {
 %end;
 </p>
 
-<table border="1">
+<table border="1" width=700px>
 <tr>
 <td><label for="first_name">[*first name/first names]0</label></td>
 <td>
-<input name="first_name" size="30" maxlength="200" value="%first_name;"%sp;
+<input name="first_name" size="40" maxlength="200" value="%first_name;"%sp;
  id="first_name"%/></td>
 <td><label for="occ">[*number]0</label></td>
 <td>
@@ -310,14 +307,14 @@ function changeCalendar(e,v,m,c) {
 <tr>
 <td><label for="image">[*image/images]0</label></td>
 <td colspan="3">
-<input name="image" size="50" value="%image;" id="image"%/>
+<input name="image" size="40" value="%image;" id="image"%/>
 </td>
 </tr>
 </table>
 
 <p></p>
 
-<table border="1">
+<table border="1" width=700px>
 %if;has_qualifiers;
   %foreach;qualifier;
     <tr>
@@ -408,7 +405,7 @@ function changeCalendar(e,v,m,c) {
 
 <h4>[*birth]</h4>
 
-<table border="1">
+<table border="1" width=700px>
 <tr>
 <td>[*born]2...</td>
 <td><label for="birth_place">[*place]</label></td>
@@ -425,7 +422,7 @@ function changeCalendar(e,v,m,c) {
 
 <p></p>
 
-<table border="1">
+<table border="1" width=700px>
 <tr>
 <td>[*baptized]2...</td>
 <td><label for="bapt_place">[*place]</label></td>
@@ -442,7 +439,7 @@ function changeCalendar(e,v,m,c) {
 
 <h4>[*death]</h4>
 
-<table border="1">
+<table border="1" width=700px>
 <tr>
 <td>
 <select name="death">
@@ -472,7 +469,7 @@ function changeCalendar(e,v,m,c) {
 
 %apply;date([*date]0, "death", "death", " onfocus='setDead()'")
 
-<table border="1">
+<table border="1" width=700px>
 <tr>
 <td>
 <label>
@@ -499,7 +496,7 @@ function changeCalendar(e,v,m,c) {
 
 <h4>[*burial]</h4>
 
-<table border="1">
+<table border="1" width=700px>
 <tr>
 <td>
 <select name="burial">
@@ -525,10 +522,10 @@ function changeCalendar(e,v,m,c) {
 
 <h4><label for="occu">[*occupation]</label></h4>
 
-<table border="1">
+<table border="1" width=700px>
 <tr>
 <td>
-<input name="occu" size="50" maxlength="200" value="%occupation;" id="occu"%/>
+<input name="occu" size="40" maxlength="200" value="%occupation;" id="occu"%/>
 </td>
 </tr>
 </table>
@@ -572,7 +569,7 @@ function changeCalendar(e,v,m,c) {
   </table>
 %end;
 %define;one_relation(xcnt,xvar,xrel,xsex)
- <table border="1">
+ <table border="1" width=700px>
     <tr>
       <td><label for="rxcnt_xvar_fn">[*first name/first names]0</label></td>
       <td>
@@ -640,11 +637,11 @@ function changeCalendar(e,v,m,c) {
   </table>
 %end;
 %define;one_title(xcnt)
-  <table border="1">
+  <table border="1" width=700px>
     <tr>
       <td><label for="t_identxcnt">[*title/titles]0</label></td>
       <td>
-        <input name="t_identxcnt" size="15" value="%title.t_ident;"%sp;
+        <input name="t_identxcnt" size="20" value="%title.t_ident;"%sp;
          id="t_identxcnt"%/>
       </td>
       <td><label for="t_placexcnt">[*estate]0</label></td>
@@ -709,7 +706,9 @@ function changeCalendar(e,v,m,c) {
 </table>
 
 <h4><label for="notes">[*note/notes]1</label></h4>
-
+<div id="toolbar">
+     %let;name;notes%in;
+      %include.toolbar;
 <p>
 <table>
   <tr>
@@ -730,7 +729,7 @@ function changeCalendar(e,v,m,c) {
 
 <h4><label for="src">[*source/sources]0</label></h4>
 
-<table border="1">
+<table border="1" width=700px>
   <tr>
     <td>
       <input name="src" size="70" maxlength="300"%sp; value="%sources;"%sp;
@@ -744,10 +743,11 @@ function changeCalendar(e,v,m,c) {
 </p>
 </form>
 
-<div><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:%right;"%/></a><br%/>
-</div>
+</body>
+
+<div id=footer">
 %copyright;
 %base_trailer;
-</body>
+</div>
+
 </html>
