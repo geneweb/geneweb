@@ -13,6 +13,20 @@ open Mutil;
 open Printf;
 open TemplAst;
 
+value get_wday conf d =
+  let jd = match d with
+  [ Dgreg d Dgregorian | Dgreg d Djulian | Dgreg d Dfrench | Dgreg d Dhebrew ->
+    Calendar.sdn_of_gregorian d
+  | _ -> -1 ]
+  in 
+  let wday =
+    let jd_today = Calendar.sdn_of_gregorian conf.today in
+    let x = conf.today_wd - jd_today + jd in
+    if x < 0 then 6 + (x + 1) mod 7 else x mod 7
+  in
+  " (" ^ (transl_nth conf "(week day)" wday) ^ ")"
+;
+
 value nbsp = "&nbsp;";
 value death_symbol conf =
   match

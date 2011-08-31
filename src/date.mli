@@ -19,3 +19,6 @@ value get_birth_death_date : person -> (option date * option date * bool);
 
 value before_date : dmy -> dmy -> bool;
   (* [before_date d1 d2] = True if d2 before d1; I know, it is not logical *)
+
+(* return the day of the week given the date as parameter *)
+value get_wday : config -> date -> string;
