@@ -88,6 +88,21 @@ value record_notes conf base (num, file) action =
   gen_record conf base (Rnotes num file) action
 ;
 
+value record_key conf base old_key new_key =
+  match p_getenv conf.base_env "notify_key" with
+  [ Some comm ->
+    let args = [| comm; conf.bname; old_key; new_key |] in
+    match Unix.fork () with
+    [ 0 ->
+      if Unix.fork () <> 0 then exit 0
+      else do {
+        try Unix.execvp comm args with _ -> ();
+        exit 0
+      }
+    | id -> ignore (Unix.waitpid [] id) ]
+  | None -> () ]
+;
+
 (* Request for history printing *)
 
 exception Begin_of_file;
