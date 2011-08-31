@@ -1973,9 +1973,11 @@ value find_person_in_env conf base suff =
           [ Some ip ->
               let p = pget conf base ip in
               if is_hidden p then None
-              else if not (is_hide_names conf p) || authorized_age conf base p then
-                Some p
-              else None
+              else 
+                if not (is_hide_names conf p) || authorized_age conf base p 
+                then
+                  Some p
+                else None
           | None -> None ]
       | _ -> None ] ]
 ;

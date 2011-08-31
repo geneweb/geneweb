@@ -746,6 +746,7 @@ function changeCalendar(e,v,m,c) {
 
 </body>
 
+<br />
 <div id=footer">
 %copyright;
 %base_trailer;

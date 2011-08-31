@@ -48,7 +48,7 @@
 %end;
 
 <table border="%border;" width="100%%"><tr><td align="center">
-<table border="%border;" width="90%%">
+<table border="%border;">
 <tr>
   <td align="center">
   <form method="get" action="%action;">
