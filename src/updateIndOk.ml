@@ -748,7 +748,21 @@ value print_mod_aux conf base callback =
   [ Update.ModErr -> () ]
 ;
 
+value get_old_key conf base =
+  let ip = 
+    match p_getenv conf.env "i" with
+    [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
+    | _ -> -1 ]
+  in
+  let p = poi base (Adef.iper_of_int ip) in
+  let first_name = sou base (Gwdb.get_first_name p) in
+  let surname = sou base (Gwdb.get_surname p) in
+  let occ = Gwdb.get_occ p in
+  default_image_name_of_key first_name surname occ
+;
+
 value print_mod o_conf base =
+  let old_key = get_old_key o_conf base in
   let conf = Update.update_conf o_conf in
   let callback sp = do {
     let p = effective_mod conf base sp in
@@ -777,6 +791,8 @@ value print_mod o_conf base =
     let k = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
     Util.commit_patches conf base;
     History.record conf base k "mp";
+    let new_key = default_image_name_of_key sp.first_name sp.surname sp.occ in
+    History.record_key conf base old_key new_key ;
     if not (is_quest_string p.surname) &&
        not (is_quest_string p.first_name) &&
        not (is_old_person conf p)
