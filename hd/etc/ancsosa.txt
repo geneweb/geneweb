@@ -706,7 +706,11 @@
                   %apply;link(ancestor.access, ancestor)
                 %end;
               %end;
-              %ancestor.title;%ancestor.dates;
+              %ancestor.title;%sp;
+              %apply;somebody_long_info("ancestor")
+              %if;ancestor.has_occupation;
+                , %apply;capitalize(ancestor.occupation)%nn;
+              %end;
               </li>%nl;
             %end;
           %elseif;(evar.ms = "on" and ancestor.has_parents)
@@ -719,8 +723,11 @@
                   %apply;link(ancestor.father.access, [husband/wife]0)
                 %and;
                   %ancestor.mother;
-                  %ancestor.mother.title;
-                  %ancestor.mother.dates;
+                  %ancestor.mother.title;%sp
+                  %apply;somebody_long_info("ancestor.mother")
+                  %if;ancestor.mother.has_occupation;
+                    , %apply;capitalize(ancestor.mother.occupation)%nn;
+                  %end;
                 %end;
                 </li>%nl;
               %end;
@@ -734,8 +741,11 @@
                   %apply;link(ancestor.mother.access, [husband/wife]1)
                 %and;
                   %ancestor.father;
-                  %ancestor.father.title;
-                  %ancestor.father.dates;
+                  %ancestor.father.title;%sp;
+                  %apply;somebody_long_info("ancestor.father")
+                  %if;ancestor.father.has_occupation;
+                    , %apply;capitalize(ancestor.father.occupation)%nn;
+                  %end;
                 %end;
                 </li>%nl;
               %end;
