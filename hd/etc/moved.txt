@@ -3,9 +3,11 @@
 <head>
   <meta name="robots" content="none">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>install -&gt; http://geneweb.inria.fr/roglo?</title>
 </head>
-<body background="images/bg_motif.png">
+<body>
 [
 en: The database "%b" has moved to:
 fr: La base de données "%b" se trouve maintenant à l'adresse:

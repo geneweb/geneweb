@@ -5,6 +5,8 @@
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -16,7 +18,6 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
 <body>

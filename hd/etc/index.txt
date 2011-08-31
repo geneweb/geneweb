@@ -1,9 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <meta name="robots" content="none">
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>Base</title>
 </head>
-<body background="%o/bg_motif.png">
+<body>
 <center><h1><font color=#2f6400>Base</font></h1></center>
 <ul>
 <li>

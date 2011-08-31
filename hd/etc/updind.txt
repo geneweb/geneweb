@@ -5,6 +5,8 @@
   <!-- Copyright (c) 1998-2007 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -12,7 +14,6 @@
       [*modify::person/persons]0 # %index;
     %else;[*add::person/persons]0%end;
   </title>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
 <body>
