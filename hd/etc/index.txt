@@ -3,7 +3,7 @@
   <meta name="robots" content="none">
   <title>Base</title>
 </head>
-<body background="%o/gwback.jpg">
+<body background="%o/bg_motif.png">
 <center><h1><font color=#2f6400>Base</font></h1></center>
 <ul>
 <li>

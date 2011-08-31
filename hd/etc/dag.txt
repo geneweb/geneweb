@@ -11,11 +11,7 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <style type="text/css"><!--
-    .highlight { color: %highlight;; font-weight: bold }
-    hr { border: 0; border-bottom: 1px solid }
-    a.date { text-decoration: none; color: black }
-  --></style>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
 <body>
@@ -169,12 +165,12 @@
   %end;
 %end;
 
-<div>
-<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
-<br%/>
-</div>
+</body>
+
+<div id="footer">
 %copyright;
 %base_trailer;
-</body>
+</div>
+
+
 </html>
