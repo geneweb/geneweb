@@ -72,27 +72,27 @@
   %end;
   %if;(xx.has_birth_date or xx.has_birth_place)
     , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
-    %if;xx.has_birth_date; %xx.on_birth_date;%end;
+    %if;xx.has_birth_date; %xx.on_birth_long_date;%end;
     %if;xx.has_birth_place;, %xx.birth_place;%end;
   %end;
   %if;(xx.has_baptism_date or xx.has_baptism_place)
     , %if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
     %else;[baptized]2%end;
-    %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
+    %if;xx.has_baptism_date; %xx.on_baptism_long_date;%end;
     %if;xx.has_baptism_place;, %xx.baptism_place;%end;
   %end;
   %if;xx.is_dead;, %xx.died;
-    %if;(xx.has_death_date) %xx.on_death_date;%end;
+    %if;(xx.has_death_date) %xx.on_death_long_date;%end;
     %if;(xx.has_death_place), %xx.death_place;%end;
   %end;
   %if;xx.is_buried;,
     %if;xx.is_male;[buried]0%else;[buried]1%end;
-    %if;xx.has_burial_date; %xx.on_burial_date;%end;
+    %if;xx.has_burial_date; %xx.on_burial_long_date;%end;
     %if;xx.has_burial_place;, %xx.burial_place;%end;%nl;
   %end;
   %if;xx.is_cremated;,
     %if;xx.is_male;[cremated]0%else;[cremated]1%end;
-    %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
+    %if;xx.has_cremation_date; %xx.on_cremation_long_date;%end;
     %if;xx.has_cremation_place;, %xx.cremation_place;%end;%nl;
   %end;
   %if;xx.computable_death_age;%sp;
@@ -143,7 +143,7 @@
       %apply;married_to%with;
         %xx.is_male;
       %and;
-        %if;(on_marriage_date != "") %on_marriage_date;%end;
+        %if;(on_marriage_date != "") %on_marriage_long_date;%end;
         %if;(marriage_place != ""), %marriage_place;,%end;
       %end;
     %end;%nl;
