@@ -2544,9 +2544,10 @@ value print_foreach conf base print_ast eval_expr =
     | _ -> raise Not_found ]
   and print_foreach_alias env al ((p, p_auth) as ep) =
     if p_auth then
-      List.iter
-        (fun a ->
+      list_iter_first
+        (fun first a ->
            let env = [("alias", Vstring (sou base a)) :: env] in
+           let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_aliases p)
     else ()
