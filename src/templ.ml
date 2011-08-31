@@ -1058,11 +1058,7 @@ value print_body_prop conf =
 ;
 
 value print_css_prop conf =
-  let s =
-    try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
-    [ Not_found -> "" ]
-  in
-  Wserver.wprint "%s" (s ^ Util.css_prop conf)
+  Wserver.wprint "%s" (Util.css_prop conf)
 ;
 
 type vother 'a =
