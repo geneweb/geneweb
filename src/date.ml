@@ -24,7 +24,10 @@ value get_wday conf d =
     let x = conf.today_wd - jd_today + jd in
     if x < 0 then 6 + (x + 1) mod 7 else x mod 7
   in
-  " (" ^ (transl_nth conf "(week day)" wday) ^ ")"
+  if jd <> -1 then
+    " (" ^ (transl_nth conf "(week day)" wday) ^ ")"
+  else
+    ""
 ;
 
 value nbsp = "&nbsp;";
