@@ -616,6 +616,7 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 </body>
 
 
+<br />
 <div id="footer">
 %copyright;
 
