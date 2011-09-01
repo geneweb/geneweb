@@ -508,14 +508,14 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;child(xcnt)
-  <table border="1">
+  <table border="1" width=660px>
     <tr>
       <td><label for="chxcnt_fn">[*first name/first names]0</label></td>
       <td colspan="2">
-        <input name="chxcnt_fn" size="23" maxlength="200"%sp;
+        <input name="chxcnt_fn" size="40" maxlength="200"%sp;
          value="%child.first_name;" id="chxcnt_fn"%/>
       </td>
-      <td align="%right;"><label for="chxcnt_occ">[*number]</label></td>
+      <td><label for="chxcnt_occ">[*number]</label></td>
       <td>
         <input name="chxcnt_occ" size="5" maxlength="8" value="%child.occ;"%sp;
          id="chxcnt_occ"%/>
