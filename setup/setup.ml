@@ -1717,7 +1717,8 @@ value wrap_setup a b c =
          and we cannot parse the arg list again, because of possible spaces
          in arguments which may appear as separators *)
       try default_lang.val := Sys.getenv "GWLANG" with [ Not_found -> () ];
-      try setup_dir.val := Sys.getenv "GWGD" with [ Not_found -> () ]
+      try setup_dir.val := Sys.getenv "GWGD" with [ Not_found -> () ];
+      try bin_dir.val := Sys.getenv "GWGD" with [ Not_found -> () ]
     }
     ELSE () END;
     try setup a b c with [ Exit -> () ]
