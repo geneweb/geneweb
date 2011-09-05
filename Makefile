@@ -75,10 +75,16 @@ distrib: new_distrib wrappers
 
 wrappers:
 	if test "$(CAMLP5F)" = "-DWIN95"; then \
-	  echo 'cd gw' > $(DESTDIR)/gwd.bat; \
-	  echo 'gwd' >> $(DESTDIR)/gwd.bat; \
-	  echo 'cd gw' > $(DESTDIR)/gwsetup.bat; \
-	  echo 'gwsetup' >> $(DESTDIR)/gwsetup.bat; \
+	  echo 'setlocal enableextensions' > $(DESTDIR)/gwd.bat; \
+	  echo 'md bases' >> $(DESTDIR)/gwd.bat; \
+	  echo 'endlocal' >> $(DESTDIR)/gwd.bat; \
+	  echo 'cd bases' >> $(DESTDIR)/gwd.bat; \
+	  echo '..\\gw\\gwd -hd ..\\gw' >> $(DESTDIR)/gwd.bat; \
+	  echo 'setlocal enableextensions' > $(DESTDIR)/gwsetup.bat; \
+	  echo 'md bases' >> $(DESTDIR)/gwsetup.bat; \
+	  echo 'endlocal' >> $(DESTDIR)/gwsetup.bat; \
+	  echo 'cd bases' >> $(DESTDIR)/gwsetup.bat; \
+	  echo '..\\gw\\gwsetup -gd ..\\gw' >> $(DESTDIR)/gwsetup.bat; \
 	else \
 	  (echo '#!/bin/sh'; \
 	   echo 'mkdir -p bases'; \
