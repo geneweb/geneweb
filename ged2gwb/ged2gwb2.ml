@@ -2498,7 +2498,7 @@ value anonfun s =
   else raise (Arg.Bad "Cannot treat several GEDCOM files")
 ;
 
-value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
+value errmsg = "Usage: ged2gwb2 [<ged>] [options] where options are:";
 
 value main () =
   do {

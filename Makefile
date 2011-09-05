@@ -40,6 +40,7 @@ install:
 	cp src/gwd $(PREFIX)/bin/gwd$(EXE)
 	cp src/gwu $(PREFIX)/bin/gwu$(EXE)
 	cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE)
+	cp ged2gwb/ged2gwb2 $(PREFIX)/bin/ged2gwb2$(EXE)
 	cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE)
 	mkdir -p $(DOCDIR)
 	cp doc/*.htm $(DOCDIR)/.

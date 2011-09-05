@@ -367,6 +367,7 @@ value make_index bdir particles f2 = do {
           loop rev_iofc (i + 1) list
         } ]
   in
+  close_in ic;
   let oc = open_out_bin index_dat_fname in
   output_value oc (a : array (string * int));
   close_out oc;

@@ -739,6 +739,14 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
         tag "tr" begin
           tag "td" begin
             tag "table" begin
+              match Util.open_etc_file "toolbar" with
+              [ Some ic ->
+                  tag "tr" begin
+                    tag "td" begin
+                      Templ.copy_from_templ conf [("name", "notes")] ic;
+                    end;
+                  end
+              | None -> () ];
               tag "tr" begin
                 tag "td" begin
                   stag "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"%s"

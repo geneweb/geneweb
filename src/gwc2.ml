@@ -126,7 +126,7 @@ value anonfun x =
 
 value errmsg =
   "\
-Usage: gwc [options] [files]
+Usage: gwc2 [options] [files]
 where [files] are a list of files:
   source files end with .gw
   object files end with .gwo
