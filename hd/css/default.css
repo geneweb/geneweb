@@ -1,6 +1,6 @@
 html 
 { 
- background: url('/images/bg_motif.png');
+ background: url('/images/gwback.jpg');
  font-family: "Arial";
 }
 
@@ -25,7 +25,7 @@ h1
 
 #footer 
 { 
- background-color: #e7edb3; 
+ background-color: #e7edb3;
 }
 
 #user-info 

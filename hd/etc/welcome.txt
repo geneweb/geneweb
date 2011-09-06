@@ -28,32 +28,32 @@
 
 %define;database()
 [
-af: Genealogiese databasis
+af: Databasis
 ar: قاعدة المعلومات العائلية (جينيالوجيا)
 bg: Родословна база от данни
-br: Bon roadoù genealogiezh
-ca: Base de dades genealògica
-cs: Genealogická databáze
-da: Genealogisk database
-de: Genealogische Datenbank
-en: Genealogical database
-eo: Datenbazo genealogia
-es: Base de datos genealógica
-et: Genealoogiline andmebaas
+br: Bon roadoù
+ca: Base de dades
+cs: Databáze
+da: Database
+de: Datenbank
+en: Database
+eo: Datenbazo
+es: Base de datos
+et: Andmebaas
 fi: Sukutietokanta
 fr: Base de données
 he: מאגר מידע תולדותי
 is: Ættfræði gagnagrunnur
-it: Base di dati genealogica
-lv: Ciltsrakstu datu bāze
-nl: Genealogische databank
-no: Genealogisk database
-pl: Genealogiczna baza danych
-pt: Base de Dados Genealógica
-ro: Baza de date genealogice
+it: Base di dati
+lv: Datu bāze
+nl: Databank
+no: Database
+pl: Baza danych
+pt: Base de Dados
+ro: Baza de date
 ru: Генеaлогическая база данных
-sl: Genealoška baza podatkov
-sv: Genealogisk databas
+sl: Baza podatkov
+sv: Databas
 zh: 网络家谱
 ]
 %end;

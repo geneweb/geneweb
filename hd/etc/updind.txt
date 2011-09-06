@@ -708,8 +708,9 @@ function changeCalendar(e,v,m,c) {
 
 <h4><label for="notes">[*note/notes]1</label></h4>
 <div id="toolbar">
-     %let;name;notes%in;
-      %include.toolbar;
+%let;name;notes%in;
+%include.toolbar;
+</div>
 <p>
 <table>
   <tr>
