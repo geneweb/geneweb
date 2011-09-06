@@ -122,6 +122,13 @@
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
+    %if;(evar.image = "on" and xx.has_image)
+      <br />
+      %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
+      <img src="%xx.image_url;"%xx.image_small_size;%sp;
+      border="0" alt="[image/images]0"%/>
+      %if;(evar.cgl != "on")</a>%end;
+    %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;
   %end;%nl;
 %end;
@@ -130,6 +137,13 @@
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
+    %if;(evar.image = "on" and xx.has_image)
+      <br />
+      %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
+      <img src="%xx.image_url;"%xx.image_small_size;%sp;
+      border="0" alt="[image/images]0"%/>
+      %if;(evar.cgl != "on")</a>%end;
+    %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;
   %end;%nl;
 %end;

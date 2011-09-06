@@ -75,16 +75,16 @@ distrib: new_distrib wrappers
 
 wrappers:
 	if test "$(CAMLP5F)" = "-DWIN95"; then \
-	  echo 'setlocal enableextensions' > $(DESTDIR)/gwd.bat; \
-	  echo 'md bases' >> $(DESTDIR)/gwd.bat; \
-	  echo 'endlocal' >> $(DESTDIR)/gwd.bat; \
-	  echo 'cd bases' >> $(DESTDIR)/gwd.bat; \
-	  echo '..\\gw\\gwd -hd ..\\gw' >> $(DESTDIR)/gwd.bat; \
-	  echo 'setlocal enableextensions' > $(DESTDIR)/gwsetup.bat; \
-	  echo 'md bases' >> $(DESTDIR)/gwsetup.bat; \
-	  echo 'endlocal' >> $(DESTDIR)/gwsetup.bat; \
-	  echo 'cd bases' >> $(DESTDIR)/gwsetup.bat; \
-	  echo '..\\gw\\gwsetup -gd ..\\gw' >> $(DESTDIR)/gwsetup.bat; \
+	  echo -ne 'setlocal enableextensions\r\n' > $(DESTDIR)/gwd.bat; \
+	  echo -ne 'md bases\r\n' >> $(DESTDIR)/gwd.bat; \
+	  echo -ne 'endlocal\r\n' >> $(DESTDIR)/gwd.bat; \
+	  echo -ne 'cd bases\r\n' >> $(DESTDIR)/gwd.bat; \
+	  echo -ne '..\\gw\\gwd -hd ..\\gw\r\n' >> $(DESTDIR)/gwd.bat; \
+	  echo -ne 'setlocal enableextensions\r\n' > $(DESTDIR)/gwsetup.bat; \
+	  echo -ne 'md bases\r\n' >> $(DESTDIR)/gwsetup.bat; \
+	  echo -ne 'endlocal\r\n' >> $(DESTDIR)/gwsetup.bat; \
+	  echo -ne 'cd bases\r\n' >> $(DESTDIR)/gwsetup.bat; \
+	  echo -ne '..\\gw\\gwsetup -gd ..\\gw\r\n' >> $(DESTDIR)/gwsetup.bat; \
 	else \
 	  (echo '#!/bin/sh'; \
 	   echo 'mkdir -p bases'; \

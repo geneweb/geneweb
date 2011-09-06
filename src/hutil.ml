@@ -27,7 +27,7 @@ value link_to_referer conf =
           string_of_int hei ^ "\""
       | None -> "" ]
     in
-    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s alt=\"&lt;&lt;\"%s></a>\n"
+    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s style=\"border: 0\" alt=\"&lt;&lt;\"%s></a>\n"
       referer (Util.image_prefix conf) fname wid_hei conf.xhs
   else ""
 ;
@@ -50,7 +50,7 @@ value gen_print_link_to_welcome f conf right_aligned =
     let str = link_to_referer conf in
     if str = "" then () else Wserver.wprint "%s" str;
     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>"
+    Wserver.wprint "<img src=\"%s/%s\"%s style=\"border: 0\" alt=\"^^\"%s>"
       (Util.image_prefix conf) fname wid_hei conf.xhs;
     Wserver.wprint "</a>\n";
     if right_aligned then Wserver.wprint "</div>\n"
