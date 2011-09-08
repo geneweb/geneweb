@@ -13,7 +13,7 @@
   <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
-<body>
+<body %body_prop;>
 %message_to_wizard;
 
 <h1 style="text-align:center" class="highlight">[*link between]%sp;

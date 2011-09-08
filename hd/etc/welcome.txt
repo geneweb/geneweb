@@ -11,7 +11,7 @@
   <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
-<body>
+<body %body_prop;>
 
 
 <script type="text/javascript"><!--
@@ -369,38 +369,36 @@ sv: <span class="highlight"; style="margin-left:10px">genom</span>
 
 <br/>
 <div id="options">
-  <h3><img src="%image_prefix;/picto_molette.png"/> Autres options</h3>
-%(  <div style="text-align: center">
-    [
-  af: Jy kan ook kyk na
-  bg: Можете също да се насочите към
-  br: Gellout a rit ivez gweladenniñ
-  ca: També podeu consultar
-  cs: Lze také zobrazit
-  da: Du kan også fremkalde:
-  de: Du kannst zugreifen auf
-  en: You can consult
-  eo: Vi povas ankaù konsulti
-  es: Puede consultar
-  et: Vaata lisaks:
-  fi: Voit myös katsoa
-  fr: Autres options
-  he: אפשר גם להראות
-  is: Þú getur einnig athugað
-  it: Si può anche consultare
-  lv: Informācija par:
-  nl: U kunt de volgende zaken bekijken:
-  no: Du kan også slå opp
-  pl: Możesz także obejrzeć:
-  pt: Também pode consultar
-  ro: poti consulta
-  ru: Вы можете также обратиться к
-  sl: Lahko pregledate:
-  sv: Du kan också konsultera
-  zh:
-  ]
-  </div>
-  %)
+  <h3><img src="%image_prefix;/picto_molette.png"/>
+[
+af: Other options
+bg: Other options
+br: Other options
+ca: Other options
+cs: Other options
+da: Other options
+de: Other options
+en: Other options
+eo: Other options
+es: Other options
+et: Other options
+fi: Other options
+fr: Autres options
+he: Other options
+is: Other options
+it: Other options
+lv: Other options
+nl: Other options
+no: Other options
+pl: Other options
+pt: Other options
+ro: Other options
+ru: Other options
+sl: Other options
+sv: Other options
+zh: Other options
+]
+  </h3>
   <div id="list_left">
   <ul>
     <li>
@@ -621,8 +619,7 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 %copyright;
 
 %define;language_link(xx,yy)%sq;
-  %let;zz;%if;("yy" = "")xx%else;yy-xx%end;%in;%sq;
-  <a title="%zz; : %apply;language_name(zz)%sp;" href="%prefix_base;lang=%zz;">xx</a>
+  <a title="%apply;language_name(yy)" href="%prefix_base;lang=yy;">xx</a>
 %end;
 
 <div id="lang">
@@ -653,33 +650,15 @@ sl: Lahko izberete drug jezik:
 sv: Du kan välja ett annat språk bland de följande:
 ]</em>
   <div class="list">
-    %apply;language_link("af", "")
-    %apply;language_link("bg", "")
-    %apply;language_link("br", "")
-    %apply;language_link("ca", "")
-    %apply;language_link("cs", "")
-    %apply;language_link("da", "")
-    %apply;language_link("de", "")
-    %apply;language_link("en", "")
-    %apply;language_link("eo", "")
-    %apply;language_link("es", "")
-    %apply;language_link("et", "")
-    %apply;language_link("fi", "")
-    %apply;language_link("fr", "")
-    %apply;language_link("he", "")
-    %apply;language_link("is", "")
-    %apply;language_link("it", "")
-    %apply;language_link("lv", "")
-    %apply;language_link("nl", "")
-    %apply;language_link("no", "")
-    %apply;language_link("pl", "")
-    %apply;language_link("pt", "")
-    %apply;language_link("pt", "br")
-    %apply;language_link("ro", "")
-    %apply;language_link("ru", "")
-    %apply;language_link("sl", "")
-    %apply;language_link("sv", "")
-    %apply;language_link("zh", "")
+    %apply;language_link("Deutsch", "de")
+    %apply;language_link("English", "en")
+    %apply;language_link("Español", "es")
+    %apply;language_link("Français", "fr")
+    %apply;language_link("Italiano", "it")
+    %apply;language_link("Nederlands", "nl")
+    %apply;language_link("Norsk", "no")
+    %apply;language_link("Suomi", "sv")
+    %apply;language_link("Svenska", "sl")
   </div>
 </div>
 

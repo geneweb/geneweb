@@ -14,7 +14,7 @@
   <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
-<body>
+<body %body_prop;>
 %message_to_wizard;
 
 <a href="%prefix;" accesskey="T"></a>
