@@ -1003,10 +1003,12 @@ value image_prefix conf =
   else "images"
 ;
 
+(* Code mort. Géré par le css *)
 value default_background conf =
   sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
 ;
 
+(* Code mort. Géré par le css *)
 value default_body_prop conf =
   let style =
     match p_getenv conf.env "size" with
@@ -1020,10 +1022,10 @@ value default_body_prop conf =
 value body_prop conf =
   try
     match List.assoc "body_prop" conf.base_env with
-    [ "" -> default_body_prop conf
+    [ "" -> ""
     | s -> " " ^ s ]
   with
-  [ Not_found -> default_body_prop conf ]
+  [ Not_found -> "" ]
 ;
 
 value css_prop conf =
