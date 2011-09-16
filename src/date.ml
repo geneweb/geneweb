@@ -15,8 +15,10 @@ open TemplAst;
 
 value get_wday conf d =
   let jd = match d with
-  [ Dgreg d Dgregorian | Dgreg d Djulian | Dgreg d Dfrench | Dgreg d Dhebrew ->
-    Calendar.sdn_of_gregorian d
+  [ Dgreg d _  ->
+    match d.prec with 
+    [ Sure -> Calendar.sdn_of_gregorian d
+    | _ -> -1 ]
   | _ -> -1 ]
   in 
   let wday =
