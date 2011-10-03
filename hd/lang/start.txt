@@ -51,7 +51,7 @@ sv: Genealogi
 <table border="0" width="100%%">
 <tr align="%L">
 <td rowspan="2" style="width: 20%%">
-<a href="http://www.geneweb.org/"><img width="96" height="108"
+<a href="http://opensource.geneanet.org/projects/geneweb/"><img width="96" height="108"
  src="%o/gwlogo.png" style="align: %L; border: 0" alt="GeneWeb"%/></a>
 </td>
 %I&wNf<td align="%R"
