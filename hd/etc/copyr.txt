@@ -1,14 +1,10 @@
 
-<div style="font-size: 80%%">
+<div>
   <em>
-    <a href="http://www.geneweb.org/"><img src="%image_prefix;/logo_bas.png"
-    align="center" style="border: 0"%/></a>%sp;
-    %version; %compilation_time;%sp;
-    Copyright &copy; 1998-2007 INRIA%connections;%sq;
-    %if;(not cancel_links) 
-      - <a href="%prefix;m=DOC">DOC</a>
-    %end;
-    %sq;
-    %setup_link;
-    </em><br%/>
+    <a href="http://opensource.geneanet.org/projects/geneweb/" target="_blank">
+    <img src="%image_prefix;/logo_bas.png"
+    align="absmiddle" style="border: 0"%/></a>%sp;
+    Version %version; %compilation_time;%sp;
+    Copyright &copy; 1998-2011 %connections;%sq;
+  </em><br%/>
 </div>

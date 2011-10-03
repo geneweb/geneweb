@@ -2,11 +2,17 @@
 <head>
   <meta name="robots" content="none">
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="stylesheet" type="text/css" href="css/default.css" />
   <title>Base</title>
 </head>
 <body>
 <center><h1>Base</h1></center>
+
+Please, enter the name of the database you want to use:
+<br />
+Entrez le nom de la base de données que vous voulez utiliser:
+
 <ul>
 <li>
 <form method=get action="%k">
@@ -14,7 +20,17 @@
 <input type=submit value="Ok">
 </ul>
 
-<p><hr><font size=-1><em>Copyright (c) 1998-2007 INRIA -
-<a href="http://www.geneweb.org/">
-GeneWeb %v</a></em></font><br>
+<br />
+<div id="footer">
+  <hr />
+  <div>
+    <em>
+      <a href="http://opensource.geneanet.org/projects/geneweb/"><img src="images/logo_bas.png"
+      align="center" style="border: 0"></a>
+      Version %v
+      Copyright &copy; 1998-2011
+    </em><br%/>
+  </div>
+</div>
+
 </body>

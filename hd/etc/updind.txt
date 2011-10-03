@@ -6,6 +6,7 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
@@ -745,12 +746,13 @@ function changeCalendar(e,v,m,c) {
 </p>
 </form>
 
-</body>
 
 <br />
 <div id="footer">
+<hr />
 %copyright;
 %base_trailer;
 </div>
 
+</body>
 </html>

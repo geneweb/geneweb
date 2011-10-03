@@ -7,6 +7,7 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
@@ -24,11 +25,11 @@
     %if;(referer != "")
       <a href="%referer;"><img
        src="%image_prefix;/left.jpg"%wid_hei;left.jpg; 
-       style="border: 0" alt="&lt;&lt;"%/></a>
+       style="border: 0" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.jpg"%wid_hei;up.jpg; 
-    style="border: 0" alt="^^"%/></a>
+    style="border: 0" title="^^"%/></a>
   </td></tr></table>
 %end;
 
@@ -39,7 +40,7 @@
 </tr>
 <tr align="%left;">
   <td valign="top">
-    <a href="%prefix;m=MOD_IND;i=%index;" accesskey="P">[*modify::] (P)</a>
+    <a href="%prefix;m=MOD_IND;i=%index;" accesskey="P">[*modify::] </a>
     <br%/>
     %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
          and surname != "?")
@@ -79,7 +80,7 @@
       %end;
       <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
        "%if;(nb_families = 1) accesskey="F"%end;>%nn;
-      [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
+      [*modify::family/families]0%if;(nb_families = 1) %end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
       <br%/>
       <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
@@ -99,7 +100,7 @@
       <br%/>
     %else;
       <a href="%prefix;m=ADD_FAM;ip=%index;" accesskey="A">%nn;
-      [*add::marriage/marriages]0 (A)</a>
+      [*add::marriage/marriages]0 </a>
       <br%/>
     %end;
     %if;(nb_children != 0)
@@ -126,13 +127,13 @@
   </p>
 %end;
 
-</body>
 
 <br />
 <div id="footer">
+<hr />
 %copyright;
 %base_trailer;
 </div>
 
-
+</body>
 </html>
