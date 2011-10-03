@@ -62,7 +62,7 @@ compilation.ml: always
 	> compilation.ml
 	echo "open Def;" >> compilation.ml
 	echo "value (wd, d, h) = ($$(date "+%u, {day=%d;month=%m;year=%Y;prec=Sure;delta=0}, \"%T %Z\""));" >> compilation.ml
-	echo "value ct conf = Printf.sprintf \" (%s %4d-%02d-%02d %s)\" (Util.transl conf \"version\") d.year d.month d.day h;" >> compilation.ml
+	echo "value ct conf = Printf.sprintf \" (%4d-%02d-%02d %s)\" d.year d.month d.day h;" >> compilation.ml
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
 
 clean::

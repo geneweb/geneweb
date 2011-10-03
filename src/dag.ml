@@ -191,7 +191,7 @@ value image_normal_txt conf base p fname width height =
   let k = default_image_name base p in
   let r =
     sprintf "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s border=\"0\" alt=\"%s\">"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s border=\"0\" title=\"%s\">"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
       (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
@@ -205,7 +205,7 @@ value image_normal_txt conf base p fname width height =
 value image_url_txt conf base url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nheight=%d border=\"0\" alt=\"%s\">" url height
+    sprintf "<img src=\"%s\"\nheight=%d border=\"0\" title=\"%s\">" url height
       image_txt ^
     "</a>\n"
 ;
@@ -213,7 +213,7 @@ value image_url_txt conf base url height =
 value image_url_txt_with_size conf base url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\">"
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" title=\"%s\">"
       url width height image_txt ^
     "</a>\n"
 ;

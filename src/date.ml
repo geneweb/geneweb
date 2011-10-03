@@ -17,7 +17,9 @@ value get_wday conf d =
   let jd = match d with
   [ Dgreg d _  ->
     match d.prec with 
-    [ Sure -> Calendar.sdn_of_gregorian d
+    [ Sure -> 
+        if (d.day <> 0 && d.month <> 0) then Calendar.sdn_of_gregorian d
+        else -1
     | _ -> -1 ]
   | _ -> -1 ]
   in 

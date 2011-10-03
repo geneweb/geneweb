@@ -27,7 +27,7 @@ value link_to_referer conf =
           string_of_int hei ^ "\""
       | None -> "" ]
     in
-    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s style=\"border: 0\" alt=\"&lt;&lt;\"%s></a>\n"
+    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s style=\"border: 0\" title=\"&lt;&lt;\"%s></a>\n"
       referer (Util.image_prefix conf) fname wid_hei conf.xhs
   else ""
 ;
@@ -50,7 +50,7 @@ value gen_print_link_to_welcome f conf right_aligned =
     let str = link_to_referer conf in
     if str = "" then () else Wserver.wprint "%s" str;
     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.wprint "<img src=\"%s/%s\"%s style=\"border: 0\" alt=\"^^\"%s>"
+    Wserver.wprint "<img src=\"%s/%s\"%s style=\"border: 0\" title=\"^^\"%s>"
       (Util.image_prefix conf) fname wid_hei conf.xhs;
     Wserver.wprint "</a>\n";
     if right_aligned then Wserver.wprint "</div>\n"
@@ -74,6 +74,8 @@ value header_without_http conf title = do {
   Wserver.wprint
     "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
     conf.xhs;
+  Wserver.wprint 
+    "  <link rel=\"shortcut icon\" href=\"images/favicon_gwd.png\" />\n" ;
   Wserver.wprint 
     "  <link rel=\"stylesheet\" type=\"text/css\" href=\"css/%s\" />\n"
     (Util.css_prop conf);
@@ -120,20 +122,19 @@ value red_color = "red";
 
 value rheader conf title = do {
   header_without_page_title conf title;
-  Wserver.wprint "<center><h1><font color=%s>" red_color;
+  Wserver.wprint "<center><h1 class=\"error\">";
   title False;
-  Wserver.wprint "</font></h1></center>\n";
+  Wserver.wprint "</h1></center>\n";
 };
 
 value gen_trailer with_logo conf = do {
-  if not with_logo then ()
-  else Wserver.wprint "</body>\n" ;
   Wserver.wprint "<br />\n";
   Wserver.wprint "<div id=\"footer\">\n" ;
+  Wserver.wprint "<hr />\n";
   Templ.print_copyright conf;
   Wserver.wprint "</div>\n" ;
   Templ.include_hed_trl conf None "trl";
-  Wserver.wprint "</html>\n";
+  Wserver.wprint "</body>\n</html>\n";
 };
 
 value trailer = gen_trailer True;
