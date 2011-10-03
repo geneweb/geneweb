@@ -4,6 +4,7 @@
   <meta name="robots" content="none">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>install -&gt; http://geneweb.inria.fr/roglo?</title>
 </head>
@@ -16,6 +17,18 @@ fr: La base de données "%b" se trouve maintenant à l'adresse:
 <a href="%t">%t</a>
 </dd></dt></dl>
 
-<p><hr>
+<br />
+<div id="footer">
+  <hr />
+  <div>
+    <em>
+      <a href="http://opensource.geneanet.org/projects/geneweb/"><img src="images/logo_bas.png"
+      align="center" style="border: 0"></a>
+      Version %v
+      Copyright &copy; 1998-2011
+    </em><br%/>
+  </div>
+</div>
+
 </body>
 </html>

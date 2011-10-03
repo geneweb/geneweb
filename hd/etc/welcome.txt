@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop" />
 %base_header;
 </head>
@@ -61,59 +61,64 @@ zh: 网络家谱
 
 <div id="title">
   <div id="logo">
-    <a href="http://www.geneweb.org/"><img width="96" height="108"
-     src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
-     alt="GeneWeb"%/></a>
+    <img src="%image_prefix;/gwlogo.png" style="border: 0"%sp; 
+    title="GeneWeb"%/>
   </div>
 
-  <div>
-  <div id="acces">
-    <h3><img src="%image_prefix;/picto_cle.png"/>[*access] :</h3>
-    <div id="disconnection">
-      %if;(wizard and not friend)
+  %( Display the acces bloc if there is  %)
+  %( a password or an empty block if not %)
+  %if; (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""
+        or bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+    <div id="acces" style="border: solid 2px #6f8301;">
+      <h3><img src="%image_prefix;/picto_cle.png"/>[*access] :</h3>
+      %if;((bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+           or (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
+         %if;(not wizard and 
+              (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
+           %if;(not cgi and bvar.auth_file = "")
+             <a href="%prefix;w=w"><em>%sq;
+             [wizard/wizards/friend/friends/exterior]0</em></a><br%/>
+           %else;
+             <form method="post" action="%action;">
+               <div>
+                 %hidden;
+                 [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
+                 <input name="w" type="password" size="10" maxlength="200"%/>
+                 <input type="submit" value="Ok"%/>
+               </div>
+             </form>
+           %end;
+         %end;
+         %if;(not friend and
+              (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
+           %if;(not cgi and bvar.auth_file = "")
+             <a href="%prefix;w=f"><em>%sq;
+             [wizard/wizards/friend/friends/exterior]2</em></a><br%/>
+           %end;
+         %end;
+      %end;
+      %if;(wizard 
+           and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
         <em>[wizard/wizards/friend/friends/exterior]0%sq;
-        %if;((wizard or just_friend_wizard) and user.ident != "")
+        %if;(just_friend_wizard) and user.ident != "")
           : %user.ident;%sq;
         %end;</em>
-        %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
-          %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
-            <span style="font-size:70%%">(<a
-             href="%prefix;w=">[disconnect]</a>)</span>
-          %end;
-        %end;
+        (<a href="%prefix;w=">[disconnect]</a>)
       %end;
-      %if;(friend and not wizard)
+      %if;(friend and
+           (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
         <em>[wizard/wizards/friend/friends/exterior]2</em>
-        %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
-          <span style="font-size:70%%">(<a
-           href="%prefix;w=">[disconnect]</a>)</span>
-        %end;
+        (<a href="%prefix;w=">[disconnect]</a>)
       %end;
     </div>
-  %if;(not wizard and not friend)
-    %if;(not cgi and bvar.auth_file = "")
-      <a href="%prefix;w=w"><em>%sq;
-        [wizard/wizards/friend/friends/exterior]0</em></a><br%/>
-      <a href="%prefix;w=f"><em>%sq;
-        [wizard/wizards/friend/friends/exterior]2</em></a><br%/>
-    %else;
-      <form method="post" action="%action;">
-        <div>
-          %hidden;
-          [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
-          <input name="w" type="password" size="10" maxlength="200"%/>
-          <input type="submit" value="Ok"%/>
-        </div>
-      </form>
-    %end;
+  %else
+    <div id="acces"></div>
   %end;
-  </div>
 
   <h1>
     %apply;database() %base.name;
     <br /><small>%base.nb_persons; [person/persons]1</small>
   </h1>
-  </div>
 </div>
 
 
@@ -288,80 +293,80 @@ zh: 访问次数
       %end;
       %if;(bvar.hide_advanced_request = "no")
         %apply;interp([
-af: <span class="highlight"; style="margin-left:10px">deur 'n</span>
-       <a href="%prefix;m=H;v=advanced"><b>detail
-       navraag</b></a>.
-bg: <span class="highlight"; style="margin-left:10px">чрез</span>
-       <a href="%prefix;m=H;v=advanced"><b>разширено
-       търсене</b></a>.
-br: <span class="highlight"; style="margin-left:10px"> dre ar</span>
-       <a href="%prefix;m=H;v=advanced"><b>klask
-       a-raokaet</b></a>.
-ca: <span class="highlight"; style="margin-left:10px">per la</span>
-       <a href="%prefix;m=H;v=advanced"><b>consulta
-       avançada</b></a>.
-cs: <span class="highlight"; style="margin-left:10px">lze také zadat</span>
-       <a href="%prefix;m=H;v=advanced"><b>rozšířený
-       dotaz</b></a>.
-da: <span class="highlight"; style="margin-left:10px">ved</span>
-       <a href="%prefix;m=H;v=advanced"><b>avanceret
-       søgning</b></a>.
-de: <span class="highlight"; style="margin-left:10px">mit der</span>
-       <a href="%prefix;m=H;v=advanced"><b>erweiterten
-       Suche</b></a>.
-en: <span class="highlight"; style="margin-left:10px">by the</span>
-       <a href="%prefix;m=H;v=advanced"><b>advanced
-       request</b></a>.
+af: <span class="highlight"; style="margin-left:10px">deur 'n
+       <a href="%prefix;m=H;v=advanced">detail
+       navraag</a></span>.
+bg: <span class="highlight"; style="margin-left:10px">чрез
+       <a href="%prefix;m=H;v=advanced">разширено
+       търсене</a></span>.
+br: <span class="highlight"; style="margin-left:10px"> dre ar
+       <a href="%prefix;m=H;v=advanced">klask
+       a-raokaet</a></span>.
+ca: <span class="highlight"; style="margin-left:10px">per la
+       <a href="%prefix;m=H;v=advanced">consulta
+       avançada</a></span>.
+cs: <span class="highlight"; style="margin-left:10px">lze také zadat
+       <a href="%prefix;m=H;v=advanced">rozšířený
+       dotaz</a></span>.
+da: <span class="highlight"; style="margin-left:10px">ved
+       <a href="%prefix;m=H;v=advanced">avanceret
+       søgning</a></span>.
+de: <span class="highlight"; style="margin-left:10px">mit der
+       <a href="%prefix;m=H;v=advanced">erweiterten
+       Suche</a></span>.
+en: <span class="highlight"; style="margin-left:10px">by the
+       <a href="%prefix;m=H;v=advanced">advanced
+       request</a></span>.
 eo: <span style="highlight">per la</span>
-       <a href="%prefix;m=H;v=advanced"><b>serĉado
-       progresata</b></a>.
-es: <span class="highlight"; style="margin-left:10px">mediante una</span>
-       <a href="%prefix;m=H;v=advanced"><b>consulta
-       avanzada</b></a>.
-et: <span class="highlight"; style="margin-left:10px"></span>
-       <a href="%prefix;m=H;v=advanced"><b>laiendatud 
-       päring</b></a>.
+       <a href="%prefix;m=H;v=advanced">serĉado
+       progresata</a></span>.
+es: <span class="highlight"; style="margin-left:10px">mediante una
+       <a href="%prefix;m=H;v=advanced">consulta
+       avanzada</a></span>.
+et: <span class="highlight"; style="margin-left:10px">
+       <a href="%prefix;m=H;v=advanced">laiendatud 
+       päring</a></span>.
 fi: <a href="%prefix;m=H;v=advanced"><span
-       class="highlight">erityishaulla</span></a>.
-fr: <span class="highlight"; style="margin-left:10px"> par la</span>
-       <a href="%prefix;m=H;v=advanced"><b>requête
-        évoluée</b></a>.
-he: <span class="highlight"; style="margin-left:10px">ע"י </span>
-       <a href="%prefix;m=H;v=advanced"><b>
-       בקשה מתקדמת</b></a>.
-is: <span class="highlight"; style="margin-left:10px">eftir </span>
-       <a href="%prefix;m=H;v=advanced"><b>frekari
-       óskum</b></a>.
-it: <span class="highlight"; style="margin-left:10px">per la</span>
-       <a href="%prefix;m=H;v=advanced"><b>richiesta
-       avanzata</b></a>.
-lv: <span class="highlight"; style="margin-left:10px">meklēt pēc</span>
-       <a href="%prefix;m=H;v=advanced"><b>citiem
-       parametriem</b></a>.
-nl: <span class="highlight"; style="margin-left:10px">via een</span>
-       <a href="%prefix;m=H;v=advanced"><font
-       color="%highlight;"><b>gedetailleerde opzoeking</b></a>.
-no: <span class="highlight"; style="margin-left:10px">gjennom</span>
-       <a href="%prefix;m=H;v=advanced"><b>avansert
-       søking</b></a>.
-pl: <span class="highlight"; style="margin-left:10px">skorzystać z</span>
-       <a href="%prefix;m=H;v=advanced"><font
-       color="%highlight;"><b>wyszukiwania zaawansowanego</b></a>.
-pt: <span class="highlight"; style="margin-left:10px">por</span>
-       <a href="%prefix;m=H;v=advanced"><b>pesquisa
-       complexa</b></a>.
-ro: <span class="highlight"; style="margin-left:10px">prin</span>
-       <a href="%prefix;m=H;v=advanced"><b>specificare
-       complexa</b></a>.
-ru: <span class="highlight"; style="margin-left:10px">через</span>
-       <a href="%prefix;m=H;v=advanced"><b>расширенный
-       запрос</b></a>.
-sl: <span class="highlight"; style="margin-left:10px">s pomočjo</span>
-       <a href="%prefix;m=H;v=advanced"><b>naprednega iskanja
-       </b></a>.
-sv: <span class="highlight"; style="margin-left:10px">genom</span>
-       <a href="%prefix;m=H;v=advanced"><b>avancerad
-       sökning</b></a>.
+       class="highlight">erityishaulla</a></span>.
+fr: <span class="highlight"; style="margin-left:10px"> par la
+       <a href="%prefix;m=H;v=advanced">requête
+        évoluée</a></span>.
+he: <span class="highlight"; style="margin-left:10px">ע"י 
+       <a href="%prefix;m=H;v=advanced">
+       בקשה מתקדמת</a></span>.
+is: <span class="highlight"; style="margin-left:10px">eftir 
+       <a href="%prefix;m=H;v=advanced">frekari
+       óskum</a></span>.
+it: <span class="highlight"; style="margin-left:10px">per la
+       <a href="%prefix;m=H;v=advanced">richiesta
+       avanzata</a></span>.
+lv: <span class="highlight"; style="margin-left:10px">meklēt pēc
+       <a href="%prefix;m=H;v=advanced">citiem
+       parametriem</a></span>.
+nl: <span class="highlight"; style="margin-left:10px">via een
+       <a href="%prefix;m=H;v=advanced">gedetailleerde 
+       opzoeking</a></span>.
+no: <span class="highlight"; style="margin-left:10px">gjennom
+       <a href="%prefix;m=H;v=advanced">avansert
+       søking</a></span>.
+pl: <span class="highlight"; style="margin-left:10px">skorzystać z
+       <a href="%prefix;m=H;v=advanced">wyszukiwania 
+       zaawansowanego</a></span>.
+pt: <span class="highlight"; style="margin-left:10px">por
+       <a href="%prefix;m=H;v=advanced">pesquisa
+       complexa</a></span>.
+ro: <span class="highlight"; style="margin-left:10px">prin
+       <a href="%prefix;m=H;v=advanced">specificare
+       complexa</a></span>.
+ru: <span class="highlight"; style="margin-left:10px">через
+       <a href="%prefix;m=H;v=advanced">расширенный
+       запрос</a></span>.
+sl: <span class="highlight"; style="margin-left:10px">s pomočjo
+       <a href="%prefix;m=H;v=advanced">naprednega iskanja
+       </a></span>.
+sv: <span class="highlight"; style="margin-left:10px">genom
+       <a href="%prefix;m=H;v=advanced">avancerad
+       sökning</a></span>.
 ])
       %end;
     </div> %( end div search %)
@@ -371,24 +376,24 @@ sv: <span class="highlight"; style="margin-left:10px">genom</span>
 <div id="options">
   <h3><img src="%image_prefix;/picto_molette.png"/>
 [
-af: Other options
+af: Ander opsies
 bg: Other options
 br: Other options
 ca: Other options
 cs: Other options
 da: Other options
-de: Other options
+de: Andere optionen
 en: Other options
 eo: Other options
-es: Other options
+es: Otras opciones
 et: Other options
-fi: Other options
+fi: Muita vaihtoehtoja
 fr: Autres options
 he: Other options
 is: Other options
-it: Other options
+it: Altre opzioni
 lv: Other options
-nl: Other options
+nl: Andere opties
 no: Other options
 pl: Other options
 pt: Other options
@@ -457,9 +462,6 @@ zh: Other options
         [wizard/wizards/friend/friends/exterior]1 - [note/notes]1</a>
       </li>
     %end;
-    <li>
-      <a href="%prefix;m=FORUM">[database forum]</a>
-    </li>
   </ul>
   </div>
 </div>
@@ -525,7 +527,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 ])%nl;
 </div>
 
-<div style="margin-top: 1em; padding: 0 20%%">
+<div style="text-align: center; margin-top: 1em; padding: 0 20%%">
   %apply;interp([
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
@@ -609,22 +611,20 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 ])%nl;
 </div>
 <br/>
-</div> %(<div content>%)
-
-</body>
-
+</div> 
 
 <br />
 <div id="footer">
+<hr />
 %copyright;
 
 %define;language_link(xx,yy)%sq;
-  <a title="%apply;language_name(yy)" href="%prefix_base;lang=yy;">xx</a>
+  <a href="%prefix_base;lang=yy;">xx</a>
 %end;
 
 <div id="lang">
-  <hr/>
-    <em>[
+  <br />
+  <em>[
 af: Taalvoorkeur/Language preference:
 ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
 bg: Можете да изберете друг език за съобщения измежду следните:
@@ -632,38 +632,36 @@ br: Dibab a c'hellit ur yezh all etre ar re-mañ:
 ca: Podeu seleccionar una altre llengua, hi ha disponibles les següents:
 cs: Zvolte jazyk pro prohlížení databáze:
 da: Du kan vælge fremstilling på et andet sprog blandt de følgende:
-de: Du kannst eine der folgenden Sprachen für die Anzeige auswählen:
-en: You can select another displaying language among the following ones:
+de: Blick auf:
+en: View in:
 eo: Vi povas elekti alian lingvon inter la sekvantajn:
-es: Puede seleccionar uno de los idiomas siguientes:
+es: Ver en:
 et: Võid valida ka mõne muu keele järgnevatest:
-fi: Voit valita jonkin muun kielen allaolevista:
-fr: Vous pouvez sélectionner une autre langue d'affichage parmi les suivantes:
-it: Potete scegliere un'altra lingua fra le seguenti:
+fi: Näytä:
+fr: Afficher en:
+it: Vista in:
 is: Þú getur valið milli eftirfarandi tungumála:
 lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
-nl: U kunt een andere taal kiezen uit een van de volgende mogelijkheden:
+nl: Bekijk in het:
 no: Du kan velge sidevisning på et annet språk blant følgende:
 pl: Możesz wybrać inny język spośród następujących:
 ro: poti sa alegi una din urmatoarele limbi pentru afisaj
 sl: Lahko izberete drug jezik:
 sv: Du kan välja ett annat språk bland de följande:
 ]</em>
-  <div class="list">
-    %apply;language_link("Deutsch", "de")
-    %apply;language_link("English", "en")
-    %apply;language_link("Español", "es")
-    %apply;language_link("Français", "fr")
-    %apply;language_link("Italiano", "it")
-    %apply;language_link("Nederlands", "nl")
-    %apply;language_link("Norsk", "no")
-    %apply;language_link("Suomi", "sv")
-    %apply;language_link("Svenska", "sl")
-  </div>
+  %apply;language_link("Deutsch", "de")
+  %apply;language_link("English", "en")
+  %apply;language_link("Español", "es")
+  %apply;language_link("Français", "fr")
+  %apply;language_link("Italiano", "it")
+  %apply;language_link("Nederlands", "nl")
+  %apply;language_link("Norsk", "no")
+  %apply;language_link("Suomi", "fi")
+  %apply;language_link("Svenska", "sv")
 </div>
 
 %base_trailer;
 </div>
 
-
+</body>
 </html>
