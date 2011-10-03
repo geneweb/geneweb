@@ -53,7 +53,7 @@ install:
 	mkdir -p $(LANGDIR)/lang
 	cp hd/lang/*.txt $(LANGDIR)/lang/.
 	mkdir -p $(LANGDIR)/images
-	cp hd/images/*.jpg hd/images/*.png $(LANGDIR)/images/.
+	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(LANGDIR)/images/.
 	mkdir -p $(LANGDIR)/etc
 	cp hd/etc/*.txt $(LANGDIR)/etc/.
 	mkdir -p $(MANDIR)
@@ -79,12 +79,12 @@ wrappers:
 	  echo -ne 'md bases\r\n' >> $(DESTDIR)/gwd.bat; \
 	  echo -ne 'endlocal\r\n' >> $(DESTDIR)/gwd.bat; \
 	  echo -ne 'cd bases\r\n' >> $(DESTDIR)/gwd.bat; \
-	  echo -ne '..\\gw\\gwd -hd ..\\gw\r\n' >> $(DESTDIR)/gwd.bat; \
+	  echo -ne 'start /MIN ..\\gw\\gwd -hd ..\\gw\r\n' >> $(DESTDIR)/gwd.bat; \
 	  echo -ne 'setlocal enableextensions\r\n' > $(DESTDIR)/gwsetup.bat; \
 	  echo -ne 'md bases\r\n' >> $(DESTDIR)/gwsetup.bat; \
 	  echo -ne 'endlocal\r\n' >> $(DESTDIR)/gwsetup.bat; \
 	  echo -ne 'cd bases\r\n' >> $(DESTDIR)/gwsetup.bat; \
-	  echo -ne '..\\gw\\gwsetup -gd ..\\gw\r\n' >> $(DESTDIR)/gwsetup.bat; \
+	  echo -ne 'start /MIN ..\\gw\\gwsetup -lang fr -gd ..\\gw\r\n' >> $(DESTDIR)/gwsetup.bat; \
 	else \
 	  (echo '#!/bin/sh'; \
 	   echo 'mkdir -p bases'; \
@@ -159,7 +159,7 @@ classical_distrib:
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
 	mkdir $(DESTDIR)/images
-	cp hd/images/*.jpg hd/images/*.png $(DESTDIR)/images/.
+	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc
 	cp hd/etc/*.txt $(DESTDIR)/etc/.
 	mkdir $(DESTDIR)/css
