@@ -1,4 +1,7 @@
 # $Id: a.gwf,v 5.12 2007-01-23 14:24:10 ddr Exp $
+#
+# Using body_prop to customize background, color is deprecated !!!
+# Please, use instead css_prop or customize default.css
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -25,6 +28,15 @@
 # body_prop=background="geneweb?m=IM;v=/foo.jpg"
 #   the file foo.jpg must be in the directory "images"
 #   on CGI mode, replace 'geneweb' by the name of the CGI
+
+# css_prop
+# The file stylesheet.css must be in the directory "css".
+# Customize the default.css stylesheet or create your own one and
+# specify it to geneweb by adding this line in your gwf.
+# More about how to customize here : 
+# http://opensource.geneanet.org/projects/geneweb/wiki/en_css
+css_prop=stylesheet
+
 
 # Highlight color
 highlight_color=#2f6400
