@@ -631,19 +631,14 @@ value print_population_pyramid conf base = do {
   let print_image doit sex iname =
     stagn "td" begin
       if doit then
-        let wid_hei =
-          match Util.image_size (Util.image_file_name iname) with
-          [ Some (wid, hei) ->
-              Printf.sprintf " width=\"%d\" height=\"%d\"" wid hei
-          | None -> "" ]
-        in
-        xtag "img" "src=\"%s/%s\"%s alt=\"%s\""
-          (Util.image_prefix conf) iname wid_hei (transl_nth conf "M/F" sex)
+        xtag "img" "src=\"%s/%s\" title=\"%s\""
+          (Util.image_prefix conf) iname (transl_nth conf "M/F" sex)
       else Wserver.wprint "&nbsp;";
     end
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
+  print_link_to_welcome conf True;
   let max_hum =
     let max_men = Array.fold_left max 0 men in
     let max_wom = Array.fold_left max 0 wom in
@@ -666,7 +661,7 @@ value print_population_pyramid conf base = do {
         let nb_men = men.(i) in
         let nb_wom = wom.(i) in
         tag "tr" begin
-          stagn "td" "style=\"font-size:60%%; font-style:italic\"" begin
+          stagn "td" "style=\"font-style:italic\"" begin
             Wserver.wprint "%d" (at_year - i * interval);
           end;
           stagn "td" begin Wserver.wprint "&nbsp;"; end;
@@ -675,12 +670,12 @@ value print_population_pyramid conf base = do {
           tag "td" "align=\"right\"" begin
             tag "table" "%s" c begin
               tag "tr" begin
-                stagn "td" "style=\"font-size:70%%; font-style: italic\""
+                stagn "td" "style=\"font-style: italic\""
                 begin
                   if nb_men <> 0 then Wserver.wprint "%d" nb_men else ();
                   Wserver.wprint "&nbsp;";
                 end;
-                stagn "td" "style=\"background: blue\"" begin
+                stagn "td" "style=\"background: #0c4460\"" begin
                   if nb_men = 0 then ()
                   else
                     let n = max 1 (band_size nb_men) in
@@ -696,13 +691,13 @@ value print_population_pyramid conf base = do {
           tag "td" "align=\"left\"" begin
             tag "table" "%s" c begin
               tag "tr" begin
-                stagn "td" "style=\"background: red\"" begin
+                stagn "td" "style=\"background: #e45484\"" begin
                   if nb_wom = 0 then ()
                   else
                     let n = max 1 (band_size nb_wom) in
                     for j = 1 to n do { Wserver.wprint "&nbsp;"; };
                 end;
-                stagn "td" "style=\"font-size:70%%; font-style: italic\""
+                stagn "td" "style=\"font-style: italic\""
                 begin
                   Wserver.wprint "&nbsp;";
                   if nb_wom <> 0 then Wserver.wprint "%d" nb_wom else ();
@@ -713,7 +708,7 @@ value print_population_pyramid conf base = do {
           stagn "td" begin Wserver.wprint "&nbsp;"; end;
           print_image (i = 0) 1 "female.png";
           stagn "td" begin Wserver.wprint "&nbsp;"; end;
-          stagn "td" "style=\"font-size:60%%; font-style:italic\"" begin
+          stagn "td" "style=\"font-style:italic\"" begin
             Wserver.wprint "%d" (at_year - i * interval);
           end;
         end;

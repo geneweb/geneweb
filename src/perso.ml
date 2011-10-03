@@ -2066,6 +2066,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
   | "first_name_key_val" ->
       if (is_hide_names conf p) && not p_auth then ""
       else Name.lower (p_first_name base p)
+  | "first_name_key_strip" ->
+      if (is_hide_names conf p) && not p_auth then ""
+      else Name.lower (Name.strip_c (p_surname base p) '"')
   | "image" -> if not p_auth then "" else sou base (get_image p)
   | "image_html_url" -> string_of_image_url conf base env ep True
   | "image_size" -> string_of_image_size conf base env ep
@@ -2285,6 +2288,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
   | "surname_key_val" ->
       if (is_hide_names conf p) && not p_auth then ""
       else Name.lower (p_surname base p)
+  | "surname_key_strip" ->
+      if (is_hide_names conf p) && not p_auth then ""
+      else Name.lower (Name.strip_c (p_surname base p) '"')
   | "title" -> person_title conf base p
   | _ -> raise Not_found ]
 and eval_witness_relation_var conf base env

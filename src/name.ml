@@ -420,6 +420,13 @@ value strip s =
     else copy (i + 1) (Buff.store len s.[i])
 ;
 
+value strip_c s c =
+  copy 0 0 where rec copy i len =
+    if i = String.length s then Buff.get len
+    else if s.[i] = c then copy (i + 1) len
+    else copy (i + 1) (Buff.store len s.[i])
+;
+
 (* Name.crush *)
 
 value roman_number s i =

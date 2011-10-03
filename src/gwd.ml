@@ -718,7 +718,7 @@ value print_request_failure cgi msg =
     Wserver.wprint "<head><title>Request failure</title></head>\n";
     Wserver.wprint "\
 <body bgcolor=\"white\">
-<h1 align=\"center\"><font color=\"red\">Request failure</font></h1>
+<h1 class=\"error\" align=\"center\">Request failure</h1>
 The request could not be completed.<p>\n";
     Wserver.wprint "<em><font size=\"-1\">Internal message: %s</font></em>\n"
       msg;

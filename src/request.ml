@@ -259,7 +259,7 @@ value specify conf base n pl =
          tag "li" begin
            let sosa_num = Perso.p_sosa conf base p in
            if Num.gt sosa_num Num.zero then
-             Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\"/> " 
+             Wserver.wprint "<img src=\"%s/%s\" title=\"sosa\"/> " 
                (Util.image_prefix conf) "sosa.png"
            else () ;
            match tl with

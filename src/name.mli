@@ -12,6 +12,8 @@ value abbrev : string -> string;
   (* Name.abbrev: suppress lowercase particles, shorten "saint" into "st" *)
 value strip : string -> string;
   (* Name.strip = name without spaces *)
+value strip_c : string -> char -> string;
+  (* Name.strip_c = name without the charater c given as parameter *)
 value crush : string -> string;
   (* Name.crush:
      - no spaces
