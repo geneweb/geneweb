@@ -121,18 +121,14 @@ value abs_setup_dir () =
 
 value trailer conf =
   do {
-    Wserver.wprint "<p />\n";
-    if conf.comm = "" then ()
-    else
-      Wserver.wprint "
-<img src=\"images/gwlogo.png\" width=\"64\" height=\"72\" align=\"right\" alt=\"logo\" />
-<br />
-";
-    Wserver.wprint "
-<hr><font size=\"-1\"><em>Copyright (c) 1998-2007 INRIA -
-GeneWeb %s</em></font>" Version.txt;
-    Wserver.wprint "<br />";
-    
+    Wserver.wprint "\n<br />\n";
+    Wserver.wprint "<div id=\"footer\">\n" ;
+    Wserver.wprint "<hr />\n";
+    Wserver.wprint "<div>\n";
+    Wserver.wprint "<em>\n";
+    Wserver.wprint "<a href=\"http://opensource.geneanet.org/projects/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2011\n</em>\n" Version.txt;
+    Wserver.wprint "</div>\n" ;
+    Wserver.wprint "</div>\n" ;
     (* finish the html page *)
     Wserver.wprint "</body>\n";
     Wserver.wprint "</html>\n";
@@ -1533,6 +1529,7 @@ value raw_file conf s =
     if end_with s ".png" then "image/png"
     else if end_with s ".jpg" then "image/jpeg"
     else if end_with s ".gif" then "image/gif"
+    else if end_with s ".css" then "text/css"
     else "text/html"
   in
   print_typed_file conf typ fname
@@ -1588,7 +1585,8 @@ value setup_comm_ok conf =
   | "gwd" -> gwd conf
   | "gwd_1" -> gwd_1 conf
   | x ->
-      if start_with x "doc/" || start_with x "images/" then raw_file conf x
+      if start_with x "doc/" || start_with x "images/" || start_with x "css/"
+      then raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"") ]
 ;
 
