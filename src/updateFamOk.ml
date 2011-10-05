@@ -664,9 +664,11 @@ value is_created_or_already_there ochil_arr nchil schil =
    3/ or the new family have the same parents than the old one *and*
       all linked (not created) new children were already children.
 *)
+(* Replaced && by || to do more checks. *)
+(* Improvement : check the name on the parents/children if they linked *)
 
 value need_check_noloop (scpl, sdes, onfs) =
-  if array_exists is_a_link (parent_array scpl) &&
+  if array_exists is_a_link (parent_array scpl) ||
      array_exists is_a_link sdes.children
   then
     match onfs with
