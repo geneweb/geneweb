@@ -75,27 +75,27 @@
   %end;
   %if;(xx.has_birth_date or xx.has_birth_place)
     , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
-    %if;xx.has_birth_date; %xx.on_birth_long_date;%end;
+    %if;xx.has_birth_date; %xx.on_birth_date;%end;
     %if;xx.has_birth_place;, %xx.birth_place;%end;
   %end;
   %if;(xx.has_baptism_date or xx.has_baptism_place)
     , %if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
     %else;[baptized]2%end;
-    %if;xx.has_baptism_date; %xx.on_baptism_long_date;%end;
+    %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
     %if;xx.has_baptism_place;, %xx.baptism_place;%end;
   %end;
   %if;xx.is_dead;, %xx.died;
-    %if;(xx.has_death_date) %xx.on_death_long_date;%end;
+    %if;(xx.has_death_date) %xx.on_death_date;%end;
     %if;(xx.has_death_place), %xx.death_place;%end;
   %end;
   %if;xx.is_buried;,
     %if;xx.is_male;[buried]0%else;[buried]1%end;
-    %if;xx.has_burial_date; %xx.on_burial_long_date;%end;
+    %if;xx.has_burial_date; %xx.on_burial_date;%end;
     %if;xx.has_burial_place;, %xx.burial_place;%end;%nl;
   %end;
   %if;xx.is_cremated;,
     %if;xx.is_male;[cremated]0%else;[cremated]1%end;
-    %if;xx.has_cremation_date; %xx.on_cremation_long_date;%end;
+    %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
     %if;xx.has_cremation_place;, %xx.cremation_place;%end;%nl;
   %end;
   %if;xx.computable_death_age;%sp;
@@ -116,6 +116,7 @@
 
 %define;married_to(is_male, date_place)
   %if;("is_male" = 1)
+    %sp;
     %if;are_married;[married%t to:::date_place]0%nn;
     %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
     %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
@@ -123,6 +124,7 @@
     %elseif;is_no_mention;date_place [with]%nn;
     %end;
   %else;
+    %sp;
     %if;are_married;[married%t to:::date_place]1%nn;
     %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
     %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
@@ -142,9 +144,9 @@
              bvar.no_note_for_visitor="no"))
       or
       (evar.src="on" and xx.has_sources))%sp;
-     ([*see] [note/notes]0%sp;
+     %[[*note/notes]0%sp;
      <a href="#note-%ctr;">%nn;
-        %ctr;</a>)%nn;
+        %ctr;</a>%]%nn;
   %end
   %incr_count;
   %apply;lazy_print%with;<br%/>%nl;%end;
@@ -154,7 +156,7 @@
       %apply;married_to%with;
         %xx.is_male;
       %and;
-        %if;(on_marriage_date != "") %on_marriage_long_date;%end;
+        %if;(on_marriage_date != "") %on_marriage_date;%end;
         %if;(marriage_place != ""), %marriage_place;,%end;
       %end;
     %end;%nl;
@@ -167,9 +169,9 @@
                bvar.no_note_for_visitor="no"))
         or
         (evar.src="on" and spouse.has_sources))%sp;
-       ([*see] [note/notes]0%sp;
+       %[[*note/notes]0%sp;
        <a href="#note-%ctr;-%family_cnt;">%nn;
-          %ctr;-%family_cnt;</a>)%nn;
+          %ctr;-%family_cnt;</a>%]%nn;
     %end;
     %if;(evar.witn = "on" and has_witnesses)%nl;([witness/witnesses]1:
       %foreach;witness;
