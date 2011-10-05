@@ -254,11 +254,11 @@ value find_sosa conf base a sosa_ref_l =
                 sosa, et retourne son numéro de sosa sinon
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
-value p_sosa conf base a = 
+value p_sosa conf base p = 
   match Util.find_sosa_ref conf base with
-  [ Some p -> 
-    match find_sosa_aux conf base a p with
-    [ Some (q,s) -> q
+  [ Some per -> 
+    match find_sosa_aux conf base p per with
+    [ Some (n,_) -> n
     | None -> Num.zero ]
   | None -> Num.zero ]
 ;
@@ -1361,6 +1361,23 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "count" env with
       [ Vcnt c -> do { c.val := 0; "" }
       | _ -> "" ]
+  | "reset_desc_level" ->
+      let flevt_save =
+        match get_env "desc_level_table_save" env with
+        [ Vdesclevtab levt -> 
+            let (_, flevt) = Lazy.force levt in
+            flevt
+        | _ -> raise Not_found ]
+      in
+      match get_env "desc_level_table" env with
+      [ Vdesclevtab levt -> do {
+          let (_, flevt) = Lazy.force levt in
+          for i = 0 to Array.length flevt - 1 do {
+            flevt.(i) := flevt_save.(i);
+          };
+          ""
+        }
+      | _ -> raise Not_found ]
   | "source_type" ->
        match get_env "src_typ" env with
        [ Vstring s -> s
@@ -2068,7 +2085,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       else Name.lower (p_first_name base p)
   | "first_name_key_strip" ->
       if (is_hide_names conf p) && not p_auth then ""
-      else Name.lower (Name.strip_c (p_surname base p) '"')
+      else Name.strip_c (p_first_name base p) '"'
   | "image" -> if not p_auth then "" else sou base (get_image p)
   | "image_html_url" -> string_of_image_url conf base env ep True
   | "image_size" -> string_of_image_size conf base env ep
@@ -3055,6 +3072,10 @@ value interp_templ templ_fname conf base p = do {
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.lazy_from_fun dlt
     in
+    let desc_level_table_l_save =
+      let dlt () = make_desc_level_table conf base emal p in
+      Lazy.lazy_from_fun dlt
+    in
     let mal () =
       Vint (max_ancestor_level conf base (get_key_index p) emal + 1)
     in
@@ -3080,6 +3101,7 @@ value interp_templ templ_fname conf base p = do {
      ("max_cous_level", Vlazy (Lazy.lazy_from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.lazy_from_fun mdl));
      ("desc_level_table", Vdesclevtab desc_level_table_l);
+     ("desc_level_table_save", Vdesclevtab desc_level_table_l_save);
      ("nldb", Vlazy (Lazy.lazy_from_fun nldb));
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in

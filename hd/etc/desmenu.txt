@@ -111,6 +111,21 @@
           </label>
           <br%/>
           <label>
+            - [note/notes]1
+            <input type="checkbox" name="notes" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [source/sources]1
+            <input type="checkbox" name="src" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [relation/relations]1
+            <input type="checkbox" name="rel" value="on"%/>
+          </label>
+          <br%/>
+          <label>
             - [with::surname/surnames]1
             <input type="checkbox" name="alwsurn" value="yes"%/>
           </label>
@@ -123,11 +138,6 @@
           <label>
             - [comment] ([marriage/marriages]1)
             <input type="checkbox" name="comm" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [relation/relations]1
-            <input type="checkbox" name="rel" value="on"%/>
           </label>
         </td>
         <td align="%left;" valign="top">
