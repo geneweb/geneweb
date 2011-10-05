@@ -1311,15 +1311,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           match (m_auth, Adef.od_of_codate (get_marriage fam)) with
-          [ (True, Some s) -> Date.string_of_ondate conf s
-          | _ -> "" ] 
-      | _ -> raise Not_found ]
-  | "on_marriage_long_date" ->
-      match get_env "fam" env with
-      [ Vfam _ fam _ m_auth ->
-          match (m_auth, Adef.od_of_codate (get_marriage fam)) with
           [ (True, Some s) -> 
-            (Date.string_of_ondate conf s) ^ (Date.get_wday conf s)
+            match p_getenv conf.base_env "long_date" with
+            [ Some "yes" -> (Date.string_of_ondate conf s) ^ (Date.get_wday conf s)
+            | _ -> Date.string_of_ondate conf s ]
           | _ -> "" ] 
       | _ -> raise Not_found ]
   | "origin_file" ->
@@ -2181,63 +2176,45 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       else ""
   | "on_baptism_date" ->
       match (p_auth, Adef.od_of_codate (get_baptism p)) with
-      [ (True, Some d) -> Date.string_of_ondate conf d
-      | _ -> "" ]
-  | "on_baptism_long_date" ->
-      match (p_auth, Adef.od_of_codate (get_baptism p)) with
       [ (True, Some d) -> 
-        (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          | _ -> Date.string_of_ondate conf d ]
       | _ -> "" ]
   | "on_birth_date" ->
       match (p_auth, Adef.od_of_codate (get_birth p)) with
-      [ (True, Some d) -> Date.string_of_ondate conf d
-      | _ -> "" ]
-  | "on_birth_long_date" ->
-      match (p_auth, Adef.od_of_codate (get_birth p)) with
       [ (True, Some d) -> 
-        (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          | _ -> Date.string_of_ondate conf d ]
       | _ -> "" ]
   | "on_burial_date" ->
       match get_burial p with
       [ Buried cod ->
           match (p_auth, Adef.od_of_codate cod) with
-          [ (True, Some d) -> Date.string_of_ondate conf d
-          | _ -> "" ]
-      | _ -> raise Not_found ]
-  | "on_burial_long_date" ->
-      match get_burial p with
-      [ Buried cod ->
-          match (p_auth, Adef.od_of_codate cod) with
           [ (True, Some d) -> 
-            (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+              match p_getenv conf.base_env "long_date" with
+              [ Some "yes" -> (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+              | _ -> Date.string_of_ondate conf d ]
           | _ -> "" ]
       | _ -> raise Not_found ]
   | "on_cremation_date" ->
       match get_burial p with
       [ Cremated cod ->
           match (p_auth, Adef.od_of_codate cod) with
-          [ (True, Some d) -> Date.string_of_ondate conf d
-          | _ -> "" ]
-      | _ -> raise Not_found ]
-  | "on_cremation_long_date" ->
-      match get_burial p with
-      [ Cremated cod ->
-          match (p_auth, Adef.od_of_codate cod) with
           [ (True, Some d) -> 
-            (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+              match p_getenv conf.base_env "long_date" with
+              [ Some "yes" -> (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+              | _ -> Date.string_of_ondate conf d ]
           | _ -> "" ]
       | _ -> raise Not_found ]
   | "on_death_date" ->
       match (p_auth, get_death p) with
       [ (True, Death _ d) ->
           let d = Adef.date_of_cdate d in
-          Date.string_of_ondate conf d
-      | _ -> "" ]
-  | "on_death_long_date" ->
-      match (p_auth, get_death p) with
-      [ (True, Death _ d) ->
-          let d = Adef.date_of_cdate d in
-          (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          | _ -> Date.string_of_ondate conf d ]
       | _ -> "" ]
   | "prev_fam_father" ->
       match get_env "prev_fam" env with
