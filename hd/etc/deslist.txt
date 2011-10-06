@@ -136,7 +136,7 @@
 
 %define;descendants_by_list(xx, yy, curlev, maxlev, famlev, ctr)
   %if;(curlev = 0)<p>%nl;%end;
-  <b>%if;(evar.cgl = "on" or xx.is_restricted)%yy;%else;
+  <b id="person-%ctr;">%if;(evar.cgl = "on" or xx.is_restricted)%yy;%else;
   <a href="%prefix;%xx.access;">%yy;</a>%end;</b>%nn;
   %apply;somebody_long_info("xx").
   %if;(((evar.notes="on" and xx.has_notes)
@@ -162,7 +162,7 @@
         %if;(marriage_place != ""), %marriage_place;,%end;
       %end;
     %end;%nl;
-    <b>%if;(evar.cgl = "on" or spouse.is_restricted)%spouse;%else;
+    <b id="person-%ctr;-%family_cnt;">%if;(evar.cgl = "on" or spouse.is_restricted)%spouse;%else;
     <a href="%prefix;%spouse.access;">%spouse;</a>%end;</b>%nn;
     %apply;somebody_long_info("spouse")
     %if;(((evar.notes="on" and spouse.has_notes)
