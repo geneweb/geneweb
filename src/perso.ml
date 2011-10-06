@@ -2284,7 +2284,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       else Name.lower (p_surname base p)
   | "surname_key_strip" ->
       if (is_hide_names conf p) && not p_auth then ""
-      else Name.lower (Name.strip_c (p_surname base p) '"')
+      else Name.strip_c (p_surname base p) '"'
   | "title" -> person_title conf base p
   | _ -> raise Not_found ]
 and eval_witness_relation_var conf base env
