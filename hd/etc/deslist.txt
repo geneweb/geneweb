@@ -138,6 +138,7 @@
   %if;(curlev = 0)<p>%nl;%end;
   <b>%if;(evar.cgl = "on" or xx.is_restricted)%yy;%else;
   <a href="%prefix;%xx.access;">%yy;</a>%end;</b>%nn;
+  %apply;somebody_long_info("xx").
   %if;(((evar.notes="on" and xx.has_notes)
         and (wizard or friend or
              bvar.no_note_for_visitor="" or
@@ -152,6 +153,7 @@
   %apply;lazy_print%with;<br%/>%nl;%end;
   %foreach;xx.family;
     %if;(family_cnt != 1 and curlev = 0)<p>%nl;%end;
+    %lazy_force;
     %apply;capitalize%with;
       %apply;married_to%with;
         %xx.is_male;
