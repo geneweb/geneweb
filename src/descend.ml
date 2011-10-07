@@ -841,10 +841,7 @@ value make_tree_hts conf base gv p =
       match po with
       [ Some (p, auth) ->
           let ncol = nb_column 0 (v - 1) p in
-          let txt =
-            if v = 1 then person_text_without_surname conf base p
-            else person_title_text conf base p
-          in
+          let txt = person_title_text conf base p in
           let txt = reference conf base p txt in
           let txt =
             if auth then txt ^ Date.short_dates_text conf base p else txt
@@ -878,7 +875,7 @@ value make_tree_hts conf base gv p =
             in
             let td =
               let fam = foi base ifam in
-              let ncol = fam_nb_column 0 (v - 1) fam in
+              let ncol = nb_column 0 (v - 1) p in
               let s =
                 let sp = pget conf base (spouse (get_key_index p) fam) in
                 let txt = person_title_text conf base sp in
@@ -952,7 +949,10 @@ value make_tree_hts conf base gv p =
           let tdl = List.fold_left (spouses_txt v) [] gen in
           let tdal = [Array.of_list (List.rev tdl) :: tdal] in
           loop tdal gen (next_gen gen) (v - 1)
-        else tdal
+        else 
+          let tdl = List.fold_left (spouses_txt v) [] gen in
+          let tdal = [Array.of_list (List.rev tdl) :: tdal] in
+          tdal
     in
     Array.of_list (List.rev tdal)
   in

@@ -18,21 +18,23 @@
 <body %body_prop;>
 %message_to_wizard;
 
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; 
+       style="border: 0" title="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; 
+    style="border: 0" title="^^"%/></a>
+  </td></tr></table>
+  <hr style="clear:both; visibility:hidden;" />
+%end;
+
 <a href="%prefix;" accesskey="T"></a>
 
 %if;(evar.slices = "on")
-  %if;(evar.cgl != "on")
-    <table style="float:%right;"><tr><td>
-      %if;(referer != "")
-        <a href="%referer;"><img
-         src="%image_prefix;/left.jpg"%wid_hei;left.jpg; 
-         style="border: 0" title="&lt;&lt;"%/></a>
-      %end;
-      <a href="%prefix;"><img%sp;
-      src="%image_prefix;/up.jpg"%wid_hei;up.jpg; 
-      style="border: 0" title="^^"%/></a>
-    </td></tr></table>
-  %end;
   <h1 style="text-align:center" class="highlight">%nn;
     [*display by slices/slice width/overlap/total width]0%nn;
   </h1>
