@@ -719,6 +719,9 @@ value make_tree_hts conf base gv p =
         [ None | Some "" -> ""
         | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
   in
+  (* TODO : il faut refaire le calcul car ajouter les conjoints *)
+  (* massacre la dernière ligne de l'arbre si une personne a    *)
+  (* plusieurs conjoints                                        *)
   let rec nb_column n v u =
     if v = 0 then n + 1
     else if Array.length (get_family u) = 0 then n + 1
@@ -875,7 +878,12 @@ value make_tree_hts conf base gv p =
             in
             let td =
               let fam = foi base ifam in
-              let ncol = nb_column 0 (v - 1) p in
+              let ncol = fam_nb_column 0 (v-1) fam
+                (* TODO
+                if v > 1 then fam_nb_column 0 (v-1) fam
+                else nb_column 0 (v - 1) p 
+                *)
+              in
               let s =
                 let sp = pget conf base (spouse (get_key_index p) fam) in
                 let txt = person_title_text conf base sp in
@@ -950,8 +958,10 @@ value make_tree_hts conf base gv p =
           let tdal = [Array.of_list (List.rev tdl) :: tdal] in
           loop tdal gen (next_gen gen) (v - 1)
         else 
+(* TODO
           let tdl = List.fold_left (spouses_txt v) [] gen in
           let tdal = [Array.of_list (List.rev tdl) :: tdal] in
+*)
           tdal
     in
     Array.of_list (List.rev tdal)
