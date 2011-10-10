@@ -315,11 +315,7 @@
   ([spouses not included]).
   %if;(evar.notes="on" or evar.src="on")
     <hr>
-    %if;(evar.notes="on" and evar.src="on")
-      <h3>[*note/notes]1 [and] [*source/sources]1</h3>
-    %elseif;(evar.notes="on")<h3>[*note/notes]1</h3>
-    %elseif;(evar.src="on")<h3>[*source/sources]1</h3>
-    %end;
+    <h3>%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
     <dl>
       %reset_count;
       %reset_desc_level;
