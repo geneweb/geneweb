@@ -116,7 +116,6 @@
 
 %define;married_to(is_male, date_place)
   %if;("is_male" = 1)
-    %sp;
     %if;are_married;[married%t to:::date_place]0%nn;
     %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
     %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
@@ -124,7 +123,6 @@
     %elseif;is_no_mention;date_place [with]%nn;
     %end;
   %else;
-    %sp;
     %if;are_married;[married%t to:::date_place]1%nn;
     %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
     %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
