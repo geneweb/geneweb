@@ -1722,7 +1722,6 @@ value geneweb_server () =
         | None -> try Unix.gethostname () with _ -> "computer" ]
       in
       eprintf "GeneWeb %s - " Version.txt;
-      eprintf "Copyright (c) 1998-2007 INRIA\n";
       if not daemon.val then do {
         eprintf "Possible addresses:";
         eprintf "
