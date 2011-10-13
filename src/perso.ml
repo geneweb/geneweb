@@ -171,6 +171,13 @@ value string_of_titles conf base cap and_txt p =
 
 (* Version matching the Sosa number of the "ancestor" pages *)
 
+(*                       !!! FIX ME !!!                                *)
+(* J'ai rajouté un try catch qui ignore qu'on pointe en dehors du      *)
+(* tableau, mais ce n'est pas une bonne solution. Il faut corriger en  *)
+(* en profondeur ce problème d'index de tableau qui semble se produire *)
+(* lorsqu'on ajoute des personnes puis en supprime. Le calcul de sosa  *)
+(* ne se fait pas alors correctement et on plante à l'affichage par    *)
+(* branche *)
 value find_sosa_aux conf base a p =
   let tstab = Util.create_topological_sort conf base in
   let mark = Array.create (nb_of_persons base) False in
@@ -182,8 +189,14 @@ value find_sosa_aux conf base a p =
         else if mark.(Adef.int_of_iper ip) then gene_find zil
         else do {
           mark.(Adef.int_of_iper ip) := True;
-          if tstab.(Adef.int_of_iper (get_key_index a)) <=
-               tstab.(Adef.int_of_iper ip) then
+          (* FIX ME : Util.create_topological_sort *)
+          let bool =
+            try 
+              tstab.(Adef.int_of_iper (get_key_index a)) <=
+               tstab.(Adef.int_of_iper ip)
+            with [ Invalid_argument "index out of bounds" -> True ]
+          in
+          if bool then
             gene_find zil
           else
             let asc = pget conf base ip in
