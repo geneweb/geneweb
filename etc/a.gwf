@@ -320,3 +320,7 @@ expand_env=no
 
 # Display the compilation time at bottom of pages.
 # display_compilation_time=off
+
+# Display the date with the explicit day in parenthesis.
+# Only works if the date is "exact" and *not* enter in "text mode"
+#long_date=yes/no
