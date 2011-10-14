@@ -209,10 +209,10 @@
           %end;
           </ul>
           %apply;lazy_print%with;%end;
-        %else;
+        %else;.
           %if;(curlev = 0)%nl;</p>%nl;
           %else;%apply;lazy_print%with;<br%/>%nl;%end;
-          %end;.
+          %end;
         %end;
       %elseif;has_children;, ...
       %else;.
