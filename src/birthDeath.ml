@@ -679,7 +679,11 @@ value print_population_pyramid conf base = do {
                   if nb_men = 0 then ()
                   else
                     let n = max 1 (band_size nb_men) in
-                    for j = 1 to n do { Wserver.wprint "<img src=\"images/pyr_male.png\" />"; };
+                    (* On multiplie par 3 parce que c'est *)
+                    (* la largeur de l'image : 3 x 14     *)
+                    Wserver.wprint 
+                      ("<img src=\"images/pyr_male.png\" width=%d height=%d />") 
+                      (n * 3) 14;
                 end;
               end;
             end;
@@ -695,7 +699,11 @@ value print_population_pyramid conf base = do {
                   if nb_wom = 0 then ()
                   else
                     let n = max 1 (band_size nb_wom) in
-                    for j = 1 to n do { Wserver.wprint "<img src=\"images/pyr_female.png\" />"; };
+                    (* On multiplie par 3 parce que c'est *)
+                    (* la largeur de l'image : 3 x 14     *)
+                    Wserver.wprint 
+                      ("<img src=\"images/pyr_female.png\" width=%d height=%d />")
+                      (n * 3) 14;
                 end;
                 stagn "td" 
                 begin
