@@ -920,7 +920,7 @@ eo: bofrato/bofratino
 es: un cuñado/una cuñada
 et: küdi või nääl:g:+u või õemees:g:--he/nadu või käli või vennanaine:g:--se
 fi: lanko:g:--gon/käly:g:+n
-fr: un beau-frère/une belle-soeur
+fr: un beau-frère/une belle-sœur
 he:  גיס/ גיסה
 is: mágur/mágkona
 it: un cognato/una cognata
@@ -947,7 +947,7 @@ eo: frato/fratino/frat(in)o
 es: un hermano/una hermana/un(a) hermano(a)
 et: vend:g:-na/õde:g:--e/õde:g:--e või vend:g:-na
 fi: veli:g:-jen/sisar:g:+en/sisarus:g:-ksen
-fr: un frère/une soeur/un frère ou une soeur
+fr: un frère/une sœur/un frère ou une sœur
 he:   אח/ אחות/ אח(ות)
 is: bróðir/systir/systkyn
 it: un fratello/una sorella/un fratello o una sorella
@@ -1190,7 +1190,7 @@ eo: duonfrato/duonfratino/duonfrat(in)o
 es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
 et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
 fi: velipuoli:g:-en/sisarpuoli:g:-en/isä- tai äitipuolen lapsi:g:-en
-fr: un demi-frère/une demi-soeur/un demi-frère ou une demi-soeur
+fr: un demi-frère/une demi-sœur/un demi-frère ou une demi-sœur
 he:   חצי אח/ חצי אחות/ חצי אח(ות)
 is: hálfbróðir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
@@ -5971,7 +5971,7 @@ eo: sekvanta frato/sekvanta fratino/sekvanta frat(in)o
 es: hermano siguiente/hermana siguiente/hermano(a) siguiente
 et: järgmine vend/järgmine õde/järgmine õde või vend
 fi: seuraava veli/seuraava sisar/seuraava sisaruksista
-fr: frère suivant/soeur suivante/frère ou soeur suivant
+fr: frère suivant/sœur suivante/frère ou sœur suivant
 he:  אח(ות) צעיר(ה)
 is: næsta systkyni
 it: fratello seguente/sorella seguente/fratello o sorella seguente
@@ -7061,7 +7061,7 @@ eo: antaùa frato/antaùa fratino/antaùa frat(in)o
 es: hermano anterior/hermana anterior/hermano (a) anterior
 et: eelmine vend/eelmine õde/eelmine õde või vend
 fi: edellinen veli/edellinen sisar/edellinen sisaruksista
-fr: frère précédent/soeur précédente/frère ou soeur précédent
+fr: frère précédent/sœur précédente/frère ou sœur précédent
 he:   אח(ות) הגדול(ה)
 is: fyrra systkyn
 it: fratello precedente/sorella precedente/fratello o sorella precedente
@@ -7737,7 +7737,7 @@ eo: gefratoj
 es: hermanos y hermanas
 et: õed ja vennad
 fi: sisarukset
-fr: frères et soeurs
+fr: frères et sœurs
 he:  אחים
 is: systkyni
 it: fratelli
