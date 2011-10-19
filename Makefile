@@ -2,7 +2,6 @@
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
-DOCDIR=$(PREFIX)/share/geneweb/doc
 MANDIR=$(PREFIX)/man/man1
 DESTDIR=distribution
 MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwc2.1 gwu.1 gwd.1 consang.1 gwsetup.1
@@ -17,7 +16,6 @@ out::
 	cd src; $(MAKE) PREFIX=$(PREFIX) all
 	cd ged2gwb; $(MAKE) all
 	cd gwb2ged; $(MAKE) all
-	cd doc; $(MAKE) all
 	cd setup; $(MAKE) all
 	cd gwtp; $(MAKE) all
 
@@ -27,7 +25,6 @@ opt::
 	cd src; $(MAKE) PREFIX=$(PREFIX) opt
 	cd ged2gwb; $(MAKE) opt
 	cd gwb2ged; $(MAKE) opt
-	cd doc; $(MAKE) opt
 	cd setup; $(MAKE) opt
 	cd gwtp; $(MAKE) opt
 
@@ -42,14 +39,6 @@ install:
 	cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE)
 	cp ged2gwb/ged2gwb2 $(PREFIX)/bin/ged2gwb2$(EXE)
 	cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE)
-	mkdir -p $(DOCDIR)
-	cp doc/*.htm $(DOCDIR)/.
-	for i in de en fr it nl sv; do \
-	  mkdir -p $(DOCDIR)/$$i; \
-	  cp doc/$$i/*.htm $(DOCDIR)/$$i/.; \
-	done
-	mkdir -p $(DOCDIR)/images
-	cp doc/images/*.jpg doc/images/gwlogo.png $(DOCDIR)/images/.
 	mkdir -p $(LANGDIR)/lang
 	cp hd/lang/*.txt $(LANGDIR)/lang/.
 	mkdir -p $(LANGDIR)/images
@@ -144,18 +133,6 @@ classical_distrib:
 	cp etc/README.txt $(DESTDIR)/.
 	cp etc/INSTALL.htm $(DESTDIR)/.
 	cp etc/a.gwf $(DESTDIR)/.
-	mkdir $(DESTDIR)/doc
-	mkdir $(DESTDIR)/doc/wdoc
-	cp doc/*.htm $(DESTDIR)/doc/.
-	cp doc/wdoc/*.txt $(DESTDIR)/doc/wdoc/.
-	for i in de en fr it nl sv; do \
-	  mkdir $(DESTDIR)/doc/$$i; \
-	  mkdir $(DESTDIR)/doc/wdoc/$$i; \
-	  cp doc/$$i/*.htm $(DESTDIR)/doc/$$i/.; \
-	  if test -d "doc/wdoc/$$i"; then cp doc/wdoc/$$i/*.txt $(DESTDIR)/doc/wdoc/$$i/.; fi; \
-	done
-	mkdir $(DESTDIR)/doc/images
-	cp doc/images/*.jpg doc/images/gwlogo.png $(DESTDIR)/doc/images/.
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
 	mkdir $(DESTDIR)/images
@@ -180,7 +157,6 @@ clean::
 	cd src; $(MAKE) clean
 	cd ged2gwb; $(MAKE) clean
 	cd gwb2ged; $(MAKE) clean
-	cd doc; $(MAKE) clean
 	cd setup; $(MAKE) clean
 	cd gwtp; $(MAKE) clean
 	$(RM) -rf $(DESTDIR)
