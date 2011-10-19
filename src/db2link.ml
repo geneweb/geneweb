@@ -845,6 +845,16 @@ value changed_p (ip, p, o_sex, o_rpar) =
   do { Printf.eprintf "person %d not changed\n" i; flush stderr }
 ;
 
+(* ******************************************************************** *)
+(*  [Fonc] link : (file_info -> unit -> Gwcomp.gw_syntax option) ->     *)
+(*                  string -> bool                                      *)
+(** [Description] : TODO
+    [Args] :
+      - next_family_fun : 
+      - bdir : nom de la base.
+    [Retour] : 
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
 value link next_family_fun bdir = do {
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   Mutil.remove_dir tmp_dir;
