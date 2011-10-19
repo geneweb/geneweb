@@ -417,7 +417,8 @@ value family_m conf base =
       SendImage.print_del_ok conf base
   | Some "DEL_IND" when conf.wizard -> UpdateInd.print_del conf base
   | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
-  | Some "DOC" -> Doc.print conf
+  (* Fonction obsolète, la documentation n'étant plus à jour *)
+  (* | Some "DOC" -> Doc.print conf *)
   | Some "FORUM" -> Forum.print conf base
   | Some "FORUM_ADD" -> Forum.print_add conf base
   | Some "FORUM_ADD_OK" -> Forum.print_add_ok conf base
@@ -456,8 +457,9 @@ value family_m conf base =
   | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
   | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
-  | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf
-  | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base
+  (* Fonction obsolète, la documentation n'étant plus à jour *)
+  (* | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf *)
+  (* | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base *)
   | Some "MOD_WIZNOTES" -> Wiznotes.print_mod conf base
   | Some "MOD_WIZNOTES_OK" -> Wiznotes.print_mod_ok conf base
   | Some "MRG" when conf.wizard ->
@@ -560,7 +562,8 @@ value family_m conf base =
       [ Some p -> updmenu_print conf base p
       | _ -> very_unknown conf ]
   | Some "VIEW_WIZNOTES" when conf.wizard -> Wiznotes.print_view conf base
-  | Some "WDOC" -> Doc.print_wdoc conf
+  (* Fonction obsolète, la documentation n'étant plus à jour *)
+  (* | Some "WDOC" -> Doc.print_wdoc conf *)
   | Some "WIZNOTES" -> Wiznotes.print conf base
   | Some "WIZNOTES_SEARCH" -> Wiznotes.print_search conf base
   | Some mode -> incorrect_request conf
