@@ -5,6 +5,17 @@
 open Gwcomp;
 open Printf;
 
+(* ******************************************************************** *)
+(*  [Fonc] check_magic : string -> in_channel -> unit                   *)
+(** [Description] : Vérifie le header du fichier passé en paramètre tel
+                    que défini par magic_gwo
+    [Args] :
+      - fname : nom du fichier.
+      - ic : descripteur du fichier.
+    [Retour] : Si le header n'est pas compatible, on quite en lançant
+               une exception Failure suivie du message d'erreur.
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
 value check_magic =
   let b = String.create (String.length magic_gwo) in
   fun fname ic ->
@@ -91,6 +102,12 @@ value separate = ref False;
 value shift = ref 0;
 value files = ref [];
 
+(* ******************************************************************** *)
+(*  [Var] speclist : (string * Arg.spec * string) list                  *)
+(** [Description] : Positionne les variables en fonction des options
+                    données à gwc2
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
 value speclist =
   [("-c", Arg.Set just_comp, "Only compiling");
    ("-o", Arg.String (fun s -> out_file.val := s),
@@ -133,6 +150,14 @@ where [files] are a list of files:
 and [options] are:"
 ;
 
+(* ******************************************************************** *)
+(*  [Fonc] main : unit -> unit                                          *)
+(** [Description] : Fonction principale de création d'une base au 
+                    format gwb2.
+    [Args] : Néant.
+    [Retour] : Néant.
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
 value main () =
   do {
     Mutil.verbose.val := False;
@@ -192,6 +217,8 @@ value print_exc =
   fun
   [ Failure txt ->
       do { printf "Failed: %s\n" txt; flush stdout; exit 2 }
+  (* FIX ME : Printexc.catch is deprecated *)
+  (* use Printexc.print raise exc instead  *)
   | exc -> Printexc.catch raise exc ]
 ;
 
