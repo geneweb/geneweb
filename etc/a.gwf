@@ -329,3 +329,7 @@ expand_env=no
 # are considered 'incorect request'. Default behaviour is that the forum
 # is *not* disable
 #disable_forum=yes/no
+
+# If counter is off, the counter for visiting geneweb's web pages is 
+# *not* incremented. Default behaviour is that the counter is on.
+#counter=on/off
