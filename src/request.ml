@@ -419,13 +419,34 @@ value family_m conf base =
   | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "DOC" -> Doc.print conf *)
-  | Some "FORUM" -> Forum.print conf base
-  | Some "FORUM_ADD" -> Forum.print_add conf base
-  | Some "FORUM_ADD_OK" -> Forum.print_add_ok conf base
-  | Some "FORUM_DEL" -> Forum.print_del conf base
-  | Some "FORUM_SEARCH" -> Forum.print_search conf base
-  | Some "FORUM_VAL" -> Forum.print_valid conf base
-  | Some "FORUM_VIEW" -> Forum.print conf base
+  | Some "FORUM" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print conf base ]
+  | Some "FORUM_ADD" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print_add conf base ]
+  | Some "FORUM_ADD_OK" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print_add_ok conf base ]
+  | Some "FORUM_DEL" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print_del conf base ]
+  | Some "FORUM_SEARCH" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print_search conf base ]
+  | Some "FORUM_VAL" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print_valid conf base ]
+  | Some "FORUM_VIEW" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print conf base ]
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f
