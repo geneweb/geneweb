@@ -324,3 +324,8 @@ expand_env=no
 # Display the date with the explicit day in parenthesis.
 # Only works if the date is "exact" and *not* enter in "text mode"
 #long_date=yes/no
+
+# If disable_forum is set to yes, then all the request on the forum
+# are considered 'incorect request'. Default behaviour is that the forum
+# is *not* disable
+#disable_forum=yes/no
