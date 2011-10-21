@@ -2893,6 +2893,10 @@ value print_foreach conf base print_ast eval_expr =
       | [] -> [(typ, src)] ]
     in
     let insert typ src srcl = insert_loop (Util.translate_eval typ) src srcl in
+    (* On brise la logique interne de GeneWeb en constituant les      *)
+    (* notes/sources de la personne sans ses informations de décès,   *)
+    (* puis les notes/sources de sa famille et enfin ses informations *)
+    (* de décès. Ce qui évite : naissance, baptême, décès, mariage.   *)
     let srcl = [] in
     let srcl =
       if not (is_hide_names conf p) || p_auth then
@@ -2907,11 +2911,6 @@ value print_foreach conf base print_ast eval_expr =
         let srcl =
           insert (transl_nth conf "baptism" 0) (get_baptism_src p) srcl
         in
-        let srcl =
-          insert (transl_nth conf "death" 0) (get_death_src p) srcl
-        in
-        let srcl =
-          insert (transl_nth conf "burial" 0) (get_burial_src p) srcl in
         srcl
       else srcl
     in
@@ -2932,6 +2931,16 @@ value print_foreach conf base print_ast eval_expr =
            let src_typ = transl_nth conf "family/families" 0 in
            (insert (src_typ ^ lab) (get_fsources fam) srcl, i + 1))
         (srcl, 1) (get_family p)
+    in
+    let srcl = 
+      if p_auth then
+        let srcl =
+          insert (transl_nth conf "death" 0) (get_death_src p) srcl
+        in
+        let srcl =
+          insert (transl_nth conf "burial" 0) (get_burial_src p) srcl in
+        srcl
+      else srcl
     in
     let print_src (src_typ, src) =
       let s = sou base src in
