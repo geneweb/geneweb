@@ -749,18 +749,18 @@ value treat_request conf base log = do {
         make_senv conf base;
         if only_special_env conf.env then do {
           match p_getenv conf.base_env "counter" with
-          [ Some "on" -> 
+          [ Some "off" -> ()
+          | _ -> 
               let r = Srcfile.incr_welcome_counter conf in
-              log_count conf log r
-          | _ -> () ];
+              log_count conf log r ];
           Srcfile.print_start conf base
         }
         else do {
           match p_getenv conf.base_env "counter" with
-          [ Some "on" -> 
+          [ Some "off" -> ()
+          | _ -> 
               let r = Srcfile.incr_request_counter conf in
-              log_count conf log r
-          | _ -> () ] ;
+              log_count conf log r ] ;
           match p_getenv conf.env "ptempl" with
           [ Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
               match find_person_in_env conf base "" with
