@@ -749,7 +749,7 @@ value treat_request conf base log = do {
         make_senv conf base;
         if only_special_env conf.env then do {
           match p_getenv conf.base_env "counter" with
-          [ Some "off" -> ()
+          [ Some "no" -> ()
           | _ -> 
               let r = Srcfile.incr_welcome_counter conf in
               log_count conf log r ];
@@ -757,7 +757,7 @@ value treat_request conf base log = do {
         }
         else do {
           match p_getenv conf.base_env "counter" with
-          [ Some "off" -> ()
+          [ Some "no" -> ()
           | _ -> 
               let r = Srcfile.incr_request_counter conf in
               log_count conf log r ] ;
