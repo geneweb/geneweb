@@ -330,6 +330,6 @@ expand_env=no
 # is *not* disable
 #disable_forum=yes/no
 
-# If counter is off, the counter for visiting geneweb's web pages is 
-# *not* incremented. Default behaviour is that the counter is on.
-#counter=on/off
+# If counter is set to no, the counter for visiting geneweb's web pages is 
+# *not* incremented. Default behaviour is that the counter is on (set to yes).
+#counter=yes/no
