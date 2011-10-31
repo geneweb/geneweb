@@ -9757,6 +9757,18 @@ ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки 
 sv: ditt meddelande väntar på giltighet
 
+    %s forbidden char
+da: forkert karakter (%s) brugt i efternavn/fornavn
+de: ungültiges Zeichen (%s) im nachname/vorname
+en: invalid character (%s) used in surname/first name
+es: carácter inválido (%) en la apellido/nombre
+fi: olet kättänyt sopimatonta merkkiä (%s) sukunimi/etunimi
+fr: caractères interdits (%s) dans le patronyme/prénom
+it: carattere non valido (%s) nella cognome/nome
+nl: ongeldig karakter (%s) in familienaam/voornaam
+no: etternavn/fornavn du skrev inn, inneholder ugyldige tegn (%s)
+sv: Ogiltigt tecken (%s) i efternamn/förnamn
+
     navigation
 af: stap met
 bg: навигация

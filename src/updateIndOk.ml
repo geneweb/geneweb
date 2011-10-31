@@ -11,6 +11,13 @@ open Hutil;
 open Mutil;
 open Util;
 
+(* Liste des string dont on a supprimé un caractère.       *)
+(* Utilisé pour le message d'erreur lors de la validation. *)
+value removed_string = ref [] ;
+
+(* Booléen pour savoir si on a supprimé un caractère interdit *)
+value removed_forbidden_char = ref False;
+
 value raw_get conf key =
   match p_getenv conf.env key with
   [ Some v -> v
@@ -117,6 +124,20 @@ value reconstitute_relation_parent conf var key sex =
   | (fn, sn) ->
       let fn = only_printable fn in
       let sn = only_printable sn in
+      (* S'il y a des caractères interdits, on les supprime *)
+      let (fn, sn) =
+        let contain_fn = String.contains fn in
+        let contain_sn = String.contains sn in
+        if (List.exists contain_fn Name.forbidden_char) || 
+           (List.exists contain_sn Name.forbidden_char) then
+          do {
+            removed_forbidden_char.val := True;
+            removed_string.val := 
+              [(Name.purge fn ^ " " ^ Name.purge sn) :: removed_string.val];
+            (Name.purge fn, Name.purge sn)
+          }
+        else (fn, sn)
+      in
       let occ =
         try int_of_string (getn conf var (key ^ "_occ")) with
         [ Failure _ -> 0 ]
@@ -206,6 +227,20 @@ value reconstitute_person conf =
   in
   let first_name = no_html_tags (only_printable (get conf "first_name")) in
   let surname = no_html_tags (only_printable (get conf "surname")) in
+  (* S'il y a des caractères interdits, on les supprime *)
+  let (first_name, surname) =
+    let contain_fn = String.contains first_name in
+    let contain_sn = String.contains surname in
+    if (List.exists contain_fn Name.forbidden_char) ||
+       (List.exists contain_sn Name.forbidden_char) then
+      do {
+        removed_forbidden_char.val := True;
+        removed_string.val := 
+          [(Name.purge first_name ^ " " ^ Name.purge surname) :: removed_string.val];
+        (Name.purge first_name, Name.purge surname)
+      }
+    else (first_name, surname)
+  in
   let occ =
     try int_of_string (strip_spaces (get conf "occ")) with [ Failure _ -> 0 ]
   in
@@ -586,6 +621,20 @@ value print_mod_ok conf base wl p =
   do {
     header conf title;
     print_link_to_welcome conf True;
+    (* Si on a supprimé des caractères interdits *)
+    if removed_forbidden_char.val then
+      do {
+         Wserver.wprint "<h3 class=\"error\">" ;
+         Wserver.wprint 
+           (fcapitale (ftransl conf "%s forbidden char")) 
+           (List.fold_left 
+              (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") 
+              " " 
+              Name.forbidden_char);
+         Wserver.wprint "</h3>\n" ;
+         List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
+      }
+    else ();
     Wserver.wprint "\n%s"
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.wprint "\n";
@@ -648,6 +697,13 @@ value print_add_ok conf base wl p =
   do {
     header conf title;
     print_link_to_welcome conf True;
+    (* Si on a supprimé des caractères interdits *)
+    if removed_forbidden_char.val then
+      do {
+         Wserver.wprint "<h2 class=\"error\">%s</h2>\n" (capitale (transl conf "forbidden char"));
+         List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
+      }
+    else ();
     Wserver.wprint "\n%s"
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.wprint "\n";
@@ -676,6 +732,10 @@ value print_del_ok conf base wl =
 ;
 
 value print_add o_conf base =
+  (* Attention ! On pense à remettre les compteurs à *)
+  (* zéro pour la détection des caractères interdits *)
+  let () = removed_forbidden_char.val := False in
+  let () = removed_string.val := [] in
   let conf = Update.update_conf o_conf in
   try
     let (sp, ext) = reconstitute_person conf in
@@ -764,6 +824,10 @@ value get_old_key conf base =
 ;
 
 value print_mod o_conf base =
+  (* Attention ! On pense à remettre les compteurs à *)
+  (* zéro pour la détection des caractères interdits *)
+  let () = removed_forbidden_char.val := False in
+  let () = removed_string.val := [] in
   let old_key = get_old_key o_conf base in
   let conf = Update.update_conf o_conf in
   let callback sp = do {
