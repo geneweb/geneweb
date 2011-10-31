@@ -462,12 +462,18 @@ zh: Other options
         [wizard/wizards/friend/friends/exterior]1 - [note/notes]1</a>
       </li>
     %end;
+    %if;(bvar.disable_forum != "yes")%sq;
+      <li>
+      <a href="%prefix;m=FORUM">[database forum]</a>
+      </li>
+    %end;
   </ul>
   </div>
 </div>
 
 
 <br/>
+%if;(bvar.counter != "no")%sq
 <div style="text-align: center">
   %apply;interp([
 af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
@@ -526,6 +532,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     次访问本主页， 自从 %start_date;。
 ])%nl;
 </div>
+%end;
 
 <div style="text-align: center; margin-top: 1em; padding: 0 20%%">
   %apply;interp([
