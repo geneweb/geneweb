@@ -345,37 +345,7 @@
 %end;
 
 <div id="navigation">
-  <h3>
-[
-af: Navigation
-bg: Navigation
-br: Navigation
-ca: Navigation
-cs: Navigation
-da: Navigation
-de: Navigation
-en: Navigation
-eo: Navigation
-es: Navigation
-et: Navigation
-fi: Navigation
-fr: Navigation
-fr-cr: Navigation
-he: Navigation
-is: Navigation
-it: Navigation
-lv: Navigation
-nl: Navigation
-no: Navigation
-pl: Navigation
-pt: Navigation
-ro: Navigation
-ru: Navigation
-sl: Navigation
-sv: Navigation
-zh: Navigation
-]
-  </h3>
+  <h3>[*navigation]</h3>
   %if;not cancel_links;
     <div id="list_left">
     <ul>
