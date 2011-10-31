@@ -9756,3 +9756,30 @@ pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
 ru: ваше сообщение ожидает проверки 
 sv: ditt meddelande väntar på giltighet
+
+    navigation
+af: stap met
+bg: навигация
+br: merdeadur
+ca: navegació
+cs: prohlížení
+da: navigering
+de: navigation
+en: navigation
+eo: navigado
+es: navegación
+et: navigeerimine
+fi: navigointi
+fr: navigation
+he:  ניוות
+is: leiðsögn
+it: percorso
+lv: meklēt
+nl: navigatie
+no: navigering
+pl: nawigacja
+pt: navegação
+ro: navigatie
+ru: навигация
+sl: pregled
+sv: navigering
