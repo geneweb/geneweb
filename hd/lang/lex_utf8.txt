@@ -9795,3 +9795,27 @@ ro: navigatie
 ru: навигация
 sl: pregled
 sv: navigering
+
+    age at %s birth date
+de: alter zum zeitpunkt der geburt von %s
+en: age at %s birth date
+es: edad en el nacimiento de %s
+fr: âge à la naissance de %s
+it: età alla nascita di %s
+nl: leeftijd bij de geboorte van %s
+
+    half-siblings
+de: halbbrüder und schwestern
+en: half-siblings
+es: hermanastros y hermanastras
+fr: demi frères et soeurs
+it: fratellastri e sorellastre
+nl: half broers en zusters
+
+    direct ancestor of %s
+de: direkter Vorfahre von %s
+en: direct ancestor of %s
+es: antepasado directo de %s
+fr: ancêtre direct de %s
+it: antenato diretto di %s
+nl: rechtstreeks voorouder van %s

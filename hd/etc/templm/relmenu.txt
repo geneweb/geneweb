@@ -1,0 +1,293 @@
+%doctype;
+<html>
+<head>
+  <!-- $Id: relmenu.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/09/28 geneweb-6.00 templ=templmr -->
+  <!-- cousmenu.txt is included in relmenu.txt -->
+  <title>[*link between]%sp;
+    %if;(public_name != "")%public_name;
+    %else;%first_name; %surname;%end; [and]0...%nn;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+    fieldset {width: 300px; float: left; margin: 2px;}
+    fieldset fieldset {width: 270px;}
+    .footer {clear: both; width: 100%%;}
+    .menu2
+    { position: absolute;
+      top: 0;
+      right: 0;
+    }
+    .menu2 a
+    {
+     float: left;
+     background-color: buttonface; 
+     border: solid 1px #FFFFC0;
+     margin: 0;
+     padding: 2px;
+     color: buttontext;
+    }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%define;relative_sosa(sosa_link)
+  [<em>Sosa number</em> relative to %t:::sosa_link]
+%end;
+
+%define;navsosa(xx)
+  [*navigation with %t as Sosa reference:::xx].
+%end;
+
+%define;nth_cousins(xx)
+  [*%s cousins:::xx]%nn;
+%end;
+
+
+<h1 style="text-align:center" class="highlight">[*link between]%sp;
+  %if;(public_name != "")%public_name;%else;%first_name;%end;
+  %if;(qualifier != "") <em>%qualifier;</em>%end;
+  %sp;%surname;
+  %if;(alias != "") <em>(%alias;)</em>%end;
+  %sp;[and]0...%nn;
+</h1>
+
+%if;not cancel_links;
+  <div class="menu2">
+    %if;has_referer;
+      <a href="%referer;" title="[back]">&lt;&lt;</a>
+    %end;
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
+%end;
+
+
+<form method="get" action="%action;">
+<p>
+%hidden;
+<input type="hidden" name="em" value="R"%/>
+%if;access_by_key;
+  <input type="hidden" name="ep" value="%first_name_key_val;"%/>
+  <input type="hidden" name="en" value="%surname_key_val;"%/>
+  %if;(occ != "0")
+    <input type="hidden" name="eoc" value="%occ;"%/>
+  %end;
+%else
+  <input type="hidden" name="ei" value="%index;"%/>
+%end;
+</p>
+
+<fieldset style="width: auto;">
+    <input type="hidden" name="m" value="NG"%/>
+    <input type="radio" name="select" value="input" checked="checked"%/>
+    <input name="n" size="40" maxlength="200"%/>
+    <input type="submit" value="Ok"%/>
+    <br%/>&nbsp;&nbsp;&nbsp;
+    <label>
+        <input type="radio" name="t" value="PN" checked="checked"%/>
+        <em>[first name/first names]0 [surname/surnames]0</em>
+        [or] <em>[public name]</em>
+        [or] <em>[alias]</em>
+        %if;browsing_with_sosa_ref;[or]
+          %apply;relative_sosa%with
+            <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+          %end;
+        %end;
+    </label>
+    <br%/>&nbsp;&nbsp;&nbsp;
+    <label>
+        <input type="radio" name="t" value="P"%/>
+        <em>[first name/first names]0</em>
+    </label>
+    <br%/>&nbsp;&nbsp;&nbsp;
+    <label>
+        <input type="radio" name="t" value="N"%/>
+        <em>[surname/surnames]0</em>
+    </label>
+
+  %foreach;family;
+    %if;(spouse != "? ?")
+      <br%/>
+      <label>
+        <input type="radio" name="select" value="%spouse.index;"%/>
+        %apply;capitalize(nth([husband/wife],spouse.sex))%nl;:%nl;%spouse;
+        %if;spouse.has_nobility_titles;,%sp;
+        <em>%spouse.nobility_title;</em>%end;%nl;
+      </label>
+    %end;
+  %end;
+  %foreach;relation;
+    %if;has_relation_him;
+      <br%/>
+      <label>
+        <input type="radio" name="select" value="%relation_him.index;"%/>
+        %apply;capitalize(relation_him.type)%nl;:%nl;%relation_him;
+        %if;relation_him.has_nobility_titles;,%sp;
+        <em>%relation_him.nobility_title;</em>%end;%nl;
+      </label>
+    %end;
+    %if;has_relation_her;
+      <br%/>
+      <label>
+        <input type="radio" name="select" value="%relation_her.index;"%/>
+        %apply;capitalize(relation_her.type)%nl;:%nl;%relation_her;
+        %if;relation_her.has_nobility_titles;,%sp;
+        <em>%relation_her.nobility_title;</em>%end;%nl;
+      </label>
+    %end;
+  %end;
+  %foreach;related;
+    <br%/>
+    <label>
+      <input type="radio" name="select" value="%related.index;"%/>
+      %apply;capitalize(related.type)%nl;:%nl;%related;
+      %if;related.has_nobility_titles;,%sp;
+      <em>%related.nobility_title;</em>%end;%nl;
+    </label>
+  %end;
+  %foreach;family;
+    %foreach;witness;
+      <br%/>
+      <label>
+        <input type="radio" name="select" value="%witness.index;"%/>
+        [*witness/witnesses]0%nl;:%nl;%witness;%nl;
+      </label>
+    %end;
+  %end;
+</fieldset>
+<fieldset>
+    <label>
+      <input type="radio" name="et" value="A" checked="checked"%/>
+      [*ancestors]
+    </label>
+    <br%/>
+    <label>
+      <input type="radio" name="et" value="M"%/>
+      [*relationships by marriage]
+    </label>
+    <br%/>
+    <label>
+      <input type="radio" name="et" value="S"%/>
+      [*shortest path]
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="long" value="on"%/>
+      [*long display]
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="spouse" value="on" checked="checked"%/>
+      [*include spouses]
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="cgl" value="on"%/>
+      [*cancel GeneWeb links]
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="image" value="on"%/>
+      [*image/images]1
+    </label>
+    <br%/>
+    <label>
+      [*border]
+      <input name="bd" size="1" maxlength="2" value="0"%/>
+    </label>
+    <br%/>
+      <table summary="colors" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="%left;">[*color]&nbsp;</td>
+          <td>
+            <input type="radio" name="color" value="" checked="checked"%/>
+          </td>
+          <td style="background:#FFC0C0">
+            <input type="radio" name="color" value="#FFC0C0"%/>
+          </td>
+          <td style="background:#FFFFC0">
+            <input type="radio" name="color" value="#FFFFC0"%/>
+          </td>
+          <td style="background:#C0FFC0">
+            <input type="radio" name="color" value="#C0FFC0"%/>
+          </td>
+          <td style="background:#C0FFFF">
+            <input type="radio" name="color" value="#C0FFFF"%/>
+          </td>
+          <td style="background:#C0C0FF">
+            <input type="radio" name="color" value="#C0C0FF"%/>
+          </td>
+          <td style="background:#FFC0FF">
+            <input type="radio" name="color" value="#FFC0FF"%/>
+          </td>
+        </tr>
+      </table>
+</fieldset>
+</form>
+
+%if;(has_siblings or father.has_parents or mother.has_parents)
+  <form method="get" action="%action;">
+  <fieldset>
+      %hidden;
+      <input type="hidden" name="m" value="C"%/>
+      %if;access_by_key;
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="oc" value="%occ;"%/>
+        %end;
+      %else
+        <input type="hidden" name="i" value="%index;"%/>
+      %end;
+      <select name="v1">
+        %foreach;cousin_level;
+          <option value="%level;"%if;(level = 2) selected="selected"%end;>%nn;
+          %if;(level = 1)[*siblings]%nn;
+          %elseif;(level = 2)[*cousins]%nn;
+          %elseif;(level = 3)[*2nd cousins]%nn;
+          %elseif;(level = 4)[*3rd cousins]%nn;
+          %else;
+            %apply;nth_cousins%with;
+              %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
+            %end;
+          %end;
+          </option>
+         %end;
+      </select>
+      <input type="submit" value="Ok"%/>
+      <br%/>
+      <label>
+        <input type="checkbox" name="csp" value="on"%/>
+        [*include spouses]
+      </label>
+    %if;(father.has_siblings or mother.has_siblings)
+        <br%/>
+        <a href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
+    %end;
+    %if;has_nephews_or_nieces;
+        <br%/>
+        <a href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
+    %end;
+  </fieldset>
+  </form>
+%end;
+<div class = "footer">
+  <br%/>
+  %apply;navsosa%with;
+    <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
+    %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
+  %end;
+  %copyright;
+  %base_trailer;
+</div>
+
+</body>
+</html>

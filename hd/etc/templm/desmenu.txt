@@ -1,0 +1,274 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/09/28 geneweb-6.00 templ=templmr -->
+  <title>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*descendants]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+    fieldset {width: 300px; float: left; margin: 2px;}
+    fieldset fieldset {width: 270px;}
+    .footer {clear: both; width: 100%%;}
+    .menu2
+    { position: absolute;
+      top: 0;
+      right: 0;
+    }
+    .menu2 a
+    {
+     float: left;
+     background-color: buttonface; 
+     border: solid 1px #FFFFC0;
+     margin: 0;
+     padding: 2px;
+     color: buttontext;
+    }
+  --></style>
+%base_header;
+
+<script type="text/javascript">
+  <!--
+  function valid(id) {
+    document.getElementById(id).checked = true;
+  }
+    -->
+  
+</script>
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%define;tothegen(xx)
+  [*to the %s generation:::xx]%nn;
+%end;
+
+%define;navsosa(xx)
+  [*navigation with %t as Sosa reference:::xx].
+%end;
+
+<h1 style="text-align:center" class="highlight">%nn;
+  %apply;a_of_b_gr_eq_lev%with;
+    [*descendants]%nn;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;
+  %end;
+</h1>
+
+%if;not cancel_links;
+  <div class="menu2">
+    %if;has_referer;
+      <a href="%referer;" title="[back]">&lt;&lt;</a>
+    %end;
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
+%end;
+
+  <form method="get" action="%action;">
+    <p>
+      %hidden;
+      <input type="hidden" name="m" value="D"%/>
+      %if;access_by_key;
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="oc" value="%occ;"%/>
+        %end;
+      %else
+        <input type="hidden" name="i" value="%index;"%/>
+      %end;
+    </p>
+        <fieldset>
+          <select name="v">
+            %foreach;descendant_level;
+              <option value="%level;"%if(level = 3) selected="selected"%end;>%nn;
+                %if;(level = 0)[*specify::generation/generations]0%nn;
+                %elseif;(level = 1)[*to the children]%nn;
+                %elseif;(level = 2)[*to the grandchildren]%nn;
+                %elseif;(level = 3)[*to the great-grandchildren]%nn;
+                %else;
+                  %apply;tothegen%with;
+                    %apply;nth([nth (generation)], level)
+                  %end;
+                %end;
+                %if;(level != 0) (%number_of_descendants;)%end;
+              </option>
+            %end;
+          </select>
+          <input type="submit" value="Ok"%/>
+          <br%/><br%/>
+          <label>
+            <input type="checkbox" name="cgl" value="on"%/>
+            [*cancel GeneWeb links]
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="S"%/>
+            [*only the generation selected]
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="N"%/>
+            [*families with encoding]
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="G"%/>
+            [*index of the descendants]
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="C"%/>
+            [*index of the spouses (non descendants)]
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="A"%/>
+            d'Aboville
+          </label>
+          <br%/>
+    </fieldset>
+    <fieldset>
+    <legend>
+      <label>
+        <input type="radio" name="t" value="L" checked="checked"%/>
+        [*list/list (ancestors)]0
+      </label>
+    </legend>
+      %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+        ([maximum] 12 [generation/generations]1)
+      %elseif;(
+        bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
+        )
+        ([maximum] %bvar.max_desc_level; [generation/generations]1)
+      %end;
+      <label>
+        <input type="radio" name="t" value="M"%/>
+        [*male line/female line]0
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="F"%/>
+        [*male line/female line]1
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="alwsurn" value="yes"%/>
+        [*with::surname/surnames]1
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="rel" value="on"%/>
+        [*relation/relations]1
+      </label>
+      <br%/>
+        <label>
+        <input type="checkbox" name="spouse" value="on" checked="checked"%/>
+        [*include spouses]
+        </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="parents" value="on" checked="checked"%/>
+        [*parents]
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="witn" value="on"%/>
+        [*witness/witnesses]1 ([marriage/marriages]1)
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="comm" value="on"%/>
+        [*comment] ([marriage/marriages]1)
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="notes" value="on" checked="checked"%/>
+        [*note/notes]1
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="src" value="on" checked="checked"%/>
+        [*source/sources]1
+      </label>
+    </fieldset>
+    <fieldset>
+    <legend>
+      <label>
+        <input type="radio" id="tT" name="t" value="T"%/>
+        [*tree]
+        %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
+          ([maximum] 4 [generation/generations]1)
+        %elseif;(
+          bvar.max_desc_tree != "" and max_desc_level >= bvar.max_desc_tree
+        )
+          ([maximum] %bvar.max_desc_tree; [generation/generations]1)
+        %end;
+      </label>
+    </legend>
+      <label>
+       <input type="checkbox" name="image" value="on" onChange="valid('tT')"%/>
+        [*image/images]1
+      </label>
+      <br%/>
+      <label>
+        [*border]
+        <input name="bd" size="1" maxlength="2" value="0" onChange="valid('tT')"%/>
+      </label>
+      <br%/>
+      <table summary="colors" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="%left;">[*color]&nbsp;</td>
+          <td>
+            <input type="radio" name="color" value="" checked="checked" onChange="valid('tT')"%/>
+          </td>
+          <td style="background:#FFC0C0">
+            <input type="radio" name="color" value="#FFC0C0" onChange="valid('tT')"%/>
+          </td>
+          <td style="background:#FFFFC0">
+            <input type="radio" name="color" value="#FFFFC0" onChange="valid('tT')"%/>
+          </td>
+          <td style="background:#C0FFC0">
+            <input type="radio" name="color" value="#C0FFC0" onChange="valid('tT')"%/>
+          </td>
+          <td style="background:#C0FFFF">
+            <input type="radio" name="color" value="#C0FFFF" onChange="valid('tT')"%/>
+          </td>
+          <td style="background:#C0C0FF">
+            <input type="radio" name="color" value="#C0C0FF" onChange="valid('tT')"%/>
+          </td>
+          <td style="background:#FFC0FF">
+            <input type="radio" name="color" value="#FFC0FF" onChange="valid('tT')"%/>
+          </td>
+        </tr>
+      </table>
+    </fieldset>
+  </form>
+
+<div class = "footer">
+  <br%/>
+  %apply;navsosa%with;
+    <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
+    %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
+  %end;
+  %copyright;
+  %base_trailer;
+</div>
+</body>
+</html>
