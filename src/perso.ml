@@ -634,7 +634,12 @@ value tree_generation_list conf base gv p =
 ;
 
 value string_of_place conf base istr =
-  string_with_macros conf [] (sou base istr)
+  (* Astuce temporaire pour supprimer les crochets dans un lieu-dit  *)
+  (* A l'avenir, il faudra revoir comment sont implémentés les lieux *)
+    List.fold_left
+      (fun s c -> Name.strip_c s c)
+      (string_with_macros conf [] (sou base istr))
+      [ '[' ; ']' ]
 ;
 
 (* Ancestors surnames list *)
@@ -1256,7 +1261,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
               let d = Adef.od_of_codate d in
               match d with
               [ Some d when m_auth ->
-                  " <em>" ^ Date.string_of_ondate conf d ^ "</em>"
+                match p_getenv conf.base_env "long_date" with
+                [ Some "yes" -> " <em>" ^ (Date.string_of_ondate conf d) 
+                                ^ (Date.get_wday conf d) ^ "</em>"
+                | _ -> " <em>" ^ Date.string_of_ondate conf d ^ "</em>" ]
               | _ -> "" ]
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
