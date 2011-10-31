@@ -1757,7 +1757,6 @@ IFDEF UNIX THEN
 value cgi_timeout tmout _ =
   let nl () = Wserver.wprint "\013\010" in
   do {
-    Wserver.wprint "HTTP/1.0 200 OK"; nl ();
     Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
     nl (); nl ();
     Wserver.wprint "<head><title>Time out</title></head>\n";
