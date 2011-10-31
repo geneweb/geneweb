@@ -1,3 +1,52 @@
+GeneWeb version 6.02
+--------------------
+
+* In the population pyramid, display an image instead of &nbsp. The purpose is 
+that it can be printed now.
+* Added a patch in the calculus of the sosa until the number of person in the
+database is well managed.
+* Some esthetic changes
+* Change "href=#" by "void" because internet explorer does'nt support it (go
+to the top of the page).
+* Fix bug (in the source code, not the template) in updating a death date from 
+OfCourseDead to Dead if there is actually a date of death.
+* Deleting the documentation (DOC ans WDOC) and the associated request.
+* Added an option to activate/deactivate the forum.
+* Added an option to turn on/off the counter for visiting web pages.
+* Change the order of displaying the note/source in the individual page. The
+family note/source comes before the informations of death of the individual.
+* Added execution rights to configure and camlp5_comm.sh. Geneweb can now be
+compiled out of box (I mean after svn co).
+* Fix bug in the GeneWeb server in CGI mode. Should not answer 200 OK.
+* Fix bug in the death date by merging two individuals.
+* Add a function to delete bad characters (such as ':') in the first name and
+surname (that compose the key) and broken the links.
+* Added template of Dominique Deram and Mickaël Rouesné.
+* New implementation of the surname search function. There is now no 
+differences between capital letters, accent ...
+
+GeneWeb version 6.01
+--------------------
+
+For this version, you will not find a tag of GeneWeb 6.01 because I forgot it.
+Few changes since 6.00 (which was set up to start a new developpement of 
+GeneWeb).
+* Add an option to display the day of a date.
+* Add notes/sources in the descendants list.
+* Fix bug creating a loop when adding a family and creating a father and mother
+bug linking the child to his parent (with the same name of course !).
+
+GeneWeb version 6.00
+--------------------
+
+Sorry, I forgot to add the "new" feature for this version. Hopefully there
+is basically no new feature.
+
+* Add a picto sosa next to a person after a research (by first name/surname).
+* Fix bug in hidding individual of the same family.
+* Fix bug in showing individual by first name whereas there were hidden.
+* Use of css sheetstyle to customize the pages.
+
 GeneWeb version 5.02.0
 ----------------------
 
