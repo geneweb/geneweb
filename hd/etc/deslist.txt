@@ -312,7 +312,7 @@
   [*total]: %expr(count-1) [[person/persons]1@(c)]%sp;
   ([spouses not included]).
   %if;(evar.notes="on" or evar.src="on")
-    <hr />
+    <hr%/>
     <h3>%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
     <dl>
       %reset_count;
