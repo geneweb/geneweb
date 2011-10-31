@@ -329,12 +329,8 @@
 %end;
 
 
-<br />
-<div id="footer">
-<hr />
-%copyright;
 %base_trailer;
-</div>
+%copyright;
 
 </body>
 </html>

@@ -129,12 +129,8 @@
 %if;(evar.m = "HIST_SEARCH" and found)%apply;search_form("left")%end;
 
 
-<br />
-<div id="footer">
-<hr />
-%copyright;
 %base_trailer;
-</div>
+%copyright;
 
 </body>
 </html>
