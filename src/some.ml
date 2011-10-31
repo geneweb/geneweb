@@ -443,7 +443,7 @@ value print_one_branch conf base bh psn lev =
     } ]
 ;
 
-value print_one_surname_by_branch conf base (bhl, str) = do {
+value print_one_surname_by_branch conf base x xl (bhl, str) = do {
   let ancestors =
     match p_getenv conf.env "order" with
     [ Some "d" ->
@@ -471,7 +471,15 @@ value print_one_surname_by_branch conf base (bhl, str) = do {
         try List.assoc "always_surname" conf.base_env = "yes" with
         [ Not_found -> False ] ]
   in
-  let title _ = Wserver.wprint "%s" str in
+  let title h = 
+    if h || p_getenv conf.env "t" = Some "A" then Wserver.wprint "%s" x
+    else
+      Mutil.list_iter_first
+        (fun first x ->
+           Wserver.wprint "%s<a href=\"%sm=N;v=%s;t=A\">%s</a>"
+             (if first then "" else ", ") (commd conf) (code_varenv x) x)
+        (StrSet.elements xl)
+  in
   let br = p_getint conf.env "br" in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   header conf title;
@@ -480,8 +488,12 @@ value print_one_surname_by_branch conf base (bhl, str) = do {
     tag "p" begin
       Wserver.wprint "<em style=\"font-size:80%%\">\n";
       Wserver.wprint "%s " (capitale (transl conf "click"));
-      Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-        (code_varenv str ^ ";t=A") (transl conf "here");
+      if p_getenv conf.env "t" = Some "A" then 
+        Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+          (code_varenv x ^ ";t=A") (transl conf "here")
+      else
+        Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+          (code_varenv x ^ ";t=N") (transl conf "here");
       Wserver.wprint "%s"
         (transl conf "for the first names by alphabetic order");
       Wserver.wprint ".</em>\n";
@@ -530,48 +542,35 @@ value print_one_surname_by_branch conf base (bhl, str) = do {
   trailer conf;
 };
 
-value print_several_possible_surnames x conf base (bhl, homonymes) = do {
-  let fx = x in
-  let x =
-    match homonymes with
-    [ [x :: _] -> x
-    | _ -> x ]
-  in
-  let title h =
+
+value print_several_possible_surnames n conf base (bhl, list) =
+  let title _ =
     Wserver.wprint "%s \"%s\" : %s"
-      (capitale (transl_nth conf "surname/surnames" 0)) fx
+      (capitale (transl_nth conf "surname/surnames" 0)) n
       (transl conf "specify")
   in
-  header conf title;
-  print_link_to_welcome conf True;
-  let list =
-    List.map
-      (fun sn ->
-         let txt = Util.surname_end base sn ^ Util.surname_begin base sn in
-         let ord = name_unaccent txt in
-         (ord, txt, sn))
-      homonymes
-  in
-  let list = List.sort compare list in
-  let access txt sn =
-    geneweb_link conf ("m=N;v=" ^ code_varenv sn ^ ";t=A") txt
-  in
-  Util.wprint_in_columns conf
-    (fun (ord, _, _) -> ord)
-    (fun (_, txt, sn) -> Wserver.wprint "%s" (access txt sn)) list;
-  tag "p" begin
-    Wserver.wprint "<em style=\"font-size:80%%\">\n";
-    Wserver.wprint "%s " (capitale (transl conf "click"));
-    Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-      (if List.length homonymes = 1 then code_varenv x ^ ";t=A"
-       else code_varenv fx)
-      (transl conf "here");
-    Wserver.wprint "%s"
-      (transl conf "for the first names by alphabetic order");
-    Wserver.wprint ".</em>\n";
-  end;
-  trailer conf;
-};
+  do {
+    header conf title;
+    Wserver.wprint "<ul>";
+    List.iter
+      (fun (sstr, (strl, _)) ->
+         do {
+           Wserver.wprint "\n";
+           html_li conf;
+           Wserver.wprint "<a href=\"%sm=N;v=%s\">" (commd conf)
+             (code_varenv sstr);
+           list_iter_first
+             (fun first str ->
+                Wserver.wprint "%s%s" (if first then "" else ", ") str)
+             (StrSet.elements strl);
+           Wserver.wprint "</a>\n";
+         })
+      list;
+    Wserver.wprint "</ul>\n";
+    trailer conf;
+  }
+;
+
 
 value print_family_alphabetic x conf base liste =
   let homonymes =
@@ -701,10 +700,8 @@ value persons_of_absolute_surname conf base x =
     istrl []
 ;
 
-module PerSet = Set.Make (struct type t = iper; value compare = compare; end);
-
 value surname_print conf base not_found_fun x =
-  let (l, name_inj) =
+  let (list, name_inj) =
     if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
       (persons_of_absolute_surname conf base x, fun x -> x)
     else if x = "" then ([], fun [])
@@ -712,21 +709,26 @@ value surname_print conf base not_found_fun x =
       persons_of_fsname conf base base_strings_of_surname
         (spi_find (persons_of_surname base)) get_surname x
   in
-  let (iperl, strl) =
-    List.fold_right
-      (fun (str, istr, iperl1) (iperl, strl) ->
-         let len = List.length iperl1 in
-         let strl =
-           try
-             let len1 = List.assoc str strl in
-             [(str, len + len1) :: List.remove_assoc str strl]
-           with
-           [ Not_found -> [(str, len) :: strl] ]
-         in
-         (List.fold_right PerSet.add iperl1 iperl, strl))
-      l (PerSet.empty, [])
+  let list =
+    List.map
+      (fun (str, istr, iperl) ->
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
+      list
   in
-  let iperl = PerSet.elements iperl in
+  let list = List.fold_right merge_insert list [] in
+  let iperl = 
+    if List.length list = 0 then []
+    else snd (snd (List.hd list)) 
+  in
+  let bhl = select_ancestors conf base name_inj iperl in
+  let bhl =
+    List.map
+      (fun bh ->
+        {bh_ancestor = pget conf base bh.bh_ancestor;
+         bh_well_named_ancestors =
+         List.map (pget conf base) bh.bh_well_named_ancestors})
+      bhl
+  in
   match p_getenv conf.env "o" with
   [ Some "i" ->
       let pl =
@@ -735,28 +737,17 @@ value surname_print conf base not_found_fun x =
       let pl =
         List.fold_right
           (fun p pl -> 
-            if not (is_hide_names conf p) || (Util.fast_auth_age conf p)
-            then [p :: pl] 
-            else pl)
+	    if not (is_hide_names conf p) || (fast_auth_age conf p) 
+	    then [p :: pl] 
+	    else pl)
           pl []
       in
       print_family_alphabetic x conf base pl
   | _ -> 
-      let strl =
-        List.sort (fun (_, len1) (_, len2) -> compare len2 len1) strl
-      in
-      let strl = List.map fst strl in
-      let bhl = select_ancestors conf base name_inj iperl in
-      let bhl =
-        List.map
-          (fun bh ->
-             {bh_ancestor = pget conf base bh.bh_ancestor;
-              bh_well_named_ancestors =
-                List.map (pget conf base) bh.bh_well_named_ancestors})
-          bhl
-      in
-      match (bhl, strl) with
-      [ ([], _) -> not_found_fun conf x
-      | (_, [str]) -> print_one_surname_by_branch conf base (bhl, str)
-      | _ -> print_several_possible_surnames x conf base (bhl, strl) ] ]
+    match (bhl, list) with
+    [ ([], _) -> not_found_fun conf x
+    | (_, [(s, (strl, iperl))]) -> 
+        print_one_surname_by_branch conf base x strl (bhl, s)
+    | _ -> print_several_possible_surnames x conf base (bhl, list) ]]
 ;
+
