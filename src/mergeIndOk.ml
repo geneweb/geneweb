@@ -81,7 +81,11 @@ value reconstitute conf base p1 p2 =
      field "baptism_place" (fun p -> sou base (get_baptism_place p)) ( \= "");
    baptism_src =
      merge_strings base (get_baptism_src p1) ", " (get_baptism_src p2);
-   death = field "death" get_death ( \= DontKnowIfDead);
+   death = field "death" get_death
+     (fun x -> 
+       match x with 
+       [ DontKnowIfDead | OfCourseDead -> True
+       | _ -> False]);
    death_place =
      field "death_place" (fun p -> sou base (get_death_place p)) ( \= "");
    death_src = merge_strings base (get_death_src p1) ", " (get_death_src p2);
