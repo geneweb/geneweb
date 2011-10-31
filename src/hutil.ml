@@ -128,12 +128,8 @@ value rheader conf title = do {
 };
 
 value gen_trailer with_logo conf = do {
-  Wserver.wprint "<br />\n";
-  Wserver.wprint "<div id=\"footer\">\n" ;
-  Wserver.wprint "<hr />\n";
-  Templ.print_copyright conf;
-  Wserver.wprint "</div>\n" ;
   Templ.include_hed_trl conf None "trl";
+  Templ.print_copyright conf;
   Wserver.wprint "</body>\n</html>\n";
 };
 

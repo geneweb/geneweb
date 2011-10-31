@@ -611,12 +611,8 @@ function changeCalendar(e,v,m,c) {
 </form>
 
 
-<br />
-<div id="footer">
-<hr />
-%copyright;
 %base_trailer;
-</div>
+%copyright;
 
 </body>
 </html>

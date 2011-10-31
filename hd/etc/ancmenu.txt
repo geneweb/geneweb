@@ -288,12 +288,8 @@
 </td></tr></table>
 
 
-<br />
-<div id="footer">
-<hr />
-%copyright;
 %base_trailer;
-</div>
+%copyright;
 
 </body>
 </html>
