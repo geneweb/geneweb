@@ -45,6 +45,22 @@ install:
 	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(LANGDIR)/images/.
 	mkdir -p $(LANGDIR)/etc
 	cp hd/etc/*.txt $(LANGDIR)/etc/.
+	mkdir -p $(LANGDIR)/etc/templa
+	mkdir -p $(LANGDIR)/etc/templb
+	mkdir -p $(LANGDIR)/etc/templc
+	mkdir -p $(LANGDIR)/etc/templd
+	mkdir -p $(LANGDIR)/etc/templf
+	mkdir -p $(LANGDIR)/etc/templh
+	mkdir -p $(LANGDIR)/etc/templm
+	mkdir -p $(LANGDIR)/etc/templm/my_base
+	cp hd/etc/templa/*.txt $(LANGDIR)/etc/templa/.
+	cp hd/etc/templb/*.txt $(LANGDIR)/etc/templb/.
+	cp hd/etc/templc/*.txt $(LANGDIR)/etc/templc/.
+	cp hd/etc/templd/*.txt $(LANGDIR)/etc/templd/.
+	cp hd/etc/templf/*.txt $(LANGDIR)/etc/templf/.
+	cp hd/etc/templh/*.txt $(LANGDIR)/etc/templh/.
+	cp hd/etc/templm/*.txt $(LANGDIR)/etc/templm/.
+	cp hd/etc/templm/my_base/*.txt $(LANGDIR)/etc/templm/my_base/.
 	mkdir -p $(MANDIR)
 	cd man; cp $(MANPAGES) $(MANDIR)/.
 
@@ -139,6 +155,22 @@ classical_distrib:
 	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc
 	cp hd/etc/*.txt $(DESTDIR)/etc/.
+	mkdir -p $(DESTDIR)/etc/templa
+	mkdir -p $(DESTDIR)/etc/templb
+	mkdir -p $(DESTDIR)/etc/templc
+	mkdir -p $(DESTDIR)/etc/templd
+	mkdir -p $(DESTDIR)/etc/templf
+	mkdir -p $(DESTDIR)/etc/templh
+	mkdir -p $(DESTDIR)/etc/templm
+	mkdir -p $(DESTDIR)/etc/templm/my_base
+	cp hd/etc/templa/*.txt $(DESTDIR)/etc/templa/.
+	cp hd/etc/templb/*.txt $(DESTDIR)/etc/templb/.
+	cp hd/etc/templc/*.txt $(DESTDIR)/etc/templc/.
+	cp hd/etc/templd/*.txt $(DESTDIR)/etc/templd/.
+	cp hd/etc/templf/*.txt $(DESTDIR)/etc/templf/.
+	cp hd/etc/templh/*.txt $(DESTDIR)/etc/templh/.
+	cp hd/etc/templm/*.txt $(DESTDIR)/etc/templm/.
+	cp hd/etc/templm/my_base/*.txt $(DESTDIR)/etc/templm/my_base/.
 	mkdir $(DESTDIR)/css
 	cp hd/css/*.css $(DESTDIR)/css/.
 
