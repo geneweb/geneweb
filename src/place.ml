@@ -9,6 +9,11 @@ open Hutil;
 open Util;
 
 value fold_place inverted s =
+  (* petit hack (pour GeneaNet) en attendant une vraie gestion des lieux *)
+  (* transforme "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)"    *)
+  let s =
+   Str.global_replace (Str.regexp "^\[\([^]]+\)\] *- *\(.*\)") "\1, \2" s 
+  in
   let rec loop iend list i ibeg =
     if i = iend then
       if i > ibeg then [String.sub s ibeg (i - ibeg) :: list] else list
