@@ -31,6 +31,10 @@ value crush : string -> string;
 value strip_lower : string -> string;
   (* strip_lower = strip o lower, as first comparison of names.
      First names and Surnames comparison is strip_lower equality. *)
+
+value purge : string -> string ;
+  (* String without any forbidden caracters defined in forbidden_char *)
+
 value crush_lower : string -> string;
   (* crush_lower = crush o abbrev o lower, as second comparison of names.
      In index by names, the "names" are crush_lowers *)
@@ -43,3 +47,5 @@ value unaccent_utf_8 : bool -> string -> int -> (string * int);
 value nbc : char -> int;
 
 value utf_8_db : ref bool;
+
+value forbidden_char : list char ;

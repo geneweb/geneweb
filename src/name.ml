@@ -3,6 +3,9 @@
 
 value utf_8_db = ref True;
 
+(* La liste des caractères interdits *)
+value forbidden_char = [':'; '@'; '#'; '='; '$'] ;
+
 (* Name.lower *)
 
 value unaccent_iso_8859_1 =
@@ -426,6 +429,21 @@ value strip_c s c =
     else if s.[i] = c then copy (i + 1) len
     else copy (i + 1) (Buff.store len s.[i])
 ;
+
+
+(* ******************************************************************** *)
+(*  [Fonc] purge : string -> string                                     *)
+(** [Description] : Supprime tous les caractères interdits (défini par
+                    forbidden_char) présents dans la chaine passée en 
+                    argument.
+    [Args] :
+      - s : string que l'on veut purger
+    [Retour] :
+      - string : retourne la chaîne délestée des caractères interdits
+    [Rem] : Exporté en clair hors de ce module.                         *)
+(* ******************************************************************** *)
+value purge s = List.fold_left (fun s c -> strip_c s c) s forbidden_char ;
+
 
 (* Name.crush *)
 
