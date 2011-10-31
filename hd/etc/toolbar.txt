@@ -68,6 +68,6 @@ function insertTags (tagOpen, tagClose, sampleText) {
 <a onclick="return insertTags('\n== ',' ==\n','Titre de rubrique');" href="javascript:;">
 <img border="0" width="25" height="25" title="Titre de rubrique" src="%image_prefix;/button_headline.png"/></a>
 
-<a onclick="return insertTags('\n<hr>\n','','');" href="javascript:;">
+<a onclick="return insertTags('\n<hr />\n','','');" href="javascript:;">
 <img border="0" width="25" height="25" title="Ligne horizontale" src="%image_prefix;/button_hr.png"/></a>
 

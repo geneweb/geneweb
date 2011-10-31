@@ -695,7 +695,7 @@ value printf_link_to_main env b tok =
     | _ -> "en" ]
   in
   do {
-    printf "<p><hr><div align=right>\n";
+    printf "<p><hr /><div align=right>\n";
     printf "<a href=\"%s?m=MAIN;b=%s;t=%s;lang=%s\">%s</a></div>\n"
       (cgi_script_name ()) b tok lang (transl lang "main page");
   }

@@ -50,7 +50,7 @@ fr: Naviguer
 </ul>
 %E%E
 
-<p><hr>
+<p><hr />
 
 </body>
 </html>

@@ -312,7 +312,7 @@ it: Modificare
 ]">
 </form>
 
-<p><hr><div align=right>
+<p><hr /><div align=right>
 <a href="%s?m=MAIN;b=%b;t=%t;lang=%l">[main page]</a></div>
 </body>
 </html>

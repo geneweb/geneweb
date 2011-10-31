@@ -261,7 +261,7 @@ value propose_merge_ind conf base branches p1 p2 =
     print_differences conf base branches p1 p2;
     if branches <> [] then do {
       html_p conf;
-      Wserver.wprint "<hr>";
+      Wserver.wprint "<hr />";
       html_p conf;
       Wserver.wprint "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
       html_p conf;
