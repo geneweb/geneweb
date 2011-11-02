@@ -1,50 +1,52 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 2011/10/04 geneweb-6.00 templ=templmr -->
-<!-- To work : copy this file to bases/etc/your_database_name/ -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 2011/11/01 geneweb-6.01 templ=templm -->
+<!-- To do : copy this file to bases/etc/my_base/ -->
 %if;(not cancel_links)
-  %if;(evar.m = "CAL" and evar.yg != "" and (wizard or friend))
+  <div style="clear: both;">
+    %if;(evar.m = "CAL" and evar.yg != "" and (wizard or friend))
+      <form method="get" action="%action;">
+        <p>
+        <a href="%prefix;m=STAT">[statistics] : </a>
+        %hidden;
+        <input name="k" value="%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;" size="5" maxlength="5" %/>
+        <label>
+          <input type="radio" name="m" value="LB" checked="checked" %/>
+          [birth]
+        </label>
+        <label>
+          <input type="radio" name="m" value="LM" %/>
+          [marriage/marriages]0
+        </label>
+        <label>
+          <input type="radio" name="m" value="LD" %/>
+          [death]
+        </label>
+        ... ([before (date)]...
+          %if;([ !dates order]0 = "ddmmyy")
+            <input name="bd" value="%evar.dg;" size="2" maxlength="2" %/>
+            <input name="bm" value="%evar.mg;" size="2" maxlength="2" %/>
+            <input name="by" value="%evar.yg;" size="4" maxlength="4" %/>
+          %else;
+            <input name="by" value="%evar.yg;" size="4" maxlength="4" %/>
+            <input name="bm" value="%evar.mg;" size="2" maxlength="2" %/>
+            <input name="bd" value="%evar.dg;" size="2" maxlength="2" %/>
+          %end;)
+        <input type="submit" value="Ok" %/>
+        </p>
+      </form>
+      <ul>
+        <li><a href="%prefix;m=POP_PYR;i=5;lim=0;y=%evar.yg;">[population pyramid] (%evar.yg;)</a></li>
+        <li><a href="%prefix;m=AN;v=%evar.mg;">[birthdays]</a></li>
+        <li><a href="%prefix;m=AD;v=%evar.mg;">[anniversaries of dead people]</a></li>
+        <li><a href="%prefix;m=AM;v=%evar.mg;">[anniversaries of marriage]</a></li>
+      </ul>
+    %end;
     <form method="get" action="%action;">
       <p>
-      <a href="%prefix;m=STAT">[statistics] : </a>
       %hidden;
-      <input name="k" value="%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;" size="5" maxlength="5" />
-      <label>
-        <input type="radio" name="m" value="LB" checked="checked"%/>
-        [birth]
-      </label>
-      <label>
-        <input type="radio" name="m" value="LM" %/>
-        [marriage/marriages]0
-      </label>
-      <label>
-        <input type="radio" name="m" value="LD" %/>
-        [death]
-      </label>
-      ... ([before (date)]...
-        %if;([ !dates order]0 = "ddmmyy")
-          <input name="bd" value="%evar.dg;" size="2" maxlength="2" />
-          <input name="bm" value="%evar.mg;" size="2" maxlength="2" />
-          <input name="by" value="%evar.yg;" size="4" maxlength="4" />
-        %else;
-          <input name="by" value="%evar.yg;" size="4" maxlength="4" />
-          <input name="bm" value="%evar.mg;" size="2" maxlength="2" />
-          <input name="bd" value="%evar.dg;" size="2" maxlength="2" />
-        %end;)
-      <input type="submit" value="Ok" />
+      <input type="hidden" name="m" value="NG" %/>
+      <input name="n" size="20" maxlength="200" title="[*search/case sensitive]0 (9)" accesskey="9" %/>%nn;
+      <input type="submit" value="[*search/case sensitive]0 (9)" %/>
       </p>
     </form>
-    <ul>
-      <li><a href="%prefix;m=POP_PYR;i=5;lim=0;y=%evar.yg;">[population pyramid] (%evar.yg;)</a></li>
-      <li><a href="%prefix;m=AN;v=%evar.mg;">[birthdays]</a></li>
-      <li><a href="%prefix;m=AD;v=%evar.mg;">[anniversaries of dead people]</a></li>
-      <li><a href="%prefix;m=AM;v=%evar.mg;">[anniversaries of marriage]</a></li>
-    </ul>
-  %end;
-  <form style="bottom: 0; left: 0; margin: 0;" method="get" action="%action;">
-    <p style="margin: 0px;">
-    %hidden;
-    <input type="hidden" name="m" value="NG"%/>
-    <input name="n" size="20" maxlength="200" title="[*search/case sensitive]0 (9)" accesskey="9" %/>%nn;
-    <input type="submit" value="[*search/case sensitive]0 (9)" %/>
-    </p>
-  </form>
+  </div>
 %end;

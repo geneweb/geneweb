@@ -1,9 +1,9 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/09/28 geneweb-6.00--> 
+  <!-- Modified mickroue(a)yahoo.fr 2011/10/31 geneweb-6.01 templ=templm -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -13,16 +13,13 @@
       %if;(qualifier != "") %qualifier;%end; %surname;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <style type="text/css"><!--
-    .highlight { color: %highlight;; font-weight: bold }
-    hr { border: 0; border-bottom: 1px solid;}
-    a.date { text-decoration: none; color: black }
-    .color_sosa {color: rgb(255,215,0);}
-  --></style>
-%base_header;
+  <meta name="robots" content="none" %/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
+  <meta http-equiv="Content-Style-Type" content="text/css" %/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <link rel="stylesheet" type="text/css" href="css/templm.css" %/>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
+  %base_header;
 
 %define;symbol(xx)
   %if;(xx.has_sosa and evar.cgl != "on")
@@ -68,13 +65,13 @@
         </tr></table>
       %end;
       %if;(evar.image = "on" and cell.person.has_image)
-        <br%/>
+        <br %/>
         <table border="0" align="center"><tr align="left">
         <td>%nn;
         %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
         <img%sp;
         src="%cell.person.image_url;"%cell.person.image_small_size;%sp;
-         border="0" alt="[image/images]0"%/>%nn;
+         border="0" alt="[image/images]0" %/>%nn;
         %if;(evar.cgl != "on")</a>%end;</td>%nl;
         </tr></table>
       %end;
@@ -115,7 +112,7 @@
     %foreach;cell;
       %if;(not is_first)
         <td colspan="1" align="center">%nn;
-        %if;(cell.is_right)<hr width="100%%"%/>%nn;
+        %if;(cell.is_right)<hr width="100%%" %/>%nn;
         %else;<tt>&nbsp;</tt>%end;
         </td>
       %end;
@@ -124,8 +121,8 @@
          %elseif;cell.is_right;%left;
          %else;center%end;">%nn;
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-      %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;"%/>%nn;
-      %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+      %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;" %/>%nn;
+      %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;" %/>%nn;
       %else;|%end;
       </td>
     %end;
@@ -137,7 +134,7 @@
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>|<br%/>%end;
+    %if;("xx" != "self")<br %/>|<br %/>%end;
   %end;%nl;
 %end;
 
@@ -145,7 +142,7 @@
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>|<br%/>%end;
+    %if;("xx" != "self")<br %/>|<br %/>%end;
   %end;%nl;
 %end;
 
@@ -158,8 +155,18 @@
 %end;
 
 </head>
-<body%body_prop;>
+<body id="anctree">
 %message_to_wizard;
+
+%if;not cancel_links;
+  <div class="menu2">
+    %if;has_referer;
+      <a href="%referer;" title="[back]">&lt;&lt;</a>
+    %end;
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
+  <br %/>
+%end;
 
 %if;(evar.t = "T" and not cancel_links)%nn;
   <div style="text-align:%right;">%nn;
@@ -178,8 +185,7 @@
 %elseif;(evar.t = "C")
     <div style="text-align: center">%apply;female_line("self", evar.v) </div>
 %end;
-
-%copyright;
-%base_trailer;
+  %base_trailer;
+  %copyright;
 </body>
 </html>
