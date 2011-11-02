@@ -555,10 +555,8 @@
 
 %if;(evar_opt="misc")%misc_names;%end;
 
-<div id="footer"><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
-  title="..." width="131" height="36" style="border: 0;float: %right;"%/></a><br%/>
-%copyright;
 %base_trailer;
-</div>
+%copyright;
+
 </body>
 </html>
