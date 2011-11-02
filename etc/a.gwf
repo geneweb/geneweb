@@ -97,8 +97,14 @@ moderator_file=
 supervisor=
 
 # Notify change program (e.g. shell script) to be executed for each
-# database change.
+# database change. First argument is the name of the base, then the
+# individual and finaly the action performed.
 # notify_change=
+
+# Notify key program (e.g. shell script) to be executed for each
+# database individual's name change. First argument is the name of the base,
+# then the old key of the individual and finaly the new key of the individual.
+# notify_key=
 
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
