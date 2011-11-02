@@ -15,9 +15,6 @@ open Util;
 (* Utilisé pour le message d'erreur lors de la validation. *)
 value removed_string = ref [] ;
 
-(* Booléen pour savoir si on a supprimé un caractère interdit *)
-value removed_forbidden_char = ref False;
-
 value raw_get conf key =
   match p_getenv conf.env key with
   [ Some v -> v
@@ -131,7 +128,6 @@ value reconstitute_relation_parent conf var key sex =
         if (List.exists contain_fn Name.forbidden_char) || 
            (List.exists contain_sn Name.forbidden_char) then
           do {
-            removed_forbidden_char.val := True;
             removed_string.val := 
               [(Name.purge fn ^ " " ^ Name.purge sn) :: removed_string.val];
             (Name.purge fn, Name.purge sn)
@@ -234,7 +230,6 @@ value reconstitute_person conf =
     if (List.exists contain_fn Name.forbidden_char) ||
        (List.exists contain_sn Name.forbidden_char) then
       do {
-        removed_forbidden_char.val := True;
         removed_string.val := 
           [(Name.purge first_name ^ " " ^ Name.purge surname) :: removed_string.val];
         (Name.purge first_name, Name.purge surname)
@@ -622,7 +617,7 @@ value print_mod_ok conf base wl p =
     header conf title;
     print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
-    if removed_forbidden_char.val then
+    if List.length removed_string.val > 0 then
       do {
          Wserver.wprint "<h3 class=\"error\">" ;
          Wserver.wprint 
@@ -698,7 +693,7 @@ value print_add_ok conf base wl p =
     header conf title;
     print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
-    if removed_forbidden_char.val then
+    if List.length removed_string.val > 0 then
       do {
          Wserver.wprint "<h2 class=\"error\">%s</h2>\n" (capitale (transl conf "forbidden char"));
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
@@ -734,7 +729,6 @@ value print_del_ok conf base wl =
 value print_add o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
-  let () = removed_forbidden_char.val := False in
   let () = removed_string.val := [] in
   let conf = Update.update_conf o_conf in
   try
@@ -826,7 +820,6 @@ value get_old_key conf base =
 value print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
-  let () = removed_forbidden_char.val := False in
   let () = removed_string.val := [] in
   let old_key = get_old_key o_conf base in
   let conf = Update.update_conf o_conf in
