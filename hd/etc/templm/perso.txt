@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/10/12 geneweb-6.01 templ=templmr --> 
+  <!-- Modified mickroue(a)yahoo.fr 2011/11/01 geneweb-6.01 templ=templm --> 
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -13,103 +13,13 @@
       %else;%first_name; %surname;%end;
     %end;
   </title>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta name="robots" content="none"%/>
-  
-
+  <meta name="robots" content="none" %/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
+  <meta http-equiv="Content-Style-Type" content="text/css" %/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <link rel="stylesheet" type="text/css" href="css/templm.css" %/>
+  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   <style type="text/css">
-    body {margin: 0; padding-top: 2em; padding-right: 2px; padding-bottom: 2em; padding-left: 2px; }
-    h1, h3 {color: %highlight;; margin: 5px; padding: 5px;}
-    h1 {font-size: 150%%}
-    h3 {font-size: 120%%; border-bottom: 1px dashed %highlight;;}
-    ol, ul {margin-left: 0; padding-left: 20px; }
-    li { margin: 2px 0 0 0;  padding: 0 0 0 10px;}
-    sub a {color: rgb(255,215,0);}
-    wbr {display: inline-block;}
-    
-    .menu
-    {
-      margin: 0;
-      padding: 0;
-      border: 0;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    .menu span
-    { 
-     position: relative;
-     display: block;
-     float: left;
-    }
-    .menu span a {float: left;}
-    .menu .s_menu
-    {
-     display: none;
-     float: left;
-     margin-left: 0;
-     margin-top: 0;
-     padding: 0;
-     border: 0;
-     width: 150px;
-    }
-    .menu span:hover > .s_menu 
-    {
-     display: block;
-     position: absolute;
-     left: 0;
-     top: 1.5em;
-     z-index: 10;
-    }
-    .menu .s_menu a {width: 150px;}
-    .menu1 {clear: both; font-size: 70%%;} 
-    .menu1 > span
-    {
-     display: block;
-     width: auto;
-     max-width: 161px;
-     float: left;
-     margin: 10px;
-    }
-    .menu1 .s_menu a
-    {
-     display: block;
-     position: relative;
-     top: 5px;
-     left: 5px;
-     width: auto;
-     max-width: 150px;
-     }
-    .menu2
-    { position: absolute;
-      top: 0;
-      right: 0;
-    }
-    .menu2 a {float: left;}
-    .button, .menu a, .menu1 a, .menu2 a, .menu3 a
-    {
-     background-color: buttonface; 
-     border: solid 1px #FFFFC0;
-     margin: 0;
-     padding: 2px;
-     color: buttontext;
-    }
-    .border_sex_0 {border-left-width: 5px; border-left-color: rgb(173,216,230);} 
-    .border_sex_1 {border-left-width: 5px; border-left-color: rgb(255,182,193);}
-    .border_sex_2 {border-left-width: 5px; border-left-color: rgb(255,0,0);}
-    .border_sosa {border-left: solid 5px rgb(255,215,0);}
-    .border_family_0 {border-left-style: double;}
-    .border_family_1 {border-left-style: solid;}
-    .background_sex_0 {background-color: rgb(173,216,230);} 
-    .background_sex_1 {background-color: rgb(255,182,193);}
-    .background_sex_2 {background-color: rgb(255,0,0);}
-    .sosa_parent {background-color: rgb(192,192,192);}
-    .color_sosa {color: rgb(255,215,0);}
-    .color_sex_0 {color: rgb(173,216,230);}
-    .color_sex_1 {color: rgb(255,182,193);}
-    .color_sex_2 {color: rgb(255,0,0);}
-    
     %if;(evar.wide = "on")
       .fam1, .fam2, .person_content {width: 99%%;}
       .image_sheet {font-size: 89%%;}
@@ -117,43 +27,10 @@
        .fam1, .fam2, .person_content {width: 49%%; min-width: 300px;}
        .image_sheet {font-size: 71%%;}
     %end;
-    
-    .list_no_style {margin: 0; padding-left: 10px; list-style-type: none;} 
-    .small {font-size: 70%%;}
-    .fam1, .fam2, .person_content {
-        float: left;
-        padding: 2px;
-        margin: 2px;
-        border: solid 1px #FFFFC0;
-        }
-    .fam ol, .siblings ol {list-style-type: none; margin-left:-10px;}
-    .fam ul {list-style-type: none;
-          margin: 0;
-          padding-top: 3px;
-          padding-bottom: 3px;
-          padding-left: 0;
-          padding-right: 0;
-          }
-    .fam ul li {clear: both;}
-    .ancestors{width: auto; float: left; margin: 5px;}
-    .siblings{width: auto; float: left; margin: 5px;} 
     .person h1 {text-align: center;%if;(has_sosa) border: 5px solid rgb(255,215,0);%end;}
-    .person p, .person div {text-align: center;}
-    .person_content, .person, .notes, .sources, .relations {clear: both;}
-    .footer {clear: both; width: 100%%;}
-    .image, .image img, .image_sheet {float: left; width: 12.5em;}
-    .image {display: block; margin: 0; padding: 0;}
-    .image img {border: none; margin:0; padding:0;}
-    .t_witness td{background-color: buttonface; padding: 2px; margin: 2px;}
-    .sheet{max-width: 95%%; width: auto; float: left;
-            border: 0; margin: 5px; padding: 5px;
-            background-color: #FFFFC0; color: infotext; text-align: left;}
-    .image_sheet{
-            border: 0; margin: 4px; padding: 5px;
-            background-color: #FFFFC0; color: infotext; text-align: center;}
   </style>
-
   %base_header;
+</head>
 
 %( <!-- Begin define --> %)
   %define;letter(xx)
@@ -207,7 +84,7 @@
   %define;link_image(xx)
       <a target="blank" class="image"
         href="%xx.image_html_url;">
-        <img src="%xx.image_url;" alt="[image/images]0"%/>
+        <img src="%xx.image_url;" alt="[image/images]0" %/>
       </a>
   %end;
 
@@ -245,7 +122,7 @@
         %foreach;family;
             %if;(evar.spouse != "off")  
               <div class="image_sheet" style="font-size: 80%%;">
-                  %if;(spouse.has_image)%apply;link_image("spouse")<br%/>%end;
+                  %if;(spouse.has_image)%apply;link_image("spouse")<br %/>%end;
                   %apply;somebody("spouse")
               </div>
             %end;
@@ -253,7 +130,7 @@
               %if;(has_children)
                 %foreach;child;
                   <div class="image_sheet" style="font-size: 75%%;margin-left: 8%%; border: dashed 1px %highlight;;">
-                    %if;(child.has_image)%apply;link_image("child")<br%/>%end;
+                    %if;(child.has_image)%apply;link_image("child")<br %/>%end;
                     %apply;child_long_info(curlev+1, maxlev)
                   </div>
                 %end;
@@ -287,7 +164,7 @@
       %if;(evar.image="on")
         %foreach;child;
             <div class="image_sheet ">
-                %if;(has_image)%apply;link_image("self")<br%/>%end;
+                %if;(has_image)%apply;link_image("self")<br %/>%end;
                 %apply;child_long_info(0, evar.maxlev)
             </div>
         %end;
@@ -381,23 +258,23 @@
   %define;content_family(xx,yy)
      %if;(evar.image="on")
        <div class="image_sheet">
-          %if;(xx.has_image)%apply;link_image("xx")<br%/>%end;
+          %if;(xx.has_image)%apply;link_image("xx")<br %/>%end;
           %apply;somebody("xx")
        </div>
        <div class="image_sheet">%apply;link_marriage()</div>
        <div class="image_sheet" style="clear:right;">
-          %if;(yy.has_image)%apply;link_image("yy")<br%/>%end;
+          %if;(yy.has_image)%apply;link_image("yy")<br %/>%end;
           %apply;somebody("yy")
        </div>
      %else;
       %apply;link_marriage()
       %apply;somebody("yy")
      %end;
-    <br style="clear: both;"%/>
+    <br style="clear: both;" %/>
      %apply;type_marriage()
      %apply;marriage_date_place()
      %apply;content_marriage("xx")
-    <br%/>
+    <br %/>
      %apply;children_list()
   %end;
 
@@ -433,7 +310,7 @@
       yy%apply;symbol1("parent")
         %apply;link_name("parent")
         %apply;link_dates("parent")
-        <br%/>
+        <br %/>
     %end;
   %end;
 
@@ -668,9 +545,7 @@
  
 %( <!-- End define --> %)
 
-</head>
-
-<body%body_prop;>%nn;
+<body id="perso">%nn;
 
 %message_to_wizard;
 %( <!-- Begin display menu --> %)
@@ -770,7 +645,7 @@
       %if;has_image;
       <div>
        <a target="blank" href="%image_html_url;">
-         <img style="width:150px; border: 0; clear: both;" src="%image_url;" alt="[image/images]0"%/>
+         <img style="width:150px; border: 0; clear: both;" src="%image_url;" alt="[image/images]0" %/>
        </a>
       </div>
       %end;
@@ -781,13 +656,13 @@
             %else;<a href="%prefix;m=A;t=D;i=%sosa_ref.index;;i1=%index;;l=%max_desc_level;">[*Sosa] : %sosa;</a>%nn;
             %end;
           </em>
-          <br%/>
+          <br %/>
         %end;
         %foreach;qualifier;
           %( <!-- Begin personalization mickroue --> %)
             %if;is_first;
               %if;(title=", <em>Cousin</em>")
-                <strong><a target="blank" href="http://gw.geneanet.org/index.php3?b=%qualifier&amp;lang=fr;m=N;v=%surname;" title="Arbre en ligne sur Geneanet">Arbre en ligne</a></strong><br%/>
+                <strong><a target="blank" href="http://gw.geneanet.org/index.php3?b=%qualifier&amp;lang=fr;m=N;v=%surname;" title="Arbre en ligne sur Geneanet">Arbre en ligne</a></strong><br %/>
               %end;
             %end;
           %( <!-- End personalization mickroue --> %)
@@ -808,7 +683,7 @@
             %end;
           </em>
         %end;
-        %if;has_linked_page.HEAD;%linked_page.HEAD;%end;
+        %if;(has_linked_pages and has_linked_page.HEAD)%linked_page.HEAD;%sp;%end;
         %if;(has_public_name or has_qualifiers)
           <em>(%if;cancel_links;%first_name; %surname;
               %else;
@@ -826,12 +701,12 @@
       </p>
       %if;(has_occupation or has_birth_date or has_birth_place or
         has_baptism_date or has_baptism_place or is_dead or is_buried or
-        is_cremated or has_consanguinity or has_linked_page.OCCU)
+        is_cremated or has_consanguinity or (has_linked_pages and has_linked_page.OCCU))
         <ul class="list_no_style">
           %if;has_occupation;
             <li>%apply;capitalize%with;%occupation;%end;</li>%nl;
           %end;
-          %if;has_linked_page.OCCU;
+          %if;(has_linked_pages and has_linked_page.OCCU)
             <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
           %end;
           %if;has_birth_date;
@@ -898,7 +773,7 @@
   </div>
 %( <!-- End display image, person --> %)
 %( <!-- Begin display linked pages : Images --> %)
-    %if;(bvar.var_img_ext != "")
+    %if;(bvar.var_img_ext != "" and has_linked_pages)
       <div class = "notes">
         %empty_sorted_list;
         %reset_count;
@@ -952,18 +827,20 @@
     %end;
 %( <!-- End display linked pages : Images --> %)
 %( <!-- Begin display notes, relations, sources --> %)
-    %if;(has_notes or has_linked_page.BNOTE or has_linked_page.NOTE)
-    <div class = "notes"><h3>[*note/notes]1</h3>
-      <dl><dd>
-        %if;(has_linked_page.BNOTE)
-          <p>%apply;capitalize(linked_page.BNOTE).</p>
-        %end;
-        %notes;
-        %if;(has_linked_page.NOTE)
-          <p>%apply;capitalize(linked_page.NOTE).</p>
-        %end;
-      </dd></dl>
-    </div>
+    %if;(has_notes or has_linked_pages)
+      %if;(has_notes or has_linked_page.BNOTE or has_linked_page.NOTE)
+      <div class = "notes"><h3>[*note/notes]1</h3>
+        <dl><dd>
+          %if;(has_linked_page.BNOTE)
+            <p>&gt;&gt; %apply;capitalize(linked_page.BNOTE).</p>
+          %end;
+          %notes;
+          %if;(has_linked_page.NOTE)
+            <p>&gt;&gt; %apply;capitalize(linked_page.NOTE).</p>
+          %end;
+        </dd></dl>
+      </div>
+      %end;
     %end;
     %if;has_relations;
       <div class = "relations">
@@ -1126,13 +1003,13 @@
           %elseif;(not is_male and not is_female)
             <a class="button" href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;
             [*add::marriage/marriages]0 ([M/F]0)</a>
-            <br%/>
+            <br %/>
             <a class="button" href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;
             [*add::marriage/marriages]0 ([M/F]1)</a>
-            <br%/>
+            <br %/>
           %else;
             <a class="button" href="%prefix;m=ADD_FAM;ip=%index;" title="[*add::marriage/marriages]0 (A)">[*add::marriage/marriages]0</a>
-            <br%/>
+            <br %/>
           %end;
         </div>
       %end;
@@ -1193,14 +1070,12 @@
     </div>
   %end;
 %( <!-- End display menu --> %)
-
-%( <!-- Begin display logo, copyright, base_trailer --> %)
-  <div class = "footer">
-    <br%/>
-    %if;(evar.opt = "misc")%misc_names;<p>%end;
-    %copyright;
-    %base_trailer;
-  </div>
-%( <!-- End display logo, copyright, base_trailer --> %)
+  %if;(evar.opt = "misc")
+    <div style="clear: both;">
+      %misc_names;
+    </div>
+  %end;
+  %base_trailer;
+  %copyright;
 </body>
 </html>
