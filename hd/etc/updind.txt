@@ -365,7 +365,7 @@ function changeCalendar(e,v,m,c) {
     <input name="first_name_alias%cnt;" size="30"%sp;
      value="%first_name_alias;" id="first_name_alias%cnt;"%/>
     </td>
-    <td><label="add_first_name_alias%cnt;">[*insert::first name alias]%nn;
+    <td><label for="add_first_name_alias%cnt;">[*insert::first name alias]%nn;
      </label></td>
     <td><input type="checkbox" name="add_first_name_alias%cnt;"%sp;
     value="on" id="add_first_name_alias%cnt;"%/></td>
