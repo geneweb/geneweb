@@ -196,7 +196,7 @@ value image_normal_txt conf base p fname width height =
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
       (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
       (if height = 0 then "" else " height=" ^ string_of_int height ^ "\"")
-      image_txt
+      image_txt image_txt
   in
   if conf.cancel_links then r
   else sprintf "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k ^ r ^ "</a>"
@@ -206,7 +206,7 @@ value image_url_txt conf base url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
     sprintf "<img src=\"%s\"\nheight=%d border=\"0\" alt=\"%s\" title=\"%s\">" url height
-      image_txt ^
+      image_txt image_txt ^
     "</a>\n"
 ;
 
@@ -214,7 +214,7 @@ value image_url_txt_with_size conf base url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
     sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\" title=\"%s\">"
-      url width height image_txt ^
+      url width height image_txt image_txt ^
     "</a>\n"
 ;
 
