@@ -302,8 +302,8 @@
         %end;
       %end;
     %end;
-    </dl>
   %end;
+  </dl>
 %end;
 
 %define;long_display_ancestor_personal()
@@ -523,7 +523,6 @@
             %if;(ancestor.same != "")%ancestor.same;
             %else;%ancestor;%end;
           %end;
-          </a>%nn;
           %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
         %end;
         </li>%nl;
@@ -561,7 +560,6 @@
            %else;%ancestor.same;%end;
          %else;%ancestor;%end;
       %end;
-      </a>%nn;
       %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
       </li>%nl;
     %end;
