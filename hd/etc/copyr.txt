@@ -1,12 +1,12 @@
 
-<br />
-  <div id="footer">
+<div id="footer">
+  <br />
   <hr />
   <div>
     <em>
       <a href="http://opensource.geneanet.org/projects/geneweb/" target="_blank">
-      <img src="%image_prefix;/logo_bas.png"
-      align="absmiddle" style="border: 0"%/></a>%sp;
+      <img src="%image_prefix;/logo_bas.png" align="absmiddle" 
+      style="border: 0" alt="GeneWeb" title="GeneWeb"%/></a>%sp;
       Version %version; %compilation_time;%sp;
       Copyright &copy; 1998-2011 %connections;%sq;
     </em><br%/>
