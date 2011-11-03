@@ -631,7 +631,7 @@ value print_population_pyramid conf base = do {
   let print_image doit sex iname =
     stagn "td" begin
       if doit then
-        xtag "img" "src=\"%s/%s\" title=\"%s\""
+        xtag "img" "src=\"%s/%s\" alt=\"%s\" title=\"%s\""
           (Util.image_prefix conf) iname (transl_nth conf "M/F" sex)
       else Wserver.wprint "&nbsp;";
     end

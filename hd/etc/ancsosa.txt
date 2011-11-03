@@ -45,11 +45,11 @@
     %if;(referer != "")
       <a href="%referer;"><img
        src="%image_prefix;/left.jpg"%wid_hei;left.jpg; 
-       style="border: 0" title="&lt;&lt;"%/></a>
+       style="border: 0" alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.jpg"%wid_hei;up.jpg; 
-    style="border: 0" title="^^"%/></a>
+    style="border: 0" alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
 
