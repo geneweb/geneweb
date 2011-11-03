@@ -284,8 +284,12 @@ zh: 访问次数
               - [birth]
                 <input type="checkbox" name="bi" value="on"
                  checked="checked"%/>
+              - [baptism]
+                <input type="checkbox" name="bp" value="on"%/>
               - [death]
                 <input type="checkbox" name="de" value="on"%/>
+              - [burial]
+                <input type="checkbox" name="bu" value="on"%/>
               - [marriage/marriages]0
                 <input type="checkbox" name="ma" value="on"%/>
               - <input type="submit" value="Ok"%/>

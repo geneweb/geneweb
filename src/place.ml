@@ -49,7 +49,9 @@ value fold_place inverted s =
 
 value get_all conf base =
   let add_birth = p_getenv conf.env "bi" = Some "on" in
+  let add_baptism = p_getenv conf.env "bp" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
+  let add_burial = p_getenv conf.env "bu" = Some "on" in
   let add_marriage = p_getenv conf.env "ma" = Some "on" in
   let inverted =
     try List.assoc "places_inverted" conf.base_env = "yes" with
@@ -71,7 +73,7 @@ value get_all conf base =
     incr cnt
   in
   do {
-    if add_birth || add_death then
+    if add_birth || add_death || add_baptism || add_burial then
       let rec loop i =
         if i = nb_of_persons base then ()
         else do {
@@ -81,19 +83,19 @@ value get_all conf base =
           let pl_de = get_death_place p in
           let pl_bu = get_burial_place p in
           if (not add_birth || is_empty_string pl_bi) &&
-             (not add_birth || is_empty_string pl_bp) &&
+             (not add_baptism || is_empty_string pl_bp) &&
              (not add_death || is_empty_string pl_de) &&
-             (not add_death || is_empty_string pl_bu)
+             (not add_burial || is_empty_string pl_bu)
           then
             ()
           else do {
             if add_birth && not (is_empty_string pl_bi) then ht_add pl_bi p
             else ();
-            if add_birth && not (is_empty_string pl_bp) then ht_add pl_bp p
+            if add_baptism && not (is_empty_string pl_bp) then ht_add pl_bp p
             else ();
             if add_death && not (is_empty_string pl_de) then ht_add pl_de p
             else ();
-            if add_death && not (is_empty_string pl_bu) then ht_add pl_bu p
+            if add_burial && not (is_empty_string pl_bu) then ht_add pl_bu p
             else ()
           };
           loop (i + 1)
