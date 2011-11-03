@@ -191,11 +191,11 @@ value image_normal_txt conf base p fname width height =
   let k = default_image_name base p in
   let r =
     sprintf "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s border=\"0\" alt=\"%s\" title=\"%s\">"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s border=\"0\" alt=\"%s\" title=\"%s\" />"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
       (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
-      (if height = 0 then "" else " height=" ^ string_of_int height ^ "\"")
+      (if height = 0 then "" else " height=\"" ^ string_of_int height ^ "\"")
       image_txt image_txt
   in
   if conf.cancel_links then r
@@ -205,7 +205,7 @@ value image_normal_txt conf base p fname width height =
 value image_url_txt conf base url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nheight=%d border=\"0\" alt=\"%s\" title=\"%s\">" url height
+    sprintf "<img src=\"%s\"\nheight=%d border=\"0\" alt=\"%s\" title=\"%s\" />" url height
       image_txt image_txt ^
     "</a>\n"
 ;
@@ -213,7 +213,7 @@ value image_url_txt conf base url height =
 value image_url_txt_with_size conf base url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\" title=\"%s\">"
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\" title=\"%s\" />"
       url width height image_txt image_txt ^
     "</a>\n"
 ;
@@ -225,20 +225,20 @@ value image_txt conf base p =
       [ Some (True, f, Some (wid, hei)) ->
           "<br" ^ conf.xhs ^
            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f wid hei ^ "</table></center>\n"
+            image_normal_txt conf base p f wid hei ^ "</td></tr></table></center>\n"
       | Some (True, f, None) ->
           "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f 0 75 ^ "</table></center>\n"
+            image_normal_txt conf base p f 0 75 ^ "</td></tr></table></center>\n"
       | Some (False, url, Some (wid, hei)) ->
           "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt_with_size conf base url wid hei ^
-            "</table></center>\n"
+            "</td></tr></table></center>\n"
       | Some (False, url, None) ->
           "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt conf base url 75 ^ "</table></center>\n"
+            image_url_txt conf base url 75 ^ "</td></tr></table></center>\n"
       | _ -> "" ]
   | _ -> "" ]
 ;
@@ -912,7 +912,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     in
     if bd > 0 || td <> "" then
       sprintf "\
-<table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s</table>"
+<table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s </td></tr></table>"
         bd td (indi_txt n)
     else indi_txt n
   in
