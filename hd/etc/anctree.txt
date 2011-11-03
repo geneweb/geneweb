@@ -64,7 +64,7 @@
         %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
         <img%sp;
         src="%cell.person.image_url;"%cell.person.image_small_size;%sp;
-         border="0" title="[image/images]0"%/>%nn;
+         border="0" alt="[image/images]0" title="[image/images]0"%/>%nn;
         %if;(evar.cgl != "on")</a>%end;</td>%nl;
         </tr></table>
       %end;
@@ -127,7 +127,7 @@
       <br />
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img src="%xx.image_url;"%xx.image_small_size;%sp;
-      border="0" title="[image/images]0"%/>
+      border="0" alt="[image/images]0" title="[image/images]0"%/>
       %if;(evar.cgl != "on")</a>%end;
     %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;
@@ -142,7 +142,7 @@
       <br />
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img src="%xx.image_url;"%xx.image_small_size;%sp;
-      border="0" title="[image/images]0"%/>
+      border="0" alt="[image/images]0" title="[image/images]0"%/>
       %if;(evar.cgl != "on")</a>%end;
     %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;

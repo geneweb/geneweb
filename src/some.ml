@@ -85,7 +85,7 @@ value print_elem conf base is_surname (p, xl) =
          if not first then Wserver.wprint "</li>\n<li>\n  " else ();
          let sosa_num = Perso.p_sosa conf base x in
          if Num.gt sosa_num Num.zero then
-           Wserver.wprint "<img src=\"%s/%s\" title=\"sosa\"/> "
+           Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa\"/> "
              (Util.image_prefix conf) "sosa.png"
          else ();
          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
@@ -338,7 +338,7 @@ value print_branch conf base psn name =
     print_selection_bullet conf first_select;
     let sosa_num = Perso.p_sosa conf base p in
     if Num.gt sosa_num Num.zero then
-      Wserver.wprint "<img src=\"%s/%s\" title=\"sosa\"/> "
+      Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa\"/> "
         (Util.image_prefix conf) "sosa.png"
     else ();
     stag "strong" begin
@@ -363,7 +363,7 @@ value print_branch conf base psn name =
                  print_selection_bullet conf select;
                  let sosa_num = Perso.p_sosa conf base p in
                  if Num.gt sosa_num Num.zero then
-                   Wserver.wprint "<img src=\"%s/%s\" title=\"sosa\"/> "
+                   Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa\"/> "
                      (Util.image_prefix conf) "sosa.png"
                  else ();
                  stag "em" begin
@@ -383,7 +383,7 @@ value print_branch conf base psn name =
                  (Date.short_marriage_date_text conf base fam p c);
                let sosa_num = Perso.p_sosa conf base c in
                if Num.gt sosa_num Num.zero then
-                 Wserver.wprint "<img src=\"%s/%s\" title=\"sosa\"/> "
+                 Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa\"/> "
                    (Util.image_prefix conf) "sosa.png"
                else ();
                stag "strong" begin

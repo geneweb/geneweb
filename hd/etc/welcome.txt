@@ -62,7 +62,7 @@ zh: 网络家谱
 <div id="title">
   <div id="logo">
     <img src="%image_prefix;/gwlogo.png" style="border: 0"%sp; 
-    title="GeneWeb"%/>
+    alt="GeneWeb" title="GeneWeb"%/>
   </div>
 
   %( Display the acces bloc if there is  %)
