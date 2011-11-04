@@ -538,7 +538,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td>
         <select name="chxcnt_p">
-          <option value="link"%if;(child.create = "link")
+          <option value="link"%if;(child.create = "link")%sp;
            selected="selected"%end;>[*link]0</option>
           <option value="create"%if;(child.create = "create")%sp;
            selected="selected"%end;>[*create]0</option>
@@ -569,7 +569,7 @@ function changeCalendar(e,v,m,c) {
 %apply;insert_child("0")
 %foreach;child;
   %if;(cnt != 1)
-    </td><td>&nbsp;</td><td>
+    <td>&nbsp;</td>
     %apply;invert_children(cnt)
   %end;
   </tr></table>
