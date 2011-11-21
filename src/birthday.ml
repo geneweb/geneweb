@@ -413,7 +413,7 @@ value gen_print_menu_birth conf base f_scan mode =
          xx.val :=
            List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
              xx.val)
-      [list_tod; list_tom; list_aft; coming];
+      [list_tod; list_tom; list_aft];
     print_birth_day conf base (transl conf "today")
       (ftransl conf "%s, it is %s of") conf.today_wd conf.today list_tod.val;
     print_birth_day conf base (transl conf "tomorrow")
