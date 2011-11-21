@@ -89,14 +89,16 @@ value get_all conf base =
           then
             ()
           else do {
-            if add_birth && not (is_empty_string pl_bi) then ht_add pl_bi p
+            if (fast_auth_age conf p) then do {
+              if add_birth && not (is_empty_string pl_bi) then ht_add pl_bi p
+              else ();
+              if add_baptism && not (is_empty_string pl_bp) then ht_add pl_bp p
+              else ();
+              if add_death && not (is_empty_string pl_de) then ht_add pl_de p
+              else ();
+              if add_burial && not (is_empty_string pl_bu) then ht_add pl_bu p
+              else () }
             else ();
-            if add_baptism && not (is_empty_string pl_bp) then ht_add pl_bp p
-            else ();
-            if add_death && not (is_empty_string pl_de) then ht_add pl_de p
-            else ();
-            if add_burial && not (is_empty_string pl_bu) then ht_add pl_bu p
-            else ()
           };
           loop (i + 1)
         }
