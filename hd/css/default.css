@@ -82,7 +82,7 @@ h1
 #title 
 { 
  padding-top: 10px;
- width: 100%%;
+ width: 100%;
  background-color: #e7edb3;
 }
 
@@ -127,7 +127,6 @@ h1
  width: 750px; 
  border: solid 2px #6f8301;
  text-align: left; 
- align: center;
  margin-left: auto;
  margin-right: auto;
 }
@@ -172,7 +171,6 @@ h1
  border: solid 2px #6f8301;
  text-align: left; 
  overflow: auto;
- align: center;
  margin-left: auto;
  margin-right: auto;
 }
@@ -196,7 +194,6 @@ h1
  border: solid 2px #6f8301;
  text-align: left; 
  overflow: auto;
- align: center;
  margin-left: auto;
  margin-right: auto;
 }
