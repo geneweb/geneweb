@@ -595,7 +595,7 @@ value family_m conf base =
 ;
 
 value print_no_index conf base =
-  let title _ = Wserver.wprint "Link to use" in
+  let title _ = Wserver.wprint "%s" (Util.capitale (transl conf "link to use")) in
   let link = url_no_index conf base in
   do {
     header conf title;
