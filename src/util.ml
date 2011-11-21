@@ -1719,7 +1719,7 @@ value parent conf base p a =
   match get_public_name a with
   [ n when sou base n <> "" -> sou base n ^ person_title conf base a
   | _ ->
-      if (is_hide_names conf p) && not (fast_auth_age conf a) then "x x"
+      if (is_hide_names conf a) && not (fast_auth_age conf a) then "x x"
       else
         p_first_name base a ^
           (if not (eq_istr (get_surname p) (get_surname a)) then
