@@ -44,7 +44,7 @@
     %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
     %else;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
-        <table border="%evar.bd;"><tr>
+        <table style="border:%evar.bd;"><tr>
         <td align="center"%nn;
          %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
       %end;
