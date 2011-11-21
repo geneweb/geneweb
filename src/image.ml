@@ -13,7 +13,7 @@ value content cgi t len fname =
     Util.nl ();
     Wserver.wprint "Content-length: %d" len;
     Util.nl ();
-    Wserver.wprint "Content-disposition: attachment; filename=%s"
+    Wserver.wprint "Content-disposition: inline; filename=%s"
       (Filename.basename fname);
     Util.nl ();
     Util.nl ();
