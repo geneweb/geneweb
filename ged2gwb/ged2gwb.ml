@@ -987,7 +987,7 @@ value unknown_fam gen i =
   let f =
     family_of_gen_family
       {marriage = Adef.codate_None; marriage_place = empty;
-       marriage_src = empty; witnesses = [| |]; relation = Married;
+       marriage_src = empty; witnesses = [| |]; relation = NoMention;
        divorce = NotDivorced; comment = empty; origin_file = empty;
        fsources = empty; fam_index = Adef.ifam_of_int i}
   and c = couple_of_gen_couple (couple False father mother)
@@ -1941,7 +1941,7 @@ value add_fam_norm gen r adop_list =
         | None ->
             match find_field "ENGA" r.rsons with
             [ Some r -> (Engaged, Some r)
-            | None -> (Married, None) ] ]
+            | None -> (NoMention, None) ] ]
       in
       match sons with
       [ Some r ->
