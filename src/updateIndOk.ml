@@ -184,21 +184,19 @@ value reconstitute_death conf birth death_place burial burial_place =
     | Some "Unspecified" | None -> Unspecified
     | Some x -> failwith ("bad death reason type " ^ x) ]
   in
-  (* Il faut d'abord regarder si il existe une date de décès *)
-  (* avant de regarder quelle option a été sélectionnée      *)
-  match d with 
-  [ Some d -> Death dr (Adef.cdate_of_date d)
-  | _ -> 
-      match get conf "death" with
-      [ "Auto" when d = None ->
-          if death_place <> "" || burial <> UnknownBurial || burial_place <> "" ||
-             dr <> Unspecified then
-            DeadDontKnowWhen
-          else Update.infer_death conf birth
-      | "DeadYoung" when d = None -> DeadYoung
-      | "DontKnowIfDead" when d = None -> DontKnowIfDead
-      | "NotDead" -> NotDead
-      | "OfCourseDead" -> OfCourseDead
+  match get conf "death" with
+  [ "Auto" when d = None ->
+      if death_place <> "" || burial <> UnknownBurial || burial_place <> "" ||
+         dr <> Unspecified then
+        DeadDontKnowWhen
+      else Update.infer_death conf birth
+  | "DeadYoung" when d = None -> DeadYoung
+  | "DontKnowIfDead" when d = None -> DontKnowIfDead
+  | "NotDead" -> NotDead
+  | "OfCourseDead" when d = None -> OfCourseDead
+  | _ ->   
+      match d with 
+      [ Some d -> Death dr (Adef.cdate_of_date d)
       | _ -> DeadDontKnowWhen ] ]
 ;
 
