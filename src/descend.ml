@@ -719,11 +719,8 @@ value make_tree_hts conf base gv p =
         [ None | Some "" -> ""
         | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
   in
-  (* TODO : il faut refaire le calcul car ajouter les conjoints *)
-  (* massacre la dernière ligne de l'arbre si une personne a    *)
-  (* plusieurs conjoints                                        *)
   let rec nb_column n v u =
-    if v = 0 then n + 1
+    if v = 0 then n + (max 1 (Array.length (get_family u)))
     else if Array.length (get_family u) = 0 then n + 1
     else
       List.fold_left (fun n ifam -> fam_nb_column n v (foi base ifam)) n
@@ -843,7 +840,10 @@ value make_tree_hts conf base gv p =
     let td =
       match po with
       [ Some (p, auth) ->
-          let ncol = nb_column 0 (v - 1) p in
+          let ncol = 
+            if v > 1 then nb_column 0 (v - 1) p
+            else Array.length (get_family p)
+          in
           let txt = person_title_text conf base p in
           let txt = reference conf base p txt in
           let txt =
@@ -878,11 +878,9 @@ value make_tree_hts conf base gv p =
             in
             let td =
               let fam = foi base ifam in
-              let ncol = fam_nb_column 0 (v-1) fam
-                (* TODO
-                if v > 1 then fam_nb_column 0 (v-1) fam
-                else nb_column 0 (v - 1) p 
-                *)
+              let ncol = 
+                if v > 1 then fam_nb_column 0 (v - 1) fam
+                else 1
               in
               let s =
                 let sp = pget conf base (spouse (get_key_index p) fam) in
@@ -953,16 +951,13 @@ value make_tree_hts conf base gv p =
           let tdl = List.fold_left (person_txt v) [] gen in
           [Array.of_list (List.rev tdl) :: tdal]
         in
+        let tdal =
+          let tdl = List.fold_left (spouses_txt v) [] gen in
+          [Array.of_list (List.rev tdl) :: tdal] 
+        in
         if v > 1 then
-          let tdl = List.fold_left (spouses_txt v) [] gen in
-          let tdal = [Array.of_list (List.rev tdl) :: tdal] in
           loop tdal gen (next_gen gen) (v - 1)
-        else 
-(* TODO
-          let tdl = List.fold_left (spouses_txt v) [] gen in
-          let tdal = [Array.of_list (List.rev tdl) :: tdal] in
-*)
-          tdal
+        else tdal
     in
     Array.of_list (List.rev tdal)
   in
