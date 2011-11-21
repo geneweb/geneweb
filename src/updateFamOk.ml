@@ -342,15 +342,7 @@ value print_error_disconnected conf =
   do {
     rheader conf title;
     Hutil.print_link_to_welcome conf True;
-    Wserver.wprint "\
-Sorry, you can add only families connected to the rest.<br>
-This restriction has been added by this database owner.
-<p>
-D&eacute;sol&eacute;, vous ne pouvez ajouter que des familles
-connect&eacute;es au reste.<br>
-Cette restriction a &eacute;t&eacute; ajout&eacute;e par le
-propri&eacute;taire de cette base de donn&eacute;es.
-";
+    Wserver.wprint "%s" (capitale (transl conf "msg error disconnected"));
     trailer conf;
     raise Update.ModErr
   }
