@@ -13,6 +13,8 @@ value print_ascend : config -> base -> person -> unit;
 value print_what_links : config -> base -> person -> unit;
 value p_sosa : config -> base -> person -> Num.t;
 
+value string_of_num : string -> Num.t -> string;
+
 (**)
 
 value infinite : int;
