@@ -5,6 +5,7 @@
   <meta name="robots" content="none">
   <!--meta http-equiv="Content-Type" content="text/html; charset=%e"-->
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%o/favicon_gwd.png"%/>
   <link rel="stylesheet" type="text/css" href="css/%C" />
   <title>[*advanced request]</title>
 %j</head>

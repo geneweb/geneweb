@@ -2,7 +2,7 @@
 <head>
   <meta name="robots" content="none">
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="shortcut icon" href="%o/favicon_gwd.png"%/>
   <link rel="stylesheet" type="text/css" href="css/default.css" />
   <title>Base</title>
 </head>

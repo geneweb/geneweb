@@ -75,7 +75,8 @@ value header_without_http conf title = do {
     "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
     conf.xhs;
   Wserver.wprint 
-    "  <link rel=\"shortcut icon\" href=\"images/favicon_gwd.png\" />\n" ;
+    "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\"%s>\n" 
+    (Util.image_prefix conf) conf.xhs;
   Wserver.wprint 
     "  <link rel=\"stylesheet\" type=\"text/css\" href=\"css/%s\" />\n"
     (Util.css_prop conf);
