@@ -237,18 +237,36 @@ value get_var ic lab s =
   else ("", s)
 ;
 
-value sp2nbsp lim s =
-  loop 0 0 where rec loop i len =
-    if i >= String.length s || s.[i] = '\n' then Buff.get len
-    else if i > lim && String.length s > lim + 3 then Buff.get len ^ "..."
+value size_of_char s i =
+  if Mutil.utf_8_db.val then max 1 (Name.nbc s.[i])
+  else 1
+;
+
+value string_length s i =
+  loop i where rec loop i =
+    if i >= String.length s then 0
     else
+      let size = size_of_char s i in
+      size + loop (i + size)
+;
+
+value sp2nbsp lim s =
+  let trunc_signature = "..." in
+  let signature_length = string_length trunc_signature 0 in
+  loop 0 0 lim where rec loop i len lim =
+    if i >= String.length s || s.[i] = '\n' then Buff.get len
+    else if lim <= 0 &&
+            (string_length s i) > signature_length
+         then Buff.get len ^ trunc_signature
+    else
+      let size = size_of_char s i in
       let len =
         match s.[i] with
         [ ' ' -> Buff.mstore len "&nbsp;"
         | '&' -> Buff.mstore len "&amp;"
-        | x -> Buff.store len x ]
+        | _ -> Buff.mstore len (String.sub s i size) ]
       in
-      loop (i + 1) len
+      loop (i + size) len (lim - 1)
 ;
 
 (* Print a message *)
@@ -951,8 +969,10 @@ value search_text conf base s =
       do {
         match p_getenv conf.env "p" with
         [ Some pos ->
-            let pos = MF.pos_of_string pos in
-            try MF.rseek_in ic (MF.prev_pos pos) with [ Sys_error _ -> () ]
+            let pos = MF.pos_of_string pos in do {
+              try MF.rseek_in ic pos with [ Sys_error _ -> () ];
+              let _ = read_message conf ic in ()
+            }
         | None -> () ];
         let messo = loop () in
         let next_pos = MF.rpos_in ic in
