@@ -643,7 +643,7 @@ value display_spouse_index conf base max_level ancestor =
                  let c = pget conf base c in
                  if p_first_name base c <> "?" && p_surname base c <> "?" &&
                     p_first_name base p <> "x" &&
-                    (not (is_hide_names conf p) || fast_auth_age conf c) &&
+                    (not (is_hide_names conf c) || fast_auth_age conf c) &&
                     not (List.mem (get_key_index c) list.val)
                  then
                    list.val := [get_key_index c :: list.val]

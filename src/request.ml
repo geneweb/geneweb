@@ -164,10 +164,12 @@ value find_all conf base an =
             if is_hidden p then [] else [p]
           in
           let pl =
-            if not conf.wizard && not conf.friend && conf.hide_names then
+            if not conf.wizard && not conf.friend then
               List.fold_right
                 (fun p pl ->
-                   if Util.fast_auth_age conf p then [p :: pl] else pl)
+                   if not (is_hide_names conf p) || Util.fast_auth_age conf p 
+                   then [p :: pl] 
+                   else pl)
                 pl []
             else pl
           in
@@ -197,10 +199,12 @@ value find_all conf base an =
             else spl
           in
           let pl =
-            if not conf.wizard && not conf.friend && conf.hide_names then
+            if not conf.wizard && not conf.friend then
               List.fold_right
                 (fun p pl ->
-                   if Util.fast_auth_age conf p then [p :: pl] else pl)
+                   if not (is_hide_names conf p) || Util.fast_auth_age conf p 
+                   then [p :: pl] 
+                   else pl)
                 pl []
             else pl
           in
