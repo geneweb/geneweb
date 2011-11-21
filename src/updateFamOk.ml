@@ -181,7 +181,7 @@ value reconstitute_family conf =
     | _ -> Married ]
   in
   let marriage = Update.reconstitute_date conf "marr" in
-  let marriage_place = only_printable (get conf "marr_place") in
+  let marriage_place = no_html_tags (only_printable (get conf "marr_place")) in
   let (witnesses, ext) =
     loop 1 ext where rec loop i ext =
       match
