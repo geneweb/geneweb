@@ -9826,3 +9826,15 @@ fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br /
 
     link to use
 en: link to use
+
+    to come
+de: in Erwartung
+en: to come
+es: pronto
+fi: tulevat tapahtumat
+fr: à venir
+it: da venire
+nl: te komen
+no: kommende hendelser
+sv: kommande händelser
+
