@@ -384,16 +384,9 @@ value gen_print_menu_birth conf base f_scan mode =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "birthdays")) in
   let tom = day_after conf.today in
   let aft = day_after tom in
-  let week = 
-    let rec next_day i d l = 
-      if i = 7 then l
-      else next_day (i+1) (day_after d) [(day_after d) :: l]
-    in next_day 0 aft []
-  in
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
-  let coming = ref [] in
   do {
     header conf title;
     print_link_to_welcome conf True;
@@ -409,8 +402,6 @@ value gen_print_menu_birth conf base f_scan mode =
                 list_tom.val := [(p, d.year, DeBirth, txt_of) :: list_tom.val]
               else if match_dates conf base p d aft then
                 list_aft.val := [(p, d.year, DeBirth, txt_of) :: list_aft.val]
-              else if List.exists (match_dates conf base p d) week then
-                coming.val := [(p, d.year, DeBirth, txt_of) :: coming.val]
               else ()
             else ()
         | _ -> () ]
@@ -431,8 +422,6 @@ value gen_print_menu_birth conf base f_scan mode =
     print_birth_day conf base (transl conf "the day after tomorrow")
       (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
-    Wserver.wprint "%s\n" (capitale (transl conf "to come"));
-    print_anniversary_list conf base False aft coming.val;
     Wserver.wprint "\n";
     propose_months conf mode;
     Wserver.wprint "\n";
