@@ -265,12 +265,12 @@ value reconstitute_person conf =
     | _ -> Neuter ]
   in
   let birth = Update.reconstitute_date conf "birth" in
-  let birth_place = only_printable (get conf "birth_place") in
+  let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
   let bapt = Adef.codate_of_od (Update.reconstitute_date conf "bapt") in
-  let bapt_place = only_printable (get conf "bapt_place") in
-  let burial_place = only_printable (get conf "burial_place") in
+  let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
+  let burial_place = no_html_tags (only_printable (get conf "burial_place")) in
   let burial = reconstitute_burial conf burial_place in
-  let death_place = only_printable (get conf "death_place") in
+  let death_place = no_html_tags (only_printable (get conf "death_place")) in
   let death = reconstitute_death conf birth death_place burial burial_place in
   let death_place =
     match death with
