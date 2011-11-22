@@ -6949,6 +6949,28 @@ ru: место
 sl: kraj
 sv: plats
 
+    places
+de: orts
+en: places
+es: lugares
+fi: paikoista
+fr: lieux
+it: luoghi
+nl: plaatsen
+no: steder
+sv: orternas
+
+    book of places
+de: ortsverzeichnis
+en: places
+es: diccionario de lugares
+fi: luettelo paikoista
+fr: dictionnaire des lieux
+it: dizionario dei luoghi
+nl: woordenboek der plaatsen
+no: liste over steder
+sv: orternas uppslagsbok
+
     population pyramid
 bg: възрастова пирамида
 cs: populacna pyramida
@@ -9837,4 +9859,61 @@ it: da venire
 nl: te komen
 no: kommende hendelser
 sv: kommande händelser
+
+    tools
+de: hilfsmittel
+en: tools
+es: herramientas
+fi: työkalut
+fr: outils
+it: utilitari
+nl: nuttige zaken
+no: verktøy
+sv: verktyg
+
+    family history
+de: rund um den Stammbaum
+en: family History
+es: autor del árbol
+fi: sukupuun lisäksi
+fr: autour de l'arbre
+it: attorno all'albero
+nl: rond de stamboom
+no: tillegg til slektstreet
+sv: utöver släktträdet
+
+    %d places starting with %s
+de: %d orts beginnend mit %s
+en: %d places starting with %s
+es: %d lugares comenzando con %s
+fi: %d paikoista ensimmäisenä %s
+fr: %d lieux commençant par %s
+it: %d luoghi partendo da %s
+nl: %d plaatsen beginnend met %s
+no: %d steder som starter med %s
+sv: %d orternas som börjar med %s
+
+    place modified
+de: ort geändert
+en: place modified
+es: lugar modificada
+fi: paikka muokattu
+fr: lieu modifié
+it: luogo modificata
+nl: plaats veranderd
+no: sted er endret
+sv: plats ändrad
+
+    no modification
+fr: aucune modification
+
+    the modification impacted %d persons
+en: the modification impacted %d persons
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+
+    help places
+fr: Cliquez sur "[modifier]" pour corriger un lieu : l'ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées.<br />Merci de bien respecter la norme de saisie suivante : [Lieu-dit] - Ville, Code ville (facultatif), Sous-Région/Département, Région (facultatif), Pays.
+
+    new modification
+fr: souhaitez-vous effectuer une nouvelle correction
 

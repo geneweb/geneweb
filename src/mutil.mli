@@ -35,6 +35,8 @@ value iso_8859_1_of_utf_8 : string -> string;
 value roman_of_arabian : int -> string;
 value arabian_of_roman : string -> int;
 
+value start_with : string -> string -> bool;
+
 value compare_after_particle : list string -> string -> string -> int;
 
 value input_lexicon :

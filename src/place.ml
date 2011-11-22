@@ -8,6 +8,37 @@ open Gwdb;
 open Hutil;
 open Util;
 
+module PlaceSet = Set.Make
+  (struct
+    type t = (Gwdb.istr * int) ;
+    value compare (_, i1) (_, i2) = Pervasives.compare i1 i2;
+  end)
+;
+
+module PersMap = Map.Make
+  (struct 
+    type t = int;
+    value compare = compare;
+  end)
+;
+
+module PersSet = Set.Make 
+  (struct 
+    type t = person; 
+    value compare p1 p2 = 
+      let i1 = Adef.int_of_iper (get_key_index p1) in
+      let i2 = Adef.int_of_iper (get_key_index p2) in
+      Pervasives.compare i1 i2; 
+  end)
+;
+
+module StringSet = Set.Make
+  (struct
+    type t = string;
+    value compare = compare;
+  end)
+;
+
 value fold_place inverted s =
   (* petit hack (pour GeneaNet) en attendant une vraie gestion des lieux *)
   (* transforme "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)"    *)
@@ -142,6 +173,163 @@ value get_all conf base =
     in
     (list, len.val)
   }
+;
+
+
+(* ******************************************************************** *)
+(*  [Fonc] get_all_places : config -> base ->  PlaceSet.elt list        *)
+(** [Description] : Construit la liste de tous les lieux de la base et
+                    leur associe une clé unique.
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] :
+      - (Gwdb.istr * int) list : La liste sans doublon de tous les 
+          lieux de la base avec leur clé.
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
+value get_all_places conf base = do {
+  let places = ref PlaceSet.empty in
+  (* Ajoute tous les lieux liés à un individu *)
+  let rec loop i = 
+    if i = nb_of_persons base then ()
+    else 
+      do {
+        let p = pget conf base (Adef.iper_of_int i) in
+        let pl_bi = get_birth_place p in
+        let pl_bp = get_baptism_place p in
+        let pl_de = get_death_place p in
+        let pl_bu = get_burial_place p in
+        if not (is_empty_string pl_bi) then 
+          places.val := PlaceSet.add (pl_bi, Hashtbl.hash pl_bi) places.val
+        else ();
+        if not (is_empty_string pl_bp) then 
+          places.val := PlaceSet.add (pl_bp, Hashtbl.hash pl_bp) places.val
+        else ();
+        if not (is_empty_string pl_de) then 
+          places.val := PlaceSet.add (pl_de, Hashtbl.hash pl_de) places.val
+        else ();
+        if not (is_empty_string pl_bu) then 
+          places.val := PlaceSet.add (pl_bu, Hashtbl.hash pl_bu) places.val
+        else ();
+        loop (i+1)
+      }
+  in loop 0;
+  (* Ajoute tous les lieux liés à une famille *)
+  let rec loop i = 
+    if i = nb_of_families base then ()
+    else
+      do {
+        let fam = foi base (Adef.ifam_of_int i) in
+        if is_deleted_family fam then ()
+        else do {
+          let pl_ma = get_marriage_place fam in
+          if not (is_empty_string pl_ma) then 
+            places.val := PlaceSet.add (pl_ma, Hashtbl.hash pl_ma) places.val
+          else ();
+        loop (i+1)}
+      }
+  in loop 0;
+  PlaceSet.elements places.val }
+;
+
+
+(* ************************************************************************** *)
+(*  [Fonc] get_person_places : config -> base -> (Gwdb.istr * PersSet.t list) *)
+(** [Description] : Construit a partir de la clé d'un lieu, l'ensemble des
+                    personnes en relation avec ce lieu
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] :
+      - (Gwdb.istr * person list) : retourne le lieu ainsi que la liste des
+          personnes en relation avec ce lieu
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value get_person_places conf base = do {
+  (* Le Hashtbl.hash du lieu *)
+  let k = 
+    match p_getenv conf.env "k" with
+    [ Some s -> int_of_string s
+    | None -> raise Not_found ]
+  in
+  let pers_map = ref PersMap.empty in
+  (* Fonction d'ajout dans la map des personnes (PersMap).        *)
+  (* k = key, istr = place, p = person.                           *)
+  (* A la clé k est associé le binding (istr, ensemble d'individu *)
+  let map_add k istr p =
+    try
+      let (istr, set) = PersMap.find k pers_map.val in
+      let set = PersSet.add p set in
+      pers_map.val := PersMap.add k (istr, set) pers_map.val
+    with 
+    [ Not_found ->
+      let set = PersSet.add p PersSet.empty in
+      pers_map.val := PersMap.add k (istr, set) pers_map.val ]
+  in
+  (* Parcours tous les individus et ajoute dans la map les  *)
+  (* individus en relation avec le lieu donné par la clé k. *)
+  let rec loop i =
+    if i = nb_of_persons base then ()
+    else 
+      do {
+        let p = pget conf base (Adef.iper_of_int i) in
+        let pl_bi = get_birth_place p in
+        let hash_pl_bi = Hashtbl.hash pl_bi in
+        let pl_bp = get_baptism_place p in
+        let hash_pl_bp = Hashtbl.hash pl_bp in
+        let pl_de = get_death_place p in
+        let hash_pl_de = Hashtbl.hash pl_de in
+        let pl_bu = get_burial_place p in
+        let hash_pl_bu = Hashtbl.hash pl_bu in
+        if not (is_empty_string pl_bi) && (hash_pl_bi = k) then 
+          map_add k pl_bi p
+        else ();
+        if not (is_empty_string pl_bp) && (hash_pl_bp = k) then 
+          map_add k pl_bp p
+        else ();
+        if not (is_empty_string pl_de) && (hash_pl_de = k) then 
+          map_add k pl_de p
+        else ();
+        if not (is_empty_string pl_bu) && (hash_pl_bu = k) then 
+          map_add k pl_bu p
+        else ();
+        loop (i+1)
+      }
+  in loop 0;
+  (* Parcours toutes les familles et ajoute dans la map les  *)
+  (* individus en relation avec le lieu donnée par la clé k. *)
+  let rec loop i =
+    if i = nb_of_families base then ()
+    else
+      do {
+        let fam = foi base (Adef.ifam_of_int i) in
+        if is_deleted_family fam then ()
+        else 
+          do {
+            let pl_ma = get_marriage_place fam in
+            let hash_pl_ma = Hashtbl.hash pl_ma in
+            if not (is_empty_string pl_ma) && (hash_pl_ma = k) then 
+              do {
+                let p = pget conf base (get_father fam) in
+                map_add k pl_ma p;
+                let p = pget conf base (get_mother fam) in
+                map_add k pl_ma p
+              }
+            else ();
+          };       
+        loop (i+1) 
+      }
+  in loop 0;
+  (* On fait un try-with au cas où les individus en *)
+  (* relation avec le lieu auraient été supprimés.  *)
+  try
+    let (istr, pset) = PersMap.find k pers_map.val in 
+    (istr, PersSet.elements pset) 
+  with 
+  [ Not_found -> 
+    let empty_string =  Gwdb.insert_string base "" in
+    (empty_string, []) ] }
 ;
 
 value max_len = ref 2000;
@@ -309,3 +497,380 @@ value print_all_places_surnames conf base =
     print_all_places_surnames_short conf list
   else print_all_places_surnames_long conf base list
 ;
+
+
+(* ************************************************************************** *)
+(*  [Fonc] combine_by_ini : string -> (string * 'a * 'b) list -> 
+                              (string * ('a * 'b) list) list                  *)
+(** [Description] : Retourne une liste en recombinant toutes les chaines en
+                    fonction de leur début de chaîne.
+    [Args] :
+      - ini  : les premières lettres de la chaîne
+      - list : la liste composée des premières lettres de la chaîne, 'a, 'b
+    [Retour] :
+      - (string * ('a * 'b) list) list
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value combine_by_ini ini list =
+  let list =
+    loop [] list where rec loop new_list =
+      fun
+      [ [] -> new_list
+      | [(k, s, cnt) :: list] -> do {
+          let ini_k =
+            if String.length k > String.length ini then
+              String.sub k 0 (index_of_next_char k (String.length ini))
+            else k ^ String.make (String.length ini + 1 - String.length k) '_'
+          in
+          for i = 0 to String.length ini_k - 1 do {
+            if ini_k.[i] = ' ' then ini_k.[i] := '_' else ()
+          };
+          let new_list =
+            if ini_k = "_" then new_list
+            else
+              match new_list with
+              [ [] -> [(ini_k, [(s, cnt)])]
+              | [(ini_k1, l) :: ll] ->
+                  if ini_k1 = ini_k then [(ini_k1, [(s, cnt) :: l]) :: ll]
+                  else [(ini_k, [(s, cnt)]); (ini_k1, l) :: ll] ]
+          in
+          loop new_list list
+        } ]
+  in
+  List.fold_left (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) []
+    list
+;
+
+
+(* ************************************************************************** *)
+(*  [Fonc] print_title : config -> base -> string -> int -> unit              *)
+(** [Description] : Affiche le titre du dictionnaire des lieux en fonction
+                    de la longueur de la liste
+    [Args] :
+      - conf : configuration
+      - base : base
+      - ini  : les premières lettres du lieu
+      - len  : le nombre de lieu commençant par ini
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value print_title conf base ini len = do {
+  Wserver.wprint "%s" (capitale (transl conf "book of places"));
+  if ini = "" then
+    Wserver.wprint " (%d %s)" len (transl conf "places")
+  else do {
+    Wserver.wprint " - ";
+    Wserver.wprint 
+      (fcapitale (ftransl conf "%d places starting with %s")) len ini }
+};
+
+
+(* ************************************************************************** *)
+(*  [Fonc] print_place : config -> base -> (string * int) list -> int -> unit *)
+(** [Description] : Affiche le tableau des lieux en leur associant une clé
+                    unique afin de pouvoir mettre un champs de modification.
+    [Args] :
+      - conf : configuration
+      - base : base
+      - list : liste de couple (lieu, clé)
+      - len  : la longueur de la liste
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value print_place conf base list len =
+  let key = 
+    match p_getenv conf.env "k" with 
+    [ Some s -> s 
+    | None -> "" ] 
+  in 
+  let ini =
+    match p_getenv conf.env "s" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  (* Construit à partir de la liste de (place * hash) la liste dont    *)
+  (* le premier composant est les premières lettres du lieu.           *)
+  (* Attention, il ne faut pas faire String.length ini + 1 parce qu'en *)
+  (* utf8, il se peut que le caractère soit codé sur plusieurs octets. *)
+  let list =
+    List.map
+      (fun (s, k) -> 
+        let ini = String.sub s 0 (index_of_next_char s (String.length ini)) in
+        (ini, s, k))
+      list
+  in
+  (* Re-combine la liste en fonction des premières *)
+  (* lettres afin de pouvoir poser des ancres.     *)
+  let list = combine_by_ini ini list in
+  (* Astuce pour gérer les espaces. *)
+  let list = List.map (fun (ini, l) -> (Mutil.tr ' ' '_' ini, l)) list in
+  do {
+    let title _ = print_title conf base ini len in
+    Hutil.header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<p>%s</p>" (capitale (transl conf "help places")) ;
+    (* Ancre en haut de page afin de naviguer plus facilement. *)
+    tag "p" begin
+      List.iter
+        (fun (ini, _) ->
+           stagn "a" "href=\"#%s\"" ini begin
+             Wserver.wprint "%s" ini;
+           end)
+      list;
+    end;
+    Wserver.wprint 
+      "<form method=\"post\" action=\"%s\">\n" conf.command;
+    tag "ul" begin
+      List.iter 
+        (fun (ini_k, list) -> do {
+          tag "li" begin
+            stagn "a" "id=\"%s\"" ini_k begin
+              Wserver.wprint "%s" ini_k;
+            end;
+            Wserver.wprint "<table>\n" ;
+            List.iter
+              (fun (s, k) -> 
+                do {
+                  Wserver.wprint "<tr>"; 
+                  if key <> string_of_int k then
+                    do { 
+                      Wserver.wprint "<td>%s</td>" s; 
+                      Wserver.wprint 
+                        "<td><a style=\"font-size:80%%\" href=\"%sm=MOD_P;k=%d;s=%s#mod\">(%s)</a></td>"
+                        (commd conf) k (code_varenv ini)
+                        (capitale (Util.transl_decline conf "modify" ""));
+                    } 
+                  else
+                    do { 
+                      Wserver.wprint "<td><a name=\"mod\">&nbsp;</a>"; 
+                      (* envoie les données de façon masquée *)
+                      Util.hidden_env conf; 
+                      Wserver.wprint 
+                        "<input type=\"hidden\" name=\"k\" value=\"%d\"/>" k;
+                      Wserver.wprint 
+                        "<input type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"/>" ;
+                      Wserver.wprint 
+                        "<input type=\"text\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\" /></td>" (quote_escaped (no_html_tags (only_printable s))); 
+                      Wserver.wprint "<td><input type=\"submit\" value=\"Ok\" /></td>" ; 
+                    };
+                  Wserver.wprint "</tr>\n"; 
+                }
+              )
+              list;
+            Wserver.wprint "</table>\n";
+            Wserver.wprint "<br />\n";
+          end; }
+        ) 
+        list;
+    end;
+    Wserver.wprint "</form>\n";
+    Hutil.trailer conf ;
+  }
+;
+
+
+
+(* ************************************************************************ *)
+(*  [Fonc] print_short : config -> base -> (string * _) list -> int -> unit *)
+(** [Description] : Si le nombre de lieux est trop grand, on affiche les
+                    première lettre de chaque lieu en fonction des premières
+                    lettres données par le paramètre s dans la configuration.
+    [Args] :
+      - conf : configuration
+      - base : base
+      - list : la liste des les lieux
+      - len  : la longueur de la liste
+    [Retour] :
+      - unit
+    [Rem] : Non xporté en clair hors de ce module.                          *)
+(* ************************************************************************ *)
+value print_short conf base list len =
+  let ini =
+    match p_getenv conf.env "s" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  (* Construit la liste des string commençant par ini. *)
+  (* Attention, il ne faut pas faire String.length     *)
+  (* ini + 1 parce qu'en utf8, il se peut que le       *)
+  (* caractère soit codé sur plusieurs octet.          *)
+  let list =
+    List.map
+      (fun (s, _) -> String.sub s 0 (index_of_next_char s (String.length ini)))
+      list
+  in
+  (* Fonction pour supprimer les doublons. *)
+  let remove_dup list =
+    StringSet.elements 
+      (List.fold_right StringSet.add list StringSet.empty)
+  in
+  let list = remove_dup list in
+  (* Astuce pour gérer les espaces. *)
+  let list = List.map (fun p -> Mutil.tr ' ' '_' p) list in
+  do {
+    let title _ = print_title conf base ini len in
+    Hutil.header conf title;
+    print_link_to_welcome conf True;
+    List.iter
+      (fun s ->
+        Wserver.wprint "<a href=\"%sm=MOD_P;s=%s\">%s</a> " 
+          (commd conf) (code_varenv s) s
+      )
+      list;
+    Hutil.trailer conf 
+  }
+;
+
+
+value max_nb_places = 1000 ;
+
+
+(* ********************************************************************* *)
+(*  [Fonc] print_mod : config -> base -> unit                            *)
+(** [Description] : Récupère la liste de tous les lieux de la base et en
+                    fonction du nombre de résultats, fait un affichage
+                    court ou un afficahge long.
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+value print_mod conf base = 
+  (* Paramètre pour savoir par quoi commence la chaine. *)
+  let ini =
+    match p_getenv conf.env "s" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  (* Astuce pour gérer les espaces. *)
+  let ini = Mutil.tr '_' ' ' ini in
+  let list = get_all_places conf base in
+  let list = List.map (fun (istr, k) -> (sou base istr, k)) list in
+  let list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list in
+  (* Fonction qui à une liste de lieux retourne la *)
+  (* liste de tous les lieux commençant par ini.   *)
+  let reduce l =
+    (* fold_right pour conserver le tri précédent. *)
+    List.fold_right
+      (fun (place, k) acc -> 
+        if Mutil.start_with ini place then
+          [ (place, k) :: acc ]
+        else acc
+      )
+      l []
+  in
+  let list = 
+    if ini <> "" then reduce list
+    else list
+  in
+  let len = List.length list in
+  if len > max_nb_places then
+    print_short conf base list len
+  else print_place conf base list len
+;
+
+
+(* ******************************************************************** *)
+(*  [Fonc] print_mod_ok : config -> base -> unit                        *)
+(** [Description] : Met la jour toutes les personnes en relation avec
+                    le lieu que l'on veut modifié, donné par le 
+                    paramètre new_place
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
+value print_mod_ok conf base = do {
+  let new_place = 
+    match p_getenv conf.env "place" with 
+    [ Some s -> (no_html_tags (only_printable s))
+    | None -> "" ] 
+  in 
+  let (istr, perl) = get_person_places conf base in
+  let old_place = sou base istr in
+  if old_place <> new_place then do {
+    (* mise à jour de toutes les personnes concernées par le nouveau lieu *)
+    List.iter 
+      (fun p -> do {
+        let pl_bi = get_birth_place p in
+        let s_bi = sou base pl_bi in 
+        let pl_bp = get_baptism_place p in
+        let s_bp = sou base pl_bp in 
+        let pl_de = get_death_place p in
+        let s_de = sou base pl_de in 
+        let pl_bu = get_burial_place p in
+        let s_bu = sou base pl_bu in 
+        let birth_place = 
+          if old_place = s_bi then Gwdb.insert_string base new_place
+          else pl_bi
+        in
+        let baptism_place = 
+          if old_place = s_bp then Gwdb.insert_string base new_place
+          else pl_bp
+        in
+        let death_place = 
+          if old_place = s_de then Gwdb.insert_string base new_place
+          else pl_de
+        in
+        let burial_place = 
+          if old_place = s_bu then Gwdb.insert_string base new_place
+          else pl_bu
+        in
+        let np = {(gen_person_of_person p) with birth_place = birth_place; 
+                 baptism_place = baptism_place; death_place = death_place; 
+                 burial_place = burial_place} in
+        patch_person base np.key_index np;
+        let fam = Array.to_list (get_family p) in
+        List.iter
+          (fun f ->
+            let ifam = foi base f in
+            let p_ma = get_marriage_place ifam in
+            let s_ma = sou base p_ma in
+            if old_place = s_ma then
+                let fam = {(gen_family_of_family ifam) with 
+                           marriage_place = Gwdb.insert_string base new_place} 
+                in
+                patch_family base fam.fam_index fam
+            else ()
+          )
+          fam;
+        Util.commit_patches conf base;
+        (* On met aussi à jour l'historique. *)
+        let fn = sou base (get_first_name p) in
+        let sn = sou base (get_surname p) in
+        let occ = get_occ p in
+        let ip = get_key_index p in
+        History.record conf base (fn, sn, occ, ip) "mp"; }
+      )
+      perl;
+    let title _ = 
+      Wserver.wprint "%s" (capitale (transl conf "place modified")) 
+    in
+    Hutil.header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint 
+      (fcapitale (ftransl conf "the modification impacted %d persons")) 
+      (List.length perl);
+    Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
+      (commd conf) (capitale (transl conf "new modification")) ;
+    Hutil.trailer conf }
+  else
+    do {
+      let title _ = 
+        Wserver.wprint "%s" (capitale (transl conf "no modification"))
+      in
+      Hutil.header conf title;
+      print_link_to_welcome conf True;
+      Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
+        (commd conf) (capitale (transl conf "new modification")) ;
+      Hutil.trailer conf 
+    }
+};
+
+
