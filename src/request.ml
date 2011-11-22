@@ -482,6 +482,8 @@ value family_m conf base =
   | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
   | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
+  | Some "MOD_P" when conf.wizard -> Place.print_mod conf base
+  | Some "MOD_P_OK" when conf.wizard -> Place.print_mod_ok conf base
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf *)
   (* | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base *)

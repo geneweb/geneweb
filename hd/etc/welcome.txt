@@ -70,7 +70,7 @@ zh: 网络家谱
   %if; (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""
         or bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
     <div id="acces" style="border: solid 2px #6f8301;">
-      <h3><img src="%image_prefix;/picto_cle.png"/>[*access] :</h3>
+      <h3><img src="%image_prefix;/picto_cle.png"/> [*access] :</h3>
       %if;((bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
            or (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
          %if;(not wizard and 
@@ -378,36 +378,7 @@ sv: <span class="highlight"; style="margin-left:10px">genom
 
 <br/>
 <div id="options">
-  <h3><img src="%image_prefix;/picto_molette.png"/>
-[
-af: Ander opsies
-bg: Other options
-br: Other options
-ca: Other options
-cs: Other options
-da: Other options
-de: Andere optionen
-en: Other options
-eo: Other options
-es: Otras opciones
-et: Other options
-fi: Muita vaihtoehtoja
-fr: Autres options
-he: Other options
-is: Other options
-it: Altre opzioni
-lv: Other options
-nl: Andere opties
-no: Other options
-pl: Other options
-pt: Other options
-ro: Other options
-ru: Other options
-sl: Other options
-sv: Other options
-zh: Other options
-]
-  </h3>
+  <h3><img src="%image_prefix;/picto_rotor.png"/> [*family history]</h3>
   <div id="list_left">
   <ul>
     <li>
@@ -422,9 +393,6 @@ zh: Other options
     </li>
     <li>
       <a href="%prefix;m=AM">[anniversaries of marriage]</a>
-    </li>
-    <li>
-      <a href="%prefix;m=CAL">[calendar/calendars]1</a>
     </li>
   </ul>
   </div>
@@ -475,6 +443,20 @@ zh: Other options
   </div>
 </div>
 
+<br/>
+<div id="options">
+  <h3><img src="%image_prefix;/picto_molette.png"/> [*tools]</h3>
+  <ul>
+    <li>
+      <a href="%prefix;m=CAL">[calendar/calendars]1</a>
+    </li>
+    %if;(wizard and (bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != ""))
+      <li>
+        <a href="%prefix;m=MOD_P">[book of places]</a>
+      </li>
+    %end;
+  </ul>
+</div>
 
 <br/>
 %if;(bvar.counter != "no")%sq
