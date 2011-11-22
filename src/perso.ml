@@ -1438,8 +1438,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
   | ["child" :: sl] ->
       match get_env "child" env with
       [ Vind p ->
-          let auth = authorized_age conf base p
-          in
+          let auth = authorized_age conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
@@ -2491,11 +2490,7 @@ value print_foreach conf base print_ast eval_expr =
       | ["child" :: sl] ->
           match get_env "child" env with
           [ Vind p ->
-              let auth =
-                match get_env "auth" env with
-                [ Vbool True -> authorized_age conf base p
-                | _ -> False ]
-              in
+              let auth = authorized_age conf base p in
               let ep = (p, auth) in
               loop ep efam sl
           | _ -> raise Not_found ]
