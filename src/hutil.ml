@@ -5,7 +5,7 @@
 open Config;
 open Printf;
 
-value up_fname conf = "up.jpg";
+value up_fname conf = "up.png";
 
 value commd_no_params conf =
   conf.command ^ "?" ^
@@ -19,7 +19,7 @@ value commd_no_params conf =
 value link_to_referer conf =
   let referer = Wserver.extract_param "referer: " '\n' conf.request in
   if referer <> "" then
-    let fname = "left.jpg" in
+    let fname = "left.png" in
     let wid_hei =
       match Util.image_size (Util.image_file_name fname) with
       [ Some (wid, hei) ->
