@@ -1779,7 +1779,7 @@ value specify_homonymous conf base p =
               if Array.length ct > 0 then
                 let enfant = pget conf base ct.(0) in
                 let (child_fn, child_sn) =
-                  if (is_hide_names conf p) && not (fast_auth_age conf enfant) then
+                  if (is_hide_names conf enfant) && not (fast_auth_age conf enfant) then
                     ("x", " x")
                   else
                     (p_first_name base enfant,
