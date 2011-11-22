@@ -75,10 +75,10 @@
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
         <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
-          src="%image_prefix;/left.jpg"%wid_hei;left.jpg;%/></a>
+          src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
       %end;
       <a href="%prefix;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
-        src="%image_prefix;/up.jpg"%wid_hei;up.jpg;/></a>
+        src="%image_prefix;/up.png"%wid_hei;up.png;/></a>
       <a href="%prefix;%self.access;;cgl=on"><img style="border-width: thin"%sp;%nn;
         src="%image_prefix;/right.jpg"%wid_hei;right.jpg; alt="" title="[cancel GeneWeb links]"%/></a>
     </td></tr></table>
