@@ -688,7 +688,7 @@
   %foreach;ancestor_level;
     %if;(evar.v != "" and level <= evar.v)
       %apply;lazy_print%with;
-        <li>%nl;[*generation/generations]0 %expr(level+1);%nl;
+        <li>%nl;[*generation/generations]0 %expr(level+1)%nl;
         <ul>%nl;
       %end;
       %foreach;ancestor;
