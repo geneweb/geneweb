@@ -450,7 +450,7 @@ sv: <span class="highlight"; style="margin-left:10px">genom
     <li>
       <a href="%prefix;m=CAL">[calendar/calendars]1</a>
     </li>
-    %if;(wizard and (bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != ""))
+    %if;(wizard)
       <li>
         <a href="%prefix;m=MOD_P">[book of places]</a>
       </li>
