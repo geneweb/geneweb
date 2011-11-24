@@ -234,8 +234,8 @@ value get_all_places conf base = do {
           if not (is_empty_string pl_ma) then 
             places.val := 
               PlaceSet.add (pl_ma, "ma", Hashtbl.hash pl_ma) places.val
-          else ();
-        loop (i+1)}
+          else (); } ;
+        loop (i+1)
       }
   in loop 0;
   PlaceSet.elements places.val }
@@ -842,6 +842,131 @@ value print_mod conf base =
 ;
 
 
+(* ********************************************************************** *)
+(*  [Fonc] reduce_sub_list : config -> base -> string -> list -> unit     *)
+(** [Description] : 
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value reduce_sub_list size list =
+  let rec aux size cnt reduced_list list = 
+    if cnt > size then reduced_list 
+    else
+      match list with
+       [ [] -> reduced_list
+       | [x :: l] -> aux size (cnt+1) [x::reduced_list] l ]
+  in aux size 0 [] list
+;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] reduce_list : config -> base -> string -> list -> unit         *)
+(** [Description] : 
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value reduce_list size list =
+  let rec aux size cnt redu list =
+    if cnt > size then redu 
+    else
+      match list with
+       [ [] -> redu 
+       | [(a, sl) :: l] ->
+           if List.length sl > (size-cnt) then
+             [(a, reduce_sub_list (size-cnt) sl) :: redu]
+           else
+             aux size (cnt+List.length sl) [(a,sl)::redu] l ]
+  in aux size 0 [] list
+;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] update_partial_list : config -> base -> string -> list -> unit *)
+(** [Description] : 
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value update_person_list conf base new_place list nb_pers max_updates = do {
+  let list = 
+    if nb_pers > max_updates then
+      reduce_list max_updates list 
+    else list
+  in
+  List.iter
+    (fun (old_place, perl) ->
+      if old_place <> new_place then do {
+        (* mise à jour de toutes les personnes concernées par le nouveau lieu *)
+        let place_istr = Gwdb.insert_string base new_place in 
+        List.iter 
+          (fun p -> do {
+            let pl_bi = get_birth_place p in
+            let s_bi = sou base pl_bi in 
+            let pl_bp = get_baptism_place p in
+            let s_bp = sou base pl_bp in 
+            let pl_de = get_death_place p in
+            let s_de = sou base pl_de in 
+            let pl_bu = get_burial_place p in
+            let s_bu = sou base pl_bu in 
+            let birth_place = 
+              if old_place = s_bi then place_istr
+              else pl_bi
+            in
+            let baptism_place = 
+              if old_place = s_bp then place_istr
+              else pl_bp
+            in
+            let death_place = 
+              if old_place = s_de then place_istr
+              else pl_de
+            in
+            let burial_place = 
+              if old_place = s_bu then place_istr
+              else pl_bu
+            in
+            let np = {(gen_person_of_person p) with birth_place = birth_place; 
+                     baptism_place = baptism_place; death_place = death_place; 
+                     burial_place = burial_place} in
+            patch_person base np.key_index np; 
+            let fam = Array.to_list (get_family p) in
+            List.iter
+              (fun f ->
+                let ifam = foi base f in
+                let p_ma = get_marriage_place ifam in
+                let s_ma = sou base p_ma in
+                if old_place = s_ma then
+                    let fam = {(gen_family_of_family ifam) with 
+                               marriage_place = place_istr} 
+                    in
+                    patch_family base fam.fam_index fam 
+                else ()
+              )
+              fam;
+            (* On met aussi à jour l'historique. *)
+            let fn = sou base (get_first_name p) in
+            let sn = sou base (get_surname p) in
+            let occ = get_occ p in
+            let ip = get_key_index p in
+            History.record conf base (fn, sn, occ, ip) "mp"; }
+          )
+          perl  }
+      else () )
+    list;
+  Util.commit_patches conf base; }
+;
+
+
 (* ******************************************************************** *)
 (*  [Fonc] print_mod_ok : config -> base -> unit                        *)
 (** [Description] : Met à jour toutes les personnes en relation avec
@@ -855,6 +980,24 @@ value print_mod conf base =
     [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
 value print_mod_ok conf base = do {
+  let env_keys = 
+    let list = ref [] in
+    let _ = 
+      List.map
+        (fun key -> 
+          match p_getenv conf.env key with
+          [ Some s -> list.val := [ (key, int_of_string s) :: list.val ]
+          | None -> () ] )
+        [ "bi"; "bp"; "de"; "bu"; "ma" ] 
+    in List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list.val
+  in
+(*
+  let env_keys =
+    List.fold_left
+      (fun accu (k, i) -> accu ^ k ^ "=" ^ (string_of_int i) ^ ";")
+      "" env_keys
+  in
+*)
   let new_place = 
     match p_getenv conf.env "place" with 
     [ Some s -> (no_html_tags (only_printable s))
@@ -862,92 +1005,56 @@ value print_mod_ok conf base = do {
   in
   let list = get_person_places conf base in
   let list = List.map (fun (istr, perl) -> (sou base istr, perl)) list in
-  let nb_pers_mod = 
+  let nb_pers = 
     List.fold_left
       (fun accu (_, perl) -> accu + List.length perl)
       0 list
   in
-  List.iter
-    (fun (old_place, perl) ->
-        if old_place <> new_place then do {
-          (* mise à jour de toutes les personnes concernées par le nouveau lieu *)
-          List.iter 
-            (fun p -> do {
-              let pl_bi = get_birth_place p in
-              let s_bi = sou base pl_bi in 
-              let pl_bp = get_baptism_place p in
-              let s_bp = sou base pl_bp in 
-              let pl_de = get_death_place p in
-              let s_de = sou base pl_de in 
-              let pl_bu = get_burial_place p in
-              let s_bu = sou base pl_bu in 
-              let birth_place = 
-                if old_place = s_bi then Gwdb.insert_string base new_place
-                else pl_bi
-              in
-              let baptism_place = 
-                if old_place = s_bp then Gwdb.insert_string base new_place
-                else pl_bp
-              in
-              let death_place = 
-                if old_place = s_de then Gwdb.insert_string base new_place
-                else pl_de
-              in
-              let burial_place = 
-                if old_place = s_bu then Gwdb.insert_string base new_place
-                else pl_bu
-              in
-              let np = {(gen_person_of_person p) with birth_place = birth_place; 
-                       baptism_place = baptism_place; death_place = death_place; 
-                       burial_place = burial_place} in
-              patch_person base np.key_index np;
-              let fam = Array.to_list (get_family p) in
-              List.iter
-                (fun f ->
-                  let ifam = foi base f in
-                  let p_ma = get_marriage_place ifam in
-                  let s_ma = sou base p_ma in
-                  if old_place = s_ma then
-                      let fam = {(gen_family_of_family ifam) with 
-                                 marriage_place = Gwdb.insert_string base new_place} 
-                      in
-                      patch_family base fam.fam_index fam
-                  else ()
-                )
-                fam;
-              Util.commit_patches conf base;
-              (* On met aussi à jour l'historique. *)
-              let fn = sou base (get_first_name p) in
-              let sn = sou base (get_surname p) in
-              let occ = get_occ p in
-              let ip = get_key_index p in
-              History.record conf base (fn, sn, occ, ip) "mp"; }
-            )
-            perl  }
-        else ())
-    list;
-    if nb_pers_mod <> 0 then do {
-      let title _ = 
-        Wserver.wprint "%s" (capitale (transl conf "place modified")) 
-      in
-      Hutil.header conf title;
-      print_link_to_welcome conf True;
+  let max_updates = 10000 in
+  update_person_list conf base new_place list nb_pers max_updates;
+  if nb_pers <> 0 then do {
+    let title _ = 
+      Wserver.wprint "%s" (capitale (transl conf "place modified")) 
+    in
+    Hutil.header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint 
+      (fcapitale (ftransl conf "the modification impacted %d persons")) 
+      (min nb_pers max_updates);
+    if nb_pers > max_updates then do {
+      Wserver.wprint "<p>" ;
       Wserver.wprint 
-        (fcapitale (ftransl conf "the modification impacted %d persons")) 
-        nb_pers_mod;
-      Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
-        (commd conf) (capitale (transl conf "new modification")) ;
-      Hutil.trailer conf }
-    else do {
-      let title _ = 
-        Wserver.wprint "%s" (capitale (transl conf "no modification"))
-      in
-      Hutil.header conf title;
-      print_link_to_welcome conf True;
-      Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
-        (commd conf) (capitale (transl conf "new modification")) ;
-      Hutil.trailer conf 
-    }
+        "<form method=\"post\" action=\"%s\">\n" conf.command;
+      Util.hidden_env conf;
+      List.iter
+        (fun (s,i) -> 
+          Wserver.wprint 
+            "<input type=\"hidden\" name=\"%s\" value=\"%d\"/>" s i )
+         env_keys ;
+      Wserver.wprint 
+        "<input type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"/>" ;
+      Wserver.wprint 
+        "<input type=\"hidden\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\" />" 
+        (quote_escaped (no_html_tags (only_printable new_place))) ;
+      Wserver.wprint 
+        "%s ? </a></p>" (capitale (transl conf "continue merging")) ;
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\" />" ; 
+      Wserver.wprint "</form>\n";
+      }
+    else ();
+    Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
+      (commd conf) (capitale (transl conf "new modification")) ;
+    Hutil.trailer conf }
+  else do {
+    let title _ = 
+      Wserver.wprint "%s" (capitale (transl conf "no modification"))
+    in
+    Hutil.header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
+      (commd conf) (capitale (transl conf "new modification")) ;
+    Hutil.trailer conf 
+  }
 };
 
 
