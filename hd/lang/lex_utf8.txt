@@ -9905,15 +9905,26 @@ no: sted er endret
 sv: plats ändrad
 
     no modification
+de: keine Ortsänderung vermerkt
+en: no changes
+se: ninguna modificación
 fr: aucune modification
 
     the modification impacted %d persons
-en: the modification impacted %d persons
+de: die Änderungen sind abgeschlossen : % der Datei (en) kopiert
+en: successfully updated: %d places have been changed
+es: la modificación ha sido hecha: %d ficha(s) corregida(s)
 fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
 
     help places
-fr: Cliquez sur "[modifier]" pour corriger un lieu : l'ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées.<br />Merci de bien respecter la norme de saisie suivante : [Lieu-dit] - Ville, Code ville (facultatif), Sous-Région/Département, Région (facultatif), Pays.
+de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit Ihrer Dateien die diesen Standort betreffen werden sofort korrigiert werden
+en: Click "[Edit]" to edit a place: the place names will be automatically updated in your entire family tree
+es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
+fr: Cliquez sur "[modifier]" pour corriger un lieu : l'ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
 
     new modification
+de: möchten Sie eine weitere Änderung durchführen
+en: continue edit
+es: ¿Quiere hacer una nueva corrección?
 fr: souhaitez-vous effectuer une nouvelle correction
 
