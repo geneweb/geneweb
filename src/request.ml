@@ -830,7 +830,7 @@ value this_request_updates_database conf =
         "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" |
         "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" |
         "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" |
-        "SND_IMAGE_OK" -> True
+        "MOD_P_OK" | "SND_IMAGE_OK" -> True
       | _ -> False ]
   | _ -> False ]
 ;
