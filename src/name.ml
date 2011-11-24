@@ -4,7 +4,7 @@
 value utf_8_db = ref True;
 
 (* La liste des caractères interdits *)
-value forbidden_char = [':'; '@'; '#'; '='; '$'; '°'] ;
+value forbidden_char = [':'; '@'; '#'; '='; '$'] ;
 
 (* Name.lower *)
 
