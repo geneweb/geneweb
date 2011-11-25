@@ -991,13 +991,6 @@ value print_mod_ok conf base = do {
         [ "bi"; "bp"; "de"; "bu"; "ma" ] 
     in List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list.val
   in
-(*
-  let env_keys =
-    List.fold_left
-      (fun accu (k, i) -> accu ^ k ^ "=" ^ (string_of_int i) ^ ";")
-      "" env_keys
-  in
-*)
   let new_place = 
     match p_getenv conf.env "place" with 
     [ Some s -> (no_html_tags (only_printable s))
