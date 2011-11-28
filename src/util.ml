@@ -2751,3 +2751,25 @@ value wprint_in_columns conf order wprint_elem list =
   in
   print_in_columns conf len_list list wprint_elem
 ;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] reduce_list : int -> list 'a -> list 'a                        *)
+(** [Description] : Retourne la sous liste de taille size composée des
+                    éléments 0 à (size - 1)
+    [Args] :
+      - size : la taille de la nouvelle liste
+      - list : la liste originiale
+    [Retour] :
+      - list : la nouvelle liste de taille size
+    [Rem] : Exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value reduce_list size list =
+  let rec loop size cnt reduced_list list = 
+    if cnt >= size then reduced_list 
+    else
+      match list with
+       [ [] -> reduced_list
+       | [x :: l] -> loop size (cnt + 1) [x :: reduced_list] l ]
+  in loop size 0 [] list
+;

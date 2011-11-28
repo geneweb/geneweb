@@ -648,8 +648,11 @@ value print_place conf base list len =
   let list =
     List.map
       (fun (s, k) -> 
-        let ini = String.sub s 0 (index_of_next_char s (String.length ini)) in
-        (ini, s, k))
+        let ini = 
+          if String.length s > String.length ini then
+            String.sub s 0 (index_of_next_char s (String.length ini))
+          else ini
+        in (ini, s, k))
       list
   in
   (* Re-combine la liste en fonction des premières *)
@@ -761,7 +764,10 @@ value print_short conf base list len =
   (* caractère soit codé sur plusieurs octets.         *)
   let list =
     List.map
-      (fun (s, _) -> String.sub s 0 (index_of_next_char s (String.length ini)))
+      (fun (s, _) -> 
+        if String.length s > String.length ini then
+          String.sub s 0 (index_of_next_char s (String.length ini))
+        else s)
       list
   in
   (* Fonction pour supprimer les doublons. *)
@@ -842,49 +848,29 @@ value print_mod conf base =
 ;
 
 
-(* ********************************************************************** *)
-(*  [Fonc] reduce_sub_list : config -> base -> string -> list -> unit     *)
-(** [Description] : 
+(* ************************************************************************** *)
+(*  [Fonc] reduce_cpl_list : int -> ('a, 'b list) list -> ('a, 'b list) list  *)
+(** [Description] : Retourne la sous liste telle que la somme des longueurs
+                    des ('b list) soit égale à size.
     [Args] :
-      - conf : configuration
-      - base : base
+      - size : la taille de la liste retournée
+      - list : la liste originale
     [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                       *)
-(* ********************************************************************** *)
-value reduce_sub_list size list =
-  let rec aux size cnt reduced_list list = 
-    if cnt > size then reduced_list 
+      - list : la nouvelle liste dont la somme des ('b list) est égale à size
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value reduce_cpl_list size list =
+  let rec loop size cnt reduced_list list =
+    if cnt >= size then reduced_list 
     else
       match list with
-       [ [] -> reduced_list
-       | [x :: l] -> aux size (cnt+1) [x::reduced_list] l ]
-  in aux size 0 [] list
-;
-
-
-(* ********************************************************************** *)
-(*  [Fonc] reduce_list : config -> base -> string -> list -> unit         *)
-(** [Description] : 
-    [Args] :
-      - conf : configuration
-      - base : base
-    [Retour] :
-      - unit
-    [Rem] : Non exporté en clair hors de ce module.                       *)
-(* ********************************************************************** *)
-value reduce_list size list =
-  let rec aux size cnt redu list =
-    if cnt > size then redu 
-    else
-      match list with
-       [ [] -> redu 
+       [ [] -> reduced_list 
        | [(a, sl) :: l] ->
-           if List.length sl > (size-cnt) then
-             [(a, reduce_sub_list (size-cnt) sl) :: redu]
+           if List.length sl >= (size - cnt) then
+             [(a, Util.reduce_list (size - cnt) sl) :: reduced_list]
            else
-             aux size (cnt+List.length sl) [(a,sl)::redu] l ]
-  in aux size 0 [] list
+             loop size (cnt + List.length sl) [(a,sl) :: reduced_list] l ]
+  in loop size 0 [] list
 ;
 
 
@@ -901,7 +887,7 @@ value reduce_list size list =
 value update_person_list conf base new_place list nb_pers max_updates = do {
   let list = 
     if nb_pers > max_updates then
-      reduce_list max_updates list 
+      reduce_cpl_list max_updates list 
     else list
   in
   List.iter
