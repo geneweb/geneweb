@@ -16,10 +16,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
 %base_header;
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %message_to_wizard;
 
 
@@ -36,7 +36,7 @@
   </td></tr></table>
 %end;
 
-<h1 style="text-align:center" class="highlight">
+<h1>
 %if;(is_male or is_female or
      bvar.show_invisible = "on" and wizard and is_invisible)
   %if;is_male;
@@ -117,7 +117,7 @@
   <table border="%border;" width="90%%">
   <tr><td>
    <a href="%image_html_url;"><img
-    src="%image_url;"%image_size; style="border:0"
+    src="%image_url;"%image_size;
     alt="[image/images]0" title="[image/images]0"%/></a></td>
 %end;
 %if;(has_occupation or has_birth_date or has_birth_place or
@@ -172,16 +172,17 @@
       <li>[*consanguinity]: %consanguinity;</li>%nl;
     %end;
   </ul>
+  %if;has_image;</td>%end;
 %end;
 %if;has_image;
-  </td></tr></table>
+  </tr></table>
 %end;
 
 %if;has_parents;
   <h3 class="highlight">[*parents]</h3>
   <ul>
   %foreach;parent;
-    <li style="list-style-type:%if;parent.has_parents;disc%else;circle%end;">
+    <li class="%if;parent.has_parents;goway%else;noway%end;">
     %if;(cancel_links or parent.is_restricted)%parent;
     %else;<a href="%prefix;%parent.access;">%parent;</a>%end;
     %parent.title;%parent.dates;</li>%nl;
@@ -215,7 +216,7 @@
   <h3 class="highlight">[*marriage/marriages]1 [and::child/children]1</h3>
   <ul>
   %foreach;family;
-    <li style="list-style-type:%if;spouse.has_parents;disc%else;circle%end;">
+    <li class="%if;spouse.has_parents;goway%else;noway%end;">
     %apply;married_to%with;
       %if;(marriage_place = "")
         %if;(on_marriage_date = "")
@@ -244,8 +245,7 @@
       , [having as children]0
       <ul>
         %foreach;child;
-          <li style="list-style-type:%if;child.has_families;disc%else;
-           circle%end;">
+          <li class="%if;child.has_families;goway%else;noway%end;">
           %if;(cancel_links or child.is_restricted)%child.child_name;
           %else;
             <a href="%prefix;%child.access;">%child.child_name;</a>%nn;
@@ -268,13 +268,11 @@
       %if;(has_relation_him and has_relation_her)
         %nl;
         <ul>
-        <li style="list-style-type:%if;relation_him.has_families;disc%else;
-         circle%end;">
+        <li class="%if;relation_him.has_families;goway%else;noway%end;">
         %if;(cancel_links or relation_him.is_restricted)%relation_him;
         %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
         %relation_him.title;%relation_him.dates;</li>%nl;
-        <li style="list-style-type:%if;relation_her.has_families;disc%else;
-         circle%end;">
+        <li class="%if;relation_her.has_families;goway%else;noway%end;">
         %if;(cancel_links or relation_her.is_restricted)%relation_her;
         %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
         %relation_her.title;%relation_her.dates;</li>%nl;
@@ -291,14 +289,14 @@
       </li>
     %end;
     %foreach;related;
-      <li style="list-style-type:%if;related.has_families;disc%else;
-       circle%end;">%apply;capitalize(related_type):
+      <li class="%if;related.has_families;goway%else;
+       noway%end;">%apply;capitalize(related_type):
       %if;cancel_links;%related;
       %else;<a href="%prefix;%related.access">%related;</a>%end;
       %related.title;%related.dates;</li>%nl;
     %end;
     %foreach;witness_relation;
-      <li style="list-style-type:disc">%nn;
+      <li class="noway">%nn;
         %apply;witness_relation%with;
           %if;cancel_links;%witness_relation.father;
           %else<a href="%prefix;%witness_relation.father.access;
@@ -410,6 +408,5 @@
 
 %base_trailer;
 %copyright;
-
 </body>
 </html>

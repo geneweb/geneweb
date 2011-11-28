@@ -354,8 +354,8 @@ and eval_create c =
 and add_precision s p =
   match p with
   [ Maybe -> "?" ^ s
-  | Before -> "<" ^ s
-  | After -> ">" ^ s
+  | Before -> "&lt;" ^ s
+  | After -> "&gt;" ^ s
   | About -> "/" ^ s ^ "/"
   | _ -> s ]
 and eval_relation_kind =

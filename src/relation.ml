@@ -506,9 +506,9 @@ value print_shortest_path conf base p1 p2 =
         do {
           header_no_page_title conf title;
           if excl_faml = [] then do {
-            Wserver.wprint "<center><h1><font color=\"%s\">" conf.highlight;
+            Wserver.wprint "<h1>";
             title False;
-            Wserver.wprint "</font></h1></center>\n";
+            Wserver.wprint "</h1>\n";
             Hutil.print_link_to_welcome conf True;
             Wserver.wprint "%s\n"
               (capitale
@@ -517,8 +517,8 @@ value print_shortest_path conf base p1 p2 =
           }
           else do {
             Wserver.wprint "<ul>\n";
-            Wserver.wprint "<li>%s\n" s1;
-            Wserver.wprint "<li>%s\n" s2;
+            Wserver.wprint "<li>%s</li>\n" s1;
+            Wserver.wprint "<li>%s</li>\n" s2;
             Wserver.wprint "</ul>\n"
           };
           trailer conf
@@ -885,8 +885,7 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   tag "ul" begin
     List.iter
       (fun (a, n) ->
-         do {
-           html_li conf;
+         stag "li" begin
            Wserver.wprint "<em>%s %s"
              (if n < 0 then "***" else string_of_big_int conf n)
              (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
@@ -916,8 +915,7 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            }
            else ();
            Wserver.wprint ".</em>\n";
-           ()
-         })
+         end)
       list;
   end
 ;
@@ -1138,9 +1136,8 @@ value print_propose_upto conf base p1 p2 rl =
           (fun (_, _, (x1, x2, _), _) maxlen -> max maxlen (max x1 x2)) rl 0
       in
       let (p, a) = if x1 = 0 then (p2, p1) else (p1, p2) in
-      do {
-        html_p conf;
-        Wserver.wprint "<span style=\"font-size:80%%\">";
+      tag "p" begin
+        Wserver.wprint "<span class=\"smaller\">";
         Wserver.wprint "%s"
           (capitale
              (translate_eval
@@ -1152,8 +1149,8 @@ value print_propose_upto conf base p1 p2 rl =
         Wserver.wprint "<a href=\"%sm=A;t=D;%s;%s;l=%d\">" (commd conf)
           (acces conf base p) (acces_n conf base "1" a) maxlen;
         Wserver.wprint "%s</a>" (transl conf "here");
-        Wserver.wprint ".</em></span>\n"
-      }
+        Wserver.wprint ".</em></span>\n";
+      end
   | _ -> () ]
 ;
 

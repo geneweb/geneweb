@@ -1,31 +1,18 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="robots" content="none">
-  <!--meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"-->
   <title>Access refused</title>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%o/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"%/>
 </head>
 <body>
 <h1>Access refused</h1>
 
-This address has been considered to be a robot and its access has
-been automatically disconnected.
-<p>
-Contact the site administrator to restore it.
+<p>This address has been considered to be a robot and its access has
+been automatically disconnected.</p>
+<p>Contact the site administrator to restore it.</p>
 
-<br />
-<div id="footer">
-  <hr />
-  <div>
-    <em>
-      <a href="http://opensource.geneanet.org/projects/geneweb/"><img src="images/logo_bas.png"
-      align="center" style="border: 0"></a>
-      Version %v
-      Copyright &copy; 1998-2011
-    </em><br%/>
-  </div>
-</div>
-
+%copyright_nologo;
 </body>
+</html>

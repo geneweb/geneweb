@@ -22,13 +22,13 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
 %base_header;
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %message_to_wizard;
 
-<h1 style="text-align:center" class="highlight">%nn;
+<h1>%nn;
   %apply;a_of_b%with;
     %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
   %and;
@@ -45,11 +45,11 @@
     %if;(referer != "")
       <a href="%referer;"><img
        src="%image_prefix;/left.png"%wid_hei;left.png; 
-       style="border: 0" alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.png"%wid_hei;up.png; 
-    style="border: 0" alt="^^" title="^^"%/></a>
+    alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
 
@@ -548,7 +548,7 @@
     %foreach;ancestor;
       %lazy_force;
       %if;(ancestor.same = "")%incr_count;%end;
-      <li%if;ancestor.has_parents; style="list-style-type:disc"%end;>%nn;
+      <li class="%if;ancestor.has_parents;goway%else;noway%end;">%nn;
       %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;
       %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;
       %else;%ancestor.anc_sosa;%end;%sp;
@@ -820,9 +820,7 @@
   </ul>
 %end;
 
-
 %base_trailer;
 %copyright;
-
 </body>
 </html>

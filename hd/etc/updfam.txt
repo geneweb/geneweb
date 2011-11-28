@@ -7,7 +7,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -19,9 +18,10 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
+%include.css;
 %base_header;
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %message_to_wizard;
 
 <script type="text/javascript">
@@ -325,7 +325,7 @@ function changeCalendar(e,v,m,c) {
   </table>
 %end;
 
-<h1 style="text-align:center" class="highlight">%nn;
+<h1>%nn;
 %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
   [*add::family/families]0
 %elseif;(evar_m = "ADD_PAR")
@@ -610,9 +610,7 @@ function changeCalendar(e,v,m,c) {
 </p>
 </form>
 
-
 %base_trailer;
 %copyright;
-
 </body>
 </html>

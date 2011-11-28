@@ -26,17 +26,17 @@ type excl =
     max_conn : mutable (int * string) }
 ;
 
-value robot_error cgi from cnt sec =
+value robot_error conf from cnt sec =
   do {
-    if not cgi then Wserver.http "403 Forbidden" else ();
+    if not conf.cgi then Wserver.http "403 Forbidden" else ();
     Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
     Util.nl ();
     Util.nl ();
     let env =
-      [('c', fun _ -> string_of_int cnt); ('s', fun _ -> string_of_int sec)]
+      [("cnt", string_of_int cnt) ; ("sec", string_of_int sec)]
     in
     match open_etc_file "robot" with
-    [ Some ic -> copy_from_etc env "en" "geneweb" ic
+    [ Some ic -> Templ.copy_from_templ conf env ic
     | None ->
         let title _ = Wserver.wprint "Access refused" in
         do {
@@ -219,7 +219,7 @@ value check oc tm from max_call sec conf suicide =
     with
     [ Some oc -> do { output_excl oc xcl; close_out oc; }
     | None -> () ];
-    if refused then robot_error conf.cgi from max_call sec else ();
+    if refused then robot_error conf from max_call sec else ();
     W.fold
       (fun _ w (c, cw, cf, wl) ->
          if w.nbase = conf.bname && w.nbase <> "" then

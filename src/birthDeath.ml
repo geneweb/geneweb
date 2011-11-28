@@ -661,7 +661,7 @@ value print_population_pyramid conf base = do {
         let nb_men = men.(i) in
         let nb_wom = wom.(i) in
         tag "tr" begin
-          stagn "td" "style=\"font-style:italic\"" begin
+          stagn "td" "class=\"pyramid_year\"" begin
             Wserver.wprint "%d" (at_year - i * interval);
           end;
           stagn "td" begin Wserver.wprint "&nbsp;"; end;
@@ -670,7 +670,7 @@ value print_population_pyramid conf base = do {
           tag "td" "align=\"right\"" begin
             tag "table" "%s" c begin
               tag "tr" begin
-                stagn "td" "style=\"font-style: italic\""
+                stagn "td" "class=\"pyramid_nb\""
                 begin
                   if nb_men <> 0 then Wserver.wprint "%d" nb_men else ();
                   Wserver.wprint "&nbsp;";
@@ -705,7 +705,7 @@ value print_population_pyramid conf base = do {
                       ("<img src=\"images/pyr_female.png\" width=%d height=%d />")
                       (n * 3) 14;
                 end;
-                stagn "td" 
+                stagn "td" "class=\"pyramid_nb\""
                 begin
                   Wserver.wprint "&nbsp;";
                   if nb_wom <> 0 then Wserver.wprint "%d" nb_wom else ();
@@ -716,7 +716,7 @@ value print_population_pyramid conf base = do {
           stagn "td" begin Wserver.wprint "&nbsp;"; end;
           print_image (i = 0) 1 "female.png";
           stagn "td" begin Wserver.wprint "&nbsp;"; end;
-          stagn "td" "style=\"font-style:italic\"" begin
+          stagn "td" "class=\"pyramid_year\"" begin
             Wserver.wprint "%d" (at_year - i * interval);
           end;
         end;

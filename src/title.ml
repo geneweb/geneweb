@@ -592,10 +592,11 @@ value print_all_places conf base = do {
     string_list_uniq (List.sort compare_places l)
   in
   header conf title;
-  Wserver.wprint "<ul>\n";
-  List.iter
-    (fun t -> do { html_li conf; give_access_all_places conf t; () }) list;
-  Wserver.wprint "</ul>\n";
+  tag "ul" begin
+    List.iter (fun t -> do {
+      stagn "li" begin give_access_all_places conf t; end;
+    }) list;
+  end;
   trailer conf;
 };
 
