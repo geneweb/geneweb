@@ -465,18 +465,22 @@ value print_all_places_surnames_short conf list =
   do {
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    stag "a" "href=\"%sm=PS%s;k=\"" (commd conf) opt begin
-      Wserver.wprint "%s" (transl conf "long display");
+    tag "p" begin
+      stag "a" "href=\"%sm=PS%s;k=\"" (commd conf) opt begin
+        Wserver.wprint "%s" (transl conf "long display");
+      end;
     end;
-    Wserver.wprint "\n<p>\n";
-    List.iter
-      (fun (s, len, ip) ->
-         do {
-           Wserver.wprint "<a href=\"%sm=PS%s;k=%s\">" (commd conf) opt
-             (Util.code_varenv s);
-           Wserver.wprint "%s</a> (%d),\n" s len;
-         })
-      list;
+    tag "p" begin
+      List.iter
+        (fun (s, len, ip) -> do {
+          stag "a" "href=\"%sm=PS%s;k=%s\"" 
+            (commd conf) opt (Util.code_varenv s) 
+          begin
+            Wserver.wprint "%s" s;
+          end;
+          Wserver.wprint " (%d),\n" len; } )
+        list;
+    end;
     Hutil.trailer conf
   }
 ;
@@ -664,7 +668,9 @@ value print_place conf base list len =
     let title _ = print_title conf base ini len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<p>%s</p>" (capitale (transl conf "help places")) ;
+    tag "p" begin
+      Wserver.wprint "%s" (capitale (transl conf "help places")) ;
+    end;
     (* Ancre en haut de page afin de naviguer plus facilement. *)
     tag "p" begin
       List.iter
@@ -674,65 +680,61 @@ value print_place conf base list len =
            end)
       list;
     end;
-    Wserver.wprint 
-      "<form method=\"post\" action=\"%s\">\n" conf.command;
-    tag "ul" begin
-      List.iter 
-        (fun (ini_k, list) -> do {
-          tag "li" begin
-            stagn "a" "id=\"%s\"" ini_k begin
-              Wserver.wprint "%s" ini_k;
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+      tag "ul" begin
+        List.iter 
+          (fun (ini_k, list) -> do {
+            tag "li" begin
+              stagn "a" "id=\"%s\"" ini_k begin
+                Wserver.wprint "%s" ini_k;
             end;
-            Wserver.wprint "<table>\n" ;
-            List.iter
-              (fun (s, k) -> 
-                do {
+            tag "table" begin
+              List.iter
+                (fun (s, k) -> do {
                   let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
-                  Wserver.wprint "<tr>"; 
-                  if k <> env_keys then
-                    do { 
-                      Wserver.wprint "<td>%s</td>" s; 
+                  tag "tr" begin
+                    if k <> env_keys then do { 
+                      tag "td" begin
+                        Wserver.wprint "%s" s;
+                      end;
                       let k =
                         List.fold_left 
                           (fun accu (k, i) -> 
                             accu ^ k ^ "=" ^ (string_of_int i) ^ ";")
                           "" k
                       in
-                      Wserver.wprint 
-                        "<td><a style=\"font-size:80%%\" href=\"%sm=MOD_P;%s;s=%s#mod\">(%s)</a></td>"
-                        (commd conf) k (code_varenv ini)
-                        (capitale (Util.transl_decline conf "modify" ""));
-                    } 
-                  else 
-                    do { 
-                      Wserver.wprint "<td><a name=\"mod\">&nbsp;</a>"; 
-                      (* envoie les données de façon masquée *)
-                      Util.hidden_env conf; 
-                      List.iter
-                        (fun (s,i) -> 
-                          Wserver.wprint 
-                            "<input type=\"hidden\" name=\"%s\" value=\"%d\"/>" s i
-                        )
-                        env_keys
-                      ;
-                      Wserver.wprint 
-                        "<input type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"/>" ;
-                      Wserver.wprint 
-                        "<input type=\"text\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\" /></td>" 
-                        (quote_escaped (no_html_tags (only_printable s))); 
-                      Wserver.wprint "<td><input type=\"submit\" value=\"Ok\" /></td>" ; 
-                    };
-                  Wserver.wprint "</tr>\n"; 
-                }
-              )
-              list;
-            Wserver.wprint "</table>\n";
-            Wserver.wprint "<br />\n";
-          end; }
-        ) 
-        list;
+                      tag "td" begin
+                        stag "a" "style=\"font-size:80%%\" href=\"%sm=MOD_P;%s;s=%s#mod\""
+                          (commd conf) k (code_varenv ini)
+                        begin
+                          Wserver.wprint "%s" 
+                            (capitale (Util.transl_decline conf "modify" ""));
+                        end;
+                      end; } 
+                    else do { 
+                      tag "td" begin
+                        Wserver.wprint "<a name=\"mod\">&nbsp;</a>";
+                        (* envoie les données de façon masquée *)
+                        Util.hidden_env conf; 
+                        List.iter
+                          (fun (s,i) -> 
+                            xtag "input" "type=\"hidden\" name=\"%s\" value=\"%d\"" s i )
+                          env_keys ;
+                        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"" ;
+                        xtag "input" "type=\"text\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\"" 
+                          (quote_escaped (no_html_tags (only_printable s))) ;
+                        tag "td" begin
+                          xtag "input" "type=\"submit\" value=\"Ok\"" ;
+                        end;
+                      end; };
+                  end; } )
+                list;
+              end; 
+              xtag "br"; 
+            end; } ) 
+          list;
+      end;
     end;
-    Wserver.wprint "</form>\n";
     Hutil.trailer conf ;
   }
 ;
@@ -782,12 +784,14 @@ value print_short conf base list len =
     let title _ = print_title conf base ini len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    List.iter
-      (fun s ->
-        Wserver.wprint "<a href=\"%sm=MOD_P;s=%s\">%s</a> " 
-          (commd conf) (code_varenv s) s
-      )
-      list;
+    tag "p" begin
+      List.iter
+        (fun s ->
+          stagn "a" "href=\"%sm=MOD_P;s=%s\"" (commd conf) (code_varenv s) begin
+            Wserver.wprint "%s" s;
+          end)
+        list;
+    end;
     Hutil.trailer conf 
   }
 ;
@@ -833,8 +837,7 @@ value print_mod conf base =
       (fun (place, k) acc -> 
         if Mutil.start_with ini place then
           [ (place, k) :: acc ]
-        else acc
-      )
+        else acc )
       l []
   in
   let list = 
@@ -875,7 +878,7 @@ value reduce_cpl_list size list =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] update_partial_list : config -> base -> string -> list -> unit *)
+(*  [Fonc] update_person_list : config -> base -> string -> list -> unit  *)
 (** [Description] : 
     [Args] :
       - conf : configuration
@@ -997,32 +1000,34 @@ value print_mod_ok conf base = do {
     in
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint 
-      (fcapitale (ftransl conf "the modification impacted %d persons")) 
-      (min nb_pers max_updates);
+    tag "p" begin
+      Wserver.wprint 
+        (fcapitale (ftransl conf "the modification impacted %d persons")) 
+        (min nb_pers max_updates);
+    end;
     if nb_pers > max_updates then do {
-      Wserver.wprint "<p>" ;
-      Wserver.wprint 
-        "<form method=\"post\" action=\"%s\">\n" conf.command;
-      Util.hidden_env conf;
-      List.iter
-        (fun (s,i) -> 
+      tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+        tag "p" begin
+          Util.hidden_env conf;
+          List.iter
+            (fun (s,i) -> 
+              xtag "input" "type=\"hidden\" name=\"%s\" value=\"%d\"" s i)
+             env_keys ;
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"" ;
+          xtag "input" "type=\"hidden\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\"" 
+            (quote_escaped (no_html_tags (only_printable new_place)));
           Wserver.wprint 
-            "<input type=\"hidden\" name=\"%s\" value=\"%d\"/>" s i )
-         env_keys ;
-      Wserver.wprint 
-        "<input type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"/>" ;
-      Wserver.wprint 
-        "<input type=\"hidden\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\" />" 
-        (quote_escaped (no_html_tags (only_printable new_place))) ;
-      Wserver.wprint 
-        "%s ? </a></p>" (capitale (transl conf "continue merging")) ;
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\" />" ; 
-      Wserver.wprint "</form>\n";
+            "%s ?" (capitale (transl conf "continue merging")) ;
+          xtag "input" "type=\"submit\" value=\"Ok\"" ;
+        end;
+      end
       }
     else ();
-    Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
-      (commd conf) (capitale (transl conf "new modification")) ;
+    tag "p" begin
+      stag "a" "href=\"%sm=MOD_P\"" (commd conf) begin
+        Wserver.wprint "%s ?" (capitale (transl conf "new modification"));
+      end;
+    end;
     Hutil.trailer conf }
   else do {
     let title _ = 
@@ -1030,8 +1035,11 @@ value print_mod_ok conf base = do {
     in
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<p><a href=\"%sm=MOD_P\">%s ?</a></p>" 
-      (commd conf) (capitale (transl conf "new modification")) ;
+    tag "p" begin
+      stag "a" "href=\"%sm=MOD_P\"" (commd conf) begin
+        Wserver.wprint "%s ?" (capitale (transl conf "new modification"));
+      end;
+    end;
     Hutil.trailer conf 
   }
 };
