@@ -196,13 +196,12 @@ value advanced_search conf base max_answers =
 ;
 
 value print_result conf base max_answers (list, len) =
-  if len > max_answers then do {
-    Wserver.wprint (fcapitale (ftransl conf "more than %d answers"))
-      max_answers;
-    Wserver.wprint "\n";
-    html_p conf;
-  }
-  else if len = 0 then
+  let list =
+    if len > max_answers then
+      Util.reduce_list max_answers list
+    else list
+  in
+  if len = 0 then
     Wserver.wprint "%s\n" (capitale (transl conf "no match"))
   else
     tag "ul" begin
