@@ -769,7 +769,7 @@ value print_short conf base list len =
       (fun (s, _) -> 
         if String.length s > String.length ini then
           String.sub s 0 (index_of_next_char s (String.length ini))
-        else s)
+        else s ^ String.make (String.length ini + 1 - String.length s) '_')
       list
   in
   (* Fonction pour supprimer les doublons. *)
@@ -777,9 +777,9 @@ value print_short conf base list len =
     StringSet.elements 
       (List.fold_right StringSet.add list StringSet.empty)
   in
-  let list = remove_dup list in
   (* Astuce pour gérer les espaces. *)
   let list = List.map (fun p -> Mutil.tr ' ' '_' p) list in
+  let list = remove_dup list in
   do {
     let title _ = print_title conf base ini len in
     Hutil.header conf title;
@@ -835,7 +835,8 @@ value print_mod conf base =
     (* fold_right pour conserver le tri précédent. *)
     List.fold_right
       (fun (place, k) acc -> 
-        if Mutil.start_with ini place then
+        let place_tmp =  Mutil.tr '_' ' ' place in
+        if Mutil.start_with ini place_tmp || (place_tmp ^ " " = ini) then
           [ (place, k) :: acc ]
         else acc )
       l []
