@@ -50,15 +50,14 @@ value print_same_name conf base p =
   match Gutil.find_same_name base p with
   [ [_] -> ()
   | pl ->
-      do {
-        let pl = restrict_to_small_list pl in
-        html_p conf;
+      let pl = restrict_to_small_list pl in
+      tag "p" begin
         Wserver.wprint "%s:\n"
           (capitale (transl conf "persons having the same name"));
         tag "ul" begin
           List.iter
-            (fun p -> do {
-               html_li conf;
+            (fun p ->
+             stag "li" begin
                match p with
                [ Some p -> do {
                    stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
@@ -68,11 +67,11 @@ value print_same_name conf base p =
                    end;
                    Wserver.wprint "%s\n" (Date.short_dates_text conf base p)
                  }
-               | None -> Wserver.wprint "...\n" ]
-             })
+               | None -> Wserver.wprint "...\n" ];
+             end)
             pl;
-        end
-      } ]
+        end;
+      end ]
 ;
 
 value print_return conf =
@@ -257,15 +256,16 @@ value print_warning conf base =
           (fun _ ->
              print_someone_strong conf base (poi base (get_mother cpl)));
         Wserver.wprint ":\n";
-        Wserver.wprint "<ul>\n";
-        html_li conf;
-        print_first_name_strong conf base elder;
-        Wserver.wprint "%s" (Date.short_dates_text conf base elder);
-        Wserver.wprint "\n";
-        html_li conf;
-        print_first_name_strong conf base x;
-        Wserver.wprint "%s" (Date.short_dates_text conf base x);
-        Wserver.wprint "</ul>"
+        tag "ul" begin
+          stag "li" begin
+            print_first_name_strong conf base elder;
+            Wserver.wprint "%s" (Date.short_dates_text conf base elder);
+          end;
+          stag "li" begin
+            print_first_name_strong conf base x;
+            Wserver.wprint "%s" (Date.short_dates_text conf base x);
+          end;
+        end;
       }
   | DeadTooEarlyToBeFather father child ->
       Wserver.wprint
@@ -346,7 +346,6 @@ value print_warning conf base =
 value print_warnings conf base wl =
   if wl = [] then ()
   else do {
-    html_p conf;
     Wserver.wprint "%s\n" (capitale (transl conf "warnings"));
     tag "ul" begin
       List.iter
@@ -430,11 +429,13 @@ value error_digest conf =
   do {
     rheader conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint
-      (fcapitale
-         (ftransl conf "\
+    tag "p" begin
+      Wserver.wprint
+        (fcapitale
+           (ftransl conf "\
 the base has changed; do \"back\", \"reload\", and refill the form"));
-    Wserver.wprint ".\n";
+      Wserver.wprint ".\n";
+    end;
     trailer conf;
     raise ModErr
   }
@@ -609,11 +610,9 @@ value print_create_conflict conf base p var =
       (fun _ ->
          Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
       (fun _ -> "</a>.");
-    html_p conf;
     let free_n =
       find_free_occ base (p_first_name base p) (p_surname base p) 0
     in
-    html_p conf;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
@@ -623,22 +622,25 @@ value print_create_conflict conf base p var =
       xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
       xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
       tag "ul" begin
-        html_li conf;
-        Wserver.wprint "%s: %d. \n"
-          (capitale (transl conf "first free number")) free_n;
-        Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
-          (transl conf "create");
-        Wserver.wprint "%s." (transl conf " to try again with this number");
-        html_li conf;
-        Wserver.wprint "%s " (capitale (transl conf "or"));
-        Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
-          (transl conf "change it (the number) yourself");
-        html_li conf;
-        Wserver.wprint "%s " (capitale (transl conf "or"));
-        Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
-          (transl conf "use \"link\" instead of \"create\"");
+        stag "li" begin
+          Wserver.wprint "%s: %d. \n"
+            (capitale (transl conf "first free number")) free_n;
+          Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+            (transl conf "create");
+          Wserver.wprint "%s." (transl conf " to try again with this number");
+        end;
+        stag "li" begin
+          Wserver.wprint "%s " (capitale (transl conf "or"));
+          Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+          Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+            (transl conf "change it (the number) yourself");
+        end;
+        stag "li" begin
+          Wserver.wprint "%s " (capitale (transl conf "or"));
+          Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+          Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+            (transl conf "use \"link\" instead of \"create\"");
+        end;
       end;
       xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
         (capitale (transl conf "create"));

@@ -1003,12 +1003,11 @@ value image_prefix conf =
   else "images"
 ;
 
-(* Code mort. Géré par le css *)
+(* Code mort. Géré par le css
 value default_background conf =
   sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
 ;
 
-(* Code mort. Géré par le css *)
 value default_body_prop conf =
   let style =
     match p_getenv conf.env "size" with
@@ -1018,6 +1017,7 @@ value default_body_prop conf =
   let style = sprintf "%s%s" style (default_background conf) in
   " style=\"" ^ style ^ "\""
 ;
+   Code mort. Géré par le css *)
 
 value body_prop conf =
   try
@@ -1026,15 +1026,6 @@ value body_prop conf =
     | s -> " " ^ s ]
   with
   [ Not_found -> "" ]
-;
-
-value css_prop conf =
-  try
-    match List.assoc "css_prop" conf.base_env with
-    [ "" -> "default.css"
-    | s -> s ^ ".css" ]
-  with
-  [ Not_found -> "default.css" ]
 ;
 
 value get_server_string_aux cgi request =
@@ -2720,8 +2711,7 @@ value print_in_columns conf len_list list wprint_elem = do {
                      else if kind.val <> Elem then Wserver.wprint "</ul>\n"
                      else ();
                      if kind.val <> Elem then do {
-                       Wserver.wprint "<h3 style=\"border-bottom: \
-                         dotted 1px\">%s%s</h3>\n"
+                       Wserver.wprint "<h3 class=\"subtitle\">%s%s</h3>\n"
                          (if ord = "" then "..." else String.make 1 ord.[0])
                          (if kind.val = HeadElem then ""
                           else " (" ^ transl conf "continued" ^ ")");

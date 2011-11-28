@@ -717,7 +717,7 @@ value make_tree_hts conf base gv p =
     | _ ->
         match Util.p_getenv conf.env "color" with
         [ None | Some "" -> ""
-        | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
+        | Some x -> " class=\"" ^ x ^ "\"" ] ]
   in
   let rec nb_column n v u =
     if v = 0 then n + (max 1 (Array.length (get_family u)))

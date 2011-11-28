@@ -356,7 +356,7 @@ value print_html_places_surnames conf base list =
   in
   do {
     Wserver.wprint "<ul>\n";
-    let print_li_place x = Wserver.wprint "<li>%s\n" x in
+    let print_li_place x = Wserver.wprint "<li>%s</li>\n" x in
     let print_ul_li_place x =
       do {
         Wserver.wprint "<ul>\n";
@@ -422,7 +422,7 @@ value print_html_places_surnames conf base list =
                    Wserver.wprint "\">%s</a> (%d),\n" sn len
                  })
               snl;
-            Wserver.wprint "</ul>\n";
+            Wserver.wprint "</li></ul>\n";
             loop pl list
           }
       | [] -> List.iter (fun _ -> Wserver.wprint "</ul>\n") prev ]
@@ -468,7 +468,7 @@ value print_all_places_surnames_short conf list =
     stag "a" "href=\"%sm=PS%s;k=\"" (commd conf) opt begin
       Wserver.wprint "%s" (transl conf "long display");
     end;
-    Wserver.wprint "\n<p>\n";
+    xtag "p";
     List.iter
       (fun (s, len, ip) ->
          do {

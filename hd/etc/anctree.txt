@@ -16,10 +16,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
 %base_header;
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %message_to_wizard;
 
 %define;a_tree_line()
@@ -46,7 +46,7 @@
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
         <table style="border:%evar.bd;"><tr>
         <td align="center"%nn;
-         %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
+         %if;(evar.color != "") class="%evar.color;"%end;>%nn;
       %end;
       %if;(evar.cgl = "on")%cell.person;
       %else;
@@ -64,7 +64,7 @@
         %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
         <img%sp;
         src="%cell.person.image_url;"%cell.person.image_small_size;%sp;
-         border="0" alt="[image/images]0" title="[image/images]0"%/>%nn;
+         alt="[image/images]0" title="[image/images]0"%/>%nn;
         %if;(evar.cgl != "on")</a>%end;</td>%nl;
         </tr></table>
       %end;
@@ -124,10 +124,10 @@
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
     %if;(evar.image = "on" and xx.has_image)
-      <br />
+      <br%/>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img src="%xx.image_url;"%xx.image_small_size;%sp;
-      border="0" alt="[image/images]0" title="[image/images]0"%/>
+       alt="[image/images]0" title="[image/images]0"%/>
       %if;(evar.cgl != "on")</a>%end;
     %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;
@@ -139,10 +139,10 @@
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
     %if;(evar.image = "on" and xx.has_image)
-      <br />
+      <br%/>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img src="%xx.image_url;"%xx.image_small_size;%sp;
-      border="0" alt="[image/images]0" title="[image/images]0"%/>
+       alt="[image/images]0" title="[image/images]0"%/>
       %if;(evar.cgl != "on")</a>%end;
     %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;
@@ -180,9 +180,7 @@
   </tr></tr></table>
 %end;
 
-
 %base_trailer;
 %copyright;
-
 </body>
 </html>

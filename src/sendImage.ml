@@ -16,12 +16,15 @@ value incorrect_content_type conf base p s =
     rheader conf title;
     print_link_to_welcome conf True;
     tag "p" begin
-      Wserver.wprint "<font size=\"-1\"><em>";
+      Wserver.wprint "<em style=\"font-size:smaller\">";
       Wserver.wprint "Error: incorrect image content type: %s" s;
-      Wserver.wprint "</em></font>\n";
+      Wserver.wprint "</em>\n";
     end;
-    Wserver.wprint "<ul><li>%s</ul>\n"
-      (referenced_person_title_text conf base p);
+    tag "ul" begin
+      tag "li" begin
+        Wserver.wprint "%s" (referenced_person_title_text conf base p);
+      end;
+    end;
     trailer conf;
     raise Update.ModErr
   }
@@ -32,13 +35,17 @@ value error_too_big_image conf base p len max_len =
   do {
     rheader conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<p>\n<font size=\"-1\"><em>";
-    Wserver.wprint "Error: this image is too big: %d bytes<br>\n" len;
-    Wserver.wprint "Maximum authorized in this database: %d bytes<br>\n"
-      max_len;
-    Wserver.wprint "</em></font>\n<p>\n";
-    Wserver.wprint "<ul><li>%s</ul>\n"
-      (referenced_person_title_text conf base p);
+    Wserver.wprint "<p><em style=\"font-size:smaller\">";
+    Wserver.wprint "Error: this image is too big: %d bytes<br%s>\n" len
+      conf.xhs;
+    Wserver.wprint "Maximum authorized in this database: %d bytes<br%s>\n"
+      max_len conf.xhs;
+    Wserver.wprint "</em></p>\n";
+    tag "ul" begin
+      tag "li" begin
+        Wserver.wprint "%s" (referenced_person_title_text conf base p);
+      end;
+    end;
     trailer conf;
     raise Update.ModErr
   }
@@ -168,9 +175,9 @@ value print_sent conf base p =
   do {
     header conf title;
     tag "ul" begin
-      html_li conf;
-      Wserver.wprint "\n%s" (referenced_person_text conf base p);
-      Wserver.wprint "\n";
+      stag "li" begin
+        Wserver.wprint "%s" (referenced_person_text conf base p);
+      end;
     end;
     trailer conf
   }

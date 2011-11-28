@@ -1,39 +1,31 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="robots" content="none">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%o/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
   <title>Address changed</title>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+%include.css;
 </head>
 <body>
 <h1>Address changed</h1>
 
-The address of this service has changed.
-Please use now:
-<br>
-L'adresse du service a changé.
-Utiliser maintenant:
-<br>
-L'indirizzo di questo service è cambiato.
-Utilizzate:<p>
+<p>
+[
+en: The address of this service has changed.
+    Please use now:
+fr: L'adresse du service a changé.
+    Utiliser maintenant:
+it: L'indirizzo di questo service è cambiato.
+    Utilizzate:
+]
 <ul>
-<li>
-<a href="%l">%l</a>
+<li><a href="%link;">%link;</a></li>
 </ul>
+</p>
 
-<br />
-<div id="footer">
-  <hr />
-  <div>
-    <em>
-      <a href="http://opensource.geneanet.org/projects/geneweb/"><img src="images/logo_bas.png"
-      align="center" style="border: 0"></a>
-      Version %v
-      Copyright &copy; 1998-2011
-    </em><br%/>
-  </div>
-</div>
-
+%base_trailer;
+%copyright;
 </body>
+</html>

@@ -22,7 +22,6 @@ value default_lang = ref "fr";
 value setup_link = ref False;
 value choose_browser_lang = ref False;
 value images_dir = ref "";
-value css_dir = ref "";
 value log_file = ref "";
 value log_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
@@ -319,7 +318,7 @@ value read_base_env cgi bname =
 ;
 
 value print_renamed conf new_n =
-  let link () =
+  let link =
     let req = Util.get_request_string conf in
     let new_req =
       let len = String.length conf.bname in
@@ -335,20 +334,19 @@ value print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf ^ new_req
   in
   let env =
-    [('o', fun _ -> conf.bname); ('e', fun _ -> new_n); ('l', link)]
+    [("old", conf.bname) ; ("new", new_n) ; ("link", link)]
   in
   match Util.open_etc_file "renamed" with
   [ Some ic ->
       do {
         Util.html conf;
         Util.nl ();
-        Util.copy_from_etc env conf.lang conf.indep_command ic;
+        Templ.copy_from_templ conf env ic;
       }
   | None ->
       let title _ = Wserver.wprint "%s -&gt; %s" conf.bname new_n in
       do {
         Hutil.header conf title;
-        let link = link () in
         tag "ul" begin
           Util.html_li conf;
           tag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
@@ -376,7 +374,7 @@ value log_redirect conf from request req =
 value print_redirected conf from request new_addr =
   let req = Util.get_request_string conf in
   let link = "http://" ^ new_addr ^ req in
-  let env = [('l', fun _ -> link)] in
+  let env = [("link", link)] in
   do {
     log_redirect conf from request req;
     match Util.open_etc_file "redirect" with
@@ -384,7 +382,7 @@ value print_redirected conf from request new_addr =
         do {
           Util.html conf;
           Util.nl ();
-          Util.copy_from_etc env conf.lang conf.indep_command ic;
+          Templ.copy_from_templ conf env ic;
         }
     | None ->
         let title _ = Wserver.wprint "Address changed" in
@@ -419,11 +417,10 @@ value propose_base conf =
 value general_welcome conf =
   match Util.open_etc_file "index" with
   [ Some ic ->
-      let env = [('w', fun _ -> Hutil.link_to_referer conf)] in
       do {
         Util.html conf;
         Util.nl ();
-        Util.copy_from_etc env conf.lang conf.indep_command ic;
+        Templ.copy_from_templ conf [] ic;
       }
   | None -> propose_base conf ]
 ;
@@ -718,9 +715,9 @@ value print_request_failure cgi msg =
     Wserver.wprint "<head><title>Request failure</title></head>\n";
     Wserver.wprint "\
 <body bgcolor=\"white\">
-<h1 class=\"error\" align=\"center\">Request failure</h1>
-The request could not be completed.<p>\n";
-    Wserver.wprint "<em><font size=\"-1\">Internal message: %s</font></em>\n"
+<h1 style=\"text-align: center; color: red;\">Request failure</h1>
+<p>The request could not be completed.</p>\n";
+    Wserver.wprint "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
       msg;
     Wserver.wprint "</body>\n";
   }    
@@ -1426,10 +1423,10 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
         else ();
         match (cgi, auth_err, passwd_err) with
         [ (True, True, _) ->
-            if is_robot from then Robot.robot_error cgi from 0 0
+            if is_robot from then Robot.robot_error conf from 0 0
             else no_access conf
         | (_, True, _) ->
-            if is_robot from then Robot.robot_error cgi from 0 0
+            if is_robot from then Robot.robot_error conf from 0 0
             else
               let auth_type =
                 let x =
@@ -1440,7 +1437,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
               in
               refuse_auth conf from auth auth_type
         | (_, _, ({ar_ok = False} as ar)) ->
-            if is_robot from then Robot.robot_error cgi from 0 0
+            if is_robot from then Robot.robot_error conf from 0 0
             else do {
               let tm = Unix.time () in
               lock_wait Srcfile.adm_file "gwd.lck" with
@@ -1530,58 +1527,6 @@ value image_request cgi script_name env =
         let _ = Image.print_image_file cgi fname in
         True
       else False ]
-;
-
-value content_css cgi =
-  do {
-  if not cgi then Wserver.http "" else ();
-  Wserver.wprint "Content-type: text/css";
-  Util.nl ();
-  Util.nl ();
-  Wserver.wflush ();
-  }
-;
-
-value css_file_name str =
-  let fname1 =
-    List.fold_right Filename.concat [Secure.base_dir (); "css"] str
-  in
-  if Sys.file_exists fname1 then fname1
-  else search_in_lang_path (Filename.concat "css" str)
-;
-
-value print_css_file cgi fname =
-  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      let buf = String.create 1024 in
-      let len = in_channel_length ic in
-      do {
-        content_css cgi;
-        let rec loop len =
-          if len = 0 then ()
-          else do {
-            let olen = min (String.length buf) len in
-            really_input ic buf 0 olen;
-            Wserver.wprint "%s" (String.sub buf 0 olen);
-            loop (len - olen)
-          }
-        in
-        loop len;
-        close_in ic;
-      }
-  | None -> () ]
-;
-
-value css_request cgi script_name =
-  let s = script_name in
-  if Util.start_with s 0 "css/" then
-    let i = String.length "css/" in
-    let fname = String.sub s i (String.length s - i) in
-    let fname = Filename.basename fname in
-    let fname = css_file_name fname in
-    let _ = print_css_file cgi fname in
-    True
-  else False 
 ;
 
 value strip_quotes s =
@@ -1683,8 +1628,7 @@ value connection cgi (addr, request) script_name contents =
       else
         try
           let (contents, env) = build_env request contents in
-          if image_request cgi script_name env || css_request cgi script_name
-          then ()
+          if image_request cgi script_name env then ()
           else
             conf_and_connection cgi from (addr, request) script_name contents
               env
