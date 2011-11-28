@@ -259,8 +259,8 @@ value get_person_places conf base = do {
   let env_keys = 
     List.map
       (fun key -> 
-        match p_getenv conf.env key with
-        [ Some s -> (key, int_of_string s)
+        match p_getint conf.env key with
+        [ Some hash -> (key, hash)
         | None -> (key, (-1)) ] )
       [ "bi"; "bp"; "de"; "bu"; "ma" ] 
   in
@@ -630,8 +630,8 @@ value print_place conf base list len =
     let _ = 
       List.map
         (fun key -> 
-          match p_getenv conf.env key with
-          [ Some s -> list.val := [ (key, int_of_string s) :: list.val ]
+          match p_getint conf.env key with
+          [ Some hash -> list.val := [ (key, hash) :: list.val ]
           | None -> () ] )
         [ "bi"; "bp"; "de"; "bu"; "ma" ] 
     in List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list.val
@@ -971,8 +971,8 @@ value print_mod_ok conf base = do {
     let _ = 
       List.map
         (fun key -> 
-          match p_getenv conf.env key with
-          [ Some s -> list.val := [ (key, int_of_string s) :: list.val ]
+          match p_getint conf.env key with
+          [ Some hash -> list.val := [ (key, hash) :: list.val ]
           | None -> () ] )
         [ "bi"; "bp"; "de"; "bu"; "ma" ] 
     in List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list.val
