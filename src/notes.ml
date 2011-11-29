@@ -84,7 +84,7 @@ value print_whole_notes conf base fnotes title s ho = do {
       [ Some (case_sens, h) -> html_highlight case_sens h title
       | None -> title ]
     in
-    Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
+    Wserver.wprint "<h1>%s</h1>\n" title
   else ();
   match Util.open_etc_file "summary" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
@@ -124,7 +124,7 @@ value print_notes_part conf base fnotes title s cnt0 =
     if cnt0 = 0 && title <> "" then do {
       xtag "br";
       xtag "br";
-      Wserver.wprint "<h1 style=\"text-align:center\">%s</h1>\n" title
+      Wserver.wprint "<h1>%s</h1>\n" title
     }
     else ();
     let s = string_with_macros conf [] s in
@@ -490,7 +490,7 @@ value print_misc_notes conf base =
     if db <> [] then
       tag "ul" begin
         if d <> "" then
-          tag "li" begin
+          tag "li" "class=\"parent\"" begin
             stag "a" "href=\"%sm=MISC_NOTES%s\"" (commd conf)
               (try
                  let i = String.rindex d NotesLinks.char_dir_sep in
@@ -518,7 +518,7 @@ value print_misc_notes conf base =
                    let f = file_path conf base (path_of_fnotes f) in
                    if Sys.file_exists f then "" else " style=\"color:red\""
                  in
-                 tag "li" "style=\"list-style-type:circle\"" begin
+                 tag "li" "class=\"file\"" begin
                    Wserver.wprint "<tt>[";
                    stag "a" "href=\"%sm=NOTES;f=%s\"%s" (commd conf) f c begin
                      Wserver.wprint "%s" r;
@@ -527,7 +527,7 @@ value print_misc_notes conf base =
                      (if txt = "" then "" else " : " ^ txt);
                  end
              | None ->
-                 tag "li" begin
+                 tag "li" "class=\"folder\"" begin
                    stag "tt" begin
                      stag "a" "href=\"%sm=MISC_NOTES;d=%s\"" (commd conf)
                        (if d = "" then r else

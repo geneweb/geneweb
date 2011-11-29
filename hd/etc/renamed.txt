@@ -1,39 +1,32 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta name="robots" content="none">
-  <!--meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"-->
+  <title>%old; -&gt; %new;</title>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
-  <title>%o -&gt; %e</title>
+%include.css;
 </head>
 <body>
-<h1>%o -&gt; %e</h1>
+<h1>%old; -&gt; %new;</h1>
 
-The database "%o" has been renamed "%e".
-Please use now:
-<br>
-La base de données "%o" est renommée "%e".
-Utiliser maintenant:
-<br>
-La base di dati "%o" ha cambiato nome "%e".
-Utilizzate:<p>
+<p>
+%apply;interp([
+en: The database "%old;" has been renamed "%new;".
+    Please use now:
+fr: La base de donnÃ©es "%old;" est renommÃ©e "%new;".
+    Utiliser maintenant:
+it: La base di dati "%old;" ha cambiato nome "%new;".
+    Utilizzate:
+])
 <ul>
 <li>
-<a href="%l">%l</a>
+<a href="%link;">%link;</a>
 </ul>
+</p>
 
-<br />
-<div id="footer">
-  <hr />
-  <div>
-    <em>
-      <a href="http://opensource.geneanet.org/projects/geneweb/"><img src="images/logo_bas.png"
-      align="center" style="border: 0"></a>
-      Version %v
-      Copyright &copy; 1998-2011
-    </em><br%/>
-  </div>
-</div>
-
+%base_trailer;
+%copyright;
 </body>
+</html>

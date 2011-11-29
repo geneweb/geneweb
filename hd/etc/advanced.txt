@@ -1,0 +1,120 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>[*advanced request]</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="content-style-type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+%include.css;
+%base_header;
+</head>
+<body%body_prop;>
+
+<h1>[*advanced request]</h1>
+
+<form method="POST" action="%action;">
+%hidden;
+<input type="hidden" name="m" value="AS_OK"%/>
+
+<h4>[*first name/first names]0</h4>
+
+<table border="1">
+<tr align="left">
+<td>
+<input name="first_name" size="40" maxlength="200"%/>
+</td>
+</tr>
+</table>
+
+<h4>[*surname/surnames]0</h4>
+
+<table border="1">
+<tr align="left">
+<td>
+<input name="surname" size="40" maxlength="200"%/>
+</td>
+</tr>
+</table>
+
+%define;event(xx)
+<table border="1"><tr align="left">
+<td>[*place]</td>
+<td><input name="xx_place" size="40" maxlength="200"%/></td>
+</tr></table>
+<table border="1"><tr align="left">
+<td>[*after]</td>
+<td>
+[year/month/day]0<input name="xx1_yyyy" size="5" maxlength="5"%/>
+[year/month/day]1<input name="xx1_mm" size="2" maxlength="2"%/>
+[year/month/day]2<input name="xx1_dd" size="2" maxlength="2"%/>
+</td>
+</tr>
+<tr align="left">
+<td>[*before]</td>
+<td>
+[year/month/day]0<input name="xx2_yyyy" size="5" maxlength="5"%/>
+[year/month/day]1<input name="xx2_mm" size="2" maxlength="2"%/>
+[year/month/day]2<input name="xx2_dd" size="2" maxlength="2"%/>
+</td>
+</tr>
+</table>
+%end;
+
+<h4>[*birth]</h4>
+%apply;event("birth")
+
+<h4>[*baptism]</h4>
+%apply;event("bapt")
+
+<h4>[*death]</h4>
+
+<table border="1">
+<tr align="left">
+<td>
+<select name="death">
+<option value="Dead">[*died]</option>
+<option value="NotDead">[*alive]</option>
+<option value="" selected="selected">-</option>
+</select>
+</td>
+</tr>
+</table>
+%apply;event("death")
+
+<h4>[*burial]</h4>
+%apply;event("burial")
+
+<h4>[*occupation]</h4>
+
+<table border="1">
+<tr align="left">
+<td>
+<input name="occu" size="50" maxlength="200"%/>
+</td>
+</tr>
+</table>
+
+<h4>[*sex]</h4>
+
+<input type="radio" name="sex" id="sexM" value="M"%/><label for="sexM">[M/F]0</label>
+<input type="radio" name="sex" id="sexF" value="F"%/><label for="sexF">[M/F]1</label>
+<input type="radio" name="sex" id="sexU" value="N" checked="checked"%/><label for="sexU">-</label>
+
+<h4>[*married]0</h4>
+
+<input type="radio" name="married" id="mY" value="Y"%/><label for="mY">[Y/N]0</label>
+<input type="radio" name="married" id="mN" value="N"%/><label for="mN">[Y/N]1</label>
+<input type="radio" name="married" id="mA" value="A" checked="checked"%/><label for="mA">-</label>
+
+<p>
+[*maximum]: <input name="max" size="5" value="100" maxlength="5"%/> [person/persons]1
+<input type="submit" value="Ok"%/>
+</p>
+
+</form>
+
+%base_trailer;
+%copyright;
+</body>
+</html>

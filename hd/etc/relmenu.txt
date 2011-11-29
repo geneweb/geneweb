@@ -11,13 +11,13 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
 %base_header;
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %message_to_wizard;
 
-<h1 style="text-align:center" class="highlight">[*link between]%sp;
+<h1>[*link between]%sp;
   %if;(public_name != "")%public_name;%else;%first_name;%end;
   %if;(qualifier != "") <em>%qualifier;</em>%end;
   %sp;%surname;
@@ -34,11 +34,11 @@
     %if;(referer != "")
       <a href="%referer;"><img
        src="%image_prefix;/left.png"%wid_hei;left.png; 
-       style="border: 0" alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.png"%wid_hei;up.png; 
-    style="border: 0" alt="^^" title="^^"%/></a>
+    alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
 
@@ -199,23 +199,23 @@
     <td>
       <input type="radio" name="color" value="" checked="checked"%/>
     </td>
-    <td style="background:#FFC0C0">
-      <input type="radio" name="color" value="#FFC0C0"%/>
+    <td class="bg1">
+      <input type="radio" name="color" value="bg1"%/>
     </td>
-    <td style="background:#FFFFC0">
-      <input type="radio" name="color" value="#FFFFC0"%/>
+    <td class="bg2">
+      <input type="radio" name="color" value="bg2"%/>
     </td>
-    <td style="background:#C0FFC0">
-      <input type="radio" name="color" value="#C0FFC0"%/>
+    <td class="bg3">
+      <input type="radio" name="color" value="bg3"%/>
     </td>
-    <td style="background:#C0FFFF">
-      <input type="radio" name="color" value="#C0FFFF"%/>
+    <td class="bg4">
+      <input type="radio" name="color" value="bg4"%/>
     </td>
-    <td style="background:#C0C0FF">
-      <input type="radio" name="color" value="#C0C0FF"%/>
+    <td class="bg5">
+      <input type="radio" name="color" value="bg5"%/>
     </td>
-    <td style="background:#FFC0FF">
-      <input type="radio" name="color" value="#FFC0FF"%/>
+    <td class="bg6">
+      <input type="radio" name="color" value="bg6"%/>
     </td>
     </tr></table>
   </td>
@@ -238,6 +238,5 @@
 
 %base_trailer;
 %copyright;
-
 </body>
 </html>

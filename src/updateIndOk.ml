@@ -341,35 +341,35 @@ value print_conflict conf base p =
   do {
     rheader conf title;
     Update.print_error conf base (AlreadyDefined p);
-    html_p conf;
     let free_n =
       Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
     in
     tag "ul" begin
-      html_li conf;
-      Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
-        free_n;
-      Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
-        (transl conf "create");
-      Wserver.wprint "%s.\n" (transl conf " to try again with this number");
-      html_li conf;
-      Wserver.wprint "%s " (capitale (transl conf "or"));
-      Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-      Wserver.wprint " %s %s." (transl_nth conf "and" 0)
-        (transl conf "change it (the number) yourself");
+      stag "li" begin
+        Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
+          free_n;
+        Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+          (transl conf "create");
+        Wserver.wprint "%s.\n" (transl conf " to try again with this number");
+      end;
+      stag "li" begin
+        Wserver.wprint "%s " (capitale (transl conf "or"));
+        Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+          (transl conf "change it (the number) yourself");
+      end;
     end;
-    html_p conf;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
-           Wserver.wprint "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
+           xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
              (quote_escaped (decode_varenv v)))
         (conf.henv @ conf.env);
-      Wserver.wprint "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
+      xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\""
         free_n;
-      Wserver.wprint "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
+      xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
         (capitale (transl conf "create"));
-      Wserver.wprint "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
+      xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
         (capitale (transl conf "back"));
     end;
     Update.print_same_name conf base p;
@@ -628,7 +628,7 @@ value print_mod_ok conf base wl p =
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
       }
     else ();
-    Wserver.wprint "\n%s"
+    Wserver.wprint "\n<p>%s</p>"
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.wprint "\n";
     Update.print_warnings conf base wl;

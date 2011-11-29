@@ -691,11 +691,11 @@ value log_count conf (log_file, log_oc, flush_log) r =
 value print_moved conf base s =
   match Util.open_etc_file "moved" with
   [ Some ic ->
-      let env = [('b', fun () -> conf.bname); ('t', fun () -> s)] in
+      let env = [("bname", conf.bname)] in
       do {
         Util.html conf;
         Util.nl ();
-        Util.copy_from_etc env conf.lang conf.indep_command ic;
+        Templ.copy_from_templ conf env ic;
       }
   | None ->
       let title _ = Wserver.wprint "%s -&gt; %s" conf.bname s in
