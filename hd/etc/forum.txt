@@ -21,10 +21,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
 %base_header;
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %message_to_wizard;
 
 %if;not cancel_links;
@@ -32,11 +32,11 @@
     %if;(referer != "")
       <a href="%referer;"><img
        src="%image_prefix;/left.png"%wid_hei;left.png; 
-       style="border: 0" alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.png"%wid_hei;up.png; 
-    style="border: 0" alt="^^" title="^^"%/></a>
+    alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
 
@@ -64,7 +64,7 @@
 %if;(evar.m = "FORUM_ADD")
   %( add a message %)
   %if;can_post;
-    <h1 style="text-align:center" class="highlight">%nn;
+    <h1>%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
     </h1>
     <table width="100%%"><tr><td align="center">
@@ -118,14 +118,14 @@
     </td></tr></table>
     </td></tr></table>
   %else;
-    <h1 style="text-align:center" class="highlight">%nn;
+    <h1>%nn;
       [*incorrect request]
     </h1>
   %end;
 %elseif;(evar.m = "FORUM_ADD_OK")
   %( visualize a message before post %)
   %if;can_post;
-    <h1 style="text-align:center" class="highlight">%nn;
+    <h1>%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
     </h1>
     %if;(message.ident != "" and message.text != "")
@@ -209,7 +209,7 @@
     </td></tr></table>
     </td></tr></table>
   %else;
-    <h1 style="text-align:center" class="highlight">%nn;
+    <h1>%nn;
       [*incorrect request]
     </h1>
   %end;
@@ -306,7 +306,7 @@
   %end;
 %else;
   %( display message headers %)
-  <h1 style="text-align:center" class="highlight">[*database forum]</h1>
+  <h1>[*database forum]</h1>
   %apply;search_form("true")
   %if;can_post;
     <form method="get" action="%action;">
@@ -357,9 +357,7 @@
   </table>
 %end;
 
-
 %base_trailer;
 %copyright;
-
 </body>
 </html>

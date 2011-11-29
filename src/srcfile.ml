@@ -231,12 +231,6 @@ value macro conf base =
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
         (Num.of_int r.welcome_cnt)
-  | 'C' ->
-      let s =
-        try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
-        [ Not_found -> "" ]
-      in
-      s ^ css_prop conf
   | 'd' -> string_of_start_date conf
   | 'D' -> (count conf).start_date
   | 'e' -> conf.charset
@@ -520,8 +514,6 @@ value gen_print with_logo mode conf base fname =
       } ]
 ;
 
-value print = gen_print True Lang;
-
 value print_source = gen_print True Source;
 
 (* welcome page *)
@@ -629,6 +621,22 @@ value print_start conf base =
       else "start"
     in
     gen_print False Lang conf base fname
+;
+
+(* code déplacé et modifié pour gérer advanced.txt *)
+value print conf base fname = 
+  match fname with
+  [ "advanced" -> do {
+      Wserver.wrap_string.val := Util.xml_pretty_print;
+      Hutil.interp conf base "advanced"
+        {Templ.eval_var = eval_var conf base;
+         Templ.eval_transl env = Templ.eval_transl conf;
+         Templ.eval_predefined_apply = eval_predefined_apply conf;
+         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+         Templ.print_foreach = fun []}
+        [] ()
+    }
+  | _ -> gen_print True Lang conf base fname ]
 ;
 
 (* lexicon (info) *)

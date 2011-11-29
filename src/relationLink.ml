@@ -226,7 +226,7 @@ value print_someone_and_spouse conf base info in_tab ip n ipl =
     Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip));
     if s <> "" then do {
       Wserver.wprint "&amp;%s" d;
-      html_br conf;
+      xtag "br";
       Wserver.wprint "%s\n" s;
       match spo with
       [ Some ip ->
@@ -477,14 +477,14 @@ value print_one_branch_no_table conf base info =
   let sp = if info.b1 = [] then info.sp2 else info.sp1 in
   tag "div" "style=\"text-align:center\"" begin
     print_someone_and_spouse conf base info False info.ip sp b;
-    html_br conf;
+    xtag "br";
     list_iter_hd_tl
       (fun (ip1, _) ipl1 ->
          do {
            Wserver.wprint "|";
-           html_br conf;
+           xtag "br";
            print_someone_and_spouse conf base info False ip1 sp ipl1;
-           html_br conf;
+           xtag "br";
          })
       b;
   end
@@ -562,13 +562,13 @@ value print_two_branches_with_table conf base info =
     end;
     tag "tr" "align=\"%s\"" "left" begin
       stagn "td" "align=\"%s\"" conf.right begin
-        xtag "hr" "dir=\"ltr\" width=\"50%%\" align=\"%s\"" conf.right;
+        xtag "hr" "class=\"%s\"" conf.right;
       end;
       stagn "td" begin
-        xtag "hr" "width=\"100%%\"";
+        xtag "hr" "class=\"full\"";
       end;
       stagn "td" "align=\"%s\"" conf.left begin
-        xtag "hr" "dir=\"ltr\" width=\"50%%\" align=\"%s\"" conf.left;
+        xtag "hr" "class=\"%s\"" conf.left;
       end;
     end;
     print_both_branches conf base info info.b1 info.b2;
@@ -578,14 +578,14 @@ value print_two_branches_with_table conf base info =
       tag "tr" "align=\"%s\"" "left" begin
         tag "td" begin
           if info.pb1 <> None || info.nb1 <> None then do {
-            html_br conf; print_prev_next_1 conf base info info.pb1 info.nb1
+            xtag "br"; print_prev_next_1 conf base info info.pb1 info.nb1
           }
           else Wserver.wprint "&nbsp;";
         end;
         tag "td" begin Wserver.wprint "&nbsp;"; end;
         tag "td" begin
           if info.pb2 <> None || info.nb2 <> None then do {
-            html_br conf; print_prev_next_2 conf base info info.pb2 info.nb2
+            xtag "br"; print_prev_next_2 conf base info info.pb2 info.nb2
           }
           else Wserver.wprint "&nbsp;";
         end;
@@ -609,13 +609,14 @@ value print_relation_path conf base info =
        (info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
         info.nb2 <> None) then
        do {
-      html_p conf;
-      if info.pb1 <> None || info.nb1 <> None then
-        print_prev_next_1 conf base info info.pb1 info.nb1
-      else ();
-      if info.pb2 <> None || info.nb2 <> None then
-        print_prev_next_2 conf base info info.pb2 info.nb2
-      else ()
+      tag "p" begin
+        if info.pb1 <> None || info.nb1 <> None then
+          print_prev_next_1 conf base info info.pb1 info.nb1
+        else ();
+        if info.pb2 <> None || info.nb2 <> None then
+          print_prev_next_2 conf base info info.pb2 info.nb2
+        else ();
+      end
     }
     else ()
   }
@@ -637,16 +638,6 @@ value print_relation_ok conf base info =
     }
   in
   do {
-    let conf =
-      (* changing doctype to transitional because use of
-         <hr width=... align=...> *)
-      let doctype =
-        match p_getenv conf.base_env "doctype" with
-        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
-        | _ -> "xhtml-1.0-trans" ]
-      in
-      {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
-    in
     header_no_page_title conf title;
     print_relation_path conf base info;
     trailer conf
@@ -719,7 +710,7 @@ value print_relation_no_dag conf base po ip1 ip2 =
         | _ ->
             match Util.p_getenv conf.env "color" with
             [ None | Some "" -> ""
-            | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
+            | Some x -> " class=\"" ^ x ^ "\"" ] ]
       in
       let info =
         {ip = ip; sp = sp; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2; c1 = c1;

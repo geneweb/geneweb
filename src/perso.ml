@@ -2148,7 +2148,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         in
         if list <> [] then
           "<ul>\n" ^
-          List.fold_left (fun s n -> s ^ "<li>" ^ n ^ "\n") "" list ^
+          List.fold_left (fun s n -> s ^ "<li>" ^ n ^ "</li>\n") "" list ^
           "</ul>\n"
         else ""
       else ""

@@ -27,7 +27,7 @@ value link_to_referer conf =
           string_of_int hei ^ "\""
       | None -> "" ]
     in
-    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s style=\"border: 0\" alt=\"&lt;&lt;\" title=\"&lt;&lt;\"%s></a>\n"
+    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s alt=\"&lt;&lt;\" title=\"&lt;&lt;\"%s></a>\n"
       referer (Util.image_prefix conf) fname wid_hei conf.xhs
   else ""
 ;
@@ -50,7 +50,7 @@ value gen_print_link_to_welcome f conf right_aligned =
     let str = link_to_referer conf in
     if str = "" then () else Wserver.wprint "%s" str;
     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.wprint "<img src=\"%s/%s\"%s style=\"border: 0\" alt=\"^^\" title=\"^^\"%s>"
+    Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\" title=\"^^\"%s>"
       (Util.image_prefix conf) fname wid_hei conf.xhs;
     Wserver.wprint "</a>\n";
     if right_aligned then Wserver.wprint "</div>\n"
@@ -74,12 +74,12 @@ value header_without_http conf title = do {
   Wserver.wprint
     "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
     conf.xhs;
-  Wserver.wprint 
-    "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\"%s>\n" 
+  Wserver.wprint
+    "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\"%s>\n"
     (Util.image_prefix conf) conf.xhs;
-  Wserver.wprint 
-    "  <link rel=\"stylesheet\" type=\"text/css\" href=\"css/%s\" />\n"
-    (Util.css_prop conf);
+  match Util.open_etc_file "css" with
+  [ Some ic -> Templ.copy_from_templ conf [] ic
+  | None -> () ];
   Templ.include_hed_trl conf None "hed";
   Wserver.wprint "</head>\n";
   let s =
@@ -100,7 +100,7 @@ value header_without_page_title conf title = do {
 value header_link_welcome conf title = do {
   header_without_page_title conf title;
   print_link_to_welcome conf True;
-  Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+  Wserver.wprint "<h1>";
   title False;
   Wserver.wprint "</h1>\n";
 };
@@ -109,16 +109,12 @@ value header_no_page_title conf title = do {
   header_without_page_title conf title;
   match Util.p_getenv conf.env "title" with
   [ None | Some "" -> ()
-  | Some x -> do {
-      Wserver.wprint "<h1 align=\"center\"><font color=%s>" conf.highlight;
-      Wserver.wprint "%s" x;
-      Wserver.wprint "</font></h1>\n"
-    } ];
+  | Some x -> Wserver.wprint "<h1>%s</h1>\n" x ];
 };
 
 value header conf title = do {
   header_without_page_title conf title;
-  Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+  Wserver.wprint "<h1>";
   title False;
   Wserver.wprint "</h1>\n";
 };
@@ -127,14 +123,15 @@ value red_color = "red";
 
 value rheader conf title = do {
   header_without_page_title conf title;
-  Wserver.wprint "<center><h1 class=\"error\">";
+  Wserver.wprint "<h1 class=\"error\">";
   title False;
-  Wserver.wprint "</h1></center>\n";
+  Wserver.wprint "</h1>\n";
 };
 
 value gen_trailer with_logo conf = do {
   Templ.include_hed_trl conf None "trl";
-  Templ.print_copyright conf;
+  if with_logo then Templ.print_copyright_with_logo conf
+  else Templ.print_copyright conf;
   Wserver.wprint "</body>\n</html>\n";
 };
 

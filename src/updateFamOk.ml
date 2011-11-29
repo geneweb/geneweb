@@ -732,27 +732,25 @@ value print_family conf base wl cpl des = do {
         else ()
       }
   | None -> () ];
-  Wserver.wprint "<ul>\n";
-  html_li conf;
-  Wserver.wprint "\n%s"
-    (referenced_person_text conf base (poi base (Adef.father cpl)));
-  Wserver.wprint "\n";
-  html_li conf;
-  Wserver.wprint "\n%s"
-    (referenced_person_text conf base (poi base (Adef.mother cpl)));
-  Wserver.wprint "</ul>\n";
+  tag "ul" begin
+    stag "li" begin
+      Wserver.wprint "%s" (referenced_person_text conf base (poi base (Adef.father cpl)));
+    end;
+    Wserver.wprint "\n";
+    stag "li" begin
+      Wserver.wprint "%s" (referenced_person_text conf base (poi base (Adef.mother cpl)));
+    end;
+  end;
   if des.children <> [| |] then do {
-    html_p conf;
-    Wserver.wprint "<ul>\n";
-    Array.iter
-      (fun ip -> do {
-         html_li conf;
-         Wserver.wprint "\n%s"
-           (referenced_person_text conf base (poi base ip));
-         Wserver.wprint "\n"
-       })
-      des.children;
-    Wserver.wprint "</ul>\n"
+    tag "ul" begin
+      Array.iter
+        (fun ip ->
+          stag "li" begin
+            Wserver.wprint "%s" (referenced_person_text conf base (poi base ip));
+          end
+        )
+        des.children;
+    end;
   }
   else ();
   Update.print_warnings conf base wl

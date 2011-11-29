@@ -95,6 +95,6 @@ value print_html conf base =
          let v = if k = "m" then "IM" else v in
          Wserver.wprint "%s%s=%s" (if first then "" else ";") k v)
       conf.env;
-    Wserver.wprint "\">\n</body>\n</html>";
+    Wserver.wprint "\"%s>\n</body>\n</html>" conf.xhs;
   }
 ;

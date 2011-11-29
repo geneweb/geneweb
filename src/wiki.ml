@@ -341,7 +341,7 @@ value summary_of_tlsw_lines conf short lines =
     in
     let lines =
       ["<dl><dd>";
-       "<table border=\"1\" cellpadding=\"10\">";
+       "<table id=\"summary\" cellpadding=\"10\">";
        "<tr><td align=\"" ^ conf.left ^ "\">";
        "<div style=\"text-align:center\"><b>" ^
           capitale (message_txt conf 3) ^ "</b>";
@@ -524,7 +524,7 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
             in
             let s =
              let style =
-               if slev <= 3 then " style=\"border-bottom: solid 1px\""
+               if slev <= 3 then " class=\"subtitle\""
                else ""
              in
              sprintf "<h%d%s>%s%s</h%d>" slev style section_num
@@ -894,7 +894,7 @@ value print_ok conf wi edit_mode fname title_is_1st s =
     let lines =
       if v = 0 && title <> "" then
         let title =
-          Printf.sprintf "<h1 style=\"text-align:center\">%s</h1>\n" title
+          Printf.sprintf "<h1>%s</h1>\n" title
         in
         [title :: lines]
       else lines

@@ -1,3 +1,15 @@
+GeneWeb version 6.03
+--------------------
+
+Ludovic Ledieu :
+* New implamentation of CSS as a template (css.txt)
+* Tree displaying (dag and RL) compliant with XHTML
+* Better W3C compliance
+* Fix wrong display for advanced request in welcome page
+* rewrite old templates so that they uses common language :
+   index.txt, moved.txt, redirect.txt, renamed.txt,
+   robot.txt (no favicon, no image, no css since the client has no access)
+
 GeneWeb version 6.02
 --------------------
 

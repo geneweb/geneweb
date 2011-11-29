@@ -314,7 +314,7 @@ value print_main conf base auth_file =
   do {
     Hutil.header_no_page_title conf title; (* mouais... *)
     print_link_to_welcome conf True;
-    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+    Wserver.wprint "<h1>";
     title False;
     Wserver.wprint "</h1>\n";
     let list =
@@ -374,7 +374,7 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
   let title = wizard_page_title conf wz wizname in
   header_no_page_title conf title;
   print_link_to_welcome conf True;
-  Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
+  Wserver.wprint "<h1>";
   title False;
   Wserver.wprint "</h1>\n";
   match Util.open_etc_file "summary" with

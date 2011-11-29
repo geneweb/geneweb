@@ -12,10 +12,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
 %base_header;
 </head>
-<body %body_prop;>
+<body%body_prop;>
 %message_to_wizard;
 
 %if;not cancel_links;
@@ -23,19 +23,19 @@
     %if;(referer != "")
       <a href="%referer;"><img
        src="%image_prefix;/left.png"%wid_hei;left.png; 
-       style="border: 0" alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.png"%wid_hei;up.png; 
-    style="border: 0" alt="^^" title="^^"%/></a>
+    alt="^^" title="^^"%/></a>
   </td></tr></table>
-  <hr style="clear:both; visibility:hidden;" />
+  <hr style="clear:both; visibility:hidden;"%/>
 %end;
 
 <a href="%prefix;" accesskey="T"></a>
 
 %if;(evar.slices = "on")
-  <h1 style="text-align:center" class="highlight">%nn;
+  <h1>%nn;
     [*display by slices/slice width/overlap/total width]0%nn;
   </h1>
   <form method="GET" action="%action;">
@@ -149,11 +149,11 @@
         %elseif;(dag_cell.text != "")%dag_cell.text;
         %else;
           %if;dag_cell.is_hr_left;
-            <hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+            <hr class="%left;"%/>%nn;
           %elseif;dag_cell.is_hr_right;
-            <hr dir="ltr" width="50%%" align="%right;"%/>%nn;
+            <hr class="%right;"%/>%nn;
           %else;
-            <hr width="100%%"%/>
+            <hr class="full"%/>%nn;
           %end;
         %end;
         </td>
@@ -172,6 +172,5 @@
 
 %base_trailer;
 %copyright;
-
 </body>
 </html>

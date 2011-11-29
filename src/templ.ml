@@ -1057,10 +1057,6 @@ value print_body_prop conf =
   Wserver.wprint "%s" (s ^ Util.body_prop conf)
 ;
 
-value print_css_prop conf =
-  Wserver.wprint "%s" (Util.css_prop conf)
-;
-
 type vother 'a =
   [ Vdef of list string and list ast
   | Vval of expr_val 'a
@@ -1264,6 +1260,13 @@ value print_copyright conf =
       end;
       xtag "br";
     } ]
+;
+
+value print_copyright_with_logo conf =
+  let conf =
+     {(conf) with env = [("with_logo", "yes") :: conf.env]}
+  in
+  print_copyright conf
 ;
 
 value old_include_hed_trl conf base_opt suff =
@@ -1473,8 +1476,8 @@ and print_simple_variable conf base_opt =
   [ "base_header" -> include_hed_trl conf base_opt "hed"
   | "base_trailer" -> include_hed_trl conf base_opt "trl"
   | "body_prop" -> print_body_prop conf
-  | "css_prop" -> print_css_prop conf
-  | "copyright" -> print_copyright conf
+  | "copyright" -> print_copyright_with_logo conf
+  | "copyright_nologo" -> print_copyright conf
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found ]

@@ -33,4 +33,5 @@ value interp_ast :
 value template_file : ref string;
 value input_templ : config -> string -> option (list ast);
 value print_copyright : config -> unit;
+value print_copyright_with_logo : config -> unit;
 value include_hed_trl : config -> option base -> string -> unit;

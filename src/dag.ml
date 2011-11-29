@@ -191,7 +191,7 @@ value image_normal_txt conf base p fname width height =
   let k = default_image_name base p in
   let r =
     sprintf "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s border=\"0\" alt=\"%s\" title=\"%s\" />"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s alt=\"%s\" title=\"%s\" />"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
       (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
@@ -205,7 +205,7 @@ value image_normal_txt conf base p fname width height =
 value image_url_txt conf base url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nheight=%d border=\"0\" alt=\"%s\" title=\"%s\" />" url height
+    sprintf "<img src=\"%s\"\nheight=%d alt=\"%s\" title=\"%s\" />" url height
       image_txt image_txt ^
     "</a>\n"
 ;
@@ -213,7 +213,7 @@ value image_url_txt conf base url height =
 value image_url_txt_with_size conf base url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\" title=\"%s\" />"
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" />"
       url width height image_txt image_txt ^
     "</a>\n"
 ;
@@ -288,15 +288,11 @@ value print_table conf hts =
           | TDhr align ->
               match align with
               [ LeftA ->
-                  Wserver.wprint
-                    "<hr dir=\"ltr\" width=\"50%%\" align=\"%s\"%s>" conf.left
-                      conf.xhs
+                  xtag "hr" "class=\"%s\"" conf.left
               | RightA ->
-                  Wserver.wprint
-                    "<hr dir=\"ltr\" width=\"50%%\" align=\"%s\"%s>" conf.right
-                      conf.xhs
+                  xtag "hr" "class=\"%s\"" conf.right
               | _ ->
-                  Wserver.wprint "<hr width=\"100%%\"%s>" conf.xhs ] ];
+                  xtag "hr" "class=\"full\"" ] ];
           Wserver.wprint "</td>\n"
         };
       end;
@@ -854,7 +850,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     | _ ->
         match Util.p_getenv conf.env "color" with
         [ None | Some "" -> ""
-        | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
+        | Some x -> " class=\"" ^ x ^ "\"" ] ]
   in
   let indi_txt n =
     match n.valu with
@@ -912,7 +908,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     in
     if bd > 0 || td <> "" then
       sprintf "\
-<table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s </td></tr></table>"
+<table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s</td></tr></table>"
         bd td (indi_txt n)
     else indi_txt n
   in
@@ -1280,18 +1276,6 @@ value print_slices_menu_or_dag_page conf base page_title hts next_txt =
   if p_getenv conf.env "old" = Some "on" then
     old_print_slices_menu_or_dag_page conf base page_title hts next_txt else
 (**)
-  let conf =
-    if p_getenv conf.env "slices" = Some "on" then conf
-    else
-      let doctype =
-        (* changing doctype to transitional because use of
-           <hr width=... align=...> *)
-        match p_getenv conf.base_env "doctype" with
-        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
-        | _ -> "xhtml-1.0-trans" ]
-      in
-      {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
-  in
   let env =
     let table_pre_dim () =
       let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim conf hts in
