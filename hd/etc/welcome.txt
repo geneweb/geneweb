@@ -332,8 +332,8 @@ es: <span class="highlight" style="margin-left:10px">mediante una
 et: <span class="highlight" style="margin-left:10px">
        <a href="%prefix;m=H;v=advanced">laiendatud 
        päring</a></span>.
-fi: <a href="%prefix;m=H;v=advanced"><span
-       class="highlight">erityishaulla</a></span>.
+fi: <span class="highlight" style="margin-left:10px">
+       <a href="%prefix;m=H;v=advanced">erityishaulla</a></span>.
 fr: <span class="highlight" style="margin-left:10px"> par la
        <a href="%prefix;m=H;v=advanced">requête
         évoluée</a></span>.
