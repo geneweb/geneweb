@@ -161,11 +161,11 @@ h1
   border: 0;
 }
 
-/* Properties of the option block. Page welcome.txt        */
+/* Properties of the misc block. Page welcome.txt          */
 /* Trick : to center easily this block, one must add the   */
 /* following properties : align, margin-left, margin-right */
 /* and the trick : overflow: auto.                         */
-#options 
+#misc
 {
  width: 750px; 
  border: solid 2px #6f8301;
@@ -175,8 +175,31 @@ h1
  margin-right: auto;
 }
 
-/* Properties of the title in the option block. Page welcome.txt */
-#options h3 
+/* Properties of the title in the misc block. Page welcome.txt */
+#misc h3 
+{
+ margin: 0; 
+ text-align: left; 
+ background-color: #6f8301; 
+ color: white;
+}
+
+/* Properties of the tools block. Page welcome.txt         */
+/* Trick : to center easily this block, one must add the   */
+/* following properties : align, margin-left, margin-right */
+/* and the trick : overflow: auto.                         */
+#tools
+{
+ width: 750px; 
+ border: solid 2px #6f8301;
+ text-align: left; 
+ overflow: auto;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+/* Properties of the title in the tools block. Page welcome.txt */
+#tools h3 
 {
  margin: 0; 
  text-align: left; 
