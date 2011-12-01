@@ -167,8 +167,6 @@ classical_distrib:
 	cp hd/etc/templh/*.txt $(DESTDIR)/etc/templh/.
 	cp hd/etc/templm/*.txt $(DESTDIR)/etc/templm/.
 	cp hd/etc/templm/my_base/*.txt $(DESTDIR)/etc/templm/my_base/.
-	mkdir $(DESTDIR)/css
-	cp hd/css/*.css $(DESTDIR)/css/.
 
 windows_files:
 	@for i in distribution/*.txt distribution/gw/*.txt; do \
