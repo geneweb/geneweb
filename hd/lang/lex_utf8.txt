@@ -9928,3 +9928,29 @@ en: continue edit
 es: ¿Quiere hacer una nueva corrección?
 fr: souhaitez-vous effectuer une nouvelle correction
 
+    continue correcting
+af: gaan voort met die samevoeging
+bg: да продължи обединяването
+br: derc'hel da gendeuziñ
+ca: continuar la fusió
+cs: pokračovat ve spojování
+da: fortsæt sammenføjning
+de: Zusammenführung fortsetzen
+en: continue merging
+eo: daùrigu la kuniĝon
+es: continuar la fusión
+et: jätka ühendamist
+fi: jatka yhdistämistä
+fr: continuer à fusionner
+he:  להמשיך לאחד
+is: halda áfram að sameina
+it: continua la fusione
+lv: turpināt apvienošanu
+nl: doorgaan met samenvoegen
+no: fortsett sammenslåing
+pl: kontynuuj scalanie
+pt: continuar a fusão
+ro: continua unificarea
+ru: продолжить объединение
+sl: nadaljuj z združevanjem
+sv: fortsätt slå samman
