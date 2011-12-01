@@ -809,14 +809,45 @@ value gwc_or_ged2gwb out_name_of_in_name conf =
   else print_file conf "bso.htm"
 ;
 
+value gwc2_or_ged2gwb2 out_name_of_in_name conf =
+  let in_file =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  let out_file =
+    match p_getenv conf.env "o" with
+    [ Some f -> strip_spaces f
+    | _ -> "" ]
+  in
+  let out_file =
+    if out_file = "" then out_name_of_in_name in_file else out_file
+  in
+  let conf = conf_with_env conf "o" out_file in
+  if in_file = "" || out_file = "" then print_file conf "err_miss.htm"
+  else if not (Sys.file_exists in_file) then print_file conf "err_unkn.htm"
+  else if not (good_name out_file) then print_file conf "err_name.htm"
+  else print_file conf "bso.htm"
+;
+
 value gwc_check conf =
   let conf = {(conf) with env = [("nofail", "on"); ("f", "on") :: conf.env]} in
   gwc_or_ged2gwb out_name_of_gw conf
 ;
 
+value gwc2_check conf =
+  let conf = {(conf) with env = [("nofail", "on"); ("f", "on") :: conf.env]} in
+  gwc2_or_ged2gwb2 out_name_of_gw conf
+;
+
 value ged2gwb_check conf =
   let conf = {(conf) with env = [("f", "on") :: conf.env]} in
   gwc_or_ged2gwb out_name_of_ged conf
+;
+
+value ged2gwb2_check conf =
+  let conf = {(conf) with env = [("f", "on") :: conf.env]} in
+  gwc2_or_ged2gwb2 out_name_of_ged conf
 ;
 
 (*ifdef WIN95 then*)
@@ -832,6 +863,22 @@ value infer_rc conf rc =
 value gwc conf =
   let rc =
     let comm = stringify (Filename.concat bin_dir.val "gwc") in
+    exec_f (comm ^ parameters conf.env)
+  in
+  let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+  do {
+    let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
+    try Sys.remove gwo with [ Sys_error _ -> () ];
+    eprintf "\n";
+    flush stderr;
+    if rc > 1 then print_file conf "bso_err.htm"
+    else print_file conf "bso_ok.htm"
+  }
+;
+
+value gwc2 conf =
+  let rc =
+    let comm = stringify (Filename.concat bin_dir.val "gwc2") in
     exec_f (comm ^ parameters conf.env)
   in
   let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
@@ -1452,6 +1499,20 @@ value ged2gwb conf =
   }
 ;
 
+value ged2gwb2 conf =
+  let rc =
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
+    exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
+  in
+  let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+  do {
+    eprintf "\n";
+    flush stderr;
+    if rc > 1 then print_file conf "bso_err.htm"
+    else print_file conf "bso_ok.htm"
+  }
+;
+
 value consang conf ok_file =
   let rc =
     let comm = stringify (Filename.concat bin_dir.val conf.comm) in
@@ -1564,6 +1625,10 @@ value setup_comm_ok conf =
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwc_check conf
       | _ -> gwc conf ]
+  | "gwc2" ->
+      match p_getenv conf.env "opt" with
+      [ Some "check" -> gwc2_check conf
+      | _ -> gwc2 conf ]
   | "gwu" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwu conf
@@ -1572,6 +1637,10 @@ value setup_comm_ok conf =
       match p_getenv conf.env "opt" with
       [ Some "check" -> ged2gwb_check conf
       | _ -> ged2gwb conf ]
+  | "ged2gwb2" ->
+      match p_getenv conf.env "opt" with
+      [ Some "check" -> ged2gwb2_check conf
+      | _ -> ged2gwb2 conf ]
   | "gwb2ged" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwb2ged conf

@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwc2.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <link rel="stylesheet" type="text/css" href="css/default.css" />
+  <title>[
+de: GeneWeb-Quelldatei importieren
+en: Import a GeneWeb source file
+es: Importaci&oacute;n d'un fichero fuente GeneWeb
+fr: Importation d'un fichier source GeneWeb
+it: Importazione di un file sorgente GeneWeb
+lv: GeneWeb resursdatnes imports
+sv: Importera en GeneWeb källfil
+]</title>
+</head>
+
+<body>
+
+<center><h1><font color=#2f6400>Gwc2:<br>[
+de: GeneWeb-Quelldatei importieren
+en: Import of a GeneWeb source file
+es: Importaci&oacute;n d'un fichero fuente GeneWeb
+fr: Importation d'un fichier source GeneWeb
+it: Importazione di un file sorgente GeneWeb
+lv: GeneWeb resursdatnes imports
+sv: Importera en GeneWeb källfil
+]</font></h1></center>
+
+<p><p>
+
+<form method=GET action="gwc2">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=%l>
+
+<ul><li>
+[
+de: Bitte gib folgende Daten ein kompletter Name deiner <font
+    color=#2f6400><b>GeneWeb</b></font>-Quelldatei (inklusive Endung ".gw");
+en: Select the name of your GeneWeb source file (ending with ".gw");
+es: Entre Ud el nombre completo de su fichero fuente GeneWeb (que
+    termina en ".gw").
+fr: S&eacute;lectionnnez votre fichier source <b><font
+    color=#2f6400>GeneWeb</font></b> (se terminant par ".gw"):
+it: Selezionate il vostro file sorgente <b><font
+    color=#2f6400>GeneWeb</font></b> (che finisce con ".gw"):
+lv: Ierakstiet pilnu GeneWeb resursdatnes nosaukumu (kas beidzas ar ".gw").
+sv: Skriv in det kompletta namnet för din <font
+    color=#2f6400><b>GeneWeb</b></font> källfil (den måste sluta med ".gw"):
+]
+
+%j
+
+</ul>
+
+<p>
+
+<ul><li>[
+de: Den Namen, den du deiner <font
+    color=#2f6400><b>GeneWeb</b></font>-Datenbank geben m&ouml;chtest. Wenn
+    du nichts eingibst, wird der Name aus deiner <font
+    color=#2f6400><b>GeneWeb</b></font>-Quelldatei abgeleitet.
+en: Enter the name you want to give to your <font
+    color=#2f6400><b>GeneWeb</b></font> database. If you write nothing, it
+    will be deducted from the GeneWeb source file.
+es: El nombre que Ud. desea dar a su base de datos <font
+    color=#2f6400><b>GeneWeb</b></font>. Si Ud. no escribe nada, el nombre
+    se deducir&aacute; a partir del nombre del fichero fuente GeneWeb.
+fr: Entrez le nom que vous voulez donner &agrave; votre base de
+    donn&eacute;es <b><font color=#2f6400>GeneWeb</font></b>.Si vous ne
+    mettez rien, il sera d&eacute;duit du nom du fichier source GeneWeb.
+it: Digitate il nome che volete dare alla vostra base di dati
+   <b><font color=#2f6400>GeneWeb</font></b>. Se non mettete niente
+   il nome verr&agrave; dedotto da quello del file sorgente GeneWeb.
+lv: Ierakstiet nosaukumu, kâdâ Jûs  vçlaties nosaukt savu <font
+    color=#2f6400><b>GeneWeb</b></font> datu bâzi. Ja nekas netiks
+    ierakstîts, datu bâzes nosaukums tiks izveidots no GeneWeb resursdatnes
+    nosaukuma.
+sv: Namnet du vill kalla din <font color=#2f6400><b>GeneWeb</b></font>
+    databas. Om du inte skriver någonting, kommer namnet att bli härlätt
+    från <font color=#2f6400><b>GeneWeb</b></font> källfilens namn.
+]
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+[
+de: W&auml;hle die gew&uuml;nschten Optionen:
+en: Select the options you want:
+es: Seleccione las opciones que Ud. desee:
+fr: S&eacute;lectionnez les options que vous d&eacute;sirez:
+it: Selezionate le opzioni desiderate:
+lv: Izvçlieties atbilstoðos parametrus:
+sv: Välj de optioner du vill ha:
+]
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><input type=checkbox name=stats value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Statistiken nach Abschlu&szlig; der
+    Operation ausgeben (sind dann in der Trace-Ausgabe sichtbar).
+en: Display some statistics at the end (they will be visible in the traces).
+es: Mostrar algunas estad&iacute;sticas
+    al final (ellas seran visibles en las trazas).
+fr: Afficher quelques statistiques
+    &agrave; la fin (elles seront visibles dans les traces).
+it: Visualizzare alcune statistiche
+    alla fine (saranno visibili nelle tracce).
+lv: Beigâs parâdît darbîbas statistiku
+    (tâ bûs redzama programas darbîbâs pçdâs).
+sv: Visa statistik på slutet (den kommer att synas i utskriften).
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><input type=checkbox name=nc value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Datenkonsistenz nicht &uuml;berpr&uuml;fen.
+en: Do not check the consistency of the data.
+es: No verificar la coherencia de los datos.
+fr: Ne pas v&eacute;rifier la coh&eacute;rence des donn&eacute;es.
+it: Non verificare la coerenza dei dati.
+lv: Nepârbaudît datu saskanîbu.
+sv: Kontrollera inte att databasens data är OK.
+]</td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><input type=checkbox name=cg value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Initialisierung der Blutsverwandtschaften auch durchf&uuml;hren.
+en: End by the initialization of consanguinities.
+es: Terminar por el c&aacute;lculo previo de consanguinidad.
+fr: Terminer par le pr&eacute;calcul de consanguinit&eacute;.
+it: Terminare con il pre-calcolo di consanguineit&agrave;.
+lv: Nobeigt ar asinsradniecîbas pârrçíinu.
+sv: Avsluta med att beräkna blodsbanden.
+]</td>
+</tr>
+</table></dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke "Ok".
+en: Then click on "Ok".
+es: Finalmente cliquear en "Ok".
+fr: Puis cliquez sur "Ok".
+it: Poi cliccate su "Ok".
+lv: Tad nospiediet "Ok".
+sv: Klicka sedan på "OK".
+]
+
+<p>
+
+<input type=submit value="Ok">
+
+</form>

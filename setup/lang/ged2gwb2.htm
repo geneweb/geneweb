@@ -1,0 +1,487 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: ged2gwb2.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <link rel="stylesheet" type="text/css" href="css/default.css" />
+  <title>[
+de: GEDCOM-Datei importieren
+en: Import a GEDCOM file
+es: Importaci&oacute;n de un fichero GEDCOM
+fr: Importation d'un fichier GEDCOM
+it: Importazione di un file GEDCOM
+lv: GEDCOM datnes imports
+sv: Importera en GEDCOM-fil
+]</title>
+</head>
+
+<body>
+
+<center><h1><font color=#2f6400>Ged2gwb2:<br>
+[
+de: GEDCOM-Datei importieren
+en: Import a GEDCOM file
+es: Importaci&oacute;n de un fichero GEDCOM
+fr: Importation d'un fichier GEDCOM
+it: Importazione di un file GEDCOM
+lv: GEDCOM datnes imports
+sv: Importera en GEDCOM-fil
+]</font></h1></center>
+
+<p><p>
+
+<form method=GET action="ged2gwb2">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=%l>
+
+<p>
+<ul><li>[
+de: Bitte eingeben vollst&auml;ndiger Name deiner GEDCOM-Datei.
+en: Select your GEDCOM file:
+es: Agregue Ud el nombre completo de su fichero GEDCOM.
+fr: S&eacute;lectionnez votre fichier GEDCOM.
+it: Selezionate il vostro file GEDCOM.
+lv: Ievadiet pilnu GEDCOM datnes nosaukumu.
+sv: Skriv det kompletta namnet på din GEDCOM-fil.
+]
+
+<p>
+
+%j
+
+</ul>
+
+<p>
+
+<ul><li>[
+de: Name, den du deiner <font color=#2f6400><b>GeneWeb</b></font>-Datenbank
+    geben m&ouml;chtest. Wenn du hier nichts eingibst, wird der
+    Datenbankname aus dem Namen der  GEDCOM-Datei abgeleitet.
+en: Enter The name you want to give to your <font
+    color=#2f6400><b>GeneWeb</b></font> database.  If omitted, it will be
+    deducted from the name of the GEDCOM file.
+es: El nombre que Ud. desea dar a su base de datos <font
+    color=#2f6400><b>GeneWeb</b></font>. Si Ud. no mete ning&uacute;n
+    nombre, &eacute;l ser&aacute; deducido del nombre del fichero GEDCOM.
+fr: Entrez le nom que vous voulez donner &agrave; votre base de
+    donn&eacute;es <b><font color=#2f6400>GeneWeb</font></b>. Si vous ne
+    mettez rien, il sera d&eacute;duit du nom du fichier GEDCOM.
+it: Digitate il nome che volete dare alla vostra base di dati
+    <b><font color=#2f6400>GeneWeb</font></b>. Se non mettete niente il
+    nome sar&agrave; dedotto da quello del file GEDCOM.
+lv: Nosaukumu kurâ Jûs vçlties nosaukt savu <font
+    color=#2f6400><b>GeneWeb</b></font> datu bâzi. Ja neierakstîsiet, tad
+    datu bâzes nosaukums tiks veidos no GEDCOM datnes nosaukuma.
+sv: Namnet du vill kalla din <font color=#2f6400><b>GeneWeb</b></font>
+    databas. Om namnet utelämnas, kommer det att bli härlätt från
+    GEDCOM-filens namn.
+]
+
+<p>
+
+<input name="o" size="30">
+
+</ul>
+
+<p>
+
+[
+de: Sofern gew&uuml;nscht, w&auml;hle bitte aus den folgenden Optionen:
+en: Select the options you want:
+es: Seleccione las opciones que Ud. desee :
+fr: S&eacute;lectionnez les options que vous d&eacute;sirez:
+it: Selezionate le opzioni desiderate:
+lv: Iezîmçjiet nepiecieðmâs papildus iespçjas:
+sv: Välj de optioner du vill ha:
+]
+
+<p>
+
+<dl><dt><dd><table border="1">
+<tr align="left">
+<td><input type="checkbox" name="uin" value="on" />&nbsp;&nbsp;&nbsp;</td>
+<td>[
+en: Put untreated GEDCOM tags in notes.
+fi: Pistä käsittelemättömät GEDCOM merkit lainausmerkkeihin.
+fr: Sauvegarder les tags GEDCOM non reconnus dans les notes.
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border="1">
+<tr align="left">
+<td><input type="checkbox" name="lf" value="on" />&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Vornamen in Kleinbuchstaben wandeln, nur Anfangsbuchstaben in
+    gro&szlig;.
+en: Convert first names to lowercase letters, with initials in uppercase.
+es: Forzar los nombres a estar en min&uacute;sculas. Meter sus iniciales en
+    may&uacute;sculas.
+fr: Convertit les pr&eacute;noms en minuscules, avec leurs initiales en
+    majuscules.
+it: Convertire i nomi in minuscolo, con le loro iniziali in maiuscolo.
+lv: Pârveidot personvârdus uz mazajiem burtiem ar pirmajiem lielajiem.
+sv: Forcera gemena förnamn, bara initialer behålls som versaler. 
+]</td>
+</tr>
+</table></dl>
+
+<dl><dd><table border=1>
+<tr align=left>
+<td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Nachnamen in Kleinbuchstaben wandeln, nur Anfangsbuchstaben in
+    gro&szlig;. Kleinschreibung von Partikeln m&ouml;glichst
+    beibehalten.
+en: Convert surnames to lowercase letters, with initials in uppercase. Try
+    to keep lowercase particles.
+es: Forzar los apellidos a estar en min&uacute;sculas. Meter sus iniciales
+    en may&uacute;sculas. Trate de mantener las part&iacute;culas en
+    min&uacute;sculas.
+fr: Convertit les noms de famille en minuscules, avec leurs initiales en
+    majuscules. Essaye de garder les particules en minuscules.
+it: Convertire i cognomi in minuscolo, con le loro iniziali in
+    maiuscolo. Cercate di mantenere le particelle in minuscolo.
+lv: Pârveidot uzvârdus  uz mazajiem burtiem ar pirmajiem lielajiem. Mçginât
+    saglabât partikulus ar mazajiem burtiem.
+sv: Forcera gemena efternamn, bara initialer behålls som versaler.
+]</td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left><td>&nbsp;</td>
+<td>[
+de: Wenn der GEDCOM-Vorname mehrere, durch Kommata getrennte Namen
+    enth&auml;lt, soll beim Anlegen einer Person der erste dieser Namen der
+    "Vorname" werden, w&auml;hrend der vollst&auml;ndige GEDCOM-Vorname als
+    "Vornamen-Alias" eingetragen wird.
+en: When creating a person, if the GEDCOM first name part holds several
+    names separated by spaces, you can ask that the first of this names
+    becomes the person "first name" and the complete GEDCOM first name part
+    a "first name alias".
+es: Al crear una persona, si el campo nombre del fichero GEDCOM esta
+    constituido de varios nombres, puede preguntar que el primero de ellos
+    ir&aacute; en el campo "nombre" y que el nombre completo se transforma
+    en un "alias de nombre".
+fr: Au moment de la cr&eacute;ation d'une personne, si la partie
+    pr&eacute;nom dans le GEDCOM est form&eacute;e de plusieurs noms
+    s&eacute;par&eacute;s par des espaces, on peut vouloir que le premier de
+    ces noms aille dans la partie "pr&eacute;nom" et que le pr&eacute;nom
+    complet devient un "pr&eacute;nom alias".
+it: Al momento della creazione di una persona, se la parte
+    nome nel GEDCOM &egrave; formata da pi&ugrave; nomi con degli spazi,
+    potete chiedere che il primo di questi nomi vada nella parte "nome"
+    e che il nome completo diventi un "alias di nome"
+lv: Ja personas vârds GEDCOM datnç satur vairâkus vârdus variet norâdît, lai
+    pirmais no ðiem vârdiem kïûst par personas "pirmo vârdu" un GEDCOMa
+    datnes pilnais vârds kïust par pirmâ vârda " "pieòemto vârdu".
+sv: När man skapar en person, om förnamnen i GEDCOM-filen innehåller flera
+    namn separerade med mellanslag, kan du be att den första av dessa blir
+    en persons "förnamn" och GEDCOM-filens kompletta förnamnsdel blir ett
+    "förnnamns alias".
+]</td>
+
+<tr align=left>
+<td><input type=checkbox name=efn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Diese Option aktivieren.
+en: Set this option.
+es: Poner esta opci&oacute;n.
+fr: Mettre cette option.
+it: Scegliere questa opzione.
+lv: Ieslçgt ðo iespçju
+sv: Sätt denna option.
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left><td>&nbsp;</td>
+<td>[
+de: Normalerweise wird beim Anlegen einer Person, deren GEDCOM-Vorname wie
+    ein &ouml;ffentlicher Name aussieht, d.h. falls er folgendes beinhaltet:
+    <ul> <li>Eine Zahl oder eine eine r&ouml;mische Zahl, von der angenommen
+    wird,  da&szlig; es sich um die Nummer eines Adelstitels handelt 
+    (z.&nbsp;B. George V) <li>Eines der W&ouml;rter: "der", "den", "die",
+    "el", "le", "la", "the", von dem angenommen wird, da&szlig; es sich um
+    den Beginn eines Beinamens handelt (z.&nbsp;B. William der Eroberer)
+    </ul> dann wird der GEDCOM-Vorname der "&Ouml;ffentliche Name" der
+    Person und das erste Wort des GEDCOM-Vornamens wird ihr "Vorname".
+en: By default, when creating a person, if the GEDCOM first name part looks
+    like a public name, i.e. holds: <ul> <li>A number or a roman number,
+    supposed to be a number of a nobility title (e.g. George V) <li>One of
+    the words: "der", "den", "die", "el", "le", "la", "the", supposed to be
+    the beginning of a qualifier (e.g. William the Conqueror) </ul> then the
+    GEDCOM first name part becomes the person "public name" and its first
+    word his "first name".
+es: Por defecto, al crear una persona, si el campo nombre en el fichero
+    GEDCOM se asemeja a un nombre p&uacute;blico, es decir, si &eacute;l
+    contiene: <ul> <li>Un n&uacute;mero ordinario o en cifras romanas,
+    normalmente considerado como un n&uacute;mero de un t&iacute;tulo de
+    nobleza (por ejemplo: Luis XIV), <li>Una de las palabras: "der", "den",
+    "die", "el", "le", "la", "the", normalmente utilizadas como particula
+    inicial de un calificativo (por ejemplo: Guillermo el Conquistador),
+    </ul> entonces el nombre en el fichero GEDCOM se transforma en un
+    "nombre p&uacute;blico" y la primera palabra del campo nombre va en el
+    campo "nombre".
+fr: Par d&eacute;faut, au moment de la cr&eacute;ation d'une personne, si la
+    partie pr&eacute;nom dans le GEDCOM ressemble &agrave; un nom public,
+    c'est-&agrave;-dire contient: <ul> <li>Un nombre normal ou en chiffres
+    romains, cens&eacute; &ecirc;tre un num&eacute;ro d'un titre de noblesse
+    (exemple: Louis XIV), <li>Un des mots: "der", "den", "die", "el", "le",
+    "la", "the", cens&eacute; &ecirc;tre le d&eacute;but d'un qualificatif
+    (exemple: Guillaume le Conqu&eacute;rant), </ul> alors le pr&eacute;nom
+    dans le GEDCOM devient un "nom public" et le premier mot de la partie
+    pr&eacute;nom va dans la partie "pr&eacute;nom".
+it: Come settaggio standard, al momento della creazione di una persona, se la
+    parte nome nel GEDCOM somiglia a un nome pubblico, cio&egrave; contiene:
+    <ul> <li>un numero in cifre arabe o romane che potrebbe essere il numero
+    di un titolo nobiliare (Esempio: Luigi XIV),<li> Una delle parole: "der",
+    "den", "die", "el", "le", "il", "la", "the", considerati come l'inizio
+    di un qualificativo (Esempio: Guglielmo il Conquistatore), </ul>
+    allora il nome nel GEDCOM diventa un "nome pubblico" e la prima parola
+    della parte nome va nella parte nome.
+lv: Noklusçtajâ variantâ GEDCOM standartâ pirmais vârds ir kâ oficiâlais
+    vârds, t.i.tas var saturçt: <ul> <li>Romieði skaitli, kas apzîmç
+    aristokrâta titlu (piemçram, George V) <li>Vienu no sekojoðiem vârdiem:
+    "der", "den", "die", "el", "le", "la", "the", kâ kvalifikators (e.g.
+    William the Conqueror) </ul> tâdâ gadîjumâ GEDCOMa pirmais vârds kïûst
+    par personas "oficiâlo vârdu" un tâ pirmais vârds par personas vârdu.
+sv: Denna option är förvald: när man skapar en person, om GEDCOM-filens
+    förnamnsdel ser ut som ett officiellt namn, dvs innehåller: <ul> <li>Ett
+    nummer eller ett romersktnummer, förmodas det vara ett nummer för en
+    kunglig- eller adelstitel (tex Gustaf V) <li>Ett av dessa ord: "der",
+    "den", "die", "el", "le", "la", "the", förmodas vara en bestämmning till
+    (tex William the Conqueror) </ul> då blir GEDCOM-filens förnamnsdel
+    personens "officiellanamn" och första ordet dess "förnamn".
+]
+
+<tr align=left>
+<td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Diese Option abschalten.
+en: Cancel this option.
+es: Anular esta opci&oacute;n.
+fr: Annuler cette option.
+it: Annullare questa opzione.
+lv: Izslçgt ðo iespçju
+sv: Välj bort denna option.
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Negative Datumsangaben erzeugen, falls Inkonsistenzen erkannt werden
+    (z.&nbsp;B. Geburt nach Tod).
+en: Set negative dates when inconsistency (e.g. birth after death).
+es: En caso de incoherencia existente, tratar de incluir las fechas
+    negativas (por ejemplo: nacimiento despues de su muerte).
+fr: Essayer de mettre des dates n&eacute;gatives s'il y a incoh&eacute;rence
+    (exemple: naissance apr&egrave;s la mort).
+it: In caso di incoerenza, provate a mettere delle date negative
+    (Esempio: data di nascita posteriore a data di morte).
+lv: Pretrunu gadîjumâ viedot negatîvus datumus (piemçram, dzimðana pçc
+    nâves).
+sv: Sätt negativt datum när datumen är motsägande varandra (tex födelse
+    efter död).
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Keine negativen Datumsangaben: Ein Jahr mit vorangestelltem Minuszeichen
+    soll nicht als negative Jahresangabe interpretiert werden. 
+en: No negative dates: do not interpret a year preceded by a minus sign as a
+    negative year.
+es: No aceptar las fechas negativas: no interpretar un a&ntilde;o precedido
+    de un signo menos "-" como una fecha negativa.
+fr: Pas de dates n&eacute;gatives: ne pas interpr&eacute;ter une
+    ann&eacute;e pr&eacute;c&eacute;d&eacute;e du signe moins "-" comme une
+    date n&eacute;gative.
+it: Non accettare le date negative: non interpretare un anno preceduto dal
+    segno "-" come una data negativa.
+lv: Neveidot negatîvus datumus no esoðajiem negatîvajiem datumiem.
+sv: Inga negativa datum: tolka inte ett år med minus tecken framför som ett
+    negativt år.
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left><td>&nbsp;</td>
+<td>[
+de: GEDCOM-Dateien enthalten manchmal numerische Monatsangaben (von 1 bis
+    12). Der GEDCOM-Standard 5.5  schreibt aber vor, da&szlig; Monate durch
+    K&uuml;rzel dargestellt werden (z.&nbsp;B. "MAY 1912" und nicht
+    "05/1912"). Die Angabe "02/05/1912" ist mehrdeutig (bedeutet je nach
+    Land "2. Mai 1912" oder "5. Februar 1912").
+en: Some GEDCOM files sometimes write dates with numbered months (from 1 to
+    12). The GEDCOM standard 5.5 requires that the months be represented by
+    identifiers (e.g. "MAY 1912" and not "05/1912"). The notation
+    "02/05/1912" is ambiguous (means "May 2, 1912" or "February 5, 1912"
+    according to the countries).
+es: Algunos ficheros  GEDCOM utilizan a veces los n&uacute;meros ordinarios
+    para referirse a los meses (de 1 a 12). El est&aacute;ndar GEDCOM 5.5
+    exije que los meses sean representados por sus identificadores (por ej:
+    "MAY 1912" y no "05/1912"). La notaci&oacute;n "02/05/1912" es
+    ambig&uuml;a; (puede significar "2 de mayo de 1912" o "5 de fevrero de
+    1912" seg&uacute;n los diferentes paises).
+fr: Certains fichiers GEDCOM &eacute;crivent parfois les dates en mettant
+    les mois avec des nombres (de 1 &agrave; 12). Le standard GEDCOM 5.5
+    exige que les mois soient repr&eacute;sent&eacute;s par des
+    identificateurs (ex: "MAY 1912" et non pas "05/1912"). La notation
+    "02/05/1912" est ambigu&euml; (peut signifier "2 mai 1912" ou "5
+    f&eacute;vrier 1912" suivant les pays).
+it: Certi files GEDCOM scrivono talvolta le date indicando il mese
+    con un numero (da 1 a 12); lo standard GEDCOM 5.5 esige
+    che i mesi siano rappresentati da identificatori (esempio: "MAY 1912" e non
+    "05/1912"). La notazione "02/05/1912" &egrave; ambigua; (pu&ograve;
+    voler dire "2 maggio 1912" oppure "5 febbraio 1912", secondo i paesi).
+lv: Daþâs GEDCOM datnçs mçneði datumos tiek apzîmçti ar nummuriem (1-12).
+    GEDCOM standarts 5.5 nosaka, ka mçðiem jâbût apzîmçtiem ar to nosaukumu
+    saîsinâjumiem(piemçram "MAY 1912" un nevis "05/1912"). Datums
+    "02/05/1912" ir daþâdi tulkojams (atkarîbâ no valsts tas ir 1912.gada
+    2.maijs vai 1912.gada 5.februâris).
+sv: En del GEDCOM-filer innehåller ibland datum med numrerade månader (från
+    1 till 12). GEDCOM-standarden version 5.5 kräver att månaderna ska
+    skrivas med identifierare (tex "MAY 1912" och inte "05/1912").
+    Notationen "02/05/1912" är tvetydig (den kan antingen betyda "May 2,
+    1912" eller "February 5, 1912" beroende på land).
+]</td></tr>
+
+<tr align=left>
+<td><input type=radio name=dates value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Aus solchen Daten soll nur die Jahreszahl verwendet werden.
+en: For these dates, extract only the "year" part.
+es: Por este tipo de fechas, extraer solamente la parte "a&ntilde;o".
+fr: Pour ces dates, n'extraire que la partie "ann&eacute;e".
+it: Per queste date, estrarre solamente la parte "anno".
+lv: Ðâdiem datumiem atstât tikai gadu
+sv: För dessa datum, extrahera endast "år" delen.
+]</td>
+</tr>
+
+<tr align=left>
+<td><input type=radio name=dates value="_dm">&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Interpretiere solche Daten als "Tag/Monat/Jahr".
+en: Interpret these dates as "day/month/year".
+es: Interpretar estas fechas como "d&iacute;a/mes/a&ntilde;o".
+fr: Interpr&eacute;ter ces dates comme "jour/mois/ann&eacute;e".
+it: Interpretare queste date come "giorno/mese/anno".
+lv: Pieòemt ðo datumus kâ "diena/mçnesis/gads"
+sv: Tolka dessa datum som "dag/månad/år".
+]</td>
+</tr>
+
+<tr align=left>
+<td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Interpretiere solche Daten als "Monat/Tag/Jahr".
+en: Interpret these dates as "month/day/year".
+es: Interpretar estas fechas como "mes/d&iacute;a/a&ntilde;o".
+fr: Interpr&eacute;ter ces dates comme "mois/jour/ann&eacute;e".
+it: Interpretare queste date come "mese/giorno/anno".
+lv: Pieòemt ðo datumus kâ "mçnesis/diena/gads"
+sv: Tolka dessa datum som "månad/dag/år".
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left><td>&nbsp;</td>
+<td>[
+de: Die Kodierung f&uuml;r Sonderzeichen ist normalerweise im Kopf der
+    GEDCOM-Datei angegeben.
+en: The accentuated characters encoding is normally specified in the GEDCOM
+    header.
+es: El codage de los car&aacute;cteres acentuados esta indicado en principio
+    en el encabezamiento del fichero GEDCOM.
+fr: Le codage des lettres accentu&eacute;es est en principe indiqu&eacute;
+    dans l'en-t&ecirc;te du fichier GEDCOM.
+it: La codifica dei caratteri accentuati &egrave; normalmente indicata
+    nell'intestazione del file GEDCOM.
+lv: Uzsvçrtie burti parsti ir norâdîti GEDCOM datnes galvgaïa aprakstâ.
+sv: Hur de accentuerade tecknen är kodade är normalt specifierat i
+    GEDCOM-huvudet.
+]</td></tr>
+
+<tr align=left>
+<td><input type=radio name=charset value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Beachte die Hinweise aus der GEDCOM-Datei.
+en: Follow the indications of the GEDCOM header.
+es: Seguir las indicaciones del encabezamiento del fichero GEDCOM.
+fr: Suivre les indications de l'en-t&ecirc;te du GEDCOM.
+it: Seguire le indicazioni dell'intestazione del file GEDCOM.
+lv: Sekot GEDCOM datnes galvgaïa apraksta norâdîjumam
+sv: Följ GEDCOM-huvudets information.
+]</td>
+</tr>
+
+<tr align=left>
+<td><input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Die Sonderzeichen folgen der ANSEL-Kodierung.
+en: The accentuated characters are in ANSEL encoding.
+es: Los car&aacute;cteres acentuados est&aacute;n en codage ANSEL.
+fr: Les lettres accentu&eacute;es sont en codage ANSEL.
+it: I caratteri accentuati sono codificati in ANSEL.
+lv: Uzsvçrtie burti ir ANSEL kodçjumâ.
+sv: De accentuerade tecknen är ANSEL kodade.
+]</td></tr>
+
+<tr align=left>
+<td><input type=radio name=charset value=ASCII>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Die Sonderzeichen folgen der ASCII-Kodierung .
+en: The accentuated characters are in ASCII encoding.
+es: Los car&aacute;cteres acentuados est&aacute;n en codage ASCII.
+fr: Les lettres accentu&eacute;es sont en codage ASCII.
+it: I caratteri accentuati sono codificati in ASCII.
+lv: Uzsvçrtie burti ir ASCII kodçjumâ.
+sv: De accentuerade tecknen är ASCII kodade.
+]</td></tr>
+
+<tr align=left>
+<td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Die Sonderzeichen folgen der MSDOS-Kodierung.
+en: The accentuated characters are in MSDOS encoding.
+es: Los car&aacute;cteres acentuados est&aacute;n en codage MSDOS.
+fr: Les lettres accentu&eacute;es sont en codage MSDOS.
+it: I caratteri accentuati sono codificati in MSDOS.
+lv: Uzsvçrtie burti ir MSDOS kodçjumâ.
+sv: De accentuerade tecknen är MS-DOS kodade.
+]</td></tr>
+</table></dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke auf "Ok".
+en: Then click on "Ok".
+es: Finalmente cliquerar en "Ok".
+fr: Puis cliquez sur "Ok".
+it: Poi cliccate su "Ok".
+lv: Tad nospiediet "Ok".
+sv: Klicka sedan på "OK".
+lv: Tad nospiediet "Ok".
+]
+
+<p>
+
+<input type=submit value="Ok">
+
+</form>
