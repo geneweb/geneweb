@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template b v 6.00a 2011/10/01 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: perso.txt, Template a v 6.03a 2011/11/24 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2011 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -77,10 +77,10 @@
         <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
           src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
       %end;
-      <a href="%prefix;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
+      <a href="%prefix;"><img style="border-width: thin" alt="" title="^^"%sp;
         src="%image_prefix;/up.png"%wid_hei;up.png;%/></a>
-      <a href="%prefix;%self.access;;cgl=on"><img style="border-width: thin"%sp;%nn;
-        src="%image_prefix;/right.jpg"%wid_hei;right.jpg; alt="" title="[cancel GeneWeb links]"%/></a>
+      <a href="%prefix;%self.access;;cgl=on"><img style="border-width: thin"%sp;
+        src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[cancel GeneWeb links]"%/></a>
     </td></tr></table>
   %end;
 %end;
@@ -114,11 +114,11 @@
 %end;
 
 %define;short_display_person(xx)
+  %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
     %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
   %end;%sp;
-  %apply;display_sosa("xx")
   %xx.title;%xx.dates;
 %end;
 
@@ -557,6 +557,6 @@
 
 %base_trailer;
 %copyright;
-
+</div>
 </body>
 </html>
