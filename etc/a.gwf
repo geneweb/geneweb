@@ -339,3 +339,7 @@ expand_env=no
 # If counter is set to no, the counter for visiting geneweb's web pages is 
 # *not* incremented. Default behaviour is that the counter is on (set to yes).
 #counter=yes/no
+
+# Default value if not specified is 5000 (which means that it will
+# take at most 5 seconds to modify the "set of places".
+#max_places_update=...
