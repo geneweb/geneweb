@@ -17,7 +17,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/templm.css" %/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   <style type="text/css">
     %if;(evar.wide = "on")
@@ -29,6 +28,8 @@
     %end;
     .person h1 {text-align: center;%if;(has_sosa) border: 5px solid rgb(255,215,0);%end;}
   </style>
+  %include.css;
+  %include.templm_css;
   %base_header;
 </head>
 
