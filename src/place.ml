@@ -723,9 +723,9 @@ value print_place conf base list len =
                         xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"" ;
                         xtag "input" "type=\"text\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\"" 
                           (quote_escaped (no_html_tags (only_printable s))) ;
-                        tag "td" begin
-                          xtag "input" "type=\"submit\" value=\"Ok\"" ;
-                        end;
+                      end;
+                      tag "td" begin
+                        xtag "input" "type=\"submit\" value=\"Ok\"" ;
                       end; };
                   end; } )
                 list;
@@ -895,63 +895,60 @@ value update_person_list conf base new_place list nb_pers max_updates = do {
     else list
   in
   List.iter
-    (fun (old_place, perl) ->
-      if old_place <> new_place then do {
-        (* mise à jour de toutes les personnes concernées par le nouveau lieu *)
-        let place_istr = Gwdb.insert_string base new_place in 
-        List.iter 
-          (fun p -> do {
-            let pl_bi = get_birth_place p in
-            let s_bi = sou base pl_bi in 
-            let pl_bp = get_baptism_place p in
-            let s_bp = sou base pl_bp in 
-            let pl_de = get_death_place p in
-            let s_de = sou base pl_de in 
-            let pl_bu = get_burial_place p in
-            let s_bu = sou base pl_bu in 
-            let birth_place = 
-              if old_place = s_bi then place_istr
-              else pl_bi
-            in
-            let baptism_place = 
-              if old_place = s_bp then place_istr
-              else pl_bp
-            in
-            let death_place = 
-              if old_place = s_de then place_istr
-              else pl_de
-            in
-            let burial_place = 
-              if old_place = s_bu then place_istr
-              else pl_bu
-            in
-            let np = {(gen_person_of_person p) with birth_place = birth_place; 
-                     baptism_place = baptism_place; death_place = death_place; 
-                     burial_place = burial_place} in
-            patch_person base np.key_index np; 
-            let fam = Array.to_list (get_family p) in
-            List.iter
-              (fun f ->
-                let ifam = foi base f in
-                let p_ma = get_marriage_place ifam in
-                let s_ma = sou base p_ma in
-                if old_place = s_ma then
-                    let fam = {(gen_family_of_family ifam) with 
-                               marriage_place = place_istr} 
-                    in
-                    patch_family base fam.fam_index fam 
-                else ()
-              )
-              fam;
-            (* On met aussi à jour l'historique. *)
-            let fn = sou base (get_first_name p) in
-            let sn = sou base (get_surname p) in
-            let occ = get_occ p in
-            let ip = get_key_index p in
-            History.record conf base (fn, sn, occ, ip) "mp"; }
-          )
-          perl  }
-      else () )
+    (fun (old_place, perl) -> do {
+      (* mise à jour de toutes les personnes concernées par le nouveau lieu *)
+      let place_istr = Gwdb.insert_string base new_place in 
+      List.iter 
+        (fun p -> do {
+          let pl_bi = get_birth_place p in
+          let s_bi = sou base pl_bi in 
+          let pl_bp = get_baptism_place p in
+          let s_bp = sou base pl_bp in 
+          let pl_de = get_death_place p in
+          let s_de = sou base pl_de in 
+          let pl_bu = get_burial_place p in
+          let s_bu = sou base pl_bu in 
+          let birth_place = 
+            if old_place = s_bi then place_istr
+            else pl_bi
+          in
+          let baptism_place = 
+            if old_place = s_bp then place_istr
+            else pl_bp
+          in
+          let death_place = 
+            if old_place = s_de then place_istr
+            else pl_de
+          in
+          let burial_place = 
+            if old_place = s_bu then place_istr
+            else pl_bu
+          in
+          let np = {(gen_person_of_person p) with birth_place = birth_place; 
+                   baptism_place = baptism_place; death_place = death_place; 
+                   burial_place = burial_place} in
+          patch_person base np.key_index np; 
+          let fam = Array.to_list (get_family p) in
+          List.iter
+            (fun f ->
+              let ifam = foi base f in
+              let p_ma = get_marriage_place ifam in
+              let s_ma = sou base p_ma in
+              if old_place = s_ma then
+                  let fam = {(gen_family_of_family ifam) with 
+                             marriage_place = place_istr} 
+                  in
+                  patch_family base fam.fam_index fam 
+              else ()
+            )
+            fam;
+          (* On met aussi à jour l'historique. *)
+          let fn = sou base (get_first_name p) in
+          let sn = sou base (get_surname p) in
+          let occ = get_occ p in
+          let ip = get_key_index p in
+          History.record conf base (fn, sn, occ, ip) "cp"; } )
+        perl } )
     list;
   Util.commit_patches conf base; }
 ;
@@ -993,9 +990,19 @@ value print_mod_ok conf base = do {
       (fun accu (_, perl) -> accu + List.length perl)
       0 list
   in
-  let max_updates = 10000 in
+  let place_modified =
+    List.for_all (fun (old_place, _) -> new_place <> old_place) list
+  in
+  (* Indication : 1000 fiches prend environ 1 seconde de traitement. *)
+  (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
+  (* pour ne pas dépasser le time out du serveur.                    *)
+  let max_updates = 
+    match p_getint conf.base_env "max_places_update" with
+    [ Some n -> if n > 50000 then 5000 else n
+    | _ -> 5000 ]
+  in
   update_person_list conf base new_place list nb_pers max_updates;
-  if nb_pers <> 0 then do {
+  if nb_pers <> 0 && place_modified then do {
     let title _ = 
       Wserver.wprint "%s" (capitale (transl conf "place modified")) 
     in
@@ -1018,7 +1025,7 @@ value print_mod_ok conf base = do {
           xtag "input" "type=\"hidden\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\"" 
             (quote_escaped (no_html_tags (only_printable new_place)));
           Wserver.wprint 
-            "%s ?" (capitale (transl conf "continue merging")) ;
+            "%s ?" (capitale (transl conf "continue correcting")) ;
           xtag "input" "type=\"submit\" value=\"Ok\"" ;
         end;
       end
