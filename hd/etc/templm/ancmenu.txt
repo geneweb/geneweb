@@ -17,7 +17,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/templm.css" %/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   <script type="text/javascript">
     <!--
@@ -26,6 +25,8 @@
     }
       -->
   </script>
+  %include.css;
+  %include.templm_css;
   %base_header;
 </head>
 

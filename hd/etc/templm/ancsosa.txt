@@ -23,8 +23,8 @@
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <meta name="robots" content="none" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/templm.css" %/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
+  %include.templ_css;
   %base_header;
 </head>
 %( <!-- Begin define --> %)

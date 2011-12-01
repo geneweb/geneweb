@@ -8,7 +8,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/templm.css" %/>
   <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
@@ -21,6 +20,8 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
+  %include.css;
+  %include.templm_css;
   %base_header;
 
 %(<!-- Begin define (used in updind.txt, updfam.txt)  -->%)
