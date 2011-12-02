@@ -331,6 +331,18 @@ value translate_eval s = Translate.eval (nominative s);
 
 (* *)
 
+value escape_amp s =
+  loop 0 0 where rec loop i len =
+    if i = String.length s then Buff.get len
+    else if s.[i] = '&' then loop (i + 1) (Buff.mstore len "&amp;")
+    else loop (i + 1) (Buff.store len s.[i])
+;
+
+value get_referer conf =
+  let referer = Wserver.extract_param "referer: " '\n' conf.request in
+  escape_amp referer
+;
+
 value begin_centered conf =
   Wserver.wprint
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"

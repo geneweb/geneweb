@@ -20,6 +20,8 @@ value escache_value : base -> string;
 value commit_patches : config -> base -> unit;
 value update_wf_trace : config -> string -> unit;
 
+value get_referer : config -> string;
+
 value no_html_tags : string -> string;
 
 value nl : unit -> unit;
