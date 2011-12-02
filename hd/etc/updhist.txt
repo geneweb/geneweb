@@ -71,7 +71,7 @@
   %elseif;(uu = "aa")[add::parents]%nn;
   %elseif;(uu = "mn")[modify::note/notes]1%nn;
   %elseif;(uu = "cp")[modify::place]%nn;
-  %else;uu%nn;
+  %else;%appy;interp(uu) %nn;
   %end;
 %end;
 
