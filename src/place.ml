@@ -354,81 +354,77 @@ value print_html_places_surnames conf base list =
     [ Some "yes" -> True
     | _ -> False ]
   in
-  do {
-    Wserver.wprint "<ul>\n";
-    let print_li_place x = Wserver.wprint "<li>%s</li>\n" x in
-    let print_ul_li_place x =
-      do {
-        Wserver.wprint "<ul>\n";
-        print_li_place x;
-      }
+  let print_sn len p sn sep =
+    do {
+      Wserver.wprint "%s<a href=\"%s" sep (commd conf);
+      if link_to_ind then
+        Wserver.wprint "%s" (acces conf base p)
+      else
+        Wserver.wprint "m=N;v=%s" (code_varenv sn);
+      Wserver.wprint "\">%s</a> (%d)" sn len
+    }
+  in
+  let print_sn_list snl =
+    let snl =
+      List.map
+        (fun (len, ip) ->
+           let p = pget conf base ip in
+           let sn = p_surname base p in
+           (len, p, sn))
+        snl
     in
-    let rec loop prev =
-      fun
-      [ [(pl, snl) :: list] ->
-          let rec loop1 prev pl =
-            match (prev, pl) with
-            [ ([], [x2 :: l2]) ->
-                do {
-                  print_li_place x2;
-                  List.iter print_ul_li_place l2;
-                }
-            | ([x1], [x2 :: l2]) ->
-                do {
-                  if x1 = x2 then () else print_li_place x2;
-                  List.iter print_ul_li_place l2
-                }
-            | ([x1 :: l1], [x2 :: l2]) ->
-                if x1 = x2 then loop1 l1 l2
-                else do {
-                  List.iter (fun _ -> Wserver.wprint "</ul>\n") l1;
-                  print_li_place x2;
-                  List.iter print_ul_li_place l2;
-                }
-            | _ -> assert False ]
-          in
-          do {
-            loop1 prev pl;
-            Wserver.wprint "<ul>\n<li>\n";
-            let snl =
-              List.map
-                (fun (len, ip) ->
-                   let p = pget conf base ip in
-                   let sn = p_surname base p in
-                   (len, p, sn))
-                snl
-            in
-            let snl =
-              List.sort (fun (_, _, sn1) (_, _, sn2) -> compare sn1 sn2) snl
-            in
-            let snl =
-              List.fold_right
-                (fun (len, p, sn) ->
-                   fun
-                   [ [(len1, p1, sn1) :: snl] ->
-                       if sn = sn1 then [(len + len1, p, sn) :: snl]
-                       else [(len, p, sn); (len1, p1, sn1) :: snl]
-                   | [] -> [(len, p, sn)] ])
-                snl []
-            in
-            List.iter
-              (fun (len, p, sn) ->
-                 do {
-                   Wserver.wprint "<a href=\"%s" (commd conf);
-                   if link_to_ind then
-                     Wserver.wprint "%s" (acces conf base p)
-                   else
-                     Wserver.wprint "m=N;v=%s" (code_varenv sn);
-                   Wserver.wprint "\">%s</a> (%d),\n" sn len
-                 })
-              snl;
-            Wserver.wprint "</li></ul>\n";
-            loop pl list
-          }
-      | [] -> List.iter (fun _ -> Wserver.wprint "</ul>\n") prev ]
+    let snl =
+      List.sort (fun (_, _, sn1) (_, _, sn2) -> compare sn1 sn2) snl
+    in 
+    let snl =
+      List.fold_right
+        (fun (len, p, sn) ->
+           fun
+           [ [(len1, p1, sn1) :: snl] ->
+               if sn = sn1 then [(len + len1, p, sn) :: snl]
+               else [(len, p, sn); (len1, p1, sn1) :: snl]
+           | [] -> [(len, p, sn)] ])
+        snl []
     in
-    loop [] list
-  }
+    let (len, p, sn, snl) =
+      match snl with
+      [ [(len, p, sn) :: snl] -> (len, p, sn, snl)
+      | _ -> assert False ]
+    in
+    tag "li" begin
+      print_sn len p sn "";
+      List.iter
+        (fun (len, p, sn) -> print_sn len p sn ",\n")
+        snl;
+      Wserver.wprint "\n";
+    end
+  in
+  let rec loop prev =
+    fun
+    [ [(pl, snl) :: list] ->
+        let rec loop1 prev pl =
+          match (prev, pl) with
+          [ ([], l2) -> List.iter (fun x -> Wserver.wprint "<li>%s<ul>\n" x) l2
+          | ([x1 :: l1], [x2 :: l2]) ->
+              if x1 = x2 then loop1 l1 l2
+              else do {
+                List.iter (fun _ -> Wserver.wprint "</ul></li>\n") [x1 :: l1];
+                loop1 [] [x2 :: l2]
+              }
+          | _ -> assert False ]
+        in
+        do {
+          loop1 prev pl;
+          print_sn_list snl;
+          loop pl list
+        }
+    | [] -> do {
+        List.iter (fun _ -> Wserver.wprint "</ul></li>\n") prev
+      } ]
+  in
+  tag "ul" begin
+    loop [] list;
+  end
 ;
 
 value print_all_places_surnames_short conf list =
