@@ -1001,8 +1001,8 @@ value print_mod_ok conf base = do {
     [ Some n -> if n > 50000 then 5000 else n
     | _ -> 5000 ]
   in
-  update_person_list conf base new_place list nb_pers max_updates;
   if nb_pers <> 0 && place_modified then do {
+    update_person_list conf base new_place list nb_pers max_updates;
     let title _ = 
       Wserver.wprint "%s" (capitale (transl conf "place modified")) 
     in
