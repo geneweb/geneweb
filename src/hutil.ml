@@ -17,7 +17,7 @@ value commd_no_params conf =
 ;
 
 value link_to_referer conf =
-  let referer = Wserver.extract_param "referer: " '\n' conf.request in
+  let referer = Util.get_referer conf in
   if referer <> "" then
     let fname = "left.png" in
     let wid_hei =
