@@ -2179,7 +2179,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
-  | "occ" -> if p_auth then string_of_int (get_occ p) else ""
+  | "occ" -> 
+      if (is_hide_names conf p) && not p_auth then ""
+      else string_of_int (get_occ p)
   | "occupation" ->
       if p_auth then
         let s = sou base (get_occupation p) in
