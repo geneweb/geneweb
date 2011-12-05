@@ -25,7 +25,34 @@ value ext_flags =
 
 type changed =
   [ Rperson of string and string and int and Adef.iper
-  | Rnotes of option int and string ]
+  | Rnotes of option int and string 
+  | Rplaces ] 
+;
+
+value notify_change conf base changed action =
+  IFDEF UNIX THEN
+    match p_getenv conf.base_env "notify_change" with
+    [ Some comm ->
+        let args =
+          match changed with
+          [ Rperson fn sn occ ip ->
+              [| fn; sn; string_of_int occ;
+                 string_of_int (Adef.int_of_iper ip) |]
+          | Rnotes (Some num) file -> [| file; string_of_int num |]
+          | Rnotes None file -> [| file |] 
+          | Rplaces -> [| |] ]
+        in
+        let args = Array.append [| comm; conf.bname; conf.user; action |] args in
+        match Unix.fork () with
+        [ 0 ->
+            if Unix.fork () <> 0 then exit 0
+            else do {
+              try Unix.execvp comm args with _ -> ();
+              exit 0
+            }
+        | id -> ignore (Unix.waitpid [] id) ]
+    | None -> () ]
+  ELSE () END
 ;
 
 value gen_record conf base changed action =
@@ -38,7 +65,8 @@ value gen_record conf base changed action =
           | Rnotes (Some num) file ->
               let s = string_of_int num in
               if file = "" then s else file ^ "/" ^ s
-          | Rnotes None file -> file ]
+          | Rnotes None file -> file 
+          | Rplaces -> "" ]
         in
         let fname = file_name conf in
         match
@@ -55,28 +83,13 @@ value gen_record conf base changed action =
             }
         | None -> () ]
     | _ -> () ];
-    IFDEF UNIX THEN
-      match p_getenv conf.base_env "notify_change" with
-      [ Some comm ->
-          let args =
-            match changed with
-            [ Rperson fn sn occ ip ->
-                [| fn; sn; string_of_int occ;
-                   string_of_int (Adef.int_of_iper ip) |]
-            | Rnotes (Some num) file -> [| file; string_of_int num |]
-            | Rnotes None file -> [| file |] ]
-          in
-          let args = Array.append [| comm; conf.bname; conf.user; action |] args in
-          match Unix.fork () with
-          [ 0 ->
-              if Unix.fork () <> 0 then exit 0
-              else do {
-                try Unix.execvp comm args with _ -> ();
-                exit 0
-              }
-          | id -> ignore (Unix.waitpid [] id) ]
-      | None -> () ]
-    ELSE () END;
+    (* Effet de bord du dictionnaire des lieux : on peut facilement   *)
+    (* créer 5000 nouveaux processus à chaque mise à jour d'un lieu.  *)
+    (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
+    (* mise à jour de l'historique.                                   *)
+    if action <> "cp" then 
+      notify_change conf base changed action 
+    else ();
   }
 ;
 
@@ -86,6 +99,10 @@ value record conf base (fn, sn, occ, i) action =
 
 value record_notes conf base (num, file) action =
   gen_record conf base (Rnotes num file) action
+;
+
+value notify_places conf base action =
+  notify_change conf base Rplaces action
 ;
 
 value record_key conf base old_key new_key =

@@ -946,7 +946,13 @@ value update_person_list conf base new_place list nb_pers max_updates = do {
           History.record conf base (fn, sn, occ, ip) "cp"; } )
         perl } )
     list;
-  Util.commit_patches conf base; }
+  Util.commit_patches conf base; 
+  (* On appelle explicitement notify_change car la base est modifiée.  *)
+  (* On fait cet appel à la fin de chaque mise à jour de la liste des  *)
+  (* personnes, car si l'administrateur de la base ne modifie pas tous *)
+  (* les évènements liés à ce lieux, on ne sera pas mis au courant que *)
+  (* la base à été mise à jour.                                        *)
+  History.notify_places conf base "cp"; }
 ;
 
 

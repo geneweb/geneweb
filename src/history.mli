@@ -14,3 +14,6 @@ value print : config -> base -> unit;
 value print_search : config -> base -> unit;
 
 value record_key : config -> base -> string -> string -> unit;
+
+value notify_places : config -> base -> string -> unit;
+  
