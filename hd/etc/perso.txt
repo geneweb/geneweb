@@ -44,7 +44,11 @@
   %elseif;is_female;
     <img src="%image_prefix;/female.png"%wid_hei;female.png; alt="[M/F]1" title="[M/F]1"%/>%nn;
   %end;
-  %if;(bvar.show_invisible = "on" and wizard and is_invisible) (x)%end;
+  %if;(bvar.show_invisible = "on" and wizard and is_invisible)
+    <div style="float:%left;">%nn;
+      <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)"%/>%nn;
+    </div>
+  %end;
   %sp;
 %end;
 %if;has_public_name;
