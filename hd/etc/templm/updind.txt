@@ -3,12 +3,7 @@
 <head>
   <!-- $Id: updind.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2010/11/02 geneweb-6.01 templ=templm -->
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
+  <!-- Modified mickroue(a)yahoo.fr 2010/12/02 geneweb-6.03 templ=templm -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -16,8 +11,72 @@
       [*modify::person/persons]0 # %index;
     %else;[*add::person/persons]0%end;
   </title>
+  <meta name="robots" content="none" %/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
+  <meta http-equiv="Content-Style-Type" content="text/css" %/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    /* templm */
+    .nobr {
+    	white-space: nowrap;
+    }
+    .background_sex_0 {
+    	background-color: rgb(173,216,230);
+    }
+    .background_sex_1 {
+    	background-color: rgb(255,182,193);
+    }
+    .background_sex_2 {
+    	background-color: rgb(255,0,0);
+    }
+    /* updind.txt, updfam.txt */
+    #upd form, #upd input, #upd select, #upd textarea {
+    	font-size: 11px;
+    }
+    #upd fieldset {
+    	width: auto;
+    	float: left;
+    	border: solid 1px;
+    	border-color: rgb(128,128,128);
+    	margin: 0.2em;
+    	padding: 0.2em;
+    }
+    #upd fieldset dt {
+    	width: auto;
+    	float: left;
+    	font-weight: bold;
+    }
+    #upd input {
+    	padding: 0em 0.2em 0em;
+    	margin: 0em 0.2em 0em;
+    }
+    #upd input[type='checkbox'], #upd input[type='radio'] {
+    	width: auto;
+    }
+    #upd legend {
+    	font-size: 12px;
+    	font-weight: bold;
+    }
+    #upd .sure {
+    	background-color: rgb(144,238,144);
+    }
+    #upd .not_sure {
+    	background-color: rgb(192,192,192);
+    }
+    #upd .number {
+    	font-family: "Courier New", Courier, monospace;
+    	font-size: 12px;
+    	font-weight: bold;
+    	text-align: center;
+    }
+    /* updind.txt */
+    #sex_person, .modify_person {
+    	text-align: right;
+    	padding: 0.5em;
+    	margin: 0em;
+    }
+  </style>
   %base_header;
 
   %define;search_focus(xcnt)
@@ -52,7 +111,7 @@
     %end;
   %end;
 
-<!-- Begin define (used in updind.txt, updfam.txt)  -->
+%(<!-- Begin define (used in updind.txt, updfam.txt)  -->%)
   <script type="text/javascript">
   <!--
   function changeCalendar(e,v,m,c) 
@@ -349,7 +408,7 @@
 
 %(<!-- End define  -->%)
 </head>
-<body id="upd" %apply;load_focus()>
+<body%body_prop; id="upd" %apply;load_focus()>
 %message_to_wizard;
 
 <form name="updind" method="post" action="%action;">

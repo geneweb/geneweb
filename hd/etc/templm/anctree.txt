@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/10/31 geneweb-6.01 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/03 geneweb-6.03 templ=templm -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -17,9 +17,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    .color_sosa {
+    	color: rgb(255,215,0);
+    }
+  </style>
   %base_header;
 
 %define;symbol(xx)
@@ -156,7 +159,7 @@
 %end;
 
 </head>
-<body id="anctree">
+<body%body_prop; id="anctree">
 %message_to_wizard;
 
 %if;not cancel_links;
@@ -166,13 +169,15 @@
     %end;
       <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
   </div>
-  <br %/>
 %end;
 
 %if;(evar.t = "T" and not cancel_links)%nn;
-  <div style="text-align:%right;">%nn;
-  <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
-  ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
+  <div style="text-align:%right;">
+    <br %/>
+    <a href="%prefix;m=A;t=T;v=%evar.v;;%access;;dag=on;notab=on;slices=on">
+      <tt>//</tt>
+    </a>
+  </div>
 %end;
 
 %if;(evar.t = "T")

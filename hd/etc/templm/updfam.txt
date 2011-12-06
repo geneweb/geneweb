@@ -3,12 +3,7 @@
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/11/02 geneweb-6.01 templ=templm -->
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -20,8 +15,66 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
+  <meta name="robots" content="none" %/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
+  <meta http-equiv="Content-Style-Type" content="text/css" %/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    /* templm */
+    .nobr {
+    	white-space: nowrap;
+    }
+    .background_sex_0 {
+    	background-color: rgb(173,216,230);
+    }
+    .background_sex_1 {
+    	background-color: rgb(255,182,193);
+    }
+    .background_sex_2 {
+    	background-color: rgb(255,0,0);
+    }
+    /* updind.txt, updfam.txt */
+    #upd form, #upd input, #upd select, #upd textarea {
+    	font-size: 11px;
+    }
+    #upd fieldset {
+    	width: auto;
+    	float: left;
+    	border: solid 1px;
+    	border-color: rgb(128,128,128);
+    	margin: 0.2em;
+    	padding: 0.2em;
+    }
+    #upd fieldset dt {
+    	width: auto;
+    	float: left;
+    	font-weight: bold;
+    }
+    #upd input {
+    	padding: 0em 0.2em 0em;
+    	margin: 0em 0.2em 0em;
+    }
+    #upd input[type='checkbox'], #upd input[type='radio'] {
+    	width: auto;
+    }
+    #upd legend {
+    	font-size: 12px;
+    	font-weight: bold;
+    }
+    #upd .sure {
+    	background-color: rgb(144,238,144);
+    }
+    #upd .not_sure {
+    	background-color: rgb(192,192,192);
+    }
+    #upd .number {
+    	font-family: "Courier New", Courier, monospace;
+    	font-size: 12px;
+    	font-weight: bold;
+    	text-align: center;
+    }
+  </style>
   %base_header;
 
 %(<!-- Begin define (used in updind.txt, updfam.txt)  -->%)
@@ -370,7 +423,7 @@
 %( <!-- End define --> %)
 </head>
 
-<body id="upd" %apply;load_focus()>
+<body%body_prop; id="upd" %apply;load_focus()>
 %message_to_wizard;
 <form name="updfam" method="post" action="%action;">
   <p>%hidden;  

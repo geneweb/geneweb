@@ -289,13 +289,32 @@ hr.full
 }
 
 /* Listes ascendance */
+/* sans parent */
 li.noway
 {
   list-style-type: circle;
 }
+/* avec parents */
 li.goway
 {
   list-style-type: disc;
+}
+
+/* liste descendance */
+/* sans conjoint */
+li.nospou
+{
+  list-style-type: circle;
+}
+/* avec conjoint, sans descendance */
+li.nodesc
+{
+  list-style-type: disc
+}
+/* avec descendance */
+li.desc
+{
+  list-style-type: square;
 }
 
 /* Propositions de background dans certains menus */

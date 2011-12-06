@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/11/01 geneweb-6.01 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -18,9 +18,58 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    .nobr {
+    	white-space: nowrap;
+    }
+    .list_no_style {
+    	margin: 0;
+    	padding-left: 10px;
+    	list-style-type: none;
+    }
+    .border_sex_0 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(173,216,230);
+    }
+    .border_sex_1 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(255,182,193);
+    }
+    .border_sex_2 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(255,0,0);
+    }
+    .border_sosa {
+    	border-left: solid 5px rgb(255,215,0);
+    }
+    .border_family_0 {
+    	border-left-style: double;
+    }
+    .border_family_1 {
+    	border-left-style: solid;
+    }
+    .color_sosa {
+    	color: rgb(255,215,0);
+    }
+    .color_sex_0 {
+    	color: rgb(173,216,230);
+    }
+    .color_sex_1 {
+    	color: rgb(255,182,193);
+    }
+    .color_sex_2 {
+    	color: rgb(255,0,0);
+    }
+    /* deslist.txt */
+    #deslist li {
+    	margin: 2px 0 0 0;
+    	padding: 0 0 0 10px;
+    }
+    #deslist .notes_src em {
+    	font-size: 80%%;
+    }
+  </style>
   %base_header;
 </head>
 
@@ -317,7 +366,7 @@
 %end;
 
 %(   Main   %)
-<body id="deslist">
+<body%body_prop; id="deslist">
 %message_to_wizard;
 
 <h1 style="text-align:center" class="highlight">%nn;

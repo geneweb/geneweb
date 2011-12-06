@@ -1,10 +1,10 @@
-/* my_base.css + default.css */
-/* mickroue(a)yahoo.fr 2011/11/02 geneweb-6.01 */
-/* my_base is the name of the database */
+/* my_base.css + default.css                                         */
+/* mickroue(a)yahoo.fr 2011/11/10 geneweb-6.02                       */
+/* my_base is the name of the database                               */
 /* To do : rename this file my_base.css into your database name .css */
-/* To do : copy the file to bases/css/ */
-/* To do : add to my_base.gwf : css_prop=my_base */
-/* Properties of all my_base html pages. */
+/* To do : copy the file to bases/css/                               */
+/* To do : add to my_base.gwf : css_prop=my_base                     */
+/* Properties of all my_base html pages.                             */
 html {
 	background: url('/images/gwback-my_base.jpg')
 }
@@ -111,9 +111,9 @@ h1 {
 	border: 0;
 }
 /* Properties of the option block. Page welcome.txt        */
-/* Trick:to center easily this block, one must add the   */
-/* following properties:align, margin-left, margin-right */
-/* and the trick:overflow:auto.                         */
+/* Trick:to center easily this block, one must add the     */
+/* following properties:align, margin-left, margin-right   */
+/* and the trick:overflow:auto.                            */
 #options {
 	width: 750px;
 	border: solid 2px #6f8301;
@@ -131,9 +131,9 @@ h1 {
 	color: white;
 }
 /* Properties of the navigation block. Page perso.txt      */
-/* Trick:to center easily this block, one must add the   */
-/* following properties:align, margin-left, margin-right */
-/* and the trick:overflow:auto.                         */
+/* Trick:to center easily this block, one must add the     */
+/* following properties:align, margin-left, margin-right   */
+/* and the trick:overflow:auto.                            */
 #navigation {
 	width: 750px;
 	border: solid 2px #6f8301;
@@ -151,8 +151,8 @@ h1 {
 	margin: 0;
 }
 /* list_left and list_right allow to display lists in 2 columns.     */
-/* It's applied in the welcome.txt page:"other option" block and    */
-/* in the perso.txt page:"navigation" block.                        */
+/* It's applied in the welcome.txt page:"other option" block and     */
+/* in the perso.txt page:"navigation" block.                         */
 /* width specify that this block is half of its parent's block and   */
 /* float specify the position of the list (relative to the parents). */
 /* The text-align property is inherited by the parent's block.       */

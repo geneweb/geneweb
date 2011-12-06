@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt, Template x v 6.03a 2011/11/24 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: ancsosa.txt, Template x v 6.03b 2011/12/01 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2011 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -22,7 +22,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
   <style type="text/css"><!--
   --></style>
 %base_header;
@@ -547,12 +547,12 @@
    Main
 %)
 
-<body %body_prop;>
+<body%body_prop;>
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %message_to_wizard;
 
-<h1 style="text-align:center" class="highlight">%nn;
+<h1>%nn;
   %apply;a_of_b%with;
     %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
   %and;
@@ -899,6 +899,5 @@
 
 %base_trailer;
 %copyright;
-</div>
 </body>
 </html>

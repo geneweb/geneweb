@@ -3,15 +3,92 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/11/01 geneweb-6.01 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none" %/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    /* welcome.txt */
+    #welcome {
+      margin: 0;
+      padding: 2px;
+    }
+    #welcome_content-top, #welcome_content-bottom {
+    	width: 100%%;
+    	clear: both;
+    	padding-top: 20px;
+    	padding-bottom: 20px;
+    	text-align: center;
+    }
+    #welcome_content-left, #welcome_content-right {
+    	min-width: 300px;
+    	min-height: 350px;
+    	width: 49%%;
+    	float: left;
+    }
+    #welcome_content-left, #welcome_content-right, #welcome_motd {
+    	padding: 2px;
+    	margin: 2px;
+    	border: solid 1px #FFFFC0;
+    }
+    #welcome_content-right h2 {
+    	text-align: center;
+    }
+    #welcome_content-right form {
+    	float: left;
+    	margin: 0;
+    	padding: 0;
+    }
+    #welcome_content-right fieldset {
+    	border: 0;
+    }
+    #welcome_user-info {
+    	position: absolute;
+    	right: 0px;
+    	top: 0px;
+    	margin-right: 3em;
+    }
+    #welcome_user-info form {
+    	margin: 0;
+    	padding: 0;
+    }
+    #welcome_logo, #welcome_title {
+    	float: left;
+    	min-width: 300px;
+    	width: 50%%;
+    	padding: 0;
+    	margin: 0;
+    }
+    #welcome_title small {
+    	font-size: 60%%;
+    }
+    #welcome_motd {
+    	clear: both;
+    	width: 99%%
+    }
+    #welcome_form-person, #welcome_form-titles {
+    	width: 100%%;
+    }
+    #welcome_form-person select {
+    	width: 200px;
+    }
+    #welcome_form-titles div {
+    	float: left;
+    	margin-right: 3px;
+    }
+    #welcome_form-titles a {
+    	font-size: 70%%;
+    }
+    #welcome_form-list, #welcome_form-place {
+    	width: 40%%;
+    }
+    #welcome_form-list select {
+    	width: 100%%;
+    }
+  </style>
   %base_header;
 </head>
 
@@ -30,7 +107,7 @@
   %end;
 %end;
 
-<body id="welcome">
+<body%body_prop; id="welcome">
 <div id="welcome_content-top">
   <div id="welcome_logo">
     <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" %/>
@@ -158,6 +235,11 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
       %if;(not base.has_notes)
         <li>
           <a href="%prefix;m=MOD_NOTES">[add::note/notes]0</a>
+        </li>
+      %end;
+      %if;(wizard)
+        <li>
+          <a href="%prefix;m=MOD_P">[book of places]</a>
         </li>
       %end;
     %end;

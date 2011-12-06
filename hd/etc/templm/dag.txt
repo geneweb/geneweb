@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/10/31 geneweb-6.01 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
@@ -13,24 +13,36 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    hr.left {
+      direction: ltr;
+      width: 50%%;
+      text-align: left;
+      margin-left: 0;
+    } 
+    hr.right {
+      direction: ltr;
+      width: 50%%;
+      text-align: right;
+      margin-right: 0;
+    }
+    hr.full {
+      width:100%%;
+    }
+  </style>
   %base_header;
 </head>
-<body id="dag">
+<body%body_prop; id="dag">
 %message_to_wizard;
-
-<a href="%prefix;" accesskey="T"></a>
 
 %if;not cancel_links;
   <div class="menu2">
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>
     %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+    <a href="%prefix;" title="[visualize/show/hide/summary]3" accesskey="T">^^</a>
   </div>
-  <br %/>
 %end;
 %if;(evar.slices = "on")
   <h1 style="text-align:center" class="highlight">%nn;
@@ -87,9 +99,13 @@
   </form>
 %else;
   %if;(evar.notab != "on" and not cancel_links)
-    <div style="text-align:%right;
-    "><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
-       notab=on;slices=on" accesskey="/"><tt>//</tt></a></div>
+    <div style="text-align:%right;">
+     <br %/>
+     <a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;%nn;
+       notab=on;slices=on" accesskey="/" title="[*display by slices/slice width/overlap/total width]0">
+       <tt>//</tt>
+     </a>
+    </div>
   %end;
   %if;(evar.notab = "on" or evar.pos2 != "")
     %let;dpos;%if;(evar.dpos != "")%evar.dpos;%else;78%end;%in;
@@ -147,11 +163,11 @@
         %elseif;(dag_cell.text != "")%dag_cell.text;
         %else;
           %if;dag_cell.is_hr_left;
-            <hr dir="ltr" width="50%%" align="%left;" %/>%nn;
+            <hr class="%left;"%/>%nn;
           %elseif;dag_cell.is_hr_right;
-            <hr dir="ltr" width="50%%" align="%right;" %/>%nn;
+            <hr class="%right;"%/>%nn;
           %else;
-            <hr width="100%%" %/>
+            <hr class="full"%/>%nn;
           %end;
         %end;
         </td>

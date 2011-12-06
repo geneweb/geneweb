@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancsosa.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/11/01 geneweb-6.01 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] ... [up to] ...%nn;
@@ -23,8 +23,85 @@
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <meta name="robots" content="none" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
-  %include.templ_css;
+  %include.css;
+  <style type="text/css">
+    .list_no_style {
+    	margin: 0;
+    	padding-left: 10px;
+    	list-style-type: none;
+    }
+    .border_sex_0 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(173,216,230);
+    }
+    .border_sex_1 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(255,182,193);
+    }
+    .border_sex_2 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(255,0,0);
+    }
+    .border_sosa {
+    	border-left: solid 5px rgb(255,215,0);
+    }
+    .border_family_0 {
+    	border-left-style: double;
+    }
+    .border_family_1 {
+    	border-left-style: solid;
+    }
+    .color_sosa {
+    	color: rgb(255,215,0);
+    }
+    /* ancsosa.txt */
+    #ancsosa li {
+    	margin: 2px 0 0 0;
+    	padding: 0 0 0 10px;
+    }
+    #ancsosa .image {
+    	max-width: 100px;
+    	max-height: 150px;
+    }
+    .is_desc_10 {
+    	background-color: rgb(173,216,230);
+    }
+    .is_desc_11 {
+    	background-color: rgb(255,182,193);
+    }
+    .notes_src em {
+    	font-size: 80%%;
+    }
+    .other_family {
+    	font-size: 80%%;
+    }
+    .short_display_table {
+    	margin-left: auto;
+    	margin-right: auto;
+    	text-align: center;
+    	border: solid 1px rgb(150,150,150);
+    }
+    .short_display_table tr td {
+    	border: solid 1px rgb(150,150,150);
+    	margin-left: 0px;
+    	margin-right: 0px;
+    }
+    .short_display_table a {
+    	display: block;
+    }
+    .sure_dates0 {
+    	display: block;
+    }
+    .sure_dates1, .sure_dates11 {
+    	display: block;
+    	background-color: rgb(144,238,144);
+    }
+    .bmd_sosa {
+    	font-style: normal;
+    	font-size: x-small;
+    	vertical-align: top;
+    }
+  </style>
   %base_header;
 </head>
 %( <!-- Begin define --> %)
@@ -606,7 +683,7 @@
 %( <!-- End define --> %)
 
 %(   Main   %)
-<body id="ancsosa">
+<body%body_prop; id="ancsosa">
 %message_to_wizard;
 
 <h1 style="text-align:center" class="highlight">%nn;
