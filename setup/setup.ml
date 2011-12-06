@@ -949,6 +949,16 @@ value consang_check conf =
   else print_file conf "bsi.htm"
 ;
 
+value update_nldb_check conf =
+  let in_f =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  if in_f = "" then print_file conf "err_miss.htm"
+  else print_file conf "bsi.htm"
+;
+
 value has_gwu dir =
   match
     try Some (Unix.opendir dir) with [ Unix.Unix_error _ _ _ -> None ]
@@ -1525,6 +1535,18 @@ value consang conf ok_file =
   }
 ;
 
+value update_nldb conf ok_file =
+  let rc =
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
+    exec_f (comm ^ parameters conf.env)
+  in
+  do {
+    eprintf "\n";
+    flush stderr;
+    if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  }
+;
+
 value separate_slashed_filename s =
   loop 0 where rec loop i =
     match try Some (String.index_from s i '/') with [ Not_found -> None ] with
@@ -1649,6 +1671,10 @@ value setup_comm_ok conf =
       match p_getenv conf.env "opt" with
       [ Some "check" -> consang_check conf
       | _ -> consang conf "consg_ok.htm" ]
+  | "update_nldb" ->
+      match p_getenv conf.env "opt" with
+      [ Some "check" -> update_nldb_check conf
+      | _ -> update_nldb conf "update_nldb_ok.htm" ]
   | "gwf" -> gwf conf
   | "gwf_1" -> gwf_1 conf
   | "gwd" -> gwd conf
