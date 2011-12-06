@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/11/01 geneweb-6.01 templ=templm --> 
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm --> 
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -17,8 +17,231 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
+  %include.css;
   <style type="text/css">
+    .nobr {
+    	white-space: nowrap;
+    }
+    .list_no_style {
+    	margin: 0;
+    	padding-left: 10px;
+    	list-style-type: none;
+    }
+    .background_sex_0 {
+    	background-color: rgb(173,216,230);
+    }
+    .background_sex_1 {
+    	background-color: rgb(255,182,193);
+    }
+    .background_sex_2 {
+    	background-color: rgb(255,0,0);
+    }
+    .border_sex_0 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(173,216,230);
+    }
+    .border_sex_1 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(255,182,193);
+    }
+    .border_sex_2 {
+    	border-left-width: 5px;
+    	border-left-color: rgb(255,0,0);
+    }
+    .border_sosa {
+    	border-left: solid 5px rgb(255,215,0);
+    }
+    .border_family_0 {
+    	border-left-style: double;
+    }
+    .border_family_1 {
+    	border-left-style: solid;
+    }
+    .color_sosa {
+    	color: rgb(255,215,0);
+    }
+    .color_sex_0 {
+    	color: rgb(173,216,230);
+    }
+    .color_sex_1 {
+    	color: rgb(255,182,193);
+    }
+    .color_sex_2 {
+    	color: rgb(255,0,0);
+    }
+    /* perso.txt */
+    #perso {
+    	margin: 0;
+    	padding-top: 2em;
+    	padding-right: 2px;
+    	padding-bottom: 2em;
+    	padding-left: 2px;
+    }
+    #perso h1, #perso h3 {
+    	margin: 5px;
+    	padding: 5px;
+    }
+    #perso h1 {
+    	font-size: 150%
+    }
+    #perso h3 {
+    	font-size: 120%%;
+    }
+    #perso ol, #perso ul {
+    	margin-left: 0;
+    	padding-left: 20px;
+    }
+    #perso li {
+    	margin: 2px 0 0 0;
+    	padding: 0 0 0 10px;
+    }
+    #perso sub a {
+    	color: rgb(255,215,0);
+    }
+    #perso wbr {
+    	display: inline-block;
+    }
+    .menu {
+    	margin: 0;
+    	padding: 0;
+    	border: 0;
+    	position: absolute;
+    	top: 0;
+    	left: 0;
+    	font-family: Arial;
+    	font-size: 14px;
+    }
+    .menu span {
+    	position: relative;
+    	display: block;
+    	float: left;
+    }
+    .menu span a {
+    	float: left;
+    }
+    .menu .s_menu {
+    	display: none;
+    	float: left;
+    	margin-left: 0;
+    	margin-top: 0;
+    	padding: 0;
+    	border: 0;
+    	width: 150px;
+    }
+    .menu span:hover > .s_menu {
+    	display: block;
+    	position: absolute;
+    	left: 0;
+    	top: 1.5em;
+    	z-index: 10;
+    }
+    .menu .s_menu a {
+    	width: 150px;
+    }
+    .menu1 {
+    	clear: both;
+    	font-size: 70%%;
+    }
+    .menu1 > span {
+    	display: block;
+    	width: auto;
+    	max-width: 161px;
+    	float: left;
+    	margin: 10px;
+    }
+    .menu1 .s_menu a {
+    	display: block;
+    	position: relative;
+    	top: 5px;
+    	left: 5px;
+    	width: auto;
+    	max-width: 150px;
+    }
+    .button, .menu a, .menu1 a, .menu3 a {
+    	background-color: buttonface;
+    	border: solid 1px #FFFFC0;
+    	margin: 0;
+    	padding: 2px;
+    	color: buttontext;
+    }
+    #perso .small {
+    	font-size: 70%%;
+    }
+    #perso .fam1, #perso .fam2, #perso .person_content {
+    	float: left;
+    	padding: 2px;
+    	margin: 2px;
+    	border: solid 1px #FFFFC0;
+    }
+    #perso .fam ol, #perso .siblings ol {
+    	list-style-type: none;
+    	margin-left: -10px;
+    }
+    #perso .fam ul {
+    	list-style-type: none;
+    	margin: 0;
+    	padding-top: 3px;
+    	padding-bottom: 3px;
+    	padding-left: 0;
+    	padding-right: 0;
+    }
+    #perso .fam ul li {
+    	clear: both;
+    }
+    #perso .ancestors {
+    	width: auto;
+    	float: left;
+    	margin: 5px;
+    }
+    #perso .siblings {
+    	width: auto;
+    	float: left;
+    	margin: 5px;
+    }
+    #perso .person p, #perso .person div {
+    	text-align: center;
+    }
+    #perso .person_content, #perso .person, #perso .notes, #perso .sources, #perso .relations {
+    	clear: both;
+    }
+    #perso .image, #perso .image img, #perso .image_sheet {
+    	float: left;
+    	width: 12.5em;
+    }
+    #perso .image {
+    	display: block;
+    	margin: 0;
+    	padding: 0;
+    }
+    #perso .image img {
+    	border: none;
+    	margin: 0;
+    	padding: 0;
+    }
+    #perso .t_witness td {
+    	background-color: buttonface;
+    	padding: 2px;
+    	margin: 2px;
+    }
+    #perso .sheet {
+    	max-width: 95%%;
+    	width: auto;
+    	float: left;
+    	border: 0;
+    	margin: 5px;
+    	padding: 5px;
+    	background-color: #FFFFC0;
+    	color: infotext;
+    	text-align: left;
+    }
+    #perso .image_sheet {
+    	border: 0;
+    	margin: 4px;
+    	padding: 5px;
+    	background-color: #FFFFC0;
+    	color: infotext;
+    	text-align: center;
+    }    
     %if;(evar.wide = "on")
       .fam1, .fam2, .person_content {width: 99%%;}
       .image_sheet {font-size: 89%%;}
@@ -28,8 +251,6 @@
     %end;
     .person h1 {text-align: center;%if;(has_sosa) border: 5px solid rgb(255,215,0);%end;}
   </style>
-  %include.css;
-  %include.templm_css;
   %base_header;
 </head>
 
@@ -546,7 +767,7 @@
  
 %( <!-- End define --> %)
 
-<body id="perso">%nn;
+<body%body_prop; id="perso">%nn;
 
 %message_to_wizard;
 %( <!-- Begin display menu --> %)

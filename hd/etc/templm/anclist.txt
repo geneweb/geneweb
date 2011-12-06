@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/10/31 geneweb-6.01 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>%nn;
     %if;(evar.t = "F" and evar.opt = "csv")
       CSV
@@ -29,12 +29,62 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    /* anclist.txt */
+    .ld_table {
+    	margin-left: auto;
+    	margin-right: auto;
+    	text-align: center;
+    	border: solid 1px rgb(150,150,150);
+    }
+    .ld_table tr td {
+    	border: solid 1px rgb(150,150,150);
+    	margin-left: 0px;
+    	margin-right: 0px;
+    }
+    .ld_table a {
+    	display: block;
+    }
+    .ld_birth0 {
+    	background-color: rgb(173,216,230);
+    }
+    .ld_birth1 {
+    	background-color: rgb(255,182,193);
+    }
+    .ld_birth2 {
+    	background-color: rgb(255,0,0);
+    }
+    .ld_death0, .ld_death0 td a {
+    	background-color: rgb(0,0,0);
+    	color: rgb(173,216,230);
+    }
+    .ld_death1, .ld_death1 td a {
+    	background-color: rgb(0,0,0);
+    	color: rgb(255,182,193);
+    }
+    .ld_death2, .ld_death2 td a {
+    	background-color: rgb(0,0,0);
+    	color: rgb(255,0,0);
+    }
+    .ld_marriage {
+    	background-color: rgb(255,255,128);
+    }
+    .ld_before, .ld_after {
+    	background-color: rgb(192,192,192);
+    }
+    .ld_no_date {
+    	background-color: rgb(220,220,220);
+    }
+    .ld_him_her {
+    	font-style: italic;
+    	font-weight: bold;
+    }
+
+  </style>
   %base_header;
 </head>
-<body id="anclist">
+<body%body_prop; id="anclist">
 %message_to_wizard;
 
 <h1 style="text-align:center" class="highlight">%nn;

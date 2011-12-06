@@ -1,4 +1,4 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 2011/11/01 geneweb-6.01 templ=templm -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 2011/11/10 geneweb-6.02 templ=templm -->
 <!-- To do : copy this file to bases/etc/my_base/ -->
 %if;(not cancel_links)
   <div style="clear: both;">
@@ -50,3 +50,4 @@
     </form>
   </div>
 %end;
+<!-- end trl.txt -->

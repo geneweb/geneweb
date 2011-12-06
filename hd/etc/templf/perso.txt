@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template a v 6.03a 2011/11/24 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: perso.txt, Template a v 6.03b 2011/12/01 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2011 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -16,7 +16,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop" />
+%include.css;
   <style type="text/css"><!--
   --></style>
 %base_header;
@@ -55,8 +55,7 @@
 %end;
 
 %define;li_SD(xx)
-  <li style="vertical-align: middle;list-style-type:%sp;
-    %if;xx.has_parents;disc%else;circle%end;">%nn;
+  <li class="%if;xx.has_parents;goway%else;noway%end;">%nn;
 %end;
 
 %define;li_SDC(xx)
@@ -66,8 +65,7 @@
       %if;(nb_children>0)%incr_count;%end;
     %end;
   %end;
-  <li style="vertical-align: middle;list-style-type:%sp;
-    %if;xx.has_families;%if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
+  <li class="%if;xx.has_families;%if;(count!=0)desc%else;nodesc%end;%else;nospou%end;">%nn;
 %end;
 
 %define;display_arrows()
@@ -365,7 +363,7 @@
   [*navigation with %t as Sosa reference:::xxx]
 %end;
 
-<body %body_prop;>
+<body%body_prop;>
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %message_to_wizard;
@@ -1192,6 +1190,5 @@
 
 %base_trailer;
 %copyright;
-</div>
 </body>
 </html>

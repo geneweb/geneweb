@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/10/31 geneweb-6.01 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -17,7 +17,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
   <meta http-equiv="Content-Style-Type" content="text/css" %/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
-  <link rel="stylesheet" type="text/css" href="css/%css_prop;" %/>
   <script type="text/javascript">
     <!--
     function valid(id) {
@@ -26,7 +25,17 @@
       -->
   </script>
   %include.css;
-  %include.templm_css;
+  <style type="text/css">
+    /* ancmenu.txt, desmenu.txt, relmenu.txt */
+    #menutxt fieldset {
+    	width: 300px;
+    	float: left;
+    	margin: 2px;
+    }
+    #menutxt fieldset fieldset {
+    	width: 270px;
+    }
+  </style>
   %base_header;
 </head>
 
@@ -38,7 +47,7 @@
   [*navigation with %t as Sosa reference:::xx].
 %end;
 
-<body id="menutxt">
+<body%body_prop; id="menutxt">
 %message_to_wizard;
 
 <h1 style="text-align:center" class="highlight">%nn;
