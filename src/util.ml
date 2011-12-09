@@ -784,6 +784,58 @@ value reference conf base p s =
   else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
+
+(* ************************************************************************* *)
+(*  [Fonc] update_family_loop : config -> base -> person -> string -> string *)
+(** [Description] : Essaie de déterminer dans quelle famille il peut y avoir
+                    une boucle. Si il n'y a pas d'ambiguité, alors on renvoie
+                    un lien vers la famille à modifier, sinon, on renvoie un
+                    lien vers le menu général de mise à jour.
+    [Args] :
+      - conf : configuration
+      - base : base
+      - p    : person
+      - s    : la clé de la personne sous forme de string
+    [Retour] :
+      - string : retourne un lien de mise à jour soit vers la famille
+                 contenant la boucle, soit vers le menu de mise à jour.
+    [Rem] : Exporté en clair hors de ce module.                              *)
+(* ************************************************************************* *)
+value update_family_loop conf base p s =
+  if conf.cancel_links || is_hidden p then s
+  else 
+    let iper = get_key_index p in
+    let list = Array.to_list (get_family p) in
+    let list = List.map (fun ifam -> (ifam, foi base ifam)) list in
+    let list = 
+      List.map 
+        (fun (ifam, fam) -> (ifam, Array.to_list (get_children fam))) 
+        list 
+    in
+    (* [Fonc] : 'a list -> (ifam, iper list) list -> ifam list *)
+    let rec loop accu l =
+      match l with
+      [ [] -> accu
+      | [(ifam, children) :: l ] -> 
+          if List.exists (fun c -> iper = c) children then loop [ifam :: accu] l
+          else loop accu l ]
+    in
+    let res = loop [] list in
+    if conf.wizard then
+      (* Si il n'y a pas d'ambiguité, i.e. pas 2 boucles dans 2 familles *)
+      (* pour un même individu, alors on renvoit le lien vers la mise à  *)
+      (* jour de la famille, sinon, un lien vers le menu de mise à jour. *)
+      if List.length list = 1 then
+        let iper = string_of_int (Adef.int_of_iper iper) in
+        let ifam = string_of_int (Adef.int_of_ifam (List.hd res)) in
+        "<a href=\"" ^ commd conf ^ "m=MOD_FAM;i=" ^ ifam ^ ";ip=" ^ iper ^ "\">" ^ s ^ "</a>"
+      else
+        let iper = string_of_int (Adef.int_of_iper iper) in
+        "<a href=\"" ^ commd conf ^ "m=U;i=" ^ iper ^ "\">" ^ s ^ "</a>"
+    else s
+;  
+
+
 value no_reference conf base p s = s;
 
 value gen_person_title_text reference p_access conf base p =

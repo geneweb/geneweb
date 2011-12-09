@@ -1577,7 +1577,7 @@ value print_base_loop conf base p =
     Wserver.wprint
       (fcapitale
          (ftransl conf "loop in database: %s is his/her own ancestor"))
-      (reference conf base p (person_text conf base p));
+      (Util.update_family_loop conf base p (person_text conf base p));
     Wserver.wprint ".\n";
     trailer conf
   }

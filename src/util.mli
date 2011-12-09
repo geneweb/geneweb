@@ -73,6 +73,7 @@ value gen_person_title_text :
 ;
 
 value reference : config -> base -> person -> string -> string;
+value update_family_loop : config -> base -> person -> string -> string;
 value no_reference : config -> base -> person -> string -> string;
 value person_text : config -> base -> person -> string;
 value person_text_no_html : config -> base -> person -> string;
