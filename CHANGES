@@ -1,14 +1,53 @@
 GeneWeb version 6.03
 --------------------
 
+* Added an option to authorized or not the wizards notes. By default,
+  notes are not allowed. One must specified
+  authorized_wizards_notes=yes in the gwf to allowed them.
+* Added the tool update_nldb to update the wiki's note in the database
+* Fix bug in the access rights of a person's occ. It was possible to
+  have an invalid request in a relationship calculus.
+* Delete some duplicates files (README/LISEZMOI/LICENCE)
+* Added gwc2 and ged2gwb2 in the gwsetup tool
+* In the advanced search, if the number of results is more than the
+  max defined, then it display the "max first" results instead of "too
+  many results"
+* Added a book of places (see a.gwf to specify the maximum number of
+  event that can be corrected in one pass. 
+  !!! Beware !!! This functionnality is not completly functionnal when
+  using gwc2. You can not edit twice the same place. If you want to
+  edit more than one time one place, you have to do a consang between
+  each modifications (because it will recalculate the indexs).
+* Fix the regression of rtl/ltr display in some pages
+* When using ged2gwb, the status of a family is now by default
+  NoMention.
+* Added the sosa picture in the advance search
+* In the place/surname search, one can now search only for baptism or
+  burial (which was before included in birth and death).
+* Display the picture of an individual inline instead of attachment
+* In the surname search, if the surname was not found, display the
+  results in ncols (you can specify it directly in the URL: ncols =x).
+* Added spouse (if exists) in the descendants tree
+* various source code refactoring
 Ludovic Ledieu :
-* New implamentation of CSS as a template (css.txt)
+* Fix the truncate name and uncaught exception : end of file in the
+  forum 
+* Interpretation of the 'is_invisible' variable in the updhist.txt template
+* Better management of the variable 'referer' (link to welcome and
+  previous page)
+* New implementation of the 'place/surname' request that corrects the
+  html errors
+* New implementation of CSS as a template (css.txt)
 * Tree displaying (dag and RL) compliant with XHTML
 * Better W3C compliance
 * Fix wrong display for advanced request in welcome page
 * rewrite old templates so that they uses common language :
-   index.txt, moved.txt, redirect.txt, renamed.txt,
-   robot.txt (no favicon, no image, no css since the client has no access)
+  index.txt, moved.txt, redirect.txt, renamed.txt,
+  robot.txt (no favicon, no image, no css since the client has no access)
+Dominique Deram :
+* Update templates a, b, c, d, f, and h
+Mickaël Rouesné :
+* Update template m
 
 GeneWeb version 6.02
 --------------------
