@@ -430,7 +430,8 @@ sv: <span class="highlight" style="margin-left:10px">genom
       </li>
     %end;
     %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
-         and (wizard or wiznotes_dir_exists))
+         and (wizard or wiznotes_dir_exists) and
+         bvar.authorized_wizards_notes = "yes")
       <li>
         <a href="%prefix;m=WIZNOTES">%sq;
         [wizard/wizards/friend/friends/exterior]1 - [note/notes]1</a>
