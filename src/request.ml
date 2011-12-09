@@ -487,8 +487,10 @@ value family_m conf base =
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf *)
   (* | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base *)
-  | Some "MOD_WIZNOTES" -> Wiznotes.print_mod conf base
-  | Some "MOD_WIZNOTES_OK" -> Wiznotes.print_mod_ok conf base
+  | Some "MOD_WIZNOTES" when conf.authorized_wizards_notes -> 
+      Wiznotes.print_mod conf base
+  | Some "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes -> 
+      Wiznotes.print_mod_ok conf base
   | Some "MRG" when conf.wizard ->
       match find_person_in_env conf base "" with
       [ Some p -> Merge.print conf base p
@@ -588,11 +590,14 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> updmenu_print conf base p
       | _ -> very_unknown conf ]
-  | Some "VIEW_WIZNOTES" when conf.wizard -> Wiznotes.print_view conf base
+  | Some "VIEW_WIZNOTES" when conf.wizard && conf.authorized_wizards_notes -> 
+      Wiznotes.print_view conf base
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "WDOC" -> Doc.print_wdoc conf *)
-  | Some "WIZNOTES" -> Wiznotes.print conf base
-  | Some "WIZNOTES_SEARCH" -> Wiznotes.print_search conf base
+  | Some "WIZNOTES" when conf.authorized_wizards_notes -> 
+      Wiznotes.print conf base
+  | Some "WIZNOTES_SEARCH" when conf.authorized_wizards_notes -> 
+      Wiznotes.print_search conf base
   | Some mode -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with

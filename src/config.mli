@@ -39,6 +39,7 @@ type config =
     default_lang : string;
     multi_parents : bool;
     can_send_image : bool;
+    authorized_wizards_notes : bool;
     public_if_titles : bool;
     public_if_no_date : bool;
     cancel_links : mutable bool;
