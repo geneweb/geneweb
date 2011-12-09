@@ -99,7 +99,7 @@ zh: 网络家谱
       %if;(wizard 
            and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
         <em>[wizard/wizards/friend/friends/exterior]0%sq;
-        %if;(just_friend_wizard) and user.ident != "")
+        %if;(user.ident != "")
           : %user.ident;%sq;
         %end;</em>
         (<a href="%prefix;w=">[disconnect]</a>)
