@@ -1250,6 +1250,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      can_send_image =
        try List.assoc "can_send_image" base_env <> "no" with
        [ Not_found -> True ];
+     authorized_wizards_notes =
+       try List.assoc "authorized_wizards_notes" base_env = "yes" with
+       [ Not_found -> False ];
      public_if_titles =
        try List.assoc "public_if_titles" base_env = "yes" with
        [ Not_found -> False ];
