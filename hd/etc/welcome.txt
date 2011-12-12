@@ -70,42 +70,36 @@ zh: 网络家谱
         or bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
     <div id="acces" style="border: solid 2px #6f8301;">
       <h3><img src="%image_prefix;/picto_cle.png" alt=""/> [*access] :</h3>
-      %if;((bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
-           or (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
-         %if;(not wizard and 
-              (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
-           %if;(not cgi and bvar.auth_file = "")
-             <a href="%prefix;w=w"><em>%sq;
-             [wizard/wizards/friend/friends/exterior]0</em></a><br%/>
-           %else;
-             <form method="post" action="%action;">
-               <div>
-                 %hidden;
-                 [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
-                 <input name="w" type="password" size="10" maxlength="200"%/>
-                 <input type="submit" value="Ok"%/>
-               </div>
-             </form>
-           %end;
-         %end;
-         %if;(not friend and
-              (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
-           %if;(not cgi and bvar.auth_file = "")
-             <a href="%prefix;w=f"><em>%sq;
-             [wizard/wizards/friend/friends/exterior]2</em></a><br%/>
-           %end;
-         %end;
+      %if;(not wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
+        %if;(not cgi and bvar.auth_file = "")
+          <a href="%prefix;w=w"><em>%sq;
+          [wizard/wizards/friend/friends/exterior]0</em></a><br%/>
+        %else;
+          <form method="post" action="%action;">
+            <div>
+              %hidden;
+              [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
+              <input name="w" type="password" size="10" maxlength="200"%/>
+              <input type="submit" value="Ok"%/>
+            </div>
+          </form>
+        %end;
       %end;
-      %if;(wizard 
-           and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
+      %if;(not friend and
+           (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
+        %if;(not cgi and bvar.auth_file = "")
+          <a href="%prefix;w=f"><em>%sq;
+          [wizard/wizards/friend/friends/exterior]2</em></a><br%/>
+        %end;
+      %end;
+      %if;(wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
         <em>[wizard/wizards/friend/friends/exterior]0%sq;
         %if;(user.ident != "")
           : %user.ident;%sq;
         %end;</em>
         (<a href="%prefix;w=">[disconnect]</a>)
       %end;
-      %if;(friend and
-           (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
+      %if;(friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
         <em>[wizard/wizards/friend/friends/exterior]2</em>
         (<a href="%prefix;w=">[disconnect]</a>)
       %end;
