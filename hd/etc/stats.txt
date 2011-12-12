@@ -53,7 +53,7 @@
 
 %if;(wizard or friend)
   <ul>
-    <li><a href="%prefix;m=POP_PYR;i=5;lim=0">[population pyramid]</a></li>
+    <li><a href="%prefix;m=POP_PYR;int=5;lim=0">[population pyramid]</a></li>
   </ul>
 %end;
 

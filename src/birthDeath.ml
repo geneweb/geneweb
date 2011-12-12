@@ -572,7 +572,7 @@ value print_statistics conf base =
 
 value print_population_pyramid conf base = do {
   let interval =
-    match p_getint conf.env "i" with
+    match p_getint conf.env "int" with
     [ Some i -> max 1 i
     | None -> 5 ]
   in
@@ -734,7 +734,7 @@ value print_population_pyramid conf base = do {
     tag "form" "method=\"get\" action=\"%s\"" (commd conf) begin
       hidden_env conf;
       xtag "input" "type=\"hidden\" name=\"m\" value=\"POP_PYR\"";
-      xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\"" interval;
+      xtag "input" "type=\"hidden\" name=\"int\" value=\"%d\"" interval;
       xtag "input" "type=\"hidden\" name=\"lim\" value=\"%d\"" limit;
       Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 0);
       xtag "input" "name=\"y\" value=\"%d\" size=\"5\"" at_year;
