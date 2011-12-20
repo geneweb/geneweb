@@ -1901,6 +1901,28 @@ and eval_bool_person_field conf base env (p, p_auth) =
             conf.today.day = 1 && conf.today.month = 3
           else False
       | _ -> False ]
+  | "wedding_birthday" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          match get_relation fam with
+          [ Married | NoSexesCheckMarried -> 
+              match (m_auth, Adef.od_of_codate (get_marriage fam)) with
+              [ (True, Some (Dgreg d _)) ->
+                let father = pget conf base (get_father fam) in
+                let mother = pget conf base (get_mother fam) in
+                if d.prec = Sure && authorized_age conf base father 
+                  && get_death father = NotDead 
+                  && authorized_age conf base mother 
+                  && get_death mother = NotDead then
+                    (d.day = conf.today.day && d.month = conf.today.month &&
+                    d.year < conf.today.year) ||
+                    (not (CheckItem.leap_year conf.today.year) &&
+                    d.day = 29 && d.month = 2 &&
+                    conf.today.day = 1 && conf.today.month = 3)
+                else False
+              | _ -> False ]
+          | _ -> False ]
+      | _ -> False ]
   | "computable_age" ->
       if p_auth then
         match (Adef.od_of_codate (get_birth p), get_death p) with
