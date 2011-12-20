@@ -225,9 +225,12 @@
       %if;(marriage_place = "")
         %if;(on_marriage_date = "")
         %else; <em>%on_marriage_date;</em>%end;
+        %if;wedding_birthday; ([happy birthday to them!])%end;
       %else;
         %if;(on_marriage_date = "")<em>, %marriage_place;, </em>
-        %else; <em>%on_marriage_date;, %marriage_place, </em>%end;
+        %else; <em>%on_marriage_date;
+          %if;wedding_birthday; ([happy birthday to them!])%end;
+          , %marriage_place, </em>%end;
       %end;
     %end;
     %if;(cancel_links or spouse.is_restricted)%spouse;

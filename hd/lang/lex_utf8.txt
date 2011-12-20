@@ -4247,6 +4247,17 @@ ru: с днем рождения тебя!
 sl: srečen rojstni dan!
 sv: gratulerar på födelsedagen!
 
+    happy birthday to them!
+de: Herzlichen Glückwunsch zum Geburtstag!
+en: happy birthday to them!
+es: ¡Feliz cumpleaños!
+fi: hyvää syntymäpäivää!
+fr: bon anniversaire!
+it: buon compleanno!
+nl: van harte gefeliciteerd met Uw verjaardag!
+no: gratulerer med dagen!
+sv: gratulerar på födelsedagen!
+
     having as children
 af: met as kinders:-
 bg: деца:
