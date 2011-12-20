@@ -1004,6 +1004,49 @@ value open_etc_file fname =
       try Some (Secure.open_in fname2) with [ Sys_error _ -> None ] ]
 ;
 
+value open_templ conf name =
+  let config_templ =
+    try
+      let s = List.assoc "template" conf.base_env in
+      let rec loop list i len =
+        if i = String.length s then List.rev [Buff.get len :: list]
+        else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
+        else loop list (i + 1) (Buff.store len s.[i])
+      in
+      loop [] 0 0
+    with
+    [ Not_found -> [conf.bname; "*"] ]
+  in
+  let dir =
+    match p_getenv conf.env "templ" with
+    [ Some x when List.mem "*" config_templ -> x
+    | Some x when List.mem x config_templ -> x
+    | Some _ | None ->
+        match config_templ with
+        [ [] | ["*"] -> ""
+        | [x :: _] -> x ] ]
+  in
+  let dir =
+    if dir = "" then Filename.current_dir_name
+    else Filename.basename dir
+  in
+  let std_fname =
+    search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
+  in
+  if dir = "" || dir = Filename.current_dir_name then
+    try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
+  else
+    let dir = Filename.basename dir in
+    let fname =
+      Filename.concat (base_path ["etc"] dir) (name ^ ".txt")
+    in
+    try Some (Secure.open_in fname) with
+    [ Sys_error _ ->
+        if (*dir = conf.bname*)True(**) then
+          try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
+        else None ]
+;
+
 value macro_etc env imcom c =
   try List.assoc c env () with
   [ Not_found ->

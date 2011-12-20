@@ -77,7 +77,7 @@ value header_without_http conf title = do {
   Wserver.wprint
     "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\"%s>\n"
     (Util.image_prefix conf) conf.xhs;
-  match Util.open_etc_file "css" with
+  match Util.open_templ conf "css" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
   Templ.include_hed_trl conf None "hed";

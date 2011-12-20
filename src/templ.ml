@@ -510,51 +510,8 @@ value parse_templ conf strm =
   strip_newlines_after_variables astl
 ;
 
-value open_templ conf name =
-  let config_templ =
-    try
-      let s = List.assoc "template" conf.base_env in
-      let rec loop list i len =
-        if i = String.length s then List.rev [Buff.get len :: list]
-        else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
-      in
-      loop [] 0 0
-    with
-    [ Not_found -> [conf.bname; "*"] ]
-  in
-  let dir =
-    match Util.p_getenv conf.env "templ" with
-    [ Some x when List.mem "*" config_templ -> x
-    | Some x when List.mem x config_templ -> x
-    | Some _ | None ->
-        match config_templ with
-        [ [] | ["*"] -> ""
-        | [x :: _] -> x ] ]
-  in
-  let dir =
-    if dir = "" then Filename.current_dir_name
-    else Filename.basename dir
-  in
-  let std_fname =
-    Util.search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
-  in
-  if dir = "" || dir = Filename.current_dir_name then
-    try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
-  else
-    let dir = Filename.basename dir in
-    let fname =
-      Filename.concat (Util.base_path ["etc"] dir) (name ^ ".txt")
-    in
-    try Some (Secure.open_in fname) with
-    [ Sys_error _ ->
-        if (*dir = conf.bname*)True(**) then
-          try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
-        else None ]
-;
-
 value input_templ conf fname =
-  match open_templ conf fname with
+  match Util.open_templ conf fname with
   [ Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in
       do { close_in ic; Some astl }
@@ -976,7 +933,7 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
 ;
 
 value line_of_loc conf fname (bp, ep) =
-  match open_templ conf fname with
+  match Util.open_templ conf fname with
   [ Some ic ->
       let strm = Stream.of_channel ic in
       let rec loop lin =
