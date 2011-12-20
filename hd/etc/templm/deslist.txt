@@ -359,7 +359,7 @@
     %foreach;descendant_level;
       %if;(level = desc_lev)
         [*total] : %number_of_descendants; [[person/persons]1@(c)],
-        ([spouses not included] = %expr(count -1 - number_of_descendants))
+        ([spouses not included] = %expr(count -1 - number_of_descendants.v))
       %end;
     %end;
   </p>
