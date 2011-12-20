@@ -11,6 +11,7 @@ type token =
   [ BANGEQUAL
   | COMMA
   | DOT
+  | DIV
   | EQUAL
   | GREATER
   | GREATEREQUAL
@@ -142,6 +143,7 @@ value rec get_token =
   | [: `'+' :] ep -> Tok (bp, ep) PLUS
   | [: `'-' :] ep -> Tok (bp, ep) MINUS
   | [: `'*' :] ep -> Tok (bp, ep) STAR
+  | [: `'/' :] ep -> Tok (bp, ep) DIV
   | [: `'%';
        a =
          parser
@@ -239,6 +241,8 @@ and parse_expr_5_kont e =
   parser
   [ [: `Tok loc STAR; e2 = parse_simple_expr;
        a = parse_expr_5_kont (Aop2 loc "*" e e2) :] -> a
+  | [: `Tok loc DIV; e2 = parse_simple_expr;
+       a = parse_expr_5_kont (Aop2 loc "/" e e2) :] -> a
   | [: `Tok loc PERCENT; e2 = parse_simple_expr;
        a = parse_expr_5_kont (Aop2 loc "%" e e2) :] -> a
   | [: :] -> e ]
