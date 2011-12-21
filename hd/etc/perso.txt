@@ -224,8 +224,9 @@
     %apply;married_to%with;
       %if;(marriage_place = "")
         %if;(on_marriage_date = "")
-        %else; <em>%on_marriage_date;</em>%end;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
+        %else; <em>%on_marriage_date;
+          %if;wedding_birthday; ([happy birthday to them!])</em>%end;
+        %end;
       %else;
         %if;(on_marriage_date = "")<em>, %marriage_place;, </em>
         %else; <em>%on_marriage_date;

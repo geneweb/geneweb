@@ -566,8 +566,8 @@ value print_menu_marriage conf base =
       let fam = foi base (Adef.ifam_of_int i) in
       if is_deleted_family fam then ()
       else
-        match Adef.od_of_codate (get_marriage fam) with
-        [ Some (Dgreg d _) when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
+        match (Adef.od_of_codate (get_marriage fam), get_divorce fam) with
+        [ (Some (Dgreg d _), NotDivorced) when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
             let update_list cpl =
               if match_mar_dates conf base cpl d conf.today then
                 list_tod.val := [(cpl, d.year) :: list_tod.val]

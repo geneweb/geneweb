@@ -1904,8 +1904,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "wedding_birthday" ->
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
-          match get_relation fam with
-          [ Married | NoSexesCheckMarried -> 
+          match (get_relation fam, get_divorce fam) with
+          [ (Married | NoSexesCheckMarried, NotDivorced) -> 
               match (m_auth, Adef.od_of_codate (get_marriage fam)) with
               [ (True, Some (Dgreg d _)) ->
                 let father = pget conf base (get_father fam) in
