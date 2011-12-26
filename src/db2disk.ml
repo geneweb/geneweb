@@ -543,7 +543,7 @@ value commit_patches2 db2 = do {
   let fname = Filename.concat db2.bdir2 "patches" in
   let oc = open_out_bin (fname ^ "1") in
   output_string oc magic_patch;
-  output_value oc db2.patches;
+  output_value_no_sharing oc db2.patches;
   close_out oc;
   remove_file (fname ^ "~");
   try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
