@@ -226,7 +226,7 @@
         %if;(on_marriage_date = "")
         %else; <em>%on_marriage_date;
           %if;wedding_birthday; ([happy birthday to them!])%end;
-          </em>%end;
+          </em>
         %end;
       %else;
         %if;(on_marriage_date = "")<em>, %marriage_place;, </em>
