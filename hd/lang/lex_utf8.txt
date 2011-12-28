@@ -1,4 +1,3 @@
-# $Id: lex_utf8.txt,v 5.102 2008-03-11 10:15:31 ddr Exp $
 # Copyright (c) 1998-2007 INRIA
 
      !dates order
@@ -26,6 +25,7 @@ pl: ddmmyy
 pt: ddmmyy
 ro: ddmmyy
 ru: ddmmyy
+sk: ddmmyy
 sl: ddmmyy
 sv: ddmmyy
 
@@ -58,6 +58,7 @@ pt: af=Afrikaans/ca=Catalã/cs=Checo/da=Dinamarquês/de=Alemão/en=Inglês/eo=Es
 pt-br: af=Afrikaner/ca=Catalão/cs=Checo/da=Dinamarquês/de=Alemão/en=Inglês/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finlandês/fr=Francês/he=Hebreu/is=Islandês/it=Italiano/lv=Lituano/nl=Holandês/no=Norueguês/pl=Polonês/pt=Português/pt-br=Português-do-Brasil/ru=Russo/sv=Sueco/zh=Chinês
 ro: af=africaans/ca=catalana/cs=checha/da=daneza/de=germana/en=engleza/eo=esperanto/es=spaniola/fi=finlandeza/fr=franceza/he=evreiasca/is=islandeza/it=italiana/nl=olandeza/no=norvegiana/pl=poloneza/pt=potugeza/pt-br=portugeza-in-brazilia/ro=romaneste/ru=rusa/sv=suedeza/zh=chineza
 ru: af=африканский/bg=болгарский/ca=каталанский/cs=чешский/da=датский/de=немецкий/en=английский/eo=эсперанто/es=испанский/et=эстонский/fi=финский/fr=французский/he=иврит/is=исландский/it=итальянский/lv=латышский/nl=голландский/no=норвежский/pl=польский/pt=португальский/pt-br=бразильско-португальский/ru=русский/sl=славянский/sv=шведский/zh=китайский
+sk: af=afrikánčina/bg=bulharčina/cs=čeština/da=dánčina/de=nemčina/en=angličtina/eo=esperanto/es=španielčina/fi=fínština/fr=francúzština/he=hebrejčina/is=islandčina/it=taliančina/lv=lotyština/nl=holandčina/no=nórčina/pt=portugalčina/pt-br=brazílčina/ru=ruština/sv=švédčina/zh=čínština
 sl: af=afrikaanščina/ca=katalonščina/cs=češčina/da=danščina/de=nemščina/en=angleščina/eo=esperanto/es=španščina/et=estonščina/fi=finščina/fr=francoščina/he=hebrejščina/is=islandščina/it=italijanščina/lv=litvanščina/nl=nizozemščina/no=norveščina/pl=poljščina/pt=portugalščina/pt-br=brazilska-portugalščina/ru=ruščina/sl=slovenščina/sv=švedščina/zh=kitajščina
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sl=slovenska/sv=svenska/zh=kinesiska
 zh: fr=法语/zh=中文
@@ -67,6 +68,7 @@ en: to change
 et: muutmiseks
 fr: pour changer
 it: per cambiare
+sk: pre zmenu
 
      to see the first branch
 af:  om die eerste staak te sien
@@ -92,6 +94,7 @@ pl:  aby zobaczyć pierwszą linię (gałąź)
 pt:  para ver o primeiro ramo
 ro:  pentru a vedea primul
 ru:  чтобы увидеть первую ветку
+sk:  aby ste videli prvú vetvu
 sl:  za prikaz prve veje
 sv:  för att se den första
 
@@ -119,6 +122,7 @@ pl:  aby zobaczyć pierwszą linię pokrewieństwa
 pt:  para ver o primeiro link
 ro:  pentru a vedea prima relatie
 ru:  чтобы увидеть первую связь отношения
+sk:  zobraziť prvý vzťah
 sl:  za prikaz prve sorodstvene povezave
 sv:  för att se den första
 
@@ -146,6 +150,7 @@ pl:  aby ponowić z tym numerem
 pt:  para tentar novamente com este número
 ro:  incearca din nou cu acest numar 
 ru:  для того, чтобы пытаться снова с этим числом
+sk:  skúsiť znovu s týmto číslom
 sl:  za ponoven poskus s to številko
 sv:  för att försöka igen med detta nummer
 
@@ -173,6 +178,7 @@ pl: %1 :g:%2
 pt: %1 de %2
 ro: %1 pentru %2 
 ru: %1 :g:%2
+sk: %1 :g:%2
 sl: %1 od :g:%2
 sv: %1 till %2
 
@@ -200,6 +206,7 @@ pl: przed %d laty
 pt: há %d anos
 ro: de %d ani
 ru: %d лет назад
+sk: pred %d rokmi
 sl: pred %d leti
 sv: %d år sedan
 
@@ -249,6 +256,7 @@ pl: kuzyni %s stopnia
 pt: primos em %s grau
 ro: veri de gradul %s 
 ru: %s кузены
+sk: %s bratranci/sesternice
 sl: %s bratranci/sestrične
 sv: %smänningar
 
@@ -276,6 +284,7 @@ pl: %s, jest %s
 pt: %s, é %s de
 ro: %s, este %s pentru
 ru: %s, это %s
+sk: %s, je %s
 sl: %s, je %s od
 sv: %s, är det %s till
 
@@ -303,6 +312,7 @@ pl: %s, będzie %s
 pt: %s, será %s de
 ro: %s, va fi %s pentru
 ru: %s, это будет %s
+sk: %s, bude %s
 sl: %s, bo %s od
 sv: %s, är det %s till
 
@@ -330,6 +340,7 @@ pl: %t już ma rodziców
 pt: os pais de %t já existem
 ro: %t are deja parinti
 ru: %t уже имеет родителей
+sk: %t už má rodičov
 sl: %t že ima starše
 sv: %t har redan föräldrar
 
@@ -357,6 +368,7 @@ pl: %t zmarł przed swymi narodzinami/zmarła przed swymi narodzinami
 pt: %t morreu antes de nascer
 ro: %t a murit inaninte de nastere
 ru: %t умер перед его/ее рождением
+sk: %t zomrel pred svojim narodením/zomrela pred svojim narodením
 sl: %t je umrl pred svojim rojstvom/umrla pred svojim rojstvom
 sv: %t dog före sin egen födelse
 
@@ -385,6 +397,7 @@ pt: as datas de um título de %t não estão correctas
 pt-br: as datas de um título de %t não estão corretas
 ro: %t are data de titlu incorrecta %t
 ru: %t имеет неправильное название даты: %t
+sk: %t má nesprávne údaje o tituloch: %t
 sl: %t ima napačne datume naslova
 sv: %t har felaktiga titeldatum: %t
 
@@ -412,6 +425,7 @@ pl: %t urodził się/urodziła się po śmierci swojej matki: %t
 pt: %t nasceu depois do óbito da mãe
 ro: %t e nascut dupa decesul mamei
 ru: %t родился после смерти его/ее матери %t
+sk: %t narodený/narodená po smrti svojej matky %t
 sl: %t je rojen(a) po smrti svoje matere
 sv: %t är född efter att sin egen mor dog %t
 
@@ -439,6 +453,7 @@ pl: %t urodził się/urodziła się ponad 2 lata po śmierci swojego ojca: %t
 pt: %t nasceu mais de 2 anos depois do óbito do pai
 ro: %t e nascut mai mult de doi ani dupa decesul tatalui 
 ru: %t родился более, чем через 2 года после смерти его/ее отца %t
+sk: %t narodený/narodená viac ako dva roky po smrti svojho otca: %t
 sl: %t je rojen(a) več kot 2 leti po smrti svojega očeta
 sv: %t är född mer än 2 år efter att sin egen far dog %t
 
@@ -466,6 +481,7 @@ pl: %t: jego/jej płeć nie odpowiada jego/jej związkom
 pt: o sexo de %t não é coerente com suas relações
 ro: %t are genul incoerent cu relatia
 ru: пол %t не стыкуется с его/ее взаимоотношениями
+sk: pohlavie %t sa nezhodnuje s jeho/jej vzťahmi
 sl: spol %t ni usklajen z zvezami
 sv: %ts kön stämmer inte överens med sina relationer
 
@@ -494,6 +510,7 @@ pl: 1 %m %y/%d %m %y/%m %y/%y
 pt: 1 de %m de %y/%d de %m de %y/%m %y/%y
 ro: 1 %m %y/%d. %m %y/%m %y/%y
 ru: 1 %m %y/%d %m %y/%m %y/%y
+sk: 1. %m %y/%d. %m %y/%m %y/%y
 sl: 1. %m %y/%d. %m %y/%m %y/%y
 sv: 1 %m %y/%d %m %y/%m %y/%y
 zh: %y年%m1日/%y年%m%d日/%y年%m/%y年
@@ -522,6 +539,7 @@ pl: ,
 pt: ,
 ro: ,
 ru: .
+sk: ,
 sl: ,
 sv: ,
 
@@ -548,6 +566,7 @@ pl: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prair
 pt: Vindimiário/Brumário/Frimário/Nevoso/Pluvioso/Ventoso/Germinal/Floreal/Pradial/Messidor/Termidor/Frutidor/Complementar
 ro: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 ru: Вандемиер/Брюмэр/Фримэр/Нивоз/Плювиоз/Вантоз/Жерминаль/Флореаль/Прерияль/Мессидор/Тэрмидор/Фрюктидор
+sk: Vendémiaire/Brumaire/Frimaire/Nivôse/Pluviôse/Ventôse/Germinal/Floréal/Prairial/Messidor/Thermidor/Fructidor/Complémentaire
 sl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 sv: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
 
@@ -575,6 +594,7 @@ pl: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
 pt: Tishrei/Cheshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nissan/Iyar/Sivan/Tamuz/Av/Elul
 ro: Tischri/Marcheschwan/Kislev/Tebet/Schebat/Adar/WeAdar/Nisan/Ijar/Siwan/Tammuz/Ab/Elul
 ru: Тишри/Хешван/Кислев/Тевет/Шеват/Адар 1/Адар 2/Нисан/Ияр/Сиван/Таммуз/Ав/Элюль
+sk: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 sl: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 sv: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
@@ -603,6 +623,7 @@ pl: I/II/III/IV/V/VI/VII/VIII/IX/X/XI/XII
 pt: Janeiro/Fevereiro/Março/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
 ro: januarie/februarie/martie/aprilie/mai/junie/julie/august/septembrie/octombrie/noiembrie/decembrie
 ru: Января/февраля/марта/апреля/мая/июня/июля/августа/сентября/октября/ноября/декабря
+sk: január/február/marec/apríl/máj/jún/júl/august/september/október/november/december
 sl: januarja/februarja/marca/aprila/maja/junija/julija/avgusta/septembra/oktobra/novembra/decembra
 sv: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november/december
 zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
@@ -632,6 +653,7 @@ pl: .
 pt: .
 ro: .
 ru: '
+sk: &nbsp;
 sl: .
 sv: .
 zh: .
@@ -661,6 +683,7 @@ pl: niedziela:a:-ę/poniedziałek/wtorek/środa:a:-ę/czwartek/piątek/sobota:a:
 pt: domingo/segunda-feira/terça-feira/quarta-feira/quinta-feira/sexta-feira/sábado
 ro: duminica/luni/marti/miercuri/joi/vineri/simbata
 ru: воскресенье/понедельник/вторник/среда/четверг/пятница
+sk: nedeľa/pondelok/utorok/streda/štvrtok/piatok/sobota
 sl: nedelja/ponedeljek/torek/sreda/četrtek/petek/sobota
 sv: söndag/måndag/tisdag/onsdag/torsdag/fredag/lördag
 
@@ -688,6 +711,7 @@ pl: kuzyni drugiego stopnia
 pt: primos em 2º grau
 ro: var de gradul doi
 ru: троюродные братья/троюродные сестры
+sk: bratranci/sesternice z druhého kolena
 sl: bratranec/sestrična v drugem kolenu
 sv: sysslingar
 
@@ -715,6 +739,7 @@ pl: kuzyni trzeciego stopnia
 pt: primos em 3º grau
 ro: var de gradul trei
 ru: троюродные кузены/троюродные кузины
+sk: bratranci/sesternice z tretieho kolena
 sl: bratranec/sestrična v tretjem kolenu
 sv: bryllingar
 
@@ -742,6 +767,7 @@ pl: <em>numer "Sosa"</em>, odnoszący się do: %t
 pt: <em>número Sosa</em> em relação a %t
 ro: <em>numar Sosa</em> in relatie cu
 ru: <em>Sosa номер</em> относительно %t
+sk: <em>"Sosa" číslo</em> vo vzťahu k %t
 sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
 
@@ -769,6 +795,7 @@ pl: M/Ż
 pt: M/F
 ro: M/F
 ru: М/Ж
+sk: M/Ž
 sl: M/Ž
 sv: M/K
 
@@ -796,6 +823,7 @@ pl: "Sosa"
 pt: Sosa
 ro: Sosa
 ru: Sosa
+sk: Sosa
 sl: številka Sosa
 sv: annummer
 
@@ -823,6 +851,7 @@ pl: T/N
 pt: S/N
 ro: da/nu
 ru: Д/Н
+sk: áno/nie
 sl: da/ne
 sv: J/N
 
@@ -850,6 +879,7 @@ pl: kuzyn %s-tego stopnia/kuzynka %s-tego stopnia
 pt: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
 ro: un var de gradul %s
 ru: %s-ий кузен/%s-я кузина
+sk: bratranec/sesternica z %s kolena
 sl: bratranec v %s kolenu/sestrična v %s kolenu
 sv: %smänning
 
@@ -877,6 +907,7 @@ pl: kuzyn/kuzynka drugiego stopnia
 pt: um primo em 2º grau/uma prima em 2º grau/um(a) primo(a) em 2º grau
 ro: un var de gradul doi
 ru: троюродный брат/троюродная сестра
+sk: bratranec/sesternica z druhého kolena
 sl: bratranec iz drugega kolena/sestrična iz drugega kolena 
 sv: en syssling
 
@@ -904,6 +935,7 @@ pl: kuzyn/kuzynka trzeciego stopnia
 pt: um primo em 3º grau/uma prima em 3º grau/um(a) primo(a) em 3º grau
 ro: un var de gradul trei
 ru: троюродный кузен/троюродная кузина
+sk: bratranec/sesternica z tretieho kolena
 sl: bratranec v tretjem kolenu/sestrična v tretjem kolenu
 sv: en brylling
 
@@ -931,6 +963,7 @@ pl: szwagier/szwagierka
 pt: um cunhado/uma cunhada
 ro: un cumnat/o cumnata
 ru: деверь-шурин/заловка-свояченица
+sk: švagor/švagriná
 sl: svak/svakinja
 sv: en svåger/en svägerska
 
@@ -958,6 +991,7 @@ pl: brat/siostra/brat lub siostra
 pt: um irmão/uma irmã/um(a) irmão(ã)
 ro: frate/sora/un frate sau o sora
 ru: брат/сестра/брат или сестра
+sk: brat/sestra/súrodenec
 sl: brat/sestra/brat ali sestra
 sv: en bror/en syster/ett syskon
 
@@ -985,6 +1019,7 @@ pl: kuzyn/kuzynka
 pt: um primo/uma prima
 ro: un var
 ru: кузен/кузина
+sk: bratranec/sesternica
 sl: bratranec/sestrična
 sv: en kusin
 
@@ -1012,6 +1047,7 @@ pl: potomek
 pt: um descendente/uma descendente
 ro: un descendent
 ru: потомок
+sk: potomok
 sl: potomec
 sv: en ättling
 
@@ -1039,6 +1075,7 @@ pl: dziadek/babka/dziadkowie
 pt: um avô/uma avó/um(a) avô(ó)
 ro: un bunic/o bunica/bunici
 ru: дедушка/бабушка/прародитель
+sk: dedo/babka/prarodič
 sl: dedka/babice/starega starša
 sv: farfar/farmor/en farförälder/morfar/mormor/en morförälder
 
@@ -1066,6 +1103,7 @@ pl: wnuk/wnuczka/wnuki
 pt: um neto/uma neta/um(a) neto(a)
 ro: nepot/nepoata/nepoti
 ru: внук/внучка/ребенок детей
+sk: vnuk/vnučka/vnúča
 sl: vnuk/vnukinja/pravnuk ali pravnukinja
 sv: en sonson/en sondotter/ett barnbarn/en dotterson/en dotterdotter/ett barnbarn
 
@@ -1093,6 +1131,7 @@ pl: pradziadek/prababka/pradziadkowie
 pt: um bisavô/uma bisavó/um(a) bisavô(ó)
 ro: un strabunic/o strabunica/strabunici
 ru: прапрадед/прапрабабка/прапрапрародитель
+sk: pradedo/prababka/praprarodič
 sl: pradedek/prababica/prastari starš
 sv: en gammel-farfar/en gammel-farmor/en gammel-farförälder/en gammel-morfar/en gammel-mormor/en gammel-morförälder
 
@@ -1120,6 +1159,7 @@ pl: prawnuk/prawnuczka/prawnuki
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
 ro: stranepot/stranepoata/stranepoti
 ru: праправнук/праправнучка/праправнук
+sk: pravnuk/pravnučka/pravnúča
 sl: pravnuk/pravnukinja/pravnuk ali pravnukinja
 sv: en sonsons son/en sonsons dotter/ett barnbarns barn/en sondotters son/en sondotters dotter/ett barnbarns barn/en dottersons son/en dottersons dotter/ett barnbarns barn/en dotterdotters son/en dotterdotters dotter/ett barnbarns barn
 
@@ -1147,6 +1187,7 @@ pl: wnuk brata lub siostry/wnuczka brata lub siostry
 pt: um sobrinho-neto/uma sobrinha-neta
 ro: stranepot/stranepoata/stranepoti
 ru: внучатый племянник/внучатая племянница
+sk: prasynovec/praneter
 sl: pranečak/pranečakinja
 sv: en gammel-nevö/en gammel-niece
 
@@ -1174,6 +1215,7 @@ pl: brat dziadka lub babki/siostra dziadka lub babki
 pt: um tio-avô/uma tia-avó
 ro: frate de bunici/sara de bunici
 ru: дядя родителя/тетя родителя
+sk: prastrýko/prateta
 sl: prastric/prateta
 sv: en gammel-farbror/en gammel-faster/en gammel-morbror/en gammel-moster
 
@@ -1201,6 +1243,7 @@ pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
 pt: um meio-irmão/uma meia-irmã/um(a) meio(a) irmão(ã)
 ro: frate vitreg/sora vitrega/surori sau frati vitregi
 ru: полуродной брат/полуродная сестра/полуродной брат
+sk: nevlastný brat/nevlastná sestra/ nevlastný súrodenec
 sl: polbrata/polsestra/polbrat ali polsestra
 sv: en halvbror/en halvsyster/ett halvsyskon
 
@@ -1228,6 +1271,7 @@ pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
 pt: um sobrinho/uma sobrinha
 ro: nepot/nepoata/nepoti
 ru: племянник/племянница
+sk: synovec/neter
 sl: nečak/nečakinja/nečak ali nečakinja
 sv: en nevö/en niece
 
@@ -1255,6 +1299,7 @@ pl: zięć/synowa
 pt: um genro/uma nora
 ro: ginere/nora
 ru: зять/невестка
+sk: zať/nevesta
 sl: zet/snaha
 sv: en måg/en svärdotter
 
@@ -1282,6 +1327,7 @@ pl: syn/córka/dziecko
 pt: um filho/uma filha/um(a) filho(a)
 ro: fiu/fica/copil
 ru: сын/дочь/ребенок
+sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: en son/en dotter/ett barn
 
@@ -1309,6 +1355,7 @@ pl: około
 pt: cerca
 ro: circa
 ru: около
+sk: okolo
 sl: približno
 sv: omkring
 
@@ -1336,6 +1383,7 @@ pl: dostęp
 pt: acesso
 ro: acces
 ru: доступ
+sk: prístup
 sl: dostop
 sv: tillträde
 
@@ -1363,6 +1411,7 @@ pl: dodaj :a:
 pt: acrescentar
 ro: adauga
 ru: добавить :a:
+sk: pridať :a:
 sl: dodaj
 sv: lägg till
 
@@ -1391,6 +1440,7 @@ pt: pai adoptivo/mãe adoptiva/pais adoptivos
 pt-br: pai adotivo/mãe adotiva/pais adotivos
 ro: tatal adoptiv/mama adoptiva/parinti adoptivi
 ru: приемный отец/приемная мать/приемные родители
+sk: adoptívny otec/adoptnívna matka/adoptívny rodičia
 sl: posvojitveni oče/posvojitvena mati/posvojitveni starši
 sv: adoptivfar/adoptivmor/adoptivföräldrar
 
@@ -1419,6 +1469,7 @@ pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
 pt-br: filho adotivo/filha adotiva/filho(a) adotivo(a)
 ro: fiu adoptiv/fica adoptiva/copil adoptiv
 ru: приемный сын/приемная дочь/приемны ребенок
+sk: adoptívny syn/adoptívna dcéra/adoptívne dieťa
 sl: posvojenec/posvojenka/posvojeni otrok
 sv: adoptivson/adoptivdotter/adoptivbarn
 
@@ -1446,6 +1497,7 @@ pl: wyszukiwanie zaawansowane
 pt: pesquisa complexa
 ro: consultatie avansata 
 ru: расширенный запрос
+sk: rozšírená požiadavka
 sl: napredno iskanje
 sv: avancerad sökning
 zh:  高级访问请求
@@ -1474,6 +1526,7 @@ pl: po
 pt: depois
 ro: dupa
 ru: после
+sk: po
 sl: po
 sv: efter
 
@@ -1501,6 +1554,7 @@ pl: po
 pt: depois de
 ro: dupa
 ru: после
+sk: po
 sl: po
 sv: efter
 
@@ -1529,6 +1583,7 @@ pl: wiek
 pt: idade
 ro: etate
 ru: возраст
+sk: vek
 sl: starost
 sv: ålder
 zh:  年龄
@@ -1557,6 +1612,7 @@ pl: wiek:
 pt: com a idade de
 ro: etate la deces
 ru: в возрасте
+sk: vek v dobe úmrtia
 sl: živel(a)
 sv: livslängd:
 zh:  享年
@@ -1586,6 +1642,7 @@ pt: alias
 pt-br: apelido
 ro: alias
 ru: псевдоним
+sk: alias
 sl: alias
 sv: alias
 
@@ -1613,6 +1670,7 @@ pl: osoba żyjąca
 pt: não falecido/não falecida/não falecido(a)
 ro: in viata 
 ru: живой
+sk: žijúci
 sl: živi
 sv: lever
 
@@ -1640,6 +1698,7 @@ pl: wszystkie domeny
 pt: todos os lugares
 ro: toate localitatile
 ru: все места
+sk: všetky miesta
 sl: vsa posestva
 sv: alla platser
 
@@ -1667,6 +1726,7 @@ pl: wszystkie tytuły
 pt: todos os títulos
 ro: toate titlurile
 ru: все титулы
+sk: všetky tituly
 sl: vsi nazivi
 sv: alla titlar
 
@@ -1694,6 +1754,7 @@ pl: alfabetycznie
 pt: ordem alfabética
 ro: alfabetica
 ru: алфавитный порядок
+sk: v abecednom poradí
 sl: abecedni red
 sv: bokstavsordning
 
@@ -1721,6 +1782,7 @@ pl: także
 pt: também
 ro: si
 ru: также
+sk: tiež
 sl: tudi
 sv: också
 
@@ -1748,6 +1810,7 @@ pl: przodek
 pt: um antepassado/uma antepassada
 ro: un strabun
 ru: предок
+sk: predok
 sl: prednik
 sv: en ana
 
@@ -1775,6 +1838,7 @@ pl: stryj lub wuj/ciotka
 pt: um tio/uma tia
 ro: un unchi/o matusa
 ru: дядя/тетя
+sk: strýc/teta
 sl: stric/teta
 sv: en farbror/en faster/en morbror/en moster
 
@@ -1802,6 +1866,7 @@ pl: przodkowie
 pt: antepassados
 ro: strabuni
 ru: предки
+sk: predkovia
 sl: predniki
 sv: anor
 zh:  祖先
@@ -1830,6 +1895,7 @@ pl: przodkowie
 pt: antepassados
 ro: strabuni
 ru: возможные предки
+sk: predkovia
 sl: predniki
 sv: anor
 
@@ -1858,6 +1924,7 @@ pl: i
 pt: e
 ro: si
 ru: и
+sk: a
 sl: in
 sv: och
 zh:  和
@@ -1886,6 +1953,7 @@ pl: rocznice
 pt: aniversários
 ro: aniversare
 ru: годовщины
+sk: výročia
 sl: obletnice
 sv: årsdagar
 
@@ -1913,6 +1981,7 @@ pl: rocznice urodzin i śmierci osób nieżyjących
 pt: aniversários das pessoas falecidas
 ro: aniversare a persoanelor decedate
 ru: годовщины смерти
+sk: výročia zomretých osôb
 sl: obletnice umrlih oseb
 sv: årsdagar för avlidna personer
 zh:  死亡于今日的记录
@@ -1941,6 +2010,7 @@ pl: rocznice ślubów
 pt: aniversários de casamento
 ro: aniversare de mariaj
 ru: годовщины брака
+sk: výročia svadieb
 sl: obletnice porok
 sv: bröllopsdagar
 zh:  结婚于今日的记录
@@ -1969,6 +2039,7 @@ pl: to
 pt: são
 ro: sint
 ru: есть
+sk: sú
 sl: so
 sv: är
 
@@ -1996,6 +2067,7 @@ pl: zarazem
 pt: ao mesmo tempo
 ro: in acelas timp
 ru: в то же самое время
+sk: v tom istom čase
 sl: sočasno
 sv: samtidigt
 
@@ -2019,6 +2091,7 @@ pl: średni wiek śmierci
 pt: idade média ao morrer
 ro: virsta media la deces
 ru: примерный возраст смерти
+sk: priemerný vek v čase úmrtia
 sl: povprečna starost ob smrti
 sv: medelålder vid dödstillfället
 
@@ -2046,6 +2119,7 @@ pl: wstecz
 pt: voltar
 ro: inapoi
 ru: назад
+sk: späť
 sl: nazaj
 sv: tillbaka
 
@@ -2074,6 +2148,7 @@ pt: baptismo
 pt-br: batismo
 ro: botez
 ru: крещение
+ks: krst
 sl: krst
 sv: dop
 
@@ -2102,6 +2177,7 @@ pt: baptizado/baptizada/baptizado(a)
 pt-br: batizado/batizada/batizado(a)
 ro: botezat/botezata/botezat
 ru: крещеный
+sk: pokrstený/pokrstená
 sl: krščen/krščena
 sv: döpt
 
@@ -2129,6 +2205,7 @@ pl: przed
 pt: antes
 ro: inainte
 ru: перед
+sk: pred
 sl: pred
 sv: före
 
@@ -2156,6 +2233,7 @@ pl: przed
 pt: antes de
 ro: inainte de
 ru: до
+sk: pred
 sl: pred
 sv: före
 
@@ -2183,6 +2261,7 @@ pl: początek
 pt: começo
 ro: inceput
 ru: начиная с
+sk: začiatok
 sl: začetek
 sv: börjar
 
@@ -2210,6 +2289,7 @@ pl: między
 pt: entre
 ro: intre
 ru: между
+sk: medzi
 sl: med
 sv: mellan
 
@@ -2237,6 +2317,7 @@ pl: urodzenie
 pt: nascimento
 ro: nastere
 ru: рождение
+sk: narodenie
 sl: rojstva
 sv: födelse
 
@@ -2265,6 +2346,7 @@ pt: aniversários
 pt-br: aniversários de nascimento
 ro: zi de nastere
 ru: дни рождения
+sk: narodeniny
 sl: rojstni dnevi
 sv: födelsedagar
 zh:  出生于今日的记录
@@ -2293,6 +2375,7 @@ pl: granica
 pt: borda
 ro: bordura
 ru: рамка
+sk: okraj
 sl: okvir
 sv: kantlinje
 
@@ -2321,6 +2404,7 @@ pl: urodzony/urodzona/urodzone
 pt: nascido/nascida/nascido(a)
 ro: născut/născută/născut
 ru: родился/родилась
+sk: narodený/narodená
 sl: rojen/rojena
 sv: född
 zh:  出生
@@ -2349,6 +2433,7 @@ pl: linia/linie
 pt: ramo/ramos
 ro: ramura
 ru: ветвь/ветви
+sk: vetva/vetvy
 sl: veja/veje
 sv: anlinje/anlinjer
 
@@ -2376,6 +2461,7 @@ pl: pogrzeb
 pt: enterro
 ro: inmormintare
 ru: похороны
+sk: pohreb
 sl: pogreb
 sv: begravning
 
@@ -2403,6 +2489,7 @@ pl: pochowany/pochowana/pochówek
 pt: enterrado/enterrada/enterrado(a)
 ro: inmormintat
 ru: похоронен/похоронена
+sk: pochovaný/pochovaná
 sl: pokopan/pokopana/pokopani
 sv: begravd
 
@@ -2431,6 +2518,7 @@ pl: kalendarz/kalendarze
 pt: calendário/calendários
 ro: calendar/calendare
 ru: календарь/календари
+sk: kalendár/kalendáre
 sl: koledar/koledarji
 sv: kalender
 
@@ -2458,6 +2546,7 @@ pl: pomiń łącza GeneWeb
 pt: cancelar os links Geneweb
 ro: anuleaza conexiuni GeneWeb
 ru: без GeneWeb ссылок
+sk: zrušiť GeneWeb spojenia
 sl: brez GeneWeb povezav
 sv: inga GeneWeb länkar
 
@@ -2485,6 +2574,7 @@ pl: prawdopodobny ojciec/prawdopodobna matka/prawdopodobni rodzice
 pt: suposto pai/suposta mãe/supostos pais
 ro: tata posibil/mama posibila/parinti posibili
 ru: возможный отец/возможная мать/возможные родители
+sk: pravdepodobný otec/pravdepodobná matka/pravdepodobní rodičia
 sl: možen oče/možna mati/možni starši
 sv: möjlig far/möjlig mor/möjliga föräldrar
 
@@ -2512,6 +2602,7 @@ pl: prawdopodobny syn/prawdopodobna córka/prawdopodobne dzieci
 pt: suposto filho/suposta filha/supostos filhos
 ro: fiu posibil/fica posibila/copil posibil
 ru: возможный сын/возможная дочь/возможный ребенок
+sk: pravdepodobný syn/pravdepodobná dcéra/pravdepodobné dieťa
 sl: možen sine/možna hčerka/možni otroci
 sv: möjlig son/möjlig dotter/möjliga barn
 
@@ -2540,6 +2631,7 @@ pt: não se pode aceder à base
 pt-br: não pode acessar a base
 ro: nu pot accesa baza de date
 ru: нет доступа к базе
+sk: databáza je neprístupná
 sl: baza podatkov ni dostopna
 sv: kan inte nå databasen
 
@@ -2567,6 +2659,7 @@ pl: zmiana płci osoby pozostającej w związku małżeńskim jest niemożliwa
 pt: não se pode modificar o sexo de uma pessoa casada
 ro: nu pot schimba sexul unei persoane casatorite
 ru: нелья изменить пол супруга
+sk: nemožno zmeniť pohlavie zosobášenej osoby
 sl: ne da se spremeniti spol poročene osebe
 sv: kan inte ändra kön på en gift person
 
@@ -2594,6 +2687,7 @@ pl: zmień imiona dzieci
 pt: alterar os nomes dos filhos
 ro: schimba numele copiilor
 ru: изменение имени ребенка
+sk: zmeniť mená detí
 sl: spremeni imena otrok
 sv: ändra barnens namn
 
@@ -2621,6 +2715,7 @@ pl: zmień numer własnoręcznie
 pt: escolha outro
 ro: schimba numarul tu insasi
 ru: измените его сами
+sk: zmeniť číslo
 sl: spremenite sami
 sv: ändra det själv
 
@@ -2648,6 +2743,7 @@ pl: kolejność dzieci została zmieniona
 pt: mudar a ordem dos filhos
 ro: sa schimbat ordinea copiilor
 ru: изменяющий порядок детей
+sk: zmeniť poradie detí
 sl: zamenjan vrstni red otrok
 sv: ändrade ordningen för barnen
 
@@ -2676,6 +2772,7 @@ pl: dziecko/dzieci
 pt: filho/filhos
 ro: copil/copii
 ru: ребенок:g:--ка:a:--ка/дети
+sk: dieťa/deti
 sl: otrok/otroci
 sv: barn/barn
 zh:  子女
@@ -2704,6 +2801,7 @@ pl: imiona dzieci zostały zmienione
 pt: nomes das crianças foram alterados
 ro: numele copiilor sa schimbat
 ru: имя ребенка изменено
+sk: mená detí zmenené
 sl: spremenjena imena otrok
 sv: barnens namn ändrade
 
@@ -2731,6 +2829,7 @@ pl: kliknij
 pt: clicar
 ro: clic
 ru: нажмите
+sk: klik
 sl: kliknite
 sv: klicka
 
@@ -2758,6 +2857,7 @@ pl: kliknij "%s"
 pt: clicar "%s"
 ro: clicheaza pe %s
 ru: нажмите "%s"
+sk: poklepte na "%s"
 sl: kliknite na "%s"
 sv: klicka "%s"
 
@@ -2786,6 +2886,7 @@ pl: kolor
 pt: côr
 ro: culoare
 ru: цвет
+sk: farba
 sl: barva
 sv: färg
 
@@ -2813,6 +2914,7 @@ pl: uwagi
 pt: comentário
 ro: comentar
 ru: комментарий
+sk: komentár
 sl: komentar
 sv: kommentar
 
@@ -2836,6 +2938,7 @@ pl: połączenie
 pt: conexões
 ro: conexiuni
 ru: связи
+sk: spojenia
 sl: povprečna starost ob smrti
 sv: kopplingar
 
@@ -2863,6 +2966,7 @@ pl: pokrewieństwo
 pt: consanguinidade
 ro: consanguinitate
 ru: родство
+sk: pokrvenstvo
 sl: krvno sorodstvo
 sv: blodsband
 
@@ -2890,6 +2994,7 @@ pl: kontynuuj scalanie
 pt: continuar a fusão
 ro: continua unificarea
 ru: продолжить объединение
+sk: pokračovať v spájaní
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
 
@@ -2913,6 +3018,7 @@ pl: ciąg dalszy
 pt: continuação
 ro: continuare
 ru: продолжено
+sk: pokračovať
 sl: nadaljevano
 sv: forts
 
@@ -2940,6 +3046,7 @@ pl: kuzyni/kuzynki
 pt: primos
 ro: veri
 ru: кузены
+sk: bratranci/sesternice
 sl: bratranci/sestrične
 sv: kusiner
 
@@ -2967,6 +3074,7 @@ pl: kuzyni
 pt: primos
 ro: veri
 ru: кузены
+sk: pokrvní príbuzní
 sl: bratranci/sestrične
 sv: kusiner och flermänningar
 
@@ -2994,6 +3102,7 @@ pl: utwórz
 pt: criar
 ro: creaza
 ru: создать
+sk: vytvor
 sl: ustvari
 sv: skapa
 
@@ -3021,6 +3130,7 @@ pl: kremacja
 pt: cremado/cremada/cremado(a)
 ro: incinerat/incinerata/incinerati
 ru: кремирован/кремирована
+sk: spopolnený/spopolnená
 sl: ustvarjeno
 sv: kremerad
 
@@ -3048,6 +3158,7 @@ pl: forum bazy
 pt: fórum da base de dados
 ro: forumul basei de date
 ru: форум базы данных
+sk: databázové fórum
 sl: forum baze podatkov
 sv: databas forum
 
@@ -3075,6 +3186,7 @@ pl: data
 pt: data
 ro: data
 ru: дата
+sk: dátum
 sl: datum
 sv: datum
 
@@ -3102,6 +3214,7 @@ pl: dni
 pt: dias
 ro: zile
 ru: лет
+sk: dňov starý/dňov stará
 sl: dni star/dni stara
 sv: dagar
 
@@ -3129,6 +3242,7 @@ pl: zgon
 pt: morte
 ro: deces
 ru: смерть
+sk: úmrtie
 sl: smrti
 sv: död
 
@@ -3156,6 +3270,7 @@ pl: usuń :a:
 pt: apagar
 ro: sterge
 ru: удалить :a:
+sk: zmazať
 sl: izbriši
 sv: ta bort
 
@@ -3183,6 +3298,7 @@ pl: potomkowie
 pt: descendentes
 ro: descendenti
 ru: потомки
+sk: potomkovia
 sl: potomci
 sv: ättlingar
 zh:  后代
@@ -3212,6 +3328,7 @@ pl: zmarł/zmarła/zgon
 pt: falecido/falecida/falecido(a)
 ro: a decedat
 ru: умер/умерла
+sk: zomrel/zomrela
 sl: umrl/umrla
 sv: död
 zh:  死
@@ -3240,6 +3357,7 @@ pl: zmarł młodo/zmarła młodo/zm.młodo
 pt: morreu jovem
 ro: a decedat tinar
 ru: умер в детстве
+sk: zomrel mladý/zomrela mladá
 sl: umrl mlad/umrla mlada/umrl(a) mlad(a)
 sv: dog ung
 
@@ -3267,6 +3385,7 @@ pl: zaginął/zaginęła/zaginięcie
 pt: desaparecido/desaparecida/desaparecido(a)
 ro: a disparut
 ru: исчез/исчезла
+sk: zmiznutý/zmiznutá
 sl: izginil/izginila/izginil(a)
 sv: försvunnen
 
@@ -3290,6 +3409,7 @@ pl: rozłącz
 pt: desconectar
 ro: deconectare
 ru: отключить
+sk: odpojené
 sl: prekinjeno
 sv: koppla från
 
@@ -3317,6 +3437,7 @@ pl: wyświetl w segmentach/szerokość segmentu/szerokość pokrywania się/szer
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
 ro: resultat segmentat/largimea segmentului/acoperire/largimea totala
 ru: отображать частами/ширина части/перекрытие/общая ширина
+sk: zobraz po segmentoch/šírka segmentu/prekrytie/celková šírka
 sl: prikaži s pomočjo izsekov/širina izseka/prekrivanje/skupna širina
 sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
@@ -3344,6 +3465,7 @@ pl: rozwód
 pt: divórcio
 ro: divort
 ru: развод
+sk: rozvod
 sl: ločitev
 sv: skilsmässa
 
@@ -3371,6 +3493,7 @@ pl: rozwiedzeni
 pt: divorciados
 ro: divortati
 ru: в разводе
+sk: rozvedení
 sl: ločena
 sv: skilda
 
@@ -3398,6 +3521,7 @@ pl: nie grupuj wspólnych linii razem
 pt: não reagrupar os ramos comuns
 ro: nu grupa ramuri comune inpreuna
 ru: не группировать основные ветви вместе
+sk: nespájať spoločné vetvy
 sl: ne zbiraj skupnih vej
 sv: gruppera inte ihop de gemensamma anlinjerna
 
@@ -3425,6 +3549,7 @@ pl: nie wiadomo
 pt: não sei
 ro: nu stiu
 ru: не известен
+sk: nie je známe
 sl: ni znano
 sv: vet ej
 
@@ -3452,6 +3577,7 @@ pl: koniec
 pt: fim
 ro: sfirsit
 ru: кончая
+sk: koniec
 sl: konec
 sv: slutar
 
@@ -3479,6 +3605,7 @@ pl: zaręczyny
 pt: Noivos
 ro: logodit
 ru: помолвлены
+sk: snúbenci
 sl: zaroka
 sv: förlovad
 
@@ -3506,6 +3633,7 @@ pl: zaręczony%t z:/zaręczona%t z:
 pt: noivo%t de/noiva%t de
 ro: logodit%t cu/logodita%t cu 
 ru: %t помолвлен с
+sk: zasnúbený %t s/zasnúbená %t s
 sl: zaročen z %/zaročena z
 sv: förlovad%t med
 
@@ -3533,6 +3661,7 @@ pl: błąd
 pt: erro
 ro: eroare
 ru: ошибка
+sk: chyba
 sl: napaka
 sv: fel
 
@@ -3561,6 +3690,7 @@ pt: lugar
 pt-br: localidade
 ro: localitate
 ru: место
+sk: miesto
 sl: posestvo
 sv: plats
 zh:  地点
@@ -3590,6 +3720,7 @@ pt: exacta
 pt-br: exata
 ro: exact
 ru: в точности
+sk: presne
 sl: točno
 sv: exakt
 
@@ -3617,6 +3748,7 @@ pl: egzekucja
 pt: executado/executada/executado(a)
 ro: executat
 ru: казнен/казнена
+sk: popravený/popravená
 sl: usmrčen/usmrčena/usmrčen(a)
 sv: avrättad
 
@@ -3644,6 +3776,7 @@ pl: rodziny z kodowaniem
 pt: famílias com código
 ro: familie cu codare
 ru: семейные коды
+sk: rodiny s kódmi
 sl: družine s kodami
 sv: familjer med kod
 
@@ -3671,6 +3804,7 @@ pl: rodzina została dodana
 pt: família adicionada
 ro: familie adaugata
 ru: cемья добавленна
+sk: rodina pridaná
 sl: družina dodana
 sv: ny familj tillagd
 
@@ -3698,6 +3832,7 @@ pl: rodzina została usunięta
 pt: família suprimida
 ro: familie suprimata
 ru: cемья удалена
+sk: rodina zmazaná
 sl: družina izbrisana
 sv: familj borttagen
 
@@ -3725,6 +3860,7 @@ pl: rodzina została zmodyfikowana
 pt: família modificada
 ro: familie modificata
 ru: cемья изменена
+sk: rodina zmazaná
 sl: družina spremenjena
 sv: familj ändrad
 
@@ -3752,6 +3888,7 @@ pl: rodzina:a:-ę/rodziny
 pt: família/famílias
 ro: familie/fmalilii
 ru: семья:a:-ю:g:-и/семьи
+sk: rodina:a:-u/rodiny
 sl: družina/družine
 sv: familj/familjer
 
@@ -3779,6 +3916,7 @@ pl: ojciec/matka
 pt: pai/mãe
 ro: tata/mama
 ru: отец/мать
+sk: otec/matka
 sl: oče/mati
 sv: far/mor
 
@@ -3807,6 +3945,7 @@ pt: ficheiro
 pt-br: arquivo
 ro: fisier
 ru: файл
+sk: súbor
 sl: datoteka
 sv: fil
 
@@ -3834,6 +3973,7 @@ pl: najniższy wolny numer
 pt: primeiro número livre
 ro: primul numar liber
 ru: первый свободный номер
+sk: prvé voľné číslo
 sl: prva prosta številka
 sv: första lediga nummer
 
@@ -3862,6 +4002,7 @@ pt: alias do nome
 pt-br: apelido do prenome
 ro: alias de prenume
 ru: имя отчество
+sk: alias mena
 sl: drugo osebno ime
 sv: förnamns alias
 
@@ -3890,6 +4031,7 @@ pt: falta o nome
 pt-br: falta o prenome
 ro: numele lipseste
 ru: имя пропущено
+sk: chýba meno
 sl: manjka osebno ime
 sv: förnamn saknas
 
@@ -3918,6 +4060,7 @@ pt: nome não encontrado
 pt-br: prenome não encontrado
 ro: nu am gasit prenumele
 ru: имя не найденно
+sk: meno nenájdené
 sl: osebno ime ni najdeno
 sv: hittar inte förnamn
 
@@ -3947,6 +4090,7 @@ pt: nome/nomes
 pt-br: prenome/prenomes
 ro: prenume
 ru: имя/имена
+sk: meno/mená
 sl: osebno ime/osebna imena
 sv: förnamn/förnamn
 zh:  名
@@ -3976,6 +4120,7 @@ pt: para obter os nomes próprios por ordem alfabética
 pt-br: para obter os prenomes por ordem alfabética
 ro: prenume in ordine alfabetica
 ru: чтобы упорядочить имена по алфавиту
+sk: podľa mena v abecednom poradí
 sl: za lastna imena po abecednem redu
 sv: för förnamnen i bokstavsordning
 
@@ -3999,6 +4144,7 @@ pl: aby oglądać listę według daty ostatniej modyfikacji
 pt: para a lista ordenada por data da última modificação
 ro: pentru listă, după data ultimei modificări
 ru: для списка отсортированного по дате последнего изменения
+sk: pre zoznam podľa dátumu poslednej zmeny
 sl: za seznam razvrščen po datumu zadnje spremembe
 sv: för listan över sista ändringsdatum
 
@@ -4027,6 +4173,7 @@ pt: pai adoptivo/mãe adoptiva/pais adoptivos
 pt-br: pai de criação/mãe de criação/pais de criação
 ro: tata tutelar/mama tutelara/parinti tutelari  
 ru: приемный отец/приемная мать/приемный родитель
+sk: pestún/pestúnka/pestúni
 sl: rejnik/rejnica/rejniki
 sv: fosterfar/fostermor/fosterföräldrar
 
@@ -4055,6 +4202,7 @@ pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
 pt-br: filho de criação/filha de criação/filho(a) de criação
 ro: fiu tutelar/fica/tutelara/copil tutelar
 ru: приемный сын/приемная дочь/приемный ребенок
+sk: opatrovanec/opatrovankyňa/opatrovanec
 sl: rejenec/rejenka/rejenec
 sv: fosterson/fosterdotter/fosterbarn
 
@@ -4082,6 +4230,7 @@ pl: pokolenie/pokolenia
 pt: geração/gerações
 ro: generatie/generatii
 ru: поколение/поколений
+sk: generácia:a:-u/generácie
 sl: generacija/generacije
 sv: generation/generationer
 
@@ -4108,6 +4257,7 @@ no: gudfar/gudmor/gudfedre
 pl: ojciec chrzestny/matka chrzestna/rodzice chrzestni
 pt: padrinho/madrinha/padrinhos
 ro: nas/nasa/nasi
+sk: krstný otec/krstná matka/krstní rodičia
 ru: крестный отец/крестная мать/крестный
 sl: boter/botra/botri
 sv: gudfar/gudmor/gudföräldrar
@@ -4136,6 +4286,7 @@ pl: chrześniak/chrześniaczka/chrześniak
 pt: afilhado/afilhada/afilhado(a)
 ro: finu/fina/finii
 ru: крестник/крестница/крестник
+sk: krstný syn/krstná dcéra/krstné deti
 sl: krščenec/krščenka/krščenci
 sv: gudson/guddotter/gudbarn
 
@@ -4163,6 +4314,7 @@ pl: dziadkowie
 pt: avós
 ro: bunici
 ru: прародители
+sk: prarodičia
 sl: stari starši
 sv: farföräldrar/morföräldrar
 
@@ -4191,6 +4343,7 @@ pt: bisavós
 ro: strabunici
 ru: прапрародители
 sl: prastari starši
+sk: praprastarí rodičia
 sv: gammel-farföräldrar/gammel-morföräldrar
 
     gregorian/julian/french/hebrew
@@ -4217,6 +4370,7 @@ pl: gregoriański/juliański/rewolucyjny francuski/hebrajski
 pt: gregoriano/juliano/francês/hebraico
 ro: gregorian/julian/francez/evreiesc
 ru: грегорианский/юлианский/французский/еврейский
+sk: gregoránsky/juliánsky/francúzsky/židovský
 sl: gregorijanski/julijanski/francoski/hebrejski
 sv: gregoriansk/juliansk/franska rep./hebreisk
 
@@ -4244,6 +4398,7 @@ pl: wszystkiego najlepszego w dniu urodzin!
 pt: feliz aniversário!
 ro: la multi ani!
 ru: с днем рождения тебя!
+sk: všetko najlepšie k narodeninám!
 sl: srečen rojstni dan!
 sv: gratulerar på födelsedagen!
 
@@ -4283,6 +4438,7 @@ pt: tiveram
 ro: cu copii
 ru: имели детей
 sl: otroci:
+sk: mali spolu deti
 sv: barn
 zh:  生有子女
 
@@ -4310,6 +4466,7 @@ pl: tutaj
 pt: aqui
 ro: aici
 ru: здесь
+sk: tu
 sl: tukaj
 sv: här
 
@@ -4337,6 +4494,7 @@ pl: on/ona
 pt: ele/ela
 ro: el/ea
 ru: он/она
+sk: on/ona
 sl: on/ona
 sv: honom/henne
 
@@ -4365,6 +4523,7 @@ pt: historial das actualizações
 pt-br: histórico das atualizações
 ro: istoria de actualizare
 ru: история обновлений
+sk: história zmien
 sl: zgodovina sprememb
 sv: uppdateringarnas historia
 
@@ -4392,6 +4551,7 @@ pl: w poziomie
 pt: horizontalmente
 ro: orizontal 
 ru: горизонтально
+sk: horizontálne
 sl: vodoravno
 sv: horisontellt
 
@@ -4419,6 +4579,7 @@ pl: mąż/żona
 pt: marido/esposa
 ro: sot/sotie
 ru: муж/жена
+sk: manžel/manželka
 sl: mož/žena
 sv: make/maka
 
@@ -4446,6 +4607,7 @@ pl: ident/email/temat
 pt: ident/email/assunto
 ro: identitate/email/subiect
 ru: идентификатор/email/тема
+sk: ident/email/predmet
 sl: ime/e-pošta/vsebina
 sv: ident/email/ämne
 
@@ -4473,6 +4635,7 @@ pl: jeśli z tytułem
 pt: se títulos
 ro: are titlu
 ru: если титул
+sk: ak sú tituly
 sl: če so nazivi
 sv: om titlar
 
@@ -4500,6 +4663,7 @@ pl: ilustracja została usunięta
 pt: imagem suprimida
 ro: imagine suprimata
 ru: картинка удалена
+sk: obrázok zmazaný
 sl: slika izbrisana
 sv: bilden borttagen
 
@@ -4527,6 +4691,7 @@ pl: ilustracja została dołączona
 pt: imagem recebida
 ro: imagine receptionata
 ru: картинка получена
+sk: obrázok prijatý
 sl: slika sprejeta
 sv: bilden mottagen
 
@@ -4554,6 +4719,7 @@ pl: ilustracja:a:-ę/ilustracje
 pt: imagem/imagens
 ro: imagine/imagini
 ru: картинку
+sk: obrázok/obrázky
 sl: slika/slike
 sv: bild/bilder
 
@@ -4581,6 +4747,7 @@ pl: w
 pt: em
 ro: in
 ru: в
+sk: v
 sl: v
 sv: i
 zh:  于
@@ -4610,6 +4777,7 @@ pt: em
 ro: in anul
 ru: в
 sl: v letu
+sk: v
 sv: 
 zh:  于
 
@@ -4637,6 +4805,7 @@ pl: pokaż brakujących małżonków
 pt: incluir os cônjugues que faltam
 ro: include soti necunoscuti
 ru: включая потерянных супругов
+sk: vrátane chýbajúcich manželov/manželiek
 sl: vključi manjkajoče može/žene
 sv: inkludera makar som saknas
 
@@ -4664,6 +4833,7 @@ pl: pokaż małżonków
 pt: incluir os cônjugues
 ro: include soti
 ru: включая супругов
+sk: vrátane manželov/manželiek
 sl: pokaži može/žene
 sv: inkludera makar
 
@@ -4691,6 +4861,7 @@ pl: niezgodne płcie
 pt: sexos incompatíveis
 ro: sex incompatibil
 ru: несовместимый пол
+sk: nesprávne pohlavie
 sl: napačna spola
 sv: oförenliga kön
 
@@ -4719,6 +4890,7 @@ pt: data incorrecta
 pt-br: data incorreta
 ro: data incorecta
 ru: неправильная дата
+sk: nesprávny dátum
 sl: napačen datum
 sv: fel datum
 
@@ -4747,6 +4919,7 @@ pt: consulta incorrecta
 pt-br: consulta incorreta
 ro: consultatie incorecta
 ru: некорректный запрос
+sk: nesprávna požiadavka
 sl: napačna zahteva
 sv: fel förfrågan
 
@@ -4774,6 +4947,7 @@ pl: ściślej biorąc,
 pt: com efeito,
 ro: pentru
 ru: на самом деле,
+sk: v skutočnosti
 sl: torej
 sv: faktiskt,
 
@@ -4801,6 +4975,7 @@ pl: lista potomków
 pt: índice dos descendentes
 ro: indice de descendenti 
 ru: индекс потомков
+sk: zoznam potomkov
 sl: seznam potomcev
 sv: förteckning över ättlingarna
 
@@ -4828,6 +5003,7 @@ pl: lista małżonków (nie będących potomkami)
 pt: índice dos cônjuges (não descendentes)
 ro: indice de soti (nedescendenti)
 ru: индекс супругов (не потомков)
+sk: zoznam manželov/manželiek (bez potomkov)
 sl: seznam mož/žena (brez potomcev)
 sv: förteckning över makarna (icke ättlingar)
 
@@ -4855,6 +5031,7 @@ pl: dodaj :a:
 pt: inserir
 ro: intercaleaza
 ru: вставить :a:
+sk: vložiť
 sl: vstavi
 sv: infoga
 
@@ -4883,6 +5060,7 @@ pt: inversão efectuada
 pt-br: inversão feita
 ro: inversiune executata
 ru: переключение завершено
+sk: výmena dokončená
 sl: zamenjano
 sv: omflyttning klar
 
@@ -4910,6 +5088,7 @@ pl: zmień kolejność
 pt: inverter
 ro: inverseaza
 ru: переключить
+sk: vymeniť
 sl: zamenjaj
 sv: byt ordning
 
@@ -4937,6 +5116,7 @@ pl: czy zmienić kolejność nastepujących małżeństw lub związków?
 pt: inverter a ordem das famílias seguintes
 ro: inverseaza ordinea urmatoarelor familii
 ru: изменить порядок следующих семей
+sk: zmeň poradie nasledujúcich rodín
 sl: zamenjaj vrstni red naslednjih družin
 sv: ändra ordningen på de följande familjerna
 
@@ -4964,6 +5144,7 @@ pl: to
 pt: é
 ro: este
 ru: 
+sk: je
 sl: je
 sv: är
 
@@ -4992,6 +5173,7 @@ pt: é um pai demasiado jovem
 pt-br: é um pai jovem demais
 ro: este un parinte foarte tinar
 ru: очень молодые родители
+sk: je veľmi mladý rodič
 sl: je zelo mlad oče/je zelo mlada mamica
 sv: är en väldigt ung förälder
 
@@ -5019,6 +5201,7 @@ pl: jest urodzony/urodzona później niż swoje dziecko
 pt: nasceu depois do seu filho
 ro: este nascut dup copil
 ru: рожден после его/ее ребенка
+sk: narodila/narodila sa po svojom dieťati
 sl: je rojen po tem, ko je imel otroka/je rojena po tem, ko je imela otroka 
 sv: är född efter sitt barn
 
@@ -5046,6 +5229,7 @@ pl: to jest ta sama osoba!
 pt: é a mesma pessoa!
 ro: este aceiasi persoana!
 ru: это тот же человек!
+sk: je to tá istá osoba!
 sl: je ena in ista oseba!
 sv: det är samma person!
 
@@ -5073,6 +5257,7 @@ pl: dzień w kalendarzu juliańskim
 pt: dia juliano
 ro: zi juliana
 ru: юлианский день
+sk: juliánsky deň
 sl: julijanski dan
 sv: julianskdag
 
@@ -5100,6 +5285,7 @@ pl: zginął/zginęła
 pt: morto/morta/morto(a)
 ro: cazut in lupta
 ru: убит в /убита в
+sk: zabitý/zabitá
 sl: ubit/ubita/ubit(a)
 sv: stupat
 
@@ -5127,6 +5313,7 @@ pl: młodszy niż 1 miesiąc/młodsza niż 1 miesiąc
 pt: menos de um mês
 ro: mai putin de o luna 
 ru: менее чем месячный/менее чем месячная
+sk: mladší ako jeden mesiac
 sl: star manj kot en mesec/stara manj kot en mesec
 sv: mindre än en månad
 
@@ -5153,6 +5340,7 @@ no: koble
 pl: link
 pt: ligar
 ro: uneste
+sk: spojenie
 ru: связать
 sl: poveži
 sv: länk
@@ -5181,6 +5369,7 @@ pl: więzy pokrewieństwa pomiędzy
 pt: relação entre
 ro: relatie intre
 ru: связь между
+sk: vzťah medzi
 sl: sorodstvo med
 sv: släktskap emellan
 
@@ -5206,6 +5395,7 @@ pt: páginas ligadas
 pt-br: página associadas
 ro: pagini legate
 ru: связанные страницы
+sk: spojené stránky
 sl: povezane strani
 sv: länkade sidor
 
@@ -5233,6 +5423,7 @@ pl: lista
 pt: lista
 ro: lista
 ru: список
+sk: zoznam
 sl: seznam
 sv: lista/trädlista
 
@@ -5260,6 +5451,7 @@ pl: pełna postać
 pt: resultados detalhados
 ro: resultat detaliat
 ru: подробно
+sk: dlhý zoznam
 sl: dolg seznam
 sv: utökad rapport
 
@@ -5287,6 +5479,7 @@ pl: pętla w bazie: %s jest swoim własnym przodkiem
 pt: referência circular no banco de dados: %s é seu próprio ancestral
 ro: referinta circulara: %s este propriul stramos 
 ru: петля в базе данных: %s его/ее совственный предок
+sk: slučka v databáze: %s je svoj predok
 sl: krog v bazi podatkov: %s je svoj(a) prednik
 sv: loop i databasen: %s är sin egen ana
 
@@ -5314,6 +5507,7 @@ pl: główny tytuł
 pt: título principal
 ro: titlu principal
 ru: главный заголовок
+sk: hlavný titul
 sl: glavni naziv
 sv: huvudtitel
 
@@ -5341,6 +5535,7 @@ pl: linia męska/linia żeńska
 pt: linha masculina (agnatícia)/linha feminina (cognática)
 ro: linie masculina/linia feminina
 ru: мужская линия/женская линия
+sk: mužská línia/ženská línia
 sl: moška linija/ženska linija
 sv: manliga linjen/kvinnliga linjen
 
@@ -5368,6 +5563,7 @@ pl: małżeństwo z %t po śmierci
 pt: casamento de %t depois da sua morte
 ro: casatoria %t este dupa deces
 ru: брак %t после его/ее смерти
+sk: svadba s t% po svojej smrti
 sl: %t se je poročil(a) po svoji smrti
 sv: äktenskap med %t före makens/makans död
 
@@ -5395,6 +5591,7 @@ pl: małżeństwo z %t przed narodzeniem
 pt: casamento de %t antes do seu nascimento
 ro: casatoria %t inaninte de nastere
 ru: брак %t перед его/ее рождением
+sk: sobáš s %t pred svojim narodením
 sl: %t se je poročil(a) pred svojim rojstvom
 sv: äktenskap med %t före makens/makans födelse
 
@@ -5423,6 +5620,7 @@ pl: ślub/śluby
 pt: casamento/casamentos
 ro: casatorie/casatorii
 ru: брак/браки
+sk: manželstvo/manželstvá
 sl: poroke/poroke
 sv: äktenskap/äktenskap
 
@@ -5450,6 +5648,7 @@ pl: małżeństwo
 pt: casados
 ro: casatorit
 ru: в браке
+sk: manželia
 sl: poroka
 sv: gift
 
@@ -5477,6 +5676,7 @@ pl: ożenił się w wieku %t lat/wyszła za mąż w wieku %t lat
 pt: casado com a idade de %t
 ro: casatorit la virsta de %t
 ru: в браке с %t лет
+sk: oženil sa vo veku %t/vydala sa vo veku %t
 sl: se je poročil ko je imel %t/se je poročila ko je imela %t 
 sv: gift vid %t ålder
 
@@ -5504,6 +5704,7 @@ pl: żona (ślub: %t):/mąż (ślub: %t):
 pt: casado%t com/casada%t com
 ro: casatorit%t cu
 ru: в браке с%t
+sk: %t si vzal/%t si vzala
 sl: %t se je poročil z/%t se je poročila z
 sv: gift%t med
 zh: %t配偶是
@@ -5532,6 +5733,7 @@ pl: maksymalnie
 pt: máximo
 ro: maximum
 ru: максимально
+sk: maximum
 sl: največ
 sv: maximalt
 
@@ -5559,6 +5761,7 @@ pl: scal
 pt: fusão
 ro: unifica
 ru: объединить
+sk: spojiť
 sl: združi
 sv: slå samman
 
@@ -5586,6 +5789,7 @@ pl: scalenie zostało dokonane
 pt: fusão terminada
 ro: executat fuzionarea
 ru: объединение завершено
+sk: spojenie dokončené
 sl: združitev končana
 sv: sammanslagning klar
 
@@ -5613,6 +5817,7 @@ pl: wiadomość została dodana
 pt: mensagem adicionada
 ro: adaugat mesajul
 ru: сообщение добавлено
+sk: správa pridaná
 sl: sporočilo dodano
 sv: meddelande inlagt
 
@@ -5640,6 +5845,7 @@ pl: wiadomość usunięta
 pt: mensagem eliminada
 ro: mesajul este suprimat
 ru: уппвэеойе хдбмеоп
+sk: správa vymazaná
 sl: sporočilo izbrisano
 sv: meddelandet borttaget
 
@@ -5667,6 +5873,7 @@ pl: wiadomość/poprzednia wiadomość/poprzednia wiadomość/następna wiadomo�
 pt: mensagem/mensagem anterior/mensagem anterior/mensagem seguinte
 ro: mesaj/mesajul anterior/mesajele anterioare/mesajele urmatoara
 ru: сообщение/предыдущее сообщение/предыдущие сообщения/следующее сообщение
+sk: správa:a:-u/predchádzajúca správa/predchádzajúce správy/nasledujúca správa
 sl: sporočilo/prejšnje sporočilo/prejšnja sporočila/naslednje sporočilo
 sv: meddelande/föregående meddelande/föregående meddelande/nästa meddelande
 
@@ -5691,6 +5898,7 @@ pl: pozostałe uwagi
 pt: notas diversas
 ro: insemnari diverse
 ru: дополнительные заметки
+sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
 
@@ -5718,6 +5926,7 @@ pl: brakujący przodkowie
 pt: ascendentes que faltam
 ro: stramosi necunoscuti
 ru: потерянные предки
+sk: chýbajúci predkovia
 sl: manjkajoči predniki
 sv: anor som saknas
 
@@ -5745,6 +5954,7 @@ pl: zaktualizuj :a:
 pt: modificar
 ro: modifica
 ru: изменить :a:
+sk: zmeniť :a:
 sl: spremeni
 sv: ändra
 
@@ -5772,6 +5982,7 @@ pl: miesięcy
 pt: meses
 ro: luni
 ru: месяцы
+sk: mesiacov starý/mesiacov stará
 sl: mesecev star/mesecev stara
 sv: månader
 
@@ -5798,6 +6009,7 @@ pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
 pt: dia do mês lunar/lua nova/quarto crescente/lua cheia/quarto minguante
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
+sk: mesačná fáza/nov/prvá štvrť/spln/posledná štvrť
 ru: фаза луны/новолуние/первая четверть/полнолуние/четвертая четверть
 sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
 sv: månålder/nymåne/första kvarter/fullmåne/sista kvarter
@@ -5826,6 +6038,7 @@ pl: więcej niż %d odpowiedzi
 pt: mais de %d respostas
 ro: mai mult de %s raspunsuri
 ru: более, чем %d ответы
+sk: viac ako %d odpovedí
 sl: več kot %d zadetkov
 sv: fler än %d svar
 
@@ -5853,6 +6066,7 @@ pl: zamordowany/zamordowana/morderstwo
 pt: assassinado/assassinada/assassinado(a)
 ro: ucis
 ru: убит/убита
+sk: zavraždený/zavraždená
 sl: umorjen/umorjena
 sv: mördad
 
@@ -5884,6 +6098,7 @@ pt: apelido
 pt-br: nome
 ro: nume
 ru: название
+sk: meno
 sl: ime
 sv: namn
 
@@ -5912,6 +6127,7 @@ pt: apelido %s já utilizado por %testa pessoa%t
 pt-br: nome %s já utilizado por %testa pessoa%t
 ro: numele %s est in uz de %taceasta persoana%t
 ru: имя %s уже использовано %tэтим человеком%t
+sk: meno %s už má táto %tosoba%t
 sl: ime %s že uporablja %tta oseba%t
 sv: namn %s används redan av %tdenna person%t
 
@@ -5939,6 +6155,7 @@ pl: nawigacja z numerami "Sosa" odnoszącymi się do osoby: %t
 pt: navegação com %t como a referência Sosa
 ro: navigatie cu %t referinta Sosa
 ru: навигация с %t как ссылка Sosa
+sk: prezeranie s %t ako referenciou "Sosa"
 sl: pregled z %t kot Sosa
 sv: navigering med %t som proband (Kekules system)
 
@@ -5966,6 +6183,7 @@ pl: bratankowie lub siostrzeńcy/bratanice lub siostrzenice
 pt: sobrinhos e sobrinhas
 ro: nepoti si nepoate
 ru: племянники и племянницы
+sk: synovci a netere
 sl: nečaki in nečakinje
 sv: nevöer och niecer
 
@@ -5993,6 +6211,7 @@ pl: następny brat lub siostra
 pt: irmão seguinte/irmã seguinte/irmã(o) seguinte
 ro: urmatorul frate/urmatoarea sora/ urmatoarele frati si surori
 ru: следующий брат/следующая сестра
+sk: mladší brat/mladšia sestra/mladší súrodenec
 sl: mlajši brat/mlajša sestra
 sv: nästa bror/nästa syster/nästa syskon
 
@@ -6020,6 +6239,7 @@ pl: nie ma żadnej rocznicy
 pt: nenhum aniversário
 ro: nu e aniversare
 ru: нет годовщин
+sk: žiadne výročie
 sl: nobene obletnice
 sv: ingen årsdag
 
@@ -6047,6 +6267,7 @@ pl: nie ma żadnej rocznicy urodzin
 pt: nenhum aniversário de nascimento
 ro: nu e zi de nastere
 ru: нет дней рождений
+sk: žiadne narodeniny
 sl: nobenega rojstnega dneva
 sv: ingen födelsedag
 
@@ -6074,6 +6295,7 @@ pl: nie są znane żadne więzy pokrewieństwa pomiędzy osobami: %s i %s
 pt: nenhum grau de parentesco conhecido entre %s e %s
 ro: nici o relatie intre %s si %s
 ru: неизвестно о родственных связях между %s и %s
+sk: žiadny známy vzťah medzi %s a %s
 sl: Brez znane zveze med %s in %s
 sv: ingen känd släktskap emellan %s och %s
 
@@ -6101,6 +6323,7 @@ pl: brak pasującej odpowiedzi
 pt: nenhuma resposta
 ro: nici un rezultat 
 ru: нет совпадений
+sk: nenájdená zhoda
 sl: brez
 sv: inga träffar
 
@@ -6128,6 +6351,7 @@ pl: bez wzmianki
 pt: sem informação
 ro: nementionat
 ru: нет упоминаний
+sk: žiadna zmienka
 sl: ni omembe
 sv: inte nämnd
 
@@ -6155,6 +6379,7 @@ pl: ta sama płeć
 pt: não verificar os sexos
 ro: fara control de gen
 ru: не проверять пол
+sk: bez kontroly pohlavia
 sl: ne glede na spol
 sv: ingen kontroll av könen
 
@@ -6182,6 +6407,7 @@ pl: nie rozwiedzeni
 pt: não divorciado
 ro: nedivortat
 ru: не разведены
+sk: nerozvedení
 sl: brez ločitve
 sv: inte skilda
 
@@ -6209,6 +6435,7 @@ pl: nie znaleziono:
 pt: não encontrado
 ro: negasit
 ru: не найден
+sk: nenájdený
 sl: ni najdeno
 sv: hittar inte
 
@@ -6236,6 +6463,7 @@ pl: bez ślubu
 pt: não casados
 ro: necasatorit
 ru: не в браке
+sk: slobodný
 sl: brez poroke
 sv: ogifta
 
@@ -6264,6 +6492,7 @@ pl: uwagi
 pt: nota/notas
 ro: nota/note
 ru: заметка/заметки
+sk: poznámka/poznámky
 sl: zapisek/zapiski
 sv: notering/noteringar
 zh:  备注
@@ -6292,6 +6521,7 @@ pl: uwagi zmodyfikowane
 pt: notas modificadas
 ro: nota modificata
 ru: заметки изменены
+sk: poznámky zmenené
 sl: zaznamek spremenjen
 sv: noteringar modifierade
 
@@ -6320,6 +6550,7 @@ pt: n-ésimo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14rto/15
 pt-br: n-ésimo/1º/2º/3º/4º/5º/6º/7º/8º/9º/10º/11º/12º/13º/14º/15º/16º/17º/18º/19º/20º/21º/22º/23º/24º/25º/26º/27º/28º/29º/30º/31º/32º/33º/34º/35º/36º/37º/38º/39º/40º/41º/42º/43º/44º/45º/46º/47º/48º/49º/50º/51º/52º/53º/54º/55º/56º/57º/58º/59º/60º/61º/62º/63º/64º/65º/66º/67º/68º/69º/70º/71º/72º/73º/74º/75º/76º/77º/78º/79º/80º/81º/82º/83º/84º/85º/86º/87º/88º/89º/90º/91º/92º/93º/94º/95º/96º/97º/98º/99º
 ro: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
+sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl:  št./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
 
@@ -6348,6 +6579,7 @@ pt: n-ésimo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14rto/15
 pt-br: n-ésimo/1º/2º/3º/4º/5º/6º/7º/8º/9º/10º/11º/12º/13º/14º/15º/16º/17º/18º/19º/20º/21º/22º/23º/24º/25º/26º/27º/28º/29º/30º/31º/32º/33º/34º/35º/36º/37º/38º/39º/40º/41º/42º/43º/44º/45º/46º/47º/48º/49º/50º/51º/52º/53º/54º/55º/56º/57º/58º/59º/60º/61º/62º/63º/64º/65º/66º/67º/68º/69º/70º/71º/72º/73º/74º/75º/76º/77º/78º/79º/80º/81º/82º/83º/84º/85º/86º/87º/88º/89º/90º/91º/92º/93º/94º/95º/96º/97º/98º/99º
 ro: n-elea/primar/de gradul 2/de gradul 3/de gradul 4/de gardul 5/de gradul 6/de gradul 7/de gradul 8/de gradul 9/de gradul 10   
 ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
+sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n/två/tre/fyra/fem/sex/sju/åtta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
 
@@ -6376,6 +6608,7 @@ pt: n-ésima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta
 pt-br: n-ésima/1º/2º/3º/4º/5º/6º/7º/8º/9º/10º/11º/12º/13º/14º/15º/16º/17º/18º/19º/20º/21º/22º/23º/24º/25º/26º/27º/28º/29º/30º/31º/32º/33º/34º/35º/36º/37º/38º/39º/40º/41º/42º/43º/44º/45º/46º/47º/48º/49º/50º/51º/52º/53º/54º/55º/56º/57º/58º/59º/60º/61º/62º/63º/64º/65º/66º/67º/68º/69º/70º/71º/72º/73º/74º/75º/76º/77º/78º/79º/80º/81º/82º/83º/84º/85º/86º/87º/88º/89º/90º/91º/92º/93º/94º/95º/96º/97º/98º/99º
 ro: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 ru: энного/1-го/2-го/3-го/4-го/5-го/6-го/7-го/8-го/9-го/10-го/11-го/12-го/13-го/14-го/15-го/16-го/17-го/18-го/19-го/20-го/10-го/11-го/12-го/13-го/14-го/15-го/16-го/17-го/18-го/19-го/10-го/21-го/22-го/23-го/24-го/25-го/26-го/27-го/28-го/29-го/30-го/31-го/32-го/33-го/34-го/35-го/36-го/37-го/38-го/39-го/40-го/41-го/42-го/43-го/44-го/45-го/46-го/47-го/48-го/49-го/50-го/51-го/52-го/53-го/54-го/55-го/56-го/57-го/58-го/59-го/60-го/61-го/62-го/63-го/64-го/65-го/66-го/67-го/68-го/69-го/70-го/71-го/72-го/73-го/74-го/75-го/76-го/77-го/78-го/79-го/80-го/81-го/82-го/83-го/84-го/85-го/86-го/87-го/88-го/89-го/90-го/91-го/92-го/93-го/94-го/95-го/96-го/97-го/98-го/99-го
+sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
 
@@ -6403,6 +6636,7 @@ pl: numer
 pt: número
 ro: numar
 ru: число
+sk: číslo
 sl: številka
 sv: nummer
 
@@ -6430,6 +6664,7 @@ pl: liczba linii (gałęzi)
 pt: número de ramos
 ro: numar de ramuri
 ru: число ветвей
+sk: počet vetví
 sl: število vej
 sv: antal grenar
 
@@ -6453,6 +6688,7 @@ pl: liczba osób żyjących:
 pt: número de pessoas vivas :
 ro: numarul de persoane in viata:
 ru: количество живых персон
+sk: počet žijúcich osôb
 sl: število živih oseb
 sv: antal levande personer:
 
@@ -6480,6 +6716,7 @@ pl: zawód
 pt: ocupação
 ro: ocupatie
 ru: занятие
+sk: povolanie
 sl: poklic
 sv: yrke
 
@@ -6518,6 +6755,7 @@ pl: w %s. pokoleniu
 pt: da %s geração
 ro: de generatia %s
 ru: %s поколения
+sk: zo %s generácie 
 sl: %s generacije
 sv: av den %s generationen
 
@@ -6545,6 +6783,7 @@ pl: ze strony osoby: %s
 pt: pelo lado de %s
 ro: de partea %s
 ru: со стороны %s
+sk: zo strany :g:%s
 sl: po strani %s
 sv: från %ss släktsida
 
@@ -6573,6 +6812,7 @@ pl: dnia
 pt: a
 ro: la
 ru:
+sk: dňa
 sl:
 sv: den
 zh:  于
@@ -6601,6 +6841,7 @@ pl: w :a:
 pt:
 ro: 
 ru:
+sk:
 sl:
 sv:
 zh:
@@ -6629,6 +6870,7 @@ pl: w wieku 1 dnia
 pt: um dia
 ro: o zi
 ru: однодневный
+sk: starý jeden deň/stará jeden deň
 sl: star en dan
 sv: en dag
 
@@ -6656,6 +6898,7 @@ pl: w wieku 1 miesiąca
 pt: um mês
 ro: o luna
 ru: месячный
+sk: starý jeden mesiac/stará jeden mesiac
 sl: star en mesec
 sv: en månad
 
@@ -6683,6 +6926,7 @@ pl: w wieku 1 roku
 pt: um ano
 ro: un an
 ru: до года
+sk: starý jeden rok/stará jeden rok
 sl: star eno leto
 sv: ett år
 
@@ -6710,6 +6954,7 @@ pl: tylko wybrane pokolenie
 pt: só a geração selecionada
 ro: numai generatia aleasa
 ru: только выбранное поколение
+sk: iba zvolená generácia
 sl: samo izbrana generacija
 sv: endast den valda generationen
 
@@ -6737,6 +6982,7 @@ pl: opcjonalnie
 pt: opcional
 ro: optional
 ru: дополнительно
+sk: voľba
 sl: po želji
 sv: valfritt
 
@@ -6765,6 +7011,7 @@ pl: lub
 pt: ou
 ro: sau
 ru: или
+sk: alebo
 sl: ali
 sv: eller
 
@@ -6793,6 +7040,7 @@ pl: rodzice:a:-ów
 pt: pais
 ro: parinti
 ru: родители
+sk: rodičia
 sl: starši
 sv: föräldrar
 zh:  父母
@@ -6821,6 +7069,7 @@ pl: osoba została dodana
 pt: pessoa acrescentada
 ro: persoana adaugata
 ru: человек добавлен
+sk: osoba pridaná
 sl: oseba dodana
 sv: person tillagd
 
@@ -6848,6 +7097,7 @@ pl: osoba została usunieta
 pt: pessoa suprimida
 ro: persoana suprimata
 ru: человек удален
+sk: osoba zmazaná
 sl: oseba izbrisana
 sv: person borttagen
 
@@ -6875,6 +7125,7 @@ pl: dane poniższej osoby zostały zaktualizowane
 pt: pessoa modificada
 ro: persoana modificata
 ru: человек изменен
+sk: osoba zmenená
 sl: oseba spremenjena
 sv: person ändrad
 
@@ -6902,6 +7153,7 @@ pl: osoba:a:-ę/osoby
 pt: pessoa/pessoas
 ro: persoana/persoane
 ru: Человека/Человек
+sk: osoba/osoby
 sl: oseba/oseb
 sv: person/personer
 
@@ -6930,6 +7182,7 @@ pt: pessoas com o mesmo apelido
 pt-br: pessoas com o mesmo nome
 ro: persoane cu acelas nume
 ru: человек с тем же именем
+sk: osoby majúce to isté meno
 sl: osebe z istim imenom
 sv: personer som har samma namn
 
@@ -6957,6 +7210,7 @@ pl: miejsce
 pt: lugar
 ro: localitate
 ru: место
+sk: miesto
 sl: kraj
 sv: plats
 
@@ -7002,6 +7256,7 @@ pl: piramida wieku
 pt: pirâmide populacional
 ro: piramida demografică
 ru: пирамида популяции
+sk: populačná pyramída
 sl: populacijska piramida
 sv: befolkningspyramid
 
@@ -7024,6 +7279,7 @@ pl: możliwe duplikaty
 pt: eventual duplicidade
 ro: posibile dublete
 ru: возможные дубликаты
+sk: možné duplikácie
 sl: možno podvajanje
 sv: eventuellt dubblett
 
@@ -7051,6 +7307,7 @@ pl: prawdopodobnie
 pt: possivelmente
 ro: poate
 ru: возможно
+sk: možno
 sl: verjetno
 sv: kanske
 
@@ -7078,6 +7335,7 @@ pl: dokładność
 pt: precisão
 ro: precizie
 ru: точно
+sk: presne
 sl: natančnost
 sv: precision
 
@@ -7105,6 +7363,7 @@ pl: poprzedni brat lub siostra
 pt: irmão precedente/irmã precedente/irmã(o) precedente
 ro: frate precedent/soraprecedenta/frati sau surori precedente
 ru: предшествующий брат/предшествующая сестра
+sk: starší brat/staršia sestra/starší súrodenec
 sl: starejši brat/starejša sestra
 sv: föregående bror/föregående syster/föregående syskon
 
@@ -7132,6 +7391,7 @@ pl: bez danych osobowych
 pt: privado
 ro: privat
 ru: Частный
+sk: súkromé
 sl: zasebno
 sv: privat
 
@@ -7159,6 +7419,7 @@ pl: bez ograniczeń
 pt: público
 ro: public
 ru: общий
+sk: verejné
 sl: javno
 sv: offentligt
 
@@ -7186,6 +7447,7 @@ pl: imię oficjalne
 pt: nome público
 ro: nume public
 ru: известен как
+sk: verejné meno
 sl: uradno ime
 sv: officiellt namn
 
@@ -7213,6 +7475,7 @@ pl: przydomek
 pt: alcunha
 ro: calificativ
 ru: прозвище
+sk: prívlastok
 sl: oznaka
 sv: smeknamn
 
@@ -7240,6 +7503,7 @@ pl: uznany syn/uznana córka/uznane dziecko
 pt: filho reconhecido/filha reconhecida/filhos reconhecidos
 ro: fiu recunoscut/fica recunoscuta/copil recunoscut
 ru: усыновлен/удочерена/признанный ребенок
+sk: uznaný syn/uznaná dcéra/uznaný potomok
 sl: znan sin/znana hčerka/znani otroci
 sv: erkänd son/erkänd dotter/erkänt barn
 
@@ -7267,6 +7531,7 @@ pl: uznający ojciec/uznająca matka/uznający rodzice
 pt: pai que o reconheceu/mãe que o reconheceu/pais que o reconheceram
 ro: tata recunoscator/mama recunoscatoare/parinti recunoscatori
 ru: признанный отец/признанная мать/признаный родитель
+sk: uznaný otec/uznaná matka/uznaný rodič
 sl: znani oče/znana mati/znani starši
 sv: erkännande far/erkännande mor/erkännande föräldrar
 
@@ -7294,6 +7559,7 @@ pl: inne więzy
 pt: relação/relações
 ro: relatie/relatii
 ru: отношения/отношения
+sk: vzťah/vzťahy
 sl: razmerje/razmerja
 sv: relation/relationer
 
@@ -7321,6 +7587,7 @@ pl: pokrewieństwo
 pt: parentesco
 ro: relatie
 ru: родство
+sk: vzťah
 sl: zveza
 sv: släktskap
 
@@ -7348,6 +7615,7 @@ pl: szukanie pokrewieństwa
 pt: cálculo de parentesco
 ro: calcul de relatii
 ru: кому приходится
+sk: nájdenie vzťahov
 sl: pregled sorodstva
 sv: släktskapsberäkning
 zh:  相关查询
@@ -7376,6 +7644,7 @@ pl: linia pokrewieństwa/linie pokrewieństwa
 pt: grau de parentesco/graus de parentesco
 ro: linie de relatii
 ru: родственная связь/родственные связи
+sk: príbuzenský vzťah/príbuzenské vzťahy
 sl: sorodnik/sorodnikov
 sv: anlinje/anlinjer
 
@@ -7404,6 +7673,7 @@ pt: relacionado%t com/relacionada%t com
 pt-br: junto%t com
 ro: relatia%t cu
 ru: приходится%t
+sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
 
@@ -7431,6 +7701,7 @@ pl: powinowactwo
 pt: relações por casamento
 ro: relatie prin mariaj 
 ru: связь браком
+sk: príbuzenské vzťahy cez svadby
 sl: sorodstvo preko poroke
 sv: släktskap genom äktenskap
 
@@ -7456,6 +7727,7 @@ pt: pesquisar/sensível à capitulação
 pt-br: procurar/diferencia maiúsculas
 ro: cautare/sensibila la caz
 ru: поиск/регистрозависимый
+sk: hľadať/citlivý na veľkosť písma
 sl: iskanje/razlikovanje VELIKIH-malih črk
 sv: sök/skiftlägeskänslig
 
@@ -7483,6 +7755,7 @@ pl: zobacz
 pt: ver
 ro: vezi
 ru: смотри
+sk: pozri
 sl: glej
 sv: se
 
@@ -7511,6 +7784,7 @@ pt: ver encima
 pt-br: ver acima
 ro: vezi antecedenta
 ru: смотри выше
+sk: pozri vyššie
 sl: glej zgoraj
 sv: se ovan
 
@@ -7538,6 +7812,7 @@ pl: zobacz niżej
 pt: ver a continuação
 ro: vezi urmatoarea
 ru: смотри дальше
+sk: pozri ďalej
 sl: nadalje glej
 sv: se vidare
 
@@ -7565,6 +7840,7 @@ pl: dołącz :a:
 pt: enviar
 ro: trimite
 ru: послать
+sk: pošli
 sl: pošlji
 sv: skicka
 
@@ -7592,6 +7868,7 @@ pl: w separacji
 pt: separados
 ro: despartiti
 ru: разделены
+sk: odlúčení
 sl: živela narazen
 sv: separerat
 
@@ -7619,6 +7896,7 @@ pl: więcej niż jedna odpowiedź
 pt: várias respostas
 ro: mai multe raspunsuri
 ru: несколько ответов
+sk: viac odpovedí
 sl: več rešitev
 sv: flera svar
 
@@ -7646,6 +7924,7 @@ pl: płeć
 pt: sexo
 ro: sex
 ru: пол
+sk: pohlavie
 sl: spol
 sv: kön
 
@@ -7673,6 +7952,7 @@ pl: postać skrócona
 pt: resultados sucintos
 ro: resultat scurt
 ru: кратко
+sk: krátky výpis
 sl: kratek seznam
 sv: kort rapport
 
@@ -7700,6 +7980,7 @@ pl: najkrótsza linia
 pt: caminho mais curto
 ro: drumul cel mai scurt
 ru: кратчайший путь
+sk: najkratšia cesta
 sl: najkrajša vez
 sv: kortaste vägen
 
@@ -7727,6 +8008,7 @@ pl: powinna być kobietą
 pt: teria que ser de sexo feminino
 ro: ar trebui sa fie feminin
 ru: должна быть женщиной
+sk: mala by byť žena
 sl: bi moral biti ženska
 sv: borde vara kvinna
 
@@ -7754,6 +8036,7 @@ pl: powinna być mężczyzną
 pt: teria que ser de sexo masculino
 ro: ar trebui sa fie masculin
 ru: должен быть мужчиной
+sk: mal by byť muž
 sl: bi morala biti moški
 sv: borde vara man
 
@@ -7781,6 +8064,7 @@ pl: rodzeństwo
 pt: irmãos e irmãs
 ro: frati/surori
 ru: братья или сесты
+sk: súrodenci
 sl: bratje in sestre
 sv: syskon
 
@@ -7806,6 +8090,7 @@ ro: de la ultimul click
 ru: с момента последнего щелчка
 sl: od zadnjega klika
 sv: från senaste klick
+sk: od posledného poklepania
 
     son/daughter/child
 af: seun/dogter/kind
@@ -7831,6 +8116,7 @@ pl: syn/córka/dziecko
 pt: filho/filha/filho(a)
 ro: fiu/fica/copil
 ru: сын/дочь/дети
+sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
@@ -7858,6 +8144,7 @@ pl: źródło/źródła
 pt: fonte/fontes
 ro: sursa/surse
 ru: источник/источники
+sk: zdroj/zdroje
 sl: vir/viri
 sv: källa/källor
 
@@ -7885,6 +8172,7 @@ pl: wybierz
 pt: especificar
 ro: specifica
 ru: укажите
+sk: upresni
 sl: določi
 sv: välj
 zh:  从下列选取
@@ -7913,6 +8201,7 @@ pl: bez wliczania małżonków
 pt: cônjuges não incluídos
 ro: conjugati exclusi
 ru: супругов не включать
+sk: manželia/manželky nie sú zahrnuté
 sl: brez mož/žena
 sv: exklusive makar
 
@@ -7940,6 +8229,7 @@ pl: zaczynając od:
 pt: começando com
 ro: incepind cu
 ru: начинаются с
+sk: začať s
 sl: začenši z
 sv: som börjar med
 
@@ -7967,6 +8257,7 @@ pl: zestawienia
 pt: estatísticas
 ro: statistici 
 ru: статистика
+sk: štatistika
 sl: statistike
 sv: statistik
 
@@ -7995,6 +8286,7 @@ pt: alias do apelido
 pt-br: apelido do sobrenome
 ro: alias de nume 
 ru: новая:a:--ую фамилия:a:-ю
+sk: alias priezviska
 sl: drug priimek
 sv: efternamns alias
 
@@ -8023,6 +8315,7 @@ pt: falta o apelido
 pt-br: falta o sobrenome
 ro: prenumele lipseste 
 ru: фамилия утрачена
+sk: priezvisko chýba
 sl: manjka priimek
 sv: efternamn saknas
 
@@ -8051,6 +8344,7 @@ pt: apelido não foi encontrado
 pt-br: sobrenome não foi encontrado
 ro: nume negasit
 ru: фамилия не найдена
+sk: priezvisko nenájdené
 sl: priimek ni najden
 sv: hittar inte efternamn
 
@@ -8081,6 +8375,7 @@ pt: apelido/apelidos
 pt-br: sobrenome/sobrenomes
 ro: nume de familie
 ru: фамилия/фамилии
+sk: priezvisko/priezviská
 sl: priimek/priimki
 sv: efternamn/efternamn
 zh:  姓
@@ -8110,6 +8405,7 @@ pt: lista de apelidos
 pt-br: lista de sobrenomes
 ro: lista de nume de familie 
 ru: список фамилий
+sk: zoznam priezvísk
 sl: seznam priimkov
 sv: efternamns lista
 
@@ -8137,6 +8433,7 @@ pl: tekst
 pt: texto
 ro: text
 ru: текст
+sk: text
 sl: tekst
 sv: text
 
@@ -8165,6 +8462,7 @@ pt: os %d nomes
 pt-br: os %d prenomes
 ro: %d prenume
 ru: %d имён
+sk: %d mien
 sl: %d lastnih imen
 sv: de %d förnamnen
 
@@ -8192,6 +8490,7 @@ pt: o %d mais velho casal talvez ainda vivo e noivado
 pt-br: os %d mais velhos casais talvez ainda vivos
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
 ru: старейшие %d возможно живых супругов или помолвленных
+sk: %d najstarších párov pravdepodobne žijúcich a zadaných
 sl: %d najstarejših morda še živih in zaročenih parov
 sv: de %d äldsta nu levande paren som kanske fortfarande är förlovade
 
@@ -8219,6 +8518,7 @@ pl: %d najstarszych osób (prawdopodobnie) żyjących
 pt: os %d mais velhos talvez ainda vivos
 ro: %d cei mai batrini posibil mai in viata
 ru: %d самых старых еще живущих
+sk: %d najstaších, snáď ešte žijúcich osôb
 sl: %d najstarejših, morda še živečih
 sv: de %d äldsta personerna som kanske lever
 
@@ -8247,6 +8547,7 @@ pt: os %d apelidos
 pt-br: os %d sobrenomes
 ro: %d nume de familie
 ru: %d фамилий
+sk: %d priezvísk
 sl: %d priimkov
 sv: de %d efternamnen
 
@@ -8274,6 +8575,7 @@ pl: %d osób, które żyły najdłużej
 pt: os %d que mais viveram
 ro: %d cei mai in virsta
 ru: %d проживших дольше всех
+sk: %d osôb, ktoré žili najdlhšie
 sl: %d oseb, ki so živele najdlje 
 sv: de %d personerna som har levt längst
 
@@ -8301,6 +8603,7 @@ pl: %s pokolenie
 pt: a %s geração
 ro: generatia %s
 ru: %s-е поколение
+sk: %s. generácia
 sl: %s. generacija
 sv: den %s generationen
 
@@ -8328,6 +8631,7 @@ pl: rocznica
 pt: o aniversário
 ro: aniversarea
 ru: годовщина
+sk: výročie
 sl: obletnica
 sv: årsdagen
 
@@ -8355,6 +8659,7 @@ pl: rocznica ślubu
 pt: o aniversário de casamento
 ro: aniversatia de mariaj 
 ru: годовщина брака
+sk: výročie svadby
 sl: obletnica poroke
 sv: bröllopsdagen
 
@@ -8382,6 +8687,7 @@ pl: w bazie zostały dokonane zmiany; kliknij "wstecz" i "odśwież", a następn
 pt: a base mudou: fazer "back", "reload" e preencher novamente o formulário
 ro: basa de date a fost schimbata; mergi inapoi, ceri formularul si intra datele din nou
 ru: база изменилась; нажмите "назад", "перечитать" и заполните снова форму
+sk: databáza sa zmenila; vráťte se späť (back), znovu načítajte stránku (reload) a vyplňte formulár
 sl: baza podatkov se je spremenila: kliknite "back" in "reload" ter ponovno vpišite podatke
 sv: databasen har ändrats; gå tillbaka, klicka uppdatera och fyll i formuläret igen
 
@@ -8409,6 +8715,7 @@ pl: urodziny
 pt: o aniversário de nascimento
 ro: aniversarea zilei de nastere
 ru: день рождения
+sk: narodeniny
 sl: rojstni dan
 sv: födelsedagen
 
@@ -8436,6 +8743,7 @@ pl: dzieci
 pt: os filhos
 ro: copii 
 ru: ребенок
+sk: deti
 sl: otroci
 sv: barnen
 
@@ -8463,6 +8771,7 @@ pl: pojutrze
 pt: depois de amanhã
 ro: poimaine
 ru: послезавтра
+sk: pozajtra
 sl: pojutrišnem
 sv: i övermorgon
 
@@ -8490,6 +8799,7 @@ pl: teść/teściowa
 pt: o sogro/a sogra
 ro: socrul/soacra
 ru: свекор-тесть/свекровь-теща
+sk: svokor/svokra
 sl: tast/tašča
 sv: svärfadern/svärmodern
 
@@ -8517,6 +8827,7 @@ pl: ojciec/matka/rodzic
 pt: o pai/a mãe/um dos pais
 ro: tatal/mama/parinti
 ru: мать/отец/родители
+sk: otec/matka/rodič
 sl: oče/mati/starš
 sv: fadern/modern/en förälder
 zh:  父/ 母/a parent
@@ -8545,6 +8856,7 @@ pl: plik jest chwilowo niedostępny; spróbuj później, ewentualnie chwilę odc
 pt: a base está temporariamente inacessível: por favor tente novamente. Se não funcionar, espere um momento
 ro: fisierul este blocat; incearca mai tirziu din nou
 ru: файл временно заблокирован: пожалуйста попытайтесь снова
+sk: súbor je uzamknutý, skúste znova.
 sl: ta datoteka je začasno zaklenjena: prosimo poskusite znova. Če še vedno ne deluje, prosimo počakajte trenutek
 sv: filen är temporärt låst: försök igen. Om det ändå inte fungerar, vänta ett tag innan nästa försök
 
@@ -8572,6 +8884,7 @@ pl: nastepujące dzieci (rodzice: %t i %t) nie są ułożone w porządku chronol
 pt: os seguintes filhos de %t e %t não estão apresentados em ordem
 ro: urmatori copii a lui %t si %t nu sint in ordine cronologica 
 ru: следующие дети %t и %t - идут не по порядку
+sk: nasledujúce deti rodičov %t a %t nie sú chronologicky
 sl: naslednji otroci od %t in %t niso po vrstnem redu
 sv: de följande barnen till %t och %t är inte i kronologiskordning
 
@@ -8599,6 +8912,7 @@ pl: wnuki
 pt: os netos
 ro: nepoti
 ru: правнуки
+sk: vnúčatá
 sl: vnuki
 sv: barnbarnen
 
@@ -8626,6 +8940,7 @@ pl: dziadkowie
 pt: os avós
 ro: bunici
 ru: прародитель
+sk: prarodičia
 sl: stari starši
 sv: den 3:e generationen
 
@@ -8653,6 +8968,7 @@ pl: prawnuki
 pt: os bisnetos
 ro: stranepoti
 ru: праправнук
+sk: pravnúčatá
 sl: pravnuki
 sv: barnbarns barnen
 
@@ -8680,6 +8996,7 @@ pl: pradziadkowie
 pt: os bisavós
 ro: strabunici 
 ru: прапрародитель
+sk: praprarodičia
 sl: prastari starši
 sv: den 4:e generationen
 
@@ -8707,6 +9024,7 @@ pl: %d ostatnich narodzin
 pt: os %d nascimentos mais recentes
 ro: ultimile %d nascuti
 ru: %d последних рождений
+sk: posledných %d narodení
 sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
 
@@ -8734,6 +9052,7 @@ pl: %d ostatnich ślubów
 pt: os %d casamentos mais recentes
 ro: ultimi %d insurati
 ru: последние %d браков
+sk: posledných %d sobášov
 sl: zadnjih %d porok
 sv: de senaste %d äktenskapen
 
@@ -8761,6 +9080,7 @@ pl: %t ostatnich zgonów
 pt: os %t óbitos mais recentes
 ro: ultimi %t decedati
 ru: %t последних смертей
+sk: posledných %t úmrtí
 sl: zadnjih %t smrti
 sv: de senaste %t avlidna
 
@@ -8788,6 +9108,7 @@ pl: rodzice
 pt: os pais
 ro: parinti
 ru: родители
+sk: rodičia
 sl: starši
 sv: föräldrarna
 
@@ -8815,6 +9136,7 @@ pl: mąż/żona
 pt: o marido/a esposa
 ro: sotul/sotia
 ru: муж/жена
+sk: manžel/manželka
 sl: mož/žena
 sv: maken/makan
 
@@ -8842,6 +9164,7 @@ pl: pełna lista
 pt: toda a lista
 ro: toata lista
 ru: целый список
+sk: celý zoznam
 sl: celoten seznam
 sv: hela listan
 
@@ -8893,6 +9216,7 @@ pl: tytuł/tytuły
 pt: título/títulos
 ro: titlu/titluri
 ru: титул/титулы
+sk: titul/tituly
 sl: naziv/nazivi
 sv: titel/titlar
 
@@ -8921,6 +9245,7 @@ pt: para acrescentar um filho a uma família utilizar "%s"
 ro: pentru a adauga un copil utilizeaza "%s"
 ru: чтобы добавить ребенка к семье, используй "%s"
 sl: da bi dodal otroka k družini, uporabite "%s"
+sk: pre pridanie dieťaťa do rodiny použi "%s"
 sv: för att lägga till ett barn i en familj, använd "%s"
 
     to the %s generation
@@ -8947,6 +9272,7 @@ pl: do %s pokolenia
 pt: até à %s geração
 ro: pina la generatia %s
 ru: до %s поколения
+sk: do %s generácie
 sl: do %s generacije
 sv: till den %s generationen
 
@@ -8974,6 +9300,7 @@ pl: tylko dzieci
 pt: até aos filhos
 ro: pina la copii
 ru: до детей
+sk: k deťom
 sl: do otrok
 sv: till barnen
 
@@ -9001,6 +9328,7 @@ pl: dzieci i wnuki
 pt: até aos netos
 ro: pina la nepoti
 ru: до внуков
+sk: k vnúčatám
 sl: do vnukov
 sv: till barnbarnen
 
@@ -9028,6 +9356,7 @@ pl: rodzice i dziadkowie
 pt: até aos avós
 ro: pina la bunici
 ru: до прадедов
+sk: k prarodičom
 sl: do starih staršev
 sv: till den 3:e generationen
 
@@ -9055,6 +9384,7 @@ pl: do prawnuków
 pt: até aos bisnetos
 ro: pina la stranepoti
 ru: до праправнуков
+sk: k pravnúčatám
 sl: do pravnukov
 sv: till barnbarns barnen
 
@@ -9082,6 +9412,7 @@ pl: do pradziadków
 pt: até aos bisavós
 ro: pina la strabunici
 ru: до прапрародителей
+sk: k praprarodičom
 sl: do prastarih staršev
 sv: till den 4:e generationen
 
@@ -9109,6 +9440,7 @@ pl: tylko rodzice
 pt: até aos pais
 ro: pina la parinti
 ru: до родителей
+sk: k rodičom
 sl: do staršev
 sv: till föräldrarna
 
@@ -9136,6 +9468,7 @@ pl: dzisiaj
 pt: hoje
 ro: astazi
 ru: сегодня
+sk: dnes
 sl: danes
 sv: i dag
 
@@ -9163,6 +9496,7 @@ pl: jutro
 pt: amanhã
 ro: maine
 ru: завтра
+sk: zajtra
 sl: jutri
 sv: i morgon
 
@@ -9190,6 +9524,7 @@ pl: łącznie
 pt: total
 ro: in total
 ru: всего
+sk: spolu
 sl: skupaj
 sv: totalt
 
@@ -9217,6 +9552,7 @@ pl: drzewo
 pt: árvore
 ro: arbore 
 ru: дерево
+sk: strom
 sl: drevo
 sv: träd
 
@@ -9229,6 +9565,7 @@ et: proovi uuesti
 fi: yritä uudestaan
 fr: réessayer
 nl: opnieuw proberen
+sk: skús znovu
 
     uncles and aunts
 af: ooms en tantes
@@ -9254,6 +9591,7 @@ pl: stryjowie lub wujowie oraz ciotki
 pt: tios e tias
 ro: unchi/matuse
 ru: дяди и тети
+sk: strýkovia a tety
 sl: strici in tete
 sv: farbröder-morbröder och fastrar-mostrar
 
@@ -9281,6 +9619,7 @@ pl: %t ma nieokreśloną płeć
 pt: sexo indefinido para %t
 ro: gen nedefinit pentru %t
 ru: неизвестный пол у %t
+sk: nedefinované pohlavie pre %t
 sl: %t nima določenega spola
 sv: odefinierat kön för %t
 
@@ -9308,6 +9647,7 @@ pl: osoba nieznana
 pt: pessoa desconhecida
 ro: persoana necunoscuta
 ru: неизвестный человек
+sk: neznáma osoba
 sl: neznana oseba
 sv: okänd person
 
@@ -9335,6 +9675,7 @@ pl: nieokreślone
 pt: não especificado
 ro: nespecificata
 ru: неопределенный
+sk: neurčené
 sl: nedoločeno
 sv: ospecificerad
 
@@ -9362,6 +9703,7 @@ pl: do
 pt: até
 ro: pina la
 ru: вплоть до
+sk: až po :a:
 sl: do
 sv: upp till
 
@@ -9391,6 +9733,7 @@ pt-br: atualizar
 ro: actualizare
 ru: изменить
 sl: spremeni
+sk: upraviť
 sv: uppdatera
 zh:  更新
 
@@ -9418,6 +9761,7 @@ pl: użyj "link" zamiast "utwórz"
 pt: use "ligar" em lugar de "criar"
 ro: utilizeaza "reuneste" in loc de "creaza"
 ru: используйте "связать" вместо "создать"
+sk: použi "spojenie" namiesto "vytvorenia"
 sl: uporabite "povezava" namesto "ustvari"
 sv: använd "länk" istället för "skapa"
 
@@ -9459,6 +9803,7 @@ pl: sprawdź/usuń
 pt: validar/eliminar
 ro: valideaza/sterge
 ru: проверить/удалить
+sk: potvrdiť/zmazať
 sv: giltligt/tas bort
 
     version
@@ -9469,6 +9814,7 @@ fr: version
 en: view source
 et: vaata lähteteksti
 fr: voir source
+sk: pozri zdroj
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
@@ -9488,6 +9834,7 @@ pl: wyświetl/pokaż/ukryj/podsumowanie
 pt: visualizar/mostrar/esconder/sumário
 ro: vizualizeaza/arata/ascunde/sumar
 ru: построить/показать/скрыть/общая
+sk: vizualizovať/ukázať/schovať/sumarizovať
 sv: visualisera/visa/göm/summering
 
     warnings
@@ -9514,6 +9861,7 @@ pl: uwaga!
 pt: avisos
 ro: avertisment
 ru: внимание
+sk: varovanie
 sl: opozorila
 sv: varningar
 
@@ -9541,6 +9889,7 @@ pl: z:
 pt: com
 ro: cu
 ru: с
+sk: s :i:
 sl: z
 sv: med
 
@@ -9568,6 +9917,7 @@ pl: świadek małżeństwa pomiędzy osobami: %s i %s
 pt: testemunha do casamento de %s e %s
 ro: martor la mariajul lui %s cu %s  
 ru: свидетель в браке %s и %s
+sk: svedok na svadbe %s a %s
 sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
 
@@ -9595,6 +9945,7 @@ pl: świadek:a:--ka/świadkowie
 pt: testemunha/testemunhas
 ro: martor/martori
 ru: свидетель:g:-я:a:-я/свидетели
+sk: svedok:g:--ka/svedkovia
 sl: priča/priče
 sv: vittne/vittnen
 
@@ -9622,6 +9973,7 @@ pl: wizard/wizard/friend/friends/exterior
 pt: feiticeiro/feiticeiros/amigo/amigos/exterior
 ro: magician/magician/amic/amic/exterior
 ru: wizard/wizard/друг/друг/exterior
+sk: wizard/wizards/friend/friends/exterior
 sl: čarovnik/čarovnik/prijatelj/prijatelj/exterior
 sv: administratör/administratörer/vän/vän/exterior
 
@@ -9649,6 +10001,7 @@ pl: byłby/byłaby swoim własnym przodkiem
 pt: seria seu própio antepassado
 ro: ar fi propriul stramos
 ru: было бы его/ее собственным предком
+sk: bol/bola by svoj vlastný predok
 sl: bi bil svoj lasten prednik
 sv: skulle vara sin egen ana
 
@@ -9677,6 +10030,7 @@ pl: rok/miesiąc/dzień
 pt: ano/mês/dia
 ro: anul/luna/ziua
 ru: год/месяц/день
+sk: rok/mesiac/deň
 sl: leto/mesec/dan
 sv: år/månad/dag
 
@@ -9705,6 +10059,7 @@ pl: lat
 pt: anos
 ro: ani
 ru: лет
+sk: rokov
 sl: let
 sv: år
 zh:  岁
@@ -9740,6 +10095,7 @@ pl: musisz najpierw dokonać scalenia
 pt: tem que fundir primeiro
 ro: trebuia intai sa unesti
 ru: вы должны сначала объединить
+sk: najprv musíš spojiť
 sl: naprej morate združiti
 sv: du måste först slå samman
 
@@ -9767,6 +10123,7 @@ pl: musisz najpierw scalić 2 rodziny
 pt: primeiro tem que fundir as 2 famílias
 ro: trebuie intai sa unesti cele doua familii 
 ru: вы должны сначала объединить 2 семьи
+sk: najprv musíš spojiť tieto dbe rodiny
 sl: najprej morate združiti obe družini
 sv: du måste först slå samman de 2 familjerna
 
@@ -9787,6 +10144,7 @@ no: Beskjeden din avventer bekreftelse
 pl: twoja wiadomość czeka na potwierdzenie
 pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
+sk: tvoja správa čaká na potvrdenie
 ru: ваше сообщение ожидает проверки 
 sv: ditt meddelande väntar på giltighet
 
