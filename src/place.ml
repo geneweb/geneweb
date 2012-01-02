@@ -717,6 +717,7 @@ value print_place conf base list len =
                             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%d\"" s i )
                           env_keys ;
                         xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_P_OK\"" ;
+                        xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
                         xtag "input" "type=\"text\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\"" 
                           (quote_escaped (no_html_tags (only_printable s))) ;
                       end;
@@ -969,6 +970,11 @@ value update_person_list conf base new_place list nb_pers max_updates = do {
     [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
 value print_mod_ok conf base = do {
+  let ini =
+    match p_getenv conf.env "s" with
+    [ Some s -> s
+    | None -> "" ]
+  in
   let env_keys = 
     let list = ref [] in
     let _ = 
@@ -1034,7 +1040,7 @@ value print_mod_ok conf base = do {
       }
     else ();
     tag "p" begin
-      stag "a" "href=\"%sm=MOD_P\"" (commd conf) begin
+      stag "a" "href=\"%sm=MOD_P;s=%s\"" (commd conf) ini begin
         Wserver.wprint "%s ?" (capitale (transl conf "new modification"));
       end;
     end;
@@ -1046,7 +1052,7 @@ value print_mod_ok conf base = do {
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
-      stag "a" "href=\"%sm=MOD_P\"" (commd conf) begin
+      stag "a" "href=\"%sm=MOD_P;s=%s\"" (commd conf) ini begin
         Wserver.wprint "%s ?" (capitale (transl conf "new modification"));
       end;
     end;
