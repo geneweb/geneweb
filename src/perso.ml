@@ -268,12 +268,18 @@ value find_sosa conf base a sosa_ref_l =
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
 value p_sosa conf base p = 
-  match Util.find_sosa_ref conf base with
-  [ Some per -> 
-    match find_sosa_aux conf base p per with
-    [ Some (n,_) -> n
+  (* Pour les grosses bases (>100 000 personnes), le calcul de sosa *)
+  (* peut être long lors d'une recherche de personnes. Cette option *)
+  (* permet d'activer ou désactiver le calcul de sosa.              *)
+  if p_getenv conf.base_env "compute_sosa" = Some "no" then
+    Num.zero
+  else
+    match Util.find_sosa_ref conf base with
+    [ Some per -> 
+      match find_sosa_aux conf base p per with
+      [ Some (n,_) -> n
+      | None -> Num.zero ]
     | None -> Num.zero ]
-  | None -> Num.zero ]
 ;
 
 value max_ancestor_level conf base ip max_lev =
