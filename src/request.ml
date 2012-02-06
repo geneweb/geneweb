@@ -265,8 +265,9 @@ value specify conf base n pl =
          tag "li" begin
            let sosa_num = Perso.get_sosa_person conf base p in
            if Num.gt sosa_num Num.zero then
-             Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa\"/> " 
-               (Util.image_prefix conf) "sosa.png"
+             Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
+               (Util.image_prefix conf) "sosa.png" 
+               (Perso.string_of_num (Util.transl conf "(thousand separator)") sosa_num)
            else () ;
            match tl with
            [ [] ->
