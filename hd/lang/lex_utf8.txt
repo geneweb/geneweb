@@ -10199,7 +10199,7 @@ nl: leeftijd bij de geboorte van %s
 de: halbbrüder und schwestern
 en: half-siblings
 es: hermanastros y hermanastras
-fr: demi frères et sœurs
+fr: demi frères et demi sœurs
 it: fratellastri e sorellastre
 nl: half broers en zusters
 
