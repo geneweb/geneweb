@@ -324,6 +324,18 @@ value check_parents conf base cpl =
   | ((False, True), (True, True)) -> 
       Some ((transl_nth conf "father/mother" 0) ^ (" : ")
             ^ (transl conf "surname missing"))
+  | ((False, False), (True, False)) -> 
+      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
+            ^ (transl conf "first name missing"))
+  | ((False, False), (False, True)) -> 
+      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
+            ^ (transl conf "surname missing"))
+  | ((True, False), (False, False)) -> 
+      Some ((transl_nth conf "father/mother" 0) ^ (" : ")
+            ^ (transl conf "first name missing"))
+  | ((False, True), (False, False)) -> 
+      Some ((transl_nth conf "father/mother" 0) ^ (" : ")
+            ^ (transl conf "surname missing"))
   | _ -> None ]
 ;
 
