@@ -2120,7 +2120,8 @@ value create_topological_sort conf base =
       lock (Mutil.lock_file bfile) with
       [ Accept ->
           let tstab_file =
-            if conf.use_restrict then Filename.concat bfile "tstab_visitor"
+            if conf.use_restrict && not conf.wizard && not conf.friend then 
+              Filename.concat bfile "tstab_visitor"
             else Filename.concat bfile "tstab"
           in
           let r =
@@ -2144,7 +2145,8 @@ value create_topological_sort conf base =
               let () = load_couples_array base in
               let tstab = Consang.topological_sort base (pget conf) in
               do {
-                if conf.use_restrict then base_visible_write base else ();
+                if conf.use_restrict && not conf.wizard && not conf.friend then 
+                  base_visible_write base else ();
                 match
                   try Some (Secure.open_out_bin tstab_file) with
                   [ Sys_error _ -> None ]
