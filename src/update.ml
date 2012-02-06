@@ -212,7 +212,7 @@ value print_warning conf base =
       Wserver.wprint "-&gt;\n";
       Wserver.wprint "%s"
         (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
-           someone_ref_text conf base moth ^ "\n");
+           " " ^ someone_ref_text conf base moth ^ "\n");
       let print_list arr diff_arr =
         Array.iteri
           (fun i ip ->
