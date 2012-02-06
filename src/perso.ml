@@ -169,17 +169,26 @@ value string_of_titles conf base cap and_txt p =
     "" titles
 ;
 
+
+value print_base_loop conf base p =
+  do {
+    Wserver.wprint
+      (fcapitale
+         (ftransl conf "loop in database: %s is his/her own ancestor"))
+      (Util.update_family_loop conf base p (person_text conf base p));
+    Wserver.wprint ".\n";
+    Hutil.trailer conf;
+    exit 2
+  }
+;
+
 (* Version matching the Sosa number of the "ancestor" pages *)
 
-(*                       !!! FIX ME !!!                                *)
-(* J'ai rajouté un try catch qui ignore qu'on pointe en dehors du      *)
-(* tableau, mais ce n'est pas une bonne solution. Il faut corriger en  *)
-(* en profondeur ce problème d'index de tableau qui semble se produire *)
-(* lorsqu'on ajoute des personnes puis en supprime. Le calcul de sosa  *)
-(* ne se fait pas alors correctement et on plante à l'affichage par    *)
-(* branche *)
 value find_sosa_aux conf base a p =
-  let tstab = Util.create_topological_sort conf base in
+  let tstab = 
+    try Util.create_topological_sort conf base with
+    [ Consang.TopologicalSortError p -> print_base_loop conf base p ]
+  in
   let mark = Array.create (nb_of_persons base) False in
   let rec gene_find =
     fun
@@ -189,14 +198,8 @@ value find_sosa_aux conf base a p =
         else if mark.(Adef.int_of_iper ip) then gene_find zil
         else do {
           mark.(Adef.int_of_iper ip) := True;
-          (* FIX ME : Util.create_topological_sort *)
-          let bool =
-            try 
-              tstab.(Adef.int_of_iper (get_key_index a)) <=
-               tstab.(Adef.int_of_iper ip)
-            with [ Invalid_argument "index out of bounds" -> True ]
-          in
-          if bool then
+          if tstab.(Adef.int_of_iper (get_key_index a)) <=
+               tstab.(Adef.int_of_iper ip) then
             gene_find zil
           else
             let asc = pget conf base ip in
@@ -254,8 +257,79 @@ value find_sosa conf base a sosa_ref_l =
   | None -> None ]
 ;
 
+
+(* [Type]: (Def.iper, Num.t) Hashtbl.t *)
+value sosa_ht = Hashtbl.create 5003; 
+
+
+(* ************************************************************************ *)
+(*  [Fonc] build_sosa_ht : config -> base -> unit                           *)
+(** [Description] : Construit à partir du sosa de référence de la base, la
+      liste de tous ces ancêtres directs et la stocke dans une hashtbl. La 
+      clé de la table est l'iper de la personne et on lui associe son numéro
+      de sosa. Les sosa multiples ne sont représentés qu'une seule fois par 
+      leur plus petit numéro sosa.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value build_sosa_ht conf base =
+  let () = load_ascends_array base in 
+  let () = load_couples_array base in 
+  match Util.find_sosa_ref conf base with
+  [ Some sosa_ref -> 
+      let nb_persons = nb_of_persons base in
+      let mark = Array.create nb_persons False in 
+      (* Tableau qui va socker au fur et à mesure les ancêtres du sosa_ref. *)
+      (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
+      (* commence à l'indice 1 !                                            *)
+      let sosa_accu = 
+        Array.create (nb_persons + 1) (Num.zero, Adef.iper_of_int 0) 
+      in
+      let () = Array.set sosa_accu 1 (Num.one, get_key_index sosa_ref) in  
+      let rec loop i len =
+        if i > nb_persons then ()
+        else
+          let (sosa_num, ip) = Array.get sosa_accu i in 
+          (* Si la personne courante n'a pas de numéro de sosa, alors il n'y *)
+          (* a plus d'ancêtres car ils ont été ajoutés par ordre croissant.  *)
+          if Num.eq sosa_num Num.zero then ()
+          else do {  
+            Hashtbl.add sosa_ht ip sosa_num;
+            let asc = pget conf base ip in
+            (* Ajoute les nouveaux ascendants au tableau des ancêtres. *)
+            match get_parents asc with
+            [ Some ifam -> 
+                let cpl = foi base ifam in
+                let z = Num.twice sosa_num in
+                let len =
+                  if not mark.(Adef.int_of_iper (get_father cpl)) then do {
+                    Array.set sosa_accu (len + 1) (z, get_father cpl) ;
+                    mark.(Adef.int_of_iper (get_father cpl)) := True ; 
+                    len + 1 }
+                  else len 
+                in
+                let len = 
+                  if not mark.(Adef.int_of_iper (get_mother cpl)) then do {
+                    Array.set sosa_accu (len + 1) (Num.inc z 1, get_mother cpl);
+                    mark.(Adef.int_of_iper (get_mother cpl)) := True ; 
+                    len + 1 }
+                else len 
+                in
+                loop (i + 1) len
+            | None -> loop (i + 1) len ] 
+          } 
+      in 
+      loop 1 1
+   | None -> () ]
+;
+
+
 (* ******************************************************************** *)
-(*  [Fonc] p_sosa : config -> base -> person -> Num.t                   *)
+(*  [Fonc] get_sosa_person : config -> base -> person -> Num.t          *)
 (** [Description] : Recherche si la personne passée en argument a un
                     numéro de sosa.
     [Args] :
@@ -267,20 +341,34 @@ value find_sosa conf base a sosa_ref_l =
                 sosa, ou retourne son numéro de sosa sinon
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
-value p_sosa conf base p = 
-  (* Pour les grosses bases (>100 000 personnes), le calcul de sosa *)
-  (* peut être long lors d'une recherche de personnes. Cette option *)
-  (* permet d'activer ou désactiver le calcul de sosa.              *)
-  if p_getenv conf.base_env "compute_sosa" = Some "no" then
-    Num.zero
-  else
-    match Util.find_sosa_ref conf base with
-    [ Some per -> 
-      match find_sosa_aux conf base p per with
-      [ Some (n,_) -> n
-      | None -> Num.zero ]
-    | None -> Num.zero ]
+value get_sosa_person conf base p = 
+  try Hashtbl.find sosa_ht (get_key_index p) with
+  [ Not_found -> Num.zero ]
 ;
+
+
+(* ******************************************************************** *)
+(*  [Fonc] get_single_sosa : config -> base -> person -> Num.t          *)
+(** [Description] : Recherche si la personne passée en argument a un
+                    numéro de sosa.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : personne dont on cherche si elle a un numéro sosa
+    [Retour] :
+      - Num.t : retourne Num.zero si la personne n'a pas de numéro de
+                sosa, ou retourne son numéro de sosa sinon
+    [Rem] : Exporté en clair hors de ce module.                         *)
+(* ******************************************************************** *)
+value get_single_sosa conf base p = 
+  match Util.find_sosa_ref conf base with
+  [ Some per -> 
+    match find_sosa_aux conf base p per with
+    [ Some (n,_) -> n
+    | None -> Num.zero ]
+  | None -> Num.zero ]
+;
+
 
 value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in

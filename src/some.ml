@@ -83,7 +83,7 @@ value print_elem conf base is_surname (p, xl) =
     (fun first x ->
        do {
          if not first then Wserver.wprint "</li>\n<li>\n  " else ();
-         let sosa_num = Perso.p_sosa conf base x in
+         let sosa_num = Perso.get_sosa_person conf base x in
          if Num.gt sosa_num Num.zero then
            Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
              (Util.image_prefix conf) "sosa.png" 
@@ -242,6 +242,8 @@ value first_name_print conf base x =
       list
   in
   let list = List.fold_right merge_insert list [] in
+  (* Construction de la table des sosa de la base *)
+  let () = Perso.build_sosa_ht conf base in 
   match list with
   [ [] -> first_name_not_found conf x
   | [(_, (strl, iperl))] ->
@@ -337,8 +339,8 @@ value print_branch conf base psn name =
       | _ -> None ]
     in
     print_selection_bullet conf first_select;
-    let sosa_num = Perso.p_sosa conf base p in
-    if Num.gt sosa_num Num.zero then
+    let sosa_num = Perso.get_sosa_person conf base p in 
+    if Num.gt sosa_num Num.zero then 
       Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
         (Util.image_prefix conf) "sosa.png" 
         (Perso.string_of_num (Util.transl conf "(thousand separator)") sosa_num)
@@ -363,8 +365,8 @@ value print_branch conf base psn name =
                  if is_first_level then Wserver.wprint "<br%s>\n" conf.xhs
                  else Wserver.wprint "</dd>\n<dd>\n";
                  print_selection_bullet conf select;
-                 let sosa_num = Perso.p_sosa conf base p in
-                 if Num.gt sosa_num Num.zero then
+                 let sosa_num = Perso.get_sosa_person conf base p in 
+                 if Num.gt sosa_num Num.zero then 
                    Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
                      (Util.image_prefix conf) "sosa.png" 
                      (Perso.string_of_num (Util.transl conf "(thousand separator)") sosa_num)
@@ -384,8 +386,8 @@ value print_branch conf base psn name =
                Wserver.wprint "  &amp;";
                Wserver.wprint "%s\n"
                  (Date.short_marriage_date_text conf base fam p c);
-               let sosa_num = Perso.p_sosa conf base c in
-               if Num.gt sosa_num Num.zero then
+               let sosa_num = Perso.get_sosa_person conf base c in 
+               if Num.gt sosa_num Num.zero then 
                  Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
                    (Util.image_prefix conf) "sosa.png"
                    (Perso.string_of_num (Util.transl conf "(thousand separator)") sosa_num)
@@ -446,6 +448,7 @@ value print_one_branch conf base bh psn lev =
         bh.bh_well_named_ancestors;
     } ]
 ;
+
 
 value print_one_surname_by_branch conf base x xl (bhl, str) = do {
   let ancestors =
@@ -759,6 +762,8 @@ value surname_print conf base not_found_fun x =
          List.map (pget conf base) bh.bh_well_named_ancestors})
       bhl
   in
+  (* Construction de la table des sosa de la base *)
+  let () = Perso.build_sosa_ht conf base in 
   match p_getenv conf.env "o" with
   [ Some "i" ->
       let pl =
