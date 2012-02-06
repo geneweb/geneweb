@@ -36,6 +36,7 @@ value login_timeout = ref 1800;
 value conn_timeout = ref 120;
 value trace_failed_passwd = ref False;
 value use_auth_digest_scheme = ref False;
+value no_host_address = ref False;
 
 value log_oc () =
   if log_file.val <> "" then
@@ -1616,8 +1617,11 @@ value connection cgi (addr, request) script_name contents =
     match addr with
     [ Unix.ADDR_UNIX x -> x
     | Unix.ADDR_INET iaddr port ->
-        try (Unix.gethostbyaddr iaddr).Unix.h_name with _ ->
-          Unix.string_of_inet_addr iaddr ]
+        if no_host_address.val then
+          Unix.string_of_inet_addr iaddr
+        else
+          try (Unix.gethostbyaddr iaddr).Unix.h_name with _ ->
+            Unix.string_of_inet_addr iaddr ]
   in
   do {
     if not cgi && script_name = "robots.txt" then robots_txt ()
@@ -1895,6 +1899,8 @@ value main () =
 <file>
        Authorization file to restrict access. The file must hold lines
        of the form \"user:password\".");
+       ("-no_host_address", Arg.Set no_host_address,"\n       \
+        Force no reverse host by address");
        ("-digest", Arg.Set use_auth_digest_scheme, "\n       \
         Use Digest authorization scheme (more secure on passwords)");
        ("-log", Arg.String (fun x -> log_file.val := x),
