@@ -439,6 +439,10 @@ value family_m conf base =
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_del conf base ]
+  | Some "FORUM_P_P" -> 
+      match p_getenv conf.base_env "disable_forum" with
+      [ Some "yes" -> incorrect_request conf
+      | _ -> Forum.print_access_switch conf base ]
   | Some "FORUM_SEARCH" -> 
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf

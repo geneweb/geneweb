@@ -294,15 +294,21 @@
   </dd></dl>
   %if;(message.wizard != "" and wizard and user.ident = message.wizard or
        manitou or supervisor)
-    <form method="POST" action="%action;">
     <p>
+    <form method="GET" action="%action;">
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_P_P"%/>
+    <input type="hidden" name="p" value="%message.pos;"%/>
+    <input type="submit" value="[*public]/[*private]"%/>
+    </form>
+    <form method="POST" action="%action;">
     %hidden;
     <input type="hidden" name="m" value="FORUM_DEL"%/>
     <input type="hidden" name="p" value="%message.pos;"%/>
     <input type="submit" value="%nn;
        [*delete::message/previous message/previous messages/next message]0"%/>
-    </p>
     </form>
+    </p>
   %end;
 %else;
   %( display message headers %)
