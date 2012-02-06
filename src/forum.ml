@@ -947,6 +947,54 @@ value print_valid conf base =
   | None -> print_forum_headers conf base ]
 ;
 
+(* access switch *)
+
+value set_access conf base pos =
+  let rec get_access ic =
+    let pos = MF.rpos_in ic in
+    let s = MF.input_line ic in
+    let (access, _) = get_var ic "Access:" s in
+    if access = "" then get_access ic
+    else (access, pos)
+  in
+  let fname = forum_file conf in
+  match try Some (MF.open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      do {
+        MF.rseek_in ic pos;
+        let (access, pos) = get_access ic in
+        MF.close_in ic;
+        if access = "publ" || access = "priv" then do {
+          let new_access =
+            match access with
+            [ "publ" -> "priv"
+            | _ -> "publ" ]
+          in           
+          MF.patch fname pos (sprintf "Access: %s" new_access);
+          True
+        }
+        else False
+      }
+  | None -> False ]
+;
+
+value access_switch_forum_message conf base pos =
+  match get_message conf pos with
+  [ Some (a, m, _, _) ->
+      if (a && conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
+         passwd_in_file conf "wizard" || conf.manitou || conf.supervisor)
+         && set_access conf base pos then
+        print_forum_message conf base (get_message conf pos) None
+      else print_forum_headers conf base
+  | None -> print_forum_headers conf base ]
+;
+
+value print_access_switch conf base =
+  match p_getenv conf.env "p" with
+  [ Some pos -> access_switch_forum_message conf base (MF.pos_of_string pos)
+  | None -> print_forum_headers conf base ]
+;
+
 (* searching *)
 
 value search_text conf base s =
