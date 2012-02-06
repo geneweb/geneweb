@@ -319,7 +319,11 @@ value check_person conf base p =
 value error_person conf base p err =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
-    rheader conf title; Wserver.wprint "%s\n" (capitale err); trailer conf;
+    rheader conf title; 
+    Wserver.wprint "%s\n" (capitale err); 
+    Update.print_return conf;
+    trailer conf;
+    raise Update.ModErr
   }
 ;
 

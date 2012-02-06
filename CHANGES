@@ -1,3 +1,25 @@
+GeneWeb version 6.04
+--------------------
+
+* It is now NOT possible to add or modify a family in which the first
+  name or the surname of a person is not specify. => It can break the 
+  generation of the gw file.
+* Added a return button when there had been an error in a modification
+  of a person or a family.
+* Fix the wedding anniversary list only if the couple is not divorced
+* Added an "happy birthday" for the wedding anniversary in the
+  individual page
+* Added the operator '/' (DIV) in the template language
+* Fix the calculs in case there is more than a thousand number in templm
+* Fix the duplicates of adresse in gwc2. Now the book of places if
+  working completly in gwc1 and gwc2
+
+Ondrej Blazo:
+* New language available (Slovak) thanks to him !
+
+Ludovic Ledieu:
+* Fix the searching path for template in the CSS
+
 GeneWeb version 6.03
 --------------------
 
