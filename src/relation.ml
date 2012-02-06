@@ -1356,7 +1356,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
         | _ ->
             match Util.p_getenv conf.env "color" with
             [ None | Some "" -> ""
-            | Some x -> " bgcolor=" ^ x ] ]
+            | Some x -> " class=\"" ^ x ^ "\"" ] ]
       in
       let info =
         {ip = ip; sp = get_sex a; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
