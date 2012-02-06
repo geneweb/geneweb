@@ -289,19 +289,22 @@ value error_family conf base err =
 
 value check_witnesses conf base fam =
   let wl = Array.to_list fam.witnesses in
-  let rec loop conf base wl =
+  let rec loop wl =
     match wl with 
     [ [] -> None
     | [(fn, sn, _, _, _) :: l] -> 
-        if fn = "" || fn = "?" then
+        if fn = "" && sn = "" then 
+          (* Champs non renseigné, il faut passer au suivant *)
+          loop l
+        else if fn = "" || fn = "?" then
           Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
                 ^ (transl conf "first name missing"))
         else if sn = "" || sn = "?" then 
           Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
                 ^ (transl conf "surname missing"))
-        else loop conf base l ]
+        else loop l ]
   in
-  loop conf base wl
+  loop wl
 ;
 
 value check_parents conf base cpl =
