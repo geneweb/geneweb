@@ -310,19 +310,21 @@ value check_witnesses conf base fam =
 value check_parents conf base cpl =
   let (fa_fn, fa_sn, _, _, _) = father cpl in
   let (mo_fn, mo_sn, _, _, _) = mother cpl in
-  if fa_fn = "" || fa_fn = "?" then
-    Some ((transl_nth conf "father/mother" 0) ^ (" : ")
-          ^ (transl conf "first name missing"))
-  else if mo_fn = "" || mo_fn = "?" then
-    Some ((transl_nth conf "father/mother" 1) ^ (" : ")
-          ^ (transl conf "first name missing"))
-  else if fa_sn = "" || fa_sn = "?" then 
-    Some ((transl_nth conf "father/mother" 0) ^ (" : ")
-          ^ (transl conf "surname missing"))
-  else if mo_sn = "" || mo_sn = "?" then
-    Some ((transl_nth conf "father/mother" 1) ^ (" : ")
-          ^ (transl conf "surname missing"))
-  else None
+  match ((fa_fn = "", fa_sn = ""), (mo_fn = "", mo_sn = "")) with
+  [ ((True, True), (True, True)) -> None (* Parent inconnu *)
+  | ((True, True), (True, False)) -> 
+      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
+            ^ (transl conf "first name missing"))
+  | ((True, True), (False, True)) -> 
+      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
+            ^ (transl conf "surname missing"))
+  | ((True, False), (True, True)) -> 
+      Some ((transl_nth conf "father/mother" 0) ^ (" : ")
+            ^ (transl conf "first name missing"))
+  | ((False, True), (True, True)) -> 
+      Some ((transl_nth conf "father/mother" 0) ^ (" : ")
+            ^ (transl conf "surname missing"))
+  | _ -> None ]
 ;
 
 value check_family conf base fam cpl =
