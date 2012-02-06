@@ -10,6 +10,7 @@ type ast =
   | Awid_hei of string
   | Aif of ast and list ast and list ast
   | Aforeach of (loc * string * list string) and list (list ast) and list ast
+  | Afor of string and ast and ast and list ast
   | Adefine of string and list string and list ast and list ast
   | Aapply of loc and string and list (list ast)
   | Alet of string and list ast and list ast
