@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: db2link.ml,v 5.4 2008-01-15 17:12:01 ddr Exp $ *)
+(* $Id: db2link.ml,v 5.10 2012-01-19 12:11:59 ddr Exp $ *)
 (* Copyright (c) 2006-2008 INRIA *)
 
 open Def;
@@ -32,7 +32,8 @@ type family =
 type file_field 'a =
   { oc_dat : out_channel;
     oc_acc : out_channel;
-    start_pos : Iovalue.header_pos;
+    dname : option string;
+    start_pos : option Iovalue.header_pos;
     sz32 : mutable int;
     sz64 : mutable int;
     item_cnt : mutable int;
@@ -63,20 +64,6 @@ type gen =
     g_person_related : (Iochan.t * Iochan.t);
     g_person_notes : (Iochan.t * out_channel)}
 ;
-
-value open_out_field tmp_dir (name, valu) = do {
-  let d = Filename.concat tmp_dir name in
-  try Mutil.mkdir_p d with _ -> ();
-
-  let oc_dat = open_out_bin (Filename.concat d "data") in
-  let oc_acc = open_out_bin (Filename.concat d "access") in
-  let start_pos = Iovalue.create_output_value_header oc_dat in
-  Iovalue.output_block_header oc_dat 0 Db2out.phony_min_size;
-  assert (pos_out oc_dat = Db2.first_item_pos);
-  {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
-   sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
-   item_cnt = 0; valu = valu}
-};
 
 value person_fields_arr =
  [("first_name", fun so -> Obj.repr so.first_name);
@@ -552,15 +539,95 @@ value insert_gwo_2 gen =
   | Wnotes wizid str -> () ]
 ;
 
-value close_out_field pad ff = do {
+value open_out_field_unknown_size d valu = do {
+  let oc_dat = open_out_bin (Filename.concat d "data1") in
+  let oc_acc = open_out_bin (Filename.concat d "access1") in
+  {oc_dat = oc_dat; oc_acc = oc_acc; dname = Some d; start_pos = None;
+   sz32 = 0; sz64 = 0; item_cnt = 0; valu = valu}
+};
+
+value close_out_field_known_size pad ff = do {
+  close_out ff.oc_dat;
   close_out ff.oc_acc;
+
+  (* making input_value header of "data" file, and copying "data1" file *)
+  let dname =
+    match ff.dname with
+    [ Some dname -> dname
+    | None -> assert False ]
+  in
+  let oc_dat = open_out_bin (Filename.concat dname "data") in
+  let start_pos = Iovalue.create_output_value_header oc_dat in
+  Iovalue.size_32.val := ff.sz32;
+  Iovalue.size_64.val := ff.sz64;
+  Iovalue.output_block_header oc_dat 0 ff.item_cnt;
+  let acc_shift = pos_out oc_dat in
+  let fname = Filename.concat dname "data1" in
+  let ic_dat = open_in_bin fname in
+  try while True do { output_byte oc_dat (input_byte ic_dat) } with
+  [ End_of_file -> () ];
+  let _ : int = Iovalue.patch_output_value_header oc_dat start_pos in
+  close_out oc_dat;
+  close_in ic_dat;
+  Sys.remove fname;
+
+(*
+  - test
+  Printf.eprintf "*** test %s/data\n" dname; flush stderr;
+  let ic = open_in_bin (Filename.concat dname "data") in
+  let tab = input_value ic in
+  if not (Obj.is_block (Obj.repr tab)) then failwith "not a block" else ();
+  Printf.eprintf "tab len %d cnt %d\n" (Array.length tab) ff.item_cnt;
+  flush stderr;
+  if Array.length tab <> ff.item_cnt then failwith "error" else ();
+  close_in ic;
+  Printf.eprintf "test ok\n"; flush stderr;
+*)
+
+  (* making "access" file from "access1" file with shift *)
+  let oc_acc = open_out_bin (Filename.concat dname "access") in
+  let fname = Filename.concat dname "access1" in
+  let ic_acc = open_in_bin fname in
+  try
+    while True do {
+      output_binary_int oc_acc (input_binary_int ic_acc + acc_shift);
+    }
+  with
+  [ End_of_file -> () ];
+  close_out oc_acc;
+  close_in ic_acc;
+  Sys.remove fname;
+};
+
+(* used only by "reorder_fields": should be simplified *)
+value open_out_field d e len valu = do {
+  let oc_dat = open_out_bin (Filename.concat d ("data" ^ e)) in
+  let oc_acc = open_out_bin (Filename.concat d ("access" ^ e)) in
+  let start_pos = Iovalue.create_output_value_header oc_dat in
+  Iovalue.output_block_header oc_dat 0 (max len Db2out.phony_min_size);
+  assert (pos_out oc_dat = Db2.first_item_pos len);
+  {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = Some start_pos;
+    dname = None; sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
+   item_cnt = 0; valu = valu}
+};
+
+(* used only by "reorder_fields": should be simplified *)
+value close_out_field pad ff len = do {
+  close_out ff.oc_acc;
+  ff.item_cnt := len;
   for i = ff.item_cnt + 1 to Db2out.phony_min_size do {
     output_item (ff.valu pad) ff;
   };
-  Iovalue.size_32.val := ff.sz32 - Db2out.phony_min_size + ff.item_cnt;
-  Iovalue.size_64.val := ff.sz64 - Db2out.phony_min_size + ff.item_cnt;
-  ignore (Iovalue.patch_output_value_header ff.oc_dat ff.start_pos : int);
+  Iovalue.size_32.val := ff.sz32;
+  Iovalue.size_64.val := ff.sz64;
+  let start_pos =
+    match ff.start_pos with
+    [ Some s -> s
+    | None -> assert False ]
+  in
+  ignore (Iovalue.patch_output_value_header ff.oc_dat start_pos : int);
   Iovalue.output_block_header ff.oc_dat 0 ff.item_cnt;
+  assert (pos_out ff.oc_dat = Db2.first_item_pos ff.item_cnt);
   close_out ff.oc_dat;
 };
 
@@ -592,16 +659,18 @@ value no_family empty_string ifam =
 
 value pad_fam = no_family "" (Adef.ifam_of_int 0);
 
-value compress_type_string field_d ic oc oc_str =
-  Db2out.output_value_array oc_str "" True
+value compress_type_string len field_d ic oc oc_str =
+  Db2out.output_value_array oc_str len "" True
     (fun output_item -> do {
+       seek_in ic (Db2.first_item_pos len);
        let istr_empty = output_item "" in
        let istr_quest = output_item "?" in
-       assert (istr_empty = Db2.empty_string_pos);
-       assert (istr_quest = Db2.quest_string_pos);
+       assert (istr_empty = Db2.empty_string_pos len);
+       assert (istr_quest = Db2.quest_string_pos len);
        try
          while True do {
            let s : string = Iovalue.input ic in
+           assert (Obj.tag (Obj.repr s) = Obj.string_tag);
            let pos = output_item s in
            output_binary_int oc pos
          }
@@ -610,13 +679,19 @@ value compress_type_string field_d ic oc oc_str =
      })
 ;
 
-value compress_type_list_string field_d ic oc oc_str = do {
+value compress_type_list_string len field_d ic oc oc_str = do {
   let ht = Hashtbl.create 1 in
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
+  seek_in ic (Db2.first_item_pos len);
   try
     let items_cnt = ref 0 in
     while True do {
       let sl : list string = Iovalue.input ic in
+      if Obj.is_block (Obj.repr sl) then do {
+        assert (Obj.tag (Obj.repr sl) = 0);
+        assert (Obj.size (Obj.repr sl) = 2);
+      }
+      else assert (Obj.magic sl = 0);
       match sl with
       [ [_ :: _] -> do {
           output_binary_int oc (pos_out oc_ext);
@@ -634,9 +709,10 @@ value compress_type_list_string field_d ic oc oc_str = do {
   close_out oc_ext;
 };
 
-value compress_type_list_title field_d ic oc oc_str = do {
+value compress_type_list_title len field_d ic oc oc_str = do {
   let ht = Hashtbl.create 1 in
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
+  seek_in ic (Db2.first_item_pos len);
   try
     let items_cnt = ref 0 in
     while True do {
@@ -660,9 +736,9 @@ value compress_type_list_title field_d ic oc oc_str = do {
   close_out oc_ext;
 };
 
-value compress_fields tmp_dir =
+value compress_fields nper nfam tmp_dir =
   List.iter
-    (fun (f1, f2, compress_type) -> do {
+    (fun (f1, f2, compress_type, len) -> do {
        let field_d =
          List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
        in
@@ -674,9 +750,8 @@ value compress_fields tmp_dir =
        else ();
        let oc_acc2 = open_out_bin (Filename.concat field_d "access2") in
        let oc_dat2 = open_out_bin (Filename.concat field_d "data2") in
-       seek_in ic Db2.first_item_pos;
 
-       compress_type field_d ic oc_acc2 oc_dat2;
+       compress_type len field_d ic oc_acc2 oc_dat2;
 
        close_out oc_dat2;
        close_out oc_acc2;
@@ -694,35 +769,35 @@ value compress_fields tmp_dir =
        }
        else ();
      })
-    [("person", "baptism_place", compress_type_string);
-     ("person", "baptism_src", compress_type_string);
-     ("person", "birth_place", compress_type_string);
-     ("person", "birth_src", compress_type_string);
-     ("person", "burial_place", compress_type_string);
-     ("person", "burial_src", compress_type_string);
-     ("family", "comment", compress_type_string);
-     ("person", "death_place", compress_type_string);
-     ("person", "death_src", compress_type_string);
-     ("person", "first_name", compress_type_string);
-     ("family", "fsources", compress_type_string);
-     ("person", "image", compress_type_string);
-     ("family", "marriage_place", compress_type_string);
-     ("family", "marriage_src", compress_type_string);
-     ("person", "occupation", compress_type_string);
-     ("family", "origin_file", compress_type_string);
-     ("person", "psources", compress_type_string);
-     ("person", "public_name", compress_type_string);
-     ("person", "surname", compress_type_string);
+    [("person", "baptism_place", compress_type_string, nper);
+     ("person", "baptism_src", compress_type_string, nper);
+     ("person", "birth_place", compress_type_string, nper);
+     ("person", "birth_src", compress_type_string, nper);
+     ("person", "burial_place", compress_type_string, nper);
+     ("person", "burial_src", compress_type_string, nper);
+     ("family", "comment", compress_type_string, nfam);
+     ("person", "death_place", compress_type_string, nper);
+     ("person", "death_src", compress_type_string, nper);
+     ("person", "first_name", compress_type_string, nper);
+     ("family", "fsources", compress_type_string, nfam);
+     ("person", "image", compress_type_string, nper);
+     ("family", "marriage_place", compress_type_string, nfam);
+     ("family", "marriage_src", compress_type_string, nfam);
+     ("person", "occupation", compress_type_string, nper);
+     ("family", "origin_file", compress_type_string, nfam);
+     ("person", "psources", compress_type_string, nper);
+     ("person", "public_name", compress_type_string, nper);
+     ("person", "surname", compress_type_string, nper);
 
-     ("person", "aliases", compress_type_list_string);
-     ("person", "first_names_aliases", compress_type_list_string);
-     ("person", "qualifiers", compress_type_list_string);
-     ("person", "surnames_aliases", compress_type_list_string);
-     ("person", "titles", compress_type_list_title)]
+     ("person", "aliases", compress_type_list_string, nper);
+     ("person", "first_names_aliases", compress_type_list_string, nper);
+     ("person", "qualifiers", compress_type_list_string, nper);
+     ("person", "surnames_aliases", compress_type_list_string, nper);
+     ("person", "titles", compress_type_list_title, nper)]
 ;
 
-value read_int_array_field (ic_acc, ic_dat) i = do {
-  seek_in ic_acc (4 * i);
+value read_int_array_field (ic_acc, ic_dat) n = do {
+  seek_in ic_acc (4 * n);
   let pos = input_binary_int ic_acc in
   loop [] pos where rec loop list pos =
     if pos = -1 then Array.of_list list
@@ -745,9 +820,9 @@ value reorder_type_list_int field_d ic_acc ic_dat ff = do {
   [ End_of_file -> () ];
 };
 
-value reorder_fields tmp_dir =
+value reorder_fields tmp_dir nper =
   List.iter
-    (fun (f1, f2, reorder_type) -> do {
+    (fun (f1, f2, reorder_type, len) -> do {
        let field_d =
          List.fold_left Filename.concat tmp_dir ["base_d"; f1; f2]
        in
@@ -758,20 +833,10 @@ value reorder_fields tmp_dir =
          flush stderr;
        }
        else ();
-       let ff = do {
-         let oc_dat = open_out_bin (Filename.concat field_d "data2") in
-         let oc_acc = open_out_bin (Filename.concat field_d "access2") in
-         let start_pos = Iovalue.create_output_value_header oc_dat in
-         Iovalue.output_block_header oc_dat 0 Db2out.phony_min_size;
-         assert (pos_out oc_dat = Db2.first_item_pos);
-         {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = start_pos;
-          sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
-          item_cnt = 0; valu = Obj.repr}
-       }
-       in
+       let ff = open_out_field field_d "2" len Obj.repr in
        reorder_type field_d ic_acc ic_dat ff;
 
-       close_out_field [| |] ff;
+       close_out_field [| |] ff len;
        close_in ic_dat;
        close_in ic_acc;
        List.iter
@@ -787,7 +852,7 @@ value reorder_fields tmp_dir =
        }
        else ();
      })
-    [("person", "family", reorder_type_list_int)]
+    [("person", "family", reorder_type_list_int, nper)]
 ;
 
 value output_command_line bdir = do {
@@ -845,14 +910,20 @@ value changed_p (ip, p, o_sex, o_rpar) =
   do { Printf.eprintf "person %d not changed\n" i; flush stderr }
 ;
 
+value mkdir_and_open_out_field_unknown_size tmp_dir (name, valu) = do {
+  let d = Filename.concat tmp_dir name in
+  try Mutil.mkdir_p d with _ -> ();
+  open_out_field_unknown_size d valu
+};
+
 (* ******************************************************************** *)
 (*  [Fonc] link : (file_info -> unit -> Gwcomp.gw_syntax option) ->     *)
 (*                  string -> bool                                      *)
 (** [Description] : TODO
     [Args] :
-      - next_family_fun : 
+      - next_family_fun :
       - bdir : nom de la base.
-    [Retour] : 
+    [Retour] :
     [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
 value link next_family_fun bdir = do {
@@ -862,17 +933,18 @@ value link next_family_fun bdir = do {
   let person_d =
     List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
   in
-  try Mutil.mkdir_p person_d with _ -> ();
-  let person_fields =
-    List.map (open_out_field person_d) person_fields_arr
+  let family_d =
+    List.fold_left Filename.concat tmp_dir ["base_d"; "family"]
   in
-  let family_fields = do {
-    let family_d =
-      List.fold_left Filename.concat tmp_dir ["base_d"; "family"]
-    in
-    try Mutil.mkdir_p family_d with _ -> ();
-    List.map (open_out_field family_d) family_fields_arr
-  }
+  try Mutil.mkdir_p person_d with _ -> ();
+  try Mutil.mkdir_p family_d with _ -> ();
+  let person_fields =
+    List.map (mkdir_and_open_out_field_unknown_size person_d)
+      person_fields_arr
+  in
+  let family_fields =
+    List.map (mkdir_and_open_out_field_unknown_size family_d)
+      family_fields_arr
   in
   let person_parents = do {
     let d = Filename.concat person_d "parents" in
@@ -966,8 +1038,8 @@ value link next_family_fun bdir = do {
   }
   else ();
 
-  List.iter (close_out_field pad_per) person_fields;
-  List.iter (close_out_field pad_fam) family_fields;
+  List.iter (close_out_field_known_size pad_per) person_fields;
+  List.iter (close_out_field_known_size pad_fam) family_fields;
   Iochan.close (fst person_notes);
   close_out (snd person_notes);
   Iochan.close (fst person_related);
@@ -980,7 +1052,7 @@ value link next_family_fun bdir = do {
   close_out (snd person_parents);
   Gc.compact ();
 
-  let person_of_key_d = 
+  let person_of_key_d =
     List.fold_left Filename.concat tmp_dir ["base_d"; "person_of_key"]
   in
   try Mutil.mkdir_p person_of_key_d with _ -> ();
@@ -994,8 +1066,8 @@ value link next_family_fun bdir = do {
   Hashtbl.clear gen.g_strings;
   Gc.compact ();
 
-  compress_fields tmp_dir;
-  reorder_fields tmp_dir;
+  compress_fields gen.g_pcnt gen.g_fcnt tmp_dir;
+  reorder_fields tmp_dir gen.g_pcnt;
 
   Db2out.make_indexes (Filename.concat tmp_dir "base_d") gen.g_pcnt
     gen.g_particles;
