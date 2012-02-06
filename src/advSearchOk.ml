@@ -204,12 +204,14 @@ value print_result conf base max_answers (list, len) =
   if len = 0 then
     Wserver.wprint "%s\n" (capitale (transl conf "no match"))
   else
+    (* Construction de la table des sosa de la base *)
+    let () = Perso.build_sosa_ht conf base in 
     tag "ul" begin
       List.iter
         (fun p ->
            do {
              html_li conf;
-             let sosa_num = Perso.p_sosa conf base p in
+             let sosa_num = Perso.get_sosa_person conf base p in
              if Num.gt sosa_num Num.zero then
                Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
                  (Util.image_prefix conf) "sosa.png"

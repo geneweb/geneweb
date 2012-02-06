@@ -258,10 +258,12 @@ value specify conf base n pl =
     header conf title;
     conf.cancel_links := False;
     Wserver.wprint "<ul>\n";
+    (* Construction de la table des sosa de la base *)
+    let () = Perso.build_sosa_ht conf base in 
     List.iter
       (fun (p, tl) ->
          tag "li" begin
-           let sosa_num = Perso.p_sosa conf base p in
+           let sosa_num = Perso.get_sosa_person conf base p in
            if Num.gt sosa_num Num.zero then
              Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa\"/> " 
                (Util.image_prefix conf) "sosa.png"

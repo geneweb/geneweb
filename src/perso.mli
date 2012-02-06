@@ -11,7 +11,10 @@ value interp_templ : string -> config -> base -> person -> unit;
 value print : config -> base -> person -> unit;
 value print_ascend : config -> base -> person -> unit;
 value print_what_links : config -> base -> person -> unit;
-value p_sosa : config -> base -> person -> Num.t;
+
+value build_sosa_ht : config -> base -> unit; 
+value get_sosa_person : config -> base -> person -> Num.t;
+value get_single_sosa : config -> base -> person -> Num.t;
 
 value string_of_num : string -> Num.t -> string;
 

@@ -347,8 +347,3 @@ expand_env=no
 # Authorized wizards notes. By default, wizards notes are not allowed.
 #authorized_wizards_notes=yes/no
 
-# Default value is yes. For the big bases, if a sosa is defined, when
-# a resarch is made, the computation of the sosa number may take a
-# while. This option force GeneWeb to ignore the sosa computation
-# (i.e. the picture sosa).
-#compute_sosa=yes/no
