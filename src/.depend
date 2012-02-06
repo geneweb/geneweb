@@ -2,10 +2,10 @@ adef.cmo: adef.cmi
 adef.cmx: adef.cmi 
 advSearchOk.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi \
     gutil.cmi gwdb.cmi hutil.cmi name.cmi some.cmo util.cmi \
-    ../wserver/wserver.cmi 
+    num.cmi perso.cmi ../wserver/wserver.cmi 
 advSearchOk.cmx: adef.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx name.cmx some.cmx util.cmx \
-    ../wserver/wserver.cmx 
+    num.cmx perso.cmx ../wserver/wserver.cmx 
 alln.cmo: buff.cmo config.cmi def.cmi gutil.cmi gwdb.cmi hutil.cmi mutil.cmi \
     name.cmi util.cmi ../wserver/wserver.cmi 
 alln.cmx: buff.cmx config.cmi def.cmi gutil.cmx gwdb.cmx hutil.cmx mutil.cmx \
@@ -146,11 +146,11 @@ gwcomp.cmi: def.cmi
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
     gutil.cmi hutil.cmi image.cmo lock.cmi mutil.cmi name.cmi \
     relationLink.cmi request.cmi robot.cmo secure.cmi srcfile.cmi util.cmi \
-    version.cmo ../wserver/wserver.cmi 
+    templ.cmi version.cmo ../wserver/wserver.cmi 
 gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     gutil.cmx hutil.cmx image.cmx lock.cmx mutil.cmx name.cmx \
     relationLink.cmx request.cmx robot.cmx secure.cmx srcfile.cmx util.cmx \
-    version.cmx ../wserver/wserver.cmx 
+    templ.cmx version.cmx ../wserver/wserver.cmx 
 gwdb.cmo: adef.cmi database.cmi db2.cmi db2disk.cmi dbdisk.cmi def.cmi \
     futil.cmi mutil.cmi name.cmi secure.cmi gwdb.cmi 
 gwdb.cmx: adef.cmx database.cmx db2.cmx db2disk.cmx dbdisk.cmi def.cmi \
@@ -295,8 +295,10 @@ request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx wiznotes.cmx \
     ../wserver/wserver.cmx request.cmi 
 request.cmi: config.cmi 
-robot.cmo: config.cmi secure.cmi srcfile.cmi util.cmi ../wserver/wserver.cmi 
-robot.cmx: config.cmi secure.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
+robot.cmo: config.cmi secure.cmi srcfile.cmi util.cmi templ.cmi \
+    ../wserver/wserver.cmi 
+robot.cmx: config.cmi secure.cmx srcfile.cmx util.cmx templ.cmx \
+    ../wserver/wserver.cmx 
 secure.cmo: secure.cmi 
 secure.cmx: secure.cmi 
 select.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi name.cmi 
@@ -309,10 +311,10 @@ sendImage.cmx: adef.cmx buff.cmx config.cmi def.cmi gutil.cmx gwdb.cmx \
     ../wserver/wserver.cmx 
 some.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi date.cmi def.cmi \
     gutil.cmi gwdb.cmi hutil.cmi mutil.cmi name.cmi util.cmi \
-    ../wserver/wserver.cmi 
+    num.cmi perso.cmi ../wserver/wserver.cmi 
 some.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx \
-    ../wserver/wserver.cmx 
+    num.cmx perso.cmx ../wserver/wserver.cmx 
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gwdb.cmi history.cmi \
     hutil.cmi lock.cmi mutil.cmi notesLinks.cmi num.cmi secure.cmi templ.cmi \
     templAst.cmi translate.cmi util.cmi version.cmo wiznotes.cmi \
@@ -356,10 +358,12 @@ updateFam.cmx: adef.cmx calendar.cmx config.cmi def.cmi futil.cmx gutil.cmx \
 updateFam.cmi: config.cmi def.cmi gwdb.cmi update.cmi 
 updateFamOk.cmo: adef.cmi checkItem.cmi config.cmi consang.cmi def.cmi \
     futil.cmi gutil.cmi gwdb.cmi history.cmi hutil.cmi mutil.cmi notes.cmi \
-    notesLinks.cmi update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
+    notesLinks.cmi update.cmi updateFam.cmi util.cmi name.cmi \
+    ../wserver/wserver.cmi 
 updateFamOk.cmx: adef.cmx checkItem.cmx config.cmi consang.cmx def.cmi \
     futil.cmx gutil.cmx gwdb.cmx history.cmx hutil.cmx mutil.cmx notes.cmx \
-    notesLinks.cmx update.cmx updateFam.cmx util.cmx ../wserver/wserver.cmx 
+    notesLinks.cmx update.cmx updateFam.cmx util.cmx name.cmx \
+    ../wserver/wserver.cmx 
 updateInd.cmo: adef.cmi calendar.cmi config.cmi def.cmi futil.cmi gwdb.cmi \
     hutil.cmi templ.cmi templAst.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi updateInd.cmi 
