@@ -1,5 +1,5 @@
 (* camlp5r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 5.49 2007-09-12 09:58:44 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 5.56 2012-01-18 21:03:02 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Printf;
@@ -23,7 +23,7 @@ value anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 ;
 
-value rebuild_field_array db2 pad bdir compress f = do {
+value rebuild_field_array db2 len pad bdir compress f = do {
   if Mutil.verbose.val then do {
     eprintf "rebuilding %s..." (Filename.basename bdir);
     flush stderr;
@@ -31,7 +31,7 @@ value rebuild_field_array db2 pad bdir compress f = do {
   else ();
   let oc_dat = open_out_bin (Filename.concat bdir "data") in
   let oc_acc = open_out_bin (Filename.concat bdir "access") in
-  Db2out.output_value_array oc_dat pad compress (f oc_acc);
+  Db2out.output_value_array oc_dat len pad compress (f oc_acc);
   close_out oc_acc;
   close_out oc_dat;
   if Mutil.verbose.val then do {
@@ -54,7 +54,7 @@ value rebuild_any_field_array db2 fi pad compress (f2, get) = do {
     List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
   in
   Mutil.mkdir_p bdir;
-  rebuild_field_array db2 pad bdir compress
+  rebuild_field_array db2 fi.fi_nb pad bdir compress
     (fun oc_acc output_item -> do {
        (* put pad as 1st elem; not necessary, just for beauty *)
        if compress then ignore (output_item pad : int) else ();
@@ -77,7 +77,7 @@ value rebuild_option_field_array db2 fi pad (f2, get) = do {
     List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
   in
   Mutil.mkdir_p bdir;
-  rebuild_field_array db2 pad bdir True
+  rebuild_field_array db2 fi.fi_nb pad bdir True
     (fun oc_acc output_item ->
         for i = 0 to fi.fi_nb - 1 do {
           let x =
@@ -196,12 +196,12 @@ value rebuild_string_field db2 fi (f2, get) = do {
     List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
   in
   Mutil.mkdir_p bdir;
-  rebuild_field_array db2 "" bdir True
+  rebuild_field_array db2 fi.fi_nb "" bdir True
     (fun oc_acc output_item -> do {
        let istr_empty = output_item "" in
        let istr_quest = output_item "?" in
-       assert (istr_empty = Db2.empty_string_pos);
-       assert (istr_quest = Db2.quest_string_pos);
+       assert (istr_empty = Db2.empty_string_pos fi.fi_nb);
+       assert (istr_quest = Db2.quest_string_pos fi.fi_nb);
        for i = 0 to fi.fi_nb - 1 do {
          let s =
            try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
@@ -222,12 +222,12 @@ value rebuild_list_with_string_field_array g h db2 fi (f2, get) = do {
   in
   Mutil.mkdir_p bdir;
   let oc_ext = open_out_bin (Filename.concat bdir "data2.ext") in
-  rebuild_field_array db2 "" bdir True
+  rebuild_field_array db2 fi.fi_nb "" bdir True
     (fun oc_acc output_item -> do {
        let istr_empty = output_item "" in
        let istr_quest = output_item "?" in
-       assert (istr_empty = Db2.empty_string_pos);
-       assert (istr_quest = Db2.quest_string_pos);
+       assert (istr_empty = Db2.empty_string_pos fi.fi_nb);
+       assert (istr_quest = Db2.quest_string_pos fi.fi_nb);
        for i = 0 to fi.fi_nb - 1 do {
          let sl =
            try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
@@ -284,10 +284,12 @@ value make_key_index db2 nb_per bdir = do {
       let pos = Db2disk.get_field_acc db2 i f1f2_fn in
       Db2disk.string_of_istr2 db2 f1f2_fn pos
     in
+    assert (Obj.tag (Obj.repr fn) = Obj.string_tag);
     let sn =
       let pos = Db2disk.get_field_acc db2 i f1f2_sn in
       Db2disk.string_of_istr2 db2 f1f2_sn pos
     in
+    assert (Obj.tag (Obj.repr sn) = Obj.string_tag);
     if fn = "?" || sn = "?" then ()
     else
       let fn = unique_key_string ht_strings fn in

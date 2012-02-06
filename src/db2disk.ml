@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.19 2007-04-06 09:51:29 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.23 2012-01-19 12:11:59 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -87,8 +87,7 @@ value get_field db2 i path =
 ;
 
 value string_of_istr2 db2 f pos =
-  if pos = -1 || pos = Db2.empty_string_pos then ""
-  else get_field_data db2 pos f "data"
+  if pos = -1 then "" else get_field_data db2 pos f "data"
 ;
 
 (* hash tables in disk *)

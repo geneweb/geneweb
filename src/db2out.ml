@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: db2out.ml,v 5.12 2009-03-10 22:05:46 ddr Exp $ *)
+(* $Id: db2out.ml,v 5.18 2012-01-19 12:11:59 ddr Exp $ *)
 (* Copyright (c) 2007 INRIA *)
 
 value phony_min_size = 8;
@@ -15,27 +15,27 @@ value output_item_return_pos oc_dat ht item_cnt compress s =
     } ]
 ;
 
-value output_value_array oc_dat pad compress f = do {
+value output_value_array oc_dat len pad compress f = do {
   let ht : Hashtbl.t 'a _ = Hashtbl.create 1 in
   let header_pos = Iovalue.create_output_value_header oc_dat in
-  Iovalue.output_block_header oc_dat 0 phony_min_size;
-  assert (pos_out oc_dat = Db2.first_item_pos);
+  Iovalue.output_block_header oc_dat 0 (max len phony_min_size);
+  assert (pos_out oc_dat = Db2.first_item_pos len);
   let nb_items = ref 0 in
   f (output_item_return_pos oc_dat ht nb_items compress);
   (* padding to at least 8 items to allow correct read by input_value *)
-  for i = nb_items.val + 1 to phony_min_size do {
+  for i = nb_items.val + 1 to 8 do {
     incr nb_items;
     Iovalue.output oc_dat (pad : 'a);
   };
-  Iovalue.size_32.val := Iovalue.size_32.val - phony_min_size + nb_items.val;
-  Iovalue.size_64.val := Iovalue.size_64.val - phony_min_size + nb_items.val;
   ignore (Iovalue.patch_output_value_header oc_dat header_pos : int);
   Iovalue.output_block_header oc_dat 0 nb_items.val;
+  assert (pos_out oc_dat = Db2.first_item_pos nb_items.val);
 };
 
 type hashtbl_t 'a 'b =
   { size: mutable int;
-    data: mutable array (bucketlist 'a 'b) }
+    data: mutable array (bucketlist 'a 'b);
+    seed: mutable int }
 and bucketlist 'a 'b =
   [ Empty
   | Cons of 'a and 'b and bucketlist 'a 'b ]
@@ -45,6 +45,14 @@ value output_hashtbl dir file ht = do {
   let oc_ht = open_out_bin (Filename.concat dir file) in
   let oc_hta = open_out_bin (Filename.concat dir (file ^ "a")) in
   let ht : hashtbl_t 'a 'b = Obj.magic (ht : Hashtbl.t 'a 'b) in
+  (* check compatibility with version of Hashtbl of OCaml *)
+  assert (Obj.is_block (Obj.repr ht));
+  assert (Obj.tag (Obj.repr ht) = 0);
+  assert (Obj.size (Obj.repr ht) = 2 || Obj.size (Obj.repr (ht)) = 3);
+  assert (Obj.is_int (Obj.repr ht.size));
+  assert (Obj.is_block (Obj.repr ht.data));
+  if Obj.size (Obj.repr ht) = 3 then assert (Obj.is_int (Obj.repr ht.seed))
+  else ();
   output_binary_int oc_hta (Array.length ht.data);
 
   (* we could alternatively use Iovalue.output_array_access, the
@@ -53,14 +61,16 @@ value output_hashtbl dir file ht = do {
      probably faster, but the drawback is that we must know exactly
      where the array starts *)
   let pos_start = Iovalue.create_output_value_header oc_ht in
-  Iovalue.output_block_header oc_ht 0 2;
+  Iovalue.output_block_header oc_ht 0 (Obj.size (Obj.repr ht));
   Iovalue.output oc_ht ht.size;
   Iovalue.output_block_header oc_ht 0 (Array.length ht.data);
   for i = 0 to Array.length ht.data - 1 do {
     output_binary_int oc_hta (pos_out oc_ht);
     Iovalue.output oc_ht ht.data.(i);
   };
-  ignore (Iovalue.patch_output_value_header oc_ht pos_start : int);
+  if Obj.size (Obj.repr ht) = 3 then Iovalue.output oc_ht ht.seed
+  else ();
+  let _ : int = Iovalue.patch_output_value_header oc_ht pos_start in
 
   close_out oc_hta;
   close_out oc_ht;
@@ -72,7 +82,7 @@ value add_name ht s pos =
   if List.mem pos posl then () else Hashtbl.add ht k pos
 ;
 
-value make_string_of_crush_index bpdir =
+value make_string_of_crush_index bpdir len =
   List.iter
     (fun (field, is_surname) -> do {
        let field_d = Filename.concat bpdir field in
@@ -83,12 +93,13 @@ value make_string_of_crush_index bpdir =
        }
        else ();
        let ht = Hashtbl.create 1 in
-       seek_in ic_dat Db2.empty_string_pos;
-       loop Db2.empty_string_pos where rec loop pos =
+       seek_in ic_dat (Db2.empty_string_pos len);
+       loop (Db2.empty_string_pos len) where rec loop pos =
          match
            try Some (Iovalue.input ic_dat) with [ End_of_file -> None ]
          with
          [ Some s -> do {
+             assert (Obj.tag (Obj.repr s) = Obj.string_tag);
              if s <> "?" then do {
                add_name ht s pos;
                if is_surname then
@@ -310,21 +321,22 @@ value start_with s p =
   String.sub s 0 (String.length p) = p
 ;
 
-value make_index bdir particles f2 = do {
+value make_index bdir particles f2 nb_per = do {
   let f1 = "person" in
   let fdir = List.fold_left Filename.concat bdir [f1; f2] in
   let index_dat_fname = Filename.concat fdir "index.dat" in
   let index_ini_fname = Filename.concat fdir "index.ini" in
   let data_fname = Filename.concat fdir "data" in
   let ic = open_in_bin data_fname in
-  seek_in ic Db2.first_item_pos;
+  seek_in ic (Db2.first_item_pos nb_per);
   let (list, len) =
-    loop [] 0 Db2.first_item_pos where rec loop list len pos =
+    loop [] 0 (Db2.first_item_pos nb_per) where rec loop list len pos =
       match
         try Some (Iovalue.input ic : string) with
         [ End_of_file -> None ]
       with
-      [ Some s ->
+      [ Some s -> do {
+          assert (Obj.tag (Obj.repr s) = Obj.string_tag);
           let s =
             try
               let part = List.find (start_with s) particles in
@@ -336,6 +348,7 @@ value make_index bdir particles f2 = do {
           in
           let list = [(s, pos) :: list] in
           loop list (len + 1) (pos_in ic)
+        }
       | None -> (list, len) ]
   in
   let list = List.sort compare list in
@@ -383,9 +396,9 @@ value make_index bdir particles f2 = do {
 
 value make_indexes bbdir nb_per particles = do {
   let bpdir = Filename.concat bbdir "person" in
-  make_string_of_crush_index bpdir;
+  make_string_of_crush_index bpdir nb_per;
   make_person_of_string_index bpdir;
   make_name_index bbdir nb_per;
-  make_index bbdir particles "first_name";
-  make_index bbdir particles "surname";
+  make_index bbdir particles "first_name" nb_per;
+  make_index bbdir particles "surname" nb_per;
 };
