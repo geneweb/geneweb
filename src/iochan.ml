@@ -1,4 +1,4 @@
-(* $Id: iochan.ml,v 5.4 2007-01-19 01:53:16 ddr Exp $ *)
+(* $Id: iochan.ml,v 5.5 2012-01-27 08:53:53 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 type t = {iofd : Unix.file_descr; iopos : mutable int};
@@ -26,10 +26,15 @@ value input_binary_int ioc = do {
   let ret = Unix.read ioc.iofd ib 0 4 in
   if ret <> 4 then failwith "Iochan.input_binary_int" else ();
   ioc.iopos := ioc.iopos + 4;
-  Char.code ib.[0] lsl 24 +
+  let r =
+    Iovalue.sign_extend (Char.code ib.[0]) lsl 24 +
   Char.code ib.[1] lsl 16 +
   Char.code ib.[2] lsl 8 +
   Char.code ib.[3]
+  in
+  assert (r >= -0x40000000);
+  assert (r <= 0x3fffffff);
+  r
 };
 
 value input ioc buff start len =

@@ -31,11 +31,10 @@ value rebuild_field_array db2 len pad bdir compress f = do {
     flush stderr;
   }
   else ();
-  let oc_dat = open_out_bin (Filename.concat bdir "data") in
-  let oc_acc = open_out_bin (Filename.concat bdir "access") in
-  Db2out.output_value_array oc_dat len pad compress (f oc_acc);
-  close_out oc_acc;
-  close_out oc_dat;
+  if compress then
+    Db2out.output_value_array_compress bdir "" len pad f
+  else
+    Db2out.output_value_array_no_compress bdir "" len pad f;
   if Mutil.verbose.val then do {
     eprintf "\n";
     flush stderr
@@ -200,10 +199,6 @@ value rebuild_string_field db2 fi (f2, get) = do {
   Mutil.mkdir_p bdir;
   rebuild_field_array db2 fi.fi_nb "" bdir True
     (fun oc_acc output_item -> do {
-       let istr_empty = output_item "" in
-       let istr_quest = output_item "?" in
-       assert (istr_empty = Db2.empty_string_pos fi.fi_nb);
-       assert (istr_quest = Db2.quest_string_pos fi.fi_nb);
        for i = 0 to fi.fi_nb - 1 do {
          let s =
            try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with
@@ -226,10 +221,6 @@ value rebuild_list_with_string_field_array g h db2 fi (f2, get) = do {
   let oc_ext = open_out_bin (Filename.concat bdir "data2.ext") in
   rebuild_field_array db2 fi.fi_nb "" bdir True
     (fun oc_acc output_item -> do {
-       let istr_empty = output_item "" in
-       let istr_quest = output_item "?" in
-       assert (istr_empty = Db2.empty_string_pos fi.fi_nb);
-       assert (istr_quest = Db2.quest_string_pos fi.fi_nb);
        for i = 0 to fi.fi_nb - 1 do {
          let sl =
            try get (Hashtbl.find fi.fi_ht (fi.fi_index_of_int i)) with

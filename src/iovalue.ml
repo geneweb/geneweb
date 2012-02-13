@@ -1,5 +1,5 @@
 (* camlp5r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 5.13 2012-01-18 19:10:42 ddr Exp $ *)
+(* $Id: iovalue.ml,v 5.15 2012-01-27 16:27:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -165,9 +165,15 @@ value rec output_loop ofuns oc x =
       failwith "Iovalue.output: floats not implemented"
     else do {
       gen_output_block_header ofuns oc (Obj.tag x) (Obj.size x);
-      for i = 0 to Obj.size x - 1 do {
+      (* last case of "for" separated, to make more tail recursive cases
+         when last field is itself, to prevent some stacks overflows *)
+      if Obj.size x > 0 then do {
+        for i = 0 to Obj.size x - 2 do {
         output_loop ofuns oc (Obj.field x i);
       };
+        output_loop ofuns oc (Obj.field x (Obj.size x - 1))
+    }
+      else ();
     }
 ;
 
@@ -313,6 +319,12 @@ value create_output_value_header oc = do {
 
 value patch_output_value_header oc (pos_header, pos_start) = do {
   let pos_end = pos_out oc in
+  if Sys.word_size = 64 &&
+     (pos_end >= 1 lsl 32 ||
+      size_32.val >= 1 lsl 32 ||
+      size_64.val >= 1 lsl 32)
+  then failwith "Iovalue.output: object too big"
+  else ();
   (* block_length *)
   seek_out oc pos_header;
   output_binary_int oc (pos_end - pos_start);
