@@ -1,5 +1,5 @@
 (* camlp5r *)
-(* $Id: db2link.ml,v 5.10 2012-01-19 12:11:59 ddr Exp $ *)
+(* $Id: db2link.ml,v 5.18 2012-01-27 08:53:53 ddr Exp $ *)
 (* Copyright (c) 2006-2008 INRIA *)
 
 open Def;
@@ -32,7 +32,7 @@ type family =
 type file_field 'a =
   { oc_dat : out_channel;
     oc_acc : out_channel;
-    dname : option string;
+    dname : string;
     start_pos : option Iovalue.header_pos;
     sz32 : mutable int;
     sz64 : mutable int;
@@ -542,7 +542,7 @@ value insert_gwo_2 gen =
 value open_out_field_unknown_size d valu = do {
   let oc_dat = open_out_bin (Filename.concat d "data1") in
   let oc_acc = open_out_bin (Filename.concat d "access1") in
-  {oc_dat = oc_dat; oc_acc = oc_acc; dname = Some d; start_pos = None;
+  {oc_dat = oc_dat; oc_acc = oc_acc; dname = d; start_pos = None;
    sz32 = 0; sz64 = 0; item_cnt = 0; valu = valu}
 };
 
@@ -551,42 +551,23 @@ value close_out_field_known_size pad ff = do {
   close_out ff.oc_acc;
 
   (* making input_value header of "data" file, and copying "data1" file *)
-  let dname =
-    match ff.dname with
-    [ Some dname -> dname
-    | None -> assert False ]
-  in
-  let oc_dat = open_out_bin (Filename.concat dname "data") in
+  let oc_dat = open_out_bin (Filename.concat ff.dname "data") in
   let start_pos = Iovalue.create_output_value_header oc_dat in
   Iovalue.size_32.val := ff.sz32;
   Iovalue.size_64.val := ff.sz64;
   Iovalue.output_block_header oc_dat 0 ff.item_cnt;
   let acc_shift = pos_out oc_dat in
-  let fname = Filename.concat dname "data1" in
-  let ic_dat = open_in_bin fname in
+  let fname1 = Filename.concat ff.dname "data1" in
+  let ic_dat = open_in_bin fname1 in
   try while True do { output_byte oc_dat (input_byte ic_dat) } with
   [ End_of_file -> () ];
   let _ : int = Iovalue.patch_output_value_header oc_dat start_pos in
   close_out oc_dat;
   close_in ic_dat;
-  Sys.remove fname;
-
-(*
-  - test
-  Printf.eprintf "*** test %s/data\n" dname; flush stderr;
-  let ic = open_in_bin (Filename.concat dname "data") in
-  let tab = input_value ic in
-  if not (Obj.is_block (Obj.repr tab)) then failwith "not a block" else ();
-  Printf.eprintf "tab len %d cnt %d\n" (Array.length tab) ff.item_cnt;
-  flush stderr;
-  if Array.length tab <> ff.item_cnt then failwith "error" else ();
-  close_in ic;
-  Printf.eprintf "test ok\n"; flush stderr;
-*)
-
+  Sys.remove fname1;
   (* making "access" file from "access1" file with shift *)
-  let oc_acc = open_out_bin (Filename.concat dname "access") in
-  let fname = Filename.concat dname "access1" in
+  let oc_acc = open_out_bin (Filename.concat ff.dname "access") in
+  let fname = Filename.concat ff.dname "access1" in
   let ic_acc = open_in_bin fname in
   try
     while True do {
@@ -597,17 +578,21 @@ value close_out_field_known_size pad ff = do {
   close_out oc_acc;
   close_in ic_acc;
   Sys.remove fname;
+
+  (* test *)
+  Db2out.check_input_value "Db2link.close_out_field_known_size"
+    (Filename.concat ff.dname "data") ff.item_cnt;
 };
 
 (* used only by "reorder_fields": should be simplified *)
-value open_out_field d e len valu = do {
-  let oc_dat = open_out_bin (Filename.concat d ("data" ^ e)) in
-  let oc_acc = open_out_bin (Filename.concat d ("access" ^ e)) in
+value open_out_field d len valu = do {
+  let oc_dat = open_out_bin (Filename.concat d "data2") in
+  let oc_acc = open_out_bin (Filename.concat d "access2") in
   let start_pos = Iovalue.create_output_value_header oc_dat in
   Iovalue.output_block_header oc_dat 0 (max len Db2out.phony_min_size);
   assert (pos_out oc_dat = Db2.first_item_pos len);
   {oc_dat = oc_dat; oc_acc = oc_acc; start_pos = Some start_pos;
-    dname = None; sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
+   dname = d; sz32 = Iovalue.size_32.val; sz64 = Iovalue.size_64.val;
    item_cnt = 0; valu = valu}
 };
 
@@ -629,6 +614,9 @@ value close_out_field pad ff len = do {
   Iovalue.output_block_header ff.oc_dat 0 ff.item_cnt;
   assert (pos_out ff.oc_dat = Db2.first_item_pos ff.item_cnt);
   close_out ff.oc_dat;
+  (* test *)
+  Db2out.check_input_value "Db2link.close_out_field"
+    (Filename.concat ff.dname "data2") ff.item_cnt;
 };
 
 value no_person empty_string ip =
@@ -659,29 +647,27 @@ value no_family empty_string ifam =
 
 value pad_fam = no_family "" (Adef.ifam_of_int 0);
 
-value compress_type_string len field_d ic oc oc_str =
-  Db2out.output_value_array oc_str len "" True
-    (fun output_item -> do {
+value compress_type_string len field_d e ic = do {
+  Db2out.output_value_array_compress field_d e len ""
+    (fun oc_acc output_item -> do {
        seek_in ic (Db2.first_item_pos len);
-       let istr_empty = output_item "" in
-       let istr_quest = output_item "?" in
-       assert (istr_empty = Db2.empty_string_pos len);
-       assert (istr_quest = Db2.quest_string_pos len);
        try
          while True do {
            let s : string = Iovalue.input ic in
            assert (Obj.tag (Obj.repr s) = Obj.string_tag);
            let pos = output_item s in
-           output_binary_int oc pos
+           output_binary_int oc_acc pos
          }
        with
        [ End_of_file -> () ]
      })
-;
+};
 
-value compress_type_list_string len field_d ic oc oc_str = do {
-  let ht = Hashtbl.create 1 in
+value compress_type_list_string len field_d e ic = do {
+  let oc_acc = open_out_bin (Filename.concat field_d ("access" ^ e)) in
+  let oc_dat = open_out_bin (Filename.concat field_d ("data" ^ e)) in
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
+  let ht = Hashtbl.create 1 in
   seek_in ic (Db2.first_item_pos len);
   try
     let items_cnt = ref 0 in
@@ -694,24 +680,28 @@ value compress_type_list_string len field_d ic oc oc_str = do {
       else assert (Obj.magic sl = 0);
       match sl with
       [ [_ :: _] -> do {
-          output_binary_int oc (pos_out oc_ext);
+          output_binary_int oc_acc (pos_out oc_ext);
           let sl =
             List.map
-              (Db2out.output_item_return_pos oc_str ht items_cnt True) sl
+              (Db2out.output_item_compress_return_pos oc_dat ht items_cnt) sl
           in
           Iovalue.output oc_ext (sl : list int)
         }
       | [] ->
-          output_binary_int oc (-1) ]
+          output_binary_int oc_acc (-1) ]
     }
   with
   [ End_of_file -> () ];
   close_out oc_ext;
+  close_out oc_dat;
+  close_out oc_acc;
 };
 
-value compress_type_list_title len field_d ic oc oc_str = do {
-  let ht = Hashtbl.create 1 in
+value compress_type_list_title len field_d e ic = do {
+  let oc_acc = open_out_bin (Filename.concat field_d ("access" ^ e)) in
+  let oc_dat = open_out_bin (Filename.concat field_d ("data" ^ e)) in
   let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
+  let ht = Hashtbl.create 1 in
   seek_in ic (Db2.first_item_pos len);
   try
     let items_cnt = ref 0 in
@@ -719,21 +709,23 @@ value compress_type_list_title len field_d ic oc oc_str = do {
       let tl : list (gen_title string) = Iovalue.input ic in
       match tl with
       [ [_ :: _] -> do {
-          output_binary_int oc (pos_out oc_ext);
+          output_binary_int oc_acc (pos_out oc_ext);
           let tl =
             List.map
               (map_title_strings
-                 (Db2out.output_item_return_pos oc_str ht items_cnt True))
+                 (Db2out.output_item_compress_return_pos oc_dat ht items_cnt))
               tl
           in
           Iovalue.output oc_ext (tl : list (gen_title int))
         }
       | [] ->
-          output_binary_int oc (-1) ]
+          output_binary_int oc_acc (-1) ]
     }
   with
   [ End_of_file -> () ];
   close_out oc_ext;
+  close_out oc_dat;
+  close_out oc_acc;
 };
 
 value compress_fields nper nfam tmp_dir =
@@ -748,13 +740,7 @@ value compress_fields nper nfam tmp_dir =
          flush stderr;
        }
        else ();
-       let oc_acc2 = open_out_bin (Filename.concat field_d "access2") in
-       let oc_dat2 = open_out_bin (Filename.concat field_d "data2") in
-
-       compress_type len field_d ic oc_acc2 oc_dat2;
-
-       close_out oc_dat2;
-       close_out oc_acc2;
+       compress_type len field_d "2" ic;
        close_in ic;
        List.iter
          (fun n -> do {
@@ -833,7 +819,7 @@ value reorder_fields tmp_dir nper =
          flush stderr;
        }
        else ();
-       let ff = open_out_field field_d "2" len Obj.repr in
+       let ff = open_out_field field_d len Obj.repr in
        reorder_type field_d ic_acc ic_dat ff;
 
        close_out_field [| |] ff len;

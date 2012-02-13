@@ -1,6 +1,25 @@
 GeneWeb version 6.04
 --------------------
 
+* Added an option in the ged2gwn tool. It behaves like previously, i.e. default
+  relation for a couple is Married. If Someone prefer, one can use the option
+  -rs_no_mention to set the relation status to NoMention.
+* Added a new intruction in the template langage : FOR.
+  It is a simple instruction, and could be improved later but for now it works
+  like this :
+  for (i=MIN; i<MAX; i++) => in template language : %for;i;MIN;MAX .... %end;
+  You can define any variable for iterator and you can used it in the loop. This
+  variable lives only in the loop. Thus it behaves like this :
+  %let;i;42%in
+  %i;
+  %for;i:0:10;
+    %i;
+  %end;
+  %i;
+  OUTPUT => 42; 0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 42
+* Added an option to not try a getHostByName. Could slow down on windows.
+* New implementation of the fonction that calculate if a person has a sosa 
+  number or not. Much more efficent than the previous one !
 * It is now NOT possible to add or modify a family in which the first
   name or the surname of a person is not specify. => It can break the 
   generation of the gw file.
@@ -13,6 +32,11 @@ GeneWeb version 6.04
 * Fix the calculs in case there is more than a thousand number in templm
 * Fix the duplicates of adresse in gwc2. Now the book of places if
   working completly in gwc1 and gwc2
+
+Daniel de Rauglaudre:
+* Fix bug (limitation of the int size in OCaml). Now in 64 bits architecture,
+  the maximum number of persons is more than 18 billions (in 64 bits only !!)
+* Added an option to limit the computation time of the consang
 
 Ondrej Blazo:
 * New language available (Slovak) thanks to him !

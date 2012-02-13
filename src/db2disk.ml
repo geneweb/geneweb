@@ -1,4 +1,4 @@
-(* $Id: db2disk.ml,v 5.23 2012-01-19 12:11:59 ddr Exp $ *)
+(* $Id: db2disk.ml,v 5.27 2012-01-27 16:57:07 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
 open Def;
@@ -59,9 +59,13 @@ value field_exists db2 (f1, f2) =
 ;
 
 value get_field_acc db2 i (f1, f2) =
-  try
+  try do {
     let ic = fast_open_in_bin_and_seek db2 f1 f2 "access" (4 * i) in
-    input_binary_int ic
+    let r = input_binary_int ic in
+    assert (r >= -1);
+    assert (r <= 0x3fffffff);
+    r
+  }
   with e -> do {
     eprintf "Error get_field_acc \"%s/%s/access\" i = %d\n" f1 f2 i;
     flush stderr;
@@ -126,7 +130,11 @@ value hashtbl_find_all dir file key = do {
         if compare k key = 0 then [d :: find_in_bucket rest]
         else find_in_bucket rest ]
   in
-  let ic_ht = open_in_bin (Filename.concat dir file) in
+  match
+    try Some (open_in_bin (Filename.concat dir file)) with
+    [ Sys_error _ -> None ]
+  with
+  [ Some ic_ht -> do {
   let ic_hta = open_in_bin (Filename.concat dir (file ^ "a")) in
   let alen = input_binary_int ic_hta in
   let pos = int_size + (Hashtbl.hash key) mod alen * int_size in
@@ -137,6 +145,8 @@ value hashtbl_find_all dir file key = do {
   let bl : bucketlist _ _ = Iovalue.input ic_ht in
   close_in ic_ht;
   find_in_bucket bl
+    }
+  | None -> [] ]
 };
 
 value key_hashtbl_find dir file k = hashtbl_find dir file (Db2.key2_of_key k);
