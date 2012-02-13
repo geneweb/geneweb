@@ -972,7 +972,7 @@ value link next_family_fun bdir = do {
   else ();
   if not gen.g_errored then do {
     if do_consang.val then
-      let _ : option _ = ConsangAll.compute base True False in ()
+      let _ : option _ = ConsangAll.compute base (-1) True False in ()
     else ();
     Gc.compact ();
     Outbase.output bdir dsk_base;
