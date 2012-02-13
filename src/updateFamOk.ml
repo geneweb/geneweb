@@ -311,32 +311,20 @@ value check_parents conf base cpl =
   let (fa_fn, fa_sn, _, _, _) = father cpl in
   let (mo_fn, mo_sn, _, _, _) = mother cpl in
   match ((fa_fn = "", fa_sn = ""), (mo_fn = "", mo_sn = "")) with
-  [ ((True, True), (True, True)) -> None (* Parent inconnu *)
-  | ((True, True), (True, False)) -> 
-      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
-            ^ (transl conf "first name missing"))
-  | ((True, True), (False, True)) -> 
-      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
-            ^ (transl conf "surname missing"))
-  | ((True, False), (True, True)) -> 
-      Some ((transl_nth conf "father/mother" 0) ^ (" : ")
-            ^ (transl conf "first name missing"))
-  | ((False, True), (True, True)) -> 
+  [ ((True, True), (True, True)) | ((True, True), (False, False)) |
+    ((False, False), (True, True)) | ((False, False), (False, False)) -> None
+  | ((False, True), _) ->
       Some ((transl_nth conf "father/mother" 0) ^ (" : ")
             ^ (transl conf "surname missing"))
-  | ((False, False), (True, False)) -> 
-      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
-            ^ (transl conf "first name missing"))
-  | ((False, False), (False, True)) -> 
-      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
-            ^ (transl conf "surname missing"))
-  | ((True, False), (False, False)) -> 
+  | ((True, False), _) ->
       Some ((transl_nth conf "father/mother" 0) ^ (" : ")
             ^ (transl conf "first name missing"))
-  | ((False, True), (False, False)) -> 
-      Some ((transl_nth conf "father/mother" 0) ^ (" : ")
+  | (_, (False, True)) ->
+      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
             ^ (transl conf "surname missing"))
-  | _ -> None ]
+  | (_, (True, False)) ->
+      Some ((transl_nth conf "father/mother" 1) ^ (" : ")
+            ^ (transl conf "first name missing")) ]
 ;
 
 value check_family conf base fam cpl =
@@ -346,12 +334,7 @@ value check_family conf base fam cpl =
 ;
 
 value strip_family fam des =
-  (* On ne supprime plus les témoins dont on a renseigné *)
-  (* que le prénom, car la vérification est maintenant   *)
-  (* faite dans la fonction check_family.                *)
-  (*  
   let fam = {(fam) with witnesses = strip_array_persons fam.witnesses} in 
-  *)
   let des = {children = strip_array_persons des.children} in
   (fam, des)
 ;
@@ -951,10 +934,10 @@ value print_add o_conf base =
     else if forbidden_disconnected conf sfam scpl sdes then
       print_error_disconnected conf
     else 
-      let (sfam, sdes) = strip_family sfam sdes in
       match check_family conf base sfam scpl with
       [ (Some err, _) | (_, Some err) -> error_family conf base err
       | (None, None) -> do { 
+          let (sfam, sdes) = strip_family sfam sdes in
           let (ifam, fam, cpl, des) = effective_add conf base sfam scpl sdes in
           let wl =
             all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
@@ -1031,10 +1014,11 @@ value print_mod_aux conf base callback =
       if ext || redisp then
         UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
       else
-        let (sfam, sdes) = strip_family sfam sdes in
         match check_family conf base sfam scpl with
         [ (Some err, _) | (_, Some err) -> error_family conf base err
-        | (None, None) -> callback sfam scpl sdes ]
+        | (None, None) -> 
+            let (sfam, sdes) = strip_family sfam sdes in
+            callback sfam scpl sdes ]
     else Update.error_digest conf
   with
   [ Update.ModErr -> () ]
