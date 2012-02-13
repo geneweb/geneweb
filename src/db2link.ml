@@ -1100,7 +1100,7 @@ value link next_family_fun bdir = do {
           (fun _ -> True) changed_p pr_stats.val
       else ();
       if do_consang.val then
-        let _ : option _ = ConsangAll.compute base True False in ()
+        let _ : option _ = ConsangAll.compute base (-1) True False in ()
       else ();
     }
     else ();

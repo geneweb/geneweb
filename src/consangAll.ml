@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 5.35 2007-02-21 18:14:01 ddr Exp $ *)
+(* $Id: consangAll.ml,v 5.35 2007/02/21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
@@ -39,7 +39,7 @@ value trace quiet cnt max_cnt =
   }
 ;
 
-value compute base from_scratch quiet = do {
+value compute base tlim from_scratch quiet = do {
   let () = load_ascends_array base in
   let () = load_couples_array base in
   let (fget, cget, cset, carray) = ascends_array base in
@@ -83,7 +83,8 @@ value compute base from_scratch quiet = do {
     else Printf.eprintf "Computing consanguinity...";
     flush stderr;
     let running = ref True in
-    while running.val do {
+    let end_time = Unix.time () +. float tlim in
+    while running.val && (tlim < 0 || Unix.time () < end_time) do {
       running.val := False;
       for i = 0 to nb_of_persons base - 1 do {
         if cget i = Adef.no_consang then
