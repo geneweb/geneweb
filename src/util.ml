@@ -1377,7 +1377,7 @@ value default_good_tag_list =
   ["a"; "b"; "blockquote"; "br"; "center"; "cite"; "dd"; "dir"; "div"; "dl";
    "dt"; "em"; "font"; "hr"; "h1"; "h2"; "h3"; "h4"; "h5"; "h6"; "i"; "img";
    "li"; "ol"; "p"; "pre"; "span"; "strong"; "sub"; "sup"; "table"; "tbody";
-   "td"; "th"; "tr"; "tt"; "u"; "ul"; "!--"]
+   "td"; "th"; "tr"; "tt"; "u"; "ul"; "!--"; "area"; "map"]
 ;
 
 value allowed_tags_file = ref "";
