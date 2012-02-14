@@ -455,8 +455,8 @@ value make_index bdir particles f2 = do {
   in
   let (list, len) =
     if pos_1st >= 0 then do {
-  let data_fname = Filename.concat fdir "data" in
-  let ic = open_in_bin data_fname in
+      let data_fname = Filename.concat fdir "data" in
+      let ic = open_in_bin data_fname in
       seek_in ic pos_1st;
       loop [] 0 pos_1st where rec loop list len pos =
       match
@@ -477,7 +477,7 @@ value make_index bdir particles f2 = do {
           let list = [(s, pos) :: list] in
           loop list (len + 1) (pos_in ic)
         }
-      | None -> (list, len) ]
+      | None -> let _ = close_in ic in (list, len) ]
     }
     else ([], 0)
   in
