@@ -631,10 +631,10 @@ zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
     (thousand separator)
 af: &nbsp;
 ar: .
-bg: &nbsp;
+bg: &#x2009;
 br: .
 ca: .
-cs: &nbsp;
+cs: &#x2009;
 da: .
 de: .
 en: ,
@@ -5902,6 +5902,18 @@ sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
 
+    notes summary
+bg: резюме на бележките
+en: notes summary
+fr: Sommaire des notes diverses
+zh: zzz
+
+    celebrities
+bg: знаменити хора
+en: celebrities
+fr: Personnes Célèbres
+zh: zzz
+
     missing ancestors
 af: ontbrekende voorsate
 bg: липсващи предци
@@ -6719,6 +6731,12 @@ ru: занятие
 sk: povolanie
 sl: poklic
 sv: yrke
+
+    bibliography
+bg: библиография
+en: bibliography
+fr: bibliographie
+zh: zzz
 
     of course dead
 bg: разбира се починал
@@ -8261,6 +8279,12 @@ sk: štatistika
 sl: statistike
 sv: statistik
 
+    statistics and anniversaries
+bg: статистика и годишнини
+en: statistics and anniversaries
+fr: Statistiques et anniversaires
+zh: zzz
+
     surname alias
 af: van alias
 bg: друго фамилно име
@@ -9055,6 +9079,18 @@ ru: последние %d браков
 sk: posledných %d sobášov
 sl: zadnjih %d porok
 sv: de senaste %d äktenskapen
+
+    the latest %d registered marriages
+bg: последните %d регистрирани сватби
+en: the latest %d registered marriages
+fr: les %d derniers mariages enregistrés
+zh: zzz
+
+    the latest %d celebrated marriages
+bg: последните %d чествувани сватби
+en: the latest %d celebrated marriages
+fr: les %d derniers mariages célébrés
+zh: zzz
 
     the latest %t deaths
 af: die laaste %t afsterwes
