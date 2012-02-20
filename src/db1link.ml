@@ -763,9 +763,9 @@ value families_record_access fam_index_ic fam_ic len =
 
 value input_particles part_file =
   if part_file = "" then
-    ["af "; "d'"; "dal "; "de "; "di "; "du "; "of "; "van ";
+    ["af "; "d'"; "d’"; "dal "; "de "; "di "; "du "; "of "; "van ";
      "von und zu "; "von "; "zu "; "zur ";
-     "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
+     "AF "; "D'"; "D’"; "DAL "; "DE "; "DI "; "DU "; "OF "; "VAN ";
      "VON UND ZU "; "VON "; "ZU "; "ZUR "]
   else Mutil.input_particles part_file
 ;
