@@ -273,7 +273,7 @@ eo: %s, estas %s de
 es: %s, es %s de
 et: %s, on %s
 fi: %s, on %s
-fr: %s, c'est %s de
+fr: %s, c’est %s de
 he: %s, זה %s של
 is: %s, er %s
 it: %s, è %s di
@@ -385,7 +385,7 @@ eo: la nobeltitolaj datoj de %t estas malkorektaj: %t
 es: las fechas de un título de %t son incorrectas: %t
 et: isiku %t tiitli kuupäev %t on vigane
 fi: henkilön %t arvonimen päivämäärässä %t on virhe
-fr: %t a des dates de titre incorrectes: %t
+fr: %t a des dates de titre incorrectes : %t
 he:  תאריכים לתארים של %t אינם נכונים: %t
 is: %t hefur vitlausa dagsetningu %t
 it: alcune date dei titoli di %t sono incorrette: %t
@@ -470,7 +470,7 @@ eo: la sekso de %t ne koheras kun siaj rilatoj
 es: el género de %t es incoherente con sus relaciones
 et: isiku %t sugu ei sobi tema suhetega
 fi: henkilön %t sukupuoli ja hänen suhteensa eivät täsmää
-fr: le sexe de %t n'est pas cohérent avec ses relations
+fr: le sexe de %t n’est pas cohérent avec ses relations
 he:  המין של %t לא מתאים ליחסיו/ליחסיה
 is: kyn %t er ekki í samræmi við skyldleika
 it: il sesso di %t non e' coerente con le sue relazioni
@@ -728,7 +728,7 @@ eo: 3aj gradaj gekuzoj
 es: primos en tercer grado
 et: kolmanda astme nõod
 fi: kolmannet serkut
-fr: cousins issus d'issus de germains
+fr: cousins issus d’issus de germains
 he:   בני דודים שלישיים
 is: fjórmenningar
 it: cugini di 3o grado
@@ -924,7 +924,7 @@ eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 et: kolmanda astme nõbu:g:--o
 fi: kolmas serkku:g:nnen&nbsp;serkun
-fr: un cousin issu d'issus de germains/une cousine issue d'issus de germains/un(e) cousin(e) issu(e) d'issus de germains
+fr: un cousin issu d’issus de germains/une cousine issue d’issus de germains/un(e) cousin(e) issu(e) d’issus de germains
 he:  בן-דוד שלישי/ בת-דוד שלישית
 is: fjórmenningur
 it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
@@ -1092,7 +1092,7 @@ eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
 et: poja- või tütrepoeg:g:--ja/poja- või tütretütar:g:--re/lapselaps:g:+e
 fi: pojan tai tyttären poika:g:---jan/pojan tai tyttären tytär:g:--tären/lapsenlapsi:g:-en
-fr: un petit fils/une petite fille/un petit enfant
+fr: un petit-fils/une petite-fille/un petit-enfant
 he:  נכד/ נכדה
 is: barnabarn/barnabarn/barnabarn
 it: un nipote/una nipote/un(a) nipote
@@ -1601,7 +1601,7 @@ eo: mortaĝo
 es: a la edad de
 et: vanus surres
 fi: ikä kuollessa
-fr: à l'âge de
+fr: à l’âge de
 he:   גיל במותו/מותה
 is: dánaraldur
 it: all'età di
@@ -2619,7 +2619,7 @@ eo: ne eblas eniri la bazon
 es: acceso a la base imposible
 et: ei saa pöörduda andmebaasi poole
 fi: tietokantaan ei pääse
-fr: impossible d'accéder à la base
+fr: impossible d’accéder à la base
 he:  אין כניסה למאגר המידע
 is: get ekki tengst gagnagrunni
 it: accesso alla base impossibile
@@ -2648,7 +2648,7 @@ eo: ne eblas aliigi sekson de edziĝinta persono
 es: no puede modificarse el sexo de una persona casada
 et: ei saa muuta abiellunud inimese sugu
 fi: et voi vaihtaa naimisissa olevan henkilön sukupuolta
-fr: on ne peut pas changer le sexe d'une personne mariée
+fr: on ne peut pas changer le sexe d’une personne mariée
 he:  אין אפשרות לשנות מין של אדם נשוי
 is: getur ekki breytt kyni giftrar manneskju
 it: non si può cambiare il sesso di una persona sposata
@@ -2732,7 +2732,7 @@ eo: ŝanĝo de la ordo de la idoj
 es: cambio del orden de los hijos
 et: laste järjekord muudetud
 fi: lasten järjestystä on muutettu
-fr: changement de l'ordre des enfants
+fr: changement de l’ordre des enfants
 he:  סדר הילדים השתנה
 is: breytti röð barna
 it: ordine dei figli cambiato
@@ -2846,7 +2846,7 @@ eo: kliku "%s"
 es: cliquear "%s"
 et: klõpsa "%s"
 fi: klikkaa "%s"
-fr: cliquez sur "%s"
+fr: cliquez sur « %s »
 he:   לחץ "%s"
 is: Ýtið "%s"
 it: seleziona "%s"
@@ -4303,7 +4303,7 @@ eo: geavoj
 es: abuelos
 et: vanavanemad
 fi: isovanhemmat
-fr: des grands-parents
+fr: grands-parents
 he:   סבים
 is: afi og amma
 it: nonni
@@ -4331,7 +4331,7 @@ eo: gepraavoj
 es: bisabuelos
 et: vanavanavanemad
 fi: iso-isovanhemmat
-fr: des arrière-grands-parents
+fr: arrière-grands-parents
 he:   רב-סבים
 is: langafi og langamma
 it: bisnonni
@@ -4407,7 +4407,7 @@ de: Herzlichen Glückwunsch zum Geburtstag!
 en: happy birthday to them!
 es: ¡Feliz cumpleaños!
 fi: hyvää syntymäpäivää!
-fr: bon anniversaire!
+fr: bon anniversaire !
 it: buon compleanno!
 nl: van harte gefeliciteerd met Uw verjaardag!
 no: gratulerer med dagen!
@@ -5105,7 +5105,7 @@ eo: interŝanĝi la ordon de la familioj sekvantaj
 es: invertir el orden de las familias siguientes
 et: vaheta järgmiste perede järjekord
 fi: vaihda seuraavien perheiden järjestystä
-fr: permuter l'ordre des familles suivantes
+fr: permuter l’ordre des familles suivantes
 he:  לשנות סדר המשפחות הבאות
 is: breyta röð eftirfarandi fjölskyldna
 it: scambiare l'ordine delle famiglie seguenti
@@ -5218,7 +5218,7 @@ eo: estas la sama persono!
 es: ¡es la misma persona!
 et: see on ju sama isik!
 fi: yksi ja sama henkilö!
-fr: c'est la même personne!
+fr: c’est la même personne !
 he:  אותו האדם
 is: þetta er sama manneskjan !
 it: è la stessa persona!
@@ -5302,7 +5302,7 @@ eo: malpli ol unu monato
 es: menos de un mes
 et: alla kuu vanune
 fi: alle kuukauden ikäinen
-fr: moins d'un mois
+fr: moins d’un mois
 he:  פחות מחודש בגיל
 is: minna en mánaðar gamalt
 it: meno di un mese
@@ -5468,7 +5468,7 @@ eo: estas maŝo en la datenbazo: %s estas sia propra avo
 es: referencia circulár en la base de datos: %s es su propio ancestro
 et: silmus andmebaasis: %s on iseenda esivanem
 fi: silmukka tietokannassa: %s on oma esivanhempansa
-fr: boucle dans la base de données: %s est son propre ancêtre
+fr: boucle dans la base de données : %s est son propre ancêtre
 he:  מעגל במאגר הנתונים: %s  צאצא(ה) לאצמו/לאצמה
 is: villa í gagnagrunni: %s er sinn eigin forfaðir/afkomandi
 it: loop nel data-base: %s è antenato(a) di se stesso(a)
@@ -5665,7 +5665,7 @@ eo: edziĝinta je la aĝo de %t jaroj
 es: casado a la edad de %t
 et: abiellus %t aastasena
 fi: vihitty %t ikäisenä
-fr: marié(e) à l'àge de %t
+fr: marié(e) à l’âge de %t
 he:  התחתן בגיל %t
 is: giftist %t ára
 it: sposato(a) all'età di %t
@@ -6240,7 +6240,7 @@ eo: neniu datreveno
 es: ningún aniversario
 et: pole ühtegi aastapäeva
 fi: ei vuosipäivää
-fr: pas d'anniversaire
+fr: pas d’anniversaire
 he:  אין תאריך יום השנה
 is: engir merkisdagar
 it: nessun anniversario
@@ -6268,7 +6268,7 @@ eo: neniu naskiĝtago
 es: ningún cumpleaños
 et: pole ühtegi sünnipäeva
 fi: ei syntymäpäivää
-fr: pas d'anniversaire
+fr: pas d’anniversaire
 he:   אין יום הולדת
 is: engir afmælisdagar
 it: nessun compleanno
@@ -6690,7 +6690,7 @@ eo: nombro de la vivantaj personoj:
 es: número de personas vivas:
 et: elavaid inimesi:
 fi: elossa olevien henkilöiden lukumäärä:
-fr: nombre de personnes vivantes :
+fr: nombre de personnes vivantes :
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi:
 lv: dzīvo personu skaits:
@@ -7538,7 +7538,7 @@ eo: agnoskinta patro/agnoskinta patrino/agnoskintaj gepatroj
 es: padre reconocido/madre reconocida/padres reconocidos
 et: omakstunnistanud isa/omakstunnistanud ema/omakstunnistanud vanemad
 fi: tunnustanut isä/tunnustanut äiti/tunnustaneet vanhemmat
-fr: père l'ayant reconnu/mère l'ayant reconnu/parents l'ayant reconnu
+fr: père l’ayant reconnu/mère l’ayant reconnu/parents l’ayant reconnu
 he:   אב מכיר / אם מכירה / הורים מכירים
 is: viðurkenndur faðir/viðurkennd móðir/viðurkennd foreldri
 it: padre che ha riconosciuto/madre che ha riconosciuto/genitori che hanno riconosciuto
@@ -8644,7 +8644,7 @@ eo: la datreveno
 es: el aniversario
 et: aastapäev
 fi: merkkipäivä
-fr: l'anniversaire
+fr: l’anniversaire
 he:  יום השנה
 is: afmælisdagar
 it: l'anniversario
@@ -8672,7 +8672,7 @@ eo: la datreveno de edziĝo
 es: el aniversario de casamiento
 et: pulma-aastapäev
 fi: hääpäivä
-fr: l'anniversaire de mariage
+fr: l’anniversaire de mariage
 he:  יום הנישואין
 is: brúðkaupsafmæli
 it: l'anniversario di matrimonio
@@ -8700,7 +8700,7 @@ eo: la bazo ŝangis; faru "malantaŭe", "reŝargi", kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud: mine tagasi, värskenda lehekülg ja täida vorm uuesti
 fi: tietokanta on muuttunut; peruuta, lataa uudelleen ja täytä kaavake
-fr: la base a changé: revenez à la page précédente, faites "actualiser la page", et refaites le formulaire
+fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
 he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerðu "Back", "Reload", og settu aftur í formið
 it: la base è cambiata; fate "back", "reload" e rifate la scheda
@@ -8728,7 +8728,7 @@ eo: la naskiĝdatreveno
 es: el cumpleaños
 et: sünnipäev
 fi: syntymäpäivä
-fr: l'anniversaire
+fr: l’anniversaire
 he:  יום ההולדת
 is: afmælisdagur
 it: il compleanno
@@ -8869,7 +8869,7 @@ eo: la sliparo estas provizore riglata: provu denove. Se tio ne funkcios, atendu
 es: la base está temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar nuevamente
 et: fail on ajutiselt lukustatud: proovi uuesti
 fi: tiedosto on lukkiutunut, yritä hetken kuluttua uudelleen
-fr: le fichier est temporairement verrouillé: essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
+fr: le fichier est temporairement verrouillé : essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
 he:  הקובץ נעול זמנית: לחקות ולנסות שוב
 is: skjalið er læst í augnablikinu, reyndu aftur
 it: l'archivio è temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
@@ -8897,7 +8897,7 @@ eo: la sekvantaj infanoj de %t kaj %t ne estas orde
 es: los hijos siguientes de %t y %t no están presentados en orden
 et: %t ja %t lastest järgnevad ei ole vanuse järjekorras
 fi: %t ja %t lapsista seuraavat eivät ole ikäjärjestyksessä
-fr: les enfants suivants de %t et de %t ne sont pas dans l'ordre
+fr: les enfants suivants de %t et de %t ne sont pas dans l’ordre
 he:  הילדים של %t ו-%t לא בסדר נכון
 is: þessi börn %t og %t eru ekki í röð
 it: i seguenti figli di %t and %t non sono in ordine d'età
@@ -8953,7 +8953,7 @@ eo: la geavoj
 es: los abuelos
 et: vanavanemad
 fi: isovanhemmat
-fr: les grands-parents
+fr: grands-parents
 he:  הסבים
 is: afi og amma
 it: i nonni
@@ -9161,7 +9161,7 @@ eo: la edzo/la edzino
 es: el esposo/la esposa
 et: abikaasa
 fi: puoliso
-fr: l'époux/l'épouse
+fr: l’époux/l’épouse
 he:  בן הזוג/ בת הזוג
 is: maki
 it: lo sposo/la sposa
@@ -9269,7 +9269,7 @@ eo: por aldoni infanon al familio, uzu "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 et: lapse lisamiseks perre kasuta "%st"
 fi: lisätäksesi perheeseen lapsen käytä "%s"
-fr: pour ajouter un enfant à une famille, utiliser "%s"
+fr: pour ajouter un enfant à une famille, utiliser « %s »
 he:  להוסיף ילד למשפחה, השתמש ב-"%s"
 is: til að bæta barni við fjölskyldu, notaðu "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
@@ -9325,7 +9325,7 @@ eo: ĝis la idoj
 es: hasta los hijos
 et: lasteni
 fi: lapsiin
-fr: jusqu'aux enfants
+fr: jusqu’aux enfants
 he:  עד הילדים
 is: til barnsins
 it: fino ai figli
@@ -9353,7 +9353,7 @@ eo: ĝis la genepoj
 es: hasta los nietos
 et: lastelasteni
 fi: lapsenlapsiin
-fr: jusqu'aux petits-enfants
+fr: jusqu’aux petits-enfants
 he:  עד הנכדים
 is: til barnabarna
 it: fino ai nipoti
@@ -9381,7 +9381,7 @@ eo: ĝis la geavoj
 es: hasta los abuelos
 et: vanavanemateni
 fi: isovanhempiin
-fr: jusqu'aux grands-parents
+fr: jusqu’aux grands-parents
 he:  עד הסבים
 is: til afa og ömmu
 it: fino ai nonni
@@ -9409,7 +9409,7 @@ eo: ĝis la gepranepoj
 es: hasta los bisnietos
 et: lastelastelasteni
 fi: lapsen-lapsenlapsiin
-fr: jusqu'aux arrière-petits-enfants
+fr: jusqu’aux arrière-petits-enfants
 he:  עד הנינים
 is: til barnabarnabarna
 it: fino ai pronipoti
@@ -9437,7 +9437,7 @@ eo: ĝis la gepraavoj
 es: hasta los bisabuelos
 et: vanavanavanemateni
 fi: iso-isovanhempiin
-fr: jusqu'aux arrière-grands-parents
+fr: jusqu’aux arrière-grands-parents
 he:  עד ההורים השילשים
 is: til langlangafa og ömmu
 it: fino ai bisnonni
@@ -9465,7 +9465,7 @@ eo: ĝis la gepatroj
 es: hasta los padres
 et: vanemateni
 fi: vanhempiin
-fr: jusqu'aux parents
+fr: jusqu’aux parents
 he:  עד ההורים
 is: til foreldra
 it: fino ai genitori
@@ -9493,7 +9493,7 @@ eo: hodiaù
 es: hoy
 et: täna
 fi: tänään
-fr: aujourd'hui
+fr: aujourd’hui
 he:  היום
 is: í dag
 it: oggi
@@ -9728,7 +9728,7 @@ eo: ĝis
 es: hasta
 et: kuni
 fi: saakka
-fr: jusqu'à
+fr: jusqu’à
 he:  עד
 is: upp að
 it: fino a
@@ -9786,7 +9786,7 @@ eo: uzu "bindi" anstataù ol "krei"
 es: utilise "reunir" en lugar de "crear"
 et: vali "loo" asemel "viita"
 fi: käytä "luo" toiminnon "liitä" sijaan
-fr: utilisez "relier" au lieu de "créer"
+fr: utilisez « relier » au lieu de « créer »
 he:  להשתמש ב-"קשר" במקום "עשה"
 is: notaðu "tengja" í stað "búa til"
 it: usare "link" invece di "create"
@@ -10104,7 +10104,7 @@ zh:  岁
 de: du bist sichtbar/du bist nicht sichtbar
 en: you are visible/you are not visible
 et: sa oled nähtav/sa ei ole nähtav
-fr: vous êtes visible/vous n'êtes pas visible
+fr: vous êtes visible/vous n’êtes pas visible
 ro: tu esti vizibil/tu nu esti vizibil
 
     you must first merge
@@ -10120,7 +10120,7 @@ eo: vi devas unue kunigi
 es: antes Ud. debe fusionar
 et: kõigepealt pead ühendama
 fi: yhdistä ensin
-fr: vous devez d'abord fusionner
+fr: vous devez d’abord fusionner
 he:  צריך לאחד קודם
 is: þú þarft fyrst að sameina
 it: dovete in primo luogo fondere
@@ -10148,7 +10148,7 @@ eo: vi devas unue kunigi la 2 familiojn
 es: debe primero fusionar las 2 familias
 et: kõigepealt peab ühendama mõlemad pered
 fi: yhdistä ensin molemmat perheet
-fr: vous devez d'abord fusionner les 2 familles
+fr: vous devez d’abord fusionner les 2 familles
 he:  צריך לאחד קודם את 2 המשפחות
 is: þú verður fyrst að sameina þessar 2 fjölskyldur
 it: dovete in primo luogo fondere le 2 famiglie
@@ -10281,7 +10281,7 @@ de: rund um den Stammbaum
 en: family History
 es: autor del árbol
 fi: sukupuun lisäksi
-fr: autour de l'arbre
+fr: autour de l’arbre
 it: attorno all'albero
 nl: rond de stamboom
 no: tillegg til slektstreet
@@ -10319,13 +10319,13 @@ fr: aucune modification
 de: die Änderungen sind abgeschlossen : % der Datei (en) kopiert
 en: successfully updated: %d places have been changed
 es: la modificación ha sido hecha: %d ficha(s) corregida(s)
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
 
     help places
 de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit Ihrer Dateien die diesen Standort betreffen werden sofort korrigiert werden
 en: Click "[Update]" to edit a place: the place names will be automatically updated in your entire family tree
 es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
-fr: Cliquez sur "[modifier]" pour corriger un lieu : l'ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
+fr: Cliquez sur « Modifier » pour corriger un lieu : l’ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
 
     new modification
 de: möchten Sie eine weitere Änderung durchführen
