@@ -285,7 +285,7 @@ value print_selection_bullet conf =
       in
       if conf.cancel_links then ()
       else
-        Wserver.wprint "<a id=\"i%s\" href=\"%s%s%s%s\">" txt (commd conf) req
+        Wserver.wprint "<a id=\"i%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt (commd conf) req
           (if sel then ";u=" ^ txt else "")
           (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
       Wserver.wprint "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
@@ -518,7 +518,7 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
                stagn "dt" begin
                  if conf.cancel_links then Wserver.wprint "%d." n
                  else
-                   stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
+                   stag "a" "href=\"%sm=N;v=%s;br=%d\" rel=\"nofollow\"" (commd conf)
                        (Util.code_varenv str) n begin
                      Wserver.wprint "%d." n;
                    end;
