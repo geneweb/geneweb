@@ -55,6 +55,32 @@ value notify_change conf base changed action =
   ELSE () END
 ;
 
+value notify_delete conf base changed action =
+  IFDEF UNIX THEN
+    match p_getenv conf.base_env "notify_delete" with
+    [ Some comm ->
+        let args =
+          match changed with
+          [ Rperson fn sn occ ip ->
+              let key = Util.default_image_name_of_key fn sn occ in
+              [| key |]
+          | Rnotes (Some num) file -> [| |]
+          | Rnotes None file -> [| |] 
+          | Rplaces -> [| |] ]
+        in
+        let args = Array.append [| comm; conf.bname |] args in
+        match Unix.fork () with
+        [ 0 ->
+            if Unix.fork () <> 0 then exit 0
+            else do {
+              try Unix.execvp comm args with _ -> ();
+              exit 0
+            }
+        | id -> ignore (Unix.waitpid [] id) ]
+    | None -> () ]
+  ELSE () END
+;
+
 value gen_record conf base changed action =
   do {
     match p_getenv conf.base_env "history" with
@@ -87,9 +113,10 @@ value gen_record conf base changed action =
     (* créer 5000 nouveaux processus à chaque mise à jour d'un lieu.  *)
     (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
     (* mise à jour de l'historique.                                   *)
-    if action <> "cp" then 
-      notify_change conf base changed action 
-    else ();
+    match action with
+    [ "cp" -> ()
+    | "dp" -> notify_delete conf base changed action 
+    | _ -> notify_change conf base changed action ]
   }
 ;
 
