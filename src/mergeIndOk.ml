@@ -231,7 +231,26 @@ value redirect_added_families base p ip2 p2_family =
   }
 ;
 
-value effective_mod_merge conf base sp =
+value get_key conf base i =
+  let ip = 
+    match p_getint conf.env i with
+    [ Some i -> i
+    | _ -> -1 ]
+  in
+  let p = poi base (Adef.iper_of_int ip) in
+  let first_name = sou base (Gwdb.get_first_name p) in
+  let surname = sou base (Gwdb.get_surname p) in
+  let occ = Gwdb.get_occ p in
+  default_image_name_of_key first_name surname occ
+;
+
+value notify_change_key conf base old_key new_key =
+  if old_key <> new_key then
+    History.record_key conf base old_key new_key
+  else ()
+;
+
+value effective_mod_merge conf base p1_old_key p2_old_key sp =
   match p_getint conf.env "i2" with
   [ Some i2 -> do {
       let ip2 = Adef.iper_of_int i2 in
@@ -265,6 +284,9 @@ value effective_mod_merge conf base sp =
       let key = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
       Util.commit_patches conf base;
       History.record conf base key "fp";
+      let new_key = default_image_name_of_key sp.first_name sp.surname sp.occ in 
+      notify_change_key conf base p1_old_key new_key ;
+      notify_change_key conf base p2_old_key new_key ;
       Update.delete_topological_sort conf base;
       print_mod_merge_ok conf base wl p;
     }
@@ -272,6 +294,8 @@ value effective_mod_merge conf base sp =
 ;
 
 value print_mod_merge o_conf base =
+  let p1_old_key = get_key o_conf base "i" in
+  let p2_old_key = get_key o_conf base "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateIndOk.print_mod_aux conf base (effective_mod_merge conf base)
+  UpdateIndOk.print_mod_aux conf base (effective_mod_merge conf base p1_old_key p2_old_key)
 ;

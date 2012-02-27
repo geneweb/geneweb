@@ -806,10 +806,10 @@ value print_mod_aux conf base callback =
   [ Update.ModErr -> () ]
 ;
 
-value get_old_key conf base =
+value get_key conf base =
   let ip = 
-    match p_getenv conf.env "i" with
-    [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
+    match p_getint conf.env "i" with
+    [ Some i -> i
     | _ -> -1 ]
   in
   let p = poi base (Adef.iper_of_int ip) in
@@ -819,11 +819,17 @@ value get_old_key conf base =
   default_image_name_of_key first_name surname occ
 ;
 
+value notify_change_key conf base old_key new_key =
+  if old_key <> new_key then
+    History.record_key conf base old_key new_key
+  else ()
+;
+
 value print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string.val := [] in
-  let old_key = get_old_key o_conf base in
+  let old_key = get_key o_conf base in
   let conf = Update.update_conf o_conf in
   let callback sp = do {
     let p = effective_mod conf base sp in
@@ -853,7 +859,7 @@ value print_mod o_conf base =
     Util.commit_patches conf base;
     History.record conf base k "mp";
     let new_key = default_image_name_of_key sp.first_name sp.surname sp.occ in
-    History.record_key conf base old_key new_key ;
+    notify_change_key conf base old_key new_key;
     if not (is_quest_string p.surname) &&
        not (is_quest_string p.first_name) &&
        not (is_old_person conf p)
