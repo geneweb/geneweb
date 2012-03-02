@@ -1005,6 +1005,33 @@ value open_etc_file fname =
 ;
 
 value open_templ conf name =
+  (* On cherche le fichier dans cet ordre :
+     - dans la base (./templx/name.txt)
+     - dans le répertoire des programmes (../gw/etc/templx/name.txt)
+     - le template par défaut (../gw/etc/name.txt) *)
+  let file_exist dir = 
+    let base_tpl_dir = 
+      Filename.concat (Filename.basename dir) (name ^ ".txt") 
+    in
+    let etc_tpl_dir = 
+      Filename.concat 
+        (search_in_lang_path "etc") (Filename.concat dir ((name ^ ".txt")))
+    in
+    if Sys.file_exists base_tpl_dir then base_tpl_dir
+    else
+      if Sys.file_exists etc_tpl_dir then etc_tpl_dir
+      else ""
+  in
+  (* Recherche le template par défaut en fonction de la variable gwf *)
+  (* template = templ1,templ2,*                                      *)
+  let rec default_templ config_templ std_fname =
+    match config_templ with
+    [ [] | ["*"] -> std_fname
+    | [x :: l] -> 
+        match file_exist x with
+        [ "" -> default_templ l std_fname 
+        | s -> s ] ]
+  in
   let config_templ =
     try
       let s = List.assoc "template" conf.base_env in
@@ -1030,22 +1057,13 @@ value open_templ conf name =
   let std_fname =
     search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
   in
-  (* On cherche le fichier dans cet ordre :
-     - dans la base (./templx/name.txt)
-     - dans le répertoire des programmes (../gw/etc/templx/name.txt)
-     - le template par défaut (../gw/etc/name.txt) *)
+  (* On cherche le template dans l'ordre de file_exist.         *)
+  (* Si on ne trouve rien, alors on cherche le premier template *)
+  (* par défaut tel que défini par la variable template du gwf  *)
   let fname =
-    let base_tpl_dir = 
-      Filename.concat (Filename.basename dir) (name ^ ".txt") 
-    in
-    let etc_tpl_dir = 
-      Filename.concat 
-        (search_in_lang_path "etc") (Filename.concat dir ((name ^ ".txt")))
-    in
-    if Sys.file_exists base_tpl_dir then base_tpl_dir
-    else
-      if Sys.file_exists etc_tpl_dir then etc_tpl_dir
-      else std_fname
+    match file_exist dir with
+    [ "" -> default_templ config_templ std_fname 
+    | s -> s ]
   in
   try Some (Secure.open_in fname) with
   [ Sys_error _ ->
