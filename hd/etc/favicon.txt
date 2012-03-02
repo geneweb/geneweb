@@ -1,0 +1,7 @@
+%if;is_male;
+  <link rel="shortcut icon" href="%image_prefix;/bmale.png"%/>
+%elseif;is_female;
+  <link rel="shortcut icon" href="%image_prefix;/bfemale.png"%/>
+%else;
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+%end;
