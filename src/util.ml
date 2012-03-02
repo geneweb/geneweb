@@ -1026,25 +1026,32 @@ value open_templ conf name =
         [ [] | ["*"] -> ""
         | [x :: _] -> x ] ]
   in
-  let dir =
-    if dir = "" then Filename.current_dir_name
-    else Filename.basename dir
-  in
+  (* template par défaut *)
   let std_fname =
     search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
   in
-  if dir = "" || dir = Filename.current_dir_name then
-    try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
-  else
-    let dir = Filename.basename dir in
-    let fname =
-      Filename.concat (base_path ["etc"] dir) (name ^ ".txt")
+  (* On cherche le fichier dans cet ordre :
+     - dans la base (./templx/name.txt)
+     - dans le répertoire des programmes (../gw/etc/templx/name.txt)
+     - le template par défaut (../gw/etc/name.txt) *)
+  let fname =
+    let base_tpl_dir = 
+      Filename.concat (Filename.basename dir) (name ^ ".txt") 
     in
-    try Some (Secure.open_in fname) with
-    [ Sys_error _ ->
-        if (*dir = conf.bname*)True(**) then
-          try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
-        else None ]
+    let etc_tpl_dir = 
+      Filename.concat 
+        (search_in_lang_path "etc") (Filename.concat dir ((name ^ ".txt")))
+    in
+    if Sys.file_exists base_tpl_dir then base_tpl_dir
+    else
+      if Sys.file_exists etc_tpl_dir then etc_tpl_dir
+      else std_fname
+  in
+  try Some (Secure.open_in fname) with
+  [ Sys_error _ ->
+      if (*dir = conf.bname*)True(**) then
+        try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
+      else None ]
 ;
 
 value macro_etc env imcom c =
