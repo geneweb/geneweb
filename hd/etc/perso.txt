@@ -135,6 +135,7 @@
     %end;
     %if;has_birth_date;
       <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
+      %if;computable_age;, %age;%sp;%end;
       %if;birthday; ([happy birthday to you!])%end;
       %if;has_birth_place; - %birth_place;%end;</li>
     %else;
