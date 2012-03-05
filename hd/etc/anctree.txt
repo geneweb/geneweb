@@ -98,23 +98,23 @@
     %end;
     </tr>
     <tr>
-    %foreach;cell;
-      %if;(not is_first)
-        <td colspan="1" align="center">%nn;
-        %if;(cell.is_right)<hr width="100%%"%/>%nn;
-        %else;<tt>&nbsp;</tt>%end;
+      %foreach;cell;
+        %if;(not is_first)
+          <td colspan="1" align="center">%nn;
+          %if;(cell.is_right)<hr class="full;"%/>%nn;
+          %else;<tt>&nbsp;</tt>%end;
+          </td>
+        %end;
+        <td colspan="%cell.colspan;" align="%nn;
+           %if;cell.is_left;%right;
+           %elseif;cell.is_right;%left;
+           %else;center%end;">%nn;
+        %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+        %elseif;cell.is_left;<hr class="%right;"%/>%nn;
+        %elseif;cell.is_right;<hr class="%left;"%/>%nn;
+        %else;|%end;
         </td>
       %end;
-      <td colspan="%cell.colspan;" align="%nn;
-         %if;cell.is_left;%right;
-         %elseif;cell.is_right;%left;
-         %else;center%end;">%nn;
-      %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-      %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;"%/>%nn;
-      %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;"%/>%nn;
-      %else;|%end;
-      </td>
-    %end;
     </tr>
   %end;
 %end;

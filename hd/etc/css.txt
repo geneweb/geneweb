@@ -257,25 +257,31 @@ h1
 }
 
 /* Affichage des arbres */
-hr.left
+table hr 
 {
-  direction: ltr;
-  width: 50%%;
-  text-align: left;
-  margin-left: 0;
+  border-top: solid 1px black;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
 }
 
-hr.right
+hr.left 
 {
-  direction: ltr;
-  width: 50%%;
-  text-align: right;
+  margin-left:0;
+  margin-right: 50%%;
+}
+
+hr.right 
+{
+  margin-left: 50%%;
   margin-right: 0;
 }
 
 hr.full
 {
-  width:100%%
+  margin-left: 0;
+  margin-right: 0;
 }
 
 /* Pyramide des âges */
