@@ -1006,12 +1006,13 @@ value open_etc_file fname =
 
 value open_templ conf name =
   (* On cherche le fichier dans cet ordre :
-     - dans la base (./templx/name.txt)
-     - dans le répertoire des programmes (../gw/etc/templx/name.txt)
-     - le template par défaut (../gw/etc/name.txt) *)
+     - dans la base (bases/etc/templx/name.txt)
+     - dans le répertoire des programmes (gw/etc/templx/name.txt)
+     - le template par défaut (gw/etc/name.txt) *)
   let file_exist dir = 
     let base_tpl_dir = 
-      Filename.concat (base_path ["etc"] dir) (name ^ ".txt")
+      Filename.concat 
+        (base_path ["etc"] (Filename.basename dir)) (name ^ ".txt")
     in
     let etc_tpl_dir = 
       Filename.concat 
