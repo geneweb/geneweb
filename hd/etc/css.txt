@@ -31,6 +31,13 @@ img
   color: #9c1117;
 }
 
+.with_picto
+{
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding: 4px 4px 4px 20px;
+}
+
 /* Properties for the unvisited, visited and mouse over links. All pages. */
 a:link.highlight 
 {
@@ -107,10 +114,10 @@ h1
  width: 160px; 
 }
 
-/* Properties of the acces block. Page welcome.txt */
-/* The border property is exported in the template */
-/* so that the acces menu is not visible if there  */
-/* no password defined for wizard or friends       */
+/* Properties of the acces block. Page welcome.txt, perso.txt */
+/* The border property is exported in the template            */
+/* so that the acces menu is not visible if there             */
+/* no password defined for wizard or friends                  */
 #acces 
 {
  float: right; 
@@ -118,6 +125,14 @@ h1
  height: 65px;
  margin-right: 10px;
  text-align: center; 
+}
+
+#acces>ul
+{
+ padding: 0px;
+ padding-top: 5px;
+ margin: 0px;
+ list-style-type: none;
 }
 
 /* Properties of the title in the acces block. Page welcome.txt */

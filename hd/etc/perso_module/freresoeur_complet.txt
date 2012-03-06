@@ -1,0 +1,91 @@
+<!--  Freres et soeurs simple -->
+
+%if;has_siblings;
+  <h3 class="highlight">[*siblings]</h3>
+  <ul>
+    %let;cur;%index;%in;
+    %foreach;father.child;
+      %if;(index!=cur)
+        %apply;long_display_siblings()
+      %end;
+    %end;
+  </ul>
+%end;
+
+%if;has_parents;
+  %if;(father.nb_families>1 or mother.nb_families>1)
+    %reset_count;
+    %foreach;father.family;
+      %if;(spouse.index!=mother.index)
+        %if;(nb_children>0)%incr_count;%end;
+      %end;
+    %end;
+    %let;half_father;%count;%in;
+    %reset_count;
+    %foreach;mother.family;
+      %if;(spouse.index!=father.index)
+        %if;(nb_children>0)%incr_count;%end;
+      %end;
+    %end;
+    %let;half_mother;%count;%in;
+    %if;(half_father!=0 or half_mother!=0)
+      <h3 class="highlight">[*half siblings]</h3>
+      <table border="%border;" width="100%%">
+        <tr>
+          %if;(half_father!=0)
+            <td width="50%%">
+              [*on %s's side:::] %apply;long_display_person("father")
+            </td>
+          %end;
+          %if;(half_mother!=0)
+            <td width="50%%">
+              [*on %s's side:::] %apply;long_display_person("mother")
+            </td>
+          %end;
+        </tr>
+        <tr>
+          %if;(father.nb_families>1)
+            <td style="vertical-align: top">
+              %foreach;father.family;
+                %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
+                  <ul>
+                    %apply;li_SD("spouse")
+                      [with] %apply;long_display_person("spouse")
+                      %if;has_children;
+                        <ul>
+                          %foreach;child;
+                            %apply;long_display_siblings()
+                          %end;
+                        </ul>
+                      %end;
+                    </li>
+                  </ul>
+                %end;
+              %end;
+            </td>
+          %end;
+          %if;(mother.nb_families>1)
+            <td style="vertical-align: top">
+              %foreach;mother.family;
+                %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
+                  <ul>
+                    %apply;li_SD("spouse")
+                      [with] %apply;long_display_person("spouse")
+                      %if;has_children;
+                        <ul>
+                          %foreach;child;
+                            %apply;long_display_siblings()
+                          %end;
+                        </ul>
+                      %end;
+                    </li>
+                  </ul>
+                %end;
+              %end;
+            </td>
+          %end;
+        </tr>
+      </table>
+    %end;
+  %end;
+%end;

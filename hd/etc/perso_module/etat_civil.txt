@@ -1,0 +1,63 @@
+%if;(has_birth_date or has_birth_place or
+     has_baptism_date or has_baptism_place or is_dead or is_buried or
+     is_cremated or (has_consanguinity and bvar.show_consang!="no") or
+     has_occupation or has_linked_page.OCCU !="")
+  <!--  Portrait -->
+  %if;has_image;
+    <table border="%border;">
+    <tr><td>
+     <a href="%image_url;" target="_blank"><img
+      src="%image_url;"%image_size;
+      alt="[image/images]0" class="fiche_photo"%/></a></td><td valign="top">
+  %end;
+  <!--  <h3 class="etat_civil">[*etat civil]</h3> -->
+  <ul>
+    %if;has_birth_date;
+      <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
+      %if;computable_age;, %age;%sp;%end;
+      %if;birthday; ([happy birthday to you!])%end;
+      %if;has_birth_place; - %birth_place;%end;</li>%nl;
+    %else;
+      %if;has_birth_place;
+        <li>%apply;capitalize(nth([born],sex)) - %birth_place;</li>%nl;
+      %end;
+    %end;
+    %if;has_baptism_date;
+      <li>%apply;capitalize(nth([baptized],sex)) %on_baptism_date;
+      %if;has_baptism_place; - %baptism_place;%end;</li>%nl;
+    %else;
+      %if;has_baptism_place;
+        <li>%apply;capitalize(nth([baptized],sex)) - %baptism_place;</li>%nl;
+      %end;
+    %end;
+    %if;is_dead;
+      <li>%apply;capitalize(died)
+      %if;has_death_date; %on_death_date;%end;
+      %if;has_death_place; - %death_place;%end;
+      %if;(has_linked_page.DEATH !="") %linked_page.DEATH;%end;
+      %if;computable_death_age;, [age at death:] %death_age;%end;</li>%nl;
+    %end;
+    %if;is_buried;
+      <li>%apply;capitalize(nth([buried],sex))
+      %if;has_burial_date; %on_burial_date;%end;
+      %if;has_burial_place; - %burial_place;%end;</li>%nl;
+    %end;
+    %if;is_cremated;
+      <li>%apply;capitalize(nth([cremated],sex))
+      %if;has_cremation_date; %on_cremation_date;%end;
+      %if;has_cremation_place; - %cremation_place;%end;</li>%nl;
+    %end;
+    %if;has_occupation;
+      <li>%apply;capitalize(occupation)</li>%nl;
+    %end;
+    %if;(has_linked_page.OCCU)
+      <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
+    %end;
+    %if;(has_consanguinity and bvar.show_consang!="no")
+      <li>[*consanguinity] : %consanguinity;</li>%nl;
+    %end;
+  </ul>
+  %if;has_image;
+    </td></tr></table>
+  %end;
+%end;

@@ -1,0 +1,17 @@
+<!-- Parents evolue -->
+
+%if;has_parents;
+<h3 class="highlight">[*parents]</h3>
+  <ul>
+    %apply;li_SD("father")
+      %apply;display_sosa("father")
+      %apply;short_display_person("father")%sp;
+      %if;father.has_occupation;(%apply;capitalize(father.occupation))%nl;%end;
+    </li>
+    %apply;li_SD("mother")
+      %apply;display_sosa("mother")
+      %apply;short_display_person("mother")%sp;
+      %if;mother.has_occupation;(%apply;capitalize(mother.occupation))%nl;%end;
+    </li>
+  </ul>
+%end;

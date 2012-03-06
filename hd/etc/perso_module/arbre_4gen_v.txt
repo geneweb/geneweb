@@ -1,0 +1,244 @@
+<!--  Arbre 4 generations vertical -->
+
+<h3 class="highlight">[*navigation arbre]</h3>
+%if;has_parents;
+  <table border="0" style="width: 100%%;" class="border_color">
+    <tr>
+      <td id="ancestors" style="vertical-align: top">
+        <table border="%border;" style="text-align: center"%sp;
+          cellspacing="0" cellpadding="0" width="100%%">
+          %if;(max_anc_level>3)
+            <tr>
+              %( line 1 : up to 8 great-grandparents %)
+              %if;(father.has_parents and father.father.has_parents)
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("father.father.father")</td>
+                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("father.father.mother")</td>
+              %else;
+                <td colspan="3" rowspan="4">&nbsp;</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(father.has_parents and father.mother.has_parents)
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("father.mother.father")</td>
+                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("father.mother.mother")</td>
+              %else;
+                <td colspan="3" rowspan="4">&nbsp;</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.father.has_parents)
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("mother.father.father")</td>
+                <td>&nbsp;</td>
+		<td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("mother.father.mother")</td>
+              %else;
+                <td colspan="3" rowspan="4">&nbsp;</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.mother.has_parents)
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("mother.mother.father")</td>
+                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;short_display_person("mother.mother.mother")</td>
+              %else;
+                <td colspan="3" rowspan="4">&nbsp;</td>
+              %end;
+            </tr>
+
+            <tr>
+              %( line 2 : up to 8 vertical lines with number %)
+              %if;(father.has_parents and father.father.has_parents)
+                <td style="text-align: center;font-size: 80%%">|<br%/>8</td>
+                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">|<br%/>9</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(father.has_parents and father.mother.has_parents)
+                <td style="text-align: center;font-size: 80%%">|<br%/>10</td>
+                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">|<br%/>11</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.father.has_parents)
+                <td style="text-align: center;font-size: 80%%">|<br%/>12</td>
+                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">|<br%/>13</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.mother.has_parents)
+                <td style="text-align: center;font-size: 80%%">|<br%/>14</td>
+                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">|<br%/>15</td>
+              %end;
+            </tr>
+            <tr>
+              %( line 3: up to 4 horizontal lines %)
+              %if;(father.has_parents and father.father.has_parents)
+                <td align="%right;">%nn;
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td align="%left;">%nn;
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(father.has_parents and father.mother.has_parents)
+                <td align="%right;">%nn;
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td align="%left;">%nn;
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.father.has_parents)
+                <td align="%right;">%nn;
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td align="%left;">%nn;
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.mother.has_parents)
+                <td align="%right;">%nn;
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td align="%left;">%nn;
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+            </tr>
+
+            <tr>
+              %( line 4 : up to 4 vertical lines %)
+              %if;(father.has_parents and father.father.has_parents)
+                <td colspan="3" style="text-align: center">|</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(father.has_parents and father.mother.has_parents)
+                <td colspan="3" style="text-align: center">|</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.father.has_parents)
+                <td colspan="3" style="text-align: center">|</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;(mother.has_parents and mother.mother.has_parents)
+                <td colspan="3" style="text-align: center">|</td>
+              %end;
+            </tr>
+          %end;
+
+          %if;(max_anc_level>2)
+            <tr>
+              %( line 5 : up to 4 grandparents %)
+              %if;father.has_parents;
+                <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
+                  %apply;short_display_person("father.father")</td>
+                <td>&nbsp;</td>
+                <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
+                  %apply;short_display_person("father.mother")</td>
+              %else;
+                <td colspan="7" rowspan="4">&nbsp;</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;mother.has_parents;
+                <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
+                  %apply;short_display_person("mother.father")</td>
+                <td>&nbsp;</td>
+                <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
+                  %apply;short_display_person("mother.mother")</td>
+              %else;
+                <td colspan="7" rowspan="4">&nbsp;</td>
+              %end;
+            </tr>
+
+            <tr>
+              %( line 6 : up to 4 vertical lines with number %)
+              %if;father.has_parents;
+                <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>4</td>
+                <td>&nbsp;</td>
+                <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>5</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;mother.has_parents;
+                <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>6</td>
+                <td>&nbsp;</td>
+                <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>7</td>
+              %end;
+            </tr>
+
+            <tr>
+              %( line 7 : up to 2 horizontal lines %)
+              %if;father.has_parents;
+                <td colspan="3" align="%right;">%nn;
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td colspan="3" align="%left;">%nn;
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+              <td>&nbsp;</td>
+              %if;mother.has_parents;
+                <td colspan="3" align="%right;">%nn;
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td colspan="3" align="%left;">%nn;
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+            </tr>
+
+            <tr>
+              %( line 8 : up to 2 vertical lines %)
+              %if;father.has_parents;
+                <td colspan="7" style="text-align: center">|</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;mother.has_parents;
+                <td colspan="7" style="text-align: center">|</td>
+              %end;
+            </tr>
+          %end;
+
+          <tr>
+            %( line 9 : 2 parents %)
+            <td colspan="7" style="text-align: center">%nn;
+              %apply;short_display_person("father")</td>
+            <td>&nbsp;</td>
+            <td colspan="7" style="text-align: center">%nn;
+              %apply;short_display_person("mother")</td>
+          </tr>
+
+          <tr>
+            %( line 10 : 2 vertical lines with number %)
+            <td colspan="7" style="text-align: center">|<br%/>2</td>
+            <td>&nbsp;</td>
+            <td colspan="7" style="text-align: center">|<br%/>3</td>
+          </tr>
+
+          <tr>
+            %( line 11 : 2 horizontal lines %)
+            <td colspan="7" align="%right;">%nn;
+              <hr dir="ltr" width="50%%" align="%right;"%/></td>
+            <td><hr width="100%%"%/></td>
+            <td colspan="7" align="%left;">%nn;
+              <hr dir="ltr" width="50%%" align="%left;"%/></td>
+          </tr>
+
+          <tr>
+            %( line 12 : 1 vertical line %)
+            <td colspan="15" style="text-align: center">|</td>
+          </tr>
+
+          <tr>
+            %( line 13 : 1 person %)
+            <td colspan="15" style="text-align: center">%nn;
+              %apply;short_display_person("self")</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+%end;

@@ -1,0 +1,48 @@
+<!--  Union simple -->
+
+%if;has_families;
+  <h3 class="highlight">[*marriage/marriages]1 %if;has_children; [and::child/children]1%end;</h3>
+  <ul>
+    %( On remet les compteurs à zéro et on commence à compter à 1 %)
+    %reset_count; %incr_count;
+    %foreach;family;
+      %apply;li_SD("spouse")
+        %if;(wizard)
+          <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;">
+            <img src="%image_prefix;/picto_molette.png" width="13" height="13" alt="[modify]" title="[modify::family/families]0"%/>
+          </a>
+        %end;
+        %apply;long_married("self")%sp;
+        %apply;short_display_person("spouse")%sp;
+        %if;has_witnesses;
+          &nbsp;([witness/witnesses]w :
+          %foreach;witness;
+            %if;not is_first;, %end;
+            %apply;short_display_person("witness")%nl;
+          %end;)
+        %end;
+        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
+          ([see::note/notes]0 <a href="#note-wed-%count;" name="wed-note-%count;" id="wed-note-%count;">%count;</a>)
+          %incr_count;
+        %end;
+        %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
+        %if;are_separated;, [separated]0%sp;%end;
+        %if;has_children;[having as children]0
+          %( On sauvegarde l'ancienne valeur de count %)
+          %let;prev_count;%count;%in;
+          <ul>
+            %foreach;child;
+              %apply;li_SDC("child")
+                %apply;image_MF("child","13")
+                %apply;short_display_person("child")
+              </li>
+            %end;
+          </ul>
+          %( On rétablie l'ancienne valeur de count %)
+          %apply;init_count(prev_count)
+        %end;
+        %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
+      </li>
+    %end;
+  </ul>
+%end;
