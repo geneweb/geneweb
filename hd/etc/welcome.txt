@@ -69,40 +69,44 @@ zh: 网络家谱
   %if; (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""
         or bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
     <div id="acces" style="border: solid 2px #6f8301;">
-      <h3><img src="%image_prefix;/picto_cle.png" alt=""/> [*access] :</h3>
-      %if;(not wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
-        %if;(not cgi and bvar.auth_file = "")
-          <a href="%prefix;w=w"><em>%sq;
-          [wizard/wizards/friend/friends/exterior]0</em></a><br%/>
-        %else;
-          <form method="post" action="%action;">
-            <div>
-              %hidden;
-              [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
-              <input name="w" type="password" size="10" maxlength="200"%/>
-              <input type="submit" value="Ok"%/>
-            </div>
-          </form>
+      <h3 class="with_picto" style=" background-image:url(%image_prefix;/picto_cle.png)"> [*access] :</h3>
+      <ul>
+        %if;(not wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
+          %if;(not cgi and bvar.auth_file = "")
+            <li><a href="%prefix;w=w"><em>%sq; [wizard/wizards/friend/friends/exterior]0</em></a></li>
+          %else;
+            <form method="post" action="%action;">
+              <div>
+                %hidden;
+                [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
+                <input name="w" type="password" size="10" maxlength="200"%/>
+                <input type="submit" value="Ok"%/>
+              </div>
+            </form>
+          %end;
         %end;
-      %end;
-      %if;(not friend and
-           (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
-        %if;(not cgi and bvar.auth_file = "")
-          <a href="%prefix;w=f"><em>%sq;
-          [wizard/wizards/friend/friends/exterior]2</em></a><br%/>
+        %if;(not friend and
+             (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
+          %if;(not cgi and bvar.auth_file = "")
+            <li><a href="%prefix;w=f"><em>%sq; [wizard/wizards/friend/friends/exterior]2</em></a></li>
+          %end;
         %end;
-      %end;
-      %if;(wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
-        <em>[wizard/wizards/friend/friends/exterior]0%sq;
-        %if;(user.ident != "")
-          : %user.ident;%sq;
-        %end;</em>
-        (<a href="%prefix;w=">[disconnect]</a>)
-      %end;
-      %if;(friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
-        <em>[wizard/wizards/friend/friends/exterior]2</em>
-        (<a href="%prefix;w=">[disconnect]</a>)
-      %end;
+        %if;(wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != ""))
+          <li>
+            <em>[wizard/wizards/friend/friends/exterior]0%sq;
+            %if;(user.ident != "")
+              : %user.ident;%sq;
+            %end;</em>
+            (<a href="%prefix;w=">[disconnect]</a>)
+          </li>
+        %end;
+        %if;(friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != ""))
+          <li>
+            <em>[wizard/wizards/friend/friends/exterior]2</em>
+            (<a href="%prefix;w=">[disconnect]</a>)
+          </li>
+        %end;
+      </ul>  
     </div>
   %else
     <div id="acces"></div>
@@ -139,7 +143,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 
 <div id="content">
   <div id="search">
-    <h3><img src="%image_prefix;/picto_loupe.png" alt=""/> [*search/case sensitive]0</h3>
+    <h3 class="with_picto" style=" background-image:url(%image_prefix;/picto_loupe.png)"> [*search/case sensitive]0</h3>
       <form id="form-person" method="get" action="%action;">
         <div>
           %hidden;
@@ -374,7 +378,7 @@ sv: <span class="highlight" style="margin-left:10px">genom
 
 <br/>
 <div id="misc">
-  <h3><img src="%image_prefix;/picto_rotor.png" alt=""/> [*family history]</h3>
+  <h3 class="with_picto" style=" background-image:url(%image_prefix;/picto_rotor.png)"> [*family history]</h3>
   <div id="list_left">
   <ul>
     <li>
@@ -442,7 +446,7 @@ sv: <span class="highlight" style="margin-left:10px">genom
 
 <br/>
 <div id="tools">
-  <h3><img src="%image_prefix;/picto_molette.png" alt=""/> [*tools]</h3>
+  <h3 class="with_picto" style=" background-image:url(%image_prefix;/picto_molette.png)"> [*tools]</h3>
   <ul>
     <li>
       <a href="%prefix;m=CAL">[calendar/calendars]1</a>

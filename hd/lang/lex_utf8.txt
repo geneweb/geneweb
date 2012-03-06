@@ -10359,3 +10359,74 @@ ro: continua unificarea
 ru: продолжить объединение
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
+
+    navigation arbre
+af:
+bg:
+br:
+ca:
+cs:
+da:
+de: überblick vom Stammbaum
+en: Preview Family Tree
+eo:
+es: ver ärbol
+et:
+fi: yleissilmäys sukutauluun
+fr: aperçu de l'arbre
+he:
+is:
+it: anteprima dell’albero
+lv:
+nl: overzicht van de stamboom
+no: oversikt over
+pl:
+pt:
+pt-br:
+ro:
+ru:
+sl:
+sv: översikt över
+zh:
+
+    marriage notes
+de: notizen zu den Ehen
+en: marriage Notes
+es: notas de matrionios
+fi: lisämerkintöjä vihkimisestä
+fr: notes de mariage
+it: note di matrimoni
+nl: nota’s over het huwelijk
+no: notater om ekteskapet
+sv: anteckningar om vigseln
+
+    paternal grand-parents
+de: großeltern väterlicherseits
+en: paternal grand-parents
+fi: isän puolen isovanhemmat
+fr: grands parents paternels
+it: nonni paterni
+nl: grootouders langs vaderszijde
+no: farmor og farfar
+sv: farmor och farfar
+
+    maternal grand-parents
+de: Großeltern mütterlicherseits
+en: maternal grand-parents
+fi: äidin puolen isovanhemmat
+fr: grands parents maternels
+it: nonni materni
+nl: grootouders langs moederszijde
+no: mormor og morfar
+sv: mormor och morfar
+
+    half siblings
+de: halbbrüder und-schwestern
+en: half-siblings
+es: hermanastros y hermanastras
+fi: puolisisarukset
+fr: demi frères et demi sœurs
+it: fratellastri e sorellastre
+nl: half broers en zusters
+no: halvbrødre/halvsøstre/halvsøsken
+sv: halvbröder och halvsystrar

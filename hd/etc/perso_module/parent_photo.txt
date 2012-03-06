@@ -1,0 +1,53 @@
+<!-- Parents photo -->
+
+%if;has_parents;
+  <h3 class="highlight">[*parents]</h3>
+  <table>
+    <tr>
+      <td width="50%%">
+        <table>
+          <tr>
+            <td style="text-align:left; vertical-align: middle">
+              %if;father.has_image;
+                <img %father.image_small_size;%sp;src="%father.image_url;" style="border: none" alt="[image/images]0"%/>
+              %else;&nbsp;
+              %end;
+            </td>
+            <td style="text-align:left; vertical-align: middle">
+              <ul>
+                %apply;li_SD("father")
+                  %apply;short_display_person("father")%sp;
+                </li>
+                %if;father.has_occupation;
+                  <li>%apply;capitalize(father.occupation)</li>%nl;
+                %end;
+              </ul>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td width="50%%">
+        <table>
+          <tr>
+            <td style="text-align:left; vertical-align: middle">
+              %if;mother.has_image;
+                <img %mother.image_small_size;%sp;src="%mother.image_url;" style="border: none" alt="[image/images]0"%/>
+              %else;&nbsp;
+              %end;
+            </td>
+            <td style="text-align:left; vertical-align: middle">
+              <ul>
+                %apply;li_SD("mother")
+                  %apply;short_display_person("mother")%sp;
+                </li>
+                %if;mother.has_occupation;
+                  <li>%apply;capitalize(mother.occupation)</li>%nl;
+                %end;
+              </ul>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+%end;

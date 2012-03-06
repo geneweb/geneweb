@@ -1,0 +1,133 @@
+<!--  Arbre 3 generations vertical avec photos -->
+
+<h3 class="highlight">[*navigation arbre]</h3>
+%if;has_parents;
+  <div style="text-align: center"><table border="0" style="width: 80%%;" class="border_color arbre_asc">
+    <tr>
+      <td style="vertical-align: top;" id="ancestors">
+        <table border="%border;" cellspacing="0" cellpadding="0">
+          %if;(max_anc_level>2)
+            <tr>
+              %if;father.has_parents;
+                <td style="font-size: 80%%" class="arbre_pers">%nn;
+                  %if;father.father.has_image;
+                    <img %father.father.image_small_size;%sp;src="%father.father.image_url;" style="border: none" alt="[image/images]0"%/>
+                    <br%/>
+                  %end;
+                  %apply;short_display_person("father.father")</td>
+                <td>&nbsp;</td>
+                <td style="font-size: 80%%" class="arbre_pers">%nn;
+                  %if;father.mother.has_image;
+                    <img %father.mother.image_small_size;%sp;src="%father.mother.image_url;" style="border: none" alt="[image/images]0"%/>
+                    <br%/>
+                  %end;
+                  %apply;short_display_person("father.mother")</td>
+              %else;
+                <td colspan="3" rowspan="4">&nbsp;</td>
+              %end;
+              <td>&nbsp;</td>
+              %if;mother.has_parents;
+                <td style="font-size: 80%%" class="arbre_pers">%nn;
+                  %if;mother.father.has_image;
+                    <img %mother.father.image_small_size;%sp;src="%mother.father.image_url;" style="border: none" alt="[image/images]0"%/>
+                    <br%/>
+                  %end;
+                  %apply;short_display_person("mother.father")</td>
+                <td>&nbsp;</td>
+                <td style="font-size: 80%%" class="arbre_pers">%nn;
+                  %if;mother.mother.has_image;
+                    <img %mother.mother.image_small_size;%sp;src="%mother.mother.image_url;" style="border: none" alt="[image/images]0"%/>
+                    <br%/>
+                  %end;
+                  %apply;short_display_person("mother.mother")</td>
+              %else;
+                <td colspan="3" rowspan="4">&nbsp;</td>
+              %end;
+            </tr>
+            <tr>
+              %if;father.has_parents;
+                <td class="arbre_separateur"><span>|</span></td>
+                <td></td>
+                <td class="arbre_separateur"><span>|</span></td>
+              %end;
+              <td></td>
+              %if;mother.has_parents;
+		<td class="arbre_separateur"><span>|</span></td>
+                <td></td>
+                <td class="arbre_separateur"><span>|</span></td>
+              %end;
+            </tr>
+            <tr>
+              %if;father.has_parents;
+                <td align="%right;">
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td align="%left;">
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+              <td></td>
+              %if;mother.has_parents;
+                <td align="%right;">
+                  <hr dir="ltr" width="50%%" align="%right;"%/></td>
+                <td><hr width="100%%"%/></td>
+                <td align="%left;">
+                  <hr dir="ltr" width="50%%" align="%left;"%/></td>
+              %end;
+            </tr>
+            <tr>
+              %if;father.has_parents;
+		<td></td><td class="arbre_separateur"><span>|</span></td><td></td>
+              %end;
+              <td></td>
+              %if;mother.has_parents;
+		<td></td><td class="arbre_separateur"><span>|</span></td><td></td>
+              %end;
+            </tr>
+          %end;
+          <tr>
+            <td></td><td class="arbre_pers">%nn;
+              %if;father.has_image;
+                <img %father.image_small_size;%sp;src="%father.image_url;" style="border: none" alt="[image/images]0"%/>
+                <br%/>
+              %end;
+              %apply;short_display_person("father")</td>
+            <td></td>
+            <td>&nbsp;</td>
+            <td></td><td class="arbre_pers">%nn;
+              %if;mother.has_image;
+                <img %mother.image_small_size;%sp;src="%mother.image_url;" style="border: none" alt="[image/images]0"%/>
+                <br%/>
+              %end;
+              %apply;short_display_person("mother")</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td></td><td class="arbre_separateur"><span>|</span></td><td></td>
+            <td></td>
+	    <td></td><td class="arbre_separateur"><span>|</span></td><td></td>
+          </tr>
+          <tr>
+            <td></td><td align="%right;">
+              <hr dir="ltr" width="50%%" align="%right;"%/></td>
+	    <td colspan="3"><hr width="100%%"%/></td>
+            <td align="%left;">
+              <hr dir="ltr" width="50%%" align="%left;"%/></td>
+          </tr>
+          <tr>
+	    <td colspan="3"></td><td class="arbre_separateur"><span>|</span></td>
+            <td colspan="3"></td>
+          </tr>
+          <tr>
+            <td colspan="3"></td><td class="arbre_pers">%nn;
+              %if;self.has_image;
+                <img %self.image_small_size;%sp;src="%self.image_url;" style="border: none" alt="[image/images]0"%/>
+                <br%/>
+              %end;
+              %apply;short_display_person("self")</td>
+	    <td colspan="3"></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table></div>
+%end;

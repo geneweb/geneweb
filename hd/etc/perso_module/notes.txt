@@ -1,0 +1,42 @@
+<!-- notes -->
+
+<div id ="link_pages">
+  %if;(not cancel_links and has_linked_pages)
+    (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
+  %end;
+</div>
+
+%if;((wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
+    (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
+  <h3 class="highlight">[*note/notes]1</h3>
+  <dl><dd>
+    %if;(has_linked_page.BNOTE)
+      <p>%apply;capitalize(linked_page.BNOTE).</p>
+    %end;
+    %notes;
+    %if;(has_linked_page.NOTE)
+      <p>%apply;capitalize(linked_page.NOTE).</p>
+    %end;
+  </dd></dl>
+%end;
+
+%if;has_families;
+  %( On remet les compteurs à zéro et on commence à compter à 1 %)
+  %reset_count; %incr_count;
+  %foreach;family;
+    %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
+      %if;((count=1) and ((wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
+          (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))) 
+        <h4 class="highlight">[*marriage notes]0</h4>
+      %elseif;(count=1)
+          <h3 class="highlight">[*marriage notes]0</h3>
+      %end;
+      <dl> 
+        <dt><a href="#wed-note-%count;" name="note-wed-%count;" id="note-wed-%count;">%count;</a>:</dt>
+        <dd>%comment;</dd>
+      </dl>
+      %incr_count;
+    %end;
+  %end;
+%end;
+

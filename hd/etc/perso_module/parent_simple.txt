@@ -1,0 +1,13 @@
+<!-- Parents simple -->
+
+%if;has_parents;
+<h3 class="highlight">[*parents]</h3>
+  <ul>
+    %apply;li_SD("father")
+      %apply;short_display_person("father")%sp;
+    </li>
+    %apply;li_SD("mother")
+      %apply;short_display_person("mother")%sp;
+    </li>
+  </ul>
+%end;
