@@ -1011,7 +1011,7 @@ value open_templ conf name =
      - le template par défaut (../gw/etc/name.txt) *)
   let file_exist dir = 
     let base_tpl_dir = 
-      Filename.concat (Filename.basename dir) (name ^ ".txt") 
+      Filename.concat (base_path ["etc"] dir) (name ^ ".txt")
     in
     let etc_tpl_dir = 
       Filename.concat 
