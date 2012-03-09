@@ -14,9 +14,9 @@
   <ul>
     %if;has_birth_date;
       <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
-      %if;computable_age;, %age;%sp;%end;
       %if;birthday; ([happy birthday to you!])%end;
       %if;has_birth_place; - %birth_place;%end;</li>%nl;
+      %if;computable_age;<li>[*age] : %age;</li>%end;
     %else;
       %if;has_birth_place;
         <li>%apply;capitalize(nth([born],sex)) - %birth_place;</li>%nl;
