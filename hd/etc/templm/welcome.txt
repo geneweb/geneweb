@@ -3,12 +3,12 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/01/09 geneweb-6.04 templ=templm -->
   <title>Geneweb - %base.name;</title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   <style type="text/css">
     /* welcome.txt */
@@ -29,7 +29,7 @@
     	width: 49%%;
     	float: left;
     }
-    #welcome_content-left, #welcome_content-right, #welcome_motd {
+    #welcome_content-left, #welcome_content-right, #welcome_motd, #welcome_lang {
     	padding: 2px;
     	margin: 2px;
     	border: solid 1px #FFFFC0;
@@ -65,7 +65,7 @@
     #welcome_title small {
     	font-size: 60%%;
     }
-    #welcome_motd {
+    #welcome_motd, #welcome_lang {
     	clear: both;
     	width: 99%%
     }
@@ -96,6 +96,19 @@
   [<em>Sosa number</em> relative to %t:::xx]
 %end;
 
+%define;lang(xx)
+  %apply;nth%with;
+    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/pl/pt/pt-br/ro/ru/sk/sl/sv/zh
+  %and;xx%end;
+%end;
+
+%define;link_lang(level,maxlev)
+  <a href="%prefix_base;lang=%apply;lang(level)">%apply;lang(level)</a>
+  %if;(level < maxlev)
+    %apply;link_lang(level+1,maxlev)
+  %end;
+%end;
+
 %define;disconnect(xx,yy)
   %if;(just_friend_wizard or bvar.xx_passwd != "" or bvar.xx_passwd_file != "")
       <em>yy
@@ -110,12 +123,12 @@
 <body%body_prop; id="welcome">
 <div id="welcome_content-top">
   <div id="welcome_logo">
-    <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" %/>
+    <img src="%image_prefix;/gwlogo.png" alt="GeneWeb"%/>
   </div>
   <div id="welcome_title">
     <h1>%apply;capitalize(base.name) <small>(%base.nb_persons; [person/persons]1)</small>
       %if;(browsing_with_sosa_ref)
-          <br %/><small>Sosa 1 : %sosa_ref;</small>
+          <br%/><small>Sosa 1 : %sosa_ref;</small>
       %end;%nl;
     </h1>
   </div>
@@ -137,8 +150,8 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
           <div>
             %hidden;
             [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0) :
-            <input name="w" type="password" size="10" maxlength="200" %/>
-            <input type="submit" value="Ok" %/>
+            <input name="w" type="password" size="10" maxlength="200"%/>
+            <input type="submit" value="Ok"%/>
           </div>
         </form>
       %end;
@@ -151,8 +164,8 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
             <div>
               %hidden;
               [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
-              <input name="w" type="password" size="10" maxlength="200" %/>
-              <input type="submit" value="Ok" %/>
+              <input name="w" type="password" size="10" maxlength="200"%/>
+              <input type="submit" value="Ok"%/>
             </div>
           </form>
         %end; 
@@ -187,11 +200,12 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     %end;
     %if;has_misc_notes;
       <li>
-        <a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>
+        <a href="%prefix;m=MISC_NOTES">[miscellaneous notes]…</a>
       </li>
     %end;
     %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
-         and (wizard or wiznotes_dir_exists))
+         and (wizard or wiznotes_dir_exists) and
+		         bvar.authorized_wizards_notes = "yes")
       <li>
         <a href="%prefix;m=WIZNOTES">%sq;
         [wizard/wizards/friend/friends/exterior]1 - [note/notes]1</a>
@@ -229,7 +243,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     %if;(wizard and (not base.has_notes or bvar.propose_add_family != "no"))
       %if;(bvar.propose_add_family != "no")
         <li>
-          <a href="%prefix;m=ADD_FAM">[add::family/families]0</a><br %/>
+          <a href="%prefix;m=ADD_FAM">[add::family/families]0</a><br%/>
         </li>
       %end;
       %if;(not base.has_notes)
@@ -252,35 +266,35 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     <form id="welcome_form-person" method="get" action="%action;">
       <fieldset>
         %hidden;
-        <input type="hidden" name="m" value="NG" %/>
-        <label>[person/persons]0<br %/><input name="n" size="30" maxlength="200" %/></label>
+        <input type="hidden" name="m" value="NG"%/>
+        <label>[person/persons]0<br%/><input name="n" size="30" maxlength="200"%/></label>
         <select name="t">
-          <option value="PN" selected="selected">[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa...</option>       
+          <option value="PN" selected="selected">[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa…</option>       
           <option value="P">[first name/first names]0</option>
           <option value="N">[surname/surnames]0</option>
         </select>
-        <input type="submit" value="Ok" %/>
+        <input type="submit" value="Ok"%/>
       </fieldset>
     </form>
     %if;(bvar.propose_titles != "no")%nl;
       <form id="welcome_form-titles" method="get" action="%action;">
         <fieldset>
               %hidden;
-              <input type="hidden" name="m" value="TT" %/>
+              <input type="hidden" name="m" value="TT"%/>
               <div>
-                <label>[title/titles]0<br %/>
-                  <input name="t" size="25" maxlength="200" %/>
-                </label><br %/>
+                <label>[title/titles]0<br%/>
+                  <input name="t" size="25" maxlength="200"%/>
+                </label><br%/>
                   <a href="%prefix;m=TT;t=">([all the titles])</a>
               </div>
               <div>
-                <label>[estate]0<br %/>
-                  <input name="p" size="25" maxlength="200" %/>%sq;
+                <label>[estate]0<br%/>
+                  <input name="p" size="25" maxlength="200"%/>%sq;
                 </label>
-                <input type="submit" value="Ok" %/>
-                <br %/>
+                <input type="submit" value="Ok"%/>
+                <br%/>
                 <a href="%prefix;m=TT;p=*">([all the estates])</a>
-              </div><br %/>
+              </div><br%/>
         </fieldset>
       </form>
     %end;
@@ -289,12 +303,12 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
         <legend>[list/list (ancestors)]</legend>
         %hidden;
         %if;(bvar.hide_advanced_request = "no")
-          <a href="%prefix;m=H;v=advanced"> - [advanced request]</a><br %/>
+          <a href="%prefix;m=H;v=advanced"> - [advanced request]</a><br%/>
         %end;
         <select name="m">
           <option value="N" selected="selected">[surname/surnames]1</option>
           <option value="P">[first name/first names]1</option>
-        </select><br %/>
+        </select><br%/>
         <select name="tri">
           <option value="A" selected="selected">[alphabetic order]</option>
           <option value="F">[
@@ -326,24 +340,29 @@ sl: pogostosti
 sv: frekvensordning
 zh: 访问次数
 ]</option>
-        </select><br %/>
-        <input type="submit" value="Ok" %/>
+        </select><br%/>
+        <input type="submit" value="Ok"%/>
       </fieldset>
     </form>
     %if;(bvar.propose_place_surnames != "no")%nl;
       <form id="welcome_form-place" method="get" action="%prefix;">
         <fieldset>
-         %hidden;
-         <legend>[place] / [surname/surnames]0</legend> 
-         <input type="hidden" name="m" value="PS" %/>
-         <label><input type="checkbox" name="bi" value="on" checked="checked" %/>[birth]</label><br %/> 
-         <label><input type="checkbox" name="de" value="on" %/>[death]</label><br %/>
-         <label><input type="checkbox" name="ma" value="on" %/>[marriage/marriages]0</label><br %/> 
-         <input type="submit" value="Ok" %/>
+          %hidden;
+          <legend>[place] / [surname/surnames]0</legend> 
+          <input type="hidden" name="m" value="PS"%/>
+          <label><input type="checkbox" name="bi" value="on" checked="checked"%/>[birth]</label>
+          <label><input type="checkbox" name="bp" value="on"%/>[baptism]</label><br%/> 
+          <label><input type="checkbox" name="de" value="on"%/>[death]</label>
+          <label><input type="checkbox" name="bu" value="on"%/>[burial]</label><br%/>
+          <label><input type="checkbox" name="ma" value="on"%/>[marriage/marriages]0</label><br%/>
+          <input type="submit" value="Ok"%/>
         </fieldset>
       </form>
     %end;
   </div>
+</div>
+<div id="welcome_lang">
+  lang= %apply;link_lang(1,28)
 </div>
 <div id="welcome_content-bottom">
   %apply;interp([

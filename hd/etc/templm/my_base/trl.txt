@@ -1,53 +1,41 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 2011/11/10 geneweb-6.02 templ=templm -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 2012/03/08 geneweb-6.04 templ=templm -->
 <!-- To do : copy this file to bases/etc/my_base/ -->
+
 %if;(not cancel_links)
-  <div style="clear: both;">
-    %if;(evar.m = "CAL" and evar.yg != "" and (wizard or friend))
-      <form method="get" action="%action;">
-        <p>
-        <a href="%prefix;m=STAT">[statistics] : </a>
-        %hidden;
-        <input name="k" value="%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;" size="5" maxlength="5" %/>
-        <label>
-          <input type="radio" name="m" value="LB" checked="checked" %/>
-          [birth]
-        </label>
-        <label>
-          <input type="radio" name="m" value="LM" %/>
-          [marriage/marriages]0
-        </label>
-        <label>
-          <input type="radio" name="m" value="LD" %/>
-          [death]
-        </label>
-        ... ([before (date)]...
-          %if;([ !dates order]0 = "ddmmyy")
-            <input name="bd" value="%evar.dg;" size="2" maxlength="2" %/>
-            <input name="bm" value="%evar.mg;" size="2" maxlength="2" %/>
-            <input name="by" value="%evar.yg;" size="4" maxlength="4" %/>
-          %else;
-            <input name="by" value="%evar.yg;" size="4" maxlength="4" %/>
-            <input name="bm" value="%evar.mg;" size="2" maxlength="2" %/>
-            <input name="bd" value="%evar.dg;" size="2" maxlength="2" %/>
-          %end;)
-        <input type="submit" value="Ok" %/>
-        </p>
-      </form>
-      <ul>
-        <li><a href="%prefix;m=POP_PYR;i=5;lim=0;y=%evar.yg;">[population pyramid] (%evar.yg;)</a></li>
-        <li><a href="%prefix;m=AN;v=%evar.mg;">[birthdays]</a></li>
-        <li><a href="%prefix;m=AD;v=%evar.mg;">[anniversaries of dead people]</a></li>
-        <li><a href="%prefix;m=AM;v=%evar.mg;">[anniversaries of marriage]</a></li>
-      </ul>
-    %end;
+  <div style="clear: both; padding: 2px; margin: 2px;	border: solid 1px #FFFFC0;">
     <form method="get" action="%action;">
       <p>
       %hidden;
-      <input type="hidden" name="m" value="NG" %/>
-      <input name="n" size="20" maxlength="200" title="[*search/case sensitive]0 (9)" accesskey="9" %/>%nn;
-      <input type="submit" value="[*search/case sensitive]0 (9)" %/>
+      <input type="hidden" name="m" value="NG"%/>
+      <input name="n" size="20" maxlength="200" title="[*search/case sensitive]0 (9)" accesskey="9"%/>%nn;
+      <input type="submit" value="[*search/case sensitive]0 (9)"%/>
       </p>
     </form>
+    <p>
+     templ=
+      <a href="%prefix_base;templ=">-</a>%sp;
+      <a href="%prefix_base;templ=templa">a</a>%sp;
+      <a href="%prefix_base;templ=templb">b</a>%sp;
+      <a href="%prefix_base;templ=templc">c</a>%sp;
+      <a href="%prefix_base;templ=templd">d</a>%sp;
+      <a href="%prefix_base;templ=templf">f</a>%sp;
+      <a href="%prefix_base;templ=templh">h</a>%sp;
+      <a href="%prefix_base;templ=templm">m</a>%sp;
+    </p>
   </div>
 %end;
+
+<script type="text/javascript">
+<!--
+var htmlTitle = window.document.getElementsByTagName("title")[0].firstChild.data
+if (
+     htmlTitle == "[*person modified]" |
+     htmlTitle == "[*family modified]" |
+     htmlTitle == "[*person added]" | 
+     htmlTitle == "[*family added]"
+    )
+{document.getElementsByTagName("a")[2].focus()};
+-->
+</script>
+
 <!-- end trl.txt -->

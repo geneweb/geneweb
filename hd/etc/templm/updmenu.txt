@@ -5,11 +5,16 @@
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
   <title>[*update]</title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
+  <style type="text/css">
+    tr {
+     text-align: left;
+    }
+  </style>
   %base_header;
 </head>
 <body%body_prop; id="menutxt">
@@ -24,88 +29,87 @@
   </div>
 %end;
 
-<h1 style="text-align:center" class="highlight">%nn;
-  [*update]:<br %/>
+<h1>%nn;
+  [*update]:<br%/>
   %first_name;
   .%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end; %surname;
 </h1>
 
 <table border="%border;" width="90%%">
-<tr align="%left;">
-  <th align="%left;" style="color:%highlight;">[*person/persons]0</th>
-  <th align="%left;" style="color:%highlight;">[*family/families]1</th>
+<tr>
+  <th>[*person/persons]0</th>
+  <th>[*family/families]1</th>
 </tr>
-<tr align="%left;">
-  <td valign="top">
+<tr>
+  <td>
+    <br%/>
     <a href="%prefix;m=MOD_IND;i=%index;" title="[*modify::person/persons]0 (P)" accesskey="P">[*modify::] (P)</a>
-    <br %/>
+    <br%/>
     %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
          and surname != "?")
       <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
-      <br %/>
+      <br%/>
       %if;(auto_image_file_name != "")
         <a href="%prefix;m=DEL_IMAGE;i=%index;">[*delete::image/images]0</a>
-        <br %/>
+        <br%/>
       %end;
     %end;
-    <br %/>
+    <br%/>
     <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
-    <br %/>
-    <br %/>
+    <br%/>
+    <br%/>
     <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>
-    <br %/>
+    <br%/>
     %if;(not has_parents and first_name != "?" and surname != "?")
-      <br %/>
+      <br%/>
       <a href="%prefix;m=ADD_PAR;ip=%index;">[*add::parents]</a>
-      <br %/>
+      <br%/>
     %end;
   </td>
-  <td valign="top">
+  <td>
     %foreach;family;
       %if;(family_cnt != 1)
-        <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;
-         ">[*invert]</a>
-        <br %/>
+        <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;">[*invert]</a>
+        <br%/>
         %if;(family.father.index = prev_family.father.index
          and family.mother.index = prev_family.mother.index)
           <a href=%nn;
-          "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;
-          ;ip=%index;">%nn;
+          "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;">%nn;
           [*merge::]</a>
-          <br %/>
+          <br%/>
         %end;
       %end;
       <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
        " %if;(nb_families = 1) title="[*modify::family/families]0 (F)" accesskey="F"%end;>%nn;
       [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br %/>
+      <br%/>
       <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br %/>
+      <br%/>
     %end;
-    <br %/>
+    <br%/>
     %if;((first_name = "?" or surname = "?") and
          (nb_families != 0 or has_parents))
     %elseif;(not is_male and not is_female)
       <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;
       [*add::marriage/marriages]0 ([M/F]0)</a>
-      <br %/>
+      <br%/>
       <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;
       [*add::marriage/marriages]0 ([M/F]1)</a>
-      <br %/>
+      <br%/>
     %else;
       <a href="%prefix;m=ADD_FAM;ip=%index;" title="[*add::marriage/marriages]0 (A)" accesskey="A">%nn;
       [*add::marriage/marriages]0 (A)</a>
-      <br %/>
+      <br%/>
     %end;
     %if;(nb_children != 0)
-      <br %/>
+      <br%/>
       <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
     %end;      
     %if;has_possible_duplications;
-      <br %/>
+      <br%/>
       <a href="%prefix;m=MRG_DUP;ip=%index;">%sq;
       [*merge::possible duplications]</a>
     %end;      
@@ -120,7 +124,7 @@
 %if;(nb_families != 0)
   <p>
     %apply;hint([*modify::family/families]0)
-    <br %/>
+    <br%/>
   </p>
 %end;
 

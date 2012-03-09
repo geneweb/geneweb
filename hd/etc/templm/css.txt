@@ -1,6 +1,7 @@
 <style type="text/css">
 /* Properties of all html pages.*/
-/* mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm */
+/* mickroue(a)yahoo.fr 2012/03/07 geneweb-6.04 templ=templm */
+
 html 
 { 
  background: url('%image_prefix;/gwback.jpg');
@@ -31,7 +32,9 @@ a:link, a:visited, a:link.highlight, a:visited.highlight {
 	color: #291D81;
 	text-decoration: none;
 }
-a:hover.date, a:hover, a:active, a:focus, label:hover {
+a:hover.date, a:hover, label:hover, input:hover, .button:hover,
+  .menu a:hover, .menu1 a:hover, .menu2 a:hover, .menu3 a:hover 
+  a:active,  a:focus, input:focus  {
 	background-color: #FFD700;
 	text-decoration: none;
 }
@@ -69,6 +72,25 @@ h1 {
  width: 100%%;
  background-color: #e7edb3;
 }
+/* Propositions de background dans certains menus */
+.bg1 {
+  background-color: #FFC0C0;
+}
+.bg2 {
+  background-color: #FFFFC0;
+}
+.bg3 {
+  background-color: #C0FFC0;
+}
+.bg4 {
+  background-color: #C0FFFF;
+}
+.bg5 {
+  background-color: #C0C0FF;
+}
+.bg6 {
+  background-color: #FFC0FF;
+}
 /* Pyramide des âges */
 .pyramid_year {
   font-style: italic;
@@ -86,7 +108,7 @@ li.file {
 li.parent {
   list-style-type: disc;
 }
-/* ... avec images */
+/* … avec images */
 li.folder {
   list-style-image: url('%image_prefix;/folder.png');
 }
@@ -114,5 +136,25 @@ div.summary ul ul {
   color: black;
   background-color: #afa;
   font-weight:bold
+}
+hr.left, hr.right, hr.full  {
+  border-top: solid 1px black;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
+}
+/* trees */
+hr.left {
+  margin-left:0;
+  margin-right: 50%%;
+}
+hr.right {
+  margin-left: 50%%;
+  margin-right: 0;
+}
+hr.full {
+  margin-left: 0;
+  margin-right: 0;
 }
 </style>

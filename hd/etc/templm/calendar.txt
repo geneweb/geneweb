@@ -1,0 +1,235 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/03/02 geneweb-6.04 templ=templm -->
+  <title>[*calendar/calendars]1</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  %include.css;
+  <style type="text/css">
+    /* calendar.txt */
+    #calendar {margin-right: auto; margin-left: auto;}
+    #calendar th {background-color: #E7EDB3; padding: 5px;}
+    #calendar input {text-align: right;}
+    #calendar select {text-align: center; width: 100%%;}
+  </style>
+  %base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%if;not cancel_links;
+  <div class="menu2">
+    %if;has_referer;
+      <a href="%referer;" title="[back]">&lt;&lt;</a>
+    %end;
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
+%end;
+
+<h1>[*calendar/calendars]1</h1>
+
+%define;french_day(xx)
+  %apply;nth%with;
+    /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi
+    /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi
+    /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi
+  %and;xx%end;
+%end;
+
+%define;french_year(xx)
+  %apply;nth%with;
+    /I/II/III/IV/V/VI/VII/VIII/IX/X/XI/XII/XIII/XIV
+  %and;xx%end;
+%end;
+
+%define;day(ccc, nnn)
+  <td><input type="submit" name="dccc1" value="&lt;"%/></td>
+  <td><input name="dccc" size="2" maxlength="2" value="%date.nnn.day;"%/></td>
+  <td><input type="submit" name="dccc2" value="&gt;"%/></td>
+%end;
+
+%define;month(ccc, nnn, vvv, lll)
+  <td><input type="submit" name="mccc1" value="&lt;"%/></td>
+  <td>
+    <select name="mccc">
+      %foreach;integer_range(1, vvv)
+        <option value="%integer;"%nn;
+         %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
+           %apply;capitalize%with;%apply;nth("lll", integer-1)%end;
+        </option>
+      %end;
+    </select>
+  </td>
+  <td><input type="submit" name="mccc2" value="&gt;"%/></td>
+%end;
+
+%define;year(ccc, nnn)
+  <td><input type="submit" name="yccc1" value="&lt;"%/></td>
+  <td><input name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
+  <td><input type="submit" name="yccc2" value="&gt;"%/></td>
+%end;
+
+%define;julian_year(ccc, nnn)
+  %let;year;
+    %if;(date.julian.month < 3 or
+         date.julian.month = 3 and date.julian.day < 25)
+      %expr(date.nnn.year - 1)/%expr(date.nnn.year % 10)
+    %else;%date.nnn.year;%end;
+  %in;
+  <td><input type="submit" name="yccc1" value="&lt;"%/></td>
+  <td><input name="yccc" size="6" maxlength="6" value="%year;"%/></td>
+  <td><input type="submit" name="yccc2" value="&gt;"%/></td>
+%end;
+
+%define;calendar(ccc, nnn, vvv, lll, yyy)
+  %if;([ !dates order] = "ddmmyy")
+    %apply;day("ccc", "nnn")
+    %apply;month("ccc", "nnn", "vvv", "lll")
+    %apply;yyy("ccc", "nnn")
+  %else;
+    %apply;yyy("ccc", "nnn")
+    %apply;month("ccc", "nnn", "vvv", "lll")
+    %apply;day("ccc", "nnn")
+  %end;
+  <td><input type="submit" name="tccc" value="="%/></td>
+%end;
+
+<table id="calendar">
+<tr>
+  <td>
+    <form method="get" action="%action;">
+      <p>
+        %hidden;
+        <input type="hidden" name="m" value="CAL"%/>
+      </p>
+    <table>
+    <tr>
+      <td>&nbsp;</td>
+      %if;([ !dates order] = "ddmmyy")
+        <th colspan="3">[*year/month/day]2</th>
+        <th colspan="3">[*year/month/day]1</th>
+        <th colspan="3">[*year/month/day]0</th>
+      %else;
+        <th colspan="3">[*year/month/day]0</th>
+        <th colspan="3">[*year/month/day]1</th>
+        <th colspan="3">[*year/month/day]2</th>
+      %end;
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <th>[*gregorian/julian/french/hebrew]0</th>
+      %apply;calendar("g", "gregorian", 12, [(month)], "year")
+    </tr>
+    <tr>
+      <th>[*gregorian/julian/french/hebrew]1</th>
+      %apply;calendar("j", "julian", 12, [(month)], "julian_year")
+    </tr>
+    <tr>
+      <th>[*gregorian/julian/french/hebrew]2</th>
+      %apply;calendar("f", "french", 13, [(french revolution month)], "year")
+    </tr>
+    <tr>
+      <th>[*gregorian/julian/french/hebrew]3</th>
+      %apply;calendar("h", "hebrew", 13, [(hebrew month)], "year")
+    </tr>
+  </table>
+  </form>
+  </td>
+</tr>
+<tr>
+<td>
+  <ul>
+    <li>
+      %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
+      %if;(date.julian_day = today.julian_day)%sp;%time;%end;
+    </li>
+    %if;(date.julian_day > 2375839 and date.julian_day < 2380688)
+      <li>%apply;french_day(date.french.day),%sp;%date.french.day;
+          %sp;%apply;capitalize%with;%apply;nth([(french revolution month)], date.french.month -1)%end;
+          %sp;an %apply;french_year(date.french.year) 
+      </li>
+    %end;
+    <li>
+      [*moon age/new moon/first quarter/full moon/last quarter]0 : %date.moon_age;
+      %if;(date.moon_phase.index != 0)
+        %sp;-%sp;
+        %apply;capitalize%with;
+          %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
+                     date.moon_phase.index) :%sp;
+           %date.moon_phase.hour;:%date.moon_phase.minute; UT
+        %end;
+      %end;
+    </li>
+    <li>
+      [*julian day] :%sp;
+      %if;(date.julian_day < 1000)%date.julian_day;
+      %else;%date.julian_day.sep1000;
+      %end;
+    </li>
+  </ul>
+  %if;(wizard or friend)
+    <form method="get" action="%action;">
+      <p>
+      <a href="%prefix;m=STAT">[*statistics] :</a>%sp;
+      %hidden;
+      <input name="k" value="%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;" size="5" maxlength="5" %/>
+      <label>
+        <input type="radio" name="m" value="LB" checked="checked" %/>
+        [birth]
+      </label>
+      <label>
+        <input type="radio" name="m" value="LM" %/>
+        [marriage/marriages]0
+      </label>
+      <label>
+        <input type="radio" name="m" value="LD" %/>
+        [death]
+      </label>
+      … ([before (date)]…
+        %if;([ !dates order]0 = "ddmmyy")
+          <input name="bd" value="%expr(date.gregorian.day + 1)" size="2" maxlength="2" %/>
+          <input name="bm" value="%date.gregorian.month;" size="2" maxlength="2" %/>
+          <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>
+        %else;
+          <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>
+          <input name="bm" value="%date.gregorian.month;" size="2" maxlength="2" %/>
+          <input name="bd" value="%expr(date.gregorian.day + 1)" size="2" maxlength="2" %/>
+        %end;)
+      <input type="submit" value="Ok" %/>
+      </p>
+    </form>
+    <ul>
+      <li>
+        <a href="%prefix;m=POP_PYR;i=5;lim=0;y=%date.gregorian.year;">
+          [population pyramid] (%date.gregorian.year;)
+        </a>
+      </li>
+      <li>
+        <a href="%prefix;m=AN;v=%date.gregorian.month;">
+          [birthdays] (%apply;capitalize%with;%apply;nth([(month)], date.gregorian.month-1)%end;)
+        </a>
+      </li>
+      <li>
+        <a href="%prefix;m=AD;v=%date.gregorian.month;">
+          [anniversaries of dead people] (%apply;capitalize%with;%apply;nth([(month)], date.gregorian.month-1)%end;)
+        </a>
+      </li>
+      <li>
+        <a href="%prefix;m=AM;v=%date.gregorian.month;">
+          [anniversaries of marriage] (%apply;capitalize%with;%apply;nth([(month)], date.gregorian.month-1)%end;)
+        </a>
+      </li>
+    </ul>
+  %end;
+</td>
+</tr>
+</table>
+%base_trailer;
+%copyright;
+</body>
+</html>

@@ -25,10 +25,10 @@
       %end;
     %end;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   <style type="text/css">
     /* anclist.txt */
@@ -87,7 +87,7 @@
 <body%body_prop; id="anclist">
 %message_to_wizard;
 
-<h1 style="text-align:center" class="highlight">%nn;
+<h1>%nn;
   %if;(evar.t = "F" and evar.opt = "csv")
   %elseif;(evar.t = "F" and evar.opt = "fam")
     %apply;a_of_b%with;
@@ -102,7 +102,7 @@
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;<br %/>
+    %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
     - [*surnames list] -
   %else;
     %apply;a_of_b%with;[*ancestors]%and;
@@ -160,7 +160,7 @@
         "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
         "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
     %end;
-    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br %/>
+    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br%/>
     %if;(pp.has_parents)
       %apply;ancestors_horizontally(
         "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
@@ -253,10 +253,10 @@
         %incr_count;%count;
         %apply;csv_line1("yy.zz")
         %apply;csv_line2()
-        <br %/>
+        <br%/>
         %if;(spouse.sosa_in_list = "")
           %incr_count;%count;
-          %apply;csv_line3("spouse","yy.zz",family_cnt)<br %/>
+          %apply;csv_line3("spouse","yy.zz",family_cnt)<br%/>
         %end;        
         %if;(evar.cousins="on" and child.has_families and child.sosa_in_list = "")
           %apply;csv_line("yy.zz",child_cnt)
@@ -265,7 +265,7 @@
     %else;
     %incr_count;%count;
     %apply;csv_line1("yy.zz")%nn;
-     ;;;<br %/>
+     ;;;<br%/>
     %end;
   %end;
 %end;
@@ -353,7 +353,7 @@
     [marriage/marriages]0%nn;
   %and;
     %if;(cancel_links or xx.is_restricted)
-      %xx;<br %/> &amp; %spouse;%nn;
+      %xx;<br%/> &amp; %spouse;%nn;
     %else;
       <a href="%prefix;%xx.access;">%xx;</a> &amp; %spouse;%nn;   
     %end;
@@ -578,7 +578,7 @@
   ;[marriage/marriages]0_first_name_key_val%nn;
   ;[marriage/marriages]0_surname_key_val%nn;
   ;[marriage/marriages]0_occ%nn;
-  <br %/>
+  <br%/>
   %reset_count;
   %foreach;ancestor_level(evar.v + 1)
     %if;(level != 1 and evar.only != "on" or level = evar.v + 1)

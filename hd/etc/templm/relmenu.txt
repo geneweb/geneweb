@@ -3,16 +3,16 @@
 <head>
   <!-- $Id: relmenu.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/02/27 geneweb-6.04 templ=templm -->
   <!-- cousmenu.txt is included in relmenu.txt -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
-    %else;%first_name; %surname;%end; [and]0...%nn;
+    %else;%first_name; %surname;%end; [and]0…%nn;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   <style type="text/css">
     /* ancmenu.txt, desmenu.txt, relmenu.txt */
@@ -43,12 +43,12 @@
 %end;
 
 
-<h1 style="text-align:center" class="highlight">[*link between]%sp;
+<h1>[*link between]%sp;
   %if;(public_name != "")%public_name;%else;%first_name;%end;
   %if;(qualifier != "") <em>%qualifier;</em>%end;
   %sp;%surname;
   %if;(alias != "") <em>(%alias;)</em>%end;
-  %sp;[and]0...%nn;
+  %sp;[and]0…%nn;
 </h1>
 
 %if;not cancel_links;
@@ -64,26 +64,26 @@
 <form method="get" action="%action;">
 <p>
 %hidden;
-<input type="hidden" name="em" value="R" %/>
+<input type="hidden" name="em" value="R"%/>
 %if;access_by_key;
-  <input type="hidden" name="ep" value="%first_name_key_val;" %/>
-  <input type="hidden" name="en" value="%surname_key_val;" %/>
+  <input type="hidden" name="ep" value="%first_name_key_val;"%/>
+  <input type="hidden" name="en" value="%surname_key_val;"%/>
   %if;(occ != "0")
-    <input type="hidden" name="eoc" value="%occ;" %/>
+    <input type="hidden" name="eoc" value="%occ;"%/>
   %end;
 %else
-  <input type="hidden" name="ei" value="%index;" %/>
+  <input type="hidden" name="ei" value="%index;"%/>
 %end;
 </p>
 
 <fieldset style="width: auto;">
-    <input type="hidden" name="m" value="NG" %/>
-    <input type="radio" name="select" value="input" checked="checked" %/>
-    <input name="n" size="40" maxlength="200" %/>
-    <input type="submit" value="Ok" %/>
-    <br %/>&nbsp;&nbsp;&nbsp;
+    <input type="hidden" name="m" value="NG"%/>
+    <input type="radio" name="select" value="input" checked="checked"%/>
+    <input name="n" size="40" maxlength="200"%/>
+    <input type="submit" value="Ok"%/>
+    <br%/>&nbsp;&nbsp;&nbsp;
     <label>
-        <input type="radio" name="t" value="PN" checked="checked" %/>
+        <input type="radio" name="t" value="PN" checked="checked"%/>
         <em>[first name/first names]0 [surname/surnames]0</em>
         [or] <em>[public name]</em>
         [or] <em>[alias]</em>
@@ -93,22 +93,22 @@
           %end;
         %end;
     </label>
-    <br %/>&nbsp;&nbsp;&nbsp;
+    <br%/>&nbsp;&nbsp;&nbsp;
     <label>
-        <input type="radio" name="t" value="P" %/>
+        <input type="radio" name="t" value="P"%/>
         <em>[first name/first names]0</em>
     </label>
-    <br %/>&nbsp;&nbsp;&nbsp;
+    <br%/>&nbsp;&nbsp;&nbsp;
     <label>
-        <input type="radio" name="t" value="N" %/>
+        <input type="radio" name="t" value="N"%/>
         <em>[surname/surnames]0</em>
     </label>
 
   %foreach;family;
     %if;(spouse != "? ?")
-      <br %/>
+      <br%/>
       <label>
-        <input type="radio" name="select" value="%spouse.index;" %/>
+        <input type="radio" name="select" value="%spouse.index;"%/>
         %apply;capitalize(nth([husband/wife],spouse.sex))%nl;:%nl;%spouse;
         %if;spouse.has_nobility_titles;,%sp;
         <em>%spouse.nobility_title;</em>%end;%nl;
@@ -117,18 +117,18 @@
   %end;
   %foreach;relation;
     %if;has_relation_him;
-      <br %/>
+      <br%/>
       <label>
-        <input type="radio" name="select" value="%relation_him.index;" %/>
+        <input type="radio" name="select" value="%relation_him.index;"%/>
         %apply;capitalize(relation_him.type)%nl;:%nl;%relation_him;
         %if;relation_him.has_nobility_titles;,%sp;
         <em>%relation_him.nobility_title;</em>%end;%nl;
       </label>
     %end;
     %if;has_relation_her;
-      <br %/>
+      <br%/>
       <label>
-        <input type="radio" name="select" value="%relation_her.index;" %/>
+        <input type="radio" name="select" value="%relation_her.index;"%/>
         %apply;capitalize(relation_her.type)%nl;:%nl;%relation_her;
         %if;relation_her.has_nobility_titles;,%sp;
         <em>%relation_her.nobility_title;</em>%end;%nl;
@@ -136,9 +136,9 @@
     %end;
   %end;
   %foreach;related;
-    <br %/>
+    <br%/>
     <label>
-      <input type="radio" name="select" value="%related.index;" %/>
+      <input type="radio" name="select" value="%related.index;"%/>
       %apply;capitalize(related.type)%nl;:%nl;%related;
       %if;related.has_nobility_titles;,%sp;
       <em>%related.nobility_title;</em>%end;%nl;
@@ -146,9 +146,9 @@
   %end;
   %foreach;family;
     %foreach;witness;
-      <br %/>
+      <br%/>
       <label>
-        <input type="radio" name="select" value="%witness.index;" %/>
+        <input type="radio" name="select" value="%witness.index;"%/>
         [*witness/witnesses]0%nl;:%nl;%witness;%nl;
       </label>
     %end;
@@ -156,68 +156,68 @@
 </fieldset>
 <fieldset>
     <label>
-      <input type="radio" name="et" value="A" checked="checked" %/>
+      <input type="radio" name="et" value="A" checked="checked"%/>
       [*ancestors]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="radio" name="et" value="M" %/>
+      <input type="radio" name="et" value="M"%/>
       [*relationships by marriage]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="radio" name="et" value="S" %/>
+      <input type="radio" name="et" value="S"%/>
       [*shortest path]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="checkbox" name="long" value="on" %/>
+      <input type="checkbox" name="long" value="on"%/>
       [*long display]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="checkbox" name="spouse" value="on" checked="checked" %/>
+      <input type="checkbox" name="spouse" value="on" checked="checked"%/>
       [*include spouses]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="checkbox" name="cgl" value="on" %/>
+      <input type="checkbox" name="cgl" value="on"%/>
       [*cancel GeneWeb links]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="checkbox" name="image" value="on" %/>
+      <input type="checkbox" name="image" value="on"%/>
       [*image/images]1
     </label>
-    <br %/>
+    <br%/>
     <label>
       [*border]
-      <input name="bd" size="1" maxlength="2" value="0" %/>
+      <input name="bd" size="1" maxlength="2" value="0"%/>
     </label>
-    <br %/>
+    <br%/>
       <table summary="colors" cellpadding="0" cellspacing="0">
         <tr>
           <td align="%left;">[*color]&nbsp;</td>
           <td>
-            <input type="radio" name="color" value="" checked="checked" %/>
+            <input type="radio" name="color" value="" checked="checked"%/>
           </td>
-          <td style="background:#FFC0C0">
-            <input type="radio" name="color" value="#FFC0C0" %/>
+          <td class="bg1">
+            <input type="radio" name="color" value="bg1"%/>
           </td>
-          <td style="background:#FFFFC0">
-            <input type="radio" name="color" value="#FFFFC0" %/>
+          <td class="bg2">
+            <input type="radio" name="color" value="bg2"%/>
           </td>
-          <td style="background:#C0FFC0">
-            <input type="radio" name="color" value="#C0FFC0" %/>
+          <td class="bg3">
+            <input type="radio" name="color" value="bg3"%/>
           </td>
-          <td style="background:#C0FFFF">
-            <input type="radio" name="color" value="#C0FFFF" %/>
+          <td class="bg4">
+            <input type="radio" name="color" value="bg4"%/>
           </td>
-          <td style="background:#C0C0FF">
-            <input type="radio" name="color" value="#C0C0FF" %/>
+          <td class="bg5">
+            <input type="radio" name="color" value="bg5"%/>
           </td>
-          <td style="background:#FFC0FF">
-            <input type="radio" name="color" value="#FFC0FF" %/>
+          <td class="bg6">
+            <input type="radio" name="color" value="bg6"%/>
           </td>
         </tr>
       </table>
@@ -228,15 +228,15 @@
   <form method="get" action="%action;">
   <fieldset>
       %hidden;
-      <input type="hidden" name="m" value="C" %/>
+      <input type="hidden" name="m" value="C"%/>
       %if;access_by_key;
-        <input type="hidden" name="p" value="%first_name_key_val;" %/>
-        <input type="hidden" name="n" value="%surname_key_val;" %/>
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
         %if;(occ != "0")
-          <input type="hidden" name="oc" value="%occ;" %/>
+          <input type="hidden" name="oc" value="%occ;"%/>
         %end;
       %else
-        <input type="hidden" name="i" value="%index;" %/>
+        <input type="hidden" name="i" value="%index;"%/>
       %end;
       <select name="v1">
         %foreach;cousin_level;
@@ -253,19 +253,19 @@
           </option>
          %end;
       </select>
-      <input type="submit" value="Ok" %/>
-      <br %/>
+      <input type="submit" value="Ok"%/>
+      <br%/>
       <label>
-        <input type="checkbox" name="csp" value="on" %/>
+        <input type="checkbox" name="csp" value="on"%/>
         [*include spouses]
       </label>
     %if;(father.has_siblings or mother.has_siblings)
-        <br %/>
-        <a href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
+        <br%/>
+        <a href="%prefix;%access;;m=C;v1=2;v2=1">- [*uncles and aunts]</a>
     %end;
     %if;has_nephews_or_nieces;
-        <br %/>
-        <a href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
+        <br%/>
+        <a href="%prefix;%access;;m=C;v1=1;v2=2">- [*nephews and nieces]</a>
     %end;
   </fieldset>
   </form>

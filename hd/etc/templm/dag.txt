@@ -3,34 +3,17 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/03/02 geneweb-6.04 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
     %else;%head_title;%end;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    hr.left {
-      direction: ltr;
-      width: 50%%;
-      text-align: left;
-      margin-left: 0;
-    } 
-    hr.right {
-      direction: ltr;
-      width: 50%%;
-      text-align: right;
-      margin-right: 0;
-    }
-    hr.full {
-      width:100%%;
-    }
-  </style>
   %base_header;
 </head>
 <body%body_prop; id="dag">
@@ -45,7 +28,7 @@
   </div>
 %end;
 %if;(evar.slices = "on")
-  <h1 style="text-align:center" class="highlight">%nn;
+  <h1>%nn;
     [*display by slices/slice width/overlap/total width]0%nn;
   </h1>
   <form method="GET" action="%action;">
@@ -53,7 +36,7 @@
   %hidden;
   %foreach;env_binding;
     %if;(env.key != "slices")
-      <input type="hidden" name="%env.key;" value="%env.val.decoded;" %/>
+      <input type="hidden" name="%env.key;" value="%env.val.decoded;"%/>
     %end;
   %end;
   </p>
@@ -62,7 +45,7 @@
     <td align="%right;">
       <label>
       [*don't group the common branches together]
-      <input type="checkbox" name="nogroup" value="on" %/>
+      <input type="checkbox" name="nogroup" value="on"%/>
       </label>
     </td>
   </tr>
@@ -70,7 +53,7 @@
     <td align="%right;">
       <label>
       [*display by slices/slice width/overlap/total width]1
-      <input name="dpos" size="5" value="78" %/>
+      <input name="dpos" size="5" value="78"%/>
       </label>
     </td>
   </tr>
@@ -78,7 +61,7 @@
     <td align="%right;">
       <label>
       [*display by slices/slice width/overlap/total width]2
-      <input name="overlap" size="5" value="10" %/>
+      <input name="overlap" size="5" value="10"%/>
       </label>
     </td>
   </tr>
@@ -90,17 +73,17 @@
       <input name="width" size="5" value="%nn;
         %if;(dag.max_wid <= 78)%dag.max_wid;
         %elseif;(dag.min_wid >= 78)%dag.min_wid;
-        %else;78%end;" %/>
+        %else;78%end;"%/>
       </label>
     </td>
   </tr>
   </table>
-  <p><input type="submit" value="Ok" %/></p>
+  <p><input type="submit" value="Ok"%/></p>
   </form>
 %else;
   %if;(evar.notab != "on" and not cancel_links)
     <div style="text-align:%right;">
-     <br %/>
+     <br%/>
      <a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;%nn;
        notab=on;slices=on" accesskey="/" title="[*display by slices/slice width/overlap/total width]0">
        <tt>//</tt>
@@ -157,7 +140,7 @@
         %if;dag_cell.is_nothing;&nbsp;%nn;
         %elseif;dag_cell.is_bar;
           %if;(dag_cell.bar_link != "" and evar.cgl != "on")
-            <a style="text-decoration:none" href="%dag_cell.bar_link;">|</a>%nn;
+            <a style="text-decoration:none;" href="%dag_cell.bar_link;">|</a>%nn;
           %else;|%end;
         %elseif;(dag_cell.item != "")%dag_cell.item;
         %elseif;(dag_cell.text != "")%dag_cell.text;
