@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/02/20 geneweb-6.04 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -13,10 +13,10 @@
       %sp;%surname;
     %end;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <script type="text/javascript">
     <!--
     function valid(id) {
@@ -50,7 +50,7 @@
 <body%body_prop; id="menutxt">
 %message_to_wizard;
 
-<h1 style="text-align:center" class="highlight">%nn;
+<h1>%nn;
   %apply;a_of_b_gr_eq_lev%with;
     [*descendants]%nn;
   %and;
@@ -73,15 +73,15 @@
   <form method="get" action="%action;">
     <p>
       %hidden;
-      <input type="hidden" name="m" value="D" %/>
+      <input type="hidden" name="m" value="D"%/>
       %if;access_by_key;
-        <input type="hidden" name="p" value="%first_name_key_val;" %/>
-        <input type="hidden" name="n" value="%surname_key_val;" %/>
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
         %if;(occ != "0")
-          <input type="hidden" name="oc" value="%occ;" %/>
+          <input type="hidden" name="oc" value="%occ;"%/>
         %end;
       %else
-        <input type="hidden" name="i" value="%index;" %/>
+        <input type="hidden" name="i" value="%index;"%/>
       %end;
     </p>
         <fieldset>
@@ -101,43 +101,43 @@
               </option>
             %end;
           </select>
-          <input type="submit" value="Ok" %/>
-          <br %/><br %/>
+          <input type="submit" value="Ok"%/>
+          <br%/><br%/>
           <label>
-            <input type="checkbox" name="cgl" value="on" %/>
+            <input type="checkbox" name="cgl" value="on"%/>
             [*cancel GeneWeb links]
           </label>
-          <br %/>
+          <br%/>
           <label>
-            <input type="radio" name="t" value="S" %/>
+            <input type="radio" name="t" value="S"%/>
             [*only the generation selected]
           </label>
-          <br %/>
+          <br%/>
           <label>
-            <input type="radio" name="t" value="N" %/>
+            <input type="radio" name="t" value="N"%/>
             [*families with encoding]
           </label>
-          <br %/>
+          <br%/>
           <label>
-            <input type="radio" name="t" value="G" %/>
+            <input type="radio" name="t" value="G"%/>
             [*index of the descendants]
           </label>
-          <br %/>
+          <br%/>
           <label>
-            <input type="radio" name="t" value="C" %/>
+            <input type="radio" name="t" value="C"%/>
             [*index of the spouses (non descendants)]
           </label>
-          <br %/>
+          <br%/>
           <label>
-            <input type="radio" name="t" value="A" %/>
-            d'Aboville
+            <input type="radio" name="t" value="A"%/>
+            d’Aboville
           </label>
-          <br %/>
+          <br%/>
     </fieldset>
     <fieldset>
     <legend>
       <label>
-        <input type="radio" name="t" value="L" checked="checked" %/>
+        <input type="radio" name="t" value="L" checked="checked"%/>
         [*list/list (ancestors)]0
       </label>
     </legend>
@@ -149,59 +149,64 @@
         ([maximum] %bvar.max_desc_level; [generation/generations]1)
       %end;
       <label>
-        <input type="radio" name="t" value="M" %/>
+        <input type="radio" name="t" value="M"%/>
         [*male line/female line]0
       </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="radio" name="t" value="F" %/>
+        <input type="radio" name="t" value="F"%/>
         [*male line/female line]1
       </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="checkbox" name="alwsurn" value="yes" %/>
+        <input type="checkbox" name="alwsurn" value="yes"%/>
         [*with::surname/surnames]1
       </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="checkbox" name="rel" value="on" %/>
+        <input type="checkbox" name="alias" value="on" checked="checked" onchange="valid('tG')"%/>
+          [*surname alias], [*first name alias]
+        </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="rel" value="on"%/>
         [*relation/relations]1
       </label>
-      <br %/>
+      <br%/>
         <label>
-        <input type="checkbox" name="spouse" value="on" checked="checked" %/>
+        <input type="checkbox" name="spouse" value="on" checked="checked"%/>
         [*include spouses]
         </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="checkbox" name="parents" value="on" checked="checked" %/>
+        <input type="checkbox" name="parents" value="on" checked="checked"%/>
         [*parents]
       </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="checkbox" name="witn" value="on" %/>
+        <input type="checkbox" name="witn" value="on"%/>
         [*witness/witnesses]1 ([marriage/marriages]1)
       </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="checkbox" name="comm" value="on" %/>
+        <input type="checkbox" name="comm" value="on"%/>
         [*comment] ([marriage/marriages]1)
       </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="checkbox" name="notes" value="on" checked="checked" %/>
+        <input type="checkbox" name="notes" value="on" checked="checked"%/>
         [*note/notes]1
       </label>
-      <br %/>
+      <br%/>
       <label>
-        <input type="checkbox" name="src" value="on" checked="checked" %/>
+        <input type="checkbox" name="src" value="on" checked="checked"%/>
         [*source/sources]1
       </label>
     </fieldset>
     <fieldset>
     <legend>
       <label>
-        <input type="radio" id="tT" name="t" value="T" %/>
+        <input type="radio" id="tT" name="t" value="T"%/>
         [*tree]
         %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
           ([maximum] 4 [generation/generations]1)
@@ -213,38 +218,38 @@
       </label>
     </legend>
       <label>
-       <input type="checkbox" name="image" value="on" onchange="valid('tT')" %/>
+       <input type="checkbox" name="image" value="on" onchange="valid('tT')"%/>
         [*image/images]1
       </label>
-      <br %/>
+      <br%/>
       <label>
         [*border]
-        <input name="bd" size="1" maxlength="2" value="0" onchange="valid('tT')" %/>
+        <input name="bd" size="1" maxlength="2" value="0" onchange="valid('tT')"%/>
       </label>
-      <br %/>
+      <br%/>
       <table summary="colors" cellpadding="0" cellspacing="0">
         <tr>
           <td align="%left;">[*color]&nbsp;</td>
           <td>
-            <input type="radio" name="color" value="" checked="checked" onchange="valid('tT')" %/>
+            <input type="radio" name="color" value="" checked="checked" onchange="valid('tT')"%/>
           </td>
-          <td style="background:#FFC0C0">
-            <input type="radio" name="color" value="#FFC0C0" onchange="valid('tT')" %/>
+          <td class="bg1">
+            <input type="radio" name="color" value="bg1" onchange="valid('tT')"%/>
           </td>
-          <td style="background:#FFFFC0">
-            <input type="radio" name="color" value="#FFFFC0" onchange="valid('tT')" %/>
+          <td class="bg2">
+            <input type="radio" name="color" value="bg2" onchange="valid('tT')"%/>
           </td>
-          <td style="background:#C0FFC0">
-            <input type="radio" name="color" value="#C0FFC0" onchange="valid('tT')" %/>
+          <td class="bg3">
+            <input type="radio" name="color" value="bg3" onchange="valid('tT')"%/>
           </td>
-          <td style="background:#C0FFFF">
-            <input type="radio" name="color" value="#C0FFFF" onchange="valid('tT')" %/>
+          <td class="bg4">
+            <input type="radio" name="color" value="bg4" onchange="valid('tT')"%/>
           </td>
-          <td style="background:#C0C0FF">
-            <input type="radio" name="color" value="#C0C0FF" onchange="valid('tT')" %/>
+          <td class="bg5">
+            <input type="radio" name="color" value="bg5" onchange="valid('tT')"%/>
           </td>
-          <td style="background:#FFC0FF">
-            <input type="radio" name="color" value="#FFC0FF" onchange="valid('tT')" %/>
+          <td class="bg6">
+            <input type="radio" name="color" value="bg6" onchange="valid('tT')"%/>
           </td>
         </tr>
       </table>

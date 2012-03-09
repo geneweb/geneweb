@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/03 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/02/27 geneweb-6.04 templ=templm -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -13,12 +13,31 @@
       %if;(qualifier != "") %qualifier;%end; %surname;
     %end;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   <style type="text/css">
+    table hr {
+    border-top: solid 1px black;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    margin:0;
+    }
+    hr.left {
+    margin-left:0;
+    margin-right: 50%%;
+    }
+    hr.right {
+    margin-left: 50%%;
+    margin-right: 0;
+    }    
+    hr.full {
+    margin-left: 0;
+    margin-right: 0;
+    }
     .color_sosa {
     	color: rgb(255,215,0);
     }
@@ -26,10 +45,12 @@
   %base_header;
 
 %define;symbol(xx)
-  %if;(xx.has_sosa and evar.cgl != "on")
-    <span class="color_sosa">%if;xx.has_siblings;&diams;%else;&loz;%end;</span>
+  %if;(evar.cgl != "on")
+    %if;(xx.has_sosa)
+      <span class="color_sosa">%if;xx.has_siblings;&diams;%else;&loz;%end;</span>
+    %end;
   %else;
-  |
+    |
   %end;
 %end;
 
@@ -55,9 +76,9 @@
     %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
     %else;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
-        <table border="%evar.bd;"><tr>
+        <table style="border:%evar.bd;"><tr>
         <td align="center"%nn;
-         %if;(evar.color != "") style="background:%evar.color;"%end;>%nn;
+         %if;(evar.color != "") class="%evar.color;"%end;>%nn;
       %end;
       %if;(evar.cgl = "on")%cell.person;
       %else;
@@ -69,13 +90,13 @@
         </tr></table>
       %end;
       %if;(evar.image = "on" and cell.person.has_image)
-        <br %/>
+        <br%/>
         <table border="0" align="center"><tr align="left">
         <td>%nn;
         %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
         <img%sp;
         src="%cell.person.image_url;"%cell.person.image_small_size;%sp;
-         border="0" alt="[image/images]0" %/>%nn;
+         border="0" alt="[image/images]0"%/>%nn;
         %if;(evar.cgl != "on")</a>%end;</td>%nl;
         </tr></table>
       %end;
@@ -116,7 +137,7 @@
     %foreach;cell;
       %if;(not is_first)
         <td colspan="1" align="center">%nn;
-        %if;(cell.is_right)<hr width="100%%" %/>%nn;
+        %if;(cell.is_right)<hr class="full"%/>%nn;
         %else;<tt>&nbsp;</tt>%end;
         </td>
       %end;
@@ -125,8 +146,8 @@
          %elseif;cell.is_right;%left;
          %else;center%end;">%nn;
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-      %elseif;cell.is_left;<hr dir="ltr" width="50%%" align="%right;" %/>%nn;
-      %elseif;cell.is_right;<hr dir="ltr" width="50%%" align="%left;" %/>%nn;
+      %elseif;cell.is_left;<hr class="%right;"%/>%nn;
+      %elseif;cell.is_right;<hr class="%left;"%/>%nn;
       %else;|%end;
       </td>
     %end;
@@ -138,7 +159,7 @@
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;("xx" != "self")<br %/>|<br %/>%end;
+    %if;("xx" != "self")<br%/>|<br%/>%end;
   %end;%nl;
 %end;
 
@@ -146,7 +167,7 @@
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
     <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;("xx" != "self")<br %/>|<br %/>%end;
+    %if;("xx" != "self")<br%/>|<br%/>%end;
   %end;%nl;
 %end;
 
@@ -173,7 +194,7 @@
 
 %if;(evar.t = "T" and not cancel_links)%nn;
   <div style="text-align:%right;">
-    <br %/>
+    <br%/>
     <a href="%prefix;m=A;t=T;v=%evar.v;;%access;;dag=on;notab=on;slices=on">
       <tt>//</tt>
     </a>

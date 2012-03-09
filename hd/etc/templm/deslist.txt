@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/02/20 geneweb-6.04 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -14,10 +14,10 @@
       %sp;%surname;
     %end;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   <style type="text/css">
     .nobr {
@@ -38,7 +38,7 @@
     }
     .border_sex_2 {
     	border-left-width: 5px;
-    	border-left-color: rgb(255,0,0);
+    	border-left-color: rgb(255,255,255);
     }
     .border_sosa {
     	border-left: solid 5px rgb(255,215,0);
@@ -59,7 +59,7 @@
     	color: rgb(255,182,193);
     }
     .color_sex_2 {
-    	color: rgb(255,0,0);
+    	color: rgb(255,255,255);
     }
     /* deslist.txt */
     #deslist li {
@@ -91,6 +91,10 @@
     %elseif;is_no_mention;date_place [with]%nn;
     %end;
   %end;
+  …
+  %if;are_divorced;[divorced]%divorce_date;…%nn;
+  %elseif;are_separated;[separated]…%nn;
+  %end;
 %end;
 
 %define;link_mod_fam()
@@ -115,7 +119,7 @@
     <span class="color_sosa">%apply;symbol2("xx")</span>%nn;
   %else;
     %apply;symbol2("xx")
-  %end;
+  %end;  
 %end;
 
 %define;symbol(xx)
@@ -136,7 +140,7 @@
 
 %define;somebody_long_info(xx)
   %if;xx.has_aliases;
-    %foreach;xx.alias;, [alias] <em>%alias;</em>%end;
+    %foreach;xx.alias;, <em><strong>%alias;</strong></em>%end;
   %end;
   %if;(("xx" = "ancestor" or xx.sosa_in_list = "") and xx.has_nobility_titles)
     <em>%nn;
@@ -144,6 +148,23 @@
     </em>%nn;
   %end;
   %if;(xx.has_linked_pages and xx.has_linked_page.HEAD), %xx.linked_page.HEAD;%end;
+  %if;(xx.has_public_name or xx.has_qualifiers)
+    , <em>(%xx.first_name; %xx.surname;)</em>%nn;
+  %end;
+  %if;(evar.alias="on")
+    <small>
+    %if;xx.has_surnames_aliases;
+      %foreach;xx.surname_alias;
+        , <em>(%surname_alias;)</em>%nn;
+      %end;
+    %end;
+    %if;xx.has_first_names_aliases;
+      %foreach;xx.first_name_alias;
+        , <em>(%first_name_alias;)</em>%nn;
+      %end;
+    %end;
+    </small>
+  %end;
   %if;(xx.has_birth_date or xx.has_birth_place)
     , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
     %if;xx.has_birth_date; %xx.on_birth_date;%end;
@@ -212,21 +233,18 @@
 %end;
 
 %define;somebody_spouse_parent()
-    %if;(evar.parents = "on" and spouse.has_parents)%sp;
-    <br %/>...
-      <small>
-      %apply;a_of_b%with;
-        %if;(spouse.is_male)[son/daughter/child]0
-        %else;[son/daughter/child]1%end;
-      %and;
-        %apply;somebody_spouse_parent1("father") [and]
-        %apply;somebody_spouse_parent1("mother")
-      %end;
-      </small>
+  %if;(evar.parents = "on" and spouse.has_parents)%sp;
+  <br%/>…
+    <small>
+    %apply;a_of_b%with;
+      %if;(spouse.is_male)[son/daughter/child]0
+      %else;[son/daughter/child]1%end;
+    %and;
+      %apply;somebody_spouse_parent1("father") [and]
+      %apply;somebody_spouse_parent1("mother")
     %end;
-    %if;are_divorced;<br %/>... [divorced]0%divorce_date;.%nl;
-    %elseif;are_separated;<br %/>... [separated]0.%nl;
-    %end;
+    </small>
+  %end;
 %end;
 
 %( <!-- end modified mickroue (used in ancsosa.txt, deslist.txt)--> %)
@@ -278,24 +296,24 @@
   %apply;somebody("xx","yy")%sp;
   %incr_count;
   %apply;link_notes("xx")
-  %apply;lazy_print%with;<br %/>%nl;%end;
+  %apply;lazy_print%with;<br%/>%nl;%end;
   %foreach;xx.family;
     %if;(evar.spouse="on")
       %if;(family_cnt != 1 and curlev = 0)<p>%nl;%end;
-      %lazy_force;...
+      %lazy_force;…
       %apply;capitalize%with;
         %apply;married_to%with;
           %xx.is_male;
         %and;
           %if;(on_marriage_date != "") %on_marriage_date;%end;
-          %if;(marriage_place != ""), %marriage_place;,%end;
+          %if;(marriage_place != ""), %marriage_place;%end;
         %end;
-      %end; ...<br %/>...%nl;
+      %end;<br%/>…%nl;
       %apply;somebody("spouse","spouse")
       %incr_count;
       %apply;link_notes("spouse")
       %apply;somebody_spouse_parent()
-      %if;(evar.witn = "on" and has_witnesses)%nl;<br %/>... ([witness/witnesses]1 :
+      %if;(evar.witn = "on" and has_witnesses)%nl;<br%/>… ([witness/witnesses]1 :
         %foreach;witness;
           %if;(not is_first),%nl;%end;
           %apply;link2("witness","witness")
@@ -303,8 +321,6 @@
         %end;)%nn;
       %end;
       %if;(evar.comm = "on" and has_comment)%nl;(%comment;)%end;
-      %if;are_divorced;, <em>[divorced]</em>%end;
-      %if;are_separated;, <em>[separated]</em>%end;
     %end;
     %if;(curlev < maxlev)
       %if;(curlev = 0 or
@@ -313,10 +329,10 @@
            evar.t = "L")
         %if;(family.desc_level < famlev)
           , [see further].
-          %apply;lazy_print%with;<br %/>%nl;%end;
+          %apply;lazy_print%with;<br%/>%nl;%end;
         %elseif;(family.desc_level > famlev)
           , [see above].
-          %apply;lazy_print%with;<br %/>%nl;%end;
+          %apply;lazy_print%with;<br%/>%nl;%end;
         %elseif;has_children;, [having as children] : 
           %family.set_infinite_desc_level;
           %if;(curlev = 0)</p>%nl;%end;
@@ -338,13 +354,13 @@
           %apply;lazy_print%with;%end;
         %else;
           %if;(curlev = 0)%nl;</p>%nl;
-          %else;%apply;lazy_print%with;<br %/>%nl;%end;
+          %else;%apply;lazy_print%with;<br%/>%nl;%end;
           %end;.
         %end;
-      %elseif;has_children;, ...
+      %elseif;has_children;, …
       %end;
     %else;%nl;
-      %apply;lazy_print%with;<br %/>%nl;%end;
+      %apply;lazy_print%with;<br%/>%nl;%end;
     %end;
   %end;
 %end;
@@ -369,7 +385,7 @@
 <body%body_prop; id="deslist">
 %message_to_wizard;
 
-<h1 style="text-align:center" class="highlight">%nn;
+<h1>%nn;
   %apply;a_of_b_gr_eq_lev%with;
     [*descendants]%nn;
   %and;
@@ -399,7 +415,7 @@
 %apply;by_list(desc_lev)
 
 %if;(evar.notes = "on" or evar.src = "on")
-  <hr %/>
+  <hr%/>
   <h3>%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
   <dl class = "notes_src">
     %foreach;sorted_list_item;

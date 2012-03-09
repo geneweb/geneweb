@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/02/27 geneweb-6.04 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -13,10 +13,10 @@
       %sp;%surname;
     %end;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <script type="text/javascript">
     <!--
     function valid(id) {
@@ -49,7 +49,7 @@
 
 <body%body_prop; id="menutxt">
 %message_to_wizard;
-<h1 style="text-align:center" class="highlight">%nn;
+<h1>%nn;
   %apply;a_of_b%with;
     [*ancestors]%nn;
   %and;
@@ -68,15 +68,15 @@
 <form name="ancmenu" method="get" action="%action;">
   <p>
     %hidden;
-    <input type="hidden" name="m" value="A" %/>
+    <input type="hidden" name="m" value="A"%/>
     %if;access_by_key;
-      <input type="hidden" name="p" value="%first_name_key_val;" %/>
-      <input type="hidden" name="n" value="%surname_key_val;" %/>
+      <input type="hidden" name="p" value="%first_name_key_val;"%/>
+      <input type="hidden" name="n" value="%surname_key_val;"%/>
       %if;(occ != "0")
-        <input type="hidden" name="oc" value="%occ;" %/>
+        <input type="hidden" name="oc" value="%occ;"%/>
       %end;
     %else
-      <input type="hidden" name="i" value="%index;" %/>
+      <input type="hidden" name="i" value="%index;"%/>
     %end;
   </p>
   <fieldset>
@@ -97,25 +97,25 @@
         </option>
       %end;
     </select>
-    <input type="submit" value="Ok" %/>
-    <br %/><br %/>
+    <input type="submit" value="Ok"%/>
+    <br%/><br%/>
     <label>
-      <input type="checkbox" name="cgl" value="on" %/>
+      <input type="checkbox" name="cgl" value="on"%/>
       [*cancel GeneWeb links]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="radio" name="t" value="A" %/>
+      <input type="radio" name="t" value="A"%/>
       [*male line/female line]0
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="radio" name="t" value="C" %/>
+      <input type="radio" name="t" value="C"%/>
       [*male line/female line]1
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="radio" name="t" value="L" %/>
+      <input type="radio" name="t" value="L"%/>
       [*list/list (ancestors)]1
       %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
         ([maximum] 8 [generation/generations]1)
@@ -124,9 +124,9 @@
         ([maximum] %bvar.max_anc_level; [generation/generations]1)
       %end;
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="radio" name="t" value="H" %/>
+      <input type="radio" name="t" value="H"%/>
       [*horizontally]
       %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
         ([maximum] 8 [generation/generations]1)
@@ -139,68 +139,73 @@
   </fieldset>
   <fieldset>
     <legend>
-      <label><input type="checkbox" name="only" value="on" %/>
+      <label><input type="checkbox" name="only" value="on"%/>
         [*only the generation selected]
       </label>
     </legend>
     <fieldset>
       <legend>
         <label>
-          <input type="radio" id="tN" name="t" value="N" checked="checked" %/>
+          <input type="radio" id="tN" name="t" value="N" checked="checked"%/>
           [*short display]
         </label>
       </legend>
           Sosa base
-          <label><input type="radio" name="sosab" value="8" onchange="valid('tN')" %/>8</label>
+          <label><input type="radio" name="sosab" value="8" onchange="valid('tN')"%/>8</label>
           <label>%nn
-            <input type="radio" name="sosab" value="10" checked="checked" onchange="valid('tN')" %/>10
+            <input type="radio" name="sosab" value="10" checked="checked" onchange="valid('tN')"%/>10
           </label>
-          <label><input type="radio" name="sosab" value="16" onchange="valid('tN')" %/>16</label>
+          <label><input type="radio" name="sosab" value="16" onchange="valid('tN')"%/>16</label>
     </fieldset>
     <fieldset>
       <legend>
         <label>
-          <input type="radio" id="tG" name="t" value="G" %/>
+          <input type="radio" id="tG" name="t" value="G"%/>
           [*long display]
         </label>
       </legend>
         <label>
-          <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')" %/>
+          <input type="checkbox" name="alias" value="on" checked="checked" onchange="valid('tG')"%/>
+           [*surname alias], [*first name alias]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')"%/>
            [*siblings]
         </label>
-        <br %/>
+        <br%/>
         <label>
-        <input type="checkbox" name="spouse" value="on" checked="checked" onchange="valid('tG')" %/>
+        <input type="checkbox" name="spouse" value="on" checked="checked" onchange="valid('tG')"%/>
         [*include spouses]
         </label>
-        <br %/>
+        <br%/>
         <label>
-        <input type="checkbox" name="parents" value="on" checked="checked" onchange="valid('tG')" %/>
+        <input type="checkbox" name="parents" value="on" checked="checked" onchange="valid('tG')"%/>
         [*parents]
         </label>
-        <br %/>
+        <br%/>
         <label>
-          <input type="checkbox" name="rel" value="on" onchange="valid('tG')" %/>
+          <input type="checkbox" name="rel" value="on" onchange="valid('tG')"%/>
           [*relation/relations]1
         </label>
-        <br %/>
+        <br%/>
         <label>
-          <input type="checkbox" name="witn" value="on" onchange="valid('tG')" %/>
+          <input type="checkbox" name="witn" value="on" onchange="valid('tG')"%/>
           [*witness/witnesses]1 ([marriage/marriages]1)
         </label>
-        <br %/>
+        <br%/>
         <label>
-          <input type="checkbox" name="comm" value="on" onchange="valid('tG')" %/>
+          <input type="checkbox" name="comm" value="on" onchange="valid('tG')"%/>
           [*comment] ([marriage/marriages]1)
         </label>
-        <br %/>
+        <br%/>
         <label>
-          <input type="checkbox" name="notes" value="on" checked="checked" onchange="valid('tG')" %/>
+          <input type="checkbox" name="notes" value="on" checked="checked" onchange="valid('tG')"%/>
           [*note/notes]1
         </label>
-        <br %/>
+        <br%/>
         <label>
-          <input type="checkbox" name="src" value="on" checked="checked" onchange="valid('tG')" %/>
+          <input type="checkbox" name="src" value="on" checked="checked" onchange="valid('tG')"%/>
           [*source/sources]1
         </label>
     </fieldset>
@@ -208,7 +213,7 @@
   <fieldset>
   <legend>
     <label>
-      <input type="radio" id="tT" name="t" value="T" %/>
+      <input type="radio" id="tT" name="t" value="T"%/>
       [*tree]
       %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
         ([maximum] 7 [generation/generations]1)
@@ -220,43 +225,43 @@
     </label>
   </legend>
     <label>
-      <input type="checkbox" name="marriage" value="on" onchange="valid('tT')" %/>
+      <input type="checkbox" name="marriage" value="on" onchange="valid('tT')"%/>
       [*marriage/marriages]0
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="checkbox" name="image" value="on" onchange="valid('tT')" %/>
+      <input type="checkbox" name="image" value="on" onchange="valid('tT')"%/>
       [*image/images]1
     </label>
-    <br %/>
+    <br%/>
     <label>
       [*border]
-      <input name="bd" size="1" maxlength="2" value="0" onchange="valid('tT')" %/>
+      <input name="bd" size="1" maxlength="2" value="0" onchange="valid('tT')"%/>
     </label>
-    <br %/>
+    <br%/>
     <table summary="colors" cellspacing="0" cellpadding="0">
       <tr>
         <td align="%left;">[*color]&nbsp;</td>
         <td align="%left;">
-          <input type="radio" name="color" value="" checked="checked" onchange="valid('tT')" %/>
+          <input type="radio" name="color" value="" checked="checked" onchange="valid('tT')"%/>
         </td>
-        <td style="background:#FFC0C0">
-          <input type="radio" name="color" value="#FFC0C0" onchange="valid('tT')" %/>
+        <td class="bg1">
+          <input type="radio" name="color" value="bg1" onchange="valid('tT')"%/>
         </td>
-        <td style="background:#FFFFC0">
-          <input type="radio" name="color" value="#FFFFC0" onchange="valid('tT')" %/>
+        <td class="bg2">
+          <input type="radio" name="color" value="bg2" onchange="valid('tT')"%/>
         </td>
-        <td style="background:#C0FFC0">
-          <input type="radio" name="color" value="#C0FFC0" onchange="valid('tT')" %/>
+        <td class="bg3">
+          <input type="radio" name="color" value="bg3" onchange="valid('tT')"%/>
         </td>
-        <td style="background:#C0FFFF">
-          <input type="radio" name="color" value="#C0FFFF" onchange="valid('tT')" %/>
+        <td class="bg4">
+          <input type="radio" name="color" value="bg4" onchange="valid('tT')"%/>
         </td>
-        <td style="background:#C0C0FF">
-          <input type="radio" name="color" value="#C0C0FF" onchange="valid('tT')" %/>
+        <td class="bg5">
+          <input type="radio" name="color" value="bg5" onchange="valid('tT')"%/>
         </td>
-        <td style="background:#FFC0FF">
-          <input type="radio" name="color" value="#FFC0FF" onchange="valid('tT')" %/>
+        <td class="bg6">
+          <input type="radio" name="color" value="bg6" onchange="valid('tT')"%/>
         </td>
       </tr>
     </table>
@@ -264,49 +269,49 @@
   <fieldset>
   <legend>
     <label>
-      <input type="radio" id="tF" name="t" value="F" %/>
+      <input type="radio" id="tF" name="t" value="F"%/>
       [*surnames list]
     </label>
   </legend>
-      <label><input type="radio" id="tFAM" name="opt" value="fam" onchange="valid('tF')" %/>[*family/families]0
+      <label><input type="radio" id="tFAM" name="opt" value="fam" onchange="valid('tF')"%/>[*family/families]0
         %sp;([maximum] 4 [generation/generations]1)
-      </label><br %/>
+      </label><br%/>
     %if;(wizard)
-      <label><input type="radio" id="tCSV" name="opt" value="csv" onchange="valid('tF')" %/>[*long display] (csv)
+      <label><input type="radio" id="tCSV" name="opt" value="csv" onchange="valid('tF')"%/>[*long display] (csv)
       </label>
     %end;
-      <br %/>
-      <label><input type="checkbox" name="cousins" value="on" onchange="valid('tF')" %/> [*cousins]
+      <br%/>
+      <label><input type="checkbox" name="cousins" value="on" onchange="valid('tF')"%/> [*cousins]
       </label>
   </fieldset>
   <fieldset>
   <legend>
     <label>
-      <input type="radio" id="tM" name="t" value="M" %/>
+      <input type="radio" id="tM" name="t" value="M"%/>
       [*missing ancestors]
     </label>
   </legend>
     <label>
-      <input type="checkbox" name="al" value="on" onchange="valid('tM')" %/>
+      <input type="checkbox" name="al" value="on" onchange="valid('tM')"%/>
       [*alphabetic order]
     </label>
-    <br %/>
+    <br%/>
     <label>
-      <input type="checkbox" name="ms" value="on" onchange="valid('tM')" %/>
+      <input type="checkbox" name="ms" value="on" onchange="valid('tM')"%/>
       [*include missing spouses]
     </label>
     %if;(bvar.var_img_ext != "")
-      <p>[*not found] : <br %/>
+      <p>[*not found] : <br%/>
           <label>
-            <input type="checkbox" name="img_b" value="on" onchange="valid('tM')" %/>
+            <input type="checkbox" name="img_b" value="on" onchange="valid('tM')"%/>
             %bvar.var_t_BIRTHA;
-          </label><br %/>
+          </label><br%/>
           <label>
-            <input type="checkbox" name="img_m" value="on" onchange="valid('tM')" %/>
+            <input type="checkbox" name="img_m" value="on" onchange="valid('tM')"%/>
             %bvar.var_t_MARRIAGEA;
-          </label><br %/>
+          </label><br%/>
           <label>
-            <input type="checkbox" name="img_d" value="on" onchange="valid('tM')" %/>
+            <input type="checkbox" name="img_d" value="on" onchange="valid('tM')"%/>
             %bvar.var_t_DEATHA;
           </label>
       </p>

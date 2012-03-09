@@ -1,5 +1,5 @@
 <!-- $Id: accent.txt,v 5.6 2007-04-04 02:17:36 ddr Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 2011/11/02 geneweb-6.01 templ=templm -->
+<!-- Modified mickroue(a)yahoo.fr 2011/12/12 geneweb-6.03 templ=templm -->
 <!-- To work : copy this file to bases/etc/ -->
 
 <script type="text/javascript"><!--
@@ -84,7 +84,7 @@ function write_ch(v) {
       <a onclick="return write_ch('ń')" href="#">ń</a>
       <a onclick="return write_ch('Ñ')" href="#">Ñ</a>
       <a onclick="return write_ch('ñ')" href="#">ñ</a>
-      <br %/>
+      <br%/>
       <a onclick="return write_ch('Ó')" href="#">Ó</a>
       <a onclick="return write_ch('ó')" href="#">ó</a>
       <a onclick="return write_ch('Ô')" href="#">Ô</a>
@@ -125,7 +125,7 @@ function write_ch(v) {
       <a onclick="return write_ch('ź')" href="#">ź</a>
       <a onclick="return write_ch('Ż')" href="#">Ż</a>
       <a onclick="return write_ch('ż')" href="#">ż</a>
-      <br %/>
+      <br%/>
       <a onclick="return write_ch('½')" href="#">½</a>
       <a onclick="return write_ch('¼')" href="#">¼</a>
       <a onclick="return write_ch('¾')" href="#">¾</a>
@@ -161,12 +161,12 @@ function write_ch(v) {
 		</p>
 		
 		<div style="float: left; margin: 0.5em; text-align: center;">
-		  <h1 style="border-bottom: solid 1px; display: inline;"><a onclick="return insertTags('=','=','x')" href="#">=[text] 1=</a></h1><br %/>
-		  <h2 style="border-bottom: solid 1px; display: inline;"><a onclick="return insertTags('==','==','x')" href="#">==[text] 2==</a></h2><br %/>
-		  <h3 style="border-bottom: solid 1px; display: inline;"><a onclick="return insertTags('===','===','x')" href="#">===[text] 3===</a></h3><br %/>
-		  <h4 style="display: inline;"><a onclick="return insertTags('====','====','x')" href="#">====[text] 4====</a></h4><br %/>
-		  <h5 style="display: inline;"><a onclick="return insertTags('=====','=====','x')" href="#">====[text] 5====</a></h5><br %/>
-		  <h6 style="display: inline;"><a onclick="return insertTags('======','======','x')" href="#">====[text] 6====</a></h6><br %/>
+		  <h1 class="subtitle" style="display: inline;"><a onclick="return insertTags('=','=','x')" href="#">=h1=</a></h1><br%/>
+		  <h2 class="subtitle" style="display: inline;"><a onclick="return insertTags('==','==','x')" href="#">==h2==</a></h2><br%/>
+		  <h3 class="subtitle" style="display: inline;"><a onclick="return insertTags('===','===','x')" href="#">===h3===</a></h3><br%/>
+		  <h4 style="display: inline;"><a onclick="return insertTags('====','====','x')" href="#">====h4====</a></h4><br%/>
+		  <h5 style="display: inline;"><a onclick="return insertTags('=====','=====','x')" href="#">=====h5=====</a></h5><br%/>
+		  <h6 style="display: inline;"><a onclick="return insertTags('======','======','x')" href="#">======h6======</a></h6><br%/>
 		</div>
 		
 		<ul style="list-style-position: inside; text-align: left;">
@@ -175,7 +175,7 @@ function write_ch(v) {
 				<a onclick="return write_ch('%[%[x/x%]%]')" href="#">
 				 %[%[[first name/first names]0/[surname/surnames]0%]%]</a>
 				<a onclick="return write_ch('%[%[x/x/9/x%]%]')" href="#">
-				 %[%[[first name/first names]0/[surname/surnames]0/[number]/[text]%]%]</a><br %/>
+				 %[%[[first name/first names]0/[surname/surnames]0/[number]/[text]%]%]</a><br%/>
 				<a onclick="return write_ch('%[%[x/x/9/x;x{x *}x%]%]')" href="#">
 				 %[%[[first name/first names]0/[surname/surnames]0/[number]/[text];[comment]{[text] * }[comment]%]%]</a>
 			</li>
@@ -201,7 +201,7 @@ function write_ch(v) {
 			<li><i><a onclick="return insertTags('\'\'','\'\'','x')" href="#">''[text]''</a></i>&nbsp;
 				<b><a onclick="return insertTags('\'\'\'','\'\'\'','x')" href="#">'''[text]'''</a></b>&nbsp;
 				<i><b><a onclick="return insertTags('\'\'\'\'\'','\'\'\'\'\'','x')" href="#">'''''[text]'''''</a></b></i>&nbsp;
-				<a onclick="return insertTags('{','}','x')" href="#"><span class="highlight">{[text]}</span></a><br %/>
+				<a onclick="return insertTags('{','}','x')" href="#"><span class="highlight">{[text]}</span></a><br%/>
 			</li>
 		</ul>
 		

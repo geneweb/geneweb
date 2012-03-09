@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/03/08 geneweb-6.04 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -15,15 +15,18 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
-  <meta name="robots" content="none" %/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;" %/>
-  <meta http-equiv="Content-Style-Type" content="text/css" %/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png" %/>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   <style type="text/css">
     /* templm */
     .nobr {
-    	white-space: nowrap;
+     white-space: nowrap;
+    }
+    abbr {
+    border-bottom: 0;
     }
     .background_sex_0 {
     	background-color: rgb(173,216,230);
@@ -32,8 +35,12 @@
     	background-color: rgb(255,182,193);
     }
     .background_sex_2 {
-    	background-color: rgb(255,0,0);
+    	background-color: rgb(255,255,255);
     }
+    .hide {
+      visibility: hidden;
+    }
+
     /* updind.txt, updfam.txt */
     #upd form, #upd input, #upd select, #upd textarea {
     	font-size: 11px;
@@ -57,6 +64,8 @@
     }
     #upd input[type='checkbox'], #upd input[type='radio'] {
     	width: auto;
+    	height: auto;
+    	vertical-align: middle;
     }
     #upd legend {
     	font-size: 12px;
@@ -73,6 +82,15 @@
     	font-size: 12px;
     	font-weight: bold;
     	text-align: center;
+    }
+    #upd th, td {
+    white-space: nowrap;
+    padding-left: 5px;
+    padding-right: 5px;
+    }
+    #upd .bg7, #upd th {
+    font-size: 11px;
+    background-color: #E7EDB3;
     }
   </style>
   %base_header;
@@ -163,7 +181,6 @@
        break;
     }
   }
-
   function changeDisplay(id,c,cond1,cond2) 
   {
     var d = document.getElementById(id);
@@ -174,7 +191,10 @@
     else  
       {d.style.display='none';}
   }
-  
+  function valid(id) {
+    document.getElementById(id).focus();
+    document.getElementById(id).checked='checked';
+  }
   function no_sex(id)
   {
     document.getElementById(id).className='background_sex_2';
@@ -196,23 +216,33 @@
   
   %define;date(xlab,xvar,xdate)
     <span %apply;sure_date("xdate")>
+      <select name="xvar_cal"%sp; title="[*calendar/calendars]0"%sp; 
+        onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdate.month;',this)"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();">
+        <option value="G"%if;(xdate.calendar = "gregorian") selected="selected"%end;>[*gregorian/julian/french/hebrew]0</option>
+        <option value="J"%if;(xdate.calendar = "julian") selected="selected"%end;>[*gregorian/julian/french/hebrew]1</option>
+        <option value="F"%if;(xdate.calendar = "french") selected="selected"%end;>[*gregorian/julian/french/hebrew]2</option>
+        <option value="H"%if;(xdate.calendar = "hebrew") selected="selected"%end;>[*gregorian/julian/french/hebrew]3</option>
+      </select>
       %if;([ !dates order]0 = "ddmmyy")
         <label %apply;accesskey("xvar")>xlab
-         <input name="xvar_dd" class="number" title="[year/month/day]2" size="2" maxlength="2"%sp;
-         value="%xdate.day;" %/></label>
-        <label>/<span id="xvar_mm_sel"><input name="xvar_mm" class="number" title="[year/month/day]1" size="2" maxlength="2"%sp;
-         value="%xdate.month;" %/></span></label>
-        <label>/<input name="xvar_yyyy" class="number" title="? ~ &lt; &gt; / [year/month/day]0" size="5" maxlength="6"%sp;
-         value="%xdate.year;" %/></label>
+         <input id="xvar_dd" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+         value="%xdate.day;"%/></label>
+        <label>/<span id="xvar_mm_sel"><input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+         value="%xdate.month;"%/></span></label>
+        <label>/<input id="xvar_yyyy" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
+         value="%xdate.year;"%/></label>
       %else;
-        <label>xlab<input name="xvar_yyyy" class="number" title="? ~ &lt; &gt; / [year/month/day]0" size="5" maxlength="6"%sp;
-         value="%xdate.year;" %/></label>
-        <label>/<span id="xvar_mm_sel"><input name="xvar_mm" class="number" title="[year/month/day]1" size="2" maxlength="2"%sp;
-         value="%xdate.month;" %/></span></label>
-        <label>/<input name="xvar_dd" class="number" title="[year/month/day]2" size="2" maxlength="2"%sp;
-         value="%xdate.day;" %/></label>
+        <label>xlab<input name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
+         value="%xdate.year;"%/></label>
+        <label>/<span id="xvar_mm_sel"><input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+         value="%xdate.month;"%/></span></label>
+        <label>/<input name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+         value="%xdate.day;"%/></label>
       %end;
-      <select name="xvar_prec" title="[*precision]0" onchange="changeDisplay('lab_xvar_oryear',this,'oryear','yearint')">
+      <select name="xvar_prec" title="[*precision]0"%sp;
+        onchange="changeDisplay('lab_xvar_oryear',this,'oryear','yearint')"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();">
         <option value="-"%if;(xdate.prec = "") selected="selected"%end;>-</option>
         <option value="sure"%if;(xdate.prec = "sure") selected="selected"%end;>[*exact]0</option>
         <option value="about"%if;(xdate.prec = "about") selected="selected"%end;>[*about (date)]0</option>
@@ -223,90 +253,125 @@
         <option value="yearint"%if;(xdate.prec = "yearint") selected="selected"%end;>&lt;- [*between (date)] -&gt;</option>
       </select>
       <label id = "lab_xvar_oryear" %if;(xdate.oryear = "") style="display: none;"%end;>
-        <input name="xvar_oryear" class="number" title="[year/month/day]0" size="5" maxlength="5" value="%xdate.oryear;" %/>
+        <input name="xvar_oryear" class="number" autocomplete="off" title="[year/month/day]0" size="5" maxlength="5" value="%xdate.oryear;"%/>
       </label>
-      <select name="xvar_cal"%sp; title="[*calendar/calendars]0" 
-        onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdate.month;',this)">
-        <option value="G"%if;(xdate.calendar = "gregorian") selected="selected"%end;>[*gregorian/julian/french/hebrew]0</option>
-        <option value="J"%if;(xdate.calendar = "julian") selected="selected"%end;>[*gregorian/julian/french/hebrew]1</option>
-        <option value="F"%if;(xdate.calendar = "french") selected="selected"%end;>[*gregorian/julian/french/hebrew]2</option>
-        <option value="H"%if;(xdate.calendar = "hebrew") selected="selected"%end;>[*gregorian/julian/french/hebrew]3</option>
-      </select>
-    <label>...[or]0 [text]0<input name="xvar_text" size="15" maxlength="30"%sp;value="%xdate.text;" %/></label>
+      <label>…[or]0 [text]0<input name="xvar_text" size="20" maxlength="50"%sp;value="%xdate.text;"%/></label>
   </span>
   %end;
 
   %define;source(xvar, xx)
     <label>[*source/sources]0
     <input name="xvar_src" size="40" maxlength="200"
-     value="%xx_src;"%sp;id="xvar_src" %/></label>
+     value="%xx_src;"%sp;id="xvar_src"%/></label>
   %end;
 %(<!-- End define (used in updind.txt, updfam.txt)  -->%)
 
     
 %( <!-- Begin define  --> %)
 
+  %let;death_symbol;
+    %if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;
+  %in;
+
   %define;search_focus(xcnt)
     %if;(evar_ins_witnxcnt = "on")
-      onload="javascript:document.updfam.witn%expr(xcnt+1)_fn.focus();window.scrollBy(0,60);"%nn;
+      onload="javascript:document.upd.witn%expr(xcnt+1)_fn.focus();window.scrollBy(0,60);"%nn;
     %elseif;(evar_inv_chxcnt = "on")
-      onload="javascript:document.updfam.ins_ch0_n.focus();window.scrollBy(0,60);"%nn;
+      onload="javascript:document.upd.ins_ch0_n.focus();window.scrollBy(0,60);"%nn;
     %elseif;(xcnt < 10)
-      %apply;search_focus(xcnt + 1)      
+      %apply;search_focus(xcnt + 1)
     %end;
   %end;
   
   %define;load_focus()
     %if;(evar_m = "ADD_FAM_OK" or evar_m = "MOD_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
       %if;(evar_ins_ch0 = "on" or evar_ins_ch0_n > 1 and evar_ins_ch0_n < 10)
-        onload="javascript:document.updfam.ins_ch0_n.focus();window.scrollBy(0,60);"%nn;
+        onload="javascript:document.upd.ins_ch0_n.focus();window.scrollBy(0,60);"%nn;
       %else;
         %apply;search_focus(0)
       %end;
     %elseif;(evar_m = "ADD_FAM" or evar_m = "ADD_PAR")
       %if;(father.first_name = "")
-        onload="javascript:document.updfam.pa1_fn.focus();"%nn;
+        onload="javascript:document.upd.pa1_fn.focus();"%nn;
       %else;
-        onload="javascript:document.updfam.pa2_fn.focus();"%nn;
+        onload="javascript:document.upd.pa2_fn.focus();"%nn;
       %end;
     %elseif;(evar_ins_ch > 1 and evar.ins_ch < 10)
-      onload="javascript:document.updfam.submit();"%nn;
+      onload="javascript:document.upd.submit();"%nn;
+    %elseif;(marriage.prec != "sure")
+      %if;([ !dates order]0 = "ddmmyy")
+        onload="javascript:document.upd.marr_dd.focus();"%nn;
+      %else;
+        onload="javascript:document.upd.marr_yyyy.focus();"%nn;
+      %end;
     %else;
-      onload="javascript:document.updfam.ins_ch0_n.focus();"%nn;
+      onload="javascript:document.upd.ins_ch0_n.focus();"%nn;
     %end;
   %end;
   
   %define;accesskey(xvar)
     %if;("xvar"="marr")
-      title="[*marriage/marriages]0 (2)" accesskey="2"%nn;
+      title="[marriage/marriages]0 (2)" accesskey="2"%nn;
     %end;
   %end;
   <script type="text/javascript">
   <!--
-    function show(xx) {
-    document.getElementById(xx).style.display='inline';
+
+    function changeFocus(event,id) {
+      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+      if (key == 60 | key == 62)
+      {
+       document.getElementById(id).focus();
+       return false;
+      }    
     }
-    
-    function hide(xx) {
-      document.getElementById(xx).style.display='none';
+    function changeFocusFn(event,id,id1,id2) {
+      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+      if (key == 60 | key == 62)
+      {
+       if (document.getElementById(id).checked == true)
+        {
+         document.getElementById(id2).focus();
+         return false;
+        }
+       else
+        {
+         document.getElementById(id1).focus();
+         return false;
+        }
+      }    
     }
-    
+    function linkCreateVisible(xx,yy,zz) {
+      if(xx == 'pa')
+      {
+       document.getElementById('pa' + yy + '_6').style.visibility=zz;
+      }
+     if(xx == 'witn')
+      {
+       document.getElementById('witn' + yy + '_5').style.visibility=zz;
+      }
+     if(xx == 'ch')
+      {
+       document.getElementById('ch' + yy + '_5').style.visibility=zz;
+       document.getElementById('ch' + yy + '_6').style.visibility=zz;
+      }
+    }
     function fill_place(xx) 
     {
       switch(xx.value) {
-      case "1": xx.value = document.updfam.pa1b_pl.value;
+      case "1": xx.value = document.upd.pa1b_pl.value;
       break;
-      case "2": xx.value = document.updfam.pa1d_pl.value;
+      case "2": xx.value = document.upd.pa1d_pl.value;
       break;
-      case "3": xx.value = document.updfam.pa2b_pl.value;
+      case "3": xx.value = document.upd.pa2b_pl.value;
       break;
-      case "4": xx.value = document.updfam.pa2d_pl.value;
+      case "4": xx.value = document.upd.pa2d_pl.value;
       break;
-      case "*": xx.value = document.updfam.marr_place.value;
+      case "*": xx.value = document.upd.marr_place.value;
       break;
-      case "0": xx.value = document.updfam.ch1b_pl.value;
+      case "0": xx.value = document.upd.ch1b_pl.value;
       break;
-      case "+": xx.value = document.updfam.ch1d_pl.value;
+      case "+": xx.value = document.upd.ch1d_pl.value;
       break;}
     }
   //-->
@@ -315,190 +380,255 @@
   %define;place(xvar,xx)
     <label>[*place]
     <input name="xvar_place" size="40" maxlength="200"%sp;
-    title="[*place] : 1,2,3,4,*,0,+"%sp;
-    value="%xx_place;" id="xvar_place" onblur="fill_place(this)" %/></label>
+    title="[place] : 1,2,3,4,*,0,+"%sp;
+    value="%xx_place;" id="xvar_place" onblur="fill_place(this)"%/></label>
   %end;
 
-  %define;small_date(kind,xvar,xx)
+  %define;small_date(kind,xvar,xx,zz)
     %if;([ !dates order]0 = "ddmmyy")
-      <label>[*kind]<input name="xvar_dd" class="number" title="[year/month/day]2" size="2" maxlength="2"%sp;
-      value="%xx.create.kind_day;" %/></label>
-      <label>/<input name="xvar_mm" class="number" title="[year/month/day]1" size="2" maxlength="2"%sp;
-      value="%xx.create.kind_month;" %/></label>
-      <label>/<input name="xvar_yyyy" class="number" title="~ &lt; &gt; [year/month/day]0" size="5" maxlength="6"%sp;
-        value="%xx.create.kind_year;" %/></label>
+      <input name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+      value="%xx.create.kind_day;"%/>     
+      <input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+        value="%xx.create.kind_month;"%/>
+      <input id="xvar_yyyy" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
+        value="%xx.create.kind_year;" onkeypress="javascript:return changeFocus(event,'zz');"%/>
     %else;
-      <label>[*kind]<input name="xvar_yyyy" class="number" title="~ &lt; &gt; [year/month/day]0" size="5" maxlength="6"%sp;
-        value="%xx.create.kind_year;" %/></label>
-      <label>/<input name="xvar_mm" class="number" title="[year/month/day]1" size="2" maxlength="2"%sp;
-        value="%xx.create.kind_month;" %/></label>
-      <label>/<input name="xvar_dd" class="number" title="[year/month/day]2" size="2" maxlength="2"%sp;
-        value="%xx.create.kind_day;" %/></label>
+      <input id="xvar_yyyy" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
+        value="%xx.create.kind_year;" onkeypress="javascript:return changeFocus(event,'zz');"%/>
+      <input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+        value="%xx.create.kind_month;"%/>
+      <input name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+        value="%xx.create.kind_day;"%/>
     %end;
-    <label>[*place]
-      <input name="xvar_pl" size="20" maxlength="200" title="[*place] : 1,2,3,4,*,0,+"%sp;
-      value="%xx.create.kind_place;" id="xvar_pl" onblur="fill_place(this)" %/></label>
+      <input name="xvar_pl" size="20" maxlength="200" title="[place] : 1,2,3,4,*,0,+"%sp;
+        value="%xx.create.kind_place;" id="xvar_pl" onblur="fill_place(this)"%/>
   %end;
 
-  %define;birth(xvar,xx)
-    %apply;small_date("birth","xvarb","xx")
+  %define;birth(xvar,xx,beg,zz)
+    %apply;small_date("birth","xvarb","xx","xvard_yyyy")
   %end;
 
-  %define;death(xvar,xx)
-    %apply;small_date("death","xvard","xx")
+  %define;death(xvar,xx,beg,zz)
+    %apply;small_date("death","xvard","xx","begzz_fn")
   %end;
 
   %define;type_sex(beg,xcnt,xx)
-    <label  class="background_sex_2"><input type="radio" name="begxcnt_sex" onclick="no_sex('begxcnt')" value="N"%nn;
-      %if;(xx.create.sex = "neuter") checked="checked"%end; %/>?</label>
-    <label class="background_sex_0"><input type="radio" name="begxcnt_sex" onclick="male('begxcnt')" value="M"%nn;
-      %if;(xx.create.sex = "male") checked="checked"%end; %/>[M/F]0</label>
-    <label class="background_sex_1"><input type="radio" name="begxcnt_sex" onclick="female('begxcnt')" value="F"%nn;
-      %if;(xx.create.sex = "female") checked="checked"%end; %/>[M/F]1</label>
+    <label class="background_sex_0" title="[M/F]0">
+      <input id="begxcnt_sex_0" type="radio" name="begxcnt_sex" onclick="male('begxcnt')" value="M"%nn;
+      %if;(xx.create.sex = "male") checked="checked"%end;%sp;
+      onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();%nn;
+                 if (event.keyCode == 32) javascript:valid('begxcnt_sex_2'), no_sex('begxcnt');"%sp;
+      onkeypress="javascript:return changeFocus(event,'begxcntb_yyyy');"%/></label>
+    <label  class="background_sex_2" title="[sex] ?">
+      <input id="begxcnt_sex_2" type="radio" name="begxcnt_sex" onclick="no_sex('begxcnt')" value="N"%nn;
+      %if;(xx.create.sex = "neuter") checked="checked"%end;%sp;
+      onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();%nn;
+                 if (event.keyCode == 32) valid('begxcnt_sex_1'), female('begxcnt');"%sp;
+      onkeypress="javascript:return changeFocus(event,'begxcntb_yyyy');"%/></label>
+    <label class="background_sex_1" title="[M/F]1">
+      <input id="begxcnt_sex_1" type="radio" name="begxcnt_sex" onclick="female('begxcnt')" value="F"%nn;
+      %if;(xx.create.sex = "female") checked="checked"%end;%sp;
+      onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();%nn;
+                 if (event.keyCode == 32) javascript:valid('begxcnt_sex_0'), male('begxcnt');"%sp;
+      onkeypress="javascript:return changeFocus(event,'begxcntb_yyyy');"%/></label>
   %end;
   
   %define;insert_parent(xcnt)
-    <label title="[*insert::parents]"><input type="checkbox" name="ins_paxcnt" value="on" %/></label>
-    <label title="[*insert] 2  .9 [parents]"><input name="ins_paxcnt_n" class="number" size="1" maxlength="1"%sp;value="" %/></label>
+    <label title="[insert::parents]">
+      <input type="checkbox" name="ins_paxcnt" value="on"%sp;
+      onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
+    </label>
+    <label title="[insert] 2  .9 [parents]"><input name="ins_paxcnt_n" class="number" autocomplete="off" size="1" maxlength="1"%sp;value=""%/></label>
   %end;
 
   %define;insert_witness(xcnt)
-    <label title="[*insert::witness/witnesses]0"><input type="checkbox" name="ins_witnxcnt" value="on" %/></label>
+    <label title="[insert::witness/witnesses]0">
+      <input type="checkbox" name="ins_witnxcnt" value="on"%sp;
+      onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
+    </label>
   %end;
   
-  %define;insert_child(xcnt)
-    <label title="[*insert::child/children]0"><input type="checkbox" name="ins_chxcnt" value="on" %/></label>%nn;
-    <label title="[*insert] 2  .9 [child/children]1"><input name="ins_chxcnt_n" class="number" size="1" maxlength="1"%sp; value="%evar.ins_ch;" %/></label>
-  %end;
-
   %define;invert_children(xcnt)
-      <label class="nobr" title="[*invert] xcnt   . %expr(xcnt-1)">^%sp;<input type="checkbox" name="inv_chxcnt" value="on" %/></label>
+      <label class="nobr" title="[invert] xcnt &lt;-&gt; %expr(xcnt-1)">^%nn;
+        <input type="checkbox" name="inv_chxcnt" value="on"%nl;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
+      </label>
+  %end;
+  
+  %define;hide(xx)
+    %if;("xx"="link")
+      class="hide"%nn;
+    %end;
   %end;
 
   %define;person(beg,xcnt,xx,c1,c2)
-    <span class="nobr">
-      <label %nn;
-        %if;("begxcnt"="pa1")
-          title="[*him/her]0 (1)" accesskey="1"%nn;
-        %elseif;("begxcnt"="witn1")
-          title="[*witness/witnesses]1 (3)" accesskey="3"%nn;
-        %elseif;("begxcnt"="ch1")
-          title="[*child/children]1 (4)" accesskey="4"%nn; 
-        %end;>[*first name/first names]0_
-        <input name="begxcnt_fn" style = "text-align: %right;;" size="30" maxlength="200"%sp;
-         value="%xx.first_name;" id="begxcnt_fn" %/></label>
-      <label>
-        <input name="begxcnt_sn" size="30" maxlength="200"%sp;
-         value="%xx.surname;" id="begxcnt_sn" %/>_[*surname/surnames]0</label>
-      <label>[*number]_
-        <input name="begxcnt_occ" class="number" size="5" maxlength="8" value="%xx.occ;"%sp;
-         id="begxcnt_occ" %/></label>
-      <label>[*link]0
-        <input type="radio" name="begxcnt_p" value="link" onclick="hide('begxcnt')"%sp;
-         %if;(xx.create = "link")%sp;checked="checked" %end; %/></label>
-      <label>[*create]0
-        <input type="radio" name="begxcnt_p" value="create" onclick="show('begxcnt')"%sp;
-         %if;(xx.create = "create")%sp;checked="checked"%end; %/></label>
-    </span>
-    <span id="begxcnt" %if;(xx.create= "link") style="display: none;"%end;
-        %if;("c1" = "yes")
-          %if;(xx.create.sex = "male") class="background_sex_0"
-          %elseif;(xx.create.sex = "female") class="background_sex_1"
-          %else; class="background_sex_2"
-          %end;
-        %end;%nn;>
-        %if;("c1" = "yes")
-          <span class="nobr">
-            %apply;type_sex("beg","xcnt","xx")
-          </span>
-        %end;
-        %if;("c2" = "yes")
-          <br %/>
-          <span class="nobr">%apply;birth("begxcnt","xx")</span>
-          <span class="nobr">%apply;death("begxcnt","xx")</span>
-        %end;
-      </span>
+    %let;zz;
+      %expr(xcnt + 1)
+    %in;
+    <td>
+     <input id="begxcnt_p_link" title="[link]" type="radio" name="begxcnt_p" value="link"%sp;
+       %if;(xx.create = "link") checked="checked"%end;%sp;
+       onclick="linkCreateVisible('beg','xcnt','hidden')"%sp;
+       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
+                  if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','visible'), valid('begxcnt_p_create');"%/>%nn;
+     <input id="begxcnt_p_create" title="[create]" type="radio" name="begxcnt_p" value="create"%sp;
+       %if;(xx.create = "create") checked="checked"%end;%sp;
+       onclick="linkCreateVisible('beg','xcnt','visible')"%sp;
+       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
+                  if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','hidden'), valid('begxcnt_p_link');"%/>
+    </td><td>
+          <input
+            id="begxcnt_fn" name="begxcnt_fn" style="text-align: %right;;" size="30" maxlength="200" value="%xx.first_name;"
+            title="[first name/first names]0"
+            %if;("begxcnt"="pa1")
+              accesskey="1"
+            %elseif;("begxcnt"="witn1")
+              accesskey="3"
+            %elseif;("begxcnt"="ch1")
+              accesskey="4" 
+            %end;
+            %if;("beg"="pa")
+              onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcntb_yyyy','beg%zz;_fn');"
+            %elseif;("beg"="ch")
+              onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sex_2','beg%zz;_fn');"
+            %end;  
+          %/>
+    </td><td>
+          <input name="begxcnt_sn" title="[surname/surnames]0" size="30" maxlength="200"%sp;
+             value="%xx.surname;" id="begxcnt_sn"%/>
+    </td><td>
+            <input name="begxcnt_occ" title="[number]" class="number" autocomplete="off" size="5" maxlength="8" value="%xx.occ;"%sp;
+             id="begxcnt_occ"%/>
+    </td>
+    %if;("c1" = "yes")
+      <td id="begxcnt_5" %apply;hide(xx.create)>
+        %apply;type_sex("beg","xcnt","xx")
+      </td>
+    %end;
+    %if;("c2" = "yes")
+      <td id="begxcnt_6" %apply;hide(xx.create)>
+        <div><abbr title="[birth]">o</abbr>%sp;   
+        %apply;birth("begxcnt","xx","","")
+        </div>
+        <div><abbr title="[death]">%death_symbol;</abbr>%sp;
+        %apply;death("begxcnt","xx","beg",zz)
+        </div>
+      </td>
+    %end;
   %end;
-
+  
+  %define;table_th(xx)
+    <tr>
+      %if;("xx" = "witness")
+        <td class="bg7">%apply;insert_witness("0")</td>
+      %elseif;("xx" = "child")
+        <td class="bg7">
+          <input style="display: none;" type="checkbox" id="ins_ch0" name="ins_ch0" value="on"%/>
+          <label title="[insert] 1  .9 [child/children]1">%nn;
+            <input name="ins_ch0_n" class="number"%sp;
+             autocomplete="off" size="1" maxlength="1"%sp;
+             value="%evar.ins_ch;"%sp;
+             onkeydown="if (event.keyCode == 49) javascript:document.getElementById('ins_ch0').checked = true"%/></label>
+        </td>
+      %else;
+        <td>&nbsp;</td>
+      %end;
+      %if;("xx" = "child")
+        <td>&nbsp;</td>
+      %end;
+      <th><abbr title="[link]/[create]">↴ +</abbr></th>
+      <th>[first name/first names]0</th>
+      <th>[surname/surnames]0</th>
+      <th><abbr title="[number]">#</abbr></th>
+      %if;("xx" != "parent")
+        <th><abbr title="[sex]">[M/F]0 ? [M/F]1</abbr></th>
+      %end;
+      %if;("xx" != "witness")
+        <th>[date] [place]</th>
+      %else;
+        <td>&nbsp;</td>
+      %end;
+    </tr>
+  %end;
 %( <!-- End define --> %)
 </head>
 
 <body%body_prop; id="upd" %apply;load_focus()>
 %message_to_wizard;
-<form name="updfam" method="post" action="%action;">
+<form name="upd" method="post" action="%action;">
   <p>%hidden;  
-    <input type="hidden" name="digest" value="%digest;" %/>
-    %if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;" %/>%nl;%end;
-    %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;" %/>%nl;%end;
+    <input type="hidden" name="digest" value="%digest;"%/>
+    %if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;"%/>%nl;%end;
+    %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;"%/>%nl;%end;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
-      <input type="hidden" name="m" value="ADD_FAM_OK" %/>%nl;
+      <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
     %elseif;(evar_m = "ADD_PAR")
-      <input type="hidden" name="m" value="ADD_FAM_OK" %/>%nl;
+      <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
     %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
-      <input type="hidden" name="m" value="MOD_FAM_OK" %/>%nl;
+      <input type="hidden" name="m" value="MOD_FAM_OK"%/>%nl;
     %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
              evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
-      <input type="hidden" name="i2" value="%evar_i2;" %/>
+      <input type="hidden" name="i2" value="%evar_i2;"%/>
       %if;(evar_ini1 != "" and evar_ini2 != "")
-        <input type="hidden" name="ini1" value="%evar_ini1;" %/>
-        <input type="hidden" name="ini2" value="%evar_ini2;" %/>
+        <input type="hidden" name="ini1" value="%evar_ini1;"%/>
+        <input type="hidden" name="ini2" value="%evar_ini2;"%/>
       %end;
       %if;(evar.iexcl != "")
-        <input type="hidden" name="iexcl" value="%evar.iexcl;" %/>
+        <input type="hidden" name="iexcl" value="%evar.iexcl;"%/>
       %end;
       %if;(evar.fexcl != "")
-        <input type="hidden" name="fexcl" value="%evar.fexcl;" %/>
+        <input type="hidden" name="fexcl" value="%evar.fexcl;"%/>
       %end;
-      <input type="hidden" name="m" value="MRG_MOD_FAM_OK" %/>%nl;
+      <input type="hidden" name="m" value="MRG_MOD_FAM_OK"%/>%nl;
     %end;
   </p>
-  <fieldset><legend><sup>(1)</sup>
-  
-        %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
-          [*add::family/families]0
-        %elseif;(evar_m = "ADD_PAR")
-          [*add::family/families]0
-        %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
-          [*modify::family/families]0 # %evar_i;
-        %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
-             evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
-          [*merge::family/families]1 # %evar_i;
-        %end;
-        &nbsp;<input type="submit" value="Ok" %/>
-      </legend>
-    <dl>
-      %foreach;parent;
-        <dt>%parent.himher;</dt>
-        <dd  %if;(parent.himher = [*him/her]0)class="background_sex_0"%elseif;(parent.himher = [*him/her]1)class="background_sex_1"%end;>
-          %apply;person("pa",cnt,"parent","no","yes")
-          %if;(bvar.multi_parents = "yes")%apply;insert_parent(cnt)%end;
-        </dd>
+  <fieldset>
+    <legend><sup>(1)</sup>
+      %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
+        [*add::family/families]0
+      %elseif;(evar_m = "ADD_PAR")
+        [*add::family/families]0
+      %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
+        [*modify::family/families]0 # %evar_i;
+      %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
+           evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+        [*merge::family/families]1 # %evar_i;
       %end;
-      
+      &nbsp;<input type="submit" value="Ok"%/>
+    </legend>
+    <table>
+      %apply;table_th("parent")
+      %foreach;parent;
+        <tr%if;(parent.himher = [*him/her]0) class="background_sex_0"%elseif;(parent.himher = [*him/her]1) class="background_sex_1"%end;>        
+          <td>%parent.himher;</td>
+          %apply;person("pa",cnt,"parent","no","yes")
+        </tr>
+      %end;
+    </table>
+    <dl>     
       <dt>[*source/sources]1
         <label title="[source/sources]0 : [family/families]0 = [person/persons]1 ([create])">
           <input type="checkbox" name="rdsrc" value="on"%sp;
-            %if;(evar_rdsrc = "on") checked="checked"%end;
-          %/>
+          %if;(evar_rdsrc = "on") checked="checked"%end;%nl;
+          onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
         </label>
       </dt>
       <dd>
         <label>[*family/families]0<input name="src" size="40" maxlength="300"
-          value="%fsources;"%sp;id="src" %/></label>
+          value="%fsources;"%sp;id="src"%/></label>
         <label>[[*person/persons]1]<input name="psrc" size="40" maxlength="300"
-          value="%nn;%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc" %/></label>
-        
+          value="%nn;%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc"%/></label>
       </dd>
       %if;(bvar.origin_file = "on")
         <dd>
-          <label>[*file]<input name="origin_file" size="50" maxlength="200" value="%origin_file;" %/></label>
+          <label>[*file]<input name="origin_file" size="50" maxlength="200" value="%origin_file;"%/></label>
           </dd>
       %end;
     </dl>
   </fieldset>  
   <fieldset><legend><sup>(2)</sup> [*marriage/marriages]0</legend>    
     <p>
-      <select name="mrel">
+      <select name="mrel" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();">
         <option value="marr"%if;(mrel = "marr" or mrel = "nsckm") selected="selected"%end;>[*married]</option>
         <option value="not_marr"%if;(mrel = "not_marr" or mrel = "nsck") selected="selected"%end;>[*not married]</option>
         <option value="engaged"%if;(mrel = "engaged") selected="selected"%end;>[*engaged]</option>
@@ -507,20 +637,26 @@
       <span class="nobr">
         %apply;date([*date], "marr", "marriage")
       </span>
-      <br %/>
+      <br%/>
       <span class="nobr">
         %apply;place("marr", "marriage")
         %apply;source("marr", "marriage")
       </span>
-      <br %/>
-        <label>[*comment]<input name="comment" size="50" maxlength="200"%sp;
-          value="%comment;" id="comment" %/></label>
-        <label><input type="checkbox" name="nsck" value="on%nn;
-          "%if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end; %/>[*no sexes check]</label>
-      <br %/>
+      <br%/>
+      <label>[*comment]
+        <textarea style="overflow: hidden;" name="comment" rows="2" cols="110" id="comment"%sp;
+         onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();">%comment;%sq;</textarea>
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="nsck" value="on"%sp;
+        %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/> [*no sexes check]
+      </label>
     </p>
     <p>
-      <select name="div" onchange="changeDisplay('date_divorce',this,'divorced','divorced')">
+      <select name="div" onchange="changeDisplay('date_divorce',this,'divorced','divorced')"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();">
         <option value="not_divorced"%if;(divorce = "not_divorced") selected="selected"%end;>[*not divorced]</option>
         <option value="separated"%if;(divorce = "separated") selected="selected"%end;>[*separated]</option>
         <option value="divorced"%if;(divorce = "divorced") selected="selected"%end;>[*divorced]</option>
@@ -530,41 +666,40 @@
       </span>
     </p>
   </fieldset>
-  <fieldset><legend><sup>(3)</sup> %apply;insert_witness("0") [*witness/witnesses]1</legend>
-    <ol>
+  <fieldset><legend title="[*witness/witnesses]1 (3)" accesskey="3"><sup>(3)</sup> [*witness/witnesses]1</legend>
+    <table>
+      %apply;table_th("witness")
       %foreach;witness;
-          <li>
+        <tr id="witn%cnt;">
+          <td>%cnt;.</td>  
           %apply;person("witn",cnt,"witness","yes","no")
-          %apply;insert_witness(cnt)
-          </li>
+          <td class="bg7">
+            %apply;insert_witness(cnt)
+          </td>
+        </tr>
       %end;
-    </ol>
+    </table>
   </fieldset>
-
-  <fieldset><legend><sup>(4)</sup> %apply;insert_child("0") [*child/children]1</legend>
-    <ol id="child_list">
-    %foreach;child;
-      <li>
-        %apply;person("ch",cnt,"child","yes","yes")
-        %if;(cnt != 1)
-          %apply;invert_children(cnt)
-        %end;
-      </li>
-    %end;
-    </ol>
+  <fieldset>
+    <legend><sup>(4)</sup> [*child/children]1</legend>
+    <table id="child_list">
+      %apply;table_th("child")
+      %foreach;child;
+        <tr id="ch%cnt;">
+          <td style="text-align: right;">%cnt;.</td>
+          <td>
+            %if;(cnt != 1)
+              %apply;invert_children(cnt)
+            %end;
+          </td>
+          %apply;person("ch",cnt,"child","yes","yes")
+        </tr>
+      %end;
+    </table>
   </fieldset>
 </form>
-
-<div style="clear: both;">
-  <dl>
-    <dt>[*place] : </dt>
-      <dd>[*him/her]0 : 1 = [birth], 2 = [death]</dd>
-      <dd>[*him/her]1 : 3 = [birth], 4 = [death]</dd>
-      <dd>* = [*marriage/marriages]0</dd>
-      <dd>[*child/children]1 : 0 = [birth], + = [death]</dd>    
-  </dl>
-</div>
-  %base_trailer;
-  %copyright;
+%base_trailer;
+%copyright;
 </body>
 </html>
+
