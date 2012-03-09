@@ -10430,3 +10430,13 @@ it: fratellastri e sorellastre
 nl: half broers en zusters
 no: halvbrødre/halvsøstre/halvsøsken
 sv: halvbröder och halvsystrar
+
+    no descendants
+de: ohne Nachkommen
+en: without posterity
+fi: ilman jälkeläisiä
+fr: sans descendants
+it: senza discendenti
+nl: zonder afstammelingen
+no: uten etterkommere
+sv: utan ättlingar
