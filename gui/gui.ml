@@ -14,10 +14,29 @@ type state =
     waiting_pids : mutable list int }
 ;
 
+type gwf_t =
+  [ Var_string of (string * string)
+  | Var_bool of (string * bool)
+  | Var_int of (string * int) ]
+;
+
+(*
+value gwf = 
+  [("highlight_color", "#2f6400"); ("friend_passwd", "") ("wizard_passwd", ""); 
+   ("wizard_passwd_file", ""); ("manitou", ""); ("moderator_file", ""); 
+   ("supervisor", ""); ("wizard_just_friend", "")]
+;
+*)
+
+value abs_path fname =
+  if Filename.is_relative fname then
+    Filename.concat (Sys.getcwd ()) fname
+  else fname
+;
+
 value trace = ref False;
-(* utiliser bin_dir *)
-value config_file = Filename.concat "gw" "config.txt";
-value lexicon_file = Filename.concat "gw" "gui_lex.txt";
+value config_file = abs_path (Filename.concat "gw" "config.txt");
+value lexicon_file = abs_path (Filename.concat "gw" "gui_lex.txt");
 value lexicon_mtime = ref 0.0;
 
 value input_lexicon lang = do {
@@ -163,6 +182,142 @@ value browse state browser port dbn = do {
   clean_waiting_pids state;
 };
 
+value rec cut_at_equal s =
+  try
+    let i = String.index s '=' in
+    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
+  with
+  [ Not_found -> (s, "") ]
+;
+
+value read_base_env state bname = 
+  let fname = Filename.concat state.bases_dir (bname ^ ".gwf") in
+  match try Some (open_in fname) with [ Sys_error _ -> None] with
+  [ Some ic ->
+      let env =
+        loop [] where rec loop env = 
+          match try Some (input_line ic) with [End_of_file -> None] with
+          [ Some s ->
+              if s = "" || s.[0] = '#' then loop env
+              else loop [cut_at_equal s :: env]
+          | None -> env ]
+      in
+      do { close_in ic; env }
+  | None -> [] ]
+;
+
+value rm_base dir =
+  match
+    try Some (Unix.opendir dir) with [ Unix.Unix_error _ _ _ -> None ]
+  with
+  [ Some dh ->
+      let list = ref [] in
+      do {
+        try
+          while True do {
+            let file = Unix.readdir dh in
+            if file = "." || file = ".." then ()
+            else list.val := [file :: list.val]
+          }
+        with
+        [ End_of_file -> () ];
+        Unix.closedir dh;
+        List.iter (fun file -> Unix.unlink (Filename.concat dir file))
+          list.val;
+        try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ]
+      }
+  | _ -> () ]
+;
+
+value clean_database state bname = do {
+  (* save *)
+  let base = Filename.concat state.bases_dir (bname ^ ".gwb") in
+  let c = 
+    Filename.concat state.bin_dir "gwu" ^ " " ^ base ^ " -o tmp.gw" 
+  in
+  let rc = Sys.command c in
+  if rc > 1 then 
+    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
+    print_endline c
+  else ();
+  (* create *)
+  (* Il faut regarder si la base était en gwc1 ou 2 pour appeler le même *)
+  let c =
+    Filename.concat state.bin_dir "gwc" ^ " tmp.gw -f -o " ^ base ^ " > comm.log "
+  in
+  let rc = Sys.command c in
+  if rc > 1 then 
+    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
+    print_endline c
+  else ();
+};
+
+value consang state bname parameters = do {
+  let base = Filename.concat state.bases_dir (bname ^ ".gwb") in
+  let c = 
+    Filename.concat state.bin_dir "consang" ^ " " ^ base ^ " > comm.log"
+  in
+  let rc = Sys.command c in
+  if rc > 1 then
+    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
+    print_endline c
+  else ();
+};
+
+value merge state bnames bname parameters = do {
+  (* tester quel gwc *)
+  List.iter
+    (fun bname ->
+      let bname = Filename.concat state.bases_dir (bname ^ ".gwb") in
+      let c = 
+        Filename.concat state.bin_dir "gwu" ^ " " ^ bname ^ " -o " ^ bname ^ ".gw"
+      in
+      let rc = Sys.command c in
+      if rc > 1 then
+        (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
+        print_endline c
+      else () )
+    bnames;
+  let old_bases = 
+    List.fold_left 
+      (fun accu bname -> accu ^ " -sep " ^ bname ^ ".gw") 
+      "" bnames
+  in
+  let bname = Filename.concat state.bases_dir bname in
+  let c =
+    Filename.concat state.bin_dir "gwc" ^ old_bases ^ " -f -o " ^ bname
+  in 
+  let rc = Sys.command c in
+  if rc > 1 then
+    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
+    print_endline c
+  else ();
+};
+
+value save_to_ged state bname fname = do {
+  let bname = Filename.concat state.bases_dir (bname ^ ".gwb") in
+  let c =
+    Filename.concat state.bin_dir "gwb2ged" ^ bname ^ " -o " ^ fname ^ ".ged"
+  in 
+  let rc = Sys.command c in
+  if rc > 1 then
+    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
+    print_endline c
+  else ();
+};
+
+value save_to_gw state bname fname = do {
+  let bname = Filename.concat state.bases_dir (bname ^ ".gwb") in
+  let c =
+    Filename.concat state.bin_dir "gwu" ^ bname ^ " -o " ^ fname ^ ".gw"
+  in 
+  let rc = Sys.command c in
+  if rc > 1 then
+    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
+    print_endline c
+  else ();
+};
+
 value main_window = do {
   GMain.init ();
   let wnd = GWindow.window 
@@ -208,286 +363,6 @@ value select_file parent initial_file = do {
   new_file
 };
 
-(*
-value rec show_main state = do {
-  clean_waiting_pids state;
-  let databases =
-    List.sort compare
-      (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
-         (Array.to_list (Sys.readdir state.bases_dir)))
-  in
-  let (run_frame, gframe) = window_centering state.tk_win in
-  let txt = Label.create run_frame [Text (transl "Server is running...")] in
-  pack [txt] [];
-  if databases = [] then do {
-    let txt = Label.create run_frame [Text (transl "No databases.")] in
-    pack [txt] [];
-  }
-  else do {
-    let txt = Label.create run_frame [Text (transl "Available databases:")] in
-    pack [txt] [];
-    List.iter
-      (fun dbn -> do {
-         let bn = Filename.chop_extension dbn in
-         let frame = Frame.create run_frame [] in
-         let blab = Label.create frame [Text ("- " ^ bn ^ " -")] in
-         let bbut =
-           Button.create frame
-             [Text (transl "Browse");
-              Command (fun _ -> browse state state.browser state.port bn)]
-         in
-         pack [blab] [Side Side_Left];
-         pack [bbut] [Side Side_Right];
-         pack [frame] [Side Side_Top; Fill Fill_X];
-       })
-      databases;
-  };
-  let cbut =
-    Button.create run_frame
-      [Text (transl "Create a new database");
-       Command
-         (fun _ -> do {
-            Pack.forget [gframe];
-            new_database state;
-          })]
-  in
-  let obut =
-    Button.create run_frame
-      [Text (transl "Change options");
-       Command
-         (fun _ -> do {
-            Pack.forget [gframe];
-            change_options state;
-          })]
-  in
-  let rbut =
-    Button.create run_frame
-      [Text (transl "Restart");
-       Command
-         (fun _ -> do {
-            Pack.forget [gframe];
-            close_server state;
-            launch_server state;
-          })]
-  in
-  let wbut =
-    Button.create run_frame [Text (transl "Quit"); Command closeTk]
-  in
-  pack [cbut; obut; rbut; wbut] [Fill Fill_X];
-}
-
-and change_options state = do {
-  clean_waiting_pids state;
-  let (frame, gframe) = window_centering state.tk_win in
-
-  let tv2 = do {
-    let opt = Frame.create frame [] in
-    let tv = Textvariable.create () in
-    let lab =
-      Label.create opt [Text (transl "Select browser language if any:")]
-    in
-    let val1 =
-      Radiobutton.create opt [Text (transl "yes"); Value "yes"; Variable tv]
-    in
-    let val2 =
-      Radiobutton.create opt [Text (transl "no"); Value "no"; Variable tv]
-    in
-    Textvariable.set tv (if state.browser_lang then "yes" else "no");
-    pack [lab] [Side Side_Left];
-    pack [val1; val2] [Side Side_Right];
-    pack [opt] [Fill Fill_X];
-    tv
-  }
-  in
-
-  let tv3 = do {
-    let opt = Frame.create frame [] in
-    let lab = Label.create opt [Text (transl "HTTP Authentication:")] in
-    let tv = Textvariable.create () in
-    let val1 =
-      Radiobutton.create opt
-        [Text (transl "basic"); Value "basic"; Variable tv]
-    in
-    let val2 =
-      Radiobutton.create opt
-        [Text (transl "digest"); Value "digest"; Variable tv]
-    in
-    Textvariable.set tv (if state.digest_auth then "digest" else "basic");
-    pack [lab] [Side Side_Left];
-    pack [val1; val2] [Side Side_Right];
-    pack [opt] [Fill Fill_X];
-    tv
-  }
-  in
-
-  let buts = do {
-    let buts = Frame.create frame [] in
-    let but1 =
-      button_create buts [Text (transl "Cancel")]
-        (fun _ -> do {
-           Pack.forget [gframe];
-           show_main state;
-         })
-    in
-    let but2 =
-      button_create buts [Text (transl "Apply")]
-        (fun _ -> do {
-           state.browser_lang := Textvariable.get tv2 = "yes";
-           state.digest_auth := Textvariable.get tv3 = "digest";
-           Pack.forget [gframe];
-           close_server state;
-           launch_server state;
-         })
-    in
-    pack [but1] [Side Side_Left];
-    pack [but2] [Side Side_Right];
-    buts
-  }
-  in
-  pack [(*tit; sel;*) buts] [];
-}
-*)
-
-(*
-
-and config_browser state =
-  let default_sys_bin_dir =
-    match Sys.os_type with
-    [ "Win32" | "Cygwin" -> "C:\\Program Files"
-    | _ -> "/usr/bin" ]
-  in
-  let browsers () =
-    let defbrofil =
-      try Sys.getenv "DEFAULT_BROWSERS_FILE" with
-      [ Not_found -> Filename.concat "gw" "browsers.txt" ]
-    in
-    let browsers =
-      match try Some (open_in defbrofil) with [ Sys_error _ -> None ] with
-      [ Some ic ->
-          loop [] where rec loop list =
-            match try Some (input_line ic) with [ End_of_file -> None ] with
-            [ Some name -> loop [name :: list]
-            | None -> do { close_in ic; list } ]
-      | None -> [] ]
-    in
-    let default_browsers =
-      match Sys.os_type with
-      [ "Win32" | "Cygwin" ->
-          ["C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-           "C:\\Program Files\\Internet Explorer\\iexplore.exe"]
-      | _ ->
-          ["/usr/bin/firefox"; "/usr/bin/mozilla"] ]
-    in
-    List.filter Sys.file_exists (List.rev_append browsers default_browsers)
-  in
-  let browsers = lazy (browsers ()) in
-  let other_browser_var = lazy (Textvariable.create ()) in
-
-  let select frame var = do {
-    let browsers = Lazy.force browsers in
-    let other_browser_var = Lazy.force other_browser_var in
-    let other_browser_dir = Textvariable.create () in
-    Textvariable.set other_browser_dir default_sys_bin_dir;
-    let sframe = Frame.create frame [] in
-    let list =
-      if browsers = [] then do {
-        let bro = Label.create sframe [TextVariable other_browser_var] in
-        Textvariable.set var "other";
-        bro
-      }
-      else do {
-        let list = Frame.create sframe [] in
-        List.iter
-          (fun fn -> do {
-             let frad = Frame.create list [] in
-             let rad =
-               Radiobutton.create frad [Text fn; Variable var; Value fn]
-             in
-             pack [rad] [Side Side_Left];
-             pack [frad] [Fill Fill_X];
-           })
-           browsers;
-        let frad = Frame.create list [] in
-        Textvariable.set other_browser_var
-          (match state.browser with
-           [ Some s -> if List.mem s browsers then transl "other:" else s
-           | None -> transl "other:" ]);
-        let rad =
-          Radiobutton.create frad
-            [TextVariable other_browser_var; Variable var; Value "other"]
-        in
-        pack [rad] [Side Side_Left];
-        pack [frad] [Fill Fill_X];
-        Textvariable.set var
-          (match state.browser with
-           [ Some s -> if List.mem s browsers then s else "other"
-           | None -> List.hd browsers ]);
-        list
-      }
-    in
-    let but =
-      button_create sframe [Text (transl "Select")]
-        (fun () -> do {
-           Textvariable.set var "other";
-           let ini_dir = Textvariable.get other_browser_dir in
-           let br = Tk.getOpenFile [InitialDir ini_dir] in
-           if br <> "" then do {
-             Textvariable.set other_browser_var br;
-             Textvariable.set other_browser_dir (Filename.dirname br);
-           }
-           else ();
-         })
-    in
-    pack [list; but] [];
-    sframe
-  }
-  in
-  let to_string =
-    fun
-    [ Some s -> s
-    | None -> "" ]
-  in
-  let from_string s =
-    let s =
-      if s = "other" then Textvariable.get (Lazy.force other_browser_var)
-      else s
-    in
-    let s = if s = "other" then "" else s in
-    if s = "" then None else Some s
-  in
-  config state
-    (fun () ->
-       if Lazy.force browsers = [] then transl "Browser:"
-       else transl "Browser(s):")
-    (fun () -> List.assoc "browser" state.config_env)
-    None select to_string from_string
-    (fun state browser -> state.browser := browser)
-    (Some ("port", config_port))
-    (fun state -> do {
-       let browser = state.browser in
-       match browser with
-       [ Some browser -> eprintf "browser = %s\n" browser
-       | None -> eprintf "no browser\n" ];
-       flush stderr;
-       match browser with
-       [ Some browser ->
-           let config_env_browser =
-             try List.assoc "browser" state.config_env with
-             [ Not_found -> "" ]
-           in
-           if browser <> "" && browser <> config_env_browser then do {
-             state.config_env :=
-               List.filter (fun (v, _) -> v <> "browser") state.config_env @
-               [("browser", browser)];
-             write_config_env state.config_env
-           }
-           else ()
-       | None -> () ];
-       config_bases_dir state
-     })
-
-*)
-
 value create_menu depth tearoff = 
   let rec aux depth tearoff = do {
     let menu = GMenu.menu () and group = ref None in
@@ -531,7 +406,7 @@ value rec show_main state = do {
       ~text:(transl "Available databases:")
       ~packing:vbox#pack ();
     List.iter
-      (fun dbn -> 
+      (fun dbn -> do {
          let bn = Filename.chop_extension dbn in
          let hbox = GPack.hbox
            ~spacing:5
@@ -547,7 +422,18 @@ value rec show_main state = do {
          in
          ignore 
            (bbut#connect#clicked 
-             (fun () -> ignore (browse state state.browser state.port bn) ) ) )
+             (fun () -> ignore (browse state state.browser state.port bn)));
+         let blab = GMisc.label
+           ~text:(" - ")
+           ~packing:hbox#pack ()
+         in
+         let bbut = GButton.button
+           ~label:(transl "Tools")
+           ~packing:hbox#pack () 
+         in
+         ignore 
+           (bbut#connect#clicked 
+             (fun () -> do { vbox#destroy (); tools state bn })) })
       databases;
 
 
@@ -571,6 +457,7 @@ value rec show_main state = do {
     ignore 
       (cbut#connect#clicked 
         (fun () -> do { vbox#destroy (); new_database_gwc2 state } ) );
+(*
     let btn = GButton.button
       ~label:"ged2gwb"
       ~packing:hbox#pack ()
@@ -578,6 +465,7 @@ value rec show_main state = do {
     ignore 
       (btn#connect#clicked 
         (fun () -> do { vbox#destroy (); ged2gwb state } ) );
+*)
     let rbut = GButton.button
       ~label:(transl "Restart")
       ~packing:hbox#pack ()
@@ -608,6 +496,19 @@ and new_database_gwc1 state = do {
     ~text:""
     ~packing:(vbox#pack ~expand:False ~fill:False ~padding:5) () 
   in
+  GMisc.label
+    ~text:(transl "Choisir un fichier")
+    ~packing:vbox#pack ();
+  let select = GButton.button 
+    ~stock:`OPEN 
+    ~packing:(vbox#pack ~expand:False) () 
+  in
+  let file = ref "" in
+  GMisc.label
+    ~text:("actual : " ^ file.val)
+    ~packing:vbox#pack ();
+  select#connect#clicked
+    (fun () -> file.val := select_file main_window "");
   let hbox = GPack.hbox
     ~spacing:5
     ~packing:vbox#pack ()
@@ -697,6 +598,173 @@ and new_database_gwc2 state = do {
                  match s.[i] with
                  [ 'a'..'z' | 'A'..'Z' | '-' | '0'..'9' -> loop (i + 1)
                  | _ -> () ]) )
+}
+
+and config_gwf state dbn = do {
+  let vbox = GPack.vbox
+    ~spacing:5
+    ~packing:main_window#add ()
+  in
+  GMisc.label
+    ~text:(transl "Configuration gwf file of " ^ dbn)
+    ~packing:vbox#pack ();
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
+  in
+  let vbox_list = GPack.vbox
+    ~spacing:5
+    ~packing:hbox#pack ()
+  in
+  let benv = read_base_env state dbn in
+  List.iter
+    (fun (k, v) -> 
+      ignore (
+       GMisc.label
+         ~text: (k ^ " : " ^ v)
+         ~packing:vbox_list#pack () ))
+    benv;
+  let hbox_valid = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
+  in
+  let btn_cancel = GButton.button
+    ~label:(transl "Cancel")
+    ~packing:hbox_valid#pack ()
+  in
+  ignore 
+    (btn_cancel#connect#clicked 
+       (fun () -> do { vbox#destroy (); show_main state } ) );
+  let btn_ok = GButton.button
+    ~label:(transl "OK")
+    ~packing:hbox_valid#pack () 
+  in
+  ignore 
+    (btn_ok#connect#clicked 
+       (fun () -> do { vbox#destroy (); show_main state } ) )
+}
+
+and tools state bname = do {
+  let vbox = GPack.vbox
+    ~spacing:5
+    ~packing:main_window#add ()
+  in
+  GMisc.label
+    ~text:(transl "Boîte à outil pour la base " ^ bname)
+    ~packing:vbox#pack ();
+  let vvbox = GPack.vbox
+    ~spacing:5
+    ~packing:vbox#pack ()
+  in
+  let bbut = GButton.button
+    ~label:(transl "Extract GW")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Extract GEDCOM")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Import GW")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Import GEDCOM")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Configure GWF")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> do { vbox#destroy (); config_gwf state bname })) ;
+  let bbut = GButton.button
+    ~label:(transl "Extract GEDCOM")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Nettoyage")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> clean_database state bname));
+  let bbut = GButton.button
+    ~label:(transl "Renommage")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Suppression")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Fusion")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Save & Restauration")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Consang")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let bbut = GButton.button
+    ~label:(transl "Update_nldb")
+    ~packing:vvbox#pack () 
+  in
+  ignore 
+    (bbut#connect#clicked 
+      (fun () -> ()));
+  let hbox_valid = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
+  in
+  let btn_cancel = GButton.button
+    ~label:(transl "Cancel")
+    ~packing:hbox_valid#pack ()
+  in
+  ignore 
+    (btn_cancel#connect#clicked 
+       (fun () -> do { vbox#destroy (); show_main state } ) );
+  let btn_ok = GButton.button
+    ~label:(transl "OK")
+    ~packing:hbox_valid#pack () 
+  in
+  ignore 
+    (btn_ok#connect#clicked 
+       (fun () -> do { vbox#destroy (); show_main state } ) )
 }
 
 and launch_server state = do {
@@ -1001,8 +1069,10 @@ and config_browser state =
     (fun state -> ignore (launch_server state))
 ;
 
-value default_bin_dir = "./gw";
-value default_bases_dir = "./bases";
+(**/**) (* main *)
+
+value default_bin_dir = abs_path (Filename.concat (Sys.getcwd ()) "gw");
+value default_bases_dir = abs_path (Filename.concat (Sys.getcwd ()) "bases");
 value default_port = 2317;
 value default_browser = None;
 

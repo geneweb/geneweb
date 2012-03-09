@@ -4,13 +4,13 @@
 include ../tools/Makefile.inc
 
 OCAMLC=ocamlc.opt
-OCAMLOPT=ocamlopt.opt
+OCAMLOPT=ocamlopt.opt -annot
 GWB=..
 OBJS=../src/version.cmo ../src/iovalue.cmo ../src/buff.cmo ../src/name.cmo ../src/mutil.cmo gui.cmo
 OCAMLI=-I ../src -I +lablgtk2
 TEST_DIR=test $$(basename "$<") = "$<" || { echo "Please run 'make' in directory '$$(dirname "$<")' first"; exit 1; }
 
-all:: out
+all:: opt
 
 out:: gui.out
 	$(RM) gui
