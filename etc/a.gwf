@@ -106,6 +106,11 @@ supervisor=
 # then the old key of the individual and finaly the new key of the individual.
 # notify_key=
 
+# Notify delete program (e.g. shell script) to be executed for each
+# database individual's name deleted. First argument is the name of the base,
+# then the old key of the individual.
+# notify_delete=
+
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
 wizard_just_friend=no
@@ -347,3 +352,38 @@ expand_env=no
 # Authorized wizards notes. By default, wizards notes are not allowed.
 #authorized_wizards_notes=yes/no
 
+# Custom the individual page.
+# Full documentation here http://opensource.geneanet.org/projects/geneweb/wiki/Fr_Template#Personnalisation-de-toutes-les-pages
+#
+# Basic explanation :
+# Add the element you want like this :
+#perso_module_0=etat_civil;
+#perso_module_1=parent_simple;
+#perso_module_2=union_simple;
+#perso_module_3=freresoeur_simple;
+#perso_module_4=relations;
+#perso_module_5=notes;
+#perso_module_6=sources;
+#perso_module_7=arbre_3gen_v_photo;
+# And the number of module 
+#perso_module_tplnb=8;
+# List of available elements :
+# etat_civil
+# parent_simple
+# parent_evolue
+# parent_complet
+# parent_photo
+# union_simple
+# union_evolue
+# union_complet
+# union_photo
+# freresoeur_simple
+# freresoeur_complet
+# famille
+# relations
+# notes
+# sources
+# arbre_3gen_v
+# arbre_3gen_v_photo
+# arbre_4gen_v
+# arbre_5gen_h

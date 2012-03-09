@@ -1,8 +1,33 @@
 GeneWeb version 6.04
 --------------------
 
-* Added an option in the ged2gwn tool. It behaves like previously, i.e. default
-  relation for a couple is Married. If Someone prefer, one can use the option
+* You can now custom (more easily) the template perso by setting the right
+  variables in the gwf files.
+  Have a look at this page for the full documentation :
+  http://opensource.geneanet.org/projects/geneweb/wiki/En_template#Personnaliser-les-fiches-individu
+* Template perso.txt : the update menu is now in the top of the page and split
+  into :
+  - update this person (shortcut to update this person directly)
+  - update menu (the classic menu)
+* Variation of the favicon in the templates : perso, ancmenu, updmenu, relmenu,
+  desmenu, cousmenu. Display the sex of the person as favicon.
+* Added the age of the individual in perso.txt
+* New search of the template files. This is now longer needed to copy the
+  template files in the base. This evolution is backward compatible and
+  works like this :
+  - search in base/template/name.txt
+  - search in gw/etc/template/name.txt
+  - search the first default template according to the template variable (gwf)
+* Notify_key is now called each time an individual is modified AND his key has
+  changed. This is basically in the Modify individual and Merge individual.
+* Added a notify_delete that works just like notify_key
+* Added a nofollow option on the link in the search page (the number of 
+  branches and the 'o' to fold/unfold.
+* Update lex_utf8 and the particules files. The last one is now the same as
+  the generated (by GeneWeb) one.
+* Added 'area' and 'map' in the default HTML tags
+* Added an option in the ged2gwb tool. It behaves like previously, i.e. default
+  relation for a couple is Married. If someone prefer, one can use the option
   -rs_no_mention to set the relation status to NoMention.
 * Added a new intruction in the template langage : FOR.
   It is a simple instruction, and could be improved later but for now it works
@@ -43,6 +68,18 @@ Ondrej Blazo:
 
 Ludovic Ledieu:
 * Fix the searching path for template in the CSS
+
+Mickaël Rouesné:
+* Fix the wrong display of tag <hr> with IE.
+* Update of template M :
+  ** delete file updhist.txt
+  ** added calendar.txt : link to statistics, pyramid of age, anniversary,
+     if calendar is republican, display the full date
+  ** added the languages in welcome.txt
+  ** ancsosa, deslist : added the divorce date, and state
+  ** ancmenu, desmenu : added the first_name alias
+  ** updfam, updind : refactoring and added javascript controller
+  ** trl : added the link to the other templates
 
 GeneWeb version 6.03
 --------------------
