@@ -14,15 +14,17 @@
   %incr_count;
   %foreach;family;
     %foreach;child;
-      %if;child.has_children;
-        %if;(count<2)
-          %incr_count;
-        %end;
-        %foreach;family;
+      %foreach;family;
+        %if;child.has_children;
+          %if;(count<2)
+            %incr_count;
+          %end;
           %foreach;child;
-            %if;child.has_children;
-              %if;(count<3)
-                %incr_count;
+            %foreach;family;
+              %if;child.has_children;
+                %if;(count<3)
+                  %incr_count;
+                %end;
               %end;
             %end;
           %end;
@@ -32,17 +34,22 @@
   %end;
 %end;
 
+
 %if;has_families;
-  <h3 class="highlight">[*marriage/marriages]1
-    %if;(count>0)
-      [and::child/children]1
-      %if;(count>1)
+  <h3 class="highlight">[*marriage/marriages]1%nn;
+    %if;(count>0 and count>1)
+      , [child/children]1%nn;
+      %if;(count>1 and count>2)
         <span style="font-size: 90%%">, [the grandchildren]</span>
+      %else
+        <span style="font-size: 90%%"> [and::the grandchildren]</span>
       %end;
       %if;(count>2)
-        <span style="font-size: 80%%">, [the great-grandchildren]</span>
+        <span style="font-size: 80%%"> [and::the great-grandchildren]</span>
       %end;
-    %end;  
+    %else;
+      %if;has_children; [and::child/children]1%end;
+    %end;
   </h3>
   <ul>
     %( On remet les compteurs à zéro et on commence à compter à 1 %)

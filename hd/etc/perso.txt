@@ -92,6 +92,10 @@
   [*navigation with %t as Sosa reference:::xxx].
 %end;
 
+%define;witness_relation(xxx, yyy)
+  [*witness at marriage of %s and %s:::xxx:yyy]
+%end;
+
 %define;short_display_person(xx)
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;

@@ -132,7 +132,7 @@
       %if;(spouse.access = mmm.mother.access)
         %apply;access_ind("mmm.father")
       %else;
-        %mmm.father;%mmm.father.title;%mmm.father.dates;
+        %mmm.father;%mmm.father.title;%mmm.father.dates;%nl;
       %end;
       %apply;type_wedding() 
       %if(family.marriage_date.year != "")<font size="-1">(%family.marriage_date.year;)</font>%end;
@@ -160,7 +160,7 @@
         %apply;type_puce_asc("mmm.mother")
         %apply;image_MF("mmm.mother","13")
         %apply;display_sosa("mmm.mother")
-        %mmm.mother;%mmm.mother.title;%mmm.mother.dates;
+        %mmm.mother;%mmm.mother.title;%mmm.mother.dates;%nl;
         %apply;type_puce_asc("spouse")
         %apply;type_wedding()
         %if(family.marriage_date.year != "")<font size="-1">(%family.marriage_date.year;)</font>%end;
