@@ -1808,7 +1808,7 @@ value robot_exclude_arg s =
     robot_xcl.val :=
       Some (G.Entry.parse robot_xcl_arg (G.parsable (Stream.of_string s)))
   with
-  [ Stdpp.Exc_located _ (Stream.Error _ | Token.Error _) ->
+  [ Ploc.Exc _ (Stream.Error _ | Token.Error _) ->
       do {
         eprintf "Bad use of option -robot_xcl\n";
         eprintf "Use option -help for usage.\n";
