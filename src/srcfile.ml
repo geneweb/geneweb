@@ -192,7 +192,7 @@ END;
 
 value extract_date d =
   try Some (G.Entry.parse date (G.parsable (Stream.of_string d))) with
-  [ Stdpp.Exc_located _ (Stream.Error _ | Token.Error _) -> None ]
+  [ Ploc.Exc _ (Stream.Error _ | Token.Error _) -> None ]
 ;
 
 value string_of_start_date conf =
