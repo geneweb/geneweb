@@ -405,12 +405,18 @@ value rec show_main state = do {
     GMisc.label
       ~text:(transl "Available databases:")
       ~packing:vbox#pack ();
+    let scrolled_window = GBin.scrolled_window ~border_width: 10
+        ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+        ~packing:vbox#add () in
+    let vvbox = GPack.vbox ~border_width: 10
+        ~packing:scrolled_window#add_with_viewport () in
+    vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
     List.iter
       (fun dbn -> do {
          let bn = Filename.chop_extension dbn in
          let hbox = GPack.hbox
            ~spacing:5
-           ~packing:vbox#pack ()
+           ~packing:vvbox#pack ()
          in
          let blab = GMisc.label
            ~text:("- " ^ bn ^ " -")
@@ -435,10 +441,6 @@ value rec show_main state = do {
            (bbut#connect#clicked 
              (fun () -> do { vbox#destroy (); tools state bn })) })
       databases;
-
-
-
-
     let hbox = GPack.hbox
       ~spacing:5
       ~packing:vbox#pack ()
@@ -652,10 +654,18 @@ and tools state bname = do {
   GMisc.label
     ~text:(transl "Boîte à outil pour la base " ^ bname)
     ~packing:vbox#pack ();
+  let scrolled_window = GBin.scrolled_window ~border_width: 10
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~packing:vbox#add () in
+(*
   let vvbox = GPack.vbox
     ~spacing:5
     ~packing:vbox#pack ()
   in
+*)
+  let vvbox = GPack.vbox ~border_width: 10
+      ~packing:scrolled_window#add_with_viewport () in
+  vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
   let bbut = GButton.button
     ~label:(transl "Extract GW")
     ~packing:vvbox#pack () 
