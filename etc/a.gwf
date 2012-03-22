@@ -357,16 +357,16 @@ expand_env=no
 #
 # Basic explanation :
 # Add the element you want like this :
-#perso_module_0=etat_civil;
-#perso_module_1=parent_simple;
-#perso_module_2=union_simple;
-#perso_module_3=freresoeur_simple;
-#perso_module_4=relations;
-#perso_module_5=notes;
-#perso_module_6=sources;
-#perso_module_7=arbre_3gen_v_photo;
+#perso_module_0=etat_civil
+#perso_module_1=parent_simple
+#perso_module_2=union_simple
+#perso_module_3=freresoeur_simple
+#perso_module_4=relations
+#perso_module_5=notes
+#perso_module_6=sources
+#perso_module_7=arbre_3gen_v_photo
 # And the number of module 
-#perso_module_tplnb=8;
+#perso_module_tplnb=8
 # List of available elements :
 # etat_civil
 # parent_simple
