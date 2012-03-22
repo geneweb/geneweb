@@ -15,7 +15,7 @@ GeneWeb version 6.04
 * New search of the template files. This is now longer needed to copy the
   template files in the base. This evolution is backward compatible and
   works like this :
-  - search in base/template/name.txt
+  - search in base/etc/mybase/name.txt
   - search in gw/etc/template/name.txt
   - search the first default template according to the template variable (gwf)
 * Notify_key is now called each time an individual is modified AND his key has
@@ -42,7 +42,8 @@ GeneWeb version 6.04
   %end;
   %i;
   OUTPUT => 42; 0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 42
-* Added an option to not try a getHostByName. Could slow down on windows.
+* Added an option to *not* try a getHostByName. Could slow down on windows. 
+  One should add -no_host_address to gwd to use this feature.
 * New implementation of the fonction that calculate if a person has a sosa 
   number or not. Much more efficent than the previous one !
 * It is now NOT possible to add or modify a family in which the first
