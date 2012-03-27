@@ -72,11 +72,11 @@ value print_base_warning oc base =
     }
   | MarriageDateAfterDeath p -> do {
       fprintf oc "%s\n" (designation base p);
-      fprintf oc "married after his/her death\n"
+      fprintf oc "marriage after his/her death\n"
     }
   | MarriageDateBeforeBirth p -> do {
       fprintf oc "%s\n" (designation base p);
-      fprintf oc "married before his/her birth\n"
+      fprintf oc "marriage before his/her birth\n"
     }
   | MotherDeadAfterChildBirth mother child ->
       fprintf oc "%s\n  is born after the death of his/her mother\n%s\n"

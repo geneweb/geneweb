@@ -279,6 +279,10 @@ value check_normal_marriage_date base error warning (ifam, fam) = do {
     (get_father cpl);
   check_normal_marriage_date_for_someone base error warning fam
     (get_mother cpl);
+  let wl = foi base ifam in
+  List.iter
+    (fun ip -> check_normal_marriage_date_for_someone base error warning fam ip)
+    (Array.to_list (get_witnesses wl))
 };
 
 (*
