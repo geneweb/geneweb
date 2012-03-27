@@ -5539,6 +5539,65 @@ sk: mužská línia/ženská línia
 sl: moška linija/ženska linija
 sv: manliga linjen/kvinnliga linjen
 
+
+    marriage took place after %t death
+af: huwelik plaasgevind het nadat %t dood
+bg: е сключен бракът място след смъртта на %t
+ca: el matrimoni es va dur a terme després de la mort de %t
+cs: manželství se konalo po smrti %t
+da: ægteskabet fandt sted efter %t død
+de: Heirat fand nach %t Tod
+en: marriage took place after %t death
+eo: geedzeco okazis post %t morto
+es: el matrimonio se llevó a cabo después de la muerte de %t
+et: abiellusid pärast %t surma
+fi: avioliitto on solmittu jälkeen %t kuoleman
+fr: mariage a eu lieu après la mort de %t
+is: hjónaband átti sér stað eftir %t dauða
+it: matrimonio ha avuto luogo dopo la morte di %t
+jp: 結婚は%tの死の後に開催されました
+kr: 결혼 %t 사망 이후에 발생한
+lv: laulības notika pēc %t nāves
+nl: huwelijk vond plaats na de dood van %t
+no: ekteskap fant sted etter %t døden
+pl: małżeństwo miało miejsce po śmierci %t
+pt: casamento ocorreu após a morte %t
+ro: căsătoria a avut loc după moartea %t
+ru: свадьба состоялась после смерти %t
+sk: Manželstvo sa konalo po smrti %t
+sl: poroka je potekala po smrti %t
+sv: äktenskapet ägde rum efter %t döden
+zh: 結婚後%t死亡的地方
+
+    marriage took place before %t birth
+af: huwelik plaasgevind het voor %t geboorte
+bg: е сключен бракът преди раждането на %t
+ca: el matrimoni es va dur a terme abans del naixement de %t
+cs: manželství bylo uzavřeno před narozením %t
+da: Ægteskabet fandt sted før %t fødslen
+de: Ehe vor %t Geburt
+en: marriage took place before %t birth
+eo: geedzeco okazis antaŭ ol %t naskiĝo
+es: el matrimonio se llevó a cabo antes del nacimiento de %t
+et: abielu toimus enne %t sündi
+fi: avioliitto on solmittu ennen %t syntymää
+fr: mariage a eu lieu avant la naissance de %t
+is: hjónaband átti sér stað áður en %t fæðingu
+it: matrimonio ha avuto luogo prima della nascita %t
+jp: 結婚は%tの出生前に行われた
+kr: 결혼 %t 출산 전에 발생한
+lv: laulība tika noslēgta pirms %t dzimšanas
+nl: huwelijk vond plaats vóór de %t geboorte
+no: ekteskap fant sted før %t fødsel
+pl: małżeństwo zostało zawarte przed urodzeniem %t
+pt: casamento ocorreu antes do nascimento %t
+ro: căsătoria a avut loc înainte de naştere %t
+ru: Свадьба состоялась до рождения %t
+sk: manželstvo bolo uzavreté pred narodením %t
+sl: sklenjena zakonska zveza pred rojstvom %t
+sv: äktenskapet ägde rum före %t födseln
+zh: 結婚前%t出生的地方
+
     marriage of %t after his/her death
 af: huwelik van %t na sy/haar afsterwe
 bg: брак на %t след неговата/нейната смърт
