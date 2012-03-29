@@ -5546,15 +5546,15 @@ bg: е сключен бракът място след смъртта на %t
 ca: el matrimoni es va dur a terme després de la mort de %t
 cs: manželství se konalo po smrti %t
 da: ægteskabet fandt sted efter %t død
-de: Heirat fand nach %t Tod
+de: die Ehe wurde nach dem Tod von %t geschlossen
 en: marriage had occured after the death of %t
 eo: geedzeco okazis post %t morto
-es: el matrimonio se llevó a cabo después de la muerte de %t
+es: matrimonio después de la muerte de %t
 et: abiellusid pärast %t surma
 fi: avioliitto on solmittu jälkeen %t kuoleman
 fr: mariage a eu lieu après la mort de %t
 is: hjónaband átti sér stað eftir %t dauða
-it: matrimonio ha avuto luogo dopo la morte di %t
+it: matrimonio celebrato dopo la morte di %t
 jp: 結婚は%tの死の後に開催されました
 kr: 결혼 %t 사망 이후에 발생한
 lv: laulības notika pēc %t nāves
@@ -5575,15 +5575,15 @@ bg: е сключен бракът преди раждането на %t
 ca: el matrimoni es va dur a terme abans del naixement de %t
 cs: manželství bylo uzavřeno před narozením %t
 da: Ægteskabet fandt sted før %t fødslen
-de: Ehe vor %t Geburt
+de: die Ehe wurde vor der Geburt von %t geschlossen
 en: marriage had occured before the birth of %t
 eo: geedzeco okazis antaŭ ol %t naskiĝo
-es: el matrimonio se llevó a cabo antes del nacimiento de %t
+es: matrimonio antes del nacimiento de %t
 et: abielu toimus enne %t sündi
 fi: avioliitto on solmittu ennen %t syntymää
 fr: mariage a eu lieu avant la naissance de %t
 is: hjónaband átti sér stað áður en %t fæðingu
-it: matrimonio ha avuto luogo prima della nascita %t
+it: matrimonio celebrato prima della nascita di %t
 jp: 結婚は%tの出生前に行われた
 kr: 결혼 %t 출산 전에 발생한
 lv: laulība tika noslēgta pirms %t dzimšanas
