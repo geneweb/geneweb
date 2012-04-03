@@ -107,6 +107,7 @@ value speclist =
    ("-mem", Arg.Set Outbase.save_mem, " Save memory, but slower");
    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
    ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.");
+   ("-nopicture", Arg.Set Gwcomp.no_picture, " do not create associative pictures"); 
    ("-q", Arg.Clear Mutil.verbose, " no verbose");
    ("-v", Arg.Set Mutil.verbose, " verbose")]
 ;
