@@ -211,12 +211,7 @@ value print_result conf base max_answers (list, len) =
         (fun p ->
            do {
              html_li conf;
-             let sosa_num = Perso.get_sosa_person conf base p in
-             if Num.gt sosa_num Num.zero then
-               Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
-                 (Util.image_prefix conf) "sosa.png"
-                 (Perso.string_of_num (Util.transl conf "(thousand separator)") sosa_num)
-             else ();
+             Perso.print_sosa conf base p True;
              Wserver.wprint "\n%s" (referenced_person_text conf base p);
              Wserver.wprint "%s" (Date.short_dates_text conf base p);
            })

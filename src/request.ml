@@ -263,12 +263,7 @@ value specify conf base n pl =
     List.iter
       (fun (p, tl) ->
          tag "li" begin
-           let sosa_num = Perso.get_sosa_person conf base p in
-           if Num.gt sosa_num Num.zero then
-             Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\"sosa: %s\"/> "
-               (Util.image_prefix conf) "sosa.png" 
-               (Perso.string_of_num (Util.transl conf "(thousand separator)") sosa_num)
-           else () ;
+           Perso.print_sosa conf base p True;
            match tl with
            [ [] ->
                Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
