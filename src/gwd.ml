@@ -1209,6 +1209,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     (fun fname -> 
       add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
     lexicon_list.val;
+  (* COMMENTAIRE FLH *)
+  let default_sosa_ref = (Adef.iper_of_int (-1), None) in
   let ar =
     authorization cgi from_addr request base_env passwd access_type utm
       base_file command
@@ -1256,6 +1258,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
        [ Not_found -> green_color ];
      lang = if lang = "" then default_lang else lang;
      default_lang = default_lang;
+     default_sosa_ref = default_sosa_ref;
      multi_parents =
        try List.assoc "multi_parents" base_env = "yes" with
        [ Not_found -> False ];

@@ -813,13 +813,15 @@ value get_key conf base =
     | _ -> -1 ]
   in
   let p = poi base (Adef.iper_of_int ip) in
-  let first_name = sou base (Gwdb.get_first_name p) in
-  let surname = sou base (Gwdb.get_surname p) in
+  let fn = sou base (Gwdb.get_first_name p) in
+  let sn = sou base (Gwdb.get_surname p) in
   let occ = Gwdb.get_occ p in
-  default_image_name_of_key first_name surname occ
+  (get_key_index p, (fn, sn, occ))
 ;
 
-value notify_change_key conf base old_key new_key =
+value notify_change_key conf base (_, (ofn, osn, oocc)) (_, (fn, sn, occ)) =
+  let old_key = default_image_name_of_key ofn osn oocc in
+  let new_key = default_image_name_of_key fn sn occ in
   if old_key <> new_key then
     History.record_key conf base old_key new_key
   else ()
@@ -858,7 +860,8 @@ value print_mod o_conf base =
     let k = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
     Util.commit_patches conf base;
     History.record conf base k "mp";
-    let new_key = default_image_name_of_key sp.first_name sp.surname sp.occ in
+    let new_key = (sp.key_index, (sp.first_name, sp.surname, sp.occ)) in
+    update_gwf_sosa conf base new_key;
     notify_change_key conf base old_key new_key;
     if not (is_quest_string p.surname) &&
        not (is_quest_string p.first_name) &&

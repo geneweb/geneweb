@@ -238,15 +238,25 @@ value get_key conf base i =
     | _ -> -1 ]
   in
   let p = poi base (Adef.iper_of_int ip) in
-  let first_name = sou base (Gwdb.get_first_name p) in
-  let surname = sou base (Gwdb.get_surname p) in
+  let fn = sou base (Gwdb.get_first_name p) in
+  let sn = sou base (Gwdb.get_surname p) in
   let occ = Gwdb.get_occ p in
-  default_image_name_of_key first_name surname occ
+  (get_key_index p, (fn, sn, occ))
 ;
 
-value notify_change_key conf base old_key new_key =
+value notify_change_key conf base (_, (ofn, osn, oocc)) (_, (fn, sn, occ)) =
+  let old_key = default_image_name_of_key ofn osn oocc in
+  let new_key = default_image_name_of_key fn sn occ in
   if old_key <> new_key then
     History.record_key conf base old_key new_key
+  else ()
+;
+
+value notify_update_gwf conf base (ip1, _) (ip2, _) (_, new_key) =
+  if ip1 = fst conf.default_sosa_ref then
+    update_gwf_sosa conf base (ip1, new_key)
+  else if ip2 = fst conf.default_sosa_ref then
+    update_gwf_sosa conf base (ip2, new_key)
   else ()
 ;
 
@@ -284,7 +294,8 @@ value effective_mod_merge conf base p1_old_key p2_old_key sp =
       let key = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
       Util.commit_patches conf base;
       History.record conf base key "fp";
-      let new_key = default_image_name_of_key sp.first_name sp.surname sp.occ in 
+      let new_key = (sp.key_index, (sp.first_name, sp.surname, sp.occ)) in
+      notify_update_gwf conf base p1_old_key p2_old_key new_key;
       notify_change_key conf base p1_old_key new_key ;
       notify_change_key conf base p2_old_key new_key ;
       Update.delete_topological_sort conf base;
