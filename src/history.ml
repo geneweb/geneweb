@@ -217,7 +217,8 @@ type hist_item =
 ;
 
 type env 'a =
-  [ Vinfo of string and string and string and hist_item and string
+  [ Vcnt of ref int
+  | Vinfo of string and string and string and hist_item and string
   | Vpos of ref int
   | Vsearch of option (bool * string * int)
   | Vother of 'a
@@ -238,7 +239,11 @@ value possibly_highlight env s =
 
 value rec eval_var conf base env xx loc =
   fun
-  [ ["first_name"] ->
+  [ ["count"] -> 
+      match get_env "count" env with
+      [ Vcnt c -> VVstring (string_of_int c.val)
+      | _ -> VVstring "" ]
+  |  ["first_name"] ->
       match get_env "info" env with
       [ Vinfo _ _ _ (HI_ind p) _ -> VVstring (p_first_name base p)
       | _ -> VVstring "" ]
@@ -246,6 +251,10 @@ value rec eval_var conf base env xx loc =
       match get_env "search" env with
       [ Vsearch (Some _) -> VVbool True
       | _ -> VVbool False ]
+  | ["incr_count"] ->
+      match get_env "count" env with
+      [ Vcnt c -> do { incr c; VVstring "" }
+      | _ -> VVstring "" ]
   | ["is_note"] ->
       match get_env "info" env with
       [ Vinfo _ _ _ (HI_notes _ _) _ -> VVbool True
@@ -282,6 +291,10 @@ value rec eval_var conf base env xx loc =
       match get_env "pos" env with
       [ Vpos r -> VVstring (string_of_int r.val)
       | _ -> raise Not_found ]
+  | ["reset_count"] ->
+      match get_env "count" env with
+      [ Vcnt c -> do { c.val := 0; VVstring  "" }
+      | _ -> VVstring "" ]
   | ["surname"] ->
       match get_env "info" env with
       [ Vinfo _ _ _ (HI_ind p) _ -> VVstring (p_surname base p)
@@ -429,7 +442,7 @@ value print_foreach conf base print_ast eval_expr =
 
 value gen_print conf base hoo =
   let env =
-    let env = [("pos", Vpos (ref 0))] in
+    let env = [("pos", Vpos (ref 0)); ("count", Vcnt (ref 0))] in
     match hoo with
     [ Some ho -> [("search", Vsearch ho) :: env]
     | None -> env ]
