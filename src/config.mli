@@ -37,6 +37,7 @@ type config =
     highlight : string;
     lang : string;
     default_lang : string;
+    default_sosa_ref : (iper * option Gwdb.person);
     multi_parents : bool;
     can_send_image : bool;
     authorized_wizards_notes : bool;

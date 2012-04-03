@@ -760,6 +760,12 @@ value treat_request conf base log = do {
         set_owner conf;
         extract_henv conf base;
         make_senv conf base;
+        let conf =
+          match Util.default_sosa_ref conf base with
+          [ Some p ->
+              {(conf) with default_sosa_ref = (get_key_index p, Some p)}
+          | None -> conf ]
+        in
         if only_special_env conf.env then do {
           match p_getenv conf.base_env "counter" with
           [ Some "no" -> ()

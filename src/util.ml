@@ -2117,21 +2117,56 @@ value person_exists conf base (fn, sn, oc) =
       | None -> False ] ]
 ;
 
+value default_sosa_ref conf base =
+  match p_getenv conf.base_env "default_sosa_ref" with
+  [ Some n ->
+      if n = "" then None
+      else
+        match person_ht_find_all base n with
+        [ [ip] ->
+            let p = pget conf base ip in
+            if is_hidden p then None
+            else Some p
+        | _ -> None ]
+  | None -> None ]
+;
+
 value find_sosa_ref conf base =
   match find_person_in_env conf base "z" with
   [ Some p -> Some p
-  | None ->
-      match p_getenv conf.base_env "default_sosa_ref" with
-      [ Some n ->
-          if n = "" then None
-          else
-            match person_ht_find_all base n with
-            [ [ip] ->
-                let p = pget conf base ip in
-                if is_hidden p then None
-                else Some p
-            | _ -> None ]
-      | None -> None ] ]
+  | None -> default_sosa_ref conf base ]
+;
+
+value write_default_sosa conf base key = do {
+  let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
+  let gwf = List.rev [("default_sosa_ref", key) :: gwf] in
+  let fname = base_path [] (conf.bname ^ ".gwf") in
+  let tmp_fname = fname ^ "2" in
+  let oc = 
+    try Pervasives.open_out tmp_fname with 
+    [ Sys_error _ -> failwith "the gwf database is not writable" ] 
+  in
+  List.iter (fun (k, v) -> Pervasives.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
+  close_out oc ;
+  try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
+  try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+  try Sys.rename tmp_fname fname with [ Sys_error _ -> () ]
+};
+
+value update_gwf_sosa conf base (ip, (fn, sn, occ)) =
+  let sosa_ref_key =
+    match snd conf.default_sosa_ref with
+    [ Some p -> 
+        p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " 
+        ^ p_surname base p
+    | None -> "" ]
+  in
+  let new_key = fn ^ "." ^ string_of_int occ ^ " " ^ sn in
+  if ip = fst conf.default_sosa_ref && new_key != sosa_ref_key then
+    (* On met à jour le fichier gwf, la config *)
+    (* se mettera à jour par treat_request.    *)
+    write_default_sosa conf base new_key
+  else ()
 ;
 
 value create_topological_sort conf base =
