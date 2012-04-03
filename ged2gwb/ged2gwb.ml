@@ -168,6 +168,7 @@ value untreated_in_notes = ref False;
 value force = ref False;
 value default_source = ref "";
 value relation_status = ref Married;
+value no_picture = ref False;
 
 (* Reading input *)
 
@@ -1622,7 +1623,7 @@ value add_indi gen r =
     match find_field "OBJE" r.rsons with
     [ Some r ->
         match find_field "FILE" r.rsons with
-        [ Some r -> r.rval
+        [ Some r -> if no_picture.val then "" else r.rval
         | None -> "" ]
     | None -> "" ]
   in
@@ -2891,6 +2892,8 @@ be - First names enclosed -
    ("-no_nd", Arg.Set no_negative_dates, " \
 - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year");
+   ("-nopicture", Arg.Set no_picture, " \
+- Don't extract individual picture.");
    ("-udi", Arg.String set_undefined_death_interval, "\
 x-y   - Undefined death interval -
        Set the interval for persons whose death part is undefined:

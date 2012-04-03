@@ -180,6 +180,7 @@ value rindex s c =
 
 value line_cnt = ref 0;
 value no_fail = ref False;
+value no_picture = ref False;
 
 value input_line0 ic =
   let line = input_line ic in
@@ -394,7 +395,9 @@ value get_pub_name str l =
 
 value get_image str l =
   match l with
-  [ ["#image" | "#photo"; x :: l'] -> (cut_space x, l')
+  [ ["#image" | "#photo"; x :: l'] -> 
+    if no_picture.val then ("", l')
+    else (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
