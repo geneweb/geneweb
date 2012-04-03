@@ -15,6 +15,7 @@ value print_what_links : config -> base -> person -> unit;
 value build_sosa_ht : config -> base -> unit; 
 value get_sosa_person : config -> base -> person -> Num.t;
 value get_single_sosa : config -> base -> person -> Num.t;
+value print_sosa : config -> base -> person -> bool -> unit;
 
 value string_of_num : string -> Num.t -> string;
 
