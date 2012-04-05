@@ -50,6 +50,16 @@ value print_same_name conf base p =
   match Gutil.find_same_name base p with
   [ [_] -> ()
   | pl ->
+      let print_person p =
+        do {
+          stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
+          begin
+            Wserver.wprint "%s.%d %s" (p_first_name base p)
+              (get_occ p) (p_surname base p);
+          end;
+          Wserver.wprint "%s" (Date.short_dates_text conf base p)
+        }
+      in
       let pl = restrict_to_small_list pl in
       tag "p" begin
         Wserver.wprint "%s:\n"
@@ -60,12 +70,17 @@ value print_same_name conf base p =
              stag "li" begin
                match p with
                [ Some p -> do {
-                   stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
-                   begin
-                     Wserver.wprint "%s.%d %s" (p_first_name base p)
-                       (get_occ p) (p_surname base p);
-                   end;
-                   Wserver.wprint "%s\n" (Date.short_dates_text conf base p)
+                   print_person p;
+                   let ifam = get_family p in
+                   List.iter 
+                     (fun ifam -> do {
+                       let fam = foi base ifam in
+                       let sp = spouse (get_key_index p) fam in
+                       let sp = poi base sp in
+                       Wserver.wprint ", &amp; ";
+                       print_person sp } ) 
+                     (Array.to_list ifam);
+                   Wserver.wprint "\n"
                  }
                | None -> Wserver.wprint "...\n" ];
              end)
