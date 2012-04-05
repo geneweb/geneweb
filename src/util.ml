@@ -2862,7 +2862,7 @@ value dispatch_in_columns ncol list order =
   (len_list, ini_list)
 ;
 
-value print_in_columns conf len_list list wprint_elem = do {
+value print_in_columns conf ncols len_list list wprint_elem = do {
   begin_centered conf;
   tag "table" "width=\"95%%\" border=\"%d\"" conf.border begin
     tag "tr" "align=\"%s\" valign=\"top\"" conf.left begin
@@ -2877,7 +2877,7 @@ value print_in_columns conf len_list list wprint_elem = do {
                else
                  match list with
                  [ [(kind, ord, elem) :: list] -> do {
-                     if n = len then Wserver.wprint "<td>\n"
+                     if n = len then Wserver.wprint "<td width=\"%d\">\n" (100/ncols)
                      else if kind.val <> Elem then Wserver.wprint "</ul>\n"
                      else ();
                      if kind.val <> Elem then do {
@@ -2901,15 +2901,20 @@ value print_in_columns conf len_list list wprint_elem = do {
 };
 
 value wprint_in_columns conf order wprint_elem list =
-  let (len_list, list) =
-    let ncols =
-      match p_getint conf.env "ncols" with
-      [ Some n -> max 1 n
-      | None -> if List.length list < 10 then 1 else 3 ]
-    in
+  let ncols =
+    match p_getint conf.env "ncols" with
+    [ Some n -> max 1 n
+    | None -> 
+        let len_list = List.length list in
+        if len_list < 10 then 1 
+        else if len_list < 100 then 2
+        else if len_list < 200 then 3
+        else 4 ]
+  in
+  let (len_list, list) = 
     dispatch_in_columns ncols list order
   in
-  print_in_columns conf len_list list wprint_elem
+  print_in_columns conf ncols len_list list wprint_elem
 ;
 
 
