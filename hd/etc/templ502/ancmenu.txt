@@ -1,0 +1,300 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: ancmenu.txt,v 5.11 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %apply;a_of_b%with;
+      [*ancestors]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  </style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<h1 style="text-align:center" class="highlight">%nn;
+  %apply;a_of_b%with;
+    [*ancestors]%nn;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;
+  %end;
+</h1>
+
+%define;tothegen(xx)
+  [*to the %s generation:::xx]%nn;
+%end;
+
+%define;navsosa(xx)
+  [*navigation with %t as Sosa reference:::xx].
+%end;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+<table border="%border;" width="100%%"><tr><td align="center">
+<table border="%border;">
+<tr>
+  <td align="center">
+    <form method="get" action="%action;">
+    <p>
+      %hidden;
+      <input type="hidden" name="m" value="A"%/>
+      %if;access_by_key;
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="oc" value="%occ;"%/>
+        %end;
+      %else
+        <input type="hidden" name="i" value="%index;"%/>
+      %end;
+    </p>
+    <div>
+      <select name="v">
+        %foreach;ancestor_level;
+          <option value="%level;"%nn;
+            %if;(level = 1) selected="selected"%end;>%nn;
+            %if;(level = 1)[*specify::generation/generations]0%nn;
+            %elseif;(level = 2)[*to the parents]%nn;
+            %elseif;(level = 3)[*to the grandparents]%nn;
+            %elseif;(level = 4)[*to the great-grandparents]%nn;
+            %else;
+              %apply;tothegen%with;
+                %apply;nth([nth (generation)], level)
+              %end;
+            %end;
+            %if;(level != 1) (%number_of_ancestors;)%end;
+          </option>
+        %end;
+      </select>
+      <input type="submit" value="Ok"%/>
+    </div>
+    <table border="%border;" width="100%%" style="margin-top:1em">
+      <tr>
+        <td align="%left;" valign="top">
+          <label>
+            <input type="radio" name="t" value="N" checked="checked"%/>
+            [*short display] (*)
+          </label>
+          <br%/>
+          - Sosa base
+          <label><input type="radio" name="sosab" value="8"%/>8</label>
+          <label>%nn
+            <input type="radio" name="sosab" value="10" checked="checked"%/
+          >10</label>
+          <label><input type="radio" name="sosab" value="16"%/>16</label>
+          <br%/><br%/>
+          <label>
+            <input type="radio" name="t" value="G"%/>
+            [*long display] (*)
+          </label>
+          <br%/>
+          <label>
+            - [siblings]
+            <input type="checkbox" name="siblings" value="on"%sp;
+             checked="checked"%/>
+          </label>
+          <br%/>
+          <label>
+            - [note/notes]1
+            <input type="checkbox" name="notes" value="on" checked="checked"%/>
+          </label>
+          <br%/>
+          <label>
+            - [source/sources]1
+            <input type="checkbox" name="src" value="on" checked="checked"%/>
+          </label>
+          <br%/>
+          <label>
+            - [relation/relations]1
+            <input type="checkbox" name="rel" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [witness/witnesses]1 ([marriage/marriages]1)
+            <input type="checkbox" name="witn" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [comment] ([marriage/marriages]1)
+            <input type="checkbox" name="comm" value="on"%/>
+          </label>
+        </td>
+        <td align="%left;" valign="top">
+          <label>
+            <input type="radio" name="t" value="T"%/>
+            [*tree]
+            %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
+              ([maximum] 7 [generation/generations]1)
+            %elseif;(
+              bvar.max_anc_tree != "" and
+              max_anc_level >= bvar.max_anc_tree
+            )
+              ([maximum] %bvar.max_anc_tree; [generation/generations]1)
+            %end;
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="A"%/>
+            [*male line/female line]0
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="C"%/>
+            [*male line/female line]1
+          </label>
+          <br%/>
+          <label>
+            - [*image/images]1
+            <input type="checkbox" name="image" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [*marriage/marriages]0
+            <input type="checkbox" name="marriage" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [*border]
+            <input name="bd" size="1" maxlength="2" value="0"%/>
+          </label>
+          <br%/>
+          <table cellspacing="0" cellpadding="0" border="%border;">
+            <tr>
+              <td align="%left;">-&nbsp;[*color]</td>
+              <td align="%left;">
+                <input type="radio" name="color" value="" checked="checked"%/>
+              </td>
+              <td style="background:#FFC0C0">
+                <input type="radio" name="color" value="#FFC0C0"%/>
+              </td>
+              <td style="background:#FFFFC0">
+                <input type="radio" name="color" value="#FFFFC0"%/>
+              </td>
+              <td style="background:#C0FFC0">
+                <input type="radio" name="color" value="#C0FFC0"%/>
+              </td>
+              <td style="background:#C0FFFF">
+                <input type="radio" name="color" value="#C0FFFF"%/>
+              </td>
+              <td style="background:#C0C0FF">
+                <input type="radio" name="color" value="#C0C0FF"%/>
+              </td>
+              <td style="background:#FFC0FF">
+                <input type="radio" name="color" value="#FFC0FF"%/>
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td align="%left;" valign="top">
+          <label>
+            <input type="radio" name="t" value="L"%/>
+            [*list/list (ancestors)]1
+            %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
+              ([maximum] 8 [generation/generations]1)
+            %elseif;(
+              bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level
+            )
+              ([maximum] %bvar.max_anc_level; [generation/generations]1)
+            %end;
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="H"%/>
+            [*horizontally]
+            %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
+              ([maximum] 8 [generation/generations]1)
+            %elseif;(
+              bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level
+            )
+              ([maximum] %bvar.max_anc_level; [generation/generations]1)
+            %end;
+          </label>
+          <br%/>
+          <label>
+            <input type="radio" name="t" value="F"%/>
+            [*surnames list]
+          </label>
+          <br%/><br%/>
+          <label>
+            <input type="radio" name="t" value="M"%/>
+            [*missing ancestors]
+          </label>
+          <br%/>
+          <label>
+            - [*alphabetic order]
+            <input type="checkbox" name="al" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [*include missing spouses]
+            <input type="checkbox" name="ms" value="on"%/>
+          </label>
+          <br%/>
+        </td>
+      </tr>
+      <tr><td colspan="3">&nbsp;</td></tr>
+      <tr>
+        <td colspan="3" align="center">
+          <label>
+            [*cancel GeneWeb links]
+            <input type="checkbox" name="cgl" value="on"%/>
+          </label>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3" align="center">
+          <label>
+            (*) [*only the generation selected]
+            <input type="checkbox" name="only" value="on"%/>
+          </label>
+        </td>
+      </tr>
+    </table>
+    </form>
+
+    <p>
+      %apply;navsosa%with;
+        <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
+        %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
+      %end;
+    </p>
+  </td>
+</tr>
+</table>
+</td></tr></table>
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

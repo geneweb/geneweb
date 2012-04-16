@@ -1,0 +1,70 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: stats.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>[*statistics]</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  </style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+<h1 style="text-align:center" class="highlight">[*statistics]</h1>
+
+%define;births(nnn)[the latest %d births:::nnn]%end;
+%define;deaths(nnn)[the latest %t deaths:::nnn]%end;
+%define;marriages(nnn)[the latest %d marriages:::nnn]%end;
+%define;engaged(nnn)
+  [the %d oldest couples perhaps still alive and engaged:::nnn]%nn;
+%end;
+%define;alive(nnn)[the %d oldest perhaps still alive:::nnn]%end;
+%define;lived(nnn)[the %d who lived the longest:::nnn]%end;
+
+%let;n;%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;%in;
+
+<ul>
+%if;(wizard or friend)
+  <li><a href="%prefix;m=LB;k=%n;">%apply;births(n)</a></li>
+  <li><a href="%prefix;m=LD;k=%n;">%apply;deaths(n)</a></li>
+  <li><a href="%prefix;m=LM;k=%n;">%apply;marriages(n)</a></li>
+  <li><a href="%prefix;m=OE;k=%n;">%apply;engaged(n)</a></li>
+  <li><a href="%prefix;m=OA;k=%n;;lim=0">%apply;alive(n)</a></li>
+%end;
+<li><a href="%prefix;m=LL;k=%n;">%apply;lived(n)</a></li>
+</ul>
+
+%if;(wizard or friend)
+  <ul>
+    <li><a href="%prefix;m=POP_PYR;i=5;lim=0">[population pyramid]</a></li>
+  </ul>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

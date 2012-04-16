@@ -1,0 +1,168 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>[*calendar/calendars]1</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  </style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+<h1 style="text-align:center" class="highlight">[*calendar/calendars]1</h1>
+
+%define;day(ccc, nnn)
+  <td><input type="submit" name="dccc1" value=" &lt; "%/></td>
+  <td><input name="dccc" size="2" maxlength="2" value="%date.nnn.day;"%/></td>
+  <td><input type="submit" name="dccc2" value=" &gt; "%/></td>
+%end;
+
+%define;month(ccc, nnn, vvv, lll)
+  <td><input type="submit" name="mccc1" value=" &lt; "%/></td>
+  <td align="center">
+    <select name="mccc">
+      %foreach;integer_range(1, vvv)
+        <option value="%integer;"%nn;
+         %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
+           %apply;capitalize%with;%apply;nth("lll", integer-1)%end;
+        </option>
+      %end;
+    </select>
+  </td>
+  <td><input type="submit" name="mccc2" value=" &gt; "%/></td>
+%end;
+
+%define;year(ccc, nnn)
+  <td><input type="submit" name="yccc1" value=" &lt; "%/></td>
+  <td><input name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
+  <td><input type="submit" name="yccc2" value=" &gt; "%/></td>
+%end;
+
+%define;julian_year(ccc, nnn)
+  %let;year;
+    %if;(date.julian.month < 3 or
+         date.julian.month = 3 and date.julian.day < 25)
+      %expr(date.nnn.year - 1)/%expr(date.nnn.year % 10)
+    %else;%date.nnn.year;%end;
+  %in;
+  <td><input type="submit" name="yccc1" value=" &lt; "%/></td>
+  <td><input name="yccc" size="6" maxlength="6" value="%year;"%/></td>
+  <td><input type="submit" name="yccc2" value=" &gt; "%/></td>
+%end;
+
+%define;calendar(ccc, nnn, vvv, lll, yyy)
+  %if;([ !dates order] = "ddmmyy")
+    %apply;day("ccc", "nnn")
+    %apply;month("ccc", "nnn", "vvv", "lll")
+    %apply;yyy("ccc", "nnn")
+  %else;
+    %apply;yyy("ccc", "nnn")
+    %apply;month("ccc", "nnn", "vvv", "lll")
+    %apply;day("ccc", "nnn")
+  %end;
+  <td><input type="submit" name="tccc" value=" = "%/></td>
+%end;
+
+<table border="%border;" width="100%%"><tr><td align="center">
+
+<table border="%border;">
+<tr>
+<td align="%left;">
+  - %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end; -
+  %if;(date.julian_day = today.julian_day)<tt>%time;</tt>%end;
+</td>
+</tr>
+<tr><td align="%left;">&nbsp;</td></tr>
+<tr>
+<td align="center">
+  <form method="get" action="%action;">
+  <p>
+  %hidden;
+  <input type="hidden" name="m" value="CAL"%/>
+  </p>
+  <table border="1">
+  <tr align="%left;">
+  <td>&nbsp;</td>
+  %if;([ !dates order] = "ddmmyy")
+    <th align="center" colspan="3">[*year/month/day]2</th>
+    <th align="center" colspan="3">[*year/month/day]1</th>
+    <th align="center" colspan="3">[*year/month/day]0</th>
+  %else;
+    <th align="center" colspan="3">[*year/month/day]0</th>
+    <th align="center" colspan="3">[*year/month/day]1</th>
+    <th align="center" colspan="3">[*year/month/day]2</th>
+  %end;
+  <td>&nbsp;</td>
+  </tr>
+  <tr align="%left;">
+  <th>[*gregorian/julian/french/hebrew]0</th>
+  %apply;calendar("g", "gregorian", 12, [(month)], "year")
+  </tr>
+  <tr align="%left;">
+  <th>[*gregorian/julian/french/hebrew]1</th>
+  %apply;calendar("j", "julian", 12, [(month)], "julian_year")
+  </tr>
+  <tr align="%left;">
+  <th>[*gregorian/julian/french/hebrew]2</th>
+  %apply;calendar("f", "french", 13, [(french revolution month)], "year")
+  </tr>
+  <tr align="%left;">
+  <th>[*gregorian/julian/french/hebrew]3</th>
+  %apply;calendar("h", "hebrew", 13, [(hebrew month)], "year")
+  </tr>
+  </table>
+  </form>
+</td>
+</tr>
+<tr>
+<td align="center">
+  %if;(date.moon_phase.index != 0)
+    %apply;capitalize%with;
+      %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
+                 date.moon_phase.index) -%sp;
+      <tt>%date.moon_phase.hour;:%date.moon_phase.minute;</tt> UT
+    %end;
+  %end;
+  <br%/>
+  <span style="font-size:80%%">(%nn;
+    [moon age/new moon/first quarter/full moon/last quarter]0%sp;
+    = %date.moon_age;)</span>
+  <br%/><br%/>
+  [*julian day]:%sp;
+    %if;(date.julian_day < 1000)%date.julian_day;
+    %else;%date.julian_day.sep1000;%end;
+</td>
+</tr>
+</table>
+
+</td></tr></table>
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

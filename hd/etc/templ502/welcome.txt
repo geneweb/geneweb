@@ -1,0 +1,1301 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
+  <!-- Copyright (c) 2006-2007 INRIA -->
+  <title>[
+af: Genealogie/Familiekunde
+bg: Genealogy
+br: Genealogiezh
+ca: Genealogia
+cs: Genealogy
+da: Genealogi
+de: Genealogie
+en: Genealogy
+eo: Genealogio
+es: Genealogía
+et: Genealoogia
+fi: Genealogia
+fr: Généalogie
+he: תולדות
+is: Ættfræði
+it: Genealogia
+lv: Ģenealoģija
+nl: Genealogie
+no: Genealogi
+pl: Genealogia
+pt: Genealogia
+ro: Genealogie
+ru: Genealogy
+sl: Genealogija - Družinsko drevo
+sv: Genealogi
+] - %base.name;</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="%image_prefix;/gwlogo.png"%/>
+  <style type="text/css">
+    %if;(evar.templ = "random")
+      %include.random_css;
+    %else;
+      html { background:url('%image_prefix;/gwback.jpg') }
+      span.highlight { color: %highlight;; font-weight: bold }
+      #user-info { float: %right; }
+      #title { padding-top: 1em }
+      #title { text-align: center; vertical-align: middle; width: 100%% }
+      #title { color: %highlight; }
+      #lang { text-align: center }
+      #lang .title { font-size: 80%% }
+      #lang .list { width: 100%% }
+      #lang a { display: inline }
+      #lang .item span { display: none }
+      #content .subtitle { text-align: center }
+    %end;
+  </style>
+%base_header;
+</head>
+<body%if;(evar.templ != "random")%body_prop;%end;>
+
+<script type="text/javascript"><!--
+  function WorkOnBrowser() {
+    if (navigator.appVersion.substring(0,3) >= 3.0 &&
+        navigator.appName == 'Netscape' ||
+        navigator.appVersion.substring(0,3) >= 4.0 &&
+        navigator.appName.substring(0,9) == 'Microsoft') return true;
+    else return false;
+  }
+  // -->
+</script>
+
+%define;language_link(xx,yy)%sq;
+  %let;zz;%if;("yy" = "")xx%else;xx-yy%end;%in;%sq;
+  %let;tt;%if;("yy" = "")xx%else;xx_yy%end;%in;%sq;
+  <a class="item" title="%apply;language_name(zz)"
+   href="%prefix_base;lang=%zz;"
+   onmouseover="if (WorkOnBrowser())%sp;%sq;
+   i%tt;.src='%image_prefix;/t-xx.png'"
+   onmouseout="i%tt;.src='%image_prefix;/l-%zz;.jpg'"><img
+   src="%image_prefix;/l-%zz;.jpg" width="36" height="22" alt=""
+   id="i%tt;" style="border: 0"%/>%sq;
+  <span>%apply;language_name(zz)</span></a>
+%end;
+
+%define;sosa_rel(xx)
+  [<em>Sosa number</em> relative to %t:::xx]
+%end;
+
+<div id="user-info">
+  %if;(wizard and not friend)
+    <em>[wizard/wizards/friend/friends/exterior]0%sq;
+    %if;((wizard or just_friend_wizard) and user.ident != "")
+      : %user.ident;%sq;
+    %end;</em>
+    %if;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+      %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+        <span style="font-size:70%%">(<a
+         href="%prefix;w=">[disconnect]</a>)</span>
+      %end;
+    %end;
+  %end;
+  %if;(friend and not wizard)
+    <em>[wizard/wizards/friend/friends/exterior]2</em>
+    %if;(bvar.friend_passwd != "" or bvar.friend_passwd_file != "")
+      <span style="font-size:70%%">(<a
+       href="%prefix;w=">[disconnect]</a>)</span>
+    %end;
+  %end;
+  <a href="%prefix_base;lang=%evar.lang;
+   %if;(evar.templ != "random");templ=random%end;"%sp;
+   style="text-decoration:none">o</a>
+  <a href="%prefix_base;lang=%evar.lang;;templ=exp"%sp;
+   style="text-decoration:none">+</a>
+  %if;(referer != "")
+    <a href="%referer;"><img%sp;
+    src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+  %end;
+  <a href="%prefix_base;suicide=x"> </a>
+</div>
+
+<div style="float: %left;">
+  <a href="http://www.geneweb.org/"><img width="96" height="108"
+   src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
+   alt="GeneWeb"%/></a>
+</div>
+
+<div id="title">
+  <h1>[
+af: Genealogiese databasis
+ar: قاعدة المعلومات العائلية (جينيالوجيا)
+bg: Родословна база от данни
+br: Bon roadoù genealogiezh
+ca: Base de dades genealògica
+cs: Genealogická databáze
+da: Genealogisk database
+de: Genealogische Datenbank
+en: Genealogical database
+eo: Datenbazo genealogia
+es: Base de datos genealógica
+et: Genealoogiline andmebaas
+fi: Sukutietokanta
+fr: Base de données généalogique
+he: מאגר מידע תולדותי
+is: Ættfræði gagnagrunnur
+it: Base di dati genealogica
+lv: Ciltsrakstu datu bāze
+nl: Genealogische databank
+no: Genealogisk database
+pl: Genealogiczna baza danych
+pt: Base de Dados Genealógica
+ro: Baza de date genealogice
+ru: Генеaлогическая база данных
+sl: Genealoška baza podatkov
+sv: Genealogisk databas
+zh: 网络家谱
+]</h1>
+</div>
+
+<div id="lang">
+  <div class="title">
+    <em>[
+af: Taalvoorkeur/Language preference:
+ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
+bg: Можете да изберете друг език за съобщения измежду следните:
+br: Dibab a c'hellit ur yezh all etre ar re-mañ:
+ca: Podeu seleccionar una altre llengua, hi ha disponibles les següents:
+cs: Zvolte jazyk pro prohlížení databáze:
+da: Du kan vælge fremstilling på et andet sprog blandt de følgende:
+de: Du kannst eine der folgenden Sprachen für die Anzeige auswählen:
+en: You can select another displaying language among the following ones:
+eo: Vi povas elekti alian lingvon inter la sekvantajn:
+es: Puede seleccionar uno de los idiomas siguientes:
+et: Võid valida ka mõne muu keele järgnevatest:
+fi: Voit valita jonkin muun kielen allaolevista:
+fr: Vous pouvez sélectionner une autre langue d'affichage parmi les suivantes:
+it: Potete scegliere un'altra lingua fra le seguenti:
+is: Þú getur valið milli eftirfarandi tungumála:
+lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
+nl: U kunt een andere taal kiezen uit een van de volgende mogelijkheden:
+no: Du kan velge sidevisning på et annet språk blant følgende:
+pl: Możesz wybrać inny język spośród następujących:
+ro: poti sa alegi una din urmatoarele limbi pentru afisaj
+sl: Lahko izberete drug jezik:
+sv: Du kan välja ett annat språk bland de följande:
+]</em>
+  </div>
+  <div class="list">
+    %apply;language_link("af", "")
+    %apply;language_link("bg", "")
+    %apply;language_link("br", "")
+    %apply;language_link("ca", "")
+    %apply;language_link("cs", "")
+    %apply;language_link("da", "")
+    %apply;language_link("de", "")
+    %apply;language_link("en", "")
+    %apply;language_link("eo", "")
+    %apply;language_link("es", "")
+    %apply;language_link("et", "")
+    %apply;language_link("fi", "")
+    %apply;language_link("fr", "")
+    %apply;language_link("he", "")
+    %apply;language_link("is", "")
+    %apply;language_link("it", "")
+    %apply;language_link("lv", "")
+    %apply;language_link("nl", "")
+    %apply;language_link("no", "")
+    %apply;language_link("pl", "")
+    %apply;language_link("pt", "")
+    %apply;language_link("pt", "br")
+    %apply;language_link("ro", "")
+    %apply;language_link("ru", "")
+    %apply;language_link("sl", "")
+    %apply;language_link("sv", "")
+    %apply;language_link("zh", "")
+  </div>
+</div>
+
+%if;just_friend_wizard;
+  <div style="color: red; font-weight: bold; text-align: center">
+    [
+en: Wizard rights are now suspended for maintenance.
+fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
+]
+  </div>
+%end;
+
+%if;(bvar.motd != "")
+  <div>
+    %apply;interp(bvar.motd)
+  </div>
+%end;
+
+<div id="content">
+
+<div style="text-align: center; padding-top: 1em">
+  %apply;interp([
+af: Die databasis <span class="highlight">"%base.name;"</span> bevat%sq;
+    tans %base.nb_persons; persone.
+ar: قاعدة المعلومات <span class="highlight">"%base.name;"</span>
+    تحوي إلى يومنا %base.nb_persons; فرد
+bg: Базата от данни <span class="highlight">"%base.name;"</span>
+    в момента съдържа сведения за %base.nb_persons; души.
+br: Niver an dud a zo er bon roadoù <span class="highlight">%sq;
+    "%base.name;"</span> bremañ a zo : %base.nb_persons;.
+ca: La base de dades <span class="highlight">"%base.name;"</span>
+    conté actualment %base.nb_persons; persones.
+cs: Databáze <span class="highlight">"%base.name;"</span> obsahuje
+    %base.nb_persons; osob.
+da: Databasen <span class="highlight">"%base.name;"</span> indeholder
+    for øjeblikket %base.nb_persons; personer.
+de: Die Datenbank <span class="highlight">"%base.name;"</span>
+    enthält z. Zt. %base.nb_persons; Personen.
+en: The database <span class="highlight">"%base.name;"</span> now
+    holds %base.nb_persons; persons.
+eo: La datenbazo <span class="highlight">"%base.name;"</span> enhavas
+    nun %base.nb_persons; personojn.
+es: La base <span class="highlight">"%base.name;"</span> contiene
+    actualmente %base.nb_persons; personas.
+et: Andmebaas <span class="highlight">"%base.name;"</span> sisaldab
+    andmeid %base.nb_persons; isiku kohta.
+fi: Tietokannassa <span class="highlight">"%base.name;"</span> on
+    nyt %base.nb_persons; henkilöä.
+fr: La base de données <span class="highlight">"%base.name;"%sq;
+    </span> contient actuellement %base.nb_persons; personnes.
+fr-cr: Ni atchuèlement %base.nb_persons; nhon-m, fan-m, yiche adan
+       chagement <span class="highlight">"%base.name;"</span> ta-la
+he: במאגר המידע <span class="highlight">"%base.name;"</span> יש
+    %base.nb_persons; אנשים.
+is: Gagnagrunnurinn <span class="highlight">"%base.name;"</span> er
+    nú með %base.nb_persons; einstaklinga skráða.
+it: La base di dati <span class="highlight">"%base.name;"</span>
+    contiene attualmente %base.nb_persons; persone.
+lv: Datu bāze <span class="highlight">"%base.name;"</span> patreiz
+    satur %base.nb_persons; personas.
+nl: Deze databank <span class="highlight">"%base.name;"</span> bevat
+    nu %base.nb_persons; personen.
+no: Databasen <span class="highlight">"%base.name;"</span> inneholder
+    nå %base.nb_persons; personer.
+pl: Baza danych <span class="highlight">"%base.name;"</span> zawiera
+    obecnie osób: %base.nb_persons;.
+pt: A base de dados <span class="highlight">"%base.name;"</span>
+    contém actualmente %base.nb_persons; pessoas.
+pt-br: A base de dados <span class="highlight">"%base.name;"</span>
+       contém atualmente %base.nb_persons; pessoas.
+ro: baza de date <span class="highlight">"%base.name;"</span> conține
+    %base.nb_persons; persoane.
+ru: База данных <span class="highlight">"%base.name;"</span> сейчас
+    содержит %base.nb_persons; человек.
+sl: Baza podatkov <span class="highlight">"%base.name;"</span>
+    vsebuje %base.nb_persons; oseb.
+sv: Databasen <span class="highlight">"%base.name;"</span>
+    innehåller nu %base.nb_persons; personer.
+zh: 现有 %base.nb_persons; 人在数据库中。
+])
+</div>
+
+<div class="subtitle">
+  %if;base.has_notes;
+    <div>
+      (<a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;)
+    </div>
+  %end;
+  %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
+       and (wizard or wiznotes_dir_exists))
+    <div>
+      (<a href="%prefix;m=WIZNOTES">%sq;
+      [wizard/wizards/friend/friends/exterior]1</a>)
+    </div>
+  %end;
+  %if;has_misc_notes;
+    <div>
+      (<a href="%prefix;m=MISC_NOTES">[miscellaneous notes]...</a>)
+    </div>
+  %end;
+</div>
+
+%if;(not wizard and not just_friend_wizard)
+  %if;(not cgi and bvar.auth_file = "")
+    %( IE seems not to recognize style "display: table"; must use a table %)
+    <table cellpadding="0" cellspacing="0"%sp;
+     style="text-align: center; display: table; margin: auto">
+      <tr style="display: table-row">
+        <td style="display: table-cell; padding: 1em 100px">
+          %apply;interp([
+af: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a> toegang<br%/> (password)
+bg: Достъп като <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
+    </em></a><br%/> (парола)
+br: mont e-barzh evel <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (ger-tremen)
+ca: accés <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (clau)
+cs: <a href="%prefix;w=w">{<em>"%sq;
+    [wizard/wizards/friend/friends/exterior]0"</em></a>%sq;
+    přístup<br%/> (heslo)
+da: <a href="%prefix;w=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
+de: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a>-Zugang<br%/> (Passwort)
+en: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a> access<br%/> (password)
+eo: <a href="%prefix;w=w">Aliro <em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a><br%/> (pasvorto)
+es: <a href="%prefix;w=w">Entrada <em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
+    </em></a><br%/> (contraseña)
+et: Ligipääs: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
+    </em></a><br%/> (parool)
+fi: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a> kirjautuminen<br%/> (salasana)
+fr: accès <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (mot de passe).
+he: כניסה  <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
+    </em></a>
+is: <a href="%prefix;w=w"><em>Uppfærslu</em></a> aðgangur<br%/> (aðgangsorð)
+it: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a> access<br%/> (password)
+lv: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a> access<br%/> (password)
+nl: Toegang als <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
+    </em></a><br%/> (wachtwoord)
+no: <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a> adgang<br%/> (passord)
+pl: <a href="%prefix;w=w"><em>"%sq;
+    [wizard/wizards/friend/friends/exterior]0"</em>%sq;
+    </a> dostęp<br%/> (hasło)
+pt: Entrada <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0%sq;
+    </em></a><br%/> (palavra chave)
+ro: Acces pentru <a href="%prefix;w=w"><em>%sq;
+    [wizard/wizards/friend/friends/exterior]0</em></a><br%/> (parola)
+sl: Urejanje kot <a href="%prefix;w=w"><em>"%sq;
+    [wizard/wizards/friend/friends/exterior]0"</em></a> (geslo)
+sv: <a href="%prefix;w=w"><em>%sq;
+    [*wizard/wizards/friend/friends/exterior]0</em>%sq;
+    </a> tillträde<br%/> (passord)
+])%nl;
+        </td>
+        %if;(not friend)
+          <td style="display: table-cell; padding: 1em 100px">
+            %apply;interp([
+af: <a href="%prefix;w=f"><em>Vriend</em></a> toegang<br%/> (password)
+bg: Достъп като <a href="%prefix;w=f"><em>приятел</em></a><br%/> (парола)
+br: mont e-barzh evel <a href="%prefix;w=f"><em>mignon</em></a>%sq;
+    <br%/> (ger-tremen)
+ca: accés <a href="%prefix;w=f"><em>amic</em></a><br%/> (clau)
+cs: <a href="%prefix;w=f">{<em>"Friend"</em></a> přístup<br%/> (heslo)
+da: <a href="%prefix;w=f"><em>Betroet adgang</em></a><br%/> (adgangskode)
+de: <a href="%prefix;w=f"><em>Freund</em></a>-Zugang<br%/> (Passwort)
+en: <a href="%prefix;w=f"><em>Friend</em></a> access<br%/> (password)
+eo: <a href="%prefix;w=f">Aliro <em>amiko</em></a><br%/> (pasvorto)
+es: <a href="%prefix;w=f">Entrada <em>amigo</em></a><br%/> (contraseña)
+et: Ligipääs: <a href="%prefix;w=f"><em>sõber</em></a><br%/> (parool)
+fi: <a href="%prefix;w=f"><em>Valittu</em></a> kirjautuminen<br%/> (salasana)
+fr: accès <a href="%prefix;w=f"><em>ami</em></a><br%/> (mot de passe).
+he: כניסה<a href="%prefix;w=f"><em> מיוחסת </em></a>
+is: <a href="%prefix;w=f"><em>Vina</em></a> aðgangur<br%/> (aðgangsorð)
+it: <a href="%prefix;w=f"><em>amico</em></a> access<br%/> (password)
+lv: <a href="%prefix;w=f"><em>Friend</em></a> access<br%/> (password)
+nl: Toegang als <a href="%prefix;w=f"><em>vriend</em></a><br%/> (wachtwoord)
+no: <a href="%prefix;w=f"><em>Venners</em></a> adgang<br%/> (passord)
+pl: <a href="%prefix;w=f"><em>"Friend"</em></a> dostęp<br%/> (hasło)
+pt: Entrada <a href="%prefix;w=f"><em>amigo</em></a><br%/> (palavra chave)
+ro: Acces pentru <a href="%prefix;w=f"><em>amici</em></a><br%/> (parola)
+sl: Urejanje kot <a href="%prefix;w=f"><em>prijatelj</em></a><br%/> (geslo)
+sv: <a href="%prefix;w=f"><em>Vän</em></a> tillträde<br%/> (passord)
+])%nl;
+          </td>
+        %end;
+      </tr>
+    </table>
+  %else;
+    <div style="text-align: center">
+      <form method="post" action="%action;">
+        %hidden;
+        [
+af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
+bg: Парола за достъп като <em>приятел</em> или
+    <em>администратор</em>:
+br: Ger-tremen evit mont e-barzh evel <em>mignon</em> pe <em>strobineller</em>:
+ca: Clau, per accés <em>amic</em> o <em>administrador</em>:
+cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> přístup:</em>:
+da: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
+de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
+en: Password, for <em>friend</em> or <em>wizard</em> access:
+eo: Pasvorto, por aliro <em>amiko</em> aù <em>sorĉisto</em>:
+es: Contraseña, para entrada <em>amigo</em> o <em>brujo</em>:
+et: Parool <em>sõbrana</em> või <em>teadmamehena</em> ligipääsuks:
+fi: Salasana <em>Valittu</em> tai <em>Velho</em> kirjautumiseen:
+fr: Mot de passe, pour accès <em>ami</em> ou <em>magicien</em>:
+he: סיסמה לכניסה <em> מיוחסת  </em> או <em>כגאון</em>
+is: Aðgangsorð, fyrir <em>vina</em> eða <em>uppfærslu</em> aðgang:
+it: Parola d'accesso, per accesso dell' <em>amico</em> o del <em>wizard</em>:
+lv: Password, for <em>friend</em> or <em>wizard</em> access:
+nl: Wachtwoord, voor toegang als <em>vriend</em> of <em>tovenaar</em>:
+no: Passord, for <em>venner</em> eller <em>oppdaterings</em> adgang:
+pl: Hasło dla dostępu <em>"friend"</em> lub <em>"wizard"</em> :
+pt: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
+ro: Parola, pentru acces de <em>amic</em> sau <em>magician</em>:
+sv: Passord, för <em>vänner</em> eller <em>administratör</em>
+    tillträde:
+]
+        <input name="w" type="password" size="10" maxlength="200"%/>
+        <input type="submit" value="Ok"%/>
+      </form>
+    </div>
+  %end;
+%end;
+
+<div style="margin-top: 1em">
+  <div>
+    <div style="text-align: center">
+      %apply;interp([
+af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
+ar: بإمكانك البحث في هذه القاعدة:
+bg: Можете да използвате тази база от данни за търсене:
+br: Evit merdeiñ er bon roadoù-mañ e c'hellit klask:
+ca: Per navegar en aquesta base, podeu fer la vostra recerca:
+cs: Databázi lze prohledávat:
+da: For at navigere i denne database kan du søge:
+de: Zum Benutzen dieser Datenbank kannst du hier suchen:
+en: To navigate in this database, you can do your search:
+eo: Por navigi en ĉi tiu datenbazo, vi povas fari vian serĉon:
+es: Para navegar en esta base de datos, puede hacer su búsqueda:
+et: Navigeeri andmebaasis:
+fi: Liikkuaksesi tässä tietokannassa voit etsiä:
+fr: Pour naviguer dans cette base de données, vous pouvez%sp;
+    effectuer votre recherche:
+fr-cr: L'heù zott lé chaché ti-tac toupatou, zott pé jiss crié:
+he: נווט במאגר מידה על-ידי חיפוס:
+is: Í þessum gagnagrunni getur þú leitað:
+it: Per sfogliare questa base di dati, si può fare una ricerca:
+lv: Jūs variet meklēt šinī datu bāzē:
+nl: Om deze databank te consulteren, kan u een opzoeking doen:
+no: For å navigere i databasen, kan du søke:
+pl: Aby poruszać się po bazie, możesz:
+pt: Para consultar esta base de dados, pode procurar:
+ro: pentru folosirea basei de date poti sa selectezi:
+ru: Чтобы найти в этой базе данных, Вы можете искать:
+sl: Da bi pregledali vašo bazo podatkov, lahko iščete:
+sv: För att navigera i denna databas, kan du söka:
+zh:
+])%nl;
+    </div>
+    %( IE seems not to recognize style "display: table"; must use a table %)
+    <table cellpadding="0" cellspacing="0"%sp;
+     style="display: table; margin: auto">
+      <tr style="display: table-row">
+        <td style="display: table-cell">
+          <dl>
+            <dd>
+              <div>
+                <form method="get" action="%action;">
+                  <div>
+                    %hidden;
+                    <input type="hidden" name="m" value="NG"%/>
+                    <label><span class="highlight">- [
+af: per persoon
+ar: عن فرد
+bg: по име на човек
+br: dre anv-den
+ca: per persona
+cs: Podle osob
+da: personnavn
+de: nach einer Person
+en: by person
+eo: laù la persono
+es: por persona
+et: isik
+fi: henkilön mukaan
+fr: par personne
+fr-cr: an-ni an seul moune
+he: לפי שם או זהות
+is: eftir nafni
+it: per persona
+lv: personas
+nl: op naam
+no: etter person
+pl: znaleźć osobę:
+pt: por pessoa
+ro: persoane
+ru: по человеку
+sl: osebo:
+sv: efter person
+zh: 搜索：
+]</span>
+                    <input name="n" size="40" maxlength="200"%/></label>
+                    <input type="submit" value="Ok"%/>
+                  </div>
+                  <ul style="text-align: %left;; list-style: none">
+                    <li>
+                      <label><input type="radio" name="t" value="PN"
+                       checked="checked" id="tPN"%/>
+                      <em>[first name/first names]0</em>
+                      <em>[surname/surnames]0</em> [or]
+                      <em>[public name]</em> [or]
+                      <em>[alias]</em>%sq;
+                      %if;browsing_with_sosa_ref; [or]
+                        %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
+                      %end;%nl;
+                      </label>
+                    </li>
+                    <li>
+                      <label><input type="radio" name="t" value="P"
+                       id="tP"%/>
+                      <em>[first name/first names]0</em></label>
+                    </li>
+                    <li>
+                      <label><input type="radio" name="t" value="N"
+                       id="tN"%/>
+                      <em>[surname/surnames]0</em></label>
+                    </li>
+                 </ul>
+                </form>
+              </div>
+            </dd>
+            %if;(bvar.propose_titles != "no")%nl;
+              <dd>
+                <form method="get" action="%action;">
+                  <table cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td valign="top">
+                        <span class="highlight">-&nbsp;</span>
+                      </td>
+                      <td align="%left;">
+                        %hidden;
+                        <input type="hidden" name="m" value="TT"%/>
+                        <label><span class="highlight">[
+af: by title
+bg: по титла
+br: dre ditl
+ca: per títol
+cs: podle titulu
+da: titel (nob.)
+de: nach einem Titel
+en: by title
+eo: laù la moŝto
+es: por título
+et: tiitel
+fi: arvonimen mukaan
+fr: par titre
+he: לפי תאר
+is: eftir titli
+it: per titolo
+lv: tituls
+nl: op titel
+no: etter titel
+pl: znaleźć: tytuł
+pt: por título
+ro: titlu
+ru: по титулу
+sl: naziv:
+sv: efter titel
+zh: 根据名衔
+]</span><br%/>
+                               <input name="t" size="14" maxlength="200"%/>%sq;
+                        </label><br%/>
+                               (<a href="%prefix;m=TT;t=">[all the titles]</a>)<br%/>
+                             </td>
+                             <td>...</td>
+                             <td align="%left;">
+                               <label><span class="highlight">[estate]0[
+da:  (domæne, slægt)
+en:
+]</span><br%/>
+                        <input name="p" size="25" maxlength="200"%/>%sq;
+                        </label><br%/>
+                        (<a href="%prefix;m=TT;p=*">[all the estates]</a>)
+                      </td>
+                      <td>
+                        <input type="submit" value="Ok"%/>
+                      </td>
+                    </tr>
+                  </table>
+                </form>
+              </dd>
+            %end;
+            <dd>
+              <form method="get" action="%action;">
+                <div>
+                  %hidden;
+                  <span class="highlight">- </span>[
+af: <span class="highlight">in die lys </span>van alle
+bg: <span class="highlight">в списъка</span> на всички
+br: <span class="highlight">dre roll</span> an holl
+ca: <span class="highlight">pel llistat</span> de tots els
+cs: <span class="highlight">ze seznamu</span> všech
+da: <span class="highlight">i liste</span> over alle
+de: <span class="highlight">in der Liste</span> aller
+en: <span class="highlight">by the list</span> of all
+eo: <span class="highlight">per la listo</span> de ĉiuj
+es: <span class="highlight">por la lista</span> de todos los
+et: <span class="highlight">loendis</span> kõik
+fi: <span class="highlight">listasta</span> kaikki
+fr: <span class="highlight">par la liste</span> de tous les
+fr-cr: <span class="highlight">an-ni</span> an
+he: <span class="highlight">רשימה</span> של כל שמות
+is: <span class="highlight">eftir lista</span> yfir öll
+it: <span class="highlight">per la lista</span> di tutti i
+lv: <span class="highlight">visus</span>
+nl: <span class="highlight">via de lijst</span> van alle
+no: <span class="highlight">med liste</span> over alle
+pl: <span class="highlight">przejrzeć listę</span> wszystkich
+pt: <span class="highlight">pela lista</span> de todos os
+ro: <span class="highlight">pe lista</span> tuturor
+ru: <span class="highlight">по списку</span>  всех
+sl: <span class="highlight">seznam</span> vseh
+sv: <span class="highlight">efter listan</span> av alla
+zh: 显示所的
+]
+                  <select name="m">
+                    <option value="N" selected="selected">[
+af: vanne
+bg: фамилни имена
+br: anvioù-familh
+ca: cognoms
+cs: příjmení
+da: efternavne
+de: Nachnamen
+en: surnames
+eo: familiaj nomoj
+es: apellidos
+et: perekonnanimed
+fi: sukunimet
+fr: patronymes
+fr-cr: nom-fan-mille
+he:   המשפחה
+is: eftirnöfn
+it: cognomi
+lv: uzvārdus
+nl: familienamen
+no: etternavn
+pl: nazwisk
+pt: apelidos
+pt-br: sobrenomes
+ro: nume de familie
+ru: фамилий
+sl: priimkov
+sv: efternamn
+zh: 姓
+]</option>
+                    <option value="P">[
+af: voorname
+bg: собствени имена
+br: raganvioù
+ca: noms
+cs: křestní jméno
+da: fornavne
+de: Vornamen
+en: first names
+eo: propraj nomoj
+es: nombres
+et: eesnimed
+fi: etunimet
+fr: prénoms
+he:   הפרטיים
+is: fornöfn
+it: nomi
+lv: vārdus
+nl: voornamen
+no: fornavn
+pl: imion
+pt: nomes próprios
+pt-br: prenomes
+ro: prenume
+ru: имён
+sl: osebnih imen
+sv: förnamn
+zh: 名
+]</option>
+                  </select>
+                  [
+af: volgens
+bg: ,&nbsp; подредени по
+br: dre
+ca: per
+cs: seřazená podle
+da: sorteret efter
+de:
+en: by
+eo: laù
+es: por
+et: järjestatud
+fi: lajiteltuina
+fr: par
+fr-cr: zott pé trappé assou liste-la
+he: לפי
+is: eftir
+it: in ordine
+lv:
+nl: volgens
+no: sortert
+pl: ułożonych
+pt: por
+ro: in
+ru: упорядоченных
+sl: po
+sv: sorterade i
+zh: 根据
+]
+                  <select name="tri">
+                    <option value="A" selected="selected">[
+af: alfabeties volgorde
+bg: азбучен ред
+br: urzh al lizherenneg
+ca: ordre alfabètic
+cs: abecedy
+da: alfabetisk orden
+de: alphabetisch sortiert
+en: alphabetic order
+eo: alfabeta ordo
+es: orden alfabético
+et: tähestiku
+fi: aakkosjärjestykseen
+fr: ordre alphabétique
+fr-cr: ça ki coumencé con ça a.b.c.d...
+he:  סדר האלף-בית
+is: stafrófsröð
+it: alfabetico
+lv: alfabētiskā kārtībā
+nl: alfabet
+no: alfabetisk
+pl: w porządku alfabetycznym
+pt: ordem alfabética
+ro: ordine alfabetica
+ru: по алфавиту
+sl: abecednem redu
+sv: bokstavsordning
+zh: 字母序
+]</option>
+                    <option value="F">[
+af: frekwensie
+bg: честота на срещане
+br: stankted
+ca: freqüència
+cs: četnosti
+da: hyppighed
+de: nach Häufigkeit
+en: frequency
+eo: ofteco
+es: frecuencia
+et: sageduse
+fi: määräjärjestykseen
+fr: fréquence
+fr-cr: ça ki ka ruvini empile
+he:  השכיחות
+is: tíðni
+it: di frequenza
+lv: pēc sastopamības
+nl: aantal
+no: etter frekvens
+pl: według częstości występowania
+pt: frequência
+ro: dupa frecventa
+ru: по частоте
+sl: pogostosti
+sv: frekvensordning
+zh: 访问次数
+]</option>
+                  </select>
+                  [
+en:
+et: järgi
+]
+                  <input type="submit" value="Ok"%/>
+                </div>
+              </form>
+            </dd>
+            %if;(bvar.propose_place_surnames != "no")%nl;
+              <dd>
+                <form method="get" action="%prefix;">
+                  %hidden;
+                  <input type="hidden" name="m" value="PS"%/>
+                  <span class="highlight"> - [
+af: by
+bg: по
+br: dre
+ca: per
+cs: podle
+da: ved
+de: mit
+en: by
+eo: per
+es: por
+et:
+fi:
+fr: par
+is: eftir
+it: per
+lv:
+nl: via
+no: etter
+pl: przejrzeć listę:
+pt: por
+ro: cu
+sl: 
+sv: efter
+] [place] / [surname/surnames]0</span>
+                      - [birth]
+                        <input type="checkbox" name="bi" value="on"
+                         checked="checked"%/>
+                      - [death]
+                        <input type="checkbox" name="de" value="on"%/>
+                      - [marriage/marriages]0
+                        <input type="checkbox" name="ma" value="on"%/>
+                      - <input type="submit" value="Ok"%/>
+                </form>
+              </dd>
+            %end;
+            %if;(bvar.hide_advanced_request = "no")
+              <dd>
+                <span class="highlight">-</span>
+                %apply;interp([
+af: <span class="highlight">deur 'n</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>detail
+       navraag</b></font></a>.
+bg: <span class="highlight">чрез</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>разширено
+       търсене</b></font></a>.
+br: <span class="highlight"> dre ar</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>klask
+       a-raokaet</b></font></a>.
+ca: <span class="highlight">per la</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>consulta
+       avançada</b></font></a>.
+cs: <span class="highlight">lze také zadat</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>rozšířený
+       dotaz</b></font></a>.
+da: <span class="highlight">ved</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avanceret
+       søgning</b></font></a>.
+de: <span class="highlight">mit der</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>erweiterten
+       Suche</b></font></a>.
+en: <span class="highlight">by the</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>advanced
+       request</b></font></a>.
+eo: <span class="highlight">per la</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>serĉado
+       progresata</b></font></a>.
+es: <span class="highlight">mediante una</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>consulta
+       avanzada</b></font></a>.
+et: <span class="highlight"></span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>laiendatud 
+       päring</b></font></a>.
+fi: <a href="%prefix;m=H;v=advanced"><span
+       class="highlight">erityishaulla</span></a>.
+fr: <span class="highlight"> par la</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>requête
+        évoluée</b></font></a>.
+he: <span class="highlight">ע"י </span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>
+       בקשה מתקדמת</b></font></a>.
+is: <span class="highlight">eftir </span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>frekari
+       óskum</b></font></a>.
+it: <span class="highlight">per la</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>richiesta
+       avanzata</b></font></a>.
+lv: <span class="highlight">meklēt pēc</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>citiem
+       parametriem</b></font></a>.
+nl: <span class="highlight">via een</span>
+       <a href="%prefix;m=H;v=advanced"><font
+       color="%highlight;"><b>gedetailleerde opzoeking</b></font></a>.
+no: <span class="highlight">gjennom</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avansert
+       søking</b></font></a>.
+pl: <span class="highlight">skorzystać z</span>
+       <a href="%prefix;m=H;v=advanced"><font
+       color="%highlight;"><b>wyszukiwania zaawansowanego</b></font></a>.
+pt: <span class="highlight">por</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>pesquisa
+       complexa</b></font></a>.
+ro: <span class="highlight">prin</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>specificare
+       complexa</b></font></a>.
+ru: <span class="highlight">через</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>расширенный
+       запрос</b></font></a>.
+sl: <span class="highlight">s pomočjo</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>naprednega iskanja
+       </b></font></a>.
+sv: <span class="highlight">genom</span>
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>avancerad
+       sökning</b></font></a>.
+])
+              </dd>
+            %end;
+          </dl>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+%if;(wizard and (not base.has_notes or bvar.propose_add_family != "no"))
+  <div style="text-align: center">
+    [
+af: Jy kan
+bg: Можете още
+br: Gellout a rit
+ca: Podeu
+cs: Zde můžete
+da: Du kan:
+de: Du kannst
+en: You can
+eo: Vi povas
+es: Puede
+et: Täiendamine:
+fi: Taikka
+fr: Vous pouvez
+he:  יש אפשרות 
+is: Þú getur
+it: Si può
+lv: Izmaiņu veikšana:
+nl: U kunt:
+no: Du kan
+pl: Możesz:
+pt: Pode
+ro: Tu poti
+ru: Вы можете
+sl: Lahko:
+sv: Du kan
+zh:
+]
+  </div>
+  %( IE seems not to recognize style "display: table"; must use a table %)
+  <table cellpadding="0" cellspacing="0"%sp;
+   style="text-align: center; display: table; margin: auto">
+    <tr style="display: table-row">
+      %if;(bvar.propose_add_family != "no")
+        <td style="display: table-cell">
+          <ul>
+            <li>
+              <a href="%prefix;m=ADD_FAM">[
+af: 'n familie byvoeg
+bg: да добавите семейство
+br: ouzhpennañ ur familh
+ca: afegir una família
+cs: přidat novou rodinu
+da: tilføje en familie
+de: eine Familie hinzufügen
+en: add a family
+eo: aldoni familion
+es: agregar una familia
+et: lisa pere
+fi: lisää perhe
+fr: ajouter une famille
+he:  להוסיף משפחה
+is: bætt við fjölskyldu
+it: aggiungere una famiglia
+lv: pievienot ģimeni
+nl: een familie toevoegen
+no: legge til en familie
+pl: dodać rodzinę (parę)
+pt: acrescentar uma família
+ro: adauga o familie
+ru: добавить семью
+sl: dodate družino
+sv: lägga till en familj
+zh: 增加家庭记录
+]</a>
+            </li>
+          </ul>
+        </td>
+      %end;
+      %if;(not base.has_notes)
+        <td style="display: table-cell">
+          <ul>
+            <li>
+              <a href="%prefix;m=MOD_NOTES">[
+af: die notas wysig
+bg: да промените бележките
+br: kemm an notennoù
+ca: modificar les notes
+cs: upravit poznámky
+da: ændre noterne
+de: die Notizen ändern
+en: add notes
+eo: modifi la notojn
+es: modificar las notas
+et: muuda märkusi andmebaasi kohta
+fi: muokkaa lisätietoja
+fr: ajouter des notes
+he:  לעדכן את ההערות
+is: breytt athugasemdum
+it: modificare le note
+lv: labot piezīmes
+nl: de aantekeningen wijzigen
+no: endre notater
+pl: zmodyfikować uwagi
+pt: modificar as notas
+ro: modifica nota
+ru: изменить заметку
+sl: spremenite zapiske
+sv: ändra noteringar
+]</a>
+            </li>
+          </ul>
+        </td>
+      %end;
+    </tr>
+  </table>
+%end;
+
+<div style="text-align: center">
+  [
+af: Jy kan ook kyk na
+bg: Можете също да се насочите към
+br: Gellout a rit ivez gweladenniñ
+ca: També podeu consultar
+cs: Lze také zobrazit
+da: Du kan også fremkalde:
+de: Du kannst zugreifen auf
+en: You can consult
+eo: Vi povas ankaù konsulti
+es: Puede consultar
+et: Vaata lisaks:
+fi: Voit myös katsoa
+fr: Vous pouvez consulter
+he: אפשר גם להראות
+is: Þú getur einnig athugað
+it: Si può anche consultare
+lv: Informācija par:
+nl: U kunt de volgende zaken bekijken:
+no: Du kan også slå opp
+pl: Możesz także obejrzeć:
+pt: Também pode consultar
+ro: poti consulta
+ru: Вы можете также обратиться к
+sl: Lahko pregledate:
+sv: Du kan också konsultera
+zh:
+]
+</div>
+
+%( IE seems not to recognize style "display: table"; must use a table %)
+<table cellpadding="0" cellspacing="0"%sp;
+ style="display: table; margin: auto; white-space: nowrap">
+  <tr style="display: table-row">
+    <td style="display: table-cell">
+      <ul>
+        <li>
+          <a href="%prefix;m=AN">[birthdays]</a>
+        </li>
+        <li>
+          <a href="%prefix;m=AD">%sq;
+          [anniversaries of dead people]</a>
+        </li>
+        <li>
+          <a href="%prefix;m=AM">[anniversaries of marriage]</a>
+        </li>
+        <li>
+          <a href="%prefix;m=STAT">[statistics]</a>
+        </li>
+      </ul>
+    </td>
+    <td style="display: table-cell" valign="top">
+      <ul>
+      %if;has_history;%nl;
+        <li>
+          <a href="%prefix;m=HIST;k=20">[history of updates]</a>
+        </li>%sq;
+      %end;%nl;
+        <li>
+          <a href="%prefix;m=CAL">[calendar/calendars]1</a>
+        </li>
+        <li>
+          <a href="%prefix;m=FORUM">[database forum]</a>
+        </li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<div style="text-align: center">
+  %apply;interp([
+af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
+    aan hierdie blad, sedert %start_date;.
+bg: От %start_date; насам е имало %nb_accesses; посещения, от които
+    %nb_accesses_to_welcome; са на настоящата страница.
+br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :
+    %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
+ca: Hi ha hagut %nb_accesses; consultes, de les quals
+    %nb_accesses_to_welcome; en aquesta pàgina, des del %start_date;.
+cs: %nb_accesses; přístupů, z toho %nb_accesses_to_welcome; na tuto
+    stránku, od %start_date;.
+da: Der har været %nb_accesses; opslag, %nb_accesses_to_welcome;
+    af dem på denne side, siden %start_date;.
+de: Seit dem %start_date; gab es %nb_accesses; Zugriffe, davon
+    %nb_accesses_to_welcome; auf diese Seite.
+en: There have been %nb_accesses; accesses, %nb_accesses_to_welcome;%sp;
+    of them to this page, since %start_date;.
+eo: Estis %nb_accesses; alirejoj, el kiuj %nb_accesses_to_welcome; al
+    ĉi tiu paĝo, ekde la %start_date;.
+es: Ha habido %nb_accesses; consultas, de las cuales
+    %nb_accesses_to_welcome; corresponden a esta página, desde
+    el %start_date;.
+et: Alates andmebaasi loomise päevast (%start_date;) on selle poole
+    pöördutud %nb_accesses; korda, neist %nb_accesses_to_welcome; korda
+    sellele lehele.
+fi: Tähän mennessä %nb_accesses; tapahtumaa, joista
+    %nb_accesses_to_welcome; tälle sivulle %start_date; jälkeen.
+fr: Il y a eu %nb_accesses; consultations, dont %nb_accesses_to_welcome; à
+    cette page, depuis le %start_date;.
+he: היו %nb_accesses; כניסות, כולל %nb_accesses_to_welcome;
+    כניסות לעמוד זה, מאז %start_date;.
+is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome;
+    af þeim á þessa síðu, síðan %start_date;.
+it: Dal %start_date; ci sono stati %nb_accesses; accessi,
+    %nb_accesses_to_welcome; dei quali a questa pagina.
+lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
+    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē. 
+nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
+    bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
+no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome;
+    av dem til denne siden, siden %start_date;.
+pl: Baza została od %start_date; odwiedzona %nb_accesses; razy (w tym
+    %nb_accesses_to_welcome; razy strona tytułowa).
+pt: Houve %nb_accesses; consultas, das quais %nb_accesses_to_welcome;
+    foram a esta página, desde %start_date;.
+ro: Au avut loc %nb_accesses; accese din care %nb_accesses_to_welcome;
+    pe aceatsa pagina din %start_date;
+ru: Всего было %nb_accesses; обращений, из них %nb_accesses_to_welcome;
+    к этой странице, начиная с %start_date;.
+sl: %nb_accesses; dostopov, %nb_accesses_to_welcome; od teh na to stran,
+    od %start_date;.
+sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
+    av dem till den här sidan, sedan %start_date;.
+zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
+    次访问本主页， 自从 %start_date;。
+])%nl;
+</div>
+
+<div style="margin-top: 1em; padding: 0 20%%">
+  %apply;interp([
+af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
+    om die dokument te herlaai), probeer die volgende <a
+    href="%prefix;escache=0">link</a>.
+bg: Ако Вашият браузър не актуализира автоматично страниците, които
+    са модифицирани (принуждавайки Ви да ги презареждате Вие),
+    опитайте се да тръгнете от <a href="%prefix;escache=0">тази
+    препратка</a>.
+br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoù kemmet (ha
+    dre-se emañ ret deoc'h "nevesaat ar bajenn"), klakit merdeiñ gant al
+    liamm-mañ.
+ca: Si el vostre navegador no actualitza automàticament les
+    pàgines modificades (obligant-vos a fer actualitzar manualment
+    la pàgina), proveu de navegar des d'<a href="%prefix;%sq;
+    escache=0">aquest altre lloc</a>.
+cs: Pokud Váš prohlížeč neprovádí automaticky obnovu upravených stránek
+    (musíte používat tlačítko "obnovit"), zkuste prohlížení přes <a
+    href="%prefix;escache=0">tento odkaz</a>.
+da: Hvis din browser ikke automatisk opdaterer ændrede sider
+    (nødvendiggør genindlæsning af det aktuelle
+    dokument), prøv da at navigere <a href="%prefix;%sq;
+    escache=0">herfra</a>.
+de: Wenn die geänderten Seiten nicht automatisch aktualisiert werden
+    (man muß ständig im Browser auf "Neu laden" klicken),
+    bitte <a href="%prefix;escache=0">hier</a> klicken.
+en: If your browser does not automatically update the modified pages (forcing
+    you to do "reload current document"), try navigating from <a
+    href="%prefix;escache=0">this link</a>.
+eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
+    (se vi devas fari "reŝarĝi kurantan dokumenton"), provu ekde <a
+    href="%prefix;escache=0">ĉi tiu legilo</a>.
+es: Si las páginas modificadas no serán actualizadas
+    automaticamente, favor de usar esta conexión:
+    <a href="%prefix;escache=0">hier</a>.
+et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
+    (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
+    navigeerimist <a href="%prefix;escache=0">sellest viitest</a>.
+fi: Mikäli selaimesi ei automaattisesti päivitä muutettuja
+    sivuja (jolloin sinun täytyy "ladata uudelleen nykyinen
+    dokumentti") kokeile <a href="%prefix;escache=0">tätä
+    linkkiä</a>.
+fr: Si votre navigateur ne met pas à jour automatiquement
+    les pages modifiées (vous obligeant à faire "actualiser
+    la page"), essayez la navigation à partir de
+    <a href="%prefix;escache=0">ce lien</a>.
+is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
+    <a href="%prefix;escache=0">þetta</a>.
+it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
+    (obbligandovi a fare « aggiorna »), provate a partire da
+    <a href="%prefix;escache=0">questo collegamento</a>.
+lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
+    veiktajām izmaiņām (tādējādi radot Jums nepieciešamību "pārlādēt
+    tekošo dokumentu"), tad pamēģiniet uzklikšķināt <a
+    href="%prefix;escache=0">šeit</a>.
+nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
+    alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
+    <a href="%prefix;escache=0">deze link</a>.
+no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
+    oppfrisking av den aktuelle siden), prøv da å navigere <a
+    href="%prefix;escache=0">herfra</a>.
+pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron 
+    (zmuszając cię do ich ręcznego odświeżania), kliknij <a
+    href="%prefix;escache=0">tutaj</a>.
+pt: Se o seu <i>browser</i> não actualiza automaticamente as
+    páginas modificadas (forçando a fazer
+    "reload current document"), tente navegar desde <a
+    href="%prefix;escache=0">este link</a>.
+pt-br: Se o seu <i>browser</i> não atualiza automaticamente as
+    páginas modificadas (forçando a fazer
+    "reload current document"), tente navegar desde <a
+    href="%prefix;escache=0">este link</a>.
+ro: daca pagina modificata nu este actualizata in mod automat (trebue sa
+    fortezi "reload current document") navigeaza cu acest
+    <a href="%prefix;escache=0">link</a>
+sl: Če vaš brskalnik ne more obnavljati strani avtomatično (morate
+    "reload current document"), kliknite <a
+    href="%prefix;escache=0">tukaj</a>.
+sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
+    (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
+    navigera <a href="%prefix;escache=0">härifrån</a>.
+])%nl;
+</div>
+
+<div style="text-align: %right;; font-size: 80%%">
+  <em><a href="%prefix;m=LEX">[
+bg: лексикон
+br: geriaoueg
+ca: Lèxic
+cs: lexikon
+da: leksikon
+de: Lexikon
+en: lexicon
+eo: leksikono
+es: diccionario
+et: sõnastik
+fi: Sanasto
+fr: lexique
+he: לקסיקון
+is: orðasafn
+it: lessico 
+no: leksikon
+pl: leksykon
+ro: lexicon
+sl: leksikon
+sv: lexikon
+zh: 本站使用的术语
+]</a></em>
+</div>
+
+</div>
+
+%copyright;
+%base_trailer;
+</body>
+</html>

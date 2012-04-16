@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <meta name="robots" content="none">
+  <!--meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"-->
+  <title>%o -&gt; %e</title>
+</head>
+<body background="%km=IM;v=/gwback.jpg">
+<h1>%o -&gt; %e</h1>
+
+The database "%o" has been renamed "%e".
+Please use now:
+<br>
+La base de données "%o" est renommée "%e".
+Utiliser maintenant:
+<br>
+La base di dati "%o" ha cambiato nome "%e".
+Utilizzate:<p>
+<ul>
+<li>
+<a href="%l">%l</a>
+</ul>
+<p>
+<img src="%km=IM;v=/gwlogo.png"
+alt=GeneWeb width=64 height=72 align=right>
+<br>
+
+<p><hr><font size=-1><em>Copyright (c) 1998-2007 INRIA -
+<a href="http://www.geneweb.org/">
+GeneWeb %v</a></em></font><br>
+</body>
