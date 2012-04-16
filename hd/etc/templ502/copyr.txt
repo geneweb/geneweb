@@ -1,0 +1,18 @@
+
+<hr style="margin:0"%/><div style="font-size: 80%%"><em>%apply;interp([
+de: Seite angezeigt von
+    <a href="http://www.geneweb.org/">GeneWeb %version;</a>
+en: Page displayed by
+    <a href="http://www.geneweb.org/">GeneWeb %version;</a>
+et: Kasutusel on
+    <a href="http://www.geneweb.org/">GeneWeb %version;</a>
+fr: Page affich&eacute;e par
+    <a href="http://www.geneweb.org/">GeneWeb %version;</a>
+it: Pagina visualizzata da
+    <a href="http://www.geneweb.org/">GeneWeb %version;</a>
+sl: Strani ustvarjene z:
+    <a href="http://www.geneweb.org/">GeneWeb %version;</a>
+])%compilation_time;%sp;
+Copyright &copy; 1998-2007 INRIA%connections;%sq;
+%if;(not cancel_links) - <a href="%prefix;m=DOC">DOC</a>%end;%sq;
+%setup_link;</em><br%/><br%/></div>

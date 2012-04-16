@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta name="robots" content="none">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>install -&gt; http://geneweb.inria.fr/roglo?</title>
+</head>
+<body background="images/gwback.jpg">
+[
+en: The database "%b" has moved to:
+fr: La base de données "%b" se trouve maintenant à l'adresse:
+]
+<dl><dt><dd>
+<a href="%t">%t</a>
+</dd></dt></dl>
+<p>
+<img src="images/gwlogo.png"
+alt=... width=64 height=72 align=right border=0>
+<br>
+
+<p><hr>
+</body>
+</html>

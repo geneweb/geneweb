@@ -1,0 +1,151 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: anclist.txt,v 5.5 2007-07-25 13:15:18 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %if;(evar.t = "F")- [*surnames list] -%nn;
+    %else
+      %apply;a_of_b%with;
+        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
+      %and;
+        %if;(public_name != "")%public_name;%else;%first_name;%end;
+        %if;(qualifier != "") %qualifier;%end;
+        %sp;%surname;
+      %end;
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<h1 style="text-align:center" class="highlight">%nn;
+  %if;(evar.t = "F")
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
+    - [*surnames list] -
+  %else;
+    %apply;a_of_b%with;[*ancestors]%and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+      %if;(alias != "") <em>(%alias;)</em>%end;
+    %end;
+    %if;(evar.t = "D") [up to] %pvar.1;%end;
+  %end;
+</h1>
+
+%if;(evar.cgl != "on")
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+%define;tothegen(xx)
+  [*to the %s generation:::xx]%nn;
+%end;
+
+%define;togen(xx)
+  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[*to the parents]%nn;
+  %elseif;(xx = 3)[*to the grandparents]%nn;
+  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+
+%define;ancestors_by_list(xx, nnn)
+  %if;(xx.has_parents and nnn > 1)
+    <ul>
+    <li style="list-style-type:square"><a href="%prefix;
+    %xx.father.access;">%xx.father;</a>%xx.father.title;%xx.father.dates;%nl;
+    %apply;ancestors_by_list("xx.father", nnn - 1)</li>
+    <li style="list-style-type:circle"><a href="%prefix;
+    %xx.mother.access;">%xx.mother;</a>%xx.mother.title;%xx.mother.dates;%nl;
+    %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
+    </ul>
+  %end;
+%end;
+
+%define;ancestors_horizontally(pp, xx, ss1, ss2, ss3)
+  %if;(xx > 0)
+    %if;(pp.has_parents)
+      %apply;ancestors_horizontally(
+        "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
+        "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
+    %end;
+    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br%/>
+    %if;(pp.has_parents)
+      %apply;ancestors_horizontally(
+        "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
+        "ss3&nbsp;+--&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+    %end;
+  %end;
+%end;
+
+%if;(evar.t = "L")
+  %( by list %)
+  %let;xx;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %in;
+  <p>
+  %apply;togen(xx).
+  </p>
+  %apply;ancestors_by_list("self", xx)
+%elseif;(evar.t = "H")
+  %( horizontally %)
+  %let;xx;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %in;
+  <p>
+  %apply;togen(xx).
+  </p>
+  <table><tr><td style="white-space:nowrap">
+  %apply;ancestors_horizontally(
+    "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
+  </tr></tr></table>
+%elseif;(evar.t = "F")
+  %( surnames list %)
+  <ul>
+  %foreach;ancestor_surname(evar.v)
+    <li>%nn;
+    %if;(evar.cgl != "on")<a href="%prefix;m=DAG;%ancestor.sosa_access;">%nn;
+    %ancestor.surname_end;%ancestor.surname_begin;</a>%nn;
+    %else;%ancestor.surname_end;%ancestor.surname_begin;%end;
+    %if;(ancestor.nb_times > 1) (%ancestor.nb_times;)%end;
+    ; %ancestor.place;
+    ; %ancestor.date_begin.year;-%ancestor.date_end.year;</li>
+  %end;
+  </ul>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

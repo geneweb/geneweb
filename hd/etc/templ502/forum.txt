@@ -1,0 +1,371 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: forum.txt,v 5.19 2008-01-07 13:29:47 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
+      %if;can_post;
+        [*add::message/previous message/previous messages/next message]0%nn;
+      %else;
+        [*incorrect request]%nn;
+      %end;
+    %elseif;(pos = "")[*database forum]%nn;
+    %elseif;(message.subject = "" or message.subject = "-")
+      [*database forum]%nn;
+    %else;
+      %message.subject.cut.50;%nn;
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
+    .highlight { color: %highlight;; font-weight: bold }
+    .found { color: black; background-color: #afa;font-weight:bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  </style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+%define;search_form(main)
+  <table style="float:%right;"><tr><td align="%right;">
+  <form method="get" action="%action;">
+    <p>
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_SEARCH"%/>
+    %if;("main" != "true")
+      <input type="hidden" name="p" value="%pos;"%/>
+    %end;
+    <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
+    <label>
+    <input type="checkbox" name="c" value="on"%nn;
+     %if;("main" != "true" and evar.c = "on") checked="checked"%end;
+     %/>[search/case sensitive]1
+    </label>
+    <input type="submit" value="[*search/case sensitive]0"%/>
+    </p>
+  </form>
+  </td></tr></table>
+%end;
+
+%if;(evar.m = "FORUM_ADD")
+  %( add a message %)
+  %if;can_post;
+    <h1 style="text-align:center" class="highlight">%nn;
+      [*add::message/previous message/previous messages/next message]0%nn;
+    </h1>
+    <table width="100%%"><tr><td align="center">
+    <table border="1"><tr><td>
+      <form method="POST" action="%action;">
+      <p>
+        %hidden;
+        <input type="hidden" name="m" value="FORUM_ADD_OK"%/>
+      </p>
+      <table border="%border;">
+      <tr align="%left;">
+        <td>[*ident/email/subject]0</td>
+        <td><input name="Ident" size="60" maxlength="200"%sp;
+             value="%if;(user.name = "")%user.ident;%else;%user.name;%end;"%/
+             ></td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]1 ([optional])</td>
+        <td><input name="Email" size="60" maxlength="200" value=""%/></td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]2 ([optional])</td>
+        <td><input name="Subject" size="60" maxlength="200" value=""%/></td>
+      </tr>
+      </table>
+      <p>
+      [*message/previous message/previous messages/next message]0
+      <br%/>
+      <table>
+        <tr>
+          <td>
+            <textarea name="Text" rows="15" cols="100"></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            %let;name;Text%in;
+            %include.accent;
+          </td>
+        </tr>
+      </table>
+      <br%/>
+      <input type="submit" name="visu"%sp;
+       value="[visualize/show/hide/summary]0"%/>
+      %if;is_moderated_forum;
+	<br%/>
+        <span style="color:green">([this forum is moderated])</span>
+      %end;
+      </p>
+      </form>
+    </td></tr></table>
+    </td></tr></table>
+  %else;
+    <h1 style="text-align:center" class="highlight">%nn;
+      [*incorrect request]
+    </h1>
+  %end;
+%elseif;(evar.m = "FORUM_ADD_OK")
+  %( visualize a message before post %)
+  %if;can_post;
+    <h1 style="text-align:center" class="highlight">%nn;
+      [*add::message/previous message/previous messages/next message]0%nn;
+    </h1>
+    %if;(message.ident != "" and message.text != "")
+      <b>%message.ident;</b>
+      %if;(message.email != "")%nn;
+        <a href="mailto:%message.email.v;">%message.email;</a>%end;
+      <br%/>
+      %if;(message.subject != "")
+        <b>[*ident/email/subject]2: %message.subject;</b>
+        <br%/>
+      %end;
+      %if;(message.access = "priv")
+        <b>[*access]: [private]</b>
+        <br%/>
+      %end;
+      <i>%message.time;</i>
+      <dl><dd>
+        %message.text.wiki;
+      </dd></dl>
+    %end;
+    <table width="100%%"><tr><td align="center">
+    <table border="1"><tr><td>
+      <form method="POST" action="%action;">
+      <p>
+        %hidden;
+        <input type="hidden" name="m" value="FORUM_ADD_OK"%/>
+      </p>
+      <table border="%border;">
+      <tr align="%left;">
+        <td%if;(message.ident = "") style="color:red"%end;
+        >[*ident/email/subject]0</td>
+        <td><input name="Ident" size="60" maxlength="200"%sp;
+             value="%message.ident;"%/></td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]1 ([optional])</td>
+        <td><input name="Email" size="60" maxlength="200" value="%nn;
+             %message.email;"%/></td>
+      </tr>
+      <tr align="%left;">
+        <td>[*ident/email/subject]2 ([optional])</td>
+        <td><input name="Subject" size="60" maxlength="200" value="%nn;
+             %message.subject;"%/></td>
+      </tr>
+      </table>
+      <p>
+      <span%if;(message.text = "") style="color:red"%end;>
+      [*message/previous message/previous messages/next message]0</span>
+      <br%/>
+      <table>
+        <tr>
+          <td>
+            <textarea name="Text" rows="15" cols="100">%message.text;%sq;
+            </textarea>%sq;
+          </td>
+        </tr>
+        <tr>
+          <td>
+            %let;name;Text%in;
+            %include.accent;
+          </td>
+        </tr>
+      </table>
+      <br%/>
+      <input type="submit" name="visu"%sp;
+       value="[visualize/show/hide/summary]0"%/>
+      %if;(message.ident != "" and message.text != "")
+        %if;(wizard or friend)
+          <input type="submit" name="publ_acc" value="[public]"%/>
+          <input type="submit" name="priv_acc" value="[private]"%/>
+        %else;
+          <input type="submit" value="ok">
+        %end;
+      %end;
+      %if;is_moderated_forum;
+        <br%/>
+        <span style="color:green">([this forum is moderated])</span>
+      %end;
+      </p>
+      </form>
+    </td></tr></table>
+    </td></tr></table>
+  %else;
+    <h1 style="text-align:center" class="highlight">%nn;
+      [*incorrect request]
+    </h1>
+  %end;
+%elseif;(pos != "")
+  %( display a message %)
+  %if;(evar.m = "FORUM_SEARCH")
+    %apply;search_form("false")
+  %end;
+  <ul>
+  <li>%nn;
+    <a href="%prefix;m=FORUM" accesskey="F">%nn;
+    [*database forum] (F)</a></li>
+  <li>%nn;
+    %if;(message.next_pos != "")
+       <a href="%prefix;m=FORUM;p=%message.next_pos;" accesskey="N">%nn;
+       [*message/previous message/previous messages/next message]3 (N)%nn;
+       </a>%nn;
+    %else;&nbsp;%end;</li>
+  <li>
+    %if;(message.prev_pos != "")
+       <a href="%prefix;m=FORUM;p=%message.prev_pos;" accesskey="P">%nn;
+       [*message/previous message/previous messages/next message]1 (P)%nn;
+       </a>%nn;
+    %else;&nbsp;%end;</li>
+  </ul>
+  %let;col;%if;message.is_waiting; style="color:red"%end;%in;
+  %if;message.is_waiting;
+    <p>
+    %if;is_moderator;
+      <form method="POST" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="FORUM_VAL"%/>
+      <input type="hidden" name="p" value="%pos;"%/>
+      <input type="submit" name="v" value="%nn;[*validate/delete]0"%>
+      <input type="submit" name="d" value="%nn;[*validate/delete]1"%/>
+      </p>
+      </form>
+    %else;
+      <span style="color:green">[*your message is waiting for validation]%nn;
+      </span>
+    %end;
+    </p>
+  %end;
+  %if;(evar.m != "FORUM_VIEW")
+    <div style="font-size:80%%;float:%right;;margin-%left;:3em">(<a%sp;
+    href="%prefix;m=FORUM_VIEW;p=%message.pos;">[view source]</a>)</div>
+  %end;
+  <p%col;>
+  <b>%message.ident;</b>
+  %if;(message.email != "")%nn;
+    <a href="mailto:%message.email.v;">%message.email;</a>
+  %end;
+  %if;supervisor;
+    <b style="color:#999">-%sp;
+    %if;(message.wizard != "")
+      [wizard/wizards/friend/friends/exterior]0:%sp;
+      <a href="%prefix;m=WIZNOTES;v=%message.wizard;" style="color:#999">%sq;
+      %message.wizard;</a>%sp;
+    %end;
+    %if;(message.friend != "")
+      [wizard/wizards/friend/friends/exterior]2: %message.friend;%sp;
+    %end;
+    ... %message.from;</b>
+  %end;
+  <br%/>
+  %if;(message.subject != "")
+    <b>[*ident/email/subject]2: %message.subject;</b>
+    <br%/>
+  %end;
+  %if;(message.access = "priv")
+    <b>[*access]: [private]</b>
+    <br%/>
+  %end;
+  <i>%message.time;</i>
+  </p>
+  <dl%col;><dd>
+    %if;(evar.m = "FORUM_VIEW")
+      <textarea rows="15" cols="100" readonly="readonly">%message.text.raw;
+      </textarea>
+    %elseif;(message.wiki = "on")%message.text.wiki;
+    %else;%message.text.nowiki;%end;
+  </dd></dl>
+  %if;(message.wizard != "" and wizard and user.ident = message.wizard or
+       manitou or supervisor)
+    <form method="POST" action="%action;">
+    <p>
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_DEL"%/>
+    <input type="hidden" name="p" value="%message.pos;"%/>
+    <input type="submit" value="%nn;
+       [*delete::message/previous message/previous messages/next message]0"%/>
+    </p>
+    </form>
+  %end;
+%else;
+  %( display message headers %)
+  <h1 style="text-align:center" class="highlight">[*database forum]</h1>
+  %apply;search_form("true")
+  %if;can_post;
+    <form method="get" action="%action;">
+    <p>
+    %hidden;
+    <input type="hidden" name="m" value="FORUM_ADD"%/>
+    <input type="submit"%sp;
+     value="[*add::message/previous message/previous messages/next message]0"%/
+     >
+    </p>
+    </form>
+  %end;
+  %let;len;%if;(evar.len != "")%evar.len;%else;100%end;%in;
+  %let;to;%if;(evar.to != "")%evar.to;%else;-1%end;%in;
+  <table border="%border;">
+  %foreach;message(to, len)
+    %let;col;%if;message.is_waiting; style="color:red"%end;%in;
+    %if;(message.date != message.prev_date)
+      %if;(message.prev_date != "" and
+           message.date.month != message.prev_date.month)
+        <tr align="%left;"><td colspan="4">&nbsp;</td></tr>
+      %end;
+      <tr align="%left;"><td colspan="4">%message.date;</td></tr>
+    %end;
+    <tr align="%left;"%col;>
+    <td><tt>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
+            &nbsp;</tt></td>
+    <td><tt>%message.hour;</tt></td>
+    <td><a href="%prefix;m=FORUM;p=%message.pos;
+         "%if;(message.prev_date = "") accesskey="1"%end;%col;
+	 ><b>%message.ident.cut.26;
+        </b></a></td>
+    <td>%nn;
+       %if;(message.subject = "" or message.subject = "-")
+         <i>...&nbsp;%message.text.cut.80;</i>%nn;
+       %else;
+         %message.subject.cut.80;%nn;
+       %end;
+    </td>
+    </tr>
+  %end;
+  %if;(pos != "")
+    <tr align="%left;"><td colspan="4">&nbsp;</td></tr>
+    <tr align="%left;"><td colspan="4">%nn;
+      <a href="%prefix;m=FORUM;len=%len;;to=%pos;
+      ">[message/previous message/previous messages/next message]2</a></td></tr>
+  %end;
+  </table>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

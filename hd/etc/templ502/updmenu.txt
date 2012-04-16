@@ -1,0 +1,140 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: updmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>[*update]</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  </style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<h1 style="text-align:center" class="highlight">%nn;
+  [*update]:<br%/>
+  %first_name;
+  .%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end; %surname;
+</h1>
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+<table border="%border;" width="90%%">
+<tr align="%left;">
+  <th align="%left;" style="color:%highlight;">[*person/persons]0</th>
+  <th align="%left;" style="color:%highlight;">[*family/families]1</th>
+</tr>
+<tr align="%left;">
+  <td valign="top">
+    <a href="%prefix;m=MOD_IND;i=%index;" accesskey="P">[*modify::] (P)</a>
+    <br%/>
+    %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
+         and surname != "?")
+      <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
+      <br%/>
+      %if;(auto_image_file_name != "")
+        <a href="%prefix;m=DEL_IMAGE;i=%index;">[*delete::image/images]0</a>
+        <br%/>
+      %end;
+    %end;
+    <br%/>
+    <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
+    <br%/>
+    <br%/>
+    <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>
+    <br%/>
+    %if;(not has_parents and first_name != "?" and surname != "?")
+      <br%/>
+      <a href="%prefix;m=ADD_PAR;ip=%index;">[*add::parents]</a>
+      <br%/>
+    %end;
+  </td>
+  <td valign="top">
+    %foreach;family;
+      %if;(family_cnt != 1)
+        <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;
+         ">[*invert]</a>
+        <br%/>
+        %if;(family.father.index = prev_family.father.index
+         and family.mother.index = prev_family.mother.index)
+          <a href=%nn;
+          "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;
+          ;ip=%index;">%nn;
+          [*merge::]</a>
+          <br%/>
+        %end;
+      %end;
+      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
+       "%if;(nb_families = 1) accesskey="F"%end;>%nn;
+      [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
+      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
+      <br%/>
+      <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
+      [*delete::family/families]0</a>
+      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
+      <br%/>
+    %end;
+    <br%/>
+    %if;((first_name = "?" or surname = "?") and
+         (nb_families != 0 or has_parents))
+    %elseif;(not is_male and not is_female)
+      <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;
+      [*add::marriage/marriages]0 ([M/F]0)</a>
+      <br%/>
+      <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;
+      [*add::marriage/marriages]0 ([M/F]1)</a>
+      <br%/>
+    %else;
+      <a href="%prefix;m=ADD_FAM;ip=%index;" accesskey="A">%nn;
+      [*add::marriage/marriages]0 (A)</a>
+      <br%/>
+    %end;
+    %if;(nb_children != 0)
+      <br%/>
+      <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
+    %end;      
+    %if;has_possible_duplications;
+      <br%/>
+      <a href="%prefix;m=MRG_DUP;ip=%index;">%sq;
+      [*merge::possible duplications]</a>
+    %end;      
+  </td>
+</tr>
+</table>
+
+%define;hint(xx)
+  [*to add a child to a family, use "%s":::xx]
+%end;
+
+%if;(nb_families != 0)
+  <p>
+    %apply;hint([*modify::family/families]0)
+    <br%/>
+  </p>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

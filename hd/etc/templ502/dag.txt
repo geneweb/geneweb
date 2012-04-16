@@ -1,0 +1,180 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: dag.txt,v 5.5 2007-07-25 13:15:19 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %if;(evar.slices = "on")
+      [*display by slices/slice width/overlap/total width]0%nn;
+    %else;%head_title;%end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  --></style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<a href="%prefix;" accesskey="T"></a>
+
+%if;(evar.slices = "on")
+  %if;(evar.cgl != "on")
+    <table style="float:%right;"><tr><td>
+      %if;(referer != "")
+        <a href="%referer;"><img
+         src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+      %end;
+      <a href="%prefix;"><img%sp;
+      src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+    </td></tr></table>
+  %end;
+  <h1 style="text-align:center" class="highlight">%nn;
+    [*display by slices/slice width/overlap/total width]0%nn;
+  </h1>
+  <form method="GET" action="%action;">
+  <p>
+  %hidden;
+  %foreach;env_binding;
+    %if;(env.key != "slices")
+      <input type="hidden" name="%env.key;" value="%env.val.decoded;"%/>
+    %end;
+  %end;
+  </p>
+  <table>
+  <tr align="%left;">
+    <td align="%right;">
+      <label>
+      [*don't group the common branches together]
+      <input type="checkbox" name="nogroup" value="on"%/>
+      </label>
+    </td>
+  </tr>
+  <tr align="%left;">
+    <td align="%right;">
+      <label>
+      [*display by slices/slice width/overlap/total width]1
+      <input name="dpos" size="5" value="78"%/>
+      </label>
+    </td>
+  </tr>
+  <tr align="%left;">
+    <td align="%right;">
+      <label>
+      [*display by slices/slice width/overlap/total width]2
+      <input name="overlap" size="5" value="10"%/>
+      </label>
+    </td>
+  </tr>
+  <tr align="%left;">
+    <td align="%right;">
+      <label>
+      [*display by slices/slice width/overlap/total width]3
+      (%dag.min_wid;-%dag.max_wid;)
+      <input name="width" size="5" value="%nn;
+        %if;(dag.max_wid <= 78)%dag.max_wid;
+        %elseif;(dag.min_wid >= 78)%dag.min_wid;
+        %else;78%end;"%/>
+      </label>
+    </td>
+  </tr>
+  </table>
+  <p><input type="submit" value="Ok"%/></p>
+  </form>
+%else;
+  %if;(evar.notab != "on")
+    <div style="text-align:%right;
+    "><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
+       notab=on;slices=on" accesskey="/"><tt>//</tt></a></div>
+  %end;
+  %if;(evar.notab = "on" or evar.pos2 != "")
+    %let;dpos;%if;(evar.dpos != "")%evar.dpos;%else;78%end;%in;
+    %let;pos1;%if;(evar.pos1 != "")%evar.pos1;%else;0%end;%in;
+    %let;pos2;%if;(evar.pos2 != "")%evar.pos2;%else;%dpos;%end;%in;
+    %let;overlap;%if;(evar.overlap != "")%evar.overlap;%else;10%end;%in;
+    %if;(pos1 != 0 or pos2 < dag.ncol)
+      <div style="text-align:right">
+        %if;(pos1 = 0)&nbsp;%nn;
+        %else;
+          <a href="%prefix;
+            %foreach;env_binding;
+              %if;(env.key != "pos1" and env.key != "pos2")
+                %env.key=%env.val;;%nn;
+              %end;
+            %end;
+            pos1=%expr;(pos1 + overlap - dpos)
+            ;pos2=%expr(pos1 + overlap)">&lt;&lt;</a>%nn;
+        %end;%nl
+        %if;(pos2 >= dag.ncol)&nbsp;%nn;
+        %else;
+          <a href="%prefix;
+            %foreach;env_binding;
+              %if;(env.key != "pos1" and env.key != "pos2")
+                %env.key=%env.val;;%nn;
+              %end;
+            %end;
+            pos1=%expr;(pos2 - overlap)
+            ;pos2=%expr(pos2 - overlap + dpos)">&gt;&gt;</a>%nn;
+        %end;%nl;
+      </div>
+    %end;
+    <pre>
+    %foreach;dag_line;
+      %foreach;dag_line_pre;
+        %foreach;dag_cell_pre;
+          %dag_cell_pre;%nn;
+        %end;%nl;
+      %end;
+    %end;
+    </pre>
+  %else;
+    <table border="%border;" width="100%%"><tr><td align="center">
+    <table border="%border;" cellspacing="0" cellpadding="0">
+    %foreach;dag_line;
+      <tr align="left">
+      %foreach;dag_cell;
+        <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
+        %if;dag_cell.is_nothing;&nbsp;%nn;
+        %elseif;dag_cell.is_bar;
+          %if;(dag_cell.bar_link != "" and evar.cgl != "on")
+            <a style="text-decoration:none" href="%dag_cell.bar_link;">|</a>%nn;
+          %else;|%end;
+        %elseif;(dag_cell.item != "")%dag_cell.item;
+        %elseif;(dag_cell.text != "")%dag_cell.text;
+        %else;
+          %if;dag_cell.is_hr_left;
+            <hr dir="ltr" width="50%%" align="%left;"%/>%nn;
+          %elseif;dag_cell.is_hr_right;
+            <hr dir="ltr" width="50%%" align="%right;"%/>%nn;
+          %else;
+            <hr width="100%%"%/>
+          %end;
+        %end;
+        </td>
+      %end;
+      </tr>
+    %end;
+    </table>
+    </td></tr></table>
+  %end;
+  %if;(link_next != "")
+    <p>
+    <a href="%link_next;" accesskey=">">&gt;&gt;</a>%nl;
+    </p>
+  %end;
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>

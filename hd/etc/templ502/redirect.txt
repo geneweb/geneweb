@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <meta name="robots" content="none">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Address changed</title>
+</head>
+<body>
+<h1>Address changed</h1>
+
+The address of this service has changed.
+Please use now:
+<br>
+L'adresse du service a changé.
+Utiliser maintenant:
+<br>
+L'indirizzo di questo service è cambiato.
+Utilizzate:<p>
+<ul>
+<li>
+<a href="%l">%l</a>
+</ul>
+
+<p><hr><font size=-1><em>Copyright (c) 1998-2007 INRIA -
+<a href="http://www.geneweb.org/">
+GeneWeb %v</a></em></font><br>
+</body>

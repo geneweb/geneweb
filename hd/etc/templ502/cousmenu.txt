@@ -1,0 +1,119 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: cousmenu.txt,v 5.6 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*cousins (general term)]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <style type="text/css">
+    html { background:url('%image_prefix;/gwback.jpg') }
+    .highlight { color: %highlight;; font-weight: bold }
+    hr { border: 0; border-bottom: 1px solid }
+    a.date { text-decoration: none; color: black }
+  </style>
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<h1 style="text-align:center" class="highlight">%nn;
+  %apply;a_of_b_gr_eq_lev%with;
+    [*cousins (general term)]%nn;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;
+  %end;
+</h1>
+
+%define;nth_cousins(xx)
+  [*%s cousins:::xx]%nn;
+%end;
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+  </td></tr></table>
+%end;
+
+<ul>
+  <li>
+  <form method="get" action="%action;">
+    <p>
+      %hidden;
+      <input type="hidden" name="m" value="C"%/>
+      %if;access_by_key;
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="oc" value="%occ;"%/>
+        %end;
+      %else
+        <input type="hidden" name="i" value="%index;"%/>
+      %end;
+      <select name="v1">
+        %foreach;cousin_level;
+          <option value="%level;"%if;(level = 2) selected="selected"%end;>%nn;
+          %if;(level = 1)[*siblings]%nn;
+          %elseif;(level = 2)[*cousins]%nn;
+          %elseif;(level = 3)[*2nd cousins]%nn;
+          %elseif;(level = 4)[*3rd cousins]%nn;
+          %else;
+            %apply;nth_cousins%with;
+              %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
+            %end;
+          %end;
+          </option>
+         %end;
+      </select>
+      <input type="submit" value="Ok"%/>
+      <br%/>
+      <label>
+        <input type="checkbox" name="csp" value="on"%/>
+        [*include spouses]
+      </label>
+    </p>
+  </form>
+  </li>
+  <li>
+    <a href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
+  </li>
+  %if;has_nephews_or_nieces;
+    <li>
+      <a href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
+    </li>
+  %end;
+</ul>
+%if;(died = "" and (wizard or friend))
+  <ul>
+    <li>
+      <a href="%prefix;%access;;m=C;t=AN">[*birthdays]</a>
+    </li>
+  </ul>
+%end;
+
+<div>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
+<br%/>
+</div>
+%copyright;
+%base_trailer;
+</body>
+</html>
