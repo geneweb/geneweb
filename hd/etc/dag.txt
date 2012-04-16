@@ -139,7 +139,7 @@
     %foreach;dag_line;
       <tr align="left">
       %foreach;dag_cell;
-        <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
+        <td colspan="%if;(dag_cell.colspan > 1)%dag_cell.colspan;%else;1%end;" align="%dag_cell.align;">%nn;
         %if;dag_cell.is_nothing;&nbsp;%nn;
         %elseif;dag_cell.is_bar;
           %if;(dag_cell.bar_link != "" and evar.cgl != "on")
