@@ -226,8 +226,19 @@ value rename_image_file conf base p (nfn, nsn, noc) =
   | _ -> () ]
 ;
 
+value notify_change_key conf base (_, (ofn, osn, oocc)) (_, (fn, sn, occ)) =
+  let old_key = default_image_name_of_key ofn osn oocc in
+  let new_key = default_image_name_of_key fn sn occ in
+  if old_key <> new_key then
+    History.record_key conf base old_key new_key
+  else ()
+;
+
 value change_child conf base parent_surname ip =
   let p = poi base ip in
+  let old_key = 
+    (ip, (p_first_name base p, p_surname base p, get_occ p))
+  in
   let var = "c" ^ string_of_int (Adef.int_of_iper (get_key_index p)) in
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
@@ -267,6 +278,9 @@ value change_child conf base parent_surname ip =
     let np_misc_names = gen_person_misc_names base p (fun p -> p.titles) in
     List.iter (fun key -> person_ht_add base key p.key_index)
       np_misc_names;
+    let new_key = (ip, (new_first_name, new_surname, new_occ)) in
+    update_gwf_sosa conf base new_key;
+    notify_change_key conf base old_key new_key;
   }
   else ()
 ;
