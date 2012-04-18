@@ -9,7 +9,7 @@ open Printf;
 value languages =
   ["af"; "bg"; "br"; "ca"; "cs"; "da"; "de"; "en"; "eo"; "es"; "et"; "fi";
    "fr"; "he"; "is"; "it"; "lv"; "nl"; "no"; "pl"; "pt"; "pt-br"; "ro"; "ru";
-   "sl"; "sv"(*; "zh": too many missing things, gave up *)]
+   "sl"; "sv"; "zh"]
 ;
 
 value linenum = ref 0;
@@ -63,34 +63,38 @@ value check first lang =
     try
       while True do {
         let line = input_line ic_i18n in
-        skip_to_same_line ic_lex ("    " ^ line);
-        let list = get_all_versions first ic_lex in
-        if first && Sort.list compare_assoc list <> list then do {
-          eprintf "Misordered for:\n   \"%s\"\n" line; flush stderr
-        }
-        else ();
-        if not (List.mem_assoc lang list || List.mem_assoc derived_lang list)
-        then do {
-          let list =
-            Sort.list compare_assoc
-              [(lang, ""); ("en", List.assoc "en" list);
-               ("fr", List.assoc "fr" list)]
-          in
-          printf "    %s\n" line;
-          List.iter
-            (fun (lang, transl) ->
-               printf "%s:%s\n" lang
-                 (if transl = "" then " ..." else transl))
-            list;
-          printf "\n";
-          has_missing.val := True
-        }
-        else if
-          List.length (List.find_all (fun (l, _) -> l = lang) list) >= 2
-        then do {
-          eprintf "Several translations in %s for:\n   \"%s\"\n" lang line;
-          flush stderr
-        }
+        if line <> " !dir" then
+          do {
+            skip_to_same_line ic_lex ("    " ^ line);
+            let list = get_all_versions first ic_lex in
+            if first && Sort.list compare_assoc list <> list then do {
+              eprintf "Misordered for:\n   \"%s\"\n" line; flush stderr
+            }
+            else ();
+            if not (List.mem_assoc lang list || List.mem_assoc derived_lang list)
+            then do {
+              let list =
+                Sort.list compare_assoc
+                  [(lang, ""); ("en", List.assoc "en" list);
+                   ("fr", List.assoc "fr" list)]
+              in
+              printf "    %s\n" line;
+              List.iter
+                (fun (lang, transl) ->
+                   printf "%s:%s\n" lang
+                     (if transl = "" then " ..." else transl))
+                list;
+              printf "\n";
+              has_missing.val := True
+            }
+            else if
+              List.length (List.find_all (fun (l, _) -> l = lang) list) >= 2
+            then do {
+              eprintf "Several translations in %s for:\n   \"%s\"\n" lang line;
+              flush stderr
+            }
+            else ()
+          } 
         else ()
       }
     with
