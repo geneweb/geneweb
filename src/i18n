@@ -1,12 +1,15 @@
  !dates order
+ !dir
  !languages
  to see the first branch
  to see the first relationship link
  to try again with this number
 %1 of %2
+%d places starting with %s
 %d years ago
 %s access cancelled for that page
 %s cousins
+%s forbidden char
 %s, it is %s of
 %s, it will be %s of
 %t already has parents
@@ -25,29 +28,15 @@
 2nd cousins
 3rd cousins
 <em>Sosa number</em> relative to %t
-M/F
-Sosa
-Y/N
-a %s cousin
 a 2nd cousin
 a 3rd cousin
-a brother-in-law/a sister-in-law
-a brother/a sister/a sibling
-a cousin
-a descendant
-a grandfather/a grandmother/a grandparent
-a grandson/a granddaughter/a grandchild
-a great-grandfather/a great-grandmother/a great-grandparent
-a great-grandson/a great-granddaughter/a great-grandchild
-a great-nephew/a great-niece
-a great-uncle/a great-aunt
-a half-brother/a half-sister/a half-sibling
-a nephew/a niece
-a son-in-law/a daughter-in-law
-a son/a daughter/a child
 about (date)
+a brother/a sister/a sibling
+a brother-in-law/a sister-in-law
 access
+a cousin
 add
+a descendant
 adoptive father/adoptive mother/adoptive parents
 adoptive son/adoptive daughter/adoptive child
 advanced request
@@ -55,6 +44,14 @@ after
 after (date)
 age
 age at death:
+age at %s birth date
+a grandfather/a grandmother/a grandparent
+a grandson/a granddaughter/a grandchild
+a great-grandfather/a great-grandmother/a great-grandparent
+a great-grandson/a great-granddaughter/a great-grandchild
+a great-nephew/a great-niece
+a great-uncle/a great-aunt
+a half-brother/a half-sister/a half-sibling
 alias
 alive
 all the estates
@@ -62,14 +59,18 @@ all the titles
 alphabetic order
 also
 an ancestor
-an uncle/an aunt
 ancestors
 ancestors (some)
 and
+a nephew/a niece
 anniversaries
 anniversaries of dead people
 anniversaries of marriage
+an uncle/an aunt
 are
+a %s cousin
+a son/a daughter/a child
+a son-in-law/a daughter-in-law
 at the same time
 average age at death
 back
@@ -79,8 +80,10 @@ before
 before (date)
 begin
 between (date)
+bibliography
 birth
 birthdays
+book of places
 border
 born
 branch/branches
@@ -92,9 +95,10 @@ candidate father/candidate mother/candidate parents
 candidate son/candidate daughter/candidate child
 cannot access base
 cannot change sex of a married person
+celebrities
 change children's names
-change it (the number) yourself
 changed order of children
+change it (the number) yourself
 child/children
 children's names changed
 click
@@ -103,8 +107,9 @@ color
 comment
 connections
 consanguinity
-continue merging
+continue correcting
 continued
+continue merging
 cousins
 cousins (general term)
 create
@@ -117,6 +122,7 @@ delete
 descendants
 died
 died young
+direct ancestor of %s
 disappeared
 disconnect
 display by slices/slice width/overlap/total width
@@ -134,15 +140,16 @@ executed (legally killed)
 families with encoding
 family added
 family deleted
-family modified
 family/families
+family history
+family modified
 father/mother
 file
 first free number
 first name alias
+first name/first names
 first name missing
 first name not found
-first name/first names
 for the first names by alphabetic order
 for the list ordered by the date of the last modification
 foster father/foster mother/foster parents
@@ -153,8 +160,12 @@ godson/goddaughter/godchild
 grand-parents
 great-grand-parents
 gregorian/julian/french/hebrew
+half siblings
+half-siblings
+happy birthday to them!
 happy birthday to you!
 having as children
+help places
 here
 him/her
 history of updates
@@ -163,10 +174,8 @@ husband/wife
 ident/email/subject
 if titles
 image deleted
-image received
 image/images
-in (month year)
-in (year)
+image received
 include missing spouses
 include spouses
 incompatible sexes
@@ -175,10 +184,12 @@ incorrect request
 indeed,
 index of the descendants
 index of the spouses (non descendants)
+in (month year)
 insert
 inversion done
 invert
 invert the order of the following families
+in (year)
 is
 is a very young parent
 is born after his/her child
@@ -189,46 +200,60 @@ less than one month old
 link
 link between
 linked pages
+link to use
 list/list (ancestors)
 long display
 loop in database: %s is his/her own ancestor
+M/F
 main title
 male line/female line
+marriage had occured after the death of %t
+marriage had occured before the birth of %t
+marriage/marriages
+marriage notes
 marriage of %t after his/her death
 marriage of %t before his/her birth
-marriage/marriages
 married
 married at age %t
 married%t to
+maternal grand-parents
 maximum
 merge
 merge done
 message added
 message deleted
 message/previous message/previous messages/next message
+M/F
 miscellaneous notes
 missing ancestors
 modify
 months old
 moon age/new moon/first quarter/full moon/last quarter
 more than %d answers
+msg error disconnected
 murdered
 name
 name %s already used by %tthis person%t
+navigation
+navigation arbre
 navigation with %t as Sosa reference
 nephews and nieces
+new modification
 next sibling
 no anniversary
 no birthday
+no descendants
 no known relationship link between %s and %s
 no match
 no mention
+no modification
 no sexes check
 not divorced
-not found
-not married
 note/notes
 notes modified
+notes summary
+not found
+not married
 nth
 nth (cousin)
 nth (generation)
@@ -238,22 +263,25 @@ number of living persons:
 occupation
 of course dead
 of the %s generation
-on %s's side
 on (day month year)
-on (weekday day month year)
 one day old
 one month old
 one year old
 only the generation selected
+on %s's side
+on (weekday day month year)
 optional
 or
 parents
+paternal grand-parents
 person added
 person deleted
 person modified
 person/persons
 persons having the same name
 place
+place modified
+places
 population pyramid
 possible duplications
 possibly (date)
@@ -269,8 +297,8 @@ relation/relations
 relationship
 relationship computing
 relationship link/relationship links
-relationship%t to
 relationships by marriage
+relationship%t to
 search/case sensitive
 see
 see above
@@ -286,29 +314,30 @@ should be male
 siblings
 since the last click
 son/daughter/child
+Sosa
 source/sources
 specify
 spouses not included
 starting with
 statistics
+statistics and anniversaries
 surname alias
 surname missing
 surname not found
-surname/surnames
 surnames list
+surname/surnames
 text
-the %d first names
-the %d oldest couples perhaps still alive and engaged
-the %d oldest perhaps still alive
-the %d surnames
-the %d who lived the longest
-the %s generation
 the anniversary
 the anniversary of marriage
 the base has changed; do "back", "reload", and refill the form
 the birthday
 the children
 the day after tomorrow
+the %d first names
+the %d oldest couples perhaps still alive and engaged
+the %d oldest perhaps still alive
+the %d surnames
+the %d who lived the longest
 the father-in-law/the mother-in-law
 the father/the mother/a parent
 the file is temporarily locked: please try again
@@ -318,33 +347,39 @@ the grandparents
 the great-grandchildren
 the great-grandparents
 the latest %d births
+the latest %d celebrated marriages
 the latest %d marriages
+the latest %d registered marriages
 the latest %t deaths
+the modification impacted %d persons
 the parents
+the %s generation
 the spouse
 the whole list
 this forum is moderated
 title/titles
 to add a child to a family, use "%s"
 to change
-to the %s generation
+to come
+today
+tomorrow
+tools
+total
 to the children
 to the grandchildren
 to the grandparents
 to the great-grandchildren
 to the great-grandparents
 to the parents
-today
-tomorrow
-total
+to the %s generation
 tree
 try again
 uncles and aunts
 undefined sex for %t
 unknown person
 unspecified
-up to
 update
+up to
 use "link" instead of "create"
 user/password/cancel
 validate/delete
@@ -355,11 +390,11 @@ warnings
 with
 witness at marriage of %s and %s
 witness/witnesses
-wizard/wizards/friend/friends
 wizard/wizards/friend/friends/exterior
 would be his/her own ancestor
 year/month/day
 years old
+Y/N
 you are visible/you are not visible
 you must first merge
 you must first merge the 2 families

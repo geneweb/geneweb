@@ -63,13 +63,6 @@ sl: af=afrikaanščina/ca=katalonščina/cs=češčina/da=danščina/de=nemšči
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sl=slovenska/sv=svenska/zh=kinesiska
 zh: fr=法语/zh=中文
 
-    to change
-en: to change
-et: muutmiseks
-fr: pour changer
-it: per cambiare
-sk: pre zmenu
-
      to see the first branch
 af:  om die eerste staak te sien
 bg:  за да видите първия клон
@@ -182,6 +175,17 @@ sk: %1 :g:%2
 sl: %1 od :g:%2
 sv: %1 till %2
 
+    %d places starting with %s
+de: %d orts beginnend mit %s
+en: %d places starting with %s
+es: %d lugares comenzando con %s
+fi: %d paikoista ensimmäisenä %s
+fr: %d lieux commençant par %s
+it: %d luoghi partendo da %s
+nl: %d plaatsen beginnend met %s
+no: %d steder som starter med %s
+sv: %d orternas som börjar med %s
+
     %d years ago
 af: %d jaar gelede
 bg: преди %d години
@@ -259,6 +263,18 @@ ru: %s кузены
 sk: %s bratranci/sesternice
 sl: %s bratranci/sestrične
 sv: %smänningar
+
+    %s forbidden char
+da: forkert karakter (%s) brugt i efternavn/fornavn
+de: ungültiges Zeichen (%s) im nachname/vorname
+en: invalid character (%s) used in surname/first name
+es: carácter inválido (%) en la apellido/nombre
+fi: olet kättänyt sopimatonta merkkiä (%s) sukunimi/etunimi
+fr: caractères interdits (%s) dans le patronyme/prénom
+it: carattere non valido (%s) nella cognome/nome
+nl: ongeldig karakter (%s) in familienaam/voornaam
+no: etternavn/fornavn du skrev inn, inneholder ugyldige tegn (%s)
+sv: Ogiltigt tecken (%s) i efternamn/förnamn
 
     %s, it is %s of
 af: %s, dit is %s van
@@ -771,118 +787,6 @@ sk: <em>"Sosa" číslo</em> vo vzťahu k %t
 sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
 
-    M/F
-af: M/V
-bg: М/Ж
-br: Gour/Maouez
-ca: M/F
-cs: M/Ž
-da: M/K
-de: M/F
-en: M/F
-eo: Maskla/Ina
-es: M/F
-et: M/N
-fi: M/N
-fr: H/F
-he:  ז/נ
-is: KK/KvK
-it: M/F
-lv: V/S
-nl: M/V
-no: M/K
-pl: M/Ż
-pt: M/F
-ro: M/F
-ru: М/Ж
-sk: M/Ž
-sl: M/Ž
-sv: M/K
-
-    Sosa
-af: Sosa
-bg: Число на Соса
-br: Sosa
-ca: número "Sosa"
-cs: "Sosa"
-da: Sosa
-de: Ahnenkennziffer
-en: Sosa
-eo: Sosa
-es: Sosa
-et: Sosa
-fi: Sosa
-fr: Sosa
-he: Sosa
-is: Sosa
-it: Sosa
-lv: SOSA
-nl: Sosa
-no: Sosa
-pl: "Sosa"
-pt: Sosa
-ro: Sosa
-ru: Sosa
-sk: Sosa
-sl: številka Sosa
-sv: annummer
-
-    Y/N
-af: J/N
-bg: Д/Н
-br: Ya/N'eo ket
-ca: S/N
-cs: A/N
-da: J/N
-de: J/N
-en: Y/N
-eo: J/N
-es: S/N
-et: J/E
-fi: K/E
-fr: O/N
-he:   ק/ל
-is: J/N
-it: S/N
-lv: J/N
-nl: J/N
-no: J/N
-pl: T/N
-pt: S/N
-ro: da/nu
-ru: Д/Н
-sk: áno/nie
-sl: da/ne
-sv: J/N
-
-    a %s cousin
-af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
-bg: %sи братовчед/%sа братовчедка
-br: ur c'henderv a live an %s derez/ur geniterv a live an %s derez/ ur c'h(g)enderv(ez) a live an %s derez
-ca: un cosí de %s grau/una cosina de %s grau/un(a) cosí(na) de %s grau
-cs: bratranec z %s kolena/sestřenice z %s kolena
-da: en fætter af %s grad/en kusine af %s grad
-de: ein:d:+em Cousin %s Grades/eine:d:+r Cousine %s Grades
-en: a %s cousin
-eo: %s grada kuzo/%s grada kuzino/%s grada kuz(in)o
-es: un primo en %s grado/una prima en %s grado/un(a) primo(a) en %s grado
-et: %s astme nõbu:g:--o
-fi: %s serkku:g:--un
-fr: un cousin au %s degré/une cousine au %s degré/un(e) cousin(e) au %s degré
-he:  בן-דוד לדרגה  %s/ בת-דוד לדרגה  %s
-is: systkynabarn %s
-it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
-lv: %s brālēns/māsīca
-nl: een neef in de %s generatie/een nicht in de %s generatie
-no: %smenning
-pl: kuzyn %s-tego stopnia/kuzynka %s-tego stopnia
-pt: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
-ro: un var de gradul %s
-ru: %s-ий кузен/%s-я кузина
-sk: bratranec/sesternica z %s kolena
-sl: bratranec v %s kolenu/sestrična v %s kolenu
-sv: %smänning
-
     a 2nd cousin
 af: 'n kleinneef/'n kleinniggie
 bg: втори братовчед/втора братовчедка
@@ -939,33 +843,33 @@ sk: bratranec/sesternica z tretieho kolena
 sl: bratranec v tretjem kolenu/sestrična v tretjem kolenu
 sv: en brylling
 
-    a brother-in-law/a sister-in-law
-af: 'n swaer/'n skoonsuster
-bg: сестрин съпруг, шурей или баджанак/братова съпруга, шуренайка или балдъза/сестрин съпруг, съпруг на зълва или девер/братова съпруга, зълва или етърва
-br: ur breur-kaer/ur c'hoar-gaer
-ca: un cunyat/una cunyada
-cs: švagr/švagrová
-da: en svoger/en svigerinde
-de: ein Schwager/eine Schwägerin
-en: a brother-in-law/a sister-in-law
-eo: bofrato/bofratino
-es: un cuñado/una cuñada
-et: küdi või nääl:g:+u või õemees:g:--he/nadu või käli või vennanaine:g:--se
-fi: lanko:g:--gon/käly:g:+n
-fr: un beau-frère/une belle-sœur
-he:  גיס/ גיסה
-is: mágur/mágkona
-it: un cognato/una cognata
-lv: svainis/svaine
-nl: een schoonbroer(zwager)/een schoonzuster
-no: svoger/svigerinne
-pl: szwagier/szwagierka
-pt: um cunhado/uma cunhada
-ro: un cumnat/o cumnata
-ru: деверь-шурин/заловка-свояченица
-sk: švagor/švagriná
-sl: svak/svakinja
-sv: en svåger/en svägerska
+    about (date)
+af: ongeveer
+bg: около
+br: war-dro
+ca: al voltant de
+cs: kolem
+da: omkring
+de: ca.
+en: about
+eo: ĉirkaù
+es: alrededor de
+et: umbes :i:
+fi: noin
+fr: vers
+he:   בערך
+is: um
+it: circa
+lv: ap
+nl: circa
+no: ca
+pl: około
+pt: cerca
+ro: circa
+ru: около
+sk: okolo
+sl: približno
+sv: omkring
 
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
@@ -995,369 +899,33 @@ sk: brat/sestra/súrodenec
 sl: brat/sestra/brat ali sestra
 sv: en bror/en syster/ett syskon
 
-    a cousin
-af: 'n neef/'n niggie
-bg: първи братовчед/първа братовчедка
-br: ur c'henderv/ur geniterv
-ca: un cosí/una cosina
-cs: bratranec/sestřenice
-da: en fætter/en kusine
-de: ein:d:+em Cousin/eine:d:+r Cousine
-en: a cousin
-eo: kuzo/kuzino
-es: un primo/una prima
-et: nõbu:g:--o
-fi: serkku:g:--un
-fr: un cousin/une cousine
-he:  בן-דוד/ בת-דוד
-is: systkynabarn
-it: un cugino/una cugina
-lv: brālēns/māsīca
-nl: een neef/een nicht
-no: fetter/kusine
-pl: kuzyn/kuzynka
-pt: um primo/uma prima
-ro: un var
-ru: кузен/кузина
-sk: bratranec/sesternica
-sl: bratranec/sestrična
-sv: en kusin
-
-    a descendant
-af: 'n afstammeling
-bg: потомък
-br: un diskennad/ un diskennadez
-ca: un descendent/una descendent
-cs: potomek
-da: en efterkommer
-de: ein:d:+em Nachkomme:d:+n
-en: a descendant
-eo: posteulo
-es: un descendiente/una descendiente
-et: järglane:g:--se
-fi: jälkeläinen:g:---sen
-fr: un descendant/une descendante
-he:   צאצא/ צאצאה
-is: afkomandi
-it: un discendente/una discendente
-lv: pēcnācējs
-nl: een afstammeling
-no: etterkommer
-pl: potomek
-pt: um descendente/uma descendente
-ro: un descendent
-ru: потомок
-sk: potomok
-sl: potomec
-sv: en ättling
-
-    a grandfather/a grandmother/a grandparent
-af: 'n oupa/'n ouma/'n grootouer
-bg: дядо/баба/дядо или баба
-br: un tad-kozh/ur vamm-gozh/un den-kar-kozh
-ca: un avi/una àvia/un(a) avi(a)
-cs: dědeček/babička/prarodič
-da: en bedstefader/en bedstemoder/en bedsteforælder
-de: ein:d:+em Großvater/eine:d:+r Großmutter/ein:d:+em Großelternteil
-en: a grandfather/a grandmother/a grandparent
-eo: avo/avino/av(in)o
-es: un abuelo/una abuela/un(a) abuelo(a)
-et: vanaisa/vanaema/vanavanem:g:+a
-fi: isoisä:g:+n/isoäiti:g:--din/isovanhempi:g:--man
-fr: un grand-père/une grand-mère/un grand-parent
-he:    סבא/ סבתא
-is: afi/amma/afi og amma
-it: un nonno/una nonna/un(a) nonno(a)
-lv: vectēvs/vecmamma/vecvecāki
-nl: een grootvader/een grootmoeder/een grootouder
-no: bestefar/bestemor/en av besteforeldrene
-pl: dziadek/babka/dziadkowie
-pt: um avô/uma avó/um(a) avô(ó)
-ro: un bunic/o bunica/bunici
-ru: дедушка/бабушка/прародитель
-sk: dedo/babka/prarodič
-sl: dedka/babice/starega starša
-sv: farfar/farmor/en farförälder/morfar/mormor/en morförälder
-
-    a grandson/a granddaughter/a grandchild
-af: 'n kleinseun/'n kleindogter/'n kleinkind
-bg: внук/внучка/внук или внучка
-br: ur mab bihan/ur verc'h vihan/ur bugel bihan
-ca: un net/una neta/un(a) net(a)
-cs: vnuk/vnučka/vnouče
-da: en sønne-søn/en sønne-datter/et barnebarn/en datter-søn/en datter-datter/et barnebarn
-de: ein:d:+em Enkel/eine:d:+r Enkelin/ein:d:+em Enkelkind
-en: a grandson/a granddaughter/a grandchild
-eo: nepo/nepino/nep(in)o
-es: un nieto/una nieta/un(a) nieto(a)
-et: poja- või tütrepoeg:g:--ja/poja- või tütretütar:g:--re/lapselaps:g:+e
-fi: pojan tai tyttären poika:g:---jan/pojan tai tyttären tytär:g:--tären/lapsenlapsi:g:-en
-fr: un petit-fils/une petite-fille/un petit-enfant
-he:  נכד/ נכדה
-is: barnabarn/barnabarn/barnabarn
-it: un nipote/una nipote/un(a) nipote
-lv: mazdēls/mazmeita/mazbērns
-nl: een kleinzoon/een kleindochter/een kleinkind
-no: barnebarn/barnebarn/barnebarn
-pl: wnuk/wnuczka/wnuki
-pt: um neto/uma neta/um(a) neto(a)
-ro: nepot/nepoata/nepoti
-ru: внук/внучка/ребенок детей
-sk: vnuk/vnučka/vnúča
-sl: vnuk/vnukinja/pravnuk ali pravnukinja
-sv: en sonson/en sondotter/ett barnbarn/en dotterson/en dotterdotter/ett barnbarn
-
-    a great-grandfather/a great-grandmother/a great-grandparent
-af: 'n oupagrootjie/'n oumagrootjie/'n grootjie
-bg: прадядо/прабаба/прадядо или прабаба
-br: un tad kuñv/ur vamm-guñv/ un den-kar-kozh-kuñv
-ca: un besavi/una besàvia/un(a) besavi(a)
-cs: pradědeček/prababička/praprarodič
-da: en oldefader/en oldemoder/en oldeforælder
-de: ein:d:+em Urgroßvater/eine:d:+r Urgroßmutter/ein:d:+em Urgroßelternteil
-en: a great-grandfather/a great-grandmother/a great-grandparent
-eo: praavo/praavino/praav(in)o
-es: un bisabuelo/una bisabuela/un(a) bisabuelo(a)
-et: vanavanaisa/vanavanaema/vanavanavanem:g:+a
-fi: iso-isoisä:g:+n/iso-isoäiti:g:--din/iso-isovanhempi:g:--man
-fr: un arrière-grand-père/une arrière-grand-mère/un arrière-grand-parent
-he:   רב-סבא/ רב-סבתא
-is: langafi/langamma/langafi og langamma
-it: un bisnonno/una bisnonna/un(a) bisnonno(a)
-lv: vecvectēvs/vecvecmamma/vecvecvecāki
-nl: een overgrootvader/een overgrootmoeder/een overgrootouder
-no: oldefar/oldemor/en av oldeforeldrene
-pl: pradziadek/prababka/pradziadkowie
-pt: um bisavô/uma bisavó/um(a) bisavô(ó)
-ro: un strabunic/o strabunica/strabunici
-ru: прапрадед/прапрабабка/прапрапрародитель
-sk: pradedo/prababka/praprarodič
-sl: pradedek/prababica/prastari starš
-sv: en gammel-farfar/en gammel-farmor/en gammel-farförälder/en gammel-morfar/en gammel-mormor/en gammel-morförälder
-
-    a great-grandson/a great-granddaughter/a great-grandchild
-af: 'n agterkleinseun/'n agterkleindogter/'n agterkleinkind
-bg: правнук/правнучка/правнук или правнучка
-br: ur mab-kuñv /ur verc'h guñv/ ur bugel-kuñv
-ca: un besnet/una besneta/un(a) besnet(a)
-cs: pravnuk/pravnučka/pravnoučata
-da: en oldesøn/en oldedatter/et oldebarn
-de: ein:d:+em Urenkel/eine:d:+r Urenkelin/ein:d:+em Urenkelkind
-en: a great-grandson/a great-granddaughter/a great-grandchild
-eo: pranepo/pranepino/pranep(in)o
-es: un bisnieto/una bisnieta/un(a) bisnieto(a)
-et: lapselapse poeg:g:--ja/lapselapse tütar:g:--re/lapselapselaps:g:+e
-fi: lapsenlapsen poika:g:---jan/lapsenlapsen tytär:g:--tären/lapsenlapsen lapsi:g:-en
-fr: un arrière-petit-fils/une arrière-petite-fille/un arrière-petit-enfant
-he:   נין/ נינה
-is: barnabarnabarn/barnabarnabarn/barnabarnabarn
-it: un pronipote/una pronipote/un(a) pronipote
-lv: mazmazdēls/mazmazmeita/mazmazbērni
-nl: een achterkleinzoon/een achterkleindochter/een achterkleinkind
-no: oldebarn
-pl: prawnuk/prawnuczka/prawnuki
-pt: um bisneto/uma bisneta/um(a) bisneto(a)
-ro: stranepot/stranepoata/stranepoti
-ru: праправнук/праправнучка/праправнук
-sk: pravnuk/pravnučka/pravnúča
-sl: pravnuk/pravnukinja/pravnuk ali pravnukinja
-sv: en sonsons son/en sonsons dotter/ett barnbarns barn/en sondotters son/en sondotters dotter/ett barnbarns barn/en dottersons son/en dottersons dotter/ett barnbarns barn/en dotterdotters son/en dotterdotters dotter/ett barnbarns barn
-
-    a great-nephew/a great-niece
-af: 'n agterneef/'n agterniggie
-bg: внук на брат или сестра/внучка на брат или сестра
-br: un niz bihan/ur verc'h vihan
-ca: un besnebot/una besneboda
-cs: prasynovec/praneteř
-da: en grandnevø/en grandniece
-de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte
-en: a great-nephew/a great-niece
-eo: pranevo/pranevino
-es: un sobrino nieto/una sobrina nieta
-et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
-fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:--tären
-fr: un petit neveu/une petite nièce
-he:   בן האחיין/ בת האחיין
-is: frændi/frænka
-it: un pronipote/una pronipote
-lv: brāļa/māsas mazdēls/mazmeita
-nl: een achterneef/een achternicht
-no: grandnevø/grandniese
-pl: wnuk brata lub siostry/wnuczka brata lub siostry
-pt: um sobrinho-neto/uma sobrinha-neta
-ro: stranepot/stranepoata/stranepoti
-ru: внучатый племянник/внучатая племянница
-sk: prasynovec/praneter
-sl: pranečak/pranečakinja
-sv: en gammel-nevö/en gammel-niece
-
-    a great-uncle/a great-aunt
-af: 'n grootoom/'n groottante
-bg: чичо на родител/леля на родител/вуйчо на родител/леля на родител
-br: un eontr-kuñv /ur voereb guñv
-ca: un oncle avi/una tia àvia
-cs: prastrýc/prateta
-da: en grandonkel/en grandtante
-de: ein:d:+em Großonkel/eine:d:+r Großtante
-en: a great-uncle/a great-aunt
-eo: praonklo/praonklino
-es: un tio abuelo/una tia abuela
-et: vanaonu/vanatädi
-fi: isosetä:g:--dän/isotäti:g:--din
-fr: un grand-oncle/une grand-tante
-he:   דוד-סב/ דודה-סבה
-is: afa(ömmu)bróðir/afa(ömmu)systir
-it: un prozio/una prozia
-lv: vectēva/vecmamas brālis/māsa
-nl: een oudoom/een oudtante
-no: en grandonkel/en grandtante
-pl: brat dziadka lub babki/siostra dziadka lub babki
-pt: um tio-avô/uma tia-avó
-ro: frate de bunici/sara de bunici
-ru: дядя родителя/тетя родителя
-sk: prastrýko/prateta
-sl: prastric/prateta
-sv: en gammel-farbror/en gammel-faster/en gammel-morbror/en gammel-moster
-
-    a half-brother/a half-sister/a half-sibling
-af: 'n stiefbroer/'n stiefsuster/'n stiefbroer of -suster
-bg: полубрат/полусестра/полубрат или полусестра
-br: ul lezvreur/ul lezc'hoar/un hanter-breur pe -c'hoar
-ca: un germanastre/una germanastra/un(a) germanastre(a)
-cs: nevlastní bratr/nevlastní sestra/nevlastní sourozenec
-da: en halvbroder/en halvsøster/en halvsøskende
-de: ein:d:+em Halbbruder/eine:d:+r Halbschwester/ein:d:+em Halbbruder oder eine:d:+r Halbschwester
-en: a half-brother/a half-sister/a half-sibling
-eo: duonfrato/duonfratino/duonfrat(in)o
-es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
-et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
-fi: velipuoli:g:-en/sisarpuoli:g:-en/isä- tai äitipuolen lapsi:g:-en
-fr: un demi-frère/une demi-sœur/un demi-frère ou une demi-sœur
-he:   חצי אח/ חצי אחות/ חצי אח(ות)
-is: hálfbróðir/hálfsystir/hálfsystkin
-it: un fratello/una sorella/un fratello o una sorella
-lv: pusbrālis/pusmāsa/pusbērns
-nl: een halfbroer/een halfzuster/een halfbroer of halfzuster
-no: halvbror/halvsøster/halvsøsken
-pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
-pt: um meio-irmão/uma meia-irmã/um(a) meio(a) irmão(ã)
-ro: frate vitreg/sora vitrega/surori sau frati vitregi
-ru: полуродной брат/полуродная сестра/полуродной брат
-sk: nevlastný brat/nevlastná sestra/ nevlastný súrodenec
-sl: polbrata/polsestra/polbrat ali polsestra
-sv: en halvbror/en halvsyster/ett halvsyskon
-
-    a nephew/a niece
-af: 'n broerskind/'n susterskind
-bg: племенник/племенница
-br: un niz/un nizez
-ca: un nebot/una neboda
-cs: synovec/neteř
-da: en nevø/en niece
-de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte
-en: a nephew/a niece
-eo: nevo/nevino
-es: un sobrino/a sobrina
-et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
-fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:--tären
-fr: un neveu/une nièce
-he:   אחיין/ אחיינית
-is: bróður(systur)sonur/bróður(systur)dóttir
-it: un nipote/una nipote
-lv: brāļa/māsas dēls/meita
-nl: een neef/een nicht (oom- of tantezegger)
-no: nevø/niese
-pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
-pt: um sobrinho/uma sobrinha
-ro: nepot/nepoata/nepoti
-ru: племянник/племянница
-sk: synovec/neter
-sl: nečak/nečakinja/nečak ali nečakinja
-sv: en nevö/en niece
-
-    a son-in-law/a daughter-in-law
-af: 'n skoonseun/'n skoondogter
-bg: съпруг на дъщеря/съпруга на син
-br: mabeg/merc'heg
-ca: un gendre/una jove
-cs: zeť/snacha
-da: en svigersøn/en svigerdatter
-de: ein Schwiegersohn/eine Schwiegertochter
-en: a son-in-law/a daughter-in-law
-eo: bofilo/bofilino
-es: un yerno/una nuera
-et: väimees:g:--he/minia
-fi: vävy:g:+n/miniä:g:+n
-fr: un beau-fils/une belle-fille
-he:  חתן/ כלה
-is: tengdasonur/tengdadóttir
-it: un genero/una nuora
-lv: znots/vedekla
-nl: schoonzoon/schoondochter
-no: svigersønn/svigerdatter
-pl: zięć/synowa
-pt: um genro/uma nora
-ro: ginere/nora
-ru: зять/невестка
-sk: zať/nevesta
-sl: zet/snaha
-sv: en måg/en svärdotter
-
-    a son/a daughter/a child
-af: 'n seun/'n dogter/'n kind
-bg: син/дъщеря/дете
-br: ur mab/ur verc'h/ur bugel
-ca: un fill/una filla/un(a) fill(a)
-cs: syn/dcera/dítě
-da: en søn/en datter/et barn
-de: ein:d:+em Sohn/eine:d:+r Tochter/ein:d:+em Kind
-en: a son/a daughter/a child
-eo: filo/filino/ido
-es: un hijo/una hija/un(a) hijo(a)
-et: poeg:g:--ja/tütar:g:--re/laps:g:+e
-fi: poika:g:---jan/tytär:g:--tären/lapsi:g:-en
-fr: un fils/une fille/un enfant
-he:   בן/ בת/ ילד
-is: sonur/dóttir/barn
-it: un figlio/una figlia/un(a) figlio(a)
-lv: dēls/meita/bērns
-nl: een zoon/een dochter/een kind
-no: sønn/datter/barn
-pl: syn/córka/dziecko
-pt: um filho/uma filha/um(a) filho(a)
-ro: fiu/fica/copil
-ru: сын/дочь/ребенок
-sk: syn/dcéra/dieťa
-sl: sin/hčerka/otrok
-sv: en son/en dotter/ett barn
-
-    about (date)
-af: ongeveer
-bg: около
-br: war-dro
-ca: al voltant de
-cs: kolem
-da: omkring
-de: ca.
-en: about
-eo: ĉirkaù
-es: alrededor de
-et: umbes :i:
-fi: noin
-fr: vers
-he:   בערך
-is: um
-it: circa
-lv: ap
-nl: circa
-no: ca
-pl: około
-pt: cerca
-ro: circa
-ru: около
-sk: okolo
-sl: približno
-sv: omkring
+    a brother-in-law/a sister-in-law
+af: 'n swaer/'n skoonsuster
+bg: сестрин съпруг, шурей или баджанак/братова съпруга, шуренайка или балдъза/сестрин съпруг, съпруг на зълва или девер/братова съпруга, зълва или етърва
+br: ur breur-kaer/ur c'hoar-gaer
+ca: un cunyat/una cunyada
+cs: švagr/švagrová
+da: en svoger/en svigerinde
+de: ein Schwager/eine Schwägerin
+en: a brother-in-law/a sister-in-law
+eo: bofrato/bofratino
+es: un cuñado/una cuñada
+et: küdi või nääl:g:+u või õemees:g:--he/nadu või käli või vennanaine:g:--se
+fi: lanko:g:--gon/käly:g:+n
+fr: un beau-frère/une belle-sœur
+he:  גיס/ גיסה
+is: mágur/mágkona
+it: un cognato/una cognata
+lv: svainis/svaine
+nl: een schoonbroer(zwager)/een schoonzuster
+no: svoger/svigerinne
+pl: szwagier/szwagierka
+pt: um cunhado/uma cunhada
+ro: un cumnat/o cumnata
+ru: деверь-шурин/заловка-свояченица
+sk: švagor/švagriná
+sl: svak/svakinja
+sv: en svåger/en svägerska
 
     access
 af: toegang
@@ -1387,6 +955,34 @@ sk: prístup
 sl: dostop
 sv: tillträde
 
+    a cousin
+af: 'n neef/'n niggie
+bg: първи братовчед/първа братовчедка
+br: ur c'henderv/ur geniterv
+ca: un cosí/una cosina
+cs: bratranec/sestřenice
+da: en fætter/en kusine
+de: ein:d:+em Cousin/eine:d:+r Cousine
+en: a cousin
+eo: kuzo/kuzino
+es: un primo/una prima
+et: nõbu:g:--o
+fi: serkku:g:--un
+fr: un cousin/une cousine
+he:  בן-דוד/ בת-דוד
+is: systkynabarn
+it: un cugino/una cugina
+lv: brālēns/māsīca
+nl: een neef/een nicht
+no: fetter/kusine
+pl: kuzyn/kuzynka
+pt: um primo/uma prima
+ro: un var
+ru: кузен/кузина
+sk: bratranec/sesternica
+sl: bratranec/sestrična
+sv: en kusin
+
     add
 af: byvoeg
 bg: добавяне на
@@ -1414,6 +1010,34 @@ ru: добавить :a:
 sk: pridať :a:
 sl: dodaj
 sv: lägg till
+
+    a descendant
+af: 'n afstammeling
+bg: потомък
+br: un diskennad/ un diskennadez
+ca: un descendent/una descendent
+cs: potomek
+da: en efterkommer
+de: ein:d:+em Nachkomme:d:+n
+en: a descendant
+eo: posteulo
+es: un descendiente/una descendiente
+et: järglane:g:--se
+fi: jälkeläinen:g:---sen
+fr: un descendant/une descendante
+he:   צאצא/ צאצאה
+is: afkomandi
+it: un discendente/una discendente
+lv: pēcnācējs
+nl: een afstammeling
+no: etterkommer
+pl: potomek
+pt: um descendente/uma descendente
+ro: un descendent
+ru: потомок
+sk: potomok
+sl: potomec
+sv: en ättling
 
     adoptive father/adoptive mother/adoptive parents
 af: aangenome vader/angenome moeder/aangenome ouers
@@ -1617,6 +1241,210 @@ sl: živel(a)
 sv: livslängd:
 zh:  享年
 
+    age at %s birth date
+de: alter zum zeitpunkt der geburt von %s
+en: age at %s birth date
+es: edad en el nacimiento de %s
+fr: âge à la naissance de %s
+it: età alla nascita di %s
+nl: leeftijd bij de geboorte van %s
+
+    a grandfather/a grandmother/a grandparent
+af: 'n oupa/'n ouma/'n grootouer
+bg: дядо/баба/дядо или баба
+br: un tad-kozh/ur vamm-gozh/un den-kar-kozh
+ca: un avi/una àvia/un(a) avi(a)
+cs: dědeček/babička/prarodič
+da: en bedstefader/en bedstemoder/en bedsteforælder
+de: ein:d:+em Großvater/eine:d:+r Großmutter/ein:d:+em Großelternteil
+en: a grandfather/a grandmother/a grandparent
+eo: avo/avino/av(in)o
+es: un abuelo/una abuela/un(a) abuelo(a)
+et: vanaisa/vanaema/vanavanem:g:+a
+fi: isoisä:g:+n/isoäiti:g:--din/isovanhempi:g:--man
+fr: un grand-père/une grand-mère/un grand-parent
+he:    סבא/ סבתא
+is: afi/amma/afi og amma
+it: un nonno/una nonna/un(a) nonno(a)
+lv: vectēvs/vecmamma/vecvecāki
+nl: een grootvader/een grootmoeder/een grootouder
+no: bestefar/bestemor/en av besteforeldrene
+pl: dziadek/babka/dziadkowie
+pt: um avô/uma avó/um(a) avô(ó)
+ro: un bunic/o bunica/bunici
+ru: дедушка/бабушка/прародитель
+sk: dedo/babka/prarodič
+sl: dedka/babice/starega starša
+sv: farfar/farmor/en farförälder/morfar/mormor/en morförälder
+
+    a grandson/a granddaughter/a grandchild
+af: 'n kleinseun/'n kleindogter/'n kleinkind
+bg: внук/внучка/внук или внучка
+br: ur mab bihan/ur verc'h vihan/ur bugel bihan
+ca: un net/una neta/un(a) net(a)
+cs: vnuk/vnučka/vnouče
+da: en sønne-søn/en sønne-datter/et barnebarn/en datter-søn/en datter-datter/et barnebarn
+de: ein:d:+em Enkel/eine:d:+r Enkelin/ein:d:+em Enkelkind
+en: a grandson/a granddaughter/a grandchild
+eo: nepo/nepino/nep(in)o
+es: un nieto/una nieta/un(a) nieto(a)
+et: poja- või tütrepoeg:g:--ja/poja- või tütretütar:g:--re/lapselaps:g:+e
+fi: pojan tai tyttären poika:g:---jan/pojan tai tyttären tytär:g:--tären/lapsenlapsi:g:-en
+fr: un petit-fils/une petite-fille/un petit-enfant
+he:  נכד/ נכדה
+is: barnabarn/barnabarn/barnabarn
+it: un nipote/una nipote/un(a) nipote
+lv: mazdēls/mazmeita/mazbērns
+nl: een kleinzoon/een kleindochter/een kleinkind
+no: barnebarn/barnebarn/barnebarn
+pl: wnuk/wnuczka/wnuki
+pt: um neto/uma neta/um(a) neto(a)
+ro: nepot/nepoata/nepoti
+ru: внук/внучка/ребенок детей
+sk: vnuk/vnučka/vnúča
+sl: vnuk/vnukinja/pravnuk ali pravnukinja
+sv: en sonson/en sondotter/ett barnbarn/en dotterson/en dotterdotter/ett barnbarn
+
+    a great-grandfather/a great-grandmother/a great-grandparent
+af: 'n oupagrootjie/'n oumagrootjie/'n grootjie
+bg: прадядо/прабаба/прадядо или прабаба
+br: un tad kuñv/ur vamm-guñv/ un den-kar-kozh-kuñv
+ca: un besavi/una besàvia/un(a) besavi(a)
+cs: pradědeček/prababička/praprarodič
+da: en oldefader/en oldemoder/en oldeforælder
+de: ein:d:+em Urgroßvater/eine:d:+r Urgroßmutter/ein:d:+em Urgroßelternteil
+en: a great-grandfather/a great-grandmother/a great-grandparent
+eo: praavo/praavino/praav(in)o
+es: un bisabuelo/una bisabuela/un(a) bisabuelo(a)
+et: vanavanaisa/vanavanaema/vanavanavanem:g:+a
+fi: iso-isoisä:g:+n/iso-isoäiti:g:--din/iso-isovanhempi:g:--man
+fr: un arrière-grand-père/une arrière-grand-mère/un arrière-grand-parent
+he:   רב-סבא/ רב-סבתא
+is: langafi/langamma/langafi og langamma
+it: un bisnonno/una bisnonna/un(a) bisnonno(a)
+lv: vecvectēvs/vecvecmamma/vecvecvecāki
+nl: een overgrootvader/een overgrootmoeder/een overgrootouder
+no: oldefar/oldemor/en av oldeforeldrene
+pl: pradziadek/prababka/pradziadkowie
+pt: um bisavô/uma bisavó/um(a) bisavô(ó)
+ro: un strabunic/o strabunica/strabunici
+ru: прапрадед/прапрабабка/прапрапрародитель
+sk: pradedo/prababka/praprarodič
+sl: pradedek/prababica/prastari starš
+sv: en gammel-farfar/en gammel-farmor/en gammel-farförälder/en gammel-morfar/en gammel-mormor/en gammel-morförälder
+
+    a great-grandson/a great-granddaughter/a great-grandchild
+af: 'n agterkleinseun/'n agterkleindogter/'n agterkleinkind
+bg: правнук/правнучка/правнук или правнучка
+br: ur mab-kuñv /ur verc'h guñv/ ur bugel-kuñv
+ca: un besnet/una besneta/un(a) besnet(a)
+cs: pravnuk/pravnučka/pravnoučata
+da: en oldesøn/en oldedatter/et oldebarn
+de: ein:d:+em Urenkel/eine:d:+r Urenkelin/ein:d:+em Urenkelkind
+en: a great-grandson/a great-granddaughter/a great-grandchild
+eo: pranepo/pranepino/pranep(in)o
+es: un bisnieto/una bisnieta/un(a) bisnieto(a)
+et: lapselapse poeg:g:--ja/lapselapse tütar:g:--re/lapselapselaps:g:+e
+fi: lapsenlapsen poika:g:---jan/lapsenlapsen tytär:g:--tären/lapsenlapsen lapsi:g:-en
+fr: un arrière-petit-fils/une arrière-petite-fille/un arrière-petit-enfant
+he:   נין/ נינה
+is: barnabarnabarn/barnabarnabarn/barnabarnabarn
+it: un pronipote/una pronipote/un(a) pronipote
+lv: mazmazdēls/mazmazmeita/mazmazbērni
+nl: een achterkleinzoon/een achterkleindochter/een achterkleinkind
+no: oldebarn
+pl: prawnuk/prawnuczka/prawnuki
+pt: um bisneto/uma bisneta/um(a) bisneto(a)
+ro: stranepot/stranepoata/stranepoti
+ru: праправнук/праправнучка/праправнук
+sk: pravnuk/pravnučka/pravnúča
+sl: pravnuk/pravnukinja/pravnuk ali pravnukinja
+sv: en sonsons son/en sonsons dotter/ett barnbarns barn/en sondotters son/en sondotters dotter/ett barnbarns barn/en dottersons son/en dottersons dotter/ett barnbarns barn/en dotterdotters son/en dotterdotters dotter/ett barnbarns barn
+
+    a great-nephew/a great-niece
+af: 'n agterneef/'n agterniggie
+bg: внук на брат или сестра/внучка на брат или сестра
+br: un niz bihan/ur verc'h vihan
+ca: un besnebot/una besneboda
+cs: prasynovec/praneteř
+da: en grandnevø/en grandniece
+de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte
+en: a great-nephew/a great-niece
+eo: pranevo/pranevino
+es: un sobrino nieto/una sobrina nieta
+et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
+fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:--tären
+fr: un petit neveu/une petite nièce
+he:   בן האחיין/ בת האחיין
+is: frændi/frænka
+it: un pronipote/una pronipote
+lv: brāļa/māsas mazdēls/mazmeita
+nl: een achterneef/een achternicht
+no: grandnevø/grandniese
+pl: wnuk brata lub siostry/wnuczka brata lub siostry
+pt: um sobrinho-neto/uma sobrinha-neta
+ro: stranepot/stranepoata/stranepoti
+ru: внучатый племянник/внучатая племянница
+sk: prasynovec/praneter
+sl: pranečak/pranečakinja
+sv: en gammel-nevö/en gammel-niece
+
+    a great-uncle/a great-aunt
+af: 'n grootoom/'n groottante
+bg: чичо на родител/леля на родител/вуйчо на родител/леля на родител
+br: un eontr-kuñv /ur voereb guñv
+ca: un oncle avi/una tia àvia
+cs: prastrýc/prateta
+da: en grandonkel/en grandtante
+de: ein:d:+em Großonkel/eine:d:+r Großtante
+en: a great-uncle/a great-aunt
+eo: praonklo/praonklino
+es: un tio abuelo/una tia abuela
+et: vanaonu/vanatädi
+fi: isosetä:g:--dän/isotäti:g:--din
+fr: un grand-oncle/une grand-tante
+he:   דוד-סב/ דודה-סבה
+is: afa(ömmu)bróðir/afa(ömmu)systir
+it: un prozio/una prozia
+lv: vectēva/vecmamas brālis/māsa
+nl: een oudoom/een oudtante
+no: en grandonkel/en grandtante
+pl: brat dziadka lub babki/siostra dziadka lub babki
+pt: um tio-avô/uma tia-avó
+ro: frate de bunici/sara de bunici
+ru: дядя родителя/тетя родителя
+sk: prastrýko/prateta
+sl: prastric/prateta
+sv: en gammel-farbror/en gammel-faster/en gammel-morbror/en gammel-moster
+
+    a half-brother/a half-sister/a half-sibling
+af: 'n stiefbroer/'n stiefsuster/'n stiefbroer of -suster
+bg: полубрат/полусестра/полубрат или полусестра
+br: ul lezvreur/ul lezc'hoar/un hanter-breur pe -c'hoar
+ca: un germanastre/una germanastra/un(a) germanastre(a)
+cs: nevlastní bratr/nevlastní sestra/nevlastní sourozenec
+da: en halvbroder/en halvsøster/en halvsøskende
+de: ein:d:+em Halbbruder/eine:d:+r Halbschwester/ein:d:+em Halbbruder oder eine:d:+r Halbschwester
+en: a half-brother/a half-sister/a half-sibling
+eo: duonfrato/duonfratino/duonfrat(in)o
+es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
+et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
+fi: velipuoli:g:-en/sisarpuoli:g:-en/isä- tai äitipuolen lapsi:g:-en
+fr: un demi-frère/une demi-sœur/un demi-frère ou une demi-sœur
+he:   חצי אח/ חצי אחות/ חצי אח(ות)
+is: hálfbróðir/hálfsystir/hálfsystkin
+it: un fratello/una sorella/un fratello o una sorella
+lv: pusbrālis/pusmāsa/pusbērns
+nl: een halfbroer/een halfzuster/een halfbroer of halfzuster
+no: halvbror/halvsøster/halvsøsken
+pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
+pt: um meio-irmão/uma meia-irmã/um(a) meio(a) irmão(ã)
+ro: frate vitreg/sora vitrega/surori sau frati vitregi
+ru: полуродной брат/полуродная сестра/полуродной брат
+sk: nevlastný brat/nevlastná sestra/ nevlastný súrodenec
+sl: polbrata/polsestra/polbrat ali polsestra
+sv: en halvbror/en halvsyster/ett halvsyskon
+
     alias
 af: alias
 bg: именува се още
@@ -1814,34 +1642,6 @@ sk: predok
 sl: prednik
 sv: en ana
 
-    an uncle/an aunt
-af: 'n oom/'n tante
-bg: чичо/леля/вуйчо/леля
-br: un eontr/ur voereb
-ca: un oncle/una tia
-cs: strýc/teta
-da: en onkel/en tante
-de: ein:d:+em Onkel/eine:d:+r Tante
-en: an uncle/an aunt
-eo: onklo/onklino
-es: un tío/una tía
-et: onu/tädi
-fi: setä:g:--dän/täti:g:--din/eno:g:+n/täti:g:--din
-fr: un oncle/une tante
-he:   דוד/ דודה
-is: föður(móður)bróðir/föður(móður)systir
-it: uno zio/una zia
-lv: onkulis/tante
-nl: een oom/een tante
-no: onkel/tante
-pl: stryj lub wuj/ciotka
-pt: um tio/uma tia
-ro: un unchi/o matusa
-ru: дядя/тетя
-sk: strýc/teta
-sl: stric/teta
-sv: en farbror/en faster/en morbror/en moster
-
     ancestors
 af: voorouers
 bg: предци
@@ -1929,6 +1729,34 @@ sl: in
 sv: och
 zh:  和
 
+    a nephew/a niece
+af: 'n broerskind/'n susterskind
+bg: племенник/племенница
+br: un niz/un nizez
+ca: un nebot/una neboda
+cs: synovec/neteř
+da: en nevø/en niece
+de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte
+en: a nephew/a niece
+eo: nevo/nevino
+es: un sobrino/a sobrina
+et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
+fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:--tären
+fr: un neveu/une nièce
+he:   אחיין/ אחיינית
+is: bróður(systur)sonur/bróður(systur)dóttir
+it: un nipote/una nipote
+lv: brāļa/māsas dēls/meita
+nl: een neef/een nicht (oom- of tantezegger)
+no: nevø/niese
+pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
+pt: um sobrinho/uma sobrinha
+ro: nepot/nepoata/nepoti
+ru: племянник/племянница
+sk: synovec/neter
+sl: nečak/nečakinja/nečak ali nečakinja
+sv: en nevö/en niece
+
     anniversaries
 af: herdenkinge
 bg: годишнини
@@ -2015,6 +1843,34 @@ sl: obletnice porok
 sv: bröllopsdagar
 zh:  结婚于今日的记录
 
+    an uncle/an aunt
+af: 'n oom/'n tante
+bg: чичо/леля/вуйчо/леля
+br: un eontr/ur voereb
+ca: un oncle/una tia
+cs: strýc/teta
+da: en onkel/en tante
+de: ein:d:+em Onkel/eine:d:+r Tante
+en: an uncle/an aunt
+eo: onklo/onklino
+es: un tío/una tía
+et: onu/tädi
+fi: setä:g:--dän/täti:g:--din/eno:g:+n/täti:g:--din
+fr: un oncle/une tante
+he:   דוד/ דודה
+is: föður(móður)bróðir/föður(móður)systir
+it: uno zio/una zia
+lv: onkulis/tante
+nl: een oom/een tante
+no: onkel/tante
+pl: stryj lub wuj/ciotka
+pt: um tio/uma tia
+ro: un unchi/o matusa
+ru: дядя/тетя
+sk: strýc/teta
+sl: stric/teta
+sv: en farbror/en faster/en morbror/en moster
+
     are
 af: is
 bg: са
@@ -2042,6 +1898,90 @@ ru: есть
 sk: sú
 sl: so
 sv: är
+
+    a %s cousin
+af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
+bg: %sи братовчед/%sа братовчедка
+br: ur c'henderv a live an %s derez/ur geniterv a live an %s derez/ ur c'h(g)enderv(ez) a live an %s derez
+ca: un cosí de %s grau/una cosina de %s grau/un(a) cosí(na) de %s grau
+cs: bratranec z %s kolena/sestřenice z %s kolena
+da: en fætter af %s grad/en kusine af %s grad
+de: ein:d:+em Cousin %s Grades/eine:d:+r Cousine %s Grades
+en: a %s cousin
+eo: %s grada kuzo/%s grada kuzino/%s grada kuz(in)o
+es: un primo en %s grado/una prima en %s grado/un(a) primo(a) en %s grado
+et: %s astme nõbu:g:--o
+fi: %s serkku:g:--un
+fr: un cousin au %s degré/une cousine au %s degré/un(e) cousin(e) au %s degré
+he:  בן-דוד לדרגה  %s/ בת-דוד לדרגה  %s
+is: systkynabarn %s
+it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
+lv: %s brālēns/māsīca
+nl: een neef in de %s generatie/een nicht in de %s generatie
+no: %smenning
+pl: kuzyn %s-tego stopnia/kuzynka %s-tego stopnia
+pt: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
+ro: un var de gradul %s
+ru: %s-ий кузен/%s-я кузина
+sk: bratranec/sesternica z %s kolena
+sl: bratranec v %s kolenu/sestrična v %s kolenu
+sv: %smänning
+
+    a son/a daughter/a child
+af: 'n seun/'n dogter/'n kind
+bg: син/дъщеря/дете
+br: ur mab/ur verc'h/ur bugel
+ca: un fill/una filla/un(a) fill(a)
+cs: syn/dcera/dítě
+da: en søn/en datter/et barn
+de: ein:d:+em Sohn/eine:d:+r Tochter/ein:d:+em Kind
+en: a son/a daughter/a child
+eo: filo/filino/ido
+es: un hijo/una hija/un(a) hijo(a)
+et: poeg:g:--ja/tütar:g:--re/laps:g:+e
+fi: poika:g:---jan/tytär:g:--tären/lapsi:g:-en
+fr: un fils/une fille/un enfant
+he:   בן/ בת/ ילד
+is: sonur/dóttir/barn
+it: un figlio/una figlia/un(a) figlio(a)
+lv: dēls/meita/bērns
+nl: een zoon/een dochter/een kind
+no: sønn/datter/barn
+pl: syn/córka/dziecko
+pt: um filho/uma filha/um(a) filho(a)
+ro: fiu/fica/copil
+ru: сын/дочь/ребенок
+sk: syn/dcéra/dieťa
+sl: sin/hčerka/otrok
+sv: en son/en dotter/ett barn
+
+    a son-in-law/a daughter-in-law
+af: 'n skoonseun/'n skoondogter
+bg: съпруг на дъщеря/съпруга на син
+br: mabeg/merc'heg
+ca: un gendre/una jove
+cs: zeť/snacha
+da: en svigersøn/en svigerdatter
+de: ein Schwiegersohn/eine Schwiegertochter
+en: a son-in-law/a daughter-in-law
+eo: bofilo/bofilino
+es: un yerno/una nuera
+et: väimees:g:--he/minia
+fi: vävy:g:+n/miniä:g:+n
+fr: un beau-fils/une belle-fille
+he:  חתן/ כלה
+is: tengdasonur/tengdadóttir
+it: un genero/una nuora
+lv: znots/vedekla
+nl: schoonzoon/schoondochter
+no: svigersønn/svigerdatter
+pl: zięć/synowa
+pt: um genro/uma nora
+ro: ginere/nora
+ru: зять/невестка
+sk: zať/nevesta
+sl: zet/snaha
+sv: en måg/en svärdotter
 
     at the same time
 af: ter selfdertyd
@@ -2140,6 +2080,7 @@ fr: baptême
 he:  תבילה
 is: skírn
 it: battesimo
+ks: krst
 lv: baptisms
 nl: doop
 no: dåp
@@ -2148,7 +2089,6 @@ pt: baptismo
 pt-br: batismo
 ro: botez
 ru: крещение
-ks: krst
 sl: krst
 sv: dop
 
@@ -2293,6 +2233,11 @@ sk: medzi
 sl: med
 sv: mellan
 
+    bibliography
+bg: библиография
+en: bibliography
+fr: bibliographie
+
     birth
 af: geboorte
 bg: раждане
@@ -2351,6 +2296,17 @@ sl: rojstni dnevi
 sv: födelsedagar
 zh:  出生于今日的记录
 
+    book of places
+de: ortsverzeichnis
+en: places
+es: diccionario de lugares
+fi: luettelo paikoista
+fr: dictionnaire des lieux
+it: dizionario dei luoghi
+nl: woordenboek der plaatsen
+no: liste over steder
+sv: orternas uppslagsbok
+
     border
 af: rand
 bg: рамка
@@ -2370,7 +2326,7 @@ is: jaðar
 it: bordo
 lv: mala
 nl: omranding
-no: ramme         
+no: ramme
 pl: granica 
 pt: borda
 ro: bordura
@@ -2663,6 +2619,11 @@ sk: nemožno zmeniť pohlavie zosobášenej osoby
 sl: ne da se spremeniti spol poročene osebe
 sv: kan inte ändra kön på en gift person
 
+    celebrities
+bg: знаменити хора
+en: celebrities
+fr: Personnes Célèbres
+
     change children's names
 af: verander kinders se name
 bg: да се промени име на дете
@@ -2691,34 +2652,6 @@ sk: zmeniť mená detí
 sl: spremeni imena otrok
 sv: ändra barnens namn
 
-    change it (the number) yourself
-af: verander dit self
-bg: променете сами номера
-br: dibabit un niver all
-ca: elegiu-ne un altre
-cs: změnit číslo
-da: vælg et andet
-de: ändere die Nummer selbst
-en: change it yourself
-eo: kaj ŝanĝu ion mem
-es: escoja otro
-et: muuda number ise
-fi: muuta se itse
-fr: choisissez-en un autre
-he:  ולשנות בעצמך
-is: og breyttu því sjálf(ur)
-it: scieglietene un'altro
-lv: nomainiet to
-nl: verander het nummer zelf
-no: endre det selv
-pl: zmień numer własnoręcznie
-pt: escolha outro
-ro: schimba numarul tu insasi
-ru: измените его сами
-sk: zmeniť číslo
-sl: spremenite sami
-sv: ändra det själv
-
     changed order of children
 af: verander die volgorde van kinders
 bg: промяна в последователността на децата
@@ -2746,6 +2679,34 @@ ru: изменяющий порядок детей
 sk: zmeniť poradie detí
 sl: zamenjan vrstni red otrok
 sv: ändrade ordningen för barnen
+
+    change it (the number) yourself
+af: verander dit self
+bg: променете сами номера
+br: dibabit un niver all
+ca: elegiu-ne un altre
+cs: změnit číslo
+da: vælg et andet
+de: ändere die Nummer selbst
+en: change it yourself
+eo: kaj ŝanĝu ion mem
+es: escoja otro
+et: muuda number ise
+fi: muuta se itse
+fr: choisissez-en un autre
+he:  ולשנות בעצמך
+is: og breyttu því sjálf(ur)
+it: scieglietene un'altro
+lv: nomainiet to
+nl: verander het nummer zelf
+no: endre det selv
+pl: zmień numer własnoręcznie
+pt: escolha outro
+ro: schimba numarul tu insasi
+ru: измените его сами
+sk: zmeniť číslo
+sl: spremenite sami
+sv: ändra det själv
 
     child/children
 af: kind/kinders
@@ -2881,7 +2842,7 @@ is: litur
 it: colore
 lv: krāsa
 nl: kleur
-no: farge         
+no: farge
 pl: kolor
 pt: côr
 ro: culoare
@@ -2970,6 +2931,57 @@ sk: pokrvenstvo
 sl: krvno sorodstvo
 sv: blodsband
 
+    continue correcting
+af: gaan voort met die samevoeging
+bg: да продължи обединяването
+br: derc'hel da gendeuziñ
+ca: continuar la fusió
+cs: pokračovat ve spojování
+da: fortsæt sammenføjning
+de: Zusammenführung fortsetzen
+en: continue merging
+eo: daùrigu la kuniĝon
+es: continuar la fusión
+et: jätka ühendamist
+fi: jatka yhdistämistä
+fr: continuer à fusionner
+he:  להמשיך לאחד
+is: halda áfram að sameina
+it: continua la fusione
+lv: turpināt apvienošanu
+nl: doorgaan met samenvoegen
+no: fortsett sammenslåing
+pl: kontynuuj scalanie
+pt: continuar a fusão
+ro: continua unificarea
+ru: продолжить объединение
+sl: nadaljuj z združevanjem
+sv: fortsätt slå samman
+
+    continued
+bg: следва
+cs: pokracuje
+da: fortsat
+de: fortgesetzt
+en: continued
+eo: continuigo
+es: continúa
+et: jätkub
+fi: jatkuu
+fr: suite
+he: המשך
+it: continua
+lv: nepārtraukts
+nl: vervolgd
+no: fortsatt
+pl: ciąg dalszy
+pt: continuação
+ro: continuare
+ru: продолжено
+sk: pokračovať
+sl: nadaljevano
+sv: forts
+
     continue merging
 af: gaan voort met die samevoeging
 bg: да продължи обединяването
@@ -2997,30 +3009,6 @@ ru: продолжить объединение
 sk: pokračovať v spájaní
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
-
-    continued
-bg: следва
-cs: pokracuje
-da: fortsat
-de: fortgesetzt
-en: continued
-eo: continuigo
-es: continúa
-et: jätkub
-fi: jatkuu
-fr: suite
-he: המשך
-it: continua
-lv: nepārtraukts
-nl: vervolgd
-no: fortsatt
-pl: ciąg dalszy
-pt: continuação
-ro: continuare
-ru: продолжено
-sk: pokračovať
-sl: nadaljevano
-sv: forts
 
     cousins
 af: neefs/niggies
@@ -3360,6 +3348,14 @@ ru: умер в детстве
 sk: zomrel mladý/zomrela mladá
 sl: umrl mlad/umrla mlada/umrl(a) mlad(a)
 sv: dog ung
+
+    direct ancestor of %s
+de: direkter Vorfahre von %s
+en: direct ancestor of %s
+es: antepasado directo de %s
+fr: ancêtre direct de %s
+it: antenato diretto di %s
+nl: rechtstreeks voorouder van %s
 
     disappeared
 af: verdwyn
@@ -3836,34 +3832,6 @@ sk: rodina zmazaná
 sl: družina izbrisana
 sv: familj borttagen
 
-    family modified
-af: familie verander
-bg: данните за cемейството са променени
-br: tiegezh kemmet
-ca: família modificada
-cs: rodina změněna
-da: familie ændret
-de: Familie geändert
-en: family modified
-eo: familio modifita
-es: familia modificada
-et: pere muudetud
-fi: perhettä muutettu
-fr: famille modifiée
-he:  משפחה העודכנה
-is: fjölskyldu breytt
-it: famiglia modificata
-lv: ģimene labota
-nl: gezin veranderd
-no: familie endret
-pl: rodzina została zmodyfikowana
-pt: família modificada
-ro: familie modificata
-ru: cемья изменена
-sk: rodina zmazaná
-sl: družina spremenjena
-sv: familj ändrad
-
     family/families
 af: familie/families
 bg: данни за семейството
@@ -3891,6 +3859,45 @@ ru: семья:a:-ю:g:-и/семьи
 sk: rodina:a:-u/rodiny
 sl: družina/družine
 sv: familj/familjer
+
+    family history
+de: rund um den Stammbaum
+en: family History
+es: autor del árbol
+fi: sukupuun lisäksi
+fr: autour de l’arbre
+it: attorno all'albero
+nl: rond de stamboom
+no: tillegg til slektstreet
+sv: utöver släktträdet
+
+    family modified
+af: familie verander
+bg: данните за cемейството са променени
+br: tiegezh kemmet
+ca: família modificada
+cs: rodina změněna
+da: familie ændret
+de: Familie geändert
+en: family modified
+eo: familio modifita
+es: familia modificada
+et: pere muudetud
+fi: perhettä muutettu
+fr: famille modifiée
+he:  משפחה העודכנה
+is: fjölskyldu breytt
+it: famiglia modificata
+lv: ģimene labota
+nl: gezin veranderd
+no: familie endret
+pl: rodzina została zmodyfikowana
+pt: família modificada
+ro: familie modificata
+ru: cемья изменена
+sk: rodina zmazaná
+sl: družina spremenjena
+sv: familj ändrad
 
     father/mother
 af: vader/moeder
@@ -4006,6 +4013,37 @@ sk: alias mena
 sl: drugo osebno ime
 sv: förnamns alias
 
+    first name/first names
+af: voornaam/voorname
+ar: الإسم
+bg: собствено име/собствени имена
+br: raganv/raganvioù
+ca: nom/noms
+cs: křestní jméno/křestní jména
+da: fornavn/fornavne
+de: Vorname/Vornamen
+en: first name/first names
+eo: propra nomo/propraj nomoj
+es: nombre/nombres
+et: eesnimi/eesnimed
+fi: etunimi/etunimet
+fr: prénom/prénoms
+he:   שם פרטי/ שמות פרטיים
+is: fornafn/fornöfn
+it: nome/nomi
+lv: vārds/vārdi
+nl: voornaam/voornamen
+no: fornavn/fornavn
+pl: imię/imiona
+pt: nome/nomes
+pt-br: prenome/prenomes
+ro: prenume
+ru: имя/имена
+sk: meno/mená
+sl: osebno ime/osebna imena
+sv: förnamn/förnamn
+zh:  名
+
     first name missing
 af: voornaam ontbreek
 bg: собственото име липсва
@@ -4063,37 +4101,6 @@ ru: имя не найденно
 sk: meno nenájdené
 sl: osebno ime ni najdeno
 sv: hittar inte förnamn
-
-    first name/first names
-af: voornaam/voorname
-ar: الإسم
-bg: собствено име/собствени имена
-br: raganv/raganvioù
-ca: nom/noms
-cs: křestní jméno/křestní jména
-da: fornavn/fornavne
-de: Vorname/Vornamen
-en: first name/first names
-eo: propra nomo/propraj nomoj
-es: nombre/nombres
-et: eesnimi/eesnimed
-fi: etunimi/etunimet
-fr: prénom/prénoms
-he:   שם פרטי/ שמות פרטיים
-is: fornafn/fornöfn
-it: nome/nomi
-lv: vārds/vārdi
-nl: voornaam/voornamen
-no: fornavn/fornavn
-pl: imię/imiona
-pt: nome/nomes
-pt-br: prenome/prenomes
-ro: prenume
-ru: имя/имена
-sk: meno/mená
-sl: osebno ime/osebna imena
-sv: förnamn/förnamn
-zh:  名
 
     for the first names by alphabetic order
 af: om die voorname in alfabetiese volgorde te kry
@@ -4257,8 +4264,8 @@ no: gudfar/gudmor/gudfedre
 pl: ojciec chrzestny/matka chrzestna/rodzice chrzestni
 pt: padrinho/madrinha/padrinhos
 ro: nas/nasa/nasi
-sk: krstný otec/krstná matka/krstní rodičia
 ru: крестный отец/крестная мать/крестный
+sk: krstný otec/krstná matka/krstní rodičia
 sl: boter/botra/botri
 sv: gudfar/gudmor/gudföräldrar
 
@@ -4342,8 +4349,8 @@ pl: pradziadkowie
 pt: bisavós
 ro: strabunici
 ru: прапрародители
-sl: prastari starši
 sk: praprastarí rodičia
+sl: prastari starši
 sv: gammel-farföräldrar/gammel-morföräldrar
 
     gregorian/julian/french/hebrew
@@ -4374,6 +4381,36 @@ sk: gregoránsky/juliánsky/francúzsky/židovský
 sl: gregorijanski/julijanski/francoski/hebrejski
 sv: gregoriansk/juliansk/franska rep./hebreisk
 
+    half siblings
+de: halbbrüder und-schwestern
+en: half-siblings
+es: hermanastros y hermanastras
+fi: puolisisarukset
+fr: demi frères et demi sœurs
+it: fratellastri e sorellastre
+nl: half broers en zusters
+no: halvbrødre/halvsøstre/halvsøsken
+sv: halvbröder och halvsystrar
+
+    half-siblings
+de: halbbrüder und schwestern
+en: half-siblings
+es: hermanastros y hermanastras
+fr: demi frères et demi sœurs
+it: fratellastri e sorellastre
+nl: half broers en zusters
+
+    happy birthday to them!
+de: Herzlichen Glückwunsch zum Geburtstag!
+en: happy birthday to them!
+es: ¡Feliz cumpleaños!
+fi: hyvää syntymäpäivää!
+fr: bon anniversaire !
+it: buon compleanno!
+nl: van harte gefeliciteerd met Uw verjaardag!
+no: gratulerer med dagen!
+sv: gratulerar på födelsedagen!
+
     happy birthday to you!
 af: Geluk met jou verjaarsdag!
 bg: Честит рожден ден!
@@ -4402,17 +4439,6 @@ sk: všetko najlepšie k narodeninám!
 sl: srečen rojstni dan!
 sv: gratulerar på födelsedagen!
 
-    happy birthday to them!
-de: Herzlichen Glückwunsch zum Geburtstag!
-en: happy birthday to them!
-es: ¡Feliz cumpleaños!
-fi: hyvää syntymäpäivää!
-fr: bon anniversaire !
-it: buon compleanno!
-nl: van harte gefeliciteerd met Uw verjaardag!
-no: gratulerer med dagen!
-sv: gratulerar på födelsedagen!
-
     having as children
 af: met as kinders:-
 bg: деца:
@@ -4437,10 +4463,16 @@ pl: dzieci:
 pt: tiveram
 ro: cu copii
 ru: имели детей
-sl: otroci:
 sk: mali spolu deti
+sl: otroci:
 sv: barn
 zh:  生有子女
+
+    help places
+de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit Ihrer Dateien die diesen Standort betreffen werden sofort korrigiert werden
+en: Click "[Update]" to edit a place: the place names will be automatically updated in your entire family tree
+es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
+fr: Cliquez sur « Modifier » pour corriger un lieu : l’ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
 
     here
 af: hier
@@ -4667,34 +4699,6 @@ sk: obrázok zmazaný
 sl: slika izbrisana
 sv: bilden borttagen
 
-    image received
-af: prent ontvang
-bg: изображението е получено
-br: skeudenn resevet
-ca: imatge rebuda
-cs: obrázek přijat
-da: billede indsat
-de: Bild erhalten
-en: image received
-eo: bildo ricevita
-es: imagen recibida
-et: pilt vastu võetud
-fi: kuva saatu
-fr: image reçue
-he:  התמונה התקבלה
-is: mynd móttekin
-it: immagine ricevuta
-lv: attēls saņemts
-nl: beeld ontvangen
-no: bildet er mottatt
-pl: ilustracja została dołączona
-pt: imagem recebida
-ro: imagine receptionata
-ru: картинка получена
-sk: obrázok prijatý
-sl: slika sprejeta
-sv: bilden mottagen
-
     image/images
 af: prent/prente
 bg: изображение/изображения
@@ -4723,63 +4727,33 @@ sk: obrázok/obrázky
 sl: slika/slike
 sv: bild/bilder
 
-    in (month year)
-af: in
-bg: през
-br: e
-ca: el/l'
-cs: v
-da: i
-de: im
-en: in
-eo: en
-es: en
-et: :s:
-fi: 
-fr: en
-he:   ב-
-is: í
-it: nel
-lv: mēnesī
-nl: in
-no: i
-pl: w
-pt: em
-ro: in
-ru: в
-sk: v
-sl: v
-sv: i
-zh:  于
-
-    in (year)
-af: in
-bg: през
-br: e
-ca: el
-cs: v
-da: i
-de: im Jahre
-en: in
-eo: en
-es: en
-et:
-fi:   
-fr: en
-he:  ב-
-is: &nbsp;
-it: nel
-lv: gads:
-nl: in
-no: i
-pl: w roku
-pt: em
-ro: in anul
-ru: в
-sl: v letu
-sk: v
-sv: 
-zh:  于
+    image received
+af: prent ontvang
+bg: изображението е получено
+br: skeudenn resevet
+ca: imatge rebuda
+cs: obrázek přijat
+da: billede indsat
+de: Bild erhalten
+en: image received
+eo: bildo ricevita
+es: imagen recibida
+et: pilt vastu võetud
+fi: kuva saatu
+fr: image reçue
+he:  התמונה התקבלה
+is: mynd móttekin
+it: immagine ricevuta
+lv: attēls saņemts
+nl: beeld ontvangen
+no: bildet er mottatt
+pl: ilustracja została dołączona
+pt: imagem recebida
+ro: imagine receptionata
+ru: картинка получена
+sk: obrázok prijatý
+sl: slika sprejeta
+sv: bilden mottagen
 
     include missing spouses
 af: ontbrekende ouers ingesluit
@@ -5007,6 +4981,35 @@ sk: zoznam manželov/manželiek (bez potomkov)
 sl: seznam mož/žena (brez potomcev)
 sv: förteckning över makarna (icke ättlingar)
 
+    in (month year)
+af: in
+bg: през
+br: e
+ca: el/l'
+cs: v
+da: i
+de: im
+en: in
+eo: en
+es: en
+et: :s:
+fi: 
+fr: en
+he:   ב-
+is: í
+it: nel
+lv: mēnesī
+nl: in
+no: i
+pl: w
+pt: em
+ro: in
+ru: в
+sk: v
+sl: v
+sv: i
+zh:  于
+
     insert
 af: invoeg
 bg: вмъкване на
@@ -5119,6 +5122,35 @@ ru: изменить порядок следующих семей
 sk: zmeň poradie nasledujúcich rodín
 sl: zamenjaj vrstni red naslednjih družin
 sv: ändra ordningen på de följande familjerna
+
+    in (year)
+af: in
+bg: през
+br: e
+ca: el
+cs: v
+da: i
+de: im Jahre
+en: in
+eo: en
+es: en
+et:
+fi:   
+fr: en
+he:  ב-
+is: &nbsp;
+it: nel
+lv: gads:
+nl: in
+no: i
+pl: w roku
+pt: em
+ro: in anul
+ru: в
+sk: v
+sl: v letu
+sv: 
+zh:  于
 
     is
 af: is
@@ -5340,8 +5372,8 @@ no: koble
 pl: link
 pt: ligar
 ro: uneste
-sk: spojenie
 ru: связать
+sk: spojenie
 sl: poveži
 sv: länk
 
@@ -5398,6 +5430,10 @@ ru: связанные страницы
 sk: spojené stránky
 sl: povezane strani
 sv: länkade sidor
+
+    link to use
+en: link to use
+fr: lien à utiliser
 
     list/list (ancestors)
 af: lys
@@ -5483,6 +5519,34 @@ sk: slučka v databáze: %s je svoj predok
 sl: krog v bazi podatkov: %s je svoj(a) prednik
 sv: loop i databasen: %s är sin egen ana
 
+    M/F
+af: M/V
+bg: М/Ж
+br: Gour/Maouez
+ca: M/F
+cs: M/Ž
+da: M/K
+de: M/F
+en: M/F
+eo: Maskla/Ina
+es: M/F
+et: M/N
+fi: M/N
+fr: H/F
+he:  ז/נ
+is: KK/KvK
+it: M/F
+lv: V/S
+nl: M/V
+no: M/K
+pl: M/Ż
+pt: M/F
+ro: M/F
+ru: М/Ж
+sk: M/Ž
+sl: M/Ž
+sv: M/K
+
     main title
 af: hooftitel
 bg: главна титла
@@ -5539,7 +5603,6 @@ sk: mužská línia/ženská línia
 sl: moška linija/ženska linija
 sv: manliga linjen/kvinnliga linjen
 
-
     marriage had occured after the death of %t
 af: huwelik plaasgevind het nadat %t dood
 bg: е сключен бракът място след смъртта на %t
@@ -5587,7 +5650,7 @@ it: matrimonio celebrato prima della nascita di %t
 jp: 結婚は%tの出生前に行われた
 kr: 결혼 %t 출산 전에 발생한
 lv: laulība tika noslēgta pirms %t dzimšanas
-nl: huwelijk vond plaats vóór de %t geboorte
+nl: huwelijk vond plaats vóór de geboorte van %t
 no: ekteskap fant sted før %t fødsel
 pl: małżeństwo zostało zawarte przed urodzeniem %t
 pt: casamento ocorreu antes do nascimento %t
@@ -5597,6 +5660,46 @@ sk: manželstvo bolo uzavreté pred narodením %t
 sl: sklenjena zakonska zveza pred rojstvom %t
 sv: äktenskapet ägde rum före %t födseln
 zh: 結婚前%t出生的地方
+
+    marriage/marriages
+af: huwelik/huwelike
+ar: زواج/زواجات
+bg: брак/бракове
+br: eured/euredoù
+ca: casament/casaments
+cs: manželství
+da: giftermål/giftermål
+de: Heirat/Heiraten
+en: marriage/marriages
+eo: edziĝo:a:+n/edziĝoj
+es: casamiento/casamientos
+et: abielu/abielud
+fi: avioliitto/avioliitot
+fr: mariage/mariages
+he:    נישואין
+is: gifting/giftingar
+it: matrimonio/matrimoni
+lv: ģimene
+nl: huwelijk/huwelijken
+no: ekteskap/ekteskap
+pl: ślub/śluby
+pt: casamento/casamentos
+ro: casatorie/casatorii
+ru: брак/браки
+sk: manželstvo/manželstvá
+sl: poroke/poroke
+sv: äktenskap/äktenskap
+
+    marriage notes
+de: notizen zu den Ehen
+en: marriage Notes
+es: notas de matrionios
+fi: lisämerkintöjä vihkimisestä
+fr: notes de mariage
+it: note di matrimoni
+nl: nota’s over het huwelijk
+no: notater om ekteskapet
+sv: anteckningar om vigseln
 
     marriage of %t after his/her death
 af: huwelik van %t na sy/haar afsterwe
@@ -5653,35 +5756,6 @@ ru: брак %t перед его/ее рождением
 sk: sobáš s %t pred svojim narodením
 sl: %t se je poročil(a) pred svojim rojstvom
 sv: äktenskap med %t före makens/makans födelse
-
-    marriage/marriages
-af: huwelik/huwelike
-ar: زواج/زواجات
-bg: брак/бракове
-br: eured/euredoù
-ca: casament/casaments
-cs: manželství
-da: giftermål/giftermål
-de: Heirat/Heiraten
-en: marriage/marriages
-eo: edziĝo:a:+n/edziĝoj
-es: casamiento/casamientos
-et: abielu/abielud
-fi: avioliitto/avioliitot
-fr: mariage/mariages
-he:    נישואין
-is: gifting/giftingar
-it: matrimonio/matrimoni
-lv: ģimene
-nl: huwelijk/huwelijken
-no: ekteskap/ekteskap
-pl: ślub/śluby
-pt: casamento/casamentos
-ro: casatorie/casatorii
-ru: брак/браки
-sk: manželstvo/manželstvá
-sl: poroke/poroke
-sv: äktenskap/äktenskap
 
     married
 af: getroud
@@ -5767,6 +5841,16 @@ sk: %t si vzal/%t si vzala
 sl: %t se je poročil z/%t se je poročila z
 sv: gift%t med
 zh: %t配偶是
+
+    maternal grand-parents
+de: Großeltern mütterlicherseits
+en: maternal grand-parents
+fi: äidin puolen isovanhemmat
+fr: grands parents maternels
+it: nonni materni
+nl: grootouders langs moederszijde
+no: mormor og morfar
+sv: mormor och morfar
 
     maximum
 af: maksimum
@@ -5936,6 +6020,34 @@ sk: správa:a:-u/predchádzajúca správa/predchádzajúce správy/nasledujúca 
 sl: sporočilo/prejšnje sporočilo/prejšnja sporočila/naslednje sporočilo
 sv: meddelande/föregående meddelande/föregående meddelande/nästa meddelande
 
+    M/F
+af: M/V
+bg: М/Ж
+br: Gour/Maouez
+ca: M/F
+cs: M/Ž
+da: M/K
+de: M/F
+en: M/F
+eo: Maskla/Ina
+es: M/F
+et: M/N
+fi: M/N
+fr: H/F
+he:  ז/נ
+is: KK/KvK
+it: M/F
+lv: V/S
+nl: M/V
+no: M/K
+pl: M/Ż
+pt: M/F
+ro: M/F
+ru: М/Ж
+sk: M/Ž
+sl: M/Ž
+sv: M/K
+
     miscellaneous notes
 bg: разни бележки
 ca: miscel·lània
@@ -5960,18 +6072,6 @@ ru: дополнительные заметки
 sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
-
-    notes summary
-bg: резюме на бележките
-en: notes summary
-fr: Sommaire des notes diverses
-zh: zzz
-
-    celebrities
-bg: знаменити хора
-en: celebrities
-fr: Personnes Célèbres
-zh: zzz
 
     missing ancestors
 af: ontbrekende voorsate
@@ -6080,8 +6180,8 @@ pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
 pt: dia do mês lunar/lua nova/quarto crescente/lua cheia/quarto minguante
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
-sk: mesačná fáza/nov/prvá štvrť/spln/posledná štvrť
 ru: фаза луны/новолуние/первая четверть/полнолуние/четвертая четверть
+sk: mesačná fáza/nov/prvá štvrť/spln/posledná štvrť
 sl: lunine mene/ mlada luna/prvi krajec/polna luna/zadnji krajec
 sv: månålder/nymåne/första kvarter/fullmåne/sista kvarter
 
@@ -6113,6 +6213,10 @@ sk: viac ako %d odpovedí
 sl: več kot %d zadetkov
 sv: fler än %d svar
 
+    msg error disconnected
+en: sorry, you can add only families connected to the rest.<br />This restriction has been added by this database owner.
+fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br />Cette restriction a été ajoutée par le propriétaire de cette base de données.
+
     murdered
 af: vermoor
 bg: убит/убита/убит(а)
@@ -6140,9 +6244,6 @@ ru: убит/убита
 sk: zavraždený/zavraždená
 sl: umorjen/umorjena
 sv: mördad
-
-    n
-pl: n/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 
     name
 af: naam
@@ -6202,6 +6303,44 @@ sk: meno %s už má táto %tosoba%t
 sl: ime %s že uporablja %tta oseba%t
 sv: namn %s används redan av %tdenna person%t
 
+    navigation
+af: stap met
+bg: навигация
+br: merdeadur
+ca: navegació
+cs: prohlížení
+da: navigering
+de: navigation
+en: navigation
+eo: navigado
+es: navegación
+et: navigeerimine
+fi: navigointi
+fr: navigation
+he:  ניוות
+is: leiðsögn
+it: percorso
+lv: meklēt
+nl: navigatie
+no: navigering
+pl: nawigacja
+pt: navegação
+ro: navigatie
+ru: навигация
+sl: pregled
+sv: navigering
+
+    navigation arbre
+de: überblick vom Stammbaum
+en: Preview Family Tree
+es: ver ärbol
+fi: yleissilmäys sukutauluun
+fr: aperçu de l'arbre
+it: anteprima dell’albero
+nl: overzicht van de stamboom
+no: oversikt over
+sv: översikt över
+
     navigation with %t as Sosa reference
 af: stap met %t as Sosa verwysing
 bg: навигация чрез числа на Соса относно %t
@@ -6257,6 +6396,12 @@ ru: племянники и племянницы
 sk: synovci a netere
 sl: nečaki in nečakinje
 sv: nevöer och niecer
+
+    new modification
+de: möchten Sie eine weitere Änderung durchführen
+en: continue edit
+es: ¿Quiere hacer una nueva corrección?
+fr: souhaitez-vous effectuer une nouvelle correction
 
     next sibling
 af: volgende broer/volgende suster/volgende broer of suster
@@ -6342,6 +6487,16 @@ sk: žiadne narodeniny
 sl: nobenega rojstnega dneva
 sv: ingen födelsedag
 
+    no descendants
+de: ohne Nachkommen
+en: without posterity
+fi: ilman jälkeläisiä
+fr: sans descendants
+it: senza discendenti
+nl: zonder afstammelingen
+no: uten etterkommere
+sv: utan ättlingar
+
     no known relationship link between %s and %s
 af: geen bekende verwantskap tussen %s en %s
 bg: няма данни за родство между %s и %s
@@ -6426,6 +6581,12 @@ sk: žiadna zmienka
 sl: ni omembe
 sv: inte nämnd
 
+    no modification
+de: keine Ortsänderung vermerkt
+en: no changes
+fr: aucune modification
+se: ninguna modificación
+
     no sexes check
 af: geslag word nie aangedui nie
 bg: без проверка за пол
@@ -6481,62 +6642,6 @@ ru: не разведены
 sk: nerozvedení
 sl: brez ločitve
 sv: inte skilda
-
-    not found
-af: niks gekry nie
-bg: няма резултат от търсенето
-br: n'eo ket bet kavet
-ca: no localitzat
-cs: nenalezeno
-da: ikke fundet
-de: nicht gefunden
-en: not found
-eo: ne trovita
-es: no encontrado
-et: ei leitud
-fi: ei löydy
-fr: pas trouvé
-he:  לא נמצא
-is: fannst ekki
-it: non trovato
-lv: nav atrodams
-nl: niet gevonden
-no: ikke funnet
-pl: nie znaleziono:
-pt: não encontrado
-ro: negasit
-ru: не найден
-sk: nenájdený
-sl: ni najdeno
-sv: hittar inte
-
-    not married
-af: Ongetroud
-bg: без брак
-br: nann euredet
-ca: no casats
-cs: svobodní
-da: ikke gift
-de: nicht verheiratet
-en: not married
-eo: ne edziĝintaj
-es: no casados
-et: pole abielus
-fi: eivät naimisissa
-fr: non mariés
-he:   לא נשואים
-is: ógift
-it: non sposati
-lv: nav precējušies
-nl: niet gehuwd
-no: ugift
-pl: bez ślubu
-pt: não casados
-ro: necasatorit
-ru: не в браке
-sk: slobodný
-sl: brez poroke
-sv: ogifta
 
     note/notes
 af: nota/notas
@@ -6595,6 +6700,67 @@ ru: заметки изменены
 sk: poznámky zmenené
 sl: zaznamek spremenjen
 sv: noteringar modifierade
+
+    notes summary
+bg: резюме на бележките
+en: notes summary
+fr: Sommaire des notes diverses
+
+    not found
+af: niks gekry nie
+bg: няма резултат от търсенето
+br: n'eo ket bet kavet
+ca: no localitzat
+cs: nenalezeno
+da: ikke fundet
+de: nicht gefunden
+en: not found
+eo: ne trovita
+es: no encontrado
+et: ei leitud
+fi: ei löydy
+fr: pas trouvé
+he:  לא נמצא
+is: fannst ekki
+it: non trovato
+lv: nav atrodams
+nl: niet gevonden
+no: ikke funnet
+pl: nie znaleziono:
+pt: não encontrado
+ro: negasit
+ru: не найден
+sk: nenájdený
+sl: ni najdeno
+sv: hittar inte
+
+    not married
+af: Ongetroud
+bg: без брак
+br: nann euredet
+ca: no casats
+cs: svobodní
+da: ikke gift
+de: nicht verheiratet
+en: not married
+eo: ne edziĝintaj
+es: no casados
+et: pole abielus
+fi: eivät naimisissa
+fr: non mariés
+he:   לא נשואים
+is: ógift
+it: non sposati
+lv: nav precējušies
+nl: niet gehuwd
+no: ugift
+pl: bez ślubu
+pt: não casados
+ro: necasatorit
+ru: не в браке
+sk: slobodný
+sl: brez poroke
+sv: ogifta
 
     nth
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
@@ -6791,12 +6957,6 @@ sk: povolanie
 sl: poklic
 sv: yrke
 
-    bibliography
-bg: библиография
-en: bibliography
-fr: bibliographie
-zh: zzz
-
     of course dead
 bg: разбира се починал
 de: natürlich tot
@@ -6836,34 +6996,6 @@ sk: zo %s generácie
 sl: %s generacije
 sv: av den %s generationen
 
-    on %s's side
-af: aan die kant van %s
-bg: от страна на %s
-br: eus tu %s
-ca: per part de %s
-cs: ze strany :g:%s
-da: fra %s's side
-de: von %ss Seite
-en: on %s's side
-eo: de la flanko de %s
-es: por parte de %s
-et: %s poolt
-fi: henkilön %s puolelta
-fr: du côté de %s
-he:  בצד של %s
-is: á %s hlið
-it: dalla parte di %s
-lv: %s-jā pusē
-nl: van %s's kant
-no: fra %ss slektside
-pl: ze strony osoby: %s
-pt: pelo lado de %s
-ro: de partea %s
-ru: со стороны %s
-sk: zo strany :g:%s
-sl: po strani %s
-sv: från %ss släktsida
-
     on (day month year)
 af: op
 ar: يوم
@@ -6893,35 +7025,6 @@ sk: dňa
 sl:
 sv: den
 zh:  于
-
-    on (weekday day month year)
-af:
-bg:
-br: d'ar
-ca:
-cs:
-da:
-de:
-en:
-eo:
-es:
-et: :i:
-fi: :e:
-fr:
-he:
-is:
-it:
-lv:
-nl:
-no:
-pl: w :a:
-pt:
-ro: 
-ru:
-sk:
-sl:
-sv:
-zh:
 
     one day old
 af: een dag oud
@@ -7035,6 +7138,63 @@ sk: iba zvolená generácia
 sl: samo izbrana generacija
 sv: endast den valda generationen
 
+    on %s's side
+af: aan die kant van %s
+bg: от страна на %s
+br: eus tu %s
+ca: per part de %s
+cs: ze strany :g:%s
+da: fra %s's side
+de: von %ss Seite
+en: on %s's side
+eo: de la flanko de %s
+es: por parte de %s
+et: %s poolt
+fi: henkilön %s puolelta
+fr: du côté de %s
+he:  בצד של %s
+is: á %s hlið
+it: dalla parte di %s
+lv: %s-jā pusē
+nl: van %s's kant
+no: fra %ss slektside
+pl: ze strony osoby: %s
+pt: pelo lado de %s
+ro: de partea %s
+ru: со стороны %s
+sk: zo strany :g:%s
+sl: po strani %s
+sv: från %ss släktsida
+
+    on (weekday day month year)
+af:
+bg:
+br: d'ar
+ca:
+cs:
+da:
+de:
+en:
+eo:
+es:
+et: :i:
+fi: :e:
+fr:
+he:
+is:
+it:
+lv:
+nl:
+no:
+pl: w :a:
+pt:
+ro: 
+ru:
+sk:
+sl:
+sv:
+zh:
+
     optional
 af: opsioneel
 bg: по желание
@@ -7121,6 +7281,16 @@ sk: rodičia
 sl: starši
 sv: föräldrar
 zh:  父母
+
+    paternal grand-parents
+de: großeltern väterlicherseits
+en: paternal grand-parents
+fi: isän puolen isovanhemmat
+fr: grands parents paternels
+it: nonni paterni
+nl: grootouders langs vaderszijde
+no: farmor og farfar
+sv: farmor och farfar
 
     person added
 af: persoon bygevoeg
@@ -7291,6 +7461,17 @@ sk: miesto
 sl: kraj
 sv: plats
 
+    place modified
+de: ort geändert
+en: place modified
+es: lugar modificada
+fi: paikka muokattu
+fr: lieu modifié
+it: luogo modificata
+nl: plaats veranderd
+no: sted er endret
+sv: plats ändrad
+
     places
 de: orts
 en: places
@@ -7301,17 +7482,6 @@ it: luoghi
 nl: plaatsen
 no: steder
 sv: orternas
-
-    book of places
-de: ortsverzeichnis
-en: places
-es: diccionario de lugares
-fi: luettelo paikoista
-fr: dictionnaire des lieux
-it: dizionario dei luoghi
-nl: woordenboek der plaatsen
-no: liste over steder
-sv: orternas uppslagsbok
 
     population pyramid
 bg: възрастова пирамида
@@ -7725,6 +7895,34 @@ sk: príbuzenský vzťah/príbuzenské vzťahy
 sl: sorodnik/sorodnikov
 sv: anlinje/anlinjer
 
+    relationships by marriage
+af: aangetroude verwantskappe
+bg: родство чрез брак
+br: liammoù a gerentiezh dre euredennoù
+ca: parentiu polític
+cs: příbuzenské vztahy přes svatby
+da: slægtskaber ved giftermål
+de: Heiratsbeziehungen
+en: relationships by marriage
+eo: ligoj per edziĝo
+es: parentescos políticos
+et: sugulus abielu kaudu
+fi: sukulaisuus avioliiton kautta
+fr: liens de parenté par alliance
+he:  קשרים דרך נשואין
+is: tengjast með giftingu
+it: parentele per matrimonio
+lv: precību saites
+nl: verwant door huwelijk
+no: slektskap gjennom gifte
+pl: powinowactwo
+pt: relações por casamento
+ro: relatie prin mariaj 
+ru: связь браком
+sk: príbuzenské vzťahy cez svadby
+sl: sorodstvo preko poroke
+sv: släktskap genom äktenskap
+
     relationship%t to
 af: verwantskap%t met
 bg: има връзка%t с
@@ -7753,34 +7951,6 @@ ru: приходится%t
 sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
-
-    relationships by marriage
-af: aangetroude verwantskappe
-bg: родство чрез брак
-br: liammoù a gerentiezh dre euredennoù
-ca: parentiu polític
-cs: příbuzenské vztahy přes svatby
-da: slægtskaber ved giftermål
-de: Heiratsbeziehungen
-en: relationships by marriage
-eo: ligoj per edziĝo
-es: parentescos políticos
-et: sugulus abielu kaudu
-fi: sukulaisuus avioliiton kautta
-fr: liens de parenté par alliance
-he:  קשרים דרך נשואין
-is: tengjast með giftingu
-it: parentele per matrimonio
-lv: precību saites
-nl: verwant door huwelijk
-no: slektskap gjennom gifte
-pl: powinowactwo
-pt: relações por casamento
-ro: relatie prin mariaj 
-ru: связь браком
-sk: príbuzenské vzťahy cez svadby
-sl: sorodstvo preko poroke
-sv: släktskap genom äktenskap
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
@@ -8165,9 +8335,9 @@ pl: od ostatniego kliknięcia
 pt: desde o último clique
 ro: de la ultimul click
 ru: с момента последнего щелчка
+sk: od posledného poklepania
 sl: od zadnjega klika
 sv: från senaste klick
-sk: od posledného poklepania
 
     son/daughter/child
 af: seun/dogter/kind
@@ -8196,6 +8366,34 @@ ru: сын/дочь/дети
 sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: son/dotter/barn
+
+    Sosa
+af: Sosa
+bg: Число на Соса
+br: Sosa
+ca: número "Sosa"
+cs: "Sosa"
+da: Sosa
+de: Ahnenkennziffer
+en: Sosa
+eo: Sosa
+es: Sosa
+et: Sosa
+fi: Sosa
+fr: Sosa
+he: Sosa
+is: Sosa
+it: Sosa
+lv: SOSA
+nl: Sosa
+no: Sosa
+pl: "Sosa"
+pt: Sosa
+ro: Sosa
+ru: Sosa
+sk: Sosa
+sl: številka Sosa
+sv: annummer
 
     source/sources
 af: bron/bronne
@@ -8431,6 +8629,35 @@ sk: priezvisko nenájdené
 sl: priimek ni najden
 sv: hittar inte efternamn
 
+    surnames list
+af: vanne lys
+bg: списък на фамилните имена
+br: roll an anvioù-tud
+ca: llistat de cognoms
+cs: seznam příjmení
+da: efternavnsoversigt
+de: Nachnamen-Liste
+en: surnames list
+eo: listo de la familiaj nomoj
+es: lista de apellidos
+et: perekonnanimede nimekiri
+fi: sukunimiluettelo
+fr: liste éclair
+he:  רשימת שמות משפחה
+is: eftirnafna listi
+it: lista dei cognomi
+lv: uzvārdu saraksts
+nl: lijst van familienamen
+no: liste over etternavn
+pl: lista nazwisk
+pt: lista de apelidos
+pt-br: lista de sobrenomes
+ro: lista de nume de familie 
+ru: список фамилий
+sk: zoznam priezvísk
+sl: seznam priimkov
+sv: efternamns lista
+
     surname/surnames
 af: van/vanne
 ar: اللقب
@@ -8463,35 +8690,6 @@ sl: priimek/priimki
 sv: efternamn/efternamn
 zh:  姓
 
-    surnames list
-af: vanne lys
-bg: списък на фамилните имена
-br: roll an anvioù-tud
-ca: llistat de cognoms
-cs: seznam příjmení
-da: efternavnsoversigt
-de: Nachnamen-Liste
-en: surnames list
-eo: listo de la familiaj nomoj
-es: lista de apellidos
-et: perekonnanimede nimekiri
-fi: sukunimiluettelo
-fr: liste éclair
-he:  רשימת שמות משפחה
-is: eftirnafna listi
-it: lista dei cognomi
-lv: uzvārdu saraksts
-nl: lijst van familienamen
-no: liste over etternavn
-pl: lista nazwisk
-pt: lista de apelidos
-pt-br: lista de sobrenomes
-ro: lista de nume de familie 
-ru: список фамилий
-sk: zoznam priezvísk
-sl: seznam priimkov
-sv: efternamns lista
-
     text
 af: teks
 bg: текст
@@ -8519,176 +8717,6 @@ ru: текст
 sk: text
 sl: tekst
 sv: text
-
-    the %d first names
-af: die %d voorname
-bg: %d собствени имена
-br: ar %d raganv
-ca: els %d noms
-cs: %d křestních jmen
-da: de %d fornavne
-de: die %d Vornamen
-en: the %d first names
-eo: la %d unuaj nomoj
-es: los %d nombres
-et: %d eesnime
-fi: %d etunimeä
-fr: les %d prénoms
-he: %d שמות הפרטיים
-is: %d fyrstu fornöfnin
-it: i %d nomi
-lv: %d personvārdi
-nl: de %d voornamen
-no: de %d fornavnene
-pl: %d imion
-pt: os %d nomes
-pt-br: os %d prenomes
-ro: %d prenume
-ru: %d имён
-sk: %d mien
-sl: %d lastnih imen
-sv: de %d förnamnen
-
-    the %d oldest couples perhaps still alive and engaged
-af: die %d oudste pare moontlik nog in lewe en verloof
-bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
-ca: les parelles més grans potser encara vives i juntes
-cs: %d nejstarších párů pravděpodobně žijících a zadaných
-da: og de %d ældste par muligvis stadig i live og forlovede
-de: die %d ältesten verlobten und möglicherweise noch lebenden Paare
-en: the %d oldest couples perhaps still alive and engaged
-eo: versajne la %d plej altaj paroj ankorau vivas kaj estas fiancigitaj
-es: los novios más viejos y quizás todavía vivos
-et: %d vanimat kihlatud ja võib-olla veel elus olevat paari
-fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
-fr: les %d couples les plus anciens peut-être encore vivants et fiancés
-he: יתכן ש-%d הזוגות המבוגרים ביותר עודם בחיים ועודם מאורסים
-is: %d elstu pörin eru hugsanlega enn saman og á lífi
-it: le %d coppie più anziane forse ancora viventi e fidanzate
-lv: % iespējams vēl dzīvu un saderīnātu vecāko pāru
-nl: De %d oudste, mogelijk nog in leven zijnde, verloofde paren
-no: Det % eldste par som kanskje fremdeles er i live og forlovet
-pl: %d najstarszych par prawdopodobnie jeszcze zyjących i pozostających zaręczeni
-pt: o %d mais velho casal talvez ainda vivo e noivado
-pt-br: os %d mais velhos casais talvez ainda vivos
-ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
-ru: старейшие %d возможно живых супругов или помолвленных
-sk: %d najstarších párov pravdepodobne žijúcich a zadaných
-sl: %d najstarejših morda še živih in zaročenih parov
-sv: de %d äldsta nu levande paren som kanske fortfarande är förlovade
-
-    the %d oldest perhaps still alive
-af: die %d oudstes wat nog leef
-bg: най-старите %d евентуално още живи лица
-br: ar %d den koshañ bev c'hoazh marteze
-ca: les %d persones més grans, potser encara vives
-cs: %d nejstarších snad ještě žijících osob
-da: de %d ældste af de muligt levende
-de: die %d ältesten vermutlich noch lebenden Personen
-en: the %d oldest perhaps still alive
-eo: la %d plej maljunaj eble ankoraù vivantaj
-es: los %s más viejos quizás todovía vivo
-et: %d vanimat, kes võib-olla on veel elus
-fi: %d vanhinta ehkä vielä elävää
-fr: les %d les plus âgés peut-être encore vivants
-he:  הזקן ה %d  שאולי עוד בחיים
-is: %d elsti sem kann að vera á lífi
-it: %d più anziani che possono essere ancora viventi
-lv: %d visvecākie iespējams vēl ir dzīvi
-nl: de %d oudste, mogelijk nog in leven zijnde, personen
-no: de %d eldste som muligens lever
-pl: %d najstarszych osób (prawdopodobnie) żyjących
-pt: os %d mais velhos talvez ainda vivos
-ro: %d cei mai batrini posibil mai in viata
-ru: %d самых старых еще живущих
-sk: %d najstaších, snáď ešte žijúcich osôb
-sl: %d najstarejših, morda še živečih
-sv: de %d äldsta personerna som kanske lever
-
-    the %d surnames
-af: die %d vanne
-bg: %d фамилни имена
-br: ar %d anv-familh
-ca: els %d cognoms
-cs: %d příjmení
-da: de %d efternavne
-de: die %d Nachnamen
-en: the %d surnames
-eo: la %d familiaj nomoj
-es: los %d apellidos
-et: %d perekonnanime
-fi: %d sukunimeä
-fr: les %d patronymes
-he: %d שמות המשפחה
-is: %d fyrstu eftirnöfnin
-it: i %d cognomi
-lv: %d uzvārdi
-nl: de %d familienamen
-no: de %d etternavnene
-pl: %d nazwisk
-pt: os %d apelidos
-pt-br: os %d sobrenomes
-ro: %d nume de familie
-ru: %d фамилий
-sk: %d priezvísk
-sl: %d priimkov
-sv: de %d efternamnen
-
-    the %d who lived the longest
-af: die %d wat die langste gelewe het
-bg: най-дълго живелите %d лица
-br: ar %d o deus bevet ar pellañ
-ca: les %d persones que han viscut més anys
-cs: %d osob které žili nejdéle
-da: de %d som har levet længst
-de: die %d Personen, die am längsten lebten  
-en: the %d who lived the longest
-eo: la %d, kiuj vivis plejlonge
-es: los %d que han vivido más mucho tiempo
-et: %d kõige kauem elanut
-fi: %d pisimpään elänyttä
-fr: les %d ayant vécu le plus longtemps
-he:  ה %d באריכות ימים
-is: %d sem lifði lengst
-it: i %d che hanno vissuto più a lungo
-lv: %d, kuri dzīvojuši visilgāk
-nl: de %d personen die het langst geleefd hebben
-no: de %d som har levd lengst
-pl: %d osób, które żyły najdłużej
-pt: os %d que mais viveram
-ro: %d cei mai in virsta
-ru: %d проживших дольше всех
-sk: %d osôb, ktoré žili najdlhšie
-sl: %d oseb, ki so živele najdlje 
-sv: de %d personerna som har levt längst
-
-    the %s generation
-af: die %s geslag
-bg: %s поколение
-br: ar %s rummad-tud
-ca: la %s generació
-cs: %s. generace
-da: den %s generation
-de: die %s Generation
-en: the %s generation
-eo: la %s generacio
-es: la %s generación
-et: %s. sugupõlv
-fi: %s. sukupolvi
-fr: la %s génération
-he:   דור ה%s
-is: %s kynslóð
-it: la %s generazione
-lv: %s. paaudze
-nl: de %s generatie
-no: %s generasjon
-pl: %s pokolenie
-pt: a %s geração
-ro: generatia %s
-ru: %s-е поколение
-sk: %s. generácia
-sl: %s. generacija
-sv: den %s generationen
 
     the anniversary
 af: die herdenking
@@ -8857,6 +8885,148 @@ ru: послезавтра
 sk: pozajtra
 sl: pojutrišnem
 sv: i övermorgon
+
+    the %d first names
+af: die %d voorname
+bg: %d собствени имена
+br: ar %d raganv
+ca: els %d noms
+cs: %d křestních jmen
+da: de %d fornavne
+de: die %d Vornamen
+en: the %d first names
+eo: la %d unuaj nomoj
+es: los %d nombres
+et: %d eesnime
+fi: %d etunimeä
+fr: les %d prénoms
+he: %d שמות הפרטיים
+is: %d fyrstu fornöfnin
+it: i %d nomi
+lv: %d personvārdi
+nl: de %d voornamen
+no: de %d fornavnene
+pl: %d imion
+pt: os %d nomes
+pt-br: os %d prenomes
+ro: %d prenume
+ru: %d имён
+sk: %d mien
+sl: %d lastnih imen
+sv: de %d förnamnen
+
+    the %d oldest couples perhaps still alive and engaged
+af: die %d oudste pare moontlik nog in lewe en verloof
+bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
+ca: les parelles més grans potser encara vives i juntes
+cs: %d nejstarších párů pravděpodobně žijících a zadaných
+da: og de %d ældste par muligvis stadig i live og forlovede
+de: die %d ältesten verlobten und möglicherweise noch lebenden Paare
+en: the %d oldest couples perhaps still alive and engaged
+eo: versajne la %d plej altaj paroj ankorau vivas kaj estas fiancigitaj
+es: los novios más viejos y quizás todavía vivos
+et: %d vanimat kihlatud ja võib-olla veel elus olevat paari
+fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
+fr: les %d couples les plus anciens peut-être encore vivants et fiancés
+he: יתכן ש-%d הזוגות המבוגרים ביותר עודם בחיים ועודם מאורסים
+is: %d elstu pörin eru hugsanlega enn saman og á lífi
+it: le %d coppie più anziane forse ancora viventi e fidanzate
+lv: % iespējams vēl dzīvu un saderīnātu vecāko pāru
+nl: De %d oudste, mogelijk nog in leven zijnde, verloofde paren
+no: Det % eldste par som kanskje fremdeles er i live og forlovet
+pl: %d najstarszych par prawdopodobnie jeszcze zyjących i pozostających zaręczeni
+pt: o %d mais velho casal talvez ainda vivo e noivado
+pt-br: os %d mais velhos casais talvez ainda vivos
+ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
+ru: старейшие %d возможно живых супругов или помолвленных
+sk: %d najstarších párov pravdepodobne žijúcich a zadaných
+sl: %d najstarejših morda še živih in zaročenih parov
+sv: de %d äldsta nu levande paren som kanske fortfarande är förlovade
+
+    the %d oldest perhaps still alive
+af: die %d oudstes wat nog leef
+bg: най-старите %d евентуално още живи лица
+br: ar %d den koshañ bev c'hoazh marteze
+ca: les %d persones més grans, potser encara vives
+cs: %d nejstarších snad ještě žijících osob
+da: de %d ældste af de muligt levende
+de: die %d ältesten vermutlich noch lebenden Personen
+en: the %d oldest perhaps still alive
+eo: la %d plej maljunaj eble ankoraù vivantaj
+es: los %s más viejos quizás todovía vivo
+et: %d vanimat, kes võib-olla on veel elus
+fi: %d vanhinta ehkä vielä elävää
+fr: les %d les plus âgés peut-être encore vivants
+he:  הזקן ה %d  שאולי עוד בחיים
+is: %d elsti sem kann að vera á lífi
+it: %d più anziani che possono essere ancora viventi
+lv: %d visvecākie iespējams vēl ir dzīvi
+nl: de %d oudste, mogelijk nog in leven zijnde, personen
+no: de %d eldste som muligens lever
+pl: %d najstarszych osób (prawdopodobnie) żyjących
+pt: os %d mais velhos talvez ainda vivos
+ro: %d cei mai batrini posibil mai in viata
+ru: %d самых старых еще живущих
+sk: %d najstaších, snáď ešte žijúcich osôb
+sl: %d najstarejših, morda še živečih
+sv: de %d äldsta personerna som kanske lever
+
+    the %d surnames
+af: die %d vanne
+bg: %d фамилни имена
+br: ar %d anv-familh
+ca: els %d cognoms
+cs: %d příjmení
+da: de %d efternavne
+de: die %d Nachnamen
+en: the %d surnames
+eo: la %d familiaj nomoj
+es: los %d apellidos
+et: %d perekonnanime
+fi: %d sukunimeä
+fr: les %d patronymes
+he: %d שמות המשפחה
+is: %d fyrstu eftirnöfnin
+it: i %d cognomi
+lv: %d uzvārdi
+nl: de %d familienamen
+no: de %d etternavnene
+pl: %d nazwisk
+pt: os %d apelidos
+pt-br: os %d sobrenomes
+ro: %d nume de familie
+ru: %d фамилий
+sk: %d priezvísk
+sl: %d priimkov
+sv: de %d efternamnen
+
+    the %d who lived the longest
+af: die %d wat die langste gelewe het
+bg: най-дълго живелите %d лица
+br: ar %d o deus bevet ar pellañ
+ca: les %d persones que han viscut més anys
+cs: %d osob které žili nejdéle
+da: de %d som har levet længst
+de: die %d Personen, die am längsten lebten  
+en: the %d who lived the longest
+eo: la %d, kiuj vivis plejlonge
+es: los %d que han vivido más mucho tiempo
+et: %d kõige kauem elanut
+fi: %d pisimpään elänyttä
+fr: les %d ayant vécu le plus longtemps
+he:  ה %d באריכות ימים
+is: %d sem lifði lengst
+it: i %d che hanno vissuto più a lungo
+lv: %d, kuri dzīvojuši visilgāk
+nl: de %d personen die het langst geleefd hebben
+no: de %d som har levd lengst
+pl: %d osób, które żyły najdłużej
+pt: os %d que mais viveram
+ro: %d cei mai in virsta
+ru: %d проживших дольше всех
+sk: %d osôb, ktoré žili najdlhšie
+sl: %d oseb, ki so živele najdlje 
+sv: de %d personerna som har levt längst
 
     the father-in-law/the mother-in-law
 af: die skoonpa/die skoonma
@@ -9111,6 +9281,11 @@ sk: posledných %d narodení
 sl: zadnjih %d rojstev
 sv: de senaste %d födslarna
 
+    the latest %d celebrated marriages
+bg: последните %d чествувани сватби
+en: the latest %d celebrated marriages
+fr: les %d derniers mariages célébrés
+
     the latest %d marriages
 af: die laaste %d huwelike
 bg: последните %d брака
@@ -9143,13 +9318,6 @@ sv: de senaste %d äktenskapen
 bg: последните %d регистрирани сватби
 en: the latest %d registered marriages
 fr: les %d derniers mariages enregistrés
-zh: zzz
-
-    the latest %d celebrated marriages
-bg: последните %d чествувани сватби
-en: the latest %d celebrated marriages
-fr: les %d derniers mariages célébrés
-zh: zzz
 
     the latest %t deaths
 af: die laaste %t afsterwes
@@ -9179,6 +9347,12 @@ sk: posledných %t úmrtí
 sl: zadnjih %t smrti
 sv: de senaste %t avlidna
 
+    the modification impacted %d persons
+de: die Änderungen sind abgeschlossen : % der Datei (en) kopiert
+en: successfully updated: %d places have been changed
+es: la modificación ha sido hecha: %d ficha(s) corregida(s)
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+
     the parents
 af: die ouers
 bg: родителите
@@ -9206,6 +9380,34 @@ ru: родители
 sk: rodičia
 sl: starši
 sv: föräldrarna
+
+    the %s generation
+af: die %s geslag
+bg: %s поколение
+br: ar %s rummad-tud
+ca: la %s generació
+cs: %s. generace
+da: den %s generation
+de: die %s Generation
+en: the %s generation
+eo: la %s generacio
+es: la %s generación
+et: %s. sugupõlv
+fi: %s. sukupolvi
+fr: la %s génération
+he:   דור ה%s
+is: %s kynslóð
+it: la %s generazione
+lv: %s. paaudze
+nl: de %s generatie
+no: %s generasjon
+pl: %s pokolenie
+pt: a %s geração
+ro: generatia %s
+ru: %s-е поколение
+sk: %s. generácia
+sl: %s. generacija
+sv: den %s generationen
 
     the spouse
 af: die eggenoot/die eggenote
@@ -9339,37 +9541,122 @@ pl: aby dodać dziecko do pary rodziców użyj "%s"
 pt: para acrescentar um filho a uma família utilizar "%s"
 ro: pentru a adauga un copil utilizeaza "%s"
 ru: чтобы добавить ребенка к семье, используй "%s"
-sl: da bi dodal otroka k družini, uporabite "%s"
 sk: pre pridanie dieťaťa do rodiny použi "%s"
+sl: da bi dodal otroka k družini, uporabite "%s"
 sv: för att lägga till ett barn i en familj, använd "%s"
 
-    to the %s generation
-af: tot die %s geslag
-bg: до %s поколение
-br: betek ar %s rummad-tud
-ca: fins a la %s generació
-cs: až do %s generace
-da: til den %s generation
-de: bis zur %s Generation
-en: to the %s generation
-eo: ĝis la %s generacio
-es: hasta la %s generación
-et: %s sugupõlveni
-fi: %s sukupolveen
-fr: jusqu'à la %s génération
-he:  לדור ה%s
-is: til %s kynslóðar
-it: fino alla %s generazione
-lv: līdz %s. paaudzei
-nl: tot de %s generatie
-no: til %s generasjon
-pl: do %s pokolenia
-pt: até à %s geração
-ro: pina la generatia %s
-ru: до %s поколения
-sk: do %s generácie
-sl: do %s generacije
-sv: till den %s generationen
+    to change
+en: to change
+et: muutmiseks
+fr: pour changer
+it: per cambiare
+sk: pre zmenu
+
+    to come
+de: in Erwartung
+en: to come
+es: pronto
+fi: tulevat tapahtumat
+fr: à venir
+it: da venire
+nl: te komen
+no: kommende hendelser
+sv: kommande händelser
+
+    today
+af: vandag
+bg: днес
+br: hiziv an deiz
+ca: avui
+cs: dnes
+da: i dag
+de: heute
+en: today
+eo: hodiaù
+es: hoy
+et: täna
+fi: tänään
+fr: aujourd’hui
+he:  היום
+is: í dag
+it: oggi
+lv: šodien
+nl: vandaag
+no: i dag
+pl: dzisiaj
+pt: hoje
+ro: astazi
+ru: сегодня
+sk: dnes
+sl: danes
+sv: i dag
+
+    tomorrow
+af: môre
+bg: утре
+br: warc'hoazh
+ca: demà
+cs: zítra
+da: i morgen
+de: morgen
+en: tomorrow
+eo: morgaù
+es: mañana
+et: homme
+fi: huomenna
+fr: demain
+he:  מחר
+is: á morgun
+it: domani
+lv: rīt
+nl: morgen
+no: i morgen
+pl: jutro
+pt: amanhã
+ro: maine
+ru: завтра
+sk: zajtra
+sl: jutri
+sv: i morgon
+
+    tools
+de: hilfsmittel
+en: tools
+es: herramientas
+fi: työkalut
+fr: outils
+it: utilitari
+nl: nuttige zaken
+no: verktøy
+sv: verktyg
+
+    total
+af: totaal
+bg: общо
+br: en holl
+ca: total
+cs: celkem
+da: totalt
+de: Summe
+en: total
+eo: tuto
+es: total
+et: kokku
+fi: yhteensä
+fr: total
+he:  סה'כ
+is: alls
+it: totale
+lv: kopā
+nl: totaal
+no: totalt
+pl: łącznie
+pt: total
+ro: in total
+ru: всего
+sk: spolu
+sl: skupaj
+sv: totalt
 
     to the children
 af: tot die kinders
@@ -9539,89 +9826,33 @@ sk: k rodičom
 sl: do staršev
 sv: till föräldrarna
 
-    today
-af: vandag
-bg: днес
-br: hiziv an deiz
-ca: avui
-cs: dnes
-da: i dag
-de: heute
-en: today
-eo: hodiaù
-es: hoy
-et: täna
-fi: tänään
-fr: aujourd’hui
-he:  היום
-is: í dag
-it: oggi
-lv: šodien
-nl: vandaag
-no: i dag
-pl: dzisiaj
-pt: hoje
-ro: astazi
-ru: сегодня
-sk: dnes
-sl: danes
-sv: i dag
-
-    tomorrow
-af: môre
-bg: утре
-br: warc'hoazh
-ca: demà
-cs: zítra
-da: i morgen
-de: morgen
-en: tomorrow
-eo: morgaù
-es: mañana
-et: homme
-fi: huomenna
-fr: demain
-he:  מחר
-is: á morgun
-it: domani
-lv: rīt
-nl: morgen
-no: i morgen
-pl: jutro
-pt: amanhã
-ro: maine
-ru: завтра
-sk: zajtra
-sl: jutri
-sv: i morgon
-
-    total
-af: totaal
-bg: общо
-br: en holl
-ca: total
-cs: celkem
-da: totalt
-de: Summe
-en: total
-eo: tuto
-es: total
-et: kokku
-fi: yhteensä
-fr: total
-he:  סה'כ
-is: alls
-it: totale
-lv: kopā
-nl: totaal
-no: totalt
-pl: łącznie
-pt: total
-ro: in total
-ru: всего
-sk: spolu
-sl: skupaj
-sv: totalt
+    to the %s generation
+af: tot die %s geslag
+bg: до %s поколение
+br: betek ar %s rummad-tud
+ca: fins a la %s generació
+cs: až do %s generace
+da: til den %s generation
+de: bis zur %s Generation
+en: to the %s generation
+eo: ĝis la %s generacio
+es: hasta la %s generación
+et: %s sugupõlveni
+fi: %s sukupolveen
+fr: jusqu'à la %s génération
+he:  לדור ה%s
+is: til %s kynslóðar
+it: fino alla %s generazione
+lv: līdz %s. paaudzei
+nl: tot de %s generatie
+no: til %s generasjon
+pl: do %s pokolenia
+pt: até à %s geração
+ro: pina la generatia %s
+ru: до %s поколения
+sk: do %s generácie
+sl: do %s generacije
+sv: till den %s generationen
 
     tree
 af: boom
@@ -9774,6 +10005,36 @@ sk: neurčené
 sl: nedoločeno
 sv: ospecificerad
 
+    update
+af: bywerk
+bg: промяна
+br: hizivadur
+ca: actualització
+cs: upravit
+da: opdater
+de: Aktualisieren
+en: update
+eo: ĝisdatigo
+es: revisión
+et: täienda
+fi: päivitä
+fr: mise à jour
+he:  עדכן
+is: uppfæra
+it: aggiornamento
+lv: informācijas papildināšana
+nl: actualiseer
+no: oppdatere
+pl: aktualizacja
+pt: actualizar
+pt-br: atualizar
+ro: actualizare
+ru: изменить
+sk: upraviť
+sl: spremeni
+sv: uppdatera
+zh:  更新
+
     up to
 af: tot by
 bg: до
@@ -9801,36 +10062,6 @@ ru: вплоть до
 sk: až po :a:
 sl: do
 sv: upp till
-
-    update
-af: bywerk
-bg: промяна
-br: hizivadur
-ca: actualització
-cs: upravit
-da: opdater
-de: Aktualisieren
-en: update
-eo: ĝisdatigo
-es: revisión
-et: täienda
-fi: päivitä
-fr: mise à jour
-he:  עדכן
-is: uppfæra
-it: aggiornamento
-lv: informācijas papildināšana
-nl: actualiseer
-no: oppdatere
-pl: aktualizacja
-pt: actualizar
-pt-br: atualizar
-ro: actualizare
-ru: изменить
-sl: spremeni
-sk: upraviť
-sv: uppdatera
-zh:  更新
 
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"
@@ -10159,6 +10390,34 @@ sl: let
 sv: år
 zh:  岁
 
+    Y/N
+af: J/N
+bg: Д/Н
+br: Ya/N'eo ket
+ca: S/N
+cs: A/N
+da: J/N
+de: J/N
+en: Y/N
+eo: J/N
+es: S/N
+et: J/E
+fi: K/E
+fr: O/N
+he:   ק/ל
+is: J/N
+it: S/N
+lv: J/N
+nl: J/N
+no: J/N
+pl: T/N
+pt: S/N
+ro: da/nu
+ru: Д/Н
+sk: áno/nie
+sl: da/ne
+sv: J/N
+
     you are visible/you are not visible
 de: du bist sichtbar/du bist nicht sichtbar
 en: you are visible/you are not visible
@@ -10239,263 +10498,6 @@ no: Beskjeden din avventer bekreftelse
 pl: twoja wiadomość czeka na potwierdzenie
 pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
-sk: tvoja správa čaká na potvrdenie
 ru: ваше сообщение ожидает проверки 
+sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
-
-    %s forbidden char
-da: forkert karakter (%s) brugt i efternavn/fornavn
-de: ungültiges Zeichen (%s) im nachname/vorname
-en: invalid character (%s) used in surname/first name
-es: carácter inválido (%) en la apellido/nombre
-fi: olet kättänyt sopimatonta merkkiä (%s) sukunimi/etunimi
-fr: caractères interdits (%s) dans le patronyme/prénom
-it: carattere non valido (%s) nella cognome/nome
-nl: ongeldig karakter (%s) in familienaam/voornaam
-no: etternavn/fornavn du skrev inn, inneholder ugyldige tegn (%s)
-sv: Ogiltigt tecken (%s) i efternamn/förnamn
-
-    navigation
-af: stap met
-bg: навигация
-br: merdeadur
-ca: navegació
-cs: prohlížení
-da: navigering
-de: navigation
-en: navigation
-eo: navigado
-es: navegación
-et: navigeerimine
-fi: navigointi
-fr: navigation
-he:  ניוות
-is: leiðsögn
-it: percorso
-lv: meklēt
-nl: navigatie
-no: navigering
-pl: nawigacja
-pt: navegação
-ro: navigatie
-ru: навигация
-sl: pregled
-sv: navigering
-
-    age at %s birth date
-de: alter zum zeitpunkt der geburt von %s
-en: age at %s birth date
-es: edad en el nacimiento de %s
-fr: âge à la naissance de %s
-it: età alla nascita di %s
-nl: leeftijd bij de geboorte van %s
-
-    half-siblings
-de: halbbrüder und schwestern
-en: half-siblings
-es: hermanastros y hermanastras
-fr: demi frères et demi sœurs
-it: fratellastri e sorellastre
-nl: half broers en zusters
-
-    direct ancestor of %s
-de: direkter Vorfahre von %s
-en: direct ancestor of %s
-es: antepasado directo de %s
-fr: ancêtre direct de %s
-it: antenato diretto di %s
-nl: rechtstreeks voorouder van %s
-
-    msg error disconnected
-en: sorry, you can add only families connected to the rest.<br />This restriction has been added by this database owner.
-fr: désolé, vous ne pouvez ajouter que des familles connectées au reste.<br />Cette restriction a été ajoutée par le propriétaire de cette base de données.
-
-    link to use
-en: link to use
-
-    to come
-de: in Erwartung
-en: to come
-es: pronto
-fi: tulevat tapahtumat
-fr: à venir
-it: da venire
-nl: te komen
-no: kommende hendelser
-sv: kommande händelser
-
-    tools
-de: hilfsmittel
-en: tools
-es: herramientas
-fi: työkalut
-fr: outils
-it: utilitari
-nl: nuttige zaken
-no: verktøy
-sv: verktyg
-
-    family history
-de: rund um den Stammbaum
-en: family History
-es: autor del árbol
-fi: sukupuun lisäksi
-fr: autour de l’arbre
-it: attorno all'albero
-nl: rond de stamboom
-no: tillegg til slektstreet
-sv: utöver släktträdet
-
-    %d places starting with %s
-de: %d orts beginnend mit %s
-en: %d places starting with %s
-es: %d lugares comenzando con %s
-fi: %d paikoista ensimmäisenä %s
-fr: %d lieux commençant par %s
-it: %d luoghi partendo da %s
-nl: %d plaatsen beginnend met %s
-no: %d steder som starter med %s
-sv: %d orternas som börjar med %s
-
-    place modified
-de: ort geändert
-en: place modified
-es: lugar modificada
-fi: paikka muokattu
-fr: lieu modifié
-it: luogo modificata
-nl: plaats veranderd
-no: sted er endret
-sv: plats ändrad
-
-    no modification
-de: keine Ortsänderung vermerkt
-en: no changes
-se: ninguna modificación
-fr: aucune modification
-
-    the modification impacted %d persons
-de: die Änderungen sind abgeschlossen : % der Datei (en) kopiert
-en: successfully updated: %d places have been changed
-es: la modificación ha sido hecha: %d ficha(s) corregida(s)
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
-
-    help places
-de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit Ihrer Dateien die diesen Standort betreffen werden sofort korrigiert werden
-en: Click "[Update]" to edit a place: the place names will be automatically updated in your entire family tree
-es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
-fr: Cliquez sur « Modifier » pour corriger un lieu : l’ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
-
-    new modification
-de: möchten Sie eine weitere Änderung durchführen
-en: continue edit
-es: ¿Quiere hacer una nueva corrección?
-fr: souhaitez-vous effectuer une nouvelle correction
-
-    continue correcting
-af: gaan voort met die samevoeging
-bg: да продължи обединяването
-br: derc'hel da gendeuziñ
-ca: continuar la fusió
-cs: pokračovat ve spojování
-da: fortsæt sammenføjning
-de: Zusammenführung fortsetzen
-en: continue merging
-eo: daùrigu la kuniĝon
-es: continuar la fusión
-et: jätka ühendamist
-fi: jatka yhdistämistä
-fr: continuer à fusionner
-he:  להמשיך לאחד
-is: halda áfram að sameina
-it: continua la fusione
-lv: turpināt apvienošanu
-nl: doorgaan met samenvoegen
-no: fortsett sammenslåing
-pl: kontynuuj scalanie
-pt: continuar a fusão
-ro: continua unificarea
-ru: продолжить объединение
-sl: nadaljuj z združevanjem
-sv: fortsätt slå samman
-
-    navigation arbre
-af:
-bg:
-br:
-ca:
-cs:
-da:
-de: überblick vom Stammbaum
-en: Preview Family Tree
-eo:
-es: ver ärbol
-et:
-fi: yleissilmäys sukutauluun
-fr: aperçu de l'arbre
-he:
-is:
-it: anteprima dell’albero
-lv:
-nl: overzicht van de stamboom
-no: oversikt over
-pl:
-pt:
-pt-br:
-ro:
-ru:
-sl:
-sv: översikt över
-zh:
-
-    marriage notes
-de: notizen zu den Ehen
-en: marriage Notes
-es: notas de matrionios
-fi: lisämerkintöjä vihkimisestä
-fr: notes de mariage
-it: note di matrimoni
-nl: nota’s over het huwelijk
-no: notater om ekteskapet
-sv: anteckningar om vigseln
-
-    paternal grand-parents
-de: großeltern väterlicherseits
-en: paternal grand-parents
-fi: isän puolen isovanhemmat
-fr: grands parents paternels
-it: nonni paterni
-nl: grootouders langs vaderszijde
-no: farmor og farfar
-sv: farmor och farfar
-
-    maternal grand-parents
-de: Großeltern mütterlicherseits
-en: maternal grand-parents
-fi: äidin puolen isovanhemmat
-fr: grands parents maternels
-it: nonni materni
-nl: grootouders langs moederszijde
-no: mormor og morfar
-sv: mormor och morfar
-
-    half siblings
-de: halbbrüder und-schwestern
-en: half-siblings
-es: hermanastros y hermanastras
-fi: puolisisarukset
-fr: demi frères et demi sœurs
-it: fratellastri e sorellastre
-nl: half broers en zusters
-no: halvbrødre/halvsøstre/halvsøsken
-sv: halvbröder och halvsystrar
-
-    no descendants
-de: ohne Nachkommen
-en: without posterity
-fi: ilman jälkeläisiä
-fr: sans descendants
-it: senza discendenti
-nl: zonder afstammelingen
-no: uten etterkommere
-sv: utan ättlingar

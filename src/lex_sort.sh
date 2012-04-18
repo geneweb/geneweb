@@ -11,8 +11,7 @@ let input_line_cnt ic = incr linenum; input_line ic
 
 let rec skip_to_same_line ic line_ref =
   let line = input_line_cnt ic in
-  printf "%s\n" line;
-  if line = line_ref then ()
+  if line = line_ref then printf "%s\n" line
   else skip_to_same_line ic line_ref
 
 let rec get_all_versions ic =
@@ -55,10 +54,11 @@ let print_languages (lang, str) =
   printf "\n"
 
 let lex_sort () =
-  linenum := 0;
-  let ic_lex = open_in "../hd/lang/lexicon.txt" in
+  let ic_lex = open_in "../hd/lang/lex_utf8.txt" in
   let ic_i18n = open_in "i18n" in
   let rec loop line =
+    linenum := 0;
+    seek_in ic_lex 0;
     skip_to_same_line ic_lex ("    " ^ line);
     let list = get_all_versions ic_lex in
     let list = List.sort (fun (l1, _) (l2, _) -> compare l1 l2) list in
