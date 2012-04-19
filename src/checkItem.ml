@@ -524,7 +524,10 @@ value family base error warning ifam fam =
         None (Array.to_list after)
     in
     if is_empty_string (get_fsources fam) then 
-      warning (MissingFamilySources fath)
+      do {
+        warning (MissingFamilySources fath);
+        warning (MissingFamilySources moth)
+      }
     else (); 
   }
 ;
