@@ -217,24 +217,24 @@ sv: %d år sedan
     %s access cancelled for that page
 bg: отменен достъп като %s за тази страница
 cs: pristup pre tuto stranku bol zruseny
-de: Zugang zu dieser Seite gesperrt
+de: Zugang für %s wurde gelöscht
 en: %s access cancelled for that page
 eo: %s aliro ne estas ebla por la paĝo
-es: %s acesso negado para esta página
+es: acceso %s anulado para esta página
 et: %s: ligipääs sellele lehele on keelatud
-fi: %s käyttöoikeus peruutettu tuolle sivulle
+fi: %s pääsy sivulle peruttu
 fr: accès %s annulé pour cette page
 he: דף זה חסום בפניך. הגישה מוגבלת %s דפים
 it: accesso %s annullato per questa pagina
 lv: %s piekļuve šai lapai ir pārtraukta
-nl: toegang tot %s is afgebroken
-no: %s adgang til siden er sperret
+nl: %s toegang gewist voor deze pagina
+no: du har ikke lenger tilgang til denne siden %s
 pl: dostęp %s anulowany dla tej strony
 pt: acesso %s cancelado para aquela página
 ro: %s acces anulat la această pagină
 ru: доступ %s к этой странице запрещён
 sl: %s nima dostopa do te strani
-sv: %s åtkomst ogiltig för den sidan
+sv: du har inte längre tillträde till denna sida %s
 
     %s cousins
 af: neefs en niggies %s geslagte verwyder
@@ -255,7 +255,7 @@ is: skyld í %s lið
 it: cugini di %s grado
 lv: %s brālēni/māsīcas
 nl: neven en nichten in de %s graad
-no: %smenninger
+no: %s søskenbarn
 pl: kuzyni %s stopnia
 pt: primos em %s grau
 ro: veri de gradul %s 
@@ -284,7 +284,7 @@ ca: %s, és %s de
 cs: %s, je %s
 da: %s, er det %s til
 de: %s ist %s von
-en: %s, it is %s of
+en: %s, is %s of
 eo: %s, estas %s de
 es: %s, es %s de
 et: %s, on %s
@@ -312,7 +312,7 @@ ca: %s, serà %s de
 cs: %s, bude %s
 da: %s, er det %s til
 de: %s ist %s von
-en: %s, it will be %s of
+en: %s, will be %s of
 eo: %s, estos %s de
 es: %s, será %s de
 et: %s, on %s
@@ -429,7 +429,7 @@ en: %t is born after the death of his/her mother %t
 eo: %t naskiĝis post la morto de sia patrino %t
 es: %t ha nacido después de la muerte de su madre %t
 et: %t on sündinud pärast oma ema %t surma
-fi: %t on syntynyt äitinsä kuoleman jälkeen
+fi: %t on syntynyt äitinsä kuoleman jälkeen %t
 fr: %t est né(e) après la mort de sa mère %t
 he: %t  נלד(ה) אחרי מוות האם
 is: %t er fædd(ur) eftir andlát móður sinnar %t
@@ -457,7 +457,7 @@ en: %t is born more than 2 years after the death of his/her father %t
 eo: %t naskiĝis pli ol 2 jaroj post la morto de sia patro %t
 es: %t ha nacido más de 2 años después de la muerte de su padre %
 et: %t on sündinud enam kui 2 aastat pärast oma isa %t surma
-fi: %t on syntynyt yli 2 vuotta isänsä kuoleman jälkeen
+fi: %t on syntynyt yli 2 vuotta isänsä kuoleman jälkeen %t
 fr: %t est né(e) plus de 2 ans après la mort de son père %t
 he: %t  נלד(ה) יותר משנתיים אחרי מוות האב
 is: %t er fædd(ur) meira en 2 árum eftir andlát föður síns %t
@@ -598,7 +598,7 @@ en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/A
 eo: tiŝrio/heŝvano/kislevo/teveto/ŝevato/adaro 1/adaro 2/nisano/ijaro/sivano/tamuzo/avo/elulo
 es: tishri/marjeshvan o jeshvan/kislev/tevet/shevat/adar /( + adar sheni, adar bet o ve-adar)/nisan/iyar/sivan/tamuz/av/elul
 et: tishrei/chesvan/kislev/tevet/shvat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
-fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
+fi: Tišrì/Hešván/Kislév/Tevét/Sevat/Adár/Adár II/Nisán/Ijjár/Siván/Tammúz/Ab/Elúl
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: תשרי/ חשון/ כסלו/ טבת/ שבט/ אדר א'/ אדר ב'/ ניסן/ אייר/ סיון/ תמוז/ אב/ אלול
 is: tísrí/marhesvan/kíslev/tebet/sebat/adar 1/adar 2/nísan/ijjar/sívan/tammús/ab/elúl
@@ -647,10 +647,10 @@ zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
     (thousand separator)
 af: &nbsp;
 ar: .
-bg: &#x2009;
+bg: &nbsp;
 br: .
 ca: .
-cs: &#x2009;
+cs: &nbsp;
 da: .
 de: .
 en: ,
@@ -806,7 +806,7 @@ is: tremenningur
 it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
 lv: otrais brālēns/māsīca
 nl: een neef in de tweede generatie/een nicht in de tweede generatie
-no: tremenning
+no: en tremenning
 pl: kuzyn/kuzynka drugiego stopnia
 pt: um primo em 2º grau/uma prima em 2º grau/um(a) primo(a) em 2º grau
 ro: un var de gradul doi
@@ -834,7 +834,7 @@ is: fjórmenningur
 it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
 lv: trešais brālēns/māsīca
 nl: een neef in de derde generatie/een nicht in de derde generatie
-no: firmenning
+no: en firmenning
 pl: kuzyn/kuzynka trzeciego stopnia
 pt: um primo em 3º grau/uma prima em 3º grau/um(a) primo(a) em 3º grau
 ro: un var de gradul trei
@@ -974,7 +974,7 @@ is: systkynabarn
 it: un cugino/una cugina
 lv: brālēns/māsīca
 nl: een neef/een nicht
-no: fetter/kusine
+no: et søskenbarn
 pl: kuzyn/kuzynka
 pt: um primo/uma prima
 ro: un var
@@ -1030,7 +1030,7 @@ is: afkomandi
 it: un discendente/una discendente
 lv: pēcnācējs
 nl: een afstammeling
-no: etterkommer
+no: en etterkommer
 pl: potomek
 pt: um descendente/uma descendente
 ro: un descendent
@@ -1324,7 +1324,7 @@ is: langafi/langamma/langafi og langamma
 it: un bisnonno/una bisnonna/un(a) bisnonno(a)
 lv: vecvectēvs/vecvecmamma/vecvecvecāki
 nl: een overgrootvader/een overgrootmoeder/een overgrootouder
-no: oldefar/oldemor/en av oldeforeldrene
+no: en oldefar/en oldemor/en av oldeforeldrene
 pl: pradziadek/prababka/pradziadkowie
 pt: um bisavô/uma bisavó/um(a) bisavô(ó)
 ro: un strabunic/o strabunica/strabunici
@@ -1352,7 +1352,7 @@ is: barnabarnabarn/barnabarnabarn/barnabarnabarn
 it: un pronipote/una pronipote/un(a) pronipote
 lv: mazmazdēls/mazmazmeita/mazmazbērni
 nl: een achterkleinzoon/een achterkleindochter/een achterkleinkind
-no: oldebarn
+no: et oldebarn
 pl: prawnuk/prawnuczka/prawnuki
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
 ro: stranepot/stranepoata/stranepoti
@@ -1380,7 +1380,7 @@ is: frændi/frænka
 it: un pronipote/una pronipote
 lv: brāļa/māsas mazdēls/mazmeita
 nl: een achterneef/een achternicht
-no: grandnevø/grandniese
+no: en grandnevø/en grandniese
 pl: wnuk brata lub siostry/wnuczka brata lub siostry
 pt: um sobrinho-neto/uma sobrinha-neta
 ro: stranepot/stranepoata/stranepoti
@@ -1436,7 +1436,7 @@ is: hálfbróðir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
 lv: pusbrālis/pusmāsa/pusbērns
 nl: een halfbroer/een halfzuster/een halfbroer of halfzuster
-no: halvbror/halvsøster/halvsøsken
+no: en halvbror/en halvsøster/en halvsøsken
 pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
 pt: um meio-irmão/uma meia-irmã/um(a) meio(a) irmão(ã)
 ro: frate vitreg/sora vitrega/surori sau frati vitregi
@@ -1457,7 +1457,7 @@ en: alias
 eo: aliasa:a:+n
 es: alias
 et: hüüdnimi
-fi: kutsumanimi
+fi: alias
 fr: alias
 he:   שם נוסף
 is: aukanafn
@@ -1486,14 +1486,14 @@ en: alive
 eo: vivanta
 es: no fallecido/no fallecida/no fallecido(a)
 et: elus
-fi: elää
+fi: elossa
 fr: vivant/vivante/vivant(e)
 he:  בחיים
 is: ekki látin(n)
 it: non deceduto/non deceduta/non deceduto(a)
 lv: dzīvs
 nl: niet overleden
-no: ikke død
+no: lever
 pl: osoba żyjąca
 pt: não falecido/não falecida/não falecido(a)
 ro: in viata 
@@ -1510,7 +1510,7 @@ ca: tots els llocs
 cs: všechna místa
 da: alle ophav
 de: alle Orte
-en: all the estates
+en: all the fiefs
 eo: ĉiuj nobelbienoj
 es: todos los lugares
 et: kõik valdused
@@ -1566,7 +1566,7 @@ ca: ordre alfabètic
 cs: v abecedním pořadí
 da: alfabetisk orden
 de: alphabetische Ordnung
-en: alphabetic order
+en: alphabetical order
 eo: alfabeta ordo
 es: orden alfabético
 et: tähestikuline järjekord
@@ -1577,7 +1577,7 @@ is: stafrófsröð
 it: ordine alfabetico
 lv: alfabētiskā kārtībā
 nl: alfabetische volgorde
-no: alfabetisk
+no: alfabetisk rekkefølge
 pl: alfabetycznie
 pt: ordem alfabética
 ro: alfabetica
@@ -1633,7 +1633,7 @@ is: forfaðir
 it: un antenato/un'antenata
 lv: sencis
 nl: een voorouder
-no: ane
+no: en ane
 pl: przodek
 pt: um antepassado/uma antepassada
 ro: un strabun
@@ -1650,7 +1650,7 @@ ca: ascendents
 cs: předkové
 da: forfædre
 de: Vorfahren
-en: ancestors
+en: ancestry
 eo: prapatro
 es: ascendientes
 et: esivanemad
@@ -1776,7 +1776,7 @@ is: merkisdagar
 it: anniversari
 lv: gadadienas
 nl: verjaardagen
-no: årsdager
+no: merkedager
 pl: rocznice
 pt: aniversários
 ro: aniversare
@@ -1797,14 +1797,14 @@ en: anniversaries of dead people
 eo: mortotagaj datrevenoj
 es: aniversarios de las personas fallecidas
 et: surnud inimeste mälestuspäevad
-fi: vainajien muistopäiviä
+fi: kuolleiden vuosipäiviä
 fr: anniversaires des personnes décédées
 he:   ימי שנה למוות
 is: ártíðir
 it: anniversari delle persone decedute
 lv: miršanas piemiņas dienas
 nl: verjaardagen van overleden mensen
-no: årsdager for avdøde personer
+no: merkedager for avdøde personer
 pl: rocznice urodzin i śmierci osób nieżyjących
 pt: aniversários das pessoas falecidas
 ro: aniversare a persoanelor decedate
@@ -1822,7 +1822,7 @@ ca: aniversaris de casament
 cs: výročí sňatků
 da: årsdage for bryllupper
 de: Hochzeitstage
-en: anniversaries of marriage
+en: wedding Anniversaries
 eo: datrevenoj de edziĝo
 es: aniversarios de casamiento
 et: pulma-aastapäevad
@@ -2020,13 +2020,13 @@ en: average age at death
 eo: meza aĝo dum la morto
 es: edad promedio de deceso
 et: keskmine eluiga
-fi: keskimääräinen ikä kuollessa
+fi: keskimääräinen kuolinikä
 fr: âge moyen de décès
 he: גיל פטירה ממוצע
 it: età media di morte
 lv: vidējais dzīves ilgums
 nl: gemiddelde leeftijd bij overlijden
-no: gennemsnitlig alder ved død
+no: gjennomsnittsalder ved død
 pl: średni wiek śmierci
 pt: idade média ao morrer
 ro: virsta media la deces
@@ -2257,7 +2257,7 @@ is: fæðing
 it: nascita
 lv: dzimšana
 nl: geboorte
-no: født
+no: fødsel
 pl: urodzenie
 pt: nascimento
 ro: nastere
@@ -2317,16 +2317,16 @@ da: ramme
 de: Rand
 en: border
 eo: limo
-es: borde
+es: marcos
 et: ääris
-fi: raja
+fi: rajaus
 fr: bordure
 he:  מסגרת
 is: jaðar
 it: bordo
 lv: mala
 nl: omranding
-no: ramme
+no: kantlinje
 pl: granica 
 pt: borda
 ro: bordura
@@ -2373,11 +2373,11 @@ ca: branca/branques
 cs: větev/větve
 da: gren/grene
 de: Ast/Äste
-en: branch/branches
+en: line/lines
 eo: branĉo/branĉoj
 es: rama/ramas
 et: haru/harud
-fi: haara/haaraa
+fi: sukuhaara/sukuhaarat
 fr: branche/branches
 he:   ענף/ ענפים
 is: grein/greinar
@@ -2406,7 +2406,7 @@ eo: entombigo
 es: entierro
 et: matus
 fi: hautaus
-fr: enterrement
+fr: inhumation
 he:  קבורה
 is: útför
 it: sepoltura
@@ -2486,7 +2486,7 @@ ca: anul·lar els lligams GeneWeb
 cs: zrušit spoje GeneWebu
 da: uden GeneWeb-links
 de: GeneWeb-Links entfernen
-en: cancel GeneWeb links
+en: without GeneWeb links
 eo: nuligi GeneWeb-ajn ligilojn
 es: anular los lazos GeneWeb
 et: ilma GeneWebi viideteta
@@ -2514,7 +2514,7 @@ ca: possible pare/possible mare/possibles pares
 cs: pravděpodobný otec/pravděpodobná matka/pravděpodobní rodiče
 da: mulig fader/mulig moder/mulige forældre
 de: möglicher Vater/mögliche Mutter/mögliche Eltern
-en: candidate father/candidate mother/candidate parents
+en: may be father/may be mother/may be parents
 eo: ebla patro/ebla patrino/eblaj gepatroj
 es: padre posible/madre posible/padres posibles
 et: oletatav isa/oletatav ema/oletatavad vanemad
@@ -2632,7 +2632,7 @@ ca: canviar els noms dels fills
 cs: změnit jména dětí
 da: ændre børns navne
 de: Namen der Kinder ändern
-en: change children's names
+en: update name of children
 eo: ŝanĝi nomojn de la idoj
 es: cambiar los nombres de los hijos
 et: muuda laste nimed
@@ -2757,7 +2757,7 @@ is: nafni barns breytt
 it: nomi dei figli cambiati
 lv: bērnu vārdi mainīti
 nl: namen van kinderen gewijzigd
-no: barnas navn er endret
+no: barnas navn endret
 pl: imiona dzieci zostały zmienione
 pt: nomes das crianças foram alterados
 ro: numele copiilor sa schimbat
@@ -2778,7 +2778,7 @@ en: click
 eo: kliku
 es: cliquear
 et: klõpsa
-fi: klikkaa
+fi: napsauta
 fr: cliquez
 he:   לחץ
 is: Ýtið
@@ -2806,7 +2806,7 @@ en: click on "%s"
 eo: kliku "%s"
 es: cliquear "%s"
 et: klõpsa "%s"
-fi: klikkaa "%s"
+fi: napsauta "%s"
 fr: cliquez sur « %s »
 he:   לחץ "%s"
 is: Ýtið "%s"
@@ -2863,7 +2863,7 @@ en: comment
 eo: komento:a:+n
 es: comentario
 et: kommentaar
-fi: huomautus
+fi: kommentti
 fr: commentaire
 he:   הערה
 is: athugasemd
@@ -2888,13 +2888,13 @@ en: connections
 eo: konektoj
 es: conexiones
 et: ühendused
-fi: yhteyksien määrä
+fi: yhteydet
 fr: connexions
 he: קישורים
 it: connessioni
 lv: radniecība
 nl: connecties
-no: forbindelser
+no: koblinger
 pl: połączenie
 pt: conexões
 ro: conexiuni
@@ -3050,7 +3050,7 @@ en: cousins
 eo: gekuzoj
 es: primos
 et: kaimud
-fi: serkuksia
+fi: serkut
 fr: cousins
 he:   בני דודים
 is: frændfólk
@@ -3274,7 +3274,7 @@ en: descendants
 eo: posteuloj
 es: descendientes
 et: järeltulijad
-fi: jälkeläisiä
+fi: jälkeläiset
 fr: descendants
 he:   צאצאים
 is: afkomendur
@@ -3310,7 +3310,7 @@ he:   נפטר/ נפטרה
 is: dó
 it: deceduto/deceduta/deceduto(a)
 lv: miršanas
-nl: gestorven
+nl: overleden
 no: død
 pl: zmarł/zmarła/zgon
 pt: falecido/falecida/falecido(a)
@@ -3329,7 +3329,7 @@ ca: mort jove/morta jove/mort(a) jove
 cs: zemřel mladý/zemřela mladá/zemřeli mladí
 da: død som ung
 de: jung gestorben
-en: died young
+en: dead as an infant
 eo: june mortinta
 es: muerto joven/muerta joven/muerto(a) joven
 et: suri noorelt
@@ -3390,24 +3390,24 @@ bg: да се прекъсне връзката
 cs: odpojene
 da: afbryd
 de: abmelden
-en: disconnect
+en: log out
 eo: diskonekti
 es: desconectar
 et: logi välja
 fi: yhteyskatko
 fr: déconnecter
 he: התנתק
-it: disconnettersi
+it: disconnettere
 lv: atvienot
-nl: ontkoppelen
-no: avbryt
+nl: uitloggen
+no: logg ut
 pl: rozłącz
 pt: desconectar
 ro: deconectare
 ru: отключить
 sk: odpojené
 sl: prekinjeno
-sv: koppla från
+sv: logga ut
 
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
@@ -3428,7 +3428,7 @@ is: sýnt í hlutum/breidd hlutans/skörun hlutanna/öll breiddin
 it: visualizzare per segmenti/larghezza del segmento/sovrapposizione/larghezza totale
 lv: rādīt pa loksnēm/loksnes platums/pārklājums/kopējais platums
 nl: weergave per segment/segmentbreedte/overlapping/totale breedte
-no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
+no: vis med delte sider/sidebredde/overlapping/total bredde
 pl: wyświetl w segmentach/szerokość segmentu/szerokość pokrywania się/szerokość całkowita
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
 ro: resultat segmentat/largimea segmentului/acoperire/largimea totala
@@ -3505,7 +3505,7 @@ en: don't group the common branches together
 eo: ne grupigu la branĉojn komunajn
 es: no agrupar las ramas comunes
 et: ära grupeeri ühiseid harusid
-fi: ei yhteisten sukuhaarojen ryhmittelyä
+fi: älä kokoa yhteisiä sukuhaaroja yhteen
 fr: ne pas regrouper les branches communes
 he:  לא לשלב ענפי משפחה משותפים
 is: ekki slá saman sameiginlegum ættingjum
@@ -3529,7 +3529,7 @@ ca: no se sap
 cs: není známo
 da: ved ikke
 de: unbekannt
-en: don't know
+en: unknown
 eo: ne scias
 es: desconocido
 et: pole teada
@@ -3540,7 +3540,7 @@ is: veit ekki
 it: non si sa
 lv: nav zināms
 nl: onbekend
-no: ukjent
+no: vet ikke
 pl: nie wiadomo
 pt: não sei
 ro: nu stiu
@@ -3617,7 +3617,7 @@ en: engaged%t to
 eo: fianĉigita%t kun/fianĉinigita%t kun
 es: comprometido%t con/comprometida%t con
 et: kihlatud%t
-fi: kihlattu%t
+fi: kihloissa%t kanssa
 fr: fiancé%t avec/fiancée%t avec
 he:   התארס  %t עם/ התארסה  %t עם
 is: trúlofaðist%t
@@ -3669,11 +3669,11 @@ ca: lloc
 cs: místo
 da: ophav
 de: Ort
-en: estate
+en: fief
 eo: nobelbieno
 es: lugar
 et: valdus
-fi: paikka
+fi: tila
 fr: domaine
 he:   מקום
 is: staður
@@ -3784,7 +3784,7 @@ ca: família afegida
 cs: rodina přidána
 da: familie tilføjet
 de: Familie hinzugefügt
-en: family added
+en: family has been added
 eo: familio aldonita
 es: familia agregada
 et: pere lisatud
@@ -3812,7 +3812,7 @@ ca: família esborrada
 cs: rodina smazána
 da: familie slettet
 de: Familie gelöscht
-en: family deleted
+en: family has been deleted
 eo: familio nuligita
 es: familia borrada
 et: pere kustutatud
@@ -3883,7 +3883,7 @@ en: family modified
 eo: familio modifita
 es: familia modificada
 et: pere muudetud
-fi: perhettä muutettu
+fi: perhettä muokattu
 fr: famille modifiée
 he:  משפחה העודכנה
 is: fjölskyldu breytt
@@ -3992,18 +3992,18 @@ ca: àlies del nom
 cs: alias křestního jména
 da: fornavns alias
 de: Vornamen-Alias
-en: first name alias
+en: alternate First Name
 eo: aliasa:a:+n propra:a:+n nomo:a:+n
 es: nombre alias
 et: muu eesnimi
-fi: muu etunimi
+fi: etunimen alias
 fr: prénom alias
 he:  שם פרטי אחר
 is: gælunafn á fornafni
 it: alias del nome
 lv: iesaukas vārds
 nl: alias voor voornaam
-no: alias fornavn
+no: fornavn alias
 pl: alias imienia
 pt: alias do nome
 pt-br: apelido do prenome
@@ -4110,7 +4110,7 @@ ca: per veure els noms en ordre alfabètic
 cs: pro křestní jména v abecedním pořádku
 da: for fornavnene i alfabetisk orden
 de: für die Vornamen in alphabetischer Ordnung
-en: for the first names by alphabetic order
+en: to display the results list by alphabetical order of first names
 eo: por la propraj nomoj laù la alfabeta ordo
 es: por los nombres en orden alfabético
 et: et järjestada eesnimed tähestiku järgi
@@ -4136,17 +4136,17 @@ bg: за списъка по дати на последно изменение
 cs: pre vypis podla datumu poslednej zmeny
 da: for en liste sorteret efter datoen for seneste ændring
 de: für eine, nach dem Datum der letzten Änderung geordnete Liste
-en: for the list ordered by the date of the last modification
+en: to display the results list by date of the last modification
 eo: por la listo ordita laǔ la dato de la lasta modifigo
 es: para la lista ordenada por fecha de la última modificación
 et: sorteerimaks nimekirja viimase muudatuse tegemise aja järgi
-fi: viimeisen muutospäivän mukaan järjestetylle listalle
+fi: viimeisimmän muokkauspäivämäärän mukaan järjestettyä listaa varten
 fr: pour la liste par date de dernière modification
 he: לרשימה, ממוינת על פי תאריך עדכון אחרון
 it: per la lista ordinata secondo la data dell'ultima modifica
 lv: sarakstam, kas sakārtots pēc pēdējo izmaiņu datumiem
 nl: voor de lijst, gesorteerd op datum van de laatste wijziging
-no: for en liste sortert etter siste endringsdato
+no: for listen sortert på siste endringsdato
 pl: aby oglądać listę według daty ostatniej modyfikacji
 pt: para a lista ordenada por data da última modificação
 ro: pentru listă, după data ultimei modificări
@@ -4225,7 +4225,7 @@ en: generation/generations
 eo: generacio:a:+n/generacioj
 es: generación/generaciones
 et: sugupõlv/sugupõlved
-fi: sukupolvi/sukupolvea
+fi: sukupolvi/sukupolvet
 fr: génération/générations
 he:   דור / דורות
 is: kynslóð/kynslóðir
@@ -4310,7 +4310,7 @@ eo: geavoj
 es: abuelos
 et: vanavanemad
 fi: isovanhemmat
-fr: grands-parents
+fr: des grands-parents
 he:   סבים
 is: afi og amma
 it: nonni
@@ -4338,7 +4338,7 @@ eo: gepraavoj
 es: bisabuelos
 et: vanavanavanemad
 fi: iso-isovanhemmat
-fr: arrière-grands-parents
+fr: des arrière-grands-parents
 he:   רב-סבים
 is: langafi og langamma
 it: bisnonni
@@ -4361,7 +4361,7 @@ ca: gregorià/julià/francès/hebreu
 cs: gregoriánský/juliánský/francouzský/židovský
 da: gregoriansk/juliansk/fransk rep./jødisk
 de: Gregorianisch/Julianisch/Französisch/Hebräisch
-en: Gregorian/Julian/French/Hebrew
+en: Gregorian/Julian/French Republican/Hebrew
 eo: gregoriana/juliana/franca/hebra
 es: gregoriano/juliano/francés/hebreo
 et: gregooriuse/juuliuse/prantsuse revolutsiooni/juudi
@@ -4446,7 +4446,7 @@ br: anezho ez eo bet ganet bugale
 ca: fills:
 cs: měli spolu děti
 da: børn
-de: mit
+de: ihre Kinder
 en: with
 eo: havis ido(j)n
 es: con
@@ -4486,7 +4486,7 @@ en: here
 eo: tie
 es: aquí
 et: siia
-fi: tässä
+fi: tästä
 fr: ici
 he:   כאן
 is: hér
@@ -4510,7 +4510,7 @@ ca: ell/ella
 cs: on/ona
 da: han/hun
 de: er/sie
-en: him/her
+en: father or individual/mother or individual
 eo: li/ŝi
 es: él/ella
 et: mees/naine
@@ -4538,9 +4538,9 @@ ca: històric de les actualitzacions
 cs: historie změn
 da: opdateringers historie
 de: Chronik der Aktualisierungen
-en: history of updates
+en: update History
 eo: historio de la ĝisdatigoj
-es: historia de las actualizaciones
+es: historico de las actualizaciones
 et: muudatuste ajalugu
 fi: päivityshistoria
 fr: historique des mises à jour
@@ -4548,7 +4548,7 @@ he:  רשימת העדכונים
 is: uppfærslusaga
 it: riassunto degli aggiornamenti
 lv: labojumu vēsture
-nl: chroniek van wijzigingen
+nl: kroniek van de wijzigingen
 no: oppdateringshistorie
 pl: rejestr zmian
 pt: historial das actualizações
@@ -4578,7 +4578,7 @@ is: lárétt
 it: orizzontalmente
 lv: horizontāli
 nl: horizontaal
-no: horisontal
+no: horisontalt
 pl: w poziomie
 pt: horizontalmente
 ro: orizontal 
@@ -4599,7 +4599,7 @@ en: husband/wife
 eo: edzo/edzino
 es: esposo/esposa
 et: mees/naine
-fi: mies/vaimo
+fi: aviomies/aviovaimo
 fr: époux/épouse
 he:   בעל/ אשה
 is: eiginmaður/eiginkona
@@ -4627,14 +4627,14 @@ en: ident/e-mail/subject
 eo: ident/email/objekto
 es: Nombre/Email/asunto
 et: nimi/e-post/teema
-fi: ident/email/kohde
-fr: nom/courriel/sujet
+fi: nimi/sähköposti/aihe
+fr: nom/e-mail/sujet
 he: ident/email/ נושא
 is: ident/email/um
 it: ident/email/oggetto
 lv: vārds/e-pasts/subjekts
 nl: identiteit/e-mail/onderwerp
-no: ident/email/emne
+no: ident/epost/emne
 pl: ident/email/temat
 pt: ident/email/assunto
 ro: identitate/email/subiect
@@ -4651,7 +4651,7 @@ ca: si títols
 cs: jsou-li tituly
 da: hvis titler
 de: eingeschränkt
-en: if titles
+en: if nobility titles
 eo: se nobeltitoloj
 es: si títulos
 et: kui on tiitlid
@@ -4679,11 +4679,11 @@ ca: imatge esborrada
 cs: obrázek smazán
 da: billede slettet
 de: Bild gelöscht
-en: image deleted
+en: picture has been deleted
 eo: bildo detruita
 es: imagen suprimida
 et: pilt kustutatud
-fi: kuva poistettu
+fi: kuva tuhottu
 fr: image supprimée
 he:  תמונה נמחקה
 is: mynd eytt
@@ -4707,6 +4707,7 @@ ca: imatge/imatges
 cs: obrázek/obrázky
 da: billede/billeder
 de: Bild/Bilder
+en: picture has been uploaded
 en: image/images
 eo: bildo:a:+n/bildoj
 es: imagen/imágenes
@@ -4735,11 +4736,11 @@ ca: imatge rebuda
 cs: obrázek přijat
 da: billede indsat
 de: Bild erhalten
-en: image received
+en: picture has been uploaded
 eo: bildo ricevita
 es: imagen recibida
 et: pilt vastu võetud
-fi: kuva saatu
+fi: kuva vastaanotettu
 fr: image reçue
 he:  התמונה התקבלה
 is: mynd móttekin
@@ -4763,18 +4764,18 @@ ca: incloure els cònjuges que falten
 cs: včetně chybějících manželů/manželek
 da: medtag ukendte ægtefæller
 de: Fehlende Ehegatten einbeziehen
-en: include missing spouses
+en: include unknown spouses
 eo: inkludi mankantajn edz(in)ojn
 es: incluir los cónyuges faltantes
 et: kaasa puuduvad abikaasad
-fi: lue mukaan puuttuvat puolisot
+fi: sisällytä puuttuvat puolisot
 fr: inclure les conjoints manquants
 he:  כלל בני זוג החסרים
 is: meðtaldir makar sem vantar
 it: includere i coniugi mancanti
 lv: ieskaitot iztrūkstošos dzīvesbiedrus
 nl: inclusief ontbrekende echtgenoten
-no: inkluder ukjente maker
+no: inkluder savnede ektefeller
 pl: pokaż brakujących małżonków
 pt: incluir os cônjugues que faltam
 ro: include soti necunoscuti
@@ -4795,14 +4796,14 @@ en: include spouses
 eo: inkludi edz(in)ojn
 es: incluir los cónyuges
 et: kaasa abikaasad
-fi: mukaanlue puolisot
+fi: sisällytä puolisot
 fr: inclure les conjoints
 he:  בלל
 is: meðtaldar makar
 it: includere i coniugi
 lv: ieskaitot dzīvesbiedrus
 nl: inclusief echtgenoten
-no: inkluder maker
+no: inkluder ektefeller
 pl: pokaż małżonków
 pt: incluir os cônjugues
 ro: include soti
@@ -4880,7 +4881,7 @@ en: incorrect request
 eo: nekorekta serĉado
 es: consulta incorrecta
 et: vigane päring
-fi: väärin kysytty
+fi: virheellinen pyyntö
 fr: requête incorrecte
 he:  בקשה שגויה
 is: beiðni ekki rétt
@@ -4916,7 +4917,7 @@ is: jú,
 it: infatti,
 lv: patiešām,
 nl: immers:
-no: felles forfedre,
+no: faktisk
 pl: ściślej biorąc,
 pt: com efeito,
 ro: pentru
@@ -4933,7 +4934,7 @@ ca: índex dels descendents
 cs: seznam potomků
 da: fortegnelse over efterkommerne
 de: Index der Nachkommen
-en: index of the descendants
+en: index of descendants
 eo: indekso de la posteuloj
 es: índice de los descendientes
 et: järglaste loetelu
@@ -4944,7 +4945,7 @@ is: skrá afkomenda
 it: indice dei discendenti
 lv: pēcnācēju saraksts
 nl: index van afstammelingen
-no: etterkommerindeks
+no: fortegnelse over etterkommere
 pl: lista potomków
 pt: índice dos descendentes
 ro: indice de descendenti 
@@ -4961,7 +4962,7 @@ ca: índex dels cònjuges (no descendents)
 cs: seznam manželů/manželek (ne potomků)
 da: fortegnelse over ægtefællerne (ikke efterkommere)
 de: Index der Ehegatten (nicht Nachkommen)
-en: index of the spouses (non descendants)
+en: index of spouses (non descendants)
 eo: indekso de la geedzoj (ne posteuloj)
 es: índice de los cónyuges (no descendientes)
 et: abikaasade loetelu (pole järglased)
@@ -4972,7 +4973,7 @@ is: skrá make (ekki afkomenda)
 it: indice dei coniugi (non discendenti)
 lv: dzīvesbiedru saraksts (bez pēcnācējiem)
 nl: index van echtgenoten (geen afstammelingen)
-no: ektefelleindeks
+no: fortegnelse over ektefeller (ikke etterkommere)
 pl: lista małżonków (nie będących potomkami)
 pt: índice dos cônjuges (não descendentes)
 ro: indice de soti (nedescendenti)
@@ -5018,7 +5019,7 @@ ca: insertar
 cs: vložit
 da: indsæt
 de: einfügen +before
-en: insert
+en: add
 eo: enmeti :a:
 es: insertar
 et: lisa
@@ -5029,7 +5030,7 @@ is: setja inn
 it: inserire
 lv: pievienot :a:
 nl: invoegen +before
-no: skyt inn
+no: sett inn
 pl: dodaj :a:
 pt: inserir
 ro: intercaleaza
@@ -5046,18 +5047,18 @@ ca: inversió realitzada
 cs: prohození dokončeno
 da: rækkefølge omvendt
 de: umgekehrt
-en: inversion done
+en: reversed
 eo: interŝanĝo farita
 es: inversión realizada
 et: vahetatud
-fi: vaihto tehty
+fi: järjestys vaihdettu
 fr: permutation effectuée
 he:  ההחלפה בוצעה
 is: breyting gerð
 it: scambio fatto
 lv: pārslēgšana izpildīta
 nl: verwisseld/veranderd
-no: rekkefølgen er endret
+no: rekkefølgen endret
 pl: kolejność została zmieniona
 pt: inversão efectuada
 pt-br: inversão feita
@@ -5075,18 +5076,18 @@ ca: invertir
 cs: prohodit
 da: omvend rækkefølge
 de: umkehren
-en: invert
+en: reverse
 eo: interŝanĝi :a:
 es: invertir
 et: vaheta
-fi: vaihda
+fi: vaihda järjestys
 fr: permuter
 he:  החלפה
 is: breyta röð
 it: scambiare
 lv: pārslēgt(?)
 nl: verwisselen
-no: bytt rekkefølge
+no: endre rekkefølge
 pl: zmień kolejność
 pt: inverter
 ro: inverseaza
@@ -5103,7 +5104,7 @@ ca: invertir l'ordre de les famílies següents
 cs: prohodit pořadí následujících rodin
 da: omvend rækkefølgen for de følgende familier
 de: die Reihenfolge der folgenden Familien umkehren
-en: invert the order of the following families
+en: reverse the order of the following families
 eo: interŝanĝi la ordon de la familioj sekvantaj
 es: invertir el orden de las familias siguientes
 et: vaheta järgmiste perede järjekord
@@ -5114,7 +5115,7 @@ is: breyta röð eftirfarandi fjölskyldna
 it: scambiare l'ordine delle famiglie seguenti
 lv: pārslēgt sekojošo ģimeņu secību (?)
 nl: verwissel de volgorde van de volgende gezinnen
-no: bytt rekkefølgen til følgende familier
+no: endre rekkefølgen på følgende familier
 pl: czy zmienić kolejność nastepujących małżeństw lub związków?
 pt: inverter a ordem das famílias seguintes
 ro: inverseaza ordinea urmatoarelor familii
@@ -5192,14 +5193,14 @@ en: is a very young parent
 eo: estas treege juna patr(in)o
 es: es un padre demasiado joven
 et: on väga noor lapsevanem
-fi: on kovin nuori isä tai äiti
+fi: on kovin nuori vanhempi
 fr: est vraiment un parent très jeune
 he:  הורה מאוד צעיר
 is: er mjög ungt foreldri
 it: è veramente un genitore molto giovane
 lv: ir ļoti jauns vecāks
 nl: is werkelijk een zeer jonge ouder
-no: er en svært ung far/mor
+no: er en svært ung foreldre
 pl: jest bardzo młodym ojcem/jest bardzo młodą matką
 pt: é um pai demasiado jovem
 pt-br: é um pai jovem demais
@@ -5273,7 +5274,7 @@ ca: dia julià
 cs: juliánský den
 da: juliansk dag
 de: Julianisch
-en: Julian day
+en: Julian Day
 eo: tago juliana
 es: día julian
 et: juuliuse päev
@@ -5312,7 +5313,7 @@ is: lést
 it: ucciso/uccisa/ucciso(a)
 lv: nogalināts(a) (negadījumā)
 nl: gesneuveld
-no: falt
+no: drept i strid
 pl: zginął/zginęła
 pt: morto/morta/morto(a)
 ro: cazut in lupta
@@ -5361,7 +5362,7 @@ en: link
 eo: bindi
 es: reunir
 et: viita
-fi: linkkaa
+fi: linkitä
 fr: relier
 he:  קשר
 is: tengsl
@@ -5385,11 +5386,11 @@ ca: lligam entre
 cs: vztah mezi
 da: slægtskab mellem
 de: Beziehung zwischen
-en: link between
+en: relationship between
 eo: bindo inter
 es: relación entre
 et: nendevaheline seos:
-fi: näiden välinen yhteys
+fi: sukulaisuussuhde henkilöiden välillä
 fr: lien entre
 he:   קשר בין
 is: tengsl á milli
@@ -5415,13 +5416,13 @@ en: linked pages
 eo: linkitaj paĝoj
 es: páginas enlazadas
 et: seotud leheküljed
-fi: linkkisivuja
+fi: linkitettyjä sivuja
 fr: pages liées
 he: דפים מקושרים 
 it: pagine collegate
 lv: saistītās lapas
 nl: verbonden pagina's
-no: linkede sider
+no: koblede sider
 pl: linki
 pt: páginas ligadas
 pt-br: página associadas
@@ -5471,11 +5472,11 @@ ca: presentació extensa
 cs: dlouhý seznam
 da: udvidet rapport
 de: Lange Ansicht
-en: long display
+en: full
 eo: longa afiŝado
 es: presentación extensa
 et: põhjalik raport
-fi: laaja raportti
+fi: laaja esitys
 fr: affichage long
 he:  תצוגה ארוכה
 is: löng skýrsla
@@ -5510,7 +5511,7 @@ is: villa í gagnagrunni: %s er sinn eigin forfaðir/afkomandi
 it: loop nel data-base: %s è antenato(a) di se stesso(a)
 lv: cilpa datu bāzē: %s ir viņa/viņas pašas secis
 nl: circulaire referentie in de database: %s is zijn/haar eigen voorouder
-no: loop i databasen: %s er sin egen etterkommer
+no: loop i databasen: %s er sin egen ane
 pl: pętla w bazie: %s jest swoim własnym przodkiem
 pt: referência circular no banco de dados: %s é seu próprio ancestral
 ro: referinta circulara: %s este propriul stramos 
@@ -5559,7 +5560,7 @@ en: main title
 eo: ĉefa nobeltitolo
 es: título principal
 et: peamine tiitel
-fi: pääarvonimi
+fi: ensisijainen arvonimi
 fr: titre principal
 he:   תואר ראשית
 is: aðal titill
@@ -5587,8 +5588,8 @@ en: male line/female line
 eo: vira linio /virina linio
 es: línea masculina/línea femenina
 et: meesliin/naisliin
-fi: miehen puoleinen linja/naisen puoleinen linja
-fr: lignée agnatique/lignée cognatique
+fi: mieslinja/naislinja
+fr: lignée agnatique (homme)/lignée cognatique (femme)
 he:  קו זכרי / קו נקבי
 is: karllegg/kvenlegg
 it: linea agnatizia/linea cognatizia
@@ -5670,7 +5671,7 @@ ca: casament/casaments
 cs: manželství
 da: giftermål/giftermål
 de: Heirat/Heiraten
-en: marriage/marriages
+en: spouse/spouses
 eo: edziĝo:a:+n/edziĝoj
 es: casamiento/casamientos
 et: abielu/abielud
@@ -5797,7 +5798,7 @@ en: married at age %t
 eo: edziĝinta je la aĝo de %t jaroj
 es: casado a la edad de %t
 et: abiellus %t aastasena
-fi: vihitty %t ikäisenä
+fi: vihitty %t vuoden ikäisenä
 fr: marié(e) à l’âge de %t
 he:  התחתן בגיל %t
 is: giftist %t ára
@@ -5864,7 +5865,7 @@ en: maximum
 eo: maksimume
 es: máximo
 et: maksimaalselt
-fi: korkeintaan
+fi: enintään
 fr: maximum
 he:  מקסימום
 is: hámark
@@ -5927,7 +5928,7 @@ is: sameiningu lokið
 it: fusione terminata
 lv: apvienošana paveikta
 nl: samenvoeging is uitgevoerd
-no: er slått sammen
+no: sammenslåing utført 
 pl: scalenie zostało dokonane
 pt: fusão terminada
 ro: executat fuzionarea
@@ -5976,7 +5977,7 @@ en: message deleted
 eo: mesaĝo nuligita
 es: mensaje borrado
 et: teade kustutatud
-fi: viesti poistettu
+fi: viesti tuhottu
 fr: message supprimé
 he:  הודעה נמחקה
 is: skilaboðum eytt
@@ -6081,7 +6082,7 @@ ca: ascendents que falten
 cs: chybějící předkové
 da: manglende forfædre
 de: fehlende Vorfahren
-en: missing ancestors
+en: unknown ancestors
 eo: mankintaj antaùeuloj
 es: ascendientes que faltan
 et: puuduvad esivanemad
@@ -6109,7 +6110,7 @@ ca: modificar
 cs: změnit :a:
 da: ændre
 de: ändern +before
-en: modify
+en: update
 eo: modifi :a:
 es: modificar
 et: muuda :g:
@@ -6141,7 +6142,7 @@ en: months old
 eo: monatoj
 es: meses
 et: kuud
-fi: kuukautta
+fi: kuukautta vanha
 fr: mois
 he:  חודשים
 is: mánaðar gamall
@@ -6164,7 +6165,7 @@ ca: fase lunar/lluna nova/quart creixent/lluna plena/quart minvant
 cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 da: månefase/nymåne/tiltagende måne/fuldmåne/aftagende måne
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
-en: moon age/new moon/first quarter/full moon/last quarter
+en: number of days after new moon/new moon/first quarter/full moon/last quarter
 eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
 es: edad de la luna/luna nueva/cuarto cresciente/luna llena/cuarto menguante
 et: kuu vanus/noorkuu/esimene veerand/täiskuu/viimane veerand
@@ -6175,7 +6176,7 @@ is: tunglaldur/nýtt tungl/vaxandi tungl/fullt tungl/minnkandi tungl
 it: fasi della luna/luna nuova/primo quarto/luna piena/ultimo quarto
 lv: Mēness fāze/jauns Mēness/pirmais ceturksnis/pilns Mēness/pēdējais ceturksnis
 nl: maansouderdom/nieuwemaan/eerste kwartier/vollemaan/laatste kwartier
-no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
+no: månealder/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
 pt: dia do mês lunar/lua nova/quarto crescente/lua cheia/quarto minguante
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
@@ -6204,7 +6205,7 @@ is: fleiri en %d svör
 it: più di %d risposte
 lv: vairāk nekā %d atbildes
 nl: meer dan %d antwoorden
-no: fler enn %d svar
+no: mer enn %d svar
 pl: więcej niż %d odpowiedzi
 pt: mais de %d respostas
 ro: mai mult de %s raspunsuri
@@ -6255,7 +6256,7 @@ da: navn
 de: Name
 en: name
 eo: nomo
-es: nombre
+es: apellido
 et: nimi
 fi: nimi
 fr: nom
@@ -6293,7 +6294,7 @@ is: nafnið %s er þegar í %tnotkun af%t
 it: nome %s già utilizzato da %tquesta persona%t
 lv: vārds - %s jau ir %tšai personai%t
 nl: de naam %s is al gebruikt door deze persoon%t
-no: navnet %s er alt i bruk av %tdenne personen%t
+no: navn %s brukes allerede av %tdenne personen%t
 pl: imię %s jest już używane przez %ttę osobę%t
 pt: apelido %s já utilizado por %testa pessoa%t
 pt-br: nome %s já utilizado por %testa pessoa%t
@@ -6349,11 +6350,11 @@ ca: navegació amb %t amb referència de "número Sosa"
 cs: prohlížení s %t jako "sosa" referencí
 da: navigering med %t som reference for fortløbende anenummerering (Sosa o.a.)
 de: Navigation mit %t als Proband für die Ahnenkennziffern
-en: navigation with %t as Sosa reference
+en: browse using %t as Family Tree Root
 eo: navigado kun %t kiel Sosa referenco
 es: navegación con %t como referencia de Sosa
 et: navigeerimine kasutades %t Sosa viidet
-fi: navigointi %t Sosa-viitteenä
+fi: navigointi käyttäen %t Sosa-viitteenä
 fr: navigation avec %t comme référence Sosa
 he:  ניוות עם %t כאזכור Sosa
 is: leiðsögn með %t sem Sosa tilvísun
@@ -6450,7 +6451,7 @@ is: engir merkisdagar
 it: nessun anniversario
 lv: nav gadadienas
 nl: geen verjaardag
-no: ingen årsdager
+no: ingen merkedager
 pl: nie ma żadnej rocznicy
 pt: nenhum aniversário
 ro: nu e aniversare
@@ -6478,7 +6479,7 @@ is: engir afmælisdagar
 it: nessun compleanno
 lv: nav dzimšanas dienas
 nl: geen verjaardag
-no: ingen fødselsdager
+no: ingen fødselsdag
 pl: nie ma żadnej rocznicy urodzin
 pt: nenhum aniversário de nascimento
 ro: nu e zi de nastere
@@ -6533,7 +6534,7 @@ ca: cap resposta
 cs: nenalezena shoda
 da: intet resultat af søgningen
 de: keine passenden Einträge
-en: no match
+en: no results found
 eo: neniu respondo
 es: ninguna respuesta
 et: ei leitud
@@ -6572,7 +6573,7 @@ is: óþekkt
 it: senza menzione
 lv: nav minēts
 nl: geen vermelding
-no: ukjent familieforhold
+no: ikke nevnt
 pl: bez wzmianki
 pt: sem informação
 ro: nementionat
@@ -6594,26 +6595,26 @@ br: n'eo ket bet gwiriekaet ar reizh
 ca: no verificar els sexes
 cs: bez kontroly pohlaví
 da: ingen verificering af kønnene
-de: keine Kontrolle des Geschlechts
-en: no sexes check
+de: homosexuelles paar (keine Überprüfung des geschlechts)
+en: same sex couple
 eo: sen kontrolo pri seksoj
-es: sin comprobacion de sexo
+es: pareja homosexual (sin comprobación de sexo)
 et: ära kontrolli sugude sobivust
-fi: ei sukupuolitarkistusta
-fr: pas de vérification des sexes
+fi: samaa sukupuolta oleva pariskunta (sukupuolta ei vahvistettu)
+fr: union homosexuelle (pas de vérification des sexes)
 he:  בלי לוודא מין
 is: ekki athuga kyn
-it: senza verifica del sesso
+it: coppia omosessuale (senza verifica del sesso)
 lv: nepābaudīt dzimumus
-nl: geslacht niet geverifiëerd
-no: ikke kontroll av kjønn
+nl: homokoppel (geen nazicht op de geslachten)
+no: ingen kjønnssjekk
 pl: ta sama płeć
 pt: não verificar os sexos
 ro: fara control de gen
 ru: не проверять пол
 sk: bez kontroly pohlavia
 sl: ne glede na spol
-sv: ingen kontroll av könen
+sv: enkönig vigsel (ingen könskontroll)
 
     not divorced
 af: nie geskei nie
@@ -6627,7 +6628,7 @@ en: not divorced
 eo: ne eksedziĝintaj
 es: no divorciado
 et: pole lahutatud
-fi: eivät eronneita
+fi: eivät ole eronneet
 fr: non divorcés
 he:  לא גרושים
 is: ekki skilin
@@ -6770,7 +6771,7 @@ ca: n-èssim/1er/2on/3er/4rt/5è/6è/7è/8è/9è/10è/11è/12è/13è/14è/15è/1
 cs: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 da: ordenstal/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 de: n-ten/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
-en: nth/1st/2nd/3rd/4th/5th/6th/7th/8th/9th/10th/11th/12th/13th/14th/15th/16th/17th/18th/19th/20th/21st/22nd/23rd/24th/25th/26th/27th/28th/29th/30th/31st/32nd/33rd/34th/35th/36th/37th/38th/39th/40th/41st/42nd/43rd/44th/45th/46th/47th/48th/49th/50th/51st/52nd/53rd/54th/55th/56th/57th/58th/59th/60th/61st/62nd/63rd/64th/65th/66th/67th/68th/69th/70th/71st/72nd/73rd/74th/75th/76th/77th/78th/79th/80th/81st/82nd/83rd/84th/85th/86th/87th/88th/89th/90th/91st/92nd/93rd/94th/95th/96th/97th/98th/99th
+en: rank/1st/2nd/3rd/4th/5th/6th/7th/8th/9th/10th/11th/12th/13th/14th/15th/16th/17th/18th/19th/20th/21st/22nd/23rd/24th/25th/26th/27th/28th/29th/30th/31st/32nd/33rd/34th/35th/36th/37th/38th/39th/40th/41st/42nd/43rd/44th/45th/46th/47th/48th/49th/50th/51st/52nd/53rd/54th/55th/56th/57th/58th/59th/60th/61st/62nd/63rd/64th/65th/66th/67th/68th/69th/70th/71st/72nd/73rd/74th/75th/76th/77th/78th/79th/80th/81st/82nd/83rd/84th/85th/86th/87th/88th/89th/90th/91st/92nd/93rd/94th/95th/96th/97th/98th/99th
 eo: n-a/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
 es: n-ésimo/1ro/2ndo/3ro/4to/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14to/15to/16to/17mo/18vo/19no/20mo/21ro/22ndo/23ro/24to/25to/26to/27mo/28vo/29no/30mo/31ro/32ndo/33ro/34to/35to/36to/37mo/38vo/39no/40mo/41ro/42ndo/43ro/44to/45to/46to/47mo/48vo/49no/50mo/51ro/52ndo/53ro/54to/55to/56to/57mo/58vo/59no/60mo/61ro/62ndo/63ro/64to/65to/66to/67mo/68vo/69no/70mo/71ro/72ndo/73ro/74to/75to/76to/77mo/78vo/79no/80mo/81ro/82ndo/83ro/84to/85to/86to/87mo/88vo/89no/90mo/91ro/92ndo/93ro/94to/95to/96to/97mo/98vo/99na
 et: n-s/esimene/teine/kolmas/neljas/viies/kuues/seitsmes/kaheksas/üheksas/kümnes/üheteistkümnes/kaheteistkümnes/kolmeteistkümnes/neljateistkümnes/viieteistkümnes/kuueteistkümnes/seitsmeteistkümnes/kaheksateistkümnes/üheksateistkümnes/kahekümnes/kahekümne esimene/22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -6885,18 +6886,18 @@ ca: nombre de branques
 cs: počet větví
 da: antal grene
 de: Anzahl der Äste
-en: number of branches
+en: number of lines
 eo: nombro da branĉoj
 es: número de ramas
 et: harude arv
-fi: sukuhaarojen määrä
+fi: Sukuhaarojen lukumäärä
 fr: nombre de branches
 he:  מספר ענפים
 is: fjöldi greina
 it: numero di rami
 lv: zaru skaits
 nl: aantal takken
-no: antall slektsgrener
+no: antall grener
 pl: liczba linii (gałęzi)
 pt: número de ramos
 ro: numar de ramuri
@@ -6910,17 +6911,17 @@ bg: брой на живите лица:
 cs: pocet zijucich osob:
 da: antal nulevende personer:
 de: Anzahl der lebenden Personen:
-en: number of living persons:
+en: number of living individuals:
 eo: nombro de la vivantaj personoj:
 es: número de personas vivas:
 et: elavaid inimesi:
-fi: elossa olevien henkilöiden lukumäärä:
+fi: elossa olevien lukumäärä:
 fr: nombre de personnes vivantes :
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi:
 lv: dzīvo personu skaits:
 nl: aantal personen in leven:
-no: antall nålevende personer:
+no: antall personer i live:
 pl: liczba osób żyjących:
 pt: número de pessoas vivas :
 ro: numarul de persoane in viata:
@@ -6987,7 +6988,7 @@ is: af %s kynslóð
 it: della %s generazione
 lv: %s-ā paaudzē
 nl: van de %s generatie
-no: av %s generasjon
+no: av den %s generasjon
 pl: w %s. pokoleniu
 pt: da %s geração
 ro: de generatia %s
@@ -7005,7 +7006,7 @@ ca: el
 cs: dne
 da: den
 de: am
-en: on
+en: 
 eo: la
 es: el
 et: :i:
@@ -7066,7 +7067,7 @@ en: one month old
 eo: unu monato
 es: un mes
 et: üks kuu
-fi: kuukauden ikäisenä
+fi: kuukauden ikäinen
 fr: un mois
 he:  בן/בת חודש
 is: mánaðar gamalt
@@ -7094,7 +7095,7 @@ en: one year old
 eo: unu jaro
 es: un año
 et: üks aasta
-fi: vuoden ikäisenä
+fi: vuoden ikäinen
 fr: un an
 he:  בן/בת שנה
 is: ársgamalt
@@ -7304,14 +7305,14 @@ en: person added
 eo: persono aldonita
 es: persona agregada
 et: isik lisatud
-fi: lisätty henkilö
+fi: henkilö lisätty
 fr: personne ajoutée
 he:  אדם הוסף
 is: einstaklingi bætt við
 it: persona aggiunta
 lv: persona pievienota
 nl: persoon toegevoegd
-no: personen er opprettet
+no: person opprettet
 pl: osoba została dodana
 pt: pessoa acrescentada
 ro: persoana adaugata
@@ -7328,18 +7329,18 @@ ca: persona esborrada
 cs: osoba smazána
 da: person slettet
 de: Person gelöscht
-en: person deleted
+en: individual has been deleted
 eo: persono nuligita
 es: persona borrada
 et: isik kustutatud
-fi: poistettu henkilö
+fi: henkilön tiedot tuhottu
 fr: personne supprimée
 he:  אדם נמחק
 is: einstaklingi eytt
 it: persona cancellata
 lv: persona izdzēsta
 nl: persoon verwijderd
-no: personen er fjernet
+no: person fjernet
 pl: osoba została usunieta
 pt: pessoa suprimida
 ro: persoana suprimata
@@ -7367,7 +7368,7 @@ is: einstaklingi breytt
 it: persona modificata
 lv: personas dati mainīti
 nl: persoon veranderd
-no: personen er endret
+no: person endret
 pl: dane poniższej osoby zostały zaktualizowane
 pt: pessoa modificada
 ro: persoana modificata
@@ -7384,7 +7385,7 @@ ca: persona/persones
 cs: osoba/osob
 da: person/personer
 de: Person/Personen
-en: person/persons
+en: individual/individuals
 eo: persono:a:+n/personoj:a:+n
 es: persona/personas
 et: isik/isiku@(c?t:d)
@@ -7490,7 +7491,7 @@ da: befolkningspyramide
 de: Alterspyramide
 en: population pyramid
 eo: laǔaĝa piramido
-es: pirámide de población
+es: gráfico por edades
 et: rahvastikupüramiid
 fi: väestöpyramidi
 fr: pyramide des âges
@@ -7510,25 +7511,25 @@ sv: befolkningspyramid
     possible duplications
 bg: възможни дублирания
 cs: mozna duplikacia
-de: mögliche Duplikate
+de: mögliche  Doppel
 en: possible duplications
 eo: ebla duobligo
 es: posible duplicación
 et: võimalikud duplikaadid
-fi: mahdollisia kaksoiskappaleita
+fi: mahdolliset kaksoiskappaleet
 fr: doublons éventuels
 he: ייתכנו כפילויות
-it: possibile doppione
+it: eventuali doppioni
 lv: iespējama dublēšanās
-nl: mogelijke dubbele vermeldingen
-no: mulig dublett
+nl: eventuele dubbels
+no: mulige dubletter
 pl: możliwe duplikaty
 pt: eventual duplicidade
 ro: posibile dublete
 ru: возможные дубликаты
 sk: možné duplikácie
 sl: možno podvajanje
-sv: eventuellt dubblett
+sv: möjliga dubbletter
 
     possibly (date)
 af: miskien
@@ -7549,7 +7550,7 @@ is: kannski
 it: forse
 lv: iespējams
 nl: mogelijkerwijze
-no: kanskje
+no: muligens
 pl: prawdopodobnie
 pt: possivelmente
 ro: poate
@@ -7678,7 +7679,7 @@ ca: nom públic
 cs: veřejné jméno
 da: officielt navn
 de: öffentlicher Name
-en: public name
+en: nickname
 eo: publika nomo
 es: sobrenombre
 et: esindusnimi
@@ -7706,18 +7707,18 @@ ca: qualificatiu
 cs: přívlastek
 da: tilnavn
 de: Beiname
-en: qualifier
+en: title
 eo: kromnomo:a:+n
 es: calificativo
 et: lisanimi
 fi: lisänimi
-fr: qualificatif
+fr: sobriquet
 he:  כינוי
 is: uppnefni
 it: soprannome
 lv: paskaidrojuma vārds
 nl: bijnaam
-no: tilnavn
+no: kallenavn
 pl: przydomek
 pt: alcunha
 ro: calificativ
@@ -7745,7 +7746,7 @@ is: viðurkendur sonur/viðurkend dóttir/viðurkent barn
 it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
 lv: atzīts dēls/māsa/bērns (?)
 nl: erkende zoon/erkende dochter/erkend kind
-no: bekreftet sønn/bekreftet datter/bekreftet barn
+no: bekrefteter far/bekrefteter mor/bekrefter foreldre
 pl: uznany syn/uznana córka/uznane dziecko
 pt: filho reconhecido/filha reconhecida/filhos reconhecidos
 ro: fiu recunoscut/fica recunoscuta/copil recunoscut
@@ -7762,7 +7763,7 @@ ca: pare reconegut/mare reconeguda/pares reconeguts
 cs: uznaný otec/uznaná matka/uznaní rodiče
 da: sig vedkendende fader/sig vedkendende moder/sig vedkendende forældre
 de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
-en: recognizing father/recognizing mother/recognizing parents
+en: recognized by father/recognized by mother/recognized by
 eo: agnoskinta patro/agnoskinta patrino/agnoskintaj gepatroj
 es: padre reconocido/madre reconocida/padres reconocidos
 et: omakstunnistanud isa/omakstunnistanud ema/omakstunnistanud vanemad
@@ -7790,18 +7791,18 @@ ca: relació/relacions
 cs: vztah/vztahy
 da: forbindelse/forbindelser
 de: Beziehung/Beziehungen
-en: relation/relations
+en: relationship/relationships
 eo: konato:a:+n/konatoj
 es: relación/relaciones
 et: suhe/suhted
-fi: sukulaisuus/sukulaisuutta
+fi: sukulaisuus/sukulaisuudet
 fr: relation/relations
 he:  יחסים
 is: skyldleiki/skyldleikar
 it: relazione/relazioni
 lv: saistība/saistības
 nl: verwantschap/verwantschappen
-no: forbindelse/forbindelser
+no: relasjon/relasjoner
 pl: inne więzy
 pt: relação/relações
 ro: relatie/relatii
@@ -7875,7 +7876,7 @@ ca: grau de parentesc/graus de parentesc
 cs: vztah/vztahy
 da: slægtskabsforbindelse/slægtskabsforbindelser
 de: Verwandtschaft/Verwandtschaften
-en: relationship link/relationship links
+en: relationship/relationships
 eo: ligo de parenceco/ligoj de parenceco
 es: grado de parentesco/grados de parentesco
 et: sugulussuhe/sugulussuhet
@@ -7914,7 +7915,7 @@ is: tengjast með giftingu
 it: parentele per matrimonio
 lv: precību saites
 nl: verwant door huwelijk
-no: slektskap gjennom gifte
+no: relasjon gjennom ekteskap
 pl: powinowactwo
 pt: relações por casamento
 ro: relatie prin mariaj 
@@ -7962,7 +7963,7 @@ en: search/case sensitive
 eo: search/dependema de la grandaj-malgrandaj literoj
 es: buscar/fijarse en mayúsculas&#047;menúsculas
 et: otsi/tõstutundlik
-fi: haku/tunnistaa merkkikoon
+fi: haku/merkkikokoriippuvainen
 fr: rechercher/sensible à la casse
 he: חיפוש/case sensitive
 it: ricerca/sensibile a maiuscole e minuscole
@@ -8025,7 +8026,7 @@ is: sjá að ofan
 it: vedi sopra
 lv: skatīt iepriekš
 nl: zie hierboven
-no: se foran
+no: se ovenfor
 pl: zobacz wyżej
 pt: ver encima
 pt-br: ver acima
@@ -8047,14 +8048,14 @@ en: see further
 eo: vidu ĉi-malsupre
 es: ver a continuación
 et: vaata altpoolt
-fi: katso alla
+fi: katso tarkemmin
 fr: voir plus loin
 he:  כדלקמן
 is: sjá nánar
 it: vedi di seguito
 lv: skatīt tālāk
 nl: zie verder
-no: se senere
+no: se videre
 pl: zobacz niżej
 pt: ver a continuação
 ro: vezi urmatoarea
@@ -8071,7 +8072,7 @@ ca: enviar
 cs: odeslat
 da: indsæt
 de: senden +before
-en: send
+en: updload
 eo: sendi :a:
 es: enviar
 et: saada
@@ -8109,7 +8110,7 @@ he:  נפרדו
 is: skilin
 it: separati
 lv: nedzīvo kopā
-nl: gescheiden van tafel en bed
+nl: gescheiden
 no: separert
 pl: w separacji
 pt: separados
@@ -8187,7 +8188,7 @@ en: short display
 eo: mallonga afiŝado
 es: presentación corta
 et: lühiraport
-fi: lyhyt raportti
+fi: lyhyt esitys
 fr: affichage court
 he:  תצוגה מקוצרת
 is: stutt sýn
@@ -8222,7 +8223,7 @@ is: stysta leið
 it: legame più diretto
 lv: īsākais ceļš
 nl: kortste weg
-no: korteste gren
+no: korteste vei
 pl: najkrótsza linia
 pt: caminho mais curto
 ro: drumul cel mai scurt
@@ -8250,7 +8251,7 @@ is: ætti að vera kvenkyns
 it: dovrebbe essere di sesso femminile
 lv: jābūt sievietei
 nl: moet vrouwelijk zijn
-no: kjønn skulle vært kvinne
+no: kjønn burde være kvinne
 pl: powinna być kobietą
 pt: teria que ser de sexo feminino
 ro: ar trebui sa fie feminin
@@ -8278,7 +8279,7 @@ is: ætti að vera karlkyns
 it: dovrebbe essere di sesso maschile
 lv: jābūt vīrietim
 nl: moet mannelijk zijn
-no: kjønn skulle vært mann
+no: kjønn burde være mann
 pl: powinna być mężczyzną
 pt: teria que ser de sexo masculino
 ro: ar trebui sa fie masculin
@@ -8324,7 +8325,7 @@ en: since the last click
 eo: depost la lasta kliko
 es: desde el último click
 et: alates viimasest klõpsust
-fi: viime napsautuksen jälkeen
+fi: edellisestä napsautuksesta
 fr: depuis le dernier clic
 he: מאז הלחיצה האחרונה
 it: dall'ultimo click
@@ -8431,7 +8432,7 @@ ca: especificar
 cs: zvol
 da: præciser
 de: Auswahl der
-en: specify
+en: select
 eo: specifu :a:
 es: especificar
 et: täpsusta
@@ -8464,14 +8465,14 @@ en: spouses not included
 eo: geedzoj ne inkluzivitaj
 es: cónyuges no incluidos
 et: ilma abikaasadeta
-fi: puolisot poislukien
+fi: puolisot ei sisällytetty
 fr: conjoints non compris
 he:  לא כולל בני זוג
 is: undanskildir makar
 it: coniugi esclusi
 lv: laulātie nav ietverti
 nl: zonder echtgenoten
-no: maker er utelatt
+no: ektefeller utelatt
 pl: bez wliczania małżonków
 pt: cônjuges não incluídos
 ro: conjugati exclusi
@@ -8488,7 +8489,7 @@ ca: començant per
 cs: počínaje
 da: som begynder med
 de: beginnend mit
-en: starting with
+en: begin with
 eo: komencante kun
 es: comenzando con
 et: algusega
@@ -8550,7 +8551,7 @@ ca: nom de casa
 cs: alias příjmení
 da: efternavns alias
 de: Nachnamen-Alias
-en: surname alias
+en: alternate Surname
 eo: familia:a:+n nomo:a:+n aliasa:a:+n
 es: apellido alias
 et: muu perekonnanimi
@@ -8730,14 +8731,14 @@ en: the anniversary
 eo: la datreveno
 es: el aniversario
 et: aastapäev
-fi: merkkipäivä
+fi: vuosipäivä
 fr: l’anniversaire
 he:  יום השנה
 is: afmælisdagar
 it: l'anniversario
 lv: gadadiena
 nl: de verjaardag
-no: årsdagen
+no: merkedagen
 pl: rocznica
 pt: o aniversário
 ro: aniversarea
@@ -8754,7 +8755,7 @@ ca: l'aniversari de bodes
 cs: výročí svatby
 da: bryllupsdagen
 de: der Hochzeitstag
-en: the anniversary of marriage
+en: the wedding anniversary
 eo: la datreveno de edziĝo
 es: el aniversario de casamiento
 et: pulma-aastapäev
@@ -8786,14 +8787,14 @@ en: the base has changed; do "back", "reload", and refill the form
 eo: la bazo ŝangis; faru "malantaŭe", "reŝargi", kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud: mine tagasi, värskenda lehekülg ja täida vorm uuesti
-fi: tietokanta on muuttunut; peruuta, lataa uudelleen ja täytä kaavake
+fi: tietokanta on muuttunut; valitse "takaisin", "lataa uudelleen" ja täytä lomake uudelleen
 fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
 he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerðu "Back", "Reload", og settu aftur í formið
 it: la base è cambiata; fate "back", "reload" e rifate la scheda
 lv: datu bāzē ir veiktas izmaiņas; nospiediet "back", "reload", un aizpildiet formu
 nl: het bestand is veranderd; klik "back", "reload" en vul de details nogmaals in
-no: databasen er endret; klikk tilbake og oppfrisk, og fyll ut formularet på nytt
+no: databasen er endret; gå tilbake, klikk "oppfrisk", og fyll ut formularet på nytt
 pl: w bazie zostały dokonane zmiany; kliknij "wstecz" i "odśwież", a następnie ponownie wprowadź dane
 pt: a base mudou: fazer "back", "reload" e preencher novamente o formulário
 ro: basa de date a fost schimbata; mergi inapoi, ceri formularul si intra datele din nou
@@ -9104,7 +9105,7 @@ is: skjalið er læst í augnablikinu, reyndu aftur
 it: l'archivio è temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
 lv: datne pagaidām ir slēgta: lūdzu mēģiniet vēlreiz
 nl: het bestand is tijdelijk niet toegankelijk: probeer later weer eens
-no: filen er midlertidig stengt: vent og prøv igjen
+no: filen er midlertidig låst: Vennligst vent og prøv igjen
 pl: plik jest chwilowo niedostępny; spróbuj później, ewentualnie chwilę odczekaj
 pt: a base está temporariamente inacessível: por favor tente novamente. Se não funcionar, espere um momento
 ro: fisierul este blocat; incearca mai tirziu din nou
@@ -9182,7 +9183,7 @@ eo: la geavoj
 es: los abuelos
 et: vanavanemad
 fi: isovanhemmat
-fr: grands-parents
+fr: les grands-parents
 he:  הסבים
 is: afi og amma
 it: i nonni
@@ -9209,7 +9210,7 @@ en: the great-grandchildren
 eo: la gepranepoj
 es: los bisnietos
 et: lastelastelapsed
-fi: lasten-lastenlapset
+fi: lastenlastenlapset
 fr: les arrière-petits-enfants
 he:  הנינים
 is: barnabarnabörnin
@@ -9237,7 +9238,7 @@ en: the great-grandparents
 eo: la gepraavoj
 es: los bisabuelos
 et: vanavanavanemad
-fi: iso-isovanhemmat
+fi: isoisovanhemmat
 fr: les arrière-grands-parents
 he:  הורים השילשים
 is: langafi og langamma
@@ -9261,12 +9262,12 @@ ca: els %d naixements més recents
 cs: posledních %d narození
 da: de seneste %d fødsler
 de: die letzten %d Geburten
-en: the latest %d births
+en: latest %d births
 eo: la lastaj %d naskiĝoj
-es: los %d nacimientos más recientes
+es: los %d últimos nacimientos 
 et: viimased %d sündi
 fi: viimeiset %d syntymää
-fr: les %d dernières naissances
+fr: %d dernières naissances
 he: %d הלידות האחרונות
 is: síðustu %d fæðingar
 it: le ultime %d nascite
@@ -9294,11 +9295,11 @@ ca: els %d matrimonis més recents
 cs: posledních %d svateb
 da: de seneste %d bryllupper
 de: die letzten %d Heiraten
-en: the latest %d marriages
+en: latest %d marriages
 eo: la lastaj %d edziĝoj
-es: los %d casamientos más recientes
+es: los %d últimos casamientos 
 et: viimased %d pulma
-fi: viime %d naimisiinmenoa
+fi: viimeiset %d avioliittoa
 fr: les %d derniers mariages
 he: %d הנישואים האחרונים
 is: síðast giftist %d
@@ -9323,13 +9324,13 @@ fr: les %d derniers mariages enregistrés
 af: die laaste %t afsterwes
 bg: последните %t умирания
 br: ar %t tremenvan diwezhañ
-ca: les %t defuncions més recents
+ca: les %t defunciones 
 cs: posledních %t úmrtí
 da: de seneste %t dødsfald
 de: die letzten %t Ableben
-en: the latest %t deaths
+en: latest %t deaths
 eo: la lastaj %t mortoj
-es: las %t muertes más recientes
+es: las %t últimas defunciones
 et: viimased %t surma
 fi: viimeiset %t kuolemantapausta
 fr: les %t derniers décès
@@ -9428,7 +9429,7 @@ is: maki
 it: lo sposo/la sposa
 lv: laulātais
 nl: echtgenoot/echtgenote
-no: maken
+no: ektefellen
 pl: mąż/żona
 pt: o marido/a esposa
 ro: sotul/sotia
@@ -9445,7 +9446,7 @@ ca: tot el llistat
 cs: kompletní seznam
 da: hele listen
 de: die ganze Liste
-en: the whole list
+en: full list
 eo: la tuta tabelo
 es: toda la lista
 et: kogu nimekiri
@@ -9501,14 +9502,14 @@ en: title/titles
 eo: nobeltitolo:a:+n/nobeltitoloj:a:+n
 es: título/títulos
 et: tiitel/tiitlid
-fi: arvo/arvot
+fi: arvonimi/arvonimet
 fr: titre/titres
 he:  תואר/ תארים
 is: titill/titlar
 it: titolo/titoli
 lv: tituls/tituli
 nl: titel/titels
-no: titel/titler
+no: tittel/titler
 pl: tytuł/tytuły
 pt: título/títulos
 ro: titlu/titluri
@@ -9536,7 +9537,7 @@ is: til að bæta barni við fjölskyldu, notaðu "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
 lv: lai pievienotu bērnu ģimenei, lietojiet "%s"
 nl: gebruik "%s" om een kind aan een gezin toe te voegen
-no: for å tilføye et barn til en familie, bruk "%s"
+no: for å knytte et barn til en familie, bruk "%s"
 pl: aby dodać dziecko do pary rodziców użyj "%s"
 pt: para acrescentar um filho a uma família utilizar "%s"
 ro: pentru a adauga un copil utilizeaza "%s"
@@ -9754,7 +9755,7 @@ en: to the great-grandchildren
 eo: ĝis la gepranepoj
 es: hasta los bisnietos
 et: lastelastelasteni
-fi: lapsen-lapsenlapsiin
+fi: lapsenlapsenlapsiin
 fr: jusqu’aux arrière-petits-enfants
 he:  עד הנינים
 is: til barnabarnabarna
@@ -9782,7 +9783,7 @@ en: to the great-grandparents
 eo: ĝis la gepraavoj
 es: hasta los bisabuelos
 et: vanavanavanemateni
-fi: iso-isovanhempiin
+fi: isoisovanhempiin
 fr: jusqu’aux arrière-grands-parents
 he:  עד ההורים השילשים
 is: til langlangafa og ömmu
@@ -9886,12 +9887,16 @@ sv: träd
 bg: опитайте отново
 da: prøv igen
 de: Nocheinmal versuchen
-en: try again
+en: retry
+es: volver a intentar
 et: proovi uuesti
 fi: yritä uudestaan
 fr: réessayer
-nl: opnieuw proberen
+it: riprovare
+nl: terug proberen
+no: prøv igjen
 sk: skús znovu
+sv: försöka igen
 
     uncles and aunts
 af: ooms en tantes
@@ -9933,7 +9938,7 @@ en: undefined sex for %t
 eo: sekso nedifinita por %t
 es: sexo no definido por %t
 et: %t sugu on määratlemata
-fi: %t:n sukupuoli tuntematon
+fi: henkilön %t sukupuoli tuntematon
 fr: sexe indéfini pour %t
 he:  המין של %t לא מוגדר
 is: kyn ekki skilgreint fyrir %t
@@ -10024,7 +10029,7 @@ is: uppfæra
 it: aggiornamento
 lv: informācijas papildināšana
 nl: actualiseer
-no: oppdatere
+no: oppdater
 pl: aktualizacja
 pt: actualizar
 pt-br: atualizar
@@ -10075,7 +10080,7 @@ en: use "link" instead of "create"
 eo: uzu "bindi" anstataù ol "krei"
 es: utilise "reunir" en lugar de "crear"
 et: vali "loo" asemel "viita"
-fi: käytä "luo" toiminnon "liitä" sijaan
+fi: käytä toimintoa "linkitä" toiminnon "luo" sijaan
 fr: utilisez « relier » au lieu de « créer »
 he:  להשתמש ב-"קשר" במקום "עשה"
 is: notaðu "tengja" í stað "búa til"
@@ -10117,7 +10122,7 @@ ca: validar/eliminar
 cs: ovìøit/výmaz
 da: valider/slet
 de: Bestätigen/Verwerfen
-en: validate/delete
+en: submit/delete
 es: validar/borrar
 et: kinnita/kustuta
 fi: tarkista/hylkää
@@ -10137,10 +10142,17 @@ en: version
 fr: version
 
     view source
+de: siehe Quelle
 en: view source
+es: ver fuente
 et: vaata lähteteksti
+fi: katso lähde
 fr: voir source
+it: vedere fonte
+nl: zie bron
+no: se kilde
 sk: pozri zdroj
+sv: se källa
 
     visualize/show/hide/summary
 bg: да се визуализира/да се покаже/да се скрие/резюме
@@ -10148,14 +10160,14 @@ ca: visualtza/mostra/sumari
 cs: zviditelnit/ukázat/souhrnný
 da: visualiser/vis/gem/opsummere
 de: veranschaulichen/einblenden/ausblenden/Zusammenfassung
-en: visualize/show/hide/summary
+en: view/display/hide/summary
 es: visualizar/mostrar/ocultar/resumen
 et: kuva/näita/peida/kokkuvõte
 fi: kuvaa/näytä/piilota/yhteenveto
 fr: visualiser/afficher/masquer/sommaire
 it: visualizza/mostra/nascondi/riassunto
 nl: visualiseren/tonen/verbergen/samenvatting
-no: visualiser/vis/skjul/summert
+no: visualiser/vis/skjul/summarisk
 pl: wyświetl/pokaż/ukryj/podsumowanie
 pt: visualizar/mostrar/esconder/sumário
 ro: vizualizeaza/arata/ascunde/sumar
@@ -10282,10 +10294,10 @@ br: strobineller/strobinellerien/mignon/mignon/exterior
 ca: administrador/administrador/amic/amic/exterior
 cs: wizard/wizards/friend/friends/exterior
 da: bidragyder/bidragydere/betroet/betroet/exterior
-de: Wizard/Wizards/Freund/Freunde/exterior
+de: Meister/Meisters/Freund/Freunde/exterior
 en: wizard/wizards/friend/friends/exterior
 eo: sorĉisto/sorĉistoj/amiko/amikoj/exterior
-es: brujo/brujos/amigo/amigos/exterior
+es: mago/magos/amigo/amigos/exterior
 et: teadmamees/teadmamehed/sõber/sõbrad/tavakasutaja
 fi: velho/velho/valittu/valittu/exterior
 fr: magicien/magiciens/ami/amis/extérieur
@@ -10293,8 +10305,8 @@ he:  כגאון / כגאון / מיוחסת / מיוחסת /exterior
 is: uppfæra/uppfæra/vinur/vinur/exterior
 it: wizard/wizard/amico/amico/exterior
 lv: wizard/wizard/friend/friends/exterior
-nl: beheerder/beheerder/vriend/vrienden/exterior
-no: Oppdaterings/Oppdaterings/venner/venner/exterior
+nl: beheerder/beheerder/gast/gast/exterior
+no: administrator/administratorer/venn/venner/eksteriør
 pl: wizard/wizard/friend/friends/exterior
 pt: feiticeiro/feiticeiros/amigo/amigos/exterior
 ro: magician/magician/amic/amic/exterior
@@ -10322,7 +10334,7 @@ is: myndi verða sinn eigin forfaðir
 it: sarebbe antenato(a) di se stesso(a)
 lv: varētu būt viņa/viņas priekštecis
 nl: zou zijn/haar eigen voorouder zijn
-no: ville være sin egen etterkommer
+no: ville være sin egen ane
 pl: byłby/byłaby swoim własnym przodkiem
 pt: seria seu própio antepassado
 ro: ar fi propriul stramos
@@ -10380,7 +10392,7 @@ is: ára
 it: anni
 lv: gadi
 nl: jaar oud
-no: år gammel
+no: år
 pl: lat
 pt: anos
 ro: ani
@@ -10419,11 +10431,17 @@ sl: da/ne
 sv: J/N
 
     you are visible/you are not visible
-de: du bist sichtbar/du bist nicht sichtbar
-en: you are visible/you are not visible
+de: sie sind sichtbar/sie sind unsichtbar
+en: you are visible/you are invisible
+es: es visible/no es visible
 et: sa oled nähtav/sa ei ole nähtav
+fi: olet näkyvissä/olet nakymaton
 fr: vous êtes visible/vous n’êtes pas visible
+it: sei visibile/sei invisibile
+nl: u bent zichtbaar / u bent niet zichbaar
+no: du er synlig/du er usynlig
 ro: tu esti vizibil/tu nu esti vizibil
+sv: du är synlig/du är ej synlig
 
     you must first merge
 af: jy moet eers saamvoeg
@@ -10494,7 +10512,7 @@ fi: viestisi odottaa tarkistusta
 fr: votre message est en attente de validation
 it: il vostro messaggio è in attesa di convalida
 nl: uw bericht wacht op validatie
-no: Beskjeden din avventer bekreftelse
+no: Beskjeden din venter på validering
 pl: twoja wiadomość czeka na potwierdzenie
 pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
