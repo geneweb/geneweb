@@ -321,14 +321,20 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
-  | MissingFamilySources p ->
+  | MissingFamilySources fath moth ->
       Wserver.wprint
-        (fcapitale (ftransl conf "missing family sources for %t"))
-        (fun _ -> print_someone_strong conf base p)
-  | MissingIndividualSources p ->
+        (fcapitale (ftransl conf "missing family sources for %t and %t"))
+        (fun _ -> print_someone_strong conf base fath)
+        (fun _ -> print_someone_strong conf base moth)
+  | MissingIndividualSources p -> ()
+      (* On n'affiche pas les sources manquantes pour l'individu,    *)
+      (* car il peut très vite en manquer beaucoup, et l'information *)
+      (* serait alors noyée. Le code est laissé au cas où...         *)
+      (*
       Wserver.wprint
         (fcapitale (ftransl conf "missing individual sources for %t"))
         (fun _ -> print_someone_strong conf base p)
+      *)
   | MotherDeadAfterChildBirth mother child ->
       Wserver.wprint
         (ftransl conf "%t is born after the death of his/her mother %t")

@@ -78,14 +78,20 @@ value print_base_warning oc base =
       fprintf oc "%s\n" (designation base p);
       fprintf oc "marriage before his/her birth\n"
     }
-  | MissingFamilySources p -> do {
+  | MissingFamilySources p _ -> do {
       fprintf oc "%s\n" (designation base p);
       fprintf oc "family sources missing\n"
     }
-  | MissingIndividualSources p -> do {
-      fprintf oc "%s\n" (designation base p);
-      fprintf oc "individual sources missing\n"
-    }
+  | MissingIndividualSources p -> ()
+      (* On n'affiche pas les sources manquantes pour l'individu,    *)
+      (* car il peut très vite en manquer beaucoup, et l'information *)
+      (* serait alors noyée. Le code est laissé au cas où...         *)
+      (*
+      do {
+        fprintf oc "%s\n" (designation base p);
+        fprintf oc "individual sources missing\n"
+      }
+      *)
   | MotherDeadAfterChildBirth mother child ->
       fprintf oc "%s\n  is born after the death of his/her mother\n%s\n"
         (designation base child) (designation base mother)

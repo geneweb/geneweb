@@ -6102,9 +6102,9 @@ sk: chýbajúci predkovia
 sl: manjkajoči predniki
 sv: anor som saknas
 
-    missing family sources for %t
-en: missing family sources for %t
-fr: sources familiale manquantes pour %t
+    missing family sources for %t and %t
+en: missing family sources for %t and %t
+fr: sources familiale manquantes pour %t et %t
 
     missing individual sources for %t
 en: missing individual sources for %t

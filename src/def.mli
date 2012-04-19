@@ -154,7 +154,7 @@ type warning 'person 'descend 'title =
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
   | MissingIndividualSources of 'person
-  | MissingFamilySources of 'person
+  | MissingFamilySources of 'person and 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
   | ParentTooYoung of 'person and dmy
