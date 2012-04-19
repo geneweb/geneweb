@@ -475,7 +475,9 @@ value child_has_sex warning child =
 value person base warning p = do {
   birth_before_death base warning p;
   List.iter (titles_after_birth base warning p) (get_titles p);
-  related_sex_is_coherent base warning p
+  if is_empty_string (get_psources p) then warning (MissingSources p)
+  else (); 
+  related_sex_is_coherent base warning p;
 };
 
 value family base error warning ifam fam =
@@ -520,6 +522,7 @@ value family base error warning ifam fam =
            })
         None (Array.to_list after)
     in
-    ();
+    if is_empty_string (get_fsources fam) then warning (MissingSources fath)
+    else (); 
   }
 ;

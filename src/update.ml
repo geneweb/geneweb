@@ -321,6 +321,10 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
+  | MissingSources p ->
+      Wserver.wprint
+        (fcapitale (ftransl conf "missing sources for %t"))
+        (fun _ -> print_someone_strong conf base p)
   | MotherDeadAfterChildBirth mother child ->
       Wserver.wprint
         (ftransl conf "%t is born after the death of his/her mother %t")

@@ -78,6 +78,10 @@ value print_base_warning oc base =
       fprintf oc "%s\n" (designation base p);
       fprintf oc "marriage before his/her birth\n"
     }
+  | MissingSources p -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "sources missing\n"
+    }
   | MotherDeadAfterChildBirth mother child ->
       fprintf oc "%s\n  is born after the death of his/her mother\n%s\n"
         (designation base child) (designation base mother)
