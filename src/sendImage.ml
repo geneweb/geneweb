@@ -55,20 +55,43 @@ value raw_get conf key =
   try List.assoc key conf.env with [ Not_found -> incorrect conf ]
 ;
 
+(* print delete image link *)
+value print_link_delete_image conf base p =
+  if Util.has_image conf base p then
+    do {
+      tag "p" begin
+        stag "a" "href=\"%sm=DEL_IMAGE;i=%d\"" 
+          (commd conf) (Adef.int_of_iper (get_key_index p))
+        begin
+          Wserver.wprint "%s %s" 
+            (capitale (transl conf "delete")) 
+            (transl_nth conf "image/images" 0);
+        end;
+      end;
+    }
+  else ()
+;
+
 (* Send image form *)
 
 value print_send_image conf base p =
   let title h =
     do {
-      Wserver.wprint "%s"
-        (capitale
-           (transl_decline conf "send" (transl_nth conf "image/images" 0)));
+      if Util.has_image conf base p then
+        Wserver.wprint "%s"
+          (capitale
+             (transl_decline conf "modify" (transl_nth conf "image/images" 0)))
+      else
+        Wserver.wprint "%s"
+          (capitale
+             (transl_decline conf "add" (transl_nth conf "image/images" 0)));
       if h then ()
       else do {
         let fn = p_first_name base p in
         let sn = p_surname base p in
         Wserver.wprint ": ";
-        Wserver.wprint "%s.%d %s" fn (get_occ p) sn
+        Wserver.wprint "%s %s" fn sn;
+        Util.print_reference conf fn (get_occ p) sn
       }
     }
   in
@@ -98,6 +121,7 @@ type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
         xtag "input" "type=\"submit\" value=\"Ok\"";
       end;
     end;
+    print_link_delete_image conf base p;
     trailer conf
   }
 ;
