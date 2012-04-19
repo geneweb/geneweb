@@ -153,6 +153,7 @@ type warning 'person 'descend 'title =
   | IncoherentAncestorDate of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
+  | MissingSources of 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
   | ParentTooYoung of 'person and dmy
