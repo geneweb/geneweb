@@ -2938,3 +2938,10 @@ value reduce_list size list =
        | [x :: l] -> loop size (cnt + 1) [x :: reduced_list] l ]
   in loop size 0 [] list
 ;
+
+value print_reference conf fn occ sn =
+  stag "span" "class=\"reference\"" begin
+    Wserver.wprint " (%s: %s.%d %s)" 
+      (transl conf "access key") (Name.lower fn) occ (Name.lower sn);
+  end
+;
