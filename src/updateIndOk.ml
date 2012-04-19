@@ -115,9 +115,18 @@ value reconstitute_add_relation conf ext cnt rl =
   | _ -> (rl, ext) ]
 ;
 
+value deleted_relation = ref [];
+
 value reconstitute_relation_parent conf var key sex =
   match (getn conf var (key ^ "_fn"), getn conf var (key ^ "_sn")) with
-  [ ("", _) | ("?", _) | (_, "?") -> None
+  [ ("", _) | (_, "") | ("?", _) | (_, "?") as n ->
+      (* On enregistre les personnes dont on supprime le lien, pour  *)
+      (* prévenir l'utilisateur lors de la validation du formulaire. *)
+      do {
+        let p = only_printable (fst n) ^ only_printable (snd n) in
+        if p = "" || p = "??" then ()
+        else deleted_relation.val := [p :: deleted_relation.val];
+        None }
   | (fn, sn) ->
       let fn = only_printable fn in
       let sn = only_printable sn in
@@ -632,6 +641,24 @@ value print_mod_ok conf base wl p =
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
       }
     else ();
+    (* Si on a supprimé des relations, on les mentionne *)
+    match deleted_relation.val with
+    [ [] -> ()
+    | _ ->
+        do {
+          tag "p" 
+            begin
+              Wserver.wprint "%s, %s %s %s :"
+                (capitale (transl_nth conf "relation/relations" 0))
+                (transl conf "first name missing")
+                (transl conf "or") 
+                (transl conf "surname missing") ;
+              tag "ul" begin
+                List.iter 
+                  (fun s -> do {stag "li" begin Wserver.wprint "%s" s; end;})
+                  deleted_relation.val;
+              end;
+            end; } ] ;
     Wserver.wprint "\n<p>%s</p>"
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.wprint "\n";
@@ -701,6 +728,10 @@ value print_add_ok conf base wl p =
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
       }
     else ();
+    (* Si on a supprimé des relations, on les mentionne *)
+    List.iter
+      (fun s -> Wserver.wprint "%s -> %s\n" s (transl conf "forbidden char"))
+      deleted_relation.val;
     Wserver.wprint "\n%s"
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.wprint "\n";
