@@ -246,3 +246,5 @@ value wprint_in_columns :
 value is_hide_names : config -> person -> bool;
 
 value reduce_list : int -> list 'a -> list 'a;
+
+value print_reference : config -> string -> int -> string -> unit;
