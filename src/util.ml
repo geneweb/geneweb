@@ -825,7 +825,7 @@ value update_family_loop conf base p s =
       (* Si il n'y a pas d'ambiguité, i.e. pas 2 boucles dans 2 familles *)
       (* pour un même individu, alors on renvoit le lien vers la mise à  *)
       (* jour de la famille, sinon, un lien vers le menu de mise à jour. *)
-      if List.length list = 1 then
+      if List.length res = 1 then
         let iper = string_of_int (Adef.int_of_iper iper) in
         let ifam = string_of_int (Adef.int_of_ifam (List.hd res)) in
         "<a href=\"" ^ commd conf ^ "m=MOD_FAM;i=" ^ ifam ^ ";ip=" ^ iper ^ "\">" ^ s ^ "</a>"
