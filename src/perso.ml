@@ -283,7 +283,18 @@ type sosa_t =
 value init_sosa_t conf base sosa_ref =
   let tstab = 
     try Util.create_topological_sort conf base with
-    [ Consang.TopologicalSortError p -> print_base_loop conf base p ]
+    [ Consang.TopologicalSortError p -> 
+      (* Avec la nouvelle implementation du calcul de sosa, si à    *)
+      (* l'init il y a une boucle, alors on a pas encore interprété *)
+      (* le template, donc on n'a pas de header.                    *)
+      (* Il faut trouver aussi un algo de suppression de boucle parce  *)
+      (* que si la boucle n'est pas à une génération d'écart, alors on *)
+      (* boucle sur l'interprétation du template.                      *)
+      do {
+        let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+        Hutil.rheader conf title;
+        print_base_loop conf base p 
+      } ]
   in
   let mark = Array.make (nb_of_persons base) False in
   let last_zil = [(get_key_index sosa_ref, Num.one)] in
