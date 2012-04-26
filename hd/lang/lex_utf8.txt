@@ -7791,6 +7791,10 @@ sk: uznaný otec/uznaná matka/uznaný rodič
 sl: znani oče/znana mati/znani starši
 sv: erkännande far/erkännande mor/erkännande föräldrar
 
+    reference key
+en: key
+fr: référence
+
     relation/relations
 af: verwant/verwante
 bg: взаимоотношение/взаимоотношения
