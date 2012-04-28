@@ -2,7 +2,7 @@
 
 open Printf;
 
-type state =
+type conf =
   { config_env : mutable list (string * string);
     bin_dir : mutable string;
     bases_dir : mutable string;
@@ -13,20 +13,6 @@ type state =
     server_running : mutable option int;
     waiting_pids : mutable list int }
 ;
-
-type gwf_t =
-  [ Var_string of (string * string)
-  | Var_bool of (string * bool)
-  | Var_int of (string * int) ]
-;
-
-(*
-value gwf = 
-  [("highlight_color", "#2f6400"); ("friend_passwd", "") ("wizard_passwd", ""); 
-   ("wizard_passwd_file", ""); ("manitou", ""); ("moderator_file", ""); 
-   ("supervisor", ""); ("wizard_just_friend", "")]
-;
-*)
 
 value abs_path fname =
   if Filename.is_relative fname then
@@ -124,33 +110,33 @@ value exec prog args out err =
   Unix.create_process prog (Array.of_list [prog :: args]) Unix.stdin out err
 ;
 
-value close_server state =
-  match state.server_running with
+value close_server conf =
+  match conf.server_running with
   [ Some server_pid -> do {
       eprintf "Closing..."; flush stderr;
       (* Making a (empty) file STOP_SERVER to make the server stop. *)
       let stop_server =
-        List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
+        List.fold_left Filename.concat conf.bases_dir ["cnt"; "STOP_SERVER"]
       in
       let oc = open_out stop_server in
       close_out oc;
       (* Send a phony connection to unblock it. *)
       let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
       try
-        Unix.connect s (Unix.ADDR_INET Unix.inet_addr_loopback state.port)
+        Unix.connect s (Unix.ADDR_INET Unix.inet_addr_loopback conf.port)
       with
       [ Unix.Unix_error _ _ _ -> () ];
       try Unix.close s with
       [ Unix.Unix_error _ _ _ -> () ];
       let _ : (int * _) = Unix.waitpid [] server_pid in
-      state.server_running := None;
+      conf.server_running := None;
       eprintf "\n"; flush stderr;
     }
   | None -> () ]
 ;
 
-value clean_waiting_pids state =
-  state.waiting_pids :=
+value clean_waiting_pids conf =
+  conf.waiting_pids :=
     List.filter
       (fun pid ->
          let (r, _) = Unix.waitpid [Unix.WNOHANG] pid in
@@ -162,24 +148,24 @@ value clean_waiting_pids state =
            } 
          in
          r <> pid)
-      state.waiting_pids
+      conf.waiting_pids
 ;
 
-value browse state browser port dbn = do {
+value browse conf browser port bname = do {
   let pid =
     match browser with
     [ Some browser ->
-        exec browser [sprintf "http://localhost:%d/%s" port dbn]
+        exec browser [sprintf "http://localhost:%d/%s" port bname]
           Unix.stdout Unix.stderr
     | None -> -1 ]
   in
   if pid = -1 then do {
     eprintf "Open http://localhost:%d/%s in your favorite browser.\n"
-      port dbn;
+      port bname;
     flush stderr;
   }
-  else state.waiting_pids := [pid :: state.waiting_pids];
-  clean_waiting_pids state;
+  else conf.waiting_pids := [pid :: conf.waiting_pids];
+  clean_waiting_pids conf;
 };
 
 value rec cut_at_equal s =
@@ -190,8 +176,8 @@ value rec cut_at_equal s =
   [ Not_found -> (s, "") ]
 ;
 
-value read_base_env state bname = 
-  let fname = Filename.concat state.bases_dir (bname ^ ".gwf") in
+value read_base_env conf bname = 
+  let fname = Filename.concat conf.bases_dir (bname ^ ".gwf") in
   match try Some (open_in fname) with [ Sys_error _ -> None] with
   [ Some ic ->
       let env =
@@ -229,11 +215,11 @@ value rm_base dir =
   | _ -> () ]
 ;
 
-value clean_database state bname = do {
+value clean_database conf bname = do {
   (* save *)
-  let base = Filename.concat state.bases_dir (bname ^ ".gwb") in
+  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
   let c = 
-    Filename.concat state.bin_dir "gwu" ^ " " ^ base ^ " -o tmp.gw" 
+    Filename.concat conf.bin_dir "gwu" ^ " " ^ base ^ " -o tmp.gw" 
   in
   let rc = Sys.command c in
   if rc > 1 then 
@@ -243,7 +229,7 @@ value clean_database state bname = do {
   (* create *)
   (* Il faut regarder si la base était en gwc1 ou 2 pour appeler le même *)
   let c =
-    Filename.concat state.bin_dir "gwc" ^ " tmp.gw -f -o " ^ base ^ " > comm.log "
+    Filename.concat conf.bin_dir "gwc" ^ " tmp.gw -f -o " ^ base ^ " > comm.log "
   in
   let rc = Sys.command c in
   if rc > 1 then 
@@ -252,10 +238,38 @@ value clean_database state bname = do {
   else ();
 };
 
-value consang state bname parameters = do {
-  let base = Filename.concat state.bases_dir (bname ^ ".gwb") in
+value update_nldb conf bname = ()
+(*
+  let rc =
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
+    exec_f (comm ^ parameters conf.env)
+  in
+  do {
+    eprintf "\n";
+    flush stderr;
+    if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  }
+*)
+;
+
+value consang conf ok_file = ()
+(*
+  let rc =
+    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
+    exec_f (comm ^ parameters conf.env)
+  in
+  do {
+    eprintf "\n";
+    flush stderr;
+    if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
+  }
+*)
+;
+
+value consang conf bname parameters = do {
+  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
   let c = 
-    Filename.concat state.bin_dir "consang" ^ " " ^ base ^ " > comm.log"
+    Filename.concat conf.bin_dir "consang" ^ " " ^ base ^ " > comm.log"
   in
   let rc = Sys.command c in
   if rc > 1 then
@@ -264,13 +278,13 @@ value consang state bname parameters = do {
   else ();
 };
 
-value merge state bnames bname parameters = do {
+value merge conf bnames bname parameters = do {
   (* tester quel gwc *)
   List.iter
     (fun bname ->
-      let bname = Filename.concat state.bases_dir (bname ^ ".gwb") in
+      let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
       let c = 
-        Filename.concat state.bin_dir "gwu" ^ " " ^ bname ^ " -o " ^ bname ^ ".gw"
+        Filename.concat conf.bin_dir "gwu" ^ " " ^ bname ^ " -o " ^ bname ^ ".gw"
       in
       let rc = Sys.command c in
       if rc > 1 then
@@ -283,9 +297,9 @@ value merge state bnames bname parameters = do {
       (fun accu bname -> accu ^ " -sep " ^ bname ^ ".gw") 
       "" bnames
   in
-  let bname = Filename.concat state.bases_dir bname in
+  let bname = Filename.concat conf.bases_dir bname in
   let c =
-    Filename.concat state.bin_dir "gwc" ^ old_bases ^ " -f -o " ^ bname
+    Filename.concat conf.bin_dir "gwc" ^ old_bases ^ " -f -o " ^ bname
   in 
   let rc = Sys.command c in
   if rc > 1 then
@@ -294,10 +308,10 @@ value merge state bnames bname parameters = do {
   else ();
 };
 
-value save_to_ged state bname fname = do {
-  let bname = Filename.concat state.bases_dir (bname ^ ".gwb") in
+value save_to_ged conf bname fname = do {
+  let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
   let c =
-    Filename.concat state.bin_dir "gwb2ged" ^ bname ^ " -o " ^ fname ^ ".ged"
+    Filename.concat conf.bin_dir "gwb2ged" ^ bname ^ " -o " ^ fname ^ ".ged"
   in 
   let rc = Sys.command c in
   if rc > 1 then
@@ -306,10 +320,10 @@ value save_to_ged state bname fname = do {
   else ();
 };
 
-value save_to_gw state bname fname = do {
-  let bname = Filename.concat state.bases_dir (bname ^ ".gwb") in
+value save_to_gw conf bname fname = do {
+  let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
   let c =
-    Filename.concat state.bin_dir "gwu" ^ bname ^ " -o " ^ fname ^ ".gw"
+    Filename.concat conf.bin_dir "gwu" ^ bname ^ " -o " ^ fname ^ ".gw"
   in 
   let rc = Sys.command c in
   if rc > 1 then
@@ -317,6 +331,23 @@ value save_to_gw state bname fname = do {
     print_endline c
   else ();
 };
+
+value update_config_env conf s_conf v_conf = do {
+  eprintf "%s = %s\n" s_conf v_conf;
+  flush stderr;
+  let new_config_env =
+    try List.assoc s_conf conf.config_env with
+    [ Not_found -> "" ]
+  in
+  if s_conf <> new_config_env || not (Sys.file_exists config_file)
+  then do {
+    conf.config_env :=
+      List.filter (fun (v, _) -> v <> s_conf) conf.config_env @
+      [(s_conf, v_conf)];
+    write_config_env conf.config_env
+  }
+  else (); }
+;
 
 value main_window = do {
   GMain.init ();
@@ -363,6 +394,7 @@ value select_file parent initial_file = do {
   new_file
 };
 
+(*
 value create_menu depth tearoff = 
   let rec aux depth tearoff = do {
     let menu = GMenu.menu () and group = ref None in
@@ -383,14 +415,15 @@ value create_menu depth tearoff =
 }
   in aux depth tearoff
 ;
+*)
 
 
-value rec show_main state = do {
-  clean_waiting_pids state;
+value rec show_main conf = do {
+  clean_waiting_pids conf;
   let databases =
     List.sort compare
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
-         (Array.to_list (Sys.readdir state.bases_dir)))
+         (Array.to_list (Sys.readdir conf.bases_dir)))
   in
   let vbox = GPack.vbox
     ~spacing:5
@@ -399,6 +432,52 @@ value rec show_main state = do {
   GMisc.label
     ~text:(transl "Server is running...")
     ~packing:vbox#pack ();
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
+  in
+  let cbut = GButton.button
+    ~label:"gwc1"
+    ~packing:hbox#pack ()
+  in
+  ignore 
+    (cbut#connect#clicked 
+      (fun () -> do { vbox#destroy (); new_database_gwc1 conf } ) );
+  let cbut = GButton.button
+    ~label:"gwc2"
+    ~packing:hbox#pack ()
+  in
+  ignore 
+    (cbut#connect#clicked 
+      (fun () -> do { vbox#destroy (); new_database_gwc2 conf } ) );
+  let btn = GButton.button
+    ~label:"ged2gwb"
+    ~packing:hbox#pack ()
+  in
+  ignore 
+    (btn#connect#clicked 
+      (fun () -> ()) );
+  let btn = GButton.button
+    ~label:"setup"
+    ~packing:hbox#pack ()
+  in
+  ignore 
+    (btn#connect#clicked 
+      (fun () -> do { vbox#destroy (); setup_gui conf } ) );
+  let rbut = GButton.button
+    ~label:(transl "Restart")
+    ~packing:hbox#pack ()
+  in
+  ignore 
+    (rbut#connect#clicked 
+      (fun () -> do { vbox#destroy (); close_server conf; launch_server conf } ) );
+  let wbut = GButton.button
+    ~label:(transl "Quit")
+    ~packing:hbox#pack ()
+  in
+  ignore 
+    (wbut#connect#clicked 
+      (fun () -> do { vbox#destroy (); GMain.quit () } ) );
   if databases = [] then 
     ignore (GMisc.label ~text:(transl "No databases.") ~packing:vbox#pack () )
   else do {
@@ -412,8 +491,8 @@ value rec show_main state = do {
         ~packing:scrolled_window#add_with_viewport () in
     vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
     List.iter
-      (fun dbn -> do {
-         let bn = Filename.chop_extension dbn in
+      (fun bname -> do {
+         let bn = Filename.chop_extension bname in
          let hbox = GPack.hbox
            ~spacing:5
            ~packing:vvbox#pack ()
@@ -428,7 +507,7 @@ value rec show_main state = do {
          in
          ignore 
            (bbut#connect#clicked 
-             (fun () -> ignore (browse state state.browser state.port bn)));
+             (fun () -> ignore (browse conf conf.browser conf.port bn)));
          let blab = GMisc.label
            ~text:(" - ")
            ~packing:hbox#pack ()
@@ -439,54 +518,13 @@ value rec show_main state = do {
          in
          ignore 
            (bbut#connect#clicked 
-             (fun () -> do { vbox#destroy (); tools state bn })) })
+             (fun () -> do { vbox#destroy (); tools conf bn })) })
       databases;
-    let hbox = GPack.hbox
-      ~spacing:5
-      ~packing:vbox#pack ()
-    in
-    let cbut = GButton.button
-      ~label:"gwc1"
-      ~packing:hbox#pack ()
-    in
-    ignore 
-      (cbut#connect#clicked 
-        (fun () -> do { vbox#destroy (); new_database_gwc1 state } ) );
-    let cbut = GButton.button
-      ~label:"gwc2"
-      ~packing:hbox#pack ()
-    in
-    ignore 
-      (cbut#connect#clicked 
-        (fun () -> do { vbox#destroy (); new_database_gwc2 state } ) );
-(*
-    let btn = GButton.button
-      ~label:"ged2gwb"
-      ~packing:hbox#pack ()
-    in
-    ignore 
-      (btn#connect#clicked 
-        (fun () -> do { vbox#destroy (); ged2gwb state } ) );
-*)
-    let rbut = GButton.button
-      ~label:(transl "Restart")
-      ~packing:hbox#pack ()
-    in
-    ignore 
-      (rbut#connect#clicked 
-        (fun () -> do { vbox#destroy (); close_server state; launch_server state } ) );
-    let wbut = GButton.button
-      ~label:(transl "Quit")
-      ~packing:hbox#pack ()
-    in
-    ignore 
-      (wbut#connect#clicked 
-        (fun () -> do { vbox#destroy (); GMain.quit () } ) );
   }
 }
 
-and new_database_gwc1 state = do {
-  clean_waiting_pids state;
+and new_database_gwc1 conf = do {
+  clean_waiting_pids conf;
   let vbox = GPack.vbox
     ~spacing:5
     ~packing:main_window#add ()
@@ -521,7 +559,7 @@ and new_database_gwc1 state = do {
   in
   ignore 
       (btn_cancel#connect#clicked 
-        (fun () -> do { vbox#destroy (); show_main state } ) );
+        (fun () -> do { vbox#destroy (); show_main conf } ) );
   let btn_ok = GButton.button
     ~label:(transl "OK")
     ~packing:hbox#pack () 
@@ -534,14 +572,14 @@ and new_database_gwc1 state = do {
         else
              loop 0 where rec loop i =
                if i = String.length s then do {
-                 let db = Filename.concat state.bases_dir s in
+                 let db = Filename.concat conf.bases_dir s in
                  if Sys.file_exists (db ^ ".gwb") then ()
                  else do {
-                   let comm = Filename.concat state.bin_dir "gwc" in
+                   let comm = Filename.concat conf.bin_dir "gwc" in
                    let pid = exec comm ["-o"; db] Unix.stdout Unix.stderr in
                    let (_, _) = Unix.waitpid [] pid in
                    vbox#destroy ();
-                   show_main state;
+                   show_main conf;
                  }
                }
                else
@@ -550,8 +588,8 @@ and new_database_gwc1 state = do {
                  | _ -> () ]) )
 }
 
-and new_database_gwc2 state = do {
-  clean_waiting_pids state;
+and new_database_gwc2 conf = do {
+  clean_waiting_pids conf;
   let vbox = GPack.vbox
     ~spacing:5
     ~packing:main_window#add ()
@@ -573,7 +611,7 @@ and new_database_gwc2 state = do {
   in
   ignore 
       (btn_cancel#connect#clicked 
-        (fun () -> do { vbox#destroy (); show_main state } ) );
+        (fun () -> do { vbox#destroy (); show_main conf } ) );
   let btn_ok = GButton.button
     ~label:(transl "OK")
     ~packing:hbox#pack () 
@@ -586,14 +624,14 @@ and new_database_gwc2 state = do {
         else
              loop 0 where rec loop i =
                if i = String.length s then do {
-                 let db = Filename.concat state.bases_dir s in
+                 let db = Filename.concat conf.bases_dir s in
                  if Sys.file_exists (db ^ ".gwb") then ()
                  else do {
-                   let comm = Filename.concat state.bin_dir "gwc2" in
+                   let comm = Filename.concat conf.bin_dir "gwc2" in
                    let pid = exec comm ["-o"; db] Unix.stdout Unix.stderr in
                    let (_, _) = Unix.waitpid [] pid in
                    vbox#destroy ();
-                   show_main state;
+                   show_main conf;
                  }
                }
                else
@@ -602,23 +640,99 @@ and new_database_gwc2 state = do {
                  | _ -> () ]) )
 }
 
-and config_gwf state dbn = do {
+and setup_gui conf = do {
   let vbox = GPack.vbox
     ~spacing:5
     ~packing:main_window#add ()
   in
   GMisc.label
-    ~text:(transl "Configuration gwf file of " ^ dbn)
+    ~text:(transl "Setup the gui")
     ~packing:vbox#pack ();
+  let hbox = GPack.hbox 
+    ~spacing:5 
+    ~packing:vbox#pack () 
+  in
+  GMisc.label
+    ~text:("actual : " ^ conf.bin_dir)
+    ~packing:hbox#pack ();
+  let select = GButton.button 
+    ~stock:`OPEN 
+    ~packing:(hbox#pack ~expand:False) () 
+  in
+  select#connect#clicked
+    (fun () -> conf.bin_dir := select_dir main_window conf.bin_dir) ;
+  let hbox = GPack.hbox 
+    ~spacing:5 
+    ~packing:vbox#pack () 
+  in
+  GMisc.label
+    ~text:("actual : " ^ conf.bases_dir)
+    ~packing:hbox#pack ();
+  let select = GButton.button 
+    ~stock:`OPEN 
+    ~packing:(hbox#pack ~expand:False) () 
+  in
+  select#connect#clicked
+    (fun () -> conf.bases_dir := select_dir main_window conf.bases_dir) ;
+  let hbox = GPack.hbox 
+    ~spacing:5 
+    ~packing:vbox#pack () 
+  in
+  GMisc.label 
+    ~text:"Port :" 
+    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ();
+  let entry = GEdit.entry 
+    ~text:(string_of_int conf.port)
+    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) () 
+  in
+  conf.port := int_of_string entry#text;
   let hbox = GPack.hbox
     ~spacing:5
     ~packing:vbox#pack ()
+  in
+  let btn_cancel = GButton.button
+    ~label:(transl "Cancel")
+    ~packing:hbox#pack ()
+  in
+  ignore 
+      (btn_cancel#connect#clicked 
+        (fun () -> do { vbox#destroy (); show_main conf } ) );
+  let btn_ok = GButton.button
+    ~label:(transl "OK")
+    ~packing:hbox#pack () 
+  in
+  ignore 
+    (btn_ok#connect#clicked 
+      (fun () -> do { vbox#destroy (); 
+                      update_config_env conf "bin_dir" conf.bin_dir;
+                      update_config_env conf "bases_dir" conf.bases_dir;
+                      update_config_env conf "port" (string_of_int conf.port);
+                      show_main conf } ) );
+}
+
+and config_gwf conf bname = do {
+  let vbox = GPack.vbox
+    ~spacing:5
+    ~packing:main_window#add ()
+  in
+  GMisc.label
+    ~text:(transl "Configuration gwf file of " ^ bname)
+    ~packing:vbox#pack ();
+  let scrolled_window = GBin.scrolled_window ~border_width: 10
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~packing:vbox#add () in
+  let vvbox = GPack.vbox ~border_width: 10
+      ~packing:scrolled_window#add_with_viewport () in
+  vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vvbox#pack ()
   in
   let vbox_list = GPack.vbox
     ~spacing:5
     ~packing:hbox#pack ()
   in
-  let benv = read_base_env state dbn in
+  let benv = read_base_env conf bname in
   List.iter
     (fun (k, v) -> 
       ignore (
@@ -636,17 +750,17 @@ and config_gwf state dbn = do {
   in
   ignore 
     (btn_cancel#connect#clicked 
-       (fun () -> do { vbox#destroy (); show_main state } ) );
+       (fun () -> do { vbox#destroy (); show_main conf } ) );
   let btn_ok = GButton.button
     ~label:(transl "OK")
     ~packing:hbox_valid#pack () 
   in
   ignore 
     (btn_ok#connect#clicked 
-       (fun () -> do { vbox#destroy (); show_main state } ) )
+       (fun () -> do { vbox#destroy (); show_main conf } ) )
 }
 
-and tools state bname = do {
+and tools conf bname = do {
   let vbox = GPack.vbox
     ~spacing:5
     ~packing:main_window#add ()
@@ -655,104 +769,102 @@ and tools state bname = do {
     ~text:(transl "Boîte à outil pour la base " ^ bname)
     ~packing:vbox#pack ();
   let scrolled_window = GBin.scrolled_window ~border_width: 10
-      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~packing:vbox#add () in
-(*
-  let vvbox = GPack.vbox
-    ~spacing:5
-    ~packing:vbox#pack ()
-  in
-*)
-  let vvbox = GPack.vbox ~border_width: 10
-      ~packing:scrolled_window#add_with_viewport () in
+    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+    ~packing:vbox#add () in
+  let vvbox = GPack.hbox ~border_width: 10
+    ~packing:scrolled_window#add_with_viewport () in
   vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
+  let hbox = GPack.vbox
+    ~spacing:5
+    ~packing:vvbox#pack ()
+  in
   let bbut = GButton.button
     ~label:(transl "Extract GW")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Extract GEDCOM")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Import GW")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Import GEDCOM")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Configure GWF")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
-      (fun () -> do { vbox#destroy (); config_gwf state bname })) ;
+      (fun () -> do { vbox#destroy (); config_gwf conf bname })) ;
   let bbut = GButton.button
     ~label:(transl "Extract GEDCOM")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Nettoyage")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
-      (fun () -> clean_database state bname));
+      (fun () -> clean_database conf bname));
   let bbut = GButton.button
     ~label:(transl "Renommage")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Suppression")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Fusion")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Save & Restauration")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Consang")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> ()));
   let bbut = GButton.button
     ~label:(transl "Update_nldb")
-    ~packing:vvbox#pack () 
+    ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
@@ -767,18 +879,18 @@ and tools state bname = do {
   in
   ignore 
     (btn_cancel#connect#clicked 
-       (fun () -> do { vbox#destroy (); show_main state } ) );
+       (fun () -> do { vbox#destroy (); show_main conf } ) );
   let btn_ok = GButton.button
     ~label:(transl "OK")
     ~packing:hbox_valid#pack () 
   in
   ignore 
     (btn_ok#connect#clicked 
-       (fun () -> do { vbox#destroy (); show_main state } ) )
+       (fun () -> do { vbox#destroy (); show_main conf } ) )
 }
 
-and launch_server state = do {
-  clean_waiting_pids state;
+and launch_server conf = do {
+  clean_waiting_pids conf;
   let only = Unix.gethostname () in
   let fd =
     if trace.val then Unix.stdout
@@ -787,12 +899,12 @@ and launch_server state = do {
         0o666
   in
   let stop_server =
-    List.fold_left Filename.concat state.bases_dir ["cnt"; "STOP_SERVER"]
+    List.fold_left Filename.concat conf.bases_dir ["cnt"; "STOP_SERVER"]
   in
   try Sys.remove stop_server with [ Sys_error _ -> () ];
   let rest_of_args =
     try
-      let v = List.assoc "gwd_args" state.config_env in
+      let v = List.assoc "gwd_args" conf.config_env in
       if v = "" then []
       else
         loop 0 0 [] where rec loop ibeg i list =
@@ -806,16 +918,16 @@ and launch_server state = do {
     [ Not_found -> [] ]
   in
   let rest_of_args =
-    if state.digest_auth then ["-digest" :: rest_of_args] else rest_of_args
+    if conf.digest_auth then ["-digest" :: rest_of_args] else rest_of_args
   in
   let rest_of_args =
-    if state.browser_lang then ["-blang" :: rest_of_args] else rest_of_args
+    if conf.browser_lang then ["-blang" :: rest_of_args] else rest_of_args
   in
-  let comm = Filename.concat state.bin_dir "gwd" in
+  let comm = Filename.concat conf.bin_dir "gwd" in
   let args =
-    ["-p"; sprintf "%d" state.port; "-only"; "localhost"; "-only";
-     "127.0.0.1"; "-only"; only; "-hd"; state.bin_dir; "-bd";
-     state.bases_dir :: rest_of_args]
+    ["-p"; sprintf "%d" conf.port; "-only"; "localhost"; "-only";
+     "127.0.0.1"; "-only"; only; "-hd"; conf.bin_dir; "-bd";
+     conf.bases_dir :: rest_of_args]
   in
   eprintf "%s" comm;
   List.iter (fun a -> eprintf " %s" a) args;
@@ -831,42 +943,25 @@ and launch_server state = do {
     flush stderr;
     exit 2;
   };
-  state.server_running := Some server_pid;
-  show_main state;
+  conf.server_running := Some server_pid;
+  show_main conf;
 };
 
 
-value update_config_env state s_state v_state = do {
-  eprintf "%s = %s\n" s_state v_state;
-  flush stderr;
-  let new_config_env =
-    try List.assoc s_state state.config_env with
-    [ Not_found -> "" ]
-  in
-  if s_state <> new_config_env || not (Sys.file_exists config_file)
-  then do {
-    state.config_env :=
-      List.filter (fun (v, _) -> v <> s_state) state.config_env @
-      [(s_state, v_state)];
-    write_config_env state.config_env
-  }
-  else (); }
-;
-
-value config state var_env create_frame set next = 
+value config conf var_env create_frame set next = 
   match
     try Some (var_env ()) with
     [ Failure _ | Not_found -> None ]
   with
-  [ Some v -> do { set state v ; next state }
-  | None -> do { ignore (create_frame state) } ]
+  [ Some v -> do { set conf v ; next conf }
+  | None -> do { ignore (create_frame conf) } ]
 ;
 
-value rec config_bin_dir state =
+value rec config_bin_dir conf =
   config
-    state 
-    (fun () -> List.assoc "bin_dir" state.config_env) 
-    (fun state -> do {
+    conf 
+    (fun () -> List.assoc "bin_dir" conf.config_env) 
+    (fun conf -> do {
        let vbox = GPack.vbox
          ~spacing:5
          ~width:100 ~height:100
@@ -880,14 +975,14 @@ value rec config_bin_dir state =
          ~packing:vbox#pack () 
        in
        GMisc.label
-         ~text:("actual : " ^ state.bin_dir)
+         ~text:("actual : " ^ conf.bin_dir)
          ~packing:hbox#pack ();
        let select = GButton.button 
          ~stock:`OPEN 
          ~packing:(hbox#pack ~expand:False) () 
        in
        select#connect#clicked
-         (fun () -> state.bin_dir := select_dir main_window state.bin_dir) ;
+         (fun () -> conf.bin_dir := select_dir main_window conf.bin_dir) ;
        let hbox = GPack.hbox 
          ~spacing:5 
          ~packing:vbox#pack () 
@@ -898,16 +993,16 @@ value rec config_bin_dir state =
        in
        next#connect#clicked
          (fun () -> do { vbox#destroy ();   
-                         update_config_env state "bin_dir" state.bin_dir;
-                         ignore (config_bases_dir state) } ) } )
-    (fun state bin_dir -> state.bin_dir := bin_dir)
-    (fun state -> ignore (config_bases_dir state))
+                         update_config_env conf "bin_dir" conf.bin_dir;
+                         ignore (config_bases_dir conf) } ) } )
+    (fun conf bin_dir -> conf.bin_dir := bin_dir)
+    (fun conf -> ignore (config_bases_dir conf))
 
-and config_bases_dir state = 
+and config_bases_dir conf = 
   config
-    state 
-    (fun () -> List.assoc "bases_dir" state.config_env) 
-    (fun state -> do {
+    conf 
+    (fun () -> List.assoc "bases_dir" conf.config_env) 
+    (fun conf -> do {
        let vbox = GPack.vbox
          ~spacing:5
          ~packing:main_window#add ()
@@ -920,14 +1015,14 @@ and config_bases_dir state =
          ~packing:vbox#pack () 
        in
        GMisc.label
-         ~text:("actual : " ^ state.bases_dir)
+         ~text:("actual : " ^ conf.bases_dir)
          ~packing:hbox#pack ();
        let select = GButton.button 
          ~stock:`OPEN 
          ~packing:(hbox#pack ~expand:False) () 
        in
        select#connect#clicked
-         (fun () -> state.bases_dir := select_dir main_window state.bases_dir) ;
+         (fun () -> conf.bases_dir := select_dir main_window conf.bases_dir) ;
        let hbox = GPack.hbox 
          ~spacing:5 
          ~packing:vbox#pack () 
@@ -938,28 +1033,28 @@ and config_bases_dir state =
        in
        prev#connect#clicked
          (fun () -> do { vbox#destroy (); 
-                         let state = 
-                           { (state) with 
+                         let conf = 
+                           { (conf) with 
                              config_env = 
-                               List.remove_assoc "bin_dir" state.config_env }
+                               List.remove_assoc "bin_dir" conf.config_env }
                          in
-                         ignore (config_bin_dir state) } ) ;
+                         ignore (config_bin_dir conf) } ) ;
        let next = GButton.button 
          ~label:(transl "Next")
          ~packing:hbox#pack () 
        in
        next#connect#clicked
          (fun () -> do { vbox#destroy ();
-                         update_config_env state "bases_dir" state.bases_dir;
-                         ignore (config_port state) } ) } )
-    (fun state bases_dir -> state.bases_dir := bases_dir)
-    (fun state -> ignore (config_port state))
+                         update_config_env conf "bases_dir" conf.bases_dir;
+                         ignore (config_port conf) } ) } )
+    (fun conf bases_dir -> conf.bases_dir := bases_dir)
+    (fun conf -> ignore (config_port conf))
 
-and config_port state = 
+and config_port conf = 
   config
-    state 
-    (fun () -> List.assoc "port" state.config_env) 
-    (fun state -> do {
+    conf 
+    (fun () -> List.assoc "port" conf.config_env) 
+    (fun conf -> do {
       let vbox = GPack.vbox 
         ~spacing:5 
         ~packing:main_window#add () 
@@ -975,10 +1070,10 @@ and config_port state =
         ~text:"Port :" 
         ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ();
       let entry = GEdit.entry 
-        ~text:(string_of_int state.port)
+        ~text:(string_of_int conf.port)
         ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) () 
       in
-      state.port := int_of_string entry#text;
+      conf.port := int_of_string entry#text;
       let hbox = GPack.hbox 
         ~spacing:5 
         ~packing:vbox#pack () 
@@ -989,24 +1084,24 @@ and config_port state =
       in
       prev#connect#clicked
          (fun () -> do { vbox#destroy (); 
-                         let state = 
-                           { (state) with 
+                         let conf = 
+                           { (conf) with 
                              config_env = 
-                               List.remove_assoc "bases_dir" state.config_env }
+                               List.remove_assoc "bases_dir" conf.config_env }
                          in
-                         ignore (config_bases_dir state) } ) ;
+                         ignore (config_bases_dir conf) } ) ;
       let next = GButton.button 
         ~label:(transl "Next")
         ~packing:hbox#pack () 
       in
       next#connect#clicked
         (fun () -> do { vbox#destroy ();   
-                        update_config_env state "port" (string_of_int state.port);
-                        ignore (config_browser state) } ) } )
-    (fun state port -> state.port := (int_of_string port))
-    (fun state -> ignore (config_browser state))
+                        update_config_env conf "port" (string_of_int conf.port);
+                        ignore (config_browser conf) } ) } )
+    (fun conf port -> conf.port := (int_of_string port))
+    (fun conf -> ignore (config_browser conf))
 
-and config_browser state = 
+and config_browser conf = 
   let default_sys_bin_dir =
     match Sys.os_type with
     [ "Win32" | "Cygwin" -> "C:\\Program Files"
@@ -1038,10 +1133,10 @@ and config_browser state =
   in
   let browsers = lazy (browsers ()) in
   config
-    state
-    (fun () -> List.assoc "browser" state.config_env)
-    (fun state -> do {
-      state.browser := Some "/usr/bin/firefox" ;
+    conf
+    (fun () -> List.assoc "browser" conf.config_env)
+    (fun conf -> do {
+      conf.browser := Some "/usr/bin/firefox" ;
       let to_string =
         fun
         [ Some s -> s
@@ -1061,22 +1156,22 @@ and config_browser state =
       in
       prev#connect#clicked
          (fun () -> do { vbox#destroy (); 
-                         let state = 
-                           { (state) with 
+                         let conf = 
+                           { (conf) with 
                              config_env = 
-                               List.remove_assoc "port" state.config_env }
+                               List.remove_assoc "port" conf.config_env }
                          in
-                         ignore (config_bases_dir state) } ) ;
+                         ignore (config_bases_dir conf) } ) ;
       let next = GButton.button 
         ~label:(transl "Next")
         ~packing:hbox#pack () 
       in
       next#connect#clicked
         (fun () -> do { vbox#destroy ();   
-                        update_config_env state "browser" (to_string state.browser);
-                        ignore (launch_server state) } ) } )
-    (fun state browser -> state.browser := Some browser)
-    (fun state -> ignore (launch_server state))
+                        update_config_env conf "browser" (to_string conf.browser);
+                        ignore (launch_server conf) } ) } )
+    (fun conf browser -> conf.browser := Some browser)
+    (fun conf -> ignore (launch_server conf))
 ;
 
 (**/**) (* main *)
@@ -1097,17 +1192,17 @@ value usage_msg = "Usage: gui [option]";
 value main () = do {
   Arg.parse (Arg.align speclist) anon_fun usage_msg;
   let config_env = read_config_env () in
-  let state =
+  let conf =
     { config_env = config_env; bin_dir = default_bin_dir; 
       bases_dir = default_bases_dir; port = default_port; 
       browser = default_browser; browser_lang = True; 
       digest_auth = True; server_running = None; waiting_pids = [] }
   in  
   let () = main_window#show () in
-  config_bin_dir state;
+  config_bin_dir conf;
   let () = GMain.main () in
   Sys.catch_break True;
-  close_server state;
+  close_server conf;
   eprintf "Bye\n"; flush stderr;
 };
 
