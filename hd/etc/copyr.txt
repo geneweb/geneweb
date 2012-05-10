@@ -9,7 +9,7 @@
       style="vertical-align: middle; border: 0" 
       alt="GeneWeb" title="GeneWeb"%/></a>%sp;
       Version %version; %compilation_time;%sp;
-      Copyright &copy; 1998-2011 %connections;%sq;
+      Copyright &copy; 1998-2012 %connections;%sq;
     </em><br%/>
   </div>
 </div>
