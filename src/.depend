@@ -256,9 +256,9 @@ perso.cmi: adef.cmi config.cmi gwdb.cmi
 phonygwd.cmo: argl.cmo secure.cmi ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx secure.cmx ../wserver/wserver.cmx 
 place.cmo: adef.cmi config.cmi def.cmi gwdb.cmi hutil.cmi mutil.cmi util.cmi \
-    ../wserver/wserver.cmi 
+    history.cmi ../wserver/wserver.cmi 
 place.cmx: adef.cmx config.cmi def.cmi gwdb.cmx hutil.cmx mutil.cmx util.cmx \
-    ../wserver/wserver.cmx 
+    history.cmx ../wserver/wserver.cmx 
 pqueue.cmo: pqueue.cmi 
 pqueue.cmx: pqueue.cmi 
 progrBar.cmo: progrBar.cmi 
