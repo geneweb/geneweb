@@ -308,5 +308,6 @@ value print_mod_merge o_conf base =
   let p1_old_key = get_key o_conf base "i" in
   let p2_old_key = get_key o_conf base "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateIndOk.print_mod_aux conf base (effective_mod_merge conf base p1_old_key p2_old_key)
+  UpdateIndOk.print_mod_aux conf base 
+    (effective_mod_merge conf base p1_old_key p2_old_key)
 ;
