@@ -1033,7 +1033,7 @@ value print_mod_ok conf base = do {
           xtag "input" "type=\"hidden\" name=\"place\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"place\"" 
             (quote_escaped (no_html_tags (only_printable new_place)));
           Wserver.wprint 
-            "%s ?" (capitale (transl conf "continue correcting")) ;
+            "%s" (capitale (transl conf "continue correcting")) ;
           xtag "input" "type=\"submit\" value=\"Ok\"" ;
         end;
       end
@@ -1041,7 +1041,7 @@ value print_mod_ok conf base = do {
     else ();
     tag "p" begin
       stag "a" "href=\"%sm=MOD_P;s=%s\"" (commd conf) ini begin
-        Wserver.wprint "%s ?" (capitale (transl conf "new modification"));
+        Wserver.wprint "%s" (capitale (transl conf "new modification"));
       end;
     end;
     Hutil.trailer conf }
@@ -1053,7 +1053,7 @@ value print_mod_ok conf base = do {
     print_link_to_welcome conf True;
     tag "p" begin
       stag "a" "href=\"%sm=MOD_P;s=%s\"" (commd conf) ini begin
-        Wserver.wprint "%s ?" (capitale (transl conf "new modification"));
+        Wserver.wprint "%s" (capitale (transl conf "new modification"));
       end;
     end;
     Hutil.trailer conf 
