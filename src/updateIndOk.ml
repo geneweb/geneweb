@@ -702,10 +702,10 @@ value all_checks_person conf base p a u = do {
   in
   relation_sex_is_coherent base warning p;
   match a.parents with
-  [ Some ifam -> CheckItem.family base error warning ifam (foi base ifam)
+  [ Some ifam -> CheckItem.reduce_family base error warning ifam (foi base ifam)
   | _ -> () ];
   Array.iter
-    (fun ifam -> CheckItem.family base error warning ifam (foi base ifam))
+    (fun ifam -> CheckItem.reduce_family base error warning ifam (foi base ifam))
     u.family;
   List.iter
     (fun

@@ -5,6 +5,7 @@ open Gwdb;
 
 type base_error = Def.error person;
 type base_warning = Def.warning person family title;
+type base_misc = Def.misc person family title;
 
 value leap_year : int -> bool;
 value nb_days_in_month : int -> int -> int;
@@ -19,9 +20,17 @@ value person :
   base -> (base_warning -> unit) -> person ->
     option
       (list (Adef.iper * person * option Def.sex * option (list relation)));
+
 value family :
+  base -> (base_error -> unit) -> (base_warning -> unit) -> Def.ifam ->
+    family -> unit;
+
+value reduce_family :
   base -> (base_error -> unit) -> (base_warning -> unit) -> Def.ifam ->
     family -> unit;
 
 value sort_children :
   base -> array Adef.iper -> option (array Adef.iper * array Adef.iper);
+
+value check_other_fields :
+  base -> (base_misc -> unit) -> Def.ifam -> family -> unit;

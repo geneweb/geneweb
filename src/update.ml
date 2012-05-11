@@ -321,20 +321,6 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
-  | MissingFamilySources fath moth ->
-      Wserver.wprint
-        (fcapitale (ftransl conf "missing family sources for %t and %t"))
-        (fun _ -> print_someone_strong conf base fath)
-        (fun _ -> print_someone_strong conf base moth)
-  | MissingIndividualSources p -> ()
-      (* On n'affiche pas les sources manquantes pour l'individu,    *)
-      (* car il peut très vite en manquer beaucoup, et l'information *)
-      (* serait alors noyée. Le code est laissé au cas où...         *)
-      (*
-      Wserver.wprint
-        (fcapitale (ftransl conf "missing individual sources for %t"))
-        (fun _ -> print_someone_strong conf base p)
-      *)
   | MotherDeadAfterChildBirth mother child ->
       Wserver.wprint
         (ftransl conf "%t is born after the death of his/her mother %t")
@@ -391,6 +377,89 @@ value print_warnings conf base wl =
              html_li conf; print_warning conf base w; Wserver.wprint "\n"
            })
         wl;
+    end
+  }
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] print_misc : config -> base -> Def.misc -> unit                   *)
+(** [Description] : Fonction d'impression des 'informations diverses'.
+    [Args] :
+      - conf : configuration
+      - base : base
+      - fun  : Def.misc (miscellaneous)
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value print_misc conf base =
+  fun
+  [ MissingSources -> 
+      stag "em" begin 
+        Wserver.wprint "%s\n" (capitale (transl conf "missing sources"));
+      end ]
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] print_miscs : config -> base -> Def.misc list -> unit             *)
+(** [Description] : Affiche la liste des 'informations diverses'.
+    [Args] :
+      - conf : configuration
+      - base : base
+      - ml   : Def.misc list (miscellaneous)
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value print_miscs conf base ml =
+  if ml = [] then ()
+  else do {
+    Wserver.wprint "%s\n" (capitale (transl conf "miscellaneous informations"));
+    tag "ul" begin
+      List.iter
+        (fun m -> 
+          do {
+            html_li conf; print_misc conf base m; Wserver.wprint "\n"
+          })
+        ml;
+    end
+  }
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] print_miscs : 
+      config -> base -> (Def.warning list * Def.misc list) -> unit           *)
+(** [Description] : Affiche sous la même rubrique, la liste des warnings
+                    et la liste des 'informations diverses'.
+    [Args] :
+      - conf : configuration
+      - base : base
+      - wl   : Def.warning list
+      - ml   : Def.misc list (miscellaneous)
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                              *)
+(* ************************************************************************* *)
+value print_warnings_and_miscs conf base (wl, ml) =
+  if wl = [] && ml = [] then ()
+  else do {
+    Wserver.wprint "%s\n" (capitale (transl conf "warnings"));
+    tag "ul" begin
+      List.iter
+        (fun w ->
+           do {
+             html_li conf; print_warning conf base w; Wserver.wprint "\n"
+           })
+        wl;
+      List.iter
+        (fun m -> 
+          do {
+            html_li conf; print_misc conf base m; Wserver.wprint "\n"
+          })
+        ml;
     end
   }
 ;
