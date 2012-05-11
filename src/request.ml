@@ -257,6 +257,10 @@ value specify conf base n pl =
   do {
     header conf title;
     conf.cancel_links := False;
+    print_link_to_welcome conf True;
+    (* Si on est dans un calcul de parenté, on affiche *)
+    (* l'aide sur la sélection d'un individu.          *)
+    Util.print_tips_relationship conf;
     Wserver.wprint "<ul>\n";
     (* Construction de la table des sosa de la base *)
     let () = Perso.build_sosa_ht conf base in 
