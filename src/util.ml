@@ -835,7 +835,6 @@ value update_family_loop conf base p s =
     else s
 ;  
 
-
 value no_reference conf base p s = s;
 
 value gen_person_title_text reference p_access conf base p =
@@ -2939,9 +2938,79 @@ value reduce_list size list =
   in loop size 0 [] list
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] print_reference : config -> string -> int -> string -> unit    *)
+(** [Description] : Affiche la référence d'une personne
+    [Args] :
+      - conf : configuration de la base
+      - fn   : first name
+      - occ  : occ
+      - sn   : surname
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value print_reference conf fn occ sn =
   stag "span" "class=\"reference\"" begin
-    Wserver.wprint " (%s: %s.%d %s)" 
+    Wserver.wprint " (%s %s.%d %s)" 
       (transl conf "reference key") (Name.lower fn) occ (Name.lower sn);
   end
+;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] print_tips_relationship : conf -> unit                         *)
+(** [Description] : Lors d'un calcul de parenté, il n'est pas évident de
+                    savoir qu'il faut cliquer sur la personne pour lancer
+                    le calcul. 
+                    On affiche donc une petite aide pour l'utilisateur.
+    [Args] :
+      - conf : configuration de la base
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
+value print_tips_relationship conf =
+  if p_getenv conf.env "em" = Some "R" || 
+     p_getenv conf.env "m" = Some "C" then do {
+    tag "div" "class=\"tips\"" begin 
+      tag "table" begin
+        tag "tr" begin
+          tag "td" begin
+            Wserver.wprint "%s"
+              (capitale 
+                 (transl conf 
+                    "select an individual to compute relationship with him"));
+          end;
+        end;
+      end;
+    end;
+    xtag "br" 
+  }
+  else ()
+;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] print_image_sex : conf -> person -> int -> unit                *)
+(** [Description] : Affiche l'image du sexe correspondant à la personne.
+    [Args] :
+      - conf : configuration de la base
+      - p    : person
+      - size : taille de l'image
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
+value print_image_sex conf p size =
+  let (image, alt) = 
+    match get_sex p with
+    [ Male -> ("male.png", "M")
+    | Female -> ("female.png", "F")
+    | Neuter -> ("sexunknown.png", "?") ]
+  in
+  xtag 
+    "img" "src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\""
+    (image_prefix conf) image alt size size
 ;
