@@ -8,6 +8,7 @@ open Gwdb;
 value code_dmy : config -> dmy -> string;
 value string_of_ondate : config -> date -> string;
 value string_of_date : config -> date -> string;
+value string_slash_of_date : config -> date -> string;
 value string_of_age : config -> dmy -> string;
 value year_text : dmy -> string;
 value short_dates_text : config -> base -> person -> string;

@@ -241,6 +241,43 @@ value string_of_dmy conf d =
   let sy = code_dmy conf d in string_of_prec_dmy conf sy d
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] string_slash_of_dmy : config -> Def.dmy -> string              *)
+(** [Description] : Renvoie une date sous la forme jj/mm/aaaa (en 
+                    fonction du 'date order').
+    [Args] :
+      - conf : configuration de la base
+      - d    : Def.dmy
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value string_slash_of_dmy conf d =
+  let order = transl conf " !dates order" in
+  let sy = 
+    match (d.day, d.month, d.year) with
+    [ (0, 0, _) -> string_of_int d.year
+    | (0, _, _) -> 
+        if order = "ddmmyy" then
+          (if d.month < 10 then "0" else "") ^
+            string_of_int d.month ^ "/" ^ string_of_int d.year
+        else
+          string_of_int d.year ^ "/" ^ string_of_int d.month
+    | _ -> 
+        if order = "ddmmyy" then
+          string_of_int d.day ^ "/" ^ 
+            (if d.month < 10 then "0" else "") ^
+              string_of_int d.month ^ "/" ^
+                string_of_int d.year
+        else
+          string_of_int d.year ^ "/" ^ 
+            (if d.month < 10 then "0" else "") ^
+              string_of_int d.month ^ "/" ^
+                string_of_int d.day ]
+  in 
+  string_of_prec_dmy conf sy d 
+;
+
 value gregorian_precision conf d =
   if d.delta = 0 then string_of_dmy conf d
   else
@@ -310,6 +347,23 @@ value string_of_date conf =
   fun
   [ Dgreg d _ -> string_of_dmy conf d
   | Dtext t -> "(" ^ t ^ ")" ]
+;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] string_slash_of_date : config -> date -> string                *)
+(** [Description] : Renvoie une date sous la forme jj/mm/aaaa (en 
+                    fonction du 'date order').
+    [Args] :
+      - conf : configuration de la base
+      - fun  : Def.date
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
+value string_slash_of_date conf =
+  fun
+  [ Dgreg d _ -> string_slash_of_dmy conf d
+  | Dtext t -> t ]
 ;
 
 value string_of_age conf a =
