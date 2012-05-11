@@ -202,6 +202,10 @@ value print_birth_day conf base day_name fphrase wd dt list =
 value propose_months conf mode =
   do {
     begin_centered conf;
+    stag "span" begin
+      Wserver.wprint "%s" 
+        (capitale (transl conf "select a month to see all the anniversaires"));
+    end;
     tag "table" "border=\"%d\"" conf.border begin
       tag "tr" begin
         tag "td" begin
