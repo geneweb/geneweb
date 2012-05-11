@@ -37,6 +37,10 @@ value update_related_pointers :
 value print_return : config -> unit;
 value print_error : config -> base -> CheckItem.base_error -> unit;
 value print_warnings : config -> base -> list CheckItem.base_warning -> unit;
+value print_miscs : config -> base -> list CheckItem.base_misc -> unit;
+value print_warnings_and_miscs :
+  config -> base -> 
+    (list CheckItem.base_warning * list CheckItem.base_misc) -> unit;
 value error : config -> base -> CheckItem.base_error -> 'a;
 
 value error_locked : config -> unit;

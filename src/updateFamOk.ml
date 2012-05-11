@@ -764,18 +764,21 @@ value need_check_noloop (scpl, sdes, onfs) =
 
 value all_checks_family conf base ifam fam cpl des scdo = do {
   let wl = ref [] in
+  let ml = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
+  let misc m = ml.val := [m :: ml.val] in
   if need_check_noloop scdo then
     Consang.check_noloop_for_person_list base error
       (Array.to_list (Adef.parent_array cpl))
   else ();
   let fam = family_of_gen_family base (fam, cpl, des) in
   CheckItem.family base error warning ifam fam;
-  List.rev wl.val
+  CheckItem.check_other_fields base misc ifam fam;
+  (List.rev wl.val, List.rev ml.val)
 };
 
-value print_family conf base wl cpl des = do {
+value print_family conf base (wl, ml) cpl des = do {
   let rdsrc =
     match p_getenv conf.env "rdsrc" with
     [ Some "on" -> p_getenv conf.env "src"
@@ -810,10 +813,10 @@ value print_family conf base wl cpl des = do {
     end;
   }
   else ();
-  Update.print_warnings conf base wl
+  Update.print_warnings_and_miscs conf base (wl, ml)
 };
 
-value print_mod_ok conf base wl cpl des =
+value print_mod_ok conf base (wl, ml) cpl des =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "family modified"))
   in
@@ -834,12 +837,12 @@ value print_mod_ok conf base wl cpl des =
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
       }
     else ();
-    print_family conf base wl cpl des;
+    print_family conf base (wl, ml) cpl des;
     trailer conf
   }
 ;
 
-value print_add_ok conf base wl cpl des =
+value print_add_ok conf base (wl, ml) cpl des =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "family added")) in
   do {
     header conf title;
@@ -851,7 +854,7 @@ value print_add_ok conf base wl cpl des =
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
       }
     else ();
-    print_family conf base wl cpl des;
+    print_family conf base (wl, ml) cpl des;
     trailer conf
   }
 ;
@@ -939,7 +942,7 @@ value print_add o_conf base =
       | (None, None) -> do { 
           let (sfam, sdes) = strip_family sfam sdes in
           let (ifam, fam, cpl, des) = effective_add conf base sfam scpl sdes in
-          let wl =
+          let (wl, ml) =
             all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
           in
           let ((fn, sn, occ, _, _), i, act) =
@@ -963,7 +966,7 @@ value print_add o_conf base =
           Util.commit_patches conf base;
           History.record conf base (fn, sn, occ, Adef.iper_of_int i) act;
           Update.delete_topological_sort conf base;
-          print_add_ok conf base wl cpl des
+          print_add_ok conf base (wl, ml) cpl des
         } ]
   with
   [ Update.ModErr -> () ]
@@ -1044,7 +1047,7 @@ value print_mod o_conf base =
     Notes.update_notes_links_db conf (NotesLinks.PgFam ifam) s;
     let nfs = (Adef.parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in
-    let wl =
+    let (wl, ml) =
       all_checks_family conf base ifam fam cpl des (scpl, sdes, onfs)
     in
     let ((fn, sn, occ, _, _), ip) =
@@ -1057,7 +1060,7 @@ value print_mod o_conf base =
     Util.commit_patches conf base;
     History.record conf base (fn, sn, occ, ip) "mf";
     Update.delete_topological_sort conf base;
-    print_mod_ok conf base wl cpl des
+    print_mod_ok conf base (wl, ml) cpl des
   }
   in
   print_mod_aux conf base callback

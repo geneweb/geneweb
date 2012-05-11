@@ -153,8 +153,6 @@ type warning 'person 'descend 'title =
   | IncoherentAncestorDate of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
-  | MissingIndividualSources of 'person
-  | MissingFamilySources of 'person and 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
   | ParentTooYoung of 'person and dmy
@@ -162,5 +160,7 @@ type warning 'person 'descend 'title =
   | UndefinedSex of 'person
   | YoungForMarriage of 'person and dmy ]
 ;
+
+type misc 'person 'descend 'title = [ MissingSources ];
 
 type rn_mode = [ RnAll | Rn1Ln | RnDeg ];

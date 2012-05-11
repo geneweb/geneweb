@@ -6,6 +6,7 @@ open Gwdb;
 
 type base_error = error person;
 type base_warning = warning person family title;
+type base_misc = misc person family title;
 
 value common_prec p1 p2 =
   if p1 = p2 then p1
@@ -273,17 +274,55 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
   | None -> () ]
 ;
 
-value check_normal_marriage_date base error warning (ifam, fam) = do {
-  let cpl = foi base ifam in
-  check_normal_marriage_date_for_someone base error warning fam
-    (get_father cpl);
-  check_normal_marriage_date_for_someone base error warning fam
-    (get_mother cpl);
+
+(* ************************************************************************* *)
+(*  [Fonc] check_normal_marriage_date_for_witness : 
+      base -> (Def.error -> unit) -> (Def.warning -> unit) -> 
+        (ifam * family) -> unit                                              *)
+(** [Description] : Vérifie les dates des témoins par rapport à la date du
+                    mariage.
+    [Args] :
+      - base    : base
+      - error   : fonction qui ajoute une erreur à la liste des erreurs
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - ifam    : ifam
+      - family  : family
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value check_normal_marriage_date_for_witness base error warning (ifam, fam) =
   let wl = foi base ifam in
   List.iter
     (fun ip -> check_normal_marriage_date_for_someone base error warning fam ip)
     (Array.to_list (get_witnesses wl))
-};
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] check_normal_marriage_date_for_parent :
+      base -> (Def.error -> unit) -> (Def.warning -> unit) -> 
+        (ifam * family) -> unit                                              *)
+(** [Description] : Vérifie les dates du conjoint1 et du conjoint2 par
+                    rapport à la date du mariage.
+    [Args] :
+      - base    : base
+      - error   : fonction qui ajoute une erreur à la liste des erreurs
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - ifam    : ifam
+      - family  : family
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value check_normal_marriage_date_for_parent base error warning (ifam, fam) = 
+  do {
+    let cpl = foi base ifam in
+    check_normal_marriage_date_for_someone base error warning fam
+      (get_father cpl);
+    check_normal_marriage_date_for_someone base error warning fam
+      (get_mother cpl)
+  }
+;
+
 
 (*
  * Semi sort children by birth dates.
@@ -470,25 +509,23 @@ value child_has_sex warning child =
   if get_sex child = Neuter then warning (UndefinedSex child) else ()
 ;
 
-(* main *)
 
-value person base warning p = do {
-  birth_before_death base warning p;
-  List.iter (titles_after_birth base warning p) (get_titles p);
-  (* On n'affiche pas les sources manquantes pour l'individu,    *)
-  (* car il peut très vite en manquer beaucoup, et l'information *)
-  (* serait alors noyée. Le code est laissé au cas où...         *)
-  (*
-  if is_empty_string (get_psources p) then 
-    warning (MissingIndividualSources p)
-  else (); 
-  *)
-  related_sex_is_coherent base warning p;
-};
-
-value family base error warning ifam fam =
+(* ************************************************************************* *)
+(*  [Fonc] check_marriage_sex :
+      base -> (Def.error -> unit) -> (Def.warning -> unit) -> 
+        (ifam * family) -> unit                                              *)
+(** [Description] : Vérifie le sex du couple et s'il est correct la date de
+                    naissance par rapport à la date de décès.
+    [Args] :
+      - base    : base
+      - error   : fonction qui ajoute une erreur à la liste des erreurs
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - family  : family
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value check_marriage_sex base error warning fam =
   let cpl = fam in
-  let des = fam in
   let fath = poi base (get_father cpl) in
   let moth = poi base (get_mother cpl) in
   do {
@@ -503,33 +540,183 @@ value family base error warning ifam fam =
     | Male | Neuter ->
         if get_relation fam = NoSexesCheckNotMarried ||
            get_relation fam = NoSexesCheckMarried then ()
-        else error (BadSexOfMarriedPerson moth) ];
-    check_normal_marriage_date base error warning (ifam, fam);
-    let after = sort_children2 base warning ifam des in
-    let _ =
-      List.fold_left
-        (fun np child ->
-           let child = poi base child in
-           do {
-             birth_before_death base warning child;
-             born_after_his_elder_sibling base error warning child np ifam
-               des;
-             child_born_after_his_parent base error warning child
-               (get_father cpl);
-             child_born_after_his_parent base error warning child
-               (get_mother cpl);
-             child_born_before_mother_death base warning child
-               (get_mother cpl);
-             possible_father base warning child (get_father cpl);
-             child_has_sex warning child;
-             match Adef.od_of_codate (get_birth child) with
-             [ Some d -> Some (child, d)
-             | _ -> np ]
-           })
-        None (Array.to_list after)
-    in
-    if is_empty_string (get_fsources fam) then 
-      warning (MissingFamilySources fath moth)
-    else (); 
+        else error (BadSexOfMarriedPerson moth) ]
+};
+
+
+(* ************************************************************************* *)
+(*  [Fonc] check_children :
+      base -> (Def.error -> unit) -> (Def.warning -> unit) -> 
+        (ifam * family) -> unit                                              *)
+(** [Description] : Vérifie toutes les informations des enfants d'une famille.
+    [Args] :
+      - base    : base
+      - error   : fonction qui ajoute une erreur à la liste des erreurs
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - ifam    : ifam
+      - family  : family
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value check_children base error warning (ifam, fam) =
+  let cpl = fam in
+  let des = fam in
+  let after = sort_children2 base warning ifam des in
+  let _ =
+    List.fold_left
+      (fun np child ->
+         let child = poi base child in
+         do {
+           birth_before_death base warning child;
+           born_after_his_elder_sibling base error warning child np ifam
+             des;
+           child_born_after_his_parent base error warning child
+             (get_father cpl);
+           child_born_after_his_parent base error warning child
+             (get_mother cpl);
+           child_born_before_mother_death base warning child
+             (get_mother cpl);
+           possible_father base warning child (get_father cpl);
+           child_has_sex warning child;
+           match Adef.od_of_codate (get_birth child) with
+           [ Some d -> Some (child, d)
+           | _ -> np ]
+         })
+      None (Array.to_list after)
+  in
+  ()
+;
+
+value has_family_sources fam =
+  not (is_empty_string (get_fsources fam) 
+       && is_empty_string (get_marriage_src fam))
+;
+
+value has_person_sources p =
+  not (is_empty_string (get_psources p) 
+       && is_empty_string (get_baptism_src p)
+       && is_empty_string (get_birth_src p) 
+       && is_empty_string (get_death_src p) 
+       && is_empty_string (get_burial_src p))
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] check_sources : 
+      base -> (Def.misc -> unit) -> ifam -> family -> unit                   *)
+(** [Description] : Il y a un avertissment 'miscellaneous' si aucune des 
+                    personnes (conjoint1 ET conjoint2) n'a de sources 
+                    (indiduelles ou familliales).
+    [Args] :
+      - base : base
+      - misc : fonction qui ajoute un misc à la liste des miscs
+      - ifam : ifam
+      - fam  : family
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value check_sources base misc ifam fam =
+  if has_family_sources fam then ()
+  else
+    let cpl = foi base ifam in
+    let fath = poi base (get_father cpl) in
+    let moth = poi base (get_mother cpl) in
+    if has_person_sources fath && has_person_sources moth then ()
+    else misc MissingSources
+;
+
+(* main *)
+
+
+(* ************************************************************************* *)
+(*  [Fonc] person : base -> (Def.warning -> unit) -> person -> unit          *)
+(** [Description] : Vérifie les warnings d'une personne à la validation du
+                    formulaire individu.
+    [Args] :
+      - base    : base
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - p       : person
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value person base warning p = do {
+  birth_before_death base warning p;
+  List.iter (titles_after_birth base warning p) (get_titles p);
+  related_sex_is_coherent base warning p;
+};
+
+
+(* ************************************************************************* *)
+(*  [Fonc] family :
+      base -> (Def.error -> unit) -> (Def.warning -> unit) -> 
+        ifam -> family -> unit                                               *)
+(** [Description] : En cas de modification d'une famille, on vérifie toutes
+                    les personnes accessibles après la validation du 
+                    formulaire (famille). 
+                    Vérifie s'il y a des erreurs ou des warnings pour le 
+                    couple, les parents du couple, les témoins et les enfants
+                    du couple.
+    [Args] :
+      - base    : base
+      - error   : fonction qui ajoute une erreur à la liste des erreurs
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - ifam    : ifam
+      - fam     : family
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value family base error warning ifam fam =
+  do {
+    check_marriage_sex base error warning fam;
+    check_normal_marriage_date_for_parent base error warning (ifam, fam);
+    check_normal_marriage_date_for_witness base error warning (ifam, fam);
+    check_children base error warning (ifam, fam)
   }
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] reduce_family :
+      base -> (Def.error -> unit) -> (Def.warning -> unit) -> 
+        ifam -> family -> unit                                               *)
+(** [Description] : En cas de modification d'une personne, on ne vérifie que
+                    les personnes accessibles après la validation du 
+                    formulaire (individu). 
+                    Vérifie s'il y a des erreurs ou des warnings pour le 
+                    couple, les parents du couple et les enfants du couple.
+    [Args] :
+      - base    : base
+      - error   : fonction qui ajoute une erreur à la liste des erreurs
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - ifam    : ifam
+      - fam     : family
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value reduce_family base error warning ifam fam =
+  do {
+    check_marriage_sex base error warning fam;
+    check_normal_marriage_date_for_parent base error warning (ifam, fam);
+    check_children base error warning (ifam, fam)
+  }
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] check_other_fields : 
+      base -> (Def.misc -> unit) -> ifam -> family -> unit                   *)
+(** [Description] : Vérifie les autres champs de saisie des formulaires 
+                    individu et famille.
+    [Args] :
+      - base : base
+      - misc : fonction qui ajoute un misc à la liste des miscs
+      - ifam : ifam
+      - fam  : family
+    [Retour] : Néant
+    [Rem] : Exporté en clair hors de ce module.                              *)
+(* ************************************************************************* *)
+value check_other_fields base misc ifam fam =
+ do {
+   check_sources base misc ifam fam
+ }
 ;
