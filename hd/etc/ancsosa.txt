@@ -53,6 +53,8 @@
   </td></tr></table>
 %end;
 
+%let;central_index;%index;%in;
+
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
 %end;
@@ -82,6 +84,22 @@
     %apply;thegen%with;
       %apply;nth([nth (generation)], evar.xx)
     %end;
+  %end;
+%end;
+
+%define;image_MF(xx,wi_he)
+  %if;(xx != "x x")
+    %if;xx.is_male;
+      <img width="wi_he" height="wi_he" src="%image_prefix;/male.png"%sp;
+           style="border: none" alt="[M/F]0"%/>%nn;
+    %elseif;xx.is_female;
+      <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
+           style="border: none" alt="[M/F]1"%/>%nn;
+    %else;
+      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png" 
+           style="border: none" alt="?" title="?"%/>%nn;
+    %end;
+    %sp;
   %end;
 %end;
 
@@ -501,6 +519,186 @@
 %end;
 
 %(
+   Display ascend in table
+%)
+
+%define;table_header()
+  %reset_count;
+  %( on commence à compter à partir de 1 %)
+  %incr_count;
+  <th>[*Sosa]</th>
+  %incr_count;
+  <th>[*person/persons]0</th>
+  %incr_count;
+  %if;(evar.birth = "on")
+    <th>[*birth date]</th>
+    %incr_count;
+  %end;
+  %if;(evar.birth_place = "on")
+    <th>[*birth place]</th>
+    %incr_count;
+  %end;
+  %if;(evar.marr = "on")
+    <th>[*spouse/spouses]1</th>
+    %incr_count;
+  %end;
+  %if;(evar.marr_date = "on")
+    <th>[*marriage date]</th>
+    %incr_count;
+  %end;
+  %if;(evar.marr_place = "on")
+    <th>[*marriage place]</th>
+    %incr_count;
+  %end;
+  %if;(evar.death = "on")
+    <th>[*death date]</th>
+    %incr_count;
+  %end;
+  %if;(evar.death_place = "on")
+    <th>[*death place]</th>
+    %incr_count;
+  %end;
+  %if;(evar.death_age = "on")
+    <th>[*age at death]</th>
+    %incr_count;
+  %end;
+  %if;(evar.occu = "on")
+    <th>[*occupations]</th>
+    %incr_count;
+  %end;
+%end;
+
+%define;table_raw()
+  %lazy_force;
+  %if;(ancestor.same = "")%incr_count;%end;
+  <td>
+    %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;
+    %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;
+    %else;%ancestor.anc_sosa;%end;
+  </td>
+  <td>
+    %apply;image_MF("ancestor", "11")
+    %if;(ancestor.same != "" and evar.no_repeat = "on")
+      =&gt;%sp;
+      %apply;link%with;%ancestor.access;%and;
+        %if(evar.sosab = 16)%ancestor.same.hexa;
+        %elseif(evar.sosab = 8)%ancestor.same.octal;
+        %else;%ancestor.same;%end;
+      %end;
+    %else;
+      %apply;link%with;%ancestor.access;%and;
+        %ancestor;
+      %end
+      %if;(ancestor.same != "")
+        %sp;=&gt;%sp;
+        %if(evar.sosab = 16)%ancestor.same.hexa;
+        %elseif(evar.sosab = 8)%ancestor.same.octal;
+        %else;%ancestor.same;%end;
+      %end;
+    %end;
+  </td>
+  %if;(evar.birth = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %if;ancestor.has_birth_date;
+          %ancestor.slash_birth_date;
+        %elseif;ancestor.has_baptism_date;
+          %ancestor.slash_baptism_date;
+        %end;
+      %end;
+    </td>
+  %end;
+  %if;(evar.birth_place = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %if;ancestor.has_birth_date;
+          %ancestor.birth_place;
+        %elseif;ancestor.has_baptism_date;
+          %ancestor.baptism_place;
+        %end;
+      %end;
+    </td>
+  %end;
+  %if;(evar.marr = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %foreach;ancestor.family;
+          %apply;image_MF("spouse", "11")
+          %apply;link%with;%spouse.access;%and;
+            %spouse;
+          %end;
+          <br%/>
+        %end;
+      %end;
+    </td>
+  %end;
+  %if;(evar.marr_date = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %foreach;ancestor.family;
+          %slash_marriage_date;<br%/>
+        %end;
+      %end;
+    </td>
+  %end;
+  %if;(evar.marr_place = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %foreach;ancestor.family;
+          %marriage_place;<br%/>
+        %end;
+      %end;
+    </td>
+  %end;
+  %if;(evar.death = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %if;ancestor.has_death_date;
+          %ancestor.slash_death_date;
+        %elseif;ancestor.has_burial_date;
+          %ancestor.slash_burial_date;
+        %end;
+      %end;
+    </td>
+  %end;
+  %if;(evar.death_place = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %if;ancestor.has_death_date;
+          %ancestor.death_place;
+        %elseif;ancestor.has_burial_date;
+          %ancestor.burial_place;
+        %end;
+      %end;
+    </td>
+  %end
+  %if;(evar.death_age = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %ancestor.death_age;
+      %end;
+    </td>
+  %end;
+  %if;(evar.occu = "on")
+    <td>
+      %if;(ancestor.same != "" and evar.no_repeat = "on")
+      %else;
+        %ancestor.occupation
+      %end;
+    </td>
+  %end;
+%end;
+
+
+%(
    Main
 %)
 
@@ -808,7 +1006,7 @@
       %foreach;ancestor;
         %if;(ancestor.same = "" and ancestor.is_descendant)
           %lazy_force;
-          <li>%ancestor.anc_sosa; -%sp;
+          <li>[Sosa] %ancestor.anc_sosa; -%sp;
           <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
 	  %ancestor.title;%ancestor.dates;
           </li>
@@ -818,7 +1016,27 @@
     %if;lazy_printed;</ul>%nl;</li>%nl;%end;
   %end;
   </ul>
-%end;
+%elseif;(evar.t = "Z")
+  %reset_count;
+  <table class="ascends_table">
+    <tr class="ascend_table_header">%apply;table_header()</tr>
+    %let;nb_col;%count;%in;
+    %reset_count;
+    %foreach;ancestor_level(evar.v)
+      %if;(evar.gen = "on")
+        <tr>      
+          <th align="left" colspan="%nb_col;">[*generation/generations]0 %level;</th>
+        </tr>
+      %end;
+      %foreach;ancestor;
+        <tr>
+          %apply;table_raw()
+        </tr>
+      %end;
+    %end;
+  </table>
+%end
+
 
 %base_trailer;
 %copyright;
