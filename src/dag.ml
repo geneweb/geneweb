@@ -856,7 +856,9 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
     match n.valu with
     [ Left ip ->
         let p = pget conf base ip in
-        let txt = string_of_item conf base (elem_txt p) in
+        let txt = 
+          string_of_item conf base (elem_txt p) ^ image_txt conf base p
+        in
         let txt =
           let spouses =
             if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
@@ -894,10 +896,11 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
                    | None -> "" ]
                  in
                  txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^
-                   string_of_item conf base (elem_txt ps))
+                   string_of_item conf base (elem_txt ps) ^ 
+                     image_txt conf base ps)
             txt spouses
         in
-        txt ^ image_txt conf base p
+        txt
     | Right _ -> "&nbsp;" ]
   in
   let indi_txt n =
