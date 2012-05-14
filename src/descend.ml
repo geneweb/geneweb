@@ -1029,7 +1029,11 @@ value make_tree_hts conf base gv p =
       match po with
       [ Some (p, _) ->
           let ncol = nb_column 0 (v - 1) p in
-          (2 * ncol - 1, CenterA, TDbar None)
+          let vbar_txt =
+            Printf.sprintf "%sm=D;t=T;v=%d;%s" (commd conf) gv
+              (acces conf base p)
+          in
+          (2 * ncol - 1, CenterA, TDbar (Some vbar_txt))
       | None -> (1, LeftA, TDnothing) ]
     in
     [td :: tdl]
