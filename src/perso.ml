@@ -3541,7 +3541,7 @@ value print_ascend conf base p =
       let templ =
         match p_getenv conf.env "t" with
         [ Some ("F" | "H" | "L") -> "anclist"
-        | Some ("D" | "G" | "M" | "N") -> "ancsosa"
+        | Some ("D" | "G" | "M" | "N" | "Z") -> "ancsosa"
         | Some ("A" | "C" | "T") -> "anctree"
         | _ -> "ancmenu" ]
       in
