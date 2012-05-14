@@ -672,7 +672,7 @@ value display_spouse_index conf base max_level ancestor =
 (* *********************************************************************** *)
 value print_desc_table_header conf base = do {
   let nb_col = ref 2 in
-  tag "tr" "class=\"bgcolor array_header\"" begin
+  tag "tr" "class=\"descend_table_header\"" begin
     tag "th" begin
       Wserver.wprint "%s" (capitale (transl conf "n° d'Aboville"));
     end;
