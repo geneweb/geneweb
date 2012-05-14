@@ -219,15 +219,15 @@ value print_someone_and_spouse conf base info in_tab ip n ipl =
   let (s, d, spo) = spouse_text conf base n ip ipl in
   do {
     if in_tab && (info.bd > 0 || info.td_prop <> "") then
-      Wserver.wprint "<table border=\"%d\"><tr><td align=\"center\"%s>" info.bd
-        info.td_prop
+      Wserver.wprint "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" 
+        info.bd info.td_prop
     else ();
     Wserver.wprint "%s\n" (someone_text conf base ip);
     Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip));
     if s <> "" then do {
-      Wserver.wprint "&amp;%s" d;
       xtag "br";
-      Wserver.wprint "%s\n" s;
+      Wserver.wprint "&amp;%s" d;
+      Wserver.wprint " %s\n" s;
       match spo with
       [ Some ip ->
           Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
@@ -448,7 +448,7 @@ value other_parent_text_if_same conf base info =
 value print_someone_and_other_parent_if_same conf base info =
   do {
     if info.bd > 0 || info.td_prop <> "" then
-      Wserver.wprint "<table border=\"%d\"><tr><td align=\"center\"%s>"
+      Wserver.wprint "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>"
         info.bd info.td_prop
     else ();
     Wserver.wprint "%s\n" (someone_text conf base info.ip);
@@ -456,6 +456,7 @@ value print_someone_and_other_parent_if_same conf base info =
     match other_parent_text_if_same conf base info with
     [ Some (s, ip) ->
         do {
+          xtag "br";
           Wserver.wprint "%s" s;
           Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
         }
@@ -639,6 +640,8 @@ value print_relation_ok conf base info =
   in
   do {
     header_no_page_title conf title;
+    print_link_to_welcome conf True;
+    xtag "p" "style=\"clear:both\"";
     print_relation_path conf base info;
     trailer conf
   }

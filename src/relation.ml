@@ -889,9 +889,10 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            Wserver.wprint "<em>%s %s"
              (if n < 0 then "***" else string_of_big_int conf n)
              (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
+           Wserver.wprint "</em>\n";
            if not long then do {
              let propose_dag = n > 1 && n <= 10 in
-             Wserver.wprint ":\n%s " (transl conf "click");
+             Wserver.wprint ":\n ";
              let dp1 =
                match pp1 with
                [ Some p -> p
@@ -902,19 +903,22 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                [ Some p -> p
                | _ -> p2 ]
              in
-             Wserver.wprint "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
+             xtag "img" "src=\"%s/%s\" alt=\"\""
+               (Util.image_prefix conf) "picto_rel_small.png";
+             stag "a" "href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\""
                (commd conf) (acces conf base a) x1 (acces_n conf base "1" dp1)
                x2 (acces_n conf base "2" dp2)
                (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
                (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
-               (if propose_dag then ";dag=on" else "") image_opt;
-             Wserver.wprint "%s</a>" (transl conf "here");
-             if n > 1 && not propose_dag then
-               Wserver.wprint "%s" (transl conf " to see the first branch")
-             else ()
+               (if propose_dag then ";dag=on" else "") image_opt
+               begin
+                 Wserver.wprint "%s" (capitale (transl conf "see"));
+                 if n > 1 && not propose_dag then
+                   Wserver.wprint "%s" (transl conf " the first branch")
+                 else ();
+               end;
            }
            else ();
-           Wserver.wprint ".</em>\n";
          end)
       list;
   end
@@ -927,7 +931,7 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
     [ Some "on" -> ";image=on"
     | _ -> "" ]
   in
-  tag "ul" begin
+  tag "ul" "class=li_relationship" begin
     tag "li" begin
       Wserver.wprint "%s\n" (capitale (transl conf "indeed,"));
       tag "ul" begin
@@ -939,9 +943,9 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
                Wserver.wprint "%d %s" n
                  (transl_nth conf "relationship link/relationship links"
                     (if n = 1 then 0 else 1));
+               Wserver.wprint ")</em>\n&nbsp;";
                if not long then do {
                  let propose_dag = n > 1 && n <= 10 in
-                 Wserver.wprint ":\n%s" (transl conf "click");
                  let dp1 =
                    match pp1 with
                    [ Some p -> p
@@ -952,21 +956,19 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
                    [ Some p -> p
                    | _ -> p2 ]
                  in
-                 Wserver.wprint
-                   " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
-                   (commd conf) (acces conf base a) x1
-                   (acces_n conf base "1" dp1) x2 (acces_n conf base "2" dp2)
-                   (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
-                   (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
-                   (if propose_dag then ";dag=on" else "") image_opt;
-                 Wserver.wprint "%s</a>" (transl conf "here");
-                 if n > 1 && not propose_dag then
-                   Wserver.wprint "%s"
-                     (transl conf " to see the first relationship link")
-                 else ()
+               xtag "img" "src=\"%s/%s\" alt=\"\""
+                 (Util.image_prefix conf) "picto_rel_small.png";
+               stag "a" "href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\""
+                 (commd conf) (acces conf base a) x1
+                 (acces_n conf base "1" dp1) x2 (acces_n conf base "2" dp2)
+                 (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
+                 (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
+                 (if propose_dag then ";dag=on" else "") image_opt
+                 begin
+                   Wserver.wprint "%s" (capitale (transl conf "see"));
+                 end;
                }
                else ();
-               Wserver.wprint "</em>).\n";
              end)
           list;
       end;
@@ -1010,7 +1012,11 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
 value print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   do {
-    tag "p" begin print_link_name conf base n p1 p2 sol; end;
+    tag "p" begin 
+      xtag "img" "src=\"%s/%s\" alt=\"\"" 
+        (Util.image_prefix conf) "picto_fleche_bleu.png";
+      print_link_name conf base n p1 p2 sol; 
+    end;
     if x1 = 0 || x2 = 0 then
       print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
     else print_solution_not_ancestor conf base long p1 p2 sol;
@@ -1054,7 +1060,10 @@ value print_dag_links conf base p1 p2 rl =
   in
   if something then do {
     let rest = ref False in
-    if is_anc then Wserver.wprint "(" else Wserver.wprint "<ul>\n";
+    if is_anc then 
+      xtag "img" "src=\"%s/%s\" alt=\"\"" 
+        (Util.image_prefix conf) "picto_fleche_bleu.png"
+    else Wserver.wprint "<ul>\n";
     M.iter
       (fun ip (pp1, pp2, nn, nt, maxlev) ->
          let dp1 =
@@ -1112,7 +1121,12 @@ value print_dag_links conf base p1 p2 rl =
              [ Some "on" -> ";image=on"
              | _ -> "" ]
            in
-           Wserver.wprint ";dag=on%s\">" image_opt;
+           let border =
+             match p_getenv conf.env "bd" with
+             [ Some "on" -> ";bd=on"
+             | _ -> "" ]
+           in
+           Wserver.wprint ";dag=on%s%s\">" image_opt border;
            if is_anc then Wserver.wprint "%s" (transl conf "tree")
            else
              Wserver.wprint "%d %s" nn
@@ -1123,7 +1137,7 @@ value print_dag_links conf base p1 p2 rl =
          else rest.val := True)
       anc_map;
     if rest.val then stagn "li" begin Wserver.wprint "..."; end else ();
-    if is_anc then Wserver.wprint ")\n" else Wserver.wprint "</ul>\n"
+    if is_anc then Wserver.wprint "\n" else Wserver.wprint "</ul>\n"
   }
   else ()
 ;
@@ -1137,6 +1151,8 @@ value print_propose_upto conf base p1 p2 rl =
       in
       let (p, a) = if x1 = 0 then (p2, p1) else (p1, p2) in
       tag "p" begin
+        xtag "img" "src=\"%s/%s\" alt=\"\"" 
+          (Util.image_prefix conf) "picto_fleche_bleu.png";
         Wserver.wprint "<span class=\"smaller\">";
         Wserver.wprint "%s"
           (capitale
@@ -1145,11 +1161,17 @@ value print_propose_upto conf base p1 p2 rl =
                    (person_title_text conf base p))));
         Wserver.wprint " %s"
           (transl_decline conf "up to" (person_title_text conf base a));
-        Wserver.wprint ":\n<em>%s\n" (transl conf "click");
-        Wserver.wprint "<a href=\"%sm=A;t=D;%s;%s;l=%d\">" (commd conf)
-          (acces conf base p) (acces_n conf base "1" a) maxlen;
-        Wserver.wprint "%s</a>" (transl conf "here");
-        Wserver.wprint ".</em></span>\n";
+        Wserver.wprint "\n&nbsp;";
+        xtag "img" "src=\"%s/%s\" alt=\"\""
+          (Util.image_prefix conf) "picto_rel_asc.png";
+        stag "a" "href=\"%sm=A;t=D;%s;%s;l=%d\""
+          (commd conf) (acces conf base p) 
+          (acces_n conf base "1" a) maxlen
+          begin
+            Wserver.wprint "%s" (capitale (transl conf "see"));
+          end;
+
+        Wserver.wprint "</span>\n";
       end
   | _ -> () ]
 ;
@@ -1366,7 +1388,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       if List.mem (b1, b2) found.val then ()
       else do {
         Wserver.wprint "<table width=\"100%%\"><tr><td align=\"center\">\n";
-        tag "table" "border=\"1\"" begin
+        tag "table" begin
           tag "tr" begin
             tag "td" begin
               RelationLink.print_relation_path conf base info;
@@ -1390,7 +1412,23 @@ value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list), _) =
 ;
 
 value print_main_relationship conf base long p1 p2 rel =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
+  let total =
+    match rel with
+    [ None -> Num.zero
+    | Some (_, total, _) -> total ]
+  in
+  let title _ = do {
+    Wserver.wprint "%s" (capitale (transl conf "relationship"));
+    if Num.eq total Num.zero then ()
+    else do {
+      Wserver.wprint " (";
+      wprint_num conf total;
+      Wserver.wprint " %s)"
+        (transl_nth conf "relationship link/relationship links"
+           (if Num.eq total Num.one then 0 else 1))
+    }
+  }
+  in
   do {
     let conf =
       if long then
@@ -1423,12 +1461,21 @@ value print_main_relationship conf base long p1 p2 rel =
         if get_key_index p1 = get_key_index p2 then
           Wserver.wprint "%s\n"
             (capitale (transl conf "it is the same person!"))
-        else
+        else do {
           Wserver.wprint "%s\n"
             (capitale
                (cftransl conf "no known relationship link between %s and %s"
                   [gen_person_title_text reference raw_access conf base p1;
-                   gen_person_title_text reference raw_access conf base p2]))
+                   gen_person_title_text reference raw_access conf base p2]));
+          xtag "br";
+          tag "p" begin
+            stag "span" begin
+              Wserver.wprint "%s\n" 
+                (transl conf 
+                   "NB: you should try another relationship computing mode");
+            end;
+          end
+        }
     | Some (rl, total, relationship) ->
         let a1 = p1 in
         let a2 = p2 in
@@ -1451,14 +1498,6 @@ value print_main_relationship conf base long p1 p2 rel =
         in
         do {
           Wserver.wprint "\n";
-          tag "p" begin
-            Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
-            if Num.eq total Num.zero then Wserver.wprint "***"
-              else wprint_num conf total;
-            Wserver.wprint "</em> %s\n"
-              (transl_nth conf "relationship link/relationship links"
-                 (if Num.eq total Num.one then 0 else 1));
-          end;
           if long then () else print_dag_links conf base p1 p2 rl;
           if not all_by_marr && authorized_age conf base p1 &&
              authorized_age conf base p2 && get_consang a1 != Adef.fix (-1) &&
