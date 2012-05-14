@@ -142,6 +142,66 @@
             - [comment] ([marriage/marriages]1)
             <input type="checkbox" name="comm" value="on"%/>
           </label>
+          <br%/><br%/>
+          <label>
+            <input type="radio" name="t" value="Z"%/>
+            [*Array] (*)
+          </label>
+          <br%/>
+          <label>
+            - [birth date]
+            <input type="checkbox" name="birth" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [birth place]
+            <input type="checkbox" name="birth_place" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [spouse/spouses]1
+            <input type="checkbox" name="marr" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [marriage date]
+            <input type="checkbox" name="marr_date" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [marriage place]
+            <input type="checkbox" name="marr_place" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [death date]
+            <input type="checkbox" name="death" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [death place]
+            <input type="checkbox" name="death_place" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [age at death]
+            <input type="checkbox" name="death_age" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [occupation]
+            <input type="checkbox" name="occu" value="on"%/>
+          </label>
+          <br%/><br%/>
+          <label>
+            - [display generation]
+            <input type="checkbox" name="gen" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [don't repeat individual already seen]
+            <input type="checkbox" name="no_repeat" value="on"%/>
+          </label>
         </td>
         <td align="%left;" valign="top">
           <label>
