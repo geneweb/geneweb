@@ -88,6 +88,11 @@ h1
 }
 
 /* Properties of the footer block. All pages. */
+#footer
+{
+ clear: both;
+}
+
 #footer hr
 { 
  color: #e7edb3;
@@ -434,4 +439,138 @@ div.summary ul ul
   background-color: #afa;
   font-weight:bold
 }
+
+
+/* Properties of the relation page */
+#rel_form_search, #rel_form_cousin, #rel_form_shortcut, #rel_mode, #rel_options
+{
+ margin: 10px;
+}
+
+#rel_search_content, #rel_cousin_content
+{
+ margin-left: 25px;
+}
+
+#rel_search 
+{
+ float: left;
+ width:45%%;
+ padding-right:10px;
+ border-right:1px solid #F0ECED;
+}
+
+#rel_form_search span
+{
+ font-weight:bold;
+}
+
+#rel_search_title
+{
+ font-weight:bold;
+}
+
+#rel_form_search ul
+{
+ list-style-type: none;
+ margin:0;
+ padding:0;
+}
+
+#rel_cousin_title
+{
+ font-weight:bold;
+}
+
+#rel_form_cousin span
+{
+ font-weight:bold;
+}
+
+#rel_form_cousin select
+{
+}
+
+#rel_form_shortcut span
+{
+ font-weight:bold;
+}
+
+#rel_form_shortcut ul
+{
+ list-style-type: none;
+ margin:0;
+ padding:0;
+}
+
+#rel_options
+{
+ padding-top: 10px;
+}
+
+#rel_options span
+{
+ font-weight:bold;
+}
+
+#rel_options ul
+{
+ list-style-type: none;
+ margin:0;
+ padding:0;
+}
+
+#rel_mode span
+{
+ font-weight:bold;
+}
+
+#rel_mode ul
+{
+ list-style-type: none;
+ margin:0;
+ padding:0;
+}
+
+#rel_others
+{
+ float:left;
+ width:45%%;
+ padding-left:10px;
+}
+
+#rel_see_also ul
+{
+ list-style-type: none;
+ margin:0;
+ padding:0;
+}
+
+/* tips */
+div.tips {
+ padding:10px 10px 10px 60px;
+ min-height:50px;
+ background-color:#FFF9C1;
+ background-image:url('%image_prefix/picto_ampoule.png');
+ background-position:5px center;
+ background-repeat: no-repeat;
+}
+
+div.tips table {
+ height:50px;
+ margin:0;
+}
+
+div.tips table td{
+ vertical-align:middle;
+}
+
+/* resultat de recherche */
+
+table.display_search
+{
+ border:2px solid #F0ECED;
+}
+
+
 </style>

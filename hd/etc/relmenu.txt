@@ -17,6 +17,105 @@
 <body%body_prop;>
 %message_to_wizard;
 
+<script type="text/javascript">
+<!--
+  function enable(id) {
+    var inputs = document.getElementById(id).getElementsByTagName('input');
+    for (i=0; i<inputs.length; i++) {
+      inputs[i].disabled = '';
+    }
+    if (id == "rel_form_cousin") {
+      document.getElementById('sel_C').disabled = '';
+    }
+  }
+
+  function disable(id) {
+    var inputs = document.getElementById(id).getElementsByTagName('input');
+    for (i=0; i<inputs.length; i++) {
+      if (inputs[i].name != "select") {
+        inputs[i].disabled = 'disabled';
+      }
+    }
+    if (id == "rel_form_cousin") {
+      document.getElementById('sel_C').disabled = 'disabled';
+    }
+  }
+
+  function hide_mode() {
+    var title = document.getElementById("rel_mode");
+    var mode1 = document.getElementById("rel_ancestors");
+    var mode2 = document.getElementById("rel_by_marriage");
+    var mode3 = document.getElementById("rel_shortest_path");
+    title.style.display = 'none';
+    mode1.style.display = 'none';
+    mode2.style.display = 'none';
+    mode3.style.display = 'none';
+  }
+
+  function show_mode() {
+    var title = document.getElementById("rel_mode");
+    var mode1 = document.getElementById("rel_ancestors");
+    var mode2 = document.getElementById("rel_by_marriage");
+    var mode3 = document.getElementById("rel_shortest_path");
+    title.style.display = 'block';
+    mode1.style.display = 'block';
+    mode2.style.display = 'block';
+    mode3.style.display = 'block';
+  }
+
+  function main() {
+    var s = document.getElementById("radio_R");
+    var c = document.getElementById("radio_C");
+    %( recherche individu %)
+    if (s.checked == true) {
+      disable("rel_form_cousin");
+      disable("rel_form_shortcut");
+      enable("rel_form_search");
+      enable("rel_mode");
+      show_mode();
+    }
+    %( recherche d'un proche %)
+    else if (c.checked == true) {
+      disable("rel_form_search");
+      disable("rel_form_shortcut");
+      disable("rel_mode");
+      hide_mode();
+      enable("rel_form_cousin");
+      var sel = document.getElementById("sel_C");
+      var uncle = document.getElementById("uncle");
+      var nephew = "";
+      if (document.getElementById("nephew")) {
+          nephew = document.getElementById("nephew");
+      }
+      %( On recherche les oncles et tantes %)
+      if (uncle.selected == true) {
+        document.getElementById("v2").value = "1";
+      }
+      %( On recherche les neveux et nièces %)
+      else if (nephew != '' && nephew.selected == true) {
+        document.getElementById("v2").value = "2";
+      }
+      %( On recherche les frères ou cousins %)
+      else {
+        document.getElementById("v2").value = "";
+      }
+    }
+    %( raccourcis %)
+    else {
+      disable("rel_form_search");
+      disable("rel_form_cousin");
+      enable("rel_form_shortcut");
+      enable("rel_mode");
+      show_mode();
+    }
+  }
+-->
+</script>
+
+%define;nth_cousins(xx)
+  [*%s cousins:::xx]%nn;
+%end;
+
 <h1>[*link between]%sp;
   %if;(public_name != "")%public_name;%else;%first_name;%end;
   %if;(qualifier != "") <em>%qualifier;</em>%end;
@@ -42,198 +141,257 @@
   </td></tr></table>
 %end;
 
-<form method="get" action="%action;">
-<p>
-%hidden;
-<input type="hidden" name="em" value="R"%/>
-%if;access_by_key;
-  <input type="hidden" name="ep" value="%first_name_key_val;"%/>
-  <input type="hidden" name="en" value="%surname_key_val;"%/>
-  %if;(occ != "0")
-    <input type="hidden" name="eoc" value="%occ;"%/>
-  %end;
-%else
-  <input type="hidden" name="ei" value="%index;"%/>
-%end;
-</p>
-<ul>
-<li>
-  <input type="hidden" name="m" value="NG"%/>
-  <input type="radio" name="select" value="input" checked="checked"%/>
-  <input name="n" size="40" maxlength="200"%/>
-  <ul>
-  <li>
-    <label>
-      <input type="radio" name="t" value="PN" checked="checked"%/>
-      <em>[first name/first names]0 [surname/surnames]0</em>
-      [or] <em>[public name]</em>
-      [or] <em>[alias]</em>
-      %if;browsing_with_sosa_ref;[or]
-        %apply;relative_sosa%with
-          <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+
+<div id="rel_search">
+  <h2 class="highlight">[*relationship link between]</h2>
+  <form name="relationship" method="get" action="%action;" onsubmit="return check_form_relationship()">   
+    <p>%hidden;</p>
+    <div id="rel_form_search">
+      <input type="hidden" name="em" value="R"%/>
+      %if;access_by_key;
+        <input type="hidden" name="ep" value="%first_name_key_val;"%/>
+        <input type="hidden" name="en" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="eoc" value="%occ;"%/>
         %end;
+      %else
+        <input type="hidden" name="ei" value="%index;"%/>
       %end;
-    </label>
-  </li>
-  <li>
-    <label>
-      <input type="radio" name="t" value="P"%/>
-      <em>[first name/first names]0</em>
-    </label>
-  </li>
-  <li>
-    <label>
-      <input type="radio" name="t" value="N"%/>
-      <em>[surname/surnames]0</em>
-    </label>
-  </li>
-  </ul>
-</li>
-%foreach;family;
-  %if;(spouse != "? ?")
-    <li>
-      <label>
-        <input type="radio" name="select" value="%spouse.index;"%/>
-        %spouse;
-        %if;spouse.has_nobility_titles;,%sp;
-        <em>%spouse.nobility_title;</em>%end;%nl;
+      <input type="hidden" name="m" value="NG"%/>
+      <label id="rel_search_title">
+        <input type="radio" id="radio_R" name="select" value="input" checked="checked" onclick="main()"%/>
+        [*all individual in the base]<br%/>
       </label>
-    </li>
-  %end;
-%end;
-%foreach;relation;
-  %if;has_relation_him;
-  <li>
-    <label>
-      <input type="radio" name="select" value="%relation_him.index;"%/>
-      (%relation_him.type;)%nl;%relation_him;
-      %if;relation_him.has_nobility_titles;,%sp;
-      <em>%relation_him.nobility_title;</em>%end;%nl;
-    </label>
-  </li>
-  %end;
-  %if;has_relation_her;
-  <li>
-    <label>
-      <input type="radio" name="select" value="%relation_her.index;"%/>
-      (%relation_her.type;)%nl;%relation_her;
-      %if;relation_her.has_nobility_titles;,%sp;
-      <em>%relation_her.nobility_title;</em>%end;%nl;
-    </label>
-  </li>
-  %end;
-%end;
-%foreach;related;
-<li>
-  <label>
-    <input type="radio" name="select" value="%related.index;"%/>
-    (%related.type;)%nl;%related;
-    %if;related.has_nobility_titles;,%sp;
-    <em>%related.nobility_title;</em>%end;%nl;
-  </label>
-</li>
-%end;
-%foreach;family;
-  %foreach;witness;
-  <li>
-    <label>
-      <input type="radio" name="select" value="%witness.index;"%/>
-      ([witness/witnesses]0)%nl;%witness;%nl;
-    </label>
-  </li>
-  %end;
-%end;
-</ul>
+      <div id="rel_search_content">
+        <span>[*search/case sensitive]0 :<br%/></span>
+        <input name="n" size="40" maxlength="200"%/>
+        <ul>
+          <li>
+            <label>
+              <input type="radio" name="t" value="PN" checked="checked"%/>
+              <em>[first name/first names]0 [surname/surnames]0</em>
+              [or] <em>[public name]</em>
+              [or] <em>[alias]</em>
+              %if;browsing_with_sosa_ref;[or]
+                %apply;relative_sosa%with
+                  <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+                %end;
+              %end;
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="radio" name="t" value="P"%/>
+              <em>[first name/first names]0</em>
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="radio" name="t" value="N"%/>
+              <em>[surname/surnames]0</em>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </div>
 
-<table border="%border;" width="100%%"><tr><td align="center">
-<table border="%border;">
-<tr>
-  <td align="%left;">
-    <label>
-      [*long display]
-      <input type="checkbox" name="long" value="on"%/>
-    </label>
-  </td>
-  <td align="%left;">
-    <label>
-      [*image/images]1
-      <input type="checkbox" name="image" value="on"%/>
-    </label>
-  </td>
-  <td align="%left;">
-    <label>
-      <input type="radio" name="et" value="A" checked="checked"%/>
-      [*ancestors]
-    </label>
-  </td>
-</tr>
-<tr>
-  <td align="%left;">
-    <label>
-      [*include spouses]
-      <input type="checkbox" name="spouse" value="on"%/>
-    </label>
-  </td>
-  <td align="%left;">
-    <label>
-      [*cancel GeneWeb links]
-      <input type="checkbox" name="cgl" value="on"%/>
-    </label>
-  </td>
-  <td align="%left;">
-    <label>
-      <input type="radio" name="et" value="M"%/>
-      [*relationships by marriage]
-    </label>
-  </td>
-</tr>
-<tr>
-  <td align="%left;">
-    <label>
-      [*border]
-      <input name="bd" size="1" maxlength="2" value="0"%/>
-    </label>
-  </td>
-  <td align="%left;">
-    <table><tr><td>[*color]</td>
-    <td>
-      <input type="radio" name="color" value="" checked="checked"%/>
-    </td>
-    <td class="bg1">
-      <input type="radio" name="color" value="bg1"%/>
-    </td>
-    <td class="bg2">
-      <input type="radio" name="color" value="bg2"%/>
-    </td>
-    <td class="bg3">
-      <input type="radio" name="color" value="bg3"%/>
-    </td>
-    <td class="bg4">
-      <input type="radio" name="color" value="bg4"%/>
-    </td>
-    <td class="bg5">
-      <input type="radio" name="color" value="bg5"%/>
-    </td>
-    <td class="bg6">
-      <input type="radio" name="color" value="bg6"%/>
-    </td>
-    </tr></table>
-  </td>
-  <td align="%left;">
-    <label>
-      <input type="radio" name="et" value="S"%/>
-      [*shortest path]
-    </label>
-  </td>
-</tr>
-</table>
+    <div id="rel_form_cousin">
+      <input type="hidden" name="m" value="C"%/>
+      %if;access_by_key;
+        <input type="hidden" name="p" value="%first_name_key_val;"%/>
+        <input type="hidden" name="n" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="oc" value="%occ;"%/>
+        %end;
+      %else
+        <input type="hidden" name="i" value="%index;"%/>
+      %end;
+      <label id="rel_cousin_title">
+        <input type="radio" id="radio_C" name="select" onclick="main()"%/>
+        [*close family]<br%/>
+      </label>
+      <div id="rel_cousin_content">
+        <span>[*select]<br%/></span>
+        <select id="sel_C" style="width: 250px" name="v1" onfocus="document.getElementById('radio_C').checked=true; main()" onchange="main()">
+          <option value = "0" selected = "selected">--</option>
+          %foreach;cousin_level;
+            <option value="%level;">%nn;
+              %if;(level = 1)[*siblings]%nn;
+              %elseif;(level = 2)[*cousins]%nn;
+              %elseif;(level = 3)[*2nd cousins]%nn;
+              %elseif;(level = 4)[*3rd cousins]%nn;
+              %else;
+                %apply;nth_cousins%with;
+                  %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
+                %end;
+              %end;
+            </option>
+          %end;
+          %( Attention, il faut que ces deux options soient bien les dernières %)
+          <option id="uncle" value="2">[*uncles and aunts]</option>
+          %if;has_nephews_or_nieces;
+            <option id="nephew" value="1">[*nephews and nieces]</option>
+          %end;
+        </select>
+        <input type="hidden" id="v2" name="v2" value=""/>
+      </div>
+    </div>
 
-<tr align="%left;">
-  <td align="center" colspan="2">
-    <input type="submit" value="Ok"%/>
-  </td>
-</td></tr></table>
-</form>
+    <div id="rel_form_shortcut">
+      <input type="hidden" name="em" value="R"%/>
+      %if;access_by_key;
+        <input type="hidden" name="ep" value="%first_name_key_val;"%/>
+        <input type="hidden" name="en" value="%surname_key_val;"%/>
+        %if;(occ != "0")
+          <input type="hidden" name="eoc" value="%occ;"%/>
+        %end;
+      %else
+        <input type="hidden" name="ei" value="%index;"%/>
+      %end;
+      <input type="hidden" name="m" value="NG"%/>
+      <span>[*relationship shortcut]</span>
+      <ul>
+        %if;browsing_with_sosa_ref;
+          <li>
+            <label>
+              <input type="radio" name="select" value="%index;" onclick="main()"%/>
+              <img src="%image_prefix;/sosa.png" %sp; alt="sosa" style="border: none"%/>
+              <b>%sosa_ref;</b>
+              <i>(sosa 1)</i>
+            </label>
+          </li>
+        %end;
+        %foreach;family;
+          %if;(spouse != "? ?")
+            <li>
+              <label>
+                <input type="radio" name="select" value="%spouse.index;" onclick="main()"%/>
+                %spouse;
+                %if;spouse.has_nobility_titles;,%sp;
+                <em>%spouse.nobility_title;</em>%end;%nl;
+                ([spouse/spouses]0)%nl;
+              </label>
+            </li>
+          %end;
+        %end;
+        %foreach;relation;
+          %if;has_relation_him;
+          <li>
+            <label>
+              <input type="radio" name="select" value="%relation_him.index;" onclick="main()"%/>
+              %relation_him;
+              %if;relation_him.has_nobility_titles;,%sp;
+              <em>%relation_him.nobility_title;</em>%end;%nl;
+              (%relation_him.type;)%nl;
+            </label>
+          </li>
+          %end;
+          %if;has_relation_her;
+          <li>
+            <label>
+              <input type="radio" name="select" value="%relation_her.index;" onclick="main()"%/>
+              %relation_her;
+              %if;relation_her.has_nobility_titles;,%sp;
+              <em>%relation_her.nobility_title;</em>%end;%nl;
+              (%relation_her.type;)%nl;
+            </label>
+          </li>
+          %end;
+        %end;
+        %foreach;related;
+        <li>
+          <label>
+            <input type="radio" name="select" value="%related.index;" onclick="main()"%/>
+            %related;
+            %if;related.has_nobility_titles;,%sp;
+            <em>%related.nobility_title;</em>%end;%nl;
+            (%related.type;)%nl;
+          </label>
+        </li>
+        %end;
+        %foreach;family;
+          %foreach;witness;
+          <li>
+            <label>
+              <input type="radio" name="select" value="%witness.index;" onclick="main()"%/>
+              %witness;%nl;
+              ([witness/witnesses]0)%nl;
+            </label>
+          </li>
+          %end;
+        %end;
+      </ul>
+    </div>
+  
+    <div id="rel_options">
+      <span>[*relationship display options]</span>
+      <ul>
+        <li><label><input type="checkbox" name="spouse" value="on"%/> [*display spouse]</label></li>
+        <li><label><input type="checkbox" name="image" value="on"%/> [*display picture]1</label></li>
+        <li><label><input type="checkbox" class="radio" name="bd" value="1"%/> [*display border tree]</label></li>
+        <li><label><input name="bd" size="1" maxlength="2" value="0"%/>[*display border tree] </label></li>
+        <li>
+          <table>
+            <tr>
+              <td>[*color]</td>
+              <td><input type="radio" name="color" value="" checked="checked"%/></td>
+              <td class="bg1"><input type="radio" name="color" value="bg1"%/></td>
+              <td class="bg2"><input type="radio" name="color" value="bg2"%/></td>
+              <td class="bg3"><input type="radio" name="color" value="bg3"%/></td>
+              <td class="bg4"><input type="radio" name="color" value="bg4"%/></td>
+              <td class="bg5"><input type="radio" name="color" value="bg5"%/></td>
+              <td class="bg6"><input type="radio" name="color" value="bg6"%/></td>
+            </tr>
+          </table>
+        </li>
+      </ul>
+    </div>
+    
+    <div id="rel_mode">
+      <span>[*relationship computing mode]</span>
+      <ul>
+        <li id="rel_ancestors">
+          <label><input type="radio" name="et" value="A" checked="checked"%/>
+          [*relationship by ancestors]</label>
+        </li>
+        <li id="rel_by_marriage">
+          <label><input type="radio" name="et" value="M"%/>
+          [*relationship by marriage]</label>
+        </li>
+        <li id="rel_shortest_path">
+          <label><input type="radio" name="et" value="S"%/>
+          [*shortest path]</label>
+        </li>
+      </ul>
+    </div>
+  
+    <p class="submit-line">
+      <input type="submit" value="[*validate/delete]0"%/>
+    </p>
+  </form>
+</div>
+
+<div id="rel_others">
+  <div id="rel_see_also" class="moduleExtra">
+   <div>
+    <h2 class="highlight"><span>[*see also]</span></h2>
+    <div>
+     <ul>
+       %if;(died = "" and (wizard or friend))
+         <li>
+           <img src="%image_prefix;/picto_anniversaire_small.png" alt="" title="" %/>
+           <a href="%prefix;%access;;m=C;t=AN">[*family birthday]</a>
+         </li>
+       %end;
+       <li>
+         <img src="%image_prefix;/picto_branche_patronymique.png" alt="" title="" %/>
+         <a href="%prefix;m=A;%access;;sosab=10;v=10;siblings=on;notes=on;src=on;t=F">[*surnames branch]</a> (10 [generation/generations]1)
+       </li>
+     </ul>
+    </div>
+   </div>
+  </div>
+</div>
 
 
 %base_trailer;
