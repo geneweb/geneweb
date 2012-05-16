@@ -2979,9 +2979,7 @@ value print_tips_relationship conf =
         tag "tr" begin
           tag "td" begin
             Wserver.wprint "%s"
-              (capitale 
-                 (transl conf 
-                    "select an individual to compute relationship with him"));
+              (capitale (transl conf "select person to compute relationship"));
           end;
         end;
       end;
