@@ -1,6 +1,7 @@
  !dates order
  !dir
  !languages
+ the first branch
  to see the first branch
  to see the first relationship link
  to try again with this number
@@ -43,6 +44,7 @@ advanced request
 after
 after (date)
 age
+age at death
 age at death:
 age at %s birth date
 a grandfather/a grandmother/a grandparent
@@ -54,6 +56,7 @@ a great-uncle/a great-aunt
 a half-brother/a half-sister/a half-sibling
 alias
 alive
+all individual in the base
 all the estates
 all the titles
 alphabetic order
@@ -89,6 +92,10 @@ born
 branch/branches
 burial
 buried
+by first name
+by first name and surname
+by sosa number
+by surname
 calendar/calendars
 cancel GeneWeb links
 candidate father/candidate mother/candidate parents
@@ -103,6 +110,7 @@ child/children
 children's names changed
 click
 click on "%s"
+close family
 color
 comment
 connections
@@ -116,6 +124,9 @@ create
 cremated
 database forum
 date
+date of birth
+date of death
+date of marriage
 days old
 death
 delete
@@ -125,11 +136,17 @@ died young
 direct ancestor of %s
 disappeared
 disconnect
+display by/branch/alphabetic order
 display by slices/slice width/overlap/total width
+display border tree
+display generation
+display picture
+display spouse
 divorce
 divorced
 don't group the common branches together
 don't know
+don't repeat individual already seen
 end
 engaged
 engaged%t to
@@ -139,6 +156,7 @@ exact
 executed (legally killed)
 families with encoding
 family added
+family birthday
 family deleted
 family/families
 family history
@@ -225,20 +243,22 @@ message deleted
 message/previous message/previous messages/next message
 M/F
 miscellaneous notes
+miscellaneous informations
 missing ancestors
-missing family sources for %t and %t
-missing individual sources for %t
+missing sources
 modify
 months old
 moon age/new moon/first quarter/full moon/last quarter
 more than %d answers
 msg error disconnected
 murdered
+n° d'Aboville
 name
 name %s already used by %tthis person%t
 navigation
 navigation arbre
 navigation with %t as Sosa reference
+NB: you should try another relationship computing mode
 nephews and nieces
 new modification
 next sibling
@@ -262,7 +282,7 @@ nth (generation)
 number
 number of branches
 number of living persons:
-occupation
+occupation/occupations
 of course dead
 of the %s generation
 on (day month year)
@@ -298,19 +318,28 @@ recognizing father/recognizing mother/recognizing parents
 reference key
 relation/relations
 relationship
+relationship by ancestors
+relationship by marriage
 relationship computing
+relationship computing mode
+relationship display options
 relationship link/relationship links
-relationships by marriage
+relationship link between
 relationship%t to
 search/case sensitive
 see
 see above
+see also
 see further
+select
+select a month to see all the anniversaries
+select person to compute relationship
 send
 separated
 several answers
 sex
 short display
+shortcut: direct ancestor relationship with
 shortest path
 should be female
 should be male
@@ -320,6 +349,7 @@ son/daughter/child
 Sosa
 source/sources
 specify
+spouse/spouses
 spouses not included
 starting with
 statistics
@@ -327,8 +357,10 @@ statistics and anniversaries
 surname alias
 surname missing
 surname not found
+surnames branch
 surnames list
 surname/surnames
+table
 text
 the anniversary
 the anniversary of marriage
@@ -390,6 +422,9 @@ version
 view source
 visualize/show/hide/summary
 warnings
+where born
+where dead
+where married
 with
 witness at marriage of %s and %s
 witness/witnesses

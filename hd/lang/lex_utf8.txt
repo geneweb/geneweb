@@ -63,6 +63,34 @@ sl: af=afrikaanščina/ca=katalonščina/cs=češčina/da=danščina/de=nemšči
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sl=slovenska/sv=svenska/zh=kinesiska
 zh: fr=法语/zh=中文
 
+     the first branch
+af:  om die eerste staak te sien
+bg:  за да видите първия клон
+br:  evit gwelout ar skourr kentañ
+ca:  per veure la primera branca
+cs:  abyste viděli první
+da:  for at se den første
+de: , um den ersten zu sehen
+en:  first line
+eo:  por vidi la unuan branĉon
+es:  para ver la primera rama
+et:  esimese haru vaatamiseks
+fi:  nähdäksesi ensimmäisen haaran
+fr:  la première
+he:   לראות את הענף הראשון
+is:  til að sjá fyrstu grein
+it:  per vedere il primo
+lv:  skatīt pirmo zaru
+nl:  om de eerste tak te zien
+no:  for å se den første
+pl:  aby zobaczyć pierwszą linię (gałąź)
+pt:  para ver o primeiro ramo
+ro:  pentru a vedea primul
+ru:  чтобы увидеть первую ветку
+sk:  aby ste videli prvú vetvu
+sl:  za prikaz prve veje
+sv:  för att se den första
+
      to see the first branch
 af:  om die eerste staak te sien
 bg:  за да видите първия клон
@@ -1212,6 +1240,35 @@ sl: starost
 sv: ålder
 zh:  年龄
 
+    age at death
+af: ouderdom by afsterwe
+bg: на възраст
+br: p'edo
+ca: a l'edat de
+cs: věk v době úmrtí
+da: alder ved død
+de: Alter
+en: age at death
+eo: mortaĝo
+es: a la edad de
+et: vanus surres
+fi: ikä kuollessa
+fr: âge au décès
+he:   גיל במותו/מותה
+is: dánaraldur
+it: all'età di
+lv: miršanas vecums
+nl: leeftijd bij overlijden
+no: alder
+pl: wiek
+pt: com a idade de
+ro: etate la deces
+ru: в возрасте
+sk: vek v dobe úmrtia
+sl: živel(a)
+sv: livslängd
+zh:  享年
+
     age at death:
 af: ouderdom by afsterwe:
 bg: на възраст
@@ -1501,6 +1558,10 @@ ru: живой
 sk: žijúci
 sl: živi
 sv: lever
+
+    all individual in the base
+en: any individual in the family tree
+fr: n'importe quel individu de l'arbre
 
     all the estates
 af: alle plase
@@ -2449,6 +2510,22 @@ sk: pochovaný/pochovaná
 sl: pokopan/pokopana/pokopani
 sv: begravd
 
+    by first name
+en: by first name
+fr: par prénom
+
+    by first name and surname
+en: by full name
+fr: par prénom patronyme
+
+    by surname
+en: by surname
+fr: par patronyme
+
+    by sosa number
+en: by sosa number
+fr: par numéro sosa
+
     calendar/calendars
 af: kalender/kalenders
 ar: تقويم/تقاويم
@@ -2822,6 +2899,10 @@ sk: poklepte na "%s"
 sl: kliknite na "%s"
 sv: klicka "%s"
 
+    close family
+en: a parent
+fr: un proche
+
     color
 af: kleur
 bg: цвят
@@ -2944,7 +3025,7 @@ eo: daùrigu la kuniĝon
 es: continuar la fusión
 et: jätka ühendamist
 fi: jatka yhdistämistä
-fr: continuer à fusionner
+fr: continuer à fusionner ?
 he:  להמשיך לאחד
 is: halda áfram að sameina
 it: continua la fusione
@@ -3178,6 +3259,18 @@ sk: dátum
 sl: datum
 sv: datum
 
+    date of birth
+en: date of birth
+fr: date de naissance
+
+    date of death
+en: date of death
+fr: date de décès
+
+    date of marriage
+en: date of marriage
+fr: date de mariage
+
     days old
 af: dae oud
 bg: дни
@@ -3409,6 +3502,10 @@ sk: odpojené
 sl: prekinjeno
 sv: logga ut
 
+    display by/branch/alphabetic order
+en: display by:/line/alphabetical order
+fr: affichage par :/branches/ordre alphabétique
+
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
 bg: да се покаже на части/широчина на частите/застъпване/обща широчина
@@ -3436,6 +3533,22 @@ ru: отображать частами/ширина части/перекрыт
 sk: zobraz po segmentoch/šírka segmentu/prekrytie/celková šírka
 sl: prikaži s pomočjo izsekov/širina izseka/prekrivanje/skupna širina
 sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
+
+    display border tree
+en: display frame
+fr: afficher les bordures aux arbres
+
+    display picture
+en: display family picture
+fr: afficher portrait
+
+    display generation
+en: display generation
+fr: afficher le numéro de génération
+
+    display spouse
+en: display spouse
+fr: afficher conjoint
 
     divorce
 af: geskei
@@ -3548,6 +3661,10 @@ ru: не известен
 sk: nie je známe
 sl: ni znano
 sv: vet ej
+
+    don't repeat individual already seen
+en: don't repeat pedigree collapse
+fr: ne pas répéter les implexes
 
     end
 af: einde
@@ -3803,6 +3920,10 @@ ru: cемья добавленна
 sk: rodina pridaná
 sl: družina dodana
 sv: ny familj tillagd
+
+    family birthday
+en: family birthday
+fr: anniversaires des proches
 
     family deleted
 af: familie uitgevee
@@ -6074,6 +6195,10 @@ sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
 
+    miscellaneous information
+en: other field
+fr: champ divers
+
     missing ancestors
 af: ontbrekende voorsate
 bg: липсващи предци
@@ -6102,13 +6227,9 @@ sk: chýbajúci predkovia
 sl: manjkajoči predniki
 sv: anor som saknas
 
-    missing family sources for %t and %t
-en: missing family sources for %t and %t
-fr: sources familiale manquantes pour %t et %t
-
-    missing individual sources for %t
-en: missing individual sources for %t
-fr: sources individu manquantes pour %t
+    missing sources
+en: missing sources
+fr: sources manquantes
 
     modify
 af: wysig
@@ -6254,6 +6375,10 @@ sk: zavraždený/zavraždená
 sl: umorjen/umorjena
 sv: mördad
 
+    n° d'Aboville
+en: d'Aboville System number
+fr: n° d'Aboville
+
     name
 af: naam
 bg: име
@@ -6378,6 +6503,10 @@ sk: prezeranie s %t ako referenciou "Sosa"
 sl: pregled z %t kot Sosa
 sv: navigering med %t som proband (Kekules system)
 
+    NB: you should try another relationship computing mode
+en: cou can try another computing option
+fr: n'hésitez pas a relancer un calcul en choisissant un autre mode de calcul
+
     nephews and nieces
 af: broers- en susterskinders
 bg: племенници и племеннички
@@ -6410,7 +6539,7 @@ sv: nevöer och niecer
 de: möchten Sie eine weitere Änderung durchführen
 en: continue edit
 es: ¿Quiere hacer una nueva corrección?
-fr: souhaitez-vous effectuer une nouvelle correction
+fr: cliquez ici pour effectuer une nouvelle correction
 
     next sibling
 af: volgende broer/volgende suster/volgende broer of suster
@@ -6946,12 +7075,12 @@ ca: ocupació
 cs: zaměstnání
 da: stilling
 de: Beruf
-en: occupation
+en: occupation/occupations
 eo: okupado
 es: ocupación
 et: amet
 fi: ammatti
-fr: profession
+fr: profession/professions
 he:  מקצוע
 is: starf
 it: professione
@@ -7792,7 +7921,7 @@ sl: znani oče/znana mati/znani starši
 sv: erkännande far/erkännande mor/erkännande föräldrar
 
     reference key
-en: key
+en: ID
 fr: référence
 
     relation/relations
@@ -7851,6 +7980,38 @@ sk: vzťah
 sl: zveza
 sv: släktskap
 
+    relationship by ancestors
+en: ancestry
+fr: ascendants directs
+
+    relationship by marriage
+af: aangetroude verwantskappe
+bg: родство чрез брак
+br: liammoù a gerentiezh dre euredennoù
+ca: parentiu polític
+cs: příbuzenské vztahy přes svatby
+da: slægtskaber ved giftermål
+de: Heiratsbeziehungen
+en: relatives by marriage
+eo: ligoj per edziĝo
+es: parentescos políticos
+et: sugulus abielu kaudu
+fi: sukulaisuus avioliiton kautta
+fr: liens de parenté par alliance
+he:  קשרים דרך נשואין
+is: tengjast með giftingu
+it: parentele per matrimonio
+lv: precību saites
+nl: verwant door huwelijk
+no: relasjon gjennom ekteskap
+pl: powinowactwo
+pt: relações por casamento
+ro: relatie prin mariaj 
+ru: связь браком
+sk: príbuzenské vzťahy cez svadby
+sl: sorodstvo preko poroke
+sv: släktskap genom äktenskap
+
     relationship computing
 af: bereken verwantskappe
 bg: определяне на родство
@@ -7880,6 +8041,14 @@ sl: pregled sorodstva
 sv: släktskapsberäkning
 zh:  相关查询
 
+     relationship computing mode
+en: computing
+fr: mode de calcul
+
+     relationship display options
+en: options:
+fr: options d'affichage des arbres de parenté :
+
     relationship link/relationship links
 af: verwantskap/verwantskappe
 bg: родствена връзка/родствени връзки
@@ -7908,33 +8077,9 @@ sk: príbuzenský vzťah/príbuzenské vzťahy
 sl: sorodnik/sorodnikov
 sv: anlinje/anlinjer
 
-    relationships by marriage
-af: aangetroude verwantskappe
-bg: родство чрез брак
-br: liammoù a gerentiezh dre euredennoù
-ca: parentiu polític
-cs: příbuzenské vztahy přes svatby
-da: slægtskaber ved giftermål
-de: Heiratsbeziehungen
-en: relationships by marriage
-eo: ligoj per edziĝo
-es: parentescos políticos
-et: sugulus abielu kaudu
-fi: sukulaisuus avioliiton kautta
-fr: liens de parenté par alliance
-he:  קשרים דרך נשואין
-is: tengjast með giftingu
-it: parentele per matrimonio
-lv: precību saites
-nl: verwant door huwelijk
-no: relasjon gjennom ekteskap
-pl: powinowactwo
-pt: relações por casamento
-ro: relatie prin mariaj 
-ru: связь браком
-sk: príbuzenské vzťahy cez svadby
-sl: sorodstvo preko poroke
-sv: släktskap genom äktenskap
+    relationship link between
+en: family link with...
+fr: lien de parenté avec...
 
     relationship%t to
 af: verwantskap%t met
@@ -8048,6 +8193,10 @@ sk: pozri vyššie
 sl: glej zgoraj
 sv: se ovan
 
+    see also
+en: see also
+fr: à voir aussi
+
     see further
 af: kyk verder
 bg: вж. по-долу
@@ -8075,6 +8224,18 @@ ru: смотри дальше
 sk: pozri ďalej
 sl: nadalje glej
 sv: se vidare
+
+    select
+en: select:
+fr: choisir :
+
+    select a month to see all the anniversaries
+en: select month
+fr: sélectionnez un mois pour voir tous les anniversaires
+
+    select person to compute relationship
+en: click an individual below to calculate the family link
+fr: cliquez sur la personne avec laquelle vous souhaitez réaliser un calcul de parenté
 
     send
 af: stuur
@@ -8215,6 +8376,10 @@ ru: кратко
 sk: krátky výpis
 sl: kratek seznam
 sv: kort rapport
+
+    shortcut: direct ancestor relationship with
+en: shortcuts: Family link with...
+fr: raccourcis : liens d'ascendance avec...
 
     shortest path
 af: kortste pad
@@ -8465,6 +8630,10 @@ sl: določi
 sv: välj
 zh:  从下列选取
 
+    spouse/spouses
+en: spouse/spouses
+fr: conjoint/conjoints
+
     spouses not included
 af: eggenote weggelaat
 bg: без да се включват съпрузите/съпругите
@@ -8642,6 +8811,10 @@ sk: priezvisko nenájdené
 sl: priimek ni najden
 sv: hittar inte efternamn
 
+    surnames branch
+en: lines by name
+fr: branches patronymiques
+
     surnames list
 af: vanne lys
 bg: списък на фамилните имена
@@ -8702,6 +8875,10 @@ sk: priezvisko/priezviská
 sl: priimek/priimki
 sv: efternamn/efternamn
 zh:  姓
+
+    table
+en: table
+fr: tableau
 
     text
 af: teks
@@ -10214,6 +10391,18 @@ ru: внимание
 sk: varovanie
 sl: opozorila
 sv: varningar
+
+    where born
+en: where born
+fr: lieu de naissance
+
+    where dead
+en: where dead
+fr: lieu de décès
+
+    where married
+en: where married
+fr: lieu de mariage
 
     with
 af: met
