@@ -8041,11 +8041,11 @@ sl: pregled sorodstva
 sv: släktskapsberäkning
 zh:  相关查询
 
-     relationship computing mode
+    relationship computing mode
 en: computing
 fr: mode de calcul
 
-     relationship display options
+    relationship display options
 en: options:
 fr: options d'affichage des arbres de parenté :
 
@@ -8080,6 +8080,10 @@ sv: anlinje/anlinjer
     relationship link between
 en: family link with...
 fr: lien de parenté avec...
+
+    relationship shortcut
+en: shortcuts:
+fr: raccourcis :
 
     relationship%t to
 af: verwantskap%t met
@@ -8376,10 +8380,6 @@ ru: кратко
 sk: krátky výpis
 sl: kratek seznam
 sv: kort rapport
-
-    shortcut: direct ancestor relationship with
-en: shortcuts: Family link with...
-fr: raccourcis : liens d'ascendance avec...
 
     shortest path
 af: kortste pad
