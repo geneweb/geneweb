@@ -3043,7 +3043,7 @@ eo: daùrigu la kuniĝon
 es: continuar la fusión
 et: jätka ühendamist
 fi: jatka yhdistämistä
-fr: continuer à fusionner ?
+fr: continuer à corriger ?
 he:  להמשיך לאחד
 is: halda áfram að sameina
 it: continua la fusione
@@ -3056,30 +3056,6 @@ ro: continua unificarea
 ru: продолжить объединение
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
-
-    continued
-bg: следва
-cs: pokracuje
-da: fortsat
-de: fortgesetzt
-en: continued
-eo: continuigo
-es: continúa
-et: jätkub
-fi: jatkuu
-fr: suite
-he: המשך
-it: continua
-lv: nepārtraukts
-nl: vervolgd
-no: fortsatt
-pl: ciąg dalszy
-pt: continuação
-ro: continuare
-ru: продолжено
-sk: pokračovať
-sl: nadaljevano
-sv: forts
 
     continue merging
 af: gaan voort met die samevoeging
@@ -3108,6 +3084,30 @@ ru: продолжить объединение
 sk: pokračovať v spájaní
 sl: nadaljuj z združevanjem
 sv: fortsätt slå samman
+
+    continued
+bg: следва
+cs: pokracuje
+da: fortsat
+de: fortgesetzt
+en: continued
+eo: continuigo
+es: continúa
+et: jätkub
+fi: jatkuu
+fr: suite
+he: המשך
+it: continua
+lv: nepārtraukts
+nl: vervolgd
+no: fortsatt
+pl: ciąg dalszy
+pt: continuação
+ro: continuare
+ru: продолжено
+sk: pokračovať
+sl: nadaljevano
+sv: forts
 
     cousins
 af: neefs/niggies
@@ -3473,9 +3473,12 @@ sv: dog ung
 de: direkter Vorfahre von %s
 en: direct ancestor of %s
 es: antepasado directo de %s
-fr: ancêtre direct de %s
+fi: %s:n suora esivanhempi
+fr: anc&ecirc;tre direct de %s
 it: antenato diretto di %s
 nl: rechtstreeks voorouder van %s
+no: direkte stamfar til %s
+sv: direkt förfader till %s
 
     disappeared
 af: verdwyn
@@ -4304,7 +4307,7 @@ bg: за списъка по дати на последно изменение
 cs: pre vypis podla datumu poslednej zmeny
 da: for en liste sorteret efter datoen for seneste ændring
 de: für eine, nach dem Datum der letzten Änderung geordnete Liste
-en: to display the results list by date of the last modification
+en: for the list ordered by the date of the last modification
 eo: por la listo ordita laǔ la dato de la lasta modifigo
 es: para la lista ordenada por fecha de la última modificación
 et: sorteerimaks nimekirja viimase muudatuse tegemise aja järgi
@@ -4705,18 +4708,18 @@ br: dezrevell an hizivadurioù
 ca: històric de les actualitzacions
 cs: historie změn
 da: opdateringers historie
-de: Chronik der Aktualisierungen
-en: update History
+de: verlauf der Updates
+en: history of Updates
 eo: historio de la ĝisdatigoj
-es: historico de las actualizaciones
+es: histórico de las actualizaciones
 et: muudatuste ajalugu
-fi: päivityshistoria
+fi: Historia päivtetty
 fr: historique des mises à jour
 he:  רשימת העדכונים
 is: uppfærslusaga
-it: riassunto degli aggiornamenti
+it: cronistoria degli aggiornamenti
 lv: labojumu vēsture
-nl: kroniek van de wijzigingen
+nl: geschiedenis van de wijzigingen
 no: oppdateringshistorie
 pl: rejestr zmian
 pt: historial das actualizações
@@ -4725,7 +4728,7 @@ ro: istoria de actualizare
 ru: история обновлений
 sk: história zmien
 sl: zgodovina sprememb
-sv: uppdateringarnas historia
+sv: lista över uppdateringarna
 
     horizontally
 af: horisontaal
@@ -4875,8 +4878,7 @@ ca: imatge/imatges
 cs: obrázek/obrázky
 da: billede/billeder
 de: Bild/Bilder
-en: picture has been uploaded
-en: image/images
+en: a picture/pictures
 eo: bildo:a:+n/bildoj
 es: imagen/imágenes
 et: pilt/pildid
@@ -6781,8 +6783,9 @@ sv: inte nämnd
     no modification
 de: keine Ortsänderung vermerkt
 en: no changes
+es: ninguna modificación
 fr: aucune modification
-se: ninguna modificación
+it: nessuna modifica
 
     no sexes check
 af: geslag word nie aangedui nie
@@ -7155,15 +7158,35 @@ sl: poklic
 sv: yrke
 
     of course dead
-bg: разбира се починал
-de: natürlich tot
-en: of course dead
-fi: tietenkin kuollut
-fr: évidemment décédé(e)
-no: selvfølgelig død
-ru: конечно мёртв(а)
-sl: očitno umrl(/a)
-sv: givetsvis död
+af: oorlede
+ar: توفي
+bg: починал
+br: marvet
+ca: mort
+cs: zemřel
+da: død
+de: sicherlich bereits verstorben
+en: may be dead
+eo: mortinta
+es: fallecido/a (fecha desconocida)
+et: surnud
+fi: varmuudella kuollut
+fr: certainement décédé
+he:   נפטר
+is: dó
+it: sicuramente morto
+lv: miršanas
+nl: zeker overleden
+no: helt sikkert avgått ved døden
+pl: zmarł
+pt: falecido
+ro: a decedat
+ru: умер
+sl: umrl
+sv: helt säkert avliden
+zh:  死
+
+
 
     of the %s generation
 af: uit die %s geslag
@@ -8338,7 +8361,7 @@ ca: enviar
 cs: odeslat
 da: indsæt
 de: senden +before
-en: updload
+en: upload
 eo: sendi :a:
 es: enviar
 et: saada
@@ -9640,6 +9663,7 @@ de: die Änderungen sind abgeschlossen : % der Datei (en) kopiert
 en: successfully updated: %d places have been changed
 es: la modificación ha sido hecha: %d ficha(s) corregida(s)
 fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+it: la modifica è stata correttamente eseguita : % di schede corrette
 
     the parents
 af: die ouers
@@ -9834,11 +9858,15 @@ sl: da bi dodal otroka k družini, uporabite "%s"
 sv: för att lägga till ett barn i en familj, använd "%s"
 
     to change
+de: zum  Wechseln
 en: to change
+es: para cambiar
 et: muutmiseks
+fi: muuttaaksesi
 fr: pour changer
 it: per cambiare
-sk: pre zmenu
+nl: om te wijzigen
+sv: för att ändra
 
     to come
 de: in Erwartung

@@ -189,7 +189,7 @@
           </label>
           <br%/>
           <label>
-            - [occupation]
+            - [occupation/occupations]1
             <input type="checkbox" name="occu" value="on"%/>
           </label>
           <br%/><br%/>

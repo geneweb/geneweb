@@ -593,7 +593,7 @@
     %end;
   </p>
   <p class="modify_person">
-           <label>[*occupation]<input name="occu" size="40" maxlength="200" value="%occupation;" id="occu"%/></label>%nn;
+           <label>[*occupation/occupations]1<input name="occu" size="40" maxlength="200" value="%occupation;" id="occu"%/></label>%nn;
     <br%/><label>[*source/sources]0<input name="src" size="40" maxlength="300"%sp; value="%sources;"%sp;id="src"%/></label>%nn;
     <br%/><label>[*image/images]0<input name="image" size="30" value="%image;" id="image"%/></label>%nn;
     <br%/>

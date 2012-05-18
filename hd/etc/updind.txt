@@ -522,7 +522,7 @@ function changeCalendar(e,v,m,c) {
 
 %apply;source("burial")
 
-<h4><label for="occu">[*occupation]</label></h4>
+<h4><label for="occu">[*occupation/occupations]1</label></h4>
 
 <table border="1" width=700px>
 <tr>

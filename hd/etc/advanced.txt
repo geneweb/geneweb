@@ -85,7 +85,7 @@
 <h4>[*burial]</h4>
 %apply;event("burial")
 
-<h4>[*occupation]</h4>
+<h4>[*occupation/occupations]1</h4>
 
 <table border="1">
 <tr align="left">
