@@ -79,7 +79,7 @@ value print_differences conf base branches p1 p2 =
       (fun p -> sou base (get_image p));
     string_field True (transl conf "public name") "public_name"
       (fun p -> sou base (get_public_name p));
-    string_field True (transl conf "occupation") "occupation"
+    string_field True (transl_nth conf "occupation/occupation" 0) "occupation"
       (fun p -> sou base (get_occupation p));
     string_field False (transl conf "sex") "sex"
       (fun p ->

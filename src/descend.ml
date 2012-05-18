@@ -730,7 +730,8 @@ value print_desc_table_header conf base = do {
     if p_getenv conf.env "occu" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "occupations"));
+        Wserver.wprint "%s" 
+          (capitale (transl_nth conf "occupation/occupations" 1));
       end
     else ();
   end;
