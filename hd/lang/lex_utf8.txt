@@ -3533,6 +3533,7 @@ sl: prekinjeno
 sv: logga ut
 
     display by/branch/alphabetic order
+de: anzuzeigen/nach Zweigen/alphabetisch geordnet
 en: display by:/line/alphabetical order
 es: edición por:/ramas/orden alfabético
 fr: affichage par :/branches/ordre alphabétique
