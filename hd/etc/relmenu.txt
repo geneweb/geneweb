@@ -160,7 +160,7 @@
       <input type="hidden" name="m" value="NG"%/>
       <label id="rel_search_title">
         <input type="radio" id="radio_R" name="select" value="input" checked="checked" onclick="main()"%/>
-        [*all individual in the base]<br%/>
+        [*any individual in the base]<br%/>
       </label>
       <div id="rel_search_content">
         <span>[*search/case sensitive]0 :<br%/></span>
