@@ -672,7 +672,7 @@ value display_spouse_index conf base max_level ancestor =
 (* *********************************************************************** *)
 value print_desc_table_header conf base = do {
   let nb_col = ref 2 in
-  tag "tr" "class=\"descend_table_header\"" begin
+  tag "tr" "class=\"descends_table_header\"" begin
     tag "th" begin
       Wserver.wprint "%s" (capitale (transl conf "n° d'Aboville"));
     end;
@@ -682,13 +682,13 @@ value print_desc_table_header conf base = do {
     if p_getenv conf.env "birth" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "birth date"));
+        Wserver.wprint "%s" (capitale (transl conf "date of birth"));
       end
     else ();
     if p_getenv conf.env "birth_place" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "birth place"));
+        Wserver.wprint "%s" (capitale (transl conf "where born"));
       end
     else ();
     if p_getenv conf.env "marr" = Some "on" then
@@ -699,26 +699,26 @@ value print_desc_table_header conf base = do {
     else ();
     if p_getenv conf.env "marr_date" = Some "on" then
       tag "th" begin
-        Wserver.wprint "%s" (capitale (transl conf "marriage date"));
+        Wserver.wprint "%s" (capitale (transl conf "date of marriage"));
         incr nb_col;
       end
     else ();
     if p_getenv conf.env "marr_place" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "marriage place"));
+        Wserver.wprint "%s" (capitale (transl conf "where married"));
       end
     else ();
     if p_getenv conf.env "death" = Some "on" then
       tag "th" begin
-        Wserver.wprint "%s" (capitale (transl conf "death date"));
+        Wserver.wprint "%s" (capitale (transl conf "date of death"));
         incr nb_col;
       end
     else ();
     if p_getenv conf.env "death_place" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "death place"));
+        Wserver.wprint "%s" (capitale (transl conf "where dead"));
       end
     else ();
     if p_getenv conf.env "death_age" = Some "on" then
@@ -973,7 +973,7 @@ value display_descendant_with_table conf base max_lev p =
             tag "tr" begin
               tag "th" "align=\"left\" colspan=\"%d\"" nb_col begin
                 Wserver.wprint "%s %d" 
-                  (capitale (transl_nth conf "generation/generation" 0)) lev;
+                  (capitale (transl_nth conf "generation/generations" 0)) lev;
               end;
             end
           else ();
