@@ -70,16 +70,16 @@ br:  evit gwelout ar skourr kentañ
 ca:  per veure la primera branca
 cs:  abyste viděli první
 da:  for at se den første
-de: , um den ersten zu sehen
+de:  Erster Zweig
 en:  first line
 eo:  por vidi la unuan branĉon
-es:  para ver la primera rama
+es:  la primera rama
 et:  esimese haru vaatamiseks
 fi:  nähdäksesi ensimmäisen haaran
 fr:  la première
 he:   לראות את הענף הראשון
 is:  til að sjá fyrstu grein
-it:  per vedere il primo
+it:  il primo ramo
 lv:  skatīt pirmo zaru
 nl:  om de eerste tak te zien
 no:  for å se den første
@@ -1247,16 +1247,16 @@ br: p'edo
 ca: a l'edat de
 cs: věk v době úmrtí
 da: alder ved død
-de: Alter
+de: Alter zum Todeszeitpunkt
 en: age at death
 eo: mortaĝo
-es: a la edad de
+es: Edad de defunción
 et: vanus surres
 fi: ikä kuollessa
 fr: âge au décès
 he:   גיל במותו/מותה
 is: dánaraldur
-it: all'età di
+it: età alla morte
 lv: miršanas vecums
 nl: leeftijd bij overlijden
 no: alder
@@ -1558,10 +1558,6 @@ ru: живой
 sk: žijúci
 sl: živi
 sv: lever
-
-    all individual in the base
-en: any individual in the family tree
-fr: n'importe quel individu de l'arbre
 
     all the estates
 af: alle plase
@@ -1931,6 +1927,13 @@ ru: дядя/тетя
 sk: strýc/teta
 sl: stric/teta
 sv: en farbror/en faster/en morbror/en moster
+
+    any individual in the base
+de: jede beliebige Person im Stammbaum
+en: any individual in the family tree
+es: cualquier individuo del árbol
+fr: n'importe quel individu de l'arbre
+it: un qualsiasi individuo dell’albero
 
     are
 af: is
@@ -2511,20 +2514,32 @@ sl: pokopan/pokopana/pokopani
 sv: begravd
 
     by first name
+de: nach Vornamen
 en: by first name
+es: por nombre
 fr: par prénom
+it: per nome
 
     by first name and surname
+de: nach Vor- und Zuname
 en: by full name
+es: por nombre apellido
 fr: par prénom patronyme
+it: per nom cognome
 
     by surname
+de: nach Namen
 en: by surname
+es: por apellido
 fr: par patronyme
+it: per cognome
 
     by sosa number
+de: nach SOSA-Nummer
 en: by sosa number
+es: por número Sosa
 fr: par numéro sosa
+it: per numero Sosa
 
     calendar/calendars
 af: kalender/kalenders
@@ -2900,8 +2915,11 @@ sl: kliknite na "%s"
 sv: klicka "%s"
 
     close family
+de: naher Angehöriger
 en: a parent
+es: un amigo
 fr: un proche
+it: un parente
 
     color
 af: kleur
@@ -3260,16 +3278,25 @@ sl: datum
 sv: datum
 
     date of birth
+de: Geburtsdatum
 en: date of birth
+es: fecha de nacimiento
 fr: date de naissance
+it: data di nascita
 
     date of death
+de: Todestag
 en: date of death
+es: fecha de defunción
 fr: date de décès
+it: data di morte
 
     date of marriage
+de: Hochzeitstag
 en: date of marriage
+es: fecha de matrimonio
 fr: date de mariage
+it: data del matrimonio
 
     days old
 af: dae oud
@@ -3504,7 +3531,9 @@ sv: logga ut
 
     display by/branch/alphabetic order
 en: display by:/line/alphabetical order
+es: edición por:/ramas/orden alfabético
 fr: affichage par :/branches/ordre alphabétique
+it: visualizzazione per:/rami/ordine alfabetico
 
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
@@ -3535,20 +3564,32 @@ sl: prikaži s pomočjo izsekov/širina izseka/prekrivanje/skupna širina
 sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
     display border tree
+de: rahmen in den Bäumen zeigen
 en: display frame
+es: editar los marcos a los árboles
 fr: afficher les bordures aux arbres
+it: visualizzare i bordi degli alberi
 
     display picture
+de: porträt zeigen
 en: display family picture
+es: editar retrato
 fr: afficher portrait
+it: visualizzare il ritratto
 
     display generation
+de: nummer der Generation anzeigen
 en: display generation
+es: editar el número de generación
 fr: afficher le numéro de génération
+it: pubblicare il numero di generazioni
 
     display spouse
+de: ehepartner anzeigen
 en: display spouse
+es: editar cónyuge
 fr: afficher conjoint
+it: visualizzare il coniuge
 
     divorce
 af: geskei
@@ -3663,8 +3704,11 @@ sl: ni znano
 sv: vet ej
 
     don't repeat individual already seen
+de: bereits gezeigte Personen nicht wiederholen
 en: don't repeat pedigree collapse
+es: no repetir los individuos ya vistos
 fr: ne pas répéter les implexes
+it: non ripetere gli individui già mostrati
 
     end
 af: einde
@@ -3922,8 +3966,11 @@ sl: družina dodana
 sv: ny familj tillagd
 
     family birthday
+de: Geburtstage naher Angehöriger
 en: family birthday
+es: cumpleaños de amigos
 fr: anniversaires des proches
+it: compleanni dei parenti
 
     family deleted
 af: familie uitgevee
@@ -6196,8 +6243,11 @@ sl: razni zaznamki
 sv: blandade noteringar
 
     miscellaneous information
+de: verschiedene Felder
 en: other field
+es: campo diversos
 fr: champ divers
+it: voci diverse
 
     missing ancestors
 af: ontbrekende voorsate
@@ -6228,8 +6278,11 @@ sl: manjkajoči predniki
 sv: anor som saknas
 
     missing sources
+de: fehlende Quellenangaben
 en: missing sources
+es: faltan fuentes
 fr: sources manquantes
+it: senza fonte
 
     modify
 af: wysig
@@ -6376,8 +6429,11 @@ sl: umorjen/umorjena
 sv: mördad
 
     n° d'Aboville
+de: Nr. Aboville
 en: d'Aboville System number
+es: N° de Aboville
 fr: n° d'Aboville
+it: N° d’Aboville
 
     name
 af: naam
@@ -6504,8 +6560,11 @@ sl: pregled z %t kot Sosa
 sv: navigering med %t som proband (Kekules system)
 
     NB: you should try another relationship computing mode
+de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
 en: cou can try another computing option
+es: puede relanzar un cálculo eligiendo otro modo de cálculo
 fr: n'hésitez pas a relancer un calcul en choisissant un autre mode de calcul
+it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
 
     nephews and nieces
 af: broers- en susterskinders
@@ -7067,23 +7126,23 @@ sk: počet žijúcich osôb
 sl: število živih oseb
 sv: antal levande personer:
 
-    occupation
+    occupation/occupations
 af: beroep
 bg: занятие
 br: micher
 ca: ocupació
 cs: zaměstnání
 da: stilling
-de: Beruf
+de: Beruf/Berufe
 en: occupation/occupations
 eo: okupado
-es: ocupación
+es: profesión/profesións
 et: amet
 fi: ammatti
 fr: profession/professions
 he:  מקצוע
 is: starf
-it: professione
+it: professione/professioni
 lv: nodarbošanās
 nl: beroep
 no: yrke
@@ -7921,8 +7980,11 @@ sl: znani oče/znana mati/znani starši
 sv: erkännande far/erkännande mor/erkännande föräldrar
 
     reference key
+de: referenz
 en: ID
+es: referencia
 fr: référence
+it: riferimento
 
     relation/relations
 af: verwant/verwante
@@ -7981,8 +8043,11 @@ sl: zveza
 sv: släktskap
 
     relationship by ancestors
+de: Direkte Vorfahren
 en: ancestry
+es: ascendientes directos
 fr: ascendants directs
+it: ascendenti diretti
 
     relationship by marriage
 af: aangetroude verwantskappe
@@ -8042,12 +8107,18 @@ sv: släktskapsberäkning
 zh:  相关查询
 
     relationship computing mode
+de: berechnungsart
 en: computing
+es: modo de cálculo
 fr: mode de calcul
+it: modo di calcolo
 
     relationship display options
+de: anzeigeoptionen der Verwandtschafts-Bäume
 en: options:
+es: opciones de edición de los árboles de parentesco
 fr: options d'affichage des arbres de parenté :
+it: opzioni di visualizzazione degli alberi di parentela
 
     relationship link/relationship links
 af: verwantskap/verwantskappe
@@ -8078,12 +8149,18 @@ sl: sorodnik/sorodnikov
 sv: anlinje/anlinjer
 
     relationship link between
+de: verwandt mit ...
 en: family link with...
+es: Parentesco con...
 fr: lien de parenté avec...
+it: Imparentato con...
 
     relationship shortcut
+de: verknüpfungen:
 en: shortcuts:
+es: atajo:
 fr: raccourcis :
+it: scorciatoia:
 
     relationship%t to
 af: verwantskap%t met
@@ -8198,8 +8275,11 @@ sl: glej zgoraj
 sv: se ovan
 
     see also
+de: siehe auch
 en: see also
+es: ver también
 fr: à voir aussi
+it: vedi anche
 
     see further
 af: kyk verder
@@ -8230,16 +8310,25 @@ sl: nadalje glej
 sv: se vidare
 
     select
+de: auswählen :
 en: select:
+es: elegir:
 fr: choisir :
+it: scegliere:
 
     select a month to see all the anniversaries
+de: zum zeigen der Geburtstage den Monat auswählen
 en: select month
+es: elegir un mes para ver todos los cumpleaños
 fr: sélectionnez un mois pour voir tous les anniversaires
+it: scegliere un mese per vedere tutti i comlpeanni
 
     select person to compute relationship
+de: auf die Person klicken, zu der Sie das Verwandtschaftsverhältnis berechnen möchten
 en: click an individual below to calculate the family link
+es: pulse en la persona con la que quiere realizar un cálculo de parentesco
 fr: cliquez sur la personne avec laquelle vous souhaitez réaliser un calcul de parenté
+it: clicca sulla persona per la quale vuoi fare un calcolo di parentela
 
     send
 af: stuur
@@ -8388,7 +8477,7 @@ br: ar berrañ hent
 ca: drecera
 cs: nejkratší cesta
 da: korteste vej
-de: kürzester Pfad
+de: Auf kürzestem Weg
 en: shortest path
 eo: vojo plej mallonga
 es: atajo
@@ -8631,8 +8720,11 @@ sv: välj
 zh:  从下列选取
 
     spouse/spouses
+de: ehepartner/partner
 en: spouse/spouses
+es: cónyuge/cónyuges
 fr: conjoint/conjoints
+it: coniuge/coniugi
 
     spouses not included
 af: eggenote weggelaat
@@ -8812,8 +8904,11 @@ sl: priimek ni najden
 sv: hittar inte efternamn
 
     surnames branch
+de: zweige der Familiennamen
 en: lines by name
+es: ramas de apellidos
 fr: branches patronymiques
+it: rami per cognome
 
     surnames list
 af: vanne lys
@@ -8877,8 +8972,11 @@ sv: efternamn/efternamn
 zh:  姓
 
     table
+de: tabelle
 en: table
+es: cuadro
 fr: tableau
+it: tabella
 
     text
 af: teks
@@ -10393,16 +10491,25 @@ sl: opozorila
 sv: varningar
 
     where born
+de: Geburtsort
 en: where born
+es: lugar de nacimiento
 fr: lieu de naissance
+it: luogo di nascita
 
     where dead
+de: Sterbeort
 en: where dead
+es: lugar de defunción
 fr: lieu de décès
+it: luogo della morte
 
     where married
+de: Ort der Trauung
 en: where married
+es: lugar de matrimonio
 fr: lieu de mariage
+it: luogo del matrimonio
 
     with
 af: met
