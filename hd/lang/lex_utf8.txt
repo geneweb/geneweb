@@ -81,7 +81,7 @@ he:   לראות את הענף הראשון
 is:  til að sjá fyrstu grein
 it:  il primo ramo
 lv:  skatīt pirmo zaru
-nl:  om de eerste tak te zien
+nl:  de eerste tak
 no:  for å se den første
 pl:  aby zobaczyć pierwszą linię (gałąź)
 pt:  para ver o primeiro ramo
@@ -1934,6 +1934,7 @@ en: any individual in the family tree
 es: cualquier individuo del árbol
 fr: n'importe quel individu de l'arbre
 it: un qualsiasi individuo dell’albero
+nl: om het even welk individu van de stamboom
 
     are
 af: is
@@ -2513,34 +2514,6 @@ sk: pochovaný/pochovaná
 sl: pokopan/pokopana/pokopani
 sv: begravd
 
-    by first name
-de: nach Vornamen
-en: by first name
-es: por nombre
-fr: par prénom
-it: per nome
-
-    by first name and surname
-de: nach Vor- und Zuname
-en: by full name
-es: por nombre apellido
-fr: par prénom patronyme
-it: per nom cognome
-
-    by surname
-de: nach Namen
-en: by surname
-es: por apellido
-fr: par patronyme
-it: per cognome
-
-    by sosa number
-de: nach SOSA-Nummer
-en: by sosa number
-es: por número Sosa
-fr: par numéro sosa
-it: per numero Sosa
-
     calendar/calendars
 af: kalender/kalenders
 ar: تقويم/تقاويم
@@ -2920,6 +2893,7 @@ en: a parent
 es: un amigo
 fr: un proche
 it: un parente
+nl: een naaste
 
     color
 af: kleur
@@ -3283,6 +3257,7 @@ en: date of birth
 es: fecha de nacimiento
 fr: date de naissance
 it: data di nascita
+nl: geboortedatum
 
     date of death
 de: Todestag
@@ -3290,6 +3265,7 @@ en: date of death
 es: fecha de defunción
 fr: date de décès
 it: data di morte
+nl: datum overlijden
 
     date of marriage
 de: Hochzeitstag
@@ -3297,6 +3273,7 @@ en: date of marriage
 es: fecha de matrimonio
 fr: date de mariage
 it: data del matrimonio
+nl: huwelijksdatum
 
     days old
 af: dae oud
@@ -3538,6 +3515,7 @@ en: display by:/line/alphabetical order
 es: edición por:/ramas/orden alfabético
 fr: affichage par :/branches/ordre alphabétique
 it: visualizzazione per:/rami/ordine alfabetico
+nl: tonen per:/tak/alfabetische volgorde
 
     display by slices/slice width/overlap/total width
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
@@ -3573,6 +3551,7 @@ en: display frame
 es: editar los marcos a los árboles
 fr: afficher les bordures aux arbres
 it: visualizzare i bordi degli alberi
+nl: rand van de stambomen tonen
 
     display picture
 de: porträt zeigen
@@ -3580,6 +3559,7 @@ en: display family picture
 es: editar retrato
 fr: afficher portrait
 it: visualizzare il ritratto
+nl: portret tonen
 
     display generation
 de: nummer der Generation anzeigen
@@ -3587,6 +3567,7 @@ en: display generation
 es: editar el número de generación
 fr: afficher le numéro de génération
 it: pubblicare il numero di generazioni
+nl: nummer van de generatie tonen
 
     display spouse
 de: ehepartner anzeigen
@@ -3594,6 +3575,7 @@ en: display spouse
 es: editar cónyuge
 fr: afficher conjoint
 it: visualizzare il coniuge
+nl: partner tonen
 
     divorce
 af: geskei
@@ -3713,6 +3695,7 @@ en: don't repeat pedigree collapse
 es: no repetir los individuos ya vistos
 fr: ne pas répéter les implexes
 it: non ripetere gli individui già mostrati
+nl: personen reeds bekeken niet herhalen
 
     end
 af: einde
@@ -3975,6 +3958,7 @@ en: family birthday
 es: cumpleaños de amigos
 fr: anniversaires des proches
 it: compleanni dei parenti
+nl: verjaardagen van de naasten
 
     family deleted
 af: familie uitgevee
@@ -6251,6 +6235,7 @@ en: other field
 es: campo diversos
 fr: champ divers
 it: voci diverse
+nl: verscheidene velden
 
     missing ancestors
 af: ontbrekende voorsate
@@ -6286,6 +6271,7 @@ en: missing sources
 es: faltan fuentes
 fr: sources manquantes
 it: senza fonte
+nl: ontbrekende bronnen
 
     modify
 af: wysig
@@ -6437,6 +6423,7 @@ en: d'Aboville System number
 es: N° de Aboville
 fr: n° d'Aboville
 it: N° d’Aboville
+nl: Abovillenummer
 
     name
 af: naam
@@ -6568,6 +6555,7 @@ en: cou can try another computing option
 es: puede relanzar un cálculo eligiendo otro modo de cálculo
 fr: n'hésitez pas a relancer un calcul en choisissant un autre mode de calcul
 it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
+nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
 
     nephews and nieces
 af: broers- en susterskinders
@@ -7148,7 +7136,7 @@ he:  מקצוע
 is: starf
 it: professione/professioni
 lv: nodarbošanās
-nl: beroep
+nl: beroep/beroepen
 no: yrke
 pl: zawód
 pt: ocupação
@@ -8009,6 +7997,7 @@ en: ID
 es: referencia
 fr: référence
 it: riferimento
+nl: referentie
 
     relation/relations
 af: verwant/verwante
@@ -8072,6 +8061,7 @@ en: ancestry
 es: ascendientes directos
 fr: ascendants directs
 it: ascendenti diretti
+nl: rechtstreekse voorouders
 
     relationship by marriage
 af: aangetroude verwantskappe
@@ -8136,13 +8126,15 @@ en: computing
 es: modo de cálculo
 fr: mode de calcul
 it: modo di calcolo
+nl: berekeningswijze
 
     relationship display options
-de: anzeigeoptionen der Verwandtschafts-Bäume
+de: anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
-es: opciones de edición de los árboles de parentesco
+es: opciones de edición de los árboles de parentesco:
 fr: options d'affichage des arbres de parenté :
-it: opzioni di visualizzazione degli alberi di parentela
+it: opzioni di visualizzazione degli alberi di parentela:
+nl: toonopties van de verwantschapsstambomen
 
     relationship link/relationship links
 af: verwantskap/verwantskappe
@@ -8175,9 +8167,10 @@ sv: anlinje/anlinjer
     relationship link between
 de: verwandt mit ...
 en: family link with...
-es: Parentesco con...
+es: parentesco con...
 fr: lien de parenté avec...
-it: Imparentato con...
+it: imparentato con...
+nl: verwantschapsband met...
 
     relationship shortcut
 de: verknüpfungen:
@@ -8185,6 +8178,7 @@ en: shortcuts:
 es: atajo:
 fr: raccourcis :
 it: scorciatoia:
+nl: binnenweg :
 
     relationship%t to
 af: verwantskap%t met
@@ -8304,6 +8298,7 @@ en: see also
 es: ver también
 fr: à voir aussi
 it: vedi anche
+nl: ook te bekijken
 
     see further
 af: kyk verder
@@ -8339,6 +8334,7 @@ en: select:
 es: elegir:
 fr: choisir :
 it: scegliere:
+nl: kiezen:
 
     select a month to see all the anniversaries
 de: zum zeigen der Geburtstage den Monat auswählen
@@ -8346,6 +8342,7 @@ en: select month
 es: elegir un mes para ver todos los cumpleaños
 fr: sélectionnez un mois pour voir tous les anniversaires
 it: scegliere un mese per vedere tutti i comlpeanni
+nl: een maand kiezen om alle verjaardagen te zien
 
     select person to compute relationship
 de: auf die Person klicken, zu der Sie das Verwandtschaftsverhältnis berechnen möchten
@@ -8353,6 +8350,7 @@ en: click an individual below to calculate the family link
 es: pulse en la persona con la que quiere realizar un cálculo de parentesco
 fr: cliquez sur la personne avec laquelle vous souhaitez réaliser un calcul de parenté
 it: clicca sulla persona per la quale vuoi fare un calcolo di parentela
+nl: op de persoon klikken van waaruit u een verwantschapsberekening wenst
 
     send
 af: stuur
@@ -8749,6 +8747,7 @@ en: spouse/spouses
 es: cónyuge/cónyuges
 fr: conjoint/conjoints
 it: coniuge/coniugi
+nl: partner/partners
 
     spouses not included
 af: eggenote weggelaat
@@ -8933,6 +8932,7 @@ en: lines by name
 es: ramas de apellidos
 fr: branches patronymiques
 it: rami per cognome
+nl: naamstakken
 
     surnames list
 af: vanne lys
@@ -9001,6 +9001,7 @@ en: table
 es: cuadro
 fr: tableau
 it: tabella
+nl: tabel
 
     text
 af: teks
@@ -10525,6 +10526,7 @@ en: where born
 es: lugar de nacimiento
 fr: lieu de naissance
 it: luogo di nascita
+nl: geboorteplaats
 
     where dead
 de: Sterbeort
@@ -10532,6 +10534,7 @@ en: where dead
 es: lugar de defunción
 fr: lieu de décès
 it: luogo della morte
+nl: datum overlijden
 
     where married
 de: Ort der Trauung
@@ -10539,6 +10542,7 @@ en: where married
 es: lugar de matrimonio
 fr: lieu de mariage
 it: luogo del matrimonio
+nl: huwelijksplaats
 
     with
 af: met
