@@ -2606,7 +2606,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       match get_qualifiers p with
       [ [nn :: _] when p_auth -> sou base nn
       | _ -> "" ]
-  | "sex" -> string_of_int (index_of_sex (get_sex p))
+  | "sex" -> 
+      if p_auth then string_of_int (index_of_sex (get_sex p))
+      else string_of_int (index_of_sex Def.Neuter)
   | "sosa_in_list" ->
       match get_env "all_gp" env with
       [ Vallgp all_gp ->
