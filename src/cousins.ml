@@ -211,9 +211,11 @@ value sibling_has_desc_lev conf base lev (ip, _) =
   has_desc_lev conf base lev (pget conf base ip)
 ;
 
-value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
+value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
   let sib = siblings conf base (get_key_index a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then do {
+    if tips then Util.print_tips_relationship conf
+    else ();
     if lev1 > 1 then do {
       Wserver.wprint "<li>\n";
       Wserver.wprint "%s:\n"
@@ -239,24 +241,22 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
   do {
     if lev1 > 1 then Wserver.wprint "<ul>\n" else ();
     let some =
-      loop first_sosa False where rec loop sosa some =
+      loop first_sosa False True where rec loop sosa some print_tips =
         if cnt.val < max_cnt && Num.gt last_sosa sosa then
           let some =
             match Util.branch_of_sosa conf base (get_key_index p) sosa with
             [ Some ([(ia, _) :: _] as br) ->
                 print_cousins_side_of conf base max_cnt (pget conf base ia) p
-                  br lev1 lev2 ||
+                  br lev1 lev2 print_tips ||
                 some
             | _ -> some ]
           in
-          loop (Num.inc sosa 1) some
+          loop (Num.inc sosa 1) some False
         else some
     in
     if some then ()
     else
-      stagn "li" begin
-        Wserver.wprint "%s\n" (capitale (transl conf "no match"));
-      end;
+      Wserver.wprint "%s.\n" (capitale (transl conf "no match"));
     if lev1 > 1 then Wserver.wprint "</ul>\n" else ()
   }
 ;
@@ -295,7 +295,6 @@ value print_cousins conf base p lev1 lev2 =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Util.print_tips_relationship conf;
     cnt.val := 0;
     (* Construction de la table des sosa de la base *)
     let () = Perso.build_sosa_ht conf base in 
