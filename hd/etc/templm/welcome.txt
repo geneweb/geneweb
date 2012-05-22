@@ -3,92 +3,13 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/01/09 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/12 geneweb-6.04 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    /* welcome.txt */
-    #welcome {
-      margin: 0;
-      padding: 2px;
-    }
-    #welcome_content-top, #welcome_content-bottom {
-    	width: 100%%;
-    	clear: both;
-    	padding-top: 20px;
-    	padding-bottom: 20px;
-    	text-align: center;
-    }
-    #welcome_content-left, #welcome_content-right {
-    	min-width: 300px;
-    	min-height: 350px;
-    	width: 49%%;
-    	float: left;
-    }
-    #welcome_content-left, #welcome_content-right, #welcome_motd, #welcome_lang {
-    	padding: 2px;
-    	margin: 2px;
-    	border: solid 1px #FFFFC0;
-    }
-    #welcome_content-right h2 {
-    	text-align: center;
-    }
-    #welcome_content-right form {
-    	float: left;
-    	margin: 0;
-    	padding: 0;
-    }
-    #welcome_content-right fieldset {
-    	border: 0;
-    }
-    #welcome_user-info {
-    	position: absolute;
-    	right: 0px;
-    	top: 0px;
-    	margin-right: 3em;
-    }
-    #welcome_user-info form {
-    	margin: 0;
-    	padding: 0;
-    }
-    #welcome_logo, #welcome_title {
-    	float: left;
-    	min-width: 300px;
-    	width: 50%%;
-    	padding: 0;
-    	margin: 0;
-    }
-    #welcome_title small {
-    	font-size: 60%%;
-    }
-    #welcome_motd, #welcome_lang {
-    	clear: both;
-    	width: 99%%
-    }
-    #welcome_form-person, #welcome_form-titles {
-    	width: 100%%;
-    }
-    #welcome_form-person select {
-    	width: 200px;
-    }
-    #welcome_form-titles div {
-    	float: left;
-    	margin-right: 3px;
-    }
-    #welcome_form-titles a {
-    	font-size: 70%%;
-    }
-    #welcome_form-list, #welcome_form-place {
-    	width: 40%%;
-    }
-    #welcome_form-list select {
-    	width: 100%%;
-    }
-  </style>
   %base_header;
 </head>
 
@@ -98,7 +19,7 @@
 
 %define;lang(xx)
   %apply;nth%with;
-    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/pl/pt/pt-br/ro/ru/sk/sl/sv/zh
+    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
   %and;xx%end;
 %end;
 
@@ -205,7 +126,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     %end;
     %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
          and (wizard or wiznotes_dir_exists) and
-		         bvar.authorized_wizards_notes = "yes")
+             bvar.authorized_wizards_notes = "yes")
       <li>
         <a href="%prefix;m=WIZNOTES">%sq;
         [wizard/wizards/friend/friends/exterior]1 - [note/notes]1</a>
@@ -243,7 +164,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     %if;(wizard and (not base.has_notes or bvar.propose_add_family != "no"))
       %if;(bvar.propose_add_family != "no")
         <li>
-          <a href="%prefix;m=ADD_FAM">[add::family/families]0</a><br%/>
+          <a href="%prefix;m=ADD_FAM" target="_blank">[add::family/families]0</a><br%/>
         </li>
       %end;
       %if;(not base.has_notes)

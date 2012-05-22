@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/02/20 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/03 geneweb-6.04 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -19,57 +19,6 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    .nobr {
-    	white-space: nowrap;
-    }
-    .list_no_style {
-    	margin: 0;
-    	padding-left: 10px;
-    	list-style-type: none;
-    }
-    .border_sex_0 {
-    	border-left-width: 5px;
-    	border-left-color: rgb(173,216,230);
-    }
-    .border_sex_1 {
-    	border-left-width: 5px;
-    	border-left-color: rgb(255,182,193);
-    }
-    .border_sex_2 {
-    	border-left-width: 5px;
-    	border-left-color: rgb(255,255,255);
-    }
-    .border_sosa {
-    	border-left: solid 5px rgb(255,215,0);
-    }
-    .border_family_0 {
-    	border-left-style: double;
-    }
-    .border_family_1 {
-    	border-left-style: solid;
-    }
-    .color_sosa {
-    	color: rgb(255,215,0);
-    }
-    .color_sex_0 {
-    	color: rgb(173,216,230);
-    }
-    .color_sex_1 {
-    	color: rgb(255,182,193);
-    }
-    .color_sex_2 {
-    	color: rgb(255,255,255);
-    }
-    /* deslist.txt */
-    #deslist li {
-    	margin: 2px 0 0 0;
-    	padding: 0 0 0 10px;
-    }
-    #deslist .notes_src em {
-    	font-size: 80%%;
-    }
-  </style>
   %base_header;
 </head>
 
@@ -119,12 +68,12 @@
     <span class="color_sosa">%apply;symbol2("xx")</span>%nn;
   %else;
     %apply;symbol2("xx")
-  %end;  
+  %end;
 %end;
 
 %define;symbol(xx)
   %if;(wizard and not cancel_links)
-    &nbsp;<a target="_blank" href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::person/persons]0">%apply;symbol1("xx")</a>%nn;
+     <a target="_blank" href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::person/persons]0">%apply;symbol1("xx")</a>%nn;
   %elseif(evar.t="N")
     %apply;symbol1("xx")
   %end;
@@ -152,7 +101,7 @@
     , <em>(%xx.first_name; %xx.surname;)</em>%nn;
   %end;
   %if;(evar.alias="on")
-    <small>
+    <small>%nn;
     %if;xx.has_surnames_aliases;
       %foreach;xx.surname_alias;
         , <em>(%surname_alias;)</em>%nn;
@@ -163,7 +112,7 @@
         , <em>(%first_name_alias;)</em>%nn;
       %end;
     %end;
-    </small>
+    </small>%nn;
   %end;
   %if;(xx.has_birth_date or xx.has_birth_place)
     , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
@@ -197,26 +146,25 @@
 %end;
 
 %define;somebody_extra_info(xx)
-  %if;xx.has_occupation;, %xx.occupation;%end;
+  %if;xx.has_occupation;, <span class="highlight">%xx.occupation;</span>%end;
   %if;(xx.has_linked_pages and xx.has_linked_page.OCCU), %xx.linked_page.OCCU;%end;
   %if;(evar.rel = "on" and xx.has_relations)
-    %foreach;xx.relation;%nl;
-      (%relation_type; :
+    %foreach;xx.relation;%nn;
+       ; %relation_type; :
       %if;has_relation_him;
         %apply;link2("relation_him","relation_him")
         %apply;info2("relation_him")
       %end;
       %if;has_relation_her;
-        %if;has_relation_him;,%nl;%end;
+        %if;has_relation_him;, %end;
         %apply;link2("relation_her","relation_her")
         %apply;info2("relation_her")
-      %end;)%nn;
+      %end;
     %end;
-    %foreach;xx.related;%nl;
-      (%related_type; :
+    %foreach;xx.related;%nn;
+       ; %related_type; :
        %apply;link2("related","related")
        %apply;info2("related")
-      )%nn;
     %end;
   %end;
 %end;
@@ -234,7 +182,7 @@
 
 %define;somebody_spouse_parent()
   %if;(evar.parents = "on" and spouse.has_parents)%sp;
-  <br%/>…
+  <br%/>   
     <small>
     %apply;a_of_b%with;
       %if;(spouse.is_male)[son/daughter/child]0
@@ -243,7 +191,7 @@
       %apply;somebody_spouse_parent1("father") [and]
       %apply;somebody_spouse_parent1("mother")
     %end;
-    </small>
+    </small>%nn;
   %end;
 %end;
 
@@ -270,19 +218,19 @@
 %end;
 
 %define;link_notes(xx)
-  %if;((evar.notes = "on" and xx.has_notes) 
-        or (evar.src = "on" and xx.has_sources)
-        or (xx.has_linked_pages and (xx.has_linked_page.NOTE or xx.has_linked_page.BNOTE)))
+  %if;((evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
+      or (evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO)))
     %sp;%[%if;(not cancel_links)<a id="l_%count;" href="#notes-%count;">%nn;%end;
-    %if;(evar.notes = "on" and (xx.has_notes or xx.has_linked_pages))
-      %if;(xx.has_notes or xx.has_linked_page.NOTE or xx.has_linked_page.BNOTE) 
-        [*note/notes]0%sp;
-        %apply;add_in_sorted_list(10000+count,count,xx.notes,xx.linked_page.NOTE,xx.linked_page.BNOTE)
-      %end;
+    %if;(evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
+      [*note/notes]0%sp;
+      %apply;add_in_sorted_list(10000+count,count,xx.notes,"",xx.linked_page.BNOTE)
     %else;[*source/sources]0%sp;%nn;
       %apply;add_in_sorted_list(10000+count,count,"","","")
     %end;
-    %if;(evar.src = "on" and xx.has_sources)
+    %if;(evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO))
+      %if;(xx.has_linked_page.BIBLIO)
+        %apply;add_in_sorted_list(10000+count,count,"src_on","BIBLIO",xx.linked_page.BIBLIO)
+      %end;
       %foreach;xx.source;
         %apply;add_in_sorted_list(10000+count,count,"src_on",source_type,source)
       %end;
@@ -300,7 +248,7 @@
   %foreach;xx.family;
     %if;(evar.spouse="on")
       %if;(family_cnt != 1 and curlev = 0)<p>%nl;%end;
-      %lazy_force;…
+      %lazy_force;   
       %apply;capitalize%with;
         %apply;married_to%with;
           %xx.is_male;
@@ -308,17 +256,17 @@
           %if;(on_marriage_date != "") %on_marriage_date;%end;
           %if;(marriage_place != ""), %marriage_place;%end;
         %end;
-      %end;<br%/>…%nl;
+      %end;<br%/>   %nl;
       %apply;somebody("spouse","spouse")
       %incr_count;
       %apply;link_notes("spouse")
       %apply;somebody_spouse_parent()
-      %if;(evar.witn = "on" and has_witnesses)%nl;<br%/>… ([witness/witnesses]1 :
+      %if;(evar.witn = "on" and has_witnesses)%nl;<br%/>    [witness/witnesses]1 :
         %foreach;witness;
           %if;(not is_first),%nl;%end;
           %apply;link2("witness","witness")
           %apply;info2("witness")
-        %end;)%nn;
+        %end;%nn;
       %end;
       %if;(evar.comm = "on" and has_comment)%nl;(%comment;)%end;
     %end;
@@ -328,12 +276,12 @@
            evar.t = "F" and xx.is_female or
            evar.t = "L")
         %if;(family.desc_level < famlev)
-          , [see further].
+          , [see further]
           %apply;lazy_print%with;<br%/>%nl;%end;
         %elseif;(family.desc_level > famlev)
-          , [see above].
+          , [see above]
           %apply;lazy_print%with;<br%/>%nl;%end;
-        %elseif;has_children;, [having as children] : 
+        %elseif;has_children;, [having as children] : 
           %family.set_infinite_desc_level;
           %if;(curlev = 0)</p>%nl;%end;
           <ol style="list-style-type:lower-latin">
@@ -374,7 +322,7 @@
   <p>
     %foreach;descendant_level;
       %if;(level = desc_lev)
-        [*total] : %number_of_descendants; [[person/persons]1@(c)],
+        [*total] : %number_of_descendants; [[person/persons]1@(c)],
         ([spouses not included] = %expr(count -1 - number_of_descendants.v))
       %end;
     %end;
@@ -423,20 +371,21 @@
         <dt><strong>%nn;
         %if;(not cancel_links)
           <a id="notes-%item.2;" href="#l_%item.2;">%nn;
-            %item.2; :%nn;
+            %item.2; :%nn;
           </a>
         %else;
-          %item.2; :%nn;
+          %item.2; :%nn;
         %end;
         </strong></dt>
-        %if;(item.4 != "")<dd>&gt;&gt; %item.4;</dd>%end;
+        %if;(item.5 != "")<dd>&gt;&gt; %item.5;</dd>%end;
         %if;(item.3 != "")<dd>%item.3;</dd>%end;
-        %if;(item.5 != "")<dd>&gt;&gt; %item.5;</dd>%end;
         %if;(evar.notes = "on" and evar.src = "on" and next_item.3 = "src_on")
-          <dt><em>[*source/sources]1 :</em></dt>
+          <dt><em>[*source/sources]1 :</em></dt>
         %end;
+      %elseif;(item.4 = "BIBLIO")
+        <dd><em>&gt;&gt; %item.5;</em></dd>
       %else;
-           <dd><em> - %item.4; : %item.5;</em></dd>
+        <dd><em> - %item.4; : %item.5;</em></dd>
       %end;
     %end;
   </dl>

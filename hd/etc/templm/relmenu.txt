@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: relmenu.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/02/27 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/02 geneweb-6.04 templ=templm -->
   <!-- cousmenu.txt is included in relmenu.txt -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -14,17 +14,6 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    /* ancmenu.txt, desmenu.txt, relmenu.txt */
-    #menutxt fieldset {
-    	width: 300px;
-    	float: left;
-    	margin: 2px;
-    }
-    #menutxt fieldset fieldset {
-    	width: 270px;
-    }
-  </style>
   %base_header;
 </head>
 <body%body_prop; id="menutxt">
@@ -256,7 +245,7 @@
       <input type="submit" value="Ok"%/>
       <br%/>
       <label>
-        <input type="checkbox" name="csp" value="on"%/>
+        <input type="checkbox" name="spouse" value="on"%/>
         [*include spouses]
       </label>
     %if;(father.has_siblings or mother.has_siblings)

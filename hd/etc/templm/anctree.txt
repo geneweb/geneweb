@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/02/27 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/27 geneweb-6.04 templ=templm -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -18,37 +18,14 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    table hr {
-    border-top: solid 1px black;
-    border-left: 0;
-    border-right: 0;
-    border-bottom: 0;
-    margin:0;
-    }
-    hr.left {
-    margin-left:0;
-    margin-right: 50%%;
-    }
-    hr.right {
-    margin-left: 50%%;
-    margin-right: 0;
-    }    
-    hr.full {
-    margin-left: 0;
-    margin-right: 0;
-    }
-    .color_sosa {
-    	color: rgb(255,215,0);
-    }
-  </style>
   %base_header;
+</head>
+
+%let;evar_v;%if;(evar.v > 0)%expr(evar.v-1)%end;%in;
 
 %define;symbol(xx)
   %if;(evar.cgl != "on")
-    %if;(xx.has_sosa)
-      <span class="color_sosa">%if;xx.has_siblings;&diams;%else;&loz;%end;</span>
-    %end;
+      <span %if;(xx.has_sosa)class="color_sosa"%end;>%if;xx.has_siblings;&diams;%else;&loz;%end;</span>
   %else;
     |
   %end;
@@ -179,7 +156,6 @@
   </table>
 %end;
 
-</head>
 <body%body_prop; id="anctree">
 %message_to_wizard;
 
@@ -195,7 +171,7 @@
 %if;(evar.t = "T" and not cancel_links)%nn;
   <div style="text-align:%right;">
     <br%/>
-    <a href="%prefix;m=A;t=T;v=%evar.v;;%access;;dag=on;notab=on;slices=on">
+    <a href="%prefix;m=A;t=T;v=%evar_v;;%access;;dag=on;notab=on;slices=on">
       <tt>//</tt>
     </a>
   </div>
@@ -203,14 +179,14 @@
 
 %if;(evar.t = "T")
   %apply;tree%with;
-    %if;(bvar.max_anc_tree = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_tree)
+    %if;(bvar.max_anc_tree = "")%apply;min(evar_v, max_anc_level, 7)
+    %else;%apply;min(evar_v, max_anc_level, bvar.max_anc_tree)
     %end;
   %end;
 %elseif;(evar.t = "A")
-    <div style="text-align: center">%apply;male_line("self", evar.v)</div>
+    <div style="text-align: center">%apply;male_line("self", evar_v)</div>
 %elseif;(evar.t = "C")
-    <div style="text-align: center">%apply;female_line("self", evar.v) </div>
+    <div style="text-align: center">%apply;female_line("self", evar_v) </div>
 %end;
   %base_trailer;
   %copyright;

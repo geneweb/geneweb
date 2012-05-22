@@ -3,20 +3,13 @@
 <head>
   <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/03/02 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/02 geneweb-6.04 templ=templm -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    /* calendar.txt */
-    #calendar {margin-right: auto; margin-left: auto;}
-    #calendar th {background-color: #E7EDB3; padding: 5px;}
-    #calendar input {text-align: right;}
-    #calendar select {text-align: center; width: 100%%;}
-  </style>
   %base_header;
 </head>
 <body%body_prop;>

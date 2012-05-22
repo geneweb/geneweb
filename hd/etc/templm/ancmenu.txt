@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/02/27 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/26 geneweb-6.04 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -25,17 +25,6 @@
       -->
   </script>
   %include.css;
-  <style type="text/css">
-    /* ancmenu.txt, desmenu.txt, relmenu.txt */
-    #menutxt fieldset {
-    	width: 300px;
-    	float: left;
-    	margin: 2px;
-    }
-    #menutxt fieldset fieldset {
-    	width: 270px;
-    }
-  </style>
   %base_header;
 </head>
 
@@ -80,9 +69,12 @@
     %end;
   </p>
   <fieldset>
+    <legend>
+      <label><input type="submit" value="Ok"%/></label>
+    </legend>
     <select name="v">
       %foreach;ancestor_level;
-        <option value="%level;"%nn;
+        <option value="%expr(level+1)"%nn;
           %if;(level = 4) selected="selected"%end;>%nn;
           %if;(level = 1)[*specify::generation/generations]0%nn;
           %elseif;(level = 2)[*to the parents]%nn;
@@ -97,8 +89,11 @@
         </option>
       %end;
     </select>
-    <input type="submit" value="Ok"%/>
-    <br%/><br%/>
+    <br%/>
+    <label><input type="checkbox" name="only" value="on"%/>
+      [*only the generation selected]
+    </label>
+    <br%/>
     <label>
       <input type="checkbox" name="cgl" value="on"%/>
       [*cancel GeneWeb links]
@@ -139,76 +134,69 @@
   </fieldset>
   <fieldset>
     <legend>
-      <label><input type="checkbox" name="only" value="on"%/>
-        [*only the generation selected]
+      <label>
+        <input type="radio" id="tN" name="t" value="N" checked="checked"%/>
+        [*short display]
       </label>
     </legend>
-    <fieldset>
-      <legend>
-        <label>
-          <input type="radio" id="tN" name="t" value="N" checked="checked"%/>
-          [*short display]
-        </label>
-      </legend>
-          Sosa base
-          <label><input type="radio" name="sosab" value="8" onchange="valid('tN')"%/>8</label>
-          <label>%nn
-            <input type="radio" name="sosab" value="10" checked="checked" onchange="valid('tN')"%/>10
-          </label>
-          <label><input type="radio" name="sosab" value="16" onchange="valid('tN')"%/>16</label>
-    </fieldset>
-    <fieldset>
-      <legend>
-        <label>
-          <input type="radio" id="tG" name="t" value="G"%/>
-          [*long display]
-        </label>
-      </legend>
-        <label>
-          <input type="checkbox" name="alias" value="on" checked="checked" onchange="valid('tG')"%/>
-           [*surname alias], [*first name alias]
-        </label>
-        <br%/>
-        <label>
-          <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')"%/>
-           [*siblings]
-        </label>
-        <br%/>
-        <label>
-        <input type="checkbox" name="spouse" value="on" checked="checked" onchange="valid('tG')"%/>
-        [*include spouses]
-        </label>
-        <br%/>
-        <label>
-        <input type="checkbox" name="parents" value="on" checked="checked" onchange="valid('tG')"%/>
-        [*parents]
-        </label>
-        <br%/>
-        <label>
-          <input type="checkbox" name="rel" value="on" onchange="valid('tG')"%/>
-          [*relation/relations]1
-        </label>
-        <br%/>
-        <label>
-          <input type="checkbox" name="witn" value="on" onchange="valid('tG')"%/>
-          [*witness/witnesses]1 ([marriage/marriages]1)
-        </label>
-        <br%/>
-        <label>
-          <input type="checkbox" name="comm" value="on" onchange="valid('tG')"%/>
-          [*comment] ([marriage/marriages]1)
-        </label>
-        <br%/>
-        <label>
-          <input type="checkbox" name="notes" value="on" checked="checked" onchange="valid('tG')"%/>
-          [*note/notes]1
-        </label>
-        <br%/>
-        <label>
-          <input type="checkbox" name="src" value="on" checked="checked" onchange="valid('tG')"%/>
-          [*source/sources]1
-        </label>
-    </fieldset>
+    Sosa base
+    <label><input type="radio" name="sosab" value="8" onchange="valid('tN')"%/>8</label>
+    <label>%nn
+      <input type="radio" name="sosab" value="10" checked="checked" onchange="valid('tN')"%/>10
+    </label>
+    <label><input type="radio" name="sosab" value="16" onchange="valid('tN')"%/>16</label>
+  </fieldset>
+  <fieldset>
+    <legend>
+      <label>
+        <input type="radio" id="tG" name="t" value="G"%/>
+        [*long display]
+      </label>
+    </legend>
+    <label>
+      <input type="checkbox" name="alias" value="on" checked="checked" onchange="valid('tG')"%/>
+       [*surname alias], [*first name alias]
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')"%/>
+       [*siblings]
+    </label>
+    <br%/>
+    <label>
+    <input type="checkbox" name="spouse" value="on" checked="checked" onchange="valid('tG')"%/>
+    [*include spouses]
+    </label>
+    <br%/>
+    <label>
+    <input type="checkbox" name="parents" value="on" checked="checked" onchange="valid('tG')"%/>
+    [*parents]
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="rel" value="on" onchange="valid('tG')"%/>
+      [*relation/relations]1
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="witn" value="on" onchange="valid('tG')"%/>
+      [*witness/witnesses]1 ([marriage/marriages]1)
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="comm" value="on" onchange="valid('tG')"%/>
+      [*comment] ([marriage/marriages]1)
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="notes" value="on" checked="checked" onchange="valid('tG')"%/>
+      [*note/notes]1
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="src" value="on" checked="checked" onchange="valid('tG')"%/>
+      [*source/sources]1
+    </label>
   </fieldset>
   <fieldset>
   <legend>
@@ -298,24 +286,38 @@
     <br%/>
     <label>
       <input type="checkbox" name="ms" value="on" onchange="valid('tM')"%/>
-      [*include missing spouses]
+      [*first name/first names]1, [surname/surnames]1 = ??
     </label>
     %if;(bvar.var_img_ext != "")
       <p>[*not found] : <br%/>
           <label>
-            <input type="checkbox" name="img_b" value="on" onchange="valid('tM')"%/>
+            <input type="checkbox" name="b_l" value="on" onchange="valid('tM')"%/>
             %bvar.var_t_BIRTHA;
           </label><br%/>
           <label>
-            <input type="checkbox" name="img_m" value="on" onchange="valid('tM')"%/>
+            <input type="checkbox" name="m_l" value="on" onchange="valid('tM')"%/>
             %bvar.var_t_MARRIAGEA;
           </label><br%/>
           <label>
-            <input type="checkbox" name="img_d" value="on" onchange="valid('tM')"%/>
+            <input type="checkbox" name="d_l" value="on" onchange="valid('tM')"%/>
             %bvar.var_t_DEATHA;
           </label>
       </p>
     %end;
+    <p>[*date] &lt;&gt; [exact] :<br%/>
+        <label>
+          <input type="checkbox" name="b_d" value="on" onchange="valid('tM')"%/>
+          [*birth]
+        </label><br%/>
+        <label>
+          <input type="checkbox" name="m_d" value="on" onchange="valid('tM')"%/>
+          [*marriage/marriages]0
+        </label><br%/>
+        <label>
+          <input type="checkbox" name="d_d" value="on" onchange="valid('tM')"%/>
+          [*death]
+        </label>
+    </p>
   </fieldset>
 </form>
   <div style ="clear: both;">

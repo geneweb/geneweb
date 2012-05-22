@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/03/02 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/27 geneweb-6.04 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
@@ -136,7 +136,7 @@
     %foreach;dag_line;
       <tr align="left">
       %foreach;dag_cell;
-        <td colspan="%dag_cell.colspan;" align="%dag_cell.align;">%nn;
+        <td %if;(dag_cell.colspan > 1)colspan="%dag_cell.colspan;" %end;align="%dag_cell.align;">%nn;
         %if;dag_cell.is_nothing;&nbsp;%nn;
         %elseif;dag_cell.is_bar;
           %if;(dag_cell.bar_link != "" and evar.cgl != "on")
@@ -162,7 +162,7 @@
   %end;
   %if;(link_next != "")
     <p>
-    <a href="%link_next;" accesskey=">">&gt;&gt;</a>%nl;
+    <a href="%link_next;;image=%evar.image;;bd=%evar.bd;" accesskey=">">&gt;&gt;</a>%nl;
     </p>
   %end;
 %end;
