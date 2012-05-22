@@ -1,8 +1,8 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template a v 6.03b 2011/12/01 12:00:00 ddr/dd Exp $ -->
-  <!-- copyright (c) 1998-2011 INRIA -->
+  <!-- $Id: perso.txt, Template f v 6.05c 2012/05/16 12:00:00 ddr/dd Exp $ -->
+  <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -25,16 +25,18 @@
 %define;image_sosa(xxx,yyy)
   <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
     style="border: none" alt=""%sp;
-	title="%if;(yyy>1)[direct ancestor of %s:::xxx] , %end;[*Sosa] yyy"%/>%nn;
+    title="%if;(yyy=1)%else;[direct ancestor of %s:::xxx], %end;[*Sosa] yyy"%/>%nn;
 %end;
 
 %define;display_sosa(xx)
-  %if;xx.has_sosa;
-    %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-    %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
-	                       %sosa_ref.surname_key_strip;
-					  %and;%xx.sosa;%end;
-    %if;not cancel_links;</a>%end;%sp;
+  %if;(bvar.display_sosa="" or bvar.display_sosa="yes")
+    %if;xx.has_sosa;
+      %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
+      %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
+                             %sosa_ref.surname_key_strip;
+                        %and;%xx.sosa;%end;
+      %if;not cancel_links;</a>%end;%sp;
+    %end;
   %end;
 %end;
 
@@ -42,14 +44,13 @@
   %if;(wizard and not cancel_links and not xx.is_restricted)
     <a href="%prefix;m=MOD_IND;i=%xx.index;">%end;
   %if;xx.is_male;
-    <img width="wi_he" height="wi_he" src="%image_prefix;/male.png"%sp;
-         style="border: none" alt="" title="[M/F]0"%/>%nn;
+    <img src="%image_prefix;/male.png" title="[M/F]0"%sp;
   %elseif;xx.is_female;
-    <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
-         style="border: none" alt="" title="[M/F]1"%/>%nn;
+    <img src="%image_prefix;/female.png" title="[M/F]1"%sp;
   %else;
-    <span class="highlight">?</span>%nn;
+    <img src="%image_prefix;/sexunknown.png" title="?"%sp;
   %end;
+         width="wi_he" height="wi_he" style="border: none" alt=""%/>%nn;
   %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
   %sp;
 %end;
@@ -140,9 +141,9 @@
     <ul>
       %if;(xx.index!=central_index)
         <li>
-		  %apply;image_MF("xx","13")
+          %apply;image_MF("xx","13")
           %apply;display_sosa("xx")
-		  %if;(cancel_links or xx.is_restricted)%xx;
+          %if;(cancel_links or xx.is_restricted)%xx;
           %else;<a href="%prefix;%xx.access;">%xx;</a>%end;%sp;
         </li>%nl;
         %if;xx.has_nobility_titles;
@@ -270,10 +271,14 @@
   %apply;married_to%with;%xx.is_male%and;
     %if;(marriage_place="")
       %if;(on_marriage_date="")
-      %else; <em>%on_marriage_date;</em>%end;
+      %else; <em>%on_marriage_date;
+        %if;wedding_birthday; ([happy birthday to them!])%end;
+        </em>%end;
     %else;
       %if;(on_marriage_date="")<em>, %marriage_place;, </em>
-      %else; <em>%on_marriage_date;, %marriage_place, </em>%end;
+      %else; <em>%on_marriage_date;
+        %if;wedding_birthday; ([happy birthday to them!])%end;
+        , %marriage_place, </em>%end;
     %end;
   %end;
 %end;
@@ -331,7 +336,7 @@
             <td style="vertical-align: middle">
               [with]
               %apply;image_MF("spouse","13")
-	          %apply;short_display_person("spouse")
+              %apply;short_display_person("spouse")
             </td>
             <td style="vertical-align: middle">
               <a href="%spouse.image_html_url;"><img src="%spouse.image_url;"%sp;
@@ -342,7 +347,7 @@
       %else;
         [with]
         %apply;image_MF("spouse","13")
-	    %apply;short_display_person("spouse")
+        %apply;short_display_person("spouse")
       %end;
       %if;has_children;
         <ul>
@@ -678,10 +683,19 @@
   <table id="siblings" style="width: 100%%" border="%border;">
     <tr>
       <td style="text-align: %left;;vertical-align: top">
-        <h3 class="highlight">[*siblings]</h3>
+        <h3 class="highlight">%nn;
+          %if;(bvar.full_fratrie="" or bvar.full_fratrie="yes")
+            [*fratrie]%nn;
+          %else;
+            [*siblings]%nn;
+          %end;
+        </h3>
         <ul>
           %foreach;father.child;
-            %apply;display_sibling()
+            %if;((bvar.full_fratrie="" or bvar.full_fratrie="yes")
+              or child.index!=central_index)
+              %apply;display_sibling()
+            %end;
           %end;
         </ul>
       </td>
@@ -710,7 +724,7 @@
             %if;(parent.nb_families>1)
               <td width="50%%">
                 %apply;display_shared_parent%with;
-				  %apply;image_MF("parent","13")
+                  %apply;image_MF("parent","13")
                   %apply;short_display_person("parent")%end;
               </td>
             %end;
@@ -762,11 +776,11 @@
                   [*the great-grandparents]</h3></td>
               %if;(father.has_parents and father.father.has_parents)
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("father.father.father","10")
+                  %apply;image_MF("father.father.father","10")
                   %apply;short_display_person("father.father.father")</td>
                 <td>&nbsp;</td>
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("father.father.mother","10")
+                  %apply;image_MF("father.father.mother","10")
                   %apply;short_display_person("father.father.mother")</td>
               %else;
                 <td colspan="3" rowspan="4">&nbsp;</td>
@@ -774,11 +788,11 @@
               <td>&nbsp;</td>
               %if;(father.has_parents and father.mother.has_parents)
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("father.mother.father","10")
+                  %apply;image_MF("father.mother.father","10")
                   %apply;short_display_person("father.mother.father")</td>
                 <td>&nbsp;</td>
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("father.mother.mother","10")
+                  %apply;image_MF("father.mother.mother","10")
                   %apply;short_display_person("father.mother.mother")</td>
               %else;
                 <td colspan="3" rowspan="4">&nbsp;</td>
@@ -786,11 +800,11 @@
               <td>&nbsp;</td>
               %if;(mother.has_parents and mother.father.has_parents)
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("mother.father.father","10")
+                  %apply;image_MF("mother.father.father","10")
                   %apply;short_display_person("mother.father.father")</td>
                 <td>&nbsp;</td>
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("mother.father.mother","10")
+                  %apply;image_MF("mother.father.mother","10")
                   %apply;short_display_person("mother.father.mother")</td>
               %else;
                 <td colspan="3" rowspan="4">&nbsp;</td>
@@ -798,11 +812,11 @@
               <td>&nbsp;</td>
               %if;(mother.has_parents and mother.mother.has_parents)
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("mother.mother.father","10")
+                  %apply;image_MF("mother.mother.father","10")
                   %apply;short_display_person("mother.mother.father")</td>
                 <td>&nbsp;</td>
                 <td style="text-align: center;font-size: 80%%">%nn;
-				  %apply;image_MF("mother.mother.mother","10")
+                  %apply;image_MF("mother.mother.mother","10")
                   %apply;short_display_person("mother.mother.mother")</td>
               %else;
                 <td colspan="3" rowspan="4">&nbsp;</td>
@@ -899,11 +913,11 @@
                   [*the grandparents]</h3></td>
               %if;father.has_parents;
                 <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
-				  %apply;image_MF("father.father","11")
+                  %apply;image_MF("father.father","11")
                   %apply;short_display_person("father.father")</td>
                 <td>&nbsp;</td>
                 <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
-				  %apply;image_MF("father.mother","11")
+                  %apply;image_MF("father.mother","11")
                   %apply;short_display_person("father.mother")</td>
               %else;
                 <td colspan="7" rowspan="4">&nbsp;</td>
@@ -911,11 +925,11 @@
               <td>&nbsp;</td>
               %if;mother.has_parents;
                 <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
-				  %apply;image_MF("mother.father","11")
+                  %apply;image_MF("mother.father","11")
                   %apply;short_display_person("mother.father")</td>
                 <td>&nbsp;</td>
                 <td colspan="3" style="text-align: center;font-size: 90%%">%nn;
-				  %apply;image_MF("mother.mother","11")
+                  %apply;image_MF("mother.mother","11")
                   %apply;short_display_person("mother.mother")</td>
               %else;
                 <td colspan="7" rowspan="4">&nbsp;</td>
@@ -973,11 +987,11 @@
             <td rowspan="4" style="text-align: center;vertical-align: middle">
               <h3 class="highlight">[*the parents]</h3></td>
             <td colspan="7" style="text-align: center">%nn;
-			  %apply;image_MF("father","13")
+              %apply;image_MF("father","13")
               %apply;short_display_person("father")</td>
             <td>&nbsp;</td>
             <td colspan="7" style="text-align: center">%nn;
-			  %apply;image_MF("mother","13")
+              %apply;image_MF("mother","13")
               %apply;short_display_person("mother")</td>
           </tr>
 
@@ -1006,7 +1020,7 @@
             %( line 13 : 1 person %)
             <td>&nbsp;</td>
             <td colspan="15" style="text-align: center">%nn;
-			  %apply;image_MF("self","13")
+              %apply;image_MF("self","13")
               %apply;short_display_person("self")</td>
           </tr>
         </table>

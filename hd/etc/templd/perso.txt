@@ -1,8 +1,8 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template a v 6.03b 2011/12/01 12:00:00 ddr/dd Exp $ -->
-  <!-- copyright (c) 1998-2011 INRIA -->
+  <!-- $Id: perso.txt, Template d v 6.05c 2012/05/16 12:00:00 ddr/dd Exp $ -->
+  <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -12,11 +12,11 @@
       %else;%first_name; %surname;%end;
     %end;
   </title>
+  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
 %include.css;
-  <meta name="robots" content="none"%/>
   <style type="text/css"><!--
   --></style>
 %base_header;
@@ -25,16 +25,18 @@
 %define;image_sosa(xxx,yyy)
   <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
     style="border: none" alt=""%sp;
-	title="%if;(yyy>1)[direct ancestor of %s:::xxx] , %end;[*Sosa] yyy"%/>%nn;
+    title="%if;(yyy=1)%else;[direct ancestor of %s:::xxx], %end;[*Sosa] yyy"%/>%nn;
 %end;
 
 %define;display_sosa(xx)
-  %if;xx.has_sosa;
-    %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-    %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
-	                       %sosa_ref.surname_key_strip;
-					  %and;%xx.sosa;%end;
-    %if;not cancel_links;</a>%end;%sp;
+  %if;(bvar.display_sosa="" or bvar.display_sosa="yes")
+    %if;xx.has_sosa;
+      %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
+      %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
+                             %sosa_ref.surname_key_strip;
+                        %and;%xx.sosa;%end;
+      %if;not cancel_links;</a>%end;%sp;
+    %end;
   %end;
 %end;
 
@@ -42,14 +44,13 @@
   %if;(wizard and not cancel_links and not xx.is_restricted)
     <a href="%prefix;m=MOD_IND;i=%xx.index;">%end;
   %if;xx.is_male;
-    <img width="wi_he" height="wi_he" src="%image_prefix;/male.png"%sp;
-         style="border: none" alt="" title="[M/F]0"%/>%nn;
+    <img src="%image_prefix;/male.png" title="[M/F]0"%sp;
   %elseif;xx.is_female;
-    <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
-         style="border: none" alt="" title="[M/F]1"%/>%nn;
+    <img src="%image_prefix;/female.png" title="[M/F]1"%sp;
   %else;
-    <span class="highlight">?</span>%nn;
+    <img src="%image_prefix;/sexunknown.png" title="?"%sp;
   %end;
+         width="wi_he" height="wi_he" style="border: none" alt=""%/>%nn;
   %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
   %sp;
 %end;
@@ -206,10 +207,14 @@
   %apply;married_to%with;%xx.is_male%and;
     %if;(marriage_place="")
       %if;(on_marriage_date="")
-      %else; <em>%on_marriage_date;</em>%end;
+      %else; <em>%on_marriage_date;
+        %if;wedding_birthday; ([happy birthday to them!])%end;
+        </em>%end;
     %else;
       %if;(on_marriage_date="")<em>, %marriage_place;, </em>
-      %else; <em>%on_marriage_date;, %marriage_place, </em>%end;
+      %else; <em>%on_marriage_date;
+        %if;wedding_birthday; ([happy birthday to them!])%end;
+        , %marriage_place, </em>%end;
     %end;
   %end;
 %end;
@@ -638,18 +643,28 @@
           </tr>
         </table>
       </td>
-      <td style="text-align: left;vertical-align: top">
-        <h3 class="highlight" id="siblings" style="text-align: left">%sp;
-          &nbsp;[*siblings]</h3>
-        <ul>
-          %foreach;father.child;
-            %apply;li_SDC("child")
-              %apply;image_MF("child","13")
-              %apply;short_display_person("child")
-            </li>
+      %if;has_siblings;
+        <td style="text-align: left;vertical-align: top">
+          <h3 class="highlight" id="siblings" style="text-align: left">%sp;&nbsp;%sp;
+               %if;(bvar.full_fratrie="" or bvar.full_fratrie="yes")
+              [*fratrie]%nn;
+            %else;
+              [*siblings]%nn;
+            %end;
+          </h3>
+          <ul>
+            %foreach;father.child;
+              %if;((bvar.full_fratrie="" or bvar.full_fratrie="yes")
+                or child.index!=central_index)
+                %apply;li_SDC("child")
+                  %apply;image_MF("child","13")
+                  %apply;short_display_person("child")
+                </li>
+            %end;
           %end;
-        </ul>
-      </td>
+          </ul>
+        </td>
+      %end;
     </tr>
   </table>
 </div>
