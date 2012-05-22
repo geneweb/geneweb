@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/02 geneweb-6.04 templ=templm -->
   <title>[*update]</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -30,7 +30,7 @@
 %end;
 
 <h1>%nn;
-  [*update]:<br%/>
+  [*update]<br%/>
   %first_name;
   .%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end; %surname;
 </h1>
@@ -94,25 +94,24 @@
          (nb_families != 0 or has_parents))
     %elseif;(not is_male and not is_female)
       <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;
-      [*add::marriage/marriages]0 ([M/F]0)</a>
+      [*add::family/families]0 ([M/F]0)</a>
       <br%/>
       <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;
-      [*add::marriage/marriages]0 ([M/F]1)</a>
+      [*add::family/families]0 ([M/F]1)</a>
       <br%/>
     %else;
-      <a href="%prefix;m=ADD_FAM;ip=%index;" title="[*add::marriage/marriages]0 (A)" accesskey="A">%nn;
-      [*add::marriage/marriages]0 (A)</a>
+      <a href="%prefix;m=ADD_FAM;ip=%index;" title="[add::family/families]0 (A)" accesskey="A">%nn;
+      [*add::family/families]0 (A)</a>
       <br%/>
     %end;
     %if;(nb_children != 0)
       <br%/>
       <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
-    %end;      
+    %end;
     %if;has_possible_duplications;
       <br%/>
-      <a href="%prefix;m=MRG_DUP;ip=%index;">%sq;
-      [*merge::possible duplications]</a>
-    %end;      
+      <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
+    %end;
   </td>
 </tr>
 </table>

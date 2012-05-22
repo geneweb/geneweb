@@ -1,41 +1,77 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 2012/03/08 geneweb-6.04 templ=templm -->
-<!-- To do : copy this file to bases/etc/my_base/ -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 2012/04/12 geneweb-6.04 templ=templm -->
+<!-- How to : copy this file to bases/etc/my_base/ -->
 
 %if;(not cancel_links)
-  <div style="clear: both; padding: 2px; margin: 2px;	border: solid 1px #FFFFC0;">
+  <div id="trl">
     <form method="get" action="%action;">
       <p>
       %hidden;
       <input type="hidden" name="m" value="NG"%/>
-      <input name="n" size="20" maxlength="200" title="[*search/case sensitive]0 (9)" accesskey="9"%/>%nn;
-      <input type="submit" value="[*search/case sensitive]0 (9)"%/>
+      <input name="n" size="20" maxlength="200" title="[*search/case sensitive]0 (²)" accesskey="²"%/>
+      <input type="submit" value="[*search/case sensitive]0 (²)"%/>
       </p>
     </form>
-    <p>
-     templ=
-      <a href="%prefix_base;templ=">-</a>%sp;
-      <a href="%prefix_base;templ=templa">a</a>%sp;
-      <a href="%prefix_base;templ=templb">b</a>%sp;
-      <a href="%prefix_base;templ=templc">c</a>%sp;
-      <a href="%prefix_base;templ=templd">d</a>%sp;
-      <a href="%prefix_base;templ=templf">f</a>%sp;
-      <a href="%prefix_base;templ=templh">h</a>%sp;
-      <a href="%prefix_base;templ=templm">m</a>%sp;
-    </p>
+    <div id="templ"></div>
   </div>
+  %if;(wizard)
+    <script type="text/javascript">
+    <!--
+    function reloadClose() {
+        window.opener.location = window.opener.location;
+        parent.close();
+    }
+      
+    var htmlTitle = document.title;
+    
+    if (
+         htmlTitle == "[*person modified]" ||
+         htmlTitle == "[*family modified]" ||
+         htmlTitle == "[*person added]" || 
+         htmlTitle == "[*family added]"
+        )
+    {
+      if (window.opener && !window.opener.closed) {
+        document.getElementById("trl").innerHTML = '\
+        <p><a id="reloadclose" href="javascript:reloadClose()">[X]</a></p>\
+        ';
+        document.getElementById("reloadclose").focus();}
+    }
+    
+    -->
+    </script>
+  %end;
+  <script type="text/javascript">
+  <!--
+   var oldUrl = document.URL;
+   var searchUrl = oldUrl.search(/templ=/);
+   if(searchUrl != -1) {
+     document.getElementById("templ").innerHTML = '\
+        templ= \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=;') + '">-</a> \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templa;') + '">a</a> \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templb;') + '">b</a> \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templc;') + '">c</a> \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templd;') + '">d</a> \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templf;') + '">f</a> \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templh;') + '">h</a> \
+        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templm;') + '">m</a> \
+     ';
+   }
+   else {
+     document.getElementById("templ").innerHTML = '\
+        templ= \
+        <a href="' + oldUrl + ';templ=;">-</a> \
+        <a href="' + oldUrl + ';templ=templa;">a</a> \
+        <a href="' + oldUrl + ';templ=templb;">b</a> \
+        <a href="' + oldUrl + ';templ=templc;">c</a> \
+        <a href="' + oldUrl + ';templ=templd;">d</a> \
+        <a href="' + oldUrl + ';templ=templf;">f</a> \
+        <a href="' + oldUrl + ';templ=templh;">h</a> \
+        <a href="' + oldUrl + ';templ=templm;">m</a> \
+     ';
+   }
+  -->
+  </script>
 %end;
-
-<script type="text/javascript">
-<!--
-var htmlTitle = window.document.getElementsByTagName("title")[0].firstChild.data
-if (
-     htmlTitle == "[*person modified]" |
-     htmlTitle == "[*family modified]" |
-     htmlTitle == "[*person added]" | 
-     htmlTitle == "[*family added]"
-    )
-{document.getElementsByTagName("a")[2].focus()};
--->
-</script>
 
 <!-- end trl.txt -->

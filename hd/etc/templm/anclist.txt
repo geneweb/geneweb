@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2011/12/02 geneweb-6.03 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/05/02 geneweb-6.04 templ=templm -->
   <title>%nn;
     %if;(evar.t = "F" and evar.opt = "csv")
       CSV
@@ -13,7 +13,7 @@
         %and;
           %if;(public_name != "")%public_name;%else;%first_name;%end;
           %if;(qualifier != "") %qualifier;%end;
-          %sp;%surname;          
+          %sp;%surname;
         %end;
     %elseif;(evar.t = "F")- [*surnames list] -%nn;
       %apply;a_of_b%with;
@@ -30,58 +30,6 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    /* anclist.txt */
-    .ld_table {
-    	margin-left: auto;
-    	margin-right: auto;
-    	text-align: center;
-    	border: solid 1px rgb(150,150,150);
-    }
-    .ld_table tr td {
-    	border: solid 1px rgb(150,150,150);
-    	margin-left: 0px;
-    	margin-right: 0px;
-    }
-    .ld_table a {
-    	display: block;
-    }
-    .ld_birth0 {
-    	background-color: rgb(173,216,230);
-    }
-    .ld_birth1 {
-    	background-color: rgb(255,182,193);
-    }
-    .ld_birth2 {
-    	background-color: rgb(255,0,0);
-    }
-    .ld_death0, .ld_death0 td a {
-    	background-color: rgb(0,0,0);
-    	color: rgb(173,216,230);
-    }
-    .ld_death1, .ld_death1 td a {
-    	background-color: rgb(0,0,0);
-    	color: rgb(255,182,193);
-    }
-    .ld_death2, .ld_death2 td a {
-    	background-color: rgb(0,0,0);
-    	color: rgb(255,0,0);
-    }
-    .ld_marriage {
-    	background-color: rgb(255,255,128);
-    }
-    .ld_before, .ld_after {
-    	background-color: rgb(192,192,192);
-    }
-    .ld_no_date {
-    	background-color: rgb(220,220,220);
-    }
-    .ld_him_her {
-    	font-style: italic;
-    	font-weight: bold;
-    }
-
-  </style>
   %base_header;
 </head>
 <body%body_prop; id="anclist">
@@ -96,7 +44,7 @@
       %if;(public_name != "")%public_name;%else;%first_name;%end;
       %if;(qualifier != "") %qualifier;%end;
       %sp;%surname;
-      %sp;%dates;          
+      %sp;%dates;
     %end;
   %elseif;(evar.t = "F")
     %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -123,6 +71,13 @@
       <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
   </div>
 %end;
+
+%let;death_symbol;
+  %if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;
+%in;
+
+%let;evar_v;%if;(evar.v > 0)%expr(evar.v-1)%end;%in;
+%let;ref_index;%index;%in;
 
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
@@ -260,7 +215,7 @@
         %end;        
         %if;(evar.cousins="on" and child.has_families and child.sosa_in_list = "")
           %apply;csv_line("yy.zz",child_cnt)
-        %end;        
+        %end;
       %end;
     %else;
     %incr_count;%count;
@@ -270,7 +225,7 @@
   %end;
 %end;
 
-%define;ld_somebody1(bbb,ddd,xx,yy,lexa,lexb,sss)
+%define;ld_somebody1(bbb,ddd,xx,yy,lexa,lexb,sss,ttt)
   %apply;add_in_sorted_list%with;
     %if;(xx.yy_date.year >= 0)
       %xx.yy_date.year;%nn;
@@ -290,26 +245,28 @@
   %and;
     %xx.yy_place;
   %and;
-    [yy]%nn;
+    ttt%nn;
   %and;
     %if;(cancel_links or xx.is_restricted)
       %xx;%nn;
     %else;
-      <a href="%prefix;%xx.access;">%xx;</a>%nn;   
+      <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=on;bd=;color=;i=%ref_index;">%xx;</a>%nn;
     %end;
   %and;
     %if;("lexb" != "")
       %apply;a_of_b%with;
-        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2)%end;
+        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
       %and;
-        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2)%end;
+        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
       %end;
     %else;
       %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
-      %if;("yy" = "death" and xx.computable_death_age)
-        %sp;(%xx.death_age;)
-      %end;
     %end;
+    %if;("yy" = "death" and xx.computable_death_age)
+      %sp;(%xx.death_age;)
+    %end;
+  %and;
+    %xx.occupation;
   %and;
     %xx.index;
   %and;
@@ -337,7 +294,7 @@
     %else;
       9999%marriage_date.year;%nn;
     %end;
-  %and;    
+  %and;
     %if;(marriage_date.year >=  bbb)
       %expr(marriage_date.year - bbb)%nn;
     %elseif;(bbb > marriage_date.year)
@@ -350,23 +307,25 @@
   %and;
     %marriage_place;
   %and;
-    [marriage/marriages]0%nn;
+    &amp;%nn;
   %and;
     %if;(cancel_links or xx.is_restricted)
       %xx;<br%/> &amp; %spouse;%nn;
     %else;
-      <a href="%prefix;%xx.access;">%xx;</a> &amp; %spouse;%nn;   
+      <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=on;bd=;color=;i=%ref_index;">%xx;</a> &amp; %spouse;%nn;
     %end;
   %and;
     %if;("lexb" != "")
       %apply;a_of_b%with;
-        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2)%end;
+        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
       %and;
-        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2)%end;
+        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
       %end;
     %else;
       %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
     %end;
+  %and;
+    %xx.occupation;%nn;
   %and;
     %xx.index;
   %and;
@@ -388,32 +347,62 @@
 %end;
 
 %define;ld_somebody(bbb,ddd,xx,lexa,lexb,sss)
-  %apply;ld_somebody1(bbb,ddd,"xx","birth","lexa","lexb","sss")
+  %apply;ld_somebody1(bbb,ddd,"xx","birth","lexa","lexb","sss","o")
   %if;(xx.is_dead)
-    %apply;ld_somebody1(bbb,ddd,"xx","death","lexa","lexb","sss")
+    %apply;ld_somebody1(bbb,ddd,"xx","death","lexa","lexb","sss",death_symbol)
   %end;
 %end;
 
-%define;ld_cousin(bbb,ddd,curlev,maxlev,lexa,lexb,sss,ii,ffi,mmi)
+%define;ld_cousin(bbb,ddd,curlev,maxlev,lexa,lexb,sss)
   %if;(nb_children > 0)
     %foreach;child;
-      %if;(child.sosa_in_list = "" and child.index != ii and child.index != ffi and child.index != mmi)
+      %if;(child.sosa_in_list = "" and child.index != a_i and child.index != b_i and child.index != c_i)
         %apply;ld_somebody(bbb,ddd,"child","lexa","lexb","sss")
         %if;(child.has_families)
           %foreach;child.family;
             %apply;ld_marriage(bbb,ddd,"child","lexa","lexb","sss")
             %if;(curlev = 0)
               %apply;ld_somebody(bbb,ddd,"spouse","the spouse","an uncle/an aunt",sex)
-              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a cousin","","",ii,ffi,mmi)
+              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a cousin","","")
             %elseif;(curlev = 1)
-              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a son/a daughter/a child","a cousin",sex,ii,ffi,mmi)
+              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a son/a daughter/a child","a cousin",sex)
             %elseif;(curlev = 2)
-              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","a cousin","sss",ii,ffi,mmi)
+              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","a cousin","sss")
             %elseif;(curlev = 3)
-              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a cousin","sss",ii,ffi,mmi)
+              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a cousin","sss")
+            %elseif;(curlev = 4)
+              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"arriere petit fils","a cousin","sss")
             %end;
           %end;
-        %end;  
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;ld_2nd_cousin(bbb,ddd,curlev,maxlev,lexa,lexb,sss)
+  %if;(nb_children > 0)
+    %foreach;child;
+      %if;(child.sosa_in_list = "" and child.index != a_i and child.index != b_i and child.index != c_i 
+           and child.index != d_i and child.index != e_i and child.index != f_i and child.index != g_i)
+        %apply;ld_somebody(bbb,ddd,"child","lexa","lexb","sss")
+        %if;(child.has_families)
+          %foreach;child.family;
+            %apply;ld_marriage(bbb,ddd,"child","lexa","lexb","sss")
+            %if;(curlev = 0)
+              %apply;ld_somebody(bbb,ddd,"spouse","the spouse","a great-uncle/a great-aunt",sex)
+              %apply;ld_2nd_cousin(bbb,ddd,curlev+1,maxlev,"a cousin","the father/the mother/a parent","")
+            %elseif;(curlev = 1)
+              %apply;ld_2nd_cousin(bbb,ddd,curlev+1,maxlev,"a 2nd cousin","",sex)
+            %elseif;(curlev = 2)
+              %apply;ld_2nd_cousin(bbb,ddd,curlev+1,maxlev,"a son/a daughter/a child","a 2nd cousin",sex)
+            %elseif;(curlev = 3)
+              %apply;ld_2nd_cousin(bbb,ddd,curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","a 2nd cousin","sss")
+            %elseif;(curlev = 4)
+              %apply;ld_2nd_cousin(bbb,ddd,curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a 2nd cousin","sss")
+            %end;
+          %end;
+        %end;
       %end;
     %end;
   %end;
@@ -439,19 +428,24 @@
   %end;
 %end;
 
-%define;ld_nephew(bbb,ddd,curlev,maxlev,lexa,ii)
+%define;ld_nephew(bbb,ddd,curlev,maxlev,lexa)
   %if;(nb_children > 0)
     %foreach;child;
-      %if;(child.index != ii)
+      %if;(child.index != a_i)
         %apply;ld_somebody(bbb,ddd,"child","lexa","","")
         %if;(child.has_families)
           %foreach;child.family;
             %apply;ld_marriage(bbb,ddd,"child","lexa","","")
             %if;(curlev = 0)
-              %apply;ld_somebody(bbb,ddd,"spouse","a brother-in-law/a sister-in-law","","")
-              %apply;ld_nephew(bbb,ddd,curlev+1,maxlev,"a nephew/a niece",ii)
+              %if;("lexa" = "a half-brother/a half-sister/a half-sibling")
+                %let;test;[the spouse]%in;
+                %apply;ld_somebody(bbb,ddd,"spouse","the spouse","lexa",sex)
+              %else;                
+                %apply;ld_somebody(bbb,ddd,"spouse","a brother-in-law/a sister-in-law","","")
+              %end;
+              %apply;ld_nephew(bbb,ddd,curlev+1,maxlev,"a nephew/a niece")
             %elseif;(curlev = 1 and maxlev > 2)
-              %apply;ld_nephew(bbb,ddd,curlev+1,maxlev,"a great-nephew/a great-niece",ii)
+              %apply;ld_nephew(bbb,ddd,curlev+1,maxlev,"a great-nephew/a great-niece")
             %end;
           %end;
         %end;
@@ -462,7 +456,7 @@
 
 %define;ld(bbb,ddd)
   %let;maxlev;
-    %apply;min(evar.v, max_anc_level, 4)
+    %apply;min(evar_v, max_anc_level, 4)
   %in;
   %empty_sorted_list;
   %foreach;ancestor_level(maxlev)
@@ -480,6 +474,7 @@
           %apply;ld_children(bbb,ddd,0,maxlev,"a son/a daughter/a child","","")
         %end;
       %elseif;(level=2)
+        %let;a_i;%index;%in;
         %apply;ld_somebody(bbb,ddd,"ancestor","the father/the mother/a parent","","")
         %if;(evar.cousins = "on")
           %foreach;ancestor.family;
@@ -487,21 +482,36 @@
               %apply;ld_marriage(bbb,ddd,"ancestor","the parents","","")
             %elseif;(ancestor.nb_families > 1 and spouse.index != ancestor.spouse.index)
               %apply;ld_marriage(bbb,ddd,"ancestor","the father/the mother/a parent","","")
-              %apply;ld_nephew(bbb,ddd,0,maxlev,"a half-brother/a half-sister/a half-sibling",index)
+              %apply;ld_nephew(bbb,ddd,0,maxlev,"a half-brother/a half-sister/a half-sibling")
             %else;
-              %apply;ld_nephew(bbb,ddd,0,maxlev,"a brother/a sister/a sibling",index)
+              %apply;ld_nephew(bbb,ddd,0,maxlev,"a brother/a sister/a sibling")
             %end;
           %end;
         %end;
       %elseif;(level=3)
+        %let;a_i;%index;%in;
+        %let;b_i;%father.index;%in;
+        %let;c_i;%mother.index;%in;
         %apply;ld_somebody(bbb,ddd,"ancestor","a grandfather/a grandmother/a grandparent","","")
         %if;(evar.cousins = "on")
           %foreach;ancestor.family;
-            %apply;ld_cousin(bbb,ddd,0,maxlev,"an uncle/an aunt","","",index,father.index,mother.index)
+            %apply;ld_cousin(bbb,ddd,0,maxlev,"an uncle/an aunt","","")
           %end;
         %end;
       %elseif;(level=4)
+        %let;a_i;%index;%in;
+        %let;b_i;%father.index;%in;
+        %let;c_i;%mother.index;%in;
+        %let;d_i;%father.father.index;%in;
+        %let;e_i;%father.mother.index;%in;
+        %let;f_i;%mother.father.index;%in;
+        %let;g_i;%mother.mother.index;%in;
         %apply;ld_somebody(bbb,ddd,"ancestor","a great-grandfather/a great-grandmother/a great-grandparent","","")
+        %if;(evar.cousins = "on")
+          %foreach;ancestor.family;
+            %apply;ld_2nd_cousin(bbb,ddd,0,maxlev,"a great-uncle/a great-aunt","","")
+          %end;
+        %end;
       %end;
     %end;
   %end;
@@ -519,27 +529,32 @@
     <th>[years old]</th>
     <th>[date]</th>
     <th>[place]</th>
-    <th>&deg; &amp; %if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;</th>
+    <th><abbr title="[birth] [marriage/marriages]0 [death]">o&amp;%death_symbol;</abbr></th>
     <th>[person/persons]0</th>
     <th>[relationship]0</th>
+    <th>[occupation]0</th>
   </tr>
+    %reset_count;
     %foreach;sorted_list_item;
-      %if;(prev_item.4 = item.4 and prev_item.6 = item.6 and prev_item.9 = item.9)
+      %if;(prev_item.4 = item.4 and prev_item.6 = item.6 and prev_item.10 = item.10)
       %else;
-        <tr class="%item.10;">      
+        <tr>
           <td>%item.2;</td>
           <td>%item.4;</td>
           <td>%item.5;</td>
-          <td>%item.6;</td>
-          %if;(item.11 = "1")
-            <td style="border: 3px solid rgb(255,215,0);">%item.7;</td>
-          %else;
-            <td>%item.7;</td>
-          %end;
+          <td class="%item.11;" 
+            %if;(item.12 = "1")style="border: 3px solid rgb(255,215,0);"
+            %end;>%item.6;</td>
+          <td>%item.7;</td>
           <td>%item.8;</td>
+          <td>%item.9;</td>
         </tr>
+        %if;(item.6 = "o")
+          %incr_count;
+        %end;
       %end;
     %end;
+  <tr><td colspan="7">[*total] : %count; [[person/persons]1@(c)]</td></tr>
   </table>
 %elseif;(wizard and evar.t = "F" and evar.opt = "csv")
   %( csv display full %)
@@ -580,8 +595,8 @@
   ;[marriage/marriages]0_occ%nn;
   <br%/>
   %reset_count;
-  %foreach;ancestor_level(evar.v + 1)
-    %if;(level != 1 and evar.only != "on" or level = evar.v + 1)
+  %foreach;ancestor_level(evar_v + 1)
+    %if;(level != 1 and evar.only != "on" or level = evar_v + 1)
       %foreach;ancestor;
         %if;(ancestor.same = "" and ancestor.is_male)
           %foreach;ancestor.family;
@@ -601,8 +616,8 @@
 %elseif;(evar.t = "L")
   %( by list %)
   %let;xx;
-    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+    %if;(bvar.max_anc_level = "")%apply;min(evar_v, max_anc_level, 7)
+    %else;%apply;min(evar_v, max_anc_level, bvar.max_anc_level)%end;
   %in;
   <p>
   %apply;togen(xx).
@@ -611,8 +626,8 @@
 %elseif;(evar.t = "H")
   %( horizontally %)
   %let;xx;
-    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+    %if;(bvar.max_anc_level = "")%apply;min(evar_v, max_anc_level, 7)
+    %else;%apply;min(evar_v, max_anc_level, bvar.max_anc_level)%end;
   %in;
   <p>
   %apply;togen(xx).
@@ -624,7 +639,7 @@
 %elseif;(evar.t = "F")
   %( surnames list %)
   <ul>
-  %foreach;ancestor_surname(evar.v)
+  %foreach;ancestor_surname(evar_v)
     <li>%nn;
     %if;(evar.cgl != "on")<a href="%prefix;m=DAG;%ancestor.sosa_access;">%nn;
     %ancestor.surname_end;%ancestor.surname_begin;</a>%nn;

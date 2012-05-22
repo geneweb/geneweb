@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/02/20 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/26 geneweb-6.04 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -25,17 +25,6 @@
       -->
   </script>
   %include.css;
-  <style type="text/css">
-    /* ancmenu.txt, desmenu.txt, relmenu.txt */
-    #menutxt fieldset {
-    	width: 300px;
-    	float: left;
-    	margin: 2px;
-    }
-    #menutxt fieldset fieldset {
-    	width: 270px;
-    }
-  </style>
   %base_header;
 </head>
 
@@ -85,6 +74,9 @@
       %end;
     </p>
         <fieldset>
+          <legend>
+            <label><input type="submit" value="Ok"%/></label>
+          </legend>
           <select name="v">
             %foreach;descendant_level;
               <option value="%level;"%if(level = 3) selected="selected"%end;>%nn;
@@ -101,8 +93,7 @@
               </option>
             %end;
           </select>
-          <input type="submit" value="Ok"%/>
-          <br%/><br%/>
+          <br%/>
           <label>
             <input type="checkbox" name="cgl" value="on"%/>
             [*cancel GeneWeb links]

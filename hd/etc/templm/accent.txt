@@ -1,5 +1,5 @@
 <!-- $Id: accent.txt,v 5.6 2007-04-04 02:17:36 ddr Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 2011/12/12 geneweb-6.03 templ=templm -->
+<!-- Modified mickroue(a)yahoo.fr 2012/04/16 geneweb-6.04 templ=templm -->
 <!-- To work : copy this file to bases/etc/ -->
 
 <script type="text/javascript"><!--
@@ -26,219 +26,216 @@ function write_ch(v) {
    return false;
 }
 --></script>
-  %if;(evar.file != "")
-    <ul>
-      <li>[*link] : <a onclick="return write_ch('\n%evar.text;')" href="#">%evar.text;</a></li>
-      <li>%evar.file;</li>
-    </ul>
-    <em>([*image/images]0 : gw/src/%evar.base;/images/%evar.file;.%bvar.var_img_ext;)</em>
-  %end;
-		<p style="font-size: 120%%; text-align: center;">
-      <a onclick="return write_ch('Á')" href="#">Á</a>
-      <a onclick="return write_ch('á')" href="#">á</a>
-      <a onclick="return write_ch('Â')" href="#">Â</a>
-      <a onclick="return write_ch('â')" href="#">â</a>
-      <a onclick="return write_ch('À')" href="#">À</a>
-      <a onclick="return write_ch('à')" href="#">à</a>
-      <a onclick="return write_ch('Æ')" href="#">Æ</a>
-      <a onclick="return write_ch('æ')" href="#">æ</a>
-      <a onclick="return write_ch('Å')" href="#">Å</a>
-      <a onclick="return write_ch('å')" href="#">å</a>
-      <a onclick="return write_ch('Ä')" href="#">Ä</a>
-      <a onclick="return write_ch('ä')" href="#">ä</a>
-      <a onclick="return write_ch('Ą')" href="#">Ą</a>
-      <a onclick="return write_ch('ą')" href="#">ą</a>
-      &nbsp;
-      <a onclick="return write_ch('Ć')" href="#">Ć</a>
-      <a onclick="return write_ch('ć')" href="#">ć</a>
-      <a onclick="return write_ch('Ç')" href="#">Ç</a>
-      <a onclick="return write_ch('ç')" href="#">ç</a>
-      &nbsp;
-      <a onclick="return write_ch('Ð')" href="#">Ð</a>
-      <a onclick="return write_ch('ð')" href="#">ð</a>
-      &nbsp;
-      <a onclick="return write_ch('É')" href="#">É</a>
-      <a onclick="return write_ch('é')" href="#">é</a>
-      <a onclick="return write_ch('Ê')" href="#">Ê</a>
-      <a onclick="return write_ch('ê')" href="#">ê</a>
-      <a onclick="return write_ch('È')" href="#">È</a>
-      <a onclick="return write_ch('è')" href="#">è</a>
-      <a onclick="return write_ch('Ë')" href="#">Ë</a>
-      <a onclick="return write_ch('ë')" href="#">ë</a>
-      <a onclick="return write_ch('Ę')" href="#">Ę</a>
-      <a onclick="return write_ch('ę')" href="#">ę</a>
-      &nbsp;
-      <a onclick="return write_ch('Í')" href="#">Í</a>
-      <a onclick="return write_ch('í')" href="#">í</a>
-      <a onclick="return write_ch('Î')" href="#">Î</a>
-      <a onclick="return write_ch('î')" href="#">î</a>
-      <a onclick="return write_ch('Ì')" href="#">Ì</a>
-      <a onclick="return write_ch('ì')" href="#">ì</a>
-      <a onclick="return write_ch('Ï')" href="#">Ï</a>
-      <a onclick="return write_ch('ï')" href="#">ï</a>
-      &nbsp;
-      <a onclick="return write_ch('Ł')" href="#">Ł</a>
-      <a onclick="return write_ch('ł')" href="#">ł</a>
-      &nbsp;
-      <a onclick="return write_ch('Ń')" href="#">Ń</a>
-      <a onclick="return write_ch('ń')" href="#">ń</a>
-      <a onclick="return write_ch('Ñ')" href="#">Ñ</a>
-      <a onclick="return write_ch('ñ')" href="#">ñ</a>
-      <br%/>
-      <a onclick="return write_ch('Ó')" href="#">Ó</a>
-      <a onclick="return write_ch('ó')" href="#">ó</a>
-      <a onclick="return write_ch('Ô')" href="#">Ô</a>
-      <a onclick="return write_ch('ô')" href="#">ô</a>
-      <a onclick="return write_ch('Ò')" href="#">Ò</a>
-      <a onclick="return write_ch('ò')" href="#">ò</a>
-      <a onclick="return write_ch('Œ')" href="#">Œ</a>
-      <a onclick="return write_ch('œ')" href="#">œ</a>
-      <a onclick="return write_ch('Ø')" href="#">Ø</a>
-      <a onclick="return write_ch('ø')" href="#">ø</a>
-      <a onclick="return write_ch('Õ')" href="#">Õ</a>
-      <a onclick="return write_ch('õ')" href="#">õ</a>
-      <a onclick="return write_ch('Ö')" href="#">Ö</a>
-      <a onclick="return write_ch('ö')" href="#">ö</a>
-      &nbsp;
-      <a onclick="return write_ch('Ś')" href="#">Ś</a>
-      <a onclick="return write_ch('ś')" href="#">ś</a>
-      <a onclick="return write_ch('ſ')" href="#">ſ</a>
-      <a onclick="return write_ch('ß')" href="#">ß</a>
-      <a onclick="return write_ch('Þ')" href="#">Þ</a>
-      <a onclick="return write_ch('þ')" href="#">þ</a>
-      &nbsp;
-      <a onclick="return write_ch('Ú')" href="#">Ú</a>
-      <a onclick="return write_ch('ú')" href="#">ú</a>
-      <a onclick="return write_ch('Ù')" href="#">Ù</a>
-      <a onclick="return write_ch('ù')" href="#">ù</a>
-      <a onclick="return write_ch('Û')" href="#">Û</a>
-      <a onclick="return write_ch('û')" href="#">û</a>
-      <a onclick="return write_ch('Ü')" href="#">Ü</a>
-      <a onclick="return write_ch('ü')" href="#">ü</a>
-      &nbsp;
-      <a onclick="return write_ch('Ý')" href="#">Ý</a>
-      <a onclick="return write_ch('ý')" href="#">ý</a>
-      <a onclick="return write_ch('Ÿ')" href="#">Ÿ</a>
-      <a onclick="return write_ch('ÿ')" href="#">ÿ</a>
-      &nbsp;
-      <a onclick="return write_ch('Ź')" href="#">Ź</a>
-      <a onclick="return write_ch('ź')" href="#">ź</a>
-      <a onclick="return write_ch('Ż')" href="#">Ż</a>
-      <a onclick="return write_ch('ż')" href="#">ż</a>
-      <br%/>
-      <a onclick="return write_ch('½')" href="#">½</a>
-      <a onclick="return write_ch('¼')" href="#">¼</a>
-      <a onclick="return write_ch('¾')" href="#">¾</a>
-      &nbsp;
-      <a onclick="return write_ch('º')" href="#">º</a>
-      <a onclick="return write_ch('¹')" href="#">¹</a>
-      <a onclick="return write_ch('²')" href="#">²</a>
-      <a onclick="return write_ch('³')" href="#">³</a>
-      <a onclick="return write_ch('°')" href="#">°</a>
-      <a onclick="return write_ch('ª')" href="#">ª</a>
-      &nbsp;
-      <a onclick="return write_ch('¡')" href="#">¡</a>
-      <a onclick="return write_ch('¿')" href="#">¿</a>
-      <a onclick="return write_ch('µ')" href="#">µ</a>
-      <a onclick="return write_ch('•')" href="#">•</a>
-      <a onclick="return write_ch('·')" href="#">·</a>
-      <a onclick="return write_ch('–')" href="#">–</a>
-      <a onclick="return write_ch('—')" href="#">—</a>
-      <a onclick="return write_ch('÷')" href="#">÷</a>
-      <a onclick="return write_ch('‰')" href="#">‰</a>
-      <a onclick="return write_ch('€')" href="#">€</a>
-      <a onclick="return write_ch('£')" href="#">£</a>
-      <a onclick="return write_ch('©')" href="#">©</a>
-      <a onclick="return write_ch('®')" href="#">®</a>
-      <a onclick="return write_ch('«')" href="#">«</a>
-      <a onclick="return write_ch('»')" href="#">»</a>
-      <a onclick="return write_ch('¶')" href="#">¶</a>
-      &nbsp;
-      <a onclick="return write_ch('‡')" href="#">‡</a>
-      <a onclick="return write_ch('№')" href="#">№</a>
-      <a onclick="return write_ch('×')" href="#">×</a>
-      <a onclick="return write_ch('†')" href="#">†</a>
-		</p>
-		
-		<div style="float: left; margin: 0.5em; text-align: center;">
-		  <h1 class="subtitle" style="display: inline;"><a onclick="return insertTags('=','=','x')" href="#">=h1=</a></h1><br%/>
-		  <h2 class="subtitle" style="display: inline;"><a onclick="return insertTags('==','==','x')" href="#">==h2==</a></h2><br%/>
-		  <h3 class="subtitle" style="display: inline;"><a onclick="return insertTags('===','===','x')" href="#">===h3===</a></h3><br%/>
-		  <h4 style="display: inline;"><a onclick="return insertTags('====','====','x')" href="#">====h4====</a></h4><br%/>
-		  <h5 style="display: inline;"><a onclick="return insertTags('=====','=====','x')" href="#">=====h5=====</a></h5><br%/>
-		  <h6 style="display: inline;"><a onclick="return insertTags('======','======','x')" href="#">======h6======</a></h6><br%/>
-		</div>
-		
-		<ul style="list-style-position: inside; text-align: left;">
-			<li>[*person/persons]0&nbsp;:&nbsp;
-			  <a onclick="return insertTags('%[%[w:','%]%]','x')" href="#">%[%[w:[wizard/wizards/friend/friends/exterior]0%]%]</a>
-				<a onclick="return write_ch('%[%[x/x%]%]')" href="#">
-				 %[%[[first name/first names]0/[surname/surnames]0%]%]</a>
-				<a onclick="return write_ch('%[%[x/x/9/x%]%]')" href="#">
-				 %[%[[first name/first names]0/[surname/surnames]0/[number]/[text]%]%]</a><br%/>
-				<a onclick="return write_ch('%[%[x/x/9/x;x{x *}x%]%]')" href="#">
-				 %[%[[first name/first names]0/[surname/surnames]0/[number]/[text];[comment]{[text] * }[comment]%]%]</a>
-			</li>
-			<li>[*image/images]1&nbsp;:&nbsp;
-			  <a onclick="return write_ch('&lt;img alt=&quot;?&quot; src=&quot;%%sm=IM;s=xxx.jpg&quot; %/&gt;')" href="#">
-        &lt;img src="%%sm=IM;s=xxx.jpg" alt="?"/&gt;</a>
-        <a onclick="return write_ch('&lt;a href=&quot;%%sm=IMH;s=xxx.jpg&quot;&gt;[*image/images]0&lt;/a&gt;')" href="#">
-        &lt;a href="%%sm=IMH;s=xxx.jpg"&gt;[*image/images]0&lt;/a&gt;</a>
-      </li>
-			<li>[*miscellaneous notes]&nbsp;:&nbsp;
-				<a onclick="return write_ch('%[%[%[x:x/x%]%]%]')" href="#">%[%[%[directory:filename/[text]%]%]%]</a>
-				<a onclick="return write_ch('TITLE=')" href="#">TITLE=</a>
-				<a onclick="return write_ch('HEAD=')" href="#">HEAD=</a>
-				<a onclick="return write_ch('OCCU=')" href="#">OCCU=</a>
-				<a onclick="return write_ch('BNOTE=')" href="#">BNOTE=</a>
-				<a onclick="return write_ch('NOTE=')" href="#">NOTE=</a>
-			</li>
-			<li>[*visualize/show/hide/summary]3 :
-				<a onclick="return write_ch('__TOC__')" href="#">__TOC__</a>
-				<a onclick="return write_ch('__SHORT_TOC__')" href="#">__SHORT_TOC__</a>
-				<a onclick="return write_ch('__NOTOC__')" href="#">__NOTOC__</a>
-      </li>
-			<li><i><a onclick="return insertTags('\'\'','\'\'','x')" href="#">''[text]''</a></i>&nbsp;
-				<b><a onclick="return insertTags('\'\'\'','\'\'\'','x')" href="#">'''[text]'''</a></b>&nbsp;
-				<i><b><a onclick="return insertTags('\'\'\'\'\'','\'\'\'\'\'','x')" href="#">'''''[text]'''''</a></b></i>&nbsp;
-				<a onclick="return insertTags('{','}','x')" href="#"><span class="highlight">{[text]}</span></a><br%/>
-			</li>
-		</ul>
-		
-		<table summary="wiki-list-style"  style="text-align: left;">
-		<tr>
-		<td style="border: solid 1px;">			
-			<ul>
-				<li><a onclick="return write_ch('*')" href="#">*[text]</a>
-					<ul><li><a onclick="return write_ch('**')" href="#">**[text]</a>
-							<ul><li><a onclick="return write_ch('***')" href="#">***[text]</a></li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</td>
-		<td style="border: solid 1px;">
-			<ol>
-				<li><a onclick="return write_ch('#')" href="#">#[text]</a>
-					<ol><li><a onclick="return write_ch('##')" href="#">##[text]</a>
-							<ol><li><a onclick="return write_ch('###')" href="#">###[text]</a></li>
-							</ol>
-						</li>
-					</ol>
-				</li>
-			</ol>
-		</td>
-		<td style="border: solid 1px;">
-			<dl>
-				<dd><a onclick="return write_ch(':')" href="#">:[text]</a>
-					<dl><dd><a onclick="return write_ch('::')" href="#">::[text]</a>
-							<dl><dd><a onclick="return write_ch(':::')" href="#">:::[text]</a></dd>
-							</dl>
-						</dd>
-					</dl>
-				</dd>
-			</dl>
-		</td>
-		</tr>
-		</table>
+%if;(evar.file != "")
+  <ul>
+    <li>[*link] : <a onclick="return write_ch('\n%evar.text;')" href="#">%evar.text;</a></li>
+    <li>%evar.file;</li>
+  </ul>
+  <em>([*image/images]0 : ../src/%evar.base;/images/%evar.file;.%bvar.var_img_ext;)</em>
+%end;
+<p style="font-size: 120%%; text-align: center;">
+  <a onclick="return write_ch('Á')" href="#">Á</a>
+  <a onclick="return write_ch('á')" href="#">á</a>
+  <a onclick="return write_ch('Â')" href="#">Â</a>
+  <a onclick="return write_ch('â')" href="#">â</a>
+  <a onclick="return write_ch('À')" href="#">À</a>
+  <a onclick="return write_ch('à')" href="#">à</a>
+  <a onclick="return write_ch('Æ')" href="#">Æ</a>
+  <a onclick="return write_ch('æ')" href="#">æ</a>
+  <a onclick="return write_ch('Å')" href="#">Å</a>
+  <a onclick="return write_ch('å')" href="#">å</a>
+  <a onclick="return write_ch('Ä')" href="#">Ä</a>
+  <a onclick="return write_ch('ä')" href="#">ä</a>
+  <a onclick="return write_ch('Ą')" href="#">Ą</a>
+  <a onclick="return write_ch('ą')" href="#">ą</a>
+  &nbsp;
+  <a onclick="return write_ch('Ć')" href="#">Ć</a>
+  <a onclick="return write_ch('ć')" href="#">ć</a>
+  <a onclick="return write_ch('Ç')" href="#">Ç</a>
+  <a onclick="return write_ch('ç')" href="#">ç</a>
+  &nbsp;
+  <a onclick="return write_ch('Ð')" href="#">Ð</a>
+  <a onclick="return write_ch('ð')" href="#">ð</a>
+  &nbsp;
+  <a onclick="return write_ch('É')" href="#">É</a>
+  <a onclick="return write_ch('é')" href="#">é</a>
+  <a onclick="return write_ch('Ê')" href="#">Ê</a>
+  <a onclick="return write_ch('ê')" href="#">ê</a>
+  <a onclick="return write_ch('È')" href="#">È</a>
+  <a onclick="return write_ch('è')" href="#">è</a>
+  <a onclick="return write_ch('Ë')" href="#">Ë</a>
+  <a onclick="return write_ch('ë')" href="#">ë</a>
+  <a onclick="return write_ch('Ę')" href="#">Ę</a>
+  <a onclick="return write_ch('ę')" href="#">ę</a>
+  &nbsp;
+  <a onclick="return write_ch('Í')" href="#">Í</a>
+  <a onclick="return write_ch('í')" href="#">í</a>
+  <a onclick="return write_ch('Î')" href="#">Î</a>
+  <a onclick="return write_ch('î')" href="#">î</a>
+  <a onclick="return write_ch('Ì')" href="#">Ì</a>
+  <a onclick="return write_ch('ì')" href="#">ì</a>
+  <a onclick="return write_ch('Ï')" href="#">Ï</a>
+  <a onclick="return write_ch('ï')" href="#">ï</a>
+  &nbsp;
+  <a onclick="return write_ch('Ł')" href="#">Ł</a>
+  <a onclick="return write_ch('ł')" href="#">ł</a>
+  &nbsp;
+  <a onclick="return write_ch('Ń')" href="#">Ń</a>
+  <a onclick="return write_ch('ń')" href="#">ń</a>
+  <a onclick="return write_ch('Ñ')" href="#">Ñ</a>
+  <a onclick="return write_ch('ñ')" href="#">ñ</a>
+  <br%/>
+  <a onclick="return write_ch('Ó')" href="#">Ó</a>
+  <a onclick="return write_ch('ó')" href="#">ó</a>
+  <a onclick="return write_ch('Ô')" href="#">Ô</a>
+  <a onclick="return write_ch('ô')" href="#">ô</a>
+  <a onclick="return write_ch('Ò')" href="#">Ò</a>
+  <a onclick="return write_ch('ò')" href="#">ò</a>
+  <a onclick="return write_ch('Œ')" href="#">Œ</a>
+  <a onclick="return write_ch('œ')" href="#">œ</a>
+  <a onclick="return write_ch('Ø')" href="#">Ø</a>
+  <a onclick="return write_ch('ø')" href="#">ø</a>
+  <a onclick="return write_ch('Õ')" href="#">Õ</a>
+  <a onclick="return write_ch('õ')" href="#">õ</a>
+  <a onclick="return write_ch('Ö')" href="#">Ö</a>
+  <a onclick="return write_ch('ö')" href="#">ö</a>
+  &nbsp;
+  <a onclick="return write_ch('Ś')" href="#">Ś</a>
+  <a onclick="return write_ch('ś')" href="#">ś</a>
+  <a onclick="return write_ch('ſ')" href="#">ſ</a>
+  <a onclick="return write_ch('ß')" href="#">ß</a>
+  <a onclick="return write_ch('Þ')" href="#">Þ</a>
+  <a onclick="return write_ch('þ')" href="#">þ</a>
+  &nbsp;
+  <a onclick="return write_ch('Ú')" href="#">Ú</a>
+  <a onclick="return write_ch('ú')" href="#">ú</a>
+  <a onclick="return write_ch('Ù')" href="#">Ù</a>
+  <a onclick="return write_ch('ù')" href="#">ù</a>
+  <a onclick="return write_ch('Û')" href="#">Û</a>
+  <a onclick="return write_ch('û')" href="#">û</a>
+  <a onclick="return write_ch('Ü')" href="#">Ü</a>
+  <a onclick="return write_ch('ü')" href="#">ü</a>
+  &nbsp;
+  <a onclick="return write_ch('Ý')" href="#">Ý</a>
+  <a onclick="return write_ch('ý')" href="#">ý</a>
+  <a onclick="return write_ch('Ÿ')" href="#">Ÿ</a>
+  <a onclick="return write_ch('ÿ')" href="#">ÿ</a>
+  &nbsp;
+  <a onclick="return write_ch('Ź')" href="#">Ź</a>
+  <a onclick="return write_ch('ź')" href="#">ź</a>
+  <a onclick="return write_ch('Ż')" href="#">Ż</a>
+  <a onclick="return write_ch('ż')" href="#">ż</a>
+  <br%/>
+  <a onclick="return write_ch('½')" href="#">½</a>
+  <a onclick="return write_ch('¼')" href="#">¼</a>
+  <a onclick="return write_ch('¾')" href="#">¾</a>
+  &nbsp;
+  <a onclick="return write_ch('º')" href="#">º</a>
+  <a onclick="return write_ch('¹')" href="#">¹</a>
+  <a onclick="return write_ch('²')" href="#">²</a>
+  <a onclick="return write_ch('³')" href="#">³</a>
+  <a onclick="return write_ch('°')" href="#">°</a>
+  <a onclick="return write_ch('ª')" href="#">ª</a>
+  &nbsp;
+  <a onclick="return write_ch('¡')" href="#">¡</a>
+  <a onclick="return write_ch('¿')" href="#">¿</a>
+  <a onclick="return write_ch('µ')" href="#">µ</a>
+  <a onclick="return write_ch('•')" href="#">•</a>
+  <a onclick="return write_ch('·')" href="#">·</a>
+  <a onclick="return write_ch('–')" href="#">–</a>
+  <a onclick="return write_ch('—')" href="#">—</a>
+  <a onclick="return write_ch('÷')" href="#">÷</a>
+  <a onclick="return write_ch('‰')" href="#">‰</a>
+  <a onclick="return write_ch('€')" href="#">€</a>
+  <a onclick="return write_ch('£')" href="#">£</a>
+  <a onclick="return write_ch('©')" href="#">©</a>
+  <a onclick="return write_ch('®')" href="#">®</a>
+  <a onclick="return write_ch('«')" href="#">«</a>
+  <a onclick="return write_ch('»')" href="#">»</a>
+  <a onclick="return write_ch('¶')" href="#">¶</a>
+  &nbsp;
+  <a onclick="return write_ch('‡')" href="#">‡</a>
+  <a onclick="return write_ch('№')" href="#">№</a>
+  <a onclick="return write_ch('×')" href="#">×</a>
+  <a onclick="return write_ch('†')" href="#">†</a>
+</p>
+<div style="float: left; margin: 0.5em; text-align: center;">
+  <h1 class="subtitle" style="display: inline;"><a onclick="return insertTags('=','=','x')" href="#">=h1=</a></h1><br%/>
+  <h2 class="subtitle" style="display: inline;"><a onclick="return insertTags('==','==','x')" href="#">==h2==</a></h2><br%/>
+  <h3 class="subtitle" style="display: inline;"><a onclick="return insertTags('===','===','x')" href="#">===h3===</a></h3><br%/>
+  <h4 style="display: inline;"><a onclick="return insertTags('====','====','x')" href="#">====h4====</a></h4><br%/>
+  <h5 style="display: inline;"><a onclick="return insertTags('=====','=====','x')" href="#">=====h5=====</a></h5><br%/>
+  <h6 style="display: inline;"><a onclick="return insertTags('======','======','x')" href="#">======h6======</a></h6><br%/>
+</div>
+<ul style="list-style-position: inside; text-align: left;">
+  <li>[*person/persons]0&nbsp;:&nbsp;
+    <a onclick="return insertTags('%[%[w:','%]%]','x')" href="#">%[%[w:[wizard/wizards/friend/friends/exterior]0%]%]</a>
+    <a onclick="return write_ch('%[%[x/x%]%]')" href="#">
+     %[%[[first name/first names]0/[surname/surnames]0%]%]</a>
+    <a onclick="return write_ch('%[%[x/x/9/x%]%]')" href="#">
+     %[%[[first name/first names]0/[surname/surnames]0/[number]/[text]%]%]</a><br%/>
+    <a onclick="return write_ch('%[%[x/x/9/x;*x{x}x%]%]')" href="#">
+     %[%[[first name/first names]0/[surname/surnames]0/[number]/[text];*<small><em>(HEAD=)</em></small>[comment]{href}[comment]%]%]</a>
+  </li>
+  <li>[*image/images]1&nbsp;:&nbsp;
+    <a onclick="return write_ch('&lt;img alt=&quot;?&quot; src=&quot;%%sm=IM;s=xxx.jpg&quot;%/&gt;')" href="#">
+    &lt;img alt="?" src="%%sm=IM;s=xxx.jpg"/&gt;</a>
+    <a onclick="return write_ch('&lt;a href=&quot;%%sm=IMH;s=xxx.jpg&quot;&gt;[*image/images]0&lt;/a&gt;')" href="#">
+    &lt;a href="%%sm=IMH;s=xxx.jpg"&gt;[*image/images]0&lt;/a&gt;</a>
+  </li>
+  <li>[*miscellaneous notes]&nbsp;:&nbsp;
+    <a onclick="return write_ch('%[%[%[x:x/x%]%]%]')" href="#">%[%[%[directory:filename/[text]%]%]%]</a>
+    <a onclick="return write_ch('TITLE=')" href="#">TITLE=</a>
+    <a onclick="return write_ch('HEAD=')" href="#">HEAD=[him/her]0/[him/her]1</a>
+    <a onclick="return write_ch('OCCU=')" href="#">OCCU=</a>
+    <a onclick="return write_ch('BNOTE=')" href="#">BNOTE=</a>
+    <a onclick="return write_ch('BIBLIO=')" href="#">BIBLIO=</a>
+  </li>
+  <li>[*visualize/show/hide/summary]3 :
+    <a onclick="return write_ch('__TOC__')" href="#">__TOC__</a>
+    <a onclick="return write_ch('__SHORT_TOC__')" href="#">__SHORT_TOC__</a>
+    <a onclick="return write_ch('__NOTOC__')" href="#">__NOTOC__</a>
+  </li>
+  <li><i><a onclick="return insertTags('\'\'','\'\'','x')" href="#">''[text]''</a></i>&nbsp;
+    <b><a onclick="return insertTags('\'\'\'','\'\'\'','x')" href="#">'''[text]'''</a></b>&nbsp;
+    <i><b><a onclick="return insertTags('\'\'\'\'\'','\'\'\'\'\'','x')" href="#">'''''[text]'''''</a></b></i>&nbsp;
+    <a onclick="return insertTags('{','}','x')" href="#"><span class="highlight">{[text]}</span></a><br%/>
+  </li>
+</ul>
+<table summary="wiki-list-style"  style="text-align: left;">
+  <tr>
+    <td style="border: solid 1px;">
+      <ul>
+        <li><a onclick="return write_ch('*')" href="#">*[text]</a>
+          <ul><li><a onclick="return write_ch('**')" href="#">**[text]</a>
+              <ul><li><a onclick="return write_ch('***')" href="#">***[text]</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </td>
+    <td style="border: solid 1px;">
+      <ol>
+        <li><a onclick="return write_ch('#')" href="#">#[text]</a>
+          <ol><li><a onclick="return write_ch('##')" href="#">##[text]</a>
+              <ol><li><a onclick="return write_ch('###')" href="#">###[text]</a></li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </td>
+    <td style="border: solid 1px;">
+      <dl>
+        <dd><a onclick="return write_ch(':')" href="#">:[text]</a>
+          <dl><dd><a onclick="return write_ch('::')" href="#">::[text]</a>
+              <dl><dd><a onclick="return write_ch(':::')" href="#">:::[text]</a></dd>
+              </dl>
+            </dd>
+          </dl>
+        </dd>
+      </dl>
+    </td>
+  </tr>
+</table>

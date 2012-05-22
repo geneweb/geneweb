@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/03/08 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/04/02 geneweb-6.04 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -20,85 +20,12 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  <style type="text/css">
-    /* templm */
-    .nobr {
-     white-space: nowrap;
-    }
-    abbr {
-    border-bottom: 0;
-    }
-    .background_sex_0 {
-    	background-color: rgb(173,216,230);
-    }
-    .background_sex_1 {
-    	background-color: rgb(255,182,193);
-    }
-    .background_sex_2 {
-    	background-color: rgb(255,255,255);
-    }
-    .hide {
-      visibility: hidden;
-    }
-
-    /* updind.txt, updfam.txt */
-    #upd form, #upd input, #upd select, #upd textarea {
-    	font-size: 11px;
-    }
-    #upd fieldset {
-    	width: auto;
-    	float: left;
-    	border: solid 1px;
-    	border-color: rgb(128,128,128);
-    	margin: 0.2em;
-    	padding: 0.2em;
-    }
-    #upd fieldset dt {
-    	width: auto;
-    	float: left;
-    	font-weight: bold;
-    }
-    #upd input {
-    	padding: 0em 0.2em 0em;
-    	margin: 0em 0.2em 0em;
-    }
-    #upd input[type='checkbox'], #upd input[type='radio'] {
-    	width: auto;
-    	height: auto;
-    	vertical-align: middle;
-    }
-    #upd legend {
-    	font-size: 12px;
-    	font-weight: bold;
-    }
-    #upd .sure {
-    	background-color: rgb(144,238,144);
-    }
-    #upd .not_sure {
-    	background-color: rgb(192,192,192);
-    }
-    #upd .number {
-    	font-family: "Courier New", Courier, monospace;
-    	font-size: 12px;
-    	font-weight: bold;
-    	text-align: center;
-    }
-    #upd th, td {
-    white-space: nowrap;
-    padding-left: 5px;
-    padding-right: 5px;
-    }
-    #upd .bg7, #upd th {
-    font-size: 11px;
-    background-color: #E7EDB3;
-    }
-  </style>
   %base_header;
 
 %(<!-- Begin define (used in updind.txt, updfam.txt)  -->%)
   <script type="text/javascript">
   <!--
-  function changeCalendar(e,v,m,c) 
+  function changeCalendar(e,v,d2,d3,m,c) 
   {
     var mv = m;
     switch (m) 
@@ -122,26 +49,26 @@
       case 'G':
       case 'J':
       document.getElementById(e).innerHTML = '\
-      <select name="' + v + '">\
+      <select id="' + d2 + '" name="' + v + '" onkeypress="javascript:return changeFocus(event,\''+ d3 +'\');">\
         <option value=""' + (mv == 0 ? ' selected="selected"' : '') + '>%nn;-<\/option>\
-        <option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;[(month)]0<\/option>\
-        <option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;[(month)]1<\/option>\
-        <option value="3"' + (mv == 3 ? ' selected="selected"' : '') + '>%nn;[(month)]2<\/option>\
-        <option value="4"' + (mv == 4 ? ' selected="selected"' : '') + '>%nn;[(month)]3<\/option>\
-        <option value="5"' + (mv == 5 ? ' selected="selected"' : '') + '>%nn;[(month)]4<\/option>\
-        <option value="6"' + (mv == 6 ? ' selected="selected"' : '') + '>%nn;[(month)]5<\/option>\
-        <option value="7"' + (mv == 7 ? ' selected="selected"' : '') + '>%nn;[(month)]6<\/option>\
-        <option value="8"' + (mv == 8 ? ' selected="selected"' : '') + '>%nn;[(month)]7<\/option>\
-        <option value="9"' + (mv == 9 ? ' selected="selected"' : '') + '>%nn;[(month)]8<\/option>\
-        <option value="10"' + (mv == 10 ? ' selected="selected"' : '') + '>%nn;[(month)]9<\/option>\
-        <option value="11"' + (mv == 11 ? ' selected="selected"' : '') + '>%nn;[(month)]10<\/option>\
-        <option value="12"' + (mv == 12 ? ' selected="selected"' : '') + '>%nn;[(month)]11<\/option>\
+        <option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;1 - [(month)]0<\/option>\
+        <option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;2 - [(month)]1<\/option>\
+        <option value="3"' + (mv == 3 ? ' selected="selected"' : '') + '>%nn;3 - [(month)]2<\/option>\
+        <option value="4"' + (mv == 4 ? ' selected="selected"' : '') + '>%nn;4 - [(month)]3<\/option>\
+        <option value="5"' + (mv == 5 ? ' selected="selected"' : '') + '>%nn;5 - [(month)]4<\/option>\
+        <option value="6"' + (mv == 6 ? ' selected="selected"' : '') + '>%nn;6 - [(month)]5<\/option>\
+        <option value="7"' + (mv == 7 ? ' selected="selected"' : '') + '>%nn;7 - [(month)]6<\/option>\
+        <option value="8"' + (mv == 8 ? ' selected="selected"' : '') + '>%nn;8 - [(month)]7<\/option>\
+        <option value="9"' + (mv == 9 ? ' selected="selected"' : '') + '>%nn;9 - [(month)]8<\/option>\
+        <option value="10"' + (mv == 10 ? ' selected="selected"' : '') + '>%nn;10 - [(month)]9<\/option>\
+        <option value="11"' + (mv == 11 ? ' selected="selected"' : '') + '>%nn;11 - [(month)]10<\/option>\
+        <option value="12"' + (mv == 12 ? ' selected="selected"' : '') + '>%nn;12 - [(month)]11<\/option>\
       <\/select>\
       ';
       break;
       case 'F':
       document.getElementById(e).innerHTML = '\
-      <select name="' + v + '">\
+      <select id="' + d2 + '" name="' + v + '" onkeypress="javascript:return changeFocus(event,\''+ d3 +'\');">\
         <option value=""' + (mv == 0 ? ' selected="selected"' : '') + '>%nn;-<\/option>\
         <option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;[(french revolution month)]0<\/option>\
         <option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;[(french revolution month)]1<\/option>\
@@ -161,7 +88,7 @@
       break;
       case 'H':
       document.getElementById(e).innerHTML = '\
-      <select name="' + v + '">\
+      <select id="' + d2 + '" name="' + v + '" onkeypress="javascript:return changeFocus(event,\''+ d3 +'\');">\
         <option value=""' + (mv == 0 ? ' selected="selected"' : '') + '>%nn;-<\/option>\
         <option value="1"' + (mv == 1 ? ' selected="selected"' : '') + '>%nn;[(hebrew month)]0<\/option>\
         <option value="2"' + (mv == 2 ? ' selected="selected"' : '') + '>%nn;[(hebrew month)]1<\/option>\
@@ -191,9 +118,24 @@
     else  
       {d.style.display='none';}
   }
+  function changeFocus(event,id) {
+    var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+    if (key == 42 || key == 60 || key == 62 || key == 95)
+    {
+     document.getElementById(id).focus();
+     return false;
+    }    
+  }
   function valid(id) {
     document.getElementById(id).focus();
-    document.getElementById(id).checked='checked';
+    document.getElementById(id).checked = true;
+  }
+  function addRow(event,id) {
+    var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+    if (key == 49 || key == 13)
+    { document.getElementById(id).checked = true;
+      document.upd.submit()
+    }
   }
   function no_sex(id)
   {
@@ -214,10 +156,10 @@
     class="%if;(xvar.prec = "sure")sure%else;not_sure%end;"%nn;
   %end;  
   
-  %define;date(xlab,xvar,xdate)
+ %define;date(xlab,xvar,xdate)
     <span %apply;sure_date("xdate")>
       <select name="xvar_cal"%sp; title="[*calendar/calendars]0"%sp; 
-        onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdate.month;',this)"%sp;
+        onchange="changeCalendar('xvar_mm_sel','xvar_mm','xvar_d2','xvar_d3','%xdate.month;',this)"%sp;
         onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();">
         <option value="G"%if;(xdate.calendar = "gregorian") selected="selected"%end;>[*gregorian/julian/french/hebrew]0</option>
         <option value="J"%if;(xdate.calendar = "julian") selected="selected"%end;>[*gregorian/julian/french/hebrew]1</option>
@@ -226,34 +168,37 @@
       </select>
       %if;([ !dates order]0 = "ddmmyy")
         <label %apply;accesskey("xvar")>xlab
-         <input id="xvar_dd" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
-         value="%xdate.day;"%/></label>
-        <label>/<span id="xvar_mm_sel"><input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
-         value="%xdate.month;"%/></span></label>
-        <label>/<input id="xvar_yyyy" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
-         value="%xdate.year;"%/></label>
+          <input id="xvar_d1" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+           value="%xdate.day;" onkeypress="javascript:return changeFocus(event,'xvar_d2');"%/></label>
+        <span id="xvar_mm_sel"><input id="xvar_d2" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+         value="%xdate.month;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/></span>
+        <input id="xvar_d3" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
+         value="%xdate.year;"onkeypress="javascript:return changeFocus(event,'xvar_d4');"%/>
       %else;
-        <label>xlab<input name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
-         value="%xdate.year;"%/></label>
-        <label>/<span id="xvar_mm_sel"><input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
-         value="%xdate.month;"%/></span></label>
-        <label>/<input name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
-         value="%xdate.day;"%/></label>
+        <label %apply;accesskey("xvar")>xlab
+          <input id="xvar_d1" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
+           value="%xdate.year;" onkeypress="javascript:return changeFocus(event,'xvar_d2');"%/></label>
+        <span id="xvar_mm_sel"><input id="xvar_d2" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+         value="%xdate.month;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/></span>
+        <input id="xvar_d3" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+         value="%xdate.day;" onkeypress="javascript:return changeFocus(event,'xvar_d4');"%/>
       %end;
-      <select name="xvar_prec" title="[*precision]0"%sp;
-        onchange="changeDisplay('lab_xvar_oryear',this,'oryear','yearint')"%sp;
-        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();">
+      <select id="xvar_d4" name="xvar_prec" title="[*precision]0"
+        onchange="changeDisplay('lab_xvar_oryear',this,'oryear','yearint')"
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"
+        onkeypress="javascript:return changeFocus(event,'xvar_d5');"
+        onkeyup="changeDisplay('lab_xvar_oryear',this,'oryear','yearint')">
         <option value="-"%if;(xdate.prec = "") selected="selected"%end;>-</option>
         <option value="sure"%if;(xdate.prec = "sure") selected="selected"%end;>[*exact]0</option>
         <option value="about"%if;(xdate.prec = "about") selected="selected"%end;>[*about (date)]0</option>
         <option value="maybe"%if;(xdate.prec = "maybe") selected="selected"%end;>[*possibly (date)]0</option>
         <option value="before"%if;(xdate.prec = "before") selected="selected"%end;>[*before (date)]0</option>
         <option value="after"%if;(xdate.prec = "after") selected="selected"%end;>[*after (date)]0</option>
-        <option value="oryear"%if;(xdate.prec = "oryear") selected="selected"%end;>&lt;- [*or] -&gt;</option>
-        <option value="yearint"%if;(xdate.prec = "yearint") selected="selected"%end;>&lt;- [*between (date)] -&gt;</option>
+        <option value="oryear"%if;(xdate.prec = "oryear") selected="selected"%end;>[*or] -&gt;</option>
+        <option value="yearint"%if;(xdate.prec = "yearint") selected="selected"%end;>[*between (date)] -&gt;</option>
       </select>
-      <label id = "lab_xvar_oryear" %if;(xdate.oryear = "") style="display: none;"%end;>
-        <input name="xvar_oryear" class="number" autocomplete="off" title="[year/month/day]0" size="5" maxlength="5" value="%xdate.oryear;"%/>
+      <label id="lab_xvar_oryear" %if;(xdate.oryear = "") style="display: none;"%end;>
+        <input id="xvar_d5" name="xvar_oryear" class="number" autocomplete="off" title="[year/month/day]0" size="5" maxlength="5" value="%xdate.oryear;"%/>
       </label>
       <label>…[or]0 [text]0<input name="xvar_text" size="20" maxlength="50"%sp;value="%xdate.text;"%/></label>
   </span>
@@ -265,7 +210,6 @@
      value="%xx_src;"%sp;id="xvar_src"%/></label>
   %end;
 %(<!-- End define (used in updind.txt, updfam.txt)  -->%)
-
     
 %( <!-- Begin define  --> %)
 
@@ -317,17 +261,9 @@
   <script type="text/javascript">
   <!--
 
-    function changeFocus(event,id) {
-      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-      if (key == 60 | key == 62)
-      {
-       document.getElementById(id).focus();
-       return false;
-      }    
-    }
     function changeFocusFn(event,id,id1,id2) {
       var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-      if (key == 60 | key == 62)
+      if (key == 42 || key == 60 || key == 62 || key == 95)
       {
        if (document.getElementById(id).checked == true)
         {
@@ -356,7 +292,7 @@
        document.getElementById('ch' + yy + '_6').style.visibility=zz;
       }
     }
-    function fill_place(xx) 
+    function fillPlace(xx) 
     {
       switch(xx.value) {
       case "1": xx.value = document.upd.pa1b_pl.value;
@@ -381,27 +317,27 @@
     <label>[*place]
     <input name="xvar_place" size="40" maxlength="200"%sp;
     title="[place] : 1,2,3,4,*,0,+"%sp;
-    value="%xx_place;" id="xvar_place" onblur="fill_place(this)"%/></label>
+    value="%xx_place;" id="xvar_place" onblur="fillPlace(this)"%/></label>
   %end;
 
   %define;small_date(kind,xvar,xx,zz)
     %if;([ !dates order]0 = "ddmmyy")
       <input name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
-      value="%xx.create.kind_day;"%/>     
-      <input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
-        value="%xx.create.kind_month;"%/>
+      value="%xx.create.kind_day;" onkeypress="javascript:return changeFocus(event,'xvar_d2');"%/>
+      <input id="xvar_d2" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+        value="%xx.create.kind_month;" onkeypress="javascript:return changeFocus(event,'xvar_yyyy');"%/>
       <input id="xvar_yyyy" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
         value="%xx.create.kind_year;" onkeypress="javascript:return changeFocus(event,'zz');"%/>
     %else;
       <input id="xvar_yyyy" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
-        value="%xx.create.kind_year;" onkeypress="javascript:return changeFocus(event,'zz');"%/>
-      <input name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
-        value="%xx.create.kind_month;"%/>
-      <input name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
-        value="%xx.create.kind_day;"%/>
+        value="%xx.create.kind_year;" onkeypress="javascript:return changeFocus(event,'xvar_d2');"%/>
+      <input id="xvar_d2" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+        value="%xx.create.kind_month;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/>
+      <input id="xvar_d3" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+        value="%xx.create.kind_day;" onkeypress="javascript:return changeFocus(event,'zz');"%/>
     %end;
       <input name="xvar_pl" size="20" maxlength="200" title="[place] : 1,2,3,4,*,0,+"%sp;
-        value="%xx.create.kind_place;" id="xvar_pl" onblur="fill_place(this)"%/>
+        value="%xx.create.kind_place;" id="xvar_pl" onblur="fillPlace(this)"%/>
   %end;
 
   %define;birth(xvar,xx,beg,zz)
@@ -442,9 +378,10 @@
   %end;
 
   %define;insert_witness(xcnt)
-    <label title="[insert::witness/witnesses]0">
-      <input type="checkbox" name="ins_witnxcnt" value="on"%sp;
-      onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
+    <label class="addrow" %if;("xcnt"="0")%sp;title="[insert::witness/witnesses]0 (3)"%sp;accesskey="3"%sp;%end;>%nn;
+      <input type="checkbox" id="ins_witnxcnt" name="ins_witnxcnt" value="on"%sp;
+      title="[insert::witness/witnesses]0"%sp;
+      onkeydown="return addRow(event,'ins_witnxcnt')"%/>%nn;
     </label>
   %end;
   
@@ -482,20 +419,19 @@
             title="[first name/first names]0"
             %if;("begxcnt"="pa1")
               accesskey="1"
-            %elseif;("begxcnt"="witn1")
-              accesskey="3"
-            %elseif;("begxcnt"="ch1")
-              accesskey="4" 
             %end;
             %if;("beg"="pa")
-              onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcntb_yyyy','beg%zz;_fn');"
+              onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sn','beg%zz;_fn');"
             %elseif;("beg"="ch")
               onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sex_2','beg%zz;_fn');"
             %end;  
           %/>
     </td><td>
           <input name="begxcnt_sn" title="[surname/surnames]0" size="30" maxlength="200"%sp;
-             value="%xx.surname;" id="begxcnt_sn"%/>
+             value="%xx.surname;" id="begxcnt_sn"
+             %if;("beg"="pa")
+               %sp;onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcntb_yyyy','beg%zz;_fn');"
+            %end;%/>
     </td><td>
             <input name="begxcnt_occ" title="[number]" class="number" autocomplete="off" size="5" maxlength="8" value="%xx.occ;"%sp;
              id="begxcnt_occ"%/>
@@ -524,11 +460,10 @@
       %elseif;("xx" = "child")
         <td class="bg7">
           <input style="display: none;" type="checkbox" id="ins_ch0" name="ins_ch0" value="on"%/>
-          <label title="[insert] 1  .9 [child/children]1">%nn;
-            <input name="ins_ch0_n" class="number"%sp;
-             autocomplete="off" size="1" maxlength="1"%sp;
-             value="%evar.ins_ch;"%sp;
-             onkeydown="if (event.keyCode == 49) javascript:document.getElementById('ins_ch0').checked = true"%/></label>
+          <label title="[insert] 1…9 [child/children]1 (4)" accesskey="4">%nn;
+            <input name="ins_ch0_n" class="number addrow"%sp;
+             autocomplete="off" size="1" maxlength="1" value="%evar.ins_ch;"%sp;
+             onkeypress="javascript:return addRow(event,'ins_ch0')"%/></label>
         </td>
       %else;
         <td>&nbsp;</td>
@@ -666,7 +601,7 @@
       </span>
     </p>
   </fieldset>
-  <fieldset><legend title="[*witness/witnesses]1 (3)" accesskey="3"><sup>(3)</sup> [*witness/witnesses]1</legend>
+  <fieldset><legend title="[*witness/witnesses]1 (3)"><sup>(3)</sup> [*witness/witnesses]1</legend>
     <table>
       %apply;table_th("witness")
       %foreach;witness;
