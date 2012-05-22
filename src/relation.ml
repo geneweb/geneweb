@@ -510,7 +510,7 @@ value print_shortest_path conf base p1 p2 =
             title False;
             Wserver.wprint "</h1>\n";
             Hutil.print_link_to_welcome conf True;
-            Wserver.wprint "%s\n"
+            Wserver.wprint "%s.\n"
               (capitale
                  (cftransl conf "no known relationship link between %s and %s"
                     [s1; s2]))
@@ -1462,7 +1462,7 @@ value print_main_relationship conf base long p1 p2 rel =
           Wserver.wprint "%s\n"
             (capitale (transl conf "it is the same person!"))
         else do {
-          Wserver.wprint "%s\n"
+          Wserver.wprint "%s.\n"
             (capitale
                (cftransl conf "no known relationship link between %s and %s"
                   [gen_person_title_text reference raw_access conf base p1;
@@ -1470,9 +1470,10 @@ value print_main_relationship conf base long p1 p2 rel =
           xtag "br";
           tag "p" begin
             stag "span" begin
-              Wserver.wprint "%s\n" 
-                (transl conf 
-                   "NB: you should try another relationship computing mode");
+              Wserver.wprint "%s.\n"
+                (capitale 
+                  (transl conf 
+                    "NB: you should try another relationship computing mode"));
             end;
           end
         }

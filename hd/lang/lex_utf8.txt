@@ -3569,6 +3569,14 @@ fr: afficher le numéro de génération
 it: pubblicare il numero di generazioni
 nl: nummer van de generatie tonen
 
+    display smallest sosa number relative to ancestor
+de: bereits gezeigte Personen nicht wiederholen
+en: display pedigree collapse
+es: no repetir los individuos ya vistos
+fr: afficher les implexes
+it: non ripetere gli individui già mostrati
+nl: personen reeds bekeken niet herhalen
+
     display spouse
 de: ehepartner anzeigen
 en: display spouse
@@ -3688,14 +3696,6 @@ ru: не известен
 sk: nie je známe
 sl: ni znano
 sv: vet ej
-
-    don't repeat individual already seen
-de: bereits gezeigte Personen nicht wiederholen
-en: don't repeat pedigree collapse
-es: no repetir los individuos ya vistos
-fr: ne pas répéter les implexes
-it: non ripetere gli individui già mostrati
-nl: personen reeds bekeken niet herhalen
 
     end
 af: einde
@@ -6233,7 +6233,7 @@ sv: blandade noteringar
 de: verschiedene Felder
 en: other field
 es: campo diversos
-fr: champ divers
+fr: champs divers
 it: voci diverse
 nl: verscheidene velden
 
@@ -6553,7 +6553,7 @@ sv: navigering med %t som proband (Kekules system)
 de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
 en: cou can try another computing option
 es: puede relanzar un cálculo eligiendo otro modo de cálculo
-fr: n'hésitez pas a relancer un calcul en choisissant un autre mode de calcul
+fr: n'hésitez pas à recommencer en utilisant un autre mode de calcul
 it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
 nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
 
@@ -6726,7 +6726,7 @@ eo: neniu respondo
 es: ninguna respuesta
 et: ei leitud
 fi: ei löytynyt
-fr: aucune réponse
+fr: pas de réponses
 he:  אין דבר דומה
 is: engin fannst
 it: nessuna risposta
