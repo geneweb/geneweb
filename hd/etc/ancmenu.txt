@@ -199,7 +199,7 @@
           </label>
           <br%/>
           <label>
-            - [don't repeat individual already seen]
+            - [display smallest sosa number relative to ancestor]
             <input type="checkbox" name="no_repeat" value="on"%/>
           </label>
         </td>
