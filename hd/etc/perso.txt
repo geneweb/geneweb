@@ -239,6 +239,12 @@
       %end;
     %end;
   %end;
+  %if;(wizard)
+    &nbsp;
+    <a href="%prefix;m=MOD_IND;i=%index;;">
+      <img class="modify_family" src="%image_prefix;/picto_molette.png" width="13" height="13" title="[modify::person/persons]0"%/>
+    </a>
+  %end;
 </h1>
 
 %if;(has_sosa or has_qualifiers or has_aliases or has_nobility_titles or
@@ -323,8 +329,7 @@
 <div id="navigation">
   <h3>[*navigation]</h3>
   %if;not cancel_links;
-    <div id="list_left">
-    <ul>
+    <ul class = "li_left">
       %if;has_parents;
         <li>
         <a href="%prefix;m=A;%access;"
@@ -335,6 +340,8 @@
         <a href="%prefix;m=D;%access;"
          class="highlight">[*descendants]</a></li>
       %end;
+    </ul>
+    <ul class = "li_left">
       %if;has_parents;
         %foreach;father.child;
           %if;is_sibling_before;
@@ -350,26 +357,12 @@
         %end;
       %end;
     </ul>
-    </div>
-    <div id="list_right">
-    <ul>
+    <ul class = "li_left">
       <li>
         <a href="%prefix;m=R;%access;"
          class="highlight" accesskey="R">[*relationship computing]</a>
       </li>
-      %if;(has_parents and (father.has_parents or mother.has_parents))
-        <li>
-        <a href="%prefix;m=C;%access;"
-         class="highlight">[*cousins (general term)]</a></li>
-      %else;
-        %if;has_nephews_or_nieces;
-          <li>
-          <a href="%prefix;m=C;v1=1;v2=2;%access;"
-           class="highlight">[*nephews and nieces]</a></li>
-        %end;
-      %end;
     </ul>
-    </div>
   %end;
 </div>
 

@@ -276,6 +276,13 @@ h1
  float: right;
 }
 
+/* perso.txt page: "navigation" block. */
+.li_left
+{
+ width: 25%%; 
+ float: left;
+}
+
 /* Affichage des arbres */
 table hr 
 {
