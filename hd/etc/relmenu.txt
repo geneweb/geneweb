@@ -14,7 +14,7 @@
   %include.css;
   %base_header;
 </head>
-<body%body_prop;>
+<body%body_prop; onload="main()">
 %message_to_wizard;
 
 <script type="text/javascript">
@@ -146,7 +146,7 @@
   <h2 class="highlight">[*relationship link between]</h2>
   <form name="relationship" method="get" action="%action;" onsubmit="return check_form_relationship()">   
     <p>%hidden;</p>
-    <div id="rel_form_search">
+    <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
       <input type="hidden" name="em" value="R"%/>
       %if;access_by_key;
         <input type="hidden" name="ep" value="%first_name_key_val;"%/>
@@ -195,7 +195,7 @@
       </div>
     </div>
 
-    <div id="rel_form_cousin">
+    <div id="rel_form_cousin" onclick="document.getElementById('radio_C').checked = 'checked'; main();">
       <input type="hidden" name="m" value="C"%/>
       %if;access_by_key;
         <input type="hidden" name="p" value="%first_name_key_val;"%/>
@@ -254,7 +254,7 @@
         %if;browsing_with_sosa_ref;
           <li>
             <label>
-              <input type="radio" name="select" value="%index;" onclick="main()"%/>
+              <input type="radio" name="select" value="%sosa_ref.index;" onclick="main()"%/>
               <img src="%image_prefix;/sosa.png" %sp; alt="sosa" style="border: none"%/>
               <b>%sosa_ref;</b>
               <i>(sosa 1)</i>
