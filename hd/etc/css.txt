@@ -449,16 +449,24 @@ div.summary ul ul
   font-weight:bold
 }
 
+/* perso.txt */
+.marriage_perso > li 
+{
+ margin-bottom: 15px;
+}
+
 /* lists and tree */
-.ascends_table, .descends_table{
-border-width:1px;
-border-style:solid;
-border-collapse:collapse;
+.ascends_table, .descends_table
+{
+ border-width:1px;
+ border-style:solid;
+ border-collapse:collapse;
 }
  
 .ascends_table th, .ascends_table td,
-.descends_table th, .descends_table td{
-border:1px solid black;
+.descends_table th, .descends_table td
+{
+ border:1px solid black;
 }
 
 /* Properties of the relation page */
