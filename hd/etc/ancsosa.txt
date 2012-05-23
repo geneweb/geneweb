@@ -531,11 +531,11 @@
   <th>[*person/persons]0</th>
   %incr_count;
   %if;(evar.birth = "on")
-    <th>[*birth date]</th>
+    <th>[*date of birth]</th>
     %incr_count;
   %end;
   %if;(evar.birth_place = "on")
-    <th>[*birth place]</th>
+    <th>[*where born]</th>
     %incr_count;
   %end;
   %if;(evar.marr = "on")
@@ -543,19 +543,19 @@
     %incr_count;
   %end;
   %if;(evar.marr_date = "on")
-    <th>[*marriage date]</th>
+    <th>[*date of marriage]</th>
     %incr_count;
   %end;
   %if;(evar.marr_place = "on")
-    <th>[*marriage place]</th>
+    <th>[*where married]</th>
     %incr_count;
   %end;
   %if;(evar.death = "on")
-    <th>[*death date]</th>
+    <th>[*date of death]</th>
     %incr_count;
   %end;
   %if;(evar.death_place = "on")
-    <th>[*death place]</th>
+    <th>[*where dead]</th>
     %incr_count;
   %end;
   %if;(evar.death_age = "on")
@@ -563,7 +563,7 @@
     %incr_count;
   %end;
   %if;(evar.occu = "on")
-    <th>[*occupations]</th>
+    <th>[*occupation/occupations]1</th>
     %incr_count;
   %end;
 %end;

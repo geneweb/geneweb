@@ -145,16 +145,16 @@
           <br%/><br%/>
           <label>
             <input type="radio" name="t" value="Z"%/>
-            [*Array] (*)
+            [*table] (*)
           </label>
           <br%/>
           <label>
-            - [birth date]
+            - [date of birth]
             <input type="checkbox" name="birth" value="on"%/>
           </label>
           <br%/>
           <label>
-            - [birth place]
+            - [where born]
             <input type="checkbox" name="birth_place" value="on"%/>
           </label>
           <br%/>
@@ -164,22 +164,22 @@
           </label>
           <br%/>
           <label>
-            - [marriage date]
+            - [date of marriage]
             <input type="checkbox" name="marr_date" value="on"%/>
           </label>
           <br%/>
           <label>
-            - [marriage place]
+            - [where married]
             <input type="checkbox" name="marr_place" value="on"%/>
           </label>
           <br%/>
           <label>
-            - [death date]
+            - [date of death]
             <input type="checkbox" name="death" value="on"%/>
           </label>
           <br%/>
           <label>
-            - [death place]
+            - [where dead]
             <input type="checkbox" name="death_place" value="on"%/>
           </label>
           <br%/>
