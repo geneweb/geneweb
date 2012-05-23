@@ -36,7 +36,7 @@
 
 %if;has_families;
   <h3 class="highlight">[*marriage/marriages]1 %if;has_children; [and::child/children]1%end;</h3>
-  <ul>
+  <ul class="marriage_perso">
     %( On remet les compteurs à zéro et on commence à compter à 1 %)
     %reset_count; %incr_count;
     %foreach;family;
