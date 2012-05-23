@@ -449,6 +449,17 @@ div.summary ul ul
   font-weight:bold
 }
 
+/* lists and tree */
+.ascends_table, .descends_table{
+border-width:1px;
+border-style:solid;
+border-collapse:collapse;
+}
+ 
+.ascends_table th, .ascends_table td,
+.descends_table th, .descends_table td{
+border:1px solid black;
+}
 
 /* Properties of the relation page */
 #rel_form_search, #rel_form_cousin, #rel_form_shortcut, #rel_mode, #rel_options
