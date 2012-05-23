@@ -1,7 +1,6 @@
 <!-- sources -->
 
 %if;(has_sources or has_linked_page.BIBLIO)
-  <h3 class="highlight">[*source/sources]1</h3>
   <p>
     %foreach;source;
       - %source_type;: %source;<br%/>
@@ -10,3 +9,18 @@
   </p>
 %end;
 
+%if;(has_sources or has_linked_page.BIBLIO)
+  <h3 class="highlight">[*source/sources]1</h3>
+  <em>
+    <ul>
+      %foreach;source;
+        <li>%source_type;: %source;</li>
+      %end;
+    </ul>
+  </em>
+  %if;has_linked_page.BIBLIO; - [*bibliography]
+    <p>
+      %apply;capitalize(linked_page.BIBLIO)
+    </p>
+  %end;
+%end;

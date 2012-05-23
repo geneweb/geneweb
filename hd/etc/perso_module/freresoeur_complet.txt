@@ -1,12 +1,22 @@
 <!--  Freres et soeurs simple -->
 
 %if;has_siblings;
-  <h3 class="highlight">[*siblings]</h3>
+  <h3 class="highlight">
+    %if;(bvar.full_siblings="yes")
+      [*full siblings]
+    %else;
+      [*siblings]
+    %end;
+  </h3>
   <ul>
     %let;cur;%index;%in;
     %foreach;father.child;
-      %if;(index!=cur)
+      %if;(bvar.full_siblings="yes")
         %apply;long_display_siblings()
+      %else;
+        %if;(index!=cur)
+          %apply;long_display_siblings()
+        %end;
       %end;
     %end;
   </ul>

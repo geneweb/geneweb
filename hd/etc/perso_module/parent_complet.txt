@@ -4,7 +4,6 @@
   <h3 class="highlight">[*parents]</h3>
   <ul>
     %apply;li_SD("father")
-      %apply;display_sosa("father")
       %apply;long_display_person("father")%sp;
       <br%/>
       %foreach;father.family;
@@ -14,7 +13,6 @@
       %end;
     </li>
     %apply;li_SD("mother")
-      %apply;display_sosa("mother")
       %apply;long_display_person("mother")%sp;
       %foreach;father.family;
         %if;(spouse.access=mother.access)

@@ -387,3 +387,10 @@ expand_env=no
 # arbre_3gen_v_photo
 # arbre_4gen_v
 # arbre_5gen_h
+
+# display the picto sosa on the template perso.txt (individual page).
+#display_sosa=yes/no
+
+# display the individual in his 'own' siblings on the template perso.txt 
+# (individual page).
+#full_siblings=yes/no

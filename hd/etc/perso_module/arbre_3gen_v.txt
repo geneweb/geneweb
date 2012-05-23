@@ -1,7 +1,7 @@
 <!--  Arbre 3 generations vertival -->
 
-<h3 class="highlight">[*navigation arbre]</h3>
 %if;has_parents;
+  <h3 class="highlight">[*preview family tree]</h3>
   <div style="text-align: center"><table border="0" style="width: 80%%;" class="border_color arbre_asc">
     <tr>
       <td style="vertical-align: top;" id="ancestors">
