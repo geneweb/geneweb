@@ -4369,6 +4369,34 @@ sk: opatrovanec/opatrovankyňa/opatrovanec
 sl: rejenec/rejenka/rejenec
 sv: fosterson/fosterdotter/fosterbarn
 
+    full siblings
+af: broers en susters
+bg: братя и сестри
+br: breudeur ha c'hoarezed
+ca: germans i germanes
+cs: sourozenci
+da: søskende
+de: Geschwister
+en: siblings
+eo: gefratoj
+es: hermanos y hermanas
+et: õed ja vennad
+fi: sisarukset
+fr: fratrie
+he:  אחים
+is: systkyni
+it: fratelli
+lv: brāļi/māsas
+nl: broers en zusters
+no: søsken
+pl: rodzeństwo
+pt: irmãos e irmãs
+ro: frati/surori
+ru: братья или сесты
+sk: súrodenci
+sl: bratje in sestre
+sv: syskon
+
     generation/generations
 af: geslag/geslagte
 bg: поколение/поколения
@@ -5137,6 +5165,17 @@ sk: zoznam manželov/manželiek (bez potomkov)
 sl: seznam mož/žena (brez potomcev)
 sv: förteckning över makarna (icke ättlingar)
 
+    individual notes
+de: Hinweis zur Person
+en: individual Note
+es: nota individual
+fi: merkintöjä henkilöstä
+fr: notes individuelles
+it: nota dell’individuo
+nl: nota’s over de persoon
+no: notater om personen
+sv: anteckningar om personen
+
     in (month year)
 af: in
 bg: през
@@ -5851,7 +5890,7 @@ de: notizen zu den Ehen
 en: marriage Notes
 es: notas de matrionios
 fi: lisämerkintöjä vihkimisestä
-fr: notes de mariage
+fr: notes de mariages
 it: note di matrimoni
 nl: nota’s over het huwelijk
 no: notater om ekteskapet
@@ -5912,6 +5951,17 @@ ru: брак %t перед его/ее рождением
 sk: sobáš s %t pred svojim narodením
 sl: %t se je poročil(a) pred svojim rojstvom
 sv: äktenskap med %t före makens/makans födelse
+
+    marriage with
+de: eheschließungen
+en: marriage with
+es: casamiento(s)
+fi: aviopuoliso(t)
+fr: mariage avec
+it: matrimoni
+nl: huwelijken
+no: giftermål
+sv: vigslar
 
     married
 af: getroud
@@ -6510,7 +6560,7 @@ ru: навигация
 sl: pregled
 sv: navigering
 
-    navigation arbre
+    preview family tree
 de: überblick vom Stammbaum
 en: Preview Family Tree
 es: ver ärbol
