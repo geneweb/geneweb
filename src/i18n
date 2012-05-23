@@ -168,6 +168,7 @@ for the first names by alphabetic order
 for the list ordered by the date of the last modification
 foster father/foster mother/foster parents
 foster son/foster daughter/foster child
+full siblings
 generation/generations
 godfather/godmother/godparents
 godson/goddaughter/godchild
@@ -198,6 +199,7 @@ incorrect request
 indeed,
 index of the descendants
 index of the spouses (non descendants)
+individual notes
 in (month year)
 insert
 inversion done
@@ -227,6 +229,7 @@ marriage/marriages
 marriage notes
 marriage of %t after his/her death
 marriage of %t before his/her birth
+marriage with
 married
 married at age %t
 married%t to
@@ -252,7 +255,6 @@ n° d'Aboville
 name
 name %s already used by %tthis person%t
 navigation
-navigation arbre
 navigation with %t as Sosa reference
 NB: you should try another relationship computing mode
 nephews and nieces
@@ -304,6 +306,7 @@ population pyramid
 possible duplications
 possibly (date)
 precision
+preview family tree
 previous sibling
 private
 public
