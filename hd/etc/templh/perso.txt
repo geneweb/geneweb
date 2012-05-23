@@ -409,15 +409,15 @@
 
 %if;has_siblings;  
   <h3 class="highlight">%nn;
-       %if;(bvar.full_fratrie="" or bvar.full_fratrie="yes")
-      [*fratrie]%nn;
+       %if;(bvar.full_siblings="" or bvar.full_siblings="yes")
+      [*full siblings]%nn;
     %else;
       [*siblings]%nn;
     %end;
   </h3>
   <ul>
     %foreach;father.child;
-      %if;((bvar.full_fratrie="" or bvar.full_fratrie="yes")
+      %if;((bvar.full_siblings="" or bvar.full_siblings="yes")
         or child.index!=central_index)
         %apply;li_SDC("child")
           %apply;image_MF("child","13")
