@@ -362,7 +362,20 @@ value string_of_date conf =
 (* ********************************************************************** *)
 value string_slash_of_date conf =
   fun
-  [ Dgreg d _ -> string_slash_of_dmy conf d
+  [ Dgreg d Dgregorian -> 
+      string_slash_of_dmy conf d
+  | Dgreg d Djulian -> 
+      let d1 = Calendar.julian_of_gregorian d in
+      string_slash_of_dmy conf d1 ^ " (" ^
+        (transl_nth conf "gregorian/julian/french/hebrew" 1) ^ ")"
+  | Dgreg d Dfrench -> 
+      let d1 = Calendar.french_of_gregorian d in
+      string_slash_of_dmy conf d1 ^ " (" ^
+        (transl_nth conf "gregorian/julian/french/hebrew" 2) ^ ")"
+  | Dgreg d Dhebrew -> 
+      let d1 = Calendar.french_of_gregorian d in
+      string_slash_of_dmy conf d1 ^ " (" ^
+        (transl_nth conf "gregorian/julian/french/hebrew" 3) ^ ")"
   | Dtext t -> t ]
 ;
 
