@@ -297,12 +297,14 @@ hr.left
 {
   margin-left:0;
   margin-right: 50%%;
+  width: 50%%;
 }
 
 hr.right 
 {
   margin-left: 50%%;
   margin-right: 0;
+  width: 50%%;
 }
 
 hr.full
