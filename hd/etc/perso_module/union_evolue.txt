@@ -1,5 +1,39 @@
 <!--  Union evolue -->
 
+%(
+  Copie des fonctions qui se trouvent dans perso.txt dont la SEULE
+  modification est que la phrase NE commence PAS par une majuscule.
+%)
+
+%define;loc_married_to(sex, date)
+  %if;(sex = 0 or sex = 2)
+    %if;are_married;[married%t to:::date]0%nn;
+    %elseif;are_not_married;[relationship%t to:::date]0%nn;
+    %elseif;are_engaged;[engaged%t to:::date]0%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date]0%nn;
+    %elseif;is_no_mention;date [with]%nn;
+    %end;
+  %else;
+    %if;are_married;[married%t to:::date]1%nn;
+    %elseif;are_not_married;[relationship%t to:::date]1%nn;
+    %elseif;are_engaged;[engaged%t to:::date]1%nn;
+    %elseif;is_no_sexes_check;[relationship%t to:::date]1%nn;
+    %elseif;is_no_mention;date [with]%nn;
+    %end;
+  %end;
+%end;
+
+%define;loc_long_married(xx)
+  %apply;loc_married_to%with;%xx.sex%and;
+    %if;(on_marriage_date = "")
+    %else; <em>%on_marriage_date;
+      %if;wedding_birthday; ([happy birthday to them!])%end;
+      </em>
+    %end;
+  %end;
+%end;
+
+
 %if;has_families;
   <h3 class="highlight">[*marriage/marriages]1 %if;has_children; [and::child/children]1%end;</h3>
   <ul>
@@ -29,7 +63,7 @@
           %end;)
         %end;
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
-          ([see::note/notes]0 <a href="#note-wed-%count;" name="wed-note-%count;" id="wed-note-%count;">%count;</a>)
+          ([see] <a href="#note-wed-%count;" name="wed-note-%count;" id="wed-note-%count;">[note/notes]0</a>)
           %incr_count;
         %end;
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
@@ -42,6 +76,16 @@
               %apply;li_SDC("child")
                 %apply;image_MF("child","13")
                 %apply;short_display_person("child")
+                %if;child.has_families;
+                  %foreach;child.family;
+                    %if;(family_cnt!=1)
+                      <img width="13" height="13"%sp; src="%image_prefix;/1pixel.png"  alt=""%/>%sp;
+                      <em>%child;%child.title;%child.dates;</em>
+                    %end;%sp;
+                    %sp;%apply;loc_long_married("child")%sp;
+                    %apply;short_display_person("spouse")<br%/>
+                  %end;
+                %end;
               </li>
             %end;
           </ul>

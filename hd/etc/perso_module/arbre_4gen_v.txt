@@ -1,7 +1,7 @@
 <!--  Arbre 4 generations vertical -->
 
-<h3 class="highlight">[*navigation arbre]</h3>
 %if;has_parents;
+  <h3 class="highlight">[*preview family tree]</h3>
   <table border="0" style="width: 100%%;" class="border_color">
     <tr>
       <td id="ancestors" style="vertical-align: top">

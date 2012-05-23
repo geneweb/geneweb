@@ -74,15 +74,14 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" %sp; alt="sosa" 
-    style="border: none" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
+  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
 %end;
 
 %define;display_sosa(xx)
-  %if;xx.has_sosa;
+  %if;(xx.has_sosa and bvar.display_sosa="yes")
     %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-    %apply;image_sosa%with;%sosa_ref.first_name_key_val;%sp;
-    %sosa_ref.surname_key_val;
+    %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
+    %sosa_ref.surname_key_strip;
     %and;%xx.sosa;%end;
     %if;not cancel_links;</a>%end;%sp;
   %end;
@@ -97,6 +96,7 @@
 %end;
 
 %define;short_display_person(xx)
+  %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
     %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
@@ -105,6 +105,7 @@
 %end;
 
 %define;long_display_person(xx)
+  %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
     %else;<a href="%prefix;%xx.access;">%xx;</a>
@@ -145,8 +146,8 @@
   </span>
 %end;
 
-%define;married_to(masc, date_place)
-  %if;masc;
+%define;married_to(sex, date_place)
+  %if;(sex = 0 or sex = 2)
     %if;are_married;[*married%t to:::date_place]0%nn;
     %elseif;are_not_married;[*relationship%t to:::date_place]0%nn;
     %elseif;are_engaged;[*engaged%t to:::date_place]0%nn;
@@ -164,7 +165,7 @@
 %end;
 
 %define;long_married(xx)
-  %apply;married_to%with;%xx.is_male%and;
+  %apply;married_to%with;%xx.sex%and;
     %if;(marriage_place = "")
       %if;(on_marriage_date = "")
       %else; <em>%on_marriage_date;

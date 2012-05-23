@@ -9,6 +9,7 @@
 %if;((wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
     (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
   <h3 class="highlight">[*note/notes]1</h3>
+  <h5 class="highlight">[*individual notes]</h5>
   <dl><dd>
     %if;(has_linked_page.BNOTE)
       <p>%apply;capitalize(linked_page.BNOTE).</p>
@@ -20,6 +21,8 @@
   </dd></dl>
 %end;
 
+<p style="clear:both"></p>
+
 %if;has_families;
   %( On remet les compteurs à zéro et on commence à compter à 1 %)
   %reset_count; %incr_count;
@@ -27,12 +30,15 @@
     %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
       %if;((count=1) and ((wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
           (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))) 
-        <h4 class="highlight">[*marriage notes]0</h4>
+        <h5 class="highlight">[*marriage notes]0</h5>
       %elseif;(count=1)
           <h3 class="highlight">[*marriage notes]0</h3>
       %end;
       <dl> 
-        <dt><a href="#wed-note-%count;" name="note-wed-%count;" id="note-wed-%count;">%count;</a>:</dt>
+        <dt>
+          [*marriage with] %spouse.first_name; %spouse.surname;
+          <a href="#wed-note-%count;" name="note-wed-%count;" id="note-wed-%count;" style="text-decoration:none"><sup><font size="3" title="[see] [marriage/marriages]0"> ↑ </font></sup></a>: 
+        </dt>
         <dd>%comment;</dd>
       </dl>
       %incr_count;

@@ -20,9 +20,8 @@
 %end;
 
 
-<h3 class="highlight">[*navigation arbre]</h3>
 %if;has_parents;
-%let;nbga;%apply;min(max_anc_level, 5)%in;%(<h2>[*ancestors]%sp;<span class="more_infos">%if;has_parents;<a href="%prefix;m=A;%access&siblings=on&notes=on&t=T&v=50&image=on&marriage=on&full=on" target="_blank" class="see-more">ASC [*tree]</a>%end;%if;has_children;<a href="%prefix;m=D;%access&siblings=on&notes=on&t=T&v=20&image=on&marriage=on&full=on" target="_blank" class="MenuSousTitre" class="see-more">DESC [*tree]</a>%end;</span></h2>%)
+<h3 class="highlight">[*preview family tree]</h3>
 <div>
   <table border="0" style="width: 80%%;" class="border_color">
     <tr>
