@@ -144,7 +144,7 @@
 
 <div id="rel_search">
   <h2 class="highlight">[*relationship link between]</h2>
-  <form name="relationship" method="get" action="%action;" onsubmit="return check_form_relationship()">   
+  <form name="relationship" method="get" action="%action;">   
     <p>%hidden;</p>
     <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
       <input type="hidden" name="em" value="R"%/>
