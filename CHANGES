@@ -1,3 +1,59 @@
+GeneWeb version 6.05
+--------------------
+
+* Optimization of the sosa computing in the template. Can be 3 to 40 times 
+  faster (mainly with the option display_sosa=yes).
+* New organization of the relationship computing page. Cousin and Relation 
+  are now in the same page. Should be easier to use (javascript must be 
+  activated).
+* New ouput in the ascendants and descendants menu : display in table.
+* Added a link to browse in the descendants tree as in the ascendants tree.
+* Added a warning in case the source field is not complete. Beware, it may 
+  not behave as you think.
+  In order not to spoil the display, the warning will be display only like
+  this :
+    if there is any family sources then OK (no warning)
+    else
+      if there is any individual sources for him AND her then OK (no warning)
+      else Warning missing sources
+* Add a warning if a witness is born/dead after/before marriage.
+* If you define a "sosa ref" in your gwf file, then GeneWeb will keep the gwf 
+  file up to date when the user modify the base (and potentially this 
+  individual).
+* Added the notify_key when changing the name of the children and check if 
+  the "sosa ref" has changed.
+* In case of homonyms (creation of individual/family), display the spouses of 
+  the homonyms in the list.
+* When searching for a surname, the more there is answers the more the result 
+  will be displayed in many columns.
+* Add the option -add_lexicon to dictionnaries.
+* Add the option -nopicture in order not to import picture of GEDCOM/GW.
+* Added the template of the 5.02 version (named templ502).
+* Update copyright
+* Update lex_utf8.txt.
+* Various fixes.
+
+Dominique DERAM :
+* Update of template A, B, C, D, F, H :
+** New directory templx for the templates anclist, ancsosa, anctree. 
+   It will be used by the template a, b, c, d, f, h.
+** Update copyrigth
+** Various fix of minors bugs and improvements.
+
+Mickaël Rouesné:
+* Update of template M :
+** css.txt : refactoring of the css.
+** perso.txt : 
+     - Display the number of ascendants and descendant.
+     - If misc=on (in the gwf file) or opt=misc (in the URL), then display the 
+       wiki links, index and ID (reference key) of the individual in the 
+       bottom of the page.
+     - Vertical Family Tree with 4 generations.
+     - Open the update individual/family form in a new page and automatic 
+       relead after clicking on the [x] at the bottom of the page.
+** ancmenu, ancsosa, anclist, anctree : fix bug in evar.v.
+** ancsosa : improve the surname list, add occupations, update style.
+
 GeneWeb version 6.04
 --------------------
 
