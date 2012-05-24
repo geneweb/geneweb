@@ -1019,7 +1019,7 @@
 %elseif;(evar.t = "Z")
   %reset_count;
   <table class="ascends_table">
-    <tr class="ascend_table_header">%apply;table_header()</tr>
+    <tr class="ascends_table_header">%apply;table_header()</tr>
     %let;nb_col;%count;%in;
     %reset_count;
     %foreach;ancestor_level(evar.v)
