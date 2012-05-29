@@ -10655,7 +10655,7 @@ es: lugar de matrimonio
 fr: lieu de mariage
 it: luogo del matrimonio
 nl: huwelijksplaats
-no: vis anesammenfallet (anetapet)
+no: sted for vigsel
 sv: vigselort
 
     with
