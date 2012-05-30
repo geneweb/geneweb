@@ -103,16 +103,15 @@ new_distrib: classical_distrib
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
 	cp setup/gwsetup $(DESTDIR)/gw/gwsetup$(EXE)
-	cat etc/README.distrib.txt >> $(DESTDIR)/README.txt; \
 	cp LICENSE $(DESTDIR)/LICENSE.txt
 	cp etc/START.htm $(DESTDIR)/.
+	cp CHANGES $(DESTDIR)/.
 	echo "127.0.0.1" > $(DESTDIR)/gw/only.txt
 	echo "-setup_link" > $(DESTDIR)/gw/gwd.arg
 
 classical_distrib:
 	$(RM) -rf $(DESTDIR)
 	mkdir $(DESTDIR)
-	cp CHANGES $(DESTDIR)/CHANGES.txt
 	cp src/gwc $(DESTDIR)/gwc$(EXE)
 	cp src/gwc1 $(DESTDIR)/gwc1$(EXE)
 	cp src/gwc2 $(DESTDIR)/gwc2$(EXE)
@@ -128,7 +127,6 @@ classical_distrib:
 	cp gwtp/gwtp $(DESTDIR)/gwtp_tmp/gwtp$(EXE)
 	cp gwtp/README $(DESTDIR)/gwtp_tmp/.
 	cp gwtp/lang/*.txt $(DESTDIR)/gwtp_tmp/lang/.
-	cp etc/INSTALL.htm $(DESTDIR)/.
 	cp etc/a.gwf $(DESTDIR)/.
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
