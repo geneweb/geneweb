@@ -9,15 +9,22 @@
 %include.css;
 </head>
 <body%body_prop;>
-<h1>Base</h1>
+<h1>
+[
+en: Open a Tree
+fr: Ouvrir une généalogie
+]
+</h1>
 
+<div style="text-align:center">
 <p>
 [
 en: Please, enter the name of the database you want to use:
-fr: Entrez le nom de la base de données que vous voulez utiliser:
+fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
 ]
 </p>
-<ul>
+
+<ul style="list-style-type: none">
 <li>
 <form method="get" action="%prefix;">
 <p>
@@ -27,6 +34,16 @@ fr: Entrez le nom de la base de données que vous voulez utiliser:
 </form>
 </li>
 </ul>
+
+<p>
+<a href="http://localhost:2316/gwsetup?v=list.htm">
+[
+en: Available Family Tree (use Gwsetup)
+fr: Listes des généalogies disponibles (utilise Gwsetup)
+]
+</a>
+</p>
+</div>
 
 %copyright;
 </body>

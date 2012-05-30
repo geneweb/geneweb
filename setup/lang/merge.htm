@@ -3,7 +3,7 @@
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
   <!-- $Id: merge.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
@@ -19,13 +19,17 @@ sv: Sammanslagning av databaser
 
 <body background="images/gwback.jpg">
 
-<center><h1><font color=#2f6400>[
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[
 de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
 fr: Fusion de bases de donn&eacute;es
 it: Fusione di basi di dati
 sv: Sammanslagning av databaser
-]</font></h1></center>
+]
+</h1>
+</div>
 
 <form method=GET action="merge">
 <input type=hidden name=lang value=%l>
@@ -49,26 +53,26 @@ sv: Alla databaser som ska slås samman måste finnas under
 [
 de: Falls das nicht der Fall ist, sondern einige von ihnen z.B. nur
     als GEDCOM-Dateien oder GeneWeb-Quelldateien vorliegen, kehre zum
-    <a href="gwsetup?lang=%l;v=main.htm">Hauptmen&uuml;</a> zur&uuml;ck,
+    <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmen&uuml;</a> zur&uuml;ck,
     um sie unter <b><font color=#2f6400>GeneWeb</font></b> anzulegen,
     dann kehre hierher zur&uuml;ck.
 en: If it is not the case, if, for example, some of them are just GEDCOM
     files or GeneWeb source files, return to the <a
-    href="gwsetup?lang=%l;v=main.htm">main menu</a> to create them under
+    href="gwsetup?lang=%l;v=welcome.htm">main menu</a> to create them under
     <b><font color=#2f6400>GeneWeb</font></b>, then go back to this page.
 fr: Si ce n'est pas le cas, si, par exemple, certaines d'entre elles sont
     sous forme GEDCOM ou fichiers source GeneWeb, revenez au <a
-    href="gwsetup?lang=%l;v=main.htm">menu principal</a> pour les
+    href="gwsetup?lang=%l;v=welcome.htm">menu principal</a> pour les
     cr&eacute;er sous <b><font color=#2f6400>GeneWeb</font></b>, puis
     revenez &agrave; cette page.
 it: Se non &egrave; il caso e certune, ad esempio, sono
     al formato GEDCOM o file sorgente  GeneWeb, tornate al <a
-    href="gwsetup?lang=%l;v=main.htm">menu principale</a> per crearle
+    href="gwsetup?lang=%l;v=welcome.htm">menu principale</a> per crearle
     sotto <b><font color=#2f6400>GeneWeb</font></b>, poi
     ritornate a questa pagina.
 sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM
     filer eller GeneWeb källfiler, gå tilbaka till <a
-    href = "gwsetup?lang=%l;v=main.htm">huvudmenyn</a> för att skapa dem
+    href = "gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a> för att skapa dem
     under <b><font color=#2f6400>GeneWeb</font></b>, gå sedan tillbaka
     till denna sida.
 ]
