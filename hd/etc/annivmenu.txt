@@ -1,0 +1,49 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: annivmenu.txt,v 0.01 2012-05-31 147:40:30 flh Exp $ -->
+  <!-- Copyright (c) 2006-2007 INRIA -->
+  <title>[*anniversaries]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  %include.css;
+  %base_header;
+</head>
+<body%body_prop;>
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.png"%wid_hei;left.png; 
+       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.png"%wid_hei;up.png; 
+    alt="^^" title="^^"%/></a>
+  </td></tr></table>
+%end;
+
+<h1>[*anniversaries]</h1>
+
+<p>
+  <ul>
+    <li>
+      <a href="%prefix;m=AN">[*anniversaries of birth]</a>
+    </li>
+    <li>
+      <a href="%prefix;m=AD">[*anniversaries of dead people]</a>
+    </li>
+    <li>
+      <a href="%prefix;m=AM">[*anniversaries of marriage]</a>
+    </li>
+  </ul>
+</p>
+
+%base_trailer;
+%copyright;
+
+</body>
+</html>
