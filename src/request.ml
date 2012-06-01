@@ -387,6 +387,7 @@ value family_m conf base =
   | Some "ADD_IND" when conf.wizard -> UpdateInd.print_add conf base
   | Some "ADD_IND_OK" when conf.wizard -> UpdateIndOk.print_add conf base
   | Some "ADD_PAR" when conf.wizard -> UpdateFam.print_add_parents conf base
+  | Some "ANM" -> Birthday.print_anniversaries conf base
   | Some "AN" ->
       match p_getenv conf.env "v" with
       [ Some x -> Birthday.print_birth conf base (int_of_string x)
