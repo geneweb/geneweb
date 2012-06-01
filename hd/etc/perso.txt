@@ -299,12 +299,31 @@
   <p></p>
 %end;
 
+
 %if;wizard;
-  <div id="acces" style="border: solid 2px #6f8301;">
-    <h3 class="with_picto" style=" background-image:url(%image_prefix;/picto_molette.png)">[*modify] :</h3>
+  <div class="select" style="float:right">
+    <span><span style="background-image:url(%image_prefix;/picto_molette.png);background-repeat:no-repeat;padding:3px 0px 3px 25px;">[*modify]</span></span>
     <ul>
-      <li><a href="%prefix;m=MOD_IND;i=%index;" class="highlight" accesskey="U">[*modify::person/persons]0</a></li>
-      <li><a href="%prefix;m=U;%access;" class="highlight" accesskey="U">[*update]</a></li>
+      <li class="title"><span>[*person/persons]0</span></li>
+      <li><a href="%prefix;m=MOD_IND;i=%index;">[*update]</a></li>
+      %if;(not has_parents and first_name != "?" and surname != "?")
+        <li><a href="%prefix;m=ADD_PAR;ip=%index;">[*add::parents]</a></li>
+      %end;
+  
+      %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
+        <li><a href="%prefix;m=SND_IMAGE;i=%index;" class="add_portrait">%if;(auto_image_file_name != "")[*modify picture]%else;[*add picture]%end;</a></li>
+      %end;
+  
+      <li class="title"><span>[*family/families]0</span></li>
+      <li><a href="%prefix;m=U;%access;">[*update]</a></li>
+  
+      %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
+      %elseif;(not is_male and not is_female)
+        <li><a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;[*add::marriage/marriages]0 ([M/F]0)</a></li>
+        <li><a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;[*add::marriage/marriages]0 ([M/F]1)</a></li>
+      %else;
+        <li><a href="%prefix;m=ADD_FAM;ip=%index;">%nn;[*add::marriage/marriages]0</a></li>
+      %end;
     </ul>
   </div>
 %end;

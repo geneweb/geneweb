@@ -37,6 +37,7 @@ a brother-in-law/a sister-in-law
 access
 a cousin
 add
+add picture
 a descendant
 adoptive father/adoptive mother/adoptive parents
 adoptive son/adoptive daughter/adoptive child
@@ -66,6 +67,7 @@ ancestors (some)
 and
 a nephew/a niece
 anniversaries
+anniversaries of birth
 anniversaries of dead people
 anniversaries of marriage
 an uncle/an aunt
@@ -79,6 +81,9 @@ average age at death
 back
 baptism
 baptized
+base index notes
+base notes
+base wizard notes
 before
 before (date)
 begin
@@ -246,6 +251,7 @@ miscellaneous informations
 missing ancestors
 missing sources
 modify
+modify picture
 months old
 moon age/new moon/first quarter/full moon/last quarter
 more than %d answers
@@ -292,6 +298,7 @@ on %s's side
 on (weekday day month year)
 optional
 or
+other action
 parents
 paternal grand-parents
 person added

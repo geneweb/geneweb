@@ -38,6 +38,110 @@ img
   padding: 4px 4px 4px 20px;
 }
 
+.reference
+{
+  font-size:80%%;
+  font-style:italic;
+}
+
+/* Properties of the submit/OK/validate... button */
+input[type=submit]
+{
+  background-color : #6F8301;
+  border: medium none;
+  color:white;
+  font-weight:bold;
+  padding:2px 4px;
+}
+
+/* Simulate a select button */
+div.select
+{
+  display:inline-block;
+  position:relative;
+  border:1px solid #E7ED83;
+  background-color:#6F8301;
+  cursor:pointer;
+  z-index:1;
+  padding-right:5px;
+  padding-left:4px;
+}
+
+div.select > span
+{
+  background-image:url(%image_prefix;/picto_fleche_blanche.png);
+  background-position:center right;
+  background-repeat:no-repeat;
+  padding-right:18px;
+  display:inline-block;
+  background-color:#6F8301;
+  color:white;
+  font-weight:bold;
+  text-align:left;
+  width:200px;
+  padding-top:6px;
+  padding-bottom:4px;
+}
+
+div.select ul
+{
+  position:absolute;
+  display:none;
+  margin:0px;
+  padding:0px;
+  top:24px;
+  white-space:nowrap;
+  text-align:left;
+  background-color:white;
+  left:-1px;
+  border:1px solid #6F8301;
+}
+
+div.select ul li
+{
+  margin:0;
+  line-height:20px;
+  list-style-type:none;
+}
+
+div.select ul li.title
+{
+  background-color:#E7ED83;
+  padding-left:5px;
+  font-weight:bold;
+}
+
+div.select ul a
+{
+  color:black;
+  display:block;
+  padding-left:5px;
+  padding-right:5px;
+  width:217px;
+  text-decoration:none;
+}
+
+div.select ul a 
+{
+  color: #2F6400;
+}
+
+div.select ul a:hover 
+{
+  text-decoration:underline;
+}
+
+div.select:hover 
+{
+  border:1px solid #6F8301;
+}
+
+div.select:hover ul
+{
+  display:block;
+  z-index:100;
+}
+
 /* Properties for the unvisited, visited and mouse over links. All pages. */
 a:link.highlight 
 {
@@ -247,6 +351,7 @@ h1
  overflow: auto;
  margin-left: auto;
  margin-right: auto;
+ margin-top : 40px;
 }
 
 /* Properties of the title in the navigation block. Page perso.txt */
@@ -578,10 +683,11 @@ div.summary ul ul
 div.tips {
  padding:0px 0px 0px 50px;
  min-height:50px;
- background-color:#FFF9C1;
+ background-color:#E7EDB3;
  background-image:url('%image_prefix/picto_ampoule.png');
  background-position:5px center;
  background-repeat: no-repeat;
+ margin-right:60px;
 }
 
 div.tips table {

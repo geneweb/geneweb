@@ -9,7 +9,7 @@
       %apply;li_SD("spouse")
         %if;(wizard)
           <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;">
-            <img src="%image_prefix;/picto_molette.png" width="13" height="13" alt="[modify]" title="[modify::family/families]0"%/>
+            <img src="%image_prefix;/picto_molette.png" width="13" height="13" alt="[modify]" title="[modify::family/families]0"%/>%nn;
           </a>
         %end;
         %apply;long_married("self")%sp;

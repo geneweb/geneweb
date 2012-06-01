@@ -1039,6 +1039,33 @@ sk: pridať :a:
 sl: dodaj
 sv: lägg till
 
+    add picture
+af: byvoeg prent
+bg: добавяне на изображение
+br: ouzhpennañ skeudenn
+ca: afegir imatge
+cs: přidat :a: obrázek
+da: tilføj billede
+de: hinzufügen Bild
+en: add Picture
+eo: aldoni :a: bildo:a:+n
+es: agregar imagen
+et: lisa pilt
+fi: lisää kuva
+fr: ajouter portrait
+he:  תמונה  הוספה
+is: bæta við mynd
+it: aggiungere immagine
+lv: pievienot attēli
+nl: invoeren beeld
+no: tilføy bilde
+pl: dodaj :a: ilustracja:a:-ę
+pt: acrescentar imagem
+ro: adauga imagine
+ru: добавить :a: картинку
+sl: dodaj slika
+sv: lägg till bild
+
     a descendant
 af: 'n afstammeling
 bg: потомък
@@ -1842,6 +1869,36 @@ sk: výročia
 sl: obletnice
 sv: årsdagar
 
+    anniversaries of birth
+af: verjaarsdae
+bg: рождени дни
+br: deizioù ganedigezh
+ca: aniversaris
+cs: narozeniny
+da: fødselsdage
+de: Geburtstage
+en: birthdays
+eo: datrevenoj de naskiĝo
+es: cumpleaños
+et: sünnipäevad
+fi: syntymäpäiviä
+fr: anniversaires de naissance
+he:   ימי הולדת
+is: afmælisdagar
+it: compleanni
+lv: dzimšanas dienas
+nl: verjaardagen
+no: fødselsdager
+pl: urodziny
+pt: aniversários
+pt-br: aniversários de nascimento
+ro: zi de nastere
+ru: дни рождения
+sk: narodeniny
+sl: rojstni dnevi
+sv: födelsedagar
+zh:  出生于今日的记录
+
     anniversaries of dead people
 af: herdenkings van afsterwe
 bg: годишнини на починали хора
@@ -2158,6 +2215,94 @@ ro: botez
 ru: крещение
 sl: krst
 sv: dop
+
+    base index notes
+af: notas
+ar: بطاقات
+bg: бележки
+br: notennoù
+ca: notes
+cs: poznámky
+da: noter
+de: Notizen
+en: notes
+eo: notoj:a:+n
+es: notas
+et: märkused:g:-id
+fi: lisätietoja
+fr: index des notes
+he:  הערות
+is: athugasemdum
+it: note
+lv: piezīme(s)
+nl: notities
+no: notater
+pl: uwagi
+pt: notas
+ro: note
+ru: заметки
+sk: poznámky
+sl: zapiski
+sv: noteringar
+zh:  备注
+
+    base notes
+af: notas
+ar: بطاقات
+bg: бележки
+br: notennoù
+ca: notes
+cs: poznámky
+da: noter
+de: Notizen
+en: notes
+eo: notoj:a:+n
+es: notas
+et: märkused:g:-id
+fi: lisätietoja
+fr: chronique familiale
+he:  הערות
+is: athugasemdum
+it: note
+lv: piezīme(s)
+nl: notities
+no: notater
+pl: uwagi
+pt: notas
+ro: note
+ru: заметки
+sk: poznámky
+sl: zapiski
+sv: noteringar
+zh:  备注
+
+    base wizard notes
+af: Medewerkers notas
+bg: администратори бележки
+br: strobinellerien notennoù
+ca: administrador notes
+cs: wizards notes
+da: bidragydere noter
+de: Meisters Notizen
+en: wizards notes
+eo: sorĉistoj notoj:a:+n
+es: magos notas
+et: teadmamehed märkused:g:-id
+fi: velho lisätietoja
+fr: notes magiciens
+he:  הערות כגאון
+is: uppfæra athugasemdum
+it: wizard note
+lv: wizard piezīme(s)
+nl: beheerder notities
+no: administratorer notater
+pl: wizard uwagi
+pt: feiticeiros notas
+ro: magician note
+ru: wizard заметки
+sk: wizards poznámky
+sl: čarovnik zapiski
+sv: administratörer noteringar
 
     baptized
 af: gedoop
@@ -6379,6 +6524,33 @@ sk: zmeniť :a:
 sl: spremeni
 sv: ändra
 
+    modify picture
+af: wysig prent
+bg: да се променят изображение
+br: kemmañ skeudenn
+ca: modificar imatge
+cs: změnit :a: obrázek
+da: ændre billede
+de: ändern +before Bild
+en: update Picture
+eo: modifi :a: bildo:a:+n
+es: modificar imagen
+et: muuda :g: pilt
+fi: muokkaa kuva
+fr: modifier portrait
+he:  תמונה לשנות
+is: breyta mynd
+it: modificare immagine
+lv: izmainīt attēli
+nl: wijzigen beeld
+no: endre bilde
+pl: zaktualizuj :a: ilustracja:a:-ę
+pt: modificar imagem
+ro: modifica imagine
+ru: изменить :a: картинку
+sl: spremeni slika
+sv: ändra bild
+
     months old
 af: maande oud
 bg: месеца
@@ -7542,6 +7714,32 @@ ru: или
 sk: alebo
 sl: ali
 sv: eller
+
+    other action
+af: ander stappe
+bg: други действия
+cs: další akce
+da: anden handling
+de: andere Aktion
+en: other action
+eo: alia ago
+es: otra acción
+et: muud toimingud
+fi: muut toimet
+fr: autre action
+is: aðrar aðgerðir
+it: altra azione
+lv: cita darbība
+nl: andere acties
+no: andre tiltak
+pl: inne działania
+pt: outra ação
+ro: alte măsuri
+ru: другие действия
+sk: ďalšie akcie
+sl: druge dejavnosti
+sv: andra åtgärder
+zh: 其他行動
 
     parents
 af: ouers
