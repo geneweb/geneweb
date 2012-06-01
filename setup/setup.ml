@@ -754,6 +754,38 @@ value setup_gen conf =
   | _ -> error conf "request needs \"v\" parameter" ]
 ;
 
+value print_default_gwf_file conf = 
+  let gwf = 
+    [ "access_by_key=yes";
+      "disable_forum=yes";
+      "hide_private_names=no";
+      "use_restrict=no";
+      "show_consang=yes";
+      "display_sosa=yes";
+      "place_surname_link_to_ind=yes";
+      "max_anc_level=8";
+      "max_anc_tree=7";
+      "max_desc_level=12";
+      "max_desc_tree=4";
+      "max_cousins=2000";
+      "max_cousins_level=5";
+      "latest_event=20";
+      "template=*";
+      "long_date=no";
+      "counter=no";
+      "full_siblings=yes";
+      "hide_advanced_request=no" ]
+  in
+  let bname = try List.assoc "o" conf.env with [ Not_found -> "" ] in
+  let fname = bname ^ ".gwf" in
+  if Sys.file_exists fname then ()
+  else do {
+    let oc = open_out fname in
+    List.iter (fun s -> fprintf oc "%s\n" s) gwf;
+    close_out oc
+  }
+;
+
 value simple conf =
   let ged =
     match p_getenv conf.env "anon" with
