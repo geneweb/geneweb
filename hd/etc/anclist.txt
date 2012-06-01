@@ -4,7 +4,7 @@
   <!-- $Id: anclist.txt,v 5.5 2007-07-25 13:15:18 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
-    %if;(evar.t = "F")- [*surnames list] -%nn;
+    %if;(evar.t = "F")- [*surnames branch] -%nn;
     %else
       %apply;a_of_b%with;
         %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
@@ -31,7 +31,7 @@
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
     %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
-    - [*surnames list] -
+    - [*surnames branch] -
   %else;
     %apply;a_of_b%with;[*ancestors]%and;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -125,7 +125,7 @@
     "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
   </td></tr></table>
 %elseif;(evar.t = "F")
-  %( surnames list %)
+  %( surnames branch %)
   <ul>
   %foreach;ancestor_surname(evar.v)
     <li>%nn;

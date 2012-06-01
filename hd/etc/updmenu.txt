@@ -35,34 +35,9 @@
 
 <table border="%border;" width="90%%">
 <tr align="%left;">
-  <th align="%left;" style="color:%highlight;">[*person/persons]0</th>
   <th align="%left;" style="color:%highlight;">[*family/families]1</th>
 </tr>
 <tr align="%left;">
-  <td valign="top">
-    <a href="%prefix;m=MOD_IND;i=%index;" accesskey="P">[*modify::] </a>
-    <br%/>
-    %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
-         and surname != "?")
-      <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
-      <br%/>
-      %if;(auto_image_file_name != "")
-        <a href="%prefix;m=DEL_IMAGE;i=%index;">[*delete::image/images]0</a>
-        <br%/>
-      %end;
-    %end;
-    <br%/>
-    <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
-    <br%/>
-    <br%/>
-    <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>
-    <br%/>
-    %if;(not has_parents and first_name != "?" and surname != "?")
-      <br%/>
-      <a href="%prefix;m=ADD_PAR;ip=%index;">[*add::parents]</a>
-      <br%/>
-    %end;
-  </td>
   <td valign="top">
     %foreach;family;
       %if;(family_cnt != 1)

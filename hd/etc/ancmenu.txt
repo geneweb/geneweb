@@ -296,7 +296,7 @@
           <br%/>
           <label>
             <input type="radio" name="t" value="F"%/>
-            [*surnames list]
+            [*surnames branch]
           </label>
           <br%/><br%/>
           <label>
