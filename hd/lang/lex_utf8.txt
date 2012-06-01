@@ -3733,11 +3733,11 @@ no: vis generasjonsnummer
 sv: visa generations nummer
 
     display smallest sosa number relative to ancestor
-de: bereits gezeigte Personen nicht wiederholen
+de: Implexe anzeigen
 en: display pedigree collapse
-es: no repetir los individuos ya vistos
+es: editar las implexiones
 fr: afficher les implexes
-it: non ripetere gli individui già mostrati
+it: pubblicare il antenati consanguinei
 nl: kwartierherhaling tonen
 no: vis anesammenfallet (anetapet)
 sv: visa anförlusten
