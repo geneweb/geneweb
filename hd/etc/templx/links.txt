@@ -1,0 +1,101 @@
+﻿%( Template links v 6.05d 2012/06/02 12:00:00 ddr/dd %)
+%if;not cancel_links;
+  <table id="links" border="%border;" style="width: 100%%">
+    <tr>
+      <td style="text-align: %left;">
+        <ul>
+          <li><a href="%prefix;m=R;%access;" class="highlight">%nn
+                 [*relationship computing]</a></li>
+          %if;(browsing_with_sosa_ref and sosa_ref.index!=central_index)
+            <li><a href="%prefix;em=R;ei=%index;;m=NG;select=input;n=1;%nn;
+                   long=on;image=on;spouse=on;et=M" class="highlight">%nn;
+                   [*relationship computing::with]</a> %sosa_ref;</li>
+            <li><a href="%prefix;em=R;ei=%index;;m=NG;select=input;n=1;%nn;
+                   long=on;image=on;spouse=on;et=S" class="highlight">%nn;
+                   [*shortest path::with]</a> %sosa_ref;</li>
+          %end;
+          %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
+            <li>%apply;nav_with_sosa_ref%with;<a class="highlight"%sp;
+              href="%prefix_no_iz;iz=%self.index;;%self.access;">%self;</a>%end;
+            </li>
+          %end;
+        </ul>
+      </td>
+      <td style="text-align: %left;">
+        <ul>
+          %if;has_parents;
+            %let;nba;%apply;min(max_anc_level, 5)%in;
+            <li><a href="%prefix;m=A;%access;"  class="highlight">%nn;
+                   [*ancestors]</a></li>
+            <li><a href="%prefix;m=A;%access;;siblings=on;notes=on;t=T;image=on;%nn;
+                   marriage=on;v=%nba;" class="highlight">[*tree] [ancestors]%sp;
+                   %apply;togena%with;%nba%end;</a></li>
+          %end;
+          %if;has_children;
+            %let;nbd;%apply;min(max_desc_level, 4)%in;
+            <li><a href="%prefix;m=D;%access;" class="highlight">%nn;
+                   [*descendants]</a></li>
+            <li><a href="%prefix;m=D;%access;;siblings=on;notes=on;t=T;image=on;%nn;
+                   v=%nbd;" class="highlight">[*tree] [descendants]%sp;
+                   %apply;togend%with;%nbd%end;</a></li>
+          %end;
+          %if;(has_parents and (father.has_parents or mother.has_parents))
+            <li><a href="%prefix;m=C;%access;" class="highlight">%nn;
+                   [*cousins (general term)]</a></li>
+          %end;
+          %if;has_nephews_or_nieces;
+            <li><a href="%prefix;m=C;v1=1;v2=2;%access;" class="highlight">%nn;
+                   [*nephews and nieces]</a></li>
+          %end;
+          %if;has_siblings;
+            %foreach;father.child;
+              %if;is_sibling_before;
+                <li><a href="%prefix;%child.access;" class="highlight">%nn;
+                       %apply;capitalize(nth([previous sibling],sex))</a></li>
+              %end;
+              %if;is_sibling_after;
+                <li><a href="%prefix;%child.access;" class="highlight">%nn;
+                       %apply;capitalize(nth([next sibling],sex))</a></li>
+              %end;
+            %end;
+          %end;
+        </ul>
+      </td>
+      %if;wizard;
+        <td style="text-align: %left;">
+          <ul>
+            <li><a href="%prefix;m=U;%access;" class="highlight">%nn;
+                   [*update]</a><br%/>&nbsp;</li>
+            <li><a href="%prefix;m=MOD_IND;i=%index;" class="highlight">%nn;
+                   [*modify]</a></li>
+            %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
+                 and surname != "?")
+              <li><a href="%prefix;m=SND_IMAGE;i=%index;" class="highlight">%nn;
+                     [*send::image/images]0</a></li>
+            %end;
+            %if;(auto_image_file_name != "")
+              <li><a href="%prefix;m=DEL_IMAGE;i=%index;" class="highlight">%nn;
+                     [*delete::image/images]0</a></li>
+            %end;
+            <li><a href="%prefix;m=DEL_IND;i=%index;" class="highlight">%nn;
+                   [*delete::]</a></li>
+            <li><a href="%prefix;m=MRG;i=%index;" class="highlight">%nn;
+                   [*merge::]</a></li>
+            %if;(not has_parents and first_name != "?" and surname != "?")
+              <li><a href="%prefix;m=ADD_PAR;ip=%index;" class="highlight">%nn;
+                     [*add::parents]</a></li>
+            %end;
+            %if;has_families;
+              %foreach;family;
+                <li><a href="%prefix;m=MOD_FAM;i=%family.index;
+                       ;ip=%index" class="highlight">%nn;
+                       [*modify::family/families]0</a>%sp;
+                       [with] %spouse.first_name;.%spouse.occ; %spouse.surname;</li>
+              %end;
+            %end;
+          </ul>
+        </td>
+      %end;
+    </tr>
+  </table>
+%end;

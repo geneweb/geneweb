@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt, Template x v 6.05c 2012/05/16 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: ancsosa.txt, Template x v 6.05d 2012/06/02 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -61,7 +61,7 @@
   %sp;
 %end;
 
-%define;display_arrows()
+%define;display_2arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
@@ -82,7 +82,7 @@
   [*the %s generation:::xx]%nn;
 %end;
 
-%define;togen(xx)
+%define;togena(xx)
   %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
   %elseif;(evar.xx = 2)[*to the parents]%nn;
   %elseif;(evar.xx = 3)[*to the grandparents]%nn;
@@ -94,7 +94,7 @@
   %end;
 %end;
 
-%define;gen(xx)
+%define;gena(xx)
   %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
   %elseif;(evar.xx = 2)[*the parents]%nn;
   %elseif;(evar.xx = 3)[*the grandparents]%nn;
@@ -554,7 +554,7 @@
 
 %define;table_header()
   %nl;
-  <tr class="ascend_table_header">
+  <tr class="ascends_table_header">
     <th>[*Sosa]</th>%nl;
     %( do not put %incr_count; here to obtain finally nb_col - 1 %)
     <th>[*person/persons]0</th>%nl;
@@ -706,7 +706,7 @@
   %if;(evar.t = "D") [up to] %pvar.1;%end;
 </h1>
 
-%apply;display_arrows()
+%apply;display_2arrows()
 
 %if;(evar.t = "N" and evar.only = "on")
   %( short display; only the selected generation %)
@@ -714,7 +714,7 @@
   <ul>
   %foreach;ancestor_level2;
     %if;(evar.v != "" and level = evar.v)
-      <li>%nl;%apply;gen("v")%nl;
+      <li>%nl;%apply;gena("v")%nl;
       <ul>%nl;
       %foreach;ancestor;
         <li>%sp;
@@ -745,7 +745,7 @@
 %elseif;(evar.t = "N")
   %( short display %)
   <p>
-  %apply;togen("v").
+  %apply;togena("v").
   </p>
   %reset_count;
   <ul>
@@ -787,7 +787,7 @@
 %elseif;(evar.t = "M" and evar.al = "on")
   %( missing ancestors alphabetically %)
   <p>
-  %apply;togen("v")
+  %apply;togena("v")
   %if;(evar.after != "") [after] %evar.after;%end;
   %if;(evar.before != "") [before] %evar.before;%end;.
   </p>
@@ -890,7 +890,7 @@
 %elseif;(evar.t = "M")
   %( missing ancestors in ancestors order %)
   <p>
-  %apply;togen("v")
+  %apply;togena("v")
   %if;(evar.after != "") [after] %evar.after;%end;
   %if;(evar.before != "") [before] %evar.before;%end;.
   </p>
@@ -978,7 +978,7 @@
   %( long display %)
   %if;(evar.only != "on")
     <p>
-    %apply;togen("v").
+    %apply;togena("v").
     </p>
   %end;
   %foreach;ancestor_level(evar.v)
@@ -1041,11 +1041,9 @@
 %elseif;(evar.t = "Z")
   %( ancestors in a table %)
   %if;(evar.only != "on")
-    <p>
-    %apply;togen("v").
-    </p>
+    <p>%apply;togena("v").</p>
   %end;
-  <table class="ascends_table" border="1">
+  <table class="ascends_table">
     %reset_count;
     %apply;table_header()
     %let;nb_colm1;%count;%in;

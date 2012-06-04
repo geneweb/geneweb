@@ -1,0 +1,6 @@
+﻿%( Template linked_page v 6.05d 2012/06/02 12:00:00 ddr/dd %)
+%if;(not cancel_links and has_linked_pages)
+  <table style="float:%right;"><tr><td style="font-size:80%%">
+    (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
+  </td></tr></table>
+%end;

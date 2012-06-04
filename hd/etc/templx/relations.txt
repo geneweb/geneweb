@@ -1,0 +1,49 @@
+﻿%( Template relations v 6.05d 2012/06/02 12:00:00 ddr/dd %)
+%if;has_relations;
+  <h3 id="relations" class="highlight">[*relation/relations]1</h3>
+  <ul>
+    %foreach;relation;
+      %if;(has_relation_him and has_relation_her)
+        <li>%apply;capitalize(relation_type) :%nl;
+          <ul>
+            %apply;li_SDC("relation_him")
+              %apply;image_MF("relation_him","13")
+              %apply;short_display_person("relation_him")
+            </li>
+            %apply;li_SDC("relation_her")
+              %apply;image_MF("relation_her","13")
+              %apply;short_display_person("relation_her")
+            </li>
+          </ul>
+        </li>
+      %elseif;has_relation_him;
+        %apply;li_SDC("relation_him")%apply;capitalize(relation_type) :%sp;
+          %apply;image_MF("relation_him","13")
+          %apply;short_display_person("relation_him")
+        </li>
+      %elseif;has_relation_her;
+        %apply;li_SDC("relation_her")%apply;capitalize(relation_type) :%sp;
+          %apply;image_MF("relation_her","13")
+          %apply;short_display_person("relation_her")
+        </li>
+      %end;
+    %end;
+    %foreach;related;
+      %apply;li_SDC("related")%apply;capitalize(related_type) :%sp;
+        %apply;image_MF("related","13")
+        %apply;short_display_person("related")
+      </li>
+    %end;
+    %foreach;witness_relation;
+      <li style="list-style-type:disc">%nn;
+        %if;(witness_relation.marriage_date.year>0)
+          <em> %witness_relation.marriage_date.year;</em> :
+        %end;
+        %apply;witness_relation%with;
+          %apply;very_short_display_person("witness_relation.father")%and;
+          %apply;very_short_display_person("witness_relation.mother")
+        %end;
+      </li>%nl;
+    %end;
+  </ul>
+%end;

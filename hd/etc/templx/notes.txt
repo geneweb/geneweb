@@ -1,0 +1,11 @@
+﻿%( Template notes v 6.05d 2012/06/02 12:00:00 ddr/dd %)
+%if;((wizard or friend or 
+      bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and
+     (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
+  <h3 id="notes" class="highlight">[*note/notes]1</h3>
+  <dl><dd>
+    %if;(has_linked_page.BNOTE)<p>%apply;capitalize(linked_page.BNOTE).</p>%end;
+    %if;(has_notes)%notes;%end;
+    %if;(has_linked_page.NOTE)<p>%apply;capitalize(linked_page.NOTE).</p>%end;
+  </dd></dl>
+%end;

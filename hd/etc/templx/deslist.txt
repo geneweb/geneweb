@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: deslist.txt, Template x v 6.05c 2012/05/16 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: deslist.txt, Template x v 6.05d 2012/06/02 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -55,7 +55,7 @@
   %sp;
 %end;
 
-%define;display_arrows()
+%define;display_2arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
@@ -72,7 +72,7 @@
   [*to the %s generation:::xx]%nn;
 %end;
 
-%define;togen(xx)
+%define;togend(xx)
   %if;(xx=0)[*specify::generation/generations]0%nn;
   %elseif;(xx=1)[*to the children]%nn;
   %elseif;(xx=2)[*to the grandchildren]%nn;
@@ -343,7 +343,7 @@
 %end;
 
 %define;by_list(xx)
-  %apply;togen(xx).
+  %apply;togend(xx).
   <br%/><br%/>
   %reset_count;
   %apply;descendants_by_list("self", "self", 0, xx, 0, 1)%nl;
@@ -381,7 +381,7 @@
   %end;
 </h1>
 
-%apply;display_arrows()
+%apply;display_2arrows()
 
 %apply;by_list%with;
   %if;(bvar.max_desc_level="")%apply;min(evar.v, max_desc_level, 12)

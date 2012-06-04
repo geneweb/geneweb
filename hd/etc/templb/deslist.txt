@@ -1,5 +1,5 @@
-%define;template(file)
+%define;include_file(file)
   %include.file;
 %end;
 
-%apply;template("templx/deslist")
+%apply;include_file("templx/deslist")

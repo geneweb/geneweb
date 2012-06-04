@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anctree.txt, Template x v 6.05c 2012/05/16 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anctree.txt, Template x v 6.05d 2012/06/02 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -55,7 +55,7 @@
   %sp;
 %end;
 
-%define;display_arrows()
+%define;display_2arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
@@ -209,13 +209,13 @@
     %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_tree)%end;
   %end;
 %elseif;(evar.t = "A")
-  %apply;display_arrows()
+  %apply;display_2arrows()
   <table border="%border;" width="100%%"><tr><td align="center">
   <tr><td align="center">
     %apply;male_line("self", evar.v)
   </tr></tr></table>
 %elseif;(evar.t = "C")
-  %apply;display_arrows()
+  %apply;display_2arrows()
   <table border="%border;" width="100%%"><tr><td align="center">
   <tr><td align="center">
     %apply;female_line("self", evar.v)

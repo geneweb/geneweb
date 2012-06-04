@@ -1,5 +1,5 @@
-%define;template(file)
+%define;include_file(file)
   %include.file;
 %end;
 
-%apply;template("templx/ancsosa")
+%apply;include_file("templx/ancsosa")
