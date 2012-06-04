@@ -1,15 +1,6 @@
 <!-- sources -->
 
 %if;(has_sources or has_linked_page.BIBLIO)
-  <p>
-    %foreach;source;
-      - %source_type;: %source;<br%/>
-    %end;
-    %if;has_linked_page.BIBLIO; - bibliographie: %linked_page.BIBLIO;%end;
-  </p>
-%end;
-
-%if;(has_sources or has_linked_page.BIBLIO)
   <h3 class="highlight">[*source/sources]1</h3>
   <em>
     <ul>
