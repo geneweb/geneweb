@@ -460,19 +460,68 @@ value string_of_age conf a =
       else "0" ]
 ;
 
-value year_text d =
-  let s =
-    match d.prec with
-    [ Before -> "/"
-    | About | Maybe -> "ca "
-    | _ -> "" ]
-  in
-  let s = s ^ string_of_int d.year in
+
+(* ************************************************************************ *)
+(*  [Fonc] prec_text : Def.dmy -> string                                    *)
+(** [Description] : Renvoie la précision d'une date.
+    [Args] :
+      - d : Def.dmy
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value prec_text d =
   match d.prec with
-  [ After -> s ^ "/"
-  | OrYear x -> s ^ "/" ^ string_of_int x
-  | YearInt x -> s ^ "/" ^ string_of_int x
-  | _ -> s ]
+  [ About -> "ca"
+  | Maybe -> "?"
+  | Before -> "<"
+  | After -> ">"
+  | OrYear _ -> "|"
+  | YearInt _ -> ".."
+  | _ -> "" ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] day_text : Def.dmy -> string                                     *)
+(** [Description] : Renvoie le jour d'une date.
+    [Args] :
+      - d : Def.dmy
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value day_text d =
+  if d.day = 0 then ""
+  else string_of_int d.day
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] month_text : Def.dmy -> string                                   *)
+(** [Description] : Renvoie le mois d'une date.
+    [Args] :
+      - d : Def.dmy
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value month_text d =
+  if d.month = 0 then ""
+  else string_of_int d.month
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] year_text : Def.dmy -> string                                    *)
+(** [Description] : Renvoie l'année d'une date.
+    [Args] :
+      - d : Def.dmy
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value year_text d =
+  match d.prec with
+  [ OrYear x -> string_of_int d.year ^ "/" ^ string_of_int x
+  | YearInt x -> string_of_int d.year ^ "/" ^ string_of_int x
+  | _ -> string_of_int d.year ]
 ;
 
 value get_birth_death_date p =
