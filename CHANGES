@@ -26,11 +26,16 @@ GeneWeb version 6.05
   the homonyms in the list.
 * When searching for a surname, the more there is answers the more the result 
   will be displayed in many columns.
+* New template : annivmenu.txt. This page contains all the links related to
+  an anniversary (birth, marriage, death...)
+* Lifting of gwsetup. I hope the menu is a bit clearer.
+* Some modifications in perso.txt (modify menu ...)
 * Add the option -add_lexicon to dictionnaries.
 * Add the option -nopicture in order not to import picture of GEDCOM/GW.
 * Added the template of the 5.02 version (named templ502).
 * Update copyright
 * Update lex_utf8.txt.
+* Delete file README and INSTALL that pointed to an old documentation.
 * Various fixes.
 
 Dominique DERAM :
