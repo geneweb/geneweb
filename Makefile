@@ -105,7 +105,7 @@ new_distrib: classical_distrib
 	cp setup/gwsetup $(DESTDIR)/gw/gwsetup$(EXE)
 	cp LICENSE $(DESTDIR)/LICENSE.txt
 	cp etc/START.htm $(DESTDIR)/.
-	cp CHANGES $(DESTDIR)/.
+	cp CHANGES $(DESTDIR)/CHANGES.txt
 	echo "127.0.0.1" > $(DESTDIR)/gw/only.txt
 	echo "-setup_link" > $(DESTDIR)/gw/gwd.arg
 
