@@ -1039,6 +1039,34 @@ sk: pridať :a:
 sl: dodaj
 sv: lägg till
 
+    add base notes
+af: byvoeg notas
+bg: добавяне на бележки
+br: ouzhpennañ notennoù
+ca: afegir notes
+cs: přidat :a: poznámky
+da: tilføj noter
+de: hinzufügen Notizen
+en: add notes
+eo: aldoni :a: notoj:a:+n
+es: agregar notas
+et: lisa märkused:g:-id
+fi: lisää lisätietoja
+fr: saisir une chronique
+he:  הערות  הוספה
+is: bæta við athugasemdum
+it: aggiungere note
+lv: pievienot piezīme(s)
+nl: invoeren notities
+no: tilføy notater
+pl: dodaj :a: uwagi
+pt: acrescentar notas
+ro: adauga note
+ru: добавить :a: заметки
+sk: pridať :a: poznámky
+sl: dodaj zapiski
+sv: lägg till noteringar
+
     add picture
 af: byvoeg prent
 bg: добавяне на изображение

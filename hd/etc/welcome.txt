@@ -407,7 +407,7 @@ sv: <span class="highlight" style="margin-left:10px">genom
     %end;
     %if;(wizard and not base.has_notes)
       <li>
-        <a href="%prefix;m=MOD_NOTES">[*add::base notes]</a>
+        <a href="%prefix;m=MOD_NOTES">[*add base notes]</a>
       </li>
     %end;
   </ul>
