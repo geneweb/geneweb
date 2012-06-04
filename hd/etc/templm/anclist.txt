@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/05/02 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/04 geneweb-6.05 templ=templm -->
   <title>%nn;
     %if;(evar.t = "F" and evar.opt = "csv")
       CSV
@@ -532,7 +532,7 @@
     <th><abbr title="[birth] [marriage/marriages]0 [death]">o&amp;%death_symbol;</abbr></th>
     <th>[person/persons]0</th>
     <th>[relationship]0</th>
-    <th>[occupation]0</th>
+    <th>[occupation/occupations]0</th>
   </tr>
     %reset_count;
     %foreach;sorted_list_item;
