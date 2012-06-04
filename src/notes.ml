@@ -352,8 +352,7 @@ value print_mod conf base =
     | None -> "" ]
   in
   let title _ =
-    let s = transl_nth conf "note/notes" 1 in
-    Wserver.wprint "%s - %s%s" (capitale (transl_decline conf "modify" s))
+    Wserver.wprint "%s - %s%s" (capitale (transl conf "base notes"))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let (env, s) = read_notes base fnotes in
