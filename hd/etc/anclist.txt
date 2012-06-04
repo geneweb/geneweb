@@ -134,7 +134,7 @@
     %else;%ancestor.surname_end;%ancestor.surname_begin;%end;
     %if;(ancestor.nb_times > 1) (%ancestor.nb_times;)%end;
     ; %ancestor.place;
-    ; %ancestor.date_begin.year;-%ancestor.date_end.year;</li>
+    ; %ancestor.date_begin.prec;%ancestor.date_begin.year; - %ancestor.date_end.prec;%ancestor.date_end.year;</li>
   %end;
   </ul>
 %end;

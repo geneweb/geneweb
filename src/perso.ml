@@ -2175,7 +2175,19 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   | _ -> raise Not_found ]
 and eval_date_field_var d =
   fun
-  [ ["year"] ->
+  [ ["prec"] ->
+      match d with
+      [ Dgreg dmy  _ -> VVstring (Date.prec_text dmy)
+      | _ -> VVstring "" ]
+  | ["day"] ->
+      match d with
+      [ Dgreg dmy _ -> VVstring (Date.day_text dmy)
+      | _ -> VVstring "" ]
+  | ["month"] ->
+      match d with
+      [ Dgreg dmy _ -> VVstring (Date.month_text dmy)
+      | _ -> VVstring "" ]
+  | ["year"] ->
       match d with
       [ Dgreg dmy _ -> VVstring (Date.year_text dmy)
       | _ -> VVstring "" ]
