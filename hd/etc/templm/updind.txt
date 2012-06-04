@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updind.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/04/02 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/04 geneweb-6.05 templ=templm -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -557,7 +557,7 @@
     %end;
   </p>
   <p class="modify_person">
-          <label>[*occupation] (P)<input name="occu" size="40" maxlength="200" value="%occupation;" id="occu" accesskey="P" title="[occupation] (P)"%/></label>%nn;
+          <label>[*occupation/occupations]0 (P)<input name="occu" size="40" maxlength="200" value="%occupation;" id="occu" accesskey="P" title="[occupation/occupations] (P)"%/></label>%nn;
     <br%/><label>[*source/sources]0<input name="src" size="40" maxlength="300"%sp; value="%sources;"%sp;id="src"%/></label>%nn;
     <br%/><label>[*image/images]0<input name="image" size="30" value="%image;" id="image"%/></label>%nn;
     <br%/>

@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/05/02 geneweb-6.04 templ=templm --> 
+  <!-- Modified mickroue(a)yahoo.fr 2012/05/17 geneweb-6.04 templ=templm --> 
   <title>%first_name; %surname;</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -530,13 +530,17 @@
     %end;
   %end;
   
-  %define;max_evar_v(xx,vv)
-    %if;(max_xx_level < vv)%max_xx_level;%else;vv%end;%nn;
+  %define;max_anc_v(vv)
+    %if;(max_anc_level + 1 < vv)%expr(max_anc_level + 1)%else;vv%end;%nn;
   %end;
 
-%define;nav_with_sosa_ref(xx)
-  [*navigation with %t as Sosa reference:::xx]
-%end;
+  %define;max_desc_v(vv)
+    %if;(max_desc_level < vv)%max_desc_level;%else;vv%end;%nn;
+  %end;
+  
+  %define;nav_with_sosa_ref(xx)
+    [*navigation with %t as Sosa reference:::xx]
+  %end;
 
 %( <!-- End define --> %)
 
@@ -568,11 +572,11 @@
             %end;
           %end; [*ancestors]</a>
           <span class="s_menu">
-            <a href="%prefix;m=A;t=T;v=%apply;max_evar_v("anc",5);image=on;marriage=on;%access;">[*tree]</a>
+            <a href="%prefix;m=A;t=T;v=%apply;max_anc_v(5);image=on;marriage=on;%access;">[*tree]</a>
             <a href="%prefix;m=A;t=F;v=%expr(max_anc_level+1);i=%index;">[*surnames list]</a>
-            <a href="%prefix;m=A;t=F;v=%apply;max_evar_v("anc",5);%access;;opt=fam;cousins=on">[*family/families]0</a>
-            <a href="%prefix;m=A;t=N;v=%apply;max_evar_v("anc",8);%access;">[*short display]</a>
-            <a href="%prefix;m=A;t=G;v=%apply;max_evar_v("anc",5);siblings=on;spouse=on;parents=on;alias=on;rel=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=A;t=F;v=%apply;max_anc_v(5);%access;;opt=fam;cousins=on">[*family/families]0</a>
+            <a href="%prefix;m=A;t=N;v=%apply;max_anc_v(8);%access;">[*short display]</a>
+            <a href="%prefix;m=A;t=G;v=%apply;max_anc_v(5);siblings=on;spouse=on;parents=on;alias=on;rel=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;
@@ -584,9 +588,9 @@
              %end;
           %end; [*descendants]</a>
           <span class="s_menu">
-            <a href="%prefix;m=D;t=T;v=%apply;max_evar_v("desc",4);image=on;%access">[*tree]</a>
+            <a href="%prefix;m=D;t=T;v=%apply;max_desc_v(4);image=on;%access">[*tree]</a>
             <a href="%prefix;m=D;t=A;v=%max_desc_level;;%access">d’Aboville</a>
-            <a href="%prefix;m=D;t=L;v=%apply;max_evar_v("desc",2);alwsurn=yes;alias=on;rel=on;spouse=on;parents=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=D;t=L;v=%apply;max_desc_v(3);alwsurn=yes;alias=on;rel=on;spouse=on;parents=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;
@@ -1043,20 +1047,20 @@
       %if;has_parents;
         <span><a href="%prefix;m=A;%access;">[*ancestors]</a>
           <span class="s_menu">
-            <a href="%prefix;m=A;t=T;v=%apply;max_evar_v("anc",5);image=on;marriage=on;%access;">[*tree]</a>
+            <a href="%prefix;m=A;t=T;v=%apply;max_anc_v(5);image=on;marriage=on;%access;">[*tree]</a>
             <a href="%prefix;m=A;t=F;v=%expr(max_anc_level+1);i=%index;">[*surnames list]</a>
-            <a href="%prefix;m=A;t=F;v=%apply;max_evar_v("anc",5);%access;;opt=fam;cousins=on">[*family/families]0</a>
-            <a href="%prefix;m=A;t=N;v=%apply;max_evar_v("anc",8);%access;">[*short display]</a>
-            <a href="%prefix;m=A;t=G;v=%apply;max_evar_v("anc",5);siblings=on;spouse=on;parents=on;alias=on;rel=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=A;t=F;v=%apply;max_anc_v(5);%access;;opt=fam;cousins=on">[*family/families]0</a>
+            <a href="%prefix;m=A;t=N;v=%apply;max_anc_v(8);%access;">[*short display]</a>
+            <a href="%prefix;m=A;t=G;v=%apply;max_anc_v(5);siblings=on;spouse=on;parents=on;alias=on;rel=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;
       %if;has_children;
         <span><a href="%prefix;m=D;%access;">[*descendants]</a>
           <span class="s_menu">
-            <a href="%prefix;m=D;t=T;v=%apply;max_evar_v("desc",4);image=on;%access">[*tree]</a>
+            <a href="%prefix;m=D;t=T;v=%apply;max_desc_v(4);image=on;%access">[*tree]</a>
             <a href="%prefix;m=D;t=A;v=%max_desc_level;;%access">d’Aboville</a>
-            <a href="%prefix;m=D;t=L;v=%apply;max_evar_v("desc",2);alwsurn=yes;alias=on;rel=on;spouse=on;parents=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=D;t=L;v=%apply;max_desc_v(3);alwsurn=yes;alias=on;rel=on;spouse=on;parents=on;witn=on;comm=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;
