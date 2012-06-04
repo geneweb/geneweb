@@ -1,0 +1,13 @@
+﻿%( Template sources v 6.05d 2012/06/02 12:00:00 ddr/dd %)
+%if;(has_sources or has_linked_page.BIBLIO)
+  %if;has_sources;
+    <p>
+    <em style="font-size:80%%">[*source/sources]1:<br%/>
+    %foreach;source;
+      - %source_type;: %source;<br%/>
+    %end;
+    </em>
+    </p>
+  %end;
+  %if;has_linked_page.BIBLIO;<p>%apply;capitalize(linked_page.BIBLIO).</p>%end;
+%end;

@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anclist.txt, Template x v 6.05c 2012/05/16 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anclist.txt, Template x v 6.05d 2012/06/02 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames list] -%nn;
@@ -58,7 +58,7 @@
   %sp;
 %end;
 
-%define;display_arrows()
+%define;display_2arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
@@ -82,7 +82,7 @@
   [*to the %s generation:::xx]%nn;
 %end;
 
-%define;togen(xx)
+%define;togena(xx)
   %if;(xx = 1)[*specify::generation/generations]0%nn;
   %elseif;(xx = 2)[*to the parents]%nn;
   %elseif;(xx = 3)[*to the grandparents]%nn;
@@ -147,7 +147,7 @@
   %end;
 </h1>
 
-%apply;display_arrows()
+%apply;display_2arrows()
 
 %if;(evar.t = "L")
   %( by list %)
@@ -156,7 +156,7 @@
     %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
   %in;
   <p>
-  %apply;togen(xx).
+  %apply;togena(xx).
   </p>
   %apply;ancestors_by_list("self", xx)
 %elseif;(evar.t = "H")
@@ -166,7 +166,7 @@
     %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
   %in;
   <p>
-  %apply;togen(xx).
+  %apply;togena(xx).
   </p>
   <table><tr><td style="white-space:nowrap">
     %apply;ancestors_horizontally(
