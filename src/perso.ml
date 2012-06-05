@@ -919,15 +919,6 @@ value tree_generation_list conf base gv p =
   enrich_tree gen
 ;
 
-value string_of_place conf base istr =
-  (* Astuce temporaire pour supprimer les crochets dans un lieu-dit  *)
-  (* A l'avenir, il faudra revoir comment sont implémentés les lieux *)
-    List.fold_left
-      (fun s c -> Name.strip_c s c)
-      (string_with_macros conf [] (sou base istr))
-      [ '[' ; ']' ]
-;
-
 (* Ancestors surnames list *)
 
 value get_date_place conf base auth_for_all_anc p =
@@ -1589,7 +1580,8 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "marriage_place" ->
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
-          if m_auth then string_of_place conf base (get_marriage_place fam)
+          if m_auth then 
+            Util.string_of_place conf (sou base (get_marriage_place fam))
           else ""
       | _ -> raise Not_found ]
   | "max_anc_level" ->
@@ -2015,7 +2007,7 @@ and eval_anc_by_surnl_field_var conf base env ep
       [ Some d -> eval_date_field_var d sl
       | None -> VVstring "" ]
   | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
-  | ["place"] -> VVstring (string_with_macros conf [] place)
+  | ["place"] -> VVstring (Util.string_of_place conf place)
   | ["sosa_access"] ->
       let (str, _) =
         List.fold_right
@@ -2375,11 +2367,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       [ Some s when p_auth -> s
       | _ -> "" ]
   | "birth_place" ->
-      if p_auth then string_of_place conf base (get_birth_place p) else ""
+      if p_auth then Util.string_of_place conf (sou base (get_birth_place p))
+      else ""
   | "baptism_place" ->
-      if p_auth then string_of_place conf base (get_baptism_place p) else ""
+      if p_auth then Util.string_of_place conf (sou base (get_baptism_place p))
+      else ""
   | "burial_place" ->
-      if p_auth then string_of_place conf base (get_burial_place p) else ""
+      if p_auth then Util.string_of_place conf (sou base(get_burial_place p))
+      else ""
   | "child_name" ->
       let force_surname =
         match get_parents p with
@@ -2397,7 +2392,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           (round_2_dec (Adef.float_of_fix (get_consang p) *. 100.0)) ^ "%"
       else ""
   | "cremation_place" ->
-      if p_auth then string_of_place conf base (get_burial_place p) else ""
+      if p_auth then Util.string_of_place conf (sou base (get_burial_place p))
+      else ""
   | "dates" ->
       if p_auth then Date.short_dates_text conf base p else ""
   | "death_age" ->
@@ -2415,7 +2411,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
         | _ -> "" ]
       else ""
   | "death_place" ->
-      if p_auth then string_of_place conf base (get_death_place p) else ""
+      if p_auth then Util.string_of_place conf (sou base (get_death_place p))
+      else ""
   | "died" -> string_of_died conf base env p p_auth
   | "fam_access" ->
       (* deprecated since 5.00: rather use "i=%family.index;;ip=%index;" *)

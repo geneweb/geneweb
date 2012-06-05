@@ -103,6 +103,7 @@ value copy_from_etc :
   list (char * unit -> string) -> string -> string -> in_channel -> unit;
 value string_with_macros :
   config -> list (char * unit -> string) -> string -> string;
+value string_of_place : config -> string -> string;
 value filter_html_tags : string -> string;
 value allowed_tags_file : ref string;
 value body_prop : config -> string;
