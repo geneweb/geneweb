@@ -6873,6 +6873,10 @@ en: continue edit
 es: ¿Quiere hacer una nueva corrección?
 fr: cliquez ici pour effectuer une nouvelle correction
 
+    next relationship path
+en: next relationship path
+fr: chemin suivant
+
     next sibling
 af: volgende broer/volgende suster/volgende broer of suster
 bg: следващ брат/следваща сестра/следващ брат или следваща сестра
