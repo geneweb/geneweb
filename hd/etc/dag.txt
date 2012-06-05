@@ -93,6 +93,12 @@
     "><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
        notab=on;slices=on" accesskey="/"><tt>//</tt></a></div>
   %end;
+  %if;(link_next != "")
+    <p>
+      <img src="%image_prefix;/picto_parente.png" alt="&gt;&gt;" %/>
+      <a href="%link_next;" accesskey=">">[*next relationship path]</a>%nl;
+    </p>
+  %end;
   %if;(evar.notab = "on" or evar.pos2 != "")
     %let;dpos;%if;(evar.dpos != "")%evar.dpos;%else;78%end;%in;
     %let;pos1;%if;(evar.pos1 != "")%evar.pos1;%else;0%end;%in;
@@ -162,11 +168,6 @@
     %end;
     </table>
     </td></tr></table>
-  %end;
-  %if;(link_next != "")
-    <p>
-    <a href="%link_next;" accesskey=">">&gt;&gt;</a>%nl;
-    </p>
   %end;
 %end;
 
