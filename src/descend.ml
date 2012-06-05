@@ -782,9 +782,11 @@ value print_person_table conf base p lab = do {
     if p_getenv conf.env "birth_place" = Some "on" then
       tag "td" begin
         if get_birth p <> Adef.codate_None then
-          Wserver.wprint "%s" (sou base (get_birth_place p))
+          Wserver.wprint "%s" 
+            (Util.string_of_place conf (sou base (get_birth_place p)))
         else
-          Wserver.wprint "%s" (sou base (get_baptism_place p));
+          Wserver.wprint "%s" 
+            (Util.string_of_place conf (sou base (get_baptism_place p)));
       end
     else ();
     if p_getenv conf.env "marr" = Some "on" then
@@ -831,7 +833,8 @@ value print_person_table conf base p lab = do {
         let u = p in
         for i = 0 to Array.length (get_family u) - 1 do {
           let fam = foi base (get_family u).(i) in
-          Wserver.wprint "%s" (sou base (get_marriage_place fam));
+          Wserver.wprint "%s" 
+            (Util.string_of_place conf (sou base (get_marriage_place fam)));
           xtag "br"
         };
       end
@@ -860,13 +863,13 @@ value print_person_table conf base p lab = do {
         let d =
         match get_death p with
         [ Death _ d -> 
-            sou base (get_death_place p)
+            Util.string_of_place conf (sou base (get_death_place p))
         | _ -> 
             match get_burial p with
             [ Cremated cod | Buried cod -> 
                 match Adef.od_of_codate cod with
                 [ Some d ->
-                    sou base (get_burial_place p)
+                    Util.string_of_place conf (sou base (get_burial_place p))
                 | _ -> "" ]
             | _ -> "" ] ]
         in

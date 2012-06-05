@@ -1569,6 +1569,27 @@ value string_with_macros conf env s =
     else filter_html_tags (Buffer.contents buff)
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] string_of_place : config -> string -> string                   *)
+(** [Description] : Astuce temporaire pour supprimer les crochets dans 
+                    un lieu-dit. A l'avenir, il faudra revoir comment sont 
+                    implémentés les lieux.
+    [Args] :
+      - conf  : configuration de la base
+      - place : lieu dont on veut supprimer les crochets
+    [Retour] :
+      - string : lieu sans les crochets du lieu-dit.
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
+value string_of_place conf place =
+  List.fold_left
+    (fun s c -> Name.strip_c s c)
+    (string_with_macros conf [] place)
+    [ '[' ; ']' ]
+;
+
+
 type xhtml_tag =
   [ Btag of string and string
   | Etag of string
