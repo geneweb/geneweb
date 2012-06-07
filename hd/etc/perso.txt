@@ -396,6 +396,6 @@
 %base_trailer;
 %copyright;
 
-</div> (% the magic Safari div %)
+</div> %( the magic Safari div %)
 </body>
 </html>
