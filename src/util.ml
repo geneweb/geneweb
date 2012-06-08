@@ -617,6 +617,22 @@ value is_public conf base p =
   is_old_person conf (gen_person_of_person p)
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] accessible_by_key : 
+             config -> base -> person -> string -> string -> bool         *)
+(** [Description] : Vrai si la personne est accessible par sa clé, 
+                    Faux sinon.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+      - fn   : prénom de la personne
+      - sn   : patronyme de la personne
+    [Retour] :
+      - bool : Vrai si la personne est accessible par sa clé, faux sinon.
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value accessible_by_key conf base p fn sn =
   conf.access_by_key
   && not (fn = "?" || sn = "?")
@@ -624,15 +640,30 @@ value accessible_by_key conf base p fn sn =
       || conf.friend || conf.wizard)
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] acces_n : config -> base -> string -> person -> string         *)
+(** [Description] : Renvoie les paramètres URL pour l'accès à la nième
+                    personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - n    : la nième personne (e.g. : calcul de parenté entre p1 et p2)
+      - p    : person
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
   if surname = "" then ""
+  (* pX=fn;nX=sn;ocX=occ *)
   else if accessible_by_key conf base x first_name surname then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
       (if get_occ x > 0 then ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
        else "")
+  (* iX=index;ocX=occ *)
   else
     "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_key_index x)) ^
     (if conf.wizard && get_occ x > 0 then
@@ -640,6 +671,17 @@ value acces_n conf base n x =
      else "")
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] acces_n : config -> base -> person -> string                   *)
+(** [Description] : Renvoie les paramètres URL pour l'accès à la personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value acces conf base x = acces_n conf base "" x;
 
 type p_access = (base -> person -> string * base -> person -> string);
