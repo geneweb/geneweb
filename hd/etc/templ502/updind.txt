@@ -157,7 +157,7 @@ function changeCalendar(e,v,m,c) {
   <tr>
   <td>xlab</td>
   <td>
-    %if;([ !dates order]0 = "ddmmyy")
+    %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
       <label>[year/month/day]2
       <input name="xvar_dd" size="2" maxlength="2"%sp;
        value="%xdt.day;"xcond%/></label>
