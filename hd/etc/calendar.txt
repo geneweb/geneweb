@@ -29,13 +29,13 @@
 
 <h1>[*calendar/calendars]1</h1>
 
-%define;day(ccc, nnn)
+%define;fun_day(ccc, nnn)
   <td><input type="submit" name="dccc1" value=" &lt; "%/></td>
   <td><input name="dccc" size="2" maxlength="2" value="%date.nnn.day;"%/></td>
   <td><input type="submit" name="dccc2" value=" &gt; "%/></td>
 %end;
 
-%define;month(ccc, nnn, vvv, lll)
+%define;fun_month(ccc, nnn, vvv, lll)
   <td><input type="submit" name="mccc1" value=" &lt; "%/></td>
   <td align="center">
     <select name="mccc">
@@ -50,13 +50,13 @@
   <td><input type="submit" name="mccc2" value=" &gt; "%/></td>
 %end;
 
-%define;year(ccc, nnn)
+%define;fun_year(ccc, nnn)
   <td><input type="submit" name="yccc1" value=" &lt; "%/></td>
   <td><input name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
   <td><input type="submit" name="yccc2" value=" &gt; "%/></td>
 %end;
 
-%define;julian_year(ccc, nnn)
+%define;fun_julian_year(ccc, nnn)
   %let;year;
     %if;(date.julian.month < 3 or
          date.julian.month = 3 and date.julian.day < 25)
@@ -68,15 +68,15 @@
   <td><input type="submit" name="yccc2" value=" &gt; "%/></td>
 %end;
 
-%define;calendar(ccc, nnn, vvv, lll, yyy)
-  %if;([ !dates order] = "ddmmyy")
-    %apply;day("ccc", "nnn")
-    %apply;month("ccc", "nnn", "vvv", "lll")
-    %apply;yyy("ccc", "nnn")
+%define;calendar(ccc, nnn, vvv, lll, fun_yyy)
+  %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+    %apply;fun_day("ccc", "nnn")
+    %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_yyy("ccc", "nnn")
   %else;
-    %apply;yyy("ccc", "nnn")
-    %apply;month("ccc", "nnn", "vvv", "lll")
-    %apply;day("ccc", "nnn")
+    %apply;fun_yyy("ccc", "nnn")
+    %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_day("ccc", "nnn")
   %end;
   <td><input type="submit" name="tccc" value=" = "%/></td>
 %end;
@@ -101,7 +101,7 @@
   <table border="1">
   <tr align="%left;">
   <td>&nbsp;</td>
-  %if;([ !dates order] = "ddmmyy")
+  %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
     <th align="center" colspan="3">[*year/month/day]2</th>
     <th align="center" colspan="3">[*year/month/day]1</th>
     <th align="center" colspan="3">[*year/month/day]0</th>
@@ -114,19 +114,19 @@
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]0</th>
-  %apply;calendar("g", "gregorian", 12, [(month)], "year")
+  %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]1</th>
-  %apply;calendar("j", "julian", 12, [(month)], "julian_year")
+  %apply;calendar("j", "julian", 12, [(month)], "fun_julian_year")
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]2</th>
-  %apply;calendar("f", "french", 13, [(french revolution month)], "year")
+  %apply;calendar("f", "french", 13, [(french revolution month)], "fun_year")
   </tr>
   <tr align="%left;">
   <th>[*gregorian/julian/french/hebrew]3</th>
-  %apply;calendar("h", "hebrew", 13, [(hebrew month)], "year")
+  %apply;calendar("h", "hebrew", 13, [(hebrew month)], "fun_year")
   </tr>
   </table>
   </form>
