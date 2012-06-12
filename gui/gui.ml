@@ -215,6 +215,35 @@ value rm_base dir =
   | _ -> () ]
 ;
 
+value error_popup msg = do {
+  let wnd = GWindow.window 
+    ~title:"error"
+    ~position:`CENTER 
+    ~resizable:True 
+    ~width:300 ~height:150 () 
+  in 
+  wnd#connect#destroy ~callback:(fun _ -> ());
+  let vbox = GPack.vbox
+    ~spacing:5
+    ~packing:wnd#add ()
+  in
+  GMisc.label
+    ~text:msg
+    ~packing:vbox#pack ();
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
+  in
+  let btn_ok = GButton.button
+    ~label:(transl "OK")
+    ~packing:hbox#pack () 
+  in
+  ignore 
+    (btn_ok#connect#clicked 
+       (fun () -> vbox#destroy ()) );
+  wnd#show();
+};
+
 value clean_database conf bname = do {
   (* save *)
   let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
@@ -222,9 +251,7 @@ value clean_database conf bname = do {
     Filename.concat conf.bin_dir "gwu" ^ " " ^ base ^ " -o tmp.gw" 
   in
   let rc = Sys.command c in
-  if rc > 1 then 
-    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
-    print_endline c
+  if rc > 1 then error_popup c
   else ();
   (* create *)
   (* Il faut regarder si la base était en gwc1 ou 2 pour appeler le même *)
@@ -232,51 +259,34 @@ value clean_database conf bname = do {
     Filename.concat conf.bin_dir "gwc" ^ " tmp.gw -f -o " ^ base ^ " > comm.log "
   in
   let rc = Sys.command c in
-  if rc > 1 then 
-    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
-    print_endline c
+  if rc > 1 then error_popup c
   else ();
 };
 
-value update_nldb conf bname = ()
-(*
-  let rc =
-    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
-    exec_f (comm ^ parameters conf.env)
-  in
-  do {
-    eprintf "\n";
-    flush stderr;
-    if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
-  }
-*)
-;
-
-value consang conf ok_file = ()
-(*
-  let rc =
-    let comm = stringify (Filename.concat bin_dir.val conf.comm) in
-    exec_f (comm ^ parameters conf.env)
-  in
-  do {
-    eprintf "\n";
-    flush stderr;
-    if rc > 1 then print_file conf "bsi_err.htm" else print_file conf ok_file
-  }
-*)
-;
-
-value consang conf bname parameters = do {
+value update_nldb conf bname = 
   let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
   let c = 
-    Filename.concat conf.bin_dir "consang" ^ " " ^ base ^ " > comm.log"
+    Filename.concat conf.bin_dir "update_nldb" ^ " " ^ base
   in
   let rc = Sys.command c in
-  if rc > 1 then
-    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
-    print_endline c
-  else ();
-};
+  if rc > 1 then error_popup c
+  else ()
+;
+
+value delete_base conf bname = 
+  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
+  rm_base base
+;
+
+value consang conf bname =
+  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
+  let c = 
+    Filename.concat conf.bin_dir "consang" ^ " -i " ^ base
+  in
+  let rc = Sys.command c in
+  if rc > 1 then error_popup c
+  else ()
+;
 
 value merge conf bnames bname parameters = do {
   (* tester quel gwc *)
@@ -287,10 +297,8 @@ value merge conf bnames bname parameters = do {
         Filename.concat conf.bin_dir "gwu" ^ " " ^ bname ^ " -o " ^ bname ^ ".gw"
       in
       let rc = Sys.command c in
-      if rc > 1 then
-        (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
-        print_endline c
-      else () )
+      if rc > 1 then error_popup c
+      else ())
     bnames;
   let old_bases = 
     List.fold_left 
@@ -302,9 +310,7 @@ value merge conf bnames bname parameters = do {
     Filename.concat conf.bin_dir "gwc" ^ old_bases ^ " -f -o " ^ bname
   in 
   let rc = Sys.command c in
-  if rc > 1 then
-    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
-    print_endline c
+  if rc > 1 then error_popup c
   else ();
 };
 
@@ -314,9 +320,7 @@ value save_to_ged conf bname fname = do {
     Filename.concat conf.bin_dir "gwb2ged" ^ bname ^ " -o " ^ fname ^ ".ged"
   in 
   let rc = Sys.command c in
-  if rc > 1 then
-    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
-    print_endline c
+  if rc > 1 then error_popup c
   else ();
 };
 
@@ -326,9 +330,7 @@ value save_to_gw conf bname fname = do {
     Filename.concat conf.bin_dir "gwu" ^ bname ^ " -o " ^ fname ^ ".gw"
   in 
   let rc = Sys.command c in
-  if rc > 1 then
-    (* Ouvrir une fenêtre pop-up pour dire que la sauvegarde a échouée *)
-    print_endline c
+  if rc > 1 then error_popup c
   else ();
 };
 
@@ -355,7 +357,8 @@ value main_window = do {
     ~title:("GeneWeb - " ^ Version.txt)
     ~position:`CENTER 
     ~resizable:True 
-    ~width:640 ~height:480 () in 
+    ~width:640 ~height:480 () 
+  in 
   wnd#connect#destroy ~callback:GMain.quit; 
   wnd 
 };
@@ -861,14 +864,14 @@ and tools conf bname = do {
   in
   ignore 
     (bbut#connect#clicked 
-      (fun () -> ()));
+      (fun () -> consang conf bname));
   let bbut = GButton.button
     ~label:(transl "Update_nldb")
     ~packing:hbox#pack () 
   in
   ignore 
     (bbut#connect#clicked 
-      (fun () -> ()));
+      (fun () -> update_nldb conf bname));
   let hbox_valid = GPack.hbox
     ~spacing:5
     ~packing:vbox#pack ()
