@@ -556,7 +556,7 @@ value short_dates_text conf base p =
     let s = "" in
     let s =
       match birth_date with
-      [ Some (Dgreg d _) -> s ^ year_text d
+      [ Some (Dgreg d _) -> s ^ prec_text ^ year_text d
       | _ -> s ]
     in
     let s =
@@ -572,7 +572,7 @@ value short_dates_text conf base p =
     in
     let s =
       match death_date with
-      [ Some (Dgreg d _) -> s ^ year_text d
+      [ Some (Dgreg d _) -> s ^ prec_text ^ year_text d
       | _ -> s ]
     in
     if s <> "" then " <em><bdo dir=\"ltr\">" ^ s ^ "</bdo></em>" else s
@@ -583,7 +583,7 @@ value short_marriage_date_text conf base fam p1 p2 =
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_codate (get_marriage fam) with
     [ Some (Dgreg d _) ->
-        "<span style=\"font-size:70%\">" ^ year_text d ^ "</span>"
+        "<span style=\"font-size:70%\">" ^ prec_text ^ year_text d ^ "</span>"
     | _ -> "" ]
   else ""
 ;
