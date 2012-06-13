@@ -499,12 +499,12 @@ value get_sosa_person conf base p =
 value get_single_sosa conf base p =
   let sosa_ref = Util.find_sosa_ref conf base in
   match sosa_ref with
-  [ Some p -> 
+  [ Some p_sosa -> 
       let sosa_ref_l =
         let sosa_ref () = sosa_ref in
         Lazy.lazy_from_fun sosa_ref
       in
-      let t_sosa = init_sosa_t conf base p in
+      let t_sosa = init_sosa_t conf base p_sosa in
       match find_sosa conf base p sosa_ref_l t_sosa with
       [ Some (z, p) -> z 
       | None -> Num.zero ]
