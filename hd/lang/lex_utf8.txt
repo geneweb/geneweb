@@ -6579,6 +6579,34 @@ ru: изменить :a: картинку
 sl: spremeni slika
 sv: ändra bild
 
+    modify places
+af: wysig
+bg: да се променят
+br: kemmañ
+ca: modificar
+cs: změnit :a:
+da: ændre
+de: ändern +before
+en: edit
+eo: modifi :a:
+es: modificar
+et: muuda :g:
+fi: muokkaa
+fr: modifier
+he:  לשנות
+is: breyta
+it: modificare
+lv: izmainīt
+nl: wijzigen +before
+no: endre
+pl: zaktualizuj :a:
+pt: modificar
+ro: modifica
+ru: изменить :a:
+sk: zmeniť :a:
+sl: spremeni
+sv: ändra
+
     months old
 af: maande oud
 bg: месеца
