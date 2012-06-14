@@ -704,7 +704,7 @@ value print_place conf base list len =
                           (commd conf) k (code_varenv ini)
                         begin
                           Wserver.wprint "%s" 
-                            (capitale (Util.transl_decline conf "modify" ""));
+                            (capitale (Util.transl_decline conf "modify places" ""));
                         end;
                       end; } 
                     else do { 
