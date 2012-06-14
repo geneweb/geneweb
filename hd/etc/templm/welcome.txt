@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/04/12 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/06 geneweb-6.05 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>

@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updind.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/06/04 geneweb-6.05 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/12 geneweb-6.05 templ=templm -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -195,7 +195,7 @@
         <option value="F"%if;(xdate.calendar = "french") selected="selected"%end;>[*gregorian/julian/french/hebrew]2</option>
         <option value="H"%if;(xdate.calendar = "hebrew") selected="selected"%end;>[*gregorian/julian/french/hebrew]3</option>
       </select>
-      %if;([ !dates order]0 = "ddmmyy")
+      %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
         <label %apply;accesskey("xvar")>xlab
           <input id="xvar_d1" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
            value="%xdate.day;" onkeypress="javascript:return changeFocus(event,'xvar_d2');"%/></label>

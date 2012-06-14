@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/06/04 geneweb-6.05 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/14 geneweb-6.05 templ=templm -->
   <title>%nn;
     %if;(evar.t = "F" and evar.opt = "csv")
       CSV
@@ -63,7 +63,7 @@
   %end;
 </h1>
 
-%if;not cancel_links;
+%if;(not cancel_links and evar.opt != "csv")
   <div class="menu2">
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>
@@ -126,9 +126,11 @@
 
 %define;csv_line2()
           ;%family_cnt;
-          ;%on_marriage_date;
+          ;%marriage_date.prec;
+          ;%marriage_date.year;
+          ;%marriage_date.month;
+          ;%marriage_date.day;
           ;%marriage_place;
-          ;%has_linked_page.MARRIAGEA;
           ;%spouse.first_name;
           ;%spouse.surname;
           ;%spouse.first_name_key_val;
@@ -149,12 +151,16 @@
           ;%consanguinity;
           ;%first_name;
           ;%surname;
-          ;%on_birth_date;
+          ;%birth_date.prec;
+          ;%birth_date.year;
+          ;%birth_date.month;
+          ;%birth_date.day;
           ;%birth_place;
-          ;%has_linked_page.BIRTHA;
-          ;%on_death_date;
+          ;%death_date.prec;
+          ;%death_date.year;
+          ;%death_date.month;
+          ;%death_date.day;
           ;%death_place;
-          ;%has_linked_page.DEATHA;
           ;%father.first_name;
           ;%father.surname;
           ;%father_age_at_birth;
@@ -177,12 +183,16 @@
           ;%consanguinity;
           ;%xx.first_name;
           ;%xx.surname;
-          ;%xx.on_birth_date;
+          ;%birth_date.prec;
+          ;%birth_date.year;
+          ;%birth_date.month;
+          ;%birth_date.day;
           ;%xx.birth_place;
-          ;%xx.has_linked_page.BIRTHA;
-          ;%xx.on_death_date;
+          ;%death_date.prec;
+          ;%death_date.year;
+          ;%death_date.month;
+          ;%death_date.day;
           ;%xx.death_place;
-          ;%xx.has_linked_page.DEATHA;
           ;%xx.father.first_name;
           ;%xx.father.surname;
           ;%nn;
@@ -190,9 +200,11 @@
           ;%xx.mother.surname;
           ;%nn;
           ;%family_cnt;
-          ;%on_marriage_date;
+          ;%marriage_date.prec;
+          ;%marriage_date.year;
+          ;%marriage_date.month;
+          ;%marriage_date.day;
           ;%marriage_place;
-          ;%has_linked_page.MARRIAGEA;
           ;%first_name;
           ;%surname;
           ;%first_name_key_val;
@@ -228,7 +240,7 @@
 %define;ld_somebody1(bbb,ddd,xx,yy,lexa,lexb,sss,ttt)
   %apply;add_in_sorted_list%with;
     %if;(xx.yy_date.year >= 0)
-      %xx.yy_date.year;%nn;
+      %xx.yy_date.year;%if;(xx.yy_date.month < 10)0%end;%xx.yy_date.month;%if;(xx.yy_date.day < 10)0%end;%xx.yy_date.day;
     %else;
       9999%xx.yy_date.year;%nn;
     %end;
@@ -572,12 +584,16 @@
   ;[consanguinity]%nn;
   ;[first name/first names]0%nn;
   ;[surname/surnames]0%nn;
-  ;[birth]_[date]%nn;
+  ;[birth]_[precision]%nn;
+  ;[birth]_[year/month/day]0%nn;
+  ;[birth]_[year/month/day]1%nn;
+  ;[birth]_[year/month/day]2%nn;
   ;[birth]_[place]%nn;
-  ;BIRTHA%nn;
-  ;[death]_[date]%nn;
+  ;[death]_[precision]%nn;
+  ;[death]_[year/month/day]0%nn;
+  ;[death]_[year/month/day]1%nn;
+  ;[death]_[year/month/day]2%nn;
   ;[death]_[place]%nn;
-  ;DEATHA%nn;
   ;[father/mother]0_[first name/first names]0%nn;
   ;[father/mother]0_[surname/surnames]0%nn;
   ;[father/mother]0_[age]%nn;
@@ -585,9 +601,11 @@
   ;[father/mother]1_[surname/surnames]0%nn;
   ;[father/mother]1_[age]%nn;
   ;[family/families]0_[number]%nn;
-  ;[marriage/marriages]0_[date]%nn;
+  ;[marriage/marriages]0_[precision]%nn;
+  ;[marriage/marriages]0_[year/month/day]0%nn;
+  ;[marriage/marriages]0_[year/month/day]1%nn;
+  ;[marriage/marriages]0_[year/month/day]2%nn;
   ;[marriage/marriages]0_[place]%nn;
-  ;MARRIAGEA%nn;
   ;[marriage/marriages]0_[first name/first names]0%nn;
   ;[marriage/marriages]0_[surname/surnames]0%nn;
   ;[marriage/marriages]0_first_name_key_val%nn;
@@ -650,7 +668,10 @@
   %end;
   </ul>
 %end;
+
+%if;(evar.opt != "csv")
   %base_trailer;
   %copyright;
+%end;
 </body>
 </html>
