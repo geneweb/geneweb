@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/05/17 geneweb-6.04 templ=templm --> 
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/07 geneweb-6.05 templ=templm --> 
   <title>%first_name; %surname;</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -46,11 +46,11 @@
   %define;link_marriage()
     %if;(wizard and not cancel_links)
       <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
-      title="[modify::family/families]0" target="_blank">&amp;%marriage_date.year;%sp;</a>
+      title="[modify::family/families]0" target="_blank">&amp;%marriage_date.year;</a>
     %elseif;(on_marriage_date != "")
-      &amp;%marriage_date.year;%sp;
+      &amp;%marriage_date.year;
     %else;
-      &amp;%sp;
+      &amp;
     %end;
   %end;
 
@@ -129,7 +129,7 @@
         %foreach;family;
           %if;(evar.spouse != "off")
             <small>
-              %apply;link_marriage()
+              %apply;link_marriage()%sp;
               %apply;somebody("spouse")
             </small>
           %end;
@@ -248,13 +248,13 @@
           %if;(xx.has_image)%apply;link_image("xx")<br%/>%end;
           %apply;somebody("xx")
        </div>
-       <div class="image_sheet">%apply;link_marriage()</div>
+       <div class="image_sheet">%apply;link_marriage()%sp;</div>
        <div class="image_sheet" style="clear:right;">
           %if;(yy.has_image)%apply;link_image("yy")<br%/>%end;
           %apply;somebody("yy")
        </div>
      %else;
-      %apply;link_marriage()
+      %apply;link_marriage()%sp;
       %apply;somebody("yy")
      %end;
     <br style="clear: both;"%/>
@@ -545,6 +545,7 @@
 %( <!-- End define --> %)
 
 <body%body_prop; id="perso">%nn;
+<div onclick="void(0);">%( the magic Safari div %)
 %message_to_wizard;
 %( <!-- Begin display menu --> %)
   %if;not cancel_links;
@@ -1109,5 +1110,6 @@
     %base_trailer;
     %copyright;
   </div>
+</div>%( the magic Safari div %)
 </body>
 </html>

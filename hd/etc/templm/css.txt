@@ -1,6 +1,6 @@
 <style type="text/css">
 /* Properties of all html pages.*/
-/* mickroue(a)yahoo.fr 2012/05/01 geneweb-6.04 templ=templm */
+/* mickroue(a)yahoo.fr 2012/06/06 geneweb-6.05 templ=templm */
 html{background:url('%image_prefix;/gwback.jpg');}
 /* Properties of all html pages */
 body{word-wrap:break-word;}
@@ -159,6 +159,7 @@ abbr{border-bottom:0;}
 .bmd_sosa{font-style:normal;font-size:x-small;vertical-align:top;}
 /* welcome.txt */
 #welcome{margin:0;padding:2px;}
+#welcome_content-top{height:75px;}
 #welcome_content-top,#welcome_content-bottom{width:100%%;clear:both;padding-top:20px;padding-bottom:20px;text-align:center;}
 #welcome_content-left,#welcome_content-right{min-width:300px;min-height:350px;width:49%%;float:left;}
 #welcome_content-left,#welcome_content-right,#welcome_motd,#welcome_lang{padding:2px;margin:2px;border:solid 1px #FFFFC0;}

@@ -4,7 +4,7 @@
 <head>
   <!-- $Id: ancsosa.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/05/09 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/04 geneweb-6.05 templ=templm -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] … [up to] …%nn;
@@ -139,12 +139,12 @@
   %if;xx.is_buried;,
     %if;xx.is_male;[buried]0%else;[buried]1%end;
     %if;xx.has_burial_date; %xx.on_burial_date;%end;
-    %if;xx.has_burial_place;, %xx.burial_place;%end;%nl;
+    %if;xx.has_burial_place;, %xx.burial_place;%end;
   %end;
   %if;xx.is_cremated;,
     %if;xx.is_male;[cremated]0%else;[cremated]1%end;
     %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
-    %if;xx.has_cremation_place;, %xx.cremation_place;%end;%nl;
+    %if;xx.has_cremation_place;, %xx.cremation_place;%end;
   %end;
   %if;(xx.has_linked_pages and xx.has_linked_page.DEATH), %xx.linked_page.DEATH;%end;
   %if;xx.computable_death_age;%sp;
