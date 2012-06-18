@@ -62,6 +62,10 @@ type p_access = (base -> person -> string * base -> person -> string);
 value std_access : p_access;
 value raw_access : p_access;
 
+(* Fonctions d'écriture du nom et prénom d'un individu en fonction de : *)
+(*   - son/ses titre de noblesse                                        *)
+(*   - son/ses nom public                                               *)
+(*   - son/ses sobriquets ...                                           *)
 value gen_person_text : p_access -> config -> base -> person -> string;
 value gen_person_text_no_html : p_access -> config -> base -> person -> string;
 value gen_person_text_without_title :
@@ -71,26 +75,26 @@ value gen_person_title_text :
   (config -> base -> person -> string -> string) ->
     p_access -> config -> base -> person -> string
 ;
-
-value reference : config -> base -> person -> string -> string;
-value update_family_loop : config -> base -> person -> string -> string;
-value no_reference : config -> base -> person -> string -> string;
 value person_text : config -> base -> person -> string;
 value person_text_no_html : config -> base -> person -> string;
 value person_text_without_surname : config -> base -> person -> string;
 value person_text_no_surn_no_acc_chk : config -> base -> person -> string;
 value person_text_without_title : config -> base -> person -> string;
+value main_title : config -> base -> person -> option title;
 value titled_person_text : config -> base -> person -> title -> string;
 value one_title_text : config -> base -> person -> title -> string;
 value person_title_text : config -> base -> person -> string;
 value person_title : config -> base -> person -> string;
 
+value reference : config -> base -> person -> string -> string;
+value no_reference : config -> base -> person -> string -> string;
 value referenced_person_title_text : config -> base -> person -> string;
 value referenced_person_text : config -> base -> person -> string;
 value referenced_person_text_without_surname :
   config -> base -> person -> string;
 
-value main_title : config -> base -> person -> option title;
+value update_family_loop : config -> base -> person -> string -> string;
+
 value p_getenv : list (string * string) -> string -> option string;
 value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);

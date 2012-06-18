@@ -691,12 +691,19 @@ value raw_access =
    fun base p -> sou base (get_surname p))
 ;
 
+
+(**/**)
+(* Fonctions d'écriture du nom et prénom d'un individu en fonction de : *)
+(*   - son/ses titre de noblesse                                        *)
+(*   - son/ses nom public                                               *)
+(*   - son/ses sobriquets                                               *)
+
+
 value restricted_txt conf = ".....";
 
 
-(* ********************************************************************** *)
-(*  [Fonc]  gen_person_text : 
-              fun -> fun -> config -> base -> person -> string            *)
+(* ************************************************************************** *)
+(*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
 (** [Description] : Renvoie le prénom et nom d'un individu en fonction 
                     de son nom public et sobriquet.
     [Args] :
@@ -706,8 +713,8 @@ value restricted_txt conf = ".....";
       - base : base de donnée
       - p    : person
     [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                       *)
-(* ********************************************************************** *)
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
 value gen_person_text (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
   else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
@@ -720,16 +727,23 @@ value gen_person_text (p_first_name, p_surname) conf base p =
       | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
       | (n, []) -> n ]
     in
-(*
-    let ali =
-      match p.aliases with
-      [ [alias :: _] -> " <em>(" ^ sou base alias ^ ")</em>"
-      | _ -> "" ]
-    in
-*)
-    beg ^ " " ^ p_surname base p (*^ ali*)
+    beg ^ " " ^ p_surname base p
 ;
 
+
+(* ************************************************************************** *)
+(*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
+(** [Description] : Renvoie le prénom et nom d'un individu en fonction 
+                    de son nom public et sobriquet (sans balise html <em>).
+    [Args] :
+      - p_first_name : renvoie le prénom d'un individu (string)
+      - p_surname    : renvoie le nom d'un individu (string)
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
   else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
@@ -744,6 +758,20 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
     beg ^ " " ^ p_surname base p
 ;
 
+
+(* ************************************************************************** *)
+(*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
+(** [Description] : Renvoie le prénom d'un individu en fonction de son 
+                    nom public et sobriquet.
+    [Args] :
+      - p_first_name : renvoie le prénom d'un individu (string)
+      - p_surname    : renvoie le nom d'un individu (string)
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
 value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
     base p
 =
@@ -758,15 +786,9 @@ value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
       | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
       | (_, []) -> p_first_name base p ]
     in
-(*
-    let ali =
-      match p.aliases with
-      [ [alias :: _] -> " <em>(" ^ sou base alias ^ ")</em>"
-      | _ -> "" ]
-    in
-*)
-    s (*^ ali*)
+    s
 ;
+
 
 value person_text = gen_person_text std_access;
 value person_text_no_html = gen_person_text_no_html std_access;
