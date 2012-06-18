@@ -289,6 +289,7 @@ value translate_dmy conf (fst, snd, trd) cal short =
   in
   match transl conf " !dates order" with
   [ "yymmdd" | "yyyymmdd" -> (translate_year fst, translate_month snd, trd)
+  | "mmddyyyy" -> (translate_month fst, snd, translate_year trd)
   | _ -> (fst, translate_month snd, translate_year trd) ]
 ;
 
@@ -310,6 +311,18 @@ value decode_dmy conf d =
   match transl conf " !dates order" with
   [ "dmyyyy" -> 
       (string_of_int d.day, string_of_int d.month, string_of_int d.year)
+  | "mmddyyyy" ->
+      (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
+      (* on rajoute les 0 nécessaires.                        *)
+      match (d.day, d.month, d.year) with
+      [ (0, 0, year) -> ("", "", string_of_int year)
+      | (0, month, year) -> 
+          let m = Printf.sprintf "%02d" month in
+          (m, "", string_of_int year)
+      | (day, month, year) ->
+          let d = Printf.sprintf "%02d" day in
+          let m = Printf.sprintf "%02d" month in
+          (m, d, string_of_int year) ]
   | "yyyymmdd" | "yymmdd" (* backward compatibility < 6.05 *) ->
       (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
       (* on rajoute les 0 nécessaires.                        *)
@@ -845,16 +858,26 @@ value print_some_calendar conf order date cal n month_name n_months var =
           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
       end;
       Wserver.wprint "\n";
-      if order = "ddmmyy" || order = "ddmmyyyy" then do {
-        print_day conf date var;
-        print_month conf date month_name n_months var;
-        print_year conf date cal var;
-      }
-      else do {
-        print_year conf date cal var;
-        print_month conf date month_name n_months var;
-        print_day conf date var;
-      };
+      match order with
+      [ "yymmdd" | "yyyymmdd" ->
+          do {
+            print_year conf date cal var;
+            print_month conf date month_name n_months var;
+            print_day conf date var;
+          }
+      | "mmddyyyy" ->
+          do {
+            print_month conf date month_name n_months var;
+            print_day conf date var;
+            print_year conf date cal var;
+          }
+      | _ ->
+          do {
+            print_day conf date var;
+            print_month conf date month_name n_months var;
+            print_year conf date cal var;
+          }
+      ];
       stagn "td" begin
         xtag "input" "type=\"submit\" name=\"t%s\" value=\" = \"" var;
       end;
@@ -866,20 +889,30 @@ value print_calendar_head conf order =
   tag "tr" "align=\"%s\"" conf.left begin
     stag "td" begin Wserver.wprint "&nbsp;"; end;
     Wserver.wprint "\n";
-    if order = "ddmmyy" || order = "ddmmyyyy" then
-      for i = 2 downto 0 do {
-        stag "th" "align=\"center\" colspan=\"3\"" begin
-          Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
-        end;
-        Wserver.wprint "\n";
-      }
-    else
+    match order with
+    [ "yymmdd" | "yyyymmdd" ->
       for i = 0 to 2 do {
         stag "th" "align=\"center\" colspan=\"3\"" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
         end;
         Wserver.wprint "\n";
-      };
+      }
+    | "mmddyyyy" ->
+        for i = 0 to 2 do {
+          let nth = abs (-i*i + max i 1) in
+          stag "th" "align=\"center\" colspan=\"3\"" begin
+            Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" nth));
+          end;
+          Wserver.wprint "\n";
+        }
+    | _ ->
+        for i = 2 downto 0 do {
+          stag "th" "align=\"center\" colspan=\"3\"" begin
+            Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
+          end;
+          Wserver.wprint "\n";
+        }
+    ];
     stag "td" begin Wserver.wprint "&nbsp;"; end;
     Wserver.wprint "\n";
   end
