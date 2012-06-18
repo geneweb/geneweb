@@ -253,3 +253,5 @@ value print_reference : config -> string -> int -> string -> unit;
 value print_tips_relationship : config -> unit;
 
 value print_image_sex : config -> person -> int -> unit;
+
+value display_options : config -> string;
