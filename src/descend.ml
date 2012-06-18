@@ -759,7 +759,7 @@ value print_person_table conf base p lab = do {
     end;
     tag "td" begin
       Util.print_image_sex conf p 11;
-      Wserver.wprint " %s" (referenced_person_text conf base p); 
+      Wserver.wprint " %s" (referenced_person_title_text conf base p); 
     end;
     if p_getenv conf.env "birth" = Some "on" then
       tag "td" begin
