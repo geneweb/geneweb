@@ -1032,9 +1032,11 @@ value make_tree_hts conf base gv p =
     let td =
       match po with
       [ Some (p, _) ->
+          (* Récupère les options d'affichage. *)
+          let options = Util.display_options conf in
           let ncol = nb_column 0 (v - 1) p in
           let vbar_txt =
-            Printf.sprintf "%sm=D;t=T;v=%d;%s" (commd conf) gv
+            Printf.sprintf "%sm=D;t=T;v=%d;%s;%s" (commd conf) gv options
               (acces conf base p)
           in
           (2 * ncol - 1, CenterA, TDbar (Some vbar_txt))

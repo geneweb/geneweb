@@ -3075,3 +3075,35 @@ value print_image_sex conf p size =
     "img" "src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\""
     (image_prefix conf) image alt size size
 ;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] display_options : config -> string                             *)
+(** [Description] : Recherche dans l'URL les options d'affichage qui sont
+                    données et renvoie la concaténation de ces options.
+    [Args] :
+      - conf : configuration de la base
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
+value display_options conf =
+  let s = 
+    if p_getenv conf.env "image" = Some "on" then ";image=on"
+    else ""
+  in
+  let s = 
+    if p_getenv conf.env "marriage" = Some "on" then s ^ ";marriage=on"
+    else s
+  in
+  let s = 
+    match p_getenv conf.env "bd" with
+    [ Some i -> s ^ ";bd=" ^ i
+    | None -> s ] 
+  in
+  let s = 
+    match p_getenv conf.env "color" with
+    [ Some c -> s ^ ";color=" ^ c
+    | None -> s ] 
+  in
+  s
+;
