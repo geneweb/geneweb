@@ -73,6 +73,10 @@
     %apply;fun_day("ccc", "nnn")
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_yyy("ccc", "nnn")
+  %elseif;([ !dates order] = "mmddyyyy")
+    %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_day("ccc", "nnn")
+    %apply;fun_yyy("ccc", "nnn")
   %else;
     %apply;fun_yyy("ccc", "nnn")
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
@@ -104,6 +108,10 @@
   %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
     <th align="center" colspan="3">[*year/month/day]2</th>
     <th align="center" colspan="3">[*year/month/day]1</th>
+    <th align="center" colspan="3">[*year/month/day]0</th>
+  %elseif;([ !dates order] = "mmddyyyy")
+    <th align="center" colspan="3">[*year/month/day]1</th>
+    <th align="center" colspan="3">[*year/month/day]2</th>
     <th align="center" colspan="3">[*year/month/day]0</th>
   %else;
     <th align="center" colspan="3">[*year/month/day]0</th>

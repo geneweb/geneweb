@@ -9,7 +9,7 @@ ca: ddmmyyyy
 cs: yyyymmdd
 da: ddmmyyyy
 de: ddmmyyyy
-en: yyyymmdd
+en: mmddyyyy
 eo: ddmmyyyy
 es: ddmmyyyy
 et: ddmmyyyy
