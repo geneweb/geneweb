@@ -693,6 +693,21 @@ value raw_access =
 
 value restricted_txt conf = ".....";
 
+
+(* ********************************************************************** *)
+(*  [Fonc]  gen_person_text : 
+              fun -> fun -> config -> base -> person -> string            *)
+(** [Description] : Renvoie le prénom et nom d'un individu en fonction 
+                    de son nom public et sobriquet.
+    [Args] :
+      - p_first_name : renvoie le prénom d'un individu (string)
+      - p_surname    : renvoie le nom d'un individu (string)
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
 value gen_person_text (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
   else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
@@ -762,7 +777,21 @@ value person_text_no_surn_no_acc_chk =
   gen_person_text_without_surname False std_access
 ;
 
+
+(* *********************************************************************** *)
+(*  [Fonc] main_title : config -> base -> person -> title option           *)
+(** [Description] : Renvoie le titre principal d'une personne. Si aucun
+                    titre principal n'est trouvé mais que la personne a 
+                    plusieurs titre, alors on renvoie le premier titre.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : title option
+    [Rem] : Exporté en clair hors de ce module.                            *)
+(* *********************************************************************** *)
 value main_title conf base p =
+  (* Fonction de recherche du titre principal. *)
   let rec find_main =
     fun
     [ [] -> None
@@ -770,22 +799,43 @@ value main_title conf base p =
   in
   match find_main (nobtit conf base p) with
   [ None ->
+      (* Aucun titre trouvé, on renvoie le premier (s'il existe). *)
       match nobtit conf base p with
       [ [x :: _] -> Some x
       | _ -> None ]
   | x -> x ]
 ;
 
+
+(* *********************************************************************** *)
+(*  [Fonc] titled_person_text : config -> base -> person -> istr gen_title *)
+(** [Description] : Renvoie la chaîne de caractère de la personne en 
+                    fonction de son titre.
+    [Args] :
+      - conf : configuration de la base
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                        *)
+(* *********************************************************************** *)
 value titled_person_text conf base p t =
   let estate = sou base t.t_place in
   let surname = p_surname base p in
   let elen = String.length estate in
   let slen = String.length surname in
+  (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
+  (*   - le nom du titre                                               *)
+  (*   - le nom du titre et le premier sobriquet                       *)
+  (*   - le nom de la personne (donné par son nom de domaine) en       *)
+  (*     fonction du nom public et sobriquet                           *)
   if Name.strip_lower estate = Name.strip_lower surname then
     match (t.t_name, get_qualifiers p) with
     [ (Tname n, []) -> sou base n
     | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
     | _ -> person_text_without_surname conf base p ]
+  (* Si le nom de l'individu contient le nom de son domaine, on renvoie : *)
+  (*   - le nom du titre                                                  *)
+  (*   - le nom du titre et le premier sobriquet                          *)
+  (*   - le nom de la personne (nom du domaine épuré du patronyme) en     *)
+  (*     fonction du nom public et sobriquet                              *)
   else if elen < slen && String.sub surname (slen - elen) elen = estate then
     match (t.t_name, get_qualifiers p) with
     [ (Tname n, []) -> sou base n
@@ -796,6 +846,10 @@ value titled_person_text conf base p t =
         in
         let trunc_access = (p_first_name, trunc_surname) in
         gen_person_text trunc_access conf base p ]
+  (* Sinon, on renvoie :                                              *)
+  (*   - le nom du titre                                              *)
+  (*   - le nom du titre et le premier sobriquet                      *)
+  (*   - le nom de la personne en fonction du nom public et sobriquet *)
   else
     match t.t_name with
     [ Tname s ->
@@ -806,6 +860,19 @@ value titled_person_text conf base p t =
     | _ -> person_text conf base p ]
 ;
 
+
+(* *********************************************************************** *)
+(*  [Fonc] one_title_text : config -> base -> person -> istr gen_title     *)
+(** [Description] : Renvoie la chaîne de caractère du titre ainsi que le
+                    domaine.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne dont on veut le titre
+      - t    : le titre de noblesse que l'on veut afficher
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                        *)
+(* *********************************************************************** *)
 value one_title_text conf base p t =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
