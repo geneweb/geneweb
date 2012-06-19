@@ -22,6 +22,7 @@ type create_info =
       ci_death : death;
       ci_death_date : option date;
       ci_death_place : string;
+      ci_occupation : string;
       ci_public : bool }
 ;
 
@@ -105,9 +106,11 @@ value reconstitute_parent_or_child conf var default_surname =
     in
     let d = Update.reconstitute_date conf (var ^ "d") in
     let dpl = getn conf (var ^ "d") "pl" in
+    let occupation = only_printable (getn conf var "occupation") in
     let public = getn conf (var ^ "b") "yyyy" = "p" in
     {ci_birth_date = b; ci_birth_place = bpl; ci_death = death;
-     ci_death_date = d; ci_death_place = dpl; ci_public = public}
+     ci_death_date = d; ci_death_place = dpl; ci_occupation = occupation;
+     ci_public = public}
   in
   let sex =
     match p_getenv conf.env (var ^ "_sex") with

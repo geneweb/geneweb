@@ -17,6 +17,7 @@ type create_info =
       ci_death : death;
       ci_death_date : option date;
       ci_death_place : string;
+      ci_occupation : string;
       ci_public : bool }
 ;
 
@@ -343,6 +344,11 @@ and eval_create c =
           [ DeadDontKnowWhen -> "+"
           | NotDead -> "-"
           | _ -> "" ]
+      | _ -> "" ]
+  | "occupation" ->
+      match c with
+      [ Update.Create _ (Some {ci_occupation = occupation}) -> 
+          quote_escaped occupation
       | _ -> "" ]
   | "sex" ->
       match c with
