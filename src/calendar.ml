@@ -242,6 +242,8 @@ value findStartOfYear year =
 ;
 
 value sdn_of_hebrew d =
+  (* correction possible ? *)
+  (* let d = { (d) with year = if d.year <= 0 then 1 else d.year } in *)
   let sdn =
     match d.month with
     [ 1 | 2 ->
