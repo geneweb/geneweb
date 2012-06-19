@@ -16,6 +16,7 @@ type create_info =
     ci_death : death;
     ci_death_date : option date;
     ci_death_place : string;
+    ci_occupation : string;
     ci_public : bool }
 ;
 type create = [ Create of sex and option create_info | Link ];
@@ -810,6 +811,11 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                 (dead, dpl)
             | _ -> (infer_death conf birth, "") ]
           in
+          let occupation = 
+            match info with
+            [ Some { ci_occupation = occupation } -> occupation
+            | _ -> "" ]
+          in
           let access =
             match info with
             [ Some {ci_public = p} -> if p then Public else IfTitles
@@ -822,7 +828,8 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
              first_names_aliases = []; surnames_aliases = [];
              public_name = empty_string; qualifiers = []; aliases = [];
              titles = []; rparents = []; related = [];
-             occupation = empty_string; sex = sex; access = access;
+             occupation = Gwdb.insert_string base occupation;
+             sex = sex; access = access;
              birth = Adef.codate_of_od birth;
              birth_place = Gwdb.insert_string base birth_place;
              birth_src = empty_string; baptism = Adef.codate_of_od baptism;
