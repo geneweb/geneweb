@@ -614,6 +614,12 @@ function changeCalendar(e,v,m,c) {
       </td>
       %apply;death("chxcnt", "child", "false")
     </tr>
+    <tr>
+      <td><label for="chxcnt_occupation">[*occupation/occupations]0</label></td>
+      <td colspan="4">
+        <input name="chxcnt_occupation" size="40" maxlength="200" value="%child.create.occupation;" id="chxcnt_occupation"%/>
+      </td>
+    </tr>
   </table>
 %end;
 
