@@ -572,6 +572,8 @@ div.summary ul ul
 .descends_table th, .descends_table td
 {
  border:1px solid black;
+ vertical-align:top;
+ padding:2px;
 }
 
 /* Properties of the relation page */
