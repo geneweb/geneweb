@@ -63,14 +63,26 @@
   [*the %s generation:::xx]%nn;
 %end;
 
+%( Fonction pour corriger le nombre de générations si mal utilisée. %)
+%( Si on met v=99 mais qu'il n'y a pas 99 générations, alors on     %)
+%( corrige par le nombre maximum d'ancetres de l'individu.          %)
+%define;correct_nb_gen(xx)
+  %if;(xx > max_anc_level)
+    %max_anc_level;
+  %else;
+    %xx;
+  %end;
+%end;
+
 %define;togen(xx)
-  %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(evar.xx = 2)[*to the parents]%nn;
-  %elseif;(evar.xx = 3)[*to the grandparents]%nn;
-  %elseif;(evar.xx = 4)[*to the great-grandparents]%nn;
+  %let;xx;%apply;correct_nb_gen(evar.xx)%in;
+  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[*to the parents]%nn;
+  %elseif;(xx = 3)[*to the grandparents]%nn;
+  %elseif;(xx = 4)[*to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
-      %apply;nth([nth (generation)], evar.xx)
+      %apply;nth([nth (generation)], xx)
     %end;
   %end;
 %end;
@@ -107,6 +119,18 @@
   %apply;nth%with;
     /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
   %and;xx%end;
+%end;
+
+%define;interval_dates(xxx, yyy)
+  %if;(evar.after != "" and evar.before != "")
+    %sp; [living between %s and %s:::xxx:yyy]
+  %elseif;(evar.before != "")
+    %sp; [living before %s:::yyy]
+  %elseif;(evar.after != "")
+    %sp; [living after %s:::xxx]
+  %else;
+    %( On n'affiche rien %)
+  %end;
 %end;
 
 %define;somebody_long_info(xx)
@@ -808,9 +832,8 @@
 %elseif;(evar.t = "M" and evar.al = "on")
   %( missing ancestors alphabetically %)
   <p>
-  %apply;togen("v")
-  %if;(evar.after != "") [after] %evar.after;%end;
-  %if;(evar.before != "") [before] %evar.before;%end;.
+    %apply;togen("v")
+    %apply;interval_dates(evar.after, evar.before)
   </p>
   %empty_sorted_list;
   %reset_count;
@@ -818,40 +841,48 @@
     %if;(evar.v != "" and level < evar.v)%nn;
       %foreach;ancestor;
         %if;(ancestor.same = "")
-          %if;(not ancestor.has_parents and
-               ancestor.first_name != "?" and ancestor.surname != "?")
+          %let;missing_parent;
+            %if;(not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?")
+              [parents]
+            %end;
+          %in;
+          %let;missing_spouse;
+            %if;(ancestor.has_parents)
+              %if;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
+                [husband/wife]0
+              %else;
+                [husband/wife]1
+              %end;
+            %end;
+          %in;
+          %if;(not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?")
             %if;(dates_in_interval(ancestor.var) = "true")
               %incr_count;
               %apply;add_in_sorted_list(
                 ancestor.surname_end, ancestor.first_name,
                 ancestor.surname_begin, "0",
                 ancestor.nobility_title, ancestor.access,
-                ancestor.dates, [parents],
-                ancestor.family.marriage_date.year,
-                ancestor.spouse, ancestor.spouse.dates,
-                ancestor.spouse.nobility_title)
+                ancestor.dates, missing_parent, missing_spouse)
             %end;
-          %elseif;(evar.ms = "on" and ancestor.has_parents)
-            %if;(ancestor.father.first_name = "?" and
-                 ancestor.father.surname = "?")
+          %elseif;(ancestor.has_parents)
+            %if;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
               %if;(dates_in_interval(ancestor.mother.var) = "true")
                 %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.mother.surname_end, ancestor.mother.first_name,
                   ancestor.mother.surname_begin, "1",
                   ancestor.mother.nobility_title, ancestor.mother.access,
-                  ancestor.mother.dates, [husband/wife]0)
+                  ancestor.mother.dates, missing_parent, missing_spouse)
               %end;
             %end;
-            %if;(ancestor.mother.first_name = "?" and
-                 ancestor.mother.surname = "?")
+            %if;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
               %if;(dates_in_interval(ancestor.father.var) = "true")
                 %incr_count;
                 %apply;add_in_sorted_list(
                   ancestor.father.surname_end, ancestor.father.first_name,
                   ancestor.father.surname_begin, "1",
                   ancestor.father.nobility_title, ancestor.father.access,
-                  ancestor.father.dates, [husband/wife]1)
+                  ancestor.father.dates, missing_parent, missing_spouse)
               %end;
             %end;
           %end;
@@ -859,140 +890,133 @@
       %end;
     %end;
   %end;
+
   %if;(count > 100)
-    %foreach;sorted_list_item;
-      %if;(initial(prev_item.1) != initial(item.1))
-        <a href="#a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
-      %end;
-    %end;
-  %end;
-  %if;(evar.ms != "on")
     <p>
-    %apply;a_of_b([*parents], "...")
+      %foreach;sorted_list_item;
+        %if;(initial(prev_item.1) != initial(item.1))
+          <a href="#a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+        %end;
+      %end;
     </p>
   %end;
+
   <ul>
-  %foreach;sorted_list_item;
-    <li>%nn;
-    %if;(count > 100 and initial(prev_item.1) != initial(item.1))
-      <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
-      <ul>
+    %foreach;sorted_list_item;
+      %if;(count > 100 and initial(prev_item.1) != initial(item.1))
         <li>%nn;
-    %end;
-    %if;(prev_item.1 != item.1)
-      %item.1;
-      %if;(number_of_subitems > 1)%nl;
-        <ul>
-          <li>%nn;
+        <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+        <table class="missing_ancestors_table">
+          <tr>
+            <th>[*person/persons]0</th>
+            <th>[*missing parents]</th>
+            <th>[*missing spouse]</th>
+          </tr>
+      %end;
+      <tr>
+        <td> 
+          %item.1;
+          %sp;<a href="%prefix;%item.6;">%item.2;</a>
+          %item.3;
+          %if;(item.5 != ""), <em>%item.5;</em>%end;
+          %item.7;
+        </td>
+        <td>%item.8;</td>
+        <td>%item.9;</td>
+      </tr>
+      %if;(count > 100 and initial(item.1) != initial(next_item.1))
+        </table>
+        </li>
+        <br%/>
       %end;
     %end;
-    %sp;<a href="%prefix;%item.6;">%item.2;</a>%item.3;
-    %if;(item.5 != ""), <em>%item.5;</em>%end;%item.7;
-    %if;(evar.ms != "on")
-      %if;(item.10 != "? ?")
-        %nl;&amp;%nn;
-        %if;(item.9 != "")<span style="font-size:70%%">%item.9;</span>%end;
-        %sp;%item.10;%item.11;
-        %if;(item.12 != ""), <em>%item.12;</em>%end;
-      %end;
-    %else; =&gt; %item.8;%end;
-    </li>
-    %if;(prev_item.1 = item.1 and number_of_subitems = 1)
-      </ul>
-      </li>
-    %end;
-    %if;(count > 100 and initial(item.1) != initial(next_item.1))
-      </ul>
-      </li>
-    %end;
-  %end;
   </ul>
 %elseif;(evar.t = "M")
-  %( missing ancestors in ancestors order %)
+  %( missing ancestors by generation %)
   <p>
-  %apply;togen("v")
-  %if;(evar.after != "") [after] %evar.after;%end;
-  %if;(evar.before != "") [before] %evar.before;%end;.
+    %apply;togen("v")
+    %apply;interval_dates(evar.after, evar.before)
   </p>
-  %if;(evar.ms != "on")
-    <p>
-    %apply;a_of_b([*parents], "...")
-    </p>
-  %end;
-  <ul>
-  %foreach;ancestor_level;
-    %if;(evar.v != "" and level <= evar.v)
-      %apply;lazy_print%with;
-        <li>%nl;[*generation/generations]0 %expr(level+1)%nl;
-        <ul>%nl;
-      %end;
-      %foreach;ancestor;
-        %if;(ancestor.same = "")
-          %if;(not ancestor.has_parents and
-               ancestor.first_name != "?" and ancestor.surname != "?")
-            %if;(dates_in_interval(ancestor.var) = "true")
-              %lazy_force;
-              <li>%sp;
-                %expr(ancestor.anc_sosa.v * 2)
-                -%expr((ancestor.anc_sosa.v * 2 + 1) % 10) -
-              %if;(evar.ms != "on")
-                %apply;link(ancestor.access, ancestor)
-              %else;
-                %apply;a_of_b%with;[parents]%and;
-                  %apply;link(ancestor.access, ancestor)
+  <table class="missing_ancestors_table">
+    <tr>
+      <th>[*Sosa]</th>
+      <th>[*missing parents]</th>
+      <th>[*missing spouse]</th>
+      <th>[*person/persons]0</th>
+      <th>[individual info]</th>
+    </tr>
+    %foreach;ancestor_level;
+      %if;(evar.v != "" and level <= evar.v)
+        %apply;lazy_print%with;
+          <tr>
+            <td colspan="5">[*generation/generations]0 %level;</td>
+          </tr>
+        %end;
+        %foreach;ancestor;
+          %if;(ancestor.same = "")
+            %if;(not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?")
+              %if;(dates_in_interval(ancestor.var) = "true")
+                <tr>
+                  %lazy_force;
+                  <td>
+                    %expr(ancestor.anc_sosa.v * 2) - %expr((ancestor.anc_sosa.v * 2 + 1) % 10)
+                  </td>
+                  <td align="center"> x </td>
+                  <td> &nbsp; </td>
+                  <td>
+                    %apply;link(ancestor.access, ancestor)
+                    %ancestor.title;
+                  </td>
+                  <td>
+                    %apply;somebody_long_info("ancestor")
+                  </td>
+                </tr>
+              %end;
+            %elseif;(ancestor.has_parents)
+              %if;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
+                %if;(dates_in_interval(ancestor.mother.var) = "true")
+                  <tr>
+                    %lazy_force;
+                    <td>
+                      %expr(ancestor.anc_sosa.v * 2)
+                    </td>
+                    <td> &nbsp; </td>
+                    <td align="center">[husband/wife]0</td>
+                    <td>
+                      %apply;link(ancestor.mother.access, ancestor.mother)
+                      %ancestor.mother.title;
+                    </td>
+                    <td>
+                      %apply;somebody_long_info("ancestor.mother")
+                    </td>
+                  </tr>
                 %end;
               %end;
-              %ancestor.title;%sp;
-              %apply;somebody_long_info("ancestor")
-              %if;ancestor.has_occupation;
-                , %apply;capitalize(ancestor.occupation)%nn;
-              %end;
-              </li>%nl;
-            %end;
-          %elseif;(evar.ms = "on" and ancestor.has_parents)
-            %if;(ancestor.father.first_name = "?" and
-                 ancestor.father.surname = "?")
-              %if;(dates_in_interval(ancestor.mother.var) = "true")
-                %lazy_force;
-                <li> %expr(ancestor.anc_sosa.v * 2)%sp; -
-                %apply;a_of_b%with;
-                  %apply;link(ancestor.father.access, [husband/wife]0)
-                %and;
-                  %ancestor.mother;
-                  %ancestor.mother.title;%sp
-                  %apply;somebody_long_info("ancestor.mother")
-                  %if;ancestor.mother.has_occupation;
-                    , %apply;capitalize(ancestor.mother.occupation)%nn;
-                  %end;
+              %if;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
+                %if;(dates_in_interval(ancestor.father.var) = "true")
+                  <tr>
+                    %lazy_force;
+                    <td>
+                      %expr(ancestor.anc_sosa.v * 2 + 1)%sp;
+                    </td>
+                    <td> &nbsp; </td>
+                    <td align="center">[husband/wife]1</td>
+                    <td>
+                      %apply;link(ancestor.father.access, ancestor.father)
+                      %ancestor.father.title;
+                    </td>
+                    <td>
+                      %apply;somebody_long_info("ancestor.father")
+                    </td>
+                  </tr>
                 %end;
-                </li>%nl;
-              %end;
-            %end;
-            %if;(ancestor.mother.first_name = "?" and
-                 ancestor.mother.surname = "?")
-              %if;(dates_in_interval(ancestor.father.var) = "true")
-                %lazy_force;
-                <li> %expr(ancestor.anc_sosa.v * 2 + 1)%sp; -
-                %apply;a_of_b%with;
-                  %apply;link(ancestor.mother.access, [husband/wife]1)
-                %and;
-                  %ancestor.father;
-                  %ancestor.father.title;%sp;
-                  %apply;somebody_long_info("ancestor.father")
-                  %if;ancestor.father.has_occupation;
-                    , %apply;capitalize(ancestor.father.occupation)%nn;
-                  %end;
-                %end;
-                </li>%nl;
               %end;
             %end;
           %end;
         %end;
       %end;
-      %if;lazy_printed;</ul>%nl;</li>%nl;%end;
     %end;
-  %end;
-  </ul>
+  </table>
 %elseif;(evar.t = "G")
   %( long display %)
   %if;(evar.only != "on")
