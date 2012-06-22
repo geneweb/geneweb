@@ -903,7 +903,7 @@
 
   <ul>
     %foreach;sorted_list_item;
-      %if;(count > 100 and initial(prev_item.1) != initial(item.1))
+      %if;(initial(prev_item.1) != initial(item.1))
         <li>%nn;
         <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
         <table class="missing_ancestors_table">
@@ -924,7 +924,7 @@
         <td>%item.8;</td>
         <td>%item.9;</td>
       </tr>
-      %if;(count > 100 and initial(item.1) != initial(next_item.1))
+      %if;(initial(item.1) != initial(next_item.1))
         </table>
         </li>
         <br%/>
