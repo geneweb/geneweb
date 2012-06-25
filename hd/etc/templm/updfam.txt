@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/06/12 geneweb-6.05 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 2012/06/22 geneweb-6.05 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -424,7 +424,7 @@
               onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sn','beg%zz;_fn');"
             %elseif;("beg"="ch")
               onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sex_2','beg%zz;_fn');"
-            %end;  
+            %end;
           %/>
     </td><td>
           <input name="begxcnt_sn" title="[surname/surnames]0" size="30" maxlength="200"%sp;
@@ -443,12 +443,19 @@
     %end;
     %if;("c2" = "yes")
       <td id="begxcnt_6" %apply;hide(xx.create)>
-        <div><abbr title="[birth]">o</abbr>%sp;   
-        %apply;birth("begxcnt","xx","","")
-        </div>
-        <div><abbr title="[death]">%death_symbol;</abbr>%sp;
-        %apply;death("begxcnt","xx","beg",zz)
-        </div>
+        <span><abbr title="[birth]">o</abbr>%sp;
+          %apply;birth("begxcnt","xx","","")
+          <br%/>
+          <abbr title="[death]">%death_symbol;</abbr>%sp;
+          %apply;death("begxcnt","xx","beg",zz)
+        </span>
+        <span>
+          <label>[*occupation/occupations]0&nbsp;
+            <input title="[occupation/occupations]0" 
+             name="begxcnt_occupation" size="40" maxlength="200" value="%xx.create.occupation" 
+             id="begxcnt_occupation"%/>
+          </label>
+        </span>
       </td>
     %end;
   %end;
@@ -479,7 +486,7 @@
         <th><abbr title="[sex]">[M/F]0 ? [M/F]1</abbr></th>
       %end;
       %if;("xx" != "witness")
-        <th>[date] [place]</th>
+        <th>[date] [place] [occupation/occupations]0</th>
       %else;
         <td>&nbsp;</td>
       %end;
@@ -540,7 +547,7 @@
         </tr>
       %end;
     </table>
-    <dl>     
+    <dl>
       <dt>[*source/sources]1
         <label title="[source/sources]0 : [family/families]0 = [person/persons]1 ([create])">
           <input type="checkbox" name="rdsrc" value="on"%sp;
