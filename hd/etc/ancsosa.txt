@@ -63,19 +63,11 @@
   [*the %s generation:::xx]%nn;
 %end;
 
-%( Fonction pour corriger le nombre de générations si mal utilisée. %)
-%( Si on met v=99 mais qu'il n'y a pas 99 générations, alors on     %)
-%( corrige par le nombre maximum d'ancetres de l'individu.          %)
-%define;correct_nb_gen(xx)
-  %if;(xx > max_anc_level)
-    %max_anc_level;
-  %else;
-    %xx;
-  %end;
-%end;
-
 %define;togen(xx)
-  %let;xx;%apply;correct_nb_gen(evar.xx)%in;
+  %( Corriger le nombre de générations si mal utilisée.           %)
+  %( Si on met v=99 mais qu'il n'y a pas 99 générations, alors on %)
+  %( corrige par le nombre maximum d'ancetres de l'individu.      %)
+  %let;xx;%apply;min(evar.xx, max_anc_level, bvar.max_anc_level)%in;
   %if;(xx = 1)[*specify::generation/generations]0%nn;
   %elseif;(xx = 2)[*to the parents]%nn;
   %elseif;(xx = 3)[*to the grandparents]%nn;
