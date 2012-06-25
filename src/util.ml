@@ -567,6 +567,34 @@ value parent_has_title conf base p =
   | _ -> False ]
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] authorized_age : config -> base -> person -> bool              *)
+(** [Description] : Calcul les droits de visualisation d'une personne en
+      fonction de son age.
+      Renvoie (dans l'ordre des tests) :
+        - Vrai si : magicien ou ami ou la personne est public
+        - Vrai si : la personne est en si_titre, qu'elle ou ses parents
+                    ont au moins un titre et que public_if_title = yes 
+                    dans le fichier gwf
+        - Faux si : la personne n'est pas décédée et private_years > 0
+        - Vrai si : la personne est plus agée (en fonction de la date de
+                    naissance ou de la date de baptème) que privates_years
+        - Faux si : la personne est plus jeune (en fonction de la date de
+                    naissance ou de la date de baptème) que privates_years
+        - Vrai si : la personne est décédée depuis plus de privates_years
+        - Faux si : la personne est décédée depuis moins de privates_years
+        - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
+                    privée et public_if_no_date = yes
+        - Vrai si : la personne s'est mariée depuis plus de private_years
+        - Faux dans tous les autres cas
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : Vrai si on a les droits, Faux sinon.
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value authorized_age conf base p =
   if conf.wizard || conf.friend || get_access p = Public then True
   else if
@@ -2416,12 +2444,36 @@ value sosa_of_branch ipl =
 
 value space_to_unders = Mutil.tr ' ' '_';
 
+
+(* ************************************************************************** *)
+(*  [Fonc] default_image_name_of_key : string -> string -> int -> string      *)
+(** [Description] : Renvoie à partir de la clé d'une personne, le nom par
+                    défaut de son image (portrait). 
+                    Par exemple, Jean Claude DUPOND 3 => jean_claude.3.dupond
+    [Args] :
+      - fnam : first name
+      - snam : surname
+      - occ  : occ
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
 value default_image_name_of_key fnam surn occ =
   let f = space_to_unders (Name.lower fnam) in
   let s = space_to_unders (Name.lower surn) in
   f ^ "." ^ string_of_int occ ^ "." ^ s
 ;
 
+
+(* *********************************************************************** *)
+(*  [Fonc] default_image_name : base -> person -> string                   *)
+(** [Description] : Renvoie à partir d'une personne, le nom par défaut de 
+                    son image (portrait) => voir default_image_name_of_key.
+    [Args] :
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                            *)
+(* *********************************************************************** *)
 value default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
     (get_occ p)
@@ -2477,6 +2529,18 @@ value image_and_size conf base p image_size =
   else None
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] has_image : config -> base -> person -> bool                   *)
+(** [Description] : Renvoie Vrai si la personne a une photo et qu'on a les
+                    droits pour la voir, Faux sinon.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : Vrai si la personne a une image, Faux sinon.
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
     not (is_empty_string (get_image p)) || auto_image_file conf base p <> None
@@ -3078,7 +3142,7 @@ value wprint_in_columns conf order wprint_elem list =
       - list : la liste originiale
     [Retour] :
       - list : la nouvelle liste de taille size
-    [Rem] : Exporté en clair hors de ce module.                       *)
+    [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value reduce_list size list =
   let rec loop size cnt reduced_list list = 
