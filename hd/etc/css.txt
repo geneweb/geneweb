@@ -619,6 +619,23 @@ div.summary ul ul
  padding:2px;
 }
 
+/* surname branch */
+/* lists and tree */
+.surname_branch_table
+{
+ border-width:1px;
+ border-style:solid;
+ border-collapse:collapse;
+}
+ 
+.surname_branch_table th, .surname_branch_table td
+{
+ border:1px solid black;
+ vertical-align:top;
+ padding:2px;
+}
+
+
 /* modifications of places */
 
 .mod_places_ul
