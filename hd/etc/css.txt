@@ -576,6 +576,66 @@ div.summary ul ul
  padding:2px;
 }
 
+.missing_ancestors_ul_alpha
+{
+ float:left;
+}
+
+.missing_ancestors_table_alpha
+{
+ border-width:1px;
+ border-style:solid;
+ border-collapse:collapse;
+ width:100%%;
+}
+
+.missing_ancestors_table_alpha th, 
+.missing_ancestors_table_alpha td
+{
+ border:1px solid black;
+ vertical-align:top;
+ padding:2px;
+}
+
+.missing_ancestors_table_alpha th.missing_parent,
+.missing_ancestors_table_alpha th.missing_spouse
+{
+ width:100px;
+ align:center;
+}
+
+.missing_ancestors_table
+{
+ border-width:1px;
+ border-style:solid;
+ border-collapse:collapse;
+}
+
+.missing_ancestors_table th, 
+.missing_ancestors_table td
+{
+ border:1px solid black;
+ vertical-align:top;
+ padding:2px;
+}
+
+/* modifications of places */
+
+.mod_places_ul
+{
+ float:left;
+}
+
+.mod_places_table
+{
+ width:100%%;
+}
+
+.mod_places_table td.mod_places_table_modify
+{
+ width:100px;
+}
+
 /* Properties of the relation page */
 #rel_form_search, #rel_form_cousin, #rel_form_shortcut, #rel_mode, #rel_options
 {
