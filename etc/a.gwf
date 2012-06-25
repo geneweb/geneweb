@@ -150,6 +150,9 @@ show_consang=yes
 # Death symbol in dates (default: christians' one)
 # death_symbol=†
 
+# Birth symbol in dates (default: christians' one)
+# birth_symbol=°
+
 # Allow the usage of the request m=KILL_ANC
 can_kill_ancestors=no
 

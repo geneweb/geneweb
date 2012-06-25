@@ -45,13 +45,23 @@ value get_wday conf d =
 ;
 
 value nbsp = "&nbsp;";
+
 value death_symbol conf =
   match
     try Some (List.assoc "death_symbol" conf.base_env) with
     [ Not_found -> None ]
   with
   [ Some x -> x
-  | None -> if utf_8_db.val then "\226\128\160" else "+" ]
+  | None -> if utf_8_db.val then "†" else "+" ]
+;
+
+value birth_symbol conf =
+  match
+    try Some (List.assoc "birth_symbol" conf.base_env) with
+    [ Not_found -> None ]
+  with
+  [ Some x -> x
+  | None -> if utf_8_db.val then "°" else "°" ]
 ;
 
 value before_date d d1 =
@@ -492,12 +502,16 @@ value string_of_age conf a =
 (* ************************************************************************ *)
 value prec_text d =
   match d.prec with
-  [ About -> "ca"
+  [ About -> "ca "
   | Maybe -> "?"
   | Before -> "<"
   | After -> ">"
+(* La précision dans les deux cas ci-dessous est donnée *)
+(* directement dans l'année : 1700..1710 ou 1700/1710.  *)
+(*
   | OrYear _ -> "|"
   | YearInt _ -> ".."
+*)
   | _ -> "" ]
 ;
 
@@ -541,10 +555,23 @@ value month_text d =
 value year_text d =
   match d.prec with
   [ OrYear x -> string_of_int d.year ^ "/" ^ string_of_int x
-  | YearInt x -> string_of_int d.year ^ "/" ^ string_of_int x
+  | YearInt x -> string_of_int d.year ^ ".." ^ string_of_int x
   | _ -> string_of_int d.year ]
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] get_birth_death : 
+             person -> (Adef.date option * Adef.date option * bool)       *)
+(** [Description] : Renvoie la date de naissance, la date de décès et un
+      booléen pour savoir si la date de naissance et la date décès ont été 
+      trouvées. Si on ne trouve pas la date de naissance et la date de 
+      décès, alors approx = True.
+    [Args] :
+      - p    : person
+    [Retour] : (Adef.date option * Adef.date option * bool)
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value get_birth_death_date p =
   let (birth_date, approx) =
     match Adef.od_of_codate (get_birth p) with
@@ -563,40 +590,62 @@ value get_birth_death_date p =
   (birth_date, death_date, approx)
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] short_dates_text : config -> base -> person -> string          *)
+(** [Description] : Renvoie la concatenation de l'année de naissance et 
+                    l'année de décès (si trouvée par get_birth_death_date). 
+                    La précision de la date est ajoutée pour chaque année.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value short_dates_text conf base p =
   if authorized_age conf base p then
     let (birth_date, death_date, _) = get_birth_death_date p in
-    let s = "" in
-    let s =
-      match birth_date with
-      [ Some (Dgreg d _) -> s ^ prec_text d ^ year_text d
-      | _ -> s ]
-    in
     let s =
       match (birth_date, death_date) with
-      [ (Some _, Some _) -> s ^ "-"
-      | (Some _, None) -> if get_death p = NotDead then s ^ "-" else s
-      | _ ->
+      [ (Some (Dgreg b _), Some (Dgreg d _)) ->
+          let birth = quote_escaped (prec_text b) ^ year_text b in
+          let death = quote_escaped (prec_text d) ^ year_text d in
+          birth ^ " - " ^ death
+      | (Some (Dgreg b _), None) ->
+          birth_symbol conf ^ quote_escaped (prec_text b) ^ year_text b
+      | (None, Some (Dgreg d _)) ->
           match get_death p with
           [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
-              let d = death_symbol conf in
-              if s = "" then d else s ^ nbsp ^ d
-          | _ -> s ] ]
+              death_symbol conf ^ quote_escaped (prec_text d) ^ year_text d
+          | _ -> "" ]
+      (* On ne peut pas traiter les dates au format texte. *)
+      | (_, _) -> "" ]
     in
-    let s =
-      match death_date with
-      [ Some (Dgreg d _) -> s ^ prec_text d ^ year_text d
-      | _ -> s ]
-    in
-    if s <> "" then " <em><bdo dir=\"ltr\">" ^ s ^ "</bdo></em>" else s
+    if s <> "" then " <em>" ^ s ^ "</em>" else s
   else ""
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] short_marriage_date_text : 
+             config -> base -> person -> person -> string                 *)
+(** [Description] : Renvoie l'année de la date de mariage ansi que la
+                    précision de la date.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p1   : conjoint 1
+      - p2   : conjoint 2
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
 value short_marriage_date_text conf base fam p1 p2 =
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_codate (get_marriage fam) with
     [ Some (Dgreg d _) ->
-        "<span style=\"font-size:70%\">" ^ prec_text d ^ year_text d ^ "</span>"
+        let date = quote_escaped (prec_text d) ^ year_text d in
+        "<span style=\"font-size:70%\">" ^ date ^ "</span>"
     | _ -> "" ]
   else ""
 ;

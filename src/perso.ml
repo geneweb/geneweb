@@ -2169,7 +2169,7 @@ and eval_date_field_var d =
   fun
   [ ["prec"] ->
       match d with
-      [ Dgreg dmy  _ -> VVstring (Date.prec_text dmy)
+      [ Dgreg dmy  _ -> VVstring (quote_escaped (Date.prec_text dmy))
       | _ -> VVstring "" ]
   | ["day"] ->
       match d with
