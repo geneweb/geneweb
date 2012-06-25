@@ -677,14 +677,14 @@ value print_place conf base list len =
       list;
     end;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      tag "ul" begin
+      tag "ul" "class=mod_places_ul" begin
         List.iter 
           (fun (ini_k, list) -> do {
             tag "li" begin
               stagn "a" "id=\"%s\"" ini_k begin
                 Wserver.wprint "%s" ini_k;
             end;
-            tag "table" begin
+            tag "table" "class=mod_places_table" begin
               List.iter
                 (fun (s, k) -> do {
                   let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
@@ -699,7 +699,7 @@ value print_place conf base list len =
                             accu ^ k ^ "=" ^ (string_of_int i) ^ ";")
                           "" k
                       in
-                      tag "td" begin
+                      tag "td" "class=mod_places_table_modify" begin
                         stag "a" "style=\"font-size:80%%\" href=\"%sm=MOD_P;%s;s=%s#mod\""
                           (commd conf) k (code_varenv ini)
                         begin
