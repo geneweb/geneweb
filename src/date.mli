@@ -10,7 +10,7 @@ value string_of_ondate : config -> date -> string;
 value string_of_date : config -> date -> string;
 value string_slash_of_date : config -> date -> string;
 value string_of_age : config -> dmy -> string;
-value prec_text : dmy -> string;
+value prec_text : config -> dmy -> string;
 value day_text : dmy -> string;
 value month_text : dmy -> string;
 value year_text : dmy -> string;

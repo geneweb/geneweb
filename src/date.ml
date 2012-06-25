@@ -493,16 +493,22 @@ value string_of_age conf a =
 
 
 (* ************************************************************************ *)
-(*  [Fonc] prec_text : Def.dmy -> string                                    *)
+(*  [Fonc] prec_text : config -> Def.dmy -> string                          *)
 (** [Description] : Renvoie la précision d'une date.
     [Args] :
-      - d : Def.dmy
+      - conf : configuration de la base
+      - d    : Def.dmy
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-value prec_text d =
+value prec_text conf d =
   match d.prec with
-  [ About -> "ca "
+  [ About -> 
+      (* On utilise le dictionnaire pour être sur *)
+      (* que ce soit compréhensible de tous.      *)
+      match transl conf "about (short date)" with
+      [ "ca" -> "ca "
+      | s -> s ]
   | Maybe -> "?"
   | Before -> "<"
   | After -> ">"
@@ -609,15 +615,15 @@ value short_dates_text conf base p =
     let s =
       match (birth_date, death_date) with
       [ (Some (Dgreg b _), Some (Dgreg d _)) ->
-          let birth = quote_escaped (prec_text b) ^ year_text b in
-          let death = quote_escaped (prec_text d) ^ year_text d in
-          birth ^ " - " ^ death
+          let birth = quote_escaped (prec_text conf b) ^ year_text b in
+          let death = quote_escaped (prec_text conf d) ^ year_text d in
+          birth ^ (if prec_text conf d <> "" then " - " else "-") ^ death
       | (Some (Dgreg b _), None) ->
-          birth_symbol conf ^ quote_escaped (prec_text b) ^ year_text b
+          birth_symbol conf ^ quote_escaped (prec_text conf b) ^ year_text b
       | (None, Some (Dgreg d _)) ->
           match get_death p with
           [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
-              death_symbol conf ^ quote_escaped (prec_text d) ^ year_text d
+              death_symbol conf ^ quote_escaped (prec_text conf d) ^ year_text d
           | _ -> "" ]
       (* On ne peut pas traiter les dates au format texte. *)
       | (_, _) -> "" ]
@@ -644,7 +650,7 @@ value short_marriage_date_text conf base fam p1 p2 =
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_codate (get_marriage fam) with
     [ Some (Dgreg d _) ->
-        let date = quote_escaped (prec_text d) ^ year_text d in
+        let date = quote_escaped (prec_text conf d) ^ year_text d in
         "<span style=\"font-size:70%\">" ^ date ^ "</span>"
     | _ -> "" ]
   else ""

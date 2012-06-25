@@ -2000,11 +2000,11 @@ and eval_anc_by_surnl_field_var conf base env ep
   fun
   [ ["date_begin" :: sl] ->
       match db with
-      [ Some d -> eval_date_field_var d sl
+      [ Some d -> eval_date_field_var conf d sl
       | None -> VVstring "" ]
   | ["date_end" :: sl] ->
       match de with
-      [ Some d -> eval_date_field_var d sl
+      [ Some d -> eval_date_field_var conf d sl
       | None -> VVstring "" ]
   | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
   | ["place"] -> VVstring (Util.string_of_place conf place)
@@ -2034,29 +2034,30 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   fun
   [ ["baptism_date" :: sl] ->
       match Adef.od_of_codate (get_baptism p) with
-      [ Some d when p_auth -> eval_date_field_var d sl
+      [ Some d when p_auth -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
   | ["birth_date" :: sl] ->
       match Adef.od_of_codate (get_birth p) with
-      [ Some d when p_auth -> eval_date_field_var d sl
+      [ Some d when p_auth -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
   | ["burial_date" :: sl] ->
       match get_burial p with
       [ Buried cod when p_auth ->
           match Adef.od_of_codate cod with
-          [ Some d -> eval_date_field_var d sl
+          [ Some d -> eval_date_field_var conf d sl
           | None -> VVstring "" ]
       | _ -> VVstring "" ]
   | ["cremated_date" :: sl] ->
       match get_burial p with
       [ Cremated cod when p_auth ->
           match Adef.od_of_codate cod with
-          [ Some d -> eval_date_field_var d sl
+          [ Some d -> eval_date_field_var conf d sl
           | None -> VVstring "" ]
       | _ -> VVstring "" ]
   | ["death_date" :: sl] ->
       match get_death p with
-      [ Death _ cd when p_auth -> eval_date_field_var (Adef.date_of_cdate cd) sl
+      [ Death _ cd when p_auth -> 
+          eval_date_field_var conf (Adef.date_of_cdate cd) sl
       | _ -> VVstring "" ]
   | ["father" :: sl] ->
       match get_parents p with
@@ -2122,7 +2123,7 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
       match get_env "fam" env with
       [ Vfam _ fam _ True ->
           match Adef.od_of_codate (get_marriage fam) with
-          [ Some d -> eval_date_field_var d sl
+          [ Some d -> eval_date_field_var conf d sl
           | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["mother" :: sl] ->
@@ -2165,11 +2166,11 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           [ Not_found -> obsolete_eval conf base env ep loc s ] ]
   | [] -> str_val (simple_person_text conf base p p_auth)
   | _ -> raise Not_found ]
-and eval_date_field_var d =
+and eval_date_field_var conf d =
   fun
   [ ["prec"] ->
       match d with
-      [ Dgreg dmy  _ -> VVstring (quote_escaped (Date.prec_text dmy))
+      [ Dgreg dmy  _ -> VVstring (quote_escaped (Date.prec_text conf dmy))
       | _ -> VVstring "" ]
   | ["day"] ->
       match d with
@@ -2694,7 +2695,7 @@ and eval_family_field_var conf base env
       eval_person_field_var conf base env ep loc sl
   | ["marriage_date" :: sl] ->
       match Adef.od_of_codate (get_marriage fam) with
-      [ Some d when m_auth -> eval_date_field_var d sl
+      [ Some d when m_auth -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
   | ["mother" :: sl] ->
       let ep = make_ep conf base imoth in
