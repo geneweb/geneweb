@@ -899,6 +899,10 @@ sk: okolo
 sl: približno
 sv: omkring
 
+    about (short date)
+en: ~
+fr: ca
+
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
 bg: брат/сестра/брат или сестра

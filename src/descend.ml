@@ -1377,7 +1377,7 @@ value print_aboville conf base max_level p =
                 match Adef.od_of_codate (get_marriage fam) with
                 [ Some (Dgreg d _) ->
                     let date = 
-                      quote_escaped (Date.prec_text d) ^ Date.year_text d
+                      quote_escaped (Date.prec_text conf d) ^ Date.year_text d
                     in
                     "<font size=\"-2\"><em>" ^ date ^ "</em></font>"
                 | _ -> "" ]
