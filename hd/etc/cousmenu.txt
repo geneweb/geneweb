@@ -83,7 +83,7 @@
       <input type="submit" value="Ok"%/>
       <br%/>
       <label>
-        <input type="checkbox" name="csp" value="on"%/>
+        <input type="checkbox" name="spouse" value="on"%/>
         [*include spouses]
       </label>
     </p>
