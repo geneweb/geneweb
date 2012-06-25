@@ -126,7 +126,7 @@
   </td></tr></table>
 %elseif;(evar.t = "F")
   %( surnames branch %)
-    <table>
+    <table class="surname_branch_table">
     <tr>
       <th>[person/persons]0</th>
       <th>[number of branch]</th>
