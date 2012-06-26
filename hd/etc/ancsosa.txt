@@ -125,6 +125,58 @@
   %end;
 %end;
 
+%define;display_missing_ancestor_info()
+  %if;(evar.birth = "on")
+    <td>
+      %if;(ancestor.has_birth_date or ancestor.has_birth_place)
+        %apply;capitalize(nth([born], ancestor.sex))
+        %if;ancestor.has_birth_date; %ancestor.on_birth_date;%end;
+        %if;ancestor.has_birth_place; - %ancestor.birth_place;%end;
+      %elseif;(ancestor.has_baptism_date or ancestor.has_baptism_place)
+        %apply;capitalize(nth([baptized], ancestor.sex))
+        %if;ancestor.has_baptism_date; %ancestor.on_baptism_date;%end;
+        %if;ancestor.has_baptism_place; - %ancestor.baptism_place;%end;
+      %else;
+        &nbsp;
+      %end;
+    </td>
+  %end;
+  %if;(evar.death = "on")
+    <td>
+      %if;ancestor.is_dead;
+        %apply;capitalize(ancestor.died)
+        %if;ancestor.has_death_date; %ancestor.on_death_date;%end;
+        %if;ancestor.has_death_place; - %ancestor.death_place;%end;
+      %elseif;ancestor.is_buried;
+        %apply;capitalize(nth([buried], ancestor.sex)) 
+        %if;ancestor.has_burial_date; %ancestor.on_burial_date;%end;
+        %if;ancestor.has_burial_place; - %ancestor.burial_place;%end;
+      %elseif;ancestor.is_cremated;
+        %apply;capitalize(nth([cremated], ancestor.sex)) 
+        %if;ancestor.has_cremation_date; %ancestor.on_cremation_date;%end;
+        %if;ancestor.has_cremation_place; - %ancestor.cremation_place;%end;
+      %else;
+        &nbsp;
+      %end;
+    </td>
+  %end;
+  %if;(evar.spouse = "on")
+    <td>
+      %if;ancestor.has_families;
+        %if;(not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?")
+          %foreach;ancestor.family;
+            %if;(ancestor.spouse.first_name != "?" and ancestor.spouse.surname != "?")
+              %if;(family_cnt > 1),%sp;%end;
+              %apply;image_MF("ancestor.spouse", "11")
+              %ancestor.spouse
+            %end;
+          %end;
+        %end;
+      %end;
+    </td>
+  %end;
+%end;
+
 %define;somebody_long_info(xx)
   %if;xx.has_aliases;
     %foreach;xx.alias;, [alias] <em>%alias;</em>%end;
@@ -929,19 +981,23 @@
     %apply;togen("v")
     %apply;interval_dates(evar.after, evar.before)
   </p>
+  %reset_count;
   <table class="missing_ancestors_table">
     <tr>
       <th>[*missing sosa]</th>
       <th>[*missing parents]</th>
       <th>[*missing spouse]</th>
       <th>[*person/persons]0</th>
-      <th>[individual info]</th>
+      %if;(evar.birth = "on") <th>[birth]</th> %incr_count; %end;
+      %if;(evar.death = "on") <th>[death]</th> %incr_count; %end;
+      %if;(evar.spouse = "on") <th>[marriage]</th> %incr_count; %end;
     </tr>
+    %let;nb_col;%expr(count + 4)%in;
     %foreach;ancestor_level;
       %if;(evar.v != "" and level <= evar.v)
         %apply;lazy_print%with;
           <tr>
-            <td colspan="5">[*generation/generations]0 %level;</td>
+            <td colspan="%nb_col;">[*generation/generations]0 %level;</td>
           </tr>
         %end;
         %foreach;ancestor;
@@ -951,17 +1007,16 @@
                 <tr>
                   %lazy_force;
                   <td>
-                    %expr(ancestor.anc_sosa.v * 2) - %expr((ancestor.anc_sosa.v * 2 + 1) % 10)
+                    %expr(ancestor.anc_sosa.v * 2) - %expr(ancestor.anc_sosa.v * 2 + 1)
                   </td>
                   <td align="center"> x </td>
                   <td> &nbsp; </td>
                   <td>
+                    %apply;image_MF("ancestor", "11")
                     %apply;link(ancestor.access, ancestor)
                     %ancestor.title;
                   </td>
-                  <td>
-                    %apply;somebody_long_info("ancestor")
-                  </td>
+                  %apply;display_missing_ancestor_info()
                 </tr>
               %end;
             %elseif;(ancestor.has_parents)
@@ -973,14 +1028,13 @@
                       %expr(ancestor.anc_sosa.v * 2)
                     </td>
                     <td> &nbsp; </td>
-                    <td align="center">[husband/wife]0</td>
+                    <td align="center"> x </td>
                     <td>
+                      %apply;image_MF("ancestor.mother", "11")
                       %apply;link(ancestor.mother.access, ancestor.mother)
                       %ancestor.mother.title;
                     </td>
-                    <td>
-                      %apply;somebody_long_info("ancestor.mother")
-                    </td>
+                    %apply;display_missing_ancestor_info()
                   </tr>
                 %end;
               %end;
@@ -989,17 +1043,16 @@
                   <tr>
                     %lazy_force;
                     <td>
-                      %expr(ancestor.anc_sosa.v * 2 + 1)%sp;
+                      %expr(ancestor.anc_sosa.v * 2 + 1)
                     </td>
                     <td> &nbsp; </td>
-                    <td align="center">[husband/wife]1</td>
+                    <td align="center"> x </td>
                     <td>
+                      %apply;image_MF("ancestor.father", "11")
                       %apply;link(ancestor.father.access, ancestor.father)
                       %ancestor.father.title;
                     </td>
-                    <td>
-                      %apply;somebody_long_info("ancestor.father")
-                    </td>
+                    %apply;display_missing_ancestor_info()
                   </tr>
                 %end;
               %end;
