@@ -939,16 +939,22 @@
         <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
         <table class="missing_ancestors_table_alpha">
           <tr>
-            <th>[*person/persons]0</th>
-            %if;(evar.birth = "on") <th>[birth]</th> %incr_count; %end;
-            %if;(evar.death = "on") <th>[death]</th> %incr_count; %end;
-            <th class="missing_parent">[*missing parents]</th>
-            <th class="missing_spouse">[*missing spouse]</th>
+            <th style="width:20%%;">[*person/persons]0</th>
+            %if;(evar.birth = "on") 
+              <th %if;(evar.death = "on")style="width:30%%;"%end;>[birth]</th> 
+              %incr_count; 
+            %end;
+            %if;(evar.death = "on")
+              <th>[death]</th> 
+              %incr_count; 
+            %end;
+            <th style="width:10%%;">[*missing parents]</th>
+            <th style="width:10%%;">[*missing spouse]</th>
           </tr>
       %end;
       <tr>
         <td> 
-          %item.5;%item.1;%sp;<a href="%prefix;%item.4;">%item.2;</a>%item.3;
+          %item.5;<a href="%prefix;%item.4;">%item.1;%sp;%item.2;</a>%item.3;
           %if;(item.6 != ""), <em>%item.6;</em>%end;
         </td>
         %if;(evar.birth = "on")
