@@ -67,6 +67,10 @@
   %xx.title;%xx.dates;
 %end;
 
+%define;p_link(aa, xx)
+  %if;(evar.cgl = "on")xx%else;<a href="%prefix;aa">xx</a>%end;
+%end;
+
 %define;somebody_long_info(xx)
   %if;xx.has_nobility_titles;
     <em>%nn;
@@ -302,6 +306,48 @@
   %end;
 %end;
 
+%define;display_images(xx, curlev, maxlev, famlev, ctr)
+  %if;(count = 10)
+    %reset_count;
+    </tr>
+  %end;
+  %if;(count = 0 and curlev = 0)<tr>%end;
+  %if;xx.has_image;
+    %incr_count;
+    <td width="100px">
+      <img src="%xx.image_url;" %image_small_size; alt=""%/>
+      <p>
+        %apply;p_link(xx.access, xx)
+        %xx.dates;
+      </p>
+    </td>
+  %end;
+  %foreach;xx.family;
+    %if;spouse.has_image;
+      %incr_count;
+      <td width="100px">
+        <img src="%spouse.image_url;" %image_small_size; alt=""%/>
+        <p>
+          %apply;p_link(spouse.access, spouse)
+          %spouse.dates;
+        </p>
+      </td>
+    %end;
+    %if;(curlev < maxlev)
+      %if;(curlev = 0 or evar.t = "L")
+        %if;(family.desc_level < famlev)
+        %elseif;(family.desc_level > famlev)
+        %elseif;has_children;
+          %family.set_infinite_desc_level;
+          %foreach;child;
+            %apply;display_images("child", curlev+1, maxlev, famlev+1, count+1)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
 %define;by_list(xx)
   <p>
   %apply;togen(xx).
@@ -319,6 +365,14 @@
       %reset_desc_level;
       %apply;notes_by_list("self", 0, xx, 0, 1)%nl;
     </dl>
+  %end;
+  %if;(evar.image = "on")
+    %reset_count;
+    %reset_desc_level;
+    <h3>[*image/images]1</h3>
+    <table>
+      %apply;display_images("self", 0, xx, 0, 1)
+    </table>
   %end;
   </p>
 %end;

@@ -390,6 +390,34 @@
   </dl>
 %end;
 
+%define;display_images()
+  <h3>[*image/images]1</h3>
+  %reset_count;
+  <table>
+    %foreach;ancestor_level;
+      %if;(evar.v != "" and level <= evar.v and (evar.only != "on" or level = evar.v))
+        %foreach;ancestor;
+          %if;(ancestor.same = "" and ancestor.has_image)
+            %if;(count = 0)<tr>%end;
+            %incr_count;
+            <td width="100px">
+              <img src="%ancestor.image_url;" %image_small_size; alt=""%/>
+              <p>
+                %apply;link(ancestor.access, ancestor)
+                %ancestor.dates;
+              </p>
+            </td>
+            %if;(count = 10)
+              %reset_count;
+              </tr>
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  </table>
+%end;
+
 %define;long_display_ancestor_personal()
   %apply;somebody("ancestor").
   %if;(evar.only != "on" and ancestor.father_sosa != "")
@@ -834,6 +862,7 @@
   %end;
   </ul>
   [*total]: %count; [[person/persons]1@(c)]
+
 %elseif;(evar.t = "N")
   %( short display %)
   <p>
@@ -1061,6 +1090,7 @@
       %end;
     %end;
   </table>
+
 %elseif;(evar.t = "G")
   %( long display %)
   %if;(evar.only != "on")
@@ -1098,6 +1128,10 @@
     %apply;long_display_notes()
     </p>
   %end;
+  %if;(evar.image = "on")
+    %apply;display_images()
+  %end;
+
 %elseif;(evar.t = "D")
   %( ancestors up to somebody %)
   %pvar.1.mark_descendants;
@@ -1121,6 +1155,7 @@
     %if;lazy_printed;</ul>%nl;</li>%nl;%end;
   %end;
   </ul>
+
 %elseif;(evar.t = "Z")
   %reset_count;
   <table class="ascends_table">
