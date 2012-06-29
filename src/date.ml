@@ -493,6 +493,35 @@ value string_of_age conf a =
 
 
 (* ************************************************************************ *)
+(*  [Fonc] prec_year_text : config -> Def.dmy -> string                     *)
+(** [Description] : Renvoie la précision d'une date et l'année de la date.
+    [Args] :
+      - conf : configuration de la base
+      - d    : Def.dmy
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value prec_year_text conf d = 
+  let s = 
+    match d.prec with
+    [ About -> 
+        (* On utilise le dictionnaire pour être sur *)
+        (* que ce soit compréhensible de tous.      *)
+        match transl conf "about (short date)" with
+        [ "ca" -> "ca "
+        | s -> s ]
+    | Maybe -> "?"
+    | Before -> "/" 
+    | _ -> "" ]
+  in
+  let s = s ^ string_of_int d.year in
+  match d.prec with
+  [ After -> s ^ "/"
+  | _ -> s ]
+;
+
+
+(* ************************************************************************ *)
 (*  [Fonc] prec_text : config -> Def.dmy -> string                          *)
 (** [Description] : Renvoie la précision d'une date.
     [Args] :
@@ -600,8 +629,14 @@ value get_birth_death_date p =
 (* ********************************************************************** *)
 (*  [Fonc] short_dates_text : config -> base -> person -> string          *)
 (** [Description] : Renvoie la concatenation de l'année de naissance et 
-                    l'année de décès (si trouvée par get_birth_death_date). 
-                    La précision de la date est ajoutée pour chaque année.
+      l'année de décès (si trouvée par get_birth_death_date). La précision 
+      de la date est ajoutée pour chaque année. 
+      L'affichage est le suivant : 
+        * 1700-1780 (date naissance - date décès)
+        * 1700-     (naissance - décédé)
+        * 1700      (naissance - vivant)
+        * †1780     (pas date naissance - date décès)
+        * †         (pas date naissance - décédé)
     [Args] :
       - conf : configuration de la base
       - base : base de donnée
@@ -615,15 +650,22 @@ value short_dates_text conf base p =
     let s =
       match (birth_date, death_date) with
       [ (Some (Dgreg b _), Some (Dgreg d _)) ->
-          let birth = quote_escaped (prec_text conf b) ^ year_text b in
-          let death = quote_escaped (prec_text conf d) ^ year_text d in
-          birth ^ (if prec_text conf d <> "" then " - " else "-") ^ death
+          prec_year_text conf b ^ "-" ^ prec_year_text conf d
       | (Some (Dgreg b _), None) ->
-          birth_symbol conf ^ quote_escaped (prec_text conf b) ^ year_text b
+          (* La personne peut être décédée mais ne pas avoir de date. *)
+          match get_death p with
+          [ Death _ _ | DeadDontKnowWhen | DeadYoung -> 
+              prec_year_text conf b ^ "-"
+          | _ -> prec_year_text conf b ]
       | (None, Some (Dgreg d _)) ->
           match get_death p with
-          [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
-              death_symbol conf ^ quote_escaped (prec_text conf d) ^ year_text d
+          [ Death _ _ | DeadDontKnowWhen | DeadYoung -> 
+              death_symbol conf ^ prec_year_text conf d
+          | _ -> "" ]
+      | (None, None) ->
+          (* La personne peut être décédée mais ne pas avoir de date. *)
+          match get_death p with
+          [ Death _ _ | DeadDontKnowWhen | DeadYoung -> death_symbol conf
           | _ -> "" ]
       (* On ne peut pas traiter les dates au format texte. *)
       | (_, _) -> "" ]
@@ -650,8 +692,7 @@ value short_marriage_date_text conf base fam p1 p2 =
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_codate (get_marriage fam) with
     [ Some (Dgreg d _) ->
-        let date = quote_escaped (prec_text conf d) ^ year_text d in
-        "<span style=\"font-size:70%\">" ^ date ^ "</span>"
+        "<span style=\"font-size:70%\">" ^ prec_year_text conf d ^ "</span>"
     | _ -> "" ]
   else ""
 ;
