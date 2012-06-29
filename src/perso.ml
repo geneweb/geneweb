@@ -1251,7 +1251,14 @@ value links_to_ind conf base db key =
 value rec compare_ls sl1 sl2 =
   match (sl1, sl2) with
   [ ([s1 :: sl1], [s2 :: sl2]) ->
-      let c = Gutil.alphabetic_order s1 s2 in
+      (* Je ne sais pas s'il y a des effets de bords, mais on  *)
+      (* essaie de convertir s1 s2 en int pour éviter que "10" *)
+      (* soit plus petit que "2". J'espère qu'on ne casse pas  *)
+      (* les performances à cause du try..with.                *)
+      let c = 
+        try Pervasives.compare (int_of_string s1) (int_of_string s2)
+        with [ Failure "int_of_string" -> Gutil.alphabetic_order s1 s2 ]
+      in
       if c = 0 then compare_ls sl1 sl2 else c
   | ([_ :: _], []) -> 1
   | ([], [_ :: _]) -> -1
