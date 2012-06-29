@@ -125,7 +125,7 @@
     "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
   </td></tr></table>
 %elseif;(evar.t = "F" and evar.sort = "on")
-  %( surnames branch sorted in decreasing order of number of branches %)
+  %( surnames branch sorted by number of branches %)
   %empty_sorted_list;
   %reset_count;
   %foreach;ancestor_surname(evar.v)
@@ -144,8 +144,8 @@
     <p>
       <span>[*number of branches] : </span>
       %foreach;sorted_list_item;
-        %if;(initial(prev_item.1) != initial(item.1))
-          <a href="#a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+        %if;(prev_item.1 != item.1)
+          <a href="#a_%apply;hexa(item.1)">%item.1;</a>
         %end;
       %end;
     </p>
@@ -153,9 +153,9 @@
 
   <ul class="missing_ancestors_ul_alpha">
     %foreach;sorted_list_item;
-      %if;(initial(prev_item.1) != initial(item.1))
+      %if;(prev_item.1 != item.1)
         <li>%nn;
-        <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+        <a name="a_%apply;hexa(item.1)">%item.1;</a>
         <table class="surname_branch_table">
           <tr>
             <th>[*surname/surnames]0</th>
@@ -182,7 +182,7 @@
           %item.6; - %item.7;
         </td>
       </tr>
-      %if;(initial(item.1) != initial(next_item.1))
+      %if;(item.1 != next_item.1)
         </table>
         </li>
         <br%/>
