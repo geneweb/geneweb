@@ -493,35 +493,6 @@ value string_of_age conf a =
 
 
 (* ************************************************************************ *)
-(*  [Fonc] prec_year_text : config -> Def.dmy -> string                     *)
-(** [Description] : Renvoie la précision d'une date et l'année de la date.
-    [Args] :
-      - conf : configuration de la base
-      - d    : Def.dmy
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-value prec_year_text conf d = 
-  let s = 
-    match d.prec with
-    [ About -> 
-        (* On utilise le dictionnaire pour être sur *)
-        (* que ce soit compréhensible de tous.      *)
-        match transl conf "about (short date)" with
-        [ "ca" -> "ca "
-        | s -> s ]
-    | Maybe -> "?"
-    | Before -> "/" 
-    | _ -> "" ]
-  in
-  let s = s ^ string_of_int d.year in
-  match d.prec with
-  [ After -> s ^ "/"
-  | _ -> s ]
-;
-
-
-(* ************************************************************************ *)
 (*  [Fonc] prec_text : config -> Def.dmy -> string                          *)
 (** [Description] : Renvoie la précision d'une date.
     [Args] :
@@ -592,6 +563,35 @@ value year_text d =
   [ OrYear x -> string_of_int d.year ^ "/" ^ string_of_int x
   | YearInt x -> string_of_int d.year ^ ".." ^ string_of_int x
   | _ -> string_of_int d.year ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] prec_year_text : config -> Def.dmy -> string                     *)
+(** [Description] : Renvoie la précision d'une date et l'année de la date.
+    [Args] :
+      - conf : configuration de la base
+      - d    : Def.dmy
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value prec_year_text conf d = 
+  let s = 
+    match d.prec with
+    [ About -> 
+        (* On utilise le dictionnaire pour être sur *)
+        (* que ce soit compréhensible de tous.      *)
+        match transl conf "about (short date)" with
+        [ "ca" -> "ca "
+        | s -> s ]
+    | Maybe -> "?"
+    | Before -> "/" 
+    | _ -> "" ]
+  in
+  let s = s ^ year_text d in
+  match d.prec with
+  [ After -> s ^ "/"
+  | _ -> s ]
 ;
 
 
