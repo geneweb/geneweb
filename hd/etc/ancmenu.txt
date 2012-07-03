@@ -142,6 +142,16 @@
             - [comment] ([marriage/marriages]1)
             <input type="checkbox" name="comm" value="on"%/>
           </label>
+          <br%/>
+          <label>
+            - [display notes/sources inline]
+            <input type="checkbox" name="inline" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [portfolio]
+            <input type="checkbox" name="image" value="on"%/>
+          </label>
           <br%/><br%/>
           <label>
             <input type="radio" name="t" value="Z"%/>
@@ -171,6 +181,11 @@
           <label>
             - [where married]
             <input type="checkbox" name="marr_place" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [child/children]1
+            <input type="checkbox" name="child" value="on"%/>
           </label>
           <br%/>
           <label>
@@ -298,6 +313,11 @@
             <input type="radio" name="t" value="F"%/>
             [*surnames branch]
           </label>
+          <br%/>
+          <label>
+            - [*sort by increasing order]
+            <input type="checkbox" name="sort" value="on"%/>
+          </label>
           <br%/><br%/>
           <label>
             <input type="radio" name="t" value="M"%/>
@@ -310,8 +330,9 @@
           </label>
           <br%/>
           <label>
-            - [*include missing spouses]
-            <input type="checkbox" name="ms" value="on"%/>
+            - [living from] 
+            <input type="text" name="after" size="4" maxlength="4" value=""%/> [to] 
+            <input type="text" name="before" size="4" maxlength="4" value=""%/>
           </label>
           <br%/>
         </td>

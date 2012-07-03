@@ -139,6 +139,16 @@
             - [comment] ([marriage/marriages]1)
             <input type="checkbox" name="comm" value="on"%/>
           </label>
+          <br%/>
+          <label>
+            - [display notes/sources inline]
+            <input type="checkbox" name="inline" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [portfolio]
+            <input type="checkbox" name="image" value="on"%/>
+          </label>
           <br%/><br%/>
           <label>
             <input type="radio" name="t" value="H"%/>
@@ -168,6 +178,11 @@
           <label>
             - [where married]
             <input type="checkbox" name="marr_place" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [child/children]1
+            <input type="checkbox" name="child" value="on"%/>
           </label>
           <br%/>
           <label>
