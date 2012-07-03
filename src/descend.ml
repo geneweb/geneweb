@@ -709,6 +709,12 @@ value print_desc_table_header conf base = do {
         Wserver.wprint "%s" (capitale (transl conf "where married"));
       end
     else ();
+    if p_getenv conf.env "child" = Some "on" then
+      tag "th" begin
+        incr nb_col;
+        Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
+      end
+    else ();
     if p_getenv conf.env "death" = Some "on" then
       tag "th" begin
         Wserver.wprint "%s" (capitale (transl conf "date of death"));
@@ -863,6 +869,33 @@ value print_person_table conf base p lab = do {
         else Wserver.wprint "&nbsp;";
       end
     else ();
+    (* On affiche que la première famille (get_family u).(0). *)
+    (* Les autres familles seront affichées après qu'on ait   *)
+    (* fini de remplir le <tr>.                               *)
+    if p_getenv conf.env "child" = Some "on" then
+      if p_getenv conf.env "marr" = Some "on" ||
+         p_getenv conf.env "marr_place" = Some "on" ||
+         p_getenv conf.env "marr_date" = Some "on"
+      then
+        tag "td" "%s" 
+          (if nb_families > 1 then "style=\"border-bottom:none\"" else "") 
+          begin
+          let u = p in
+          if nb_families > 0 then
+            let fam = foi base (get_family u).(0) in
+            Wserver.wprint "%d &nbsp;" (Array.length (get_children fam))
+          else Wserver.wprint "&nbsp;";
+          end
+      else
+        let n =
+          List.fold_left
+            (fun n ifam -> n + Array.length (get_children (foi base ifam)))
+            0 (Array.to_list (get_family p))
+        in
+        tag "td" begin
+          Wserver.wprint "%d &nbsp;" n;
+        end
+    else ();
     if p_getenv conf.env "death" = Some "on" then
       tag "td" "%s" rowspan begin
         let d =
@@ -973,6 +1006,13 @@ value print_person_table conf base p lab = do {
               begin
                 Wserver.wprint "%s &nbsp;" 
                   (Util.string_of_place conf (sou base (get_marriage_place fam)));
+            end
+          else ();
+          if p_getenv conf.env "child" = Some "on" then
+            tag "td" "style=\"border-top:none; %s\"" 
+              (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
+              begin
+                Wserver.wprint "%d &nbsp;" (Array.length (get_children fam));
             end
           else ();
         end
