@@ -3268,10 +3268,10 @@ value print_foreach conf base print_ast eval_expr =
       | [] -> [(typ, src)] ]
     in
     let insert typ src srcl = insert_loop (Util.translate_eval typ) src srcl in
-    (* On brise la logique interne de GeneWeb en constituant les      *)
-    (* notes/sources de la personne sans ses informations de décès,   *)
-    (* puis les notes/sources de sa famille et enfin ses informations *)
-    (* de décès. Ce qui évite : naissance, baptême, décès, mariage.   *)
+    (* On brise la logique interne de GeneWeb en constituant les     *)
+    (* sources de la personne sans ses informations de décès, puis   *)
+    (* les sources de sa famille et enfin ses informations de décès. *)
+    (* Ce qui évite : naissance, baptême, décès, mariage.            *)
     let srcl = [] in
     let srcl =
       if not (is_hide_names conf p) || p_auth then
@@ -3317,14 +3317,36 @@ value print_foreach conf base print_ast eval_expr =
         srcl
       else srcl
     in
-    let print_src (src_typ, src) =
-      let s = sou base src in
-      if s = "" then ()
-      else
-        let env = [("src_typ", Vstring src_typ); ("src", Vstring s) :: env] in
-        List.iter (print_ast env ep) al
+    (* On parcours la liste des sources, et on supprime toutes les  *)
+    (* sources vides afin de pouvoir savoir qu'elle est la première *)
+    (* source (is_first) et quelle est la dernière (is_last).       *)
+    let srcl =
+      let rec loop srcl accu =
+        match srcl with
+        [ [] -> 
+            (* Il faut renverser la liste puisqu'on a ajouté en tête. *)
+            List.rev accu
+        | [(src_typ, src) :: srcl] -> 
+            let s = sou base src in
+            if s = "" then loop srcl accu
+            else loop srcl [(src_typ, s) :: accu] ]
+      in
+      loop srcl []
     in
-    List.iter print_src srcl
+    (* Affiche les sources et met à jour les variables "first" et "last". *)
+    let rec loop first =
+      fun
+      [ [(src_typ, src) :: srcl] ->
+          let env = 
+            [("first", Vbool first); ("last", Vbool (srcl = []));
+             ("src_typ", Vstring src_typ); ("src", Vstring src) :: env]
+          in
+          do {
+            List.iter (print_ast env ep) al;
+            loop False srcl
+          }
+      | [] -> () ]
+    in loop True srcl
   and print_foreach_surname_alias env al ((p, p_auth) as ep) =
     if p_auth then
       List.iter
@@ -3426,6 +3448,7 @@ value eval_predefined_apply conf env f vl =
         string_of_int m
       with
       [ Failure _ -> raise Not_found ]
+  | ("no_html_tags", [s]) -> Util.no_html_tags s
   | _ -> raise Not_found ]
 ;
 
