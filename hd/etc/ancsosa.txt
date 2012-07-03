@@ -55,6 +55,8 @@
 
 %let;central_index;%index;%in;
 
+%let;nb_gen;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%in;
+
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
 %end;
@@ -422,16 +424,24 @@
   %apply;somebody("ancestor").
   %if;(evar.only != "on" and ancestor.father_sosa != "")
     [*parents]:%sp;
-    <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;
-    </a></b>%sp;
+    <b><a href="#%ancestor.father_sosa;">%ancestor.father_sosa;</a></b>%sp;
     [and]%sp;
-    <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;
-    </a></b>.
+    <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;</a></b>.
   %end;
-  %if;(evar.notes = "on" and ancestor.has_notes or
-       evar.src = "on" and ancestor.has_sources)
+  %if;(evar.notes = "on" and ancestor.has_notes and evar.inline = "on")
+    <b>[*note/notes]0</b> : %apply;no_html_tags(ancestor.notes).%sp;
+  %end;
+  %if;(evar.src = "on" and ancestor.has_sources and evar.inline = "on")
+    <b>[*source/sources]1</b> : 
+    %foreach;ancestor.source;
+      %source_type;: %apply;no_html_tags(source)
+      %if;(not is_last),%sp;%end;
+    %end;.
+  %end;
+  %if;((evar.notes = "on" and ancestor.has_notes or evar.src = "on" and ancestor.has_sources) and evar.inline != "on")
     %if;(evar.notes = "on")%[[*note/notes]0%sp;
-    %else;%[[*source/sources]1%sp;%end;
+    %else;%[[*source/sources]1%sp;
+    %end;
     <b><a href="#notes-%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>%].
   %end;
   %if;(evar.siblings = "on")
@@ -462,13 +472,11 @@
 %end;
 
 %define;child_long_info(spec)
-  <b>%apply;my_link(child.access, child.child_name, child.is_restricted)%nn;
-  </b>%nn;
+  <b>%apply;my_link(child.access, child.child_name, child.is_restricted)%nn;</b>%nn;
   %apply;somebody_long_info("child")
   %if;(child.sosa_in_list != "").
     %if;(evar.only != "on")[*see]%sp;
-      <a href="#%child.sosa_in_list;"><b>%child.sosa_in_list;
-      </b></a>.
+      <a href="#%child.sosa_in_list;"><b>%child.sosa_in_list;</b></a>.
     %end;
   %else;
     %apply;somebody_extra_info("child").
@@ -492,17 +500,28 @@
         %end;
       %end;.
       %if;are_divorced;[*divorced]0%divorce_date;.%nl;
-      %elseif;are_separated;[*separated]0.%nl;%end;
+      %elseif;are_separated;[*separated]0.%nl;
+      %end;
     %end;
-    %if;(evar.notes = "on" and child.has_notes or
-         evar.src = "on" and child.has_sources)
+    %if;(evar.notes = "on" and child.has_notes and evar.inline = "on")
+      <b>[*note/notes]0</b> : %apply;no_html_tags(child.notes).%sp;
+    %end;
+    %if;(evar.src = "on" and child.has_sources and evar.inline = "on")
+      <b>[*source/sources]1</b> : 
+      %foreach;child.source;
+        %source_type;: %apply;no_html_tags(source)
+        %if;(not is_last),%sp;%end;
+      %end;.
+    %end;
+    %if;((evar.notes = "on" and child.has_notes or evar.src = "on" and child.has_sources) and evar.inline != "on")
       %if;(evar.notes = "on")%[[*note/notes]0%sp;
-      %else;%[[*source/sources]1%sp;%end;
-      <b><a href="#notes-%ancestor.anc_sosa.v;
-      %if;("spec" != "")-spec%end;
-      %apply;letter(child_cnt)">%ancestor.anc_sosa;
-      %if;("spec" != "")-spec%end;
-      %apply;letter(child_cnt)</a></b>%].
+      %else;%[[*source/sources]1%sp;
+      %end;
+      <b>
+        <a href="#notes-%ancestor.anc_sosa.v;%if;("spec" != "")-spec%end;%apply;letter(child_cnt)">
+          %ancestor.anc_sosa;%if;("spec" != "")-spec%end;%apply;letter(child_cnt)
+        </a>
+      </b>%].
     %end;
   %end;
 %end;
@@ -837,67 +856,68 @@
   %( short display; only the selected generation %)
   %reset_count;
   <ul>
-  %foreach;ancestor_level2;
-    %if;(evar.v != "" and level = evar.v)
-      <li>%nl;%apply;gen("v")%nl;
-      <ul>%nl;
-      %foreach;ancestor;
-        <li>%sp;
-        %if;(ancestor.interval != "")%ancestor.interval;
-        %else;
-          %if;(ancestor.same = "")%incr_count;%end;
-          %ancestor.anc_sosa;%sp;
-          %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-          %apply;link%with;%ancestor.access;%and;
-            %if;(ancestor.same != "")%ancestor.same;
-            %else;%ancestor;%end;
-          %end;
-          %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
-        %end;
-        </li>%nl;
+    %foreach;ancestor_level2;
+      %if;(evar.v != "" and level = evar.v)
+        <li>%nl;%apply;gen("v")%nl;
+          <ul>%nl;
+            %foreach;ancestor;
+              <li>%sp;
+                %if;(ancestor.interval != "")%ancestor.interval;
+                %else;
+                  %if;(ancestor.same = "")%incr_count;%end;
+                  %ancestor.anc_sosa;%sp;
+                  %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
+                  %apply;link%with;%ancestor.access;%and;
+                    %if;(ancestor.same != "")%ancestor.same;
+                    %else;%ancestor;%end;
+                  %end;
+                  %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
+                %end;
+              </li>%nl;
+            %end;
+          </ul>
+        </li>
       %end;
-      </ul>
-      </li>
     %end;
-  %end;
   </ul>
   [*total]: %count; [[person/persons]1@(c)]
 
 %elseif;(evar.t = "N")
   %( short display %)
-  <p>
-  %apply;togen("v").
-  </p>
+  <p>%apply;togen(nb_gen).</p>
   %reset_count;
   <ul>
-  %foreach;ancestor_level(evar.v)
-    %apply;lazy_print%with;
-      <li>%nl;<b>[*generation/generations]0 %level;</b>%nl;
-      <ul>%nl;
-    %end;
-    %foreach;ancestor;
-      %lazy_force;
-      %if;(ancestor.same = "")%incr_count;%end;
-      <li class="%if;ancestor.has_parents;goway%else;noway%end;">%nn;
-      %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;
-      %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;
-      %else;%ancestor.anc_sosa;%end;%sp;
-      %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-      %apply;link%with;%ancestor.access;%and;
-         %if;(ancestor.same != "")%nn;
-           %if(evar.sosab = 16)%ancestor.same.hexa;
-           %elseif(evar.sosab = 8)%ancestor.same.octal;
-           %else;%ancestor.same;%end;
-         %else;%ancestor;%end;
+    %foreach;ancestor_level(nb_gen)
+      %apply;lazy_print%with;
+        <li>%nl;<b>[*generation/generations]0 %level;</b>%nl;
+        <ul>%nl;
       %end;
-      %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
-      </li>%nl;
+      %foreach;ancestor;
+        %lazy_force;
+        %if;(ancestor.same = "")%incr_count;%end;
+        <li class="%if;ancestor.has_parents;goway%else;noway%end;">%nn;
+          %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;
+          %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;
+          %else;%ancestor.anc_sosa;
+          %end;%sp;
+          %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
+          %apply;link%with;%ancestor.access;%and;
+             %if;(ancestor.same != "")%nn;
+               %if(evar.sosab = 16)%ancestor.same.hexa;
+               %elseif(evar.sosab = 8)%ancestor.same.octal;
+               %else;%ancestor.same;
+               %end;
+             %else;%ancestor;
+             %end;
+          %end;
+          %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
+        </li>%nl;
+      %end;
+      %if;lazy_printed;
+        </ul>
+        </li>
+      %end;
     %end;
-    %if;lazy_printed;
-      </ul>
-      </li>
-    %end;
-  %end;
   </ul>
   [*total]: %count; [[person/persons]1@(c)]
 
@@ -1094,39 +1114,31 @@
 %elseif;(evar.t = "G")
   %( long display %)
   %if;(evar.only != "on")
-    <p>
-    %apply;togen("v").
-    </p>
+    <p>%apply;togen(nb_gen).</p>
   %end;
-  %foreach;ancestor_level(evar.v)
-    %if;(evar.only != "on" or level = evar.v)
-      <h3><em>[*generation/generations]0 %level;</em></h3>
-      %foreach;ancestor;
-        %if;(ancestor.same != "")
-          <p>
+  %foreach;ancestor_level(nb_gen)
+    <h3><em>[*generation/generations]0 %level;</em></h3>
+    %foreach;ancestor;
+      %if;(ancestor.same != "")
+        <p>
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>:
           [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
-          </p>
-        %else;
-          <p>
+        </p>
+      %else;
+        <p>
           <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
           %apply;long_display_ancestor_personal()
-          </p>
-          %if;(ancestor.index != self.index)
-            <p>
-            %apply;long_display_ancestor_families()
-            </p>
-          %end;
+        </p>
+        %if;(ancestor.index != self.index)
+          <p>%apply;long_display_ancestor_families()</p>
         %end;
       %end;
-      <br%/>
     %end;
+    <br%/>
   %end;
-  %if;(evar.notes = "on" or evar.src = "on")
+  %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
     <p><hr%/></p>
-    <p>
-    %apply;long_display_notes()
-    </p>
+    <p>%apply;long_display_notes()</p>
   %end;
   %if;(evar.image = "on")
     %apply;display_images()
@@ -1136,24 +1148,24 @@
   %( ancestors up to somebody %)
   %pvar.1.mark_descendants;
   <ul>
-  %foreach;ancestor_level;
-    %apply;lazy_print%with;
-      <li>[*generation/generations]0 %level;%nl;
-      <ul>
-    %end;
-    %if;(level <= evar.l + 1)
-      %foreach;ancestor;
-        %if;(ancestor.same = "" and ancestor.is_descendant)
-          %lazy_force;
-          <li>[Sosa] %ancestor.anc_sosa; -%sp;
-          <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
-	  %ancestor.title;%ancestor.dates;
-          </li>
+    %foreach;ancestor_level;
+      %apply;lazy_print%with;
+        <li>[*generation/generations]0 %level;%nl;
+        <ul>
+      %end;
+      %if;(level <= evar.l + 1)
+        %foreach;ancestor;
+          %if;(ancestor.same = "" and ancestor.is_descendant)
+            %lazy_force;
+            <li>[Sosa] %ancestor.anc_sosa; -%sp;
+              <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
+  	          %ancestor.title;%ancestor.dates;
+            </li>
+          %end;
         %end;
       %end;
+      %if;lazy_printed;</ul>%nl;</li>%nl;%end;
     %end;
-    %if;lazy_printed;</ul>%nl;</li>%nl;%end;
-  %end;
   </ul>
 
 %elseif;(evar.t = "Z")
