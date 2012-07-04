@@ -601,7 +601,7 @@ div.summary ul ul
 .missing_ancestors_table_alpha th.missing_spouse
 {
  width:100px;
- align:center;
+ text-align:center;
 }
 
 .missing_ancestors_table
