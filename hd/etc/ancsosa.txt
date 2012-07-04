@@ -1143,20 +1143,22 @@
     <p>%apply;togen(nb_gen).</p>
   %end;
   %foreach;ancestor_level(nb_gen)
-    <h3><em>[*generation/generations]0 %level;</em></h3>
-    %foreach;ancestor;
-      %if;(ancestor.same != "")
-        <p>
-          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>:
-          [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
-        </p>
-      %else;
-        <p>
-          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
-          %apply;long_display_ancestor_personal()
-        </p>
-        %if;(ancestor.index != self.index)
-          <p>%apply;long_display_ancestor_families()</p>
+    %if;(evar.only != "on" or level = evar.v)
+      <h3><em>[*generation/generations]0 %level;</em></h3>
+      %foreach;ancestor;
+        %if;(ancestor.same != "")
+          <p>
+            <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>:
+            [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
+          </p>
+        %else;
+          <p>
+            <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
+            %apply;long_display_ancestor_personal()
+          </p>
+          %if;(ancestor.index != self.index)
+            <p>%apply;long_display_ancestor_families()</p>
+          %end;
         %end;
       %end;
     %end;
