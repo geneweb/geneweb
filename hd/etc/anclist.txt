@@ -218,7 +218,21 @@
           %ancestor.place;
         </td>
         <td>
-          %ancestor.date_begin.prec;%ancestor.date_begin.year; - %ancestor.date_end.prec;%ancestor.date_end.year;
+          %if;(ancestor.date_begin.prec = "&lt;")
+            /%ancestor.date_begin.year;%nn;
+          %elseif;(ancestor.date_begin.prec = "&gt;")
+            %ancestor.date_begin.year;/%nn;
+          %else;
+            %ancestor.date_begin.prec;%ancestor.date_begin.year;%nn;
+          %end;
+          -%nn;
+          %if;(ancestor.date_end.prec = "&lt;")
+            /%ancestor.date_end.year;%nn;
+          %elseif;(ancestor.date_end.prec = "&gt;")
+            %ancestor.date_end.year;/%nn;
+          %else;
+            %ancestor.date_end.prec;%ancestor.date_end.year;%nn;
+          %end;
         </td>
       </tr>
     %end;
