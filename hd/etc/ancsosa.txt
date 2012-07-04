@@ -55,7 +55,11 @@
 
 %let;central_index;%index;%in;
 
-%let;nb_gen;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%in;
+%let;nb_gen;
+  %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level)
+  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)
+  %end;
+%in;
 
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
