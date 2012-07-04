@@ -884,7 +884,7 @@
   <ul>
     %foreach;ancestor_level2;
       %if;(evar.v != "" and level = evar.v)
-        <li>%nl;%apply;gen("v")%nl;
+        <li>%nl;<b>%apply;gen("v")</b>%nl;
           <ul>%nl;
             %foreach;ancestor;
               <li>%sp;
@@ -1142,7 +1142,7 @@
 %elseif;(evar.t = "G" and evar.only= "on")
   %( long display; only the selected generation %)
   %foreach;ancestor_level2;
-    %if;(evar.v != "" or level = evar.v)
+    %if;(evar.v != "" and level = evar.v)
       <p>%apply;gen("v").</p>
       %foreach;ancestor;
         %if;(ancestor.same != "")
