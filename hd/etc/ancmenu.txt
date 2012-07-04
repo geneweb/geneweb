@@ -330,6 +330,21 @@
           </label>
           <br%/>
           <label>
+            - [*birth]
+            <input type="checkbox" name="birth" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [*death]
+            <input type="checkbox" name="death" value="on"%/>
+          </label>
+          <br%/>
+          <label>
+            - [*spouse] (* only in display by generation)
+            <input type="checkbox" name="spouse" value="on"%/>
+          </label>
+          <br%/>
+          <label>
             - [living from] 
             <input type="text" name="after" size="4" maxlength="4" value=""%/> [to] 
             <input type="text" name="before" size="4" maxlength="4" value=""%/>
