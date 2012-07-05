@@ -291,6 +291,11 @@
             d'Aboville
           </label>
           <br%/>
+          <label>
+            <input type="checkbox" name="num" value="on"%/>
+            - [display aboville number]
+          </label>
+          <br%/>
         </td>
       </tr>
       <tr align="%left;">
