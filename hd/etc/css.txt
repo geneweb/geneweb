@@ -635,6 +635,11 @@ div.summary ul ul
  padding:2px;
 }
 
+.descends_aboville_pipe
+{
+  border-left: 1px solid;
+  padding-left: 10px;
+}
 
 /* modifications of places */
 

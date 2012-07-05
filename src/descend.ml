@@ -1394,13 +1394,15 @@ value print_tree conf base v p =
 
 value print_aboville conf base max_level p =
   let max_level = min (Perso.limit_desc conf) max_level in
+  let num_aboville = p_getenv conf.env "num" = Some "on" in
   do {
     Hutil.header conf (descendants_title conf base p);
     print_link_to_welcome conf True;
     Wserver.wprint "%s.<br><p>" (capitale (text_to conf max_level));
     let rec loop_ind lev lab p =
       do {
-        Wserver.wprint "<tt>%s</tt>\n" lab;
+        if num_aboville then Wserver.wprint "<tt>%s</tt>\n" lab
+        else Wserver.wprint "%s\n" lab;
         Wserver.wprint "%s%s\n" (referenced_person_title_text conf base p)
           (Date.short_dates_text conf base p);
         let u = p in
@@ -1436,7 +1438,9 @@ value print_aboville conf base max_level p =
                 if j = Array.length (get_children des) then
                   loop_fam cnt_chil (i + 1)
                 else do {
-                  loop_ind (lev + 1) (lab ^ string_of_int cnt_chil ^ ".")
+                  loop_ind (lev + 1) 
+                    (if num_aboville then lab ^ string_of_int cnt_chil ^ "."
+                     else lab ^ "<span class=\"descends_aboville_pipe\">&nbsp;</span>")
                     (pget conf base (get_children des).(j));
                   loop_chil (cnt_chil + 1) (j + 1)
                 }
