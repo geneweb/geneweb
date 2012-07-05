@@ -148,11 +148,13 @@
     <b>[*note/notes]0</b> : %apply;no_html_tags(xx.notes).%sp;
   %end;
   %if;(evar.src = "on" and xx.has_sources and evar.inline = "on")
-    <b>[*source/sources]1</b> : 
-    %foreach;xx.source;
-      %source_type;: %apply;no_html_tags(source)
-      %if;(not is_last),%sp;%end;
-    %end;.
+    <em>
+      <b>[*source/sources]1</b> : 
+      %foreach;xx.source;
+        %source_type;: %apply;no_html_tags(source)
+        %if;(not is_last),%sp;%end;
+      %end;.
+    </em>
   %end;
   %if;((((evar.notes="on" and xx.has_notes)
         and (wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no"))
@@ -182,11 +184,13 @@
       <b>[*note/notes]0</b> : %apply;no_html_tags(spouse.notes).%sp;
     %end;
     %if;(evar.src = "on" and spouse.has_sources and evar.inline = "on")
-      <b>[*source/sources]1</b> : 
-      %foreach;spouse.source;
-        %source_type;: %apply;no_html_tags(source)
-        %if;(not is_last),%sp;%end;
-      %end;.
+      <em>
+        <b>[*source/sources]1</b> : 
+        %foreach;spouse.source;
+          %source_type;: %apply;no_html_tags(source)
+          %if;(not is_last),%sp;%end;
+        %end;.
+      </em>
     %end;
     %if;((((evar.notes="on" and spouse.has_notes)
           and (wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no"))
@@ -321,33 +325,64 @@
   %end;
 %end;
 
+%define;img_td(xx, curlev)
+  %if;(count = 8)
+    %reset_count;
+    </tr>
+  %end;
+  %if;(count = 0 and curlev = 0)<tr>%end;
+  %if;(xx.has_image or evar.alw_img = "on")
+    %if;(count = 0)<tr>%end;
+    %incr_count;
+    <td width="100px" valign="top">
+      <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
+      <p>
+        %apply;p_link(xx.access, xx)
+        %xx.dates;
+      </p>
+    </td>
+    %if;(count = 8)
+      %reset_count;
+      </tr>
+    %end;
+  %end;
+%end;
+
 %define;display_images(xx, curlev, maxlev, famlev, ctr)
+%(
   %if;(count = 10)
     %reset_count;
     </tr>
   %end;
   %if;(count = 0 and curlev = 0)<tr>%end;
+%)
+  %apply;img_td(xx, curlev)
+%(
   %if;xx.has_image;
     %incr_count;
     <td width="100px">
-      <img src="%xx.image_url;" %image_small_size; alt=""%/>
+      <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
       <p>
         %apply;p_link(xx.access, xx)
         %xx.dates;
       </p>
     </td>
   %end;
+%)
   %foreach;xx.family;
+    %apply;img_td("spouse", curlev)
+%(
     %if;spouse.has_image;
       %incr_count;
       <td width="100px">
-        <img src="%spouse.image_url;" %image_small_size; alt=""%/>
+        <img src="%spouse.image_url;" %spouse.image_small_size; alt=""%/>
         <p>
           %apply;p_link(spouse.access, spouse)
           %spouse.dates;
         </p>
       </td>
     %end;
+%)
     %if;(curlev < maxlev)
       %if;(curlev = 0 or evar.t = "L")
         %if;(family.desc_level < famlev)

@@ -152,6 +152,11 @@
             - [portfolio]
             <input type="checkbox" name="image" value="on"%/>
           </label>
+          <br%/>
+          <label>
+            - [always display picture] (* only for the portfolio)
+            <input type="checkbox" name="alw_img" value="on"%/>
+          </label>
           <br%/><br%/>
           <label>
             <input type="radio" name="t" value="Z"%/>

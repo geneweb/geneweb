@@ -392,26 +392,43 @@
   </dl>
 %end;
 
+%define;td_img(xx)
+  %if;(xx.has_image or evar.alw_img = "on")
+    %if;(count = 0)<tr>%end;
+    %incr_count;
+    <td width="100px" valign="top">
+      <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
+      <p>
+        %apply;link(xx.access, xx)
+        %xx.dates;
+      </p>
+    </td>
+    %if;(count = 8)
+      %reset_count;
+      </tr>
+    %end;
+  %end;
+%end;
+
 %define;display_images()
   <h3>[*image/images]1</h3>
   %reset_count;
   <table>
     %foreach;ancestor_level;
-      %if;(evar.v != "" and level <= evar.v and (evar.only != "on" or level = evar.v))
+      %if;(evar.v != "" and level <= nb_gen and (evar.only != "on" or level = evar.v))
         %foreach;ancestor;
-          %if;(ancestor.same = "" and ancestor.has_image)
-            %if;(count = 0)<tr>%end;
-            %incr_count;
-            <td width="100px">
-              <img src="%ancestor.image_url;" %image_small_size; alt=""%/>
-              <p>
-                %apply;link(ancestor.access, ancestor)
-                %ancestor.dates;
-              </p>
-            </td>
-            %if;(count = 10)
-              %reset_count;
-              </tr>
+          %if;(ancestor.same = "")
+            %apply;td_img("ancestor")
+            %if;(ancestor.index != self.index)
+              %if;ancestor.is_female;
+                %foreach;ancestor.family;
+                  %foreach;child;
+                    %if;(evar.siblings = "on" or child.sosa_in_list != "")
+                      %apply;td_img("child")
+                    %end;
+                  %end;
+                %end;
+              %end;
             %end;
           %end;
         %end;
@@ -419,6 +436,7 @@
     %end;
   </table>
 %end;
+
 
 %define;long_display_ancestor_personal()
   %apply;somebody("ancestor").
@@ -432,11 +450,13 @@
     <b>[*note/notes]0</b> : %apply;no_html_tags(ancestor.notes).%sp;
   %end;
   %if;(evar.src = "on" and ancestor.has_sources and evar.inline = "on")
-    <b>[*source/sources]1</b> : 
-    %foreach;ancestor.source;
-      %source_type;: %apply;no_html_tags(source)
-      %if;(not is_last),%sp;%end;
-    %end;.
+    <em>
+      <b>[*source/sources]1</b> : 
+      %foreach;ancestor.source;
+        %source_type;: %apply;no_html_tags(source)
+        %if;(not is_last),%sp;%end;
+      %end;.
+    </em>
   %end;
   %if;((evar.notes = "on" and ancestor.has_notes or evar.src = "on" and ancestor.has_sources) and evar.inline != "on")
     %if;(evar.notes = "on")%[[*note/notes]0%sp;
@@ -507,11 +527,13 @@
       <b>[*note/notes]0</b> : %apply;no_html_tags(child.notes).%sp;
     %end;
     %if;(evar.src = "on" and child.has_sources and evar.inline = "on")
-      <b>[*source/sources]1</b> : 
-      %foreach;child.source;
-        %source_type;: %apply;no_html_tags(source)
-        %if;(not is_last),%sp;%end;
-      %end;.
+      <em>
+        <b>[*source/sources]1</b> : 
+        %foreach;child.source;
+          %source_type;: %apply;no_html_tags(source)
+          %if;(not is_last),%sp;%end;
+        %end;.
+      </em>
     %end;
     %if;((evar.notes = "on" and child.has_notes or evar.src = "on" and child.has_sources) and evar.inline != "on")
       %if;(evar.notes = "on")%[[*note/notes]0%sp;
@@ -1143,7 +1165,7 @@
   %( long display; only the selected generation %)
   %foreach;ancestor_level2;
     %if;(evar.v != "" and level = evar.v)
-      <p>%apply;gen("v").</p>
+      <h3><em>%apply;gen("v").</em></h3>
       %foreach;ancestor;
         %if;(ancestor.same != "")
           <p>
@@ -1176,22 +1198,20 @@
     <p>%apply;togen(nb_gen).</p>
   %end;
   %foreach;ancestor_level(nb_gen)
-    %if;(evar.only != "on" or level = evar.v)
-      <h3><em>[*generation/generations]0 %level;</em></h3>
-      %foreach;ancestor;
-        %if;(ancestor.same != "")
-          <p>
-            <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>:
-            [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
-          </p>
-        %else;
-          <p>
-            <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
-            %apply;long_display_ancestor_personal()
-          </p>
-          %if;(ancestor.index != self.index)
-            <p>%apply;long_display_ancestor_families()</p>
-          %end;
+    <h3><em>[*generation/generations]0 %level;</em></h3>
+    %foreach;ancestor;
+      %if;(ancestor.same != "")
+        <p>
+          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>:
+          [see] <b><a href="#%ancestor.same.v;">%ancestor.same;</a></b>.
+        </p>
+      %else;
+        <p>
+          <b><a name="%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>
+          %apply;long_display_ancestor_personal()
+        </p>
+        %if;(ancestor.index != self.index)
+          <p>%apply;long_display_ancestor_families()</p>
         %end;
       %end;
     %end;
