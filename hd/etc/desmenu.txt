@@ -159,6 +159,13 @@
             <input type="radio" name="t" value="H"%/>
             [*table]
           </label>
+          %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+            ([maximum] 12 [generation/generations]1)
+          %elseif;(
+            bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
+          )
+            ([maximum] %bvar.max_desc_level; [generation/generations]1)
+          %end;
           <br%/>
           <label>
             - [date of birth]
@@ -290,6 +297,13 @@
             <input type="radio" name="t" value="A"%/>
             d'Aboville
           </label>
+          %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+            ([maximum] 12 [generation/generations]1)
+          %elseif;(
+            bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
+          )
+            ([maximum] %bvar.max_desc_level; [generation/generations]1)
+          %end;
           <br%/>
           <label>
             <input type="checkbox" name="num" value="on"%/>
