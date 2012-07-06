@@ -1273,7 +1273,7 @@
     %end;
   </table>
   <p>[*total]: %count; [[person/persons]1@(c)]</p>
-%end
+%end;
 
 
 %base_trailer;
