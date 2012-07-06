@@ -55,12 +55,6 @@
 
 %let;central_index;%index;%in;
 
-%let;nb_gen;
-  %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level)
-  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)
-  %end;
-%in;
-
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
 %end;
@@ -932,6 +926,7 @@
 
 %elseif;(evar.t = "N")
   %( short display %)
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   <p>%apply;togen(nb_gen).</p>
   %reset_count;
   <ul>
@@ -971,13 +966,14 @@
 
 %elseif;(evar.t = "M" and evar.al = "on")
   %( missing ancestors alphabetically %)
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   <p>
-    %apply;togen%with;%evar.v;%end;
-    %apply;living_interval_dates(evar.after, evar.before)
+    %apply;togen(nb_gen)
+    %apply;living_interval_dates(evar.after, evar.before).
   </p>
   %empty_sorted_list;
   %reset_count;
-  %foreach;ancestor_level;
+  %foreach;ancestor_level(nb_gen)
     %foreach;ancestor;
       %if;(ancestor.same = "")
         %if;(((not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?") or 
@@ -1072,8 +1068,9 @@
 
 %elseif;(evar.t = "M")
   %( missing ancestors by generation %)
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   <p>
-    %apply;togen%with;%evar.v;%end;
+    %apply;togen(nb_gen)
     %apply;living_interval_dates(evar.after, evar.before)
   </p>
   %reset_count;
@@ -1089,7 +1086,7 @@
     </tr>
     %let;nb_col;%expr(count + 4)%in;
     %reset_count;
-    %foreach;ancestor_level;
+    %foreach;ancestor_level(nb_gen)
       %apply;lazy_print%with;
         <tr>
           <td colspan="%nb_col;">[*generation/generations]0 %level;</td>
@@ -1194,9 +1191,8 @@
 
 %elseif;(evar.t = "G")
   %( long display %)
-  %if;(evar.only != "on")
-    <p>%apply;togen(nb_gen).</p>
-  %end;
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
+  <p>%apply;togen(nb_gen).</p>
   %foreach;ancestor_level(nb_gen)
     <h3><em>[*generation/generations]0 %level;</em></h3>
     %foreach;ancestor;
@@ -1250,6 +1246,7 @@
   </ul>
 
 %elseif;(evar.t = "Z")
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   <p>%apply;togen(nb_gen).</p>
   %reset_count;
   <table class="ascends_table">
