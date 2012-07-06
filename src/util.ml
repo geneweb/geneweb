@@ -487,6 +487,13 @@ value no_html_tags s =
   else s
 ;
 
+(* Version 1 => moche *)
+value clean_html_tags s l =
+  List.fold_left
+    (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "" s)
+    s l
+;
+
 value hidden_env conf =
   List.iter
     (fun (k, v) ->

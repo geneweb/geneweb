@@ -447,13 +447,13 @@
     <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;</a></b>.
   %end;
   %if;(evar.notes = "on" and ancestor.has_notes and evar.inline = "on")
-    <b>[*note/notes]0</b> : %apply;no_html_tags(ancestor.notes).%sp;
+    <b>[*note/notes]0</b> : %apply;clean_html_tags(ancestor.notes).%sp;
   %end;
   %if;(evar.src = "on" and ancestor.has_sources and evar.inline = "on")
     <em>
       <b>[*source/sources]1</b> : 
       %foreach;ancestor.source;
-        %source_type;: %apply;no_html_tags(source)
+        %source_type;: %apply;clean_html_tags(source)
         %if;(not is_last),%sp;%end;
       %end;.
     </em>
@@ -524,13 +524,13 @@
       %end;
     %end;
     %if;(evar.notes = "on" and child.has_notes and evar.inline = "on")
-      <b>[*note/notes]0</b> : %apply;no_html_tags(child.notes).%sp;
+      <b>[*note/notes]0</b> : %apply;clean_html_tags(child.notes).%sp;
     %end;
     %if;(evar.src = "on" and child.has_sources and evar.inline = "on")
       <em>
         <b>[*source/sources]1</b> : 
         %foreach;child.source;
-          %source_type;: %apply;no_html_tags(source)
+          %source_type;: %apply;clean_html_tags(source)
           %if;(not is_last),%sp;%end;
         %end;.
       </em>

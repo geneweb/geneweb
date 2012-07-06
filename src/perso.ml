@@ -3448,7 +3448,8 @@ value eval_predefined_apply conf env f vl =
         string_of_int m
       with
       [ Failure _ -> raise Not_found ]
-  | ("no_html_tags", [s]) -> Util.no_html_tags s
+  | ("clean_html_tags", [s]) -> 
+      Util.clean_html_tags s ["<br */?>"; "</?p>"; "</?b>"; "</?span>"]
   | _ -> raise Not_found ]
 ;
 
