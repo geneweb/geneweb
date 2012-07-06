@@ -3449,7 +3449,8 @@ value eval_predefined_apply conf env f vl =
       with
       [ Failure _ -> raise Not_found ]
   | ("clean_html_tags", [s]) -> 
-      Util.clean_html_tags s ["<br */?>"; "</?p>"; "</?b>"; "</?span>"]
+      (* On supprime surtout les balises qui peuvent casser la mise en page. *)
+      Util.clean_html_tags s ["<br */?>"; "</?p>"; "</?div>"; "</?span>"]
   | _ -> raise Not_found ]
 ;
 
