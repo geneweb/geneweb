@@ -1078,6 +1078,7 @@ value build_desc conf base l =
 (* ********************************************************************** *)
 value display_descendant_with_table conf base max_lev p =
   let max_lev = min (Perso.limit_desc conf) max_lev in
+  let nb_pers = ref 0 in
   (* Affiche la liste des personnes, génération par génération.    *)
   (* On affiche toutes les personnes de l, et quand la liste est   *)
   (* vide, on construit la list des descendants de l (mais comme l *)
@@ -1100,18 +1101,30 @@ value display_descendant_with_table conf base max_lev p =
             end
           else ();
           if Util.authorized_age conf base p then 
-            print_person_table conf base p lab
+            do {
+              print_person_table conf base p lab;
+              incr nb_pers
+            }
           else ();
           loop lev nb_col False refl q
         } ]
   in
   do {
     header conf (descendants_title conf base p);
+    tag "p" begin 
+      Wserver.wprint "%s." (capitale (text_to conf max_lev));
+    end;
     tag "table" "class=descends_table" begin
       (* On affiche l'entête et on en profite pour récupèrer *)
       (* le nombre de colonnes à afficher pour les colspans. *)
       let nb_col = print_desc_table_header conf base in
       loop 0 nb_col True [(p, "")] [(p, "")];
+    end;
+    tag "p" begin 
+      Wserver.wprint "%s: %d %s" 
+        (capitale (transl conf "total")) 
+        nb_pers.val 
+        (transl_nth conf "person/persons" 1);
     end;
     trailer conf
   }
