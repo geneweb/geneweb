@@ -512,12 +512,8 @@ value prec_text conf d =
   | Maybe -> "?"
   | Before -> "<"
   | After -> ">"
-(* La précision dans les deux cas ci-dessous est donnée *)
-(* directement dans l'année : 1700..1710 ou 1700/1710.  *)
-(*
   | OrYear _ -> "|"
   | YearInt _ -> ".."
-*)
   | _ -> "" ]
 ;
 
