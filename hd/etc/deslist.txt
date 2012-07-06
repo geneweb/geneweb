@@ -145,13 +145,13 @@
   </b>%nn;
   %apply;somebody_long_info("xx").
   %if;(evar.notes = "on" and xx.has_notes and evar.inline = "on")
-    <b>[*note/notes]0</b> : %apply;no_html_tags(xx.notes).%sp;
+    <b>[*note/notes]0</b> : %apply;clean_html_tags(xx.notes).%sp;
   %end;
   %if;(evar.src = "on" and xx.has_sources and evar.inline = "on")
     <em>
       <b>[*source/sources]1</b> : 
       %foreach;xx.source;
-        %source_type;: %apply;no_html_tags(source)
+        %source_type;: %apply;clean_html_tags(source)
         %if;(not is_last),%sp;%end;
       %end;.
     </em>
@@ -181,13 +181,13 @@
     </b>%nn;
     %apply;somebody_long_info("spouse").
     %if;(evar.notes = "on" and spouse.has_notes and evar.inline = "on")
-      <b>[*note/notes]0</b> : %apply;no_html_tags(spouse.notes).%sp;
+      <b>[*note/notes]0</b> : %apply;clean_html_tags(spouse.notes).%sp;
     %end;
     %if;(evar.src = "on" and spouse.has_sources and evar.inline = "on")
       <em>
         <b>[*source/sources]1</b> : 
         %foreach;spouse.source;
-          %source_type;: %apply;no_html_tags(source)
+          %source_type;: %apply;clean_html_tags(source)
           %if;(not is_last),%sp;%end;
         %end;.
       </em>
