@@ -50,275 +50,292 @@
   </td></tr></table>
 %end;
 
+
+
+<form method="get" action="%action;">
+  <p>
+    %hidden;
+    <input type="hidden" name="m" value="D"%/>
+    %if;access_by_key;
+      <input type="hidden" name="p" value="%first_name_key_val;"%/>
+      <input type="hidden" name="n" value="%surname_key_val;"%/>
+      %if;(occ != "0")
+        <input type="hidden" name="oc" value="%occ;"%/>
+      %end;
+    %else
+      <input type="hidden" name="i" value="%index;"%/>
+    %end;
+  </p>
+
+  <div style="text-align:center;"><div style="display:inline-block; text-align:left; padding-bottom: 25px;">
+    <div class="descends_menu_list">
+      <label>
+        <input type="radio" name="t" value="L" checked="checked"%/>
+        [*list/list (ancestors)]0
+      </label>
+      %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+        ([maximum] 12 [generation/generations]1)
+      %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
+        ([maximum] %bvar.max_desc_level; [generation/generations]1)
+      %end;
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="M"%/>
+        [*male line/female line]0
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="F"%/>
+        [*male line/female line]1
+      </label>
+      <div class="descends_menu_option_div">
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="alwsurn" value="yes"%/>
+            [with::surname/surnames]1
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="rel" value="on"%/>
+            [relation/relations]1
+          </label>
+          <label>
+            <input type="checkbox" name="witn" value="on"%/>
+            [witness/witnesses]1 ([marriage/marriages]1)
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="notes" value="on"%/>
+            [note/notes]1
+          </label>
+          <label>
+            <input type="checkbox" name="src" value="on"%/>
+            [source/sources]1
+          </label>
+          <label>
+            <input type="checkbox" name="inline" value="on"%/>
+            [display notes/sources inline]
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="comm" value="on"%/>
+            [comment] ([marriage/marriages]1)
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="image" value="on"%/>
+            [portfolio]
+          </label>
+          <label>
+            <input type="checkbox" name="alw_img" value="on"%/>
+            [always display picture] (* only for the portfolio)
+          </label>
+        </p>
+      </div>
+
+      <label>
+        <input type="radio" name="t" value="H"%/>
+        [*table]
+      </label>
+      %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+        ([maximum] 12 [generation/generations]1)
+      %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
+        ([maximum] %bvar.max_desc_level; [generation/generations]1)
+      %end;
+      <div class="descends_menu_option_div">
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="birth" value="on"%/>
+            [date of birth]
+          </label>
+          <label>
+            <input type="checkbox" name="birth_place" value="on"%/>
+            [where born]
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="marr" value="on"%/>
+            [spouse/spouses]1
+          </label>
+          <label>
+            <input type="checkbox" name="marr_date" value="on"%/>
+            [date of marriage]
+          </label>
+          <label>
+            <input type="checkbox" name="marr_place" value="on"%/>
+            [where married]
+          </label>
+          <label>
+            <input type="checkbox" name="child" value="on"%/>
+            [child/children]1
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="death" value="on"%/>
+            [date of death]
+          </label>
+          <label>
+            <input type="checkbox" name="death_place" value="on"%/>
+            [where dead]
+          </label>
+          <label>
+            <input type="checkbox" name="death_age" value="on"%/>
+            [age at death]
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="occu" value="on"%/>
+            [occupation/occupations]1
+          </label>
+        </p>
+        <p class="descends_menu_option_p">
+          <label>
+            <input type="checkbox" name="gen" value="on"%/>
+            [display generation]
+          </label>
+        </p>
+      </div>
+    </div>
+
+    <div class="descends_menu_tree">
+      <label>
+        <input type="radio" name="t" value="T"%/>
+        [*tree]
+        %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
+          ([maximum] 4 [generation/generations]1)
+        %elseif;(bvar.max_desc_tree != "" and max_desc_level >= bvar.max_desc_tree)
+          ([maximum] %bvar.max_desc_tree; [generation/generations]1)
+        %end;
+      </label>
+      <div class="descends_menu_option_div">
+        <label>
+          <input type="checkbox" name="image" value="on"%/>
+          [*image/images]1
+        </label>
+        <br%/>
+        <label>
+          [*border]
+          <input name="bd" size="1" maxlength="2" value="0"%/>
+        </label>
+        <br%/>
+        <table cellpadding="0" cellspacing="0">
+          <tr>
+            <td align="%left;">[*color]</td>
+            <td>
+              <input type="radio" name="color" value="" checked="checked"%/>
+            </td>
+            <td class="bg1">
+              <input type="radio" name="color" value="bg1"%/>
+            </td>
+            <td class="bg2">
+              <input type="radio" name="color" value="bg2"%/>
+            </td>
+            <td class="bg3">
+              <input type="radio" name="color" value="bg3"%/>
+            </td>
+            <td class="bg4">
+              <input type="radio" name="color" value="bg4"%/>
+            </td>
+            <td class="bg5">
+              <input type="radio" name="color" value="bg5"%/>
+            </td>
+            <td class="bg6">
+              <input type="radio" name="color" value="bg6"%/>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="descends_menu_other">
+      <label>
+        <input type="radio" name="t" value="S"%/>
+        [*only the generation selected]
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="N"%/>
+        [*families with encoding]
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="G"%/>
+        [*index of the descendants]
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="C"%/>
+        [*index of the spouses (non descendants)]
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="A"%/>
+        d'Aboville
+      </label>
+      %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+        ([maximum] 12 [generation/generations]1)
+      %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
+        ([maximum] %bvar.max_desc_level; [generation/generations]1)
+      %end;
+      <div class="descends_menu_option_div">
+        <label>
+          <input type="checkbox" name="num" value="on"%/>
+          [display aboville number]
+        </label>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="descends_menu_valid">
+    <label>
+      <input type="checkbox" name="cgl" value="on"%/>
+      [*cancel GeneWeb links]
+    </label><br%/><br%/>
+    <select name="v">
+      %foreach;descendant_level;
+        <option value="%level;"%if(level = 0) selected="selected"%end;>%nn;
+          %if;(level = 0)[*specify::generation/generations]0%nn;
+          %elseif;(level = 1)[*to the children]%nn;
+          %elseif;(level = 2)[*to the grandchildren]%nn;
+          %elseif;(level = 3)[*to the great-grandchildren]%nn;
+          %else;
+            %apply;tothegen%with;
+              %apply;nth([nth (generation)], level)
+            %end;
+          %end;
+          %if;(level != 0) (%number_of_descendants;)%end;
+        </option>
+      %end;
+    </select>
+    <input type="submit" value="Ok"%/>
+  </div>
+</form>
+
 <table border="%border;" width="100%%"><tr><td align="center">
 <table border="%border;">
 <tr>
   <td align="center">
-  <form method="get" action="%action;">
-    <p>
-      %hidden;
-      <input type="hidden" name="m" value="D"%/>
-      %if;access_by_key;
-        <input type="hidden" name="p" value="%first_name_key_val;"%/>
-        <input type="hidden" name="n" value="%surname_key_val;"%/>
-        %if;(occ != "0")
-          <input type="hidden" name="oc" value="%occ;"%/>
-        %end;
-      %else
-        <input type="hidden" name="i" value="%index;"%/>
-      %end;
-      <select name="v">
-        %foreach;descendant_level;
-          <option value="%level;"%if(level = 0) selected="selected"%end;>%nn;
-            %if;(level = 0)[*specify::generation/generations]0%nn;
-            %elseif;(level = 1)[*to the children]%nn;
-            %elseif;(level = 2)[*to the grandchildren]%nn;
-            %elseif;(level = 3)[*to the great-grandchildren]%nn;
-            %else;
-              %apply;tothegen%with;
-                %apply;nth([nth (generation)], level)
-              %end;
-            %end;
-            %if;(level != 0) (%number_of_descendants;)%end;
-          </option>
-        %end;
-      </select>
-      <input type="submit" value="Ok"%/>
-    </p>
     <table border="%border;" width="100%%">
       <tr>
         <td align="%left;">
-          <label>
-            <input type="radio" name="t" value="L" checked="checked"%/>
-            [*list/list (ancestors)]0
-          </label>
-          %if;(bvar.max_desc_level = "" and max_desc_level > 12)
-            ([maximum] 12 [generation/generations]1)
-          %elseif;(
-            bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
-          )
-            ([maximum] %bvar.max_desc_level; [generation/generations]1)
-          %end;
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="M"%/>
-            [*male line/female line]0
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="F"%/>
-            [*male line/female line]1
-          </label>
-          <br%/>
-          <label>
-            - [note/notes]1
-            <input type="checkbox" name="notes" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [source/sources]1
-            <input type="checkbox" name="src" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [relation/relations]1
-            <input type="checkbox" name="rel" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [with::surname/surnames]1
-            <input type="checkbox" name="alwsurn" value="yes"%/>
-          </label>
-          <br%/>
-          <label>
-            - [witness/witnesses]1 ([marriage/marriages]1)
-            <input type="checkbox" name="witn" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [comment] ([marriage/marriages]1)
-            <input type="checkbox" name="comm" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [display notes/sources inline]
-            <input type="checkbox" name="inline" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [portfolio]
-            <input type="checkbox" name="image" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [always display picture] (* only for the portfolio)
-            <input type="checkbox" name="alw_img" value="on"%/>
-          </label>
           <br%/><br%/>
-          <label>
-            <input type="radio" name="t" value="H"%/>
-            [*table]
-          </label>
-          %if;(bvar.max_desc_level = "" and max_desc_level > 12)
-            ([maximum] 12 [generation/generations]1)
-          %elseif;(
-            bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
-          )
-            ([maximum] %bvar.max_desc_level; [generation/generations]1)
-          %end;
-          <br%/>
-          <label>
-            - [date of birth]
-            <input type="checkbox" name="birth" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [where born]
-            <input type="checkbox" name="birth_place" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [spouse/spouses]1
-            <input type="checkbox" name="marr" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [date of marriage]
-            <input type="checkbox" name="marr_date" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [where married]
-            <input type="checkbox" name="marr_place" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [child/children]1
-            <input type="checkbox" name="child" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [date of death]
-            <input type="checkbox" name="death" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [where dead]
-            <input type="checkbox" name="death_place" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [age at death]
-            <input type="checkbox" name="death_age" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [occupation/occupations]1
-            <input type="checkbox" name="occu" value="on"%/>
-          </label>
-          <br%/><br%/>
-          <label>
-            - [display generation]
-            <input type="checkbox" name="gen" value="on"%/>
-          </label>
         </td>
         <td align="%left;" valign="top">
-          <label>
-            <input type="radio" name="t" value="T"%/>
-            [*tree]
-            %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
-              ([maximum] 4 [generation/generations]1)
-            %elseif;(
-              bvar.max_desc_tree != "" and max_desc_level >= bvar.max_desc_tree
-            )
-              ([maximum] %bvar.max_desc_tree; [generation/generations]1)
-            %end;
-          </label>
-          <br%/>
-          <label>
-            - [*image/images]1
-           <input type="checkbox" name="image" value="on"%/>
-          </label>
-          <br%/>
-          <label>
-            - [*border]
-            <input name="bd" size="1" maxlength="2" value="0"%/>
-          </label>
-          <br%/>
-          <table cellpadding="0" cellspacing="0">
-            <tr>
-              <td align="%left;">-&nbsp;[*color]</td>
-              <td>
-                <input type="radio" name="color" value="" checked="checked"%/>
-              </td>
-              <td class="bg1">
-                <input type="radio" name="color" value="bg1"%/>
-              </td>
-              <td class="bg2">
-                <input type="radio" name="color" value="bg2"%/>
-              </td>
-              <td class="bg3">
-                <input type="radio" name="color" value="bg3"%/>
-              </td>
-              <td class="bg4">
-                <input type="radio" name="color" value="bg4"%/>
-              </td>
-              <td class="bg5">
-                <input type="radio" name="color" value="bg5"%/>
-              </td>
-              <td class="bg6">
-                <input type="radio" name="color" value="bg6"%/>
-              </td>
-            </tr>
-          </table>
         </td>
         <td align="%left;" valign="top">
-          <label>
-            <input type="radio" name="t" value="S"%/>
-            [*only the generation selected]
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="N"%/>
-            [*families with encoding]
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="G"%/>
-            - [*index of the descendants]
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="C"%/>
-            - [*index of the spouses (non descendants)]
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="A"%/>
-            d'Aboville
-          </label>
-          %if;(bvar.max_desc_level = "" and max_desc_level > 12)
-            ([maximum] 12 [generation/generations]1)
-          %elseif;(
-            bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
-          )
-            ([maximum] %bvar.max_desc_level; [generation/generations]1)
-          %end;
-          <br%/>
-          <label>
-            <input type="checkbox" name="num" value="on"%/>
-            - [display aboville number]
-          </label>
           <br%/>
         </td>
       </tr>
       <tr align="%left;">
         <td colspan="3" align="center">
           <br%/>
-          <label>
-            [*cancel GeneWeb links]
-            <input type="checkbox" name="cgl" value="on"%/>
-          </label>
           <br%/>
         </td>
       </tr>

@@ -560,6 +560,29 @@ div.summary ul ul
  margin-bottom: 15px;
 }
 
+.ascends_menu_list, .ascends_menu_tree, .ascends_menu_other,
+.descends_menu_list, .descends_menu_tree, .descends_menu_other
+{
+  float: left;
+}
+
+.ascends_menu_valid, .descends_menu_valid
+{
+  clear: both;
+  text-align: center;
+}
+
+.ascends_menu_option_div, .descends_menu_option_div
+{
+  padding-left: 25px;
+}
+
+.ascends_menu_option_p, .descends_menu_option_p
+{
+  margin: 0;
+  padding: 2px;
+}
+
 /* lists and tree */
 .ascends_table, .descends_table
 {
