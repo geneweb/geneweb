@@ -74,7 +74,7 @@
               %end;
             </td>
           %end;
-          %if;(mother.nb_families > 1 and hasl_mother != 0)
+          %if;(mother.nb_families > 1 and half_mother != 0)
             <td style="vertical-align: top">
               %foreach;mother.family;
                 %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
