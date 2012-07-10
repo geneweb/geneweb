@@ -90,45 +90,45 @@
         <p class="ascends_menu_option_p">
           <label>
             <input type="checkbox" name="siblings" value="on" checked="checked"%/>
-            [siblings]
+            [*siblings]
           </label>
           <label>
             <input type="checkbox" name="rel" value="on"%/>
-            [relation/relations]1
+            [*relation/relations]1
           </label>
           <label>
             <input type="checkbox" name="witn" value="on"%/>
-            [witness/witnesses]1 ([marriage/marriages]1)
+            [*witness/witnesses]1 ([marriage/marriages]1)
           </label>
         </p>
         <p class="ascends_menu_option_p">
           <label>
             <input type="checkbox" name="notes" value="on" checked="checked"%/>
-            [note/notes]1
+            [*note/notes]1
           </label>
           <label>
             <input type="checkbox" name="src" value="on" checked="checked"%/>
-            [source/sources]1
+            [*source/sources]1
           </label>
           <label>
             <input type="checkbox" name="inline" value="on"%/>
-            [display notes/sources inline]
+            [*display notes/sources inline]
           </label>
         </p>
         <p class="ascends_menu_option_p">
           <label>
             <input type="checkbox" name="comm" value="on"%/>
-            [comment] ([marriage/marriages]1)
+            [*comment] ([marriage/marriages]1)
           </label>
         </p>
         <p class="ascends_menu_option_p">
           <label>
             <input type="checkbox" name="image" value="on"%/>
-            [portfolio]
+            [*image/images]1
           </label>
           <label>
             <input type="checkbox" name="alw_img" value="on"%/>
-            [always display picture] (* only for the portfolio)
+            [*display empty picture]
           </label>
         </p>
       </div>
@@ -141,59 +141,59 @@
       <p class="ascends_menu_option_p">
         <label>
           <input type="checkbox" name="birth" value="on"%/>
-          [date of birth]
+          [*date of birth]
         </label>
         <label>
           <input type="checkbox" name="birth_place" value="on"%/>
-          [where born]
+          [*where born]
         </label>
       </p>
       <p class="ascends_menu_option_p">
         <label>
           <input type="checkbox" name="marr" value="on"%/>
-          [spouse/spouses]1
+          [*spouse/spouses]1
         </label>
         <label>
           <input type="checkbox" name="marr_date" value="on"%/>
-          [date of marriage]
+          [*date of marriage]
         </label>
         <label>
           <input type="checkbox" name="marr_place" value="on"%/>
-          [where married]
+          [*where married]
         </label>
         <label>
           <input type="checkbox" name="child" value="on"%/>
-          [child/children]1
+          [*number of children]
         </label>
       </p>
       <p class="ascends_menu_option_p">
         <label>
           <input type="checkbox" name="death" value="on"%/>
-          [date of death]
+          [*date of death]
         </label>
         <label>
           <input type="checkbox" name="death_place" value="on"%/>
-          [where dead]
+          [*where dead]
         </label>
         <label>
           <input type="checkbox" name="death_age" value="on"%/>
-          [age at death]
+          [*age at death]
         </label>
       </p>
       <p class="ascends_menu_option_p">
         <label>
           <input type="checkbox" name="occu" value="on"%/>
-          [occupation/occupations]1
+          [*occupation/occupations]1
         </label>
       </p>
       <p class="ascends_menu_option_p">
         <label>
           <input type="checkbox" name="gen" value="on"%/>
-          [display generation]
+          [*display generation]
         </label>
         <label>
           <input type="checkbox" name="no_repeat" value="on"%/>
-          [display smallest sosa number relative to ancestor]
+          [*display smallest sosa number relative to ancestor]
         </label>
       </p>
       </div>
@@ -293,7 +293,7 @@
       <div class="ascends_menu_option_div">
         <label>
           <input type="checkbox" name="sort" value="on"%/>
-          [*sort by increasing order]
+          [*sort by number of branches]
         </label>
       </div>
     
@@ -319,12 +319,13 @@
         <br%/>
         <label>
           <input type="checkbox" name="spouse" value="on"%/>
-          [*spouse] (* only in display by generation)
+          [*spouse/spouses]1 ([only with display by generation])
         </label>
         <br%/>
         <label>
-          [living from] 
-          <input type="text" name="after" size="4" maxlength="4" value=""%/> [to] 
+          [*living from/to]0 %sp;
+          <input type="text" name="after" size="4" maxlength="4" value=""%/>
+          [living from/to]1 %sp;
           <input type="text" name="before" size="4" maxlength="4" value=""%/>
         </label>
       </div>
