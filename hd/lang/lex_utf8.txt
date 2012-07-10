@@ -900,8 +900,34 @@ sl: približno
 sv: omkring
 
     about (short date)
-en: ~
+af: ca
+bg: ca
+br: ca
+ca: ca
+cs: ca
+da: ca
+de: ca
+en: ca
+eo: ca
+es: ca
+et: ca
+fi: ca
 fr: ca
+he: ca
+is: ca
+it: ca
+lv: ca
+nl: ca
+no: ca
+pl: ca
+pt: ca
+pt-br: ca
+ro: ca
+ru: ca
+sk: ca
+sl: ca
+sv: ca
+zh: ca
 
     a brother/a sister/a sibling
 af: 'n broer/'n sister/'n sibbe
