@@ -38,23 +38,23 @@
       %end;
     %end;
     %let;half_mother;%count;%in;
-    %if;(half_father!=0 or half_mother!=0)
+    %if;(half_father != 0 or half_mother != 0)
       <h3 class="highlight">[*half siblings]</h3>
       <table border="%border;" width="100%%">
         <tr>
-          %if;(half_father!=0)
+          %if;(half_father != 0)
             <td width="50%%">
               [*on %s's side:::] %apply;long_display_person("father")
             </td>
           %end;
-          %if;(half_mother!=0)
+          %if;(half_mother != 0)
             <td width="50%%">
               [*on %s's side:::] %apply;long_display_person("mother")
             </td>
           %end;
         </tr>
         <tr>
-          %if;(father.nb_families>1)
+          %if;(father.nb_families > 1 and half_father != 0)
             <td style="vertical-align: top">
               %foreach;father.family;
                 %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
@@ -74,7 +74,7 @@
               %end;
             </td>
           %end;
-          %if;(mother.nb_families>1)
+          %if;(mother.nb_families > 1 and half_mother != 0)
             <td style="vertical-align: top">
               %foreach;mother.family;
                 %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
