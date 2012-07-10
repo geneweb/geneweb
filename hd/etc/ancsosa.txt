@@ -111,11 +111,11 @@
 
 %define;living_interval_dates(xxx, yyy)
   %if;(evar.after != "" and evar.before != "")
-    %sp;[living between %s and %s:::xxx:yyy]
+    ,%sp;[living between %s and %s:::xxx:yyy]
   %elseif;(evar.before != "")
-    %sp;[living before %s:::yyy]
+    ,%sp;[living before %s:::yyy]
   %elseif;(evar.after != "")
-    %sp;[living after %s:::xxx]
+    ,%sp;[living after %s:::xxx]
   %else; %( On n'affiche rien %)
   %end;
 %end;
@@ -324,6 +324,7 @@
 %end;
 
 %define;long_display_notes()
+  <a name="ns">&nbsp;</a>
   <h3>%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
   <dl>
   %foreach;ancestor_level;
@@ -391,7 +392,15 @@
     %if;(count = 0)<tr>%end;
     %incr_count;
     <td width="100px" valign="top">
-      <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
+      %if;xx.has_image;
+        <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
+      %else;
+        %if;xx.is_female;
+          <img src="%image_prefix;/img_unknown_woman.png" widht="50" height="75" alt=""%/>
+        %else;
+          <img src="%image_prefix;/img_unknown_man.png" widht="50" height="75" alt=""%/>
+        %end;
+      %end;
       <p>
         %apply;link(xx.access, xx)
         %xx.dates;
@@ -405,6 +414,8 @@
 %end;
 
 %define;display_images()
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
+  <a name="img">&nbsp;</a>
   <h3>[*image/images]1</h3>
   %reset_count;
   <table>
@@ -413,6 +424,7 @@
         %foreach;ancestor;
           %if;(ancestor.same = "")
             %apply;td_img("ancestor")
+%(
             %if;(ancestor.index != self.index)
               %if;ancestor.is_female;
                 %foreach;ancestor.family;
@@ -424,6 +436,7 @@
                 %end;
               %end;
             %end;
+%)
           %end;
         %end;
       %end;
@@ -441,11 +454,11 @@
     <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;</a></b>.
   %end;
   %if;(evar.notes = "on" and ancestor.has_notes and evar.inline = "on")
-    <b>[*note/notes]0</b> : %apply;clean_html_tags(ancestor.notes).%sp;
+    [*note/notes]0 : %apply;clean_html_tags(ancestor.notes).%sp;
   %end;
   %if;(evar.src = "on" and ancestor.has_sources and evar.inline = "on")
     <em>
-      <b>[*source/sources]1</b> : 
+      [*source/sources]1 :
       %foreach;ancestor.source;
         %source_type;: %apply;clean_html_tags(source)
         %if;(not is_last),%sp;%end;
@@ -518,11 +531,11 @@
       %end;
     %end;
     %if;(evar.notes = "on" and child.has_notes and evar.inline = "on")
-      <b>[*note/notes]0</b> : %apply;clean_html_tags(child.notes).%sp;
+      [*note/notes]0 : %apply;clean_html_tags(child.notes).%sp;
     %end;
     %if;(evar.src = "on" and child.has_sources and evar.inline = "on")
       <em>
-        <b>[*source/sources]1</b> : 
+        [*source/sources]1 :
         %foreach;child.source;
           %source_type;: %apply;clean_html_tags(source)
           %if;(not is_last),%sp;%end;
@@ -678,7 +691,7 @@
     %incr_count;
   %end;
   %if;(evar.child = "on")
-    <th>[*child/children]1</th>
+    <th>[*number of children]</th>
     %incr_count;
   %end;
   %if;(evar.death = "on")
@@ -1032,12 +1045,10 @@
           <tr>
             <th style="width:20%%;">[*person/persons]0</th>
             %if;(evar.birth = "on") 
-              <th %if;(evar.death = "on")style="width:30%%;"%end;>[birth]</th> 
-              %incr_count; 
+              <th %if;(evar.death = "on")style="width:30%%;"%end;>[*birth]</th> 
             %end;
             %if;(evar.death = "on")
-              <th>[death]</th> 
-              %incr_count; 
+              <th>[*death]</th> 
             %end;
             <th style="width:10%%;">[*missing parents]</th>
             <th style="width:10%%;">[*missing spouse]</th>
@@ -1080,16 +1091,16 @@
       <th>[*missing parents]</th>
       <th>[*missing spouse]</th>
       <th>[*person/persons]0</th>
-      %if;(evar.birth = "on") <th>[birth]</th> %incr_count; %end;
-      %if;(evar.death = "on") <th>[death]</th> %incr_count; %end;
-      %if;(evar.spouse = "on") <th>[marriage]</th> %incr_count; %end;
+      %if;(evar.birth = "on") <th>[*birth]</th> %incr_count; %end;
+      %if;(evar.death = "on") <th>[*death]</th> %incr_count; %end;
+      %if;(evar.spouse = "on") <th>[*spouse/spouses]1</th> %incr_count; %end;
     </tr>
     %let;nb_col;%expr(count + 4)%in;
     %reset_count;
     %foreach;ancestor_level(nb_gen)
       %apply;lazy_print%with;
         <tr>
-          <td colspan="%nb_col;">[*generation/generations]0 %level;</td>
+          <th align="left" colspan="%nb_col;">[*generation/generations]0 %level;</th>
         </tr>
       %end;
       %foreach;ancestor;
@@ -1160,9 +1171,17 @@
 
 %elseif;(evar.t = "G" and evar.only= "on")
   %( long display; only the selected generation %)
+  <h3><em>%apply;gen("v").</em></h3>
+  <p> 
+    %if;(evar.notes = "on" or evar.src = "on")
+      <a href="#ns">[*see ascendants notes/sources]</a>
+    %end;
+    %if;(evar.image = "on")
+      <a href="#img">[*see ascendants pictures]</a>
+    %end;
+  </p>
   %foreach;ancestor_level2;
     %if;(evar.v != "" and level = evar.v)
-      <h3><em>%apply;gen("v").</em></h3>
       %foreach;ancestor;
         %if;(ancestor.same != "")
           <p>
@@ -1193,6 +1212,14 @@
   %( long display %)
   %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
   <p>%apply;togen(nb_gen).</p>
+  <p> 
+    %if;(evar.notes = "on" or evar.src = "on")
+      <a href="#ns">[*see ascendants notes/sources]</a>
+    %end;
+    %if;(evar.image = "on")
+      <a href="#img">[*see ascendants pictures]</a>
+    %end;
+  </p>
   %foreach;ancestor_level(nb_gen)
     <h3><em>[*generation/generations]0 %level;</em></h3>
     %foreach;ancestor;

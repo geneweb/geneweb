@@ -145,11 +145,11 @@
   </b>%nn;
   %apply;somebody_long_info("xx").
   %if;(evar.notes = "on" and xx.has_notes and evar.inline = "on")
-    <b>[*note/notes]0</b> : %apply;clean_html_tags(xx.notes).%sp;
+    [*note/notes]0 : %apply;clean_html_tags(xx.notes).%sp;
   %end;
   %if;(evar.src = "on" and xx.has_sources and evar.inline = "on")
     <em>
-      <b>[*source/sources]1</b> : 
+      [*source/sources]1 :
       %foreach;xx.source;
         %source_type;: %apply;clean_html_tags(source)
         %if;(not is_last),%sp;%end;
@@ -181,11 +181,11 @@
     </b>%nn;
     %apply;somebody_long_info("spouse").
     %if;(evar.notes = "on" and spouse.has_notes and evar.inline = "on")
-      <b>[*note/notes]0</b> : %apply;clean_html_tags(spouse.notes).%sp;
+      [*note/notes]0 : %apply;clean_html_tags(spouse.notes).%sp;
     %end;
     %if;(evar.src = "on" and spouse.has_sources and evar.inline = "on")
       <em>
-        <b>[*source/sources]1</b> : 
+        [*source/sources]1 :
         %foreach;spouse.source;
           %source_type;: %apply;clean_html_tags(source)
           %if;(not is_last),%sp;%end;
@@ -335,7 +335,15 @@
     %if;(count = 0)<tr>%end;
     %incr_count;
     <td width="100px" valign="top">
-      <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
+      %if;xx.has_image;
+        <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
+      %else;
+        %if;xx.is_female;
+          <img src="%image_prefix;/img_unknown_woman.png" widht="50" height="75" alt=""%/>
+        %else;
+          <img src="%image_prefix;/img_unknown_man.png" widht="50" height="75" alt=""%/>
+        %end;
+      %end;      
       <p>
         %apply;p_link(xx.access, xx)
         %xx.dates;
@@ -349,40 +357,23 @@
 %end;
 
 %define;display_images(xx, curlev, maxlev, famlev, ctr)
-%(
-  %if;(count = 10)
-    %reset_count;
-    </tr>
+  %apply;img_td("xx", curlev)
+  %if;(evar.rel = "on" and xx.has_relations)
+    %foreach;xx.relation;%nl;
+      %if;has_relation_him;%apply;img_td("relation_him", curlev)%end;
+      %if;has_relation_her;%apply;img_td("relation_her", curlev)%end;
+    %end;
+    %foreach;xx.related;
+      %apply;img_td("related.var", curlev)
+    %end;
   %end;
-  %if;(count = 0 and curlev = 0)<tr>%end;
-%)
-  %apply;img_td(xx, curlev)
-%(
-  %if;xx.has_image;
-    %incr_count;
-    <td width="100px">
-      <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
-      <p>
-        %apply;p_link(xx.access, xx)
-        %xx.dates;
-      </p>
-    </td>
-  %end;
-%)
   %foreach;xx.family;
     %apply;img_td("spouse", curlev)
-%(
-    %if;spouse.has_image;
-      %incr_count;
-      <td width="100px">
-        <img src="%spouse.image_url;" %spouse.image_small_size; alt=""%/>
-        <p>
-          %apply;p_link(spouse.access, spouse)
-          %spouse.dates;
-        </p>
-      </td>
+    %if;(evar.witn = "on" and has_witnesses)%nl;
+      %foreach;witness;
+        %apply;img_td(witness.var, curlev)
+      %end;
     %end;
-%)
     %if;(curlev < maxlev)
       %if;(curlev = 0 or evar.t = "L")
         %if;(family.desc_level < famlev)
@@ -400,6 +391,14 @@
 
 %define;by_list(xx)
   <p>%apply;togen(xx).</p>
+  <p> 
+    %if;(evar.notes = "on" or evar.src = "on")
+      <a href="#ns">[*see descendants notes/sources]</a>
+    %end;
+    %if;(evar.image = "on")
+      <a href="#img">[*see descendants pictures]</a>
+    %end;
+  </p>
   %reset_count;
   %apply;descendants_by_list("self", "self", 0, xx, 0, 1)%nl;
   <p>
@@ -407,6 +406,7 @@
   ([spouses not included]).
   %if;((evar.notes="on" or evar.src="on") and evar.inline != "on")
     <hr%/>
+    <a name="ns">&nbsp;</a>
     <h3 class="highlight">%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
     <dl>
       %reset_count;
@@ -417,6 +417,7 @@
   %if;(evar.image = "on")
     %reset_count;
     %reset_desc_level;
+    <a name="img">&nbsp;</a>
     <h3>[*image/images]1</h3>
     <table>
       %apply;display_images("self", 0, xx, 0, 1)
