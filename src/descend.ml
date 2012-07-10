@@ -712,7 +712,7 @@ value print_desc_table_header conf base = do {
     if p_getenv conf.env "child" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
+        Wserver.wprint "%s" (capitale (transl conf "number of children"));
       end
     else ();
     if p_getenv conf.env "death" = Some "on" then

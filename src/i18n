@@ -139,10 +139,13 @@ died young
 direct ancestor of %s
 disappeared
 disconnect
+display Aboville number
 display by/branch/alphabetic order
 display by slices/slice width/overlap/total width
 display border tree
+display empty picture
 display generation
+display notes/sources inline
 display picture
 display smallest sosa number relative to ancestor
 display spouse
@@ -225,6 +228,10 @@ link between
 linked pages
 link to use
 list/list (ancestors)
+living after %s
+living before %s
+living between %s and %s
+living from/to
 long display
 loop in database: %s is his/her own ancestor
 M/F
@@ -251,6 +258,9 @@ M/F
 miscellaneous notes
 miscellaneous informations
 missing ancestors
+missing parents
+missing sosa
+missing spouse
 missing sources
 modify
 modify picture
@@ -289,6 +299,7 @@ nth (cousin)
 nth (generation)
 number
 number of branches
+number of children
 number of living persons:
 occupation/occupations
 of course dead
@@ -298,6 +309,7 @@ one day old
 one month old
 one year old
 only the generation selected
+only with display by generation
 on %s's side
 on (weekday day month year)
 optional
@@ -357,6 +369,7 @@ should be male
 siblings
 since the last click
 son/daughter/child
+sort by number of branches
 Sosa
 source/sources
 specify

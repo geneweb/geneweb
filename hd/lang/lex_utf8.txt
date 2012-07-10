@@ -3696,6 +3696,9 @@ sk: odpojené
 sl: prekinjeno
 sv: logga ut
 
+    display Aboville number
+fr: afficher la numérotation d’Aboville
+
     display by/branch/alphabetic order
 de: anzuzeigen/nach Zweigen/alphabetisch geordnet
 en: display by:/line/alphabetical order
@@ -3744,15 +3747,8 @@ nl: rand van de stambomen tonen
 no: vis kantlinje
 sv: visa kantlinje
 
-    display picture
-de: porträt zeigen
-en: display family picture
-es: editar retrato
-fr: afficher portrait
-it: visualizzare il ritratto
-nl: portret tonen
-no: vis bilder
-sv: visa bilder
+    display empty picture
+fr: toujours afficher les images
 
     display generation
 de: nummer der Generation anzeigen
@@ -3763,6 +3759,19 @@ it: pubblicare il numero di generazioni
 nl: nummer van de generatie tonen
 no: vis generasjonsnummer
 sv: visa generations nummer
+
+    display notes/sources inline
+fr: afficher les notes/sources dans le contenu
+
+    display picture
+de: porträt zeigen
+en: display family picture
+es: editar retrato
+fr: afficher portrait
+it: visualizzare il ritratto
+nl: portret tonen
+no: vis bilder
+sv: visa bilder
 
     display smallest sosa number relative to ancestor
 de: Implexe anzeigen
@@ -5859,6 +5868,18 @@ sk: zoznam
 sl: seznam
 sv: lista/trädlista
 
+    living after %s
+fr: vivant après %s
+
+    living before %s
+fr: vivant avant %s
+
+    living between %s and %s
+fr: vivant de %s à %s
+
+    living from/to
+fr: vivant de/à
+
     long display
 af: uitgebreide weergawe
 bg: подробни резултати
@@ -6518,6 +6539,15 @@ sk: chýbajúci predkovia
 sl: manjkajoči predniki
 sv: anor som saknas
 
+    missing parents
+fr: parents manquants
+
+    missing sosa
+fr: sosa manquants
+
+    missing spouse
+fr: conjoint manquant
+
     missing sources
 de: fehlende Quellenangaben
 en: missing sources
@@ -6731,7 +6761,7 @@ sv: mördad
 de: Nr. Aboville
 en: d'Aboville System number
 es: N° de Aboville
-fr: n° d'Aboville
+fr: n° d’Aboville
 it: N° d’Aboville
 nl: Abovillenummer
 no: nummer
@@ -7412,6 +7442,10 @@ sk: počet vetví
 sl: število vej
 sv: antal grenar
 
+    number of children
+en: number of children
+fr: nombre d’enfants
+
     number of living persons:
 bg: брой на живите лица:
 cs: pocet zijucich osob:
@@ -7636,6 +7670,9 @@ ru: до года
 sk: starý jeden rok/stará jeden rok
 sl: star eno leto
 sv: ett år
+
+    only with display by generation
+fr: seulement avec l'affichage par génération
 
     only the generation selected
 af: net die gekose geslag
@@ -8482,7 +8519,7 @@ sv: uträkningssätt
 de: anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
 es: opciones de edición de los árboles de parentesco:
-fr: options d'affichage des arbres de parenté :
+fr: options d’affichage des arbres de parenté :
 it: opzioni di visualizzazione degli alberi di parentela:
 nl: toonopties van de verwantschapsstambomen
 no: visningsmåte
@@ -9019,6 +9056,9 @@ ru: сын/дочь/дети
 sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: son/dotter/barn
+
+    sort by number of branches
+fr: trier par nombre de branches
 
     Sosa
 af: Sosa
