@@ -762,6 +762,11 @@ hr.full
   float:left;
 }
 
+ul.surname_branch_sort > li
+{
+  margin-bottom:15px;
+}
+
 .surname_branch_table
 {
   border-width:1px;
@@ -779,6 +784,11 @@ hr.full
 .missing_ancestors_ul_alpha
 {
   float:left;
+}
+
+ul.missing_ancestors_ul_alpha > li
+{
+  margin-bottom:15px;
 }
 
 .missing_ancestors_table_alpha
