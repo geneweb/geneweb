@@ -1071,7 +1071,6 @@
       %if;(initial(item.1) != initial(next_item.1))
         </table>
         </li>
-        <br%/>
       %end;
     %end;
   </ul>

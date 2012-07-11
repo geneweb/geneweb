@@ -165,7 +165,7 @@
             <th style="width:30%%;">[*surname/surnames]0</th>
             <th style="width:10%%;">[*number of branches]</th>
             <th>[*place]</th>
-            <th style="width:10%%;">[*date]</th>
+            <th style="width:15%%;">[*date]</th>
           </tr>
       %end;
       <tr>
@@ -207,7 +207,6 @@
       %if;(item.1 != next_item.1)
         </table>
         </li>
-        <br%/>
       %end;
     %end;
   </ul>
