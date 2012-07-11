@@ -54,94 +54,6 @@ input[type=submit]
   padding:2px 4px;
 }
 
-/* Simulate a select button */
-div.select
-{
-  display:inline-block;
-  position:relative;
-  border:1px solid #E7ED83;
-  background-color:#6F8301;
-  cursor:pointer;
-  z-index:1;
-  padding-right:5px;
-  padding-left:4px;
-}
-
-div.select > span
-{
-  background-image:url(%image_prefix;/picto_fleche_blanche.png);
-  background-position:center right;
-  background-repeat:no-repeat;
-  padding-right:18px;
-  display:inline-block;
-  background-color:#6F8301;
-  color:white;
-  font-weight:bold;
-  text-align:left;
-  width:200px;
-  padding-top:6px;
-  padding-bottom:4px;
-}
-
-div.select ul
-{
-  position:absolute;
-  display:none;
-  margin:0px;
-  padding:0px;
-  top:24px;
-  white-space:nowrap;
-  text-align:left;
-  background-color:white;
-  left:-1px;
-  border:1px solid #6F8301;
-}
-
-div.select ul li
-{
-  margin:0;
-  line-height:20px;
-  list-style-type:none;
-}
-
-div.select ul li.title
-{
-  background-color:#E7ED83;
-  padding-left:5px;
-  font-weight:bold;
-}
-
-div.select ul a
-{
-  color:black;
-  display:block;
-  padding-left:5px;
-  padding-right:5px;
-  width:217px;
-  text-decoration:none;
-}
-
-div.select ul a 
-{
-  color: #2F6400;
-}
-
-div.select ul a:hover 
-{
-  text-decoration:underline;
-}
-
-div.select:hover 
-{
-  border:1px solid #6F8301;
-}
-
-div.select:hover ul
-{
-  display:block;
-  z-index:100;
-}
-
 /* Properties for the unvisited, visited and mouse over links. All pages. */
 a:link.highlight 
 {
@@ -388,46 +300,6 @@ h1
  float: left;
 }
 
-/* Affichage des arbres */
-table hr 
-{
-  border-top: solid 1px black;
-  border-left: 0;
-  border-right: 0;
-  border-bottom: 0;
-  margin:0;
-}
-
-hr.left 
-{
-  margin-left:0;
-  margin-right: 50%%;
-  width: 50%%;
-}
-
-hr.right 
-{
-  margin-left: 50%%;
-  margin-right: 0;
-  width: 50%%;
-}
-
-hr.full
-{
-  margin-left: 0;
-  margin-right: 0;
-}
-
-/* Pyramide des âges */
-.pyramid_year
-{
-  font-style: italic;
-}
-.pyramid_nb
-{
-  font-style: italic;
-}
-
 /* Listes ascendance */
 /* sans parent */
 li.noway
@@ -483,70 +355,43 @@ li.desc
   background-color: #FFC0FF;
 }
 
-/* Pour affichage ascendance par liste m=A;t=L */
-li.male
+
+/* --------------------------- Pyramide des âges -------------------------- */
+
+.pyramid_year
 {
-  list-style-type: square;
-}
-li.female
-{
-  list-style-type: circle;
-}
-/* ... avec images */
-li.male
-{
-  list-style-image: url('%image_prefix;/male.png');
-}
-li.female
-{
-  list-style-image: url('%image_prefix;/female.png');
+  font-style: italic;
 }
 
-/* Notes diverses */
-li.folder
+.pyramid_nb
 {
-  list-style-type: disc;
-}
-li.file
-{
-  list-style-type: circle;
-}
-li.parent
-{
-  list-style-type: disc;
-}
-/* ... avec images */
-li.folder
-{
-  list-style-image: url('%image_prefix;/folder.png');
-}
-li.file
-{
-  list-style-image: url('%image_prefix;/file.png');
-}
-li.parent
-{
-  list-style-image: url('%image_prefix;/left.png');
+  font-style: italic;
 }
 
-/* wiki */
+
+/* --------------------------------- wiki -------------------------------- */
+
 #summary
 {
   border: ridge 3px #844404;
 }
+
 div.summary ul
 {
   padding-left: 0;
   list-style-type: none
 }
+
 div.summary ul ul
 {
   padding-left: 1.618em
 }
+
 .subtitle
 {
   border-bottom: solid 1px #844404;
 }
+
 .found
 {
   color: black;
@@ -554,12 +399,294 @@ div.summary ul ul
   font-weight:bold
 }
 
-/* perso.txt */
+
+/* --------------------------------- notes -------------------------------- */
+
+li.folder
+{
+  list-style-type: disc;
+}
+
+li.file
+{
+  list-style-type: circle;
+}
+
+li.parent
+{
+  list-style-type: disc;
+}
+
+/* ... avec images */
+li.folder
+{
+  list-style-image: url('%image_prefix;/folder.png');
+}
+
+li.file
+{
+  list-style-image: url('%image_prefix;/file.png');
+}
+
+li.parent
+{
+  list-style-image: url('%image_prefix;/left.png');
+}
+
+
+/* ------------------------------- perso.txt ------------------------------ */
+
 .marriage_perso > li 
 {
  margin-bottom: 15px;
 }
 
+
+/* ------------------ Display by branch/alphabetic order ------------------ */
+
+table.display_search
+{
+ border:2px solid #F0ECED;
+}
+
+
+/* --------------------------------- Tips --------------------------------- */
+
+div.tips {
+ padding:0px 0px 0px 50px;
+ min-height:50px;
+ background-color:#E7EDB3;
+ background-image:url('%image_prefix/picto_ampoule.png');
+ background-position:5px center;
+ background-repeat: no-repeat;
+ margin-right:60px;
+}
+
+div.tips table {
+ height:50px;
+ margin:0;
+ color: #514549;
+}
+
+div.tips table td{
+ vertical-align:middle;
+}
+
+
+/* ----------------------- Simulate a select button ----------------------- */
+
+div.select
+{
+  display:inline-block;
+  position:relative;
+  border:1px solid #E7ED83;
+  background-color:#6F8301;
+  cursor:pointer;
+  z-index:1;
+  padding-right:5px;
+  padding-left:4px;
+}
+
+div.select > span
+{
+  background-image:url(%image_prefix;/picto_fleche_blanche.png);
+  background-position:center right;
+  background-repeat:no-repeat;
+  padding-right:18px;
+  display:inline-block;
+  background-color:#6F8301;
+  color:white;
+  font-weight:bold;
+  text-align:left;
+  width:200px;
+  padding-top:6px;
+  padding-bottom:4px;
+}
+
+div.select ul
+{
+  position:absolute;
+  display:none;
+  margin:0px;
+  padding:0px;
+  top:24px;
+  white-space:nowrap;
+  text-align:left;
+  background-color:white;
+  left:-1px;
+  border:1px solid #6F8301;
+}
+
+div.select ul li
+{
+  margin:0;
+  line-height:20px;
+  list-style-type:none;
+}
+
+div.select ul li.title
+{
+  background-color:#E7ED83;
+  padding-left:5px;
+  font-weight:bold;
+}
+
+div.select ul a
+{
+  color:black;
+  display:block;
+  padding-left:5px;
+  padding-right:5px;
+  width:217px;
+  text-decoration:none;
+}
+
+div.select ul a 
+{
+  color: #2F6400;
+}
+
+div.select ul a:hover 
+{
+  text-decoration:underline;
+}
+
+div.select:hover 
+{
+  border:1px solid #6F8301;
+}
+
+div.select:hover ul
+{
+  display:block;
+  z-index:100;
+}
+
+
+/* ---------------------------- Modify places ---------------------------- */
+
+.mod_places_ul
+{
+ float:left;
+}
+
+.mod_places_table
+{
+ width:100%%;
+}
+
+.mod_places_table td.mod_places_table_modify
+{
+ width:100px;
+}
+
+
+/* ----------------------------- Relationship ----------------------------- */
+
+#rel_form_search, #rel_form_cousin, #rel_form_shortcut, #rel_mode, #rel_options
+{
+  margin: 10px;
+}
+
+#rel_search_content, #rel_cousin_content
+{
+  margin-left: 25px;
+}
+
+#rel_search 
+{
+  float: left;
+  width:45%%;
+  padding-right:10px;
+  border-right:1px solid #F0ECED;
+}
+
+#rel_form_search span
+{
+  font-weight:bold;
+}
+
+#rel_search_title
+{
+  font-weight:bold;
+}
+
+#rel_form_search ul
+{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+}
+
+#rel_cousin_title
+{
+  font-weight:bold;
+}
+
+#rel_form_cousin span
+{
+  font-weight:bold;
+}
+
+#rel_form_shortcut span
+{
+  font-weight:bold;
+}
+
+#rel_form_shortcut ul
+{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+}
+
+#rel_options
+{
+  padding-top: 10px;
+}
+
+#rel_options span
+{
+  font-weight:bold;
+}
+
+#rel_options ul
+{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+}
+
+#rel_mode span
+{
+  font-weight:bold;
+}
+
+#rel_mode ul
+{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+}
+
+#rel_others
+{
+  float:left;
+  width:45%%;
+  padding-left:10px;
+}
+
+#rel_see_also ul
+{
+  list-style-type: none;
+  margin:0;
+  padding:0;
+}
+
+
+/* ---------------------- Ascendants and Descendants ---------------------- */
+
+/* --- Ascendants/Descendants menu --- */
 .ascends_menu_list, .ascends_menu_tree, .ascends_menu_other,
 .descends_menu_list, .descends_menu_tree, .descends_menu_other
 {
@@ -583,7 +710,37 @@ div.summary ul ul
   padding: 2px;
 }
 
-/* lists and tree */
+/* --- Ascendants/Descendants trees --- */
+table hr 
+{
+  border-top: solid 1px black;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
+}
+
+hr.left 
+{
+  margin-left:0;
+  margin-right: 50%%;
+  width: 50%%;
+}
+
+hr.right 
+{
+  margin-left: 50%%;
+  margin-right: 0;
+  width: 50%%;
+}
+
+hr.full
+{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* --- Ascendants/Descendants table --- */
 .ascends_table, .descends_table
 {
  border-width:1px;
@@ -599,225 +756,96 @@ div.summary ul ul
  padding:2px;
 }
 
+/* --- Ascendants --- */
+.surname_branch_sort
+{
+  float:left;
+}
+
+.surname_branch_table
+{
+  border-width:1px;
+  border-style:solid;
+  border-collapse:collapse;
+}
+ 
+.surname_branch_table th, .surname_branch_table td
+{
+  border:1px solid black;
+  vertical-align:top;
+  padding:2px;
+}
+
 .missing_ancestors_ul_alpha
 {
- float:left;
+  float:left;
 }
 
 .missing_ancestors_table_alpha
 {
- border-width:1px;
- border-style:solid;
- border-collapse:collapse;
- width:100%%;
+  border-width:1px;
+  border-style:solid;
+  border-collapse:collapse;
+  width:100%%;
 }
 
 .missing_ancestors_table_alpha th, 
 .missing_ancestors_table_alpha td
 {
- border:1px solid black;
- vertical-align:top;
- padding:2px;
+  border:1px solid black;
+  vertical-align:top;
+  padding:2px;
 }
 
 .missing_ancestors_table_alpha th.missing_parent,
 .missing_ancestors_table_alpha th.missing_spouse
 {
- width:100px;
- text-align:center;
+  width:100px;
+  text-align:center;
 }
 
 .missing_ancestors_table
 {
- border-width:1px;
- border-style:solid;
- border-collapse:collapse;
+  border-width:1px;
+  border-style:solid;
+  border-collapse:collapse;
 }
 
 .missing_ancestors_table th, 
 .missing_ancestors_table td
 {
- border:1px solid black;
- vertical-align:top;
- padding:2px;
+  border:1px solid black;
+  vertical-align:top;
+  padding:2px;
 }
 
-.surname_branch_sort
+/* Pour affichage ascendance par liste m=A;t=L */
+li.male
 {
- float:left;
+  list-style-type: square;
 }
 
-/* surname branch */
-/* lists and tree */
-.surname_branch_table
+li.female
 {
- border-width:1px;
- border-style:solid;
- border-collapse:collapse;
-}
- 
-.surname_branch_table th, .surname_branch_table td
-{
- border:1px solid black;
- vertical-align:top;
- padding:2px;
+  list-style-type: circle;
 }
 
+/* ... avec images */
+li.male
+{
+  list-style-image: url('%image_prefix;/male.png');
+}
+
+li.female
+{
+  list-style-image: url('%image_prefix;/female.png');
+}
+
+/* --- Descendants --- */
 .descends_aboville_pipe
 {
   border-left: 1px solid;
   padding-left: 10px;
 }
-
-/* modifications of places */
-
-.mod_places_ul
-{
- float:left;
-}
-
-.mod_places_table
-{
- width:100%%;
-}
-
-.mod_places_table td.mod_places_table_modify
-{
- width:100px;
-}
-
-/* Properties of the relation page */
-#rel_form_search, #rel_form_cousin, #rel_form_shortcut, #rel_mode, #rel_options
-{
- margin: 10px;
-}
-
-#rel_search_content, #rel_cousin_content
-{
- margin-left: 25px;
-}
-
-#rel_search 
-{
- float: left;
- width:45%%;
- padding-right:10px;
- border-right:1px solid #F0ECED;
-}
-
-#rel_form_search span
-{
- font-weight:bold;
-}
-
-#rel_search_title
-{
- font-weight:bold;
-}
-
-#rel_form_search ul
-{
- list-style-type: none;
- margin:0;
- padding:0;
-}
-
-#rel_cousin_title
-{
- font-weight:bold;
-}
-
-#rel_form_cousin span
-{
- font-weight:bold;
-}
-
-#rel_form_cousin select
-{
-}
-
-#rel_form_shortcut span
-{
- font-weight:bold;
-}
-
-#rel_form_shortcut ul
-{
- list-style-type: none;
- margin:0;
- padding:0;
-}
-
-#rel_options
-{
- padding-top: 10px;
-}
-
-#rel_options span
-{
- font-weight:bold;
-}
-
-#rel_options ul
-{
- list-style-type: none;
- margin:0;
- padding:0;
-}
-
-#rel_mode span
-{
- font-weight:bold;
-}
-
-#rel_mode ul
-{
- list-style-type: none;
- margin:0;
- padding:0;
-}
-
-#rel_others
-{
- float:left;
- width:45%%;
- padding-left:10px;
-}
-
-#rel_see_also ul
-{
- list-style-type: none;
- margin:0;
- padding:0;
-}
-
-/* tips */
-div.tips {
- padding:0px 0px 0px 50px;
- min-height:50px;
- background-color:#E7EDB3;
- background-image:url('%image_prefix/picto_ampoule.png');
- background-position:5px center;
- background-repeat: no-repeat;
- margin-right:60px;
-}
-
-div.tips table {
- height:50px;
- margin:0;
- color: #514549;
-}
-
-div.tips table td{
- vertical-align:middle;
-}
-
-/* resultat de recherche */
-
-table.display_search
-{
- border:2px solid #F0ECED;
-}
-
 
 </style>
