@@ -642,6 +642,11 @@ div.summary ul ul
  padding:2px;
 }
 
+.surname_branch_sort
+{
+ float:left;
+}
+
 /* surname branch */
 /* lists and tree */
 .surname_branch_table

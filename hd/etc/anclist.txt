@@ -111,6 +111,7 @@
   %apply;togen(xx).
   </p>
   %apply;ancestors_by_list("self", xx)
+
 %elseif;(evar.t = "H")
   %( horizontally %)
   %let;xx;
@@ -124,6 +125,7 @@
   %apply;ancestors_horizontally(
     "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
   </td></tr></table>
+
 %elseif;(evar.t = "F" and evar.sort = "on")
   %( surnames branch sorted by number of branches %)
   %empty_sorted_list;
@@ -153,17 +155,17 @@
     </p>
   %end;
 
-  <ul class="missing_ancestors_ul_alpha">
+  <ul class="surname_branch_sort">
     %foreach;sorted_list_item;
       %if;(prev_item.1 != item.1)
         <li>%nn;
         <a name="a_%apply;hexa(item.1)">%item.1;</a>
         <table class="surname_branch_table">
           <tr>
-            <th>[*surname/surnames]0</th>
-            <th>[*number of branches]</th>
+            <th style="width:30%%;">[*surname/surnames]0</th>
+            <th style="width:10%%;">[*number of branches]</th>
             <th>[*place]</th>
-            <th>[*date]</th>
+            <th style="width:10%%;">[*date]</th>
           </tr>
       %end;
       <tr>
@@ -193,6 +195,8 @@
       %end;
     %end;
   </ul>
+  <p style="clear:both"></p>
+
 %elseif;(evar.t = "F")
   %( surnames branch %)
   <table class="surname_branch_table">
