@@ -1056,7 +1056,11 @@
       %end;
       <tr>
         <td> 
-          %item.5;<a href="%prefix;%item.4;">%item.1;%sp;%item.2;</a>%item.3;
+          %if;(evar.cgl = "on")
+            %item.5;%item.1;%sp;%item.2;%item.3;
+          %else;
+            %item.5;<a href="%prefix;%item.4;">%item.1;%sp;%item.2;</a>%item.3;
+          %end;
           %if;(item.6 != ""), <em>%item.6;</em>%end;
         </td>
         %if;(evar.birth = "on")
