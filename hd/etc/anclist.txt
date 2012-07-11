@@ -183,9 +183,25 @@
           %item.5;
         </td>
         <td>
-          %if;(item.6 = "&lt;")/%item.7;%elseif(item.6 = "&gt;")%item.7;/%else;%item.6;%item.7;%end;%nn;
+          %if;(item.6 = "&lt;")
+            /%item.7;
+          %elseif(item.6 = "&gt;")
+            %item.7;/
+          %elseif;(item.6 = "|" or item.6 = "..")
+            %item.7;
+          %else;
+            %item.6;%item.7;
+          %end;%nn;
           -%nn;
-          %if;(item.8 = "&lt;")/%item.9;%elseif(item.8 = "&gt;")%item.9;/%else;%item.8;%item.9;%end;
+          %if;(item.8 = "&lt;")
+            /%item.9;
+          %elseif(item.8 = "&gt;")
+            %item.9;/
+          %elseif;(item.8 = "|" or item.8 = "..")
+            %item.9;
+          %else;
+            %item.8;%item.9;
+          %end;
         </td>
       </tr>
       %if;(item.1 != next_item.1)
