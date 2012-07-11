@@ -8721,6 +8721,18 @@ nl: ook te bekijken
 no: vis også
 sv: visa också
 
+    see ascendants notes/sources
+fr: voir les notes/sources
+
+    see ascendants pictures
+fr: voir les portraits
+
+    see descendants notes/sources
+fr: voir les notes/sources
+
+    see descendants pictures
+fr: voir les portraits
+
     see further
 af: kyk verder
 bg: вж. по-долу
