@@ -402,7 +402,7 @@ sv: <span class="highlight" style="margin-left:10px">genom
     %end;
     %if;(wizard)
       <li>
-        <a href="%prefix;m=MOD_P">[*book of places]</a>
+        <a href="%prefix;m=MOD_PLACE">[*book of places]</a>
       </li>
     %end;
     %if;(wizard and not base.has_notes)

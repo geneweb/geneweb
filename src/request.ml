@@ -489,8 +489,10 @@ value family_m conf base =
   | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
   | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
-  | Some "MOD_P" when conf.wizard -> Place.print_mod conf base
-  | Some "MOD_P_OK" when conf.wizard -> Place.print_mod_ok conf base
+  | Some "MOD_PLACE" when conf.wizard -> Place.print_mod conf base
+  | Some "MOD_PLACE_OK" when conf.wizard -> Place.print_mod_ok conf base
+  | Some "MOD_SRC" when conf.wizard -> Source.print_mod conf base
+  | Some "MOD_SRC_OK" when conf.wizard -> Source.print_mod_ok conf base
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf *)
   (* | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base *)
@@ -848,7 +850,7 @@ value this_request_updates_database conf =
         "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MOD_NOTES_OK" |
         "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" | "MRG_DUP_FAM_Y_N" |
         "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" |
-        "MOD_P_OK" | "SND_IMAGE_OK" -> True
+        "MOD_PLACE_OK" | "MOD_SRC_OK" | "SND_IMAGE_OK" -> True
       | _ -> False ]
   | _ -> False ]
 ;
