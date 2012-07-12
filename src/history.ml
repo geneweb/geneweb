@@ -26,7 +26,8 @@ value ext_flags =
 type changed =
   [ Rperson of string and string and int and Adef.iper
   | Rnotes of option int and string 
-  | Rplaces ] 
+  | Rplaces 
+  | Rsources ] 
 ;
 
 value notify_change conf base changed action =
@@ -40,7 +41,7 @@ value notify_change conf base changed action =
                  string_of_int (Adef.int_of_iper ip) |]
           | Rnotes (Some num) file -> [| file; string_of_int num |]
           | Rnotes None file -> [| file |] 
-          | Rplaces -> [| |] ]
+          | Rplaces | Rsources -> [| |] ]
         in
         let args = Array.append [| comm; conf.bname; conf.user; action |] args in
         match Unix.fork () with
@@ -66,7 +67,7 @@ value notify_delete conf base changed action =
               [| key |]
           | Rnotes (Some num) file -> [| |]
           | Rnotes None file -> [| |] 
-          | Rplaces -> [| |] ]
+          | Rplaces | Rsources -> [| |] ]
         in
         let args = Array.append [| comm; conf.bname |] args in
         match Unix.fork () with
@@ -92,7 +93,7 @@ value gen_record conf base changed action =
               let s = string_of_int num in
               if file = "" then s else file ^ "/" ^ s
           | Rnotes None file -> file 
-          | Rplaces -> "" ]
+          | Rplaces | Rsources -> "" ]
         in
         let fname = file_name conf in
         match
@@ -109,12 +110,12 @@ value gen_record conf base changed action =
             }
         | None -> () ]
     | _ -> () ];
-    (* Effet de bord du dictionnaire des lieux : on peut facilement   *)
-    (* créer 5000 nouveaux processus à chaque mise à jour d'un lieu.  *)
+    (* Effet de bord des modifications en masse : on peut facilement  *)
+    (* créer 5000 nouveaux processus à chaque mise à jour.            *)
     (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
     (* mise à jour de l'historique.                                   *)
     match action with
-    [ "cp" -> ()
+    [ "cp" | "cs" -> ()
     | "dp" -> notify_delete conf base changed action 
     | _ -> notify_change conf base changed action ]
   }
@@ -130,6 +131,10 @@ value record_notes conf base (num, file) action =
 
 value notify_places conf base action =
   notify_change conf base Rplaces action
+;
+
+value notify_sources conf base action =
+  notify_change conf base Rsources action
 ;
 
 value record_key conf base old_key new_key =
