@@ -84,7 +84,7 @@ value print_branch_to_alphabetic conf x nb_branch = do {
 
 
 (* **********************************************************************)
-(*  [Fonc] print_branch_to_alphabetic : conf -> string -> int -> unit   *)
+(*  [Fonc] print_alphabetic_to_branch : conf -> string -> int -> unit   *)
 (** [Description] : A partir de l'affichage alphabétique, permet 
                     d'afficher les liens pour un affichage par branches.
     [Args] :
