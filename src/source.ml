@@ -332,7 +332,7 @@ value print_title conf base ini len = do {
   else do {
     Wserver.wprint " - ";
     Wserver.wprint 
-      (fcapitale (ftransl conf "%d sources starting with %s")) len ini }
+      (fcapitale (ftransl conf "%d sources starting with '%s'")) len ini }
 };
 
 
@@ -387,7 +387,7 @@ value print_src conf base list len =
   (* Astuce pour gérer les espaces. *)
   let list = List.map (fun (ini, l) -> (Mutil.tr ' ' '_' ini, l)) list in
   do {
-    let title _ = print_title conf base ini len in
+    let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
@@ -516,7 +516,7 @@ value print_short conf base list len =
   in
   let ini_list = build_ini list (String.length ini) in
   do {
-    let title _ = print_title conf base ini len in
+    let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
