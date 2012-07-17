@@ -75,7 +75,7 @@ en:  first line
 eo:  por vidi la unuan branĉon
 es:  la primera rama
 et:  esimese haru vaatamiseks
-fi:  nähdäksesi ensimmäisen haaran
+fi:  ensimmäinen sukuhaara
 fr:  la première
 he:   לראות את הענף הראשון
 is:  til að sjá fyrstu grein
@@ -1337,7 +1337,7 @@ en: age at death
 eo: mortaĝo
 es: Edad de defunción
 et: vanus surres
-fi: ikä kuollessa
+fi: elinikä
 fr: âge au décès
 he:   גיל במותו/מותה
 is: dánaraldur
@@ -2047,6 +2047,7 @@ sv: en farbror/en faster/en morbror/en moster
 de: jede beliebige Person im Stammbaum
 en: any individual in the family tree
 es: cualquier individuo del árbol
+fi: yksi henkilö sukupuussasi
 fr: n'importe quel individu de l'arbre
 it: un qualsiasi individuo dell’albero
 nl: om het even welk individu van de stamboom
@@ -3096,6 +3097,7 @@ sv: klicka "%s"
 de: naher Angehöriger
 en: a parent
 es: un amigo
+fi: sukulainen
 fr: un proche
 it: un parente
 nl: een naaste
@@ -3462,6 +3464,7 @@ sv: datum
 de: Geburtsdatum
 en: date of birth
 es: fecha de nacimiento
+fi: syntymäpäivämäärä
 fr: date de naissance
 it: data di nascita
 nl: geboortedatum
@@ -3472,6 +3475,7 @@ sv: födelsedatum
 de: Todestag
 en: date of death
 es: fecha de defunción
+fi: kuolinpäivämäärä
 fr: date de décès
 it: data di morte
 nl: datum overlijden
@@ -3482,6 +3486,7 @@ sv: dödsdatum
 de: Hochzeitstag
 en: date of marriage
 es: fecha de matrimonio
+fi: vihkipäivämäärä
 fr: date de mariage
 it: data del matrimonio
 nl: huwelijksdatum
@@ -3729,6 +3734,7 @@ fr: afficher la numérotation d’Aboville
 de: anzuzeigen/nach Zweigen/alphabetisch geordnet
 en: display by:/line/alphabetical order
 es: edición por:/ramas/orden alfabético
+fi: näytetään:/sukuhaaroittain/aakkosjärjestyksessä
 fr: affichage par :/branches/ordre alphabétique
 it: visualizzazione per:/rami/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
@@ -3767,6 +3773,7 @@ sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
 de: rahmen in den Bäumen zeigen
 en: display frame
 es: editar los marcos a los árboles
+fi: näytä rajat
 fr: afficher les bordures aux arbres
 it: visualizzare i bordi degli alberi
 nl: rand van de stambomen tonen
@@ -3780,6 +3787,7 @@ fr: toujours afficher les images
 de: nummer der Generation anzeigen
 en: display generation
 es: editar el número de generación
+fi: näytä sukupolvinumero
 fr: afficher le numéro de génération
 it: pubblicare il numero di generazioni
 nl: nummer van de generatie tonen
@@ -3793,6 +3801,7 @@ fr: afficher les notes/sources dans le contenu
 de: porträt zeigen
 en: display family picture
 es: editar retrato
+fi: näytä kuvat
 fr: afficher portrait
 it: visualizzare il ritratto
 nl: portret tonen
@@ -3803,6 +3812,7 @@ sv: visa bilder
 de: Implexe anzeigen
 en: display pedigree collapse
 es: editar las implexiones
+fi: näytä sukupolvikato
 fr: afficher les implexes
 it: pubblicare il antenati consanguinei
 nl: kwartierherhaling tonen
@@ -3813,6 +3823,7 @@ sv: visa anförlusten
 de: ehepartner anzeigen
 en: display spouse
 es: editar cónyuge
+fi: näytä puolisot
 fr: afficher conjoint
 it: visualizzare il coniuge
 nl: partner tonen
@@ -4190,6 +4201,7 @@ sv: ny familj tillagd
 de: Geburtstage naher Angehöriger
 en: family birthday
 es: cumpleaños de amigos
+fi: syntymäpäivät
 fr: anniversaires des proches
 it: compleanni dei parenti
 nl: verjaardagen van de naasten
@@ -6531,6 +6543,7 @@ sv: blandade noteringar
 de: verschiedene Felder
 en: other field
 es: campo diversos
+fi: muut kentät
 fr: champs divers
 it: voci diverse
 nl: verscheidene velden
@@ -6578,6 +6591,7 @@ fr: conjoint manquant
 de: fehlende Quellenangaben
 en: missing sources
 es: faltan fuentes
+fi: puuttuvat lähteet
 fr: sources manquantes
 it: senza fonte
 nl: ontbrekende bronnen
@@ -6787,6 +6801,7 @@ sv: mördad
 de: Nr. Aboville
 en: d'Aboville System number
 es: N° de Aboville
+fi: Numero
 fr: n° d’Aboville
 it: N° d’Aboville
 nl: Abovillenummer
@@ -6921,6 +6936,7 @@ sv: navigering med %t som proband (Kekules system)
 de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
 en: cou can try another computing option
 es: puede relanzar un cálculo eligiendo otro modo de cálculo
+fi: valitse toinen laskutapa ja laske uudelleen
 fr: n'hésitez pas à recommencer en utilisant un autre mode de calcul
 it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
 nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
@@ -7440,6 +7456,38 @@ sk: číslo
 sl: številka
 sv: nummer
 
+    nb branches
+af: aantal stake
+bg: брой на клоновете
+br: niver ar skourroù
+ca: nombre de branques
+cs: počet větví
+da: antal grene
+de: Anzahl der Äste
+en: number of lines
+eo: nombro da branĉoj
+es: número de ramas
+et: harude arv
+fi: Sukuhaarojen lukumäärä
+fr: nb. branches
+he:  מספר ענפים
+is: fjöldi greina
+it: numero di rami
+lv: zaru skaits
+nl: aantal takken
+no: antall grener
+pl: liczba linii (gałęzi)
+pt: número de ramos
+ro: numar de ramuri
+ru: число ветвей
+sk: počet vetví
+sl: število vej
+sv: antal grenar
+
+    nb children
+en: number of children
+fr: nb. enfants
+
     number of branches
 af: aantal stake
 bg: брой на клоновете
@@ -7508,7 +7556,7 @@ en: occupation/occupations
 eo: okupado
 es: profesión/profesións
 et: amet
-fi: ammatti
+fi: ammatti/ammatti
 fr: profession/professions
 he:  מקצוע
 is: starf
@@ -8402,6 +8450,7 @@ sv: erkännande far/erkännande mor/erkännande föräldrar
 de: referenz
 en: ID
 es: referencia
+fi: referenssi
 fr: référence
 it: riferimento
 nl: referentie
@@ -8468,6 +8517,7 @@ sv: släktskap
 de: Direkte Vorfahren
 en: ancestry
 es: ascendientes directos
+fi: esipolvet
 fr: ascendants directs
 it: ascendenti diretti
 nl: rechtstreekse voorouders
@@ -8535,6 +8585,7 @@ zh:  相关查询
 de: berechnungsart
 en: computing
 es: modo de cálculo
+fi: laskutapa
 fr: mode de calcul
 it: modo di calcolo
 nl: berekeningswijze
@@ -8545,6 +8596,7 @@ sv: uträkningssätt
 de: anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
 es: opciones de edición de los árboles de parentesco:
+fi: näyttötapa:
 fr: options d’affichage des arbres de parenté :
 it: opzioni di visualizzazione degli alberi di parentela:
 nl: toonopties van de verwantschapsstambomen
@@ -8583,6 +8635,7 @@ sv: anlinje/anlinjer
 de: verwandt mit ...
 en: family link with...
 es: parentesco con...
+fi: sukulaisuus henkilön kanssa...
 fr: lien de parenté avec...
 it: imparentato con...
 nl: verwantschapsband met...
@@ -8593,6 +8646,7 @@ sv: släktskap med...
 de: verknüpfungen:
 en: shortcuts:
 es: atajo:
+fi: oikotie:
 fr: raccourcis :
 it: scorciatoia:
 nl: binnenweg :
@@ -8715,6 +8769,7 @@ sv: se ovan
 de: siehe auch
 en: see also
 es: ver también
+fi: näytä myös
 fr: à voir aussi
 it: vedi anche
 nl: ook te bekijken
@@ -8765,6 +8820,7 @@ sv: se vidare
 de: auswählen :
 en: select:
 es: elegir:
+fi: valitse:
 fr: choisir :
 it: scegliere:
 nl: kiezen:
@@ -8775,6 +8831,7 @@ sv: välj
 de: zum zeigen der Geburtstage den Monat auswählen
 en: select month
 es: elegir un mes para ver todos los cumpleaños
+fi: valitse kuukausi nähdäksesi kaikki syntymäpäivät
 fr: sélectionnez un mois pour voir tous les anniversaires
 it: scegliere un mese per vedere tutti i comlpeanni
 nl: een maand kiezen om alle verjaardagen te zien
@@ -8785,6 +8842,7 @@ sv: välj en månad för att visa alla födelsedagar
 de: auf die Person klicken, zu der Sie das Verwandtschaftsverhältnis berechnen möchten
 en: click an individual below to calculate the family link
 es: pulse en la persona con la que quiere realizar un cálculo de parentesco
+fi: napsauta henkilöä, jonka sukulaisuusasteen haluat laskea
 fr: cliquez sur la personne avec laquelle vous souhaitez réaliser un calcul de parenté
 it: clicca sulla persona per la quale vuoi fare un calcolo di parentela
 nl: op de persoon klikken van waaruit u een verwantschapsberekening wenst
@@ -8943,7 +9001,7 @@ en: shortest path
 eo: vojo plej mallonga
 es: atajo
 et: lühim tee
-fi: lyhin polku
+fi: lyhyin reitti
 fr: chemin le plus court
 he:   קשר הכי קרוב 
 is: stysta leið
@@ -9187,6 +9245,7 @@ zh:  从下列选取
 de: ehepartner/partner
 en: spouse/spouses
 es: cónyuge/cónyuges
+fi: puoliso/puoliso
 fr: conjoint/conjoints
 it: coniuge/coniugi
 nl: partner/partners
@@ -9374,6 +9433,7 @@ sv: hittar inte efternamn
 de: zweige der Familiennamen
 en: lines by name
 es: ramas de apellidos
+fi: sukuhaarat
 fr: branches patronymiques
 it: rami per cognome
 nl: naamstakken
@@ -9445,6 +9505,7 @@ zh:  姓
 de: tabelle
 en: table
 es: cuadro
+fi: taulukko
 fr: tableau
 it: tabella
 nl: tabel
@@ -10972,6 +11033,7 @@ sv: varningar
 de: Geburtsort
 en: where born
 es: lugar de nacimiento
+fi: syntymäpaikka
 fr: lieu de naissance
 it: luogo di nascita
 nl: geboorteplaats
@@ -10982,6 +11044,7 @@ sv: födelseort
 de: Sterbeort
 en: where dead
 es: lugar de defunción
+fi: kuolinpaikka
 fr: lieu de décès
 it: luogo della morte
 nl: datum overlijden
@@ -10992,6 +11055,7 @@ sv: dödsort
 de: Ort der Trauung
 en: where married
 es: lugar de matrimonio
+fi: vihkipaikka
 fr: lieu de mariage
 it: luogo del matrimonio
 nl: huwelijksplaats
