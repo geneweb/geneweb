@@ -107,6 +107,9 @@
 <input type="radio" name="married" id="mN" value="N"%/><label for="mN">[Y/N]1</label>
 <input type="radio" name="married" id="mA" value="A" checked="checked"%/><label for="mA">-</label>
 
+<h4>[*marriage/marriages]0</h4>
+%apply;event("marriage")
+
 <p>
 [*maximum]: <input name="max" size="5" value="100" maxlength="5"%/> [person/persons]1
 <input type="submit" value="Ok"%/>
