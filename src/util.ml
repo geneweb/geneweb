@@ -490,7 +490,7 @@ value no_html_tags s =
 (* Version 1 => moche *)
 value clean_html_tags s l =
   List.fold_left
-    (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "" s)
+    (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "&nbsp;" s)
     s l
 ;
 
