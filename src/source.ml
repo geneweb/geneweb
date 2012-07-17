@@ -86,7 +86,7 @@ value get_all_sources conf base = do {
         else ();
         if not (is_empty_string src_p) then 
           sources.val := 
-            SourceSet.add (src_bu, "p", Hashtbl.hash src_p) sources.val
+            SourceSet.add (src_p, "p", Hashtbl.hash src_p) sources.val
         else ();
         loop (i+1)
       }
@@ -332,7 +332,7 @@ value print_title conf base ini len = do {
   else do {
     Wserver.wprint " - ";
     Wserver.wprint 
-      (fcapitale (ftransl conf "%d sources starting with '%s'")) len ini }
+      (fcapitale (ftransl conf "%d sources starting with \"%s\"")) len ini }
 };
 
 
