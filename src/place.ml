@@ -661,7 +661,7 @@ value print_place conf base list len =
   (* Astuce pour gérer les espaces. *)
   let list = List.map (fun (ini, l) -> (Mutil.tr ' ' '_' ini, l)) list in
   do {
-    let title _ = print_title conf base ini len in
+    let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
@@ -778,7 +778,7 @@ value print_short conf base list len =
   let list = List.map (fun p -> Mutil.tr ' ' '_' p) list in
   let list = remove_dup list in
   do {
-    let title _ = print_title conf base ini len in
+    let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
