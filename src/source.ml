@@ -746,7 +746,7 @@ value print_mod_ok conf base = do {
   (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
   (* pour ne pas dépasser le time out du serveur.                    *)
   let max_updates = 
-    match p_getint conf.base_env "max_sources_update" with
+    match p_getint conf.base_env "max_nb_update" with
     [ Some n -> if n > 50000 then 5000 else n
     | _ -> 5000 ]
   in
