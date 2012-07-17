@@ -712,7 +712,7 @@ value print_desc_table_header conf base = do {
     if p_getenv conf.env "child" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "number of children"));
+        Wserver.wprint "%s" (capitale (transl conf "nb children"));
       end
     else ();
     if p_getenv conf.env "death" = Some "on" then
@@ -877,7 +877,7 @@ value print_person_table conf base p lab = do {
          p_getenv conf.env "marr_place" = Some "on" ||
          p_getenv conf.env "marr_date" = Some "on"
       then
-        tag "td" "%s" 
+        tag "td" "align=\"center\" %s" 
           (if nb_families > 1 then "style=\"border-bottom:none\"" else "") 
           begin
           let u = p in
@@ -1009,7 +1009,7 @@ value print_person_table conf base p lab = do {
             end
           else ();
           if p_getenv conf.env "child" = Some "on" then
-            tag "td" "style=\"border-top:none; %s\"" 
+            tag "td" "align=\"center\" style=\"border-top:none; %s\"" 
               (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
               begin
                 Wserver.wprint "%d &nbsp;" (Array.length (get_children fam));
@@ -1280,6 +1280,7 @@ value make_tree_hts conf base gv p =
           let txt =
             if auth then txt ^ Date.short_dates_text conf base p else txt
           in
+          let txt = txt ^ Dag.image_txt conf base p in
           let txt =
             if bd > 0 || td_prop <> "" then
               Printf.sprintf
@@ -1288,7 +1289,6 @@ value make_tree_hts conf base gv p =
                 bd td_prop txt
             else txt
           in
-          let txt = txt ^ Dag.image_txt conf base p in
           (2 * ncol - 1, CenterA, TDitem txt)
       | None -> (1, LeftA, TDnothing) ]
     in
