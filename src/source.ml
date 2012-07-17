@@ -484,25 +484,37 @@ value print_short conf base list len =
     | None -> "" ]
   in
   (* Construit la liste des string commençant par ini. *)
-  (* Attention, il ne faut pas faire String.length     *)
-  (* ini + 1 parce qu'en utf8, il se peut que le       *)
-  (* caractère soit codé sur plusieurs octets.         *)
-  let list =
-    List.map
-      (fun (s, _) -> 
-        if String.length s > String.length ini then
-          String.sub s 0 (index_of_next_char s (String.length ini))
-        else s ^ String.make (String.length ini + 1 - String.length s) '_')
-      list
+  (* Fonctionne différement du dictionnaire des lieux  *)
+  (* parce que l'on peut avoir beaucoup de sources qui *)
+  (* commencent par les mêmes lettres. On calcul alors *)
+  (* à partir de quelle lettre de ini, les sources     *)
+  (* sont différentes.                                 *)
+  (* ex: eta -> etat -> etat_ -> ... -> etat_civil     *)
+  let rec build_ini l len =
+    (* Attention, il ne faut pas faire String.length     *)
+    (* ini + 1 parce qu'en utf8, il se peut que le       *)
+    (* caractère soit codé sur plusieurs octets.         *)
+    let ini_list =
+      List.map
+        (fun (s, _) -> 
+          if String.length s > len then
+            String.sub s 0 (index_of_next_char s len)
+          else s ^ String.make (len + 1 - String.length s) '_')
+        l
+    in
+    (* Fonction pour supprimer les doublons. *)
+    let remove_dup list =
+      StringSet.elements 
+        (List.fold_right StringSet.add list StringSet.empty)
+    in
+    (* Astuce pour gérer les espaces. *)
+    let ini_list = List.map (fun p -> Mutil.tr ' ' '_' p) ini_list in
+    let ini_list = remove_dup ini_list in
+    (* Si la liste des ini n'a qu'un élément, on calcul on 'rang' d'après *)
+    if List.length ini_list = 1 then build_ini list (len + 1)
+    else ini_list
   in
-  (* Fonction pour supprimer les doublons. *)
-  let remove_dup list =
-    StringSet.elements 
-      (List.fold_right StringSet.add list StringSet.empty)
-  in
-  (* Astuce pour gérer les espaces. *)
-  let list = List.map (fun p -> Mutil.tr ' ' '_' p) list in
-  let list = remove_dup list in
+  let ini_list = build_ini list (String.length ini) in
   do {
     let title _ = print_title conf base ini len in
     Hutil.header conf title;
@@ -510,10 +522,11 @@ value print_short conf base list len =
     tag "p" begin
       List.iter
         (fun s ->
-          stagn "a" "href=\"%sm=MOD_SRC;s=%s\"" (commd conf) (code_varenv s) begin
-            Wserver.wprint "%s" s;
-          end)
-        list;
+          stagn "a" "href=\"%sm=MOD_SRC;s=%s\"" (commd conf) (code_varenv s) 
+            begin
+              Wserver.wprint "%s" s;
+            end)
+        ini_list;
     end;
     Hutil.trailer conf 
   }
