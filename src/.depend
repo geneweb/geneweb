@@ -440,6 +440,7 @@ relationLink.cmo relationLink.cmx: pa_html.cmo
 request.cmo request.cmx: def_syn.cmo pa_lock.cmo pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_html.cmo
 some.cmo some.cmx: pa_html.cmo
+source.cmo source.cmx: pa_html.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
 templ.cmo templ.cmx: pa_html.cmo
 title.cmo title.cmx: pa_html.cmo
