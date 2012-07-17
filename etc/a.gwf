@@ -349,8 +349,9 @@ expand_env=no
 #counter=yes/no
 
 # Default value if not specified is 5000 (which means that it will
-# take at most 5 seconds to modify the "set of places".
-#max_places_update=...
+# take at most 5 seconds to realize a set of modifications (such as the 
+# "set of places", "set of sources" ...
+#max_nb_update=2000
 
 # Authorized wizards notes. By default, wizards notes are not allowed.
 #authorized_wizards_notes=yes/no
