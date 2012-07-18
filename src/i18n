@@ -93,6 +93,7 @@ between (date)
 bibliography
 birth
 birthdays
+birth date and birth place
 book of places
 border
 born
@@ -132,8 +133,10 @@ date of death
 date of marriage
 days old
 death
+death date and death place
 delete
 descendants
+descendants at the generation
 died
 died young
 direct ancestor of %s
@@ -191,6 +194,7 @@ happy birthday to them!
 happy birthday to you!
 having as children
 help places
+help surname branch
 here
 him/her
 history of updates
@@ -375,7 +379,8 @@ should be male
 siblings
 since the last click
 son/daughter/child
-sort by number of branches
+sort by/branch/alphabetic order
+sort by/generation/alphabetic order
 Sosa
 source/sources
 specify

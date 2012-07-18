@@ -1149,12 +1149,12 @@
     %reset_count;
     <table class="missing_ancestors_table">
       <tr class="missing_ancestors_table_header">
-        <th width="5%%">[*missing sosa]</th>
-        <th width="5%%">[*missing parents]</th>
-        <th width="5%%">[*missing spouse]</th>
-        <th width="15%%">[*person/persons]0</th>
-        %if;(evar.birth = "on") <th width="20%%">[*birth date and birth place]</th> %incr_count; %end;
-        %if;(evar.death = "on") <th width="20%%">[*death date and death place]</th> %incr_count; %end;
+        <th>[*missing sosa]</th>
+        <th>[*missing parents]</th>
+        <th>[*missing spouse]</th>
+        <th>[*person/persons]0</th>
+        %if;(evar.birth = "on") <th>[*birth date and birth place]</th> %incr_count; %end;
+        %if;(evar.death = "on") <th>[*death date and death place]</th> %incr_count; %end;
         %if;(evar.spouse = "on") <th>[*spouse/spouses]1</th> %incr_count; %end;
       </tr>
       %let;nb_col;%expr(count + 4)%in;

@@ -257,7 +257,7 @@
     <div class="descends_menu_other">
       <label>
         <input type="radio" name="t" value="S"%/>
-        [*only the generation selected]
+        [*descendants at the generation]
       </label>
       <br%/>
       <label>
