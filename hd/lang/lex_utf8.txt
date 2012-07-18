@@ -2567,6 +2567,9 @@ sl: rojstni dnevi
 sv: födelsedagar
 zh:  出生于今日的记录
 
+    birth date and birth place
+fr: date et lieu de naissance
+
     book of places
 de: ortsverzeichnis
 en: places
@@ -3549,6 +3552,9 @@ sk: úmrtie
 sl: smrti
 sv: död
 
+    death date and death place
+fr: date et lieu de décès
+
     delete
 af: verwyder
 bg: да няма
@@ -3605,6 +3611,9 @@ sk: potomkovia
 sl: potomci
 sv: ättlingar
 zh:  后代
+
+    descendants at the generation
+fr: descendants à la génération...
 
     died
 af: oorlede
@@ -4905,6 +4914,9 @@ de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit I
 en: Click "[Update]" to edit a place: the place names will be automatically updated in your entire family tree
 es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
 fr: Cliquez sur « Modifier » pour corriger un lieu : l’ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
+
+    help surname branch
+fr: cliquez sur le nombre de branches pour afficher l'arbre des patronymes
 
     here
 af: hier
@@ -9153,8 +9165,11 @@ sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
-    sort by number of branches
-fr: trier par nombre de branches
+    sort by/branch/alphabetic order
+fr: trier par:/branches/ordre alphabétique
+
+    sort by/generation/alphabetic order
+fr: trier par:/génération/ordre alphabétique
 
     Sosa
 af: Sosa

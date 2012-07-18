@@ -125,6 +125,7 @@
             [*comment] ([marriage/marriages]1)
           </label>
         </p>
+%(
         <p class="ascends_menu_option_p">
           <label>
             <input type="checkbox" name="image" value="on"%/>
@@ -135,6 +136,7 @@
             [*display empty picture]
           </label>
         </p>
+%)
       </div>
     
       <label>
@@ -293,13 +295,7 @@
       <label>
         <input type="radio" name="t" value="F"%/>
         [*surnames branch]
-      </label>
-      <div class="ascends_menu_option_div">
-        <label>
-          <input type="checkbox" name="sort" value="on"%/>
-          [*sort by number of branches]
-        </label>
-      </div>
+      </label><br%/>
     
       <label>
         <input type="radio" name="t" value="M"%/>
@@ -307,31 +303,28 @@
       </label>
       <div class="ascends_menu_option_div">
         <label>
-          <input type="checkbox" name="al" value="on"%/>
-          [*alphabetic order]
-        </label>
-        <br%/>
-        <label>
           <input type="checkbox" name="birth" value="on"%/>
-          [*birth]
+          [*birth date and birth place]
         </label>
         <br%/>
         <label>
           <input type="checkbox" name="death" value="on"%/>
-          [*death]
+          [*death date and death place]
         </label>
         <br%/>
         <label>
           <input type="checkbox" name="spouse" value="on"%/>
-          [*spouse/spouses]1 ([only with display by generation])
+          [*spouse/spouses]1
         </label>
         <br%/>
+%(
         <label>
           [*living from/to]0 %sp;
           <input type="text" name="after" size="4" maxlength="4" value=""%/>
           [living from/to]1 %sp;
           <input type="text" name="before" size="4" maxlength="4" value=""%/>
         </label>
+%)
       </div>
     </div>
   </div></div>
