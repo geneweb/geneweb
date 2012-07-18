@@ -61,7 +61,7 @@
 %end;
 
 %define;togen(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %if;(xx = 1 and evar.t != "F")[*specify::generation/generations]0%nn;
   %elseif;(xx = 2)[*to the parents]%nn;
   %elseif;(xx = 3)[*to the grandparents]%nn;
   %elseif;(xx = 4)[*to the great-grandparents]%nn;
@@ -144,6 +144,10 @@
       ancestor.date_end.year)
   %end;    
 
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
+  <p>%apply;togen(nb_gen).</p>
+
+%(
   %if;(count > 100)
     <p>
       <span>[*number of branches] : </span>
@@ -154,18 +158,36 @@
       %end;
     </p>
   %end;
+%)
 
+  <p>[*help surname branch].</p>
+  <div class="not_printable">
+    <table class="display_search">
+      <tr>
+        <td><b>[*sort by/branch/alphabetic order]0</b></td>
+        <td><img src="%image_prefix;/picto_branch.png"%/></td>
+        <td>[sort by/branch/alphabetic order]1</td>
+        <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+        <td>
+          <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;sosab=%evar.sosab;&amp;t=%evar.t;&amp;v=%evar.v;">
+            [sort by/branch/alphabetic order]2
+          </a>
+        </td>
+      </tr>
+    </table>
+  </div>
   <ul class="surname_branch_sort">
     %foreach;sorted_list_item;
       %if;(prev_item.1 != item.1)
         <li>%nn;
-        <a name="a_%apply;hexa(item.1)">%item.1;</a>
+        %( <a name="a_%apply;hexa(item.1)">%item.1;</a> %)
+        <a name="a_%apply;hexa(item.1)">&nbsp;</a>
         <table class="surname_branch_table">
-          <tr>
-            <th style="width:30%%;">[*surname/surnames]0</th>
-            <th style="width:10%%;">[*number of branches]</th>
-            <th>[*place]</th>
-            <th style="width:15%%;">[*date]</th>
+          <tr class="surname_branch_table_header">
+            <th width="30%%">[*surname/surnames]0</th>
+            <th width="10%%">[*nb branches]</th>
+            <th width="45%%">[*place]</th>
+            <th width="15%%">[*date]</th>
           </tr>
       %end;
       <tr>
@@ -214,10 +236,28 @@
 
 %elseif;(evar.t = "F")
   %( surnames branch %)
+  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
+  <p>%apply;togen(nb_gen).</p>
+  <p>[*help surname branch].</p>
+  <div class="not_printable" style="margin-bottom:25px;">
+    <table class="display_search">
+      <tr>
+        <td><b>[*sort by/branch/alphabetic order]0</b></td>
+        <td><img src="%image_prefix;/picto_branch.png"%/></td>
+        <td>
+          <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;sosab=%evar.sosab;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=on">
+            [sort by/branch/alphabetic order]1
+          </a>
+        </td>
+        <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+        <td>[sort by/branch/alphabetic order]2</td>
+      </tr>
+    </table>
+  </div>
   <table class="surname_branch_table">
-    <tr>
+    <tr class="surname_branch_table_header">
       <th>[*surname/surnames]0</th>
-      <th>[*number of branches]</th>
+      <th>[*nb branches]</th>
       <th>[*place]</th>
       <th>[*date]</th>
     </tr>
