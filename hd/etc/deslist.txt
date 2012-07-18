@@ -144,17 +144,22 @@
     %end;
   </b>%nn;
   %apply;somebody_long_info("xx").
-  %if;(evar.notes = "on" and xx.has_notes and evar.inline = "on")
-    [*note/notes]0 : %apply;clean_html_tags(xx.notes).%sp;
-  %end;
-  %if;(evar.src = "on" and xx.has_sources and evar.inline = "on")
-    <em>
-      [*source/sources]1 :
-      %foreach;xx.source;
-        %source_type;: %apply;clean_html_tags(source)
-        %if;(not is_last),%sp;%end;
-      %end;.
-    </em>
+  %if;((evar.notes = "on" and xx.has_notes and evar.inline = "on") or (evar.src = "on" and xx.has_sources and evar.inline = "on"))
+    <p class="desc_notes_src_inline">
+      %if;xx.has_notes;
+        [*note/notes]0 : %apply;clean_html_tags(xx.notes)
+        <br%/>
+      %end;
+      %if;xx.has_sources;
+        <em>
+          [*source/sources]1 :
+          %foreach;xx.source;
+            %source_type;: %apply;clean_html_tags(source)
+            %if;(not is_last),%sp;%end;
+          %end;
+        </em>
+      %end;
+    </p>
   %end;
   %if;((((evar.notes="on" and xx.has_notes)
         and (wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no"))
@@ -180,17 +185,22 @@
       %end;
     </b>%nn;
     %apply;somebody_long_info("spouse").
-    %if;(evar.notes = "on" and spouse.has_notes and evar.inline = "on")
-      [*note/notes]0 : %apply;clean_html_tags(spouse.notes).%sp;
-    %end;
-    %if;(evar.src = "on" and spouse.has_sources and evar.inline = "on")
-      <em>
-        [*source/sources]1 :
-        %foreach;spouse.source;
-          %source_type;: %apply;clean_html_tags(source)
-          %if;(not is_last),%sp;%end;
-        %end;.
-      </em>
+    %if;((evar.notes = "on" and spouse.has_notes and evar.inline = "on") or (evar.src = "on" and spouse.has_sources and evar.inline = "on"))
+      <p class="desc_notes_src_inline">
+        %if;spouse.has_notes;
+          [*note/notes]0 : %apply;clean_html_tags(spouse.notes)
+          <br%/>
+        %end;
+        %if;spouse.has_sources;
+          <em>
+            [*source/sources]1 :
+            %foreach;spouse.source;
+              %source_type;: %apply;clean_html_tags(source)
+              %if;(not is_last),%sp;%end;
+            %end;
+          </em>
+        %end;
+      </p>
     %end;
     %if;((((evar.notes="on" and spouse.has_notes)
           and (wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no"))
@@ -217,7 +227,7 @@
       %elseif;(family.desc_level > famlev)
         <i>, [see above]</i>.
         %apply;lazy_print%with;<br%/>%nl;%end;
-      %elseif;has_children;, <i>[having as children]</i>
+      %elseif;has_children;<p>... <i>[having as children]</i></p>
           %family.set_infinite_desc_level;
           %if;(curlev = 0)</p>%nl;%end;
           <ul>
@@ -339,9 +349,9 @@
         <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
       %else;
         %if;xx.is_female;
-          <img src="%image_prefix;/img_unknown_woman.png" widht="50" height="75" alt=""%/>
+          <img src="%image_prefix;/img_unknown_woman.png" width="50" height="75" alt=""%/>
         %else;
-          <img src="%image_prefix;/img_unknown_man.png" widht="50" height="75" alt=""%/>
+          <img src="%image_prefix;/img_unknown_man.png" width="50" height="75" alt=""%/>
         %end;
       %end;      
       <p>
@@ -390,39 +400,51 @@
 %end;
 
 %define;by_list(xx)
-  <p>%apply;togen(xx).</p>
-  <p> 
-    %if;(evar.notes = "on" or evar.src = "on")
-      <a href="#ns">[*see descendants notes/sources]</a>
+  <p class="not_printable"> 
+    %if;(((evar.notes = "on" or evar.src = "on") and evar.inline != "on") or evar.image = "on")
+      [*see]: <a href="#desc">[*descendants]</a>%sp;%nn;
+    %end;
+    %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
+      | <a href="#ns">[*note/notes]1</a>
     %end;
     %if;(evar.image = "on")
-      <a href="#img">[*see descendants pictures]</a>
+      | <a href="#img">[*media/medias]1</a>
     %end;
   </p>
   %reset_count;
-  %apply;descendants_by_list("self", "self", 0, xx, 0, 1)%nl;
   <p>
-  [*total]: %expr(count-1) [[person/persons]1@(c)]%sp;
-  ([spouses not included]).
-  %if;((evar.notes="on" or evar.src="on") and evar.inline != "on")
-    <hr%/>
-    <a name="ns">&nbsp;</a>
-    <h3 class="highlight">%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
-    <dl>
+    %apply;togen(xx).
+    <a name="desc">&nbsp;</a>
+  </p>
+    %reset_count;
+    %apply;descendants_by_list("self", "self", 0, xx, 0, 1)%nl;
+    <p>
+    [*total]: %expr(count-1) [[person/persons]1@(c)]%sp;
+    ([spouses not included]).
+    %if;((evar.notes="on" or evar.src="on") and evar.inline != "on")
+      <p><hr%/></p>
+      <h3 class="highlight">
+        %if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;
+        <a name="ns">&nbsp;</a>
+      </h3>
+      <dl>
+        %reset_count;
+        %reset_desc_level;
+        %apply;notes_by_list("self", 0, xx, 0, 1)%nl;
+      </dl>
+    %end;
+    %if;(evar.image = "on")
       %reset_count;
       %reset_desc_level;
-      %apply;notes_by_list("self", 0, xx, 0, 1)%nl;
-    </dl>
-  %end;
-  %if;(evar.image = "on")
-    %reset_count;
-    %reset_desc_level;
-    <a name="img">&nbsp;</a>
-    <h3>[*image/images]1</h3>
-    <table>
-      %apply;display_images("self", 0, xx, 0, 1)
-    </table>
-  %end;
+      <p><hr%/></p>
+      <h3>
+        [*image/images]1
+        <a name="img">&nbsp;</a>
+      </h3>
+      <table>
+        %apply;display_images("self", 0, xx, 0, 1)
+      </table>
+    %end;
   </p>
 %end;
 

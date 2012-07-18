@@ -67,6 +67,7 @@
     %else
       <input type="hidden" name="i" value="%index;"%/>
     %end;
+    <input type="hidden" name="sosab" value="10"%/>
   </p>
   
   <div style="text-align:center;"><div style="display:inline-block; text-align:left; padding-bottom: 25px;">
@@ -74,13 +75,16 @@
       <label>
         <input type="radio" name="t" value="N" checked="checked"%/>
         [*short display] (*)
-      </label>
+      </label><br%/>
+%( Positionne directement l'affiche du numéro sosa en base 10 %)
+%(
       <div class="ascends_menu_option_div">
         Sosa base
         <label><input type="radio" name="sosab" value="8"%/>8</label>
         <label><input type="radio" name="sosab" value="10" checked="checked"%/>10</label>
         <label><input type="radio" name="sosab" value="16"%/>16</label>
       </div>
+%)
     
       <label>
         <input type="radio" name="t" value="G"%/>

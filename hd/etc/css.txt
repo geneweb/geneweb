@@ -756,10 +756,18 @@ hr.full
  padding:2px;
 }
 
+/* --- Ascendants/Descendants liste rédigée --- */
+.asc_notes_src_inline, .desc_notes_src_inline
+{
+  padding-left:15px;
+}
+
 /* --- Ascendants --- */
 .surname_branch_sort
 {
   float:left;
+  list-style-type: none;
+  padding-left: 0;
 }
 
 ul.surname_branch_sort > li
@@ -773,45 +781,30 @@ ul.surname_branch_sort > li
   border-style:solid;
   border-collapse:collapse;
 }
- 
-.surname_branch_table th, .surname_branch_table td
-{
-  border:1px solid black;
-  vertical-align:top;
-  padding:2px;
-}
 
-.missing_ancestors_ul_alpha
+.surname_branch_sort .surname_branch_table
 {
-  float:left;
-}
-
-ul.missing_ancestors_ul_alpha > li
-{
-  margin-bottom:15px;
-}
-
-.missing_ancestors_table_alpha
-{
-  border-width:1px;
-  border-style:solid;
-  border-collapse:collapse;
   width:100%%;
 }
-
-.missing_ancestors_table_alpha th, 
-.missing_ancestors_table_alpha td
+ 
+.surname_branch_table th, 
+.surname_branch_table td
 {
   border:1px solid black;
   vertical-align:top;
   padding:2px;
 }
 
-.missing_ancestors_table_alpha th.missing_parent,
-.missing_ancestors_table_alpha th.missing_spouse
+.missing_ancestors_sort
 {
-  width:100px;
-  text-align:center;
+  float:left;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+ul.missing_ancestors_sort > li
+{
+  margin-bottom:15px;
 }
 
 .missing_ancestors_table
@@ -821,12 +814,24 @@ ul.missing_ancestors_ul_alpha > li
   border-collapse:collapse;
 }
 
+.missing_ancestors_sort .missing_ancestors_table
+{
+  width:100%%;
+}
+
 .missing_ancestors_table th, 
 .missing_ancestors_table td
 {
   border:1px solid black;
   vertical-align:top;
   padding:2px;
+}
+
+.missing_ancestors_table th.missing_parent,
+.missing_ancestors_table th.missing_spouse
+{
+  width:100px;
+  text-align:center;
 }
 
 /* Pour affichage ascendance par liste m=A;t=L */
