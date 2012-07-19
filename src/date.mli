@@ -27,3 +27,5 @@ value before_date : dmy -> dmy -> bool;
 
 (* return the day of the week given the date as parameter *)
 value get_wday : config -> date -> string;
+
+value compare_date : date -> date -> int;
