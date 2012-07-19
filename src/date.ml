@@ -666,7 +666,7 @@ value short_dates_text conf base p =
       (* On ne peut pas traiter les dates au format texte. *)
       | (_, _) -> "" ]
     in
-    if s <> "" then " <em>" ^ s ^ "</em>" else s
+    if s <> "" then " <em><bdo dir=\"ltr\">" ^ s ^ "</bdo></em>" else s
   else ""
 ;
 
@@ -811,6 +811,33 @@ value print_dates conf base p =
     | _ -> () ];
   }
 ;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] compare_date : date -> date -> int                             *)
+(** [Description] : Renvoie 0 si les deux dates sont égales, 1 si la 
+                    première date est plus grande et -1 sinon.
+                    On ne tiens pas compte de la précision de la date.
+    [Args] :
+      - d1 : la première date
+      - d2 : la deuxième date
+    [Retour] : int
+    [Rem] : Exporté en clair hors de ce module.                           *)
+(* ********************************************************************** *)
+value compare_date d1 d2 =
+  match (d1, d2) with
+  [ (Dgreg dmy1 _, Dgreg dmy2 _) -> 
+      match Pervasives.compare dmy1.year dmy2.year with
+      [ 0 ->
+          match Pervasives.compare dmy1.month dmy2.month with
+          [ 0 -> Pervasives.compare dmy1.day dmy2.day
+          | x -> x ]
+      | x -> x]
+  | (Dgreg dmy1 _, Dtext _) -> 1
+  | (Dtext _, Dgreg dmy2 _) -> -1
+  | (Dtext _, Dtext _) -> 0 ]
+;
+
 
 (* Calendar request *)
 
