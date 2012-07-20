@@ -158,11 +158,16 @@ value advanced_search conf base max_answers =
           [ "Y" -> get_family p <> [| |]
           | "N" -> get_family p = [| |]
           | _ -> True ]) &&
-       List.exists
-         (fun ifam ->
-           let fam = foi base ifam in
-           test_date p "marriage" (fun () -> Adef.od_of_codate (get_marriage fam))) 
-         (Array.to_list (get_family p)) &&
+       (* Si il n'y a pas de famille, il n'y a pas 'au moins un' *)
+       (* élément satisfaisant le prédicat.                      *)
+       (if get_family p = [| |] then True 
+        else
+          List.exists
+            (fun ifam ->
+              let fam = foi base ifam in
+              test_date p "marriage" 
+                (fun () -> Adef.od_of_codate (get_marriage fam)))
+            (Array.to_list (get_family p)) ) &&
        test_auth p "birth_place"
          (fun x -> name_incl x (sou base (get_birth_place p))) &&
        test_auth p "bapt_place"
@@ -171,17 +176,22 @@ value advanced_search conf base max_answers =
          (fun x -> name_incl x (sou base (get_death_place p))) &&
        test_auth p "burial_place"
          (fun x -> name_incl x (sou base (get_burial_place p))) &&
-       test_auth p "occu" (fun x -> name_incl x (sou base (get_occupation p))) &&
-       List.exists
-         (fun ifam ->
-           let fam = foi base ifam in
-           let father = poi base (get_father fam) in
-           let mother = poi base (get_mother fam) in
-           if fast_auth_age conf father && fast_auth_age conf mother then
-             test_auth p "marriage_place"
-               (fun x -> name_incl x (sou base (get_marriage_place fam)))
-           else False)
-         (Array.to_list (get_family p))
+       test_auth p "occu" 
+         (fun x -> name_incl x (sou base (get_occupation p))) &&
+       (* Si il n'y a pas de famille, il n'y a pas 'au moins un' *)
+       (* élément satisfaisant le prédicat.                      *)
+       (if get_family p = [| |] then True
+        else
+          List.exists
+            (fun ifam ->
+              let fam = foi base ifam in
+              let father = poi base (get_father fam) in
+              let mother = poi base (get_mother fam) in
+              if fast_auth_age conf father && fast_auth_age conf mother then
+                test_auth p "marriage_place"
+                  (fun x -> name_incl x (sou base (get_marriage_place fam)))
+              else False)
+            (Array.to_list (get_family p)))
     then do {
       list.val := [p :: list.val]; incr len;
     }
