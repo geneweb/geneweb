@@ -1150,7 +1150,7 @@ value build_surnames_list conf base v p =
     }
   in
   do {
-    loop 0 Num.one p (get_surname p) (get_date_place conf base auth p);
+    loop 1 Num.one p (get_surname p) (get_date_place conf base auth p);
     let list = ref [] in
     Hashtbl.iter
       (fun i dp ->
@@ -1165,6 +1165,149 @@ value build_surnames_list conf base v p =
          [ 0 ->
              Gutil.alphabetic_order (surname_begin base s1)
                (surname_begin base s2)
+         | x -> x ])
+      list.val
+  }
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] build_list_eclair : 
+      config -> base -> int -> person -> 
+        list 
+          (string * string * option date * option date * person * list iper) *)
+(** [Description] : Construit la liste éclair des ascendants de p jusqu'à la 
+                    génération v.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - v    : le nombre de génération
+      - p    : person
+    [Retour] : (surname * place * date begin * date end * person * list iper)
+    [Rem] : Exporté en clair hors de ce module.                              *)
+(* ************************************************************************* *)
+value build_list_eclair conf base v p =
+  let ht = Hashtbl.create 701 in
+  let mark = Array.create (nb_of_persons base) False in
+  (* Fonction d'ajout dans la Hashtbl. A la clé (surname, place) on associe *)
+  (* la personne (pour l'interprétation dans le template), la possible date *)
+  (* de début, la possible date de fin, la liste des personnes/évènements.  *)
+  (* Astuce: le nombre d'élément de la liste correspond au nombre             *)
+  (* d'évènements et le nombre d'iper unique correspond au nombre d'individu. *)
+  let add_surname p surn pl d =
+    if not (is_empty_string pl) then
+      (* On utilise la string du lieu, parce qu'en gwc2, les adresses des *)
+      (* lieux sont différentes selon l'évènement.                        *)
+      (* On fait un string_of_place à cause des éventuels crochets, pour  *)
+      (* avoir l'unicité du lieu et le trie alphabétique.                 *)
+      let pl = Util.string_of_place conf (sou base pl) in
+      let r = 
+        try Hashtbl.find ht (surn, pl) with
+        [ Not_found -> 
+            let r = ref (p, None, None, []) in
+            do { Hashtbl.add ht (surn, pl) r; r } ]
+      in
+      (* Met la jour le binding : dates et liste des iper. *)
+      r.val := 
+        (fun p (pp, db, de, l) -> 
+          let db = 
+            match db with
+            [ Some dd -> 
+                match d with
+                [ Some d ->
+                  if Date.compare_date d dd < 0 then Some d
+                  else db
+                | None -> db ]
+            | None -> d ]
+          in
+          let de = 
+            match de with
+            [ Some dd ->
+                match d with
+                [ Some d ->
+                  if Date.compare_date d dd > 0 then Some d
+                  else de
+                | None -> de ]
+            | None -> d ]
+          in
+          (pp, db, de, [(get_key_index p) :: l]))
+        p r.val
+    else ()
+  in
+  (* Fonction d'ajout de tous les évènements d'une personne (birth, bapt...). *)
+  let add_person p surn = 
+    if mark.(Adef.int_of_iper (get_key_index p)) then ()
+    else do {
+      mark.(Adef.int_of_iper (get_key_index p)) := True;
+      add_surname p surn (get_birth_place p) (Adef.od_of_codate (get_birth p));
+      add_surname p surn (get_baptism_place p) 
+        (Adef.od_of_codate (get_baptism p));
+      let death =
+        match get_death p with
+        [ Death _ cd -> Some (Adef.date_of_cdate cd)
+        | _ -> None ]
+      in
+      add_surname p surn (get_death_place p) death;
+      let burial =
+        match get_burial p with
+        [ Buried cod | Cremated cod -> Adef.od_of_codate cod
+        | _ -> None ]
+      in
+      add_surname p surn (get_burial_place p) burial;
+      List.iter
+        (fun ifam ->
+          let fam = foi base ifam in
+          add_surname p surn (get_marriage_place fam) 
+            (Adef.od_of_codate (get_marriage fam)))
+        (Array.to_list (get_family p))
+    }
+  in
+  (* Parcours les ascendants de p et les ajoute dans la Hashtbl. *)
+  let rec loop lev p surn =
+    if lev = v then
+      if (is_hide_names conf p) && not (fast_auth_age conf p) then ()
+      else add_person p surn
+    else do {
+      add_person p surn;
+      match get_parents p with
+      [ Some ifam ->
+          let cpl = foi base ifam in
+          let fath = pget conf base (get_father cpl) in
+          let moth = pget conf base (get_mother cpl) in
+          do {
+            if not (is_hidden fath) then loop (lev + 1) fath (get_surname fath)
+            else ();
+            if not (is_hidden moth) then loop (lev + 1) moth (get_surname moth)
+            else ();
+          }
+      | None -> () ]
+    }
+  in
+  do {
+    (* Construction de la Hashtbl. *)
+    loop 1 p (get_surname p);
+    (* On parcours la Hashtbl, et on élimine les noms vide (=?) *)
+    let list = ref [] in
+    Hashtbl.iter
+      (fun (istr, place) ht_val ->
+         let surn = sou base istr in
+         if surn <> "?" then 
+           let (p, db, de, pl) = (fun x -> x) ht_val.val in
+           list.val := [(surn, place, db, de, p, pl) :: list.val]
+         else ())
+      ht;
+    (* On trie la liste par nom, puis lieu. *)
+    List.sort
+      (fun (s1, pl1, _, _, _, _) (s2, pl2, _, _, _, _) ->
+         match
+           Gutil.alphabetic_order (surname_end base s1) (surname_end base s2)
+         with
+         [ 0 ->
+             match Gutil.alphabetic_order (surname_begin base s1) 
+               (surname_begin base s2)
+             with
+             [ 0 -> Gutil.alphabetic_order pl1 pl2
+             | x -> x ]
          | x -> x ])
       list.val
   }
@@ -1269,8 +1412,28 @@ module SortedList =
   Set.Make (struct type t = list string; value compare = compare_ls; end)
 ;
 
+module IperSet =
+  Set.Make 
+    (struct 
+      type t = iper; 
+      value compare i1 i2 = 
+        Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2);
+     end)
+;
+
+
+(* 
+   Type pour représenté soit :
+     - la liste des branches patronymique
+       (surname * date begin * date end * place * person * list sosa * loc)
+     - la liste éclair
+       (surname * place * date begin * date end * person * list iper * loc)
+*)
 type ancestor_surname_info =
-  (string * option date * option date * string * person * list Num.t * loc)
+  [ Branch of 
+      (string * option date * option date * string * person * list Num.t * loc)
+  | Eclair of 
+      (string * string * option date * option date * person * list iper * loc) ]
 ;
 
 type env 'a =
@@ -2002,34 +2165,56 @@ and eval_ancestor_field_var conf base env gp loc =
           let ep = make_ep conf base ip in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ] ]
-and eval_anc_by_surnl_field_var conf base env ep
-      (s, db, de, place, p, sosa_list, loc) =
-  fun
-  [ ["date_begin" :: sl] ->
-      match db with
-      [ Some d -> eval_date_field_var conf d sl
-      | None -> VVstring "" ]
-  | ["date_end" :: sl] ->
-      match de with
-      [ Some d -> eval_date_field_var conf d sl
-      | None -> VVstring "" ]
-  | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
-  | ["place"] -> VVstring (Util.string_of_place conf place)
-  | ["sosa_access"] ->
-      let (str, _) =
-        List.fold_right
-          (fun sosa (str, n) ->
-             let str =
-               str ^ ";s" ^ string_of_int n ^ "=" ^ Num.to_string sosa
-             in
-             (str, n + 1))
-          sosa_list ("", 1)
-      in
-      let (p, _) = ep in
-      VVstring (acces_n conf base "1" p ^ str)
-  | sl ->
-      let ep = make_ep conf base (get_key_index p) in
-      eval_person_field_var conf base env ep loc sl ]
+and eval_anc_by_surnl_field_var conf base env ep info =
+  match info with
+  [ Branch (s, db, de, place, p, sosa_list, loc) ->
+      fun
+      [ ["date_begin" :: sl] ->
+          match db with
+          [ Some d -> eval_date_field_var conf d sl
+          | None -> VVstring "" ]
+      | ["date_end" :: sl] ->
+          match de with
+          [ Some d -> eval_date_field_var conf d sl
+          | None -> VVstring "" ]
+      | ["nb_times"] -> VVstring (string_of_int (List.length sosa_list))
+      | ["place"] -> VVstring (Util.string_of_place conf place)
+      | ["sosa_access"] ->
+          let (str, _) =
+            List.fold_right
+              (fun sosa (str, n) ->
+                 let str =
+                   str ^ ";s" ^ string_of_int n ^ "=" ^ Num.to_string sosa
+                 in
+                 (str, n + 1))
+              sosa_list ("", 1)
+          in
+          let (p, _) = ep in
+          VVstring (acces_n conf base "1" p ^ str)
+      | sl ->
+          let ep = make_ep conf base (get_key_index p) in
+          eval_person_field_var conf base env ep loc sl ]
+  | Eclair (s, place, db, de, p, persl, loc) ->  
+      fun
+      [ ["date_begin" :: sl] ->
+          match db with
+          [ Some d -> eval_date_field_var conf d sl
+          | None -> VVstring "" ]
+      | ["date_end" :: sl] ->
+          match de with
+          [ Some d -> eval_date_field_var conf d sl
+          | None -> VVstring "" ]
+      | ["nb_events"] -> VVstring (string_of_int (List.length persl))
+      | ["nb_ind"] -> 
+          let list =
+            IperSet.elements
+              (List.fold_right IperSet.add persl IperSet.empty)
+          in
+          VVstring (string_of_int (List.length list))
+      | ["place"] -> VVstring place
+      | sl ->
+          let ep = make_ep conf base (get_key_index p) in
+          eval_person_field_var conf base env ep loc sl ] ]
 and eval_num conf n =
   fun
   [ ["hexa"] -> "0x" ^ Num.to_string_sep_base "" 16 n
@@ -3009,12 +3194,28 @@ value print_foreach conf base print_ast eval_expr =
           | _ -> 0 ]
       | _ -> raise Not_found ]
     in
-    let list = build_surnames_list conf base max_level p in
-    List.iter
-      (fun (a, (((b, c, d), e), f)) ->
-         let env = [("ancestor", Vanc_surn (a, b, c, d, e, f, loc)) :: env] in
-         List.iter (print_ast env ep) al)
-      list
+    (* En fonction du type de sortie demandé, on construit *)
+    (* soit la liste des branches soit la liste éclair.    *)
+    match p_getenv conf.env "t" with
+    [ Some "E" ->
+        let list = build_list_eclair conf base max_level p in
+        List.iter
+          (fun (a, b, c, d, e, f) ->
+             let env = 
+               [("ancestor", Vanc_surn (Eclair (a, b, c, d, e, f, loc))) :: env]
+             in
+             List.iter (print_ast env ep) al)
+          list 
+    | Some "F" ->
+        let list = build_surnames_list conf base max_level p in
+        List.iter
+          (fun (a, (((b, c, d), e), f)) ->
+             let env = 
+               [("ancestor", Vanc_surn (Branch (a, b, c, d, e, f, loc))) :: env] 
+             in
+             List.iter (print_ast env ep) al)
+          list
+    | _ -> () ]
   and print_foreach_ancestor_tree env el al ((p, _) as ep) =
     let (p, max_level) =
       match el with
@@ -3587,7 +3788,7 @@ value print_ascend conf base p =
   | _ ->
       let templ =
         match p_getenv conf.env "t" with
-        [ Some ("F" | "H" | "L") -> "anclist"
+        [ Some ("E" | "F" | "H" | "L") -> "anclist"
         | Some ("D" | "G" | "M" | "N" | "Z") -> "ancsosa"
         | Some ("A" | "C" | "T") -> "anctree"
         | _ -> "ancmenu" ]
