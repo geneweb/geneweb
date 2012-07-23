@@ -101,13 +101,18 @@
 <input type="radio" name="sex" id="sexF" value="F"%/><label for="sexF">[M/F]1</label>
 <input type="radio" name="sex" id="sexU" value="N" checked="checked"%/><label for="sexU">-</label>
 
-<h4>[*married]0</h4>
+<h4>[*marriage/marriages]0</h4>
 
+<table border="1">
+<tr align="left">
+<td>[*married]</td>
+<td>
 <input type="radio" name="married" id="mY" value="Y"%/><label for="mY">[Y/N]0</label>
 <input type="radio" name="married" id="mN" value="N"%/><label for="mN">[Y/N]1</label>
 <input type="radio" name="married" id="mA" value="A" checked="checked"%/><label for="mA">-</label>
-
-<h4>[*marriage/marriages]0</h4>
+</td>
+</tr>
+</table>
 %apply;event("marriage")
 
 <p>
