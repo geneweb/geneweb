@@ -128,6 +128,8 @@ create
 cremated
 database forum
 date
+date begin
+date end
 date of birth
 date of death
 date of marriage
@@ -232,6 +234,7 @@ link between
 linked pages
 link to use
 list/list (ancestors)
+list eclair
 living after %s
 living before %s
 living between %s and %s
@@ -304,6 +307,7 @@ nth (generation)
 number
 nb branches
 nb children
+nb individuals
 number of branches
 number of children
 number of living persons:
@@ -380,6 +384,7 @@ siblings
 since the last click
 son/daughter/child
 sort by/branch/alphabetic order
+sort by/date begin/alphabetic order
 sort by/generation/alphabetic order
 Sosa
 source/sources

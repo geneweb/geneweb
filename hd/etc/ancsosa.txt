@@ -1022,6 +1022,7 @@
         </tr>
       </table>
     </div>
+
     %empty_sorted_list;
     %reset_count;
     %foreach;ancestor_level(nb_gen)
@@ -1081,8 +1082,24 @@
     %end;
   
     <ul class="missing_ancestors_sort">
+      %if;(count <= 100)
+        <li>%nn;
+        <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
+        <table class="missing_ancestors_table">
+          <tr class="missing_ancestors_table_header">
+            <th width="20%%">[*person/persons]0</th>
+            %if;(evar.birth = "on") 
+              <th %if;(evar.death = "on")width="30%%"%else;width="60%%"%end;>[*birth date and birth place]</th>
+            %end;
+            %if;(evar.death = "on")
+              <th %if;(evar.birth = "on")width="30%%"%else;width="60%%"%end;>[*death date and death place]</th>
+            %end;
+            <th width="10%%">[*missing parents]</th>
+            <th width="10%%">[*missing spouse]</th>
+          </tr>
+      %end;
       %foreach;sorted_list_item;
-        %if;(initial(prev_item.1) != initial(item.1))
+        %if;(initial(prev_item.1) != initial(item.1) and count > 100)
           <li>%nn;
           <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
           <table class="missing_ancestors_table">
@@ -1116,10 +1133,14 @@
           <td align="center">%item.9;</td>
           <td align="center">%item.10;</td>
         </tr>
-        %if;(initial(item.1) != initial(next_item.1))
+        %if;(initial(item.1) != initial(next_item.1) and count > 100)
           </table>
           </li>
         %end;
+      %end;
+      %if;(count <= 100)
+        </table>
+        </li>
       %end;
     </ul>
     <p style="clear:both;">[*total]: %count; [[person/persons]1@(c)]</p>
@@ -1349,24 +1370,32 @@
   
   %elseif;(evar.t = "Z")
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togen(nb_gen).</p>
+    <p>
+      %if;(evar.only = "on")
+        %apply;gen("v").
+      %else;
+        %apply;togen(nb_gen).
+      %end;
+    </p>
     %reset_count;
     <table class="ascends_table">
       <tr class="ascends_table_header">%apply;table_header()</tr>
       %let;nb_col;%count;%in;
       %reset_count;
       %foreach;ancestor_level(nb_gen)
-        %if;(evar.gen = "on")
-          <tr>
-            <th align="left" colspan="%nb_col;">[*generation/generations]0 %level;</th>
-          </tr>
-        %end;
-        %foreach;ancestor;
-          <tr>
-            %apply;table_row()
-          </tr>
-          %if;(ancestor.nb_families > 1)
-            %apply;table_family()
+        %if;(evar.v != "" and level <= nb_gen and (evar.only != "on" or level = nb_gen))
+          %if;(evar.gen = "on")
+            <tr>
+              <th align="left" colspan="%nb_col;">[*generation/generations]0 %level;</th>
+            </tr>
+          %end;
+          %foreach;ancestor;
+            <tr>
+              %apply;table_row()
+            </tr>
+            %if;(ancestor.nb_families > 1)
+              %apply;table_family()
+            %end;
           %end;
         %end;
       %end;
