@@ -3463,6 +3463,12 @@ sk: dátum
 sl: datum
 sv: datum
 
+    date begin
+fr: date de début
+
+    date end
+fr: date de fin
+
     date of birth
 de: Geburtsdatum
 en: date of birth
@@ -3804,7 +3810,7 @@ no: vis generasjonsnummer
 sv: visa generations nummer
 
     display notes/sources inline
-fr: afficher les notes/sources dans le contenu
+fr: inclure les notes/sources au contenu
 
     display picture
 de: porträt zeigen
@@ -5918,6 +5924,9 @@ sk: zoznam
 sl: seznam
 sv: lista/trädlista
 
+    list eclair
+fr: liste éclair
+
     living after %s
 fr: vivant après %s
 
@@ -7469,36 +7478,16 @@ sl: številka
 sv: nummer
 
     nb branches
-af: aantal stake
-bg: брой на клоновете
-br: niver ar skourroù
-ca: nombre de branques
-cs: počet větví
-da: antal grene
-de: Anzahl der Äste
-en: number of lines
-eo: nombro da branĉoj
-es: número de ramas
-et: harude arv
-fi: Sukuhaarojen lukumäärä
 fr: nb. branches
-he:  מספר ענפים
-is: fjöldi greina
-it: numero di rami
-lv: zaru skaits
-nl: aantal takken
-no: antall grener
-pl: liczba linii (gałęzi)
-pt: número de ramos
-ro: numar de ramuri
-ru: число ветвей
-sk: počet vetví
-sl: število vej
-sv: antal grenar
 
     nb children
-en: number of children
 fr: nb. enfants
+
+    nb events
+fr: nb. évènements
+
+    nb individuals
+fr: nb. individus
 
     number of branches
 af: aantal stake
@@ -7529,7 +7518,6 @@ sl: število vej
 sv: antal grenar
 
     number of children
-en: number of children
 fr: nombre d’enfants
 
     number of living persons:
@@ -9167,6 +9155,9 @@ sv: son/dotter/barn
 
     sort by/branch/alphabetic order
 fr: trier par:/branches/ordre alphabétique
+
+    sort by/date begin/alphabetic order
+fr: trier par:/date de début/ordre alphabétique
 
     sort by/generation/alphabetic order
 fr: trier par:/génération/ordre alphabétique

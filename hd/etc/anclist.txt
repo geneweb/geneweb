@@ -158,7 +158,7 @@
       <table class="display_search">
         <tr>
           <td><b>[*sort by/date begin/alphabetic order]0</b></td>
-          <td><img src="%image_prefix;/picto_branch.png"%/></td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
           <td>[sort by/date begin/alphabetic order]1</td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
           <td>
@@ -176,7 +176,7 @@
         <th>[*place]</th>
         <th>[*date begin]</th>
         <th>[*date end]</th>
-        <th>[*nb individual]</th>
+        <th>[*nb individuals]</th>
         <th>[*nb events]</th>
       </tr>
       %foreach;sorted_list_item;
@@ -219,7 +219,7 @@
       <table class="display_search">
         <tr>
           <td><b>[*sort by/date begin/alphabetic order]0</b></td>
-          <td><img src="%image_prefix;/picto_branch.png"%/></td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
           <td>
             <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=on">
               [sort by/date begin/alphabetic order]1
@@ -237,7 +237,7 @@
         <th>[*place]</th>
         <th>[*date begin]</th>
         <th>[*date end]</th>
-        <th>[*nb individual]</th>
+        <th>[*nb individuals]</th>
         <th>[*nb events]</th>
       </tr>
       %foreach;ancestor_surname(evar.v)
@@ -297,7 +297,6 @@
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togen(nb_gen).</p>
   
-  %(
     %if;(count > 100)
       <p>
         <span>[*number of branches] : </span>
@@ -308,7 +307,6 @@
         %end;
       </p>
     %end;
-  %)
   
     <p>[*help surname branch].</p>
     <div class="not_printable">
@@ -327,11 +325,20 @@
       </table>
     </div>
     <ul class="surname_branch_sort">
+      %if;(count <= 100)
+        <li>%nn;
+        <table class="surname_branch_table">
+          <tr class="surname_branch_table_header">
+            <th width="30%%">[*surname/surnames]0</th>
+            <th width="10%%">[*nb branches]</th>
+            <th width="45%%">[*place]</th>
+            <th width="15%%">[*date]</th>
+          </tr>
+      %end;
       %foreach;sorted_list_item;
-        %if;(prev_item.1 != item.1)
+        %if;(prev_item.1 != item.1 and count > 100)
           <li>%nn;
-          %( <a name="a_%apply;hexa(item.1)">%item.1;</a> %)
-          <a name="a_%apply;hexa(item.1)">&nbsp;</a>
+          <a name="a_%apply;hexa(item.1)">%item.1;</a>
           <table class="surname_branch_table">
             <tr class="surname_branch_table_header">
               <th width="30%%">[*surname/surnames]0</th>
@@ -376,10 +383,14 @@
             %end;
           </td>
         </tr>
-        %if;(item.1 != next_item.1)
+        %if;(item.1 != next_item.1 and count > 100)
           </table>
           </li>
         %end;
+      %end;
+      %if;(count <= 100)
+        </table>
+        </li>
       %end;
     </ul>
     <p style="clear:both"></p>

@@ -293,6 +293,11 @@
       </label><br%/>
     
       <label>
+        <input type="radio" name="t" value="E"%/>
+        [*list eclair]
+      </label><br%/>
+    
+      <label>
         <input type="radio" name="t" value="F"%/>
         [*surnames branch]
       </label><br%/>
