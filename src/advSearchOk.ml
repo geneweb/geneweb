@@ -122,11 +122,63 @@ value advanced_search conf base max_answers =
         | _ -> False ]
     | _ -> True ]
   in
-  let rec test_family p f =
-    fun
-    [ [] -> True
-    | [x] -> f x
-    | [x :: l] -> f x || test_family p f l ]
+  let test_date_fam p x =
+    let test_date df =
+      List.exists
+        (fun ifam ->
+           let fam = foi base ifam in
+           let father = poi base (get_father fam) in
+           let mother = poi base (get_mother fam) in
+           if fast_auth_age conf father && fast_auth_age conf mother then 
+             df (Adef.od_of_codate (get_marriage fam))
+           else False)
+        (Array.to_list (get_family p))
+    in
+    let (d1, d2) =
+      try Hashtbl.find hd x with
+      [ Not_found ->
+          let v =
+            (reconstitute_date conf (x ^ "1"),
+             reconstitute_date conf (x ^ "2"))
+          in
+          do { Hashtbl.add hd x v; v } ]
+    in
+    match (d1, d2) with
+    [ (Some d1, Some d2) ->
+        test_date 
+          (fun
+          [ Some d ->
+              if CheckItem.strictly_before d d1 then False
+              else if CheckItem.strictly_before d2 d then False
+              else True
+          | _ -> False ])
+    | (Some d1, _) ->
+        test_date 
+          (fun
+          [ Some d when fast_auth_age conf p ->
+              if CheckItem.strictly_before d d1 then False else True
+          | _ -> False ])
+    | (_, Some d2) ->
+        test_date
+          (fun
+          [ Some d when fast_auth_age conf p ->
+              if CheckItem.strictly_after d d2 then False else True
+          | _ -> False ])
+    | _ -> True ]
+  in
+  let test_auth_fam p x =
+    let y = gets x in
+    if y = "" then True
+    else
+      List.exists
+        (fun ifam ->
+           let fam = foi base ifam in
+           let father = poi base (get_father fam) in
+           let mother = poi base (get_mother fam) in
+           if fast_auth_age conf father && fast_auth_age conf mother then
+             name_incl y (sou base (get_marriage_place fam))
+           else False)
+        (Array.to_list (get_family p))
   in
   let list = ref [] in
   let len = ref 0 in
@@ -164,18 +216,7 @@ value advanced_search conf base max_answers =
           [ "Y" -> get_family p <> [| |]
           | "N" -> get_family p = [| |]
           | _ -> True ]) &&
-(*
-       test_family p
-         (fun ifam ->
-           let fam = foi base ifam in
-           let father = poi base (get_father fam) in
-           let mother = poi base (get_mother fam) in
-           if fast_auth_age conf father && fast_auth_age conf mother then
-             (test_date p "marriage" 
-                (fun () -> Adef.od_of_codate (get_marriage fam)))
-           else False)
-         (Array.to_list (get_family p)) &&
-*)
+       test_date_fam p "marriage" &&
        test_auth p "birth_place"
          (fun x -> name_incl x (sou base (get_birth_place p))) &&
        test_auth p "bapt_place"
@@ -185,19 +226,8 @@ value advanced_search conf base max_answers =
        test_auth p "burial_place"
          (fun x -> name_incl x (sou base (get_burial_place p))) &&
        test_auth p "occu" 
-         (fun x -> name_incl x (sou base (get_occupation p)))
-(*
-       test_family p
-         (fun ifam ->
-           let fam = foi base ifam in 
-           let father = poi base (get_father fam) in
-           let mother = poi base (get_mother fam) in
-           if fast_auth_age conf father && fast_auth_age conf mother then
-             (test_auth p "marriage_place"
-                (fun x -> name_incl x (sou base (get_marriage_place fam))))
-           else False)
-         (Array.to_list (get_family p))
-*)
+         (fun x -> name_incl x (sou base (get_occupation p))) &&
+       test_auth_fam p "marriage_place"
     then do {
       list.val := [p :: list.val]; incr len;
     }
