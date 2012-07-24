@@ -1368,22 +1368,15 @@
       %end;
     </ul>
   
-  %elseif;(evar.t = "Z")
-    %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>
-      %if;(evar.only = "on")
-        %apply;gen("v").
-      %else;
-        %apply;togen(nb_gen).
-      %end;
-    </p>
+  %elseif;(evar.t = "Z" and evar.only = "on")
+    <p>%apply;gen("v").</p>
     %reset_count;
     <table class="ascends_table">
       <tr class="ascends_table_header">%apply;table_header()</tr>
       %let;nb_col;%count;%in;
       %reset_count;
-      %foreach;ancestor_level(nb_gen)
-        %if;(evar.v != "" and level <= nb_gen and (evar.only != "on" or level = nb_gen))
+      %foreach;ancestor_level2;
+        %if;(evar.v != "" and level = evar.v)
           %if;(evar.gen = "on")
             <tr>
               <th align="left" colspan="%nb_col;">[*generation/generations]0 %level;</th>
@@ -1396,6 +1389,32 @@
             %if;(ancestor.nb_families > 1)
               %apply;table_family()
             %end;
+          %end;
+        %end;
+      %end;
+    </table>
+    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+
+  %elseif;(evar.t = "Z")
+    %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
+    <p>%apply;togen(nb_gen).</p>
+    %reset_count;
+    <table class="ascends_table">
+      <tr class="ascends_table_header">%apply;table_header()</tr>
+      %let;nb_col;%count;%in;
+      %reset_count;
+      %foreach;ancestor_level(nb_gen)
+        %if;(evar.gen = "on")
+          <tr>
+            <th align="left" colspan="%nb_col;">[*generation/generations]0 %level;</th>
+          </tr>
+        %end;
+        %foreach;ancestor;
+          <tr>
+            %apply;table_row()
+          </tr>
+          %if;(ancestor.nb_families > 1)
+            %apply;table_family()
           %end;
         %end;
       %end;
