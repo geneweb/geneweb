@@ -1209,7 +1209,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     (fun fname -> 
       add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
     lexicon_list.val;
-  (* COMMENTAIRE FLH *)
+  (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
+  (* Il sera mis à jour par effet de bord dans request.ml       *)
   let default_sosa_ref = (Adef.iper_of_int (-1), None) in
   let ar =
     authorization cgi from_addr request base_env passwd access_type utm
