@@ -1541,7 +1541,10 @@ value image_request cgi script_name env =
       if Util.start_with s 0 "images/" then
         let i = String.length "images/" in
         let fname = String.sub s i (String.length s - i) in
-        let fname = Filename.basename fname in
+        (* Je ne sais pas pourquoi on fait un basename, mais ça empeche *)
+        (* empeche d'avoir des images qui se trouvent dans le dossier   *)
+        (* image. Si on ne fait pas de basename, alors ça marche.       *)
+        (* let fname = Filename.basename fname in *)
         let fname = Util.image_file_name fname in
         let _ = Image.print_image_file cgi fname in
         True
