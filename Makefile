@@ -42,6 +42,8 @@ install:
 	mkdir -p $(LANGDIR)/lang
 	cp hd/lang/*.txt $(LANGDIR)/lang/.
 	mkdir -p $(LANGDIR)/images
+	mkdir -p $(LANGDIR)/images/flags
+	cp hd/images/flags/*.jpg hd/images/flags/*.png $(LANGDIR)/images/flags/.
 	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(LANGDIR)/images/.
 	mkdir -p $(LANGDIR)/etc
 	cp -R hd/etc/* $(LANGDIR)/etc/.
@@ -131,6 +133,8 @@ classical_distrib:
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
 	mkdir $(DESTDIR)/images
+	mkdir $(DESTDIR)/images/flags
+	cp hd/images/flags/*.jpg hd/images/flags/*.png $(DESTDIR)/images/flags/.
 	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc
 	cp -R hd/etc/* $(DESTDIR)/etc/.
