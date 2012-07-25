@@ -11,26 +11,27 @@
 %include.css;
 %base_header;
 </head>
-<body%body_prop;>
+<body %body_prop;>
+
 %message_to_wizard;
 
 %define;search_form(xxx)
   %if;(wizard or friend)
     <form method="get" action="%action;">
       <p>
-      %hidden;
-      <input type="hidden" name="m" value="HIST_SEARCH"%/>
-      <input type="hidden" name="k" value="%evar.k;"%/>
-      %if;(evar.m = "HIST_SEARCH" and found)
-        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;"%/>
-      %end;
-      <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
-      <label>
-      <input type="checkbox" name="c" value="on"%nn;
-       %if;("main" != "true" and evar.c = "on") checked="checked"%end;
-       %/>[search/case sensitive]1
-      </label>
-      <input type="submit" value="[*search/case sensitive]0"%/>
+        %hidden;
+        <input type="hidden" name="m" value="HIST_SEARCH"%/>
+        <input type="hidden" name="k" value="%evar.k;"%/>
+        %if;(evar.m = "HIST_SEARCH" and found)
+          <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;"%/>
+        %end;
+        <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
+        <label>
+        <input type="checkbox" name="c" value="on"%nn;
+         %if;("main" != "true" and evar.c = "on") checked="checked"%end;
+         %/>[search/case sensitive]1
+        </label>
+        <input type="submit" value="[*search/case sensitive]0"%/>
       </p>
     </form>
   %end;
@@ -39,13 +40,13 @@
 %if;not cancel_links;
   <table style="float:%right;"><tr><td align="%right;">
     %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      <a href="%referer;">
+        <img src="%image_prefix;/left.png"%wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
+      </a>
     %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
-    alt="^^" title="^^"%/></a>
+    <a href="%prefix;">
+      <img src="%image_prefix;/up.png"%wid_hei;up.png; alt="^^" title="^^"%/>
+    </a>
   </td></tr></table>
 %end;
 
@@ -77,57 +78,68 @@
 %end;
 
 <table border="%border;" style="white-space:nowrap">
-%let;kk;%if;(evar.k = "")3%else;%evar.k%end;%in;
-%let;wiz;%if;(evar.wiz != "" and evar.n = "")%evar.wiz;%end;%in;
-%foreach;history_line(kk, evar.pos, wiz)
   <tr>
-    <td>
-      <tt><b>*</b> %time;</tt>
-      (%apply;update_text(update.var)
-      %if;(user != "")
-        %sp;<i>-%sp;
-        %if;(wiz = "")<a href="%prefix;m=HIST;k=%kk;
-             ;wiz=%user.v;">%user;</a>%nn;
-        %else;%user;%end;
-        </i>%nn;
-      %end;) ...
-      %if;(first_name != "")
-        <!--%first_name;/%occ;/%surname;-->
-        <a href="%prefix;%person.access;">%person;</a>%person.title;
-        %person.dates;
-        %if;(bvar.show_invisible = "on" and wizard and person.is_invisible)
-          <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)"%/>%nn;
-        %end;
-      %elseif;is_note;
-        - <a href="%prefix;m=NOTES%if;(note.page != "");f=%note.page.v;%end;
-        %if;(note.part != "");v=%note.part;%end;">
-        <i>%if;(note.page = "")[note/notes]1%else;%[%note.page;%]%end;
-        </i></a>
-        %if;(note.part != "")- <span style="font-size:50%%">#%note.part;
-          </span>%nn;
-        %end;
-      %else;
-        %key;
-      %end;
-    </td>
+    <th>[*date]</th>
+    <th>[*wizard/wizards/friend/friends/exterior]0</th>
+    <th>[*update]</th>
+    <th>[*person/persons]0</th>
   </tr>
-%end;
+  %let;kk;%if;(evar.k = "")3%else;%evar.k%end;%in;
+  %let;wiz;%if;(evar.wiz != "" and evar.n = "")%evar.wiz;%end;%in;
+  %foreach;history_line(kk, evar.pos, wiz)
+    <tr>
+      <td>%time;</td>
+      <td>
+        %if;(user != "")
+          <i>
+            %if;(wiz = "")
+              <a href="%prefix;m=HIST;k=%kk;;wiz=%user.v;">%user;</a>%nn;
+            %else;
+              %user;
+            %end;
+          </i>
+        %end;
+      </td>
+      <td>%apply;update_text(update.var)</td>
+      <td>
+        %if;(first_name != "")
+          <!--%first_name;/%occ;/%surname;-->
+          <a href="%prefix;%person.access;">%person;</a>%person.title;
+          %person.dates;
+          %if;(bvar.show_invisible = "on" and wizard and person.is_invisible)
+            <img src="%image_prefix;/restricted.png"%wid_hei;restricted.png; alt=" (x)"%/>%nn;
+          %end;
+        %elseif;is_note;
+          - <a href="%prefix;m=NOTES%if;(note.page != "");f=%note.page.v;%end;
+          %if;(note.part != "");v=%note.part;%end;">
+          <i>%if;(note.page = "")[note/notes]1%else;%[%note.page;%]%end;
+          </i></a>
+          %if;(note.part != "")- <span style="font-size:50%%">#%note.part;
+            </span>%nn;
+          %end;
+        %else;
+          %key;
+        %end;
+      </td>
+    </tr>
+  %end;
 </table>
+
 %if;(pos != "")
   <form method="get" action="%action;">
-  <p>
-  %hidden;
-  <input type="hidden" name="m" value="HIST"%/>
-  <input name="k" size="3" value="%kk;"%/>
-  <input type="hidden" name="pos" value="%pos;"%/>
-  %if;(wiz != "")
-    <input type="hidden" name="wiz" value="%wiz;"%/>(%wiz;)
-  %end;
-  <input type="submit" value="&gt;&gt;"%/>
-  %if;(wiz != "")
-    <input type="submit" name="n" value="&gt;&gt;"%/>
-  %end;
-  </p>
+    <p>
+      %hidden;
+      <input type="hidden" name="m" value="HIST"%/>
+      <input name="k" size="3" value="%kk;"%/>
+      <input type="hidden" name="pos" value="%pos;"%/>
+      %if;(wiz != "")
+        <input type="hidden" name="wiz" value="%wiz;"%/>(%wiz;)
+      %end;
+      <input type="submit" value="&gt;&gt;"%/>
+      %if;(wiz != "")
+        <input type="submit" name="n" value="&gt;&gt;"%/>
+      %end;
+    </p>
   </form>
 %end;
 
