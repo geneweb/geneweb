@@ -73,8 +73,8 @@ sv: Genealogi
   <a class="item" title="%apply;language_name(zz)"
    href="%prefix_base;lang=%zz;"
    onmouseover="if (WorkOnBrowser())%sp;%sq;
-   i%tt;.src='%image_prefix;/t-xx.png'"
-   onmouseout="i%tt;.src='%image_prefix;/l-%zz;.jpg'"><img
+   i%tt;.src='%image_prefix;/flags/t-xx.png'"
+   onmouseout="i%tt;.src='%image_prefix;/flags/l-%zz;.jpg'"><img
    src="%image_prefix;/l-%zz;.jpg" width="36" height="22" alt=""
    id="i%tt;" style="border: 0"%/>%sq;
   <span>%apply;language_name(zz)</span></a>
