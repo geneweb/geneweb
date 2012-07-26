@@ -356,6 +356,19 @@ li.desc
 }
 
 
+/* ---------------------- Historique des mises à jour --------------------- */
+
+.updhist_table
+{
+  white-space: nowrap;
+}
+
+.updhist_table_header
+{
+  background-color: #6F8301;
+  color: white;
+}
+
 /* --------------------------- Pyramide des âges -------------------------- */
 
 .pyramid_year

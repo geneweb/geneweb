@@ -77,8 +77,8 @@
   %end;
 %end;
 
-<table border="%border;" style="white-space:nowrap">
-  <tr>
+<table cellpadding="4px;" class="updhist_table">
+  <tr class="updhist_table_header">
     <th>[*date]</th>
     <th>[*wizard/wizards/friend/friends/exterior]0</th>
     <th>[*update]</th>
