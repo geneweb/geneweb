@@ -107,7 +107,7 @@
   %end;
 %end;
 
-%if;(evar.v <= 1)
+%if;(evar.v = "" or evar.v <= 1)
   [*specify::generation/generations]0.
 %else;
   %if;(evar.t = "L")
@@ -135,21 +135,28 @@
       "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
     </td></tr></table>
   
-  %elseif;(evar.t = "E" and evar.sort = "on")
-    %( list eclair sorted by date begin %)
+  %elseif;(evar.t = "E" and evar.sort != "")
+    %( list eclair sorted by date begin or number of individuals or number of events %)
     %empty_sorted_list;
     %foreach;ancestor_surname(evar.v)
-      %apply;add_in_sorted_list(
-        ancestor.date_begin.year,
-        ancestor.surname_end,
-        ancestor.surname_begin,
-        ancestor.place,
-        ancestor.date_begin.prec,
-        ancestor.date_begin.year,
-        ancestor.date_end.prec,
-        ancestor.date_end.year,
-        ancestor.nb_ind,
-        ancestor.nb_events)
+      %apply;add_in_sorted_list%with;
+        %if;(evar.sort = "ind")
+          %ancestor.nb_ind;
+        %elseif;(evar.sort = "evt")
+          %ancestor.nb_events;
+        %else;
+          %ancestor.date_begin.year;
+        %end;
+        %and;%ancestor.surname_end;
+        %and;%ancestor.surname_begin;
+        %and;%ancestor.place;
+        %and;%ancestor.date_begin.prec;
+        %and;%ancestor.date_begin.year;
+        %and;%ancestor.date_end.prec;
+        %and;%ancestor.date_end.year;
+        %and;%ancestor.nb_ind;
+        %and;%ancestor.nb_events;
+      %end;
     %end;    
 
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
@@ -158,13 +165,39 @@
       <table class="display_search">
         <tr>
           <td><b>[*sort by/date begin/alphabetic order]0</b></td>
-          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
-          <td>[sort by/date begin/alphabetic order]1</td>
+          <td><img src="%image_prefix;/picto_calendar.png"%/></td>
+          <td>
+            %if;(evar.sort = "date")
+              [sort by/date begin/alphabetic order]1
+            %else;
+              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
+                [sort by/date begin/alphabetic order]1
+              </a>
+            %end;
+          </td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
           <td>
             <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;">
               [sort by/date begin/alphabetic order]2
             </a>
+          </td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
+          <td>
+            %if;(evar.sort = "ind")
+              [number of individuals]
+            %else;
+              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
+                [number of individuals]%nn;
+              </a>
+            %end;
+            [or]
+            %if;(evar.sort = "evt")
+              [number of events]
+            %else;
+              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
+                [number of events]
+              </a>
+            %end;
           </td>
         </tr>
       </table>
@@ -183,7 +216,7 @@
         <tr>
           <td>%item.2;%item.3</td>
           <td>%item.4;</td>
-          <td>
+          <td align="center">
             %if;(item.5 = "&lt;")
               /%item.6;
             %elseif(item.5 = "&gt;")
@@ -194,7 +227,7 @@
               %item.5;%item.6;
             %end;
           </td>
-          <td>
+          <td align="center">
             %if;(item.7 = "&lt;")
               /%item.7;
             %elseif(item.7 = "&gt;")
@@ -212,21 +245,31 @@
     </table>
 
   %elseif;(evar.t = "E")
-    %( list eclair %)
+    %( list eclair by alphabetic order %)
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togen(nb_gen).</p>
     <div class="not_printable" style="margin-bottom:15px;">
       <table class="display_search">
         <tr>
           <td><b>[*sort by/date begin/alphabetic order]0</b></td>
-          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
+          <td><img src="%image_prefix;/picto_calendar.png"%/></td>
           <td>
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=on">
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
               [sort by/date begin/alphabetic order]1
             <a>
           </td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
           <td>[sort by/date begin/alphabetic order]2</td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
+          <td>
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
+              [number of individuals]%nn;
+            </a>
+            [or]
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
+              [number of events]
+            </a>
+          </td>
         </tr>
       </table>
     </div>
@@ -248,7 +291,7 @@
           <td>
             %ancestor.place;
           </td>
-          <td>
+          <td align="center">
             %if;(ancestor.date_begin.prec = "&lt;")
               /%ancestor.date_begin.year;%nn;
             %elseif;(ancestor.date_begin.prec = "&gt;")
@@ -259,7 +302,7 @@
               %ancestor.date_begin.prec;%ancestor.date_begin.year;%nn;
             %end;
           </td>
-          <td>
+          <td align="center">
             %if;(ancestor.date_end.prec = "&lt;")
               /%ancestor.date_end.year;%nn;
             %elseif;(ancestor.date_end.prec = "&gt;")
