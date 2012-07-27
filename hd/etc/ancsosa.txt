@@ -120,49 +120,49 @@
   %end;
 %end;
 
-%define;ancestor_missing_birth()
-  %if;(ancestor.has_birth_date or ancestor.has_birth_place)
-    %if;ancestor.has_birth_date; %ancestor.slash_birth_date;%end;
-    %if;ancestor.has_birth_place; - %ancestor.birth_place;%end;
-  %elseif;(ancestor.has_baptism_date or ancestor.has_baptism_place)
-    %if;ancestor.has_baptism_date; %ancestor.slash_baptism_date;%end;
-    %if;ancestor.has_baptism_place; - %ancestor.baptism_place;%end;
+%define;ancestor_missing_birth(xx)
+  %if;(xx.has_birth_date or xx.has_birth_place)
+    %if;xx.has_birth_date; %xx.slash_birth_date;%end;
+    %if;xx.has_birth_place; - %xx.birth_place;%end;
+  %elseif;(xx.has_baptism_date or xx.has_baptism_place)
+    %if;xx.has_baptism_date; %xx.slash_baptism_date;%end;
+    %if;xx.has_baptism_place; - %xx.baptism_place;%end;
   %else;
     &nbsp;
   %end;
 %end;
 
-%define;ancestor_missing_death()
-  %if;ancestor.is_dead;
-    %if;ancestor.has_death_date; %ancestor.slash_death_date;%end;
-    %if;ancestor.has_death_place; - %ancestor.death_place;%end;
-  %elseif;ancestor.is_buried;
-    %if;ancestor.has_burial_date; %ancestor.slash_burial_date;%end;
-    %if;ancestor.has_burial_place; - %ancestor.burial_place;%end;
-  %elseif;ancestor.is_cremated;
-    %if;ancestor.has_cremation_date; %ancestor.slash_cremation_date;%end;
-    %if;ancestor.has_cremation_place; - %ancestor.cremation_place;%end;
+%define;ancestor_missing_death(xx)
+  %if;xx.is_dead;
+    %if;xx.has_death_date; %xx.slash_death_date;%end;
+    %if;xx.has_death_place; - %xx.death_place;%end;
+  %elseif;xx.is_buried;
+    %if;xx.has_burial_date; %xx.slash_burial_date;%end;
+    %if;xx.has_burial_place; - %xx.burial_place;%end;
+  %elseif;xx.is_cremated;
+    %if;xx.has_cremation_date; %xx.slash_cremation_date;%end;
+    %if;xx.has_cremation_place; - %xx.cremation_place;%end;
   %else;
     &nbsp;
   %end;
 %end;
 
-%define;display_missing_ancestor_info()
+%define;display_missing_ancestor_info(xx)
   %if;(evar.birth = "on")
-    <td>%apply;ancestor_missing_birth()</td>
+    <td>%apply;ancestor_missing_birth("xx")</td>
   %end;
   %if;(evar.death = "on")
-    <td>%apply;ancestor_missing_death()</td>
+    <td>%apply;ancestor_missing_death("xx")</td>
   %end;
   %if;(evar.spouse = "on")
     <td>
-      %if;ancestor.has_families;
+      %if;xx.has_families;
         %if;(not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?")
-          %foreach;ancestor.family;
-            %if;(ancestor.spouse.first_name != "?" and ancestor.spouse.surname != "?")
+          %foreach;xx.family;
+            %if;(spouse.first_name != "?" and spouse.surname != "?")
               %if;(family_cnt > 1),%sp;%end;
-              %apply;image_MF("ancestor.spouse", "11")
-              %apply;link(ancestor.spouse.access, ancestor.spouse)
+              %apply;image_MF("spouse", "11")
+              %apply;link(spouse.access, spouse)
             %end;
           %end;
         %end;
@@ -927,7 +927,7 @@
    Main
 %)
 
-%if;(evar.v <= 1)
+%if;(evar.v = "" or evar.v <= 1)
   [*specify::generation/generations]0.
 %else;
   %if;(evar.t = "N" and evar.only = "on")
@@ -1028,11 +1028,7 @@
     %foreach;ancestor_level(nb_gen)
       %foreach;ancestor;
         %if;(ancestor.same = "")
-          %if;(((not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?") or 
-               ((ancestor.has_parents) and 
-                ((ancestor.father.first_name = "?" and ancestor.father.surname = "?") or 
-                 (ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")))) or
-               (ancestor.has_families and ancestor.spouse.first_name = "?" and ancestor.spouse.surname = "?"))
+          %if;(ancestor.first_name != "?" and ancestor.surname != "?" and ((not ancestor.has_parents and level < nb_gen) or (ancestor.has_families and (ancestor.spouse.first_name = "?" and ancestor.spouse.surname = "?"))))
             %if;(dates_in_interval(ancestor.var) = "true")
               %incr_count;
               %apply;add_in_sorted_list%with
@@ -1042,25 +1038,17 @@
                 %and;%ancestor.access;
                 %and;%apply;image_MF("ancestor", "11")
                 %and;%ancestor.nobility_title;
-                %and;%apply;ancestor_missing_birth()
-                %and;%apply;ancestor_missing_death()
+                %and;%apply;ancestor_missing_birth("ancestor")
+                %and;%apply;ancestor_missing_death("ancestor")
                 %and;
-                  %if;(not ancestor.has_parents)
-                    x
-                  %elseif;(ancestor.has_parents and
-                           ((ancestor.father.first_name = "?" and ancestor.father.surname = "?") or
-                           (ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")))
+                  %if;(not ancestor.has_parents and level < nb_gen)
                     x
                   %else;
                     &nbsp;
                   %end;
                 %and;
-                  %if;ancestor.has_families;
-                    %if;(ancestor.spouse.first_name = "?" and ancestor.spouse.surname = "?")
-                      x
-                    %else;
-                      &nbsp;
-                    %end;
+                  %if;(ancestor.has_families and (ancestor.spouse.first_name = "?" and ancestor.spouse.surname = "?"))
+                    x
                   %else;
                     &nbsp;
                   %end;
@@ -1071,7 +1059,9 @@
       %end;
     %end;
   
-    %if;(count > 100)
+    %let;nb_ind;%count;%in;
+    %reset_count;
+    %if;(nb_ind > 100)
       <p>
         %foreach;sorted_list_item;
           %if;(initial(prev_item.1) != initial(item.1))
@@ -1082,7 +1072,7 @@
     %end;
   
     <ul class="missing_ancestors_sort">
-      %if;(count <= 100)
+      %if;(nb_ind <= 100)
         <li>%nn;
         <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
         <table class="missing_ancestors_table">
@@ -1099,7 +1089,7 @@
           </tr>
       %end;
       %foreach;sorted_list_item;
-        %if;(initial(prev_item.1) != initial(item.1) and count > 100)
+        %if;(initial(prev_item.1) != initial(item.1) and nb_ind > 100)
           <li>%nn;
           <a name="a_%apply;hexa(initial(item.1))">%apply;initial(item.1)</a>
           <table class="missing_ancestors_table">
@@ -1130,15 +1120,21 @@
           %if;(evar.death = "on")
             <td>%item.8;</td>
           %end;
-          <td align="center">%item.9;</td>
-          <td align="center">%item.10;</td>
+          <td align="center">
+            %item.9;
+            %if;(initial(item.9) = "x")%incr_count;%incr_count;%end;
+          </td>
+          <td align="center">
+            %item.10;
+            %if;(initial(item.10) = "x")%incr_count;%end;
+          </td>
         </tr>
-        %if;(initial(item.1) != initial(next_item.1) and count > 100)
+        %if;(initial(item.1) != initial(next_item.1) and nb_ind > 100)
           </table>
           </li>
         %end;
       %end;
-      %if;(count <= 100)
+      %if;(nb_ind <= 100)
         </table>
         </li>
       %end;
@@ -1167,6 +1163,7 @@
         </tr>
       </table>
     </div>
+
     %reset_count;
     <table class="missing_ancestors_table">
       <tr class="missing_ancestors_table_header">
@@ -1180,17 +1177,17 @@
       </tr>
       %let;nb_col;%expr(count + 4)%in;
       %reset_count;
-      %foreach;ancestor_level(nb_gen)
+      %foreach;ancestor_level(nb_gen-1)
         %apply;lazy_print%with;
           <tr>
-            <th align="left" colspan="%nb_col;">[*generation/generations]0 %level;</th>
+            <th align="left" colspan="%nb_col;">[*generation/generations]0 %expr(level+1)</th>
           </tr>
         %end;
         %foreach;ancestor;
           %if;(ancestor.same = "")
             %if;(not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?")
               %if;(dates_in_interval(ancestor.var) = "true")
-                %incr_count;
+                %incr_count;%incr_count;
                 %lazy_force;
                 <tr>
                   <td>
@@ -1203,11 +1200,11 @@
                     %apply;link(ancestor.access, ancestor)
                     %ancestor.title;
                   </td>
-                  %apply;display_missing_ancestor_info()
+                  %apply;display_missing_ancestor_info("ancestor")
                 </tr>
               %end;
             %elseif;(ancestor.has_parents)
-              %if;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
+              %if;(ancestor.mother.same = "" and ancestor.mother.first_name = "?" and ancestor.father.surname = "?")
                 %if;(dates_in_interval(ancestor.mother.var) = "true")
                   %incr_count;
                   %lazy_force;
@@ -1222,11 +1219,11 @@
                       %apply;link(ancestor.mother.access, ancestor.mother)
                       %ancestor.mother.title;
                     </td>
-                    %apply;display_missing_ancestor_info()
+                    %apply;display_missing_ancestor_info("ancestor.mother")
                   </tr>
                 %end;
               %end;
-              %if;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
+              %if;(ancestor.father.same = "" and ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
                 %if;(dates_in_interval(ancestor.father.var) = "true")
                   %incr_count;
                   %lazy_force;
@@ -1241,7 +1238,7 @@
                       %apply;link(ancestor.father.access, ancestor.father)
                       %ancestor.father.title;
                     </td>
-                    %apply;display_missing_ancestor_info()
+                    %apply;display_missing_ancestor_info("ancestor.father")
                   </tr>
                 %end;
               %end;
