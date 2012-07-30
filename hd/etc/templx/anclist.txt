@@ -1,18 +1,29 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anclist.txt, Template x v 6.05d 2012/06/02 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anclist.txt, Template x v 6.06a 2012/07/30 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
-    %if;(evar.t = "F")- [*surnames list] -%nn;
-    %else
-      %apply;a_of_b%with;
-        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
-      %and;
+    %if;(evar.t = "E")
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+      %if;(alias != "") (%alias;)%end;
+      - [*list eclair] -
+    %elseif;(evar.t = "F")
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+      %if;(alias != "") (%alias;)%end;
+      - [*surnames branch] -
+    %else;
+      %apply;a_of_b%with;[*ancestors]%and;
         %if;(public_name != "")%public_name;%else;%first_name;%end;
         %if;(qualifier != "") %qualifier;%end;
         %sp;%surname;
+        %if;(alias != "") (%alias;)%end;
       %end;
+      %if;(evar.t = "D") [up to] %pvar.1;%end;
     %end;
   </title>
   <meta name="robots" content="none"%/>
@@ -58,6 +69,7 @@
   %sp;
 %end;
 
+
 %define;display_2arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
@@ -94,17 +106,336 @@
   %end;
 %end;
 
-%define;ancestors_by_list(xx, nnn)
-  %if;(xx.has_parents and nnn > 1)
-    <ul>
-    <li style="list-style-type:square">%apply;image_MF("xx.father","13")
-      %apply;short_display_person("xx.father")%nl;
-      %apply;ancestors_by_list("xx.father", nnn - 1)</li>
-    <li style="list-style-type:circle">%apply;image_MF("xx.mother","13")
-      %apply;short_display_person("xx.mother")%nl;
-      %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
-    </ul>
+%define;list_eclair_by_date_or_events()
+  %( list eclair sorted by date begin or number of individuals or number of events %)
+  %empty_sorted_list;
+  %foreach;ancestor_surname(nb_gena)
+    %apply;add_in_sorted_list%with;
+      %if;(evar.sort = "ind")
+        %ancestor.nb_ind;
+      %elseif;(evar.sort = "evt")
+        %ancestor.nb_events;
+      %else;
+        %ancestor.date_begin.year;
+      %end;
+      %and;%ancestor.surname_end;
+      %and;%ancestor.surname_begin;
+      %and;%ancestor.place;
+      %and;%ancestor.date_begin.prec;
+      %and;%ancestor.date_begin.year;
+      %and;%ancestor.date_end.prec;
+      %and;%ancestor.date_end.year;
+      %and;%ancestor.nb_ind;
+      %and;%ancestor.nb_events;
+    %end;
   %end;
+
+  %if;not cancel_links;
+    <div class="not_printable" style="margin-bottom:15px;">
+      <table class="display_search">
+        <tr>
+          <td><b>[*sort by/date begin/alphabetic order]0</b></td>
+          <td><img src="%image_prefix;/picto_calendar.png"%/></td>
+          <td>
+            %if;(evar.sort = "date")
+              [sort by/date begin/alphabetic order]1
+            %else;
+              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
+                [sort by/date begin/alphabetic order]1
+              </a>
+            %end;
+          </td>
+          <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+          <td>
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;">
+              [sort by/date begin/alphabetic order]2
+            </a>
+          </td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
+          <td>
+            %if;(evar.sort = "ind")
+              [number of individuals]
+            %else;
+              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
+                [number of individuals]%nn;
+              </a>
+            %end;
+            [or]
+            %if;(evar.sort = "evt")
+              [number of events]
+            %else;
+              <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
+                [number of events]
+              </a>
+            %end;
+          </td>
+        </tr>
+      </table>
+    </div>
+  %end;
+
+  <table class="list_eclair_table">
+    <tr class="list_eclair_table_header">
+      <th>[*surname/surnames]0</th>
+      <th>[*place]</th>
+      <th>[*date begin]</th>
+      <th>[*date end]</th>
+      <th>[*nb individuals]</th>
+      <th>[*nb events]</th>
+    </tr>
+    %foreach;sorted_list_item;
+      %nl;
+      <tr>
+        <td>%item.2;%item.3</td>
+        <td>%item.4;</td>
+        <td>%nn;
+          %if;(item.5 = "&lt;")
+            /%item.6;
+          %elseif(item.5 = "&gt;")
+            %item.6;/%nn;
+          %elseif;(item.5 = "|" or item.5 = "..")
+            %item.6;
+          %else;
+            %item.5;%item.6;
+          %end;
+        </td>
+        <td>%nn;
+          %if;(item.7 = "&lt;")
+            /%item.8;
+          %elseif(item.7 = "&gt;")
+            %item.8;/%nn;
+          %elseif;(item.7 = "|" or item.7 = "..")
+            %item.8;
+          %else;
+            %item.7;%item.8;
+          %end;
+        </td>
+        <td align="center">%item.9;</td>
+        <td align="center">%item.10;</td>
+      </tr>
+    %end;
+  </table>
+  %empty_sorted_list;
+%end;
+
+%define;list_eclair()
+  %( list eclair by alphabetic order %)
+  %if;not cancel_links;
+    <div class="not_printable" style="margin-bottom:15px;">
+      <table class="display_search">
+        <tr>
+          <td><b>[*sort by/date begin/alphabetic order]0</b></td>
+          <td><img src="%image_prefix;/picto_calendar.png"%/></td>
+          <td>
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
+              [sort by/date begin/alphabetic order]1
+            <a>
+          </td>
+          <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+          <td>[sort by/date begin/alphabetic order]2</td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
+          <td>
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
+              [number of individuals]%nn;
+            </a>
+            [or]
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
+              [number of events]
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  %end;
+
+  <table class="list_eclair_table">
+    <tr class="list_eclair_table_header">
+      <th>[*surname/surnames]0</th>
+      <th>[*place]</th>
+      <th>[*date begin]</th>
+      <th>[*date end]</th>
+      <th>[*nb individuals]</th>
+      <th>[*nb events]</th>
+    </tr>
+    %foreach;ancestor_surname(nb_gena)
+      %nl;
+      <tr>
+        <td>%ancestor.surname_end;%ancestor.surname_begin;</td>
+        <td>%ancestor.place;</td>
+        <td>%nn;
+          %if;(ancestor.date_begin.prec = "&lt;")
+            /%ancestor.date_begin.year;
+          %elseif;(ancestor.date_begin.prec = "&gt;")
+            %ancestor.date_begin.year;/%nn;
+          %elseif;(ancestor.date_begin.prec = "|" or ancestor.date_begin.prec = "..")
+            %ancestor.date_begin.year;
+          %else;
+            %ancestor.date_begin.prec;%ancestor.date_begin.year;%nn;
+          %end;
+        </td>
+        <td>%nn;
+          %if;(ancestor.date_end.prec = "&lt;")
+            /%ancestor.date_end.year;
+          %elseif;(ancestor.date_end.prec = "&gt;")
+            %ancestor.date_end.year;/%nn;
+          %elseif;(ancestor.date_end.prec = "|" or ancestor.date_end.prec = "..")
+            %ancestor.date_end.year;
+          %else;
+            %ancestor.date_end.prec;%ancestor.date_end.year;%nn;
+          %end;
+        </td>
+        <td align="center">%ancestor.nb_ind;</td>
+        <td align="center">%ancestor.nb_events;</td>
+      </tr>
+    %end;
+  </table>
+%end;
+
+%define;surname_branch_by_number_of_branches()
+  %( surnames branch sorted in descending order of number of branches %)
+  %empty_sorted_list;
+  %reset_count;
+  %foreach;ancestor_surname(nb_gena)
+    %incr_count;
+    %apply;add_in_sorted_list%with
+      %expr(9999 - ancestor.nb_times)
+      %and;%ancestor.surname_end;
+      %and;%ancestor.surname_begin;
+      %and;%ancestor.sosa_access;
+      %and;%ancestor.place;
+      %and;%ancestor.date_begin.prec;
+      %and;%ancestor.date_begin.year;
+      %and;%ancestor.date_end.prec;
+      %and;%ancestor.date_end.year;
+      %and;%ancestor.nb_times;
+    %end;
+  %end;
+
+  %if;not cancel_links;
+    %if;(count > 100)
+      <p>
+        <span>[*number of branches] : </span>
+        %foreach;sorted_list_item;
+          %if;(prev_item.1 != item.1)
+            <a href="#a_%apply;hexa(item.10)">%item.10</a>
+          %end;
+        %end;
+      </p>
+    %end;
+  %end;
+
+  %if;not cancel_links;
+    <div class="not_printable" style="margin-bottom:25px;">
+      <table class="display_search">
+        <tr>
+          <td><b>[*sort by/branch/alphabetic order]0</b></td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
+          <td>[sort by/branch/alphabetic order]1</td>
+          <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+          <td>
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;sosab=%evar.sosab;&amp;t=%evar.t;&amp;v=%evar.v;">
+              [sort by/branch/alphabetic order]2
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  %end;
+
+  <ul class="missing_ancestors_ul_alpha">
+    %foreach;sorted_list_item;
+      %if;(prev_item.1 != item.1)
+        %nl;
+        <li id="a_%apply;hexa(item.10)"><b>[*number of branches] : %item.10;</b><br%/><br%/>
+        <table class="surname_branch_table">
+          %nl;
+          <tr class="surname_branch_table_header">
+            <th>[*surname/surnames]0</th>
+            <th>[*place]</th>
+            <th>[*date]</th>
+          </tr>
+      %end;
+      %nl;
+      <tr>
+        <td>%nn;
+          %if;not cancel_links;<a href="%prefix;m=DAG;%item.4;">%end;
+          %item.2;%item.3;
+          %if;not cancel_links;</a>%end;
+        </td>
+        <td>%item.5;</td>
+        <td>
+          %if;(item.6 = "&lt;")/%item.7;%elseif(item.6 = "&gt;")%item.7;/%else;%item.6;%item.7;%end;%nn;
+          -%nn;
+          %if;(item.8 = "&lt;")/%item.9;%elseif(item.8 = "&gt;")%item.9;/%else;%item.8;%item.9;%end;
+        </td>
+      </tr>
+      %if;(item.1 != next_item.1)
+        </table>
+        </li>
+        <br%/>
+      %end;
+    %end;
+  </ul>
+  %empty_sorted_list;
+%end;
+
+%define;surname_branch_alphabetically()
+  %( surnames branch alphabetically %)
+  %if;not cancel_links;
+    <div class="not_printable" style="margin-bottom:25px;">
+      <table class="display_search">
+        <tr>
+          <td><b>[*sort by/branch/alphabetic order]0</b></td>
+          <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
+          <td>
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;sosab=%evar.sosab;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=on">
+              [sort by/branch/alphabetic order]1
+            </a>
+          </td>
+          <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
+          <td>[sort by/branch/alphabetic order]2</td>
+        </tr>
+      </table>
+    </div>
+  %end;
+  <table class="surname_branch_table">
+    %nl;
+    <tr class="surname_branch_table_header">
+      <th>[*surname/surnames]0</th>
+      <th>[*number of branches]</th>
+      <th>[*place]</th>
+      <th>[*date]</th>
+    </tr>
+    %foreach;ancestor_surname(nb_gena)
+      %nl;
+      <tr>
+        <td>%nn;
+          %if;not cancel_links;<a href="%prefix;m=DAG;%ancestor.sosa_access;">%end;
+          %ancestor.surname_end;%ancestor.surname_begin;
+          %if;not cancel_links;</a>%end;
+        </td>
+        <td align="center">%ancestor.nb_times;</td>
+        <td>%ancestor.place;</td>
+        <td>
+          %if;(ancestor.date_begin.prec = "&lt;")
+            /%ancestor.date_begin.year;%nn;
+          %elseif;(ancestor.date_begin.prec = "&gt;")
+            %ancestor.date_begin.year;/%nn;
+          %else;
+            %ancestor.date_begin.prec;%ancestor.date_begin.year;%nn;
+          %end;
+          -%nn;
+          %if;(ancestor.date_end.prec = "&lt;")
+            /%ancestor.date_end.year;%nn;
+          %elseif;(ancestor.date_end.prec = "&gt;")
+            %ancestor.date_end.year;/%nn;
+          %else;
+            %ancestor.date_end.prec;%ancestor.date_end.year;%nn;
+          %end;
+        </td>
+      </tr>
+    %end;
+  </table>
 %end;
 
 %define;ancestors_horizontally(xx, nnn, ss1, ss2, ss3)
@@ -124,18 +455,41 @@
   %end;
 %end;
 
+%define;ancestors_by_list(xx, nnn)
+  %if;(xx.has_parents and nnn > 1)
+    <ul>
+    <li style="list-style-type:square">%apply;image_MF("xx.father","13")
+      %apply;short_display_person("xx.father")%nl;
+      %apply;ancestors_by_list("xx.father", nnn - 1)</li>
+    <li style="list-style-type:circle">%apply;image_MF("xx.mother","13")
+      %apply;short_display_person("xx.mother")%nl;
+      %apply;ancestors_by_list("xx.mother", nnn - 1)</li>
+    </ul>
+  %end;
+%end;
+
 <body%body_prop;>
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
+%let;nb_gena;
+  %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+%in;
 %message_to_wizard;
 
 <h1>%nn;
-  %if;(evar.t = "F")
+  %if;(evar.t = "E")
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
     %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
-    - [*surnames list] -
+    - [*list eclair] -
+  %elseif;(evar.t = "F")
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
+    - [*surnames branch] -
   %else;
     %apply;a_of_b%with;[*ancestors]%and;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -149,42 +503,26 @@
 
 %apply;display_2arrows()
 
-%if;(evar.t = "L")
-  %( by list %)
-  %let;xx;
-    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
-  %in;
-  <p>
-  %apply;togena(xx).
-  </p>
-  %apply;ancestors_by_list("self", xx)
-%elseif;(evar.t = "H")
-  %( horizontally %)
-  %let;xx;
-    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
-  %in;
-  <p>
-  %apply;togena(xx).
-  </p>
-  <table><tr><td style="white-space:nowrap">
-    %apply;ancestors_horizontally(
-    "self", xx, "&nbsp;&nbsp;&nbsp;&nbsp;", "====", "&nbsp;&nbsp;&nbsp;&nbsp;")
-  </td></tr></table>
-%elseif;(evar.t = "F")
-  %( surnames list %)
-  <ul>
-  %foreach;ancestor_surname(evar.v)
-    <li>%nn;
-    %if;cancel_links;%ancestor.surname_end;%ancestor.surname_begin;%nn;
-    %else;<a href="%prefix;m=DAG;%ancestor.sosa_access;">%nn;
-    %ancestor.surname_end;%ancestor.surname_begin;</a>%end;
-    %if;(ancestor.nb_times > 1) (%ancestor.nb_times;)%end;
-    ; %ancestor.place;
-    ; %ancestor.date_begin.year;-%ancestor.date_end.year;</li>
+%if;(evar.v <= 1)
+  [*specify::generation/generations]0.
+%else;
+  <p>%apply;togena(nb_gena).</p>
+  %if;(evar.t = "E" and evar.sort != "")
+    %apply;list_eclair_by_date_or_events()
+  %elseif;(evar.t = "E")
+    %apply;list_eclair()
+  %elseif;(evar.t = "F" and evar.sort = "on")
+    %apply;surname_branch_by_number_of_branches()
+  %elseif;(evar.t = "F")
+    %apply;surname_branch_alphabetically()
+  %elseif;(evar.t = "H")
+    <table><tr><td style="white-space:nowrap">
+      %apply;ancestors_horizontally(
+      "self", nb_gena, "&nbsp;&nbsp;&nbsp;&nbsp;", "====", "&nbsp;&nbsp;&nbsp;&nbsp;")
+    </td></tr></table>
+  %elseif;(evar.t = "L")
+    %apply;ancestors_by_list("self", nb_gena)
   %end;
-  </ul>
 %end;
 
 %base_trailer;

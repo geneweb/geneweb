@@ -1,4 +1,4 @@
-﻿%( Template relations v 6.05d 2012/06/02 12:00:00 ddr/dd %)
+﻿%( Template relations v 6.06a 2012/07/30 12:00:00 ddr/dd  %)
 %if;has_relations;
   <h3 id="relations" class="highlight">[*relation/relations]1</h3>
   <ul>
@@ -37,11 +37,13 @@
     %foreach;witness_relation;
       <li style="list-style-type:disc">%nn;
         %if;(witness_relation.marriage_date.year>0)
-          <em> %witness_relation.marriage_date.year;</em> :
+          <em> %witness_relation.marriage_date.year;</em> :%sp;
         %end;
         %apply;witness_relation%with;
-          %apply;very_short_display_person("witness_relation.father")%and;
-          %apply;very_short_display_person("witness_relation.mother")
+          %apply;image_MF("witness_relation.father","13")%sp;
+          %apply;short_display_person("witness_relation.father")%and;
+          %apply;image_MF("witness_relation.mother","13")%sp;
+          %apply;short_display_person("witness_relation.mother")
         %end;
       </li>%nl;
     %end;
