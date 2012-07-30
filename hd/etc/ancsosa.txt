@@ -1204,7 +1204,7 @@
                 </tr>
               %end;
             %elseif;(ancestor.has_parents)
-              %if;(ancestor.mother.same = "" and ancestor.mother.first_name = "?" and ancestor.father.surname = "?")
+              %if;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
                 %if;(dates_in_interval(ancestor.mother.var) = "true")
                   %incr_count;
                   %lazy_force;
@@ -1223,7 +1223,7 @@
                   </tr>
                 %end;
               %end;
-              %if;(ancestor.father.same = "" and ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
+              %if;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
                 %if;(dates_in_interval(ancestor.father.var) = "true")
                   %incr_count;
                   %lazy_force;
