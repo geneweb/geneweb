@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template h v 6.05d 2012/06/02 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: perso.txt, Template h v 6.06a 2012/07/30 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -127,14 +127,6 @@
     %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
   %end;%sp;
   %xx.title;%xx.dates;
-%end;
-
-%define;very_short_display_person(xx)
-  %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
-  %end;%sp;
-  %xx.title;%xx.dates;%nn;
 %end;
 
 %define;display_vertical(xx)
