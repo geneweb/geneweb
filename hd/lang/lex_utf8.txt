@@ -2568,7 +2568,11 @@ sv: födelsedagar
 zh:  出生于今日的记录
 
     birth date and birth place
+de: Datum und Ort der Geburt
+en: Date & Place of birth
+es: Fecha y lugar de nacimiento
 fr: date et lieu de naissance
+it: Data e luogo di nascita
 
     book of places
 de: ortsverzeichnis
@@ -3559,7 +3563,11 @@ sl: smrti
 sv: död
 
     death date and death place
+de: Datum und Ort des Todes
+en: Date & Place of death
+es: Fecha y lugar de fallecimiento
 fr: date et lieu de décès
+it: Data e luogo di morte
 
     delete
 af: verwyder
@@ -3619,7 +3627,11 @@ sv: ättlingar
 zh:  后代
 
     descendants at the generation
+de: Nachkommen bis zu Generation...
+en: List by name
+es: Descendientes hasta la generación...
 fr: descendants à la génération...
+it: Discendenti fino alla generazione...
 
     died
 af: oorlede
@@ -3743,7 +3755,11 @@ sl: prekinjeno
 sv: logga ut
 
     display Aboville number
+de: Zeigen der Aboville-Nummerierung
+en: Display Sosa number
+es: Editar la numeración de Aboville
 fr: afficher la numérotation d’Aboville
+it: Visualizzare la numerazione d’Aboville
 
     display by/branch/alphabetic order
 de: anzuzeigen/nach Zweigen/alphabetisch geordnet
@@ -3809,8 +3825,15 @@ nl: nummer van de generatie tonen
 no: vis generasjonsnummer
 sv: visa generations nummer
 
+    display marriage date
+fr: afficher la date de mariage
+
     display notes/sources inline
+de: fügen Sie Noten/Quellenangaben zum Inhalt hinzu
+en: display in individual data
+es: incluir las notas/fuentes al contenido
 fr: inclure les notes/sources au contenu
+it: includere le note/fonti al contenuto
 
     display picture
 de: porträt zeigen
@@ -4887,10 +4910,10 @@ sl: srečen rojstni dan!
 sv: gratulerar på födelsedagen!
 
     having as children
-af: met as kinders:-
-bg: деца:
+af: met as kinders
+bg: деца
 br: anezho ez eo bet ganet bugale
-ca: fills:
+ca: fills
 cs: měli spolu děti
 da: børn
 de: ihre Kinder
@@ -4904,14 +4927,14 @@ he:    עם ילדים
 is: börn
 it: da cui
 lv: bērni:
-nl: en hun kinderen:
+nl: en hun kinderen
 no: barn
-pl: dzieci:
+pl: dzieci
 pt: tiveram
 ro: cu copii
 ru: имели детей
 sk: mali spolu deti
-sl: otroci:
+sl: otroci
 sv: barn
 zh:  生有子女
 
@@ -4922,7 +4945,11 @@ es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que c
 fr: Cliquez sur « Modifier » pour corriger un lieu : l’ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
 
     help surname branch
-fr: cliquez sur le nombre de branches pour afficher l'arbre des patronymes
+de: Um den Baum mit den Zweigen der Familiennamen zu erhalten, klicken Sie auf die Zahl der Zweige
+en: click the number of lines in the table below to view the family tree
+es: Para obtener el árbol de las ramas patronímicas, pulse en el número de rama
+fr: pour obtenir l'arbre des branches patronymiques, cliquez sur le nombre de branche
+it: Per ottenere l’albero dei rami del cognome, clicca sul numero del ramo
 
     here
 af: hier
@@ -5925,7 +5952,7 @@ sl: seznam
 sv: lista/trädlista
 
     list eclair
-fr: liste éclair
+fr: liste-éclair
 
     living after %s
 fr: vivant après %s
@@ -6600,13 +6627,25 @@ sl: manjkajoči predniki
 sv: anor som saknas
 
     missing parents
+de: Fehlende Eltern
+en: Unknown parents
+es: Padres que faltan
 fr: parents manquants
+it: Genitori mancanti
 
     missing sosa
+de: Fehlende Sosa
+en: Unknown Sosa number
+es: Sosa que faltan
 fr: sosa manquants
+it: Sosa mancanti
 
     missing spouse
+de: Fehlende Partner
+en: Unknown spouse
+es: Cónyuges que faltan
 fr: conjoint manquant
+it: Coniugi mancanti
 
     missing sources
 de: fehlende Quellenangaben
@@ -7478,10 +7517,18 @@ sl: številka
 sv: nummer
 
     nb branches
+de: nb. Zweige
+en: Lines
+es: Nº ramas
 fr: nb. branches
+it: N° rami
 
     nb children
+de: nb. Kinder
+en: Children
+es: Nº hijos
 fr: nb. enfants
+it: N° figli
 
     nb events
 fr: nb. évènements
@@ -7518,7 +7565,17 @@ sl: število vej
 sv: antal grenar
 
     number of children
+de: anzahl der Kinder
+en: number of children
+es: número de hijos
 fr: nombre d’enfants
+it: numero di figli
+
+    number of individuals
+fr: nombre d'individus
+
+    number of events
+fr: nombre d'évènements
 
     number of living persons:
 bg: брой на живите лица:
@@ -9154,13 +9211,21 @@ sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
     sort by/branch/alphabetic order
+de: Sortieren nach:/Zweigen/Alphabetisch
+en: sort by:/Line/Alphabetical order
+es: Organizar por:/Ramas/Orden alfabético
 fr: trier par:/branches/ordre alphabétique
+it: Smistare per :/Rami/Ordine alfabetico
 
     sort by/date begin/alphabetic order
 fr: trier par:/date de début/ordre alphabétique
 
     sort by/generation/alphabetic order
+de: Sortieren nach:/Generationen/Alphabetisch
+en: sort by:/Generation/Alphabetical order
+es: Organizar por :/Generaciones/Orden alfabético
 fr: trier par:/génération/ordre alphabétique
+it: Smistare per :/Generazioni/Ordine alfabetico
 
     Sosa
 af: Sosa
