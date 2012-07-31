@@ -821,6 +821,40 @@ value simple conf =
   else print_file conf "bso.htm"
 ;
 
+value simple2 conf =
+  let ged =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  let ged =
+    if Filename.check_suffix (String.lowercase ged) ".ged" then ged
+    else ""
+  in
+  let out_file =
+    match p_getenv conf.env "o" with
+    [ Some f -> strip_spaces f
+    | _ -> "" ]
+  in
+  let out_file =
+    if ged = "" then out_file
+    else if out_file = "" then out_name_of_ged ged
+    else out_file
+  in
+  let env = [("f", "on") :: conf.env] in
+  let env = list_replace "anon" ged env in
+  let conf =
+    {comm = if ged = "" then "gwc2" else "ged2gwb2";
+     env = list_replace "o" out_file env; lang = conf.lang;
+     request = conf.request; lexicon = conf.lexicon}
+  in
+  if ged <> "" && not (Sys.file_exists ged) then
+    print_file conf "err_unkn.htm"
+  else if out_file = "" then print_file conf "err_miss.htm"
+  else if not (good_name out_file) then print_file conf "err_name.htm"
+  else print_file conf "bso.htm"
+;
+
 value gwc_or_ged2gwb out_name_of_in_name conf =
   let in_file =
     match p_getenv conf.env "anon" with
@@ -1678,6 +1712,7 @@ value setup_comm_ok conf =
   fun
   [ "gwsetup" -> setup_gen conf
   | "simple" -> simple conf
+  | "simple2" -> simple2 conf
   | "recover" -> recover conf
   | "recover_1" -> recover_1 conf
   | "recover_2" -> recover_2 conf
