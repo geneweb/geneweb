@@ -150,6 +150,7 @@ display by slices/slice width/overlap/total width
 display border tree
 display empty picture
 display generation
+display marriage date
 display notes/sources inline
 display picture
 display smallest sosa number relative to ancestor
@@ -308,8 +309,11 @@ number
 nb branches
 nb children
 nb individuals
+nb events
 number of branches
 number of children
+number of individuals
+number of events
 number of living persons:
 occupation/occupations
 of course dead
