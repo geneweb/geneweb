@@ -261,6 +261,7 @@ value clean_database conf bname = do {
   let rc = Sys.command c in
   if rc > 1 then error_popup c
   else ();
+  (* consang + update_nldb *)
 };
 
 value update_nldb conf bname = 
