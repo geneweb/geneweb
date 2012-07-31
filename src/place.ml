@@ -822,7 +822,9 @@ value print_mod conf base =
   let list = List.map (fun (istr, s, k) -> (sou base istr, s, k)) list in
   (* On tri la liste avant de la combiner *)
   (* sinon on n'élimine pas les doublons. *)
-  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
+  let list = 
+    List.sort (fun (s1, _, _) (s2, _, _) -> Gutil.alphabetic_order s1 s2) list
+  in
   (* On combine la liste parce qu'en gwc2, les *)
   (* lieux ont tous des adresses différentes.  *)
   let list = combine list in
