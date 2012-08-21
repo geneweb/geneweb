@@ -202,9 +202,9 @@ value print_elem conf base is_surname (p, xl) =
          else Wserver.wprint "%s" p;
          Wserver.wprint "</a>";
          Wserver.wprint "%s" (Date.short_dates_text conf base x);
-         Wserver.wprint " <em>";
-         specify_homonymous conf base x;
-         Wserver.wprint "</em>\n";
+         stag "em" begin
+           specify_homonymous conf base x True;
+         end;
        })
     xl
 ;

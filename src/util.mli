@@ -127,7 +127,7 @@ value get_particle : base -> string -> string;
 value old_surname_begin : string -> string;
 value old_surname_end : string -> string;
 
-value specify_homonymous : config -> base -> person -> unit;
+value specify_homonymous : config -> base -> person -> bool -> unit;
 
 type format2 'a 'b = format4 'a unit string 'b;
 
