@@ -275,6 +275,9 @@ value print_result conf base max_answers (list, len) =
              Perso.print_sosa conf base p True;
              Wserver.wprint "\n%s" (referenced_person_text conf base p);
              Wserver.wprint "%s" (Date.short_dates_text conf base p);
+             stag "em" begin
+               specify_homonymous conf base p False;
+             end;
            })
         list;
       if len > max_answers then do { html_li conf; Wserver.wprint "...\n"; }

@@ -525,9 +525,9 @@ value print_elem conf base paths precision (n, pll) =
                             (p_first_name base p);
                         end;
                         if several && precision then do {
-                          Wserver.wprint " <em>";
-                          specify_homonymous conf base p;
-                          Wserver.wprint "</em>"
+                          stag "em" begin
+                            specify_homonymous conf base p True;
+                          end;
                         }
                         else ();
                         Wserver.wprint "%s"

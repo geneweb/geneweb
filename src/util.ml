@@ -708,7 +708,7 @@ value acces_n conf base n x =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] acces_n : config -> base -> person -> string                   *)
+(*  [Fonc] acces : config -> base -> person -> string                     *)
 (** [Description] : Renvoie les paramètres URL pour l'accès à la personne.
     [Args] :
       - conf : configuration de la base
@@ -767,7 +767,8 @@ value gen_person_text (p_first_name, p_surname) conf base p =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
+(*  [Fonc] gen_person_text_no_html : 
+             fun -> fun -> config -> base -> person -> string                 *)
 (** [Description] : Renvoie le prénom et nom d'un individu en fonction 
                     de son nom public et sobriquet (sans balise html <em>).
     [Args] :
@@ -795,7 +796,8 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
+(*  [Fonc] gen_person_text_without_surname : 
+             fun -> fun -> config -> base -> person -> string                 *)
 (** [Description] : Renvoie le prénom d'un individu en fonction de son 
                     nom public et sobriquet.
     [Args] :
@@ -870,6 +872,9 @@ value main_title conf base p =
                     fonction de son titre.
     [Args] :
       - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+      - t    : gen_title
     [Retour] : string
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
@@ -2025,99 +2030,178 @@ value print_alphab_list conf crit print_elem liste = do {
   end;
 };
 
-value parent conf base p a =
-  match get_public_name a with
-  [ n when sou base n <> "" -> sou base n ^ person_title conf base a
-  | _ ->
-      if (is_hide_names conf a) && not (fast_auth_age conf a) then "x x"
-      else
-        p_first_name base a ^
-          (if not (eq_istr (get_surname p) (get_surname a)) then
-             " " ^ p_surname base a
-           else "") ]
-;
 
-value print_parent conf base p fath moth =
-  let s =
-    match (fath, moth) with
-    [ (Some fath, None) -> parent conf base p fath
-    | (None, Some moth) -> parent conf base p moth
-    | (Some fath, Some moth) ->
-        parent conf base p fath ^ " " ^ transl_nth conf "and" 0 ^ " " ^
-          parent conf base p moth
-    | _ -> "" ]
+(* ************************************************************************** *)
+(*  [Fonc] child_of_parent : config -> base -> person -> unit                 *)
+(** [Description] : Traduction selon l'existence des parents :
+                      * fils/fille de Jean (et) Jeanne
+    [Args] :
+      - conf : configuration
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value child_of_parent conf base p =
+  (* Si le père a un nom de famille différent de la personne *)
+  (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
+  let print_father fath =
+    if not (eq_istr (get_surname p) (get_surname fath)) then
+      person_text conf base fath
+    else
+      gen_person_text (p_first_name, (fun _ _ -> "")) conf base fath
   in
-  let is = index_of_sex (get_sex p) in
-  Wserver.wprint "%s"
-    (translate_eval
-      (transl_a_of_gr_eq_gen_lev conf
-         (transl_nth conf "son/daughter/child" is) s))
+  let a = pget conf base (get_key_index p) in
+  let ifam =
+    match get_parents a with
+    [ Some ifam ->
+        let cpl = foi base ifam in
+        let fath =
+          let fath = pget conf base (get_father cpl) in
+          if p_first_name base fath = "?" then None else Some fath
+        in
+        let moth =
+          let moth = pget conf base (get_mother cpl) in
+          if p_first_name base moth = "?" then None else Some moth
+        in
+        Some (fath, moth)
+    | None -> None ]
+  in
+  match ifam with
+  [ Some (None, None) | None -> ""
+  | Some (fath, moth) -> 
+      let s =
+        match (fath, moth) with
+        [ (Some fath, None) -> print_father fath
+        | (None, Some moth) -> person_text conf base moth
+        | (Some fath, Some moth) ->
+            print_father fath ^ " " ^ transl_nth conf "and" 0 ^ " " ^
+              person_text conf base moth
+        | _ -> "" ]
+      in
+      let is = index_of_sex (get_sex p) in
+      translate_eval
+        (transl_a_of_gr_eq_gen_lev conf
+           (transl_nth conf "son/daughter/child" is) s) ]
 ;
 
-value specify_homonymous conf base p =
+
+(* ************************************************************************** *)
+(*  [Fonc] husband_wife : config -> base -> person -> unit                    *)
+(** [Description] : Traduction selon l'existence du premier conjoint 
+                    différent de ?? :
+                      * époux/épouse de Jean/Jeanne
+    [Args] :
+      - conf : configuration
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value husband_wife conf base p =
   let is = index_of_sex (get_sex p) in
+  let rec loop i =
+    if i < Array.length (get_family p) then
+      let fam = foi base (get_family p).(i) in
+      let conjoint = spouse (get_key_index p) fam in
+      let conjoint = pget conf base conjoint in
+      if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?" 
+      then
+        translate_eval
+          (transl_a_of_b conf
+             (transl_nth conf "husband/wife" is)
+             (person_text conf base conjoint))
+      else loop (i + 1)
+    else ""
+  in
+  loop 0
+;
+
+
+(* ************************************************************************** *)
+(*  [Fonc] first_child : config -> base -> person -> unit                     *)
+(** [Description] : Traduction selon l'existence du premier enfants :
+                      * père/mère de Jean
+    [Args] :
+      - conf : configuration
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value first_child conf base p =
+  let is = index_of_sex (get_sex p) in
+  let rec loop i =
+    if i < Array.length (get_family p) then
+      let fam = foi base (get_family p).(i) in
+      let ct = get_children fam in
+      if Array.length ct > 0 then
+        let enfant = pget conf base ct.(0) in
+        let child =
+          if (is_hide_names conf enfant) && not (fast_auth_age conf enfant) then
+            "xx"
+          else
+            if not (eq_istr (get_surname p) (get_surname enfant)) then
+              person_text conf base enfant
+            else
+              gen_person_text (p_first_name, (fun _ _ -> "")) conf base enfant
+        in
+        translate_eval
+          (transl_a_of_b conf
+             (transl_nth conf "father/mother" is)
+             child)
+      else loop (i + 1)
+    else ""
+  in
+  loop 0
+;
+
+
+(* ************************************************************************** *)
+(*  [Fonc] specify_homonymous : config -> base -> person -> bool -> string    *)
+(** [Description] : Permet d'afficher des informations supplémentaires sur la
+      personne en cas d'homonymes (par exemple sur la recherche par ordre 
+      alphabétique). 
+      L'affichage se fait de façon similaire à gen_person_text, i.e. en 
+      fonction du nom publique et sobriquet si on valorise le paramètre 
+      specify_public_name à True :
+        * Louis VI le gros (nom publique sobriquet)
+        * Louis le gros    (prénom sobriquet)
+        * Louis VI         (nom publique)
+        * Louis Capétiens, fils de Philippe et Berthe, marié avec Adèlaïde, 
+            père de Philippe
+    [Args] :
+      - conf : configuration
+      - base : base de donnée
+      - p    : person
+      - specify_public_name : en fonction des affichages, on peut déjà avoir
+          affiché le nom public de la personne, et dans ce cas, on ne veut pas
+          l'afficher de nouveau.
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
+value specify_homonymous conf base p specify_public_name =
   match (get_public_name p, get_qualifiers p) with
-  [ (n, [nn :: _]) when sou base n <> "" ->
-      Wserver.wprint "%s <em>%s</em>" (sou base n) (sou base nn)
-  | (_, [nn :: _]) ->
-      Wserver.wprint "%s <em>%s</em>" (p_first_name base p) (sou base nn)
-  | (n, []) when sou base n <> "" -> Wserver.wprint "%s" (sou base n)
-  | (_, []) ->
-      let a = pget conf base (get_key_index p) in
-      let ifam =
-        match get_parents a with
-        [ Some ifam ->
-            let cpl = foi base ifam in
-            let fath =
-              let fath = pget conf base (get_father cpl) in
-              if p_first_name base fath = "?" then None else Some fath
-            in
-            let moth =
-              let moth = pget conf base (get_mother cpl) in
-              if p_first_name base moth = "?" then None else Some moth
-            in
-            Some (fath, moth)
-        | None -> None ]
+  [ (n, [nn :: _]) when sou base n <> "" && specify_public_name ->
+      Wserver.wprint " %s <em>%s</em>" (sou base n) (sou base nn)
+  | (_, [nn :: _]) when specify_public_name ->
+      Wserver.wprint " %s <em>%s</em>" (p_first_name base p) (sou base nn)
+  | (n, []) when sou base n <> "" && specify_public_name -> 
+      Wserver.wprint " %s" (sou base n)
+  | (_, _) ->
+      (* Le nom public et le qualificatif ne permettent pas de distinguer *)
+      (* la personne, donc on affiche les informations sur les parents,   *)
+      (* le mariage et/ou le premier enfant.                              *)
+      let cop = child_of_parent conf base p in
+      let hw = husband_wife conf base p in
+      let fc = first_child conf base p in
+      let s = 
+        (if cop = "" then "" else ", " ^ cop) ^ 
+          (if hw = "" then 
+            if fc = "" then "" else ", " ^ fc
+           else ", " ^ hw)
       in
-      match ifam with
-      [ Some (None, None) | None ->
-          let rec loop i =
-            if i < Array.length (get_family p) then
-              let fam = foi base (get_family p).(i) in
-              let conjoint = spouse (get_key_index p) fam in
-              let ct = get_children fam in
-              if Array.length ct > 0 then
-                let enfant = pget conf base ct.(0) in
-                let (child_fn, child_sn) =
-                  if (is_hide_names conf enfant) && not (fast_auth_age conf enfant) then
-                    ("x", " x")
-                  else
-                    (p_first_name base enfant,
-                     if not (eq_istr (get_surname p) (get_surname enfant))
-                     then
-                       " " ^ p_surname base enfant
-                     else "")
-                in
-                Wserver.wprint "%s"
-                  (translate_eval
-                     (transl_a_of_b conf
-                        (transl_nth conf "father/mother" is)
-                        (child_fn ^ child_sn)))
-              else
-                let conjoint = pget conf base conjoint in
-                if p_first_name base conjoint <> "?" ||
-                   p_surname base conjoint <> "?" then
-                  Wserver.wprint "%s"
-                    (translate_eval
-                       (transl_a_of_b conf
-                          (transl_nth conf "husband/wife" is)
-                          (p_first_name base conjoint ^ " " ^
-                           p_surname base conjoint)))
-                else loop (i + 1)
-            else Wserver.wprint "..."
-          in
-          loop 0
-      | Some (fath, moth) -> print_parent conf base p fath moth ] ]
+      Wserver.wprint "%s" s ]
 ;
 
 (* fix system bug: string_of_float 17.97 = "17.969999999999" *)
