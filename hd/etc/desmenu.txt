@@ -107,11 +107,11 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="notes" value="on"%/>
+            <input type="checkbox" name="notes" value="on" checked="checked"%/>
             [*note/notes]1
           </label>
           <label>
-            <input type="checkbox" name="src" value="on"%/>
+            <input type="checkbox" name="src" value="on" checked="checked"%/>
             [*source/sources]1
           </label>
           <label>
@@ -149,7 +149,7 @@
       <div class="descends_menu_option_div">
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="birth" value="on"%/>
+            <input type="checkbox" name="birth" value="on" checked="checked"%/>
             [*date of birth]
           </label>
           <label>
@@ -159,11 +159,11 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="marr" value="on"%/>
+            <input type="checkbox" name="marr" value="on" checked="checked"%/>
             [*spouse/spouses]1
           </label>
           <label>
-            <input type="checkbox" name="marr_date" value="on"%/>
+            <input type="checkbox" name="marr_date" value="on" checked="checked"%/>
             [*date of marriage]
           </label>
           <label>
@@ -177,7 +177,7 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="death" value="on"%/>
+            <input type="checkbox" name="death" value="on" checked="checked"%/>
             [*date of death]
           </label>
           <label>
@@ -197,7 +197,7 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="gen" value="on"%/>
+            <input type="checkbox" name="gen" value="on" checked="checked"%/>
             [*display generation]
           </label>
         </p>
