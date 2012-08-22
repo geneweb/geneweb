@@ -204,15 +204,15 @@ sl: %1 od :g:%2
 sv: %1 till %2
 
     %d places starting with %s
-de: %d orts beginnend mit %s
-en: %d places starting with %s
-es: %d lugares comenzando con %s
-fi: %d paikoista ensimmäisenä %s
-fr: %d lieux commençant par %s
-it: %d luoghi partendo da %s
-nl: %d plaatsen beginnend met %s
-no: %d steder som starter med %s
-sv: %d orternas som börjar med %s
+de: %d orts beginnend mit "%s"
+en: %d places starting with "%s"
+es: %d lugares comenzando con "%s"
+fi: %d paikoista ensimmäisenä "%s"
+fr: %d lieux commençant par "%s"
+it: %d luoghi partendo da "%s"
+nl: %d plaatsen beginnend met "%s"
+no: %d steder som starter med "%s"
+sv: %d orternas som börjar med "%s"
 
     %d years ago
 af: %d jaar gelede
