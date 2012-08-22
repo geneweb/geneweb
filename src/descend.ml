@@ -759,6 +759,7 @@ value print_desc_table_header conf base = do {
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 value print_person_table conf base p lab = do {
+  let p_auth = Util.authorized_age conf base p in
   let nb_families = Array.length (get_family p) in
   (* On calcul le nombre de rowspan pour avoir un affichage joli. *)
   let rowspan = 
@@ -784,14 +785,14 @@ value print_person_table conf base p lab = do {
         if get_birth p <> Adef.codate_None then
           let d =
             match Adef.od_of_codate (get_birth p) with
-            [ Some d -> Date.string_slash_of_date conf d
+            [ Some d when p_auth -> Date.string_slash_of_date conf d
             | _ -> "&nbsp;" ]
           in
           Wserver.wprint "%s" d
         else
           let d =
             match Adef.od_of_codate (get_baptism p) with
-            [ Some d -> Date.string_slash_of_date conf d
+            [ Some d when p_auth -> Date.string_slash_of_date conf d
             | _ -> "&nbsp;" ]
           in
           Wserver.wprint "%s" d;
@@ -800,11 +801,15 @@ value print_person_table conf base p lab = do {
     if p_getenv conf.env "birth_place" = Some "on" then
       tag "td" "%s" rowspan begin
         if get_birth p <> Adef.codate_None then
-          Wserver.wprint "%s &nbsp;" 
-            (Util.string_of_place conf (sou base (get_birth_place p)))
+          Wserver.wprint "%s &nbsp;"
+            (if p_auth then 
+              Util.string_of_place conf (sou base (get_birth_place p))
+             else "")
         else
           Wserver.wprint "%s &nbsp;" 
-            (Util.string_of_place conf (sou base (get_baptism_place p)));
+            (if p_auth then 
+              Util.string_of_place conf (sou base (get_baptism_place p))
+             else "");
       end
     else ();
     (* On affiche que la première famille (get_family u).(0). *)
@@ -815,16 +820,16 @@ value print_person_table conf base p lab = do {
         (if nb_families > 1 then "style=\"border-bottom:none\"" else "") 
         begin
         let u = p in
-        if nb_families > 0 then
-          let cpl = foi base (get_family u).(0) in
-          let spouse =
-            pget conf base (Gutil.spouse (get_key_index p) cpl)
-          in
-          if Util.authorized_age conf base spouse then do {
+        if nb_families > 0 then 
+          do {
+            let cpl = foi base (get_family u).(0) in
+            let spouse =
+              pget conf base (Gutil.spouse (get_key_index p) cpl)
+            in
             Util.print_image_sex conf spouse 11;
-            Wserver.wprint " %s &nbsp;" (referenced_person_text conf base spouse);
+            Wserver.wprint 
+              " %s &nbsp;" (referenced_person_text conf base spouse);
           }
-          else Wserver.wprint "&nbsp;"
         else Wserver.wprint "&nbsp;";
       end
     else ();
@@ -863,9 +868,17 @@ value print_person_table conf base p lab = do {
         begin
         let u = p in
         if nb_families > 0 then
-          let fam = foi base (get_family u).(0) in
-          Wserver.wprint "%s &nbsp;" 
-            (Util.string_of_place conf (sou base (get_marriage_place fam)))
+          let cpl = foi base (get_family u).(0) in
+          let spouse =
+            pget conf base (Gutil.spouse (get_key_index p) cpl)
+          in
+          let mplace = 
+            if authorized_age conf base p && authorized_age conf base spouse 
+            then
+              Util.string_of_place conf (sou base (get_marriage_place cpl))
+            else ""
+          in
+          Wserver.wprint "%s &nbsp;" mplace
         else Wserver.wprint "&nbsp;";
       end
     else ();
@@ -899,18 +912,19 @@ value print_person_table conf base p lab = do {
     if p_getenv conf.env "death" = Some "on" then
       tag "td" "%s" rowspan begin
         let d =
-        match get_death p with
-        [ Death _ d -> 
-            let d = Adef.date_of_cdate d in
-            Date.string_slash_of_date conf d
-        | _ -> 
-            match get_burial p with
-            [ Cremated cod | Buried cod -> 
-                match Adef.od_of_codate cod with
-                [ Some d ->
-                    Date.string_slash_of_date conf d
-                | _ -> "&nbsp;" ]
-            | _ -> "&nbsp;" ] ]
+          if not p_auth then "&nbsp;"
+          else
+            match get_death p with
+            [ Death _ d -> 
+                let d = Adef.date_of_cdate d in
+                Date.string_slash_of_date conf d
+            | _ -> 
+                match get_burial p with
+                [ Cremated cod | Buried cod -> 
+                    match Adef.od_of_codate cod with
+                    [ Some d -> Date.string_slash_of_date conf d
+                    | _ -> "&nbsp;" ]
+                | _ -> "&nbsp;" ] ]
         in
         Wserver.wprint "%s" d;
       end
@@ -918,17 +932,19 @@ value print_person_table conf base p lab = do {
     if p_getenv conf.env "death_place" = Some "on" then
       tag "td" "%s" rowspan begin
         let d =
-          match get_death p with
-          [ Death _ d -> 
-              Util.string_of_place conf (sou base (get_death_place p))
-          | _ -> 
-              match get_burial p with
-              [ Cremated cod | Buried cod -> 
-                  match Adef.od_of_codate cod with
-                  [ Some d ->
-                      Util.string_of_place conf (sou base (get_burial_place p))
-                  | _ -> "" ]
-              | _ -> "" ] ]
+          if not p_auth then ""
+          else
+            match get_death p with
+            [ Death _ d -> 
+                Util.string_of_place conf (sou base (get_death_place p))
+            | _ -> 
+                match get_burial p with
+                [ Cremated cod | Buried cod -> 
+                    match Adef.od_of_codate cod with
+                    [ Some d ->
+                        Util.string_of_place conf (sou base (get_burial_place p))
+                    | _ -> "" ]
+                | _ -> "" ] ]
         in
         Wserver.wprint "%s &nbsp;" d;
       end
@@ -936,24 +952,27 @@ value print_person_table conf base p lab = do {
     if p_getenv conf.env "death_age" = Some "on" then
       tag "td" "%s" rowspan begin
         let d = 
-          match Date.get_birth_death_date p with
-          [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
-             Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
-            when d1 <> d2 ->
-              let a = CheckItem.time_elapsed d1 d2 in
-              let s =
-                if not approx && d1.prec = Sure && d2.prec = Sure then ""
-                else transl_decline conf "possibly (date)" "" ^ " "
-              in
-              s ^ Date.string_of_age conf a
-          | _ -> "" ]
+          if not p_auth then ""
+          else
+            match Date.get_birth_death_date p with
+            [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
+               Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
+              when d1 <> d2 ->
+                let a = CheckItem.time_elapsed d1 d2 in
+                let s =
+                  if not approx && d1.prec = Sure && d2.prec = Sure then ""
+                  else transl_decline conf "possibly (date)" "" ^ " "
+                in
+                s ^ Date.string_of_age conf a
+            | _ -> "" ]
         in
         Wserver.wprint "%s &nbsp;" d;
       end
     else ();
     if p_getenv conf.env "occu" = Some "on" then
       tag "td" "%s" rowspan begin
-        Wserver.wprint "%s &nbsp;" (sou base (get_occupation p));
+        Wserver.wprint 
+          "%s &nbsp;" (if p_auth then sou base (get_occupation p) else "");
       end
     else ();
   end;
@@ -977,11 +996,9 @@ value print_person_table conf base p lab = do {
             tag "td" "style=\"border-top:none; %s\"" 
               (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
               begin
-                if Util.authorized_age conf base spouse then do {
-                  Util.print_image_sex conf spouse 11;
-                  Wserver.wprint " %s &nbsp;" (referenced_person_text conf base spouse);
-                }
-                else Wserver.wprint "&nbsp;";
+                Util.print_image_sex conf spouse 11;
+                Wserver.wprint 
+                  " %s &nbsp;" (referenced_person_text conf base spouse);
             end
           else ();
           if p_getenv conf.env "marr_date" = Some "on" then
@@ -1004,8 +1021,13 @@ value print_person_table conf base p lab = do {
             tag "td" "style=\"border-top:none; %s\"" 
               (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
               begin
-                Wserver.wprint "%s &nbsp;" 
-                  (Util.string_of_place conf (sou base (get_marriage_place fam)));
+                let mplace = 
+                  if authorized_age conf base p && 
+                     authorized_age conf base spouse then
+                    Util.string_of_place conf (sou base (get_marriage_place cpl))
+                  else ""
+                in
+                Wserver.wprint "%s &nbsp;" mplace;
             end
           else ();
           if p_getenv conf.env "child" = Some "on" then
@@ -1100,12 +1122,8 @@ value display_descendant_with_table conf base max_lev p =
               end;
             end
           else ();
-          if Util.authorized_age conf base p then 
-            do {
-              print_person_table conf base p lab;
-              incr nb_pers
-            }
-          else ();
+          print_person_table conf base p lab;
+          incr nb_pers;
           loop lev nb_col False refl q
         } ]
   in
