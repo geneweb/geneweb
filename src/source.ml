@@ -283,7 +283,7 @@ value combine_by_ini ini list =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] combine_by_ini : ('a * 'b * 'c) list -> ('a * ('b * 'c) list) list *)
+(*  [Fonc] combine : ('a * 'b * 'c) list -> ('a * ('b * 'c) list) list        *)
 (** [Description] : 
     [Args] :
       - list : la liste de triplets
@@ -332,7 +332,7 @@ value print_title conf base ini len = do {
   else do {
     Wserver.wprint " - ";
     Wserver.wprint 
-      (fcapitale (ftransl conf "%d sources starting with \"%s\"")) len ini }
+      (fcapitale (ftransl conf "%d sources starting with %s")) len ini }
 };
 
 

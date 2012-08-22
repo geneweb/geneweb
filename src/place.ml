@@ -606,7 +606,7 @@ value print_title conf base ini len = do {
   else do {
     Wserver.wprint " - ";
     Wserver.wprint 
-      (fcapitale (ftransl conf "%d places starting with \"%s\"")) len ini }
+      (fcapitale (ftransl conf "%d places starting with %s")) len ini }
 };
 
 
