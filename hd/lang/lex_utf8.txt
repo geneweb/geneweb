@@ -3468,9 +3468,13 @@ sl: datum
 sv: datum
 
     date begin
+en: from
+es: fecha de inicio
 fr: date de début
 
     date end
+en: to
+es: fecha final
 fr: date de fin
 
     date of birth
@@ -4948,7 +4952,7 @@ fr: Cliquez sur « Modifier » pour corriger un lieu : l’ensemble des fiche
 de: Um den Baum mit den Zweigen der Familiennamen zu erhalten, klicken Sie auf die Zahl der Zweige
 en: click the number of lines in the table below to view the family tree
 es: Para obtener el árbol de las ramas patronímicas, pulse en el número de rama
-fr: pour obtenir l'arbre des branches patronymiques, cliquez sur le nombre de branche
+fr: pour obtenir l'arbre des branches patronymiques, cliquez sur le nombre de branches
 it: Per ottenere l’albero dei rami del cognome, clicca sul numero del ramo
 
     here
@@ -5952,6 +5956,8 @@ sl: seznam
 sv: lista/trädlista
 
     list eclair
+en: list by name, place & date
+es: lista rápida
 fr: liste-éclair
 
     living after %s
@@ -7531,9 +7537,13 @@ fr: nb. enfants
 it: N° figli
 
     nb events
-fr: nb. évènements
+en: events
+es: Nº acontecimientos
+fr: nb. événements
 
     nb individuals
+en: individuals
+es: Nº individuos
 fr: nb. individus
 
     number of branches
@@ -7572,10 +7582,14 @@ fr: nombre d’enfants
 it: numero di figli
 
     number of individuals
+en: number of Individuals
+es: número de individuos
 fr: nombre d'individus
 
     number of events
-fr: nombre d'évènements
+en: number of Events
+es: número de acontecimientos
+fr: nombre d'événements
 
     number of living persons:
 bg: брой на живите лица:
@@ -9211,14 +9225,19 @@ sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
     sort by/branch/alphabetic order
-de: Sortieren nach:/Zweigen/Alphabetisch
+de: sortieren nach:/Zweigen/Alphabetisch
 en: sort by:/Line/Alphabetical order
-es: Organizar por:/Ramas/Orden alfabético
-fr: trier par:/branches/ordre alphabétique
-it: Smistare per :/Rami/Ordine alfabetico
+es: organizar por:/Ramas/Orden alfabético
+fr: trier par :/branches/ordre alphabétique
+it: smistare per :/Rami/Ordine alfabetico
+nl: tonen per:/tak/alfabetische volgorde
+no: vises etter:/grener/alfabetisk orden
+sv: visas efter:/grenar/alfabetisk ordning
 
-    sort by/date begin/alphabetic order
-fr: trier par:/date de début/ordre alphabétique
+    sort by/date begin/alphabetic order/nb individuals/nb events
+en: sort by:/Date/Alphabetical order/Number of Individuals/Number of Events
+es: organizar por:/Fecha de inicio/Orden alfabético/Número de individuos/Número de acontecimientos
+fr: trier par:/date de début/ordre alphabétique/nombre d'individus/nombre d'événements
 
     sort by/generation/alphabetic order
 de: Sortieren nach:/Generationen/Alphabetisch
@@ -9226,6 +9245,9 @@ en: sort by:/Generation/Alphabetical order
 es: Organizar por :/Generaciones/Orden alfabético
 fr: trier par:/génération/ordre alphabétique
 it: Smistare per :/Generazioni/Ordine alfabetico
+nl: tonen per:/tak/alfabetische volgorde
+no: vises etter:/grener/alfabetisk orden
+sv: visas efter:/grenar/alfabetisk ordning
 
     Sosa
 af: Sosa
@@ -11118,7 +11140,7 @@ es: lugar de defunción
 fi: kuolinpaikka
 fr: lieu de décès
 it: luogo della morte
-nl: datum overlijden
+nl: plaats overlijden
 no: dødssted
 sv: dödsort
 
