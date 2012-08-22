@@ -1266,7 +1266,7 @@
       <em>%apply;gen("v").</em>
       <a name="asc">&nbsp;</a>
     </h3>
-    %foreach;ancestor_level2;
+    %foreach;ancestor_level;
       %if;(evar.v != "" and level = evar.v)
         %foreach;ancestor;
           %if;(ancestor.same != "")
@@ -1372,7 +1372,7 @@
       <tr class="ascends_table_header">%apply;table_header()</tr>
       %let;nb_col;%count;%in;
       %reset_count;
-      %foreach;ancestor_level2;
+      %foreach;ancestor_level;
         %if;(evar.v != "" and level = evar.v)
           %if;(evar.gen = "on")
             <tr>
