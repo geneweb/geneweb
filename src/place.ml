@@ -374,7 +374,9 @@ value print_html_places_surnames conf base list =
         snl
     in
     let snl =
-      List.sort (fun (_, _, sn1) (_, _, sn2) -> compare sn1 sn2) snl
+      List.sort 
+        (fun (_, _, sn1) (_, _, sn2) -> Gutil.alphabetic_order sn1 sn2) 
+        snl
     in 
     let snl =
       List.fold_right
@@ -436,7 +438,9 @@ value print_all_places_surnames_short conf list =
          (s, len, ip) )
       list
   in
-  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
+  let list = 
+    List.sort (fun (s1, _, _) (s2, _, _) -> Gutil.alphabetic_order s1 s2) list
+  in
   let list =
     List.fold_left
       (fun list (p, len, ip) ->
@@ -491,7 +495,17 @@ value print_all_places_surnames_long conf base list =
          | _ -> [(pl, [(len, ip)]) :: list] ])
       [] list
   in
-  let list = List.sort (fun (pl1, _) (pl2, _) -> compare pl1 pl2) list in
+  let rec sort_place_utf8 pl1 pl2 =
+    match (pl1, pl2) with
+    [ (_, []) -> 1
+    | ([], _) -> -1
+    | ([s1 :: pl11], [s2 :: pl22]) -> 
+        if Gutil.alphabetic_order s1 s2 = 0 then sort_place_utf8 pl11 pl22
+        else Gutil.alphabetic_order s1 s2 ]
+  in
+  let list = 
+    List.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) list 
+  in
   let title _ =
     Wserver.wprint "%s / %s" (capitale (transl conf "place"))
       (capitale (transl_nth conf "surname/surnames" 0))
@@ -776,7 +790,7 @@ value print_short conf base list len =
   in
   (* Astuce pour gérer les espaces. *)
   let list = List.map (fun p -> Mutil.tr ' ' '_' p) list in
-  let list = remove_dup list in
+  let list = List.sort Gutil.alphabetic_order (remove_dup list) in
   do {
     let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;

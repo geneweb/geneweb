@@ -512,7 +512,7 @@ value print_short conf base list len =
     let ini_list = remove_dup ini_list in
     (* Si la liste des ini n'a qu'un élément, on calcul on 'rang' d'après *)
     if List.length ini_list = 1 then build_ini list (len + 1)
-    else ini_list
+    else List.sort Gutil.alphabetic_order ini_list
   in
   let ini_list = build_ini list (String.length ini) in
   do {
