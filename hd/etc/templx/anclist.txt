@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anclist.txt, Template x v 6.06a 2012/07/30 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anclist.txt, Template x v 6.06b 2012/08/23 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "E")
@@ -112,9 +112,9 @@
   %foreach;ancestor_surname(nb_gena)
     %apply;add_in_sorted_list%with;
       %if;(evar.sort = "ind")
-        %ancestor.nb_ind;
+        %expr(9999-ancestor.nb_ind)
       %elseif;(evar.sort = "evt")
-        %ancestor.nb_events;
+        %expr(9999-ancestor.nb_events)
       %else;
         %ancestor.date_begin.year;
       %end;
@@ -134,38 +134,38 @@
     <div class="not_printable" style="margin-bottom:15px;">
       <table class="display_search">
         <tr>
-          <td><b>[*sort by/date begin/alphabetic order]0</b></td>
+          <td><b>[*sort by/date begin/alphabetic order/nb individuals/nb events]0</b></td>
           <td><img src="%image_prefix;/picto_calendar.png"%/></td>
           <td>
             %if;(evar.sort = "date")
-              [sort by/date begin/alphabetic order]1
+              [sort by/date begin/alphabetic order/nb individuals/nb events]1
             %else;
               <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
-                [sort by/date begin/alphabetic order]1
+                [sort by/date begin/alphabetic order/nb individuals/nb events]1
               </a>
             %end;
           </td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
           <td>
             <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;">
-              [sort by/date begin/alphabetic order]2
+              [sort by/date begin/alphabetic order/nb individuals/nb events]2
             </a>
           </td>
           <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
           <td>
             %if;(evar.sort = "ind")
-              [number of individuals]
+              [sort by/date begin/alphabetic order/nb individuals/nb events]3
             %else;
               <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
-                [number of individuals]%nn;
+                [sort by/date begin/alphabetic order/nb individuals/nb events]3%nn;
               </a>
             %end;
             [or]
             %if;(evar.sort = "evt")
-              [number of events]
+              [sort by/date begin/alphabetic order/nb individuals/nb events]4
             %else;
               <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
-                [number of events]
+                [sort by/date begin/alphabetic order/nb individuals/nb events]4
               </a>
             %end;
           </td>
@@ -224,23 +224,23 @@
     <div class="not_printable" style="margin-bottom:15px;">
       <table class="display_search">
         <tr>
-          <td><b>[*sort by/date begin/alphabetic order]0</b></td>
+          <td><b>[*sort by/date begin/alphabetic order/nb individuals/nb events]0</b></td>
           <td><img src="%image_prefix;/picto_calendar.png"%/></td>
           <td>
             <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=date">
-              [sort by/date begin/alphabetic order]1
+              [sort by/date begin/alphabetic order/nb individuals/nb events]1
             <a>
           </td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
-          <td>[sort by/date begin/alphabetic order]2</td>
+          <td>[sort by/date begin/alphabetic order/nb individuals/nb events]2</td>
           <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
           <td>
             <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=ind">
-              [number of individuals]%nn;
+              [sort by/date begin/alphabetic order/nb individuals/nb events]3%nn;
             </a>
             [or]
             <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;sort=evt">
-              [number of events]
+              [sort by/date begin/alphabetic order/nb individuals/nb events]4
             </a>
           </td>
         </tr>
