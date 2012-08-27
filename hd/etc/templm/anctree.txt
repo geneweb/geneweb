@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/04/27 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120712 templ=templm -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -14,6 +14,7 @@
     %end;
   </title>
   <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>

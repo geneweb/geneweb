@@ -3,9 +3,10 @@
 <head>
   <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/06/12 geneweb-6.05 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120807 templ=templm -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
@@ -80,9 +81,13 @@
 %end;
 
 %define;calendar(ccc, nnn, vvv, lll, fun_yyy)
-  %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+  %if;([ !dates order]0 = "ddmmyyyy")
     %apply;fun_day("ccc", "nnn")
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_yyy("ccc", "nnn")
+  %elseif;([ !dates order]0 = "mmddyyyy")
+    %apply;fun_month("ccc", "nnn", "vvv", "lll")
+    %apply;fun_day("ccc", "nnn")
     %apply;fun_yyy("ccc", "nnn")
   %else;
     %apply;fun_yyy("ccc", "nnn")
@@ -103,9 +108,13 @@
     <table>
     <tr>
       <td>&nbsp;</td>
-      %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+      %if;([ !dates order] = "ddmmyyyy")
         <th colspan="3">[*year/month/day]2</th>
         <th colspan="3">[*year/month/day]1</th>
+        <th colspan="3">[*year/month/day]0</th>
+      %elseif;([ !dates order] = "mmddyyyy")
+        <th colspan="3">[*year/month/day]1</th>
+        <th colspan="3">[*year/month/day]2</th>
         <th colspan="3">[*year/month/day]0</th>
       %else;
         <th colspan="3">[*year/month/day]0</th>
@@ -184,9 +193,13 @@
         [death]
       </label>
       … ([before (date)]…
-        %if;([ !dates order]0 = "ddmmyy")
+        %if;([ !dates order]0 = "ddmmyyyy")
           <input name="bd" value="%expr(date.gregorian.day + 1)" size="2" maxlength="2" %/>
           <input name="bm" value="%date.gregorian.month;" size="2" maxlength="2" %/>
+          <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>
+        %elseif;([ !dates order]0 = "mmddyyyy")
+          <input name="bm" value="%date.gregorian.month;" size="2" maxlength="2" %/>
+          <input name="bd" value="%expr(date.gregorian.day + 1)" size="2" maxlength="2" %/>
           <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>
         %else;
           <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>

@@ -1,5 +1,5 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 2012/04/12 geneweb-6.04 templ=templm -->
-<!-- How to : copy this file to bases/etc/my_base/ -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 20120827 templ=templm -->
+<!-- How to : copy this file to bases/etc/base_name/ -->
 
 %if;(not cancel_links)
   <div id="trl">
@@ -37,6 +37,8 @@
         document.getElementById("reloadclose").focus();}
     }
     
+    if (htmlTitle == "[*place modified]" || htmlTitle == "[*no modification]" )
+    {document.getElementsByTagName("a")[2].focus();}
     -->
     </script>
   %end;

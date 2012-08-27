@@ -1,5 +1,5 @@
 <!-- $Id: accent.txt,v 5.6 2007-04-04 02:17:36 ddr Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 2012/04/16 geneweb-6.04 templ=templm -->
+<!-- Modified mickroue(a)yahoo.fr 20120712 templ=templm -->
 <!-- To work : copy this file to bases/etc/ -->
 
 <script type="text/javascript"><!--
