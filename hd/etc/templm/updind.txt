@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updind.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/06/12 geneweb-6.05 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120807 templ=templm -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -12,6 +12,7 @@
     %else;[*add::person/persons]0%end;
   </title>
   <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
@@ -51,6 +52,7 @@
       %end;
     %end;
   %end;
+
 %(<!-- Begin define (used in updind.txt, updfam.txt)  -->%)
   <script type="text/javascript">
   <!--
@@ -141,7 +143,6 @@
   {
     var d = document.getElementById(id);
     var val = c.options%[c.selectedIndex%].value;
-
     if (val == cond1 || val == cond2)
       {d.style.display='inline';}
     else  
@@ -153,7 +154,7 @@
     {
      document.getElementById(id).focus();
      return false;
-    }    
+    }
   }
   function valid(id) {
     document.getElementById(id).focus();
@@ -183,7 +184,7 @@
   
   %define;sure_date(xvar)
     class="%if;(xvar.prec = "sure")sure%else;not_sure%end;"%nn;
-  %end;  
+  %end;
   
  %define;date(xlab,xvar,xdate)
     <span %apply;sure_date("xdate")>
@@ -195,12 +196,20 @@
         <option value="F"%if;(xdate.calendar = "french") selected="selected"%end;>[*gregorian/julian/french/hebrew]2</option>
         <option value="H"%if;(xdate.calendar = "hebrew") selected="selected"%end;>[*gregorian/julian/french/hebrew]3</option>
       </select>
-      %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
-        <label %apply;accesskey("xvar")>xlab
+      %if;([ !dates order]0 = "ddmmyyyy")
+        <label %apply;accesskey("xvar")>xlab%nn;
           <input id="xvar_d1" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
            value="%xdate.day;" onkeypress="javascript:return changeFocus(event,'xvar_d2');"%/></label>
         <span id="xvar_mm_sel"><input id="xvar_d2" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
          value="%xdate.month;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/></span>
+        <input id="xvar_d3" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
+         value="%xdate.year;"onkeypress="javascript:return changeFocus(event,'xvar_d4');"%/>
+      %elseif;([ !dates order]0 = "mmddyyyy")
+        <label for="xvar_d1" %apply;accesskey("xvar")>xlab</label>%nn;
+          <span id="xvar_mm_sel"><input id="xvar_d1" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
+         value="%xdate.month;" onkeypress="javascript:return changeFocus(event,'xvar_d2');"%/></span>
+        <input id="xvar_d2" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
+           value="%xdate.day;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/>
         <input id="xvar_d3" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="5" maxlength="6"%sp;
          value="%xdate.year;"onkeypress="javascript:return changeFocus(event,'xvar_d4');"%/>
       %else;
@@ -234,7 +243,7 @@
   %end;
 
   %define;source(xvar, xx)
-    <label>[*source/sources]0
+    <label>[*source/sources]0%nn;
     <input name="xvar_src" size="40" maxlength="200"
      value="%xx_src;"%sp;id="xvar_src"%/></label>
   %end;
@@ -315,7 +324,7 @@
 %end;
 
 %define;place(xvar,xx)
-  <label>[*place]
+  <label>[*place]%nn;
     <input name="xvar_place" size="40" maxlength="200"%sp;
      title="[*place] : 1=[birth], 2=[baptism], 3=[death], 4=[burial]"%sp; 
      value="%xx_place;" id="xvar_place" onblur="fill_place(this)"%/>

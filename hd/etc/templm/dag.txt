@@ -3,13 +3,14 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/04/27 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120712 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
     %else;%head_title;%end;
   </title>
   <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
@@ -97,6 +98,7 @@
     %let;overlap;%if;(evar.overlap != "")%evar.overlap;%else;10%end;%in;
     %if;(pos1 != 0 or pos2 < dag.ncol)
       <div style="text-align:right">
+        <br%/>
         %if;(pos1 = 0)&nbsp;%nn;
         %else;
           <a href="%prefix;

@@ -3,9 +3,10 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/06/06 geneweb-6.05 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120713 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
@@ -97,7 +98,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
         %apply;disconnect("friend",[wizard/wizards/friend/friends/exterior]2)
       %else;
         %apply;disconnect("wizard",[wizard/wizards/friend/friends/exterior]0)
-        %setup_link; 
+        %setup_link;
       %end;
     %end;
   </div>
@@ -164,7 +165,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     %if;(wizard and (not base.has_notes or bvar.propose_add_family != "no"))
       %if;(bvar.propose_add_family != "no")
         <li>
-          <a href="%prefix;m=ADD_FAM" target="_blank">[add::family/families]0</a><br%/>
+          <a href="%prefix;m=ADD_FAM" onclick="window.open(this.href); return false;">[add::family/families]0</a><br%/>
         </li>
       %end;
       %if;(not base.has_notes)
@@ -174,7 +175,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
       %end;
       %if;(wizard)
         <li>
-          <a href="%prefix;m=MOD_P">[book of places]</a>
+          <a href="%prefix;m=MOD_PLACE">[book of places]</a>
         </li>
       %end;
     %end;

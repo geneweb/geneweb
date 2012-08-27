@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 2012/04/26 geneweb-6.04 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120807 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -14,6 +14,7 @@
     %end;
   </title>
   <meta name="robots" content="none"%/>
+  <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
@@ -90,27 +91,44 @@
       %end;
     </select>
     <br%/>
-    <label><input type="checkbox" name="only" value="on"%/>
+    <label><input type="checkbox" name="only" value="on" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*only the generation selected]
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="cgl" value="on"%/>
+      <input type="checkbox" name="cgl" value="on" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*cancel GeneWeb links]
     </label>
     <br%/>
     <label>
-      <input type="radio" name="t" value="A"%/>
+      <input type="radio" id="tZ" name="t" value="Z" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      [*table]
+    </label>
+    <br%/>
+    <label>
+      <input type="radio" name="t" value="A" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*male line/female line]0
     </label>
     <br%/>
     <label>
-      <input type="radio" name="t" value="C"%/>
+      <input type="radio" name="t" value="C" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*male line/female line]1
     </label>
     <br%/>
     <label>
-      <input type="radio" name="t" value="L"%/>
+      <input type="radio" name="t" value="H" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      [*horizontally]
+      %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
+        ([maximum] 8 [generation/generations]1)
+      %elseif;(
+        bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level
+      )
+        ([maximum] %bvar.max_anc_level; [generation/generations]1)
+      %end;
+    </label>
+    <br%/>
+    <label>
+      <input type="radio" name="t" value="L" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*list/list (ancestors)]1
       %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
         ([maximum] 8 [generation/generations]1)
@@ -121,87 +139,75 @@
     </label>
     <br%/>
     <label>
-      <input type="radio" name="t" value="H"%/>
-      [*horizontally]
-      %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
-        ([maximum] 8 [generation/generations]1)
-      %elseif;(
-        bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level
-      )
-        ([maximum] %bvar.max_anc_level; [generation/generations]1)
-      %end;
+      <input type="radio" id="tF" name="t" value="F" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      [*surnames list]
     </label>
   </fieldset>
   <fieldset>
     <legend>
       <label>
-        <input type="radio" id="tN" name="t" value="N" checked="checked"%/>
-        [*short display]
-      </label>
-    </legend>
-    Sosa base
-    <label><input type="radio" name="sosab" value="8" onchange="valid('tN')"%/>8</label>
-    <label>%nn
-      <input type="radio" name="sosab" value="10" checked="checked" onchange="valid('tN')"%/>10
-    </label>
-    <label><input type="radio" name="sosab" value="16" onchange="valid('tN')"%/>16</label>
-  </fieldset>
-  <fieldset>
-    <legend>
-      <label>
-        <input type="radio" id="tG" name="t" value="G"%/>
+        <input type="radio" id="tG" name="t" value="G" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         [*long display]
       </label>
     </legend>
     <label>
-      <input type="checkbox" name="alias" value="on" checked="checked" onchange="valid('tG')"%/>
+      <input type="checkbox" name="sd" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      [*date] : 
+      %if;([ !dates order]0 = "ddmmyyyy")[year/month/day]2/[year/month/day]1/[year/month/day]0
+      %elseif;([ !dates order]0 = "mmddyyyy")[year/month/day]1/[year/month/day]2/[year/month/day]0
+      %else;[year/month/day]0/[year/month/day]1/[year/month/day]2
+      %end;
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="alias" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
        [*surname alias], [*first name alias]
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')"%/>
+      <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
        [*siblings]
     </label>
     <br%/>
     <label>
-    <input type="checkbox" name="spouse" value="on" checked="checked" onchange="valid('tG')"%/>
+    <input type="checkbox" name="spouse" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
     [*include spouses]
     </label>
     <br%/>
     <label>
-    <input type="checkbox" name="parents" value="on" checked="checked" onchange="valid('tG')"%/>
+    <input type="checkbox" name="parents" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
     [*parents]
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="rel" value="on" onchange="valid('tG')"%/>
+      <input type="checkbox" name="rel" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*relation/relations]1
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="witn" value="on" onchange="valid('tG')"%/>
+      <input type="checkbox" name="witn" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*witness/witnesses]1 ([marriage/marriages]1)
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="comm" value="on" onchange="valid('tG')"%/>
+      <input type="checkbox" name="comm" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*comment] ([marriage/marriages]1)
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="notes" value="on" checked="checked" onchange="valid('tG')"%/>
+      <input type="checkbox" name="notes" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*note/notes]1
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="src" value="on" checked="checked" onchange="valid('tG')"%/>
+      <input type="checkbox" name="src" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*source/sources]1
     </label>
   </fieldset>
   <fieldset>
   <legend>
     <label>
-      <input type="radio" id="tT" name="t" value="T"%/>
+      <input type="radio" id="tT" name="t" value="T" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*tree]
       %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
         ([maximum] 7 [generation/generations]1)
@@ -213,12 +219,17 @@
     </label>
   </legend>
     <label>
-      <input type="checkbox" name="marriage" value="on" onchange="valid('tT')"%/>
+      <input type="checkbox" name="dag" value="on" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      dag=on
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="marriage" value="on" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*marriage/marriages]0
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="image" value="on" onchange="valid('tT')"%/>
+      <input type="checkbox" name="image" value="on" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*image/images]1
     </label>
     <br%/>
@@ -231,96 +242,116 @@
       <tr>
         <td align="%left;">[*color]&nbsp;</td>
         <td align="%left;">
-          <input type="radio" name="color" value="" checked="checked" onchange="valid('tT')"%/>
+          <input type="radio" name="color" value="" checked="checked" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         </td>
         <td class="bg1">
-          <input type="radio" name="color" value="bg1" onchange="valid('tT')"%/>
+          <input type="radio" name="color" value="bg1" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         </td>
         <td class="bg2">
-          <input type="radio" name="color" value="bg2" onchange="valid('tT')"%/>
+          <input type="radio" name="color" value="bg2" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         </td>
         <td class="bg3">
-          <input type="radio" name="color" value="bg3" onchange="valid('tT')"%/>
+          <input type="radio" name="color" value="bg3" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         </td>
         <td class="bg4">
-          <input type="radio" name="color" value="bg4" onchange="valid('tT')"%/>
+          <input type="radio" name="color" value="bg4" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         </td>
         <td class="bg5">
-          <input type="radio" name="color" value="bg5" onchange="valid('tT')"%/>
+          <input type="radio" name="color" value="bg5" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         </td>
         <td class="bg6">
-          <input type="radio" name="color" value="bg6" onchange="valid('tT')"%/>
+          <input type="radio" name="color" value="bg6" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         </td>
       </tr>
     </table>
   </fieldset>
   <fieldset>
-  <legend>
-    <label>
-      <input type="radio" id="tF" name="t" value="F"%/>
-      [*surnames list]
-    </label>
-  </legend>
-      <label><input type="radio" id="tFAM" name="opt" value="fam" onchange="valid('tF')"%/>[*family/families]0
-        %sp;([maximum] 4 [generation/generations]1)
-      </label><br%/>
+    <legend>
+      <label>
+        <input type="radio" id="tE" name="t" value="E" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*list/list (ancestors)]0
+      </label>
+    </legend>
+    <label><input type="radio" id="tFAM" name="opt" value="fam" onchange="valid('tE')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>[*family/families]0
+      %sp;([maximum] 4 [generation/generations]1)
+    </label><br%/>
     %if;(wizard)
-      <label><input type="radio" id="tCSV" name="opt" value="csv" onchange="valid('tF')"%/>[*long display] (csv)
+      <label><input type="radio" id="tCSV" name="opt" value="csv" onchange="valid('tE')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>[*long display] (csv)
       </label>
     %end;
-      <br%/>
-      <label><input type="checkbox" name="cousins" value="on" onchange="valid('tF')"%/> [*cousins]
-      </label>
+    <br%/>
+    <label><input type="checkbox" name="cousins" value="on" onchange="valid('tE')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/> [*cousins]
+    </label>
   </fieldset>
   <fieldset>
-  <legend>
-    <label>
-      <input type="radio" id="tM" name="t" value="M"%/>
-      [*missing ancestors]
-    </label>
-  </legend>
-    <label>
-      <input type="checkbox" name="al" value="on" onchange="valid('tM')"%/>
-      [*alphabetic order]
-    </label>
-    <br%/>
-    <label>
-      <input type="checkbox" name="ms" value="on" onchange="valid('tM')"%/>
-      [*first name/first names]1, [surname/surnames]1 = ??
-    </label>
-    %if;(bvar.var_img_ext != "")
-      <p>[*not found] : <br%/>
-          <label>
-            <input type="checkbox" name="b_l" value="on" onchange="valid('tM')"%/>
-            %bvar.var_t_BIRTHA;
-          </label><br%/>
-          <label>
-            <input type="checkbox" name="m_l" value="on" onchange="valid('tM')"%/>
-            %bvar.var_t_MARRIAGEA;
-          </label><br%/>
-          <label>
-            <input type="checkbox" name="d_l" value="on" onchange="valid('tM')"%/>
-            %bvar.var_t_DEATHA;
-          </label>
-      </p>
-    %end;
-    <p>[*date] &lt;&gt; [exact] :<br%/>
+    <legend>
+      <label>
+        <input type="radio" id="tM" name="t" value="M" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*not found]
+      </label>
+    </legend>
+    <fieldset>
+      <legend>
         <label>
-          <input type="checkbox" name="b_d" value="on" onchange="valid('tM')"%/>
-          [*birth]
-        </label><br%/>
-        <label>
-          <input type="checkbox" name="m_d" value="on" onchange="valid('tM')"%/>
-          [*marriage/marriages]0
-        </label><br%/>
-        <label>
-          <input type="checkbox" name="d_d" value="on" onchange="valid('tM')"%/>
-          [*death]
+          <input type="radio" id="tM1" name="miss" value="M1" onclick="valid('tM')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+          [*missing ancestors]
         </label>
-    </p>
+      </legend>
+      <label>
+        <input type="checkbox" name="al" value="on" onchange="valid('tM');valid('tM1')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*alphabetic order]
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="ms" value="on" onchange="valid('tM');valid('tM1')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*first name/first names]1, [surname/surnames]1 = ??
+      </label>
+    </fieldset>
+    %if;(bvar.var_img_ext != "")
+      <fieldset>
+        <legend>
+          <label>
+            <input type="radio" id="tM2" name="miss" value="M2" onclick="valid('tM')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+            [*miscellaneous notes]
+          </label>
+        </legend>
+        <label>
+          <input type="checkbox" name="M2b" value="b" onchange="valid('tM');valid('tM2')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+          %bvar.var_t_BIRTHA;
+        </label><br%/>
+        <label>
+          <input type="checkbox" name="M2m" value="m" onchange="valid('tM');valid('tM2')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+          %bvar.var_t_MARRIAGEA;
+        </label><br%/>
+        <label>
+          <input type="checkbox" name="M2d" value="d" onchange="valid('tM');valid('tM2')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+          %bvar.var_t_DEATHA;
+        </label>
+      </fieldset>
+    %end;
+    <fieldset>
+      <legend>
+        <label>
+          <input type="radio" id="tM3" name="miss" value="M3" onclick="valid('tM')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+          [*date] &lt;&gt; [exact]
+        </label>
+      </legend>
+      <label>
+        <input type="checkbox" name="M3b" value="b" onchange="valid('tM');valid('tM3')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*birth]
+      </label><br%/>
+      <label>
+        <input type="checkbox" name="M3m" value="m" onchange="valid('tM');valid('tM3')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*marriage/marriages]0
+      </label><br%/>
+      <label>
+        <input type="checkbox" name="M3d" value="d" onchange="valid('tM');valid('tM3')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*death]
+      </label>
+    </fieldset>
   </fieldset>
 </form>
-  <div style ="clear: both;">
+  <div style="clear: both;">
     %apply;navsosa%with;
       <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
       %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
