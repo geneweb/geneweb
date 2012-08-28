@@ -3468,14 +3468,18 @@ sl: datum
 sv: datum
 
     date begin
+de: Anfangsdatum
 en: from
 es: fecha de inicio
 fr: date de début
+it: data d'inizio
 
     date end
+de: Enddatum
 en: to
 es: fecha final
 fr: date de fin
+it: data di fine
 
     date of birth
 de: Geburtsdatum
@@ -5956,9 +5960,11 @@ sl: seznam
 sv: lista/trädlista
 
     list eclair
+de: Blitzliste
 en: list by name, place & date
 es: lista rápida
 fr: liste-éclair
+it: lista lampo
 
     living after %s
 fr: vivant après %s
@@ -7537,14 +7543,18 @@ fr: nb. enfants
 it: N° figli
 
     nb events
+de: Ereignisse
 en: events
 es: Nº acontecimientos
 fr: nb. événements
+it: N° d'eventi
 
     nb individuals
+de: Individuen
 en: individuals
 es: Nº individuos
 fr: nb. individus
+it: N° individui
 
     number of branches
 af: aantal stake
@@ -7585,11 +7595,13 @@ it: numero di figli
 en: number of Individuals
 es: número de individuos
 fr: nombre d'individus
+it: numero d'individui
 
     number of events
 en: number of Events
 es: número de acontecimientos
 fr: nombre d'événements
+it: numero d'eventi
 
     number of living persons:
 bg: брой на живите лица:
@@ -9235,9 +9247,11 @@ no: vises etter:/grener/alfabetisk orden
 sv: visas efter:/grenar/alfabetisk ordning
 
     sort by/date begin/alphabetic order/nb individuals/nb events
+de: sortieren nach:/Anfangsdatum/Alphabetisch/Anzahl der Individuen/Anzahl der Ereignisse
 en: sort by:/Date/Alphabetical order/Number of Individuals/Number of Events
 es: organizar por:/Fecha de inicio/Orden alfabético/Número de individuos/Número de acontecimientos
 fr: trier par:/date de début/ordre alphabétique/nombre d'individus/nombre d'événements
+it: Smistare per :/Data d'inizio/Ordine alfabetico/Numero d'individui/Numero d'eventi
 
     sort by/generation/alphabetic order
 de: Sortieren nach:/Generationen/Alphabetisch
