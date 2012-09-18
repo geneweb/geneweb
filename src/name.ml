@@ -44,6 +44,7 @@ value unaccent_utf_8 lower s i =
     let c = Char.code s.[i] in
     let s =
       match c with
+      (* il ne faut pas garder le cas 0xC2 parce qu'il casse le code UTF8 *)
       [ 0xC2 -> f (String.make 1 s.[i+1])
       | 0xC3 ->
           match Char.code s.[i+1] with
@@ -333,6 +334,16 @@ value unaccent_utf_8 lower s i =
           | 0x85 -> "o"
           | 0x86 -> "f"
           | _ -> String.sub s i nbc ]
+      (* Code pour supprimer l'apostrophe typographique *)
+      (*
+      | 0xE2 ->
+          match Char.code s.[i+1] with
+          [ 0x80 ->
+            match Char.code s.[i+2] with
+            [ 0x99 -> " " 
+            | _ -> String.sub s i nbc ]
+          | _ -> String.sub s i nbc]
+      *)
       | c ->
           String.sub s i nbc ]
     in
