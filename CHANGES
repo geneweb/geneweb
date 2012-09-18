@@ -1,3 +1,34 @@
+GeneWeb version 6.06
+--------------------
+
+* Add a "book of sources" just like the "book of places". The two 
+  functions uses the same variable in the gwf file : max_nb_updates. This 
+  variable allows to set up the maximum number of updates that can be done at 
+  a single time.
+* Add a field in the advanced request to search in the marriage informations.
+  This is just a small evolution, it is not meant to add other searching 
+  fields again and again.
+* Add the occupation in the edition of a family form. One can create a
+  family and specify the occupation of the father/mother and the children.
+  This is again a small evolution.
+* Add a new output : "liste-éclair" (Tiny tafel).
+* "Better" display in the ascendants/descendants menu/list/tree.
+* Add a few new options in the ascendants/descendants list/tree.
+* The way a date is displayed is now completely depedant of the "date order"
+  in the language dictionnary. For exemple, if your date order is dd/mm/yyyy,
+  your date will be 01/02/1880. If instead it's d/m/yyyy, it will be displayed
+  as 1/2/1880. Format accepted now are : 
+  - dmyyyy
+  - mmddyyyy
+  - yyyymmdd or yymmdd
+  - ddmmyyyy or ddmmyy
+* Add the evaluation functions of a date (year, month, day, prec) in the
+  template (interpreted by perso.ml).
+* Display the history of updates in a table.
+* Code refactoring.
+* Various fixes.
+
+
 GeneWeb version 6.05
 --------------------
 
