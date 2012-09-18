@@ -494,9 +494,17 @@ value error_locked conf =
             List.iter
               (fun (x, v) ->
                  if x = "retry" then ()
-                 else
-                   xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-                     (quote_escaped (decode_varenv v)))
+                 else do {
+                   (* Seul un textarea peut contenir des sauts de ligne. *)
+                   (* On remplace donc l'input par un textarea.          *)
+                   if x = "notes" then
+                     tag "textarea" "style=\"display:none;\" name=\"%s\"" x 
+                       begin
+                         Wserver.wprint "%s" (quote_escaped (decode_varenv v));
+                       end
+                   else
+                     xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+                       (quote_escaped (decode_varenv v))})
               (conf.henv @ conf.env);
             (* just to see in the traces... *)
             xtag "input" "type=\"hidden\" name=\"retry\" value=\"%s\""
@@ -723,8 +731,16 @@ value print_create_conflict conf base p var =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
-           xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-             (quote_escaped (decode_varenv v)))
+           (* Seul un textarea peut contenir des sauts de ligne. *)
+           (* On remplace donc l'input par un textarea.          *)
+           if x = "notes" then
+             tag "textarea" "style=\"display:none;\" name=\"%s\"" x 
+               begin
+                 Wserver.wprint "%s" (quote_escaped (decode_varenv v));
+               end
+           else
+             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+               (quote_escaped (decode_varenv v)))
         (conf.henv @ conf.env);
       xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
       xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
