@@ -780,10 +780,10 @@ value print_add o_conf base =
           let (p, a) = effective_add conf base sp in
           let u = {family = get_family (poi base p.key_index)} in
           let wl = all_checks_person conf base p a u in
-          let k = (sp.first_name, sp.surname, sp.occ, p.key_index) in
           do {
             Util.commit_patches conf base;
-            History.record conf base k "ap";
+            let changed = U_Add_person (Util.string_gen_person base p) in
+            History.record conf base changed "ap";
             print_add_ok conf base wl p;
           } ]
     }
@@ -799,7 +799,6 @@ value print_del conf base =
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
       let occ = get_occ p in
-      let k = (fn, sn, occ, ip) in
       let old_related = get_related p in
       update_relations_of_related base ip old_related;
       let warning _ = () in
@@ -808,7 +807,8 @@ value print_del conf base =
       delete_key base fn sn occ;
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
       Util.commit_patches conf base;
-      History.record conf base k "dp";
+      let changed = U_Delete_person (Util.string_gen_person base p) in
+      History.record conf base changed "dp";
       print_del_ok conf base [];
     }
   | _ -> incorrect_request conf ]
@@ -837,32 +837,21 @@ value print_mod_aux conf base callback =
   [ Update.ModErr -> () ]
 ;
 
-value get_key conf base =
-  let ip = 
-    match p_getint conf.env "i" with
-    [ Some i -> i
-    | _ -> -1 ]
-  in
-  let p = poi base (Adef.iper_of_int ip) in
-  let fn = sou base (Gwdb.get_first_name p) in
-  let sn = sou base (Gwdb.get_surname p) in
-  let occ = Gwdb.get_occ p in
-  (get_key_index p, (fn, sn, occ))
-;
-
-value notify_change_key conf base (_, (ofn, osn, oocc)) (_, (fn, sn, occ)) =
-  let old_key = default_image_name_of_key ofn osn oocc in
-  let new_key = default_image_name_of_key fn sn occ in
-  if old_key <> new_key then
-    History.record_key conf base old_key new_key
-  else ()
-;
-
 value print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string.val := [] in
-  let old_key = get_key o_conf base in
+  let o_p = 
+    match p_getint o_conf.env "i" with
+    [ Some ip ->
+        Util.string_gen_person
+          base
+          (gen_person_of_person (poi base (Adef.iper_of_int ip)))
+    | None ->
+        Util.string_gen_person
+          base
+          (gen_person_of_person (poi base (Adef.iper_of_int (-1)))) ]
+  in
   let conf = Update.update_conf o_conf in
   let callback sp = do {
     let p = effective_mod conf base sp in
@@ -888,12 +877,9 @@ value print_mod o_conf base =
       let a = {parents = get_parents a; consang = get_consang a} in
       all_checks_person conf base p a u
     in
-    let k = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
     Util.commit_patches conf base;
-    History.record conf base k "mp";
-    let new_key = (sp.key_index, (sp.first_name, sp.surname, sp.occ)) in
-    update_gwf_sosa conf base new_key;
-    notify_change_key conf base old_key new_key;
+    let changed = U_Modify_person o_p (Util.string_gen_person base p) in
+    History.record conf base changed "mp";
     if not (is_quest_string p.surname) &&
        not (is_quest_string p.first_name) &&
        not (is_old_person conf p)

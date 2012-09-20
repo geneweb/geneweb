@@ -696,11 +696,8 @@ value update_person_list conf base new_src list nb_pers max_updates = do {
               patch_family base nfam.fam_index nfam)
             fam;
           (* On met aussi à jour l'historique. *)
-          let fn = sou base (get_first_name p) in
-          let sn = sou base (get_surname p) in
-          let occ = get_occ p in
-          let ip = get_key_index p in
-          History.record conf base (fn, sn, occ, ip) "cs"; } )
+          let changed = U_Multi_sources (Util.string_gen_person base np) in
+          History.record conf base changed "cs"; } )
         perl } )
     list;
   Util.commit_patches conf base; 
@@ -709,7 +706,7 @@ value update_person_list conf base new_src list nb_pers max_updates = do {
   (* personnes, car si l'administrateur de la base ne modifie pas tous *)
   (* les évènements liés à cette source, on ne sera pas mis au courant *)
   (* que la base à été mise à jour.                                    *)
-  History.notify_sources conf base "cs"; }
+  History.notify conf base "cs"; }
 ;
 
 

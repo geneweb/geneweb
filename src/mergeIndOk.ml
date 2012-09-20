@@ -231,36 +231,7 @@ value redirect_added_families base p ip2 p2_family =
   }
 ;
 
-value get_key conf base i =
-  let ip = 
-    match p_getint conf.env i with
-    [ Some i -> i
-    | _ -> -1 ]
-  in
-  let p = poi base (Adef.iper_of_int ip) in
-  let fn = sou base (Gwdb.get_first_name p) in
-  let sn = sou base (Gwdb.get_surname p) in
-  let occ = Gwdb.get_occ p in
-  (get_key_index p, (fn, sn, occ))
-;
-
-value notify_change_key conf base (_, (ofn, osn, oocc)) (_, (fn, sn, occ)) =
-  let old_key = default_image_name_of_key ofn osn oocc in
-  let new_key = default_image_name_of_key fn sn occ in
-  if old_key <> new_key then
-    History.record_key conf base old_key new_key
-  else ()
-;
-
-value notify_update_gwf conf base (ip1, _) (ip2, _) (_, new_key) =
-  if ip1 = fst conf.default_sosa_ref then
-    update_gwf_sosa conf base (ip1, new_key)
-  else if ip2 = fst conf.default_sosa_ref then
-    update_gwf_sosa conf base (ip2, new_key)
-  else ()
-;
-
-value effective_mod_merge conf base p1_old_key p2_old_key sp =
+value effective_mod_merge conf base o_p1 o_p2 sp =
   match p_getint conf.env "i2" with
   [ Some i2 -> do {
       let ip2 = Adef.iper_of_int i2 in
@@ -291,13 +262,9 @@ value effective_mod_merge conf base p1_old_key p2_old_key sp =
         let a = {parents = get_parents a; consang = get_consang a} in
         UpdateIndOk.all_checks_person conf base p a u
       in
-      let key = (sp.first_name, sp.surname, sp.occ, sp.key_index) in
       Util.commit_patches conf base;
-      History.record conf base key "fp";
-      let new_key = (sp.key_index, (sp.first_name, sp.surname, sp.occ)) in
-      notify_update_gwf conf base p1_old_key p2_old_key new_key;
-      notify_change_key conf base p1_old_key new_key ;
-      notify_change_key conf base p2_old_key new_key ;
+      let changed = U_Merge_person o_p1 o_p2 (Util.string_gen_person base p) in
+      History.record conf base changed "fp";
       Update.delete_topological_sort conf base;
       print_mod_merge_ok conf base wl p;
     }
@@ -305,9 +272,20 @@ value effective_mod_merge conf base p1_old_key p2_old_key sp =
 ;
 
 value print_mod_merge o_conf base =
-  let p1_old_key = get_key o_conf base "i" in
-  let p2_old_key = get_key o_conf base "i2" in
+  let get_gen_person i =
+    match p_getint o_conf.env i with
+    [ Some i ->
+        Util.string_gen_person 
+          base
+          (gen_person_of_person (poi base (Adef.iper_of_int i)))
+    | None -> 
+        Util.string_gen_person 
+          base
+          (gen_person_of_person (poi base (Adef.iper_of_int (-1)))) ]
+  in
+  let o_p1 = get_gen_person "i" in
+  let o_p2 = get_gen_person "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateIndOk.print_mod_aux conf base 
-    (effective_mod_merge conf base p1_old_key p2_old_key)
+  UpdateIndOk.print_mod_aux conf base (effective_mod_merge conf base o_p1 o_p2)
 ;
+

@@ -23,26 +23,162 @@ value ext_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
 ;
 
-type changed =
-  [ Rperson of string and string and int and Adef.iper
-  | Rnotes of option int and string 
-  | Rplaces 
-  | Rsources ] 
+
+(* ********************************************************************** *)
+(*  [Fonc] slash_name_of_key : string -> string -> int -> string          *)
+(** [Description] : Renvoie la clé nom/prénom/occ.
+    [Args] :
+      - fn  : string
+      - sn  : string
+      - occ : int
+    [Retour] : string
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value slash_name_of_key fn sn occ =
+  let space_to_unders = Mutil.tr ' ' '_' in
+  let fn = space_to_unders (Name.lower fn) in
+  let sn = space_to_unders (Name.lower sn) in
+  sn ^ "/" ^ fn ^ "/" ^ string_of_int occ
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] diff_visibility : 
+             config -> base -> gen_person -> gen_person -> string array   *)
+(** [Description] : Si la visibilité de la personne a changé (entre 
+                    l'ancienne et la nouvelle), alors on revoie un tableau 
+                    avec la nouvelle visibilité.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - op   : la person avant les modifications
+      - np   : la person après les modifications
+    [Retour] : string array
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value diff_visibility conf base op np =
+  let k = slash_name_of_key np.first_name np.surname np.occ in
+  let empty_union = {family = [| |]} in
+  let empty_ascend = {parents = None; consang = Adef.fix (-1)} in
+  let op = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) op in
+  let np = Futil.map_person_ps (fun p -> p) (Gwdb.insert_string base) np in
+  let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
+  let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
+  let tmp_conf = {(conf) with wizard = False; friend = False} in
+  let visible =
+    Util.authorized_age tmp_conf base o_p <> 
+      Util.authorized_age tmp_conf base n_p 
+  in
+  if visible then [| "VISIBLE"; k; string_of_bool visible |]
+  else [| |]
+;
+
+
+type kind_diff =
+  [ Diff_person of gen_person iper string and gen_person iper string
+  | Diff_string of (string * string * int) and (string * string * int) ]
+;
+
+(* ********************************************************************** *)
+(*  [Fonc] diff_key : gen_person -> gen_person -> string array            *)
+(** [Description] : Si la clé de la personne a changé, alors on renvoie un
+                    tableau avec l'ancienne clé et la nouvelle clé.
+    [Args] :
+      - op   : la person avant les modifications
+      - np   : la person après les modifications
+    [Retour] : string array
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value diff_key d =
+  match d with
+  [ Diff_person op np ->
+      let o_key = slash_name_of_key op.first_name op.surname op.occ in
+      let n_key = slash_name_of_key np.first_name np.surname np.occ in
+      if o_key <> n_key then [| "KEY"; o_key; n_key |]
+      else [| |]
+  | Diff_string (ofn, osn, oocc) (fn, sn, occ) ->
+      let o_key = slash_name_of_key ofn osn oocc in
+      let n_key = slash_name_of_key fn sn occ in
+      if o_key <> n_key then [| "KEY"; o_key; n_key |]
+      else [| |] ]
+;
+
+
+(* ********************************************************************** *)
+(*  [Fonc] diff_person : 
+             config -> base -> gen_person -> gen_person -> string array   *)
+(** [Description] : Fonction qui ajouté des paramètres passés dans la 
+                    ligne de commande de notify_change. Elle permet de 
+                    savoir quelle genre de modifications ont été faites.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - op   : la person avant les modifications
+      - np   : la person après les modifications
+    [Retour] : string array
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value diff_person conf base changed =
+  match changed with
+  [ U_Add_person p | U_Delete_person p -> [| |]
+  | U_Modify_person o n -> 
+      Array.append (diff_key (Diff_person o n)) (diff_visibility conf base o n)
+  | U_Merge_person p1 p2 p -> 
+      let args_p1 = 
+        Array.append 
+          (diff_key (Diff_person p1 p)) (diff_visibility conf base p1 p)
+      in
+      let args_p2 = 
+        Array.append 
+          (diff_key (Diff_person p2 p)) (diff_visibility conf base p2 p)
+      in
+      Array.append args_p1 args_p2
+  | U_Send_image _ | U_Delete_image _ 
+  | U_Add_family _ _ | U_Modify_family _ _ _ | U_Delete_family _ _ 
+  | U_Invert_family _ _ | U_Merge_family _ _ _ _ | U_Add_parent _ _ -> [| |]
+  | U_Change_children_name _ l -> 
+      List.fold_left
+        (fun accu ((ofn, osn, oocc, _), (fn, sn, occ, _)) ->
+          Array.append 
+            accu (diff_key (Diff_string (ofn, osn, oocc) (fn, sn, occ))))
+        [| |] l
+  | U_Multi_sources _ | U_Multi_places _ | U_Multi 
+  | U_Notes _ _ | U_Kill_ancestors _ -> [| |] ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] notify_change : config -> base -> base_changed -> string -> unit *)
+(** [Description] : Appel le script défini par la variable notify_change du
+                    fichier gwf.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - changed : le type de modification (voir def.mli)
+      - action : le code du type de modification
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
 value notify_change conf base changed action =
   IFDEF UNIX THEN
     match p_getenv conf.base_env "notify_change" with
     [ Some comm ->
-        let args =
+        let base_args =
           match changed with
-          [ Rperson fn sn occ ip ->
-              [| fn; sn; string_of_int occ;
-                 string_of_int (Adef.int_of_iper ip) |]
-          | Rnotes (Some num) file -> [| file; string_of_int num |]
-          | Rnotes None file -> [| file |] 
-          | Rplaces | Rsources -> [| |] ]
+          [ U_Add_person p | U_Modify_person _ p | U_Delete_person p
+          | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p 
+          | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _ 
+          | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _ 
+          | U_Kill_ancestors p | U_Change_children_name p _ 
+          | U_Multi_sources p | U_Multi_places p -> 
+              let key = slash_name_of_key p.first_name p.surname p.occ in
+              [| key; string_of_int (Adef.int_of_iper (p.key_index)) |]
+          | U_Multi -> [| |]
+          | U_Notes (Some num) file -> [| file; string_of_int num |]
+          | U_Notes None file -> [| file |] ]
         in
+        let optional_args = diff_person conf base changed in
+        let args = Array.append base_args optional_args in
         let args = Array.append [| comm; conf.bname; conf.user; action |] args in
         match Unix.fork () with
         [ 0 ->
@@ -56,44 +192,39 @@ value notify_change conf base changed action =
   ELSE () END
 ;
 
-value notify_delete conf base changed action =
-  IFDEF UNIX THEN
-    match p_getenv conf.base_env "notify_delete" with
-    [ Some comm ->
-        let args =
-          match changed with
-          [ Rperson fn sn occ ip ->
-              let key = Util.default_image_name_of_key fn sn occ in
-              [| key |]
-          | Rnotes (Some num) file -> [| |]
-          | Rnotes None file -> [| |] 
-          | Rplaces | Rsources -> [| |] ]
-        in
-        let args = Array.append [| comm; conf.bname |] args in
-        match Unix.fork () with
-        [ 0 ->
-            if Unix.fork () <> 0 then exit 0
-            else do {
-              try Unix.execvp comm args with _ -> ();
-              exit 0
-            }
-        | id -> ignore (Unix.waitpid [] id) ]
-    | None -> () ]
-  ELSE () END
-;
 
+(* ************************************************************************ *)
+(*  [Fonc] gen_record : config -> base -> base_changed -> string -> unit    *)
+(** [Description] : Enregistre dans le fichier historique si la variable
+      "hitory" du fichier gwf est valorisée à "yes". Le fait qu'on ait des 
+      gen_person, nous permet de pouvoir faire un diff entre avant et après 
+      la modification d'une personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - changed : le type de modification (voir def.mli)
+      - action : le code du type de modification
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
 value gen_record conf base changed action =
   do {
     match p_getenv conf.base_env "history" with
     [ Some "yes" when not conf.manitou ->
         let item =
           match changed with
-          [ Rperson fn sn occ _ -> fn ^ "." ^ string_of_int occ ^ " " ^ sn
-          | Rnotes (Some num) file ->
+          [ U_Add_person p | U_Modify_person _ p | U_Delete_person p
+          | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p 
+          | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _ 
+          | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _ 
+          | U_Kill_ancestors p | U_Change_children_name p _ 
+          | U_Multi_sources p | U_Multi_places p -> 
+              p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
+          | U_Multi -> "" (* Normalement, on n'a jamais ce cas. *)
+          | U_Notes (Some num) file ->
               let s = string_of_int num in
               if file = "" then s else file ^ "/" ^ s
-          | Rnotes None file -> file 
-          | Rplaces | Rsources -> "" ]
+          | U_Notes None file -> file ]
         in
         let fname = file_name conf in
         match
@@ -116,41 +247,70 @@ value gen_record conf base changed action =
     (* mise à jour de l'historique.                                   *)
     match action with
     [ "cp" | "cs" -> ()
-    | "dp" -> notify_delete conf base changed action 
     | _ -> notify_change conf base changed action ]
   }
 ;
 
-value record conf base (fn, sn, occ, i) action =
-  gen_record conf base (Rperson fn sn occ i) action
+
+(* ************************************************************************ *)
+(*  [Fonc] record : config -> base -> base_changed -> string -> unit        *)
+(** [Description] : Suite à la mise à jour de la base, on réalise les 
+      traitements suivant :
+        - mise à jour (si nécessaire) du fichier gwf pour le sosa_ref
+        - mise à jour du fichier historique
+        - appel du script notify_change
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - changed : le type de modification (voir def.mli)
+      - action : le code du type de modification
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value record conf base changed action = 
+  do {
+    (* Mise à jour du fichier gwf si le sosa_ref a changé. *)
+    match changed with
+    [ U_Modify_person _ p -> 
+        let (fn, sn, occ, ip) = (p.first_name, p.surname, p.occ, p.key_index) in
+        update_gwf_sosa conf base (ip, (fn, sn, occ))
+    | U_Merge_person p1 _ p -> do {
+        let (fn, sn, occ, ip) = 
+          (p1.first_name, p1.surname, p1.occ, p1.key_index)
+        in
+        update_gwf_sosa conf base (ip, (fn, sn, occ));
+        (* On n'a pas besoin de faire un update sur "p2" *)
+        (* parce qu'on le fait sur p dans tous les cas.  *)
+        let (fn, sn, occ, ip) = (p.first_name, p.surname, p.occ, p.key_index) in
+        update_gwf_sosa conf base (ip, (fn, sn, occ)); }
+    | U_Change_children_name _ l ->
+        List.iter
+          (fun (_, (fn, sn, occ, ip)) -> 
+            update_gwf_sosa conf base (ip, (fn, sn, occ)))
+          l 
+    | _ -> () ];
+    (* Mise à jour du fichier historique et appel de notify_change. *)
+    gen_record conf base changed action
+  }
 ;
 
-value record_notes conf base (num, file) action =
-  gen_record conf base (Rnotes num file) action
+
+(* ************************************************************************ *)
+(*  [Fonc] notify : config -> base -> string -> unit                        *)
+(** [Description] : Appel explicite de notify_change suite à une modification
+                    de masse de la base (typiquement, le dico des lieux). 
+                    On évite comme ça la création de 5000 processus.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - action : le code du type de modification
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value notify conf base action =
+  notify_change conf base U_Multi action
 ;
 
-value notify_places conf base action =
-  notify_change conf base Rplaces action
-;
-
-value notify_sources conf base action =
-  notify_change conf base Rsources action
-;
-
-value record_key conf base old_key new_key =
-  match p_getenv conf.base_env "notify_key" with
-  [ Some comm ->
-    let args = [| comm; conf.bname; old_key; new_key |] in
-    match Unix.fork () with
-    [ 0 ->
-      if Unix.fork () <> 0 then exit 0
-      else do {
-        try Unix.execvp comm args with _ -> ();
-        exit 0
-      }
-    | id -> ignore (Unix.waitpid [] id) ]
-  | None -> () ]
-;
 
 (* Request for history printing *)
 

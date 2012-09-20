@@ -6,15 +6,9 @@ open Def;
 open Gwdb;
 
 value file_name : config -> string;
-value record :
-  config -> base -> (string * string * int * iper) -> string -> unit
-;
-value record_notes : config -> base -> (option int * string) -> string -> unit;
+
+value record : config -> base -> base_changed iper string -> string -> unit;
+value notify : config -> base -> string -> unit;
+
 value print : config -> base -> unit;
 value print_search : config -> base -> unit;
-
-value record_key : config -> base -> string -> string -> unit;
-
-value notify_places : config -> base -> string -> unit;
-value notify_sources : config -> base -> string -> unit;
-  

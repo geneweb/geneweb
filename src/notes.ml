@@ -399,7 +399,7 @@ value commit_notes conf base fnotes s =  do {
   Mutil.mkdir_p (Filename.dirname fpath);
   try Gwdb.commit_notes base fname s with
   [ Sys_error _ -> do { incorrect_request conf; raise Update.ModErr } ];
-  History.record_notes conf base (p_getint conf.env "v", fnotes) "mn";
+  History.record conf base (Def.U_Notes (p_getint conf.env "v") fnotes) "mn";
   update_notes_links_db conf pg s;
 };
 
