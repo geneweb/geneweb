@@ -98,7 +98,7 @@ value print_mod_merge_ok conf base wl cpl des = do {
   trailer conf;
 };
 
-value effective_mod_merge conf base sfam scpl sdes =
+value effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
   match p_getint conf.env "i2" with
   [ Some i2 ->
       let ifam2 = Adef.ifam_of_int i2 in
@@ -112,21 +112,40 @@ value effective_mod_merge conf base sfam scpl sdes =
           UpdateFamOk.all_checks_family conf base ifam fam cpl des
             (scpl, sdes, None (* should be Some *))
         in
-        let ((fn, sn, occ, _, _), ip) =
-          match p_getint conf.env "ip" with
-          [ Some i ->
-              let ip = Adef.iper_of_int i in
-              (if Adef.mother cpl = ip then mother scpl else father scpl, ip)
-          | None -> (father scpl, Adef.iper_of_int (-1)) ]
-        in
         Util.commit_patches conf base;
-        History.record conf base (fn, sn, occ, ip) "ff";
+        let changed =
+          let gen_p =
+            let p = 
+              match p_getint conf.env "ip" with
+              [ Some i ->
+                  let ip = Adef.iper_of_int i in
+                  if Adef.mother cpl = ip then poi base (Adef.mother cpl)
+                  else poi base (Adef.father cpl)
+              | None -> poi base (Adef.father cpl) ]
+            in
+            Util.string_gen_person base (gen_person_of_person p)
+          in
+          let n_f = Util.string_gen_family base fam in
+          U_Merge_family gen_p o_f1 o_f2 n_f
+        in
+        History.record conf base changed "ff";
         print_mod_merge_ok conf base wl cpl des;
       }
   | None -> incorrect_request conf ]
 ;
 
 value print_mod_merge o_conf base =
+  let get_gen_family i =
+    match p_getint o_conf.env i with
+    [ Some i -> 
+        let fam = foi base (Adef.ifam_of_int i) in
+        Util.string_gen_family base (gen_family_of_family fam)
+    | None -> 
+        let fam = foi base (Adef.ifam_of_int (-1)) in
+        Util.string_gen_family base (gen_family_of_family fam) ]
+  in
+  let o_f1 = get_gen_family "i" in
+  let o_f2 = get_gen_family "i2" in
   let conf = Update.update_conf o_conf in
-  UpdateFamOk.print_mod_aux conf base (effective_mod_merge conf base)
+  UpdateFamOk.print_mod_aux conf base (effective_mod_merge conf base o_f1 o_f2)
 ;

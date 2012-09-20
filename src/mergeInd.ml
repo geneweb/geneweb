@@ -680,11 +680,12 @@ value print conf base =
         do {
           if changes_done then Util.commit_patches conf base else ();
           if ok then do {
-            let key =
-              (sou base (get_first_name p1), sou base (get_surname p1),
-               get_occ p1, get_key_index p1)
+            let changed =
+              let p1 = Util.string_gen_person base (gen_person_of_person p1) in
+              let p2 = Util.string_gen_person base (gen_person_of_person p2) in
+              U_Merge_person p1 p2 p2
             in
-            History.record conf base key "fp";
+            History.record conf base changed "fp";
             Update.delete_topological_sort conf base;
             print_merged conf base (List.rev rev_wl.val) p1;
           }
@@ -736,16 +737,16 @@ value print_kill_ancestors conf base =
   [ Some "yes" ->
       match find_person_in_env conf base "" with
       [ Some p ->
-          let key =
-            (sou base (get_first_name p), sou base (get_surname p),
-             get_occ p, get_key_index p)
-          in
           let nb_ind = ref 0 in
           let nb_fam = ref 0 in
           do {
             kill_ancestors conf base False p nb_ind nb_fam;
             Util.commit_patches conf base;
-            History.record conf base key "ka";
+            let changed = 
+              U_Kill_ancestors 
+                (Util.string_gen_person base (gen_person_of_person p))
+            in
+            History.record conf base changed "ka";
             print_killed conf base p nb_ind.val nb_fam.val;
           }
       | None -> incorrect_request conf ]

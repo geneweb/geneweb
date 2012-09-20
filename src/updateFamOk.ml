@@ -948,26 +948,36 @@ value print_add o_conf base =
           let (wl, ml) =
             all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
           in
-          let ((fn, sn, occ, _, _), i, act) =
-            match p_getint conf.env "ip" with
-            [ Some i ->
-                if Adef.int_of_iper (Adef.mother cpl) = i then
-                  (mother scpl, i, "af")
-                else
-                  let a = poi base (Adef.iper_of_int i) in
-                  match get_parents a with
-                  [ Some x when x = ifam ->
-                      let p = poi base (Adef.iper_of_int i) in
-                      let key =
-                        (sou base (get_first_name p), sou base (get_surname p),
-                         get_occ p, Update.Link, "")
-                      in
-                      (key, i, "aa")
-                  | _ -> (father scpl, i, "af") ]
-            | _ -> (father scpl, -1, "af") ]
+          let (changed, act) =
+            let fam = Util.string_gen_family base fam in
+            let (ip, act) =
+              match p_getint conf.env "ip" with
+              [ Some i ->
+                  if Adef.int_of_iper (Adef.mother cpl) = i then 
+                    (Adef.mother cpl, "af")
+                  else 
+                    let a = poi base (Adef.iper_of_int i) in
+                    match get_parents a with
+                    [ Some x when x = ifam -> (Adef.iper_of_int i, "aa")
+                    | _ -> (Adef.father cpl, "af") ]
+              | None -> (Adef.father cpl, "af") ]
+            in
+            match act with
+            [ "af" -> 
+                let gen_p = 
+                  Util.string_gen_person 
+                    base (gen_person_of_person (poi base ip))
+                in
+                (U_Add_family gen_p fam, "af")
+            | _ -> 
+                let gen_p = 
+                  Util.string_gen_person 
+                    base (gen_person_of_person (poi base ip))
+                in
+                (U_Add_parent gen_p fam, "aa") ]
           in
           Util.commit_patches conf base;
-          History.record conf base (fn, sn, occ, Adef.iper_of_int i) act;
+          History.record conf base changed act;
           Update.delete_topological_sort conf base;
           print_add_ok conf base (wl, ml) cpl des
         } ]
@@ -980,22 +990,26 @@ value print_del conf base =
   [ Some i ->
       let ifam = Adef.ifam_of_int i in
       let fam = foi base ifam in
-      let k =
-        let ip =
-          match p_getint conf.env "ip" with
-          [ Some i when Adef.int_of_iper (get_mother fam) = i ->
-              get_mother fam
-          | _ -> get_father fam ]
-        in
-        let p = poi base ip in
-        (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-         get_key_index p)
-      in
       do {
         if not (is_deleted_family fam) then do {
           effective_del conf base (ifam, fam);
           Util.commit_patches conf base;
-          History.record conf base k "df";
+          let changed =
+            let gen_p = 
+              let p =
+                match p_getint conf.env "ip" with
+                [ Some i when Adef.int_of_iper (get_mother fam) = i -> 
+                    poi base (get_mother fam)
+                | _ -> poi base (get_father fam) ]
+              in
+              Util.string_gen_person base (gen_person_of_person p)
+            in
+            let gen_fam = 
+              Util.string_gen_family base (gen_family_of_family fam)
+            in
+            U_Delete_family gen_p gen_fam
+          in
+          History.record conf base changed "df";
           Update.delete_topological_sort conf base
         }
         else ();
@@ -1039,6 +1053,14 @@ value print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string.val := [] in
+  let o_f = 
+    let ifam = 
+      match p_getint o_conf.env "i" with
+      [ Some i -> Adef.ifam_of_int i
+      | None -> Adef.ifam_of_int (-1) ]
+    in
+    Util.string_gen_family base (gen_family_of_family (foi base ifam))
+  in
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes = do {
     let ofs = family_structure conf base sfam.fam_index in
@@ -1053,15 +1075,20 @@ value print_mod o_conf base =
     let (wl, ml) =
       all_checks_family conf base ifam fam cpl des (scpl, sdes, onfs)
     in
-    let ((fn, sn, occ, _, _), ip) =
-      match p_getint conf.env "ip" with
-      [ Some i ->
-          let ip = Adef.iper_of_int i in
-          (if Adef.mother cpl = ip then mother scpl else father scpl, ip)
-      | None -> (father scpl, Adef.iper_of_int (-1)) ]
-    in
     Util.commit_patches conf base;
-    History.record conf base (fn, sn, occ, ip) "mf";
+    let changed =
+      let ip = 
+        match p_getint o_conf.env "ip" with
+        [ Some i -> Adef.iper_of_int i
+        | None -> Adef.iper_of_int (-1) ]
+      in
+      let p = 
+        Util.string_gen_person base (gen_person_of_person (poi base ip))
+      in
+      let n_f = Util.string_gen_family base fam in
+      U_Modify_family p o_f n_f
+    in
+    History.record conf base changed "mf";
     Update.delete_topological_sort conf base;
     print_mod_ok conf base (wl, ml) cpl des
   }
@@ -1073,15 +1100,17 @@ value print_inv conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam) ->
       let p = poi base (Adef.iper_of_int ip) in
-      let k =
-        (sou base (get_first_name p), sou base (get_surname p), get_occ p,
-         get_key_index p)
-      in
       try
         do {
           effective_inv conf base (get_key_index p) p (Adef.ifam_of_int ifam);
           Util.commit_patches conf base;
-          History.record conf base k "if";
+          let changed = 
+            let gen_p = 
+              Util.string_gen_person base (gen_person_of_person p)
+            in
+            U_Invert_family gen_p (Adef.ifam_of_int ifam)
+          in
+          History.record conf base changed "if";
           print_inv_ok conf base p
         }
       with

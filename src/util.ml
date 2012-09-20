@@ -591,6 +591,14 @@ value pget (conf : config) base ip =
   else poi base ip
 ;
 
+value string_gen_person base p =
+  Futil.map_person_ps (fun p -> p) (sou base) p
+;
+
+value string_gen_family base fam =
+  Futil.map_family_ps (fun p -> p) (sou base) fam
+;
+
 value parent_has_title conf base p =
   match get_parents p with
   [ Some ifam ->

@@ -164,3 +164,32 @@ type warning 'person 'descend 'title =
 type misc 'person 'descend 'title = [ MissingSources ];
 
 type rn_mode = [ RnAll | Rn1Ln | RnDeg ];
+
+
+(* Historique des modifications *)
+
+type base_changed 'person 'string =
+  [ U_Add_person of gen_person 'person 'string
+  | U_Modify_person of gen_person 'person 'string and gen_person 'person 'string
+  | U_Delete_person of gen_person 'person 'string
+  | U_Merge_person of gen_person 'person 'string and gen_person 'person 'string
+      and gen_person 'person 'string
+  | U_Send_image of gen_person 'person 'string
+  | U_Delete_image of gen_person 'person 'string
+  | U_Add_family of gen_person 'person 'string and gen_family 'person 'string
+  | U_Modify_family of gen_person 'person 'string and 
+      gen_family 'person 'string and gen_family 'person 'string
+  | U_Delete_family of gen_person 'person 'string and gen_family 'person 'string
+  | U_Invert_family of gen_person 'person 'string and ifam
+  | U_Merge_family of gen_person 'person 'string and 
+      gen_family 'person 'string and gen_family 'person 'string and
+      gen_family 'person 'string
+  | U_Change_children_name of gen_person 'person 'string and 
+      list ((string * string * int * iper) * (string * string * int *iper))
+  | U_Add_parent of gen_person 'person 'string and gen_family 'person 'string
+  | U_Kill_ancestors of gen_person 'person 'string
+  | U_Multi_sources of gen_person 'person 'string
+  | U_Multi_places of gen_person 'person 'string
+  | U_Multi
+  | U_Notes of option int and string ]
+;

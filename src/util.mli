@@ -60,6 +60,12 @@ value is_restricted : config -> base -> iper -> bool;
 value is_hidden : person -> bool;
 
 value pget : config -> base -> iper -> person;
+value string_gen_person : 
+  base -> gen_person iper istr -> gen_person iper string
+;
+value string_gen_family : 
+  base -> gen_family iper istr -> gen_family iper string
+;
 
 type p_access = (base -> person -> string * base -> person -> string);
 value std_access : p_access;
