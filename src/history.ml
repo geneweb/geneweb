@@ -65,11 +65,10 @@ value diff_visibility conf base op np =
   let o_p = Gwdb.person_of_gen_person base (op, empty_ascend, empty_union) in
   let n_p = Gwdb.person_of_gen_person base (np, empty_ascend, empty_union) in
   let tmp_conf = {(conf) with wizard = False; friend = False} in
-  let visible =
-    Util.authorized_age tmp_conf base o_p <> 
-      Util.authorized_age tmp_conf base n_p 
-  in
-  if visible then [| "VISIBLE"; k; string_of_bool visible |]
+  let old_visibility = Util.authorized_age tmp_conf base o_p in
+  let new_visibility = Util.authorized_age tmp_conf base n_p in
+  if old_visibility <> new_visibility then 
+    [| "VISIBLE"; k; string_of_bool new_visibility |]
   else [| |]
 ;
 
