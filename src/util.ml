@@ -2067,6 +2067,19 @@ value print_alphab_list conf crit print_elem liste = do {
 };
 
 
+value relation_txt conf sex fam =
+  let is = index_of_sex sex in
+  match get_relation fam with
+  [ NotMarried | NoSexesCheckNotMarried ->
+      ftransl_nth conf "relationship%t to" is
+  | Married | NoSexesCheckMarried -> ftransl_nth conf "married%t to" is
+  | Engaged -> ftransl_nth conf "engaged%t to" is
+  | NoMention ->
+      let s = "%t " ^ transl conf "with" in
+      valid_format "%t" s ]
+;
+
+
 (* ************************************************************************** *)
 (*  [Fonc] child_of_parent : config -> base -> person -> unit                 *)
 (** [Description] : Traduction selon l'existence des parents :
@@ -2135,7 +2148,6 @@ value child_of_parent conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 value husband_wife conf base p =
-  let is = index_of_sex (get_sex p) in
   let rec loop i =
     if i < Array.length (get_family p) then
       let fam = foi base (get_family p).(i) in
@@ -2143,10 +2155,11 @@ value husband_wife conf base p =
       let conjoint = pget conf base conjoint in
       if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?" 
       then
-        translate_eval
-          (transl_a_of_b conf
-             (transl_nth conf "husband/wife" is)
-             (person_text conf base conjoint))
+        let relation = 
+          Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
+        in
+        translate_eval 
+          (transl_a_of_b conf relation (person_text conf base conjoint))
       else loop (i + 1)
     else ""
   in
@@ -2849,18 +2862,6 @@ value of_course_died conf p =
   match Adef.od_of_codate (get_birth p) with
   [ Some (Dgreg d _) -> conf.today.year - d.year > 120
   | _ -> False ]
-;
-
-value relation_txt conf sex fam =
-  let is = index_of_sex sex in
-  match get_relation fam with
-  [ NotMarried | NoSexesCheckNotMarried ->
-      ftransl_nth conf "relationship%t to" is
-  | Married | NoSexesCheckMarried -> ftransl_nth conf "married%t to" is
-  | Engaged -> ftransl_nth conf "engaged%t to" is
-  | NoMention ->
-      let s = "%t " ^ transl conf "with" in
-      valid_format "%t" s ]
 ;
 
 value escache_value base =
