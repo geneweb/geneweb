@@ -441,11 +441,11 @@ value close_siblings base error warning x np ifam des =
   [ (None, _) -> () 
   | (Some (elder, d1), Some d2) ->
       match (d1, d2) with
-      [ (Dgreg d1 _, Dgreg d2 _) when d1.year = d2.year ->
-          (* Est-ce que ce sont des jumeaux ? *)
-          if d1.month = d2.month && abs (d1.day - d2.day) > 10 then
-            warning (CloseChildren ifam des elder x)
-          else if abs (d1.month - d2.month) < 7 then
+      [ (Dgreg d1 _, Dgreg d2 _) ->
+          let d = time_elapsed d1 d2 in
+          (* On vérifie les jumeaux ou naissances proches. *)
+          if d.year = 0 && d.month = 0 && d.day < 10 then ()
+          else if d.year = 0 && d.month < 7 && d.day > 10 then
             warning (CloseChildren ifam des elder x)
           else ()
       | _ -> () ]
@@ -494,10 +494,6 @@ value child_born_after_his_parent base error warning x iparent =
       else
         let a = time_elapsed g1 g2 in
         if year_of a < 11 then warning (ParentTooYoung parent a) 
-        else if (get_sex parent = Female && year_of a > 55) || 
-                (get_sex parent = Male && year_of a > 70) 
-        then 
-          warning (ParentTooOld parent a) 
         else ()
   | _ -> () ]
 ;
