@@ -149,12 +149,14 @@ type warning 'person 'descend 'title =
   | IncoherentSex of 'person and int and int
   | ChangedOrderOfChildren of ifam and 'descend and array iper and array iper
   | ChildrenNotInOrder of ifam and 'descend and 'person and 'person
+  | CloseChildren of ifam and 'descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
   | IncoherentAncestorDate of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
+  | ParentTooOld of 'person and dmy
   | ParentTooYoung of 'person and dmy
   | TitleDatesError of 'person and 'title
   | UndefinedSex of 'person

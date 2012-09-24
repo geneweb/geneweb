@@ -291,6 +291,29 @@ value print_warning conf base =
           end;
         end;
       }
+  | CloseChildren ifam des elder x ->
+      let cpl = foi base ifam in
+      do {
+        Wserver.wprint
+          (fcapitale
+             (ftransl conf
+                "the following children of %t and %t are born very close"))
+          (fun _ ->
+             print_someone_strong conf base (poi base (get_father cpl)))
+          (fun _ ->
+             print_someone_strong conf base (poi base (get_mother cpl)));
+        Wserver.wprint ":\n";
+        tag "ul" begin
+          stag "li" begin
+            print_first_name_strong conf base elder;
+            Wserver.wprint "%s" (Date.short_dates_text conf base elder);
+          end;
+          stag "li" begin
+            print_first_name_strong conf base x;
+            Wserver.wprint "%s" (Date.short_dates_text conf base x);
+          end;
+        end;
+      }
   | DeadTooEarlyToBeFather father child ->
       Wserver.wprint
         (ftransl conf "\
@@ -339,6 +362,12 @@ value print_warning conf base =
       do {
         Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
           (transl conf "is a very young parent");
+        Wserver.wprint "(%s)" (Date.string_of_age conf a);
+      }
+  | ParentTooOld p a ->
+      do {
+        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
+          (transl conf "is a very old parent");
         Wserver.wprint "(%s)" (Date.string_of_age conf a);
       }
   | TitleDatesError p t ->

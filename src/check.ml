@@ -47,6 +47,15 @@ value print_base_warning oc base =
       fprintf oc "- %s\n" (designation base elder);
       fprintf oc "- %s\n" (designation base x)
     }
+  | CloseChildren ifam des elder x -> do {
+      let cpl = foi base ifam in
+      fprintf oc
+        "The following children of\n  %s\nand\n  %s\nare born very close:\n"
+        (designation base (poi base (get_father cpl)))
+        (designation base (poi base (get_mother cpl)));
+      fprintf oc "- %s\n" (designation base elder);
+      fprintf oc "- %s\n" (designation base x)
+    }
   | DeadTooEarlyToBeFather father child -> do {
       fprintf oc "%s\n" (designation base child);
       fprintf oc
@@ -84,6 +93,9 @@ value print_base_warning oc base =
   | ParentBornAfterChild parent child ->
       fprintf oc "%s born after his/her child %s\n"
         (designation base parent) (designation base child)
+  | ParentTooOld p a ->
+      fprintf oc "%s was parent at age of %d\n" (designation base p)
+        a.year
   | ParentTooYoung p a ->
       fprintf oc "%s was parent at age of %d\n" (designation base p)
         a.year

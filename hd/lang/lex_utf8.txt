@@ -5676,6 +5676,10 @@ sk: je
 sl: je
 sv: är
 
+    is a very old parent
+en: is a very old parent
+fr: est vraiment un parent très âgé
+
     is a very young parent
 af: is 'n baie jong ouer
 bg: твърде млад родител
@@ -10041,6 +10045,9 @@ ru: файл временно заблокирован: пожалуйста п�
 sk: súbor je uzamknutý, skúste znova.
 sl: ta datoteka je začasno zaklenjena: prosimo poskusite znova. Če še vedno ne deluje, prosimo počakajte trenutek
 sv: filen är temporärt låst: försök igen. Om det ändå inte fungerar, vänta ett tag innan nästa försök
+
+    the following children of %t and %t are born very close
+fr: les enfants suivants de %t et de %t sont nés très rapprochés
 
     the following children of %t and %t are not in order
 af: die volgende kinders van %t and %t is nie in die regte volgorde nie
