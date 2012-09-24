@@ -1,10 +1,23 @@
 GeneWeb version 6.06
 --------------------
 
+* Add two new warnings : ParentTooOld and CloseSiblings. Activated the
+  warning YoungForMarriage.
+* Change totally the way to notify and record the changes of a base. There is
+  now only one variable in your gwf file (notify_change) so you should update
+  your script if you were using notify_delete and notify_key. You should then
+  test in your script notify_change the kind of action : "dp" -> delete person
+  (see upthist.txt for the complete list of action) ...
+  The order of the argument are : base wizard action [variable arguments]
+  In the variable arguments, you may have :
+    - KEY old_key new_key
+    - VISIBLE key boolean
+  This modification should allow in a close future to be able to see what was 
+  exactly modify in a person/family (eg: birth place, marriage date ...).
 * Add a "book of sources" just like the "book of places". The two 
-  functions uses the same variable in the gwf file : max_nb_updates. This 
-  variable allows to set up the maximum number of updates that can be done at 
-  a single time.
+  functions uses the same variable in the gwf file : max_nb_updates (you should
+  then update your gwf files). This variable allows to set up the maximum 
+  number of updates that can be done at a single time.
 * Add a field in the advanced request to search in the marriage informations.
   This is just a small evolution, it is not meant to add other searching 
   fields again and again.
@@ -25,8 +38,7 @@ GeneWeb version 6.06
 * Add the evaluation functions of a date (year, month, day, prec) in the
   template (interpreted by perso.ml).
 * Display the history of updates in a table.
-* Code refactoring.
-* Various fixes.
+* Other small things...
 
 
 GeneWeb version 6.05
