@@ -253,15 +253,19 @@ value related_sex_is_coherent base warning p_ref =
   | None -> try_to_fix_relation_sex base warning p_ref ]
 ;
 
+value year_of d = d.year;
+
 value check_normal_marriage_date_for_someone base error warning fam ip =
   let p = poi base ip in
   match Adef.od_of_codate (get_marriage fam) with
-  [ Some d2 ->
+  [ Some (Dgreg g2 _ as d2) ->
       do {
         match Adef.od_of_codate (get_birth p) with
-        [ Some d1 ->
+        [ Some (Dgreg g1 _ as d1) ->
             if strictly_before d2 d1 then
               warning (MarriageDateBeforeBirth p)
+            else if year_of g2 > 1850 && year_of (time_elapsed g1 g2) < 13 then
+               warning (YoungForMarriage p (time_elapsed g1 g2))
             else ()
         | _ -> () ];
         match get_death p with
@@ -271,7 +275,7 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
             else ()
         | _ -> () ];
       }
-  | None -> () ]
+  | _ -> () ]
 ;
 
 
@@ -432,6 +436,22 @@ value sort_children2 base warning ifam des =
     } ]
 ;
 
+value close_siblings base error warning x np ifam des =
+  match (np, Adef.od_of_codate (get_birth x)) with
+  [ (None, _) -> () 
+  | (Some (elder, d1), Some d2) ->
+      match (d1, d2) with
+      [ (Dgreg d1 _, Dgreg d2 _) when d1.year = d2.year ->
+          (* Est-ce que ce sont des jumeaux ? *)
+          if d1.month = d2.month && abs (d1.day - d2.day) > 10 then
+            warning (CloseChildren ifam des elder x)
+          else if abs (d1.month - d2.month) < 7 then
+            warning (CloseChildren ifam des elder x)
+          else ()
+      | _ -> () ]
+  | _ -> () ]
+;
+
 value born_after_his_elder_sibling base error warning x np ifam des =
   match (np, Adef.od_of_codate (get_birth x), get_death x) with
   [ (None, _, _) -> ()
@@ -453,8 +473,6 @@ value date_of_death =
   | _ -> None ]
 ;
 
-value year_of d = d.year;
-
 value child_born_after_his_parent base error warning x iparent =
   let parent = poi base iparent in
   match
@@ -465,12 +483,22 @@ value child_born_after_his_parent base error warning x iparent =
       if strictly_after d1 d2 then warning (ParentBornAfterChild parent x)
       else
         let a = time_elapsed g1 g2 in
-        if year_of a < 11 then warning (ParentTooYoung parent a) else ()
+        if year_of a < 11 then warning (ParentTooYoung parent a) 
+        else if (get_sex parent = Female && year_of a > 55) || 
+                (get_sex parent = Male && year_of a > 70) 
+        then 
+          warning (ParentTooOld parent a) 
+        else ()
   | (Some (Dgreg g1 _ as d1), _, Some (Dgreg g2 _ as d2)) ->
       if strictly_after d1 d2 then warning (ParentBornAfterChild parent x)
       else
         let a = time_elapsed g1 g2 in
-        if year_of a < 11 then warning (ParentTooYoung parent a) else ()
+        if year_of a < 11 then warning (ParentTooYoung parent a) 
+        else if (get_sex parent = Female && year_of a > 55) || 
+                (get_sex parent = Male && year_of a > 70) 
+        then 
+          warning (ParentTooOld parent a) 
+        else ()
   | _ -> () ]
 ;
 
@@ -570,6 +598,7 @@ value check_children base error warning (ifam, fam) =
            birth_before_death base warning child;
            born_after_his_elder_sibling base error warning child np ifam
              des;
+           close_siblings base error warning child np ifam des;
            child_born_after_his_parent base error warning child
              (get_father cpl);
            child_born_after_his_parent base error warning child

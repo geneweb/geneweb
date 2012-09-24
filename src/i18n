@@ -224,6 +224,7 @@ invert
 invert the order of the following families
 in (year)
 is
+is a very old parent
 is a very young parent
 is born after his/her child
 it is the same person!
@@ -420,6 +421,7 @@ the %d who lived the longest
 the father-in-law/the mother-in-law
 the father/the mother/a parent
 the file is temporarily locked: please try again
+the following children of %t and %t are born very close
 the following children of %t and %t are not in order
 the grandchildren
 the grandparents
