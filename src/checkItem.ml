@@ -445,7 +445,7 @@ value close_siblings base error warning x np ifam des =
           let d = time_elapsed d1 d2 in
           (* On vérifie les jumeaux ou naissances proches. *)
           if d.year = 0 && d.month = 0 && d.day < 10 then ()
-          else if d.year = 0 && d.month < 7 && d.day > 10 then
+          else if d.year = 0 && d.month < 7 then
             warning (CloseChildren ifam des elder x)
           else ()
       | _ -> () ]
