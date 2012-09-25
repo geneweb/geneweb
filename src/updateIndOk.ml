@@ -800,6 +800,7 @@ value print_del conf base =
       let sn = sou base (get_surname p) in
       let occ = get_occ p in
       let old_related = get_related p in
+      let op = Util.string_gen_person base (gen_person_of_person p) in
       update_relations_of_related base ip old_related;
       let warning _ = () in
       let p = effective_del conf base warning p in
@@ -807,7 +808,7 @@ value print_del conf base =
       delete_key base fn sn occ;
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
       Util.commit_patches conf base;
-      let changed = U_Delete_person (Util.string_gen_person base p) in
+      let changed = U_Delete_person op in
       History.record conf base changed "dp";
       print_del_ok conf base [];
     }
