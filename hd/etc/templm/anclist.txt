@@ -1,13 +1,9 @@
-%let;evar_v;%if;(evar.v > 0)%expr(evar.v-1)%end;%in;
-%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
-%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
-%let;ref_index;%index;%in;
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120810 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120927 templ=templm -->
   <title>%nn;
     %if;(evar.t = "E" and evar.opt = "csv")
       CSV
@@ -37,47 +33,12 @@
   %include.css;
   %base_header;
 </head>
-<body%body_prop; id="anclist">
-%message_to_wizard;
-
-<h1>%nn;
-  %if;(evar.t = "E" and evar.opt = "")
-    !?! [select] [*family/families]0 ([maximum] 4 [generation/generations]1) [or] [*long display] (csv)
-  %elseif;(evar.t = "E" and evar.opt = "csv")
-  %elseif;(evar.t = "E" and evar.opt = "fam")
-    %apply;a_of_b%with;
-      %sp;[*family/families]0
-    %and;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") %qualifier;%end;
-      %sp;%surname;
-      %sp;%dates;
-    %end;
-  %elseif;(evar.t = "F")
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end;
-    %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
-    - [*surnames list] -
-  %else;
-    %apply;a_of_b%with;[*ancestors]%and;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") <em>%qualifier;</em>%end;
-      %sp;%surname;
-      %if;(alias != "") <em>(%alias;)</em>%end;
-    %end;
-    %if;(evar.t = "D") [up to] %pvar.1;%end;
-  %end;
-</h1>
-
-%if;(not cancel_links and evar.opt != "csv")
-  <div class="menu2">
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
-    %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
+%(<!-- Begin define --> %)
+%let;evar_v;%if;(evar.v > 0)%expr(evar.v-1)%end;%in;
+%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;ref_index;%index;%in;
+%let;ref_sex;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
 
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
@@ -238,6 +199,17 @@
 %end;
 
 %define;ld_somebody1(bbb,ddd,xx,yy,lexa,lexb,sss,ttt)
+  %let;relationship;
+    %if;("lexb" != "")
+      %apply;a_of_b%with;
+        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+      %and;
+        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
+      %end;
+    %else;
+      %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+    %end;
+  %in;
   %apply;add_in_sorted_list%with;
     %if;(xx.yy_date.year != "")
       %xx.yy_date.year;%nn;
@@ -253,7 +225,7 @@
       -%expr(bbb - xx.yy_date.year)%nn;
     %end;
   %and;
-    %if;("yy" = "birth")1%else;3%end; %(sorted : birth = 1 marriage = 2 death = 3%)
+    %if;("yy" = "birth")1%else;3%end;%(sorted : birth = 1 marriage = 2 death = 3%)%nn;
   %and;
     %xx.on_yy_date;
   %and;
@@ -264,23 +236,23 @@
     %if;(cancel_links or xx.is_restricted)
       %xx;%nn;
     %else;
-      <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=on;bd=;color=;i=%ref_index;">%xx;</a>%nn;
+      %if;(browsing_with_sosa_ref)
+        <a href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;%nn;
+          i1=%sosa_ref.index;;%nn;
+          i2=%xx.index;;t2=%relationship;;%nn;
+          i3=%ref_index;;t3=%ref_sex;;%nn;
+          i4=%sosa_ref.index;;t4=sosa_1">%xx;</a>%nn;
+      %else;
+        <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=%evar.image;;i=%ref_index;">%xx;</a>%nn;
+      %end;
     %end;
   %and;
-    %if;("lexb" != "")
-      %apply;a_of_b%with;
-        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
-      %and;
-        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
-      %end;
-    %else;
-      %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
-    %end;
+    %relationship;
     %if;("yy" = "death" and xx.computable_death_age)
-      <span class="nobr xsmall">%sp;%death_symbol;%xx.death_age;</span>
+      <span class="nobr xs">%sp;%death_symbol;%xx.death_age;</span>
     %end;
     %if;("yy" = "birth" and xx.computable_age)
-      <span class="nobr xsmall">%sp;%birth_symbol;%xx.age;</span>
+      <span class="nobr xs">%sp;%birth_symbol;%xx.age;</span>
     %end;
   %and;
     %xx.occupation;
@@ -308,6 +280,17 @@
 %end;
 
 %define;ld_marriage(bbb,ddd,xx,lexa,lexb,sss)
+  %let;relationship;
+    %if;("lexb" != "")
+      %apply;a_of_b%with;
+        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+      %and;
+        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
+      %end;
+    %else;
+      %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
+    %end;
+  %in;
   %apply;add_in_sorted_list%with;
     %if;(marriage_date.year != "")
       %marriage_date.year;%nn;
@@ -323,7 +306,7 @@
       -%expr(bbb - marriage_date.year)%nn;
     %end;
   %and;
-    2 %(sorted : birth = 1 marriage = 2 death = 3%)
+    2%nn;%(sorted : birth = 1 marriage = 2 death = 3%)
   %and;
     %on_marriage_date;
   %and;
@@ -334,18 +317,19 @@
     %if;(cancel_links or xx.is_restricted)
       %xx;<br%/> &amp; %spouse;%nn;
     %else;
-      <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=on;bd=;color=;i=%ref_index;">%xx;</a> &amp; %spouse;%nn;
+      %if;(browsing_with_sosa_ref)
+        <a href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;%nn;
+          i1=%sosa_ref.index;;%nn;
+          i2=%xx.index;;t2=%relationship;;%nn;
+          i3=%ref_index;;t3=%ref_sex;;%nn;
+          i4=%sosa_ref.index;;t4=sosa_1">%xx;</a>%nn;
+      %else;
+        <a href="%prefix;em=R;ei=%xx.index;;spouse=on;et=S;image=%evar.image;;i=%ref_index;">%xx;</a>
+      %end;
+       &amp; %spouse;%nn;
     %end;
   %and;
-    %if;("lexb" != "")
-      %apply;a_of_b%with;
-        %if(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
-      %and;
-        %if(sss = 0)[lexb]0%elseif;(sss = 1)[lexb]1%else;[lexb]2%end;
-      %end;
-    %else;
-      %if;(xx.is_male)[lexa]0%elseif;(xx.is_female)[lexa]1%else;[lexa]2%end;
-    %end;
+    %relationship;
   %and;
     %xx.occupation;%nn;
   %and;
@@ -541,7 +525,48 @@
     %end;
   %end;
 %end;
+%(<!-- End define --> %)
 
+<body%body_prop; id="anclist">
+%message_to_wizard;
+
+<h1>%nn;
+  %if;(evar.t = "E" and evar.opt = "")
+    !?! [select] [*family/families]0 ([maximum] 4 [generation/generations]1) [or] [*long display] (csv)
+  %elseif;(evar.t = "E" and evar.opt = "csv")
+  %elseif;(evar.t = "E" and evar.opt = "fam")
+    %apply;a_of_b%with;
+      %sp;[*family/families]0
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+      %sp;%dates;
+    %end;
+  %elseif;(evar.t = "F")
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
+    - [*surnames list] -
+  %else;
+    %apply;a_of_b%with;[*ancestors]%and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+      %if;(alias != "") <em>(%alias;)</em>%end;
+    %end;
+    %if;(evar.t = "D") [up to] %pvar.1;%end;
+  %end;
+</h1>
+%if;(not cancel_links and evar.opt != "csv")
+  <div class="menu2">
+    %if;has_referer;
+      <a href="%referer;" title="[back]">&lt;&lt;</a>
+    %end;
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
+%end;
 %if;(evar.t = "E" and evar.opt = "fam")
   %(family life dates %)
   %if;(is_dead and death_date.year > 0)
@@ -550,6 +575,15 @@
     %apply;ld(birth_date.year,9999)
   %end;
   <table summary="family life dates" class="ld_table">
+    <colgroup>
+    <col width="35"%/>
+    <col width="10"%/>
+    <col width="300"%/>
+    <col width="30"%/>
+    <col width="300"%/>
+    <col width="300"%/>
+    <col width="300"%/>
+  </colgroup>
   <tr>
     <th>[years old]</th>
     <th>[date]</th>
@@ -572,7 +606,7 @@
           <td><div class="%item.14;">%item.8;</div></td>
           <td>%item.9;</td>
         </tr>
-        %if;(item.6 = birth_symbol)
+        %if;(item.3 = 1)
           %incr_count;
         %end;
       %end;
@@ -679,7 +713,6 @@
   %end;
   </ul>
 %end;
-
 %if;(evar.opt != "csv")
   %base_trailer;
   %copyright;

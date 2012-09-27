@@ -1,0 +1,100 @@
+%( <!-- Begin inc_mickroue1 20120926 --> %)
+%( <!-- relations - photos --> %)
+  %if;(has_relations)
+    %apply;lazy_print%with;
+      <div class = "relations">
+      <h3>[*relation/relations]1</h3>
+      <ul class="list_no_style">
+    %end;
+    %foreach;relation;
+      %if;(relation_type != [foster father/foster mother/foster parents]0
+      and relation_type != [foster father/foster mother/foster parents]1
+      and relation_type != [foster father/foster mother/foster parents]2)
+        %lazy_force;
+        <li class="sheet"><em>%apply;relation_computing()</em>
+          <ul class="list_no_style">
+            %if;has_relation_him;
+              <li class="border_family_1 border_sex_0">%apply;somebody("relation_him")</li>
+            %end;
+            %if;has_relation_her;
+              <li class="border_family_1 border_sex_1">%apply;somebody("relation_her")</li>
+            %end;
+          </ul>
+        </li>
+      %end;
+    %end;
+    %foreach;related;
+      %if;(related_type != [foster son/foster daughter/foster child]0
+      and related_type != [foster son/foster daughter/foster child]1
+      and related_type != [foster son/foster daughter/foster child]2)
+        %lazy_force;
+        <li class="sheet"><em>%apply;related_computing()</em>
+          <ul class="list_no_style">
+            <li class="border_family_1 border_sex_%related.sex;">%apply;somebody("related")</li>
+          </ul>
+        </li>
+      %end;
+    %end;
+    %reset_count;
+    %foreach;witness_relation;
+      %if;(count = 0)
+        <li class="sheet"><em>%apply;witness_computing()</em>
+        <table class="t_witness" summary="[witness at marriage of %s and %s:::x:y]">
+      %end;
+      <tr>
+        <td>%apply;somebody("witness_relation.father")</td>
+        <td>%apply;link_marriage("witness_relation.father")</td>
+        <td>%apply;somebody("witness_relation.mother")</td>
+      </tr>
+      %incr_count;
+    %end;
+    %if;(count > 0)
+      </table>
+      %if;(count > 5)
+        <em>[*total] : %count;</em>
+      %end;
+      </li>
+    %end;
+    %if;lazy_printed;</ul></div>%end;
+  %end;
+  %apply;lazy_print%with;
+    <div class = "relations">
+    <h3>Photos</h3>
+    <ul class="list_no_style">
+  %end;
+  %foreach;relation;
+    %if;(relation_type = [foster father/foster mother/foster parents]0
+      or relation_type = [foster father/foster mother/foster parents]1
+      or relation_type = [foster father/foster mother/foster parents]2)
+      %lazy_force;
+      %if;(has_relation_him)
+        <li class="image_sheet">
+          %apply;link_image("relation_him")
+          %apply;somebody("relation_him")
+        </li>
+      %end;
+      %if;(has_relation_her)
+        <li class = "image_sheet">
+          %apply;link_image("relation_her")
+          %apply;somebody("relation_her")
+        </li>
+      %end;
+    %end;
+  %end;
+  %foreach;related;
+    %if;(related_type = [foster son/foster daughter/foster child]0
+      or related_type = [foster son/foster daughter/foster child]1
+      or related_type = [foster son/foster daughter/foster child]2)
+      %lazy_force;
+      <li class="image_sheet">
+        %apply;link_image("related")
+        %if;(cancel_links or xx.is_restricted)
+          %related.public_name; %related.qualifier;
+        %else;
+          <a href="%prefix;%related.access;;wide=%evar.wide;;maxlev=%evar.maxlev;;image=%evar.image;;spouse=%evar.spouse;">%related.public_name; %related.qualifier;</a>&nbsp;
+        %end;
+      </li>
+    %end;
+  %end;
+  %if;lazy_printed;</ul></div>%end;
+%( <!-- End inc_mickroue1 --> %)

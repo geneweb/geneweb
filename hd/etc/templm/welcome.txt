@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120713 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120918 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -12,6 +12,33 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   %base_header;
+  <script type="text/javascript">
+  <!--
+    function changeTri(xx) {
+       var labelTriA = document.getElementById('labelTriA')
+       var triA = document.getElementById('triA')
+       var mNG = document.getElementById('mNG')
+       var tP = document.getElementById('tP')
+       var tN = document.getElementById('tN')
+       var n = document.getElementById('n')
+       
+       triA.style.visibility=xx;
+       labelTriA.style.visibility=xx;
+       if(xx == 'visible' && triA.checked == true)
+      {
+        if(tP.checked == true) mNG.value='P';
+        if(tN.checked == true) mNG.value='N';
+        n.name='k';
+      }
+       if(xx == 'hidden' || triA.checked == false)
+      {
+       mNG.value='NG';
+       n.name='n';
+      }
+    }
+
+  -->
+  </script>
 </head>
 
 %define;sosa_rel(xx)
@@ -42,7 +69,8 @@
   %end;
 %end;
 
-<body%body_prop; id="welcome">
+<body%body_prop; id="welcome" onload="javascript:document.getElementById('n').focus();">
+
 <div id="welcome_content-top">
   <div id="welcome_logo">
     <img src="%image_prefix;/gwlogo.png" alt="GeneWeb"%/>
@@ -185,16 +213,34 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 <div id="welcome_content-right">
   <div>
     <h2>[*search/case sensitive]0</h2>
+    <ul style="clear: both;">
+      <li>[first name/first names]1 :
+        <a href="%prefix;m=P;tri=A">ABC</a>
+        <a href="%prefix;m=P;tri=F">987</a>
+      </li>
+      <li>[surname/surnames]1 :
+        <a href="%prefix;m=N;tri=A">ABC</a>
+        <a href="%prefix;m=N;tri=F">987</a>
+      </li>
+       %if;(bvar.hide_advanced_request = "no")
+        <li><a href="%prefix;m=H;v=advanced">[advanced request]</a></li>
+      %end;
+    </ul>
     <form id="welcome_form-person" method="get" action="%action;">
       <fieldset>
         %hidden;
-        <input type="hidden" name="m" value="NG"%/>
-        <label>[person/persons]0<br%/><input name="n" size="30" maxlength="200"%/></label>
-        <select name="t">
-          <option value="PN" selected="selected">[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa…</option>       
-          <option value="P">[first name/first names]0</option>
-          <option value="N">[surname/surnames]0</option>
-        </select>
+        <input id="mNG" type="hidden" name="m" value="NG"%/>
+        <label><input id="tPN" type="radio" name="t" value="PN" checked="checked"
+                      onclick="changeTri('hidden')"
+                %/><abbr title="[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa…">[person/persons]0</abbr></label>
+        <label><input id="tP" type="radio" name="t" value="P" 
+                      onclick="changeTri('visible')"%/>[first name/first names]0</label>
+        <label><input id="tN" type="radio" name="t" value="N" 
+                      onclick="changeTri('visible')"%/>[surname/surnames]0</label>
+        <label id="labelTriA" style="visibility:hidden;">
+               <input id="triA" type="checkbox" name="tri" value="A"
+                      onclick="changeTri('visible')"%/>[starting with]</label>
+        <br%/><input id="n" name="n" size="54" maxlength="200"%/>
         <input type="submit" value="Ok"%/>
       </fieldset>
     </form>
@@ -220,52 +266,6 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
         </fieldset>
       </form>
     %end;
-    <form id="welcome_form-list" method="get" action="%action;">
-      <fieldset>
-        <legend>[list/list (ancestors)]</legend>
-        %hidden;
-        %if;(bvar.hide_advanced_request = "no")
-          <a href="%prefix;m=H;v=advanced"> - [advanced request]</a><br%/>
-        %end;
-        <select name="m">
-          <option value="N" selected="selected">[surname/surnames]1</option>
-          <option value="P">[first name/first names]1</option>
-        </select><br%/>
-        <select name="tri">
-          <option value="A" selected="selected">[alphabetic order]</option>
-          <option value="F">[
-af: frekwensie
-bg: честота на срещане
-br: stankted
-ca: freqüència
-cs: četnosti
-da: hyppighed
-de: nach Häufigkeit
-en: frequency
-eo: ofteco
-es: frecuencia
-et: sageduse
-fi: määräjärjestykseen
-fr: fréquence
-fr-cr: ça ki ka ruvini empile
-he:  השכיחות
-is: tíðni
-it: di frequenza
-lv: pēc sastopamības
-nl: aantal
-no: etter frekvens
-pl: według częstości występowania
-pt: frequência
-ro: dupa frecventa
-ru: по частоте
-sl: pogostosti
-sv: frekvensordning
-zh: 访问次数
-]</option>
-        </select><br%/>
-        <input type="submit" value="Ok"%/>
-      </fieldset>
-    </form>
     %if;(bvar.propose_place_surnames != "no")%nl;
       <form id="welcome_form-place" method="get" action="%prefix;">
         <fieldset>
@@ -273,10 +273,10 @@ zh: 访问次数
           <legend>[place] / [surname/surnames]0</legend> 
           <input type="hidden" name="m" value="PS"%/>
           <label><input type="checkbox" name="bi" value="on" checked="checked"%/>[birth]</label>
-          <label><input type="checkbox" name="bp" value="on"%/>[baptism]</label><br%/> 
+          <label><input type="checkbox" name="bp" value="on"%/>[baptism]</label>
           <label><input type="checkbox" name="de" value="on"%/>[death]</label>
-          <label><input type="checkbox" name="bu" value="on"%/>[burial]</label><br%/>
-          <label><input type="checkbox" name="ma" value="on"%/>[marriage/marriages]0</label><br%/>
+          <label><input type="checkbox" name="bu" value="on"%/>[burial]</label>
+          <label><input type="checkbox" name="ma" value="on"%/>[marriage/marriages]0</label>
           <input type="submit" value="Ok"%/>
         </fieldset>
       </form>

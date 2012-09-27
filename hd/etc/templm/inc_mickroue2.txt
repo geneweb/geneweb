@@ -1,0 +1,50 @@
+%( <!-- Begin inc_mickroue2 20120926 --> %)
+%( <!-- display linked pages : Images --> %)
+<div class = "notes">
+  %empty_sorted_list;
+  %reset_count;
+  <ul class="list_no_style">
+    %if;(bvar.var_n_BIRTH > 0)
+      %if;(has_birth_date)
+        %apply;display_images("BIRTH","A","birth",0,bvar.var_n_BIRTH)
+      %elseif;(has_baptism_date)
+        %apply;display_images("BIRTH","A","baptism",0,bvar.var_n_BIRTH)
+      %end;
+    %end;
+    %if;(bvar.var_n_MARRIAGE > 0)
+      %if;(has_families)
+        %foreach;family
+          %if;(on_marriage_date != "")
+            %apply;display_images("MARRIAGE","A","marriage",0,bvar.var_n_MARRIAGE)
+          %end;
+        %end;
+      %end;
+    %end;
+    %if;(bvar.var_n_DEATH > 0)
+      %if;(has_death_date)
+        %apply;display_images("DEATH","A","death",0,bvar.var_n_DEATH)
+      %elseif;(has_burial_date)
+        %apply;display_images("DEATH","A","burial",0,bvar.var_n_DEATH)
+      %elseif;(has_cremation_date)
+        %apply;display_images("DEATH","A","cremated",0,bvar.var_n_DEATH)
+      %end;
+    %end;
+    %if;(bvar.var_n_OTHER > 0)
+      %apply;display_images("OTHER","A","other",0,bvar.var_n_OTHER)
+    %end;
+  </ul>
+  %if;(wizard and not cancel_links)
+    <div id="l_images" class="menu" style="margin-left: 2em; clear: both; position: relative;">
+      %foreach;sorted_list_item;
+        %if;(item.2 != "")
+          <span><a href="#l_images" title="[add] [linked pages]">%item.2;</a>
+          <span class="s_menu">
+        %end;
+        %item.3;
+        %if;(next_item.2 != "")</span></span>%end;
+      %end;
+      </span></span>
+    </div>
+  %end;
+</div>
+%( <!-- End inc_mickroue2 --> %)

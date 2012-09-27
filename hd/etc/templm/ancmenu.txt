@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120807 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120926 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -146,10 +146,15 @@
   <fieldset>
     <legend>
       <label>
-        <input type="radio" id="tG" name="t" value="G" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        <input type="radio" id="tG" name="t" value="G" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
         [*long display]
       </label>
     </legend>
+    <label>
+      <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+       [*siblings]
+    </label>
+    <br%/>
     <label>
       <input type="checkbox" name="sd" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*date] : 
@@ -165,11 +170,6 @@
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="siblings" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
-       [*siblings]
-    </label>
-    <br%/>
-    <label>
     <input type="checkbox" name="spouse" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
     [*include spouses]
     </label>
@@ -180,18 +180,8 @@
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="rel" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      <input type="checkbox" name="rel" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*relation/relations]1
-    </label>
-    <br%/>
-    <label>
-      <input type="checkbox" name="witn" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
-      [*witness/witnesses]1 ([marriage/marriages]1)
-    </label>
-    <br%/>
-    <label>
-      <input type="checkbox" name="comm" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
-      [*comment] ([marriage/marriages]1)
     </label>
     <br%/>
     <label>
@@ -202,6 +192,11 @@
     <label>
       <input type="checkbox" name="src" value="on" checked="checked" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*source/sources]1
+    </label>
+    <br%/>
+    <label>
+      <input type="checkbox" name="inline" value="on"%/>
+      [*display notes/sources inline]
     </label>
   </fieldset>
   <fieldset>

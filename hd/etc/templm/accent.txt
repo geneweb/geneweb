@@ -1,5 +1,5 @@
 <!-- $Id: accent.txt,v 5.6 2007-04-04 02:17:36 ddr Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 20120712 templ=templm -->
+<!-- Modified mickroue(a)yahoo.fr 20120906 templ=templm -->
 <!-- To work : copy this file to bases/etc/ -->
 
 <script type="text/javascript"><!--
@@ -29,7 +29,8 @@ function write_ch(v) {
 %if;(evar.file != "")
   <ul>
     <li>[*link] : <a onclick="return write_ch('\n%evar.text;')" href="#">%evar.text;</a></li>
-    <li>%evar.file;</li>
+    <li><label><input onclick="javascript: this.select();" type="text" name="evar_file" size="80"
+               value="%evar.file;"%/></label></li>
   </ul>
   <em>([*image/images]0 : ../src/%evar.base;/images/%evar.file;.%bvar.var_img_ext;)</em>
 %end;
