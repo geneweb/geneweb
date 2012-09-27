@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120807 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120926 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -152,6 +152,11 @@
       </label>
       <br%/>
       <label>
+        <input type="checkbox" name="alwsurn" value="yes" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
+        [*with::surname/surnames]1
+      </label>
+      <br%/>
+      <label>
         <input type="checkbox" name="sd" value="on" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
         [*date] : 
         %if;([ !dates order]0 = "ddmmyyyy")[year/month/day]2/[year/month/day]1/[year/month/day]0
@@ -161,19 +166,9 @@
       </label>
       <br%/>
       <label>
-        <input type="checkbox" name="alwsurn" value="yes" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [*with::surname/surnames]1
-      </label>
-      <br%/>
-      <label>
         <input type="checkbox" name="alias" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
           [*surname alias], [*first name alias]
         </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="rel" value="on" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [*relation/relations]1
-      </label>
       <br%/>
         <label>
         <input type="checkbox" name="spouse" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
@@ -186,13 +181,8 @@
       </label>
       <br%/>
       <label>
-        <input type="checkbox" name="witn" value="on" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [*witness/witnesses]1 ([marriage/marriages]1)
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="comm" value="on" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [*comment] ([marriage/marriages]1)
+        <input type="checkbox" name="rel" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
+        [*relation/relations]1
       </label>
       <br%/>
       <label>
@@ -203,6 +193,11 @@
       <label>
         <input type="checkbox" name="src" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
         [*source/sources]1
+      </label>
+      <br%/>
+      <label>
+        <input type="checkbox" name="inline" value="on"%/>
+        [*display notes/sources inline]
       </label>
     </fieldset>
     <fieldset>

@@ -1,13 +1,10 @@
-%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
-%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
-
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120809 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120927 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -27,6 +24,9 @@
 </head>
 
 %( <!-- Begin define (used in ancsosa.txt, deslist.txt)--> %)
+%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+
 %define;married_to(is_male, date_place)
   %if;("is_male" = 1)
     %if;are_married;[married%t to:::date_place]0%nn;
@@ -43,15 +43,17 @@
     %elseif;is_no_mention;date_place [with]%nn;
     %end;
   %end;
-  …
-  %if;are_divorced;[divorced]%divorce_date;…%nn;
-  %elseif;are_separated;[separated]…%nn;
+  %if;are_divorced;… [divorced]%divorce_date;%nn;
+  %elseif;are_separated;… [separated]%nn;
   %end;
 %end;
 
 %define;married(xx)
   %if;(evar.sd = "on")
-    %apply;link_marriage("xx")
+    %apply;link_marriage("xx")%nn;
+    %if;are_divorced;… [divorced]%divorce_date;%nn;
+    %elseif;are_separated;… [separated]%nn;
+    %end;
   %else;
     %apply;married_to%with
       %xx.is_male;
@@ -62,10 +64,10 @@
   %end;
 %end;
 
-%define;link_mod_fam()
-  %if;(not cancel_links and wizard)
-    <a onclick="window.open(this.href); return false;" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;ins_ch=2" title="[*modify::family/families]0">
-    &amp;%marriage_date.year;&nbsp;</a>
+%define;link1(xx,yy,fff)
+  %if;(cancel_links or xx.is_restricted)%yy;
+  %else;
+    <a id="ifff" href="%prefix;%xx.access;">%yy;</a>%nn;
   %end;
 %end;
 
@@ -77,34 +79,52 @@
 %end;
 
 %define;somebody_long_info(xx)
-  %if;xx.has_aliases;
-    %foreach;xx.alias;, <em><strong>%alias;</strong></em>%end;
-  %end;
-  %if;(("xx" = "ancestor" or xx.sosa_in_list = "") and xx.has_nobility_titles)
-    <em>%nn;
-    %foreach;xx.nobility_title;, %nobility_title;%end;
-    </em>%nn;
-  %end;
-  %if;(xx.has_linked_pages and xx.has_linked_page.HEAD), %xx.linked_page.HEAD;%end;
-  %if;(xx.has_public_name or xx.has_qualifiers)
-    , <em>(%xx.first_name; %xx.surname;)</em>%nn;
-  %end;
-  %if;(evar.alias="on")
-    <small>%nn;
-    %if;xx.has_surnames_aliases;
-      %foreach;xx.surname_alias;
-        , <em>(%surname_alias;)</em>%nn;
+  %if;xx.has_qualifiers;
+    %apply;lazy_print(", ")
+    %foreach;xx.qualifier;
+      %if;not is_first;
+        %if;(lazy_printed)/%end;
+        %lazy_force;
+        %qualifier;%nn;
       %end;
     %end;
+  %end;
+  %if;xx.has_aliases;
+    %apply;lazy_print(", ")
+    %foreach;xx.alias;
+      %if;(lazy_printed)/%end;
+      %lazy_force;
+      <em><strong>%alias;</strong></em>%nn;
+    %end;
+  %end;
+  %if;(("xx" = "ancestor" or xx.sosa_in_list = "") and xx.has_nobility_titles)
+    <em>%foreach;xx.nobility_title;, %nobility_title;%end;</em>%nn;
+  %end;
+  %if;(xx.has_linked_pages and xx.has_linked_page.HEAD), %xx.linked_page.HEAD;%end;
+  %if;(xx.has_public_name or xx.has_qualifiers), <em>(%xx.first_name; %xx.surname;)</em>%end;
+  %if;(evar.alias="on")
+    <small>%nn;
     %if;xx.has_first_names_aliases;
+      %apply;lazy_print(", ")
       %foreach;xx.first_name_alias;
-        , <em>(%first_name_alias;)</em>%nn;
+        %if;(lazy_printed)/%end;
+        %lazy_force;
+        %first_name_alias;%nn;
+      %end;
+    %end;
+    %if;xx.has_surnames_aliases;
+      %apply;lazy_print(", ")
+      %foreach;xx.surname_alias;
+        %if;(lazy_printed)/%end;
+        %lazy_force;
+        %surname_alias;%nn;
       %end;
     %end;
     </small>%nn;
   %end;
+  %if;(xx.computable_age), %xx.age;%end;
   %if;(evar.sd = "on")
-    %apply;link_dates("xx")%nn;
+    , %apply;link_dates("xx")%nn;
   %else;
     %if;(xx.has_birth_date or xx.has_birth_place)
       , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
@@ -133,8 +153,8 @@
     %end;
   %end;
   %if;(xx.has_linked_pages and xx.has_linked_page.DEATH), %xx.linked_page.DEATH;%end;
-  %if;(evar.sd != "on" and xx.computable_death_age)%sp;
-    ([age at death:] %xx.death_age;)%nn;
+  %if;(xx.computable_death_age)
+    , [age at death:] %xx.death_age;%nn;
   %end;
 %end;
 
@@ -166,21 +186,14 @@
   %end;
 %end;
 
-%define;somebody(xx,yy)
-  <strong>%apply;link2("xx","yy")</strong>%nn;
-  %apply;somebody_long_info("xx")
-  %apply;somebody_extra_info("xx")
-%end;
-
 %define;somebody_spouse_parent1(xx)
   <strong>%apply;link2("spouse.xx","spouse.xx")</strong>%nn;
   %apply;info2("spouse.xx")
 %end;
 
 %define;somebody_spouse_parent()
-  %if;(evar.parents = "on" and spouse.has_parents)%sp;
-  <br%/>   
-    <small>
+  %if;(evar.parents = "on" and spouse.has_parents)
+    <br%/>   <small>%nn;
     %apply;a_of_b%with;
       %if;(spouse.is_male)[son/daughter/child]0
       %else;[son/daughter/child]1%end;
@@ -188,14 +201,14 @@
       %apply;somebody_spouse_parent1("father") [and]
       %apply;somebody_spouse_parent1("mother")
     %end;
-    </small>%nn;
+    </small>
   %end;
 %end;
 
 %define;link_dates(xx)
   %sp;
   %if;(wizard and not cancel_links)
-    <a class="date" href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::person/persons]0"
+    <a class="date" href="%prefix;m=MOD_IND;i=%xx.index;" title="[modify::person/persons]0"
        onclick="window.open(this.href); return false;">%nn;
       %apply;sure_dates("xx","birth","baptism","baptism",xx.has_linked_page.BIRTHA)
       %if;(xx.is_dead)
@@ -213,21 +226,15 @@
 %define;link_marriage(xx)
   %if;(wizard and not cancel_links)
     <a class="date" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;ins_ch=2;"
-      title="[*modify::family/families]0" onclick="window.open(this.href); return false;">
+      title="[modify::family/families]0" onclick="window.open(this.href); return false;">%nn;
       <span class="sure_dates%xx.has_linked_page.MARRIAGEA;%xx.spouse.has_linked_page.MARRIAGEA;
         %if;(marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") not_sure_dates%end;">&amp;</span>%nn;
-      %slash_marriage_date;<small class="xsmall"> %marriage_place;</small>
-      %if;(evar.t = "Z" or evar.t = "D")
-        <br%/>&amp;%nb_children;
-      %end;
+      %slash_marriage_date;<small class="xs"> %marriage_place;</small>
     </a>
   %else;
     <span class="sure_dates%xx.has_linked_page.MARRIAGEA;%xx.spouse.has_linked_page.MARRIAGEA;
       %if;(marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") not_sure_dates%end;">&amp;</span>%nn;
-    %slash_marriage_date;<small class="xsmall"> %marriage_place;</small>
-    %if;(evar.t = "Z" or evar.t = "D")
-      <br%/>&amp;%nb_children;
-    %end;
+    %slash_marriage_date;<small class="xs"> %marriage_place;</small>
   %end;
 %end;
 
@@ -242,15 +249,104 @@
     <span class="not_sure_dates">%dd1_symbol;</span>%nn;
   %end;
   %if;(xx.dd1_place != "")
-    <small class="xsmall"> %xx.dd1_place;</small>%nn;
+    <small class="xs"> %xx.dd1_place;</small>%nn;
   %elseif;(xx.dd2_place != "")
-    <small class="xsmall"> %xx.dd2_place;</small>%nn;
+    <small class="xs"> %xx.dd2_place;</small>%nn;
   %elseif;(xx.dd3_place != "")
-    <small class="xsmall"> %xx.dd3_place;</small>%nn;
+    <small class="xs"> %xx.dd3_place;</small>%nn;
   %end;
 %end;
 
-%( <!-- end modified mickroue (used in ancsosa.txt, deslist.txt)--> %)
+%define;inline_notes(xx)
+  %incr_count;
+  %if;(evar.notes = "on")
+    %if;(xx.has_notes or xx.has_linked_page.BNOTE)
+      <div class="inot">
+        %if;xx.has_linked_page.BNOTE;&gt;&gt; %xx.linked_page.BNOTE;%end;
+        %if;xx.has_notes;%xx.notes;%end;
+      </div>
+    %end;
+  %end;
+  %if;(evar.src = "on")
+    %if;(xx.has_sources or xx.has_linked_page.BIBLIO)
+      <div class="isrc">
+        %if;xx.has_linked_page.BIBLIO;&gt;&gt; %xx.linked_page.BIBLIO;%end;
+        %if;(xx.has_sources)
+          %foreach;xx.source
+            <span>- %source_type; : </span> %source;%sp;
+          %end;
+        %end;
+      </div>
+    %end;
+  %end;
+%end;
+
+%define;inline_comment()
+  %incr_count;
+  <div class="icom">%comment;</div>
+%end;
+
+%define;link_notes(xx,yy)
+  %incr_count;
+  %if;((evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
+      or (evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO)))
+    <sup>%if;(not cancel_links)<a href="#nyy">%nn;%end;
+    %if;(evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
+      %apply;add_in_sorted_list(10000+count,"yy",xx.notes,"",xx.linked_page.BNOTE,xx,xx.dates)
+    %else;
+      %apply;add_in_sorted_list(10000+count,"yy","","","",xx,xx.dates)
+    %end;
+    %if;(evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO))
+      %if;(xx.has_linked_page.BIBLIO)
+        %apply;add_in_sorted_list(10000+count,"yy","src_on","BIBLIO",xx.linked_page.BIBLIO,xx,xx.dates)
+      %end;
+      %foreach;xx.source;
+        %apply;add_in_sorted_list(10000+count,"yy","src_on",source_type,source,xx,xx.dates)
+      %end;
+    %end;
+    yy%if;(not cancel_links)</a>%end;</sup>%nn;
+  %end;
+%end;
+
+%define;link_comment(yy,zz)
+  %incr_count;
+  <sup>%if;(not cancel_links)<a id="iyy" href="#nyy">%nn;%end;
+    %apply;add_in_sorted_list(10000+count,"yy",comment,"","","","zz")
+  yy%if;(not cancel_links)</a>%end;</sup>%nn;
+%end;
+
+%define;sorted_notes()
+  %if;(evar.notes = "on" or evar.src = "on")
+    <hr%/>
+    <h3>%if;(evar.notes = "on")[*note/notes]1
+          %if;(evar.src = "on")[and] [source/sources]1%end;
+        %else;[*source/sources]1%end;</h3>
+    <dl>
+    %foreach;sorted_list_item;
+      %if;(item.3 != "src_on")
+        <dt><br%/>
+        <strong>%nn;
+          %if;(cancel_links)
+            %item.2;. %item.6;%item.7;
+          %else;
+            <a id="n%item.2;" href="#i%item.2;">%item.2;</a>%nn;
+          %end;
+        </strong>. %item.6;%item.7;
+        </dt>
+        %if;(item.5 != "")<dd>&gt;&gt; %item.5;</dd>%end;
+        %if;(item.3 != "")<dd>%item.3;</dd>%end;
+      %elseif;(item.4 = "BIBLIO")
+        <dd class="xs">&gt;&gt; %item.5;</dd>
+      %else;
+        <dd class="xs">- %item.4; : %item.5;</dd>
+      %end;
+    %end;
+    </dl>
+  %end;
+%end;
+
+%( <!-- End define (used in ancsosa.txt, deslist.txt)--> %)
+%( <!-- Begin define --> %)
 
 %define;info2(xx)
   %xx.title;%xx.dates;
@@ -272,52 +368,52 @@
   %end;
 %end;
 
-%define;link_notes(xx)
-  %if;((evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
-      or (evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO)))
-    <span class="xsmall">%sp;%[%if;(not cancel_links)<a id="l_%count;" href="#notes-%count;">%nn;%end;
-    %if;(evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
-      [*note/notes]0%sp;
-      %apply;add_in_sorted_list(10000+count,count,xx.notes,"",xx.linked_page.BNOTE)
-    %else;[*source/sources]0%sp;%nn;
-      %apply;add_in_sorted_list(10000+count,count,"","","")
+%define;marriage_info()
+  %if;(evar.rel = "on" and has_witnesses)
+    <span><br%/>   [witness/witnesses]1 :
+    %foreach;witness;
+      %if;(not is_first),%nl;%end;
+      %apply;link2("witness","witness")
+      %apply;info2("witness")
     %end;
-    %if;(evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO))
-      %if;(xx.has_linked_page.BIBLIO)
-        %apply;add_in_sorted_list(10000+count,count,"src_on","BIBLIO",xx.linked_page.BIBLIO)
-      %end;
-      %foreach;xx.source;
-        %apply;add_in_sorted_list(10000+count,count,"src_on",source_type,source)
-      %end;
+    </span>
+    %if;(has_comment and evar.notes = "on" and evar.inline = "on")
+      %apply;inline_comment()
     %end;
-    <strong>%count;</strong>%if;(not cancel_links)</a>%end;%]</span>
   %end;
 %end;
 
 %define;descendants_by_list(xx, yy, curlev, maxlev, famlev)
-  %if;(curlev = 0)<p>%nl;%end;
-  %apply;somebody("xx","yy")%sp;
-  %incr_count;
-  %apply;link_notes("xx")
+  %if;(curlev = 0)<div>%nl;%end;
+  <strong>%apply;link1("xx","yy",count)</strong>%nn;
+  %apply;somebody_long_info("xx")
+  %apply;somebody_extra_info("xx")
+  %if;(evar.inline = "on")
+    %apply;inline_notes("xx")
+  %else;
+    %apply;link_notes("xx",count)
+  %end;
   %apply;lazy_print%with;<br%/>%nl;%end;
   %foreach;xx.family;
     %if;(evar.spouse="on")
-      %if;(family_cnt != 1 and curlev = 0)<p>%nl;%end;
-      %lazy_force;   
+      %if;(family_cnt != 1 and curlev = 0)<div>%nl;%end;
+      %lazy_force;   %nn;
+      %let;txt;%xx; &amp;%marriage_date.year; %spouse;%in;
       %apply;married("xx")
-      <br%/>   %nl;
-      %apply;somebody("spouse","spouse")
-      %incr_count;
-      %apply;link_notes("spouse")
-      %apply;somebody_spouse_parent()
-      %if;(evar.witn = "on" and has_witnesses)%nl;<br%/>    [witness/witnesses]1 :
-        %foreach;witness;
-          %if;(not is_first),%nl;%end;
-          %apply;link2("witness","witness")
-          %apply;info2("witness")
-        %end;%nn;
+      %if;(has_comment and evar.notes = "on" and evar.inline != "on")
+        %apply;link_comment(count,txt)
       %end;
-      %if;(evar.comm = "on" and has_comment)%nl;(%comment;)%end;
+      <br%/>   %nn;
+      <strong>%apply;link1("spouse","spouse",count)</strong>%nn;
+      %apply;somebody_long_info("spouse")
+      %apply;somebody_extra_info("spouse")
+      %apply;somebody_spouse_parent()
+      %if;(evar.inline = "on")
+        %apply;inline_notes("spouse")
+      %else;
+        %apply;link_notes("spouse",count)
+      %end;
+      %apply;marriage_info()
     %end;
     %if;(curlev < maxlev)
       %if;(curlev = 0 or
@@ -330,9 +426,9 @@
         %elseif;(family.desc_level > famlev)
           , [see above]
           %apply;lazy_print%with;<br%/>%nl;%end;
-        %elseif;has_children;, [having as children] :
+        %elseif;has_children;
           %family.set_infinite_desc_level;
-          %if;(curlev = 0)</p>%nl;%end;
+          %if;(curlev = 0)</div>%nl;%end;
           <ol style="list-style-type:lower-latin">
           %foreach;child;
             <li class=%if;(has_sosa)"border_sosa"%nn;
@@ -350,7 +446,7 @@
           </ol>
           %apply;lazy_print%with;%end;
         %else;
-          %if;(curlev = 0)%nl;</p>%nl;
+          %if;(curlev = 0)%nl;</div>%nl;
           %else;%apply;lazy_print%with;<br%/>%nl;%end;
           %end;
         %end;
@@ -372,78 +468,47 @@
   %apply;togen(xx)
   </p>
   %reset_count;
+  %incr_count;
   %apply;descendants_by_list("self", "self", 0, xx, 0)%nl;
   <p>
     %foreach;descendant_level;
       %if;(level = desc_lev)
-        [*total] : %number_of_descendants; [[person/persons]1@(c)],
-        ([spouses not included] = %expr(count -1 - number_of_descendants.v))
+        [*total] : %number_of_descendants; [[person/persons]1@(c)]
       %end;
     %end;
   </p>
 %end;
+%( <!-- End define --> %)
 
 %(   Main   %)
 <body%body_prop; id="deslist">
-%message_to_wizard;
-
-<h1>%nn;
-  %apply;a_of_b_gr_eq_lev%with;
-    [*descendants]%nn;
-  %and;
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end;
-    %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;
-  %end;
-</h1>
-
-%if;not cancel_links;
-  <div class="menu2">
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
+  %message_to_wizard;
+  <h1>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*descendants]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") <em>%qualifier;</em>%end;
+      %sp;%surname;
+      %if;(alias != "") <em>(%alias;)</em>%end;
     %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
-
-%let;desc_lev;
-  %if;(bvar.max_desc_level = "")%apply;min(evar.v, max_desc_level, 12)
-  %else;%apply;min(evar.v, max_desc_level, bvar.max_desc_level)
-  %end;
-%in;
-
-%empty_sorted_list;
-%apply;by_list(desc_lev)
-
-%if;(evar.notes = "on" or evar.src = "on")
-  <hr%/>
-  <h3>%if;(evar.notes = "on")[*note/notes]1%else;[*source/sources]1%end;</h3>
-  <dl class = "notes_src">
-    %foreach;sorted_list_item;
-      %if;(item.3 != "src_on")
-        <dt><strong>%nn;
-        %if;(not cancel_links)
-          <a id="notes-%item.2;" href="#l_%item.2;">%nn;
-            %item.2; :%nn;
-          </a>
-        %else;
-          %item.2; :%nn;
-        %end;
-        </strong></dt>
-        %if;(item.5 != "")<dd>&gt;&gt; %item.5;</dd>%end;
-        %if;(item.3 != "")<dd>%item.3;</dd>%end;
-        %if;(evar.notes = "on" and evar.src = "on" and next_item.3 = "src_on")
-          <dt><em>[*source/sources]1 :</em></dt>
-        %end;
-      %elseif;(item.4 = "BIBLIO")
-        <dd><em>&gt;&gt; %item.5;</em></dd>
-      %else;
-        <dd><em> - %item.4; : %item.5;</em></dd>
+  </h1>
+  %if;not cancel_links;
+    <div class="menu2">
+      %if;has_referer;
+        <a href="%referer;" title="[back]">&lt;&lt;</a>
       %end;
+        <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+    </div>
+  %end;
+  %let;desc_lev;
+    %if;(bvar.max_desc_level = "")%apply;min(evar.v, max_desc_level, 12)
+    %else;%apply;min(evar.v, max_desc_level, bvar.max_desc_level)
     %end;
-  </dl>
-%end;
+  %in;
+  %empty_sorted_list;
+  %apply;by_list(desc_lev)
+  %if;(evar.inline != "on")%apply;sorted_notes()%end;
   %base_trailer;
   %copyright;
 </body>
