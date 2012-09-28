@@ -2158,8 +2158,7 @@ value husband_wife conf base p =
         let relation = 
           Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
         in
-        translate_eval 
-          (transl_a_of_b conf relation (person_text conf base conjoint))
+        translate_eval (relation ^ " " ^ (person_text conf base conjoint))
       else loop (i + 1)
     else ""
   in
