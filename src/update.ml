@@ -291,6 +291,44 @@ value print_warning conf base =
           end;
         end;
       }
+  | ChangedOrderOfMarriages p before after -> do {
+      Wserver.wprint "%s\n"
+        (capitale (transl conf "changed order of marriages"));
+      Wserver.wprint "-&gt;\n";
+      let print_list arr diff_arr =
+        Array.iteri
+          (fun i ifam ->
+             let fam = foi base ifam in
+             let sp = spouse (get_key_index p) fam in
+             let sp = poi base sp in
+             tag "li" "%s"
+               (if diff_arr.(i) then "style=\"background:pink\"" else "")
+             begin
+               print_first_name conf base p;
+               Wserver.wprint "  &amp;";
+               Wserver.wprint "%s\n" 
+                 (Date.short_marriage_date_text conf base fam p sp);
+               print_someone conf base sp;
+               Wserver.wprint "\n";
+             end)
+          arr
+      in
+      let (bef_d, aft_d) = Diff.f before after in
+      tag "table" "style=\"margin:1em\"" begin
+        tag "tr" begin
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list before bef_d;
+            end;
+          end;
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list after aft_d;
+            end;
+          end;
+        end;
+      end
+    }
   | CloseChildren ifam des elder x ->
       let cpl = foi base ifam in
       do {

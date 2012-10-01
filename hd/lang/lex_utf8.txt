@@ -2958,6 +2958,9 @@ sk: zmeniť poradie detí
 sl: zamenjan vrstni red otrok
 sv: ändrade ordningen för barnen
 
+    changed order of marriages
+fr: changement de l'ordre des marriages
+
     change it (the number) yourself
 af: verander dit self
 bg: променете сами номера
