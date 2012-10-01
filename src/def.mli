@@ -148,6 +148,7 @@ type warning 'person 'descend 'title =
   [ BirthAfterDeath of 'person
   | IncoherentSex of 'person and int and int
   | ChangedOrderOfChildren of ifam and 'descend and array iper and array iper
+  | ChangedOrderOfMarriages of 'person and array ifam and array ifam
   | ChildrenNotInOrder of ifam and 'descend and 'person and 'person
   | CloseChildren of ifam and 'descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person

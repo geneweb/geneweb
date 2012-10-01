@@ -113,6 +113,32 @@ value strictly_after d1 d2 =
   | _ -> False ]
 ;
 
+(* ********************************************************************** *)
+(*  [Fonc] compare_date : date -> date -> int                             *)
+(** [Description] : Renvoie 0 si les deux dates sont égales, 1 si la 
+                    première date est plus grande et -1 sinon.
+                    On ne tiens pas compte de la précision de la date.
+                    (Fonction identique à Date.ml)
+    [Args] :
+      - d1 : la première date
+      - d2 : la deuxième date
+    [Retour] : int
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value compare_date d1 d2 =
+  match (d1, d2) with
+  [ (Dgreg dmy1 _, Dgreg dmy2 _) -> 
+      match Pervasives.compare dmy1.year dmy2.year with
+      [ 0 ->
+          match Pervasives.compare dmy1.month dmy2.month with
+          [ 0 -> Pervasives.compare dmy1.day dmy2.day
+          | x -> x ]
+      | x -> x]
+  | (Dgreg dmy1 _, Dtext _) -> 1
+  | (Dtext _, Dgreg dmy2 _) -> -1
+  | (Dtext _, Dtext _) -> 0 ]
+;
+
 value birth_before_death base warning p =
   match (Adef.od_of_codate (get_birth p), get_death p) with
   [ (Some d1, Death _ d2) ->
@@ -436,6 +462,56 @@ value sort_children2 base warning ifam des =
     } ]
 ;
 
+
+(* ********************************************************************** *)
+(*  [Fonc] check_marriages_order : 
+             base -> (Def.warning -> unit) -> person -> unit              *)
+(** [Description] : Trie les famillies en fonction des dates de mariages.
+    [Args] :
+      - base    : base de donnée
+      - warning : fonction qui ajoute un warning à la liste des warnings
+      - p       : person
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                       *)
+(* ********************************************************************** *)
+value check_marriages_order base warning p = do {
+  let b = get_family p in
+  (* Astuce : on construire un tableau identique à la famille dans *)
+  (* lequel on remplace toutes les dates inconnues par la dernière *)
+  (* date maximale que l'on ait vu.                                *)
+  (* Exemple : Ma (mariage sans date), et M3 après M1              *)
+  (* ordre initial Ma M5 Mb M3 M1 ... devient Ma M1 M3 M5 Mb       *)
+  let (_, a) = 
+    Array.fold_left 
+      (fun (max_date, tab) ifam -> 
+        let fam = foi base ifam in
+        let date = 
+          match Adef.od_of_codate (get_marriage fam) with
+          [ Some d -> Some d
+          | None -> max_date ]
+        in
+        let max_date =
+          match (date, max_date) with
+          [ (Some d1, Some d2) -> 
+              if compare_date d1 d2 = 1 then Some d1 
+              else Some d2
+          | (Some d1, None) -> Some d1
+          | _ -> max_date ]
+        in
+        (max_date, Array.append tab [| (ifam, date) |]))
+      (None, [| |]) (Array.copy b)
+  in
+  Array.stable_sort 
+    (fun (f1, d1) (f2, d2) ->
+      match (d1, d2) with
+      [ (Some d1, Some d2) -> compare_date d1 d2
+      | _ -> 0 ] ) 
+    a;
+  let a = Array.map (fun (f, _) -> f) a in
+  if a <> b then warning (ChangedOrderOfMarriages p b a)
+  else ()
+};
+
 value close_siblings base error warning x np ifam des =
   match (np, Adef.od_of_codate (get_birth x)) with
   [ (None, _) -> () 
@@ -695,7 +771,11 @@ value family base error warning ifam fam =
     check_marriage_sex base error warning fam;
     check_normal_marriage_date_for_parent base error warning (ifam, fam);
     check_normal_marriage_date_for_witness base error warning (ifam, fam);
-    check_children base error warning (ifam, fam)
+    check_children base error warning (ifam, fam);
+    let father = poi base (get_father fam) in
+    let mother = poi base (get_mother fam) in
+    check_marriages_order base warning father;
+    check_marriages_order base warning mother;
   }
 ;
 

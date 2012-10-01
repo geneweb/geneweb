@@ -778,6 +778,12 @@ value all_checks_family conf base ifam fam cpl des scdo = do {
   let fam = family_of_gen_family base (fam, cpl, des) in
   CheckItem.family base error warning ifam fam;
   CheckItem.check_other_fields base misc ifam fam;
+  List.iter
+    (fun
+     [ ChangedOrderOfMarriages p _ after ->
+         patch_union base (get_key_index p) {family = after}
+     | _ -> () ])
+    wl.val;
   (List.rev wl.val, List.rev ml.val)
 };
 
