@@ -217,6 +217,12 @@ value insert_person1 gen so = do {
             ((fn, sn, occ), {(so) with occ = occ})
           else (k, so)
         in
+        let (k, so) =
+          let psources = 
+            if so.psources = "" then default_source.val else so.psources
+          in
+          (k, {(so) with psources = psources})
+        in
         key_hashtbl_add gen.g_index_of_key k (Adef.iper_of_int gen.g_pcnt);
         List.iter (output_field so) gen.g_person_fields;
         Iochan.seek (fst gen.g_person_parents) (int_size * gen.g_pcnt);
