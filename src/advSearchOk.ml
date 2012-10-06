@@ -168,7 +168,7 @@ value advanced_search conf base max_answers =
           [ Some d when fast_auth_age conf p ->
               if CheckItem.strictly_after d d2 then False else True
           | _ -> False ])
-    | _ -> True ]
+    | _ -> test_date_place (fun _ -> True) ]
   in
   let list = ref [] in
   let len = ref 0 in
