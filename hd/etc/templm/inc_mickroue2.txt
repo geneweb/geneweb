@@ -1,6 +1,6 @@
 %( <!-- Begin inc_mickroue2 20120926 --> %)
 %( <!-- display linked pages : Images --> %)
-<div class = "notes">
+<div>
   %empty_sorted_list;
   %reset_count;
   <ul class="list_no_style">

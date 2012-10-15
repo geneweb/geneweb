@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120712 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121003 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
@@ -17,15 +17,35 @@
   %include.css;
   %base_header;
 </head>
+
+%define;url(z1,z2)
+  %foreach;env_binding;
+    %if;(env.key="z1")z1=z2;%else;%env.key;=%env.val;;%end;
+  %end;
+  z1=z2;
+%end;
+
 <body%body_prop; id="dag">
 %message_to_wizard;
 
 %if;not cancel_links;
   <div class="menu2">
+    %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+      %if;(evar.image="on")
+        <a style="text-decoration:line-through;"
+           href="%prefix_base;%apply;url("image","")"
+           title="- [image/images]1">img</a>
+      %else;
+        <a href="%prefix_base;%apply;url("image","on")"
+           title="+ [image/images]1">img</a>
+      %end;
+    %end;
+    <a style="text-decoration:line-through;" href="%prefix_base;%apply;url("cgl","on")"
+       title="[cancel GeneWeb links]">@</a>
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>
     %end;
-    <a href="%prefix;" title="[visualize/show/hide/summary]3" accesskey="T">^^</a>
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
   </div>
 %end;
 %if;(evar.slices = "on")
@@ -101,7 +121,7 @@
         <br%/>
         %if;(pos1 = 0)&nbsp;%nn;
         %else;
-          <a href="%prefix;
+          <a href="%prefix_base;
             %foreach;env_binding;
               %if;(env.key != "pos1" and env.key != "pos2")
                 %env.key=%env.val;;%nn;
@@ -112,7 +132,7 @@
         %end;%nl
         %if;(pos2 >= dag.ncol)&nbsp;%nn;
         %else;
-          <a href="%prefix;
+          <a href="%prefix_base;
             %foreach;env_binding;
               %if;(env.key != "pos1" and env.key != "pos2")
                 %env.key=%env.val;;%nn;

@@ -5,7 +5,7 @@
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120927 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120930 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -117,7 +117,7 @@
     var val = c.options%[c.selectedIndex%].value;
     if (val == cond1 || val == cond2)
       {d.style.display='inline';}
-    else  
+    else
       {d.style.display='none';}
   }
   function changeFocus(event,id) {
@@ -277,7 +277,6 @@
   %end;
   <script type="text/javascript">
   <!--
-
     function changeFocusFn(event,id,id1,id2) {
       var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
       if (key == 42 || key == 60 || key == 62 || key == 95)
@@ -292,7 +291,7 @@
          document.getElementById(id1).focus();
          return false;
         }
-      }    
+      }
     }
     function linkCreateVisible(xx,yy,zz) {
       if(xx == 'pa')

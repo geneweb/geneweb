@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancsosa.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120927 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120930 templ=templm -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] … [up to] …%nn;
@@ -351,6 +351,21 @@
   %end;
 %end;
 
+%define;url(z1,z2)
+  %apply;lazy_print("z1=z2;")
+  %foreach;env_binding;
+    %if;(env.key="z1")%lazy_force;%else;%env.key;=%env.val;;%end;
+  %end;
+  %if;(not lazy_printed)
+    z1=z2;
+  %end;
+%end;
+
+%define;image(xx)
+  %if;(evar.image="on" and xx.has_image)
+    <img class="image" src="%xx.image_url;" alt="[image/images]0" title="[image/images]0"%/>
+  %end;
+%end;
 %( <!-- End define (used in ancsosa.txt, deslist.txt)--> %)
 %( <!-- Begin define --> %)
 
@@ -468,6 +483,7 @@
 %end;
 
 %define;child_long_info(fff)
+  %apply;image("child")
   <strong>%apply;link1("child","child_name","fff")%nn;</strong>%nn;
   %if;(child.sosa_in_list != "" and evar.only != "on")
     %apply;info2("child")
@@ -528,7 +544,8 @@
         %let;id_spouse;%ancestor.anc_sosa.v;x%family_cnt;%in;
         %let;id_fam;%ancestor.anc_sosa.v;-%id_spouse;%in;
         %let;txt;%ancestor; &amp;%marriage_date.year; %spouse;%in;
-        <div>   %nn;
+        <div>%apply;image("spouse")
+             %nn;
           %if;(not cancel_links)
             <a href="#i%family.xx.sosa_in_list;"><strong>%family.xx.sosa_in_list;</strong></a>
           %else;
@@ -545,7 +562,7 @@
           %apply;somebody_extra_info("spouse")
           %apply;somebody_spouse_parent()
           %if;(evar.inline = "on")
-            %apply;inline_notes("ancestor")
+            %apply;inline_notes("spouse")
           %else;
             %apply;link_notes("spouse",id_spouse)
           %end;
@@ -637,12 +654,6 @@
     ==<br%/>xx
   %else;
     <a href="%prefix;em=R;ei=%ancestor.index;;m=NG;select=%index;;n=1;t=PN;et=A;spouse=on;image=on;" title="%ancestor; …[relationship]… %self;">==<br%/>xx</a>
-  %end;
-%end;
-
-%define;image(xx)
-  %if;(evar.image="on" and xx.has_image)
-    <img class="image" src="%xx.image_url;" alt="[image/images]0"  title="[image/images]0"%/>
   %end;
 %end;
 
@@ -1008,6 +1019,20 @@
 
 %if;not cancel_links;
   <div class="menu2">
+    %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+      %if;(evar.t="G" or evar.t="Z" or evar.t="D")
+        %if;(evar.image="on")
+          <a style="text-decoration:line-through;"
+             href="%prefix_base;%apply;url("image","")"
+             title="- [image/images]1">img</a>
+        %else;
+          <a href="%prefix_base;%apply;url("image","on")"
+             title="+ [image/images]1">img</a>
+        %end;
+      %end;
+    %end;
+    <a style="text-decoration:line-through;" href="%prefix_base;%apply;url("cgl","on")"
+       title="[cancel GeneWeb links]">@</a>
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>
     %end;
@@ -1031,15 +1056,15 @@
   %end;
   %reset_count;
   <table summary="ancestors" class="short_display_table">
-   <colgroup>
-     <col width="10"%/>
-     <col width="400"%/>
-     <col width="400" align="%left;"%/>
-     <col width="400" align="%left;"%/>
-     <col width="400" align="%left;"%/>
-     <col width="400"%/>
-     <col width="10"%/>
-   </colgroup>
+    <colgroup>
+      <col width="10"%/>
+      <col width="400"%/>
+      <col width="400" align="%left;"%/>
+      <col width="400" align="%left;"%/>
+      <col width="400" align="%left;"%/>
+      <col width="400"%/>
+      <col width="10"%/>
+    </colgroup>
   %foreach;ancestor_level(evar_v)
     %if;(level > 1 and (evar.only != "on" or level = evar_v))
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
@@ -1248,6 +1273,7 @@
           </p>
         %else;
           <div %if;(ancestor.is_male)class="ancestor_male"%end;>
+          %apply;image("ancestor")
           %apply;link_parents()
           %nn;.%sp;
           %apply;long_display_ancestor_personal(ancestor.anc_sosa.v)
@@ -1268,9 +1294,9 @@
     <colgroup>
       <col width="10"%/>
       <col width="400"%/>
-      <col width="400"%/>
-      <col width="400"%/>
-      <col width="400"%/>
+      <col width="400" align="%left;"%/>
+      <col width="400" align="%left;"%/>
+      <col width="400" align="%left;"%/>
       <col width="400"%/>
       <col width="10"%/>
     </colgroup>
@@ -1290,10 +1316,10 @@
               </td>
               <td class="is_desc_%ancestor.is_descendant;%ancestor.sex;">
                 %apply;image("ancestor")
-                %apply;link(ancestor.access, ancestor)
+                <div class="highlight">%apply;link(ancestor.access, ancestor)</div>
                 %apply;info3("ancestor")
               </td>
-              <td style="text-align:%left;">%apply;link_dates1("ancestor")</td>
+              <td>%apply;link_dates1("ancestor")</td>
               <td>
                 %foreach;ancestor.family;
                   %if;(family.index = ancestor.family.index)
@@ -1303,10 +1329,10 @@
               </td>
           %end;
           %if;(ancestor.is_female)
-              <td style="text-align:%left;">%apply;link_dates1("ancestor")</td>
+              <td>%apply;link_dates1("ancestor")</td>
               <td class="is_desc_%ancestor.is_descendant;%ancestor.sex;">
                %apply;image("ancestor")
-               %apply;link(ancestor.access, ancestor)
+               <div class="highlight">%apply;link(ancestor.access, ancestor)</div>
                %apply;info3("ancestor")
               </td>
               <td>

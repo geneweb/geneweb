@@ -1,0 +1,152 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: advanced.txt $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Modified mickroue(a)yahoo.fr 20121004 templ=templm -->
+  <title>[*advanced request]</title>
+  <meta name="robots" content="none"%/>
+  <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="content-style-type" content="text/css"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  %include.css;
+  %base_header;
+
+  <script type="text/javascript">
+  <!--
+  function valid(id) {
+    document.getElementById(id).focus();
+    document.getElementById(id).checked = true;
+  }
+  function changeDate(i0,i1,e1,i2,e2)
+  { var v0 = document.getElementById(i0);
+    var v1 = document.getElementById(i1);
+    var v2 = document.getElementById(i2);
+    if (v1.value == '' && v2.value == '')
+    { v0.firstChild.nodeValue = "[*delete] [date] %evar.birth1_yyyy; - %evar.death2_yyyy;";
+      v1.value = e1;
+      v2.value = e2;
+    }
+    else
+    { v0.firstChild.nodeValue = "[*add] [date] %evar.birth1_yyyy; - %evar.death2_yyyy;";
+      v1.value = '';
+      v2.value = '';
+    }
+  }
+  -->
+  </script>
+</head>
+
+%define;event(xx)
+  <p style="text-align:right;">
+  <label>[*place]<input id="xx_place" name="xx_place" value="%evar.xx_place;" size="40" maxlength="200"%/></label>
+  <br%/>[*before] :
+  %if;([ !dates order]0 = "ddmmyyyy")
+    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx2_yyyy"%/></label>
+  %elseif;([ !dates order]0 = "mmddyyyy")
+    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx2_yyyy"%/></label>
+  %else;
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx2_yyyy""%/></label>
+    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
+  %end;
+  <br%/>[*after] :
+  %if;([ !dates order]0 = "ddmmyyyy")
+    <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]1<input name="xx1_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx1_yyyy"%/></label>
+  %elseif;([ !dates order]0 = "mmddyyyy")
+    <label>[year/month/day]1<input name="xx1_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx1_yyyy"%/></label>
+  %else;
+    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx1_yyyy"%/></label>
+    <label>[year/month/day]1<input name="xx1_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
+  %end;
+  </p>
+%end;
+
+<body%body_prop; id="upd" %if;(evar.focus != "")onload="javascript:document.getElementById('%evar.focus;').focus();"%end;>
+%message_to_wizard;
+<form name="upd" method="post" action="%action;">
+  <p>
+    %hidden;
+    <input type="hidden" name="m" value="AS_OK"%/>
+  </p>
+  <fieldset>
+    <legend>
+      [*advanced request] <input type="submit" value="Ok"%/>
+      %if;(evar.birth1_yyyy != "" or evar.death2_yyyy != "")
+        <a class="button" href="javascript:changeDate('cd','birth1_yyyy','%evar.birth1_yyyy;','death2_yyyy','%evar.death2_yyyy;')"
+           id="cd">[*add] [date] %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
+      %end;
+    </legend>
+    <p class="modify_person">
+      <br%/>
+      <label title="[*first name/first names]0 (1)" accesskey="1">[*first name/first names]0
+        <input id="first_name" name="first_name" size="30" maxlength="200" value="%evar.first_name;"%/>
+      </label><br%/>
+      <label>[*surname/surnames]0
+        <input %sp;id="surname" name="surname" size="30" maxlength="200" value="%evar.surname;"%/>
+      </label><br%/><br%/>
+      [*sex] :
+      <label class="background_sex_0"><input type="radio" id="sexM" name="sex" value="M" onclick="male('sex_person')"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
+                   if (event.keyCode == 32) javascript:valid('sexF');"%/>[M/F]0 </label>%nn;
+      <label class="background_sex_1"><input type="radio" id="sexF" name="sex" value="F" onclick="female('sex_person')"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
+                   if (event.keyCode == 32) javascript:valid('sexU');"%/>[M/F]1 </label>%nn;
+         <label><input type="radio" id="sexU" name="sex" value="N" checked="checked"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
+                   if (event.keyCode == 32) javascript:valid('sexM');"%/>- </label><br%/><br%/>
+      [*died]0 :
+      <label><input type="radio" name="death" value="Dead"%/>[Y/N]0</label>
+      <label><input type="radio" name="death" value="NotDead"%/>[Y/N]1</label>
+      <label><input type="radio" name="death" value="" checked="checked"%/>-</label>
+           [*married] :
+      <label><input type="radio" name="married" id="mY" value="Y"%/>[Y/N]0</label>
+      <label><input type="radio" name="married" id="mN" value="N"%/>[Y/N]1</label>
+      <label><input type="radio" name="married" id="mA" value="A" checked="checked"%/>-</label> <br%/><br%/>
+      <label>[*occupation/occupations]0<input id="occu" name="occu" size="40" maxlength="200"
+                                              value="%evar.occu;"%/></label><br%/><br%/>
+      <label>[*maximum] <input name="max" class="number" size="5" value="100" maxlength="5"%/> [person/persons]1</label>
+      <br%/>
+    </p>
+  </fieldset>
+  <fieldset>
+    <legend>[*birth]</legend>
+    %apply;event("birth")
+  </fieldset>
+  <fieldset>
+    <legend>[*baptism]</legend>
+    %apply;event("bapt")
+  </fieldset>
+  <fieldset>
+    <legend>[*death]</legend>
+    %apply;event("death")
+  </fieldset>
+  <fieldset>
+    <legend>[*burial]</legend>
+    %apply;event("burial")
+  </fieldset>
+  <fieldset>
+    <legend>[*marriage/marriages]0</legend>
+    %apply;event("marriage")
+  </fieldset>
+</form>
+
+%base_trailer;
+%copyright;
+</body>
+</html>

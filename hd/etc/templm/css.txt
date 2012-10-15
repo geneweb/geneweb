@@ -1,11 +1,12 @@
 <style type="text/css">
 /* Properties of all html pages.*/
-/* mickroue(a)yahoo.fr 20120926 templ=templm */
-html{background:url('%image_prefix;/gwback.jpg');}
+/* mickroue(a)yahoo.fr 20121015 templ=templm */
+html{background:url('images/gwback.jpg');}
 /* Properties of all html pages */
 body{word-wrap:break-word;}
 table{word-wrap:normal;}
 body,td,th,form,input,select,legend{font-family:Arial;font-size:14px;}
+dt{font-weight:bold;}
 .list_no_style{margin:0;padding-left:10px;list-style-type:none;}
 .background_sex_0{background-color:#ADD8E6;}
 .background_sex_1{background-color:#FFB6C1;}
@@ -79,17 +80,17 @@ hr.full{margin-left:0;margin-right:0;}
 .menu{margin:0;padding:0;border:0;position:absolute;top:0;left:0;font-family:Arial;font-size:14px;}
 .menu span{position:relative;display:block;float:left;}
 .menu span a{float:left;}
-.menu .s_menu{display:none;float:left;margin-left:0;margin-top:0;padding:0;border:0;width:150px;}
+.menu .s_menu{display:none;float:left;margin-left:0;margin-top:0;padding:0;border:0;width:200px;}
 .menu span:hover > .s_menu{display:block;position:absolute;left:0;top:1.5em;z-index:10;}
-.menu .s_menu a{width:150px;}
+.menu .s_menu a{width:200px;}
 .menu1{clear:both;font-size:70%%;}
 .menu1 > span{display:block;width:auto;max-width:161px;float:left;margin:10px;}
-.menu1 .s_menu a{display:block;position:relative;top:5px;left:5px;width:auto;max-width:150px;}
+.menu1 .s_menu a{display:block;position:relative;top:5px;left:5px;width:auto;max-width:200px;}
 .button,.menu a,.menu1 a,.menu3 a{background-color:buttonface;border:solid 1px #FFFFC0;margin:0;padding:2px;color:buttontext;}
 .nobr{white-space:nowrap;}
 abbr{border-bottom:0;}
 .hide{visibility:hidden;}
-#perso .small{font-size:70%%;}
+.small{font-size:70%%;}
 #perso .fam1,#perso .fam2,#perso .person_content{float:left;padding:2px;margin:2px;border:solid 1px #FFFFC0;}
 #perso .fam ol,#perso .siblings ol{list-style-type:none;margin-left:-10px;}
 #perso .fam ul{list-style-type:none;margin:0;padding-top:3px;padding-bottom:3px;padding-left:0;padding-right:0;}
@@ -97,7 +98,7 @@ abbr{border-bottom:0;}
 #perso .ancestors{width:auto;float:left;margin:5px;}
 #perso .siblings{width:auto;float:left;margin:5px;}
 #perso .data1,#perso .person div{text-align:center;}
-#perso .person_content,#perso .person,#perso .notes,#perso .sources,#perso .relations{clear:both;}
+#perso .person_content,#perso .person,#perso .notes,#perso .sources,#perso .relations{clear:both;overflow:auto;}
 #perso .image,#perso .image img,#perso .image_sheet{float:left;width:12.5em;}
 #perso .image{display:block;margin:0;padding:0;}
 #perso .image img{border:none;margin:0;padding:0;}
@@ -109,7 +110,7 @@ abbr{border-bottom:0;}
 /* updind.txt,updfam.txt */
 #upd form,#upd input,#upd select,#upd textarea{font-size:11px;}
 #upd fieldset{width:auto;float:left;border:solid 1px;border-color:#808080;margin:0.2em;padding:0.2em;}
-#upd fieldset dt{width:auto;float:left;font-weight:bold;}
+#upd fieldset dt{width:auto;float:left;}
 #upd input{padding:0em 0.2em 0em;margin:0em 0.2em 0em;}
 #upd input[type='checkbox'],#upd input[type='radio']{width:auto;height:auto;vertical-align:middle;}
 #upd legend{font-size:12px;font-weight:bold;}
@@ -144,7 +145,6 @@ abbr{border-bottom:0;}
 #deslist .notes_src em{font-size:80%%;}
 /* ancsosa.txt */
 #ancsosa li{margin:2px 0 0 0;padding:0 0 0 10px;}
-#ancsosa .image{max-width:100px;max-height:150px;}
 .generation{margin:0px;padding-top:5px;border-top:ridge #D2691E 2px;text-align:center;}
 .ancestor_male{margin:0px;padding-top:5px;border-top:dotted #B8860B 1px;}
 .is_desc_10{background-color:#ADD8E6;}
@@ -158,13 +158,15 @@ abbr{border-bottom:0;}
 .p_left{padding-left:5px;}
 .p_right{padding-right:5px;}
 /* ancsosa.txt,deslist.txt */
+#ancsosa .image,#deslist .image{max-width:100px;max-height:150px;float:right;margin:3px;}
+#ancsosa li .image #deslist li .image{max-width:75px;max-height:125px;float:right;margin:3px;}
 .icom{padding:5px;margin:5px;background-color:#EFEFEF;font-size:0.9em;}
 .inot{padding:5px;margin:5px;background-color:#CFCFCF;font-size:0.9em;}
 .isrc{padding:5px;margin:5px;background-color:#8F8F8F;font-size:0.8em;}
 .isrc span{color:#DFDFDF;}
 /* ancsosa.txt,anclist.txt */
 .ld_table,.short_display_table{margin-left:auto;margin-right:auto;text-align:center;border-collapse:collapse;}
-.ld_table tr th,.short_display_table tr th{border-top:ridge #D2691E 2px;}
+.ld_table tr th,.short_display_table tr th{border-top:ridge #D2691E 2px;border-bottom:dotted #B8860B 1px;}
 .ld_table tr td,.short_display_table tr td{border:dotted #B8860B 1px;}
 .ld_table a,.short_display_table a{display:block;}
 /* welcome.txt */

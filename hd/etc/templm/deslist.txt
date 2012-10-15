@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120927 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121003 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -345,8 +345,25 @@
   %end;
 %end;
 
+%define;url(z1,z2)
+  %apply;lazy_print("z1=z2;")
+  %foreach;env_binding;
+    %if;(env.key="z1")%lazy_force;%else;%env.key;=%env.val;;%end;
+  %end;
+  %if;(not lazy_printed)
+    z1=z2;
+  %end;
+%end;
+
+%define;image(xx)
+  %if;(evar.image="on" and xx.has_image)
+    <img class="image" src="%xx.image_url;" alt="[image/images]0" title="[image/images]0"%/>
+  %end;
+%end;
 %( <!-- End define (used in ancsosa.txt, deslist.txt)--> %)
 %( <!-- Begin define --> %)
+
+  %let;let_child;%if;(evar.always_surname != "no")child%else;child_name%end;%in;
 
 %define;info2(xx)
   %xx.title;%xx.dates;
@@ -385,6 +402,7 @@
 
 %define;descendants_by_list(xx, yy, curlev, maxlev, famlev)
   %if;(curlev = 0)<div>%nl;%end;
+  %apply;image("xx")
   <strong>%apply;link1("xx","yy",count)</strong>%nn;
   %apply;somebody_long_info("xx")
   %apply;somebody_extra_info("xx")
@@ -434,13 +452,7 @@
             <li class=%if;(has_sosa)"border_sosa"%nn;
                       %else;"border_family_%has_families; border_sex_%sex;"%nn;
                       %end;>
-            %if;(evar.alwsurn = "yes")
-              %apply;descendants_by_list("child", "child", curlev+1,
-                                         maxlev, famlev+1)
-            %else;
-              %apply;descendants_by_list("child", "child_name", curlev+1,
-                                         maxlev, famlev+1)
-            %end;
+            %apply;descendants_by_list("child", let_child, curlev+1, maxlev, famlev+1)
             </li>
           %end;
           </ol>
@@ -494,12 +506,24 @@
     %end;
   </h1>
   %if;not cancel_links;
-    <div class="menu2">
-      %if;has_referer;
-        <a href="%referer;" title="[back]">&lt;&lt;</a>
+  <div class="menu2">
+    %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+      %if;(evar.image="on")
+        <a style="text-decoration:line-through;"
+           href="%prefix_base;%apply;url("image","")"
+           title="- [image/images]1">img</a>
+      %else;
+        <a href="%prefix_base;%apply;url("image","on")"
+           title="+ [image/images]1">img</a>
       %end;
-        <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-    </div>
+    %end;
+    <a style="text-decoration:line-through;" href="%prefix_base;%apply;url("cgl","on")"
+       title="[cancel GeneWeb links]">@</a>
+    %if;has_referer;
+      <a href="%referer;" title="[back]">&lt;&lt;</a>
+    %end;
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
   %end;
   %let;desc_lev;
     %if;(bvar.max_desc_level = "")%apply;min(evar.v, max_desc_level, 12)
