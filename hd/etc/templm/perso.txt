@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120926 templ=templm --> 
+  <!-- Modified mickroue(a)yahoo.fr 20121015 templ=templm --> 
   <title>%first_name; %surname;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -27,6 +27,7 @@
 %( <!-- Begin define --> %)
   %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
   %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+  %let;let_child;%if;(bvar.always_surname = "yes" and evar.always_surname != "no")child%else;child_name%end;%in;
 
   %define;init_count(prev_count)
     %reset_count;
@@ -137,7 +138,7 @@
 
   %define;child_long_info(curlev,maxlev)
     %incr_count;
-    %apply;somebody1%with;child%and;child_name%and;tabindex="%count;"%end;
+    %apply;somebody1%with;child%and;%let_child;%and;tabindex="%count;"%end;
     %if;(has_families)
       %if;(evar.image="on")
         %foreach;family;
@@ -203,11 +204,11 @@
     %end;
   %end;
 
-  %define;advanced(xx,yy)
-    %if;(not cancel_links)
-      <a class="date" href="%prefix;m=AS_OK;max=100;xx=yy" title="[advanced request]">yy</a>%nn;
+  %define;advanced(xx,zz)
+    %if;(not cancel_links and bvar.hide_advanced_request != "yes")
+      <a class="date" href="%prefix;m=H;v=advanced;xx=zz;focus=xx;birth1_yyyy=%birth_date.year;;death2_yyyy=%death_date.year;" title="[advanced request]">zz</a>%nn;
     %else;
-      yy%nn;
+      zz%nn;
     %end;
   %end;
 
@@ -338,7 +339,7 @@
             <em>%child_name;</em>
           %else;
             %incr_count;
-            %apply;link_name1%with;child%and;child_name%and;tabindex="%expr(count + 100)"%end;
+            %apply;link_name1%with;child%and;%let_child;%and;tabindex="%expr(count + 100)"%end;
           %end;
           %apply;link_dates("child")
           </li>
@@ -634,7 +635,7 @@
           <span class="s_menu">
             <a href="%prefix;m=D;t=T;v=%apply;max_desc_v(4);image=on;%access">[*tree]</a>
             <a href="%prefix;m=D;t=A;v=%max_desc_level;;num=on;%access">D’Aboville</a>
-            <a href="%prefix;m=D;t=L;v=%apply;max_desc_v(3);alwsurn=yes;alias=on;rel=on;spouse=on;parents=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=D;t=L;v=%apply;max_desc_v(3);alias=on;rel=on;spouse=on;parents=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;
@@ -758,7 +759,7 @@
         %foreach;first_name_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;link_list("P",first_name_alias)%nn;
+          %apply;advanced("first_name",first_name_alias)%nn;
         %end;
       %end;
       %if;has_surnames_aliases;
@@ -767,7 +768,7 @@
         %foreach;surname_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;link_list("N",surname_alias)%nn;
+          %apply;advanced("surname",surname_alias)%nn;
         %end;
       %end;
     </p>
@@ -1044,7 +1045,7 @@
           <span class="s_menu">
             <a href="%prefix;m=D;t=T;v=%apply;max_desc_v(4);image=on;%access">[*tree]</a>
             <a href="%prefix;m=D;t=A;v=%max_desc_level;;num=on;%access">D’Aboville</a>
-            <a href="%prefix;m=D;t=L;v=%apply;max_desc_v(3);alwsurn=yes;alias=on;rel=on;spouse=on;parents=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=D;t=L;v=%apply;max_desc_v(3);alias=on;rel=on;spouse=on;parents=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;

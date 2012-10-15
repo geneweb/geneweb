@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120926 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121003 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -152,8 +152,8 @@
       </label>
       <br%/>
       <label>
-        <input type="checkbox" name="alwsurn" value="yes" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [*with::surname/surnames]1
+        <input type="checkbox" name="always_surname" value="no" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
+        [*first name/first names]0 <span style="text-decoration:line-through;">[*surname/surnames]0</span>
       </label>
       <br%/>
       <label>

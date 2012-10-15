@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120927 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121003 templ=templm -->
   <title>%nn;
     %if;(evar.t = "E" and evar.opt = "csv")
       CSV
@@ -276,6 +276,12 @@
     %end;
   %and;
     border_family_%xx.has_families; border_sex_%xx.sex;
+  %and;
+    %if;("yy" = "birth" and "xx" != "spouse" and "xx" != "parent")
+      %if;("xx" != "ancestor" or xx.anc_sosa.v % 2 = 0)
+        %xx.index;
+      %end;
+    %end;
   %end;
 %end;
 
@@ -352,6 +358,7 @@
     %end;
   %and;
     border_family_%xx.has_families; border_sex_%xx.sex;
+  %and;
   %end;
 %end;
 
@@ -525,6 +532,17 @@
     %end;
   %end;
 %end;
+
+%define;url(z1,z2)
+  %apply;lazy_print("z1=z2;")
+  %foreach;env_binding;
+    %if;(env.key="z1")%lazy_force;%else;%env.key;=%env.val;;%end;
+  %end;
+  %if;(not lazy_printed)
+    z1=z2;
+  %end;
+%end;
+
 %(<!-- End define --> %)
 
 <body%body_prop; id="anclist">
@@ -561,6 +579,8 @@
 </h1>
 %if;(not cancel_links and evar.opt != "csv")
   <div class="menu2">
+    <a style="text-decoration:line-through;" href="%prefix_base;%apply;url("cgl","on")"
+       title="[cancel GeneWeb links]">@</a>
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>
     %end;
@@ -575,7 +595,7 @@
     %apply;ld(birth_date.year,9999)
   %end;
   <table summary="family life dates" class="ld_table">
-    <colgroup>
+  <colgroup>
     <col width="35"%/>
     <col width="10"%/>
     <col width="300"%/>
@@ -584,15 +604,18 @@
     <col width="300"%/>
     <col width="300"%/>
   </colgroup>
-  <tr>
-    <th>[years old]</th>
-    <th>[date]</th>
-    <th>[place]</th>
-    <th><abbr title="[birth] [marriage/marriages]0 [death]">%birth_symbol;&amp;%death_symbol;</abbr></th>
-    <th>[person/persons]0</th>
-    <th>[relationship]0</th>
-    <th>[occupation/occupations]0</th>
-  </tr>
+  <thead>
+    <tr>
+      <th>[years old]</th>
+      <th>[date]</th>
+      <th>[place]</th>
+      <th><abbr title="[birth] [marriage/marriages]0 [death]">%birth_symbol;&amp;%death_symbol;</abbr></th>
+      <th>[person/persons]0</th>
+      <th>[relationship]0</th>
+      <th>[occupation/occupations]0</th>
+    </tr>
+  </thead>
+  <tbody>
     %reset_count;
     %foreach;sorted_list_item;
       %if;(prev_item.4 = item.4 and prev_item.6 = item.6 and prev_item.10 = item.10)
@@ -611,7 +634,21 @@
         %end;
       %end;
     %end;
-  <tr><td colspan="7">[*total] : %count; [[person/persons]1@(c)]</td></tr>
+    <tr><td colspan="7">[*total] : %count; [[person/persons]1@(c)]%sp;
+      %reset_count;
+      <a href="%prefix;m=RLM;et=S;spouse=on;%nn;
+      %foreach;sorted_list_item;
+        %if;(item.15 != "")
+          %incr_count;
+          i%count;=%item.15;;%nn;
+          %incr_count;
+          i%count;=%index;;%nn;
+        %end;
+       %end;
+       %incr_count;
+       i%count;=%index;;t%count;=*;">[*tree]</a>
+    </td></tr>
+  </tbody>
   </table>
 %elseif;(wizard and evar.t = "E" and evar.opt = "csv")
   %( csv display full %)

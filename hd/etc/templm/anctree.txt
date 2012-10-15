@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120712 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20120930 templ=templm -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -157,11 +157,33 @@
   </table>
 %end;
 
+%define;url(z1,z2)
+  %apply;lazy_print("z1=z2;")
+  %foreach;env_binding;
+    %if;(env.key="z1")%lazy_force;%else;%env.key;=%env.val;;%end;
+  %end;
+  %if;(not lazy_printed)
+    z1=z2;
+  %end;
+%end;
+
 <body%body_prop; id="anctree">
 %message_to_wizard;
 
 %if;not cancel_links;
   <div class="menu2">
+    %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+      %if;(evar.image="on")
+        <a style="text-decoration:line-through;"
+           href="%prefix_base;%apply;url("image","")"
+           title="- [image/images]1">img</a>
+      %else;
+        <a href="%prefix_base;%apply;url("image","on")"
+           title="+ [image/images]1">img</a>
+      %end;
+    %end;
+    <a style="text-decoration:line-through;" href="%prefix_base;%apply;url("cgl","on")"
+       title="[cancel GeneWeb links]">@</a>
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>
     %end;

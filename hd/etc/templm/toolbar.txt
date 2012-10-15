@@ -1,0 +1,150 @@
+<!-- $Id: toolbar.txt,v x.x 2011-08-31 16:17:36 flh Exp $ -->
+<!-- Modified mickroue(a)yahoo.fr 20121015 templ=templm -->
+<!-- How to : Copy this file to bases/etc/ -->
+
+<script type="text/javascript">
+<!--
+
+function insertTags (tagOpen, tagClose, sampleText) {
+  var t = document.forms%[0].%name;;
+
+  // IE
+  if(document.selection) {
+    var theSelection = document.selection.createRange().text;
+    if(!theSelection) { theSelection=sampleText;}
+    t.focus();
+    if(theSelection.charAt(theSelection.length - 1) == " "){// exclude ending space char, if any
+      theSelection = theSelection.substring(0, theSelection.length - 1);
+      document.selection.createRange().text = tagOpen + theSelection + tagClose + " ";
+    } 
+    else {
+      document.selection.createRange().text = tagOpen + theSelection + tagClose;
+    }
+  }
+  else 
+    if(t.selectionStart || t.selectionStart == '0') {
+      var replaced = false;
+      var startPos = t.selectionStart;
+      var endPos = t.selectionEnd;
+      if(endPos-startPos) replaced=true;
+      var scrollTop=t.scrollTop;
+      var myText = (t.value).substring(startPos, endPos);
+      if(!myText) { myText=sampleText;}
+      if(myText.charAt(myText.length - 1) == " "){ // exclude ending space char, if any
+        subst = tagOpen + myText.substring(0, (myText.length - 1)) + tagClose + " ";
+      } 
+      else {
+        subst = tagOpen + myText + tagClose;
+      }
+      t.value = t.value.substring(0, startPos) + subst +
+                t.value.substring(endPos, t.value.length);
+      t.focus();
+      //set new selection
+      if(replaced){
+        var cPos=startPos+(tagOpen.length+myText.length+tagClose.length);
+        t.selectionStart=cPos;
+        t.selectionEnd=cPos;
+      }
+      else {
+        t.selectionStart=startPos+tagOpen.length;
+        t.selectionEnd=startPos+tagOpen.length+myText.length;
+      }
+      t.scrollTop=scrollTop;
+    }
+
+  if (t.createTextRange) t.caretPos = document.selection.createRange().duplicate();
+  return false;
+}
+--></script>
+<div style="text-align:%left;">
+%if;(evar.file != "")
+  <dl>
+    <dd>[*link] : <a onclick="return insertTags('\n%evar.text;','','')" href="javascript:;">%evar.text;</a></dd>
+    <dd><label><input onclick="javascript: this.select();" type="text" name="evar_file" size="80"
+               value="%evar.file;"%/></label></dd>
+    <dd><em>([*image/images]0 : ../src/%evar.base;/images/%evar.file;.%bvar.var_img_ext;)</em></dd>
+  </dl>
+%end;
+<div class="menu" style="clear:both;position:relative;">
+  <span>
+    <a href="#">&lt;html&gt;</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('\n<br/>\n','','')"
+         href="javascript:;" title="= shift + enter">&lt;br/&gt;</a>
+      <a onclick="return insertTags('\n<hr/>\n','','')" href="javascript:;">&lt;hr/&gt;
+        ( <tt style="text-decoration:line-through;">            </tt> )</a>
+      <a onclick="return insertTags('','<table border>\n<tr>\n<th>A1</th>\n<th>B1</th>\n</tr><tr>\n<td>A2</td>\n<td>B2</td>\n</tr><tr>\n<td>A3</td>\n<td>B3</td>\n</tr>\n</table>','')" href="javascript:;">&lt;table&gt;</a>
+      <a onclick="return insertTags('&lt;img alt=&quot;?&quot; src=&quot;%%sm=IM;s=xxx.jpg&quot;%/&gt;','','')"
+         href="javascript:;"><small>&lt;img alt="?" src="%%sm=IM;s=xxx.jpg"/&gt;</small></a>
+      <a onclick="return insertTags('&lt;a href=&quot;%%sm=IMH;s=xxx.jpg&quot;&gt;[*image/images]0&lt;/a&gt;','','')"
+         href="javascript:;">&lt;a href="%%sm=IMH;s=xxx.jpg"&gt; [*image/images]0&lt;/a&gt;</a>
+    </span>
+  </span>
+  <span>
+    <a href="#">h1</a>
+    <span class="s_menu">
+      <a style="border-bottom:1px solid #844404;font-wheight:700;font-size:21px;text-align: center;"
+         onclick="return insertTags('=','=','x')" href="javascript:;">=h1=</a>
+      <a style="border-bottom:1px solid #844404;font-wheight:700;font-size:21px;"
+         onclick="return insertTags('==','==','x')" href="javascript:;">==h2==</a>
+      <a style="border-bottom:1px solid #844404;font-wheight:700;font-size:17px"
+         onclick="return insertTags('===','===','x')" href="javascript:;">===h3===</a>
+      <a style="font-wheight:700;font-size:14px"
+         onclick="return insertTags('====','====','x')" href="javascript:;">====h4====</a>
+      <a style="font-wheight:700;font-size:11px"
+         onclick="return insertTags('=====','=====','x')" href="javascript:;">=====h5=====</a>
+      <a style="font-wheight:700;font-size:9px"
+         onclick="return insertTags('======','======','x')" href="javascript:;">======h6======</a>
+    </span>
+  </span>
+  <span>
+    <a href="#"><i>i</i> <b>b</b></a>
+    <span class="s_menu">
+      <i><a onclick="return insertTags('\'\'','\'\'','x')" href="javascript:;">''i''</a></i>
+      <b><a onclick="return insertTags('\'\'\'','\'\'\'','x')" href="javascript:;">'''b'''</a></b>
+      <i><b><a onclick="return insertTags('\'\'\'\'\'','\'\'\'\'\'','x')" href="javascript:;">'''''i + b'''''</a></b></i>
+      <a onclick="return insertTags('{','}','x')" href="javascript:;"><span class="highlight">{highlight}</span></a>
+    </span>
+  </span>
+  <span><a href="#">ul ol dl pre</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('*','','')" href="javascript:;">•  *ul li<br%/>   •  **ul ul li</a>
+      <a onclick="return insertTags('#','','')" href="javascript:;">1.  #ol li<br%/>   2.  ##ol ol li</a>
+      <a onclick="return insertTags(';x:x','','')" href="javascript:;"><strong>;dl dt</strong>:dd</a>
+      <a onclick="return insertTags(':','','')" href="javascript:;">   :dl dd<br%/>      ::dl dl dd</a>
+      <a style="font-family:'Courier New',Courier,monospace;"
+        onclick="return insertTags('\n\n \n ','\n','')" href="javascript:;">
+        &nbsp;pre<br%/>&nbsp;pre<br%/></a>
+    </span>
+  </span>
+  <span><a href="#">[*miscellaneous notes]</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('%[%[%[x:x/x%]%]%]','','')" href="javascript:;">%[%[%[directory:filename/[text]%]%]%]</a>
+      <a onclick="return insertTags('TITLE=','','')" href="javascript:;">TITLE=</a>
+      <a onclick="return insertTags('HEAD=','','')" href="javascript:;">HEAD=[him/her]0/[him/her]1</a>
+      <a onclick="return insertTags('DEATH=','','')" href="javascript:;">DEATH=</a>
+      <a onclick="return insertTags('OCCU=','','')" href="javascript:;">OCCU=</a>
+      <a onclick="return insertTags('BNOTE=','','')" href="javascript:;">BNOTE=</a>
+      <a onclick="return insertTags('BIBLIO=','','')" href="javascript:;">BIBLIO=</a>
+    </span>
+  </span>
+  <span><a href="#">[*visualize/show/hide/summary]3</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('__TOC__','','')" href="javascript:;">__TOC__</a>
+      <a onclick="return insertTags('__SHORT_TOC__','','')" href="javascript:;">__SHORT_TOC__</a>
+      <a onclick="return insertTags('__NOTOC__','','')" href="javascript:;">__NOTOC__</a>
+    </span>
+  </span>
+  <span><a href="#">[*person/persons]0</a>
+    <span class="s_menu">
+      <a onclick="return insertTags('%[%[w:','%]%]','x')" href="javascript:;">%[%[w:[wizard/wizards/friend/friends/exterior]0%]%]</a>
+      <a onclick="return insertTags('%[%[x/x%]%]','','')" href="javascript:;">
+       %[%[[first name/first names]0/[surname/surnames]0%]%]</a>
+      <a onclick="return insertTags('%[%[x/x/9/x%]%]','','')" href="javascript:;">
+       %[%[[first name/first names]0/[surname/surnames]0/[number]/ [text] href%]%]</a>
+      <a onclick="return insertTags('%[%[x/x/9/x;x%]%]','','')" href="javascript:;">
+       %[%[[first name/first names]0/[surname/surnames]0/[number]/ [text] href; [person/persons]0 [text] href%]%]</a>
+    </span>
+  </span>
+</div>
+</div>
