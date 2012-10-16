@@ -8,7 +8,7 @@ open Gwdb;
 open Hutil;
 open Util;
 
-module SourceSet = Set.Make
+module DataSet = Set.Make
   (struct
     type t = (Gwdb.istr * string * int) ;
     value compare (_, s1, i1) (_, s2, i2) = 
@@ -42,11 +42,44 @@ module StringSet = Set.Make
   end)
 ;
 
+type fun_data_p_f =
+  [ Person of person -> istr
+  | Family of family -> istr ]
+;
+
 
 (* ******************************************************************** *)
-(*  [Fonc] get_all_sources : config -> base ->  SourceSet.elt list      *)
-(** [Description] : Construit la liste de toutes les sources de la base 
-                    et leur associe une clé unique.
+(*  [Fonc] get_data : config -> (string * fun x -> istr) list * bool    *)
+(** [Description] : Renvoie la liste des labels et fonctions pour 
+                    récupérer les données que l'on veut modifier.
+    [Args] :
+      - conf : configuration
+    [Retour] :
+      - (string * fun x -> istr) list * bool : La liste des données que
+           l'on souhaite modifier ainsi qu'un boolean pour savoir s'il
+           faut tester la famille.
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
+value get_data conf =
+  match p_getenv conf.env "data" with
+  [ Some "occu" -> ([ ("occu", Person get_occupation) ], False)
+  | Some "place" -> 
+      ([ ("bi", Person get_birth_place); ("bp", Person get_baptism_place); 
+         ("de", Person get_death_place); ("bu", Person get_burial_place); 
+         ("ma", Family get_marriage_place) ], True)
+  | Some "src" ->
+      ([ ("bi", Person get_birth_src); ("bp", Person get_baptism_src); 
+         ("de", Person get_death_src); ("bu", Person get_burial_src); 
+         ("p", Person get_psources); 
+         ("ma", Family get_marriage_src); ("f", Family get_fsources) ], True)
+  | _ -> ([], False) ]
+;
+
+
+(* ******************************************************************** *)
+(*  [Fonc] get_all_data : config -> base -> DataSet.elt list            *)
+(** [Description] : Construit la liste de toutes les données de la base 
+                    que l'on veut modifier et leur associe une clé unique.
     [Args] :
       - conf : configuration
       - base : base
@@ -55,92 +88,84 @@ module StringSet = Set.Make
           sources de la base avec leur clé.
     [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
-value get_all_sources conf base = do {
-  let sources = ref SourceSet.empty in
-  (* Ajoute toutes les sources liés à un individu *)
+value get_all_data conf base = do {
+  let data_set = ref DataSet.empty in
+  let (data, test_family) = get_data conf in
+  (* Ajoute toutes les "data" liés à un individu *)
   let rec loop i = 
     if i = nb_of_persons base then ()
     else 
       do {
         let p = pget conf base (Adef.iper_of_int i) in
-        let src_bi = get_birth_src p in
-        let src_bp = get_baptism_src p in
-        let src_de = get_death_src p in
-        let src_bu = get_burial_src p in
-        let src_p = get_psources p in
-        if not (is_empty_string src_bi) then 
-          sources.val := 
-            SourceSet.add (src_bi, "bi", Hashtbl.hash src_bi) sources.val
-        else ();
-        if not (is_empty_string src_bp) then 
-          sources.val := 
-            SourceSet.add (src_bp, "bp", Hashtbl.hash src_bp) sources.val
-        else ();
-        if not (is_empty_string src_de) then 
-          sources.val := 
-            SourceSet.add (src_de, "de", Hashtbl.hash src_de) sources.val
-        else ();
-        if not (is_empty_string src_bu) then 
-          sources.val := 
-            SourceSet.add (src_bu, "bu", Hashtbl.hash src_bu) sources.val
-        else ();
-        if not (is_empty_string src_p) then 
-          sources.val := 
-            SourceSet.add (src_p, "p", Hashtbl.hash src_p) sources.val
-        else ();
+        List.iter
+          (fun (label, fun_data) ->
+            match fun_data with
+            [ Person fun_data -> 
+                let istr = fun_data p in
+                if not (is_empty_string istr) then 
+                  data_set.val := 
+                    DataSet.add (istr, label, Hashtbl.hash istr) data_set.val
+                else ()
+            | _ -> () ] )
+          data;
         loop (i+1)
       }
   in loop 0;
-  (* Ajoute toutes les sources liés à une famille *)
-  let rec loop i = 
-    if i = nb_of_families base then ()
-    else
-      do {
-        let fam = foi base (Adef.ifam_of_int i) in
-        if is_deleted_family fam then ()
-        else do {
-          let src_ma = get_marriage_src fam in
-          if not (is_empty_string src_ma) then 
-            sources.val := 
-              SourceSet.add (src_ma, "ma", Hashtbl.hash src_ma) sources.val
-          else (); 
-          let src_f = get_fsources fam in
-          if not (is_empty_string src_f) then 
-            sources.val := 
-              SourceSet.add (src_f, "f", Hashtbl.hash src_f) sources.val
-          else (); } ;
-        loop (i+1)
-      }
-  in loop 0;
-  SourceSet.elements sources.val }
+  (* Ajoute toutes les "data" liés à une famille *)
+  if test_family then
+    let rec loop i = 
+      if i = nb_of_families base then ()
+      else
+        do {
+          let fam = foi base (Adef.ifam_of_int i) in
+          if is_deleted_family fam then ()
+          else
+            List.iter
+              (fun (label, fun_data) ->
+                match fun_data with
+                [ Family fun_data -> 
+                    let istr = fun_data fam in
+                    if not (is_empty_string istr) then 
+                      data_set.val := 
+                        DataSet.add (istr, label, Hashtbl.hash istr) data_set.val
+                    else ()
+                | _ -> () ] )
+              data;
+          loop (i+1)
+        }
+    in loop 0
+  else ();
+  DataSet.elements data_set.val }
 ;
 
 
 (* ************************************************************************** *)
-(*  [Fonc] get_person_sources : config -> base -> 
-                                 (Gwdb.istr * PersSet.elt list) list          *)
-(** [Description] : Construit a partir de la clé d'une source, l'ensemble des
-                    personnes en relation avec cette source.
+(*  [Fonc] get_person_from_data :
+             config -> base -> (Gwdb.istr * PersSet.elt list) list            *)
+(** [Description] : Construit a partir de la clé d'une donnée, l'ensemble des
+                    personnes en relation avec cette donnée.
     [Args] :
       - conf : configuration
       - base : base
     [Retour] :
-      - (Gwdb.istr * person list) : retourne la liste des adresses des sources
-          ainsi que la liste des personnes en relation avec cette source.
+      - (Gwdb.istr * person list) : retourne la liste des adresses des données
+          ainsi que la liste des personnes en relation avec cette donnée.
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-value get_person_sources conf base = do {
+value get_person_from_data conf base = do {
+  let (data, test_family) = get_data conf in
   let env_keys = 
+    let list = List.map fst data in
     List.map
       (fun key -> 
         match p_getint conf.env key with
         [ Some hash -> (key, hash)
         | None -> (key, (-1)) ] )
-      [ "bi"; "bp"; "de"; "bu"; "p"; "ma"; "f" ] 
+      list
   in
   let pers_map = ref PersMap.empty in
   (* Fonction d'ajout dans la map des personnes (PersMap).         *)
-  (* k = key, istr = source, p = person.                           *)
+  (* k = key, istr = data, p = person.                             *)
   (* A la clé k est associé le binding (istr, ensemble d'individu) *)
   let map_add k istr p =
     try
@@ -153,82 +178,61 @@ value get_person_sources conf base = do {
       pers_map.val := PersMap.add k (istr, set) pers_map.val ]
   in
   (* Parcours tous les individus et ajoute dans la map les    *)
-  (* individus en relation avec la source donné par la clé k. *)
+  (* individus en relation avec la "data" donné par la clé k. *)
   let rec loop i =
     if i = nb_of_persons base then ()
     else 
       do {
         let p = pget conf base (Adef.iper_of_int i) in
-        let src_bi = get_birth_src p in
-        let hash_src_bi = Hashtbl.hash src_bi in
-        let src_bp = get_baptism_src p in
-        let hash_src_bp = Hashtbl.hash src_bp in
-        let src_de = get_death_src p in
-        let hash_src_de = Hashtbl.hash src_de in
-        let src_bu = get_burial_src p in
-        let hash_src_bu = Hashtbl.hash src_bu in
-        let src_p = get_psources p in
-        let hash_src_p = Hashtbl.hash src_p in
-        let key = List.assoc "bi" env_keys in
-        if not (is_empty_string src_bi) && (hash_src_bi = key) then 
-          map_add key src_bi p
-        else ();
-        let key = List.assoc "bp" env_keys in
-        if not (is_empty_string src_bp) && (hash_src_bp = key) then 
-          map_add key src_bp p
-        else ();
-        let key = List.assoc "de" env_keys in
-        if not (is_empty_string src_de) && (hash_src_de = key) then 
-          map_add key src_de p
-        else ();
-        let key = List.assoc "bu" env_keys in
-        if not (is_empty_string src_bu) && (hash_src_bu = key) then 
-          map_add key src_bu p
-        else ();
-        let key = List.assoc "p" env_keys in
-        if not (is_empty_string src_p) && (hash_src_p = key) then 
-          map_add key src_p p
-        else ();
+        List.iter
+          (fun (label, fun_data) ->
+            match fun_data with
+            [ Person fun_data ->
+                let istr = fun_data p in
+                let hash_istr = Hashtbl.hash istr in
+                let key =  List.assoc label env_keys in
+                if not (is_empty_string istr) && (hash_istr = key) then 
+                  map_add key istr p
+                else ()
+            | _ -> () ] )
+          data;
         loop (i+1)
       }
   in loop 0;
   (* Parcours toutes les familles et ajoute dans la map les    *)
-  (* individus en relation avec la source donnée par la clé k. *)
-  let rec loop i =
-    if i = nb_of_families base then ()
-    else
-      do {
-        let fam = foi base (Adef.ifam_of_int i) in
-        if is_deleted_family fam then ()
-        else 
-          do {
-            let src_ma = get_marriage_src fam in
-            let hash_src_ma = Hashtbl.hash src_ma in
-            let src_f = get_fsources fam in
-            let hash_src_f = Hashtbl.hash src_f in
-            let key = List.assoc "ma" env_keys in
-            if not (is_empty_string src_ma) && (hash_src_ma = key) then 
-              do {
-                let p = pget conf base (get_father fam) in
-                map_add key src_ma p;
-                let p = pget conf base (get_mother fam) in
-                map_add key src_ma p
-              }
-            else ();
-            let key = List.assoc "f" env_keys in
-            if not (is_empty_string src_f) && (hash_src_f = key) then 
-              do {
-                let p = pget conf base (get_father fam) in
-                map_add key src_f p;
-                let p = pget conf base (get_mother fam) in
-                map_add key src_f p
-              }
-            else ();
-          };       
-        loop (i+1) 
-      }
-  in loop 0;
-  (* On retourne la liste des couples (source, persons list) *)
+  (* individus en relation avec la "data" donnée par la clé k. *)
+  if test_family then
+    let rec loop i =
+      if i = nb_of_families base then ()
+      else
+        do {
+          let fam = foi base (Adef.ifam_of_int i) in
+          if is_deleted_family fam then ()
+          else 
+            do {
+              List.iter
+              (fun (label, fun_data) ->
+                match fun_data with
+                [ Family fun_data ->
+                    let istr = fun_data fam in
+                    let hash_istr = Hashtbl.hash istr in
+                    let key = List.assoc label env_keys in
+                    if not (is_empty_string istr) && (hash_istr = key) then 
+                      do {
+                        let p = pget conf base (get_father fam) in
+                        map_add key istr p;
+                        let p = pget conf base (get_mother fam) in
+                        map_add key istr p
+                      }
+                  else ()
+                | _ -> () ] )
+              data;
+            };
+          loop (i+1) 
+        }
+    in loop 0
+  else ();
+  (* On retourne la liste des couples ("data", persons list) *)
   let list = ref [] in
   PersMap.iter
     (fun hash (istr, pset) -> 
@@ -236,7 +240,6 @@ value get_person_sources conf base = do {
     pers_map.val ;
   list.val }
 ;
-
 
 
 (* ************************************************************************** *)
@@ -277,8 +280,9 @@ value combine_by_ini ini list =
           loop new_list list
         } ]
   in
-  List.fold_left (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) []
-    list
+  List.fold_left 
+    (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) 
+    [] list
 ;
 
 
@@ -307,60 +311,87 @@ value combine list =
           loop new_list list
         } ]
   in
-  List.fold_left (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) []
-    list
+  List.fold_left 
+    (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) 
+    [] list
+;
+
+
+(* ************************************************************************** *)
+(*  [Fonc] translate_title : config -> string * string                       *)
+(** [Description] : Affiche le titre du dictionnaire
+    [Args] :
+      - conf : configuration
+    [Retour] :
+      - string : le nom du dictionnaire
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value translate_title conf =
+  let title =
+    match p_getenv conf.env "data" with
+    [ Some "occu" -> transl_nth conf "occupation/occupations" 1
+    | Some "place" -> transl conf "places"
+    | Some "src" -> transl_nth conf "source/sources" 1
+    | _ -> "" ]
+  in 
+  (Printf.sprintf (ftransl conf "book of %s") title, title)
 ;
 
 
 (* ************************************************************************** *)
 (*  [Fonc] print_title : config -> base -> string -> int -> unit              *)
-(** [Description] : Affiche le titre du dictionnaire des sources en fonction
+(** [Description] : Affiche le titre du dictionnaire en fonction de data et
                     de la longueur de la liste
     [Args] :
       - conf : configuration
       - base : base
       - ini  : les premières lettres de la source
       - len  : le nombre de sources commençant par ini
-    [Retour] :
-      - unit
+    [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 value print_title conf base ini len = do {
-  Wserver.wprint "%s" (capitale (transl conf "book of sources"));
+  let (book_of, title) = translate_title conf in
+  Wserver.wprint "%s" (capitale book_of);
   if ini = "" then
-    Wserver.wprint " (%d %s)" len (transl conf "sources")
+    Wserver.wprint " (%d %s)" len title
   else do {
     Wserver.wprint " - ";
     Wserver.wprint 
-      (fcapitale (ftransl conf "%d sources starting with %s")) len ini }
+      (fcapitale (ftransl conf "%d %s starting with %s")) len title ini }
 };
 
 
 (* ************************************************************************** *)
-(*  [Fonc] print_src : config -> base -> (string * (string * int) list) list
+(*  [Fonc] print_long : config -> base -> (string * (string * int) list) list
                            -> int -> unit                                     *)
-(** [Description] : Affiche le tableau des sources en leur associant une clé
+(** [Description] : Affiche le tableau des "data" en leur associant une clé
                     unique afin de pouvoir mettre un champs de modification.
     [Args] :
       - conf : configuration
       - base : base
-      - list : liste de couple (source, (type (= bi, bp, de, bu, p) * clé) list)
+      - list : liste de couple (data, (type (= bi, occu ...) * clé) list)
       - len  : la longueur de la liste
-    [Retour] :
-      - unit
+    [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-value print_src conf base list len =
+value print_long conf base list len =
   let env_keys = 
     let list = ref [] in
+    let keys = List.map fst (fst (get_data conf)) in
     let _ = 
       List.map
         (fun key -> 
           match p_getint conf.env key with
           [ Some hash -> list.val := [ (key, hash) :: list.val ]
           | None -> () ] )
-        [ "bi"; "bp"; "de"; "bu"; "p"; "ma"; "f" ] 
+        keys 
     in List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list.val
+  in
+  let data = 
+    match p_getenv conf.env "data" with
+    [ Some s -> s
+    | None -> "" ]
   in
   let ini =
     match p_getenv conf.env "s" with
@@ -391,26 +422,26 @@ value print_src conf base list len =
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
-      Wserver.wprint "%s" (capitale (transl conf "help sources")) ;
+      Wserver.wprint "%s" (capitale (transl conf "help modify data")) ;
     end;
     (* Ancre en haut de page afin de naviguer plus facilement. *)
     tag "p" begin
       List.iter
         (fun (ini, _) ->
            stagn "a" "href=\"#%s\"" ini begin
-             Wserver.wprint "%s" ini;
+             Wserver.wprint "%s" (no_html_tags ini);
            end)
       list;
     end;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      tag "ul" "class=mod_sources_ul" begin
+      tag "ul" "class=mod_data_ul" begin
         List.iter 
           (fun (ini_k, list) -> do {
             tag "li" begin
               stagn "a" "id=\"%s\"" ini_k begin
-                Wserver.wprint "%s" ini_k;
+                Wserver.wprint "%s" (no_html_tags ini_k);
             end;
-            tag "table" "class=mod_sources_table" begin
+            tag "table" "class=mod_data_table" begin
               List.iter
                 (fun (s, k) -> do {
                   let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
@@ -425,12 +456,12 @@ value print_src conf base list len =
                             accu ^ k ^ "=" ^ (string_of_int i) ^ ";")
                           "" k
                       in
-                      tag "td" "class=mod_sources_table_modify" begin
-                        stag "a" "style=\"font-size:80%%\" href=\"%sm=MOD_SRC;%s;s=%s#mod\""
-                          (commd conf) k (code_varenv ini)
+                      tag "td" "class=mod_data_table_modify" begin
+                        stag "a" "style=\"font-size:80%%\" href=\"%sm=MOD_DATA;data=%s;%s;s=%s#mod\""
+                          (commd conf) data k (code_varenv ini)
                         begin
-                          Wserver.wprint "%s" 
-                            (capitale (Util.transl_decline conf "modify sources" ""));
+                          let (_, label) = translate_title conf in
+                          Wserver.wprint (fcapitale (ftransl conf "modify %s")) label;
                         end;
                       end; } 
                     else do { 
@@ -442,9 +473,10 @@ value print_src conf base list len =
                           (fun (s,i) -> 
                             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%d\"" s i )
                           env_keys ;
-                        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_SRC_OK\"" ;
+                        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"" ;
+                        xtag "input" "type=\"hidden\" name=\"data\" value=\"%s\"" data;
                         xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
-                        xtag "input" "type=\"text\" name=\"src\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"src\"" 
+                        xtag "input" "type=\"text\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"nx_input\"" 
                           (quote_escaped (only_printable s)) ;
                       end;
                       tag "td" begin
@@ -465,30 +497,32 @@ value print_src conf base list len =
 
 (* ************************************************************************* *)
 (*  [Fonc] print_short : config -> base -> (string * 'a) list -> int -> unit *)
-(** [Description] : Si le nombre de sources est trop grand, on affiche les
-                    première lettre de chaque source en fonction des premières
-                    lettres données par le paramètre s dans la configuration.
+(** [Description] : Si le nombre de "data" est trop grand, on affiche les
+                    premières lettres de chaque "data".
     [Args] :
       - conf : configuration
       - base : base
-      - list : la liste des sources
+      - list : la liste des "data"
       - len  : la longueur de la liste
-    [Retour] :
-      - unit
+    [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
 value print_short conf base list len =
+  let data =
+    match p_getenv conf.env "data" with
+    [ Some s -> s
+    | None -> "" ]
+  in
   let ini =
     match p_getenv conf.env "s" with
     [ Some s -> s
     | None -> "" ]
   in
   (* Construit la liste des string commençant par ini. *)
-  (* Fonctionne différement du dictionnaire des lieux  *)
-  (* parce que l'on peut avoir beaucoup de sources qui *)
-  (* commencent par les mêmes lettres. On calcul alors *)
-  (* à partir de quelle lettre de ini, les sources     *)
-  (* sont différentes.                                 *)
+  (* Pour certaines données comme les sources, on peut *)
+  (* avoir beaucoup de sources qui commencent par les  *)
+  (* mêmes lettres. On calcul alors à partir de quelle *)
+  (* lettre de ini, les sources sont différentes.      *)
   (* ex: eta -> etat -> etat_ -> ... -> etat_civil     *)
   let rec build_ini l len =
     (* Attention, il ne faut pas faire String.length     *)
@@ -522,9 +556,10 @@ value print_short conf base list len =
     tag "p" begin
       List.iter
         (fun s ->
-          stagn "a" "href=\"%sm=MOD_SRC;s=%s\"" (commd conf) (code_varenv s) 
+          stagn "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" 
+            (commd conf) data (code_varenv s) 
             begin
-              Wserver.wprint "%s" s;
+              Wserver.wprint "%s" (no_html_tags s);
             end)
         ini_list;
     end;
@@ -533,19 +568,18 @@ value print_short conf base list len =
 ;
 
 
-value max_nb_sources = 1000 ;
+value max_results = 1000 ;
 
 
 (* ********************************************************************* *)
 (*  [Fonc] print_mod : config -> base -> unit                            *)
-(** [Description] : Récupère la liste de toutes les sources de la base et 
-                    en fonction du nombre de résultats, fait un affichage
-                    court ou un afficahge long.
+(** [Description] : Récupère la liste de toutes les "données" de la base 
+                    et en fonction du nombre de résultats, fait un 
+                    affichage court ou un afficahge long.
     [Args] :
       - conf : configuration
       - base : base
-    [Retour] :
-      - unit
+    [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 value print_mod conf base = 
@@ -557,36 +591,33 @@ value print_mod conf base =
   in
   (* Astuce pour gérer les espaces. *)
   let ini = Mutil.tr '_' ' ' ini in
-  let list = get_all_sources conf base in
+  let list = get_all_data conf base in
   let list = List.map (fun (istr, s, k) -> (sou base istr, s, k)) list in
   (* On tri la liste avant de la combiner *)
   (* sinon on n'élimine pas les doublons. *)
   let list = 
     List.sort (fun (s1, _, _) (s2, _, _) -> Gutil.alphabetic_order s1 s2) list
   in
-  (* On combine la liste parce qu'en gwc2, les  *)
-  (* sources ont tous des adresses différentes. *)
+  (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
+  (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
+  (* les sources dans un seul index pour de meilleures performances.   *)
   let list = combine list in
-  (* Fonction qui à une liste de sources retourne la *)
-  (* liste de tous les souces commençant par ini.   *)
+  (* Fonction qui à une liste de données retourne la *)
+  (* liste de toutes les données commençant par ini. *)
   let reduce l =
     (* fold_right pour conserver le tri précédent. *)
     List.fold_right
-      (fun (src, k) acc -> 
-        let src_tmp =  Mutil.tr '_' ' ' src in
-        if Mutil.start_with ini src_tmp || (src_tmp ^ " " = ini) then
-          [ (src, k) :: acc ]
+      (fun (data, k) acc -> 
+        let data_tmp =  Mutil.tr '_' ' ' data in
+        if Mutil.start_with ini data_tmp || (data_tmp ^ " " = ini) then
+          [ (data, k) :: acc ]
         else acc )
       l []
   in
-  let list = 
-    if ini <> "" then reduce list
-    else list
-  in
+  let list = if ini <> "" then reduce list else list in
   let len = List.length list in
-  if len > max_nb_sources then
-    print_short conf base list len
-  else print_src conf base list len
+  if len > max_results then print_short conf base list len
+  else print_long conf base list len
 ;
 
 
@@ -616,105 +647,160 @@ value reduce_cpl_list size list =
 ;
 
 
+(* ************************************************************************** *)
+(*  [Fonc] update_person : conf -> base -> string -> string -> person -> 
+                             gen_person iper istr                             *)
+(** [Description] : Met à jour le/les champ(s) de la personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - old  : l'ancien contenu
+      - new_input : le nouveau contenu
+      - p : person
+    [Retour] :
+      - gen_person iper istr : gen_person avec les champs modifiés
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value update_person conf base old new_input p =
+  match p_getenv conf.env "data" with
+  [ Some "occu" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let occupation = get_occupation p in
+      let s_occupation = sou base occupation in
+      let occupation = if old = s_occupation then new_istr else occupation in
+      { (gen_person_of_person p) with occupation = occupation }
+  | Some "place" ->
+      let new_istr = 
+        Gwdb.insert_string base (no_html_tags (only_printable new_input)) 
+      in
+      let pl_bi = get_birth_place p in let s_bi = sou base pl_bi in 
+      let pl_bp = get_baptism_place p in let s_bp = sou base pl_bp in 
+      let pl_de = get_death_place p in let s_de = sou base pl_de in 
+      let pl_bu = get_burial_place p in let s_bu = sou base pl_bu in 
+      let birth_place = if old = s_bi then new_istr else pl_bi in
+      let baptism_place = if old = s_bp then new_istr else pl_bp in
+      let death_place = if old = s_de then new_istr else pl_de in
+      let burial_place = if old = s_bu then new_istr else pl_bu in
+      { (gen_person_of_person p) with birth_place = birth_place; 
+        baptism_place = baptism_place; death_place = death_place; 
+        burial_place = burial_place }
+  | Some "src" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let src_bi = get_birth_src p in let s_bi = sou base src_bi in 
+      let src_bp = get_baptism_src p in let s_bp = sou base src_bp in
+      let src_de = get_death_src p in let s_de = sou base src_de in 
+      let src_bu = get_burial_src p in let s_bu = sou base src_bu in 
+      let src_p = get_psources p in let s_p = sou base src_p in 
+      let birth_src = if old = s_bi then new_istr else src_bi in
+      let baptism_src = if old = s_bp then new_istr else src_bp in
+      let death_src = if old = s_de then new_istr else src_de in
+      let burial_src = if old = s_bu then new_istr else src_bu in
+      let psources_src = if old = s_p then new_istr else src_p in
+      { (gen_person_of_person p) with birth_src = birth_src; 
+        baptism_src = baptism_src; death_src = death_src; 
+        burial_src = burial_src; psources = psources_src }
+  | _ ->  gen_person_of_person p ]
+;
+
+
+(* ************************************************************************** *)
+(*  [Fonc] update_family : conf -> base -> string -> string -> person -> 
+                             gen_family ifam istr                             *)
+(** [Description] : Met à jour le/les champ(s) de la famille.
+    [Args] :
+      - conf      : configuration de la base
+      - base      : base de donnée
+      - old       : l'ancien contenu
+      - new_input : le nouveau contenu
+      - fam       : family
+    [Retour] :
+      - gen_family ifam istr : gen_family avec les champs modifiés
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+value update_family conf base old new_istr fam =
+  match p_getenv conf.env "data" with
+  [ Some "place" -> 
+      let new_istr = 
+        Gwdb.insert_string base (no_html_tags (only_printable new_istr)) 
+      in
+      let p_ma = get_marriage_place fam in let s_ma = sou base p_ma in
+      let marriage_place = if old = s_ma then new_istr else p_ma in
+      { (gen_family_of_family fam) with marriage_place = marriage_place } 
+  | Some "src" -> 
+      let new_istr = Gwdb.insert_string base (only_printable new_istr) in
+      let src_ma = get_marriage_src fam in let s_ma = sou base src_ma in
+      let src_f = get_fsources fam in let s_f = sou base src_f in
+      let marriage_src = if old = s_ma then new_istr else src_ma in
+      let fsources = if old = s_f then new_istr else src_f in
+      { (gen_family_of_family fam) with 
+        marriage_src = marriage_src; fsources = fsources }
+  | _ -> gen_family_of_family fam ]
+;
+
+
 (* ********************************************************************** *)
-(*  [Fonc] update_person_list : config -> base -> string -> list -> unit  *)
+(*  [Fonc] update_person_list : 
+             config -> base -> string -> (string * person) list -> int 
+               -> int -> unit                                             *)
 (** [Description] : 
     [Args] :
-      - conf : configuration
-      - base : base
+      - conf      : configuration
+      - base      : base
+      - new_input : le nouveau contenu
+      - list      : la liste des (clé, person list)
+      - nb_pers   : le nombre de personnes concernées par la mise à jour
+      - max_updates = le nombre maximum de persons que l'on met à jour
     [Retour] :
       - unit
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
-value update_person_list conf base new_src list nb_pers max_updates = do {
+value update_person_list conf base new_input list nb_pers max_updates = do {
+  let (_, test_family) = get_data conf in
+  let action =
+    match p_getenv conf.env "data" with
+    [ Some "occu" -> "co" 
+    | Some "place" -> "cp"
+    | Some "src" -> "cs" 
+    | _ -> "" ]
+  in
   let list = 
-    if nb_pers > max_updates then
-      reduce_cpl_list max_updates list 
-    else list
+    if nb_pers > max_updates then reduce_cpl_list max_updates list else list
   in
   List.iter
-    (fun (old_src, perl) -> do {
-      (* mise à jour de toutes les personnes *)
-      (* concernées par la nouvelle source.  *)
-      let src_istr = Gwdb.insert_string base new_src in 
+    (fun (old, perl) -> do {
+      (* Mise à jour de toutes les personnes concernées. *)
       List.iter 
         (fun p -> do {
-          let src_bi = get_birth_src p in
-          let s_bi = sou base src_bi in 
-          let src_bp = get_baptism_src p in
-          let s_bp = sou base src_bp in 
-          let src_de = get_death_src p in
-          let s_de = sou base src_de in 
-          let src_bu = get_burial_src p in
-          let s_bu = sou base src_bu in 
-          let src_p = get_psources p in
-          let s_p = sou base src_p in 
-          let birth_src = 
-            if old_src = s_bi then src_istr
-            else src_bi
-          in
-          let baptism_src = 
-            if old_src = s_bp then src_istr
-            else src_bp
-          in
-          let death_src = 
-            if old_src = s_de then src_istr
-            else src_de
-          in
-          let burial_src = 
-            if old_src = s_bu then src_istr
-            else src_bu
-          in
-          let psources_src = 
-            if old_src = s_p then src_istr
-            else src_p
-          in
-          let np = {(gen_person_of_person p) with birth_src = birth_src; 
-                   baptism_src = baptism_src; death_src = death_src; 
-                   burial_src = burial_src; psources = psources_src} 
-          in
+          let np = update_person conf base old new_input p in
           patch_person base np.key_index np; 
-          let fam = Array.to_list (get_family p) in
-          List.iter
-            (fun f ->
-              let ifam = foi base f in
-              let src_ma = get_marriage_src ifam in
-              let s_ma = sou base src_ma in
-              let src_f = get_fsources ifam in
-              let s_f = sou base src_f in
-              let marriage_src =
-                if old_src = s_ma then src_istr
-                else src_ma
-              in
-              let fsources =
-                if old_src = s_f then src_istr
-                else src_f
-              in
-              let nfam = {(gen_family_of_family ifam) with 
-                         marriage_src = marriage_src; fsources = fsources}
-              in
-              patch_family base nfam.fam_index nfam)
-            fam;
+          if test_family then
+            let fam = Array.to_list (get_family p) in
+            List.iter
+              (fun ifam -> 
+                let fam = foi base ifam in
+                let nfam = update_family conf base old new_input fam in
+                patch_family base nfam.fam_index nfam)
+              fam
+          else ();
           (* On met aussi à jour l'historique. *)
-          let changed = U_Multi_sources (Util.string_gen_person base np) in
-          History.record conf base changed "cs"; } )
+          let changed = U_Multi (Util.string_gen_person base np) in
+          History.record conf base changed action; } )
         perl } )
     list;
   Util.commit_patches conf base; 
   (* On appelle explicitement notify_change car la base est modifiée.  *)
   (* On fait cet appel à la fin de chaque mise à jour de la liste des  *)
   (* personnes, car si l'administrateur de la base ne modifie pas tous *)
-  (* les évènements liés à cette source, on ne sera pas mis au courant *)
+  (* les évènements liés à cette donnée, on ne sera pas mis au courant *)
   (* que la base à été mise à jour.                                    *)
-  History.notify conf base "cs"; }
+  History.notify conf base action; }
 ;
 
 
 (* ******************************************************************** *)
 (*  [Fonc] print_mod_ok : config -> base -> unit                        *)
 (** [Description] : Met à jour toutes les personnes en relation avec
-                    la source que l'on veut modifié, donné par le 
-                    paramètre new_src
+                    la donnée que l'on veut modifié.
     [Args] :
       - conf : configuration
       - base : base
@@ -723,6 +809,11 @@ value update_person_list conf base new_src list nb_pers max_updates = do {
     [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
 value print_mod_ok conf base = do {
+  let data = 
+    match p_getenv conf.env "data" with
+    [ Some s -> s
+    | None -> "" ]
+  in
   let ini =
     match p_getenv conf.env "s" with
     [ Some s -> s
@@ -730,30 +821,29 @@ value print_mod_ok conf base = do {
   in
   let env_keys = 
     let list = ref [] in
+    let keys = List.map fst (fst (get_data conf)) in
     let _ = 
       List.map
         (fun key -> 
           match p_getint conf.env key with
           [ Some hash -> list.val := [ (key, hash) :: list.val ]
           | None -> () ] )
-        [ "bi"; "bp"; "de"; "bu"; "p"; "ma"; "f" ] 
+        keys
     in List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list.val
   in
-  let new_src = 
-    match p_getenv conf.env "src" with 
+  let new_input = 
+    match p_getenv conf.env "nx_input" with 
     [ Some s -> only_printable s
     | None -> "" ] 
   in
-  let list = get_person_sources conf base in
+  let list = get_person_from_data conf base in
   let list = List.map (fun (istr, perl) -> (sou base istr, perl)) list in
   let nb_pers = 
     List.fold_left
       (fun accu (_, perl) -> accu + List.length perl)
       0 list
   in
-  let src_modified =
-    List.for_all (fun (old_src, _) -> new_src <> old_src) list
-  in
+  let data_modified = List.for_all (fun (old, _) -> new_input <> old) list in
   (* Indication : 1000 fiches prend environ 1 seconde de traitement. *)
   (* Attention à ne pas mettre une limite trop grande (d'où le test) *)
   (* pour ne pas dépasser le time out du serveur.                    *)
@@ -762,10 +852,11 @@ value print_mod_ok conf base = do {
     [ Some n -> if n > 50000 then 5000 else n
     | _ -> 5000 ]
   in
-  if nb_pers <> 0 && src_modified then do {
-    update_person_list conf base new_src list nb_pers max_updates;
+  if nb_pers <> 0 && data_modified then do {
+    update_person_list conf base new_input list nb_pers max_updates;
+    let (_, ddata) = translate_title conf in
     let title _ = 
-      Wserver.wprint "%s" (capitale (transl conf "src modified")) 
+      Wserver.wprint (fcapitale (ftransl conf "%s modified")) ddata 
     in
     Hutil.header conf title;
     print_link_to_welcome conf True;
@@ -782,9 +873,11 @@ value print_mod_ok conf base = do {
             (fun (s,i) -> 
               xtag "input" "type=\"hidden\" name=\"%s\" value=\"%d\"" s i)
              env_keys ;
-          xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_SRC_OK\"" ;
-          xtag "input" "type=\"hidden\" name=\"src\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"src\"" 
-            (quote_escaped (only_printable new_src));
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"" ;
+          xtag "input" "type=\"hidden\" name=\"data\" value=\"%s\"" data;
+          xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
+          xtag "input" "type=\"hidden\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"data\"" 
+            (quote_escaped (only_printable new_input));
           Wserver.wprint 
             "%s" (capitale (transl conf "continue correcting")) ;
           xtag "input" "type=\"submit\" value=\"Ok\"" ;
@@ -793,7 +886,7 @@ value print_mod_ok conf base = do {
       }
     else ();
     tag "p" begin
-      stag "a" "href=\"%sm=MOD_SRC;s=%s\"" (commd conf) ini begin
+      stag "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" (commd conf) data ini begin
         Wserver.wprint "%s" (capitale (transl conf "new modification"));
       end;
     end;
@@ -805,7 +898,7 @@ value print_mod_ok conf base = do {
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
-      stag "a" "href=\"%sm=MOD_SRC;s=%s\"" (commd conf) ini begin
+      stag "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" (commd conf) data ini begin
         Wserver.wprint "%s" (capitale (transl conf "new modification"));
       end;
     end;

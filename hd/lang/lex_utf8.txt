@@ -203,16 +203,16 @@ sk: %1 :g:%2
 sl: %1 od :g:%2
 sv: %1 till %2
 
-    %d places starting with %s
-de: %d orts beginnend mit "%s"
-en: %d places starting with "%s"
-es: %d lugares comenzando con "%s"
-fi: %d paikoista ensimmäisenä "%s"
-fr: %d lieux commençant par "%s"
-it: %d luoghi partendo da "%s"
-nl: %d plaatsen beginnend met "%s"
-no: %d steder som starter med "%s"
-sv: %d orternas som börjar med "%s"
+    %d %s starting with %s
+de: %d %s beginnend mit "%s"
+en: %d %s starting with "%s"
+es: %d %s comenzando con "%s"
+fi: %d %s ensimmäisenä "%s"
+fr: %d %s commençant par "%s"
+it: %d %s partendo da "%s"
+nl: %d %s beginnend met "%s"
+no: %d %s som starter med "%s"
+sv: %d %s som börjar med "%s"
 
     %d years ago
 af: %d jaar gelede
@@ -2574,16 +2574,16 @@ es: Fecha y lugar de nacimiento
 fr: date et lieu de naissance
 it: Data e luogo di nascita
 
-    book of places
-de: ortsverzeichnis
-en: places
-es: diccionario de lugares
-fi: luettelo paikoista
-fr: dictionnaire des lieux
-it: dizionario dei luoghi
-nl: woordenboek der plaatsen
-no: liste over steder
-sv: orternas uppslagsbok
+    book of %s
+de: %s
+en: %s
+es: diccionario de %s
+fi: luettelo %s
+fr: dictionnaire des %s
+it: dizionario dei %s
+nl: woordenboek der %s
+no: liste over %s
+sv: %s uppslagsbok
 
     border
 af: rand
@@ -4949,11 +4949,11 @@ sl: otroci
 sv: barn
 zh:  生有子女
 
-    help places
+    help modify data
 de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit Ihrer Dateien die diesen Standort betreffen werden sofort korrigiert werden
-en: Click "[Update]" to edit a place: the place names will be automatically updated in your entire family tree
+en: Click "[Update]" to edit: your entire family tree will be automatically updated
 es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
-fr: Cliquez sur « Modifier » pour corriger un lieu : l’ensemble des fiches de votre arbre comportant ce lieu seront instantanément corrigées
+fr: Cliquez sur « Modifier » pour corriger : l’ensemble des fiches de votre arbre seront instantanément corrigées
 
     help surname branch
 de: Um den Baum mit den Zweigen der Familiennamen zu erhalten, klicken Sie auf die Zahl der Zweige
@@ -6732,7 +6732,7 @@ ru: изменить :a: картинку
 sl: spremeni slika
 sv: ändra bild
 
-    modify places
+    modify %s
 af: wysig
 bg: да се променят
 br: kemmañ
@@ -6745,7 +6745,7 @@ eo: modifi :a:
 es: modificar
 et: muuda :g:
 fi: muokkaa
-fr: modifier
+fr: modifier %s
 he:  לשנות
 is: breyta
 it: modificare
@@ -7013,7 +7013,7 @@ sv: navigering med %t som proband (Kekules system)
 
     NB: you should try another relationship computing mode
 de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
-en: cou can try another computing option
+en: you can try another computing option
 es: puede relanzar un cálculo eligiendo otro modo de cálculo
 fi: valitse toinen laskutapa ja laske uudelleen
 fr: n'hésitez pas à recommencer en utilisant un autre mode de calcul
@@ -8215,16 +8215,16 @@ sk: miesto
 sl: kraj
 sv: plats
 
-    place modified
-de: ort geändert
-en: place modified
-es: lugar modificada
-fi: paikka muokattu
-fr: lieu modifié
-it: luogo modificata
-nl: plaats veranderd
-no: sted er endret
-sv: plats ändrad
+    %s modified
+de: %s geändert
+en: %s modified
+es: %s modificada
+fi: %s muokattu
+fr: %s modifié
+it: %s modificata
+nl: %s veranderd
+no: %s er endret
+sv: %s ändrad
 
     places
 de: orts
