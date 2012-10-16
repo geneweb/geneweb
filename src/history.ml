@@ -141,7 +141,7 @@ value diff_person conf base changed =
           Array.append 
             accu (diff_key (Diff_string (ofn, osn, oocc) (fn, sn, occ))))
         [| |] l
-  | U_Multi_sources _ | U_Multi_places _ | U_Multi 
+  | U_Multi _
   | U_Notes _ _ | U_Kill_ancestors _ -> [| |] ]
 ;
 
@@ -168,11 +168,9 @@ value notify_change conf base changed action =
           | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p 
           | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _ 
           | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _ 
-          | U_Kill_ancestors p | U_Change_children_name p _ 
-          | U_Multi_sources p | U_Multi_places p -> 
+          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p -> 
               let key = slash_name_of_key p.first_name p.surname p.occ in
               [| key; string_of_int (Adef.int_of_iper (p.key_index)) |]
-          | U_Multi -> [| |]
           | U_Notes (Some num) file -> [| file; string_of_int num |]
           | U_Notes None file -> [| file |] ]
         in
@@ -216,10 +214,8 @@ value gen_record conf base changed action =
           | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p 
           | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _ 
           | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _ 
-          | U_Kill_ancestors p | U_Change_children_name p _ 
-          | U_Multi_sources p | U_Multi_places p -> 
+          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p -> 
               p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
-          | U_Multi -> "" (* Normalement, on n'a jamais ce cas. *)
           | U_Notes (Some num) file ->
               let s = string_of_int num in
               if file = "" then s else file ^ "/" ^ s
@@ -244,8 +240,8 @@ value gen_record conf base changed action =
     (* créer 5000 nouveaux processus à chaque mise à jour.            *)
     (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
     (* mise à jour de l'historique.                                   *)
-    match action with
-    [ "cp" | "cs" -> ()
+    match changed with
+    [ U_Multi _ -> ()
     | _ -> notify_change conf base changed action ]
   }
 ;
@@ -307,7 +303,11 @@ value record conf base changed action =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 value notify conf base action =
-  notify_change conf base U_Multi action
+  let empty_person = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
+  let empty_person = 
+    Util.string_gen_person base (gen_person_of_person empty_person) 
+  in
+  notify_change conf base (U_Multi empty_person) action
 ;
 
 

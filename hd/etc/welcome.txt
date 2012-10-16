@@ -57,6 +57,9 @@ zh: 家譜
 ]
 %end;
 
+%define;book_of(xx)
+  [*book of %s:::xx]
+%end;
 
 <div id="title">
   <div id="logo">
@@ -402,7 +405,13 @@ sv: <span class="highlight" style="margin-left:10px">genom
     %end;
     %if;(wizard)
       <li>
-        <a href="%prefix;m=MOD_PLACE">[*book of places]</a>
+        <a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a>
+      </li>
+      <li>
+        <a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a>
+      </li>
+      <li>
+        <a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a>
       </li>
     %end;
     %if;(wizard and not base.has_notes)

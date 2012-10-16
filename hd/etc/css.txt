@@ -576,19 +576,19 @@ div.select:hover ul
 }
 
 
-/* ---------------------------- Modify places ---------------------------- */
+/* ------------------- Modify data (e.g. book of places ------------------- */
 
-.mod_places_ul
+.mod_data_ul
 {
  float:left;
 }
 
-.mod_places_table
+.mod_data_table
 {
  width:100%%;
 }
 
-.mod_places_table td.mod_places_table_modify
+.mod_data_table td.mod_data_table_modify
 {
  width:100px;
 }

@@ -6,7 +6,7 @@
  to see the first relationship link
  to try again with this number
 %1 of %2
-%d places starting with %s
+%d %s starting with %s
 %d years ago
 %s access cancelled for that page
 %s cousins
@@ -94,7 +94,7 @@ bibliography
 birth
 birthdays
 birth date and birth place
-book of places
+book of %s
 border
 born
 branch/branches
@@ -197,7 +197,7 @@ half-siblings
 happy birthday to them!
 happy birthday to you!
 having as children
-help places
+help modify data
 help surname branch
 here
 him/her
@@ -274,7 +274,7 @@ missing spouse
 missing sources
 modify
 modify picture
-modify places
+modify %s
 months old
 moon age/new moon/first quarter/full moon/last quarter
 more than %d answers
@@ -339,7 +339,7 @@ person modified
 person/persons
 persons having the same name
 place
-place modified
+%s modified
 places
 population pyramid
 possible duplications

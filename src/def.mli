@@ -191,8 +191,6 @@ type base_changed 'person 'string =
       list ((string * string * int * iper) * (string * string * int *iper))
   | U_Add_parent of gen_person 'person 'string and gen_family 'person 'string
   | U_Kill_ancestors of gen_person 'person 'string
-  | U_Multi_sources of gen_person 'person 'string
-  | U_Multi_places of gen_person 'person 'string
-  | U_Multi
+  | U_Multi of gen_person 'person 'string
   | U_Notes of option int and string ]
 ;

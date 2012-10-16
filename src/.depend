@@ -315,9 +315,9 @@ some.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi date.cmi def.cmi \
 some.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx \
     num.cmx perso.cmx ../wserver/wserver.cmx 
-source.cmo: adef.cmi config.cmi def.cmi gwdb.cmi hutil.cmi mutil.cmi util.cmi \
+updateData.cmo: adef.cmi config.cmi def.cmi gwdb.cmi hutil.cmi mutil.cmi util.cmi \
     history.cmi ../wserver/wserver.cmi 
-source.cmx: adef.cmx config.cmi def.cmi gwdb.cmx hutil.cmx mutil.cmx util.cmx \
+updateData.cmx: adef.cmx config.cmi def.cmi gwdb.cmx hutil.cmx mutil.cmx util.cmx \
     history.cmx ../wserver/wserver.cmx 
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gwdb.cmi history.cmi \
     hutil.cmi lock.cmi mutil.cmi notesLinks.cmi num.cmi secure.cmi templ.cmi \
@@ -440,7 +440,7 @@ relationLink.cmo relationLink.cmx: pa_html.cmo
 request.cmo request.cmx: def_syn.cmo pa_lock.cmo pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_html.cmo
 some.cmo some.cmx: pa_html.cmo
-source.cmo source.cmx: pa_html.cmo
+updateData.cmo updateData.cmx: pa_html.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
 templ.cmo templ.cmx: pa_html.cmo
 title.cmo title.cmx: pa_html.cmo
