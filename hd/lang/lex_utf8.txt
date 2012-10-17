@@ -4953,7 +4953,7 @@ zh:  生有子女
 de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit Ihrer Dateien die diesen Standort betreffen werden sofort korrigiert werden
 en: Click "[Update]" to edit: your entire family tree will be automatically updated
 es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
-fr: Cliquez sur « Modifier » pour corriger : l’ensemble des fiches de votre arbre seront instantanément corrigées
+fr: Cliquez sur « l’élément de la liste » que vous souhaitez corriger : l’ensemble des fiches de votre arbre seront instantanément corrigées
 
     help surname branch
 de: Um den Baum mit den Zweigen der Familiennamen zu erhalten, klicken Sie auf die Zahl der Zweige

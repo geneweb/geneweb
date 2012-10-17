@@ -437,14 +437,14 @@ value print_long conf base list len =
       list;
     end;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      tag "ul" "class=mod_data_ul" begin
+      tag "ul" begin
         List.iter 
           (fun (ini_k, list) -> do {
             tag "li" begin
               stagn "a" "id=\"%s\"" ini_k begin
                 Wserver.wprint "%s" (no_html_tags ini_k);
             end;
-            tag "table" "class=mod_data_table" begin
+            tag "ul" "class=\"mod_data_ul\"" begin
               let list =
                 List.sort 
                   (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) 
@@ -453,47 +453,44 @@ value print_long conf base list len =
               List.iter
                 (fun (s, k) -> do {
                   let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
-                  tag "tr" begin
-                    if k <> env_keys then do { 
-                      tag "td" begin
-                        Wserver.wprint "%s" (quote_escaped s);
-                      end;
+                  tag "li" begin
+                    if k <> env_keys then
                       let k =
                         List.fold_left 
                           (fun accu (k, i) -> 
                             accu ^ k ^ "=" ^ (string_of_int i) ^ ";")
                           "" k
                       in
-                      tag "td" "class=mod_data_table_modify" begin
-                        stag "a" "style=\"font-size:80%%\" href=\"%sm=MOD_DATA;data=%s;%s;s=%s#mod\""
-                          (commd conf) data k (code_varenv ini)
+                      stag "a" "href=\"%sm=MOD_DATA;data=%s;%s;s=%s#mod\""
+                        (commd conf) data k (code_varenv ini)
                         begin
-                          let (_, label) = translate_title conf in
-                          Wserver.wprint (fcapitale (ftransl conf "modify %s")) label;
+                          Wserver.wprint "%s" (quote_escaped s);
+                        end
+                    else
+                      tag "table" "class=\"mod_data_table\"" begin
+                        tag "tr" begin
+                          tag "td" begin
+                            Wserver.wprint "<a name=\"mod\">&nbsp;</a>";
+                            (* envoie les données de façon masquée *)
+                            Util.hidden_env conf; 
+                            List.iter
+                              (fun (s,i) -> 
+                                xtag "input" "type=\"hidden\" name=\"%s\" value=\"%d\"" s i )
+                              env_keys ;
+                            xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"" ;
+                            xtag "input" "type=\"hidden\" name=\"data\" value=\"%s\"" data;
+                            xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
+                            xtag "input" "type=\"text\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"nx_input\"" 
+                              (quote_escaped (only_printable s)) ;
+                          end;
+                          tag "td" begin
+                            xtag "input" "type=\"submit\" value=\"Ok\"" ;
+                          end;
                         end;
-                      end; } 
-                    else do { 
-                      tag "td" begin
-                        Wserver.wprint "<a name=\"mod\">&nbsp;</a>";
-                        (* envoie les données de façon masquée *)
-                        Util.hidden_env conf; 
-                        List.iter
-                          (fun (s,i) -> 
-                            xtag "input" "type=\"hidden\" name=\"%s\" value=\"%d\"" s i )
-                          env_keys ;
-                        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"" ;
-                        xtag "input" "type=\"hidden\" name=\"data\" value=\"%s\"" data;
-                        xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
-                        xtag "input" "type=\"text\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"nx_input\"" 
-                          (quote_escaped (only_printable s)) ;
                       end;
-                      tag "td" begin
-                        xtag "input" "type=\"submit\" value=\"Ok\"" ;
-                      end; };
                   end; } )
                 list;
               end; 
-              xtag "br"; 
             end; } ) 
           list;
       end;
