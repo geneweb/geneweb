@@ -610,14 +610,13 @@ value print_mod conf base =
   (* Fonction qui à une liste de données retourne la *)
   (* liste de toutes les données commençant par ini. *)
   let reduce l =
-    (* fold_right pour conserver le tri précédent. *)
-    List.fold_right
-      (fun (data, k) acc -> 
+    List.fold_left
+      (fun acc (data, k) -> 
         let data_tmp =  Mutil.tr '_' ' ' data in
         if Mutil.start_with ini data_tmp || (data_tmp ^ " " = ini) then
           [ (data, k) :: acc ]
         else acc )
-      l []
+      [] l
   in
   let list = if ini <> "" then reduce list else list in
   let len = List.length list in
