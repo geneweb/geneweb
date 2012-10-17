@@ -578,19 +578,9 @@ div.select:hover ul
 
 /* ------------------- Modify data (e.g. book of places ------------------- */
 
-.mod_data_ul
+.mod_data_ul li
 {
- float:left;
-}
-
-.mod_data_table
-{
- width:100%%;
-}
-
-.mod_data_table td.mod_data_table_modify
-{
- width:200px;
+  padding: 2px;
 }
 
 
