@@ -290,14 +290,14 @@ and eval_relation_var conf base env r =
       let x =
         match r with
         [ Some {r_fath = Some x} -> x
-        | _ -> ("", "", 0, Update.Link, "") ]
+        | _ -> ("", "", 0, Update.Create Neuter None, "") ]
       in
       eval_person_var conf base env x sl
   | ["r_mother" :: sl] ->
       let x =
         match r with
         [ Some {r_moth = Some x} -> x
-        | _ -> ("", "", 0, Update.Link, "") ]
+        | _ -> ("", "", 0, Update.Create Neuter None, "") ]
       in
       eval_person_var conf base env x sl
   | ["rt_adoption"] -> eval_is_relation_type Adoption r
