@@ -590,7 +590,7 @@ div.select:hover ul
 
 .mod_data_table td.mod_data_table_modify
 {
- width:100px;
+ width:200px;
 }
 
 

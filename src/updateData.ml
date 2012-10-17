@@ -417,6 +417,9 @@ value print_long conf base list len =
   let list = combine_by_ini ini list in
   (* Astuce pour gérer les espaces. *)
   let list = List.map (fun (ini, l) -> (Mutil.tr ' ' '_' ini, l)) list in
+  let list = 
+    List.sort (fun (ini1, _) (ini2,_) -> Gutil.alphabetic_order ini1 ini2) list
+  in
   do {
     let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
@@ -442,6 +445,11 @@ value print_long conf base list len =
                 Wserver.wprint "%s" (no_html_tags ini_k);
             end;
             tag "table" "class=mod_data_table" begin
+              let list =
+                List.sort 
+                  (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) 
+                  list
+              in
               List.iter
                 (fun (s, k) -> do {
                   let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
@@ -592,12 +600,12 @@ value print_mod conf base =
   (* Astuce pour gérer les espaces. *)
   let ini = Mutil.tr '_' ' ' ini in
   let list = get_all_data conf base in
-  let list = List.map (fun (istr, s, k) -> (sou base istr, s, k)) list in
+  (* On fait un rev_map (tail-rec) parce que si le nombre de *)
+  (* données est trop important, on casser la pile d'appels. *)
+  let list = List.rev_map (fun (istr, s, k) -> (sou base istr, s, k)) list in
   (* On tri la liste avant de la combiner *)
   (* sinon on n'élimine pas les doublons. *)
-  let list = 
-    List.sort (fun (s1, _, _) (s2, _, _) -> Gutil.alphabetic_order s1 s2) list
-  in
+  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
   (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
   (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
   (* les sources dans un seul index pour de meilleures performances.   *)

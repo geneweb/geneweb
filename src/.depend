@@ -284,7 +284,7 @@ request.cmo: adef.cmi advSearchOk.cmo alln.cmo birthDeath.cmo birthday.cmo \
     num.cmi perso.cmi place.cmo relation.cmo relationLink.cmi secure.cmi \
     sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
     updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi wiznotes.cmi \
-    ../wserver/wserver.cmi request.cmi 
+    updateData.cmo ../wserver/wserver.cmi request.cmi 
 request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     buff.cmx changeChildren.cmx config.cmi cousins.cmx dag.cmx date.cmx \
     def.cmi descend.cmx doc.cmx forum.cmx gutil.cmx gwdb.cmx history.cmx \
@@ -293,7 +293,7 @@ request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     num.cmx perso.cmx place.cmx relation.cmx relationLink.cmx secure.cmx \
     sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
     updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx wiznotes.cmx \
-    ../wserver/wserver.cmx request.cmi 
+    updateData.cmx ../wserver/wserver.cmx request.cmi 
 request.cmi: config.cmi 
 robot.cmo: config.cmi secure.cmi srcfile.cmi util.cmi templ.cmi \
     ../wserver/wserver.cmi 
