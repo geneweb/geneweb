@@ -281,7 +281,7 @@ value combine_by_ini ini list =
         } ]
   in
   List.fold_left 
-    (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) 
+    (fun new_l (ini_k, l) -> [(ini_k, l) :: new_l]) 
     [] list
 ;
 
@@ -312,7 +312,7 @@ value combine list =
         } ]
   in
   List.fold_left 
-    (fun new_l (ini_k, l) -> [(ini_k, List.rev l) :: new_l]) 
+    (fun new_l (ini_k, l) -> [(ini_k, l) :: new_l]) 
     [] list
 ;
 
@@ -534,7 +534,7 @@ value print_short conf base list len =
     (* ini + 1 parce qu'en utf8, il se peut que le       *)
     (* caractère soit codé sur plusieurs octets.         *)
     let ini_list =
-      List.map
+      List.rev_map
         (fun (s, _) -> 
           if String.length s > len then
             String.sub s 0 (index_of_next_char s len)
@@ -544,10 +544,12 @@ value print_short conf base list len =
     (* Fonction pour supprimer les doublons. *)
     let remove_dup list =
       StringSet.elements 
-        (List.fold_right StringSet.add list StringSet.empty)
+        (List.fold_left
+           (fun accu ini -> StringSet.add ini accu)
+           StringSet.empty list)
     in
     (* Astuce pour gérer les espaces. *)
-    let ini_list = List.map (fun p -> Mutil.tr ' ' '_' p) ini_list in
+    let ini_list = List.rev_map (fun p -> Mutil.tr ' ' '_' p) ini_list in
     let ini_list = remove_dup ini_list in
     (* Si la liste des ini n'a qu'un élément, on calcul on 'rang' d'après *)
     if List.length ini_list = 1 then build_ini list (len + 1)
