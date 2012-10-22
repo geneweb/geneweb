@@ -859,9 +859,9 @@ value surname_print conf base not_found_fun x =
       let pl =
         List.fold_right
           (fun p pl -> 
-	    if not (is_hide_names conf p) || (fast_auth_age conf p) 
-	    then [p :: pl] 
-	    else pl)
+	          if not (is_hide_names conf p) || (fast_auth_age conf p) 
+	          then [p :: pl] 
+	          else pl)
           pl []
       in
       print_family_alphabetic x conf base pl
