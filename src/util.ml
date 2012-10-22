@@ -1503,7 +1503,8 @@ value message_to_wizard conf =
 
 value doctype conf =
   match p_getenv conf.base_env "doctype" with
-  [ Some "html-4.01-trans" -> "\
+  [ Some "html-5" -> "<!DOCTYPE html>"
+  | Some "html-4.01-trans" -> "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"
  \"http://www.w3.org/TR/html4/loose.dtd\">"
   | Some "html-4.01" -> "\
