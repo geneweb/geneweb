@@ -712,6 +712,27 @@ and eval_simple_variable conf =
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
   | "sp" -> " "
+  | "suffix" ->
+      (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
+      let l =
+        List.fold_left
+          (fun accu (k, v) -> List.remove_assoc k accu)
+          conf.env (conf.henv @ conf.senv)
+      in
+      List.fold_left 
+        (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") 
+        "" l
+  | "url" -> 
+      let c = Util.commd conf in
+      (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
+      let l =
+        List.fold_left
+          (fun accu (k, v) -> List.remove_assoc k accu)
+          conf.env (conf.henv @ conf.senv)
+      in
+      List.fold_left 
+        (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") 
+        c l
   | "version" -> Version.txt
   | "/" -> conf.xhs
   | s -> raise Not_found ]
