@@ -15,6 +15,7 @@ type charset =
 
 value charset = ref Utf8;
 value no_notes = ref False;
+value no_picture = ref False;
 
 value month_txt =
   [| "JAN"; "FEB"; "MAR"; "APR"; "MAY"; "JUN"; "JUL"; "AUG"; "SEP"; "OCT";
@@ -130,7 +131,9 @@ value ged_header base oc ifile ofile =
       fprintf oc "1 FILE %s\n" (Filename.basename ofile)
     else ();
     fprintf oc "1 GEDC\n";
-    fprintf oc "2 VERS 5.5\n";
+    match charset.val with
+    [ Ansel | Ascii -> fprintf oc "2 VERS 5.5\n"
+    | Utf8 -> fprintf oc "2 VERS 5.5.1\n" ];
     fprintf oc "2 FORM LINEAGE-LINKED\n";
     match charset.val with
     [ Ansel -> fprintf oc "1 CHAR ANSEL\n"
@@ -482,9 +485,9 @@ value ged_multimedia_link base oc per =
   match sou base (get_image per) with
   [ "" -> ()
   | s ->
-      do {
-        fprintf oc "1 OBJE\n"; fprintf oc "2 FILE %s\n" s;
-      } ]
+      if not no_picture.val then
+        do {fprintf oc "1 OBJE\n"; fprintf oc "2 FILE %s\n" s;}
+      else () ]
 ;
 
 value ged_note base oc per =
@@ -721,6 +724,7 @@ value speclist =
    ("-nsp", Arg.Set no_spouses_parents,
     ": no spouses' parents (for options -s and -d)");
    ("-nn", Arg.Set no_notes, ": no (database) notes");
+   ("-nopicture", Arg.Set no_picture, ": Don't extract individual picture.");
    ("-c", Arg.Int (fun i -> censor.val := i), "\
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
