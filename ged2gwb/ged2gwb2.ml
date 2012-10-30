@@ -2466,6 +2466,7 @@ be - First names enclosed -
    ("-no_nd", Arg.Set no_negative_dates, " \
 - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year");
+   ("-nc", Arg.Clear Db2link.do_check, "\n       No consistency check");
    ("-nopicture", Arg.Set no_picture, " \
 - Don't extract individual picture.");
    ("-udi", Arg.String set_undefined_death_interval, "\
