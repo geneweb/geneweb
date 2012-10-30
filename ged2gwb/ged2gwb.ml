@@ -169,6 +169,7 @@ value force = ref False;
 value default_source = ref "";
 value relation_status = ref Married;
 value no_picture = ref False;
+value do_check = ref True;
 
 (* Reading input *)
 
@@ -2775,20 +2776,22 @@ value finish_base base (persons, families, _, _) = do {
   if try_negative_dates.val then negative_dates base persons families
   else ();
   let base = Gwdb.base_of_base1 base in
-  Check.check_base base
-     (fun x ->
-        do {
-          Check.print_base_error log_oc.val base x;
-          fprintf log_oc.val "\n"
-        })
-     (fun
-      [ UndefinedSex _ -> ()
-      | x ->
+  if do_check.val then
+    Check.check_base base
+       (fun x ->
           do {
-            Check.print_base_warning log_oc.val base x;
+            Check.print_base_error log_oc.val base x;
             fprintf log_oc.val "\n"
-          } ])
-     (fun _ -> True) (fun _ -> ()) False;
+          })
+       (fun
+        [ UndefinedSex _ -> ()
+        | x ->
+            do {
+              Check.print_base_warning log_oc.val base x;
+              fprintf log_oc.val "\n"
+            } ])
+       (fun _ -> True) (fun _ -> ()) False
+  else ();
   flush log_oc.val
 };
 
@@ -2892,6 +2895,7 @@ be - First names enclosed -
    ("-no_nd", Arg.Set no_negative_dates, " \
 - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year");
+   ("-nc", Arg.Clear do_check, "\n       No consistency check");
    ("-nopicture", Arg.Set no_picture, " \
 - Don't extract individual picture.");
    ("-udi", Arg.String set_undefined_death_interval, "\
