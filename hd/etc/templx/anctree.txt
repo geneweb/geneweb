@@ -1,7 +1,7 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anctree.txt, Template x v 6.06a 2012/07/30 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anctree.txt, Template x v 6.06b 2012/10/31 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
@@ -55,15 +55,17 @@
   %sp;
 %end;
 
-%define;display_2arrows()
+%define;display_arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
-        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;
+        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
           src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
       %end;
       <a href="%prefix;"><img style="border-width: thin" alt="" title="^^"%sp;
         src="%image_prefix;/up.png"%wid_hei;up.png;%/></a>
+      <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
+        src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[cancel GeneWeb links]"%/></a>
     </td></tr></table>
   %end;
 %end;
@@ -204,6 +206,7 @@
   %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_tree)%end;
 %in;
 %message_to_wizard;
+%apply;display_arrows()
 
 %if;(evar.t = "T")
   <div style="text-align:%right;">%nn;
@@ -211,12 +214,10 @@
   ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
   %apply;tree(nb_gena)
 %elseif;(evar.t = "A")
-  %apply;display_2arrows()
   <table border="%border;" width="100%%"><tr><td align="center">
     %apply;male_line("self", nb_gena)
   </td></tr></table>
 %elseif;(evar.t = "C")
-  %apply;display_2arrows()
   <table border="%border;" width="100%%"><tr><td align="center">
     %apply;female_line("self", nb_gena)
   </td></tr></table>

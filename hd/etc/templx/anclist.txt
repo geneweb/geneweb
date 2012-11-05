@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anclist.txt, Template x v 6.06b 2012/08/23 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anclist.txt, Template x v 6.06c 2012/10/31 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "E")
@@ -69,16 +69,17 @@
   %sp;
 %end;
 
-
-%define;display_2arrows()
+%define;display_arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
-        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;
+        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
           src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
       %end;
       <a href="%prefix;"><img style="border-width: thin" alt="" title="^^"%sp;
         src="%image_prefix;/up.png"%wid_hei;up.png;%/></a>
+      <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
+        src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[cancel GeneWeb links]"%/></a>
     </td></tr></table>
   %end;
 %end;
@@ -112,9 +113,9 @@
   %foreach;ancestor_surname(nb_gena)
     %apply;add_in_sorted_list%with;
       %if;(evar.sort = "ind")
-        %expr(9999-ancestor.nb_ind)
+        %expr(9999999 - ancestor.nb_ind)
       %elseif;(evar.sort = "evt")
-        %expr(9999-ancestor.nb_events)
+        %expr(9999999 - ancestor.nb_events)
       %else;
         %ancestor.date_begin.year;
       %end;
@@ -298,7 +299,7 @@
   %foreach;ancestor_surname(nb_gena)
     %incr_count;
     %apply;add_in_sorted_list%with
-      %expr(9999 - ancestor.nb_times)
+      %expr(9999999 - ancestor.nb_times)
       %and;%ancestor.surname_end;
       %and;%ancestor.surname_begin;
       %and;%ancestor.sosa_access;
@@ -501,7 +502,7 @@
   %end;
 </h1>
 
-%apply;display_2arrows()
+%apply;display_arrows()
 
 %if;(evar.v <= 1)
   [*specify::generation/generations]0.
