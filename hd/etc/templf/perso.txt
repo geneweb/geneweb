@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template f v 6.06a 2012/07/30 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: perso.txt, Template f v 6.06b 2012/10/31 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -73,16 +73,16 @@
   <li class="%if;xx.has_families;%if;(count!=0)desc%else;nodesc%end;%else;nospou%end;">%nn;
 %end;
 
-%define;display_3arrows()
+%define;display_arrows()
   %if;not cancel_links;
     <table style="float: %right;" border="%border;"><tr><td>
       %if;has_referer;
-        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;
+        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
           src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
       %end;
       <a href="%prefix;"><img style="border-width: thin" alt="" title="^^"%sp;
         src="%image_prefix;/up.png"%wid_hei;up.png;%/></a>
-      <a href="%prefix;%self.access;;cgl=on"><img style="border-width: thin"%sp;
+      <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
         src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[cancel GeneWeb links]"%/></a>
     </td></tr></table>
   %end;
@@ -373,7 +373,7 @@
   %apply;image_MF("self","13")
 </div>
 
-%apply;display_3arrows()
+%apply;display_arrows()
 
 <h1 class="highlight" style="text-align: center">
   %if;has_public_name;
