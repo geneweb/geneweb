@@ -396,7 +396,7 @@
 
     %apply;access("14","mother.mother.father")
 
-    %if;mother.father.father.has_parents;
+    %if;mother.mother.father.has_parents;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;\
