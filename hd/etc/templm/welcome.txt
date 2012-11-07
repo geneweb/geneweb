@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120918 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121105 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -37,9 +37,28 @@
       }
     }
 
+    function computeSosa(event,id)
+    {
+      var x = document.getElementById(id);
+      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+      var string = String.fromCharCode(key);
+      
+      if (x.value > 0)
+      {
+        switch (string)
+        {
+          case "*" : x.value = x.value * 2; return false; break;
+          case "/" : x.value = parseInt(x.value / 2); return false; break;
+        }
+      }
+    }
   -->
   </script>
 </head>
+
+%define;book_of(xx)
+  [*book of %s:::xx]
+%end;
 
 %define;sosa_rel(xx)
   [<em>Sosa number</em> relative to %t:::xx]
@@ -203,7 +222,13 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
       %end;
       %if;(wizard)
         <li>
-          <a href="%prefix;m=MOD_PLACE">[book of places]</a>
+          <a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a>
+        </li>
+        <li>
+          <a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a>
+        </li>
+        <li>
+          <a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a>
         </li>
       %end;
     %end;
@@ -240,7 +265,8 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
         <label id="labelTriA" style="visibility:hidden;">
                <input id="triA" type="checkbox" name="tri" value="A"
                       onclick="changeTri('visible')"%/>[starting with]</label>
-        <br%/><input id="n" name="n" size="54" maxlength="200"%/>
+        <br%/><input id="n" name="n" size="54" maxlength="200"
+                     onkeypress="javascript:return computeSosa(event,'n')"%/>
         <input type="submit" value="Ok"%/>
       </fieldset>
     </form>
