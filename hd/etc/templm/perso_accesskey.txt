@@ -1,0 +1,38 @@
+  <script type="text/javascript">
+  <!--
+    // mickroue(a)yahoo.fr 20121023 templ=templm 
+    function acc_key(event,sib,spo,chi,mod_ind,add_par,add_fam,mod_fam) {
+      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+      var a_k = String.fromCharCode(key);
+      switch (a_k)
+      {
+        case "9": document.getElementById("wide").focus(); break;  // menu2 wide = (·|·) or (÷)
+        case "²": document.getElementById("Tn").focus(); break;    // trl : search input
+        case "2": document.getElementById("par_2").focus(); break;
+        case "3": document.getElementById("par_3").focus(); break;
+        case "4": document.getElementById("par_4").focus(); break;
+        case "5": document.getElementById("par_5").focus(); break;
+        case "6": document.getElementById("par_6").focus(); break;
+        case "7": document.getElementById("par_7").focus(); break;
+        case "1":
+          if(document.getElementById(sib))
+            {document.getElementById(sib).focus();}
+          else
+            {document.getElementById("sib_1").focus();}
+        break; 
+        case "0": document.getElementById(spo).focus(); break;
+        case "8": document.getElementById(chi).focus(); break;
+        case "p": document.getElementById(mod_ind).click(); break;
+        case "l": document.getElementById(add_par).click(); break;
+        case "a": document.getElementById(add_fam).click(); break;
+        case "f": document.getElementById(mod_fam).click(); break;
+        case "g": document.getElementById("mod_fam_2").click(); break;
+        case "h": document.getElementById("mod_fam_3").click(); break;
+        case "i": document.getElementById("snd_image").click(); break;
+        case "r": document.getElementById("rela_comp").click(); break;
+        default : document.blur(); break;
+      }
+      return false;
+    }
+  -->
+  </script>

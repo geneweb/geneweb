@@ -1,4 +1,4 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 20120918 templ=templm -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 20121107 templ=templm -->
 <!-- How to : copy this file to bases/etc/base_name/ -->
 
 %if;(not cancel_links)
@@ -26,6 +26,23 @@
        Tn.name='n';
       }
     }
+    
+    function computeSosa(event,id)
+    {
+      var x = document.getElementById(id);
+      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+      var string = String.fromCharCode(key);
+      
+      if (x.value > 0)
+      {
+        switch (string)
+        {
+          case "*" : x.value = x.value * 2; return false; break;
+          case "/" : x.value = parseInt(x.value / 2); return false; break;
+        }
+      }
+    }
+
   -->
   </script>
 
@@ -44,8 +61,13 @@
         <label id="TlabelTriA" style="visibility:hidden;">
                <input id="TtriA" type="checkbox" name="tri" value="A"
                       onclick="TchangeTri('visible')"%/>[starting with]</label>
-        <br%/><input id="Tn" name="n" size="54" maxlength="200" title="[*search/case sensitive]0 (²)" accesskey="²"%/>
+        <br%/><input id="Tn" name="n" size="54" maxlength="200"
+                     title="[*search/case sensitive]0 (²)" accesskey="²"
+                     onkeypress="javascript:return computeSosa(event,'Tn')"%/>
         <input type="submit" value="[*search/case sensitive]0 (²)"%/>
+        %if;(bvar.hide_advanced_request = "no")
+          <a href="%prefix;m=H;v=advanced">[advanced request]</a>
+        %end;
       </div>
     </form>
     <div id="templ"></div>
@@ -57,9 +79,7 @@
         window.opener.location = window.opener.location;
         parent.close();
     }
-      
     var htmlTitle = document.title;
-    
     if (
          htmlTitle == "[*person modified]" ||
          htmlTitle == "[*family modified]" ||
