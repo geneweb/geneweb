@@ -1,13 +1,13 @@
   <script type="text/javascript">
   <!--
-    // mickroue(a)yahoo.fr 20121023 templ=templm 
+    // mickroue(a)yahoo.fr 20121108 templ=templm 
     function acc_key(event,sib,spo,chi,mod_ind,add_par,add_fam,mod_fam) {
       var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
       var a_k = String.fromCharCode(key);
       switch (a_k)
       {
-        case "9": document.getElementById("wide").focus(); break;  // menu2 wide = (·|·) or (÷)
-        case "²": document.getElementById("Tn").focus(); break;    // trl : search input
+        case "w": document.getElementById("acckey").focus(); break;  // menu2 (w)
+        case "²": document.getElementById("Tn").focus(); break;      // trl : search input
         case "2": document.getElementById("par_2").focus(); break;
         case "3": document.getElementById("par_3").focus(); break;
         case "4": document.getElementById("par_4").focus(); break;
