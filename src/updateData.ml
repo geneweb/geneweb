@@ -6,6 +6,7 @@ open Config;
 open Def;
 open Gwdb;
 open Hutil;
+open TemplAst;
 open Util;
 
 module DataSet = Set.Make
@@ -424,18 +425,30 @@ value print_long conf base list len =
     let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    tag "p" begin
-      Wserver.wprint "%s" (capitale (transl conf "help modify data")) ;
+    tag "div" "class=\"tips\"" begin 
+      tag "table" begin
+        tag "tr" begin
+          tag "td" begin
+            Wserver.wprint "%s" (capitale (transl conf "help modify data")) ;
+          end;
+        end;
+      end;
     end;
+    xtag "br";
     (* Ancre en haut de page afin de naviguer plus facilement. *)
-    tag "p" begin
-      List.iter
-        (fun (ini, _) ->
-           stagn "a" "href=\"#%s\"" ini begin
-             Wserver.wprint "%s" (no_html_tags ini);
-           end)
-      list;
+    tag "table" "class=\"display_search\"" begin
+      stag "tr" begin
+        List.iter
+          (fun (ini, _) ->
+             stag "td" begin
+               stagn "a" "href=\"#%s\"" ini begin
+                 Wserver.wprint "%s" (no_html_tags ini);
+               end;
+             end)
+        list;
+      end;
     end;
+    xtag "br";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "ul" begin
         List.iter 
@@ -480,8 +493,8 @@ value print_long conf base list len =
                             xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_DATA_OK\"" ;
                             xtag "input" "type=\"hidden\" name=\"data\" value=\"%s\"" data;
                             xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
-                            xtag "input" "type=\"text\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"nx_input\"" 
-                              (quote_escaped (only_printable s)) ;
+                            xtag "input" "type=\"text\" name=\"nx_input\" size=\"80\" maxlength=\"%d\" value=\"%s\" id=\"nx_input\"" 
+                              (if data = "src" then 300 else 200) (quote_escaped (only_printable s)) ;
                           end;
                           tag "td" begin
                             xtag "input" "type=\"submit\" value=\"Ok\"" ;
@@ -560,7 +573,8 @@ value print_short conf base list len =
     let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    tag "p" begin
+    Wserver.wprint "%s :" (capitale (transl conf "select a letter"));
+    tag "p" "class=\"list_ini\"" begin
       List.iter
         (fun s ->
           stagn "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" 
@@ -589,7 +603,7 @@ value max_results = 1000 ;
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-value print_mod conf base = 
+value print_mod_old conf base = 
   (* Paramètre pour savoir par quoi commence la chaine. *)
   let ini =
     match p_getenv conf.env "s" with
@@ -913,3 +927,351 @@ value print_mod_ok conf base = do {
 };
 
 
+(**/**) (* template *)
+
+
+(* ********************************************************************* *)
+(*  [Fonc] build_list : config -> base -> 
+                          (string * (string * int) list) list            *)
+(** [Description] : Récupère la liste de toutes les "données" de la base.
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Retour] : Retourne la liste des données
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+value build_list conf base =
+  (* Paramètre pour savoir par quoi commence la chaine. *)
+  let ini =
+    match p_getenv conf.env "s" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  (* Astuce pour gérer les espaces. *)
+  let ini = Mutil.tr '_' ' ' ini in
+  let list = get_all_data conf base in
+  (* ! rev_map  = tail-rec ! *)
+  let list = List.rev_map (fun (istr, s, k) -> (sou base istr, s, k)) list in
+  (* On tri la liste avant de la combiner *)
+  (* sinon on n'élimine pas les doublons. *)
+  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
+  (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
+  (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
+  (* les sources dans un seul index pour de meilleures performances.   *)
+  let list = combine list in
+  (* Fonction qui à une liste de données retourne la *)
+  (* liste de toutes les données commençant par ini. *)
+  let reduce l =
+    List.fold_left
+      (fun acc (data, k) -> 
+        let data_tmp =  Mutil.tr '_' ' ' data in
+        if Mutil.start_with ini data_tmp || (data_tmp ^ " " = ini) then
+          [ (data, k) :: acc ]
+        else acc )
+      [] l
+  in
+  if ini <> "" then reduce list else list
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] build_list_short : config -> base -> (string * 'a) list 
+                                -> string list                               *)
+(** [Description] : 
+    [Args] :
+      - conf : configuration
+      - base : base
+      - list : la liste des "data"
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value build_list_short conf base list =
+  let ini =
+    match p_getenv conf.env "s" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  (* Construit la liste des string commençant par ini. *)
+  (* Pour certaines données comme les sources, on peut *)
+  (* avoir beaucoup de sources qui commencent par les  *)
+  (* mêmes lettres. On calcul alors à partir de quelle *)
+  (* lettre de ini, les sources sont différentes.      *)
+  (* ex: eta -> etat -> etat_ -> ... -> etat_civil     *)
+  let rec build_ini l len =
+    (* Attention, il ne faut pas faire String.length     *)
+    (* ini + 1 parce qu'en utf8, il se peut que le       *)
+    (* caractère soit codé sur plusieurs octets.         *)
+    let ini_list =
+      List.rev_map
+        (fun (s, _) -> 
+          if String.length s > len then
+            String.sub s 0 (index_of_next_char s len)
+          else s ^ String.make (len + 1 - String.length s) '_')
+        l
+    in
+    (* Fonction pour supprimer les doublons. *)
+    let remove_dup list =
+      StringSet.elements 
+        (List.fold_left
+           (fun accu ini -> StringSet.add ini accu)
+           StringSet.empty list)
+    in
+    (* Astuce pour gérer les espaces. *)
+    let ini_list = List.rev_map (fun p -> Mutil.tr ' ' '_' p) ini_list in
+    let ini_list = remove_dup ini_list in
+    (* Si la liste des ini n'a qu'un élément, on calcul on 'rang' d'après *)
+    if List.length ini_list = 1 then build_ini list (len + 1)
+    else List.sort Gutil.alphabetic_order ini_list
+  in
+  build_ini list (String.length ini)
+;
+
+
+(* ************************************************************************* *)
+(*  [Fonc] build_list_long : config -> base -> (string * 'a) list -> 
+                               (string * (string * 'a) list) list            *)
+(** [Description] : 
+    [Args] :
+      - conf : configuration
+      - base : base
+      - list : la liste des "data"
+    [Retour] : La liste des couples (initiale de "data", "data")
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value build_list_long conf base list =
+  let ini =
+    match p_getenv conf.env "s" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  (* Construit à partir de la liste de (src * hash) la liste dont      *)
+  (* le premier composant est les premières lettres de la sources.     *)
+  (* Attention, il ne faut pas faire String.length ini + 1 parce qu'en *)
+  (* utf8, il se peut que le caractère soit codé sur plusieurs octets. *)
+  let list =
+    List.map
+      (fun (s, k) -> 
+        let ini = 
+          if String.length s > String.length ini then
+            String.sub s 0 (index_of_next_char s (String.length ini))
+          else ini
+        in (ini, s, k))
+      list
+  in
+  (* Re-combine la liste en fonction des premières *)
+  (* lettres afin de pouvoir poser des ancres.     *)
+  let list = combine_by_ini ini list in
+  (* Astuce pour gérer les espaces. *)
+  let list = List.map (fun (ini, l) -> (Mutil.tr ' ' '_' ini, l)) list in
+  List.sort (fun (ini1, _) (ini2,_) -> Gutil.alphabetic_order ini1 ini2) list
+;
+
+
+type env 'a =
+  [ Vlist_data of list (string * list (string * int))
+  | Vlist_ini of list string
+  | Vlist_value of list (string * list (string * int))
+  | Venv_keys of list (string * int)
+  | Vint of int
+  | Vstring of string
+  | Vother of 'a
+  | Vnone ]
+;
+
+value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+value get_vother = fun [ Vother x -> Some x | _ -> None ];
+value set_vother x = Vother x;
+value bool_val x = VVbool x;
+value str_val x = VVstring x;
+
+
+value rec eval_var conf base env xx loc sl =
+  try eval_simple_var conf base env xx sl with
+  [ Not_found -> eval_compound_var conf base env xx sl ]
+and eval_simple_var conf base env xx =
+  fun
+  [ [s] ->
+      try bool_val (eval_simple_bool_var conf base env xx s) with
+      [ Not_found -> str_val (eval_simple_str_var conf base env xx s) ]
+  | _ -> raise Not_found ]
+and eval_simple_bool_var conf base env xx =
+  fun
+  [ "is_modified" -> 
+      let k = 
+        match get_env "keys" env with 
+        [ Venv_keys k -> k
+        | _ -> [] ]
+      in
+      let env_keys = 
+        match get_env "env_keys" env with 
+        [ Venv_keys env_keys -> env_keys
+        | _ -> [] ]
+      in
+      k = env_keys
+  | _ -> raise Not_found ]
+and eval_simple_str_var conf base env xx =
+  fun
+  [ "entry_ini" -> eval_string_env "entry_ini" env
+  | "entry_value" -> eval_string_env "entry_value" env
+  | "ini" -> eval_string_env "ini" env
+  | "keys" ->
+      let k =
+        match get_env "keys" env with 
+        [ Venv_keys k -> k
+        | _ -> [] ]
+      in
+      List.fold_left 
+        (fun accu (k, i) -> 
+          accu ^ k ^ "=" ^ (string_of_int i) ^ ";")
+        "" k
+  | "key_name" -> eval_string_env "key_name" env
+  | "key_value" -> eval_int_env "key_value" env
+  | "nb_results" ->
+      match get_env "list" env with 
+      [ Vlist_data l -> string_of_int (List.length l)
+      | _ -> "0" ]
+  | "title" ->
+      let len = 
+        match get_env "list" env with 
+        [ Vlist_data l -> List.length l
+        | _ -> 0 ]
+      in
+      let ini =
+        match p_getenv conf.env "s" with
+        [ Some s -> s
+        | None -> "" ]
+      in
+      let (book_of, title) = translate_title conf in
+      let result =
+        if ini = "" then Printf.sprintf " (%d %s)" len title
+        else 
+          " - " ^ 
+            Printf.sprintf 
+              (ftransl conf "%d %s starting with %s") len title ini
+      in
+      (capitale book_of) ^ result
+  | _ -> raise Not_found ]
+and eval_compound_var conf base env xx sl =
+  let rec loop =
+    fun
+    [ [s] -> eval_simple_str_var conf base env xx s
+    | ["evar"; s] -> 
+        match p_getenv conf.env s with
+        [ Some s -> s
+        | None -> "" ]
+    | ["encode" :: sl] -> code_varenv (loop sl)
+    | ["escape" :: sl] -> quote_escaped (loop sl)
+    | ["html_encode" :: sl] -> no_html_tags (loop sl)
+    | ["printable" :: sl] -> only_printable (loop sl)
+    | _ -> raise Not_found ]
+  in
+  str_val (loop sl)
+and eval_string_env s env =
+  match get_env s env with
+  [ Vstring s -> s
+  | _ -> raise Not_found ]
+and eval_int_env s env =
+  match get_env s env with
+  [ Vint i -> string_of_int i
+  | _ -> raise Not_found ]
+;
+
+value print_foreach conf base print_ast eval_expr = 
+  let rec print_foreach env xx loc s sl el al =
+    match [s :: sl] with
+    [ ["initial"] -> print_foreach_initial env xx el al
+    | ["entry"] -> print_foreach_entry env xx el al
+    | ["value"] -> print_foreach_value env xx el al
+    | ["env_keys"] -> print_foreach_env_keys env xx el al
+    | _ -> raise Not_found ]
+  and print_foreach_entry env xx el al = 
+    let env_keys = 
+      let keys = List.map fst (fst (get_data conf)) in
+      let list =
+        List.fold_left
+          (fun accu key -> 
+            match p_getint conf.env key with
+            [ Some hash -> [(key, hash) :: accu]
+            | None -> accu ] )
+          [] keys
+      in
+      List.sort (fun (s1, _) (s2, _) -> compare s1 s2) list
+    in
+    let list = 
+      match get_env "list" env with
+      [ Vlist_data l -> l
+      | _ -> [] ]
+    in
+    let list = build_list_long conf base list in
+    let env = [("env_keys", Venv_keys env_keys) :: env] in
+    loop list where rec loop =
+      fun
+      [ [(ini_k, list_v) :: l] -> 
+          let env = 
+            [("entry_ini", Vstring ini_k); 
+             ("list_value", Vlist_value list_v) :: env]
+          in
+          do { List.iter (print_ast env xx) al; loop l }
+      | [] -> () ]
+  and print_foreach_value env xx el al =
+    let list =
+      match get_env "list_value" env with
+      [ Vlist_value l -> 
+          List.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) l
+      | _ -> [] ]
+    in
+    loop list where rec loop =
+      fun
+      [ [(s, k) :: l] -> 
+          let k = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) k in
+          let env = 
+            [("entry_value", Vstring s); ("keys", Venv_keys k) :: env]
+          in
+          do { List.iter (print_ast env xx) al; loop l }
+      | [] -> () ]
+  and print_foreach_initial env xx el al =
+    let list = 
+      match get_env "list" env with 
+      [ Vlist_data l -> l
+      | _ -> [] ]
+    in
+    let ini_list = build_list_short conf base list in
+    loop ini_list where rec loop =
+      fun
+      [ [ini :: l] -> 
+          let env = [("ini", Vstring ini) :: env] in
+          do { List.iter (print_ast env xx) al; loop l }
+      | [] -> () ]
+  and print_foreach_env_keys env xx el al =
+    let env_keys =
+      match get_env "env_keys" env with
+      [ Venv_keys env_keys -> env_keys
+      | _ -> [] ]
+    in
+    loop env_keys where rec loop =
+      fun
+      [ [(s, i) :: l] ->
+          let env = [("key_name", Vstring s); ("key_value", Vint i) :: env] in
+          do { List.iter (print_ast env xx) al; loop l }
+      | [] -> () ]
+  in
+  print_foreach
+;
+
+value print_mod conf base =
+  (* Pas forcément nécessaire mais bon ... On pourra faire le ménage après. *)
+  if p_getenv conf.env "old" = Some "on" then print_mod_old conf base
+  else
+    match p_getenv conf.env "data" with
+    [ Some ("place" | "src" | "occu") ->
+        let list = build_list conf base in
+        let env = [("list", Vlist_data list)] in
+        Hutil.interp conf base "upddata"
+          {Templ.eval_var = eval_var conf base;
+           Templ.eval_transl _ = Templ.eval_transl conf;
+           Templ.eval_predefined_apply _ = raise Not_found;
+           Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+           Templ.print_foreach = print_foreach conf base}
+          env ()
+    | _ -> incorrect_request conf ]
+;
