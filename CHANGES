@@ -1,8 +1,8 @@
 GeneWeb version 6.06
 --------------------
 
-* Add two new warnings : ParentTooOld and CloseSiblings. Activated the
-  warning YoungForMarriage.
+* Add three new warnings : ChangedOrderOfMarriages, CloseSiblings and 
+  ParentTooOld. Activate the warning YoungForMarriage.
 * Change totally the way to notify and record the changes of a base. There is
   now only one variable in your gwf file (notify_change) so you should update
   your script if you were using notify_delete and notify_key. You should then
