@@ -2108,8 +2108,17 @@ and eval_ancestor_field_var conf base env gp loc =
               let cpl = foi base ifam in
               match get_link all_gp (get_father cpl) with
               [ Some gp -> eval_ancestor_field_var conf base env gp loc sl
-              | None -> raise Not_found ]
+              | None -> 
+                  let ep = make_ep conf base (get_father cpl) in
+                  eval_person_field_var conf base env ep loc sl ]
           | (_, _) -> raise Not_found ]
+      | GP_same _ _ ip ->
+          match get_parents (pget conf base ip) with
+          [ Some ifam ->
+            let cpl = foi base ifam in
+            let ep = make_ep conf base (get_father cpl) in
+            eval_person_field_var conf base env ep loc sl 
+          | _ -> raise Not_found ]
       | _ -> raise Not_found ]
   | ["father_sosa"] ->
       match (gp, get_env "all_gp" env) with
@@ -2239,6 +2248,22 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           [ Some d -> eval_date_field_var conf d sl
           | None -> VVstring "" ]
       | _ -> VVstring "" ]
+  | ["computable_marriage_age" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ True ->
+          if p_auth then
+            match (Adef.od_of_codate (get_birth p), 
+                   Adef.od_of_codate (get_marriage fam)) 
+            with
+            [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _), 
+               Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) -> 
+                let a = CheckItem.time_elapsed d1 d2 in
+                VVbool 
+                  (a.year > 0 ||
+                     a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0))
+            | _ -> VVbool False ]
+          else VVbool False
+      | _ -> raise Not_found ]
   | ["cremated_date" :: sl] ->
       match get_burial p with
       [ Cremated cod when p_auth ->
@@ -2310,6 +2335,20 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           in
           let s = List.fold_left (linked_page_text conf base p s key) "" db in
           VVstring s
+      | _ -> raise Not_found ]
+  | ["marriage_age" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ True ->
+          if p_auth then
+            match (Adef.od_of_codate (get_birth p), 
+                   Adef.od_of_codate (get_marriage fam)) 
+            with
+            [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _), 
+               Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) -> 
+                let a = CheckItem.time_elapsed d1 d2 in
+                VVstring (Date.string_of_age conf a)
+            | _ -> VVstring "" ]
+          else VVstring ""
       | _ -> raise Not_found ]
   | ["marriage_date" :: sl] ->
       match get_env "fam" env with
@@ -3127,14 +3166,20 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_ancestor env al ((p, p_auth) as ep) =
     match get_env "gpl" env with
     [ Vgpl gpl ->
-        List.iter
-          (fun gp ->
-             match gp with
-             [ GP_missing _ _ -> ()
-             | _ ->
-                 let env = [("ancestor", Vanc gp) :: env] in
-                 List.iter (print_ast env ep) al ])
-          gpl
+        let rec loop first gpl =
+          match gpl with
+          [ [] -> ()
+          | [gp :: gl] -> do {
+              match gp with
+              [ GP_missing _ _ -> ()
+              | _ ->
+                  let env = 
+                    [("ancestor", Vanc gp); 
+                     ("first", Vbool first); ("last", Vbool (gl = [])) :: env]
+                  in
+                  List.iter (print_ast env ep) al ];
+              loop False gl } ]
+        in loop True gpl
     | _ -> () ]
   and print_foreach_ancestor_level env el al ((p, _) as ep) =
     let max_level =
@@ -3789,7 +3834,7 @@ value print_ascend conf base p =
       let templ =
         match p_getenv conf.env "t" with
         [ Some ("E" | "F" | "H" | "L") -> "anclist"
-        | Some ("D" | "G" | "M" | "N" | "Z") -> "ancsosa"
+        | Some ("D" | "G" | "M" | "N" | "P" | "Z") -> "ancsosa"
         | Some ("A" | "C" | "T") -> "anctree"
         | _ -> "ancmenu" ]
       in

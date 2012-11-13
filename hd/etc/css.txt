@@ -447,6 +447,205 @@ li.parent
 }
 
 
+/* ---------------------------- perso_short.txt --------------------------- */
+
+.fp_ul_summary
+{
+  list-style: none;
+  padding-left: 0px;
+}
+.fp_ul_summary > li
+{
+  padding: 5px;
+}
+.page_max
+{
+  width: 864px;
+}
+.fp_date_empty
+{
+  border: solid 1px #999999;
+  width: 60px;
+  display: block;
+}
+.fp_table
+{
+  width: 100%%;
+  margin-top: 10px;
+}
+.fp_table th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%%;
+  text-align: left;     
+  padding-left: 5px;
+}
+.fp_table td
+{
+  padding: 5px;
+}
+.fp_person
+{
+  width: 100%%;
+  border: solid 2px #00794C;
+}
+.fp_person_info 
+{
+  margin: 0px;
+  padding: 0px;
+}
+.fp_person_info_ul
+{
+  list-style-type: none;
+  padding : 0px;
+  margin: 0px;
+}
+.fp_person_info_ul li
+{
+  padding : 5px;
+}
+.fp_person_info_ul > li > hr
+{
+  border-top: solid 1px #998C90;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
+}
+.fp_grey td
+{
+  color: #998C90;
+  border-bottom: solid 1px #00794C;
+  font-weight: bold;
+  padding: 2px;
+}
+.fp_grey_italic
+{
+  color: #998C90;
+  font-style: italic;
+  font-weight: bold;
+}
+.fp_table_parent
+{
+  width: 100%%;
+  margin-top: 10px;
+}
+.fp_table_parent th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%%;
+  text-align: left;     
+  padding-left: 5px;
+}
+.fp_table_parent td
+{
+  padding: 5px;
+}
+.fp_table_siblings
+{
+  width: 100%%;
+  margin-top: 10px;
+}
+.fp_table_siblings tr td
+{
+  padding: 5px;
+}
+.fp_table_siblings th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%%;
+  text-align: left;     
+  padding-left: 5px;
+}
+.table_content_siblings > td
+{
+  padding: 2px;
+  padding-left: 0px;
+  border-top: solid 1px #F0ECED;
+}
+.fp_half_siblings
+{
+  background-color: #F0ECED;
+  font-weight: bold;
+}
+.table_content_odd > td
+{
+  background-color: #F0ECED;
+}
+.fp_table_marriage
+{
+  width:100%%;
+  margin-top: 10px;
+}
+.fp_table_marriage th
+{
+  background-color: #00794C;
+  color: white;
+  font-weight: bold;
+  font-size: 120%%;
+  text-align: left;
+  padding-left: 5px;
+}
+.fp_table_marriage td
+{
+  padding: 5px;
+}
+.fp_table_marriage table{
+  width:100%%;
+}
+.fp_marriage_notes
+{
+  width: 100%%;
+  margin-top: 10px;
+}
+.fp_marriage_notes td
+{
+  padding: 10px;
+}
+.fp_marriage_notes td,
+.fp_notes
+{
+  background-color: #F0EDEE;
+}
+.fp_marriage_notes span
+{
+  color: #00794A;
+  font-weight: bold;
+}
+.fp_family_separator
+{
+  width: 100%%;
+  border-top-width: 3px;
+  border-top-style: double;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  margin:0;
+}
+.fp_table_children
+{
+  width: 100%%;
+}
+.fp_table_children td
+{
+  padding: 5px;
+}
+.fp_source
+{
+  margin: 0px;
+  padding-left: 20px;
+}
+.fp_source > li
+{
+  padding: 2px;
+}
+
 /* ------------------------------- perso.txt ------------------------------ */
 
 .marriage_perso > li 
@@ -579,6 +778,11 @@ div.select:hover ul
 /* ------------------- Modify data (e.g. book of places ------------------- */
 
 .mod_data_ul li
+{
+  padding: 2px;
+}
+
+.list_ini a
 {
   padding: 2px;
 }

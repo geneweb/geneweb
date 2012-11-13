@@ -927,7 +927,9 @@
    Main
 %)
 
-%if;((evar.v = "" and evar.t != "D") or evar.v <= 1)
+%if;(evar.t = "P")
+  %include.perso_short;
+%elseif;((evar.v = "" and evar.t != "D") or evar.v <= 1)
   [*specify::generation/generations]0.
 %else;
   %if;(evar.t = "N" and evar.only = "on")
