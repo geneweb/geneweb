@@ -203,6 +203,69 @@
         </label>
       </p>
       </div>
+
+      <label>
+        <input type="radio" name="t" value="P"%/>
+        [*book of ascendants]
+      </label>
+      <div class="ascends_menu_option_div">
+      <p class="ascends_menu_option_p">
+        <label>
+          <input type="checkbox" name="p" value="on" checked="checked"%/>
+          [*person/persons]0
+        </label>
+        <label>
+          <input type="checkbox" name="image" value="on"%/>
+          [*image/images]0
+        </label>
+        <label>
+          <input type="checkbox" name="sosa" value="on"%/>
+          [*Sosa]
+        </label>
+        <label>
+          <input type="checkbox" name="note" value="on"%/>
+          [*individual notes]
+        </label>
+      </p>
+      <p class="ascends_menu_option_p">
+        <label>
+          <input type="checkbox" name="parents" value="on" checked="checked"%/>
+          [*parents]
+        </label>
+      </p>
+      <p class="ascends_menu_option_p">
+        <label>
+          <input type="checkbox" name="siblings" value="on" checked="checked"%/>
+          [*full siblings]
+        </label>
+      </p>
+      <p class="ascends_menu_option_p">
+        <label>
+          <input type="checkbox" name="marr" value="on" checked="checked"%/>
+          [*marriage/marriages]1
+        </label>
+        <label>
+          <input type="checkbox" name="children" value="on"%/>
+          [*child/children]1
+        </label>
+        <label>
+          <input type="checkbox" name="comm" value="on"%/>
+          [*marriage notes]
+        </label>
+      </p>
+      <p class="ascends_menu_option_p">
+        <label>
+          <input type="checkbox" name="asc" value="on"%/>
+          [*ascendants tree]
+        </label>
+      </p>
+      <p class="ascends_menu_option_p">
+        <label>
+          <input type="checkbox" name="src" value="on"%/>
+          [*source/sources]1
+        </label>
+      </p>
+      </div>
     </div>
     
     <div class="ascends_menu_tree">

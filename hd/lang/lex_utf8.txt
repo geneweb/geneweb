@@ -2082,6 +2082,12 @@ sk: sú
 sl: so
 sv: är
 
+    ascendants tree
+fr: arbre d’ascendance
+
+    at
+fr: à
+
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
 bg: %sи братовчед/%sа братовчедка
@@ -2577,13 +2583,13 @@ it: Data e luogo di nascita
     book of %s
 de: %s
 en: %s
-es: diccionario de %s
-fi: luettelo %s
-fr: dictionnaire des %s
-it: dizionario dei %s
-nl: woordenboek der %s
+es: lista de %s
+fi: lista %s
+fr: liste des %s
+it: lista dei %s
+nl: lijst der %s
 no: liste over %s
-sv: %s uppslagsbok
+sv: %s seznam
 
     border
 af: rand
@@ -3442,7 +3448,7 @@ sk: databázové fórum
 sl: forum baze podatkov
 sv: databas forum
 
-    date
+    date/dates
 af: datum
 bg: дата
 br: deiziad
@@ -3455,7 +3461,7 @@ eo: dato
 es: fecha
 et: kuupäev
 fi: päivämäärä
-fr: date
+fr: date/dates
 he:   תאריך
 is: dagsetning
 it: data
@@ -6887,6 +6893,9 @@ nl: Abovillenummer
 no: nummer
 sv: nummer
 
+    n° Sosa
+fr: n° Sosa
+
     name
 af: naam
 bg: име
@@ -8916,6 +8925,9 @@ it: scegliere:
 nl: kiezen:
 no: velg
 sv: välj
+
+    select a letter
+fr: choisissez une lettre
 
     select a month to see all the anniversaries
 de: zum zeigen der Geburtstage den Monat auswählen

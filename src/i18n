@@ -75,6 +75,8 @@ anniversaries of marriage
 an uncle/an aunt
 any individual in the base
 are
+ascendants tree
+at
 a %s cousin
 a son/a daughter/a child
 a son-in-law/a daughter-in-law
@@ -128,7 +130,7 @@ cousins (general term)
 create
 cremated
 database forum
-date
+date/dates
 date begin
 date end
 date of birth
@@ -281,6 +283,7 @@ more than %d answers
 msg error disconnected
 murdered
 n° d'Aboville
+n° Sosa
 name
 name %s already used by %tthis person%t
 navigation
@@ -375,6 +378,7 @@ see descendants notes/sources
 see descendants pictures
 see further
 select
+select a letter
 select a month to see all the anniversaries
 select person to compute relationship
 send
