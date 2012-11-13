@@ -616,7 +616,7 @@
           </table>
         </td>
         <td align="right">
-          %if;(xx.has_sosa and evar.sosa = "on")
+          %if;(evar.sosa = "on" and xx.has_sosa)
             <span>
               <img src="%image_prefix/sosa.png" alt="sosa" title="sosa"/> [*Sosa] %xx.sosa;
             </span>
@@ -625,7 +625,7 @@
       </tr>
     </table>
     <div class="fp_person_info">
-      %if;(xx.has_image and evar.image = "on")
+      %if;(evar.image = "on" and xx.has_image)
         <table width="100%%">
           <tr>
             <td width="30">
@@ -646,7 +646,7 @@
           <li>
             <span class="fp_grey_italic">[*title/titles]1:</span>
             <em>
-              %foreach;nobility_title;
+              %foreach;xx.nobility_title;
                 %if;not is_first;,%end;
                 %nobility_title;
               %end;
@@ -694,7 +694,7 @@
           </li>
         %end;
       </ul>
-      %if;(xx.has_image and evar.image = "on")
+      %if;(evar.image = "on" and xx.has_image)
         </td></tr></table>
       %end;
     </div>
@@ -875,11 +875,14 @@
     </span>
     <ul class="fp_ul_summary">
       %foreach;ancestor_level(nb_gen)
-        <li><b>[*generation/generations]0 %level;</b></li>
+        %apply;lazy_print%with;
+          <li><b>[*generation/generations]0 %level;</b></li>
+        %end;
         %foreach;ancestor;
+          %lazy_force;
           <li>
             <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
-  	        %if;(ancestor.has_sosa and evar.sosa = "on")
+  	        %if;(evar.sosa = "on" and ancestor.has_sosa)
               ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
   	        %end;
           </li>
@@ -888,7 +891,7 @@
     </ul>
     <p style="page-break-after:always;">&nbsp;</p>
   %end;
-  
+
   %foreach;ancestor_level(nb_gen)
     %foreach;ancestor;
       %apply;print_long_ind("ancestor")
