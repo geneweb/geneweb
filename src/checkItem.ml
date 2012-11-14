@@ -115,10 +115,9 @@ value strictly_after d1 d2 =
 
 (* ********************************************************************** *)
 (*  [Fonc] compare_date : date -> date -> int                             *)
-(** [Description] : Renvoie 0 si les deux dates sont égales, 1 si la 
-                    première date est plus grande et -1 sinon.
-                    On ne tiens pas compte de la précision de la date.
-                    (Fonction identique à Date.ml)
+(** [Description] : Fonction de comparaison de deux dates. On ne tiens 
+                    pas compte de la précision de la date. (Fonction 
+                    identique à Date.ml)
     [Args] :
       - d1 : la première date
       - d2 : la deuxième date
@@ -131,8 +130,15 @@ value compare_date d1 d2 =
       match Pervasives.compare dmy1.year dmy2.year with
       [ 0 ->
           match Pervasives.compare dmy1.month dmy2.month with
-          [ 0 -> Pervasives.compare dmy1.day dmy2.day
-          | x -> x ]
+          [ 0 -> 
+              (* Si l'une des deux dates n'est pas complète (mois ou jour *)
+              (* égal à zéro), alors on ne distingue pas les deux dates.  *)
+              if dmy1.day = 0 || dmy2.day = 0 then 0
+              else Pervasives.compare dmy1.day dmy2.day
+          | x -> 
+              (* Idem ci-dessus. *)
+              if dmy1.month = 0 || dmy2.month = 0 then 0
+              else x ]
       | x -> x]
   | (Dgreg dmy1 _, Dtext _) -> 1
   | (Dtext _, Dgreg dmy2 _) -> -1
@@ -475,7 +481,7 @@ value sort_children2 base warning ifam des =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
 value check_marriages_order base warning p = do {
-  let b = get_family p in
+  let b = Array.copy (get_family p) in
   (* Astuce : on construire un tableau identique à la famille dans *)
   (* lequel on remplace toutes les dates inconnues par la dernière *)
   (* date maximale que l'on ait vu.                                *)
@@ -499,7 +505,7 @@ value check_marriages_order base warning p = do {
           | _ -> max_date ]
         in
         (max_date, Array.append tab [| (ifam, date) |]))
-      (None, [| |]) (Array.copy b)
+      (None, [| |]) (get_family p)
   in
   Array.stable_sort 
     (fun (f1, d1) (f2, d2) ->
@@ -508,7 +514,12 @@ value check_marriages_order base warning p = do {
       | _ -> 0 ] ) 
     a;
   let a = Array.map (fun (f, _) -> f) a in
-  if a <> b then warning (ChangedOrderOfMarriages p b a)
+  if a <> b then do { 
+    warning (ChangedOrderOfMarriages p b a);
+    let rec loop i fam =
+      if i = Array.length fam then ()
+      else do { fam.(i) := a.(i); loop (i + 1) fam }
+    in loop 0 (get_family p) }
   else ()
 };
 
