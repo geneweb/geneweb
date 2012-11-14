@@ -108,13 +108,13 @@
                 [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[at]%sp;%marriage_place;%end;.
               %end;
               %if;computable_marriage_age;
-                %apply;capitalize(nth([husband/wife], sex)): %marriage_age;%sp;
+                %apply;capitalize(nth([groom/bride], sex)): %marriage_age;%sp;
               %end;
               %if;(computable_marriage_age and spouse.computable_marriage_age)
                 %sp;-%sp;
               %end;
               %if;spouse.computable_marriage_age;
-                %apply;capitalize(nth([husband/wife], spouse.sex)): %spouse.marriage_age;
+                %apply;capitalize(nth([groom/bride], spouse.sex)): %spouse.marriage_age;
               %end;
           </td>
           </tr>
@@ -832,7 +832,7 @@
     <div style="page-break-inside:avoid;">
       <table class="fp_table" cellspacing="0">
         <tr><th>[*note/notes]1</th></tr>
-        <tr><td class="fp_notes">%xx.notes;</td></td>
+        <tr><td class="fp_notes">%xx.notes;</td>
       </table>
     </div>
   %end;
@@ -894,9 +894,11 @@
 
   %foreach;ancestor_level(nb_gen)
     %foreach;ancestor;
-      %apply;print_long_ind("ancestor")
-      %if;(not (is_last and level = nb_gen))
-        <p style="page-break-after:always;">&nbsp;</p>
+      %if;(ancestor.same = "")
+        %apply;print_long_ind("ancestor")
+        %if;(not (is_last and level = nb_gen))
+          <p style="page-break-after:always;">&nbsp;</p>
+        %end;
       %end;
     %end;
   %end;
