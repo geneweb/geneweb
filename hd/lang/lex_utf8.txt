@@ -4868,6 +4868,10 @@ sk: gregoránsky/juliánsky/francúzsky/židovský
 sl: gregorijanski/julijanski/francoski/hebrejski
 sv: gregoriansk/juliansk/franska rep./hebreisk
 
+    groom/bride
+en: groom/bride
+fr: époux/épouse
+
     half siblings
 de: halbbrüder und-schwestern
 en: half-siblings
