@@ -375,7 +375,7 @@
             <th width="30%%">[*surname/surnames]0</th>
             <th width="10%%">[*nb branches]</th>
             <th width="45%%">[*place]</th>
-            <th width="15%%">[*date]</th>
+            <th width="15%%">[*date/dates]0</th>
           </tr>
       %end;
       %foreach;sorted_list_item;
@@ -387,7 +387,7 @@
               <th width="30%%">[*surname/surnames]0</th>
               <th width="10%%">[*nb branches]</th>
               <th width="45%%">[*place]</th>
-              <th width="15%%">[*date]</th>
+              <th width="15%%">[*date/dates]0</th>
             </tr>
         %end;
         <tr>
@@ -463,7 +463,7 @@
         <th>[*surname/surnames]0</th>
         <th>[*nb branches]</th>
         <th>[*place]</th>
-        <th>[*date]</th>
+        <th>[*date/dates]0</th>
       </tr>
       %foreach;ancestor_surname(evar.v)
         <tr>

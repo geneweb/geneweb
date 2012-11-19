@@ -429,7 +429,7 @@ function changeCalendar(e,v,m,c) {
 </tr>
 </table>
 
-%apply;date([*date]0, "birth", "birth", "")
+%apply;date([*date/dates]0, "birth", "birth", "")
 
 %apply;source("birth")
 
@@ -446,7 +446,7 @@ function changeCalendar(e,v,m,c) {
 </tr>
 </table>
 
-%apply;date([*date]0, "bapt", "bapt", "")
+%apply;date([*date/dates]0, "bapt", "bapt", "")
 
 %apply;source("bapt")
 
@@ -480,7 +480,7 @@ function changeCalendar(e,v,m,c) {
 </tr>
 </table>
 
-%apply;date([*date]0, "death", "death", " onfocus='setDead()'")
+%apply;date([*date/dates]0, "death", "death", " onfocus='setDead()'")
 
 <table border="1">
 <tr>
@@ -529,7 +529,7 @@ function changeCalendar(e,v,m,c) {
 </tr>
 </table>
 
-%apply;date([*date]0, "burial", "burial", "")
+%apply;date([*date/dates]0, "burial", "burial", "")
 
 %apply;source("burial")
 

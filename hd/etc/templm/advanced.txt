@@ -23,12 +23,12 @@
     var v1 = document.getElementById(i1);
     var v2 = document.getElementById(i2);
     if (v1.value == '' && v2.value == '')
-    { v0.firstChild.nodeValue = "[*delete] [date] %evar.birth1_yyyy; - %evar.death2_yyyy;";
+    { v0.firstChild.nodeValue = "[*delete] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;";
       v1.value = e1;
       v2.value = e2;
     }
     else
-    { v0.firstChild.nodeValue = "[*add] [date] %evar.birth1_yyyy; - %evar.death2_yyyy;";
+    { v0.firstChild.nodeValue = "[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;";
       v1.value = '';
       v2.value = '';
     }
@@ -89,7 +89,7 @@
       [*advanced request] <input type="submit" value="Ok"%/>
       %if;(evar.birth1_yyyy != "" or evar.death2_yyyy != "")
         <a class="button" href="javascript:changeDate('cd','birth1_yyyy','%evar.birth1_yyyy;','death2_yyyy','%evar.death2_yyyy;')"
-           id="cd">[*add] [date] %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
+           id="cd">[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
       %end;
     </legend>
     <p class="modify_person">

@@ -353,7 +353,7 @@
           <tr class="surname_branch_table_header">
             <th>[*surname/surnames]0</th>
             <th>[*place]</th>
-            <th>[*date]</th>
+            <th>[*date/dates]0</th>
           </tr>
       %end;
       %nl;
@@ -405,7 +405,7 @@
       <th>[*surname/surnames]0</th>
       <th>[*number of branches]</th>
       <th>[*place]</th>
-      <th>[*date]</th>
+      <th>[*date/dates]0</th>
     </tr>
     %foreach;ancestor_surname(nb_gena)
       %nl;

@@ -3456,7 +3456,7 @@ ca: data
 cs: datum
 da: dato
 de: Datum
-en: date
+en: date/dates
 eo: dato
 es: fecha
 et: kuupäev
@@ -10303,11 +10303,11 @@ sl: zadnjih %t smrti
 sv: de senaste %t avlidna
 
     the modification impacted %d persons
-de: die Änderungen sind abgeschlossen : % der Datei (en) kopiert
+de: die Änderungen sind abgeschlossen : %d der Datei (en) kopiert
 en: successfully updated: %d places have been changed
 es: la modificación ha sido hecha: %d ficha(s) corregida(s)
 fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
-it: la modifica è stata correttamente eseguita : % di schede corrette
+it: la modifica è stata correttamente eseguita : %d di schede corrette
 
     the parents
 af: die ouers

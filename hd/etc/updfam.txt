@@ -458,7 +458,7 @@ function changeCalendar(e,v,m,c) {
   </tr>
 </table>
 
-%apply;date([*date]0, "marr", "marriage")
+%apply;date([*date/dates]0, "marr", "marriage")
 %apply;source("marr", "marriage")
 
 <h4>[*witness/witnesses]1</h4>
@@ -533,7 +533,7 @@ function changeCalendar(e,v,m,c) {
  %if;(divorce = "separated") checked="checked"%end;%/>[*separated]
 </label>
 </p>
-%apply;date([*date]0, "div", "divorce")
+%apply;date([*date/dates]0, "div", "divorce")
 
 <h4><label for="comment">[*comment]</label></h4>
 

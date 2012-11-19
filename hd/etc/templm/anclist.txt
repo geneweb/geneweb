@@ -607,7 +607,7 @@
   <thead>
     <tr>
       <th>[years old]</th>
-      <th>[date]</th>
+      <th>[date/dates]0</th>
       <th>[place]</th>
       <th><abbr title="[birth] [marriage/marriages]0 [death]">%birth_symbol;&amp;%death_symbol;</abbr></th>
       <th>[person/persons]0</th>

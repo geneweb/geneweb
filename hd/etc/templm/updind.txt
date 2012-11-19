@@ -580,7 +580,7 @@
 <fieldset>
   <legend><sup>(2)</sup> [*birth]</legend>
   <span class="nobr">
-    %apply;date([*date], "birth", "birth")
+    %apply;date([*date/dates]0, "birth", "birth")
   </span>
   <div style="text-align:%right;">
     %apply;place("birth", "birth")
@@ -592,7 +592,7 @@
 <fieldset>
   <legend><sup>(3)</sup> [*baptism]</legend>
   <span class="nobr">
-    %apply;date([*date], "bapt", "bapt")
+    %apply;date([*date/dates]0, "bapt", "bapt")
   </span>
   <div style="text-align:%right;">
     %apply;place("bapt", "bapt")
@@ -636,7 +636,7 @@
   </legend>
   <div id="content_death" %if;(not_dead or dont_know_if_dead or of_course_dead)style="display: none;"%end;>
     <span class="nobr">
-      %apply;date([*date], "death", "death")
+      %apply;date([*date/dates]0, "death", "death")
     </span>
     <div style="text-align:%right;">%apply;place("death", "death")</div>
   </div>
@@ -651,7 +651,7 @@
     </select>
   </legend>
   <span class="nobr">
-    %apply;date([*date], "burial", "burial")
+    %apply;date([*date/dates]0, "burial", "burial")
   </span>
   <div style="text-align:%right;">
     %apply;place("burial", "burial")

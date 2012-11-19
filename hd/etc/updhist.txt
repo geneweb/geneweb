@@ -80,7 +80,7 @@
 
 <table cellpadding="4px;" class="updhist_table">
   <tr class="updhist_table_header">
-    <th>[*date]</th>
+    <th>[*date/dates]0</th>
     <th>[*wizard/wizards/friend/friends/exterior]0</th>
     <th>[*update]</th>
     <th>[*person/persons]0</th>

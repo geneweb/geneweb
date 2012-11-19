@@ -1008,7 +1008,7 @@
       %if;(evar.M2m="m") -%bvar.var_t_MARRIAGEA;%end;
       %if;(evar.M2d="d") -%bvar.var_t_DEATHA;%end;
     %elseif;(evar.miss="M3")
-      <br%/>[*date] &lt;&gt; [exact] :
+      <br%/>[*date/dates] &lt;&gt; [exact] :
       %if;(evar.M3b="b") -[*birth]%end;
       %if;(evar.M3m="m") -[*marriage/marriages]0%end;
       %if;(evar.M3d="d") -[*death]%end;

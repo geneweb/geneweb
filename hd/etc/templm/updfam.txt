@@ -518,7 +518,7 @@
         <th><abbr title="[sex]">[M/F]0 ? [M/F]1</abbr></th>
       %end;
       %if;("xx" != "witness")
-        <th>[date] [place] [occupation/occupations]0</th>
+        <th>[date/dates]0 [place] [occupation/occupations]0</th>
       %else;
         <td>&nbsp;</td>
       %end;
@@ -609,7 +609,7 @@
         <option value="no_ment"%if;(mrel = "no_ment") selected="selected"%end;>[*no mention]</option>
       </select>
       <span class="nobr">
-        %apply;date([*date], "marr", "marriage")
+        %apply;date([*date/dates]0, "marr", "marriage")
       </span>
       <br%/>
       <span class="nobr">
@@ -636,7 +636,7 @@
         <option value="divorced"%if;(divorce = "divorced") selected="selected"%end;>[*divorced]</option>
       </select>  
       <span id="date_divorce" %if;(divorce = "divorced")style="display: inline;"%else; style="display: none;"%end;>
-        %apply;date([*date], "div", "divorce")
+        %apply;date([*date/dates]0, "div", "divorce")
       </span>
     </p>
   </fieldset>
