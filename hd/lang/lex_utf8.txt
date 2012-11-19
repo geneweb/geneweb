@@ -6687,6 +6687,12 @@ nl: ontbrekende bronnen
 no: savnede kilder
 sv: saknade källor
 
+    modification/modifications
+fr: modification/modifications
+
+    modification successful
+fr: modification effectuée
+
     modify
 af: wysig
 bg: да се променят
