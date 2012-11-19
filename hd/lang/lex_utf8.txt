@@ -2083,10 +2083,18 @@ sl: so
 sv: är
 
     ascendants tree
+de: Stammbaum
+en: Family Tree
+es: Árbol de ascendencia
 fr: arbre d’ascendance
+it: Albero d’ascendenza
 
-    at
+    in (place)
+de: in
+en: in
+es: en
 fr: à
+it: a
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
@@ -2590,6 +2598,13 @@ it: lista dei %s
 nl: lijst der %s
 no: liste over %s
 sv: %s seznam
+
+    book of ascendants
+de: Buch der Vorfahren
+en: Ancestry Book (Page Layout)
+es: libro de ascendencia
+fr: livre d’ascendance
+it: libro d’ascendenza
 
     border
 af: rand
@@ -4869,8 +4884,32 @@ sl: gregorijanski/julijanski/francoski/hebrejski
 sv: gregoriansk/juliansk/franska rep./hebreisk
 
     groom/bride
+af: man/vrou
+bg: съпруг/съпруга
+br: pried/pried
+ca: marit/muller
+cs: manžel/manželka
+da: mand/hustru
+de: Ehegatte/Ehefrau
 en: groom/bride
+eo: edzo/edzino
+es: esposo/esposa
+et: mees/naine
+fi: aviomies/aviovaimo
 fr: époux/épouse
+he:   בעל/ אשה
+is: eiginmaður/eiginkona
+it: sposo/sposa
+lv: vīrs/sieva
+nl: echtgenoot/echtgenote
+no: mann/hustru
+pl: mąż/żona
+pt: marido/esposa
+ro: sot/sotie
+ru: муж/жена
+sk: manžel/manželka
+sl: mož/žena
+sv: make/maka
 
     half siblings
 de: halbbrüder und-schwestern
@@ -6904,7 +6943,11 @@ no: nummer
 sv: nummer
 
     n° Sosa
+de: Nr. SOSA
+en: Sosa
+es: nº Sosa
 fr: n° Sosa
+it: n° Sosa
 
     name
 af: naam
@@ -8937,7 +8980,11 @@ no: velg
 sv: välj
 
     select a letter
+de: einen Buchstaben wählen
+en: select a letter
+es: elija una letra
 fr: choisissez une lettre
+it: scegli una lettera
 
     select a month to see all the anniversaries
 de: zum zeigen der Geburtstage den Monat auswählen
@@ -9476,7 +9523,13 @@ sv: statistik
 bg: статистика и годишнини
 en: statistics and anniversaries
 fr: Statistiques et anniversaires
-zh: zzz
+
+    summary book ascendants
+de: liste der Dateien
+en: list of individuals
+es: lista de fichas
+fr: liste des fiches
+it: lista delle schede
 
     surname alias
 af: van alias
