@@ -874,16 +874,26 @@ value print_mod_ok conf base = do {
   in
   if nb_pers <> 0 && data_modified then do {
     update_person_list conf base new_input list nb_pers max_updates;
-    let (_, ddata) = translate_title conf in
     let title _ = 
-      Wserver.wprint (fcapitale (ftransl conf "%s modified")) ddata 
+      Wserver.wprint "%s" (capitale (transl conf "modification successful"))
     in
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
-      Wserver.wprint 
-        (fcapitale (ftransl conf "the modification impacted %d persons")) 
+      (* En attendant mieux ... *)
+      Wserver.wprint "%s: %d " 
+        (capitale (transl conf "modification successful")) 
         (min nb_pers max_updates);
+      if p_getenv conf.base_env "history" = Some "yes" then
+        stag "a" "href=\"%sm=HIST;k=20\"" (commd conf) begin
+          Wserver.wprint "%s." 
+            (transl_nth conf "modification/modifications" 
+               (if nb_pers > 1 then 1 else 0));
+        end
+      else
+        Wserver.wprint "%s." 
+          (transl_nth conf "modification/modifications" 
+             (if nb_pers > 1 then 1 else 0));
     end;
     if nb_pers > max_updates then do {
       tag "form" "method=\"post\" action=\"%s\"" conf.command begin
