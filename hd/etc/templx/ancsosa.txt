@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt, Template x v 6.06b 2012/10/31 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: ancsosa.txt, Template x v 6.06c 2012/11/13 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -1332,6 +1332,8 @@
     %apply;ancestors_up_to_somebody()
   %elseif;(evar.t = "Z")
     %apply;ancestors_in_a_table()
+  %elseif;(evar.t = "P")
+    %include.perso_short;
   %end;
 %end;
 
