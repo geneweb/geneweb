@@ -105,7 +105,7 @@
           <tr>
             <td colspan="2">
               %if;(on_marriage_date != "" or marriage_place != "")
-                [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[at]%sp;%marriage_place;%end;.
+                [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
               %end;
               %if;computable_marriage_age;
                 %apply;capitalize(nth([groom/bride], sex)): %marriage_age;%sp;
@@ -668,14 +668,14 @@
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([born],xx.sex))</span>
             %xx.on_birth_date;
-            %if;xx.has_birth_place;%sp;[at]%sp;%xx.birth_place;%end;
+            %if;xx.has_birth_place;%sp;[in (place)]%sp;%xx.birth_place;%end;
           </li>
         %end;
         %if;(xx.has_baptism_date or xx.has_baptism_place)
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([baptized],xx.sex))</span>
             %xx.on_baptism_date;
-            %if;xx.has_baptism_place;%sp;[at]%sp;%xx.baptism_place;%end;
+            %if;xx.has_baptism_place;%sp;[in (place)]%sp;%xx.baptism_place;%end;
           </li>
         %end;
         %if;(xx.has_death_date or xx.has_death_place)
@@ -683,14 +683,14 @@
             <span class="fp_grey_italic">%apply;capitalize(nth([died],xx.sex))</span>
             %xx.on_death_date;
             %if;xx.computable_death_age;%sp;([age at death:] %xx.death_age;)%end;
-            %if;xx.has_death_place;%sp;[at]%sp;%xx.death_place;%end;
+            %if;xx.has_death_place;%sp;[in (place)]%sp;%xx.death_place;%end;
           </li>
         %end;
         %if;(xx.has_burial_date or xx.has_burial_place)
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([buried],xx.sex))</span>
             %xx.on_burial_date;
-            %if;xx.has_burial_place;%sp;[at]%sp;%xx.burial_place;%end;
+            %if;xx.has_burial_place;%sp;[in (place)]%sp;%xx.burial_place;%end;
           </li>
         %end;
       </ul>
