@@ -10701,7 +10701,7 @@ ca: fins els fills
 cs: k dětem
 da: til børnene
 de: bis zu den Kindern
-en: to the children
+en: up to the children
 eo: ĝis la idoj
 es: hasta los hijos
 et: lasteni
@@ -10729,7 +10729,7 @@ ca: fins els nets
 cs: k vnoučatům
 da: til børnebørnene
 de: bis zu den Enkeln
-en: to the grandchildren
+en: up to the grandchildren
 eo: ĝis la genepoj
 es: hasta los nietos
 et: lastelasteni
@@ -10757,7 +10757,7 @@ ca: fins els avis
 cs: k prarodičům
 da: til bedsteforældrene
 de: bis zu den Großeltern
-en: to the grandparents
+en: up to the grandparents
 eo: ĝis la geavoj
 es: hasta los abuelos
 et: vanavanemateni
@@ -10785,7 +10785,7 @@ ca: fins els besnets
 cs: k pravnoučatům
 da: til oldebørnene
 de: bis zu den Urenkeln
-en: to the great-grandchildren
+en: up to the great-grandchildren
 eo: ĝis la gepranepoj
 es: hasta los bisnietos
 et: lastelastelasteni
@@ -10813,7 +10813,7 @@ ca: fins els besavis
 cs: k praprarodičům
 da: til oldeforældrene
 de: bis zu den Urgroßeltern
-en: to the great-grandparents
+en: up to the great-grandparents
 eo: ĝis la gepraavoj
 es: hasta los bisabuelos
 et: vanavanavanemateni
@@ -10841,7 +10841,7 @@ ca: fins els pares
 cs: k rodičům
 da: til forældrene
 de: bis zu den Eltern
-en: to the parents
+en: up to the parents
 eo: ĝis la gepatroj
 es: hasta los padres
 et: vanemateni
