@@ -2088,6 +2088,7 @@ en: Family Tree
 es: Árbol de ascendencia
 fr: arbre d’ascendance
 it: Albero d’ascendenza
+nl: Stamboom voorouders
 
     in (place)
 de: in
@@ -2095,6 +2096,7 @@ en: in
 es: en
 fr: à
 it: a
+nl: te
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
@@ -2601,10 +2603,11 @@ sv: %s seznam
 
     book of ascendants
 de: Buch der Vorfahren
-en: Ancestry Book (Page Layout)
+en: Ancestry Book
 es: libro de ascendencia
 fr: livre d’ascendance
 it: libro d’ascendenza
+nl: boek met voorouders
 
     border
 af: rand
@@ -6727,10 +6730,20 @@ no: savnede kilder
 sv: saknade källor
 
     modification/modifications
+de: änderung/änderungen
+en: update/updates
+es: modificación/modificaciónes
 fr: modification/modifications
+it: modifica/modifiche
+nl: wijziging/wijzigingen
 
     modification successful
+de: änderung durchgeführt
+en: successfully updated
+es: modificación efectuada
 fr: modification effectuée
+it: mestiere modificato
+nl: wijziging uitgevoerd
 
     modify
 af: wysig
@@ -6948,6 +6961,7 @@ en: Sosa
 es: nº Sosa
 fr: n° Sosa
 it: n° Sosa
+nl: Sosa nr.
 
     name
 af: naam
@@ -8985,6 +8999,7 @@ en: select a letter
 es: elija una letra
 fr: choisissez une lettre
 it: scegli una lettera
+nl: kies een letter
 
     select a month to see all the anniversaries
 de: zum zeigen der Geburtstage den Monat auswählen
@@ -9530,6 +9545,7 @@ en: list of individuals
 es: lista de fichas
 fr: liste des fiches
 it: lista delle schede
+nl: lijst van de fichen
 
     surname alias
 af: van alias
@@ -10853,7 +10869,7 @@ ca: fins a la %s generació
 cs: až do %s generace
 da: til den %s generation
 de: bis zur %s Generation
-en: to the %s generation
+en: up to the %s generation
 eo: ĝis la %s generacio
 es: hasta la %s generación
 et: %s sugupõlveni

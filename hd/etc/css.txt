@@ -462,12 +462,14 @@ li.parent
 {
   width: 864px;
 }
+/*
 .fp_date_empty
 {
   border: solid 1px #999999;
   width: 60px;
   display: block;
 }
+*/
 .fp_table
 {
   width: 100%%;
