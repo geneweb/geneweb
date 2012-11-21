@@ -682,7 +682,7 @@
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([died],xx.sex))</span>
             %xx.on_death_date;
-            %if;xx.computable_death_age;%sp;([age at death:] %xx.death_age;)%end;
+            %if;xx.computable_death_age;%sp;[age at death:] %xx.death_age;,%end;
             %if;xx.has_death_place;%sp;[in (place)]%sp;%xx.death_place;%end;
           </li>
         %end;
@@ -774,12 +774,12 @@
                 <td align="center">[*child/children]1</td>
               </tr>
               %if;(half_father != 0)
-                <tr class="fp_half_siblings">
-                  <td colspan="6">[*on %s's side:::] %xx.father;</td>
-                </tr>
                 %foreach;xx.father.family;
                   %if;(spouse.index != xx.mother.index and half_father!=0 and spouse.has_children)
                     %if;has_children;
+                      <tr class="fp_half_siblings">
+                        <td colspan="6">[*on %s's side:::] %xx.father; [with] %spouse;</td>
+                      </tr>
                       %foreach;child;
                         %apply;display_siblings("child", family_cnt)
                       %end;
@@ -788,12 +788,12 @@
                 %end;
               %end;
               %if;(half_mother != 0)
-                <tr class="fp_half_siblings">
-                  <td colspan="6">[*on %s's side:::] %xx.mother;</td>
-                </tr>
                 %foreach;xx.mother.family;
                   %if;(spouse.index != xx.father.index and half_mother!=0 and spouse.has_children)
                     %if;has_children;
+                      <tr class="fp_half_siblings">
+                        <td colspan="6">[*on %s's side:::] %xx.mother; [with] %spouse;</td>
+                      </tr>
                       %foreach;child;
                         %apply;display_siblings("child", family_cnt)
                       %end;
@@ -880,12 +880,14 @@
         %end;
         %foreach;ancestor;
           %lazy_force;
-          <li>
-            <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
-  	        %if;(evar.sosa = "on" and ancestor.has_sosa)
-              ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
-  	        %end;
-          </li>
+          %if;(ancestor.same = "")
+            <li>
+              <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
+    	        %if;(evar.sosa = "on" and ancestor.has_sosa)
+                ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
+    	        %end;
+            </li>
+          %end;
         %end;
       %end;
     </ul>
