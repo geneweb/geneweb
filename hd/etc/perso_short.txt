@@ -20,7 +20,7 @@
 %end;
 
 %define;display_date(xx, birth, death, with_rowspan)
-  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;">
+  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
     %if;("birth" = "")
       <span class="fp_date_empty">&nbsp;</span>
     %else;
@@ -28,7 +28,7 @@
     %end;
   </td>
   <td align="center" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>-</td>
-  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;">
+  <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
     %if;("death" = "")
       <span %if;xx.is_dead; class="fp_date_empty" %end;>&nbsp;</span>
     %else;
