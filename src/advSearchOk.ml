@@ -168,7 +168,18 @@ value advanced_search conf base max_answers =
           [ Some d when fast_auth_age conf p ->
               if CheckItem.strictly_after d d2 then False else True
           | _ -> False ])
-    | _ -> test_date_place (fun _ -> True) ]
+    | _ -> 
+        if y = "" then True
+        else
+          List.exists 
+            (fun ifam ->
+              let fam = foi base ifam in
+              let father = poi base (get_father fam) in
+              let mother = poi base (get_mother fam) in
+              if fast_auth_age conf father && fast_auth_age conf mother then
+                name_incl y (sou base (get_marriage_place fam))
+              else False )
+            (Array.to_list (get_family p)) ]
   in
   let list = ref [] in
   let len = ref 0 in
