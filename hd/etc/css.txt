@@ -103,6 +103,39 @@ h1
  color: #303900;
 }
 
+/* Properties of the trailer block. All pages. */
+#trl
+{
+ text-align: left; 
+ margin-left: auto;
+ margin-right: auto;
+ margin-top : 40px;
+}
+
+#trl ul
+{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-align: center;
+}
+
+#trl ul li { display: inline; }
+
+#trl ul li a
+{
+  text-decoration: none;
+  padding: .2em 1em;
+  color: #fff;
+  background-color: #2f6400;
+}
+
+#trl ul li a:hover
+{
+  color: #fff;
+  background-color: #4A9900;
+}
+
 /* Properties of the footer block. All pages. */
 #footer
 {
