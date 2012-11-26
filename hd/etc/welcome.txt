@@ -608,6 +608,8 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 <br/>
 </div> 
 
+%base_trailer;
+
 %copyright;
 
 %define;language_link(xx,yy)%sq;
@@ -651,8 +653,6 @@ sv: Du kan välja ett annat språk bland de följande:
   %apply;language_link("Suomi", "fi")
   %apply;language_link("Svenska", "sv")
 </div>
-
-%base_trailer;
 
 </body>
 </html>
