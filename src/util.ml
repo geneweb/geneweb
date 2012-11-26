@@ -1210,6 +1210,75 @@ value open_etc_file fname =
       try Some (Secure.open_in fname2) with [ Sys_error _ -> None ] ]
 ;
 
+value open_hed_trl conf name =
+  (* On cherche le fichier dans cet ordre :
+     - dans la base (bases/etc/base_name/name.txt)
+     - dans la base (bases/etc/templx/name.txt)
+     - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
+  let file_exist dir = 
+    let base_name_tpl_dir =
+      Filename.concat (base_path ["etc"] conf.bname) (name ^ ".txt")
+    in
+    let base_tpl_dir = 
+      Filename.concat 
+        (base_path ["etc"] (Filename.basename dir)) (name ^ ".txt")
+    in
+    let etc_tpl_dir = 
+      Filename.concat 
+        (search_in_lang_path "etc") (Filename.concat dir ((name ^ ".txt")))
+    in
+    if Sys.file_exists base_name_tpl_dir then base_name_tpl_dir
+    else if Sys.file_exists base_tpl_dir then base_tpl_dir
+    else if Sys.file_exists etc_tpl_dir then etc_tpl_dir
+    else ""
+  in
+  (* Recherche le template par défaut en fonction de la variable gwf *)
+  (* template = templ1,templ2,*                                      *)
+  let rec default_templ config_templ std_fname =
+    match config_templ with
+    [ [] | ["*"] -> std_fname
+    | [x :: l] -> 
+        match file_exist x with
+        [ "" -> default_templ l std_fname 
+        | s -> s ] ]
+  in
+  let config_templ =
+    try
+      let s = List.assoc "template" conf.base_env in
+      let rec loop list i len =
+        if i = String.length s then List.rev [Buff.get len :: list]
+        else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
+        else loop list (i + 1) (Buff.store len s.[i])
+      in
+      loop [] 0 0
+    with
+    [ Not_found -> [conf.bname; "*"] ]
+  in
+  let dir =
+    match p_getenv conf.env "templ" with
+    [ Some x when List.mem "*" config_templ -> x
+    | Some x when List.mem x config_templ -> x
+    | Some _ | None ->
+        match config_templ with
+        [ [] | ["*"] -> ""
+        | [x :: _] -> x ] ]
+  in
+  (* template par défaut *)
+  let std_fname = 
+    search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
+  in
+  (* On cherche le template dans l'ordre de file_exist.         *)
+  (* Si on ne trouve rien, alors on cherche le premier template *)
+  (* par défaut tel que défini par la variable template du gwf  *)
+  let fname =
+    match file_exist dir with
+    [ "" -> default_templ config_templ std_fname 
+    | s -> s ]
+  in
+  try Some (Secure.open_in fname) with
+  [ Sys_error _ -> None ]
+;
+
 value open_templ conf name =
   (* On cherche le fichier dans cet ordre :
      - dans la base (bases/etc/templx/name.txt)
