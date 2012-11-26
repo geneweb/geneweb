@@ -111,6 +111,7 @@ value capitale : string -> string;
 value index_of_next_char : string -> int -> int;
 
 value open_etc_file : string -> option in_channel;
+value open_hed_trl : config -> string -> option in_channel;
 value open_templ : config -> string -> option in_channel;
 value copy_from_etc :
   list (char * unit -> string) -> string -> string -> in_channel -> unit;

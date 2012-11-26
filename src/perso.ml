@@ -1807,17 +1807,6 @@ and eval_simple_str_var conf base env (_, p_auth) =
         [ Vfam _ fam _ _ -> sou base (get_origin_file fam)
         | _ -> "" ]
       else raise Not_found
-  | "prefix_no_iz" ->
-      commd {(conf) with henv = List.remove_assoc "iz" conf.henv}
-  | "prefix_no_templ" ->
-      let henv =
-        List.fold_right
-          (fun (k, v) henv -> if k = "templ" then henv else [(k, v) :: henv])
-          conf.henv []
-      in
-      let c = conf.command ^ "?" in
-      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
-        (henv @ conf.senv)
   | "qualifier" ->
       match get_env "qualifier" env with
       [ Vstring nn -> nn

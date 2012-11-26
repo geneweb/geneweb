@@ -708,6 +708,22 @@ and eval_simple_variable conf =
   | "prefix" -> Util.commd conf
   | "prefix_base" ->
       conf.command ^ "?" ^ (if conf.cgi then "b=" ^ conf.bname ^ ";" else "")
+  | "prefix_no_iz" ->
+      let henv =
+        List.fold_left
+          (fun accu k -> List.remove_assoc k accu)
+          conf.henv ["iz"; "nz"; "pz"; "ocz"]
+      in
+      Util.commd {(conf) with henv = henv}
+  | "prefix_no_templ" ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "templ" then henv else [(k, v) :: henv])
+          conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
+        (henv @ conf.senv)
   | "referer" -> Util.get_referer conf
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
@@ -1296,10 +1312,7 @@ value old_include_hed_trl conf base_opt suff =
 ;
 
 value include_hed_trl conf base_opt name =
-  let fname =
-    Filename.concat (Util.base_path ["etc"] conf.bname) (name ^ ".txt")
-  in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match Util.open_hed_trl conf name with
   [ Some ic -> copy_from_templ conf [] ic
   | None -> old_include_hed_trl conf base_opt ("." ^ name) ]
 ;
