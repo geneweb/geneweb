@@ -96,7 +96,7 @@
   %if;(link_next != "")
     <p>
       <img src="%image_prefix;/picto_parente.png" alt="&gt;&gt;" %/>
-      <a href="%link_next;" accesskey=">">[*next relationship path]</a>%nl;
+      <a href="%link_next;%if;(evar.image="on");image=on%end;" accesskey=">">[*next relationship path]</a>%nl;
     </p>
   %end;
   %if;(evar.notab = "on" or evar.pos2 != "")
