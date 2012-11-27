@@ -1,6 +1,104 @@
 # $Id: gui_lex.txt,v 1.2 2007-01-19 01:53:16 ddr Exp $
 # Copyright (c) 2006-2007 INRIA
 
+    error
+en: error
+fr: erreur
+
+    OK
+en: Ok
+fr: Ok
+
+    open url in your favorite browser
+en: open url in your favorite browser
+fr: ouvrez url dans votre navigateur préféré
+
+    Confirm
+en: confirm
+fr: confirmez
+
+    cancel
+en: cancel
+fr: annuler
+
+    database already exists
+en: database already exists
+fr: la base existe déjà
+
+    log
+en: log
+fr: log
+
+    create
+en: create
+fr: créer
+
+    create a database
+en: create a database
+fr: créer une base
+
+    view log
+en: view log
+fr: voir le log
+
+    doc
+en: doc
+fr: doc
+
+    view doc
+en: view doc
+fr: voir doc
+
+    setup
+en: setup
+fr: paramètre
+
+    setup GeneWeb
+en: setup GeneWeb
+fr: paramétrer GeneWeb
+
+    quit
+en: quit
+fr: quitter
+
+    quit GeneWeb
+en: quit GeneWen
+fr: quitter GeneWeb
+
+    no databases.
+en: no databases.
+fr: pas de base.
+
+    available databases
+en: available databases
+fr: base disponibles
+
+    browse
+en: browse
+fr: parcourir
+
+    tools
+en: tools
+fr: outils
+
+    name of the database:
+en: name of the database:
+fr: nom de la base
+
+    select a file
+en: select a file
+fr: selectionnez un fichier
+
+    Configuration gwf file of 
+en: Configuration gwf file of 
+fr: configuration du fichier gwf de 
+
+    Boîte à outil pour la base 
+en: toolbox
+fr: Boîte à outil pour la base 
+
+# Ancien
+
     Apply
 en: Apply
 fr: Appliquer

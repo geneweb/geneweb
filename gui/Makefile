@@ -21,7 +21,7 @@ opt:: gui.opt
 	cp gui.opt gui
 
 gui.out: $(OBJS)
-	$(OCAMLC) -I +lablgtk2 lablgtk.cma gtkInit.cmo unix.cma $(OBJS) -o gui.out
+	$(OCAMLC) -I +lablgtk2 lablgtk.cma unix.cma $(OBJS) -o gui.out
 
 gui.opt: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) -I +lablgtk2 lablgtk.cmxa unix.cmxa $(OBJS:.cmo=.cmx) -o gui.opt
