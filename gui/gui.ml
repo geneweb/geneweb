@@ -108,6 +108,101 @@ value mkdir_p x =
 ;
 
 value rmdir dir =
+  let split_files_folders list =
+    List.partition
+      (fun file -> 
+        let infos = Unix.lstat file in
+        infos.Unix.st_kind = Unix.S_DIR)
+      list
+  in
+  let read_dir_files fname =
+    match 
+      try Some (Unix.opendir fname) with [ Unix.Unix_error _ _ _ -> None ]
+    with
+    [ Some dh ->
+        let list = ref [] in
+        do {
+          try
+            while True do {
+              let file = Unix.readdir dh in
+              if file = "." || file = ".." then ()
+              else list.val := [file :: list.val]
+            }
+          with
+          [ End_of_file -> () ];
+          Unix.closedir dh;
+          list.val
+        }
+    | None -> [] ]
+  in
+  let (folders, files) = 
+    split_files_folders (read_dir_files dir)
+  in
+  let rec loop l folders files =
+    match l with
+    [ [] -> (folders, files)
+    | [x :: l] ->
+        let list = read_dir_files x in
+        let (fd, fi) = 
+          split_files_folders list 
+        in
+        let folders = fd @ [x :: folders] in
+        let files = fi @ files in
+        loop l folders files ]
+  in
+  let (folders, files) = loop folders [] files in
+  do {
+    List.iter (fun file -> Unix.unlink (Filename.concat dir file)) files;
+    List.iter
+      (fun file -> try Unix.rmdir file with [ Unix.Unix_error _ _ _ -> () ])
+      folders
+  }
+  
+(*  
+  let read_dir_files fname =
+    match 
+      try Some (Unix.opendir fname) with [ Unix.Unix_error _ _ _ -> None ]
+    with
+    [ Some dh ->
+        let list = ref [] in
+        do {
+          try
+            while True do {
+              let file = Unix.readdir dh in
+              if file = "." || file = ".." then ()
+              else list.val := [file :: list.val]
+            }
+          with
+          [ End_of_file -> () ];
+          Unix.closedir dh;
+          list.val
+        }
+    | None -> [] ]
+  in
+  let rec loop l accu =
+    match l with
+    [ [] -> accu 
+    | [x :: l] ->
+        let list = read_dir_files x in
+        let accu = list @ accu in
+        loop l accu ]
+  in 
+  let files_folders = loop [dir] [dir] in
+  let (folders, files) =
+    List.partition
+      (fun file -> 
+        let infos = Unix.lstat file in
+        infos.Unix.st_kind = Unix.S_DIR)
+      files_folders
+  in
+  do {
+    List.iter (fun file -> Unix.unlink (Filename.concat dir file)) files;
+    List.iter
+      (fun file -> try Unix.rmdir file with [ Unix.Unix_error _ _ _ -> () ])
+      folders
+  }
+*)
+(*
   match
     try Some (Unix.opendir dir) with [ Unix.Unix_error _ _ _ -> None ]
   with
@@ -128,6 +223,7 @@ value rmdir dir =
         try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ]
       }
   | _ -> () ]
+*)
 ;
 
 value rec cut_at_equal s =
@@ -626,6 +722,53 @@ value export_all_bases conf =
 value import_all_bases conf = ()
 ;
 
+(**/**) (* UI pratique *)
+value tmp_wnd conf bname f = do {
+  let wnd = GWindow.window 
+    ~title:(capitale (transl "confirm"))
+    ~position:`CENTER 
+    ~resizable:True () 
+  in 
+  ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
+  let vbox = GPack.vbox
+    ~spacing:5
+    ~packing:wnd#add ()
+  in
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
+  in
+  let _label = GMisc.label
+    ~text:(transl "enter a name")
+    ~packing:hbox#pack ()
+  in
+  let fname = ref "" in
+  let entry = GEdit.entry 
+    ~text:""
+    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) () 
+  in
+  ignore (entry#connect#changed (fun () -> fname.val := entry#text));
+  let bbox = GPack.button_box `HORIZONTAL
+    ~border_width: 5
+    ~layout: `SPREAD
+    ~packing: vbox#pack ()
+  in
+  let btn_cancel = GButton.button
+    ~label:(capitale (transl "cancel"))
+    ~packing:bbox#pack ()
+  in
+  ignore (btn_cancel#connect#clicked (fun () -> wnd#destroy ()));
+  let btn_ok = GButton.button
+    ~label:(transl "OK")
+    ~packing:bbox#pack () 
+  in
+  ignore (btn_ok#connect#clicked (fun () -> do {
+    wnd#destroy (); 
+    let fname = if fname.val = "" then "a" else fname.val in
+    f conf bname fname }));
+  wnd#show ();
+};
+
 
 (**/**) (* Interface graphique. *)
 
@@ -694,11 +837,13 @@ value rec show_main conf = do {
          let url = "http://opensource.geneanet.org/projects/geneweb/wiki" in
          ignore (browse conf url)) );
   toolbar#insert_space ();
+(* TOTO : gérer le restart
   ignore
     (inser_toolbar 
        (capitale (transl "setup")) (capitale (transl "setup GeneWeb")) 
        "gui_setup.png" (fun () -> do { vbox#destroy (); setup_gui conf }));
   toolbar#insert_space ();
+*)
 (*
   inser_toolbar 
     (capitale (transl "restart")) (capitale (transl "restart GeneWeb")) 
@@ -771,6 +916,62 @@ and new_database conf = do {
     ~spacing:5
     ~packing:main_window#add ()
   in
+  let table = GPack.table
+    ~rows:2
+    ~columns:2
+    ~row_spacings: 5
+    ~col_spacings: 5
+    ~packing:vbox#pack ()
+  in
+  let _label = GMisc.label
+    ~text:(capitale (transl "name of the database:"))
+    ~packing:(table#attach ~left:0 ~top:0) ()
+  in
+  let entry = GEdit.entry 
+    ~text:""
+    ~packing:(table#attach ~left:1 ~top:0) ()
+  in
+  let _label= GMisc.label
+    ~text:(capitale (transl "select a file"))
+    ~packing:(table#attach ~left:0 ~top:1) ()
+  in
+  let select = GButton.button 
+    ~stock:`OPEN 
+    ~packing:(table#attach ~left:1 ~top:1) ()
+  in
+  let file = ref "" in
+  ignore 
+    (select#connect#clicked
+       (fun () -> file.val := select_file main_window ""));
+  let bbox = GPack.button_box `HORIZONTAL
+    ~border_width: 5
+    ~layout: `SPREAD
+    ~packing: vbox#pack ()
+  in
+  let btn_cancel = GButton.button
+    ~label:(capitale (transl "cancel"))
+    ~packing:bbox#pack ()
+  in
+  ignore 
+    (btn_cancel#connect#clicked 
+      (fun () -> do { vbox#destroy (); show_main conf } ) );
+  let btn_ok = GButton.button
+    ~label:(transl "OK")
+    ~packing:bbox#pack () 
+  in
+  ignore 
+    (btn_ok#connect#clicked 
+      (fun () -> 
+        do {
+          create_base conf entry#text file.val;
+          vbox#destroy ();
+          show_main conf;
+        }))
+(*
+  let vbox = GPack.box `VERTICAL
+    ~spacing:5
+    ~packing:main_window#add ()
+  in
   let hbox = GPack.hbox 
     ~spacing:5 
     ~packing:vbox#pack () 
@@ -823,6 +1024,7 @@ and new_database conf = do {
           vbox#destroy ();
           show_main conf;
         }))
+*)
 }
 
 and setup_gui conf = do {
@@ -1034,7 +1236,7 @@ and tools conf bname = do {
     ~label:(transl "Extract GW")
     ~packing:(table#attach ~left:1 ~top:0) () 
   in
-  ignore (bbut#connect#clicked (fun () -> gwu conf bname "a"));
+  ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwu));
   let _label = GMisc.label
     ~text:"gwb2ged"
     ~packing:(table#attach ~left:0 ~top:1) ()
@@ -1043,7 +1245,7 @@ and tools conf bname = do {
     ~label:(transl "gwb2ged")
     ~packing:(table#attach ~left:1 ~top:1) () 
   in
-  ignore (bbut#connect#clicked (fun () -> gwb2ged conf bname "a"));
+  ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwb2ged));
   let _label = GMisc.label
     ~text:"gwf"
     ~packing:(table#attach ~left:0 ~top:2) ()
@@ -1073,7 +1275,7 @@ and tools conf bname = do {
     ~label:(transl "Rename")
     ~packing:(table#attach ~left:1 ~top:4) () 
   in
-  ignore (bbut#connect#clicked (fun () -> rename_base conf bname "poulp"));
+  ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname rename_base));
   let _label = GMisc.label
     ~text:"delete"
     ~packing:(table#attach ~left:0 ~top:5) ()
@@ -1303,6 +1505,8 @@ value launch_config () =
           server_running = None; waiting_pids = [] }
       in 
       write_config_file conf;
+      (* On en a besoin avant ... *)
+      (* mkdir_p conf.bases_dir; *)
       assistant#destroy ();
       launch_server conf }
     in
