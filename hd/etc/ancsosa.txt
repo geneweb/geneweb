@@ -389,66 +389,6 @@
   </dl>
 %end;
 
-%define;td_img(xx)
-  %if;(xx.has_image or evar.alw_img = "on")
-    %if;(count = 0)<tr>%end;
-    %incr_count;
-    <td width="100px" valign="top">
-      %if;xx.has_image;
-        <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
-      %else;
-        %if;xx.is_female;
-          <img src="%image_prefix;/img_unknown_woman.png" width="50" height="75" alt=""%/>
-        %else;
-          <img src="%image_prefix;/img_unknown_man.png" width="50" height="75" alt=""%/>
-        %end;
-      %end;
-      <p>
-        %apply;link(xx.access, xx)
-        %xx.dates;
-      </p>
-    </td>
-    %if;(count = 8)
-      %reset_count;
-      </tr>
-    %end;
-  %end;
-%end;
-
-%define;display_images()
-  %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-  <h3>
-    [*image/images]1
-    <a name="img">&nbsp;</a>
-  </h3>
-  %reset_count;
-  <table>
-    %foreach;ancestor_level;
-      %if;(evar.v != "" and level <= nb_gen and (evar.only != "on" or level = evar.v))
-        %foreach;ancestor;
-          %if;(ancestor.same = "")
-            %apply;td_img("ancestor")
-%(
-            %if;(ancestor.index != self.index)
-              %if;ancestor.is_female;
-                %foreach;ancestor.family;
-                  %foreach;child;
-                    %if;(evar.siblings = "on" or child.sosa_in_list != "")
-                      %apply;td_img("child")
-                    %end;
-                  %end;
-                %end;
-              %end;
-            %end;
-%)
-          %end;
-        %end;
-      %end;
-    %end;
-  </table>
-%end;
-
-
 %define;long_display_ancestor_personal()
   %apply;somebody("ancestor").
   %if;(evar.only != "on" and ancestor.father_sosa != "")
@@ -1253,14 +1193,11 @@
   
   %elseif;(evar.t = "G" and evar.only= "on")
     %( long display; only the selected generation %)
-    %if;(((evar.notes = "on" or evar.src = "on") and evar.inline != "on") or evar.image = "on")
+    %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
       <p class="not_printable"> 
         [*see]: <a href="#asc">[*ancestors]</a>%sp;%nn;
         %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
           | <a href="#ns">[*note/notes]1</a>
-        %end;
-        %if;(evar.image = "on")
-          | <a href="#img">[*media/medias]1</a>
         %end;
       </p>
     %end;
@@ -1292,21 +1229,14 @@
       <p><hr%/></p>
       <p>%apply;long_display_notes()</p>
     %end;
-    %if;(evar.image = "on")
-      <p><hr%/></p>
-      %apply;display_images()
-    %end;
   
   %elseif;(evar.t = "G")
     %( long display %)
-    %if;(((evar.notes = "on" or evar.src = "on") and evar.inline != "on") or evar.image = "on")
+    %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
       <p class="not_printable"> 
         [*see]: <a href="#asc">[*ancestors]</a>%sp;%nn;
         %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
           | <a href="#ns">[*note/notes]1</a>
-        %end;
-        %if;(evar.image = "on")
-          | <a href="#img">[*media/medias]1</a>
         %end;
       </p>
     %end;
@@ -1337,10 +1267,6 @@
     %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
       <p><hr%/></p>
       <p>%apply;long_display_notes()</p>
-    %end;
-    %if;(evar.image = "on")
-      <p><hr%/></p>
-      %apply;display_images()
     %end;
   
   %elseif;(evar.t = "D")

@@ -125,16 +125,6 @@
             [*comment] ([marriage/marriages]1)
           </label>
         </p>
-        <p class="descends_menu_option_p">
-          <label>
-            <input type="checkbox" name="image" value="on"%/>
-            [*image/images]1
-          </label>
-          <label>
-            <input type="checkbox" name="alw_img" value="on"%/>
-            [*display empty picture]
-          </label>
-        </p>
       </div>
 
       <label>
