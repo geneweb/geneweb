@@ -1,6 +1,9 @@
 GeneWeb version 6.06
 --------------------
 
+* ! New ! You can try the new graphical interface of GeneWeb. It's supposed
+  to replace gwsetup at the end. Right now, it's a beta version so every
+  thing is not finnished yet. Feedback is welcome.
 * Add three new warnings : ChangedOrderOfMarriages, CloseSiblings and 
   ParentTooOld. Activate the warning YoungForMarriage.
 * Change totally the way to notify and record the changes of a base. There is
@@ -14,19 +17,25 @@ GeneWeb version 6.06
     - VISIBLE key boolean
   This modification should allow in a close future to be able to see what was 
   exactly modify in a person/family (eg: birth place, marriage date ...).
-* Add a "book of sources" just like the "book of places". The two 
-  functions uses the same variable in the gwf file : max_nb_updates (you should
-  then update your gwf files). This variable allows to set up the maximum 
-  number of updates that can be done at a single time.
+* Add a "book of sources" and "book of occupations" just like the "book of 
+  places". The three functions uses the same variable in the gwf file: 
+  max_nb_updates (you should then update your gwf files). This variable 
+  allows to set up the maximum number of updates that can be done at a single 
+  time.
+  Plus, this page is available as a template. For those who changed the values
+  in updind and updfam template for the fields place, source, occupation, 
+  beware to put the right value in the upddata template.
 * Add a field in the advanced request to search in the marriage informations.
   This is just a small evolution, it is not meant to add other searching 
   fields again and again.
 * Add the occupation in the edition of a family form. One can create a
   family and specify the occupation of the father/mother and the children.
-  This is again a small evolution.
-* Add a new output : "liste-éclair" (Tiny tafel).
-* "Better" display in the ascendants/descendants menu/list/tree.
-* Add a few new options in the ascendants/descendants list/tree.
+  This is again a small evolution, it is not meant to add other fields again 
+  and again.
+* Add two new outputs : "liste-éclair" (Tiny tafel) and "book of ascendants".
+* "Better" display in the ascendants/descendants menu/list/tree and the 
+  relatives outputs. Add a few new options in the ascendants/descendants 
+  list/tree.
 * The way a date is displayed is now completely depedant of the "date order"
   in the language dictionnary. For exemple, if your date order is dd/mm/yyyy,
   your date will be 01/02/1880. If instead it's d/m/yyyy, it will be displayed
