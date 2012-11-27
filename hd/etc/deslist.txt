@@ -366,49 +366,13 @@
   %end;
 %end;
 
-%define;display_images(xx, curlev, maxlev, famlev, ctr)
-  %apply;img_td("xx", curlev)
-  %if;(evar.rel = "on" and xx.has_relations)
-    %foreach;xx.relation;%nl;
-      %if;has_relation_him;%apply;img_td("relation_him", curlev)%end;
-      %if;has_relation_her;%apply;img_td("relation_her", curlev)%end;
-    %end;
-    %foreach;xx.related;
-      %apply;img_td("related.var", curlev)
-    %end;
-  %end;
-  %foreach;xx.family;
-    %apply;img_td("spouse", curlev)
-    %if;(evar.witn = "on" and has_witnesses)%nl;
-      %foreach;witness;
-        %apply;img_td(witness.var, curlev)
-      %end;
-    %end;
-    %if;(curlev < maxlev)
-      %if;(curlev = 0 or evar.t = "L")
-        %if;(family.desc_level < famlev)
-        %elseif;(family.desc_level > famlev)
-        %elseif;has_children;
-          %family.set_infinite_desc_level;
-          %foreach;child;
-            %apply;display_images("child", curlev+1, maxlev, famlev+1, count+1)
-          %end;
-        %end;
-      %end;
-    %end;
-  %end;
-%end;
-
 %define;by_list(xx)
   <p class="not_printable"> 
-    %if;(((evar.notes = "on" or evar.src = "on") and evar.inline != "on") or evar.image = "on")
+    %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
       [*see]: <a href="#desc">[*descendants]</a>%sp;%nn;
     %end;
     %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
       | <a href="#ns">[*note/notes]1</a>
-    %end;
-    %if;(evar.image = "on")
-      | <a href="#img">[*media/medias]1</a>
     %end;
   </p>
   %reset_count;
@@ -432,18 +396,6 @@
         %reset_desc_level;
         %apply;notes_by_list("self", 0, xx, 0, 1)%nl;
       </dl>
-    %end;
-    %if;(evar.image = "on")
-      %reset_count;
-      %reset_desc_level;
-      <p><hr%/></p>
-      <h3>
-        [*image/images]1
-        <a name="img">&nbsp;</a>
-      </h3>
-      <table>
-        %apply;display_images("self", 0, xx, 0, 1)
-      </table>
     %end;
   </p>
 %end;
