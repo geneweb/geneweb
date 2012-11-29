@@ -3,12 +3,12 @@
 <head>
   <!-- $Id: ancsosa.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121128 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121129 templ=templm -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] … [up to] …%nn;
     %elseif;(evar.t = "N" and evar.only = "on")
-      [*generation/generations]0 %evar_v;
+      [*generation/generations]0 %evar.v;
     %else;
       %apply;a_of_b%with;
         %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
@@ -27,7 +27,6 @@
   %include.css;
   %base_header;
 </head>
-%let;evar_v;%if;(evar.v > 0)%expr(evar.v-1)%end;%in;
 
 %( <!-- Begin define (used in ancsosa.txt, deslist.txt)--> %)
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
@@ -458,9 +457,9 @@
 %define;gen()
   <p>
     %if;(evar.only != "on")
-      %apply;togen(evar_v)
+      %apply;togen(evar.v)
     %else;
-      [*generation/generations]0 %evar_v;
+      [*generation/generations]0 %evar.v;
     %end;
   </p>
 %end;
@@ -877,8 +876,8 @@
     %apply;gen()
     %empty_sorted_list;
     %reset_count;
-    %foreach;ancestor_level(evar_v)
-      %if;(level > 1 and (evar.only != "on" or level = evar_v))
+    %foreach;ancestor_level(evar.v)
+      %if;(level > 1 and (evar.only != "on" or level = evar.v))
         %foreach;ancestor;
           %if;(ancestor.same = "")
             %apply;miss_bbmmdd("xx","bb","mm","dd")
@@ -940,7 +939,7 @@
 %define;same_consang()
   %reset_count;
   <p class="highlight">[*display smallest sosa number relative to ancestor] + [*consanguinity]</p>
-  <p>%apply;togen(evar_v).</p>
+  <p>%apply;togen(evar.v).</p>
   <ul>
   %foreach;ancestor_level
     <li><span class="highlight">[*generation/generations]0 %level;</span>
@@ -969,7 +968,7 @@
 %define;same_same()
   %reset_count;
   <p class="highlight">[*display smallest sosa number relative to ancestor]</p>
-  <p>%apply;togen(evar_v).</p>
+  <p>%apply;togen(evar.v).</p>
   <ul>
   %foreach;ancestor_level
     <li><span class="highlight">[*generation/generations]0 %level;</span>
@@ -1051,7 +1050,7 @@
   %( short display, table with occupation, death_age, consanguinity, dates, places %)
   %if;(evar.only != "on")
     <p>
-      %apply;togen(evar_v).
+      %apply;togen(evar.v).
     </p>
   %end;
   %reset_count;
@@ -1065,8 +1064,8 @@
       <col width="400"%/>
       <col width="10"%/>
     </colgroup>
-  %foreach;ancestor_level(evar_v)
-    %if;(level > 1 and (evar.only != "on" or level = evar_v))
+  %foreach;ancestor_level(evar.v)
+    %if;(level > 1 and (evar.only != "on" or level = evar.v))
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
       %foreach;ancestor
           %incr_count;
@@ -1096,8 +1095,8 @@
   %apply;gen()
   %empty_sorted_list;
   %reset_count;
-  %foreach;ancestor_level(evar_v)
-    %if;(level > 1 and (evar.only != "on" or level = evar_v))%nn;
+  %foreach;ancestor_level(evar.v)
+    %if;(level > 1 and (evar.only != "on" or level = evar.v))%nn;
       %foreach;ancestor;
         %if;(ancestor.same = "")
           %if;(not ancestor.has_parents and
@@ -1188,7 +1187,7 @@
   %( missing ancestors in ancestors order %)
   %if;(evar.only != "on")
     <p>
-      %apply;togen(evar_v)
+      %apply;togen(evar.v)
     </p>
   %end;
   %if;(evar.ms != "on")
@@ -1198,8 +1197,8 @@
   %end;
   <ul>
   %reset_count;
-  %foreach;ancestor_level(evar_v)
-    %if;(level > 1 and (evar.only != "on" or level = evar_v))%nn;
+  %foreach;ancestor_level(evar.v)
+    %if;(level > 1 and (evar.only != "on" or level = evar.v))%nn;
       %apply;lazy_print%with;
         <li>%nl;[*generation/generations]0 %level;%nl;
         <ul>%nl;
@@ -1249,13 +1248,13 @@
   %( long display %)
   %if;(evar.only != "on")
     <p>
-    %apply;togen(evar_v).
+    %apply;togen(evar.v).
     </p>
   %end;
   %empty_sorted_list;
   %reset_count;
-  %foreach;ancestor_level(evar_v)
-    %if;(evar.only != "on" or level = evar_v)
+  %foreach;ancestor_level(evar.v)
+    %if;(evar.only != "on" or level = evar.v)
       <h3 class="generation">[*generation/generations]0 %level;</h3>
       %foreach;ancestor;
         %if;(ancestor.same != "")

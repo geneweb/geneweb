@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120930 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121129 templ=templm -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -21,8 +21,6 @@
   %include.css;
   %base_header;
 </head>
-
-%let;evar_v;%if;(evar.v > 0)%expr(evar.v-1)%end;%in;
 
 %define;symbol(xx)
   %if;(evar.cgl != "on")
@@ -194,7 +192,7 @@
 %if;(evar.t = "T" and not cancel_links)%nn;
   <div style="text-align:%right;">
     <br%/>
-    <a href="%prefix;m=A;t=T;v=%evar_v;;%access;;dag=on;notab=on;slices=on">
+    <a href="%prefix;m=A;t=T;v=%evar.v;;%access;;dag=on;notab=on;slices=on">
       <tt>//</tt>
     </a>
   </div>
@@ -202,14 +200,14 @@
 
 %if;(evar.t = "T")
   %apply;tree%with;
-    %if;(bvar.max_anc_tree = "")%apply;min(evar_v, max_anc_level, 7)
-    %else;%apply;min(evar_v, max_anc_level, bvar.max_anc_tree)
+    %if;(bvar.max_anc_tree = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_tree)
     %end;
   %end;
 %elseif;(evar.t = "A")
-    <div style="text-align: center">%apply;male_line("self", evar_v)</div>
+    <div style="text-align: center">%apply;male_line("self", evar.v)</div>
 %elseif;(evar.t = "C")
-    <div style="text-align: center">%apply;female_line("self", evar_v) </div>
+    <div style="text-align: center">%apply;female_line("self", evar.v) </div>
 %end;
   %base_trailer;
   %copyright;

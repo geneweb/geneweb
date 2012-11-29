@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120926 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121129 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -75,7 +75,7 @@
     </legend>
     <select name="v">
       %foreach;ancestor_level;
-        <option value="%expr(level+1)"%nn;
+        <option value="%level;"%nn;
           %if;(level = 4) selected="selected"%end;>%nn;
           %if;(level = 1)[*specify::generation/generations]0%nn;
           %elseif;(level = 2)[*to the parents]%nn;
@@ -195,7 +195,7 @@
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="inline" value="on"%/>
+      <input type="checkbox" name="inline" value="on" onchange="valid('tG')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
       [*display notes/sources inline]
     </label>
   </fieldset>

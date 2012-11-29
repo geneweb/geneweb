@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121003 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121129 templ=templm -->
   <title>%nn;
     %if;(evar.t = "E" and evar.opt = "csv")
       CSV
@@ -34,7 +34,6 @@
   %base_header;
 </head>
 %(<!-- Begin define --> %)
-%let;evar_v;%if;(evar.v > 0)%expr(evar.v-1)%end;%in;
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
 %let;ref_index;%index;%in;
@@ -387,7 +386,7 @@
             %elseif;(curlev = 3)
               %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a cousin","sss")
             %elseif;(curlev = 4)
-              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"arriere petit fils","a cousin","sss")
+              %apply;ld_cousin(bbb,ddd,curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a cousin","sss")
             %end;
           %end;
         %end;
@@ -472,7 +471,7 @@
 
 %define;ld(bbb,ddd)
   %let;maxlev;
-    %apply;min(evar_v, max_anc_level, 4)
+    %apply;min(evar.v, max_anc_level, 4)
   %in;
   %empty_sorted_list;
   %foreach;ancestor_level(maxlev)
@@ -482,7 +481,7 @@
         %foreach;ancestor.family;
           %apply;ld_marriage(bbb,ddd,"ancestor","him/her","","")
           %apply;ld_somebody(bbb,ddd,"spouse","the spouse","","")
-          %if;(spouse.has_parents and evar_v != 1)
+          %if;(spouse.has_parents and evar.v != 1)
             %foreach;spouse.parent;
               %apply;ld_somebody(bbb,ddd,"parent","the father-in-law/the mother-in-law","","")
             %end;
@@ -695,8 +694,8 @@
   ;[marriage/marriages]0_occ%nn;
   <br%/>
   %reset_count;
-  %foreach;ancestor_level(evar_v + 1)
-    %if;(level != 1 and evar.only != "on" or level = evar_v + 1)
+  %foreach;ancestor_level(evar.v)
+    %if;(level != 1 and evar.only != "on" or level = evar.v)
       %foreach;ancestor;
         %if;(ancestor.same = "" and ancestor.is_male)
           %foreach;ancestor.family;
@@ -716,8 +715,8 @@
 %elseif;(evar.t = "L")
   %( by list %)
   %let;xx;
-    %if;(bvar.max_anc_level = "")%apply;min(evar_v, max_anc_level, 7)
-    %else;%apply;min(evar_v, max_anc_level, bvar.max_anc_level)%end;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
   %in;
   <p>
   %apply;togen(xx).
@@ -726,8 +725,8 @@
 %elseif;(evar.t = "H")
   %( horizontally %)
   %let;xx;
-    %if;(bvar.max_anc_level = "")%apply;min(evar_v, max_anc_level, 7)
-    %else;%apply;min(evar_v, max_anc_level, bvar.max_anc_level)%end;
+    %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
   %in;
   <p>
   %apply;togen(xx).
@@ -739,7 +738,7 @@
 %elseif;(evar.t = "F")
   %( surnames list %)
   <ul>
-  %foreach;ancestor_surname(evar_v)
+  %foreach;ancestor_surname(evar.v)
     <li>%nn;
     %if;(evar.cgl != "on")<a href="%prefix;m=DAG;%ancestor.sosa_access;">%nn;
     %ancestor.surname_end;%ancestor.surname_begin;</a>%nn;
