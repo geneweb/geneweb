@@ -573,6 +573,15 @@ value rec subst sf =
   | Awid_hei s -> Awid_hei (sf s)
   | Aif e alt ale -> Aif (subst sf e) (substl sf alt) (substl sf ale)
   | Aforeach (loc, s, sl) pl al ->
+      (* Dans le cas d'une "compound variable", il faut la décomposer. *)
+      (* Ex: "ancestor.father".family  =>  ancestor.father.family      *)
+      let s1 = sf s in
+      let strm = Stream.of_string s1 in
+      let (_, s2, sl2) = get_compound_var strm in
+      let (s, sl) = 
+        if Stream.peek strm <> None then (s, sl)
+        else (s2, sl2 @ sl)
+      in
       Aforeach (loc, sf s, List.map sf sl) (List.map (substl sf) pl)
         (substl sf al)
   | Afor i min max al -> 
