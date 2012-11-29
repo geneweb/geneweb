@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template f v 6.06c 2012/11/29 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: perso.txt, Template f v 6.06d 2012/11/29 16:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -282,7 +282,8 @@
 %define;display_date_marriage_parent(xx)
   %foreach;xx.mother.family;
     %if;(spouse.access=xx.father.access)
-      %if;(marriage_date.year!="")<em>-&nbsp;%marriage_date.year;&nbsp;-</em>%else;&nbsp;%end;
+      %if;(marriage_date.year!="")<em>-&nbsp;%marriage_date.prec;
+        %marriage_date.year;&nbsp;-</em>%else;&nbsp;%end;
     %end;
   %end;
 %end;
