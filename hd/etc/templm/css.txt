@@ -1,6 +1,6 @@
 <style type="text/css">
 /* Properties of all html pages.*/
-/* mickroue(a)yahoo.fr 20121015 templ=templm */
+/* mickroue(a)yahoo.fr 20121128 templ=templm */
 html{background:url('images/gwback.jpg');}
 /* Properties of all html pages */
 body{word-wrap:break-word;}
@@ -35,7 +35,7 @@ a:hover.date,a:hover,label:hover,input:hover,.button:hover,.menu a:hover,.menu1 
 h1{text-align:center;}
 /* Properties of the menu2. All pages. */
 .menu2{position:absolute;top:0;right:0;font-family:Arial;font-size:14px;}
-.menu2 a{float:left;background-color:buttonface;border:solid 1px #FFFFC0;margin:0;padding:2px;color:buttontext;}
+.menu2 a, .menu2 input{float:left;background-color:buttonface;border:solid 1px #FFFFC0;margin:0;padding:2px;color:buttontext;}
 /* Properties of the footer block. All pages. */
 #footer{clear:both;width:100%%;}
 #footer hr{color:#e7edb3;}
@@ -98,7 +98,7 @@ abbr{border-bottom:0;}
 #perso .ancestors{width:auto;float:left;margin:5px;}
 #perso .siblings{width:auto;float:left;margin:5px;}
 #perso .data1,#perso .person div{text-align:center;}
-#perso .person_content,#perso .person,#perso .notes,#perso .sources,#perso .relations{clear:both;overflow:auto;}
+#perso .person,#perso .notes,#perso .sources,#perso .relations{clear:both;overflow:auto;}
 #perso .image,#perso .image img,#perso .image_sheet{float:left;width:12.5em;}
 #perso .image{display:block;margin:0;padding:0;}
 #perso .image img{border:none;margin:0;padding:0;}
@@ -145,14 +145,14 @@ abbr{border-bottom:0;}
 #deslist .notes_src em{font-size:80%%;}
 /* ancsosa.txt */
 #ancsosa li{margin:2px 0 0 0;padding:0 0 0 10px;}
-.generation{margin:0px;padding-top:5px;border-top:ridge #D2691E 2px;text-align:center;}
+.generation{margin:0px;padding-top:5px;padding-bottom:5px;border-top:ridge #D2691E 2px;text-align:center;}
 .ancestor_male{margin:0px;padding-top:5px;border-top:dotted #B8860B 1px;}
 .is_desc_10{background-color:#ADD8E6;}
 .is_desc_11{background-color:#FFB6C1;}
 .other_family{font-size:80%%;}
-.sure_dates0{}
-.sure_dates1,.sure_dates11{background-color:#90EE90;}
-.not_sure_dates{background-color:#C0C0C0;}
+.sure_dates0,.sure_dates00,.sure_dates01,.sure_dates10{color:#B8860B;}
+.sure_dates1,.sure_dates11{background-color:#90EE90;width:100px;}
+.not_sure_dates{background-color:#C0C0C0;color:inherit;}
 .xs{font-style:normal;font-size:x-small;}
 .top{vertical-align:top;}
 .p_left{padding-left:5px;}
@@ -188,4 +188,7 @@ abbr{border-bottom:0;}
 #welcome_form-titles div{float:left;margin-right:3px;}
 #welcome_form-titles a{font-size:70%%;}
 #trl, #misc {clear:both;padding:2px;margin:2px;border:solid 1px #FFFFC0;}
+#templ {font-size:12px;padding-top:1em;text-align: center;}
+#templ a{text-decoration:none;padding:.2em 1em;color:#fff;background-color:#2f6400;}
+#templ a:hover{color: #fff;background-color: #4A9900;}
 </style>

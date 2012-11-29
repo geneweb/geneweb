@@ -1,4 +1,4 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 20121107 templ=templm -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 20121128 templ=templm -->
 <!-- How to : copy this file to bases/etc/base_name/ -->
 
 %if;(not cancel_links)
@@ -68,9 +68,19 @@
         %if;(bvar.hide_advanced_request = "no")
           <a href="%prefix;m=H;v=advanced">[advanced request]</a>
         %end;
+        <p id="templ">
+          <a href="%prefix_no_templ;templ=;%suffix;">default</a>
+          <a href="%prefix_no_templ;templ=templa;%suffix;">templa</a>
+          <a href="%prefix_no_templ;templ=templb;%suffix;">templb</a>
+          <a href="%prefix_no_templ;templ=templc;%suffix;">templc</a>
+          <a href="%prefix_no_templ;templ=templd;%suffix;">templd</a>
+          <a href="%prefix_no_templ;templ=templf;%suffix;">templf</a>
+          <a href="%prefix_no_templ;templ=templh;%suffix;">templh</a>
+          <a href="%prefix_no_templ;templ=templm;%suffix;">templm</a>
+          <a href="%prefix_no_templ;templ=templ502;%suffix;">templ502</a>
+        </p>
       </div>
     </form>
-    <div id="templ"></div>
   </div>
   %if;(wizard)
     <script type="text/javascript">
@@ -99,38 +109,6 @@
     -->
     </script>
   %end;
-  <script type="text/javascript">
-  <!--
-   var oldUrl = document.URL;
-   var searchUrl = oldUrl.search(/templ=/);
-   if(searchUrl != -1) {
-     document.getElementById("templ").innerHTML = '\
-        templ= \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=;') + '">-</a> \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templa;') + '">a</a> \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templb;') + '">b</a> \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templc;') + '">c</a> \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templd;') + '">d</a> \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templf;') + '">f</a> \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templh;') + '">h</a> \
-        <a href="' + oldUrl.replace(/templ=\w*[;&]/,'templ=templm;') + '">m</a> \
-     ';
-   }
-   else {
-     document.getElementById("templ").innerHTML = '\
-        templ= \
-        <a href="' + oldUrl + ';templ=;">-</a> \
-        <a href="' + oldUrl + ';templ=templa;">a</a> \
-        <a href="' + oldUrl + ';templ=templb;">b</a> \
-        <a href="' + oldUrl + ';templ=templc;">c</a> \
-        <a href="' + oldUrl + ';templ=templd;">d</a> \
-        <a href="' + oldUrl + ';templ=templf;">f</a> \
-        <a href="' + oldUrl + ';templ=templh;">h</a> \
-        <a href="' + oldUrl + ';templ=templm;">m</a> \
-     ';
-   }
-  -->
-  </script>
 %end;
 
 <!-- end trl.txt -->
