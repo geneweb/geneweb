@@ -6,7 +6,8 @@
       var a_k = String.fromCharCode(key);
       switch (a_k)
       {
-        case "w": document.getElementById("acckey").focus(); break;  // menu2 (w)
+        //shift = on
+        case "W": document.getElementById("acckey").focus(); break;  // menu2 (w)
         case "²": document.getElementById("Tn").focus(); break;      // trl : search input
         case "2": document.getElementById("par_2").focus(); break;
         case "3": document.getElementById("par_3").focus(); break;
@@ -22,6 +23,31 @@
         break; 
         case "0": document.getElementById(spo).focus(); break;
         case "8": document.getElementById(chi).focus(); break;
+        case "P": document.getElementById(mod_ind).click(); break;
+        case "L": document.getElementById(add_par).click(); break;
+        case "A": document.getElementById(add_fam).click(); break;
+        case "F": document.getElementById(mod_fam).click(); break;
+        case "G": document.getElementById("mod_fam_2").click(); break;
+        case "H": document.getElementById("mod_fam_3").click(); break;
+        case "I": document.getElementById("snd_image").click(); break;
+        case "R": document.getElementById("rela_comp").click(); break;
+        //shift = off
+        case "w": document.getElementById("acckey").focus(); break;  // menu2 (w)
+        case "²": document.getElementById("Tn").focus(); break;      // trl : search input
+        case "é": document.getElementById("par_2").focus(); break;
+        case "\"": document.getElementById("par_3").focus(); break;
+        case "'": document.getElementById("par_4").focus(); break;
+        case "(": document.getElementById("par_5").focus(); break;
+        case "-": document.getElementById("par_6").focus(); break;
+        case "è": document.getElementById("par_7").focus(); break;
+        case "&":
+          if(document.getElementById(sib))
+            {document.getElementById(sib).focus();}
+          else
+            {document.getElementById("sib_1").focus();}
+        break; 
+        case "à": document.getElementById(spo).focus(); break;
+        case "_": document.getElementById(chi).focus(); break;
         case "p": document.getElementById(mod_ind).click(); break;
         case "l": document.getElementById(add_par).click(); break;
         case "a": document.getElementById(add_fam).click(); break;

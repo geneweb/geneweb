@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121108 templ=templm --> 
+  <!-- Modified mickroue(a)yahoo.fr 20121128 templ=templm -->
   <title>%first_name; %surname;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -134,7 +134,7 @@
         %foreach;family;
             %if;(evar.spouse != "off")  
               <div class="image_sheet" style="font-size: 80%%;">
-                  %if;(spouse.has_image)%apply;link_image("spouse")<br%/>%end;        
+                  %if;(spouse.has_image)%apply;link_image("spouse")<br%/>%end;
                   %apply;somebody("spouse")
               </div>
             %end;
@@ -219,8 +219,8 @@
       %else; <em>%on_marriage_date;</em>%nn;
       %end;
     %else;
-      %if;(on_marriage_date = "")<em>, %apply;advanced("marriage_place",marriage_place)</em>%nn;
-      %else; <em>%on_marriage_date;, %apply;advanced("marriage_place",marriage_place)</em>%nn;
+      %if;(on_marriage_date = "")<em> [in (place)] %apply;advanced("marriage_place",marriage_place)</em>%nn;
+      %else; <em>%on_marriage_date; [in (place)] %apply;advanced("marriage_place",marriage_place)</em>%nn;
       %end;
     %end;
   %end;
@@ -558,10 +558,12 @@
     <div class="menu2">
       %let;wide;%if;(evar.wide != "on")wide=on;%end;%in;
       %let;symbol;%if;(evar.wide != "on")&divide;%else;&middot;|&middot;%end;%in;
-      <a id="acckey"
-         href="#" accesskey="W" title="[navigation] OnKeyPress (W)"
+      <form id="ak" method="get" action="" style="display:inline;">
+        <p style="display:inline;"><input id="acckey" style="width:15px;"
+         name="acckey" accesskey="W" title="[navigation] OnKeyPress (W)" value="W"
          onkeypress="javascript:return acc_key(event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"
-         >(W)</a>
+         %/></p>
+      </form>
       <a href="%prefix;%access;;%wide;maxlev=%evar.maxlev;;image=%evar.image;;spouse=%evar.spouse;"
          title="[visualize/show/hide/summary]0">%symbol;</a>
       %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
@@ -687,10 +689,10 @@
       %if;has_birth_date;
         %apply;capitalize(nth([born],sex)) %on_birth_date;
         %if;birthday; ([happy birthday to you!])%end;
-        %if;has_birth_place;, %apply;advanced("birth_place",birth_place)%end;<br%/>
+        %if;has_birth_place; [in (place)] %apply;advanced("birth_place",birth_place)%end;<br%/>
       %else;
         %if;has_birth_place;
-          %apply;capitalize(nth([born],sex)), %apply;advanced("birth_place",birth_place)<br%/>
+          %apply;capitalize(nth([born],sex)) [in (place)] %apply;advanced("birth_place",birth_place)<br%/>
         %end;
       %end;
       %if;(father_age_at_birth != "" or mother_age_at_birth != "")
@@ -703,16 +705,16 @@
       %end;
       %if;has_baptism_date;
         %apply;capitalize(nth([baptized],sex)) %on_baptism_date;
-        %if;has_baptism_place;, %apply;advanced("bapt_place",baptism_place)%end;<br%/>
+        %if;has_baptism_place; [in (place)] %apply;advanced("bapt_place",baptism_place)%end;<br%/>
       %else;
         %if;has_baptism_place;
-          %apply;capitalize(nth([baptized],sex)), %apply;advanced("bapt_place",baptism_place)<br%/>
+          %apply;capitalize(nth([baptized],sex)) [in (place)] %apply;advanced("bapt_place",baptism_place)<br%/>
         %end;
       %end;
       %if;is_dead;
         %apply;capitalize(died)
         %if;has_death_date; %on_death_date;%end;
-        %if;has_death_place;, %apply;advanced("death_place",death_place)%end;<br%/>
+        %if;has_death_place; [in (place)] %apply;advanced("death_place",death_place)%end;<br%/>
         %if;computable_death_age;
              [age at death:] %death_age;<br%/>
         %end;
@@ -722,7 +724,7 @@
         %if;is_buried;
           %apply;capitalize(nth([buried],sex))
           %if;has_burial_date; %on_burial_date;%end;
-          %if;has_burial_place;, %apply;advanced("burial_place",burial_place)%end;<br%/>
+          %if;has_burial_place; [in (place)] %apply;advanced("burial_place",burial_place)%end;<br%/>
         %end;
         %if;is_cremated;
           %apply;capitalize(nth([cremated],sex))
@@ -863,7 +865,7 @@
           %end;
           %if;(not cancel_links)
           <span class="menu3">
-            <a id="fff" href="%prefix;%access;;wide=%evar.wide;;maxlev=%expr(evar.maxlev+1);image=%evar.image;;spouse=%evar.spouse;;#fff" title="[visualize/show/hide/summary]1 [descendants] : %expr(evar.maxlev+2)">…</a>
+            <a href="%prefix;%access;;wide=%evar.wide;;maxlev=%expr(evar.maxlev+1);image=%evar.image;;spouse=%evar.spouse;" title="[visualize/show/hide/summary]1 [descendants] : %expr(evar.maxlev+2)">…</a>
             %if;(evar.maxlev > 0)
                <a style="text-decoration:line-through;" href="%prefix;%access;;wide=%evar.wide;;maxlev=0;image=%evar.image;;spouse=%evar.spouse;" title="[visualize/show/hide/summary]2 [descendants]">…</a>
             %end;

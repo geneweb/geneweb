@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121003 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121128 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -59,7 +59,7 @@
       %xx.is_male;
     %and;
       %if;(on_marriage_date != "") %on_marriage_date;%end;
-      %if;(marriage_place != ""), %marriage_place;%end;
+      %if;(marriage_place != "") [in (place)] %marriage_place;%end;
     %end;
   %end;
 %end;
@@ -129,27 +129,27 @@
     %if;(xx.has_birth_date or xx.has_birth_place)
       , %if;xx.is_male;[born]0%elseif;xx.is_female;[born]1%else;[born]2%end;
       %if;xx.has_birth_date; %xx.on_birth_date;%end;
-      %if;xx.has_birth_place;, %xx.birth_place;%end;
+      %if;xx.has_birth_place; [in (place)] %xx.birth_place;%end;
     %end;
     %if;(xx.has_baptism_date or xx.has_baptism_place)
       , %if;xx.is_male;[baptized]0%elseif;xx.is_female;[baptized]1%nn;
       %else;[baptized]2%end;
       %if;xx.has_baptism_date; %xx.on_baptism_date;%end;
-      %if;xx.has_baptism_place;, %xx.baptism_place;%end;
+      %if;xx.has_baptism_place; [in (place)] %xx.baptism_place;%end;
     %end;
     %if;xx.is_dead;, %xx.died;
       %if;(xx.has_death_date) %xx.on_death_date;%end;
-      %if;(xx.has_death_place), %xx.death_place;%end;
+      %if;(xx.has_death_place) [in (place)] %xx.death_place;%end;
     %end;
     %if;xx.is_buried;,
       %if;xx.is_male;[buried]0%else;[buried]1%end;
       %if;xx.has_burial_date; %xx.on_burial_date;%end;
-      %if;xx.has_burial_place;, %xx.burial_place;%end;
+      %if;xx.has_burial_place; [in (place)] %xx.burial_place;%end;
     %end;
     %if;xx.is_cremated;,
       %if;xx.is_male;[cremated]0%else;[cremated]1%end;
       %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
-      %if;xx.has_cremation_place;, %xx.cremation_place;%end;
+      %if;xx.has_cremation_place; [in (place)] %xx.cremation_place;%end;
     %end;
   %end;
   %if;(xx.has_linked_pages and xx.has_linked_page.DEATH), %xx.linked_page.DEATH;%end;
@@ -175,7 +175,7 @@
       %end;
     %end;
     %foreach;xx.related;%nn;
-      %if;(related_type != [foster son/foster daughter/foster child]0 
+      %if;(related_type != [foster son/foster daughter/foster child]0
          and related_type != [foster son/foster daughter/foster child]1
          and related_type != [foster son/foster daughter/foster child]2)
          ; %related_type; :
@@ -229,31 +229,31 @@
       title="[modify::family/families]0" onclick="window.open(this.href); return false;">%nn;
       <span class="sure_dates%xx.has_linked_page.MARRIAGEA;%xx.spouse.has_linked_page.MARRIAGEA;
         %if;(marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") not_sure_dates%end;">&amp;</span>%nn;
-      %slash_marriage_date;<small class="xs"> %marriage_place;</small>
+      %slash_marriage_date; %marriage_place;
     </a>
   %else;
     <span class="sure_dates%xx.has_linked_page.MARRIAGEA;%xx.spouse.has_linked_page.MARRIAGEA;
       %if;(marriage_date.prec != "" or on_marriage_date = "" or marriage_place = "") not_sure_dates%end;">&amp;</span>%nn;
-    %slash_marriage_date;<small class="xs"> %marriage_place;</small>
+    %slash_marriage_date; %marriage_place;
   %end;
 %end;
 
 %define;sure_dates(xx,dd1,dd2,dd3,zz)
   %if;(xx.dd1_date.year != "")
-    <span class="sure_dates%zz;%if;(xx.dd1_date.prec !="") not_sure_dates%end;">%dd1_symbol;</span>%xx.slash_dd1_date;%nn;
+    <tt class="sure_dates%zz;%if;(xx.dd1_date.prec !="") not_sure_dates%end;">%dd1_symbol;</tt>%xx.slash_dd1_date;
   %elseif;(xx.dd2_date.year != "")
-    <span class="sure_dates%zz;%if;(xx.dd2_date.prec !="") not_sure_dates%end;">%dd1_symbol;</span>%xx.slash_dd2_date;%nn;
+    <tt class="sure_dates%zz;%if;(xx.dd2_date.prec !="") not_sure_dates%end;">%dd1_symbol;</tt>%xx.slash_dd2_date;
   %elseif;(xx.dd3_date.year != "")
-    <span class="sure_dates%zz;%if;(xx.dd3_date.prec !="") not_sure_dates%end;">%dd1_symbol;</span>%xx.slash_dd3_date;%nn;
+    <tt class="sure_dates%zz;%if;(xx.dd3_date.prec !="") not_sure_dates%end;">%dd1_symbol;</tt>%xx.slash_dd3_date;
   %else;
-    <span class="not_sure_dates">%dd1_symbol;</span>%nn;
+    <tt class="not_sure_dates">%dd1_symbol;</tt>
   %end;
   %if;(xx.dd1_place != "")
-    <small class="xs"> %xx.dd1_place;</small>%nn;
+    %sp;%xx.dd1_place;%nn;
   %elseif;(xx.dd2_place != "")
-    <small class="xs"> %xx.dd2_place;</small>%nn;
+    %sp;%xx.dd2_place;%nn;
   %elseif;(xx.dd3_place != "")
-    <small class="xs"> %xx.dd3_place;</small>%nn;
+    %sp;%xx.dd3_place;%nn;
   %end;
 %end;
 
