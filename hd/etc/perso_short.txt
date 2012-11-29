@@ -84,7 +84,7 @@
 %end;
 
 
-%define;display_union()
+%define;display_union(xx)
   <table class="fp_table" cellspacing="0">
     <tr>
       <td width="28"><img src="%image_prefix;/marriage.png"%/></td>
@@ -107,10 +107,10 @@
               %if;(on_marriage_date != "" or marriage_place != "")
                 [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
               %end;
-              %if;computable_marriage_age;
-                %apply;capitalize(nth([groom/bride], sex)): %marriage_age;%sp;
+              %if;xx.computable_marriage_age;
+                %apply;capitalize(nth([groom/bride], sex)): %xx.marriage_age;%sp;
               %end;
-              %if;(computable_marriage_age and spouse.computable_marriage_age)
+              %if;(xx.computable_marriage_age and spouse.computable_marriage_age)
                 %sp;-%sp;
               %end;
               %if;spouse.computable_marriage_age;
@@ -819,7 +819,7 @@
         <tr>
           <td>
             %foreach;xx.family;
-              %apply;display_union()
+              %apply;display_union("xx")
               %if;(family_cnt != xx.nb_families)<hr class="fp_family_separator"%/>%end;
             %end;
           </td>
