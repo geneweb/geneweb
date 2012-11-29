@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template f v 6.06b 2012/10/31 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: perso.txt, Template f v 6.06c 2012/11/29 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -820,28 +820,32 @@
             </tr>
 
             <tr>
-              %( line 2 : up to 8 vertical lines with number %)
+              %( line 2 : up to 8 vertical lines with numbers and marriage dates %)
               %if;(father.has_parents and father.father.has_parents)
                 <td style="text-align: center;font-size: 80%%">|<br%/>8</td>
-                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;display_date_marriage_parent("father.father")</td>
                 <td style="text-align: center;font-size: 80%%">|<br%/>9</td>
               %end;
               <td>&nbsp;</td>
               %if;(father.has_parents and father.mother.has_parents)
                 <td style="text-align: center;font-size: 80%%">|<br%/>10</td>
-                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;display_date_marriage_parent("father.mother")</td>
                 <td style="text-align: center;font-size: 80%%">|<br%/>11</td>
               %end;
               <td>&nbsp;</td>
               %if;(mother.has_parents and mother.father.has_parents)
                 <td style="text-align: center;font-size: 80%%">|<br%/>12</td>
-                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;display_date_marriage_parent("mother.father")</td>
                 <td style="text-align: center;font-size: 80%%">|<br%/>13</td>
               %end;
               <td>&nbsp;</td>
               %if;(mother.has_parents and mother.mother.has_parents)
                 <td style="text-align: center;font-size: 80%%">|<br%/>14</td>
-                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 80%%">%nn;
+                  %apply;display_date_marriage_parent("mother.mother")</td>
                 <td style="text-align: center;font-size: 80%%">|<br%/>15</td>
               %end;
             </tr>
@@ -933,16 +937,18 @@
             </tr>
 
             <tr>
-              %( line 6 : up to 4 vertical lines with number %)
+              %( line 6 : up to 4 vertical lines with numbers and marriage dates %)
               %if;father.has_parents;
                 <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>4</td>
-                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 90%%">%nn;
+                  %apply;display_date_marriage_parent("father")</td>
                 <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>5</td>
               %end;
               <td>&nbsp;</td>
               %if;mother.has_parents;
                 <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>6</td>
-                <td>&nbsp;</td>
+                <td style="text-align: center;font-size: 90%%">%nn;
+                  %apply;display_date_marriage_parent("mother")</td>
                 <td colspan="3" style="text-align: center;font-size: 90%%">|<br%/>7</td>
               %end;
             </tr>
@@ -992,9 +998,10 @@
           </tr>
 
           <tr>
-            %( line 10 : 2 vertical lines with number %)
+            %( line 10 : 2 vertical lines with numbers and marriage date %)
             <td colspan="7" style="text-align: center">|<br%/>2</td>
-            <td>&nbsp;</td>
+            <td style="text-align: center;">%nn;
+              %apply;display_date_marriage_parent("self")</td>
             <td colspan="7" style="text-align: center">|<br%/>3</td>
           </tr>
 
