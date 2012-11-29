@@ -108,7 +108,7 @@
                 [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
               %end;
               %if;xx.computable_marriage_age;
-                %apply;capitalize(nth([groom/bride], sex)): %xx.marriage_age;%sp;
+                %apply;capitalize(nth([groom/bride], xx.sex)): %xx.marriage_age;%sp;
               %end;
               %if;(xx.computable_marriage_age and spouse.computable_marriage_age)
                 %sp;-%sp;
