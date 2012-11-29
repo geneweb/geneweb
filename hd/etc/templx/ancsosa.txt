@@ -864,7 +864,7 @@
                     [*parents] %expr(ancestor.anc_sosa.v * 2)&nbsp;-&nbsp;%expr(ancestor.anc_sosa.v * 2 + 1)
                   %elseif;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
                     [*father/mother]0 %expr(ancestor.anc_sosa.v * 2)
-                  %elseif;ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
+                  %elseif;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
                     [*father/mother]1 %expr(ancestor.anc_sosa.v * 2 + 1)
                   %else;
                     %sp;
