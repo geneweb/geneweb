@@ -157,7 +157,7 @@
   %if;(evar.spouse = "on")
     <td>
       %if;xx.has_families;
-        %if;(not ancestor.has_parents and ancestor.first_name != "?" and ancestor.surname != "?")
+        %if;(not xx.has_parents and xx.first_name != "?" and xx.surname != "?")
           %foreach;xx.family;
             %if;(spouse.first_name != "?" and spouse.surname != "?")
               %if;(family_cnt > 1),%sp;%end;
