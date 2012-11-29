@@ -2089,6 +2089,7 @@ es: Árbol de ascendencia
 fr: arbre d’ascendance
 it: Albero d’ascendenza
 nl: Stamboom voorouders
+sv: Antavla
 
     in (place)
 de: in
@@ -2097,6 +2098,7 @@ es: en
 fr: à
 it: a
 nl: te
+sv: i
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
@@ -2608,6 +2610,7 @@ es: libro de ascendencia
 fr: livre d’ascendance
 it: libro d’ascendenza
 nl: boek met voorouders
+sv: Förfädersbok
 
     border
 af: rand
@@ -4912,7 +4915,7 @@ ro: sot/sotie
 ru: муж/жена
 sk: manžel/manželka
 sl: mož/žena
-sv: make/maka
+sv: partner/partner
 
     half siblings
 de: halbbrüder und-schwestern
@@ -6736,6 +6739,7 @@ es: modificación/modificaciónes
 fr: modification/modifications
 it: modifica/modifiche
 nl: wijziging/wijzigingen
+sv: ändring/ändringar
 
     modification successful
 de: änderung durchgeführt
@@ -6744,6 +6748,7 @@ es: modificación efectuada
 fr: modification effectuée
 it: mestiere modificato
 nl: wijziging uitgevoerd
+sv: ändring slutförd
 
     modify
 af: wysig
@@ -6962,6 +6967,7 @@ es: nº Sosa
 fr: n° Sosa
 it: n° Sosa
 nl: Sosa nr.
+sv: Annummer
 
     name
 af: naam
@@ -9000,6 +9006,7 @@ es: elija una letra
 fr: choisissez une lettre
 it: scegli una lettera
 nl: kies een letter
+sv: välj en bokstav 
 
     select a month to see all the anniversaries
 de: zum zeigen der Geburtstage den Monat auswählen
@@ -9546,6 +9553,7 @@ es: lista de fichas
 fr: liste des fiches
 it: lista delle schede
 nl: lijst van de fichen
+sv: lista över ansedlar
 
     surname alias
 af: van alias
