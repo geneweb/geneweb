@@ -4975,6 +4975,14 @@ sk: všetko najlepšie k narodeninám!
 sl: srečen rojstni dan!
 sv: gratulerar på födelsedagen!
 
+    having a family
+en: having a fmaily
+fr: ayant une famille
+
+    having no family
+en: having no family
+fr: n'ayant pas de famille
+
     having as children
 af: met as kinders
 bg: деца
@@ -8853,6 +8861,10 @@ ru: приходится%t
 sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
+
+    searching all
+en: searching all
+fr: recherche tous les
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
