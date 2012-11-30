@@ -285,6 +285,97 @@ value print_result conf base max_answers (list, len) =
     end
 ;
 
+value searching_fields conf base =
+  let test_string x =
+    match p_getenv conf.env x with
+    [ Some v -> if v <> "" then True else False
+    | None -> False ]
+  in
+  let test_date x =
+    match 
+      (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
+    with
+    [ (Some d1, Some d2) -> True
+    | (Some d1, _) -> True
+    | (_, Some d2) -> True
+    | _ -> False ]
+  in
+  let gets x =
+    match p_getenv conf.env x with
+    [ Some v -> v
+    | None -> "" ]
+  in
+  let getd x = 
+    (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
+  in
+  let sex = 
+    match gets "sex" with
+    [ "M" -> 0
+    | "F" -> 1
+    | _ -> 2 ]
+  in
+  (* Fonction pour tester un simple champ texte (e.g: first_name). *)
+  let string_field x search =
+    if test_string x then search ^ " " ^ gets x
+    else search
+  in
+  (* Fonction pour tester un "bloc date" (e.g: birth, birth_place). *)
+  let date_field x y z search =
+    let sep = if search <> "" then ", " else "" in
+    let search =
+      if test_string x || test_date y then 
+        search ^ sep ^ (transl_nth conf z sex)
+      else search
+    in
+    let search =
+      match getd y with
+      [ (Some d1, Some d2) ->
+          Printf.sprintf "%s %s %s %s %s"
+            search (transl conf "between (date)") 
+            (Date.string_of_date conf d1) 
+            (transl conf "and")
+            (Date.string_of_date conf d2)
+      | (Some d1, _) ->
+          Printf.sprintf "%s %s %s"
+            search (transl conf "after (date)") (Date.string_of_date conf d1)
+      | (_, Some d2) ->
+          Printf.sprintf "%s %s %s"
+            search (transl conf "before (date)") (Date.string_of_date conf d2)
+      | _ -> search ]
+    in
+    let search =
+      if test_string x then 
+        search ^ " " ^ transl conf "in (place)" ^ " " ^ gets x
+      else search
+    in
+    search
+  in
+  let search = "" in
+  let search = string_field "first_name" search in
+  let search = string_field "surname" search in
+  let search = date_field "birth_place" "birth" "born" search in
+  let search = date_field "bapt_place" "bapt" "baptized" search in
+  let search = date_field "marriage_place" "marriage" "married" search in
+  let search = date_field "death_place" "death" "died" search in
+  let search = date_field "burial_place" "burial" "buried" search in
+  (* C'est vraiment pas très heureux ce test... *)
+  let search =
+    if not (test_string "marriage_place" || test_date "marriage") then
+      let sep = if search <> "" then ", " else "" in
+      if gets "married" = "Y" then 
+        search ^ sep ^ transl conf "having a family"
+      else if gets "married" = "N" then 
+        search ^ sep ^ transl conf "having no family"
+      else search
+    else search
+  in
+  let search = 
+    let sep = if search <> "" then "," else "" in
+    string_field "occu" (search ^ sep)
+  in
+  search
+;
+
 value print conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "advanced request"))
@@ -296,6 +387,10 @@ value print conf base =
   in
   do {
     header conf title;
+    tag "p" begin
+      Wserver.wprint "%s: %s." 
+        (capitale (transl conf "searching all")) (searching_fields conf base);
+    end;
     let list = advanced_search conf base max_answers in
     print_result conf base max_answers list;
     trailer conf;
