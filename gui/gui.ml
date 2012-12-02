@@ -6,6 +6,7 @@ type conf =
   { bases_dir : mutable string;
     port : mutable int;
     browser : mutable option string;
+    log : mutable string;
     gui_arg : mutable list (string * string);
     gwd_arg : mutable list string;
     only_arg : mutable list string;
@@ -78,24 +79,18 @@ value capitale w = String.capitalize w ;
 
 (**/**) (* Fonctions utiles. *)
 
-value exec_p cmd =
-  let cmd = cmd ^ " > " ^ "comm.log" in
-  Sys.command cmd
-(* 
-   TODO : pouvoir faire un waitpid et avoir une barre de progression.
-   Problème, on voudrait un code d'erreur comme pour Sys.command.
-
-  let prog = cmd ^ " > " ^ "comm.log" in
-  let pid = 
-    Unix.create_process 
-      prog (Array.of_list [prog]) Unix.stdin Unix.stdout Unix.stderr
-  in
-  ignore (Unix.waitpid [] pid)
-*)
-;
 
 value exec prog args out err =
   Unix.create_process prog (Array.of_list [prog :: args]) Unix.stdin out err
+;
+
+value exec_wait conf prog args =
+  let fd =
+    Unix.openfile conf.log [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o666
+  in
+  let pid = exec prog args fd fd in
+  let (_, _) = Unix.waitpid [] pid in
+  Unix.close fd
 ;
 
 value mkdir_p x =
@@ -107,123 +102,35 @@ value mkdir_p x =
     }
 ;
 
-value rmdir dir =
-  let split_files_folders list =
-    List.partition
-      (fun file -> 
-        let infos = Unix.lstat file in
-        infos.Unix.st_kind = Unix.S_DIR)
-      list
+value rmdir conf dir =
+  (* Récupère tous les fichiers et dossier d'un dossier         *)
+  (* et renvoie la liste des dossiers et la liste des fichiers. *)
+  let read_files_folders fname =
+    let list = 
+      List.map 
+        (fun file -> Filename.concat fname file)
+        (Array.to_list (Sys.readdir fname)) 
+    in
+    List.partition Sys.is_directory list
   in
-  let read_dir_files fname =
-    match 
-      try Some (Unix.opendir fname) with [ Unix.Unix_error _ _ _ -> None ]
-    with
-    [ Some dh ->
-        let list = ref [] in
-        do {
-          try
-            while True do {
-              let file = Unix.readdir dh in
-              if file = "." || file = ".." then ()
-              else list.val := [file :: list.val]
-            }
-          with
-          [ End_of_file -> () ];
-          Unix.closedir dh;
-          list.val
-        }
-    | None -> [] ]
-  in
-  let (folders, files) = 
-    split_files_folders (read_dir_files dir)
-  in
+  (* Parcours récursif de tous les dossiers *)
   let rec loop l folders files =
     match l with
     [ [] -> (folders, files)
     | [x :: l] ->
-        let list = read_dir_files x in
-        let (fd, fi) = 
-          split_files_folders list 
-        in
-        let folders = fd @ [x :: folders] in
-        let files = fi @ files in
+        let (fd, fi) = read_files_folders x in
+        let l = List.rev_append l fd in
+        let folders = List.rev_append fd folders in
+        let files = List.rev_append fi files in
         loop l folders files ]
   in
-  let (folders, files) = loop folders [] files in
+  (* Toute l'arborescence de dir *)
+  let (folders, files) = loop [dir] [] [] in
   do {
-    List.iter (fun file -> Unix.unlink (Filename.concat dir file)) files;
-    List.iter
-      (fun file -> try Unix.rmdir file with [ Unix.Unix_error _ _ _ -> () ])
-      folders
+    List.iter Unix.unlink files;
+    List.iter Unix.rmdir folders;
+    Unix.rmdir dir
   }
-  
-(*  
-  let read_dir_files fname =
-    match 
-      try Some (Unix.opendir fname) with [ Unix.Unix_error _ _ _ -> None ]
-    with
-    [ Some dh ->
-        let list = ref [] in
-        do {
-          try
-            while True do {
-              let file = Unix.readdir dh in
-              if file = "." || file = ".." then ()
-              else list.val := [file :: list.val]
-            }
-          with
-          [ End_of_file -> () ];
-          Unix.closedir dh;
-          list.val
-        }
-    | None -> [] ]
-  in
-  let rec loop l accu =
-    match l with
-    [ [] -> accu 
-    | [x :: l] ->
-        let list = read_dir_files x in
-        let accu = list @ accu in
-        loop l accu ]
-  in 
-  let files_folders = loop [dir] [dir] in
-  let (folders, files) =
-    List.partition
-      (fun file -> 
-        let infos = Unix.lstat file in
-        infos.Unix.st_kind = Unix.S_DIR)
-      files_folders
-  in
-  do {
-    List.iter (fun file -> Unix.unlink (Filename.concat dir file)) files;
-    List.iter
-      (fun file -> try Unix.rmdir file with [ Unix.Unix_error _ _ _ -> () ])
-      folders
-  }
-*)
-(*
-  match
-    try Some (Unix.opendir dir) with [ Unix.Unix_error _ _ _ -> None ]
-  with
-  [ Some dh ->
-      let list = ref [] in
-      do {
-        try
-          while True do {
-            let file = Unix.readdir dh in
-            if file = "." || file = ".." then ()
-            else list.val := [file :: list.val]
-          }
-        with
-        [ End_of_file -> () ];
-        Unix.closedir dh;
-        List.iter (fun file -> Unix.unlink (Filename.concat dir file))
-          list.val;
-        try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ]
-      }
-  | _ -> () ]
-*)
 ;
 
 value rec cut_at_equal s =
@@ -432,8 +339,7 @@ value display_log conf = do {
   let vvbox = GPack.hbox ~border_width: 10
     ~packing:scrolled_window#add_with_viewport () in
   vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
-  let fname = Filename.concat conf.bases_dir "comm.log" in
-  match try Some (open_in fname) with [Sys_error _ -> None] with
+  match try Some (open_in conf.log) with [Sys_error _ -> None] with
   [ Some ic ->
       do {
         let len = in_channel_length ic in
@@ -492,8 +398,9 @@ value delete_base conf bname = do {
       (fun () -> 
         do {
           let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-          rmdir base;
+          rmdir conf base;
           wnd#destroy ();
+          (* TODO : revenir sur l'accueil *)
         }));
   wnd#show ();
 };
@@ -502,7 +409,7 @@ value delete_base conf bname = do {
 (**/**) (* Autres binaires. *)
 
 value read_error_cmd conf =
-  match try Some (open_in "comm.log") with [ Sys_error _ -> None ] with
+  match try Some (open_in conf.log) with [ Sys_error _ -> None ] with
   [ Some ic ->
       loop "" where rec loop msg =
         match try Some (input_line ic) with [ End_of_file -> None ] with
@@ -524,88 +431,75 @@ value browse conf url = do {
 
 
 (**/**) (* Binaires GeneWeb. *)
+(* 
+   NB: Windows :
+   let base = Filename.concat conf.bases_dir bname in
+   Plante car il n'interprète pas les chemins avec espaces. On se place 
+   donc toujours dans le répertoire des bases dans launch_server.
+*)
 
 value gwc1 conf bname fname = 
-  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let args = " -nc " in
-  let c = Filename.concat bin_dir "gwc1 " ^ fname ^ args ^ "-o " ^ base in
-  if exec_p c > 1 then 
-    let msg = read_error_cmd conf in error_popup msg
-  else ()
+  (* Hack Windows, pas de Filename.concat mais juste bname *)
+  let prog = Filename.concat bin_dir "gwc1" in
+  let args = ["-nc"; "-o"; bname] in
+  let args = if fname <> "" then [fname :: args] else args in
+  exec_wait conf prog args
 ;
 
 value gwc2 conf bname fname = 
-  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let args = " -nc " in
-  let c = Filename.concat bin_dir "gwc2 " ^ fname ^ args ^ "-o " ^ base in
-  if exec_p c > 1 then
-    let msg = read_error_cmd conf in error_popup msg
-  else ()
+  let prog = Filename.concat bin_dir "gwc2" in
+  let args = ["-nc"; "-o"; bname] in
+  let args = if fname <> "" then [fname :: args] else args in
+  exec_wait conf prog args
 ;
 
 value ged2gwb conf bname fname = 
-  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let args = " -nc " in
-  let c = 
-    Filename.concat bin_dir "ged2gwb " ^ fname ^args ^ "-o " ^ base 
-  in
-  if exec_p c > 1 then
-    let msg = read_error_cmd conf in error_popup msg
-  else ()
+  let prog = Filename.concat bin_dir "ged2gwb" in
+  let args = ["-nc"; "-o"; bname] in
+  let args = if fname <> "" then [fname :: args] else args in
+  exec_wait conf prog args
 ;
 
 value ged2gwb2 conf bname fname = 
-  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let args = " -nc " in
-  let c = 
-    Filename.concat bin_dir "ged2gwb2 " ^ fname ^ args ^ "-o " ^ base 
-  in
-  if exec_p c > 1 then
-    let msg = read_error_cmd conf in error_popup msg
-  else ()
+  let prog = Filename.concat bin_dir "ged2gwb2" in
+  let args = ["-nc"; "-o"; bname] in
+  let args = if fname <> "" then [fname :: args] else args in
+  exec_wait conf prog args
 ;
 
-value gwb2ged conf bname fname = do {
-  let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let c = 
-    Filename.concat bin_dir "gwb2ged " ^ bname ^ " -o " ^ fname ^ ".ged"
-  in 
-  if exec_p c > 1 then error_popup c
-  else ();
-};
+value gwb2ged conf bname fname =
+  let fname = fname ^ ".ged" in
+  let prog = Filename.concat bin_dir "gwb2ged" in
+  let args = [bname; "-o"; fname] in
+  exec_wait conf prog args
+;
 
-value gwu conf bname fname = do {
-  let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let c =
-    Filename.concat bin_dir "gwu " ^ bname ^ " -o " ^ fname ^ ".gw"
-  in 
-  if exec_p c > 1 then error_popup c
-  else ();
-};
+value gwu conf bname fname = 
+  let fname = fname ^ ".gw" in
+  let prog = Filename.concat bin_dir "gwu" in
+  let args = [bname; "-o"; fname] in
+  exec_wait conf prog args
+;
 
 value consang conf bname =
-  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let args = " -i " in
-  let c = Filename.concat bin_dir "consang " ^ args ^ base in
-  if exec_p c > 1 then error_popup c
-  else ()
+  let prog = Filename.concat bin_dir "consang" in
+  let args = ["-i"; bname] in
+  exec_wait conf prog args
 ;
 
 value update_nldb conf bname = 
-  let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let c = Filename.concat bin_dir "update_nldb " ^ " " ^ base in
-  (* il faut effacer le fichier avant de le re-créer *)
+  let prog = Filename.concat bin_dir "update_nldb" in
+  let args = [bname] in
+  (* TODO il faut effacer le fichier avant de le re-créer *)
   (* rm bname/notes_links *)
-  if exec_p c > 1 then error_popup c
-  else ()
+  exec_wait conf prog args
 ;
 
-value check_base conf bname = do {
-  let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-  let c = Filename.concat bin_dir "check_base " ^ bname in
-  if exec_p c > 1 then error_popup c
-  else ();
-};
+value check_base conf bname = 
+  let prog = Filename.concat bin_dir "check_base" in
+  let args = [bname] in
+  exec_wait conf prog args
+;
 
 
 (**/**) (* Fonctions utilies pour les binaires GeneWeb. *)
@@ -648,7 +542,7 @@ value create_base conf bname src_file =
         gwc2 conf bname src_file
       else if Filename.check_suffix fname ".ged" then
         ged2gwb2 conf bname src_file
-      else error_popup "Unknown file";
+      else error_popup (transl "Unknown file");
     let gwf_file = Filename.concat conf.bases_dir (bname ^ ".gwf") in
     if Sys.file_exists gwf_file then ()
     else print_default_gwf_file conf bname
@@ -670,15 +564,16 @@ value rename_base conf bname new_name =
 ;
 
 value clean_database conf bname = do {
-  gwu conf bname (bname ^ "_save.gw");
+  gwu conf bname (bname ^ "_save");
   rename_base conf bname (bname ^ "_old");
-  gwc2 conf bname (bname ^ "_save.gw");
+  let fname = Filename.concat conf.bases_dir (bname ^ "_save.gw") in 
+  gwc2 conf bname fname;
   consang conf bname;
   update_nldb conf bname;
 };
 
 value merge conf bnames bname parameters = do {
-  (* tester quel gwc *)
+  (* TODO : même méthode que clean *)
   List.iter
     (fun bname ->
       let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
@@ -935,9 +830,14 @@ and new_database conf = do {
     ~text:(capitale (transl "select a file"))
     ~packing:(table#attach ~left:0 ~top:1) ()
   in
+  let bbox = GPack.button_box `HORIZONTAL
+    ~border_width: 5
+    ~layout: `SPREAD
+    ~packing: (table#attach ~left:1 ~top:1) ()
+  in
   let select = GButton.button 
     ~stock:`OPEN 
-    ~packing:(table#attach ~left:1 ~top:1) ()
+    ~packing:bbox#pack ()
   in
   let file = ref "" in
   ignore 
@@ -967,71 +867,14 @@ and new_database conf = do {
           vbox#destroy ();
           show_main conf;
         }))
-(*
-  let vbox = GPack.box `VERTICAL
-    ~spacing:5
-    ~packing:main_window#add ()
-  in
-  let hbox = GPack.hbox 
-    ~spacing:5 
-    ~packing:vbox#pack () 
-  in
-  let _label = GMisc.label
-    ~text:(capitale (transl "name of the database:"))
-    ~packing:hbox#pack ()
-  in
-  let entry = GEdit.entry 
-    ~text:""
-    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) () 
-  in
-  let hbox = GPack.hbox
-    ~spacing:5
-    ~packing:vbox#pack ()
-  in
-  let _label= GMisc.label
-    ~text:(capitale (transl "select a file"))
-    ~packing:hbox#pack ()
-  in
-  let select = GButton.button 
-    ~stock:`OPEN 
-    ~packing:(hbox#pack ~expand:False) () 
-  in
-  let file = ref "" in
-  ignore 
-    (select#connect#clicked
-       (fun () -> file.val := select_file main_window ""));
-  let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: vbox#pack ()
-  in
-  let btn_cancel = GButton.button
-    ~label:(capitale (transl "cancel"))
-    ~packing:bbox#pack ()
-  in
-  ignore 
-    (btn_cancel#connect#clicked 
-      (fun () -> do { vbox#destroy (); show_main conf } ) );
-  let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack () 
-  in
-  ignore 
-    (btn_ok#connect#clicked 
-      (fun () -> 
-        do {
-          create_base conf entry#text file.val;
-          vbox#destroy ();
-          show_main conf;
-        }))
-*)
 }
 
 and setup_gui conf = do {
   let old_conf = 
-    { bases_dir = conf.bases_dir; port = conf.port; 
-      browser = conf.browser; gui_arg = []; gwd_arg = [] ;
-      only_arg = []; server_running = conf.server_running;
+    { bases_dir = conf.bases_dir; port = conf.port;
+      browser = conf.browser; log = conf.log; gui_arg = []; 
+      gwd_arg = [] ; only_arg = []; 
+      server_running = conf.server_running;
       waiting_pids = conf.waiting_pids }
   in
   let vbox = GPack.vbox
@@ -1212,7 +1055,7 @@ and tools conf bname = do {
     ~packing:main_window#add ()
   in
   let _label = GMisc.label
-    ~text:(transl "Boîte à outil pour la base " ^ bname)
+    ~text:(transl "toolbox" ^ " " ^ bname)
     ~packing:vbox#pack ()
   in
   let scrolled_window = GBin.scrolled_window ~border_width: 10
@@ -1229,7 +1072,7 @@ and tools conf bname = do {
     ~packing:vvbox#pack ()
   in
   let _label = GMisc.label
-    ~text:"gwu"
+    ~text:(transl "extract gw file")
     ~packing:(table#attach ~left:0 ~top:0) ()
   in
   let bbut = GButton.button
@@ -1238,54 +1081,58 @@ and tools conf bname = do {
   in
   ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwu));
   let _label = GMisc.label
-    ~text:"gwb2ged"
+    ~text:(transl "extract ged file")
     ~packing:(table#attach ~left:0 ~top:1) ()
   in
   let bbut = GButton.button
-    ~label:(transl "gwb2ged")
+    ~label:(transl "Extract GED")
     ~packing:(table#attach ~left:1 ~top:1) () 
   in
   ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwb2ged));
   let _label = GMisc.label
-    ~text:"gwf"
+    ~text:(transl "setup base options")
     ~packing:(table#attach ~left:0 ~top:2) ()
   in
   let bbut = GButton.button
-    ~label:(transl "gwf")
+    ~label:(transl "setup gwf file")
     ~packing:(table#attach ~left:1 ~top:2) () 
   in
   ignore 
     (bbut#connect#clicked 
       (fun () -> do { vbox#destroy (); config_gwf conf bname })) ;
   let _label = GMisc.label
-    ~text:"netoyage"
+    ~text:(transl "Clean database")
     ~packing:(table#attach ~left:0 ~top:3) ()
   in
   let bbut = GButton.button
-    ~label:(transl "Netoyage")
+    ~label:(transl "Clean")
     ~packing:(table#attach ~left:1 ~top:3) () 
   in
   ignore (bbut#connect#clicked (fun () -> clean_database conf bname));
-(* TODO !!! *)
   let _label = GMisc.label
-    ~text:"rename"
+    ~text:(transl "Rename")
     ~packing:(table#attach ~left:0 ~top:4) ()
   in
   let bbut = GButton.button
     ~label:(transl "Rename")
     ~packing:(table#attach ~left:1 ~top:4) () 
   in
-  ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname rename_base));
+  ignore 
+    (bbut#connect#clicked 
+       (fun () -> do {
+         tmp_wnd conf bname rename_base; 
+         vbox#destroy (); 
+         show_main conf}));
   let _label = GMisc.label
-    ~text:"delete"
+    ~text:(transl "Delete")
     ~packing:(table#attach ~left:0 ~top:5) ()
   in
   let bbut = GButton.button
-    ~label:(transl "delete")
+    ~label:(transl "Delete")
     ~packing:(table#attach ~left:1 ~top:5) () 
   in
   ignore (bbut#connect#clicked (fun () -> delete_base conf bname));
-(*
+(* TODO
   GMisc.label
     ~text:"merge"
     ~packing:(table#attach ~left:0 ~top:0) ();
@@ -1298,7 +1145,7 @@ and tools conf bname = do {
       (fun () -> ()));
 *)
   let _label = GMisc.label
-    ~text:"consang"
+    ~text:(transl "Consang")
     ~packing:(table#attach ~left:0 ~top:6) ()
   in
   let bbut = GButton.button
@@ -1307,7 +1154,7 @@ and tools conf bname = do {
   in
   ignore (bbut#connect#clicked (fun () -> consang conf bname));
   let _label = GMisc.label
-    ~text:"update_nldb"
+    ~text:(transl "Update_nldb")
     ~packing:(table#attach ~left:0 ~top:7) ()
   in
   let bbut = GButton.button
@@ -1330,29 +1177,30 @@ and tools conf bname = do {
 }
 
 and launch_server conf = do {
+  (* On se place dans le répertoire des bases (obligatoire pour Windows). *)
+  Sys.chdir conf.bases_dir;
   clean_waiting_pids conf;
-  let fd =
+  (* TODO *)
+(*
+  let cmd_log =
+    Unix.openfile conf.log [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o666
+  in
+*)
+  let gwd_log =
     if trace.val then Unix.stdout
     else
       let fname = Filename.concat conf.bases_dir "gwd.log" in
-      (* j'aime pas trop, je préfèrerais être sûr *)
-      try 
-        Unix.openfile fname [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC]
-          0o666
-      with
-      [ Unix.Unix_error _ _ f -> 
-          let _ = eprintf "Cannot open log file: %s" f in 
-          Unix.stdout ]
+      Unix.openfile fname [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o666
   in
   let stop_server =
     List.fold_left Filename.concat conf.bases_dir ["cnt"; "STOP_SERVER"]
   in
   try Sys.remove stop_server with [ Sys_error _ -> () ];
-  let comm = Filename.concat bin_dir "gwd" in
+  let prog = Filename.concat bin_dir "gwd" in
   let args =
     ["-hd"; bin_dir; "-bd"; conf.bases_dir; "-p"; sprintf "%d" conf.port]
   in
-  let server_pid = exec comm args fd fd in
+  let server_pid = exec prog args gwd_log gwd_log in
   let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
   if pid = 0 then ()
   else do {
@@ -1372,9 +1220,10 @@ value launch_config () =
     let bases_dir = List.assoc "bd" gui_arg in
     let port = int_of_string (List.assoc "port" gui_arg) in
     let browser = Some (List.assoc "browser" gui_arg) in
+    let log = Filename.concat bases_dir "comm.log" in
     let conf =
       { bases_dir = bases_dir; 
-        port = port; browser = browser;
+        port = port; browser = browser; log = log;
         gui_arg = gui_arg; gwd_arg = []; only_arg = [];
         server_running = None; waiting_pids = [] }
     in
@@ -1501,12 +1350,13 @@ value launch_config () =
       let conf =
         { bases_dir = bases_dir.val; 
           port = port.val; browser = Some browser.val;
+          log = Filename.concat bases_dir.val "comm.log";
           gui_arg = gui_arg; gwd_arg = []; only_arg = [];
           server_running = None; waiting_pids = [] }
       in 
-      write_config_file conf;
-      (* On en a besoin avant ... *)
+      (* TODO : On en a besoin avant ... *)
       (* mkdir_p conf.bases_dir; *)
+      write_config_file conf;
       assistant#destroy ();
       launch_server conf }
     in
