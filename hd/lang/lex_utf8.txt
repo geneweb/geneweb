@@ -8317,7 +8317,7 @@ no: %s er endret
 sv: %s ändrad
 
     places
-de: orts
+de: orte
 en: places
 es: lugares
 fi: paikoista

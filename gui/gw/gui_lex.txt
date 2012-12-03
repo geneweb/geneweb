@@ -10,8 +10,8 @@ en: Ok
 fr: Ok
 
     open url in your favorite browser
-en: open url in your favorite browser
-fr: ouvrez url dans votre navigateur préféré
+en: open this url in your favorite browser
+fr: ouvrez cette url dans votre navigateur préféré
 
     Confirm
 en: confirm
@@ -93,120 +93,110 @@ fr: selectionnez un fichier
 en: Configuration gwf file of 
 fr: configuration du fichier gwf de 
 
-    Boîte à outil pour la base 
+    toolbox
 en: toolbox
 fr: Boîte à outil pour la base 
 
-# Ancien
+    Unknown file
+en: Unknown file
+fr: Fichier inconnu
 
-    Apply
-en: Apply
-fr: Appliquer
+    enter a name
+en: enter a name
+fr: entrez un nom
 
-    Available databases:
-en: Available databases:
-fr: Bases disponibles :
+    Setup GeneWeb
+en: Setup GeneWeb
+fr: Configurer GeneWeb
 
-    Browse
-en: Browse
-fr: Naviguer
+    This assistant will help you to setup GeneWeb
+en: This assistant will help you to setup GeneWeb
+fr: Cet assistant va vous aider à configurer GeneWeb
 
-    Browser:
-en: Browser:
-fr: Navigateur :
+    select bases directory
+en: Select bases directory
+fr: Selectionnez le répertoire des bases
 
-    Browser(s):
-en: Browser(s):
-fr: Navigateur(s) :
+    enter port
+en: Setup eventually the port number
+fr: Configurez éventuellement le numéro de port
 
-    Cancel
-en: Cancel
-fr: Annuler
+    select browser
+en: Select the browser you want to use
+fr: Selectionnez le navigateur que vous voulez utiliser
 
-    Change options
-en: Change options
-fr: Changer les options
+    save preferences
+en: Save preference
+fr: Enregistrer la configuration
 
-    Create a new database
-en: Create a new database
-fr: Créer une nouvelle base
+    Introduction
+en: Introduction
+fr: Introduction
 
-    Databases directory:
-en: Databases directory:
-fr: Répertoire des bases :
+    Setup bases directory
+en: Setup bases directory
+fr: Configuration du répertoire des bases
 
-    Enter the name:
-en: Enter the name:
-fr: Entrer le nom :
+    Setup port
+en: Setup port
+fr: Configuration du port
 
-    GeneWeb binary directory:
-en: GeneWeb binary directory:
-fr: Répertoire des binaires de GeneWeb :
+    Setup browser
+en: Setup browser
+fr: Configuration du navigateur
 
-    GeneWeb system directory:
-en: GeneWeb system directory:
-fr: Répertoire système de GeneWeb :
+    Finnish
+en: Finnish
+fr: Terminer
 
-    HTTP Authentication:
-en: HTTP Authentication:
-fr: Authentification HTTP :
+    Home
+en: Home
+fr: Accueil
 
-    Next
-en: Next
-fr: Suivant
+    extract gw file
+en: Save the base in the GeneWeb format
+fr: Sauvegarder la base au format GeneWeb
 
-    No databases.
-en: No databases.
-fr: Pas de bases.
+    Extract GW
+en: Save GW
+fr: Sauvegarde GW
 
-    OK
-en: OK
-fr: D'accord
+    extract ged file
+en: Save the base in the Gedcom format
+fr: Sauvegarder la base au format Gedcom
 
-    Port:
-en: Port:
-fr: Port :
+    Extract GED
+en: Save Gedcom
+fr: Sauvegarde Gedcom
 
-    Prev
-en: Prev
-fr: Précédent
+    setup base options
+en: Setup base options
+fr: Configurer les options de la base
 
-    Quit
-en: Quit
-fr: Quitter
+    setup gwf file
+en: Setup gwf file
+fr: Configuration du fichier gwf
 
-    Restart
-en: Restart
-fr: Redémarrer
+    Clean database
+en: Deep clean (save, import, consang, upd_nldb)
+fr: Netoyage en profondeur (export, import, consang, upd_nldb)
 
-    Select
-en: Select
-fr: Selectionner
+    Clean
+en: Clean
+fr: Netoyage
 
-    Select browser language if any:
-en: Select browser language if any:
-fr: Selectionner la langue du navigateur :
+    Rename
+en: Rename
+fr: Renommer
 
-    Server is running...
-en: Server is running...
-fr: Le serveur tourne... 
+    Delete
+en: Delete
+fr: Supprimer
 
-    basic
-en: basic
-fr: basique
+    Consang
+en: Consang
+fr: Consang
 
-    digest
-en: digest
-fr: digest
-
-    no
-en: no
-fr: non
-
-    other:
-en: other:
-fr: autre :
-
-    yes
-en: yes
-fr: oui
+    Update_nldb
+en: Update_nldb
+fr: Update_nldb
