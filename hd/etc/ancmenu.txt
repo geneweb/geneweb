@@ -199,7 +199,7 @@
       <div class="ascends_menu_option_div">
       <p class="ascends_menu_option_p">
         <label>
-          <input type="checkbox" name="p" value="on" checked="checked"%/>
+          <input type="checkbox" checked="checked"%/>
           [*person/persons]0
         </label>
         <label>
