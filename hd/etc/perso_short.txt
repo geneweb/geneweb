@@ -618,7 +618,7 @@
         <td align="right">
           %if;(evar.sosa = "on" and xx.has_sosa)
             <span>
-              <img src="%image_prefix/sosa.png" alt="sosa" title="sosa"/> [*Sosa] %xx.sosa;
+              <img src="%image_prefix;/sosa.png" alt="sosa" title="sosa"/> [*Sosa] %xx.sosa;
             </span>
           %end;
         </td>
