@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121128 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121203 templ=templm -->
   <title>%first_name; %surname;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -59,10 +59,16 @@
   %end;
 
   %define;link_marriage(xx)
-    %let;him;%if;(marriage_date.year > 0 and xx.birth_date.year > 0)
-      [him/her]0 %expr(marriage_date.year - xx.birth_date.year) [years old]%end;%in;
-    %let;her;%if;(marriage_date.year > 0 and xx.spouse.birth_date.year > 0)
-      [him/her]1 %expr(marriage_date.year - xx.spouse.birth_date.year) [years old]%end;%in;
+    %let;him;[him/her]0 
+      %if;(marriage_date.year > 0 and xx.birth_date.year > 0)
+        %expr(marriage_date.year - xx.birth_date.year)
+      %else; ?%end; [years old]
+    %in;
+    %let;her;[him/her]1 
+      %if;(marriage_date.year > 0 and xx.spouse.birth_date.year > 0)
+        %expr(marriage_date.year - xx.spouse.birth_date.year)
+      %else; ?%end; [years old]
+    %in;
     <abbr title="%him;, %her;
           %if;(wizard and not cancel_links) ; [modify::family/families]0%end;">
     %if;(wizard and not cancel_links)
@@ -77,10 +83,12 @@
   %end;
 
   %define;a_title(xx)
-    %if;(xx.father_age_at_birth != "") [father/mother]0 %xx.father_age_at_birth;, %end;
-    %if;(xx.mother_age_at_birth != "") [father/mother]1 %xx.mother_age_at_birth;%end;
-    %if;(xx.computable_death_age) ; %death_symbol%xx.death_age;%end;
-    %if;(xx.computable_age) ; %birth_symbol;%xx.age;%end;
+    [father/mother]0 
+    %if;(xx.father_age_at_birth != "")%xx.father_age_at_birth;%else;? [years old]%end;
+    , [father/mother]1 
+    %if;(xx.mother_age_at_birth != "")%xx.mother_age_at_birth;%else;? [years old]%end;
+    %if;(xx.computable_death_age) ; %death_symbol%xx.death_age;%end;
+    %if;(xx.computable_age) ; %birth_symbol;%xx.age;%end;
   %end;
 
   %define;link_name(xx)
@@ -469,7 +477,7 @@
   %end;
 
   %define;max_anc_v(vv)
-    %if;(max_anc_level + 1 < vv)%expr(max_anc_level + 1)%else;vv%end;%nn;
+    %if;(max_anc_level < vv)%max_anc_level;%else;vv%end;%nn;
   %end;
 
   %define;max_desc_v(vv)
@@ -518,11 +526,11 @@
             %end;
           %end; [ancestors]</a>
           <span class="s_menu">
-            <a href="%prefix;m=A;t=T;v=%apply;max_anc_v(5);image=on;marriage=on;%access;">[*tree]</a>
-            <a href="%prefix;m=A;t=F;v=%expr(max_anc_level+1);i=%index;">[*surnames list]</a>
-            <a href="%prefix;m=A;t=E;v=%apply;max_anc_v(5);%access;;opt=fam;cousins=on;image=%evar.image;">[*family/families]0</a>
-            <a href="%prefix;m=A;t=Z;image=%evar.image;;v=%apply;max_anc_v(8);%access;">[*table]</a>
-            <a href="%prefix;m=A;t=G;v=%apply;max_anc_v(5);siblings=on;spouse=on;parents=on;alias=on;rel=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=A;t=T;v=%apply;max_anc_v(4);image=on;marriage=on;%access;">[*tree]</a>
+            <a href="%prefix;m=A;t=F;v=%max_anc_level;;i=%index;">[*surnames branch]</a>
+            <a href="%prefix;m=A;t=E;v=%apply;max_anc_v(4);%access;;opt=fam;cousins=on;image=%evar.image;">[*family/families]0</a>
+            <a href="%prefix;m=A;t=Z;image=%evar.image;;v=%apply;max_anc_v(7);%access;">[*table]</a>
+            <a href="%prefix;m=A;t=G;v=%apply;max_anc_v(4);siblings=on;spouse=on;parents=on;alias=on;rel=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;
@@ -754,7 +762,7 @@
       %if;(count != 0)
         <br%/>
         %if;(not cancel_links)
-          <a href="%prefix;m=A;t=N;v=%expr(max_anc_level+1);i=%index;;same=%count;">
+          <a href="%prefix;m=A;t=N;v=%max_anc_level;;i=%index;;same=%count;">
            [*display smallest sosa number relative to ancestor] : %count;
           </a>
         %else;
@@ -841,7 +849,7 @@
         <ul>
           %if;(has_linked_page.BIBLIO)<li>&gt;&gt; %linked_page.BIBLIO;</li>%end;
           %foreach;source;
-            <li>%source_type; : %source;</li>
+            <li><em>%source_type; : </em>%source;</li>
           %end;
         </ul>
       </div>
@@ -946,11 +954,11 @@
       %if;has_parents;
         <span><a href="%prefix;m=A;%access;">[*ancestors]</a>
           <span class="s_menu">
-            <a href="%prefix;m=A;t=T;v=%apply;max_anc_v(5);image=on;marriage=on;%access;">[*tree]</a>
-            <a href="%prefix;m=A;t=F;v=%expr(max_anc_level+1);i=%index;">[*surnames list]</a>
-            <a href="%prefix;m=A;t=E;v=%apply;max_anc_v(5);%access;;opt=fam;cousins=on;image=%evar.image;">[*family/families]0</a>
-            <a href="%prefix;m=A;t=Z;image=%evar.image;;v=%apply;max_anc_v(8);%access;">[*table]</a>
-            <a href="%prefix;m=A;t=G;v=%apply;max_anc_v(5);siblings=on;spouse=on;parents=on;alias=on;rel=on;notes=on;src=on;%access;">[*long display]</a>
+            <a href="%prefix;m=A;t=T;v=%apply;max_anc_v(4);image=on;marriage=on;%access;">[*tree]</a>
+            <a href="%prefix;m=A;t=F;v=%max_anc_level;;i=%index;">[*surnames branch]</a>
+            <a href="%prefix;m=A;t=E;v=%apply;max_anc_v(4);%access;;opt=fam;cousins=on;image=%evar.image;">[*family/families]0</a>
+            <a href="%prefix;m=A;t=Z;image=%evar.image;;v=%apply;max_anc_v(7);%access;">[*table]</a>
+            <a href="%prefix;m=A;t=G;v=%apply;max_anc_v(4);siblings=on;spouse=on;parents=on;alias=on;rel=on;notes=on;src=on;%access;">[*long display]</a>
           </span>
         </span>
       %end;

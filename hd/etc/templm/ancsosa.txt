@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancsosa.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121129 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121130 templ=templm -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] … [up to] …%nn;
@@ -278,7 +278,7 @@
         %if;xx.has_linked_page.BIBLIO;&gt;&gt; %xx.linked_page.BIBLIO;%end;
         %if;(xx.has_sources)
           %foreach;xx.source
-            <span>- %source_type; : </span> %source;%sp;
+             <em>• %source_type; : </em>%source;%sp;
           %end;
         %end;
       </div>
@@ -343,7 +343,7 @@
       %elseif;(item.4 = "BIBLIO")
         <dd class="xs">&gt;&gt; %item.5;</dd>
       %else;
-        <dd class="xs">- %item.4; : %item.5;</dd>
+        <dd class="xs">• <em>%item.4; : </em>%item.5;</dd>
       %end;
     %end;
     </dl>

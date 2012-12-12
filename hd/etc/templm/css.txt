@@ -1,6 +1,6 @@
 <style type="text/css">
 /* Properties of all html pages.*/
-/* mickroue(a)yahoo.fr 20121128 templ=templm */
+/* mickroue(a)yahoo.fr 20121130 templ=templm */
 html{background:url('images/gwback.jpg');}
 /* Properties of all html pages */
 body{word-wrap:break-word;}
@@ -30,7 +30,7 @@ dt{font-weight:bold;}
 /* Properties for the unvisited,visited and mouse over links. All pages. */
 a:link.date,a:visited.date{text-decoration:none;color:inherit;background-color:transparent;}
 a:link,a:visited,a:link.highlight,a:visited.highlight{color:#291D81;text-decoration:none;}
-a:hover.date,a:hover,label:hover,input:hover,.button:hover,.menu a:hover,.menu1 a:hover,.menu2 a:hover,.menu3 a:hover, a:active,a:focus,input:focus{background-color:#FFFF00;text-decoration:none;}
+a:hover.date,a:hover,label:hover,input:hover,.button:hover,.menu a:hover,.menu1 a:hover,.menu2 a:hover,.menu3 a:hover, a:active,a:focus,input:focus{background-color:#FFF700;text-decoration:none;}
 /* Properties of the main title. All pages. */
 h1{text-align:center;}
 /* Properties of the menu2. All pages. */
@@ -163,7 +163,7 @@ abbr{border-bottom:0;}
 .icom{padding:5px;margin:5px;background-color:#EFEFEF;font-size:0.9em;}
 .inot{padding:5px;margin:5px;background-color:#CFCFCF;font-size:0.9em;}
 .isrc{padding:5px;margin:5px;background-color:#8F8F8F;font-size:0.8em;}
-.isrc span{color:#DFDFDF;}
+.isrc em{color:#DFDFDF;}
 /* ancsosa.txt,anclist.txt */
 .ld_table,.short_display_table{margin-left:auto;margin-right:auto;text-align:center;border-collapse:collapse;}
 .ld_table tr th,.short_display_table tr th{border-top:ridge #D2691E 2px;border-bottom:dotted #B8860B 1px;}
@@ -187,8 +187,8 @@ abbr{border-bottom:0;}
 #welcome_form-person select{width:200px;}
 #welcome_form-titles div{float:left;margin-right:3px;}
 #welcome_form-titles a{font-size:70%%;}
-#trl, #misc {clear:both;padding:2px;margin:2px;border:solid 1px #FFFFC0;}
-#templ {font-size:12px;padding-top:1em;text-align: center;}
-#templ a{text-decoration:none;padding:.2em 1em;color:#fff;background-color:#2f6400;}
-#templ a:hover{color: #fff;background-color: #4A9900;}
+#trl,#misc{clear:both;padding:2px;margin:2px;border:solid 1px #FFFFC0;}
+#templ{font-size:12px;padding-top:1em;text-align: center;}
+#templ a{text-decoration:none;padding:.2em 1em;color:#FFFFFF;background-color:#2F6400;}
+#templ a:hover{color: #FFFFFF;background-color: #4A9900;}
 </style>

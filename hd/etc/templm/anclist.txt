@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121129 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121202 templ=templm -->
   <title>%nn;
     %if;(evar.t = "E" and evar.opt = "csv")
       CSV
@@ -15,7 +15,7 @@
           %if;(qualifier != "") %qualifier;%end;
           %sp;%surname;
         %end;
-    %elseif;(evar.t = "F")- [*surnames list] -%nn;
+    %elseif;(evar.t = "F")- [*surnames branch] -%nn;
       %apply;a_of_b%with;
         [*ancestors]
       %and;
@@ -434,8 +434,8 @@
             %apply;ld_somebody(bbb,ddd,"spouse","a son-in-law/a daughter-in-law","","")
             %apply;ld_children(bbb,ddd,curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","",sex)
           %elseif;(curlev = 1 and maxlev > 3)
-            %apply;ld_somebody(bbb,ddd,"spouse","the spouse","a grandson/a granddaughter/a grandchild","sss")
-            %apply;ld_children(bbb,ddd,curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","","")         
+            %apply;ld_somebody(bbb,ddd,"spouse","the spouse","a grandson/a granddaughter/a grandchild",sex)
+            %apply;ld_children(bbb,ddd,curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","","")
           %end;
         %end;
       %end;
@@ -565,7 +565,7 @@
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
     %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
-    - [*surnames list] -
+    - [*surnames branch] -
   %else;
     %apply;a_of_b%with;[*ancestors]%and;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -736,7 +736,7 @@
     "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
   </tr></tr></table>
 %elseif;(evar.t = "F")
-  %( surnames list %)
+  %( surnames branch %)
   <ul>
   %foreach;ancestor_surname(evar.v)
     <li>%nn;

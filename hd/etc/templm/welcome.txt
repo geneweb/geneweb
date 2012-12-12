@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121105 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121201 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -127,7 +127,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     %elseif;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
       %if;(friend and (bvar.friend_passwd = "" and bvar.friend_passwd_file = ""))
         %if;(not cgi and bvar.auth_file = "")
-          [*access] : <a href="%prefix;w=w">[wizard/wizards/friend/friends/exterior]0</a>        
+          [*access] : <a href="%prefix;w=w">[wizard/wizards/friend/friends/exterior]0</a>
         %elseif;(not just_friend_wizard)
           <form method="post" action="%action;">
             <div>
@@ -164,12 +164,12 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
   <ul>
     %if;base.has_notes;
       <li>
-        <a href="%prefix;m=NOTES">[note/notes]1</a>%base.title;
+        <a href="%prefix;m=NOTES">[base notes]</a>%base.title;
       </li>
     %end;
     %if;has_misc_notes;
       <li>
-        <a href="%prefix;m=MISC_NOTES">[miscellaneous notes]…</a>
+        <a href="%prefix;m=MISC_NOTES">[base index notes]</a>
       </li>
     %end;
     %if;((bvar.wizard_passwd_file != "" or bvar.wizard_descr_file != "")
@@ -177,7 +177,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
              bvar.authorized_wizards_notes = "yes")
       <li>
         <a href="%prefix;m=WIZNOTES">%sq;
-        [wizard/wizards/friend/friends/exterior]1 - [note/notes]1</a>
+        [base wizard notes]</a>
       </li>
     %end;
     <li>
@@ -189,14 +189,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
       <a href="%prefix;m=STAT">[statistics]</a>
     </li>
     <li>
-      <a href="%prefix;m=AN">[birthdays]</a>
-    </li>
-    <li>
-      <a href="%prefix;m=AD">%sq;
-      [anniversaries of dead people]</a>
-    </li>
-    <li>
-      <a href="%prefix;m=AM">[anniversaries of marriage]</a>
+      <a href="%prefix;m=ANM">[anniversaries]</a>
     </li>
     <li>
       <a href="%prefix;m=CAL">[calendar/calendars]1</a>
@@ -217,7 +210,7 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
       %end;
       %if;(not base.has_notes)
         <li>
-          <a href="%prefix;m=MOD_NOTES">[add::note/notes]0</a>
+          <a href="%prefix;m=MOD_NOTES">[add base notes]</a>
         </li>
       %end;
       %if;(wizard)
