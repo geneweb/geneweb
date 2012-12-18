@@ -145,17 +145,20 @@ type error 'person =
 ;
 
 type warning 'person 'descend 'title =
-  [ BirthAfterDeath of 'person
+  [ BigAgeBetweenSpouses of 'person and 'person and dmy
+  | BirthAfterDeath of 'person
   | IncoherentSex of 'person and int and int
   | ChangedOrderOfChildren of ifam and 'descend and array iper and array iper
   | ChangedOrderOfMarriages of 'person and array ifam and array ifam
   | ChildrenNotInOrder of ifam and 'descend and 'person and 'person
   | CloseChildren of ifam and 'descend and 'person and 'person
+  | DeadOld of 'person and dmy
   | DeadTooEarlyToBeFather of 'person and 'person
   | IncoherentAncestorDate of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
   | MotherDeadAfterChildBirth of 'person and 'person
+  | OldIndividual of 'person and dmy
   | ParentBornAfterChild of 'person and 'person
   | ParentTooOld of 'person and dmy
   | ParentTooYoung of 'person and dmy
