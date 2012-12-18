@@ -222,7 +222,17 @@ value print_first_name_ref conf base p =
 
 value print_warning conf base =
   fun
-  [ BirthAfterDeath p ->
+  [ BigAgeBetweenSpouses fath moth a ->
+      do {
+        Wserver.wprint
+          (fcapitale 
+             (ftransl conf 
+                "the difference of age between %t and %t is quite important"))
+          (fun _ -> print_someone_strong conf base fath)
+          (fun _ -> print_someone_strong conf base moth);
+        Wserver.wprint ": %s" (Date.string_of_age conf a)
+      }
+  | BirthAfterDeath p ->
       Wserver.wprint (ftransl conf "%t died before his/her birth")
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
@@ -352,6 +362,13 @@ value print_warning conf base =
           end;
         end;
       }
+  | DeadOld p a ->
+      do {
+        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
+          (transl_nth 
+             conf "died at an advanced age" (index_of_sex (get_sex p)));
+        Wserver.wprint "(%s)" (Date.string_of_age conf a);
+      }
   | DeadTooEarlyToBeFather father child ->
       Wserver.wprint
         (ftransl conf "\
@@ -392,6 +409,12 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base mother)
              (Date.short_dates_text conf base mother))
+  | OldIndividual p a ->
+      do {
+        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
+          (transl conf "is a very old individual");
+        Wserver.wprint "(%s)" (Date.string_of_age conf a);
+      }
   | ParentBornAfterChild p c ->
       Wserver.wprint "%s\n%s\n%s" (print_someone_strong conf base p)
         (transl conf "is born after his/her child")
