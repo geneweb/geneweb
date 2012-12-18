@@ -5,7 +5,7 @@
   <em>
     <ul>
       %foreach;source;
-        <li>%source_type;: %source;</li>
+        <li>%apply;capitalize(source_type): %source;</li>
       %end;
     </ul>
   </em>
