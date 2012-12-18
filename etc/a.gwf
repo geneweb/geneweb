@@ -161,6 +161,10 @@ images_path=
 # only wizards and friend know.
 no_image_for_visitor=no
 
+# Don't search notes if normal visitor (i.e. neither "wizard" nor "friend").
+# Notes = individual note or Marriage note.
+no_note_for_visitor=yes/no
+
 # Global authorization file for this database (overriding the value
 # of the option "-auth" of "gwd"). This file must hold lines of the
 # form "user:password". Works only in server (not cgi) mode.

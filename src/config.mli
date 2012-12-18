@@ -50,6 +50,7 @@ type config =
     hide_names : bool;
     use_restrict : bool;
     no_image : bool;
+    no_note : bool;
     bname : string;
     env : list (string * string);
     senv : mutable list (string * string);

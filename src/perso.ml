@@ -1622,7 +1622,8 @@ and eval_simple_bool_var conf base env (_, p_auth) =
       | _ -> raise Not_found ]
   | "has_comment" ->
       match get_env "fam" env with
-      [ Vfam _ fam _ m_auth -> m_auth && sou base (get_comment fam) <> ""
+      [ Vfam _ fam _ m_auth -> 
+          m_auth && not conf.no_note && sou base (get_comment fam) <> ""
       | _ -> raise Not_found ]
   | "has_relation_her" ->
       match get_env "rel" env with
@@ -1679,7 +1680,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "comment" ->
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
-          if m_auth then
+          if m_auth && not conf.no_note then
             let s =
               let wi =
                 {Wiki.wi_mode = "NOTES";
@@ -2237,22 +2238,6 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           [ Some d -> eval_date_field_var conf d sl
           | None -> VVstring "" ]
       | _ -> VVstring "" ]
-  | ["computable_marriage_age" :: sl] ->
-      match get_env "fam" env with
-      [ Vfam _ fam _ True ->
-          if p_auth then
-            match (Adef.od_of_codate (get_birth p), 
-                   Adef.od_of_codate (get_marriage fam)) 
-            with
-            [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _), 
-               Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) -> 
-                let a = CheckItem.time_elapsed d1 d2 in
-                VVbool 
-                  (a.year > 0 ||
-                     a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0))
-            | _ -> VVbool False ]
-          else VVbool False
-      | _ -> raise Not_found ]
   | ["cremated_date" :: sl] ->
       match get_burial p with
       [ Cremated cod when p_auth ->
@@ -2324,20 +2309,6 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           in
           let s = List.fold_left (linked_page_text conf base p s key) "" db in
           VVstring s
-      | _ -> raise Not_found ]
-  | ["marriage_age" :: sl] ->
-      match get_env "fam" env with
-      [ Vfam _ fam _ True ->
-          if p_auth then
-            match (Adef.od_of_codate (get_birth p), 
-                   Adef.od_of_codate (get_marriage fam)) 
-            with
-            [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _), 
-               Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) -> 
-                let a = CheckItem.time_elapsed d1 d2 in
-                VVstring (Date.string_of_age conf a)
-            | _ -> VVstring "" ]
-          else VVstring ""
       | _ -> raise Not_found ]
   | ["marriage_date" :: sl] ->
       match get_env "fam" env with
@@ -2467,6 +2438,21 @@ and eval_bool_person_field conf base env (p, p_auth) =
             a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
         | _ -> False ]
       else False
+  | "computable_marriage_age" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          if m_auth then
+            match (Adef.od_of_codate (get_birth p), 
+                   Adef.od_of_codate (get_marriage fam)) 
+            with
+            [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _), 
+               Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) -> 
+                let a = CheckItem.time_elapsed d1 d2 in
+                (a.year > 0 || 
+                   a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0))
+            | _ -> False ]
+          else False
+      | _ -> raise Not_found ]
   | "has_aliases" -> p_auth && get_aliases p <> []
   | "has_baptism_date" -> p_auth && get_baptism p <> Adef.codate_None
   | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
@@ -2506,7 +2492,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
-  | "has_notes" -> p_auth && sou base (get_notes p) <> ""
+  | "has_notes" -> p_auth && not conf.no_note && sou base (get_notes p) <> ""
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
   | "has_parents" -> get_parents p <> None
   | "has_possible_duplications" -> has_possible_duplications conf base p
@@ -2688,6 +2674,20 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
             "";
           }
       | _ -> raise Not_found ]
+  | "marriage_age" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          if m_auth then
+            match (Adef.od_of_codate (get_birth p), 
+                   Adef.od_of_codate (get_marriage fam)) 
+            with
+            [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _), 
+               Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) -> 
+                let a = CheckItem.time_elapsed d1 d2 in
+                Date.string_of_age conf a
+            | _ -> "" ]
+          else ""
+      | _ -> raise Not_found ]
   | "mother_age_at_birth" -> string_of_parent_age conf base ep get_mother
   | "misc_names" ->
       if p_auth then
@@ -2718,7 +2718,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           string_of_int n ]
   | "nb_families" -> string_of_int (Array.length (get_family p))
   | "notes" ->
-      if p_auth then
+      if p_auth && not conf.no_note then
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = sou base (get_notes p) in
         let s = string_with_macros conf env s in
