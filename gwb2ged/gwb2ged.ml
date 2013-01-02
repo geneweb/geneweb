@@ -501,8 +501,9 @@ value ged_marriage base oc fam =
     (Adef.od_of_codate (get_marriage fam), sou base (get_marriage_place fam),
      get_relation fam)
   with
-  [ (None, "", Married | Engaged) -> ()
-  | (d, pl, _) ->
+  (* Pourquoi ne pas exporter dans ce cas ? *)
+  (*[ (None, "", Married | Engaged) -> ()*)
+  [ (d, pl, _) ->
       do {
         fprintf oc "1 %s"
           (if get_relation fam = Engaged then "ENGA" else "MARR");
