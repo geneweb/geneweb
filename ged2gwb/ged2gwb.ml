@@ -1014,9 +1014,14 @@ value this_year =
   tm.Unix.tm_year + 1900
 ;
 
-value infer_death birth =
-  match birth with
-  [ Some (Dgreg d _) ->
+value infer_death birth bapt =
+  match (birth, bapt) with
+  [ (Some (Dgreg d _), _) ->
+      let a = this_year - d.year in
+      if a > dead_years.val then DeadDontKnowWhen
+      else if a <= alive_years.val then NotDead
+      else DontKnowIfDead
+  | (_, Some (Dgreg d _)) ->
       let a = this_year - d.year in
       if a > dead_years.val then DeadDontKnowWhen
       else if a <= alive_years.val then NotDead
@@ -1738,15 +1743,15 @@ value add_indi gen r =
           [ Some r -> strip_spaces r.rval
           | _ -> "" ]
         in
-        (Adef.codate_of_od d, p, source gen r)
-    | None -> (Adef.codate_None, "", ("", [])) ]
+        (d, p, source gen r)
+    | None -> (None, "", ("", [])) ]
   in
   let (death, death_place, (death_src, death_nt)) =
     match find_field "DEAT" r.rsons with
     [ Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then (DeadDontKnowWhen, "", ("", []))
-          else (infer_death birth, "", ("", []))
+          else (infer_death birth bapt, "", ("", []))
         else
           let d =
             match find_field "DATE" r.rsons with
@@ -1762,7 +1767,7 @@ value add_indi gen r =
             | _ -> "" ]
           in
           (d, p, source gen r)
-    | None -> (infer_death birth, "", ("", [])) ]
+    | None -> (infer_death birth bapt, "", ("", [])) ]
   in
   let (burial, burial_place, (burial_src, burial_nt)) =
     let (buri, buri_place, (buri_src, buri_nt)) =
@@ -1810,6 +1815,7 @@ value add_indi gen r =
     | _ -> (buri, buri_place, (buri_src, buri_nt)) ]
   in
   let birth = Adef.codate_of_od birth in
+  let bapt = Adef.codate_of_od bapt in
   let (psources, psources_nt) =
     let (s, s_nt) = source gen r in
     if s = "" then (default_source.val, s_nt) else (s, s_nt)
