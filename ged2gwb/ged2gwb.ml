@@ -1523,7 +1523,7 @@ value add_indi gen r =
         let (f, fal) =
           match first_names_brackets.val with
           [ Some (' ', eb) ->
-              try
+              let first_enclosed f =
                 let j = String.index f eb in
                 let i =
                   try String.rindex_from f (j - 1) ' ' with
@@ -1531,14 +1531,25 @@ value add_indi gen r =
                 in
                 let fn = String.sub f (i + 1) (j - i - 1) in
                 let fa =
-                  String.sub f 0 j ^
+                  String.sub f 0 j ^ fn ^
                     String.sub f (j + 1) (String.length f - j - 1)
                 in
-                if fn = fa then (fn, fal) else (fn, [fa :: fal])
-              with
-              [ Not_found -> (f, fal) ]
+                (fn, fa)
+              in
+              loop True f "" where rec loop first ff accu =
+                try
+                  let (fn, fa) = first_enclosed ff in
+                  let accu =
+                    if first then fn 
+                    else if fn <> "" then accu ^ " " ^ fn 
+                    else accu
+                  in
+                  loop False fa accu
+                with
+                [ Not_found ->
+                    if f = ff then (f, fal) else (accu, [ff :: fal]) ]
           | Some (bb, eb) ->
-              try
+              let first_enclosed f =
                 let i = String.index f bb in
                 let j =
                   if i + 2 >= String.length f then raise Not_found
@@ -1549,9 +1560,20 @@ value add_indi gen r =
                   String.sub f 0 i ^ fn ^
                     String.sub f (j + 1) (String.length f - j - 1)
                 in
-                if fn = fa then (fn, fal) else (fn, [fa :: fal])
-              with
-              [ Not_found -> (f, fal) ]
+                (fn, fa)
+              in
+              loop True f "" where rec loop first ff accu =
+                try 
+                  let (fn, fa) = first_enclosed ff in
+                  let accu =
+                    if first then fn 
+                    else if fn <> "" then accu ^ " " ^ fn 
+                    else accu
+                  in
+                  loop False fa accu
+                with
+                [ Not_found -> 
+                    if f = ff then (f, fal) else (accu, [ff :: fal]) ]
           | None -> (f, fal) ]
         in
         let (f, pn, fal) =
