@@ -806,7 +806,7 @@ is: <em>Sosa númer</em> tengt %t
 it: <em>Numero Sosa</em> relativo a %t
 lv: <em>SOSA pakāpe</em> attiecībā pret %t
 nl: <em>Sosa nummer</em> ten opzichte van %t
-no: <em>Sosa nummer</em> i forhold til %t
+no: <em>Anenummer</em> i forhold til %t
 pl: <em>numer "Sosa"</em>, odnoszący się do: %t
 pt: <em>número Sosa</em> em relação a %t
 ro: <em>numar Sosa</em> in relatie cu
@@ -2086,6 +2086,7 @@ sv: är
 de: Stammbaum
 en: Family Tree
 es: Árbol de ascendencia
+fi: Esipolvitaulu
 fr: arbre d’ascendance
 it: Albero d’ascendenza
 nl: Stamboom voorouders
@@ -2095,9 +2096,11 @@ sv: Antavla
 de: in
 en: in
 es: en
+fi: 
 fr: à
 it: a
 nl: te
+no: i
 sv: i
 
     a %s cousin
@@ -2607,9 +2610,11 @@ sv: %s seznam
 de: Buch der Vorfahren
 en: Ancestry Book
 es: libro de ascendencia
+fi: Esivanhempainkirja
 fr: livre d’ascendance
 it: libro d’ascendenza
 nl: boek met voorouders
+no: forfedre-bok
 sv: Förfädersbok
 
     border
@@ -2986,7 +2991,7 @@ sl: zamenjan vrstni red otrok
 sv: ändrade ordningen för barnen
 
     changed order of marriages
-fr: changement de l'ordre des marriages
+fr: changement de l’ordre des mariages
 
     change it (the number) yourself
 af: verander dit self
@@ -3197,6 +3202,20 @@ ru: комментарий
 sk: komentár
 sl: komentar
 sv: kommentar
+
+    compute all marriages
+de: Alle Lebenspartner einbeziehen
+en: include spouses
+es: incluir todos los cónyuges
+fr: inclure tous les conjoints
+it: includere i coniugi
+
+    compute approximatives dates
+de: Ungefähre Datumsangaben mit einbeziehen
+en: search unsure dates
+es: tener en cuenta las fechas aproximadas
+fr: prendre en compte les dates approximatives
+it: considerare anche le date approssimative
 
     connections
 bg: потребителски връзки
@@ -3701,6 +3720,9 @@ sl: umrl/umrla
 sv: död
 zh:  死
 
+    died at an advanced age
+fr: est décédé à un âge avancé/est décédée à un âge avancé/est décédé(e) à un âge avancé
+
     died young
 af: jonk oorlede
 bg: починал млад/починала млада/починал(а) млад(а)
@@ -3857,7 +3879,7 @@ de: nummer der Generation anzeigen
 en: display generation
 es: editar el número de generación
 fi: näytä sukupolvinumero
-fr: afficher le numéro de génération
+fr: afficher les générations
 it: pubblicare il numero di generazioni
 nl: nummer van de generatie tonen
 no: vis generasjonsnummer
@@ -4901,7 +4923,7 @@ en: groom/bride
 eo: edzo/edzino
 es: esposo/esposa
 et: mees/naine
-fi: aviomies/aviovaimo
+fi: puoliso/puoliso
 fr: époux/épouse
 he:   בעל/ אשה
 is: eiginmaður/eiginkona
@@ -5742,6 +5764,9 @@ sk: je
 sl: je
 sv: är
 
+    is a very old individual
+fr: est une vieille personne
+
     is a very old parent
 en: is a very old parent
 fr: est vraiment un parent très âgé
@@ -6075,6 +6100,13 @@ ru: подробно
 sk: dlhý zoznam
 sl: dolg seznam
 sv: utökad rapport
+
+    looking for
+de: wonach suchen
+en: check
+es: elementos a buscar
+fr: éléments à rechercher
+it: elementi da cercare
 
     loop in database: %s is his/her own ancestor
 af: fout in die databasis: %s sy/haar eie voorvader
@@ -6708,6 +6740,13 @@ sk: chýbajúci predkovia
 sl: manjkajoči predniki
 sv: anor som saknas
 
+    missing events
+de: Fehlende Ereignisse
+en: missing events
+es: acontecimientos que faltan
+fr: événements manquants
+it: eventi mancanti
+
     missing parents
 de: Fehlende Eltern
 en: Unknown parents
@@ -6717,7 +6756,7 @@ it: Genitori mancanti
 
     missing sosa
 de: Fehlende Sosa
-en: Unknown Sosa number
+en: Sosa number
 es: Sosa que faltan
 fr: sosa manquants
 it: Sosa mancanti
@@ -6744,6 +6783,7 @@ sv: saknade källor
 de: änderung/änderungen
 en: update/updates
 es: modificación/modificaciónes
+fi: muutos/muutokset
 fr: modification/modifications
 it: modifica/modifiche
 nl: wijziging/wijzigingen
@@ -6753,6 +6793,7 @@ sv: ändring/ändringar
 de: änderung durchgeführt
 en: successfully updated
 es: modificación efectuada
+fi: muutos suoritettu
 fr: modification effectuée
 it: mestiere modificato
 nl: wijziging uitgevoerd
@@ -6972,9 +7013,11 @@ sv: nummer
 de: Nr. SOSA
 en: Sosa
 es: nº Sosa
+fi: Sosa-viite
 fr: n° Sosa
 it: n° Sosa
 nl: Sosa nr.
+no: Anenummer
 sv: Annummer
 
     name
@@ -7092,7 +7135,7 @@ is: leiðsögn með %t sem Sosa tilvísun
 it: percorso con %t come riferimento Sosa
 lv: meklēt senčus -&gt; %t pēc Sosa pakāpes
 nl: navigatie met %t als proband
-no: navigering med %t som Sosa referanse
+no: navigering med %t som Anenummer
 pl: nawigacja z numerami "Sosa" odnoszącymi się do osoby: %t
 pt: navegação com %t como a referência Sosa
 ro: navigatie cu %t referinta Sosa
@@ -8862,9 +8905,19 @@ sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
 
+    same ancestor as n° Sosa
+de: identisch mit der Sosa/Pkz-Nr.
+en: same as Sosa #
+es: sdéntico al número Sosa
+fr: identique au n° Sosa
+it: pari al numero Sosa
+
     searching all
-en: searching all
+de: suche alle
+en: search
+es: buscar todos los
 fr: recherche tous les
+it: ricercare tutti gli
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
@@ -9015,6 +9068,7 @@ sv: välj
 de: einen Buchstaben wählen
 en: select a letter
 es: elija una letra
+fi: valitse kirjain
 fr: choisissez une lettre
 it: scegli una lettera
 nl: kies een letter
@@ -9392,7 +9446,7 @@ is: Sosa
 it: Sosa
 lv: SOSA
 nl: Sosa
-no: Sosa
+no: Anenummer
 pl: "Sosa"
 pt: Sosa
 ro: Sosa
@@ -9562,9 +9616,11 @@ fr: Statistiques et anniversaires
 de: liste der Dateien
 en: list of individuals
 es: lista de fichas
+fi: kaikki perhetietokortit
 fr: liste des fiches
 it: lista delle schede
 nl: lijst van de fichen
+no: sammendrag
 sv: lista över ansedlar
 
     surname alias
@@ -9932,6 +9988,9 @@ ru: послезавтра
 sk: pozajtra
 sl: pojutrišnem
 sv: i övermorgon
+
+    the difference of age between %t and %t is quite important
+fr: la différence d’âge entre %t et %t est assez importante
 
     the %d first names
 af: die %d voorname

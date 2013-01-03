@@ -19,6 +19,22 @@
   %end;
 %end;
 
+%define;relation_txt()
+  %if;(on_marriage_date != "" or marriage_place != "")
+    %if;are_married;
+      [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+    %elseif;are_not_married;
+      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+    %elseif;are_engaged;
+      [*engaged]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+    %elseif;is_no_sexes_check;
+      [*relation/relations]0%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+    %elseif;is_no_mention;
+      %apply;capitalize(on_marriage_date)%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
+    %end;
+  %end;
+%end;
+
 %define;display_date(xx, birth, death, with_rowspan)
   <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
     %if;("birth" = "")
@@ -104,17 +120,23 @@
           </tr>
           <tr>
             <td colspan="2">
-              %if;(on_marriage_date != "" or marriage_place != "")
-                [*married]%sp;%on_marriage_date;%sp;%if;(marriage_place != "")%sp;[in (place)]%sp;%marriage_place;%end;.
-              %end;
+              %apply;relation_txt()
               %if;xx.computable_marriage_age;
-                %apply;capitalize(nth([groom/bride], xx.sex)): %xx.marriage_age;%sp;
+                %if;(are_married or are_engaged)
+                  %apply;capitalize(nth([groom/bride], xx.sex)): %xx.marriage_age;%sp;
+                %else;
+                  %apply;capitalize(nth([conjoint/conjointe], xx.sex)): %xx.marriage_age;%sp;
+                %end;
               %end;
               %if;(xx.computable_marriage_age and spouse.computable_marriage_age)
                 %sp;-%sp;
               %end;
               %if;spouse.computable_marriage_age;
-                %apply;capitalize(nth([groom/bride], spouse.sex)): %spouse.marriage_age;
+                %if;(are_married or are_engaged)
+                  %apply;capitalize(nth([groom/bride], spouse.sex)): %spouse.marriage_age;
+                %else;
+                  %apply;capitalize(nth([conjoint/conjointe], spouse.sex)): %spouse.marriage_age;
+                %end;
               %end;
           </td>
           </tr>

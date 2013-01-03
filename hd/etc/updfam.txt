@@ -426,7 +426,7 @@ function changeCalendar(e,v,m,c) {
 %if;(bvar.multi_parents = "yes")%apply;insert_parent(cnt)%end;
 %end;
 
-<h4>[*marriage/marriages]0</h4>
+<h4><a name="marr">[*marriage/marriages]0</a></h4>
 <p>
 <label>
 <input type="radio" name="mrel" value="marr"%nn;
