@@ -120,6 +120,8 @@ click on "%s"
 close family
 color
 comment
+compute all marriages
+compute approximatives dates
 connections
 consanguinity
 continue correcting
@@ -143,6 +145,7 @@ delete
 descendants
 descendants at the generation
 died
+died at an advanced age
 died young
 direct ancestor of %s
 disappeared
@@ -230,6 +233,7 @@ invert
 invert the order of the following families
 in (year)
 is
+is a very old individual
 is a very old parent
 is a very young parent
 is born after his/her child
@@ -248,6 +252,7 @@ living before %s
 living between %s and %s
 living from/to
 long display
+looking for
 loop in database: %s is his/her own ancestor
 M/F
 main title
@@ -273,6 +278,7 @@ M/F
 miscellaneous notes
 miscellaneous informations
 missing ancestors
+missing events
 missing parents
 missing sosa
 missing spouse
@@ -373,6 +379,7 @@ relationship link/relationship links
 relationship link between
 relationship shortcut
 relationship%t to
+same ancestor as n° Sosa
 searching all
 search/case sensitive
 see
@@ -424,6 +431,7 @@ the base has changed; do "back", "reload", and refill the form
 the birthday
 the children
 the day after tomorrow
+the difference of age between %t and %t is quite important
 the %d first names
 the %d oldest couples perhaps still alive and engaged
 the %d oldest perhaps still alive

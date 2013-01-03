@@ -186,7 +186,7 @@
           [*display generation]
         </label>
         <label>
-          <input type="checkbox" name="no_repeat" value="on" checked="checked"%/>
+          <input type="checkbox" name="repeat" value="on" checked="checked"%/>
           [*display smallest sosa number relative to ancestor]
         </label>
       </p>
@@ -381,6 +381,34 @@
           <input type="text" name="before" size="4" maxlength="4" value=""%/>
         </label>
 %)
+      </div>
+
+      <label>
+        <input type="radio" name="t" value="M"%/>
+        [*missing events]
+      </label>
+      <div class="ascends_menu_option_div">
+        <input type="hidden" name="evt" value="on"%/>
+        <label>
+          <input type="checkbox" name="marr" value="on"%/>
+          [*compute all marriages]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" name="date" value="on" checked="checked"%/>
+          [*compute approximatives dates]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" name="gen" value="on" checked="checked"%/>
+          [*display generation]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" name="repeat" value="on" checked="checked"%/>
+          [*display smallest sosa number relative to ancestor]
+        </label>
+        <br%/>
       </div>
     </div>
   </div></div>

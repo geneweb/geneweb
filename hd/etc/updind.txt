@@ -426,7 +426,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 </table>
 
-<h4>[*birth]</h4>
+<h4><a name="birth">[*birth]</a></h4>
 
 <table border="1" width=700px>
 <tr>
@@ -460,7 +460,7 @@ function changeCalendar(e,v,m,c) {
 
 %apply;source("bapt")
 
-<h4>[*death]</h4>
+<h4><a name="death">[*death]</a></h4>
 
 <table border="1" width=700px>
 <tr>
