@@ -5,8 +5,8 @@
   modification est que la phrase NE commence PAS par une majuscule.
 %)
 
-%define;loc_married_to(sex, date)
-  %if;(sex = 0 or sex = 2)
+%define;loc_married_to(sexx, date)
+  %if;(sexx = 0 or sexx = 2)
     %if;are_married;[married%t to:::date]0%nn;
     %elseif;are_not_married;[relationship%t to:::date]0%nn;
     %elseif;are_engaged;[engaged%t to:::date]0%nn;
