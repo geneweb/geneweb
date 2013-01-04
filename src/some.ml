@@ -372,7 +372,12 @@ value first_name_print conf base x =
 ;
 
 value has_children_with_that_name conf base des name =
-  List.exists (fun ip -> p_surname base (pget conf base ip) = name)
+  let compare_name n1 n2 = 
+    if p_getenv conf.env "t" = Some "A" then n1 = n2
+    else Name.lower n1 = Name.lower n2
+  in
+  List.exists 
+    (fun ip -> compare_name (p_surname base (pget conf base ip)) name)
     (Array.to_list (get_children des))
 ;
 
@@ -491,8 +496,8 @@ value print_branch conf base psn name =
                  Wserver.wprint "%s"
                    (reference conf base c
                       (if (is_hide_names conf c) && not (fast_auth_age conf c) 
-		      then "x"
-                      else person_text conf base c));
+		                   then "x"
+                       else person_text conf base c));
                end;
                Wserver.wprint "%s" (Date.short_dates_text conf base c);
                Wserver.wprint "\n";
@@ -840,15 +845,6 @@ value surname_print conf base not_found_fun x =
       list (PerSet.empty, [])
   in
   let iperl = PerSet.elements iperl in
-  let bhl = select_ancestors conf base name_inj iperl in
-  let bhl =
-    List.map
-      (fun bh ->
-        {bh_ancestor = pget conf base bh.bh_ancestor;
-         bh_well_named_ancestors =
-         List.map (pget conf base) bh.bh_well_named_ancestors})
-      bhl
-  in
   (* Construction de la table des sosa de la base *)
   let () = Perso.build_sosa_ht conf base in 
   match p_getenv conf.env "o" with
@@ -866,12 +862,20 @@ value surname_print conf base not_found_fun x =
       in
       print_family_alphabetic x conf base pl
   | _ -> 
-    match (bhl, list) with
-    [ ([], _) -> not_found_fun conf x
-    | (_, [(s, (strl, iperl))]) -> 
-        print_one_surname_by_branch conf base x strl (bhl, s)
-    | _ -> 
-        let strl = List.map (fun (s, (strl, _)) -> s) list in
-        print_several_possible_surnames x conf base (bhl, strl) ]]
+      let bhl = select_ancestors conf base name_inj iperl in
+      let bhl =
+        List.map
+          (fun bh ->
+            {bh_ancestor = pget conf base bh.bh_ancestor;
+             bh_well_named_ancestors =
+             List.map (pget conf base) bh.bh_well_named_ancestors})
+          bhl
+      in
+      match (bhl, list) with
+      [ ([], _) -> not_found_fun conf x
+      | (_, [(s, (strl, iperl))]) -> 
+          print_one_surname_by_branch conf base x strl (bhl, s)
+      | _ -> 
+          let strl = List.map (fun (s, (strl, _)) -> s) list in
+          print_several_possible_surnames x conf base (bhl, strl) ]]
 ;
-
