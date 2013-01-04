@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121202 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121220 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -23,7 +23,7 @@
     function valid(id) {
       document.getElementById(id).checked = true;
     }
-      -->
+    -->
   </script>
   %include.css;
   %base_header;
@@ -262,21 +262,43 @@
   </fieldset>
   <fieldset>
     <legend>
-      <label>
-        <input type="radio" id="tE" name="t" value="E" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
-        [*list/list (ancestors)]0
-      </label>
+      <label><input type="radio" id="tE" name="t" value="E"
+              onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      [*list/list (ancestors)]0</label>
     </legend>
-    <label><input type="radio" id="tFAM" name="opt" value="fam" onchange="valid('tE')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>[*family/families]0
-      %sp;([maximum] 4 [generation/generations]1)
-    </label><br%/>
-    %if;(wizard)
-      <label><input type="radio" id="tCSV" name="opt" value="csv" onchange="valid('tE')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>[*long display] (csv)
-      </label>
-    %end;
-    <br%/>
-    <label><input type="checkbox" name="cousins" value="on" onchange="valid('tE')" onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/> [*cousins]
-    </label>
+    <label><input type="radio" id="tPLACE" name="opt" value="place" onchange="valid('tE')"
+            onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+    [*list eclair]0 - [places]</label><br%/>
+    <label><input type="radio" id="tSURN" name="opt" value="surn" onchange="valid('tE')"
+            onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+    [*list eclair]0 - [surname/surnames]1 / [places]</label><br%/>
+    <label><input type="radio" id="tAAD" name="opt" value="aad" onchange="valid('tE')"
+            onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+            [*age at death]
+            ([him/her]0, [him/her]1)</label><br%/>
+    <label><input type="radio" id="tAFM" name="opt" value="afm" onchange="valid('tE')"
+            onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+            [*age]
+            ([father/mother]0, [father/mother]1)</label><br%/>
+    <label><input type="radio" id="tBMDM" name="opt" value="bmdm" onchange="valid('tE')"
+            onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+            [*birth], [death]
+            ([him/her]0, [him/her]1) / [year/month/day]1</label><br%/>
+    <fieldset>
+      <legend>
+        <label><input type="checkbox" name="cousins" value="on" onchange="valid('tE')"
+                onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*cousins]</label>
+      </legend>
+      <label><input type="radio" id="tFAM" name="opt" value="fam" onchange="valid('tE')"
+              onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+      [*family/families]0 ([maximum] 4 [generation/generations]1)</label><br%/>
+      %if;(wizard)
+        <label><input type="radio" id="tCSV" name="opt" value="csv" onchange="valid('tE')"
+                onkeydown="if (event.keyCode == 13) javascript:document.ancmenu.submit();"%/>
+        [*long display] (csv)</label>
+      %end;
+    </fieldset>
   </fieldset>
   <fieldset>
     <legend>

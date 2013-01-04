@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121203 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130101 templ=templm -->
   <title>%first_name; %surname;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -17,14 +17,24 @@
       .fam1, .fam2, .person_content {width: 99%%;}
       .image_sheet {font-size: 89%%;}
     %else;
-       .fam1, .fam2, .person_content {width: 49%%; min-width: 300px;}
+       .fam1, .fam2, .person_content {width: 48%%; min-width: 265px;}
        .image_sheet {font-size: 71%%;}
     %end;
   </style>
+  <script type="text/javascript">
+  <!--
+    function adv(z1,z2)
+    {
+     var x1 = "%prefix;m=H;v=advanced;focus=" + z2 + ";birth1_yyyy=%birth_date.year;;death2_yyyy=%death_date.year;;" + z2 + "=";
+     var x2 = z1.innerHTML;
+     parent.location.href = x1 + x2;
+    }
+  //-->
+  </script>
+
   %base_header;
   %include.perso_accesskey;
 </head>
-
 
 %( <!-- Begin define --> %)
   %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
@@ -37,7 +47,7 @@
       %incr_count;
     %end;
   %end;
-   
+
   %define;letter(xx)
     %apply;nth%with;
       /A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z%and;
@@ -140,7 +150,7 @@
     %if;(has_families)
       %if;(evar.image="on")
         %foreach;family;
-            %if;(evar.spouse != "off")  
+            %if;(evar.spouse != "off")
               <div class="image_sheet" style="font-size: 80%%;">
                   %if;(spouse.has_image)%apply;link_image("spouse")<br%/>%end;
                   %apply;somebody("spouse")
@@ -204,11 +214,11 @@
     %end;
   %end;
 
-  %define;advanced(xx,zz)
+  %define;advanced(z1,z2)
     %if;(not cancel_links and bvar.hide_advanced_request != "yes")
-      <a class="date" href="%prefix;m=H;v=advanced;xx=zz;focus=xx;birth1_yyyy=%birth_date.year;;death2_yyyy=%death_date.year;" title="[advanced request]">zz</a>%nn;
+      <a class="date" href="javascript:void()" onclick="javascript:adv(this,'z1')" title="[advanced request]">z2</a>%nn;
     %else;
-      zz%nn;
+      z2%nn;
     %end;
   %end;
 
@@ -353,7 +363,7 @@
     %if;has_parents;
     <div class="fam2">
       <div class="ancestors">
-        <h3>[*parents]%if;(father.has_parents or mother.has_parents), [the grandparents]%end;</h3>
+        <h3>[*the parents]%if;(father.has_parents or mother.has_parents), [the grandparents]%end;</h3>
         %if;father.has_parents;<small>%apply;parents("father","&nbsp;&nbsp;&nbsp;&nbsp;",4)</small>%end;
         %apply;parents("self","",2)
         %if;mother.has_parents;<small>%apply;parents("mother","&nbsp;&nbsp;&nbsp;&nbsp;",6)</small>%end;
@@ -608,7 +618,7 @@
     %if;has_image;
     <div>
      <a onclick="window.open(this.href); return false;" href="%image_html_url;">
-       <img style="width:150px; border: 0; clear: both;" src="%image_url;" alt="[image/images]0"%/>
+       <img %image_size; style="border: 0; clear: both;" src="%image_url;" alt="[image/images]0"%/>
      </a>
     </div>
     %end;
