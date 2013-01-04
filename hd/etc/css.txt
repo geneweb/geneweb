@@ -446,6 +446,60 @@ div.summary ul ul
 }
 
 
+/* ------------------------------ Biographie ----------------------------- */
+
+#bio_block
+{ 
+  padding:9px; 
+  text-align:justify; 
+  text-indent:18px; 
+  font-size:1.1em; 
+}
+
+#bio_block h6 
+{ 
+  width:50%; 
+  border:3px double #2f6400; 
+  padding:3px; 
+  text-align:left; 
+  font-size:1.4em;
+}
+
+#bio_block hr 
+{ 
+  height:3px; 
+  color:#2f6400;
+}
+
+#bio_block :first-letter 
+{ 
+  font-weight:900; 
+  font-size:1.2em; 
+  color:#2f6400;
+}
+
+#bio_right 
+{
+  float:right; 
+  border:#2f6400 solid 3px; 
+  margin:12px; 
+  padding:6px;
+  text-align:center; 
+  text-indent:0px; 
+  font-size:0.9em;
+}
+
+#bio_left 
+{
+  float:left; 
+  border:#2f6400 solid 3px; 
+  margin:12px; padding:6px; 
+  text-align:center; 
+  text-indent:0px; 
+  font-size:0.9em;
+}
+
+
 /* --------------------------------- notes -------------------------------- */
 
 li.folder
