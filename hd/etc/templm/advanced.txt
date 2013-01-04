@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: advanced.txt $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121004 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121206 templ=templm -->
   <title>[*advanced request]</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
@@ -40,23 +40,6 @@
 %define;event(xx)
   <p style="text-align:right;">
   <label>[*place]<input id="xx_place" name="xx_place" value="%evar.xx_place;" size="40" maxlength="200"%/></label>
-  <br%/>[*before] :
-  %if;([ !dates order]0 = "ddmmyyyy")
-    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx2_yyyy"%/></label>
-  %elseif;([ !dates order]0 = "mmddyyyy")
-    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx2_yyyy"%/></label>
-  %else;
-    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx2_yyyy""%/></label>
-    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
-  %end;
   <br%/>[*after] :
   %if;([ !dates order]0 = "ddmmyyyy")
     <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
@@ -74,6 +57,23 @@
     <label>[year/month/day]1<input name="xx1_mm" class="number" size="2" maxlength="2"%/></label>
     <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
   %end;
+  <br%/>[*before] :
+  %if;([ !dates order]0 = "ddmmyyyy")
+    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx2_yyyy"%/></label>
+  %elseif;([ !dates order]0 = "mmddyyyy")
+    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx2_yyyy"%/></label>
+  %else;
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
+                                   id="xx2_yyyy""%/></label>
+    <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
+    <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
+  %end;
   </p>
 %end;
 
@@ -88,8 +88,13 @@
     <legend>
       [*advanced request] <input type="submit" value="Ok"%/>
       %if;(evar.birth1_yyyy != "" or evar.death2_yyyy != "")
-        <a class="button" href="javascript:changeDate('cd','birth1_yyyy','%evar.birth1_yyyy;','death2_yyyy','%evar.death2_yyyy;')"
-           id="cd">[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
+        %if;(evar.marriage_place != "")
+          <a class="button" href="javascript:changeDate('cd','marriage1_yyyy','%evar.birth1_yyyy;','marriage2_yyyy','%evar.death2_yyyy;')"
+             id="cd">[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
+        %else;
+          <a class="button" href="javascript:changeDate('cd','birth1_yyyy','%evar.birth1_yyyy;','death2_yyyy','%evar.death2_yyyy;')"
+             id="cd">[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
+        %end;
       %end;
     </legend>
     <p class="modify_person">

@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120807 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121230 templ=templm -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -211,7 +211,7 @@
     </form>
     <ul>
       <li>
-        <a href="%prefix;m=POP_PYR;i=5;lim=0;y=%date.gregorian.year;">
+        <a href="%prefix;m=POP_PYR;int=5;lim=0;y=%date.gregorian.year;">
           [population pyramid] (%date.gregorian.year;)
         </a>
       </li>

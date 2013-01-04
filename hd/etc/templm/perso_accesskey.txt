@@ -1,6 +1,6 @@
   <script type="text/javascript">
   <!--
-    // mickroue(a)yahoo.fr 20121108 templ=templm 
+    // mickroue(a)yahoo.fr 20121108 templ=templm
     function acc_key(event,sib,spo,chi,mod_ind,add_par,add_fam,mod_fam) {
       var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
       var a_k = String.fromCharCode(key);
@@ -22,7 +22,7 @@
             {document.getElementById("sib_1").focus();}
         break; 
         case "0": document.getElementById(spo).focus(); break;
-        case "8": document.getElementById(chi).focus(); break;
+case "8": document.getElementById(chi).focus(); break;
         case "P": document.getElementById(mod_ind).click(); break;
         case "L": document.getElementById(add_par).click(); break;
         case "A": document.getElementById(add_fam).click(); break;

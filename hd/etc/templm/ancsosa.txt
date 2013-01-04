@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancsosa.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121130 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20121219 templ=templm -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] … [up to] …%nn;
@@ -362,7 +362,7 @@
 
 %define;image(xx)
   %if;(evar.image="on" and xx.has_image)
-    <img class="image" src="%xx.image_url;" alt="[image/images]0" title="[image/images]0"%/>
+    <img class="image" src="%xx.image_url;" alt="[image/images]0" title="%xx;"%/>
   %end;
 %end;
 %( <!-- End define (used in ancsosa.txt, deslist.txt)--> %)
@@ -771,9 +771,9 @@
 %define;M2b_b()
   %if;(not ancestor.has_linked_page.BIRTHA)
     %if;(ancestor.has_birth_date)
-        %apply;sorted_list_birth("birth")
+      %apply;sorted_list_birth("birth")
     %elseif;(ancestor.has_baptism_date)
-        %apply;sorted_list_birth("baptism")
+      %apply;sorted_list_birth("baptism")
     %end;
   %end;
 %end;
@@ -791,11 +791,11 @@
 %define;M2d_d()
   %if;(not ancestor.has_linked_page.DEATHA)
     %if;(ancestor.has_death_date)
-        %apply;sorted_list_death("death")
+      %apply;sorted_list_death("death")
     %elseif;(ancestor.has_burial_date)
-        %apply;sorted_list_death("burial")
+      %apply;sorted_list_death("burial")
     %elseif;(ancestor.has_cremation_date)
-        %apply;sorted_list_death("cremated")
+      %apply;sorted_list_death("cremated")
     %end;
   %end;
 %end;
@@ -805,7 +805,7 @@
     %apply;sorted_list_birth("birth")
   %elseif;(ancestor.baptism_date.prec != "")
     %apply;sorted_list_birth("baptism")
-  %elseif;(ancestor.birth_date.day = "" and ancestor.baptism_date.day = "")
+  %elseif;(ancestor.on_birth_date = "" and ancestor.on_baptism_date = "")
     %if;(ancestor.has_birth_date)
       %apply;sorted_list_birth("birth")
     %elseif;(ancestor.has_baptism_date)
@@ -819,7 +819,7 @@
 %define;M3m_m()
   %if;(ancestor.is_male)
     %foreach;ancestor.family
-      %if;(marriage_date.prec != "" or on_marriage_date.day = "")
+      %if;(marriage_date.prec != "" or on_marriage_date = "")
         %apply;sorted_list_marriage()
       %end;
     %end;
@@ -832,7 +832,7 @@
       %apply;sorted_list_death("death")
     %elseif;(ancestor.burial_date.prec != "")
       %apply;sorted_list_death("burial")
-    %elseif;(ancestor.death_date.day = "" and ancestor.burial_date.day = "")
+    %elseif;(ancestor.on_death_date = "" and ancestor.burial_date.day = "")
       %if;(ancestor.has_death_date)
         %apply;sorted_list_death("death")
       %elseif;(ancestor.has_burial_date)
