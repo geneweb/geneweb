@@ -236,6 +236,7 @@ value check_person_age base warning p =
   let is_dead =
     match get_death p with
     [ Death _ _ | DeadYoung | DeadDontKnowWhen -> True
+    | OfCourseDead -> True (* Cas spécial. *)
     | _ -> False ]
   in
   if is_dead then
