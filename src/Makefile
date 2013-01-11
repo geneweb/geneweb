@@ -66,7 +66,7 @@ compilation.ml: always
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
 
 clean::
-	$(RM) gwc gwc1 gwc2 consang gwd gwu update_nldb gwlib.ml
+	$(RM) gwc gwc1 gwc2 consang gwd gwu update_nldb check_base gwlib.ml
 
 gwlib.ml:
 	echo "value prefix =" > gwlib.ml
