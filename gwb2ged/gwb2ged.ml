@@ -107,12 +107,7 @@ value ged_header base oc ifile ofile =
     fprintf oc "2 VERS %s\n" Version.txt;
     fprintf oc "2 NAME %s\n" (Filename.basename Sys.argv.(0));
     fprintf oc "2 CORP INRIA\n";
-    fprintf oc "3 ADDR Domaine de Voluceau\n";
-    fprintf oc "4 CONT B.P 105 - Rocquencourt\n";
-    fprintf oc "4 CITY Le Chesnay Cedex\n";
-    fprintf oc "4 POST 78153\n";
-    fprintf oc "4 CTRY France\n";
-    fprintf oc "3 PHON +33 01 39 63 55 11\n";
+    fprintf oc "3 ADDR http://www.geneweb.org\n";
     fprintf oc "2 DATA %s\n"
       (let fname = Filename.basename ifile in
        if Filename.check_suffix fname ".gwb" then fname else fname ^ ".gwb");
