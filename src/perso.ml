@@ -2551,7 +2551,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "is_invisible" ->
       let conf = {(conf) with wizard = False; friend = False} in
       not (authorized_age conf base p)
-  | "is_male" -> get_sex p= Male
+  | "is_male" -> get_sex p = Male
   | "is_private" -> get_access p = Private
   | "is_public" -> get_access p = Public
   | "is_restricted" -> is_hidden p
@@ -2837,8 +2837,8 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       [ [nn :: _] when p_auth -> sou base nn
       | _ -> "" ]
   | "sex" -> 
-      if p_auth then string_of_int (index_of_sex (get_sex p))
-      else string_of_int (index_of_sex Def.Neuter)
+      (* Pour éviter les traductions bizarre, on ne teste pas p_auth. *)
+      string_of_int (index_of_sex (get_sex p))
   | "sosa_in_list" ->
       match get_env "all_gp" env with
       [ Vallgp all_gp ->
