@@ -950,10 +950,9 @@ value get_date_place conf base auth_for_all_anc p =
       if auth_for_all_anc then True
       else
         match d2 with
-        [ Some (Dgreg d _)
-          when (CheckItem.time_elapsed d conf.today).year >
-               conf.private_years ->
-            True
+        [ Some (Dgreg d _) ->
+            let a = CheckItem.time_elapsed d conf.today in
+            Util.strictly_after_private_years conf a
         | _ -> False ]
     in
     let pl =
@@ -2474,7 +2473,8 @@ and eval_bool_person_field conf base env (p, p_auth) =
              let des = foi base ifam in Array.length (get_children des) > 0)
           (Array.to_list (get_family p)) ]
   | "has_consanguinity" ->
-      p_auth && get_consang p != Adef.fix (-1) && get_consang p != Adef.fix 0
+      p_auth && get_consang p != Adef.fix (-1) && 
+        get_consang p >= Adef.fix_of_float 0.01
   | "has_cremation_date" ->
       if p_auth then
         match get_burial p with

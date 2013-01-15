@@ -547,6 +547,12 @@ value nobtit conf base p =
   Gwdb.nobtit base conf.allowed_titles conf.denied_titles p
 ;
 
+value strictly_after_private_years conf a =
+  if a.year > conf.private_years then True
+  else if a.year < conf.private_years then False
+  else a.month > 0 || a.day > 0 
+;
+
 value is_old_person conf p =
   match
     (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
@@ -555,13 +561,13 @@ value is_old_person conf p =
   [ (_, _, NotDead, _) when conf.private_years > 0 -> False
   | (Some (Dgreg d _), _, _, _) ->
       let a = CheckItem.time_elapsed d conf.today in
-      a.year > conf.private_years
+      strictly_after_private_years conf a
   | (_, Some (Dgreg d _), _, _) ->
       let a = CheckItem.time_elapsed d conf.today in
-      a.year > conf.private_years
+      strictly_after_private_years conf a
   | (_, _, _, Some (Dgreg d _)) ->
       let a = CheckItem.time_elapsed d conf.today in
-      a.year > conf.private_years
+      strictly_after_private_years conf a
   | (None, None, DontKnowIfDead, None) ->
       p.access <> Private && conf.public_if_no_date
   | _ -> False ]
@@ -652,13 +658,13 @@ value authorized_age conf base p =
     [ (_, _, NotDead, _) when conf.private_years > 0 -> False
     | (Some (Dgreg d _), _, _, _) ->
         let a = CheckItem.time_elapsed d conf.today in
-        a.year > conf.private_years
+        strictly_after_private_years conf a
     | (_, Some (Dgreg d _), _, _) ->
         let a = CheckItem.time_elapsed d conf.today in
-        a.year > conf.private_years
+        strictly_after_private_years conf a
     | (_, _, _, Some (Dgreg d _)) ->
         let a = CheckItem.time_elapsed d conf.today in
-        a.year > conf.private_years
+        strictly_after_private_years conf a
     | (None, None, DontKnowIfDead, None) ->
         get_access p <> Private && conf.public_if_no_date
     | _ ->
@@ -669,7 +675,7 @@ value authorized_age conf base p =
             match Adef.od_of_codate (get_marriage fam) with
             [ Some (Dgreg d _) ->
                 let a = CheckItem.time_elapsed d conf.today in
-                a.year > conf.private_years
+                strictly_after_private_years conf a
             | _ -> loop (i + 1) ]
         in
         loop 0 ]
@@ -3348,7 +3354,9 @@ value reduce_list size list =
       match list with
        [ [] -> reduced_list
        | [x :: l] -> loop size (cnt + 1) [x :: reduced_list] l ]
-  in loop size 0 [] list
+  in 
+  let sublist = loop size 0 [] list in
+  List.rev sublist
 ;
 
 
