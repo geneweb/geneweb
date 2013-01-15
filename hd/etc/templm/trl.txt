@@ -1,4 +1,4 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 20130103 templ=templm -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 20130114 templ=templm -->
 
 %if;(not cancel_links)
   <script type="text/javascript">
@@ -65,7 +65,7 @@
                      onkeypress="javascript:return computeSosa(event,'Tn')"%/>
         <input type="submit" value="[*search/case sensitive]0 (²)"%/>
         %if;(bvar.hide_advanced_request = "no")
-          <a href="%prefix;m=H;v=advanced">[advanced request]</a>
+          <a class="button" href="%prefix;m=H;v=advanced">[advanced request]</a>
         %end;
         <p id="templ">
           <a href="%prefix_no_templ;templ=;%suffix;">default</a>

@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 201211220 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130107 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -256,7 +256,7 @@
       <label><input type="radio" id="tAAD" name="opt" value="aad" onchange="valid('tL')"
               onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
               [*age at death]
-              ([him/her]0, [him/her]1)</label><br%/>
+              ([M/F]0, [M/F]1)</label><br%/>
       <label><input type="radio" id="tAFM" name="opt" value="afm" onchange="valid('tL')"
               onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
               [*age]
@@ -264,7 +264,7 @@
       <label><input type="radio" id="tBMDM" name="opt" value="bmdm" onchange="valid('tL')"
               onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
               [*birth], [death]
-              ([him/her]0, [him/her]1) / [year/month/day]1</label><br%/>
+              ([M/F]0, [M/F]1) / [year/month/day]1</label><br%/>
     </fieldset>
   </form>
   <div style ="clear: both;">

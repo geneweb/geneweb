@@ -1,6 +1,6 @@
 <style type="text/css">
 /* Properties of all html pages.*/
-/* mickroue(a)yahoo.fr 20130103 templ=templm */
+/* mickroue(a)yahoo.fr 20130111 templ=templm */
 html{background:url('images/gwback.jpg');}
 /* Properties of all html pages */
 body{word-wrap:break-word;}
@@ -106,7 +106,9 @@ abbr{border-bottom:0;}
 #perso .siblings{width:auto;float:left;margin:5px;}
 #perso .data1,#perso .person div{text-align:center;}
 #perso .person,#perso .notes,#perso .sources,#perso .relations{clear:both;overflow:auto;}
-#perso .image,#perso .image img,#perso .image_sheet{float:left;width:12.5em;}
+#perso .person_img{max-width:15em;max-height:15em;}
+#perso .image img{max-width:12.5em;max-height:12.5em;}
+#perso .image,#perso .image_sheet{float:left;width:12.5em;}
 #perso .image{display:block;margin:0;padding:0;}
 #perso .image img{border:none;margin:0;padding:0;}
 #perso .t_witness td{background-color:buttonface;padding:2px;margin:2px;}
@@ -150,7 +152,7 @@ abbr{border-bottom:0;}
 
 /* anclist.txt, deslist.txt */
 .bcbg1{border:solid 1px #555555;color:#EEEEEE;background-color:#000000;}
-.col{position:absolute;text-align:right;line-height:30px;font-size:16px;}
+.col{position:absolute;text-align:right;line-height:30px;font-size:16px;width:80px;padding-right:5px;}
 .title{background-color:#555555;}
 .stat_ars{position:relative;margin-left:-10px;}
 .stat_ars a{position:absolute;}
@@ -166,20 +168,20 @@ abbr{border-bottom:0;}
 .stat_age2{position:relative;clear:both;width:900px;margin-left:auto;margin-right:auto;margin-top:10px;}
 .stat_age2 .body{position:relative;}
 .stat_age2 .link{position:absolute;font-size:x-small;}
-.stat_age2 .date{position:absolute;left:850px;top:10px;}
+.stat_age2 .date{position:absolute;left:860px;top:10px;}
 .stat_age2 .lev{position:absolute;left:10px;top:10px;}
 
-.stat_calendar,.stat_month{position:relative;margin:5px;}
-.stat_calendar{clear:both;top:5px;width:962px;height:400px;}
-.stat_calendar div{position:absolute;padding:5px;}
-.stat_calendar .title{display:block;width:100px;height:20px;text-align:center;font-size:15px;}
-.stat_calendar .row{left:110px;top:0px;width:842px;height:20px;font-family:monospace;font-size:15px;text-align:center;}
-.stat_calendar .col{top:30px;height:360px;width:100px;}
-.stat_calendar .body{left:110px;top:30px;width:842px;height:360px;}
-.stat_calendar .body a,.stat_calendar .body span{position:absolute;width:24px;font-size:12px;font-family:monospace;line-height:27px;text-align:center;vertical-align:middle;}
-.stat_month{float:left;width:475px;height:382px;top:0px;}
-.stat_month .col{width:100px;padding-right:5px;}
-.stat_month .body{position:absolute;left:105px;top:19px;}
+.stat_bmdm{margin:auto;}
+.stat_calendar,.stat_month{position:relative;}
+.stat_calendar{clear:both;top:2px;width:956px;height:390px;line-height:30px;font-size:16px;text-align:center;vertical-align:middle;}
+.stat_calendar div{position:absolute;}
+.stat_calendar .title{display:block;width:88px;}
+.stat_calendar .row{left:88px;top:0px;font-family:monospace;}
+.stat_calendar .row div{position:relative;float:left;width:28px;}
+.stat_calendar .body{left:89px;top:31px;}
+.stat_calendar .body a,.stat_calendar .body span{position:absolute;width:25px;font-size:12px;font-family:monospace;line-height:27px;}
+.stat_month{width:475px;height:382px;top:0px;}
+.stat_month .body{position:absolute;left:85px;top:19px;}
 .stat_month .body span{position:absolute;font-size:10px;line-height:7px;padding-left:5px;}
 
 .m01{top:10px;}.m02{top:40px;}.m03{top:70px;}.m04{top:100px;}.m05{top:130px;}.m06{top:160px;}.m07{top:190px;}.m08{top:220px;}.m09{top:250px;}.m010{top:280px;}.m011{top:310px;}.m012{top:340px;}
