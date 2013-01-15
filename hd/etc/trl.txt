@@ -1,6 +1,6 @@
 
 %if;not cancel_links;
-  <div id="trl">
+  <div id="trl" style="clear:both;">
     <ul>
       <li><a href="%prefix_no_templ;%suffix;">default</a></li>
       <li><a href="%prefix_no_templ;templ=templa;%suffix;">templa</a></li>
