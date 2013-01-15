@@ -3,14 +3,14 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130103 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130107 templ=templm -->
   <title>%nn;
     %first_name; %surname;
     %if;(evar.t = "E" and evar.opt = "csv") - CSV - 
     %elseif;(evar.t = "E" and evar.opt = "fam") - [*family/families]0 - 
     %elseif;(evar.t = "E" and evar.opt = "place") - [*list eclair]0 - [places] 
     %elseif;(evar.t = "E" and evar.opt = "surn") - [*list eclair]0 - [surname/surnames]1 / [places] 
-    %elseif;(evar.t = "E" and evar.opt = "aad") - [*age at death] ([him/her]0, [him/her]1) 
+    %elseif;(evar.t = "E" and evar.opt = "aad") - [*age at death] ([M/F]0, [M/F]1) 
     %elseif;(evar.t = "E" and evar.opt = "afm") - [*age] ([father/mother]0, [father/mother]1) 
     %elseif;(evar.t = "F") - [*surnames branch] - 
     %else; - [*ancestors] - 
@@ -546,7 +546,6 @@
 %end;
 
 %define;stat_month(xx)
-  %let;max_width;340%in;
   %reset_count;
   %empty_sorted_list;
   %foreach;ancestor_level(evar.v)
@@ -562,14 +561,15 @@
       %end;
     %end;
   %end;
-  %let;l_size;%if;(count > 750)3%elseif;(count > 500)6%elseif;(count > 250)9%else;12%end;%in;
+  %let;max_width;360%in;
+  %let;l_size;%expr(36 / ((120 + count) /12 / 10))%in;
   <div class="stat_month bcbg1">
     <table class="title" width="100%%"><tr>
       <td>[*year/month/day]1</td>
       <td align="center">
         [*xx]
-        (<span style="color:#4682B4;"/>[him/her]0</span>,
-         <span style="color:#FF69B4;"/>[him/her]1</span>)</td>
+        (<span style="color:#4682B4;"/>[M/F]0</span>,
+         <span style="color:#FF69B4;"/>[M/F]1</span>)</td>
       <td align="right"><em>%count; [date/dates]1</em></td>
     </tr></table>
     <div class="col">
@@ -635,7 +635,11 @@
     <a class="title" style="color:#EEEEEE;" href="%prefix;m=A;t=E;opt=ars;i=%index;;v=%evar.v;;only=%evar.only;"
          title="Ars">[*calendar/calendars]0</a>
     <div class="row">
-      01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+      %reset_count;
+      %for;i;1;32;
+        %incr_count;
+        <div>%count;</div>
+      %end;
     </div>
     <div class="col">
       [(month)]0<br%/>[(month)]1<br%/>[(month)]2<br%/>[(month)]3<br%/>
@@ -654,8 +658,8 @@
         i%count;=%item.4;;t%count;=%item.5;;%nn;
       %end;
       %if;(next_item.1 != item.1)
-        %let;top;%expr(item.2 * 30 - 22)%in;
-        %let;left;%expr(item.3 * 27 - 19)%in;
+        %let;top;%expr(item.2 * 30 - 30)%in;
+        %let;left;%expr(item.3 * 28 - 28)%in;
         %let;colhex;%apply;color(count)%in;
         %incr_count;
         i%count;=%index;;t%count;=%item.3; %apply;nth([(month)],item.2-1);%nn;
@@ -802,7 +806,7 @@
       </li><ul>
       <table border>
       <tr>
-        <th class="bcbg1" colspan="2">[*him/her]0</th><th class="bcbg1" colspan="2">[*him/her]1</th>
+        <th class="bcbg1" colspan="2">[*M/F]0</th><th class="bcbg1" colspan="2">[*M/F]1</th>
       </tr>
         <th class="bcbg1">[birth]</th>
         <td>
@@ -875,7 +879,7 @@
       %incr_count;
       %let;l_top;%expr(20 + (count * 2))%in;
       %let;l_left0;%expr(20 + item.2 * 8)%in;
-      %let;l_left;%if;(l_left0 > 850)850%else;%l_left0;%end;%in;
+      %let;l_left;%if;(l_left0 > 840)840%else;%l_left0;%end;%in;
       %if;(count = 1)
         <span class="date">%item.1;</span>
         <span class="lev">%level;</span>
@@ -1095,7 +1099,7 @@
       %incr_count;
       i%count;=%index;;t%count;=%item.1;
       %if;(max_event >= count)">(%expr(count - 1))</a>;%item.2;
-      %else;" style="display:none;"></a>(%expr(count - 1));%item.2;
+      %else;" style="display:none;"></a><em>(%expr(count - 1))</em>;%item.2;
       %end;
     %end;
   %end;
@@ -1164,7 +1168,7 @@
       %incr_count;
       i%count;=%index;;t%count;=%item.1;
       %if;(max_event >= count)">(%expr(count - 1))</a>;%item.2;
-      %else;" style="display:none;"></a>(%expr(count - 1));%item.2;
+      %else;" style="display:none;"></a><em>(%expr(count - 1))</em>;%item.2;
       %end;
     %end;
   %end;
@@ -1172,7 +1176,6 @@
 %elseif;(evar.t = "E" and evar.opt = "aad")
   %( age_at_death by generation opt = aad %)
   %apply;gen()
-  %let;max_width;400%in;
   %reset_count;
   %empty_sorted_list;
   %foreach;ancestor_level(evar.v)
@@ -1190,13 +1193,14 @@
       %end;
     %end;
   %end;
-  %let;l_size;%if;(count > 750)2%elseif;(count > 500)4%elseif;(count > 250)6%else;10%end;%in;
+  %let;max_width;360%in;
+  %let;l_size;%expr(36 / ((60 + count) / 6 / 10))%in;
   <div class="stat_age1 bcbg1">
     <table class="title" width="100%%"><tr>
     <td>[*age]</td>
     <td align="center">[*age at death]
-      (<span style="color:#4682B4;"/>[him/her]0</span>,
-       <span style="color:#FF69B4;"/>[him/her]1</span>)</td>
+      (<span style="color:#4682B4;"/>[M/F]0</span>,
+       <span style="color:#FF69B4;"/>[M/F]1</span>)</td>
     <td align="right"><em>%count; [date/dates]1</em></td>
     </tr></table>
     %apply;stat_age1()
@@ -1205,8 +1209,8 @@
     <table class="title" width="100%%"><tr>
       <td>[*generation/generations]0</td>
       <td align="center">[*age at death]
-          (<span style="color:#4682B4;"/>[him/her]0</span>,
-           <span style="color:#FF69B4;"/>[him/her]1</span>)</td>
+          (<span style="color:#4682B4;"/>[M/F]0</span>,
+           <span style="color:#FF69B4;"/>[M/F]1</span>)</td>
       <td align="right">[*date of birth]</td>
     </tr></table>
     %foreach;ancestor_level(evar.v)
@@ -1217,7 +1221,7 @@
           %if;(ancestor.same = "")
             %let;l_aby;%ancestor.birth_date.year;%in;
             %let;l_ady;%ancestor.death_date.year;%in;
-            %if;(ancestor.computable_death_age and l_ady > l_aby)
+            %if;(ancestor.computable_death_age and l_ady >= l_aby)
               %incr_count;
               %let;l_age;%expr(l_ady - l_aby)%in;
               %apply;add_in_sorted_list(l_aby,l_age,ancestor.sex,ancestor.index)
@@ -1231,7 +1235,6 @@
 %elseif;(evar.t = "E" and evar.opt = "afm")
   %( age father mother by generation opt = afm %)
   %apply;gen()
-  %let;max_width;400%in;
   %reset_count;
   %empty_sorted_list;
   %foreach;ancestor_level(evar.v)
@@ -1241,21 +1244,22 @@
           %let;l_aby;%ancestor.birth_date.year;%in;
           %let;l_fby;%ancestor.father.birth_date.year;%in;
           %let;l_mby;%ancestor.mother.birth_date.year;%in;
-          %if;(l_aby > l_fby)
+          %if;(l_aby >= l_fby)
             %incr_count;
             %let;l_age;%expr((l_aby - l_fby)/10)%in;
-            %apply;add_in_sorted_list(0,l_age,ancestor.father.index)
+            %apply;add_in_sorted_list(0,l_age,ancestor.father.index,count)
           %end;
-          %if;(l_aby > l_mby)
+          %if;(l_aby >= l_mby)
             %incr_count;
             %let;l_age;%expr((l_aby - l_mby)/10)%in;
-            %apply;add_in_sorted_list(1,l_age,ancestor.mother.index)
+            %apply;add_in_sorted_list(1,l_age,ancestor.mother.index,count)
           %end;
         %end;
       %end;
     %end;
   %end;
-  %let;l_size;%if;(count > 750)1%elseif;(count > 500)2%elseif;(count > 250)3%else;4%end;%in;
+  %let;max_width;360%in;
+  %let;l_size;%expr(36 / ((40 + count) / 4 / 10))%in;
   <div class="stat_age1 bcbg1">
     <table class="title" width="100%%"><tr>
     <td>[*age]</td>
@@ -1283,15 +1287,15 @@
             %let;l_aby;%ancestor.birth_date.year;%in;
             %let;l_fby;%ancestor.father.birth_date.year;%in;
             %let;l_mby;%ancestor.mother.birth_date.year;%in;
-            %if;(l_aby > l_fby)
+            %if;(l_aby >= l_fby)
               %incr_count;
               %let;l_age;%expr(l_aby - l_fby)%in;
-              %apply;add_in_sorted_list(l_aby,l_age,0,ancestor.index)
+              %apply;add_in_sorted_list(l_aby,l_age,0,ancestor.index,count)
             %end;
-            %if;(l_aby > l_mby)
+            %if;(l_aby >= l_mby)
               %incr_count;
               %let;l_age;%expr(l_aby - l_mby)%in;
-              %apply;add_in_sorted_list(l_aby,l_age,1,ancestor.index)
+              %apply;add_in_sorted_list(l_aby,l_age,1,ancestor.index,count)
             %end;
           %end;
         %end;
@@ -1301,10 +1305,19 @@
   </div>
 %elseif;(evar.t = "E" and evar.opt = "bmdm")
   %( birth month death month opt = bmdm %)
-  %apply;gen()
-  %apply;stat_month("birth")
-  %apply;stat_month("death")
-  %apply;stat_calendar()
+    <table class="stat_bmdm">
+      <tr><td colspan="2">
+        %apply;gen()
+      </td></tr>
+      <tr><td>
+        %apply;stat_month("birth")
+      </td><td>
+        %apply;stat_month("death")
+      </td></tr>
+      <tr><td colspan="2">
+        %apply;stat_calendar()
+      </td></tr>
+    </table>
 %elseif;(evar.t ="E" and evar.opt = "ars")
   %( ars table day month generation %)
   %( rlm link 2     %) %let;rlm2;i2=%index;;t2=0%in;
@@ -1336,11 +1349,11 @@
     <li><a href="%prefix;m=A;t=E;opt=place;i=%index;;v=%evar.v;;only=%evar.only;">[*list eclair]0 - [places]</a></li>
     <li><a href="%prefix;m=A;t=E;opt=surn;i=%index;;v=%evar.v;;only=%evar.only;">[*list eclair]0 - [surname/surnames]1 / [places]</a></li>
     <li><a href="%prefix;m=A;t=E;opt=aad;i=%index;;v=%evar.v;;only=%evar.only;">
-        [*age at death] ([him/her]0, [him/her]1)</a></li>
+        [*age at death] ([M/F]0, [M/F]1)</a></li>
     <li><a href="%prefix;m=A;t=E;opt=afm;i=%index;;v=%evar.v;;only=%evar.only;">
         [*age] ([father/mother]0, [father/mother]1)</a></li>
     <li><a href="%prefix;m=A;t=E;opt=bmdm;i=%index;;v=%evar.v;;only=%evar.only;">
-        [*birth], [death] ([him/her]0, [him/her]1) / [year/month/day]1</a></li>
+        [*birth], [death] ([M/F]0, [M/F]1) / [year/month/day]1</a></li>
   </ul>
 %elseif;(evar.t = "L")
   %( by list %)

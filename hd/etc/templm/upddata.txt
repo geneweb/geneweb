@@ -1,10 +1,11 @@
-%doctype;
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 %let;maxl;%if;(evar.data = "src")300%else;200%end;%in;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: upddata.txt,v 0.01 2012-10-29 11:42:30 flh Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130103 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130109 templ=templm -->
   <title>%title;</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
@@ -30,7 +31,6 @@
    x6.setAttribute("style","visibility:hidden","false");
    return false;
   }
-
   function lhr()
    {
     var x1 = "%prefix;m=H;v=advanced;occu=";
@@ -44,7 +44,7 @@
     zz.setAttribute("id","nx_a","false");
     var x2 = document.getElementById('nx_a');
     var x3 = x2.getAttribute("style","false");
-    if (x3 == null )
+    if (x3 == null)
     {
       document.getElementById('nx_span').outerHTML = "";
       var x4 = x2.innerHTML;
@@ -52,11 +52,13 @@
                 +"<input type=\"text\" id=\"nx_input\" name=\"nx_input\" size=\"80\" maxlength=\"%maxl;\" \/>"
                 +"<input type=\"submit\" value=\"ok\"\/>"
                 %if;(bvar.hide_advanced_request = "no" and evar.data = "occu")
-                  +"<a href=\"javascript:lhr()\"> [*advanced request] <\/a>"
+                  +"<a class=\"button\" href=\"javascript:lhr()\"> [*advanced request] <\/a>"
                 %end;
                 +"<\/span>";
       x2.insertAdjacentHTML("AfterEnd",x5);
-      document.getElementById('nx_input').setAttribute("value",x4,"false");
+      var x6 = document.getElementById('nx_input');
+      x6.setAttribute("value",x4,"false");
+      x6.focus();
       return false;
     }
    }
@@ -77,19 +79,17 @@
   <p>[*help modify data]</p>
   <p>
      %foreach;entry;
-          <a href="#%entry_ini;">%html_encode.entry_ini;</a>
-      %end;
+       <a href="#%entry_ini;">%html_encode.entry_ini;</a>
+     %end;
   </p>
   <form id="updata" method="post" action="%action;" onsubmit="return submitupd()">
     <dl>
       %foreach;entry;
         <dt><a id="%entry_ini;">%html_encode.entry_ini;</a></dt>
-        
-          %foreach;value;
-            <dd><a title="%keys;" href="javascript:void(0);"
-                   onfocus="javascript:upd(this)">%escape.entry_value;</a></dd>
-          %end;
-        
+        %foreach;value;
+          <dd><a title="%keys;" href="javascript:void(0);"
+                 onclick="javascript:upd(this)">%escape.entry_value;</a></dd>
+        %end;
       %end;
     </dl>
   </form>

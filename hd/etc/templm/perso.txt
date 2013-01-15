@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130101 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130114 templ=templm -->
   <title>%first_name; %surname;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -25,13 +25,21 @@
   <!--
     function adv(z1,z2)
     {
-     var x1 = "%prefix;m=H;v=advanced;focus=" + z2 + ";birth1_yyyy=%birth_date.year;;death2_yyyy=%death_date.year;;" + z2 + "=";
-     var x2 = z1.innerHTML;
+     var x1 = "%prefix;m=H;v=advanced;focus=" + z1 + ";birth1_yyyy=%birth_date.year;;death2_yyyy=%death_date.year;;" + z1 + "=";
+     var x2 = z2.innerHTML;
      parent.location.href = x1 + x2;
     }
   //-->
-  </script>
+  <!--
+    function link_ng(z1,z2)
+    {
+     var x1 = "%prefix;m=NG;t=" + z1 + ";n="
+     var x2 = z2.innerHTML;
+     parent.location.href = x1 + x2;
+    }
+  //-->
 
+  </script>
   %base_header;
   %include.perso_accesskey;
 </head>
@@ -69,18 +77,18 @@
   %end;
 
   %define;link_marriage(xx)
-    %let;him;[him/her]0 
+    %let;him;[him/her]0 %nn;
       %if;(marriage_date.year > 0 and xx.birth_date.year > 0)
-        %expr(marriage_date.year - xx.birth_date.year)
-      %else; ?%end; [years old]
+        %expr(marriage_date.year - xx.birth_date.year)%nn;
+      %else; ?%end; [years old]%nn;
     %in;
-    %let;her;[him/her]1 
+    %let;her;[him/her]1 %nn;
       %if;(marriage_date.year > 0 and xx.spouse.birth_date.year > 0)
-        %expr(marriage_date.year - xx.spouse.birth_date.year)
-      %else; ?%end; [years old]
+        %expr(marriage_date.year - xx.spouse.birth_date.year)%nn;
+      %else; ?%end; [years old]%nn;
     %in;
-    <abbr title="%him;, %her;
-          %if;(wizard and not cancel_links) ; [modify::family/families]0%end;">
+    <abbr title=" %him;%nl; %her;
+          %if;(wizard and not cancel_links)%nl; [modify::family/families]0%end;">
     %if;(wizard and not cancel_links)
       <a id="f%family.index;" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
       onclick="window.open(this.href); return false;">&amp;%marriage_date.year;</a>
@@ -93,12 +101,12 @@
   %end;
 
   %define;a_title(xx)
-    [father/mother]0 
+     [father/mother]0 %nn;
     %if;(xx.father_age_at_birth != "")%xx.father_age_at_birth;%else;? [years old]%end;
-    , [father/mother]1 
+    %nl; [father/mother]1 %nn;
     %if;(xx.mother_age_at_birth != "")%xx.mother_age_at_birth;%else;? [years old]%end;
-    %if;(xx.computable_death_age) ; %death_symbol%xx.death_age;%end;
-    %if;(xx.computable_age) ; %birth_symbol;%xx.age;%end;
+    %if;(xx.computable_death_age)%nl; %death_symbol%xx.death_age;%end;
+    %if;(xx.computable_age)%nl; %birth_symbol;%xx.age;%end;
   %end;
 
   %define;link_name(xx)
@@ -143,8 +151,8 @@
     %apply;somebody1%with;
       child%and;
       %l_child;%and;
-      %if;(curlev = 0)id="chi_%family_cnt;_%child_cnt;"
-        onkeypress="javascript:return acc_key(event,'sib_1','spo_%family_cnt;','%next_chi;','child_%child.index;','','','');"
+      %if;(curlev = 0)id="chi_%family_cnt;_%child_cnt;"%if;(child.has_sosa) name="sosa" %end;
+        onkeypress="javascript:return acc_key(this,event,'sib_1','spo_%family_cnt;','%next_chi;','child_%child.index;','0','0','0');"
       %end;
     %end;
     %if;(has_families)
@@ -216,7 +224,7 @@
 
   %define;advanced(z1,z2)
     %if;(not cancel_links and bvar.hide_advanced_request != "yes")
-      <a class="date" href="javascript:void()" onclick="javascript:adv(this,'z1')" title="[advanced request]">z2</a>%nn;
+      <a class="date" href="javascript:void()" onclick="javascript:adv('z1',this)" title="[advanced request]">z2</a>%nn;
     %else;
       z2%nn;
     %end;
@@ -321,7 +329,7 @@
         yy%and;
         yy%and;
         id="spo_%family_cnt;"
-        onkeypress="javascript:return acc_key(event,'sib_1','%next_spo;','chi_%family_cnt;_1','spouse_%spouse.index;','','','f%family.index;');"
+        onkeypress="javascript:return acc_key(this,event,'sib_1','%next_spo;','chi_%family_cnt;_1','spouse_%spouse.index;','0','0','f%family.index;');"
       %end;
     %end;
     <br style="clear: both;"%/>
@@ -352,7 +360,7 @@
           parent%and;
           parent%and;
           id="par_%l_sosa;"
-          onkeypress="javascript:return acc_key(event,'sib_1','spo_1','chi_1_1','parent_%parent.index;','add_par_%l_sosa;','par_%l_sosa;','par_%l_sosa;');"
+          onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','parent_%parent.index;','add_par_%l_sosa;','par_%l_sosa;','par_%l_sosa;');"
         %end;
         %apply;link_dates("parent")
         <br%/>
@@ -380,7 +388,7 @@
               child%and;
               %l_child;%and;
               id="sib_%child_cnt;"
-              onkeypress="javascript:return acc_key(event,'%next_sib;','spo_1','chi_1_1','child_%child.index;','','','');"
+              onkeypress="javascript:return acc_key(this,event,'%next_sib;','spo_1','chi_1_1','child_%child.index;','0','0','0');"
             %end;
             %if;is_self;</em>%end;
             %apply;link_dates("child")
@@ -405,21 +413,19 @@
           %incr_count;
           i%count;=%relation_him.index;;%nn;
           t%count;=*;%nn;
-        %end;
-        %incr_count;
-        %if;(browsing_with_sosa_ref)
-          i%count;=%sosa_ref.index;;%nn;
           %incr_count;
           i%count;=%index;;%nn;
           t%count;=0;%nn;
+        %end;
+        %if;(browsing_with_sosa_ref)
           %incr_count;
           i%count;=%sosa_ref.index;;%nn;
           t%count;=sosa_1;%nn;
-        %else;
-          i%count;=%index;;%nn;
-          t%count;=0;%nn;
         %end;
         %if;has_relation_her;
+          %incr_count;
+          i%count;=%index;;%nn;
+          t%count;=0;%nn;
           %incr_count;
           i%count;=%relation_her.index;;%nn;
           t%count;=*;%nn;
@@ -434,6 +440,9 @@
     %else;
       %reset_count;
       <a href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
+      %incr_count;
+      i%count;=%index;;%nn;
+      t%count;=0;%nn;
       %incr_count;
       i%count;=%related.index;;%nn;
       t%count;=%related_type;;%nn;
@@ -498,10 +507,10 @@
     [*navigation with %t as Sosa reference:::xx]
   %end;
 
-  %define;link_list(xx,yy)
-    %if;cancel_links;yy%nn;
+  %define;link_ng(z1,z2)
+    %if;cancel_links;z2%nn;
     %else;
-      <a href="%prefix;m=NG;t=xx;n=yy" title="[search/case sensitive]0">yy</a>%nn;
+      <a href="javascript:void()" onclick="javascript:link_ng('z1',this)" title="[search/case sensitive]0">z2</a>%nn;
     %end;
   %end;
 
@@ -561,8 +570,8 @@
       <span><a href="%prefix;m=R;%access;">[*relationship computing]</a>
         <span class="s_menu">
           %if;(sosa_ref.index != "" and sosa_ref.index != index)
-            <a href="%prefix;em=R;ei=%sosa_ref.index;;i=%index;;et=M;spouse=on" title="%self; …[relationship]… %sosa_ref;">[*relationship] … [Sosa] 1</a>
-            <a href="%prefix;em=R;ei=%index;;m=NG;n=1;t=PN;spouse=on;image=on;bd=;color=;et=S" title="%self; …[shortest path]… %sosa_ref;">[*shortest path]</a>
+            <a href="%prefix;em=R;ei=%sosa_ref.index;;i=%index;;et=M;spouse=on" title="…[relationship]… %sosa_ref;">[*relationship] … [Sosa] 1</a>
+            <a href="%prefix;em=R;ei=%index;;m=NG;n=1;t=PN;spouse=on;image=on;bd=;color=;et=S" title="…[shortest path]… %sosa_ref;">[*shortest path]</a>
           %end;
           %if;(father.has_siblings or mother.has_siblings)
             <a href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
@@ -578,8 +587,8 @@
       %let;symbol;%if;(evar.wide != "on")&divide;%else;&middot;|&middot;%end;%in;
       <form id="ak" method="get" action="" style="display:inline;">
         <p style="display:inline;"><input id="acckey" style="width:15px;"
-         name="acckey" accesskey="W" title="[navigation] OnKeyPress (W)" value="W"
-         onkeypress="javascript:return acc_key(event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"
+         name="acckey" accesskey="W" title="[navigation] OnKeyPress (W)" value="W" size="1" maxlength="1"
+         onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"
          %/></p>
       </form>
       <a href="%prefix;%access;;%wide;maxlev=%evar.maxlev;;image=%evar.image;;spouse=%evar.spouse;"
@@ -608,17 +617,17 @@
   <div class = "person">
     <h1 class="background_sex_%sex;%if;(has_sosa) h1_border_sosa%end;">
       %if;(has_public_name or has_qualifiers)
-        %apply;link_list("PN",self)
+        %apply;link_ng("PN",self)
       %else;
-        %apply;link_list("P",first_name)%sp;%nn;
-        %apply;link_list("N",surname)
+        %apply;link_ng("P",first_name)%sp;%nn;
+        %apply;link_ng("N",surname)
       %end;
       <small>%apply;link_dates("self")</small>
     </h1>
     %if;has_image;
     <div>
      <a onclick="window.open(this.href); return false;" href="%image_html_url;">
-       <img %image_size; style="border: 0; clear: both;" src="%image_url;" alt="[image/images]0"%/>
+       <img class="person_img" src="%image_url;" alt="[image/images]0"%/>
      </a>
     </div>
     %end;
@@ -640,7 +649,7 @@
       %end;
       %if;(has_linked_pages and has_linked_page.HEAD)%linked_page.HEAD;<br%/>%end;
       %if;(has_nobility_titles and has_public_name)
-        <br%/>%apply;link_list("PN",public_name)
+        <br%/>%apply;link_ng("PN",public_name)
       %end;
       %if;has_qualifiers;
         %apply;lazy_print("")
@@ -656,7 +665,7 @@
           %if;not is_first;
              %if;(lazy_printed)/%end;
              %lazy_force;
-             %apply;link_list("PN",qualifier)%nn;
+             %apply;link_ng("PN",qualifier)%nn;
           %end;
         %end;
       %end;
@@ -667,15 +676,15 @@
         %foreach;alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;link_list("PN",alias)%nn;
+          %apply;link_ng("PN",alias)%nn;
         %end;
         </strong></em>
       %end;
       %if;(has_public_name or has_qualifiers)
         <br%/>
         <em>
-        (%apply;link_list("P",first_name)%sp;
-        %apply;link_list("N",surname))
+        (%apply;link_ng("P",first_name)%sp;
+        %apply;link_ng("N",surname))
         </em>
       %end;
       %if;has_first_names_aliases;
@@ -984,8 +993,8 @@
       <span><a id="rela_comp" href="%prefix;m=R;%access;" title="[relationship computing] (R)" accesskey="R" >[*relationship computing] (R)</a>
         <span class="s_menu">
           %if;(sosa_ref.index != "" and sosa_ref.index != index)
-            <a href="%prefix;em=R;ei=%sosa_ref.index;;i=%index;;et=M;spouse=on" title="%self; …[relationship]… %sosa_ref;">[*relationship] … [Sosa] 1</a>
-            <a href="%prefix;em=R;ei=%index;;m=NG;n=1;t=PN;spouse=on;image=on;bd=;color=;et=S" title="%self; …[shortest path]… %sosa_ref;">
+            <a href="%prefix;em=R;ei=%sosa_ref.index;;i=%index;;et=M;spouse=on" title="…[relationship]… %sosa_ref;">[*relationship] … [Sosa] 1</a>
+            <a href="%prefix;em=R;ei=%index;;m=NG;n=1;t=PN;spouse=on;image=on;bd=;color=;et=S" title="…[shortest path]… %sosa_ref;">
             [*shortest path]</a>
           %end;
           %if;(father.has_siblings or mother.has_siblings)

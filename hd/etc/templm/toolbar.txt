@@ -1,5 +1,5 @@
 <!-- $Id: toolbar.txt,v x.x 2011-08-31 16:17:36 flh Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 20121015 templ=templm -->
+<!-- Modified mickroue(a)yahoo.fr 20130107 templ=templm -->
 <!-- How to : Copy this file to bases/etc/ -->
 
 <script type="text/javascript">
@@ -59,7 +59,7 @@ function insertTags (tagOpen, tagClose, sampleText) {
 <div style="text-align:%left;">
 %if;(evar.file != "")
   <dl>
-    <dd>[*link] : <a onclick="return insertTags('\n%evar.text;','','')" href="javascript:;">%evar.text;</a></dd>
+    <dd>[*link] : <a class="button" onclick="return insertTags('\n%evar.text;','','')" href="javascript:;">%evar.text;</a></dd>
     <dd><label><input onclick="javascript: this.select();" type="text" name="evar_file" size="80"
                value="%evar.file;"%/></label></dd>
     <dd><em>([*image/images]0 : ../src/%evar.base;/images/%evar.file;.%bvar.var_img_ext;)</em></dd>
