@@ -164,34 +164,10 @@
       </label>
       <div id="rel_search_content">
         <span>[*search/case sensitive]0 :<br%/></span>
-        <input name="n" size="40" maxlength="200"%/>
-        <ul>
-          <li>
-            <label>
-              <input type="radio" name="t" value="PN" checked="checked"%/>
-              <em>[first name/first names]0 [surname/surnames]0</em>
-              [or] <em>[public name]</em>
-              [or] <em>[alias]</em>
-              %if;browsing_with_sosa_ref;[or]
-                %apply;relative_sosa%with
-                  <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
-                %end;
-              %end;
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="radio" name="t" value="P"%/>
-              <em>[first name/first names]0</em>
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="radio" name="t" value="N"%/>
-              <em>[surname/surnames]0</em>
-            </label>
-          </li>
-        </ul>
+        <input type="text" name="fn" placeholder="[*first name/first names]0" size="25" maxlength="200"%/>
+        <input type="text" name="sn" placeholder="[*surname/surnames]0" size="25" maxlength="200"%/>
+        <br%/>
+        <input type="text" name="v" placeholder="[*public name], [*alias] %if;browsing_with_sosa_ref;, [n° Sosa] %end; ..." size="53" maxlength="200"%/>
       </div>
     </div>
 

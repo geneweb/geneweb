@@ -151,34 +151,14 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
         <div>
           %hidden;
           <input type="hidden" name="m" value="NG"%/>
-          <label><span class="highlight">[person/persons]0</span>
-          <input name="n" size="40" maxlength="200"%/></label>
+          <span class="highlight">[person/persons]0</span>
+          <br%/>
+          <input type="text" name="fn" placeholder="[*first name/first names]0" size="25" maxlength="200"%/>
+          <input type="text" name="sn" placeholder="[*surname/surnames]0" size="25" maxlength="200"%/>
+          <br%/>
+          <input type="text" name="v" placeholder="[*public name], [*alias] %if;browsing_with_sosa_ref;, [n° Sosa]%end; ..." size="53" maxlength="200"%/>
           <input type="submit" value="Ok"%/>
         </div>
-        <ul style="text-align: %left;; list-style: none">
-          <li>
-            <label><input type="radio" name="t" value="PN"
-             checked="checked" id="tPN"%/>
-            <em>[first name/first names]0</em>
-            <em>[surname/surnames]0</em> [or]
-            <em>[public name]</em> [or]
-            <em>[alias]</em>%sq;
-            %if;browsing_with_sosa_ref; [or]
-              %apply;sosa_rel%with;<br%/>%sosa_ref;%end;
-            %end;%nl;
-            </label>
-          </li>
-          <li>
-            <label><input type="radio" name="t" value="P"
-             id="tP"%/>
-            <em>[first name/first names]0</em></label>
-          </li>
-          <li>
-            <label><input type="radio" name="t" value="N"
-             id="tN"%/>
-            <em>[surname/surnames]0</em></label>
-          </li>
-       </ul>
       </form>
       %if;(bvar.propose_titles != "no")%nl;
         <form id="form-titles" method="get" action="%action;">
@@ -383,7 +363,7 @@ sl: <span class="highlight" style="margin-left:10px">s pomočjo
 sv: <span class="highlight" style="margin-left:10px">genom
        <a href="%prefix;m=H;v=advanced" class="highlight">avancerad
        sökning</a></span>.
-])
+])<br%/><br%/>
       %end;
     </div> %( end div search %)
 

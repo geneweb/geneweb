@@ -22,10 +22,23 @@ value person_is_std_key conf base p k =
 ;
 
 value select_std_eq conf base pl k =
-  List.fold_right
-    (fun p pl ->
-       if person_is_std_key conf base p k then [p :: pl] else pl)
-    pl []
+  (* Peut être qu'on a presque la clé. *)
+  let al = 
+    let k = Name.strip_lower k in
+    List.fold_right
+      (fun p pl ->
+        if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p)
+        then [p :: pl] 
+        else pl)
+      pl []
+  in
+  if al <> [] then al
+  else
+    List.fold_right
+      (fun p pl ->
+        let _ = print_endline (Gutil.designation base p) in
+         if person_is_std_key conf base p k then [p :: pl] else pl)
+      pl []
 ;
 
 value very_unknown conf =
@@ -520,40 +533,47 @@ value family_m conf base =
       [ Some v -> Some.surname_print conf base Some.surname_not_found v
       | _ -> Alln.print_surnames conf base ]
   | Some "NG" ->
-      match (p_getenv conf.env "n", p_getenv conf.env "select") with
-      [ (Some n, Some "input" | None) ->
-          match p_getenv conf.env "t" with
-          [ Some "P" ->
-              do {
-                conf.cancel_links := False; Some.first_name_print conf base n
-              }
-          | Some "N" ->
-              do {
-                conf.cancel_links := False;
-                Some.surname_print conf base Some.surname_not_found n
-              }
-          | _ ->
-              if n = "" then unknown conf n
-              else
-                let (pl, sosa_acc) = find_all conf base n in
-                match pl with
-                [ [] ->
-                    do {
-                      conf.cancel_links := False;
-                      Some.surname_print conf base unknown n
-                    }
-                | [p] ->
-                    if sosa_acc ||
-                       Gutil.person_of_string_key base n <> None ||
-                       person_is_std_key conf base p n
-                    then
-                      person_selected conf base p
-                    else specify conf base n pl
-                | pl -> specify conf base n pl ] ]
-      | (_, Some i) ->
+      match p_getenv conf.env "select" with
+      [ Some "input" | None ->
+          (* Récupère le contenu le contenu non vide de la recherche. *)
+          let real_input label =
+            match p_getenv conf.env label with
+            [ Some s -> if s = "" then None else Some s
+            | None -> None ]
+          in
+          (* Recherche par clé, sosa, alias ... *)
+          let search n =
+            let (pl, sosa_acc) = find_all conf base n in
+            match pl with
+            [ [] -> unknown conf n
+            | [p] ->
+                if sosa_acc ||
+                   Gutil.person_of_string_key base n <> None ||
+                   person_is_std_key conf base p n
+                then
+                  person_selected conf base p
+                else specify conf base n pl
+            | pl -> specify conf base n pl ]
+          in
+          match real_input "v" with
+          [ Some n -> search n
+          | None ->
+              match (real_input "fn", real_input "sn") with
+              [ (Some fn, Some sn) -> search (fn ^ " " ^ sn)
+              | (Some fn, None) ->
+                  do { 
+                    conf.cancel_links := False; 
+                    Some.first_name_print conf base fn
+                  }
+              | (None, Some sn) ->
+                  do { 
+                    conf.cancel_links := False; 
+                    Some.surname_print conf base unknown sn
+                  }
+              | (None, None) -> incorrect_request conf ] ]
+      | Some i ->
           relation_print conf base
-            (pget conf base (Adef.iper_of_int (int_of_string i)))
-      | _ -> () ]
+            (pget conf base (Adef.iper_of_int (int_of_string i))) ]
   | Some "NOTES" -> Notes.print conf base
   | Some "OA" when conf.wizard || conf.friend ->
       BirthDeath.print_oldest_alive conf base
