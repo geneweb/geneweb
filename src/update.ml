@@ -449,6 +449,18 @@ value print_warning conf base =
   | UndefinedSex p ->
       Wserver.wprint (fcapitale (ftransl conf "undefined sex for %t"))
         (fun _ -> print_someone_strong conf base p)
+  | WitnessDateAfterDeath p ->
+      Wserver.wprint
+        (fcapitale (ftransl conf "%t was witness after his/her death")) 
+        (fun _ ->
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
+  | WitnessDateBeforeBirth p ->
+      Wserver.wprint
+        (fcapitale (ftransl conf "%t was witness before his/her birth"))
+        (fun _ ->
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
   | YoungForMarriage p a ->
      do {
         Wserver.wprint "%s\n" (print_someone_strong conf base p);

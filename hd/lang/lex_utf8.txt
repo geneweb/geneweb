@@ -529,6 +529,14 @@ sk: pohlavie %t sa nezhodnuje s jeho/jej vzťahmi
 sl: spol %t ni usklajen z zvezami
 sv: %ts kön stämmer inte överens med sina relationer
 
+    %t was witness after his/her death
+en: %t was witness after his/her death
+fr: %t était témoin après sa mort
+
+    %t was witness before his/her birth
+en: %t was witness before his/her birth
+fr: %t était témoin avant sa naissance
+
     (date)
 af: 1 %m %y/%d %m %y/%m %y/%y
 ar: 1 %m %y/%d %m %y/%m %y/%y

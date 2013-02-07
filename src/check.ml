@@ -116,6 +116,14 @@ value print_base_warning oc base =
     }
   | UndefinedSex _ ->
       ()
+  | WitnessDateAfterDeath p -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "was witness after his/her death\n"
+    }
+  | WitnessDateBeforeBirth p -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "was witness before his/her birth\n"
+    }
   | YoungForMarriage p a ->
       fprintf oc "%s married at age %d\n" (designation base p) a.year ]
 ;      

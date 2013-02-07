@@ -388,7 +388,7 @@ value check_difference_age_between_cpl base warning ifath imoth =
 
 value year_of d = d.year;
 
-value check_normal_marriage_date_for_someone base error warning fam ip =
+value check_normal_marriage_date_for_someone base error warning witn fam ip =
   let p = poi base ip in
   match Adef.od_of_codate (get_marriage fam) with
   [ Some (Dgreg g2 _ as d2) ->
@@ -396,7 +396,8 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
         match Adef.od_of_codate (get_birth p) with
         [ Some (Dgreg g1 _ as d1) ->
             if strictly_before d2 d1 then
-              warning (MarriageDateBeforeBirth p)
+              if witn then warning (WitnessDateBeforeBirth p) 
+              else warning (MarriageDateBeforeBirth p)
             else if year_of g2 > lim_date_marriage && 
                     year_of (time_elapsed g1 g2) < min_age_marriage 
             then
@@ -406,7 +407,9 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
         match get_death p with
         [ Death _ d3 ->
             let d3 = Adef.date_of_cdate d3 in
-            if strictly_after d2 d3 then warning (MarriageDateAfterDeath p)
+            if strictly_after d2 d3 then 
+              if witn then warning (WitnessDateAfterDeath p) 
+              else warning (MarriageDateAfterDeath p)
             else ()
         | _ -> () ];
       }
@@ -432,7 +435,8 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
 value check_normal_marriage_date_for_witness base error warning (ifam, fam) =
   let wl = foi base ifam in
   List.iter
-    (fun ip -> check_normal_marriage_date_for_someone base error warning fam ip)
+    (fun ip -> 
+        check_normal_marriage_date_for_someone base error warning True fam ip)
     (Array.to_list (get_witnesses wl))
 ;
 
@@ -455,9 +459,9 @@ value check_normal_marriage_date_for_witness base error warning (ifam, fam) =
 value check_normal_marriage_date_for_parent base error warning (ifam, fam) = 
   do {
     let cpl = foi base ifam in
-    check_normal_marriage_date_for_someone base error warning fam
+    check_normal_marriage_date_for_someone base error warning False fam
       (get_father cpl);
-    check_normal_marriage_date_for_someone base error warning fam
+    check_normal_marriage_date_for_someone base error warning False fam
       (get_mother cpl);
     check_difference_age_between_cpl base warning 
       (get_father cpl) (get_mother cpl)
