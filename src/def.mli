@@ -164,6 +164,8 @@ type warning 'person 'descend 'title =
   | ParentTooYoung of 'person and dmy
   | TitleDatesError of 'person and 'title
   | UndefinedSex of 'person
+  | WitnessDateAfterDeath of 'person
+  | WitnessDateBeforeBirth of 'person
   | YoungForMarriage of 'person and dmy ]
 ;
 
