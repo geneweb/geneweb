@@ -15,12 +15,43 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <script type="text/javascript" src="jquery_1_9_1_min.js"></script>
   %include.favicon;
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
+
+<script type="text/javascript"><!--
+
+function long_display_options () {
+  /* On décoche toutes les options. */
+  $('input[type=checkbox]').prop('checked', false);
+
+  /* On ne coche que celle qu'on veut. */
+  $('input[type=checkbox][id=ld_notes]').prop('checked', true);
+  $('input[type=checkbox][id=ld_src]').prop('checked', true);
+}
+
+function table_options () {
+  /* On décoche toutes les options. */
+  $('input[type=checkbox]').prop('checked', false);
+
+  /* On ne coche que celle qu'on veut. */
+  $('input[type=checkbox][id=t_birth]').prop('checked', true);
+  $('input[type=checkbox][id=t_marr]').prop('checked', true);
+  $('input[type=checkbox][id=t_marr_date]').prop('checked', true);
+  $('input[type=checkbox][id=t_death]').prop('checked', true);
+  $('input[type=checkbox][id=t_gen]').prop('checked', true);
+}
+
+function no_options () {
+  /* On décoche toutes les options. */
+  $('input[type=checkbox]').prop('checked', false);
+}
+
+--></script>
 
 <h1>%nn;
   %apply;a_of_b_gr_eq_lev%with;
@@ -70,7 +101,7 @@
   <div style="text-align:center;"><div style="display:inline-block; text-align:left; padding-bottom: 25px;">
     <div class="descends_menu_list">
       <label>
-        <input type="radio" name="t" value="L" checked="checked"%/>
+        <input type="radio" name="t" value="L" checked="checked" onclick="long_display_options ()"%/>
         [*list/list (ancestors)]0
       </label>
       %if;(bvar.max_desc_level = "" and max_desc_level > 12)
@@ -80,12 +111,12 @@
       %end;
       <br%/>
       <label>
-        <input type="radio" name="t" value="M"%/>
+        <input type="radio" name="t" value="M" onclick="long_display_options ()"%/>
         [*male line/female line]0
       </label>
       <br%/>
       <label>
-        <input type="radio" name="t" value="F"%/>
+        <input type="radio" name="t" value="F" onclick="long_display_options ()"%/>
         [*male line/female line]1
       </label>
       <div class="descends_menu_option_div">
@@ -107,11 +138,11 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="notes" value="on" checked="checked"%/>
+            <input type="checkbox" id="ld_notes" name="notes" value="on" checked="checked"%/>
             [*note/notes]1
           </label>
           <label>
-            <input type="checkbox" name="src" value="on" checked="checked"%/>
+            <input type="checkbox" id="ld_src" name="src" value="on" checked="checked"%/>
             [*source/sources]1
           </label>
           <label>
@@ -128,7 +159,7 @@
       </div>
 
       <label>
-        <input type="radio" name="t" value="H"%/>
+        <input type="radio" name="t" value="H" onclick="table_options ()"%/>
         [*table]
       </label>
       %if;(bvar.max_desc_level = "" and max_desc_level > 12)
@@ -139,7 +170,7 @@
       <div class="descends_menu_option_div">
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="birth" value="on" checked="checked"%/>
+            <input type="checkbox" id="t_birth" name="birth" value="on"%/>
             [*date of birth]
           </label>
           <label>
@@ -149,11 +180,11 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="marr" value="on" checked="checked"%/>
+            <input type="checkbox" id="t_marr" name="marr" value="on"%/>
             [*spouse/spouses]1
           </label>
           <label>
-            <input type="checkbox" name="marr_date" value="on" checked="checked"%/>
+            <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>
             [*date of marriage]
           </label>
           <label>
@@ -167,7 +198,7 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="death" value="on" checked="checked"%/>
+            <input type="checkbox" id="t_death" name="death" value="on"%/>
             [*date of death]
           </label>
           <label>
@@ -187,7 +218,7 @@
         </p>
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="gen" value="on" checked="checked"%/>
+            <input type="checkbox" id="t_gen" name="gen" value="on"%/>
             [*display generation]
           </label>
         </p>
@@ -196,7 +227,7 @@
 
     <div class="descends_menu_tree">
       <label>
-        <input type="radio" name="t" value="T"%/>
+        <input type="radio" name="t" value="T" onclick="no_options ()"%/>
         [*tree]
         %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
           ([maximum] 4 [generation/generations]1)
@@ -246,27 +277,27 @@
 
     <div class="descends_menu_other">
       <label>
-        <input type="radio" name="t" value="S"%/>
+        <input type="radio" name="t" value="S" onclick="no_options ()"%/>
         [*descendants at the generation]
       </label>
       <br%/>
       <label>
-        <input type="radio" name="t" value="N"%/>
+        <input type="radio" name="t" value="N" onclick="no_options ()"%/>
         [*families with encoding]
       </label>
       <br%/>
       <label>
-        <input type="radio" name="t" value="G"%/>
+        <input type="radio" name="t" value="G" onclick="no_options ()"%/>
         [*index of the descendants]
       </label>
       <br%/>
       <label>
-        <input type="radio" name="t" value="C"%/>
+        <input type="radio" name="t" value="C" onclick="no_options ()"%/>
         [*index of the spouses (non descendants)]
       </label>
       <br%/>
       <label>
-        <input type="radio" name="t" value="A"%/>
+        <input type="radio" name="t" value="A" onclick="no_options ()"%/>
         d'Aboville
       </label>
       %if;(bvar.max_desc_level = "" and max_desc_level > 12)
