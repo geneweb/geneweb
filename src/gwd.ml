@@ -1556,6 +1556,75 @@ value image_request cgi script_name env =
       else False ]
 ;
 
+
+(* Une version un peu à cheval entre avant et maintenant afin de   *)
+(* pouvoir inclure une css, un fichier javascript (etc) facilement *)
+(* et que le cache du navigateur puisse prendre le relais.         *)
+type misc_fname =
+  [ Css of string
+  | Js of string 
+  | Other of string ]
+;
+
+value content_misc cgi len misc_fname = do {
+  if not cgi then Wserver.http "" else ();
+  let (fname, t) = 
+    match misc_fname with
+    [ Css fname -> (fname, "text/css")
+    | Js fname -> (fname, "text/javascript")
+    | Other fname -> (fname, "text/plain") ]
+  in
+  Wserver.wprint "Content-type: %s" t;
+  Util.nl ();
+  Wserver.wprint "Content-length: %d" len;
+  Util.nl ();
+  Wserver.wprint "Content-disposition: inline; filename=%s"
+    (Filename.basename fname);
+  Util.nl ();
+  Util.nl ();
+  Wserver.wflush ();
+};
+
+value print_misc_file cgi misc_fname =
+  match misc_fname with
+  [ Css fname | Js fname ->
+      match 
+        try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+      with
+      [ Some ic ->
+          let buf = String.create 1024 in
+          let len = in_channel_length ic in
+          do {
+            content_misc cgi len misc_fname;
+            let rec loop len =
+              if len = 0 then ()
+              else do {
+                let olen = min (String.length buf) len in
+                really_input ic buf 0 olen;
+                Wserver.wprint "%s" (String.sub buf 0 olen);
+                loop (len - olen)
+              }
+            in
+            loop len;
+            close_in ic;
+            True
+          }
+      | None -> False ]
+  | Other _ -> False ]
+;
+
+value misc_request cgi fname =
+  let fname = Util.find_misc_file fname in
+  if fname <> "" then
+    let misc_fname =
+      if Filename.check_suffix fname ".css" then Css fname
+      else if Filename.check_suffix fname ".js" then Js fname
+      else Other fname
+    in
+    print_misc_file cgi misc_fname
+  else False
+;
+
 value strip_quotes s =
   let i0 = if String.length s > 0 && s.[0] = '"' then 1 else 0 in
   let i1 =
@@ -1659,6 +1728,7 @@ value connection cgi (addr, request) script_name contents =
         try
           let (contents, env) = build_env request contents in
           if image_request cgi script_name env then ()
+          else if misc_request cgi script_name then ()
           else
             conf_and_connection cgi from (addr, request) script_name contents
               env
