@@ -386,6 +386,11 @@
         <a href="%prefix;m=R;%access;"
          class="highlight" accesskey="R">[*relationship computing]</a>
       </li>
+      %if;(bvar.history_diff="yes" and has_history)
+        <li>
+          <a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;" class="highlight">[*history of updates]</a>
+        </li>
+      %end;
     </ul>
   %end;
 </div>

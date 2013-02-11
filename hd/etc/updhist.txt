@@ -80,28 +80,27 @@
 
 <table cellpadding="4px;" class="updhist_table">
   <tr class="updhist_table_header">
+    %if;(bvar.history_diff = "yes")<th>[hist/diff]0 | [hist/diff]1</th>%end
     <th>[*date/dates]0</th>
+    <th>[*person/persons]0</th>
     <th>[*wizard/wizards/friend/friends/exterior]0</th>
     <th>[*update]</th>
-    <th>[*person/persons]0</th>
   </tr>
   %let;kk;%if;(evar.k = "")3%else;%evar.k%end;%in;
   %let;wiz;%if;(evar.wiz != "" and evar.n = "")%evar.wiz;%end;%in;
   %foreach;history_line(kk, evar.pos, wiz)
     <tr>
+      %if;(bvar.history_diff = "yes")
+        <td>
+          %if;(first_name != "" and person.has_history)
+            (<a href="%prefix;m=HIST_DIFF;t=SUM;f=%person.history_file;">[hist/diff]0</a> | 
+             <a href="%prefix;m=HIST_DIFF;t=DIFF;f=%person.history_file;;new=0;old=1">[hist/diff]1</a>)
+          %else;
+            &nbsp;
+          %end;
+        </td>
+      %end;
       <td>%time;</td>
-      <td>
-        %if;(user != "")
-          <i>
-            %if;(wiz = "")
-              <a href="%prefix;m=HIST;k=%kk;;wiz=%user.v;">%user;</a>%nn;
-            %else;
-              %user;
-            %end;
-          </i>
-        %end;
-      </td>
-      <td>%apply;update_text(update.var)</td>
       <td>
         %if;(first_name != "")
           <!--%first_name;/%occ;/%surname;-->
@@ -122,6 +121,18 @@
           %key;
         %end;
       </td>
+      <td>
+        %if;(user != "")
+          <i>
+            %if;(wiz = "")
+              <a href="%prefix;m=HIST;k=%kk;;wiz=%user.v;">%user;</a>%nn;
+            %else;
+              %user;
+            %end;
+          </i>
+        %end;
+      </td>
+      <td>%apply;update_text(update.var)</td>
     </tr>
   %end;
 </table>

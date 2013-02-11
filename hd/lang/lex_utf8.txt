@@ -2304,6 +2304,12 @@ ru: крещение
 sl: krst
 sv: dop
 
+    baptism place
+fr: lieu de baptême
+
+    baptism src
+fr: source baptême
+
     base index notes
 af: notas
 ar: بطاقات
@@ -2566,6 +2572,12 @@ sk: narodenie
 sl: rojstva
 sv: födelse
 
+    birth place
+fr: lieu de naissance
+
+    birth src
+fr: source naissance
+
     birthdays
 af: verjaarsdae
 bg: рождени дни
@@ -2738,6 +2750,12 @@ ru: похороны
 sk: pohreb
 sl: pogreb
 sv: begravning
+
+    burial place
+fr: lieu d'inhumation
+
+    burial src
+fr: source inhumation
 
     buried
 af: begrawe
@@ -3211,6 +3229,12 @@ sk: komentár
 sl: komentar
 sv: kommentar
 
+    compare
+fr: comparer
+
+    compare selected revisions
+fr: comparer les révisions sélectionnées
+
     compute all marriages
 de: Alle Lebenspartner einbeziehen
 en: include spouses
@@ -3627,6 +3651,12 @@ sk: úmrtie
 sl: smrti
 sv: död
 
+    death place
+fr: lieu de décès
+
+    death src
+fr: source décès
+
     death date and death place
 de: Datum und Ort des Todes
 en: Date & Place of death
@@ -3758,6 +3788,9 @@ ru: умер в детстве
 sk: zomrel mladý/zomrela mladá
 sl: umrl mlad/umrla mlada/umrl(a) mlad(a)
 sv: dog ung
+
+    difference between the two revisions
+fr: différence entre les deux révisions
 
     direct ancestor of %s
 de: direkter Vorfahre von %s
@@ -4341,6 +4374,9 @@ ru: cемья удалена
 sk: rodina zmazaná
 sl: družina izbrisana
 sv: familj borttagen
+
+    family source
+fr: source famille
 
     family/families
 af: familie/families
@@ -5111,6 +5147,9 @@ sk: on/ona
 sl: on/ona
 sv: honom/henne
 
+    hist/diff
+fr: hist/diff
+
     history of updates
 af: bywerkingsgeskiedenis
 bg: история на измененията
@@ -5223,6 +5262,9 @@ ru: идентификатор/email/тема
 sk: ident/email/predmet
 sl: ime/e-pošta/vsebina
 sv: ident/email/ämne
+
+    iftitles/public/private
+fr: si titres/public/privé
 
     if titles
 af: as titels
@@ -6200,6 +6242,9 @@ sk: hlavný titul
 sl: glavni naziv
 sv: huvudtitel
 
+    male/female/neuter
+fr: homme/femme/non spécifié
+
     male line/female line
 af: manlike lyn/vroulike lyn
 bg: мъжка линия/женска линия
@@ -6285,6 +6330,15 @@ sk: manželstvo bolo uzavreté pred narodením %t
 sl: sklenjena zakonska zveza pred rojstvom %t
 sv: äktenskapet ägde rum före %t födseln
 zh: 結婚前%t出生的地方
+
+    marriage date
+fr: date de mariage
+
+    marriage place
+fr: lieu de mariage
+
+    marriage src
+fr: source mariage
 
     marriage/marriages
 af: huwelik/huwelike
@@ -8300,6 +8354,9 @@ sk: osoba zmenená
 sl: oseba spremenjena
 sv: person ändrad
 
+    person source
+fr: source individu
+
     person/persons
 af: persoon/persone
 bg: данни за лицето/сведения за лица
@@ -8942,6 +8999,12 @@ sk: vzťah %t s
 sl: zveza z %t
 sv: förhållande%t med
 
+    revision history
+fr: historique des révisions
+
+    revision of
+fr: révision du
+
     same ancestor as n° Sosa
 de: identisch mit der Sosa/Pkz-Nr.
 en: same as Sosa #
@@ -9132,6 +9195,9 @@ it: clicca sulla persona per la quale vuoi fare un calcolo di parentela
 nl: op de persoon klikken van waaruit u een verwantschapsberekening wenst
 no: klikk på personen som du vil beregne slektskapsgraden til
 sv: klicka på personen som du vill räkna ut släktskapsgraden med
+
+    select the two revisions you want to compare
+fr: selectionnez les deux révisions que vous voulez comparer
 
     send
 af: stuur

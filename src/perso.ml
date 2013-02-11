@@ -2489,6 +2489,12 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
   | "has_families" -> Array.length (get_family p) > 0
   | "has_first_names_aliases" -> get_first_names_aliases p <> []
+  | "has_history" ->
+      let fn = sou base (get_first_name p) in
+      let sn = sou base (get_surname p) in
+      let occ = get_occ p in
+      let person_file = History_diff.history_file fn sn occ in
+      p_auth && (Sys.file_exists (History_diff.history_path conf person_file))
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
@@ -2640,6 +2646,13 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
   | "first_name_key_strip" ->
       if (is_hide_names conf p) && not p_auth then ""
       else Name.strip_c (p_first_name base p) '"'
+  | "history_file" -> 
+      if not p_auth then "" 
+      else 
+        let fn = sou base (get_first_name p) in
+        let sn = sou base (get_surname p) in
+        let occ = get_occ p in
+        History_diff.history_file fn sn occ
   | "image" -> if not p_auth then "" else sou base (get_image p)
   | "image_html_url" -> string_of_image_url conf base env ep True
   | "image_size" -> string_of_image_size conf base env ep
