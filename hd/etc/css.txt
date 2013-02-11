@@ -44,6 +44,16 @@ img
   font-style:italic;
 }
 
+.odd
+{
+  background-color: #FBFBFB;
+}
+
+.even
+{
+  background-color: transparent;
+}
+
 /* Properties of the submit/OK/validate... button */
 input[type=submit]
 {
@@ -401,6 +411,25 @@ li.desc
   background-color: #6F8301;
   color: white;
 }
+
+.hist_summary
+{
+  margin-top:15px;
+  margin-bottom:15px;
+}
+
+.diff_highlight
+{
+  background-color:pink;
+}
+
+.hist_lbl
+{
+  white-space: nowrap;
+  background-color : #6F8301;
+  color: white;
+}
+
 
 /* --------------------------- Pyramide des âges -------------------------- */
 

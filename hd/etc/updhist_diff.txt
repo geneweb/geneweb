@@ -1,0 +1,310 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: upddata.txt,v 0.01 2012-10-29 11:42:30 flh Exp $ -->
+  <!-- Copyright (c) 2006-2007 INRIA -->
+  <title>[*revision history]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <script type="text/javascript" src="jquery_1_9_1_min.js"></script>
+  %include.css;
+  %base_header;
+</head>
+<body%body_prop;>
+
+
+
+<script type="text/javascript"><!--
+
+function update_new () {
+  var input_new = $('input[type=radio][name=new]:checked').val(),
+      input_old = $('input[type=radio][name=old]:checked').val();
+  if (input_new >= input_old){
+    var tmp = parseInt(input_new) + 1;
+    $('input[type=radio][name=old][value='+input_old+']').prop('checked', false);
+    $('input[type=radio][name=old][value='+tmp+']').prop('checked', true);
+  }
+}
+
+function update_old () {
+  var input_new = $('input[type=radio][name=new]:checked').val(),
+      input_old = $('input[type=radio][name=old]:checked').val();
+  if (input_old <= input_new){
+    var tmp = parseInt(input_old) - 1;
+    $('input[type=radio][name=new][value='+input_new+']').prop('checked', false);
+    $('input[type=radio][name=new][value='+tmp+']').prop('checked', true);
+  }
+}
+
+--></script>
+
+%if;not cancel_links;
+  <table style="float:%right;">
+    <tr><td>
+      %if;(referer != "")
+        <a href="%referer;">
+          <img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
+        </a>
+      %end;
+      <a href="%prefix;">
+        <img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="^^"%/>
+      </a>
+    </td></tr>
+  </table>
+%end;
+
+<h1>
+  %if;(evar.t = "SUM")
+    %person;, [revision history]
+  %else;
+    [*difference between the two revisions]
+  %end;
+</h1>
+
+%define;print_summary()
+  [*select the two revisions you want to compare].
+  <form method="GET" action="%action;">
+    <p>%hidden;</p>
+    <input type="hidden" name="m" value="HIST_DIFF"%/>
+    <input type="hidden" name="t" value="DIFF"%/>
+    <input type="hidden" name="f" value="%evar.f;"%/>
+    <table class="hist_summary">
+      <tr>
+        <th>[*compare]</th>
+        <th>[*date/dates]0</th>
+        <th>[*wizard/wizards/friend/friends/exterior]0</th>
+      </tr>
+      %foreach;history_line;
+        <tr>
+          <td>
+            <input type="radio" name="old" value="%line;" onclick="update_old()" %if;(line = 0) style="visibility: hidden" %elseif;(line = 1) checked="checked" %else;%end;%/>
+            <input type="radio" name="new" value="%line;" onclick="update_new()" %if;(line = 0) checked="checked" %elseif;(line = history_len - 1) style="visibility: hidden" %else;%end;%/>
+          </td>
+          <td>%date;</td>
+          <td>%wizard;</td>
+        </tr>
+      %end;
+    </table>
+    <input type="submit" value="[*compare selected revisions]"%/>
+  </form>
+%end;
+
+%define;empty()
+  <tr>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+  </tr>
+%end;
+
+%define;print_diff_person()
+  <tr>
+    <td class="hist_lbl">[*name]</td>
+    <td class="odd">%before.first_name; %before.surname;</td>
+    <td class="odd">%after.first_name; %after.surname;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*sex]</td>
+    <td class="odd">%before.sex;</td>
+    <td class="odd">%after.sex;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*public name]</td>
+    <td class="odd">%before.public_name;</td>
+    <td class="odd">%after.public_name;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*qualifier]</td>
+    <td class="odd">%before.qualifiers;</td>
+    <td class="odd">%after.qualifiers;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*alias]</td>
+    <td class="odd">%before.aliases;</td>
+    <td class="odd">%after.aliases;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*first name alias]</td>
+    <td class="odd">%before.first_names_aliases;</td>
+    <td class="odd">%after.first_names_aliases;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*surname alias]</td>
+    <td class="odd">%before.surnames_aliases;</td>
+    <td class="odd">%after.surnames_aliases;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*occupation/occupations]1</td>
+    <td class="odd">%before.occupation;</td>
+    <td class="odd">%after.occupation;</td>
+  </tr>
+  %apply;empty()
+  <tr>
+    <td class="hist_lbl">[*birth]</td>
+    <td class="odd">%before.birth;</td>
+    <td class="odd">%after.birth;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*birth place]</td>
+    <td class="odd">%before.birth_place;</td>
+    <td class="odd">%after.birth_place;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*birth src]</td>
+    <td class="odd">%before.birth_src;</td>
+    <td class="odd">%after.birth_src;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*baptism]</td>
+    <td class="odd">%before.baptism;</td>
+    <td class="odd">%after.baptism;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*baptism place]</td>
+    <td class="odd">%before.baptism_place;</td>
+    <td class="odd">%after.baptism_place;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*baptism src]</td>
+    <td class="odd">%before.baptism_src;</td>
+    <td class="odd">%after.baptism_src;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*death]</td>
+    <td class="odd">%before.death;</td>
+    <td class="odd">%after.death;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*death place]</td>
+    <td class="odd">%before.death_place;</td>
+    <td class="odd">%after.death_place;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*death src]</td>
+    <td class="odd">%before.death_src;</td>
+    <td class="odd">%after.death_src;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*burial]</td>
+    <td class="odd">%before.burial;</td>
+    <td class="odd">%after.burial;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*burial place]</td>
+    <td class="odd">%before.burial_place;</td>
+    <td class="odd">%after.burial_place;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*burial src]</td>
+    <td class="odd">%before.burial_src;</td>
+    <td class="odd">%after.burial_src;</td>
+  </tr>
+  %apply;empty()
+  <tr>
+    <td class="hist_lbl">[*relation/relations]1</td>
+    <td class="odd">%before.relations;</td>
+    <td class="odd">%after.relations;</td>
+  </tr>
+  %apply;empty()
+  <tr>
+    <td class="hist_lbl">[*title/titles]1</td>
+    <td class="odd">%before.titles;</td>
+    <td class="odd">%after.titles;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*person source]</td>
+    <td class="odd">%before.psources;</td>
+    <td class="odd">%after.psources;</td>
+  </tr>
+  <tr>
+    <td class="hist_lbl">[*note/notes]1</td>
+    <td class="odd">%before.notes;</td>
+    <td class="odd">%after.notes;</td>
+  </tr>
+%end;
+
+%define;print_diff_family()
+  %foreach;family;
+    <tr>
+      <td class="hist_lbl">[*marriage/marriages]0</td>
+      <td class="odd">%before.marriage_type;: %before.spouse;</td>
+      <td class="odd">%after.marriage_type;: %after.spouse;</td>
+    </tr>
+    <tr>
+      <td class="hist_lbl">[*marriage date]</td>
+      <td class="odd">%before.marriage;</td>
+      <td class="odd">%after.marriage;</td>
+    </tr>
+    <tr>
+      <td class="hist_lbl">[*marriage place]</td>
+      <td class="odd">%before.marriage_place;</td>
+      <td class="odd">%after.marriage_place;</td>
+    </tr>
+    <tr>
+      <td class="hist_lbl">[*marriage src]</td>
+      <td class="odd">%before.marriage_src;</td>
+      <td class="odd">%after.marriage_src;</td>
+    </tr>
+    <tr>
+      <td class="hist_lbl">[*divorce]</td>
+      <td class="odd">%before.divorce;</td>
+      <td class="odd">%after.divorce;</td>
+    </tr>
+    <tr>
+      <td class="hist_lbl">[*witness/witnesses]1</td>
+      <td class="odd">%before.witnesses;</td>
+      <td class="odd">%after.witnesses;</td>
+    </tr>
+    <tr>
+      <td class="hist_lbl">[*family source]</td>
+      <td class="odd">%before.fsources;</td>
+      <td class="odd">%after.fsources;</td>
+    </tr>
+    <tr>
+      <td class="hist_lbl">[*comment]</td>
+      <td class="odd">%before.comment;</td>
+      <td class="odd">%after.comment;</td>
+    </tr>
+    %apply;empty()
+    <tr>
+      <td class="hist_lbl">[*child/children]1</td>
+      <td class="odd">%before.children;</td>
+      <td class="odd">%after.children;</td>
+    </tr>
+    %apply;empty()
+  %end;
+%end;
+
+
+%define;print_diff()
+  <table cellspacing="5">
+    <tr>
+      <td>&nbsp;</td>
+      <td>[*revision of]: <b>%before.date;</b></td>
+      <td>[*revision of]: <b>%after.date;</b></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td>[*wizard/wizards/friend/friends/exterior]0 <b>%before.wizard;</b></td>
+      <td>[*wizard/wizards/friend/friends/exterior]0 <b>%after.wizard;</b></td>
+    </tr>
+    %apply;empty()
+    %apply;print_diff_person()
+    %apply;empty()
+    %apply;print_diff_family()
+  </table>
+%end;
+
+%if;(evar.t = "SUM")
+  %apply;print_summary()
+%else;
+  %apply;print_diff()
+%end;
+
+%base_trailer;
+%copyright;
+
+</body>
+</html>

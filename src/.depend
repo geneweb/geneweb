@@ -162,10 +162,16 @@ gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx gwdb.cmx \
     mutil.cmx notesLinks.cmx progrBar.cmx secure.cmx select.cmx 
 history.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi \
     gwdb.cmi hutil.cmi mutil.cmi secure.cmi templ.cmi templAst.cmi util.cmi \
-    ../wserver/wserver.cmi history.cmi 
+    history_diff.cmi ../wserver/wserver.cmi history.cmi 
 history.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx \
     gwdb.cmx hutil.cmx mutil.cmx secure.cmx templ.cmx templAst.cmi util.cmx \
-    ../wserver/wserver.cmx history.cmi 
+    history_diff.cmx ../wserver/wserver.cmx history.cmi 
+history_diff.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi \
+    gwdb.cmi hutil.cmi mutil.cmi secure.cmi templ.cmi templAst.cmi util.cmi \
+    ../wserver/wserver.cmi history_diff.cmi 
+history_diff.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx \
+    gwdb.cmx hutil.cmx mutil.cmx secure.cmx templ.cmx templAst.cmi util.cmx \
+    ../wserver/wserver.cmx history_diff.cmx 
 history.cmi: config.cmi def.cmi gwdb.cmi 
 hutil.cmo: config.cmi templ.cmi util.cmi ../wserver/wserver.cmi hutil.cmi 
 hutil.cmx: config.cmi templ.cmx util.cmx ../wserver/wserver.cmx hutil.cmi 

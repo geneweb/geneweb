@@ -242,6 +242,18 @@ always_surname=no
 # it when it is too large, if you prefer.
 history=no
 
+# History: set it to yes to save update traces in database (in a directory 
+# named "history_d" in the database directory "base.gwb" or the directory
+# specified by history_path (view below)). It allows you to see the differences
+# between two modifications.
+# Warning: this directory grows indefinitively... 
+history_diff=no
+
+# You can define a specific path where to store all the histories. If you
+# don't specify it, it will save the history in your database directory 
+# (which is juste fine).
+history_path=
+
 # Consider persons having titles as public, i.e. even not friends can see
 # their dates; "yes" = consider; "no" = don't consider
 public_if_titles=no

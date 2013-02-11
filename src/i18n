@@ -86,6 +86,8 @@ at the same time
 average age at death
 back
 baptism
+baptism place
+baptism src
 baptized
 base index notes
 base notes
@@ -96,6 +98,8 @@ begin
 between (date)
 bibliography
 birth
+birth place
+birth src
 birthdays
 birth date and birth place
 book of %s
@@ -103,6 +107,8 @@ border
 born
 branch/branches
 burial
+burial place
+burial src
 buried
 calendar/calendars
 cancel GeneWeb links
@@ -122,6 +128,8 @@ click on "%s"
 close family
 color
 comment
+compare
+compare selected revisions
 compute all marriages
 compute approximatives dates
 connections
@@ -142,6 +150,8 @@ date of death
 date of marriage
 days old
 death
+death place
+death src
 death date and death place
 delete
 descendants
@@ -149,6 +159,7 @@ descendants at the generation
 died
 died at an advanced age
 died young
+difference between the two revisions
 direct ancestor of %s
 disappeared
 disconnect
@@ -178,6 +189,7 @@ families with encoding
 family added
 family birthday
 family deleted
+family source
 family/families
 family history
 family modified
@@ -211,10 +223,12 @@ help modify data
 help surname branch
 here
 him/her
+hist/diff
 history of updates
 horizontally
 husband/wife
 ident/email/subject
+iftitles/public/private
 if titles
 image deleted
 image/images
@@ -258,9 +272,13 @@ looking for
 loop in database: %s is his/her own ancestor
 M/F
 main title
+male/female/neuter
 male line/female line
 marriage had occured after the death of %t
 marriage had occured before the birth of %t
+marriage date
+marriage place
+marriage src
 marriage/marriages
 marriage notes
 marriage of %t after his/her death
@@ -353,6 +371,7 @@ paternal grand-parents
 person added
 person deleted
 person modified
+person source
 person/persons
 persons having the same name
 place
@@ -382,6 +401,8 @@ relationship link/relationship links
 relationship link between
 relationship shortcut
 relationship%t to
+revision history
+revision of
 same ancestor as n° Sosa
 searching all
 search/case sensitive
@@ -397,6 +418,7 @@ select
 select a letter
 select a month to see all the anniversaries
 select person to compute relationship
+select the two revisions you want to compare
 send
 separated
 several answers
