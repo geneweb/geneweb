@@ -117,8 +117,8 @@ value print_alphabetic_to_branch conf x = do {
                 (transl_nth conf "display by/branch/alphabetic order" 1);
             end
         else
-          stag "a" "href=\"%sm=NG;n=%s\" rel=\"nofollow\"" 
-            (commd conf) (code_varenv x ^ ";t=N")
+          stag "a" "href=\"%sm=NG;sn=%s\" rel=\"nofollow\"" 
+            (commd conf) (code_varenv x)
             begin
               Wserver.wprint "%s" 
                 (transl_nth conf "display by/branch/alphabetic order" 1);
