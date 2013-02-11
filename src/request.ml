@@ -476,10 +476,12 @@ value family_m conf base =
       [ Some f -> Srcfile.print conf base f
       | None -> Hutil.incorrect_request conf ]
   | Some "HIST" -> History.print conf base
+(*
   | Some "HIST_CLEAN" when conf.wizard -> History_diff.print_clean conf base
   | Some "HIST_CLEAN_OK" when conf.wizard -> 
       History_diff.print_clean_ok conf base
   | Some "HIST_DIFF" -> History_diff.print conf base
+*)
   | Some "HIST_SEARCH" -> History.print_search conf base
   | Some "IMH" -> Image.print_html conf base
   | Some "INV_FAM" when conf.wizard -> UpdateFam.print_inv conf base
