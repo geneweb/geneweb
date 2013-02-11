@@ -7028,6 +7028,35 @@ nl: Sosa nr.
 no: Anenummer
 sv: Annummer
 
+    n° Sosa relative to
+af: Sosa nommer relatief tot
+bg: число на Соса относно
+br: niverenn Sosa e keñver
+ca: número "Sosa"relatiu a
+cs: "Sosa" číslo vztažené k
+da: Sosa-nummer, refererende til
+de: Ahnenkennziffer relativ zu
+en: Sosa relative to
+eo: numero Sosa relative al
+es: número Sosa respecto a
+et: Sosa number suhtes
+fi: Sosa-numero suhteen
+fr: n° Sosa par rapport à
+he:  מספר Sosa ביחס ל- 
+is: Sosa númer tengt
+it: Numero Sosa relativo a
+lv: SOSA pakāpe attiecībā pret
+nl: Sosa nummer ten opzichte van
+no: Anenummer i forhold til
+pl: numer "Sosa", odnoszący się do:
+pt: número Sosa em relação a
+ro: numar Sosa in relatie cu
+ru: Sosa номер относительно
+sk: "Sosa" číslo vo vzťahu k
+sl: številka"Sosa", v odnosu z
+sv: annummer med som proband (Kekules system)
+
+
     name
 af: naam
 bg: име
@@ -9462,6 +9491,22 @@ ru: Sosa
 sk: Sosa
 sl: številka Sosa
 sv: annummer
+
+    Sosa reference: %t
+af: Sosa verwysing: %t
+ca: referència de "número Sosa": %t
+en: Family Tree Root: %t
+eo: Sosa referenco: %t
+es: referencia de Sosa: %t
+et: Sosa viidet: %t
+fi: Sosa-viitteenä: %t
+fr: référence Sosa : %t
+he:  כאזכור Sosa: %t
+it: riferimento Sosa: %t
+lv: Sosa pakāpes: %t
+pt: referência Sosa: %t
+ro: referinta Sosa: %t
+sk: referenciou "Sosa": %t
 
     source/sources
 af: bron/bronne
