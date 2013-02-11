@@ -22,23 +22,10 @@ value person_is_std_key conf base p k =
 ;
 
 value select_std_eq conf base pl k =
-  (* Peut être qu'on a presque la clé. *)
-  let al = 
-    let k = Name.strip_lower k in
-    List.fold_right
-      (fun p pl ->
-        if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p)
-        then [p :: pl] 
-        else pl)
-      pl []
-  in
-  if al <> [] then al
-  else
-    List.fold_right
-      (fun p pl ->
-        let _ = print_endline (Gutil.designation base p) in
-         if person_is_std_key conf base p k then [p :: pl] else pl)
-      pl []
+  List.fold_right
+    (fun p pl -> 
+       if person_is_std_key conf base p k then [p :: pl] else pl)
+    pl []
 ;
 
 value very_unknown conf =
