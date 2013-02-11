@@ -297,6 +297,7 @@ msg error disconnected
 murdered
 n° d'Aboville
 n° Sosa
+n° Sosa relative to
 name
 name %s already used by %tthis person%t
 navigation
@@ -412,6 +413,7 @@ sort by/branch/alphabetic order
 sort by/date begin/alphabetic order/nb individuals/nb events
 sort by/generation/alphabetic order
 Sosa
+Sosa reference: %t
 source/sources
 specify
 spouse/spouses

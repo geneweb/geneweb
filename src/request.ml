@@ -476,6 +476,10 @@ value family_m conf base =
       [ Some f -> Srcfile.print conf base f
       | None -> Hutil.incorrect_request conf ]
   | Some "HIST" -> History.print conf base
+  | Some "HIST_CLEAN" when conf.wizard -> History_diff.print_clean conf base
+  | Some "HIST_CLEAN_OK" when conf.wizard -> 
+      History_diff.print_clean_ok conf base
+  | Some "HIST_DIFF" -> History_diff.print conf base
   | Some "HIST_SEARCH" -> History.print_search conf base
   | Some "IMH" -> Image.print_html conf base
   | Some "INV_FAM" when conf.wizard -> UpdateFam.print_inv conf base
@@ -533,6 +537,18 @@ value family_m conf base =
       [ Some v -> Some.surname_print conf base Some.surname_not_found v
       | _ -> Alln.print_surnames conf base ]
   | Some "NG" ->
+      (* Rétro-compatibilité.  *)
+      let env = 
+        match p_getenv conf.env "n" with
+        [ Some n ->
+            match p_getenv conf.env "t" with
+            [ Some "P" -> [("fn", n) :: conf.env]
+            | Some "N" -> [("sn", n) :: conf.env]
+            | _ -> [("v", n) :: conf.env] ]
+        | None -> conf.env ]
+      in
+      let conf = {(conf) with env = env} in
+      (* Nouveau mode de recherche. *)
       match p_getenv conf.env "select" with
       [ Some "input" | None ->
           (* Récupère le contenu le contenu non vide de la recherche. *)
