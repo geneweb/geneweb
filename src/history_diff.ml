@@ -154,16 +154,24 @@ value record_diff conf base changed =
           let gr = make_gen_record conf base False p in
           write_history_file conf person_file fname gr
       | U_Modify_person o p ->
+          let o_person_file = history_file o.first_name o.surname o.occ in
           let person_file = history_file p.first_name p.surname p.occ in
+          let ofname = history_path conf o_person_file in
           let fname = history_path conf person_file in
-          if Sys.file_exists fname then
-            let gr = make_gen_record conf base False p in
-            write_history_file conf person_file fname gr
-          else do {
-            let gr = make_gen_record conf base True o in
-            write_history_file conf person_file fname gr;
-            let gr = make_gen_record conf base False p in
-            write_history_file conf person_file fname gr;
+          do {
+            (* La clé a changé, on reprend l'ancien historique. *)
+            if o_person_file <> person_file && Sys.file_exists ofname then
+              try Sys.rename ofname fname with [ Sys_error _ -> () ]
+            else ();
+            if Sys.file_exists fname then
+              let gr = make_gen_record conf base False p in
+              write_history_file conf person_file fname gr
+            else do {
+              let gr = make_gen_record conf base True o in
+              write_history_file conf person_file fname gr;
+              let gr = make_gen_record conf base False p in
+              write_history_file conf person_file fname gr;
+            }
           }
       | U_Delete_person _ -> () (* Faut-il supprimer l'historique ? *)
       | U_Merge_person _ o p ->
