@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt, Template x v 6.06c 2012/11/13 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: ancsosa.txt, Template x v 6.07b 2013/01/04 12:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2012 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -10,7 +10,10 @@
       [*generation/generations]0 %evar.v;
     %else;
       %apply;a_of_b%with;
-        %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
+        %if;(evar.t = "M")
+          %if;(evar.evt = "on")[*missing events]%else;[*missing ancestors]%end;
+        %else;[*ancestors]
+        %end;
       %and;
         %if;(public_name != "")%public_name;%else;%first_name;%end;
         %if;(qualifier != "") %qualifier;%end;
@@ -27,6 +30,10 @@
   --></style>
 %base_header;
 </head>
+
+%define;include_file(file)
+  %include.file;
+%end;
 
 %define;image_sosa(xxx,yyy)
   <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
@@ -298,9 +305,7 @@
 
 %define;somebody_notes_and_sources(xx)
   <dd>
-    %if;((wizard or friend or
-          bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and
-          evar.notes = "on")
+    %if;(evar.notes = "on")
       %if;(xx.has_linked_page.BNOTE or xx.has_notes or xx.has_linked_page.NOTE)
         <table><tr><td>%nn;
           %if;(xx.has_linked_page.BNOTE)<p>%apply;capitalize(xx.linked_page.BNOTE).</p>%end;
@@ -311,16 +316,18 @@
     %end;
     %if;(evar.src = "on")
       %if;(xx.has_sources)
-        <em style="font-size:80%%">[*source/sources]1:<br%/>
-          %foreach;xx.source;
-            - %source_type;: %source;<br%/>
-          %end;
+        <em style="font-size:80%%">[*source/sources]1:
+          <ul>
+            %foreach;xx.source;
+              <li>%apply;capitalize(source_type): %source;</li>
+            %end;
+          </ul>
         </em>
-        <br%/>
       %end;
       %if;xx.has_linked_page.BIBLIO;<p>%apply;capitalize(xx.linked_page.BIBLIO).</p>%end;
     %end;
   </dd>
+  <br%>
 %end;
 
 %define;long_display_ancestor_personal()
@@ -336,10 +343,7 @@
     %if;not cancel_links;</a>%end;
   %end;
   %if;(((evar.notes="on")
-        and (ancestor.has_linked_page.BNOTE or ancestor.has_notes or ancestor.has_linked_page.NOTE)
-        and (wizard or friend or
-             bvar.no_note_for_visitor="" or
-             bvar.no_note_for_visitor="no"))
+        and (ancestor.has_linked_page.BNOTE or ancestor.has_notes or ancestor.has_linked_page.NOTE))
        or
        (evar.src="on" and ancestor.has_sources))
     %if;(evar.inline = "on")
@@ -383,9 +387,7 @@
           %end;
           )%nn;
         %end;
-        %if;(evar.comm = "on" and has_comment and
-             (wizard or friend or
-              bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no"))
+        %if;(evar.comm = "on" and has_comment)
           ,%sp;(%comment;)%nn;
         %end;
         .%nn;
@@ -437,10 +439,7 @@
       .%nn;
     %end;
     %if;(((evar.notes="on")
-          and (child.has_linked_page.BNOTE or child.has_notes or child.has_linked_page.NOTE)
-          and (wizard or friend or
-               bvar.no_note_for_visitor="" or
-               bvar.no_note_for_visitor="no"))
+          and (child.has_linked_page.BNOTE or child.has_notes or child.has_linked_page.NOTE))
          or
          (evar.src="on" and child.has_sources))
       %if;(evar.inline = "on")
@@ -486,9 +485,7 @@
             %apply;short_display_person("witness")
           %end;),
         %end;
-        %if;(evar.comm = "on" and has_comment and
-             (wizard or friend or
-              bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no"))
+        %if;(evar.comm = "on" and has_comment)
           %sp;(%comment;)%nl;
         %end;
         [having as children] : %nn;
@@ -539,10 +536,7 @@
 %define;child_notes_and_sources(spec)
   %if;(child.sosa_in_list = "")
   %if;(((evar.notes="on")
-        and (child.has_linked_page.BNOTE or child.has_notes or child.has_linked_page.NOTE)
-        and (wizard or friend or
-             bvar.no_note_for_visitor="" or
-             bvar.no_note_for_visitor="no"))
+        and (child.has_linked_page.BNOTE or child.has_notes or child.has_linked_page.NOTE))
        or
        (evar.src="on" and child.has_sources))
       %nl;<br%/>
@@ -572,10 +566,7 @@
       %foreach;ancestor;
         %if;(ancestor.same = "")
           %if;(((evar.notes="on")
-                and (ancestor.has_linked_page.BNOTE or ancestor.has_notes or ancestor.has_linked_page.NOTE)
-                and (wizard or friend or
-                     bvar.no_note_for_visitor="" or
-                     bvar.no_note_for_visitor="no"))
+                and (ancestor.has_linked_page.BNOTE or ancestor.has_notes or ancestor.has_linked_page.NOTE))
                or
                (evar.src="on" and ancestor.has_sources))
             %nl;<br%/>
@@ -1305,7 +1296,10 @@
 
 <h1>%nn;
   %apply;a_of_b%with;
-    %if;(evar.t = "M")[*missing ancestors]%else;[*ancestors]%end;
+    %if;(evar.t = "M")
+      %if;(evar.evt = "on")[*missing events]%else;[*missing ancestors]%end;
+    %else;[*ancestors]
+    %end;
   %and;
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
@@ -1325,7 +1319,9 @@
   %elseif;(evar.t = "G")
     %apply;long_display_generations()
   %elseif;(evar.t = "M" and evar.al = "on")
-    %apply;missing_ancestors_alphabetically()
+    %apply;missing_ancestors_alphabetically()  
+  %elseif;(evar.t = "M" and evar.evt = "on")
+    %apply;include_file("templx/miss_evt")
   %elseif;(evar.t = "M")
     %apply;missing_ancestors_by_generation()
   %elseif;(evar.t = "D")
