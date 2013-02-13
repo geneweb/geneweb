@@ -109,7 +109,7 @@
 %end;
 
 %define;display_edit_ind_btn(label)
-  %if;(wizard)
+  %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%ancestor.index;#label">
       <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit person]"%/>
     </a>
@@ -119,7 +119,7 @@
 %end;
 
 %define;display_edit_fam_btn()
-  %if;(wizard)
+  %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%ancestor.index;#marr">
       <img class="not_printable" src="%image_prefix;/picto_edit_big.png" title="[edit family]"%/>
     </a>
@@ -161,8 +161,7 @@
   <td %if;(xx.same != "") colspan="8" %else; %apply;td_missing_events_rowspan("xx") bgcolor="#CCC3C6" %end;>
     %apply;image_MF("xx", "11")
     <a name="%xx.index;">
-    %apply;link%with;%xx.access;%and;%xx;%end
-    %xx.title;
+    %apply;short_display_person("xx")
     %if;(xx.same != "" and evar.repeat = "on")
       %sp;->
       [same ancestor as n° Sosa]
@@ -229,9 +228,7 @@
           %if;(family_cnt = 1)
             <td %if;(xx.nb_families > 1) style="border-bottom:none" %end; bgcolor="#CCC3C6">
               %apply;image_MF("spouse", "11")
-              %apply;link%with;%spouse.access;%and;
-                %spouse;
-              %end;
+              %apply;short_display_person("spouse")
             </td>
           %end;
         %end;        
@@ -241,10 +238,8 @@
     %else;
       <td bgcolor="#CCC3C6">
         %if;xx.has_families;
-          %apply;image_MF("xx.spouse", "11")
-          %apply;link%with;%xx.spouse.access;%and;
-            %xx.spouse;
-          %end;
+          %apply;image_MF("spouse", "11")
+          %apply;short_display_person("spouse")
         %else;
           &nbsp;
         %end;
@@ -397,9 +392,7 @@
       <tr>
         <td %apply;td_family_missing_events2("xx") bgcolor="#CCC3C6">
           %apply;image_MF("spouse", "11")
-          %apply;link%with;%spouse.access;%and;
-            %spouse;
-          %end;
+          %apply;short_display_person("spouse")
         </td>
 
         %reset_count;
@@ -431,8 +424,8 @@
    Main 
 %)
 
-%let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-<p>%apply;togen(nb_gen).</p>
+%let;nb_gena;%apply;min(evar.v, max_anc_level)%in;
+<p>%apply;togena(nb_gena).</p>
 <table class="ascends_table splitForPrint">
   <thead>
     <tr class="ascends_table_header">
@@ -448,9 +441,9 @@
     </tr>
   </thead>
   <tbody>
-    %foreach;ancestor_level(nb_gen)
+    %foreach;ancestor_level(nb_gena)
       %if;(evar.gen = "on")
-        <tr>
+		<tr>
           <th align="left" colspan="9">[*generation/generations]0 %level;</th>
         </tr>
       %end;
