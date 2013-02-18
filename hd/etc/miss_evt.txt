@@ -238,8 +238,8 @@
     %else;
       <td bgcolor="#CCC3C6">
         %if;xx.has_families;
-          %apply;image_MF("spouse", "11")
-          %apply;short_display_person("spouse")
+          %apply;image_MF("xx.spouse", "11")
+          %apply;short_display_person("xx.spouse")
         %else;
           &nbsp;
         %end;
