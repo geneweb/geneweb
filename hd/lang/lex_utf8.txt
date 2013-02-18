@@ -5672,6 +5672,9 @@ sk: vložiť
 sl: vstavi
 sv: infoga
 
+    insufficient revision history for %s
+fr: l'historique des révisions de %s est insuffisant pour réaliser des comparaisons
+
     inversion done
 af: omgeruil
 bg: обръщането извършено
@@ -8058,9 +8061,6 @@ ru: до года
 sk: starý jeden rok/stará jeden rok
 sl: star eno leto
 sv: ett år
-
-    only with display by generation
-fr: seulement avec l'affichage par génération
 
     only the generation selected
 af: net die gekose geslag

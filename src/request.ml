@@ -524,7 +524,7 @@ value family_m conf base =
       [ Some v -> Some.surname_print conf base Some.surname_not_found v
       | _ -> Alln.print_surnames conf base ]
   | Some "NG" ->
-      (* Rétro-compatibilité.  *)
+      (* Rétro-compatibilité <= 6.06 *)
       let env = 
         match p_getenv conf.env "n" with
         [ Some n ->
@@ -538,7 +538,7 @@ value family_m conf base =
       (* Nouveau mode de recherche. *)
       match p_getenv conf.env "select" with
       [ Some "input" | None ->
-          (* Récupère le contenu le contenu non vide de la recherche. *)
+          (* Récupère le contenu non vide de la recherche. *)
           let real_input label =
             match p_getenv conf.env label with
             [ Some s -> if s = "" then None else Some s

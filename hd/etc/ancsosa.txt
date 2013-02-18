@@ -301,6 +301,30 @@
   %end;
 %end;
 
+%define;image_sosa(xxx,yyy)
+  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
+%end;
+
+%define;display_sosa(xx)
+  %if;(xx.has_sosa and bvar.display_sosa="yes")
+    %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
+    %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
+    %sosa_ref.surname_key_strip;
+    %and;%xx.sosa;%end;
+    %if;not cancel_links;</a>%end;%sp;
+  %end;
+%end;
+
+%define;short_display_person(xx)
+  %apply;display_sosa("xx")
+  %if;(xx.index=central_index)<b>%xx;</b>%else;
+    %if;(cancel_links or xx.is_restricted)%xx;
+    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  %end;
+  %xx.title;%xx.dates;
+%end;
+
+
 %define;married_to(is_male, date_place)
   %if;("is_male" = 1)
     %if;are_married;[married%t to:::date_place]0%nn;
