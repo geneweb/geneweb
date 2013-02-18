@@ -2474,7 +2474,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
           (Array.to_list (get_family p)) ]
   | "has_consanguinity" ->
       p_auth && get_consang p != Adef.fix (-1) && 
-        get_consang p >= Adef.fix_of_float 0.01
+        get_consang p >= Adef.fix_of_float 0.0001
   | "has_cremation_date" ->
       if p_auth then
         match get_burial p with
