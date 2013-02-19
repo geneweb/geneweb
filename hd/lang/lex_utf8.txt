@@ -5147,8 +5147,8 @@ sk: on/ona
 sl: on/ona
 sv: honom/henne
 
-    hist/diff
-fr: hist/diff
+    history
+fr: historique
 
     history of updates
 af: bywerkingsgeskiedenis

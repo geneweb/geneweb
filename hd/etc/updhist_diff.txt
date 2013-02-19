@@ -56,21 +56,26 @@ function update_old () {
 %end;
 
 <h1>
-  %if;(evar.t = "SUM")
-    %person;, [revision history]
-  %else;
-    [*difference between the two revisions]
+  <a href="%prefix;%acces;">%person;</a>%nn;
+  %if;(evar.t = "SUM"), [revision history]
+  %else;, [difference between the two revisions]
   %end;
 </h1>
 
+%define;no_diff(xx)
+  [*insufficient revision history for %s:::xx]
+%end;
+
 %define;print_summary()
-  [*select the two revisions you want to compare].
+  %if;(history_len >= 2)
+    [*select the two revisions you want to compare].
+  %end;
   <form method="GET" action="%action;">
     <p>%hidden;</p>
     <input type="hidden" name="m" value="HIST_DIFF"%/>
     <input type="hidden" name="t" value="DIFF"%/>
     <input type="hidden" name="f" value="%evar.f;"%/>
-    <table class="hist_summary">
+    <table class="hist_summary" cellspacing="5">
       <tr>
         <th>[*compare]</th>
         <th>[*date/dates]0</th>
@@ -78,16 +83,20 @@ function update_old () {
       </tr>
       %foreach;history_line;
         <tr>
-          <td>
+          <td %if;(line % 2 != 0) class="odd" %end;>
             <input type="radio" name="old" value="%line;" onclick="update_old()" %if;(line = 0) style="visibility: hidden" %elseif;(line = 1) checked="checked" %else;%end;%/>
             <input type="radio" name="new" value="%line;" onclick="update_new()" %if;(line = 0) checked="checked" %elseif;(line = history_len - 1) style="visibility: hidden" %else;%end;%/>
           </td>
-          <td>%date;</td>
-          <td>%wizard;</td>
+          <td %if;(line % 2 != 0) class="odd" %end;>%apply;transl_date%with;%date;%end;</td>
+          <td %if;(line % 2 != 0) class="odd" %end;>%wizard;</td>
         </tr>
       %end;
     </table>
-    <input type="submit" value="[*compare selected revisions]"%/>
+    %if;(history_len >= 2)
+      <input type="submit" value="[*compare selected revisions]"%/>
+    %else;
+      %apply;no_diff(person)
+    %end;
   </form>
 %end;
 
@@ -223,6 +232,12 @@ function update_old () {
     <td class="odd">%before.notes;</td>
     <td class="odd">%after.notes;</td>
   </tr>
+  %apply;empty()
+  <tr>
+    <td class="hist_lbl">[*access]</td>
+    <td class="odd">%before.access;</td>
+    <td class="odd">%after.access;</td>
+  </tr>
 %end;
 
 %define;print_diff_family()
@@ -280,10 +295,15 @@ function update_old () {
 
 %define;print_diff()
   <table cellspacing="5">
+    <colgroup>
+      <col>
+      <col width="50%%;">
+      <col width="50%%;">
+    </colgroup>
     <tr>
       <td>&nbsp;</td>
-      <td>[*revision of]: <b>%before.date;</b></td>
-      <td>[*revision of]: <b>%after.date;</b></td>
+      <td>[*revision of]: <b>%apply;transl_date%with;%before.date;%end;</b></td>
+      <td>[*revision of]: <b>%apply;transl_date%with;%after.date;%end;</b></td>
     </tr>
     <tr>
       <td>&nbsp;</td>
@@ -291,9 +311,25 @@ function update_old () {
       <td>[*wizard/wizards/friend/friends/exterior]0 <b>%after.wizard;</b></td>
     </tr>
     %apply;empty()
+    <tr>
+      <td colspan="3">
+        <h2 class="highlight" style="border-bottom: 1px solid #6F8301;">
+          [*person/persons]0
+        </h2>
+      </td>
+    </tr>
     %apply;print_diff_person()
     %apply;empty()
-    %apply;print_diff_family()
+    %if;(nb_families > 0)
+      <tr>
+        <td colspan="3">
+          <h2 class="highlight" style="border-bottom: 1px solid #6F8301;">
+            [*family/families]0
+          </h2>
+        </td>
+      </tr>
+      %apply;print_diff_family()
+    %end;
   </table>
 %end;
 

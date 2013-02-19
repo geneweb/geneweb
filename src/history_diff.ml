@@ -29,19 +29,18 @@ value history_file fn sn occ =
 
 (* Le chemin du dossier history_d. *)
 value history_d conf =
-  match p_getenv conf.base_env "history_path" with
-  [ Some path ->
-      let bname =
-        if Filename.check_suffix conf.bname ".gwb" then conf.bname
-        else conf.bname ^ ".gwb"
-      in
-      List.fold_left Filename.concat "" [path; bname; "history_d"]
-  | None ->
-      let bname =
-        if Filename.check_suffix conf.bname ".gwb" then conf.bname
-        else conf.bname ^ ".gwb"
-      in
-      Filename.concat (Util.base_path [] bname) "history_d" ]
+  let path =
+    match p_getenv conf.base_env "history_path" with
+    [ Some path -> path
+    | None -> "" ]
+  in
+  let bname = Util.base_path [] conf.bname in
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname
+    else bname ^ ".gwb"
+  in
+  List.fold_left 
+    Filename.concat "" [path; (Util.base_path [] bname); "history_d"]
 ;
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
@@ -163,13 +162,12 @@ value record_diff conf base changed =
             if o_person_file <> person_file && Sys.file_exists ofname then
               try Sys.rename ofname fname with [ Sys_error _ -> () ]
             else ();
+            let gr = make_gen_record conf base False p in
             if Sys.file_exists fname then
-              let gr = make_gen_record conf base False p in
               write_history_file conf person_file fname gr
             else do {
-              let gr = make_gen_record conf base True o in
-              write_history_file conf person_file fname gr;
-              let gr = make_gen_record conf base False p in
+              let o_gr = make_gen_record conf base True o in
+              write_history_file conf person_file fname o_gr;
               write_history_file conf person_file fname gr;
             }
           }
@@ -394,19 +392,20 @@ value print_clean_ok conf base =
         let history = load_person_history conf f in
         let new_history = clean_history 0 history [] in
         let fname = history_path conf f in
-        let ext_flags = 
-          [Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock]
-        in
-        match 
-          try Some (Secure.open_out_gen ext_flags 0o644 fname) 
-          with [ Sys_error _ -> None ]
-        with
-        [ Some oc -> 
-            do { 
+        if new_history = [] then 
+          try Sys.remove fname with [ Sys_error _ -> () ]
+        else
+          let ext_flags = 
+            [Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock]
+          in
+          match 
+            try Some (Secure.open_out_gen ext_flags 0o644 fname) 
+            with [ Sys_error _ -> None ]
+          with
+          [ Some oc -> do { 
               List.iter (fun v -> output_value oc (v : gen_record)) new_history;
-              close_out oc 
-            }
-        | None -> () ];
+              close_out oc }
+          | None -> () ];
         Hutil.trailer conf
       }
   | _ -> Hutil.incorrect_request conf ]
@@ -463,11 +462,27 @@ value string_of_title conf titles =
     [ Tname s -> s
     | _ -> "" ]
   in
+  let one_title t =
+    let name = t.t_ident ^ " " ^ t.t_place in
+    let name = if name = " " then "" else name in
+    let dates = 
+      string_of_codate conf t.t_date_start ^ "-" ^ 
+        string_of_codate conf t.t_date_end 
+    in
+    let dates = if dates = "-" then "" else "(" ^ dates ^ ")" in
+    let nth = if t.t_nth = 0 then "" else string_of_int t.t_nth in
+    let nth =
+      if string_of_t_name t = "" then nth 
+      else string_of_t_name t ^ " " ^ string_of_int t.t_nth
+    in
+    let nth = if nth = "" || nth = " " then "" else "[" ^ nth ^ "]" in
+    name ^ (if name = "" then "" else " ") ^ nth ^ 
+      (if nth = "" then "" else " ") ^ dates
+  in
   List.fold_left
-    (fun accu t ->
-      accu ^ " " ^ string_of_t_name t ^ " " ^ t.t_ident ^ " " ^ t.t_place ^ 
-        " " ^ string_of_codate conf t.t_date_start ^ " " ^ 
-          string_of_codate conf t.t_date_end ^ string_of_int t.t_nth)
+    (fun accu t -> 
+      if accu = "" then one_title t 
+      else accu ^ ", " ^ one_title t)
     "" titles
 ;
 
@@ -737,7 +752,9 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
         in
         let brp = string_of_rparents conf base bef.gen_p.rparents in
         let arp = string_of_rparents conf base aft.gen_p.rparents in
-        diff_string (br ^ ". " ^ brp) (ar  ^ ". " ^  arp)
+        let b = if br = "" then brp else (br ^ ". " ^ brp) in
+        let a = if ar = "" then arp else (ar ^ ". " ^ brp) in
+        diff_string b a
       else ("", "")
   | "occupation" ->
       if p_auth then
@@ -1019,9 +1036,15 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
   | _ -> raise Not_found ]
 and eval_simple_str_var conf base env (bef, aft, p_auth) =
   fun
-  [ "date" -> eval_string_env "date" env
+  [ "acces" ->
+      let p = pget conf base aft.gen_p.key_index in
+      acces conf base p
+  | "date" -> eval_string_env "date" env
   | "history_len" -> eval_int_env "history_len" env
   | "line" -> eval_int_env "line" env
+  | "nb_families" -> 
+      let nb_fam = max (List.length bef.gen_f) (List.length aft.gen_f) in
+      string_of_int nb_fam
   | "person" ->
       if p_auth then person_of_iper conf base aft.gen_p.key_index
       else eval_string_env "history_file" env
@@ -1128,6 +1151,26 @@ value print_foreach conf base print_ast eval_expr =
   print_foreach
 ;
 
+value eval_predefined_apply conf env f vl =
+  let vl = List.map (fun [ VVstring s -> s | _ -> raise Not_found ]) vl in
+  match (f, vl) with
+  [ ("transl_date", [date_txt]) -> 
+      (* date_tpl = "0000-00-00 00:00:00" *)
+      try 
+        let year = int_of_string (String.sub date_txt 0 4) in
+        let month = int_of_string (String.sub date_txt 5 2) in
+        let day = int_of_string (String.sub date_txt 8 2) in
+        let date = 
+          Dgreg 
+            {day = day; month = month; year = year; prec = Sure; delta = 0}
+            Dgregorian
+        in
+        let time = String.sub date_txt 11 8 in
+        Date.string_of_date conf date ^ ", " ^ time
+      with [ Failure "int_of_string" -> date_txt ]
+  | _ -> raise Not_found ]
+;
+
 value print conf base =
   match p_getenv conf.env "t" with
   [ Some ("SUM" | "DIFF") ->
@@ -1147,8 +1190,7 @@ value print conf base =
                 (o, n)
             | _ -> (0, 0) ]
           in
-          (* Il faut au moins 2 entrées pour faire un diff. *)
-          if len >= 2 then
+          try
             let before = List.nth history before in
             let after = List.nth history after in
             let p = poi base after.gen_p.key_index in
@@ -1159,11 +1201,11 @@ value print conf base =
             Hutil.interp conf base "updhist_diff"
               {Templ.eval_var = eval_var conf base;
                Templ.eval_transl _ = Templ.eval_transl conf;
-               Templ.eval_predefined_apply _ = raise Not_found;
+               Templ.eval_predefined_apply = eval_predefined_apply conf;
                Templ.get_vother = get_vother; Templ.set_vother = set_vother;
                Templ.print_foreach = print_foreach conf base}
               env (before, after, p_auth)
-          else Hutil.incorrect_request conf
+          with _ -> Hutil.incorrect_request conf
       | _ -> Hutil.incorrect_request conf ]
   | _ -> Hutil.incorrect_request conf ]
 ;

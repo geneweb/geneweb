@@ -80,7 +80,7 @@
 
 <table cellpadding="4px;" class="updhist_table">
   <tr class="updhist_table_header">
-    %if;(bvar.history_diff = "yes")<th>[hist/diff]0 | [hist/diff]1</th>%end
+    %if;(bvar.history_diff = "yes")<th>[history]</th>%end
     <th>[*date/dates]0</th>
     <th>[*person/persons]0</th>
     <th>[*wizard/wizards/friend/friends/exterior]0</th>
@@ -93,8 +93,7 @@
       %if;(bvar.history_diff = "yes")
         <td>
           %if;(first_name != "" and person.has_history)
-            (<a href="%prefix;m=HIST_DIFF;t=SUM;f=%person.history_file;">[hist/diff]0</a> | 
-             <a href="%prefix;m=HIST_DIFF;t=DIFF;f=%person.history_file;;new=0;old=1">[hist/diff]1</a>)
+            <a href="%prefix;m=HIST_DIFF;t=SUM;f=%person.history_file;">[history]</a>
           %else;
             &nbsp;
           %end;
