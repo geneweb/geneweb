@@ -1,5 +1,3 @@
-# Copyright (c) 1998-2007 INRIA
-
      !dates order
 af: yyyymmdd
 ar: ddmmyyyy
@@ -530,12 +528,18 @@ sl: spol %t ni usklajen z zvezami
 sv: %ts kön stämmer inte överens med sina relationer
 
     %t was witness after his/her death
-en: %t was witness after his/her death
+de: %t war Zeitzeuge nach seinem Tod
+en: %t was a witness after their death
+es: %t era testigo tras su muerte
 fr: %t était témoin après sa mort
+it: %t era testimone dopo la sua morte
 
     %t was witness before his/her birth
-en: %t was witness before his/her birth
+de: %t war Zeitzeuge vor seiner Geburt
+en: %t was a witness before their birth
+es: %t era testigo antes de su nacimiento
 fr: %t était témoin avant sa naissance
+it: %t era testimone prima della sua nascita
 
     (date)
 af: 1 %m %y/%d %m %y/%m %y/%y
@@ -1392,9 +1396,9 @@ sv: livslängd:
 zh:  享年
 
     age at %s birth date
-de: alter zum zeitpunkt der geburt von %s
-en: age at %s birth date
-es: edad en el nacimiento de %s
+de: Alter bei der Geburt von %s
+en: Age at birth of %s
+es: edad al nacimiento de %s
 fr: âge à la naissance de %s
 it: età alla nascita di %s
 nl: leeftijd bij de geboorte van %s
@@ -2091,12 +2095,12 @@ sl: so
 sv: är
 
     ascendants tree
-de: Stammbaum
+de: Stammbaum der Vorfahren
 en: Family Tree
-es: Árbol de ascendencia
+es: árbol de ascendencia
 fi: Esipolvitaulu
 fr: arbre d’ascendance
-it: Albero d’ascendenza
+it: albero d'ascendenza
 nl: Stamboom voorouders
 sv: Antavla
 
@@ -2305,10 +2309,18 @@ sl: krst
 sv: dop
 
     baptism place
+de: Ort der Taufe
+en: Place of baptism
+es: lugar de bautismo
 fr: lieu de baptême
+it: luogo del battesimo
 
     baptism src
-fr: source baptême
+de: Ort der Taufe
+en: Place of baptism
+es: lugar de bautismo
+fr: lieu de baptême
+it: luogo del battesimo
 
     base index notes
 af: notas
@@ -2541,8 +2553,11 @@ sv: mellan
 
     bibliography
 bg: библиография
+de: Bibliographie
 en: bibliography
+es: bibliografía
 fr: bibliographie
+it: bibliografia
 
     birth
 af: geboorte
@@ -2573,10 +2588,18 @@ sl: rojstva
 sv: födelse
 
     birth place
+de: Ort der Geburt
+en: Place of birth
+es: lugar de nacimiento
 fr: lieu de naissance
+it: luogo di nascita
 
     birth src
+de: Ouellenangabe-Geburt
+en: Source of birth
+es: fuente nacimiento
 fr: source naissance
+it: fonte della nascita
 
     birthdays
 af: verjaarsdae
@@ -2611,9 +2634,9 @@ zh:  出生于今日的记录
     birth date and birth place
 de: Datum und Ort der Geburt
 en: Date & Place of birth
-es: Fecha y lugar de nacimiento
+es: fecha y lugar de nacimiento
 fr: date et lieu de naissance
-it: Data e luogo di nascita
+it: data e luogo di nascita
 
     book of %s
 de: %s
@@ -2752,10 +2775,18 @@ sl: pogreb
 sv: begravning
 
     burial place
+de: Ort der Bestattung
+en: Place of burial
+es: lugar de inhumación
 fr: lieu d'inhumation
+it: luogo di sepoltura
 
     burial src
+de: Ouellenangabe-Bestattung
+en: Source of burial
+es: fuente inhumación
 fr: source inhumation
+it: fonte della sepoltura
 
     buried
 af: begrawe
@@ -2957,8 +2988,11 @@ sv: kan inte ändra kön på en gift person
 
     celebrities
 bg: знаменити хора
-en: celebrities
+de: Bekannte Persönlichkeiten
+en: Famous people
+es: Personas Famosas
 fr: Personnes Célèbres
+it: Personaggi Celebri
 
     change children's names
 af: verander kinders se name
@@ -3017,7 +3051,11 @@ sl: zamenjan vrstni red otrok
 sv: ändrade ordningen för barnen
 
     changed order of marriages
+de: Die Reihenfolge der Ehen wurde geändert
+en: Ordering of marriages has been changed
+es: el orden de los matrimonios ha sido cambiado
 fr: changement de l’ordre des mariages
+it: l'ordine dei matrimoni è stato modificato
 
     change it (the number) yourself
 af: verander dit self
@@ -3230,24 +3268,32 @@ sl: komentar
 sv: kommentar
 
     compare
+de: vergleichen
+en: Compare
+es: comparar
 fr: comparer
+it: paragonare
 
     compare selected revisions
+de: die ausgewählten Revisionen vergleichen
+en: View revision history
+es: comparar las revisiones seleccionadas
 fr: comparer les révisions sélectionnées
+it: paragonare le versioni selezionate
 
     compute all marriages
-de: Alle Lebenspartner einbeziehen
-en: include spouses
+de: Lebenspartner mit einschließen
+en: Include spouses
 es: incluir todos los cónyuges
 fr: inclure tous les conjoints
-it: includere i coniugi
+it: includere tutti i coniugi
 
     compute approximatives dates
-de: Ungefähre Datumsangaben mit einbeziehen
-en: search unsure dates
+de: ungefähre Daten berücksichtigen
+en: Include unsure dates
 es: tener en cuenta las fechas aproximadas
 fr: prendre en compte les dates approximatives
-it: considerare anche le date approssimative
+it: prendere in considerazione le date approssimative
 
     connections
 bg: потребителски връзки
@@ -3550,14 +3596,14 @@ sv: datum
 
     date begin
 de: Anfangsdatum
-en: from
+en: From
 es: fecha de inicio
 fr: date de début
 it: data d'inizio
 
     date end
 de: Enddatum
-en: to
+en: To
 es: fecha final
 fr: date de fin
 it: data di fine
@@ -3652,17 +3698,25 @@ sl: smrti
 sv: död
 
     death place
+de: Sterbeort
+en: Place of death
+es: lugar de defunción
 fr: lieu de décès
+it: luogo di morte
 
     death src
+de: Ouellenangabe-Ableben
+en: Source of death
+es: fuente defunción
 fr: source décès
+it: fonte della morte
 
     death date and death place
-de: Datum und Ort des Todes
+de: Datum und Ort des Ablebens
 en: Date & Place of death
-es: Fecha y lugar de fallecimiento
+es: fecha y lugar de defunción
 fr: date et lieu de décès
-it: Data e luogo di morte
+it: data e luogo della morte
 
     delete
 af: verwyder
@@ -3722,11 +3776,11 @@ sv: ättlingar
 zh:  后代
 
     descendants at the generation
-de: Nachkommen bis zu Generation...
+de: Generation der Nachkommen ...
 en: List by name
-es: Descendientes hasta la generación...
+es: descendientes en la generación...
 fr: descendants à la génération...
-it: Discendenti fino alla generazione...
+it: discendenti fino alla generazione...
 
     died
 af: oorlede
@@ -3759,7 +3813,11 @@ sv: död
 zh:  死
 
     died at an advanced age
+de: ist in hohem Alter verstorben
+en: died old
+es: ha fallecido a una edad avanzada
 fr: est décédé à un âge avancé/est décédée à un âge avancé/est décédé(e) à un âge avancé
+it: è morto ad un'età avanzata/è morta ad un'età avanzata/è morto/a ad un'età avanzata
 
     died young
 af: jonk oorlede
@@ -3790,7 +3848,11 @@ sl: umrl mlad/umrla mlada/umrl(a) mlad(a)
 sv: dog ung
 
     difference between the two revisions
+de: Unterschied zwischen den zwei Revisionen
+en: Revision history
+es: diferencia entre las dos revisiones
 fr: différence entre les deux révisions
+it: divario tra le due versioni
 
     direct ancestor of %s
 de: direkter Vorfahre von %s
@@ -3856,11 +3918,11 @@ sl: prekinjeno
 sv: logga ut
 
     display Aboville number
-de: Zeigen der Aboville-Nummerierung
+de: Sosa/Kekule-Nummer anzeigen
 en: Display Sosa number
-es: Editar la numeración de Aboville
+es: editar la numeración de Aboville
 fr: afficher la numérotation d’Aboville
-it: Visualizzare la numerazione d’Aboville
+it: visualizzare la numerazione d'Aboville
 
     display by/branch/alphabetic order
 de: anzuzeigen/nach Zweigen/alphabetisch geordnet
@@ -3913,7 +3975,11 @@ no: vis kantlinje
 sv: visa kantlinje
 
     display empty picture
+de: Bilder immer anzeigen
+en: Display picture
+es: editar siempre las imágenes
 fr: toujours afficher les images
+it: visualizzare sempre le immagini
 
     display generation
 de: nummer der Generation anzeigen
@@ -3927,12 +3993,16 @@ no: vis generasjonsnummer
 sv: visa generations nummer
 
     display marriage date
+de: Hochzeitstag anzeigen
+en: Display date of marriage
+es: editar la fecha de nacimiento
 fr: afficher la date de mariage
+it: visualizzare la data del matrimonio
 
     display notes/sources inline
-de: fügen Sie Noten/Quellenangaben zum Inhalt hinzu
-en: display in individual data
-es: incluir las notas/fuentes al contenido
+de: einschließen der Notizen/Quellen und Inhalt
+en: Add notes & sources
+es: incluir las notas/fuentes en el contenido
 fr: inclure les notes/sources au contenu
 it: includere le note/fonti al contenuto
 
@@ -4376,7 +4446,11 @@ sl: družina izbrisana
 sv: familj borttagen
 
     family source
+de: Ouellenangabe-Familie
+en: Source
+es: fuente familiar
 fr: source famille
+it: fonte di famiglia
 
     family/families
 af: familie/families
@@ -4995,9 +5069,9 @@ no: halvbrødre/halvsøstre/halvsøsken
 sv: halvbröder och halvsystrar
 
     half-siblings
-de: halbbrüder und schwestern
-en: half-siblings
-es: hermanastros y hermanastras
+de: Halbgeschwister
+en: Half-siblings
+es: hermanastros/as
 fr: demi frères et demi sœurs
 it: fratellastri e sorellastre
 nl: half broers en zusters
@@ -5042,12 +5116,18 @@ sl: srečen rojstni dan!
 sv: gratulerar på födelsedagen!
 
     having a family
-en: having a fmaily
+de: hat einen Lebenspartner und/oder Kinder
+en: Spouse and children are known
+es: tiene un cónyuge y/o hijos
 fr: ayant une famille
+it: con coniuge e/o figli
 
     having no family
-en: having no family
+de: hat weder Kinder noch einen Lebenspartner
+en: Spouse and children are unknown
+es: no tiene hijos ni cónyuge
 fr: n'ayant pas de famille
+it: senza figli né coniuge
 
     having as children
 af: met as kinders
@@ -5079,17 +5159,18 @@ sv: barn
 zh:  生有子女
 
     help modify data
-de: Klicken auf “[ändern]” um den Standort zu korrigieren: die Gesamtheit Ihrer Dateien die diesen Standort betreffen werden sofort korrigiert werden
-en: Click "[Update]" to edit: your entire family tree will be automatically updated
-es: Pulse en "[modificar]" para corregir un lugar: las fichas de su árbol que contengan este lugar serán corregidas instantáneamente
+de: Klicken Sie auf das zu korrigierende "Listen-Element": alle Dateien Ihres Baumes werden sofort korrigiert
+en: Click 'Update' to edit and your entire family tree will be automatically updated
+es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente
 fr: Cliquez sur « l’élément de la liste » que vous souhaitez corriger : l’ensemble des fiches de votre arbre seront instantanément corrigées
+it: Clicca su « l’elemento della lista » che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette
 
     help surname branch
-de: Um den Baum mit den Zweigen der Familiennamen zu erhalten, klicken Sie auf die Zahl der Zweige
-en: click the number of lines in the table below to view the family tree
-es: Para obtener el árbol de las ramas patronímicas, pulse en el número de rama
+de: um die Zweige Ihres Stammbaums zu den Nachnamen zu erhalten, klicken Sie auf die Zahlenangabe der Baumzweige
+en: click a number to view family tree
+es: para obtener el árbol de las ramas patrónimicas, pulse en el número de las ramas
 fr: pour obtenir l'arbre des branches patronymiques, cliquez sur le nombre de branches
-it: Per ottenere l’albero dei rami del cognome, clicca sul numero del ramo
+it: per ottenere l'albero dei rami patronimici, clicca sul numero di rami
 
     here
 af: hier
@@ -5264,7 +5345,11 @@ sl: ime/e-pošta/vsebina
 sv: ident/email/ämne
 
     iftitles/public/private
+de: Adelstitel/öffendlich/privat
+en: If titles/Public/Private
+es: si hay títulos/público/privado
 fr: si titres/public/privé
+it: se titoli/pubblico/privato
 
     if titles
 af: as titels
@@ -5818,11 +5903,18 @@ sl: je
 sv: är
 
     is a very old individual
+de: ist eine sehr alte Person
+en: is old
+es: es una persona mayor
 fr: est une vieille personne
+it: è una persona anziana
 
     is a very old parent
-en: is a very old parent
+de: ist ein sehr alter Verwandter
+en: is old
+es: es un padre muy viejo
 fr: est vraiment un parent très âgé
+it: è un parente molto anziano
 
     is a very young parent
 af: is 'n baie jong ouer
@@ -6109,22 +6201,38 @@ sv: lista/trädlista
 
     list eclair
 de: Blitzliste
-en: list by name, place & date
+en: List by name, place & date
 es: lista rápida
 fr: liste-éclair
 it: lista lampo
 
     living after %s
+de: lebte nach %s
+en: lived after %s
+es: vivo después de %s
 fr: vivant après %s
+it: in vita dopo il %s
 
     living before %s
+de: lebte vor %s
+en: lived before %s
+es: vivo antes de %s
 fr: vivant avant %s
+it: in vita prima del %s
 
     living between %s and %s
+de: lebte von %s bis %s
+en: lived from %s to %s
+es: vivo desde %s a %s
 fr: vivant de %s à %s
+it: vivente dal %s al %s
 
     living from/to
+de: lebte von/bis
+en: lived from/to
+es: vivo de/a
 fr: vivant de/à
+it: vivente dal/al
 
     long display
 af: uitgebreide weergawe
@@ -6155,11 +6263,11 @@ sl: dolg seznam
 sv: utökad rapport
 
     looking for
-de: wonach suchen
-en: check
+de: zu suchende Elemente
+en: Check
 es: elementos a buscar
 fr: éléments à rechercher
-it: elementi da cercare
+it: elementi da ricercare
 
     loop in database: %s is his/her own ancestor
 af: fout in die databasis: %s sy/haar eie voorvader
@@ -6246,7 +6354,11 @@ sl: glavni naziv
 sv: huvudtitel
 
     male/female/neuter
+de: Mann/Frau/Unbekannt
+en: Male/Female/Unknown
+es: hombre/mujer/no específicado
 fr: homme/femme/non spécifié
+it: maschio/femmina/non specificato
 
     male line/female line
 af: manlike lyn/vroulike lyn
@@ -6335,13 +6447,25 @@ sv: äktenskapet ägde rum före %t födseln
 zh: 結婚前%t出生的地方
 
     marriage date
+de: Datum der Eheschließung
+en: Date of marriage
+es: fecha de matrimonio
 fr: date de mariage
+it: data del matrimonio
 
     marriage place
+de: Ort der Eheschließung
+en: Place of marriage
+es: lugar de matrimonio
 fr: lieu de mariage
+it: luogo del matrimonio
 
     marriage src
+de: Ouellenangabe-Eheschließung
+en: Source of marriage
+es: fuente matrimonio
 fr: source mariage
+it: fonte del matrimonio
 
     marriage/marriages
 af: huwelik/huwelike
@@ -6537,7 +6661,8 @@ zh: %t配偶是
 
     maternal grand-parents
 de: Großeltern mütterlicherseits
-en: maternal grand-parents
+en: Mother's parents
+es: abuelos maternos
 fi: äidin puolen isovanhemmat
 fr: grands parents maternels
 it: nonni materni
@@ -6807,31 +6932,31 @@ sv: anor som saknas
 
     missing events
 de: Fehlende Ereignisse
-en: missing events
-es: acontecimientos que faltan
+en: Events unknown
+es: faltan eventos
 fr: événements manquants
 it: eventi mancanti
 
     missing parents
-de: Fehlende Eltern
-en: Unknown parents
-es: Padres que faltan
+de: Eltern fehlen
+en: Parents unknown
+es: faltan padres
 fr: parents manquants
-it: Genitori mancanti
+it: genitori mancanti
 
     missing sosa
-de: Fehlende Sosa
-en: Sosa number
-es: Sosa que faltan
+de: Fehlende SOSA
+en: Sosa Number
+es: falta sosa
 fr: sosa manquants
-it: Sosa mancanti
+it: sosa mancante
 
     missing spouse
-de: Fehlende Partner
-en: Unknown spouse
-es: Cónyuges que faltan
+de: Lebenspartner fehlt
+en: Spouse unknown
+es: falta cónyuge
 fr: conjoint manquant
-it: Coniugi mancanti
+it: coniuge mancante
 
     missing sources
 de: fehlende Quellenangaben
@@ -6845,7 +6970,7 @@ no: savnede kilder
 sv: saknade källor
 
     modification/modifications
-de: änderung/änderungen
+de: Änderung/Änderungen
 en: update/updates
 es: modificación/modificaciónes
 fi: muutos/muutokset
@@ -6855,12 +6980,12 @@ nl: wijziging/wijzigingen
 sv: ändring/ändringar
 
     modification successful
-de: änderung durchgeführt
-en: successfully updated
-es: modificación efectuada
+de: Änderung durchgeführt
+en: Successfully updated
+es: hecha modificación
 fi: muutos suoritettu
 fr: modification effectuée
-it: mestiere modificato
+it: modifica effettuata
 nl: wijziging uitgevoerd
 sv: ändring slutförd
 
@@ -7113,7 +7238,6 @@ sk: "Sosa" číslo vo vzťahu k
 sl: številka"Sosa", v odnosu z
 sv: annummer med som proband (Kekules system)
 
-
     name
 af: naam
 bg: име
@@ -7278,14 +7402,18 @@ sl: nečaki in nečakinje
 sv: nevöer och niecer
 
     new modification
-de: möchten Sie eine weitere Änderung durchführen
-en: continue edit
-es: ¿Quiere hacer una nueva corrección?
+de: hier klicken um eine neue Korrektion durchzuführen
+en: Continue edit
+es: pulse aquí para hacer una nueva corrección
 fr: cliquez ici pour effectuer une nouvelle correction
+it: clicca qui per una nuova correzione
 
     next relationship path
-en: next relationship path
+de: nächster Verwandtschaftsgrad
+en: Next relationship path
+es: siguiente ruta de parentesco
 fr: chemin suivant
+it: percorso seguente
 
     next sibling
 af: volgende broer/volgende suster/volgende broer of suster
@@ -7372,11 +7500,12 @@ sl: nobenega rojstnega dneva
 sv: ingen födelsedag
 
     no descendants
-de: ohne Nachkommen
-en: without posterity
+de: Ohne Nachkommen
+en: Without posterity
+es: sin descendencia
 fi: ilman jälkeläisiä
 fr: sans descendants
-it: senza discendenti
+it: senza ascendenti
 nl: zonder afstammelingen
 no: uten etterkommere
 sv: utan ättlingar
@@ -7466,8 +7595,8 @@ sl: ni omembe
 sv: inte nämnd
 
     no modification
-de: keine Ortsänderung vermerkt
-en: no changes
+de: Keine Änderungen
+en: No changes
 es: ninguna modificación
 fr: aucune modification
 it: nessuna modifica
@@ -7588,8 +7717,11 @@ sv: noteringar modifierade
 
     notes summary
 bg: резюме на бележките
-en: notes summary
+de: Zusammenfassung sonstiger Notizen
+en: Notes
+es: sumario de notas diversas
 fr: Sommaire des notes diverses
+it: Sommario delle diverse note
 
     not found
 af: niks gekry nie
@@ -7763,32 +7895,32 @@ sl: številka
 sv: nummer
 
     nb branches
-de: nb. Zweige
+de: Zweige
 en: Lines
-es: Nº ramas
+es: núm. ramas
 fr: nb. branches
-it: N° rami
+it: n° rami
 
     nb children
-de: nb. Kinder
+de: Kinder
 en: Children
-es: Nº hijos
+es: núm. hijos
 fr: nb. enfants
-it: N° figli
+it: n° figli
 
     nb events
 de: Ereignisse
-en: events
-es: Nº acontecimientos
+en: Events
+es: núm. eventos
 fr: nb. événements
-it: N° d'eventi
+it: n° eventi
 
     nb individuals
 de: Individuen
-en: individuals
-es: Nº individuos
+en: Individuals
+es: núm. individuos
 fr: nb. individus
-it: N° individui
+it: n° individui
 
     number of branches
 af: aantal stake
@@ -7819,21 +7951,23 @@ sl: število vej
 sv: antal grenar
 
     number of children
-de: anzahl der Kinder
-en: number of children
+de: Anzahl der Kinder
+en: Number of children
 es: número de hijos
 fr: nombre d’enfants
 it: numero di figli
 
     number of individuals
-en: number of Individuals
+de: Anzahl der Individuen
+en: Number of Individuals
 es: número de individuos
 fr: nombre d'individus
 it: numero d'individui
 
     number of events
-en: number of Events
-es: número de acontecimientos
+de: Anzahl der Ereignisse
+en: Number of Events
+es: número de eventos
 fr: nombre d'événements
 it: numero d'eventi
 
@@ -7917,8 +8051,6 @@ ru: умер
 sl: umrl
 sv: helt säkert avliden
 zh:  死
-
-
 
     of the %s generation
 af: uit die %s geslag
@@ -8261,8 +8393,9 @@ sv: föräldrar
 zh:  父母
 
     paternal grand-parents
-de: großeltern väterlicherseits
-en: paternal grand-parents
+de: Großeltern väterlicherseits
+en: Father's parents
+es: abuelos paternos
 fi: isän puolen isovanhemmat
 fr: grands parents paternels
 it: nonni paterni
@@ -8355,7 +8488,11 @@ sl: oseba spremenjena
 sv: person ändrad
 
     person source
+de: Quellenangabe-Individuum
+en: Source of individual
+es: fuente individuo
 fr: source individu
+it: fonte individuo
 
     person/persons
 af: persoon/persone
@@ -8960,15 +9097,15 @@ no: i slekt med...
 sv: släktskap med...
 
     relationship shortcut
-de: verknüpfungen:
-en: shortcuts:
-es: atajo:
+de: Verknüpfungen :
+en: Shortcuts:
+es: atajos :
 fi: oikotie:
 fr: raccourcis :
-it: scorciatoia:
+it: scorciatoie :
+nl: genväg:
 nl: binnenweg :
 no: snarvei:
-nl: genväg:
 
     relationship%t to
 af: verwantskap%t met
@@ -9000,24 +9137,32 @@ sl: zveza z %t
 sv: förhållande%t med
 
     revision history
+de: Verlauf der Revisionen
+en: Revision history
+es: histórico de las revisiones
 fr: historique des révisions
+it: cronistoria delle revisioni
 
     revision of
+de: Revision von
+en: Revision date
+es: revisión del
 fr: révision du
+it: revisione del
 
     same ancestor as n° Sosa
-de: identisch mit der Sosa/Pkz-Nr.
-en: same as Sosa #
-es: sdéntico al número Sosa
+de: identisch mit Sosa Nr.
+en: Same as Sosa #
+es: idéntico al nº Sosa
 fr: identique au n° Sosa
-it: pari al numero Sosa
+it: identico al n° Sosa
 
     searching all
 de: suche alle
-en: search
-es: buscar todos los
+en: Search
+es: buscar todos los 
 fr: recherche tous les
-it: ricercare tutti gli
+it: ricercare tutti i
 
     search/case sensitive
 bg: търсене/с различаване на главни и малки букви
@@ -9114,16 +9259,32 @@ no: vis også
 sv: visa också
 
     see ascendants notes/sources
+de: siehe Notizen/Quellen
+en: View notes/sources
+es: ver las notas/fuentes
 fr: voir les notes/sources
+it: vedere le note/fonti
 
     see ascendants pictures
+de: siehe Porträts
+en: View pictures
+es: ver los retratos
 fr: voir les portraits
+it: vedere i ritratti
 
     see descendants notes/sources
+de: siehe Notizen/Quellen
+en: View notes/sources
+es: ver las notas/fuentes
 fr: voir les notes/sources
+it: vedere le note/fonti
 
     see descendants pictures
+de: siehe Porträts
+en: View pictures
+es: ver los retratos
 fr: voir les portraits
+it: vedere i ritratti
 
     see further
 af: kyk verder
@@ -9165,8 +9326,8 @@ no: velg
 sv: välj
 
     select a letter
-de: einen Buchstaben wählen
-en: select a letter
+de: wählen Sie einen Buchstaben
+en: Select a letter
 es: elija una letra
 fi: valitse kirjain
 fr: choisissez une lettre
@@ -9197,7 +9358,11 @@ no: klikk på personen som du vil beregne slektskapsgraden til
 sv: klicka på personen som du vill räkna ut släktskapsgraden med
 
     select the two revisions you want to compare
+de: wählen Sie zwei zu vergleichende Revisionen
+en: Select revisions to view history
+es: seleccione las dos revisiones que quiere comparar
 fr: selectionnez les deux révisions que vous voulez comparer
+it: seleziona le due versioni da paragonare
 
     send
 af: stuur
@@ -9504,28 +9669,28 @@ sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
     sort by/branch/alphabetic order
-de: sortieren nach:/Zweigen/Alphabetisch
-en: sort by:/Line/Alphabetical order
-es: organizar por:/Ramas/Orden alfabético
+de: sortieren nach: /Zweige/Alphabet
+en: Sort by:/Line/Alphabetical order
+es: organizar por: ramas/orden alfabético
 fr: trier par :/branches/ordre alphabétique
-it: smistare per :/Rami/Ordine alfabetico
+it: smistare per :/rami/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
 sv: visas efter:/grenar/alfabetisk ordning
 
     sort by/date begin/alphabetic order/nb individuals/nb events
-de: sortieren nach:/Anfangsdatum/Alphabetisch/Anzahl der Individuen/Anzahl der Ereignisse
-en: sort by:/Date/Alphabetical order/Number of Individuals/Number of Events
-es: organizar por:/Fecha de inicio/Orden alfabético/Número de individuos/Número de acontecimientos
+de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Ereignisse
+en: Sort by:/Date/Alphabetical order/Number of individuals/Number of events
+es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
 fr: trier par:/date de début/ordre alphabétique/nombre d'individus/nombre d'événements
-it: Smistare per :/Data d'inizio/Ordine alfabetico/Numero d'individui/Numero d'eventi
+it: smistare per : data d'inizio/ordine alfabetico/numero d'individui/numero d'eventi
 
     sort by/generation/alphabetic order
-de: Sortieren nach:/Generationen/Alphabetisch
-en: sort by:/Generation/Alphabetical order
-es: Organizar por :/Generaciones/Orden alfabético
+de: sortieren nach: /Generationen/Alphabet
+en: Sort by:/Generation/Alphabetical order
+es: organizar por: generación/orden alfabético
 fr: trier par:/génération/ordre alphabétique
-it: Smistare per :/Generazioni/Ordine alfabetico
+it: smistare per : /generazione/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
 sv: visas efter:/grenar/alfabetisk ordning
@@ -9561,14 +9726,16 @@ sv: annummer
     Sosa reference: %t
 af: Sosa verwysing: %t
 ca: referència de "número Sosa": %t
+de: Sosa Referenz: %t
 en: Family Tree Root: %t
 eo: Sosa referenco: %t
-es: referencia de Sosa: %t
+es: referencia Sosa: %t
 et: Sosa viidet: %t
 fi: Sosa-viitteenä: %t
 fr: référence Sosa : %t
+fr: référence Sosa : %t
 he:  כאזכור Sosa: %t
-it: riferimento Sosa: %t
+it: riferimento Sosa : %t
 lv: Sosa pakāpes: %t
 pt: referência Sosa: %t
 ro: referinta Sosa: %t
@@ -9728,8 +9895,11 @@ sv: statistik
 
     statistics and anniversaries
 bg: статистика и годишнини
-en: statistics and anniversaries
+de: Statistik und Geburtstage
+en: statistics and Family Events
+es: Estadísticas y aniversarios
 fr: Statistiques et anniversaires
+it: Statistiche e compleanni
 
     summary book ascendants
 de: liste der Dateien
@@ -10109,7 +10279,11 @@ sl: pojutrišnem
 sv: i övermorgon
 
     the difference of age between %t and %t is quite important
+de: der Altersunterschied zwischen %t und %t ist sehr groß
+en: Date of birth of %t and %t are too far together
+es: la diferencia de edad entre %t y %t es grande
 fr: la différence d’âge entre %t et %t est assez importante
+it: il divario d'età tra %t e %t è importante
 
     the %d first names
 af: die %d voorname
@@ -10339,7 +10513,11 @@ sl: ta datoteka je začasno zaklenjena: prosimo poskusite znova. Če še vedno n
 sv: filen är temporärt låst: försök igen. Om det ändå inte fungerar, vänta ett tag innan nästa försök
 
     the following children of %t and %t are born very close
+de: das Geburtsdatum der Kinder %t und %t liegt sehr nah beieinander
+en: Date of birth of the children of %t and %t are too close together
+es: las fechas de nacimiento de los siguientes hijos de %t y de %t son muy próximas
 fr: les enfants suivants de %t et de %t sont nés très rapprochés
+it: le date di nascita dei seguenti figli di %t e di %t sono vicinissime
 
     the following children of %t and %t are not in order
 af: die volgende kinders van %t and %t is nie in die regte volgorde nie
@@ -10511,8 +10689,11 @@ sv: de senaste %d födslarna
 
     the latest %d celebrated marriages
 bg: последните %d чествувани сватби
-en: the latest %d celebrated marriages
+de: die %d letzten Hochzeiten
+en: Latest %d marriages (Date of marriage)
+es: los %d últimos matrimonios célebres
 fr: les %d derniers mariages célébrés
+it: i %d ultimi matrimoni celebrati
 
     the latest %d marriages
 af: die laaste %d huwelike
@@ -10544,8 +10725,11 @@ sv: de senaste %d äktenskapen
 
     the latest %d registered marriages
 bg: последните %d регистрирани сватби
-en: the latest %d registered marriages
+de: die %d letzten eingetragenen Hochzeiten
+en: Latest %d marriages (Date of entry)
+es: los %d últimos matrimonios registrados
 fr: les %d derniers mariages enregistrés
+it: i %d ultimi matrimoni inseriti
 
     the latest %t deaths
 af: die laaste %t afsterwes
@@ -10576,11 +10760,11 @@ sl: zadnjih %t smrti
 sv: de senaste %t avlidna
 
     the modification impacted %d persons
-de: die Änderungen sind abgeschlossen : %d der Datei (en) kopiert
-en: successfully updated: %d places have been changed
-es: la modificación ha sido hecha: %d ficha(s) corregida(s)
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
-it: la modifica è stata correttamente eseguita : %d di schede corrette
+de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
+en: %d entries have been successfully updated
+es: la modificación ha sido hecha: %d ficha/s corregida/s
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+it: la modifica è stata effettuata : %d scheda/e corretta/e
 
     the parents
 af: die ouers
@@ -10775,13 +10959,13 @@ sl: da bi dodal otroka k družini, uporabite "%s"
 sv: för att lägga till ett barn i en familj, använd "%s"
 
     to change
-de: zum  Wechseln
-en: to change
+de: zum wechseln
+en: Edit
 es: para cambiar
 et: muutmiseks
 fi: muuttaaksesi
 fr: pour changer
-it: per cambiare
+it: per modificare
 nl: om te wijzigen
 sv: för att ändra
 
@@ -11370,8 +11554,11 @@ sk: potvrdiť/zmazať
 sv: giltligt/tas bort
 
     version
-en: version
+de: Version
+en: Version
+es: versión
 fr: version
+it: versione
 
     view source
 de: siehe Quelle
