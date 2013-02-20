@@ -1,18 +1,18 @@
 ged2gwb2.cmo: ../src/adef.cmi ../src/ansel.cmo ../src/argl.cmo \
     ../src/buff.cmo ../src/calendar.cmi ../src/db2link.cmi ../src/def.cmi \
     ../src/futil.cmi ../src/gwcomp.cmi ../src/lock.cmi ../src/mutil.cmi \
-    ../src/name.cmi ../src/secure.cmi 
+    ../src/name.cmi ../src/secure.cmi ./utf8.cmi
 ged2gwb2.cmx: ../src/adef.cmx ../src/ansel.cmx ../src/argl.cmx \
     ../src/buff.cmx ../src/calendar.cmx ../src/db2link.cmx ../src/def.cmi \
     ../src/futil.cmx ../src/gwcomp.cmx ../src/lock.cmx ../src/mutil.cmx \
-    ../src/name.cmx ../src/secure.cmx 
+    ../src/name.cmx ../src/secure.cmx ./utf8.cmx
 ged2gwb.cmo: ../src/adef.cmi ../src/ansel.cmo ../src/argl.cmo \
     ../src/buff.cmo ../src/calendar.cmi ../src/check.cmi \
     ../src/checkItem.cmi ../src/dbdisk.cmi ../src/def.cmi ../src/gwdb.cmi \
     ../src/lock.cmi ../src/mutil.cmi ../src/name.cmi ../src/outbase.cmi \
-    ../src/secure.cmi 
+    ../src/secure.cmi ./utf8.cmi
 ged2gwb.cmx: ../src/adef.cmx ../src/ansel.cmx ../src/argl.cmx \
     ../src/buff.cmx ../src/calendar.cmx ../src/check.cmx \
     ../src/checkItem.cmx ../src/dbdisk.cmi ../src/def.cmi ../src/gwdb.cmx \
     ../src/lock.cmx ../src/mutil.cmx ../src/name.cmx ../src/outbase.cmx \
-    ../src/secure.cmx 
+    ../src/secure.cmx ./utf8.cmx
