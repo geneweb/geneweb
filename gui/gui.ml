@@ -80,17 +80,65 @@ value capitale w = String.capitalize w ;
 (**/**) (* Fonctions utiles. *)
 
 
+value channel_redirector channel callback = do {
+  let (cout,cin) = Unix.pipe () in
+  Unix.dup2 cin channel ;
+  let chan = GMain.Io.channel_of_descr cout in
+  let len = 80 in
+  let buf = String.create len in
+  GMain.Io.add_watch chan ~prio:0 ~cond:[`IN; `HUP; `ERR] ~callback:
+    do { fun cond -> 
+      try 
+        if List.mem `IN cond then do {
+	        (* On Windows, you must use Io.read *)
+	        let len = GMain.Io.read chan ~buf ~pos:0 ~len in
+	        len >= 1 && (callback (String.sub buf 0 len)) 
+        }
+        else False
+      with [ _ -> False ]
+  }
+};
+
+
 value exec prog args out err =
   Unix.create_process prog (Array.of_list [prog :: args]) Unix.stdin out err
 ;
 
 value exec_wait conf prog args =
-  let fd =
-    Unix.openfile conf.log [Unix.O_WRONLY; Unix.O_CREAT; Unix.O_TRUNC] 0o666
-  in
-  let pid = exec prog args fd fd in
-  let (_, _) = Unix.waitpid [] pid in
-  Unix.close fd
+  do {
+    let wnd = GWindow.window 
+      ~title:(capitale (transl "Processing"))
+      ~position:`CENTER 
+      ~resizable:True 
+      ~width:600 ~height:300 () 
+    in 
+    ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
+    wnd#show();
+    let vbox = GPack.vbox
+      ~spacing:5
+      ~packing:wnd#add ()
+    in
+    let scrolled_window = GBin.scrolled_window ~border_width: 10
+      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
+      ~packing:vbox#add () 
+    in
+    let vvbox = GPack.hbox 
+      ~border_width: 10
+      ~packing:scrolled_window#add_with_viewport () 
+    in
+    vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
+    let redirect channel =
+      let buffer = GText.buffer () in
+      let _text = GText.view ~buffer ~editable:False ~packing:vvbox#add () in
+      channel_redirector channel (fun c -> do {buffer#insert c; True})
+    in
+    ignore (redirect Unix.stderr);
+    let pid = exec prog args Unix.stdout Unix.stderr in
+    (* On voudrait bien attendre la fin du process 
+       mais sinon wnd ne s'affiche pas ...         *)
+    let (_, _) = Unix.waitpid [] pid in
+    ()
+  }
 ;
 
 value mkdir_p x =
@@ -335,9 +383,12 @@ value display_log conf = do {
   in
   let scrolled_window = GBin.scrolled_window ~border_width: 10
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:vbox#add () in
-  let vvbox = GPack.hbox ~border_width: 10
-    ~packing:scrolled_window#add_with_viewport () in
+    ~packing:vbox#add () 
+  in
+  let vvbox = GPack.hbox 
+    ~border_width: 10
+    ~packing:scrolled_window#add_with_viewport () 
+  in
   vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
   match try Some (open_in conf.log) with [Sys_error _ -> None] with
   [ Some ic ->
@@ -441,14 +492,14 @@ value browse conf url = do {
 value gwc1 conf bname fname = 
   (* Hack Windows, pas de Filename.concat mais juste bname *)
   let prog = Filename.concat bin_dir "gwc1" in
-  let args = ["-nc"; "-o"; bname] in
+  let args = ["-v"; "-nc"; "-o"; bname] in
   let args = if fname <> "" then [fname :: args] else args in
   exec_wait conf prog args
 ;
 
 value gwc2 conf bname fname = 
   let prog = Filename.concat bin_dir "gwc2" in
-  let args = ["-nc"; "-o"; bname] in
+  let args = ["-v"; "-nc"; "-o"; bname] in
   let args = if fname <> "" then [fname :: args] else args in
   exec_wait conf prog args
 ;
