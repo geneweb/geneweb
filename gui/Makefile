@@ -3,11 +3,12 @@
 
 include ../tools/Makefile.inc
 
+LABLGTK2=+lablgtk2
 OCAMLC=ocamlc.opt
 OCAMLOPT=ocamlopt.opt -annot
 GWB=..
 OBJS=../src/version.cmo ../src/iovalue.cmo ../src/buff.cmo ../src/name.cmo ../src/mutil.cmo gui.cmo
-OCAMLI=-I ../src -I +lablgtk2
+OCAMLI=-I ../src -I $(LABLGTK2)
 TEST_DIR=test $$(basename "$<") = "$<" || { echo "Please run 'make' in directory '$$(dirname "$<")' first"; exit 1; }
 
 all:: opt
@@ -21,10 +22,10 @@ opt:: gui.opt
 	cp gui.opt gui
 
 gui.out: $(OBJS)
-	$(OCAMLC) -I +lablgtk2 lablgtk.cma unix.cma $(OBJS) -o gui.out
+	$(OCAMLC) -I $(LABLGTK2) lablgtk.cma unix.cma $(OBJS) -o gui.out
 
 gui.opt: $(OBJS:.cmo=.cmx)
-	$(OCAMLOPT) -I +lablgtk2 lablgtk.cmxa unix.cmxa $(OBJS:.cmo=.cmx) -o gui.opt
+	$(OCAMLOPT) -I $(LABLGTK2) lablgtk.cmxa unix.cmxa $(OBJS:.cmo=.cmx) -o gui.opt
 
 clean::
 	$(RM) gui
