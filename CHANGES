@@ -1,3 +1,23 @@
+GeneWeb version 6.07
+--------------------
+
+* Added a detailed history. It allows you to compare two modifications of an
+  individual and see what have changed.
+* New design for the search form in the welcome page. Instead of 3 radio 
+  buttons, there is now 3 input text. The first one allow you to search by
+  first names. The second one by names. The last one by key (first name.occ
+  surname), public name, alias, sosa ... One trick is possible, you can 
+  enter first name(.occ) and name in the respective field and it will search 
+  by first name and surname.
+* Added the warning BigAgeBetweenSpouses, DeadOld (if dead after 1900 and aged
+  of 105 years old or if dead before 1900 and aged of 100 years old), 
+  OldIndividual (if not dead and aged more than 120 years old). Specify if the 
+  warning "marriage before/after birth/death" applies to a witness or a couple.
+* Fix import Gedcom option for uppercase/lowercase name when using utf8.
+* New output : missing events.
+* Other small things...
+
+
 GeneWeb version 6.06
 --------------------
 
