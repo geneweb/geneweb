@@ -244,8 +244,8 @@ function update_old () {
   %foreach;family;
     <tr>
       <td class="hist_lbl">[*marriage/marriages]0</td>
-      <td class="odd">%before.marriage_type;: %before.spouse;</td>
-      <td class="odd">%after.marriage_type;: %after.spouse;</td>
+      <td class="odd">%if;(before.marriage_type != "")%before.marriage_type;:%end; %before.spouse;</td>
+      <td class="odd">%if;(after.marriage_type != "")%after.marriage_type;: %end;%after.spouse;</td>
     </tr>
     <tr>
       <td class="hist_lbl">[*marriage date]</td>
