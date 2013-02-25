@@ -1,8 +1,8 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt, Template x v 6.07b 2013/01/04 12:00:00 ddr/dd Exp $ -->
-  <!-- copyright (c) 1998-2012 INRIA -->
+  <!-- $Id: ancsosa.txt, Template x v 6.07c 2013/02/19 12:00:00 ddr/dd Exp $ -->
+  <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] ... [up to] ...%nn;
@@ -30,10 +30,6 @@
   --></style>
 %base_header;
 </head>
-
-%define;include_file(file)
-  %include.file;
-%end;
 
 %define;image_sosa(xxx,yyy)
   <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
@@ -1321,7 +1317,7 @@
   %elseif;(evar.t = "M" and evar.al = "on")
     %apply;missing_ancestors_alphabetically()  
   %elseif;(evar.t = "M" and evar.evt = "on")
-    %apply;include_file("templx/miss_evt")
+    %include.miss_evt;
   %elseif;(evar.t = "M")
     %apply;missing_ancestors_by_generation()
   %elseif;(evar.t = "D")
