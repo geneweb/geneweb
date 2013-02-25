@@ -9361,7 +9361,7 @@ sv: klicka på personen som du vill räkna ut släktskapsgraden med
 de: wählen Sie zwei zu vergleichende Revisionen
 en: Select revisions to view history
 es: seleccione las dos revisiones que quiere comparar
-fr: selectionnez les deux révisions que vous voulez comparer
+fr: sélectionnez les deux révisions que vous voulez comparer
 it: seleziona le due versioni da paragonare
 
     send
