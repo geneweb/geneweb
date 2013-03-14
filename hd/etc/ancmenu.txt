@@ -296,6 +296,12 @@ function no_options () {
       </p>
       <p class="ascends_menu_option_p">
         <label>
+          <input type="checkbox" id="boa_relations" name="rel" value="on"%/>
+          [*relation/relations]1
+        </label>
+      </p>
+      <p class="ascends_menu_option_p">
+        <label>
           <input type="checkbox" id="boa_marr" name="marr" value="on"%/>
           [*marriage/marriages]1
         </label>
