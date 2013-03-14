@@ -16,7 +16,6 @@ value max_month_btw_sibl = 7;
 value lim_date_death = 1900;
 value max_death_after_lim_date_death = 105;
 value max_death_before_lim_date_death = 100;
-value max_age = 120;
 value min_parent_age = 11;
 value max_father_age = 70;
 value max_mother_age = 55;
@@ -252,13 +251,7 @@ value check_person_age base warning p =
             warning (DeadOld p a) 
           else ()
     | _ -> () ]
-  else
-    match first_found_date with
-    [ Some d ->
-        let a = time_elapsed d today in
-        if a.year > max_age then warning (OldIndividual p a)
-        else ()
-    | None -> () ]
+  else ()
 ;
 
 value try_to_fix_relation_sex base warning p_ref = do {
