@@ -1107,6 +1107,9 @@ value lowercase_or_uppercase_utf8 lower s =
   with [ Not_found -> s ]
 ;
 
+value lowercase_utf8 s = lowercase_or_uppercase_utf8 True s;
+value uppercase_utf8 s = lowercase_or_uppercase_utf8 False s;
+
 value lowercase_name s =
   let s = String.copy s in
   copy False 0 0 (particle s 0) where rec copy special i len uncap =
@@ -1134,7 +1137,10 @@ value lowercase_name s =
               copy False (i + 1) (Buff.store len s.[i]) True
             else
               let s = String.sub s i nbc in
-              let s = if not uncap then s else lowercase_or_uppercase_utf8 True s in
+              let s = 
+                if not uncap then uppercase_utf8 s 
+                else lowercase_utf8 s 
+              in
               let (t, j) = (s, i + nbc) in
               copy False j (Buff.mstore len t) True ]
 ;
@@ -1166,7 +1172,7 @@ value uppercase_name s =
               copy False (i + 1) (Buff.store len s.[i]) False
             else
               let s = String.sub s i nbc in
-              let s = if uncap then s else lowercase_or_uppercase_utf8 False s in
+              let s = if uncap then s else uppercase_utf8 s in
               let (t, j) = (s, i + nbc) in
               copy False j (Buff.mstore len t) False ]
 ;
