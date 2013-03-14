@@ -19,6 +19,22 @@
   %end;
 %end;
 
+%define;relation_type_txt(xx, sex)
+  %if;("xx" = [adoptive father/adoptive mother/adoptive parents]2)
+    %apply;capitalize(nth([adoptive father/adoptive mother/adoptive parents], sex))
+  %elseif;("xx" = [recognizing father/recognizing mother/recognizing parents]2)
+    %apply;capitalize(nth([recognizing father/recognizing mother/recognizing parents], sex))
+  %elseif;("xx" = [candidate father/candidate mother/candidate parents]2)
+    %apply;capitalize(nth([candidate father/candidate mother/candidate parents], sex))
+  %elseif;("xx" = [godfather/godmother/godparents]2)
+    %apply;capitalize(nth([godfather/godmother/godparents], sex))
+  %elseif;("xx" = [foster father/foster mother/foster parents]2)
+    %apply;capitalize(nth([foster father/foster mother/foster parents], sex))
+  %else;
+    %apply;capitalize("xx")
+  %end;  
+%end;
+
 %define;relation_txt()
   %if;(on_marriage_date != "" or marriage_place != "")
     %if;are_married;
@@ -35,20 +51,22 @@
   %end;
 %end;
 
-%define;display_date(xx, birth, death, with_rowspan)
+%define;display_date(xx, with_rowspan)
   <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
-    %if;("birth" = "")
-      <span class="fp_date_empty">&nbsp;</span>
-    %else;
-      birth
+    %if;xx.has_birth_date;%xx.slash_birth_date;
+    %elseif;xx.has_baptism_date;%xx.slash_baptism_date;
+    %else;<span class="fp_date_empty">&nbsp;</span>
     %end;
   </td>
-  <td align="center" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>-</td>
+  <td align="center" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
+    %if;(xx.has_birth_date or xx.has_baptism_date or xx.has_death_date or xx.has_burial_date) -
+    %else; &nbsp;
+    %end;
+  </td>
   <td align="right" width="10" %if;(xx.nb_families > 1 and with_rowspan = 1) rowspan="%xx.nb_families;" %end;>
-    %if;("death" = "")
-      <span %if;xx.is_dead; class="fp_date_empty" %end;>&nbsp;</span>
-    %else;
-      death
+    %if;xx.has_death_date;%xx.slash_death_date;
+    %elseif;xx.has_burial_date;%xx.slash_burial_date;
+    %else;<span class="fp_date_empty">&nbsp;</span>
     %end;
   </td>
 %end;
@@ -67,7 +85,7 @@
 %define;display_siblings(xx, count)
   <tr %if;(count != 1) class="table_content_siblings" %end;>
     <td %if;(xx.nb_families > 1) rowspan="%xx.nb_families;" %end;>%apply;image_MF("xx", "11") %xx;</td>
-    %apply;display_date("xx", xx.slash_birth_date, xx.slash_death_date, 1)
+    %apply;display_date("xx", 1)
     <td>
       %foreach;xx.family;
         %if;(family_cnt = 1)
@@ -94,11 +112,10 @@
       %apply;image_MF("xx", "11")
       %xx;
     </td>
-    %apply;display_date("xx", xx.slash_birth_date, xx.slash_death_date, 0)
+    %apply;display_date("xx", 0)
     <td>%xx.birth_place;</td>
   </tr>
 %end;
-
 
 %define;display_union(xx)
   <table class="fp_table" cellspacing="0">
@@ -822,6 +839,84 @@
                     %end;
                   %end;
                 %end;
+              %end;
+            %end;
+          %end;
+        %end;
+      </table>
+    </div>
+  %end;
+
+  %reset_count;
+  %if;xx.has_families;
+    %foreach;xx.family;
+      %if;has_witnesses;
+        %incr_count;
+      %end;
+    %end;
+  %end;
+  %if;(evar.rel = "on" and (xx.has_relations or count > 0))
+    <div style="page-break-inside:avoid;">
+      <table class="fp_table_relations" cellspacing="0">
+        <tr><th colspan="4" class="bgcolor">[*relation/relations]1</th></tr>
+        <tr class="fp_grey">
+          <td class="borderna">[*name]</td>
+          <td class="borderna" colspan="3">[*date/dates]1</td>
+        </tr>
+        %foreach;xx.relation;
+          %if;(has_relation_him and has_relation_her)
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_him", "11") %relation_him; %sp;
+                (%apply;relation_type_txt(relation_type, relation_him.sex))
+              </td>
+              %apply;display_date("relation_him", 0)
+            </tr>
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_her", "11") %relation_her; %sp;
+                (%apply;relation_type_txt(relation_type, relation_her.sex))
+              </td>
+              %apply;display_date("relation_her", 0)
+            </tr>
+          %elseif;has_relation_him;
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_him", "11") %relation_him; %sp;
+                (%apply;capitalize(relation_type))
+              </td>
+              %apply;display_date("relation_him", 0)
+            </tr>
+          %elseif;has_relation_her;
+            <tr class="table_content_relations">
+              <td class="borderna">
+                %apply;image_MF("relation_her", "11") %relation_her; %sp;
+                (%apply;capitalize(relation_type))
+              </td>
+              %apply;display_date("relation_her", 0)
+            </tr>
+          %end;
+        %end;
+        %foreach;xx.related;
+          <tr class="table_content_relations">
+            <td class="borderna">
+              %apply;image_MF("related", "11") %related;  %sp;
+              (%apply;capitalize(related_type))
+            </td>
+            %apply;display_date("related", 0)
+          </tr>
+        %end;
+        %if;xx.has_families;
+          %foreach;xx.family;
+            %if;has_witnesses;
+              %foreach;witness;
+                <tr>
+                  <td class="borderna">
+                    %apply;image_MF("witness", "11") %witness; %sp; 
+                    ([*witness/witnesses]0)
+                  </td>
+                  %apply;display_date("witness", 0)
+                </tr>
               %end;
             %end;
           %end;
