@@ -5902,13 +5902,6 @@ sk: je
 sl: je
 sv: är
 
-    is a very old individual
-de: ist eine sehr alte Person
-en: is old
-es: es una persona mayor
-fr: est une vieille personne
-it: è una persona anziana
-
     is a very old parent
 de: ist ein sehr alter Verwandter
 en: is old
@@ -6932,7 +6925,7 @@ sv: anor som saknas
 
     missing events
 de: Fehlende Ereignisse
-en: Events unknown
+en: missing events
 es: faltan eventos
 fr: événements manquants
 it: eventi mancanti

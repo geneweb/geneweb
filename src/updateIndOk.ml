@@ -182,7 +182,7 @@ value rec reconstitute_relations conf ext cnt =
   | _ -> ([], ext) ]
 ;
 
-value reconstitute_death conf birth death_place burial burial_place =
+value reconstitute_death conf birth baptism death_place burial burial_place =
   let d = Update.reconstitute_date conf "death" in
   let dr =
     match p_getenv conf.env "death_reason" with
@@ -198,7 +198,7 @@ value reconstitute_death conf birth death_place burial burial_place =
       if death_place <> "" || burial <> UnknownBurial || burial_place <> "" ||
          dr <> Unspecified then
         DeadDontKnowWhen
-      else Update.infer_death conf birth
+      else Update.infer_death conf birth baptism
   | "DeadYoung" when d = None -> DeadYoung
   | "DontKnowIfDead" when d = None -> DontKnowIfDead
   | "NotDead" -> NotDead
@@ -275,12 +275,14 @@ value reconstitute_person conf =
   in
   let birth = Update.reconstitute_date conf "birth" in
   let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
-  let bapt = Adef.codate_of_od (Update.reconstitute_date conf "bapt") in
+  let bapt = Update.reconstitute_date conf "bapt" in
   let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
   let burial_place = no_html_tags (only_printable (get conf "burial_place")) in
   let burial = reconstitute_burial conf burial_place in
   let death_place = no_html_tags (only_printable (get conf "death_place")) in
-  let death = reconstitute_death conf birth death_place burial burial_place in
+  let death = 
+    reconstitute_death conf birth bapt death_place burial burial_place 
+  in
   let death_place =
     match death with
     [ Death _ _ | DeadYoung | DeadDontKnowWhen -> death_place
@@ -304,8 +306,8 @@ value reconstitute_person conf =
      rparents = rparents; occupation = occupation; related = []; sex = sex;
      access = access; birth = Adef.codate_of_od birth;
      birth_place = birth_place;
-     birth_src = only_printable (get conf "birth_src"); baptism = bapt;
-     baptism_place = bapt_place;
+     birth_src = only_printable (get conf "birth_src"); 
+     baptism = Adef.codate_of_od bapt; baptism_place = bapt_place;
      baptism_src = only_printable (get conf "bapt_src"); death = death;
      death_place = death_place;
      death_src = only_printable (get conf "death_src"); burial = burial;

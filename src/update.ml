@@ -22,9 +22,14 @@ type create_info =
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 
-value infer_death conf birth =
-  match birth with
-  [ Some (Dgreg d _) ->
+value infer_death conf birth bapt =
+  match (birth, bapt) with
+  [ (Some (Dgreg d _), _) ->
+      let a = (CheckItem.time_elapsed d conf.today).year in
+      if a > 120 then OfCourseDead
+      else if a <= 80 then NotDead
+      else DontKnowIfDead
+  | (_, Some (Dgreg d _)) ->
       let a = (CheckItem.time_elapsed d conf.today).year in
       if a > 120 then OfCourseDead
       else if a <= 80 then NotDead
@@ -409,12 +414,6 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base mother)
              (Date.short_dates_text conf base mother))
-  | OldIndividual p a ->
-      do {
-        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
-          (transl conf "is a very old individual");
-        Wserver.wprint "(%s)" (Date.string_of_age conf a);
-      }
   | ParentBornAfterChild p c ->
       Wserver.wprint "%s\n%s\n%s" (print_someone_strong conf base p)
         (transl conf "is born after his/her child")
@@ -927,7 +926,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
               {ci_death = (DeadDontKnowWhen | NotDead as dead);
                ci_death_date = None; ci_death_place = dpl} ->
                 (dead, dpl)
-            | _ -> (infer_death conf birth, "") ]
+            | _ -> (infer_death conf birth baptism, "") ]
           in
           let occupation = 
             match info with
