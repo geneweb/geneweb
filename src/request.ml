@@ -548,7 +548,12 @@ value family_m conf base =
           let search n =
             let (pl, sosa_acc) = find_all conf base n in
             match pl with
-            [ [] -> unknown conf n
+            [ [] ->
+                (* S'il n'y a pas de résultat, on recherche par nom. *)
+                do {
+                  conf.cancel_links := False;
+                  Some.surname_print conf base unknown n
+                }
             | [p] ->
                 if sosa_acc ||
                    Gutil.person_of_string_key base n <> None ||
