@@ -1,0 +1,48 @@
+
+1. Compilation
+---------------
+
+installation caml
+urpmi ocaml camlp5
+
+mettre gwpublic dans repertoire geneweb-5.01/
+
+modifier Makefile avec le bon chemin, ex:
+GW=../../geneweb-5.01-new/src
+
+puis make
+
+2. Utilisation
+--------------
+
+lancer public à la racine des bases
+cd /home/travauxjlm/geneweb/bases
+[jacques@localhost bases]$ ./gwpublic1 jerome
+*** read ascends
+*** read couples
+Jean.0 GALICON
+
+Pour public2 avec log mettre -t:
+./gwpublic2 -y 1900 -t jerome
+
+Pour public2priv avec log mettre -t:
+./gwpublic2priv -y 1900 -t jerome
+
+Pour private
+../gwprivate -ind "Jeanne.0 BERERD" jerome
+(ca met en privé Jeanne Bererd)
+
+mettre en public Jeanne.0 BERERD" et tout ses ascendants (utile pour mettre un SOSA)
+../gwpublic1 -ind "Jeanne.0 BERERD" jerome
+
+Egalement pour les tests:
+../gwiftitles -everybody jerome (mets tout le monde en iftitles)
+../gwpublic1 -everybody jerome (met tout le monde en public)
+../gwprivate -everybody jerome (met tout le monde en privé)
+
+
+
+Les deux scripts:
+gwPublic1. Il prend les individus de de plus de 100 ans et met en "public" tous les ascendants sans dates [ et ? ses descendants à raison de 3 génération par siecle (Daniel avait mis 2 générations par siecle).]
+gwPublic2 mets en public les conjoints de personne public et pour une personne il regarde si dans les ancetres on peut recalculer un plus de 100 ans (en comptant 30 ans par generation)
+gwpublic2priv mets en public les personnes de plus de 100 ans en calculant (30 ans par génération) et en privé les personnes de moins de 100 ans.
