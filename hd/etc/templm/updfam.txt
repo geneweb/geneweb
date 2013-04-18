@@ -5,7 +5,7 @@
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120930 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130404 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -23,8 +23,8 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
+  <script type="text/javascript" src="templm/upd.js"></script>
   %base_header;
-
 %(<!-- Begin define (used in updind.txt, updfam.txt)  -->%)
   <script type="text/javascript">
   <!--
@@ -111,63 +111,14 @@
        break;
     }
   }
-  function changeDisplay(id,c,cond1,cond2) 
-  {
-    var d = document.getElementById(id);
-    var val = c.options%[c.selectedIndex%].value;
-    if (val == cond1 || val == cond2)
-      {d.style.display='inline';}
-    else
-      {d.style.display='none';}
-  }
-  function changeFocus(event,id) {
-    var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-    if (key == 42 || key == 60 || key == 62 || key == 95)
-    {
-     document.getElementById(id).focus();
-     return false;
-    }
-  }
-  function valid(id) {
-    document.getElementById(id).focus();
-    document.getElementById(id).checked = true;
-  }
-  function addRow(event,id) {
-    var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-    if (key == 49 || key == 13)
-    { document.getElementById(id).checked = true;
-      document.upd.submit()
-    }
-  }
-  function no_sex(id)
-  {
-    document.getElementById(id).className='background_sex_2';
-  }
-  function male(id) 
-  {
-    document.getElementById(id).className='background_sex_0';
-  }
-  function female(id) 
-  {
-    document.getElementById(id).className='background_sex_1';
-  }
-  function compute(id,prec)
-  {
-   var x = document.getElementById(id);
-   var y = document.getElementById(prec);
-   if (x.value != '' && x.value != eval(x.value))
-   { x.value = eval(x.value);
-     y.value = 'about'
-   }
-  }
 -->
 </script>
-  
+
   %define;sure_date(xvar)
     class="%if;(xvar.prec = "sure")sure%else;not_sure%end;"%nn;
   %end;
-  
- %define;date(xlab,xvar,xdate)
+
+  %define;date(xlab,xvar,xdate)
     <span %apply;sure_date("xdate")>
       <select name="xvar_cal"%sp; title="[*calendar/calendars]0"%sp; 
         onchange="changeCalendar('xvar_mm_sel','xvar_mm','xvar_d2','xvar_d3','%xdate.month;',this)"%sp;
@@ -184,7 +135,9 @@
         <span id="xvar_mm_sel"><input id="xvar_d2" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
          value="%xdate.month;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/></span>
         <input id="xvar_d3" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="6" maxlength="12"%sp;
-         value="%xdate.year;" onkeypress="javascript:return changeFocus(event,'xvar_d4');" onblur="javascript:compute('xvar_d3','xvar_d4')"%/>
+         value="%xdate.year;"
+         onkeypress="javascript:return orYear(event,'xvar_d4','lab_xvar_oryear','xvar_d5');javascript:return changeFocus(event,'xvar_d4');"
+         onblur="javascript:compute('xvar_d3','xvar_d4')"%/>
       %elseif;([ !dates order]0 = "mmddyyyy")
         <label for="xvar_d1" %apply;accesskey("xvar")>xlab</label>%nn;
           <span id="xvar_mm_sel"><input id="xvar_d1" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
@@ -192,11 +145,15 @@
         <input id="xvar_d2" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
            value="%xdate.day;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/>
         <input id="xvar_d3" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="6" maxlength="12"%sp;
-         value="%xdate.year;" onkeypress="javascript:return changeFocus(event,'xvar_d4');" onblur="javascript:compute('xvar_d3','xvar_d4')"%/>
+         value="%xdate.year;"
+         onkeypress="javascript:return orYear(event,'xvar_d4','lab_xvar_oryear','xvar_d5');javascript:return changeFocus(event,'xvar_d4');"
+         onblur="javascript:compute('xvar_d3','xvar_d4')"%/>
       %else;
         <label %apply;accesskey("xvar")>xlab
           <input id="xvar_d1" name="xvar_yyyy" class="number" autocomplete="off" title="? /[year/month/day]0/" size="6" maxlength="12"%sp;
-           value="%xdate.year;" onkeypress="javascript:return changeFocus(event,'xvar_d2');" onblur="javascript:compute('xvar_d1','xvar_d4')"%/></label>
+           value="%xdate.year;"
+           onkeypress="javascript:return orYear(event,'xvar_d4','lab_xvar_oryear','xvar_d5');javascript:return changeFocus(event,'xvar_d2');"
+           onblur="javascript:compute('xvar_d1','xvar_d4')"%/></label>
         <span id="xvar_mm_sel"><input id="xvar_d2" name="xvar_mm" class="number" autocomplete="off" title="[year/month/day]1" size="2" maxlength="2"%sp;
          value="%xdate.month;" onkeypress="javascript:return changeFocus(event,'xvar_d3');"%/></span>
         <input id="xvar_d3" name="xvar_dd" class="number" autocomplete="off" title="[year/month/day]2" size="2" maxlength="2"%sp;
@@ -214,7 +171,7 @@
         <option value="before"%if;(xdate.prec = "before") selected="selected"%end;>[*before (date)]0</option>
         <option value="after"%if;(xdate.prec = "after") selected="selected"%end;>[*after (date)]0</option>
         <option value="oryear"%if;(xdate.prec = "oryear") selected="selected"%end;>[*or] -&gt;</option>
-        <option value="yearint"%if;(xdate.prec = "yearint") selected="selected"%end;>[*between (date)] -&gt;</option>
+        <option value="yearint"%if;(xdate.prec = "yearint") selected="selected"%end;>..[*between (date)] -&gt;</option>
       </select>
       <label id="lab_xvar_oryear" %if;(xdate.oryear = "") style="display: none;"%end;>
         <input id="xvar_d5" name="xvar_oryear" class="number" autocomplete="off" title="[year/month/day]0" size="5" maxlength="5" value="%xdate.oryear;"%/>
@@ -275,74 +232,12 @@
       title="[marriage/marriages]0 (2)" accesskey="2"%nn;
     %end;
   %end;
-  <script type="text/javascript">
-  <!--
-    function changeFocusFn(event,id,id1,id2) {
-      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-      if (key == 42 || key == 60 || key == 62 || key == 95)
-      {
-       if (document.getElementById(id).checked == true)
-        {
-         document.getElementById(id2).focus();
-         return false;
-        }
-       else
-        {
-         document.getElementById(id1).focus();
-         return false;
-        }
-      }
-    }
-    function linkCreateVisible(xx,yy,zz) {
-      if(xx == 'pa')
-      {
-       document.getElementById('pa' + yy + '_6').style.visibility=zz;
-      }
-     if(xx == 'witn')
-      {
-       document.getElementById('witn' + yy + '_5').style.visibility=zz;
-      }
-     if(xx == 'ch')
-      {
-       document.getElementById('ch' + yy + '_5').style.visibility=zz;
-       document.getElementById('ch' + yy + '_6').style.visibility=zz;
-      }
-    }
-    function fillPlace(xx) 
-    {
-      switch(xx.value) {
-      case "1": xx.value = document.upd.pa1b_pl.value;
-      break;
-      case "2": xx.value = document.upd.pa1d_pl.value;
-      break;
-      case "3": xx.value = document.upd.pa2b_pl.value;
-      break;
-      case "4": xx.value = document.upd.pa2d_pl.value;
-      break;
-      case "*": xx.value = document.upd.marr_place.value;
-      break;
-      case "0": xx.value = document.upd.ch1b_pl.value;
-      break;
-      case "+": xx.value = document.upd.ch1d_pl.value;
-      break;}
-    }
-    function computeSD(id)
-    {
-     var x = document.getElementById(id);
-     if (x.value != '' && x.value != eval(x.value))
-     {
-      x.value = '/' + eval(x.value) + '/';
-     }
-    }
-
-  //-->
-  </script>
 
   %define;place(xvar,xx)
     <label>[*place]%nn;
     <input name="xvar_place" size="40" maxlength="200"%sp;
     title="[place] : 1,2,3,4,*,0,+"%sp;
-    value="%xx_place;" id="xvar_place" onblur="fillPlace(this)"%/></label>
+    value="%xx_place;" id="xvar_place" onblur="fillPlaceFam(this)"%/></label>
   %end;
 
   %define;small_date(kind,xvar,xx,zz)
@@ -369,7 +264,7 @@
         value="%xx.create.kind_day;" onkeypress="javascript:return changeFocus(event,'zz');"%/>
     %end;
       <input name="xvar_pl" size="20" maxlength="200" title="[place] : 1,2,3,4,*,0,+"%sp;
-        value="%xx.create.kind_place;" id="xvar_pl" onblur="fillPlace(this)"%/>
+        value="%xx.create.kind_place;" id="xvar_pl" onblur="fillPlaceFam(this)"%/>
   %end;
 
   %define;birth(xvar,xx,beg,zz)
@@ -435,38 +330,38 @@
       %expr(xcnt + 1)
     %in;
     <td>
-     <input id="begxcnt_p_link" title="[link]" type="radio" name="begxcnt_p" value="link"%sp;
-       %if;(xx.create = "link") checked="checked"%end;%sp;
-       onclick="linkCreateVisible('beg','xcnt','hidden')"%sp;
-       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
-                  if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','visible'), valid('begxcnt_p_create');"%/>%nn;
-     <input id="begxcnt_p_create" title="[create]" type="radio" name="begxcnt_p" value="create"%sp;
-       %if;(xx.create = "create") checked="checked"%end;%sp;
-       onclick="linkCreateVisible('beg','xcnt','visible')"%sp;
-       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
-                  if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','hidden'), valid('begxcnt_p_link');"%/>
+      <input id="begxcnt_p_link" title="[link]" type="radio" name="begxcnt_p" value="link"%sp;
+        %if;(xx.create = "link") checked="checked"%end;%sp;
+        onclick="linkCreateVisible('beg','xcnt','hidden')"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
+                   if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','visible'), valid('begxcnt_p_create');"%/>%nn;
+      <input id="begxcnt_p_create" title="[create]" type="radio" name="begxcnt_p" value="create"%sp;
+        %if;(xx.create = "create") checked="checked"%end;%sp;
+        onclick="linkCreateVisible('beg','xcnt','visible')"%sp;
+        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
+                   if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','hidden'), valid('begxcnt_p_link');"%/>
     </td><td>
-          <input
-            id="begxcnt_fn" name="begxcnt_fn" style="text-align: %right;;" size="30" maxlength="200" value="%xx.first_name;"
-            title="[first name/first names]0"
-            %if;("begxcnt"="pa1")
-              accesskey="1"
-            %end;
-            %if;("beg"="pa")
-              onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sn','beg%zz;_fn');"
-            %elseif;("beg"="ch")
-              onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sex_2','beg%zz;_fn');"
-            %end;
-          %/>
+      <input
+        id="begxcnt_fn" name="begxcnt_fn" style="text-align: %right;;" size="30" maxlength="200" value="%xx.first_name;"
+        title="[first name/first names]0"
+        %if;("begxcnt"="pa1")
+          accesskey="1"
+        %end;
+        %if;("beg"="pa")
+          onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sn','beg%zz;_fn');"
+        %elseif;("beg"="ch")
+          onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcnt_sex_2','beg%zz;_fn');"
+        %end;
+      %/>
     </td><td>
-          <input name="begxcnt_sn" title="[surname/surnames]0" size="30" maxlength="200"%sp;
+      <input name="begxcnt_sn" title="[surname/surnames]0" size="30" maxlength="200"%sp;
              value="%xx.surname;" id="begxcnt_sn"
-             %if;("beg"="pa")
-               %sp;onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcntb_yyyy','beg%zz;_fn');"
-            %end;%/>
+        %if;("beg"="pa")
+          %sp;onkeypress="javascript:return changeFocusFn(event,'begxcnt_p_link','begxcntb_yyyy','beg%zz;_fn');"
+        %end;%/>
     </td><td>
-            <input name="begxcnt_occ" title="[number]" class="number" autocomplete="off" size="5" maxlength="8" value="%xx.occ;"%sp;
-             id="begxcnt_occ"%/>
+      <input name="begxcnt_occ" title="[number]" class="number" autocomplete="off" size="5" maxlength="8" value="%xx.occ;"%sp;
+       id="begxcnt_occ"%/>
     </td>
     %if;("c1" = "yes")
       <td id="begxcnt_5" %apply;hide(xx.create)>
@@ -640,7 +535,7 @@
       </span>
     </p>
   </fieldset>
-  <fieldset><legend title="[*witness/witnesses]1 (3)"><sup>(3)</sup> [*witness/witnesses]1</legend>
+  <fieldset><legend><sup>(3)</sup> [*witness/witnesses]1</legend>
     <table>
       %apply;table_th("witness")
       %foreach;witness;
@@ -676,4 +571,3 @@
 %copyright;
 </body>
 </html>
-

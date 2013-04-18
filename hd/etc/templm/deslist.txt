@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130108 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130122 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -348,7 +348,8 @@
 %define;url(z1,z2)
   %apply;lazy_print("z1=z2;")
   %foreach;env_binding;
-    %if;(env.key="z1")%lazy_force;%else;%env.key;=%env.val;;%end;
+    %if;(env.key="z1")%lazy_force;
+    %elseif;(env.key !="templ")%env.key;=%env.val;;%end;
   %end;
   %if;(not lazy_printed)
     z1=z2;
@@ -965,14 +966,14 @@
     %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
       %if;(evar.image="on")
         <a style="text-decoration:line-through;"
-           href="%prefix_base;%apply;url("image","")"
+           href="%prefix_no_iz;%apply;url("image","")"
            title="- [image/images]1">img</a>
       %else;
-        <a href="%prefix_base;%apply;url("image","on")"
+        <a href="%prefix_no_iz;%apply;url("image","on")"
            title="+ [image/images]1">img</a>
       %end;
     %end;
-    <a style="text-decoration:line-through;" href="%prefix_base;%apply;url("cgl","on")"
+    <a style="text-decoration:line-through;" href="%prefix_no_iz;%apply;url("cgl","on")"
        title="[cancel GeneWeb links]">@</a>
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>

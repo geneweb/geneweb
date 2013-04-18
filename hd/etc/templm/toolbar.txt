@@ -1,65 +1,11 @@
 <!-- $Id: toolbar.txt,v x.x 2011-08-31 16:17:36 flh Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 20130107 templ=templm -->
+<!-- Modified mickroue(a)yahoo.fr 20130211 templ=templm -->
 <!-- How to : Copy this file to bases/etc/ -->
 
-<script type="text/javascript">
-<!--
-
-function insertTags (tagOpen, tagClose, sampleText) {
-  var t = document.forms%[0].%name;;
-
-  // IE
-  if(document.selection) {
-    var theSelection = document.selection.createRange().text;
-    if(!theSelection) { theSelection=sampleText;}
-    t.focus();
-    if(theSelection.charAt(theSelection.length - 1) == " "){// exclude ending space char, if any
-      theSelection = theSelection.substring(0, theSelection.length - 1);
-      document.selection.createRange().text = tagOpen + theSelection + tagClose + " ";
-    } 
-    else {
-      document.selection.createRange().text = tagOpen + theSelection + tagClose;
-    }
-  }
-  else 
-    if(t.selectionStart || t.selectionStart == '0') {
-      var replaced = false;
-      var startPos = t.selectionStart;
-      var endPos = t.selectionEnd;
-      if(endPos-startPos) replaced=true;
-      var scrollTop=t.scrollTop;
-      var myText = (t.value).substring(startPos, endPos);
-      if(!myText) { myText=sampleText;}
-      if(myText.charAt(myText.length - 1) == " "){ // exclude ending space char, if any
-        subst = tagOpen + myText.substring(0, (myText.length - 1)) + tagClose + " ";
-      } 
-      else {
-        subst = tagOpen + myText + tagClose;
-      }
-      t.value = t.value.substring(0, startPos) + subst +
-                t.value.substring(endPos, t.value.length);
-      t.focus();
-      //set new selection
-      if(replaced){
-        var cPos=startPos+(tagOpen.length+myText.length+tagClose.length);
-        t.selectionStart=cPos;
-        t.selectionEnd=cPos;
-      }
-      else {
-        t.selectionStart=startPos+tagOpen.length;
-        t.selectionEnd=startPos+tagOpen.length+myText.length;
-      }
-      t.scrollTop=scrollTop;
-    }
-
-  if (t.createTextRange) t.caretPos = document.selection.createRange().duplicate();
-  return false;
-}
---></script>
 <div style="text-align:%left;">
 %if;(evar.file != "")
   <dl>
-    <dd>[*link] : <a class="button" onclick="return insertTags('\n%evar.text;','','')" href="javascript:;">%evar.text;</a></dd>
+    <dd class="button">[*link] : <a onclick="return insertTags('\n%evar.text;','','')" href="javascript:;">%evar.text;</a></dd>
     <dd><label><input onclick="javascript: this.select();" type="text" name="evar_file" size="80"
                value="%evar.file;"%/></label></dd>
     <dd><em>([*image/images]0 : ../src/%evar.base;/images/%evar.file;.%bvar.var_img_ext;)</em></dd>
