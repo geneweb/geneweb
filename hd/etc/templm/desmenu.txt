@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130107 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130211 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -18,13 +18,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <script type="text/javascript">
-    <!--
-    function valid(id) {
-      document.getElementById(id).checked = true;
-    }
-      -->
-  </script>
   %include.css;
   %base_header;
 </head>
@@ -75,9 +68,7 @@
       %end;
     </p>
         <fieldset>
-          <legend>
-            <label><input type="submit" value="Ok"%/></label>
-          </legend>
+          <legend><input type="submit" value="Ok"%/></legend>
           <select name="v">
             %foreach;descendant_level;
               <option value="%level;"%if(level = 3) selected="selected"%end;>%nn;

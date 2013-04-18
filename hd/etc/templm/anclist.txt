@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130107 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130121 templ=templm -->
   <title>%nn;
     %first_name; %surname;
     %if;(evar.t = "E" and evar.opt = "csv") - CSV - 
@@ -921,7 +921,7 @@
 %if;(cancel_links or evar.opt = "csv")
 %else;
   <div class="menu2">
-    <a style="text-decoration:line-through;" href="%prefix_base;%apply;url("cgl","on")"
+    <a style="text-decoration:line-through;" href="%prefix_no_iz;%apply;url("cgl","on")"
        title="[cancel GeneWeb links]">@</a>
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>

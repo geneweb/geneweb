@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: advanced.txt $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121206 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130211 templ=templm -->
   <title>[*advanced request]</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
@@ -11,30 +11,6 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   %base_header;
-
-  <script type="text/javascript">
-  <!--
-  function valid(id) {
-    document.getElementById(id).focus();
-    document.getElementById(id).checked = true;
-  }
-  function changeDate(i0,i1,e1,i2,e2)
-  { var v0 = document.getElementById(i0);
-    var v1 = document.getElementById(i1);
-    var v2 = document.getElementById(i2);
-    if (v1.value == '' && v2.value == '')
-    { v0.firstChild.nodeValue = "[*delete] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;";
-      v1.value = e1;
-      v2.value = e2;
-    }
-    else
-    { v0.firstChild.nodeValue = "[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;";
-      v1.value = '';
-      v2.value = '';
-    }
-  }
-  -->
-  </script>
 </head>
 
 %define;event(xx)
@@ -44,16 +20,13 @@
   %if;([ !dates order]0 = "ddmmyyyy")
     <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
     <label>[year/month/day]1<input name="xx1_mm" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx1_yyyy"%/></label>
+    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5" id="xx1_yyyy"%/></label>
   %elseif;([ !dates order]0 = "mmddyyyy")
     <label>[year/month/day]1<input name="xx1_mm" class="number" size="2" maxlength="2"%/></label>
     <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx1_yyyy"%/></label>
+    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5" id="xx1_yyyy"%/></label>
   %else;
-    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx1_yyyy"%/></label>
+    <label>[year/month/day]0<input name="xx1_yyyy" class="number" size="5" maxlength="5" id="xx1_yyyy"%/></label>
     <label>[year/month/day]1<input name="xx1_mm" class="number" size="2" maxlength="2"%/></label>
     <label>[year/month/day]2<input name="xx1_dd" class="number" size="2" maxlength="2"%/></label>
   %end;
@@ -61,19 +34,17 @@
   %if;([ !dates order]0 = "ddmmyyyy")
     <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
     <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx2_yyyy"%/></label>
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5" id="xx2_yyyy"%/></label>
   %elseif;([ !dates order]0 = "mmddyyyy")
     <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
     <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
-    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx2_yyyy"%/></label>
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5" id="xx2_yyyy"%/></label>
   %else;
-    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5"
-                                   id="xx2_yyyy""%/></label>
+    <label>[year/month/day]0<input name="xx2_yyyy" class="number" size="5" maxlength="5" id="xx2_yyyy"%/></label>
     <label>[year/month/day]1<input name="xx2_mm" class="number" size="2" maxlength="2"%/></label>
     <label>[year/month/day]2<input name="xx2_dd" class="number" size="2" maxlength="2"%/></label>
   %end;
+  <br%/>
   </p>
 %end;
 
@@ -85,15 +56,18 @@
     <input type="hidden" name="m" value="AS_OK"%/>
   </p>
   <fieldset>
-    <legend>
+    <legend class="button">
       [*advanced request] <input type="submit" value="Ok"%/>
       %if;(evar.birth1_yyyy != "" or evar.death2_yyyy != "")
+        %let;text;
+           [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;%nn;
+        %in;
         %if;(evar.marriage_place != "")
-          <a class="button" href="javascript:changeDate('cd','marriage1_yyyy','%evar.birth1_yyyy;','marriage2_yyyy','%evar.death2_yyyy;')"
-             id="cd">[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
+          <a href="javascript:changeDate('[*add]','[*delete]','%text;','cd','marriage1_yyyy','%evar.birth1_yyyy;','marriage2_yyyy','%evar.death2_yyyy;')"
+             id="cd">[*add] %text;</a>
         %else;
-          <a class="button" href="javascript:changeDate('cd','birth1_yyyy','%evar.birth1_yyyy;','death2_yyyy','%evar.death2_yyyy;')"
-             id="cd">[*add] [date/dates]0 %evar.birth1_yyyy; - %evar.death2_yyyy;</a>
+          <a href="javascript:changeDate('[*add]','[*delete]','%text;','cd','birth1_yyyy','%evar.birth1_yyyy;','death2_yyyy','%evar.death2_yyyy;')"
+             id="cd">[*add] %text;</a>
         %end;
       %end;
     </legend>

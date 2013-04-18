@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121214 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130211 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -12,48 +12,6 @@
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   %base_header;
-  <script type="text/javascript">
-  <!--
-    function changeTri(xx) {
-       var labelTriA = document.getElementById('labelTriA')
-       var triA = document.getElementById('triA')
-       var mNG = document.getElementById('mNG')
-       var tP = document.getElementById('tP')
-       var tN = document.getElementById('tN')
-       var n = document.getElementById('n')
-       
-       triA.style.visibility=xx;
-       labelTriA.style.visibility=xx;
-       if(xx == 'visible' && triA.checked == true)
-      {
-        if(tP.checked == true) mNG.value='P';
-        if(tN.checked == true) mNG.value='N';
-        n.name='k';
-      }
-       if(xx == 'hidden' || triA.checked == false)
-      {
-       mNG.value='NG';
-       n.name='n';
-      }
-    }
-
-    function computeSosa(event,id)
-    {
-      var x = document.getElementById(id);
-      var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
-      var string = String.fromCharCode(key);
-      
-      if (x.value > 0)
-      {
-        switch (string)
-        {
-          case "*" : x.value = x.value * 2; return false; break;
-          case "/" : x.value = parseInt(x.value / 2); return false; break;
-        }
-      }
-    }
-  -->
-  </script>
 </head>
 
 %define;book_of(xx)
@@ -89,77 +47,70 @@
 %end;
 
 <body%body_prop; id="welcome" onload="javascript:document.getElementById('n').focus();">
-
-<div id="welcome_content-top">
-  <div id="welcome_logo">
-    <img src="%image_prefix;/gwlogo.png" alt="GeneWeb"%/>
-  </div>
-  <div id="welcome_title">
-    <h1>%apply;capitalize(base.name) <small>(%base.nb_persons; [person/persons]1)</small>
-      %if;(browsing_with_sosa_ref)
-          <br%/><small>Sosa 1 : %sosa_ref;</small>
-      %end;%nl;
-    </h1>
-  </div>
-  <div id="welcome_user-info">
-    %if;just_friend_wizard;
-      <span style="color: red; font-size: bold;">
-      [
+<table id="welcome_content-top">
+  <tr><td align="left">
+    <small>lang= %apply;link_lang(1,28)</small>
+  </td><td align="right">
+  %if;just_friend_wizard;
+    <span style="color: red; font-size: bold;">
+    [
 en: Wizard rights are now suspended for maintenance.
 fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 ]
-      </span>
+    </span>
+  %end;
+  %if;(not friend and not wizard)
+    %if;(not cgi and bvar.auth_file = "")
+      [*access] : <a href="%prefix;w=w">[wizard/wizards/friend/friends/exterior]0</a>
+        - <a href="%prefix;w=f">[wizard/wizards/friend/friends/exterior]2</a>
+    %else;
+      <form method="post" action="%action;">
+        <div>
+          %hidden;
+          [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0) :
+          <input name="w" type="password" size="10" maxlength="200"%/>
+          <input type="submit" value="Ok"%/>
+        </div>
+      </form>
     %end;
-    %if;(not friend and not wizard)
+  %elseif;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
+    %if;(friend and (bvar.friend_passwd = "" and bvar.friend_passwd_file = ""))
       %if;(not cgi and bvar.auth_file = "")
         [*access] : <a href="%prefix;w=w">[wizard/wizards/friend/friends/exterior]0</a>
-          - <a href="%prefix;w=f">[wizard/wizards/friend/friends/exterior]2</a>
-      %else;
+      %elseif;(not just_friend_wizard)
         <form method="post" action="%action;">
           <div>
             %hidden;
-            [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0) :
+            [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
             <input name="w" type="password" size="10" maxlength="200"%/>
             <input type="submit" value="Ok"%/>
           </div>
         </form>
       %end;
-    %elseif;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
-      %if;(friend and (bvar.friend_passwd = "" and bvar.friend_passwd_file = ""))
-        %if;(not cgi and bvar.auth_file = "")
-          [*access] : <a href="%prefix;w=w">[wizard/wizards/friend/friends/exterior]0</a>
-        %elseif;(not just_friend_wizard)
-          <form method="post" action="%action;">
-            <div>
-              %hidden;
-              [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
-              <input name="w" type="password" size="10" maxlength="200"%/>
-              <input type="submit" value="Ok"%/>
-            </div>
-          </form>
-        %end; 
-      %end;    
-    %end; 
-    %if;(wizard or friend)
-      %if;(friend)
-        %apply;disconnect("friend",[wizard/wizards/friend/friends/exterior]2)
-      %else;
-        %apply;disconnect("wizard",[wizard/wizards/friend/friends/exterior]0)
-        %setup_link;
-      %end;
     %end;
-  </div>
-  <div class="menu2">
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
+  %end; 
+  %if;(wizard or friend)
+    %if;(friend)
+      %apply;disconnect("friend",[wizard/wizards/friend/friends/exterior]2)
+    %else;
+      %apply;disconnect("wizard",[wizard/wizards/friend/friends/exterior]0)
+      %setup_link;
     %end;
-  </div>
-</div>
-  %if;(bvar.motd != "")
-    <div id="welcome_motd">
-      %apply;interp(bvar.motd)
-    </div>
   %end;
+  %if;has_referer;
+      <span class="button"><a href="%referer;" title="[back]">&lt;&lt;</a></span>
+  %end;
+  </td></tr>
+  <tr><td align="left">
+  <img src="%image_prefix;/gwlogo.png" alt="GeneWeb"%/>
+  </td><td>
+  <h1>%apply;capitalize(base.name)</h1>
+    (%base.nb_persons; [person/persons]1)
+  </td></tr>
+</table>
+%if;(bvar.motd != "")
+  <div id="welcome_motd">%apply;interp(bvar.motd)</div>
+%end;
 <div id="welcome_content-left">
   <ul>
     %if;base.has_notes;
@@ -235,76 +186,85 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
 
 <div id="welcome_content-right">
   <div>
-    <h2>[*search/case sensitive]0</h2>
+    <h3>
+      %if;(browsing_with_sosa_ref)
+        Sosa 1 : %sosa_ref;
+      %else;
+        [*search/case sensitive]0
+      %end;
+    </h3>
+    <form id="welcome_form-person" method="get" action="%action;">
+      <table>
+        <tr><td>
+          %hidden;
+          <input id="mNG" type="hidden" name="m" value="NG"%/>
+          <label><input id="tPN" type="radio" name="t" value="PN" checked="checked"
+                        onclick="changeTri('hidden')"
+                  %/><abbr title="[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa…">[person/persons]0</abbr></label>
+          <label><input id="tP" type="radio" name="t" value="P" 
+                        onclick="changeTri('visible')"%/>[first name/first names]0</label>
+          <label><input id="tN" type="radio" name="t" value="N" 
+                        onclick="changeTri('visible')"%/>[surname/surnames]0</label>
+          <label id="labelTriA" style="visibility:hidden;">
+                 <input id="triA" type="checkbox" name="tri" value="A"
+                        onclick="changeTri('visible')"%/>[starting with]</label>
+          <br%/><input id="n" name="n" size="54" maxlength="200"
+                       onkeypress="javascript:return computeSosa(event,'n')"%/>
+        </td><td align="right">
+          <input type="submit" value="Ok"%/>
+        </td></tr>
+      </table>
+    </form>
+    %if;(bvar.propose_place_surnames != "no")%nl;
+      <form id="welcome_form-place" method="get" action="%prefix;">
+        <table>
+          <tr><td>
+            %hidden;
+            [*place] :
+            <input type="hidden" name="m" value="PS"%/>
+            <label><input type="checkbox" name="bi" value="on" checked="checked"%/>[birth]</label>
+            <label><input type="checkbox" name="bp" value="on" checked="checked"%/>[baptism]</label>
+            <label><input type="checkbox" name="de" value="on" checked="checked"%/>[death]</label>
+            <label><input type="checkbox" name="bu" value="on" checked="checked"%/>[burial]</label>
+            <label><input type="checkbox" name="ma" value="on" checked="checked"%/>[marriage/marriages]0</label>
+          </td><td align="right">
+            <input type="submit" value="Ok"%/>
+          </td></tr>
+        </table>
+      </form>
+    %end;
+    %if;(bvar.propose_titles != "no")%nl;
+      <form id="welcome_form-titles" method="get" action="%action;">
+        <table>
+          <tr><td>
+            %hidden;
+            <input type="hidden" name="m" value="TT"%/>
+            <label>[*title/titles]0
+            <input name="t" size="25" maxlength="200"%/>%nn;
+            </label>
+            <label>[*estate]0
+              <input name="p" size="25" maxlength="200"%/>
+            </label>
+          </td><td align="right">
+            <input type="submit" value="Ok"%/>
+          </td></tr>
+        </table>
+      </form>
+    %end;
     <ul style="clear: both;">
+      <li><a href="%prefix;m=TT;t=">[*all the titles]</a>,
+          <a href="%prefix;m=TT;p=*">[all the estates]</a></li>
       <li>[*first name/first names]1 :
         <a href="%prefix;m=P;tri=A">ABC</a>
-        <a href="%prefix;m=P;tri=F">987</a>
-      </li>
+        <a href="%prefix;m=P;tri=F">987</a></li>
       <li>[*surname/surnames]1 :
         <a href="%prefix;m=N;tri=A">ABC</a>
         <a href="%prefix;m=N;tri=F">987</a>
       </li>
-       %if;(bvar.hide_advanced_request = "no")
+      %if;(bvar.hide_advanced_request = "no")
         <li><a href="%prefix;m=H;v=advanced">[*advanced request]</a></li>
       %end;
     </ul>
-    <form id="welcome_form-person" method="get" action="%action;">
-      <fieldset>
-        %hidden;
-        <input id="mNG" type="hidden" name="m" value="NG"%/>
-        <label><input id="tPN" type="radio" name="t" value="PN" checked="checked"
-                      onclick="changeTri('hidden')"
-                %/><abbr title="[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa…">[person/persons]0</abbr></label>
-        <label><input id="tP" type="radio" name="t" value="P" 
-                      onclick="changeTri('visible')"%/>[first name/first names]0</label>
-        <label><input id="tN" type="radio" name="t" value="N" 
-                      onclick="changeTri('visible')"%/>[surname/surnames]0</label>
-        <label id="labelTriA" style="visibility:hidden;">
-               <input id="triA" type="checkbox" name="tri" value="A"
-                      onclick="changeTri('visible')"%/>[starting with]</label>
-        <br%/><input id="n" name="n" size="54" maxlength="200"
-                     onkeypress="javascript:return computeSosa(event,'n')"%/>
-        <input type="submit" value="Ok"%/>
-      </fieldset>
-    </form>
-    %if;(bvar.propose_titles != "no")%nl;
-      <form id="welcome_form-titles" method="get" action="%action;">
-        <fieldset>
-              %hidden;
-              <input type="hidden" name="m" value="TT"%/>
-              <div>
-                <label>[title/titles]0<br%/>
-                  <input name="t" size="25" maxlength="200"%/>
-                </label><br%/>
-                  <a href="%prefix;m=TT;t=">([all the titles])</a>
-              </div>
-              <div>
-                <label>[estate]0<br%/>
-                  <input name="p" size="25" maxlength="200"%/>%sq;
-                </label>
-                <input type="submit" value="Ok"%/>
-                <br%/>
-                <a href="%prefix;m=TT;p=*">([all the estates])</a>
-              </div><br%/>
-        </fieldset>
-      </form>
-    %end;
-    %if;(bvar.propose_place_surnames != "no")%nl;
-      <form id="welcome_form-place" method="get" action="%prefix;">
-        <fieldset>
-          %hidden;
-          <legend>[place] / [surname/surnames]0</legend> 
-          <input type="hidden" name="m" value="PS"%/>
-          <label><input type="checkbox" name="bi" value="on" checked="checked"%/>[birth]</label>
-          <label><input type="checkbox" name="bp" value="on"%/>[baptism]</label>
-          <label><input type="checkbox" name="de" value="on"%/>[death]</label>
-          <label><input type="checkbox" name="bu" value="on"%/>[burial]</label>
-          <label><input type="checkbox" name="ma" value="on"%/>[marriage/marriages]0</label>
-          <input type="submit" value="Ok"%/>
-        </fieldset>
-      </form>
-    %end;
   </div>
 </div>
 <div id="welcome_content-bottom">
@@ -367,8 +327,5 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
 </div>
   %base_trailer;
   %copyright;
-<div id="welcome_lang">
-  lang= %apply;link_lang(1,28)
-</div>
 </body>
 </html>

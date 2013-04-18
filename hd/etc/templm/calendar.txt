@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121230 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130224 templ=templm -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -29,15 +29,7 @@
 
 %define;french_day(xx)
   %apply;nth%with;
-    /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi
-    /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi
-    /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi
-  %and;xx%end;
-%end;
-
-%define;french_year(xx)
-  %apply;nth%with;
-    /I/II/III/IV/V/VI/VII/VIII/IX/X/XI/XII/XIII/XIV
+    /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi/Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi/Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi/
   %and;xx%end;
 %end;
 
@@ -150,12 +142,11 @@
       %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
       %if;(date.julian_day = today.julian_day)%sp;%time;%end;
     </li>
-    %if;(date.julian_day > 2375839 and date.julian_day < 2380688)
-      <li>%apply;french_day(date.french.day),%sp;%date.french.day;
-          %sp;%apply;capitalize%with;%apply;nth([(french revolution month)], date.french.month -1)%end;
-          %sp;an %apply;french_year(date.french.year) 
-      </li>
-    %end;
+    <li %if;(date.julian_day > 2375839 and date.julian_day < 2380688)style="font-weight:bold;"%end;>
+        %apply;french_day(date.french.day),%sp;%date.french.day;
+        %sp;%apply;capitalize%with;%apply;nth([(french revolution month)], date.french.month -1)%end;
+        %sp;an %date.french.year.roman; 
+    </li>
     <li>
       [*moon age/new moon/first quarter/full moon/last quarter]0 : %date.moon_age;
       %if;(date.moon_phase.index != 0)

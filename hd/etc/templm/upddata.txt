@@ -5,7 +5,7 @@
 <head>
   <!-- $Id: upddata.txt,v 0.01 2012-10-29 11:42:30 flh Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130109 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130117 templ=templm -->
   <title>%title;</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
@@ -48,11 +48,11 @@
     {
       document.getElementById('nx_span').outerHTML = "";
       var x4 = x2.innerHTML;
-      var x5 = "<span id=\"nx_span\">"
+      var x5 = "<span id=\"nx_span\" class=\"button\">"
                 +"<input type=\"text\" id=\"nx_input\" name=\"nx_input\" size=\"80\" maxlength=\"%maxl;\" \/>"
                 +"<input type=\"submit\" value=\"ok\"\/>"
                 %if;(bvar.hide_advanced_request = "no" and evar.data = "occu")
-                  +"<a class=\"button\" href=\"javascript:lhr()\"> [*advanced request] <\/a>"
+                  +"<a href=\"javascript:lhr()\"> [*advanced request] <\/a>"
                 %end;
                 +"<\/span>";
       x2.insertAdjacentHTML("AfterEnd",x5);

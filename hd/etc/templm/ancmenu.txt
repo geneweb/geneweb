@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130107 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130211 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -18,13 +18,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <script type="text/javascript">
-    <!--
-    function valid(id) {
-      document.getElementById(id).checked = true;
-    }
-    -->
-  </script>
   %include.css;
   %base_header;
 </head>
@@ -70,9 +63,7 @@
     %end;
   </p>
   <fieldset>
-    <legend>
-      <label><input type="submit" value="Ok"%/></label>
-    </legend>
+    <legend><input type="submit" value="Ok"%/></legend>
     <select name="v">
       %foreach;ancestor_level;
         <option value="%level;"%nn;
