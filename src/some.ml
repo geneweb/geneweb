@@ -199,7 +199,7 @@ value print_elem conf base is_surname (p, xl) =
          Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
            Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p)
-         else Wserver.wprint "%s" p;
+         else Wserver.wprint "%s" (if p = "" then "?" else p);
          Wserver.wprint "</a>";
          Wserver.wprint "%s" (Date.short_dates_text conf base x);
          stag "em" begin
@@ -210,11 +210,14 @@ value print_elem conf base is_surname (p, xl) =
 ;
 
 value first_char s =
-  if Mutil.utf_8_db.val then
-    let len = Name.nbc s.[0] in
-    if len < String.length s then String.sub s 0 len
-    else s
-  else String.sub s (initial s) 1
+  (* Si la personne n'a pas de prénom/nom, on renvoie '?' *)
+  if s = "" then "?" 
+  else
+    if Mutil.utf_8_db.val then
+      let len = Name.nbc s.[0] in
+      if len < String.length s then String.sub s 0 len
+      else s
+    else String.sub s (initial s) 1
 ;
 
 value name_unaccent s =
