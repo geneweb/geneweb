@@ -1127,7 +1127,7 @@ value uppercase_word s =
 value capitalize_name s = 
   loop 0 0 where rec loop len k =
     let i = next_word_pos s k in
-    if i = String.length s then Buff.get len
+    if i = String.length s then Buff.get (String.length s)
     else
       let j = next_sep_pos s i in
       if j > i then
@@ -1152,7 +1152,7 @@ value capitalize_name s =
 value uppercase_name s = 
   loop 0 0 where rec loop len k =
     let i = next_word_pos s k in
-    if i = String.length s then Buff.get len
+    if i = String.length s then Buff.get (String.length s)
     else
       let j = next_sep_pos s i in
       if j > i then
