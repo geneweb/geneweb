@@ -77,6 +77,15 @@ value public_all bname lim_year trace = do {
   let () = load_couples_array base in
   let n = nb_of_persons base in
   let changes = ref False in
+  Consang.check_noloop base
+        (fun
+         [ OwnAncestor p -> do {
+             printf "I cannot deal this database.\n";
+             printf "%s is his own ancestors\n" (Gutil.designation base p);
+             flush stdout;
+             exit 2
+           }
+         | _ -> assert False ]);
   ProgrBar.start ();
   for i = 0 to n - 1 do {
     ProgrBar.run i n;
