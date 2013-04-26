@@ -513,7 +513,20 @@ value print_shortest_path conf base p1 p2 =
             Wserver.wprint "%s.\n"
               (capitale
                  (cftransl conf "no known relationship link between %s and %s"
-                    [s1; s2]))
+                    [s1; s2]));
+            xtag "br";
+            tag "p" begin
+              stag "span" begin
+                stag "a" "href=\"%s;m=R;%s\"" (commd conf) (acces conf base p1)
+                  begin
+                    Wserver.wprint "%s"
+                      (capitale 
+                         (transl_nth conf "try another/relationship computing" 0));
+                  end;
+                Wserver.wprint " %s.\n"
+                  (transl_nth conf "try another/relationship computing" 1);
+              end;
+            end;
           }
           else do {
             Wserver.wprint "<ul>\n";
@@ -785,7 +798,7 @@ value print_link_name conf base n p1 p2 sol =
       let sp2 = pp2 <> None in
       if x2 = 0 then
         if sp1 && x1 = 1 then
-          (parent_in_law_label conf (get_sex ini_p1) (get_sex ini_p2),
+          (parent_in_law_label conf (get_sex ini_p2) (get_sex ini_p1),
            False, sp2)
         else
           let info = ((info, x1), fun r -> r.Consang.lens1) in
@@ -1470,12 +1483,16 @@ value print_main_relationship conf base long p1 p2 rel =
           xtag "br";
           tag "p" begin
             stag "span" begin
-              Wserver.wprint "%s.\n"
-                (capitale 
-                  (transl conf 
-                    "NB: you should try another relationship computing mode"));
+              stag "a" "href=\"%s;m=R;%s\"" (commd conf) (acces conf base p1)
+                begin
+                  Wserver.wprint "%s"
+                    (capitale 
+                       (transl_nth conf "try another/relationship computing" 0));
+                end;
+              Wserver.wprint " %s.\n"
+                (transl_nth conf "try another/relationship computing" 1);
             end;
-          end
+          end;
         }
     | Some (rl, total, relationship) ->
         let a1 = p1 in
