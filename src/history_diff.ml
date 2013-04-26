@@ -415,14 +415,21 @@ value print_clean_ok conf base =
 (**/**) (* Template *)
 
 
+value person_of_gen_p_key base gen_p =
+  match person_of_key base gen_p.first_name gen_p.surname gen_p.occ with
+  [ Some ip -> poi base ip
+  | None -> Gwdb.empty_person base (Adef.iper_of_int (-1)) ]
+;
+
 (* N'est pas forcément très précis. En effet, on enregistre que     *)
 (* les ipers. Or lors d'un nettoyage de la base, il se peut que     *)
 (* ces ipers changent. On peut donc pointer vers une autre persone. *)
 value person_of_iper conf base ip =
-  let p = pget conf base ip in
-  if authorized_age conf base p then
-    Util.person_text conf base p
-  else ""
+  try
+    let p = pget conf base ip in
+    if authorized_age conf base p then Util.person_text conf base p
+    else ""
+  with _ -> ""
 ;
 
 value person_of_iper_list conf base ipl =
@@ -490,20 +497,22 @@ value string_of_related conf base ip related =
   let related =
     List.fold_right
       (fun ic accu ->
-        let c = pget conf base ic in
-        let rel =
-          loop (get_rparents c) where rec loop rp =
-            match rp with
-            [ [r :: l] ->
-                match r.r_fath with
-                [ Some ifath when ifath = ip -> 
-                    Util.rchild_type_text conf r.r_type 2
-                | _ -> loop l ]
-            | [] -> "" ]
-        in
         let p = person_of_iper conf base ip in
         if p = "" then accu
-        else [capitale rel ^ ": " ^ p :: accu])
+        else 
+          (* Si l'enfant n'existe plus. *)
+          let c = try pget conf base ic with _ -> Gwdb.empty_person base ic in
+          let rel =
+            loop (get_rparents c) where rec loop rp =
+              match rp with
+              [ [r :: l] ->
+                  match r.r_fath with
+                  [ Some ifath when ifath = ip -> 
+                      Util.rchild_type_text conf r.r_type 2
+                  | _ -> loop l ]
+              | [] -> "" ]
+          in
+          [capitale rel ^ ": " ^ p :: accu])
       related []
   in
   String.concat ", " related
@@ -524,15 +533,17 @@ value string_of_rparents conf base rparents =
             | ("", p) -> [rel ^ ": " ^ p :: accu]
             | (p1, p2) -> [rel ^ ": " ^ p1 ^ ", " ^ p2 :: accu] ]
         | (Some ip, None) ->
-            let rel = capitale (Util.relation_type_text conf rp.r_type 2) in
             let p = person_of_iper conf base ip in
             if p = "" then accu
-            else [rel ^ ": " ^ p :: accu]
+            else 
+              let rel = capitale (Util.relation_type_text conf rp.r_type 2) in
+              [rel ^ ": " ^ p :: accu]
         | (None, Some ip) -> 
-            let rel = capitale (Util.relation_type_text conf rp.r_type 2) in
             let p = person_of_iper conf base ip in
             if p = "" then accu
-            else [rel ^ ": " ^ p :: accu]
+            else 
+              let rel = capitale (Util.relation_type_text conf rp.r_type 2) in
+              [rel ^ ": " ^ p :: accu]
         | (None, None) -> accu ])
       rparents []
   in
@@ -1037,7 +1048,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
 and eval_simple_str_var conf base env (bef, aft, p_auth) =
   fun
   [ "acces" ->
-      let p = pget conf base aft.gen_p.key_index in
+      let p = person_of_gen_p_key base aft.gen_p in
       acces conf base p
   | "date" -> eval_string_env "date" env
   | "history_len" -> eval_int_env "history_len" env
@@ -1046,7 +1057,9 @@ and eval_simple_str_var conf base env (bef, aft, p_auth) =
       let nb_fam = max (List.length bef.gen_f) (List.length aft.gen_f) in
       string_of_int nb_fam
   | "person" ->
-      if p_auth then person_of_iper conf base aft.gen_p.key_index
+      if p_auth then 
+        let p = person_of_gen_p_key base aft.gen_p in
+        Util.person_text conf base p
       else eval_string_env "history_file" env
   | "wizard" -> eval_string_env "wizard" env
   | _ -> raise Not_found ]
@@ -1190,22 +1203,20 @@ value print conf base =
                 (o, n)
             | _ -> (0, 0) ]
           in
-          try
-            let before = List.nth history before in
-            let after = List.nth history after in
-            let p = poi base after.gen_p.key_index in
-            let p_auth = authorized_age conf base p in
-            let env = 
-              [("history_file", Vstring file); ("history_len", Vint len)] 
-            in
-            Hutil.interp conf base "updhist_diff"
-              {Templ.eval_var = eval_var conf base;
-               Templ.eval_transl _ = Templ.eval_transl conf;
-               Templ.eval_predefined_apply = eval_predefined_apply conf;
-               Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-               Templ.print_foreach = print_foreach conf base}
-              env (before, after, p_auth)
-          with _ -> Hutil.incorrect_request conf
+          let before = List.nth history before in
+          let after = List.nth history after in
+          let p = person_of_gen_p_key base after.gen_p in
+          let p_auth = authorized_age conf base p in
+          let env = 
+            [("history_file", Vstring file); ("history_len", Vint len)] 
+          in
+          Hutil.interp conf base "updhist_diff"
+            {Templ.eval_var = eval_var conf base;
+             Templ.eval_transl _ = Templ.eval_transl conf;
+             Templ.eval_predefined_apply = eval_predefined_apply conf;
+             Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+             Templ.print_foreach = print_foreach conf base}
+            env (before, after, p_auth)
       | _ -> Hutil.incorrect_request conf ]
   | _ -> Hutil.incorrect_request conf ]
 ;
