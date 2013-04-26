@@ -155,8 +155,16 @@
                   %apply;capitalize(nth([conjoint/conjointe], spouse.sex)): %spouse.marriage_age;
                 %end;
               %end;
-          </td>
+            </td>
           </tr>
+          %if;(are_divorced or are_separated)
+            <tr>
+              <td colspan="2">
+                %if;are_divorced;[*divorced] %divorce_date;. %end;
+                %if;are_separated;[*separated]. %end;
+              </td>
+            </tr>
+          %end;
         </table>
       </td>
     </tr>
@@ -901,7 +909,13 @@
           <tr class="table_content_relations">
             <td class="borderna">
               %apply;image_MF("related", "11") %related;  %sp;
-              (%apply;capitalize(related_type))
+              %if;(related = [foster son/foster daughter/foster child]0)
+                (%apply;capitalize([foster son/foster daughter/foster child]2))
+              %elseif;(related = [foster son/foster daughter/foster child]1)
+                (%apply;capitalize([foster son/foster daughter/foster child]2))
+              %else;
+                (%apply;capitalize(related_type))
+              %end;
             </td>
             %apply;display_date("related", 0)
           </tr>
