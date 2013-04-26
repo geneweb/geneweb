@@ -139,8 +139,8 @@
 %define;descendants_by_list(xx, yy, curlev, maxlev, famlev, ctr)
   %if;(curlev = 0)<p>%nl;%end;
   <b id="person-%ctr;">
-    %if;(evar.cgl = "on" or xx.is_restricted)%yy;
-    %else;<a href="%prefix;%xx.access;">%yy;</a>
+    %if;(evar.cgl = "on" or xx.is_restricted)%yy;%nn;
+    %else;<a href="%prefix;%xx.access;">%yy;</a>%nn;
     %end;
   </b>%nn;
   %apply;somebody_long_info("xx").
@@ -180,11 +180,11 @@
       %end;
     %end;%nl;
     <b id="person-%ctr;-%family_cnt;">
-      %if;(evar.cgl = "on" or spouse.is_restricted)%spouse;
-      %else;<a href="%prefix;%spouse.access;">%spouse;</a>
+      %if;(evar.cgl = "on" or spouse.is_restricted)%spouse;%nn;
+      %else;<a href="%prefix;%spouse.access;">%spouse;</a>%nn;
       %end;
     </b>%nn;
-    %apply;somebody_long_info("spouse").
+    %apply;somebody_long_info("spouse")
     %if;((evar.notes = "on" and spouse.has_notes and evar.inline = "on") or (evar.src = "on" and spouse.has_sources and evar.inline = "on"))
       <p class="desc_notes_src_inline">
         %if;spouse.has_notes;
@@ -331,37 +331,6 @@
           %end;
         %end;
       %end;
-    %end;
-  %end;
-%end;
-
-%define;img_td(xx, curlev)
-  %if;(count = 8)
-    %reset_count;
-    </tr>
-  %end;
-  %if;(count = 0 and curlev = 0)<tr>%end;
-  %if;(xx.has_image or evar.alw_img = "on")
-    %if;(count = 0)<tr>%end;
-    %incr_count;
-    <td width="100px" valign="top">
-      %if;xx.has_image;
-        <img src="%xx.image_url;" %xx.image_small_size; alt=""%/>
-      %else;
-        %if;xx.is_female;
-          <img src="%image_prefix;/img_unknown_woman.png" width="50" height="75" alt=""%/>
-        %else;
-          <img src="%image_prefix;/img_unknown_man.png" width="50" height="75" alt=""%/>
-        %end;
-      %end;      
-      <p>
-        %apply;p_link(xx.access, xx)
-        %xx.dates;
-      </p>
-    </td>
-    %if;(count = 8)
-      %reset_count;
-      </tr>
     %end;
   %end;
 %end;
