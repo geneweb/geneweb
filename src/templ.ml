@@ -376,6 +376,7 @@ value parse_templ conf strm =
         | (_, v, []) when List.mem v end_list -> (List.rev astl, v)
         | (_, "define", []) -> parse_define astl end_list strm
         | (_, "let", []) -> parse_let astl end_list strm
+        | (_, "import", []) -> parse_import astl end_list strm
         | x ->
             let ast =
               match x with
@@ -452,6 +453,26 @@ value parse_templ conf strm =
           (Atext (bp, bp + 1) "let syntax error", "") ]
     in        
     (List.rev [ast :: astl], tok)
+  and parse_import astl end_list strm =
+    let ast =
+      try 
+        let file = get_ident 0 strm in
+        let al = 
+          match Util.open_templ conf file with
+          [ Some ic ->
+              let strm2 = (Stream.of_channel ic) in
+              let (al, _) = parse_astl [] True 0 [] strm2 in
+              Some (Aimport file al)
+          | None -> None ]
+        in
+        al
+      with 
+      [ Stream.Failure | Stream.Error _ -> None ]
+    in
+    let (alk, tok) = parse_astl [] False 0 end_list strm in
+    match ast with
+    [ Some ast -> (List.rev [ast :: astl] @ alk, tok)
+    | None -> (astl @ alk, tok) ]
   and parse_apply bp strm =
     try
       let f = get_ident 0 strm in
@@ -590,6 +611,7 @@ value rec subst sf =
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
   | Aapply loc f all -> Aapply loc (sf f) (List.map (substl sf) all)
   | Alet k v al -> Alet (sf k) (substl sf v) (substl sf al)
+  | Aimport file al -> Aimport (sf file) (substl sf al)
   | Aint loc s -> Aint loc s
   | Aop1 loc op e -> Aop1 loc op (subst sf e)
   | Aop2 loc op e1 e2 -> Aop2 loc (sf op) (subst sf e1) (subst sf e2) ]
@@ -1326,7 +1348,11 @@ value include_hed_trl conf base_opt name =
   | None -> old_include_hed_trl conf base_opt ("." ^ name) ]
 ;
 
-value rec interp_ast conf base ifun =
+value import = ref 0;
+value imported_files = ref [];
+
+value rec interp_ast conf base ifun env =
+  let m_env = ref env in
   let rec eval_ast env ep a =
     string_of_expr_val (eval_ast_expr env ep a)
   and eval_ast_list env ep =
@@ -1353,7 +1379,7 @@ value rec interp_ast conf base ifun =
     let rec loop =
       fun
       [ [] -> []
-     | [Avar _ "sq" []; Atext loc s :: al] ->
+      | [Avar _ "sq" []; Atext loc s :: al] ->
          let s = squeeze_spaces s in
          loop [Atext loc s :: al]
       | [a :: al] -> [eval_ast_expr env ep a :: loop al] ]
@@ -1459,10 +1485,20 @@ value rec interp_ast conf base ifun =
     | x -> Wserver.wprint "%s" (eval_ast env ep x) ]
   and print_ast_list env ep =
     fun
-    [ [] -> ()
+    [ [] -> m_env.val := env
     | [Avar _ "sq" []; Atext loc s :: al] ->
         let s = squeeze_spaces s in
         print_ast_list env ep [Atext loc s :: al]
+    | [Aimport templ astl :: al] -> 
+        (* Protection pour ne pas inclure plusieurs fois un même template ? *)
+        if not (List.mem templ imported_files.val) then do {
+          (*incr import;*)
+          print_ast_list env ep astl;
+          (*decr import;*)
+          print_ast_list m_env.val ep al;
+        }
+        else ()
+    | [a] -> print_ast env ep a
     | [a :: al] -> do {
         print_ast env ep a;
         print_ast_list env ep al
@@ -1507,7 +1543,7 @@ value rec interp_ast conf base ifun =
       else ()
     in loop env min max
   in
-  print_ast_list
+  print_ast_list env
 and print_var print_ast_list conf base ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try

@@ -16,7 +16,8 @@ type ast =
   | Alet of string and list ast and list ast
   | Aop1 of loc and string and ast
   | Aop2 of loc and string and ast and ast
-  | Aint of loc and string ]
+  | Aint of loc and string 
+  | Aimport of string and list ast]
 and loc = (int * int)
 ;
 
