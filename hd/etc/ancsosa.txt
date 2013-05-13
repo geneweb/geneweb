@@ -447,6 +447,31 @@
     [and]%sp;
     <b><a href="#%ancestor.mother_sosa;">%ancestor.mother_sosa;</a></b>.
   %end;
+  %if;(evar.siblings = "on")
+    %foreach;ancestor.family;
+      %if;(ancestor.index = index or family.index != ancestor.family.index)
+        %apply;capitalize%with;
+          %apply;married_to%with;
+            %ancestor.is_male;
+          %and;
+            %if;(ancestor.index != index) (%family_cnt;)%end;
+            %if;(on_marriage_date != "") %on_marriage_date;%end;
+            %if;(marriage_place != ""), %marriage_place;, %end;
+          %end;%sp;
+        %end;
+        %apply;somebody("spouse")%nn;
+        %if;spouse.has_parents;,%sp;
+          %apply;a_of_b%with;
+            %if;spouse.is_male;[son/daughter/child]0
+            %else;[son/daughter/child]1%end;
+          %and;
+            %apply;somebody_spouse_parent("father") [and]
+            %apply;somebody_spouse_parent("mother")
+          %end;
+        %end;.
+      %end;
+    %end;
+  %end;
   %if;((evar.notes = "on" and ancestor.has_notes and evar.inline = "on") or (evar.src = "on" and ancestor.has_sources and evar.inline = "on"))
     <p class="asc_notes_src_inline">
       %if;ancestor.has_notes;
@@ -469,34 +494,6 @@
     %else;%[[*source/sources]1%sp;
     %end;
     <b><a href="#notes-%ancestor.anc_sosa.v;">%ancestor.anc_sosa;</a></b>%].
-  %end;
-  %if;(evar.siblings = "on")
-    %foreach;ancestor.family;
-      %if;(ancestor.index = index or family.index != ancestor.family.index)
-        %if;(evar.inline= "on" and ((ancestor.has_notes and evar.notes = "on") or (ancestor.has_sources and evar.src = "on")))
-          <br%/>
-        %end; 
-        %apply;capitalize%with;
-          %apply;married_to%with;
-            %ancestor.is_male;
-          %and;
-            %if;(ancestor.index != index) (%family_cnt;)%end;
-            %if;(on_marriage_date != "") %on_marriage_date;%end;
-            %if;(marriage_place != ""), %marriage_place;, %end;
-          %end;%sp;
-        %end;
-        %apply;somebody("spouse")%nn;
-        %if;spouse.has_parents;,%sp;
-          %apply;a_of_b%with;
-            %if;spouse.is_male;[son/daughter/child]0
-            %else;[son/daughter/child]1%end;
-          %and;
-            %apply;somebody_spouse_parent("father") [and]
-            %apply;somebody_spouse_parent("mother")
-          %end;
-        %end;.
-      %end;
-    %end;
   %end;
 %end;
 
