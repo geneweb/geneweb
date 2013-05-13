@@ -1228,54 +1228,52 @@ value uppercase_word s =
               copy False j (Buff.mstore len t) False ]
 ;
 
+module Buff2 = Buff.Make (struct value buff = ref (String.create 80); end);
+
 value capitalize_name s = 
+  (* On initialise le buffer à la valeur de s. *)
+  let _ = Buff2.mstore 0 s in
   loop 0 0 where rec loop len k =
     let i = next_word_pos s k in
-    if i = String.length s then Buff.get (String.length s)
+    if i = String.length s then Buff2.get (String.length s)
     else
       let j = next_sep_pos s i in
       if j > i then
-        (* On sauvegarde l'ancienne valeur de buff *)
-        let buff = Buff.get len in
         let w = String.sub s i (j - i) in
         let w =
           if is_roman_int w || particle s i || List.mem w public_name_word 
           then w
           else capitalize_word w
         in
-        (* On restore l'ancienne valeur de buff *)
-        let _ = Buff.mstore 0 buff in
         let len =
           loop len k where rec loop len k =
-            if k = i then len else loop (Buff.store len s.[k]) (k + 1)
+            if k = i then len else loop (Buff2.store len s.[k]) (k + 1)
         in
-        loop (Buff.mstore len w) j
-      else Buff.get len
+        loop (Buff2.mstore len w) j
+      else Buff2.get len
 ;
 
 value uppercase_name s = 
+  (* On initialise le buffer à la valeur de s. *)
+  let _ = Buff2.mstore 0 s in
   loop 0 0 where rec loop len k =
     let i = next_word_pos s k in
-    if i = String.length s then Buff.get (String.length s)
+    if i = String.length s then Buff2.get (String.length s)
     else
       let j = next_sep_pos s i in
       if j > i then
-        (* On sauvegarde l'ancienne valeur de buff *)
-        let buff = Buff.get len in
         let w = String.sub s i (j - i) in
         let w =
           if is_roman_int w || particle s i || List.mem w public_name_word 
           then w
           else uppercase_word w
         in
-        (* On restore l'ancienne valeur de buff *)
-        let _ = Buff.mstore 0 buff in
         let len =
           loop len k where rec loop len k =
-            if k = i then len else loop (Buff.store len s.[k]) (k + 1)
+            if k = i then len else loop (Buff2.store len s.[k]) (k + 1)
         in
-        loop (Buff.mstore len w) j
-      else Buff.get len
+        loop (Buff2.mstore len w) j
+      else Buff2.get len
 ;
 
 value get_lev0 =
@@ -1758,6 +1756,10 @@ value add_indi gen r =
         in
         do { incr r; (f, s, r.val, pn, fal) }
     | None -> ("?", "?", Adef.int_of_iper ip, givn, []) ]
+  in
+  (* S'il y a des caractères interdits, on les supprime *)
+  let (first_name, surname) = 
+    (Name.strip_c first_name ':', Name.strip_c surname ':') 
   in
   let qualifier =
     match name_sons with
