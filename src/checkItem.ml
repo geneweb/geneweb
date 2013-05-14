@@ -391,7 +391,7 @@ value check_normal_marriage_date_for_someone base error warning witn fam ip =
             if strictly_before d2 d1 then
               if witn then warning (WitnessDateBeforeBirth p) 
               else warning (MarriageDateBeforeBirth p)
-            else if year_of g2 > lim_date_marriage && 
+            else if not witn && year_of g2 > lim_date_marriage && 
                     year_of (time_elapsed g1 g2) < min_age_marriage 
             then
                warning (YoungForMarriage p (time_elapsed g1 g2))
