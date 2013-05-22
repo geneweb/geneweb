@@ -8,10 +8,10 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <script type="text/javascript" src="jquery_1_9_1_min.js"></script>
+  %include.js;
   <script type="text/javascript" src="jquery_placeholder_min.js"></script>
-%include.css;
-%base_header;
+  %include.css;
+  %base_header;
 </head>
 <body%body_prop;>
 
