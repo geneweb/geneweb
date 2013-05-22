@@ -18,8 +18,9 @@
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
-%include.css;
-%base_header;
+  %include.js;
+  %include.css;
+  %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
@@ -149,6 +150,8 @@ function changeCalendar(e,v,m,c) {
 }
 -->
 </script>
+
+%include_perso_header;
 
 %define;date(xlab,xvar,xdate)
   <table border="1" width=700px>

@@ -392,7 +392,9 @@ value gen_print_menu_birth conf base f_scan mode =
   let list_tom = ref [] in
   let list_aft = ref [] in
   do {
-    header conf title;
+    match Util.find_person_in_env conf base "" with
+    [ Some p -> Perso.interp_notempl_with_menu title "perso_header" conf base p
+    | None -> header conf title ];
     print_link_to_welcome conf True;
     try
       while True do {

@@ -97,7 +97,7 @@ value print_send_image conf base p =
   in
   let digest = Update.digest_person (UpdateInd.string_person_of base p) in
   do {
-    header conf title;
+    Perso.interp_notempl_with_menu title "perso_header" conf base p;
     tag "form" "method=\"post\" action=\"%s\" enctype=\"multipart/form-data\""
       conf.command
     begin

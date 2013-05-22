@@ -7,6 +7,10 @@ open Config;
 value string_of_titles : config -> base -> bool -> string -> person -> string;
 value string_of_marriage_text : config -> base -> family -> string;
 value interp_templ : string -> config -> base -> person -> unit;
+value interp_templ_with_menu : 
+  (bool -> unit) -> string -> config -> base -> person -> unit;
+value interp_notempl_with_menu : 
+  (bool -> unit) -> string -> config -> base -> person -> unit;
 
 value print : config -> base -> person -> unit;
 value print_ascend : config -> base -> person -> unit;
