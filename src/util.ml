@@ -1624,9 +1624,10 @@ value http_string conf s i =
         else j
     in
     let j =
-      match s.[j - 1] with
-      [ ')' | ',' |  '.' |  ':' | ';' -> j - 1
-      | _ -> j ]
+      loop j where rec loop j =
+        match s.[j - 1] with
+        [ ')' | ',' |  '.' |  ':' | ';' -> loop (j - 1)
+        | _ -> j ]
     in
     let s = String.sub s i (j - i) in
     Some (s, j)
