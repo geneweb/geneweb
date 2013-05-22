@@ -80,6 +80,9 @@ value header_without_http conf title = do {
   match Util.open_templ conf "css" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
+  match Util.open_templ conf "js" with
+  [ Some ic -> Templ.copy_from_templ conf [] ic
+  | None -> () ];
   Templ.include_hed_trl conf None "hed";
   Wserver.wprint "</head>\n";
   let s =
