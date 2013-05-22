@@ -1020,7 +1020,7 @@
     %foreach;ancestor_level(nb_gen)
       %foreach;ancestor;
         %if;(ancestor.same = "")
-          %if;(ancestor.first_name != "?" and ancestor.surname != "?" and ((not ancestor.has_parents and level < nb_gen) or (ancestor.has_families and (ancestor.spouse.first_name = "?" and ancestor.spouse.surname = "?"))))
+          %if;(ancestor.first_name != "?" and ancestor.surname != "?" and (not ancestor.has_parents or (ancestor.has_families and (ancestor.spouse.first_name = "?" and ancestor.spouse.surname = "?"))))
             %if;(dates_in_interval(ancestor.var) = "true")
               %incr_count;
               %apply;add_in_sorted_list%with
@@ -1033,7 +1033,7 @@
                 %and;%apply;ancestor_missing_birth("ancestor")
                 %and;%apply;ancestor_missing_death("ancestor")
                 %and;
-                  %if;(not ancestor.has_parents and level < nb_gen)
+                  %if;(not ancestor.has_parents)
                     x
                   %else;
                     &nbsp;
@@ -1169,7 +1169,7 @@
       </tr>
       %let;nb_col;%expr(count + 4)%in;
       %reset_count;
-      %foreach;ancestor_level(nb_gen-1)
+      %foreach;ancestor_level(nb_gen)
         %apply;lazy_print%with;
           <tr>
             <th align="left" colspan="%nb_col;">[*generation/generations]0 %expr(level+1)</th>
