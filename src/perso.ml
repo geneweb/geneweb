@@ -1680,17 +1680,18 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           if m_auth && not conf.no_note then
-            let s =
-              let wi =
-                {Wiki.wi_mode = "NOTES";
-                 Wiki.wi_cancel_links = conf.cancel_links;
-                 Wiki.wi_file_path = Notes.file_path conf base;
-                 Wiki.wi_person_exists = person_exists conf base;
-                 Wiki.wi_always_show_link = conf.wizard || conf.friend}
-              in
-              Wiki.syntax_links conf wi (sou base (get_comment fam))
-            in
-            string_with_macros conf [] s
+            let s = sou base (get_comment fam) in
+            let s = string_with_macros conf [] s in
+            let lines = Wiki.html_of_tlsw conf s in
+            let wi =
+              {Wiki.wi_mode = "NOTES";
+               Wiki.wi_cancel_links = conf.cancel_links;
+               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_person_exists = person_exists conf base;
+               Wiki.wi_always_show_link = conf.wizard || conf.friend}
+             in
+            let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+            if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
       | _ -> raise Not_found ]
   | "count" ->

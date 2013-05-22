@@ -247,7 +247,9 @@ value reconstitute_family conf =
           ([c :: parents], ext)
       | None -> ([], ext) ]
   in
-  let comment = only_printable (get conf "comment") in
+  let comment = 
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "comment"))
+  in
   let fsources = only_printable (get conf "src") in
   let origin_file =
     match p_getenv conf.env "origin_file" with

@@ -102,7 +102,7 @@ value print_return conf =
         (fun (x, v) ->
            (* Seul un textarea peut contenir des sauts de ligne. *)
            (* On remplace donc l'input par un textarea.          *)
-           if x = "notes" then
+           if x = "notes" || x = "comment" then
              tag "textarea" "style=\"display:none;\" name=\"%s\"" x 
                begin
                  Wserver.wprint "%s" (quote_escaped (decode_varenv v));
