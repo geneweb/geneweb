@@ -689,6 +689,28 @@ value effective_inv conf base ip u ifam =
   patch_union base ip u
 ;
 
+
+(* ************************************************************************ *)
+(*  [Fonc] effective_chg_order : 
+             config -> base -> iper -> person -> ifam -> int -> unit        *)
+(** [Description] : Modifie l'ordre de la famille en positionnant la famille
+      ifam à la position n. Exemple : [f1 f2 f3 f4] f1 3 => [f2 f3 f1 f4].
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - ip   : iper
+      - u    : person
+      - ifam : famille à changer de place
+      - n    : nouvelle position de la famille
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value effective_chg_order conf base ip u ifam n =
+  let fam = UpdateFam.change_order conf base ip u ifam n in
+  let u = {family = Array.of_list fam} in
+  patch_union base ip u
+;
+
 value kill_family base ifam1 ip =
   let u = poi base ip in
   let l =
@@ -1111,6 +1133,31 @@ value print_inv conf base =
       try
         do {
           effective_inv conf base (get_key_index p) p (Adef.ifam_of_int ifam);
+          Util.commit_patches conf base;
+          let changed = 
+            let gen_p = 
+              Util.string_gen_person base (gen_person_of_person p)
+            in
+            U_Invert_family gen_p (Adef.ifam_of_int ifam)
+          in
+          History.record conf base changed "if";
+          print_inv_ok conf base p
+        }
+      with
+      [ Update.ModErr -> () ]
+  | _ -> incorrect_request conf ]
+;
+
+value print_change_order_ok conf base =
+  match 
+    (p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n") 
+  with
+  [ (Some ip, Some ifam, Some n) ->
+      let p = poi base (Adef.iper_of_int ip) in
+      try
+        do {
+          effective_chg_order conf base 
+            (get_key_index p) p (Adef.ifam_of_int ifam) n;
           Util.commit_patches conf base;
           let changed = 
             let gen_p = 

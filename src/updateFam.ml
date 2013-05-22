@@ -586,3 +586,89 @@ value print_inv conf base =
       | _ -> incorrect_request conf ]
   | _ -> incorrect_request conf ]
 ;
+
+value change_order conf base ip u ifam n =
+  let rec loop i =
+    fun
+    [ [] -> if i = n then [ifam] else []
+    | [fam :: faml] ->
+        if ifam = fam then
+          if i = n then [ifam :: loop (i+1) [fam :: faml]]
+          else loop i faml
+        else
+          if i = n then [ifam :: loop (i+1) [fam :: faml]]
+          else [fam :: loop (i+1) faml] ]
+  in
+  loop 1 (Array.to_list (get_family u))
+;
+
+value print_change_order conf base =
+  match 
+    (p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n") 
+  with
+  [ (Some ip, Some ifam, Some n) -> do {
+      let p = poi base (Adef.iper_of_int ip) in
+      let print_list arr diff_arr =
+        Array.iteri
+          (fun i ifam ->
+             let fam = foi base ifam in
+             let sp = spouse (get_key_index p) fam in
+             let sp = poi base sp in
+             tag "li" "%s"
+               (if diff_arr.(i) then "style=\"background:pink\"" else "")
+             begin
+               Wserver.wprint "%s%s" (p_first_name base p)
+                 (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
+               Wserver.wprint "  &amp;";
+               Wserver.wprint "%s\n" 
+                 (Date.short_marriage_date_text conf base fam p sp);
+               Wserver.wprint "%s%s %s" (p_first_name base sp)
+                 (if get_occ sp = 0 then "" else "." ^ string_of_int (get_occ sp))
+                 (p_surname base sp);
+               Wserver.wprint "\n";
+             end)
+          arr
+      in
+      let after = 
+        change_order conf base (get_key_index p) p (Adef.ifam_of_int ifam) n
+      in
+      let (before, after) = (get_family p, Array.of_list after) in
+      let (bef_d, aft_d) = Diff.f before after in
+      let title _ =
+        Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
+      in
+      Perso.interp_templ_with_menu title "perso_header" conf base p;
+      Wserver.wprint "%s:"
+        (capitale (transl conf "invert the order of the following families"));
+      tag "table" "style=\"margin:1em\"" begin
+        tag "tr" begin
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list before bef_d;
+            end;
+          end;
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list after aft_d;
+            end;
+          end;
+        end;
+      end;
+      tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+        tag "p" begin
+          Util.hidden_env conf;
+          xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\"" ip;
+          xtag "input" "type=\"hidden\" name=\"f\" value=\"%d\"" ifam;
+          xtag "input" "type=\"hidden\" name=\"n\" value=\"%d\"" n;
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"CHG_FAM_ORD_OK\"";
+        end;
+        tag "p" begin
+          xtag "input" "type=\"submit\" value=\"Ok\"";
+        end;
+      end;
+      Wserver.wprint "\n";
+      trailer conf
+    }
+  | _ -> incorrect_request conf ]
+;
+

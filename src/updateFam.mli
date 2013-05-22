@@ -18,6 +18,10 @@ value print_del : config -> base -> unit;
 value print_inv : config -> base -> unit;
 value print_add_parents : config -> base -> unit;
 
+value change_order : 
+  config -> base -> iper -> person -> ifam -> int -> list ifam;
+value print_change_order : config -> base -> unit;
+
 value person_key : base -> iper -> Update.key;
 value string_family_of :
   config -> base -> ifam ->
