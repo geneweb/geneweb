@@ -38,7 +38,7 @@
   </td></tr></table>
 %end;
 
-
+%(
 <div class="page_max">
   <h2>[*update family]</h2>
   <div class="new-form">
@@ -162,7 +162,7 @@
   });
 </script>
 
-
+%)
 
 
 
