@@ -55,7 +55,7 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
     Wserver.wprint "%s\n" (capitale (transl conf "merge"))
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
-  Hutil.header conf title;
+  Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Hutil.print_link_to_welcome conf True;
   tag "ul" begin
     tag "li" begin print_link conf base (poi base ip1); end;
@@ -90,7 +90,7 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
          (transl_decline conf "merge" (transl_nth conf "family/families" 1)))
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
-  Hutil.header conf title;
+  Perso.interp_notempl_with_menu title "perso_header" conf base p;
   Hutil.print_link_to_welcome conf True;
   let (ip1, ip2) =
     let cpl = foi base ifam1 in

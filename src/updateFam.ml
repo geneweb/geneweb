@@ -104,7 +104,10 @@ value obsolete version var new_var r =
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
-value rec eval_var conf base env (fam, cpl, des) loc =
+value rec eval_var conf base env (fam, cpl, des) loc sl =
+  try eval_special_var conf base (fam, cpl, des) sl with 
+  [ Not_found -> eval_simple_var conf base env (fam, cpl, des) loc sl ]
+and eval_simple_var conf base env (fam, cpl, des) loc =
   fun
   [ ["bvar"; v] ->
       try VVstring (List.assoc v conf.base_env) with
@@ -372,6 +375,17 @@ and eval_relation_kind =
   | NoSexesCheckNotMarried -> "nsck"
   | NoSexesCheckMarried -> "nsckm"
   | NoMention -> "no_ment" ]
+and eval_special_var conf base p =
+  fun 
+  [ ["include_perso_header"] ->
+      match p_getint conf.env "ip" with
+      [ Some i -> do {
+          let p = poi base (Adef.iper_of_int i) in
+          Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf base p;
+          VVstring ""
+        }
+      | None -> VVstring "" ]
+  | _ -> raise Not_found ]
 and eval_int_env var env =
   match get_env var env with
   [ Vint x -> str_val (string_of_int x)
@@ -432,7 +446,12 @@ value print_del1 conf base ifam =
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
   do {
-    header conf title;
+    let p = 
+      match p_getint conf.env "ip" with
+      [ Some ip -> poi base (Adef.iper_of_int ip)
+      | None -> Gwdb.empty_person base (Adef.iper_of_int (-1)) ]
+    in
+    Perso.interp_notempl_with_menu title "perso_header" conf base p;
     print_link_to_welcome conf True;
     Wserver.wprint "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
@@ -461,7 +480,7 @@ value print_inv1 conf base p ifam1 ifam2 =
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
   do {
-    header conf title;
+    Perso.interp_templ_with_menu title "perso_header" conf base p;
     Wserver.wprint "%s:"
       (capitale (transl conf "invert the order of the following families"));
     tag "ul" begin
@@ -671,4 +690,3 @@ value print_change_order conf base =
     }
   | _ -> incorrect_request conf ]
 ;
-

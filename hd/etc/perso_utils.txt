@@ -1,0 +1,183 @@
+%let;central_index;%index;%in;
+
+%define;show_templ(tpl)
+  %include.tpl;
+%end;
+
+%define;get_templ(tplnum)
+  %let;templ;perso_module/%bvar.perso_module_tplnum;%in
+  %apply;show_templ(templ)
+%end;
+
+%( initialise le compteur à/avec la valeur passée en paramètre %)
+%define;init_count(prev_count)
+  %reset_count;
+  %for;i;0;prev_count;
+    %incr_count;
+  %end;
+%end;
+
+%define;li_SD(xx)
+  <li style="vertical-align: middle;list-style-type: %nn;
+    %if;xx.has_parents;disc%else;circle%end;">%nn;
+%end;
+
+%define;li_SDC(xx)
+  %if;xx.has_families;
+    %reset_count;
+    %foreach;family;
+      %if;(nb_children>0)%incr_count;%end;
+    %end;
+  %end;
+  <li style="vertical-align: middle;list-style-type: %nn;
+    %if;xx.has_families;%if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
+%end;
+
+%define;image_MF(xx,wi_he)
+  %if;(xx != "x x")
+    %if;xx.is_male;
+      <img width="wi_he" height="wi_he" src="%image_prefix;/male.png"%sp;
+           style="border: none" alt="[M/F]0"%/>%nn;
+    %elseif;xx.is_female;
+      <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
+           style="border: none" alt="[M/F]1"%/>%nn;
+    %else;
+      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png" 
+           style="border: none" alt="?" title="?"%/>%nn;
+    %end;
+    %sp;
+  %end;
+%end;
+
+%define;image_sosa(xxx,yyy)
+  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
+%end;
+
+%define;nav_with_sosa_ref(xxx)
+  [*navigation with %t as Sosa reference:::xxx].
+%end;
+
+%define;witness_relation(xxx, yyy)
+  [*witness at marriage of %s and %s:::xxx:yyy]
+%end;
+
+%define;display_sosa(xx)
+  %if;(xx.has_sosa and bvar.display_sosa="yes")
+    %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
+    %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
+    %sosa_ref.surname_key_strip;
+    %and;%xx.sosa;%end;
+    %if;not cancel_links;</a>%end;%sp;
+  %end;
+%end;
+
+%define;short_display_person(xx)
+  %apply;display_sosa("xx")
+  %if;(xx.index=central_index)<b>%xx;</b>%else;
+    %if;(cancel_links or xx.is_restricted)%xx;
+    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  %end;
+  %xx.title;%xx.dates;
+%end;
+
+%define;long_display_person(xx)
+  %apply;display_sosa("xx")
+  %if;(xx.index=central_index)<b>%xx;</b>%else;
+    %if;(cancel_links or xx.is_restricted)%xx;
+    %else;<a href="%prefix;%xx.access;">%xx;</a>
+    %end;
+    %if;xx.has_nobility_titles;
+      %foreach;xx.nobility_title;, %nobility_title;%end;
+    %end;
+  %end;
+  <span style="font-size: 90%%">%nn;
+    %if;xx.has_birth_date;, %apply;nth([born],xx.sex) %xx.on_birth_date;
+      %if;xx.birthday; ([happy birthday to you!])%end;
+      %if;xx.has_birth_place; - %xx.birth_place;%end;
+    %else;
+      %if;xx.has_birth_place;, %apply;nth([born],xx.sex) - %xx.birth_place;%end;
+    %end;
+    %if;xx.has_baptism_date;, %apply;nth([baptized],xx.sex) %xx.on_baptism_date;
+      %if;xx.has_baptism_place; - %xx.baptism_place;%end;
+    %else;
+      %if;xx.has_baptism_place;, %apply;nth([baptized],xx.sex) - %xx.baptism_place;%end;
+    %end;
+    %if;xx.computable_age;, [age] : %xx.age; %end;
+    %if;xx.is_dead;, %xx.died;
+      %if;xx.has_death_date; %xx.on_death_date;%end;
+      %if;xx.has_death_place; - %xx.death_place;%end;
+      %if;xx.computable_death_age; [age at death:] %xx.death_age;%end;
+    %end;
+    %if;xx.is_buried; , %apply;nth([buried],xx.sex)%sp;
+      %if;xx.has_burial_date; %xx.on_burial_date;%end;
+      %if;xx.has_burial_place; - %xx.burial_place;%end;
+    %end;
+    %if;xx.is_cremated; , %apply;nth([cremated],xx.sex)%sp;
+      %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
+      %if;xx.has_cremation_place; - %xx.cremation_place;%end;
+    %end;
+    %if;xx.has_occupation;, %apply;capitalize(xx.occupation)%end;
+    %if;(xx.has_consanguinity and bvar.show_consang!="no"),%sp;
+      [consanguinity] : %xx.consanguinity;%end;
+  </span>
+%end;
+
+%define;married_to(sexx, date_place)
+  %if;(sexx = 0 or sexx = 2)
+    %if;are_married;[*married%t to:::date_place]0%nn;
+    %elseif;are_not_married;[*relationship%t to:::date_place]0%nn;
+    %elseif;are_engaged;[*engaged%t to:::date_place]0%nn;
+    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]0%nn;
+    %elseif;is_no_mention;date_place [*with]%nn;
+    %end;
+  %else;
+    %if;are_married;[*married%t to:::date_place]1%nn;
+    %elseif;are_not_married;[*relationship%t to:::date_place]1%nn;
+    %elseif;are_engaged;[*engaged%t to:::date_place]1%nn;
+    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]1%nn;
+    %elseif;is_no_mention;date_place [*with]%nn;
+    %end;
+  %end;
+%end;
+
+%define;long_married(xx)
+  %apply;married_to%with;%xx.sex%and;
+    %if;(marriage_place = "")
+      %if;(on_marriage_date = "")
+      %else; <em>%on_marriage_date;
+        %if;wedding_birthday; ([happy birthday to them!])%end;
+        </em>
+      %end;
+    %else;
+      %if;(on_marriage_date = "")<em>, %marriage_place;, </em>
+      %else; <em>%on_marriage_date;
+        %if;wedding_birthday; ([happy birthday to them!])%end;
+        , %marriage_place, </em>
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;short_display_siblings()
+  %apply;li_SDC("child")
+    %apply;image_MF("child","13")
+    %apply;short_display_person("child")
+  </li>
+%end;
+
+%define;long_display_siblings()
+  %apply;li_SDC("child")
+    %apply;image_MF("child","13")
+    %apply;short_display_person("child")
+    %if;child.has_families;
+      %foreach;child.family;
+        %if;(family_cnt!=1)
+          <br%/><img src="%image_prefix;/1pixel.png" width="13" height="13" alt=""%/>
+          <em>%child;%child.title;%child.dates;</em>
+        %end;
+        <em> %apply;long_married("child")</em>
+        %apply;short_display_person("spouse")
+      %end;
+    %end;
+  </li>
+%end;

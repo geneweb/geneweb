@@ -1,0 +1,358 @@
+<!-- $Id: menubar.txt,v 1.0 2013/03/15 15:53:12 flh Exp $ -->
+
+%define;marriage_with_txt(xx)
+  [*marriage with %s:::xx]
+%end;
+
+%define;relationship_txt(xx)
+  [*relationship by marriage with %s:::xx]
+%end;
+
+%define;navsosa(xx)
+  [*navigation with %t as Sosa reference:::xx].
+%end;
+
+<ul id="menuBar">
+  <li class="person %if;(evar.m="" and evar.type="")on%end;">
+    <a href="%prefix;%self.access;" alt="[*person/persons]0" title="[*person/persons]0">
+      <span class="text">bouton fiche</span>
+    </a>
+    %if;(not(bvar.wizard_just_friend = "yes") and wizard)
+      <div>
+        <ul>
+          <li>
+            <a href="%prefix;m=MOD_IND;i=%index;">[*modify::person/persons]0</a>
+          </li>
+
+          %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
+            <li>
+              <a href="%prefix;m=SND_IMAGE;i=%index;" class="add_portrait">
+                %if;(auto_image_file_name != "")
+                  [*modify picture]
+                %else;
+                  [*add picture]
+                %end;
+              </a>
+            </li>
+          %end;
+
+          <li class="menubar_separateur">&nbsp;</li>
+          
+          <li><a href="%prefix;m=MRG;i=%index;">[*merge::]</a></li>
+          <li><a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a></li>
+          %if;has_possible_duplications;
+            <li>
+              <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
+            </li>
+          %end;
+        </ul>
+      </div>
+    %end;
+  </li>
+
+
+  %if;(not(bvar.wizard_just_friend = "yes") and wizard)
+    <li class="family %if;(evar.m="U")on%end;">
+      <a href="%prefix;m=U;%access;" alt="[*family/families]0" title="[*family/families]0">
+        <span class="text">bouton famille</span>
+      </a>
+      <div>
+        <ul>
+          %if;(not has_parents and first_name != "?" and surname != "?")
+            <li><a href="%prefix;m=ADD_PAR;ip=%index;">[*add::parents]</a></li>
+          %end;
+
+          %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
+          %elseif;(not is_male and not is_female)
+            <li>
+              <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">[*add::marriage/marriages]0 ([M/F]0)</a>
+            </li>
+            <li>
+              <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">[*add::marriage/marriages]0 ([M/F]1)</a>
+            </li>
+          %else;
+            <li>
+              <a href="%prefix;m=ADD_FAM;ip=%index;">[*add::marriage/marriages]0</a>
+            </li>
+          %end;
+
+          %if;((not has_parents and first_name != "?" and surname != "?") or not ((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents)))
+            <li class="menubar_separateur">&nbsp;</li>
+          %end;
+
+          %if;has_families;
+            %foreach;family;
+              <li class="sub_menu"> 
+                <span>%apply;marriage_with_txt%with;%spouse;%end;</span>
+      	        <div>
+                  <span class="fleche_droite">&nbsp;</span>
+                  <ul>
+                    <li>
+                      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;">[*modify::family/families]0</a>
+                    </li>
+                    <li>
+                      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;#child">[*add::child/children]0</a>
+                    </li>
+                    %if;(nb_children != 0)
+                      <li>
+                        <a href="%prefix;m=CHG_CHN;i=%family.index;;ip=%index;">[*change children's names]</a>
+                      </li>
+                    %end;
+                    <li>
+                      <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">[*delete::family/families]0</a>
+                    </li>
+                    %if;(family_cnt != 1)
+                      %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
+                        <li>
+                          <a href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;">[*merge::]</a>
+                        </li>
+                      %end;
+                    %end;
+                  </ul>
+                </div>
+              </li>
+            %end;
+          %end;
+        </ul>
+      </div>
+    </li>
+  %end;
+
+  <li class="liste %if;(evar.m="A" or evar.m="D" or evar.type="graph")on%end;">
+    <a href="%prefix;m=A;%access;" alt="[*ancestors] [and] [descendants]" title="[*ancestors] [and] [descendants]">
+      <span class="text">bouton listes et états</span>
+    </a>
+    <div>
+      <ul>
+        %if;has_parents;
+          <li><a href="%prefix;m=A;%access;">[*ancestors]</a></li>
+        %end;
+
+        %if;has_children;
+          <li><a href="%prefix;m=D;%access;">[*descendants]</a></li>
+        %end;
+      </ul>
+    </div>
+  </li>
+
+  <li class="parente %if;(evar.m="R")on%end;">
+    <a href="%prefix;m=R;%access;" accesskey="R" alt="[*relationship]" title="[*relationship]">
+      <span class="text">bouton parenté</span>
+    </a>
+    <div>
+      <ul>
+        %if;(died = "" and (wizard or friend))
+          <li>
+            <a href="%prefix;%access;;m=C;t=AN">[*family birthday]</a>
+          </li>
+        %end;
+
+        <li class="menubar_separateur">&nbsp;</li>
+         
+        %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
+          <li>
+            <a href="%prefix;em=R;
+              %if;access_by_key;
+                ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
+              %else;
+                ei=%index;;
+              %end;
+              m=NG;n=;t=N;select=%sosa_ref.index;;et=M;image=on;">
+              %apply;relationship_txt%with;
+                %sosa_ref; <i>(sosa 1)</i>
+              %end;
+            </a>
+          </li>
+        %end;
+        %foreach;family;
+          %if;(spouse != "? ?")
+            <li>
+              <a href="%prefix;em=R;
+                %if;access_by_key;
+                  ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
+                %else;
+                  ei=%index;;
+                %end;
+                m=NG;n=;t=N;select=%spouse.index;;et=M;image=on;">
+                %apply;relationship_txt%with;
+                  %spouse;
+                  %if;spouse.has_nobility_titles;,%sp;
+                  <em>%spouse.nobility_title;</em>%end;%nl;
+                  <i>([spouse/spouses]0)</i>%nl;
+                %end;
+              </a>
+            </li>
+          %end;
+        %end;
+        %foreach;relation;
+          %if;has_relation_him;
+            <li>
+              <a href="%prefix;em=R;
+                %if;access_by_key;
+                  ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
+                %else;
+                  ei=%index;;
+                %end;
+                m=NG;n=;t=N;select=%relation_him.index;;et=M;image=on;">
+                %apply;relationship_txt%with;
+                  %relation_him;
+                  %if;relation_him.has_nobility_titles;,%sp;
+                  <em>%relation_him.nobility_title;</em>%end;%nl;
+                  <i>(%relation_him.type;)</i>%nl;
+                %end;
+              </a> 
+            </li>
+          %end;
+          %if;has_relation_her;
+            <li>
+              <a href="%prefix;em=R;
+                %if;access_by_key;
+                  ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
+                %else;
+                  ei=%index;;
+                %end;
+                m=NG;n=;t=N;select=%relation_her.index;;et=M;image=on;">
+                %apply;relationship_txt%with;
+                  %relation_her;
+                  %if;relation_her.has_nobility_titles;,%sp;
+                  <em>%relation_her.nobility_title;</em>%end;%nl;
+                  <i>(%relation_her.type;)</i>%nl;
+                %end;
+              </a> 
+            </li>
+          %end;
+        %end;
+        %foreach;related;
+          <li>
+            <a href="%prefix;em=R;
+              %if;access_by_key;
+                ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
+              %else;
+                ei=%index;;
+              %end;
+              m=NG;n=;t=N;select=%related.index;;et=M;image=on;">
+              %apply;relationship_txt%with;
+                %related;
+                %if;related.has_nobility_titles;,%sp;
+                <em>%related.nobility_title;</em>%end;%nl;
+                <i>(%related.type;)</i>%nl;
+              %end;
+            </a> 
+          </li>
+        %end;
+        %foreach;family;
+          %foreach;witness;
+            <li>
+              <a href="%prefix;em=R;
+                %if;access_by_key;
+                  ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
+                %else;
+                  ei=%index;;
+                %end;
+                m=NG;n=;t=N;select=%witness.index;;et=M;image=on;">
+                %apply;relationship_txt%with;
+                  %witness;%nl;
+                  <i>([witness/witnesses]0)</i>%nl;
+                %end;
+              </a> 
+            </li>
+          %end;
+        %end;
+      </ul>
+    </div>
+  </li>
+
+  <li class="misc %if;(evar.type="carto" or evar.type="liens")on%end;">
+    <a href="javascript:;" alt="[*miscellaneous]" title="[*miscellaneous]">
+      <span class="text">bouton misc</span>
+    </a>
+    <div>
+      <ul>
+        %if;(bvar.history_diff = "yes" and has_history)
+          <li class="menubar_separateur">&nbsp;</li>
+          <li>
+            <a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;">[*individual history]</a>
+          </li>
+        %end;
+
+        %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
+          <li>
+            <a href="%prefix_no_iz;iz=%self.index;;%self.access;">
+              %apply;navsosa%with;
+                %self; %if;has_nobility_titles;, <em>%nobility_title;</em>%end;
+              %end;
+            </a>
+          </li>
+        %end;
+        %if;has_parents;
+          %foreach;father.child;
+            %if;is_sibling_before;
+              <li>
+                <a href="%prefix;%child.access;">
+                  %apply;capitalize(nth([previous sibling],sex))
+                </a>
+              </li>
+            %end;
+            %if;is_sibling_after;
+              <li>
+                <a href="%prefix;%child.access;">
+                  %apply;capitalize(nth([next sibling],sex))
+                </a>
+              </li>
+            %end;
+          %end;
+        %end;
+      </ul>
+    </div>
+  </li>
+</ul>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#menuBar > li > div").click(function(){
+    $("#menuBar > li div.hover").removeClass("hover");
+    $("#menuBar > li.hover").removeClass("hover");
+    $("#menuBar > li > div li").removeClass("hover");
+    $(this).parent().toggleClass("hover");
+    $(this).toggleClass("hover");
+    return false;
+  });
+
+  $("#menuBar > li.misc > a").click(function(){
+    $("#menuBar > li div.hover").removeClass("hover");
+    $("#menuBar > li.hover").removeClass("hover");
+    $("#menuBar > li > div li").removeClass("hover");
+    $(this).parent().toggleClass("hover");
+    $(this).parent().children("div").toggleClass("hover");
+    return false;
+  });
+
+  $("#menuBar > li.liste > a").click(function(){
+    $("#menuBar > li div.hover").removeClass("hover");
+    $("#menuBar > li.hover").removeClass("hover");
+    $("#menuBar > li > div li").removeClass("hover");
+    $(this).parent().toggleClass("hover");
+    $(this).parent().children("div").toggleClass("hover");
+    return false;
+  });
+
+  $("#menuBar > li > div li").click(function(){
+    $("#menuBar > li > div li").removeClass("hover");
+    $(this).toggleClass("hover");
+    return false;
+  });
+
+  $("#menuBar > li > div li a").click(function(){
+    if(typeof ($(this).attr("onclick")) == "undefined" || $(this).attr("onclick") == ""){
+      window.location = $(this).attr("href");
+      return false;
+    }
+  });
+
+  $(document).click(function(){
+    $("#menuBar > li div.hover").removeClass("hover");
+    $("#menuBar > li.hover").removeClass("hover");
+    $("#menuBar > li > div li").removeClass("hover");
+  });
+});
+</script>

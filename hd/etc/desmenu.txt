@@ -15,8 +15,8 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <script type="text/javascript" src="jquery_1_9_1_min.js"></script>
   %include.favicon;
+  %include.js;
   %include.css;
   %base_header;
 </head>
@@ -52,6 +52,8 @@ function no_options () {
 }
 
 --></script>
+
+%include.perso_header;
 
 <h1>%nn;
   %apply;a_of_b_gr_eq_lev%with;

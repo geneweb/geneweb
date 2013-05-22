@@ -31,7 +31,7 @@ value print conf base p =
       list []
   in
   do {
-    header conf title;
+    Perso.interp_notempl_with_menu title "perso_header" conf base p;
     Wserver.wprint "\n";
     tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       tag "p" begin

@@ -15,8 +15,8 @@
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <script type="text/javascript" src="jquery_1_9_1_min.js"></script>
   %include.favicon;
+  %include.js;
   %include.css;
   %base_header;
 </head>
@@ -88,6 +88,7 @@ function no_options () {
 
 --></script>
 
+%include.perso_header;
 
 <h1>%nn;
   %apply;a_of_b%with;
@@ -102,10 +103,6 @@ function no_options () {
 
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
-%end;
-
-%define;navsosa(xx)
-  [*navigation with %t as Sosa reference:::xx].
 %end;
 
 %if;not cancel_links;
@@ -515,14 +512,6 @@ function no_options () {
     <input type="submit" value="Ok"%/>
   </div>
 </form>
-
-<p style="text-align:center;">
-  %apply;navsosa%with;
-    <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
-    %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
-  %end;
-</p>
-
 
 %base_trailer;
 %copyright;

@@ -11,6 +11,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   %include.favicon;
+  %include.js;
   %include.css;
   %base_header;
 </head>
@@ -115,6 +116,8 @@
 %define;nth_cousins(xx)
   [*%s cousins:::xx]%nn;
 %end;
+
+%include.perso_header;
 
 <h1>[*link between]%sp;
   %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -345,28 +348,6 @@
       <input type="submit" value="[*validate/delete]0"%/>
     </p>
   </form>
-</div>
-
-<div id="rel_others">
-  <div id="rel_see_also" class="moduleExtra">
-   <div>
-    <h2 class="highlight"><span>[*see also]</span></h2>
-    <div>
-     <ul>
-       %if;(died = "" and (wizard or friend))
-         <li>
-           <img src="%image_prefix;/picto_anniversaire_small.png" alt="" title="" %/>
-           <a href="%prefix;%access;;m=C;t=AN">[*family birthday]</a>
-         </li>
-       %end;
-       <li>
-         <img src="%image_prefix;/picto_branche_patronymique.png" alt="" title="" %/>
-         <a href="%prefix;m=A;%access;;sosab=10;v=10;siblings=on;notes=on;src=on;t=F">[*surnames branch]</a> (10 [generation/generations]1)
-       </li>
-     </ul>
-    </div>
-   </div>
-  </div>
 </div>
 
 

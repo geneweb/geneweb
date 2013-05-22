@@ -58,7 +58,10 @@ value obsolete version var new_var r =
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
-value rec eval_var conf base env p loc =
+value rec eval_var conf base env p loc sl =
+  try eval_special_var conf base p sl with 
+  [ Not_found -> eval_simple_var conf base env p loc sl ]
+and eval_simple_var conf base env p loc =
   fun
   [ ["alias"] -> eval_string_env "alias" env
   | ["acc_if_titles"] -> bool_val (p.access = IfTitles)
@@ -338,6 +341,17 @@ and eval_is_relation_type rt =
   [ Some {r_fath = None; r_moth = None} -> bool_val False
   | Some {r_type = x} -> bool_val (x = rt)
   | _ -> bool_val False ]
+and eval_special_var conf base p =
+  fun 
+  [ ["include_perso_header"] ->
+      match p_getint conf.env "i" with
+      [ Some i -> do {
+          let p = poi base (Adef.iper_of_int i) in
+          Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf base p;
+          VVstring ""
+        }
+      | None -> VVstring "" ]
+  | _ -> raise Not_found ]
 and eval_int_env var env =
   match get_env var env with
   [ Vint x -> str_val (string_of_int x)
@@ -414,13 +428,13 @@ value print_del1 conf base p =
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
   do {
-    header conf title;
+    Perso.interp_notempl_with_menu title "perso_header" conf base p;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
-          (Adef.int_of_iper p.key_index);
+          (Adef.int_of_iper (get_key_index p));
         xtag "input" "type=\"submit\" value=\"Ok\"";
       end;
     end;
@@ -457,6 +471,6 @@ value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      print_del1 conf base (string_person_of base p)
+      print_del1 conf base p
   | _ -> incorrect_request conf ]
 ;

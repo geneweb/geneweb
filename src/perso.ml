@@ -1,4 +1,4 @@
-(* camlp5r *)
+(* camlp5r ./pa_html.cmo *)
 (* $Id: perso.ml,v 5.82 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
@@ -1689,7 +1689,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
                Wiki.wi_file_path = Notes.file_path conf base;
                Wiki.wi_person_exists = person_exists conf base;
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
-             in
+            in
             let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
             if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
@@ -3704,7 +3704,7 @@ value eval_predefined_apply conf env f vl =
   | _ -> raise Not_found ]
 ;
 
-value interp_templ templ_fname conf base p = do {
+value gen_interp_templ menu title templ_fname conf base p = do {
   template_file.val := templ_fname ^ ".txt";
   let ep = (p, authorized_age conf base p) in
   let emal =
@@ -3765,13 +3765,46 @@ value interp_templ templ_fname conf base p = do {
      ("nldb", Vlazy (Lazy.lazy_from_fun nldb));
      ("all_gp", Vlazy (Lazy.lazy_from_fun all_gp))]
   in
-  Hutil.interp conf base templ_fname
-    {Templ.eval_var = eval_var conf base;
-     Templ.eval_transl = eval_transl conf;
-     Templ.eval_predefined_apply = eval_predefined_apply conf;
-     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-     Templ.print_foreach = print_foreach conf base}
-    env ep
+  if menu then 
+    (* Petit calcul pour voir si le fichier est vide => on   *)
+    (* ne veut pas utiliser le header avec la barre de menu. *)
+    let size =
+      match Util.open_templ conf templ_fname with
+      [ Some ic -> do {
+          let fd = Unix.descr_of_in_channel ic in
+          let stats = Unix.fstat fd in
+          close_in ic;
+          stats.Unix.st_size
+        }
+      | None -> 0 ]
+    in
+    if size = 0 then Hutil.header conf title
+    else do {
+      Hutil.interp_no_header conf base templ_fname
+        {Templ.eval_var = eval_var conf base;
+         Templ.eval_transl = eval_transl conf;
+         Templ.eval_predefined_apply = eval_predefined_apply conf;
+         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+         Templ.print_foreach = print_foreach conf base}
+        env ep;
+      tag "h2" begin title False; end
+    }
+  else 
+    Hutil.interp conf base templ_fname
+      {Templ.eval_var = eval_var conf base;
+       Templ.eval_transl = eval_transl conf;
+       Templ.eval_predefined_apply = eval_predefined_apply conf;
+       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+       Templ.print_foreach = print_foreach conf base}
+      env ep
+};
+
+value interp_templ = gen_interp_templ False (fun _ -> ());
+value interp_templ_with_menu = gen_interp_templ True;
+value interp_notempl_with_menu title templ_fname conf base p = do {
+  (* On envoie le header car on n'est pas dans un template (exple: merge). *)
+  Hutil.header_without_page_title conf title;
+  gen_interp_templ True title templ_fname conf base p;
 };
 
 (* Main *)

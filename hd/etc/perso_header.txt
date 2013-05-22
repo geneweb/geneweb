@@ -1,0 +1,80 @@
+
+%( On importe perso_utils pour l'inclusion hors template. %)
+%( Normalement, il n'est ajouté qu'une seule fois.        %)
+%import;perso_utils
+
+%include.menubar;
+
+<h1>
+  %apply;image_MF("self", "")
+  %if;has_public_name;
+    %if;has_qualifiers;%public_name; <em>%qualifier;</em>
+    %else;%public_name; %surname;%end;
+  %else;
+    %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+    %else;
+      %if;cancel_links;%first_name; %surname;
+      %else;
+        <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+        <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+      %end;
+    %end;
+  %end;
+  %if;(wizard)
+    &nbsp;
+    <a href="%prefix;m=MOD_IND;i=%index;;">
+      <img class="modify_family" src="%image_prefix;/picto_molette.png" width="13" height="13" title="[modify::person/persons]0"%/>
+    </a>
+  %end;
+</h1>
+
+%if;(has_sosa or has_qualifiers or has_aliases or has_nobility_titles or
+     has_public_name or has_surnames_aliases or has_first_names_aliases or
+     has_linked_page.HEAD)
+  <table style="width:100%%" border="%border;"><tr><td align="center">
+  <table border="%border;" cellspacing="0" cellpadding="0">
+  <tr><td>
+  %if;has_sosa;
+    <img src="%image_prefix/sosa.png" alt="sosa" title="sosa"/>
+    <em>[*Sosa]:
+    %if;cancel_links;%sosa;
+    %else;<a href="%prefix;%sosa_link;">%sosa;</a>%end;
+    </em><br%/>
+  %end;
+  %foreach;qualifier;
+    %if;not is_first;
+      %if;has_public_name;%public_name; %qualifier;
+      %else;%first_name; %qualifier;%end;<br%/>
+    %end;
+  %end;
+  %foreach;alias;
+    <em><strong>%alias;</strong></em><br%/>
+  %end;
+  %if;has_nobility_titles;
+    <em>
+    %foreach;nobility_title;
+      %if;not is_first;,
+      %end;
+      %nobility_title;
+    %end;
+    </em><br%/>
+  %end;
+  %if;has_linked_page.HEAD;%linked_page.HEAD;<br%/>%end;
+  %if;(has_public_name or has_qualifiers)
+    <em>(%if;cancel_links;%first_name; %surname;
+         %else;
+           <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+           <a href="%prefix;m=N;v=%surname_key;">%surname;</a>%nn;
+         %end;)</em><br%/>
+  %end;
+  %foreach;surname_alias;
+    <em>(%first_name; %surname_alias;)</em><br%/>
+  %end;
+  %foreach;first_name_alias;
+    <em>(%first_name_alias; %surname;)</em><br%/>
+  %end;
+  </td></tr>
+  </table>
+  </td></tr></table>
+  <p></p>
+%end;
