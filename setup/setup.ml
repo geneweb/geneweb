@@ -1199,28 +1199,38 @@ value recover_2 conf =
   }
 ;
 
-value rm_base dir =
-  match
-    try Some (Unix.opendir dir) with [ Unix.Unix_error _ _ _ -> None ]
-  with
-  [ Some dh ->
-      let list = ref [] in
-      do {
-        try
-          while True do {
-            let file = Unix.readdir dh in
-            if file = "." || file = ".." then ()
-            else list.val := [file :: list.val]
-          }
-        with
-        [ End_of_file -> () ];
-        Unix.closedir dh;
-        List.iter (fun file -> Unix.unlink (Filename.concat dir file))
-          list.val;
-        try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ]
-      }
-  | _ -> () ]
+value rmdir dir =
+  (* Récupère tous les fichiers et dossier d'un dossier         *)
+  (* et renvoie la liste des dossiers et la liste des fichiers. *)
+  let read_files_folders fname =
+    let list = 
+      List.map 
+        (fun file -> Filename.concat fname file)
+        (Array.to_list (Sys.readdir fname)) 
+    in
+    List.partition Sys.is_directory list
+  in
+  (* Parcours récursif de tous les dossiers *)
+  let rec loop l folders files =
+    match l with
+    [ [] -> (folders, files)
+    | [x :: l] ->
+        let (fd, fi) = read_files_folders x in
+        let l = List.rev_append l fd in
+        let folders = List.rev_append fd folders in
+        let files = List.rev_append fi files in
+        loop l folders files ]
+  in
+  (* Toute l'arborescence de dir *)
+  let (folders, files) = loop [dir] [] [] in
+  do {
+    List.iter Unix.unlink files;
+    List.iter Unix.rmdir folders;
+    Unix.rmdir dir
+  }
 ;
+
+value rm_base dir = rmdir dir;
 
 value cleanup conf =
   let in_base =
