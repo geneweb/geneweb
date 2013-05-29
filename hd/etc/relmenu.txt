@@ -307,7 +307,7 @@
       <ul>
         <li><label><input type="checkbox" name="spouse" value="on"%/> [*display spouse]</label></li>
         <li><label><input type="checkbox" name="image" value="on"%/> [*display picture]1</label></li>
-        <li><label><input type="checkbox" class="radio" name="bd" value="1"%/> [*display border tree]</label></li>
+        <li><label><input type="checkbox" name="long" value="on"%/> [*long display]</label></li>
         <li><label><input name="bd" size="1" maxlength="2" value="0"%/>[*display border tree] </label></li>
         <li>
           <table>
