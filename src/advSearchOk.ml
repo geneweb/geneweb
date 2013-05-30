@@ -246,7 +246,15 @@ value advanced_search conf base max_answers =
             (gets "surname")
       in
       let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-      List.iter (fun ip -> test_person (pget conf base ip)) slist
+      loop slist where rec loop =
+        fun
+        [ [] -> ()
+        | [ip :: l] ->
+            if len.val > max_answers then ()
+            else do {
+              test_person (pget conf base ip);
+              loop l
+            } ]
     else
       for i = 0 to nb_of_persons base - 1 do {
         if len.val > max_answers then ()
