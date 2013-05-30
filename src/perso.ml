@@ -3512,11 +3512,14 @@ value print_foreach conf base print_ast eval_expr =
     let rec insert_loop typ src =
       fun
       [ [(typ1, src1) :: srcl] ->
-          if eq_istr src src1 then [(typ1 ^ ", " ^ typ, src1) :: srcl]
+          if src = src1 then [(typ1 ^ ", " ^ typ, src1) :: srcl]
           else [(typ1, src1) :: insert_loop typ src srcl]
       | [] -> [(typ, src)] ]
     in
-    let insert typ src srcl = insert_loop (Util.translate_eval typ) src srcl in
+    let insert typ src srcl = 
+      if src = "" then srcl
+      else insert_loop (Util.translate_eval typ) src srcl 
+    in
     (* On brise la logique interne de GeneWeb en constituant les     *)
     (* sources de la personne sans ses informations de décès, puis   *)
     (* les sources de sa famille et enfin ses informations de décès. *)
@@ -3524,16 +3527,18 @@ value print_foreach conf base print_ast eval_expr =
     let srcl = [] in
     let srcl =
       if not (is_hide_names conf p) || p_auth then
-        insert (transl_nth conf "person/persons" 0) (get_psources p) srcl
+        insert 
+          (transl_nth conf "person/persons" 0) (sou base (get_psources p)) srcl
       else srcl
     in
     let srcl =
       if p_auth then
         let srcl =
-          insert (transl_nth conf "birth" 0) (get_birth_src p) srcl
+          insert (transl_nth conf "birth" 0) (sou base (get_birth_src p)) srcl
         in
         let srcl =
-          insert (transl_nth conf "baptism" 0) (get_baptism_src p) srcl
+          insert 
+            (transl_nth conf "baptism" 0) (sou base (get_baptism_src p)) srcl
         in
         srcl
       else srcl
@@ -3549,38 +3554,23 @@ value print_foreach conf base print_ast eval_expr =
            let srcl =
              if p_auth then
                let src_typ = transl_nth conf "marriage/marriages" 0 in
-               insert (src_typ ^ lab) (get_marriage_src fam) srcl
+               insert (src_typ ^ lab) (sou base (get_marriage_src fam)) srcl
              else srcl
            in
            let src_typ = transl_nth conf "family/families" 0 in
-           (insert (src_typ ^ lab) (get_fsources fam) srcl, i + 1))
+           (insert (src_typ ^ lab) (sou base (get_fsources fam)) srcl, i + 1))
         (srcl, 1) (get_family p)
     in
     let srcl = 
       if p_auth then
         let srcl =
-          insert (transl_nth conf "death" 0) (get_death_src p) srcl
+          insert (transl_nth conf "death" 0) (sou base (get_death_src p)) srcl
         in
         let srcl =
-          insert (transl_nth conf "burial" 0) (get_burial_src p) srcl in
+          insert (transl_nth conf "burial" 0) (sou base (get_burial_src p)) srcl
+        in
         srcl
       else srcl
-    in
-    (* On parcours la liste des sources, et on supprime toutes les  *)
-    (* sources vides afin de pouvoir savoir qu'elle est la première *)
-    (* source (is_first) et quelle est la dernière (is_last).       *)
-    let srcl =
-      let rec loop srcl accu =
-        match srcl with
-        [ [] -> 
-            (* Il faut renverser la liste puisqu'on a ajouté en tête. *)
-            List.rev accu
-        | [(src_typ, src) :: srcl] -> 
-            let s = sou base src in
-            if s = "" then loop srcl accu
-            else loop srcl [(src_typ, s) :: accu] ]
-      in
-      loop srcl []
     in
     (* Affiche les sources et met à jour les variables "first" et "last". *)
     let rec loop first =
