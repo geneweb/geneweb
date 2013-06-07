@@ -4,7 +4,9 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130122 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130607 templ=templm -->
+  %let;l_v0;%if;(evar.v > max_desc_level)%max_desc_level;%else;%evar.v;%end;%in;
+  %let;l_v;%if;(bvar.max_desc_level = "")%l_v0;%elseif;(bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -65,16 +67,26 @@
 %end;
 
 %define;link1(xx,yy,fff)
-  %if;(cancel_links or xx.is_restricted)%yy;
+  <strong>%nn;
+  %if;(cancel_links or xx.is_restricted)
+    <a id="ifff" href="">%yy;</a>%nn;
   %else;
     <a id="ifff" href="%prefix;%xx.access;">%yy;</a>%nn;
   %end;
+  </strong>%nn;
 %end;
 
 %define;link2(xx,yy)
   %if;(cancel_links or xx.is_restricted)%yy;
   %else;
-    <a href="%prefix;%xx.access;">%yy;</a>%nn;
+    <a href="%prefix;%xx.access;">%yy;</a>
+  %end;
+  %xx.title;%xx.dates;
+  %if;(xx.sosa_in_list != "" and evar.only != "on" and level != 2)
+    %sp;(&rArr;
+    <strong>
+      <a href="#i%xx.sosa_in_list;" title="[see] %xx.sosa_in_list;">%xx.sosa_in_list;</a>%nn;
+    </strong>.)%nn;
   %end;
 %end;
 
@@ -166,12 +178,10 @@
        ; %relation_type; :
       %if;has_relation_him;
         %apply;link2("relation_him","relation_him")
-        %apply;info2("relation_him")
       %end;
       %if;has_relation_her;
         %if;has_relation_him;, %end;
         %apply;link2("relation_her","relation_her")
-        %apply;info2("relation_her")
       %end;
     %end;
     %foreach;xx.related;%nn;
@@ -180,15 +190,9 @@
          and related_type != [foster son/foster daughter/foster child]2)
          ; %related_type; :
          %apply;link2("related","related")
-         %apply;info2("related")
       %end;
     %end;
   %end;
-%end;
-
-%define;somebody_spouse_parent1(xx)
-  <strong>%apply;link2("spouse.xx","spouse.xx")</strong>%nn;
-  %apply;info2("spouse.xx")
 %end;
 
 %define;somebody_spouse_parent()
@@ -198,8 +202,8 @@
       %if;(spouse.is_male)[son/daughter/child]0
       %else;[son/daughter/child]1%end;
     %and;
-      %apply;somebody_spouse_parent1("father") [and]
-      %apply;somebody_spouse_parent1("mother")
+      %apply;link2("spouse.father","spouse.father") [and]
+      %apply;link2("spouse.mother","spouse.mother")
     %end;
     </small>
   %end;
@@ -257,27 +261,32 @@
   %end;
 %end;
 
-%define;inline_notes(xx)
-  %incr_count;
-  %if;(evar.notes = "on")
-    %if;(xx.has_notes or xx.has_linked_page.BNOTE)
-      <div class="inot">
-        %if;xx.has_linked_page.BNOTE;&gt;&gt; %xx.linked_page.BNOTE;%end;
-        %if;xx.has_notes;%xx.notes;%end;
-      </div>
+%define;somebody_notes(xx,yy)
+  %if;(evar.inline = "on")
+    %incr_count;
+    %if;(evar.notes = "on")
+      %if;(xx.has_notes or xx.has_linked_page.BNOTE)
+        <div class="inot">
+          %if;xx.has_linked_page.BNOTE;&gt;&gt; %xx.linked_page.BNOTE;%end;
+          %if;xx.has_notes;%xx.notes;%end;
+        </div>
+      %end;
     %end;
-  %end;
-  %if;(evar.src = "on")
-    %if;(xx.has_sources or xx.has_linked_page.BIBLIO)
-      <div class="isrc">
-        %if;xx.has_linked_page.BIBLIO;&gt;&gt; %xx.linked_page.BIBLIO;%end;
-        %if;(xx.has_sources)
-          %foreach;xx.source
-             <em>• %source_type; : </em>%source;%sp;
+    %if;(evar.src = "on")
+      %if;(xx.has_sources or xx.has_linked_page.BIBLIO)
+        <div class="isrc">
+          %if;xx.has_linked_page.BIBLIO;&gt;&gt; %xx.linked_page.BIBLIO;%end;
+          %if;(xx.has_sources)
+            %foreach;xx.source
+              <em>• %source_type; : </em>%source;%sp;
+            %end;
           %end;
-        %end;
-      </div>
+        </div>
+      %end;
     %end;
+  %elseif;((evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
+        or (evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO)))
+      <sup><a href="#nyy">yy</a></sup>%nn;
   %end;
 %end;
 
@@ -286,73 +295,42 @@
   <div class="icom">%comment;</div>
 %end;
 
-%define;link_notes(xx,yy)
-  %incr_count;
-  %if;((evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
-      or (evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO)))
-    <sup>%if;(not cancel_links)<a href="#nyy">%nn;%end;
-    %if;(evar.notes = "on" and (xx.has_notes or xx.has_linked_page.BNOTE))
-      %apply;add_in_sorted_list(10000+count,"yy",xx.notes,"",xx.linked_page.BNOTE,xx,xx.dates)
-    %else;
-      %apply;add_in_sorted_list(10000+count,"yy","","","",xx,xx.dates)
-    %end;
-    %if;(evar.src = "on" and (xx.has_sources or xx.has_linked_page.BIBLIO))
-      %if;(xx.has_linked_page.BIBLIO)
-        %apply;add_in_sorted_list(10000+count,"yy","src_on","BIBLIO",xx.linked_page.BIBLIO,xx,xx.dates)
-      %end;
-      %foreach;xx.source;
-        %apply;add_in_sorted_list(10000+count,"yy","src_on",source_type,source,xx,xx.dates)
-      %end;
-    %end;
-    yy%if;(not cancel_links)</a>%end;</sup>%nn;
+%define;init_count(prev_count)
+  %reset_count;
+  %for;i;0;prev_count;
+    %incr_count;
   %end;
 %end;
 
-%define;link_comment(yy,zz)
-  %incr_count;
-  <sup>%if;(not cancel_links)<a id="iyy" href="#nyy">%nn;%end;
-    %apply;add_in_sorted_list(10000+count,"yy",comment,"","","","zz")
-  yy%if;(not cancel_links)</a>%end;</sup>%nn;
+%define;link_comment(z1)
+  %if;(has_comment and evar.notes = "on" and evar.inline != "on")
+    <sup><a id="iz1" href="#nz1">z1</a></sup>%nn;
+  %end;
 %end;
 
-%define;sorted_notes()
-  %if;(evar.notes = "on" or evar.src = "on")
-    <hr%/>
-    <h3>%if;(evar.notes = "on")[*note/notes]1
-          %if;(evar.src = "on")[and] [source/sources]1%end;
-        %else;[*source/sources]1%end;</h3>
-    <dl>
-    %foreach;sorted_list_item;
-      %if;(item.3 != "src_on")
-        <dt><br%/>
-        <strong>%nn;
-          %if;(cancel_links)
-            %item.2;. %item.6;%item.7;
-          %else;
-            <a id="n%item.2;" href="#i%item.2;">%item.2;</a>%nn;
-          %end;
-        </strong>. %item.6;%item.7;
-        </dt>
-        %if;(item.5 != "")<dd>&gt;&gt; %item.5;</dd>%end;
-        %if;(item.3 != "")<dd>%item.3;</dd>%end;
-      %elseif;(item.4 = "BIBLIO")
-        <dd class="xs">&gt;&gt; %item.5;</dd>
-      %else;
-        <dd class="xs">• <em>%item.4; : </em>%item.5;</dd>
+%define;bcomment(z1,z2)
+  %if;(has_comment and evar.notes = "on")
+    <dt><a id="nz2" href="#iz2">z2</a>. %z1; &amp;%marriage_date.year; %spouse;</dt>
+    <dd>%comment;</dd>
+  %end;
+%end;
+
+%define;bnotes(z1,z2)
+  %if;((evar.notes = "on" and (z1.has_notes or z1.has_linked_page.BNOTE))
+         or (evar.src = "on" and (z1.has_sources or z1.has_linked_page.BIBLIO)))
+    <dt><a id="nz2" href="#iz2">z2</a>. %z1;%z1.dates;</dt>
+    %if;(evar.notes = "on" and (z1.has_notes or z1.has_linked_page.BNOTE))
+      %if;(z1.has_linked_page.BNOTE)<dd>&gt;&gt; %z1.linked_page.BNOTE;</dd>%end;
+      %if;(z1.has_notes)<dd>%z1.notes;</dd>%end;
+    %end;
+    %if;(evar.src = "on" and (z1.has_sources or z1.has_linked_page.BIBLIO))
+      %if;(z1.has_linked_page.BIBLIO)<dd class="xs">&gt;&gt; %z1.linked_page.BIBLIO;</dd>%end;
+      %if;(z1.has_sources)
+        %foreach;z1.source;
+          <dd class="xs">• <em>%source_type; : </em>%source;</dd>
+        %end;
       %end;
     %end;
-    </dl>
-  %end;
-%end;
-
-%define;url(z1,z2)
-  %apply;lazy_print("z1=z2;")
-  %foreach;env_binding;
-    %if;(env.key="z1")%lazy_force;
-    %elseif;(env.key !="templ")%env.key;=%env.val;;%end;
-  %end;
-  %if;(not lazy_printed)
-    z1=z2;
   %end;
 %end;
 
@@ -362,6 +340,7 @@
   %end;
 %end;
 %( <!-- End define (used in ancsosa.txt, deslist.txt)--> %)
+
 %( <!-- Begin define (used in anclist.txt, deslist.txt)--> %)
 %define;stat_age1()
   <div class="col">
@@ -413,7 +392,34 @@
     %end;
   </div>
 %end;
+
+%define;stat1b(z1)
+  %reset_count;
+  %foreach;sorted_list_item;
+    %if;(item.1 = 0)
+      %incr_count;
+      %if;(next_item.2 != item.2 or next_item.1 = 1)
+        %let;l_top;%expr(item.2 + z1)%in;
+        %let;l_width0;%expr(count * l_size)%in;
+        %let;l_width;%if;(l_width0 > max_width)%max_width;%else;%l_width0;%end;%in;
+        <span class="s5" style="top:%l_top;em;border-width:%l_width;px;">%count;</span>
+        %reset_count;
+      %end;
+    %elseif;(item.1 = 1)
+      %incr_count;
+      %if;(next_item.2 != item.2)
+        %let;l_top;%expr(item.2 + z1)%in;
+        %let;l_width0;%expr(count * l_size)%in;
+        %let;l_width;%if;(l_width0 > max_width)%max_width;%else;%l_width0;%end;%in;
+        <span class="s6" style="top:%l_top;em;border-width:%l_width;px;">%count;</span>
+        %reset_count;
+      %end;
+    %end;
+  %end;
+%end;
+
 %( <!-- End define (used in anclist.txt, deslist.txt)--> %)
+
 %( <!-- Begin define --> %)
 
 %let;let_child;%if;(evar.always_surname != "no")child%else;child_name%end;%in;
@@ -454,37 +460,67 @@
   %end;
 %end;
 
+%define;bnotes2(xx, curlev, maxlev, famlev)
+  %incr_count;
+  %apply;bnotes("xx",count)
+  %foreach;xx.family;
+    %if;(evar.spouse="on")
+      %incr_count;
+      %let;id_fam;x%family_cnt;-%count;%in;
+      %apply;bcomment("xx",id_fam)
+      %apply;bnotes("spouse",count)
+    %end;
+    %if;(curlev < maxlev)
+      %if;(curlev = 0 or
+           evar.t = "M" and xx.is_male or
+           evar.t = "F" and xx.is_female or
+           evar.t = "L")
+        %if;(family.desc_level = famlev and has_children)
+          %family.set_infinite_desc_level;
+          %foreach;child;
+            %apply;bnotes2("child", curlev+1, maxlev, famlev+1)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
+%define;bnotes1()
+  %if;(evar.inline != "on" and (evar.notes = "on" or evar.src = "on"))
+    %reset_desc_level;
+    %reset_count;
+    <hr%/>
+    <h3>%if;(evar.notes = "on")[*note/notes]1
+          %if;(evar.src = "on")[and] [source/sources]1%end;
+        %else;[*source/sources]1%end;</h3>
+    <dl>%apply;bnotes2("self",0,l_v,0)</dl>
+  %end;
+%end;
+
 %define;descendants_by_list(xx, yy, curlev, maxlev, famlev)
   %if;(curlev = 0)<div>%nl;%end;
   %apply;image("xx")
-  <strong>%apply;link1("xx","yy",count)</strong>%nn;
+  %incr_count;
+  %apply;link1("xx","yy",count)
   %apply;somebody_long_info("xx")
   %apply;somebody_extra_info("xx")
-  %if;(evar.inline = "on")
-    %apply;inline_notes("xx")
-  %else;
-    %apply;link_notes("xx",count)
-  %end;
+  %apply;somebody_notes("xx",count)
   %apply;lazy_print%with;<br%/>%nl;%end;
   %foreach;xx.family;
     %if;(evar.spouse="on")
       %if;(family_cnt != 1 and curlev = 0)<div>%nl;%end;
       %lazy_force;   %nn;
-      %let;txt;%xx; &amp;%marriage_date.year; %spouse;%in;
       %apply;married("xx")
-      %if;(has_comment and evar.notes = "on" and evar.inline != "on")
-        %apply;link_comment(count,txt)
-      %end;
+      %incr_count;
+      %let;id_fam;x%family_cnt;-%count;%in;
+      %apply;link_comment(id_fam)
       <br%/>   %nn;
-      <strong>%apply;link1("spouse","spouse",count)</strong>%nn;
+      %apply;link1("spouse","spouse",count)
       %apply;somebody_long_info("spouse")
       %apply;somebody_extra_info("spouse")
       %apply;somebody_spouse_parent()
-      %if;(evar.inline = "on")
-        %apply;inline_notes("spouse")
-      %else;
-        %apply;link_notes("spouse",count)
-      %end;
+      %apply;somebody_notes("spouse",count)
       %apply;marriage_info()
     %end;
     %if;(curlev < maxlev)
@@ -534,11 +570,10 @@
   %apply;togen(xx)
   </p>
   %reset_count;
-  %incr_count;
   %apply;descendants_by_list("self", "self", 0, xx, 0)%nl;
   <p>
     %foreach;descendant_level;
-      %if;(level = desc_lev)
+      %if;(level = l_v)
         [*total] : %number_of_descendants; [[person/persons]1@(c)]
       %end;
     %end;
@@ -630,28 +665,26 @@
 %end;
 
 %define;desc_ars(curlev,famlev,maxlev,m_bt,m_bf,m_dt,m_df,f_bt,f_bf,f_dt,f_df)
-  %if;(curlev > 0 and (evar.only != "on" or curlev = evar.v))
-    %incr_count;
-    %let;lev;%expr(evar.v - curlev + 1)%in;
-    %let;aad;
-      %if;(death_date.year > birth_date.year)
-        %expr((death_date.year - birth_date.year)*2)
-        %else;0%nn;
-      %end;
-    %in;
-    %if;(sex = 0)
-      %apply;add_in_sorted_list(
-             lev,index,sex,
-             birth_date.day,birth_date.month,
-             death_date.day,death_date.month,
-             "m_bt",m_bf,"m_dt",m_df,aad,curlev)
-    %else;
-      %apply;add_in_sorted_list(
-             lev,index,sex,
-             birth_date.day,birth_date.month,
-             death_date.day,death_date.month,
-             "f_bt",f_bf,"f_dt",f_df,aad,curlev)
+  %incr_count;
+  %let;lev;%expr(l_v - curlev + 1)%in;
+  %let;aad;
+    %if;(death_date.year > birth_date.year)
+      %expr((death_date.year - birth_date.year)*2)
+      %else;0%nn;
     %end;
+  %in;
+  %if;(sex = 0)
+    %apply;add_in_sorted_list(
+           lev,index,sex,
+           birth_date.day,birth_date.month,
+           death_date.day,death_date.month,
+           "m_bt",m_bf,"m_dt",m_df,aad,curlev)
+  %else;
+    %apply;add_in_sorted_list(
+           lev,index,sex,
+           birth_date.day,birth_date.month,
+           death_date.day,death_date.month,
+           "f_bt",f_bf,"f_dt",f_df,aad,curlev)
   %end;
   %foreach;family;
     %if;(curlev < maxlev and family.desc_level = famlev and has_children)
@@ -688,7 +721,7 @@
   %reset_desc_level;
   %reset_count;
   %empty_sorted_list;
-  %apply;desc_ars(0,0,desc_lev,"m_bt","m_bf","m_dt","m_df","f_bt","f_bf","f_dt","f_df")
+  %apply;desc_ars(0,0,l_v,"m_bt","m_bf","m_dt","m_df","f_bt","f_bf","f_dt","f_df")
   <div class="stat_ars bcbg1" style="width:%width;px;height:%height;px;font-family:%ff;;">
     %foreach;sorted_list_item;
       %let;i9;%if;(count > ic)%apply;initial(item.9)%else;%item.9;%end;%in;
@@ -749,7 +782,7 @@
     <fieldset>
       <legend><input type="submit" value="Ok"%/></legend>
       <ul><li>
-        <label>[*generation/generations]0<input name="v" value="%evar.v;" class="number"%/></label>
+        <label>[*generation/generations]0<input name="v" value="%l_v;" class="number"%/></label>
       </li><li>
         <label>Initial count<input name="ic" value="%ic;" class="number"%/></label>
       </li><li>
@@ -802,7 +835,7 @@
 %end;
 
 %define;desc_month(xx,curlev,famlev,maxlev)
-  %let;l_month;%xx_date.month;%in;
+  %let;l_month;%if;(xx_date.day > 0)%xx_date.month;%end;%in;
   %if;(l_month > 0)
     %incr_count;
     %apply;add_in_sorted_list(sex,l_month,count)
@@ -818,17 +851,15 @@
 %end;
 
 %define;desc_calendar(curlev,famlev,maxlev)
-  %if;(curlev > 0 and (evar.only != "on" or curlev = evar.v))
-    %if;(birth_date.day > 0)
-      %incr_count;
-      %let;mm_dd;%expr(birth_date.month+100)_%expr(birth_date.day+100)%in;
-      %apply;add_in_sorted_list(mm_dd,birth_date.month,birth_date.day,index,birth_symbol)
-    %end;
-    %if;(death_date.day > 0)
-      %incr_count
-      %let;mm_dd;%expr(death_date.month+100)_%expr(death_date.day+100)%in;
-      %apply;add_in_sorted_list(mm_dd,death_date.month,death_date.day,index,death_symbol)
-    %end;
+  %if;(birth_date.day > 0)
+    %incr_count;
+    %let;mm_dd;%expr(birth_date.month+100)_%expr(birth_date.day+100)%in;
+    %apply;add_in_sorted_list(mm_dd,birth_date.month,birth_date.day,index,birth_symbol)
+  %end;
+  %if;(death_date.day > 0)
+    %incr_count
+    %let;mm_dd;%expr(death_date.month+100)_%expr(death_date.day+100)%in;
+    %apply;add_in_sorted_list(mm_dd,death_date.month,death_date.day,index,death_symbol)
   %end;
   %foreach;family;
     %if;(curlev < maxlev and family.desc_level = famlev and has_children)
@@ -844,7 +875,7 @@
   %reset_desc_level;
   %reset_count;
   %empty_sorted_list;
-  %apply;desc_month("xx",0,0,desc_lev)
+  %apply;desc_month("xx",0,0,l_v)
   %let;max_width;360%in;
   %let;l_size;%expr(36 / ((120 + count) /12 / 10))%in;
   <div class="stat_month bcbg1">
@@ -889,7 +920,7 @@
 
 %define;color(xx)
   %apply;nth%with;
-    /333333/993333/339933/333399/999999/339999/993399/999933/AAAAAA/FFAAAA/AAFFAA/AAAAFF/FFFFFF/AAFFFF/FFAAFF/FFFFAA%and;
+    /555555/993333/339933/333399/999999/339999/993399/999933/AAAAAA/FFAAAA/AAFFAA/AAAAFF/FFFFFF/AAFFFF/FFAAFF/FFFFAA%and;
     xx%end;
 %end;
 
@@ -898,15 +929,13 @@
   %reset_desc_level;
   %reset_count;
   %empty_sorted_list;
-  %apply;desc_calendar(0,0,desc_lev)
+  %apply;desc_calendar(0,0,l_v)
   <div class="stat_calendar bcbg1">
-    <a class="title" style="color:#EEEEEE;" href="%prefix;m=D;t=L;opt=ars;i=%index;;v=%evar.v;;only=%evar.only;"
+    <a class="title" style="color:#EEEEEE;" href="%prefix;m=D;t=L;opt=ars;i=%index;;v=%l_v;;only=%evar.only;"
          title="Ars">[*calendar/calendars]0</a>
     <div class="row">
-      %reset_count;
       %for;i;1;32;
-        %incr_count;
-        <div>%count;</div>
+        <div>%i;</div>
       %end;
     </div>
     <div class="col">
@@ -943,6 +972,79 @@
   </div>
 %end;
 
+%define;dstat1(z1)
+  %reset_count;%reset_desc_level;%empty_sorted_list;
+  %apply;dstat1a("z1_date.day","z1_date.date.moon_age",3,0,0,l_v)
+  %let;nb_date;%count;%in;
+  %let;l_size;%expr(40 / ((90 + nb_date) / 9 / 10))%in;
+  <div class="s1 bcbg2" style="height:20px;">
+    <strong class="s2">[*z1]</strong>
+    <strong class="s3">%nb_date; [date/dates]1</strong>
+  </div>
+  <div class="s1 bcbg1" style="height:320px;">
+    <span class="s4" style="top:1em;">[*moon age/new moon/first quarter/full moon/last quarter]1</span>
+    <span class="s4" style="top:8em;">[*moon age/new moon/first quarter/full moon/last quarter]2</span>
+    <span class="s4" style="top:16em;">[*moon age/new moon/first quarter/full moon/last quarter]3</span>
+    <span class="s4" style="top:24em;">[*moon age/new moon/first quarter/full moon/last quarter]4</span>
+    %apply;stat1b(0)
+  </div>
+  %reset_count;%reset_desc_level;%empty_sorted_list;
+  %apply;dstat1a("z1_date.day","z1_date.date.week_day",1,0,0,l_v)
+  %let;nb_female;%count;%in;
+  %let;l_size;%expr(40 / ((40 + nb_date) / 4 / 10))%in;
+  <div class="s1 bcbg1" style="height:90px;">
+    <span class="s4" style="top:1em;">[*(week day)]0</span>
+    <span class="s4" style="top:2em;">[*(week day)]1</span>
+    <span class="s4" style="top:3em;">[*(week day)]2</span>
+    <span class="s4" style="top:4em;">[*(week day)]3</span>
+    <span class="s4" style="top:5em;">[*(week day)]4</span>
+    <span class="s4" style="top:6em;">[*(week day)]5</span>
+    <span class="s4" style="top:7em;">[*(week day)]6</span>
+    %apply;stat1b(1)
+  </div>
+  %reset_count;%reset_desc_level;%empty_sorted_list;
+  %apply;dstat1a("z1_date.day","z1_date.date.month",0,0,0,l_v)
+  %let;nb_male;%count;%in;
+  %let;l_size;%expr(40 / ((40 + nb_date) / 4 / 10))%in;
+  <div class="s1 bcbg1" style="height:140px;">
+    <span class="s4" style="top:1em;">[*(month)]0</span>
+    <span class="s4" style="top:2em;">[*(month)]1</span>
+    <span class="s4" style="top:3em;">[*(month)]2</span>
+    <span class="s4" style="top:4em;">[*(month)]3</span>
+    <span class="s4" style="top:5em;">[*(month)]4</span>
+    <span class="s4" style="top:6em;">[*(month)]5</span>
+    <span class="s4" style="top:7em;">[*(month)]6</span>
+    <span class="s4" style="top:8em;">[*(month)]7</span>
+    <span class="s4" style="top:9em;">[*(month)]8</span>
+    <span class="s4" style="top:10em;">[*(month)]9</span>
+    <span class="s4" style="top:11em;">[*(month)]10</span>
+    <span class="s4" style="top:12em;">[*(month)]11</span>
+    %apply;stat1b(0)
+  </div>
+  <div class="s1 bcbg2" style="height:20px;">
+    <strong class="s2" style="color:#4682B4;">%nb_male; [M/F]0</strong>
+    <strong class="s3" style="color:#FF69B4;">%nb_female; [M/F]1</strong>
+  </div>
+%end;
+
+%define;dstat1a(z1,z2,z3,curlev,famlev,maxlev)
+  %if;(z1 > 0)
+    %let;l_y;%z2;%in;
+    %if;(z3 = 3 or sex = z3)
+      %incr_count;
+    %end;
+    %apply;add_in_sorted_list(sex,l_y,index)
+  %end;
+  %foreach;family;
+    %if;(curlev < maxlev and family.desc_level = famlev and has_children)
+      %family.set_infinite_desc_level;
+      %foreach;child;
+        %apply;dstat1a("z1","z2","z3",curlev+1,famlev+1,maxlev)
+      %end;
+    %end;
+  %end;
+%end;
+
 %( <!-- End define --> %)
 
 %(   Main   %)
@@ -962,37 +1064,111 @@
       %sp;%dates;<br%/>
   </h1>
   %if;not cancel_links;
-  <div class="menu2">
-    %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-      %if;(evar.image="on")
-        <a style="text-decoration:line-through;"
-           href="%prefix_no_iz;%apply;url("image","")"
-           title="- [image/images]1">img</a>
-      %else;
-        <a href="%prefix_no_iz;%apply;url("image","on")"
-           title="+ [image/images]1">img</a>
+    <div class="menu2">
+      %if;(evar.opt != "ars")
+        <form id="tools" style="display:inline" method="get" action="%action;">
+          %hidden;
+          <input type="hidden" name="m" value="D"%/>
+          %if;(evar.p != "" or evar.n != "" or evar.oc != "")
+            <input type="hidden" name="p" value="%evar.p;"%/>
+            <input type="hidden" name="n" value="%evar.n;"%/>
+            <input type="hidden" name="oc" value="%evar.oc;"%/>
+          %end;
+          %if;(evar.i != "")
+            <input type="hidden" name="i" value="%evar.i;"%/>
+          %end;
+          <div><a href="#">[*tools]</a>
+          <div class="s_menu">
+            <fieldset>
+              <label><input type="checkbox" name="cgl" value="on"
+                     %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
+                %if;(evar.opt = "" and (bvar.no_image_for_visitor != "yes" or friend or wizard))
+                  <label><input type="checkbox" name="image" value="on"
+                         %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
+                %end;
+            </fieldset>
+            %if;(evar.opt = "")
+              %if;(evar.t = "L" or evar.t = "M" or evar.t = "F")
+                <fieldset>
+                  <legend>
+                    <label><input type="radio" name="t" value="L" 
+                            %if;(evar.t = "L") checked="checked"%end;%/>[*long display]0</label>
+                  </legend>
+                  <label><input type="radio" name="t" value="M" 
+                          %if;(evar.t = "M") checked="checked"%end;%/>[male line/female line]0</label>
+                  <label><input type="radio" name="t" value="F" 
+                          %if;(evar.t = "F") checked="checked"%end;%/>[male line/female line]1</label>
+                  <label><input type="checkbox" name="always_surname" value="no" 
+                          %if;(evar.always_surname = "no") checked="checked"%end;%/>[first name/first names]0
+                          <span style="text-decoration:line-through;"> [surname/surnames]0</span></label>
+                  <label><input type="checkbox" name="sd" value="on" 
+                         %if;(evar.sd = "on") checked="checked"%end;%/>[date/dates]0 : 
+                         %if;([ !dates order]0 = "ddmmyyyy")[year/month/day]2/[year/month/day]1/[year/month/day]0
+                         %elseif;([ !dates order]0 = "mmddyyyy")[year/month/day]1/[year/month/day]2/[year/month/day]0
+                         %else;[year/month/day]0/[year/month/day]1/[year/month/day]2
+                         %end;
+                  </label>
+                  <label><input type="checkbox" name="alias" value="on" 
+                         %if;(evar.alias = "on") checked="checked"%end;%/>[surname alias], [first name alias]</label>
+                  <label><input type="checkbox" name="spouse" value="on" 
+                         %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
+                  <label><input type="checkbox" name="parents" value="on" 
+                         %if;(evar.parents = "on") checked="checked"%end;%/>[parents]</label>
+                  <label><input type="checkbox" name="rel" value="on"
+                         %if;(evar.rel = "on") checked="checked"%end;%/>[relation/relations]1</label>
+                  <label><input type="checkbox" name="notes" value="on"
+                         %if;(evar.notes = "on") checked="checked"%end;%/>[note/notes]1</label>
+                  <label><input type="checkbox" name="src" value="on"
+                         %if;(evar.src = "on") checked="checked"%end;%/>[source/sources]1</label>
+                  <label><input type="checkbox" name="inline" value="on"
+                         %if;(evar.inline = "on") checked="checked"%end;%/>[display notes/sources inline]</label>
+                </fieldset>
+              %end;
+            %else;
+              <input type="hidden" name="t" value="L"%/>
+              <fieldset>
+                <legend>[*statistics]</legend>
+                <label><input type="radio" name="opt" value="bmdm"
+                        %if;(evar.opt = "bmdm") checked="checked"%end;%/>[calendar/calendars]0</label>
+                <label><input type="radio" name="opt" value="stat1"
+                        %if;(evar.opt = "stat1") checked="checked"%end;%/>[moon age/new moon/first quarter/full moon/last quarter]0</label>
+                <label><input type="radio" name="opt" value="afm"
+                        %if;(evar.opt = "afm") checked="checked"%end;%/>[age] ([father/mother]0, [father/mother]1)</label>
+                <label><input type="radio" name="opt" value="aad"
+                        %if;(evar.opt = "aad") checked="checked"%end;%/>[age at death]</label>
+              </fieldset>
+            %end;
+          <fieldset><legend>[*generation/generations]0</legend>
+          <div class="v">
+            %let;l_bmaxv;%if;(bvar.max_desc_level = "")%evar.maxv;%else;%bvar.max_desc_level;%end;%in;
+            %let;l_emaxv;%if;(evar.maxv = "")%l_bmaxv;%elseif;(evar.maxv < l_bmaxv)%evar.maxv;%else;%l_bmaxv;%end;%in;
+            %let;l_maxv;%expr(l_emaxv + 1)%in;
+            <input type="hidden" name="maxv" value="%evar.maxv;"%/>
+            %for;i;1;l_maxv;
+              <label>%i;<br%/>
+                <input type="radio" name="v" value="%i;"%if;(l_v = i) checked="checked"%end;%/>
+              </label>
+            %end;
+          </div>
+          </fieldset>
+          <div class="ok"><input type="submit" value="ok"%/></div>
+          </div>
+          </div>
+        </form>
       %end;
-    %end;
-    <a style="text-decoration:line-through;" href="%prefix_no_iz;%apply;url("cgl","on")"
-       title="[cancel GeneWeb links]">@</a>
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
-    %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
+      %if;has_referer;
+        <a href="%referer;" title="[back]">&lt;&lt;</a>
+      %end;
+        <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+    </div>
   %end;
-  %let;desc_lev;
-    %if;(bvar.max_desc_level = "")%apply;min(evar.v, max_desc_level, 12)
-    %else;%apply;min(evar.v, max_desc_level, bvar.max_desc_level)
-    %end;
-  %in;
   %if;(evar.m = "D" and evar.t = "L" and evar.opt = "aad")
     %( age_at_death by generation opt = aad %)
-    <p>%apply;togen(desc_lev)</p>
+    <p>%apply;togen(l_v)</p>
     %reset_count;
     %reset_desc_level;
     %empty_sorted_list;
-    %apply;desc_aad(0, 0, desc_lev)
+    %apply;desc_aad(0,0,l_v)
     %let;max_width;360%in;
     %let;l_size;%expr(36 / ((60 + count) / 6 / 10))%in;
     <div class="stat_age1 bcbg1">
@@ -1016,16 +1192,16 @@
       %reset_desc_level;
       %reset_count;
       %empty_sorted_list;
-      %apply;desc_aad1(0, 0, desc_lev)
+      %apply;desc_aad1(0,0,l_v)
       %apply;stat_age2()
     </div>
   %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "afm")
     %( age father mother by generation opt = afm %)
-    <p>%apply;togen(desc_lev)</p>
+    <p>%apply;togen(l_v)</p>
     %reset_count;
     %reset_desc_level;
     %empty_sorted_list;
-    %apply;desc_afm(0, 0, desc_lev)
+    %apply;desc_afm(0,0,l_v)
     %let;max_width;360%in;
     %let;l_size;%expr(36 / ((40 + count) / 4 / 10))%in;
     <div class="stat_age1 bcbg1">
@@ -1048,14 +1224,14 @@
       %reset_desc_level;
       %reset_count;
       %empty_sorted_list;
-      %apply;desc_afm1(0,0,desc_lev)
+      %apply;desc_afm1(0,0,l_v)
       %apply;stat_age2()
     </div>
   %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "bmdm")
     %( birth month death month opt = bmdm %)
     <table class="stat_bmdm">
       <tr><td colspan="2">
-        %apply;togen(desc_lev)
+        <p>%apply;togen(l_v)</p>
       </td></tr>
       <tr><td>
         %apply;stat_month("birth")
@@ -1064,6 +1240,17 @@
       </td></tr>
       <tr><td colspan="2">
         %apply;stat_calendar()
+      </td></tr>
+    </table>
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "stat1")
+    %( opt = stat1 %)
+    %let;max_width;180%in;
+    <p>%apply;togen(l_v)</p>
+    <table class="stat1">
+      <tr><td>
+        %apply;dstat1("birth")
+      </td><td>
+        %apply;dstat1("death")
       </td></tr>
     </table>
   %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "ars")
@@ -1090,9 +1277,8 @@
     %(female death field%) %let;fdf;%if;(evar.fdf != "")%evar.fdf;%else;dates%end;%in;
     %apply;ars(mbt,mbf,mdt,mdf,fbt,fbf,fdt,fdf)
   %else;
-    %empty_sorted_list;
-    %apply;by_list(desc_lev)
-    %if;(evar.inline != "on")%apply;sorted_notes()%end;
+    %apply;by_list(l_v)
+    %apply;bnotes1()
   %end;
   %base_trailer;
   %copyright;

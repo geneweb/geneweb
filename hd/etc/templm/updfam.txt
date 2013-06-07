@@ -5,7 +5,7 @@
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130404 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130428 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -212,8 +212,10 @@
       %else;
         onload="javascript:document.upd.pa2_fn.focus();"%nn;
       %end;
-    %elseif;(evar_ins_ch > 1 and evar.ins_ch < 10)
-      onload="javascript:document.upd.submit();"%nn;
+    %elseif;(evar_ins_ch != "")
+      %if;(evar_ins_ch > 1 and evar.ins_ch < 10)
+        onload="javascript:document.upd.submit();"%nn;
+      %end;
     %elseif;(marriage.prec != "sure")
       %if;([ !dates order]0 = "ddmmyyyy")
         onload="javascript:document.upd.marr_dd.focus();"%nn;

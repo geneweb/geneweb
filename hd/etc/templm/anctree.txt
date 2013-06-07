@@ -3,7 +3,9 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130121 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130604 templ=templm -->
+  %let;l_v0;%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%in;
+  %let;l_v;%if;(bvar.max_anc_tree = "")%l_v0;%elseif;(bvar.max_anc_tree > l_v0)%l_v0;%else;%bvar.max_anc_tree;%end;%in;
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -24,7 +26,7 @@
 
 %define;symbol(xx)
   %if;(evar.cgl != "on")
-      <span %if;(xx.has_sosa)class="color_sosa"%end;>%if;xx.has_siblings;&diams;%else;&loz;%end;</span>
+    <span %if;(xx.has_sosa)class="color_sosa"%end;>%if;xx.has_siblings;&diams;%else;&loz;%end;</span>
   %else;
     |
   %end;
@@ -52,7 +54,7 @@
     %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
     %else;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
-        <table style="border:%evar.bd;"><tr>
+        <table style="border:solid %evar.bd;px; inherit;"><tr>
         <td align="center"%nn;
          %if;(evar.color != "") class="%evar.color;"%end;>%nn;
       %end;
@@ -100,7 +102,7 @@
         <a style="text-decoration:none" href="%prefix_no_iz;%cell.person.access;;%nn;
         %foreach;env_binding;
           %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i")
-          %else;%env.key;=%env.val;;%nn;
+          %else;%env.key;=%env.val.decoded;;%nn;
           %end;
         %end;">%nn;
         %apply;symbol("cell.person")</a>%nn;
@@ -154,33 +156,77 @@
   </table>
 %end;
 
-%define;url(z1,z2)
-  %apply;lazy_print("z1=z2;")
-  %foreach;env_binding;
-    %if;(env.key="z1")%lazy_force;%else;%env.key;=%env.val;;%end;
-  %end;
-  %if;(not lazy_printed)
-    z1=z2;
-  %end;
-%end;
-
 <body%body_prop; id="anctree">
 %message_to_wizard;
 
 %if;not cancel_links;
   <div class="menu2">
-    %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-      %if;(evar.image="on")
-        <a style="text-decoration:line-through;"
-           href="%prefix_no_iz;%apply;url("image","")"
-           title="- [image/images]1">img</a>
-      %else;
-        <a href="%prefix_no_iz;%apply;url("image","on")"
-           title="+ [image/images]1">img</a>
+    <form id="tools" style="display:inline" method="get" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="A"%/>
+      %if;(evar.p != "" or evar.n != "" or evar.oc != "")
+        <input type="hidden" name="p" value="%evar.p;"%/>
+        <input type="hidden" name="n" value="%evar.n;"%/>
+        <input type="hidden" name="oc" value="%evar.oc;"%/>
       %end;
-    %end;
-    <a style="text-decoration:line-through;" href="%prefix_no_iz;%apply;url("cgl","on")"
-       title="[cancel GeneWeb links]">@</a>
+      %if;(evar.i != "")
+        <input type="hidden" name="i" value="%evar.i;"%/>
+      %end;
+      <div><a href="#">[*tools]</a>
+      <div class="s_menu">
+        <fieldset>
+          <label><input type="checkbox" name="cgl" value="on"
+                 %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
+          %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+            <label><input type="checkbox" name="image" value="on"
+                   %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
+          %end;
+        </fieldset>
+        <fieldset>
+          <legend>
+            <label><input type="radio" name="t" value="T"
+                   %if;(evar.t = "T") checked="checked"%end;%/>[*tree]</label>
+          </legend>
+          <label><input type="radio" name="t" value="A"
+                 %if;(evar.t = "A") checked="checked"%end;%/>[male line/female line]0</label>
+          <label><input type="radio" name="t" value="C"
+                 %if;(evar.t = "C") checked="checked"%end;%/>[male line/female line]1</label>
+          <label><input type="checkbox" name="marriage" value="on"
+                 %if;(evar.marriage = "on") checked="checked"%end;%/>[marriage/marriages]0</label>
+          <label><input type="checkbox" name="dag" value="on"
+                 %if;(evar.dag = "on") checked="checked"%end;%/>dag=on</label>
+          <label>[border]<input name="bd" size="1" maxlength="2" style="width:1em;" value="%evar.bd;" %/></label>
+          <table summary="colors" cellspacing="0" cellpadding="0">
+            <tr>
+              <td align="%left;">[color] </td>
+              <td align="%left;">
+                <input type="radio" name="color" value=""
+                  %if;(evar.color="") checked="checked"%end;%/></td>
+              %for;i;1;7;
+                %let;bgi;bg%i;%in;
+                <td class="%bgi;"><input type="radio" name="color" value="%bgi;"
+                    %if;(evar.color=bgi) checked="checked"%end;%/></td>
+              %end;
+            </tr>
+          </table>
+        </fieldset>
+        <fieldset><legend>[*generation/generations]0</legend>
+          <div class="v">
+            %let;l_bmaxv;%if;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;%in;
+            %let;l_emaxv;%if;(evar.maxv = "")%l_bmaxv;%elseif;(evar.maxv < l_bmaxv)%evar.maxv;%else;%l_bmaxv;%end;%in;
+            %let;l_maxv;%expr(l_emaxv + 1)%in;
+            <input type="hidden" name="maxv" value="%evar.maxv;"%/>
+            %for;i;2;l_maxv;
+              <label>%i;<br%/>
+                <input type="radio" name="v" value="%i;"%if;(l_v = i) checked="checked"%end;%/>
+              </label>
+            %end;
+          </div>
+        </fieldset>
+        <div class="ok"><input type="submit" value="ok"%/></div>
+      </div>
+      </div>
+    </form>
     %if;has_referer;
       <a href="%referer;" title="[back]">&lt;&lt;</a>
     %end;
@@ -191,22 +237,18 @@
 %if;(evar.t = "T" and not cancel_links)%nn;
   <div style="text-align:%right;">
     <br%/>
-    <a href="%prefix;m=A;t=T;v=%evar.v;;%access;;dag=on;notab=on;slices=on">
+    <a href="%prefix;m=A;t=T;v=%l_v;;maxv=%evar.maxv;;%access;;dag=on;notab=on;slices=on">
       <tt>//</tt>
     </a>
   </div>
 %end;
 
 %if;(evar.t = "T")
-  %apply;tree%with;
-    %if;(bvar.max_anc_tree = "")%apply;min(evar.v, max_anc_level, 7)
-    %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_tree)
-    %end;
-  %end;
+  %apply;tree(l_v)
 %elseif;(evar.t = "A")
-    <div style="text-align: center">%apply;male_line("self", evar.v)</div>
+  <div style="text-align: center">%apply;male_line("self",l_v)</div>
 %elseif;(evar.t = "C")
-    <div style="text-align: center">%apply;female_line("self", evar.v) </div>
+  <div style="text-align: center">%apply;female_line("self",l_v)</div>
 %end;
   %base_trailer;
   %copyright;

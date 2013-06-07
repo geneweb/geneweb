@@ -1,4 +1,4 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 20130411 templ=templm -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 20130515 templ=templm -->
 
 %if;(not cancel_links)
   <div id="trl">
@@ -59,7 +59,7 @@
       if (window.opener && !window.opener.closed) 
       {
         document.getElementById("trl").innerHTML = '\
-        <p><a id="reloadclose" href="javascript:reloadClose()">[X]</a></p>\
+        <p><a id="reloadclose" href="javascript:reloadClose()">[X]<\/a><\/p>\
         ';
         document.getElementById("reloadclose").focus();
       }
