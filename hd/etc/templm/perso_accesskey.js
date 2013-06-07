@@ -1,4 +1,4 @@
-    /* perso_accesskey.js mickroue(a)yahoo.fr 20130122 templ=templm */
+    /* perso_accesskey.js mickroue(a)yahoo.fr 20130525 templ=templm */
     function acc_key(thi,event,xsib,xspo,xchi,xmod_ind,xadd_par,xadd_fam,xmod_fam) {
       var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
       var charKey = String.fromCharCode(key);
@@ -77,6 +77,8 @@
         case "H": mod_fam_3.click(); break;
         case "I": snd_image.click(); break;
         case "R": rela_comp.click(); break;
+        case "S": nav_sosa_ref.click(); break;
+        case "U": upd.click(); break;
         //shift = off
         case "w": acckey.focus(); break;  // menu2 (w)
         case "²": Tn.focus(); break;      // trl : search input
@@ -98,6 +100,8 @@
         case "h": mod_fam_3.click(); break;
         case "i": snd_image.click(); break;
         case "r": rela_comp.click(); break;
+        case "s": nav_sosa_ref.click(); break;
+        case "u": upd.click(); break;
         default: return true; break;
       }
       return false;

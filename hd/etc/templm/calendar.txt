@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130224 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130412 templ=templm -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -142,11 +142,13 @@
       %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
       %if;(date.julian_day = today.julian_day)%sp;%time;%end;
     </li>
-    <li %if;(date.julian_day > 2375839 and date.julian_day < 2380688)style="font-weight:bold;"%end;>
+    %if;(date.julian_day > 2375839)
+      <li %if;(date.julian_day < 2380688)style="font-weight:bold;"%end;>
         %apply;french_day(date.french.day),%sp;%date.french.day;
         %sp;%apply;capitalize%with;%apply;nth([(french revolution month)], date.french.month -1)%end;
         %sp;an %date.french.year.roman; 
-    </li>
+      </li>
+    %end;
     <li>
       [*moon age/new moon/first quarter/full moon/last quarter]0 : %date.moon_age;
       %if;(date.moon_phase.index != 0)
@@ -200,7 +202,20 @@
       <input type="submit" value="Ok" %/>
       </p>
     </form>
+    %let;lang;
+      %if;(evar.lang != "")
+        %evar.lang;
+      %elseif;(bvar.default_lang != "")
+        %bvar.default_lang;
+      %else;en%nn;
+      %end;
+    %in;
     <ul>
+      <li>
+        <a href="http://%lang;.wikipedia.org/wiki/%date.gregorian.year;">
+          http://%lang;.wikipedia.org/wiki/%date.gregorian.year;
+        </a>
+      </li>
       <li>
         <a href="%prefix;m=POP_PYR;int=5;lim=0;y=%date.gregorian.year;">
           [population pyramid] (%date.gregorian.year;)
