@@ -4,7 +4,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130607 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130608 templ=templm -->
   <title>%if;(evar.del = "on")[*delete]...[person/persons]1...[family/families]1...%else;%first_name; %surname;%end;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -93,22 +93,26 @@
   %end;
 
   %define;link_marriage(xx)
-    %if;(not cancel_links)
-      %let;him;[him/her]0 %nn;
-        %if;(xx.computable_marriage_age)
-          %xx.marriage_age;%nn;
-        %else; ? [years old]%end;%nn;
-      %in;
-      %let;her;[him/her]1 %nn;
-        %if;(xx.spouse.computable_marriage_age)
-          %xx.spouse.marriage_age;%nn;
-        %else; ? [years old]%end;%nn;
-      %in;
-      <a id="f%family.index;" %l_lmarriage1;i=%family.index;;ip=%index;" 
-         title=" %him;%nl; %her; %l_lmarriage2;"
-         >&amp;%marriage_date.prec;%marriage_date.year;</a>
+    %if;(on_marriage_date = "")
+      &amp;
     %else;
-      &amp;%marriage_date.prec;%marriage_date.year;
+      %if;(not cancel_links)
+        %let;him;[him/her]0 %nn;
+          %if;(xx.computable_marriage_age)
+            %xx.marriage_age;%nn;
+          %else; ? [years old]%end;%nn;
+        %in;
+        %let;her;[him/her]1 %nn;
+          %if;(xx.spouse.computable_marriage_age)
+            %xx.spouse.marriage_age;%nn;
+          %else; ? [years old]%end;%nn;
+        %in;
+        <a id="f%family.index;" %l_lmarriage1;i=%family.index;;ip=%index;" 
+           title=" %him;%nl; %her; %l_lmarriage2;"
+           >&amp;%marriage_date.prec;%marriage_date.year;</a>
+      %else;
+        &amp;%marriage_date.prec;%marriage_date.year;
+      %end;
     %end;
   %end;
 

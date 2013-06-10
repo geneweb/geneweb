@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: relmenu.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20121209 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130608 templ=templm -->
   <!-- cousmenu.txt is included in relmenu.txt -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -185,32 +185,32 @@
     <br%/>
     <label>
       <input type="checkbox" name="long" value="on" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
-      [*long display]
+      [long display]
     </label>
     <br%/>
     <label>
       <input type="checkbox" name="spouse" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
-      [*include spouses]
+      [include spouses]
     </label>
     <br%/>
     <label>
       <input type="checkbox" name="cgl" value="on" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
-      [*cancel GeneWeb links]
+      [cancel GeneWeb links]
     </label>
     <br%/>
     <label>
       <input type="checkbox" name="image" value="on" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
-      [*image/images]1
+      [image/images]1
     </label>
     <br%/>
     <label>
-      [*border]
+      [border]
       <input name="bd" size="1" maxlength="2" value="0"%/>
     </label>
     <br%/>
     <table summary="colors" cellpadding="0" cellspacing="0">
       <tr>
-        <td align="%left;">[*color]&nbsp;</td>
+        <td align="%left;">[color]&nbsp;</td>
         <td>
           <input type="radio" name="color" value="" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
         </td>
