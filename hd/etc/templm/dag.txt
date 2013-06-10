@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130604 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130608 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
@@ -31,6 +31,7 @@
              env.key = "cgl" or
              env.key = "color" or
              env.key = "image" or
+             env.key = "spouse" or
              env.key = "v"
              )
         %else;
@@ -61,6 +62,12 @@
             </tr>
           </table>
         </fieldset>
+        %if;(evar.m = "RLM" or evar.em = "R")
+          <fieldset>
+            <label><input type="checkbox" name="spouse" value="on"
+                   %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
+          </fieldset>
+        %end;
         %if;(evar.t="T")
           <fieldset><legend>[*generation/generations]0</legend>
             <div class="v">
@@ -146,13 +153,19 @@
   <p><input type="submit" value="Ok"%/></p>
   </form>
 %else;
-  %if;(evar.notab != "on" and not cancel_links)
-    <div style="text-align:%right;">
-     <br%/>
-     <a href="%prefix;%foreach;env_binding;%env.key;=%env.val.decoded;;%end;%nn;
-       notab=on;slices=on" accesskey="/" title="[*display by slices/slice width/overlap/total width]0">
-       <tt>//</tt>
-     </a>
+  %if;(not cancel_links)
+    <div class="menu">
+      %if;(evar.notab != "on")
+        <span>
+         <a href="%prefix;%foreach;env_binding;%env.key;=%env.val.decoded;;%end;%nn;
+           notab=on;slices=on" accesskey="/" title="[display by slices/slice width/overlap/total width]0">//</a>
+        </span>
+      %end;
+      %if;(link_next != "")
+        <span>
+          <a href="%link_next;;image=%evar.image;;bd=%evar.bd;" title="[next relationship path] (&gt;)" accesskey=">">[next relationship path] &gt;&gt;</a>
+        </span>
+      %end;
     </div>
   %end;
   %if;(evar.notab = "on" or evar.pos2 != "")
@@ -225,11 +238,6 @@
     %end;
     </table>
     </td></tr></table>
-  %end;
-  %if;(link_next != "")
-    <p>
-    <a href="%link_next;;image=%evar.image;;bd=%evar.bd;" title="[next relationship path] (&gt;)" accesskey=">">[next relationship path] &gt;&gt;</a>%nl;
-    </p>
   %end;
 %end;
   %base_trailer;
