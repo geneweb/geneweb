@@ -1,15 +1,17 @@
-    /* perso_accesskey.js mickroue(a)yahoo.fr 20130525 templ=templm */
+    /* perso_accesskey.js mickroue(a)yahoo.fr 20130617 templ=templm */
     function acc_key(thi,event,xsib,xspo,xchi,xmod_ind,xadd_par,xadd_fam,xmod_fam) {
       var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
       var charKey = String.fromCharCode(key);
       var acckey = (document.getElementById("acckey")) ? document.getElementById("acckey") : thi;
       var add_par = (document.getElementById(xadd_par)) ? document.getElementById(xadd_par) : thi;
       var add_fam = (document.getElementById(xadd_fam)) ? document.getElementById(xadd_fam) : thi;
+      var anc_tree = (document.getElementById("anc_tree")) ? document.getElementById("anc_tree") : thi;
       var chi = (document.getElementById(xchi)) ? document.getElementById(xchi) : thi;
       var mod_fam = (document.getElementById(xmod_fam)) ? document.getElementById(xmod_fam) : thi;
       var mod_fam2 = (document.getElementById("mod_fam2")) ? document.getElementById("mod_fam2") : thi;
       var mod_fam3 = (document.getElementById("mod_fam3")) ? document.getElementById("mod_fam3") : thi;
       var mod_ind = (document.getElementById(xmod_ind)) ? document.getElementById(xmod_ind) : thi;
+      var nav_sosa_ref = (document.getElementById("nav_sosa_ref")) ? document.getElementById("nav_sosa_ref") : thi;
       var par_2 = (document.getElementById("par_2")) ? document.getElementById("par_2") : thi;
       var par_3 = (document.getElementById("par_3")) ? document.getElementById("par_3") : thi;
       var par_4 = (document.getElementById("par_4")) ? document.getElementById("par_4") : thi;
@@ -23,7 +25,7 @@
       if(document.getElementById(xsib))
         {var sib = document.getElementById(xsib);}
       else
-        {var sib = document.getElementById("sib_1") ? document.getElementById("sib_1") : thi;}   
+        {var sib = document.getElementById("sib_1") ? document.getElementById("sib_1") : thi;}
       var sosa = "";
       if(document.getElementsByName("sosa")[0])
       {
@@ -55,7 +57,7 @@
       {sosa = thi;}
       
       switch (charKey)
-      {  
+      {
         //shift = on
         case "W": acckey.focus(); break;  // menu2 (w)
         case "²": Tn.focus(); break;      // trl : search input
@@ -79,6 +81,7 @@
         case "R": rela_comp.click(); break;
         case "S": nav_sosa_ref.click(); break;
         case "U": upd.click(); break;
+        case "Y": anc_tree.click(); break;
         //shift = off
         case "w": acckey.focus(); break;  // menu2 (w)
         case "²": Tn.focus(); break;      // trl : search input
@@ -102,6 +105,7 @@
         case "r": rela_comp.click(); break;
         case "s": nav_sosa_ref.click(); break;
         case "u": upd.click(); break;
+        case "y": anc_tree.click(); break;
         default: return true; break;
       }
       return false;

@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130608 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130615 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
@@ -17,13 +17,14 @@
   %include.css;
   %base_header;
 </head>
-
 <body%body_prop; id="dag">
 %message_to_wizard;
 
-%if;not cancel_links;
+%if;(not cancel_links or evar.notab = "on")
   <div class="menu2">
-    <form id="tools" style="display:inline" method="get" action="%action;">
+    %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
+    <form id="tools" name="tools" style="display:inline" method="get" action="%action;">
+      %hidden;
       %foreach;env_binding;
         %if;(
              env.key = "bd" or
@@ -31,44 +32,75 @@
              env.key = "cgl" or
              env.key = "color" or
              env.key = "image" or
+             env.key = "opt" or
              env.key = "spouse" or
-             env.key = "v"
-             )
+             env.key = "v" or
+             env.key = "dpos" or env.key = "pos1" or env.key = "pos2" or env.key = "nogroup" or env.key = "notab" or env.key = "overlap" or
+             env.key = "width" or env.key = "slices" or
+             env.key = "templ" or env.key = "iz" or env.key = "pz" or env.key = "nz" or env.key = "ocz"
+            )
         %else;
-         <input type="hidden" name="%env.key;" value="%env.val.decoded;" %/>
+          <input type="hidden" name="%env.key;" value="%env.val.decoded;" %/>
         %end;
       %end;
       <div><a href="#">[*tools]</a>
       <div class="s_menu">
-        <fieldset>
-          <label><input type="checkbox" name="cgl" value="on"
-                 %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
-          %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-            <label><input type="checkbox" name="image" value="on"
-                   %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
-          %end;
-          <label>[border]<input name="bd" size="1" maxlength="2" style="width:1em;" value="%evar.bd;" %/></label>
-          <table summary="colors" cellspacing="0" cellpadding="0">
-            <tr>
-              <td align="%left;">[color] </td>
-              <td align="%left;">
-                <input type="radio" name="color" value=""
-                  %if;(evar.color="") checked="checked"%end;%/></td>
-              %for;i;1;7;
-                %let;bgi;bg%i;%in;
-                <td class="%bgi;"><input type="radio" name="color" value="%bgi;"
-                    %if;(evar.color=bgi) checked="checked"%end;%/></td>
-              %end;
-            </tr>
-          </table>
-        </fieldset>
-        %if;(evar.m = "RLM" or evar.em = "R")
+        %if;(evar.notab = "on")
           <fieldset>
-            <label><input type="checkbox" name="spouse" value="on"
-                   %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
+            <legend>
+              <label><input type="checkbox" name="notab" value="on" checked="checked" %l_on;
+                    %/>[*display by slices/slice width/overlap/total width]0</label>
+            </legend>
+            <label><input type="checkbox" name="nogroup" value="on" %l_on;
+                   %if;(evar.nogroup = "on") checked="checked"%end;
+                   %/>[don't group the common branches together]</label>
+            <label><input name="dpos" size="5" value="%if;(evar.dpos != "")%evar.dpos;%else;78%end;"
+                   %/>[display by slices/slice width/overlap/total width]1</label>
+            <label><input name="overlap" size="5" value="%if;(evar.overlap != "")%evar.overlap;%else;10%end;"
+                   %/>[display by slices/slice width/overlap/total width]2</label>
+            <label><input name="width" size="5" value="%nn;
+                   %if;(evar.width != "")%evar.width;
+                   %elseif;(dag.max_wid <= 78)%dag.max_wid;
+                   %elseif;(dag.min_wid >= 78)%dag.min_wid;
+                   %else;78%end;"
+                   %/>[display by slices/slice width/overlap/total width]3 (%dag.min_wid;-%dag.max_wid;)</label>
           </fieldset>
+        %else;
+          <a href="%prefix;%suffix;notab=on" accesskey="/" 
+             title="[display by slices/slice width/overlap/total width]0 (/)"
+             >[*display by slices/slice width/overlap/total width]0</a>
         %end;
-        %if;(evar.t="T")
+        <fieldset>
+          %if;(evar.m = "RLM" or evar.em = "R")
+              <label><input type="checkbox" name="spouse" value="on" %l_on;
+                     %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
+          %end;
+          <label><input type="checkbox" name="opt" value="no_index" %l_on;
+                 %if;(evar.opt = "no_index") checked="checked"%end;%/>[link to use]</label>
+          <label><input type="checkbox" name="cgl" value="on" %l_on;
+                 %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
+          %if;(evar.notab != "on")
+            %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+              <label><input type="checkbox" name="image" value="on" %l_on;
+                     %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
+            %end;
+            <label>[border]<input name="bd" size="1" maxlength="2" style="width:1em;" value="%evar.bd;" %/></label>
+            <table summary="colors" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="%left;">[color] </td>
+                <td align="%left;">
+                  <input type="radio" name="color" value="" %l_on;
+                    %if;(evar.color="") checked="checked"%end;%/></td>
+                %for;i;1;7;
+                  %let;bgi;bg%i;%in;
+                  <td class="%bgi;"><input type="radio" name="color" value="%bgi;" %l_on;
+                                    %if;(evar.color=bgi) checked="checked"%end;%/></td>
+                %end;
+              </tr>
+            </table>
+          %end;
+        </fieldset>
+        %if;(evar.t = "T")
           <fieldset><legend>[*generation/generations]0</legend>
             <div class="v">
               %let;l_bmaxv;
@@ -83,7 +115,7 @@
               %let;l_minv;%if;(evar.m = "D")1%else;2%end;%in;
               %for;i;l_minv;l_maxv;
                 <label>%i;<br%/>
-                  <input type="radio" name="v" value="%i;"%if;(evar.v = i) checked="checked"%end;%/>
+                  <input type="radio" name="v" value="%i;" %l_on;%if;(evar.v = i) checked="checked"%end;%/>
                 </label>
               %end;
             </div>
@@ -93,78 +125,71 @@
       </div>
       </div>
     </form>
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
-    %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
   </div>
 %end;
 %if;(evar.slices = "on")
-  <h1>%nn;
-    [*display by slices/slice width/overlap/total width]0%nn;
-  </h1>
+  <h1>[*display by slices/slice width/overlap/total width]0</h1>
   <form method="GET" action="%action;">
-  <p>
-  %hidden;
-  %foreach;env_binding;
-    %if;(env.key != "slices")
-      <input type="hidden" name="%env.key;" value="%env.val.decoded;"%/>
+    %hidden;
+    %foreach;env_binding;
+      %if;(
+           env.key = "dpos" or
+           env.key = "nogroup" or
+           env.key = "overlap" or
+           env.key = "width" or
+           env.key = "slices" or env.key = "templ" or env.key = "iz" or env.key = "pz" or env.key = "nz" or env.key = "ocz"
+          )
+      %else;
+        <input type="hidden" name="%env.key;" value="%env.val.decoded;"%/>
+      %end;
     %end;
-  %end;
-  </p>
-  <table>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*don't group the common branches together]
-      <input type="checkbox" name="nogroup" value="on"%/>
-      </label>
-    </td>
-  </tr>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*display by slices/slice width/overlap/total width]1
-      <input name="dpos" size="5" value="78"%/>
-      </label>
-    </td>
-  </tr>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*display by slices/slice width/overlap/total width]2
-      <input name="overlap" size="5" value="10"%/>
-      </label>
-    </td>
-  </tr>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*display by slices/slice width/overlap/total width]3
-      (%dag.min_wid;-%dag.max_wid;)
-      <input name="width" size="5" value="%nn;
-        %if;(dag.max_wid <= 78)%dag.max_wid;
-        %elseif;(dag.min_wid >= 78)%dag.min_wid;
-        %else;78%end;"%/>
-      </label>
-    </td>
-  </tr>
-  </table>
-  <p><input type="submit" value="Ok"%/></p>
+    <fieldset>
+      <legend>[*display by slices/slice width/overlap/total width]0</legend>
+      <label><input type="checkbox" name="nogroup" value="on"
+             %/>[don't group the common branches together]</label><br%/>
+      <label><input name="dpos" size="5" value="78"
+             %/>[display by slices/slice width/overlap/total width]1</label><br%/>
+      <label><input name="overlap" size="5" value="10"
+             %/>[display by slices/slice width/overlap/total width]2</label><br%/>
+      <label><input name="width" size="5" value="%nn;
+          %if;(dag.max_wid <= 78)%dag.max_wid;
+          %elseif;(dag.min_wid >= 78)%dag.min_wid;
+          %else;78%end;"
+        %/>[*display by slices/slice width/overlap/total width]3 (%dag.min_wid;-%dag.max_wid;)</label>
+      <p><input type="submit" value="Ok"%/></p>
+    </fieldset>
   </form>
 %else;
-  %if;(not cancel_links)
+  %if;(not cancel_links and evar.notab != "on")
     <div class="menu">
-      %if;(evar.notab != "on")
-        <span>
-         <a href="%prefix;%foreach;env_binding;%env.key;=%env.val.decoded;;%end;%nn;
-           notab=on;slices=on" accesskey="/" title="[display by slices/slice width/overlap/total width]0">//</a>
-        </span>
-      %end;
       %if;(link_next != "")
         <span>
           <a href="%link_next;;image=%evar.image;;bd=%evar.bd;" title="[next relationship path] (&gt;)" accesskey=">">[next relationship path] &gt;&gt;</a>
         </span>
+      %end;
+      %if;(evar.t = "T")
+        %if;(evar.m = "A")
+          <span>
+            <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+                %foreach;env_binding;
+                  %if;(env.key = "m")m=D;%nn;
+                  %elseif;(env.key = "templ")
+                  %else;%env.key;=%env.val.decoded;;%nn;
+                  %end;
+                %end;">[*tree] &darr;&darr;&darr;</a>
+          </span>
+        %elseif;(evar.m = "D")
+          <span>
+            <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+                %foreach;env_binding;
+                  %if;(env.key = "m")m=A;%nn;
+                  %elseif;(env.key = "dag" or env.key = "templ")
+                  %else;%env.key;=%env.val.decoded;;%nn;
+                  %end;
+                %end;">[*tree] &uarr;&uarr;&uarr;</a>
+          </span>
+        %end;
       %end;
     </div>
   %end;
@@ -174,33 +199,36 @@
     %let;pos2;%if;(evar.pos2 != "")%evar.pos2;%else;%dpos;%end;%in;
     %let;overlap;%if;(evar.overlap != "")%evar.overlap;%else;10%end;%in;
     %if;(pos1 != 0 or pos2 < dag.ncol)
-      <div style="text-align:right">
-        <br%/>
-        %if;(pos1 = 0)&nbsp;%nn;
+      <div class="menu">
+        <span>
+        %if;(pos1 = 0)
         %else;
           <a href="%prefix_no_iz;
             %foreach;env_binding;
-              %if;(env.key != "pos1" and env.key != "pos2")
+              %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
                 %env.key=%env.val.decoded;;%nn;
               %end;
             %end;
-            pos1=%expr;(pos1 + overlap - dpos)
-            ;pos2=%expr(pos1 + overlap)">&lt;&lt;</a>%nn;
-        %end;%nl
+            %let;l_pos1;%expr;(pos1 + overlap - dpos)%in;
+            pos1=%l_pos1;
+            ;pos2=%expr(pos1 + overlap)">&lt;&lt; %l_pos1;</a>%nn;
+        %end;
         %if;(pos2 >= dag.ncol)&nbsp;%nn;
         %else;
           <a href="%prefix_no_iz;
             %foreach;env_binding;
-              %if;(env.key != "pos1" and env.key != "pos2")
+              %if;(env.key != "pos1" and env.key != "pos2" and env.key != "templ")
                 %env.key=%env.val.decoded;;%nn;
               %end;
             %end;
-            pos1=%expr;(pos2 - overlap)
-            ;pos2=%expr(pos2 - overlap + dpos)">&gt;&gt;</a>%nn;
-        %end;%nl;
+            %let;l_pos1;%expr;(pos2 - overlap)%in;
+            pos1=%l_pos1;
+            ;pos2=%expr(pos2 - overlap + dpos)">%l_pos1; &gt;&gt;</a>%nn;
+        %end;
+        </span>
       </div>
     %end;
-    <pre>
+    <pre style="width:%dpos;em;">
     %foreach;dag_line;
       %foreach;dag_line_pre;
         %foreach;dag_cell_pre;
@@ -210,6 +238,8 @@
     %end;
     </pre>
   %else;
+    %let;l_arr;%if(evar.m = "A")&uarr;%else;&darr;%end;%in;
+    %let;l_a;%if;(evar.em = "R")----&gt;8----%else;[tree]%end;%in;
     <table border="%border;" width="100%%"><tr><td align="center">
     <table border="%border;" cellspacing="0" cellpadding="0">
     %foreach;dag_line;
@@ -219,7 +249,7 @@
         %if;dag_cell.is_nothing;&nbsp;%nn;
         %elseif;dag_cell.is_bar;
           %if;(dag_cell.bar_link != "" and evar.cgl != "on")
-            <a style="text-decoration:none;" href="%dag_cell.bar_link;">|</a>%nn;
+            <a style="text-decoration:none;" href="%dag_cell.bar_link;;image=%evar.image;" title="%l_a;">        %l_arr;        </a>%nn;
           %else;|%end;
         %elseif;(dag_cell.item != "")%dag_cell.item;
         %elseif;(dag_cell.text != "")%dag_cell.text;

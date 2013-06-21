@@ -1,4 +1,4 @@
-%( <!-- Begin inc_mickroue1 20120926 --> %)
+%( <!-- Begin inc_mickroue1 20130617 --> %)
 %( <!-- relations - photos --> %)
   %if;(has_relations)
     %apply;lazy_print%with;
@@ -37,6 +37,7 @@
     %end;
     %reset_count;
     %foreach;witness_relation;
+      %lazy_force;
       %if;(count = 0)
         <li class="sheet"><em>%apply;witness_computing()</em>
         <table class="t_witness" summary="[witness at marriage of %s and %s:::x:y]">

@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130604 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130615 templ=templm -->
   %let;l_v0;%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_anc_tree = "")%l_v0;%elseif;(bvar.max_anc_tree > l_v0)%l_v0;%else;%bvar.max_anc_tree;%end;%in;
   <title>%nn;
@@ -25,11 +25,8 @@
 </head>
 
 %define;symbol(xx)
-  %if;(evar.cgl != "on")
-    <span %if;(xx.has_sosa)class="color_sosa"%end;>%if;xx.has_siblings;&diams;%else;&loz;%end;</span>
-  %else;
-    |
-  %end;
+  <span %if;(xx.has_sosa)class="color_sosa"%end;
+  >        %if;(xx.has_siblings)&diams;%elseif;(xx.has_parents)&loz;%else;|%end;        </span>
 %end;
 
 %define;a_tree_line()
@@ -97,15 +94,14 @@
       %end;
       <td colspan="%cell.colspan;" align="center">%nn;
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
-      %elseif;(evar.cgl = "on")|%nn;
+      %elseif;(evar.cgl = "on")%apply;symbol("cell.person")%nn;
       %else;
-        <a style="text-decoration:none" href="%prefix_no_iz;%cell.person.access;;%nn;
+        <a style="text-decoration:none;" title="[tree]" href="%prefix_no_iz;%cell.person.access;;%nn;
         %foreach;env_binding;
-          %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i")
+          %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i" or env.key = "templ")
           %else;%env.key;=%env.val.decoded;;%nn;
           %end;
-        %end;">%nn;
-        %apply;symbol("cell.person")</a>%nn;
+        %end;">%apply;symbol("cell.person")</a>%nn;
       %end;
       </td>
     %end;
@@ -160,8 +156,22 @@
 %message_to_wizard;
 
 %if;not cancel_links;
+  %if;(evar.t = "T")
+    <div class="menu">
+      <span>
+        <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
+          %foreach;env_binding;
+            %if;(env.key = "m")m=D;%nn;
+            %elseif;(env.key = "templ")
+            %else;%env.key;=%env.val.decoded;;%nn;
+            %end;
+          %end;">[*tree] &darr;&darr;&darr;</a>
+      </span>
+    </div>
+  %end;
   <div class="menu2">
-    <form id="tools" style="display:inline" method="get" action="%action;">
+    %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
+    <form id="tools" name="tools" style="display:inline" method="get" action="%action;">
       %hidden;
       <input type="hidden" name="m" value="A"%/>
       %if;(evar.p != "" or evar.n != "" or evar.oc != "")
@@ -174,26 +184,31 @@
       %end;
       <div><a href="#">[*tools]</a>
       <div class="s_menu">
+        %if;(evar.t = "T")
+          <a href="%prefix;m=A;t=T;v=%l_v;;maxv=%evar.maxv;;%access;;dag=on;notab=on" accesskey="/" 
+             title="[display by slices/slice width/overlap/total width]0 (/)"
+             >[*display by slices/slice width/overlap/total width]0</a>
+        %end;
         <fieldset>
-          <label><input type="checkbox" name="cgl" value="on"
+          <label><input type="checkbox" name="cgl" value="on" %l_on;
                  %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
           %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-            <label><input type="checkbox" name="image" value="on"
+            <label><input type="checkbox" name="image" value="on" %l_on;
                    %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
           %end;
         </fieldset>
         <fieldset>
           <legend>
-            <label><input type="radio" name="t" value="T"
+            <label><input type="radio" name="t" value="T" %l_on;
                    %if;(evar.t = "T") checked="checked"%end;%/>[*tree]</label>
           </legend>
-          <label><input type="radio" name="t" value="A"
+          <label><input type="radio" name="t" value="A" %l_on;
                  %if;(evar.t = "A") checked="checked"%end;%/>[male line/female line]0</label>
-          <label><input type="radio" name="t" value="C"
+          <label><input type="radio" name="t" value="C" %l_on;
                  %if;(evar.t = "C") checked="checked"%end;%/>[male line/female line]1</label>
-          <label><input type="checkbox" name="marriage" value="on"
+          <label><input type="checkbox" name="marriage" value="on" %l_on;
                  %if;(evar.marriage = "on") checked="checked"%end;%/>[marriage/marriages]0</label>
-          <label><input type="checkbox" name="dag" value="on"
+          <label><input type="checkbox" name="dag" value="on" %l_on;
                  %if;(evar.dag = "on") checked="checked"%end;%/>dag=on</label>
           <label>[border]<input name="bd" size="1" maxlength="2" style="width:1em;" value="%evar.bd;" %/></label>
           <table summary="colors" cellspacing="0" cellpadding="0">
@@ -204,8 +219,8 @@
                   %if;(evar.color="") checked="checked"%end;%/></td>
               %for;i;1;7;
                 %let;bgi;bg%i;%in;
-                <td class="%bgi;"><input type="radio" name="color" value="%bgi;"
-                    %if;(evar.color=bgi) checked="checked"%end;%/></td>
+                <td class="%bgi;"><input type="radio" name="color" value="%bgi;" %l_on;
+                                  %if;(evar.color=bgi) checked="checked"%end;%/></td>
               %end;
             </tr>
           </table>
@@ -217,9 +232,8 @@
             %let;l_maxv;%expr(l_emaxv + 1)%in;
             <input type="hidden" name="maxv" value="%evar.maxv;"%/>
             %for;i;2;l_maxv;
-              <label>%i;<br%/>
-                <input type="radio" name="v" value="%i;"%if;(l_v = i) checked="checked"%end;%/>
-              </label>
+              <label>%i;<br%/><input type="radio" name="v" value="%i;" %l_on;
+                              %if;(l_v = i) checked="checked"%end;%/></label>
             %end;
           </div>
         </fieldset>
@@ -227,19 +241,7 @@
       </div>
       </div>
     </form>
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
-    %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
-
-%if;(evar.t = "T" and not cancel_links)%nn;
-  <div style="text-align:%right;">
-    <br%/>
-    <a href="%prefix;m=A;t=T;v=%l_v;;maxv=%evar.maxv;;%access;;dag=on;notab=on;slices=on">
-      <tt>//</tt>
-    </a>
+    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
   </div>
 %end;
 

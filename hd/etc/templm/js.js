@@ -1,9 +1,15 @@
-/* js.js mickroue(a)yahoo.fr 20130211 templ=templm */
+/* js.js mickroue(a)yahoo.fr 20130618 templ=templm */
 
   function adv(z1,z2)
   {
     var x2 = z2.innerHTML;
     parent.location.href = z1 + x2;
+  }
+  function adv1(z1,z2)
+  {
+    var x2 = z2.innerHTML;
+    var x3 = x2.charAt(0)
+    parent.location.href = z1 + x3 + x2;
   }
   function changeDate(add,del,text,i0,i1,e1,i2,e2)
   {
@@ -147,6 +153,5 @@
   }
   function valid(id)
   {
-    document.getElementById(id).focus();
     document.getElementById(id).checked = true;
   }

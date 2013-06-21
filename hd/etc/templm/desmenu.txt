@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130607 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130614 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -46,152 +46,105 @@
 
 %if;not cancel_links;
   <div class="menu2">
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
-    %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
   </div>
 %end;
 
-  <form name="desmenu" method="get" action="%action;">
-    <p>
-      %hidden;
-      <input type="hidden" name="m" value="D"%/>
-      %if;access_by_key;
-        <input type="hidden" name="p" value="%first_name_key_val;"%/>
-        <input type="hidden" name="n" value="%surname_key_val;"%/>
-        %if;(occ != "0")
-          <input type="hidden" name="oc" value="%occ;"%/>
-        %end;
-      %else
-        <input type="hidden" name="i" value="%index;"%/>
+%let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%in;
+<form name="desmenu" method="get" action="%action;">
+  <p>
+    %hidden;
+    <input type="hidden" name="m" value="D"%/>
+    %if;access_by_key;
+      <input type="hidden" name="p" value="%first_name_key_val;"%/>
+      <input type="hidden" name="n" value="%surname_key_val;"%/>
+      %if;(occ != "0")
+        <input type="hidden" name="oc" value="%occ;"%/>
       %end;
-      <input type="hidden" name="maxv" value="%max_desc_level;"%/>
-    </p>
-        <fieldset>
-          <legend><input type="submit" value="Ok"%/></legend>
-          <label>[*specify::generation/generations]0 :<br%/>
-            <select style="text-align:center" name="v" size="%max_desc_level;">
-              %foreach;descendant_level;
-                %if;(level != 0)
-                  <option value="%level;"
-                    %if;(level = 3) selected="selected"%end;>
-                    %if;(level = 1)[*to the children]
-                    %elseif;(level = 2)[*to the grandchildren]
-                    %elseif;(level = 3)[*to the great-grandchildren]
-                    %else;%level;%sp;
-                    %end;
-                    (%number_of_descendants;)
-                  </option>
-                %end;
+    %else
+      <input type="hidden" name="i" value="%index;"%/>
+    %end;
+    <input type="hidden" name="maxv" value="%max_desc_level;"%/>
+  </p>
+  <fieldset>
+    <legend><input type="submit" value="Ok"%/></legend>
+    <label>[*specify::generation/generations]0 :<br%/>
+      <select style="text-align:center" name="v" size="%max_desc_level;">
+        %foreach;descendant_level;
+          %if;(level != 0)
+            <option value="%level;"
+              %if;(level = 3) selected="selected"%end;>
+              %if;(level = 1)[*to the children]
+              %elseif;(level = 2)[*to the grandchildren]
+              %elseif;(level = 3)[*to the great-grandchildren]
+              %else;%level;%sp;
               %end;
-            </select>
-          </label>
-          <br%/>
-          <label>
-            <input type="checkbox" name="cgl" value="on" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-            [cancel GeneWeb links]
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="N" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-            [families with encoding]
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="G" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-            [index of the descendants]
-          </label>
-          <br%/>
-          <label>
-            <input type="radio" name="t" value="C" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-            [index of the spouses (non descendants)]
-          </label>
-          <br%/>
-          <input type="hidden" name="num" value="on"%/>
-          <label>
-            <input type="radio" name="t" value="A" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-            d’Aboville
-          </label>
-          <br%/>
-    </fieldset>
-    <fieldset>
-    <legend>
-      <label>
-        <input type="radio" id="tL" name="t" value="L" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [*long display]0
-      </label>
-    </legend>
-      %if;(bvar.max_desc_level = "" and max_desc_level > 12)
-        ([maximum] 12 [generation/generations]1)
-      %elseif;(
-        bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
-        )
-        ([maximum] %bvar.max_desc_level; [generation/generations]1)
-      %end;
-      <label>
-        <input type="radio" name="t" value="M" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [male line/female line]0
-      </label>
-      <br%/>
-      <label>
-        <input type="radio" name="t" value="F" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [male line/female line]1
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="always_surname" value="no" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [first name/first names]0 <span style="text-decoration:line-through;">[surname/surnames]0</span>
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="sd" value="on" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [date/dates]0 : 
-        %if;([ !dates order]0 = "ddmmyyyy")[year/month/day]2/[year/month/day]1/[year/month/day]0
-        %elseif;([ !dates order]0 = "mmddyyyy")[year/month/day]1/[year/month/day]2/[year/month/day]0
-        %else;[year/month/day]0/[year/month/day]1/[year/month/day]2
+              (%number_of_descendants;)
+            </option>
+          %end;
         %end;
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="alias" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          [surname alias], [first name alias]
-        </label>
-      <br%/>
-        <label>
-        <input type="checkbox" name="spouse" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [include spouses]
-        </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="parents" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [parents]
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="rel" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [relation/relations]1
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="notes" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [note/notes]1
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="src" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [source/sources]1
-      </label>
-      <br%/>
-      <label>
-        <input type="checkbox" name="inline" value="on"%/>
-        [display notes/sources inline]
-      </label>
-    </fieldset>
-    <fieldset>
+      </select>
+    </label>
+    <br%/>
+    <label><input type="checkbox" name="cgl" value="on" %l_on;
+           %/>[cancel GeneWeb links]</label><br%/>
+    <label><input type="radio" name="t" value="N" %l_on;
+           %/>[families with encoding]</label><br%/>
+    <label><input type="radio" name="t" value="G" %l_on;
+           %/>[index of the descendants]</label><br%/>
+    <label><input type="radio" name="t" value="C" %l_on;
+           %/>[index of the spouses (non descendants)]</label><br%/>
+    <input type="hidden" name="num" value="on"%/>
+    <label><input type="radio" name="t" value="A" %l_on;
+           %/>d’Aboville</label><br%/>
+  </fieldset>
+  <fieldset>
+    %let;l_on1;onchange="valid('tL')"%in;
+    <legend>
+      <label><input type="radio" id="tL" name="t" value="L" checked="checked" %l_on;
+             %/>[*long display]0</label>
+    </legend>
+    %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+      ([maximum] 12 [generation/generations]1)
+    %elseif;(
+      bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
+      )
+      ([maximum] %bvar.max_desc_level; [generation/generations]1)
+    %end;
+    <label><input type="radio" name="t" value="M" %l_on;
+           %/>[male line/female line]0</label><br%/>
+    <label><input type="radio" name="t" value="F" %l_on;
+           %/>[male line/female line]1</label><br%/>
+    <label><input type="checkbox" name="always_surname" value="no" checked="checked" %l_on1; %l_on;
+           %/>[first name/first names]0 <span style="text-decoration:line-through;">[surname/surnames]0</span></label><br%/>
+    <label>
+      <input type="checkbox" name="sd" value="on" %l_on1; %l_on;%/>
+      [date/dates]0 : 
+      %if;([ !dates order]0 = "ddmmyyyy")[year/month/day]2/[year/month/day]1/[year/month/day]0
+      %elseif;([ !dates order]0 = "mmddyyyy")[year/month/day]1/[year/month/day]2/[year/month/day]0
+      %else;[year/month/day]0/[year/month/day]1/[year/month/day]2
+      %end;
+    </label><br%/>
+    <label><input type="checkbox" name="alias" value="on" checked="checked" %l_on1; %l_on;
+           %/>[surname alias], [first name alias]</label><br%/>
+    <label><input type="checkbox" name="spouse" value="on" checked="checked" %l_on1; %l_on;
+           %/>[include spouses]</label><br%/>
+    <label><input type="checkbox" name="parents" value="on" checked="checked" %l_on1; %l_on;
+           %/>[parents]</label><br%/>
+    <label><input type="checkbox" name="rel" value="on" checked="checked" %l_on1; %l_on;
+           %/>[relation/relations]1</label><br%/>
+    <label><input type="checkbox" name="notes" value="on" checked="checked" %l_on1; %l_on;
+           %/>[note/notes]1</label><br%/>
+    <label><input type="checkbox" name="src" value="on" checked="checked" %l_on1; %l_on;
+           %/>[source/sources]1</label><br%/>
+    <label><input type="checkbox" name="inline" value="on" %l_on1; %l_on;
+           %/>[display notes/sources inline]</label>
+  </fieldset>
+  <fieldset>
+    %let;l_on1;onchange="valid('tT')"%in;
     <legend>
       <label>
-        <input type="radio" id="tT" name="t" value="T" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
+        <input type="radio" id="tT" name="t" value="T" %l_on;%/>
         [*tree]
         %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
           ([maximum] 4 [generation/generations]1)
@@ -202,65 +155,32 @@
         %end;
       </label>
     </legend>
-      <label>
-       <input type="checkbox" name="image" value="on" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-        [image/images]1
-      </label>
-      <br%/>
-      <label>
-        [border]
-        <input name="bd" size="1" maxlength="2" value="0" onchange="valid('tT')"%/>
-      </label>
-      <br%/>
-      <table summary="colors" cellpadding="0" cellspacing="0">
-        <tr>
-          <td align="%left;">[*color]&nbsp;</td>
-          <td>
-            <input type="radio" name="color" value="" checked="checked" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          </td>
-          <td class="bg1">
-            <input type="radio" name="color" value="bg1" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          </td>
-          <td class="bg2">
-            <input type="radio" name="color" value="bg2" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          </td>
-          <td class="bg3">
-            <input type="radio" name="color" value="bg3" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          </td>
-          <td class="bg4">
-            <input type="radio" name="color" value="bg4" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          </td>
-          <td class="bg5">
-            <input type="radio" name="color" value="bg5" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          </td>
-          <td class="bg6">
-            <input type="radio" name="color" value="bg6" onchange="valid('tT')" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-          </td>
-        </tr>
-      </table>
-    </fieldset>
-    <fieldset>
-      <legend>[*statistics]</legend>
-      <label><input type="radio" id="tBMDM" name="opt" value="bmdm" onchange="valid('tL')"
-              onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-              [calendar/calendars]0</label><br%/>
-      <label><input type="radio" id="tSTAT1" name="opt" value="stat1" onchange="valid('tL')"
-              onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-              [moon age/new moon/first quarter/full moon/last quarter]0</label><br%/>
-      <label><input type="radio" id="tAFM" name="opt" value="afm" onchange="valid('tL')"
-              onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-              [age] ([father/mother]0, [father/mother]1)</label><br%/>
-      <label><input type="radio" id="tAAD" name="opt" value="aad" onchange="valid('tL')"
-              onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%/>
-              [age at death]</label>
-    </fieldset>
-  </form>
-  <div style ="clear: both;">
-    %apply;navsosa%with;
-      <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
-      %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
-    %end;
-  </div>
+    <label><input type="checkbox" name="image" value="on" %l_on1; %l_on;
+           %/>[image/images]1</label><br%/>
+    <label>[border]<input name="bd" size="1" maxlength="2" value="0" %l_on1;%/></label><br%/>
+    <table summary="colors" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="%left;">[color] </td>
+        <td align="%left;"><input type="radio" name="color" value="" checked="checked" %l_on1; %l_on;%/></td>
+        %for;i;1;7;
+          <td class="bg%i;"><input type="radio" name="color"  value="bg%i;" %l_on1; %l_on;%/></td>
+        %end;
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset>
+    %let;l_on1;onchange="valid('tL')"%in;
+    <legend>[*statistics]</legend>
+    <label><input type="radio" id="tBMDM" name="tl1" value="bmdm" %l_on1; %l_on;
+           %/>[calendar/calendars]0</label><br%/>
+    <label><input type="radio" id="tSTAT1" name="tl1" value="stat1" %l_on1; %l_on;
+           %/>[moon age/new moon/first quarter/full moon/last quarter]0</label><br%/>
+    <label><input type="radio" id="tAFM" name="tl1" value="afm" %l_on1; %l_on;
+           %/>[age] ([father/mother]0, [father/mother]1)</label><br%/>
+    <label><input type="radio" id="tAAD" name="tl1" value="aad" %l_on1; %l_on;
+           %/>[age at death]</label>
+  </fieldset>
+</form>
   %base_trailer;
   %copyright;
 </body>
