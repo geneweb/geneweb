@@ -1,0 +1,2 @@
+<!-- begin $Id: menubar.txt,v 1.0 2013/03/15 15:53:12 flh Exp $ -->
+<!-- end $Id: menubar.txt,v 1.0 2013/03/15 15:53:12 flh Exp $ -->

@@ -97,9 +97,6 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
       %setup_link;
     %end;
   %end;
-  %if;has_referer;
-      <span class="button"><a href="%referer;" title="[back]">&lt;&lt;</a></span>
-  %end;
   </td></tr>
   <tr><td align="left">
   <img src="%image_prefix;/gwlogo.png" alt="GeneWeb"%/>

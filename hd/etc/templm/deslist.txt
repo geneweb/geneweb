@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130607 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130614 templ=templm -->
   %let;l_v0;%if;(evar.v > max_desc_level)%max_desc_level;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_desc_level = "")%l_v0;%elseif;(bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
   <title>%nn;
@@ -696,7 +696,7 @@
   %end;
 %end;
 
-%define;option_ars(xx)
+%define;tl1_ars(xx)
   <option value="evar.none"
         %if;("xx"="evar.none")selected="selected"%end;>-</option>
   <option value="first_name"
@@ -768,7 +768,7 @@
       %hidden;
       <input type="hidden" name="m" value="D"%/>
       <input type="hidden" name="t" value="L"%/>
-      <input type="hidden" name="opt" value="ars"%/>
+      <input type="hidden" name="tl1" value="ars"%/>
       %if;access_by_key;
         <input type="hidden" name="p" value="%first_name_key_val;"%/>
         <input type="hidden" name="n" value="%surname_key_val;"%/>
@@ -806,13 +806,13 @@
         <td>
           <label>[text]<input name="mbt" value="m_bt"%/></label>
           <select name="mbf">
-            %apply;option_ars(mbf)
+            %apply;tl1_ars(mbf)
           </select>
         </td>
         <th class="bcbg1">[birth]</th>
         <td><label>[text]<input name="fbt" value="f_bt"%/></label>
           <select name="fbf">
-            %apply;option_ars(fbf)
+            %apply;tl1_ars(fbf)
           </select>
         </td>
       </tr><tr>
@@ -820,13 +820,13 @@
         <td>
           <label> [text]<input name="mdt" value="m_dt"%/></label>
           <select name="mdf">
-            %apply;option_ars(mdf)
+            %apply;tl1_ars(mdf)
           </select>
         </td>
         <th class="bcbg1">[death]</th>
         <td><label>[text]<input name="fdt" value="f_dt"%/></label>
           <select name="fdf">
-            %apply;option_ars(fdf)
+            %apply;tl1_ars(fdf)
           </select>
         </td>
       </tr></table>
@@ -931,7 +931,7 @@
   %empty_sorted_list;
   %apply;desc_calendar(0,0,l_v)
   <div class="stat_calendar bcbg1">
-    <a class="title" style="color:#EEEEEE;" href="%prefix;m=D;t=L;opt=ars;i=%index;;v=%l_v;;only=%evar.only;"
+    <a class="title" style="color:#EEEEEE;" href="%prefix;m=D;t=L;tl1=ars;i=%index;;v=%l_v;;only=%evar.only;"
          title="Ars">[*calendar/calendars]0</a>
     <div class="row">
       %for;i;1;32;
@@ -1065,8 +1065,9 @@
   </h1>
   %if;not cancel_links;
     <div class="menu2">
-      %if;(evar.opt != "ars")
-        <form id="tools" style="display:inline" method="get" action="%action;">
+      %if;(evar.tl1 != "ars")
+        %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
+        <form id="tools" name="tools" style="display:inline" method="get" action="%action;">
           %hidden;
           <input type="hidden" name="m" value="D"%/>
           %if;(evar.p != "" or evar.n != "" or evar.oc != "")
@@ -1080,47 +1081,47 @@
           <div><a href="#">[*tools]</a>
           <div class="s_menu">
             <fieldset>
-              <label><input type="checkbox" name="cgl" value="on"
+              <label><input type="checkbox" name="cgl" value="on" %l_on;
                      %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
-                %if;(evar.opt = "" and (bvar.no_image_for_visitor != "yes" or friend or wizard))
-                  <label><input type="checkbox" name="image" value="on"
+                %if;(evar.tl1 = "" and (bvar.no_image_for_visitor != "yes" or friend or wizard))
+                  <label><input type="checkbox" name="image" value="on" %l_on;
                          %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
                 %end;
             </fieldset>
-            %if;(evar.opt = "")
+            %if;(evar.tl1 = "")
               %if;(evar.t = "L" or evar.t = "M" or evar.t = "F")
                 <fieldset>
                   <legend>
-                    <label><input type="radio" name="t" value="L" 
+                    <label><input type="radio" name="t" value="L" %l_on;
                             %if;(evar.t = "L") checked="checked"%end;%/>[*long display]0</label>
                   </legend>
-                  <label><input type="radio" name="t" value="M" 
+                  <label><input type="radio" name="t" value="M" %l_on;
                           %if;(evar.t = "M") checked="checked"%end;%/>[male line/female line]0</label>
-                  <label><input type="radio" name="t" value="F" 
+                  <label><input type="radio" name="t" value="F" %l_on;
                           %if;(evar.t = "F") checked="checked"%end;%/>[male line/female line]1</label>
-                  <label><input type="checkbox" name="always_surname" value="no" 
+                  <label><input type="checkbox" name="always_surname" value="no" %l_on;
                           %if;(evar.always_surname = "no") checked="checked"%end;%/>[first name/first names]0
                           <span style="text-decoration:line-through;"> [surname/surnames]0</span></label>
-                  <label><input type="checkbox" name="sd" value="on" 
+                  <label><input type="checkbox" name="sd" value="on" %l_on;
                          %if;(evar.sd = "on") checked="checked"%end;%/>[date/dates]0 : 
                          %if;([ !dates order]0 = "ddmmyyyy")[year/month/day]2/[year/month/day]1/[year/month/day]0
                          %elseif;([ !dates order]0 = "mmddyyyy")[year/month/day]1/[year/month/day]2/[year/month/day]0
                          %else;[year/month/day]0/[year/month/day]1/[year/month/day]2
                          %end;
                   </label>
-                  <label><input type="checkbox" name="alias" value="on" 
+                  <label><input type="checkbox" name="alias" value="on" %l_on;
                          %if;(evar.alias = "on") checked="checked"%end;%/>[surname alias], [first name alias]</label>
-                  <label><input type="checkbox" name="spouse" value="on" 
+                  <label><input type="checkbox" name="spouse" value="on" %l_on;
                          %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
-                  <label><input type="checkbox" name="parents" value="on" 
+                  <label><input type="checkbox" name="parents" value="on" %l_on;
                          %if;(evar.parents = "on") checked="checked"%end;%/>[parents]</label>
-                  <label><input type="checkbox" name="rel" value="on"
+                  <label><input type="checkbox" name="rel" value="on" %l_on;
                          %if;(evar.rel = "on") checked="checked"%end;%/>[relation/relations]1</label>
-                  <label><input type="checkbox" name="notes" value="on"
+                  <label><input type="checkbox" name="notes" value="on" %l_on;
                          %if;(evar.notes = "on") checked="checked"%end;%/>[note/notes]1</label>
-                  <label><input type="checkbox" name="src" value="on"
+                  <label><input type="checkbox" name="src" value="on" %l_on;
                          %if;(evar.src = "on") checked="checked"%end;%/>[source/sources]1</label>
-                  <label><input type="checkbox" name="inline" value="on"
+                  <label><input type="checkbox" name="inline" value="on" %l_on;
                          %if;(evar.inline = "on") checked="checked"%end;%/>[display notes/sources inline]</label>
                 </fieldset>
               %end;
@@ -1128,14 +1129,14 @@
               <input type="hidden" name="t" value="L"%/>
               <fieldset>
                 <legend>[*statistics]</legend>
-                <label><input type="radio" name="opt" value="bmdm"
-                        %if;(evar.opt = "bmdm") checked="checked"%end;%/>[calendar/calendars]0</label>
-                <label><input type="radio" name="opt" value="stat1"
-                        %if;(evar.opt = "stat1") checked="checked"%end;%/>[moon age/new moon/first quarter/full moon/last quarter]0</label>
-                <label><input type="radio" name="opt" value="afm"
-                        %if;(evar.opt = "afm") checked="checked"%end;%/>[age] ([father/mother]0, [father/mother]1)</label>
-                <label><input type="radio" name="opt" value="aad"
-                        %if;(evar.opt = "aad") checked="checked"%end;%/>[age at death]</label>
+                <label><input type="radio" name="tl1" value="bmdm" %l_on;
+                        %if;(evar.tl1 = "bmdm") checked="checked"%end;%/>[calendar/calendars]0</label>
+                <label><input type="radio" name="tl1" value="stat1" %l_on;
+                        %if;(evar.tl1 = "stat1") checked="checked"%end;%/>[moon age/new moon/first quarter/full moon/last quarter]0</label>
+                <label><input type="radio" name="tl1" value="afm" %l_on;
+                        %if;(evar.tl1 = "afm") checked="checked"%end;%/>[age] ([father/mother]0, [father/mother]1)</label>
+                <label><input type="radio" name="tl1" value="aad" %l_on;
+                        %if;(evar.tl1 = "aad") checked="checked"%end;%/>[age at death]</label>
               </fieldset>
             %end;
           <fieldset><legend>[*generation/generations]0</legend>
@@ -1146,7 +1147,7 @@
             <input type="hidden" name="maxv" value="%evar.maxv;"%/>
             %for;i;1;l_maxv;
               <label>%i;<br%/>
-                <input type="radio" name="v" value="%i;"%if;(l_v = i) checked="checked"%end;%/>
+                <input type="radio" name="v" value="%i;" %if;(l_v = i) checked="checked"%end; %l_on;%/>
               </label>
             %end;
           </div>
@@ -1156,14 +1157,11 @@
           </div>
         </form>
       %end;
-      %if;has_referer;
-        <a href="%referer;" title="[back]">&lt;&lt;</a>
-      %end;
-        <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
     </div>
   %end;
-  %if;(evar.m = "D" and evar.t = "L" and evar.opt = "aad")
-    %( age_at_death by generation opt = aad %)
+  %if;(evar.m = "D" and evar.t = "L" and evar.tl1 = "aad")
+    %( age_at_death by generation tl1 = aad %)
     <p>%apply;togen(l_v)</p>
     %reset_count;
     %reset_desc_level;
@@ -1195,8 +1193,8 @@
       %apply;desc_aad1(0,0,l_v)
       %apply;stat_age2()
     </div>
-  %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "afm")
-    %( age father mother by generation opt = afm %)
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "afm")
+    %( age father mother by generation tl1 = afm %)
     <p>%apply;togen(l_v)</p>
     %reset_count;
     %reset_desc_level;
@@ -1227,8 +1225,8 @@
       %apply;desc_afm1(0,0,l_v)
       %apply;stat_age2()
     </div>
-  %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "bmdm")
-    %( birth month death month opt = bmdm %)
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "bmdm")
+    %( birth month death month tl1 = bmdm %)
     <table class="stat_bmdm">
       <tr><td colspan="2">
         <p>%apply;togen(l_v)</p>
@@ -1242,8 +1240,8 @@
         %apply;stat_calendar()
       </td></tr>
     </table>
-  %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "stat1")
-    %( opt = stat1 %)
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "stat1")
+    %( tl1 = stat1 %)
     %let;max_width;180%in;
     <p>%apply;togen(l_v)</p>
     <table class="stat1">
@@ -1253,7 +1251,7 @@
         %apply;dstat1("death")
       </td></tr>
     </table>
-  %elseif;(evar.m = "D" and evar.t = "L" and evar.opt = "ars")
+  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "ars")
     %( ars table day month generation %)
     %( rlm link 2     %) %let;rlm2;i2=%index;;t2=0%in;
     %( rlm link 3     %) %let;rlm3;%if;(browsing_with_sosa_ref)i3=%sosa_ref.index;;t3=sosa_1%end;%in;

@@ -100,18 +100,9 @@
 <div id="nx_a" style="display:none">a</div>
 
 %if;not cancel_links;
-  <table style="float:%right;">
-    <tr><td>
-      %if;(referer != "")
-        <a href="%referer;">
-          <img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
-        </a>
-      %end;
-      <a href="%prefix;">
-        <img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="^^"%/>
-      </a>
-    </td></tr>
-  </table>
+  <div class="menu2">
+    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
 %end;
 
 <h1>%title;</h1>

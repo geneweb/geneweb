@@ -3,17 +3,17 @@
 <head>
   <!-- $Id: anclist.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130607 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130614 templ=templm -->
   %let;l_v0;%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
   <title>%nn;
     %first_name; %surname;
-    %if;(evar.t = "E" and evar.opt = "csv") - CSV - 
-    %elseif;(evar.t = "E" and evar.opt = "fam") - [*family/families]0 - 
-    %elseif;(evar.t = "E" and evar.opt = "place") - [*list eclair]0 - [places] 
-    %elseif;(evar.t = "E" and evar.opt = "surn") - [*list eclair]0 - [surname/surnames]1 / [places] 
-    %elseif;(evar.t = "E" and evar.opt = "aad") - [*age at death] ([M/F]0, [M/F]1) 
-    %elseif;(evar.t = "E" and evar.opt = "afm") - [*age] ([father/mother]0, [father/mother]1) 
+    %if;(evar.t = "E" and evar.te1 = "csv") - CSV - 
+    %elseif;(evar.t = "E" and evar.te1 = "fam") - [*family/families]0 - 
+    %elseif;(evar.t = "E" and evar.te1 = "place") - [*list eclair]0 - [places] 
+    %elseif;(evar.t = "E" and evar.te1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [places] 
+    %elseif;(evar.t = "E" and evar.te1 = "aad") - [*age at death] ([M/F]0, [M/F]1) 
+    %elseif;(evar.t = "E" and evar.te1 = "afm") - [*age] ([father/mother]0, [father/mother]1) 
     %elseif;(evar.t = "F") - [*surnames branch] - 
     %else; - [*ancestors] - 
     %end;
@@ -644,7 +644,7 @@
     %end;
   %end;
   <div class="stat_calendar bcbg1">
-    <a class="title" style="color:#EEEEEE;" href="%prefix;m=A;t=E;opt=ars;i=%index;;v=%l_v;;only=%evar.only;"
+    <a class="title" style="color:#EEEEEE;" href="%prefix;m=A;t=E;te1=ars;i=%index;;v=%l_v;;only=%evar.only;"
          title="Ars">[*calendar/calendars]0</a>
     <div class="row">
       %for;i;1;32;
@@ -685,7 +685,7 @@
   </div>
 %end;
 
-%define;option_ars(xx)
+%define;te1_ars(xx)
   <option value="evar.none"
         %if;("xx"="evar.none")selected="selected"%end;>-</option>
   <option value="ancestor.first_name"
@@ -784,7 +784,7 @@
       %hidden;
       <input type="hidden" name="m" value="A"%/>
       <input type="hidden" name="t" value="E"%/>
-      <input type="hidden" name="opt" value="ars"%/>
+      <input type="hidden" name="te1" value="ars"%/>
       %if;access_by_key;
         <input type="hidden" name="p" value="%first_name_key_val;"%/>
         <input type="hidden" name="n" value="%surname_key_val;"%/>
@@ -822,13 +822,13 @@
         <td>
           <label>[text]<input name="mbt" value="m_bt"%/></label>
           <select name="mbf">
-            %apply;option_ars(mbf)
+            %apply;te1_ars(mbf)
           </select>
         </td>
         <th class="bcbg1">[birth]</th>
         <td><label>[text]<input name="fbt" value="f_bt"%/></label>
           <select name="fbf">
-            %apply;option_ars(fbf)
+            %apply;te1_ars(fbf)
           </select>
         </td>
       </tr><tr>
@@ -836,13 +836,13 @@
         <td>
           <label> [text]<input name="mdt" value="m_dt"%/></label>
           <select name="mdf">
-            %apply;option_ars(mdf)
+            %apply;te1_ars(mdf)
           </select>
         </td>
         <th class="bcbg1">[death]</th>
         <td><label>[text]<input name="fdt" value="f_dt"%/></label>
           <select name="fdf">
-            %apply;option_ars(fdf)
+            %apply;te1_ars(fdf)
           </select>
         </td>
       </tr></table>
@@ -1014,7 +1014,7 @@
 %message_to_wizard;
 
 <h1>%nn;
-  %if;(evar.opt != "csv")
+  %if;(evar.te1 != "csv")
     %apply;a_of_b%with;
       [*ancestors]
     %and;
@@ -1027,18 +1027,19 @@
     %end;
       %sp;%dates;<br%/>
   %end;
-  %if;(evar.t = "E" and evar.opt = "csv")
-    %elseif;(evar.t = "E" and evar.opt = "fam") - [*family/families]0 - 
-    %elseif;(evar.t = "E" and evar.opt = "place") - [*list eclair]0 - [places] 
-    %elseif;(evar.t = "E" and evar.opt = "surn") - [*list eclair]0 - [surname/surnames]1 / [places] 
+  %if;(evar.t = "E" and evar.te1 = "csv")
+    %elseif;(evar.t = "E" and evar.te1 = "fam") - [*family/families]0 - 
+    %elseif;(evar.t = "E" and evar.te1 = "place") - [*list eclair]0 - [places] 
+    %elseif;(evar.t = "E" and evar.te1 = "surn") - [*list eclair]0 - [surname/surnames]1 / [places] 
     %elseif;(evar.t = "F") - [*surnames branch] - 
     %else;
   %end;
 </h1>
-%if;(cancel_links or evar.opt = "csv")
+%if;(cancel_links or evar.te1 = "csv")
 %else;
   <div class="menu2">
-    <form id="tools" style="display:inline" method="get" action="%action;">
+    %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
+    <form id="tools" name="tools" style="display:inline" method="get" action="%action;">
       %hidden;
       <input type="hidden" name="m" value="A"%/>
       %if;(evar.p != "" or evar.n != "" or evar.oc != "")
@@ -1050,52 +1051,52 @@
         <input type="hidden" name="i" value="%evar.i;"%/>
       %end;
       <input type="hidden" name="t" value="%evar.t;"%/>
+      %if;(evar.lang != "")<input type="hidden" name="lang" value="%evar.lang;" %/>%end;
       <div><a href="#">[*tools]</a>
       <div class="s_menu">
         <fieldset>
-          <label><input type="checkbox" name="cgl" value="on"
+          <label><input type="checkbox" name="cgl" value="on" %l_on;
                  %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
-          %if;(evar.opt = "fam")
-            <input type="hidden" name="opt" value="fam"%/>
-            <label><input type="checkbox" name="cousins" value="on"
+          %if;(evar.te1 = "fam")
+            <input type="hidden" name="te1" value="fam"%/>
+            <label><input type="checkbox" name="cousins" value="on" %l_on;
                    %if;(evar.cousins = "on") checked="checked"%end;%/>[cousins]</label>
           %end;
         </fieldset>
-        %if;(evar.opt != "" and evar.opt != "fam")
-          <input type="hidden" name="t" value="E"%/>
+        %if;(evar.te1 != "" and evar.te1 != "fam")
           <fieldset>
-            <label><input type="radio" name="opt" value="place"
-                    %if;(evar.opt = "place") checked="checked"%end;%/>[list eclair]0 - [places]</label>
-            <label><input type="radio" name="opt" value="surn"
-                    %if;(evar.opt = "surn") checked="checked"%end;%/>[list eclair]0 - [surname/surnames]1 / [places]</label>
+            <label><input type="radio" name="te1" value="place" %l_on;
+                    %if;(evar.te1 = "place") checked="checked"%end;%/>[list eclair]0 - [places]</label>
+            <label><input type="radio" name="te1" value="surn" %l_on;
+                    %if;(evar.te1 = "surn") checked="checked"%end;%/>[list eclair]0 - [surname/surnames]1 / [places]</label>
           </fieldset>
           <fieldset>
             <legend>[*statistics]</legend>
-            <label><input type="radio" name="opt" value="bmdm"
-                    %if;(evar.opt = "bmdm") checked="checked"%end;%/>[calendar/calendars]0</label>
-            <label><input type="radio" name="opt" value="stat1"
-                    %if;(evar.opt = "stat1") checked="checked"%end;%/>[moon age/new moon/first quarter/full moon/last quarter]0</label>
-            <label><input type="radio" name="opt" value="afm"
-                    %if;(evar.opt = "afm") checked="checked"%end;%/>[age] ([father/mother]0, [father/mother]1)</label>
-            <label><input type="radio" name="opt" value="aad"
-                    %if;(evar.opt = "aad") checked="checked"%end;%/>[age at death]</label>
+            <label><input type="radio" name="te1" value="bmdm" %l_on;
+                    %if;(evar.te1 = "bmdm") checked="checked"%end;%/>[calendar/calendars]0</label>
+            <label><input type="radio" name="te1" value="stat1" %l_on;
+                    %if;(evar.te1 = "stat1") checked="checked"%end;%/>[moon age/new moon/first quarter/full moon/last quarter]0</label>
+            <label><input type="radio" name="te1" value="afm" %l_on;
+                    %if;(evar.te1 = "afm") checked="checked"%end;%/>[age] ([father/mother]0, [father/mother]1)</label>
+            <label><input type="radio" name="te1" value="aad" %l_on;
+                    %if;(evar.te1 = "aad") checked="checked"%end;%/>[age at death]</label>
           </fieldset>
         %end;
         <fieldset><legend>[*generation/generations]0</legend>
         <div class="v">
           %let;l_bmaxv;%if;(bvar.max_anc_level = "")%evar.maxv;%else;%bvar.max_anc_level;%end;%in;
           %let;l_emaxv;%if;(evar.maxv = "")%l_bmaxv;%elseif;(evar.maxv < l_bmaxv)%evar.maxv;%else;%l_bmaxv;%end;%in;
-          %let;l_maxv;%if;(evar.opt = "fam" and l_emaxv > 4)5%else;%expr(l_emaxv + 1)%end;%in;
+          %let;l_maxv;%if;(evar.te1 = "fam" and l_emaxv > 4)5%else;%expr(l_emaxv + 1)%end;%in;
           <input type="hidden" name="maxv" value="%evar.maxv;"%/>
           %for;i;2;l_maxv;
           <label>%i;<br%/>
-            <input type="radio" name="v" value="%i;"%if;(l_v = i) checked="checked"%end;%/>
+            <input type="radio" name="v" value="%i;" %l_on;%if;(l_v = i) checked="checked"%end;%/>
           </label>
           %end;
         </div>
-        %if;(evar.opt != "fam" and evar.t != "H" and evar.t != "L")
+        %if;(evar.te1 != "fam" and evar.t != "H" and evar.t != "L")
           <label style="clear:both;">
-            <input type="checkbox" name="only" value="on"
+            <input type="checkbox" name="only" value="on" %l_on;
             %if;(evar.only = "on") checked="checked"%end;%/>[only the generation selected]</label>
         %end;
         </fieldset>
@@ -1103,13 +1104,10 @@
       </div>
       </div>
     </form>
-    %if;has_referer;
-      <a href="%referer;" title="[back]">&lt;&lt;</a>
-    %end;
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
   </div>
 %end;
-%if;(evar.t = "E" and evar.opt = "fam")
+%if;(evar.t = "E" and evar.te1 = "fam")
   %(family life dates %)
   %let;l_byear;
     %if;(birth_date.year != "" and birth_date.year > 0)
@@ -1184,7 +1182,7 @@
     </td></tr>
   </tbody>
   </table>
-%elseif;(wizard and evar.t = "E" and evar.opt = "csv")
+%elseif;(wizard and evar.t = "E" and evar.te1 = "csv")
   %( csv display full %)
   <p>
   [number]%nn;
@@ -1247,8 +1245,8 @@
     %end;
   %end;
   </p>
-%elseif;(evar.t = "E" and evar.opt = "place")
-  %( list eclair opt = place %)
+%elseif;(evar.t = "E" and evar.te1 = "place")
+  %( list eclair te1 = place %)
   %apply;gen()
   %empty_sorted_list;
   %reset_count;
@@ -1296,8 +1294,8 @@
     %end;
   %end;
   </p>
-%elseif;(evar.t = "E" and evar.opt = "surn")
-  %( list eclair opt = surn %)
+%elseif;(evar.t = "E" and evar.te1 = "surn")
+  %( list eclair te1 = surn %)
   %apply;gen()
   %empty_sorted_list;
   %reset_count;
@@ -1365,8 +1363,8 @@
     %end;
   %end;
   </p>
-%elseif;(evar.t = "E" and evar.opt = "stat1")
-  %( opt = stat1 %)
+%elseif;(evar.t = "E" and evar.te1 = "stat1")
+  %( te1 = stat1 %)
   %let;max_width;180%in;
   %apply;gen()
   <table class="stat1">
@@ -1376,8 +1374,8 @@
       %apply;stat1("death")
     </td></tr>
   </table>
-%elseif;(evar.t = "E" and evar.opt = "aad")
-  %( age_at_death by generation opt = aad %)
+%elseif;(evar.t = "E" and evar.te1 = "aad")
+  %( age_at_death by generation te1 = aad %)
   %apply;gen()
   %reset_count;
   %empty_sorted_list;
@@ -1435,8 +1433,8 @@
       %end;
     %end;
   </div>
-%elseif;(evar.t = "E" and evar.opt = "afm")
-  %( age father mother by generation opt = afm %)
+%elseif;(evar.t = "E" and evar.te1 = "afm")
+  %( age father mother by generation te1 = afm %)
   %apply;gen()
   %reset_count;
   %empty_sorted_list;
@@ -1506,8 +1504,8 @@
       %end;
     %end;
   </div>
-%elseif;(evar.t = "E" and evar.opt = "bmdm")
-  %( birth month death month opt = bmdm %)
+%elseif;(evar.t = "E" and evar.te1 = "bmdm")
+  %( birth month death month te1 = bmdm %)
     <table class="stat_bmdm">
       <tr><td colspan="2">
         %apply;gen()
@@ -1521,7 +1519,7 @@
         %apply;stat_calendar()
       </td></tr>
     </table>
-%elseif;(evar.t ="E" and evar.opt = "ars")
+%elseif;(evar.t ="E" and evar.te1 = "ars")
   %( ars table day month generation %)
   %( rlm link 2     %) %let;rlm2;i2=%index;;t2=0%in;
   %( rlm link 3     %) %let;rlm3;%if;(browsing_with_sosa_ref)i3=%sosa_ref.index;;t3=sosa_1%end;%in;
@@ -1545,18 +1543,20 @@
   %(female death field%) %let;fdf;%if;(evar.fdf != "")%evar.fdf;%else;ancestor.dates%end;%in;
   %apply;ars(mbt,mbf,mdt,mdf,fbt,fbf,fdt,fdf)
 %elseif;(evar.t = "E")
-  %( list opt = ? %)
+  %( list te1 = ? %)
+  %let;l_url;%prefix;m=A;t=E;i=%index;;v=%l_v;;only=%evar.only;;maxv=%evar.maxv;%in;
   <ul>
-    %if;(wizard)<li><a href="%prefix;m=A;t=E;opt=csv;i=%index;;v=%l_v;;only=%evar.only;;cousins=%evar.cousins;">CSV</a></li>%end;
-    <li><a href="%prefix;m=A;t=E;opt=fam;i=%index;;v=%l_v;;only=%evar.only;;cousins=%evar.cousins;">[*family/families]0</a></li>
-    <li><a href="%prefix;m=A;t=E;opt=place;i=%index;;v=%l_v;;only=%evar.only;">[*list eclair]0 - [places]</a></li>
-    <li><a href="%prefix;m=A;t=E;opt=surn;i=%index;;v=%l_v;;only=%evar.only;">[*list eclair]0 - [surname/surnames]1 / [places]</a></li>
-    <li><a href="%prefix;m=A;t=E;opt=aad;i=%index;;v=%l_v;;only=%evar.only;">
-        [*age at death] ([M/F]0, [M/F]1)</a></li>
-    <li><a href="%prefix;m=A;t=E;opt=afm;i=%index;;v=%l_v;;only=%evar.only;">
-        [*age] ([father/mother]0, [father/mother]1)</a></li>
-    <li><a href="%prefix;m=A;t=E;opt=bmdm;i=%index;;v=%l_v;;only=%evar.only;">
-        [*birth], [death] ([M/F]0, [M/F]1) / [year/month/day]1</a></li>
+    %if;(wizard)
+      <li><a href="%l_url;;te1=csv;;cousins=%evar.cousins;"
+          >CSV</a></li>
+    %end;
+    <li><a href="%l_url;;te1=fam;;cousins=%evar.cousins;">[*family/families]0</a></li>
+    <li><a href="%l_url;;te1=place;">[*list eclair]0 - [places]</a></li>
+    <li><a href="%l_url;;te1=surn;">[*list eclair]0 - [surname/surnames]1 / [places]</a></li>
+    <li><a href="%l_url;;te1=bmdm;">[*calendar/calendars]0</a></li>
+    <li><a href="%l_url;;te1=stat1;">[*moon age/new moon/first quarter/full moon/last quarter]0</a></li>
+    <li><a href="%l_url;;te1=afm;">[*age] ([father/mother]0, [father/mother]1)</a></li>
+    <li><a href="%l_url;;te1=aad;">[*age at death] ([M/F]0, [M/F]1)</a></li>
   </ul>
 %elseif;(evar.t = "L")
   %( by list %)
@@ -1583,7 +1583,7 @@
   %end;
   </ul>
 %end;
-%if;(evar.opt != "csv")
+%if;(evar.te1 != "csv")
   %base_trailer;
   %copyright;
 %end;

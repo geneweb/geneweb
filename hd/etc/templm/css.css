@@ -91,7 +91,7 @@ hr.left{margin-left:0;margin-right:50%;}
 hr.right{margin-left:50%;margin-right:0;}
 hr.full{margin-left:0;margin-right:0;}
 /* perso.txt */
-#perso{margin:0;padding-top:2em;padding-right:2px;padding-bottom:2em;padding-left:2px;}
+#perso,#dag,#anctree{margin:0;padding-top:2em;padding-right:2px;padding-bottom:2em;padding-left:2px;}
 #perso h1,#perso h3{margin:5px;padding:5px;}
 #perso h1{font-size:150%;}
 #perso h3{font-size:120%;}
