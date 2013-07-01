@@ -1,4 +1,4 @@
-/* js.js mickroue(a)yahoo.fr 20130618 templ=templm */
+/* js.js mickroue(a)yahoo.fr 20130624 templ=templm */
 
   function adv(z1,z2)
   {
@@ -153,5 +153,6 @@
   }
   function valid(id)
   {
+    document.getElementById(id).focus();
     document.getElementById(id).checked = true;
   }

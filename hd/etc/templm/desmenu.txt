@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130614 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130624 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -67,12 +67,20 @@
     <input type="hidden" name="maxv" value="%max_desc_level;"%/>
   </p>
   <fieldset>
+    %let;l_mdl0;
+      %if;(bvar.max_desc_level = "" and max_desc_level > 12)
+        12%nn;
+      %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
+        %bvar.max_desc_level;%nn;
+      %end;
+    %in;
+    %let;l_mdl1;%if;(l_mdl0 != "")([maximum] %l_mdl0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="Ok"%/></legend>
-    <label>[*specify::generation/generations]0 :<br%/>
+    <label>[*specify::generation/generations]0 %l_mdl1; :<br%/>
       <select style="text-align:center" name="v" size="%max_desc_level;">
         %foreach;descendant_level;
           %if;(level != 0)
-            <option value="%level;"
+            <option value="%level;" %if;(level > l_mdl0)disabled style="color:#AAAAAA;background-color:#DDDDDD;"%end;
               %if;(level = 3) selected="selected"%end;>
               %if;(level = 1)[*to the children]
               %elseif;(level = 2)[*to the grandchildren]
@@ -104,13 +112,6 @@
       <label><input type="radio" id="tL" name="t" value="L" checked="checked" %l_on;
              %/>[*long display]0</label>
     </legend>
-    %if;(bvar.max_desc_level = "" and max_desc_level > 12)
-      ([maximum] 12 [generation/generations]1)
-    %elseif;(
-      bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level
-      )
-      ([maximum] %bvar.max_desc_level; [generation/generations]1)
-    %end;
     <label><input type="radio" name="t" value="M" %l_on;
            %/>[male line/female line]0</label><br%/>
     <label><input type="radio" name="t" value="F" %l_on;
@@ -148,9 +149,7 @@
         [*tree]
         %if;(bvar.max_desc_tree = "" and max_desc_level >= 4)
           ([maximum] 4 [generation/generations]1)
-        %elseif;(
-          bvar.max_desc_tree != "" and max_desc_level >= bvar.max_desc_tree
-        )
+        %elseif;(bvar.max_desc_tree != "" and max_desc_level >= bvar.max_desc_tree)
           ([maximum] %bvar.max_desc_tree; [generation/generations]1)
         %end;
       </label>

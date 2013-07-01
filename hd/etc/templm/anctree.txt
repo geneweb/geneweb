@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: anctree.txt,v 5.8 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130615 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130624 templ=templm -->
   %let;l_v0;%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_anc_tree = "")%l_v0;%elseif;(bvar.max_anc_tree > l_v0)%l_v0;%else;%bvar.max_anc_tree;%end;%in;
   <title>%nn;
@@ -185,7 +185,7 @@
       <div><a href="#">[*tools]</a>
       <div class="s_menu">
         %if;(evar.t = "T")
-          <a href="%prefix;m=A;t=T;v=%l_v;;maxv=%evar.maxv;;%access;;dag=on;notab=on" accesskey="/" 
+          <a href="%prefix;m=A;t=T;v=%l_v;;%access;;dag=on;notab=on" accesskey="/" 
              title="[display by slices/slice width/overlap/total width]0 (/)"
              >[*display by slices/slice width/overlap/total width]0</a>
         %end;
@@ -227,13 +227,12 @@
         </fieldset>
         <fieldset><legend>[*generation/generations]0</legend>
           <div class="v">
-            %let;l_bmaxv;%if;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;%in;
-            %let;l_emaxv;%if;(evar.maxv = "")%l_bmaxv;%elseif;(evar.maxv < l_bmaxv)%evar.maxv;%else;%l_bmaxv;%end;%in;
+            %let;l_emaxv;%if;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;%in;
             %let;l_maxv;%expr(l_emaxv + 1)%in;
-            <input type="hidden" name="maxv" value="%evar.maxv;"%/>
             %for;i;2;l_maxv;
-              <label>%i;<br%/><input type="radio" name="v" value="%i;" %l_on;
-                              %if;(l_v = i) checked="checked"%end;%/></label>
+              <label>%i;<br%/>
+                <input type="radio" name="v" value="%i;" %l_on;%if;(l_v = i) checked="checked"%end;%/>
+              </label>
             %end;
           </div>
         </fieldset>

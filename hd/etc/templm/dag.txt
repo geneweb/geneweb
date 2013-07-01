@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130615 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130624 templ=templm -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
@@ -103,14 +103,13 @@
         %if;(evar.t = "T")
           <fieldset><legend>[*generation/generations]0</legend>
             <div class="v">
-              %let;l_bmaxv;
+              %let;l_emaxv;
                 %if;(evar.m = "A")
                   %if;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;
                 %else;
                   %if;(bvar.max_desc_tree = "")4%else;%bvar.max_desc_tree;%end;
                 %end;
               %in;
-              %let;l_emaxv;%if;(evar.maxv = "")%l_bmaxv;%elseif;(evar.maxv < l_bmaxv)%evar.maxv;%else;%l_bmaxv;%end;%in;
               %let;l_maxv;%expr(l_emaxv + 1)%in;
               %let;l_minv;%if;(evar.m = "D")1%else;2%end;%in;
               %for;i;l_minv;l_maxv;
@@ -162,10 +161,16 @@
   </form>
 %else;
   %if;(not cancel_links and evar.notab != "on")
+    %let;l_o;image=%evar.image;;bd=%evar.bd;;color=%evar.color;%in;
     <div class="menu">
       %if;(link_next != "")
         <span>
-          <a href="%link_next;;image=%evar.image;;bd=%evar.bd;" title="[next relationship path] (&gt;)" accesskey=">">[next relationship path] &gt;&gt;</a>
+          <a href="%link_next;;%l_o;" title="[next relationship path] (&gt;)" accesskey=">">[next relationship path] &gt;&gt;</a>
+          %if;(evar.i != "")
+            %let;l_i;ei=%evar.i;;i=%evar.ei;%in;
+            <a href="%prefix;em=R;et=A;spouse=on;%l_i;;%l_o;">[*relationship link/relationship links]1</a>
+            <a href="%prefix;em=R;et=M;spouse=on;%l_i;;%l_o;">[*relationship by marriage]</a>
+          %end;
         </span>
       %end;
       %if;(evar.t = "T")
@@ -190,6 +195,14 @@
                 %end;">[*tree] &uarr;&uarr;&uarr;</a>
           </span>
         %end;
+      %end;
+      %if;(evar.m = "RLM" and evar.i6 = "" and evar.t1 != "1")
+        <span>
+          %let;l_i;i=%evar.i1;;ei=%evar.i2;%in;
+          <a href="%prefix;em=R;et=S;spouse=on;%l_i;;%l_o;">[*shortest path]</a>
+          <a href="%prefix;em=R;et=A;spouse=on;%l_i;;%l_o;">[*relationship link/relationship links]1</a>
+          <a href="%prefix;em=R;et=M;spouse=on;%l_i;;%l_o;">[*relationship by marriage]</a>
+        </span>
       %end;
     </div>
   %end;

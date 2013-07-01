@@ -1,4 +1,4 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 20130515 templ=templm -->
+<!-- trl.txt Modified mickroue(a)yahoo.fr 20130701 templ=templm -->
 
 %if;(not cancel_links)
   <div id="trl">
@@ -7,18 +7,18 @@
         %hidden;
         <input id="TmNG" type="hidden" name="m" value="NG"%/>
         <label><input id="TtPN" type="radio" name="t" value="PN" checked="checked"
-                      onclick="TchangeTri('hidden')"
+                      onclick="TchangeTri('hidden');this.focus()"
                 %/><abbr title="[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa…">[person/persons]0</abbr></label>
         <label><input id="TtP" type="radio" name="t" value="P" 
-                      onclick="TchangeTri('visible')"%/>[first name/first names]0</label>
+                      onclick="TchangeTri('visible');this.focus()"%/>[first name/first names]0</label>
         <label><input id="TtN" type="radio" name="t" value="N" 
-                      onclick="TchangeTri('visible')"%/>[surname/surnames]0</label>
+                      onclick="TchangeTri('visible');this.focus()"%/>[surname/surnames]0</label>
         <label id="TlabelTriA" style="visibility:hidden;">
                <input id="TtriA" type="checkbox" name="tri" value="A"
-                      onclick="TchangeTri('visible')"%/>[starting with]</label>
+                      onclick="TchangeTri('visible');this.focus()"%/>[starting with]</label>
         <br%/><input id="Tn" name="n" size="54" maxlength="200"
                      title="[*search/case sensitive]0 (²)" accesskey="²"
-                     onkeypress="javascript:return computeSosa(event,'Tn')"%/>
+                     onclick="this.focus()" onkeypress="javascript:return computeSosa(event,'Tn')"%/>
         <input type="submit" value="[*search/case sensitive]0 (²)"%/>
         %if;(bvar.hide_advanced_request = "no")
           <span class="button"><a href="%prefix;m=H;v=advanced">[*advanced request]</a></span>
@@ -38,7 +38,10 @@
       <a href="%prefix_no_templ;templ=templm;%suffix;">templm</a>
       <a href="%prefix_no_templ;templ=templ502;%suffix;">templ502</a>
     </div>
-  %end;
+    <div class="button" style="margin-top:-1.3em;margin-left:2px;">
+      <a href="http://opensource.geneanet.org/projects/geneweb/wiki/Fr_templm">Doc templm</a>
+    </div>
+   %end;
   %if;(wizard)
     <script type="text/javascript">
     <!--

@@ -1,11 +1,13 @@
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%in;
+%let;l_on1;onclick="this.focus()"%in;
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: updfam.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130428 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130627 templ=templm -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -279,19 +281,19 @@
 
   %define;type_sex(beg,xcnt,xx)
     <label class="background_sex_0" title="[M/F]0">
-      <input id="begxcnt_sex_0" type="radio" name="begxcnt_sex" onclick="male('begxcnt')" value="M"%nn;
+      <input id="begxcnt_sex_0" type="radio" name="begxcnt_sex" onclick="male('begxcnt');this.focus()" value="M"%nn;
       %if;(xx.create.sex = "male") checked="checked"%end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();%nn;
                  if (event.keyCode == 32) javascript:valid('begxcnt_sex_2'), no_sex('begxcnt');"%sp;
       onkeypress="javascript:return changeFocus(event,'begxcntb_yyyy');"%/></label>
     <label  class="background_sex_2" title="[sex] ?">
-      <input id="begxcnt_sex_2" type="radio" name="begxcnt_sex" onclick="no_sex('begxcnt')" value="N"%nn;
+      <input id="begxcnt_sex_2" type="radio" name="begxcnt_sex" onclick="no_sex('begxcnt');this.focus()" value="N"%nn;
       %if;(xx.create.sex = "neuter") checked="checked"%end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();%nn;
                  if (event.keyCode == 32) valid('begxcnt_sex_1'), female('begxcnt');"%sp;
       onkeypress="javascript:return changeFocus(event,'begxcntb_yyyy');"%/></label>
     <label class="background_sex_1" title="[M/F]1">
-      <input id="begxcnt_sex_1" type="radio" name="begxcnt_sex" onclick="female('begxcnt')" value="F"%nn;
+      <input id="begxcnt_sex_1" type="radio" name="begxcnt_sex" onclick="female('begxcnt');this.focus()" value="F"%nn;
       %if;(xx.create.sex = "female") checked="checked"%end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();%nn;
                  if (event.keyCode == 32) javascript:valid('begxcnt_sex_0'), male('begxcnt');"%sp;
@@ -300,8 +302,7 @@
   
   %define;insert_parent(xcnt)
     <label title="[insert::parents]">
-      <input type="checkbox" name="ins_paxcnt" value="on"%sp;
-      onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
+      <input type="checkbox" name="ins_paxcnt" value="on" %l_on;%/>
     </label>
     <label title="[insert] 2  .9 [parents]"><input name="ins_paxcnt_n" class="number" autocomplete="off" size="1" maxlength="1"%sp;value=""%/></label>
   %end;
@@ -310,15 +311,12 @@
     <label class="addrow" %if;("xcnt"="0")%sp;title="[insert::witness/witnesses]0 (3)"%sp;accesskey="3"%sp;%end;>%nn;
       <input type="checkbox" id="ins_witnxcnt" name="ins_witnxcnt" value="on"%sp;
       title="[insert::witness/witnesses]0"%sp;
-      onkeydown="return addRow(event,'ins_witnxcnt')"%/>%nn;
-    </label>
+      %l_on1; onkeydown="return addRow(event,'ins_witnxcnt')"%/></label>
   %end;
   
   %define;invert_children(xcnt)
       <label class="nobr" title="[invert] xcnt &lt;-&gt; %expr(xcnt-1)">^%nn;
-        <input type="checkbox" name="inv_chxcnt" value="on"%nl;
-        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
-      </label>
+        <input type="checkbox" name="inv_chxcnt" value="on" %l_on;%/></label>
   %end;
   
   %define;hide(xx)
@@ -334,12 +332,12 @@
     <td>
       <input id="begxcnt_p_link" title="[link]" type="radio" name="begxcnt_p" value="link"%sp;
         %if;(xx.create = "link") checked="checked"%end;%sp;
-        onclick="linkCreateVisible('beg','xcnt','hidden')"%sp;
+        onclick="linkCreateVisible('beg','xcnt','hidden');this.focus()"%sp;
         onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
                    if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','visible'), valid('begxcnt_p_create');"%/>%nn;
       <input id="begxcnt_p_create" title="[create]" type="radio" name="begxcnt_p" value="create"%sp;
         %if;(xx.create = "create") checked="checked"%end;%sp;
-        onclick="linkCreateVisible('beg','xcnt','visible')"%sp;
+        onclick="linkCreateVisible('beg','xcnt','visible');this.focus()"%sp;
         onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
                    if (event.keyCode == 32) javascript:linkCreateVisible('beg','xcnt','hidden'), valid('begxcnt_p_link');"%/>
     </td><td>
@@ -479,10 +477,8 @@
     <dl>
       <dt>[*source/sources]1
         <label title="[source/sources]0 : [family/families]0 = [person/persons]1 ([create])">
-          <input type="checkbox" name="rdsrc" value="on"%sp;
-          %if;(evar_rdsrc = "on") checked="checked"%end;%nl;
-          onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>
-        </label>
+          <input type="checkbox" name="rdsrc" value="on" %l_on;
+          %if;(evar_rdsrc = "on") checked="checked"%end;%/></label>
       </dt>
       <dd>
         <label>[*family/families]0<input name="src" size="40" maxlength="300"
@@ -520,10 +516,8 @@
       </label>
       <br%/>
       <label>
-        <input type="checkbox" name="nsck" value="on"%sp;
-        %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%sp;
-        onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/> [*no sexes check]
-      </label>
+        <input type="checkbox" name="nsck" value="on" %l_on;
+        %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/> [*no sexes check]</label>
     </p>
     <p>
       <select name="div" onchange="changeDisplay('date_divorce',this,'divorced','divorced')"%sp;

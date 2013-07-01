@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130211 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130630 templ=templm -->
   <title>Geneweb - %base.name;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -13,6 +13,9 @@
   %include.css;
   %base_header;
 </head>
+
+%let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%in;
+%let;l_on1;onclick="this.focus()"%in;
 
 %define;book_of(xx)
   [*book of %s:::xx]
@@ -28,10 +31,9 @@
   %and;xx%end;
 %end;
 
-%define;link_lang(level,maxlev)
-  <a href="%prefix_base;lang=%apply;lang(level)">%apply;lang(level)</a>
-  %if;(level < maxlev)
-    %apply;link_lang(level+1,maxlev)
+%define;link_lang()
+  %for;i;1;29;
+    <a href="%prefix_base;lang=%apply;lang(i)">%apply;lang(i)</a>
   %end;
 %end;
 
@@ -49,7 +51,7 @@
 <body%body_prop; id="welcome" onload="javascript:document.getElementById('n').focus();">
 <table id="welcome_content-top">
   <tr><td align="left">
-    <small>lang= %apply;link_lang(1,28)</small>
+    <small>lang= %apply;link_lang()</small>
   </td><td align="right">
   %if;just_friend_wizard;
     <span style="color: red; font-size: bold;">
@@ -196,15 +198,15 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
           %hidden;
           <input id="mNG" type="hidden" name="m" value="NG"%/>
           <label><input id="tPN" type="radio" name="t" value="PN" checked="checked"
-                        onclick="changeTri('hidden')"
+                        onclick="changeTri('hidden');this.focus()"
                   %/><abbr title="[first name/first names]0/[surname/surnames]0, [public name], [alias], Sosa…">[person/persons]0</abbr></label>
           <label><input id="tP" type="radio" name="t" value="P" 
-                        onclick="changeTri('visible')"%/>[first name/first names]0</label>
+                        onclick="changeTri('visible');this.focus()"%/>[first name/first names]0</label>
           <label><input id="tN" type="radio" name="t" value="N" 
-                        onclick="changeTri('visible')"%/>[surname/surnames]0</label>
+                        onclick="changeTri('visible');this.focus()"%/>[surname/surnames]0</label>
           <label id="labelTriA" style="visibility:hidden;">
                  <input id="triA" type="checkbox" name="tri" value="A"
-                        onclick="changeTri('visible')"%/>[starting with]</label>
+                        onclick="changeTri('visible');this.focus()"%/>[starting with]</label>
           <br%/><input id="n" name="n" size="54" maxlength="200"
                        onkeypress="javascript:return computeSosa(event,'n')"%/>
         </td><td align="right">
@@ -219,11 +221,11 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
             %hidden;
             [*place] :
             <input type="hidden" name="m" value="PS"%/>
-            <label><input type="checkbox" name="bi" value="on" checked="checked"%/>[birth]</label>
-            <label><input type="checkbox" name="bp" value="on" checked="checked"%/>[baptism]</label>
-            <label><input type="checkbox" name="de" value="on" checked="checked"%/>[death]</label>
-            <label><input type="checkbox" name="bu" value="on" checked="checked"%/>[burial]</label>
-            <label><input type="checkbox" name="ma" value="on" checked="checked"%/>[marriage/marriages]0</label>
+            <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
+            <label><input type="checkbox" name="bp" value="on" checked="checked" %l_on1;%/>[baptism]</label>
+            <label><input type="checkbox" name="de" value="on" checked="checked" %l_on1;%/>[death]</label>
+            <label><input type="checkbox" name="bu" value="on" checked="checked" %l_on1;%/>[burial]</label>
+            <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>
           </td><td align="right">
             <input type="submit" value="Ok"%/>
           </td></tr>

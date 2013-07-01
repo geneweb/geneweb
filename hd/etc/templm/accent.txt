@@ -1,5 +1,5 @@
 <!-- $Id: accent.txt,v 5.6 2007-04-04 02:17:36 ddr Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 20130430 templ=templm -->
+<!-- Modified mickroue(a)yahoo.fr 20130627 templ=templm -->
 <!-- How to : Copy this file to bases/etc/ -->
 
 <script type="text/javascript"><!--
@@ -136,7 +136,7 @@ document.getElementsByName("notes")[0].onkeypress =
   <a onclick="return insertTags('×','','')" href="javascript:;">×</a>
   <a onclick="return insertTags('†','','')" href="javascript:;">†</a>
 </p>
-<div class="menu" style="clear:both;position:relative;">
+<div class="menu" style="clear:both;position:relative;margin-bottom:7em;">
   <span>
     <a href="#">&lt;html&gt;</a>
     <span class="s_menu">

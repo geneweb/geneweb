@@ -4,7 +4,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130619 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130626 templ=templm -->
   <title>%if;(evar.del = "on")[*delete]...[person/persons]1...[family/families]1...%else;%first_name; %surname;%end;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -520,27 +520,17 @@
       %else;
         %reset_count;
         <a href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
-        %if;has_relation_him;
-          %incr_count;
-          i%count;=%relation_him.index;;%nn;
-          t%count;=%l_rt0;;%nn;
-          %incr_count;
-          i%count;=%index;;%nn;
-          t%count;=%l_hh;;%nn;
+        %if;(has_relation_him and relation_him.has_parents);
+          %incr_count;i%count;=%relation_him.index;;t%count;=%l_rt0;;%nn;
         %end;
+        %if;(has_relation_her and relation_her.has_parents);
+          %incr_count;i%count;=%relation_her.index;;t%count;=%l_rt1;;%nn;
+        %end;
+        %incr_count;i%count;=%index;;t%count;=%l_hh;;%nn;
         %if;(browsing_with_sosa_ref)
-          %incr_count;
-          i%count;=%sosa_ref.index;;%nn;
-          t%count;=sosa_1;%nn;
+          %incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;
         %end;
-        %if;has_relation_her;
-          %incr_count;
-          i%count;=%index;;%nn;
-          t%count;=%l_hh;;%nn;
-          %incr_count;
-          i%count;=%relation_her.index;;%nn;
-          t%count;=%l_rt1;;%nn;
-        %end;
+        %incr_count;i%count;=%index;;t%count;=%l_hh;;%nn;
         " title="[shortest path]">%apply;capitalize(relation_type) :</a>%nn;
       %end;
   %end;
@@ -551,20 +541,12 @@
     %else;
       %reset_count;
       <a href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
-      %incr_count;
-      i%count;=%index;;%nn;
-      t%count;=%l_hh;;%nn;
-      %incr_count;
-      i%count;=%related.index;;%nn;
-      t%count;=%related_type;;%nn;
+      %incr_count;i%count;=%index;;%nn;
+      %incr_count;i%count;=%related.index;;t%count;=%related_type;;%nn;
       %if;(browsing_with_sosa_ref and related.index != sosa_ref.index)
-        %incr_count;
-        i%count;=%sosa_ref.index;;%nn;
-        t%count;=sosa_1;%nn;
+        %incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;
       %end;
-      %incr_count;
-      i%count;=%index;;%nn;
-      t%count;=%l_hh;;%nn;
+      %incr_count;i%count;=%index;;t%count;=%l_hh;;%nn;
       " title="[shortest path]">%apply;capitalize(related_type) :</a>%nn;
     %end;
   %end;
@@ -783,7 +765,7 @@
         %foreach;surname_alias;
           %if;(lazy_printed)/%end;
           %lazy_force;
-          %apply;advanced("surname",surname_alias)%nn;
+          %apply;link_ng("N",surname_alias)%nn;
         %end;
       %end;
     </p>
@@ -877,7 +859,7 @@
             %end;
           %end;
           %if;(has_consanguinity or count != 0)
-            ,
+            , <span class="nobr">
             %if;(cancel_links)
               [consanguinity] : %consanguinity;
             %else;
@@ -893,6 +875,7 @@
               %end;)
             %end;
           %end;
+          </span>
           <br%/>
         %end;
         %if;(has_children)
@@ -999,9 +982,8 @@
     %if;has_families;
       <div>
         <h3>[*descendants]</h3>
-        <ol>
         %foreach;family;
-          <li>
+          <div class="fam">
             %if;(wizard and not cancel_links and family_cnt != 1)
               %if;(family_cnt != 1)
                 <span class="button"><a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;
@@ -1017,9 +999,9 @@
             %end;
             %apply;content_family("self","spouse")
             %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em>%nl;%end;
-          </li>
+            %if;(evar.image = "on" and nb_families > 1)<hr style="clear:both;"%/>%end;
+          </div>
         %end;
-        </ol>
       </div>
     %else;
       %if;(wizard and not cancel_links)
@@ -1079,10 +1061,9 @@
         <span>
           <a href="%prefix;m=A;%access;">[*ancestors]</a>
           <span class="s_menu">
-            <a id="anc_tree" href="%prefix;m=A;t=T;v=4;maxv=%max_anc_level;;image=on;marriage=on;%access;"
+            <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;"
                title="[tree] (Y)" accesskey="Y">[tree]</a>%nn;
-            <a href="%prefix;m=A;t=F;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;">[surnames branch]</a>%nn;
-            <a href="%prefix;m=A;t=E;v=4;maxv=%max_anc_level;;%access;;te1=fam;cousins=on;image=%evar.image;">[family/families]0</a>%nn;
+            <a href="%prefix;m=A;t=E;te1=sb;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;">[surnames branch]</a>%nn;
             <a href="%prefix;m=A;t=Z;image=%evar.image;;v=7;maxv=%max_anc_level;;%access;">[table]</a>%nn;
             <a href="%prefix;m=A;t=G;v=4;maxv=%max_anc_level;;siblings=on;spouse=on;parents=on;alias=on;rel=on;notes=on;src=on;%access;">[long display]</a>%nn;
           </span>
@@ -1092,7 +1073,7 @@
         <span>
           <a href="%prefix;m=D;%access;">[*descendants]</a>
           <span class="s_menu">
-            <a href="%prefix;m=D;t=T;v=4;maxv=%max_desc_level;;image=on;%access"
+            <a href="%prefix;m=D;t=T;v=4;image=on;%access"
                %if;(not has_parents)title="[tree] (Y)" accesskey="Y"%end;>[tree]</a>%nn;
             <a href="%prefix;m=D;t=A;v=%max_desc_level;;maxv=%max_desc_level;;num=on;%access">d’Aboville</a>%nn;
             <a href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;alias=on;rel=on;spouse=on;parents=on;notes=on;src=on;%access;">[long display]</a>%nn;
@@ -1103,10 +1084,10 @@
         <span class="s_menu">
           %if;(browsing_with_sosa_ref)
             %if;(sosa_ref.index != "" and sosa_ref.index != index)
-              <a href="%prefix;em=R;ei=%sosa_ref.index;;i=%index;;et=M;spouse=on" title="[relationship] [with] %sosa_ref;">[relationship] [with] [Sosa] 1</a>%nn;
-              <a href="%prefix;em=R;ei=%index;;m=NG;n=1;t=PN;spouse=on;image=on;bd=;color=;et=S" title="…[shortest path]… %sosa_ref;">[shortest path]</a>%nn;
+              <a href="%prefix;em=R;ei=%index;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;image=on;et=S" title="…[shortest path]… %sosa_ref;">[shortest path]</a>%nn;
             %end;
           %end;
+          <a href="%prefix;%access;;m=A;t=E;te1=fam;v=3;maxv=4;cousins=on;image=%evar.image;">7 [family/families]1</a>%nn;
           %if;(has_parents)
             %if;(father.has_siblings or mother.has_siblings)
               <a href="%prefix;%access;;m=C;v1=2;v2=1">[uncles and aunts]</a>%nn;
