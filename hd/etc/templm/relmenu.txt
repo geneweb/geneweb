@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: relmenu.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130608 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130627 templ=templm -->
   <!-- cousmenu.txt is included in relmenu.txt -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -19,6 +19,8 @@
 </head>
 <body%body_prop; id="menutxt">
 %message_to_wizard;
+
+%let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%in;
 
 %define;relative_sosa(sosa_link)
   [<em>Sosa number</em> relative to %t:::sosa_link]
@@ -62,12 +64,12 @@
   </p>
   <fieldset style="width: auto;">
     <input type="hidden" name="m" value="NG"%/>
-    <input type="radio" name="select" value="input" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+    <input type="radio" name="select" value="input" checked="checked" %l_on;%/>
     <input name="n" size="40" maxlength="200"%/>
     <input type="submit" value="Ok"%/>
     <br%/>&nbsp;&nbsp;&nbsp;
     <label>
-      <input type="radio" name="t" value="PN" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="radio" name="t" value="PN" checked="checked" %l_on;%/>
       <em>[first name/first names]0 [surname/surnames]0</em>
       [or] <em>[public name]</em>
       [or] <em>[alias]</em>
@@ -79,19 +81,19 @@
     </label>
     <br%/>&nbsp;&nbsp;&nbsp;
     <label>
-        <input type="radio" name="t" value="P" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+        <input type="radio" name="t" value="P" %l_on;%/>
         <em>[first name/first names]0</em>
     </label>
     <br%/>&nbsp;&nbsp;&nbsp;
     <label>
-        <input type="radio" name="t" value="N" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+        <input type="radio" name="t" value="N" %l_on;%/>
         <em>[surname/surnames]0</em>
     </label>
     %foreach;family;
       %if;(spouse != "? ?")
         <br%/>
         <label>
-          <input type="radio" name="select" value="%spouse.index;" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="select" value="%spouse.index;" %l_on;%/>
           %apply;capitalize(nth([husband/wife],spouse.sex))%nl;:%nl;%spouse;
           %if;spouse.has_nobility_titles;,%sp;
           <em>%spouse.nobility_title;</em>%end;%nl;
@@ -102,7 +104,7 @@
       %if;has_relation_him;
         <br%/>
         <label>
-          <input type="radio" name="select" value="%relation_him.index;" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="select" value="%relation_him.index;" %l_on;%/>
           %apply;capitalize(relation_him.type)%nl;:%nl;%relation_him;
           %if;relation_him.has_nobility_titles;,%sp;
           <em>%relation_him.nobility_title;</em>%end;%nl;
@@ -111,7 +113,7 @@
       %if;has_relation_her;
         <br%/>
         <label>
-          <input type="radio" name="select" value="%relation_her.index;" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="select" value="%relation_her.index;" %l_on;%/>
           %apply;capitalize(relation_her.type)%nl;:%nl;%relation_her;
           %if;relation_her.has_nobility_titles;,%sp;
           <em>%relation_her.nobility_title;</em>%end;%nl;
@@ -121,7 +123,7 @@
     %foreach;related;
       <br%/>
       <label>
-        <input type="radio" name="select" value="%related.index;" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+        <input type="radio" name="select" value="%related.index;" %l_on;%/>
         %apply;capitalize(related.type)%nl;:%nl;%related;
         %if;related.has_nobility_titles;,%sp;
         <em>%related.nobility_title;</em>%end;%nl;
@@ -131,11 +133,12 @@
       %foreach;witness;
         <br%/>
         <label>
-          <input type="radio" name="select" value="%witness.index;" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="select" value="%witness.index;" %l_on;%/>
           [*witness/witnesses]0%nl;:%nl;%witness;%nl;
         </label>
       %end;
     %end;
+    <ul><li><a href="%prefix;%access;;m=A;t=E;te1=fam;v=3;maxv=4;cousins=on;">7 [family/families]1</a></li></ul>
     %if;(has_siblings or father.has_parents or mother.has_parents)
       <ul>
         %foreach;cousin_level;
@@ -166,37 +169,37 @@
   </fieldset>
   <fieldset>
     <label>
-      <input type="radio" name="et" value="A" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="radio" name="et" value="A" %l_on;%/>
       [*ancestors]
     </label>
     <br%/>
     <label>
-      <input type="radio" name="et" value="M" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="radio" name="et" value="M" %l_on;%/>
       [*relationship by marriage]
     </label>
     <br%/>
     <label>
-      <input type="radio" name="et" value="S" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="radio" name="et" value="S" checked="checked" %l_on;%/>
       [*shortest path]
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="long" value="on" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="checkbox" name="long" value="on" %l_on;%/>
       [long display]
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="spouse" value="on" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="checkbox" name="spouse" value="on" checked="checked" %l_on;%/>
       [include spouses]
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="cgl" value="on" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="checkbox" name="cgl" value="on" %l_on;%/>
       [cancel GeneWeb links]
     </label>
     <br%/>
     <label>
-      <input type="checkbox" name="image" value="on" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+      <input type="checkbox" name="image" value="on" %l_on;%/>
       [image/images]1
     </label>
     <br%/>
@@ -209,25 +212,25 @@
       <tr>
         <td align="%left;">[color]&nbsp;</td>
         <td>
-          <input type="radio" name="color" value="" checked="checked" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="color" value="" checked="checked" %l_on;%/>
         </td>
         <td class="bg1">
-          <input type="radio" name="color" value="bg1" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="color" value="bg1" %l_on;%/>
         </td>
         <td class="bg2">
-          <input type="radio" name="color" value="bg2" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="color" value="bg2" %l_on;%/>
         </td>
         <td class="bg3">
-          <input type="radio" name="color" value="bg3" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="color" value="bg3" %l_on;%/>
         </td>
         <td class="bg4">
-          <input type="radio" name="color" value="bg4" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="color" value="bg4" %l_on;%/>
         </td>
         <td class="bg5">
-          <input type="radio" name="color" value="bg5" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="color" value="bg5" %l_on;%/>
         </td>
         <td class="bg6">
-          <input type="radio" name="color" value="bg6" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%/>
+          <input type="radio" name="color" value="bg6" %l_on;%/>
         </td>
       </tr>
     </table>

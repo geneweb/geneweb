@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: updind.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130404 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130627 templ=templm -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -19,6 +19,9 @@
   %include.css;
   <script type="text/javascript" src="templm/upd.js"></script>
   %base_header;
+
+  %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%in;
+  %let;l_on1;onclick="this.focus()"%in;
 
   %define;search_focus(xcnt)
     %if;(evar_add_qualifierxcnt = "on")
@@ -262,9 +265,8 @@
     <input name="t_nthxcnt" class="number" autocomplete="off" size="3" value="%title.t_nth;"%sp;
     id="t_nthxcnt"%/></label>
   <label>
-    <input type="checkbox" name="t_main_titlexcnt" value="on"%sp;
-    %if;title.t_main; checked="checked"%end;%sp;
-    onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();"%/>[*main title]0</label>
+    <input type="checkbox" name="t_main_titlexcnt" value="on" %l_on;%sp;
+    %if;title.t_main; checked="checked"%end;%/>[*main title]0</label>
   <dl class="nobr">
     <dt>[*begin]0</dt>
       <dd>%apply;date("", "t_date_startxcnt", "title_date_start")</dd>
@@ -280,7 +282,7 @@
     %else;
       title="[insert::relation/relations]0"
     %end;>
-   <input type="checkbox" id="add_relationxcnt" name="add_relationxcnt" value="on"%sp;
+   <input type="checkbox" id="add_relationxcnt" name="add_relationxcnt" value="on" %l_on1;%sp;
      onkeypress="return addRow(event,'add_relationxcnt')"%/></label>
 %end;
 
@@ -317,11 +319,11 @@
     <input id="rxcnt_xvar_p_l" type="radio" name="rxcnt_xvar_p" value="link" title="[link]"%sp;
       %if;relation.xrel.link;%sp;checked="checked" %end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
-                 if (event.keyCode == 32) javascript:valid('rxcnt_xvar_p_c');"%/>
+                 if (event.keyCode == 32) javascript:valid('rxcnt_xvar_p_c');" %l_on1;%/>
     <input id="rxcnt_xvar_p_c" type="radio" name="rxcnt_xvar_p" value="create" title="[create]"%sp;
       %if;relation.xrel.create;%sp;checked="checked"%end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
-                 if (event.keyCode == 32) javascript:valid('rxcnt_xvar_p_l');"%/>
+                 if (event.keyCode == 32) javascript:valid('rxcnt_xvar_p_l');" %l_on1;%/>
   </td><td>
     <input name="rxcnt_xvar_fn" style="text-align: right;" size="30" maxlength="200"%sp;
       value="%relation.xrel.first_name;" id="rxcnt_xvar_fn"%sp;
@@ -389,15 +391,15 @@
     <label>[*surname/surnames]0<input name="surname" size="30" maxlength="200" value="%surname;"%sp;id="surname"%/></label>%nn;
     <br%/>
     <label>[*number]0<input name="occ" class="number" autocomplete="off" size="3" maxlength="8" value="%occ;" id="occ"%/></label>
-        [*sex] : <label class="background_sex_0"><input type="radio" id="sexM" name="sex" value="M" onclick="male('sex_person')"
+        [*sex] : <label class="background_sex_0"><input type="radio" id="sexM" name="sex" value="M" onclick="male('sex_person');this.focus()"
       %if;is_male;%sp;checked="checked"%end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
                  if (event.keyCode == 32) javascript:valid('sexU'), no_sex('sex_person');"%/>[M/F]0 </label>%nn;
-    <label class="background_sex_2"><input type="radio" id="sexU" name="sex" value="N" onclick="no_sex('sex_person')"
+    <label class="background_sex_2"><input type="radio" id="sexU" name="sex" value="N" onclick="no_sex('sex_person');this.focus()"
       %if;not(is_male or is_female)%sp;checked="checked"%end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
                  if (event.keyCode == 32) javascript:valid('sexF'), female('sex_person');"%/>? </label>%nn;
-    <label class="background_sex_1"><input type="radio" id="sexF" name="sex" value="F" onclick="female('sex_person')"
+    <label class="background_sex_1"><input type="radio" id="sexF" name="sex" value="F" onclick="female('sex_person');this.focus()"
      %if;is_female;%sp;checked="checked"%end;%sp;
       onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
                  if (event.keyCode == 32) javascript:valid('sexM'), male('sex_person');"%/>[M/F]1 </label> <br%/>
@@ -406,64 +408,64 @@
       [*access]0 :
       <label><input id="access_1" type="radio" name="access" value="Public"%if;acc_public; checked="checked"%end;%sp;
         onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
-                   if (event.keyCode == 32) javascript:valid('access_2');"%/>[public]0</label>
+                   if (event.keyCode == 32) javascript:valid('access_2');" %l_on1;%/>[public]0</label>
       <label><input id="access_2" type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked="checked"%end;%sp;
         onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
-                   if (event.keyCode == 32) javascript:valid('access_3');"%/>[if titles]0</label>
+                   if (event.keyCode == 32) javascript:valid('access_3');" %l_on1;%/>[if titles]0</label>
       <label><input id="access_3" type="radio" name="access" value="Private"%if;acc_private; checked="checked"%end;%sp;
         onkeydown="if (event.keyCode == 13) javascript:document.upd.submit();
-                   if (event.keyCode == 32) javascript:valid('access_1');"%/>[private]0</label>
+                   if (event.keyCode == 32) javascript:valid('access_1');" %l_on1;%/>[private]0</label>
     <br%/><br%/>
     %if;has_qualifiers;
       %foreach;qualifier;
     <label>[*qualifier]0<input name="qualifier%cnt;" size="30" value="%qualifier;"%sp; id="qualifier%cnt;"%/></label>%nn;
     <label class="addrow"><input type="checkbox" title="[insert::qualifier]" name="add_qualifier%cnt;" value="on"%sp;
-      id="add_qualifier%cnt;" onkeypress="return addRow(event,'add_qualifier%cnt;')"%/></label>%nn;
+      id="add_qualifier%cnt;" onkeypress="return addRow(event,'add_qualifier%cnt;')" %l_on1;%/></label>%nn;
     <br%/>
       %end;
     %elseif;(bvar.propose_qualifier != "no")
     <label>[*qualifier]0<input name="qualifier0" size="30" value="" id="qualifier0"%/></label>%nn;
     <label class="addrow"><input type="checkbox" title="[insert::qualifier]" name="add_qualifier0" value="on"%sp;
-      id="add_qualifier0" onkeypress="return addRow(event,'add_qualifier0')"%/></label>%nn;
+      id="add_qualifier0" onkeypress="return addRow(event,'add_qualifier0')" %l_on1;%/></label>%nn;
     <br%/>
     %end;
     %if;has_aliases;
       %foreach;alias;
     <label>[*alias]0<input name="alias%cnt;" size="30" value="%alias;"%sp; id="alias%cnt;"%/></label>%nn;
     <label class="addrow"><input type="checkbox" title="[insert::alias]" name="add_alias%cnt;" value="on"%sp;
-      id="add_alias%cnt;" onkeypress="return addRow(event,'add_alias%cnt;')"%/></label>%nn;
+      id="add_alias%cnt;" onkeypress="return addRow(event,'add_alias%cnt;')" %l_on1;%/></label>%nn;
     <br%/>
       %end;
     %elseif;(bvar.propose_alias != "no")
       <label>[*alias]0<input name="alias0" size="30" value="" id="alias0"%/></label>%nn;
       <label class="addrow"><input type="checkbox" title="[insert::alias]" name="add_alias0" value="on"%sp;
-        id="add_alias0" onkeypress="return addRow(event,'add_alias0')"%/></label>%nn;
+        id="add_alias0" onkeypress="return addRow(event,'add_alias0')" %l_on1;%/></label>%nn;
     <br%/>
     %end;
     %if;has_first_names_aliases;
       %foreach;first_name_alias;
     <label>[*first name alias]0<input name="first_name_alias%cnt;" size="30"%sp; value="%first_name_alias;" id="first_name_alias%cnt;"%/></label>%nn;
     <label class="addrow"><input type="checkbox" title="[insert::first name alias]" name="add_first_name_alias%cnt;"%sp;
-      value="on" id="add_first_name_alias%cnt;" onkeypress="return addRow(event,'add_first_name_alias%cnt;')"%/></label>%nn;
+      value="on" id="add_first_name_alias%cnt;" onkeypress="return addRow(event,'add_first_name_alias%cnt;')" %l_on1;%/></label>%nn;
     <br%/>
       %end;
     %else;
       <label>[*first name alias]0<input name="first_name_alias0" size="30" value=""%sp; id="first_name_alias0"%/></label>%nn;
       <label class="addrow"><input type="checkbox" title="[insert::first name alias]" name="add_first_name_alias0" value="on"%sp;
-        id="add_first_name_alias0" onkeypress="return addRow(event,'add_first_name_alias0')"%/></label>%nn;
+        id="add_first_name_alias0" onkeypress="return addRow(event,'add_first_name_alias0')" %l_on1;%/></label>%nn;
     <br%/>
     %end;
     %if;has_surnames_aliases;
       %foreach;surname_alias;
     <label>[*surname alias]0<input name="surname_alias%cnt;" size="30" value="%surname_alias;"%/></label>%nn;
     <label class="addrow"><input type="checkbox" title="[insert::surname alias]" name="add_surname_alias%cnt;" value="on"%sp;
-        id="add_surname_alias%cnt;" onkeypress="return addRow(event,'add_surname_alias%cnt;')"%/></label>%nn;
+        id="add_surname_alias%cnt;" onkeypress="return addRow(event,'add_surname_alias%cnt;')" %l_on1;%/></label>%nn;
     <br%/>
       %end;
     %else;
       <label>[*surname alias]0<input name="surname_alias0" size="30" value=""%sp; id="surname_alias0"%/></label>%nn;
       <label class="addrow"><input type="checkbox" title="[insert::surname alias]" name="add_surname_alias0" value="on"%sp;
-        id="add_surname_alias0" onkeypress="return addRow(event,'add_surname_alias0')"%/></label>%nn;
+        id="add_surname_alias0" onkeypress="return addRow(event,'add_surname_alias0')" %l_on1;%/></label>%nn;
     <br%/>
     %end;
     <br%/>

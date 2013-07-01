@@ -1,5 +1,5 @@
 /* css.txt or css.css */
-/* mickroue(a)yahoo.fr 20130604 templ=templm */
+/* mickroue(a)yahoo.fr 20130701 templ=templm */
 /* Properties of all html pages.*/
 html{background:url('/images/gwback.jpg');}
 /* Properties of all html pages */
@@ -47,7 +47,7 @@ h1{text-align:center;}
 .menu2 .s_menu{display:none;float:left;width:350px;padding:5px;}
 .menu2 .s_menu a{margin:10px;padding:10px;width:308px;}
 .menu2 fieldset{clear:both;padding:10px;margin:10px;}
-.menu2 div:hover > .s_menu{display:block;position:absolute;right:0px;top:1.5em;z-index:10;}
+.menu2 div:hover > .s_menu{display:block;position:absolute;right:0px;top:1.5em;z-index:10000;}
 .menu2 .s_menu label{display:block;padding:2px;}
 .menu2 .ok{width:100%;}
 .menu2 .ok input{width:100%;}
@@ -97,6 +97,7 @@ hr.full{margin-left:0;margin-right:0;}
 #perso h3{font-size:120%;}
 #perso ol,#perso ul,#perso .data2{margin-left:0px;padding-left:20px;}
 #perso li{margin:2px 0 0 0;padding:0 0 0 10px;}
+#perso .person h1{color:inherit;}
 .menu{margin:0;padding:0;border:0;position:absolute;top:0;left:0;font-family:Arial;font-size:14px;}
 .menu span{position:relative;display:block;float:left;}
 .menu span a{float:left;}
@@ -114,7 +115,8 @@ abbr{border-bottom:0;}
 #perso .col1, #perso .col2{float:left;padding:2px;margin:2px;}
 #perso .col1{margin-right:0px;}
 #perso .col2{margin-left:-1px;}
-#perso .col2 div{float:left;padding:5px;margin:5px;}
+#perso .col2 > div{float:left;padding:5px;margin:5px;}
+#perso .col2 .fam{margin-bottom:10px;clear:both;}
 #perso .col2 ol{list-style-type:none;padding:0;margin:0;}
 #perso .col2 p{display:inline;}
 #perso .data1,#perso .person div{text-align:center;}
@@ -163,7 +165,9 @@ input[type='checkbox'],input[type='radio']{width:auto;height:auto;vertical-align
 .ld_before,.ld_after{background-color:#C0C0C0;}
 .ld_no_date{background-color:#DCDCDC;}
 .ld_him_her{font-weight:bold;}
-
+.ldimg{overflow:hidden;font-size:0px;text-align:center;border:solid 1px #AAAAAA;;width:100px;height:150px;background-color:#FFFFFF;;cursor:crosshair;position:absolute;bottom:25px;left:25px;}
+.ldimg img{margin:5px;max-width:90%;max-height:70%;}
+.ldimg span{font-size:12px;line-height:12px;font-family:'Comic sans MS',sans-serif;}
 /* anclist.txt, deslist.txt */
 .bcbg1{border:solid 1px #555555;color:#EEEEEE;background-color:#000000;}
 .bcbg2{border:solid 1px #555555;color:#EEEEEE;background-color:#555555;}
