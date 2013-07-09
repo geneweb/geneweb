@@ -31,6 +31,8 @@ value of_iso_8859_1 s =
         [ 'À'..'Å' | 'Ç'.. 'Ï' | 'Ñ'..'Ö' | 'Ù'..'Ý'
         | 'à'..'å' | 'ç'.. 'ï' | 'ñ'..'ö' | 'ù'..'ý' | 'ÿ' ->
             loop (i + 1) (len + 2) False
+        | 'Ø' -> loop (i + 1) (len + 1) False
+        | 'ø' -> loop (i + 1) (len + 1) False
         | 'ß' -> loop (i + 1) (len + 1) False
         | _ -> loop (i + 1) (len + 1) identical ]
   in
@@ -81,6 +83,8 @@ value of_iso_8859_1 s =
                 s'.[i'] := Char.chr 240; s'.[i'+1] := no_accent s.[i];
                 i' + 1
               }
+          | 'Ø' -> do { s'.[i'] := Char.chr 162; i' }
+          | 'ø' -> do { s'.[i'] := Char.chr 178; i' }
           | 'ß' -> do { s'.[i'] := Char.chr 207; i' }
           | c -> do { s'.[i'] := c; i' } ]
         in
@@ -184,6 +188,8 @@ value to_iso_8859_1 s =
         match Char.code s.[i] with
         [ 225 | 226 | 227 | 228 | 232 | 234 | 240 ->
             loop (i + 2) (len + 1) False
+        | 162 -> loop (i + 1) (len + 1) False
+        | 178 -> loop (i + 1) (len + 1) False
         | 207 -> loop (i + 1) (len + 1) False
         | _ -> loop (i + 1) (len + 1) identical]
   in
@@ -197,7 +203,9 @@ value to_iso_8859_1 s =
       else
         let i =
           match Char.code s.[i] with
-          [ 207 -> do { s'.[i'] := 'ß'; i }
+          [ 162 -> do { s'.[i'] := 'Ø'; i }
+          | 178 -> do { s'.[i'] := 'ø'; i }
+          | 207 -> do { s'.[i'] := 'ß'; i }
           | 225 -> do { s'.[i'] := grave s.[i+1]; i + 1 }
           | 226 -> do { s'.[i'] := acute s.[i+1]; i + 1 }
           | 227 -> do { s'.[i'] := circum s.[i+1]; i + 1 }
