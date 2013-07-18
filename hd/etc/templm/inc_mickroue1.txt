@@ -1,4 +1,4 @@
-%( <!-- Begin inc_mickroue1 20130617 --> %)
+%( <!-- Begin inc_mickroue1 20130711 --> %)
 %( <!-- relations - photos --> %)
   %if;(has_relations)
     %apply;lazy_print%with;
@@ -89,7 +89,7 @@
       %lazy_force;
       <li class="image_sheet">
         %apply;link_image("related")
-        %if;(cancel_links or xx.is_restricted)
+        %if;(cancel_links or related.is_restricted)
           %related.public_name; %related.qualifier;
         %else;
           <a href="%prefix;%related.access;;wide=%evar.wide;;maxlev=%evar.maxlev;;image=%evar.image;;spouse=%evar.spouse;">%related.public_name; %related.qualifier;</a>&nbsp;

@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130624 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130711 templ=templm -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -72,9 +72,11 @@
         12%nn;
       %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
         %bvar.max_desc_level;%nn;
+      %else;
+        99%nn;
       %end;
     %in;
-    %let;l_mdl1;%if;(l_mdl0 != "")([maximum] %l_mdl0; [generation/generations]1)%end;%in;
+    %let;l_mdl1;%if;(l_mdl0 != 99)([maximum] %l_mdl0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="Ok"%/></legend>
     <label>[*specify::generation/generations]0 %l_mdl1; :<br%/>
       <select style="text-align:center" name="v" size="%max_desc_level;">

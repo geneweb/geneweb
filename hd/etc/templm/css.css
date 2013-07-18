@@ -1,5 +1,5 @@
 /* css.txt or css.css */
-/* mickroue(a)yahoo.fr 20130701 templ=templm */
+/* mickroue(a)yahoo.fr 20130703 templ=templm */
 /* Properties of all html pages.*/
 html{background:url('/images/gwback.jpg');}
 /* Properties of all html pages */
@@ -30,7 +30,7 @@ dt{font-weight:bold;}
 .highlight,h1,h2,h3,h4,h5,h6,legend,th{color:#620000;}
 .highlight{font-weight:bold;}
 .highlight1{color:#990000;}
-.odd{background-color: #FBFBFB;}
+.odd{background-color:#FBFBFB;}
 .reference{font-size:80%;font-style:italic;}
 .with_picto{background-repeat: no-repeat;background-position: left center;padding: 4px 4px 4px 20px;}
 /* Properties for the unvisited,visited and mouse over links. All pages. */
@@ -121,7 +121,7 @@ abbr{border-bottom:0;}
 #perso .col2 p{display:inline;}
 #perso .data1,#perso .person div{text-align:center;}
 #perso .person,#perso .notes,#perso .sources,#perso .relations{clear:both;overflow:auto;}
-#perso .person_img{max-width:15em;max-height:15em;}
+#perso .person_img{max-width:240px;max-height:240px;}
 #perso .image img{max-width:12.5em;max-height:12.5em;}
 #perso .image,#perso .image_sheet{float:left;width:12.5em;}
 #perso .image{display:block;margin:0;padding:0;}
@@ -165,9 +165,13 @@ input[type='checkbox'],input[type='radio']{width:auto;height:auto;vertical-align
 .ld_before,.ld_after{background-color:#C0C0C0;}
 .ld_no_date{background-color:#DCDCDC;}
 .ld_him_her{font-weight:bold;}
-.ldimg{overflow:hidden;font-size:0px;text-align:center;border:solid 1px #AAAAAA;;width:100px;height:150px;background-color:#FFFFFF;;cursor:crosshair;position:absolute;bottom:25px;left:25px;}
-.ldimg img{margin:5px;max-width:90%;max-height:70%;}
-.ldimg span{font-size:12px;line-height:12px;font-family:'Comic sans MS',sans-serif;}
+.fam71{font-size:16pt;float:left;color:white;text-align:center;padding:5px;margin:5px;border:solid 1px #AAAAAA;;background-color:white;}
+.fam71 img{max-width:305px;max-height:305px;}
+.fam71 a,.ldimg0 span,.ldimg0 strong{display:block;}
+.fam71 strong{color:black;}
+.fam72{overflow:hidden;font-size:0px;color:black;text-align:center;border:solid 1px #AAAAAA;;width:100px;height:150px;background-color:white;cursor:crosshair;position:absolute;bottom:25px;left:25px;}
+.fam72 img{margin:5px;max-width:90%;max-height:70%;}
+.fam72 span{font-size:12px;color:black;line-height:12px;font-family:'Comic sans MS',sans-serif;}
 /* anclist.txt, deslist.txt */
 .bcbg1{border:solid 1px #555555;color:#EEEEEE;background-color:#000000;}
 .bcbg2{border:solid 1px #555555;color:#EEEEEE;background-color:#555555;}
