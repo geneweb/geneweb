@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: relmenu.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130627 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130702 templ=templm -->
   <!-- cousmenu.txt is included in relmenu.txt -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
@@ -138,7 +138,7 @@
         </label>
       %end;
     %end;
-    <ul><li><a href="%prefix;%access;;m=A;t=E;te1=fam;v=3;maxv=4;cousins=on;">7 [family/families]1</a></li></ul>
+    <ul><li><a href="%prefix;%access;;m=A;t=E;te1=fam70;v=3;maxv=4;cousins=on;">7 [family/families]1</a></li></ul>
     %if;(has_siblings or father.has_parents or mother.has_parents)
       <ul>
         %foreach;cousin_level;

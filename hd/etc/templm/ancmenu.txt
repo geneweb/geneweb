@@ -3,7 +3,7 @@
 <head>
   <!-- $Id: ancmenu.txt,v 5.8 2007/02/04 11:50:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130625 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130711 templ=templm -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -73,9 +73,11 @@
         12%nn;
       %elseif;(bvar.max_anc_level != "" and max_anc_level > bvar.max_anc_level)
         %bvar.max_anc_level;%nn;
+      %else;
+        99%nn;
       %end;
     %in;
-    %let;l_mal1;%if;(l_mal0 != "")([maximum] %l_mal0; [generation/generations]1)%end;%in;
+    %let;l_mal1;%if;(l_mal0 != 99)([maximum] %l_mal0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="Ok"%/></legend>
     <label>[*specify::generation/generations]0 %l_mal1; :<br%/>
       <select style="text-align:center" name="v" size="%expr(max_anc_level-1)">
@@ -141,33 +143,33 @@
     </table>
   </fieldset>
   <fieldset>
-    %let;l_on1;onchange="valid('tE')"%in;
+    %let;l_on1;onchange="valid('tF')"%in;
     <legend>
-      <label><input type="radio" id="tE" name="t" value="E" %l_on;%/>[*list/list (ancestors)]0</label>
+      <label><input type="radio" id="tF" name="t" value="F" %l_on;%/>[*list/list (ancestors)]0</label>
     </legend>
     <fieldset>
-      <label><input type="radio" id="tSB" name="te1" value="sb" %l_on1; %l_on;
+      <label><input type="radio" id="tSB" name="tf1" value="sb" %l_on1; %l_on;
              %/>[surnames branch]</label><br%/>
-      <label><input type="radio" id="tSURN" name="te1" value="surn" %l_on1; %l_on;
+      <label><input type="radio" id="tSURN" name="tf1" value="surn" %l_on1; %l_on;
              %/>[list eclair]0 - [surname/surnames]1 / [places]</label><br%/>
-      <label><input type="radio" id="tPLACE" name="te1" value="place" %l_on1; %l_on;
+      <label><input type="radio" id="tPLACE" name="tf1" value="place" %l_on1; %l_on;
              %/>[list eclair]0 - [places]</label><br%/>
     </fieldset>
     <fieldset>
       <legend>[*statistics]</legend>
-      <label><input type="radio" id="tBMDM" name="te1" value="bmdm" %l_on1; %l_on;
+      <label><input type="radio" id="tBMDM" name="tf1" value="bmdm" %l_on1; %l_on;
              %/>[calendar/calendars]0</label><br%/>
-      <label><input type="radio" id="tSTAT1" name="te1" value="stat1" %l_on1; %l_on;
+      <label><input type="radio" id="tSTAT1" name="tf1" value="stat1" %l_on1; %l_on;
              %/>[moon age/new moon/first quarter/full moon/last quarter]0</label><br%/>
-      <label><input type="radio" id="tAFM" name="te1" value="afm" %l_on1; %l_on;
+      <label><input type="radio" id="tAFM" name="tf1" value="afm" %l_on1; %l_on;
              %/>[age] ([father/mother]0, [father/mother]1)</label><br%/>
-      <label><input type="radio" id="tAAD" name="te1" value="aad" %l_on1; %l_on;
+      <label><input type="radio" id="tAAD" name="tf1" value="aad" %l_on1; %l_on;
              %/>[age at death]</label>
     </fieldset>
     %if;(wizard)
       <fieldset>
         <legend>
-          <label><input type="radio" id="tCSV" name="te1" value="csv" %l_on1; %l_on;
+          <label><input type="radio" id="tCSV" name="tf1" value="csv" %l_on1; %l_on;
                  %/>[*long display] (csv)</label>
         </legend>
           <label><input type="checkbox" name="cousins" value="on" %l_on1; %l_on;

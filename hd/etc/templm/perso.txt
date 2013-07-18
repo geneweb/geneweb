@@ -4,7 +4,7 @@
 <head>
   <!-- $Id: perso.txt,v 5.10 2007/06/12 11:48:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130626 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130710 templ=templm -->
   <title>%if;(evar.del = "on")[*delete]...[person/persons]1...[family/families]1...%else;%first_name; %surname;%end;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -1063,7 +1063,7 @@
           <span class="s_menu">
             <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;"
                title="[tree] (Y)" accesskey="Y">[tree]</a>%nn;
-            <a href="%prefix;m=A;t=E;te1=sb;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;">[surnames branch]</a>%nn;
+            <a href="%prefix;m=A;t=F;tf1=sb;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;">[surnames branch]</a>%nn;
             <a href="%prefix;m=A;t=Z;image=%evar.image;;v=7;maxv=%max_anc_level;;%access;">[table]</a>%nn;
             <a href="%prefix;m=A;t=G;v=4;maxv=%max_anc_level;;siblings=on;spouse=on;parents=on;alias=on;rel=on;notes=on;src=on;%access;">[long display]</a>%nn;
           </span>
@@ -1087,7 +1087,7 @@
               <a href="%prefix;em=R;ei=%index;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;image=on;et=S" title="…[shortest path]… %sosa_ref;">[shortest path]</a>%nn;
             %end;
           %end;
-          <a href="%prefix;%access;;m=A;t=E;te1=fam;v=3;maxv=4;cousins=on;image=%evar.image;">7 [family/families]1</a>%nn;
+          <a href="%prefix;%access;;m=A;t=F;tf1=fam70;v=3;maxv=4;cousins=on;image=%evar.image;">7 [family/families]1</a>%nn;
           %if;(has_parents)
             %if;(father.has_siblings or mother.has_siblings)
               <a href="%prefix;%access;;m=C;v1=2;v2=1">[uncles and aunts]</a>%nn;

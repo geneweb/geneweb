@@ -4,7 +4,7 @@
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20130614 templ=templm -->
+  <!-- Modified mickroue(a)yahoo.fr 20130712 templ=templm -->
   %let;l_v0;%if;(evar.v > max_desc_level)%max_desc_level;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_desc_level = "")%l_v0;%elseif;(bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
   <title>%nn;
@@ -214,15 +214,15 @@
   %if;(wizard and not cancel_links)
     <a class="date" href="%prefix;m=MOD_IND;i=%xx.index;" title="[modify::person/persons]0"
        onclick="window.open(this.href); return false;">%nn;
-      %apply;sure_dates("xx","birth","baptism","baptism",xx.has_linked_page.BIRTHA)
+      %apply;sure_dates("xx","birth","baptism","baptism","baptism",xx.has_linked_page.BIRTHA)
       %if;(xx.is_dead)
-        %sp;%apply;sure_dates("xx","death","burial","cremated",xx.has_linked_page.DEATHA)
+        %sp;%apply;sure_dates("xx","death","burial","cremated","cremation",xx.has_linked_page.DEATHA)
       %end;
     </a>%nn;
   %else;
-    %apply;sure_dates("xx","birth","baptism","baptism",xx.has_linked_page.BIRTHA)%sp;
+    %apply;sure_dates("xx","birth","baptism","baptism","baptism",xx.has_linked_page.BIRTHA)%sp;
     %if;(xx.is_dead)
-      %apply;sure_dates("xx","death","burial","cremated",xx.has_linked_page.DEATHA)
+      %apply;sure_dates("xx","death","burial","cremated","cremation",xx.has_linked_page.DEATHA)
     %end;
   %end;
 %end;
@@ -242,7 +242,7 @@
   %end;
 %end;
 
-%define;sure_dates(xx,dd1,dd2,dd3,zz)
+%define;sure_dates(xx,dd1,dd2,dd3,dd4,zz)
   %if;(xx.dd1_date.year != "")
     <tt class="sure_dates%zz;%if;(xx.dd1_date.prec !="") not_sure_dates%end;">%dd1_symbol;</tt>%xx.slash_dd1_date;
   %elseif;(xx.dd2_date.year != "")
@@ -256,8 +256,8 @@
     %sp;%xx.dd1_place;%nn;
   %elseif;(xx.dd2_place != "")
     %sp;%xx.dd2_place;%nn;
-  %elseif;(xx.dd3_place != "")
-    %sp;%xx.dd3_place;%nn;
+  %elseif;(xx.dd4_place != "")
+    %sp;%xx.dd4_place;%nn;
   %end;
 %end;
 
@@ -617,9 +617,9 @@
 %end;
 
 %define;desc_afm(curlev, famlev, maxlev)
-  %let;l_aby;%birth_date.year;%in;
-  %let;l_fby;%father.birth_date.year;%in;
-  %let;l_mby;%mother.birth_date.year;%in;
+  %let;l_aby;%if;(birth_date.year = "" or birth_date.prec = ".." or birth_date.prec = "|")0%else;%birth_date.year;%end;%in;
+  %let;l_fby;%if;(has_parents)%if;(father.birth_date.year = "" or father.birth_date.prec = ".." or father.birth_date.prec = "|")9999%else;%father.birth_date.year;%end;%else;9999%end;%in;
+  %let;l_mby;%if;(has_parents)%if;(mother.birth_date.year = "" or mother.birth_date.prec = ".." or mother.birth_date.prec = "|")9999%else;%mother.birth_date.year;%end;%else;9999%end;%in;
   %if;(l_aby >= l_fby)
     %incr_count;
     %let;l_age;%expr((l_aby - l_fby)/10)%in;
@@ -641,9 +641,9 @@
 %end;
 
 %define;desc_afm1(curlev, famlev, maxlev)
-  %let;l_aby;%birth_date.year;%in;
-  %let;l_fby;%father.birth_date.year;%in;
-  %let;l_mby;%mother.birth_date.year;%in;
+  %let;l_aby;%if;(birth_date.year = "" or birth_date.prec = ".." or birth_date.prec = "|")0%else;%birth_date.year;%end;%in;
+  %let;l_fby;%if;(has_parents)%if;(father.birth_date.year = "" or father.birth_date.prec = ".." or father.birth_date.prec = "|")9999%else;%father.birth_date.year;%end;%else;9999%end;%in;
+  %let;l_mby;%if;(has_parents)%if;(mother.birth_date.year = "" or mother.birth_date.prec = ".." or mother.birth_date.prec = "|")9999%else;%mother.birth_date.year;%end;%else;9999%end;%in;
   %if;(l_aby >= l_fby)
     %incr_count;
     %let;l_age;%expr(l_aby - l_fby)%in;
@@ -835,8 +835,8 @@
 %end;
 
 %define;desc_month(xx,curlev,famlev,maxlev)
-  %let;l_month;%if;(xx_date.day > 0)%xx_date.month;%end;%in;
-  %if;(l_month > 0)
+  %let;l_month;%if;(xx_date.day != "")%xx_date.month;%end;%in;
+  %if;(l_month != "")
     %incr_count;
     %apply;add_in_sorted_list(sex,l_month,count)
   %end;
@@ -851,12 +851,12 @@
 %end;
 
 %define;desc_calendar(curlev,famlev,maxlev)
-  %if;(birth_date.day > 0)
+  %if;(birth_date.day != "")
     %incr_count;
     %let;mm_dd;%expr(birth_date.month+100)_%expr(birth_date.day+100)%in;
     %apply;add_in_sorted_list(mm_dd,birth_date.month,birth_date.day,index,birth_symbol)
   %end;
-  %if;(death_date.day > 0)
+  %if;(death_date.day != "")
     %incr_count
     %let;mm_dd;%expr(death_date.month+100)_%expr(death_date.day+100)%in;
     %apply;add_in_sorted_list(mm_dd,death_date.month,death_date.day,index,death_symbol)
@@ -920,7 +920,7 @@
 
 %define;color(xx)
   %apply;nth%with;
-    /555555/993333/339933/333399/999999/339999/993399/999933/AAAAAA/FFAAAA/AAFFAA/AAAAFF/FFFFFF/AAFFFF/FFAAFF/FFFFAA%and;
+    /606060/993333/339933/333399/999999/339999/993399/999933/AAAAAA/FFAAAA/AAFFAA/AAAAFF/FFFFFF/AAFFFF/FFAAFF/FFFFAA%and;
     xx%end;
 %end;
 
@@ -1028,7 +1028,7 @@
 %end;
 
 %define;dstat1a(z1,z2,z3,curlev,famlev,maxlev)
-  %if;(z1 > 0)
+  %if;(z1 != "")
     %let;l_y;%z2;%in;
     %if;(z3 = 3 or sex = z3)
       %incr_count;
