@@ -270,8 +270,10 @@ value sdn_of_hebrew d =
         let (metonicCycle, metonicYear, moladDay, moladHalakim, tishri1After) =
           findStartOfYear (d.year + 1)
         in
+        (* On prend la valeur absolue parce que (0 - 1) mod 19 = -1    *)
+        (* et après, on fait un 'index out of bounds' dans yearOffset. *)
         let lengthOfAdarIAndII =
-          if monthsPerYear.((d.year - 1) mod 19) = 12 then 29 else 59
+          if monthsPerYear.(abs((d.year - 1) mod 19)) = 12 then 29 else 59
         in
         if d.month = 4 then
           tishri1After + d.day - lengthOfAdarIAndII - 237
