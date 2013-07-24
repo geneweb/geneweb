@@ -480,7 +480,7 @@ value print_inv1 conf base p ifam1 ifam2 =
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
   do {
-    Perso.interp_templ_with_menu title "perso_header" conf base p;
+    Perso.interp_notempl_with_menu title "perso_header" conf base p;
     Wserver.wprint "%s:"
       (capitale (transl conf "invert the order of the following families"));
     tag "ul" begin
