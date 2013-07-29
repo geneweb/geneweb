@@ -55,7 +55,8 @@ value string_incl x y =
     else
       let rec loop1 i j =
         if i = String.length x then
-          if j = String.length y then True else String.unsafe_get y j = ' '
+          if j = String.length y then True 
+          else (String.unsafe_get y j = ' ' || String.unsafe_get y (j-1) = ' ')
         else if
           j < String.length y &&
           String.unsafe_get x i = String.unsafe_get y j then
