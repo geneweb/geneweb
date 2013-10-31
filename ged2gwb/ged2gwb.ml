@@ -2060,15 +2060,25 @@ value add_indi gen r =
 
 value add_fam_norm gen r adop_list =
   let i = fam_index gen r.rval in
-  let fath =
-    match find_field "HUSB" r.rsons with
-    [ Some r -> per_index gen r.rval
-    | None -> phony_per gen Male ]
-  in
-  let moth =
-    match find_field "WIFE" r.rsons with
-    [ Some r -> per_index gen r.rval
-    | None -> phony_per gen Female ]
+  let (fath, moth, gay) =
+    match (find_all_fields "HUSB" r.rsons, find_all_fields "WIFE" r.rsons) with
+    [ ([f1], [m1]) -> (per_index gen f1.rval, per_index gen m1.rval, False)
+    | ([f1; f2 :: []], []) -> 
+        (per_index gen f1.rval, per_index gen f2.rval, True)
+    | ([], [m1; m2 :: []]) ->
+        (per_index gen m1.rval, per_index gen m2.rval, True)
+    | _ -> 
+        let fath =
+          match find_field "HUSB" r.rsons with
+          [ Some r -> per_index gen r.rval
+          | None -> phony_per gen Male ]
+        in
+        let moth =
+          match find_field "WIFE" r.rsons with
+          [ Some r -> per_index gen r.rval
+          | None -> phony_per gen Female ]
+        in
+        (fath, moth, False) ]
   in
   do {
     match gen.g_per.arr.(Adef.int_of_iper fath) with
@@ -2115,7 +2125,8 @@ value add_fam_norm gen r adop_list =
     let (relation, marr, marr_place, (marr_src, marr_nt), witnesses) =
       let (relation, sons) =
         match find_field "MARR" r.rsons with
-        [ Some r -> (Married, Some r)
+        [ Some r -> 
+            if gay then (NoSexesCheckMarried, Some r) else (Married, Some r)
         | None ->
             match find_field "ENGA" r.rsons with
             [ Some r -> (Engaged, Some r)
