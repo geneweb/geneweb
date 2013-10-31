@@ -538,7 +538,7 @@ value ged_fsource base oc fam =
 value ged_comment base oc fam =
   match sou base (get_comment fam) with
   [ "" -> ()
-  | s -> fprintf oc "1 NOTE %s\n" (encode s) ]
+  | s -> display_note oc s ]
 ;
 
 value has_personal_infos base per =
