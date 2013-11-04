@@ -474,11 +474,11 @@
   %end;
   %if;((evar.notes = "on" and ancestor.has_notes and evar.inline = "on") or (evar.src = "on" and ancestor.has_sources and evar.inline = "on"))
     <p class="asc_notes_src_inline">
-      %if;ancestor.has_notes;
+      %if;(evar.notes = "on" and ancestor.has_notes)
         [*note/notes]0 : %apply;clean_html_tags(ancestor.notes)
         <br%/>
       %end;
-      %if;ancestor.has_sources;
+      %if;(evar.src = "on" and ancestor.has_sources)
         <em>
           [*source/sources]1 :
           %foreach;ancestor.source;
@@ -534,11 +534,11 @@
     %end;
     %if;((evar.notes = "on" and child.has_notes and evar.inline = "on") or (evar.src = "on" and child.has_sources and evar.inline = "on"))
       <p class="asc_notes_src_inline">
-        %if;child.has_notes;
+        %if;(evar.notes = "on" and child.has_notes)
           [*note/notes]0 : %apply;clean_html_tags(child.notes)
           <br%/>
         %end;
-        %if;child.has_sources;
+        %if;(evar.src = "on" and child.has_sources)
           <em>
             [*source/sources]1 :
             %foreach;child.source;
