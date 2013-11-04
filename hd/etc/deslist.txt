@@ -146,11 +146,11 @@
   %apply;somebody_long_info("xx").
   %if;((evar.notes = "on" and xx.has_notes and evar.inline = "on") or (evar.src = "on" and xx.has_sources and evar.inline = "on"))
     <p class="desc_notes_src_inline">
-      %if;xx.has_notes;
+      %if;(evar.notes = "on" and xx.has_notes)
         [*note/notes]0 : %apply;clean_html_tags(xx.notes)
         <br%/>
       %end;
-      %if;xx.has_sources;
+      %if;(evar.src = "on" and xx.has_sources)
         <em>
           [*source/sources]1 :
           %foreach;xx.source;
@@ -187,11 +187,11 @@
     %apply;somebody_long_info("spouse")
     %if;((evar.notes = "on" and spouse.has_notes and evar.inline = "on") or (evar.src = "on" and spouse.has_sources and evar.inline = "on"))
       <p class="desc_notes_src_inline">
-        %if;spouse.has_notes;
+        %if;(evar.notes = "on" and spouse.has_notes)
           [*note/notes]0 : %apply;clean_html_tags(spouse.notes)
           <br%/>
         %end;
-        %if;spouse.has_sources;
+        %if;(evar.src = "on" and spouse.has_sources)
           <em>
             [*source/sources]1 :
             %foreach;spouse.source;
