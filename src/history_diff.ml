@@ -184,7 +184,8 @@ value record_diff conf base changed =
             write_history_file conf person_file fname gr
           }
           else write_history_file conf person_file fname gr
-      | U_Add_family p f | U_Modify_family p _ f | U_Delete_family p f
+      | U_Delete_family p f -> ()
+      | U_Add_family p f | U_Modify_family p _ f
       | U_Merge_family p _ _ f | U_Add_parent p f ->
           let p_file = history_file p.first_name p.surname p.occ in
           let p_fname = history_path conf p_file in
@@ -206,26 +207,23 @@ value record_diff conf base changed =
             let gr = make_gen_record conf base False gen_sp in
             write_history_file conf sp_file sp_fname gr;
             (* Création des fichiers pour les enfants ajoutés. *)
-            match changed with
-            [ U_Delete_family _ _ -> ()
-            | _ ->
-                List.iter 
-                  (fun ip ->
-                    let p = poi base ip in
-                    let person_file = 
-                      history_file 
-                        (sou base (get_first_name p)) 
-                        (sou base (get_surname p)) 
-                        (get_occ p)
-                    in
-                    let fname = history_path conf person_file in
-                    if Sys.file_exists fname then ()
-                    else 
-                      let gen_p = gen_person_of_person p in
-                      let gen_p = Util.string_gen_person base gen_p in
-                      let gr = make_gen_record conf base False gen_p in
-                      write_history_file conf person_file fname gr)
-                  (Array.to_list (get_children cpl)) ]
+            List.iter 
+              (fun ip ->
+                let p = poi base ip in
+                let person_file = 
+                  history_file 
+                    (sou base (get_first_name p)) 
+                    (sou base (get_surname p)) 
+                    (get_occ p)
+                in
+                let fname = history_path conf person_file in
+                if Sys.file_exists fname then ()
+                else 
+                  let gen_p = gen_person_of_person p in
+                  let gen_p = Util.string_gen_person base gen_p in
+                  let gr = make_gen_record conf base False gen_p in
+                  write_history_file conf person_file fname gr)
+              (Array.to_list (get_children cpl))
           }
       | U_Change_children_name _ list -> 
           List.iter
