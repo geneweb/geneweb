@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" 
+ "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html dir="rtl">
+<head>
+  <!-- $Id: arabe.html,v 1.1 2005-05-05 07:31:30 ddr Exp $ -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Arabe</title>
+</head>
+<body>
+
+<script type="text/javascript"><!--
+function ecrire_version_ie(t, v)
+{
+  sel = document.selection.createRange();
+  sel.text = v.value;
+}
+function ecrire_version_netscape(t, v)
+{
+   var startPos = t.selectionStart;
+   var endPos = t.selectionEnd;
+   t.value = t.value.substring(0, startPos)
+            + v.value
+            + t.value.substring(endPos, t.value.length);
+   t.selectionStart = startPos + v.value.length;
+   t.selectionEnd = t.selectionStart;
+}
+function ecrire(v) {
+   var t = document.forms[0].toto;
+   t.focus();
+   if (document.selection) ecrire_version_ie(t, v)
+   else ecrire_version_netscape(t, v);
+}
+
+function selectionner()
+{
+   var t = document.forms[0].toto;
+   t.focus();
+   t.selectionStart = 0;
+   t.selectionEnd = t.value.length;
+}
+function effacer()
+{
+   document.forms[0].toto.value = "";
+}
+function alerter()
+{
+   alert(document.forms[0].toto.value);
+}
+function sauver()
+{
+   var t = document.forms[0].toto;
+   document.write('\
+<head>\n\
+  <meta http-equiv="text/html; content-type=utf-8">\n\
+</head>\n\
+<body>\n<pre>\n');
+   document.write(t.value);
+   document.write('\n</pre>\n</body>\n</html>\n');
+   document.close();
+}
+-->
+</script>
+
+<form method="post" action="http://localhost:3220/cgi-bin/save">
+<p>
+<input type="button" value="،" onclick="ecrire(this)" />
+<input type="button" value="؛" onclick="ecrire(this)" />
+<input type="button" value="؟" onclick="ecrire(this)" />
+<input type="button" value="ء" onclick="ecrire(this)" />
+<input type="button" value="ً" onclick="ecrire(this)" />
+<input type="button" value="ٌ" onclick="ecrire(this)" />
+<input type="button" value="ٍ" onclick="ecrire(this)" />
+<input type="button" value="َ" onclick="ecrire(this)" />
+<input type="button" value="ُ" onclick="ecrire(this)" />
+<input type="button" value="ِ" onclick="ecrire(this)" />
+<input type="button" value="ّ" onclick="ecrire(this)" />
+<input type="button" value="ْ" onclick="ecrire(this)" />
+<input type="button" value="ٔ" onclick="ecrire(this)" />
+<input type="button" value="ٕ" onclick="ecrire(this)" />
+<br />
+<input type="button" value="ء" onclick="ecrire(this)" />
+<input type="button" value="آ" onclick="ecrire(this)" />
+<input type="button" value="أ" onclick="ecrire(this)" />
+<input type="button" value="ؤ" onclick="ecrire(this)" />
+<input type="button" value="إ" onclick="ecrire(this)" />
+<input type="button" value="ئ" onclick="ecrire(this)" />
+<input type="button" value="ا" onclick="ecrire(this)" />
+<input type="button" value="ب" onclick="ecrire(this)" />
+<input type="button" value="ة" onclick="ecrire(this)" />
+<input type="button" value="ت" onclick="ecrire(this)" />
+<input type="button" value="ث" onclick="ecrire(this)" />
+<input type="button" value="ج" onclick="ecrire(this)" />
+<input type="button" value="ح" onclick="ecrire(this)" />
+<input type="button" value="خ" onclick="ecrire(this)" />
+<br />
+<input type="button" value="د" onclick="ecrire(this)" />
+<input type="button" value="ذ" onclick="ecrire(this)" />
+<input type="button" value="ر" onclick="ecrire(this)" />
+<input type="button" value="ز" onclick="ecrire(this)" />
+<input type="button" value="س" onclick="ecrire(this)" />
+<input type="button" value="ش" onclick="ecrire(this)" />
+<input type="button" value="ص" onclick="ecrire(this)" />
+<input type="button" value="ض" onclick="ecrire(this)" />
+<input type="button" value="ط" onclick="ecrire(this)" />
+<input type="button" value="ظ" onclick="ecrire(this)" />
+<input type="button" value="ع" onclick="ecrire(this)" />
+<input type="button" value="غ" onclick="ecrire(this)" />
+<br />
+<input type="button" value="ـ" onclick="ecrire(this)" />
+<input type="button" value="ف" onclick="ecrire(this)" />
+<input type="button" value="ق" onclick="ecrire(this)" />
+<input type="button" value="ك" onclick="ecrire(this)" />
+<input type="button" value="ل" onclick="ecrire(this)" />
+<input type="button" value="م" onclick="ecrire(this)" />
+<input type="button" value="ن" onclick="ecrire(this)" />
+<input type="button" value="ه" onclick="ecrire(this)" />
+<input type="button" value="و" onclick="ecrire(this)" />
+<input type="button" value="ى" onclick="ecrire(this)" />
+<input type="button" value="ي" onclick="ecrire(this)" />
+</p>
+
+<p>
+<dl><dd><textarea name="toto" rows="24" cols="40" id="toto">
+</textarea>
+</dd></dl>
+</p>
+
+<p>
+<input type="button" value="selectionner" onclick="selectionner()" />
+<input type="button" value="effacer" onclick="effacer()" />
+</p>
+
+<p>
+<input type="button" value="alerter" onclick="alerter()" />
+<input type="submit" value="sauver" />
+</p>
+</form>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer"><img
+          src="http://www.w3.org/Icons/valid-xhtml11"
+          alt="Valid XHTML 1.1!" height="31" width="88"
+	  style="border:0" /></a>
+</p>
+
+</body>
+</html>

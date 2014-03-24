@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" 
+ "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+  <!-- $Id: unicode.utf8.html,v 1.12 2006-11-05 00:26:17 deraugla Exp $ -->
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Unicode Keyboard</title>
+</head>
+<body>
+
+<script type="text/javascript"><!--
+function ecrire_version_ie(t, v)
+{
+  sel = document.selection.createRange();
+  sel.text = v.value;
+}
+function ecrire_version_netscape(t, v)
+{
+   var startPos = t.selectionStart;
+   var endPos = t.selectionEnd;
+   t.value = t.value.substring(0, startPos)
+            + v.value
+            + t.value.substring(endPos, t.value.length);
+   t.selectionStart = startPos + v.value.length;
+   t.selectionEnd = t.selectionStart;
+}
+function ecrire(v) {
+   var t = document.forms[0].toto;
+   t.focus();
+   if (document.selection) ecrire_version_ie(t, v)
+   else ecrire_version_netscape(t, v);
+}
+var v1 = 0;
+var v2 = 0;
+var v3 = 0;
+var default_bg;
+var ta = 0;
+var tb = 0;
+var tc = 0;
+var ty = 0;
+var initialized = 0;
+function init() {
+  if (initialized == 0) {
+     var t = document.forms[0];
+     initialized = 1;
+     ta = new Array(t.a0,t.a1,t.a2,t.a3,t.a4,t.a5,t.a6,t.a7,
+                    t.a8,t.a9,t.a10,t.a11,t.a12,t.a13,t.a14,t.a15);
+     tb = new Array(t.b0,t.b1,t.b2,t.b3,t.b4,t.b5,t.b6,t.b7,
+                    t.b8,t.b9,t.b10,t.b11,t.b12,t.b13,t.b14,t.b15);
+     tc = new Array(t.c0,t.c1,t.c2,t.c3,t.c4,t.c5,t.c6,t.c7,
+                    t.c8,t.c9,t.c10,t.c11,t.c12,t.c13,t.c14,t.c15);
+     ty = new Array(t.y0,t.y1,t.y2,t.y3,t.y4,t.y5,t.y6,t.y7,
+                    t.y8,t.y9,t.y10,t.y11,t.y12,t.y13,t.y14,t.y15);
+  }
+}
+function mise_a_jour(v1, v2, v3) {
+   var t = document.forms[0];
+   var v = v1 * 4096 + v2 * 256 + v3 * 16;
+   init ();
+   t.x.value = v1 + "-" + v2 + "-" + v3;
+   for (i = 0; i < ty.length; i++)
+     ty[i].value = String.fromCharCode(v++);
+}
+function changer1(x) {
+   if (v1 != 0) v1.style.background = default_bg;
+   default_bg = x.style.background;
+   x.style.background = "red";
+   v1 = x;
+   if (v1 != 0 && v2 != 0 && v3 != 0)
+      mise_a_jour(v1.value, v2.value, v3.value);
+}
+function changer2(x) {
+   if (v2 != 0) v2.style.background = default_bg;
+   default_bg = x.style.background;
+   x.style.background = "red";
+   v2 = x;
+   if (v1 != 0 && v2 != 0 && v3 != 0)
+      mise_a_jour(v1.value, v2.value, v3.value);
+}
+function changer3(x) {
+   if (v3 != 0) v3.style.background = default_bg;
+   default_bg = x.style.background;
+   x.style.background = "red";
+   v3 = x;
+   if (v1 != 0 && v2 != 0 && v3 != 0)
+      mise_a_jour(v1.value, v2.value, v3.value);
+}
+function precedent() {
+   init();
+   if (v1 != 0 && v2 != 0 && v3 != 0) {
+       if (v3.value > 0) changer3(tc[eval(v3.value)-1])
+       else if (v2.value > 0) {
+           changer3(tc[15]);
+           changer2(tb[eval(v2.value)-1]);
+       }
+       else if (v1.value > 0) {
+           changer3(tc[15]);
+           changer2(tb[15]);
+           changer1(ta[eval(v1.value)-1]);
+       }
+   }
+}
+function suivant() {
+   init();
+   if (v1 != 0 && v2 != 0 && v3 != 0) {
+       if (v3.value < 15) changer3(tc[eval(v3.value)+1])
+       else if (v2.value < 15) {
+           changer3(tc[0]);
+           changer2(tb[eval(v2.value)+1]);
+       }
+       else if (v1.value < 15) {
+           changer3(tc[0]);
+           changer2(tb[0]);
+           changer1(ta[eval(v1.value)+1]);
+       }
+   }
+}
+function changer(x1,x2,x3) {
+   changer1(x1);
+   changer2(x2);
+   changer3(x3);
+}
+
+function selectionner()
+{
+   var t = document.forms[0].toto;
+   t.focus();
+   t.selectionStart = 0;
+   t.selectionEnd = t.value.length;
+}
+function effacer()
+{
+   document.forms[0].toto.value = "";
+}
+function alerter()
+{
+   alert(document.forms[0].toto.value);
+}
+function sauver()
+{
+   var t = document.forms[0].toto;
+   document.write('\
+<head>\n\
+  <meta http-equiv="text/html; content-type=utf-8">\n\
+</head>\n\
+<body>\n<pre>\n');
+   document.write(t.value);
+   document.write('\n</pre>\n</body>\n</html>\n');
+   document.close();
+}
+-->
+</script>
+
+<form method="post" action="http://localhost:3220/cgi-bin/save">
+<p>
+<script type="text/javascript"><!--
+for (i = 0; i < 16; i++) {
+  document.write("<input name=\"a" + i + "\" type=\"button\" value=\"" + i + "\" onclick=\"changer1(this)\" />\n");
+}
+document.write("<br/>\n");
+for (i = 0; i < 16; i++) {
+  document.write("<input name=\"b" + i + "\" type=\"button\" value=\"" + i + "\" onclick=\"changer2(this)\" />\n");
+}
+document.write("<br/>\n");
+for (i = 0; i < 16; i++) {
+  document.write("<input name=\"c" + i + "\" type=\"button\" value=\"" + i + "\" onclick=\"changer3(this)\" />\n");
+}
+document.write("<br/>\n");
+-->
+</script>
+<input name="x" type="button" value="" />
+<br/>
+<input type="button" value="Arabic" onclick="changer(a0,b6,c2)" />
+<input type="button" value="Armenian" onclick="changer(a0,b5,c3)" />
+<input type="button" value="Braille" onclick="changer(a2,b8,c0)" />
+<input type="button" value="Chinese" onclick="changer(a4,b14,c0)" />
+<input type="button" value="Cyrillic" onclick="changer(a0,b4,c0)" />
+<input type="button" value="Georgian" onclick="changer(a1,b0,c10)" />
+<input type="button" value="Greek" onclick="changer(a0,b3,c9)" />
+<input type="button" value="Hebrew" onclick="changer(a0,b5,c13)" />
+<br/>
+<input type="button" value="Sanscrit" onclick="changer(a0,b9,c0)" />
+<input type="button" value="Latin 1" onclick="changer(a0,b0,c0)" />
+<input type="button" value="arrows" onclick="changer(a2,b1,c9)" />
+<input type="button" value="math" onclick="changer(a2,b2,c0)" />
+<input type="button" value="lines" onclick="changer(a2,b5,c0)" />
+</p>
+
+<script type="text/javascript"><!--
+document.write('<table border="0" cellpadding="0" cellspacing="0"><tr>');
+document.write('<td align="left" colspan="16">');
+document.write('<input type="button" value="&lt;" onclick="precedent()" />');
+document.write('<input type="button" value="&gt;" onclick="suivant()" />');
+document.write('</td>');
+document.write('</tr>');
+for (i = 0; i < 16; i++) {
+  if (i % 16 == 0) document.write('<tr>\n');
+  document.write("<td>\n");
+  document.write(
+    "<input name=\"y" + i + "\" style=\"background:#ccf" +
+    "\" type=\"button\" value=\"" + "" + "\" onclick=\"ecrire(this)\" />\n");
+  document.write("</td>\n");
+  if (i % 16 == 15) document.write('</tr>\n');
+}
+document.write('</table>');
+--></script>
+
+<dl><dd>
+<textarea name="toto" rows="12" cols="50" id="toto">
+</textarea>
+</dd></dl>
+
+<p>
+<input type="button" value="select" onclick="selectionner()" />
+<input type="button" value="erase" onclick="effacer()" />
+</p>
+
+<p>
+<input type="button" value="alert" onclick="alerter()" />
+</p>
+</form>
+
+<p>
+      <a href="http://validator.w3.org/check?uri=referer"><img
+          src="http://www.w3.org/Icons/valid-xhtml11"
+          alt="Valid XHTML 1.1!" height="31" width="88"
+	  style="border:0" /></a>
+</p>
+
+</body>
+</html>
