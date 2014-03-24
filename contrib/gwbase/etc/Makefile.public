@@ -1,0 +1,18 @@
+# $Id: Makefile.public,v 1.4 2008-03-31 11:36:28 deraugla Exp $
+
+GW=../../geneweb/src
+OBJS=$(GW)/secure.cmo $(GW)/buff.cmo $(GW)/name.cmo $(GW)/iovalue.cmo $(GW)/mutil.cmo $(GW)/db2.cmo $(GW)/adef.cmo $(GW)/db2disk.cmo $(GW)/futil.cmo $(GW)/btree.cmo $(GW)/dutil.cmo $(GW)/database.cmo $(GW)/gwdb.cmo $(GW)/checkItem.cmo $(GW)/gutil.cmo
+
+all: public public2
+
+clean:
+	rm -f *.o *.cm[iox] public public2
+
+public: public.cmx
+	ocamlopt.opt unix.cmxa $(OBJS:.cmo=.cmx) $< -o $@
+
+public2: public2.cmx
+	ocamlopt.opt unix.cmxa $(OBJS:.cmo=.cmx) $(GW)/progrBar.cmx $< -o $@
+
+%.cmx: %.ml
+	ocamlopt.opt -c -pp camlp5r -I $(GW) $<

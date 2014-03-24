@@ -1,0 +1,94 @@
+chkimg.cmo: $(GWB)/src/argl.cmo $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmi $(GWB)/src/gwdb.cmi 
+chkimg.cmx: $(GWB)/src/argl.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmx $(GWB)/src/gwdb.cmx 
+cleopatre.cmo: $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmi \
+    gwlib.cmo 
+cleopatre.cmx: $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmx \
+    gwlib.cmx 
+connex.cmo: $(GWB)/src/adef.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmi $(GWB)/src/gwdb.cmi \
+    $(GWB)/src/lock.cmi $(GWB)/src/mutil.cmi 
+connex.cmx: $(GWB)/src/adef.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmx $(GWB)/src/gwdb.cmx \
+    $(GWB)/src/lock.cmx $(GWB)/src/mutil.cmx 
+consmoy.cmo: $(GWB)/src/adef.cmi $(GWB)/src/argl.cmo \
+    $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmi 
+consmoy.cmx: $(GWB)/src/adef.cmx $(GWB)/src/argl.cmx \
+    $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmx 
+geneanet.cmo: $(GWB)/src/adef.cmi $(GWB)/src/ansel.cmo \
+    $(GWB)/src/argl.cmo $(GWB)/src/checkItem.cmi \
+    $(GWB)/src/def.cmi $(GWB)/src/gutil.cmi \
+    $(GWB)/src/gwdb.cmi 
+geneanet.cmx: $(GWB)/src/adef.cmx $(GWB)/src/ansel.cmx \
+    $(GWB)/src/argl.cmx $(GWB)/src/checkItem.cmx \
+    $(GWB)/src/def.cmi $(GWB)/src/gutil.cmx \
+    $(GWB)/src/gwdb.cmx 
+gwck.cmo: $(GWB)/src/adef.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmi $(GWB)/src/lock.cmi \
+    $(GWB)/src/mutil.cmi $(GWB)/src/progrBar.cmi 
+gwck.cmx: $(GWB)/src/adef.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmx $(GWB)/src/lock.cmx \
+    $(GWB)/src/mutil.cmx $(GWB)/src/progrBar.cmx 
+gwlib.cmo: $(GWB)/src/adef.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmi 
+gwlib.cmx: $(GWB)/src/adef.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmx 
+hist.cmo: $(GWB)/src/argl.cmo $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmi $(GWB)/src/gwdb.cmi 
+hist.cmx: $(GWB)/src/argl.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmx $(GWB)/src/gwdb.cmx 
+lune.cmo: $(GWB)/src/adef.cmi $(GWB)/src/calendar.cmi \
+    $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmi 
+lune.cmx: $(GWB)/src/adef.cmx $(GWB)/src/calendar.cmx \
+    $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmx 
+modif.cmo: $(GWB)/src/adef.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmi $(GWB)/src/name.cmi 
+modif.cmx: $(GWB)/src/adef.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmx $(GWB)/src/name.cmx 
+nbdesc.cmo: $(GWB)/src/adef.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmi $(GWB)/src/mutil.cmi \
+    $(GWB)/src/progrBar.cmi 
+nbdesc.cmx: $(GWB)/src/adef.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmx $(GWB)/src/mutil.cmx \
+    $(GWB)/src/progrBar.cmx 
+popule.cmo: $(GWB)/src/adef.cmi $(GWB)/src/buff.cmo \
+    $(GWB)/src/calendar.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmi gwlib.cmo $(GWB)/src/mutil.cmi \
+    $(GWB)/src/outbase.cmi 
+popule.cmx: $(GWB)/src/adef.cmx $(GWB)/src/buff.cmx \
+    $(GWB)/src/calendar.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gwdb.cmx gwlib.cmx $(GWB)/src/mutil.cmx \
+    $(GWB)/src/outbase.cmx 
+public.cmo: $(GWB)/src/adef.cmi \
+    $(GWB)/src/checkItem.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmi $(GWB)/src/gwdb.cmi 
+public.cmx: $(GWB)/src/adef.cmx \
+    $(GWB)/src/checkItem.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmx $(GWB)/src/gwdb.cmx 
+public2.cmo: $(GWB)/src/adef.cmi \
+    $(GWB)/src/checkItem.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmi $(GWB)/src/gwdb.cmi \
+    $(GWB)/src/progrBar.cmi 
+public2.cmx: $(GWB)/src/adef.cmx \
+    $(GWB)/src/checkItem.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmx $(GWB)/src/gwdb.cmx \
+    $(GWB)/src/progrBar.cmx 
+select.cmo: $(GWB)/src/adef.cmi $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmi $(GWB)/src/gwdb.cmi 
+select.cmx: $(GWB)/src/adef.cmx $(GWB)/src/def.cmi \
+    $(GWB)/src/gutil.cmx $(GWB)/src/gwdb.cmx 
+selroy.cmo: $(GWB)/src/adef.cmi $(GWB)/src/argl.cmo \
+    $(GWB)/src/buff.cmo $(GWB)/src/calendar.cmi \
+    $(GWB)/src/def.cmi $(GWB)/src/gutil.cmi \
+    $(GWB)/src/gwdb.cmi select.cmo 
+selroy.cmx: $(GWB)/src/adef.cmx $(GWB)/src/argl.cmx \
+    $(GWB)/src/buff.cmx $(GWB)/src/calendar.cmx \
+    $(GWB)/src/def.cmi $(GWB)/src/gutil.cmx \
+    $(GWB)/src/gwdb.cmx select.cmx 
+titres.cmo: $(GWB)/src/adef.cmi $(GWB)/src/buff.cmo \
+    $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmi \
+    $(GWB)/src/name.cmi 
+titres.cmx: $(GWB)/src/adef.cmx $(GWB)/src/buff.cmx \
+    $(GWB)/src/def.cmi $(GWB)/src/gwdb.cmx \
+    $(GWB)/src/name.cmx 

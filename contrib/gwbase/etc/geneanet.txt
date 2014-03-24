@@ -1,0 +1,4532 @@
+ibn Abd-ar-Rahman;calife de Cordoue;;;1;;;;;M
+d'Acigné;;1023;1579;3;;;;;M
+d' Acigné;;1684;1684;1;;;;;M
+d'Acquigny;;1210;1210;1;;;;;M
+d'Acre;;1272;1307;1;;;;;M
+Adam de Flamare;;1837;1849;2;;;;;M
+Aéton;;1689;1689;1;;;;;M
+d'Agoult;dame de Trets;;;1;;;;;M
+d' Aguesseau;;1737;1794;1;;;;;M
+d'Ahlefeldt;;1551;1741;7;;;;;M
+d'Ahlefeldt;;1672;1726;1;Copenhague;;;;M
+d'Aichelberg;;1674;1762;1;;;;;M
+de l'Aigle;;1045;1085;1;Sainte-Suzanne;;;;M
+de l'Aigle;comte du Perche;1080;1165;4;;;;;M
+d'Aigremont;;1230;1304;2;;;;;M
+d'Ailly;;1435;1470;2;;;;;M
+Alber;;1495;1692;5;;;;;M
+d'Albert;;1678;1704;3;;;;;M
+d'Albert;duc de Luynes;1578;1621;1;Mornas;;;;M
+d'Albert;duc de Luynes;1620;1758;3;Paris;;;;M
+d'Albi;;860;860;1;;;;;M
+d'Albion;;943;943;1;;;;;M
+d'Albon;comte;1045;1228;10;;;;;M
+d'Albon;comte;1095;1142;1;La Bussière;;;;M
+d'Albret;comte de Dreux;1400;1415;1;Azincourt;;;;M
+d'Albret;infante de Navarre;1115;1555;28;;;;;M
+d'Albret;reine de Navarre;1528;1572;1;à Pau;;;;M
+d'Albuquerque;comte;1339;1435;2;;;;;M
+Aldobrandini;;1585;1646;1;;;;;M
+Alen;;1722;1850;2;;;;;M
+d'Alençon;;1031;1031;4;;;;;M
+Allafort;seigneur de Lascoux;1700;1792;2;;;;;M
+Allaire;;1628;1702;1;Saint-Malo;;;;M
+Allais;;1676;1771;3;;;;;M
+Alleman;;1488;1488;1;;;;;M
+Alliata Campaglia;;1844;1844;1;;;;;M
+d'Almayne;;1235;1271;1;;;;;M
+Aloigny de Rochefort;;1691;1691;1;;;;;M
+d'Alsace;;819;1037;2;;;;;M
+d'Alsace;duc;;;1;;;ALS;FRA;M
+d'Altena;comte;1249;1249;1;;;;;M
+d'Altenbourg;comte du Sundgau;970;1050;6;;;;;M
+Alvarez de Tolède;;1522;1562;4;;;;;M
+Alvarez de Tolède;duc d'Albe de Tormes;1508;1582;1;Piedrahita, Avila;;;;M
+d'Amalon;;1150;1172;1;;;;;M
+Ambard;;1642;1658;1;Cassis;;;;M
+Ambard;;1667;1673;2;Le Prêcheur;;;;M
+d'Amboise;;1107;1485;10;;;;;M
+Ameline;;1580;1580;1;;;;;M
+d'Amiens;;795;1050;3;;;;;M
+d'Amstel;;1315;1377;1;;;;;M
+d'Andechs;;906;1279;10;;;;;M
+d'Andechs;reine de France;1196;1201;1;Château de Poissy;;;FRA;M
+Anderson;;1241;1241;1;;;;;M
+Andoin;;1755;1755;1;;;;;M
+Andre;;1629;1629;1;;;;;M
+Andre;;1662;1675;1;Le Prêcheur;;;;M
+Andreae;;1528;1624;2;;;;;M
+d'Anduze;;1115;1227;8;;;;;M
+Angar;;1717;1839;4;;;;;M
+Ange;dame de Roumanie;1294;1311;1;;;;ROM;M
+Ange;empereur de Constantinople;1155;1318;21;;;;;M
+d'Angle;seigneur d'Oiré;1110;1402;7;;;;;M
+d'Angleterre;;927;1093;5;;;;;M
+d'Angleterre;roi;1003;1066;1;à Islib, Oxfordshire;;ENG;GBR;M
+d'Angleterre;roi;1051;1125;1;;;ENG;GBR;M
+des Anglos-Saxons;roi;843;871;1;Merton, Devon, Angleterre;;;;M
+des Anglos-Saxons;roi;870;924;1;Farndon, Cheshire, Angleterre;;;;M
+des Anglos-Saxons;roi d'York;902;902;1;Holme, West Yorkshire, Angleterre;;;;M
+des Anglos-Saxons;roi de Wessex;775;951;16;;;;;M
+des Anglos-Saxons;roi de Wessex;849;899;1;Wantage, Oxfordshire, Angleterre;;;;M
+d'Angoulême;;1547;1575;1;Fontainebleau;;;;M
+d'Angoulême;comte;830;1844;41;;;;;M
+d'Angoulême;comte;1115;1179;1;Messine, Italie;;;;M
+d'Angoulême;duc;1573;1650;1;Le Fayet;;;;M
+d'Angoulême;duc d'Orléans;1549;1574;2;;;;FRA;M
+d'Angoulême;reine d'Angleterre;1186;1246;1;à Fontevrault;;ENG;GBR;M
+d'Angoulême;roi de France;1494;1547;1;à Cognac;;;FRA;M
+d'Angoulême;roi de France;1519;1559;1;Saint-Germain-en-Laye;;;FRA;M
+d'Angoulême;roi de France;1544;1560;1;Fontainebleau;;;FRA;M
+d'Angoulême;roi de France;1551;1589;1;Saint-Cloud;;;FRA;M
+d'Angoulême-Lusignan;;1220;1220;1;;;;;M
+d'Anhalt;prince;1170;1252;1;;;;;M
+d'Anhalt-Bernbourg;prince;1300;1834;14;;;;;M
+d'Anhalt-Bernbourg;princesse;1746;1823;1;Bernbourg;;;;M
+d'Anhalt-Bernbourg-Hoym;prince;1669;1766;2;;;;;M
+d'Anhalt-Bernbourg-Schaumbourg-Hoym;prince;1693;1828;4;;;;;M
+d'Anhalt-Bernbourg-Schaumbourg-Hoym;princesse;1797;1817;1;Hoym;;;;M
+d'Anhalt-Coethen;prince;1575;1802;8;;;;;M
+d'Anhalt-Dessau;prince;1567;1817;11;;;;;M
+d'Anhalt-Zerbst;;1679;1740;1;Gotha;;;;M
+d'Anhalt-Zerbst;impératrice de Russie;1729;1796;1;Stettin;;;;M
+d'Anhalt-Zerbst;prince;1230;1747;25;;;;;M
+d'Anhalt-Zerbst;princesse;1563;1718;2;Zerbst;;;;M
+d'Anjou;comte;972;1040;1;Metz;;;;M
+d'Anjou;prince de Tarente;1315;1364;1;Naples;;;;M
+d'Anjou;reine d'Angleterre;1430;1482;1;;;ENG;GBR;M
+d'Anjou;reine de France;1404;1463;1;;;;FRA;M
+d'Anjou;reine de Naples;1326;1382;1;à Naples;;;ITA;M
+d'Anjou;reine de Naples;1373;1435;1;Naples;;;ITA;M
+d'Anjou;reine de Pologne;1372;1399;1;;;;POL;M
+d'Anjou;roi d'Albanie;1318;1335;1;;;;ALB;M
+d'Anjou;roi de Hongrie;1288;1395;3;;;;HUN;M
+d'Anjou;roi de Naples;1226;1480;4;;;;ITA;M
+d'Anjou;roi de Naples;1254;1309;1;Casanova;;;ITA;M
+d'Anjou;roi de Naples;1327;1345;1;Aversa;;;ITA;M
+d'Anjou;roi de Naples;1345;1386;1;à Buda;;;ITA;M
+d'Anjou;vicomte d'Angers;888;1597;70;;;;;M
+d'Anthenaise;;1148;1350;2;;;;;M
+d'Antioche;impératrice de Constantinople;1183;1321;5;;;;;M
+d'Antioche;roi de Chypre;1284;1284;1;Tyr;;;;M
+d'Antioche-Lusignan;roi de Chypre;1334;1473;2;Nicosie;;;;M
+d'Antioche-Lusignan;roi de Chypre;1382;1487;4;;;;;M
+d'Antoing;;965;965;2;;;;;M
+d'Apchier;;1636;1636;3;;;;;M
+Apraxine;;1667;1716;2;;;;;M
+d'Apremont;;1542;1692;2;;;;;M
+d'Aquitaine;;911;1153;8;;;;;M
+d'Aquitaine;;950;972;1;Poitiers;;;;M
+d'Aquitaine;;1024;1077;1;Rome;;;;M
+d'Aquitaine;;1100;1159;1;Jaca, Espagne;;;;M
+d'Aquitaine;duc;875;1126;3;;;AQU;FRA;M
+d'Aquitaine;duc;935;963;1;à Poitiers;;AQU;FRA;M
+d'Aquitaine;duc;935;994;1;Saint-Maixent, France;;AQU;FRA;M
+d'Aquitaine;duc;960;1030;1;à Maillezais;;AQU;FRA;M
+d'Aquitaine;duc;1024;1086;1;Chizé;;AQU;FRA;M
+d'Aquitaine;duc;1099;1137;1;Toulouse;;AQU;FRA;M
+d'Aquitaine;duchesse;1122;1204;1;Fontevrault;;AQU;FRA;M
+d'Aragon;;1198;1559;46;;;;;M
+d'Aragon;;1300;1330;1;Styrie;;;;M
+d'Aragon;;1334;1358;1;Bilbao;;;;M
+d'Aragon;;1428;1445;1;Coimbra, Portugal;;;;M
+d'Aragon;;1457;1508;1;Ischia;;;;M
+d'Aragon;;1470;1524;1;Naples;;;;M
+d'Aragon;duc d'Athènes;1317;1338;2;;;;GRC;M
+d'Aragon;reine;1136;1174;1;Barcelone, Espagne;;ARA;ESP;M
+d'Aragon;reine d'Angleterre;1485;1536;1;;;ENG;GBR;M
+d'Aragon;reine de Castille;1479;1555;1;Tordesillas;;CYL;ESP;M
+d'Aragon;reine de France;1247;1271;1;à Cosenza, Calabre;;;FRA;M
+d'Aragon;roi;1036;1516;13;;;ARA;ESP;M
+d'Aragon;roi;1073;1134;1;Burgos, Espagne;;ARA;ESP;M
+d'Aragon;roi;1076;1149;1;Huesca, Espagne;;ARA;ESP;M
+d'Aragon;roi;1152;1196;1;Perpignan;;ARA;ESP;M
+d'Aragon;roi;1265;1336;2;Barcelone;;ARA;ESP;M
+d'Aragon;roi de Naples;1423;1504;2;;;;ITA;M
+d'Aragon;roi de Naples;1449;1496;1;Milan;;;ITA;M
+d'Aragon;roi de Naples;1467;1496;1;à Naples;;;ITA;M
+d'Aragon-Majorque;roi de Majorque;1336;1375;1;Perpignan;;;;M
+Arbald;;955;955;2;;;;;M
+d'Arcemale;seigneur de Breuil-Langon;1610;1610;1;;;;;M
+Archambault;;1677;1677;1;Loches;;;;M
+Ardenet des Touches;;1792;1792;1;;;;;M
+d'Ardennes;;932;998;3;;;;;M
+d'Arenberg;comtesse;1299;1823;7;;;;;M
+d'Argental;;1050;1050;1;;;;;M
+d'Argies;dame de Catheu;1160;1334;5;;;;;M
+d'Arkel;;1385;1415;1;;;;;M
+d'Arles;;1003;1032;1;Melun;;;;M
+d'Arles;comte;844;999;9;;;;;M
+d'Arles;roi d'Italie;947;947;1;Arles;;;ITA;M
+d'Arles;roi d'Italie;950;950;1;;;;ITA;M
+d'Arlon;comte;1025;1070;2;;;;;M
+d'Armagnac;;1410;1473;1;Mortagne-au-Perche;;;;M
+d'Armagnac;comte;940;1539;24;;;;;M
+Arnesson;jarl de Halland;1059;1059;2;;;;;M
+d'Arnoul;;1630;1647;2;;;;;M
+d'Artois;;1289;1348;1;Senlis;;;;M
+d'Artois;comte;1216;1250;1;bataille de la mansoura;;;;M
+d'Artois;comte;1250;1302;1;à Courtrai;;;;M
+d'Artois;comte d'Eu;1356;1387;1;Apulia;;;;M
+d'Artois;comte d'Eu;1358;1397;1;Micalizo, Anatolie;;;;M
+d'Artois;dame de Brie-Comte-Robert;1285;1425;6;;;;;M
+d'Artois;regente de Navarre;1248;1329;2;Paris;;;;M
+d'Artois;seigneur de Conches;1269;1298;1;Furnes, Belgique;;;;M
+d'Ascanie;;1080;1465;50;;;;;M
+d'Ascanie;duc de Saxe;1100;1170;1;à Stendal;;;;M
+Asen;tsar de Bulgarie;1238;1257;1;;;;BGR;M
+Asénide;;1196;1196;2;;;;;M
+Asénide;roi de Bulgarie;1196;1258;6;;;;BGR;M
+d'Aspremont;;1282;1470;2;;;;;M
+Asselin;;1799;1799;1;Case-Pilote;;;;M
+Asselin;;1820;1820;1;Les Trois-Ilets;;;;M
+Asselin du Chambuert;;1797;1797;1;Fort-St-Pierre;;;;M
+Asselin du Chambuert;;1821;1821;1;St-Pierre;;;;M
+Asselineau;;1725;1725;1;Ste-Marie;;;;M
+Assier;;1596;1771;2;Montpellier;;;;M
+Assier;;1627;1716;2;Mauguio;;;;M
+Assier;;1723;1770;6;;;;;M
+Assier;;1733;1800;1;Rivière-Salée;;;;M
+Assier de Mariette;;1742;1764;1;;;;;M
+Assier de Montferrier;;1772;1896;9;;;;;M
+Assier de Montout;;1740;1779;1;;;;;M
+Assier de Montrose;;1737;1840;2;Grande Anse (Lorrain);;;;M
+Assier de Montrose;;1768;1865;13;;;;;M
+Assier de Montrose;;1822;1894;1;Bordeaux;;;;M
+Assier de Pompignan;;1735;1762;1;Le morne Garnier;;;;M
+Assier de Pompignan;;1752;1893;25;;;;;M
+Assier du Hamelin;;1743;1873;10;;;;;M
+Assier du Louison;;1746;1819;1;;;;;M
+d'Assigny;;1686;1717;1;Treigny;;;;M
+d'Assigny;écuyer;1419;1657;11;;;;;M
+d'Astarac;comte;;;5;;;;;M
+Astorg;;1795;1795;1;Rivière-Salée;;;;M
+des Asturies;roi;693;1103;9;;;;;M
+d'Ath;;1075;1136;3;;;;;M
+Aubester;;1628;1656;1;Écosse;;;;M
+Aubéry;;1810;1846;1;St-Pierre;;;;M
+d'Aubigné;;1329;1739;4;;;;;M
+d'Aubigny;comte d'Arundel;1118;1240;6;;;;;M
+Aubin;;1624;1651;1;;;;;M
+Aubin;;1651;1706;2;St-Pierre;;;;M
+Aubry;;1806;1806;1;;;;;M
+d'Aubusson;;1469;1469;5;;;;;M
+Audebert;;1506;1506;1;Confolens;;;;M
+Audebert;;1815;1815;1;Ste-Marie;;;;M
+Audebert;seigneur de Laubuge;;;1;;;;;M
+Audebert de Laubuge;;1690;1690;1;;;;;M
+d'Audiffredy;;1820;1820;1;Les Trois-Ilets;;;;M
+Audley;;1374;1374;1;;;;;M
+Audrin;;1610;1610;1;;;;;M
+Audrin;;1662;1695;1;Case-Pilote;;;;M
+d'Auga;;1579;1661;5;;;;;M
+Augrain;;1784;1802;2;Le Robert;;;;M
+d'Aulnay;;1305;1324;4;;;;;M
+d'Aumale;comte;1015;1343;3;;;;;M
+d'Aumale;comte d' Aumale;1264;1302;1;bataille de Courtrai;;;;M
+d'Aumont;duc;1709;1826;2;Paris;;;;M
+d'Aumont;duc;1732;1799;1;Château de Guiscard;;;;M
+d'Aumont;duc;;;1;;;;;M
+d'Autrey;;1140;1140;1;;;;;M
+d'Autriche;;1013;1154;5;;;;;M
+d'Autriche;margrave;928;1102;3;;;;AUT;M
+d'Autriche-Este;;1772;1849;4;;;;;M
+d'Autriche-Este;archevêque d'Esztergom;1776;1848;2;Milan;;;;M
+d'Autriche-Este;archiduc d'Autriche;1754;1806;1;Vienne;;;AUT;M
+d'Autriche-Este;archiduchesse;1773;1846;2;Milan;;;AUT;M
+d'Autriche-Este;archiduchesse;1787;1816;1;Monza;;;AUT;M
+d'Autriche-Este;duc de Modène;1819;1875;2;Modène;;;;M
+d'Autun;;1000;1019;1;;;;;M
+d'Auvergne;;819;1437;22;;;;;M
+d'Auvergne;comte;1000;1332;15;;;AUV;FRA;M
+d'Auvergne;comte;1282;1325;1;Paris;;AUV;FRA;M
+d'Auvergne;comtesse de Forez;1358;1417;1;Cleppé en Forez, Loire, France;;;;M
+d'Auvergne;reine de France;1326;1360;1;;;;FRA;M
+d'Avaugour;;1220;1327;6;;;;;M
+d'Avesnes;;1310;1354;1;château de Murat en Bourbonnais;;;;M
+d'Avesnes;dame de Hans;1168;1369;17;;;;;M
+d'Avignon;;1024;1024;1;;;;;M
+d'Aviz;;1386;1447;1;East Shefford, Berkshire, Angleterre;;;;M
+d'Aviz;;1388;1449;2;Lisbonne, Portugal;;;;M
+d'Aviz;;1436;1467;1;Torres Vedras, Portugal;;;;M
+d'Aviz;;1527;1545;1;Coimbra;;;;M
+d'Aviz;cardinal;1378;1614;25;;;;;M
+d'Aviz;duc de Viséu;1394;1460;1;Oporto, Portugal;;;;M
+d'Aviz;duchesse de Bourgogne;1397;1472;1;Évora;;;;M
+d'Aviz;grand-Maître;1390;1443;3;Santarem, Portugal;;;;M
+d'Aviz;impératrice Romain-Germanique;1503;1539;1;Lisbonne;;;;M
+d'Aviz;prince de Catalogne;1429;1466;1;au Portugal;;;;M
+d'Aviz;reine de Castille;1439;1475;1;;;CYL;ESP;M
+d'Aviz;roi de Portugal;1357;1433;1;Lisbonne, Portugal;;;PRT;M
+d'Aviz;roi de Portugal;1391;1438;1;Vizeu, Portugal;;;PRT;M
+d'Aviz;roi de Portugal;1432;1580;5;;;;PRT;M
+d'Aviz;roi de Portugal;1554;1578;1;Lisbonne;;;PRT;M
+d'Avranches;;1055;1055;1;;;;;M
+Árpád;;978;1338;32;;;;;M
+Árpád;roi de Hongrie;1013;1060;1;Zirc;;;HUN;M
+Árpád;roi de Hongrie;1016;1290;18;;;;HUN;M
+Árpád;roi de Hongrie;1147;1172;1;Esztergom;;;HUN;M
+Árpád;roi de Hongrie;1250;1301;1;Venise;;;HUN;M
+de Babenberg;duc de Bavière;1107;1299;14;;;;;M
+de Babenberg;margrave d'Autriche;1073;1246;7;;;;AUT;M
+Babou de la Bourdaisière;;1559;1593;1;Issoire;;;;M
+Baciocchi;duc de Lucques;1762;1841;1;;;;;M
+de Backnang;;1091;1091;1;Salerne;;;;M
+Bacon;;1746;1746;1;;;;;M
+de Bade;;1655;1701;1;Bade;;;;M
+de Bade;comte de Brisgau;1040;1074;1;abbaye de Cluny;;;;M
+de Bade;duc d'Autriche;1248;1250;1;;;;AUT;M
+de Bade;duc de Zähringen;1078;1841;69;;;;;M
+de Bade;margrave;1162;1190;1;Antioche;;;;M
+de Bade;margrave;1728;1830;4;Karlsruhe;;;;M
+de Bade;princesse;1781;1826;1;Karlsruhe, Allemagne;;;;M
+de Bade-Durlach;;1512;1579;1;Sigmaringen;;;;M
+de Bade-Durlach;;1595;1651;1;Saarbrucken;;;;M
+de Bade-Durlach;margrave;1482;1789;25;;;;;M
+de Bade-Durlach;margrave;1647;1709;1;Ueckermünde;;;;M
+de Bade-Durlach;margrave;1679;1738;2;Carlsburg;;;;M
+de Bade-Durlach;prince héritier;1703;1732;1;Stuttgart;;;;M
+de Bade-Hachberg;;1480;1543;1;;;;;M
+Baillard;;1557;1557;1;;;;;M
+Baillardel;;1645;1704;1;Fort-St-Pierre;;;;M
+Baillardel;;1667;1701;2;;;;;M
+Baillardel;Martinique en 1638;1605;1660;1;Dieppe;;;;M
+Baillet de Latour;comtesse;1788;1840;1;;;;;M
+Balbi;;1710;1710;1;;;;;M
+de Balbiano;;1695;1719;1;;;;;M
+Baliol;;1285;1285;2;;;;;M
+de Baliol;;1281;1345;3;;;;;M
+de Ballabriga;;1758;1820;2;;;;;M
+Balliol;régent d'Écosse;1233;1363;3;;;SCT;GBR;M
+Bally;;1763;1843;1;Marseille;;;;M
+Bally;Marchand droguiste puis négociant à Marseille depuis 1738;1716;1784;1;Région de Montpellier;;;;M
+Bally;Ménager (métayer), négociant à Marseille;1711;1711;1;Montpellier;;;;M
+Bally;Travailleur de Terre;1679;1679;1;Baillargues;;;;M
+de Balzac d'Entragues;;1541;1633;2;;;;;M
+de Balçareni;;1005;1079;1;;;;;M
+Banny;;1668;1689;1;Trinité;;;;M
+Banny;Martinique avant 1664;1634;1671;2;;;;;M
+de Bar;;1396;1396;1;Nikopolis;;;;M
+de Bar;comte;977;1462;21;;;;;M
+de Bar;comte;1310;1336;1;Famagusta;;;;M
+de Bar;comte de Marle;1409;1415;1;Azincourt;;;;M
+Baranchon;;1660;1704;1;La Réole;;;;M
+de Barbancon-Werchin;;1520;1593;1;;;;;M
+de Barbarin;seigneur de la Borderie;1643;1643;1;;;;;M
+Barberini;;1630;1699;1;;;;;M
+de Barbezieux;;1285;1320;2;;;;;M
+Barbier;;1690;1703;2;Le Carbet;;;;M
+Barbier;;1746;1788;4;;;;;M
+Barbier;;1759;1759;1;Le Gros-Morne;;;;M
+Barbier;;1766;1791;2;Le Lamentin;;;;M
+de Barby;comtesse;1637;1637;1;;;;;M
+de Barby;comtesse;1641;1684;1;Rosenbourg;;;;M
+de Barby-Muhlingen;comte de Muhlingen;1450;1641;7;;;;;M
+de Barcelone;;897;1236;21;;;;;M
+de Barcelone;prince d'Aragon;1113;1162;1;San Dalmazio de Turin, Italie;;ARA;ESP;M
+Barclay;seigneur de Brechin;1378;1378;2;;;;;M
+Baron;;1626;1651;1;;;;;M
+Baron;;1822;1859;1;Bernadets-Dessus, Dept. Hautes Pyrenees, France;;;;M
+de Barral;;1743;1821;1;;;;;M
+de Barres;;1263;1291;1;;;;;M
+des Barres;;1188;1273;3;;;;;M
+de Barry;;1176;1263;1;;;;;M
+de Barthe;;1711;1759;1;;;;;M
+Baseliers;;1553;1615;2;;;;;M
+de Basse-Lorraine;duc;953;1014;7;;;;;M
+Bathory;prince de Transylvanie;1572;1613;1;Gyulafehervar;;;;M
+Bathory;roi de Pologne;1533;1586;1;Szilágysomlyó (aujourd'hui Simleu Silvaniei), Roumanie;;;POL;M
+de Baudement;seigneur de Braine;1075;1204;4;;;;;M
+Baudet du Savary;;1840;1840;1;;;;;M
+Baudin;;1650;1824;7;;;;;M
+Baudoin;;1577;1619;1;;;;;M
+de Bauffremont;;1447;1447;2;;;;;M
+de Baugé;;1090;1294;8;;;;;M
+Bauhof;;1557;1631;2;;;;;M
+de Baumez;sire;;;2;;;;;M
+Baur;;1504;1585;1;;;;;M
+des Baux;;1116;1538;15;;;;;M
+des Baux;comte d'Andria;1290;1351;1;Naples, Italie;;;;M
+de Bavière;;1306;1330;1;Vienne;;;;M
+de Bavière;comte;800;990;14;;;;;M
+de Bavière-Ingolstadt;;1337;1447;3;;;;;M
+de Bavière-Landshut;;1339;1503;8;;;;;M
+de Bavière-Neubourg;comte palatin de Neubourg;1615;1690;1;Neubourg;;;;M
+de Bavière-Neubourg;comtesse palatine;1547;1748;9;;;;;M
+de Bavière-Neubourg;comtesse palatine de Neubourg;1655;1720;1;Dusseldorf;;;;M
+de Bavière-Neubourg;reine d'Espagne;1667;1740;1;Düsseldorf;;;ESP;M
+de Bayning;;1639;1639;1;;;;;M
+Beaton;;1522;1522;2;;;;;M
+Beauchamp;comte de Warwick;1240;1468;4;;;;;M
+Beauchamp de Betso;baron;1413;1482;2;;;;;M
+de Beauchesne;;1686;1686;1;Blois, Loir-et-Cher;;;;M
+de Beaudiner;dame;1294;1337;1;;;;;M
+Beaudoin;;;;1;Dieppe;;;;M
+de Beauffremont;;1440;1490;1;;;;;M
+Beaufort;comte de Somerset;1371;1509;13;;;;;M
+de Beaugency;seigneur;1040;1132;10;;;;;M
+Beauharnais;;1499;1561;3;;;;;M
+de Beauharnais;;1599;1847;12;;;;;M
+de Beauharnais;;1636;1636;1;Les Presteaux de La Boische, Loiret;;;;M
+de Beauharnais;comte;1756;1819;1;La Rochelle;;;;M
+de Beauharnais;comte des Roches-Baritaud;1717;1784;1;Rochefort, France;;;;M
+de Beauharnais;prince français;1781;1824;1;München, Allemagne;;;;M
+de Beauharnais;princesse de Leuchtenberg;1816;1852;2;Munich (Allemagne);;;;M
+de Beauharnais;princesse de Leuchtenberg;1840;1843;1;Saint-Pétersbourg (Russie);;;;M
+de Beauharnais;vicomte;1760;1794;1;Fort-Royal (auj Fort-de-France), Martinique;;;;M
+de Beaujeu;dame de Belleroche;1107;1245;12;;;;;M
+de Beaumarchais;;1280;1280;1;;;;;M
+de Beaumetz;seigneur de Mirebeau;1215;1323;2;;;;;M
+Beaumont;lord;1342;1432;2;;;;;M
+de Beaumont;vicomte;1186;1356;4;;;;;M
+de Beaumont Sur Oise;;1096;1096;1;;;;;M
+de Beaumont-Gâtinais;;1160;1191;1;Acre, Palestine;;;;M
+de Beaumont-Gâtinais;;1214;1277;4;;;;;M
+de Beaumont-Maine;;1048;1301;8;;;;;M
+de Beaumont-le-Roger;;1130;1130;1;Tunbridge, Kent, Angleterre;;;;M
+de Beaumont-le-Roger;comte;1104;1166;1;Leicester, Angleterre;;;;M
+de Beaumont-le-Roger;comte de Leicester;1050;1118;1;Pont-Audemer;;;;M
+de Beaumont-le-Roger;comte de Leicester;1104;1206;4;;;;;M
+de Beauregard;seigneur de Channoir;1647;1647;1;;;;;M
+de Beauvau;;996;1474;7;;;;;M
+de Beauvoir;;1100;1300;2;;;;;M
+des Beaux;;1314;1314;1;;;;;M
+du Bec;;1678;1678;1;;;;;M
+Beckford;;1760;1844;1;Fonthill, Wiltshire;;;;M
+Belain d'Esnanbuc;;1574;1589;1;Cailleville;;;;M
+Belland;;1743;1817;2;;;;;M
+de Bellanger de Rebourseaux;;1712;1842;5;;;;;M
+Bellay;;1667;1667;1;;;;;M
+du Bellay;;1361;1389;2;;;;;M
+Belleste;Marchand à Dieppe;;;2;;;;;M
+de Bellevile-Montaigu;dame de Montaigu;1300;1359;1;;;;;M
+de Belleville-Montaigu;;1210;1303;4;;;;;M
+Belloncle;;1793;1800;2;;;;;M
+de Beloeil;;1165;1165;1;;;;;M
+Benard;;1644;1698;1;;;;;M
+Beneteau Cardin;;1748;1783;2;Grande Anse (Lorrain);;;;M
+Beneteau Laprairie;;1659;1732;1;La Rochelle;;;;M
+Beneteau Laprairie;;1711;1770;1;Grande Anse (Lorrain);;;;M
+Bennett;comtesse d'Arlington;1667;1722;2;;;;;M
+de Bentheim;comte de Bentheim-Steinfurt;1460;1562;3;;;;;M
+de Bentheim-Tecklenbourg;comte de Bentheim;1554;1670;4;;;;;M
+Bentinck;comte de Portland;1649;1809;3;;;;;M
+Bentinck;duc de Portland;1681;1726;1;en Jamaique;;;;M
+de Berg;comte de Berg-Heerenberg;1114;1506;9;;;;;M
+Berger des Rivières;;1681;1681;1;;;;;M
+de Bergerac;;1250;1250;2;;;;;M
+de Bergh;;1613;1657;1;;;;;M
+de Beringhes;;1493;1493;1;;;;;M
+de Bermond de Caylar;;1715;1715;1;;;;;M
+de Bermondet;;1654;1724;1;;;;;M
+Bernadotte;;1683;1760;1;;;;;M
+Bernadotte;;1711;1780;1;Pau, France;;;;M
+Bernadotte;roi de Suède;1763;1844;1;Pau, Bearn, France;;;SWE;M
+Bernard Cordier;;1789;1812;2;Les Anses d'Arlet;;;;M
+Bernard Cordier;;1826;1826;1;Anses d'Arlet;;;;M
+de Bernard de Feissal;;1785;1821;2;St-Pierre;;;;M
+de Bernard de Feissal;;1819;1819;1;Le Mouillage (St-Pierre);;;;M
+de Bernard de Feissal;;1826;1826;1;;;;;M
+de Bernicie;;920;920;1;;;;;M
+Bernus;;1804;1804;1;Basse-Pointe;;;;M
+Bernus;;1841;1841;1;Lorrain;;;;M
+Berry;Blanchisseur du linge du corps du Roi;1655;1759;2;Le Pecq, act. Yvelines;;;;M
+Berry;Lavandier du linge du corps du Roy. Officier chez le comte d'Artois;1719;1775;1;Le Pecq, act Yvelines;;;;M
+de Berry;;1759;1807;1;Saint Germain en Laye, France;;;;M
+de Berry;;1796;1841;1;à Fort-Royal;;;;M
+de Berry;duc;1340;1435;3;;;;;M
+de Berry;duchesse d'Auvergne;1375;1434;1;Lyon, act Rhône, France;;AUV;FRA;M
+Bertin;;1668;1734;2;;;;;M
+Bertin de Marostel;Chevau Léger, Garde.;1666;1666;1;;;;;M
+Beslivier;seigneur de Fontmorte;1642;1642;1;;;;;M
+Beslivier de Prin;;1732;1732;2;;;;;M
+de Bethizy de Mezieres;;1706;1757;1;;;;;M
+Bethlen;;1530;1590;1;;;;;M
+Bethlen;roi de Hongrie;1580;1629;1;;;;HUN;M
+de Bettau;;1030;1086;1;;;;;M
+Betulius;;1662;1699;1;;;;;M
+de Beuren;évêque de Strasbourg;1047;1103;3;;;;;M
+de Beuthen;duc;1306;1317;2;;;;;M
+de Beuze;;1697;1701;2;;;;;M
+de Beuze;;1712;1712;1;Fort-Royal, Martinique;;;;M
+de Beuze;Lieutenant de cavalerie;1678;1687;1;Bonneville Arch. Rouen;;;;M
+de Béarn;;1078;1319;8;;;;;M
+Béchameil de Nointel;;1692;1692;1;;;;;M
+de Béhague;;1734;1809;1;;;;;M
+de Bénévent;;849;1444;5;;;;;M
+Béraut;;1793;1836;1;à Terraude;;;;M
+Béraut;Cultivateur;;;1;;;;;M
+de Bésalu;;992;1020;5;;;;;M
+de Béthune;seigneur;1129;1605;10;;;;;M
+de Béthune;seigneur;1200;1248;1;Palestine;;;;M
+de Béziers;;1105;1105;2;;;;;M
+de Bickenbach;;1450;1530;1;;;;;M
+Bidenbach;;1500;1630;5;;;;;M
+von Biedenfeld;;1560;1588;1;;;;;M
+de Bielsko;duc;1246;1246;2;;;;;M
+de Biencourt;;1664;1664;1;;;;;M
+Bigod;comte de Norfolk;1225;1270;1;;;;;M
+de Bigorre;comte;965;1225;17;;;;;M
+Bigot de Terland;;1725;1725;2;;;;;M
+Biguet;;1748;1828;1;Sermaize (Marne);;;;M
+Biguet;Entrepreneur de bâtiments;;;1;;;;;M
+Biguet;Marinier jusqu'en 1808;1778;1797;1;Sermaize;;;;M
+Bilfinger;;1652;1761;2;;;;;M
+Billet;;1712;1782;1;;;;;M
+Binard;;1608;1721;3;;;;;M
+Bingham;;1781;1781;1;London;;;;M
+de Bionne;;1679;1724;1;Le Prêcheur;;;;M
+de Bionne;;1728;1795;1;St-Pierre;;;;M
+de Bionne;Chirurgien au Prêcheur;1647;1675;1;Flaville (Normandie);;;;M
+Birot;;1705;1705;1;Le Marigot;;;;M
+Birot;;1724;1724;1;Trinité;;;;M
+Birot;;1732;1732;1;Ste-Marie;;;;M
+Birot;Martinique avant 1664;1638;1743;3;;;;;M
+Birot Avenant;;1752;1752;1;Trinité;;;;M
+Birot Avenant;;1775;1810;3;Le Gros-Morne;;;;M
+Birot Avenant;;1809;1809;1;Gros-Morne;;;;M
+Birot Avenant;;1831;1831;1;Gros-Morne, Martinique;;;;M
+Birot Avenant Montlouis;;1778;1778;1;Le Gros-Morne;;;;M
+Birot Desgranges;;1810;1810;1;Le Gros-Morne;;;;M
+de Bisceglie;prince de Salerne;1481;1500;1;;;;;M
+von Bismarck;;1667;1840;4;;;;;M
+Bjelke;;1428;1436;3;;;;;M
+Bjelke;;1568;1592;1;Bråborg, Suède;;;;M
+Blanc;;1772;1772;1;St-Pierre;;;;M
+Blanchard du Boust;;1575;1575;1;;;;;M
+Blanchetiere;;1724;1724;1;Trinité;;;;M
+de Blecourt;;1495;1495;1;;;;;M
+de Bleschamp;;1778;1855;2;;;;;M
+de Blois;comtesse de Boulogne;943;1230;20;;;;;M
+de Blois;roi d'Angleterre;1097;1154;1;;;ENG;GBR;M
+Blome;;1575;1646;2;;;;;M
+Blondeau;;1677;1677;2;;;;;M
+Blondeau;;1677;1677;1;Saumur;;;;M
+de Blondeaux;;1599;1599;1;;;;;M
+Blondel;;1626;1817;7;;;;;M
+Blondel de La Rougery;chevalier de Saint-Louis;1747;1870;15;;;;;M
+von Bock und Polach;;1799;1847;1;;;;;M
+Bodet de la Fenestre;;1819;1819;1;;;;;M
+Bodulgate;;1380;1440;1;;;;;M
+de Boelaere;;1207;1207;2;;;;;M
+de Bogen;comte;1094;1198;3;;;;;M
+Boggiana;;1686;1686;1;;;;;M
+de Bohun;comte de Hereford;1171;1399;4;;;;;M
+von Boineburg;;1583;1632;1;;;;;M
+de Boisselet;;1491;1604;7;;;;;M
+Boleyn;;1477;1539;2;;;;;M
+Boleyn;reine d'Angleterre;1501;1536;1;;;ENG;GBR;M
+Bollioud de Saint-Julien;;1737;1737;2;;;;;M
+Bonaparte;;1629;1741;5;Ajaccio, Corse-du-Sud;;;;M
+Bonaparte;empereur des Français;1602;1860;19;;;;;M
+Bonaparte;empereur des Français;1769;1821;1;Ajaccio, Corse;;;;M
+Bonaparte;roi de Naples;1768;1844;1;;;;ITA;M
+Bonde;;1376;1417;2;;;;;M
+Bonde;roi de Suède;1409;1470;1;;;;SWE;M
+Bonfils;;1679;1782;2;;;;;M
+Bonjour;;1658;1680;1;Martinique;;;;M
+Bonjour;;1677;1700;1;Marin;;;;M
+Bonjour;Garde de Thoisy;;;1;;;;;M
+Bonnaire;;1835;1835;1;;;;;M
+Bonnenfant;;1448;1448;2;;;;;M
+Bonnenfant;;1683;1736;1;Le Marigot;;;;M
+Bonnet du Gennetay;;1547;1547;1;;;;;M
+Bonneville Bonneterre;;1780;1780;1;Le Gros-Morne;;;;M
+de Bonngau;;891;991;5;;;;;M
+Bonnin;;1834;1834;1;;;;;M
+Boothby;;1848;1848;1;West Twyford, Midx;;;;M
+di Borbone;;1741;1763;1;Buen Retiro;;;;M
+di Borbone;;1773;1802;1;Naples;;;;M
+di Borbone;;1814;1898;1;Palerme;;;;M
+di Borbone;duc de Parme;1720;1866;13;;;;;M
+di Borbone;duchesse de Berry;1798;1870;1;Notre-Dame de Paris;;;;M
+di Borbone;princesse de Naples;1772;1807;1;Naples;;;ITA;M
+di Borbone;princesse de Naples;1784;1806;1;;;;ITA;M
+di Borbone;reine d'Espagne;1751;1819;1;San Ildefonso;;;ESP;M
+de Borbón;;1718;1848;10;;;;;M
+de Borbón;;1771;1774;1;Escorial;;;;M
+de Borbón;;1777;1782;1;San Ildefonso;;;;M
+de Borbón;;1779;1798;1;Aranjuez;;;;M
+de Borbón;infant d'Espagne;1786;1812;1;Rio de Janeiro, Brésil;;;ESP;M
+de Borbón;infante d'Espagne;1745;1792;1;Naples;;;ESP;M
+de Borbón;infante d'Espagne;1775;1830;1;Aranjuez, Madrid;;;ESP;M
+de Borbón;roi d'Espagne;1683;1746;1;Versailles;;;ESP;M
+de Borbón;roi d'Espagne;1707;1724;1;Madrid;;;ESP;M
+de Borbón;roi d'Espagne;1713;1833;4;;;;ESP;M
+de Borbón;roi d'Espagne;1748;1819;1;Pottici;;;ESP;M
+de Bordeaux;;1195;1351;4;;;;;M
+des Bordes;;1587;1587;2;;;;;M
+de Bordesoulle;;1842;1842;1;;;;;M
+Borel;;1768;1791;1;Saint-Pierre Fort;;;;M
+Borel de Miracle;;1770;1770;1;;;;;M
+Borghese-Aldobrandini;;1812;1838;1;;;;;M
+Borghèse;prince;1775;1832;1;;;;;M
+Borgia;duc de Valentinois;1474;1519;3;Rome;;;;M
+Borgia;pape;1431;1503;1;Jávita, Espagne;;;;M
+Borgia;prince de Squillace;1481;1552;3;;;;;M
+de Borselen-Wittem;;1495;1536;1;;;;;M
+Bosc;;1790;1790;1;Chateaudouble, 26;;;;M
+Boscquet de Saint Martin;;1699;1699;1;;;;;M
+Boteler;;1604;1604;1;;;;;M
+de Bothmer;;1697;1748;1;La Hague;;;;M
+de Bothmer;seigneur;1620;1732;2;;;;;M
+Boucher;;1696;1696;1;Le Carbet;;;;M
+de Bouchout;;1440;1476;1;;;;;M
+Boudan;;1674;1674;1;;;;;M
+Boudin;;1765;1841;1;;;;;M
+Boudon;;1674;1706;1;;;;;M
+Bouilhat;;1714;1714;2;;;;;M
+de Bouillé;;1480;1579;3;;;;;M
+du Bouillonney;;1712;1760;1;Champobert;;;;M
+Boulin;;1763;1763;1;Macouba;;;;M
+Boullanger;;1642;1642;1;St-Christophe;;;;M
+de Boulogne;comte de Dammartin;850;1260;19;;;;;M
+de Boulogne;comtesse d'Auvergne;1389;1423;1;;;AUV;FRA;M
+Bourbon;;1841;1841;1;Lorrain;;;;M
+de Bourbon;;1220;1274;1;Dreux;;;;M
+de Bourbon;;1310;1402;1;Avignon;;;;M
+de Bourbon;;1328;1387;1;Naples;;;;M
+de Bourbon;;1334;1383;2;Vincennes;;;;M
+de Bourbon;;1342;1427;1;Louvre, Paris;;;;M
+de Bourbon;;1347;1401;1;Poissy;;;;M
+de Bourbon;;1493;1583;1;chateau de Ham;;;;M
+de Bourbon;;1522;1525;1;Château de la Fète, Picardie, France;;;;M
+de Bourbon;;1732;1820;4;Versailles;;;;M
+de Bourbon;;1764;1794;1;à Versailles;;;;M
+de Bourbon;;1818;1818;1;Elysée-Bourbon;;;;M
+de Bourbon;comte de la Marche;1315;1361;1;Lyon;;;;M
+de Bourbon;duc;1280;1342;1;Pontoise;;;;M
+de Bourbon;duc;1311;1356;1;Poitiers;;;;M
+de Bourbon;duc;1336;1410;1;Montluçon en Bourbonnais, Allier, France;;;;M
+de Bourbon;duc;1381;1434;1;Londres;;;;M
+de Bourbon;duc d'Aquitaine;1753;1754;1;;;AQU;FRA;M
+de Bourbon;reine d'Angleterre;1609;1669;1;;;ENG;GBR;M
+de Bourbon;reine d'Espagne;1603;1644;1;Fontainebleau;;;ESP;M
+de Bourbon;reine de France;1337;1378;1;Vincennes;;;FRA;M
+de Bourbon;roi de France;1553;1824;11;;;;FRA;M
+de Bourbon;roi de France;1601;1643;1;Fontainebleau;;;FRA;M
+de Bourbon;roi de France;1757;1836;1;Château de Versailles;;;FRA;M
+de Bourbon;roi de Naples;1370;1438;1;;;;ITA;M
+de Bourbon;roi de Navarre;1518;1562;1;Les Andelys;;;;M
+de Bourbon;régente de Savoie;1340;1402;1;Mâcon;;;;M
+de Bourbon;seigneur;1048;1821;157;;;;;M
+de Bourbon;seigneur;1197;1242;1;Cognat, Allier, France;;;;M
+de Bourbon;seigneur de Beaujeu;1388;1404;1;Hôtel de Bourbon, Paris;;;;M
+de Bourbon;évêque de Nevers;1523;1590;1;La Ferté-sous-Jouarre;;;;M
+de Bourbon-Condé;;1556;1556;1;Roucy, Aisne, France;;;;M
+de Bourbon-Condé;;1557;1557;1;Nogent-le-Rotrou, Eure-et-Loir, France;;;;M
+de Bourbon-Condé;;1562;1563;1;Gandelou-en-Brie, Aisne, France;;;;M
+de Bourbon-Condé;;1563;1563;1;Muret;;;;M
+de Bourbon-Condé;;1564;1564;1;Dijon;;;;M
+de Bourbon-Condé;;1564;1564;1;château de Roucy;;;;M
+de Bourbon-Condé;;1610;1610;1;palais du Louvre, Paris, France;;;;M
+de Bourbon-Condé;;1648;1648;1;Paris;;;;M
+de Bourbon-Condé;cardinal de Vendôme;1562;1594;1;Gandelu-en-Brie, Aisne, France;;;;M
+de Bourbon-Condé;prince de Condé;1530;1569;1;Château de Vendôme, Loir-et-Cher, France;;;;M
+de Bourbon-Condé;prince de Condé;1552;1830;36;;;;;M
+de Bourbon-Condé;prince de Conti;1558;1614;1;La Ferté-sous-Jouarre, Seine-et-Marne, France;;;;M
+de Bourbon-Conti;duchesse de Bourbon;1689;1759;2;;;;;M
+de Bourbon-Conti;prince de Conti;1629;1825;6;Paris;;;;M
+de Bourbon-Conti;roi de Pologne;1664;1709;1;Paris;;;POL;M
+de Bourbon-Montpensier;;1515;1539;1;chateau d'Amboise;;;;M
+de Bourbon-Montpensier;;1546;1582;1;Anvers;;;;M
+de Bourbon-Montpensier;comte de Montpensier;1403;1627;6;;;;;M
+de Bourbon-Montpensier;duc de Montpensier;1573;1608;1;Reims;;;;M
+de Bourbon-Montpensier;prince de Dombes;1490;1527;1;Rome;;;;M
+de Bourbon-Montpensier;prince de La Roche-sur-Yon;1473;1561;2;Moulins;;;;M
+de Bourbon-Montpensier;prince de La Roche-sur-Yon;1513;1582;1;chateau de Champagny;;;;M
+de Bourbourg;;1214;1214;3;;;;;M
+Bourcel;;1768;1768;1;Case-Pilote;;;;M
+de Bourchenu;;1664;1664;3;;;;;M
+Bourchier;comte d'Essex;1406;1483;2;;;;;M
+Bourdeau d'Antony;;1771;1821;1;Limoges. Egl  Stpierre du Q;;;;M
+Bourdeau d'Antony;;1805;1832;1;Limoges Egl St Etienne, 87;;;;M
+Bourdeau de La Chevalerie;;1680;1784;2;;;;;M
+Bourdeau de La Gueusserie;;1626;1676;1;;;;;M
+Bourdin;;1792;1792;1;Grande Anse (Lorrain);;;;M
+Bourdineau;;1561;1561;3;;;;;M
+de Bourg;;1240;1319;2;;;;;M
+de Bourgelas;;1692;1695;3;;;;;M
+de Bourgelas de Bonneterre;;1692;1770;2;;;;;M
+Bourgeois;;1628;1732;4;;;;;M
+de Bourgogne;;1213;1248;1;Carcassonne, France;;;;M
+de Bourgogne;;1270;1323;1;Chambly;;;;M
+de Bourgogne;;1292;1304;1;bataille de Mons en Puelle;;;;M
+de Bourgogne;;1378;1467;2;Dijon;;;;M
+de Bourgogne;;1390;1463;1;Bruges;;;;M
+de Bourgogne;comte d'Autun;856;1511;133;;;;;M
+de Bourgogne;comte de Boulogne;1323;1346;1;à Aiguillon;;;;M
+de Bourgogne;comte de Galice;1060;1107;1;Grajal, Espagne;;;;M
+de Bourgogne;comte de Mâcon;1060;1102;1;Ascalon, Palestine;;;;M
+de Bourgogne;comte de Portugal;1066;1112;1;Dijon, France;;;PRT;M
+de Bourgogne;comtesse de Nevers;1265;1280;1;Auxerre;;;;M
+de Bourgogne;dame de Bourbon;1272;1310;1;château de Murat en Bourbonnais;;;;M
+de Bourgogne;duc;1011;1076;1;Fleurey sur Ouche;;;;M
+de Bourgogne;duc;1056;1093;1;abbaye de Cluny;;;;M
+de Bourgogne;duc;1060;1102;1;Tarsus, Grêce;;;;M
+de Bourgogne;duc;1148;1192;1;Tyr;;;;M
+de Bourgogne;duc;1342;1404;1;Pontoise, France;;;;M
+de Bourgogne;duc;1371;1419;1;Dijon, France;;;;M
+de Bourgogne;duchesse de Brabant;1457;1482;1;Bruxelles;;;;M
+de Bourgogne;prince d'Orange;1361;1418;1;Paris;;;;M
+de Bourgogne;roi de France;890;1330;2;;;;FRA;M
+de Bourgogne;roi de Portugal;1110;1383;8;;;;PRT;M
+de Bourgogne;régente de l'Empire;931;999;1;Monastère de Seltz, Alsace;;;;M
+de Bourgogne;seigneur d'Arguel;1337;1366;1;siège de Mésembria;;;;M
+de Bourgogne Transjurane;duc;888;888;2;;;;;M
+de Bourgogne-Comté;;1188;1188;2;;;;;M
+de Bourgogne-Comté;comte de Mâcon;1125;1184;1;Mâcon;;;;M
+de Bourgogne-Montagu;;1195;1195;1;;;;;M
+de Bournonville;comte de Henin-Letard;1533;1764;9;;;;;M
+Bourreau;;1607;1607;3;;;;;M
+Bouteiller;;1661;1661;1;;;;;M
+de Bouville;;1265;1265;1;;;;;M
+de Bouzonville;;1075;1075;3;;;;;M
+Bowes de Streatlam;;1749;1800;1;;;;;M
+Bowes-Lyon;comte de Strathmore;1773;1846;2;;;;;M
+Boyd;comte d'Arran;1467;1473;1;;;;;M
+Boyer;;1712;1800;3;;;;;M
+Boyer de Sainte Geneviève;;1631;1697;1;;;;;M
+Boyle;Lord de Clifford;1661;1754;4;;;;;M
+de Boyslèsve;seigneur de Forsan;1531;1551;4;;;;;M
+da Bozzi;;1682;1682;2;;;;;M
+de Brabant;;1104;1406;20;;;;;M
+de Brabant;;1224;1288;1;Compiègne, France;;;;M
+de Brabant;cardinal;1166;1192;1;à Liège;;;;M
+de Brabant;duc;1160;1235;1;Cologne, Allemagne;;;;M
+de Brabant;duc;1207;1248;1;Louvain, Belgique;;;;M
+de Brabant;reine de France;1254;1321;1;;;;FRA;M
+de Brabant-Arschott;;1304;1304;1;;;;;M
+Brachet;;1599;1599;4;;;;;M
+Brachienne Vasselot;seigneur de Danemarie;1422;1422;2;;;;;M
+de Bracquemont;;1410;1415;1;;;;;M
+de Bragance;;1402;1834;32;;;;;M
+de Bragance;duc;1380;1461;1;Chaves;;;;M
+de Bragance;reine d'Angleterre;1638;1705;1;;;ENG;GBR;M
+de Bragance;roi de Portugal;1604;1834;9;;;;PRT;M
+de Bragance;roi de Portugal;1767;1826;1;Lisbonne;;;PRT;M
+Brahé;comte;1629;1689;4;;;;;M
+Branas d'Andrinople;;1204;1204;1;;;;;M
+de Brancas;;1667;1667;1;Paris;;;;M
+Brandon;duc de Suffolk;1484;1559;2;;;;;M
+Brankovitch;;1411;1516;10;;;;;M
+Braque;;1544;1544;8;;;;;M
+Brastberger;;1572;1635;1;;;;;M
+de Brederode;;1505;1567;1;;;;;M
+de Breslau;duc;1216;1352;2;;;;;M
+de Bressey;;1710;1710;1;;;;;M
+de Bressey;;1733;1785;1;Conde-sur-Iton;;;;M
+de Bretagne;;1297;1377;1;Montoire;;;;M
+de Bretagne;dame de Brie-Comte-Robert;1270;1327;1;Vincennes;;;;M
+de Bretagne;dame de Nogent-le-Rotrou;1296;1363;1;Ypres;;;;M
+de Bretagne;duc des Bretons;851;1506;36;;;;;M
+de Bretagne;reine de France;1477;1514;1;;;;FRA;M
+de Bretagne d'Avaugour;comte;1493;1608;4;;;;;M
+de Bretagne d'Avaugour;comte;1581;1657;2;Paris;;;;M
+de Breteuil;;1020;1020;2;;;;;M
+du Breuil;seigneur des Vories;1511;1511;2;;;;;M
+Breuilh;;1728;1802;1;;;;;M
+Breuilh;;1787;1868;1;Enraud, 87;;;;M
+Breuilh;;1789;1834;1;Limoges, 87;;;;M
+Breuilh;;1802;1802;1;Limoges ?, 87;;;;M
+Breuillard;;1788;1814;2;;;;;M
+de Breze;;1461;1577;3;;;;;M
+de Breze;comte de Maulévrier;1463;1531;1;Anet;;;;M
+Brezing;;1625;1832;6;;;;;M
+de Briansk;prince;1341;1342;2;;;;;M
+Briard;;1758;1804;2;;;;;M
+Brice;;1653;1725;1;Le Carbet;;;;M
+de Brieg;;1342;1386;2;;;;;M
+de Brienne;comte;1200;1200;1;Melun;;;;M
+de Brienne;comte d' Eu;1294;1294;1;Clermont-en Beauvaisis;;;;M
+de Brienne;empereur d'Orient;1148;1237;1;Tolède, Espagne;;;;M
+de Brienne;reine de Jérusalem;1225;1228;1;à Andria;;;;M
+de Brienne;vicomte de Beaumont;1024;1362;24;;;;;M
+Briere de L'Isle;;1846;1846;1;Le François;;;;M
+Brignole-Sale;;1737;1813;1;Wimbledon;;;;M
+Brignole-Sale;doge de Gênes;;;1;;;;;M
+de Brilhac;;1521;1521;1;;;;;M
+de Brimeu;;1460;1500;1;;;;;M
+de Briollay;;969;1120;7;;;;;M
+de Bronkhorst;;1270;1310;1;;;;;M
+Brossa;jarl;;;2;;;;;M
+de Brosse;vicomte;960;1513;6;;;;;M
+de la Brosse;seigneur;1693;1693;1;;;;;M
+de Brouilhac;;1825;1825;1;;;;;M
+Brown;;1705;1785;3;;;;;M
+de Broyes;;1089;1187;5;;;;;M
+Bruce;roi d'Irlande;1318;1318;1;;;;IRL;M
+Bruce;roi d'Écosse;1274;1371;2;;;SCT;GBR;M
+Bruce;seigneur d'Annandale;1210;1745;12;;;;;M
+Brudenall;;1707;1837;3;;;;;M
+de Brudenell;;1722;1722;1;;;;;M
+Brun;seigneur de la Forêt-Mérigot;1583;1583;2;;;;;M
+de Brunswick-Gottingen;duc;1379;1444;2;;;;;M
+de Brunswick-Göttingen;;1390;1432;1;Brunswick;;;;M
+de Brus;;1230;1230;2;;;;;M
+de Bueil;;1049;1651;2;;;;;M
+Buisson;;1632;1839;2;;;;;M
+de Bulgarie;;1209;1332;3;;;;;M
+de Bulkeley;;1700;1700;1;;;;;M
+de Bullion;;1706;1760;1;;;;;M
+de Burdelot;;1630;1630;1;;;;;M
+de Buren;;1420;1480;1;;;;;M
+de Burgat;;1599;1599;2;;;;;M
+de Burgh;comte d'Ulster;1312;1363;3;;;ULS;GBR;M
+de Burgh;comte de Kent;1221;1695;3;;;;;M
+de Burghausen;comte;1128;1142;1;;;;;M
+Burnaby;;1771;1825;1;;;;;M
+de Busca;marquis de Bosco;1115;1115;2;;;;;M
+Butler;comte d'Ormonde;1463;1710;3;;;;;M
+de Byzance;;919;1011;3;;;;;M
+de Caboet;;1185;1185;1;;;;;M
+de Cabrera;;1202;1202;2;;;;;M
+Cacqueray de Valmenière;;1706;1706;1;Fort-Royal, Martinique;;;;M
+Cacqueray de Valmenière;Capitaine de Vaisseau, Martinique 1651, Gouverneur de Grenade.;1664;1664;1;Saint-Saens;;;;M
+de Cadogan;;1719;1751;1;;;;;M
+Caffier Descostières;;1792;1792;1;Sainte-Marie;;;;M
+Caillard de Ballon;;1628;1628;2;;;;;M
+Caillaut;;1632;1651;1;;;;;M
+Calderon;Actrice;;;1;;;;;M
+de Calonne;marquis de Courtebonne;;;1;;;;;M
+de Calonne de Courtebonne;;1799;1828;1;;;;;M
+Camasse;;1757;1757;1;;;;;M
+de Cambout;;1622;1674;1;Paris;;;;M
+de Cambrai;;920;952;3;;;;;M
+Campbell;;1816;1816;1;;;;;M
+Canalis;comtesse de Saint-Sébastien;1678;1769;2;;;;;M
+de Candé;;1035;1054;2;;;;;M
+Cane;;1398;1412;1;Pavie;;;;M
+Canella;;1070;1184;2;;;;;M
+von Canstatt;baronne;;;1;;;;;M
+Cantacuzène;empereur d'Orient;1293;1383;3;;;;;M
+Capet;;1284;1305;1;Paris;;;;M
+Capet;comte de Vermandois;1057;1102;1;Tarse, Turquie;;;;M
+Capet;comtesse de Corbie;1009;1079;1;Messine, Italie;;;;M
+Capet;comtesse de Leicester;1085;1131;1;Meulan;;;;M
+Capet;dame d'Abbeville;974;1392;46;;;;;M
+Capet;reine d'Angleterre;1158;1318;2;;;ENG;GBR;M
+Capet;reine d'Angleterre;1292;1358;1;à Paris;;ENG;GBR;M
+Capet;roi de France;941;1226;3;Paris;;;FRA;M
+Capet;roi de France;972;1031;1;Orléans;;;FRA;M
+Capet;roi de France;1008;1060;1;Vitry-aux-Loges;;;FRA;M
+Capet;roi de France;1052;1108;1;Meulan;;;FRA;M
+Capet;roi de France;1081;1137;1;Herbst;;;FRA;M
+Capet;roi de France;1165;1223;1;Gonesse;;;FRA;M
+Capet;roi de France;1214;1270;1;Poissy;;;FRA;M
+Capet;roi de France;1245;1285;1;à Poissy;;;FRA;M
+Capet;roi de France;1268;1314;1;Fontainebleau;;;FRA;M
+Capet;roi de France;1289;1328;4;;;;FRA;M
+Capet;seigneur de Courtenay;1125;1182;1;Palestine;;;;M
+de Carcassonne;;991;1066;3;;;;;M
+de Cardona;;1180;1289;2;;;;;M
+de Carency;;1265;1265;1;;;;;M
+de Carinthie;roi de Bohême;890;1369;19;;;;;M
+de Carlat;;1050;1050;1;;;;;M
+de Carnazet;;1521;1633;3;;;;;M
+de Carnazet;;1595;1595;1;château d'Achy, Oise;;;;M
+Carolingien;;843;870;1;Auxerre;;;;M
+Carolingien;empereur d'Occident;747;814;1;Aix-la-Chapelle, Allemagne;;;;M
+Carolingien;empereur d'Occident;823;877;1;Modène, Italie;;;;M
+Carolingien;roi d'Aquitaine;803;866;3;;;AQU;FRA;M
+Carolingien;roi d'Aquitaine;846;879;1;Compiègne, France;;AQU;FRA;M
+Carolingien;roi de France;863;882;1;Francfort, Allemagne;;;FRA;M
+Carolingien;roi de France;864;987;5;;;;FRA;M
+Carolingien;évêque de Metz;582;1021;48;;;;;M
+Carpenter;;1783;1811;1;;;;;M
+Carpentier;;1754;1839;1;Gand;;;;M
+de Carrara;;1367;1430;2;;;;;M
+Carreau Gaschereau;;1759;1892;11;;;;;M
+Carreau Gaschereau;;1775;1847;1;New-York;;;;M
+Carreau de Gaschereau;;1706;1748;1;Vernay (Le Mans);;;;M
+Carreau de Gaschereau;;1736;1791;1;Trinité;;;;M
+Carreau de Gaschereau;;1774;1774;2;;;;;M
+de Carrick;comte;1271;1292;2;;;;;M
+de Carrière;;1596;1596;1;;;;;M
+de Carvoisin;;1531;1560;2;;;;;M
+de Carvoisin;;1595;1595;1;château d'Achy, Oise;;;;M
+de Casado de Monteleon;;1725;1761;1;La Hague;;;;M
+Cassius de Linval;;1821;1821;1;Fort-St-Pierre;;;;M
+de Castelbon-Cerdagne;;1185;1203;2;;;;;M
+de Castell;comte;1482;1631;3;;;;;M
+de Castell-Castell;;1703;1777;1;Castell;;;;M
+de Castell-Castell;comte;1641;1709;1;Remlingen;;;;M
+de Castell-Castell;comte;1668;1707;12;;;;;M
+de Castell-Remlingen;comte;1610;1717;4;;;;;M
+de Castell-Rüdenhausen;comte;1722;1849;2;;;;;M
+de Castelnau;baron;1085;1158;8;;;;;M
+de Castille;;960;1530;39;;;;;M
+de Castille;;1126;1189;1;Palencia, Espagne;;;;M
+de Castille;;1136;1160;1;Orléans;;;;M
+de Castille;;1188;1252;1;Palencia;;;;M
+de Castille;;1222;1222;1;Tolède, Espagne;;;;M
+de Castille;comte;965;1504;18;;;CYL;ESP;M
+de Castille;comtesse de Ponthieu;1244;1290;1;Harby;;;;M
+de Castille;duc de Molina;1203;1272;1;Salamanque;;;;M
+de Castille;empereur d'Espagne;1039;1109;1;Tolède, Espagne;;;ESP;M
+de Castille;grand-Maître de l'Ordre de Santiago;1334;1358;1;Séville;;;;M
+de Castille;reine;1081;1126;1;Saldana, Espagne;;CYL;ESP;M
+de Castille;roi;1311;1350;1;Salamanque;;CYL;ESP;M
+de Castille;roi;1334;1369;1;Burgos;;CYL;ESP;M
+de Castro;;1320;1479;8;;;;;M
+Cattaciolo;;1602;1602;2;;;;;M
+de Caumont;duc de Lauzun;1294;1730;6;;;;;M
+du Caurroy;;1696;1696;1;Le Prêcheur;;;;M
+du Caurroy;;1738;1771;3;Le François;;;;M
+Cavendisch-Bentinck;lord;1780;1826;1;;;;;M
+Cavendish;comte de Devonshire;1552;1794;10;;;;;M
+Cavendish-Harley;;1715;1785;1;;;;;M
+Cazeneuve;;1803;1851;4;;;;;M
+Cecil;;1638;1638;1;;;;;M
+de Celis;;1858;1858;1;;;;;M
+de la Cerda;baron de Lunel;1270;1379;3;;;;;M
+de la Cerda;infant de Castille;1253;1275;1;;;CYL;ESP;M
+Céloron de Blainville;;1710;1710;1;;;;;M
+de Chabannais;seigneur de Confolens;964;1245;8;;;;;M
+Chabanneau;;1841;1841;1;à Bordeaux (Gironde);;;;M
+de Chabannes;seigneur de Curton;1484;1484;1;;;;;M
+Chabot;duc de Rohan;1646;1655;1;chateau de Chanteloup;;;;M
+de Chabot;;1050;1180;11;;;;;M
+de Chabot;comtesse de Charny;1565;1652;1;hotel d'Elboeuf a Paris;;;;M
+Chachere;;1654;1654;2;;;;;M
+de Chalençon;;1295;1407;4;;;;;M
+Chaleu;chevalier;1371;1399;2;;;;;M
+de Chalon;;1160;1160;2;;;;;M
+de Chalus;;1734;1821;1;;;;;M
+de Cham;comte;;;2;;;;;M
+Chamaillart;vicomtesse de Beaumont;1425;1425;1;chateau d'Argentan;;;;M
+de Chambon;dame de Combrailles;1165;1180;1;;;;;M
+de Chamborant;seigneur de Boucheron;1647;1660;2;;;;;M
+du Champ;;1743;1743;1;;;;;M
+de Champagne;;1224;1283;1;Hédé;;;;M
+de Champagne;comte de Blois;1093;1306;12;;;;;M
+de Champagne;reine de France;1140;1206;1;Paris;;;FRA;M
+de Champagne;reine de France;1271;1305;1;Bar-sur-Aube;;;FRA;M
+de Champagne;roi de Navarre;1201;1253;1;Troyes;;;;M
+de Champagne;roi de Navarre;1269;1274;1;Pampelune;;;;M
+de Champagne;évêque de Chartres;1135;1202;1;à Reims;;;;M
+de Chanteloup;;1579;1579;1;Chartres;;;;M
+Chapon;;1666;1755;3;;;;;M
+Chaponnel;;1633;1678;1;Bellombre, 89;;;;M
+Chappotin;;1685;1685;1;Escolives, 89;;;;M
+Chapt de Rastignac;;1817;1817;1;;;;;M
+Chardin;;1718;1785;1;Fresneau, 60;;;;M
+Chardin;;1756;1832;1;Ivry le Temple, 60;;;;M
+Chardin;;1757;1835;1;;;;;M
+de Charenton;;1115;1195;3;;;;;M
+de Charette de La Contrie;;1827;1827;1;Paris;;;;M
+Charon;;1657;1673;1;;;;;M
+Charpillon;;1842;1842;1;Rhône;;;;M
+Chartier;;1610;1682;1;Bretagne;;;;M
+Chartier;;1655;1655;1;;;;;M
+Chateau;;1713;1765;2;;;;;M
+Chateau;;1720;1763;1;Marseille;;;;M
+Chateau Sainte-Marie;;1792;1824;2;Sainte-Marie;;;;M
+de Chateaubriant;;1240;1240;8;;;;;M
+Chatenay;;1666;1666;1;Le Carbet;;;;M
+Chatenay;;1713;1785;1;Gros Morne;;;;M
+Chatenay;;1772;1796;2;;;;;M
+Chatenay;Martinique avant 1660;1624;1678;1;La Jonchère, Vendée;;;;M
+Chatenay-Vaucourt;;1759;1803;1;Le Gros-Morne;;;;M
+Chatenay-Vaucourt;;1787;1787;1;Gros Morne;;;;M
+Chatenay-Vaucourt;;1815;1836;1;à Fort-de-France (Martinique);;;;M
+de Chatillon;;1756;1777;4;;;;;M
+Chaudrier;;1417;1514;6;;;;;M
+Chauvet;;1838;1838;1;;;;;M
+de Chauvigny;;1302;1502;7;;;;;M
+Chaworth;;1282;1322;2;;;;;M
+de Chazelles de Beauregard;;1712;1712;1;;;;;M
+de Châlon;comte;875;1228;15;;;;;M
+de Châlons;;1321;1321;2;;;;;M
+de Château-Gonthier;;1192;1192;1;;;;;M
+de Château-Porcien;;1087;1087;1;;;;;M
+de Château-du-Loir;;1099;1099;1;;;;;M
+de Châteaubriand;;1465;1509;1;;;;;M
+de Châteaudun;dame de Château-du-Loir;972;1259;13;;;;;M
+de Châteaumur;seigneur;1200;1286;6;;;;;M
+de Châteauneuf;;1248;1353;3;;;;;M
+de Châteauneuf du Tournel;;1259;1259;1;;;;;M
+de Châtellerault;;1103;1130;1;Châtellerault;;;;M
+de Châtellerault;dame;1075;1315;6;;;;;M
+de Châtellerault;vicomte;1077;1151;1;Noyers;;;;M
+de Châtillon;;1304;1304;1;Saint Pol;;;;M
+de Châtillon;comte de Penthièvre;1340;1404;1;Clisson, Loire Atlantique, France;;;;M
+de Châtillon;seigneur;1080;1470;34;;;;;M
+de Châtillon;seigneur;1110;1146;1;Palestine;;;;M
+de Châtillon;seigneur d'Outre-Jourdain;1120;1187;1;Hittin, Palestine;;;;M
+de Châtillon;seigneur de Leuze;1302;1302;1;bataille de Courtrai;;;;M
+de Châtillon-Blois;comte de Dunois;1386;1391;1;Beaumont, Hainaut;;;;M
+de Châtillon-Blois;comte de Penthièvre;1406;1479;3;;;;;M
+Cheirouze;Comtesse von Lemberg;1752;1775;1;Paris, France;;;;M
+Chenin;chevalier de Mauzé;1255;1436;4;;;;;M
+du Chesne de Saint-Léger;;1832;1832;1;;;;;M
+de Chester;comte;1187;1187;1;;;;;M
+Chestov;;1590;1631;2;;;;;M
+Chevalier;;1723;1723;2;;;;;M
+de Chevigné;;1839;1839;1;;;;;M
+Chéneaux;;1728;1760;1;Bayeux;;;;M
+Chéneaux;;1765;1820;1;Thorigny-sur-Vire,14;;;;M
+Chéneaux;;1802;1883;7;;;;;M
+Chéneaux de Leyritz;;1833;1833;1;;;;;M
+Chérémétiev;;1581;1581;2;;;;;M
+de Chièvres;;1120;1150;1;;;;;M
+de Chimay;;1190;1240;2;;;;;M
+de Chiny;comte;1060;1125;3;;;;;M
+du Chiron;;1603;1603;2;;;;;M
+Chobert;;1802;1802;1;Chatel-Censoir, 89;;;;M
+de Choiseul;comte de Stainville;1195;1794;24;;;;;M
+Chouquet;;1680;1680;1;Marin;;;;M
+Churchill;;1730;1730;2;;;;;M
+de Cibo;;1725;1790;1;;;;;M
+Cicéron;;1824;1840;1;St-Pierre;;;;M
+de Ciechanowiec-Kiszka;;1590;1606;1;;;;;M
+de Cilly;comte;1380;1451;4;;;;;M
+Claparede;;1596;1596;1;Montpellier;;;;M
+de Clare;;1130;1130;1;Tunbridge, Kent, Angleterre;;;;M
+de Clare;;1171;1171;1;Waterford, Irlande;;;;M
+de Clare;;1189;1189;1;Londres, Angleterre;;;;M
+Clary;;1725;1794;1;St. Ferreol, Marseille, France;;;;M
+Clary;reine de Naples;1771;1845;1;;;;ITA;M
+de Clary et Aldringen;;1772;1772;1;Vienne;;;;M
+de Clave;comte de Gloucester;1240;1313;5;;;;;M
+Claverie;;1768;1768;1;Fort-de-France;;;;M
+de Clavesana;margrave de Savone;1090;1224;4;;;;;M
+Clerc;;1846;1846;1;Le François;;;;M
+de Clermont;;1285;1372;3;Paris;;;;M
+de Clermont;comte;1080;1436;18;;;;;M
+de Clermont;comte;1256;1317;1;Clermont en Beauvaisis;;;;M
+de Clermont de Nesle;comte de Clermont;1208;1288;3;;;;;M
+de Clermont de Nesle;seigneur de Nesle;1245;1302;1;Courtrai, Belgique;;;;M
+de Clermont-Tonnerre;;1722;1769;1;;;;;M
+de Clervaux;;1809;1809;1;;;;;M
+de Clèves;;1515;1557;1;à Düsseldorf;;;;M
+de Clèves;comte de La Mark;905;1633;29;;;;;M
+de Clèves;comtesse d'Eu;1548;1633;1;Paris;;;;M
+de Clèves;duc;1373;1481;2;Clèves;;;;M
+de Clèves;duc de Juliers;1516;1592;1;Dusseldorf;;;;M
+de Clèves;duc de Nivernais;1544;1564;1;Nevers;;;;M
+de Clémont;;1418;1427;2;;;;;M
+de Clérieux;;1140;1140;1;;;;;M
+de Clinchamp;seigneur de la Brizardière;1610;1650;2;;;;;M
+de Clisson;;1175;1448;7;;;;;M
+de Clisson;dame de Champtoceau;1366;1441;1;Clisson, Loire Atlantique, France;;;;M
+Cobbam;lord;1428;1454;2;;;;;M
+de Coche;;1250;1250;1;;;;;M
+de Cochefilet;;1657;1719;1;;;;;M
+Cochet;;1648;1700;1;Grande Anse (Lorrain);;;;M
+Cochet;;1678;1749;1;Le Marigot;;;;M
+Cochrane;comte de Dundonald;1676;1690;2;;;;;M
+Cochrane;comte de Dundonald;1687;1720;1;Paisley;;;;M
+Cochrane;lady;1709;1786;1;Bath;;;;M
+de Coesme;;1581;1601;1;Saint-Arnoul en Beauce;;;;M
+de Coesme;seigneur de Lucé;;;1;;;;;M
+de Coesmes;baron de Luce;;;2;;;;;M
+Coëffier d'Effiat;;1630;1630;1;;;;;M
+de Coëtivy;comte de Taillebourg;1480;1501;2;;;;;M
+de Cohausen;;1775;1822;1;;;;;M
+Colard;;1688;1688;1;;;;;M
+Colbert;;1667;1747;4;;;;;M
+de Colditz;;1480;1520;1;;;;;M
+de Coligny;;1089;1620;8;;;;;M
+de Coligny;comte;1490;1522;1;Dax;;;;M
+de Coligny;comte;1519;1572;1;Chatillon sur Loing;;;;M
+Collart;;1709;1709;1;Fort-Royal;;;;M
+de Collart;écuyer;1721;1742;2;;;;;M
+Colonna;prince;1661;1672;2;;;;;M
+Colonna d'Istria;;1691;1691;1;Sollacaro, Corse-du-Sud;;;;M
+de Comborn;;1070;1086;1;Uzerche;;;;M
+de Comborn;vicomte;910;1157;9;;;;;M
+de Commercy;;1258;1275;1;;;;;M
+de Comminges;;1150;1336;7;;;;;M
+Comnène;préfet d'Orient;960;1202;21;;;;;M
+de Comps;;1130;1188;1;;;;;M
+Comyn;;1303;1325;5;;;;;M
+de Conflans;;1339;1339;1;;;;;M
+de Considat de la Courtaudie;;1590;1640;1;;;;;M
+Constancin du Chatenet;;1757;1831;1;Bellac;;;;M
+de Constantinople;empereur;1259;1332;2;;;;;M
+de Conversano;comte;1100;1103;2;;;;;M
+Cooper;;1838;1838;1;;;;;M
+de Corbeil;;978;978;1;;;;;M
+de Cordes;;1335;1546;8;;;;;M
+Cordier;;1753;1753;1;Le Vauclin;;;;M
+Cordier;;1770;1770;1;St-Esprit;;;;M
+Cordier Beaufond;;1799;1799;1;Saint-Pierre (Mouillage);;;;M
+Cordier Beaufond;;1826;1826;1;Anses d'Arlet;;;;M
+Cormenier;;1653;1653;1;;;;;M
+Cornaro;;1468;1468;1;;;;;M
+von Cornberg;;1553;1659;2;;;;;M
+de Cornouaille;comte;1025;1058;1;;;;;M
+de Cornouailles;comte;1100;1175;5;;;;;M
+de Corquilleroy;seigneur de la Bellamairie;1548;1596;2;;;;;M
+Corret;;1834;1834;1;Limoges Egl Stmichel, 87;;;;M
+Corvin;roi de Hongrie;1443;1490;1;;;;HUN;M
+de Cossé;duc de Brissac;1562;1621;1;Chateau d'Estelan;;;;M
+de Cossé;duc de Brissac;1585;1651;1;chateau de Pouancé;;;;M
+de Cossé;duc de Brissac;1668;1792;3;Paris;;;;M
+de Cossé;duc de Brissac;1702;1848;7;;;;;M
+Costallat;;1824;1824;1;Limoges Egl St  Pierre, 87;;;;M
+Coste;;1763;1763;1;;;;;M
+Costes;;1741;1788;1;;;;;M
+Cottrell;;1750;1846;2;Faversham (Kent);;;;M
+de Coucy;;1161;1222;1;Braine, Aisne, France;;;;M
+de Coucy;seigneur;1132;1805;17;;;;;M
+de Coucy;seigneur;1135;1191;1;Saint-Jean d'Acre, Israël;;;;M
+du Coudray;;1670;1735;1;Moulevrier, Maine et Loir;;;;M
+du Coudray;Ml des Comptes Nantes;1616;1679;1;Matheret, près de Fontenay-le-Comte, Vendée;;;;M
+de Couhé;seigneur de l'Estang;1504;1504;1;;;;;M
+de Couhé de Lusignan;;1787;1787;1;;;;;M
+Coula;;1682;1739;1;Montferrier;;;;M
+de Coulaines;;1389;1417;2;;;;;M
+des Coumans;khan;1255;1290;2;;;;;M
+Couraud de Salvert;;1759;1759;2;;;;;M
+de Courlande;;1646;1711;2;Mitau;;;;M
+de Courlande;duc;1610;1845;4;;;;;M
+de Courlande-Kettler;duc;1517;1640;2;;;;;M
+de Courlandon;;1290;1328;1;;;;;M
+de la Court;seigneur de la Chaignelière;1652;1652;2;;;;;M
+de Courtenay;comte de Devon;985;1539;25;;;;;M
+de Courtenay;comtesse d'Auxerre;1188;1256;1;Fontevrault;;;;M
+de Courtenay;héritière de Conches;1250;1275;1;Rome, Italie;;;;M
+de Courtenay;seigneur de Champignelle;1168;1239;1;Palestine;;;;M
+Courtois;;1687;1687;1;Basse-Pointe;;;;M
+Courtois;;1751;1751;1;Le Trou-au-Chat;;;;M
+de Coustières;dame;;;1;;;;;M
+Coustin;seigneur de Puymartin;1691;1691;2;;;;;M
+de Coutinh;;1529;1534;2;;;;;M
+de la Couture Renom;;1628;1628;1;;;;;M
+de Craon;;1255;1292;1;Paris, France;;;;M
+de Craon;seigneur;958;1420;25;;;;;M
+Crassous;chevalier de Saint-Louis;1754;1831;1;Fort Saint-Pierre;;;;M
+Cratz de Schaffenstein;;1580;1635;2;;;;;M
+Crespin;;1737;1737;1;;;;;M
+Crespon;;1025;1025;1;;;;;M
+Crespy;;1740;1818;1;;;;;M
+de Crépy;;1020;1020;7;;;;;M
+de Croatie;;965;1181;3;;;;;M
+Croise;;1629;1677;1;Rennes;;;;M
+Croise;;1679;1697;1;Grande Anse (Lorrain);;;;M
+de Croix;comte de Clerfayt;1731;1778;2;;;;;M
+de Cronberg;;1385;1440;1;;;;;M
+de la Cropte;dame de Lanquais;;;1;;;;;M
+du Cros;;1610;1610;1;;;;;M
+Crosnier de Lassichère;;1811;1869;2;;;;;M
+Crosnier de Monterfil;;1763;1763;1;Le Moule;;;;M
+Crosnier de Monterfil;;1787;1787;1;Guadeloupe;;;;M
+Crosnier des Vignes;;1787;1787;1;Guadeloupe;;;;M
+Crouppier de Romans;;1737;1808;1;;;;;M
+de Croy;marquis de Havre;1549;1613;1;Bruxelles;;;;M
+de Croy;prince de Chimay;1496;1549;1;Bruxelles, Belgique;;;;M
+de Croy-Arschot;duc d'Arschot;1526;1595;1;Valenciennes;;;;M
+de Croy-Arschot;prince de Chimay;1522;1551;1;chateau Quievraing;;;;M
+de Croy-Arschot;princesse de Chimay;1563;1635;1;Beaumont;;;;M
+de Croy-Havre;princesse;1673;1714;1;Bologna;;;;M
+de Croÿ;comte de Porcean;1385;1686;14;;;;;M
+de Croÿ;seigneur;1365;1415;1;Azincourt;;;;M
+de Crussol;duc d' Uzès;1581;1802;4;Paris;;;;M
+de Crussol;duc d'Uzès;1604;1680;1;chateau d'Uzès;;;;M
+de Crussol;duc d'Uzès;1642;1692;1;en son hotel parisien;;;;M
+de Crussol;seigneur;1215;1843;14;;;;;M
+de Crussol;seigneur;1452;1473;1;Villemagne;;;;M
+de Cuisseaux;;1131;1131;1;;;;;M
+de Culant;seigneur;1115;1323;8;;;;;M
+de Culemborg;seigneur;1335;1540;6;;;;;M
+de Cumont;;1789;1789;1;;;;;M
+de Cusance;;1637;1663;1;;;;;M
+Czartoryska;princesse;1742;1837;2;;;;;M
+Czartoryski;prince;1734;1854;2;;;;;M
+Daccard;;1646;1682;1;Barbade;;;;M
+Daccard;;1677;1699;1;Case-Pilote;;;;M
+Dages;;1849;1849;1;;;;;M
+de Dagsbourg;comtesse;925;1225;6;;;;;M
+Daguier;;1618;1618;2;;;;;M
+de Daillon;;1500;1540;1;;;;;M
+Dalassène;;1020;1020;1;;;;;M
+Dalbanne;;1840;1840;1;;;;;M
+Damas;vicomte de Châlon-sur-Saône;1341;1497;8;;;;;M
+Damas de Thianges;;1670;1670;2;;;;;M
+de Damian de Vernegues;;1798;1833;2;;;;;M
+de Dammartin;comte d'Aumale;1180;1239;1;Abbeville;;;;M
+de Dammartin;comtesse de Ponthieu;1128;1279;9;;;;;M
+de Dammartin;seigneur de Lillebonne;1155;1200;1;Londres, Angleterre;;;;M
+de Dampierre;comte de Nevers;1247;1322;1;Auxerre;;;;M
+de Dampierre;comtesse de Namur;1335;1363;1;Copenhague;;;;M
+de Dampierre;duchesse de Bourgogne;1350;1405;1;Gent;;;;M
+de Dampierre;seigneur;1090;1659;28;;;;;M
+Dampierre de Millancourt;;1665;1736;1;St-Christophe;;;;M
+Dampierre de Millancourt;;1693;1732;1;Le Trou-au-Chat;;;;M
+de Dampierre de Millancourt;St-Christophe en 1634;1622;1651;1;Abbeville;;;;M
+de Danemark;roi;1014;1038;7;;;;;M
+de Danemark;roi d'Angleterre;985;1035;1;;;ENG;GBR;M
+Danilowicz;;1607;1661;2;;;;;M
+de Danneskjold-Samsoe;comte;1699;1823;3;;;;;M
+Dantrague;;1681;1737;2;;;;;M
+Daubaignan;;1824;1824;1;;;;;M
+de Daun-Falkenstein;comte de Falkenstein;1540;1682;4;;;;;M
+David;;1642;1814;5;;;;;M
+David;;1767;1809;1;Limoges, 87;;;;M
+de Dax;;1130;1190;3;;;;;M
+Debonnaire;;1640;1680;1;;;;;M
+Degrand;;1823;1823;1;;;;;M
+Deguerre;;1754;1754;1;;;;;M
+Delage;;1837;1838;1;Limoges, 87;;;;M
+Delage;;1839;1839;1;Limoges (St Etienne), 87;;;;M
+Delage;;1840;1840;1;Limoges  (St Etienne), 87;;;;M
+Demassias;;1667;1730;1;Limoges;;;;M
+Demassias;;1715;1730;1;Le Marigot;;;;M
+Denis;;1683;1683;1;;;;;M
+Denuelle de La Plaigne;;1868;1868;1;;;;;M
+Derinly;;1747;1747;1;;;;;M
+Des Vergers d'Auroy de Chambry;;1788;1788;1;Le François;;;;M
+Des Vergers d'Auroy de Maupertuis;;1765;1765;1;Le François;;;;M
+Desaint;Aide Major milice Trinité;1730;1730;1;;;;;M
+Desaint;Lieutenant de cavalerie;1725;1787;2;Trinité;;;;M
+Descassaux-Bontemps;;1722;1722;1;;;;;M
+Deschamps;;1639;1842;2;;;;;M
+Desclefs;;1669;1669;1;Le Marigot;;;;M
+Desfriches;;1697;1697;1;Angers;;;;M
+Desfriches;;1697;1723;1;Ste-Marie;;;;M
+Desfriches;;1761;1761;1;Grande Anse (Lorrain);;;;M
+Desfriches;;1796;1796;1;Sainte-Marie;;;;M
+Desfriches;;1800;1800;1;Le Trou-au-Chat;;;;M
+Desgaudes;;1730;1730;1;Trinité;;;;M
+Desgaudes;Tailleur d'habits. Ht Capesterre;;;1;;;;;M
+Deshayes;;1638;1708;1;Coutance;;;;M
+Deshayes;;1672;1689;1;Basse-Pointe;;;;M
+Deslauriez;;1619;1658;2;;;;;M
+Desmazes;;1762;1762;1;Fort-Royal;;;;M
+Desmazes;;1797;1823;1;Cayes (St Domingue);;;;M
+Desmazes;;1823;1823;1;Fort-de-France;;;;M
+Desmier;seigneur d'Olbreuse;1580;1621;1;;;;;M
+Desmier d'Olbreuse;;1639;1723;1;;;;;M
+Desmier d'Olbreuse;seigneur d'Olbreuse;1608;1660;1;La Rochelle, France;;;;M
+Desmoulins;;1745;1745;1;;;;;M
+Desvaux de La Martinière;;1840;1840;2;;;;;M
+des Deux-Bourgognes;roi;964;1005;5;;;;;M
+des Deux-Bourgognes;roi;1032;1032;1;Lausanne;;;;M
+de Deux-Ponts;comte;1329;1570;11;;;;;M
+Devereux;;1616;1616;3;;;;;M
+Deville;;1642;1809;2;;;;;M
+Deville;;1830;1830;1;Carbet;;;;M
+Deygluss;;1758;1758;1;;;;;M
+Décasse;;1755;1839;1;;;;;M
+de Déols;seigneur;;;12;;;;;M
+Diaz de Haro;;1287;1287;1;;;;;M
+de Dicy;;1592;1592;1;;;;;M
+de Diessen;;1026;1113;3;;;;;M
+de Diest-Sichem;;1425;1472;1;;;;;M
+de Dietrichstein;;1610;1777;6;;;;;M
+Dieudonné de La Barrière;;1807;1807;1;;;;;M
+de Digoine;;1390;1390;1;;;;;M
+de Dillingen;;964;1289;2;;;;;M
+de Dinan;;1135;1139;4;;;;;M
+de Dinan-Montafilant;dame de Châteaubriant;1500;1500;1;;;;;M
+de Dinteville;seigneur de Chenêts;1373;1373;1;;;;;M
+Doé;;1785;1785;1;;;;;M
+du Dognon;seigneur de la Sandonie;1680;1711;1;;;;;M
+de Dohna-Carwinden;;1661;1724;1;;;;;M
+de Dohna-Leistenau;burgrave;1698;1786;2;;;;;M
+de Dohna-Schlobitten;comte;1661;1728;1;;;;;M
+Dolgorouki;prince;1624;1625;2;;;;;M
+Domain;;1733;1733;1;;;;;M
+de Domene;;1137;1137;1;;;;;M
+du Donjon;;1110;1110;1;;;;;M
+de Donzy;;1040;1225;9;;;;;M
+Doria;;1290;1359;2;;;;;M
+Dormoy;;1849;1849;1;;;;;M
+de Dornberg;;1804;1835;1;;;;;M
+Dorsonville;;1632;1708;2;;;;;M
+Douat;seigneur de Jeu;;;2;;;;;M
+de Doué;;987;987;1;;;;;M
+Douglas;comte d'Angus;1489;1578;6;;;;;M
+Douglas;duc de Hamilton;1634;1694;1;Abbaye de Holyrood;;;;M
+de Douglas;duc de Touraine;1369;1424;3;;;;;M
+Douglas-Hamilton;;1684;1736;1;Edimbourg;;;;M
+Douglas-Hamilton;duc de Hamilton;1658;1712;1;Hyde Park;;;;M
+Douglas-Hamilton;duc de Hamilton;1703;1743;1;St.George's Hanover Square;;;;M
+Douglas-Hamilton;duc de Hamilton;1740;1819;1;;;;;M
+Doukas Lascaris;empereur de Nicée;1250;1250;1;;;;;M
+Doukas Vatatzès;empereur de Nicée;1193;1254;1;;;;;M
+Drauglaudre;Amodiateur du Prieuré de Sermaize, aubergiste;1714;1801;1;Versailles;;;;M
+Drauglaudre;Huissier, puis garde-champêtre;1767;1847;14;Sermaize;;;;M
+de Dreux;comte;1185;1234;1;Braine, Aisne, France;;;;M
+de Dreux;comte;1211;1240;1;Nicosie, Chypre;;;;M
+de Dreux;comtesse d'Auxonne;965;1478;26;;;;;M
+de Dreux;duc de Bretagne;1191;1250;1;Méditerranée;;;;M
+de Dreux;vidame d'Esneval;1372;1415;1;Azincourt;;;;M
+Droglo;Postillon du duc (ou prince) de Condé;;;1;;;;;M
+Drouet;;1637;1746;3;;;;;M
+Drouet;;1696;1696;1;Le Carbet;;;;M
+Drouet;;1726;1726;1;Le Prêcheur;;;;M
+Drummond;;1364;1401;4;;;;;M
+Dubet;;1721;1721;2;;;;;M
+Dublancq Laborde;;1863;1863;1;;;;;M
+Dubois;;1651;1651;1;;;;;M
+Dubruel;;1724;1804;1;à Bordeaux (Gironde);;;;M
+Dubruel de Broglio;;1690;1752;1;;;;;M
+Dubruil;;1739;1800;1;;;;;M
+Ducasse;;1788;1855;1;;;;;M
+Duchamp de Chastaigné;;1654;1883;20;;;;;M
+Duchamp de Chastaigné;Droguiste épicier;1806;1889;1;St. Pierre, Martinique;;;;M
+Duchamp de Chastaigné;Premier Duchamp;1745;1851;2;Case-Pilote;;;;M
+Duchesne de Denant;;1821;1821;2;;;;;M
+Ducommun;;1740;1740;1;Switzerland;;;;M
+Ducpetiaux;;1741;1827;3;;;;;M
+Ducpetiaux;;1780;1849;1;Bruxelles;;;;M
+Dudley;duc de Northumberland;1553;1554;2;;;;;M
+Dueze;;1220;1271;2;;;;;M
+Duhamel;;1626;1626;1;;;;;M
+Dulieu;;1803;1803;1;Verdun;;;;M
+Dulieu;;1803;1879;8;;;;;M
+Dulieu;;1805;1848;1;Trinité;;;;M
+Dumas;;1691;1772;1;Bordeaux Saint-André Mardi;;;;M
+Dumas;;1699;1699;1;;;;;M
+Dumas;;1734;1798;1;Gros Morne;;;;M
+Dumas;Procureur président de Bordeaux;1643;1703;1;La Réole;;;;M
+Dupin;;1650;1808;7;;;;;M
+Dupin d'Aiguemorte;;1250;1372;4;;;;;M
+Dupin de Francueil;;1715;1777;1;;;;;M
+Dupin de La Noue;;1645;1682;2;;;;;M
+Dupin de La Salle;;1381;1635;9;;;;;M
+Dupin de Saint Cyr;;1800;1866;1;Sainte-Croix-de-Mareuil;;;;M
+Dupin de Saint Cyr;;1842;1842;1;;;;;M
+Dupin des Vinsons;;1653;1725;5;;;;;M
+Dupin du Montet;;1689;1777;9;;;;;M
+Dupont;;1744;1744;1;;;;;M
+Dupouy;;1804;1804;1;St-Pierre;;;;M
+Dupré;;1619;1680;2;;;;;M
+Durand;;1711;1711;1;Baillargues;;;;M
+Durand;Barralier (tonnelier);1688;1688;1;Saint-Brés;;;;M
+Durand;Barrallier (Tonnelier);1616;1616;1;Saint-Bris;;;;M
+Durand Decourt;;1796;1796;1;Le Gros-Morne;;;;M
+Durant;;1679;1679;2;;;;;M
+Durey de Sauroy;;1732;1732;1;;;;;M
+de Durfort;;1605;1753;5;;;;;M
+de Durfort;duc de Duras;1684;1800;3;Paris;;;;M
+de Durfort;duchesse de Mazarin;1735;1781;1;Paris, France;;;;M
+Durieu;;1807;1807;1;;;;;M
+de Dutour de Minvielle;;1748;1748;1;;;;;M
+Duval;;1646;1754;3;;;;;M
+Duval;;1712;1792;2;Grande Anse (Lorrain);;;;M
+Duval;;1727;1727;1;Les Trois-Ilets;;;;M
+Duval;;1766;1766;1;Fort-Royal, Martinique;;;;M
+Duval;Lieutenant de Milice.;1636;1663;1;Rouen;;;;M
+Duval Dugué;;1823;1823;1;;;;;M
+Duval La Branche;;1744;1782;2;Grande Anse (Lorrain);;;;M
+Duval Valmond;;1823;1823;1;Grand'Anse;;;;M
+Duval de La Roche;;1699;1754;1;;;;;M
+Dyel;;1528;1769;2;;;;;M
+Dyel de Graville;;1542;1617;2;Cailleville;;;;M
+Dyel de Graville;;1676;1676;1;;;;;M
+Dyel de Graville;;1678;1678;1;la Martinique;;;;M
+Dyel de Graville;;1712;1712;1;Le Prêcheur;;;;M
+Dyel de Graville;;1729;1729;1;Le Carbet, Martinique;;;;M
+Dyel de Graville;Capitaine de régiment en Normandie;1649;1649;1;Cany Caniel;;;;M
+Dyel de Vaudroque;;1627;1664;2;;;;;M
+Dyel de Vaudroque;;1632;1649;1;Cailleville;;;;M
+Dyel de Vaurocq et du Parquet;;1565;1589;1;Cailleville;;;;M
+Díaz de Vivar;;1043;1099;2;;;;;M
+d'Eberstein;;1259;1284;2;;;;;M
+d'Egmont;;1517;1554;1;Bruxelles;;;;M
+d'Egmont;seigneur;1310;1622;20;;;;;M
+d'Eicken;;1560;1636;1;;;;;M
+de Eilsz;;920;920;1;;;;;M
+d'Eisset;;1634;1634;2;;;;;M
+d'Elter;héritière d'Apremont;;;1;;;;;M
+Emenot Desloriez;;1698;1698;1;;;;;M
+Emenot Desloriez Reoliere;;1739;1800;3;Le Trou-au-Chat;;;;M
+Emenot Desloriez Reoliere;;1825;1825;1;Le Gros-Morne;;;;M
+Emo-Capodilista;comte;1800;1843;1;;;;;M
+d'Enghien;comte de Brienne;1185;1446;12;;;;;M
+Engrand;;1725;1821;3;;;;;M
+d'Entéça;comtesse d'Urgel;1300;1327;1;;;;;M
+Entringer;;1524;1583;2;;;;;M
+d'Eppenstein;seigneur;1018;1538;12;;;;;M
+d'Erbach;comte;1475;1742;17;;;;;M
+d'Erbach;comte;1643;1758;2;Furstenau;;;;M
+d'Erbach-Schönberg;comte;1691;1758;1;Waldenbourg;;;;M
+d'Erbach-Schönberg;comtesse;1721;1848;14;;;;;M
+Erdoedy;comte;1795;1856;2;;;;;M
+Ernoult;;1815;1828;2;Ste-Marie;;;;M
+Ernoult;;1848;1848;2;;;;;M
+Escoffier;;1781;1833;1;Ivry le Temple, 60;;;;M
+d'Escoussens;;1320;1345;1;;;;;M
+d'Esneval;dame;1404;1421;1;Chateau d'Ivry;;;;M
+d' Espagne;;1578;1578;2;;;;;M
+d'Espaigne;;1664;1664;1;;;;;M
+d'Esparbes de Lussau;;1684;1684;1;;;;;M
+de l'Espine;;1678;1678;1;Le Pecq, act. Yvelines;;;;M
+des Essarts;comtesse de Romorantin;1588;1651;1;;;;;M
+de l'Estang;;1635;1635;1;;;;;M
+d'Este;;1731;1803;1;Modène, Italie;;;;M
+d'Este;comtesse de Gisors;1531;1607;1;Paris;;;;M
+d'Este;duc de Modène;1610;1658;1;à Modène;;;;M
+d'Este;duchesse de Milan;1475;1497;1;Ferrare;;;;M
+d'Este;marquis de Saint-Martin;953;1803;93;;;;;M
+d'Este;princesse de Carrare;1750;1829;1;Modène;;;;M
+d'Este;reine d'Angleterre;1658;1718;1;;;ENG;GBR;M
+Esterhàzy de Galantha;prince;1765;1833;1;;;;;M
+d'Estourmel;;1570;1630;1;;;;;M
+d'Estouteville;duchesse;1490;1560;6;;;;;M
+d'Estrées;;1486;1599;2;;;;;M
+d'Estrées;;1559;1609;1;Chartres;;;;M
+d'Estrées;duc d' Estrées;1573;1670;1;Paris;;;;M
+Estrid;;1175;1236;1;Corbeil;;;;M
+Estrid;roi de Danemark;1018;1412;46;;;;;M
+Estrid;roi de Suède;1106;1134;1;;;;SWE;M
+d'Etissac;;1587;1587;1;;;;;M
+d'Eu;;1058;1213;7;;;;;M
+d'Everstein;comte;1335;1607;4;;;;;M
+d'Evreux;;1061;1061;1;;;;;M
+Eyriaud;;1663;1663;1;;;;;M
+d'Écosse;;1040;1295;17;;;;;M
+d'Écosse;reine d'Angleterre;1080;1118;1;Westminster;;ENG;GBR;M
+d'Écosse;roi;1001;1040;1;Dunsinane, Écosse;;SCT;GBR;M
+d'Écosse;roi;1031;1286;10;;;SCT;GBR;M
+d'Écry;;1254;1254;1;;;;;M
+d'Évreux;comte de Beaumont-le-Roger;1341;1372;1;Apulia;;;;M
+d'Évreux;comte de Longueville;1336;1363;1;Vernon;;;;M
+d'Évreux;roi de Navarre;1035;1441;21;;;;;M
+Fabre;;1681;1870;7;;;;;M
+Fabre;;1768;1768;1;Fort-de-France;;;;M
+Fabre;;1779;1779;1;Marseille;;;;M
+de Fabrique Saint-Tours;;1791;1791;1;Trou-au-Chat;;;;M
+de Fabrique Saint-Tours;;1822;1822;1;Le Diamant;;;;M
+Fabulet;;1661;1732;1;Le Prêcheur;;;;M
+Fabulet;;1664;1664;1;;;;;M
+Fabulet;;1696;1785;2;Grande Anse (Lorrain);;;;M
+de Fadally;;1785;1785;2;;;;;M
+Fagot;;1766;1766;1;;;;;M
+de Falkenstein;;1253;1409;2;;;;;M
+de Falkenstein;seigneur;1285;1290;1;Frauenberg;;;;M
+de Falkenstein-Munzenberg;;1360;1391;1;;;;;M
+de Farci;écuyer;1697;1697;2;;;;;M
+Fargier;;1777;1777;1;Marseille;;;;M
+Farnèse;cardinal;1520;1589;1;Valentano;;;;M
+Farnèse;duc de Castro;1531;1553;1;au Siège de Hesdin;;;;M
+Farnèse;duc de Parme;1545;1592;1;Rome;;;;M
+Farnèse;duc de Parme;1612;1646;1;Parme;;;;M
+Farnèse;gouverneur de Bologne;1339;1731;24;;;;;M
+Farnèse;pape;1468;1549;1;Canino;;;;M
+Farnèse;reine d'Espagne;1692;1766;1;à Parme;;;ESP;M
+de Farou;;1681;1681;1;;;;;M
+Fauchon;;1804;1804;1;Basse-Pointe;;;;M
+de Faucigny;;1030;1268;8;;;;;M
+de Faucogney;seigneur;1335;1335;1;;;;;M
+du Fauget;;1689;1689;1;;;;;M
+Faure;;1736;1821;3;;;;;M
+Faure;;1767;1767;1;Rivière-Pilote;;;;M
+Faurien;;1715;1715;2;;;;;M
+de Fay;;1135;1165;2;;;;;M
+de Faye;;1174;1174;2;;;;;M
+Fayet;;1752;1752;1;;;;;M
+Fayolle;;1723;1723;1;Grande Anse (Lorrain);;;;M
+de Ferrete;comte;;;1;;;;;M
+de Ferrete;comtesse;1300;1351;1;Basel;;;;M
+de Ferrette;;1076;1076;1;;;;;M
+Ferry;;1634;1692;1;Le Marigot;;;;M
+Festetics;comte;1786;1846;2;;;;;M
+Fettiplace;;1423;1423;1;;;;;M
+Fébvrier;;1620;1678;1;Rennes;;;;M
+Fébvrier Mézaillet;Capitaine de Milice;1717;1746;1;Marin;;;;M
+Fébvrier Mézaillet Lamothe;;1669;1747;1;Vauclin;;;;M
+Fébvrier de Méraillet;;1774;1793;1;Vauclin;;;;M
+de Fézensac;comte;895;960;2;;;;;M
+de Fiennes;baron de Tingry;1210;1353;9;;;;;M
+Fieschi;pape;1254;1287;7;;;;;M
+Fiesque;;1433;1433;1;;;;;M
+de Fiesque;comte de Lavagna;1251;1283;2;;;;;M
+Figaret;;1679;1679;1;Baillargues;;;;M
+Figaret;Menuisier;;;1;;;;;M
+von Filseck;;1593;1647;1;;;;;M
+de Finance;;1741;1741;1;;;;;M
+de Finck à Finckenstein;;1700;1728;1;;;;;M
+Fitte;;1787;1787;1;Gros-Morne;;;;M
+Fitz Flaad;;1080;1101;1;;;;;M
+Fitzalan;;1172;1577;7;;;;;M
+Fitzalan;comte d'Arundel;1306;1416;2;Arundel Castle, West Sussex, Angleterre;;;;M
+Fitzalan;comte d'Arundel;1411;1415;1;Londres;;;;M
+Fitzherbert;;1778;1781;1;;;;;M
+Fitzjames;duc de Berwick;1670;1734;1;devant Philippsbourg;;;;M
+Fitzjames;duc de Fitzjames;1702;1787;2;Saint-Germain-en-Laye;;;;M
+Fitzroy;duc de Grafton;1663;1690;1;Oxford, Angleterre;;;;M
+Fitzroy;duc de Richmond;1519;1782;6;;;;;M
+de Flandre;comte;862;879;1;Auxerre;;;;M
+de Flandre;comte;884;1372;23;;;;;M
+de Flandre;comte;1012;1067;1;Lille, France;;;;M
+de Flandre;comte;1055;1071;1;à Cassel;;;;M
+de Flandre;reine d'Angleterre;1032;1083;1;Caen;;ENG;GBR;M
+de Flaveau;baronne;1773;1791;2;;;;;M
+de Fleckenstein;baronne;1553;1595;1;;;;;M
+Fleming;lady;1530;1552;1;;;;;M
+de Flemming;comtesse;1746;1835;1;;;;;M
+Fleurantin;;1632;1632;1;;;;;M
+de Flotte;;1100;1250;6;;;;;M
+Foese;;1677;1754;1;;;;;M
+de Foix;;1484;1506;1;Bude;;;;M
+de Foix;comte;1260;1315;1;Pontoise;;;;M
+de Foix;comte de Bigorre;1010;1538;33;;;;;M
+Folkunga;;1317;1370;1;Rostock;;;;M
+Folkunga;duc de Finlande;1302;1318;1;Nykoeping;;;;M
+Folkunga;duc de Sudermanie;1312;1318;1;chateau Nykoping;;;;M
+Folkunga;jarl de Suède;1200;1359;3;;;;SWE;M
+Folkunga;roi de Norvège;1245;1387;11;;;;;M
+Folkunga;roi de Suède;1237;1302;1;chateau Nykoping;;;SWE;M
+Folkunga;roi de Suède;1240;1290;1;Visingso;;;SWE;M
+Folkunga;roi de Suède;1316;1374;1;chateau Bohus;;;SWE;M
+de Fombesse;;1681;1681;1;;;;;M
+Fontaine;;1810;1810;2;;;;;M
+de Fontange;;1715;1747;1;;;;;M
+Fonteneau;;1626;1671;1;;;;;M
+de Forcalquier;;1106;1178;4;;;;;M
+de Forez;comte;1075;1383;11;;;;;M
+de Forez;comte;1299;1358;1;couvent des Cordeliers, Sainte-Colombe, près de Vienne;;;;M
+de Formbach;comte;1020;1088;2;;;;;M
+Forsans;;1833;1833;1;;;;;M
+Fortier;;1733;1866;18;;;;;M
+Fortier;;1772;1809;1;Basse-Pointe;;;;M
+Fosse;;1807;1807;1;;;;;M
+de Fou;;1482;1482;1;;;;;M
+Foucquet;marquis de La Varenne;1590;1670;2;;;;;M
+Fourcade;;1637;1760;3;;;;;M
+de Fouvens;;1203;1203;1;;;;;M
+Fraissinet;;1627;1627;1;Mauguio;;;;M
+de Franconie;empereur Romain-Germanique;783;1143;23;;;;;M
+François;;1775;1818;1;Flirey (54);;;;M
+de Freibourg;comtesse;1286;1335;2;;;;;M
+de Fresne;dame du Plessis-Godehoust;1235;1235;1;;;;;M
+de Freteval;;1175;1195;2;;;;;M
+des Friches;;1755;1755;1;Ste-Marie;;;;M
+de Friesen;;1610;1732;2;;;;;M
+Friesenhausen;;1696;1764;1;;;;;M
+Frigière;;1823;1828;1;Le Mouillage Saint-Pierre, Martinique;;;;M
+de Frijs;;1699;1723;1;;;;;M
+de Frioul;empereur d'Occident;843;924;1;Vérone, Italie;;;;M
+de Frioul;marquis;835;910;4;;;;;M
+de Frise;margrave;1036;1044;2;;;;;M
+de Frise Occidentale;;1020;1050;2;;;;;M
+de Frolois;;1372;1406;1;;;;;M
+de Fronhoffer;;1770;1770;1;;;;;M
+de Fronsac;;1020;1020;1;;;;;M
+Fugger de Babenhausen;prince;1800;1836;1;;;;;M
+de Furstenberg;comtesse;1377;1674;7;;;;;M
+de Furstenberg-Heiligenberg;;1659;1701;1;Munich, Allemagne;;;;M
+de Furstenberg-Stuhlingen;comte;1602;1680;2;;;;;M
+de Fürstenberg-Heiligenberg;comtesse;1634;1705;1;;;;;M
+de Fürstenberg-Weitra;landgrave;1776;1848;2;;;;;M
+Gabras;;1162;1162;1;;;;;M
+Gabrielli;prince;1773;1841;1;;;;;M
+Gaigneron;;1592;1610;1;;;;;M
+Gaigneron;;1713;1713;1;Le Lamentin, Martinique;;;;M
+Gaigneron;Domestique chez Pléjot 1680. Sergent de Milice.;1656;1680;1;Saint-Pierre, Martinique;;;;M
+Gaigneron;Martinique vers 1655;1629;1656;1;Loches;;;;M
+Gaigné;;1635;1635;1;;;;;M
+Gaillard;;1580;1844;3;;;;;M
+Gaillard;;1824;1824;1;Sainte-Marie;;;;M
+de Gaillard;;1530;1580;1;;;;;M
+Gaillot;;1712;1750;1;Saint-Germain-en-Laye;;;;M
+Gaisberger;;1535;1613;1;;;;;M
+Galard;;1688;1688;1;;;;;M
+Galeotte d'Albarel;;1707;1707;1;;;;;M
+Galibert;;1757;1790;2;;;;;M
+de Galicie;;1245;1285;1;Presbourg;;;;M
+de Galicie;prince;1184;1335;11;;;;;M
+de Galles;prince;1222;1253;2;;;;;M
+Gallet Charlery;;1779;1779;1;Trinité;;;;M
+Gallet de Saint-Aurin;;1751;1786;2;Le Lamentin;;;;M
+Gallet de Saint-Aurin;;1788;1788;1;Le François;;;;M
+Gallet de Saint-Aurin;;1807;1807;1;Saint-Pierre (Le Mouillage);;;;M
+Gallet de Saint-Aurin;;1826;1826;1;Le Trou-au-Chat;;;;M
+Gallet de Saint-Aurin;;1842;1842;1;Le Carbet;;;;M
+Gallice;;1722;1840;3;;;;;M
+Gallier;;1638;1787;3;;;;;M
+de Galloway;seigneur;1209;1290;2;;;;;M
+de Gamard;;1780;1846;3;;;;;M
+de Gand;prince d'Isenghien;964;1767;12;;;;;M
+Garel;;1664;1664;1;;;;;M
+de Garlande;comte de Rochefort;1069;1224;9;;;;;M
+Garnier;;1561;1609;2;Saint-Malo;;;;M
+Garnier;;1796;1821;1;Fort-Royal, Martinique;;;;M
+Garnier;Maitre chirugien à Sainte-Lucie;1772;1795;1;Royan;;;;M
+Garnier Laroche;;1774;1774;1;;;;;M
+Garnier de Laroche;;1778;1807;1;Fort-Royal, Martinique;;;;M
+Garnier de Laroche;Capitaine FR: Hon la Jambette;1716;1784;1;Le Lamentin, Martinique;;;;M
+Garnier de Laroche;Capitaine de "l'Hercule";1624;1735;2;Saint-Malo;;;;M
+Garnier de Laroche;Capitaine de milice FR;1748;1823;1;Fort-Royal;;;;M
+de Gascogne;;890;1011;6;;;;;M
+Gasztold;palatin de Troki;1537;1542;1;;;;;M
+Gaudin;;1676;1676;1;St-Pierre;;;;M
+Gaudin;;1703;1703;1;Case-Pilote;;;;M
+Gaulard;;1718;1742;1;;;;;M
+Gaultier;;1646;1646;1;;;;;M
+Gauné de Cazau;;1727;1858;3;;;;;M
+de Gavarret;;1145;1145;3;;;;;M
+de Gavre;;1207;1286;10;;;;;M
+de Gâtinais;comte;1004;1046;3;;;;;M
+de Gedern;;1237;1251;1;;;;;M
+de Gelre;;1190;1247;1;Dillenbourg;;;;M
+Gence;;1669;1673;1;;;;;M
+Gence;;1669;1695;1;Le Prêcheur;;;;M
+Gence;;1695;1712;1;Grande Anse (Lorrain);;;;M
+de Genève;comte;1061;1392;14;;;;;M
+Geniel;;1770;1770;2;;;;;M
+de Gennep;;1370;1419;1;;;;;M
+de Gentile;;1766;1876;25;;;;;M
+de Gentils de La Breuille;;1751;1751;1;;;;;M
+de Geoffre de Chabrignac;;1776;1776;1;;;;;M
+de Gera-Plauen;;1510;1531;1;;;;;M
+Germa;;1818;1842;1;;;;;M
+de Germanie;empereur d'Occident;795;855;1;Altdorf, Allemagne;;;;M
+de Germanie;roi de Lotharingie;835;869;1;Piacenza, Italie;;;;M
+de Germanie;roi de Provence;827;925;5;;;;;M
+de Geroldseck;;1400;1440;1;;;;;M
+de Geuder gt Rabensteiner;baronne;1755;1790;1;;;;;M
+Geyer de Geyersberg;baron;1729;1772;1;Urach;;;;M
+Geyer de Geyersberg;baronne;1768;1820;1;Karlsruhe;;;;M
+Gédoin;;1657;1657;1;;;;;M
+Gérard;;1698;1744;1;Bushey Park;;;;M
+Gérard;lady;1678;1839;3;;;;;M
+Gérard;lord;1662;1684;1;Rose Tavern, Covent Garden;;;;M
+de Gévaudan;;937;1116;10;;;;;M
+Gibert;;1693;1747;1;;;;;M
+Gibert;;1728;1794;1;Coulommiers;;;;M
+Gibert;;1771;1771;1;Le Gros-Morne;;;;M
+Gibert de Lametz;;1765;1797;1;Paris, France;;;;M
+Giesen de Kirchheim;;1788;1788;1;;;;;M
+Gigon Desgranges;;1778;1781;2;Le Gros-Morne;;;;M
+Gigon Desgranges St-Louis;;1780;1780;1;Le Gros-Morne;;;;M
+Gigon Desgranges St-Louis;;1807;1807;1;;;;;M
+Gigon Zécoté;;1807;1831;2;Le Lamentin;;;;M
+de Gijon;;1420;1480;1;Sintra, Portugal;;;;M
+de Gilbert;;1701;1701;1;;;;;M
+de Gilbert de L'Homel;;1741;1741;1;;;;;M
+Gillet;;1659;1659;1;;;;;M
+Gillier;;1696;1696;1;;;;;M
+Gillotin;;1812;1812;1;;;;;M
+Gillotin;;1832;1842;1;Bruxelles;;;;M
+Gillotin;;1848;1848;1;Pont-l'Eveque;;;;M
+Girard;;1719;1719;1;;;;;M
+de Girardin;;1710;1710;1;Fort-Royal;;;;M
+de Girardin;écuyer;;;1;;;;;M
+Giraud du Poyet;;1688;1688;1;Saint-Christophe;;;;M
+Giraud du Poyet;;1723;1723;1;Fort-Royal, Martinique;;;;M
+Giraud du Poyet;Lieutenant du Roi, Martinique. Gouverneur de la Guadeloupe.;1660;1706;1;Ance à Louveb Saint-Christophe;;;;M
+Giraudelle;;1631;1699;1;Le Carbet;;;;M
+Giron;;1234;1256;5;;;;;M
+de Gironde;;1294;1345;3;;;;;M
+de Gislain de Bontin;;1829;1835;2;;;;;M
+des Gittons-Baronnière;seigneur de Cerzé;1718;1718;2;;;;;M
+de Gleiberg;;990;1146;2;;;;;M
+de Gleichen-Blankenhain;;1480;1567;1;;;;;M
+de Gleichen-Remda;;1530;1570;1;Waldenbourg;;;;M
+de Gleichen-Remda;comte de Gleichen;1504;1598;3;;;;;M
+de Gleichen-Tonna;cotme de Gleichen;1480;1578;2;;;;;M
+Glinskaïa;régente de Russie;1527;1538;1;Moscou;;;;M
+Glinski;prince;;;1;;;;;M
+de Glogau;duc;1260;1361;4;;;;;M
+de Glogow;duc;1249;1273;1;;;;;M
+de Gloucester;comte;1189;1217;2;;;;;M
+de Glymes;;1417;1551;5;;;;;M
+de Glymes;;1495;1524;1;Wouw;;;;M
+Gobeil;;1689;1689;1;;;;;M
+Gobert de Bouillon;;1664;1706;2;Le Marigot;;;;M
+Gobert de Bouillon;Martinique avant 1665;1621;1680;1;Languedoc;;;;M
+Godard Descasseaux;;1770;1772;1;Trinité;;;;M
+Godard Duval;;1761;1761;1;Le Gros-Morne;;;;M
+Godard Duval;Martinique avant 1660;1624;1690;2;;;;;M
+Godard des Casseaux Bondi;Major Capesterre;1723;1723;1;Fort-Royal, Martinique;;;;M
+Godard des Casseaux Bondi;Premier Capitaine, Capesterre Martinique.;;;1;;;;;M
+Godet;;1624;1624;1;;;;;M
+Godounov;tsar de Russie;1551;1605;3;;;;;M
+Godounova;;1581;1603;1;;;;;M
+Goiby;;1625;1801;4;;;;;M
+Goiby;;1724;1739;2;Le Trou-au-Chat;;;;M
+Golovine;;1724;1767;2;;;;;M
+de Goltz;;1553;1553;1;;;;;M
+de Gometz;;1028;1028;1;;;;;M
+de Gondrecourt;;1135;1135;2;;;;;M
+Gondron;;1776;1847;1;Sarrebourg;;;;M
+Gondron;;1836;1836;1;St. Martinville, Louisiana;;;;M
+de Gontaut;;1600;1600;1;;;;;M
+Gontcharova;;1815;1831;1;;;;;M
+de Gonzague;;1356;1746;52;;;;;M
+de Gonzague;;1566;1686;3;Mantua;;;;M
+de Gonzague;;1616;1684;1;à Paris;;;;M
+de Gonzague;duc de Nevers;1580;1637;1;Paris;;;;M
+de Gonzague;reine de Pologne;1611;1667;1;Paris;;;POL;M
+Gonzalès;comte de Lara;1125;1125;1;;;;;M
+Gonçalves;;1045;1110;4;;;;;M
+Gordon;;1783;1786;1;Château de La Tour, Pays de Vaud;;;;M
+Gordon;comte d'Aboyne;1724;1732;1;Charlton-Aboyne;;;;M
+Gordon;comte d'Aboyne;1728;1794;1;Edimbourg;;;;M
+Gordon;comte d'Aybone;1702;1702;2;;;;;M
+de Goret;;1744;1765;1;;;;;M
+von Goretzky;;1740;1796;1;;;;;M
+de Goritz;;1274;1313;1;Konigsfelden, Suisse;;;;M
+de Goritz;comte de Tirol;1258;1258;2;;;;;M
+de Gorz;;1345;1391;1;;;;;M
+Gosselin;;;;1;Paris;;;;M
+de Gotterwick;;1395;1448;1;;;;;M
+Gouasblin;;1571;1651;2;;;;;M
+Goufet;;1657;1657;1;Limoges Egl  St Maurice, 87;;;;M
+de Gouffier;;1686;1755;1;;;;;M
+Gouge;;1798;1845;1;;;;;M
+de Goulaine;;1260;1321;2;;;;;M
+de Goulard;seigneur de Beauvais;;;2;;;;;M
+de Gournay;;1118;1118;2;;;;;M
+Goursat;;1819;1842;1;;;;;M
+de Gouvernain;;1840;1840;1;;;;;M
+Gouyer Choisy;;1798;1822;2;Le Gros-Morne;;;;M
+de Goyon de Matignon;comte de Thorigny;1644;1790;6;;;;;M
+de Gr.Strelitz;duc;1359;1360;2;;;;;M
+Graham;comtesse de Menteith;1361;1469;3;;;;;M
+de Grailly;vicomte de Benauge;1230;1413;5;;;;;M
+de Gramont;duc;1639;1727;4;;;;;M
+de Grancey;;1320;1466;5;;;;;M
+de Grancey;seigneur;1331;1380;1;Grandvilliers, Lorraine;;;;M
+de Grandmesnil;;1135;1212;1;;;;;M
+de Grandpré;;1224;1275;9;;;;;M
+de Grandsaigne;seigneur;1338;1704;7;;;;;M
+de Grandsaigne;seigneur de la Flotte;1506;1506;1;Confolens;;;;M
+de Grandseigne;marquise;1610;1666;1;;;;;M
+de la Grange d'Arquien;marquis;1641;1716;2;;;;;M
+Grano;;1843;1843;1;Roseau;;;;M
+de Gratereau des Graulges;;1759;1759;1;;;;;M
+de Greques;;1460;1500;1;;;;;M
+Grey;duc de Suffolk;1508;1554;1;;;;;M
+Grey;reine d'Irlande;1537;1554;1;;;;IRL;M
+Gréau de Saint Marsault;;1763;1763;2;;;;;M
+Grébélyanovith;despote de Serbie;1389;1427;6;;;;;M
+Grifeo;prince de Partanna;1814;1814;1;;;;;M
+du Griffon;;1584;1584;2;;;;;M
+Grimaldi;;1223;1841;48;;;;;M
+Grimon;;1771;1771;1;;;;;M
+Grison;;1679;1712;1;;;;;M
+Grisot;;1767;1767;1;Bussey les Gy, Haute Saône;;;;M
+Grisot;;1773;1816;1;Fort-Royal, Martinique;;;;M
+Grisot;Notaire à Bussey les Gy, Haute Saône;;;1;;;;;M
+Grossmann;;1725;1795;1;;;;;M
+Grouchetski;;1680;1681;2;;;;;M
+Groudna-Groudzinski;princesse de Lowicz;1799;1831;2;;;;;M
+Grout;;1684;1844;2;;;;;M
+Gruyer;;1738;1827;1;Alliancelles;;;;M
+Gryphius;;1598;1674;1;;;;;M
+de Grünne;comte;1805;1841;2;;;;;M
+de Guader;;1095;1168;1;;;;;M
+de Gudensberg;héritière de Hesse;1148;1148;1;;;;;M
+de Gueldre;;945;1168;4;;;;;M
+de Gueldre;;1465;1547;1;Bruxelles;;;;M
+de Guenani;;1680;1710;1;;;;;M
+du Guescelin;;1405;1405;1;;;;;M
+Guériff;dame de la Guérivière;1359;1359;1;;;;;M
+Guérin;;1605;1692;1;;;;;M
+Guibert;;1638;1716;2;Le Carbet;;;;M
+Guillaume;;1746;1746;1;;;;;M
+Guillaume des Fontaines;;1722;1722;1;;;;;M
+Guillot;;1645;1645;1;;;;;M
+Guimard;;1632;1632;1;;;;;M
+Guimon;;1777;1777;1;;;;;M
+Guines;;1699;1769;1;Le Gros-Morne;;;;M
+Guines;;1725;1767;1;Trinité;;;;M
+de Guines;;964;1282;11;;;;;M
+de Guingamp;comtesse;;;1;;;;;M
+Guingat;;1744;1744;1;;;;;M
+Guiot;seigneur de Saint-Quentin;1632;1632;1;;;;;M
+de Guise;seigneur;1070;1631;6;;;;;M
+Gutekunst;;1662;1729;1;;;;;M
+Guttormson;;1184;1230;3;;;;;M
+Guyon de La Rocheguyon;;1713;1795;1;;;;;M
+Guyot;seigneur de Saint-Barbant;1621;1621;2;;;;;M
+Guyot d'Asnières;seigneur d'Asnières;1514;1514;3;;;;;M
+de Guzman;dame d'Albe de Liste;1479;1479;3;;;;;M
+de Guzmán;;1195;1195;1;Alarcos;;;;M
+de Guzmán;duc de Medina Sidonia;1233;1638;6;;;;;M
+de Guzmán;reine de Portugal;1613;1666;1;;;;PRT;M
+Gyldenlove;stadhouder de Norvège;1638;1704;2;;;;;M
+Gyldenlove-Danneskjold;comte Danneskjold à Samsoe;1674;1728;2;;;;;M
+de Görlitz;duc;1370;1451;2;;;;;M
+de Habsbourg;;1251;1304;1;Munich;;;;M
+de Habsbourg;;1257;1322;1;Wittenberg;;;;M
+de Habsbourg;;1279;1282;1;Landshut;;;;M
+de Habsbourg;;1280;1364;1;Konigsfelden;;;;M
+de Habsbourg;;1291;1312;1;Pise;;;;M
+de Habsbourg;;1295;1324;1;Steiermatk;;;;M
+de Habsbourg;;1416;1578;4;Wiener Neustadt;;;;M
+de Habsbourg;;1507;1507;1;Salzbourg;;;;M
+de Habsbourg;;1507;1578;1;Torquemada;;;;M
+de Habsbourg;;1515;1557;1;Cordoba;;;;M
+de Habsbourg;;1526;1741;3;Linz;;;;M
+de Habsbourg;;1528;1590;2;Prague;;;;M
+de Habsbourg;;1528;1679;7;Madrid;;;;M
+de Habsbourg;;1532;1685;9;Innsbruck;;;;M
+de Habsbourg;;1560;1618;1;Burglitz, Bohême;;;;M
+de Habsbourg;;1610;1617;1;Lerma;;;;M
+de Habsbourg;;1611;1612;1;Escurial;;;;M
+de Habsbourg;archiduc d' Autriche;1572;1572;1;Judenbourg;;;;M
+de Habsbourg;archiduc d'Autriche;1614;1662;1;Graz;;;AUT;M
+de Habsbourg;archiduchesse d'Autriche;1465;1618;2;Wiener Neustadt;;;AUT;M
+de Habsbourg;cardinal;1558;1600;1;Rome;;;;M
+de Habsbourg;comte;1076;1629;34;;;;;M
+de Habsbourg;comte;1263;1281;1;Breisach;;;;M
+de Habsbourg;duc d'Autriche;1271;1290;1;Prague;;;AUT;M
+de Habsbourg;duc d'Autriche;1283;1307;1;Horazd'ovice;;;AUT;M
+de Habsbourg;duc d'Autriche;1289;1330;1;Gutenstein, Autriche;;;AUT;M
+de Habsbourg;duc d'Autriche;1293;1757;11;Vienne;;;AUT;M
+de Habsbourg;duc d'Autriche;1349;1395;1;à Vienne;;;AUT;M
+de Habsbourg;duc d'Autriche;1377;1424;1;Bruck an der Mur;;;AUT;M
+de Habsbourg;duc d'Autriche antérieure;1382;1621;2;;;;AUT;M
+de Habsbourg;duc d'Autriche antérieure;1427;1665;3;Innsbruck;;;AUT;M
+de Habsbourg;duchesse de Savoie;1480;1530;2;Bruxelles;;;;M
+de Habsbourg;duchesse de Silésie;1392;1392;1;Schweidnitz;;;;M
+de Habsbourg;empereur Romain-Germanique;1255;1308;1;Brugg, Argovie;;;;M
+de Habsbourg;empereur Romain-Germanique;1415;1493;1;Innsburg;;;;M
+de Habsbourg;empereur Romain-Germanique;1500;1558;1;Gent;;;;M
+de Habsbourg;empereur Romain-Germanique;1503;1564;1;Alcala de Henares;;;;M
+de Habsbourg;empereur Romain-Germanique;1574;1665;13;Graz;;;;M
+de Habsbourg;gouvernante des Pays-Bas;1522;1586;1;Pamele, Flandres;;;;M
+de Habsbourg;prince des Asturies;1545;1603;2;Valladolid;;;;M
+de Habsbourg;prince-évêque de Liège;1505;1557;1;prob. Gent;;;;M
+de Habsbourg;princesse;1566;1633;2;Ségovie;;;;M
+de Habsbourg;reine d'Espagne;1584;1611;1;Graz;;;ESP;M
+de Habsbourg;reine d'Espagne;1634;1696;1;Vienne;;;ESP;M
+de Habsbourg;reine de France;1554;1592;1;à Vienne;;;FRA;M
+de Habsbourg;reine de France;1601;1666;1;Madrid;;;FRA;M
+de Habsbourg;reine de France;1638;1683;1;l'Escurial;;;FRA;M
+de Habsbourg;reine de Hongrie;1505;1558;1;;;;HUN;M
+de Habsbourg;reine de Pologne;1436;1505;1;Vienne;;;POL;M
+de Habsbourg;reine de Pologne;1573;1644;2;Graz;;;POL;M
+de Habsbourg;reine de Pologne;1653;1697;1;Regensbourg;;;POL;M
+de Habsbourg;reine de Portugal;1498;1558;1;Louvain;;;PRT;M
+de Habsbourg;reine de Portugal;1683;1754;1;Vienne;;;PRT;M
+de Habsbourg;roi d'Espagne;1527;1665;3;Valladolid;;;ESP;M
+de Habsbourg;roi d'Espagne;1578;1700;3;Madrid;;;ESP;M
+de Habsbourg;roi de Castille;1478;1506;1;Bruges;;CYL;ESP;M
+de Habsbourg;roi de Hongrie;1397;1780;2;Vienne;;;HUN;M
+de Habsbourg;roi de Hongrie;1440;1457;1;Komron;;;HUN;M
+de Habsbourg;roi des Romains;1218;1291;1;Limbourg;;;;M
+de Habsbourg;régente du duché de Lorraine;1293;1756;26;Vienne;;;;M
+de Habsbourg-Lorraine;;1737;1849;26;;;;;M
+de Habsbourg-Lorraine;;1817;1842;1;Pest;;;;M
+de Habsbourg-Lorraine;;1821;1844;1;Milan;;;;M
+de Habsbourg-Lorraine;archiduc d'Autriche;1756;1801;1;Vienne;;;AUT;M
+de Habsbourg-Lorraine;archiduc d'Autriche;1776;1847;1;Florence;;;AUT;M
+de Habsbourg-Lorraine;empereur Romain-Germanique;1708;1765;1;Nancy;;;;M
+de Habsbourg-Lorraine;gouvernante des Pays-Bas;1738;1895;17;Vienne;;;;M
+de Habsbourg-Lorraine;grand-Maître de l'Ordre Teutonique;1767;1870;9;Florence;;;;M
+de Habsbourg-Lorraine;prince impérial;1783;1853;1;Pise;;;;M
+de Habsbourg-Lorraine;prince palatin de Hongrie;1772;1795;1;Florence;;;HUN;M
+de Habsbourg-Lorraine;reine de France;1755;1793;1;Vienne;;;FRA;M
+de Habsbourg-Lorraine;reine de Naples;1752;1814;1;Vienne;;;ITA;M
+de Hainaut;comte;850;1289;28;;;;;M
+de Hainaut;comte;1056;1098;1;Palestine;;;;M
+de Hainaut;comte;1150;1195;1;Mons, Belgique;;;;M
+de Hainaut;reine de France;1170;1190;1;Valenciennes;;;FRA;M
+de Hainaut-Avesnes;princesse d'Archaïe;1318;1318;1;;;;;M
+de Haldensleben;;1116;1116;1;;;;;M
+de Halewijn;;1544;1581;1;;;;;M
+Halicz;;1251;1298;2;;;;;M
+Halys;;1316;1316;2;;;;;M
+de Ham;;1012;1012;5;;;;;M
+Hamilton;duc d'Abercorn;1440;1885;7;;;;;M
+Hamilton;duchesse de Hamilton;1632;1716;1;Hamilton;;;;M
+de Hanau;;1310;1370;1;;;;;M
+de Hanau-Lichtenberg;comte;1462;1736;12;;;;;M
+de Hanau-Munzenberg;;1576;1612;1;Hanau;;;;M
+de Hanau-Munzenberg;comte;1335;1688;15;;;;;M
+de Hanovre;;1737;1813;1;St.James Palace;;;;M
+de Hanovre;;1766;1828;1;Buckingham House, St. James Park, London;;;;M
+de Hanovre;;1796;1817;1;Esher, Surrey, Angleterre;;;;M
+de Hanovre;;1819;1819;1;Dunkirk, France;;;;M
+de Hanovre;;1819;1819;1;Hanovre, Basse Saxe, Allemagne;;;;M
+de Hanovre;;1820;1821;1;Londres, Angleterre;;;;M
+de Hanovre;;1822;1822;1;Bushy Park, Middlesex;;;;M
+de Hanovre;;1824;1824;1;;;;;M
+de Hanovre;duc de Cumberland;1721;1851;11;;;;;M
+de Hanovre;duc de Kent;1767;1820;1;Sidmouth,Devon, Angleterre;;;;M
+de Hanovre;prince de Galles;1707;1751;1;Chapel Royal, St.James Palace;;;;M
+de Hanovre;princesse de Grande-Bretagne;1687;1757;1;Berlin, Allemagne;;;GBR;M
+de Hanovre;princesse de Grande-Bretagne;1723;1772;1;Cassel;;;GBR;M
+de Hanovre;princesse de Grande-Bretagne;1724;1751;1;Leicester House, St Martin's, Londres, Angleterre;;;GBR;M
+de Hanovre;roi de Grande-Bretagne;1660;1727;1;Hanover, Allemagne;;;GBR;M
+de Hanovre;roi de Grande-Bretagne;1683;1837;4;;;;GBR;M
+de Hanovre;roi de Grande-Bretagne;1738;1820;1;Chapel royal, St. James palace, London, Angleterre;;;GBR;M
+d'Haraucourt;;1465;1550;1;;;;;M
+d'Harcourt;;1240;1488;14;;;;;M
+d'Harcourt;comte;1342;1389;1;Louvre, Paris;;;;M
+d'Harcourt;comte d' Harcourt;1346;1346;1;bataille de Crecy;;;;M
+d' Harcourt;;1772;1772;1;;;;;M
+de Hardegg;;1634;1676;1;;;;;M
+de Hardegg-sur-Glaz;comte;1594;1684;2;;;;;M
+Hardouineau;;1696;1744;4;;;;;M
+Hardy;;1750;1792;2;Grande Anse (Lorrain);;;;M
+Hardy;Premier Hardy en Martinique;1700;1700;1;Le Mans;;;;M
+Hardy de Saint Omer;;1802;1841;1;;;;;M
+Hardy des Sources;;1701;1778;4;Grande Anse (Lorrain);;;;M
+Hardy des Sources;;1836;1843;2;;;;;M
+Harpprecht;;1560;1779;5;;;;;M
+de Harrach;comte;1696;1814;3;;;;;M
+Hartmann;;1594;1638;1;;;;;M
+Hashim;prophète;570;632;1;La Mecque;;;;M
+Hastings;;1250;1250;1;;;;;M
+de Haucke;comte;1737;1830;2;;;;;M
+Hauff;;1622;1665;1;;;;;M
+de Haute-Lorraine;duc;954;1274;18;;;;;M
+d'Hautefort;;1764;1764;1;;;;;M
+de Hauteville;;1200;1200;1;Melun;;;;M
+de Hauteville;duc de Naples;1144;1144;1;;;;ITA;M
+de Hauteville;duc de Pouille;1015;1198;28;;;;;M
+de Hauteville;roi de Sicile;1095;1154;1;Palerme;;;;M
+de Hauteville;roi de Sicile;1185;1198;1;en Sicile;;;;M
+Havre;;1771;1771;1;Grande Anse (Lorrain);;;;M
+de la Haye;seigneur de Masjoubert;1554;1806;4;;;;;M
+des Hayes de Bonneval;;1691;1753;1;St-Aubin de Bonneval;;;;M
+des Hayes de Bonneval;;1738;1786;1;Perche;;;;M
+des Hayes de Bonneval;;1779;1813;1;St-Pierre;;;;M
+Hayot;;1770;1770;1;St-Esprit;;;;M
+Hayot;;1799;1799;1;Saint-Pierre (Mouillage);;;;M
+Hayot;;1812;1812;1;Les Anses d'Arlet;;;;M
+Hayot;;1842;1842;1;Le Carbet;;;;M
+de Haze;;1668;1668;1;;;;;M
+Hecquet;;1625;1685;1;Le Pecq, act. Yvelines;;;;M
+de Helfenstein;;1589;1638;1;Teschen;;;;M
+de Helfenstein;comte;1524;1601;2;;;;;M
+Heller;;1502;1617;5;;;;;M
+de Hengebach;;1217;1217;1;;;;;M
+de Henkel-Donnersmarck;comtesse de Henkel;1670;1732;1;Baruth;;;;M
+de Henneberg;comte;1157;1567;14;;;;;M
+de Henneberg-Schleusingen;;1366;1366;1;;;;;M
+Henriquez;;1497;1497;1;Perpignan, France;;;;M
+Henriquez;amiral de Castille;;;1;;;CYL;ESP;M
+Henriquez;comte d'Albe de Liste;1425;1583;7;;;;;M
+Henriquez;seigneur de Médina de Rioseco;1354;1429;1;Guadalcanal;;;;M
+Henry;;1663;1716;1;Vauclin;;;;M
+Henry Saint-Amour;Lieutenant de Milice;1629;1629;1;Vervin-Aubenton, Picardie;;;;M
+Hepburn;duc d'Orkney;1536;1578;1;Malmo;;;;M
+Herard;;1671;1749;1;St-Christophe;;;;M
+Hertel de Cournoyer;;1747;1747;1;Montréal;;;;M
+Hervieux;;1604;1604;1;;;;;M
+Hervieux;;1654;1707;1;la Martinique;;;;M
+de Hesbaye;;794;818;1;;;;;M
+de Hesse;;1453;1489;1;Cassel;;;;M
+de Hesse;landgrave;1244;1413;2;Marbourg;;;;M
+de Hesse;landgrave;1272;1848;41;;;;;M
+de Hesse;landgrave;1504;1567;1;Marburg;;;;M
+de Hesse-Cassel;;1661;1683;1;Potsdam, Brandebourg, Allemagne;;;;M
+de Hesse-Cassel;landgrave;1572;1847;25;;;;;M
+de Hesse-Cassel;landgrave;1654;1787;5;Cassel;;;;M
+de Hesse-Cassel;landgrave;1689;1753;1;Marburg;;;;M
+de Hesse-Cassel;princesse;1789;1867;1;Gottorp, Schleswig;;;;M
+de Hesse-Cassel;roi de Suède;1676;1751;1;Kassel, Hessen, Allemagne;;;SWE;M
+de Hesse-Darmstadt;;1708;1764;1;Mantua;;;;M
+de Hesse-Darmstadt;landgrave;1547;1830;34;;;;;M
+de Hesse-Darmstadt;landgrave;1605;1808;7;Darmstadt;;;;M
+de Hesse-Darmstadt;landgrave;1667;1739;1;Gotha, Schloss Friedenstein;;;;M
+de Hesse-Darmstadt;landgravine;1754;1832;1;Prenzlau;;;;M
+de Hesse-Darmstadt;landgravine;1765;1796;1;Darmstadt, Allemagne;;;;M
+de Hesse-Darmstadt;évêque d'Augsbourg;1699;1768;1;Bruxelles;;;;M
+de Hesse-Eschwege;princesse;1617;1702;3;;;;;M
+de Hesse-Hombourg;landgrave;1585;1846;10;;;;;M
+de Hesse-Philippsthal;landgrave;1655;1849;15;;;;;M
+de Hesse-Philippsthal;landgrave;1695;1810;2;Philippsthal;;;;M
+de Hesse-Philippsthal-Barchfeld;landgrave;1692;1799;2;;;;;M
+de Hesse-Philippsthal-Barchfeld;princesse;1732;1795;1;Ypres;;;;M
+de Hesse-Rheinfels-Rotenbourg;landgrave;1623;1693;1;Cologne;;;;M
+de Hesse-Rheinfels-Rotenbourg;landgrave;1648;1778;6;;;;;M
+de Hesse-Rheinfels-Rotenbourg;landgravine;1677;1739;1;Rheinfels;;;;M
+de Hesse-Rheinfels-Wanfried;;1688;1728;1;Wanfried;;;;M
+de Hesse-Wanfried;Landgrave;1649;1711;1;Rheinfels;;;;M
+Heurteaux;;1641;1641;1;;;;;M
+Heurteaux;;1686;1686;1;St-Pierre;;;;M
+Heuze;;1818;1818;1;;;;;M
+d'Hébrard;;1601;1601;1;;;;;M
+Héquet;;1676;1755;2;Le Pecq, act. Yvelines;;;;M
+d'Héricourt;;1349;1349;1;;;;;M
+Hill de Dungannon;;1742;1831;1;;;;;M
+Hocquart de Montfermeil;;1726;1779;1;;;;;M
+Hodebourg;;1687;1747;1;Le Mans;;;;M
+Hodebourg;;1717;1791;1;Le François;;;;M
+Hodebourg;Notaire Royal au Mans;;;1;;;;;M
+Hodebourg des Brosses;;1754;1799;1;Le François;;;;M
+Hodebourg des Brosses;;1791;1791;1;;;;;M
+de Hohenberg;;1230;1281;1;Vienne;;;;M
+de Hohenberg;comte;1121;1343;3;;;;;M
+d'Hohenems;comte;1654;1691;1;;;;;M
+de Hohenlohe;;1310;1371;1;;;;;M
+de Hohenlohe-Bartenstein-Jagstberg;prince;1766;1766;1;;;;;M
+de Hohenlohe-Langenbourg;;1679;1751;1;Sarrebruck;;;;M
+de Hohenlohe-Langenbourg;comte;1584;1837;5;;;;;M
+de Hohenlohe-Langenbourg;comte;1659;1835;4;Langenbourg;;;;M
+de Hohenlohe-Neuenstein;;1546;1610;1;Weikersheim;;;;M
+de Hohenlohe-Neuenstein;comte;1517;1709;8;;;;;M
+de Hohenlohe-Waldenbourg;comte de Hohenlohe;1440;1724;17;;;;;M
+de Hohenstaufen;;1047;1307;38;;;;;M
+de Hohenstaufen;roi d'Italie;1093;1152;1;;;;ITA;M
+de Hohenstein;;1570;1570;1;;;;;M
+de Hohenzollern;;1335;1377;1;Munich, Allemagne;;;;M
+de Hohenzollern;;1360;1414;1;Nurenberg;;;;M
+de Hohenzollern;;1430;1495;1;Copenhague, Danemark;;;;M
+de Hohenzollern;;1548;1604;1;Sigmaringen;;;;M
+de Hohenzollern;;1599;1655;1;Königsberg, Allemagne;;;;M
+de Hohenzollern;comte;1516;1576;1;Bruxelles, Belgique;;;;M
+de Hohenzollern;comte de Zollern;1061;1860;179;;;;;M
+de Hohenzollern;duc en Prusse;1657;1801;6;Berlin, Allemagne;;;;M
+de Hohenzollern;margrave d'Ansbach;1460;1737;2;Ansbach;;;;M
+de Hohenzollern;prince de Prusse;1772;1806;1;Saalfeld;;;;M
+de Hohenzollern;électeur de Brandebourg;1414;1486;1;Tangermünde;;;;M
+de Hohenzollern;électeur de Brandebourg;1455;1499;1;Arnebourg;;;;M
+de Hohenzollern;électeur de Brandebourg;1525;1629;2;Berlin;;;;M
+de Hohenzollern-Hechingen;comte;1545;1847;8;;;;;M
+de Hohenzollern-Sigmaringen;Prince;1605;1689;2;Munich;;;;M
+de Hohenzollern-Sigmaringen;Prince;1673;1785;3;Sigmaringen;;;;M
+de Hohenzollern-Sigmaringen;comte;1547;1853;5;;;;;M
+de Hohenzollern-s'Heerenberg;Comte;1704;1737;1;Sigmaringen;;;;M
+de Hohenzollern-s'Heerenberg;Comtesse;1727;1787;1;château s'Heerenberg;;;;M
+de Hohnstein;;1410;1559;3;;;;;M
+de Holiczky-Sternberk;;1570;1633;1;;;;;M
+Holland;comte de Kent;1349;1360;1;Rouen, Normandie, France;;;;M
+Holland;comte de Kent;1350;1434;5;;;;;M
+de Hollande;;1072;1094;1;Montreuil-sur-Mer;;;;M
+de Hollande;comte;943;1374;17;;;;;M
+de Hollande;comte;1140;1190;1;Antioche;;;;M
+de Hollande;comte;1210;1234;1;Noyon ou Corbie;;;;M
+de Holstein;;1255;1325;1;Kalmar;;;;M
+de Holstein;comte;1190;1436;11;;;;;M
+de Holstein-Gottorp;;1573;1625;1;Nyköping, Suède;;;;M
+de Holstein-Gottorp;;1649;1728;1;Gottorp;;;;M
+de Holstein-Gottorp;;1759;1818;1;Eutin;;;;M
+de Holstein-Gottorp;duc;1526;1823;29;;;;;M
+de Holstein-Gottorp;duc d'Ostrogothie;1750;1803;1;Drottningholm, Stockholm, Suède;;;;M
+de Holstein-Gottorp;prince de Suède;1798;1844;2;;;;SWE;M
+de Holstein-Gottorp;princesse;1636;1715;1;Stockholm, Suède;;;;M
+de Holstein-Gottorp;princesse de Suède;1753;1837;2;Stockholm, Suède;;;SWE;M
+de Holstein-Gottorp;roi de Suède;1710;1771;1;Gottorp, Allemagne;;;SWE;M
+de Holstein-Gottorp;roi de Suède;1746;1818;2;Riddarholmen, Stockholm, Suède;;;SWE;M
+de Holstein-Itzehoe;;1250;1289;1;;;;;M
+de Holstein-Plon;comte;1253;1770;6;;;;;M
+de Holstein-Schauenbourg;;1430;1638;5;;;;;M
+de Holstein-Segeberg;;1276;1323;1;;;;;M
+d'Holszany;princesse lithuano-russe;1405;1461;2;;;;;M
+de Holzapfel;comtesse;1640;1707;1;;;;;M
+de Honolstein;;1460;1536;1;;;;;M
+de Honstein;comtesse;1360;1404;3;;;;;M
+de Honstein-Hohenstein;;1470;1585;2;;;;;M
+de Horn-Beaucignies;;1733;1826;1;;;;;M
+de Horn-Hautekerke;;1627;1693;1;Bruxelles, Belgique;;;;M
+de Horn-Hautekerke;comte;1582;1648;1;;;;;M
+de Horn-Hautekerke;comte;1602;1663;1;Stavele;;;;M
+Hoskins;;1718;1777;1;;;;;M
+Hoston;;1845;1845;1;;;;;M
+de la Houssaye Godard;;1725;1725;1;Ste-Marie;;;;M
+de la Houssaye du Rivage;;1826;1826;1;Le Trou-au-Chat;;;;M
+Howard;;1414;1572;8;;;;;M
+Howard;duc de Norfolk;1430;1485;1;à Bosworth;;;;M
+Howard;duc de Norfolk;1473;1554;1;à Kenninghall, Norfolk;;;;M
+Howard;reine d'Angleterre;1522;1542;1;à Londres;;ENG;GBR;M
+de Hoya;comte;1404;1513;3;;;;;M
+de Hoym;;1669;1741;1;Droyssig;;;;M
+de Hoym-Droyssig;;1631;1711;1;;;;;M
+Hoyos;;1772;1828;2;Vienne;;;;M
+Hoyos-Sprinzenstein;;1799;1799;1;;;;;M
+Hubert;;1630;1676;6;;;;;M
+Hubert;;1690;1690;1;Saint-Christophe;;;;M
+Huc;;1700;1700;1;ClairacAgenais,;;;;M
+Huc;;1705;1761;1;Macouba;;;;M
+Huc;;1728;1788;1;Ste-Marie;;;;M
+Hugonin;;1769;1769;1;Trinité;;;;M
+Hugonneau;;1640;1640;2;;;;;M
+Huguet;;1613;1637;1;Chinon;;;;M
+Humblot;;1858;1858;1;;;;;M
+Hummel;;1701;1798;2;;;;;M
+de Huntingdon;comte;1070;1130;2;;;;;M
+Hunyady;;1385;1457;2;;;;;M
+Hurault;;1611;1611;1;;;;;M
+Hurepel;comte de Clermont;1200;1252;2;;;;;M
+Hurlot;;1785;1785;1;St-Pierre;;;;M
+Huyghues;;1750;1838;5;;;;;M
+Huyghues;Capitaine Aide Major de Cavalerie;1728;1787;1;Vauclin;;;;M
+Huyghues Despointes;;1792;1848;10;;;;;M
+Huyghues Despointes;;1840;1841;1;Trinité;;;;M
+Huyghues Despointes;Capitaine de Milice au Bataillon de la Trinité. Habitant sucrier au Robert.;1757;1872;4;Le Robert;;;;M
+Huyghues Despointes;Maire du Robert, Membre du conseil général de la Martinique.;1809;1859;2;Le Robert, Martinique;;;;M
+Huyghues Lacour;;1724;1724;1;Rivière-Pilote;;;;M
+Huyghues Lacour;;1753;1753;1;Le Vauclin;;;;M
+Huyghues Lacour;;1791;1791;1;Le François;;;;M
+Huyghues Lacour;;1816;1816;1;Fort-St-Pierre;;;;M
+Huyghues Lacour;;1837;1837;1;Saint-Pierre;;;;M
+Huyghues Saint-Croix;;1768;1832;1;;;;;M
+Hvide;;1163;1163;2;;;;;M
+Hyde;comte de Charendon;1635;1671;2;;;;;M
+d'Ibelin;seigneur;1175;1216;5;;;;;M
+Imperiali;prince de Franca-Villa;1662;1662;1;;;;;M
+d'Ingrandes;;1100;1100;1;;;;;M
+d'Iré;;1054;1160;7;;;;;M
+d'Isenbourg;comte;1460;1667;5;;;;;M
+d'Isenbourg-Birstein;comtesse;1680;1739;1;;;;;M
+d'Isenbourg-Budingen;;1422;1633;14;;;;;M
+d'Isenbourg-Wied;;1400;1430;1;;;;;M
+d'Isenburg Grenzau;;1510;1572;1;;;;;M
+des Isles;;1573;1573;1;Vittefleur;;;;M
+d'Istrie;comte;1040;1070;3;;;;;M
+d'Italie;;806;936;6;;;;;M
+d'Italie;roi;775;810;1;;;;ITA;M
+d'Italie;roi;797;818;1;Vermandois;;;ITA;M
+Iñiga;roi de Pampelune;;;7;;;;;M
+Jablonowski;;1660;1727;2;;;;;M
+Jabouin Canot;;1823;1823;1;Fort-de-France;;;;M
+Jacob;;1570;1607;2;;;;;M
+Jacquart;;1788;1788;1;Marseille;;;;M
+Jagellon;;1464;1512;1;Francfort sur l'Oder;;;;M
+Jagellon;;1476;1503;1;Nessau;;;;M
+Jagellon;;1526;1583;1;Stockholm, Suède;;;;M
+Jagellon;cardinal;1457;1573;8;;;;;M
+Jagellon;princesse de Pologne;1478;1534;1;Sandomir;;;POL;M
+Jagellon;reine de Hongrie;1503;1547;1;Prague;;;HUN;M
+Jagellon;roi de Bohême;1456;1516;1;Cracovie;;;;M
+Jagellon;roi de Hongrie;1506;1526;1;;;;HUN;M
+Jagellon;roi de Pologne;1351;1596;7;;;;POL;M
+Jagellon;roi de Pologne;1427;1492;1;Grodno;;;POL;M
+von Jagow;;1705;1741;1;;;;;M
+de Jaham;;1752;1752;1;Le Robert;;;;M
+de Jaham;;1802;1802;1;Le Lamentin;;;;M
+de Jaham;;1837;1837;1;Saint-Pierre;;;;M
+Jaham Beaupré;;1723;1723;1;Grande Anse (Lorrain);;;;M
+Jaham Beaupré;;1765;1765;1;Ste-Lucie;;;;M
+Jaham Desfontaines;;1662;1724;1;Le Marigot;;;;M
+Jaham Desprez;;1676;1676;1;;;;;M
+Jaham Desprez;;1715;1715;1;Le Carbet;;;;M
+Jaham Dupre;;1645;1729;1;;;;;M
+Jaham Dupre;;1680;1699;1;Le Marigot;;;;M
+Jaham de Courcilly;;1783;1784;2;Le Robert;;;;M
+Jaham de Plainval;;1702;1832;2;Le Marigot;;;;M
+Jaham de Saint-Fremont;;1820;1820;1;Ste-Marie;;;;M
+Jaham de Vertpré;;1610;1685;1;St-MarsPoitou,;;;;M
+Jaham de Vertpré;;1649;1675;1;;;;;M
+Jaham des Prés;;1652;1703;1;Marigot, Martinique;;;;M
+Jaham des Prés;;1681;1703;1;;;;;M
+Jaham des Rivières;;1712;1712;1;Le Prêcheur;;;;M
+de Jaillard de la Maronnière;seigneur de la Maronnière;;;2;;;;;M
+de la Jaille;;1480;1480;1;;;;;M
+Janret;;1758;1787;2;;;;;M
+Janssens;;1558;1558;1;;;;;M
+Jarry;;1659;1659;1;Le Lude, Sarthe;;;;M
+de Jauer;duc;1316;1346;1;;;;;M
+Jeannin de Castille;;1705;1705;1;Arcueil;;;;M
+de Jéhan;;1744;1819;1;;;;;M
+de Jérusalem;;1129;1160;1;;;;;M
+Jimena;roi de Pampelune;925;994;5;;;;;M
+Joffre;;1844;1844;1;;;;;M
+Johanson;roi de Suède;1234;1234;1;;;;SWE;M
+de Joigny;comtesse;1080;1336;8;;;;;M
+de Joinville;comtesse de Vaudémont;1110;1450;13;;;;;M
+Jolly;;1642;1694;1;Paris (probable), 75;;;;M
+Jonanovitch;;1764;1842;1;;;;;M
+de Jorna;;1791;1791;1;Trou-au-Chat;;;;M
+de Jorna;;1795;1795;1;Rivière-Salée;;;;M
+de Jorna;;1822;1822;1;Le Diamant;;;;M
+Jouanne;;1772;1837;2;;;;;M
+Jouanneau;;1698;1698;2;;;;;M
+Jouhaud;;1804;1838;2;Limoges, 87;;;;M
+Jouhaud;;1810;1872;1;Limoges (St Michel), 87;;;;M
+Joulin;;1768;1837;2;;;;;M
+Joullain;;1724;1724;1;Le Trou-au-Chat;;;;M
+Jourdain Dubois;;1660;1755;1;François;;;;M
+Jourdain Dubois;;1667;1700;1;Case Pilote;;;;M
+Jourdain Dubois;;;;1;Case-Pilote;;;;M
+Jourdain Dubois;Capitaine de Milice;1678;1678;1;Carbet;;;;M
+Jourdanneau;sénéchal de Brilhac;1687;1687;2;;;;;M
+Jouvet;;1745;1745;1;;;;;M
+de Joyeuse;Duc;1562;1615;1;Carcassonne;;;;M
+de Joyeuse;duc;1561;1587;1;bataille de Coutras;;;;M
+de Joyeuse;duc;1563;1608;1;Chateau de Couiza;;;;M
+de Joyeuse;duchesse;1585;1656;1;Le Louvre, Paris;;;;M
+de Joyeuse;seigneur de Bothéon;1477;1592;3;;;;;M
+de Juelich;comte;1177;1425;10;;;;;M
+de Juelich;comte;1218;1218;1;Damiette;;;;M
+de Juliers;duc;1562;1609;1;;;;;M
+de Juliers et Berg;comte;1455;1543;2;;;;;M
+Jung;;1567;1618;1;;;;;M
+de Jutland;roi de Danemark;1144;1146;2;;;;;M
+Kaas;;1727;1804;1;Bödstrup;;;;M
+Kaas;;1746;1800;1;Nestved;;;;M
+Kaas;;1776;1843;1;;;;;M
+de Kabardie;prince;1561;1569;2;;;;;M
+Kamaterina;;1134;1211;2;;;;;M
+Karageorgevitch;seigneur de Serbie;1752;1830;3;;;;;M
+Karolyi;;1622;1622;1;;;;;M
+des Kassoubes;duc;1248;1282;2;;;;;M
+von Katte;;1633;1714;2;;;;;M
+de Katzenelnbogen;;1220;1288;1;Mayence;;;;M
+de Katzenelnbogen;comte;1345;1517;7;;;;;M
+de Kazan;prince;1506;1523;1;;;;;M
+Keighley;;1580;1580;1;;;;;M
+Keith;;1449;1449;3;;;;;M
+Keller;;1582;1672;2;;;;;M
+Keppel;comte d'Abermarle;1702;1768;4;;;;;M
+de Kerpen;;1782;1841;1;;;;;M
+Kerr;;1830;1830;1;;;;;M
+Kettler;duc de Courlande;1692;1711;1;;;;;M
+de Kettler;;1613;1682;1;;;;;M
+de Khevenhuller;;1608;1676;1;;;;;M
+de Khevenhüller-Metsch;prince;1732;1801;1;;;;;M
+de Kholm;prince;1471;1504;2;;;;;M
+Khovanski;prince;1516;1569;2;;;;;M
+Khuen v.Lichtenberg und Belasi;;1712;1712;1;;;;;M
+de Kiev;grand-duc;980;1212;7;;;;;M
+Kinsky;comte Kinski;1784;1831;2;;;;;M
+Kinsky de Wchinitz et Tettau;;1751;1836;3;;;;;M
+de Kinzisgau;comte;910;992;2;;;;;M
+de Kirchberg;burgrave;1531;1827;5;;;;;M
+de Kirchberg;burgrave;1751;1777;1;Hachenberg;;;;M
+de Kirchberg;comte de Hachenbourg;1683;1749;1;Farnroda;;;;M
+de Kirchberg;comte de Hachenbourg;1709;1751;1;Hachenbourg;;;;M
+Kirn;;1693;1749;1;;;;;M
+de Klebelsberg;;1829;1829;1;;;;;M
+de Kleist;;1747;1814;1;;;;;M
+Koenig;;1526;1571;1;;;;;M
+de Kohary;prince;1767;1826;1;;;;;M
+Koltovski;;1572;1626;2;;;;;M
+Kontromanitch;ban de Bosnie;1312;1353;1;;;;;M
+Kontromanitch;reine de Hongrie;1339;1387;1;à Novigrad, Croatie;;;HUN;M
+Korn;;1682;1714;4;;;;;M
+de Kornely;;1765;1827;1;;;;;M
+von Koschembahr;;1774;1807;1;;;;;M
+Kottulinski;comte;1707;1788;2;;;;;M
+Krag till Juelland;;1675;1754;1;;;;;M
+Krasinski;comte;1742;1796;2;;;;;M
+Krimmel;;1612;1699;2;;;;;M
+Krtich;roi de Bosnie;1418;1463;5;;;;;M
+Krummedige;;1451;1451;2;;;;;M
+de Kunowitz;;1671;1754;1;Cassel;;;;M
+de Kunowitz;comte de Kunowitz-Ostra;1624;1722;2;;;;;M
+de Kurzbach;;1572;1625;1;;;;;M
+de Kybourg;comte;1217;1272;5;;;;;M
+de Kyvelioc;comte de Chester;1190;1231;2;;;;;M
+de L'Isle-Bouchard;;1075;1119;1;;;;;M
+de L'Isle-Marivaux;;1542;1560;2;;;;;M
+de La Barthe;;1195;1195;5;;;;;M
+de La Baume Le Blanc;duchesse de La Vallière;1644;1780;4;;;;;M
+de La Borde;;1527;1527;1;;;;;M
+de La Bussière;;1698;1698;1;;;;;M
+La Caille;;1651;1651;1;St-Christophe;;;;M
+de La Fayolle de La Tourne;;1664;1664;1;;;;;M
+de La Fayolle de La Tourne;;1698;1698;1;Montrigaud, 26;;;;M
+de La Ferté de Mun;;1644;1644;1;;;;;M
+de La Guerche;;1167;1192;3;;;;;M
+de La Guiche;;1645;1645;3;;;;;M
+de La Hante Belle Isle;;1763;1763;1;Le Trou-au-Chat;;;;M
+de La Hante Belle Isle;;1791;1791;1;Le François;;;;M
+de La Hante Saint-Alby;;1816;1816;1;Fort-St-Pierre;;;;M
+de La Haye;;1718;1718;1;Grande Anse (Lorrain);;;;M
+de La Houssaye;;1661;1703;1;la Martinique;;;;M
+de La Houssaye;;1724;1786;1;Ste-Marie;;;;M
+de La Houssaye;Martinique avant 1660;1638;1796;5;;;;;M
+de La Houssaye Godard;;1744;1744;1;Grande Anse (Lorrain);;;;M
+de La Houssaye Sainte-Croix;;1750;1750;1;Le Gros-Morne;;;;M
+de La Houssaye Sainte-Croix;;1781;1781;1;St-Pierre;;;;M
+de La Houssaye-Duvigny;;1755;1850;2;Ste-Marie;;;;M
+de La Lande Patry;;1155;1155;1;;;;;M
+de La Ligotière;;1737;1760;1;;;;;M
+de La Londe;;1569;1569;1;;;;;M
+de La March;;856;903;1;;;;;M
+de La March;duc des Austrasiens;830;886;1;Paris;;;;M
+de La Marche;comte;910;1110;10;;;;;M
+de La Marck;;1558;1591;3;;;;;M
+de La Mark;comte;1273;1542;13;;;;;M
+de La Marque;;1135;1135;1;;;;;M
+de La Mothe-Houdancourt;;1671;1671;1;;;;;M
+de La Pause;baron de La Garde;1503;1503;1;;;;;M
+de La Porte;;1623;1657;1;Poincy, Seine-et-Marne;;;;M
+de La Porte;duc de La Meilleraye;1602;1664;1;chateau de La Meilleraye;;;;M
+de La Porte;duc de La Meilleraye;1632;1713;1;Meilleraye;;;;M
+de La Porte;écuyer;1729;1729;3;;;;;M
+de La Porte Mazarin;duc de La Meilleraye;1666;1738;3;Paris;;;;M
+de La Roche;héritière de Châteauneuf;1316;1316;3;;;;;M
+de La Roche Bernard;;1245;1304;1;;;;;M
+de La Roche Derrien;;1202;1269;2;;;;;M
+de La Roche-Sur-Ognon;;1230;1291;6;;;;;M
+de La Roche-Tesson;;1150;1150;2;;;;;M
+de La Roche-en-Régnier;baron;1245;1339;3;;;;;M
+de La Rochefoucauld;duc;1588;1650;1;chateau de La Rochefoucauld;;;;M
+de La Rochefoucauld;duc;1613;1762;3;Paris;;;;M
+de La Rochefoucauld;duc;1634;1714;1;Versailles;;;;M
+de La Rochefoucauld;duc;1743;1792;1;Gisors;;;;M
+de La Rochefoucauld;seigneur;1185;1848;31;;;;;M
+de La Rue;;1705;1705;1;Grande Anse (Lorrain);;;;M
+de La Salle;;1667;1667;1;Lyon;;;;M
+de La Salle;;1697;1697;1;Le Prêcheur;;;;M
+de La Sonde;;1634;1634;1;;;;;M
+de La Tour;comte d'Auvergne;;;2;;;AUV;FRA;M
+de La Tour;seigneur;1389;1512;5;;;;;M
+de La Tour d'Auvergne;;1150;1793;16;;;;;M
+de La Tour d'Auvergne;comte d'Auvergne;1467;1501;2;;;AUV;FRA;M
+de La Tour d'Auvergne;duc de Bouillon;1706;1792;2;Paris;;;;M
+de La Tour d'Auvergne;seigneur;1225;1270;1;Tunis, Tunisie;;;;M
+de La Tour du Pin;dame de Cuiseaux;1273;1347;1;Cuiseaux;;;;M
+de La Tour du Pin;dauphin de Viennois;1050;1337;10;;;;;M
+de La Tremouille;;1501;1696;3;;;;;M
+de La Tremouille;duc de Thouars;1620;1672;1;Chateau de Thouars;;;;M
+de La Tremouille;duc de Thouars;1655;1709;1;La Haye;;;;M
+de La Tremouille;duc de Thouars;1683;1719;1;Paris;;;;M
+de La Trémouille;duc de Thouars;1521;1629;2;;;;;M
+de La Trémouille;duc de Thouars;1566;1674;2;Chateau de Thouars;;;;M
+de La Veigne;;1789;1789;1;;;;;M
+de La Vie;;1250;1250;1;;;;;M
+de La Vie de Villemur;vicomte de Calvignac;1280;1383;2;;;;;M
+Labbe;;1745;1745;1;St. Louis Cathedral, New Orleans, Louisiana;;;;M
+Labbe;;1806;1819;1;St. Grigoire de Vievre, France;;;;M
+Labbe;;1807;1807;2;St. Martin Parish, Louisiana;;;;M
+Labbe;;1808;1875;2;St. Martinville, Louisiana;;;;M
+de Laberaudie;;1225;1225;1;;;;;M
+Labiche;;1627;1627;1;Paris,75;;;;M
+de Laborde Lacarriere;;1726;1726;1;Le Prêcheur;;;;M
+de Laborde Lacarriere;;1753;1753;1;Le Vauclin;;;;M
+de Lacombe;;1751;1751;1;;;;;M
+Lacquant;Martinique avant 1671;1643;1673;1;Guyenne;;;;M
+de Lacquant;;1696;1696;4;;;;;M
+de Lacy;comtesse de Lincoln;1281;1348;2;;;;;M
+Lafargue;;1729;1786;1;;;;;M
+de Lafond de l'Espérance;;1660;1660;2;St-Christophe;;;;M
+Lafontaine;;1756;1831;2;;;;;M
+de Lagarrigue;;1180;1849;47;;;;;M
+de Lagarrigue de Bach;;1759;1824;3;;;;;M
+de Lagarrigue de Francarville;;1601;1735;9;;;;;M
+de Lagarrigue de La Tournerie;;1590;1656;2;;;;;M
+de Lagarrigue de Meillac;;1706;1849;18;;;;;M
+de Lagarrigue de Miramont;;1579;1639;2;;;;;M
+de Lagarrigue de Montcausson;;1586;1715;5;;;;;M
+de Lagarrigue de Saint Loup;;1751;1751;2;;;;;M
+de Lagasne;;1810;1810;1;;;;;M
+de Lagrange;;1799;1799;1;;;;;M
+de Laguarigue;;1658;1744;4;;;;;M
+de Laguarigue de Courcelles;;1727;1797;1;;;;;M
+de Laguarigue de La Tournerie;;1659;1795;8;;;;;M
+de Laguarigue de La Tournerie;Martinique en 1690;1623;1702;1;Sens;;;;M
+de Laguarigue de Miramont;;1753;1753;1;;;;;M
+de Laguarigue de Morange;;1755;1755;1;;;;;M
+de Laguarigue de Rocourt;;1669;1762;5;;;;;M
+de Laguarigue de Saint Isle;;1710;1785;7;;;;;M
+de Laguarigue de Savigny;;1660;1831;9;;;;;M
+de Laguarigue de Silly;;1696;1785;6;;;;;M
+de Laguarigue de Survilliers;;1668;1748;1;St-Christophe;;;;M
+de Laguarigue de Survilliers;;1702;1845;9;;;;;M
+de Laguarigue de Survilliers;;1774;1831;1;Ste-Marie;;;;M
+de Laguarigue de Survilliers;;1804;1884;1;Bordeaux;;;;M
+de Laguarigue de Survilliers de Laissée;;1699;1771;1;Ste-Marie;;;;M
+de Laguarigue de Survilliers de Laissée;;1736;1756;1;;;;;M
+de Lajus;;1799;1799;1;Case-Pilote;;;;M
+de Lalaing;;1390;1570;3;;;;;M
+Lalanne Dufond;;1848;1848;1;;;;;M
+de Lalanne de Père;;1651;1651;1;;;;;M
+Lallemand;;1701;1701;1;;;;;M
+Lallemand;;1751;1751;1;Le Trou-au-Chat;;;;M
+Lallemand;;1775;1775;1;Case-Pilote;;;;M
+Lallemand;;1787;1822;2;Le Gros-Morne;;;;M
+de Lalung;;1637;1693;1;Azay-le-Brûlé;;;;M
+de Lalung;;1680;1751;1;Basse-Pointe;;;;M
+de Lalung;;1706;1774;4;Grande Anse (Lorrain);;;;M
+Lalung de Ferrol;;1741;1769;1;Grande Anse (Lorrain);;;;M
+Lalung de Ferrol;;1783;1864;1;Ste-Marie;;;;M
+de Lamballe;;1135;1135;1;;;;;M
+de Lamberg;;1790;1790;2;;;;;M
+de Lamberg;;1828;1828;1;Vienne;;;;M
+Landais Lestaupinière;;1771;1771;1;Le Gros-Morne;;;;M
+Landais Lestaupinière;;1809;1809;1;Gros-Morne;;;;M
+de la Lande;seigneur de Lage-Cautand;1611;1611;1;;;;;M
+de Landsberg;;1318;1318;1;;;;;M
+Lang;;1648;1799;8;;;;;M
+Langellier Bellevue;;1819;1819;1;Le Mouillage (St-Pierre);;;;M
+Langellin;;1742;1742;1;;;;;M
+Langlois;;1720;1720;1;Le Lamentin;;;;M
+de Lannefranque;;1800;1800;1;;;;;M
+de Lannoy;;1510;1654;3;;;;;M
+de Lanques;sire;1412;1418;2;;;;;M
+de Laon;comte;749;783;2;;;;;M
+Laporte;;1691;1821;4;;;;;M
+de Lara;;1140;1358;9;;;;;M
+de Lara;dame;1285;1351;1;Palencia;;;;M
+Lascaris;;1218;1501;4;;;;;M
+Laslier;;1604;1735;3;;;;;M
+de Lassat;seigneur de Pressigny;1763;1763;3;;;;;M
+de Lastic;dame de Collat;1420;1441;2;;;;;M
+de Lastre;;1780;1831;1;Mouillage;;;;M
+Lathiere-Lavergne;;1842;1842;1;Oradour sur Vayre, 87;;;;M
+de Launay;;1723;1723;2;;;;;M
+de Launay;;1780;1780;1;Le Gros-Morne;;;;M
+de Launay;;1815;1815;1;Sainte-Marie;;;;M
+Laurens;;1766;1814;1;Limoges(St Maurice la Citte;;;;M
+du Lausitz;;1205;1255;2;;;;;M
+de Lautrec;vicomte;;;2;;;;;M
+de Laval;dame;1466;1466;1;Vitré;;;;M
+de Laval;dame de Perrier;1095;1529;19;;;;;M
+de Lavalette;;1769;1830;1;;;;;M
+de Lavardin;;1133;1133;1;;;;;M
+de Lavaud;dame;1482;1511;3;;;;;M
+Lavechef;;1695;1779;1;Le Pecq, act. Yvelines;;;;M
+Lavechef du Parc;;1653;1703;1;Le Pecq, act. Yvelines;;;;M
+Lavie;;1782;1782;1;Grande Anse (Lorrain);;;;M
+de Lavigne;;1646;1712;1;Paris;;;;M
+de Lavigne;Avocat, conseiller du Roi, Bailli de Sainte-Suzanne;1638;1818;11;;;;;M
+de Lavigne;Avocat, directeur de la Compagnie de la Terre Ferme 1656, Ouarapiché, Martinique;1609;1659;1;Sainte-Suzanne;;;;M
+de Lavigne Grandval;;1723;1744;3;;;;;M
+de Lavigne Sainte-Suzanne;;1692;1767;1;Le François, Martinique;;;;M
+de Lavigne Sainte-Suzanne;;1732;1838;20;;;;;M
+de Lavigne Sainte-Suzanne;;1744;1771;1;François;;;;M
+de Lavigne Sainte-Suzanne;;1792;1841;1;Le François (Martinique);;;;M
+de Lavigne Turpin;;1734;1800;5;;;;;M
+de Lavigne Turpin Bonnaire;;1773;1801;2;;;;;M
+de Lavigne de Grandval;;1690;1781;1;Le François;;;;M
+de Lavigne de Grandval;;1704;1729;1;François;;;;M
+de Lavigne de Grandval;chevalier de Saint-Louis;1648;1731;1;Paris Saint Séverin;;;;M
+Lawless;;1829;1829;1;;;;;M
+Lazur;;1735;1740;1;Paris;;;;M
+Le Balleux;;1658;1658;1;la Martinique;;;;M
+Le Balleux;;1751;1765;2;Le Lamentin;;;;M
+Le Balleux;Martinique avant 1660;1664;1748;4;;;;;M
+Le Belloux;;1733;1733;2;;;;;M
+Le Boeuf;;1672;1719;2;;;;;M
+Le Bourguignon;;1571;1571;1;;;;;M
+Le Bouteiller de Senlis;;1653;1653;1;;;;;M
+Le Breton;;1528;1528;1;;;;;M
+Le Caruyer;;1644;1644;3;;;;;M
+Le Caruyer de Beauvais;;1766;1834;4;;;;;M
+Le Chantier;;1513;1513;1;;;;;M
+Le Cocq de Saint-Vertunien;dame;;;1;;;;;M
+Le Cordier;;1778;1815;1;Port-Louis;;;;M
+Le Cordier;Lieutenant de Vaisseau;1787;1787;1;Port Louis;;;;M
+Le Curieux Belmard;;;;1;Ste-Lucie;;;;M
+Le Curieux Durival;;1751;1751;1;Le Lamentin;;;;M
+Le Curieux Grandcourt;;1775;1775;1;Case-Pilote;;;;M
+Le Curieux Laferronnay;;1846;1846;1;Le Carbet;;;;M
+Le Curieux Laferronnay;;;;1;Ste-Lucie;;;;M
+Le Curieux des Cailles;;1723;1723;1;Le Carbet;;;;M
+Le Danois;;1680;1680;1;Case-Pilote;;;;M
+Le Danois;Martinique avant 1660;;;1;;;;;M
+Le Fevre;;1789;1789;1;Les Anses d'Arlet;;;;M
+Le Fort;;1618;1683;1;L'Ile de Ré;;;;M
+Le Fort;;1694;1739;1;Case-Pilote;;;;M
+Le Geay;;1634;1634;1;;;;;M
+Le Geay;;1660;1720;1;Le Marigot;;;;M
+Le Gendre de La Bretesque;;1768;1837;2;Rivière-Pilote;;;;M
+Le Gras de Vaubercey;;1766;1842;1;Montgenost, Marne;;;;M
+Le Lièvre de La Grange;;1843;1843;1;;;;;M
+Le Maigne du Plat;;1669;1669;1;;;;;M
+Le Maire;;1703;1703;1;Case-Pilote;;;;M
+Le Maistre;;1778;1801;2;Le Lamentin;;;;M
+Le Massif;;1776;1776;1;Le Mouillage (St-Pierre);;;;M
+Le Masson de Rancé;;1840;1840;1;;;;;M
+Le Mercier;;1627;1627;1;Le Lude, Sarthe;;;;M
+Le Merle;;1637;1710;2;Saint-Christophe;;;;M
+Le Merle de Beaufond;;1741;1829;5;;;;;M
+Le Merle de Beaufond;;1742;1792;1;Le François;;;;M
+Le Merle de Beaufond;;1781;1866;1;Le Lamentin;;;;M
+Le Merle de Beaufond;;1797;1839;1;Fort-Royal, Martinique;;;;M
+Le Merle de Beaufond;Capitaine Grenadiers;1702;1809;2;Le Lamentin, Martinique;;;;M
+Le Mesle;;1628;1679;1;Morlaix;;;;M
+Le Mesle;;1710;1710;1;Fort-St-Pierre;;;;M
+Le Mesle;;1724;1833;2;Grande Anse (Lorrain);;;;M
+Le Monnier;;1643;1720;1;Dieppe;;;;M
+Le Moyne;;1657;1724;1;Grande Anse (Lorrain);;;;M
+Le Normand de Morando;;1769;1843;1;;;;;M
+Le Pelletier;;1630;1698;1;Mortain;;;;M
+Le Pelletier;Capitaine de Milice;1712;1712;1;Fort-St-Pierre,,,,;;;;M
+Le Pelletier;Martinique en 1676;1596;1678;1;Mortain,,,,;;;;M
+Le Pelletier Dugant;;1715;1715;1;Le Carbet;;;;M
+Le Pelletier Grandair;;1709;1733;2;Fort-Royal;;;;M
+Le Pelletier de Beuze;;1731;1755;1;Le François, Martinique;;;;M
+Le Pelletier de Beuze;;1741;1787;2;;;;;M
+Le Pelletier de Saint-Rémy;;1765;1765;1;Ste-Lucie;;;;M
+Le Pelletier de Saint-Rémy;;1838;1838;3;;;;;M
+Le Pelletier des Ravinières;;1788;1788;1;Case Pilote, Martinique;;;;M
+Le Pelletier du Clary;;1717;1792;3;Case-Pilote;;;;M
+Le Pelletier du Clary;;1807;1837;4;;;;;M
+Le Percher;;1681;1761;1;Trinité;;;;M
+Le Percher;Sergent de bande 1678;1638;1638;1;;;;;M
+Le Quoy;;;;1;Paris;;;;M
+Le Riche;;1165;1165;1;;;;;M
+Le Roux;;1616;1616;2;;;;;M
+Le Roux;;1677;1752;1;St-Pierre;;;;M
+Le Roux de Bordemond;;1617;1617;1;Grainville;;;;M
+Le Roux de Chapelle;;1754;1822;1;;;;;M
+Le Roy de Granchamps;;1538;1538;1;;;;;M
+Le Sade;;1643;1723;2;Grande Anse (Lorrain);;;;M
+Le Sage;;1703;1703;1;Le Carbet;;;;M
+Le Sage;;1752;1752;1;Trinité;;;;M
+Le Sage;;1796;1815;2;Sainte-Marie;;;;M
+Le Sage;;1828;1836;1;Ste-Marie;;;;M
+Le Saulnier;;1554;1554;1;;;;;M
+Le Selliers;;1629;1629;1;;;;;M
+Le Sueux;;1645;1645;1;;;;;M
+Le Tellier;marquis de Louvois;1783;1844;3;;;;;M
+Le Vassoir de Latouche;;1636;1636;2;;;;;M
+Le Vassor;;1499;1718;5;;;;;M
+Le Vassor;;1636;1636;1;Paris,75;;;;M
+Le Vassor;;;;2;Paris;;;;M
+Le Vassor de La Chardonniere;;1763;1763;1;Le Moule;;;;M
+Le Vassor de Latouche;;1683;1683;1;;;;;M
+de Lebarten;;868;1044;7;;;;;M
+Leblanc;;1500;1500;1;France;;;;M
+Leblanc;;1799;1799;1;St.James Parish;;;;M
+Leblanc;;;;8;;;;;M
+Lebreton Beauséjour;;1805;1805;1;;;;;M
+Lechalouppe;;1634;1669;1;;;;;M
+Leclerc;seigneur de Montbas;1506;1802;4;;;;;M
+Lecocq;;1643;1678;2;;;;;M
+Lecomte;Martinique avant 1671;1640;1680;1;;;;;M
+Lecomte Marsilly;;1692;1728;1;Le Marigot;;;;M
+Lecomte de Marsilly;;1728;1839;2;Grande Anse (Lorrain);;;;M
+Leconte;;1661;1703;1;Paris;;;;M
+Leconte;;1685;1720;2;Le Marigot;;;;M
+Lefebvre;;1787;1787;1;;;;;M
+Lefebvre Bonneterre;;1767;1767;1;Case-Pilote;;;;M
+Lefébure;;1642;1758;4;;;;;M
+Lefort;A confirmer;;;1;;;;;M
+Legaluppi;;1629;1629;1;Ajaccio, Corse-du-Sud;;;;M
+Legaluppi;;1645;1645;1;;;;;M
+Legay;;1689;1689;1;;;;;M
+Leger;;1724;1813;1;Petit Failly,Brreanncon), 60;;;;M
+de Lehndorff;comte;1723;1800;2;;;;;M
+de Leicester;;1120;1190;1;Durazzo, Italie;;;;M
+de Leicester;;1150;1215;1;;;;;M
+de Leinster;;1171;1171;1;Waterford, Irlande;;;;M
+de Leisnig-Penig;;1508;1560;1;;;;;M
+Lejonhufvud;;1512;1512;1;;;;;M
+Lejonhufvud;;1516;1551;1;Stockholm, Suède;;;;M
+Lembert;;1644;1820;4;;;;;M
+Lemire;;1781;1781;1;St-Pierre;;;;M
+de Lemos;comte;1542;1558;2;;;;;M
+Leneze;;1632;1632;1;;;;;M
+de Lenfernat;;1491;1661;5;;;;;M
+de Lengenfeld;;1115;1115;2;;;;;M
+Lennox;duc de Richmond;1672;1860;8;;;;;M
+Lennox;duc de Richmond-Lennox;1764;1819;1;au Canada;;;;M
+de Lennox;;1392;1457;2;;;;;M
+de Lennox;comte;1345;1425;1;Stirling, Écosse;;;;M
+de Lenoncourt;;1576;1602;1;;;;;M
+Leo;;1584;1681;2;;;;;M
+de Leon;;1092;1372;7;;;;;M
+Leonard;;1650;1718;1;Gand;;;;M
+Leonard;;1686;1736;2;Grande Anse (Lorrain);;;;M
+Lepeuple;;1786;1790;2;;;;;M
+de Lerchenfeld-Prennberg;baronne;1801;1801;1;;;;;M
+Lesade;;1761;1820;3;;;;;M
+de Leslie;comte;1692;1737;1;;;;;M
+Lesme;;1803;1803;1;Limoges Egl St Etienne, 87;;;;M
+Lesme;;1804;1824;3;Limoges, 87;;;;M
+Lesme;;1808;1842;1;Limoges Egl St Pierre, 87;;;;M
+Lesme;;1811;1811;1;Limoges Egl St  Pierre, 87;;;;M
+Lesseps;;1690;1801;3;;;;;M
+Lestaing;;1794;1794;1;;;;;M
+de Lestibaudois de La Vallee;;1717;1717;1;Case-Pilote;;;;M
+Lestrade;;1838;1838;1;Le Robert;;;;M
+Lesueur;;1661;1661;1;Dieppe;;;;M
+Leszczynska;reine de France;1703;1768;1;;;;FRA;M
+Leszczynski;;1630;1703;1;;;;;M
+Leszczynski;roi de Pologne;1677;1766;1;;;;POL;M
+de Leuchtenberg;;1537;1579;1;Dillenbourg;;;;M
+de Leuchtenberg;landgrave;1502;1555;1;;;;;M
+Levesque;seigneur de la Courmorant;1529;1529;2;;;;;M
+de Leyritz;;1681;1764;1;Bordeaux;;;;M
+de Leyritz;;1742;1822;1;Grande Anse (Lorrain);;;;M
+de Leyritz;;1762;1887;10;;;;;M
+de Lezay;;1695;1695;3;;;;;M
+de Lezay-Marnesia;;1768;1791;1;Moutonne;;;;M
+de Lezay-Marnesia;marquis;1735;1800;1;Metz, France;;;;M
+de Lezay-Marnesia;marquis de Lezay;1699;1778;1;Lons-le-Saunier;;;;M
+Lezier;;1653;1653;2;;;;;M
+de León;roi;994;1028;1;Viseu;;;;M
+de León;roi;1016;1037;1;à Támara;;;;M
+de León;roi des Asturies;791;1067;14;;;;;M
+Lécapène;empereur d'Orient;919;961;2;;;;;M
+Léontiev;;1706;1706;2;;;;;M
+de Lévis;duc de Ventadour;1553;1591;1;chateau de la Voulte;;;;M
+de Lévis;duc de Ventadour;1593;1622;1;Beaucaire;;;;M
+de Lévis;duc de Ventadour;1600;1649;1;Brive la Gaillarde;;;;M
+de Lévis;seigneur de Mirepoix;1190;1727;8;;;;;M
+de Lévis-Florensac;;1336;1380;3;;;;;M
+de Lévis-Mirepoix;seigneur de Mirepoix;1232;1304;3;;;;;M
+de Lichtenberg;;1329;1495;3;;;;;M
+de Liechtenstein;seigneur;1156;1865;94;;;;;M
+de Liegnitz;duc;1372;1691;9;;;;;M
+de Ligne;comte d'Arenberg;1525;1568;1;Heiligerlee;;;;M
+de Ligne;seigneur de Barbancon;1500;1814;2;;;;;M
+de Ligne-Arenberg;;1601;1665;1;Gent;;;;M
+de Ligne-Arenberg;prince d'Arenberg;1550;1616;1;Vollenhove;;;;M
+de Lille;châtelain;1205;1338;3;;;;;M
+de Limbourg;régente du duché de Lorraine;963;1313;14;;;;;M
+de Limbourg-Lenne;;1465;1500;1;;;;;M
+de Limoges;vicomte de Ségur;840;1291;20;;;;;M
+Limousin;;1565;1565;1;Limoges ?, 87;;;;M
+Limousin;;1590;1590;1;, Ls;;;;M
+Limousin;;1659;1659;1;Limogesegl St Maurice, 87;;;;M
+Limousin;;1659;1659;1;St Maurice de la Citte, 8 ;;;;M
+de Limpurg-Gaildorf;;1542;1712;5;;;;;M
+de Limpurg-Gaildorf;baron;1596;1734;3;Gaildorf;;;;M
+de Limpurg-Sontheim;baron;1611;1645;1;Sommershausen;;;;M
+de Limpurg-Sontheim;seigneur de Limpurg en Obersontheim;1536;1691;4;;;;;M
+de Limpurg-Speckfeld;seigneur;1474;1588;4;;;;;M
+de Linange;;1695;1766;1;Mettenheim;;;;M
+de Linange;comte;1237;1818;36;;;;;M
+de Linange;comte de Linange-Dagsbourg-Heidesheim;1662;1698;1;Broich;;;;M
+de Linange;prince;1763;1814;1;Durckheim, Allemagne;;;;M
+de Linange-Westerbourg;;1604;1667;1;Westerbourg;;;;M
+de Linange-Westerbourg;comte;1487;1635;3;;;;;M
+Linch;;1736;1736;2;;;;;M
+de Lindau-Ruppin;;1430;1511;1;;;;;M
+von Lindau-Ruppin;;1280;1343;1;;;;;M
+de Linselstein;;949;949;1;;;;;M
+de Lippe;comte;1200;1614;7;;;;;M
+de Lippe;comte;1527;1563;1;Detmold;;;;M
+de Lippe-Detmold;;1598;1638;1;Detmold;;;;M
+de Lippe-Detmold;comte;1554;1782;6;;;;;M
+de Lippe-Detmold;comte;1671;1752;2;Cassel;;;;M
+de Lithuanie;grand-duc;1260;1453;18;;;;;M
+Littée;;1795;1820;2;Ste-Marie;;;;M
+Littée;;1796;1824;3;;;;;M
+de Lizarazu;;1358;1358;1;;;;;M
+de Lobdabourg-Arnshaugk;;1300;1359;2;;;;;M
+de Lobkowitz;;1568;1677;3;;;;;M
+de Lobkowitz;;1683;1750;1;Vienne;;;;M
+de Lobkowitz;comte;1655;1715;1;Neustadt, Bohême;;;;M
+Lockhart;;1673;1731;1;;;;;M
+Lockhart;;1724;1738;1;Darnaway, co Moray;;;;M
+de Locquant;;1735;1735;3;;;;;M
+Locquet de Blossac;;1816;1816;1;;;;;M
+de Lodron;;1510;1556;1;;;;;M
+de Loeben;comtesse;1714;1714;1;;;;;M
+Logie;;1364;1364;1;;;;;M
+de Lomagne;;1000;1204;7;;;;;M
+de Lombardie;;769;773;2;;;;;M
+de Lomegau;;920;920;2;;;;;M
+de Lomenil;;1620;1620;1;;;;;M
+de Londeÿs;;1692;1692;1;Veyrac (87);;;;M
+de Londeÿs;baron de Puyférier;;;2;;;;;M
+le Long;;1738;1738;1;;;;;M
+de Longueville;duc;1595;1672;3;;;;;M
+de Longvilliers de Poincy;;1524;1595;2;;;;;M
+de Longvilliers de Poincy;;1570;1596;1;Anet en Brie;;;;M
+de Longwy;comtesse de Bar-sur-Seine;1538;1561;5;;;;;M
+de Longwy-Metz;;995;1092;2;;;;;M
+de Lonvilliers;;1652;1652;1;;;;;M
+de Loon;comte;1192;1192;2;;;;;M
+de Loon-Heinsberg;;1424;1502;1;Breda;;;;M
+de Loon-Heinsberg;;1426;1446;1;Weilbourg;;;;M
+de Loon-Heinsberg;;1443;1469;1;Mainz;;;;M
+de Loon-Heinsberg;comte de Loon;1325;1448;4;;;;;M
+de Looz;;1100;1400;7;;;;;M
+Lopoukhine;;1672;1731;2;;;;;M
+de Lor;;1339;1347;2;;;;;M
+de Lordat;;1779;1800;1;;;;;M
+de Loret;;1770;1770;1;Bordeaux;;;;M
+de Loret;;1791;1791;1;;;;;M
+de Lorraine;;890;939;1;Andernach, Allemagne;;;;M
+de Lorraine;;1170;1210;1;Louvain, Belgique;;;;M
+de Lorraine;;1397;1456;1;Sarrebrück;;;;M
+de Lorraine;;1522;1568;1;Diest;;;;M
+de Lorraine;;1529;1596;3;Joinville;;;;M
+de Lorraine;;1545;1621;1;chateau de Deneuvre;;;;M
+de Lorraine;;1550;1606;1;chateau de Saint-Germain;;;;M
+de Lorraine;;1563;1563;1;Deneuvre;;;;M
+de Lorraine;;1564;1625;1;chateau de Nomeny;;;;M
+de Lorraine;;1574;1631;1;château d'Eu;;;;M
+de Lorraine;;1648;1719;1;Montjeu;;;;M
+de Lorraine;;1702;1711;4;chateau de Lunéville;;;;M
+de Lorraine;;1705;1705;1;Arcueil;;;;M
+de Lorraine;abbesse de Remiremont;1700;1711;2;palais ducal de Nancy;;;;M
+de Lorraine;abbesse de Saint-Pierre a Reims;1522;1657;9;chateau de Joinville;;;;M
+de Lorraine;cardinal;1555;1588;1;Dampierre;;;;M
+de Lorraine;cardinal de Vaudémont;1561;1694;4;Paris;;;;M
+de Lorraine;comtesse de Flandre;860;1780;120;;;;;M
+de Lorraine;duc;1451;1508;1;chateau de Fains;;;;M
+de Lorraine;duc;1489;1550;4;Bar-le-Duc;;;;M
+de Lorraine;duc;1517;1623;8;Nancy;;;;M
+de Lorraine;duc de Bar;1699;1700;1;Bar Le Duc;;;;M
+de Lorraine;duc de Guise;1496;1550;1;chateau de Conde-sur-Moselle;;;;M
+de Lorraine;duc de Guise;1519;1577;3;chateau de Bar-le-Duc;;;;M
+de Lorraine;duchesse;1410;1453;1;à Launay, près de Saumur;;;;M
+de Lorraine;eveque de Toul;1572;1587;1;Mayence;;;;M
+de Lorraine;prince de Joinville;1550;1588;1;chateau de Blois;;;;M
+de Lorraine;reine d'Écosse;1515;1560;1;Bar-le-Duc;;SCT;GBR;M
+de Lorraine;reine de France;1553;1601;1;Nomeny;;;FRA;M
+de Lorraine;évêque d'Orléans;1299;1299;1;;;;FRA;M
+de Lorraine-Aumale;;1600;1638;1;;;;;M
+de Lorraine-Aumale;duc;1555;1631;1;Bruxelles;;;;M
+de Lorraine-Brionne;duc;1753;1787;2;;;;;M
+Loubet;;1140;1140;1;;;;;M
+de Loutsk;prince;1207;1258;2;;;;;M
+de Louvain;comte;987;1180;12;;;;;M
+Louveau de La Guigneraye;;1837;1837;2;Rivière-Pilote;;;;M
+Louvet;;1422;1828;4;;;;;M
+Luce de La Payre;;1692;1692;1;Le Lamentin;;;;M
+de Luciot;;1739;1739;1;;;;;M
+du Lude;;1030;1030;1;;;;;M
+de Luna;;1372;1406;2;;;;;M
+de Lunéville;;985;985;1;;;;;M
+de Lusignan;comtesse d' Eu;1095;1299;29;;;;;M
+de Lusignan;prince de Galilée;1316;1343;1;château de Bourbon;;;;M
+de Lusignan;roi de Chypre;1195;1218;1;Tripoli;;;;M
+Luszensky de Reglice et Lusna;;1790;1790;2;;;;;M
+Luttrel;comte de Carhampton;1742;1808;2;;;;;M
+de Lutzelbourg;;1632;1689;1;;;;;M
+de Lutzelstein;;1520;1560;1;;;;;M
+de Luxembourg;;1315;1349;1;Maubuisson;;;;M
+de Luxembourg;;1342;1442;3;Prague;;;;M
+de Luxembourg;comte de Saint-Pol;1340;1371;1;Baësirder;;;;M
+de Luxembourg;comte de Saint-Pol;1385;1433;1;Rambures;;;;M
+de Luxembourg;duc;980;1613;51;;;;;M
+de Luxembourg;duc de Piney;1583;1616;1;Jargeau;;;;M
+de Luxembourg;duchesse de Piney;1607;1680;1;Ligny;;;;M
+de Luxembourg;empereur Romain-Germanique;1274;1313;1;Buonconvento, près de Sienne, Italie;;;;M
+de Luxembourg;princesse de Martigues;1562;1623;1;Lamballe;;;;M
+de Luxembourg;roi de Bohême;1296;1346;1;Luxembourg;;;;M
+de Luxembourg;seigneur de Ligny;1245;1288;1;Woringen, Allemagne;;;;M
+de Luxembourg-Fiennes;;1495;1557;1;;;;;M
+de Luxembourg-Ligny;;1488;1566;2;;;;;M
+de Luynes;;1733;1733;1;Fort-Royal;;;;M
+de Luynes;;1767;1767;1;Rivière-Pilote;;;;M
+de Luynes;;1797;1797;1;Fort-St-Pierre;;;;M
+Lyher;;1442;1490;2;;;;;M
+Lyon;;1376;1739;2;;;;;M
+Lyon de Strathmore;comte de Strathmore;1737;1776;1;;;;;M
+de Löwenstein-Wertheim;comte;1627;1734;3;Wertheim;;;;M
+de Löwenstein-Wertheim;comte de Löwenstein-Wertheim-Virnebourg;1598;1657;1;Lowenstein;;;;M
+de Löwenstein-Wertheim-Freudenberg;;1783;1847;1;;;;;M
+de Löwenstein-Wertheim-Rochefort;comte;1616;1753;5;;;;;M
+de Löwenstein-Wertheim-Virnebourg;;1629;1816;4;;;;;M
+Maansdatter;;1550;1612;1;Satakunda, Finland;;;;M
+de Maasgau;;890;890;5;;;;;M
+Mac Culloc;;1811;1811;1;Dublin (Irlande);;;;M
+Mac Hugh;;1811;1811;1;Dublin (Irlande);;;;M
+Mac Hugh;;1843;1843;1;Roseau;;;;M
+de Machecoul;;1250;1256;2;;;;;M
+de Machicourt;;1705;1759;1;;;;;M
+de Macon;;967;967;2;;;;;M
+Magnin;;1770;1787;1;;;;;M
+Magnol-Dumas;;1807;1807;1;Limoges, 87;;;;M
+des Magyars;duc;997;1014;2;;;;;M
+des Magyars;roi de Hongrie;970;1038;1;Esztergom;;;HUN;M
+de Maigne du Plat;;1670;1706;1;;;;;M
+de Maignelais;seigneur;;;2;;;;;M
+de Maillard de La Combe;;1735;1809;2;;;;;M
+de Maillard de La Combe;;1772;1827;1;La Combe;;;;M
+de Maillard de La Combe;;1820;1859;1;château de la Combe;;;;M
+Maillet;;1685;1752;1;Bourd du Prélois St Onge;;;;M
+Maillet;;1714;1768;2;Rivière-Pilote;;;;M
+Maillet Dumaine;;1717;1750;1;Rivière Pilote;;;;M
+Maillet Dumaine;;1754;1812;1;Le François;;;;M
+Maillet Dumaine;;1771;1771;1;;;;;M
+de Maillé;;1456;1456;2;;;;;M
+de Maillé;marquise de Brézé;1628;1694;1;Brézé, Maine-et-Loire, France;;;;M
+de Mailly;dame de Conti;1766;1789;3;;;;;M
+de Mailly-Nesle;;1712;1741;1;;;;;M
+du Maine;comte;800;1085;23;;;;;M
+Maingaud;;1710;1782;1;St Maurice de la Citte, 87;;;;M
+Majer;;1695;1821;2;;;;;M
+de Majorque;infant;1278;1345;2;;;;;M
+de Majorque;roi;1243;1311;1;Montpellier;;;;M
+de Majorque;roi;1315;1349;1;Catane;;;;M
+Malatesta;;1418;1425;1;;;;;M
+Malerba;;1723;1723;1;;;;;M
+Malide;;1795;1795;1;;;;;M
+de Malines;seigneur;1225;1306;3;;;;;M
+Mallet;;1636;1636;1;Les Presteaux de La Boische, Loiret;;;;M
+de Maloyaroslav;prince;1433;1485;2;;;;;M
+de Maltitz;;1238;1333;1;;;;;M
+Malyouta-Skouratov;;1605;1605;2;;;;;M
+de Man;roi;1248;1248;1;;;;;M
+Manceau;;1608;1608;1;;;;;M
+Mancini;;1656;1760;2;;;;;M
+Mancini;duc de Nevers;1676;1798;2;Paris;;;;M
+Mancini;duchesse de Mercoeur;1636;1715;6;Rome;;;;M
+de Manderscheid;comte;1447;1611;7;;;;;M
+de Manderscheid-Blankenheim;comte;1480;1831;8;;;;;M
+de Manderscheid-Gerolstein;comte;1564;1650;2;;;;;M
+de Manderscheid-Virnebourg;comte;1508;1648;4;;;;;M
+Mandon;;1691;1822;6;;;;;M
+de Manneville;;1728;1762;1;;;;;M
+Manny;lord;1354;1372;1;;;;;M
+de Mansfeld;comte de Mansfeld-Vorderort;1360;1638;35;;;;;M
+de Mansfeld;comtesse;1522;1537;1;Offenbach;;;;M
+de Mar;comte;1296;1296;2;;;;;M
+Maranda;;1636;1725;1;Angoulême;;;;M
+Maranda;;1677;1694;1;Le Marin;;;;M
+de Maranon;;1035;1060;1;;;;;M
+de Marans;;1738;1738;1;;;;;M
+Marchet;;1777;1777;1;Villetoureix, Dordogne, France;;;;M
+de Marcillac;;1718;1788;1;;;;;M
+de Mareuil;;1150;1207;2;;;;;M
+de Marigny;;1140;1140;1;;;;;M
+de la Maronnière;;1679;1679;1;;;;;M
+de Marque;;1637;1637;1;;;;;M
+Marraud;;1664;1714;2;Agen;;;;M
+Marraud;;1701;1776;1;Macouba;;;;M
+Marraud de Sigalony;;1698;1857;2;Macouba;;;;M
+Marraud de Sigalony;;1733;1765;1;Grande Anse (Lorrain);;;;M
+Marraud de Sigalony;;1766;1874;5;;;;;M
+Marraud des Grottes;;1728;1728;1;Ste-Marie;;;;M
+Marraud des Grottes;;1737;1877;45;;;;;M
+Marraud des Grottes;;1763;1763;1;Macouba;;;;M
+de Marseille;;999;1212;6;;;;;M
+Marshal;comte de Pembroke;1224;1241;3;;;;;M
+Marshall;;1143;1143;1;Pembroke Pembrokeshire, Pays de Galles;;;;M
+Marshall;;1189;1189;1;Londres, Angleterre;;;;M
+Marshall;comtesse de Pembroke;1190;1248;1;;;;;M
+Marteau;;1623;1678;1;;;;;M
+Marteau;;1638;1638;1;Saumur;;;;M
+Martin;;1712;1712;1;Cul de sac à vaches;;;;M
+Martin;Directeur général des vivres de la Marine aux Isles;;;1;;;;;M
+Martin de La Martinière;;1629;1629;2;;;;;M
+Martin de La Martinière;;1712;1791;2;Paris;;;;M
+Martin de La Martinière;;1792;1839;1;Saint-Pierre, Martinique;;;;M
+Martin de La Martinière;;1809;1848;1;Martinique;;;;M
+Martin de La Martinière;;1819;1819;1;à Saint-Pierre (Martinique);;;;M
+Martin de La Martinière;;;;1;Villeneuve en Champagne;;;;M
+Martin des Martinieres;;1837;1837;1;Rivière-Pilote;;;;M
+Martineau;;1795;1795;1;Ste-Marie;;;;M
+de Martinitz;comte;1650;1656;2;;;;;M
+Martinozzi;;1637;1672;2;;;;;M
+Martinozzi;duchesse de Modène;1635;1687;1;Fano;;;;M
+Massé;;1614;1614;1;BeauvoirVendée,;;;;M
+Massé;;1637;1700;1;L'Ile de Ré;;;;M
+de Massias de Bonne;;1686;1686;1;Limoges;;;;M
+de Massias de Bonne;;1701;1701;1;St-Pierre;;;;M
+de Matha;;1170;1170;4;;;;;M
+de Mathefelon;;1248;1419;3;;;;;M
+Matheillon Cossois;;1807;1807;1;;;;;M
+Matheillon Cossois;;1825;1825;1;Le Gros-Morne;;;;M
+Mathey;;1816;1836;1;Dieuze;;;;M
+Mathieu;;1669;1669;1;Le Marigot;;;;M
+Maubert;;1270;1323;1;;;;;M
+Mauclerc de Lepinay;;1765;1792;1;St-Pierre;;;;M
+Maugée;;1720;1720;1;Le Lamentin;;;;M
+Maugée;;1750;1775;2;Le Gros-Morne;;;;M
+Maugée;;1754;1754;1;;;;;M
+de Mauléon;;1045;1226;6;;;;;M
+de Maulmont;;1280;1280;1;;;;;M
+de Maunoury;seigneur du Murault;1617;1636;2;;;;;M
+de Maure;;1600;1600;1;;;;;M
+Maurensanne;;1806;1806;1;Limoges Egl St Michel, 87;;;;M
+Mauriac;;1835;1835;1;;;;;M
+de Mausigny;;1376;1376;1;;;;;M
+de Mayence;;1100;1100;1;;;;;M
+de Mayenne;;1110;1246;9;;;;;M
+de Mayenne;;1168;1220;1;Égypte;;;;M
+de Mazarin;duchesse;;;1;;;;;M
+Mazarini;cardinal;1602;1661;1;Abruzzes;;;;M
+de Mazovie;;1394;1429;1;Varsovie;;;;M
+de Mazovie;duc;1291;1313;2;;;;;M
+de Mâcon;comte;910;965;2;;;;;M
+de Meaux;;979;979;2;;;;;M
+de Meaux Rocourt;;1629;1687;1;;;;;M
+de Mecklembourg;prince des Obodrites;1160;1329;22;;;;;M
+de Mecklembourg-Güstrow;duc;1590;1721;6;;;;;M
+de Mecklembourg-Güstrow;duchesse;1659;1749;2;Güstrow;;;;M
+de Mecklembourg-Schwerin;duc;1683;1778;2;Grabow;;;;M
+de Mecklembourg-Schwerin;duc de Mecklembourg;1318;1837;2;Schwerin;;;;M
+de Mecklembourg-Schwerin;duc de Mecklembourg;1361;1842;57;;;;;M
+de Mecklembourg-Schwerin;prince héritier;1778;1819;1;Ludwigslust;;;;M
+de Mecklembourg-Schwerin;roi de Suède;1340;1412;1;à Doberan;;;SWE;M
+de Mecklembourg-Schwerin-Grabow;;1685;1735;1;Berlin, Allemagne;;;;M
+de Mecklembourg-Stargard;duc;1321;1532;9;;;;;M
+de Mecklembourg-Strelitz;;1744;1818;1;Mirow, Mecklembourg-Strelitz;;;;M
+de Mecklembourg-Strelitz;;1769;1818;1;Hanover;;;;M
+de Mecklembourg-Strelitz;;1773;1839;1;Hannovre;;;;M
+de Mecklembourg-Strelitz;duc;1658;1708;1;Güstrow;;;;M
+de Mecklembourg-Strelitz;duc;1686;1841;11;;;;;M
+de Mecklembourg-Strelitz;duchesse;1694;1752;2;Strelitz;;;;M
+de Mehun;;1216;1216;1;;;;;M
+de Meingau;;900;955;2;;;;;M
+de Melanda;;995;1022;1;;;;;M
+de Melgueil;;1055;1145;8;;;;;M
+de Mello;seigneur;1080;1350;14;;;;;M
+de Melun;;835;1724;3;;;;;M
+de Melun;;1328;1389;1;Château de Monceau;;;;M
+de Melun-Espinoy;prince d'Espinoy;1520;1666;3;;;;;M
+Menant;;1732;1732;1;Ste-Marie;;;;M
+de Mendoza;marquis de Zenetta;1508;1580;4;;;;;M
+Menegault;;1703;1703;1;Le Trou-au-Chat;;;;M
+Menu;;1726;1796;2;;;;;M
+de Mercie;comte;889;911;1;;;;;M
+de Mercie;roi;853;874;1;Rome, Italie;;;;M
+Mercier;seigneur de la Motte-Malitard;1744;1744;1;;;;;M
+de Mercoeur;;1095;1290;8;;;;;M
+Meriel;;1648;1648;6;;;;;M
+Merillon;;1787;1804;2;;;;;M
+de Merode;baronne;1578;1640;1;Antwerpen;;;;M
+de Merode;comte;1627;1794;6;;;;;M
+de Merode;comte;1797;1840;1;Braunschweig;;;;M
+de Merode;marquis de Westerloo;1674;1830;2;Bruxelles;;;;M
+de Merode-Groesbeek;comtesse;1688;1695;1;;;;;M
+de Merode-Montfort;comte;1662;1773;4;;;;;M
+de Merode-Westerloo;baronne;1649;1701;1;Bruxelles;;;;M
+Mery de Neuville;;1821;1821;1;Fort-St-Pierre;;;;M
+de Mesle;;1285;1329;1;;;;;M
+de Mesmes;;1655;1655;1;;;;;M
+de Metternich;;1580;1614;1;;;;;M
+de Metz;;902;963;6;;;;;M
+Metzsch;;1507;1580;1;;;;;M
+de Mezetsk;prince;1470;1483;2;;;;;M
+de Médicis;grand-duc de Toscane;1414;1737;41;;;;;M
+de Médicis;grand-duc de Toscane;1590;1679;4;Florence;;;;M
+de Médicis;reine de France;1519;1589;1;à Florence;;;FRA;M
+de Médicis;reine de France;1573;1642;1;;;;FRA;M
+Mélentiéva;;1576;1576;1;;;;;M
+de Méranie;duc;1213;1269;5;;;;;M
+de Mérédieu;seigneur de Chanlebout;1764;1764;2;;;;;M
+de Mier;;1796;1869;2;;;;;M
+Migliaccio;duchesse de Floridia;1770;1826;2;;;;;M
+Mignot;;1648;1680;1;St-Pierre;;;;M
+Mignot;;1658;1677;2;;;;;M
+Milhe;;1688;1688;1;Saint-Brés;;;;M
+Milhe;Boulanger;1669;1669;1;Le Crès;;;;M
+Milhe;Boulanger;;;1;;;;;M
+de Millau;;985;1050;4;;;;;M
+Millon;;1677;1677;1;Case-Pilote;;;;M
+Millon;;1698;1698;4;;;;;M
+Millon de Sainte-Claire;;1807;1807;1;Le Lamentin;;;;M
+Millot;;1660;1660;1;;;;;M
+Millot de Lore;;1677;1677;1;Loches;;;;M
+Millot de Lore;;1679;1701;1;St-Médard d'Evres (Touraine);;;;M
+Millot de Lore;;1716;1766;1;Ste-Marie;;;;M
+Miloslavskaïa;;1625;1669;1;;;;;M
+de Miramont;;1530;1530;2;;;;;M
+de Mirebeau;;1185;1185;1;;;;;M
+Miron de Pont-Leroy;;1831;1831;1;;;;;M
+de Moers;comte;1360;1547;15;;;;;M
+Mohun;lord;1396;1431;2;;;;;M
+Mohylanka;prince;1591;1638;1;Warszawa;;;;M
+Molandrin;;1723;1723;1;Le Carbet;;;;M
+de Moldavie;prince;1433;1504;1;Borzesti (aujourd'hui Gheorghe Gheorghiu-Dej);;;;M
+de Moldavie;prince de Mogdavie;1482;1505;2;;;;;M
+de Molina;;1260;1321;1;;;;;M
+de Mompelgard;;1387;1444;1;;;;;M
+de Moncada;;1321;1321;1;;;;;M
+de Moncade;vicomte de Béarn;1180;1223;3;;;;;M
+de Monceaux;;1563;1563;2;;;;;M
+de Monchy;;1125;1162;2;;;;;M
+de Monferrat;roi de Salonique;1150;1207;1;;;;;M
+de Mongascon;dame;;;1;;;;;M
+Monnel Mancroix;;1708;1792;1;;;;;M
+Monnier;;1718;1718;1;;;;;M
+de Mons;;1085;1131;3;;;;;M
+Monsalard;;1753;1753;1;;;;;M
+de Monschau;;1175;1214;1;;;;;M
+de Mont d'Or;;1782;1828;1;Vaugneray (à l'Ouest de Lyon);;;;M
+de Mont d'Or;marquis;1793;1793;1;;;;;M
+de Mont-Saint-Jean;;1172;1223;3;;;;;M
+Montagu;comte de Salisbury;1406;1462;2;;;;;M
+de Montagu;seigneur;1196;1348;6;;;;;M
+Montaigne;;1645;1707;1;Le Marin;;;;M
+Montaigne;;1693;1693;1;St-Christophe;;;;M
+Montaigu de Marcoussis;;1398;1398;1;;;;;M
+de Montauban;;1443;1497;1;;;;;M
+de Montault;;1656;1698;1;;;;;M
+de Montaut;seigneur de Mussidan;1335;1777;5;;;;;M
+de Montbazon;seigneur;1304;1407;5;;;;;M
+de Montbéliard;;1076;1128;4;;;;;M
+de Montboissier;;1255;1271;2;;;;;M
+de Montdidier;comte de Ramerupt;1031;1129;5;;;;;M
+de Montfaucon;dame d'Erry;1128;1411;7;;;;;M
+de Montferrat;margrave;961;1566;29;;;;;M
+de Montfort;;1061;1117;1;Fontevrault;;;;M
+de Montfort;;1123;1181;1;Montfort l'Amaury;;;;M
+de Montfort;;1160;1229;1;Varilhes;;;;M
+de Montfort;;1228;1249;1;Nicosie, Chypre;;;;M
+de Montfort;;1530;1568;1;Orléans;;;;M
+de Montfort;comte;1165;1218;1;Toulouse, France;;;;M
+de Montfort;comte de Bigorre;1195;1220;1;Castelnaudary;;;;M
+de Montfort;comte de Montfort-l'Amaury;1192;1241;1;Otrante, Italie;;;;M
+de Montfort;dame d'Epernon;1028;1759;24;;;;;M
+de Montfort-Bregenz;;1510;1544;1;;;;;M
+Montgomerie;lady;1697;1738;1;;;;;M
+Montgomery;;1438;1438;1;;;;;M
+de Montgommery;comte d'Alençon;1095;1189;5;;;;;M
+de Monthermer;comte de Gloucester;1297;1323;1;;;;;M
+de Monthiers;;1574;1574;2;;;;;M
+de Montjay;;1090;1090;1;;;;;M
+de Montlaur;;1220;1278;2;;;;;M
+de Montlezun;vicomtesse d'Auvillar;1130;1150;1;;;;;M
+de Montlhéry;;1089;1104;8;;;;;M
+de Montluçon;sire;1165;1165;4;;;;;M
+de Montmirail;;1194;1267;4;;;;;M
+de Montmorency;;1594;1650;1;Pézenas, Hérault, France;;;;M
+de Montmorency;connetable de France;1493;1567;1;Chantilly;;;FRA;M
+de Montmorency;duc;1073;1801;36;;;;;M
+de Montmorency;duc;1530;1579;1;Écouen;;;;M
+de Montmorency;duc;1534;1614;1;Chantilly;;;;M
+de Montmorency;duc;1595;1632;1;Toulouse;;;;M
+de Montmorency;duc de Piney;1628;1695;1;Paris;;;;M
+de Montmorency;duc de Piney;1662;1726;1;Ligny;;;;M
+de Montmorency;seigneur de Marly;1135;1204;1;Constantinople;;;;M
+de Montmorency-Laval;;1239;1260;2;;;;;M
+de Montpellier;seigneur;1129;1219;12;;;;;M
+de Montrevault;;945;1048;4;;;;;M
+Monval;;1770;1770;1;Trinité;;;;M
+Monza;;1534;1534;1;Vincence, Italie;;;;M
+de Morat;seigneur de Lavaud de Blanzac;1692;1692;1;;;;;M
+de Moray;mormaer;;;2;;;;;M
+Moreau;;1686;1761;4;;;;;M
+Moreau;;1727;1727;1;St. Louis Cathedral, New Orleans, Louisiana;;;;M
+Moreau de Montcheuil;;1744;1820;1;Saint-Martial de Valette;;;;M
+Moreau de Montcheuil;;1777;1850;1;Bordeaux;;;;M
+Moreau de Villejalet;;1715;1821;3;;;;;M
+Moret;;1745;1794;1;Paris, France;;;;M
+de Morialmes;dame;1190;1190;4;;;;;M
+Morillon;;1633;1700;3;;;;;M
+Morin;;1610;1850;4;;;;;M
+Morin;;1767;1778;1;Limoges , Egl  Stmaurice, 87;;;;M
+de Moritz;;1650;1685;1;Jacobstadt;;;;M
+Morlot;;1670;1737;2;;;;;M
+de Mortagne;;1031;1031;1;;;;;M
+de Mortain;;1058;1087;2;;;;;M
+de Mortemart;;1185;1255;1;;;;;M
+de Mortemer;;1160;1184;1;;;;;M
+Mortimer;comte de March;1352;1425;5;;;;;M
+Moser;;1486;1552;2;;;;;M
+Moser von Filseck;;1553;1734;6;;;;;M
+Moser von Filseck und Weilerberg;;1525;1595;1;;;;;M
+Mosley;;1844;1844;1;;;;;M
+Moth;;1654;1700;1;;;;;M
+Motier;;1706;1706;1;;;;;M
+Motier de La Fayette;marquis de La Fayette;1757;1837;1;;;;;M
+Mouchard;;1708;1782;2;La Rochelle;;;;M
+Mouchard de Chaban;;1737;1813;1;Paris, France;;;;M
+Mouret;;1789;1834;1;La Maison Neuve Cne Oradour;;;;M
+de Mousson;;1037;1037;2;;;;;M
+de Moussy;;1430;1430;2;;;;;M
+Mouton;;1656;1740;1;;;;;M
+de Mouy;marquis;;;1;;;;;M
+de Mouy;marquise;1572;1627;1;chateau de Thugny;;;;M
+Mowbray;lord;1361;1481;4;;;;;M
+Moyeux;;1698;1698;3;;;;;M
+ibn Muhammad;calife de Cordoue;;;1;;;;;M
+de Mullot;;1807;1807;1;;;;;M
+de Mullot de Charmoy;;1752;1752;1;;;;;M
+Munk;;1598;1658;2;;;;;M
+de Munsterberg;;1500;1531;1;;;;;M
+de Munsterberg-Oels;;1601;1659;1;;;;;M
+Murat;;1793;1847;2;;;;;M
+Murat;roi de Naples;1771;1815;1;;;;ITA;M
+Mure;;1347;1347;2;;;;;M
+Murray;;1768;1830;1;;;;;M
+Murray;comte de Dunmore;1661;1710;1;Knowsley;;;;M
+Murray;lady;1687;1710;1;Whitehall;;;;M
+Mutinet de La Carnoye;;1714;1714;2;;;;;M
+Muñoz;duc de Riansares;1833;1833;1;;;;;M
+N...;;683;920;15;;;;;M
+de Naeyer;;1601;1601;1;Bruxelles (Hinisterrae ?);;;;M
+de Naeyer;;1624;1624;1;Ath (Belgique);;;;M
+de Naeyer;;1630;1630;1;Gand;;;;M
+de Naeyer;;1659;1659;1;Gand, paroisse St Bavon;;;;M
+de Naeyer;;1700;1700;1;Gand, Belgique;;;;M
+de Naeyer;;1756;1846;1;Gand (Belgique);;;;M
+Nagoï;;1580;1612;2;;;;;M
+Nagu;;1779;1779;1;;;;;M
+de Namur;comte;915;1363;16;;;;;M
+de Nangis;dame;1100;1100;1;;;;;M
+de Nantes;comte;827;1162;19;;;;;M
+Nantiac;;1667;1707;1;;;;;M
+de Narbonne;;1165;1239;1;Narbonne, France;;;;M
+de Narbonne;comte de Molina;897;1281;15;;;;;M
+de Narbonne-Pelet;;1050;1176;6;;;;;M
+Narichkine;;1623;1694;3;;;;;M
+de Nassau;comte;1135;1459;18;;;;;M
+de Nassau;comte;1180;1351;3;Dillenbourg;;;;M
+de Nassau;empereur Romain-Germanique;1255;1298;1;Göllheim;;;;M
+de Nassau-Dillenbourg;;1441;1514;1;Celle;;;;M
+de Nassau-Dillenbourg;;1491;1547;1;Vianden;;;;M
+de Nassau-Dillenbourg;comte;1380;1661;15;Dillenbourg;;;;M
+de Nassau-Dillenbourg;comte;1430;1739;18;;;;;M
+de Nassau-Dillenbourg;comte de Nassau-Dietz;1410;1544;5;Breda;;;;M
+de Nassau-Hadamar;prince;1674;1740;2;Hadamar;;;;M
+de Nassau-Idstein;comte;1603;1760;3;;;;;M
+de Nassau-Ottweiler;;1653;1773;3;Ottweiler;;;;M
+de Nassau-Ottweiler;comte;1625;1728;2;;;;;M
+de Nassau-Sarrebruck;comte;1423;1769;6;Sarrebruck;;;;M
+de Nassau-Sarrebruck;comtesse;1464;1774;10;;;;;M
+de Nassau-Siegen;;1587;1643;2;;;;;M
+de Nassau-Siegen;;1613;1669;1;Siegen;;;;M
+de Nassau-Siegen;;1622;1694;2;Culemborg;;;;M
+de Nassau-Siegen;;1625;1700;1;Arolsen;;;;M
+de Nassau-Siegen;comte;1561;1661;3;Dillenbourg;;;;M
+de Nassau-Usingen;prince;1635;1823;5;;;;;M
+de Nassau-Weilbourg;;1362;1383;1;Marbourg;;;;M
+de Nassau-Weilbourg;;1560;1634;1;Strasbourg, France;;;;M
+de Nassau-Weilbourg;;1572;1607;1;Berlebourg;;;;M
+de Nassau-Weilbourg;;1582;1635;1;Metz, France;;;;M
+de Nassau-Weilbourg;comte;1288;1857;26;;;;;M
+de Nassau-Weilbourg;comte;1368;1429;1;Sarrebrück;;;;M
+de Nassau-Weilbourg;comte;1504;1559;1;Weilnau;;;;M
+de Nassau-Weilbourg;comte;1537;1593;1;Ottweiler;;;;M
+de Nassau-Weilbourg;duc de Nassau;1792;1839;1;Kirchheimbolanden;;;;M
+de Nassau-Weilbourg;princesse;1546;1829;2;Weilbourg;;;;M
+de Nassau-Weilbourg;princesse;1776;1841;1;Kircheimbolanden;;;;M
+de Nassau-Wiesbaden-Idstein;comte;1307;1594;12;;;;;M
+de Nassau-Wiesbaden-Idstein;comte;1419;1480;1;Breda;;;;M
+de Nassau-Wiesbaden-Idstein;comte;1490;1558;1;Keulen;;;;M
+de Navailles;dame;1330;1381;1;;;;;M
+de Navarre;roi;1000;1234;16;;;;;M
+de Navarre;roi;1132;1229;2;Pampelune, Espagne;;;;M
+de Navarre;roi;1144;1150;1;Leon, Espagne;;;;M
+Navarro;;1510;1510;1;;;;;M
+de Neipperg;comte;1775;1829;1;;;;;M
+de Nellenbourg;;912;912;1;;;;;M
+Nemanya;empereur des Serbes;1308;1355;1;Diavoli;;;;M
+Nemanya;grand-joupan de Rascie;1136;1371;17;;;;;M
+Nemanya;prince de Serbie;1114;1200;1;Ribnica, Yougoslavie;;;;M
+Nemanya;roi de Serbie;1280;1280;1;monastère Sopocani;;;;M
+Nemanya;roi de Serbie;1334;1334;1;Zvecan;;;;M
+Nepveu;;1674;1674;1;;;;;M
+de Nesle;comte de Soissons;1095;1306;13;;;;;M
+de Nesmond;;1667;1667;2;;;;;M
+de Nettancourt de Passavant;;1723;1760;1;Bar-le-Duc;;;;M
+de Nettancourt-Vaubécourt;;1701;1794;2;Nettancourt;;;;M
+de Neuenahr;;1551;1626;1;;;;;M
+de Neufchatel;;1495;1544;1;;;;;M
+Neuffer;;1629;1778;3;;;;;M
+de Neuville;;1170;1707;4;;;;;M
+de Neuville de Grez;;1265;1327;1;;;;;M
+de Nevers;comte;975;1192;18;;;;;M
+de Nevers;comte;1110;1161;1;Auxerre;;;;M
+Neville;baron Neville de Raby;1329;1495;11;;;;;M
+Neville;baron Neville de Raby;1341;1388;1;Newcastle upon Tyne, Tyne and Wear, Angleterre;;;;M
+Neville;comte de Westmorland;1363;1425;1;Raby Castle, Durham, Angleterre;;;;M
+de Nice;;1032;1032;4;;;;;M
+de Nimptsch;;1773;1773;1;Breslau;;;;M
+Ninot;Forgeron;1806;1842;1;Nantois;;;;M
+de Noailles;;1578;1824;14;;;;;M
+de Noailles;duc;1620;1678;1;son hotel parisien;;;;M
+de Noailles;duc;1650;1708;1;chateau de Versaillles;;;;M
+de Noailles;duc;1713;1793;1;Versailles;;;;M
+du Noble;;1712;1712;1;;;;;M
+Noel;;1687;1704;2;;;;;M
+de Nogaret;duc d'Epernon;1622;1622;1;;;;;M
+de Nogaret de La Valette;;1581;1581;1;;;;;M
+de Nordgau;;951;1020;6;;;;;M
+de Normandie;;1053;1085;1;Saint-Jean d'Acre, Israël;;;;M
+de Normandie;;1102;1120;1;dans le Naufrage de la Blanche-Nef;;;;M
+de Normandie;comte de Flandre;1101;1128;1;à Aalst;;;;M
+de Normandie;duc;860;932;1;Norvège;;;;M
+de Normandie;duc;932;1147;20;;;;;M
+de Normandie;duc;942;942;1;en Picardie;;;;M
+de Normandie;duc;1010;1035;1;à Nicée (Asie Mineure);;;;M
+de Normandie;duc;1054;1134;1;au château de Cardiff;;;;M
+de Normandie;impératrice du Saint-Empire;1102;1167;1;Londres;;;;M
+de Normandie;roi d'Angleterre;1028;1087;1;à Falaise?;;ENG;GBR;M
+de Normandie;roi d'Angleterre;1056;1100;1;près de Lyndhurst, Hampshire;;ENG;GBR;M
+de Normandie;roi d'Angleterre;1068;1135;1;Selby, Yorkshire, Angleterre;;ENG;GBR;M
+de Northeim;duc de Bavière;1050;1141;6;;;;;M
+de Northumberland;;1010;1090;3;;;;;M
+de Norvège;;1042;1042;1;;;;;M
+Noury;;1817;1817;1;;;;;M
+de Novgorod;prince;1137;1221;4;;;;;M
+de Noyers;seigneur;1180;1374;7;;;;;M
+O'Murphy;;1737;1815;1;;;;;M
+Odoievski;prince;1555;1569;2;;;;;M
+Odone;;1657;1657;1;Ajaccio, Corse-du-Sud;;;;M
+d'Oignies;comte;1510;1791;2;;;;;M
+d'Oignies;princesse de Grimberghe;1760;1842;1;Bruxelles;;;;M
+d'Oiselet;baron;1208;1497;8;;;;;M
+d'Oisy;seigneur;1075;1165;5;;;;;M
+d'Oldenbourg;;1583;1658;1;Rotenbourg, Hesse;;;;M
+d'Oldenbourg;;1685;1687;1;Whitehall Palace a Londres;;;;M
+d'Oldenbourg;;1686;1687;1;chateau de Windsor;;;;M
+d'Oldenbourg;;1690;1690;1;Saint James Palace;;;;M
+d'Oldenbourg;;1692;1692;1;Syon House a Brentford;;;;M
+d'Oldenbourg;;1693;1693;1;Berkeley House;;;;M
+d'Oldenbourg;;1696;1698;2;Windsor;;;;M
+d'Oldenbourg;comte de Oldenbourg-Oldenbourg;1272;1849;131;;;;;M
+d'Oldenbourg;corégente du duché de Lorraine;1521;1590;1;Tortona;;;;M
+d'Oldenbourg;duc de Gloucester;1689;1700;1;Hampton Court;;;;M
+d'Oldenbourg;duc de Glücksbourg;1785;1831;1;Lindenau;;;;M
+d'Oldenbourg;duc de Holstein-Sonderbourg-Augustenbourg;1765;1814;2;Augustenburg;;;;M
+d'Oldenbourg;prince de Danemark;1653;1708;1;chapelle royale de Saint James Palace;;;;M
+d'Oldenbourg;princesse de Danemark;1771;1843;1;Christiansborg;;;;M
+d'Oldenbourg;roi de Danemark;1426;1813;3;Copenhague, Danemark;;;;M
+d'Oldenbourg;roi de Danemark;1455;1513;1;Ålborg, Danemark;;;;M
+d'Oldenbourg;roi de Danemark;1723;1766;1;Altona, Allemagne;;;;M
+Olivier Prevert;;1736;1736;1;Grande Anse (Lorrain);;;;M
+Olivier Prevert;;1763;1763;1;St-Pierre;;;;M
+Olremans;;1742;1778;1;;;;;M
+Opalinski;comte;1680;1747;2;;;;;M
+d'Opole;duc;1239;1293;4;;;;;M
+d'Oppeln;duc;1360;1413;4;;;;;M
+d'Orange;;1411;1521;3;;;;;M
+d'Orange;;1605;1674;1;Cherbourg, Manche;;;;M
+d'Orange;;1620;1620;1;Région Huivillé ou Siouville Hague 22 km SO Cherbourg;;;;M
+d'Orange;;1641;1669;1;Capesterre, Guadeloupe;;;;M
+d'Orange;prince;1438;1475;1;chateau d'Orange;;;;M
+d'Orange;prince;1443;1502;1;Chateau de Nozeroy;;;;M
+d'Orange d'Hurville;;1554;1554;1;;;;;M
+d'Orange-Nassau;;1578;1648;1;Antwerpen;;;;M
+d'Orange-Nassau;prince d'Orange;1533;1584;1;au Château de Dillenburg;;;;M
+d'Orange-Nassau;prince d'Orange;1554;1848;23;;;;;M
+d'Orange-Nassau;prince d'Orange;1626;1650;1;à La Haye;;;;M
+d'Orange-Nassau;prince de Nassau-Dietz;1686;1711;1;Cassel;;;;M
+d'Orange-Nassau;roi d'Angleterre;1650;1702;1;;;ENG;GBR;M
+d'Orange-Nassau;roi des Pays-Bas;1772;1849;2;La Haye;;;;M
+d'Orfeuille;seigneur de Luché;1573;1573;2;;;;;M
+d'Orlamuende;margrave de Meissen;;;2;;;;;M
+de Orlamuenden;;1055;1087;2;;;;;M
+d'Orleans-Rothelin;marquis de Rothelin;1620;1792;5;;;;;M
+d'Orléans;;1409;1432;1;Blois;;;;M
+d'Orléans;;1449;1501;1;Bray-sur-Seine;;;;M
+d'Orléans;;1662;1847;2;Paris;;;;M
+d'Orléans;duc;1336;1793;9;;;;FRA;M
+d'Orléans;duc de Chartres;1810;1842;1;Palermo;;;;M
+d'Orléans;duchesse de Chartres;842;1850;26;;;;;M
+d'Orléans;princesse de Commercy;1676;1744;1;à Saint-Cloud;;;;M
+d'Orléans;reine des Belges;1812;1850;1;Compiegne;;;BEL;M
+d'Orléans-Longueville;;1548;1601;1;Paris, France;;;;M
+d'Orléans-Longueville;duc de Dunois;1447;1600;9;;;;;M
+Ormson;;1438;1450;2;;;;;M
+d'Ornano;;1645;1645;1;Paris;;;;M
+Orséolo;;1015;1015;1;;;;;M
+Orsini;;1450;1520;2;;;;;M
+d'Ortenbourg;comtesse;;;3;;;;;M
+Orth;;1530;1742;5;;;;;M
+Ortlöpp;;1791;1843;1;;;;;M
+d'Orville;;1807;1807;2;;;;;M
+Ory;;1691;1760;1;;;;;M
+Osiander;;1534;1766;7;;;;;M
+d'Ossétie;;1206;1206;1;;;;;M
+d'Ostfriesland;comte;1462;1634;8;;;;;M
+d'Ostphalie;;965;1003;2;;;;;M
+Ostrogska;princesse;1560;1579;1;Wilno;;;;M
+d'Ottingen;comte;1304;1747;9;;;;;M
+d'Ottingen-Baldern;comte d'Ottingen-Wallerstein;1516;1626;2;;;;;M
+d'Ottingen-Baldern;comte d'Ottingen-Wallerstein;1544;1602;1;Sigmaringen;;;;M
+d'Ottingen-Flohberg;;1523;1560;1;;;;;M
+d'Ottingen-Katzenstein;;1619;1688;1;;;;;M
+d'Ottingen-Ottingen;comte;1486;1664;10;;;;;M
+Ottingen-Spielberg;;1703;1737;1;;;;;M
+d'Ottingen-Spielberg;comte;1693;1812;4;;;;;M
+Ouallet;;1600;1680;1;Le Prêcheur;;;;M
+Ouallet;;1649;1727;1;Grande Anse (Lorrain);;;;M
+Oudinot;;1807;1837;1;Nantois (55);;;;M
+Ozenne;;1745;1745;1;St. Louis Cathedral, New Orleans, Louisiana;;;;M
+Ozenne;;1806;1806;1;St. Martinville, Louisiana;;;;M
+Ozenne;Cooper/ Wine and Liqueur Merchant;1699;1743;2;St. Lo, Normandy;;;;M
+Ozenne;Landowner;1740;1819;1;New Orleans, Louisiana;;;;M
+Ozier;;1643;1720;1;Saint-Christophe;;;;M
+Paar;prince;1744;1812;1;;;;;M
+Pachéco;duc d'Escalona;1563;1615;1;;;;;M
+de Padilla;;1352;1361;2;;;;;M
+de Pailley;;1398;1398;1;;;;;M
+Pain de Thevigne;;1797;1797;1;;;;;M
+Paintret;;1620;1715;2;Le Pecq, act. Yvelines;;;;M
+Paletski;prince;1547;1569;2;;;;;M
+Paléologue;empereur d'Orient;1198;1503;12;;;;;M
+de Pallant;;1480;1620;4;;;;;M
+de Palmeira;;1110;1154;1;;;;;M
+de Panthoufleau;;1524;1524;1;;;;;M
+Pantin de la Hamelinière;;1256;1270;2;;;;;M
+Papin;;1626;1682;1;Nantes;;;;M
+Papin;;1658;1697;1;Cul de sac à vaches;;;;M
+Papin;;1679;1679;1;Carbet;;;;M
+Papin L'Epine;;1666;1766;2;Le Lamentin;;;;M
+Papin L'Epine;;1696;1696;1;Le Prêcheur;;;;M
+Papin L'Epine;Martinique en 1647;1626;1667;1;Hennebon, Bretagne;;;;M
+Papin de La Bazodière;;1746;1746;1;Guadeloupe;;;;M
+Paquot;;1763;1816;1;Virty-en-Perthois;;;;M
+Parade;Sellier;1809;1809;1;;;;;M
+Parant;;1778;1778;1;Le Lamentin;;;;M
+Paravicini;;1741;1741;1;Ajaccio, Corse-du-Sud;;;;M
+Pardaillan de Gondrin;Marquis de Gondrin;1712;1799;3;;;;;M
+Pardaillan de Gondrin;duc d' Antin;1665;1757;2;Paris;;;;M
+Pardaillan de Gondrin;duc d' Antin;1707;1743;1;Versailles;;;;M
+de Pareds;;1200;1200;1;;;;;M
+de Paris;comte;808;835;2;;;;;M
+de Parisot;;1672;1672;1;;;;;M
+Parr;reine d'Angleterre;1512;1548;1;à Sudeley Castle;;ENG;GBR;M
+de Parthenay;;1190;1329;12;;;;;M
+de Parthenay-Soubise;;1554;1631;1;Parc en Poitou;;;;M
+Pascal;;1766;1847;1;Marseille;;;;M
+Pascal;Négociant. Président du Tribunal de Commerce;1729;1794;1;Marseille, Saint-Férréol;;;;M
+Pasquet du Randon;;1754;1766;2;;;;;M
+Pastoureau;;1630;1630;1;;;;;M
+de Pastoureau;;1628;1628;1;;;;;M
+Paul;;1720;1793;2;Marseille;;;;M
+de Paviot de Nantillois;;1810;1844;1;;;;;M
+Payen;;1321;1697;3;;;;;M
+Payen de Montpipeau;;1320;1320;1;;;;;M
+Pays;;1627;1659;2;Le Lude, Sarthe;;;;M
+Pecoil de La Villedieu;;1720;1720;1;;;;;M
+de Pellegars de Malhortie;;1772;1832;1;;;;;M
+Pellerin de La Touche;;1824;1824;1;;;;;M
+Pelletier;;1624;1720;3;;;;;M
+de Pelsez;;1801;1801;1;;;;;M
+Penicaud;;1470;1831;5;;;;;M
+Penicaud;;1606;1869;27;Limoges, 87;;;;M
+Penicaud;;1662;1686;1;St Maurice de la Citte, 87;;;;M
+Penicaud;;1671;1741;2;Limoges Egl St Maurice, 87;;;;M
+Penicaud;;1739;1805;2;Limoges;;;;M
+Penicaud;;1740;1800;1;Limoges , Egl  Stmaurice, 87;;;;M
+Penicaud;;1772;1829;1;Limoges Egl St Etienne, 87;;;;M
+Penicaud;;1774;1806;1;Limoges ?;;;;M
+Penicaud;;1808;1808;1;Limoges Egl St Etienne;;;;M
+Penicaud;;1816;1877;1;Limoges (St Michel), 87;;;;M
+Penicaud;;1827;1827;1;Limoges Egl St Michel, 87;;;;M
+Penicaud;;1834;1834;1;Limoges Egl Stmichel, 87;;;;M
+de Penthièvre;comte;1055;1138;4;;;;;M
+du Perche;comte;1067;1143;5;;;;;M
+de Percin;;1820;1848;1;;;;;M
+Percy;;1198;1500;9;;;;;M
+de Percy;;1154;1154;1;;;;;M
+Pereira;;1401;1420;1;Leyria;;;;M
+Pereira;gouverneur de Trancoso;1225;1225;6;;;;;M
+Perez de Lara;;1176;1180;2;;;;;M
+Peri;;1691;1691;1;Sollacaro, Corse-du-Sud;;;;M
+Pernstein;;1566;1642;1;;;;;M
+Perriollat;;1698;1714;3;Montrigaud, 26;;;;M
+Perriollat;;1749;1749;1;Serres, 26;;;;M
+Perriollat;;1790;1790;1;Chateaudouble, 26;;;;M
+Perriollat;;1842;1842;1;Rhône;;;;M
+Perrone di San Martino;;1789;1849;1;;;;;M
+de Person;;1769;1847;2;;;;;M
+du Peschin;;1416;1416;1;;;;;M
+Pesset;Lieutenant 1677.;;;2;;;;;M
+de Petersdorf;;1624;1705;1;;;;;M
+Petin;baronne de Bayrstorff;1796;1838;1;;;;;M
+Petit;;1782;1782;1;Macouba;;;;M
+Petit;;1803;1803;1;St-Pierre;;;;M
+de Petit-Montrevault;;1035;1035;1;;;;;M
+Petitjean Roget;;1810;1836;1;Luneville;;;;M
+de Peyre;seigneur;;;2;;;;;M
+Peyronnel;;1658;1739;1;;;;;M
+de Peñafiel;comte;1269;1381;4;;;;;M
+Peÿs;seigneur du Mottai;1667;1692;2;;;;;M
+Pébay;;1760;1826;1;à Baudian;;;;M
+de Périgord;comte;864;1539;15;;;;;M
+de Périgord;comte;1140;1205;1;Palestine;;;;M
+de Pérusse des Cars;;1165;1165;1;;;;;M
+de Pétrovitch-Niégoch;prince évêque de Monténégro;1735;1830;10;;;;;M
+Pétry;;1767;1767;1;Rochefort;;;;M
+Pétry;Chirurgien Major des Troupes martiniquaises, régiment de Halleville;1758;1758;1;Mulhouse;;;;M
+de Pfirt;;1275;1344;3;;;;;M
+Phélippeau;;1546;1546;1;;;;;M
+Phélypeaux de Ponchartrain;;1731;1731;1;;;;;M
+de Pianezza;marquis;1659;1659;1;;;;;M
+Piast;duc de Pologne;965;1370;9;;;;POL;M
+Piast;duc de Pozman;1018;1425;57;;;;;M
+Piast;reine de Pologne;1288;1335;1;Koniggratz;;;POL;M
+Piast;roi de Pologne;1257;1296;1;Rogozno;;;POL;M
+Piast;régente de Hongrie;1305;1380;1;au Château de Buda;;;HUN;M
+Pic de La Mirandole;;1552;1552;2;;;;;M
+Picard;;1631;1631;1;;;;;M
+Picault;;1641;1666;1;Annet en Brie;;;;M
+Picault;;1711;1711;2;;;;;M
+Pichery;;1692;1692;1;Le Lamentin;;;;M
+Pichery;;1724;1724;1;Rivière-Pilote;;;;M
+Pichery des Gazons;;1763;1763;1;Le Trou-au-Chat;;;;M
+de Picquigny;;1531;1531;1;;;;;M
+de Piennes;seigneur de Montaudier;1571;1571;2;;;;;M
+de Pierre-Buffière;;1335;1335;1;;;;;M
+de Pierrefitte;;1130;1130;1;;;;;M
+de Pierrefonds;;1095;1095;1;;;;;M
+de Pierrepont;comte de Roucy;1205;1251;1;Flandres;;;;M
+de Pierrepont;comte de Roucy;1260;1304;1;Mons en Pévèle;;;;M
+de Pierrepont;comte de Roucy;1285;1346;1;Crécy;;;;M
+de Pierrepont;seigneur de Roucy;1175;1364;8;;;;;M
+de Pietra Santa;;1723;1723;1;;;;;M
+de Pietra Santa;;1743;1743;1;Ajaccio, Corse-du-Sud;;;;M
+Piétresson de Saint-Aubin;;1705;1705;1;;;;;M
+Pigace;seigneur de Nouzières;1453;1453;2;;;;;M
+de Pilcza;;1417;1420;2;;;;;M
+du Pin;;995;1856;142;;;;;M
+du Pin;seigneur de Saint-Cyr;1692;1741;1;Veyrac (87);;;;M
+du Pin;seigneur de Saint-Cyr;1760;1790;1;Bonnefond;;;;M
+du Pin;seigneur des Bâtiments;1701;1762;1;Saint-Saud Coussière, Dordogne;;;;M
+du Pin de Beyssat;;1839;1839;1;;;;;M
+du Pin de Verinas;;1699;1699;1;;;;;M
+du Pin de la Guérivière;vicomte;1789;1874;7;;;;;M
+de la Pinardière;;1631;1631;1;;;;;M
+Pinchaut;;1443;1443;1;;;;;M
+Pinel de La Pahun;;1697;1697;1;;;;;M
+Pinot;seigneur de Verinas;1647;1655;2;;;;;M
+de Pisseleu;;1525;1604;3;;;;;M
+Planck;;1726;1833;3;;;;;M
+Plantagenêt;;1156;1296;2;Londres;;;;M
+Plantagenêt;;1360;1415;1;Leicester Castle, Leicestershire, Angleterre;;;;M
+Plantagenêt;comte de Lancastre;1277;1322;1;Pontefract;;;;M
+Plantagenêt;comte de Lancastre;1281;1345;1;Grosmont Castle;;;;M
+Plantagenêt;comtesse d'Ulster;1355;1379;1;;;ULS;GBR;M
+Plantagenêt;duc de Normandie;1113;1541;67;;;;;M
+Plantagenêt;reine d'Angleterre;1465;1503;1;à Westminster;;ENG;GBR;M
+Plantagenêt;roi d'Angleterre;1133;1189;1;Le Mans, France;;ENG;GBR;M
+Plantagenêt;roi d'Angleterre;1155;1483;11;;;ENG;GBR;M
+Plantagenêt;roi d'Angleterre;1157;1199;1;Oxford;;ENG;GBR;M
+Plantagenêt;roi d'Angleterre;1367;1400;1;Bordeaux;;ENG;GBR;M
+Plantagenêt;roi d'Angleterre;1452;1485;1;Fotheringhay, Northamptonshire;;ENG;GBR;M
+de Plesse;;1533;1600;1;;;;;M
+du Plessis;;1511;1653;3;Paris;;;;M
+du Plessis;;1542;1618;5;;;;;M
+du Plessis;sire de Richelieu;1548;1590;1;Richelieu;;;;M
+du Plessis de La Savonnière;;1690;1690;2;;;;;M
+du Plessis de Richelieu;duc d' Aiguillon;1683;1750;1;Londres;;;;M
+du Plessis de Richelieu;duc de Richelieu;1629;1715;1;Le Havre de Grace;;;;M
+du Plessis de Richelieu;duc de Richelieu;1696;1822;3;Paris;;;;M
+du Plessis-Liancourt;;1611;1659;2;;;;;M
+Plissonneau;;1660;1679;1;;;;;M
+Plissonneau;;1697;1697;1;Basse-Pointe;;;;M
+Plissonneau;Martinique avant 1670;1675;1675;1;Nantes;;;;M
+Plissonneau Duquesne;;1778;1778;1;Grande Anse (Lorrain);;;;M
+Plissonneau Duquesne;;1782;1823;1;Fort-St-Pierre;;;;M
+Plissonneau Duquesne;;1805;1839;1;Le Mouillage (St-Pierre);;;;M
+Plissonneau La Montagne;;1741;1741;1;Grande Anse (Lorrain);;;;M
+Plomet;;1669;1669;1;Le Crès;;;;M
+Plomet;Boulanger;;;1;;;;;M
+de Plument;seigneur de la Bertraudie;1630;1659;4;;;;;M
+Pocquet de Puilhery;;1779;1779;1;Trinité;;;;M
+de Podiebrad;seigneur de Kunstadt;1403;1530;11;;;;;M
+de Poher;comte;;;1;;;;;M
+de Poisdebon;;1710;1710;2;;;;;M
+de Poitiers;duchesse de Valentinois;1499;1566;1;Anet;;;;M
+de Poitiers;prince d'Antioche;845;1486;6;;;;;M
+de Poitiers-Valentinois;comte;1125;1343;10;;;;;M
+de Polanen;héritière de Breda;1392;1445;1;Breda;;;;M
+de Polanen;seigneur de Breda;1350;1394;1;;;;;M
+de Polastron;;1749;1793;1;;;;;M
+Pole;lord Montague;1494;1558;5;;;;;M
+de la Pole;;1440;1525;6;;;;;M
+de Polignac;;1223;1847;13;;;;;M
+de Poligny;;1695;1695;1;;;;;M
+de Pologne;;1147;1201;2;;;;;M
+de Polotsk;prince;1239;1239;2;;;;;M
+de Polovtzy;khan;1318;1318;2;;;;;M
+de Poméranie;duc;1177;1569;25;;;;;M
+de Poméranie;duc;1454;1523;1;Stolp;;;;M
+de Poméranie-Stolp;;1392;1410;1;Bruck;;;;M
+de Poméranie-Stolp;duc de Poméranie;1316;1393;2;;;;;M
+de Pomérélie;duc;1219;1313;4;;;;;M
+de Pommarède d'Auga;;1590;1590;1;;;;;M
+Ponce de Leon;;1292;1292;2;;;;;M
+Poncy;;1681;1887;2;;;;;M
+Poncy;;1726;1726;1;Marseille;;;;M
+Poncy;;1783;1803;2;St-Pierre;;;;M
+de Pons;dame de Mareuil;1170;1278;6;;;;;M
+du Pont;;1270;1270;1;;;;;M
+de Ponthieu;;795;1387;23;;;;;M
+de Ponthieu;;1199;1250;1;Compiègne;;;;M
+de Ponthieu;comte;1142;1191;1;Saint-Jean d'Acre, Israël;;;;M
+Ponthon;;1230;1347;7;;;;;M
+de Ponthon;;1560;1849;7;;;;;M
+de Ponthon;;1772;1835;1;Sarrebourg;;;;M
+Pontier;;1793;1793;1;Saint-Pierre;;;;M
+de Pontrohart;dame;1205;1234;1;;;;;M
+de Pontville;vicomte de Rochechouart;1579;1579;4;;;;;M
+de Pontville-Rochechouart;;1494;1494;1;;;;;M
+de Porhoët;comte;1148;1234;3;;;;;M
+Porry;;1788;1788;1;Marseille;;;;M
+Porry;;1821;1821;1;Martinique;;;;M
+Porse;duc de Halland méridional;1327;1330;1;;;;;M
+Portret;;1751;1816;1;;;;;M
+Posse;comte;1782;1826;2;;;;;M
+Potérat de Billy;;1769;1769;2;;;;;M
+Pothuau;;1752;1752;1;Le Robert;;;;M
+Pothuau Desgatières;;1748;1748;1;Vauclin;;;;M
+Pothuau de Luppé;;1783;1783;1;Le Robert;;;;M
+Potocka;;1616;1642;1;Slutsk, Bielorussie;;;;M
+Potocka;comtesse;1780;1862;1;;;;;M
+Potocki;comte;1780;1850;2;;;;;M
+Potocki;palatin de Braclaw;1568;1631;1;Potok Zloty;;;;M
+de Pottenstein;;1055;1055;2;;;;;M
+de Pouancé;;1089;1134;2;;;;;M
+Pouchkine;Poète;1799;1837;1;Moscou, Russie;;;;M
+Poullet;;1690;1690;1;Le Carbet;;;;M
+Poullet;;1722;1722;2;;;;;M
+Poullet Bellecour;;1753;1753;1;;;;;M
+Poullet Bellecour;;1780;1787;2;Le Gros-Morne;;;;M
+Poussard;;1580;1648;2;;;;;M
+Poutrel;;1641;1758;3;;;;;M
+de Pouzols;;1675;1675;1;;;;;M
+Pozzo di Borgo;;1645;1645;5;;;;;M
+Pozzo di Borgo;;1660;1660;1;Alata, Corse-du-Sud;;;;M
+de Prades;;1409;1409;1;;;;;M
+de Presles;;1400;1440;1;;;;;M
+de Preuilly;;1105;1133;6;;;;;M
+de Preuilly;;1151;1151;1;Mayenne;;;;M
+Prévost;;1673;1673;1;Le Pecq, act. Yvelines;;;;M
+Prévost;;1763;1763;1;;;;;M
+Prévoteau Le Pelletier du Clary;;1840;1840;1;;;;;M
+de Prie;dame de Cors;1422;1422;1;;;;;M
+Prinsault;;1616;1616;1;;;;;M
+Prinsaut;seigneur de Pleau;1591;1591;2;;;;;M
+de Prittwitz-Gaffron;;1624;1683;1;Breslau;;;;M
+Proa de L'Orme;;1764;1848;2;;;;;M
+de Promnitz;baron;1624;1776;3;Dittersbach;;;;M
+de Promnitz;comte;1564;1732;4;;;;;M
+de Prosing;;1631;1692;1;Thurn, Autriche;;;;M
+de Provence;;1223;1291;1;Amesbury, Wiltshire;;;;M
+de Provence;comte;1180;1209;1;Palerme, Italie;;;;M
+de Provence;reine de France;1221;1295;1;Saint-Maime, près Forcalquier;;;FRA;M
+de Provence;roi;822;1267;32;;;;;M
+des Prunes du Vivier;;1808;1808;1;;;;;M
+Przemyslide;;1269;1297;1;Prague;;;;M
+Przemyslide;;1292;1330;1;Wischehrad;;;;M
+Przemyslide;duc de Bohême;1005;1336;64;;;;;M
+Przemyslide;roi de Bohême;1233;1278;1;Dürnkrut, Marchfeld;;;;M
+Przemyslide;roi de Hongrie;1289;1306;1;;;;HUN;M
+PucheuILaplace;;1686;1773;1;;;;;M
+de Puteani;baronne;1787;1787;1;;;;;M
+de Putelendorf;;1182;1182;1;;;;;M
+de Putten;;1265;1321;3;;;;;M
+du Puy du Fou;;1129;1129;1;;;;;M
+Pyvart;;1644;1686;2;Blois, Loir-et-Cher;;;;M
+de Pyvart de Chastullé;;1722;1767;3;;;;;M
+de Querelles;;1808;1846;1;;;;;M
+de Querfurt;;1386;1521;3;;;;;M
+Quesmin Desvollieres;;1801;1832;2;Le Lamentin;;;;M
+Quet;;1616;1616;1;Saint-Bris;;;;M
+de Quélus;dame;;;1;;;;;M
+de Raabs;burgrave de Nuremberg;1184;1221;2;;;;;M
+Rabbe;;1712;1712;1;;;;;M
+Raby;;1753;1843;5;Limoges, 87;;;;M
+de Racines;;1565;1565;1;;;;;M
+Radzivill;hetman de Lithuanie;1480;1551;2;;;;;M
+Radziwill;prince;1547;1603;1;Kososna;;;;M
+Radziwill;prince;1579;1620;1;Wilno;;;;M
+Radziwill;prince;1585;1640;1;Swiadosc;;;;M
+Radziwill;prince;1612;1655;1;Popiela;;;;M
+Radziwill;prince;1620;1669;1;Danzig;;;;M
+Radziwill;prince;1775;1835;1;;;;;M
+Radziwill;princesse;1640;1695;2;Konigsberg;;;;M
+Ragnwald;jarl;;;2;;;;;M
+Ragot;;1508;1508;1;;;;;M
+Ragueneau;;1680;1680;1;Paris, 75;;;;M
+de Raigecourt;;1710;1710;1;;;;;M
+de Ramerupt;comte;1040;1118;3;;;;;M
+Ramée;;1620;1706;1;;;;;M
+Ramminger;;1594;1660;2;;;;;M
+Ramolino;;1644;1743;2;Ajaccio, Corse-du-Sud;;;;M
+Ramolino;;1686;1836;7;;;;;M
+Rampont;Originaire de Metz;1660;1742;2;;;;;M
+Rampont de Surville;;1702;1783;1;Etain (Lorraine);;;;M
+Rampont de Surville;;1733;1808;1;Fort-Royal;;;;M
+de Rancon;;1141;1269;9;;;;;M
+de Randerode;;1350;1415;1;;;;;M
+de Rantzau;comte;1614;1665;3;;;;;M
+Ranvier;;1654;1807;3;;;;;M
+de Rastel;;1623;1623;1;;;;;M
+Rastelli;;1630;1630;1;Ajaccio, Corse-du-Sud;;;;M
+de Rath;comtesse de Nienbourg;1669;1740;1;;;;;M
+Ratineau;seigneur du Moissat;1710;1757;2;;;;;M
+de Rauglaudre;;1780;1848;1;Sermaize (Marne);;;;M
+de Rauglaudre;;1837;1837;1;Alliancelles;;;;M
+de Ravensberg;;1338;1389;1;;;;;M
+de Ravensbourg;comtesse;1297;1338;1;;;;;M
+Rayevski;;1641;1641;2;;;;;M
+Raymond;;1715;1819;2;;;;;M
+de Raymond;comte;1790;1790;2;;;;;M
+Razoumovski;comte;1709;1771;1;;;;;M
+de Razuns;baronne;1432;1477;1;;;;;M
+de Rechignevoisin;seigneur de Guron;1650;1650;1;;;;;M
+de Regensbourg;;915;915;1;;;;;M
+de Regenstein-Blankenbourg;comte;1489;1634;3;;;;;M
+de Reims;;813;830;2;;;;;M
+Reinaud;seigneur du Mas-Landrie;1662;1662;2;;;;;M
+Renault;;1619;1692;2;Le Prêcheur;;;;M
+de Renialme;;1306;1593;10;;;;;M
+de Rennes;comte;877;1017;7;;;;;M
+Renoult;;1720;1762;2;Le François;;;;M
+Renz;;1588;1779;8;;;;;M
+de Reuss à Ebersdorf;comte;1662;1779;3;;;;;M
+de Reuss à Ebersdorf;comtesse;1757;1831;1;Ebersdorf;;;;M
+de Reuss à Gera;seigneur;1530;1650;6;;;;;M
+de Reuss à Greiz;;1752;1824;1;Obergreiz;;;;M
+de Reuss à Greiz;comte;1696;1722;1;Dresde;;;;M
+de Reuss à Greiz;comte de Reuss à Obergreiz;1722;1800;1;Obergreitz;;;;M
+de Reuss à Greiz;seigneur;1464;1836;8;;;;;M
+de Reuss à Koestritz;;1719;1770;1;Kostritz;;;;M
+de Reuss à Koestritz;;1748;1798;1;Copenhague;;;;M
+de Reuss à Koestritz;comte;1681;1748;1;Schleiz;;;;M
+de Reuss à Koestritz;comte;1707;1783;1;Dietersbach;;;;M
+de Reuss à Koestritz;prince;1753;1841;2;;;;;M
+de Reuss à Lobenstein;comte;1621;1782;2;;;;;M
+de Reuss à Obergreiz;;1597;1697;4;;;;;M
+de Reuss à Schleiz;;1726;1773;1;Staffelstein;;;;M
+de Reuss à Schleiz;comte;1639;1744;3;Schleiz;;;;M
+Revault;;1656;1692;1;Le Prêcheur;;;;M
+Revault;;1700;1770;1;Grande Anse (Lorrain);;;;M
+de Reventlov;;1711;1779;1;;;;;M
+de Reventlow;comte;1693;1743;2;;;;;M
+de Reynal de Saint-Michel;;1771;1771;1;Grande Anse (Lorrain);;;;M
+de Reynal de Saint-Michel;;1772;1883;21;;;;;M
+Reynaud d'Alleins;;1768;1768;1;;;;;M
+de Reynel;;1182;1231;7;;;;;M
+Reynoird;;1779;1779;1;Marseille;;;;M
+Reynoird;;1826;1826;1;;;;;M
+Rémi;;1689;1689;1;;;;;M
+de Rémy;;1640;1640;1;;;;;M
+de Réthel;;1135;1325;13;;;;;M
+Rézard de Wouves;;1771;1802;2;Le François;;;;M
+von Rhau;;1711;1748;1;;;;;M
+de Rheineck;;1176;1176;1;Jerusalem;;;;M
+de Rheineck;;1475;1543;1;;;;;M
+de Rheinfelden;;1053;1061;4;;;;;M
+de Rheinfelden;roi des Romains;1030;1080;1;Hohenmölsen;;;;M
+de Rheingau;;960;960;1;;;;;M
+de Rheingelheim;reine de Germanie;890;968;1;Westphalie;;;;M
+Rhédey;comtesse de Hohenstein;1812;1841;2;;;;;M
+Ribadeau;;1630;1803;5;;;;;M
+Ribadeau du Mas;;1761;1799;1;;;;;M
+de Ribagorce;;960;960;2;;;;;M
+Ribbing;;1597;1662;2;;;;;M
+de Ribeaupierre;comte;1598;1673;1;Rappoltsweiler;;;;M
+de Ribeaupierre;seigneur;1495;1683;4;;;;;M
+Richard de Saint-Priest;;1488;1488;2;;;;;M
+de Richemont;comte;1137;1201;4;;;;;M
+de la Rie;seigneur;1553;1594;2;;;;;M
+de Riedenbourg;burgrave de Ratisbonne;1121;1121;2;;;;;M
+Riedesel;;1771;1805;1;;;;;M
+de Rieneck;;1460;1525;2;;;;;M
+de Rietberg;comte;1405;1540;4;;;;;M
+de Rieux;;1463;1570;4;;;;;M
+Rimbaud;;1773;1773;1;Marseille;;;;M
+Rimbaud;;1802;1802;1;Martinique;;;;M
+de Ringelheim;;897;897;1;;;;;M
+de Riom;comte;1692;1741;1;;;;;M
+de Rion;dame de Gergy;1221;1221;1;;;;;M
+Riou;;1777;1777;1;Rennes (St Etienne);;;;M
+de la Rivière;seigneur du Peschin;1500;1500;3;;;;;M
+Robelot;;1668;1668;1;;;;;M
+Robertien;;892;1005;7;;;;;M
+Robertien;duc de Neustrie;820;866;1;à Brissarthe, Maine-et-Loire;;;;M
+Robertien;duc des Francs;897;956;1;Paris;;;;M
+Robertien;roi de France;864;898;1;;;;FRA;M
+Robertien;roi de France;866;923;1;Soissons;;;FRA;M
+Robineau;;1565;1565;1;Mailly-lechateau, 89;;;;M
+Robineau;;1642;1699;1;Paris, 75;;;;M
+Robineau;;1642;1764;3;;;;;M
+Robineau;;1668;1687;1;Escolives, 89;;;;M
+Robineau;;1691;1762;1;Bellombre, 89;;;;M
+Robineau;;1725;1823;2;Mailly le Chateau, 89;;;;M
+de Robineau;seigneur de Gajoubert;1733;1733;2;;;;;M
+Robinet;;1766;1766;1;;;;;M
+Roblot;;1662;1775;2;Le Diamant;;;;M
+Roby;;1686;1686;1;St Maurice de la Citte, 87;;;;M
+Roche;;1848;1848;1;West Twyford, Midx;;;;M
+de la Roche;duc d'Athènes;1275;1275;1;;;;GRC;M
+de Rochechouart;duc de Mortemart;1636;1812;5;Paris;;;;M
+de Rochechouart;duc de Mortemart;1681;1746;1;Soisy sous Etiolles;;;;M
+de Rochechouart;duc de Mortemart;1682;1757;1;Bayeux;;;;M
+de Rochechouart;vicomte;1000;1839;38;;;;;M
+de Rochechouart;vicomte;1305;1356;1;Maupertuis, Vienne, France;;;;M
+de Rochechouart Pontville;;1634;1711;3;;;;;M
+de Rochefort;vicomte de Donges;1076;1327;11;;;;;M
+des Roches;sénéchal d'Anjou;1165;1220;3;;;;;M
+de Rodemachern;;1450;1500;1;;;;;M
+de Rodenmachern;;1445;1480;1;;;;;M
+de Rodez;comte;1090;1313;7;;;;;M
+de Rodez;comte;1175;1221;1;Saint-Jean d'Acre, Israël;;;;M
+Rodis von Thunderfeldt;comtesse de Thunderfeldt;1777;1822;2;;;;;M
+Rodriguez de Vivar;;1103;1103;1;;;;;M
+de Rogendorf;;1579;1650;1;;;;;M
+de Rohan;;1804;1846;1;Bruxelles;;;;M
+de Rohan;duc;1579;1638;1;Chateau de Blain;;;;M
+de Rohan;duc de Montbazon;1655;1727;1;chateau de Rochefort en Yveline;;;;M
+de Rohan;duc de Montbazon;1688;1757;1;chateau de Sainte-Maure;;;;M
+de Rohan;duc de Montbazon;1764;1836;1;Versailles;;;;M
+de Rohan;prince de Guemene;1633;1699;1;Coupvray;;;;M
+de Rohan;princesse de Maubuisson;1646;1839;6;Paris;;;;M
+de Rohan;vicomte;1308;1352;1;Moron;;;;M
+de Rohan;vicomte;1550;1607;2;Blain;;;;M
+de Rohan;vicomte de Porhoet;1066;1843;45;;;;;M
+de Rohan-Chabot;dame de Soubise;1648;1709;1;;;;;M
+de Rohan-Chabot;duc de Rohan;1652;1738;2;Paris;;;;M
+de Rohan-Chabot;duc de Rohan;1710;1791;1;Nice;;;;M
+Roibet;;1749;1749;1;Serres, 26;;;;M
+Roignan;;1776;1776;1;Le Mouillage (St-Pierre);;;;M
+Roignan;;1807;1807;1;Saint-Pierre (Le Mouillage);;;;M
+Roland;;1760;1816;1;;;;;M
+Romanet;;1699;1725;1;Ste-Marie;;;;M
+Romanet;;1700;1723;1;Le Marigot;;;;M
+Romanet;;1705;1705;1;Limogeseglstmaurice G.G.94;;;;M
+de Romano;;1240;1251;2;;;;;M
+Romanov;;1543;1740;17;;;;;M
+Romanov;impératrice de Russie;1709;1762;1;à Kolomenskoïe;;;;M
+Romanov;régente de Russie;1657;1725;2;Moscou;;;;M
+Romanov-Holstein-Gottorp;;1783;1801;1;Saint-Pétersbourg;;;;M
+Romanov-Holstein-Gottorp;;1784;1803;1;St. Petersburg;;;;M
+Romanov-Holstein-Gottorp;empereur de Russie;1728;1865;10;;;;;M
+Romanov-Holstein-Gottorp;grande-duchesse de Russie;1819;1876;1;Tsarkoe Selo (Russie);;;;M
+de Roncherolles;;1739;1739;1;;;;;M
+de Ronsard;Poète;1524;1585;1;Couture;;;;M
+de Ronsard;seigneur de La Possonnière;1485;1544;5;;;;;M
+de Roquefeuil;comptor de Nant;1150;1331;8;;;;;M
+de Roquelaure;;1601;1708;2;;;;;M
+Ros;lord;1362;1362;3;;;;;M
+de Rosenberg;seigneur;1316;1595;2;;;;;M
+de Rosenfeld;;1495;1538;1;;;;;M
+de Rosenthal;seigneur;1425;1475;2;;;;;M
+de Rosoy;;1171;1171;3;;;;;M
+de Ross;comte;1355;1387;3;;;;;M
+Rossignol;;1645;1713;1;St-Christophe;;;;M
+de Rostov;;1294;1297;5;;;;;M
+de Rostrenen;;1270;1371;2;;;;;M
+de Rotselaar;;1405;1460;1;;;;;M
+de Rott;;1078;1078;1;;;;;M
+de Roucy;;1388;1415;1;Azincourt;;;;M
+de Roucy;;1406;1459;1;St-Etienne de Dreux;;;;M
+de Roucy;;1538;1576;1;Siiege de Soissons;;;;M
+de Roucy;;1579;1590;1;Chartres;;;;M
+de Roucy;;1747;1819;1;St Michel en Thiierache;;;;M
+de Roucy;;1781;1847;1;Paris, 75;;;;M
+de Roucy;;1783;1847;1;Noyon, 60;;;;M
+de Roucy;comte;926;1815;23;;;;;M
+de Roucy;comte;951;990;1;Reims;;;;M
+de Roucy;dame de Conti;1535;1564;1;Condé en Brie, Aisne, France;;;;M
+de Roucy-Monceau;;1677;1749;2;Monceau;;;;M
+de Roucy-Origny;;1648;1692;2;;;;;M
+de Roucy-Ramerup;comte de Roucy;1196;1200;2;;;;;M
+de Roucy-Sainte Preuve;;1580;1640;1;;;;;M
+de Rouergue;comtesse d'Agen;830;985;14;;;;;M
+Rouet;;1350;1403;1;Lincoln, Lincolnshire, Angleterre;;;;M
+de Rougemont;;1310;1350;1;;;;;M
+Rouillon;;1692;1692;1;;;;;M
+Roullays;;1546;1570;2;;;;;M
+Roussane;;1753;1753;1;Le Vauclin;;;;M
+Rousseau;;1715;1715;1;Macouba;;;;M
+Rousseau;;1783;1783;1;St-Pierre;;;;M
+de Rouveroy;;1420;1465;1;;;;;M
+de Rouvrois;;1728;1774;1;;;;;M
+de Rouvrois;duc de Saint-Simon;1698;1746;1;en son hotel parisien;;;;M
+Roux;;1690;1784;4;;;;;M
+della Rovere;;1622;1694;2;;;;;M
+Roy;;1677;1677;1;Case-Pilote;;;;M
+Roy;;1698;1707;2;;;;;M
+Roy Camille;;1798;1798;1;Le Gros-Morne;;;;M
+Roy de Belleville;;1849;1849;1;;;;;M
+Royer;;1545;1545;2;;;;;M
+Royer;;1647;1691;1;Rennes;;;;M
+Royer;;1675;1692;1;Le Prêcheur;;;;M
+de Rubempré;dame;1505;1730;2;;;;;M
+Rueb;;1535;1574;1;;;;;M
+de Ruellan;;1621;1621;1;;;;;M
+Ruffo;duchesse de Sessa;1434;1434;2;;;;;M
+Ruire;;1768;1768;1;Le Trou-au-Chat;;;;M
+de Rumigny;seigneur;1050;1648;16;;;;;M
+de Runkel;comte d'Isenburg-Wied;1400;1502;2;;;;;M
+Rurikide;;1024;1075;1;Reims;;;;M
+Rurikide;grand-duc de Kiev;1043;1598;116;;;;;M
+Russel;duc de Bedford;1766;1905;3;;;;;M
+de Russel;;1688;1688;1;;;;;M
+de Ryazan;grand-duc;1464;1483;1;;;;;M
+de Rye;marquis de Varambon;1597;1598;1;;;;;M
+de Rye-Varax;comte de Varax;1540;1666;3;;;;;M
+Rügen;duc de Rügen;1272;1272;2;;;;;M
+de Rügen;duc;1195;1312;4;;;;;M
+de Saale;;1522;1566;1;;;;;M
+de Saarwerden;;1350;1420;1;;;;;M
+de Sablé;;1035;1210;7;;;;;M
+Sabouraud;seigneur de Lage-Pariole;1614;1614;1;;;;;M
+Sabourov;;1505;1571;4;;;;;M
+Sabran;;1297;1315;1;;;;;M
+de Sabran;comtesse de Gap;1178;1215;4;;;;;M
+de Saffenberg;;1136;1216;2;;;;;M
+de Sagan;duc;1363;1390;2;;;;;M
+Saint John;;1672;1672;1;;;;;M
+de Saint-Amadour;vicomtesse de Guiguen;1580;1580;2;;;;;M
+de Saint-Avit;;1475;1475;1;;;;;M
+de Saint-Bris;;1115;1115;1;;;;;M
+de Saint-Jean;;1728;1809;1;Boëol-Bezing, France;;;;M
+de Saint-Julien;;1415;1415;1;;;;;M
+de Saint-Martin;seigneur de Bagnac;1482;1482;2;;;;;M
+de Saint-Mesmin;;1506;1531;2;;;;;M
+de Saint-Omer;;1064;1278;3;;;;;M
+de Saint-Ouen de Hausselaire;;1664;1664;1;Saint-Saens;;;;M
+de Saint-Ours;;1710;1710;1;;;;;M
+de Saint-Ours;chevalier;1717;1759;1;Montréal;;;;M
+de Saint-Ours-L'Échaillon;chevalier;1787;1787;1;;;;;M
+de Saint-Palais;;1497;1497;1;;;;;M
+de Saint-Pol;comte;1130;1232;9;;;;;M
+de Saint-Pol;comte;1150;1205;1;Palestine;;;;M
+de Saint-Séverin;;1335;1335;1;;;;;M
+de Saint-Valéry;;1043;1250;8;;;;;M
+de Saint-Verrain;;1304;1304;2;;;;;M
+de Sainte-Croix;;1299;1299;2;;;;;M
+de Sainte-Maure;seigneur;1255;1664;5;;;;;M
+Saintmartin;;1814;1883;1;Périgueux;;;;M
+Saintmartin;;1843;1843;1;;;;;M
+de Salerne;;1058;1058;1;;;;;M
+de Salignac;;1464;1464;4;;;;;M
+de Salisbury;;1143;1143;1;Pembroke Pembrokeshire, Pays de Galles;;;;M
+des Salles de Boismarcel;;1789;1836;1;;;;;M
+de Salligny;;1798;1879;1;Reims;;;;M
+de Salligny;seigneur de Matignicourt;1759;1806;5;;;;;M
+à Salm;;1687;1700;1;;;;;M
+de Salm;comte;1189;1627;24;;;;;M
+de Salm-Dhaun;comte;1645;1791;2;Dhaun;;;;M
+de Salm-Dhaun;comte de Salm;1492;1733;8;;;;;M
+de Salm-Kyrbourg;comte;1529;1657;6;;;;;M
+de Salm-Kyrbourg;comte de Salm;1545;1673;3;Kyrbourg;;;;M
+de Salm-Kyrburg;Princesse;1760;1841;1;Paris;;;;M
+de Salm-Neufville;;1547;1673;6;;;;;M
+de Salm-Refferscheid;comte;1623;1688;2;;;;;M
+Salovoï;;1575;1575;2;;;;;M
+de Saluces;marquis;1129;1244;5;;;;;M
+de Saluzzo;;1431;1474;1;;;;;M
+Salvetto-Salvetti;;1845;1845;1;;;;;M
+Salviati;;1461;1543;2;;;;;M
+de San-Severino;;1343;1343;2;;;;;M
+de Sandoval;duc de Lerma;;;2;;;;;M
+Sandoz;;1455;1533;1;Le Locle, Neuchatel, Switzerland;;;;M
+Sandoz;;1489;1846;6;;;;;M
+Sandoz;;1630;1877;7;Dombresson, Neuchatel, Switzerland;;;;M
+Sandoz;;1740;1740;1;Switzerland;;;;M
+Sandoz;;1842;1842;1;St. Martinville,Louisiana;;;;M
+Sandoz;;;;1;1560;;;;M
+Sanson du Loisel;;1777;1836;1;Noyon Rue du Nord;;;;M
+Saravie-Saint-Marc;;1747;1784;1;;;;;M
+Saravie-Saint-Marc;;1760;1830;1;à Bordeaux (Gironde);;;;M
+Saravy;;1697;1697;1;;;;;M
+Sarrazin;;1839;1839;1;;;;;M
+de Sarrebruck;;1120;1460;5;;;;;M
+de Sarrebruck;;1344;1344;1;siiege d'Arras;;;;M
+de Sarrebrück;comte;1135;1147;2;;;;;M
+de Sassenage;dame de Beaumont;1449;1471;2;;;;;M
+Sauerma de Jeltsch;;1663;1708;1;Laskowitz;;;;M
+Sauerma de Jeltsch;baron de Jeltsch;1600;1664;1;Jeltsch;;;;M
+Saulger de Saint-Maurice;;1718;1718;2;;;;;M
+Saulger de Saint-Maurice;;1765;1786;2;Le Lamentin;;;;M
+Saulger de Saint-Maurice;;1829;1829;1;Fort-Royal;;;;M
+de Saulx-Tavannes;;1587;1587;1;;;;;M
+Saunders;;1588;1588;1;;;;;M
+Sauvage;;1556;1556;1;;;;;M
+de Sauzay;;1643;1643;1;;;;;M
+de Savary de Bresse;;1792;1792;1;;;;;M
+Savatte;;1666;1666;1;;;;;M
+de Savoie;;1100;1154;1;Abbaye de Montmartre;;;;M
+de Savoie;;1298;1336;1;Brabant;;;;M
+de Savoie;;1532;1568;1;Fontainebleau;;;;M
+de Savoie;;1792;1840;1;Turin;;;;M
+de Savoie;comte;1334;1451;2;Chambéry;;;;M
+de Savoie;comte en Savoie;980;1836;116;;;;;M
+de Savoie;marquis de Villars;1580;1580;1;Paris;;;;M
+de Savoie;reine d'Espagne;1688;1714;1;;;;ESP;M
+de Savoie;reine de France;1439;1483;1;;;;FRA;M
+de Savoie-Achaïe;prince d'Achaïe;1278;1418;5;;;;;M
+de Savoie-Carignan;;1800;1856;1;Paris;;;;M
+de Savoie-Carignan;prince de Carignan;1596;1849;25;;;;;M
+de Savoie-Nemours;reine de Portugal;1646;1683;1;;;;PRT;M
+de Savoie-Vaud;duc;1503;1511;2;;;;;M
+de Savoie-Villars;marquise de Villars;1560;1611;1;Soissons;;;;M
+de Savone;;1020;1118;2;;;;;M
+Savy de La Chaume;;1766;1766;2;;;;;M
+de Saxe;;1071;1126;1;Altdorf, Allemagne;;;;M
+de Saxe;duc;845;1777;44;;;;;M
+de Saxe;duc;995;1059;1;Lunebourg, Allemagne;;;;M
+de Saxe-Altenbourg;duc de Saxe-Hildburghausen;1763;1854;4;;;;;M
+de Saxe-Cobourg;;1817;1817;1;Esher, Surrey, Angleterre;;;;M
+de Saxe-Cobourg;duc de Brabant;1833;1834;1;;;;;M
+de Saxe-Cobourg;roi des Belges;1790;1865;1;Cobourg;;;BEL;M
+de Saxe-Cobourg-et-Gotha;duc;1784;1844;1;;;;;M
+de Saxe-Hildburghausen;;1760;1776;1;Hildburghausen;;;;M
+de Saxe-Hildburghausen;duc;1655;1780;5;;;;;M
+de Saxe-Lauenbourg;;1513;1535;1;Stockholm, Suède;;;;M
+de Saxe-Lauenbourg;duc;1246;1733;20;;;;;M
+de Saxe-Meiningen;duc;1649;1849;7;;;;;M
+de Saxe-Weimar-Eisenach;duc;1688;1828;4;;;;;M
+de Saxe-Weimar-Eisenach;duchesse en Saxe;1786;1816;1;Weimar;;;;M
+de Say;dame de Clun;;;1;;;;;M
+de Sayn-Hachenbourg;comte;1417;1609;10;;;;;M
+de Sayn-Hombourg;comte de Sayn-Wittgenstein;1400;1570;3;;;;;M
+de Sayn-Wittgenstein;;1561;1631;2;Berlebourg;;;;M
+de Sayn-Wittgenstein;;1585;1633;1;Dillenbourg;;;;M
+de Sayn-Wittgenstein;;1639;1671;1;Wertheim;;;;M
+de Sayn-Wittgenstein;comte;1532;1701;13;;;;;M
+de Sayn-Wittgenstein;comte;1569;1656;2;Weilbourg;;;;M
+de Sayn-Wittgenstein;comtesse de Sayn-Wittgenstein-Hombourg;1646;1678;1;Hombourg;;;;M
+de la Scala;;1325;1384;1;;;;;M
+de  Scharffenstein;;1629;1680;1;Mainz;;;;M
+de Schaumbourg-Lippe;comte;1694;1777;1;Alverdissen;;;;M
+de Schaumbourg-Lippe;comte;1723;1787;1;Rinteln;;;;M
+von Scheel;;1778;1836;1;;;;;M
+Schenk de Landsberg;;1510;1568;2;;;;;M
+de Schertz;;1633;1690;1;Bukovine;;;;M
+Schikhardt;;1755;1833;1;;;;;M
+de Schlabrendorf;;1773;1773;1;Breslau;;;;M
+de Schlabrendorf;;1799;1799;1;;;;;M
+de Schleswig-Holstein-Glücksbourg;princesse;1749;1812;1;;;;;M
+Schlick de Passau;;1475;1538;1;;;;;M
+de Schlieben;comte;1688;1827;3;;;;;M
+de Schomberg;;1653;1706;1;;;;;M
+de Schonbourg-Glauchau;seigneur;1456;1606;4;;;;;M
+de Schonbourg-Glauchau;seigneur;1486;1534;1;Dresde;;;;M
+de Schonbourg-Glauchau;seigneur;1532;1581;1;Glauchau;;;;M
+de Schonbourg-Lichtenstein;comte;1601;1664;2;;;;;M
+de Schonbourg-Penig;seigneur de Schonbourg-Glauchau;1556;1625;2;Penig;;;;M
+de Schonbourg-Waldenbourg;seigneur;1530;1566;1;Glaucha;;;;M
+de Schonbourg-Waldenbourg;seigneur;1559;1606;1;Waldenbourg;;;;M
+de Schonbourg-Waldenbourg;seigneur;1563;1809;5;;;;;M
+de Schonfeld;;1644;1681;1;;;;;M
+Schuebel;;1606;1689;2;;;;;M
+Schuepper;;1627;1688;1;;;;;M
+Schuler;;1550;1666;3;;;;;M
+de Schwamberg;;1599;1648;1;;;;;M
+de Schwarzbourg;;1416;1539;3;;;;;M
+de Schwarzbourg-Blankenbourg;comte;1418;1612;13;;;;;M
+de Schwarzbourg-Rudolstadt;comte;1537;1708;17;;;;;M
+de Schwarzbourg-Rudolstadt;prince;1641;1718;2;Rudolstadt;;;;M
+de Schwarzbourg-Rudolstadt;princesse;1700;1780;1;Rathsfeld;;;;M
+de Schwarzbourg-Sondershausen;comte;1532;1700;17;;;;;M
+de Schwarzbourg-Sondershausen;prince;1647;1849;2;Sondershausen;;;;M
+de Schwarzbourg-Sondershausen;prince;1738;1806;1;Ebeleben;;;;M
+de Schwarzbourg-Sondershausen;princesse;1681;1751;1;Schwarzbourg;;;;M
+de Schwarzenberg;prince;1741;1782;1;;;;;M
+de Schweidnitz;duc;1286;1320;2;;;;;M
+de Schweinfurt;;1017;1058;6;;;;;M
+Schweppenhauser;;1751;1833;1;;;;;M
+de Schwerin;comte;1359;1377;2;;;;;M
+de Scorailles;;1145;1254;4;;;;;M
+Scott;duc de Monmouth;1649;1685;2;;;;;M
+Segrave;lord;1338;1353;1;;;;;M
+de Segrie;dame de Morainville;1436;1490;2;;;;;M
+Seitz;;1768;1812;1;Darmstadt;;;;M
+Senamaud;;1622;1622;1;;;;;M
+Senaude;;1632;1632;1;Calais;;;;M
+de Sens;;908;1024;7;;;;;M
+de Serbie;prince;1129;1129;2;;;;;M
+Seton Montgomerie;comte d'Eglintoun;1660;1729;1;Eglintoun;;;;M
+Seton Montgomerie;lady;1694;1757;1;;;;;M
+Sevin;;1654;1694;2;;;;;M
+Seymour;baron Seymour de Sudeley;1508;1549;1;à Londres;;;;M
+Seymour;duc de Somerset;1476;1801;7;;;;;M
+Seymour;protecteur d'Angleterre;1500;1552;1;à Londres;;ENG;GBR;M
+Seymour;reine d'Angleterre;1509;1537;1;à Hampton Court;;ENG;GBR;M
+Séguier;;1641;1704;3;;;;;M
+de Sémur;seigneur;955;1109;3;;;;;M
+de Séran;;1565;1565;2;;;;;M
+de Séverac;;1115;1181;1;Montpellier;;;;M
+Sforza;;1465;1510;2;Milan;;;;M
+Sforza;;1495;1558;1;Bari;;;;M
+Sforza;comte de Pesaro;1369;1535;13;;;;;M
+Sforza;duc de Bari;1452;1508;1;Vigevano;;;;M
+Sforza;duc de Milan;1401;1466;1;à San Miniato;;;;M
+Sforza;duc de Milan;1444;1476;1;Milan, Italie;;;;M
+Sibié;;1815;1815;1;;;;;M
+Sicaire Migot de Blanzac;;1751;1751;1;;;;;M
+Sieber;;1640;1714;1;;;;;M
+Sigalony;;1650;1701;1;Provence;;;;M
+Sigalony;;1700;1700;1;Macouba;;;;M
+de Signau;;1325;1325;1;;;;;M
+de Silésie-Schweidnitz;;1339;1362;1;;;;;M
+de Silly;comtesse de Rochefort;1536;1536;1;;;;;M
+Siméonis;;1730;1771;1;Marseille;;;;M
+Siméonis;Notaire Royal à Marseille.;;;2;;;;;M
+de Simmern;;1561;1589;1;Heidelberg, Allemagne;;;;M
+de Simmern;princesse palatine;1618;1680;1;à Heidelberg;;;;M
+de Simmern;princesse palatine de Bavière;1454;1730;30;;;;;M
+Simonnet;;1722;1722;2;;;;;M
+Sinclair;comte d'Orkney;;;2;;;;;M
+Sinson;;1829;1829;1;Fort-Royal;;;;M
+Sinson Sainville;;1792;1792;1;Case-Pilote;;;;M
+de Sirck;;1452;1452;1;;;;;M
+de Sirck-Moncler;;1435;1489;1;;;;;M
+Siredey;;1758;1758;1;;;;;M
+de Sirk;;1437;1520;1;;;;;M
+Sisos;;1831;1831;1;;;;;M
+de Sisteron;;1001;1024;2;;;;;M
+de Sivrieu;;1511;1511;1;Paris;;;;M
+Skakke;roi de Norvège;1136;1184;2;;;;;M
+Skavronski;;1680;1680;1;Jacobstadt;;;;M
+Skavronski;impératrice de Russie;1684;1727;1;;;;;M
+Skule;;1225;1270;2;;;;;M
+de Smaland;;1302;1302;1;;;;;M
+Smith;;1765;1836;1;;;;;M
+de Smolensk;prince;1221;1422;6;;;;;M
+Smythe;;1756;1837;1;;;;;M
+Sobakine;;1571;1571;2;;;;;M
+Sobieska;;1702;1740;2;;;;;M
+Sobieski;;1580;1737;3;;;;;M
+Sobieski;roi de Pologne;1624;1696;1;;;;POL;M
+de Soissons;;1058;1073;2;;;;;M
+de Solms;comte;1340;1433;2;;;;;M
+de Solms-Baruth;comte;1627;1847;2;;;;;M
+de Solms-Baruth;comte;1670;1800;3;Baruth;;;;M
+de Solms-Braunfels;;1426;1814;14;;;;;M
+de Solms-Braunfels;;1602;1675;1;Braunfels;;;;M
+de Solms-Braunfels;comte;1563;1623;1;La Hague;;;;M
+de Solms-Hohensolms;;1545;1689;3;;;;;M
+de Solms-Laubach;;1579;1631;1;Laubach;;;;M
+de Solms-Laubach;comte;1521;1783;24;;;;;M
+de Solms-Lich;;1420;1594;7;;;;;M
+de Solms-Neubourg;comte;1608;1663;2;;;;;M
+de Solms-Rodelheim;comte;1623;1680;1;Baruth;;;;M
+de Solms-Rodelheim;comte;1664;1765;2;Rodelheim;;;;M
+de Solms-Rodelheim et Assenheim;contesse;;;1;;;;;M
+de Solms-Sonnenwalde;comtesse;1672;1708;1;;;;;M
+Soltykov;;1664;1724;2;;;;;M
+de Sombreffe-Kerpen;;1489;1518;1;;;;;M
+Somerset;;1713;1726;1;;;;;M
+Somis;;1737;1815;1;St. Ferreol, Marseille, France;;;;M
+de Sommerschenbourg;comte palatin;1182;1189;2;;;;;M
+de Sonnenberg;;1430;1480;1;;;;;M
+de Sons;;1699;1744;1;;;;;M
+Sorba;;1644;1644;1;Ajaccio, Corse-du-Sud;;;;M
+Sorhaindo;;1741;1741;1;Grande Anse (Lorrain);;;;M
+de Sortambosc;seigneur de Sainte-Marguerite;1627;1627;2;;;;;M
+de Souabe;;849;1050;19;;;;;M
+de Soubernon;;1249;1249;1;;;;;M
+Soueff;;1609;1609;1;Saint-Malo;;;;M
+de Soulz;;1495;1625;4;;;;;M
+de Soulzbach;comte;1078;1799;15;;;;;M
+de Soulzbach;comte palatin;1622;1733;2;Soulzbach;;;;M
+de Soulzbach;comtesse palatine;1650;1681;1;Schlackenworth;;;;M
+de Sousa;;1250;1250;2;;;;;M
+Souvain;;1361;1361;2;;;;;M
+de Souvigny;;1107;1107;1;;;;;M
+de Souvigny Sur Jaligny;;1082;1082;1;;;;;M
+de Souzdal;;1366;1407;1;;;;;M
+de Spangen;baron;1638;1735;3;;;;;M
+de Spangen-d'Uyternesse;comte;1715;1826;2;;;;;M
+de Spangen-d'Uyternesse;comtesse;1797;1845;1;Bruxelles;;;;M
+de Spanheim;;1150;1200;1;;;;;M
+de Spanheim-Heinsberg;;1280;1343;1;;;;;M
+Spencer;;1588;1615;13;;;;;M
+Spencer;;1737;1771;1;St.George's Hanover Square;;;;M
+Spencer;;1781;1781;1;London;;;;M
+Spinola;seigneur de Molfetta;1641;1709;3;;;;;M
+de Spinuzzi;comte;1741;1792;2;;;;;M
+de Spolete;;829;851;2;;;;;M
+von Sponeck;;1730;1804;1;Stuttgart;;;;M
+de Sponheim;;1268;1340;4;;;;;M
+de Stade;;955;1011;2;;;;;M
+de Staden;comte;1144;1152;2;;;;;M
+de Stafford;lord;1349;1563;12;;;;;M
+de Stahleck;comte palatin du Rhin;1127;1156;1;;;;;M
+de Stainville;;1500;1571;1;;;;;M
+Stanley;comte de Derby;1504;1504;1;;;;;M
+de Staritsa;duc;1560;1597;2;;;;;M
+de Starodoub;prince;1403;1403;2;;;;;M
+de Staufen;;1252;1600;3;;;;;M
+Stehlin;;1574;1597;1;;;;;M
+de Stein-Liebenstein;;1777;1849;1;;;;;M
+Stenbock;;1535;1621;1;Torpa, Västergötland, Suède;;;;M
+de Sternberg;seigneur;1425;1809;4;;;;;M
+Stewart;;1204;1788;16;;;;;M
+Stewart;;1298;1298;1;Falkirk, Écosse;;;;M
+Stewart;;1333;1333;1;Halidon Hill, Northumberland, Angleterre;;;;M
+Stewart;;1392;1429;1;Orléans, France;;;;M
+Stewart;;1575;1615;1;a la tour de Londres;;;;M
+Stewart;comte de Galloway;1694;1746;1;Glasserton;;;;M
+Stewart;comte de Galloway;1694;1773;1;Edimbourg;;;;M
+Stewart;comte de Lennox;1513;1513;1;Flodden, Northumberland, Angleterre;;;;M
+Stewart;lady;1759;1762;1;Aboyne Castle;;;;M
+Stockmayer;;1706;1788;3;;;;;M
+Stokes;;1554;1581;1;;;;;M
+de Stolberg;comte;1396;1520;3;;;;;M
+de Stolberg-Gedern;prince;1693;1796;2;Gedern;;;;M
+de Stolberg-Gedern;prince;1722;1834;4;;;;;M
+de Stolberg-Wernigerode;;1506;1580;1;Stolberg;;;;M
+de Stolberg-Wernigerode;;1531;1599;1;Breuberg;;;;M
+de Stolberg-Wernigerode;;1599;1634;1;Landau;;;;M
+de Stolberg-Wernigerode;comte;1467;1854;15;;;;;M
+Strechniev;;1608;1645;2;;;;;M
+de Strijen;;1250;1273;1;;;;;M
+Stuart;;1433;1480;1;Dunfermline, Écosse;;;;M
+Stuart;comte de Lennox;1516;1571;1;Château de Stirling, Écosse;;;;M
+Stuart;duc d'Albany;1340;1807;31;;;;;M
+Stuart;duc d'Albany;1541;1541;1;chateau de Falkland;;;;M
+Stuart;duc d'Albany;1545;1567;1;Temple Newsome;;;;M
+Stuart;duc de Rothesay;1540;1541;1;Saint-Andrews;;;;M
+Stuart;duchesse d'Orléans;1644;1670;1;;;;FRA;M
+Stuart;reine d'Angleterre;1665;1714;1;Saint James Palace;;ENG;GBR;M
+Stuart;reine d'Écosse;1542;1587;1;chateau de Linlithgow;;SCT;GBR;M
+Stuart;roi d'Angleterre;1566;1694;6;;;ENG;GBR;M
+Stuart;roi d'Angleterre;1633;1701;1;Londres;;ENG;GBR;M
+Stuart;roi d'Écosse;1337;1406;1;à Strathclyde;;SCT;GBR;M
+Stuart;roi d'Écosse;1452;1488;1;Stirling;;SCT;GBR;M
+Stuart;roi d'Écosse;1512;1542;1;Linlithgow palace;;SCT;GBR;M
+Stuart;sénéchal d'Écosse;1292;1513;5;;;SCT;GBR;M
+Stuve;;1472;1472;2;;;;;M
+Stuve;régent de Suède;1440;1503;1;;;;SWE;M
+de Sualefeld;;984;984;1;;;;;M
+Sudro;;1762;1762;1;Fort-Royal;;;;M
+de Suède;;1095;1254;11;;;;;M
+de Suède;roi;1066;1250;16;;;;SWE;M
+de Sully;;1252;1285;1;Aragon;;;;M
+de Sully;seigneur;1080;1499;25;;;;;M
+de Sully;seigneur de la Chapelle;1224;1269;1;Italie;;;;M
+Sune;;1243;1253;1;;;;;M
+de Supplinbourg;comte;1075;1143;3;;;;;M
+de Surgères;dame d'Aulnay;1175;1493;5;;;;;M
+de Sutherland;comte;1345;1370;1;;;;;M
+de Suze;;1007;1091;3;;;;;M
+de Swabie;;1146;1146;1;;;;;M
+de Swidnica;duc;1290;1326;1;;;;;M
+Swinford;;1366;1366;1;;;;;M
+Taets;;1395;1565;4;;;;;M
+de Taillebourg;;1147;1147;2;;;;;M
+Taillevis;;1510;1545;2;;;;;M
+Taingault;;1653;1653;3;;;;;M
+Talbot;;1416;1419;1;;;;;M
+Talma;;1737;1737;1;;;;;M
+de Taroja;;1180;1180;1;;;;;M
+de Tartas;vicomte;1135;1230;3;;;;;M
+Tartenson;;;;1;Anses d'Arlet;;;;M
+Tartenson;Chirurgien à Saint-Christophe 1664;;;1;Senez, Basses Alpes;;;;M
+Tartenson des Ruisseaux;;1704;1770;1;Trinité;;;;M
+Tartenson des Ruisseaux;;1782;1853;1;Martinique;;;;M
+Tartenson des Ruisseaux;;1788;1788;1;Trinité, Martinique;;;;M
+Tascher;;1462;1462;3;;;;;M
+de Tascher;seigneur de La Pagerie;1552;1552;1;;;;;M
+Tascher de La Pagerie;;1565;1839;12;;;;;M
+Tascher de La Pagerie;;1763;1814;1;Trois-Ilets, Martinique;;;;M
+Tascher de La Pagerie;écuyer;1735;1790;1;Le Carbet, Martinique;;;;M
+Tasse;;1587;1652;1;;;;;M
+de Tattenbach;;1675;1714;1;Geilsdorf;;;;M
+de Tattenbach;comte;1621;1693;1;Geilsddorf;;;;M
+Taveau;;1509;1509;1;;;;;M
+Taveau de Laubuge;;1643;1643;1;;;;;M
+de Taxis;;1560;1628;3;;;;;M
+de Tecklenbourg;;1453;1557;4;;;;;M
+de Tecklenbourg-Lingen;;1532;1582;1;;;;;M
+Teles de Meneses;reine de Portugal;1371;1386;1;Trás-os-Montes;;;PRT;M
+Telles de Meneses;;1225;1225;1;;;;;M
+Tellez de Meneses;dame de Montealegre;1246;1246;2;;;;;M
+de Tende;duchesse de Milan;1372;1418;1;Tende;;;;M
+de Tengling;comtesse;;;1;;;;;M
+Tenremonde;héritière de Tenremonde;1185;1224;2;;;;;M
+Tercy;;1712;1712;1;;;;;M
+de Teschen;duc;1306;1317;3;;;;;M
+Testelin;;1456;1513;1;;;;;M
+Texier;vicomte d'Hautefeuille;1738;1809;1;;;;;M
+Texier de Lafont;seigneur de Lafont;1689;1714;2;;;;;M
+de Teyssières;;1756;1836;1;;;;;M
+de Teyssières de Bellechize;;1757;1806;1;;;;;M
+de Teyssières de Mas de Champ;;1787;1836;1;;;;;M
+Theaux;;1755;1873;2;Bernadets-Dessus, Dept. Hautes Pyrenees, France;;;;M
+Theaux;;1843;1848;2;;;;;M
+Theron;;1798;1798;1;;;;;M
+Thery;;1751;1751;1;Le Lamentin;;;;M
+Theuvenin;;1648;1754;3;;;;;M
+Theuvenin;;1717;1783;1;Gros Morne;;;;M
+Theuvenin;;1737;1817;5;Le Gros-Morne;;;;M
+Theuvenin;;1787;1787;1;Gros-Morne;;;;M
+Thevenin;;1814;1814;1;Limoges Egl  Stpierre, 87;;;;M
+Thevenin;;1816;1816;1;Limoges Egl Stpierre, 87;;;;M
+Thevenin;;1817;1821;2;;;;;M
+Thevenin;;1842;1842;1;Limoges Eglise  St Pierre, 8;;;;M
+de Théligny;;1542;1542;2;;;;;M
+Thénerel Ducoudray;;1793;1793;1;Saint-Pierre;;;;M
+Thibault;;1705;1705;1;Grande Anse (Lorrain);;;;M
+Thibault;;1826;1826;1;Ste-Marie;;;;M
+de Thienne;;1534;1534;1;Vincence, Italie;;;;M
+de Thienne;;1569;1569;1;Pressigny;;;;M
+de Thienne;;1599;1633;2;;;;;M
+de Thiennes;;1485;1556;2;;;;;M
+de Thiern;;1055;1055;2;;;;;M
+Thierry;;1644;1644;1;Blois, Loir-et-Cher;;;;M
+Thierry du Bocage;;1753;1753;1;;;;;M
+Thiersant;;1640;1723;1;;;;;M
+Thomas;;1634;1693;1;Le Prêcheur;;;;M
+Thomas;;1650;1721;4;;;;;M
+Thomas;;1811;1842;1;Vexaincourt (88);;;;M
+de Thoré;;1833;1833;1;;;;;M
+Thorkel;;1302;1302;1;;;;;M
+de Thouars;baillistre de Bretagne;1155;1213;1;Chemillé, France;;;;M
+de Thouars;duchesse de Bretagne;1020;1308;16;;;;;M
+de Thouars;vicomte;1024;1093;1;Thouars;;;;M
+Thoumas de Bosmie;;1808;1808;2;;;;;M
+de Thoune;comte;1661;1723;5;;;;;M
+de Thurgovie;;880;880;1;;;;;M
+de Thuringe;comte;1080;1275;20;;;;;M
+Tiberge;;1715;1764;1;Le Lamentin;;;;M
+Tiberge;;1807;1807;2;;;;;M
+Tiberge;Martinique vers 1713;1684;1713;1;Paris;;;;M
+de Tiercelin;seigneur de la Chapelle-Baton;;;2;;;;;M
+Tilney;;1472;1497;2;;;;;M
+de Tirol;comtesse;1279;1279;1;;;;;M
+de Tolédo;;1596;1596;2;;;;;M
+de Tonnay-Charente;;1240;1263;1;;;;;M
+de Tonnerre;;1030;1085;5;;;;;M
+de Toron;sire;1191;1191;1;;;;;M
+de Torres;héritière des provinces sardes de Torres et de Gallura;1238;1255;1;;;;;M
+Torterue;;1708;1708;1;La Rochelle;;;;M
+de Tortia;;1379;1379;1;;;;;M
+de Toscane;;950;1003;1;Gand, Belgique;;;;M
+de Toscane;marquis;824;1007;10;;;;;M
+de Toscane;roi d'Italie;900;975;2;;;;ITA;M
+Touchet;dame de Belleville;1549;1638;1;;;;;M
+de Toucy;dame;1200;1317;3;;;;;M
+Toullouppe;;1698;1698;1;;;;;M
+de Toulouse;;940;1271;16;;;;;M
+de Toulouse;comte;1042;1222;2;Toulouse;;;;M
+de Toulouse;comte;1103;1148;1;près de Tripoli, en Syrie;;;;M
+de Toulouse;comte;1134;1194;1;Nîmes;;;;M
+de Toulouse;comte;1197;1249;1;Beaucaire;;;;M
+de Toulouse;comte de Tripoli;1098;1137;1;Palestine;;;;M
+Tour;;1821;1821;1;Martinique;;;;M
+de la Tour;vicomte de Turenne;;;3;;;;;M
+de la Tour du Pin la Charce;marquis;1779;1832;1;;;;;M
+de Tour-et-Taxis;;1706;1756;1;;;;;M
+de Tour-et-Taxis;comte;1621;1739;3;Bruxelles, Belgique;;;;M
+de Tour-et-Taxis;prince;1704;1773;1;Francfort sur le Main;;;;M
+de Tour-et-Taxis;prince;1733;1805;1;Francfort;;;;M
+de Tour-et-Taxis;prince;1770;1827;1;Regensbourg;;;;M
+de Tournai;;1154;1193;6;;;;;M
+du Tournel;;1215;1215;1;;;;;M
+de Tournon;seigneur;1465;1465;3;;;;;M
+de Tournon-Roussillon;;1540;1600;1;;;;;M
+de Tours;;821;851;1;;;;;M
+de Tourzel;dame de Busset;1498;1498;1;;;;;M
+Trastemirez;;1033;1038;1;;;;;M
+de Trautmannsdorf;;1587;1653;1;;;;;M
+Traversier;;1630;1677;3;;;;;M
+Traversier;;1697;1697;1;Basse-Pointe;;;;M
+de Traves;;1100;1100;1;;;;;M
+du Traynel;;1135;1223;4;;;;;M
+de Trazegnies;;1811;1835;1;;;;;M
+de Trazeignies;seigneur de Blicquy;1092;1192;5;;;;;M
+Tremblet;;1718;1718;1;Grande Anse (Lorrain);;;;M
+Trencavel;;1032;1193;11;;;;;M
+de Treves;;951;951;1;;;;;M
+Trezin de Cangey;;1802;1802;1;Le François;;;;M
+de Trèves;;909;909;1;;;;;M
+de Tréguier;comte;1110;1190;1;Mayenne;;;;M
+Triboulliet;;1653;1749;1;;;;;M
+Tricot;;1741;1741;3;;;;;M
+de Trie;;1270;1270;2;;;;;M
+Trillard;;1739;1811;3;Rennes;;;;M
+Trillard;;1782;1834;1;Lorient;;;;M
+Trillard;Huissier au Parlement de Bretagne;;;1;;;;;M
+Trivulce;;1638;1638;1;;;;;M
+Trokin;;1827;1827;1;;;;;M
+de Troppau;duc;1350;1363;2;;;;;M
+de Troussebois;seigneur de Lormet;;;2;;;;;M
+de Troyes;dame de Lachy;884;884;2;;;;;M
+de Truhendingen;;1278;1301;1;;;;;M
+de Tschernembl;;1563;1601;1;Windeck;;;;M
+de Tubingen;;1162;1609;2;;;;;M
+Tucker;;1778;1845;1;;;;;M
+Tudor;;1400;1461;1;Hereford, Hereford and Worcester, Angleterre;;;;M
+Tudor;comte de Richmond;1430;1502;4;;;;;M
+Tudor;reine d'Angleterre;1516;1558;1;Greenwich;;ENG;GBR;M
+Tudor;reine d'Écosse;1489;1541;1;;;SCT;GBR;M
+Tudor;reine de France;1496;1533;1;;;;FRA;M
+Tudor;roi d'Angleterre;1457;1603;4;;;ENG;GBR;M
+de Turenne;vicomte;951;1243;16;;;;;M
+de Turenne;vicomte;1142;1143;1;Saint-Paul-La Roche, Dordogne, France;;;;M
+de Turenne;vicomte;1143;1191;1;Saint-Jean d'Acre, Israël;;;;M
+Turpin;;1625;1640;1;Paris;;;;M
+Tusoli;;1660;1660;1;Alata, Corse-du-Sud;;;;M
+Tusoli;;1708;1708;1;Ajaccio, Corse-du-Sud;;;;M
+Tusset;;1653;1653;1;;;;;M
+de Tver;;1345;1467;5;;;;;M
+de Tyrol;comte;1344;1373;1;;;;;M
+de Tyrol-Carinthie;comte de Tyrol;;;2;;;;;M
+Tzimiskès;empereur d'Orient;925;991;2;;;;;M
+d'Ugnadin;;1605;1670;1;;;;;M
+Ungnadin;comtesse de Sonnegg;1573;1606;1;;;;;M
+Ungnadin-Sonnegg;baron de Sonnegg;1530;1605;1;;;;;M
+Urbino;;1527;1563;1;;;;;M
+d'Urgel;comte;1055;1443;8;;;;;M
+d'Uzès;vicomtesse;1125;1125;4;;;;;M
+Vacherot;;1632;1782;4;;;;;M
+du Val;;1665;1725;1;Fort-Royal, Martinique;;;;M
+du Val;;1696;1781;1;Rivière-Salée;;;;M
+du Val;seigneur de Grandchamps;1584;1584;2;;;;;M
+de Valence;;1281;1319;1;;;;;M
+de Valenciennes;;920;920;1;;;;;M
+de Valley;;1140;1200;3;;;;;M
+de Valois;;1308;1383;1;Paris;;;;M
+de Valois;;1373;1418;1;chateau d'Essay;;;;M
+de Valois;comte;1270;1325;1;Carenne;;;;M
+de Valois;dame de Mirebeau;965;1562;74;;;;;M
+de Valois;impératrice titulaire de Constantinople;1301;1346;1;à Naples;;;;M
+de Valois;reine d'Angleterre;1389;1437;2;à Paris;;ENG;GBR;M
+de Valois;reine d'Espagne;1545;1568;1;à Fontainebleau;;;ESP;M
+de Valois;roi de France;1293;1522;7;;;;FRA;M
+de Valois;roi de France;1337;1380;1;Vincennes;;;FRA;M
+de Valons;;1773;1847;1;;;;;M
+Van Bomberghen;;1490;1539;1;;;;;M
+Van Borselen;comte d'Ostrevant;1432;1432;1;;;;;M
+Van Hontsum;;1553;1693;5;;;;;M
+Van den Cruyce;;1540;1540;2;;;;;M
+Vanesson;;1774;1798;1;Fains (55);;;;M
+Vanhoudenhoven de Vieillecourt;;1690;1713;1;Fort-Royal;;;;M
+Vanhoudenhoven de Vieillecourt;Procureur Général;1645;1715;1;Le François;;;;M
+de Vannes;comte;877;907;4;;;;;M
+Vanonse;;1697;1697;1;;;;;M
+Vaque;;1726;1726;1;Marseille;;;;M
+Varachaud;;1590;1590;1;, Ls;;;;M
+de Varennes;;1070;1304;10;;;;;M
+de Varennes;comtesse de Surrey;1137;1199;1;Surrey, Angleterre;;;;M
+Varnier;;1720;1720;1;;;;;M
+Vasa;;1376;1655;22;;;;;M
+Vasa;;1619;1651;1;Varsovie;;;;M
+Vasa;duc d'Ostrogothie;1589;1618;1;Uppsala, Suède;;;;M
+Vasa;duc de Sudermanie;1601;1622;1;Reval;;;;M
+Vasa;princesse de Suède;1539;1627;6;;;;SWE;M
+Vasa;princesse de Suède;1568;1625;1;Eskilstuna, Suède;;;SWE;M
+Vasa;princesse de Suède;1584;1638;1;Nyköping, Suède;;;SWE;M
+Vasa;roi de Pologne;1566;1632;1;Gripsholm, Suède;;;POL;M
+Vasa;roi de Pologne;1595;1648;1;;;;POL;M
+Vasa;roi de Pologne;1609;1672;1;Nevers;;;POL;M
+Vasa;roi de Suède;1496;1560;1;Uppland, Suède;;;SWE;M
+Vasa;roi de Suède;1533;1689;4;Stockholm, Suède;;;SWE;M
+Vasa;roi de Suède;1537;1592;1;Stegeborg, Suède;;;SWE;M
+Vassiltchikova;;1575;1575;1;;;;;M
+Vatable;;1789;1835;5;;;;;M
+de Vathaire;seigneur de Champcornille;1527;1895;30;;;;;M
+de Vathaire de Charmoy;;1721;1829;7;;;;;M
+de Vathaire de Guerchy;;1771;1846;2;;;;;M
+de Vathaire de Montreparé;;1742;1847;5;;;;;M
+de Vathaire du Fort;;1772;1827;1;;;;;M
+Vatier;;1641;1641;1;;;;;M
+Vauclin;;1639;1663;1;Hautot-le-Vatois;;;;M
+Vauclin;;1663;1663;1;St-Pierre;;;;M
+de Vaudémont;comte;1060;1348;13;;;;;M
+de Vaulabelle ( Tenaille );;1698;1760;1;Mailly Le Chateau, 89;;;;M
+de Vaulabelle ( Tenaille );;1734;1806;1;Mailly-le-Chateau, 89;;;;M
+de Vaulabelle ( Tenaille );;1771;1816;1;;;;;M
+de Vaulabelle (Tenaille de);;1535;1651;2;;;;;M
+de Vaulabelle (Tenaille de);;1616;1696;1;Mailly la Ville, 89;;;;M
+de Vaulabelle (Tenaille de);;1661;1732;1;Mailly-la-Ville;;;;M
+de Vaulabelle (Tenaille de);;1695;1765;1;Mailly la Ville;;;;M
+Vautor;;1707;1707;2;;;;;M
+de Vegena;;1047;1047;1;;;;;M
+de Velasco;duchesse;1329;1607;3;;;;;M
+de Veldenz;comte palatin;1370;1592;3;;;;;M
+Veliaminov;boyard;1404;1404;2;;;;;M
+de Vendôme;comte;970;1412;21;;;;;M
+de Vendôme;comte;1200;1249;1;Nicosie, Chypre;;;;M
+de Vendômois;;1420;1420;1;;;;;M
+de Veneur;;1540;1600;1;;;;;M
+de Venisy;;1167;1167;2;;;;;M
+de Ventadour;;1100;1155;1;Mont Cassin, Italie;;;;M
+de Ventadour;vicomte;1151;1375;6;;;;;M
+Verdier;;1716;1822;3;;;;;M
+de Verdilhac;seigneur de La Vergne;1715;1777;5;;;;;M
+de Verdun;;920;1015;5;;;;;M
+Vere;comte d'Oxford;1532;1532;2;;;;;M
+Verger;;1818;1818;1;;;;;M
+des Vergers;écuyer;1530;1591;3;;;;;M
+des Vergers d'Auroy;;1704;1704;1;Saint-Christophe;;;;M
+des Vergers d'Auroy;;1713;1713;1;;;;;M
+des Vergers d'Auroy;;1720;1750;1;François, Martinique;;;;M
+des Vergers de Mauperthuy;;1723;1773;5;;;;;M
+des Vergers de Mauperthuy;;;;1;Anses d'Arlet;;;;M
+des Vergers de Mauperthuy;Chevau Léger, Garde, Capitaine au Régiment de Moraugis.;1630;1661;1;Annet en Brie;;;;M
+des Vergers de Mauperthuy;seigneur de Sannois;1714;1714;1;St-Christophe;;;;M
+des Vergers de Sannois;;1639;1834;11;;;;;M
+des Vergers de Sannois;;1670;1710;1;Fort-Royal;;;;M
+des Vergers de Sannois;;1736;1807;1;Trois-Îlets, Martinique;;;;M
+des Vergers de Sannois;seigneur de Sannois;1592;1624;1;Amiens, Somme;;;;M
+des Vergers de Sannois;seigneur de Sannois;1595;1657;1;Poincy, Seine-et-Marne;;;;M
+des Vergers de Sannois;seigneur de Sannois;1660;1700;1;Le Lamentin, Martinique;;;;M
+Vergnaud;;1827;1827;1;Limoges Egl St Michel, 87;;;;M
+de Vergy;;979;1430;19;;;;;M
+de Verineau;seigneur de Veyrat;1701;1701;2;;;;;M
+de Vermandois;;818;902;2;Vermandois;;;;M
+de Vermandois;;880;1023;16;;;;;M
+de Vermandois;comtesse;1062;1120;1;Meulan, Yvelines, France;;;;M
+de Vermeilles;;1346;1361;1;;;;;M
+Verneuil;seigneur de La Peyre;1763;1792;1;;;;;M
+de Verneuil;;1606;1680;1;;;;;M
+Verneuil de La Peyre;seigneur de La Valette;;;1;;;;;M
+de Verteuil;;1844;1844;1;;;;;M
+Veyrier du Potiche;;1715;1782;2;Macouba;;;;M
+Veyrier du Potiche;;1763;1763;1;St-Pierre;;;;M
+de Vérone;prince;1363;1363;1;;;;;M
+de Vialard;;1586;1591;1;;;;;M
+de Vianden;;1310;1376;1;Dillenbourg;;;;M
+de Vienne;comte;1175;1410;10;;;;;M
+de Viennois;dauphin;1304;1323;2;;;;;M
+de la Vieuville;;1630;1678;1;;;;;M
+de la Vieville;;1430;1500;1;;;;;M
+de Vigneau de Bizanos;;1742;1742;1;;;;;M
+Vignier;seigneur de Saint-Père de Nuzy;1538;1538;2;;;;;M
+de Vignory;seigneur;1055;1262;4;;;;;M
+Vilain;;1797;1797;1;Trinité;;;;M
+Vilain;;1831;1831;1;Le Lamentin;;;;M
+de Viliers;;1629;1629;1;;;;;M
+de Villareal;;1447;1452;2;;;;;M
+de Villars;;1569;1569;1;Pressigny;;;;M
+de Ville;;1629;1629;2;;;;;M
+de Villebéon;seigneur;1210;1282;2;;;;;M
+de Villehardouin;princesse d'Archaïe;1235;1311;6;;;;;M
+de Villemomble;;1195;1214;1;;;;;M
+de Villersexel;;1335;1368;1;;;;;M
+Villiers;;1604;1689;7;;;;;M
+de Villiers;;1578;1604;4;;;;;M
+de Villiers de Masjoubert;;1586;1594;1;;;;;M
+Vincent;;1728;1728;1;Saint-Saud Coussière, Dordogne;;;;M
+Vincent;seigneur de Bonnefonds;;;1;;;;;M
+de Vinstingen;;1445;1491;1;;;;;M
+de Vintschgau;;771;783;1;;;;;M
+de Virnebourg;;1303;1343;1;Virnebourg;;;;M
+de Virnebourg;;1410;1480;4;;;;;M
+Visconti;;1350;1414;1;Milan;;;;M
+Visconti;archevêque de Milan;1295;1447;24;;;;;M
+de Vitebsk;;1207;1318;3;;;;;M
+de Vitré;;1023;1248;11;;;;;M
+Vitry;;1688;1698;2;;;;;M
+Vive;;1818;1884;1;;;;;M
+Viviès;;1797;1797;1;Trinité;;;;M
+Viviès;;1832;1832;1;Le Lamentin;;;;M
+de Vivonne;;1628;1628;1;;;;;M
+de Vladimir;prince;1108;1123;1;;;;;M
+de Vladimir Volinsk;prince;1207;1247;2;;;;;M
+de Voels;baron;1575;1648;2;;;;;M
+de Vohbourg;margrave;1147;1147;2;;;;;M
+de Vohenstrauss;;1557;1597;1;;;;;M
+Voisin;;1636;1636;1;;;;;M
+Voisin;;1688;1742;1;Grande Anse (Lorrain;;;;M
+Volland;;1480;1480;3;;;;;M
+de Vouvant;;1069;1069;1;;;;;M
+Wake;lord;1325;1349;2;;;;;M
+de Walbeck;;949;949;1;;;;;M
+de Walcourt-Rochefort;;1418;1441;1;;;;;M
+de Waldbourg;;1500;1567;1;;;;;M
+de Waldburg zu Wolfegg und Zeil;;1488;1589;4;;;;;M
+de Waldburg zu Zeil;Comte de Zeil;1569;1720;4;;;;;M
+de Waldburg zu Zeil;comtesse;1702;1739;1;chateau de Zeil;;;;M
+de Waldeck;comte;1380;1702;13;;;;;M
+de Waldeck;comte;1614;1699;2;Culemborg;;;;M
+de Waldeck;prince;1620;1692;1;Arolsen;;;;M
+de Waldeck;prince;1676;1728;1;Landau;;;;M
+de Waldeck;prince;1704;1763;1;Hanau;;;;M
+de Waldeck-Wildungen;;1558;1599;1;Dillenbourg;;;;M
+de Waldeck-Wildungen;;1636;1669;1;Wildungen;;;;M
+de Waldeck-Wildungen;comte de Waldeck;1445;1678;11;;;;;M
+de Waldeck-et-Pyrmont;;1664;1813;2;Arolsen;;;;M
+de Waldeck-et-Pyrmont;prince;1789;1845;1;Weil b.Basel;;;;M
+de Waldstein;comte;1731;1775;1;;;;;M
+Walewska;;1789;1817;1;;;;;M
+de Wallenrodt;;1695;1775;1;Ragnit;;;;M
+Wallenstein;;1530;1530;1;;;;;M
+Walpole;;1736;1807;2;;;;;M
+de Wardenbourg;;1464;1538;1;;;;;M
+de Warwick;comte;1429;1492;2;;;;;M
+de Wassemberg;comte de Gueldre;1060;1218;10;;;;;M
+de Wassemburg;;987;987;2;;;;;M
+Watts;;1682;1711;1;Londres;;;;M
+de Wavrin;;1154;1193;7;;;;;M
+de Weede;baronne;1685;1724;1;;;;;M
+Weigen;;1645;1719;1;;;;;M
+de Weimar;;1040;1040;1;;;;;M
+de Weissenbach;;1630;1680;1;Eisleben;;;;M
+Weissgerber;;1595;1645;1;;;;;M
+Welf;;1673;1742;1;Lunebourg;;;;M
+Welf;;1764;1788;1;Treptow;;;;M
+Welf;;1769;1811;1;Antoinettenruh;;;;M
+Welf;comte;863;1840;159;;;;;M
+Welf;duc de Bavière;1074;1126;1;Revensbourg, Allemagne;;;;M
+Welf;duc de Brunswick;1268;1318;1;eglise Saint Blaise a Brunswixck;;;;M
+Welf;duc de Brunswick-Bevern;1680;1735;1;Bevern;;;;M
+Welf;duc de Brunswick-Lunebourg;1629;1698;1;Herzberg;;;;M
+Welf;duc de Brunswick-Lunebourg;1713;1780;1;Braunschweig;;;;M
+Welf;duc de Brunswick-Lunebourg;1735;1806;1;Wolfenbüttel, Brunswick;;;;M
+Welf;duchesse de Saxe-Weimar;1739;1807;1;à Wolfenbüttel;;;;M
+Welf;empereur Romain-Germanique;1175;1218;1;en Normandie;;;;M
+Welf;princesse d'Ahlden;1666;1726;1;Allemagne;;;;M
+Welf;princesse de Brunswick-Hanovre;1668;1705;1;Iburg;;;;M
+Welf;princesse de Brunswick-Wolfenbüttel;1691;1802;4;Wolfenbüttel;;;;M
+Wellesley;comte de Mormington;1735;1842;2;;;;;M
+Welser;baronne de Zinnenbourg;1527;1580;1;;;;;M
+de Werdenberg-Heiligenberg;comtesse;1434;1467;1;;;;;M
+de Werle;;1284;1312;1;eglise Saint Blaise a Brunswixck;;;;M
+de Werle;prince;1262;1291;1;Saal;;;;M
+de Werle-Waren;prince;1377;1377;2;;;;;M
+de Wertheim;;1340;1553;4;;;;;M
+de Westerbourg;;1315;1418;3;;;;;M
+de Wetterau;;900;973;3;;;;;M
+de Wettin;;1449;1501;1;Weimar;;;;M
+de Wettin;;1468;1524;1;Grimma, Saxe;;;;M
+de Wettin;;1609;1671;1;Dresden;;;;M
+de Wettin;;1683;1764;3;Saalfeld;;;;M
+de Wettin;;1691;1720;1;Arolsen;;;;M
+de Wettin;;1691;1743;1;Zeitz;;;;M
+de Wettin;;1799;1832;1;Dresde;;;;M
+de Wettin;duc de Saxe;1425;1539;3;Meissen;;;;M
+de Wettin;duc de Saxe;1443;1500;1;à Grimma;;;;M
+de Wettin;duc de Saxe-Cobourg-Saalfeld;1724;1810;3;Coburg;;;;M
+de Wettin;duc de Saxe-Gotha;1646;1808;6;Gotha;;;;M
+de Wettin;duc de Saxe-Gotha-Altenbourg;1601;1675;1;Altenbourg;;;;M
+de Wettin;margrave de Saxe-Ostmark;1034;1873;120;;;;;M
+de Wettin;princesse de Saxe-Weissenfels;1648;1724;2;Halle;;;;M
+de Wettin;reine de Naples;1724;1760;1;;;;ITA;M
+de Wettin;roi de Pologne;1670;1767;3;;;;POL;M
+White-Le Blanc;;1768;1768;1;;;;;M
+de Wied;comte;1425;1588;8;;;;;M
+de Wied-Runkel;prince;1763;1824;1;;;;;M
+de Wignacourt;;1750;1778;1;;;;;M
+de Wilczek;;1792;1847;1;;;;;M
+Willoughby;;1588;1588;1;;;;;M
+de Windisch-Graëtz;comtesse;1784;1848;1;;;;;M
+Winter Durennel;;1843;1843;1;;;;;M
+Wintheim;;1772;1772;1;Carénage;;;;M
+Winzelhaeuser;;1495;1559;1;;;;;M
+Wirtemberger;;1470;1470;1;;;;;M
+Wisniowecki;;1612;1651;3;;;;;M
+Wisniowecki;roi de Pologne;1640;1673;1;;;;POL;M
+de Wittelsbach;;1373;1872;6;Munich;;;;M
+de Wittelsbach;;1381;1408;1;Amberg;;;;M
+de Wittelsbach;;1419;1524;3;Heidelberg;;;;M
+de Wittelsbach;;1637;1717;1;Bischweiler;;;;M
+de Wittelsbach;;1725;1816;1;Ribeauville;;;;M
+de Wittelsbach;comte de Lowenstein-Wertheim;1530;1611;1;Vaihingen;;;;M
+de Wittelsbach;comte de Lowenstein-Wertheim-Rochefort;1616;1718;2;Rochefort;;;;M
+de Wittelsbach;comte de Löwenstein-Wertheim;1568;1735;2;Wertheim;;;;M
+de Wittelsbach;comte de Scheyern;1072;1877;164;;;;;M
+de Wittelsbach;comtesse palatine de Deux-Ponts-Birkenfeld;1721;1774;1;Strasbourg, France;;;;M
+de Wittelsbach;duc de Bavière;1117;1183;1;Pfullendorf;;;;M
+de Wittelsbach;duc de Bavière;1548;1864;2;Vienne;;;;M
+de Wittelsbach;duchesse de Modène;1823;1914;1;Wurzburg;;;;M
+de Wittelsbach;héritier d'Espagne;1692;1699;1;;;;ESP;M
+de Wittelsbach;prince de Lowenstein-Wertheim-Rochefort;1722;1838;2;Kleinheubach;;;;M
+de Wittelsbach;prince de Lowenstein-Wertheim-Rochefort;1783;1849;1;Bartenstein;;;;M
+de Wittelsbach;prince de Lowenstein-Wertheim-Rosenberg;1762;1814;1;Nancy;;;;M
+de Wittelsbach;prince palatin de Deux-Ponts;1589;1652;1;Stockholm;;;;M
+de Wittelsbach;princesse de Bavière;1788;1851;1;München, Allemagne;;;;M
+de Wittelsbach;reine de France;1371;1435;1;à Munich;;;FRA;M
+de Wittelsbach;roi de Bavière;1756;1825;1;Mannheim, Allemagne;;;;M
+de Wittelsbach;roi de Hongrie;1261;1313;1;;;;HUN;M
+de Wittelsbach;roi de Suède;1622;1660;1;Nyköping, Suède;;;SWE;M
+de Wittelsbach;roi de Suède;1655;1741;3;Stockholm, Suède;;;SWE;M
+de Wittelsbach;roi de Suède;1682;1718;2;;;;SWE;M
+de Wittelsbach;roi des Romains;1352;1410;1;à Amberg;;;;M
+de Wittelsbach;électeur-archevêque de Cologne;1577;1650;1;à Munich;;;;M
+von Witzleben;;1598;1671;2;;;;;M
+de Woevre;;;;8;;;;;M
+de Wolfstein;comte;1644;1737;2;;;;;M
+Woodville;comte de Rivers;1380;1491;5;;;;;M
+Woodville;reine d'Angleterre;1437;1492;1;à Londres;;ENG;GBR;M
+de Wrbna et Freudenthal;comtesse;1799;1863;1;;;;;M
+Wriothesley;;1615;1615;1;;;;;M
+de Wroclaw;duc;1235;1296;6;;;;;M
+Wuerttemberger;;1450;1503;1;;;;;M
+de Wurmbrand-Stuppach;comtesse;1699;1763;1;;;;;M
+de Wurtemberg;;1447;1505;1;Wernigerode;;;;M
+de Wurtemberg;;1767;1817;1;Montriond;;;;M
+de Wurtemberg;comte;1226;1852;86;;;;;M
+de Wurtemberg;comte;1265;1873;4;Stuttgart;;;;M
+de Wurtemberg;duchesse;1797;1855;1;Karlruhe;;;;M
+de Wurtemberg;roi;1754;1816;2;Treptow;;;;M
+Ybleron;;1614;1614;1;;;;;M
+Ybleron;;1659;1699;1;Le Prêcheur;;;;M
+Yngling;;1297;1312;1;Oslo;;;;M
+Yngling;reine d'Écosse;1283;1290;1;;;SCT;GBR;M
+Yngling;roi de Norvège;1015;1360;30;;;;;M
+d'York;roi;926;926;1;;;;;M
+Zamoyska;;1623;1672;1;;;;;M
+Zamoyski;comte;1716;1792;1;;;;;M
+de Zaozersk;prince;1436;1436;2;;;;;M
+von Zaworziz;;1664;1740;1;;;;;M
+Zápolya;comte de Zips;1495;1571;4;;;;;M
+Zápolya;roi de Hongrie;1487;1540;1;;;;HUN;M
+de Zelcking-Durnstein;;1603;1646;1;;;;;M
+de Zeutsch;;1624;1689;1;Eisleben;;;;M
+de Zeutsch;;1666;1699;1;;;;;M
+de Zevenbergen;;1460;1510;1;;;;;M
+Ziegler;;1757;1810;1;;;;;M
+de Zinzendorf;;1636;1709;1;Pottendorf;;;;M
+de Zinzendorf;;1659;1683;1;Pressbourg;;;;M
+de Zinzendorf;comte;1590;1743;3;;;;;M
+de Zinzendorf;comte;1620;1677;1;Vienne;;;;M
+de Zinzendorf-Pottendorf;;1605;1655;1;;;;;M
+de Zooteghem;;1193;1219;2;;;;;M
+Zuern;;1775;1795;1;;;;;M
+de Zutphen;;1095;1145;4;;;;;M
+de Zutphen;comte;1055;1113;1;Corvey;;;;M

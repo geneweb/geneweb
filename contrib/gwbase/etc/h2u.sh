@@ -1,0 +1,106 @@
+#!/bin/sh
+# $Id: h2u.sh,v 1.4 2005-07-26 12:13:24 ddr Exp $
+# Conversion DOC -> WDOC dans GeneWeb
+
+cat $1 |
+sed \
+  -e 's/\r//g' \
+  -e 's/<hr>//g' \
+  -e 's/<HR>//g' \
+  -e 's|<B>|<b>|g' \
+  -e 's|</B>|</b>|g' \
+  -e 's|<H|<h|g' \
+  -e 's|</H|</h|g' \
+  -e 's|<FONT SIZE|<font size|g' \
+  -e 's|<FONT|<font|g' \
+  -e 's|COLOR=|color=|g' \
+  -e 's|</FONT|</font|g' \
+  -e 's|<TITLE>|<title>|g' \
+  -e 's|</TITLE>|</title>|g' \
+  -e 's/HREF/href/g' \
+  -e 's|<A *$|<a|g' \
+  -e 's|<a *$|<a|g' \
+  -e 's|<A |<a |g' \
+  -e 's|</A>|</a>|g' \
+  -e 's|<[aA] NAME|<a name|g' |
+sed \
+  -e '/<a href=[^>]*[^<]*$/{N' \
+  -e 's/\n/ /}' \
+  -e '/<h1>/{p' \
+  -e 's|^.*<h1>\(.*\)</h1>.*$|\1|' \
+  -e 's|<[^>]*>||g}' \
+  -e 's|<h3>|==|g' \
+  -e 's|<h4>|===|g' \
+  -e '/==/{' \
+  -e 't hh' \
+  -e ': hh' \
+  -e 's|</h3>|</h3>|' \
+  -e 's|</h4>|</h4>|' \
+  -e 't ok' \
+  -e 'N' \
+  -e 'b hh' \
+  -e ': ok' \
+  -e 's/\n/ /g' \
+  -e 's|</h3>| ==|' \
+  -e 's|</h4>| ===|' \
+  -e 's|<font[^>]*> *||g' \
+  -e 's|</font>||g' \
+  -e 's|</a>||g' \
+  -e 't next' \
+  -e ': next' \
+  -e 's|<a name=|<a name=|' \
+  -e 'T' \
+  -e 'h' \
+  -e 's|^.*\(<a name=[^>]*>\).*$|\1</a>|' \
+  -e 'G' \
+  -e 's|== *<a name=[^>]*> *|== |' \
+  -e 's|== [0-9.]* *|== |' \
+  -e '}' \
+  -e '/<b>$/{N' \
+  -e 's/\n//}' \
+  -e '/<font$/{N' \
+  -e 's/\n */ /}' \
+  -e '/<a$/N' -e 's/<a\n */<a /' \
+  -e 's|<b>\([a-z]*\)</b></a>|\1</a>|g' \
+  -e 's|<a href="\([a-z]*\)\.htm\([^"]*\)">\([^<]*\)</a>|[[[\1\2/\3]]]|g' \
+  -e 's|<b>\[\[\[\([^]]*\)\]\]\]</b>|[[[\1]]]|g' \
+  -e '/<font size.*Copyright/,$d' |
+sed \
+  -e '0,/<h1>/d' |
+sed \
+  -e 's|<b><font color="\?#2[fF]6400"\?>GeneWeb</font></b>|{GeneWeb}|g' \
+  -e 's|<font color="\?#2[fF]6400"\?><b>GeneWeb</b></font>|{GeneWeb}|g' \
+  -e 's|m=DOC;v=\(..\)/\([^.]*\)\.htm|lang=\1;m=WDOC;f=\2|'g \
+  -e 's/&acirc;/â/g' \
+  -e 's/&Agrave;/À/g' \
+  -e 's/&agrave;\?/à/g' \
+  -e 's/&Aring;\?/Å/g' \
+  -e 's/&aring;\?/å/g' \
+  -e 's/&Auml;/Ä/g' \
+  -e 's/&auml;/ä/g' \
+  -e 's/&Ccedil;/Ç/g' \
+  -e 's/&ccedil;/ç/g' \
+  -e 's/&egrave;\?/è/g' \
+  -e 's/&Eacute;/É/g' \
+  -e 's/&eacute;/é/g' \
+  -e 's/&ecirc;/ê/g' \
+  -e 's/&euml;\?/ë/g' \
+  -e 's/&icirc;/î/g' \
+  -e 's/&igrave;\?/ì/g' \
+  -e 's/&iuml;\?/ï/g' \
+  -e 's/&oacute;/ó/g' \
+  -e 's/&ocirc;/ô/g' \
+  -e 's/&ograve;/ò/g' \
+  -e 's/&Ouml;/Ö/g' \
+  -e 's/&ouml;\?/ö/g' \
+  -e 's/&szlig;/ß/g' \
+  -e 's/&ugrave;\?/ù/g' \
+  -e 's/&ucirc;/û/g' \
+  -e 's/&Uuml;/Ü/g' \
+  -e 's/&uuml;/ü/g' \
+  -e '1a\' \
+  -e 'aaa' |
+sed \
+  -e '2,/^ *$/d' \
+  -e '1a\' \
+  -e ''
