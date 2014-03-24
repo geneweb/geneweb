@@ -54,7 +54,7 @@ value reconstitute_somebody conf var =
     if (List.exists contain_fn Name.forbidden_char) ||
        (List.exists contain_sn Name.forbidden_char) then
       do {
-        removed_string.val := 
+        removed_string.val :=
           [(Name.purge first_name ^ " " ^ Name.purge surname) :: removed_string.val];
         (Name.purge first_name, Name.purge surname)
       }
@@ -88,7 +88,7 @@ value reconstitute_parent_or_child conf var default_surname =
     if (List.exists contain_fn Name.forbidden_char) ||
        (List.exists contain_sn Name.forbidden_char) then
       do {
-        removed_string.val := 
+        removed_string.val :=
           [(Name.purge first_name ^ " " ^ Name.purge surname) :: removed_string.val];
         (Name.purge first_name, Name.purge surname)
       }
@@ -247,7 +247,7 @@ value reconstitute_family conf =
           ([c :: parents], ext)
       | None -> ([], ext) ]
   in
-  let comment = 
+  let comment =
     only_printable_or_nl (strip_all_trailing_spaces (get conf "comment"))
   in
   let fsources = only_printable (get conf "src") in
@@ -284,9 +284,9 @@ value strip_array_persons pl =
 value error_family conf base err =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
-    rheader conf title; 
-    Wserver.wprint "%s\n" (capitale err); 
-    Update.print_return conf; 
+    rheader conf title;
+    Wserver.wprint "%s\n" (capitale err);
+    Update.print_return conf;
     trailer conf;
     raise Update.ModErr
   }
@@ -295,16 +295,16 @@ value error_family conf base err =
 value check_witnesses conf base fam =
   let wl = Array.to_list fam.witnesses in
   let rec loop wl =
-    match wl with 
+    match wl with
     [ [] -> None
-    | [(fn, sn, _, _, _) :: l] -> 
-        if fn = "" && sn = "" then 
+    | [(fn, sn, _, _, _) :: l] ->
+        if fn = "" && sn = "" then
           (* Champs non renseigné, il faut passer au suivant *)
           loop l
         else if fn = "" || fn = "?" then
           Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
                 ^ (transl conf "first name missing"))
-        else if sn = "" || sn = "?" then 
+        else if sn = "" || sn = "?" then
           Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
                 ^ (transl conf "surname missing"))
         else loop l ]
@@ -339,7 +339,7 @@ value check_family conf base fam cpl =
 ;
 
 value strip_family fam des =
-  let fam = {(fam) with witnesses = strip_array_persons fam.witnesses} in 
+  let fam = {(fam) with witnesses = strip_array_persons fam.witnesses} in
   let des = {children = strip_array_persons des.children} in
   (fam, des)
 ;
@@ -526,7 +526,7 @@ value effective_mod conf base sfam scpl sdes = do {
   if Adef.father ncpl = Adef.mother ncpl then print_err conf base else ();
   let nfam =
     let origin_file =
-      if sfam.origin_file = "" then 
+      if sfam.origin_file = "" then
         if sou base oorigin <> "" then oorigin
         else infer_origin_file conf base fi ncpl ndes
       else nfam.origin_file
@@ -691,7 +691,7 @@ value effective_inv conf base ip u ifam =
 
 
 (* ************************************************************************ *)
-(*  [Fonc] effective_chg_order : 
+(*  [Fonc] effective_chg_order :
              config -> base -> iper -> person -> ifam -> int -> unit        *)
 (** [Description] : Modifie l'ordre de la famille en positionnant la famille
       ifam à la position n. Exemple : [f1 f2 f3 f4] f1 3 => [f2 f3 f1 f4].
@@ -860,11 +860,11 @@ value print_mod_ok conf base (wl, ml) cpl des =
     if List.length removed_string.val > 0 then
       do {
          Wserver.wprint "<h3 class=\"error\">" ;
-         Wserver.wprint 
-           (fcapitale (ftransl conf "%s forbidden char")) 
-           (List.fold_left 
-              (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") 
-              " " 
+         Wserver.wprint
+           (fcapitale (ftransl conf "%s forbidden char"))
+           (List.fold_left
+              (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
+              " "
               Name.forbidden_char);
          Wserver.wprint "</h3>\n" ;
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
@@ -969,10 +969,10 @@ value print_add o_conf base =
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
     else if forbidden_disconnected conf sfam scpl sdes then
       print_error_disconnected conf
-    else 
+    else
       match check_family conf base sfam scpl with
       [ (Some err, _) | (_, Some err) -> error_family conf base err
-      | (None, None) -> do { 
+      | (None, None) -> do {
           let (sfam, sdes) = strip_family sfam sdes in
           let (ifam, fam, cpl, des) = effective_add conf base sfam scpl sdes in
           let (wl, ml) =
@@ -983,9 +983,9 @@ value print_add o_conf base =
             let (ip, act) =
               match p_getint conf.env "ip" with
               [ Some i ->
-                  if Adef.int_of_iper (Adef.mother cpl) = i then 
+                  if Adef.int_of_iper (Adef.mother cpl) = i then
                     (Adef.mother cpl, "af")
-                  else 
+                  else
                     let a = poi base (Adef.iper_of_int i) in
                     match get_parents a with
                     [ Some x when x = ifam -> (Adef.iper_of_int i, "aa")
@@ -993,15 +993,15 @@ value print_add o_conf base =
               | None -> (Adef.father cpl, "af") ]
             in
             match act with
-            [ "af" -> 
-                let gen_p = 
-                  Util.string_gen_person 
+            [ "af" ->
+                let gen_p =
+                  Util.string_gen_person
                     base (gen_person_of_person (poi base ip))
                 in
                 (U_Add_family gen_p fam, "af")
-            | _ -> 
-                let gen_p = 
-                  Util.string_gen_person 
+            | _ ->
+                let gen_p =
+                  Util.string_gen_person
                     base (gen_person_of_person (poi base ip))
                 in
                 (U_Add_parent gen_p fam, "aa") ]
@@ -1025,16 +1025,16 @@ value print_del conf base =
           effective_del conf base (ifam, fam);
           Util.commit_patches conf base;
           let changed =
-            let gen_p = 
+            let gen_p =
               let p =
                 match p_getint conf.env "ip" with
-                [ Some i when Adef.int_of_iper (get_mother fam) = i -> 
+                [ Some i when Adef.int_of_iper (get_mother fam) = i ->
                     poi base (get_mother fam)
                 | _ -> poi base (get_father fam) ]
               in
               Util.string_gen_person base (gen_person_of_person p)
             in
-            let gen_fam = 
+            let gen_fam =
               Util.string_gen_family base (gen_family_of_family fam)
             in
             U_Delete_family gen_p gen_fam
@@ -1066,7 +1066,7 @@ value print_mod_aux conf base callback =
       else
         match check_family conf base sfam scpl with
         [ (Some err, _) | (_, Some err) -> error_family conf base err
-        | (None, None) -> 
+        | (None, None) ->
             let (sfam, sdes) = strip_family sfam sdes in
             callback sfam scpl sdes ]
     else Update.error_digest conf
@@ -1083,8 +1083,8 @@ value print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string.val := [] in
-  let o_f = 
-    let ifam = 
+  let o_f =
+    let ifam =
       match p_getint o_conf.env "i" with
       [ Some i -> Adef.ifam_of_int i
       | None -> Adef.ifam_of_int (-1) ]
@@ -1107,12 +1107,12 @@ value print_mod o_conf base =
     in
     Util.commit_patches conf base;
     let changed =
-      let ip = 
+      let ip =
         match p_getint o_conf.env "ip" with
         [ Some i -> Adef.iper_of_int i
         | None -> Adef.iper_of_int (-1) ]
       in
-      let p = 
+      let p =
         Util.string_gen_person base (gen_person_of_person (poi base ip))
       in
       let n_f = Util.string_gen_family base fam in
@@ -1134,8 +1134,8 @@ value print_inv conf base =
         do {
           effective_inv conf base (get_key_index p) p (Adef.ifam_of_int ifam);
           Util.commit_patches conf base;
-          let changed = 
-            let gen_p = 
+          let changed =
+            let gen_p =
               Util.string_gen_person base (gen_person_of_person p)
             in
             U_Invert_family gen_p (Adef.ifam_of_int ifam)
@@ -1149,18 +1149,18 @@ value print_inv conf base =
 ;
 
 value print_change_order_ok conf base =
-  match 
-    (p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n") 
+  match
+    (p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n")
   with
   [ (Some ip, Some ifam, Some n) ->
       let p = poi base (Adef.iper_of_int ip) in
       try
         do {
-          effective_chg_order conf base 
+          effective_chg_order conf base
             (get_key_index p) p (Adef.ifam_of_int ifam) n;
           Util.commit_patches conf base;
-          let changed = 
-            let gen_p = 
+          let changed =
+            let gen_p =
               Util.string_gen_person base (gen_person_of_person p)
             in
             U_Invert_family gen_p (Adef.ifam_of_int ifam)

@@ -288,7 +288,7 @@ value ged_adoption base (per_sel, fam_sel) oc per r =
   }
   else ()
 ;
-         
+
 value ged_fam_adop base oc i (fath, moth, child) =
   do {
     fprintf oc "0 @F%d@ FAM\n" i;

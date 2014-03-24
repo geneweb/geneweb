@@ -134,10 +134,10 @@ value reconstitute_relation_parent conf var key sex =
       let (fn, sn) =
         let contain_fn = String.contains fn in
         let contain_sn = String.contains sn in
-        if (List.exists contain_fn Name.forbidden_char) || 
+        if (List.exists contain_fn Name.forbidden_char) ||
            (List.exists contain_sn Name.forbidden_char) then
           do {
-            removed_string.val := 
+            removed_string.val :=
               [(Name.purge fn ^ " " ^ Name.purge sn) :: removed_string.val];
             (Name.purge fn, Name.purge sn)
           }
@@ -203,8 +203,8 @@ value reconstitute_death conf birth baptism death_place burial burial_place =
   | "DontKnowIfDead" when d = None -> DontKnowIfDead
   | "NotDead" -> NotDead
   | "OfCourseDead" when d = None -> OfCourseDead
-  | _ ->   
-      match d with 
+  | _ ->
+      match d with
       [ Some d -> Death dr (Adef.cdate_of_date d)
       | _ -> DeadDontKnowWhen ] ]
 ;
@@ -237,7 +237,7 @@ value reconstitute_person conf =
     if (List.exists contain_fn Name.forbidden_char) ||
        (List.exists contain_sn Name.forbidden_char) then
       do {
-        removed_string.val := 
+        removed_string.val :=
           [(Name.purge first_name ^ " " ^ Name.purge surname) :: removed_string.val];
         (Name.purge first_name, Name.purge surname)
       }
@@ -280,8 +280,8 @@ value reconstitute_person conf =
   let burial_place = no_html_tags (only_printable (get conf "burial_place")) in
   let burial = reconstitute_burial conf burial_place in
   let death_place = no_html_tags (only_printable (get conf "death_place")) in
-  let death = 
-    reconstitute_death conf birth bapt death_place burial burial_place 
+  let death =
+    reconstitute_death conf birth bapt death_place burial burial_place
   in
   let death_place =
     match death with
@@ -306,7 +306,7 @@ value reconstitute_person conf =
      rparents = rparents; occupation = occupation; related = []; sex = sex;
      access = access; birth = Adef.codate_of_od birth;
      birth_place = birth_place;
-     birth_src = only_printable (get conf "birth_src"); 
+     birth_src = only_printable (get conf "birth_src");
      baptism = Adef.codate_of_od bapt; baptism_place = bapt_place;
      baptism_src = only_printable (get conf "bapt_src"); death = death;
      death_place = death_place;
@@ -330,8 +330,8 @@ value check_person conf base p =
 value error_person conf base p err =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
-    rheader conf title; 
-    Wserver.wprint "%s\n" (capitale err); 
+    rheader conf title;
+    Wserver.wprint "%s\n" (capitale err);
     Update.print_return conf;
     trailer conf;
     raise Update.ModErr
@@ -633,11 +633,11 @@ value print_mod_ok conf base wl p =
     if List.length removed_string.val > 0 then
       do {
          Wserver.wprint "<h3 class=\"error\">" ;
-         Wserver.wprint 
-           (fcapitale (ftransl conf "%s forbidden char")) 
-           (List.fold_left 
-              (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ") 
-              " " 
+         Wserver.wprint
+           (fcapitale (ftransl conf "%s forbidden char"))
+           (List.fold_left
+              (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
+              " "
               Name.forbidden_char);
          Wserver.wprint "</h3>\n" ;
          List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
@@ -648,15 +648,15 @@ value print_mod_ok conf base wl p =
     [ [] -> ()
     | _ ->
         do {
-          tag "p" 
+          tag "p"
             begin
               Wserver.wprint "%s, %s %s %s :"
                 (capitale (transl_nth conf "relation/relations" 0))
                 (transl conf "first name missing")
-                (transl conf "or") 
+                (transl conf "or")
                 (transl conf "surname missing") ;
               tag "ul" begin
-                List.iter 
+                List.iter
                   (fun s -> do {stag "li" begin Wserver.wprint "%s" s; end;})
                   deleted_relation.val;
               end;
@@ -844,7 +844,7 @@ value print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string.val := [] in
-  let o_p = 
+  let o_p =
     match p_getint o_conf.env "i" with
     [ Some ip ->
         Util.string_gen_person

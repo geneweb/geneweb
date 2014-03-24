@@ -105,7 +105,7 @@ value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
 value rec eval_var conf base env (fam, cpl, des) loc sl =
-  try eval_special_var conf base (fam, cpl, des) sl with 
+  try eval_special_var conf base (fam, cpl, des) sl with
   [ Not_found -> eval_simple_var conf base env (fam, cpl, des) loc sl ]
 and eval_simple_var conf base env (fam, cpl, des) loc =
   fun
@@ -261,7 +261,7 @@ and eval_parent conf base env k =
       str_val s
   | sl -> eval_key k sl ]
 and eval_key (fn, sn, oc, create, var) =
-  fun 
+  fun
   [ ["create"] -> str_val (if create <> Update.Link then "create" else "link")
   | ["create"; s] -> str_val (eval_create create s)
   | ["first_name"] -> str_val (quote_escaped fn)
@@ -311,7 +311,7 @@ and eval_create c =
       | _ -> "" ]
   | "death_day" ->
       match c with
-      [ Update.Create _ 
+      [ Update.Create _
           (Some {ci_death_date = Some (Dgreg dmy Dfrench)})
         ->
           let dmy = Calendar.french_of_gregorian dmy in
@@ -350,7 +350,7 @@ and eval_create c =
       | _ -> "" ]
   | "occupation" ->
       match c with
-      [ Update.Create _ (Some {ci_occupation = occupation}) -> 
+      [ Update.Create _ (Some {ci_occupation = occupation}) ->
           quote_escaped occupation
       | _ -> "" ]
   | "sex" ->
@@ -376,7 +376,7 @@ and eval_relation_kind =
   | NoSexesCheckMarried -> "nsckm"
   | NoMention -> "no_ment" ]
 and eval_special_var conf base p =
-  fun 
+  fun
   [ ["include_perso_header"] ->
       match p_getint conf.env "ip" with
       [ Some i -> do {
@@ -446,7 +446,7 @@ value print_del1 conf base ifam =
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
   do {
-    let p = 
+    let p =
       match p_getint conf.env "ip" with
       [ Some ip -> poi base (Adef.iper_of_int ip)
       | None -> Gwdb.empty_person base (Adef.iper_of_int (-1)) ]
@@ -622,8 +622,8 @@ value change_order conf base ip u ifam n =
 ;
 
 value print_change_order conf base =
-  match 
-    (p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n") 
+  match
+    (p_getint conf.env "i", p_getint conf.env "f", p_getint conf.env "n")
   with
   [ (Some ip, Some ifam, Some n) -> do {
       let p = poi base (Adef.iper_of_int ip) in
@@ -639,7 +639,7 @@ value print_change_order conf base =
                Wserver.wprint "%s%s" (p_first_name base p)
                  (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
                Wserver.wprint "  &amp;";
-               Wserver.wprint "%s\n" 
+               Wserver.wprint "%s\n"
                  (Date.short_marriage_date_text conf base fam p sp);
                Wserver.wprint "%s%s %s" (p_first_name base sp)
                  (if get_occ sp = 0 then "" else "." ^ string_of_int (get_occ sp))
@@ -648,7 +648,7 @@ value print_change_order conf base =
              end)
           arr
       in
-      let after = 
+      let after =
         change_order conf base (get_key_index p) p (Adef.ifam_of_int ifam) n
       in
       let (before, after) = (get_family p, Array.of_list after) in

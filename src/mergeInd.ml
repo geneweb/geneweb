@@ -742,8 +742,8 @@ value print_kill_ancestors conf base =
           do {
             kill_ancestors conf base False p nb_ind nb_fam;
             Util.commit_patches conf base;
-            let changed = 
-              U_Kill_ancestors 
+            let changed =
+              U_Kill_ancestors
                 (Util.string_gen_person base (gen_person_of_person p))
             in
             History.record conf base changed "ka";

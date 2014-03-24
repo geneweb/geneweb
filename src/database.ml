@@ -389,7 +389,7 @@ value persons_of_name bname patches =
     let i = Hashtbl.hash s in
     let ai =
       let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
-      let ai =        
+      let ai =
         let i = i mod table_size in
         let fname_inx_acc = Filename.concat bname "names.acc" in
         if Sys.file_exists fname_inx_acc then
@@ -415,7 +415,7 @@ value persons_of_name bname patches =
           in
           a.(i)
       in
-      do { close_in ic_inx; ai }          
+      do { close_in ic_inx; ai }
     in
     try
       let l = Hashtbl.find patches i in
@@ -659,7 +659,7 @@ value array_ext phony fa =
       IFDEF UNIX THEN
         if verbose.val then do {
           Printf.eprintf
-            "*** extending records from size %d to size %d\n" 
+            "*** extending records from size %d to size %d\n"
             rlen alen;
           flush stderr;
         }

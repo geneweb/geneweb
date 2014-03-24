@@ -32,7 +32,7 @@ value print_base_error oc base =
 value print_base_warning oc base =
   fun
   [ BigAgeBetweenSpouses fath moth a ->
-      fprintf oc "The difference of age between %s and %s is quite important: %d\n" 
+      fprintf oc "The difference of age between %s and %s is quite important: %d\n"
         (designation base fath) (designation base moth) a.year
   | BirthAfterDeath p ->
       fprintf oc "%s\n  born after his/her death\n" (designation base p)
@@ -62,7 +62,7 @@ value print_base_warning oc base =
       fprintf oc "- %s\n" (designation base x)
     }
   | DeadOld p a ->
-      fprintf oc "%s died at the advanced age of %d years old\n" 
+      fprintf oc "%s died at the advanced age of %d years old\n"
         (designation base p) a.year
   | DeadTooEarlyToBeFather father child -> do {
       fprintf oc "%s\n" (designation base child);
@@ -124,7 +124,7 @@ value print_base_warning oc base =
     }
   | YoungForMarriage p a ->
       fprintf oc "%s married at age %d\n" (designation base p) a.year ]
-;      
+;
 
 type stats =
   { men : mutable int;

@@ -59,7 +59,7 @@ value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
 value rec eval_var conf base env p loc sl =
-  try eval_special_var conf base p sl with 
+  try eval_special_var conf base p sl with
   [ Not_found -> eval_simple_var conf base env p loc sl ]
 and eval_simple_var conf base env p loc =
   fun
@@ -288,7 +288,7 @@ and eval_title_var conf base env t =
       | _ -> str_val "" ]
   | _ -> raise Not_found ]
 and eval_relation_var conf base env r =
-  fun 
+  fun
   [ ["r_father" :: sl] ->
       let x =
         match r with
@@ -342,7 +342,7 @@ and eval_is_relation_type rt =
   | Some {r_type = x} -> bool_val (x = rt)
   | _ -> bool_val False ]
 and eval_special_var conf base p =
-  fun 
+  fun
   [ ["include_perso_header"] ->
       match p_getint conf.env "i" with
       [ Some i -> do {

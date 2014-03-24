@@ -39,25 +39,25 @@ value history_d conf =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
   in
-  List.fold_left 
+  List.fold_left
     Filename.concat "" [path; (Util.base_path [] bname); "history_d"]
 ;
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
 value history_path conf fname =
   if String.length fname >= 6 then
-    let dirs = 
-      [history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1]] 
+    let dirs =
+      [history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1]]
     in
     List.fold_right Filename.concat dirs fname
   else Filename.concat (history_d conf) fname
 ;
 
 (* Créé tous les dossiers intermédiaires. *)
-value create_history_dirs conf fname = 
+value create_history_dirs conf fname =
   if String.length fname >= 6 then
-    let dirs = 
-      [history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1]] 
+    let dirs =
+      [history_d conf; String.make 1 fname.[0]; String.make 1 fname.[1]]
     in
     Mutil.mkdir_p (List.fold_left Filename.concat "" dirs)
   else ()
@@ -76,11 +76,11 @@ value create_history_dirs conf fname =
 value write_history_file conf person_file fname gr =
   (* On créé toujours les dossiers nécessaires (changement de clé ...). *)
   let () = create_history_dirs conf person_file in
-  let ext_flags = 
+  let ext_flags =
     [Open_wronly; Open_append; Open_creat; Open_binary; Open_nonblock]
   in
-  match 
-    try Some (Secure.open_out_gen ext_flags 0o644 fname) 
+  match
+    try Some (Secure.open_out_gen ext_flags 0o644 fname)
     with [ Sys_error _ -> None ]
   with
   [ Some oc -> do { output_value oc (gr : gen_record); close_out oc }
@@ -89,29 +89,29 @@ value write_history_file conf person_file fname gr =
 
 
 (* ************************************************************************ *)
-(*  [Fonc] make_gen_record : 
+(*  [Fonc] make_gen_record :
              config -> base -> bool -> gen_person -> gen_record             *)
 (** [Description] : Crée un gen_record à partir d'une personne.
     [Args] :
       - conf : configuratino de la base
       - base : base de donnée
-      - first : booléen pour savoir si c'est la première entrée de 
+      - first : booléen pour savoir si c'est la première entrée de
                 l'historique. Si c'est le cas, on ne connait pas la date de
                 modification, donc on met "environ" une seconde avant.
       - gen_p : gen_person
-    [Retour] : 
+    [Retour] :
       - gen_record
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 value make_gen_record conf base first gen_p =
   let (hh, mm, ss) = conf.time in
-  let (hh, mm, ss) = 
+  let (hh, mm, ss) =
     (* On évite les calculs savant pour la date (ss - 1 avec une date *)
     (* autour de minuit ...). C'est simplement une indication.        *)
-    if first then (hh, mm, min 0 ss) else (hh, mm, ss) 
+    if first then (hh, mm, min 0 ss) else (hh, mm, ss)
   in
   let date =
-    Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" 
+    Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d"
       conf.today.year conf.today.month conf.today.day hh mm ss
   in
   let p = poi base gen_p.key_index in
@@ -124,11 +124,11 @@ value make_gen_record conf base first gen_p =
         let fam = foi base ifam in
         let children = get_children fam in
         let gen_f = gen_family_of_family fam in
-        ([Util.string_gen_family base gen_f :: accu_fam], 
+        ([Util.string_gen_family base gen_f :: accu_fam],
          [children :: accu_child]))
       (Array.to_list fam) ([], [])
   in
-  { date = date; wizard = conf.user; gen_p = gen_p; 
+  { date = date; wizard = conf.user; gen_p = gen_p;
     gen_f = gen_f; gen_c = gen_c }
 ;
 
@@ -192,8 +192,8 @@ value record_diff conf base changed =
           let cpl = foi base f.fam_index in
           let isp = Gutil.spouse p.key_index cpl in
           let sp = poi base isp in
-          let sp_file = 
-            history_file 
+          let sp_file =
+            history_file
               (sou base (get_first_name sp))
               (sou base (get_surname sp))
               (get_occ sp)
@@ -207,37 +207,37 @@ value record_diff conf base changed =
             let gr = make_gen_record conf base False gen_sp in
             write_history_file conf sp_file sp_fname gr;
             (* Création des fichiers pour les enfants ajoutés. *)
-            List.iter 
+            List.iter
               (fun ip ->
                 let p = poi base ip in
-                let person_file = 
-                  history_file 
-                    (sou base (get_first_name p)) 
-                    (sou base (get_surname p)) 
+                let person_file =
+                  history_file
+                    (sou base (get_first_name p))
+                    (sou base (get_surname p))
                     (get_occ p)
                 in
                 let fname = history_path conf person_file in
                 if Sys.file_exists fname then ()
-                else 
+                else
                   let gen_p = gen_person_of_person p in
                   let gen_p = Util.string_gen_person base gen_p in
                   let gr = make_gen_record conf base False gen_p in
                   write_history_file conf person_file fname gr)
               (Array.to_list (get_children cpl))
           }
-      | U_Change_children_name _ list -> 
+      | U_Change_children_name _ list ->
           List.iter
             (fun ((ofn, osn, oocc, oip), (fn, sn, occ, ip)) ->
                let o_person_file = history_file ofn osn oocc in
                let person_file = history_file fn sn occ in
-               if o_person_file <> person_file then 
+               if o_person_file <> person_file then
                  do {
                    let ofname = history_path conf o_person_file in
                    let fname = history_path conf person_file in
                    try Sys.rename ofname fname with [ Sys_error _ -> () ];
                    let p = poi base ip in
-                   let p = 
-                     Futil.map_person_ps 
+                   let p =
+                     Futil.map_person_ps
                        (fun p -> p) (sou base) (gen_person_of_person p)
                    in
                    let gr = make_gen_record conf base False p in
@@ -259,7 +259,7 @@ value record_diff conf base changed =
 (*
   let history = ref [] in
   let fname = history_path conf fname in
-  if extract_zfile fname then 
+  if extract_zfile fname then
     do {
       read_history_file fname
       Sys.remove fname
@@ -271,7 +271,7 @@ value record_diff conf base changed =
 (* ************************************************************************ *)
 (*  [Fonc] load_person_history : config -> string -> gen_record list        *)
 (** [Description] : Charge la liste des modifications pour une personne.
-      L'avantage est que les versions les plus récentes se trouvent en 
+      L'avantage est que les versions les plus récentes se trouvent en
       tête de liste.
     [Args] :
       - conf  : configuration de la base
@@ -286,7 +286,7 @@ value load_person_history conf fname = do {
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do {
-        try 
+        try
           while True do {
             let v : gen_record = input_value ic in
             history.val := [v :: history.val]
@@ -301,7 +301,7 @@ value load_person_history conf fname = do {
 
 (* ************************************************************************ *)
 (*  [Fonc] print_clean : config -> base -> unit                             *)
-(** [Description] : 
+(** [Description] :
     [Args] :
       - conf : configuration de la base
       - base : base de donnée
@@ -312,14 +312,14 @@ value print_clean conf base =
   match p_getenv conf.env "f" with
   [ Some f when f <> "" ->
       do {
-        let title _ = 
-          Wserver.wprint "%s" (capitale (transl conf "clean history")) 
+        let title _ =
+          Wserver.wprint "%s" (capitale (transl conf "clean history"))
         in
         Hutil.header conf title;
         Hutil.print_link_to_welcome conf True;
-        Util.gen_print_tips conf 
-          (capitale 
-             (transl conf 
+        Util.gen_print_tips conf
+          (capitale
+             (transl conf
                 "select the input you want to erase from the history"));
         let history = load_person_history conf f in
         tag "form" "method=\"post\" action=\"%s\"" conf.command begin
@@ -351,7 +351,7 @@ value print_clean conf base =
 (*
   let history = clean_history in
   let fname = history_path conf fname in
-  if compress_zfile fname then 
+  if compress_zfile fname then
     do {
       write_history_file fname history;
       Sys.remove fname
@@ -369,38 +369,38 @@ value print_clean conf base =
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-value print_clean_ok conf base = 
+value print_clean_ok conf base =
   let rec clean_history i history new_history =
     match history with
     [ [] -> new_history
     | [gr :: l] ->
         let lab = "i" ^ string_of_int i in
-        if p_getenv conf.env lab = Some "on" then 
+        if p_getenv conf.env lab = Some "on" then
           clean_history (i + 1) l new_history
         else clean_history (i + 1) l [gr :: new_history] ]
   in
   match p_getenv conf.env "f" with
   [ Some f when f <> "" ->
       do {
-        let title _ = 
-          Wserver.wprint "%s" (capitale (transl conf "history cleaned")) 
+        let title _ =
+          Wserver.wprint "%s" (capitale (transl conf "history cleaned"))
         in
         Hutil.header conf title;
         Hutil.print_link_to_welcome conf True;
         let history = load_person_history conf f in
         let new_history = clean_history 0 history [] in
         let fname = history_path conf f in
-        if new_history = [] then 
+        if new_history = [] then
           try Sys.remove fname with [ Sys_error _ -> () ]
         else
-          let ext_flags = 
+          let ext_flags =
             [Open_wronly; Open_trunc; Open_creat; Open_binary; Open_nonblock]
           in
-          match 
-            try Some (Secure.open_out_gen ext_flags 0o644 fname) 
+          match
+            try Some (Secure.open_out_gen ext_flags 0o644 fname)
             with [ Sys_error _ -> None ]
           with
-          [ Some oc -> do { 
+          [ Some oc -> do {
               List.iter (fun v -> output_value oc (v : gen_record)) new_history;
               close_out oc }
           | None -> () ];
@@ -433,7 +433,7 @@ value person_of_iper conf base ip =
 value person_of_iper_list conf base ipl =
   let list =
     List.fold_right
-      (fun ip accu -> 
+      (fun ip accu ->
         let p = person_of_iper conf base ip in
         if p = "" then accu
         else [p :: accu])
@@ -470,23 +470,23 @@ value string_of_title conf titles =
   let one_title t =
     let name = t.t_ident ^ " " ^ t.t_place in
     let name = if name = " " then "" else name in
-    let dates = 
-      string_of_codate conf t.t_date_start ^ "-" ^ 
-        string_of_codate conf t.t_date_end 
+    let dates =
+      string_of_codate conf t.t_date_start ^ "-" ^
+        string_of_codate conf t.t_date_end
     in
     let dates = if dates = "-" then "" else "(" ^ dates ^ ")" in
     let nth = if t.t_nth = 0 then "" else string_of_int t.t_nth in
     let nth =
-      if string_of_t_name t = "" then nth 
+      if string_of_t_name t = "" then nth
       else string_of_t_name t ^ " " ^ string_of_int t.t_nth
     in
     let nth = if nth = "" || nth = " " then "" else "[" ^ nth ^ "]" in
-    name ^ (if name = "" then "" else " ") ^ nth ^ 
+    name ^ (if name = "" then "" else " ") ^ nth ^
       (if nth = "" then "" else " ") ^ dates
   in
   List.fold_left
-    (fun accu t -> 
-      if accu = "" then one_title t 
+    (fun accu t ->
+      if accu = "" then one_title t
       else accu ^ ", " ^ one_title t)
     "" titles
 ;
@@ -497,7 +497,7 @@ value string_of_related conf base ip related =
       (fun ic accu ->
         let p = person_of_iper conf base ip in
         if p = "" then accu
-        else 
+        else
           (* Si l'enfant n'existe plus. *)
           let c = try pget conf base ic with _ -> Gwdb.empty_person base ic in
           let rel =
@@ -505,7 +505,7 @@ value string_of_related conf base ip related =
               match rp with
               [ [r :: l] ->
                   match r.r_fath with
-                  [ Some ifath when ifath = ip -> 
+                  [ Some ifath when ifath = ip ->
                       Util.rchild_type_text conf r.r_type 2
                   | _ -> loop l ]
               | [] -> "" ]
@@ -519,7 +519,7 @@ value string_of_related conf base ip related =
 value string_of_rparents conf base rparents =
   let rparents =
     List.fold_right
-      (fun rp accu -> 
+      (fun rp accu ->
         match (rp.r_fath, rp.r_moth) with
         [ (Some ip1, Some ip2) ->
             let rel = capitale (Util.relation_type_text conf rp.r_type 2) in
@@ -533,13 +533,13 @@ value string_of_rparents conf base rparents =
         | (Some ip, None) ->
             let p = person_of_iper conf base ip in
             if p = "" then accu
-            else 
+            else
               let rel = capitale (Util.relation_type_text conf rp.r_type 2) in
               [rel ^ ": " ^ p :: accu]
-        | (None, Some ip) -> 
+        | (None, Some ip) ->
             let p = person_of_iper conf base ip in
             if p = "" then accu
-            else 
+            else
               let rel = capitale (Util.relation_type_text conf rp.r_type 2) in
               [rel ^ ": " ^ p :: accu]
         | (None, None) -> accu ])
@@ -570,7 +570,7 @@ value string_of_divorce conf divorce =
       faire un diff.
     [Args] :
       - s : string à convertir
-    [Retour] : 
+    [Retour] :
       - char array
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
@@ -593,7 +593,7 @@ value array_of_string s =
     [Args] :
       - arr : tableau à convertir
       - diff_arr : tableau des différences
-    [Retour] : 
+    [Retour] :
       - string
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
@@ -610,8 +610,8 @@ value highlight_diff arr diff_arr =
       };
       accu.val := accu.val ^ "</span>";
       loop j.val accu.val
-    }      
-    else 
+    }
+    else
       loop (i + 1) (s ^ Printf.sprintf "%c" arr.(i))
 ;
 
@@ -623,15 +623,15 @@ value highlight_diff arr diff_arr =
     [Args] :
       - before : string avant modification
       - after  : string après modification
-    [Retour] : 
+    [Retour] :
       - string * string
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 value diff_string before after =
   if before = after then (before, after)
-  else if before = "" then 
+  else if before = "" then
     (before, "<span class=\"diff_highlight\">" ^ after ^ "</span>")
-  else if after = "" then 
+  else if after = "" then
     ("<span class=\"diff_highlight\">" ^ before ^ "</span>", after)
   else
     let aa = array_of_string after in
@@ -672,13 +672,13 @@ and eval_compound_var conf base env (bef, aft, p_auth) sl =
   let rec loop =
     fun
     [ [s] -> eval_simple_str_var conf base env (bef, aft, p_auth) s
-    | ["evar"; s] -> 
+    | ["evar"; s] ->
         match p_getenv conf.env s with
         [ Some s -> s
         | None -> "" ]
-    | ["before" :: sl] -> 
+    | ["before" :: sl] ->
         fst (eval_gen_record conf base env (bef, aft, p_auth) sl)
-    | ["after" :: sl] -> 
+    | ["after" :: sl] ->
         snd (eval_gen_record conf base env (bef, aft, p_auth) sl)
     | _ -> raise Not_found ]
   in
@@ -690,7 +690,7 @@ and eval_gen_record conf base env (bef, aft, p_auth) =
   | [s] -> eval_str_gen_record conf base env (bef, aft, p_auth) s
   | _ -> raise Not_found ]
 and eval_str_gen_record conf base env (bef, aft, p_auth) =
-  fun 
+  fun
   [ "first_name" ->
       if p_auth then
         let b = bef.gen_p.first_name in
@@ -709,7 +709,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
         let a = string_of_int aft.gen_p.occ in
         diff_string b a
       else ("", "")
-  | "image" -> 
+  | "image" ->
       if p_auth && not conf.no_image then
         let b = bef.gen_p.image in
         let a = aft.gen_p.image in
@@ -745,19 +745,19 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
         let a = String.concat ", " aft.gen_p.surnames_aliases in
         diff_string b a
       else ("", "")
-  | "titles" -> 
+  | "titles" ->
       if p_auth then
         let b = string_of_title conf bef.gen_p.titles in
         let a = string_of_title conf aft.gen_p.titles in
         diff_string b a
       else ("", "")
-  | "relations" -> 
+  | "relations" ->
       if p_auth then
-        let br = 
-          string_of_related conf base bef.gen_p.key_index bef.gen_p.related 
+        let br =
+          string_of_related conf base bef.gen_p.key_index bef.gen_p.related
         in
-        let ar = 
-          string_of_related conf base aft.gen_p.key_index aft.gen_p.related 
+        let ar =
+          string_of_related conf base aft.gen_p.key_index aft.gen_p.related
         in
         let brp = string_of_rparents conf base bef.gen_p.rparents in
         let arp = string_of_rparents conf base aft.gen_p.rparents in
@@ -771,21 +771,21 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
         let a = aft.gen_p.occupation in
         diff_string b a
       else ("", "")
-  | "sex" -> 
+  | "sex" ->
       if p_auth then
-        let b = 
-          transl_nth 
+        let b =
+          transl_nth
             conf "male/female/neuter" (Util.index_of_sex bef.gen_p.sex)
         in
         let a =
-          transl_nth 
+          transl_nth
             conf "male/female/neuter" (Util.index_of_sex aft.gen_p.sex)
         in
         diff_string b a
       else ("", "")
   | "access" ->
       if p_auth then
-        let b = 
+        let b =
           match bef.gen_p.access with
           [ IfTitles -> transl_nth conf "iftitles/public/private" 0
           | Public -> transl_nth conf "iftitles/public/private" 1
@@ -886,8 +886,8 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
   | "spouse" ->
       match get_env "fam" env with
       [ Vfam f_bef f_aft m_auth ->
-          if m_auth then 
-            (eval_string_env "spouse_bef" env, 
+          if m_auth then
+            (eval_string_env "spouse_bef" env,
              eval_string_env "spouse_aft" env)
           else ("", "")
       | _ -> raise Not_found ]
@@ -896,7 +896,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = string_of_codate conf b.marriage in
                 let a = string_of_codate conf a.marriage in
                 diff_string b a
@@ -910,7 +910,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = b.marriage_place in
                 let a = a.marriage_place in
                 diff_string b a
@@ -924,7 +924,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = b.marriage_src in
                 let a = a.marriage_src in
                 diff_string b a
@@ -938,27 +938,27 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
-                let b = 
-                  person_of_iper_list conf base (Array.to_list b.witnesses) 
+            [ (Some b, Some a) ->
+                let b =
+                  person_of_iper_list conf base (Array.to_list b.witnesses)
                 in
-                let a = 
-                  person_of_iper_list conf base (Array.to_list a.witnesses) 
+                let a =
+                  person_of_iper_list conf base (Array.to_list a.witnesses)
                 in
                 diff_string b a
-            | (None, Some a) -> 
+            | (None, Some a) ->
                 ("", person_of_iper_list conf base (Array.to_list a.witnesses))
-            | (Some b, None) -> 
+            | (Some b, None) ->
                 (person_of_iper_list conf base (Array.to_list b.witnesses), "")
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
-  | "marriage_type" -> 
+  | "marriage_type" ->
       match get_env "fam" env with
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = string_of_marriage conf b.relation in
                 let a = string_of_marriage conf a.relation in
                 diff_string b a
@@ -972,7 +972,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = string_of_divorce conf b.divorce in
                 let a = string_of_divorce conf a.divorce in
                 diff_string b a
@@ -986,7 +986,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth && not conf.no_note then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = b.comment in
                 let a = a.comment in
                 diff_string b a
@@ -1000,7 +1000,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = b.origin_file in
                 let a = a.origin_file in
                 diff_string b a
@@ -1014,7 +1014,7 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       [ Vfam bef aft m_auth ->
           if m_auth then
             match (bef, aft) with
-            [ (Some b, Some a) -> 
+            [ (Some b, Some a) ->
                 let b = b.fsources in
                 let a = a.fsources in
                 diff_string b a
@@ -1030,13 +1030,13 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
             match get_env "child" env with
             [ Vchild bef aft ->
                 match (bef, aft) with
-                [ (Some b, Some a) -> 
+                [ (Some b, Some a) ->
                     let b = person_of_iper_list conf base (Array.to_list b) in
                     let a = person_of_iper_list conf base (Array.to_list a) in
                     diff_string b a
-                | (None, Some a) -> 
+                | (None, Some a) ->
                     ("", person_of_iper_list conf base (Array.to_list a))
-                | (Some b, None) -> 
+                | (Some b, None) ->
                     (person_of_iper_list conf base (Array.to_list b), "")
                 | (None, None) -> ("", "") ]
             | _ -> raise Not_found ]
@@ -1051,11 +1051,11 @@ and eval_simple_str_var conf base env (bef, aft, p_auth) =
   | "date" -> eval_string_env "date" env
   | "history_len" -> eval_int_env "history_len" env
   | "line" -> eval_int_env "line" env
-  | "nb_families" -> 
+  | "nb_families" ->
       let nb_fam = max (List.length bef.gen_f) (List.length aft.gen_f) in
       string_of_int nb_fam
   | "person" ->
-      if p_auth then 
+      if p_auth then
         let p = person_of_gen_p_key base aft.gen_p in
         Util.person_text conf base p
       else eval_string_env "history_file" env
@@ -1071,7 +1071,7 @@ and eval_int_env s env =
   | _ -> raise Not_found ]
 ;
 
-value print_foreach conf base print_ast eval_expr = 
+value print_foreach conf base print_ast eval_expr =
   let rec print_foreach env xx loc s sl el al =
     match [s :: sl] with
     [ ["family"] -> print_foreach_family env xx el al
@@ -1089,14 +1089,14 @@ value print_foreach conf base print_ast eval_expr =
             let sp = person_of_iper conf base isp in
             let m_auth = authorized_age conf base (poi base isp) && p_auth in
             let vfam = Vfam None (Some gen_f) m_auth in
-            let (vchild, c) = 
+            let (vchild, c) =
               match (bef_c, aft_c) with
               [ ([], [gen_c :: l]) -> (Vchild None (Some gen_c), l)
               | _ -> (* pas normal*) (Vchild None None, []) ]
             in
-            let env = 
-              [("fam", vfam); ("spouse_bef", Vstring ""); 
-               ("spouse_aft", Vstring sp); ("child", vchild) :: env] 
+            let env =
+              [("fam", vfam); ("spouse_bef", Vstring "");
+               ("spouse_aft", Vstring sp); ("child", vchild) :: env]
             in
             List.iter (print_ast env xx) al;
             loop [] bef_c l c
@@ -1108,14 +1108,14 @@ value print_foreach conf base print_ast eval_expr =
             let sp = person_of_iper conf base isp in
             let m_auth = authorized_age conf base (poi base isp) && p_auth in
             let vfam = Vfam (Some gen_f) None m_auth in
-            let (vchild, c) = 
+            let (vchild, c) =
               match (bef_c, aft_c) with
               [ ([gen_c :: l], []) -> (Vchild (Some gen_c) None, l)
               | _ -> (* pas normal*) (Vchild None None, []) ]
             in
-            let env = 
-              [("fam", vfam); ("spouse_bef", Vstring sp); 
-               ("spouse_aft", Vstring ""); ("child", vchild) :: env] 
+            let env =
+              [("fam", vfam); ("spouse_bef", Vstring sp);
+               ("spouse_aft", Vstring ""); ("child", vchild) :: env]
             in
             List.iter (print_ast env xx) al;
             loop l c [] aft_c
@@ -1129,15 +1129,15 @@ value print_foreach conf base print_ast eval_expr =
             let sp2 = person_of_iper conf base isp2 in
             let m_auth = authorized_age conf base (poi base isp2) && p_auth in
             let vfam = Vfam (Some gen_f1) (Some gen_f2) m_auth in
-            let (vchild, c1, c2) = 
+            let (vchild, c1, c2) =
               match (bef_c, aft_c) with
-              [ ([gen_c1 :: l1], [gen_c2 :: l2]) -> 
+              [ ([gen_c1 :: l1], [gen_c2 :: l2]) ->
                   (Vchild (Some gen_c1) (Some gen_c2), l1, l2)
               | _ -> (* pas normal*) (Vchild None None, [], []) ]
             in
-            let env = 
+            let env =
               [("fam", vfam); ("spouse_bef", Vstring sp1);
-               ("spouse_aft", Vstring sp2); ("child", vchild) :: env] 
+               ("spouse_aft", Vstring sp2); ("child", vchild) :: env]
             in
             List.iter (print_ast env xx) al;
             loop l1 c1 l2 c2
@@ -1146,14 +1146,14 @@ value print_foreach conf base print_ast eval_expr =
     loop bef.gen_f bef.gen_c aft.gen_f aft.gen_c
   and print_foreach_history_line env xx el al =
     match get_env "history_file" env with
-    [ Vstring fname -> 
+    [ Vstring fname ->
         let history = load_person_history conf fname in
         loop 0 history where rec loop i list =
           match list with
           [ [] -> ()
           | [gr :: l] ->
-              let env = 
-                [("line", Vint i); ("date", Vstring gr.date); 
+              let env =
+                [("line", Vint i); ("date", Vstring gr.date);
                  ("wizard", Vstring gr.wizard) :: env]
               in
               do { List.iter (print_ast env xx) al; loop (i + 1) l } ]
@@ -1165,14 +1165,14 @@ value print_foreach conf base print_ast eval_expr =
 value eval_predefined_apply conf env f vl =
   let vl = List.map (fun [ VVstring s -> s | _ -> raise Not_found ]) vl in
   match (f, vl) with
-  [ ("transl_date", [date_txt]) -> 
+  [ ("transl_date", [date_txt]) ->
       (* date_tpl = "0000-00-00 00:00:00" *)
-      try 
+      try
         let year = int_of_string (String.sub date_txt 0 4) in
         let month = int_of_string (String.sub date_txt 5 2) in
         let day = int_of_string (String.sub date_txt 8 2) in
-        let date = 
-          Dgreg 
+        let date =
+          Dgreg
             {day = day; month = month; year = year; prec = Sure; delta = 0}
             Dgregorian
         in
@@ -1191,11 +1191,11 @@ value print conf base =
           let len = List.length history in
           let (before, after) =
             match (p_getint conf.env "old", p_getint conf.env "new") with
-            [ (Some o, Some n) -> 
-                let o = 
+            [ (Some o, Some n) ->
+                let o =
                   if o < 0 then 0 else if o > len - 1 then len - 1 else o
                 in
-                let n = 
+                let n =
                   if n < 0 then 0 else if n > len - 1 then len - 1 else n
                 in
                 (o, n)
@@ -1205,8 +1205,8 @@ value print conf base =
           let after = List.nth history after in
           let p = person_of_gen_p_key base after.gen_p in
           let p_auth = authorized_age conf base p in
-          let env = 
-            [("history_file", Vstring file); ("history_len", Vint len)] 
+          let env =
+            [("history_file", Vstring file); ("history_len", Vint len)]
           in
           Hutil.interp conf base "updhist_diff"
             {Templ.eval_var = eval_var conf base;

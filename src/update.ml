@@ -78,13 +78,13 @@ value print_same_name conf base p =
                [ Some p -> do {
                    print_person p;
                    let ifam = get_family p in
-                   List.iter 
+                   List.iter
                      (fun ifam -> do {
                        let fam = foi base ifam in
                        let sp = spouse (get_key_index p) fam in
                        let sp = poi base sp in
                        Wserver.wprint ", &amp; ";
-                       print_person sp } ) 
+                       print_person sp } )
                      (Array.to_list ifam);
                    Wserver.wprint "\n"
                  }
@@ -103,7 +103,7 @@ value print_return conf =
            (* Seul un textarea peut contenir des sauts de ligne. *)
            (* On remplace donc l'input par un textarea.          *)
            if x = "notes" || x = "comment" then
-             tag "textarea" "style=\"display:none;\" name=\"%s\"" x 
+             tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                begin
                  Wserver.wprint "%s" (quote_escaped (decode_varenv v));
                end
@@ -230,8 +230,8 @@ value print_warning conf base =
   [ BigAgeBetweenSpouses fath moth a ->
       do {
         Wserver.wprint
-          (fcapitale 
-             (ftransl conf 
+          (fcapitale
+             (ftransl conf
                 "the difference of age between %t and %t is quite important"))
           (fun _ -> print_someone_strong conf base fath)
           (fun _ -> print_someone_strong conf base moth);
@@ -321,7 +321,7 @@ value print_warning conf base =
              begin
                print_first_name conf base p;
                Wserver.wprint "  &amp;";
-               Wserver.wprint "%s\n" 
+               Wserver.wprint "%s\n"
                  (Date.short_marriage_date_text conf base fam p sp);
                print_someone conf base sp;
                Wserver.wprint "\n";
@@ -370,7 +370,7 @@ value print_warning conf base =
   | DeadOld p a ->
       do {
         Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
-          (transl_nth 
+          (transl_nth
              conf "died at an advanced age" (index_of_sex (get_sex p)));
         Wserver.wprint "(%s)" (Date.string_of_age conf a);
       }
@@ -450,7 +450,7 @@ value print_warning conf base =
         (fun _ -> print_someone_strong conf base p)
   | WitnessDateAfterDeath p ->
       Wserver.wprint
-        (fcapitale (ftransl conf "%t was witness after his/her death")) 
+        (fcapitale (ftransl conf "%t was witness after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
@@ -497,8 +497,8 @@ value print_warnings conf base wl =
 (* ************************************************************************* *)
 value print_misc conf base =
   fun
-  [ MissingSources -> 
-      stag "em" begin 
+  [ MissingSources ->
+      stag "em" begin
         Wserver.wprint "%s\n" (capitale (transl conf "missing sources"));
       end ]
 ;
@@ -521,7 +521,7 @@ value print_miscs conf base ml =
     Wserver.wprint "%s\n" (capitale (transl conf "miscellaneous informations"));
     tag "ul" begin
       List.iter
-        (fun m -> 
+        (fun m ->
           do {
             html_li conf; print_misc conf base m; Wserver.wprint "\n"
           })
@@ -532,7 +532,7 @@ value print_miscs conf base ml =
 
 
 (* ************************************************************************* *)
-(*  [Fonc] print_miscs : 
+(*  [Fonc] print_miscs :
       config -> base -> (Def.warning list * Def.misc list) -> unit           *)
 (** [Description] : Affiche sous la même rubrique, la liste des warnings
                     et la liste des 'informations diverses'.
@@ -557,7 +557,7 @@ value print_warnings_and_miscs conf base (wl, ml) =
            })
         wl;
       List.iter
-        (fun m -> 
+        (fun m ->
           do {
             html_li conf; print_misc conf base m; Wserver.wprint "\n"
           })
@@ -599,7 +599,7 @@ value error_locked conf =
                    (* Seul un textarea peut contenir des sauts de ligne. *)
                    (* On remplace donc l'input par un textarea.          *)
                    if x = "notes" then
-                     tag "textarea" "style=\"display:none;\" name=\"%s\"" x 
+                     tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                        begin
                          Wserver.wprint "%s" (quote_escaped (decode_varenv v));
                        end
@@ -835,7 +835,7 @@ value print_create_conflict conf base p var =
            (* Seul un textarea peut contenir des sauts de ligne. *)
            (* On remplace donc l'input par un textarea.          *)
            if x = "notes" then
-             tag "textarea" "style=\"display:none;\" name=\"%s\"" x 
+             tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                begin
                  Wserver.wprint "%s" (quote_escaped (decode_varenv v));
                end
@@ -928,7 +928,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                 (dead, dpl)
             | _ -> (infer_death conf birth baptism, "") ]
           in
-          let occupation = 
+          let occupation =
             match info with
             [ Some { ci_occupation = occupation } -> occupation
             | _ -> "" ]
@@ -1007,7 +1007,7 @@ value rec update_conf_env field p occ o_env n_env =
         update_conf_env field p occ rest n_env
       else update_conf_env field p occ rest [head :: n_env] ]
 ;
-  
+
 value update_conf_create conf =
   let field =
     match p_getenv conf.env "field" with

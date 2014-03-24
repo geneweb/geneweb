@@ -9,7 +9,7 @@ open Gwdb;
 open Mutil;
 open Printf;
 
-value is_hide_names conf p = 
+value is_hide_names conf p =
   if conf.hide_names || get_access p = Private then True
   else False
 ;
@@ -419,9 +419,9 @@ value unauthorized conf auth_type =
 
 (* ************************************************************************** *)
 (*  [Fonc] redirect_HTML : config -> string -> string -> unit                 *)
-(** [Description] : Effecture une redirection HTML. C'est le navigateur qui 
-                    fait la redirection en interprétant directement le header 
-                    envoyé et pas le serveur qui fait la redirection. 
+(** [Description] : Effecture une redirection HTML. C'est le navigateur qui
+                    fait la redirection en interprétant directement le header
+                    envoyé et pas le serveur qui fait la redirection.
                     La redirection est faite sur la page url.
     [Args] :
       - conf : configuration de la base
@@ -431,10 +431,10 @@ value unauthorized conf auth_type =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 value redirect_HTML conf status_code url =
-  (* TODO, passer un type pour la redirection et un 
+  (* TODO, passer un type pour la redirection et un
      mecanisme pour éviter les boucles de redirection *)
   match status_code with
-  [ "303" -> 
+  [ "303" ->
     do {
       Wserver.wprint "HTTP/1.1 303 See Other";
       nl ();
@@ -550,7 +550,7 @@ value nobtit conf base p =
 value strictly_after_private_years conf a =
   if a.year > conf.private_years then True
   else if a.year < conf.private_years then False
-  else a.month > 0 || a.day > 0 
+  else a.month > 0 || a.day > 0
 ;
 
 value is_old_person conf p =
@@ -587,9 +587,9 @@ value is_restricted (conf : config) base ip =
     not (is_quest_string (get_surname p)) &&
     not (is_quest_string (get_first_name p)) &&
     not (fast_auth_age conf p)
-  in  
+  in
   if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
-  else False 
+  else False
 ;
 
 value pget (conf : config) base ip =
@@ -624,7 +624,7 @@ value parent_has_title conf base p =
       Renvoie (dans l'ordre des tests) :
         - Vrai si : magicien ou ami ou la personne est public
         - Vrai si : la personne est en si_titre, qu'elle ou ses parents
-                    ont au moins un titre et que public_if_title = yes 
+                    ont au moins un titre et que public_if_title = yes
                     dans le fichier gwf
         - Faux si : la personne n'est pas décédée et private_years > 0
         - Vrai si : la personne est plus agée (en fonction de la date de
@@ -696,9 +696,9 @@ value is_public conf base p =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] accessible_by_key : 
+(*  [Fonc] accessible_by_key :
              config -> base -> person -> string -> string -> bool         *)
-(** [Description] : Vrai si la personne est accessible par sa clé, 
+(** [Description] : Vrai si la personne est accessible par sa clé,
                     Faux sinon.
     [Args] :
       - conf : configuration de la base
@@ -713,7 +713,7 @@ value is_public conf base p =
 value accessible_by_key conf base p fn sn =
   conf.access_by_key
   && not (fn = "?" || sn = "?")
-  && (not (is_hide_names conf p) || is_public conf base p 
+  && (not (is_hide_names conf p) || is_public conf base p
       || conf.friend || conf.wizard)
 ;
 
@@ -781,7 +781,7 @@ value restricted_txt conf = ".....";
 
 (* ************************************************************************** *)
 (*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
-(** [Description] : Renvoie le prénom et nom d'un individu en fonction 
+(** [Description] : Renvoie le prénom et nom d'un individu en fonction
                     de son nom public et sobriquet.
     [Args] :
       - p_first_name : renvoie le prénom d'un individu (string)
@@ -809,9 +809,9 @@ value gen_person_text (p_first_name, p_surname) conf base p =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] gen_person_text_no_html : 
+(*  [Fonc] gen_person_text_no_html :
              fun -> fun -> config -> base -> person -> string                 *)
-(** [Description] : Renvoie le prénom et nom d'un individu en fonction 
+(** [Description] : Renvoie le prénom et nom d'un individu en fonction
                     de son nom public et sobriquet (sans balise html <em>).
     [Args] :
       - p_first_name : renvoie le prénom d'un individu (string)
@@ -838,9 +838,9 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] gen_person_text_without_surname : 
+(*  [Fonc] gen_person_text_without_surname :
              fun -> fun -> config -> base -> person -> string                 *)
-(** [Description] : Renvoie le prénom d'un individu en fonction de son 
+(** [Description] : Renvoie le prénom d'un individu en fonction de son
                     nom public et sobriquet.
     [Args] :
       - p_first_name : renvoie le prénom d'un individu (string)
@@ -882,7 +882,7 @@ value person_text_no_surn_no_acc_chk =
 (* *********************************************************************** *)
 (*  [Fonc] main_title : config -> base -> person -> title option           *)
 (** [Description] : Renvoie le titre principal d'une personne. Si aucun
-                    titre principal n'est trouvé mais que la personne a 
+                    titre principal n'est trouvé mais que la personne a
                     plusieurs titre, alors on renvoie le premier titre.
     [Args] :
       - conf : configuration de la base
@@ -910,7 +910,7 @@ value main_title conf base p =
 
 (* *********************************************************************** *)
 (*  [Fonc] titled_person_text : config -> base -> person -> istr gen_title *)
-(** [Description] : Renvoie la chaîne de caractère de la personne en 
+(** [Description] : Renvoie la chaîne de caractère de la personne en
                     fonction de son titre.
     [Args] :
       - conf : configuration de la base
@@ -1016,20 +1016,20 @@ value reference conf base p s =
 (* ************************************************************************* *)
 value update_family_loop conf base p s =
   if conf.cancel_links || is_hidden p then s
-  else 
+  else
     let iper = get_key_index p in
     let list = Array.to_list (get_family p) in
     let list = List.map (fun ifam -> (ifam, foi base ifam)) list in
-    let list = 
-      List.map 
-        (fun (ifam, fam) -> (ifam, Array.to_list (get_children fam))) 
-        list 
+    let list =
+      List.map
+        (fun (ifam, fam) -> (ifam, Array.to_list (get_children fam)))
+        list
     in
     (* [Fonc] : 'a list -> (ifam, iper list) list -> ifam list *)
     let rec loop accu l =
       match l with
       [ [] -> accu
-      | [(ifam, children) :: l ] -> 
+      | [(ifam, children) :: l ] ->
           if List.exists (fun c -> iper = c) children then loop [ifam :: accu] l
           else loop accu l ]
     in
@@ -1046,7 +1046,7 @@ value update_family_loop conf base p s =
         let iper = string_of_int (Adef.int_of_iper iper) in
         "<a href=\"" ^ commd conf ^ "m=U;i=" ^ iper ^ "\">" ^ s ^ "</a>"
     else s
-;  
+;
 
 value no_reference conf base p s = s;
 
@@ -1221,16 +1221,16 @@ value open_hed_trl conf name =
      - dans la base (bases/etc/base_name/name.txt)
      - dans la base (bases/etc/templx/name.txt)
      - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
-  let file_exist dir = 
+  let file_exist dir =
     let base_name_tpl_dir =
       Filename.concat (base_path ["etc"] conf.bname) (name ^ ".txt")
     in
-    let base_tpl_dir = 
-      Filename.concat 
+    let base_tpl_dir =
+      Filename.concat
         (base_path ["etc"] (Filename.basename dir)) (name ^ ".txt")
     in
-    let etc_tpl_dir = 
-      Filename.concat 
+    let etc_tpl_dir =
+      Filename.concat
         (search_in_lang_path "etc") (Filename.concat dir ((name ^ ".txt")))
     in
     if Sys.file_exists base_name_tpl_dir then base_name_tpl_dir
@@ -1243,75 +1243,9 @@ value open_hed_trl conf name =
   let rec default_templ config_templ std_fname =
     match config_templ with
     [ [] | ["*"] -> std_fname
-    | [x :: l] -> 
+    | [x :: l] ->
         match file_exist x with
-        [ "" -> default_templ l std_fname 
-        | s -> s ] ]
-  in
-  let config_templ =
-    try
-      let s = List.assoc "template" conf.base_env in
-      let rec loop list i len =
-        if i = String.length s then List.rev [Buff.get len :: list]
-        else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
-        else loop list (i + 1) (Buff.store len s.[i])
-      in
-      loop [] 0 0
-    with
-    [ Not_found -> [conf.bname; "*"] ]
-  in
-  let dir =
-    match p_getenv conf.env "templ" with
-    [ Some x when List.mem "*" config_templ -> x
-    | Some x when List.mem x config_templ -> x
-    | Some _ | None ->
-        match config_templ with
-        [ [] | ["*"] -> ""
-        | [x :: _] -> x ] ]
-  in
-  (* template par défaut *)
-  let std_fname = 
-    search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
-  in
-  (* On cherche le template dans l'ordre de file_exist.         *)
-  (* Si on ne trouve rien, alors on cherche le premier template *)
-  (* par défaut tel que défini par la variable template du gwf  *)
-  let fname =
-    match file_exist dir with
-    [ "" -> default_templ config_templ std_fname 
-    | s -> s ]
-  in
-  try Some (Secure.open_in fname) with
-  [ Sys_error _ -> None ]
-;
-
-value open_templ conf name =
-  (* On cherche le fichier dans cet ordre :
-     - dans la base (bases/etc/templx/name.txt)
-     - dans le répertoire des programmes (gw/etc/templx/name.txt)
-     - le template par défaut (gw/etc/name.txt) *)
-  let file_exist dir = 
-    let base_tpl_dir = 
-      Filename.concat 
-        (base_path ["etc"] (Filename.basename dir)) (name ^ ".txt")
-    in
-    let etc_tpl_dir = 
-      Filename.concat 
-        (search_in_lang_path "etc") (Filename.concat dir ((name ^ ".txt")))
-    in
-    if Sys.file_exists base_tpl_dir then base_tpl_dir
-    else
-      if Sys.file_exists etc_tpl_dir then etc_tpl_dir
-      else ""
-  in
-  (* Recherche le template par défaut en fonction de la variable gwf *)
-  (* template = templ1,templ2,*                                      *)
-  let rec default_templ config_templ std_fname =
-    match config_templ with
-    [ [] | ["*"] -> std_fname
-    | [x :: l] -> 
-        match file_exist x with
-        [ "" -> default_templ l std_fname 
+        [ "" -> default_templ l std_fname
         | s -> s ] ]
   in
   let config_templ =
@@ -1344,7 +1278,73 @@ value open_templ conf name =
   (* par défaut tel que défini par la variable template du gwf  *)
   let fname =
     match file_exist dir with
-    [ "" -> default_templ config_templ std_fname 
+    [ "" -> default_templ config_templ std_fname
+    | s -> s ]
+  in
+  try Some (Secure.open_in fname) with
+  [ Sys_error _ -> None ]
+;
+
+value open_templ conf name =
+  (* On cherche le fichier dans cet ordre :
+     - dans la base (bases/etc/templx/name.txt)
+     - dans le répertoire des programmes (gw/etc/templx/name.txt)
+     - le template par défaut (gw/etc/name.txt) *)
+  let file_exist dir =
+    let base_tpl_dir =
+      Filename.concat
+        (base_path ["etc"] (Filename.basename dir)) (name ^ ".txt")
+    in
+    let etc_tpl_dir =
+      Filename.concat
+        (search_in_lang_path "etc") (Filename.concat dir ((name ^ ".txt")))
+    in
+    if Sys.file_exists base_tpl_dir then base_tpl_dir
+    else
+      if Sys.file_exists etc_tpl_dir then etc_tpl_dir
+      else ""
+  in
+  (* Recherche le template par défaut en fonction de la variable gwf *)
+  (* template = templ1,templ2,*                                      *)
+  let rec default_templ config_templ std_fname =
+    match config_templ with
+    [ [] | ["*"] -> std_fname
+    | [x :: l] ->
+        match file_exist x with
+        [ "" -> default_templ l std_fname
+        | s -> s ] ]
+  in
+  let config_templ =
+    try
+      let s = List.assoc "template" conf.base_env in
+      let rec loop list i len =
+        if i = String.length s then List.rev [Buff.get len :: list]
+        else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
+        else loop list (i + 1) (Buff.store len s.[i])
+      in
+      loop [] 0 0
+    with
+    [ Not_found -> [conf.bname; "*"] ]
+  in
+  let dir =
+    match p_getenv conf.env "templ" with
+    [ Some x when List.mem "*" config_templ -> x
+    | Some x when List.mem x config_templ -> x
+    | Some _ | None ->
+        match config_templ with
+        [ [] | ["*"] -> ""
+        | [x :: _] -> x ] ]
+  in
+  (* template par défaut *)
+  let std_fname =
+    search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
+  in
+  (* On cherche le template dans l'ordre de file_exist.         *)
+  (* Si on ne trouve rien, alors on cherche le premier template *)
+  (* par défaut tel que défini par la variable template du gwf  *)
+  let fname =
+    match file_exist dir with
+    [ "" -> default_templ config_templ std_fname
     | s -> s ]
   in
   try Some (Secure.open_in fname) with
@@ -1375,7 +1375,7 @@ value rec copy_from_etc env lang imcom ic =
       match input_char ic with
       [ '%' ->
           let c = input_char ic in
-          match c with 
+          match c with
           [ '+' -> incr cnt
           | '#' -> Wserver.wprint "%d" cnt.val
           | 'n' -> Wserver.wprint "%s" (base_len (input_to_semi ic))
@@ -1418,12 +1418,12 @@ value image_prefix conf =
 ;
 
 
-(* 
+(*
    On cherche le fichier dans cet ordre :
     - dans la base (bases/etc/name.txt)
     - dans le répertoire des programmes (gw/etc/name.txt)
 *)
-value find_misc_file name = 
+value find_misc_file name =
   let base_tpl_dir = Filename.concat (base_path ["etc"] "") name in
   let etc_tpl_dir = Filename.concat (search_in_lang_path "etc") name in
   if Sys.file_exists base_tpl_dir then base_tpl_dir
@@ -1604,7 +1604,7 @@ value doctype conf =
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
  \"http://www.w3.org/TR/xhtml10/DTD/loose.dtd\">"
   | _ -> "\
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"
  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" ]
 ;
 
@@ -1871,8 +1871,8 @@ value string_with_macros conf env s =
 
 (* ********************************************************************** *)
 (*  [Fonc] string_of_place : config -> string -> string                   *)
-(** [Description] : Astuce temporaire pour supprimer les crochets dans 
-                    un lieu-dit. A l'avenir, il faudra revoir comment sont 
+(** [Description] : Astuce temporaire pour supprimer les crochets dans
+                    un lieu-dit. A l'avenir, il faudra revoir comment sont
                     implémentés les lieux.
     [Args] :
       - conf  : configuration de la base
@@ -2210,7 +2210,7 @@ value child_of_parent conf base p =
   in
   match ifam with
   [ Some (None, None) | None -> ""
-  | Some (fath, moth) -> 
+  | Some (fath, moth) ->
       let s =
         match (fath, moth) with
         [ (Some fath, None) -> print_father fath
@@ -2229,7 +2229,7 @@ value child_of_parent conf base p =
 
 (* ************************************************************************** *)
 (*  [Fonc] husband_wife : config -> base -> person -> unit                    *)
-(** [Description] : Traduction selon l'existence du premier conjoint 
+(** [Description] : Traduction selon l'existence du premier conjoint
                     différent de ?? :
                       * époux/épouse de Jean/Jeanne
     [Args] :
@@ -2245,9 +2245,9 @@ value husband_wife conf base p =
       let fam = foi base (get_family p).(i) in
       let conjoint = spouse (get_key_index p) fam in
       let conjoint = pget conf base conjoint in
-      if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?" 
+      if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
       then
-        let relation = 
+        let relation =
           Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
         in
         translate_eval (relation ^ " " ^ (person_text conf base conjoint))
@@ -2300,15 +2300,15 @@ value first_child conf base p =
 (* ************************************************************************** *)
 (*  [Fonc] specify_homonymous : config -> base -> person -> bool -> string    *)
 (** [Description] : Permet d'afficher des informations supplémentaires sur la
-      personne en cas d'homonymes (par exemple sur la recherche par ordre 
-      alphabétique). 
-      L'affichage se fait de façon similaire à gen_person_text, i.e. en 
-      fonction du nom publique et sobriquet si on valorise le paramètre 
+      personne en cas d'homonymes (par exemple sur la recherche par ordre
+      alphabétique).
+      L'affichage se fait de façon similaire à gen_person_text, i.e. en
+      fonction du nom publique et sobriquet si on valorise le paramètre
       specify_public_name à True :
         * Louis VI le gros (nom publique sobriquet)
         * Louis le gros    (prénom sobriquet)
         * Louis VI         (nom publique)
-        * Louis Capétiens, fils de Philippe et Berthe, marié avec Adèlaïde, 
+        * Louis Capétiens, fils de Philippe et Berthe, marié avec Adèlaïde,
             père de Philippe
     [Args] :
       - conf : configuration
@@ -2326,7 +2326,7 @@ value specify_homonymous conf base p specify_public_name =
       Wserver.wprint " %s <em>%s</em>" (sou base n) (sou base nn)
   | (_, [nn :: _]) when specify_public_name ->
       Wserver.wprint " %s <em>%s</em>" (p_first_name base p) (sou base nn)
-  | (n, []) when sou base n <> "" && specify_public_name -> 
+  | (n, []) when sou base n <> "" && specify_public_name ->
       Wserver.wprint " %s" (sou base n)
   | (_, _) ->
       (* Le nom public et le qualificatif ne permettent pas de distinguer *)
@@ -2335,9 +2335,9 @@ value specify_homonymous conf base p specify_public_name =
       let cop = child_of_parent conf base p in
       let hw = husband_wife conf base p in
       let fc = first_child conf base p in
-      let s = 
-        (if cop = "" then "" else ", " ^ cop) ^ 
-          (if hw = "" then 
+      let s =
+        (if cop = "" then "" else ", " ^ cop) ^
+          (if hw = "" then
             if fc = "" then "" else ", " ^ fc
            else ", " ^ hw)
       in
@@ -2509,8 +2509,8 @@ value find_person_in_env conf base suff =
           [ Some ip ->
               let p = pget conf base ip in
               if is_hidden p then None
-              else 
-                if not (is_hide_names conf p) || authorized_age conf base p 
+              else
+                if not (is_hide_names conf p) || authorized_age conf base p
                 then
                   Some p
                 else None
@@ -2552,9 +2552,9 @@ value write_default_sosa conf base key = do {
   let gwf = List.rev [("default_sosa_ref", key) :: gwf] in
   let fname = base_path [] (conf.bname ^ ".gwf") in
   let tmp_fname = fname ^ "2" in
-  let oc = 
-    try Pervasives.open_out tmp_fname with 
-    [ Sys_error _ -> failwith "the gwf database is not writable" ] 
+  let oc =
+    try Pervasives.open_out tmp_fname with
+    [ Sys_error _ -> failwith "the gwf database is not writable" ]
   in
   List.iter (fun (k, v) -> Pervasives.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
   close_out oc ;
@@ -2566,8 +2566,8 @@ value write_default_sosa conf base key = do {
 value update_gwf_sosa conf base (ip, (fn, sn, occ)) =
   let sosa_ref_key =
     match snd conf.default_sosa_ref with
-    [ Some p -> 
-        p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " 
+    [ Some p ->
+        p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " "
         ^ p_surname base p
     | None -> "" ]
   in
@@ -2591,7 +2591,7 @@ value create_topological_sort conf base =
       lock (Mutil.lock_file bfile) with
       [ Accept ->
           let tstab_file =
-            if conf.use_restrict && not conf.wizard && not conf.friend then 
+            if conf.use_restrict && not conf.wizard && not conf.friend then
               Filename.concat bfile "tstab_visitor"
             else Filename.concat bfile "tstab"
           in
@@ -2616,7 +2616,7 @@ value create_topological_sort conf base =
               let () = load_couples_array base in
               let tstab = Consang.topological_sort base (pget conf) in
               do {
-                if conf.use_restrict && not conf.wizard && not conf.friend then 
+                if conf.use_restrict && not conf.wizard && not conf.friend then
                   base_visible_write base else ();
                 match
                   try Some (Secure.open_out_bin tstab_file) with
@@ -2679,7 +2679,7 @@ value space_to_unders = Mutil.tr ' ' '_';
 (* ************************************************************************** *)
 (*  [Fonc] default_image_name_of_key : string -> string -> int -> string      *)
 (** [Description] : Renvoie à partir de la clé d'une personne, le nom par
-                    défaut de son image (portrait). 
+                    défaut de son image (portrait).
                     Par exemple, Jean Claude DUPOND 3 => jean_claude.3.dupond
     [Args] :
       - fnam : first name
@@ -2697,7 +2697,7 @@ value default_image_name_of_key fnam surn occ =
 
 (* *********************************************************************** *)
 (*  [Fonc] default_image_name : base -> person -> string                   *)
-(** [Description] : Renvoie à partir d'une personne, le nom par défaut de 
+(** [Description] : Renvoie à partir d'une personne, le nom par défaut de
                     son image (portrait) => voir default_image_name_of_key.
     [Args] :
       - base : base de donnée
@@ -3338,14 +3338,14 @@ value wprint_in_columns conf order wprint_elem list =
   let ncols =
     match p_getint conf.env "ncols" with
     [ Some n -> max 1 n
-    | None -> 
+    | None ->
         let len_list = List.length list in
-        if len_list < 10 then 1 
+        if len_list < 10 then 1
         else if len_list < 100 then 2
         else if len_list < 200 then 3
         else 4 ]
   in
-  let (len_list, list) = 
+  let (len_list, list) =
     dispatch_in_columns ncols list order
   in
   print_in_columns conf ncols len_list list wprint_elem
@@ -3364,13 +3364,13 @@ value wprint_in_columns conf order wprint_elem list =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value reduce_list size list =
-  let rec loop size cnt reduced_list list = 
-    if cnt >= size then reduced_list 
+  let rec loop size cnt reduced_list list =
+    if cnt >= size then reduced_list
     else
       match list with
        [ [] -> reduced_list
        | [x :: l] -> loop size (cnt + 1) [x :: reduced_list] l ]
-  in 
+  in
   let sublist = loop size 0 [] list in
   List.rev sublist
 ;
@@ -3390,7 +3390,7 @@ value reduce_list size list =
 (* ********************************************************************** *)
 value print_reference conf fn occ sn =
   stag "span" "class=\"reference\"" begin
-    Wserver.wprint " (%s %s.%d %s)" 
+    Wserver.wprint " (%s %s.%d %s)"
       (transl conf "reference key") (Name.lower fn) occ (Name.lower sn);
   end
 ;
@@ -3406,7 +3406,7 @@ value print_reference conf fn occ sn =
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
 value gen_print_tips conf s = do {
-  tag "div" "class=\"tips\"" begin 
+  tag "div" "class=\"tips\"" begin
     tag "table" begin
       tag "tr" begin
         tag "td" begin
@@ -3415,13 +3415,13 @@ value gen_print_tips conf s = do {
       end;
     end;
   end;
-  xtag "br" 
+  xtag "br"
 };
 
 (* ********************************************************************** *)
 (*  [Fonc] print_tips_relationship : conf -> unit                         *)
 (** [Description] : Lors d'un calcul de parenté, il n'est pas évident de
-      savoir qu'il faut cliquer sur la personne pour lancer le calcul. 
+      savoir qu'il faut cliquer sur la personne pour lancer le calcul.
       On affiche donc une petite aide pour l'utilisateur.
     [Args] :
       - conf : configuration de la base
@@ -3430,10 +3430,10 @@ value gen_print_tips conf s = do {
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value print_tips_relationship conf =
-  if p_getenv conf.env "em" = Some "R" || 
+  if p_getenv conf.env "em" = Some "R" ||
      p_getenv conf.env "m" = Some "C" then
-    let s = 
-      (capitale (transl conf "select person to compute relationship")) 
+    let s =
+      (capitale (transl conf "select person to compute relationship"))
     in
     gen_print_tips conf s
   else ()
@@ -3452,13 +3452,13 @@ value print_tips_relationship conf =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value print_image_sex conf p size =
-  let (image, alt) = 
+  let (image, alt) =
     match get_sex p with
     [ Male -> ("male.png", "M")
     | Female -> ("female.png", "F")
     | Neuter -> ("sexunknown.png", "?") ]
   in
-  xtag 
+  xtag
     "img" "src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\""
     (image_prefix conf) image alt size size
 ;
@@ -3474,23 +3474,23 @@ value print_image_sex conf p size =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value display_options conf =
-  let s = 
+  let s =
     if p_getenv conf.env "image" = Some "on" then ";image=on"
     else ""
   in
-  let s = 
+  let s =
     if p_getenv conf.env "marriage" = Some "on" then s ^ ";marriage=on"
     else s
   in
-  let s = 
+  let s =
     match p_getenv conf.env "bd" with
     [ Some i -> s ^ ";bd=" ^ i
-    | None -> s ] 
+    | None -> s ]
   in
-  let s = 
+  let s =
     match p_getenv conf.env "color" with
     [ Some c -> s ^ ";color=" ^ c
-    | None -> s ] 
+    | None -> s ]
   in
   s
 ;

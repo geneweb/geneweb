@@ -115,7 +115,7 @@ value effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
         Util.commit_patches conf base;
         let changed =
           let gen_p =
-            let p = 
+            let p =
               match p_getint conf.env "ip" with
               [ Some i ->
                   let ip = Adef.iper_of_int i in
@@ -137,10 +137,10 @@ value effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
 value print_mod_merge o_conf base =
   let get_gen_family i =
     match p_getint o_conf.env i with
-    [ Some i -> 
+    [ Some i ->
         let fam = foi base (Adef.ifam_of_int i) in
         Util.string_gen_family base (gen_family_of_family fam)
-    | None -> 
+    | None ->
         let fam = foi base (Adef.ifam_of_int (-1)) in
         Util.string_gen_family base (gen_family_of_family fam) ]
   in
