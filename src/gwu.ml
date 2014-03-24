@@ -6,6 +6,10 @@ open Gutil;
 open Gwdb;
 open Printf;
 
+
+(* Backward compatibility option before the additional fields. *)
+value old_gw = ref False;
+
 type mfam =
   { m_ifam : ifam; m_fam : family; m_fath : person; m_moth : person;
     m_chil : array person }
@@ -25,8 +29,20 @@ value print_date_dmy oc d =
     else if d.day = 0 then fprintf oc "%d/%s" d.month (soy d.year)
     else fprintf oc "%d/%d/%s" d.day d.month (soy d.year);
     match d.prec with
-    [ OrYear y -> fprintf oc "|%s" (soy y)
-    | YearInt y -> fprintf oc "..%s" (soy y)
+    [ OrYear d2 ->
+        if not old_gw.val then
+          if (*d2.day2 = 0 &&*) d2.month2 = 0 then fprintf oc "|%s" (soy d2.year2)
+          else if d2.day2 = 0 then fprintf oc "|%d/%s" d2.month2 (soy d2.year2)
+          else fprintf oc "|%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
+        else
+          fprintf oc "|%s" (soy d2.year2)
+    | YearInt d2 ->
+        if not old_gw.val then
+          if (*d2.day2 = 0 &&*) d2.month2 = 0 then fprintf oc "..%s" (soy d2.year2)
+          else if d2.day2 = 0 then fprintf oc "..%d/%s" d2.month2 (soy d2.year2)
+          else fprintf oc "..%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
+        else
+          fprintf oc "..%s" (soy d2.year2)
     | _ -> () ]
   }
 ;
@@ -1401,6 +1417,8 @@ value speclist =
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
      it is Public. All the spouses and descendants are also censored.");
+   ("-old_gw", Arg.Set old_gw, ": Do not export additional fields \
+(for backward compatibility)");
    ("-raw", Arg.Set raw_output,
     "raw output (without possible utf-8 conversion)");
    ("-v", Arg.Set Mutil.verbose, "verbose");

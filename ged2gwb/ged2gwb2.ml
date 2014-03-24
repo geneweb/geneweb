@@ -634,14 +634,25 @@ EXTEND
           [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
           | End (d, cal) -> Dgreg {(d) with prec = Before} cal
           | BeginEnd (d1, cal1) (d2, cal2) ->
-              let y2 =
+              let dmy2 =
                 match cal2 with
-                [ Dgregorian -> d2.year
-                | Djulian -> (Calendar.julian_of_gregorian d2).year
-                | Dfrench -> (Calendar.french_of_gregorian d2).year
-                | Dhebrew -> (Calendar.hebrew_of_gregorian d2).year ]
+                [ Dgregorian -> 
+                    {day2 = d2.day; month2 = d2.month; 
+                     year2 = d2.year; delta2 = 0}
+                | Djulian -> 
+                    let dmy2 = Calendar.julian_of_gregorian d2 in
+                    {day2 = dmy2.day; month2 = dmy2.month; 
+                     year2 = dmy2.year; delta2 = 0}
+                | Dfrench -> 
+                    let dmy2 = Calendar.french_of_gregorian d2 in
+                    {day2 = dmy2.day; month2 = dmy2.month; 
+                     year2 = dmy2.year; delta2 = 0}
+                | Dhebrew -> 
+                    let dmy2 = Calendar.hebrew_of_gregorian d2 in
+                    {day2 = dmy2.day; month2 = dmy2.month; 
+                     year2 = dmy2.year; delta2 = 0} ]
               in
-              Dgreg {(d1) with prec = YearInt y2} cal1 ]
+              Dgreg {(d1) with prec = YearInt dmy2} cal1 ]
       | (d, cal) = date -> Dgreg d cal
       | s = TEXT -> Dtext s ] ]
   ;

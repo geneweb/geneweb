@@ -5,9 +5,11 @@ open Config;
 open Def;
 open Gwdb;
 
+value dmy_of_dmy2 : dmy2 -> dmy;
 value code_dmy : config -> dmy -> string;
 value string_of_ondate : config -> date -> string;
 value string_of_date : config -> date -> string;
+value string_of_date_sep : config -> string -> date -> string;
 value string_slash_of_date : config -> date -> string;
 value string_of_age : config -> dmy -> string;
 value prec_year_text : config -> dmy -> string;
