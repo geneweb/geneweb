@@ -32,6 +32,10 @@ value find_dated_ancestor base p =
              | None -> anc_list ])
           [] iplist
       in
+      (* Dans le cas où le nombre d'implexes est très élevé, le calcul *)
+      (* peut être très long car on le refait plusieurs fois pour les  *)
+      (* mêmes personnes. On rend donc la liste unique.                *)
+      let anc_list = Mutil.list_uniq anc_list in
       loop_ind anc_list where rec loop_ind =
         fun
         [ [ip :: iplist] ->
