@@ -703,8 +703,8 @@ value possible_father base warning x ifath =
   | (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
       let a2 =
         match d2 with
-        [ {prec = YearInt a2} -> a2
-        | {prec = OrYear a2} -> a2
+        [ {prec = YearInt dmy2} -> dmy2.year2
+        | {prec = OrYear dmy2} -> dmy2.year2
         | {year = a} -> a ]
       in
       if year_of d1 > a2 + 1 then warning (DeadTooEarlyToBeFather father x)

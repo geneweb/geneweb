@@ -34,8 +34,13 @@ and dmy =
     year : int;
     prec : precision;
     delta : int }
+and dmy2 =
+  { day2 : int;
+    month2 : int;
+    year2 : int;
+    delta2 : int }
 and precision =
-  [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
+  [ Sure | About | Maybe | Before | After | OrYear of dmy2 | YearInt of dmy2 ]
 ;
 
 type cdate =

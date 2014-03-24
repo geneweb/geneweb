@@ -236,10 +236,24 @@ value ged_date_dmy oc dt cal =
     else ();
     fprintf oc "%d" dt.year;
     match dt.prec with
-    [ OrYear i ->
-        do { fprintf oc " AND "; ged_calendar oc cal; fprintf oc "%d" i; }
-    | YearInt i ->
-        do { fprintf oc " AND "; ged_calendar oc cal; fprintf oc "%d" i; }
+    [ OrYear dmy2 ->
+        do { 
+          fprintf oc " AND "; 
+          ged_calendar oc cal; 
+          if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
+          if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
+          else ();
+          fprintf oc "%d" dmy2.year2;
+        }
+    | YearInt dmy2 ->
+        do { 
+          fprintf oc " AND "; 
+          ged_calendar oc cal; 
+          if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
+          if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
+          else ();
+          fprintf oc "%d" dmy2.year2;
+        }
     | _ -> () ];
   }
 ;

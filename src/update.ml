@@ -700,6 +700,48 @@ value int_of_field s =
   try Some (int_of_string (strip_spaces s)) with [ Failure _ -> None ]
 ;
 
+value reconstitute_date_dmy2 conf var =
+  let m =
+    let m = get var "ormonth" conf.env in
+    match String.uppercase m with
+    [ "VD" -> Some 1
+    | "BR" -> Some 2
+    | "FM" -> Some 3
+    | "NI" -> Some 4
+    | "PL" -> Some 5
+    | "VT" -> Some 6
+    | "GE" -> Some 7
+    | "FL" -> Some 8
+    | "PR" -> Some 9
+    | "ME" -> Some 10
+    | "TH" -> Some 11
+    | "FT" -> Some 12
+    | "JC" -> Some 13
+    | _ -> int_of_field m ]
+  in
+  match get_number var "oryear" conf.env with
+  [ Some y ->
+      match m with
+      [ Some m ->
+          match get_number var "orday" conf.env with
+          [ Some d ->
+              let dmy2 = {day2 = d; month2 = m; year2 = y; delta2 = 0} in
+              if dmy2.day2 >= 1 && dmy2.day2 <= 31 && dmy2.month2 >= 1 &&
+                 dmy2.month2 <= 13 then
+                dmy2
+              else
+                let d = Date.dmy_of_dmy2 dmy2 in
+                bad_date conf d
+          | None ->
+              let dmy2 = {day2 = 0; month2 = m; year2 = y; delta2 = 0} in
+              if dmy2.month2 >= 1 && dmy2.month2 <= 13 then dmy2
+              else
+                let d = Date.dmy_of_dmy2 dmy2 in
+                bad_date conf d ]
+      | None -> {day2 = 0; month2 = 0; year2 = y; delta2 = 0} ]
+  | None -> raise ModErr (* should not happen *) ]
+;
+
 value reconstitute_date_dmy conf var =
   let (prec, y) =
     let y = get var "yyyy" conf.env in
@@ -745,11 +787,15 @@ value reconstitute_date_dmy conf var =
           | Some "after" -> After
           | Some "oryear" ->
               match get_number var "oryear" conf.env with
-              [ Some y -> OrYear y
+              [ Some y ->
+                  let dmy2 = reconstitute_date_dmy2 conf var in
+                  OrYear dmy2
               | None -> Sure ]
           | Some "yearint" ->
               match get_number var "oryear" conf.env with
-              [ Some y -> YearInt y
+              [ Some y ->
+                  let dmy2 = reconstitute_date_dmy2 conf var in
+                  YearInt dmy2
               | None -> Sure ]
           | _ -> Sure ]
         in

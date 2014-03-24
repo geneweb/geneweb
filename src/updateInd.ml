@@ -209,10 +209,32 @@ and eval_date_var_aux od =
             [ Some (Dgreg _ Dfrench) -> short_f_month d.month
             | _ -> string_of_int d.month ]
       | None -> "" ]
+  | "orday" ->
+      match od with
+      [ Some (Dgreg {prec = OrYear d2} _) ->
+          if d2.day2 = 0 then "" else string_of_int d2.day2
+      | Some (Dgreg {prec = YearInt d2} _) ->
+          if d2.day2 = 0 then "" else string_of_int d2.day2
+      | _ -> "" ]
+  | "ormonth" ->
+      match od with
+      [ Some (Dgreg {prec = OrYear d2} cal) ->
+          if d2.month2 = 0 then ""
+          else
+            match cal with
+            [ Dfrench -> short_f_month d2.month2
+            | _ -> string_of_int d2.month2 ]
+      | Some (Dgreg {prec = YearInt d2} cal) ->
+          if d2.month2 = 0 then ""
+          else
+            match cal with
+            [ Dfrench -> short_f_month d2.month2
+            | _ -> string_of_int d2.month2 ]
+      | _ -> "" ]
   | "oryear" ->
       match od with
-      [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
-      | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
+      [ Some (Dgreg {prec = OrYear d2} _) -> string_of_int d2.year2
+      | Some (Dgreg {prec = YearInt d2} _) -> string_of_int d2.year2
       | _ -> "" ]
   | "prec" ->
       match od with

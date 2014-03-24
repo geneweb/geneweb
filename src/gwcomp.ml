@@ -90,6 +90,24 @@ value date_of_string s i =
     if j = i + 1 && s.[i] = '0' then (True, year, j) else (False, year, j)
   in
   let error n = failwith (Printf.sprintf "date_of_string%d %s" n s) in
+  let dmy2 year2 i =
+    match skip_slash i with
+    [ Some i ->
+        let month2 = year2 in
+        let (year2, i) = champ i in
+        match skip_slash i with
+        [ Some i ->
+            let day2 = month2 in
+            let month2 = year2 in
+            let (year2, i) = champ i in
+            if month2 < 1 || month2 > 13 then error 2
+            else if day2 < 1 || day2 > 31 then error 3
+            else ((day2, month2, year2), i)
+        | None ->
+            if month2 < 1 || month2 > 13 then error 4
+            else ((0, month2, year2), i) ]
+    | None -> ((0, 0, year2), i) ]
+  in
   let date =
     match skip_slash i with
     [ Some i ->
@@ -139,12 +157,19 @@ value date_of_string s i =
     [ Some ((Dgreg d cal as dt), i) ->
         if i = String.length s then Some (dt, i)
         else if s.[i] = '|' then
-          let (y2, i) = champ (succ i) in
-          Some (Dgreg {(d) with prec = OrYear y2} cal, i)
-        else if
-          i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
-          let (y2, i) = champ (i + 2) in
-          Some (Dgreg {(d) with prec = YearInt y2} cal, i)
+          let (year2, i) = champ (succ i) in
+          let ((day2, month2, year2), i) = dmy2 year2 i in
+          let dmy2 = 
+            {day2 = day2; month2 = month2; year2 = year2; delta2 = 0}
+          in
+          Some (Dgreg {(d) with prec = OrYear dmy2} cal, i)
+        else if i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
+          let (year2, i) = champ (i + 2) in
+          let ((day2, month2, year2), i) = dmy2 year2 i in
+          let dmy2 = 
+            {day2 = day2; month2 = month2; year2 = year2; delta2 = 0}
+          in
+          Some (Dgreg {(d) with prec = YearInt dmy2} cal, i)
         else Some (dt, i)
     | Some ((Dtext _ as dt), i) -> Some (dt, i)
     | None -> None ]
