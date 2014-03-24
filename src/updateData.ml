@@ -45,7 +45,7 @@ module StringSet = Set.Make
 
 type fun_data_p_f =
   [ Person of person -> istr
-  | Family of family -> istr 
+  | Family of family -> istr
   | Pevent of gen_pers_event iper istr -> istr
   | Fevent of gen_fam_event iper istr -> istr ]
 ;
@@ -70,14 +70,14 @@ value get_data conf =
       ([ ("bi", Person get_birth_place); ("bp", Person get_baptism_place);
          ("de", Person get_death_place); ("bu", Person get_burial_place);
          ("pe", Pevent (fun evt -> evt.epers_place));
-         ("ma", Family get_marriage_place); 
+         ("ma", Family get_marriage_place);
          ("fe", Fevent (fun evt -> evt.efam_place)) ], True)
   | Some "src" ->
       ([ ("bi", Person get_birth_src); ("bp", Person get_baptism_src);
          ("de", Person get_death_src); ("bu", Person get_burial_src);
          ("pe", Pevent (fun evt -> evt.epers_src));
          ("p", Person get_psources);
-         ("ma", Family get_marriage_src); 
+         ("ma", Family get_marriage_src);
          ("fe", Fevent (fun evt -> evt.efam_src));
          ("f", Family get_fsources) ], True)
   | _ -> ([], False) ]
@@ -118,9 +118,9 @@ value get_all_data conf base = do {
                 List.iter
                   (fun evt ->
                     let istr = fun_data evt in
-                    if not (is_empty_string istr) then 
-                      data_set.val := 
-                        DataSet.add 
+                    if not (is_empty_string istr) then
+                      data_set.val :=
+                        DataSet.add
                           (istr, label, Hashtbl.hash istr) data_set.val
                     else ())
                   (get_pevents p)
@@ -151,9 +151,9 @@ value get_all_data conf base = do {
                     List.iter
                       (fun evt ->
                         let istr = fun_data evt in
-                        if not (is_empty_string istr) then 
-                          data_set.val := 
-                            DataSet.add 
+                        if not (is_empty_string istr) then
+                          data_set.val :=
+                            DataSet.add
                               (istr, label, Hashtbl.hash istr) data_set.val
                         else ())
                       (get_fevents fam)
@@ -228,7 +228,7 @@ value get_person_from_data conf base = do {
                      let istr = fun_data evt in
                      let hash_istr = Hashtbl.hash istr in
                      let key =  List.assoc label env_keys in
-                     if not (is_empty_string istr) && (hash_istr = key) then 
+                     if not (is_empty_string istr) && (hash_istr = key) then
                        map_add key istr p
                      else ())
                   (get_pevents p)
@@ -823,7 +823,7 @@ value update_family conf base old new_istr fam =
           (get_fevents fam)
       in
       { (gen_family_of_family fam) with marriage_place = marriage_place;
-        fevents = fevents } 
+        fevents = fevents }
   | Some "src" ->
       let new_istr = Gwdb.insert_string base (only_printable new_istr) in
       let src_ma = get_marriage_src fam in let s_ma = sou base src_ma in
