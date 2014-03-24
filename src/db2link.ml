@@ -218,7 +218,7 @@ value insert_person1 gen so = do {
           else (k, so)
         in
         let (k, so) =
-          let psources = 
+          let psources =
             if so.psources = "" then default_source.val else so.psources
           in
           (k, {(so) with psources = psources})

@@ -511,7 +511,7 @@ type range 'a =
   [ Begin of 'a
   | End of 'a
   | BeginEnd of 'a and 'a ]
-; 
+;
 
 value date_g = Grammar.gcreate date_lexer;
 value date_value = Grammar.Entry.create date_g "date value";
@@ -806,7 +806,7 @@ value add_string gen s =
         Hashtbl.add gen.g_hstr s (Adef.istr_of_int i);
         Adef.istr_of_int i
       } ]
-;        
+;
 
 value extract_addr addr =
   if String.length addr > 0 && addr.[0] = '@' then
@@ -954,10 +954,10 @@ value string_ini_eq s1 i s2 =
 ;
 
 value particle s i =
-  let particles = 
-    ["af "; "d'"; "d’"; "dal "; "de "; "des "; "di "; "du "; "of "; 
+  let particles =
+    ["af "; "d'"; "d’"; "dal "; "de "; "des "; "di "; "du "; "of ";
      "van "; "von und zu "; "von "; "y "; "zu "; "zur ";
-     "AF "; "D'"; "D’"; "DAL "; "DE "; "DES "; "DI "; "DU "; "OF "; 
+     "AF "; "D'"; "D’"; "DAL "; "DE "; "DES "; "DI "; "DU "; "OF ";
      "VAN "; "VON UND ZU "; "VON "; "Y "; "ZU "; "ZUR "]
   in
   List.exists (string_ini_eq s i) particles
@@ -1013,35 +1013,35 @@ value gen_lowercase_uppercase_utf8_letter lower s =
   let list_of_encodings e =
     let rec loop len e l =
       if e = "" then l
-      else 
+      else
         let i = String.index e '/' in
-        let j = 
-          try String.index_from e (i+1) '/' 
+        let j =
+          try String.index_from e (i+1) '/'
           with [ Not_found -> String.length e ]
         in
         let k = "0" ^ String.sub e (i+1) (j-1) in
-        loop (len+1) 
+        loop (len+1)
           (String.sub e j (String.length e - j)) [int_of_string k :: l]
     in
     let l = loop 0 e [] in
     List.rev l
   in
   (* l'encodage du caractère s. *)
-  let encoding = 
+  let encoding =
     loop 0 s "" where rec loop i s e =
       if i = String.length s then e
       else
         let e = e ^ Printf.sprintf "/x%x" (Char.code s.[i]) in
         loop (i + 1) s e
   in
-  try 
+  try
     let name = Hashtbl.find ht_e_n encoding in
-    let name = 
-      if lower then Str.replace_first (Str.regexp "CAPITAL") "SMALL" name 
-      else Str.replace_first (Str.regexp "SMALL") "CAPITAL" name 
+    let name =
+      if lower then Str.replace_first (Str.regexp "CAPITAL") "SMALL" name
+      else Str.replace_first (Str.regexp "SMALL") "CAPITAL" name
     in
     let new_encoding = Hashtbl.find ht_n_e name in
-    let (el, len) = 
+    let (el, len) =
       let l = list_of_encodings new_encoding in
       (l, List.length l)
     in
@@ -1049,7 +1049,7 @@ value gen_lowercase_uppercase_utf8_letter lower s =
     loop 0 el s where rec loop i el s =
       match el with
       [ [] -> s
-      | [e :: ell] -> 
+      | [e :: ell] ->
           let _s = String.set s i (Char.chr e) in
           loop (i + 1) ell s ]
   with [ Not_found -> s ]
@@ -1065,8 +1065,8 @@ value capitalize_word s =
     else
       match s.[i] with
       [ 'a'..'z' as c ->
-          let c = 
-            if uncap then c 
+          let c =
+            if uncap then c
             else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
           in
           copy False (i + 1) (Buff.store len c) True
@@ -1077,7 +1077,7 @@ value capitalize_word s =
           in
           copy False (i + 1) (Buff.store len c) True
       | c ->
-          if Char.code c < 128 then 
+          if Char.code c < 128 then
             copy False (i + 1) (Buff.store len c) (particle s (i+1))
           else
             let nbc = Name.nbc s.[i] in
@@ -1085,9 +1085,9 @@ value capitalize_word s =
               copy False (i + 1) (Buff.store len s.[i]) True
             else
               let s = String.sub s i nbc in
-              let s = 
-                if not uncap then uppercase_utf8_letter s 
-                else lowercase_utf8_letter s 
+              let s =
+                if not uncap then uppercase_utf8_letter s
+                else lowercase_utf8_letter s
               in
               let (t, j) = (s, i + nbc) in
               copy False j (Buff.mstore len t) True ]
@@ -1100,8 +1100,8 @@ value uppercase_word s =
     else
       match s.[i] with
       [ 'a'..'z' as c ->
-          let c = 
-            if uncap then c 
+          let c =
+            if uncap then c
             else Char.chr (Char.code c - Char.code 'a' + Char.code 'A')
           in
           copy False (i + 1) (Buff.store len c) uncap
@@ -1112,7 +1112,7 @@ value uppercase_word s =
           in
           copy False (i + 1) (Buff.store len c) uncap
       | c ->
-          if Char.code c < 128 then 
+          if Char.code c < 128 then
             copy False (i + 1) (Buff.store len c) (particle s (i+1))
           else
             let nbc = Name.nbc s.[i] in
@@ -1127,7 +1127,7 @@ value uppercase_word s =
 
 module Buff2 = Buff.Make (struct value buff = ref (String.create 80); end);
 
-value capitalize_name s = 
+value capitalize_name s =
   (* On initialise le buffer à la valeur de s. *)
   let _ = Buff2.mstore 0 s in
   loop 0 0 where rec loop len k =
@@ -1138,7 +1138,7 @@ value capitalize_name s =
       if j > i then
         let w = String.sub s i (j - i) in
         let w =
-          if is_roman_int w || particle s i || List.mem w public_name_word 
+          if is_roman_int w || particle s i || List.mem w public_name_word
           then w
           else capitalize_word w
         in
@@ -1150,7 +1150,7 @@ value capitalize_name s =
       else Buff2.get len
 ;
 
-value uppercase_name s = 
+value uppercase_name s =
   (* On initialise le buffer à la valeur de s. *)
   let _ = Buff2.mstore 0 s in
   loop 0 0 where rec loop len k =
@@ -1161,7 +1161,7 @@ value uppercase_name s =
       if j > i then
         let w = String.sub s i (j - i) in
         let w =
-          if is_roman_int w || particle s i || List.mem w public_name_word 
+          if is_roman_int w || particle s i || List.mem w public_name_word
           then w
           else uppercase_word w
         in
@@ -1516,7 +1516,7 @@ value applycase_surname s =
   match case_surnames.val with
   [ NoCase -> s
   | LowerCase -> capitalize_name s
-  | UpperCase -> 
+  | UpperCase ->
       if charset.val = Utf8 then uppercase_name s
       else String.uppercase s ]
 ;
@@ -1559,8 +1559,8 @@ value add_indi gen r =
                 try
                   let (fn, fa) = first_enclosed ff in
                   let accu =
-                    if first then fn 
-                    else if fn <> "" then accu ^ " " ^ fn 
+                    if first then fn
+                    else if fn <> "" then accu ^ " " ^ fn
                     else accu
                   in
                   loop False fa accu
@@ -1583,16 +1583,16 @@ value add_indi gen r =
                 (fn, fa)
               in
               loop True f "" where rec loop first ff accu =
-                try 
+                try
                   let (fn, fa) = first_enclosed ff in
                   let accu =
-                    if first then fn 
-                    else if fn <> "" then accu ^ " " ^ fn 
+                    if first then fn
+                    else if fn <> "" then accu ^ " " ^ fn
                     else accu
                   in
                   loop False fa accu
                 with
-                [ Not_found -> 
+                [ Not_found ->
                     if f = ff then (f, fal) else (accu, [ff :: fal]) ]
           | None -> (f, fal) ]
         in
@@ -1635,11 +1635,11 @@ value add_indi gen r =
     | None -> ("?", "?", Adef.int_of_iper ip, givn, []) ]
   in
   (* S'il y a des caractères interdits, on les supprime *)
-  let (first_name, surname) = 
-    (Name.strip_c first_name ':', Name.strip_c surname ':') 
+  let (first_name, surname) =
+    (Name.strip_c first_name ':', Name.strip_c surname ':')
   in
   (* Si le prénom ou le nom est vide *)
-  let (first_name, surname) = 
+  let (first_name, surname) =
     (if first_name = "" then default_name.val else first_name,
      if surname = "" then default_name.val else surname)
   in
@@ -1945,11 +1945,11 @@ value add_fam_norm gen r adop_list =
   let (fath, moth, gay) =
     match (find_all_fields "HUSB" r.rsons, find_all_fields "WIFE" r.rsons) with
     [ ([f1], [m1]) -> (per_index gen f1.rval, per_index gen m1.rval, False)
-    | ([f1; f2 :: []], []) -> 
+    | ([f1; f2 :: []], []) ->
         (per_index gen f1.rval, per_index gen f2.rval, True)
     | ([], [m1; m2 :: []]) ->
         (per_index gen m1.rval, per_index gen m2.rval, True)
-    | _ -> 
+    | _ ->
         let fath =
           match find_field "HUSB" r.rsons with
           [ Some r -> per_index gen r.rval
@@ -2007,7 +2007,7 @@ value add_fam_norm gen r adop_list =
     let (relation, marr, marr_place, (marr_src, marr_nt), witnesses) =
       let (relation, sons) =
         match find_field "MARR" r.rsons with
-        [ Some r -> 
+        [ Some r ->
             if gay then (NoSexesCheckMarried, Some r) else (Married, Some r)
         | None ->
             match find_field "ENGA" r.rsons with
@@ -2049,7 +2049,7 @@ value add_fam_norm gen r adop_list =
             fun
             [ [] -> []
             | [ r :: asso_l ] ->
-                if find_field_with_value "RELA" "Witness" r.rsons && 
+                if find_field_with_value "RELA" "Witness" r.rsons &&
                    find_field_with_value "TYPE" "INDI" r.rsons then
                   let witness = per_index gen r.rval in
                   [ witness :: heredis_witnesses asso_l ]
@@ -2118,7 +2118,7 @@ value add_fam_norm gen r adop_list =
       | Right3 p a u ->
           let notes = gen.g_str.arr.(Adef.int_of_istr (get_notes p)) in
           let notes =
-            if notes = "" then ext_sources ^ ext_notes 
+            if notes = "" then ext_sources ^ ext_notes
             else if ext_sources = "" then notes ^ "\n" ^ ext_notes
             else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
           in

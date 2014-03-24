@@ -55,7 +55,7 @@ value string_incl x y =
     else
       let rec loop1 i j =
         if i = String.length x then
-          if j = String.length y then True 
+          if j = String.length y then True
           else (String.unsafe_get y j = ' ' || String.unsafe_get y (j-1) = ' ')
         else if
           j < String.length y &&
@@ -140,7 +140,7 @@ value advanced_search conf base max_answers =
            let fam = foi base ifam in
            let father = poi base (get_father fam) in
            let mother = poi base (get_mother fam) in
-           if fast_auth_age conf father && fast_auth_age conf mother then 
+           if fast_auth_age conf father && fast_auth_age conf mother then
              if y = "" then df (Adef.od_of_codate (get_marriage fam))
              else
                name_incl y (sou base (get_marriage_place fam)) &&
@@ -150,7 +150,7 @@ value advanced_search conf base max_answers =
     in
     match (d1, d2) with
     [ (Some d1, Some d2) ->
-        test_date_place 
+        test_date_place
           (fun
           [ Some d ->
               if CheckItem.strictly_before d d1 then False
@@ -158,7 +158,7 @@ value advanced_search conf base max_answers =
               else True
           | _ -> False ])
     | (Some d1, _) ->
-        test_date_place 
+        test_date_place
           (fun
           [ Some d when fast_auth_age conf p ->
               if CheckItem.strictly_before d d1 then False else True
@@ -169,10 +169,10 @@ value advanced_search conf base max_answers =
           [ Some d when fast_auth_age conf p ->
               if CheckItem.strictly_after d d2 then False else True
           | _ -> False ])
-    | _ -> 
+    | _ ->
         if y = "" then True
         else
-          List.exists 
+          List.exists
             (fun ifam ->
               let fam = foi base ifam in
               let father = poi base (get_father fam) in
@@ -227,7 +227,7 @@ value advanced_search conf base max_answers =
          (fun x -> name_incl x (sou base (get_death_place p))) &&
        test_auth p "burial_place"
          (fun x -> name_incl x (sou base (get_burial_place p))) &&
-       test_auth p "occu" 
+       test_auth p "occu"
          (fun x -> name_incl x (sou base (get_occupation p)))
     then do {
       list.val := [p :: list.val]; incr len;
@@ -275,7 +275,7 @@ value print_result conf base max_answers (list, len) =
     Wserver.wprint "%s\n" (capitale (transl conf "no match"))
   else
     (* Construction de la table des sosa de la base *)
-    let () = Perso.build_sosa_ht conf base in 
+    let () = Perso.build_sosa_ht conf base in
     tag "ul" begin
       List.iter
         (fun p ->
@@ -301,7 +301,7 @@ value searching_fields conf base =
     | None -> False ]
   in
   let test_date x =
-    match 
+    match
       (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
     with
     [ (Some d1, Some d2) -> True
@@ -314,10 +314,10 @@ value searching_fields conf base =
     [ Some v -> v
     | None -> "" ]
   in
-  let getd x = 
+  let getd x =
     (reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2"))
   in
-  let sex = 
+  let sex =
     match gets "sex" with
     [ "M" -> 0
     | "F" -> 1
@@ -332,7 +332,7 @@ value searching_fields conf base =
   let date_field x y z search =
     let sep = if search <> "" then ", " else "" in
     let search =
-      if test_string x || test_date y then 
+      if test_string x || test_date y then
         search ^ sep ^ (transl_nth conf z sex)
       else search
     in
@@ -340,8 +340,8 @@ value searching_fields conf base =
       match getd y with
       [ (Some d1, Some d2) ->
           Printf.sprintf "%s %s %s %s %s"
-            search (transl conf "between (date)") 
-            (Date.string_of_date conf d1) 
+            search (transl conf "between (date)")
+            (Date.string_of_date conf d1)
             (transl conf "and")
             (Date.string_of_date conf d2)
       | (Some d1, _) ->
@@ -353,7 +353,7 @@ value searching_fields conf base =
       | _ -> search ]
     in
     let search =
-      if test_string x then 
+      if test_string x then
         search ^ " " ^ transl conf "in (place)" ^ " " ^ gets x
       else search
     in
@@ -371,14 +371,14 @@ value searching_fields conf base =
   let search =
     if not (test_string "marriage_place" || test_date "marriage") then
       let sep = if search <> "" then ", " else "" in
-      if gets "married" = "Y" then 
+      if gets "married" = "Y" then
         search ^ sep ^ transl conf "having a family"
-      else if gets "married" = "N" then 
+      else if gets "married" = "N" then
         search ^ sep ^ transl conf "having no family"
       else search
     else search
   in
-  let search = 
+  let search =
     let sep = if search <> "" then "," else "" in
     string_field "occu" (search ^ sep)
   in
@@ -397,7 +397,7 @@ value print conf base =
   do {
     header conf title;
     tag "p" begin
-      Wserver.wprint "%s: %s." 
+      Wserver.wprint "%s: %s."
         (capitale (transl conf "searching all")) (searching_fields conf base);
     end;
     let list = advanced_search conf base max_answers in

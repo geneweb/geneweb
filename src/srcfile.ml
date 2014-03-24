@@ -624,7 +624,7 @@ value print_start conf base =
 ;
 
 (* code déplacé et modifié pour gérer advanced.txt *)
-value print conf base fname = 
+value print conf base fname =
   match fname with
   [ "advanced" -> do {
       Wserver.wrap_string.val := Util.xml_pretty_print;

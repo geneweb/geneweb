@@ -44,7 +44,7 @@ value read_file_contents fname =
         loop () where rec loop () =
           do { len.val := Buff.store len.val (input_char ic); loop () }
       with
-      [ End_of_file -> Buff.get len.val ]                   
+      [ End_of_file -> Buff.get len.val ]
   | None -> "" ]
 ;
 
@@ -59,7 +59,7 @@ value compute base bdir =
     flush stderr;
     let list = notes_links (base_notes_read base "") in
     if list = ([], []) then ()
-    else 
+    else
       let pg = NotesLinks.PgNotes in
       NotesLinks.update_db bdir pg list;
     Printf.eprintf "--- wizard notes\n";

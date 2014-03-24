@@ -23,7 +23,7 @@ value person_is_std_key conf base p k =
 
 value select_std_eq conf base pl k =
   List.fold_right
-    (fun p pl -> 
+    (fun p pl ->
        if person_is_std_key conf base p k then [p :: pl] else pl)
     pl []
 ;
@@ -159,7 +159,7 @@ value find_all conf base an =
   | _ ->
       match person_of_string_key base an with
       [ Some ip ->
-          let pl = 
+          let pl =
             let p = pget conf base ip in
             if is_hidden p then [] else [p]
           in
@@ -167,8 +167,8 @@ value find_all conf base an =
             if not conf.wizard && not conf.friend then
               List.fold_right
                 (fun p pl ->
-                   if not (is_hide_names conf p) || Util.fast_auth_age conf p 
-                   then [p :: pl] 
+                   if not (is_hide_names conf p) || Util.fast_auth_age conf p
+                   then [p :: pl]
                    else pl)
                 pl []
             else pl
@@ -185,7 +185,7 @@ value find_all conf base an =
               | None -> (an, ipl) ]
             else (an, ipl)
           in
-          let pl = 
+          let pl =
             List.fold_left
               (fun l ip ->
                  let p = pget conf base ip in
@@ -202,8 +202,8 @@ value find_all conf base an =
             if not conf.wizard && not conf.friend then
               List.fold_right
                 (fun p pl ->
-                   if not (is_hide_names conf p) || Util.fast_auth_age conf p 
-                   then [p :: pl] 
+                   if not (is_hide_names conf p) || Util.fast_auth_age conf p
+                   then [p :: pl]
                    else pl)
                 pl []
             else pl
@@ -263,7 +263,7 @@ value specify conf base n pl =
     Util.print_tips_relationship conf;
     Wserver.wprint "<ul>\n";
     (* Construction de la table des sosa de la base *)
-    let () = Perso.build_sosa_ht conf base in 
+    let () = Perso.build_sosa_ht conf base in
     List.iter
       (fun (p, tl) ->
          tag "li" begin
@@ -410,9 +410,9 @@ value family_m conf base =
   | Some "CAL" -> Date.print_calendar conf base
   | Some "CHG_CHN" when conf.wizard -> ChangeChildren.print conf base
   | Some "CHG_CHN_OK" when conf.wizard -> ChangeChildren.print_ok conf base
-  | Some "CHG_FAM_ORD" when conf.wizard -> 
+  | Some "CHG_FAM_ORD" when conf.wizard ->
       UpdateFam.print_change_order conf base
-  | Some "CHG_FAM_ORD_OK" when conf.wizard -> 
+  | Some "CHG_FAM_ORD_OK" when conf.wizard ->
       UpdateFamOk.print_change_order_ok conf base
   | Some "CONN_WIZ" when conf.wizard -> Wiznotes.connected_wizards conf base
   | Some "D" ->
@@ -430,35 +430,35 @@ value family_m conf base =
   | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "DOC" -> Doc.print conf *)
-  | Some "FORUM" -> 
+  | Some "FORUM" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print conf base ]
-  | Some "FORUM_ADD" -> 
+  | Some "FORUM_ADD" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_add conf base ]
-  | Some "FORUM_ADD_OK" -> 
+  | Some "FORUM_ADD_OK" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_add_ok conf base ]
-  | Some "FORUM_DEL" -> 
+  | Some "FORUM_DEL" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_del conf base ]
-  | Some "FORUM_P_P" -> 
+  | Some "FORUM_P_P" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_access_switch conf base ]
-  | Some "FORUM_SEARCH" -> 
+  | Some "FORUM_SEARCH" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_search conf base ]
-  | Some "FORUM_VAL" -> 
+  | Some "FORUM_VAL" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print_valid conf base ]
-  | Some "FORUM_VIEW" -> 
+  | Some "FORUM_VIEW" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
       | _ -> Forum.print conf base ]
@@ -468,7 +468,7 @@ value family_m conf base =
       | None -> Hutil.incorrect_request conf ]
   | Some "HIST" -> History.print conf base
   | Some "HIST_CLEAN" when conf.wizard -> History_diff.print_clean conf base
-  | Some "HIST_CLEAN_OK" when conf.wizard -> 
+  | Some "HIST_CLEAN_OK" when conf.wizard ->
       History_diff.print_clean_ok conf base
   | Some "HIST_DIFF" -> History_diff.print conf base
   | Some "HIST_SEARCH" -> History.print_search conf base
@@ -502,9 +502,9 @@ value family_m conf base =
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf *)
   (* | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base *)
-  | Some "MOD_WIZNOTES" when conf.authorized_wizards_notes -> 
+  | Some "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
       Wiznotes.print_mod conf base
-  | Some "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes -> 
+  | Some "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
       Wiznotes.print_mod_ok conf base
   | Some "MRG" when conf.wizard ->
       match find_person_in_env conf base "" with
@@ -529,7 +529,7 @@ value family_m conf base =
       | _ -> Alln.print_surnames conf base ]
   | Some "NG" ->
       (* Rétro-compatibilité <= 6.06 *)
-      let env = 
+      let env =
         match p_getenv conf.env "n" with
         [ Some n ->
             match p_getenv conf.env "t" with
@@ -573,13 +573,13 @@ value family_m conf base =
               match (real_input "fn", real_input "sn") with
               [ (Some fn, Some sn) -> search (fn ^ " " ^ sn)
               | (Some fn, None) ->
-                  do { 
-                    conf.cancel_links := False; 
+                  do {
+                    conf.cancel_links := False;
                     Some.first_name_print conf base fn
                   }
               | (None, Some sn) ->
-                  do { 
-                    conf.cancel_links := False; 
+                  do {
+                    conf.cancel_links := False;
                     Some.surname_print conf base unknown sn
                   }
               | (None, None) -> incorrect_request conf ] ]
@@ -629,13 +629,13 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> updmenu_print conf base p
       | _ -> very_unknown conf ]
-  | Some "VIEW_WIZNOTES" when conf.wizard && conf.authorized_wizards_notes -> 
+  | Some "VIEW_WIZNOTES" when conf.wizard && conf.authorized_wizards_notes ->
       Wiznotes.print_view conf base
   (* Fonction obsolète, la documentation n'étant plus à jour *)
   (* | Some "WDOC" -> Doc.print_wdoc conf *)
-  | Some "WIZNOTES" when conf.authorized_wizards_notes -> 
+  | Some "WIZNOTES" when conf.authorized_wizards_notes ->
       Wiznotes.print conf base
-  | Some "WIZNOTES_SEARCH" when conf.authorized_wizards_notes -> 
+  | Some "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
       Wiznotes.print_search conf base
   | Some mode -> incorrect_request conf
   | None ->
@@ -806,7 +806,7 @@ value treat_request conf base log = do {
         if only_special_env conf.env then do {
           match p_getenv conf.base_env "counter" with
           [ Some "no" -> ()
-          | _ -> 
+          | _ ->
               let r = Srcfile.incr_welcome_counter conf in
               log_count conf log r ];
           Srcfile.print_start conf base
@@ -814,7 +814,7 @@ value treat_request conf base log = do {
         else do {
           match p_getenv conf.base_env "counter" with
           [ Some "no" -> ()
-          | _ -> 
+          | _ ->
               let r = Srcfile.incr_request_counter conf in
               log_count conf log r ] ;
           match p_getenv conf.env "ptempl" with
@@ -876,9 +876,9 @@ value this_request_updates_database conf =
   | Some x when conf.wizard ->
       match x with
       [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHANGE_WIZ_VIS" | "CHG_CHN_OK" |
-        "CHG_FAM_ORD_OK" | "DEL_FAM_OK" | "DEL_IMAGE_OK" | "DEL_IND_OK" | 
-        "INV_FAM_OK" | "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | 
-        "MOD_NOTES_OK" | "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" | 
+        "CHG_FAM_ORD_OK" | "DEL_FAM_OK" | "DEL_IMAGE_OK" | "DEL_IND_OK" |
+        "INV_FAM_OK" | "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" |
+        "MOD_NOTES_OK" | "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" |
         "MRG_DUP_FAM_Y_N" | "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" |
         "MOD_DATA_OK" | "SND_IMAGE_OK" -> True
       | _ -> False ]

@@ -25,16 +25,16 @@ open TemplAst;
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value get_wday conf d =
-  let jd = 
+  let jd =
     match d with
       [ Dgreg d _  ->
-        match d.prec with 
-        [ Sure -> 
+        match d.prec with
+        [ Sure ->
             if (d.day <> 0 && d.month <> 0) then Calendar.sdn_of_gregorian d
             else -1
         | _ -> -1 ]
       | _ -> -1 ]
-  in 
+  in
   let wday =
     let jd_today = Calendar.sdn_of_gregorian conf.today in
     let x = conf.today_wd - jd_today + jd in
@@ -263,7 +263,7 @@ value string_of_dmy conf d =
 
 
 (* ************************************************************************ *)
-(*  [Fonc] translate_dmy : config -> (string * string * string) -> 
+(*  [Fonc] translate_dmy : config -> (string * string * string) ->
                              calendar -> bool -> (string * string * string) *)
 (** [Description] : Traduit en fonction du calendrier, le mois et/ou l'année
                     d'une date et renvoie le triplet conformément au format
@@ -280,19 +280,19 @@ value string_of_dmy conf d =
 value translate_dmy conf (fst, snd, trd) cal short =
   let translate_month m =
     match cal with
-    [ Dfrench when m <> "" -> 
+    [ Dfrench when m <> "" ->
         if short then Util.short_f_month (int_of_string m)
         else french_month conf (int_of_string m)
-    | Dhebrew when m <> "" -> 
-        if short then 
-          String.uppercase 
+    | Dhebrew when m <> "" ->
+        if short then
+          String.uppercase
             (String.sub (hebrew_month conf (int_of_string m)) 0 2)
         else hebrew_month conf (int_of_string m)
     | _ -> m ]
   in
   let translate_year y =
     match cal with
-    [ Dfrench -> 
+    [ Dfrench ->
         let y1 = int_of_string y in
         (if y1 >= 1 && y1 < 4000 then roman_of_arabian y1 else y)
     | _ -> y ]
@@ -319,14 +319,14 @@ value translate_dmy conf (fst, snd, trd) cal short =
 (* ************************************************************************ *)
 value decode_dmy conf d =
   match transl conf " !dates order" with
-  [ "dmyyyy" -> 
+  [ "dmyyyy" ->
       (string_of_int d.day, string_of_int d.month, string_of_int d.year)
   | "mmddyyyy" ->
       (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
       (* on rajoute les 0 nécessaires.                        *)
       match (d.day, d.month, d.year) with
       [ (0, 0, year) -> ("", "", string_of_int year)
-      | (0, month, year) -> 
+      | (0, month, year) ->
           let m = Printf.sprintf "%02d" month in
           (m, "", string_of_int year)
       | (day, month, year) ->
@@ -338,19 +338,19 @@ value decode_dmy conf d =
       (* on rajoute les 0 nécessaires.                        *)
       match (d.day, d.month, d.year) with
       [ (0, 0, year) -> (string_of_int year, "", "")
-      | (0, month, year) -> 
+      | (0, month, year) ->
           let m = Printf.sprintf "%02d" month in
           (string_of_int year, m, "")
       | (day, month, year) ->
           let d = Printf.sprintf "%02d" day in
           let m = Printf.sprintf "%02d" month in
           (string_of_int year, m, d) ]
-  | "ddmmyyyy" | "ddmmyy" (* backward compatibility < 6.05 *) | _ -> 
+  | "ddmmyyyy" | "ddmmyy" (* backward compatibility < 6.05 *) | _ ->
       (* Si le jour et/ou le mois n'est pas sur 2 caractères, *)
       (* on rajoute les 0 nécessaires.                        *)
       match (d.day, d.month, d.year) with
       [ (0, 0, year) -> ("", "", string_of_int year)
-      | (0, month, year) -> 
+      | (0, month, year) ->
           let m = Printf.sprintf "%02d" month in
           ("", m, string_of_int year)
       | (day, month, year) ->
@@ -395,7 +395,7 @@ value string_of_ondate_aux conf =
           transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
       in
       if d1.day > 0 && not conf.cancel_links then
-        sprintf 
+        sprintf
           "<a href=\"%sm=CAL;yj=%d;mj=%d;dj=%d;tj=1\" class=\"date\">%s</a>"
           (commd conf) d1.year d1.month d1.day s
       else s
@@ -434,7 +434,7 @@ value string_of_date conf =
 
 (* ********************************************************************** *)
 (*  [Fonc] string_slash_of_date : config -> Def.date -> string            *)
-(** [Description] : Renvoie une date sous la forme jj/mm/aaaa (en 
+(** [Description] : Renvoie une date sous la forme jj/mm/aaaa (en
                     fonction du 'date order').
     [Args] :
       - conf : configuration de la base
@@ -444,27 +444,27 @@ value string_of_date conf =
 (* ********************************************************************** *)
 value string_slash_of_date conf date =
   let slashify_dmy (fst, snd, trd) d =
-    let sy = 
-      List.fold_right 
+    let sy =
+      List.fold_right
         (fun s accu -> if s <> "" then s ^ "/" ^ accu else accu)
         [fst; snd] trd
     in
-    string_of_prec_dmy conf sy d 
+    string_of_prec_dmy conf sy d
   in
   match date with
-  [ Dgreg d Dgregorian -> 
+  [ Dgreg d Dgregorian ->
       slashify_dmy (decode_dmy conf d) d
-  | Dgreg d Djulian -> 
+  | Dgreg d Djulian ->
       let d1 = Calendar.julian_of_gregorian d in
       slashify_dmy (translate_dmy conf (decode_dmy conf d1) Djulian True) d1 ^
         " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 1) ^ ")"
-  | Dgreg d Dfrench -> 
+  | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
-      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench True) d1 ^ 
+      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench True) d1 ^
         " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 2) ^ ")"
-  | Dgreg d Dhebrew -> 
+  | Dgreg d Dhebrew ->
       let d1 = Calendar.french_of_gregorian d in
-      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew True) d1 ^ 
+      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew True) d1 ^
         " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 3) ^ ")"
   | Dtext t -> t ]
 ;
@@ -503,7 +503,7 @@ value string_of_age conf a =
 (* ************************************************************************ *)
 value prec_text conf d =
   match d.prec with
-  [ About -> 
+  [ About ->
       (* On utilise le dictionnaire pour être sur *)
       (* que ce soit compréhensible de tous.      *)
       match transl conf "about (short date)" with
@@ -571,17 +571,17 @@ value year_text d =
     [Retour] : string
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-value prec_year_text conf d = 
-  let s = 
+value prec_year_text conf d =
+  let s =
     match d.prec with
-    [ About -> 
+    [ About ->
         (* On utilise le dictionnaire pour être sur *)
         (* que ce soit compréhensible de tous.      *)
         match transl conf "about (short date)" with
         [ "ca" -> "ca "
         | s -> s ]
     | Maybe -> "?"
-    | Before -> "/" 
+    | Before -> "/"
     | _ -> "" ]
   in
   let s = s ^ year_text d in
@@ -592,11 +592,11 @@ value prec_year_text conf d =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] get_birth_death : 
+(*  [Fonc] get_birth_death :
              person -> (Adef.date option * Adef.date option * bool)       *)
 (** [Description] : Renvoie la date de naissance, la date de décès et un
-      booléen pour savoir si la date de naissance et la date décès ont été 
-      trouvées. Si on ne trouve pas la date de naissance et la date de 
+      booléen pour savoir si la date de naissance et la date décès ont été
+      trouvées. Si on ne trouve pas la date de naissance et la date de
       décès, alors approx = True.
     [Args] :
       - p    : person
@@ -623,7 +623,7 @@ value get_birth_death_date p =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] print_partial_short_dates_text : 
+(*  [Fonc] print_partial_short_dates_text :
              config -> date option -> date option -> person -> string     *)
 (** [Description] : Quand une date de naissance/décès est au format texte,
       alors on n'affiche que la partie de la date qui est au format Dgreg.
@@ -655,14 +655,14 @@ value partial_short_dates_text conf birth_date death_date p =
       | _ -> "" ]
   | (_, _) -> "" ]
 ;
- 
+
 
 (* ********************************************************************** *)
 (*  [Fonc] short_dates_text : config -> base -> person -> string          *)
-(** [Description] : Renvoie la concatenation de l'année de naissance et 
-      l'année de décès (si trouvée par get_birth_death_date). La précision 
-      de la date est ajoutée pour chaque année. 
-      L'affichage est le suivant : 
+(** [Description] : Renvoie la concatenation de l'année de naissance et
+      l'année de décès (si trouvée par get_birth_death_date). La précision
+      de la date est ajoutée pour chaque année.
+      L'affichage est le suivant :
         * 1700-1780 (date naissance - date décès)
         * 1700-     (naissance - décédé)
         * 1700      (naissance - vivant)
@@ -685,12 +685,12 @@ value short_dates_text conf base p =
       | (Some (Dgreg b _), None) ->
           (* La personne peut être décédée mais ne pas avoir de date. *)
           match get_death p with
-          [ Death _ _ | DeadDontKnowWhen | DeadYoung -> 
+          [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
               prec_year_text conf b ^ "-"
           | _ -> prec_year_text conf b ]
       | (None, Some (Dgreg d _)) ->
           match get_death p with
-          [ Death _ _ | DeadDontKnowWhen | DeadYoung -> 
+          [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
               death_symbol conf ^ prec_year_text conf d
           | _ -> "" ]
       | (None, None) ->
@@ -708,7 +708,7 @@ value short_dates_text conf base p =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] short_marriage_date_text : 
+(*  [Fonc] short_marriage_date_text :
              config -> base -> person -> person -> string                 *)
 (** [Description] : Renvoie l'année de la date de mariage ansi que la
                     précision de la date.
@@ -851,7 +851,7 @@ value print_dates conf base p =
 
 (* ********************************************************************** *)
 (*  [Fonc] compare_date : date -> date -> int                             *)
-(** [Description] : Renvoie 0 si les deux dates sont égales, 1 si la 
+(** [Description] : Renvoie 0 si les deux dates sont égales, 1 si la
                     première date est plus grande et -1 sinon.
                     On ne tiens pas compte de la précision de la date.
     [Args] :
@@ -862,7 +862,7 @@ value print_dates conf base p =
 (* ********************************************************************** *)
 value compare_date d1 d2 =
   match (d1, d2) with
-  [ (Dgreg dmy1 _, Dgreg dmy2 _) -> 
+  [ (Dgreg dmy1 _, Dgreg dmy2 _) ->
       match Pervasives.compare dmy1.year dmy2.year with
       [ 0 ->
           match Pervasives.compare dmy1.month dmy2.month with
@@ -938,7 +938,7 @@ value eval_julian_day conf =
      ("j", Djulian, Calendar.sdn_of_julian, 12);
      ("f", Dfrench, Calendar.sdn_of_french, 13);
      ("h", Dhebrew, Calendar.sdn_of_hebrew, 13)]
-;  
+;
 
 IFDEF OLD THEN declare
 value gregorian_month_name conf n =

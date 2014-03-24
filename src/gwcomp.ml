@@ -287,7 +287,7 @@ value get_burial l =
           (Cremated (Adef.codate_of_od od), l)
       | [] -> (Cremated Adef.codate_None, l) ]
   | _ -> (UnknownBurial, l) ]
-;              
+;
 
 value cut_space x =
   let len = String.length x in
@@ -395,7 +395,7 @@ value get_pub_name str l =
 
 value get_image str l =
   match l with
-  [ ["#image" | "#photo"; x :: l'] -> 
+  [ ["#image" | "#photo"; x :: l'] ->
     if no_picture.val then ("", l')
     else (cut_space x, l')
   | _ -> ("", l) ]
