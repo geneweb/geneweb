@@ -1610,7 +1610,12 @@ value doctype conf =
 
 value http_string conf s i =
   let http = "http://" in
-  if start_with s i http then
+  let https = "https://" in
+  let (http, start_with_http) =
+    if start_with s i http then (http, True)
+    else (https, start_with s i https)
+  in
+  if start_with_http then
     let j =
       loop (i + String.length http) where rec loop j =
         if j < String.length s then
@@ -2742,8 +2747,11 @@ value image_and_size conf base p image_size =
           else (s, None)
         in
         let http = "http://" in
-        if String.length s > String.length http &&
-           String.sub s 0 (String.length http) = http then
+        let https = "https://" in
+        if (String.length s > String.length http &&
+            String.sub s 0 (String.length http) = http) ||
+           (String.length s > String.length https &&
+            String.sub s 0 (String.length https) = https) then
           Some (False, s, size)
         else if Filename.is_implicit s then
           match
