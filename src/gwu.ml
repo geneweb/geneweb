@@ -46,33 +46,6 @@ value spaces_to_underscore s =
   }
 ;
 
-value print_date oc =
-  fun
-  [ Dgreg d Dgregorian -> print_date_dmy oc d
-  | Dgreg d Djulian ->
-      do {
-        print_date_dmy oc (Calendar.julian_of_gregorian d);
-        fprintf oc "J"
-      }
-  | Dgreg d Dfrench ->
-      do {
-        print_date_dmy oc (Calendar.french_of_gregorian d);
-        fprintf oc "F"
-      }
-  | Dgreg d Dhebrew ->
-      do {
-        print_date_dmy oc (Calendar.hebrew_of_gregorian d);
-        fprintf oc "H"
-      }
-  | Dtext t -> fprintf oc "0(%s)" (spaces_to_underscore t) ]
-;
-
-value print_date_option oc =
-  fun
-  [ Some d -> print_date oc d
-  | None -> () ]
-;
-
 value starting_char no_num s =
   match s.[0] with
   [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' -> True
@@ -134,6 +107,40 @@ value correct_string base is = s_correct_string (sou base is);
 value correct_string_no_colon base is =
   gen_correct_string False True (sou base is)
 ;
+
+value gen_print_date no_colon oc =
+  fun
+  [ Dgreg d Dgregorian -> print_date_dmy oc d
+  | Dgreg d Djulian ->
+      do {
+        print_date_dmy oc (Calendar.julian_of_gregorian d);
+        fprintf oc "J"
+      }
+  | Dgreg d Dfrench ->
+      do {
+        print_date_dmy oc (Calendar.french_of_gregorian d);
+        fprintf oc "F"
+      }
+  | Dgreg d Dhebrew ->
+      do {
+        print_date_dmy oc (Calendar.hebrew_of_gregorian d);
+        fprintf oc "H"
+      }
+  | Dtext t ->
+      (* Dans le cas d'une date texte pour un titre, on échappe les ':' *)
+      let t = gen_correct_string False no_colon (spaces_to_underscore t) in
+      fprintf oc "0(%s)" t ]
+;
+
+value gen_print_date_option no_colon oc =
+  fun
+  [ Some d -> gen_print_date no_colon oc d
+  | None -> () ]
+;
+
+value print_date oc = gen_print_date False oc;
+value print_date_option oc = gen_print_date_option False oc;
+value print_title_date_option oc = gen_print_date_option True oc;
 
 value has_infos_not_dates base p =
   get_first_names_aliases p <> [] || get_surnames_aliases p <> [] ||
@@ -198,7 +205,7 @@ value print_title oc base t =
     fprintf oc " [";
     match t.t_name with
     [ Tmain -> fprintf oc "*"
-    | Tname s -> fprintf oc "%s" (correct_string base s)
+    | Tname s -> fprintf oc "%s" (correct_string_no_colon base s)
     | Tnone -> () ];
     fprintf oc ":";
     fprintf oc "%s" (correct_string_no_colon base t.t_ident);
@@ -209,13 +216,13 @@ value print_title oc base t =
       match (t_date_start, t_date_end) with
       [ (Some _, _) | (_, Some _) -> fprintf oc ":"
       | _ -> () ];
-    print_date_option oc t_date_start;
+    print_title_date_option oc t_date_start;
     if t.t_nth <> 0 then fprintf oc ":"
     else
       match t_date_end with
       [ Some _ -> fprintf oc ":"
       | _ -> () ];
-    print_date_option oc t_date_end;
+    print_title_date_option oc t_date_end;
     if t.t_nth <> 0 then fprintf oc ":%d" t.t_nth else ();
     fprintf oc "]"
   }
@@ -918,7 +925,7 @@ value read_file_contents fname =
         loop () where rec loop () =
           do { len.val := Buff.store len.val (input_char ic); loop () }
       with
-      [ End_of_file -> Buff.get len.val ]                   
+      [ End_of_file -> Buff.get len.val ]
   | None -> "" ]
 ;
 
