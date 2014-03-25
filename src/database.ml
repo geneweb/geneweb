@@ -562,6 +562,22 @@ value make_visible_record_access bname persons =
   { v_write = v_write; v_get = v_get }
 ;
 
+(*
+   Synchro:
+     - synchro_person contient la liste des ip des personnes patchées.
+     - synchro_family contient la liste des ifam des familles patchées.
+     - synchro_patch contient :
+         * le timestamp de la modification
+         * la liste des personnes modifiées
+         * la liste des familles modifiées
+*)
+value can_synchro = ref False;
+value synchro_person = ref [];
+value synchro_family = ref [];
+type synchro_patch =
+  { synch_list : mutable list (string * list int * list int) }
+;
+
 (* Input *)
 
 value apply_patches tab f patches plen =
@@ -805,6 +821,20 @@ value input_patches bname =
        h_name = Hashtbl.create 1} ]
 ;
 
+value input_synchro bname =
+  match
+    try
+      Some (Secure.open_in_bin (Filename.concat bname "synchro_patches"))
+    with _ -> None
+  with
+  [ Some ic -> do {
+      let r : synchro_patch = input_value ic in
+      close_in ic;
+      r
+    }
+  | None -> {synch_list = []} ]
+;
+
 value person_of_key persons strings persons_of_name first_name surname occ =
   if first_name = "?" || surname = "?" then None
   else
@@ -834,6 +864,18 @@ value opendb bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let patches = input_patches bname in
+  (* synchro que des comptes qu'on veut. *)
+  let () =
+    can_synchro.val :=
+      List.mem
+        (Filename.basename bname)
+        [ "000jlmsosa.gwb"; "arael.gwb"; "beno1.gwb"; "benoitlecluse.gwb";
+          "cbecker.gwb"; "ftbo.gwb"; "galichonj.gwb"; "harrich.gwb"; "jyb.gwb";
+          "lheureuxf.gwb"; "pialoran.gwb"; "sdesportes.gwb"; "setaou.gwb";
+          "syltaug.gwb"; "cofranssen.gwb"; "bossardlabbe.gwb"; "exemple.gwb";
+          "zfabien.gwb"; "zharrich.gwb" ]
+  in
+  let synchro = input_synchro bname in
   let particles =
     Mutil.input_particles (Filename.concat bname "particles.txt")
   in
@@ -943,6 +985,30 @@ value opendb bname =
        })
   in
   let cleanup () = cleanup_ref.val () in
+  let commit_synchro () = do {
+    if can_synchro.val then do {
+      let tmp_fname = Filename.concat bname "1synchro_patches" in
+      let fname = Filename.concat bname "synchro_patches" in
+      let oc9 =
+        try Secure.open_out_bin tmp_fname with
+        [ Sys_error _ ->
+            raise (Adef.Request_failure "the database is not writable") ]
+      in
+      let synchro =
+        let timestamp = string_of_float (Unix.time ()) in
+        let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
+        let v = (timestamp, synchro_person.val, synchro_family.val) in
+        {synch_list = [v :: synchro.synch_list]}
+      in
+      output_value_no_sharing oc9 (synchro : synchro_patch);
+      close_out oc9;
+      remove_file (fname ^ "~");
+      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+      try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
+    }
+    else ()
+  }
+  in
   let commit_patches () = do {
     let tmp_fname = Filename.concat bname "1patches" in
     let fname = Filename.concat bname "patches" in
@@ -957,6 +1023,7 @@ value opendb bname =
     remove_file (fname ^ "~");
     try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
     try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
+    commit_synchro ();
   }
   in
   let patched_ascends () =
@@ -976,6 +1043,7 @@ value opendb bname =
       persons.len := max persons.len (i + 1);
       (fst patches.h_person).val := persons.len;
       Hashtbl.replace (snd patches.h_person) i p;
+      synchro_person.val := [i :: synchro_person.val];
     }
   in
   let patch_ascend i a =
@@ -984,6 +1052,7 @@ value opendb bname =
       ascends.len := max ascends.len (i + 1);
       (fst patches.h_ascend).val := ascends.len;
       Hashtbl.replace (snd patches.h_ascend) i a;
+      synchro_person.val := [i :: synchro_person.val];
     }
   in
   let patch_union i a =
@@ -992,6 +1061,7 @@ value opendb bname =
       unions.len := max unions.len (i + 1);
       (fst patches.h_union).val := ascends.len;
       Hashtbl.replace (snd patches.h_union) i a;
+      synchro_person.val := [i :: synchro_person.val];
     }
   in
   let patch_family i f =
@@ -1000,6 +1070,7 @@ value opendb bname =
       families.len := max families.len (i + 1);
       (fst patches.h_family).val := families.len;
       Hashtbl.replace (snd patches.h_family) i f;
+      synchro_family.val := [i :: synchro_family.val];
     }
   in
   let patch_couple i c =
@@ -1008,6 +1079,7 @@ value opendb bname =
       couples.len := max couples.len (i + 1);
       (fst patches.h_couple).val := couples.len;
       Hashtbl.replace (snd patches.h_couple) i c;
+      synchro_family.val := [i :: synchro_family.val];
     }
   in
   let patch_descend i c =
@@ -1016,6 +1088,7 @@ value opendb bname =
       descends.len := max descends.len (i + 1);
       (fst patches.h_descend).val := descends.len;
       Hashtbl.replace (snd patches.h_descend) i c;
+      synchro_family.val := [i :: synchro_family.val];
     }
   in
   let index_of_string =
