@@ -26,6 +26,7 @@ type env 'a =
   [ Vstring of string
   | Vint of int
   | Vother of 'a
+  | Vcnt of ref int
   | Vnone ]
 ;
 
@@ -68,9 +69,11 @@ and eval_simple_var conf base env p loc =
   | ["acc_private"] -> bool_val (p.access = Private)
   | ["acc_public"] -> bool_val (p.access = Public)
   | ["bapt_place"] -> str_val (quote_escaped p.baptism_place)
+  | ["bapt_note"] -> str_val (quote_escaped p.baptism_note)
   | ["bapt_src"] -> str_val (quote_escaped p.baptism_src)
   | ["birth"; s] -> eval_date_var (Adef.od_of_codate p.birth) s
   | ["birth_place"] -> str_val (quote_escaped p.birth_place)
+  | ["birth_note"] -> str_val (quote_escaped p.birth_note)
   | ["birth_src"] -> str_val (quote_escaped p.birth_src)
   | ["bapt"; s] -> eval_date_var (Adef.od_of_codate p.baptism) s
   | ["bt_buried"] ->
@@ -87,6 +90,7 @@ and eval_simple_var conf base env p loc =
       in
       eval_date_var od s
   | ["burial_place"] -> str_val (quote_escaped p.burial_place)
+  | ["burial_note"] -> str_val (quote_escaped p.burial_note)
   | ["burial_src"] -> str_val (quote_escaped p.burial_src)
   | ["cnt"] -> eval_int_env "cnt" env
   | ["dead_dont_know_when"] -> bool_val (p.death = DeadDontKnowWhen)
@@ -98,6 +102,7 @@ and eval_simple_var conf base env p loc =
       in
       eval_date_var od s
   | ["death_place"] -> str_val (quote_escaped p.death_place)
+  | ["death_note"] -> str_val (quote_escaped p.death_note)
   | ["death_src"] -> str_val (quote_escaped p.death_src)
   | ["died_young"] -> bool_val (p.death = DeadYoung)
   | ["digest"] -> eval_string_env "digest" env
@@ -107,10 +112,88 @@ and eval_simple_var conf base env p loc =
   | ["dr_killed"] -> eval_is_death_reason Killed p.death
   | ["dr_murdered"] -> eval_is_death_reason Murdered p.death
   | ["dr_unspecified"] -> eval_is_death_reason Unspecified p.death
+  | ["event" :: sl] ->
+      let e =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try Some (List.nth p.pevents (i - 1)) with [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      eval_event_var conf base env e sl
+  | ["event_date"; s] ->
+      let od =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try
+              let e = List.nth p.pevents (i - 1) in
+              Adef.od_of_codate e.epers_date
+            with
+            [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      eval_date_var od s
   | ["first_name"] -> str_val (quote_escaped p.first_name)
   | ["first_name_alias"] -> eval_string_env "first_name_alias" env
   | ["has_aliases"] -> bool_val (p.aliases <> [])
   | ["has_birth_date"] -> bool_val (Adef.od_of_codate p.birth <> None)
+  | ["has_pevent_birth"] ->
+        loop p.pevents where rec loop pevents =
+          match pevents with
+          [ [] -> bool_val False
+          | [evt :: l] ->
+              if evt.epers_name = Epers_Birth then bool_val True
+              else loop l ]
+  | ["has_pevent_baptism"] ->
+        loop p.pevents where rec loop pevents =
+          match pevents with
+          [ [] -> bool_val False
+          | [evt :: l] ->
+              if evt.epers_name = Epers_Baptism then bool_val True
+              else loop l ]
+  | ["has_pevent_death"] ->
+        loop p.pevents where rec loop pevents =
+          match pevents with
+          [ [] -> bool_val False
+          | [evt :: l] ->
+              if evt.epers_name = Epers_Death then bool_val True
+              else loop l ]
+  | ["has_pevent_burial"] ->
+        loop p.pevents where rec loop pevents =
+          match pevents with
+          [ [] -> bool_val False
+          | [evt :: l] ->
+              if evt.epers_name = Epers_Burial then bool_val True
+              else loop l ]
+  | ["has_pevent_cremation"] ->
+        loop p.pevents where rec loop pevents =
+          match pevents with
+          [ [] -> bool_val False
+          | [evt :: l] ->
+              if evt.epers_name = Epers_Cremation then bool_val True
+              else loop l ]
+  | ["has_pevents"] -> bool_val (p.pevents <> [])
+  | ["has_primary_pevents"] ->
+      let rec loop pevents =
+        match pevents with
+        [ [] -> False
+        | [evt :: l] ->
+            match evt.epers_name with
+            [ Epers_Birth | Epers_Baptism | Epers_Death |
+              Epers_Burial | Epers_Cremation -> True
+            | _ -> loop l ]]
+      in
+      bool_val (loop p.pevents)
+  | ["has_secondary_pevents"] ->
+      let rec loop pevents =
+        match pevents with
+        [ [] -> False
+        | [evt :: l] ->
+            match evt.epers_name with
+            [ Epers_Birth | Epers_Baptism | Epers_Death |
+              Epers_Burial | Epers_Cremation -> loop l
+            | _ -> True ]]
+      in
+      bool_val (loop p.pevents)
   | ["has_first_names_aliases"] -> bool_val (p.first_names_aliases <> [])
   | ["has_qualifiers"] -> bool_val (p.qualifiers <> [])
   | ["has_relations"] -> bool_val (p.rparents <> [])
@@ -120,8 +203,17 @@ and eval_simple_var conf base env p loc =
   | ["index"] -> str_val (string_of_int (Adef.int_of_iper p.key_index))
   | ["is_female"] -> bool_val (p.sex = Female)
   | ["is_male"] -> bool_val (p.sex = Male)
+  | ["nb_pevents"] -> str_val (string_of_int (List.length p.pevents))
   | ["not_dead"] -> bool_val (p.death = NotDead)
   | ["notes"] -> str_val (quote_escaped p.notes)
+  | ["next_pevent"] ->
+      match get_env "next_pevent" env with
+      [ Vcnt c -> str_val (string_of_int c.val)
+      | _ -> str_val "" ]
+  | ["incr_next_pevent"] ->
+      match get_env "next_pevent" env with
+      [ Vcnt c -> do { incr c; str_val "" }
+      | _ -> str_val "" ]
   | ["occ"] -> str_val (if p.occ <> 0 then string_of_int p.occ else "")
   | ["occupation"] -> str_val (quote_escaped p.occupation)
   | ["of_course_dead"] -> bool_val (p.death = OfCourseDead)
@@ -170,6 +262,64 @@ and eval_simple_var conf base env p loc =
         | _ -> None ]
       in
       eval_date_var od s
+  | ["wcnt"] -> eval_int_env "wcnt" env
+  | ["has_witness"] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          let e =
+            try Some (List.nth p.pevents (i - 1)) with [ Failure _ -> None ]
+          in
+          match e with
+          [ Some e -> bool_val (e.epers_witnesses <> [| |])
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
+  | ["witness" :: sl] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          let e =
+            try Some (List.nth p.pevents (i - 1)) with [ Failure _ -> None ]
+          in
+          match e with
+          [ Some e ->
+              match get_env "wcnt" env with
+              [ Vint i ->
+                  let i = i - 1 in
+                  let k =
+                    if i >= 0 && i < Array.length e.epers_witnesses then
+                      fst e.epers_witnesses.(i)
+                    else if
+                      i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
+                    then
+                      ("", "", 0, Update.Create Neuter None, "")
+                    else raise Not_found
+                  in
+                  eval_person_var conf base env k sl
+              | _ -> raise Not_found ]
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
+  | ["witness_kind"] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          let e =
+            try Some (List.nth p.pevents (i - 1)) with [ Failure _ -> None ]
+          in
+          match e with
+          [ Some e ->
+              match get_env "wcnt" env with
+              [ Vint i ->
+                  let i = i - 1 in
+                  if i >= 0 && i < Array.length e.epers_witnesses then
+                    match snd e.epers_witnesses.(i) with
+                    [ Witness_GodParent -> str_val "godp"
+                    | _ -> str_val "" ]
+                  else if
+                    i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
+                  then
+                    str_val ""
+                  else raise Not_found
+              | _ -> raise Not_found ]
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
   | [s] ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -286,6 +436,77 @@ and eval_date_field =
       | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
       | _ -> None ]
   | None -> None ]
+and eval_event_var conf base env e =
+  fun
+  [ ["e_name"] ->
+      match e with
+      [ Some {epers_name = name} ->
+          match name with
+          [ Epers_Birth -> str_val "#birt"
+          | Epers_Baptism -> str_val "#bapt"
+          | Epers_Death -> str_val "#deat"
+          | Epers_Burial -> str_val "#buri"
+          | Epers_Cremation -> str_val "#crem"
+          | Epers_Accomplishment -> str_val "#acco"
+          | Epers_Acquisition -> str_val "#acqu"
+          | Epers_Adhesion -> str_val "#adhe"
+          | Epers_BaptismLDS -> str_val "#bapl"
+          | Epers_BarMitzvah -> str_val "#barm"
+          | Epers_BatMitzvah -> str_val "#basm"
+          | Epers_Benediction -> str_val "#bles"
+          | Epers_ChangeName -> str_val "#chgn"
+          | Epers_Circumcision -> str_val "#circ"
+          | Epers_ConfirmationLDS -> str_val "#conl"
+          | Epers_Confirmation -> str_val "#conf"
+          | Epers_Decoration -> str_val "#awar"
+          | Epers_DemobilisationMilitaire -> str_val "#demm"
+          | Epers_Diploma -> str_val "#degr"
+          | Epers_Distinction -> str_val "#dist"
+          | Epers_DotationLDS -> str_val "#dotl"
+          | Epers_Dotation -> str_val "#endl"
+          | Epers_Education -> str_val "#educ"
+          | Epers_Election -> str_val "#elec"
+          | Epers_Emigration -> str_val "#emig"
+          | Epers_Excommunication -> str_val "#exco"
+          | Epers_FamilyLinkLDS -> str_val "#flkl"
+          | Epers_FirstCommunion -> str_val "#fcom"
+          | Epers_Funeral -> str_val "#fune"
+          | Epers_Graduate -> str_val "#grad"
+          | Epers_Hospitalisation -> str_val "#hosp"
+          | Epers_Illness -> str_val "#illn"
+          | Epers_Immigration -> str_val "#immi"
+          | Epers_ListePassenger -> str_val "#lpas"
+          | Epers_MilitaryDistinction -> str_val "#mdis"
+          | Epers_MilitaryPromotion -> str_val "#mpro"
+          | Epers_MilitaryService -> str_val "#mser"
+          | Epers_MobilisationMilitaire -> str_val "#mobm"
+          | Epers_Naturalisation -> str_val "#natu"
+          | Epers_Occupation -> str_val "#occu"
+          | Epers_Ordination -> str_val "#ordn"
+          | Epers_Property -> str_val "#prop"
+          | Epers_Recensement -> str_val "#cens"
+          | Epers_Residence-> str_val "#resi"
+          | Epers_Retired -> str_val "#reti"
+          | Epers_ScellentChildLDS -> str_val "#slgc"
+          | Epers_ScellentParentLDS -> str_val "#slgp"
+          | Epers_ScellentSpouseLDS -> str_val "#slgs"
+          | Epers_VenteBien -> str_val "#vteb"
+          | Epers_Will -> str_val "#will"
+          | Epers_Name x -> str_val (quote_escaped x) ]
+      | _ -> str_val "" ]
+  | ["e_place"] ->
+      match e with
+      [ Some {epers_place = x} -> str_val (quote_escaped x)
+      | _ -> str_val "" ]
+  | ["e_note"] ->
+      match e with
+      [ Some {epers_note = x} -> str_val (quote_escaped x)
+      | _ -> str_val "" ]
+  | ["e_src"] ->
+      match e with
+      [ Some {epers_src = x} -> str_val (quote_escaped x)
+      | _ -> str_val "" ]
+  | _ -> raise Not_found ]
 and eval_title_var conf base env t =
   fun
   [ ["t_estate"] ->
@@ -341,6 +562,12 @@ and eval_person_var conf base env (fn, sn, oc, create, var) =
       match create with
       [ Update.Create _ _ -> bool_val True
       | _ -> bool_val False ]
+  | ["create"; "sex"] ->
+      match create with
+      [ Update.Create Male _ -> str_val "male"
+      | Update.Create Female _ -> str_val "female"
+      | Update.Create Neuter _ -> str_val "neuter"
+      | _ -> str_val "" ]
   | ["first_name"] -> str_val (quote_escaped fn)
   | ["link"] -> bool_val (create = Update.Link)
   | ["occ"] -> str_val (if oc = 0 then "" else string_of_int oc)
@@ -405,6 +632,8 @@ value print_foreach print_ast eval_expr =
     | ["surname_alias"] -> print_foreach_string env p al p.surnames_aliases s
     | ["relation"] -> print_foreach_relation env p al p.rparents
     | ["title"] -> print_foreach_title env p al p.titles
+    | ["pevent"] -> print_foreach_pevent env p al p.pevents
+    | ["witness"] -> print_foreach_witness env p al p.pevents
     | _ -> raise Not_found ]
   and print_foreach_string env p al list lab =
     let _ =
@@ -434,6 +663,28 @@ value print_foreach print_ast eval_expr =
         1 list
     in
     ()
+  and print_foreach_pevent env p al list =
+    let _ =
+      List.fold_left
+        (fun cnt nn ->
+           let env = [("cnt", Vint cnt) :: env] in
+           do { List.iter (print_ast env p) al; cnt + 1 })
+        1 list
+    in
+    ()
+  and print_foreach_witness env p al list =
+    match get_env "cnt" env with
+    [ Vint i ->
+        match
+          try Some (List.nth list (i - 1)) with [ Failure _ -> None ]
+        with
+        [ Some e ->
+            for i = 0 to max 1 (Array.length e.epers_witnesses) - 1 do {
+              let env = [("wcnt", Vint (i + 1)) :: env] in
+              List.iter (print_ast env p) al
+            }
+        | None -> () ]
+    | _ -> () ]
   in
   print_foreach
 ;
@@ -442,7 +693,10 @@ value print_update_ind conf base p digest =
   match p_getenv conf.env "m" with
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
-      let env = [("digest", Vstring digest)] in
+      let env =
+        [("digest", Vstring digest);
+         ("next_pevent", Vcnt (ref (List.length p.pevents + 1)))]
+      in
       Hutil.interp conf base "updind"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl _ = Templ.eval_transl conf;
@@ -480,11 +734,12 @@ value print_add conf base =
      first_names_aliases = []; surnames_aliases = []; public_name = "";
      qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
      occupation = ""; sex = Neuter; access = IfTitles;
-     birth = Adef.codate_None; birth_place = ""; birth_src = "";
-     baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
-     death = DontKnowIfDead; death_place = ""; death_src = "";
-     burial = UnknownBurial; burial_place = ""; burial_src = ""; notes = "";
-     psources = ""; key_index = bogus_person_index}
+     birth = Adef.codate_None; birth_place = ""; birth_note = "";
+     birth_src = ""; baptism = Adef.codate_None; baptism_place = "";
+     baptism_note = ""; baptism_src = ""; death = DontKnowIfDead;
+     death_place = ""; death_note = ""; death_src = ""; burial = UnknownBurial;
+     burial_place = ""; burial_note = ""; burial_src = ""; pevents = [];
+     notes = ""; psources = ""; key_index = bogus_person_index}
   in
   print_update_ind conf base p ""
 ;

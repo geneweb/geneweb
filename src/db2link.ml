@@ -81,15 +81,19 @@ value person_fields_arr =
   ("access", fun so -> Obj.repr so.access);
   ("birth", fun so -> Obj.repr so.birth);
   ("birth_place", fun so -> Obj.repr so.birth_place);
+  ("birth_note", fun so -> Obj.repr so.birth_note);
   ("birth_src", fun so -> Obj.repr so.birth_src);
   ("baptism", fun so -> Obj.repr so.baptism);
   ("baptism_place", fun so -> Obj.repr so.baptism_place);
+  ("baptism_note", fun so -> Obj.repr so.baptism_note);
   ("baptism_src", fun so -> Obj.repr so.baptism_src);
   ("death", fun so -> Obj.repr so.death);
   ("death_place", fun so -> Obj.repr so.death_place);
+  ("death_note", fun so -> Obj.repr so.death_note);
   ("death_src", fun so -> Obj.repr so.death_src);
   ("burial", fun so -> Obj.repr so.burial);
   ("burial_place", fun so -> Obj.repr so.burial_place);
+  ("burial_note", fun so -> Obj.repr so.burial_note);
   ("burial_src", fun so -> Obj.repr so.burial_src);
   ("psources", fun so -> Obj.repr so.psources)]
 ;
@@ -97,6 +101,7 @@ value person_fields_arr =
 value family_fields_arr =
   [("marriage", fun so -> Obj.repr so.fam.marriage);
    ("marriage_place", fun so -> Obj.repr so.fam.marriage_place);
+   ("marriage_note", fun so -> Obj.repr so.fam.marriage_note);
    ("marriage_src", fun so -> Obj.repr so.fam.marriage_src);
    ("witnesses", fun so -> Obj.repr so.fam.witnesses);
    ("relation", fun so -> Obj.repr so.fam.relation);
@@ -249,7 +254,7 @@ value insert_somebody1 gen sex =
       insert_person1 gen so ]
 ;
 
-value insert_family1 gen co fath_sex moth_sex witl fo deo = do {
+value insert_family1 gen co fath_sex moth_sex witl fevents fo deo = do {
   let _ifath = insert_somebody1 gen fath_sex (Adef.father co) in
   let _imoth = insert_somebody1 gen moth_sex (Adef.mother co) in
   Array.iter (fun key -> insert_person1 gen key) deo.children;
@@ -319,9 +324,11 @@ value insert_wiznotes1 gen wizid str = do {
 
 value insert_gwo_1 gen =
   fun
-  [ Family cpl fs ms witl fam des -> insert_family1 gen cpl fs ms witl fam des
+  [ Family cpl fs ms witl fevents fam des -> 
+      insert_family1 gen cpl fs ms witl fevents fam des
   | Notes key str -> ()
   | Relations sb sex rl -> insert_rparents1 gen sb sex rl
+  | Pevent key pevents -> ()
   | Bnotes nfname str -> insert_bnotes1 gen nfname str
   | Wnotes wizid str -> insert_wiznotes1 gen wizid str ]
 ;
@@ -331,11 +338,12 @@ value empty_person =
    first_names_aliases = []; surnames_aliases = []; public_name = "";
    qualifiers = []; aliases = []; titles = []; rparents = []; related = [];
    occupation = ""; sex = Neuter; access = IfTitles;
-   birth = Adef.codate_None; birth_place = ""; birth_src = "";
-   baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
-   death = DontKnowIfDead; death_place = ""; death_src = "";
-   burial = UnknownBurial; burial_place = ""; burial_src = ""; notes = "";
-   psources = ""; key_index = Adef.iper_of_int 0}
+   birth = Adef.codate_None; birth_place = ""; birth_note = ""; birth_src = "";
+   baptism = Adef.codate_None; baptism_place = ""; baptism_note = "";
+   baptism_src = ""; death = DontKnowIfDead; death_place = ""; death_note = ""; 
+   death_src = ""; burial = UnknownBurial; burial_place = ""; burial_note = "";
+   burial_src = ""; pevents = []; notes = ""; psources = ""; 
+   key_index = Adef.iper_of_int 0}
 ;
 
 value insert_undefined2 gen key fn sn sex = do {
@@ -447,7 +455,7 @@ value insert_related gen irp ip = do {
   Iochan.output_binary_int ioc_acc pos2;
 };
 
-value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
+value insert_family2 gen co fath_sex moth_sex witl fevents fo deo = do {
   let ifath = get_somebody2 gen fath_sex (Adef.father co) in
   let imoth = get_somebody2 gen moth_sex (Adef.mother co) in
   let children =
@@ -463,7 +471,7 @@ value insert_family2 gen co fath_sex moth_sex witl fo deo = do {
       witl
   in
   let fam =
-    {fam ={(fo) with witnesses = Array.of_list witn};
+    {fam = {(fo) with witnesses = Array.of_list witn; fevents = []};
      cpl = Adef.couple ifath imoth;
      des = {children = children}}
   in
@@ -538,9 +546,11 @@ value insert_rparents2 gen sb sex rl = do {
 
 value insert_gwo_2 gen =
   fun
-  [ Family cpl fs ms witl fam des -> insert_family2 gen cpl fs ms witl fam des
+  [ Family cpl fs ms witl fevents fam des -> 
+      insert_family2 gen cpl fs ms witl fevents fam des
   | Notes key str -> insert_notes2 gen key str
   | Relations sb sex rl -> insert_rparents2 gen sb sex rl
+  | Pevent key pevents -> ()
   | Bnotes nfname str -> ()
   | Wnotes wizid str -> () ]
 ;
@@ -629,14 +639,18 @@ value no_person empty_string ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
    public_name = empty_string; qualifiers = []; titles = []; rparents = [];
-   related = []; aliases = []; occupation = empty_string; sex = Neuter;
-   access = Private; birth = Adef.codate_None; birth_place = empty_string;
-   birth_src = empty_string; baptism = Adef.codate_None;
-   baptism_place = empty_string; baptism_src = empty_string;
+   related = []; aliases = []; 
+   occupation = empty_string; sex = Neuter; access = Private; 
+   birth = Adef.codate_None; birth_place = empty_string; 
+   birth_note = empty_string; birth_src = empty_string; 
+   baptism = Adef.codate_None; baptism_place = empty_string; 
+   baptism_note = empty_string; baptism_src = empty_string; 
    death = DontKnowIfDead; death_place = empty_string;
-   death_src = empty_string; burial = UnknownBurial;
-   burial_place = empty_string; burial_src = empty_string;
-   notes = empty_string; psources = empty_string; key_index = ip}
+   death_note = empty_string; death_src = empty_string; 
+   burial = UnknownBurial; burial_place = empty_string; 
+   burial_note = empty_string; burial_src = empty_string;
+   pevents = []; notes = empty_string; 
+   psources = empty_string; key_index = ip}
 ;
 
 value pad_per = no_person "" (Adef.iper_of_int 0);
@@ -644,8 +658,9 @@ value pad_per = no_person "" (Adef.iper_of_int 0);
 value no_family empty_string ifam =
   {fam =
      {marriage = Adef.codate_None; marriage_place = empty_string;
-      marriage_src = empty_string; witnesses = [| |]; relation = Married;
-      divorce = NotDivorced; comment = empty_string;
+      marriage_note = empty_string; marriage_src = empty_string; 
+      witnesses = [| |]; relation = Married;
+      divorce = NotDivorced; fevents = []; comment = empty_string;
       origin_file = empty_string; fsources = empty_string; fam_index = ifam};
    cpl = Adef.couple (Adef.iper_of_int 0) (Adef.iper_of_int 0);
    des = {children = [| |]}}
@@ -762,18 +777,23 @@ value compress_fields nper nfam tmp_dir =
        else ();
      })
     [("person", "baptism_place", compress_type_string, nper);
+     ("person", "baptism_note", compress_type_string, nper);
      ("person", "baptism_src", compress_type_string, nper);
      ("person", "birth_place", compress_type_string, nper);
+     ("person", "birth_note", compress_type_string, nper);
      ("person", "birth_src", compress_type_string, nper);
      ("person", "burial_place", compress_type_string, nper);
+     ("person", "burial_note", compress_type_string, nper);
      ("person", "burial_src", compress_type_string, nper);
      ("family", "comment", compress_type_string, nfam);
      ("person", "death_place", compress_type_string, nper);
+     ("person", "death_note", compress_type_string, nper);
      ("person", "death_src", compress_type_string, nper);
      ("person", "first_name", compress_type_string, nper);
      ("family", "fsources", compress_type_string, nfam);
      ("person", "image", compress_type_string, nper);
      ("family", "marriage_place", compress_type_string, nfam);
+     ("family", "marriage_note", compress_type_string, nfam);
      ("family", "marriage_src", compress_type_string, nfam);
      ("person", "occupation", compress_type_string, nper);
      ("family", "origin_file", compress_type_string, nfam);

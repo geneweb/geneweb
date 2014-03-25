@@ -123,6 +123,7 @@ value copy_from_etc :
 value string_with_macros :
   config -> list (char * unit -> string) -> string -> string;
 value string_of_place : config -> string -> string;
+value place_of_string : config -> string -> option place;
 value filter_html_tags : string -> string;
 value allowed_tags_file : ref string;
 value body_prop : config -> string;
@@ -165,6 +166,12 @@ value translate_eval : string -> string;
 value std_color : config -> string -> string;
 
 value index_of_sex : sex -> int;
+
+value string_of_pevent_name : 
+  config -> base -> gen_pers_event_name istr -> string;
+value string_of_fevent_name : 
+  config -> base -> gen_fam_event_name istr -> string;
+value string_of_witness_kind : config -> person -> witness_kind -> string;
 
 value relation_txt :
   config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b;

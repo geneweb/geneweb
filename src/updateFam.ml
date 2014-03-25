@@ -146,8 +146,10 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
   | ["fsources"] -> str_val (quote_escaped fam.fsources)
   | ["marriage"; s] -> eval_date_var (Adef.od_of_codate fam.marriage) s
   | ["marriage_place"] -> str_val (quote_escaped fam.marriage_place)
+  | ["marriage_note"] -> str_val (quote_escaped fam.marriage_note)
   | ["marriage_src"] -> str_val (quote_escaped fam.marriage_src)
   | ["mrel"] -> str_val (eval_relation_kind fam.relation)
+  | ["nb_fevents"] -> str_val (string_of_int (List.length fam.fevents))
   | ["origin_file"] -> str_val (quote_escaped fam.origin_file)
   | ["parent" :: sl] ->
         let k =
@@ -162,6 +164,7 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
           | _ -> raise Not_found ]
         in
         eval_parent conf base env k sl
+  | ["wcnt"] -> eval_int_env "wcnt" env
   | ["witness" :: sl] ->
         let k =
           match get_env "cnt" env with
@@ -175,6 +178,84 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
           | _ -> raise Not_found ]
         in
         eval_key k sl
+  | ["has_fevents"] -> bool_val (fam.fevents <> [])
+  | ["event" :: sl] ->
+      let e =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try Some (List.nth fam.fevents (i - 1)) with [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      eval_event_var conf base env e sl
+  | ["event_date"; s] ->
+      let od =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try
+              let e = List.nth fam.fevents (i - 1) in
+              Adef.od_of_codate e.efam_date
+            with
+            [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      eval_date_var od s
+  | ["has_fwitness"] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          let e =
+            try Some (List.nth fam.fevents (i - 1)) with [ Failure _ -> None ]
+          in
+          match e with
+          [ Some e -> bool_val (e.efam_witnesses <> [| |])
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
+  | ["fwitness" :: sl] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          let e =
+            try Some (List.nth fam.fevents (i - 1)) with [ Failure _ -> None ]
+          in
+          match e with
+          [ Some e ->
+              match get_env "wcnt" env with
+              [ Vint i ->
+                  let i = i - 1 in
+                  let k =
+                    if i >= 0 && i < Array.length e.efam_witnesses then
+                      fst e.efam_witnesses.(i)
+                    else if 
+                      i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
+                    then
+                      ("", "", 0, Update.Create Neuter None, "")
+                    else raise Not_found
+                  in
+                  eval_key k sl
+              | _ -> raise Not_found ]
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
+  | ["fwitness_kind"] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          let e =
+            try Some (List.nth fam.fevents (i - 1)) with [ Failure _ -> None ]
+          in
+          match e with
+          [ Some e ->
+              match get_env "wcnt" env with
+              [ Vint i ->
+                  let i = i - 1 in
+                  if i >= 0 && i < Array.length e.efam_witnesses then
+                    match snd e.efam_witnesses.(i) with
+                    [ Witness_GodParent -> str_val "godp"
+                    | _ -> str_val "" ]
+                  else if 
+                    i >= 0 && i < 2 && Array.length e.efam_witnesses < 2
+                  then
+                    str_val ""
+                  else raise Not_found
+              | _ -> raise Not_found ]
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
   | [s] ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -270,6 +351,39 @@ and eval_date_field =
       | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
       | _ -> None ]
   | None -> None ]
+and eval_event_var conf base env e =
+  fun
+  [ ["e_name"] ->
+      match e with
+      [ Some {efam_name = name} -> 
+          match name with
+          [ Efam_Marriage -> str_val "#marr"
+          | Efam_NoMarriage -> str_val "#nmar"
+          | Efam_NoMention -> str_val "#nmen"
+          | Efam_Engage -> str_val "#enga"
+          | Efam_Divorce -> str_val "#div"
+          | Efam_Separated -> str_val "#sep"
+          | Efam_Annulation -> str_val "#anul"
+          | Efam_MarriageBann -> str_val "#marb"
+          | Efam_MarriageContract -> str_val "#marc"
+          | Efam_MarriageLicense -> str_val "#marl"
+          | Efam_PACS -> str_val "#pacs"
+          | Efam_Residence -> str_val "#resi"
+          | Efam_Name x -> str_val (quote_escaped x) ]
+      | _ -> str_val "" ]
+  | ["e_place"] ->
+      match e with
+      [ Some {efam_place = x} -> str_val (quote_escaped x)
+      | _ -> str_val "" ]
+  | ["e_note"] ->
+      match e with
+      [ Some {efam_note = x} -> str_val (quote_escaped x)
+      | _ -> str_val "" ]
+  | ["e_src"] ->
+      match e with
+      [ Some {efam_src = x} -> str_val (quote_escaped x)
+      | _ -> str_val "" ]
+  | _ -> raise Not_found ]
 and eval_parent conf base env k =
   fun
   [ ["himher"] ->
@@ -433,6 +547,8 @@ value print_foreach print_ast eval_expr =
   let rec print_foreach env ((fam, cpl, des) as fcd) _ s sl _ al =
     match [s :: sl] with
     [ ["child"] -> print_foreach_child env fcd al des.children s
+    | ["fevent"] -> print_foreach_fevent env fcd al fam.fevents s
+    | ["fwitness"] -> print_foreach_fwitness env fcd al fam.fevents s
     | ["witness"] -> print_foreach_witness env fcd al fam.witnesses s
     | ["parent"] -> print_foreach_parent env fcd al (parent_array cpl) s
     | _ -> raise Not_found ]
@@ -441,6 +557,28 @@ value print_foreach print_ast eval_expr =
       let env = [("cnt", Vint (i + 1)) :: env] in
       List.iter (print_ast env fcd) al
     }
+  and print_foreach_fevent env fcd al list lab =
+    let _ =
+      List.fold_left
+        (fun cnt nn ->
+          let env = [("cnt", Vint cnt) :: env] in
+          do { List.iter (print_ast env fcd) al; cnt + 1 })
+        1 list
+    in
+    ()
+  and print_foreach_fwitness env fcd al list lab =
+    match get_env "cnt" env with
+    [ Vint i ->
+        match
+          try Some (List.nth list (i - 1)) with [ Failure _ -> None ]
+        with
+        [ Some e ->
+            for i = 0 to max 1 (Array.length e.efam_witnesses) - 1 do {
+              let env = [("wcnt", Vint (i + 1)) :: env] in
+              List.iter (print_ast env fcd) al
+            }
+        | None -> () ]
+    | _ -> () ]
   and print_foreach_witness env fcd al arr lab =
     for i = 0 to max 2 (Array.length arr) - 1 do {
       let env = [("cnt", Vint (i + 1)) :: env] in
@@ -570,10 +708,10 @@ value print_add conf base =
          ("", "", 0, Update.Create Female None, ""), "") ]
   in
   let fam =
-    {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
-     witnesses = [| |]; relation = Married; divorce = NotDivorced;
-     comment = ""; origin_file = ""; fsources = default_source conf;
-     fam_index = bogus_family_index}
+    {marriage = Adef.codate_None; marriage_place = ""; marriage_note = "";
+     marriage_src = ""; witnesses = [| |]; relation = Married;
+     divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
+     fsources = default_source conf; fam_index = bogus_family_index}
   and cpl = couple conf.multi_parents fath moth
   and des = {children = [| |]} in
   print_update_fam conf base (fam, cpl, des) digest
@@ -584,10 +722,10 @@ value print_add_parents conf base =
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
       let fam =
-        {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
-         witnesses = [| |]; relation = Married; divorce = NotDivorced;
-         comment = ""; origin_file = ""; fsources = default_source conf;
-         fam_index = bogus_family_index}
+        {marriage = Adef.codate_None; marriage_place = ""; marriage_note = "";
+         marriage_src = ""; witnesses = [| |]; relation = Married;
+         divorce = NotDivorced; fevents = []; comment = ""; origin_file = "";
+         fsources = default_source conf; fam_index = bogus_family_index}
       and cpl =
         couple conf.multi_parents
           ("", sou base (get_surname p), 0, Update.Create Neuter None, "")

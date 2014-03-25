@@ -1178,6 +1178,86 @@ value index_of_sex =
   | Neuter -> 2 ]
 ;
 
+value string_of_pevent_name conf base epers_name =
+  match epers_name with
+  [ Epers_Birth -> transl conf "birth"
+  | Epers_Baptism -> transl conf "baptism"
+  | Epers_Death -> transl conf "death"
+  | Epers_Burial -> transl conf "burial"
+  | Epers_Cremation -> transl conf "cremation"
+  | Epers_Accomplishment -> transl conf "accomplishment"
+  | Epers_Acquisition -> transl conf "acquisition"
+  | Epers_Adhesion -> transl conf "adhesion"
+  | Epers_BaptismLDS -> transl conf "baptismLDS"
+  | Epers_BarMitzvah -> transl conf "bar mitzvah"
+  | Epers_BatMitzvah -> transl conf "bat mitzvah"
+  | Epers_Benediction -> transl conf "benediction"
+  | Epers_ChangeName -> transl conf "change name"
+  | Epers_Circumcision -> transl conf "circumcision"
+  | Epers_Confirmation -> transl conf "confirmation"
+  | Epers_ConfirmationLDS -> transl conf "confirmation LDS"
+  | Epers_Decoration -> transl conf "decoration"
+  | Epers_DemobilisationMilitaire -> transl conf "demobilisationMilitaire"
+  | Epers_Diploma -> transl conf "diploma"
+  | Epers_Distinction -> transl conf "distinction"
+  | Epers_Dotation -> transl conf "dotation"
+  | Epers_DotationLDS -> transl conf "dotationLDS"
+  | Epers_Education -> transl conf "education"
+  | Epers_Election -> transl conf "election"
+  | Epers_Emigration -> transl conf "emigration"
+  | Epers_Excommunication -> transl conf "excommunication"
+  | Epers_FamilyLinkLDS -> transl conf "familyLinkLDS"
+  | Epers_FirstCommunion -> transl conf "firstCommunion"
+  | Epers_Funeral -> transl conf "funeral"
+  | Epers_Graduate -> transl conf "graduate"
+  | Epers_Hospitalisation -> transl conf "hospitalisation"
+  | Epers_Illness -> transl conf "illness"
+  | Epers_Immigration -> transl conf "immigration"
+  | Epers_ListePassenger -> transl conf "listePassenger"
+  | Epers_MilitaryDistinction -> transl conf "militaryDistinction"
+  | Epers_MilitaryPromotion -> transl conf "militaryPromotion"
+  | Epers_MilitaryService -> transl conf "militaryService"
+  | Epers_MobilisationMilitaire -> transl conf "mobilisationMilitaire"
+  | Epers_Naturalisation -> transl conf "naturalisation"
+  | Epers_Occupation -> transl_nth conf "occupation/occupations" 0
+  | Epers_Ordination -> transl conf "ordination"
+  | Epers_Property -> transl conf "property"
+  | Epers_Recensement -> transl conf "recensement"
+  | Epers_Residence-> transl conf "residence"
+  | Epers_Retired -> transl conf  "retired"
+  | Epers_ScellentChildLDS -> transl conf "scellentChildLDS"
+  | Epers_ScellentParentLDS -> transl conf "scellentParentLDS"
+  | Epers_ScellentSpouseLDS -> transl conf "scellentSpouseLDS"
+  | Epers_VenteBien -> transl conf "venteBien"
+  | Epers_Will -> transl conf "will"
+  | Epers_Name n -> sou base n ]
+;
+
+value string_of_fevent_name conf base efam_name =
+  match efam_name with
+  [ Efam_Marriage -> transl conf "marriage event"
+  | Efam_NoMarriage -> transl conf "no marriage event"
+  | Efam_NoMention -> transl conf "no mention"
+  | Efam_Engage -> transl conf "engage event"
+  | Efam_Divorce -> transl conf "divorce event"
+  | Efam_Separated -> transl conf "separate event"
+  | Efam_Annulation -> transl conf "annulation"
+  | Efam_MarriageBann -> transl conf "marriage bann"
+  | Efam_MarriageContract -> transl conf "marriage contract"
+  | Efam_MarriageLicense -> transl conf "marriage licence"
+  | Efam_PACS -> transl conf "PACS"
+  | Efam_Residence -> transl conf "residence"
+  | Efam_Name n -> sou base n ]
+;
+
+value string_of_witness_kind conf p witness_kind =
+  match witness_kind with
+  [ Witness -> transl_nth conf "witness/witnesses" 0
+  | Witness_GodParent ->
+      let n = index_of_sex (get_sex p) in
+      transl_nth conf "godfather/godmother/godparents" n ]
+;
+
 value input_to_semi ic =
   loop 0 where rec loop len =
     let c = input_char ic in
@@ -1856,6 +1936,74 @@ value string_with_macros conf env s =
     else filter_html_tags (Buffer.contents buff)
 ;
 
+value place_of_string conf place =
+  match p_getenv conf.base_env "place" with
+  [ Some gwf_place ->
+      (*
+      let lines_list_of_string s =
+        loop [] 0 0 where rec loop lines len i =
+          if i = String.length s then
+            List.rev (if len = 0 then lines else [Buff.get len :: lines])
+          else if s.[i] = ',' then
+            let line = Buff.get len in
+            loop [line :: lines] 0 (i + 1)
+          else
+            loop lines (Buff.store len s.[i]) (i + 1)
+      in
+      *)
+      let split str sep =
+        let i = String.index str sep in
+        let s = String.sub str 0 i in
+        let sn = String.sub str (i + 1) (String.length str - i - 1) in
+        (s, sn)
+      in
+      let explode str sep =
+        let rec loop s accu =
+          try
+            let (s, sn) = split s sep in
+            loop sn [s :: accu]
+          with [ Not_found -> [s :: accu] ]
+        in
+        loop str []
+      in
+      let list = explode gwf_place ',' in
+      let list = List.map strip_spaces list in
+      let list_p = explode place ',' in
+      let list_p = List.map strip_spaces list_p in
+      let place =
+        {other = ""; town = ""; township = ""; canton = "";
+         district = ""; county = ""; region = ""; country = ""}
+      in
+      let place =
+        loop list list_p place where rec loop list list_p place =
+          match list_p with
+          [ [] -> place
+          | [x :: list_p] ->
+              match list with
+              [ [] ->
+                  let other = String.concat ", " [x :: list_p] in
+                  let other = place.other ^ " " ^ other in
+                  let place = {(place) with other = other} in
+                  place
+              | [t :: list] ->
+                  let place =
+                    match t with
+                    [ "town" -> {(place) with town = x}
+                    | "township" -> {(place) with township = x}
+                    | "canton" -> {(place) with canton = x}
+                    | "district" -> {(place) with district = x}
+                    | "county" -> {(place) with county = x}
+                    | "region" -> {(place) with region = x}
+                    | "country" -> {(place) with country = x}
+                    | _ ->
+                        let other = place.other ^ " " ^ x in
+                        {(place) with other = other}]
+                  in
+                  loop list list_p place ] ]
+      in
+      Some place
+  | None -> None ]
+;
 
 (* ********************************************************************** *)
 (*  [Fonc] string_of_place : config -> string -> string                   *)

@@ -17,6 +17,59 @@ value map_title_strings f t =
    t_date_start = t.t_date_start; t_date_end = t.t_date_end; t_nth = t.t_nth}
 ;
 
+value map_pers_event fp fs e =
+  let epers_name =
+    match e.epers_name with
+    [ Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
+    | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+    | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
+    | Epers_ChangeName | Epers_Circumcision | Epers_Confirmation
+    | Epers_ConfirmationLDS | Epers_Decoration | Epers_DemobilisationMilitaire
+    | Epers_Diploma | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+    | Epers_Education | Epers_Election | Epers_Emigration | Epers_Excommunication
+    | Epers_FamilyLinkLDS | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
+    | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
+    | Epers_ListePassenger | Epers_MilitaryDistinction | Epers_MilitaryPromotion
+    | Epers_MilitaryService | Epers_MobilisationMilitaire | Epers_Naturalisation
+    | Epers_Occupation | Epers_Ordination | Epers_Property | Epers_Recensement
+    | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
+    | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien
+    | Epers_Will as evt -> evt
+    | Epers_Name s -> Epers_Name (fs s) ]
+  in
+  let epers_date = e.epers_date in
+  let epers_place = fs e.epers_place in
+  let epers_reason = fs e.epers_reason in
+  let epers_note = fs e.epers_note in
+  let epers_src = fs e.epers_src in
+  let epers_witnesses = Array.map (fun (p, w) -> (fp p, w)) e.epers_witnesses in
+  { epers_name = epers_name; epers_date = epers_date;
+    epers_place = epers_place; epers_reason = epers_reason;
+    epers_note = epers_note; epers_src = epers_src;
+    epers_witnesses = epers_witnesses }
+;
+
+value map_fam_event fp fs e =
+  let efam_name =
+    match e.efam_name with
+    [ Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
+    | Efam_Divorce  | Efam_Separated
+    | Efam_Annulation | Efam_MarriageBann | Efam_MarriageContract
+    | Efam_MarriageLicense | Efam_PACS | Efam_Residence as evt -> evt
+    | Efam_Name s -> Efam_Name (fs s) ]
+  in
+  let efam_date = e.efam_date in
+  let efam_place = fs e.efam_place in
+  let efam_reason = fs e.efam_reason in
+  let efam_note = fs e.efam_note in
+  let efam_src = fs e.efam_src in
+  let efam_witnesses = Array.map (fun (p, w) -> (fp p, w)) e.efam_witnesses in
+  { efam_name = efam_name; efam_date = efam_date;
+    efam_place = efam_place; efam_reason = efam_reason;
+    efam_note = efam_note; efam_src = efam_src;
+    efam_witnesses = efam_witnesses }
+;
+
 value map_relation_ps fp fs r =
   {r_type = r.r_type;
    r_fath =
@@ -41,11 +94,14 @@ value map_person_ps fp fs p =
    related = p.related; aliases = List.map fs p.aliases;
    occupation = fs p.occupation; sex = p.sex; access = p.access;
    birth = p.birth; birth_place = fs p.birth_place;
-   birth_src = fs p.birth_src; baptism = p.baptism;
-   baptism_place = fs p.baptism_place; baptism_src = fs p.baptism_src;
+   birth_note = fs p.birth_note; birth_src = fs p.birth_src;
+   baptism = p.baptism; baptism_place = fs p.baptism_place;
+   baptism_note = fs p.baptism_note; baptism_src = fs p.baptism_src;
    death = p.death; death_place = fs p.death_place;
-   death_src = fs p.death_src; burial = p.burial;
-   burial_place = fs p.burial_place; burial_src = fs p.burial_src;
+   death_note = fs p.death_note; death_src = fs p.death_src; burial = p.burial;
+   burial_place = fs p.burial_place; burial_note = fs p.burial_note;
+   burial_src = fs p.burial_src;
+   pevents = List.map (map_pers_event fp fs) p.pevents;
    notes = fs p.notes; psources = fs p.psources; key_index = p.key_index}
 ;
 
@@ -53,10 +109,12 @@ value map_union_f ff u = {family = Array.map ff u.family};
 
 value map_family_ps fp fs fam =
   {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
-   marriage_src = fs fam.marriage_src; witnesses = Array.map fp fam.witnesses;
-   relation = fam.relation; divorce = fam.divorce; comment = fs fam.comment;
-   origin_file = fs fam.origin_file; fsources = fs fam.fsources;
-   fam_index = fam.fam_index}
+   marriage_note = fs fam.marriage_note; marriage_src = fs fam.marriage_src;
+   witnesses = Array.map fp fam.witnesses; relation = fam.relation;
+   divorce = fam.divorce;
+   fevents = List.map (map_fam_event fp fs) fam.fevents;
+   comment = fs fam.comment; origin_file = fs fam.origin_file;
+   fsources = fs fam.fsources; fam_index = fam.fam_index}
 ;
 
 value parent multi parent =

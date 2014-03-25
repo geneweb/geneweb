@@ -39,6 +39,153 @@ value sorp base ip =
    Update.Link, "")
 ;
 
+value merge_event_witnesses base wit1 wit2 =
+  let list =
+    List.fold_right
+      (fun wit list -> if List.mem wit list then list else [wit :: list])
+      (Array.to_list wit1)
+      (Array.to_list wit2)
+  in
+  Array.of_list list
+;
+
+value merge_events base l1 l2 p =
+  let list_mem e l =
+    let found_birth = ref False in
+    let found_baptism = ref False in
+    let found_death = ref False in
+    let found_burial = ref False in
+    match e.epers_name with
+    [ Epers_Birth | Epers_Baptism | Epers_Death |
+      Epers_Burial | Epers_Cremation ->
+        List.fold_right
+          (fun e1 (mem, l1) ->
+            match e1.epers_name with
+            [ Epers_Birth ->
+                if found_birth.val then (mem, [e1 :: l1])
+                else
+                  if e.epers_name = e1.epers_name then
+                    let witnesses =
+                      merge_event_witnesses base e1.epers_witnesses e.epers_witnesses
+                    in
+                    let e1 =
+                      {(e1) with epers_date = p.birth;
+                        epers_place = p.birth_place;
+                        epers_note = p.birth_note; epers_src = p.birth_src;
+                        epers_witnesses = witnesses}
+                    in
+                    let _ = found_birth.val := True in
+                    (True, [e1 :: l1])
+                  else
+                    (mem, [e1 :: l1])
+            | Epers_Baptism ->
+                if found_baptism.val then (mem, [e1 :: l1])
+                else
+                  if e.epers_name = e1.epers_name then
+                    let witnesses =
+                      merge_event_witnesses base e1.epers_witnesses e.epers_witnesses
+                    in
+                    let e1 =
+                      {(e1) with epers_date = p.baptism;
+                        epers_place = p.baptism_place;
+                        epers_note = p.baptism_note; epers_src = p.baptism_src;
+                        epers_witnesses = witnesses}
+                    in
+                    let _ = found_baptism.val := True in
+                    (True, [e1 :: l1])
+                  else
+                    (mem, [e1 :: l1])
+            | Epers_Death ->
+                if found_death.val then (mem, [e1 :: l1])
+                else
+                  if e.epers_name = e1.epers_name then
+                    let (is_dead, date) =
+                      match p.death with
+                      [ NotDead | DontKnowIfDead -> (False, Adef.codate_None)
+                      | Death _ cd ->
+                          (True, Adef.codate_of_od (Some (Adef.date_of_cdate cd)))
+                      | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
+                          (True, Adef.codate_None) ]
+                    in
+                    let witnesses =
+                      merge_event_witnesses base e1.epers_witnesses e.epers_witnesses
+                    in
+                    let e1 =
+                      {(e1) with epers_date = date;
+                        epers_place = p.death_place;
+                        epers_note = p.death_note; epers_src = p.death_src;
+                        epers_witnesses = witnesses}
+                    in
+                    let _ = found_death.val := True in
+                    if is_dead then (True, [e1 :: l1])
+                    else (True, l1)
+                  else
+                    (mem, [e1 :: l1])
+            | Epers_Burial ->
+                if found_burial.val then (mem, [e1 :: l1])
+                else
+                  if e.epers_name = e1.epers_name then
+                    match p.burial with
+                    [ UnknownBurial ->
+                        let _ = found_burial.val := True in
+                        (True, l1)
+                    | Buried cd ->
+                        let witnesses =
+                          merge_event_witnesses base e1.epers_witnesses e.epers_witnesses
+                        in
+                        let e1 =
+                          {(e1) with epers_date = cd;
+                            epers_place = p.burial_place;
+                            epers_note = p.burial_note; epers_src = p.burial_src;
+                            epers_witnesses = witnesses}
+                        in
+                        let _ = found_burial.val := True in
+                        (True, [e1 :: l1])
+                    | _ ->
+                        let _ = found_burial.val := True in
+                        (mem, [e1 :: l1]) ]
+                  else
+                    (mem, [e1 :: l1])
+            | Epers_Cremation ->
+                if found_burial.val then (mem, [e1 :: l1])
+                else
+                  if e.epers_name = e1.epers_name then
+                    match p.burial with
+                    [ UnknownBurial ->
+                        let _ = found_burial.val := True in
+                        (True, l1)
+                    | Cremated cd ->
+                        let witnesses =
+                          merge_event_witnesses base e1.epers_witnesses e.epers_witnesses
+                        in
+                        let e1 =
+                          {(e1) with epers_date = cd;
+                            epers_place = p.burial_place;
+                            epers_note = p.burial_note; epers_src = p.burial_src;
+                            epers_witnesses = witnesses}
+                        in
+                        let _ = found_burial.val := True in
+                        (True, [e1 :: l1])
+                    | _ ->
+                        let _ = found_burial.val := True in
+                        (mem, [e1 :: l1]) ]
+                  else
+                    (mem, [e1 :: l1])
+            | _ -> (mem, [e1 :: l1]) ])
+          l (False, [])
+    | _ -> (False, l) ]
+  in
+  let rec merge_events_aux l1 l2 =
+    match l2 with
+    [ [] -> l1
+    | [e2 :: l2] ->
+        let (mem, l1) = list_mem e2 l1 in
+        if mem then merge_events_aux l1 l2
+        else merge_events_aux (l1 @ [e2]) l2 ]
+  in
+  merge_events_aux l1 l2
+;
+
 value reconstitute conf base p1 p2 =
   let field name proj null =
     let x1 = proj p1 in
@@ -52,51 +199,73 @@ value reconstitute conf base p1 p2 =
     let l1 = List.map conv (proj p1) in
     let l2 = List.map conv (proj p2) in merge_lists l1 l2
   in
-  {first_name =
-     field "first_name" (fun p -> p_first_name base p)
-       (fun x -> x = "" || x = "?");
-   surname =
-     field "surname" (fun p -> p_surname base p) (fun x -> x = "" || x = "?");
-   occ = field "number" get_occ ( \= 0);
-   image = field "image" (fun p -> sou base (get_image p)) ( \= "");
-   public_name =
-     field "public_name" (fun p -> sou base (get_public_name p)) ( \= "");
-   qualifiers = list (sou base) get_qualifiers;
-   aliases = list (sou base) get_aliases;
-   first_names_aliases = list (sou base) get_first_names_aliases;
-   surnames_aliases = list (sou base) get_surnames_aliases;
-   titles = list (map_title_strings (sou base)) get_titles;
-   rparents = list (map_relation_ps (sorp base) (sou base)) get_rparents;
-   related = [];
-   occupation =
-     field "occupation" (fun p -> sou base (get_occupation p)) ( \= "");
-   sex = field "sex" get_sex ( \= Neuter);
-   access = field "access" get_access ( \= IfTitles);
-   birth = field "birth" get_birth ( \= Adef.codate_None);
-   birth_place =
-     field "birth_place" (fun p -> sou base (get_birth_place p)) ( \= "");
-   birth_src = merge_strings base (get_birth_src p1) ", " (get_birth_src p2);
-   baptism = field "baptism" get_baptism ( \= Adef.codate_None);
-   baptism_place =
-     field "baptism_place" (fun p -> sou base (get_baptism_place p)) ( \= "");
-   baptism_src =
-     merge_strings base (get_baptism_src p1) ", " (get_baptism_src p2);
-   death = field "death" get_death
-     (fun x ->
-       match x with
-       [ DontKnowIfDead | OfCourseDead -> True
-       | _ -> False]);
-   death_place =
-     field "death_place" (fun p -> sou base (get_death_place p)) ( \= "");
-   death_src = merge_strings base (get_death_src p1) ", " (get_death_src p2);
-   burial = field "burial" get_burial ( \= UnknownBurial);
-   burial_place =
-     field "burial_place" (fun p -> sou base (get_burial_place p)) ( \= "");
-   burial_src =
-     merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
-   notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
-   psources = merge_strings base (get_psources p1) ", " (get_psources p2);
-   key_index = get_key_index p1}
+  let merge_primary_events conv proj p =
+    let l1 = List.map conv (proj p1) in
+    let l2 = List.map conv (proj p2) in
+    merge_events base l1 l2 p
+  in
+  let p =
+    {first_name =
+       field "first_name" (fun p -> p_first_name base p)
+         (fun x -> x = "" || x = "?");
+     surname =
+       field "surname" (fun p -> p_surname base p) (fun x -> x = "" || x = "?");
+     occ = field "number" get_occ ( \= 0);
+     image = field "image" (fun p -> sou base (get_image p)) ( \= "");
+     public_name =
+       field "public_name" (fun p -> sou base (get_public_name p)) ( \= "");
+     qualifiers = list (sou base) get_qualifiers;
+     aliases = list (sou base) get_aliases;
+     first_names_aliases = list (sou base) get_first_names_aliases;
+     surnames_aliases = list (sou base) get_surnames_aliases;
+     titles = list (map_title_strings (sou base)) get_titles;
+     rparents = list (map_relation_ps (sorp base) (sou base)) get_rparents;
+     related = [];
+     occupation =
+       field "occupation" (fun p -> sou base (get_occupation p)) ( \= "");
+     sex = field "sex" get_sex ( \= Neuter);
+     access = field "access" get_access ( \= IfTitles);
+     birth = field "birth" get_birth ( \= Adef.codate_None);
+     birth_place =
+       field "birth_place" (fun p -> sou base (get_birth_place p)) ( \= "");
+     birth_note =
+       merge_strings base (get_birth_note p1) "<br>\n" (get_birth_note p2);
+     birth_src = merge_strings base (get_birth_src p1) ", " (get_birth_src p2);
+     baptism = field "baptism" get_baptism ( \= Adef.codate_None);
+     baptism_place =
+       field "baptism_place" (fun p -> sou base (get_baptism_place p)) ( \= "");
+     baptism_note =
+       merge_strings base (get_baptism_note p1) "<br>\n" (get_baptism_note p2);
+     baptism_src =
+       merge_strings base (get_baptism_src p1) ", " (get_baptism_src p2);
+     death = field "death" get_death
+       (fun x ->
+         match x with
+         [ DontKnowIfDead | OfCourseDead -> True
+         | _ -> False]);
+     death_place =
+       field "death_place" (fun p -> sou base (get_death_place p)) ( \= "");
+     death_note =
+       merge_strings base (get_death_note p1) "<br>\n" (get_death_note p2);
+     death_src = merge_strings base (get_death_src p1) ", " (get_death_src p2);
+     burial = field "burial" get_burial ( \= UnknownBurial);
+     burial_place =
+       field "burial_place" (fun p -> sou base (get_burial_place p)) ( \= "");
+     burial_note =
+       merge_strings base (get_burial_note p1) "<br>\n" (get_burial_note p2);
+     burial_src =
+       merge_strings base (get_burial_src p1) ", " (get_burial_src p2);
+       pevents = list (map_pers_event (sorp base) (sou base)) get_pevents;
+     notes = merge_strings base (get_notes p1) "<br>\n" (get_notes p2);
+     psources = merge_strings base (get_psources p1) ", " (get_psources p2);
+     key_index = get_key_index p1}
+  in
+  (* On fait la fusion des évènements à partir *)
+  (* de la fusion des évènements principaux.   *)
+  let pevents =
+    merge_primary_events (map_pers_event (sorp base) (sou base)) get_pevents p
+  in
+  {(p) with pevents = pevents}
 ;
 
 value print_merge conf base =
@@ -157,9 +326,35 @@ value redirect_relations_of_added_related base p ip2 rel_chil =
                 ([r :: pc_rparents], mod_pc, p_related, mod_p))
              (get_rparents pc) ([], False, p_related, mod_p)
          in
+         let (pc_pevents, mod_pc, p_related, mod_p) =
+           List.fold_right
+             (fun e (pc_pevents, mod_pc, p_related, mod_p) ->
+                let (e, mod_pc, p_related, mod_p) =
+                  let (witnesses, mod_p, p_related) =
+                    List.fold_right
+                      (fun (ip, k) (witnesses, mod_p, p_related) ->
+                         if ip = ip2 then do {
+                           let (p_related, mod_p) =
+                             if List.mem ipc p_related then (p_related, mod_p)
+                             else ([ipc :: p_related], True)
+                           in
+                           ([(p.key_index, k) :: witnesses], mod_p, p_related)
+                         }
+                         else ([(ip, k) :: witnesses], mod_p, p_related))
+                      (Array.to_list e.epers_witnesses) ([], mod_pc, p_related)
+                  in
+                  let e =
+                    {(e) with epers_witnesses = Array.of_list witnesses}
+                  in
+                  (e, True, p_related, mod_p)
+                in
+                ([e :: pc_pevents], mod_pc, p_related, mod_p))
+             (get_pevents pc) ([], False, p_related, mod_p)
+         in
+         (* TODO mod_pc = True tout le temps *)
          if mod_pc then
            let pc = gen_person_of_person pc in
-           let pc = {(pc) with rparents = pc_rparents} in
+           let pc = {(pc) with rparents = pc_rparents; pevents = pc_pevents} in
            patch_person base ipc pc
          else ();
          let (p_related, mod_p) =
@@ -194,6 +389,38 @@ value redirect_relations_of_added_related base p ip2 rel_chil =
                    (p_related, mod_p)
                  }
                  else (p_related, mod_p)
+               in
+               let (pc_fevents, mod_pc, p_related, mod_p) =
+                 List.fold_right
+                   (fun e (pc_fevents, mod_pc, p_related, mod_p) ->
+                      let (e, mod_pc, p_related, mod_p) =
+                        let (witnesses, mod_p, p_related) =
+                          List.fold_right
+                            (fun (ip, k) (witnesses, mod_p, p_related) ->
+                               if ip = ip2 then do {
+                                 let (p_related, mod_p) =
+                                   if List.mem ipc p_related then (p_related, mod_p)
+                                   else ([ipc :: p_related], True)
+                                 in
+                                 ([(p.key_index, k) :: witnesses], mod_p, p_related)
+                               }
+                               else ([(ip, k) :: witnesses], mod_p, p_related))
+                            (Array.to_list e.efam_witnesses) ([], mod_pc, p_related)
+                        in
+                        let e =
+                          {(e) with efam_witnesses = Array.of_list witnesses}
+                        in
+                        (e, True, p_related, mod_p)
+                      in
+                      ([e :: pc_fevents], mod_pc, p_related, mod_p))
+                   (fam.fevents) ([], False, p_related, mod_p)
+               in
+               let () =
+                 (* TODO mod_pc = True tout le temps *)
+                 if mod_pc then
+                   let fam = {(fam) with fevents = pc_fevents} in
+                   patch_family base ifam fam
+                 else ()
                in
                loop (p_related, mod_p) (i + 1)
          in

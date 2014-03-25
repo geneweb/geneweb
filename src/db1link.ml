@@ -25,6 +25,7 @@ type gen_min_person 'person 'string =
     m_occ : mutable int;
     m_rparents : mutable list (gen_relation 'person 'string);
     m_related : mutable list iper;
+    m_pevents : mutable list (gen_pers_event 'person 'string);
     m_sex : mutable sex;
     m_notes : mutable 'string }
 ;
@@ -146,8 +147,8 @@ value make_person gen p n occ =
   let empty_string = unique_string gen "" in
   let p =
     {m_first_name = unique_string gen p; m_surname = unique_string gen n;
-     m_occ = occ; m_rparents = []; m_related = []; m_sex = Neuter;
-     m_notes = empty_string}
+     m_occ = occ; m_rparents = []; m_related = []; m_pevents = [];
+     m_sex = Neuter; m_notes = empty_string}
   and a = {parents = None; consang = Adef.fix (-1)}
   and u = {family = [| |]} in
   (p, a, u)
@@ -312,6 +313,9 @@ value insert_undefined gen key =
           if key.pk_first_name <> "?" && key.pk_surname <> "?" then
             add_person_by_name gen key.pk_first_name key.pk_surname new_occ
               (Adef.iper_of_int i)
+          else if Gwcomp.create_all_keys.val then
+            add_person_by_name gen key.pk_first_name key.pk_surname new_occ
+              (Adef.iper_of_int i)
           else ();
           new_iper gen;
           gen.g_base.c_persons.(i) := x;
@@ -377,6 +381,9 @@ value insert_person gen so =
         in
         do {
           if so.first_name <> "?" && so.surname <> "?" then
+            add_person_by_name gen so.first_name so.surname new_occ
+              (Adef.iper_of_int i)
+          else if Gwcomp.create_all_keys.val then
             add_person_by_name gen so.first_name so.surname new_occ
               (Adef.iper_of_int i)
           else ();
@@ -449,14 +456,19 @@ value insert_person gen so =
          occupation = unique_string gen so.occupation;
          sex = Neuter; access = so.access;
          birth = so.birth; birth_place = unique_string gen so.birth_place;
+         birth_note = unique_string gen so.birth_note;
          birth_src = unique_string gen so.birth_src;
          baptism = so.baptism;
          baptism_place = unique_string gen so.baptism_place;
+         baptism_note = unique_string gen so.baptism_note;
          baptism_src = unique_string gen so.baptism_src;
          death = so.death; death_place = unique_string gen so.death_place;
+         death_note = unique_string gen so.death_note;
          death_src = unique_string gen so.death_src; burial = so.burial;
          burial_place = unique_string gen so.burial_place;
+         burial_note = unique_string gen so.burial_note;
          burial_src = unique_string gen so.burial_src;
+         pevents = [];
          notes = empty_string;
          psources =
            unique_string gen
@@ -518,7 +530,155 @@ value notice_sex gen p s =
   }
 ;
 
-value insert_family gen co fath_sex moth_sex witl fo deo =
+value fevent_name_unique_string gen =
+  fun
+  [ Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage
+  | Efam_Divorce  | Efam_Separated
+  | Efam_Annulation | Efam_MarriageBann | Efam_MarriageContract
+  | Efam_MarriageLicense | Efam_PACS | Efam_Residence as evt -> evt
+  | Efam_Name n -> Efam_Name (unique_string gen n)]
+;
+
+value update_family_with_fevents gen fam =
+  let found_marriage = ref False in
+  let found_divorce = ref False in
+  (* On veut cette fois ci que ce soit le dernier évènement *)
+  (* qui soit mis dans les évènements principaux.           *)
+  loop (List.rev fam.fevents) fam where rec loop fevents fam =
+    match fevents with
+    [ [] -> fam
+    | [evt :: l] ->
+        match evt.efam_name with
+        [ Efam_Engage ->
+            if found_marriage.val then loop l fam
+            else
+              let witnesses = Array.map fst evt.efam_witnesses in
+              let fam =
+                {(fam) with relation = Engaged;
+                  marriage = evt.efam_date;
+                  marriage_place = evt.efam_place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses = witnesses}
+              in
+              let () = found_marriage.val := True in
+              loop l fam
+        | Efam_Marriage | Efam_MarriageContract ->
+            if found_marriage.val then loop l fam
+            else
+              let witnesses = Array.map fst evt.efam_witnesses in
+              let fam =
+                {(fam) with relation = Married;
+                  marriage = evt.efam_date;
+                  marriage_place = evt.efam_place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses = witnesses}
+              in
+              let () = found_marriage.val := True in
+              loop l fam
+        | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
+          Efam_Annulation | Efam_PACS ->
+            if found_marriage.val then loop l fam
+            else
+              let witnesses = Array.map fst evt.efam_witnesses in
+              let fam =
+                {(fam) with relation = NoMention;
+                  marriage = evt.efam_date;
+                  marriage_place = evt.efam_place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses = witnesses}
+              in
+              let () = found_marriage.val := True in
+              loop l fam
+        | Efam_NoMarriage ->
+            if found_marriage.val then loop l fam
+            else
+              let witnesses = Array.map fst evt.efam_witnesses in
+              let fam =
+                {(fam) with relation = NotMarried;
+                  marriage = evt.efam_date;
+                  marriage_place = evt.efam_place;
+                  marriage_note = evt.efam_note;
+                  marriage_src = evt.efam_src;
+                  witnesses = witnesses}
+              in
+              let () = found_marriage.val := True in
+              loop l fam
+        | Efam_Divorce ->
+            if found_divorce.val then loop l fam
+            else
+              let fam = {(fam) with divorce = Divorced evt.efam_date} in
+              let () = found_divorce.val := True in
+              loop l fam
+        | Efam_Separated ->
+            if found_divorce.val then loop l fam
+            else
+              let fam = {(fam) with divorce = Separated} in
+              let () = found_divorce.val := True in
+              loop l fam
+        | _ -> loop l fam ] ]
+;
+
+value update_fevents_with_family gen fam =
+  let empty_string = Adef.istr_of_int 0 in
+  let evt_marr =
+    let name =
+      match fam.relation with
+      [ Married -> Efam_Marriage
+      | NotMarried -> Efam_NoMarriage
+      | Engaged -> Efam_Engage
+      | NoSexesCheckNotMarried -> Efam_NoMarriage
+      | NoMention -> Efam_NoMention
+      | NoSexesCheckMarried -> Efam_Marriage ]
+    in
+    let witnesses = Array.map (fun ip -> (ip, Witness)) fam.witnesses in
+    let evt =
+      { efam_name = name; efam_date = fam.marriage;
+        efam_place = fam.marriage_place; efam_reason = empty_string;
+        efam_note = fam.marriage_note; efam_src = fam.marriage_src;
+        efam_witnesses = witnesses }
+    in
+    Some evt
+  in
+  let evt_div =
+    match fam.divorce with
+    [ NotDivorced -> None
+    | Divorced cd ->
+        let evt =
+          { efam_name = Efam_Divorce; efam_date = cd;
+            efam_place = unique_string gen "";
+            efam_reason = unique_string gen "";
+            efam_note = unique_string gen "";
+            efam_src = unique_string gen "";
+            efam_witnesses = [| |] }
+        in
+        Some evt
+    | Separated ->
+        let evt =
+          { efam_name = Efam_Separated; efam_date = Adef.codate_None;
+            efam_place = unique_string gen "";
+            efam_reason = unique_string gen "";
+            efam_note = unique_string gen "";
+            efam_src = unique_string gen "";
+            efam_witnesses = [| |] }
+        in
+        Some evt ]
+  in
+  let fevents = [evt_marr; evt_div] in
+  let fevents =
+    List.fold_right
+      (fun evt fevents ->
+         match evt with
+         [ Some evt -> [evt :: fevents]
+         | None -> fevents ] )
+      fevents []
+  in
+  {(fam) with fevents = fevents}
+;
+
+value insert_family gen co fath_sex moth_sex witl fevtl fo deo =
   let (fath, ifath) = insert_somebody gen (Adef.father co) in
   let (moth, imoth) = insert_somebody gen (Adef.mother co) in
   let witl =
@@ -530,6 +690,35 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          ip
        })
       witl
+  in
+  (* On tri les évènements pour être sûr. *)
+  let fevents =
+    CheckItem.sort_events
+      ((fun (name, _, _, _, _, _, _) -> CheckItem.Fsort name),
+       (fun (_, date, _, _, _, _, _) -> date))
+      fevtl
+  in
+  let fevents =
+    List.map
+      (fun (name, date, place, reason, src, notes, witl) ->
+        let witnesses =
+          List.map
+            (fun (wit, sex, wk) -> do {
+               let (p, ip) = insert_somebody gen wit in
+               notice_sex gen p sex;
+               p.m_related := [ifath :: p.m_related];
+               (ip, wk)
+            })
+            witl
+        in
+        {efam_name = fevent_name_unique_string gen name;
+         efam_date = date;
+         efam_place = unique_string gen place;
+         efam_reason = unique_string gen reason;
+         efam_note = unique_string gen notes;
+         efam_src = unique_string gen src;
+         efam_witnesses = Array.of_list witnesses})
+      fevents
   in
   let children =
     Array.map
@@ -549,13 +738,19 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
     let fam =
       {marriage = fo.marriage;
        marriage_place = unique_string gen fo.marriage_place;
+       marriage_note = unique_string gen fo.marriage_note;
        marriage_src = unique_string gen fo.marriage_src;
        witnesses = Array.of_list witl; relation = fo.relation;
-       divorce = fo.divorce; comment = comment;
+       divorce = fo.divorce; fevents = fevents; comment = comment;
        origin_file = unique_string gen fo.origin_file; fsources = fsources;
        fam_index = Adef.ifam_of_int i}
     and cpl = Adef.couple ifath imoth
     and des = {children = children} in
+    (* On mets à jour les fevents et events normaux *)
+    let fam =
+      if fevents <> [] then update_family_with_fevents gen fam
+      else update_fevents_with_family gen fam
+    in
     let fath_uni = uoi gen.g_base ifath in
     let moth_uni = uoi gen.g_base imoth in
     seek_out gen.g_fam_index (Iovalue.sizeof_long * i);
@@ -584,6 +779,85 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
          })
       children;
   }
+;
+
+value pevent_name_unique_string gen =
+  fun
+  [ Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation
+  | Epers_Accomplishment | Epers_Acquisition | Epers_Adhesion
+  | Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction
+  | Epers_ChangeName | Epers_Circumcision | Epers_Confirmation
+  | Epers_ConfirmationLDS | Epers_Decoration | Epers_DemobilisationMilitaire
+  | Epers_Diploma | Epers_Distinction | Epers_Dotation | Epers_DotationLDS
+  | Epers_Education | Epers_Election | Epers_Emigration | Epers_Excommunication
+  | Epers_FamilyLinkLDS | Epers_FirstCommunion | Epers_Funeral | Epers_Graduate
+  | Epers_Hospitalisation | Epers_Illness | Epers_Immigration
+  | Epers_ListePassenger | Epers_MilitaryDistinction | Epers_MilitaryPromotion
+  | Epers_MilitaryService | Epers_MobilisationMilitaire | Epers_Naturalisation
+  | Epers_Occupation | Epers_Ordination | Epers_Property | Epers_Recensement
+  | Epers_Residence | Epers_Retired | Epers_ScellentChildLDS
+  | Epers_ScellentParentLDS | Epers_ScellentSpouseLDS | Epers_VenteBien
+  | Epers_Will as evt -> evt
+  | Epers_Name n -> Epers_Name (unique_string gen n)]
+;
+
+value insert_pevents fname gen key pevtl =
+  let occ = key.pk_occ + gen.g_file_info.f_shift in
+  match
+    try
+      Some (find_person_by_name gen key.pk_first_name key.pk_surname occ)
+    with
+    [ Not_found -> None ]
+  with
+  [ Some ip ->
+      let p = poi gen.g_base ip in
+      if p.m_pevents <> [] then do {
+        printf "\nFile \"%s\"\n" fname;
+        printf "Individual events already defined for \"%s%s %s\"\n"
+          key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
+          key.pk_surname;
+        check_error gen
+      }
+      else do {
+        (* On tri les évènements pour être sûr. *)
+        let pevents =
+          CheckItem.sort_events
+            ((fun (name, _, _, _, _, _, _) -> CheckItem.Psort name),
+             (fun (_, date, _, _, _, _, _) -> date))
+            pevtl
+        in
+        let pevents =
+          List.map
+            (fun (name, date, place, reason, src, notes, witl) ->
+              let witnesses =
+                List.map
+                  (fun (wit, sex, wk) -> do {
+                    let (wp, wip) = insert_somebody gen wit in
+                    notice_sex gen wp sex;
+                    wp.m_related := [ip :: wp.m_related];
+                    (wip, wk)
+                  })
+                  witl
+              in
+              {epers_name = pevent_name_unique_string gen name;
+               epers_date = date;
+               epers_place = unique_string gen place;
+               epers_reason = unique_string gen reason;
+               epers_note = unique_string gen notes;
+               epers_src = unique_string gen src;
+               epers_witnesses = Array.of_list witnesses})
+            pevents
+        in
+        p.m_pevents := pevents
+      }
+  | None ->
+      do {
+        printf "File \"%s\"\n" fname;
+        printf "*** warning: undefined person: \"%s%s %s\"\n"
+          key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
+          key.pk_surname;
+        flush stdout;
+      } ]
 ;
 
 value insert_notes fname gen key str =
@@ -678,9 +952,11 @@ value insert_relations fname gen sb sex rl =
 
 value insert_syntax fname gen =
   fun
-  [ Family cpl fs ms witl fam des -> insert_family gen cpl fs ms witl fam des
+  [ Family cpl fs ms witl fevents fam des ->
+      insert_family gen cpl fs ms witl fevents fam des
   | Notes key str -> insert_notes fname gen key str
   | Relations sb sex rl -> insert_relations fname gen sb sex rl
+  | Pevent key pevents -> insert_pevents fname gen key pevents
   | Bnotes nfname str -> insert_bnotes fname gen nfname str
   | Wnotes wizid str -> insert_wiznote fname gen wizid str ]
 ;
@@ -692,6 +968,202 @@ value record_access_of tab =
 ;
 
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
+
+value update_person_with_pevents gen p =
+  let found_birth = ref False in
+  let found_baptism = ref False in
+  let found_death = ref False in
+  let found_burial = ref False in
+  loop p.pevents p where rec loop pevents p =
+    match pevents with
+    [ [] -> p
+    | [evt :: l] ->
+        match evt.epers_name with
+        [ Epers_Birth ->
+            if found_birth.val then loop l p
+            else
+              let p =
+                {(p) with birth = evt.epers_date;
+                  birth_place = evt.epers_place;
+                  birth_note = evt.epers_note;
+                  birth_src = evt.epers_src}
+              in
+              let () = found_birth.val := True in
+              loop l p
+        | Epers_Baptism ->
+            if found_baptism.val then loop l p
+            else
+              let p =
+                {(p) with baptism = evt.epers_date;
+                  baptism_place = evt.epers_place;
+                  baptism_note = evt.epers_note;
+                  baptism_src = evt.epers_src}
+              in
+              let () = found_baptism.val := True in
+              loop l p
+        | Epers_Death ->
+            if found_death.val then loop l p
+            else
+              let death =
+                match Adef.od_of_codate evt.epers_date with
+                [ Some d -> Death Unspecified (Adef.cdate_of_date d)
+                | None -> DeadDontKnowWhen ]
+              in
+              let p =
+                {(p) with death = death;
+                  death_place = evt.epers_place;
+                  death_note = evt.epers_note;
+                  death_src = evt.epers_src}
+              in
+              let () = found_death.val := True in
+              loop l p
+        | Epers_Burial ->
+            if found_burial.val then loop l p
+            else
+              let p =
+                {(p) with burial = Buried evt.epers_date;
+                  burial_place = evt.epers_place;
+                  burial_note = evt.epers_note;
+                  burial_src = evt.epers_src}
+              in
+              let () = found_burial.val := True in
+              loop l p
+        | Epers_Cremation ->
+            if found_burial.val then loop l p
+            else
+              let p =
+                {(p) with burial = Cremated evt.epers_date;
+                  burial_place = evt.epers_place;
+                  burial_note = evt.epers_note;
+                  burial_src = evt.epers_src}
+              in
+              let () = found_burial.val := True in
+              loop l p
+        | _ -> loop l p ] ]
+;
+
+value update_pevents_with_person gen p =
+  let empty_string = Adef.istr_of_int 0 in
+  let evt_birth =
+    match Adef.od_of_codate p.birth with
+    [ Some d ->
+        let evt =
+          { epers_name = Epers_Birth; epers_date = p.birth;
+            epers_place = p.birth_place; epers_reason = empty_string;
+            epers_note = p.birth_note; epers_src = p.birth_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | None ->
+        if Adef.int_of_istr p.birth_place = 0 &&
+           Adef.int_of_istr p.birth_src = 0
+        then None
+        else
+          let evt =
+            { epers_name = Epers_Birth; epers_date = p.birth;
+              epers_place = p.birth_place; epers_reason = empty_string;
+              epers_note = p.birth_note; epers_src = p.birth_src;
+              epers_witnesses = [| |] }
+          in
+          Some evt ]
+  in
+  let evt_bapt =
+    match Adef.od_of_codate p.baptism with
+    [ Some d ->
+        let evt =
+          { epers_name = Epers_Baptism; epers_date = p.baptism;
+            epers_place = p.baptism_place; epers_reason = empty_string;
+            epers_note = p.baptism_note; epers_src = p.baptism_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | None ->
+        if Adef.int_of_istr p.baptism_place = 0 &&
+           Adef.int_of_istr p.baptism_src = 0
+        then None
+        else
+          let evt =
+            { epers_name = Epers_Baptism; epers_date = p.baptism;
+              epers_place = p.baptism_place; epers_reason = empty_string;
+              epers_note = p.baptism_note; epers_src = p.baptism_src;
+              epers_witnesses = [| |] }
+          in
+          Some evt ]
+  in
+  let evt_death =
+    match p.death with
+    [ NotDead | DontKnowIfDead ->
+        if Adef.int_of_istr p.death_place = 0 &&
+           Adef.int_of_istr p.death_src = 0
+        then None
+        else
+          let evt =
+            { epers_name = Epers_Death; epers_date = Adef.codate_None;
+              epers_place = p.death_place; epers_reason = empty_string;
+              epers_note = p.death_note; epers_src = p.death_src;
+              epers_witnesses = [| |] }
+          in
+          Some evt
+    | Death death_reason cd ->
+        let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
+        let evt =
+          { epers_name = Epers_Death; epers_date = date;
+            epers_place = p.death_place; epers_reason = empty_string;
+            epers_note = p.death_note; epers_src = p.death_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
+        let evt =
+          { epers_name = Epers_Death; epers_date = Adef.codate_None;
+            epers_place = p.death_place; epers_reason = empty_string;
+            epers_note = p.death_note; epers_src = p.death_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt ]
+  in
+  let evt_burial =
+    match p.burial with
+    [ UnknownBurial ->
+        if Adef.int_of_istr p.burial_place = 0 &&
+           Adef.int_of_istr p.burial_src = 0
+        then None
+        else
+          let evt =
+            { epers_name = Epers_Burial; epers_date = Adef.codate_None;
+              epers_place = p.burial_place; epers_reason = empty_string;
+              epers_note = p.burial_note; epers_src = p.burial_src;
+              epers_witnesses = [| |] }
+          in
+          Some evt
+    | Buried cd ->
+        let evt =
+          { epers_name = Epers_Burial; epers_date = cd;
+            epers_place = p.burial_place; epers_reason = empty_string;
+            epers_note = p.burial_note; epers_src = p.burial_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | Cremated cd ->
+        let evt =
+          { epers_name = Epers_Cremation; epers_date = cd;
+            epers_place = p.burial_place; epers_reason = empty_string;
+            epers_note = p.burial_note; epers_src = p.burial_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt ]
+  in
+  let pevents = [evt_birth; evt_bapt; evt_death; evt_burial] in
+  let pevents =
+    List.fold_right
+      (fun evt pevents ->
+         match evt with
+         [ Some evt -> [evt :: pevents]
+         | None -> pevents ] )
+      pevents []
+  in
+  {(p) with pevents = pevents}
+;
 
 value persons_record_access gen per_index_ic per_ic persons =
   let read_person_in_temp_file i =
@@ -713,25 +1185,36 @@ value persons_record_access gen per_index_ic per_ic persons =
       | 'U' ->
           let empty_string = Adef.istr_of_int 0 in
           {first_name = empty_string; surname = empty_string;
-           occ = 0; image = empty_string; first_names_aliases = [];
-           surnames_aliases = []; public_name = empty_string;
-           qualifiers = [];
+           occ = 0; image = empty_string;
+           first_names_aliases = []; surnames_aliases = [];
+           public_name = empty_string; qualifiers = [];
            aliases = []; titles = []; rparents = []; related = [];
            occupation = empty_string; sex = Neuter; access = IfTitles;
            birth = Adef.codate_None; birth_place = empty_string;
-           birth_src = empty_string; baptism = Adef.codate_None;
-           baptism_place = empty_string; baptism_src = empty_string;
-           death = DontKnowIfDead; death_place = empty_string;
+           birth_note = empty_string; birth_src = empty_string;
+           baptism = Adef.codate_None;
+           baptism_place = empty_string; baptism_note = empty_string;
+           baptism_src = empty_string; death = DontKnowIfDead;
+           death_place = empty_string; death_note = empty_string;
            death_src = empty_string; burial = UnknownBurial;
-           burial_place = empty_string; burial_src = empty_string;
-           notes = empty_string; psources = empty_string;
-           key_index = Adef.iper_of_int 0}
+           burial_place = empty_string; burial_note = empty_string;
+           burial_src = empty_string; pevents = []; notes = empty_string;
+           psources = empty_string; key_index = Adef.iper_of_int 0}
       | _ -> assert False ]
     in
-    {(p) with
-     first_name = mp.m_first_name; surname = mp.m_surname;
-     occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
-     sex = mp.m_sex; notes = mp.m_notes; key_index = Adef.iper_of_int i}
+    let p =
+      {(p) with
+       first_name = mp.m_first_name; surname = mp.m_surname;
+       occ = mp.m_occ; rparents = mp.m_rparents; related = mp.m_related;
+       pevents = mp.m_pevents; sex = mp.m_sex; notes = mp.m_notes;
+       key_index = Adef.iper_of_int i}
+    in
+    (* Si on a trouvé des évènements, on mets à jour *)
+    let p =
+      if p.pevents <> [] then update_person_with_pevents gen p
+      else update_pevents_with_person gen p
+    in
+    p
   in
   let get_fun i =
     try Hashtbl.find gen.g_patch_p i with

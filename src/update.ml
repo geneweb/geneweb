@@ -95,6 +95,31 @@ value print_same_name conf base p =
       end ]
 ;
 
+(* ************************************************************************* *)
+(*  [Fonc] is_label_note : string -> bool                                    *)
+(** [Description] : Test si le label contient le mot 'note' pour savoir si
+      dans les évènement secondaires, il faut traiter la note comme un
+      textarea.
+    [Args] :
+      - lbl : le label
+    [Retour] :
+      - bool
+    [Rem] : Non exporté en clair hors de ce module.                          *)
+(* ************************************************************************* *)
+value is_label_note lbl =
+  loop 0 where rec loop i =
+    if i = String.length lbl then False
+    else
+      if lbl.[i] = 'n' then
+        let note = "note" in
+        if String.length note + i <= String.length lbl then
+          let sub_x = String.sub lbl i (String.length note) in
+          if sub_x = note then True
+          else loop (i + String.length note)
+        else False
+      else loop (i + 1)
+;
+
 value print_return conf =
   tag "p" begin
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
@@ -102,7 +127,7 @@ value print_return conf =
         (fun (x, v) ->
            (* Seul un textarea peut contenir des sauts de ligne. *)
            (* On remplace donc l'input par un textarea.          *)
-           if x = "notes" || x = "comment" then
+           if x = "notes" || x = "comment" || is_label_note x then
              tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                begin
                  Wserver.wprint "%s" (quote_escaped (decode_varenv v));
@@ -328,6 +353,72 @@ value print_warning conf base =
              end)
           arr
       in
+      let (bef_d, aft_d) = Diff.f before after in
+      tag "table" "style=\"margin:1em\"" begin
+        tag "tr" begin
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list before bef_d;
+            end;
+          end;
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list after aft_d;
+            end;
+          end;
+        end;
+      end
+    }
+  | ChangedOrderOfFamilyEvents ifam before after -> do {
+      Wserver.wprint "%s\n"
+        (capitale (transl conf "changed order of family's events"));
+      Wserver.wprint "-&gt;\n";
+      let print_list arr diff_arr =
+        Array.iteri
+          (fun i evt ->
+             let name = Util.string_of_fevent_name conf base evt.efam_name in
+             tag "li" "%s"
+               (if diff_arr.(i) then "style=\"background:pink\"" else "")
+             begin
+               Wserver.wprint "%s\n" name;
+             end)
+          arr
+      in
+      let before = Array.of_list before in
+      let after = Array.of_list after in
+      let (bef_d, aft_d) = Diff.f before after in
+      tag "table" "style=\"margin:1em\"" begin
+        tag "tr" begin
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list before bef_d;
+            end;
+          end;
+          tag "td" begin
+            tag "ul" "style=\"list-style-type:none\"" begin
+              print_list after aft_d;
+            end;
+          end;
+        end;
+      end
+    }
+  | ChangedOrderOfPersonEvents p before after -> do {
+      Wserver.wprint "%s\n"
+        (capitale (transl conf "changed order of person's events"));
+      Wserver.wprint "-&gt;\n";
+      let print_list arr diff_arr =
+        Array.iteri
+          (fun i evt ->
+             let name = Util.string_of_pevent_name conf base evt.epers_name in
+             tag "li" "%s"
+               (if diff_arr.(i) then "style=\"background:pink\"" else "")
+             begin
+               Wserver.wprint "%s\n" name;
+             end)
+          arr
+      in
+      let before = Array.of_list before in
+      let after = Array.of_list after in
       let (bef_d, aft_d) = Diff.f before after in
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
@@ -612,7 +703,7 @@ value error_locked conf =
                  else do {
                    (* Seul un textarea peut contenir des sauts de ligne. *)
                    (* On remplace donc l'input par un textarea.          *)
-                   if x = "notes" then
+                   if x = "notes" || is_label_note x then
                      tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                        begin
                          Wserver.wprint "%s" (quote_escaped (decode_varenv v));
@@ -894,7 +985,7 @@ value print_create_conflict conf base p var =
         (fun (x, v) ->
            (* Seul un textarea peut contenir des sauts de ligne. *)
            (* On remplace donc l'input par un textarea.          *)
-           if x = "notes" then
+           if x = "notes" || is_label_note x then
              tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                begin
                  Wserver.wprint "%s" (quote_escaped (decode_varenv v));
@@ -1009,12 +1100,15 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
              sex = sex; access = access;
              birth = Adef.codate_of_od birth;
              birth_place = Gwdb.insert_string base birth_place;
-             birth_src = empty_string; baptism = Adef.codate_of_od baptism;
+             birth_note = empty_string; birth_src = empty_string;
+             baptism = Adef.codate_of_od baptism;
              baptism_place = Gwdb.insert_string base baptism_place;
-             baptism_src = empty_string; death = death;
-             death_place = Gwdb.insert_string base death_place;
-             death_src = empty_string; burial = UnknownBurial;
-             burial_place = empty_string; burial_src = empty_string;
+             baptism_note = empty_string; baptism_src = empty_string;
+             death = death; death_place = Gwdb.insert_string base death_place;
+             death_note = empty_string; death_src = empty_string;
+             burial = UnknownBurial; burial_place = empty_string;
+             burial_note = empty_string; burial_src = empty_string;
+             pevents = [];
              notes = empty_string;
              psources =
                if f = "?" || s = "?" then empty_string

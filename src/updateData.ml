@@ -45,7 +45,9 @@ module StringSet = Set.Make
 
 type fun_data_p_f =
   [ Person of person -> istr
-  | Family of family -> istr ]
+  | Family of family -> istr 
+  | Pevent of gen_pers_event iper istr -> istr
+  | Fevent of gen_fam_event iper istr -> istr ]
 ;
 
 
@@ -67,12 +69,17 @@ value get_data conf =
   | Some "place" ->
       ([ ("bi", Person get_birth_place); ("bp", Person get_baptism_place);
          ("de", Person get_death_place); ("bu", Person get_burial_place);
-         ("ma", Family get_marriage_place) ], True)
+         ("pe", Pevent (fun evt -> evt.epers_place));
+         ("ma", Family get_marriage_place); 
+         ("fe", Fevent (fun evt -> evt.efam_place)) ], True)
   | Some "src" ->
       ([ ("bi", Person get_birth_src); ("bp", Person get_baptism_src);
          ("de", Person get_death_src); ("bu", Person get_burial_src);
+         ("pe", Pevent (fun evt -> evt.epers_src));
          ("p", Person get_psources);
-         ("ma", Family get_marriage_src); ("f", Family get_fsources) ], True)
+         ("ma", Family get_marriage_src); 
+         ("fe", Fevent (fun evt -> evt.efam_src));
+         ("f", Family get_fsources) ], True)
   | _ -> ([], False) ]
 ;
 
@@ -107,6 +114,16 @@ value get_all_data conf base = do {
                   data_set.val :=
                     DataSet.add (istr, label, Hashtbl.hash istr) data_set.val
                 else ()
+            | Pevent fun_data ->
+                List.iter
+                  (fun evt ->
+                    let istr = fun_data evt in
+                    if not (is_empty_string istr) then 
+                      data_set.val := 
+                        DataSet.add 
+                          (istr, label, Hashtbl.hash istr) data_set.val
+                    else ())
+                  (get_pevents p)
             | _ -> () ] )
           data;
         loop (i+1)
@@ -130,6 +147,16 @@ value get_all_data conf base = do {
                       data_set.val :=
                         DataSet.add (istr, label, Hashtbl.hash istr) data_set.val
                     else ()
+                | Fevent fun_data ->
+                    List.iter
+                      (fun evt ->
+                        let istr = fun_data evt in
+                        if not (is_empty_string istr) then 
+                          data_set.val := 
+                            DataSet.add 
+                              (istr, label, Hashtbl.hash istr) data_set.val
+                        else ())
+                      (get_fevents fam)
                 | _ -> () ] )
               data;
           loop (i+1)
@@ -195,6 +222,16 @@ value get_person_from_data conf base = do {
                 if not (is_empty_string istr) && (hash_istr = key) then
                   map_add key istr p
                 else ()
+            | Pevent fun_data ->
+                List.iter
+                  (fun evt ->
+                     let istr = fun_data evt in
+                     let hash_istr = Hashtbl.hash istr in
+                     let key =  List.assoc label env_keys in
+                     if not (is_empty_string istr) && (hash_istr = key) then 
+                       map_add key istr p
+                     else ())
+                  (get_pevents p)
             | _ -> () ] )
           data;
         loop (i+1)
@@ -226,6 +263,21 @@ value get_person_from_data conf base = do {
                         map_add key istr p
                       }
                   else ()
+                | Fevent fun_data ->
+                    List.iter
+                      (fun evt ->
+                         let istr = fun_data evt in
+                         let hash_istr = Hashtbl.hash istr in
+                         let key = List.assoc label env_keys in
+                         if not (is_empty_string istr) && (hash_istr = key) then
+                           do {
+                             let p = pget conf base (get_father fam) in
+                             map_add key istr p;
+                             let p = pget conf base (get_mother fam) in
+                             map_add key istr p
+                           }
+                         else ())
+                      (get_fevents fam)
                 | _ -> () ] )
               data;
             };
@@ -701,9 +753,17 @@ value update_person conf base old new_input p =
       let baptism_place = if old = s_bp then new_istr else pl_bp in
       let death_place = if old = s_de then new_istr else pl_de in
       let burial_place = if old = s_bu then new_istr else pl_bu in
+      let pevents =
+        List.map
+          (fun evt ->
+            let pl_evt = evt.epers_place in let s_evt = sou base pl_evt in
+            let place = if old = s_evt then new_istr else pl_evt in
+            {(evt) with epers_place = place})
+          (get_pevents p)
+      in
       { (gen_person_of_person p) with birth_place = birth_place;
         baptism_place = baptism_place; death_place = death_place;
-        burial_place = burial_place }
+        burial_place = burial_place; pevents = pevents }
   | Some "src" ->
       let new_istr = Gwdb.insert_string base (only_printable new_input) in
       let src_bi = get_birth_src p in let s_bi = sou base src_bi in
@@ -716,9 +776,18 @@ value update_person conf base old new_input p =
       let death_src = if old = s_de then new_istr else src_de in
       let burial_src = if old = s_bu then new_istr else src_bu in
       let psources_src = if old = s_p then new_istr else src_p in
+      let pevents =
+        List.map
+          (fun evt ->
+            let src_evt = evt.epers_src in let s_evt = sou base src_evt in
+            let src = if old = s_evt then new_istr else src_evt in
+            {(evt) with epers_src = src})
+          (get_pevents p)
+      in
       { (gen_person_of_person p) with birth_src = birth_src;
         baptism_src = baptism_src; death_src = death_src;
-        burial_src = burial_src; psources = psources_src }
+        burial_src = burial_src; psources = psources_src;
+        pevents = pevents }
   | _ ->  gen_person_of_person p ]
 ;
 
@@ -745,15 +814,32 @@ value update_family conf base old new_istr fam =
       in
       let p_ma = get_marriage_place fam in let s_ma = sou base p_ma in
       let marriage_place = if old = s_ma then new_istr else p_ma in
-      { (gen_family_of_family fam) with marriage_place = marriage_place }
+      let fevents =
+        List.map
+          (fun evt ->
+            let pl_evt = evt.efam_place in let s_evt = sou base pl_evt in
+            let place = if old = s_evt then new_istr else pl_evt in
+            {(evt) with efam_place = place})
+          (get_fevents fam)
+      in
+      { (gen_family_of_family fam) with marriage_place = marriage_place;
+        fevents = fevents } 
   | Some "src" ->
       let new_istr = Gwdb.insert_string base (only_printable new_istr) in
       let src_ma = get_marriage_src fam in let s_ma = sou base src_ma in
       let src_f = get_fsources fam in let s_f = sou base src_f in
       let marriage_src = if old = s_ma then new_istr else src_ma in
       let fsources = if old = s_f then new_istr else src_f in
+      let fevents =
+        List.map
+          (fun evt ->
+            let src_evt = evt.efam_src in let s_evt = sou base src_evt in
+            let src = if old = s_evt then new_istr else src_evt in
+            {(evt) with efam_src = src})
+          (get_fevents fam)
+      in
       { (gen_family_of_family fam) with
-        marriage_src = marriage_src; fsources = fsources }
+        marriage_src = marriage_src; fsources = fsources; fevents = fevents }
   | _ -> gen_family_of_family fam ]
 ;
 

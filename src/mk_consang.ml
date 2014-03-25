@@ -330,12 +330,16 @@ value rebuild_fields2 db2 = do {
      ("public_name", fun p -> p.Def.public_name);
      ("occupation", fun p -> p.Def.occupation);
      ("birth_place", fun p -> p.Def.birth_place);
+     ("birth_note", fun p -> p.Def.birth_note);
      ("birth_src", fun p -> p.Def.birth_src);
      ("baptism_place", fun p -> p.Def.baptism_place);
+     ("baptism_note", fun p -> p.Def.baptism_note);
      ("baptism_src", fun p -> p.Def.baptism_src);
      ("death_place", fun p -> p.Def.death_place);
+     ("death_note", fun p -> p.Def.death_note);
      ("death_src", fun p -> p.Def.death_src);
      ("burial_place", fun p -> p.Def.burial_place);
+     ("burial_note", fun p -> p.Def.burial_note);
      ("burial_src", fun p -> p.Def.burial_src);
      ("notes", fun p -> p.Def.notes);
      ("psources", fun p -> p.Def.psources)];
@@ -364,6 +368,7 @@ value rebuild_fields2 db2 = do {
     ("death", fun p -> p.Def.death);
   rebuild_any_field_array db2 fi_per Def.UnknownBurial True
     ("burial", fun p -> p.Def.burial);
+  rebuild_list_field_array db2 fi_per ("pevents", fun p -> p.Def.pevents);
   rebuild_option_field_array db2 fi_asc (Adef.ifam_of_int (-1))
     ("parents", fun p -> p.Def.parents);
   rebuild_any_field_array db2 fi_asc Adef.no_consang False
@@ -390,6 +395,7 @@ value rebuild_fields2 db2 = do {
     ("marriage", fun f -> f.Def.marriage);
   List.iter (rebuild_string_field db2 fi_fam)
     [("marriage_place", fun f -> f.Def.marriage_place);
+     ("marriage_note", fun f -> f.Def.marriage_note);
      ("marriage_src", fun f -> f.Def.marriage_src);
      ("comment", fun f -> f.Def.comment);
      ("origin_file", fun f -> f.Def.origin_file);
@@ -400,6 +406,7 @@ value rebuild_fields2 db2 = do {
     ("relation", fun f -> f.Def.relation);
   rebuild_any_field_array db2 fi_fam Def.NotDivorced True
     ("divorce", fun f -> f.Def.divorce);
+  rebuild_list_field_array db2 fi_fam ("fevents", fun f -> f.Def.fevents);
   List.iter (rebuild_any_field_array db2 fi_cpl (Adef.iper_of_int (-1)) True)
     [("father", fun f -> Adef.father f);
      ("mother", fun f -> Adef.mother f)];

@@ -4,7 +4,7 @@
 open Gwdb;
 
 type base_error = Def.error person;
-type base_warning = Def.warning person family title;
+type base_warning = Def.warning person family title pers_event fam_event;
 type base_misc = Def.misc person family title;
 
 value leap_year : int -> bool;
@@ -15,6 +15,14 @@ value strictly_before : Def.date -> Def.date -> bool;
 value strictly_after_dmy : Def.dmy -> Def.dmy -> bool;
 value strictly_after : Def.date -> Def.date -> bool;
 value date_of_death : Def.death -> option Adef.date;
+
+
+type event_name 'string =
+  [ Psort of Def.gen_pers_event_name 'string
+  | Fsort of Def.gen_fam_event_name 'string ]
+;
+value sort_events : 
+  (('a -> event_name 'string) * ('a -> Adef.codate)) -> list 'a -> list 'a;
 
 value person :
   base -> (base_warning -> unit) -> person ->

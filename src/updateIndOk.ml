@@ -105,6 +105,189 @@ value rec reconstitute_titles conf ext cnt =
   | _ -> ([], ext) ]
 ;
 
+value reconstitute_somebody conf var =
+  let first_name = no_html_tags (only_printable (getn conf var "fn")) in
+  let surname = no_html_tags (only_printable (getn conf var "sn")) in
+  (* S'il y a des caractères interdits, on les supprime *)
+  let (first_name, surname) =
+    let contain_fn = String.contains first_name in
+    let contain_sn = String.contains surname in
+    if (List.exists contain_fn Name.forbidden_char) ||
+       (List.exists contain_sn Name.forbidden_char) then
+      do {
+        removed_string.val :=
+          [(Name.purge first_name ^ " " ^ Name.purge surname) :: removed_string.val];
+        (Name.purge first_name, Name.purge surname)
+      }
+    else (first_name, surname)
+  in
+  let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
+  let sex =
+    match p_getenv conf.env (var ^ "_sex") with
+    [ Some "M" -> Male
+    | Some "F" -> Female
+    | _ -> Neuter ]
+  in
+  let create =
+    match getn conf var "p" with
+    [ "create" -> Update.Create sex None
+    | _ -> Update.Link ]
+  in
+  (first_name, surname, occ, create, var)
+;
+
+value reconstitute_insert_pevent conf ext cnt el =
+  let var = "ins_event" ^ string_of_int cnt in
+  let n =
+    match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+    [ (_, Some n) when n > 1 -> n
+    | (Some "on", _) -> 1
+    | _ -> 0 ]
+  in
+  if n > 0 then
+    let el =
+      loop el n where rec loop el n =
+        if n > 0 then
+          let e1 =
+            {epers_name = Epers_Name ""; epers_date = Adef.codate_None;
+             epers_place = ""; epers_reason = ""; epers_note = "";
+             epers_src = ""; epers_witnesses = [| |]}
+          in
+          loop [e1 :: el] (n - 1)
+        else el
+    in
+    (el, True)
+  else (el, ext)
+;
+
+value rec reconstitute_pevents conf ext cnt =
+  match get_nth conf "e_name" cnt with
+  [ Some epers_name ->
+      let epers_name =
+        match epers_name with
+        [ "#birt" -> Epers_Birth
+        | "#bapt" -> Epers_Baptism
+        | "#deat" -> Epers_Death
+        | "#buri" -> Epers_Burial
+        | "#crem" -> Epers_Cremation
+        | "#acco" -> Epers_Accomplishment
+        | "#acqu" -> Epers_Acquisition
+        | "#adhe" -> Epers_Adhesion
+        | "#awar" -> Epers_Decoration
+        | "#bapl" -> Epers_BaptismLDS
+        | "#barm" -> Epers_BarMitzvah
+        | "#basm" -> Epers_BatMitzvah
+        | "#bles" -> Epers_Benediction
+        | "#cens" -> Epers_Recensement
+        | "#chgn" -> Epers_ChangeName
+        | "#circ" -> Epers_Circumcision
+        | "#conf" -> Epers_Confirmation
+        | "#conl" -> Epers_ConfirmationLDS
+        | "#degr" -> Epers_Diploma
+        | "#demm" -> Epers_DemobilisationMilitaire
+        | "#dist" -> Epers_Distinction
+        | "#dotl" -> Epers_DotationLDS
+        | "#educ" -> Epers_Education
+        | "#elec" -> Epers_Election
+        | "#emig" -> Epers_Emigration
+        | "#endl" -> Epers_Dotation
+        | "#exco" -> Epers_Excommunication
+        | "#fcom" -> Epers_FirstCommunion
+        | "#flkl" -> Epers_FamilyLinkLDS
+        | "#fune" -> Epers_Funeral
+        | "#grad" -> Epers_Graduate
+        | "#hosp" -> Epers_Hospitalisation
+        | "#illn" -> Epers_Illness
+        | "#immi" -> Epers_Immigration
+        | "#lpas" -> Epers_ListePassenger
+        | "#mdis" -> Epers_MilitaryDistinction
+        | "#mobm" -> Epers_MobilisationMilitaire
+        | "#mpro" -> Epers_MilitaryPromotion
+        | "#mser" -> Epers_MilitaryService
+        | "#natu" -> Epers_Naturalisation
+        | "#occu" -> Epers_Occupation
+        | "#ordn" -> Epers_Ordination
+        | "#prop" -> Epers_Property
+        | "#resi" -> Epers_Residence
+        | "#reti" -> Epers_Retired
+        | "#slgc" -> Epers_ScellentChildLDS
+        | "#slgp" -> Epers_ScellentParentLDS
+        | "#slgs" -> Epers_ScellentSpouseLDS
+        | "#vteb" -> Epers_VenteBien
+        | "#will" -> Epers_Will
+        | n -> Epers_Name (no_html_tags (only_printable n)) ]
+      in
+      let epers_date =
+        Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
+      in
+      let epers_place =
+        match get_nth conf "e_place" cnt with
+        [ Some place -> no_html_tags (only_printable place)
+        | _ -> "" ]
+      in
+      let epers_note =
+        match get_nth conf "e_note" cnt with
+        [ Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
+        | _ -> "" ]
+      in
+      let epers_src =
+        match get_nth conf "e_src" cnt with
+        [ Some src -> only_printable src
+        | _ -> "" ]
+      in
+      let (witnesses, ext) =
+        loop 1 ext where rec loop i ext =
+          match
+            try
+              let var = "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i in
+              Some (reconstitute_somebody conf var)
+            with
+            [ Failure _ -> None ]
+          with
+          [ Some c ->
+              let (witnesses, ext) = loop (i + 1) ext in
+              let var_c =
+                "e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i ^ "_kind"
+              in
+              let c =
+                match p_getenv conf.env var_c with
+                [ Some "godp" -> (c, Witness_GodParent)
+                | _ -> (c, Witness) ]
+              in
+              let var_w =
+                "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i
+              in
+              match p_getenv conf.env var_w with
+              [ Some "on" ->
+                  let new_witn =
+                    (("", "", 0, Update.Create Neuter None, ""), Witness)
+                  in
+                  ([c; new_witn :: witnesses], True)
+              | _ -> ([c :: witnesses], ext) ]
+          | None -> ([], ext) ]
+      in
+      let (witnesses, ext) =
+        let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
+        match p_getenv conf.env evt_ins with
+        [ Some "on" ->
+            let new_witn =
+              (("", "", 0, Update.Create Neuter None, ""), Witness)
+            in
+            ([new_witn :: witnesses], True)
+        | _ -> (witnesses, ext) ]
+      in
+      let e =
+        {epers_name = epers_name; epers_date = Adef.codate_of_od epers_date;
+         epers_place = epers_place; epers_reason = "";
+         epers_note = epers_note; epers_src = epers_src;
+         epers_witnesses = Array.of_list witnesses}
+      in
+      let (el, ext) = reconstitute_pevents conf ext (cnt + 1) in
+      let (el, ext) = reconstitute_insert_pevent conf ext (cnt +1) el in
+      ([e :: el], ext)
+  | _ -> ([], ext) ]
+;
+
 value reconstitute_add_relation conf ext cnt rl =
   match get_nth conf "add_relation" cnt with
   [ Some "on" ->
@@ -221,6 +404,147 @@ value reconstitute_burial conf burial_place =
   | Some x -> failwith ("bad burial type " ^ x) ]
 ;
 
+value reconstitute_from_pevents pevents ext bi bp de bu =
+  (* On tri les évènements pour être sûr. *)
+  let pevents =
+    CheckItem.sort_events
+      ((fun evt -> CheckItem.Psort evt.epers_name),
+       (fun evt -> evt.epers_date))
+      pevents
+  in
+  let found_birth = ref False in
+  let found_baptism = ref False in
+  let found_death = ref False in
+  let found_burial = ref False in
+  let rec loop pevents bi bp de bu =
+    match pevents with
+    [ [] -> (bi, bp, de, bu)
+    | [evt :: l] ->
+        match evt.epers_name with
+        [ Epers_Birth ->
+            if found_birth.val then loop l bi bp de bu
+            else
+              let bi =
+                (evt.epers_date, evt.epers_place,
+                 evt.epers_note, evt.epers_src)
+              in
+              let () = found_birth.val := True in
+              loop l bi bp de bu
+        | Epers_Baptism ->
+            if found_baptism.val then loop l bi bp de bu
+            else
+              let bp =
+                (evt.epers_date, evt.epers_place,
+                 evt.epers_note, evt.epers_src)
+              in
+              let () = found_baptism.val := True in
+              loop l bi bp de bu
+        | Epers_Death ->
+            if found_death.val then loop l bi bp de bu
+            else
+              let death =
+                match Adef.od_of_codate evt.epers_date with
+                [ Some d -> Death Unspecified (Adef.cdate_of_date d)
+                | None ->
+                    let (death, _, _, _) = de in
+                    (* On ajoute DontKnowIfDead dans le cas où tous les *)
+                    (* champs sont vides.                               *)
+                    match death with
+                    [ DeadYoung | DeadDontKnowWhen |
+                      OfCourseDead | DontKnowIfDead as death -> death
+                    | _ -> DeadDontKnowWhen ] ]
+              in
+              let de =
+                (death, evt.epers_place,
+                 evt.epers_note, evt.epers_src)
+              in
+              let () = found_death.val := True in
+              loop l bi bp de bu
+        | Epers_Burial ->
+            if found_burial.val then loop l bi bp de bu
+            else
+              let bu =
+                (Buried evt.epers_date, evt.epers_place,
+                 evt.epers_note, evt.epers_src)
+              in
+              let () = found_burial.val := True in
+              loop l bi bp de bu
+        | Epers_Cremation ->
+            if found_burial.val then loop l bi bp de bu
+            else
+              let bu =
+                (Cremated evt.epers_date, evt.epers_place,
+                 evt.epers_note, evt.epers_src)
+              in
+              let () = found_burial.val := True in
+              loop l bi bp de bu
+        | _ -> loop l bi bp de bu ] ]
+  in
+  let (bi, bp, de, bu) = loop pevents bi bp de bu in
+  (* Hack *)
+  let pevents =
+    if not found_death.val then
+      let remove_evt = ref False in
+      List.fold_left
+        (fun accu evt ->
+           if not remove_evt.val then
+             if evt.epers_name = Epers_Name "" then
+               do { remove_evt.val := True; accu }
+             else [evt :: accu]
+           else [evt :: accu])
+        [] (List.rev pevents)
+    else pevents
+  in
+  let pevents =
+    if not found_burial.val then
+      let remove_evt = ref False in
+      List.fold_left
+        (fun accu evt ->
+           if not remove_evt.val then
+             if evt.epers_name = Epers_Name "" then
+               do { remove_evt.val := True; accu }
+             else [evt :: accu]
+           else [evt :: accu])
+        [] (List.rev pevents)
+    else pevents
+  in
+  let pevents =
+    if not ext then
+      let remove_evt = ref False in
+      List.fold_left
+        (fun accu evt ->
+           if not remove_evt.val then
+             if evt.epers_name = Epers_Name "" then
+               do { remove_evt.val := True; accu }
+             else [evt :: accu]
+           else [evt :: accu])
+        [] (List.rev pevents)
+    else pevents
+  in
+  (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
+  let bi =
+    if not found_birth.val then (Adef.codate_None, "", "", "")
+    else bi
+  in
+  let bp =
+    if not found_baptism.val then (Adef.codate_None, "", "", "")
+    else bp
+  in
+  let de =
+    if not found_death.val then
+      if found_burial.val then (DeadDontKnowWhen, "", "", "")
+      else
+        let (death, _, _, _) = de in
+        (death, "", "", "")
+    else de
+  in
+  let bu =
+    if not found_burial.val then (UnknownBurial, "", "", "")
+    else bu
+  in
+  (bi, bp, de, bu, pevents)
+;
+
 value reconstitute_person conf =
   let ext = False in
   let key_index =
@@ -275,11 +599,27 @@ value reconstitute_person conf =
   in
   let birth = Update.reconstitute_date conf "birth" in
   let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
+  let birth_note =
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "birth_note"))
+  in
+  let birth_src = only_printable (get conf "birth_src") in
   let bapt = Update.reconstitute_date conf "bapt" in
   let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
+  let bapt_note =
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "bapt_note"))
+  in
+  let bapt_src = only_printable (get conf "bapt_src") in
   let burial_place = no_html_tags (only_printable (get conf "burial_place")) in
+  let burial_note =
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "burial_note"))
+  in
+  let burial_src = only_printable (get conf "burial_src") in
   let burial = reconstitute_burial conf burial_place in
   let death_place = no_html_tags (only_printable (get conf "death_place")) in
+  let death_note =
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "death_note"))
+  in
+  let death_src = only_printable (get conf "death_src") in
   let death =
     reconstitute_death conf birth bapt death_place burial burial_place
   in
@@ -293,30 +633,73 @@ value reconstitute_person conf =
     [ (NotDead | DontKnowIfDead, Buried _ | Cremated _) -> DeadDontKnowWhen
     | _ -> death ]
   in
+  let (pevents, ext) = reconstitute_pevents conf ext 1 in
+  let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
   let notes =
     if first_name = "?" || surname = "?" then ""
     else only_printable_or_nl (strip_all_trailing_spaces (get conf "notes"))
   in
   let psources = only_printable (get conf "src") in
+  (* Mise à jour des évènements principaux. *)
+  let birth = Adef.codate_of_od birth in
+  let bapt = Adef.codate_of_od bapt in
+  let (bi, bp, de, bu, pevents) =
+    reconstitute_from_pevents pevents ext
+      (birth, birth_place, birth_note, birth_src)
+      (bapt, bapt_place, bapt_note, bapt_src)
+      (death, death_place, death_note, death_src)
+      (burial, burial_place, burial_note, burial_src)
+  in
+  let (birth, birth_place, birth_note, birth_src) = bi in
+  let (bapt, bapt_place, bapt_note, bapt_src) = bp in
+  let (death, death_place, death_note, death_src) = de in
+  let (burial, burial_place, burial_note, burial_src) = bu in
+  (* Maintenant qu'on a propagé les evèenements, on a *)
+  (* peut-être besoin de refaire un infer_death.      *)
+  let death =
+    match death with
+    [ DontKnowIfDead ->
+        reconstitute_death
+          conf (Adef.od_of_codate birth) (Adef.od_of_codate bapt)
+          death_place burial burial_place
+    | _ -> death ]
+  in
   let p =
     {first_name = first_name; surname = surname; occ = occ; image = image;
      first_names_aliases = first_names_aliases;
      surnames_aliases = surnames_aliases; public_name = public_name;
      qualifiers = qualifiers; aliases = aliases; titles = titles;
      rparents = rparents; occupation = occupation; related = []; sex = sex;
-     access = access; birth = Adef.codate_of_od birth;
-     birth_place = birth_place;
-     birth_src = only_printable (get conf "birth_src");
-     baptism = Adef.codate_of_od bapt; baptism_place = bapt_place;
-     baptism_src = only_printable (get conf "bapt_src"); death = death;
-     death_place = death_place;
-     death_src = only_printable (get conf "death_src"); burial = burial;
-     burial_place = burial_place;
-     burial_src = only_printable (get conf "burial_src");
-     notes = notes; psources = psources;
-     key_index = Adef.iper_of_int key_index}
+     access = access; birth = birth; birth_place = birth_place;
+     birth_note = birth_note; birth_src = birth_src; baptism = bapt;
+     baptism_place = bapt_place; baptism_note = bapt_note;
+     baptism_src = bapt_src; death = death; death_place = death_place;
+     death_note = death_note; death_src = death_src; burial = burial;
+     burial_place = burial_place; burial_note = burial_note;
+     burial_src = burial_src; pevents = pevents; notes = notes;
+     psources = psources; key_index = Adef.iper_of_int key_index}
   in
   (p, ext)
+;
+
+value check_event_witnesses conf base witnesses =
+  let wl = Array.to_list witnesses in
+  let rec loop wl =
+    match wl with
+    [ [] -> None
+    | [((fn, sn, _, _, _), _) :: l] ->
+        if fn = "" && sn = "" then
+          (* Champs non renseigné, il faut passer au suivant *)
+          loop l
+        else if fn = "" || fn = "?" then
+          Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
+                ^ (transl conf "first name missing"))
+        else if sn = "" || sn = "?" then
+          Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
+                ^ (transl conf "surname missing"))
+        else loop l ]
+  in
+  loop wl
 ;
 
 value check_person conf base p =
@@ -324,7 +707,15 @@ value check_person conf base p =
     Some (transl conf "first name missing")
   else if p.surname = "" || p.surname = "?" then
     Some (transl conf "surname missing")
-  else None
+  else
+    (* On regarde si les témoins sont bien renseignés. *)
+    loop p.pevents where rec loop pevents =
+      match pevents with
+      [ [] -> None
+      | [evt :: l] ->
+          match check_event_witnesses conf base evt.epers_witnesses with
+          [ Some err -> Some err
+          | _ -> loop l ] ]
 ;
 
 value error_person conf base p err =
@@ -338,6 +729,32 @@ value error_person conf base p err =
   }
 ;
 
+value strip_pevents p =
+  let strip_array_witness pl =
+    let pl =
+      List.fold_right
+        (fun (((f, s, o, c, _), k) as p) pl -> if f = "" then pl else [p :: pl])
+        (Array.to_list pl) []
+    in
+    Array.of_list pl
+  in
+  List.fold_right
+    (fun e accu ->
+       let (has_infos, witnesses) =
+         match e.epers_name with
+         [ Epers_Name s -> (s <> "", strip_array_witness e.epers_witnesses)
+         | Epers_Birth | Epers_Baptism ->
+             (Adef.od_of_codate e.epers_date <> None || e.epers_place <> "" ||
+              e.epers_reason <> "" || e.epers_note <> "" || e.epers_src <> "",
+              strip_array_witness e.epers_witnesses)
+         | _ -> (True, strip_array_witness e.epers_witnesses) ]
+       in
+       if (has_infos || Array.length witnesses > 0) then
+         [ {(e) with epers_witnesses = witnesses} :: accu ]
+       else accu)
+    p.pevents []
+;
+
 value strip_list = List.filter (fun s -> s <> "");
 
 value strip_person p =
@@ -347,6 +764,7 @@ value strip_person p =
    qualifiers = strip_list p.qualifiers;
    aliases = strip_list p.aliases;
    titles = List.filter (fun t -> t.t_ident <> "") p.titles;
+   pevents = strip_pevents p;
    rparents =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 ;
@@ -459,6 +877,15 @@ value rparents_of rparents =
     [] rparents
 ;
 
+value pwitnesses_of pevents =
+  List.fold_left
+    (fun ipl e ->
+       List.fold_left
+         (fun ipl (ip, _) -> [ip :: ipl])
+         ipl (Array.to_list e.epers_witnesses))
+    [] pevents
+;
+
 value is_witness_at_marriage base ip p =
   let u = poi base ip in
   List.exists
@@ -504,8 +931,12 @@ value effective_mod conf base sp = do {
     (fun key ->
        if List.mem key op_misc_names then () else person_ht_add base key pi)
     np_misc_names;
-  let ol = rparents_of (get_rparents op) in
-  let nl = rparents_of np.rparents in
+  let ol_rparents = rparents_of (get_rparents op) in
+  let nl_rparents = rparents_of np.rparents in
+  let ol_pevents = pwitnesses_of (get_pevents op) in
+  let nl_pevents = pwitnesses_of np.pevents in
+  let ol = List.append ol_rparents ol_pevents in
+  let nl = List.append nl_rparents nl_pevents in
   let pi = np.key_index in
   Update.update_related_pointers base pi ol nl;
   np
@@ -569,9 +1000,32 @@ value update_relations_of_related base ip old_related =
                 ([rel :: list], rad))
            (get_rparents p1) ([], False)
        in
-       if rparents_are_different then
+       let (pevents, pevents_are_different) =
+         List.fold_right
+           (fun e (list, rad) ->
+             let (witnesses, rad) =
+               List.fold_right
+                 (fun (ip2, k) (accu, rad) ->
+                    if ip2 = ip then (accu, True)
+                    else ([(ip2, k) :: accu], rad))
+                 (Array.to_list e.epers_witnesses) ([], rad)
+             in
+             let e = {(e) with epers_witnesses = Array.of_list witnesses} in
+             ([e :: list], rad))
+           (get_pevents p1) ([], False)
+       in
+       if rparents_are_different || pevents_are_different then
          let p = gen_person_of_person p1 in
-         patch_person base ip1 {(p) with rparents = rparents}
+         let rparents =
+           if rparents_are_different then rparents
+           else p.rparents
+         in
+         let pevents =
+           if pevents_are_different then pevents
+           else p.pevents
+         in
+         patch_person base ip1
+           {(p) with rparents = rparents; pevents = pevents}
        else ();
        let families = get_family p1 in
        for i = 0 to Array.length families - 1 do {
@@ -579,10 +1033,32 @@ value update_relations_of_related base ip old_related =
          let fam = foi base ifam in
          let old_witnesses = Array.to_list (get_witnesses fam) in
          let new_witnesses = List.filter (\<> ip) old_witnesses in
-         if new_witnesses <> old_witnesses then
+         let (fevents, fevents_are_different) =
+           List.fold_right
+             (fun e (list, rad) ->
+               let (witnesses, rad) =
+                 List.fold_right
+                   (fun (ip2, k) (accu, rad) ->
+                      if ip2 = ip then (accu, True)
+                      else ([(ip2, k) :: accu], rad))
+                   (Array.to_list e.efam_witnesses) ([], rad)
+               in
+               let e = {(e) with efam_witnesses = Array.of_list witnesses} in
+               ([e :: list], rad))
+             (get_fevents fam) ([], False)
+         in
+         if new_witnesses <> old_witnesses || fevents_are_different then
            let fam = gen_family_of_family fam in
+           let witnesses =
+             if new_witnesses <> old_witnesses then Array.of_list new_witnesses
+             else fam.witnesses
+           in
+           let fevents =
+             if fevents_are_different then fevents
+             else fam.fevents
+           in
            patch_family base ifam
-             {(fam) with witnesses = Array.of_list new_witnesses}
+             {(fam) with witnesses = witnesses; fevents = fevents}
          else ();
        };
      })
@@ -610,15 +1086,19 @@ value effective_del conf base warning p = do {
     }
   | None -> () ];
   let old_rparents = rparents_of (get_rparents p) in
-  Update.update_related_pointers base ip old_rparents [];
+  let old_pevents = pwitnesses_of (get_pevents p) in
+  let old = List.append old_rparents old_pevents in
+  Update.update_related_pointers base ip old [];
   {first_name = none; surname = none; occ = 0; image = empty;
-   public_name = empty; qualifiers = []; aliases = []; sex = get_sex p;
-   first_names_aliases = []; surnames_aliases = []; titles = [];
-   rparents = []; related = []; occupation = empty; access = IfTitles;
-   birth = Adef.codate_None; birth_place = empty; birth_src = empty;
-   baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
-   death = DontKnowIfDead; death_place = empty; death_src = empty;
-   burial = UnknownBurial; burial_place = empty; burial_src = empty;
+   public_name = empty; qualifiers = []; aliases = [];
+   sex = get_sex p; first_names_aliases = []; surnames_aliases = [];
+   titles = []; rparents = []; related = []; occupation = empty;
+   access = IfTitles; birth = Adef.codate_None; birth_place = empty;
+   birth_note = empty; birth_src = empty; baptism = Adef.codate_None;
+   baptism_place = empty; baptism_note = empty; baptism_src = empty;
+   death = DontKnowIfDead; death_place = empty; death_note = empty;
+   death_src = empty; burial = UnknownBurial; burial_place = empty;
+   burial_note = empty; burial_src = empty; pevents = [];
    notes = empty; psources = empty; key_index = ip}
 };
 
@@ -713,6 +1193,8 @@ value all_checks_person conf base p a u = do {
     (fun
      [ ChangedOrderOfChildren ifam des _ after ->
          patch_descend base ifam {children = after}
+     | ChangedOrderOfPersonEvents _ _ after ->
+         patch_person base p.key_index {(p) with pevents = after}
      | _ -> () ])
     wl.val;
   List.rev wl.val
@@ -863,8 +1345,15 @@ value print_mod o_conf base =
     patch_person base p.key_index p;
     let s =
       let sl =
-        [p.notes; p.occupation; p.birth_src; p.baptism_src; p.death_src;
+        [p.notes; p.occupation; p.birth_note; p.birth_src; p.baptism_note;
+         p.baptism_src; p.death_note; p.death_src; p.burial_note;
          p.burial_src; p.psources]
+      in
+      let sl =
+        loop (p.pevents) sl where rec loop l accu =
+          match l with
+          [ [] -> accu
+          | [evt :: l] -> loop l [evt.epers_note; evt.epers_src :: accu]]
       in
       String.concat " " (List.map (sou base) sl)
     in
