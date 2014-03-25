@@ -119,6 +119,7 @@ value no_newlines s =
 
 value raw_output = ref False;
 value no_picture = ref False;
+value isolated = ref False;
 
 value gen_correct_string no_num no_colon s =
   let s = strip_spaces s in
@@ -372,6 +373,7 @@ value print_infos oc base is_child csrc cbp p =
 
 type gen =
   { mark : array bool;
+    mark_rel : array bool;
     per_sel : iper -> bool;
     fam_sel : ifam -> bool;
     fam_done : array bool;
@@ -809,6 +811,20 @@ value print_comment_for_family oc base gen fam =
   }
   else ()
 ;
+
+value print_empty_family oc base p = do {
+  let string_quest = Gwdb.insert_string base "?" in
+  fprintf oc "fam ? ?.0 + #noment ? ?.0\n";
+  fprintf oc "beg\n";
+  print_child oc base string_quest "" "" p;
+  fprintf oc "end\n";
+};
+
+value has_infos_isolated base p =
+  has_infos_not_dates base p || get_birth p <> Adef.codate_None ||
+  get_baptism p <> Adef.codate_None
+;
+
 
 value print_family oc base gen m =
   let fam = m.m_fam in
@@ -1280,7 +1296,10 @@ value print_relations_for_person oc base gen def_p is_definition p =
          | _ -> False ])
       (get_rparents p)
   in
-  if surn <> "?" && fnam <> "?" && exist_relation then do {
+  if surn <> "?" && fnam <> "?" && exist_relation &&
+     not gen.mark_rel.(Adef.int_of_iper (get_key_index p))
+  then do {
+    gen.mark_rel.(Adef.int_of_iper (get_key_index p)) := True;
     fprintf oc "\n";
     fprintf oc "rel %s %s%s" surn fnam
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
@@ -1323,6 +1342,29 @@ value print_relations oc base gen ml =
             if not old_gw.val then
               List.iter (print_pevents_for_person oc base gen) def_p.val
             else ()
+          }
+          else ();
+          loop (pl @ List.map (fun p -> (p, False)) def_p.val)
+        } ]
+  in
+  loop pl
+;
+
+value print_isolated_relations oc base gen p =
+  let pl = [(p, False)] in
+  let pl =
+    List.fold_right
+      (fun p pl -> if list_memf eq_key_fst p pl then pl else [p :: pl]) pl []
+  in
+  let rec loop =
+    fun
+    [ [] -> ()
+    | [(p, if_def) :: pl] ->
+        let def_p = ref [] in
+        do {
+          if get_rparents p <> [] && gen.per_sel (get_key_index p) then do {
+            print_relations_for_person oc base gen def_p if_def p;
+            List.iter (print_notes_for_person oc base gen) def_p.val
           }
           else ();
           loop (pl @ List.map (fun p -> (p, False)) def_p.val)
@@ -1650,12 +1692,13 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
   in
   let gen =
     let mark = Array.create (nb_of_persons base) False in
+    let mark_rel = Array.create (nb_of_persons base) False in
     let (per_sel, fam_sel) =
       Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
         censor.val with_siblings.val maxlev.val
     in
     let fam_done = Array.create (nb_of_families base) False in
-    {mark = mark; per_sel = per_sel; fam_sel = fam_sel;
+    {mark = mark; mark_rel = mark_rel; per_sel = per_sel; fam_sel = fam_sel;
      fam_done = fam_done; notes_pl_p = []; ext_files = [];
      notes_alias = notes_aliases in_dir; pevents_pl_p = []}
   in
@@ -1706,6 +1749,41 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
         else ()
       else ()
     };
+    (* Ajout des personnes isolée à l'export. On leur ajoute des    *)
+    (* parents pour pouvoir utiliser les autres fonctions normales. *)
+    (* Export que si c'est toute la base.                           *)
+    if isolated.val && anc = None && desc = None && ancdesc = None then
+      for i = 0 to nb_of_persons base - 1 do {
+        if gen.mark.(i) || gen.mark_rel.(i) then ()
+        else
+          let p = poi base (Adef.iper_of_int i) in
+          match get_parents p with
+          [ Some _ -> ()
+          | None ->
+              if bogus_person base p &&
+                 not (get_birth p <> Adef.codate_None || get_baptism p <> Adef.codate_None ||
+                      get_first_names_aliases p <> [] || get_surnames_aliases p <> [] ||
+                      sou base (get_public_name p) <> "" || get_qualifiers p <> [] ||
+                      get_aliases p <> [] || get_titles p <> [] ||
+                      sou base (get_occupation p) <> "" || sou base (get_birth_place p) <> "" ||
+                      sou base (get_birth_src p) <> "" ||
+                      sou base (get_baptism_place p) <> "" || sou base (get_baptism_src p) <> "" ||
+                      sou base (get_death_place p) <> "" || sou base (get_death_src p) <> "" ||
+                      sou base (get_burial_place p) <> "" || sou base (get_burial_src p) <> "" ||
+                      sou base (get_notes p) <> "" || sou base (get_psources p) <> "" ||
+                      get_rparents p <> [] || get_related p <> [])
+              then ()
+              else
+                let (oc, _first) = origin_file (base_notes_origin_file base) in
+                do {
+                  fprintf oc "\n";
+                  print_empty_family oc base p;
+                  print_notes_for_person oc base gen p;
+                  gen.mark.(i) := True;
+                  print_isolated_relations oc base gen p;
+                }]
+      }
+    else ();
     if Mutil.verbose.val then ProgrBar.finish () else ();
     if not no_notes.val then do {
       let s = base_notes_read base "" in
@@ -1872,6 +1950,7 @@ value speclist =
     ": no spouses' parents (for options -s and -d)");
    ("-nn", Arg.Set no_notes, ": no (database) notes");
    ("-nopicture", Arg.Set no_picture, ": Don't extract individual picture.");
+   ("-isolated", Arg.Set isolated, ": Export isolated persons (work only if export all database).");
    ("-c", Arg.Int (fun i -> censor.val := i), "\
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
