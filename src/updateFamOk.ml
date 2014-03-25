@@ -38,6 +38,8 @@ value get conf key =
   | None -> failwith (key ^ " unbound") ]
 ;
 
+value get_nth conf key cnt = p_getenv conf.env (key ^ string_of_int cnt);
+
 value getn conf var key =
   match p_getenv conf.env (var ^ "_" ^ key) with
   [ Some v -> v
@@ -169,7 +171,218 @@ value insert_parent conf (parents, ext) i =
   | _ -> (parents, ext) ]
 ;
 
-value reconstitute_family conf =
+value reconstitute_insert_event conf ext cnt el =
+  let var = "ins_event" ^ string_of_int cnt in
+  let n =
+    match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+    [ (_, Some n) when n > 1 -> n
+    | (Some "on", _) -> 1
+    | _ -> 0 ]
+  in
+  if n > 0 then
+    let el =
+      loop el n where rec loop el n =
+        if n > 0 then
+          let e1 =
+            {efam_name = Efam_Name ""; efam_date = Adef.codate_None;
+             efam_place = ""; efam_reason = "";efam_note = "";
+             efam_src = ""; efam_witnesses = [| |]}
+          in
+          loop [e1 :: el] (n - 1)
+        else el
+    in
+    (el, True)
+  else (el, ext)
+;
+
+value rec reconstitute_events conf ext cnt =
+  match get_nth conf "e_name" cnt with
+  [ Some efam_name ->
+      let efam_name =
+        match efam_name with
+        [ "#marr" -> Efam_Marriage
+        | "#nmar" -> Efam_NoMarriage
+        | "#nmen" -> Efam_NoMention
+        | "#enga" -> Efam_Engage
+        | "#div" -> Efam_Divorce
+        | "#sep" -> Efam_Separated
+        | "#anul" -> Efam_Annulation
+        | "#marb" -> Efam_MarriageBann
+        | "#marc" -> Efam_MarriageContract
+        | "#marl" -> Efam_MarriageLicense
+        | "#pacs" -> Efam_PACS
+        | "#resi" -> Efam_Residence
+        | n -> Efam_Name (no_html_tags (only_printable n)) ]
+      in
+      let efam_date =
+        Update.reconstitute_date conf ("e_date" ^ string_of_int cnt)
+      in
+      let efam_place =
+        match get_nth conf "e_place" cnt with
+        [ Some place -> no_html_tags (only_printable place)
+        | _ -> "" ]
+      in
+      let efam_note =
+        match get_nth conf "e_note" cnt with
+        [ Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
+        | _ -> "" ]
+      in
+      let efam_src =
+        match get_nth conf "e_src" cnt with
+        [ Some src -> only_printable src
+        | _ -> "" ]
+      in
+      let (witnesses, ext) =
+        loop 1 ext where rec loop i ext =
+          match
+            try
+              Some
+                (reconstitute_somebody conf
+                   ("e" ^ string_of_int cnt ^ "_witn" ^ string_of_int i))
+            with
+            [ Failure _ -> None ]
+          with
+          [ Some c ->
+              let (witnesses, ext) = loop (i + 1) ext in
+              let c =
+                match
+                  p_getenv conf.env
+                    ("e" ^ string_of_int cnt ^ "_witn" ^
+                        string_of_int i ^ "_kind")
+                with
+                [ Some "godp" -> (c, Witness_GodParent)
+                | _ -> (c, Witness) ]
+              in
+              match
+                p_getenv conf.env
+                  ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
+              with
+              [ Some "on" ->
+                  let new_witn =
+                    (("", "", 0, Update.Create Neuter None, ""), Witness)
+                  in
+                  ([c; new_witn :: witnesses], True)
+              | _ -> ([c :: witnesses], ext) ]
+          | None -> ([], ext) ]
+      in
+      let (witnesses, ext) =
+        let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
+        match p_getenv conf.env evt_ins with
+        [ Some "on" ->
+            let new_witn =
+              (("", "", 0, Update.Create Neuter None, ""), Witness)
+            in
+            ([new_witn :: witnesses], True)
+        | _ -> (witnesses, ext) ]
+      in
+      let e =
+        {efam_name = efam_name; efam_date = Adef.codate_of_od efam_date;
+         efam_place = efam_place; efam_reason = "";
+         efam_note = efam_note; efam_src = efam_src;
+         efam_witnesses = Array.of_list witnesses}
+      in
+      let (el, ext) = reconstitute_events conf ext (cnt + 1) in
+      let (el, ext) = reconstitute_insert_event conf ext cnt el in
+      ([e :: el], ext)
+  | _ -> ([], ext) ]
+;
+
+value reconstitute_from_fevents fevents marr div =
+  (* On tri les évènements pour être sûr. *)
+  let fevents =
+    CheckItem.sort_events
+      ((fun evt -> CheckItem.Fsort evt.efam_name),
+       (fun evt -> evt.efam_date))
+      fevents
+  in
+  let found_marriage = ref False in
+  let found_divorce = ref False in
+  (* On veut cette fois ci que ce soit le dernier évènement *)
+  (* qui soit mis dans les évènements principaux.           *)
+  let rec loop fevents marr div =
+    match fevents with
+    [ [] -> (marr, div)
+    | [evt :: l] ->
+        match evt.efam_name with
+        [ Efam_Engage ->
+            if found_marriage.val then loop l marr div
+            else
+              let marr =
+                (Engaged, evt.efam_date, evt.efam_place,
+                 evt.efam_note, evt.efam_src)
+              in
+              let () = found_marriage.val := True in
+              loop l marr div
+        | Efam_Marriage | Efam_MarriageContract ->
+            if found_marriage.val then loop l marr div
+            else
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on met une précision "vers".      *)
+              let date =
+                if evt.efam_name = Efam_MarriageContract then
+                  match Adef.od_of_codate evt.efam_date with
+                  [ Some (Dgreg dmy cal) ->
+                      let dmy = {(dmy) with prec = About} in
+                      Adef.codate_of_od (Some (Dgreg dmy cal))
+                  | _ -> evt.efam_date ]
+                else evt.efam_date
+              in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on ne met pas de lieu.            *)
+              let place =
+                if evt.efam_name = Efam_MarriageContract then ""
+                else evt.efam_place
+              in
+              let marr = (Married, date, place, evt.efam_note, evt.efam_src) in
+              let () = found_marriage.val := True in
+              loop l marr div
+        | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
+          Efam_Annulation | Efam_PACS ->
+            if found_marriage.val then loop l marr div
+            else
+              let marr =
+                (NoMention, evt.efam_date, evt.efam_place,
+                 evt.efam_note, evt.efam_src)
+              in
+              let () = found_marriage.val := True in
+              loop l marr div
+        | Efam_NoMarriage ->
+            if found_marriage.val then loop l marr div
+            else
+              let marr =
+                (NotMarried, evt.efam_date, evt.efam_place,
+                 evt.efam_note, evt.efam_src)
+              in
+              let () = found_marriage.val := True in
+              loop l marr div
+        | Efam_Divorce ->
+            if found_divorce.val then loop l marr div
+            else
+              let div = Divorced evt.efam_date in
+              let () = found_divorce.val := True in
+              loop l marr div
+        | Efam_Separated ->
+            if found_divorce.val then loop l marr div
+            else
+              let div = Separated in
+              let () = found_divorce.val := True in
+              loop l marr div
+        | _ -> loop l marr div ] ]
+  in
+  let (marr, div) = loop (List.rev fevents) marr div in
+  (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
+  let marr =
+    if not found_marriage.val then (NoMention, Adef.codate_None, "", "", "")
+    else marr
+  in
+  let div =
+    if not found_divorce.val then NotDivorced
+    else div
+  in
+  (marr, div)
+;
+
+value reconstitute_family conf base =
   let ext = False in
   let relation =
     match (p_getenv conf.env "mrel", p_getenv conf.env "nsck") with
@@ -185,6 +398,10 @@ value reconstitute_family conf =
   in
   let marriage = Update.reconstitute_date conf "marr" in
   let marriage_place = no_html_tags (only_printable (get conf "marr_place")) in
+  let marriage_note =
+    only_printable_or_nl (strip_all_trailing_spaces (get conf "marr_note"))
+  in
+  let marriage_src = strip_spaces (get conf "marr_src") in
   let (witnesses, ext) =
     loop 1 ext where rec loop i ext =
       match
@@ -214,6 +431,8 @@ value reconstitute_family conf =
     | _ ->
         Divorced (Adef.codate_of_od (Update.reconstitute_date conf "div")) ]
   in
+  let (events, ext) = reconstitute_events conf ext 1 in
+  let (events, ext) = reconstitute_insert_event conf ext 0 events in
   let surname = getn conf "pa1" "sn" in
   let (children, ext) =
     loop 1 ext where rec loop i ext =
@@ -261,15 +480,94 @@ value reconstitute_family conf =
     [ Some i -> i
     | None -> 0 ]
   in
+  (* Mise à jour des évènements principaux. *)
+  (* Attention, dans le cas où fevent est vide, i.e. on a valider   *)
+  (* avec un texte vide, par exemple lors de l'ajout d'une famille, *)
+  (* il faut ajouter un evenement no_mention.                       *)
+  let events =
+    if events = [] then
+      let evt =
+        {efam_name = Efam_NoMention ; efam_date = Adef.codate_None;
+         efam_place = ""; efam_reason = "";efam_note = "";
+         efam_src = ""; efam_witnesses = [| |]}
+      in
+      [evt]
+    else events
+  in
+  let marriage = Adef.codate_of_od marriage in
+  (* Attention, surtout pas les witnesses, parce que si on en créé un, *)
+  (* on le créé aussi dans witness et on ne pourra jamais valider.     *)
+  let (marr, div) =
+    reconstitute_from_fevents events
+      (relation, marriage, marriage_place, marriage_note, marriage_src)
+      divorce
+  in
+  let (relation, marriage, marriage_place,
+       marriage_note, marriage_src) =
+    marr
+  in
+  (* Si parents de même sex ... Pas de mode multi parent. *)
+  let relation =
+    match parents with
+    [ [father; mother] ->
+        let father_sex =
+          match father with
+          [ (_, _, _, Update.Create sex _, _) -> sex
+          | (f, s, o, Update.Link, _) ->
+              match person_of_key base f s o with
+              [ Some ip -> get_sex (poi base ip)
+              | _ -> Neuter ] ]
+        in
+        let mother_sex =
+          match mother with
+          [ (_, _, _, Update.Create sex _, _) -> sex
+          | (f, s, o, Update.Link, _) ->
+              match person_of_key base f s o with
+              [ Some ip -> get_sex (poi base ip)
+              | _ -> Neuter ] ]
+        in
+        match (father_sex, mother_sex) with
+        [ (Male, Male) | (Female, Female) ->
+            match relation with
+            [ Married -> NoSexesCheckMarried
+            | _ -> NoSexesCheckNotMarried ]
+        | _ -> relation ]
+    | _ -> relation ]
+  in
+  let divorce = div in
   let fam =
-    {marriage = Adef.codate_of_od marriage; marriage_place = marriage_place;
-     marriage_src = strip_spaces (get conf "marr_src");
+    {marriage = marriage; marriage_place = marriage_place;
+     marriage_note = marriage_note; marriage_src = marriage_src;
      witnesses = Array.of_list witnesses; relation = relation;
-     divorce = divorce; comment = comment; origin_file = origin_file;
+     divorce = divorce; fevents = events;
+     comment = comment; origin_file = origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int fam_index}
   and cpl = parent conf.multi_parents (Array.of_list parents)
   and des = {children = Array.of_list children} in
   (fam, cpl, des, ext)
+;
+
+value strip_events fevents =
+  let strip_array_witness pl =
+    let pl =
+      List.fold_right
+        (fun (((f, s, o, c, _), k) as p) pl -> if f = "" then pl else [p :: pl])
+        (Array.to_list pl) []
+    in
+    Array.of_list pl
+  in
+  List.fold_right
+    (fun e accu ->
+       let has_name =
+         match e.efam_name with
+         [ Efam_Name s -> s <> ""
+         | _ -> True ]
+       in
+       if has_name then
+         let witnesses = strip_array_witness e.efam_witnesses in
+         [ {(e) with efam_witnesses = witnesses} :: accu ]
+       else accu)
+    fevents []
 ;
 
 value strip_array_persons pl =
@@ -290,6 +588,26 @@ value error_family conf base err =
     trailer conf;
     raise Update.ModErr
   }
+;
+
+value check_event_witnesses conf base witnesses =
+  let wl = Array.to_list witnesses in
+  let rec loop wl =
+    match wl with
+    [ [] -> None
+    | [((fn, sn, _, _, _), _) :: l] ->
+        if fn = "" && sn = "" then
+          (* Champs non renseigné, il faut passer au suivant *)
+          loop l
+        else if fn = "" || fn = "?" then
+          Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
+                ^ (transl conf "first name missing"))
+        else if sn = "" || sn = "?" then
+          Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
+                ^ (transl conf "surname missing"))
+        else loop l ]
+  in
+  loop wl
 ;
 
 value check_witnesses conf base fam =
@@ -333,13 +651,35 @@ value check_parents conf base cpl =
 ;
 
 value check_family conf base fam cpl =
-  let err_witness = check_witnesses conf base fam in
+  (* N'est plus nécessaire avec les évènements. Est fait dans fevents. *)
+  (*let err_witness = check_witnesses conf base fam in*)
   let err_parents = check_parents conf base cpl in
+  let err_fevent_witness =
+    (* On regarde si les témoins sont bien renseignés. *)
+    loop fam.fevents where rec loop fevents =
+      match fevents with
+      [ [] -> None
+      | [evt :: l] ->
+          match check_event_witnesses conf base evt.efam_witnesses with
+          [ Some err -> Some err
+          | _ -> loop l ] ]
+  in
+  (*
+  let err_witness =
+    match (err_witness, err_fevent_witness) with
+    [ (Some err, _) | (_, Some err) -> Some err
+    | (None, None) -> None ]
+  in
   (err_witness, err_parents)
+  *)
+  (err_fevent_witness, err_parents)
 ;
 
 value strip_family fam des =
-  let fam = {(fam) with witnesses = strip_array_persons fam.witnesses} in
+  let fam =
+    {(fam) with witnesses = strip_array_persons fam.witnesses;
+     fevents = strip_events fam.fevents}
+  in
   let des = {children = strip_array_persons des.children} in
   (fam, des)
 ;
@@ -477,11 +817,20 @@ value infer_origin_file conf base ifam ncpl ndes =
   else r
 ;
 
+value fwitnesses_of fevents =
+  List.fold_left
+    (fun ipl e ->
+       List.fold_left
+         (fun ipl (ip, _) -> [ip :: ipl])
+         ipl (Array.to_list e.efam_witnesses))
+    [] fevents
+;
+
 value effective_mod conf base sfam scpl sdes = do {
   let fi = sfam.fam_index in
-  let (oorigin, owitnesses) =
+  let (oorigin, owitnesses, ofevents) =
     let ofam = foi base fi in
-    (get_origin_file ofam, get_witnesses ofam)
+    (get_origin_file ofam, get_witnesses ofam, get_fevents ofam)
   in
   let (oarr, ofather, omother) =
     let ocpl = foi base fi in
@@ -607,8 +956,14 @@ value effective_mod conf base sfam scpl sdes = do {
     ndes.children;
   Update.add_misc_names_for_new_persons base created_p.val;
   Update.update_misc_names_of_family base Male {family = get_family nfath};
-  Update.update_related_pointers base (Adef.father ncpl)
-    (Array.to_list owitnesses) (Array.to_list nfam.witnesses);
+  let ol_witnesses = Array.to_list owitnesses in
+  let nl_witnesses = Array.to_list nfam.witnesses in
+  let ol_fevents = fwitnesses_of ofevents in
+  let nl_fevents = fwitnesses_of nfam.fevents in
+  let ol = List.append ol_witnesses ol_fevents in
+  let nl = List.append nl_witnesses nl_fevents in
+  let pi = (Adef.father ncpl) in
+  Update.update_related_pointers base pi ol nl;
   (fi, nfam, ncpl, ndes)
 };
 
@@ -671,8 +1026,10 @@ value effective_add conf base sfam scpl sdes =
       ndes.children;
     Update.add_misc_names_for_new_persons base created_p.val;
     Update.update_misc_names_of_family base Male nfath_u;
-    Update.update_related_pointers base (Adef.father ncpl) []
-      (Array.to_list nfam.witnesses);
+    let nl_witnesses = Array.to_list nfam.witnesses in
+    let nl_fevents = fwitnesses_of nfam.fevents in
+    let nl = List.append nl_witnesses nl_fevents in
+    Update.update_related_pointers base (Adef.father ncpl) [] nl;
     (fi, nfam, ncpl, ndes)
   }
 ;
@@ -789,7 +1146,7 @@ value need_check_noloop (scpl, sdes, onfs) =
   else False
 ;
 
-value all_checks_family conf base ifam fam cpl des scdo = do {
+value all_checks_family conf base ifam gen_fam cpl des scdo = do {
   let wl = ref [] in
   let ml = ref [] in
   let error = Update.error conf base in
@@ -799,13 +1156,15 @@ value all_checks_family conf base ifam fam cpl des scdo = do {
     Consang.check_noloop_for_person_list base error
       (Array.to_list (Adef.parent_array cpl))
   else ();
-  let fam = family_of_gen_family base (fam, cpl, des) in
+  let fam = family_of_gen_family base (gen_fam, cpl, des) in
   CheckItem.family base error warning ifam fam;
   CheckItem.check_other_fields base misc ifam fam;
   List.iter
     (fun
      [ ChangedOrderOfMarriages p _ after ->
          patch_union base (get_key_index p) {family = after}
+     | ChangedOrderOfFamilyEvents ifam  _ after ->
+         patch_family base ifam {(gen_fam) with fevents = after}
      | _ -> () ])
     wl.val;
   (List.rev wl.val, List.rev ml.val)
@@ -943,13 +1302,313 @@ value forbidden_disconnected conf sfam scpl sdes =
   else False
 ;
 
+(* Lorsqu'on ajout naissance décès par exemple en créant une personne. *)
+value patch_person_with_pevents base ip =
+  let p = poi base ip in
+  let p = gen_person_of_person p in
+  let empty_string = Gwdb.insert_string base "" in
+  let evt_birth =
+    match (Adef.od_of_codate p.birth, p.birth_place) with
+    [ (Some d, _) ->
+        let evt =
+          { epers_name = Epers_Birth; epers_date = p.birth;
+            epers_place = p.birth_place; epers_reason = empty_string;
+            epers_note = p.birth_note; epers_src = p.birth_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | (_, place) ->
+        if sou base place = "" then None
+        else
+          let evt =
+            { epers_name = Epers_Birth; epers_date = Adef.codate_None;
+              epers_place = p.birth_place; epers_reason = empty_string;
+              epers_note = p.birth_note; epers_src = p.birth_src;
+              epers_witnesses = [| |] }
+          in
+          Some evt ]
+  in
+  let evt_baptism =
+    match (Adef.od_of_codate p.baptism, p.baptism_place) with
+    [ (Some d, _) ->
+        let evt =
+          { epers_name = Epers_Baptism; epers_date = p.baptism;
+            epers_place = p.baptism_place; epers_reason = empty_string;
+            epers_note = p.baptism_note; epers_src = p.baptism_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | (_, place) ->
+        if sou base place = "" then None
+        else
+          let evt =
+            { epers_name = Epers_Baptism; epers_date = Adef.codate_None;
+              epers_place = p.baptism_place; epers_reason = empty_string;
+              epers_note = p.baptism_note; epers_src = p.baptism_src;
+              epers_witnesses = [| |] }
+          in
+          Some evt ]
+  in
+  (*
+  let evt_death =
+    match p.death with
+    [ NotDead | DontKnowIfDead -> None
+    | Death death_reason cd ->
+        let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
+        let evt =
+          { epers_name = Epers_Death; epers_date = date;
+            epers_place = p.death_place; epers_reason = empty_string;
+            epers_note = p.death_note; epers_src = p.death_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | DeadYoung | DeadDontKnowWhen | OfCourseDead -> None ]
+  in
+  *)
+  let evt_death =
+    match (p.death, p.death_place) with
+    [ (Death death_reason cd, _) ->
+        let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
+        let evt =
+          { epers_name = Epers_Death; epers_date = date;
+            epers_place = p.death_place; epers_reason = empty_string;
+            epers_note = p.death_note; epers_src = p.death_src;
+            epers_witnesses = [| |] }
+        in
+        Some evt
+    | (_, place) ->
+        if sou base place = "" then None
+        else
+          let date = Adef.codate_of_od None in
+          let evt =
+            { epers_name = Epers_Death; epers_date = date;
+              epers_place = p.death_place; epers_reason = empty_string;
+              epers_note = p.death_note; epers_src = p.death_src;
+              epers_witnesses = [| |] }
+          in
+          Some evt ]
+  in
+  (* Attention, on prend aussi les autres évènements sinon,  *)
+  (* on va tout effacer et ne garder que naissance et décès. *)
+  let found_birth = ref False in
+  let found_death = ref False in
+  let pevents =
+    loop p.pevents [] where rec loop pevents accu =
+      match pevents with
+      [ [] ->
+          let accu =
+            if found_birth.val then accu
+            else
+              match (evt_birth, evt_baptism) with
+              [ (Some evt, None) -> [evt :: accu]
+              | (None, Some evt) -> [evt :: accu]
+              | _ -> accu ]
+          in
+          let accu =
+            if found_death.val then accu
+            else
+              match evt_death with
+              [ Some evt -> [evt :: accu]
+              | None -> accu ]
+          in
+          List.rev accu
+      | [evt :: l] ->
+          match evt.epers_name with
+          [ Epers_Birth | Epers_Baptism ->
+              if found_birth.val then loop l [evt :: accu]
+              else
+                match (evt_birth, evt_baptism) with
+                [ (Some evt2, None) ->
+                    let () = found_birth.val := True in
+                    (* Si il y avait des témoins, on les remets en place. *)
+                    let evt =
+                      {(evt2) with epers_witnesses = evt.epers_witnesses}
+                    in
+                    loop l [evt :: accu]
+                | (None, Some evt2) ->
+                    let () = found_birth.val := True in
+                    (* Si il y avait des témoins, on les remets en place. *)
+                    let evt =
+                      {(evt2) with epers_witnesses = evt.epers_witnesses}
+                    in
+                    loop l [evt :: accu]
+                | _ -> loop l [evt :: accu] ]
+          | Epers_Death ->
+              if found_death.val then loop l [evt :: accu]
+              else
+                match evt_death with
+                [ Some evt2 ->
+                    let () = found_death.val := True in
+                    (* Si il y avait des témoins, on les remets en place. *)
+                    let evt =
+                      {(evt2) with epers_witnesses = evt.epers_witnesses}
+                    in
+                    loop l [evt :: accu]
+                | None -> loop l [evt :: accu] ]
+          | _ -> loop l [evt :: accu] ] ]
+  in
+  let p = {(p) with pevents = pevents} in
+  patch_person base p.key_index p
+;
+
+value patch_parent_with_pevents base cpl =
+  Array.iter (patch_person_with_pevents base) (Adef.parent_array cpl)
+;
+
+value patch_children_with_pevents base des =
+  Array.iter (patch_person_with_pevents base) des.children
+;
+
+(* TODO merge avec l'autre ... *)
+value reconstitute_from_fevents2 base fevents marr div =
+  let empty_string = Gwdb.insert_string base "" in
+  (* Il faut trier avant de faire un reconstitute ... *)
+  let fevents =
+    CheckItem.sort_events
+      ((fun evt -> CheckItem.Fsort evt.efam_name),
+       (fun evt -> evt.efam_date))
+      fevents
+  in
+  let found_marriage = ref False in
+  let found_divorce = ref False in
+  (* On veut cette fois ci que ce soit le dernier évènement *)
+  (* qui soit mis dans les évènements principaux.           *)
+  let rec loop fevents marr div wit =
+    match fevents with
+    [ [] -> (marr, div, wit)
+    | [evt :: l] ->
+        match evt.efam_name with
+        [ Efam_Engage ->
+            if found_marriage.val then loop l marr div wit
+            else
+              let marr =
+                (Engaged, evt.efam_date, evt.efam_place,
+                 evt.efam_note, evt.efam_src)
+              in
+              let wit = evt.efam_witnesses in
+              let () = found_marriage.val := True in
+              loop l marr div wit
+        | Efam_Marriage | Efam_MarriageContract ->
+            if found_marriage.val then loop l marr div wit
+            else
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on met une précision "vers".      *)
+              let date =
+                if evt.efam_name = Efam_MarriageContract then
+                  match Adef.od_of_codate evt.efam_date with
+                  [ Some (Dgreg dmy cal) ->
+                      let dmy = {(dmy) with prec = About} in
+                      Adef.codate_of_od (Some (Dgreg dmy cal))
+                  | _ -> evt.efam_date ]
+                else evt.efam_date
+              in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on ne met pas de lieu.            *)
+              let place =
+                if evt.efam_name = Efam_MarriageContract then empty_string
+                else evt.efam_place
+              in
+              let marr = (Married, date, place, evt.efam_note, evt.efam_src) in
+              let wit = evt.efam_witnesses in
+              let () = found_marriage.val := True in
+              loop l marr div wit
+        | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
+          Efam_Annulation | Efam_PACS ->
+            if found_marriage.val then loop l marr div wit
+            else
+              let marr =
+                (NoMention, evt.efam_date, evt.efam_place,
+                 evt.efam_note, evt.efam_src)
+              in
+              let wit = evt.efam_witnesses in
+              let () = found_marriage.val := True in
+              loop l marr div wit
+        | Efam_NoMarriage ->
+            if found_marriage.val then loop l marr div wit
+            else
+              let marr =
+                (NotMarried, evt.efam_date, evt.efam_place,
+                 evt.efam_note, evt.efam_src)
+              in
+              let wit = evt.efam_witnesses in
+              let () = found_marriage.val := True in
+              loop l marr div wit
+        | Efam_Divorce ->
+            if found_divorce.val then loop l marr div wit
+            else
+              let div = Divorced evt.efam_date in
+              let () = found_divorce.val := True in
+              loop l marr div wit
+        | Efam_Separated ->
+            if found_divorce.val then loop l marr div wit
+            else
+              let div = Separated in
+              let () = found_divorce.val := True in
+              loop l marr div wit
+        | _ -> loop l marr div wit ] ]
+  in
+  let (marr, div, wit) = loop (List.rev fevents) marr div [| |] in
+  (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
+  let (marr, wit) =
+    if not found_marriage.val then
+      ((NoMention, Adef.codate_None, empty_string,
+        empty_string, empty_string), [| |])
+    else (marr, wit)
+  in
+  let div =
+    if not found_divorce.val then NotDivorced
+    else div
+  in
+  (marr, div, wit)
+;
+
+(* On met à jour les témoins maintenant. *)
+value patch_family_with_fevents base fam =
+  let (marr, div, witnesses) =
+    reconstitute_from_fevents2 base fam.fevents
+      (fam.relation, fam.marriage, fam.marriage_place,
+       fam.marriage_note, fam.marriage_src)
+      fam.divorce
+  in
+  let (relation, marriage, marriage_place,
+       marriage_note, marriage_src) =
+    marr
+  in
+  let divorce = div in
+  let witnesses = List.map fst (Array.to_list witnesses) in
+  let fam =
+    {(fam) with marriage = marriage; marriage_place = marriage_place;
+     marriage_note = marriage_note; marriage_src = marriage_src;
+     relation = relation; divorce = divorce;
+     witnesses = Array.of_list witnesses}
+  in
+  let () = patch_family base fam.fam_index fam in
+  fam
+  (*
+  let rec loop fevents =
+    match fevents with
+    [ [] -> []
+    | [evt :: l] ->
+        match evt.efam_name with
+        [ Efam_Marriage | Efam_MarriageBann | Efam_MarriageContract |
+          Efam_MarriageLicense ->
+            List.map fst (Array.to_list evt.efam_witnesses)
+        | _ -> loop l ] ]
+  in
+  let witnesses = loop (List.rev fam.fevents) in
+  let fam = {(fam) with witnesses = Array.of_list witnesses} in
+  patch_family base fam.fam_index fam
+  *)
+;
+
+
 value print_add o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string.val := [] in
   let conf = Update.update_conf o_conf in
   try
-    let (sfam, scpl, sdes, ext) = reconstitute_family conf in
+    let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
     let redisp =
       match p_getenv conf.env "return" with
       [ Some _ -> True
@@ -975,6 +1634,9 @@ value print_add o_conf base =
       | (None, None) -> do {
           let (sfam, sdes) = strip_family sfam sdes in
           let (ifam, fam, cpl, des) = effective_add conf base sfam scpl sdes in
+          let fam = patch_family_with_fevents base fam in
+          let () = patch_parent_with_pevents base cpl in
+          let () = patch_children_with_pevents base des in
           let (wl, ml) =
             all_checks_family conf base ifam fam cpl des (scpl, sdes, None)
           in
@@ -1050,7 +1712,7 @@ value print_del conf base =
 
 value print_mod_aux conf base callback =
   try
-    let (sfam, scpl, sdes, ext) = reconstitute_family conf in
+    let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
     let redisp =
       match p_getenv conf.env "return" with
       [ Some _ -> True
@@ -1095,8 +1757,19 @@ value print_mod o_conf base =
   let callback sfam scpl sdes = do {
     let ofs = family_structure conf base sfam.fam_index in
     let (ifam, fam, cpl, des) = effective_mod conf base sfam scpl sdes in
+    let fam = patch_family_with_fevents base fam in
+    let () = patch_parent_with_pevents base cpl in
+    let () = patch_children_with_pevents base des in
     let s =
-      let sl = [fam.comment; fam.fsources] in
+      let sl =
+        [fam.comment; fam.fsources; fam.marriage_note; fam.marriage_src]
+      in
+      let sl =
+        loop (fam.fevents) sl where rec loop l accu =
+          match l with
+          [ [] -> accu
+          | [evt :: l] -> loop l [evt.efam_note; evt.efam_src :: accu]]
+      in
       String.concat " " (List.map (sou base) sl)
     in
     Notes.update_notes_links_db conf (NotesLinks.PgFam ifam) s;

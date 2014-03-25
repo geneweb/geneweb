@@ -10,6 +10,40 @@ open Printf;
 (* Backward compatibility option before the additional fields. *)
 value old_gw = ref False;
 
+value put_events_in_notes base p =
+  (* Si on est en mode old_gw, on mets tous les évènements *)
+  (* dans les notes.                                       *)
+  if old_gw.val then
+    loop (get_pevents p) where rec loop pevents =
+      match pevents with
+      [ [] -> False
+      | [evt :: events] ->
+          match evt.epers_name with
+          [ Epers_Birth | Epers_Baptism | Epers_Death |
+            Epers_Burial | Epers_Cremation ->
+              if sou base evt.epers_note <> "" ||
+                 evt.epers_witnesses <> [| |]
+              then True
+              else loop events
+          | _ -> True ] ]
+  else False
+;
+
+value ht = Hashtbl.create 20001;
+value find_free_key key =
+  let key = Name.lower key in
+  try
+    do {
+      let occ = Hashtbl.find ht key in
+      let free_occ = succ occ in
+      Hashtbl.add ht key free_occ;
+      free_occ
+    }
+  with
+  [ Not_found -> do {Hashtbl.add ht key 0; 0} ]
+;
+
+
 type mfam =
   { m_ifam : ifam; m_fam : family; m_fath : person; m_moth : person;
     m_chil : array person }
@@ -158,6 +192,17 @@ value print_date oc = gen_print_date False oc;
 value print_date_option oc = gen_print_date_option False oc;
 value print_title_date_option oc = gen_print_date_option True oc;
 
+value lines_list_of_string s =
+  loop [] 0 0 where rec loop lines len i =
+    if i = String.length s then
+      List.rev (if len = 0 then lines else [Buff.get len :: lines])
+    else if s.[i] = '\n' then
+      let line = Buff.get len in
+      loop [line :: lines] 0 (i + 1)
+    else
+      loop lines (Buff.store len s.[i]) (i + 1)
+;
+
 value has_infos_not_dates base p =
   get_first_names_aliases p <> [] || get_surnames_aliases p <> [] ||
   sou base (get_public_name p) <> "" || get_qualifiers p <> [] ||
@@ -178,6 +223,16 @@ value print_if_not_equal_to x oc base lab is =
 ;
 
 value print_if_no_empty = print_if_not_equal_to "";
+
+value print_if_no_empty_endline oc base lab is =
+  if sou base is = "" then ()
+  else fprintf oc " %s %s\n" lab (correct_string base is)
+;
+
+value print_if_no_empty_no_newline oc base lab is =
+  if sou base is = "" then ()
+  else fprintf oc " %s %s" lab (no_newlines (correct_string base is))
+;
 
 value print_first_name_alias oc base is =
   fprintf oc " {%s}" (correct_string base is)
@@ -322,7 +377,8 @@ type gen =
     fam_done : array bool;
     notes_pl_p : mutable list person;
     ext_files : mutable list (string * ref (list string));
-    notes_alias : mutable list (string * string) }
+    notes_alias : mutable list (string * string);
+    pevents_pl_p : mutable list person }
 ;
 
 value map_notes aliases f =
@@ -373,6 +429,30 @@ value add_linked_files gen from s some_linked_files =
     else loop new_linked_files (i + 1)
 ;
 
+value find_free_occ base f s i =
+  let ipl = persons_of_name base (f ^ " " ^ s) in
+  let first_name =  f in
+  let surname =  s in
+  let list_occ =
+    loop [] ipl where rec loop list =
+      fun
+      [ [ip :: ipl] ->
+          let p = poi base ip in
+          if not (List.mem (get_occ p) list) &&
+             first_name =  (p_first_name base p) &&
+             surname =  (p_surname base p) then
+            loop [get_occ p :: list] ipl
+          else loop list ipl
+      | [] -> list ]
+  in
+  let list_occ = List.sort compare list_occ in
+  loop 0 list_occ where rec loop cnt1 =
+    fun
+    [ [cnt2 :: list] ->
+        if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
+    | [] -> cnt1 ]
+;
+
 value print_parent oc base gen fam p =
   let has_printed_parents =
     match get_parents p with
@@ -390,7 +470,13 @@ value print_parent oc base gen fam p =
   do {
     fprintf oc "%s %s%s" (s_correct_string surname)
       (s_correct_string first_name)
-      (if get_occ p = 0 || first_name = "?" || surname = "?" then ""
+      (if first_name = "?" && surname = "?" then ""
+       else if first_name = "?" || surname = "?" then
+         if get_occ p = 0 then
+           let free_n = find_free_key (first_name ^ " " ^ surname) in
+           "." ^ string_of_int free_n
+         else "." ^ string_of_int (get_occ p)
+       else if get_occ p = 0  then ""
        else "." ^ string_of_int (get_occ p));
     if pr then
       if has_infos then print_infos oc base False "" "" p
@@ -408,9 +494,15 @@ value print_child oc base fam_surname csrc cbp p =
     | Female -> fprintf oc " f"
     | _ -> () ];
     fprintf oc " %s" (s_correct_string (sou base (get_first_name p)));
-    if get_occ p = 0 || p_first_name base p = "?" || p_surname base p = "?"
-    then
-      ()
+    if p_first_name base p = "?" && p_surname base p = "?" then ()
+    else if p_first_name base p = "?" || p_surname base p = "?" then
+      if get_occ p = 0 then
+        let free_n =
+          find_free_key (p_first_name base p ^ " " ^ p_surname base p)
+        in
+        fprintf oc ".%d" free_n
+      else fprintf oc ".%d" (get_occ p)
+    else if get_occ p = 0  then ()
     else fprintf oc ".%d" (get_occ p);
     if not (eq_istr (get_surname p) fam_surname) then
       fprintf oc " %s" (s_correct_string_nonum (sou base (get_surname p)))
@@ -473,11 +565,249 @@ value print_witness oc base gen p =
       if has_infos base p then print_infos oc base False "" "" p
       else fprintf oc " 0";
       match sou base (get_notes p) with
-      [ "" -> ()
-      | _ -> gen.notes_pl_p := [p :: gen.notes_pl_p] ]
+      [ "" ->
+          if put_events_in_notes base p then
+            gen.notes_pl_p := [p :: gen.notes_pl_p]
+          else ()
+      | _ -> gen.notes_pl_p := [p :: gen.notes_pl_p] ];
+      if get_pevents p <> [] then gen.pevents_pl_p := [p :: gen.pevents_pl_p]
+      else ();
     }
     else ()
   }
+;
+
+value print_pevent oc base gen e = do {
+  match e.epers_name with
+  [ Epers_Birth -> fprintf oc "#birt"
+  | Epers_Baptism -> fprintf oc "#bapt"
+  | Epers_Death -> fprintf oc "#deat"
+  | Epers_Burial -> fprintf oc "#buri"
+  | Epers_Cremation -> fprintf oc "#crem"
+  | Epers_Accomplishment -> fprintf oc "#acco"
+  | Epers_Acquisition -> fprintf oc "#acqu"
+  | Epers_Adhesion -> fprintf oc "#adhe"
+  | Epers_BaptismLDS -> fprintf oc "#bapl"
+  | Epers_BarMitzvah -> fprintf oc "#barm"
+  | Epers_BatMitzvah -> fprintf oc "#basm"
+  | Epers_Benediction -> fprintf oc "#bles"
+  | Epers_ChangeName -> fprintf oc "#chgn"
+  | Epers_Circumcision -> fprintf oc "#circ"
+  | Epers_Confirmation -> fprintf oc "#conf"
+  | Epers_ConfirmationLDS -> fprintf oc "#conl"
+  | Epers_Decoration -> fprintf oc "#awar"
+  | Epers_DemobilisationMilitaire -> fprintf oc "#demm"
+  | Epers_Diploma -> fprintf oc "#degr"
+  | Epers_Distinction -> fprintf oc "#dist"
+  | Epers_Dotation -> fprintf oc "#endl"
+  | Epers_DotationLDS -> fprintf oc "#dotl"
+  | Epers_Education -> fprintf oc "#educ"
+  | Epers_Election -> fprintf oc "#elec"
+  | Epers_Emigration -> fprintf oc "#emig"
+  | Epers_Excommunication -> fprintf oc "#exco"
+  | Epers_FamilyLinkLDS -> fprintf oc "#flkl"
+  | Epers_FirstCommunion -> fprintf oc "#fcom"
+  | Epers_Funeral -> fprintf oc "#fune"
+  | Epers_Graduate -> fprintf oc "#grad"
+  | Epers_Hospitalisation -> fprintf oc "#hosp"
+  | Epers_Illness -> fprintf oc "#illn"
+  | Epers_Immigration -> fprintf oc "#immi"
+  | Epers_ListePassenger -> fprintf oc "#lpas"
+  | Epers_MilitaryDistinction -> fprintf oc "#mdis"
+  | Epers_MilitaryPromotion -> fprintf oc "#mpro"
+  | Epers_MilitaryService -> fprintf oc "#mser"
+  | Epers_MobilisationMilitaire -> fprintf oc "#mobm"
+  | Epers_Naturalisation -> fprintf oc "#natu"
+  | Epers_Occupation -> fprintf oc "#occu"
+  | Epers_Ordination -> fprintf oc "#ordn"
+  | Epers_Property -> fprintf oc "#prop"
+  | Epers_Recensement -> fprintf oc "#cens"
+  | Epers_Residence-> fprintf oc "#resi"
+  | Epers_Retired -> fprintf oc "#reti"
+  | Epers_ScellentChildLDS -> fprintf oc "#slgc"
+  | Epers_ScellentParentLDS -> fprintf oc "#slgp"
+  | Epers_ScellentSpouseLDS -> fprintf oc "#slgs"
+  | Epers_VenteBien -> fprintf oc "#vteb"
+  | Epers_Will -> fprintf oc "#will"
+  | Epers_Name s -> fprintf oc "#%s" (correct_string base s) ];
+  fprintf oc " ";
+  let epers_date = Adef.od_of_codate e.epers_date in
+  print_date_option oc epers_date;
+  print_if_no_empty oc base "#p" e.epers_place;
+  (* TODO *)
+  (*print_if_no_empty oc base "#c" e.epers_cause;*)
+  print_if_no_empty oc base "#s" e.epers_src;
+  fprintf oc "\n";
+  Array.iter
+    (fun (ip, wk) ->
+       if gen.per_sel ip then do {
+         let p = poi base ip in
+         fprintf oc "wit";
+         match get_sex p with
+         [ Male -> fprintf oc " m"
+         | Female -> fprintf oc " f"
+         | _ -> () ];
+         fprintf oc ": ";
+         match wk with
+         [ Witness_GodParent -> fprintf oc "#godp "
+         | _ -> () ];
+         print_witness oc base gen p;
+         fprintf oc "\n"
+       }
+       else ())
+    e.epers_witnesses;
+  let note = sou base e.epers_note in
+  if note <> "" then
+    List.iter
+      (fun line -> fprintf oc "note %s\n" line)
+      (lines_list_of_string note)
+  else ();
+};
+
+value get_persons_with_pevents base m list =
+  let fath = m.m_fath in
+  let moth = m.m_moth in
+  let list =
+    match (get_pevents fath, get_parents fath) with
+    [ ([], _) | (_, Some _) -> list
+    | _ -> [fath :: list] ]
+  in
+  let list =
+    match (get_pevents moth, get_parents moth) with
+    [ ([], _) | (_, Some _) -> list
+    | _ -> [moth :: list] ]
+  in
+  List.fold_right
+    (fun p list ->
+       match get_pevents p with
+       [ [] -> list
+       | _ -> [p :: list] ])
+    (Array.to_list m.m_chil) list
+;
+
+value print_pevents_for_person oc base gen p =
+  let pevents = get_pevents p in
+  let surn = s_correct_string (p_surname base p) in
+  let fnam = s_correct_string (p_first_name base p) in
+  if pevents <> [] && surn <> "?" && fnam <> "?" then do {
+    fprintf oc "\n";
+    fprintf oc "pevt %s %s%s\n" surn fnam
+      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
+    List.iter (print_pevent oc base gen) pevents;
+    fprintf oc "end pevt\n";
+  }
+  else ()
+;
+
+value rec list_memf f x =
+  fun
+  [ [] -> False
+  | [a :: l] -> f x a || list_memf f x l ]
+;
+
+value eq_key p1 p2 = get_key_index p1 = get_key_index p2;
+value eq_key_fst (p1, _) (p2, _) = get_key_index p1 = get_key_index p2;
+
+value print_pevents oc base gen ml =
+  let pl =
+    List.fold_right (get_persons_with_pevents base) ml gen.pevents_pl_p
+  in
+  let pl =
+    List.fold_right
+      (fun p pl -> if list_memf eq_key p pl then pl else [p :: pl]) pl []
+  in
+  List.iter
+    (fun p ->
+       if gen.per_sel (get_key_index p) then
+         print_pevents_for_person oc base gen p
+       else ())
+    pl
+;
+
+value print_fevent oc base gen in_comment e = do {
+  let print_sep () =
+    if not in_comment then fprintf oc "\n" else fprintf oc " "
+  in
+  match e.efam_name with
+  [ Efam_Marriage -> fprintf oc "#marr"
+  | Efam_NoMarriage -> fprintf oc "#nmar"
+  | Efam_NoMention -> fprintf oc "#nmen"
+  | Efam_Engage -> fprintf oc "#enga"
+  | Efam_Divorce -> fprintf oc "#div"
+  | Efam_Separated -> fprintf oc "#sep"
+  | Efam_Annulation -> fprintf oc "#anul"
+  | Efam_MarriageBann -> fprintf oc "#marb"
+  | Efam_MarriageContract -> fprintf oc "#marc"
+  | Efam_MarriageLicense -> fprintf oc "#marl"
+  | Efam_PACS -> fprintf oc "#pacs"
+  | Efam_Residence -> fprintf oc "#resi"
+  | Efam_Name n -> fprintf oc "#%s" (correct_string base n) ];
+  fprintf oc " ";
+  let efam_date = Adef.od_of_codate e.efam_date in
+  print_date_option oc efam_date;
+  print_if_no_empty oc base "#p" e.efam_place;
+  (*print_if_no_empty oc base "#c" e.efam_cause;*)
+  print_if_no_empty oc base "#s" e.efam_src;
+  print_sep ();
+  Array.iter
+    (fun (ip, wk) ->
+       if gen.per_sel ip then do {
+         let p = poi base ip in
+         fprintf oc "wit";
+         match get_sex p with
+         [ Male -> fprintf oc " m"
+         | Female -> fprintf oc " f"
+         | _ -> () ];
+         fprintf oc ": ";
+         match wk with
+         [ Witness_GodParent -> fprintf oc "#godp "
+         | _ -> () ];
+         print_witness oc base gen p;
+         print_sep ();
+       }
+       else ())
+    e.efam_witnesses;
+  let note = sou base e.efam_note in
+  if note <> "" then
+    List.iter
+      (fun line -> do {fprintf oc "note %s" line; print_sep ();})
+      (lines_list_of_string note)
+  else ();
+};
+
+value print_comment_for_family oc base gen fam =
+  let comm = sou base (get_comment fam) in
+  (* Si on est en mode old_gw, on mets tous les évènements dans les notes. *)
+  (* On supprime les 2 évènements principaux. *)
+  let fevents =
+    List.filter
+      (fun evt ->
+         match evt.efam_name with
+         [ Efam_Divorce | Efam_Engage | Efam_Marriage | Efam_NoMarriage
+         | Efam_NoMention | Efam_Separated -> False
+         | _ -> True ])
+      (get_fevents fam)
+  in
+  let has_evt =
+    old_gw.val && (fevents <> [] || sou base (get_marriage_note fam) <> "")
+  in
+  if (comm <> "" || has_evt) then do {
+    fprintf oc "comm ";
+    if comm <> "" then fprintf oc "%s " (no_newlines comm)
+    else ();
+    if old_gw.val then do {
+      if sou base (get_marriage_note fam) <> "" then
+        fprintf oc "marriage: %s "
+          (no_newlines (sou base (get_marriage_note fam)))
+      else ();
+      List.iter
+        (fun e -> do {print_fevent oc base gen True e; fprintf oc " "})
+        fevents;
+    }
+    else ();
+    fprintf oc "\n";
+  }
+  else ()
 ;
 
 value print_family oc base gen m =
@@ -548,10 +878,13 @@ value print_family oc base gen m =
       [ Some s -> do { fprintf oc "cbp %s\n" (s_correct_string s); s }
       | _ -> "" ]
     in
-    match get_comment fam with
-    [ txt when sou base txt <> "" ->
-        fprintf oc "comm %s\n" (no_newlines (sou base txt))
-    | _ -> () ];
+    print_comment_for_family oc base gen fam;
+    if not old_gw.val && (get_fevents fam) <> [] then do {
+      fprintf oc "fevt\n";
+      List.iter (print_fevent oc base gen False) (get_fevents fam);
+      fprintf oc "end fevt\n";
+    }
+    else ();
     match Array.length m.m_chil with
     [ 0 -> ()
     | _ ->
@@ -574,6 +907,22 @@ value print_family oc base gen m =
         (p_surname base m.m_moth)
     in
     ignore (add_linked_files gen f fsources [] : list _);
+    let s =
+      let sl =
+        [get_comment fam; get_fsources fam;
+         get_marriage_note fam; get_marriage_src fam]
+      in
+      let sl =
+        if not old_gw.val then
+          loop (get_fevents fam) sl where rec loop l accu =
+            match l with
+            [ [] -> accu
+            | [evt :: l] -> loop l [evt.efam_note; evt.efam_src :: accu]]
+        else sl
+      in
+      String.concat " " (List.map (sou base) sl)
+    in
+    ignore (add_linked_files gen f s [] : list _);
   }
 ;
 
@@ -582,18 +931,28 @@ value get_persons_with_notes base m list =
   let moth = m.m_moth in
   let list =
     match (sou base (get_notes fath), get_parents fath) with
-    [ ("", _) | (_, Some _) -> list
+    [ ("", _) ->
+        match get_parents fath with
+        [ Some _ -> list
+        | None ->
+            if put_events_in_notes base fath then [fath :: list] else list ]
+    | (_, Some _) -> list
     | _ -> [fath :: list] ]
   in
   let list =
     match (sou base (get_notes moth), get_parents moth) with
-    [ ("", _) | (_, Some _) -> list
+    [ ("", _) ->
+        match get_parents moth with
+        [ Some _ -> list
+        | None ->
+            if put_events_in_notes base moth then [moth :: list] else list ]
+    | (_, Some _) -> list
     | _ -> [moth :: list] ]
   in
   List.fold_right
     (fun p list ->
        match sou base (get_notes p) with
-       [ "" -> list
+       [ "" -> if put_events_in_notes base p then [p :: list] else list
        | _ -> [p :: list] ])
     (Array.to_list m.m_chil) list
 ;
@@ -619,15 +978,63 @@ value notes_aliases bdir =
 ;
 
 value print_notes_for_person oc base gen p = do {
+  let print_witness_in_notes witnesses =
+    Array.iter
+      (fun (ip, wk) -> do {
+         let p = poi base ip in
+         fprintf oc "wit";
+         match get_sex p with
+         [ Male -> fprintf oc " m"
+         | Female -> fprintf oc " f"
+         | _ -> () ];
+         fprintf oc ": ";
+         match wk with
+         [ Witness_GodParent -> fprintf oc "#godp "
+         | _ -> () ];
+         print_witness oc base gen p;
+         fprintf oc "\n"
+      })
+      witnesses
+  in
   let notes = sou base (get_notes p) in
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
-  if notes <> "" && surn <> "?" && fnam <> "?" then do {
+  (* Si on n'est en mode old_gw, on mets tous les évènements dans les notes. *)
+  if (notes <> "" || put_events_in_notes base p) && surn <> "?" && fnam <> "?"
+  then do {
     fprintf oc "\n";
     fprintf oc "notes %s %s%s\n" surn fnam
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
     fprintf oc "beg\n";
-    fprintf oc "%s\n" notes;
+    if notes <> "" then fprintf oc "%s\n" notes
+    else ();
+    if put_events_in_notes base p then do {
+      loop (get_pevents p) where rec loop pevents =
+        match pevents with
+        [ [] -> ()
+        | [evt :: events] ->
+            match evt.epers_name with
+            [ Epers_Birth | Epers_Baptism | Epers_Death |
+              Epers_Burial | Epers_Cremation ->
+                do {
+                  let name =
+                    match evt.epers_name with
+                    [ Epers_Birth -> "birth"
+                    | Epers_Baptism -> "baptism"
+                    | Epers_Death -> "death"
+                    | Epers_Burial -> "burial"
+                    | Epers_Cremation -> "creamation"
+                    | _ -> "" ]
+                  in
+                  let notes = sou base evt.epers_note in
+                  if notes <> "" then fprintf oc "%s: %s\n" name notes
+                  else ();
+                  print_witness_in_notes evt.epers_witnesses;
+                  loop events
+                }
+            | name -> do {print_pevent oc base gen evt; loop events } ] ]
+    }
+    else ();
     fprintf oc "end notes\n";
   }
   else ();
@@ -638,10 +1045,19 @@ value print_notes_for_person oc base gen p = do {
   ignore (add_linked_files gen f notes [] : list _);
   let s =
     let sl =
-      [get_notes; get_birth_src; get_baptism_src; get_death_src;
-       get_burial_src; get_psources]
+      [get_notes p; get_occupation p; get_birth_note p; get_birth_src p;
+       get_baptism_note p; get_baptism_src p; get_death_note p;
+       get_death_src p; get_burial_note p; get_burial_src p; get_psources p]
     in
-    String.concat " " (List.map (fun f -> sou base (f p)) sl)
+    let sl =
+      if not old_gw.val then
+        loop (get_pevents p) sl where rec loop l accu =
+          match l with
+          [ [] -> accu
+          | [evt :: l] -> loop l [evt.epers_note; evt.epers_src :: accu]]
+      else sl
+    in
+    String.concat " " (List.map (sou base) sl)
   in
   ignore (add_linked_files gen f s [] : list _);
 };
@@ -787,9 +1203,39 @@ value print_relation_for_person oc base gen def_p p r =
         else None
     | None -> None ]
   in
+  let err_same_sex =
+    match (fath, moth) with
+    [ (Some fath, Some moth) -> get_sex fath = get_sex moth
+    | _ -> False ]
+  in
+  let print_err_one_relation p =
+    do {
+      fprintf oc "- ";
+      match r.r_type with
+      [ Adoption -> fprintf oc "adop"
+      | Recognition -> fprintf oc "reco"
+      | CandidateParent -> fprintf oc "cand"
+      | GodParent -> fprintf oc "godp"
+      | FosterParent -> fprintf oc "fost" ];
+      if get_sex p = Male then fprintf oc " fath"
+      else fprintf oc " moth";
+      fprintf oc ": ";
+      print_relation_parent oc base gen.mark def_p p;
+      fprintf oc "\n"
+    }
+  in
   match (fath, moth) with
   [ (None, None) -> ()
   | _ ->
+      if err_same_sex then
+        match (fath, moth) with
+        [ (Some fath, Some moth) ->
+            do {
+              print_err_one_relation fath;
+              print_err_one_relation moth;
+            }
+        | _ -> ()]
+      else
       do {
         fprintf oc "- ";
         match r.r_type with
@@ -799,8 +1245,12 @@ value print_relation_for_person oc base gen def_p p r =
         | GodParent -> fprintf oc "godp"
         | FosterParent -> fprintf oc "fost" ];
         match (fath, moth) with
-        [ (Some _, None) -> fprintf oc " fath"
-        | (None, Some _) -> fprintf oc " moth"
+        [ (Some fath, None) ->
+            if get_sex fath = Male then fprintf oc " fath"
+            else fprintf oc " moth"
+        | (None, Some moth) ->
+            if get_sex moth = Female then fprintf oc " moth"
+            else fprintf oc " fath"
         | _ -> () ];
         fprintf oc ": ";
         match (fath, moth) with
@@ -835,6 +1285,8 @@ value print_relations_for_person oc base gen def_p is_definition p =
     fprintf oc "rel %s %s%s" surn fnam
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
     if is_definition then do {
+      gen.mark.(Adef.int_of_iper (get_key_index p)) := True;
+      def_p.val := [p :: def_p.val];
       if has_infos base p then print_infos oc base False "" "" p
       else fprintf oc " 0";
       match get_sex p with
@@ -867,7 +1319,10 @@ value print_relations oc base gen ml =
         do {
           if get_rparents p <> [] && gen.per_sel (get_key_index p) then do {
             print_relations_for_person oc base gen def_p if_def p;
-            List.iter (print_notes_for_person oc base gen) def_p.val
+            List.iter (print_notes_for_person oc base gen) def_p.val;
+            if not old_gw.val then
+              List.iter (print_pevents_for_person oc base gen) def_p.val
+            else ()
           }
           else ();
           loop (pl @ List.map (fun p -> (p, False)) def_p.val)
@@ -1187,7 +1642,8 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
           let oc = open_out (Filename.concat out_dir fname) in
           let x = (oc, ref True) in
           do {
-            if raw_output.val then () else fprintf oc "encoding: utf-8\n\n";
+            if raw_output.val then () else fprintf oc "encoding: utf-8\n";
+            if old_gw.val then fprintf oc "\n" else fprintf oc "gwplus\n\n";
             Hashtbl.add src_oc_ht fname x;
             x
           } ]
@@ -1201,7 +1657,7 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
     let fam_done = Array.create (nb_of_families base) False in
     {mark = mark; per_sel = per_sel; fam_sel = fam_sel;
      fam_done = fam_done; notes_pl_p = []; ext_files = [];
-     notes_alias = notes_aliases in_dir}
+     notes_alias = notes_aliases in_dir; pevents_pl_p = []}
   in
   let nb_fam = nb_of_families base in
   do {
@@ -1238,11 +1694,14 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
         in
         if ml <> [] then do {
           gen.notes_pl_p := [];
+          gen.pevents_pl_p := [];
           if not first.val then fprintf oc "\n" else ();
           first.val := False;
           List.iter (print_family oc base gen) ml;
           print_notes oc base gen ml;
-          print_relations oc base gen ml
+          print_relations oc base gen ml;
+          if not old_gw.val then print_pevents oc base gen ml
+          else ();
         }
         else ()
       else ()
@@ -1418,7 +1877,7 @@ value speclist =
      When a person is born less than <num> years ago, it is not exported unless
      it is Public. All the spouses and descendants are also censored.");
    ("-old_gw", Arg.Set old_gw, ": Do not export additional fields \
-(for backward compatibility)");
+(for backward compatibility: < 7.00)");
    ("-raw", Arg.Set raw_output,
     "raw output (without possible utf-8 conversion)");
    ("-v", Arg.Set Mutil.verbose, "verbose");
@@ -1557,7 +2016,8 @@ value main () =
     let out_oc =
       if out_file.val = "" then stdout else open_out out_file.val
     in
-    if raw_output.val then () else fprintf out_oc "encoding: utf-8\n\n";
+    if raw_output.val then () else fprintf out_oc "encoding: utf-8\n";
+    if old_gw.val then fprintf out_oc "\n" else fprintf out_oc "gwplus\n\n";
     gwu base in_dir out_dir.val out_oc src_oc_ht anc desc ancdesc;
     Hashtbl.iter (fun _ (oc, _) -> do { flush oc; close_out oc })
       src_oc_ht;

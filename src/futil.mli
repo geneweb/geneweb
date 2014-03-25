@@ -4,6 +4,10 @@
 open Def;
 
 value map_title_strings : ('a -> 'b) -> gen_title 'a -> gen_title 'b;
+value map_pers_event :
+  ('a -> 'c) -> ('b -> 'd) -> gen_pers_event 'a 'b -> gen_pers_event 'c 'd;
+value map_fam_event :
+  ('a -> 'c) -> ('b -> 'd) -> gen_fam_event 'a 'b -> gen_fam_event 'c 'd;
 value map_relation_ps :
   ('a -> 'c) -> ('b -> 'd) -> gen_relation 'a 'b -> gen_relation 'c 'd
 ;

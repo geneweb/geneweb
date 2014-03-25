@@ -237,18 +237,18 @@ value ged_date_dmy oc dt cal =
     fprintf oc "%d" dt.year;
     match dt.prec with
     [ OrYear dmy2 ->
-        do { 
-          fprintf oc " AND "; 
-          ged_calendar oc cal; 
+        do {
+          fprintf oc " AND ";
+          ged_calendar oc cal;
           if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
           if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
           else ();
           fprintf oc "%d" dmy2.year2;
         }
     | YearInt dmy2 ->
-        do { 
-          fprintf oc " AND "; 
-          ged_calendar oc cal; 
+        do {
+          fprintf oc " AND ";
+          ged_calendar oc cal;
           if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
           if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
           else ();
@@ -270,7 +270,7 @@ value ged_date oc =
   | Dtext t -> fprintf oc "(%s)" t ]
 ;
 
-value ged_ev_detail oc n typ d pl src =
+value ged_ev_detail oc n typ d pl note src =
   do {
     match (typ, d, pl) with
     [ ("", None, "") -> fprintf oc " Y"
@@ -286,7 +286,114 @@ value ged_ev_detail oc n typ d pl src =
         }
     | None -> () ];
     if pl <> "" then fprintf oc "%d PLAC %s\n" n (encode pl) else ();
+    if note <> "" then do {
+      let tag = sprintf "%d NOTE " n in
+      fprintf oc "%s" tag;
+      display_note_aux oc (encode note) (String.length tag) 0;
+    }
+    else ();
     if src <> "" then fprintf oc "%d SOUR %s\n" n (encode src) else ();
+  }
+;
+
+
+value ged_tag_pevent base evt =
+  match evt.epers_name with
+  [ Epers_Birth -> "BIRT"
+  | Epers_Baptism -> "BAPM"
+  | Epers_Death -> "DEAT"
+  | Epers_Burial -> "BURI"
+  | Epers_Cremation -> "CREM"
+  | Epers_Accomplishment -> "Accomplishment"
+  | Epers_Acquisition -> "Acquisition"
+  | Epers_Adhesion -> "Membership"
+  | Epers_BaptismLDS -> "BAPL"
+  | Epers_BarMitzvah -> "BARM"
+  | Epers_BatMitzvah -> "BASM"
+  | Epers_Benediction -> "BLES"
+  | Epers_ChangeName -> "Change name"
+  | Epers_Circumcision -> "Circumcision"
+  | Epers_Confirmation -> "CONF"
+  | Epers_ConfirmationLDS -> "CONL"
+  | Epers_Decoration -> "Award"
+  | Epers_DemobilisationMilitaire -> "Military discharge"
+  | Epers_Diploma -> "Degree"
+  | Epers_Distinction -> "Distinction"
+  | Epers_Dotation -> "ENDL"
+  | Epers_DotationLDS -> "DotationLDS"
+  | Epers_Education -> "EDUC"
+  | Epers_Election -> "Election"
+  | Epers_Emigration -> "EMIG"
+  | Epers_Excommunication -> "Excommunication"
+  | Epers_FamilyLinkLDS -> "Family link LDS"
+  | Epers_FirstCommunion -> "FCOM"
+  | Epers_Funeral -> "Funeral"
+  | Epers_Graduate -> "GRAD"
+  | Epers_Hospitalisation -> "Hospitalization"
+  | Epers_Illness -> "Illness"
+  | Epers_Immigration -> "IMMI"
+  | Epers_ListePassenger -> "Passenger list"
+  | Epers_MilitaryDistinction -> "Military distinction"
+  | Epers_MilitaryPromotion -> "Military promotion"
+  | Epers_MilitaryService -> "Military service"
+  | Epers_MobilisationMilitaire -> "Military mobilization"
+  | Epers_Naturalisation -> "NATU"
+  | Epers_Occupation -> "OCCU"
+  | Epers_Ordination -> "ORDN"
+  | Epers_Property -> "PROP"
+  | Epers_Recensement -> "CENS"
+  | Epers_Residence-> "RESI"
+  | Epers_Retired -> "RETI"
+  | Epers_ScellentChildLDS -> "SLGC"
+  | Epers_ScellentParentLDS -> "Scellent parent LDS"
+  | Epers_ScellentSpouseLDS -> "SLGS"
+  | Epers_VenteBien -> "Property sale"
+  | Epers_Will -> "WILL"
+  | Epers_Name n -> sou base n ]
+;
+
+value is_primary_pevents =
+  fun
+  [ Epers_Birth | Epers_Baptism | Epers_Death | Epers_Burial | Epers_Cremation |
+    Epers_BaptismLDS | Epers_BarMitzvah | Epers_BatMitzvah | Epers_Benediction |
+    Epers_Confirmation | Epers_ConfirmationLDS | Epers_Dotation |
+    Epers_Education | Epers_Emigration | Epers_FirstCommunion |
+    Epers_Graduate | Epers_Immigration | Epers_Naturalisation |
+    Epers_Occupation | Epers_Ordination | Epers_Property | Epers_Recensement |
+    Epers_Residence | Epers_Retired | Epers_ScellentChildLDS |
+    Epers_ScellentSpouseLDS | Epers_Will -> True
+  | _ -> False ]
+;
+
+value ged_pevent base oc per per_sel evt =
+  do {
+    let typ =
+      if is_primary_pevents evt.epers_name then do {
+        let tag = ged_tag_pevent base evt in
+        fprintf oc "1 %s" tag;
+        ""
+      }
+      else do {
+        fprintf oc "1 EVEN";
+        ged_tag_pevent base evt
+      }
+    in
+    let date = Adef.od_of_codate evt.epers_date in
+    let place = sou base evt.epers_place in
+    let note = sou base evt.epers_note in
+    let src = sou base evt.epers_src in
+    ged_ev_detail oc 2 typ date place note src;
+    Array.iter
+      (fun (ip, wk) ->
+         if per_sel ip then do {
+           fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+           fprintf oc "3 TYPE INDI\n";
+           match wk with
+           [ Witness -> fprintf oc "3 RELA witness\n"
+           | Witness_GodParent -> fprintf oc "3 RELA GODP\n" ]
+         }
+         else ())
+      evt.epers_witnesses
   }
 ;
 
@@ -330,61 +437,8 @@ value ged_fam_adop base oc i (fath, moth, child) =
   }
 ;
 
-value ged_ind_ev_str base sel oc per =
-  do {
-    let pl = sou base (get_birth_place per) in
-    let src = sou base (get_birth_src per) in
-    match (Adef.od_of_codate (get_birth per), pl) with
-    [ (None, "") -> ()
-    | (None, pl) ->
-        do {
-          fprintf oc "1 BIRT"; ged_ev_detail oc 2 "" None pl src;
-        }
-    | (od, pl) ->
-        do {
-          fprintf oc "1 BIRT"; ged_ev_detail oc 2 "" od pl src;
-        } ];
-    List.iter
-      (fun r ->
-         if r.r_type = Adoption then ged_adoption base sel oc per r else ())
-      (get_rparents per);
-    let pl = sou base (get_baptism_place per) in
-    let src = sou base (get_baptism_src per) in
-    match (Adef.od_of_codate (get_baptism per), pl) with
-    [ (None, "") -> ()
-    | (od, pl) ->
-        do {
-          fprintf oc "1 BAPM"; ged_ev_detail oc 2 "" od pl src;
-        } ];
-    let pl = sou base (get_death_place per) in
-    let src = sou base (get_death_src per) in
-    match get_death per with
-    [ NotDead -> ()
-    | Death dr cd ->
-        do {
-          fprintf oc "1 DEAT";
-          ged_ev_detail oc 2 "" (Some (Adef.date_of_cdate cd)) pl src;
-        }
-    | DeadYoung | DeadDontKnowWhen | OfCourseDead ->
-        do {
-          fprintf oc "1 DEAT"; ged_ev_detail oc 2 "" None pl src;
-        }
-    | DontKnowIfDead -> fprintf oc "1 DEAT\n" ];
-    let pl = sou base (get_burial_place per) in
-    let src = sou base (get_burial_src per) in
-    match get_burial per with
-    [ UnknownBurial -> ()
-    | Buried cod ->
-        do {
-          fprintf oc "1 BURI";
-          ged_ev_detail oc 2 "" (Adef.od_of_codate cod) pl src;
-        }
-    | Cremated cod ->
-        do {
-          fprintf oc "1 CREM";
-          ged_ev_detail oc 2 "" (Adef.od_of_codate cod) pl src;
-        } ];
-  }
+value ged_ind_ev_str base sel oc per per_sel =
+  List.iter (ged_pevent base oc per per_sel) (get_pevents per)
 ;
 
 value ged_title base oc per tit =
@@ -536,7 +590,9 @@ value ged_marriage base oc fam =
           || get_relation fam = NoSexesCheckMarried then "gay"
           else ""
         in
-        ged_ev_detail oc 2 typ d pl (sou base (get_marriage_src fam));
+        let note = sou base (get_marriage_note fam) in
+        let src = sou base (get_marriage_src fam) in
+        ged_ev_detail oc 2 typ d pl note src;
         if get_relation fam = NotMarried then
           fprintf oc "2 PLAC unmarried\n"
         else ();
@@ -549,7 +605,64 @@ value ged_divorce base oc fam =
   | Separated -> ()
   | Divorced cd ->
       let d = Adef.od_of_codate cd in
-      do { fprintf oc "1 DIV"; ged_ev_detail oc 2 "" d "" ""; } ]
+      do { fprintf oc "1 DIV"; ged_ev_detail oc 2 "" d "" "" ""; } ]
+;
+
+value ged_tag_fevent base evt =
+  match evt.efam_name with
+  [ Efam_Marriage -> "MARR"
+  | Efam_NoMarriage -> "unmarried"
+  | Efam_NoMention -> "NOMEN"
+  | Efam_Engage -> "ENGA"
+  | Efam_Divorce -> "DIV"
+  | Efam_Separated -> "SEP"
+  | Efam_Annulation -> "ANUL"
+  | Efam_MarriageBann -> "MARB"
+  | Efam_MarriageContract -> "MARC"
+  | Efam_MarriageLicense -> "MARL"
+  | Efam_PACS -> "pacs"
+  | Efam_Residence -> "residence"
+  | Efam_Name n -> sou base n ]
+;
+
+value is_primary_fevents =
+  fun
+  [ Efam_Marriage | Efam_Engage | Efam_Divorce | Efam_Separated |
+    Efam_Annulation | Efam_MarriageBann | Efam_MarriageContract |
+    Efam_MarriageLicense -> True
+  | _ -> False ]
+;
+
+value ged_fevent base oc ifam fam_sel evt =
+  do {
+    let typ =
+      if is_primary_fevents evt.efam_name then do {
+        let tag = ged_tag_fevent base evt in
+        fprintf oc "1 %s" tag;
+        ""
+      }
+      else do {
+        fprintf oc "1 EVEN";
+        ged_tag_fevent base evt
+      }
+    in
+    let date = Adef.od_of_codate evt.efam_date in
+    let place = sou base evt.efam_place in
+    let note = sou base evt.efam_note in
+    let src = sou base evt.efam_src in
+    ged_ev_detail oc 2 typ date place note src;
+    Array.iter
+      (fun (ip, wk) ->
+         if fam_sel ifam then do {
+           fprintf oc "2 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+           fprintf oc "3 TYPE INDI\n";
+           match wk with
+           [ Witness -> fprintf oc "3 RELA witness\n"
+           | Witness_GodParent -> fprintf oc "3 RELA GODP\n" ]
+         }
+         else ())
+      evt.efam_witnesses
+  }
 ;
 
 value ged_child base (per_sel, fam_sel) oc chil =
@@ -583,13 +696,13 @@ value has_personal_infos base per =
   else False
 ;
 
-value ged_ind_record base sel oc i =
+value ged_ind_record base ((per_sel, fam_sel) as sel) oc i =
   let per = poi base (Adef.iper_of_int i) in
   if has_personal_infos base per then do {
     fprintf oc "0 @I%d@ INDI\n" (i + 1);
     ged_name base oc per;
     ged_sex base oc per;
-    ged_ind_ev_str base sel oc per;
+    ged_ind_ev_str base sel oc per per_sel;
     ged_ind_attr_str base oc per;
     ged_famc base sel oc per;
     Array.iter (ged_fams base sel oc) (get_family per);
@@ -602,12 +715,12 @@ value ged_ind_record base sel oc i =
 ;
 
 value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
-  let fam = foi base (Adef.ifam_of_int i) in
+  let ifam = Adef.ifam_of_int i in
+  let fam = foi base ifam in
   if is_deleted_family fam then ()
   else do {
     fprintf oc "0 @F%d@ FAM\n" (i + 1);
-    ged_marriage base oc fam;
-    ged_divorce base oc fam;
+    List.iter (ged_fevent base oc ifam fam_sel) (get_fevents fam);
     if has_personal_infos base (poi base (get_father fam)) &&
        per_sel (get_father fam)
     then

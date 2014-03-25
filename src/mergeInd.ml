@@ -202,6 +202,14 @@ value compatible_accesses a1 a2 = (*a1 = a2*)True;
 value compatible_titles t1 t2 =
   Futil.eq_lists (Futil.eq_titles eq_istr) t1 t2 || t2 = [];
 
+value compatible_pevents pevt1 pevt2 =
+  pevt1 = [] && pevt2 = []
+;
+
+value compatible_fevents fevt1 fevt2 =
+  fevt1 = [] && fevt2 = []
+;
+
 value compatible_strings_lists sl1 sl2 =
   sl2 = [] || Futil.eq_lists eq_istr sl1 sl2;
 
@@ -220,6 +228,7 @@ value compatible_ind base p1 p2 =
   compatible_strings_lists (get_surnames_aliases p1)
     (get_surnames_aliases p2) &&
   compatible_titles (get_titles p1) (get_titles p2) &&
+  compatible_pevents (get_pevents p1) (get_pevents p2) &&
   get_rparents p2 = [] && get_related p2 = [] &&
   compatible_strings (get_occupation p1) (get_occupation p2) &&
   compatible_accesses (get_access p1) (get_access p2) &&
@@ -238,6 +247,7 @@ value compatible_fam base fam1 fam2 =
   compatible_codates (get_marriage fam1) (get_marriage fam2) &&
   compatible_strings (get_marriage_place fam1) (get_marriage_place fam2) &&
   Array.length (get_witnesses fam2) = 0 &&
+  compatible_fevents (get_fevents fam1) (get_fevents fam2) &&
   compatible_relation_kinds (get_relation fam1) (get_relation fam2) &&
   compatible_divorces (get_divorce fam1) (get_divorce fam2) &&
   compatible_strings (get_fsources fam1) (get_fsources fam2)
@@ -403,8 +413,15 @@ value effective_merge_ind conf base warning p1 p2 =
     patch_person base p2.key_index p2;
     let s =
       let sl =
-        [p1.notes; p1.occupation; p1.birth_src; p1.baptism_src; p1.death_src;
+        [p1.notes; p1.occupation; p1.birth_note; p1.birth_src; p1.baptism_note;
+         p1.baptism_src; p1.death_note; p1.death_src; p1.burial_note;
          p1.burial_src; p1.psources]
+      in
+      let sl =
+        loop (p1.pevents) sl where rec loop l accu =
+          match l with
+          [ [] -> accu
+          | [evt :: l] -> loop l [evt.epers_note; evt.epers_src :: accu]]
       in
       String.concat " " (List.map (sou base) sl)
     in

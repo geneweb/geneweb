@@ -5,7 +5,7 @@ open Def;
 open Gwdb;
 
 type base_error = error person;
-type base_warning = warning person family title;
+type base_warning = warning person family title pers_event fam_event;
 type base_misc = misc person family title;
 
 
@@ -833,6 +833,129 @@ value check_sources base misc ifam fam =
     else misc MissingSources
 ;
 
+
+type event_name 'string =
+  [ Psort of gen_pers_event_name 'string
+  | Fsort of gen_fam_event_name 'string ]
+;
+
+(*
+   Dans l'ordre de priorité :
+     birth, baptism, ..., death, funeral, burial/cremation.
+   Pour les évènements familiaux, cet ordre est envisageable :
+     engage, marraige bann, marriage contract, marriage, ..., separate, divorce
+*)
+value compare_event_name name1 name2 =
+  match (name1, name2) with
+  [ (Psort Epers_Birth, _) -> -1
+  | (_, Psort Epers_Birth) -> 1
+  | (Psort Epers_Baptism, _) -> -1
+  | (_, Psort Epers_Baptism) -> 1
+  | (Psort Epers_Burial, _) | (Psort Epers_Cremation, _) -> 1
+  | (_, Psort Epers_Burial) | (_, Psort Epers_Cremation) -> -1
+  | (Psort Epers_Funeral, _) -> 1
+  | (_, Psort Epers_Funeral) -> -1
+  | (Psort Epers_Death, _) -> 1
+  | (_, Psort Epers_Death) -> -1
+  | (Fsort Efam_Engage, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_Engage) -> 1
+  | (Fsort Efam_MarriageBann, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_MarriageBann) -> 1
+  | (Fsort Efam_MarriageContract, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_MarriageContract) -> 1
+  | (Fsort Efam_Marriage, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_Marriage) -> 1
+  | (Fsort Efam_Divorce, Fsort _) -> 1
+  | (Fsort _, Fsort Efam_Divorce) -> -1
+  | (Fsort Efam_Separated, Fsort _) -> 1
+  | (Fsort _, Fsort Efam_Separated) -> -1
+  | _ -> 0 ]
+;
+
+value compare_event_date_prec d1 d2 =
+  match (d1.prec, d2.prec) with
+  [ (Before, _) -> -1
+  | (_, Before) -> 1
+  | (After, _) -> 1
+  | (_, After) -> -1
+  | _ -> 0 ]
+;
+
+(* Compare les dates sans prendre en compte les dates textes. *)
+value compare_event_date d1 d2 =
+  match (d1, d2) with
+  [ (Dgreg dmy1 _, Dgreg dmy2 _) ->
+      match Pervasives.compare dmy1.year dmy2.year with
+      [ 0 ->
+          match Pervasives.compare dmy1.month dmy2.month with
+          [ 0 ->
+              (* Si l'une des deux dates n'est pas complète (mois ou jour *)
+              (* égal à zéro), alors on ne distingue pas les deux dates.  *)
+              if dmy1.day = 0 || dmy2.day = 0 then 0
+              else
+                match Pervasives.compare dmy1.day dmy2.day with
+                [ 0 -> compare_event_date_prec dmy1 dmy2
+                | x -> x ]
+          | x ->
+              (* Idem ci-dessus. *)
+              if dmy1.month = 0 || dmy2.month = 0 then 0
+              else x ]
+      | x -> x]
+  | _ -> 0 ]
+;
+
+value sort_events (get_name, get_date) events =
+  (* On tri d'abord par date puis par évènement, pour ça, *)
+  (* on met tous les évènements par date en premier.      *)
+  let events =
+    let rec loop accu accu_nodate events =
+      match events with
+      [ [] -> List.rev_append accu (List.rev accu_nodate)
+      | [evt :: events] ->
+          match Adef.od_of_codate (get_date evt) with
+          [ Some (Dgreg _ _) -> loop [evt :: accu] accu_nodate events
+          | _ -> loop accu [evt :: accu_nodate] events ] ]
+    in
+    loop [] [] events
+  in
+  List.stable_sort
+    (fun e1 e2 ->
+      match
+        (Adef.od_of_codate (get_date e1), Adef.od_of_codate (get_date e2))
+      with
+      [ (Some d1, Some d2) ->
+          (* On utilise compare_event_date parce qu'on ne veut *)
+          (* pas prendre en compte les dates textes, on veut   *)
+          (* que l'évènement soit plus important pour le tri.  *)
+          let comp_date = compare_event_date d1 d2 in
+          if comp_date = 0 then compare_event_name (get_name e1) (get_name e2)
+          else comp_date
+      | _ -> compare_event_name (get_name e1) (get_name e2)] )
+    events
+;
+
+value sort_pevents base warning p =
+  let a =
+    sort_events
+      (fun evt -> Psort evt.epers_name, fun evt -> evt.epers_date)
+      (get_pevents p)
+  in
+  let b = get_pevents p in
+  if b <> a then warning (ChangedOrderOfPersonEvents p b a)
+  else ()
+;
+
+value sort_fevents base warning (ifam, fam) =
+  let a =
+    sort_events
+      (fun evt -> Fsort evt.efam_name, fun evt -> evt.efam_date)
+      (get_fevents fam)
+  in
+  let b = get_fevents fam in
+  if b <> a then warning (ChangedOrderOfFamilyEvents ifam b a)
+  else ()
+;
+
 (* main *)
 
 
@@ -851,6 +974,7 @@ value person base warning p = do {
   birth_before_death base warning p;
   check_person_age base warning p;
   List.iter (titles_after_birth base warning p) (get_titles p);
+  sort_pevents base warning p;
   related_sex_is_coherent base warning p;
 };
 
@@ -884,6 +1008,7 @@ value family base error warning ifam fam =
     let mother = poi base (get_mother fam) in
     check_marriages_order base warning father;
     check_marriages_order base warning mother;
+    sort_fevents base warning (ifam, fam);
   }
 ;
 

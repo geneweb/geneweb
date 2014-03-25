@@ -1472,6 +1472,8 @@ type env 'a =
   | Vsosa of ref (list (iper * option (Num.t * person)))
   | Vt_sosa of sosa_t
   | Vtitle of person and title_item
+  | Vevent of person and event_item
+  | Vevent_witn of person and event_name
   | Vlazyp of ref (option string)
   | Vlazy of Lazy.t (env 'a)
   | Vother of 'a
@@ -1479,6 +1481,12 @@ type env 'a =
 and title_item =
   (int * gen_title_name istr * istr * list istr *
    list (option date * option date))
+and event_item =
+  (event_name * codate * istr * istr * istr *
+   array (iper * witness_kind) * option iper)
+and event_name =
+  [ Pevent of gen_pers_event_name istr
+  | Fevent of gen_fam_event_name istr ]
 ;
 
 value get_env v env =
@@ -1572,6 +1580,60 @@ value get_sosa conf base env r p =
     } ]
 ;
 
+value events_list conf base p =
+  let pevents =
+    if authorized_age conf base p then
+      (* fold_left pour le rev_append *)
+      List.fold_left
+        (fun events evt ->
+           let name = Pevent evt.epers_name in
+           let date = evt.epers_date in
+           let place = evt.epers_place in
+           let note = evt.epers_note in
+           let src = evt.epers_src in
+           let wl = evt.epers_witnesses in
+           let x = (name, date, place, note, src, wl, None) in
+           [x :: events] )
+        [] (get_pevents p)
+    else []
+  in
+  let fevents =
+    (* fold_right pour rev_append *)
+    List.fold_right
+      (fun ifam fevents ->
+         let fam = foi base ifam in
+         let ifath = get_father fam in
+         let imoth = get_mother fam in
+         let isp = Gutil.spouse (get_key_index p) fam in
+         let m_auth =
+           authorized_age conf base (pget conf base ifath) &&
+             authorized_age conf base (pget conf base imoth)
+         in
+         if m_auth then
+           List.fold_right
+             (fun evt fevents ->
+                let name = Fevent evt.efam_name in
+                let date = evt.efam_date in
+                let place = evt.efam_place in
+                let note = evt.efam_note in
+                let src = evt.efam_src in
+                let wl = evt.efam_witnesses in
+                let x = (name, date, place, note, src, wl, Some isp) in
+                [x :: fevents] )
+             (get_fevents fam) fevents
+         else fevents)
+      (Array.to_list (get_family p)) []
+  in
+  let events = List.rev_append pevents fevents in
+  CheckItem.sort_events
+    ((fun (name, _, _, _, _, _, _) ->
+      match name with
+      [ Pevent n -> CheckItem.Psort n
+      | Fevent n -> CheckItem.Fsort n ]),
+     (fun (_, date, _, _, _, _, _) -> date))
+    events
+;
+
 value make_ep conf base ip =
   let p = pget conf base ip in
   let p_auth = authorized_age conf base p in (p, p_auth)
@@ -1638,6 +1700,11 @@ and eval_simple_bool_var conf base env (_, p_auth) =
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           m_auth && not conf.no_note && sou base (get_comment fam) <> ""
+      | _ -> raise Not_found ]
+  | "has_marriage_note" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          m_auth && not conf.no_note && sou base (get_marriage_note fam) <> ""
       | _ -> raise Not_found ]
   | "has_relation_her" ->
       match get_env "rel" env with
@@ -1770,6 +1837,23 @@ and eval_simple_str_var conf base env (_, p_auth) =
             Util.string_of_place conf (sou base (get_marriage_place fam))
           else ""
       | _ -> raise Not_found ]
+  | "marriage_note" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          if m_auth && not conf.no_note then
+            let s = sou base (get_marriage_note fam) in
+            let s = string_with_macros conf [] s in
+            let lines = Wiki.html_of_tlsw conf s in
+            let wi =
+              {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_person_exists = person_exists conf base;
+               Wiki.wi_always_show_link = conf.wizard || conf.friend}
+            in
+            let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+            if conf.pure_xhtml then Util.check_xhtml s else s
+          else ""
+      | _ -> raise Not_found ]
   | "max_anc_level" ->
       match get_env "max_anc_level" env with
       [ Vint i -> string_of_int i
@@ -1894,11 +1978,29 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
       [ Vanc gp -> eval_ancestor_field_var conf base env gp loc sl
       | Vanc_surn info -> eval_anc_by_surnl_field_var conf base env ep info sl
       | _ -> raise Not_found ]
+  | ["baptism_witness" :: sl] ->
+      match get_env "baptism_witness" env with
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
   | ["base"; "name"] -> VVstring conf.bname
   | ["base"; "nb_persons"] ->
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
            (Num.of_int (nb_of_persons base)))
+  | ["birth_witness" :: sl] ->
+      match get_env "birth_witness" env with
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["burial_witness" :: sl] ->
+      match get_env "burial_witness" env with
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
   | ["cell" :: sl] ->
       match get_env "cell" env with
       [ Vcell cell -> eval_cell_field_var conf base env ep cell loc sl
@@ -1910,6 +2012,18 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
+  | ["cremation_witness" :: sl] ->
+      match get_env "cremation_witness" env with
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["death_witness" :: sl] ->
+      match get_env "death_witness" env with
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
         fun
@@ -1919,6 +2033,25 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
         | [] -> raise Not_found ]
       in
       loop env
+  | ["event_witness" :: sl] ->
+      match get_env "event_witness" env with
+      [ Vind p ->
+          let ep = (p, authorized_age conf base p) in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | ["event_witness_relation" :: sl] ->
+      match get_env "event_witness_relation" env with
+      [ Vevent p e ->
+          eval_event_witness_relation_var conf base env (p, e) loc sl
+      | _ -> raise Not_found ]
+  | ["event_witness_relation_kind" :: sl] ->
+      match get_env "event_witness_relation_kind" env with
+      [ Vstring wk -> VVstring wk
+      | _ -> raise Not_found ]
+  | ["event_witness_kind" :: sl] ->
+      match get_env "event_witness_kind" env with
+      [ Vstring s -> VVstring s
+      | _ -> raise Not_found ]
   | ["family" :: sl] ->
       match get_env "fam" env with
       [ Vfam i f c m ->
@@ -2265,6 +2398,10 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
       [ Death _ cd when p_auth ->
           eval_date_field_var conf (Adef.date_of_cdate cd) sl
       | _ -> VVstring "" ]
+  | ["event" :: sl] ->
+      match get_env "event" env with
+      [ Vevent p e -> eval_event_field_var conf base env ep e loc sl
+      | _ -> raise Not_found ]
   | ["father" :: sl] ->
       match get_parents p with
       [ Some ifam ->
@@ -2391,11 +2528,169 @@ and eval_date_field_var conf d =
       [ Dgreg dmy _ -> VVstring (Date.year_text dmy)
       | _ -> VVstring "" ]
   | _ -> raise Not_found ]
+and eval_place_field_var conf place =
+  fun
+  [ [] ->
+      (* Compatibility before eval_place_field_var *)
+      VVstring place
+  | ["other"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.other
+      | None -> VVstring "" ]
+  | ["town"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.town
+      | None -> VVstring "" ]
+  | ["township"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.township
+      | None -> VVstring "" ]
+  | ["canton"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.canton
+      | None -> VVstring "" ]
+  | ["district"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.district
+      | None -> VVstring "" ]
+  | ["county"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.county
+      | None -> VVstring "" ]
+  | ["region"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.region
+      | None -> VVstring "" ]
+  | ["country"] ->
+      match place_of_string conf place with
+      [ Some p -> VVstring p.country
+      | None -> VVstring "" ]
+  | _ -> raise Not_found ]
 and eval_nobility_title_field_var (id, pl) =
   fun
   [ ["ident_key"] -> VVstring (code_varenv id)
   | ["place_key"] -> VVstring (code_varenv pl)
   | [] -> VVstring (if pl = "" then id else id ^ " " ^ pl)
+  | _ -> raise Not_found ]
+and eval_bool_event_field
+      conf base env (p, p_auth) (name, date, place, note, src, w, isp) =
+  fun
+  [ "has_date" -> p_auth && date <> Adef.codate_None
+  | "has_place" -> p_auth && sou base place <> ""
+  | "has_note" -> p_auth && sou base note <> ""
+  | "has_src" -> p_auth && sou base src <> ""
+  | "has_witnesses" -> p_auth && Array.length w > 0
+  | "has_spouse" -> p_auth && isp <> None
+  | "computable_age" ->
+      if p_auth then
+        match Adef.od_of_codate (get_birth p) with
+        [ Some (Dgreg d _) ->
+            not (d.day = 0 && d.month = 0 && d.prec <> Sure)
+        | _ ->
+            match Adef.od_of_codate (get_baptism p) with
+            [ Some (Dgreg d _) ->
+                not (d.day = 0 && d.month = 0 && d.prec <> Sure)
+            | _ -> False ] ]
+      else False
+  | _ -> raise Not_found ]
+and eval_str_event_field
+      conf base env (p, p_auth) (name, date, place, note, src, w, isp) =
+  fun
+  [ "age" ->
+      if p_auth then
+        let (birth_date, approx) =
+          match Adef.od_of_codate (get_birth p) with
+          [ None -> (Adef.od_of_codate (get_baptism p), True)
+          | x -> (x, False) ]
+        in
+        match (birth_date, Adef.od_of_codate date) with
+        [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
+           Some (Dgreg ({prec = Sure | About | Maybe} as d2) _))
+          when d1 <> d2 ->
+            let a = CheckItem.time_elapsed d1 d2 in
+            let s =
+              if not approx && d1.prec = Sure && d2.prec = Sure then ""
+              else transl_decline conf "possibly (date)" "" ^ " "
+            in
+            s ^ Date.string_of_age conf a
+        | _ -> "" ]
+      else ""
+  | "name" ->
+      match (p_auth, name) with
+      [ (True, Pevent name) -> Util.string_of_pevent_name conf base name
+      | (True, Fevent name) -> Util.string_of_fevent_name conf base name
+      | _ -> "" ]
+  | "date" ->
+      match (p_auth, Adef.od_of_codate date) with
+      [ (True, Some d) -> Date.string_of_date conf d
+      | _ -> "" ]
+  | "place" ->
+       if p_auth then Util.string_of_place conf (sou base place)
+       else ""
+  | "note" ->
+      if p_auth && not conf.no_note then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let s = sou base note in
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
+        in
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
+      else ""
+  | "src" ->
+      if p_auth then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let src =
+          let wi =
+            {Wiki.wi_mode = "NOTES";
+             Wiki.wi_cancel_links = conf.cancel_links;
+             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_person_exists = person_exists conf base;
+             Wiki.wi_always_show_link = conf.wizard || conf.friend}
+          in
+          Wiki.syntax_links conf wi (sou base src)
+        in
+        string_with_macros conf env src
+      else ""
+  | _ -> raise Not_found ]
+and eval_event_field_var
+      conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc =
+  fun
+  [ ["date" :: sl] ->
+      match (p_auth, Adef.od_of_codate date) with
+      [ (True, Some d) -> eval_date_field_var conf d sl
+      | _ -> VVstring "" ]
+  | ["spouse" :: sl] ->
+      match isp with
+      [ Some isp ->
+          let sp = poi base isp in
+          let ep = (sp, authorized_age conf base sp) in
+          eval_person_field_var conf base env ep loc sl
+      | None -> VVstring "" ]
+  | [s] ->
+      try
+        bool_val
+          (eval_bool_event_field conf base env (p, p_auth)
+             (name, date, place, note, src, w, isp) s)
+      with
+      [ Not_found ->
+          str_val
+            (eval_str_event_field conf base env (p, p_auth)
+               (name, date, place, note, src, w, isp) s) ]
+  | _ -> raise Not_found ]
+and eval_event_witness_relation_var conf base env (p, e) loc =
+  fun
+  [ ["event" :: sl] ->
+      let ep = (p, authorized_age conf base p) in
+      eval_event_field_var conf base env ep e loc sl
+  | ["person" :: sl] ->
+      let ep = (p, authorized_age conf base p) in
+      eval_person_field_var conf base env ep loc sl
   | _ -> raise Not_found ]
 and eval_bool_person_field conf base env (p, p_auth) =
   fun
@@ -2473,8 +2768,30 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else get_aliases p <> []
   | "has_baptism_date" -> p_auth && get_baptism p <> Adef.codate_None
   | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
+  | "has_baptism_note" ->
+      p_auth && not conf.no_note && sou base (get_baptism_note p) <> ""
+  | "has_baptism_witnesses" ->
+      p_auth &&
+      loop (events_list conf base p) where rec loop pevents =
+        match pevents with
+        [ [] -> False
+        | [(name, _, _, _, _, wl, _) :: events] ->
+            if name = Pevent Epers_Baptism then
+              Array.length wl > 0
+            else loop events ]
   | "has_birth_date" -> p_auth && get_birth p <> Adef.codate_None
   | "has_birth_place" -> p_auth && sou base (get_birth_place p) <> ""
+  | "has_birth_note" ->
+      p_auth && not conf.no_note && sou base (get_birth_note p) <> ""
+  | "has_birth_witnesses" ->
+      p_auth &&
+      loop (events_list conf base p) where rec loop pevents =
+        match pevents with
+        [ [] -> False
+        | [(name, _, _, _, _, wl, _) :: events] ->
+            if name = Pevent Epers_Birth then
+              Array.length wl > 0
+            else loop events ]
   | "has_burial_date" ->
       if p_auth then
         match get_burial p with
@@ -2482,6 +2799,17 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | _ -> False ]
       else False
   | "has_burial_place" -> p_auth && sou base (get_burial_place p) <> ""
+  | "has_burial_note" ->
+      p_auth && not conf.no_note && sou base (get_burial_note p) <> ""
+  | "has_burial_witnesses" ->
+      p_auth &&
+      loop (events_list conf base p) where rec loop pevents =
+        match pevents with
+        [ [] -> False
+        | [(name, _, _, _, _, wl, _) :: events] ->
+            if name = Pevent Epers_Burial then
+              Array.length wl > 0
+            else loop events ]
   | "has_children" ->
       match get_env "fam" env with
       [ Vfam _ fam _ _ -> Array.length (get_children fam) > 0
@@ -2500,11 +2828,69 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | _ -> False ]
       else False
   | "has_cremation_place" -> p_auth && sou base (get_burial_place p) <> ""
+  | "has_cremation_witnesses" ->
+      p_auth &&
+      loop (events_list conf base p) where rec loop pevents =
+        match pevents with
+        [ [] -> False
+        | [(name, _, _, _, _, wl, _) :: events] ->
+            if name = Pevent Epers_Cremation then
+              Array.length wl > 0
+            else loop events ]
   | "has_death_date" ->
       match get_death p with
       [ Death _ _ -> p_auth
       | _ -> False ]
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
+  | "has_death_note" ->
+      p_auth && not conf.no_note && sou base (get_death_note p) <> ""
+  | "has_death_witnesses" ->
+      p_auth &&
+      loop (events_list conf base p) where rec loop pevents =
+        match pevents with
+        [ [] -> False
+        | [(name, _, _, _, _, wl, _) :: events] ->
+            if name = Pevent Epers_Death then
+              Array.length wl > 0
+            else loop events ]
+  | "has_event" ->
+      if p_auth then
+        match p_getenv conf.base_env "display_timeline" with
+        [ Some "no" -> False
+        | Some "yes" -> True
+        | _ ->
+            (* Renvoie vrai que si il y a des informations supplémentaires *)
+            (* par rapport aux évènements principaux, i.e. témoins (mais   *)
+            (* on ne prend pas en compte les notes).                       *)
+            let events = events_list conf base p in
+            let nb_fam = Array.length (get_family p) in
+            loop events 0 where rec loop events nb_marr =
+              match events with
+              [ [] -> False
+              | [(name, d, p, n, s, wl, _) :: events] ->
+                  let (p, n, s) = (sou base p, sou base n, sou base s) in
+                  match name with
+                  [ Pevent pname ->
+                      match pname with
+                      [ Epers_Birth | Epers_Baptism |
+                        Epers_Death | Epers_Burial |
+                        Epers_Cremation ->
+                          if Array.length wl > 0 then True
+                          else loop events nb_marr
+                      | _ -> True ]
+                  | Fevent fname ->
+                      match fname with
+                      [ Efam_Engage | Efam_Marriage | Efam_NoMention |
+                        Efam_NoMarriage ->
+                          let nb_marr = succ nb_marr in
+                          if nb_marr > nb_fam then True
+                          else loop events nb_marr
+                      | Efam_Divorce | Efam_Separated ->
+                          if p <> "" || n <> "" || s <> "" || Array.length wl > 0
+                          then True
+                          else loop events nb_marr
+                      | _ -> True ] ] ] ]
+      else False
   | "has_families" -> Array.length (get_family p) > 0
   | "has_first_names_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
@@ -2522,12 +2908,24 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
   | "has_parents" -> get_parents p <> None
   | "has_possible_duplications" -> has_possible_duplications conf base p
+  | "has_psources" ->
+      if (is_hide_names conf p) && not p_auth then False
+      else sou base (get_psources p) <> ""
+  | "has_fsources" ->
+      if (is_hide_names conf p) && not p_auth then False
+      else
+        List.exists
+          (fun ifam ->
+             let fam = foi base ifam in
+             p_auth && sou base (get_fsources fam) <> "")
+          (Array.to_list (get_family p))
   | "has_public_name" ->
       if not p_auth && (is_hide_names conf p) then False
       else sou base (get_public_name p) <> ""
   | "has_qualifiers" ->
       if not p_auth && (is_hide_names conf p) then False
       else get_qualifiers p <> []
+  | "has_qualifiers" -> p_auth && get_qualifiers p <> []
   | "has_relations" ->
       if p_auth && conf.use_restrict then
         let related =
@@ -2611,11 +3009,56 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
   | "birth_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_birth_place p))
       else ""
+  | "birth_note" ->
+      if p_auth && not conf.no_note then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let s = sou base (get_birth_note p) in
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
+        in
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
+      else ""
   | "baptism_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_baptism_place p))
       else ""
+  | "baptism_note" ->
+      if p_auth && not conf.no_note then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let s = sou base (get_baptism_note p) in
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
+        in
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
+      else ""
   | "burial_place" ->
       if p_auth then Util.string_of_place conf (sou base(get_burial_place p))
+      else ""
+  | "burial_note" ->
+      if p_auth && not conf.no_note then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let s = sou base (get_burial_note p) in
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
+        in
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "child_name" ->
       let force_surname =
@@ -2654,6 +3097,21 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       else ""
   | "death_place" ->
       if p_auth then Util.string_of_place conf (sou base (get_death_place p))
+      else ""
+  | "death_note" ->
+      if p_auth && not conf.no_note then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let s = sou base (get_death_note p) in
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
+        in
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "died" -> string_of_died conf base env p p_auth
   | "fam_access" ->
@@ -3173,10 +3631,19 @@ value print_foreach conf base print_ast eval_expr =
     | "ancestor_level2" -> print_foreach_ancestor_level2 env al ep
     | "ancestor_surname" -> print_foreach_anc_surn env el al loc ep
     | "ancestor_tree_line" -> print_foreach_ancestor_tree env el al ep
+    | "baptism_witness" -> print_foreach_baptism_witness env al ep
+    | "birth_witness" -> print_foreach_birth_witness env al ep
+    | "burial_witness" -> print_foreach_burial_witness env al ep
     | "cell" -> print_foreach_cell env el al ep
     | "child" -> print_foreach_child env al ep efam
     | "cousin_level" -> print_foreach_level "max_cous_level" env al ep
+    | "cremation_witness" -> print_foreach_cremation_witness env al ep
+    | "death_witness" -> print_foreach_death_witness env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
+    | "event" -> print_foreach_event env al ep
+    | "event_witness" -> print_foreach_event_witness env al ep
+    | "event_witness_relation" ->
+        print_foreach_event_witness_relation env al ep
     | "family" -> print_foreach_family env al ini_ep ep
     | "first_name_alias" -> print_foreach_first_name_alias env al ep
     | "nobility_title" -> print_foreach_nobility_title env al ep
@@ -3325,6 +3792,48 @@ value print_foreach conf base print_ast eval_expr =
             loop False gl
           }
       | [] -> () ]
+  and print_foreach_baptism_witness env al ((p, _) as ep) =
+    loop (events_list conf base p) where rec loop pevents =
+      match pevents with
+      [ [] -> ()
+      | [(name, _, _, _, _, wl, _) :: events] ->
+          if name = Pevent Epers_Baptism then
+            list_iter_first
+              (fun first (ip, _) ->
+                let p = pget conf base ip in
+                let env = [("baptism_witness", Vind p) :: env] in
+                let env = [("first", Vbool first) :: env] in
+                List.iter (print_ast env ep) al)
+              (Array.to_list wl)
+          else loop events ]
+  and print_foreach_birth_witness env al ((p, _) as ep) =
+    loop (events_list conf base p) where rec loop pevents =
+      match pevents with
+      [ [] -> ()
+      | [(name, _, _, _, _, wl, _) :: events] ->
+          if name = Pevent Epers_Birth then
+            list_iter_first
+              (fun first (ip, _) ->
+                let p = pget conf base ip in
+                let env = [("birth_witness", Vind p) :: env] in
+                let env = [("first", Vbool first) :: env] in
+                List.iter (print_ast env ep) al)
+              (Array.to_list wl)
+          else loop events ]
+  and print_foreach_burial_witness env al ((p, _) as ep) =
+    loop (events_list conf base p) where rec loop pevents =
+      match pevents with
+      [ [] -> ()
+      | [(name, _, _, _, _, wl, _) :: events] ->
+          if name = Pevent Epers_Burial then
+            list_iter_first
+              (fun first (ip, _) ->
+                let p = pget conf base ip in
+                let env = [("burial_witness", Vind p) :: env] in
+                let env = [("first", Vbool first) :: env] in
+                List.iter (print_ast env ep) al)
+              (Array.to_list wl)
+          else loop events ]
   and print_foreach_cell env el al ((p, _) as ep) =
     let celll =
       match get_env "celll" env with
@@ -3376,6 +3885,34 @@ value print_foreach conf base print_ast eval_expr =
              List.iter (print_ast env ep) al)
           (get_children fam)
     | _ -> () ]
+  and print_foreach_cremation_witness env al ((p, _) as ep) =
+    loop (events_list conf base p) where rec loop pevents =
+      match pevents with
+      [ [] -> ()
+      | [(name, _, _, _, _, wl, _) :: events] ->
+          if name = Pevent Epers_Cremation then
+            list_iter_first
+              (fun first (ip, _) ->
+                let p = pget conf base ip in
+                let env = [("cremation_witness", Vind p) :: env] in
+                let env = [("first", Vbool first) :: env] in
+                List.iter (print_ast env ep) al)
+              (Array.to_list wl)
+          else loop events ]
+  and print_foreach_death_witness env al ((p, _) as ep) =
+    loop (events_list conf base p) where rec loop pevents =
+      match pevents with
+      [ [] -> ()
+      | [(name, _, _, _, _, wl, _) :: events] ->
+          if name = Pevent Epers_Death then
+            list_iter_first
+              (fun first (ip, _) ->
+                let p = pget conf base ip in
+                let env = [("death_witness", Vind p) :: env] in
+                let env = [("first", Vbool first) :: env] in
+                List.iter (print_ast env ep) al)
+              (Array.to_list wl)
+          else loop events ]
   and print_foreach_descendant_level env al ep =
     let max_level =
       match get_env "max_desc_level" env with
@@ -3390,6 +3927,85 @@ value print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ep) al;
           loop (succ i)
         }
+  and print_foreach_event env al ((p, p_auth) as ep) =
+    let events = events_list conf base p in
+    list_iter_first
+      (fun first evt ->
+         let env = [("event", Vevent p evt) :: env] in
+         let env = [("first", Vbool first) :: env] in
+         List.iter (print_ast env ep) al)
+      events
+  and print_foreach_event_witness env al ((p, p_auth) as ep) =
+    if p_auth then
+      match get_env "event" env with
+      [ Vevent _ (_, _, _, _, _, witnesses, _) ->
+          let witnesses = Array.to_list witnesses in
+          list_iter_first
+            (fun first (ip, wk) ->
+               let p = pget conf base ip in
+               let wk = Util.string_of_witness_kind conf p wk in
+               let env = [("event_witness", Vind p) :: env] in
+               let env = [("event_witness_kind", Vstring wk) :: env] in
+               let env = [("first", Vbool first) :: env] in
+               List.iter (print_ast env ep) al)
+            witnesses
+      | _ -> () ]
+    else ()
+  and print_foreach_event_witness_relation env al ((p, p_auth) as ep) =
+    let array_mem_witn x a =
+      loop 0 where rec loop i =
+      if i = Array.length a then (False, "")
+      else if x = fst a.(i) then
+        let witness_kind =
+          Util.string_of_witness_kind conf (poi base x) (snd a.(i))
+        in
+        (True, witness_kind)
+      else loop (i + 1)
+    in
+    let related = list_uniq (List.sort compare (get_related p)) in
+    let events_witnesses = do {
+      let list = ref [] in
+      make_list related where rec make_list =
+        fun
+        [ [ic :: icl] -> do {
+            let c = pget conf base ic in
+            List.iter
+              (fun ((name, _, _, _, _, wl, _) as evt) ->
+                let (mem, wk) = array_mem_witn (get_key_index p) wl in
+                if mem then
+                  (* Attention aux doublons pour les evenements famille. *)
+                  match name with
+                  [ Fevent _ ->
+                      if get_sex c = Male then
+                        list.val := [(c, wk, evt) :: list.val]
+                      else ()
+                  | _ -> list.val := [(c, wk, evt) :: list.val] ]
+                else ())
+              (events_list conf base c);
+            make_list icl
+          }
+        | [] -> () ];
+      list.val
+    }
+    in
+    (* On tri les témoins dans le même ordre que les évènements. *)
+    let events_witnesses =
+      CheckItem.sort_events
+        ((fun (_, _, (name, _, _, _, _, _, _)) ->
+          match name with
+          [ Pevent n -> CheckItem.Psort n
+          | Fevent n -> CheckItem.Fsort n ]),
+         (fun (_, _, (_, date, _, _, _, _, _)) -> date))
+        events_witnesses
+    in
+    List.iter
+      (fun (p, wk, evt) ->
+        if p_auth then
+          let env = [("event_witness_relation", Vevent p evt) :: env] in
+          let env = [("event_witness_relation_kind", Vstring wk) :: env] in
+          List.iter (print_ast env ep) al
+        else ())
+      events_witnesses
   and print_foreach_family env al ini_ep (p, _) =
     loop None 0 where rec loop prev i =
       if i = Array.length (get_family p) then ()

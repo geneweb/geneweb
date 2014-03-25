@@ -562,6 +562,92 @@ value string_of_divorce conf divorce =
   | Separated -> transl conf "separated" ]
 ;
 
+value string_of_event_witness conf base witnesses =
+  let witnesses =
+    List.fold_right
+      (fun (ip, wk) accu ->
+         let witn = person_of_iper conf base ip in
+         let kind = Util.string_of_witness_kind conf (poi base ip) wk in
+         if witn = "" then [kind ^ ": " ^ witn :: accu]
+         else accu)
+      (Array.to_list witnesses) []
+  in
+  String.concat ", " witnesses
+;
+
+value string_of_epers_name conf epers_name =
+  match epers_name with
+  [ Epers_Birth -> capitale (transl conf "birth")
+  | Epers_Baptism -> capitale (transl conf "baptism")
+  | Epers_Death -> capitale (transl conf "death")
+  | Epers_Burial -> capitale (transl conf "burial")
+  | Epers_Cremation -> capitale (transl conf "cremation")
+  | Epers_Accomplishment -> capitale (transl conf "accomplishment")
+  | Epers_Acquisition -> capitale (transl conf "acquisition")
+  | Epers_Adhesion -> capitale (transl conf "adhesion")
+  | Epers_BaptismLDS -> capitale (transl conf "baptismLDS")
+  | Epers_BarMitzvah -> capitale (transl conf "bar mitzvah")
+  | Epers_BatMitzvah -> capitale (transl conf "bat mitzvah")
+  | Epers_Benediction -> capitale (transl conf "benediction")
+  | Epers_ChangeName -> capitale (transl conf "change name")
+  | Epers_Circumcision -> capitale (transl conf "circumcision")
+  | Epers_Confirmation -> capitale (transl conf "confirmation")
+  | Epers_ConfirmationLDS -> capitale (transl conf "confirmation LDS")
+  | Epers_Decoration -> capitale (transl conf "decoration")
+  | Epers_DemobilisationMilitaire -> capitale (transl conf "demobilisationMilitaire")
+  | Epers_Diploma -> capitale (transl conf "diploma")
+  | Epers_Distinction -> capitale (transl conf "distinction")
+  | Epers_Dotation -> capitale (transl conf "dotation")
+  | Epers_DotationLDS -> capitale (transl conf "dotationLDS")
+  | Epers_Education -> capitale (transl conf "education")
+  | Epers_Election -> capitale (transl conf "election")
+  | Epers_Emigration -> capitale (transl conf "emigration")
+  | Epers_Excommunication -> capitale (transl conf "excommunication")
+  | Epers_FamilyLinkLDS -> capitale (transl conf "familyLinkLDS")
+  | Epers_FirstCommunion -> capitale (transl conf "firstCommunion")
+  | Epers_Funeral -> capitale (transl conf "funeral")
+  | Epers_Graduate -> capitale (transl conf "graduate")
+  | Epers_Hospitalisation -> capitale (transl conf "hospitalisation")
+  | Epers_Illness -> capitale (transl conf "illness")
+  | Epers_Immigration -> capitale (transl conf "immigration")
+  | Epers_ListePassenger -> capitale (transl conf "listePassenger")
+  | Epers_MilitaryDistinction -> capitale (transl conf "militaryDistinction")
+  | Epers_MilitaryPromotion -> capitale (transl conf "militaryPromotion")
+  | Epers_MilitaryService -> capitale (transl conf "militaryService")
+  | Epers_MobilisationMilitaire -> capitale (transl conf "mobilisationMilitaire")
+  | Epers_Naturalisation -> capitale (transl conf "naturalisation")
+  | Epers_Occupation -> capitale (transl_nth conf "occupation/occupations" 0)
+  | Epers_Ordination -> capitale (transl conf "ordination")
+  | Epers_Property -> capitale (transl conf "property")
+  | Epers_Recensement -> capitale (transl conf "recensement")
+  | Epers_Residence-> capitale (transl conf "residence")
+  | Epers_Retired -> capitale (transl conf  "retired")
+  | Epers_ScellentChildLDS -> capitale (transl conf "scellentChildLDS")
+  | Epers_ScellentParentLDS -> capitale (transl conf "scellentParentLDS")
+  | Epers_ScellentSpouseLDS -> capitale (transl conf "scellentSpouseLDS")
+  | Epers_VenteBien -> capitale (transl conf "venteBien")
+  | Epers_Will -> capitale (transl conf "will")
+  | Epers_Name n -> capitale n ]
+;
+
+value string_of_efam_name conf efam_name =
+  match efam_name with
+  [ Efam_Marriage -> capitale (transl conf "marriage event")
+  | Efam_NoMarriage -> capitale (transl conf "no marriage event")
+  | Efam_NoMention -> capitale (transl conf "no mention")
+  | Efam_Engage -> capitale (transl conf "engage event")
+  | Efam_Divorce -> capitale (transl conf "divorce event")
+  | Efam_Separated -> capitale (transl conf "separate event")
+  | Efam_Annulation -> capitale (transl conf "annulation")
+  | Efam_MarriageBann -> capitale (transl conf "marriage bann")
+  | Efam_MarriageContract -> capitale (transl conf "marriage contract")
+  | Efam_MarriageLicense -> capitale (transl conf "marriage licence")
+  | Efam_PACS -> capitale (transl conf "PACS")
+  | Efam_Residence -> capitale (transl conf "residence")
+  | Efam_Name n -> capitale n ]
+;
+
+
 
 (* ************************************************************************ *)
 (*  [Fonc] array_of_string : string -> char array                           *)
@@ -644,8 +730,13 @@ value diff_string before after =
 
 type env 'a =
   [ Vgen_record of gen_record
-  | Vfam of option (gen_family iper string) and option (gen_family iper string) and bool
+  | Vfam of option (gen_family iper string) and
+      option (gen_family iper string) and bool
   | Vchild of option (array iper) and option (array iper)
+  | Vfevent of option (gen_fam_event iper string) and
+      option (gen_fam_event iper string) and bool
+  | Vpevent of option (gen_pers_event iper string) and
+      option (gen_pers_event iper string)
   | Vbool of bool
   | Vint of int
   | Vstring of string
@@ -810,6 +901,12 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
         let a = aft.gen_p.birth_place in
         diff_string b a
       else ("", "")
+  | "birth_note" ->
+      if p_auth then
+        let b = bef.gen_p.birth_note in
+        let a = aft.gen_p.birth_note in
+        diff_string b a
+      else ("", "")
   | "birth_src" ->
       if p_auth then
         let b = bef.gen_p.birth_src in
@@ -826,6 +923,12 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       if p_auth then
         let b = bef.gen_p.baptism_place in
         let a = aft.gen_p.baptism_place in
+        diff_string b a
+      else ("", "")
+  | "baptism_note" ->
+      if p_auth then
+        let b = bef.gen_p.baptism_note in
+        let a = aft.gen_p.baptism_note in
         diff_string b a
       else ("", "")
   | "baptism_src" ->
@@ -846,6 +949,12 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
         let a = aft.gen_p.death_place in
         diff_string b a
       else ("", "")
+  | "death_note" ->
+      if p_auth then
+        let b = bef.gen_p.death_note in
+        let a = aft.gen_p.death_note in
+        diff_string b a
+      else ("", "")
   | "death_src" ->
       if p_auth then
         let b = bef.gen_p.death_src in
@@ -864,12 +973,104 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
         let a = aft.gen_p.burial_place in
         diff_string b a
       else ("", "")
+  | "burial_note" ->
+      if p_auth then
+        let b = bef.gen_p.burial_note in
+        let a = aft.gen_p.burial_note in
+        diff_string b a
+      else ("", "")
   | "burial_src" ->
       if p_auth then
         let b = bef.gen_p.burial_src in
         let a = aft.gen_p.burial_src in
         diff_string b a
       else ("", "")
+  | "pevent_name" ->
+      match get_env "pevent" env with
+      [ Vpevent bef aft ->
+          if p_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = string_of_epers_name conf b.epers_name in
+                let a = string_of_epers_name conf a.epers_name in
+                diff_string b a
+            | (None, Some a) -> ("", string_of_epers_name conf a.epers_name)
+            | (Some b, None) -> (string_of_epers_name conf b.epers_name, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "pevent_date" ->
+      match get_env "pevent" env with
+      [ Vpevent bef aft ->
+          if p_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = string_of_codate conf b.epers_date in
+                let a = string_of_codate conf a.epers_date in
+                diff_string b a
+            | (None, Some a) -> ("", string_of_codate conf a.epers_date)
+            | (Some b, None) -> (string_of_codate conf b.epers_date, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "pevent_place" ->
+      match get_env "pevent" env with
+      [ Vpevent bef aft ->
+          if p_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = b.epers_place in
+                let a = a.epers_place in
+                diff_string b a
+            | (None, Some a) -> ("", a.epers_place)
+            | (Some b, None) -> (b.epers_place, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "pevent_note" ->
+      match get_env "pevent" env with
+      [ Vpevent bef aft ->
+          if p_auth && not conf.no_note then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = b.epers_note in
+                let a = a.epers_note in
+                diff_string b a
+            | (None, Some a) -> ("", a.epers_note)
+            | (Some b, None) -> (b.epers_note, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "pevent_src" ->
+      match get_env "pevent" env with
+      [ Vpevent bef aft ->
+          if p_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = b.epers_src in
+                let a = a.epers_src in
+                diff_string b a
+            | (None, Some a) -> ("", a.epers_src)
+            | (Some b, None) -> (b.epers_src, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "pevent_witness" ->
+      match get_env "pevent" env with
+      [ Vpevent bef aft ->
+          if p_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = string_of_event_witness conf base b.epers_witnesses in
+                let a = string_of_event_witness conf base a.epers_witnesses in
+                diff_string b a
+            | (None, Some a) ->
+                ("", string_of_event_witness conf base a.epers_witnesses)
+            | (Some b, None) ->
+                (string_of_event_witness conf base b.epers_witnesses, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
   | "notes" ->
       if p_auth && not conf.no_note then
         let b = bef.gen_p.notes in
@@ -980,6 +1181,92 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
+  | "fevent_name" ->
+      match get_env "fevent" env with
+      [ Vfevent bef aft m_auth ->
+          if m_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = string_of_efam_name conf b.efam_name in
+                let a = string_of_efam_name conf a.efam_name in
+                diff_string b a
+            | (None, Some a) -> ("", string_of_efam_name conf a.efam_name)
+            | (Some b, None) -> (string_of_efam_name conf b.efam_name, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "fevent_date" ->
+      match get_env "fevent" env with
+      [ Vfevent bef aft m_auth ->
+          if m_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = string_of_codate conf b.efam_date in
+                let a = string_of_codate conf a.efam_date in
+                diff_string b a
+            | (None, Some a) -> ("", string_of_codate conf a.efam_date)
+            | (Some b, None) -> (string_of_codate conf b.efam_date, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "fevent_place" ->
+      match get_env "fevent" env with
+      [ Vfevent bef aft m_auth ->
+          if m_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = b.efam_place in
+                let a = a.efam_place in
+                diff_string b a
+            | (None, Some a) -> ("", a.efam_place)
+            | (Some b, None) -> (b.efam_place, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "fevent_note" ->
+      match get_env "fevent" env with
+      [ Vfevent bef aft m_auth ->
+          if m_auth && not conf.no_note then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = b.efam_note in
+                let a = a.efam_note in
+                diff_string b a
+            | (None, Some a) -> ("", a.efam_note)
+            | (Some b, None) -> (b.efam_note, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "fevent_src" ->
+      match get_env "fevent" env with
+      [ Vfevent bef aft m_auth ->
+          if m_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = b.efam_src in
+                let a = a.efam_src in
+                diff_string b a
+            | (None, Some a) -> ("", a.efam_src)
+            | (Some b, None) -> (b.efam_src, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
+  | "fevent_witness" ->
+      match get_env "fevent" env with
+      [ Vfevent bef aft m_auth ->
+          if m_auth then
+            match (bef, aft) with
+            [ (Some b, Some a) ->
+                let b = string_of_event_witness conf base b.efam_witnesses in
+                let a = string_of_event_witness conf base a.efam_witnesses in
+                diff_string b a
+            | (None, Some a) ->
+                ("", string_of_event_witness conf base a.efam_witnesses)
+            | (Some b, None) ->
+                (string_of_event_witness conf base b.efam_witnesses, "")
+            | (None, None) -> ("", "") ]
+          else ("", "")
+      | _ -> raise Not_found ]
   | "comment" ->
       match get_env "fam" env with
       [ Vfam bef aft m_auth ->
@@ -1074,6 +1361,8 @@ value print_foreach conf base print_ast eval_expr =
   let rec print_foreach env xx loc s sl el al =
     match [s :: sl] with
     [ ["family"] -> print_foreach_family env xx el al
+    | ["fevent"] -> print_foreach_fevent env xx el al
+    | ["pevent"] -> print_foreach_pevent env xx el al
     | ["history_line"] -> print_foreach_history_line env xx el al
     | _ -> raise Not_found ]
   and print_foreach_family env xx el al =
@@ -1143,6 +1432,70 @@ value print_foreach conf base print_ast eval_expr =
           } ]
     in
     loop bef.gen_f bef.gen_c aft.gen_f aft.gen_c
+  and print_foreach_fevent env xx el al =
+    let rec loop m_auth bef_fevents aft_fevents =
+      match (bef_fevents, aft_fevents) with
+      [ ([], []) -> ()
+      | ([], [aft_evt :: l]) ->
+          do {
+            let env =
+              [("fevent", Vfevent None (Some aft_evt) m_auth) :: env]
+            in
+            List.iter (print_ast env xx) al;
+            loop m_auth [] l
+          }
+      | ([bef_evt :: l], []) ->
+          do {
+            let env =
+              [("fevent", Vfevent (Some bef_evt) None m_auth) :: env]
+            in
+            List.iter (print_ast env xx) al;
+            loop m_auth l []
+          }
+      | ([bef_evt :: l1], [aft_evt :: l2]) ->
+          do {
+            let env =
+              [("fevent", Vfevent (Some bef_evt) (Some aft_evt) m_auth) :: env]
+            in
+            List.iter (print_ast env xx) al;
+            loop m_auth l1 l2
+          } ]
+    in
+    match get_env "fam" env with
+    [ Vfam bef aft m_auth ->
+        match (bef, aft) with
+        [ (Some b, Some a) -> loop m_auth b.fevents a.fevents
+        | (None, Some a) -> loop m_auth [] a.fevents
+        | (Some b, None) -> loop m_auth b.fevents []
+        | (None, None) -> () ]
+    | _ -> () ]
+  and print_foreach_pevent env xx el al =
+    let (bef, aft, p_auth) = xx in
+    let rec loop bef_pevents aft_pevents =
+      match (bef_pevents, aft_pevents) with
+      [ ([], []) -> ()
+      | ([], [aft_evt :: l]) ->
+          do {
+            let env = [("pevent", Vpevent None (Some aft_evt)) :: env] in
+            List.iter (print_ast env xx) al;
+            loop [] l
+          }
+      | ([bef_evt :: l], []) ->
+          do {
+            let env = [("pevent", Vpevent (Some bef_evt) None) :: env] in
+            List.iter (print_ast env xx) al;
+            loop l []
+          }
+      | ([bef_evt :: l1], [aft_evt :: l2]) ->
+          do {
+            let env =
+              [("pevent", Vpevent (Some bef_evt) (Some aft_evt)) :: env]
+            in
+            List.iter (print_ast env xx) al;
+            loop l1 l2
+          } ]
+    in
+    loop bef.gen_p.pevents aft.gen_p.pevents
   and print_foreach_history_line env xx el al =
     match get_env "history_file" env with
     [ Vstring fname ->

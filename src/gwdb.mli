@@ -10,6 +10,8 @@ type family = 'abstract;
 
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
+type pers_event = Def.gen_pers_event iper istr;
+type fam_event = Def.gen_fam_event iper istr;
 
 type string_person_index = 'abstract;
 
@@ -27,15 +29,19 @@ value get_access : person -> Def.access;
 value get_aliases : person -> list istr;
 value get_baptism : person -> codate;
 value get_baptism_place : person -> istr;
+value get_baptism_note : person -> istr;
 value get_baptism_src : person -> istr;
 value get_birth : person -> codate;
 value get_birth_place : person -> istr;
+value get_birth_note : person -> istr;
 value get_birth_src : person -> istr;
 value get_burial : person -> Def.burial;
 value get_burial_place : person -> istr;
+value get_burial_note : person -> istr;
 value get_burial_src : person -> istr;
 value get_death : person -> Def.death;
 value get_death_place : person -> istr;
+value get_death_note : person -> istr;
 value get_death_src : person -> istr;
 value get_first_name : person -> istr;
 value get_first_names_aliases : person -> list istr;
@@ -44,6 +50,7 @@ value get_key_index : person -> iper;
 value get_notes : person -> istr;
 value get_occ : person -> int;
 value get_occupation : person -> istr;
+value get_pevents : person -> list pers_event;
 value get_psources : person -> istr;
 value get_public_name : person -> istr;
 value get_qualifiers : person -> list istr;
@@ -63,9 +70,11 @@ value gen_person_of_person : person -> Def.gen_person iper istr;
 
 value get_comment : family -> istr;
 value get_divorce : family -> Def.divorce;
+value get_fevents : family -> list fam_event;
 value get_fsources : family -> istr;
 value get_marriage : family -> codate;
 value get_marriage_place : family -> istr;
+value get_marriage_note : family -> istr;
 value get_marriage_src : family -> istr;
 value get_origin_file : family -> istr;
 value get_relation : family -> Def.relation_kind;

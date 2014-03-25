@@ -5,16 +5,27 @@ open Def;
 
 value magic_gwo = "GnWo000o";
 
+(* Option qui force a créé les clés des individus. De fait, *)
+(* si la clé est incomplète, on l'enregistre tout de même.  *)
+value create_all_keys = ref False;
+
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int };
 
 type somebody = [ Undefined of key | Defined of gen_person iper string ];
 
 type gw_syntax =
   [ Family of gen_couple somebody and sex and sex and
-      list (somebody * sex) and gen_family (gen_person iper string) string and
+      list (somebody * sex) and
+      list (gen_fam_event_name string * codate * string * string *
+              string * string * list (somebody * sex * witness_kind)) and
+      gen_family (gen_person iper string) string and
       gen_descend (gen_person iper string)
   | Notes of key and string
   | Relations of somebody and sex and list (gen_relation somebody string)
+  | Pevent of
+      key and
+        list (gen_pers_event_name string * codate * string *
+                string * string * string * list (somebody * sex * witness_kind))
   | Bnotes of string and string
   | Wnotes of string and string ]
 ;
@@ -159,14 +170,14 @@ value date_of_string s i =
         else if s.[i] = '|' then
           let (year2, i) = champ (succ i) in
           let ((day2, month2, year2), i) = dmy2 year2 i in
-          let dmy2 = 
+          let dmy2 =
             {day2 = day2; month2 = month2; year2 = year2; delta2 = 0}
           in
           Some (Dgreg {(d) with prec = OrYear dmy2} cal, i)
         else if i + 1 < String.length s && s.[i] = '.' && s.[i + 1] = '.' then
           let (year2, i) = champ (i + 2) in
           let ((day2, month2, year2), i) = dmy2 year2 i in
-          let dmy2 = 
+          let dmy2 =
             {day2 = day2; month2 = month2; year2 = year2; delta2 = 0}
           in
           Some (Dgreg {(d) with prec = YearInt dmy2} cal, i)
@@ -501,6 +512,104 @@ value rec get_titles str l =
   | _ -> ([], l) ]
 ;
 
+value get_pevent_name str l =
+  match l with
+  [ ["#birt" :: l'] -> (Epers_Birth, l')
+  | ["#bapt" :: l'] -> (Epers_Baptism, l')
+  | ["#deat" :: l'] -> (Epers_Death, l')
+  | ["#buri" :: l'] -> (Epers_Burial, l')
+  | ["#crem" :: l'] -> (Epers_Cremation, l')
+  | ["#acco" :: l'] -> (Epers_Accomplishment, l')
+  | ["#acqu" :: l'] -> (Epers_Acquisition, l')
+  | ["#adhe" :: l'] -> (Epers_Adhesion, l')
+  | ["#awar" :: l'] -> (Epers_Decoration, l')
+  | ["#bapl" :: l'] -> (Epers_BaptismLDS, l')
+  | ["#barm" :: l'] -> (Epers_BarMitzvah, l')
+  | ["#basm" :: l'] -> (Epers_BatMitzvah, l')
+  | ["#bles" :: l'] -> (Epers_Benediction, l')
+  | ["#cens" :: l'] -> (Epers_Recensement, l')
+  | ["#chgn" :: l'] -> (Epers_ChangeName, l')
+  | ["#circ" :: l'] -> (Epers_Circumcision, l')
+  | ["#conf" :: l'] -> (Epers_Confirmation, l')
+  | ["#conl" :: l'] -> (Epers_ConfirmationLDS, l')
+  | ["#degr" :: l'] -> (Epers_Diploma, l')
+  | ["#demm" :: l'] -> (Epers_DemobilisationMilitaire, l')
+  | ["#dist" :: l'] -> (Epers_Distinction, l')
+  | ["#dotl" :: l'] -> (Epers_DotationLDS, l')
+  | ["#educ" :: l'] -> (Epers_Education, l')
+  | ["#elec" :: l'] -> (Epers_Election, l')
+  | ["#emig" :: l'] -> (Epers_Emigration, l')
+  | ["#endl" :: l'] -> (Epers_Dotation, l')
+  | ["#exco" :: l'] -> (Epers_Excommunication, l')
+  | ["#fcom" :: l'] -> (Epers_FirstCommunion, l')
+  | ["#flkl" :: l'] -> (Epers_FamilyLinkLDS, l')
+  | ["#fune" :: l'] -> (Epers_Funeral, l')
+  | ["#grad" :: l'] -> (Epers_Graduate, l')
+  | ["#hosp" :: l'] -> (Epers_Hospitalisation, l')
+  | ["#illn" :: l'] -> (Epers_Illness, l')
+  | ["#immi" :: l'] -> (Epers_Immigration, l')
+  | ["#lpas" :: l'] -> (Epers_ListePassenger, l')
+  | ["#mdis" :: l'] -> (Epers_MilitaryDistinction, l')
+  | ["#mobm" :: l'] -> (Epers_MobilisationMilitaire, l')
+  | ["#mpro" :: l'] -> (Epers_MilitaryPromotion, l')
+  | ["#mser" :: l'] -> (Epers_MilitaryService, l')
+  | ["#natu" :: l'] -> (Epers_Naturalisation, l')
+  | ["#occu" :: l'] -> (Epers_Occupation, l')
+  | ["#ordn" :: l'] -> (Epers_Ordination, l')
+  | ["#prop" :: l'] -> (Epers_Property, l')
+  | ["#resi" :: l'] -> (Epers_Residence, l')
+  | ["#reti" :: l'] -> (Epers_Retired, l')
+  | ["#slgc" :: l'] -> (Epers_ScellentChildLDS, l')
+  | ["#slgp" :: l'] -> (Epers_ScellentParentLDS, l')
+  | ["#slgs" :: l'] -> (Epers_ScellentSpouseLDS, l')
+  | ["#vteb" :: l'] -> (Epers_VenteBien, l')
+  | ["#will" :: l'] -> (Epers_Will, l')
+  | [s :: l'] ->
+      if s.[0] = '#' then
+        (Epers_Name (String.sub s 1 (String.length s - 1)), l')
+      else failwith str
+  | _ -> failwith str ]
+;
+
+value get_fevent_name str l =
+  match l with
+  [ ["#marr" :: l'] -> (Efam_Marriage, l')
+  | ["#nmar" :: l'] -> (Efam_NoMarriage, l')
+  | ["#nmen" :: l'] -> (Efam_NoMention, l')
+  | ["#enga" :: l'] -> (Efam_Engage, l')
+  | ["#div" :: l'] -> (Efam_Divorce, l')
+  | ["#sep" :: l'] -> (Efam_Separated, l')
+  | ["#anul" :: l'] -> (Efam_Annulation, l')
+  | ["#marb" :: l'] -> (Efam_MarriageBann, l')
+  | ["#marc" :: l'] -> (Efam_MarriageContract, l')
+  | ["#marl" :: l'] -> (Efam_MarriageLicense, l')
+  | ["#resi" :: l'] -> (Efam_Residence, l')
+  | [s :: l'] ->
+      if s.[0] = '#' then
+        (Efam_Name (String.sub s 1 (String.length s - 1)), l')
+      else failwith str
+  | _ -> failwith str ]
+;
+
+value get_optional_event_date l =
+  match l with
+  [ [x :: l'] ->
+      let i = 0 in
+      if x.[i] = '!' then (None, l)
+      else
+        match x.[i] with
+        [ '~' | '?' | '<' | '>' | '-' | '0'..'9' ->
+            let d = date_of_string x i in (Some d, l')
+        | _ -> (None, l) ]
+  | _ -> (None, l) ]
+;
+
+value get_event_witness_kind str l =
+  match l with
+  [ ["#godp" :: l'] -> (Witness_GodParent, l')
+  | _ -> (Witness, l) ]
+;
+
 value get_mar_date str =
   fun
   [ [x :: l] ->
@@ -537,6 +646,7 @@ value get_mar_date str =
         | _ -> ((Married, Male, Female), l) ]
       in
       let (place, l) = get_field "#mp" l in
+      let (note, l) = get_field "#mn" l in
       let (src, l) = get_field "#ms" l in
       let (divorce, l) =
         match l with
@@ -547,7 +657,7 @@ value get_mar_date str =
         | ["#sep" :: l] -> (Separated, l)
         | _ -> (NotDivorced, l) ]
       in
-      (relation, mar, place, src, divorce, l)
+      (relation, mar, place, note, src, divorce, l)
   | [] -> failwith str ]
 ;
 
@@ -561,11 +671,11 @@ value create_person () =
    qualifiers = []; aliases = []; first_names_aliases = [];
    surnames_aliases = []; titles = []; rparents = []; related = [];
    occupation = ""; sex = Neuter; access = IfTitles; birth = Adef.codate_None;
-   birth_place = ""; birth_src = ""; baptism = Adef.codate_None;
-   baptism_place = ""; baptism_src = ""; death = DontKnowIfDead;
-   death_place = ""; death_src = ""; burial = UnknownBurial;
-   burial_place = ""; burial_src = ""; notes = ""; psources = "";
-   key_index = Adef.iper_of_int (-1)}
+   birth_place = ""; birth_note = ""; birth_src = ""; baptism = Adef.codate_None;
+   baptism_place = ""; baptism_note = ""; baptism_src = "";
+   death = DontKnowIfDead; death_place = ""; death_note = ""; death_src = "";
+   burial = UnknownBurial; burial_place = ""; burial_note = ""; burial_src = "";
+   pevents = []; notes = ""; psources = ""; key_index = Adef.iper_of_int (-1)}
 ;
 
 value bogus_def p n o = p = "?" || n = "?";
@@ -583,15 +693,18 @@ value set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   let (psources, l) = get_sources str l in
   let (naissance, l) = get_optional_birthdate l in
   let (birth_place, l) = get_field "#bp" l in
+  let (birth_note, l) = get_field "#bn" l in
   let (birth_src, l) = get_field "#bs" l in
   let (baptism, l) = get_optional_baptdate l in
   let (baptism_place, l) =
     let (pp, l) = get_field "#pp" l in
     if pp = "" then get_field "#bp" l else (pp, l)
   in
+  let (bapt_note, l) = get_field "#pn" l in
   let (bapt_src, l) = get_field "#ps" l in
   let (mort, l) = get_optional_deathdate l in
   let (death_place, l) = get_field "#dp" l in
+  let (death_note, l) = get_field "#dn" l in
   let (death_src, l) = get_field "#ds" l in
   let mort =
     match (naissance, mort) with
@@ -613,6 +726,7 @@ value set_infos fn sn occ sex comm_psources comm_birth_place str u l =
   in
   let (burial, l) = get_burial l in
   let (burial_place, l) = get_field "#rp" l in
+  let (burial_note, l) = get_field "#rn" l in
   let (burial_src, l) = get_field "#rs" l in
   let u =
     {first_name = fn; surname = sn; occ = occ;
@@ -624,11 +738,12 @@ value set_infos fn sn occ sex comm_psources comm_birth_place str u l =
      psources = if psources <> "" then psources else comm_psources;
      birth = naissance;
      birth_place = if birth_place <> "" then birth_place else comm_birth_place;
-     birth_src = birth_src; baptism = baptism;
-     baptism_place = baptism_place; baptism_src = bapt_src;
-     death = mort; death_place = death_place; death_src = death_src;
-     burial = burial; burial_place = burial_place;
-     burial_src = burial_src}
+     birth_note = birth_note; birth_src = birth_src; baptism = baptism;
+     baptism_place = baptism_place; baptism_note = bapt_note;
+     baptism_src = bapt_src; death = mort; death_place = death_place;
+     death_note = death_note; death_src = death_src; burial = burial;
+     burial_place = burial_place; burial_note = burial_note;
+     burial_src = burial_src; pevents = u.pevents}
   in
   (u, l)
 ;
@@ -754,6 +869,7 @@ value read_notes_db ic end_txt =
 type read_family 'a =
   [ F_some of 'a
   | F_enc_utf_8
+  | F_gw_plus
   | F_none
   | F_fail of string ]
 ;
@@ -761,9 +877,11 @@ type read_family 'a =
 value read_family ic fname =
   fun
   [ Some (_, ["encoding:"; "utf-8"]) -> F_enc_utf_8
+  | Some (_, ["gwplus"]) -> F_gw_plus
   | Some (str, ["fam" :: l]) ->
       let (fath_key, surname, l) = parse_parent str l in
-      let (relation_ss, marriage, marr_place, marr_src, divorce, l) =
+      let ((relation_ss, marriage, marr_place,
+            marr_note, marr_src, divorce, l)) =
         get_mar_date str l
       in
       let (relation, fath_sex, moth_sex) = relation_ss in
@@ -815,6 +933,77 @@ value read_family ic fname =
               (comm, read_line ic)
           | _ -> ("", line) ]
         in
+        let (fevents, line) =
+          match line with
+          [ Some (str, ["fevt" :: l]) ->
+              let (fevents, line) =
+                loop [] (input_a_line ic) where rec loop fevents =
+                  fun
+                  [ "end fevt" -> (fevents, read_line ic)
+                  | x -> do {
+                      let (str, l) = (x, fields x) in
+                      (* On récupère le nom, date, lieu, source, cause *)
+                      let (name, l) = get_fevent_name str l in
+                      let (date, l) = get_optional_event_date l in
+                      let (place, l) = get_field "#p" l in
+                      let (cause, l) = get_field "#c" l in
+                      let (src, l) = get_field "#s" l in
+                      let date =
+                        match date with
+                        [ None -> Adef.codate_None
+                        | Some x -> Adef.codate_of_od x ]
+                      in
+                      if l <> [] then failwith str else ();
+                      (* On récupère les témoins *)
+                      let (witn, line) =
+                        loop_witn (input_a_line ic) where rec loop_witn str =
+                          match fields str with
+                          [ ["wit" | "wit:" :: l] ->
+                              let (sex, l) =
+                                match l with
+                                [ ["m:" :: l] -> (Male, l)
+                                | ["f:" :: l] -> (Female, l)
+                                | l -> (Neuter, l) ]
+                              in
+                              let (wkind, l) = get_event_witness_kind str l in
+                              let (wk, _, l) = parse_parent str l in
+                              do {
+                                if l <> [] then failwith str else ();
+                                let (witn, str) =
+                                  loop_witn (input_a_line ic)
+                                in
+                                ([(wk, sex, wkind) :: witn], str)
+                              }
+                          | line -> ([], str) ]
+                      in
+                      (* On récupère les notes *)
+                      let (notes, line) =
+                        loop_note line where rec loop_note str =
+                          match fields str with
+                          [ ["note" :: l] ->
+                              let note =
+                                match l with
+                                [ [] -> ""
+                                | [_ :: l'] ->
+                                    String.sub str
+                                      (String.length "note" + 1)
+                                      (String.length str - String.length "note" - 1)]
+                              in
+                              let (notes, str) =
+                                loop_note (input_a_line ic)
+                              in
+                              (note ^ "\n" ^ notes, str)
+                          | line -> ("", str) ]
+                      in
+                      let notes = Mutil.strip_all_trailing_spaces notes in
+                      let evt =
+                        (name, date, place, cause, src, notes, witn)
+                      in
+                      loop [evt :: fevents] line } ]
+              in
+              (List.rev fevents, line)
+          | _ -> ([], line) ]
+        in
         match line with
         [ Some (_, ["beg"]) ->
             let cles_enfants =
@@ -835,23 +1024,26 @@ value read_family ic fname =
             in
             let fo =
               {marriage = marriage; marriage_place = marr_place;
-               marriage_src = marr_src; witnesses = [| |];
-               relation = relation; divorce = divorce; comment = comm;
-               origin_file = fname; fsources = fsrc;
-               fam_index = Adef.ifam_of_int (-1)}
+               marriage_note = marr_note; marriage_src = marr_src;
+               witnesses = [| |]; relation = relation;
+               divorce = divorce; fevents = [];
+               comment = comm; origin_file = fname;
+               fsources = fsrc; fam_index = Adef.ifam_of_int (-1)}
             in
             let deo = {children = Array.of_list cles_enfants} in
-            F_some (Family co fath_sex moth_sex witn fo deo, read_line ic)
+            F_some
+              (Family co fath_sex moth_sex witn fevents fo deo, read_line ic)
         | line ->
             let fo =
               {marriage = marriage; marriage_place = marr_place;
-               marriage_src = marr_src; witnesses = [| |];
-               relation = relation; divorce = divorce; comment = comm;
-               origin_file = fname; fsources = fsrc;
-               fam_index = Adef.ifam_of_int (-1)}
+               marriage_note = marr_note; marriage_src = marr_src;
+               witnesses = [| |]; relation = relation;
+               divorce = divorce; fevents = [];
+               comment = comm; origin_file = fname;
+               fsources = fsrc; fam_index = Adef.ifam_of_int (-1)}
             in
             let deo = {children = [| |]} in
-            F_some (Family co fath_sex moth_sex witn fo deo, line) ]
+            F_some (Family co fath_sex moth_sex witn fevents fo deo, line) ]
       }
   | Some (str, ["notes-db"]) ->
       let notes = read_notes_db ic "end notes-db" in
@@ -915,6 +1107,75 @@ value read_family ic fname =
             F_some (Relations sb sex rl, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
+  | Some (str, ["pevt" :: l]) ->
+      let (surname, l) = get_name str l in
+      let (first_name, occ, l) = get_fst_name str l in
+      if l <> [] then failwith str
+      else
+        let pevents =
+          loop [] (input_a_line ic) where rec loop pevents =
+            fun
+            [ "end pevt" -> pevents
+            | x -> do {
+                let (str, l) = (x, fields x) in
+                (* On récupère le nom, date, lieu, source, cause *)
+                let (name, l) = get_pevent_name str l in
+                let (date, l) = get_optional_event_date l in
+                let (place, l) = get_field "#p" l in
+                let (cause, l) = get_field "#c" l in
+                let (src, l) = get_field "#s" l in
+                let date =
+                  match date with
+                  [ None -> Adef.codate_None
+                  | Some x -> Adef.codate_of_od x ]
+                in
+                if l <> [] then failwith str else ();
+                (* On récupère les témoins *)
+                let (witn, line) =
+                  loop_witn (input_a_line ic) where rec loop_witn str =
+                    match fields str with
+                    [ ["wit" | "wit:" :: l] ->
+                        let (sex, l) =
+                          match l with
+                          [ ["m:" :: l] -> (Male, l)
+                          | ["f:" :: l] -> (Female, l)
+                          | l -> (Neuter, l) ]
+                        in
+                        let (wkind, l) = get_event_witness_kind str l in
+                        let (wk, _, l) = parse_parent str l in
+                        do {
+                          if l <> [] then failwith str else ();
+                          let (witn, str) = loop_witn (input_a_line ic) in
+                          ([(wk, sex, wkind) :: witn], str)
+                        }
+                    | line -> ([], str) ]
+                in
+                (* On récupère les notes *)
+                let (notes, line) =
+                  loop_note line where rec loop_note str =
+                    match fields str with
+                    [ ["note" :: l] ->
+                        let note =
+                          match l with
+                            [ [] -> ""
+                            | [_ :: l'] ->
+                                String.sub str
+                                  (String.length "note" + 1)
+                                  (String.length str - String.length "note" - 1)]
+                        in
+                        let (notes, str) = loop_note (input_a_line ic) in
+                        (note ^ "\n" ^ notes, str)
+                    | line -> ("", str) ]
+                in
+                let notes = Mutil.strip_all_trailing_spaces notes in
+                let evt = (name, date, place, cause, src, notes, witn) in
+                loop [evt :: pevents] line } ]
+        in
+        let pevents = List.rev pevents in
+        let key =
+          {pk_first_name = first_name; pk_surname = surname; pk_occ = occ}
+        in
+        F_some (Pevent key pevents, read_line ic)
   | Some (str, l) -> failwith str
   | None -> F_none ]
 ;
@@ -941,6 +1202,10 @@ value comp_families x =
               do { output_value oc (family : gw_syntax); loop line encoding }
           | F_enc_utf_8 ->
               loop (read_line (ic, E_utf_8)) E_utf_8
+          | F_gw_plus -> do {
+              create_all_keys.val := True;
+              loop (read_line (ic, encoding)) encoding
+            }
           | F_none -> ()
           | F_fail str ->
               do {

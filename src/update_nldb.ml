@@ -139,10 +139,18 @@ value compute base bdir =
       let p = poi base (Adef.iper_of_int i) in
       let s =
         let sl =
-          [get_notes; get_occupation; get_birth_src; get_baptism_src;
-           get_death_src; get_burial_src; get_psources]
+          [get_notes p; get_occupation p; get_birth_note p; get_birth_src p; 
+           get_baptism_note p; get_baptism_src p; get_death_note p; 
+           get_death_src p; get_burial_note p; get_burial_src p; 
+           get_psources p]
         in
-        String.concat " " (List.map (fun f -> sou base (f p)) sl)
+        let sl =
+          loop (get_pevents p) sl where rec loop l accu =
+          match l with
+          [ [] -> accu
+          | [evt :: l] -> loop l [evt.epers_note; evt.epers_src :: accu]]
+        in
+        String.concat " " (List.map (sou base) sl)
       in
       let list = notes_links s in
       if list = ([], []) then ()
@@ -160,8 +168,17 @@ value compute base bdir =
       let fam = foi base (Adef.ifam_of_int i) in
       if not (is_deleted_family fam) then do {
         let s =
-          let sl = [get_comment; get_fsources] in
-          String.concat " " (List.map (fun f -> sou base (f fam)) sl)
+          let sl = 
+            [get_comment fam; get_fsources fam; 
+             get_marriage_note fam; get_marriage_src fam] 
+          in
+          let sl =
+            loop (get_fevents fam) sl where rec loop l accu =
+              match l with
+              [ [] -> accu
+              | [evt :: l] -> loop l [evt.efam_note; evt.efam_src :: accu]]
+          in
+          String.concat " " (List.map (sou base) sl)
         in
         let list = notes_links s in
         if list = ([], []) then ()

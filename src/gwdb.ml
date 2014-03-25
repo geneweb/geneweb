@@ -30,14 +30,17 @@ value no_person empty_string ip =
   {first_name = empty_string; surname = empty_string; occ = 0;
    image = empty_string; first_names_aliases = []; surnames_aliases = [];
    public_name = empty_string; qualifiers = []; titles = []; rparents = [];
-   related = []; aliases = []; occupation = empty_string; sex = Neuter;
+   related = []; aliases = [];
+   occupation = empty_string; sex = Neuter;
    access = Private; birth = Adef.codate_None; birth_place = empty_string;
-   birth_src = empty_string; baptism = Adef.codate_None;
-   baptism_place = empty_string; baptism_src = empty_string;
+   birth_note = empty_string; birth_src = empty_string;
+   baptism = Adef.codate_None; baptism_place = empty_string;
+   baptism_note = empty_string; baptism_src = empty_string;
    death = DontKnowIfDead; death_place = empty_string;
-   death_src = empty_string; burial = UnknownBurial;
-   burial_place = empty_string; burial_src = empty_string;
-   notes = empty_string; psources = empty_string; key_index = ip}
+   death_note = empty_string; death_src = empty_string; burial = UnknownBurial;
+   burial_place = empty_string; burial_note = empty_string;
+   burial_src = empty_string; pevents = []; notes = empty_string;
+   psources = empty_string; key_index = ip}
 ;
 value no_ascend = {parents = None; consang = Adef.no_consang};
 value no_union = {family = [| |]};
@@ -59,6 +62,8 @@ type istr_fun 'a =
 
 type relation = Def.gen_relation iper istr;
 type title = Def.gen_title istr;
+type pers_event = Def.gen_pers_event iper istr;
+type fam_event = Def.gen_fam_event iper istr;
 
 value eq_istr i1 i2 =
   match (i1, i2) with
@@ -217,15 +222,19 @@ type person_fun 'p 'a 'u =
     get_aliases : 'p -> list istr;
     get_baptism : 'p -> codate;
     get_baptism_place : 'p -> istr;
+    get_baptism_note : 'p -> istr;
     get_baptism_src : 'p -> istr;
     get_birth : 'p -> codate;
     get_birth_place : 'p -> istr;
+    get_birth_note : 'p -> istr;
     get_birth_src : 'p -> istr;
     get_burial : 'p -> Def.burial;
     get_burial_place : 'p -> istr;
+    get_burial_note : 'p -> istr;
     get_burial_src : 'p -> istr;
     get_death : 'p -> Def.death;
     get_death_place : 'p -> istr;
+    get_death_note : 'p -> istr;
     get_death_src : 'p -> istr;
     get_first_name : 'p -> istr;
     get_first_names_aliases : 'p -> list istr;
@@ -243,6 +252,7 @@ type person_fun 'p 'a 'u =
     get_surname : 'p -> istr;
     get_surnames_aliases : 'p -> list istr;
     get_titles : 'p -> list title;
+    get_pevents : 'p -> list pers_event;
     gen_person_of_person : 'p -> Def.gen_person iper istr;
     dsk_person_of_person : 'p -> Dbdisk.dsk_person;
     get_consang : 'a -> Adef.fix;
@@ -257,12 +267,16 @@ value person1_fun =
    get_aliases p = List.map (fun i -> Istr i) p.Def.aliases;
    get_baptism p = p.Def.baptism;
    get_baptism_place p = Istr p.Def.baptism_place;
+   get_baptism_note p = Istr p.Def.baptism_note;
    get_baptism_src p = Istr p.Def.baptism_src; get_birth p = p.Def.birth;
    get_birth_place p = Istr p.Def.birth_place;
-   get_birth_src p = Istr p.Def.birth_src; get_burial p = p.Def.burial;
-   get_burial_place p = Istr p.Def.burial_place;
+   get_birth_note p = Istr p.Def.birth_note;
+   get_birth_src p = Istr p.Def.birth_src;
+   get_burial p = p.Def.burial; get_burial_place p = Istr p.Def.burial_place;
+   get_burial_note p = Istr p.Def.burial_note;
    get_burial_src p = Istr p.Def.burial_src; get_death p = p.Def.death;
    get_death_place p = Istr p.Def.death_place;
+   get_death_note p = Istr p.Def.death_note;
    get_death_src p = Istr p.Def.death_src;
    get_first_name p = Istr p.Def.first_name;
    get_first_names_aliases p =
@@ -280,6 +294,10 @@ value person1_fun =
    get_surnames_aliases p = List.map (fun i -> Istr i) p.Def.surnames_aliases;
    get_titles p =
      List.map (fun t -> map_title_strings (fun i -> Istr i) t) p.Def.titles;
+   get_pevents p =
+     List.map
+       (fun t -> map_pers_event (fun x -> x) (fun i -> Istr i) t)
+       p.Def.pevents;
    gen_person_of_person p = map_person_ps (fun p -> p) (fun s -> Istr s) p;
    dsk_person_of_person p = p;
    get_consang a = a.Def.consang;
@@ -312,15 +330,19 @@ value person2_fun =
      get_baptism (db2, i) = get_field db2 i ("person", "baptism");
      get_baptism_place (db2, i) =
        make_istr2 db2 ("person", "baptism_place") i;
+     get_baptism_note (db2, i) = make_istr2 db2 ("person", "baptism_note") i;
      get_baptism_src (db2, i) = make_istr2 db2 ("person", "baptism_src") i;
      get_birth (db2, i) = get_field db2 i ("person", "birth");
      get_birth_place (db2, i) = make_istr2 db2 ("person", "birth_place") i;
+     get_birth_note (db2, i) = make_istr2 db2 ("person", "birth_note") i;
      get_birth_src (db2, i) = make_istr2 db2 ("person", "birth_src") i;
      get_burial (db2, i) = get_field db2 i ("person", "burial");
      get_burial_place (db2, i) = make_istr2 db2 ("person", "burial_place") i;
+     get_burial_note (db2, i) = make_istr2 db2 ("person", "burial_note") i;
      get_burial_src (db2, i) = make_istr2 db2 ("person", "burial_src") i;
      get_death (db2, i) = get_field db2 i ("person", "death");
      get_death_place (db2, i) = make_istr2 db2 ("person", "death_place") i;
+     get_death_note (db2, i) = make_istr2 db2 ("person", "death_note") i;
      get_death_src (db2, i) = make_istr2 db2 ("person", "death_src") i;
      get_first_name (db2, i) = make_istr2 db2 ("person", "first_name") i;
      get_first_names_aliases (db2, i) =
@@ -367,6 +389,15 @@ value person2_fun =
        List.map
          (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
          list;
+     get_pevents (db2, i) =
+       let pos = get_field_acc db2 i ("person", "pevents") in
+       if pos = -1 then []
+       else
+         let pevtl = get_field_data db2 pos ("person", "pevents") "data" in
+         List.map
+           (map_pers_event
+              (fun x -> x) (fun pos -> Istr2 db2 ("person", "pevents") pos))
+           pevtl;
      gen_person_of_person pp =
        {first_name = self.get_first_name pp; surname = self.get_surname pp;
         occ = self.get_occ pp; image = self.get_image pp;
@@ -378,14 +409,18 @@ value person2_fun =
         related = self.get_related pp; occupation = self.get_occupation pp;
         sex = self.get_sex pp; access = self.get_access pp;
         birth = self.get_birth pp; birth_place = self.get_birth_place pp;
-        birth_src = self.get_birth_src pp; baptism = self.get_baptism pp;
+        birth_note = self.get_birth_note pp; birth_src = self.get_birth_src pp;
+        baptism = self.get_baptism pp;
         baptism_place = self.get_baptism_place pp;
+        baptism_note = self.get_baptism_note pp;
         baptism_src = self.get_baptism_src pp; death = self.get_death pp;
         death_place = self.get_death_place pp;
-        death_src = self.get_death_src pp; burial = self.get_burial pp;
-        burial_place = self.get_burial_place pp;
-        burial_src = self.get_burial_src pp; notes = self.get_notes pp;
-        psources = self.get_psources pp; key_index = self.get_key_index pp};
+        death_note = self.get_death_note pp; death_src = self.get_death_src pp;
+        burial = self.get_burial pp; burial_place = self.get_burial_place pp;
+        burial_note = self.get_burial_note pp;
+        burial_src = self.get_burial_src pp; pevents = self.get_pevents pp;
+        notes = self.get_notes pp; psources = self.get_psources pp;
+        key_index = self.get_key_index pp};
      dsk_person_of_person p = failwith "not impl dsk_person_of_person";
      get_consang (db2, i) =
        match db2.consang_array with
@@ -412,15 +447,19 @@ value person2gen_fun =
    get_aliases (db2, i, p) = List.map (fun s -> Istr2New db2 s) p.Def.aliases;
    get_baptism (db2, i, p) = p.Def.baptism;
    get_baptism_place (db2, i, p) = Istr2New db2 p.Def.baptism_place;
+   get_baptism_note (db2, i, p) = Istr2New db2 p.Def.baptism_note;
    get_baptism_src (db2, i, p) = Istr2New db2 p.Def.baptism_src;
    get_birth (db2, i, p) = p.Def.birth;
    get_birth_place (db2, i, p) = Istr2New db2 p.Def.birth_place;
+   get_birth_note (db2, i, p) = Istr2New db2 p.Def.birth_note;
    get_birth_src (db2, i, p) = Istr2New db2 p.Def.birth_src;
    get_burial (db2, i, p) = p.Def.burial;
    get_burial_place (db2, i, p) = Istr2New db2 p.Def.burial_place;
+   get_burial_note (db2, i, p) = Istr2New db2 p.Def.burial_note;
    get_burial_src (db2, i, p) = Istr2New db2 p.Def.burial_src;
    get_death (db2, i, p) = p.Def.death;
    get_death_place (db2, i, p) = Istr2New db2 p.Def.death_place;
+   get_death_note (db2, i, p) = Istr2New db2 p.Def.death_note;
    get_death_src (db2, i, p) = Istr2New db2 p.Def.death_src;
    get_first_name (db2, i, p) = Istr2New db2 p.Def.first_name;
    get_first_names_aliases (db2, i, p) =
@@ -445,6 +484,11 @@ value person2gen_fun =
    get_titles (db2, i, p) =
      List.map (fun t -> map_title_strings (fun s -> Istr2New db2 s) t)
        p.Def.titles;
+   get_pevents (db2, i, p) =
+     List.map
+       (fun t ->
+          map_pers_event (fun x -> x) (fun s -> Istr2New db2 s) t)
+       p.Def.pevents;
    gen_person_of_person (db2, i, p) =
      map_person_ps (fun p -> p) (fun s -> Istr2New db2 s) p;
    dsk_person_of_person (db2, i, p) =
@@ -525,6 +569,10 @@ value get_baptism_place p =
   let f pf = pf.get_baptism_place in
   wrap_per f f f p
 ;
+value get_baptism_note p =
+  let f pf = pf.get_baptism_note in
+  wrap_per f f f p
+;
 value get_baptism_src p =
   let f pf = pf.get_baptism_src in
   wrap_per f f f p
@@ -535,6 +583,10 @@ value get_birth p =
 ;
 value get_birth_place p =
   let f pf = pf.get_birth_place in
+  wrap_per f f f p
+;
+value get_birth_note p =
+  let f pf = pf.get_birth_note in
   wrap_per f f f p
 ;
 value get_birth_src p =
@@ -549,6 +601,10 @@ value get_burial_place p =
   let f pf = pf.get_burial_place in
   wrap_per f f f p
 ;
+value get_burial_note p =
+  let f pf = pf.get_burial_note in
+  wrap_per f f f p
+;
 value get_burial_src p =
   let f pf = pf.get_burial_src in
   wrap_per f f f p
@@ -561,8 +617,16 @@ value get_death_place p =
   let f pf = pf.get_death_place in
   wrap_per f f f p
 ;
+value get_death_note p =
+  let f pf = pf.get_death_note in
+  wrap_per f f f p
+;
 value get_death_src p =
   let f pf = pf.get_death_src in
+  wrap_per f f f p
+;
+value get_pevents p =
+  let f pf = pf.get_pevents in
   wrap_per f f f p
 ;
 value get_first_name p =
@@ -682,8 +746,10 @@ type family_fun 'f 'c 'd =
   { get_comment : 'f -> istr;
     get_divorce : 'f -> Def.divorce;
     get_fsources : 'f -> istr;
+    get_fevents : 'f -> list fam_event;
     get_marriage : 'f -> codate;
     get_marriage_place : 'f -> istr;
+    get_marriage_note : 'f -> istr;
     get_marriage_src : 'f -> istr;
     get_origin_file : 'f -> istr;
     get_relation : 'f -> Def.relation_kind;
@@ -704,8 +770,13 @@ value family1_fun =
   {get_comment f = Istr f.Def.comment;
    get_divorce f = f.Def.divorce;
    get_fsources f = Istr f.Def.fsources;
+   get_fevents f =
+      List.map
+        (fun t -> map_fam_event (fun x -> x) (fun i -> Istr i) t)
+        f.Def.fevents;
    get_marriage f = f.Def.marriage;
    get_marriage_place f = Istr f.Def.marriage_place;
+   get_marriage_note f = Istr f.Def.marriage_note;
    get_marriage_src f = Istr f.Def.marriage_src;
    get_origin_file f = Istr f.Def.origin_file;
    get_relation f = f.Def.relation;
@@ -727,9 +798,19 @@ value family2_fun =
     {get_comment (db2, i) = make_istr2 db2 ("family", "comment") i;
      get_divorce (db2, i) = get_field db2 i ("family", "divorce");
      get_fsources (db2, i) = make_istr2 db2 ("family", "fsources") i;
+     get_fevents (db2, i) =
+       let pos = get_field_acc db2 i ("family", "fevents") in
+       if pos = -1 then []
+       else
+         let fevtl = get_field_data db2 pos ("family", "fevents") "data" in
+         List.map
+           (map_fam_event
+              (fun x -> x) (fun pos -> Istr2 db2 ("family", "fevents") pos))
+           fevtl;
      get_marriage (db2, i) = get_field db2 i ("family", "marriage");
      get_marriage_place (db2, i) =
        make_istr2 db2 ("family", "marriage_place") i;
+     get_marriage_note (db2, i) = make_istr2 db2 ("family", "marriage_note") i;
      get_marriage_src (db2, i) = make_istr2 db2 ("family", "marriage_src") i;
      get_origin_file (db2, i) = make_istr2 db2 ("family", "origin_file") i;
      get_relation (db2, i) = get_field db2 i ("family", "relation");
@@ -737,11 +818,12 @@ value family2_fun =
      gen_family_of_family ((db2, i) as f) =
        {marriage = self.get_marriage f;
         marriage_place = self.get_marriage_place f;
+        marriage_note = self.get_marriage_note f;
         marriage_src = self.get_marriage_src f;
         witnesses = self.get_witnesses f; relation = self.get_relation f;
-        divorce = self.get_divorce f; comment = self.get_comment f;
-        origin_file = self.get_origin_file f; fsources = self.get_fsources f;
-        fam_index = Adef.ifam_of_int i};
+        divorce = self.get_divorce f; fevents = self.get_fevents f;
+        comment = self.get_comment f;origin_file = self.get_origin_file f;
+        fsources = self.get_fsources f; fam_index = Adef.ifam_of_int i};
      is_deleted_family (db2, i) =
        let fath =
          match db2.father_array with
@@ -774,8 +856,14 @@ value family2gen_fun =
   {get_comment (db2, f) = Istr2New db2 f.Def.comment;
    get_divorce (db2, f) = f.Def.divorce;
    get_fsources (db2, f) = Istr2New db2 f.Def.fsources;
+   get_fevents (db2, f) =
+      List.map
+        (fun t ->
+           map_fam_event (fun x -> x) (fun s -> Istr2New db2 s) t)
+        f.Def.fevents;
    get_marriage (db2, f) = f.Def.marriage;
    get_marriage_place (db2, f) = Istr2New db2 f.Def.marriage_place;
+   get_marriage_note (db2, f) = Istr2New db2 f.Def.marriage_note;
    get_marriage_src (db2, f) = Istr2New db2 f.Def.marriage_src;
    get_origin_file (db2, f) = Istr2New db2 f.Def.origin_file;
    get_relation (db2, f) = f.Def.relation;
@@ -858,12 +946,20 @@ value get_fsources fam =
   let f pf = pf.get_fsources in
   wrap_fam f f f fam
 ;
+value get_fevents fam =
+  let f pf = pf.get_fevents in
+  wrap_fam f f f fam
+;
 value get_marriage fam =
   let f pf = pf.get_marriage in
   wrap_fam f f f fam
 ;
 value get_marriage_place fam =
   let f pf = pf.get_marriage_place in
+  wrap_fam f f f fam
+;
+value get_marriage_note fam =
+  let f pf = pf.get_marriage_note in
   wrap_fam f f f fam
 ;
 value get_marriage_src fam =
@@ -1008,7 +1104,8 @@ module C_base :
       let fam =
         let empty = self.insert_string "" in
         {marriage = Adef.codate_None; marriage_place = empty;
-         marriage_src = empty; relation = Married; divorce = NotDivorced;
+         marriage_note = empty; marriage_src = empty;
+         relation = Married; divorce = NotDivorced; fevents = [];
          witnesses = [| |]; comment = empty; origin_file = empty;
          fsources = empty; fam_index = Adef.ifam_of_int (-1)}
       in

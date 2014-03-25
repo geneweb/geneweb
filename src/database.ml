@@ -617,20 +617,19 @@ value phony_person =
    aliases = []; titles = []; rparents = []; related = [];
    occupation = 0; sex = Neuter; access = IfTitles;
    birth = Adef.codate_None; birth_place = 0;
-   birth_src = 0; baptism = Adef.codate_None;
-   baptism_place = 0; baptism_src = 0;
+   birth_note = 0; birth_src = 0; baptism = Adef.codate_None;
+   baptism_place = 0; baptism_note = 0; baptism_src = 0;
    death = DontKnowIfDead; death_place = 0;
-   death_src = 0; burial = UnknownBurial;
-   burial_place = 0; burial_src = 0;
-   notes = 0; psources = 0;
-   key_index = Adef.iper_of_int 0}
+   death_note = 0; death_src = 0; burial = UnknownBurial;
+   burial_place = 0; burial_note = 0; burial_src = 0; pevents = [];
+   notes = 0; psources = 0; key_index = Adef.iper_of_int 0}
 ;
 
 value phony_family =
-  {marriage = Adef.codate_None;
-   marriage_place = 0; marriage_src = 0;
+  {marriage = Adef.codate_None; marriage_place = 0;
+   marriage_note = 0; marriage_src = 0;
    witnesses = [| |]; relation = Married;
-   divorce = NotDivorced; comment = 0;
+   divorce = NotDivorced; fevents = []; comment = 0;
    origin_file = 0; fsources = 0;
    fam_index = Adef.ifam_of_int 0}
 ;
