@@ -758,19 +758,25 @@ let infer_surname conf base p =
 ;;
 
 
+type compute_death =
+  | Compute_dead
+  | Compute_not_dead
+  | Compute_dont_know_if_dead
+;;
+
 (* ************************************************************************ *)
-(*  [Fonc] is_infer_death : config -> base -> person -> bool                *)
-(** [Description] : Renvoie true si la personne est morte et false si on ne
-                    sait pas.
+(*  [Fonc] compute_infer_death : config -> base -> person -> compute_death  *)
+(** [Description] : Renvoie le status de la personne, i.e. si elle est
+                    morte, vivante ou ne sait pas.
     [Args] :
       - conf : configuration de la base
       - base : base de donnée
-      - person : la personne à partir de laquelle on calcul le nom
+      - person : la personne à partir de laquelle on calcul le décès
     [Retour] :
-      - bool : si le calcul dit qu'il est vivant ou décédé.
+      - compute_death
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-let is_infer_death conf base p =
+let compute_infer_death conf base p =
   let is_dead p =
     match get_death p with
     | Death (_, _) | DeadYoung | DeadDontKnowWhen -> true
@@ -781,17 +787,19 @@ let is_infer_death conf base p =
     (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p))
   with
   | (Some (Dgreg (dmy, _)), _) | (_, Some (Dgreg (dmy, _))) ->
-      if (CheckItem.time_elapsed dmy conf.today).year > 120 then true
-      else false
+      if (CheckItem.time_elapsed dmy conf.today).year > 120 then Compute_dead
+      else Compute_not_dead
   | _ ->
       let rec loop all_children_dead ifaml =
         match ifaml with
-        | [] -> all_children_dead
+        | [] ->
+            if all_children_dead then Compute_dead
+            else Compute_dont_know_if_dead
         | ifam :: l ->
             let fam = foi base ifam in
             let rec loop_c all_dead children =
               match children with
-              | [] -> if all_dead then true else loop false l
+              | [] -> if all_dead then Compute_dead else loop false l
               | ip :: ll ->
                   let child = poi base ip in
                   match
@@ -800,7 +808,7 @@ let is_infer_death conf base p =
                   with
                   | (Some (Dgreg (dmy, _)), _) | (_, Some (Dgreg (dmy, _))) ->
                       if (CheckItem.time_elapsed dmy conf.today).year > 120
-                      then true
+                      then Compute_dead
                       else loop_c (all_dead && is_dead child) ll
                   | _ -> loop_c (all_dead && is_dead child) ll
             in
@@ -1389,28 +1397,25 @@ let compute_add_family conf base p =
         event_perso = None;
       }
     in
-    if is_infer_death conf base p then
-      if get_sex p = Male then
-        begin
-          mother.Mwrite.Person.death_type <- `dont_know_if_dead;
-          mother.Mwrite.Person.pevents <-
-            mother.Mwrite.Person.pevents @ [death];
-        end
-      else
-        begin
-          father.Mwrite.Person.death_type <- `dont_know_if_dead;
-          father.Mwrite.Person.pevents <-
-            father.Mwrite.Person.pevents @ [death];
-        end
-    else
-      if get_sex p = Male then
-        begin
-          mother.Mwrite.Person.death_type <- `not_dead;
-        end
-      else
-        begin
-          father.Mwrite.Person.death_type <- `not_dead;
-        end
+    match compute_infer_death conf base p with
+    | Compute_dead | Compute_dont_know_if_dead ->
+        if get_sex p = Male then
+          begin
+            mother.Mwrite.Person.death_type <- `dont_know_if_dead;
+            mother.Mwrite.Person.pevents <-
+              mother.Mwrite.Person.pevents @ [death];
+          end
+        else
+          begin
+            father.Mwrite.Person.death_type <- `dont_know_if_dead;
+            father.Mwrite.Person.pevents <-
+              father.Mwrite.Person.pevents @ [death];
+          end
+    | Compute_not_dead ->
+        if get_sex p = Male then
+          mother.Mwrite.Person.death_type <- `not_dead
+        else
+          father.Mwrite.Person.death_type <- `not_dead
   in
   family
 ;;
@@ -1905,18 +1910,19 @@ let print_add_parents conf base =
         event_perso = None;
       }
     in
-    if is_infer_death conf base p then
-      begin
-        father.Mwrite.Person.death_type <- `dont_know_if_dead;
-        mother.Mwrite.Person.death_type <- `dont_know_if_dead;
-        father.Mwrite.Person.pevents <- father.Mwrite.Person.pevents @ [death];
-        mother.Mwrite.Person.pevents <- mother.Mwrite.Person.pevents @ [death];
-      end
-    else
-      begin
-        father.Mwrite.Person.death_type <- `not_dead;
-        mother.Mwrite.Person.death_type <- `not_dead;
-      end
+    match compute_infer_death conf base p with
+    | Compute_dead | Compute_dont_know_if_dead ->
+        begin
+          father.Mwrite.Person.death_type <- `dont_know_if_dead;
+          mother.Mwrite.Person.death_type <- `dont_know_if_dead;
+          father.Mwrite.Person.pevents <- father.Mwrite.Person.pevents @ [death];
+          mother.Mwrite.Person.pevents <- mother.Mwrite.Person.pevents @ [death];
+        end
+    | Compute_not_dead ->
+        begin
+          father.Mwrite.Person.death_type <- `not_dead;
+          mother.Mwrite.Person.death_type <- `not_dead;
+        end
   in
   (* On calcul le nom du père. *)
   let () =
@@ -2154,15 +2160,14 @@ let print_add_child conf base =
         event_perso = None;
       }
     in
-    if is_infer_death conf base p then
-      begin
-        child.Mwrite.Person.death_type <- `dont_know_if_dead;
-        child.Mwrite.Person.pevents <- child.Mwrite.Person.pevents @ [death];
-      end
-    else
-      begin
-        child.Mwrite.Person.death_type <- `not_dead;
-      end
+    match compute_infer_death conf base p with
+    | Compute_dead | Compute_dont_know_if_dead ->
+        begin
+          child.Mwrite.Person.death_type <- `dont_know_if_dead;
+          child.Mwrite.Person.pevents <- child.Mwrite.Person.pevents @ [death];
+        end
+    | Compute_not_dead ->
+        child.Mwrite.Person.death_type <- `not_dead
   in
   (* On prend le nom du père *)
   let child_surname = infer_surname conf base p in
@@ -2421,20 +2426,17 @@ let print_add_sibling conf base =
         event_perso = None;
       }
     in
-    let need_infer_death =
-      match father with
-      | Some father -> is_infer_death conf base father
-      | None -> false
-    in
-    if need_infer_death then
-      begin
-        sibling.Mwrite.Person.death_type <- `dont_know_if_dead;
-        sibling.Mwrite.Person.pevents <- sibling.Mwrite.Person.pevents @ [death];
-      end
-    else
-      begin
-        sibling.Mwrite.Person.death_type <- `not_dead;
-      end
+    match father with
+    | Some father ->
+        (match compute_infer_death conf base father with
+        | Compute_dead | Compute_dont_know_if_dead ->
+            begin
+              sibling.Mwrite.Person.death_type <- `dont_know_if_dead;
+              sibling.Mwrite.Person.pevents <- sibling.Mwrite.Person.pevents @ [death];
+            end
+        | Compute_not_dead -> ())
+    | None ->
+        sibling.Mwrite.Person.death_type <- `not_dead
   in
   (* On prend le nom du père *)
   let sibling_surname =
