@@ -106,19 +106,19 @@ value advanced_search conf base max_answers =
     match (d1, d2) with
     [ (Some d1, Some d2) ->
         match df () with
-        [ Some d when fast_auth_age conf p ->
+        [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
             if CheckItem.strictly_before d d1 then False
             else if CheckItem.strictly_before d2 d then False
             else True
         | _ -> False ]
     | (Some d1, _) ->
         match df () with
-        [ Some d when fast_auth_age conf p ->
+        [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
             if CheckItem.strictly_before d d1 then False else True
         | _ -> False ]
     | (_, Some d2) ->
         match df () with
-        [ Some d when fast_auth_age conf p ->
+        [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
             if CheckItem.strictly_after d d2 then False else True
         | _ -> False ]
     | _ -> True ]
@@ -152,7 +152,7 @@ value advanced_search conf base max_answers =
     [ (Some d1, Some d2) ->
         test_date_place
           (fun
-          [ Some d ->
+          [ Some (Dgreg _ _ as d) ->
               if CheckItem.strictly_before d d1 then False
               else if CheckItem.strictly_before d2 d then False
               else True
@@ -160,13 +160,13 @@ value advanced_search conf base max_answers =
     | (Some d1, _) ->
         test_date_place
           (fun
-          [ Some d when fast_auth_age conf p ->
+          [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
               if CheckItem.strictly_before d d1 then False else True
           | _ -> False ])
     | (_, Some d2) ->
         test_date_place
           (fun
-          [ Some d when fast_auth_age conf p ->
+          [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
               if CheckItem.strictly_after d d2 then False else True
           | _ -> False ])
     | _ ->
