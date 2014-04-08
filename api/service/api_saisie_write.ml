@@ -642,7 +642,18 @@ let infer_surname conf base p =
                     then (true, x)
                     else (false, "")
               in
-              if all_children_surname then name
+              if all_children_surname then
+                (* On fait une recherche métaphone. *)
+                let (primary_surname, secondary_surname) =
+                  Metaphone.double_metaphone surname
+                in
+                let (primary_name, secondary_name) =
+                  Metaphone.double_metaphone name
+                in
+                if primary_surname = primary_name ||
+                   secondary_surname = secondary_name
+                then surname
+                else ""
               else ""
             end
           else
@@ -740,7 +751,18 @@ let infer_surname conf base p =
                     if List.for_all (fun n -> Name.crush_lower n = x_crush) l then (true, x)
                     else (false, "")
               in
-              if all_children_surname then name
+              if all_children_surname then
+                (* On fait une recherche métaphone. *)
+                let (primary_surname, secondary_surname) =
+                  Metaphone.double_metaphone surname
+                in
+                let (primary_name, secondary_name) =
+                  Metaphone.double_metaphone name
+                in
+                if primary_surname = primary_name ||
+                   secondary_surname = secondary_name
+                then surname
+                else ""
               else ""
             end
           else
