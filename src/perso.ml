@@ -351,7 +351,16 @@ value find_sosa_aux conf base a p t_sosa =
         } ]
   in
   let rec find zil =
-    match gene_find zil with
+    match
+      (* Dans le cas ou le fichier tstab n'est plus à jour, on supprime *)
+      (* le fichier pour qu'il se régénère la prochaine fois.           *)
+      try gene_find zil with
+      [ Invalid_argument "index out of bounds" ->
+          do {
+            Update.delete_topological_sort conf base;
+            Left []
+          } ]
+    with
     [ Left [] ->
         let _ =
           List.iter
