@@ -1615,27 +1615,34 @@ let full_synchro conf base synchro timestamp =
   (match !last_import with
   | Some last_mod ->
       let bname = Util.base_path [] bdir in
-      let synchro = Database.input_synchro bname in
+      let new_synchro = Database.input_synchro bname in
       let list =
         List.fold_right
           (fun (ts, ipl, ifaml) accu ->
             if (float_of_string ts < last_mod) then accu
             else (ts, ipl, ifaml) :: accu)
-          synchro.synch_list []
+          new_synchro.synch_list []
       in
-      let synchro = {synch_list = list} in
-      let tmp_fname = Filename.concat bname "1synchro_patches" in
-      let fname = Filename.concat bname "synchro_patches" in
-      let oc9 =
-        try Secure.open_out_bin tmp_fname
-        with Sys_error _ ->
-          raise (Adef.Request_failure "the database is not writable")
-      in
-      Mutil.output_value_no_sharing oc9 (synchro : Database.synchro_patch);
-      close_out oc9;
-      Mutil.remove_file (fname ^ "~");
-      (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
-      (try Sys.rename tmp_fname fname with Sys_error _ -> ());
+      let new_synchro = {synch_list = list} in
+      (* Si on a rien modifier, ça ne sert à rien de faire la mise à *)
+      (* jour du fichier synchro, parce qu'on modifie la date de     *)
+      (* dernière modification pour rien.                            *)
+      if synchro = new_synchro then ()
+      else
+        begin
+          let tmp_fname = Filename.concat bname "1synchro_patches" in
+          let fname = Filename.concat bname "synchro_patches" in
+          let oc9 =
+            try Secure.open_out_bin tmp_fname
+            with Sys_error _ ->
+              raise (Adef.Request_failure "the database is not writable")
+          in
+          Mutil.output_value_no_sharing oc9 (synchro : Database.synchro_patch);
+          close_out oc9;
+          Mutil.remove_file (fname ^ "~");
+          (try Sys.rename fname (fname ^ "~") with Sys_error _ -> ());
+          (try Sys.rename tmp_fname fname with Sys_error _ -> ());
+        end
   | _ -> ());
   (* Si timestamp plus petit que import, alors synchro totale. *)
   match !last_import with
