@@ -3,9 +3,19 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
-open Hutil;
-open Util;
 
+(* ************************************************************************** *)
+(*  [Fonc] content : bool -> string -> int -> string -> unit                  *)
+(** [Description] : Envoie les en-têtes de contenu et de cache pour une image
+                    sur le flux HTTP sortant de Wserver.
+    [Args] :
+      - cgi : True en mode CGI, False en serveur autonome
+      - t : le type MIME de l'image, par exemple "png", "jpeg" ou "gif"
+      - len : la taille en octet de l'image
+      - fname : le nom du fichier image
+    [Retour] : aucun
+    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+(* ************************************************************************** *)
 value content cgi t len fname =
   do {
     if not cgi then Wserver.http "" else ();
@@ -16,11 +26,26 @@ value content cgi t len fname =
     Wserver.wprint "Content-disposition: inline; filename=%s"
       (Filename.basename fname);
     Util.nl ();
+    (* TODO: Utiliser un cache public pour les images non personelles. *)
+    Wserver.wprint "Cache-control: private, max-age=%d" (60 * 60 * 24 * 30);
+    Util.nl ();
     Util.nl ();
     Wserver.wflush ();
   }
 ;
 
+(* ************************************************************************** *)
+(*  [Fonc] print_image_type : bool -> string -> string -> bool                *)
+(** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
+                    utilisant Wserver.
+    [Args] :
+      - cgi : True en mode CGI, False en serveur autonome
+      - fname : le chemin vers le fichier image
+      - itype : le type MIME de l'image, par exemple "png", "jpeg" ou "gif"
+    [Retour] : True si le fichier image existe et qu'il a été servi en réponse
+               HTTP.
+    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+(* ************************************************************************** *)
 value print_image_type cgi fname itype =
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -44,6 +69,9 @@ value print_image_type cgi fname itype =
   | None -> False ]
 ;
 
+(* ************************************************************************** *)
+(*  [Fonc] print_image_file : bool -> string -> bool                          *)
+(* ************************************************************************** *)
 value print_image_file cgi fname =
   List.exists
     (fun (suff, itype) ->
@@ -54,42 +82,68 @@ value print_image_file cgi fname =
     [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg"); (".gif", "gif")]
 ;
 
+(* ************************************************************************** *)
+(*  [Fonc] print_personal_image : Config.config -> Gwdb.base -> Gwdb.person -> unit *)
+(** [Description] : Affiche l'image d'une personne en réponse HTTP.
+    [Args] :
+      - conf : configuration de la requête
+      - base : base de donnée sélectionnée
+      - p : personne dans la base dont il faut afficher l'image
+    [Retour] : aucun
+    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+(* ************************************************************************** *)
 value print_personal_image conf base p =
-  match image_and_size conf base p (fun x y -> Some (1, 1)) with
+  match Util.image_and_size conf base p (fun x y -> Some (1, 1)) with
   [ Some (True, f, _) ->
-      if print_image_file conf.cgi f then () else incorrect_request conf
-  | _ -> incorrect_request conf ]
+      if print_image_file conf.cgi f then () else Hutil.incorrect_request conf
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
+(* ************************************************************************** *)
+(*  [Fonc] print_source_image : Config.config -> string -> unit               *)
+(** [Description] : Affiche une image à partir de son basename uniquement en
+                    la cherchant dans les dossiers d'images.
+    [Args] :
+      - config : configuration de la requête
+      - f : basename de l'image
+    [Retour] : aucun
+    [Rem] : Ne pas utiliser en dehors de ce module.                           *)
+(* ************************************************************************** *)
 value print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
   if fname = Filename.basename fname then
-    let fname = source_image_file_name conf.bname fname in
-    if print_image_file conf.cgi fname then () else incorrect_request conf
-  else incorrect_request conf
+    let fname = Util.source_image_file_name conf.bname fname in
+    if print_image_file conf.cgi fname then () else Hutil.incorrect_request conf
+  else Hutil.incorrect_request conf
 ;
 
+(* ************************************************************************** *)
+(*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
+(* ************************************************************************** *)
 value print conf base =
-  match p_getenv conf.env "s" with
+  match Util.p_getenv conf.env "s" with
   [ Some f -> print_source_image conf f
   | None ->
-      match find_person_in_env conf base "" with
+      match Util.find_person_in_env conf base "" with
       [ Some p -> print_personal_image conf base p
-      | _ -> incorrect_request conf ] ]
+      | _ -> Hutil.incorrect_request conf ] ]
 ;
 
+(* ************************************************************************** *)
+(*  [Fonc] print_html : config -> 'a -> unit                                  *)
+(* ************************************************************************** *)
 value print_html conf base =
   do {
     Util.html conf;
-    nl ();
+    Util.nl ();
     Wserver.wprint "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
     Wserver.wprint "<head>\n";
     Wserver.wprint "  <title>%s</title>\n"
       (Util.transl_nth conf "image/images" 0);
     Wserver.wprint "</head>\n<body>\n";
-    Wserver.wprint "<img src=\"%s" (commd conf);
+    Wserver.wprint "<img src=\"%s" (Util.commd conf);
     Mutil.list_iter_first
       (fun first (k, v) ->
          let v = if k = "m" then "IM" else v in
