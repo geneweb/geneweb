@@ -2,11 +2,6 @@
 (* $Id: wiki.ml,v 5.31 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config;
-open Hutil;
-open Printf;
-open Util;
-
 (* TLSW: Text Language Stolen to Wikipedia
    = title level 1 =
    == title level 2 ==
@@ -53,10 +48,10 @@ value section_level s len =
 
 value notes_aliases conf =
   let fname =
-    match p_getenv conf.base_env "notes_alias_file" with
+    match Util.p_getenv conf.Config.base_env "notes_alias_file" with
     [ Some f -> Util.base_path [] f
     | None ->
-        Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
+        Filename.concat (Util.base_path [] (conf.Config.bname ^ ".gwb"))
           "notes.alias" ]
   in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
@@ -120,7 +115,7 @@ value syntax_links conf wi s =
     then
       loop quot_lev pos (i + 2) (Buff.store len s.[i+1])
     else if s.[i] = '%' && i < slen - 1 && s.[i+1] = '/' then
-      loop quot_lev pos (i + 2) (Buff.mstore len conf.xhs)
+      loop quot_lev pos (i + 2) (Buff.mstore len conf.Config.xhs)
     else if s.[i] = '{' then
       let (b, j) =
         loop 0 (i + 1) where rec loop len j =
@@ -130,7 +125,7 @@ value syntax_links conf wi s =
           else if s.[j] = '}' then (Buff2.get len, j + 1)
           else loop (Buff2.store len s.[j]) (j + 1)
       in
-      let s = sprintf "<span class=\"highlight\">%s</span>" b in
+      let s = Printf.sprintf "<span class=\"highlight\">%s</span>" b in
       loop quot_lev pos j (Buff.mstore len s)
 (*
 interesting idea, but perhaps dangerous (risk of hidden messages and
@@ -178,25 +173,28 @@ use of database forum by ill-intentioned people to communicate)...
           let t =
             if wi.wi_cancel_links then text
             else
-              sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
-                (commd conf) wi.wi_mode fname anchor c text
+              Printf.sprintf "<a href=\"%sm=%s;f=%s%s\"%s>%s</a>"
+                (Util.commd conf) wi.wi_mode fname anchor c text
           in
           loop quot_lev pos j (Buff.mstore len t)
       | NotesLinks.WLperson j (fn, sn, oc) name _ ->
           let t =
             if wi.wi_cancel_links then name
             else if wi.wi_person_exists (fn, sn, oc) then
-              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
-                pos (commd conf) (code_varenv fn) (code_varenv sn)
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\">%s</a>"
+                pos (Util.commd conf) (Util.code_varenv fn)
+                (Util.code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) name
             else if wi.wi_always_show_link then
               let s = " style=\"color:red\"" in
-              sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
-                pos (commd conf) (code_varenv fn) (code_varenv sn)
+              Printf.sprintf "<a id=\"p_%d\" href=\"%sp=%s;n=%s%s\"%s>%s</a>"
+                pos (Util.commd conf) (Util.code_varenv fn)
+                (Util.code_varenv sn)
                 (if oc = 0 then "" else ";oc=" ^ string_of_int oc) s name
             else
-              sprintf "<a href=\"%s\" style=\"color:red\">%s</a>" (commd conf)
-                (if conf.hide_names then "x x" else name)
+              Printf.sprintf "<a href=\"%s\" style=\"color:red\">%s</a>"
+                (Util.commd conf)
+                (if conf.Config.hide_names then "x x" else name)
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLwizard j wiz name ->
@@ -204,8 +202,8 @@ use of database forum by ill-intentioned people to communicate)...
             let s = if name <> "" then name else wiz in
             if wi.wi_cancel_links then s
             else
-              sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>" (commd conf) wiz
-                s
+              Printf.sprintf "<a href=\"%sm=WIZNOTES;f=%s\">%s</a>"
+                (Util.commd conf) wiz s
           in
           loop quot_lev (pos + 1) j (Buff.mstore len t)
       | NotesLinks.WLnone ->
@@ -235,7 +233,7 @@ value adjust_ul_level rev_lines old_lev new_lev =
       else loop [tab lev "</ul></li>" :: rev_lines] (lev - 1)
 ;
 
-value message_txt conf i = transl_nth conf "visualize/show/hide/summary" i;
+value message_txt conf i = Util.transl_nth conf "visualize/show/hide/summary" i;
 
 value sections_nums_of_tlsw_lines lines =
   let (lev, _, cnt, rev_sections_nums) =
@@ -316,7 +314,7 @@ value summary_of_tlsw_lines conf short lines =
           in
           let summary =
             let s =
-              sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
+              Printf.sprintf "<a href=\"#a_%d\">%s%s</a>" cnt
               (if short then "" else section_num ^ " - ")
                 (Gutil.strip_spaces (String.sub s slev (len - 2 * slev)))
             in
@@ -342,9 +340,9 @@ value summary_of_tlsw_lines conf short lines =
     let lines =
       ["<dl><dd>";
        "<table id=\"summary\" cellpadding=\"10\">";
-       "<tr><td align=\"" ^ conf.left ^ "\">";
+       "<tr><td align=\"" ^ conf.Config.left ^ "\">";
        "<div style=\"text-align:center\"><b>" ^
-          capitale (message_txt conf 3) ^ "</b>";
+          Util.capitale (message_txt conf 3) ^ "</b>";
        "<script type=\"text/javascript\">";
        "//<![CDATA[";
        "showTocToggle()";
@@ -368,16 +366,18 @@ value summary_of_tlsw_lines conf short lines =
 value string_of_modify_link conf cnt empty =
   fun
   [ Some (can_edit, mode, sfn) ->
-      if conf.wizard then
+      if conf.Config.wizard then
         let mode_pref = if can_edit then "MOD" else "VIEW" in
-        sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
+        Printf.sprintf "%s(<a href=\"%sm=%s_%s;v=%d%s\">%s</a>)%s\n"
           (if empty then "<p>"
            else
-             sprintf "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">"
-               conf.right conf.left)
-          (commd conf) mode_pref mode cnt (if sfn = "" then "" else ";f=" ^ sfn)
-          (if can_edit then transl_decline conf "modify" ""
-           else transl conf "view source")
+             Printf.sprintf
+               "<div style=\"font-size:80%%;float:%s;margin-%s:3em\">"
+               conf.Config.right conf.Config.left)
+          (Util.commd conf) mode_pref mode cnt
+          (if sfn = "" then "" else ";f=" ^ sfn)
+          (if can_edit then Util.transl_decline conf "modify" ""
+           else Util.transl conf "view source")
           (if empty then "</p>" else "</div>")
       else ""
   | None -> "" ]
@@ -527,12 +527,12 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
                if slev <= 3 then " class=\"subtitle\""
                else ""
              in
-             sprintf "<h%d%s>%s%s</h%d>" slev style section_num
+             Printf.sprintf "<h%d%s>%s%s</h%d>" slev style section_num
                (String.sub s slev (len-2*slev)) slev
             in
             let list =
               if wlo <> None then
-                let s = sprintf "<p><a id=\"a_%d\"></a></p>" cnt in
+                let s = Printf.sprintf "<p><a id=\"a_%d\"></a></p>" cnt in
                 [s:: list]
               else list
             in
@@ -556,7 +556,7 @@ and select_list_lines conf prompt list =
             fun
             [ [""; s :: sl]
               when String.length s > 1 && s.[0] = prompt && s.[1] = prompt ->
-                let br = "<br" ^ conf.xhs ^ ">" in
+                let br = "<br" ^ conf.Config.xhs ^ ">" in
                 loop (s1 ^ br ^ br) [s :: sl]
             | [s :: sl] ->
                 if String.length s > 0 && s.[0] = '=' then (s1, [s :: sl])
@@ -607,7 +607,7 @@ value html_with_summary_of_tlsw conf wi edit_opt s =
   in
   if lines_before_summary <> [] || lines = [] then
     let s2 = string_of_modify_link conf 0 (s = "") edit_opt in
-    s2 ^ "<p><br" ^ conf.xhs ^ "></p>\n" ^ s
+    s2 ^ "<p><br" ^ conf.Config.xhs ^ "></p>\n" ^ s
   else s
 ;
 
@@ -636,16 +636,18 @@ value extract_sub_part s v = List.rev (rev_extract_sub_part s v);
 value print_sub_part_links conf edit_mode sfn cnt0 is_empty =
   tag "p" begin
     if cnt0 >= first_cnt then
-      stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 - 1)
+      stagn "a" "href=\"%sm=%s%s;v=%d\""
+        (Util.commd conf) edit_mode sfn (cnt0 - 1)
       begin
         Wserver.wprint "&lt;&lt;";
       end
     else ();
-    stagn "a" "href=\"%sm=%s%s\"" (commd conf) edit_mode sfn begin
+    stagn "a" "href=\"%sm=%s%s\"" (Util.commd conf) edit_mode sfn begin
       Wserver.wprint "^^";
     end;
     if not is_empty then
-      stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 + 1)
+      stagn "a" "href=\"%sm=%s%s;v=%d\""
+        (Util.commd conf) edit_mode sfn (cnt0 + 1)
       begin
         Wserver.wprint "&gt;&gt;";
       end
@@ -658,7 +660,7 @@ value print_sub_part_text conf wi edit_opt cnt0 lines =
     List.map
       (fun
        [ "__TOC__" | "__SHORT_TOC__" ->
-           sprintf "<p>...%s...</p>" (message_txt conf 3)
+           Printf.sprintf "<p>...%s...</p>" (message_txt conf 3)
        | "__NOTOC__" -> ""
        | s -> s ])
       lines
@@ -691,7 +693,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
   in
   let mode_pref = if can_edit then "MOD_" else "VIEW_" in
   let (has_v, v) =
-    match p_getint conf.env "v" with
+    match Util.p_getint conf.Config.env "v" with
     [ Some v -> (True, v)
     | None -> (False, 0) ]
   in
@@ -699,14 +701,14 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
     if not has_v then s else String.concat "\n" (extract_sub_part s v)
   in
   let is_empty = sub_part = "" in
-  let sfn = if fname = "" then "" else ";f=" ^ code_varenv fname in
-  header conf title;
+  let sfn = if fname = "" then "" else ";f=" ^ Util.code_varenv fname in
+  Hutil.header conf title;
   if can_edit then
-    tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\"" conf.right
-      conf.left
+    tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\""
+      conf.Config.right conf.Config.left
     begin
       Wserver.wprint "(";
-      stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
+      stag "a" "href=\"%sm=%s%s%s\"" (Util.commd conf) mode
         (if has_v then ";v=" ^ string_of_int v else "") sfn
       begin
         Wserver.wprint "%s" (message_txt conf 0);
@@ -714,11 +716,11 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
       Wserver.wprint ")\n";
     end
   else ();
-  print_link_to_welcome conf (if can_edit then False else True);
+  Hutil.print_link_to_welcome conf (if can_edit then False else True);
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
   else ();
-  tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+  tag "form" "method=\"post\" action=\"%s\"" conf.Config.command begin
     tag "p" begin
       Util.hidden_env conf;
       if can_edit then
@@ -734,7 +736,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
         let digest = Iovalue.digest s in
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest
       else ();
-      begin_centered conf;
+      Util.begin_centered conf;
       tag "table" "border=\"1\"" begin
         tag "tr" begin
           tag "td" begin
@@ -752,7 +754,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
                   stag "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"%s"
                     (if can_edit then "" else " readonly=\"readonly\"")
                   begin
-                    Wserver.wprint "%s" (quote_escaped sub_part);
+                    Wserver.wprint "%s" (Util.quote_escaped sub_part);
                   end;
                 end;
               end;
@@ -773,10 +775,10 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
           end;
         end;
       end;
-      end_centered conf;
+      Util.end_centered conf;
     end;
   end;
-  trailer conf;
+  Hutil.trailer conf;
 };
 
 value insert_sub_part s v sub_part =
@@ -878,7 +880,7 @@ value print_ok conf wi edit_mode fname title_is_1st s =
       Wserver.wprint " ---\n";
     end;
     Hutil.print_link_to_welcome conf True;
-    let get_v = Util.p_getint conf.env "v" in
+    let get_v = Util.p_getint conf.Config.env "v" in
     let v =
       match get_v with
       [ Some v -> v
@@ -899,14 +901,14 @@ value print_ok conf wi edit_mode fname title_is_1st s =
         [title :: lines]
       else lines
     in
-    print_sub_part conf wi conf.wizard edit_mode fname v lines;
+    print_sub_part conf wi conf.Config.wizard edit_mode fname v lines;
     Hutil.trailer conf
   }
 ;
 
 value print_mod_ok conf wi edit_mode fname read_string commit string_filter
     title_is_1st =
-  let fname = fname (Util.p_getenv conf.env "f") in
+  let fname = fname (Util.p_getenv conf.Config.env "f") in
   try
     match edit_mode fname with
     [ Some edit_mode ->
@@ -915,19 +917,19 @@ value print_mod_ok conf wi edit_mode fname read_string commit string_filter
           List.fold_left (fun s (k, v) -> s ^ k ^ "=" ^ v ^ "\n") "" e ^ s
         in
         let sub_part =
-          match Util.p_getenv conf.env "notes" with
+          match Util.p_getenv conf.Config.env "notes" with
           [ Some v -> Mutil.strip_all_trailing_spaces v
           | None -> failwith "notes unbound" ]
         in
         let digest =
-          match Util.p_getenv conf.env "digest" with
+          match Util.p_getenv conf.Config.env "digest" with
           [ Some s -> s
           | None -> "" ]
         in
         if digest <> Iovalue.digest old_string then Update.error_digest conf
         else
           let s =
-            match Util.p_getint conf.env "v" with
+            match Util.p_getint conf.Config.env "v" with
             [ Some v -> insert_sub_part old_string v sub_part
             | None -> sub_part ]
           in
