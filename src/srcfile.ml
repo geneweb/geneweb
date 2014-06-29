@@ -625,18 +625,17 @@ value print_start conf base =
 
 (* code déplacé et modifié pour gérer advanced.txt *)
 value print conf base fname =
-  match fname with
-  [ "advanced" -> do {
-      Wserver.wrap_string.val := Util.xml_pretty_print;
-      Hutil.interp conf base "advanced"
-        {Templ.eval_var = eval_var conf base;
-         Templ.eval_transl env = Templ.eval_transl conf;
-         Templ.eval_predefined_apply = eval_predefined_apply conf;
-         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-         Templ.print_foreach = fun []}
-        [] ()
-    }
-  | _ -> gen_print True Lang conf base fname ]
+  if Sys.file_exists (Util.etc_file_name conf fname) then do {
+    Wserver.wrap_string.val := Util.xml_pretty_print;
+    Hutil.interp conf base "advanced"
+      {Templ.eval_var = eval_var conf base;
+       Templ.eval_transl env = Templ.eval_transl conf;
+       Templ.eval_predefined_apply = eval_predefined_apply conf;
+       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+       Templ.print_foreach = fun []}
+      [] ()
+  }
+  else gen_print True Lang conf base fname
 ;
 
 (* lexicon (info) *)

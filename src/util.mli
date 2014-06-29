@@ -18,6 +18,8 @@ value find_misc_file : string -> string;
 value search_in_lang_path : string -> string;
 value search_in_doc_path : string -> string;
 
+value etc_file_name : config -> string -> string;
+
 value escache_value : base -> string;
 value commit_patches : config -> base -> unit;
 value update_wf_trace : config -> string -> unit;
@@ -63,10 +65,10 @@ value is_restricted : config -> base -> iper -> bool;
 value is_hidden : person -> bool;
 
 value pget : config -> base -> iper -> person;
-value string_gen_person : 
+value string_gen_person :
   base -> gen_person iper istr -> gen_person iper string
 ;
-value string_gen_family : 
+value string_gen_family :
   base -> gen_family iper istr -> gen_family iper string
 ;
 
@@ -175,7 +177,7 @@ value find_person_in_env : config -> base -> string -> option person;
 (* Recherche le sosa uniquement dans le fichier gwf *)
 value default_sosa_ref : config -> base -> option person;
 value find_sosa_ref : config -> base -> option person;
-value update_gwf_sosa : 
+value update_gwf_sosa :
   config -> base -> (iper * (string * string * int)) -> unit;
 
 value quote_escaped : string -> string;
