@@ -54,7 +54,7 @@ value tag_alone loc tag a =
     List.fold_left (fun f e -> <:expr< $f$ $e$ >>)
       <:expr< Wserver.wprint $str:"<" ^ tag ^ frm ^ "%s>" ^ s$ >> al
   in
-  <:expr< $e$ conf.xhs >>
+  <:expr< $e$ conf.Config.xhs >>
 ;
 
 EXTEND

@@ -2,28 +2,23 @@
 (* $Id: wiznotes.ml,v 5.54 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config;
-open Def;
-open Hutil;
-open Util;
-
 value dir conf base =
-  Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
+  Filename.concat (Util.base_path [] (conf.Config.bname ^ ".gwb"))
     (Gwdb.base_wiznotes_dir base)
 ;
 
 value wzfile wddir wz = Filename.concat wddir (wz ^ ".txt");
 
 value read_auth_file fname =
-  let data = read_gen_auth_file fname in
+  let data = Util.read_gen_auth_file fname in
   List.map
     (fun au ->
        let wizname =
          try
-           let k = String.index au.au_info ':' in
-           String.sub au.au_info 0 k
+           let k = String.index au.Util.au_info ':' in
+           String.sub au.Util.au_info 0 k
          with
-         [ Not_found -> au.au_user ]
+         [ Not_found -> au.Util.au_user ]
        in
        let (wizname, wizorder, islash) =
          try
@@ -35,7 +30,7 @@ value read_auth_file fname =
          with
          [ Not_found -> (wizname, wizname, 0) ]
        in
-       (au.au_user, (wizname, (wizorder, islash))))
+       (au.Util.au_user, (wizname, (wizorder, islash))))
     data
 ;
 
@@ -99,13 +94,13 @@ value print_wizards_by_alphabetic_order conf list =
   let wprint_elem (wz, (wname, (_, islash)), wfile, stm) = do {
     let tm = Unix.localtime stm in
     let with_link =
-      conf.wizard && conf.user = wz || wfile <> "" ||
-      conf.manitou
+      conf.Config.wizard && conf.Config.user = wz || wfile <> "" ||
+      conf.Config.manitou
     in
     if with_link then
       Wserver.wprint
         "<a href=\"%sm=WIZNOTES;f=%s%t\">"
-        (commd conf) (Util.code_varenv wz)
+        (Util.commd conf) (Util.code_varenv wz)
         (fun _ ->
            Printf.sprintf
             ";d=%d-%02d-%02d,%02d:%02d:%02d"
@@ -135,7 +130,7 @@ value print_wizards_by_alphabetic_order conf list =
   }
   in
   let order (_, (_, (ord, _)), _, _) = ord in
-  wprint_in_columns conf order wprint_elem list
+  Util.wprint_in_columns conf order wprint_elem list
 ;
 
 value print_wizards_by_date conf list = do {
@@ -143,11 +138,11 @@ value print_wizards_by_date conf list = do {
     [(fun tm -> tm.Unix.tm_mon,
       fun tm ->
         let dmy =
-          {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1;
-           day = 0; prec = Sure; delta = 0}
+          {Def.year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1;
+           day = 0; prec = Def.Sure; delta = 0}
         in
-        Wserver.wprint "%s"
-          (capitale (Date.string_of_ondate conf (Dgreg dmy Dgregorian))));
+        Wserver.wprint "%s" (Util.capitale
+          (Date.string_of_ondate conf (Def.Dgreg dmy Def.Dgregorian))));
      (fun tm -> tm.Unix.tm_year,
       fun tm -> Wserver.wprint "%d" (tm.Unix.tm_year + 1900))]
   in
@@ -194,9 +189,9 @@ value print_wizards_by_date conf list = do {
          Wserver.wprint "%s%t"
            (if prev = None || new_item then "" else ",\n")
            (fun _ ->
-              if conf.wizard && conf.user = wz || wfile <> "" then
+              if conf.Config.wizard && conf.Config.user = wz || wfile <> "" then
                 Printf.sprintf "<a href=\"%sm=WIZNOTES;f=%s%t\">%s</a>"
-                  (commd conf) (Util.code_varenv wz)
+                  (Util.commd conf) (Util.code_varenv wz)
                   (fun _ ->
                      Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
@@ -217,13 +212,13 @@ value print_old_wizards conf list =
   else do {
     tag "dl" begin
       tag "dd" "style=\"list-style-type:circle\"" begin
-        Wserver.wprint "%s..." (transl_nth conf "and" 0);
+        Wserver.wprint "%s..." (Util.transl_nth conf "and" 0);
         tag "dl" begin
           tag "dd" begin
             Mutil.list_iter_first
               (fun first wz -> do {
                  if not first then Wserver.wprint ",\n" else ();
-                 stag "a" "href=\"%sm=WIZNOTES;f=%s\"" (commd conf)
+                 stag "a" "href=\"%sm=WIZNOTES;f=%s\"" (Util.commd conf)
                    (Util.code_varenv wz)
                  begin
                    for i = 0 to String.length wz - 1 do {
@@ -259,16 +254,16 @@ value wizard_list_from_dir conf base =
 value print_search_form conf from_wiz =
   tag "table" begin
     tag "tr" begin
-      tag "td" "align=\"%s\"" conf.right begin
-        tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+      tag "td" "align=\"%s\"" conf.Config.right begin
+        tag "form" "method=\"get\" action=\"%s\"" conf.Config.command begin
           tag "p" begin
-            hidden_env conf;
+            Util.hidden_env conf;
             xtag "input"
               "type=\"hidden\" name=\"m\" value=\"WIZNOTES_SEARCH\"";
             xtag "input"
               "name=\"s\" size=\"30\" maxlength=\"40\" value=\"%s\""
-              (match p_getenv conf.env "s" with
-               [ Some s -> quote_escaped s
+              (match Util.p_getenv conf.Config.env "s" with
+               [ Some s -> Util.quote_escaped s
                | None -> "" ]);
             if from_wiz <> "" then
               xtag "input" "type=\"hidden\" name=\"z\" value=\"%s\"" from_wiz
@@ -276,14 +271,14 @@ value print_search_form conf from_wiz =
             xtag "br";
             tag "label" begin
               xtag "input" "type=\"checkbox\" name=\"c\" value=\"on\"%s"
-                (match p_getenv conf.env "c" with
+                (match Util.p_getenv conf.Config.env "c" with
                  [ Some "on" -> " checked=\"checked\""
                  | Some _ | None -> "" ]);
               Wserver.wprint "%s\n"
-                (transl_nth conf "search/case sensitive" 1);
+                (Util.transl_nth conf "search/case sensitive" 1);
             end;
             xtag "input" "type=\"submit\" value=\"%s\""
-              (capitale (transl_nth conf "search/case sensitive" 0));
+              (Util.capitale (Util.transl_nth conf "search/case sensitive" 0));
           end;
         end;
       end;
@@ -294,13 +289,13 @@ value print_search_form conf from_wiz =
 value print_main conf base auth_file =
   let wiztxt =
     Util.translate_eval
-      (transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
+      (Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
   in
   let title _ =
-    Wserver.wprint "%s - %s" (capitale wiztxt)
-      (Util.translate_eval (transl_nth conf "note/notes" 1))
+    Wserver.wprint "%s - %s" (Util.capitale wiztxt)
+      (Util.translate_eval (Util.transl_nth conf "note/notes" 1))
   in
-  let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
+  let by_alphab_order = Util.p_getenv conf.Config.env "o" <> Some "H" in
   let wizdata =
     let list = read_auth_file auth_file in
     if by_alphab_order then
@@ -313,7 +308,7 @@ value print_main conf base auth_file =
   let wddir = dir conf base in
   do {
     Hutil.header_no_page_title conf title; (* mouais... *)
-    print_link_to_welcome conf True;
+    Hutil.print_link_to_welcome conf True;
     Wserver.wprint "<h1>";
     title False;
     Wserver.wprint "</h1>\n";
@@ -330,13 +325,14 @@ value print_main conf base auth_file =
     in
     if by_alphab_order then do {
       tag "p" begin
-        Wserver.wprint "%d %s<br%s>\n" (List.length wizdata) wiztxt conf.xhs;
+        Wserver.wprint "%d %s<br%s>\n"
+          (List.length wizdata) wiztxt conf.Config.xhs;
         Wserver.wprint "<em style=\"font-size:80%%\">\n";
-        Wserver.wprint "%s " (capitale (transl conf "click"));
-        Wserver.wprint "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (commd conf)
-          (transl conf "here");
+        Wserver.wprint "%s " (Util.capitale (Util.transl conf "click"));
+        Wserver.wprint "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (Util.commd conf)
+          (Util.transl conf "here");
         Wserver.wprint "%s"
-          (transl conf
+          (Util.transl conf
              "for the list ordered by the date of the last modification");
         Wserver.wprint ".</em>\n";
       end;
@@ -353,7 +349,7 @@ value print_main conf base auth_file =
       print_search_form conf "";
     }
     else ();
-    trailer conf
+    Hutil.trailer conf
   }
 ;
 
@@ -368,12 +364,13 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
     [ Not_found -> wz ]
   in
   let edit_opt =
-    let can_edit = conf.wizard && conf.user = wz || conf.manitou in
-    Some (can_edit, "WIZNOTES", code_varenv wz)
+    let can_edit =
+      conf.Config.wizard && conf.Config.user = wz || conf.Config.manitou in
+    Some (can_edit, "WIZNOTES", Util.code_varenv wz)
   in
   let title = wizard_page_title conf wz wizname in
-  header_no_page_title conf title;
-  print_link_to_welcome conf True;
+  Hutil.header_no_page_title conf title;
+  Hutil.print_link_to_welcome conf True;
   Wserver.wprint "<h1>";
   title False;
   Wserver.wprint "</h1>\n";
@@ -383,62 +380,64 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
   tag "table" "border=\"0\" width=\"100%%\"" begin
     tag "tr" begin
       tag "td" begin
-        let s = string_with_macros conf [] s in
+        let s = Util.string_with_macros conf [] s in
         let s =
           let wi =
             {Wiki.wi_mode = "NOTES";
-             Wiki.wi_cancel_links = conf.cancel_links;
+             Wiki.wi_cancel_links = conf.Config.cancel_links;
              Wiki.wi_file_path = Notes.file_path conf base;
-             Wiki.wi_person_exists = person_exists conf base;
-             Wiki.wi_always_show_link = conf.wizard || conf.friend}
+             Wiki.wi_person_exists = Util.person_exists conf base;
+             Wiki.wi_always_show_link =
+               conf.Config.wizard || conf.Config.friend}
           in
           Wiki.html_with_summary_of_tlsw conf wi edit_opt s
         in
         let s =
           match ho with
-          [ Some (case_sens, h) -> html_highlight case_sens h s
+          [ Some (case_sens, h) -> Util.html_highlight case_sens h s
           | None -> s ]
         in
         Wserver.wprint "%s\n"
-          (if conf.pure_xhtml then Util.check_xhtml s else s);
+          (if conf.Config.pure_xhtml then Util.check_xhtml s else s);
       end;
     end;
   end;
   if Sys.file_exists wfile then do {
     let tm = Unix.localtime date in
     let dmy =
-      {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
-       year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
+      {Def.day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
+       year = 1900 + tm.Unix.tm_year; prec = Def.Sure; delta = 0}
     in
     tag "p" begin
       Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n"
-        (Date.string_of_ondate conf (Dgreg dmy Dgregorian))
+        (Date.string_of_ondate conf (Def.Dgreg dmy Def.Dgregorian))
         tm.Unix.tm_hour tm.Unix.tm_min;
     end
   }
   else ();
-  match p_getenv conf.env "m" with
+  match Util.p_getenv conf.Config.env "m" with
   [ Some "WIZNOTES_SEARCH" -> print_search_form conf wz
   | Some _ | None -> () ];
-  trailer conf
+  Hutil.trailer conf
 };
 
 value print_part_wiznote conf base wz s cnt0 =
   let title = wz in
   do {
     Hutil.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
-    let s = string_with_macros conf [] s in
+    let s = Util.string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
     let file_path = Notes.file_path conf base in
-    let can_edit = conf.wizard && conf.user = wz || conf.manitou in
+    let can_edit =
+      conf.Config.wizard && conf.Config.user = wz || conf.Config.manitou in
     let wi =
-      {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+      {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.Config.cancel_links;
        Wiki.wi_file_path = file_path;
-       Wiki.wi_person_exists = person_exists conf base;
-       Wiki.wi_always_show_link = conf.wizard || conf.friend}
+       Wiki.wi_person_exists = Util.person_exists conf base;
+       Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend}
     in
-    Wiki.print_sub_part conf wi can_edit "WIZNOTES" (code_varenv wz) cnt0
+    Wiki.print_sub_part conf wi can_edit "WIZNOTES" (Util.code_varenv wz) cnt0
       lines;
     Hutil.trailer conf;
   }
@@ -446,8 +445,8 @@ value print_part_wiznote conf base wz s cnt0 =
 
 value wizard_auth_file_name conf =
   match
-    (p_getenv conf.base_env "wizard_descr_file",
-     p_getenv conf.base_env "wizard_passwd_file")
+    (Util.p_getenv conf.Config.base_env "wizard_descr_file",
+     Util.p_getenv conf.Config.base_env "wizard_passwd_file")
   with
   [ (Some "" | None, Some "" | None) -> ""
   | (Some auth_file, _) -> auth_file
@@ -456,12 +455,12 @@ value wizard_auth_file_name conf =
 
 value print conf base =
   let auth_file = wizard_auth_file_name conf in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
     let f =
       (* backward compatibility *)
-      match p_getenv conf.env "f" with
-      [ None -> p_getenv conf.env "v"
+      match Util.p_getenv conf.Config.env "f" with
+      [ None -> Util.p_getenv conf.Config.env "v"
       | x -> x ]
     in
     match f with
@@ -469,7 +468,7 @@ value print conf base =
         let wz = Filename.basename wz in
         let wfile = wzfile (dir conf base) wz in
         let (s, date) = read_wizard_notes wfile in
-        match p_getint conf.env "v" with
+        match Util.p_getint conf.Config.env "v" with
         [ Some cnt0 -> print_part_wiznote conf base wz s cnt0
         | None ->
             print_whole_wiznote conf base auth_file wz wfile (s, date) None ]
@@ -479,48 +478,49 @@ value print conf base =
 value print_mod conf base =
   let auth_file =
     match
-      (p_getenv conf.base_env "wizard_descr_file",
-       p_getenv conf.base_env "wizard_passwd_file")
+      (Util.p_getenv conf.Config.base_env "wizard_descr_file",
+       Util.p_getenv conf.Config.base_env "wizard_passwd_file")
     with
     [ (Some "" | None, Some "" | None) -> ""
     | (Some auth_file, _) -> auth_file
     | (_, Some auth_file) -> auth_file ]
   in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
-    match p_getenv conf.env "f" with
+    match Util.p_getenv conf.Config.env "f" with
     [ Some wz ->
         let wz = Filename.basename wz in
-        let can_edit = conf.wizard && conf.user = wz || conf.manitou in
+        let can_edit =
+          conf.Config.wizard && conf.Config.user = wz || conf.Config.manitou in
         if can_edit then
           let title = wizard_page_title conf wz wz in
           let wfile = wzfile (dir conf base) wz in
           let (s, _) = read_wizard_notes wfile in
           Wiki.print_mod_view_page conf True "WIZNOTES" wz title [] s
-        else incorrect_request conf
-    | None -> incorrect_request conf ]
+        else Hutil.incorrect_request conf
+    | None -> Hutil.incorrect_request conf ]
 ;
 
 value print_view conf base =
   let auth_file =
     match
-      (p_getenv conf.base_env "wizard_descr_file",
-       p_getenv conf.base_env "wizard_passwd_file")
+      (Util.p_getenv conf.Config.base_env "wizard_descr_file",
+       Util.p_getenv conf.Config.base_env "wizard_passwd_file")
     with
     [ (Some "" | None, Some "" | None) -> ""
     | (Some auth_file, _) -> auth_file
     | (_, Some auth_file) -> auth_file ]
   in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
-    match p_getenv conf.env "f" with
+    match Util.p_getenv conf.Config.env "f" with
     [ Some wz ->
         let wz = Filename.basename wz in
         let title = wizard_page_title conf wz wz in
         let wfile = wzfile (dir conf base) wz in
         let (s, _) = read_wizard_notes wfile in
         Wiki.print_mod_view_page conf False "WIZNOTES" wz title [] s
-    | None -> incorrect_request conf ]
+    | None -> Hutil.incorrect_request conf ]
 ;
 
 value commit_wiznotes conf base wz s =
@@ -537,14 +537,14 @@ value commit_wiznotes conf base wz s =
 value print_mod_ok conf base =
   let auth_file =
     match
-      (p_getenv conf.base_env "wizard_descr_file",
-       p_getenv conf.base_env "wizard_passwd_file")
+      (Util.p_getenv conf.Config.base_env "wizard_descr_file",
+       Util.p_getenv conf.Config.base_env "wizard_passwd_file")
     with
     [ (Some "" | None, Some "" | None) -> ""
     | (Some auth_file, _) -> auth_file
     | (_, Some auth_file) -> auth_file ]
   in
-  if auth_file = "" then incorrect_request conf
+  if auth_file = "" then Hutil.incorrect_request conf
   else
     let fname =
       fun
@@ -552,7 +552,8 @@ value print_mod_ok conf base =
       | None -> "nobody" ]
     in
     let edit_mode wz =
-      if conf.wizard && conf.user = wz || conf.manitou then Some "WIZNOTES"
+      if conf.Config.wizard && conf.Config.user = wz || conf.Config.manitou
+      then Some "WIZNOTES"
       else None
     in
     let mode = "NOTES" in
@@ -560,13 +561,13 @@ value print_mod_ok conf base =
       ([], fst (read_wizard_notes (wzfile (dir conf base) wz)))
     in
     let commit = commit_wiznotes conf base in
-    let string_filter = string_with_macros conf [] in
+    let string_filter = Util.string_with_macros conf [] in
     let file_path = Notes.file_path conf base in
     let wi =
-      {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.cancel_links;
+      {Wiki.wi_mode = mode; Wiki.wi_cancel_links = conf.Config.cancel_links;
        Wiki.wi_file_path = file_path;
-       Wiki.wi_person_exists = person_exists conf base;
-       Wiki.wi_always_show_link = conf.wizard || conf.friend}
+       Wiki.wi_person_exists = Util.person_exists conf base;
+       Wiki.wi_always_show_link = conf.Config.wizard || conf.Config.friend}
     in
     Wiki.print_mod_ok conf wi edit_mode fname read_string commit string_filter
       False
@@ -588,7 +589,7 @@ value print_connected_wizard conf first wddir wz tm_user = do {
   let tm = Unix.localtime stm in
   if wfile <> "" then
     stag "a" "href=\"%sm=WIZNOTES;f=%s%t\""
-      (commd conf) (Util.code_varenv wz)
+      (Util.commd conf) (Util.code_varenv wz)
       (fun _ ->
          Printf.sprintf ";d=%d-%02d-%02d,%02d:%02d:%02d"
            (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
@@ -600,18 +601,18 @@ value print_connected_wizard conf first wddir wz tm_user = do {
   else Wserver.wprint "%s" wz;
   Wserver.wprint " ";
   stag "a" "href=\"%sm=HIST;k=20;wiz=%s\" style=\"text-decoration:none\""
-    (commd conf) (Util.code_varenv wz)
+    (Util.commd conf) (Util.code_varenv wz)
   begin
     Wserver.wprint "(*)";
   end;
-  let d = conf.ctime -. tm_user in
+  let d = conf.Config.ctime -. tm_user in
   if d = 0.0 then ()
   else do {
     Wserver.wprint " - %.0f s" d;
     if first then do {
       Wserver.wprint " ";
       stag "span" "style=\"font-size:80%%\"" begin
-        Wserver.wprint "(%s)" (transl conf "since the last click");
+        Wserver.wprint "(%s)" (Util.transl conf "since the last click");
       end;
     }
     else ();
@@ -620,41 +621,44 @@ value print_connected_wizard conf first wddir wz tm_user = do {
 
 value do_connected_wizards conf base (_, _, _, wl) = do {
   let title _ =
-    Wserver.wprint "%s"
-      (capitale (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
+    Wserver.wprint "%s" (Util.capitale
+      (Util.transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
   in
-  header conf title;
-  print_link_to_welcome conf True;
+  Hutil.header conf title;
+  Hutil.print_link_to_welcome conf True;
   let wddir = dir conf base in
   let denying = wizard_denying wddir in
   let wl =
-    if not (List.mem_assoc conf.user wl) then [(conf.user, conf.ctime) :: wl]
+    if not (List.mem_assoc conf.Config.user wl)
+    then [(conf.Config.user, conf.Config.ctime) :: wl]
     else wl
   in
   let wl = List.sort (fun (_, tm1) (_, tm2) -> compare tm1 tm2) wl in
-  let is_visible = not (List.mem conf.user denying) in
+  let is_visible = not (List.mem conf.Config.user denying) in
   tag "ul" begin
     let (not_everybody, _) =
       List.fold_left
         (fun (not_everybody, first) (wz, tm_user) ->
-           if wz <> conf.user && List.mem wz denying && not conf.manitou
+           if wz <> conf.Config.user && List.mem wz denying &&
+             not conf.Config.manitou
            then (True, first)
            else do {
              tag "li" "style=\"list-style-type:%s\""
-               (if wz = conf.user && not is_visible ||
-                   conf.manitou && List.mem wz denying
+               (if wz = conf.Config.user && not is_visible ||
+                   conf.Config.manitou && List.mem wz denying
                 then "circle"
                 else "disc")
              begin
                print_connected_wizard conf first wddir wz tm_user;
-               if wz = conf.user then do {
+               if wz = conf.Config.user then do {
                  Wserver.wprint " :\n%s;"
-                   (transl_nth conf "you are visible/you are not visible"
+                   (Util.transl_nth conf "you are visible/you are not visible"
                       (if is_visible then 0 else 1));
-                 Wserver.wprint " %s %s%s%s %s" (transl conf "click")
+                 Wserver.wprint " %s %s%s%s %s" (Util.transl conf "click")
                    (Printf.sprintf "<a href=\"%sm=CHANGE_WIZ_VIS;v=%d\">"
-                      (commd conf) (if is_visible then 0 else 1))
-                   (transl conf "here") "</a>" (transl conf "to change");
+                      (Util.commd conf) (if is_visible then 0 else 1))
+                   (Util.transl conf "here") "</a>"
+                   (Util.transl conf "to change");
                  Wserver.wprint ".";
                }
                else ();
@@ -666,19 +670,19 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
     in
     if not_everybody then tag "li" begin Wserver.wprint "..."; end else ();
   end;
-  trailer conf;
+  Hutil.trailer conf;
 };
 
 value connected_wizards conf base =
-  match conf.n_connect with
+  match conf.Config.n_connect with
   [ Some x -> do_connected_wizards conf base x
-  | None -> incorrect_request conf ]
+  | None -> Hutil.incorrect_request conf ]
 ;
 
 value do_change_wizard_visibility conf base x set_vis = do {
   let wddir = dir conf base in
   let denying = wizard_denying wddir in
-  let is_visible = not (List.mem conf.user denying) in
+  let is_visible = not (List.mem conf.Config.user denying) in
   if not set_vis && not is_visible || set_vis && is_visible then ()
   else do {
     let tmp_file = Filename.concat wddir "1connected.deny" in
@@ -686,14 +690,14 @@ value do_change_wizard_visibility conf base x set_vis = do {
     let found =
       List.fold_left
         (fun found wz ->
-           if wz = conf.user && set_vis then True
+           if wz = conf.Config.user && set_vis then True
            else do {
              Printf.fprintf oc "%s\n" wz;
              found
            })
         False denying
     in
-    if not found && not set_vis then Printf.fprintf oc "%s\n" conf.user
+    if not found && not set_vis then Printf.fprintf oc "%s\n" conf.Config.user
     else ();
     close_out oc;
     let file = Filename.concat wddir "connected.deny" in
@@ -704,20 +708,20 @@ value do_change_wizard_visibility conf base x set_vis = do {
 };
 
 value change_wizard_visibility conf base =
-  match (conf.n_connect, p_getint conf.env "v") with
+  match (conf.Config.n_connect, Util.p_getint conf.Config.env "v") with
   [ (Some x, Some vis) -> do_change_wizard_visibility conf base x (vis <> 0)
-  | _ -> incorrect_request conf ]
+  | _ -> Hutil.incorrect_request conf ]
 ;
 
 (* searching *)
 
 value search_text conf base s =
   let s = if s = "" then " " else s in
-  let case_sens = p_getenv conf.env "c" = Some "on" in
+  let case_sens = Util.p_getenv conf.Config.env "c" = Some "on" in
   let list =
     let list = wizard_list_from_dir conf base in
     let list = List.sort compare list in
-    match p_getenv conf.env "z" with
+    match Util.p_getenv conf.Config.env "z" with
     [ Some "" | None -> list
     | Some wz ->
         loop list where rec loop =
@@ -733,7 +737,7 @@ value search_text conf base s =
           let wz = Filename.basename wz in
           let wfile = wzfile (dir conf base) wz in
           let (nt, dt) = read_wizard_notes wfile in
-          if in_text case_sens s nt then Some (wz, wfile, nt, dt)
+          if Util.in_text case_sens s nt then Some (wz, wfile, nt, dt)
           else loop list ]
   in
   match wizo with
@@ -745,7 +749,10 @@ value search_text conf base s =
 ;
 
 value print_search conf base =
-  match try Some (List.assoc "s" conf.env) with [ Not_found -> None ] with
+  match
+    try Some (List.assoc "s" conf.Config.env)
+    with [ Not_found -> None ]
+  with
   [ Some s -> search_text conf base (Wserver.gen_decode False s)
   | None -> print conf base ]
 ;
