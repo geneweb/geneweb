@@ -627,7 +627,7 @@ value print_start conf base =
 value print conf base fname =
   if Sys.file_exists (Util.etc_file_name conf fname) then do {
     Wserver.wrap_string.val := Util.xml_pretty_print;
-    Hutil.interp conf base "advanced"
+    Hutil.interp conf base fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl env = Templ.eval_transl conf;
        Templ.eval_predefined_apply = eval_predefined_apply conf;
