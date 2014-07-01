@@ -34,6 +34,8 @@ value print_base_warning oc base =
   [ BigAgeBetweenSpouses fath moth a ->
       fprintf oc "The difference of age between %s and %s is quite important: %d\n"
         (designation base fath) (designation base moth) a.year
+  | BaptismAfterDeath p ->
+      fprintf oc "%s\n  baptized after his/her death\n" (designation base p)
   | BirthAfterDeath p ->
       fprintf oc "%s\n  born after his/her death\n" (designation base p)
   | ChangedOrderOfChildren ifam des _ _ ->

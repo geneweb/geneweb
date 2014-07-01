@@ -168,10 +168,16 @@ value date_of_death =
 ;
 
 value birth_before_death base warning p =
-  match (Adef.od_of_codate (get_birth p), get_death p) with
-  [ (Some d1, Death _ d2) ->
+  match
+    (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
+     get_death p)
+  with
+  [ (Some d1, _, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
       if strictly_after d1 d2 then warning (BirthAfterDeath p) else ()
+  | (_, Some d1, Death _ d2) ->
+      let d2 = Adef.date_of_cdate d2 in
+      if strictly_after d1 d2 then warning (BaptismAfterDeath p) else ()
   | _ -> () ]
 ;
 

@@ -386,6 +386,33 @@ sk: %t už má rodičov
 sl: %t že ima starše
 sv: %t har redan föräldrar
 
+    %t died before his/her baptism
+af: %t is dood voor sy/haar doop
+bg: %t умира преди кръщение си
+br: %t zo marv a-raok e c'h badeziant
+ca: %t va morir abans del seu bateig
+cs: %t zemřel před svým křest/zemřela před svým křest
+da: %t er døde før dåb
+de: %t ist vor der Taufe gestorben
+en: %t died before his/her baptism
+eo: %t mortis antaù sia bapto
+es: %t ha muerto antes de su bautismo
+et: %t suri enne oma ristimine
+fi: %t on kuollut ennen kaste
+fr: %t est mort(e) avant sa baptême
+he: %t מת לפני הולדתו/הולדתה
+is: %t lést áður en hann/hún skírn
+it: %t sarebbe morto prima della sua battesimo
+lv: %t miris pirms viņš/viņa baptisms
+nl: %t zou dood zijn voor zijn/haar doop
+no: %t døde før sin dåp
+pl: %t zmarł przed swymi chrzest/zmarła przed swymi chrzest
+pt: %t morreu antes de baptismo
+ro: %t a murit inaninte de botez
+ru: %t умер перед его/ее крещение
+sl: %t je umrl pred svojim krst/umrla pred svojim krst
+sv: %t dog före sin egen dop
+
     %t died before his/her birth
 af: %t is dood voor sy/haar geboorte
 bg: %t умира преди раждането си

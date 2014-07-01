@@ -237,6 +237,11 @@ value print_warning conf base =
           (fun _ -> print_someone_strong conf base moth);
         Wserver.wprint ": %s" (Date.string_of_age conf a)
       }
+  | BaptismAfterDeath p ->
+      Wserver.wprint (ftransl conf "%t died before his/her baptism")
+        (fun _ ->
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
   | BirthAfterDeath p ->
       Wserver.wprint (ftransl conf "%t died before his/her birth")
         (fun _ ->

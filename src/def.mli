@@ -146,6 +146,7 @@ type error 'person =
 
 type warning 'person 'descend 'title =
   [ BigAgeBetweenSpouses of 'person and 'person and dmy
+  | BaptismAfterDeath of 'person
   | BirthAfterDeath of 'person
   | IncoherentSex of 'person and int and int
   | ChangedOrderOfChildren of ifam and 'descend and array iper and array iper
