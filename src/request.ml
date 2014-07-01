@@ -146,7 +146,7 @@ value name_with_roman_number str =
       | c -> loop found (Buff.store len c) (i + 1) ]
 ;
 
-value find_all conf base an exact =
+value find_all conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
   let sosa_nb = try Some (Num.of_string an) with [ Failure _ -> None ] in
   match (sosa_ref, sosa_nb) with
@@ -175,42 +175,40 @@ value find_all conf base an exact =
           in
           (pl, False)
       | None ->
-          if exact then ([], False)
-          else
-            let ipl = person_not_a_key_find_all base an in
-            let (an, ipl) =
-              if ipl = [] then
-                match name_with_roman_number an with
-                [ Some an1 ->
-                    let ipl = person_ht_find_all base an1 in
-                    if ipl = [] then (an, []) else (an1, ipl)
-                | None -> (an, ipl) ]
-              else (an, ipl)
-            in
-            let pl =
-              List.fold_left
-                (fun l ip ->
-                   let p = pget conf base ip in
-                   if is_hidden p then l else [p :: l])
-              [] ipl
-            in
-            let spl = select_std_eq conf base pl an in
-            let pl =
-              if spl = [] then
-                if pl = [] then try_find_with_one_first_name conf base an else pl
-              else spl
-            in
-            let pl =
-              if not conf.wizard && not conf.friend then
-                List.fold_right
-                  (fun p pl ->
-                     if not (is_hide_names conf p) || Util.fast_auth_age conf p
-                     then [p :: pl]
-                     else pl)
-                  pl []
-              else pl
-            in
-            (compact_list conf base pl, False) ] ]
+          let ipl = person_not_a_key_find_all base an in
+          let (an, ipl) =
+            if ipl = [] then
+              match name_with_roman_number an with
+              [ Some an1 ->
+                  let ipl = person_ht_find_all base an1 in
+                  if ipl = [] then (an, []) else (an1, ipl)
+              | None -> (an, ipl) ]
+            else (an, ipl)
+          in
+          let pl =
+            List.fold_left
+              (fun l ip ->
+                 let p = pget conf base ip in
+                 if is_hidden p then l else [p :: l])
+            [] ipl
+          in
+          let spl = select_std_eq conf base pl an in
+          let pl =
+            if spl = [] then
+              if pl = [] then try_find_with_one_first_name conf base an else pl
+            else spl
+          in
+          let pl =
+            if not conf.wizard && not conf.friend then
+              List.fold_right
+                (fun p pl ->
+                   if not (is_hide_names conf p) || Util.fast_auth_age conf p
+                   then [p :: pl]
+                   else pl)
+                pl []
+            else pl
+          in
+          (compact_list conf base pl, False) ] ]
 ;
 
 value specify conf base n pl =
@@ -552,7 +550,7 @@ value family_m conf base =
           in
           (* Recherche par clé, sosa, alias ... *)
           let search n =
-            let (pl, sosa_acc) = find_all conf base n False in
+            let (pl, sosa_acc) = find_all conf base n in
             match pl with
             [ [] ->
                 (* S'il n'y a pas de résultat, on recherche par nom. *)
@@ -626,8 +624,8 @@ value family_m conf base =
         | None -> None ]
       in
       (* Recherche par clé, sosa, alias ... *)
-      let search n exact =
-        let (pl, sosa_acc) = find_all conf base n exact in
+      let search n =
+        let (pl, sosa_acc) = find_all conf base n in
         match pl with
         [ [] ->
             (* S'il n'y a pas de résultat, on recherche par nom. *)
@@ -640,18 +638,31 @@ value family_m conf base =
                Gutil.person_of_string_key base n <> None ||
                person_is_std_key conf base p n
             then
-              person_selected conf base p
+              (* On vérifie que c'est une "vraie" clé. *)
+              if Name.lower (p_surname base p) <> "" &&
+                 Name.lower (p_first_name base p) <> ""
+              then
+                person_selected conf base p
+              else do {
+                conf.cancel_links := False;
+                Some.surname_print conf base unknown n
+              }
             else specify conf base n pl
-        | pl -> specify conf base n pl ]
+        | pl ->
+            if real_input "p" = None then do {
+              conf.cancel_links := False;
+              Some.surname_print conf base unknown n
+            }
+            else specify conf base n pl ]
       in
       match (real_input "p", real_input "n") with
-      [ (Some fn, Some sn) -> search (fn ^ " " ^ sn) False
+      [ (Some fn, Some sn) -> search (fn ^ " " ^ sn)
       | (Some fn, None) ->
           do {
             conf.cancel_links := False;
             Some.first_name_print conf base fn
           }
-      | (None, Some sn) -> search sn True
+      | (None, Some sn) -> search sn
       | (None, None) -> incorrect_request conf ]
   | Some "SND_IMAGE" when conf.wizard && conf.can_send_image ->
       SendImage.print conf base
