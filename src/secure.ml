@@ -66,7 +66,7 @@ value check_open fname =
         | [] ->
             if Filename.is_relative fname then
               if List.mem Filename.parent_dir_name df then raise Exit
-              else ()  
+              else ()
             else raise Exit ]
     }
   with

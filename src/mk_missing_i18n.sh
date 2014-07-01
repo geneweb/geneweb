@@ -94,7 +94,7 @@ value check first lang =
               flush stderr
             }
             else ()
-          } 
+          }
         else ()
       }
     with

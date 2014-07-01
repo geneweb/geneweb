@@ -126,7 +126,7 @@ value speclist =
    ("-mem", Arg.Unit (fun () -> ()), " (obsolete option)");
    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
    ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.");
-   ("-nopicture", Arg.Set Gwcomp.no_picture, " do not create associative pictures"); 
+   ("-nopicture", Arg.Set Gwcomp.no_picture, " do not create associative pictures");
    ("-q", Arg.Clear Mutil.verbose, " no verbose");
    ("-v", Arg.Set Mutil.verbose, " verbose")]
 ;
@@ -153,7 +153,7 @@ and [options] are:"
 
 (* ******************************************************************** *)
 (*  [Fonc] main : unit -> unit                                          *)
-(** [Description] : Fonction principale de création d'une base au 
+(** [Description] : Fonction principale de création d'une base au
                     format gwb2.
     [Args] : Néant.
     [Retour] : Néant.

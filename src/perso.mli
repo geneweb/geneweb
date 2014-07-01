@@ -7,16 +7,16 @@ open Config;
 value string_of_titles : config -> base -> bool -> string -> person -> string;
 value string_of_marriage_text : config -> base -> family -> string;
 value interp_templ : string -> config -> base -> person -> unit;
-value interp_templ_with_menu : 
+value interp_templ_with_menu :
   (bool -> unit) -> string -> config -> base -> person -> unit;
-value interp_notempl_with_menu : 
+value interp_notempl_with_menu :
   (bool -> unit) -> string -> config -> base -> person -> unit;
 
 value print : config -> base -> person -> unit;
 value print_ascend : config -> base -> person -> unit;
 value print_what_links : config -> base -> person -> unit;
 
-value build_sosa_ht : config -> base -> unit; 
+value build_sosa_ht : config -> base -> unit;
 value get_sosa_person : config -> base -> person -> Num.t;
 value get_single_sosa : config -> base -> person -> Num.t;
 value print_sosa : config -> base -> person -> bool -> unit;

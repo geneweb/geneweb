@@ -145,7 +145,7 @@ value main_page conf base =
           print_cand_ind conf base (ip, p) excl ip1 ip2
       | Perso.DupFam ifam1 ifam2 ->
           print_cand_fam conf base (ip, p) excl ifam1 ifam2
-      | Perso.NoDup -> 
+      | Perso.NoDup ->
           print_no_candidate conf base (ip, p) ]
  | None ->
       incorrect_request conf ]

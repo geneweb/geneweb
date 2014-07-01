@@ -203,7 +203,7 @@ value propose_months conf mode =
   do {
     begin_centered conf;
     stag "span" begin
-      Wserver.wprint "%s" 
+      Wserver.wprint "%s"
         (capitale (transl conf "select a month to see all the anniversaries"));
     end;
     tag "table" "border=\"%d\"" conf.border begin

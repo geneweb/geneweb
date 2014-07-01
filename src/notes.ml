@@ -72,7 +72,7 @@ value print_whole_notes conf base fnotes title s ho = do {
         Wserver.wprint "(%s)" (transl conf "linked pages");
       end
     else ()
-  in      
+  in
   gen_print_link_to_welcome what_links_page conf True;
   tag "p" begin
     xtag "br";

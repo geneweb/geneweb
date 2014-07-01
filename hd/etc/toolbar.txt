@@ -12,12 +12,12 @@ function insertTags (tagOpen, tagClose, sampleText) {
     if(theSelection.charAt(theSelection.length - 1) == " "){// exclude ending space char, if any
       theSelection = theSelection.substring(0, theSelection.length - 1);
       document.selection.createRange().text = tagOpen + theSelection + tagClose + " ";
-    } 
+    }
     else {
       document.selection.createRange().text = tagOpen + theSelection + tagClose;
     }
   }
-  else 
+  else
     if(t.selectionStart || t.selectionStart == '0') {
       var replaced = false;
       var startPos = t.selectionStart;
@@ -28,7 +28,7 @@ function insertTags (tagOpen, tagClose, sampleText) {
       if(!myText) { myText=sampleText;}
       if(myText.charAt(myText.length - 1) == " "){ // exclude ending space char, if any
         subst = tagOpen + myText.substring(0, (myText.length - 1)) + tagClose + " ";
-      } 
+      }
       else {
         subst = tagOpen + myText + tagClose;
       }

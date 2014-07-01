@@ -6,20 +6,20 @@
 # Output all birthdays near a day or whole month
 #
 # Quick hack for GeneWeb linux users
-#   by Falko Trojahn 
+#   by Falko Trojahn
 #
-# Needed programs:  bash lynx grep 
+# Needed programs:  bash lynx grep
 #
 #
 # Arguments:       without args, give us the birthdays from the localhost
 #                   GeneWeb Database (PLEASE change GWBASE according to your
 #                   database dir)
 #	     month  as argument number one, get all anniversaries for this month
-#	     $1    if there is an argument 1, this is the geneweb host we use, 
+#	     $1    if there is an argument 1, this is the geneweb host we use,
 #                   e.g. localhost:2317/base (optional)
-#            $2    if there is an argument 2, it is the number of the month, 
+#            $2    if there is an argument 2, it is the number of the month,
 #		    e. g. 12 for december    (optional)
-# 
+#
 # crontab usage:
 #   put the script in your home path (or whereever your sysadmin
 #   permitted you to do so) and put the following two lines

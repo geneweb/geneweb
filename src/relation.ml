@@ -194,7 +194,7 @@ value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
   Dag.print_slices_menu_or_dag_page conf base page_title hts next_txt
 ;
-end ELSE declare 
+end ELSE declare
 value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   incorrect_request conf
 ;
@@ -234,7 +234,7 @@ value ind_set_of_relation_path conf base path =
 ;
 
 value print_relationship_dag conf base elem_txt vbar_txt path next_txt =
-  if p_getenv conf.env "new" <> Some "on" then 
+  if p_getenv conf.env "new" <> Some "on" then
     old_print_relationship_dag conf base elem_txt vbar_txt path next_txt
   else
   (* This new version is bugged: when displaying e.g. a relationship
@@ -520,7 +520,7 @@ value print_shortest_path conf base p1 p2 =
                 stag "a" "href=\"%s;m=R;%s\"" (commd conf) (acces conf base p1)
                   begin
                     Wserver.wprint "%s"
-                      (capitale 
+                      (capitale
                          (transl_nth conf "try another/relationship computing" 0));
                   end;
                 Wserver.wprint " %s.\n"
@@ -1025,10 +1025,10 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
 value print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   do {
-    tag "p" begin 
-      xtag "img" "src=\"%s/%s\" alt=\"\"" 
+    tag "p" begin
+      xtag "img" "src=\"%s/%s\" alt=\"\""
         (Util.image_prefix conf) "picto_fleche_bleu.png";
-      print_link_name conf base n p1 p2 sol; 
+      print_link_name conf base n p1 p2 sol;
     end;
     if x1 = 0 || x2 = 0 then
       print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
@@ -1073,8 +1073,8 @@ value print_dag_links conf base p1 p2 rl =
   in
   if something then do {
     let rest = ref False in
-    if is_anc then 
-      xtag "img" "src=\"%s/%s\" alt=\"\"" 
+    if is_anc then
+      xtag "img" "src=\"%s/%s\" alt=\"\""
         (Util.image_prefix conf) "picto_fleche_bleu.png"
     else Wserver.wprint "<ul>\n";
     M.iter
@@ -1164,7 +1164,7 @@ value print_propose_upto conf base p1 p2 rl =
       in
       let (p, a) = if x1 = 0 then (p2, p1) else (p1, p2) in
       tag "p" begin
-        xtag "img" "src=\"%s/%s\" alt=\"\"" 
+        xtag "img" "src=\"%s/%s\" alt=\"\""
           (Util.image_prefix conf) "picto_fleche_bleu.png";
         Wserver.wprint "<span class=\"smaller\">";
         Wserver.wprint "%s"
@@ -1178,7 +1178,7 @@ value print_propose_upto conf base p1 p2 rl =
         xtag "img" "src=\"%s/%s\" alt=\"\""
           (Util.image_prefix conf) "picto_rel_asc.png";
         stag "a" "href=\"%sm=A;t=D;%s;%s;l=%d\""
-          (commd conf) (acces conf base p) 
+          (commd conf) (acces conf base p)
           (acces_n conf base "1" a) maxlen
           begin
             Wserver.wprint "%s" (capitale (transl conf "see"));
@@ -1486,7 +1486,7 @@ value print_main_relationship conf base long p1 p2 rel =
               stag "a" "href=\"%s;m=R;%s\"" (commd conf) (acces conf base p1)
                 begin
                   Wserver.wprint "%s"
-                    (capitale 
+                    (capitale
                        (transl_nth conf "try another/relationship computing" 0));
                 end;
               Wserver.wprint " %s.\n"
@@ -1611,7 +1611,7 @@ value print_multi_relation conf base pl lim assoc_txt =
               loop path pl
           | None -> loop path pl ]
       | [_] | [] -> path ]
-  in 
+  in
   if path = [] then print_no_relationship conf base pl
   else
     let elem_txt p =

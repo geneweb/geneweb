@@ -4,7 +4,7 @@
 (**/**) (* Utils. *)
 
 let start_with s p =
-  String.length p <= String.length s && 
+  String.length p <= String.length s &&
     String.sub s 0 (String.length p) = p
 ;;
 
@@ -66,11 +66,11 @@ let missing_translation lexicon languages =
             let msg = skip_to_next_message ic in
             let list = get_all_versions ic in
             let list' = missing_languages list languages in
-            if list' <> [] then 
+            if list' <> [] then
               begin
                 print_endline msg;
                 print_transl_en_fr list;
-                List.iter 
+                List.iter
                   (fun lang -> print_endline (lang ^ ":")) (List.rev list');
                 print_string "\n"
               end
@@ -84,11 +84,11 @@ let missing_translation lexicon languages =
 
 (**/**) (* Sorting. *)
 
-module Lex_map = Map.Make 
-  (struct 
-    type t = string 
+module Lex_map = Map.Make
+  (struct
+    type t = string
     let compare x y = compare (String.lowercase x) (String.lowercase y)
-   end) 
+   end)
 ;;
 
 let sort_lexicon lexicon =
@@ -107,10 +107,10 @@ let sort_lexicon lexicon =
         close_in ic
       end
   | None -> ());
-  Lex_map.iter 
+  Lex_map.iter
     (fun msg list ->
        print_endline msg;
-       List.iter 
+       List.iter
          (fun (lang, transl) -> print_endline (lang ^ ":" ^ transl)) list;
        print_string "\n")
     !lex_sort
@@ -126,10 +126,10 @@ let missing_gw = ref false ;;
 let missing_gnt = ref false ;;
 
 let speclist =
-  [("-sort", Arg.Set lex_sort, ": sort the lexicon (both key and content)."); 
-   ("-missing_gw", Arg.Set missing_gw, 
+  [("-sort", Arg.Set lex_sort, ": sort the lexicon (both key and content).");
+   ("-missing_gw", Arg.Set missing_gw,
     ": print missing translation managed by gw.");
-   ("-missing_gnt", Arg.Set missing_gnt, 
+   ("-missing_gnt", Arg.Set missing_gnt,
     ": print missing translation managed by gnt.");
    ("-missing_one", Arg.String (fun x -> lang_cust := x :: !lang_cust),
     ": print missing translation for these languages.")]

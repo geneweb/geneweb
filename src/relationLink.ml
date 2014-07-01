@@ -219,7 +219,7 @@ value print_someone_and_spouse conf base info in_tab ip n ipl =
   let (s, d, spo) = spouse_text conf base n ip ipl in
   do {
     if in_tab && (info.bd > 0 || info.td_prop <> "") then
-      Wserver.wprint "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>" 
+      Wserver.wprint "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>"
         info.bd info.td_prop
     else ();
     Wserver.wprint "%s\n" (someone_text conf base ip);

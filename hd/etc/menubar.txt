@@ -37,7 +37,7 @@
           %end;
 
           <li class="menubar_separateur">&nbsp;</li>
-          
+
           <li><a href="%prefix;m=MRG;i=%index;">[*merge::]</a></li>
           <li><a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a></li>
           %if;has_possible_duplications;
@@ -82,7 +82,7 @@
 
           %if;has_families;
             %foreach;family;
-              <li class="sub_menu"> 
+              <li class="sub_menu">
                 <span>%apply;marriage_with_txt%with;%spouse;%end;</span>
       	        <div>
                   <span class="fleche_droite">&nbsp;</span>
@@ -148,7 +148,7 @@
         %end;
 
         <li class="menubar_separateur">&nbsp;</li>
-         
+
         %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
           <li>
             <a href="%prefix;em=R;
@@ -200,7 +200,7 @@
                   <em>%relation_him.nobility_title;</em>%end;%nl;
                   <i>(%relation_him.type;)</i>%nl;
                 %end;
-              </a> 
+              </a>
             </li>
           %end;
           %if;has_relation_her;
@@ -218,7 +218,7 @@
                   <em>%relation_her.nobility_title;</em>%end;%nl;
                   <i>(%relation_her.type;)</i>%nl;
                 %end;
-              </a> 
+              </a>
             </li>
           %end;
         %end;
@@ -237,7 +237,7 @@
                 <em>%related.nobility_title;</em>%end;%nl;
                 <i>(%related.type;)</i>%nl;
               %end;
-            </a> 
+            </a>
           </li>
         %end;
         %foreach;family;
@@ -254,7 +254,7 @@
                   %witness;%nl;
                   <i>([witness/witnesses]0)</i>%nl;
                 %end;
-              </a> 
+              </a>
             </li>
           %end;
         %end;

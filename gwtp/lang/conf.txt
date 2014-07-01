@@ -116,7 +116,7 @@ it: URL per le immagini:
 [
 de: Suche nach Adelstiteln auf der Startseite anbieten:
 en: Propose search by nobility titles in welcome page:
-es: Proposición para búsqueda por títulos de nobleza in la página de bienvenida: 
+es: Proposición para búsqueda por títulos de nobleza in la página de bienvenida:
 fr: Propose la recherche par titres de noblesse dans la page d'accueil:
 it: Propone la ricerca per titoli di nobiltà nella pagina di benvenuto:
 ]
@@ -288,10 +288,10 @@ en: Other configuration parameters exist, but they may have an influence
     on the performances of the server computer. Ask the GeneWeb site
     administrator if you want to change them. Be aware of the fact that
     your request may not be accepted.
-es: Otros parametros para configuracion existen, pero ellos pueden 
+es: Otros parametros para configuracion existen, pero ellos pueden
     influenciar la rapidez del servidor. Pregunta al administrator
     de la página de GeneWeb si quieres cambiarlos. Ten presente que tu
-    pedido puede ser ignorado. 
+    pedido puede ser ignorado.
 fr: D'autres paramètres de configuration existent, mais ils peuvent avoir
     une influence sur les performances de l'ordinateur serveur. Demandez
     à l'administrateur du site GeneWeb si vous voulez les changer. Soyez

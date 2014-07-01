@@ -6,4 +6,4 @@
 * Versione italiana: digitate "it"
 * Latvieðu versija: type "lv"
 * Svensk version: skriv "sv"
-? 
+?

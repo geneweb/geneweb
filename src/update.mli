@@ -40,7 +40,7 @@ value print_error : config -> base -> CheckItem.base_error -> unit;
 value print_warnings : config -> base -> list CheckItem.base_warning -> unit;
 value print_miscs : config -> base -> list CheckItem.base_misc -> unit;
 value print_warnings_and_miscs :
-  config -> base -> 
+  config -> base ->
     (list CheckItem.base_warning * list CheckItem.base_misc) -> unit;
 value error : config -> base -> CheckItem.base_error -> 'a;
 

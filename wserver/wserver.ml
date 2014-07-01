@@ -504,7 +504,7 @@ value accept_connection tmout max_clients callback s =
               Unix.close s;
               wserver_sock.val := t;
               wserver_oc.val := Unix.out_channel_of_descr t;
-(*  
+(*
    j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
               try Unix.close t with _ -> ();
 *)

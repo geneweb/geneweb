@@ -109,11 +109,11 @@ function no_options () {
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
       <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
+       src="%image_prefix;/left.png"%wid_hei;left.png;
        alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
+    src="%image_prefix;/up.png"%wid_hei;up.png;
     alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
@@ -133,7 +133,7 @@ function no_options () {
     %end;
     <input type="hidden" name="sosab" value="10"%/>
   </p>
-  
+
   <div style="text-align:center;"><div style="display:inline-block; text-align:left; padding-bottom: 25px;">
     <div class="ascends_menu_list">
       <label>
@@ -149,7 +149,7 @@ function no_options () {
         <label><input type="radio" name="sosab" value="16"%/>16</label>
       </div>
 %)
-    
+
       <label>
         <input type="radio" name="t" value="G" onclick="long_display_options()"%/>
         [*long display] (*)
@@ -190,7 +190,7 @@ function no_options () {
           </label>
         </p>
       </div>
-    
+
       <label>
         <input type="radio" name="t" value="Z" onclick="table_options()"%/>
         [*table] (*)
@@ -325,7 +325,7 @@ function no_options () {
       </p>
       </div>
     </div>
-    
+
     <div class="ascends_menu_tree">
       <label>
         <input type="radio" name="t" value="T" onclick="no_options()"%/>
@@ -391,7 +391,7 @@ function no_options () {
         </table>
       </div>
     </div>
-    
+
     <div class="ascends_menu_other">
       <label>
         <input type="radio" name="t" value="L" onclick="no_options()"%/>
@@ -402,7 +402,7 @@ function no_options () {
           ([maximum] %bvar.max_anc_level; [generation/generations]1)
         %end;
       </label><br%/>
-    
+
       <label>
         <input type="radio" name="t" value="H" onclick="no_options()"%/>
         [*horizontally]
@@ -412,17 +412,17 @@ function no_options () {
           ([maximum] %bvar.max_anc_level; [generation/generations]1)
         %end;
       </label><br%/>
-    
+
       <label>
         <input type="radio" name="t" value="E" onclick="no_options()"%/>
         [*list eclair]
       </label><br%/>
-    
+
       <label>
         <input type="radio" name="t" value="F" onclick="no_options()"%/>
         [*surnames branch]
       </label><br%/>
-    
+
       <label>
         <input type="radio" name="t" value="M" onclick="missing_ancestors_options()"%/>
         [*missing ancestors]
@@ -482,7 +482,7 @@ function no_options () {
       </div>
     </div>
   </div></div>
-  
+
   <div class="ascends_menu_valid">
     <label>
       <input type="checkbox" name="cgl" value="on"%/>

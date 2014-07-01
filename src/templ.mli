@@ -17,7 +17,7 @@ type interp_fun 'a 'b =
     eval_predefined_apply : env 'a -> string -> list (expr_val 'b) -> string;
     get_vother : 'a -> option (vother 'b);
     set_vother : vother 'b -> 'a;
-    print_foreach : 
+    print_foreach :
       (env 'a -> 'b -> ast -> unit) ->
          (env 'a -> 'b -> ast -> string) ->
          env 'a -> 'b -> loc -> string -> list string ->

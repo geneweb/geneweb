@@ -818,7 +818,7 @@ value gwtp_print_log str env b tok =
     close_in ic;
     printf_link_to_main env b tok;
     printf "</body>\n";
-  }  
+  }
 ;
 
 value gwtp_print_accesses of_wizards str env b tok =
@@ -864,7 +864,7 @@ value gwtp_print_accesses of_wizards str env b tok =
     printf "</pre>\n";
     printf_link_to_main env b tok;
     printf "</body>\n";
-  }  
+  }
 ;
 
 (* Actions *)

@@ -257,8 +257,8 @@ value change_child conf base parent_surname changed ip =
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
     (* On ajoute les enfants dans le type Change_children_name       *)
     (* pour la future mise à jour de l'historique et du fichier gwf. *)
-    changed.val := 
-      [((p_first_name base p, p_surname base p, get_occ p, ip), 
+    changed.val :=
+      [((p_first_name base p, p_surname base p, get_occ p, ip),
         (new_first_name, new_surname, new_occ, ip)) :: changed.val];
     let p =
       {(gen_person_of_person p) with
@@ -286,8 +286,8 @@ value print_change_ok conf base p =
       List.iter (change_child conf base parent_surname changed) ipl;
       Util.commit_patches conf base;
       let changed =
-        U_Change_children_name 
-          (Util.string_gen_person base (gen_person_of_person p)) 
+        U_Change_children_name
+          (Util.string_gen_person base (gen_person_of_person p))
           changed.val
       in
       History.record conf base changed "cn";

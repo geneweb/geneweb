@@ -82,8 +82,8 @@ value reconstitute conf base p1 p2 =
    baptism_src =
      merge_strings base (get_baptism_src p1) ", " (get_baptism_src p2);
    death = field "death" get_death
-     (fun x -> 
-       match x with 
+     (fun x ->
+       match x with
        [ DontKnowIfDead | OfCourseDead -> True
        | _ -> False]);
    death_place =
@@ -275,11 +275,11 @@ value print_mod_merge o_conf base =
   let get_gen_person i =
     match p_getint o_conf.env i with
     [ Some i ->
-        Util.string_gen_person 
+        Util.string_gen_person
           base
           (gen_person_of_person (poi base (Adef.iper_of_int i)))
-    | None -> 
-        Util.string_gen_person 
+    | None ->
+        Util.string_gen_person
           base
           (gen_person_of_person (poi base (Adef.iper_of_int (-1)))) ]
   in
