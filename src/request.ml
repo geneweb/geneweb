@@ -537,7 +537,7 @@ value family_m conf base =
             match p_getenv conf.env "t" with
             [ Some "P" -> [("fn", n) :: conf.env]
             | Some "N" -> [("sn", n) :: conf.env]
-            | _ -> [("v", n) :: conf.env] ]
+            | _ -> [("n", n) :: conf.env] ]
         | None -> conf.env ]
       in
       let conf = {(conf) with env = env} in
@@ -569,7 +569,7 @@ value family_m conf base =
                 else specify conf base n pl
             | pl -> specify conf base n pl ]
           in
-          match real_input "v" with
+          match real_input "n" with
           [ Some n -> search n
           | None ->
               match (real_input "fn", real_input "sn") with
