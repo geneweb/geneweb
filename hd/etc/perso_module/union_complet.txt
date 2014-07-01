@@ -41,11 +41,11 @@
   %end;
 %end;
 
-%( 
+%(
    ATTENTION: on n'utilise pas max_desc_level parce que c'est extremement
    gourmand sur les gros arbre puisqu'on calcule toute la descendance.
    Hors on n'a besoin de seulement savoir s'il y a des arrière petits
-   enfant, d'où le code ci-dessous : 
+   enfant, d'où le code ci-dessous :
    1 si on a des enfants
    2 si on a des petits enfants
    3 si on a des arrières petits endants
@@ -121,7 +121,7 @@
             %apply;short_display_person("witness")%nl;
           %end;)
         %end;
-        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
+        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
           ([see] <a href="#note-wed-%count;" name="wed-note-%count;" id="wed-note-%count;">[note/notes]0</a>)
           %incr_count;
         %end;

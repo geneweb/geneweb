@@ -2,7 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 value f _ =
-  fun  
+  fun
   [ "PREFIX_SMALL_BLOCK" -> "0x80"
   | "PREFIX_SMALL_INT" -> "0x40"
   | "PREFIX_SMALL_STRING" -> "0x20"

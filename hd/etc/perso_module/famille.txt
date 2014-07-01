@@ -4,7 +4,7 @@
   <img src="%image_prefix;/not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]"%/>
 %end;
 
-%( 
+%(
   définition affichage de la puce d'un individu en compte tenu de ses éventuels enfants
     - aucune union, donc aucun enfant => cercle
     - au moins une union avec en tout aucun enfant => disque
@@ -61,10 +61,10 @@
   %end;
 %end;
 
-%( 
-   ATTENTION nb_families ne marche que pour la personne et les boucles sur enfants. 
-   Pour les relations (him, her et related) cela donne le nb_families de la 
-   personne d'où l'affichage sans nb d'enfants si la personne n'a qu'un mariage 
+%(
+   ATTENTION nb_families ne marche que pour la personne et les boucles sur enfants.
+   Pour les relations (him, her et related) cela donne le nb_families de la
+   personne d'où l'affichage sans nb d'enfants si la personne n'a qu'un mariage
 %)
 %define;detail_wedding()
   %apply;type_wedding()
@@ -93,8 +93,8 @@
         %apply;image_MF("child","11")
         %apply;display_sosa("child")
         %if;("yyy" = "parhigh")
-          %( comme le code est utilisable dans la descendance des grands 
-             parents on teste father/mother, pour la descendance des parents 
+          %( comme le code est utilisable dans la descendance des grands
+             parents on teste father/mother, pour la descendance des parents
              on est tjrs dans else %)
           %if;(child.access = father.access or child.access = mother.access)
             %( ici on met les parents en gras %)
@@ -134,7 +134,7 @@
       %else;
         %mmm.father;%mmm.father.title;%mmm.father.dates;%nl;
       %end;
-      %apply;type_wedding() 
+      %apply;type_wedding()
       %if(family.marriage_date.year != "")<font size="-1">(%family.marriage_date.year;)</font>%end;
       %apply;type_puce_asc("spouse")
       %apply;image_MF("spouse","13")

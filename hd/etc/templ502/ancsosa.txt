@@ -140,8 +140,8 @@
   %xx.title;%xx.dates;
 %end;
 
-%define;my_link(aa, xx, rr)	
-  %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;	
+%define;my_link(aa, xx, rr)
+  %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;
 %end;
 
 %define;somebody_extra_info(xx)

@@ -1,2 +1,2 @@
-wserver.cmo: wserver.cmi 
-wserver.cmx: wserver.cmi 
+wserver.cmo: wserver.cmi
+wserver.cmx: wserver.cmi

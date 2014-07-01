@@ -89,13 +89,13 @@ fr: nom de la base
 en: select a file
 fr: selectionnez un fichier
 
-    Configuration gwf file of 
-en: Configuration gwf file of 
-fr: configuration du fichier gwf de 
+    Configuration gwf file of
+en: Configuration gwf file of
+fr: configuration du fichier gwf de
 
     toolbox
 en: toolbox
-fr: Boîte à outil pour la base 
+fr: Boîte à outil pour la base
 
     Unknown file
 en: Unknown file

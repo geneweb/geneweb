@@ -37,7 +37,7 @@ gebruikt worden op computers met of zonder permanente verbinding met
 het Internet.
 
 %description -l se
-GeneWeb är ett genealogi program med ett webbinterface. Det kan användas 
+GeneWeb är ett genealogi program med ett webbinterface. Det kan användas
 nedkopplad eller som en webbtjänst.
 
 %prep

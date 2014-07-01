@@ -43,10 +43,10 @@ value slash_name_of_key fn sn occ =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] diff_visibility : 
+(*  [Fonc] diff_visibility :
              config -> base -> gen_person -> gen_person -> string array   *)
-(** [Description] : Si la visibilité de la personne a changé (entre 
-                    l'ancienne et la nouvelle), alors on revoie un tableau 
+(** [Description] : Si la visibilité de la personne a changé (entre
+                    l'ancienne et la nouvelle), alors on revoie un tableau
                     avec la nouvelle visibilité.
     [Args] :
       - conf : configuration de la base
@@ -67,7 +67,7 @@ value diff_visibility conf base op np =
   let tmp_conf = {(conf) with wizard = False; friend = False} in
   let old_visibility = Util.authorized_age tmp_conf base o_p in
   let new_visibility = Util.authorized_age tmp_conf base n_p in
-  if old_visibility <> new_visibility then 
+  if old_visibility <> new_visibility then
     [| "VISIBLE"; k; string_of_bool new_visibility |]
   else [| |]
 ;
@@ -104,10 +104,10 @@ value diff_key d =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] diff_person : 
+(*  [Fonc] diff_person :
              config -> base -> gen_person -> gen_person -> string array   *)
-(** [Description] : Fonction qui ajouté des paramètres passés dans la 
-                    ligne de commande de notify_change. Elle permet de 
+(** [Description] : Fonction qui ajouté des paramètres passés dans la
+                    ligne de commande de notify_change. Elle permet de
                     savoir quelle genre de modifications ont été faites.
     [Args] :
       - conf : configuration de la base
@@ -120,25 +120,25 @@ value diff_key d =
 value diff_person conf base changed =
   match changed with
   [ U_Add_person p | U_Delete_person p -> [| |]
-  | U_Modify_person o n -> 
+  | U_Modify_person o n ->
       Array.append (diff_key (Diff_person o n)) (diff_visibility conf base o n)
-  | U_Merge_person p1 p2 p -> 
-      let args_p1 = 
-        Array.append 
+  | U_Merge_person p1 p2 p ->
+      let args_p1 =
+        Array.append
           (diff_key (Diff_person p1 p)) (diff_visibility conf base p1 p)
       in
-      let args_p2 = 
-        Array.append 
+      let args_p2 =
+        Array.append
           (diff_key (Diff_person p2 p)) (diff_visibility conf base p2 p)
       in
       Array.append args_p1 args_p2
-  | U_Send_image _ | U_Delete_image _ 
-  | U_Add_family _ _ | U_Modify_family _ _ _ | U_Delete_family _ _ 
+  | U_Send_image _ | U_Delete_image _
+  | U_Add_family _ _ | U_Modify_family _ _ _ | U_Delete_family _ _
   | U_Invert_family _ _ | U_Merge_family _ _ _ _ | U_Add_parent _ _ -> [| |]
-  | U_Change_children_name _ l -> 
+  | U_Change_children_name _ l ->
       List.fold_left
         (fun accu ((ofn, osn, oocc, _), (fn, sn, occ, _)) ->
-          Array.append 
+          Array.append
             accu (diff_key (Diff_string (ofn, osn, oocc) (fn, sn, occ))))
         [| |] l
   | U_Multi _
@@ -165,10 +165,10 @@ value notify_change conf base changed action =
         let base_args =
           match changed with
           [ U_Add_person p | U_Modify_person _ p | U_Delete_person p
-          | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p 
-          | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _ 
-          | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _ 
-          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p -> 
+          | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p
+          | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _
+          | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _
+          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p ->
               let key = slash_name_of_key p.first_name p.surname p.occ in
               [| key; string_of_int (Adef.int_of_iper (p.key_index)) |]
           | U_Notes (Some num) file -> [| file; string_of_int num |]
@@ -193,8 +193,8 @@ value notify_change conf base changed action =
 (* ************************************************************************ *)
 (*  [Fonc] gen_record : config -> base -> base_changed -> string -> unit    *)
 (** [Description] : Enregistre dans le fichier historique si la variable
-      "hitory" du fichier gwf est valorisée à "yes". Le fait qu'on ait des 
-      gen_person, nous permet de pouvoir faire un diff entre avant et après 
+      "hitory" du fichier gwf est valorisée à "yes". Le fait qu'on ait des
+      gen_person, nous permet de pouvoir faire un diff entre avant et après
       la modification d'une personne.
     [Args] :
       - conf : configuration de la base
@@ -211,10 +211,10 @@ value gen_record conf base changed action =
         let item =
           match changed with
           [ U_Add_person p | U_Modify_person _ p | U_Delete_person p
-          | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p 
-          | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _ 
-          | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _ 
-          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p -> 
+          | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p
+          | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _
+          | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _
+          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p ->
               p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
           | U_Notes (Some num) file ->
               let s = string_of_int num in
@@ -250,7 +250,7 @@ value gen_record conf base changed action =
 
 (* ************************************************************************ *)
 (*  [Fonc] record : config -> base -> base_changed -> string -> unit        *)
-(** [Description] : Suite à la mise à jour de la base, on réalise les 
+(** [Description] : Suite à la mise à jour de la base, on réalise les
       traitements suivant :
         - mise à jour (si nécessaire) du fichier gwf pour le sosa_ref
         - mise à jour du fichier historique
@@ -263,15 +263,15 @@ value gen_record conf base changed action =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-value record conf base changed action = 
+value record conf base changed action =
   do {
     (* Mise à jour du fichier gwf si le sosa_ref a changé. *)
     match changed with
-    [ U_Modify_person _ p -> 
+    [ U_Modify_person _ p ->
         let (fn, sn, occ, ip) = (p.first_name, p.surname, p.occ, p.key_index) in
         update_gwf_sosa conf base (ip, (fn, sn, occ))
     | U_Merge_person p1 _ p -> do {
-        let (fn, sn, occ, ip) = 
+        let (fn, sn, occ, ip) =
           (p1.first_name, p1.surname, p1.occ, p1.key_index)
         in
         update_gwf_sosa conf base (ip, (fn, sn, occ));
@@ -281,9 +281,9 @@ value record conf base changed action =
         update_gwf_sosa conf base (ip, (fn, sn, occ)); }
     | U_Change_children_name _ l ->
         List.iter
-          (fun (_, (fn, sn, occ, ip)) -> 
+          (fun (_, (fn, sn, occ, ip)) ->
             update_gwf_sosa conf base (ip, (fn, sn, occ)))
-          l 
+          l
     | _ -> () ];
     (* Mise à jour du fichier historique et appel de notify_change. *)
     gen_record conf base changed action
@@ -294,7 +294,7 @@ value record conf base changed action =
 (* ************************************************************************ *)
 (*  [Fonc] notify : config -> base -> string -> unit                        *)
 (** [Description] : Appel explicite de notify_change suite à une modification
-                    de masse de la base (typiquement, le dico des lieux). 
+                    de masse de la base (typiquement, le dico des lieux).
                     On évite comme ça la création de 5000 processus.
     [Args] :
       - conf : configuration de la base
@@ -305,8 +305,8 @@ value record conf base changed action =
 (* ************************************************************************ *)
 value notify conf base action =
   let empty_person = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
-  let empty_person = 
-    Util.string_gen_person base (gen_person_of_person empty_person) 
+  let empty_person =
+    Util.string_gen_person base (gen_person_of_person empty_person)
   in
   notify_change conf base (U_Multi empty_person) action
 ;
@@ -404,7 +404,7 @@ value possibly_highlight env s =
 
 value rec eval_var conf base env xx loc =
   fun
-  [ ["count"] -> 
+  [ ["count"] ->
       match get_env "count" env with
       [ Vcnt c -> VVstring (string_of_int c.val)
       | _ -> VVstring "" ]

@@ -21,7 +21,7 @@
             %apply;short_display_person("witness")%nl;
           %end;)
         %end;
-        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
+        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
           ([see] <a href="#note-wed-%count;" name="wed-note-%count;" id="wed-note-%count;">[note/notes]0</a>)
           %incr_count;
         %end;

@@ -548,7 +548,7 @@ GeneWeb Version 3.10
     or mother's other marriages first.
   - [10 Nov 00] Fixed bug in titles tree: when the same person appeared
     several times in the title list, the title tree showed his last order
-    number instead of his (more logicial) first order number. 
+    number instead of his (more logicial) first order number.
 
 * Installation by Linux rpm
   - [07..09 Nov 00] Many improvements. See geneweb.spec changelog
@@ -624,7 +624,7 @@ GeneWeb Version 3.07
   - [08 Aug 00] In first names by alphabetic order for a given surname,
     use now (the translation of) "%1 of %2" instead of "of".
   - [26 Jul 00] Fixed detail in Wserver: closed socket before callback
-    in order to allow the callback to fork processes without being blocked    
+    in order to allow the callback to fork processes without being blocked
   - [25 Jul 00] Restructured Wserver to be cleaner and to save memory
     when sending big files.
   - [19 Jul 00] Message "Ready" of gwd display now date as yyyy-mm-dd.
@@ -832,7 +832,7 @@ GeneWeb Version 3.01
   - [Nov 5, 99] Red display title for not found persons.
   - [Nov 5, 99] Lengthened the height of the database notes area.
 
-* GeneWeb compiler (gwc) and uncompiler (gwu) 
+* GeneWeb compiler (gwc) and uncompiler (gwu)
   - [Nov 9, 99] Fixed problem for titles holding the character colon. The
     gwc raised syntax error.
 

@@ -65,7 +65,7 @@ zh: 家譜
 
 <div id="title">
   <div id="logo">
-    <img src="%image_prefix;/gwlogo.png" style="border: 0"%sp; 
+    <img src="%image_prefix;/gwlogo.png" style="border: 0"%sp;
     alt="GeneWeb" title="GeneWeb"%/>
   </div>
 
@@ -111,7 +111,7 @@ zh: 家譜
             (<a href="%prefix;w=">[disconnect]</a>)
           </li>
         %end;
-      </ul>  
+      </ul>
     </div>
   %else
     <div id="acces"></div>
@@ -327,7 +327,7 @@ es: <span class="highlight" style="margin-left:10px">mediante una
        <a href="%prefix;m=H;v=advanced" class="highlight">consulta
        avanzada</a></span>.
 et: <span class="highlight" style="margin-left:10px">
-       <a href="%prefix;m=H;v=advanced" class="highlight">laiendatud 
+       <a href="%prefix;m=H;v=advanced" class="highlight">laiendatud
        päring</a></span>.
 fi: <span class="highlight" style="margin-left:10px">
        <a href="%prefix;m=H;v=advanced" class="highlight">erityishaulla
@@ -335,10 +335,10 @@ fi: <span class="highlight" style="margin-left:10px">
 fr: <span class="highlight" style="margin-left:10px"> par la
        <a href="%prefix;m=H;v=advanced" class="highlight">requête
         évoluée</a></span>.
-he: <span class="highlight" style="margin-left:10px">ע"י 
+he: <span class="highlight" style="margin-left:10px">ע"י
        <a href="%prefix;m=H;v=advanced" class="highlight">
        בקשה מתקדמת</a></span>.
-is: <span class="highlight" style="margin-left:10px">eftir 
+is: <span class="highlight" style="margin-left:10px">eftir
        <a href="%prefix;m=H;v=advanced" class="highlight">frekari
        óskum</a></span>.
 it: <span class="highlight" style="margin-left:10px">per la
@@ -348,13 +348,13 @@ lv: <span class="highlight" style="margin-left:10px">meklēt pēc
        <a href="%prefix;m=H;v=advanced" class="highlight">citiem
        parametriem</a></span>.
 nl: <span class="highlight" style="margin-left:10px">via een
-       <a href="%prefix;m=H;v=advanced" class="highlight">gedetailleerde 
+       <a href="%prefix;m=H;v=advanced" class="highlight">gedetailleerde
        opzoeking</a></span>.
 no: <span class="highlight" style="margin-left:10px">gjennom
        <a href="%prefix;m=H;v=advanced" class="highlight">avansert
        søking</a></span>.
 pl: <span class="highlight" style="margin-left:10px">skorzystać z
-       <a href="%prefix;m=H;v=advanced" class="highlight">wyszukiwania 
+       <a href="%prefix;m=H;v=advanced" class="highlight">wyszukiwania
        zaawansowanego</a></span>.
 pt: <span class="highlight" style="margin-left:10px">por
        <a href="%prefix;m=H;v=advanced" class="highlight">pesquisa
@@ -487,7 +487,7 @@ is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome;
 it: Dal %start_date; ci sono stati %nb_accesses; accessi,
     %nb_accesses_to_welcome; dei quali a questa pagina.
 lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
-    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē. 
+    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē.
 nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
     bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
 no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome;
@@ -545,7 +545,7 @@ eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
 es: Si las páginas modificadas no serán actualizadas
     automaticamente, favor de usar esta conexión:
     <a href="%prefix;escache=0">hier</a>.
-et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
+et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt
     (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
     navigeerimist <a href="%prefix;escache=0">sellest viitest</a>.
 fi: Mikäli selaimesi ei automaattisesti päivitä muutettuja
@@ -568,10 +568,10 @@ lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
 nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
     alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
     <a href="%prefix;escache=0">deze link</a>.
-no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
+no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever
     oppfrisking av den aktuelle siden), prøv da å navigere <a
     href="%prefix;escache=0">herfra</a>.
-pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron 
+pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron
     (zmuszając cię do ich ręcznego odświeżania), kliknij <a
     href="%prefix;escache=0">tutaj</a>.
 pt: Se o seu <i>browser</i> não actualiza automaticamente as
@@ -594,7 +594,7 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 ])%nl;
 </div>
 <br/>
-</div> 
+</div>
 
 %base_trailer;
 

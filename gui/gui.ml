@@ -87,12 +87,12 @@ value channel_redirector channel callback = do {
   let len = 80 in
   let buf = String.create len in
   GMain.Io.add_watch chan ~prio:0 ~cond:[`IN; `HUP; `ERR] ~callback:
-    do { fun cond -> 
-      try 
+    do { fun cond ->
+      try
         if List.mem `IN cond then do {
 	        (* On Windows, you must use Io.read *)
 	        let len = GMain.Io.read chan ~buf ~pos:0 ~len in
-	        len >= 1 && (callback (String.sub buf 0 len)) 
+	        len >= 1 && (callback (String.sub buf 0 len))
         }
         else False
       with [ _ -> False ]
@@ -106,12 +106,12 @@ value exec prog args out err =
 
 value exec_wait conf prog args =
   do {
-    let wnd = GWindow.window 
+    let wnd = GWindow.window
       ~title:(capitale (transl "Processing"))
-      ~position:`CENTER 
-      ~resizable:True 
-      ~width:600 ~height:300 () 
-    in 
+      ~position:`CENTER
+      ~resizable:True
+      ~width:600 ~height:300 ()
+    in
     ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
     wnd#show();
     let vbox = GPack.vbox
@@ -120,11 +120,11 @@ value exec_wait conf prog args =
     in
     let scrolled_window = GBin.scrolled_window ~border_width: 10
       ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~packing:vbox#add () 
+      ~packing:vbox#add ()
     in
-    let vvbox = GPack.hbox 
+    let vvbox = GPack.hbox
       ~border_width: 10
-      ~packing:scrolled_window#add_with_viewport () 
+      ~packing:scrolled_window#add_with_viewport ()
     in
     vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
     let redirect channel =
@@ -134,7 +134,7 @@ value exec_wait conf prog args =
     in
     ignore (redirect Unix.stderr);
     let pid = exec prog args Unix.stdout Unix.stderr in
-    (* On voudrait bien attendre la fin du process 
+    (* On voudrait bien attendre la fin du process
        mais sinon wnd ne s'affiche pas ...         *)
     let (_, _) = Unix.waitpid [] pid in
     ()
@@ -154,10 +154,10 @@ value rmdir conf dir =
   (* Récupère tous les fichiers et dossier d'un dossier         *)
   (* et renvoie la liste des dossiers et la liste des fichiers. *)
   let read_files_folders fname =
-    let list = 
-      List.map 
+    let list =
+      List.map
         (fun file -> Filename.concat fname file)
-        (Array.to_list (Sys.readdir fname)) 
+        (Array.to_list (Sys.readdir fname))
     in
     List.partition Sys.is_directory list
   in
@@ -189,12 +189,12 @@ value rec cut_at_equal s =
   [ Not_found -> (s, "") ]
 ;
 
-value read_base_env conf bname = 
+value read_base_env conf bname =
   let fname = Filename.concat conf.bases_dir (bname ^ ".gwf") in
   match try Some (open_in fname) with [ Sys_error _ -> None] with
   [ Some ic ->
       let env =
-        loop [] where rec loop env = 
+        loop [] where rec loop env =
           match try Some (input_line ic) with [End_of_file -> None] with
           [ Some s ->
               if s = "" || s.[0] = '#' then loop env
@@ -208,7 +208,7 @@ value read_base_env conf bname =
 value write_base_env conf bname env =
   let fname = Filename.concat conf.bases_dir (bname ^ ".gwf") in
   match try Some (open_out fname) with [ Sys_error _ -> None] with
-  [ Some oc -> 
+  [ Some oc ->
       do {
         List.iter (fun (k, v) -> fprintf oc "%s=%s\n" k v) env;
         close_out oc
@@ -268,12 +268,12 @@ value clean_waiting_pids conf =
     List.filter
       (fun pid ->
          let (r, _) = Unix.waitpid [Unix.WNOHANG] pid in
-         let _ = 
-           do { 
-             if r = pid then 
-               do { Printf.eprintf "--- pid ended %d\n" r; flush stderr } 
-             else () 
-           } 
+         let _ =
+           do {
+             if r = pid then
+               do { Printf.eprintf "--- pid ended %d\n" r; flush stderr }
+             else ()
+           }
          in
          r <> pid)
       conf.waiting_pids
@@ -308,12 +308,12 @@ value close_server conf =
 (**/**) (* Autres interfaces graphique ou utilitaires. *)
 
 value select_dir parent initial_dir = do {
-  let dialog = GWindow.file_chooser_dialog 
+  let dialog = GWindow.file_chooser_dialog
     ~action:`SELECT_FOLDER
     ~parent () in
   dialog#add_button_stock `CANCEL `CANCEL ;
   dialog#add_select_button_stock `OPEN `OPEN ;
-  let new_dir = 
+  let new_dir =
     if dialog#run () = `OPEN then
       match dialog#filename with
       [ Some dir -> dir
@@ -325,12 +325,12 @@ value select_dir parent initial_dir = do {
 };
 
 value select_file parent initial_file = do {
-  let dialog = GWindow.file_chooser_dialog 
+  let dialog = GWindow.file_chooser_dialog
     ~action:`OPEN
     ~parent () in
   dialog#add_button_stock `CANCEL `CANCEL ;
   dialog#add_select_button_stock `OPEN `OPEN ;
-  let new_file = 
+  let new_file =
     if dialog#run () = `OPEN then
       match dialog#filename with
       [ Some file -> file
@@ -342,11 +342,11 @@ value select_file parent initial_file = do {
 };
 
 value error_popup msg = do {
-  let wnd = GWindow.window 
+  let wnd = GWindow.window
     ~title:(capitale (transl "error"))
-    ~position:`CENTER 
-    ~resizable:True () 
-  in 
+    ~position:`CENTER
+    ~resizable:True ()
+  in
   ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
   let vbox = GPack.vbox
     ~spacing:5
@@ -363,19 +363,19 @@ value error_popup msg = do {
   in
   let btn_ok = GButton.button
     ~label:(transl "OK")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
   ignore (btn_ok#connect#clicked (fun () -> wnd#destroy ()));
   wnd#show ();
 };
 
 value display_log conf = do {
-  let wnd = GWindow.window 
+  let wnd = GWindow.window
     ~title:(capitale (transl "log"))
-    ~position:`CENTER 
-    ~resizable:True 
-    ~width:600 ~height:300 () 
-  in 
+    ~position:`CENTER
+    ~resizable:True
+    ~width:600 ~height:300 ()
+  in
   ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
   let vbox = GPack.vbox
     ~spacing:5
@@ -383,11 +383,11 @@ value display_log conf = do {
   in
   let scrolled_window = GBin.scrolled_window ~border_width: 10
     ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:vbox#add () 
+    ~packing:vbox#add ()
   in
-  let vvbox = GPack.hbox 
+  let vvbox = GPack.hbox
     ~border_width: 10
-    ~packing:scrolled_window#add_with_viewport () 
+    ~packing:scrolled_window#add_with_viewport ()
   in
   vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
   match try Some (open_in conf.log) with [Sys_error _ -> None] with
@@ -395,12 +395,12 @@ value display_log conf = do {
       do {
         let len = in_channel_length ic in
         (* TODO ! *)
-        if len > 0 then 
+        if len > 0 then
           do {
             let buf = Buffer.create len in
             Buffer.add_channel buf ic len;
             let text = GText.view ~packing:vvbox#add () in
-            text#buffer#set_text (Buffer.contents buf) 
+            text#buffer#set_text (Buffer.contents buf)
           }
         else ();
         close_in ic;
@@ -413,19 +413,19 @@ value display_log conf = do {
   in
   let btn_ok = GButton.button
     ~label:(transl "OK")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
   ignore (btn_ok#connect#clicked (fun () -> wnd#destroy ()));
   wnd#show();
 };
 
 value delete_base conf bname = do {
-  let wnd = GWindow.window 
+  let wnd = GWindow.window
     ~title:(capitale (transl "Confirm"))
-    ~position:`CENTER 
+    ~position:`CENTER
     ~resizable:True
-    ~width:300 ~height:50 () 
-  in 
+    ~width:300 ~height:50 ()
+  in
   let vbox = GPack.vbox
     ~spacing:5
     ~packing:wnd#add ()
@@ -442,11 +442,11 @@ value delete_base conf bname = do {
   ignore (btn_cancel#connect#clicked (fun () -> wnd#destroy ()));
   let btn_ok = GButton.button
     ~label:(transl "OK")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_ok#connect#clicked 
-      (fun () -> 
+  ignore
+    (btn_ok#connect#clicked
+      (fun () ->
         do {
           let base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
           rmdir conf base;
@@ -482,14 +482,14 @@ value browse conf url = do {
 
 
 (**/**) (* Binaires GeneWeb. *)
-(* 
+(*
    NB: Windows :
    let base = Filename.concat conf.bases_dir bname in
-   Plante car il n'interprète pas les chemins avec espaces. On se place 
+   Plante car il n'interprète pas les chemins avec espaces. On se place
    donc toujours dans le répertoire des bases dans launch_server.
 *)
 
-value gwc1 conf bname fname = 
+value gwc1 conf bname fname =
   (* Hack Windows, pas de Filename.concat mais juste bname *)
   let prog = Filename.concat bin_dir "gwc1" in
   let args = ["-v"; "-nc"; "-o"; bname] in
@@ -497,21 +497,21 @@ value gwc1 conf bname fname =
   exec_wait conf prog args
 ;
 
-value gwc2 conf bname fname = 
+value gwc2 conf bname fname =
   let prog = Filename.concat bin_dir "gwc2" in
   let args = ["-v"; "-nc"; "-o"; bname] in
   let args = if fname <> "" then [fname :: args] else args in
   exec_wait conf prog args
 ;
 
-value ged2gwb conf bname fname = 
+value ged2gwb conf bname fname =
   let prog = Filename.concat bin_dir "ged2gwb" in
   let args = ["-nc"; "-o"; bname] in
   let args = if fname <> "" then [fname :: args] else args in
   exec_wait conf prog args
 ;
 
-value ged2gwb2 conf bname fname = 
+value ged2gwb2 conf bname fname =
   let prog = Filename.concat bin_dir "ged2gwb2" in
   let args = ["-nc"; "-o"; bname] in
   let args = if fname <> "" then [fname :: args] else args in
@@ -525,7 +525,7 @@ value gwb2ged conf bname fname =
   exec_wait conf prog args
 ;
 
-value gwu conf bname fname = 
+value gwu conf bname fname =
   let fname = fname ^ ".gw" in
   let prog = Filename.concat bin_dir "gwu" in
   let args = [bname; "-o"; fname] in
@@ -538,7 +538,7 @@ value consang conf bname =
   exec_wait conf prog args
 ;
 
-value update_nldb conf bname = 
+value update_nldb conf bname =
   let prog = Filename.concat bin_dir "update_nldb" in
   let args = [bname] in
   (* TODO il faut effacer le fichier avant de le re-créer *)
@@ -546,7 +546,7 @@ value update_nldb conf bname =
   exec_wait conf prog args
 ;
 
-value check_base conf bname = 
+value check_base conf bname =
   let prog = Filename.concat bin_dir "check_base" in
   let args = [bname] in
   exec_wait conf prog args
@@ -555,8 +555,8 @@ value check_base conf bname =
 
 (**/**) (* Fonctions utilies pour les binaires GeneWeb. *)
 
-value print_default_gwf_file conf bname = 
-  let gwf = 
+value print_default_gwf_file conf bname =
+  let gwf =
     [ ("# File generated by GeneWeb", "");
       ("access_by_key", "yes");
       ("disable_forum", "yes");
@@ -583,7 +583,7 @@ value print_default_gwf_file conf bname =
   else write_base_env conf bname gwf
 ;
 
-value create_base conf bname src_file = 
+value create_base conf bname src_file =
   if bname = "" then ()
   else do {
     if src_file = "" then gwc2 conf bname src_file
@@ -599,16 +599,16 @@ value create_base conf bname src_file =
     else print_default_gwf_file conf bname
 };
 
-value rename_base conf bname new_name = 
+value rename_base conf bname new_name =
   let databases =
     List.sort compare
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
          (Array.to_list (Sys.readdir conf.bases_dir)))
   in
   let databases = List.map Filename.chop_extension databases in
-  if List.mem new_name databases then 
+  if List.mem new_name databases then
     error_popup (capitale (transl "database already exists"))
-  else 
+  else
     let old_base = Filename.concat conf.bases_dir (bname ^ ".gwb") in
     let new_base = Filename.concat conf.bases_dir (new_name ^ ".gwb") in
     try Sys.rename old_base new_base with [ _ -> error_popup "error rename" ]
@@ -617,7 +617,7 @@ value rename_base conf bname new_name =
 value clean_database conf bname = do {
   gwu conf bname (bname ^ "_save");
   rename_base conf bname (bname ^ "_old");
-  let fname = Filename.concat conf.bases_dir (bname ^ "_save.gw") in 
+  let fname = Filename.concat conf.bases_dir (bname ^ "_save.gw") in
   gwc2 conf bname fname;
   consang conf bname;
   update_nldb conf bname;
@@ -628,22 +628,22 @@ value merge conf bnames bname parameters = do {
   List.iter
     (fun bname ->
       let bname = Filename.concat conf.bases_dir (bname ^ ".gwb") in
-      let c = 
+      let c =
         Filename.concat bin_dir "gwu " ^ bname ^ " -o " ^ bname ^ ".gw"
       in
       let rc = Sys.command c in
       if rc > 1 then error_popup c
       else ())
     bnames;
-  let old_bases = 
-    List.fold_left 
-      (fun accu bname -> accu ^ " -sep " ^ bname ^ ".gw") 
+  let old_bases =
+    List.fold_left
+      (fun accu bname -> accu ^ " -sep " ^ bname ^ ".gw")
       "" bnames
   in
   let bname = Filename.concat conf.bases_dir bname in
   let c =
     Filename.concat bin_dir "gwc " ^ old_bases ^ " -f -o " ^ bname
-  in 
+  in
   let rc = Sys.command c in
   if rc > 1 then error_popup c
   else ();
@@ -653,7 +653,7 @@ value merge conf bnames bname parameters = do {
 (* exporte toutes les bases au formet GW: base_name_date_today.gw *)
 (* on copie toutes les base dans le nouveau dossier bases *)
 (* on cherche tous les fichiers GW, et on les importe base_name *)
-value export_all_bases conf = 
+value export_all_bases conf =
   let databases =
     List.sort compare
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
@@ -670,11 +670,11 @@ value import_all_bases conf = ()
 
 (**/**) (* UI pratique *)
 value tmp_wnd conf bname f = do {
-  let wnd = GWindow.window 
+  let wnd = GWindow.window
     ~title:(capitale (transl "confirm"))
-    ~position:`CENTER 
-    ~resizable:True () 
-  in 
+    ~position:`CENTER
+    ~resizable:True ()
+  in
   ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
   let vbox = GPack.vbox
     ~spacing:5
@@ -689,9 +689,9 @@ value tmp_wnd conf bname f = do {
     ~packing:hbox#pack ()
   in
   let fname = ref "" in
-  let entry = GEdit.entry 
+  let entry = GEdit.entry
     ~text:""
-    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) () 
+    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
   in
   ignore (entry#connect#changed (fun () -> fname.val := entry#text));
   let bbox = GPack.button_box `HORIZONTAL
@@ -706,10 +706,10 @@ value tmp_wnd conf bname f = do {
   ignore (btn_cancel#connect#clicked (fun () -> wnd#destroy ()));
   let btn_ok = GButton.button
     ~label:(transl "OK")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
   ignore (btn_ok#connect#clicked (fun () -> do {
-    wnd#destroy (); 
+    wnd#destroy ();
     let fname = if fname.val = "" then "a" else fname.val in
     f conf bname fname }));
   wnd#show ();
@@ -720,20 +720,20 @@ value tmp_wnd conf bname f = do {
 
 value main_window = do {
   ignore (GMain.init ());
-  let wnd = GWindow.window 
+  let wnd = GWindow.window
     ~title:("GeneWeb - " ^ Version.txt)
-    ~position:`CENTER 
-    ~resizable:True 
-    ~width:640 ~height:480 () 
-  in 
+    ~position:`CENTER
+    ~resizable:True
+    ~width:640 ~height:480 ()
+  in
   (* TODO : faire un close_server *)
   ignore (wnd#connect#destroy ~callback:GMain.quit);
-  wnd 
+  wnd
 };
 
 value rec show_main conf = do {
-  ignore 
-    (main_window#connect#destroy 
+  ignore
+    (main_window#connect#destroy
        ~callback:(fun () -> do {close_server conf; GMain.quit ()}));
   main_window#show ();
   clean_waiting_pids conf;
@@ -747,9 +747,9 @@ value rec show_main conf = do {
     ~packing:main_window#add ()
   in
   let toolbar = GButton.toolbar
-    ~orientation:`HORIZONTAL  
+    ~orientation:`HORIZONTAL
     ~style:`BOTH
-    ~packing:vbox#pack () 
+    ~packing:vbox#pack ()
   in
   let icon name =
     let file =
@@ -767,49 +767,49 @@ value rec show_main conf = do {
       ~callback:callback ()
   in
   ignore
-    (inser_toolbar 
-       (capitale (transl "create")) (capitale (transl "create a database")) 
+    (inser_toolbar
+       (capitale (transl "create")) (capitale (transl "create a database"))
        "gui_create.png" (fun () -> do { vbox#destroy (); new_database conf; }));
   toolbar#insert_space ();
   ignore
-    (inser_toolbar 
-       (capitale (transl "log")) (capitale (transl "view log")) "gui_log.png" 
+    (inser_toolbar
+       (capitale (transl "log")) (capitale (transl "view log")) "gui_log.png"
        (fun () -> display_log conf) );
   toolbar#insert_space ();
   ignore
-    (inser_toolbar 
-       (capitale (transl "doc")) (capitale (transl "view doc")) "gui_doc.png" 
-       (fun () -> 
+    (inser_toolbar
+       (capitale (transl "doc")) (capitale (transl "view doc")) "gui_doc.png"
+       (fun () ->
          let url = "http://opensource.geneanet.org/projects/geneweb/wiki" in
          ignore (browse conf url)) );
   toolbar#insert_space ();
 (* TOTO : gérer le restart
   ignore
-    (inser_toolbar 
-       (capitale (transl "setup")) (capitale (transl "setup GeneWeb")) 
+    (inser_toolbar
+       (capitale (transl "setup")) (capitale (transl "setup GeneWeb"))
        "gui_setup.png" (fun () -> do { vbox#destroy (); setup_gui conf }));
   toolbar#insert_space ();
 *)
 (*
-  inser_toolbar 
-    (capitale (transl "restart")) (capitale (transl "restart GeneWeb")) 
-    "gtk.xpm" 
+  inser_toolbar
+    (capitale (transl "restart")) (capitale (transl "restart GeneWeb"))
+    "gtk.xpm"
     (fun () -> do { vbox#destroy (); close_server conf; launch_server conf });
   toolbar#insert_space ();
 *)
   ignore
-    (inser_toolbar 
-       (capitale (transl "quit")) (capitale (transl "quit GeneWeb")) 
-       "gui_quit.png" 
+    (inser_toolbar
+       (capitale (transl "quit")) (capitale (transl "quit GeneWeb"))
+       "gui_quit.png"
        (fun () -> do { vbox#destroy (); close_server conf; GMain.quit () }));
-  if databases = [] then 
-    ignore 
-      (GMisc.label 
-         ~text:(capitale (transl "no databases.")) 
+  if databases = [] then
+    ignore
+      (GMisc.label
+         ~text:(capitale (transl "no databases."))
          ~packing:vbox#pack ())
   else do {
     let _label = GMisc.label
-      ~text:((capitale (transl "available databases")) ^ 
+      ~text:((capitale (transl "available databases")) ^
               " (" ^ (string_of_int (List.length databases) ^ "):"))
       ~packing:vbox#pack ()
     in
@@ -839,19 +839,19 @@ value rec show_main conf = do {
              ~label:(capitale (transl "browse"))
              ~packing:(table#attach ~left:1 ~top:i) ()
            in
-           ignore 
-             (bbut#connect#clicked 
-               (fun () -> 
-                 let url = 
-                   Printf.sprintf "http://localhost:%d/%s" conf.port bn 
+           ignore
+             (bbut#connect#clicked
+               (fun () ->
+                 let url =
+                   Printf.sprintf "http://localhost:%d/%s" conf.port bn
                  in
                  ignore (browse conf url)));
            let bbut = GButton.button
              ~label:(capitale (transl "tools"))
              ~packing:(table#attach ~left:2 ~top:i) ()
            in
-           ignore 
-             (bbut#connect#clicked 
+           ignore
+             (bbut#connect#clicked
                (fun () -> do { vbox#destroy (); tools conf bn }));
            loop (i+1) l }]
   }
@@ -873,7 +873,7 @@ and new_database conf = do {
     ~text:(capitale (transl "name of the database:"))
     ~packing:(table#attach ~left:0 ~top:0) ()
   in
-  let entry = GEdit.entry 
+  let entry = GEdit.entry
     ~text:""
     ~packing:(table#attach ~left:1 ~top:0) ()
   in
@@ -886,12 +886,12 @@ and new_database conf = do {
     ~layout: `SPREAD
     ~packing: (table#attach ~left:1 ~top:1) ()
   in
-  let select = GButton.button 
-    ~stock:`OPEN 
+  let select = GButton.button
+    ~stock:`OPEN
     ~packing:bbox#pack ()
   in
   let file = ref "" in
-  ignore 
+  ignore
     (select#connect#clicked
        (fun () -> file.val := select_file main_window ""));
   let bbox = GPack.button_box `HORIZONTAL
@@ -903,16 +903,16 @@ and new_database conf = do {
     ~label:(capitale (transl "cancel"))
     ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_cancel#connect#clicked 
+  ignore
+    (btn_cancel#connect#clicked
       (fun () -> do { vbox#destroy (); show_main conf } ) );
   let btn_ok = GButton.button
     ~label:(transl "OK")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_ok#connect#clicked 
-      (fun () -> 
+  ignore
+    (btn_ok#connect#clicked
+      (fun () ->
         do {
           create_base conf entry#text file.val;
           vbox#destroy ();
@@ -921,10 +921,10 @@ and new_database conf = do {
 }
 
 and setup_gui conf = do {
-  let old_conf = 
+  let old_conf =
     { bases_dir = conf.bases_dir; port = conf.port;
-      browser = conf.browser; log = conf.log; gui_arg = []; 
-      gwd_arg = [] ; only_arg = []; 
+      browser = conf.browser; log = conf.log; gui_arg = [];
+      gwd_arg = [] ; only_arg = [];
       server_running = conf.server_running;
       waiting_pids = conf.waiting_pids }
   in
@@ -936,56 +936,56 @@ and setup_gui conf = do {
     ~text:(transl "setup GeneWeb")
     ~packing:vbox#pack ()
   in
-  let hbox = GPack.hbox 
-    ~spacing:5 
-    ~packing:vbox#pack () 
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
   in
   let _label = GMisc.label
     ~text:("Bases dir : " ^ conf.bases_dir)
     ~packing:hbox#pack ()
   in
-  let select = GButton.button 
-    ~stock:`OPEN 
-    ~packing:(hbox#pack ~expand:False) () 
+  let select = GButton.button
+    ~stock:`OPEN
+    ~packing:(hbox#pack ~expand:False) ()
   in
-  ignore 
+  ignore
     (select#connect#clicked
        (fun () -> conf.bases_dir := select_dir main_window conf.bases_dir)) ;
-  let hbox = GPack.hbox 
-    ~spacing:5 
-    ~packing:vbox#pack () 
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
   in
-  let _label = GMisc.label 
-    ~text:"Port :" 
+  let _label = GMisc.label
+    ~text:"Port :"
     ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
   in
-  let entry = GEdit.entry 
+  let entry = GEdit.entry
     ~text:(string_of_int conf.port)
-    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) () 
+    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
   in
   ignore
     (entry#connect#changed
        (fun () -> conf.port := int_of_string entry#text));
-  let browser = 
+  let browser =
     match conf.browser with
     [ Some browser -> browser
-    | None -> "" ] 
+    | None -> "" ]
   in
-  let hbox = GPack.hbox 
-    ~spacing:5 
-    ~packing:vbox#pack () 
+  let hbox = GPack.hbox
+    ~spacing:5
+    ~packing:vbox#pack ()
   in
   let _label = GMisc.label
     ~text:("Browser : " ^ browser)
     ~packing:hbox#pack ()
   in
-  let select = GButton.button 
-    ~stock:`OPEN 
-    ~packing:(hbox#pack ~expand:False) () 
+  let select = GButton.button
+    ~stock:`OPEN
+    ~packing:(hbox#pack ~expand:False) ()
   in
-  ignore 
+  ignore
     (select#connect#clicked
-       (fun () -> 
+       (fun () ->
          let browser = select_file main_window bin_dir in
          let browser = if browser = "" then None else Some browser in
          conf.browser := browser)) ;
@@ -998,24 +998,24 @@ and setup_gui conf = do {
     ~label:(transl "Cancel")
     ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_cancel#connect#clicked 
+  ignore
+    (btn_cancel#connect#clicked
        (fun () -> do { vbox#destroy (); show_main old_conf } ) ) ;
   let btn_ok = GButton.button
     ~label:(transl "OK")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_ok#connect#clicked 
-      (fun () -> do { 
-        vbox#destroy (); 
-        let browser = 
+  ignore
+    (btn_ok#connect#clicked
+      (fun () -> do {
+        vbox#destroy ();
+        let browser =
           match conf.browser with
           [ Some b -> b
           | None -> "" ]
         in
-        let gui_arg = 
-          [("bd", conf.bases_dir); ("port", string_of_int conf.port); 
+        let gui_arg =
+          [("bd", conf.bases_dir); ("port", string_of_int conf.port);
            ("browser", browser)]
         in
         let conf = {(conf) with gui_arg = gui_arg} in
@@ -1050,11 +1050,11 @@ and config_gwf conf bname = do {
   let benv = read_base_env conf bname in
   let benv_new = ref (List.map (fun (k, v) -> (k, ref v)) benv) in
   List.iter
-    (fun (k, v) -> 
+    (fun (k, v) ->
       do {
         let hbox = GPack.hbox
-          ~spacing:5 
-          ~packing:vbox_list#pack () 
+          ~spacing:5
+          ~packing:vbox_list#pack ()
         in
         let _label = GMisc.label
           ~text: (k ^ " : ")
@@ -1062,16 +1062,16 @@ and config_gwf conf bname = do {
           ~packing:hbox#pack ()
         in
         (*
-          TODO : 
+          TODO :
           si la valeur vaut "yes" ou "no", on ajoute un bouton radio
           sinon on ajoute un champ texte
           if v.val =
         *)
-        let entry = 
-          GEdit.entry 
+        let entry =
+          GEdit.entry
             ~text: v.val
             ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
-        in 
+        in
         ignore (entry#connect#changed (fun () -> v.val := entry#text))
       } )
     benv_new.val;
@@ -1084,19 +1084,19 @@ and config_gwf conf bname = do {
     ~label:(transl "Cancel")
     ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_cancel#connect#clicked 
+  ignore
+    (btn_cancel#connect#clicked
        (fun () -> do { vbox#destroy (); show_main conf } ) );
   let btn_ok = GButton.button
     ~label:(transl "OK")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_ok#connect#clicked 
-       (fun () -> do { 
+  ignore
+    (btn_ok#connect#clicked
+       (fun () -> do {
          let new_benv = List.map (fun (k, v) -> (k, v.val)) benv_new.val in
          write_base_env conf bname new_benv;
-         vbox#destroy (); 
+         vbox#destroy ();
          show_main conf } ) )
 }
 
@@ -1128,7 +1128,7 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "Extract GW")
-    ~packing:(table#attach ~left:1 ~top:0) () 
+    ~packing:(table#attach ~left:1 ~top:0) ()
   in
   ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwu));
   let _label = GMisc.label
@@ -1137,7 +1137,7 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "Extract GED")
-    ~packing:(table#attach ~left:1 ~top:1) () 
+    ~packing:(table#attach ~left:1 ~top:1) ()
   in
   ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwb2ged));
   let _label = GMisc.label
@@ -1146,10 +1146,10 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "setup gwf file")
-    ~packing:(table#attach ~left:1 ~top:2) () 
+    ~packing:(table#attach ~left:1 ~top:2) ()
   in
-  ignore 
-    (bbut#connect#clicked 
+  ignore
+    (bbut#connect#clicked
       (fun () -> do { vbox#destroy (); config_gwf conf bname })) ;
   let _label = GMisc.label
     ~text:(transl "Clean database")
@@ -1157,7 +1157,7 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "Clean")
-    ~packing:(table#attach ~left:1 ~top:3) () 
+    ~packing:(table#attach ~left:1 ~top:3) ()
   in
   ignore (bbut#connect#clicked (fun () -> clean_database conf bname));
   let _label = GMisc.label
@@ -1166,13 +1166,13 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "Rename")
-    ~packing:(table#attach ~left:1 ~top:4) () 
+    ~packing:(table#attach ~left:1 ~top:4) ()
   in
-  ignore 
-    (bbut#connect#clicked 
+  ignore
+    (bbut#connect#clicked
        (fun () -> do {
-         tmp_wnd conf bname rename_base; 
-         vbox#destroy (); 
+         tmp_wnd conf bname rename_base;
+         vbox#destroy ();
          show_main conf}));
   let _label = GMisc.label
     ~text:(transl "Delete")
@@ -1180,7 +1180,7 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "Delete")
-    ~packing:(table#attach ~left:1 ~top:5) () 
+    ~packing:(table#attach ~left:1 ~top:5) ()
   in
   ignore (bbut#connect#clicked (fun () -> delete_base conf bname));
 (* TODO
@@ -1189,10 +1189,10 @@ and tools conf bname = do {
     ~packing:(table#attach ~left:0 ~top:0) ();
   let bbut = GButton.button
     ~label:(transl "Merge")
-    ~packing:(table#attach ~left:1 ~top:0) () 
+    ~packing:(table#attach ~left:1 ~top:0) ()
   in
-  ignore 
-    (bbut#connect#clicked 
+  ignore
+    (bbut#connect#clicked
       (fun () -> ()));
 *)
   let _label = GMisc.label
@@ -1201,7 +1201,7 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "Consang")
-    ~packing:(table#attach ~left:1 ~top:6) () 
+    ~packing:(table#attach ~left:1 ~top:6) ()
   in
   ignore (bbut#connect#clicked (fun () -> consang conf bname));
   let _label = GMisc.label
@@ -1210,7 +1210,7 @@ and tools conf bname = do {
   in
   let bbut = GButton.button
     ~label:(transl "Update_nldb")
-    ~packing:(table#attach ~left:1 ~top:7) () 
+    ~packing:(table#attach ~left:1 ~top:7) ()
   in
   ignore (bbut#connect#clicked (fun () -> update_nldb conf bname));
   let bbox = GPack.button_box `HORIZONTAL
@@ -1220,10 +1220,10 @@ and tools conf bname = do {
   in
   let btn_cancel = GButton.button
     ~label:(transl "Home")
-    ~packing:bbox#pack () 
+    ~packing:bbox#pack ()
   in
-  ignore 
-    (btn_cancel#connect#clicked 
+  ignore
+    (btn_cancel#connect#clicked
        (fun () -> do { vbox#destroy (); show_main conf } ) );
 }
 
@@ -1273,7 +1273,7 @@ value launch_config () =
     let browser = Some (List.assoc "browser" gui_arg) in
     let log = Filename.concat bases_dir "comm.log" in
     let conf =
-      { bases_dir = bases_dir; 
+      { bases_dir = bases_dir;
         port = port; browser = browser; log = log;
         gui_arg = gui_arg; gwd_arg = []; only_arg = [];
         server_running = None; waiting_pids = [] }
@@ -1283,7 +1283,7 @@ value launch_config () =
     let assistant = GAssistant.assistant () in
     assistant#misc#set_size_request ~width:450 ~height:300 ();
     assistant#set_title (transl "Setup GeneWeb");
-    let page_0 = GMisc.label 
+    let page_0 = GMisc.label
       ~text:(transl "This assistant will help you to setup GeneWeb") ()
     in
     let bases_dir = ref "" in
@@ -1297,11 +1297,11 @@ value launch_config () =
       ~layout: `SPREAD
       ~packing:(page_1#pack ~expand:False ~fill:False ~padding:5) ()
     in
-    let select = GButton.button 
-      ~stock:`OPEN 
+    let select = GButton.button
+      ~stock:`OPEN
       ~packing:(bbox#pack ~expand:False ~fill:False ~padding:5) ()
     in
-    ignore 
+    ignore
       (select#connect#clicked
          (fun () -> do {
            bases_dir.val := select_dir assistant bases_dir.val;
@@ -1318,9 +1318,9 @@ value launch_config () =
       ~text:(string_of_int port.val)
       ~packing:(page_2#pack ~expand:False ~fill:False ~padding:5) ()
     in
-    ignore 
+    ignore
       (entry#connect#changed
-         (fun () -> do { 
+         (fun () -> do {
            let txt = entry#text in
            port.val := int_of_string txt;
            let num = assistant#current_page in
@@ -1337,11 +1337,11 @@ value launch_config () =
       ~layout: `SPREAD
       ~packing:(page_3#pack ~expand:False ~fill:False ~padding:5) ()
     in
-    let select = GButton.button 
-      ~stock:`OPEN 
+    let select = GButton.button
+      ~stock:`OPEN
       ~packing:(bbox#pack ~expand:False ~fill:False ~padding:5) ()
     in
-    ignore 
+    ignore
       (select#connect#clicked
          (fun () -> do {
            browser.val := select_file assistant browser.val;
@@ -1350,42 +1350,42 @@ value launch_config () =
            assistant#set_page_complete page (browser.val <> "") }));
     match config_browser () with
     [ Some b ->
-        let btn = GButton.check_button 
-          ~label:b 
+        let btn = GButton.check_button
+          ~label:b
           ~packing:(page_3#pack ~expand:False ~fill:False ~padding:5) ()
         in
         ignore
-          (btn#connect#toggled 
-             ~callback:(fun () -> do { 
+          (btn#connect#toggled
+             ~callback:(fun () -> do {
                browser.val := b;
                let num = assistant#current_page in
                let page = assistant#nth_page num in
                assistant#set_page_complete page btn#active }))
     | None -> () ];
-    let page_4 = GMisc.label 
+    let page_4 = GMisc.label
       ~text:(transl "save preferences") ()
     in
     ignore
-      (assistant#append_page 
+      (assistant#append_page
          ~title:(transl "Introduction")
-         ~page_type:`INTRO 
+         ~page_type:`INTRO
          ~complete:True
          page_0#as_widget);
     ignore
-      (assistant#append_page 
+      (assistant#append_page
          ~title:(transl "Setup bases directory")
-         ~page_type:`CONTENT 
+         ~page_type:`CONTENT
          page_1#as_widget);
     ignore
-      (assistant#append_page 
+      (assistant#append_page
          ~title:(transl "Setup port")
-         ~page_type:`CONTENT 
+         ~page_type:`CONTENT
          ~complete:True
          page_2#as_widget);
     ignore
-      (assistant#append_page 
+      (assistant#append_page
          ~title:(transl "Setup browser")
-         ~page_type:`CONTENT 
+         ~page_type:`CONTENT
          page_3#as_widget);
     ignore
       (assistant#append_page
@@ -1394,17 +1394,17 @@ value launch_config () =
          ~complete:True
          page_4#as_widget);
     let save_config () = do {
-      let gui_arg = 
-        [("bd", bases_dir.val); ("port", string_of_int port.val); 
+      let gui_arg =
+        [("bd", bases_dir.val); ("port", string_of_int port.val);
          ("browser", browser.val)]
       in
       let conf =
-        { bases_dir = bases_dir.val; 
+        { bases_dir = bases_dir.val;
           port = port.val; browser = Some browser.val;
           log = Filename.concat bases_dir.val "comm.log";
           gui_arg = gui_arg; gwd_arg = []; only_arg = [];
           server_running = None; waiting_pids = [] }
-      in 
+      in
       (* TODO : On en a besoin avant ... *)
       (* mkdir_p conf.bases_dir; *)
       write_config_file conf;

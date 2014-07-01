@@ -364,7 +364,7 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
         let per_tab = Array.create (nb_of_persons base) 0 in
         let fam_tab = Array.create (nb_of_families base) 0 in
         let _ =
-          if censor = -1 then restrict_base base per_tab fam_tab 1      
+          if censor = -1 then restrict_base base per_tab fam_tab 1
           else censor_base base per_tab fam_tab 1 threshold
         in
         (fun i -> per_tab.(Adef.int_of_iper i) = 0,

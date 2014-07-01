@@ -842,7 +842,7 @@ no: etter
 pl: przejrzeć listę:
 pt: por
 ro: cu
-sl: 
+sl:
 sv: efter
 ] [place] / [surname/surnames]0</span>
                       - [birth]
@@ -891,7 +891,7 @@ es: <span class="highlight">mediante una</span>
        <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>consulta
        avanzada</b></font></a>.
 et: <span class="highlight"></span>
-       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>laiendatud 
+       <a href="%prefix;m=H;v=advanced"><font color="%highlight;"><b>laiendatud
        päring</b></font></a>.
 fi: <a href="%prefix;m=H;v=advanced"><span
        class="highlight">erityishaulla</span></a>.
@@ -960,7 +960,7 @@ es: Puede
 et: Täiendamine:
 fi: Taikka
 fr: Vous pouvez
-he:  יש אפשרות 
+he:  יש אפשרות
 is: Þú getur
 it: Si può
 lv: Izmaiņu veikšana:
@@ -1161,7 +1161,7 @@ is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome;
 it: Dal %start_date; ci sono stati %nb_accesses; accessi,
     %nb_accesses_to_welcome; dei quali a questa pagina.
 lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
-    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē. 
+    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē.
 nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
     bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
 no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome;
@@ -1218,7 +1218,7 @@ eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
 es: Si las páginas modificadas no serán actualizadas
     automaticamente, favor de usar esta conexión:
     <a href="%prefix;escache=0">hier</a>.
-et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
+et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt
     (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
     navigeerimist <a href="%prefix;escache=0">sellest viitest</a>.
 fi: Mikäli selaimesi ei automaattisesti päivitä muutettuja
@@ -1241,10 +1241,10 @@ lv: Ja Jūsu Interneta caurlūkprogramma automātiski nepārlādē lappuses pēc
 nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
     alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
     <a href="%prefix;escache=0">deze link</a>.
-no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
+no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever
     oppfrisking av den aktuelle siden), prøv da å navigere <a
     href="%prefix;escache=0">herfra</a>.
-pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron 
+pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron
     (zmuszając cię do ich ręcznego odświeżania), kliknij <a
     href="%prefix;escache=0">tutaj</a>.
 pt: Se o seu <i>browser</i> não actualiza automaticamente as
@@ -1283,7 +1283,7 @@ fi: Sanasto
 fr: lexique
 he: לקסיקון
 is: orðasafn
-it: lessico 
+it: lessico
 no: leksikon
 pl: leksykon
 ro: lexicon

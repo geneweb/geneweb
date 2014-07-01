@@ -13,7 +13,7 @@ value fold_place inverted s =
   (* petit hack (pour GeneaNet) en attendant une vraie gestion des lieux *)
   (* transforme "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)"    *)
   let s =
-   Str.global_replace (Str.regexp "^\[\([^]]+\)\] *- *\(.*\)") "\1, \2" s 
+   Str.global_replace (Str.regexp "^\[\([^]]+\)\] *- *\(.*\)") "\1, \2" s
   in
   let rec loop iend list i ibeg =
     if i = iend then
@@ -173,10 +173,10 @@ value print_html_places_surnames conf base list =
         snl
     in
     let snl =
-      List.sort 
-        (fun (_, _, sn1) (_, _, sn2) -> Gutil.alphabetic_order sn1 sn2) 
+      List.sort
+        (fun (_, _, sn1) (_, _, sn2) -> Gutil.alphabetic_order sn1 sn2)
         snl
-    in 
+    in
     let snl =
       List.fold_right
         (fun (len, p, sn) ->
@@ -237,7 +237,7 @@ value print_all_places_surnames_short conf list =
          (s, len, ip) )
       list
   in
-  let list = 
+  let list =
     List.sort (fun (s1, _, _) (s2, _, _) -> Gutil.alphabetic_order s1 s2) list
   in
   let list =
@@ -272,8 +272,8 @@ value print_all_places_surnames_short conf list =
     tag "p" begin
       List.iter
         (fun (s, len, ip) -> do {
-          stag "a" "href=\"%sm=PS%s;k=%s\"" 
-            (commd conf) opt (Util.code_varenv s) 
+          stag "a" "href=\"%sm=PS%s;k=%s\""
+            (commd conf) opt (Util.code_varenv s)
           begin
             Wserver.wprint "%s" s;
           end;
@@ -298,12 +298,12 @@ value print_all_places_surnames_long conf base list =
     match (pl1, pl2) with
     [ (_, []) -> 1
     | ([], _) -> -1
-    | ([s1 :: pl11], [s2 :: pl22]) -> 
+    | ([s1 :: pl11], [s2 :: pl22]) ->
         if Gutil.alphabetic_order s1 s2 = 0 then sort_place_utf8 pl11 pl22
         else Gutil.alphabetic_order s1 s2 ]
   in
-  let list = 
-    List.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) list 
+  let list =
+    List.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) list
   in
   let title _ =
     Wserver.wprint "%s / %s" (capitale (transl conf "place"))

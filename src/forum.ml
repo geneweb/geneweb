@@ -887,7 +887,7 @@ value set_validator conf base pos =
             let len = String.length moderator in
             if String.length conf.user < len - 1 then conf.user
             else String.sub conf.user 0 (len - 1)
-          in           
+          in
           MF.patch fname pos (sprintf "Moderator: /%s" m);
           True
         }
@@ -969,7 +969,7 @@ value set_access conf base pos =
             match access with
             [ "publ" -> "priv"
             | _ -> "publ" ]
-          in           
+          in
           MF.patch fname pos (sprintf "Access: %s" new_access);
           True
         }

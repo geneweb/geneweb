@@ -42,7 +42,7 @@
       <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
            style="border: none" alt="[M/F]1"%/>%nn;
     %else;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png" 
+      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png"
            style="border: none" alt="?" title="?"%/>%nn;
     %end;
     %sp;

@@ -478,7 +478,7 @@ value rec hotl conf wlo cnt edit_opt sections_nums list =
                loop2 [s] sl
               else loop1 [s :: parag] sl
           | [] -> Some (parag, [], True) ]
-        and loop2 parag = 
+        and loop2 parag =
           fun
           [ ["" :: sl] -> Some (parag, sl, False)
           | [s :: sl] ->

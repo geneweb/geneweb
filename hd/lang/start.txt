@@ -662,7 +662,7 @@ no: etter
 pl: przejrzeæ listê:
 pt: por
 ro: cu
-sl: 
+sl:
 sv: efter
 ] [place] / [surname/surnames]0</b></font>
 - [birth] <input type="checkbox" name="bi" value="on" checked="checked"%/>
@@ -768,7 +768,7 @@ es: Puede
 et: Täiendamine:
 fi: Taikka
 fr: Vous pouvez
-he:  éù àôùøåú 
+he:  éù àôùøåú
 is: Şú getur
 it: Si pu&ograve;
 lv: Izmaiòu veikğana:
@@ -919,7 +919,7 @@ en: There have been %q accesses, %c of them to this page, since %d.
 eo: Estis %q alirejoj, el kiuj %c al cxi tiu pagxo, ekde la %d.
 es: Ha habido %q consultas, de las cuales %c corresponden a esta
     p&aacute;gina, desde el %d.
-et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda, 
+et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda,
     neist %c korda sellele lehele.
 fi: T&auml;h&auml;n menness&auml; %q tapahtumaa, joista %c t&auml;lle
     sivulle %d j&auml;lkeen.
@@ -928,7 +928,7 @@ he: äéå %q ëğéñåú, ëåìì %c ëğéñåú ìòîåã æä, îàæ %d.
 is: Şağ hafa veriğ %q heimsóknir, %c af şeim á şessa síğu, síğan %d.
 it: Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
 lv: Kopğ %D datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuği ğinî
-    lappusç. 
+    lappusç.
 nl: Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
     deze verwelkomingspagina.
 no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
@@ -977,7 +977,7 @@ eo: Se via navigisto ne auxtomate gxisdatigas la modifigitajn pagxojn
 es: Si las p&aacute;ginas modificadas no ser&aacute;n actualizadas
     automaticamente, favor de usar esta conexi&oacute;n:
     <a href="%sescache=0">hier</a>.
-et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
+et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt
     (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
     navigeerimist <a href="%sescache=0">sellest viitest</a>.
 fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml; muutettuja
@@ -999,10 +999,10 @@ lv: Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
 nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
     alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
     <a href="%sescache=0">deze link</a>.
-no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
+no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever
     oppfrisking av den aktuelle siden), prøv da å navigere <a
     href="%sescache=0">herfra</a>.
-pl: Je¿eli twoja przegl±darka nie od¶wie¿a automatycznie zmienionych stron 
+pl: Je¿eli twoja przegl±darka nie od¶wie¿a automatycznie zmienionych stron
     (zmuszaj±c ciê do ich rêcznego od¶wie¿ania), kliknij <a
     href="%sescache=0">tutaj</a>.
 pt: Se o seu <i>browser</i> n&atilde;o actualiza automaticamente as
@@ -1046,7 +1046,7 @@ fi: Sanasto
 fr: lexique
 he: ì÷ñé÷åï
 is: orğasafn
-it: lessico 
+it: lessico
 no: leksikon
 pl: leksykon
 ro: lexicon

@@ -138,7 +138,7 @@
   %apply;td_missing_events_rowspan("xx")%nn;
   %if;(count > 0)
     bgcolor="#988C90" align="center" %nn;
-  %else; 
+  %else;
     bgcolor="#CCC3C6" %nn;
   %end;
 %end;
@@ -231,7 +231,7 @@
               %apply;short_display_person("spouse")
             </td>
           %end;
-        %end;        
+        %end;
       %else;
         <td bgcolor="#CCC3C6">&nbsp;</td>
       %end;
@@ -260,7 +260,7 @@
               %end;
             </td>
           %end;
-        %end;        
+        %end;
       %else;
         <td bgcolor="#CCC3C6">&nbsp;</td>
       %end;
@@ -420,8 +420,8 @@
 %end;
 
 
-%( 
-   Main 
+%(
+   Main
 %)
 
 %let;nb_gena;%apply;min(evar.v, max_anc_level)%in;

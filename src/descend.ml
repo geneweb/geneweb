@@ -666,7 +666,7 @@ value display_spouse_index conf base max_level ancestor =
     [Args] :
       - conf : configuration de la base
       - base : base de donnée
-    [Retour] : 
+    [Retour] :
       - Le nombre de colonnes à afficher (nombre d'options sélectionnées).
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
@@ -736,7 +736,7 @@ value print_desc_table_header conf base = do {
     if p_getenv conf.env "occu" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" 
+        Wserver.wprint "%s"
           (capitale (transl_nth conf "occupation/occupations" 1));
       end
     else ();
@@ -762,7 +762,7 @@ value print_person_table conf base p lab = do {
   let p_auth = Util.authorized_age conf base p in
   let nb_families = Array.length (get_family p) in
   (* On calcul le nombre de rowspan pour avoir un affichage joli. *)
-  let rowspan = 
+  let rowspan =
     if nb_families > 1 &&
        (p_getenv conf.env "marr" = Some "on" ||
         p_getenv conf.env "marr_date" = Some "on" ||
@@ -778,7 +778,7 @@ value print_person_table conf base p lab = do {
     end;
     tag "td" "%s" rowspan begin
       Util.print_image_sex conf p 11;
-      Wserver.wprint " %s &nbsp;" (referenced_person_title_text conf base p); 
+      Wserver.wprint " %s &nbsp;" (referenced_person_title_text conf base p);
     end;
     if p_getenv conf.env "birth" = Some "on" then
       tag "td" "%s" rowspan begin
@@ -802,12 +802,12 @@ value print_person_table conf base p lab = do {
       tag "td" "%s" rowspan begin
         if get_birth p <> Adef.codate_None then
           Wserver.wprint "%s &nbsp;"
-            (if p_auth then 
+            (if p_auth then
               Util.string_of_place conf (sou base (get_birth_place p))
              else "")
         else
-          Wserver.wprint "%s &nbsp;" 
-            (if p_auth then 
+          Wserver.wprint "%s &nbsp;"
+            (if p_auth then
               Util.string_of_place conf (sou base (get_baptism_place p))
              else "");
       end
@@ -816,18 +816,18 @@ value print_person_table conf base p lab = do {
     (* Les autres familles seront affichées après qu'on ait   *)
     (* fini de remplir le <tr>.                               *)
     if p_getenv conf.env "marr" = Some "on" then
-      tag "td" "%s" 
-        (if nb_families > 1 then "style=\"border-bottom:none\"" else "") 
+      tag "td" "%s"
+        (if nb_families > 1 then "style=\"border-bottom:none\"" else "")
         begin
         let u = p in
-        if nb_families > 0 then 
+        if nb_families > 0 then
           do {
             let cpl = foi base (get_family u).(0) in
             let spouse =
               pget conf base (Gutil.spouse (get_key_index p) cpl)
             in
             Util.print_image_sex conf spouse 11;
-            Wserver.wprint 
+            Wserver.wprint
               " %s &nbsp;" (referenced_person_text conf base spouse);
           }
         else Wserver.wprint "&nbsp;";
@@ -837,8 +837,8 @@ value print_person_table conf base p lab = do {
     (* Les autres familles seront affichées après qu'on ait   *)
     (* fini de remplir le <tr>.                               *)
     if p_getenv conf.env "marr_date" = Some "on" then
-      tag "td" "%s" 
-        (if nb_families > 1 then "style=\"border-bottom:none\"" else "") 
+      tag "td" "%s"
+        (if nb_families > 1 then "style=\"border-bottom:none\"" else "")
         begin
         let u = p in
         if nb_families > 0 then
@@ -863,8 +863,8 @@ value print_person_table conf base p lab = do {
     (* Les autres familles seront affichées après qu'on ait   *)
     (* fini de remplir le <tr>.                               *)
     if p_getenv conf.env "marr_place" = Some "on" then
-      tag "td" "%s" 
-        (if nb_families > 1 then "style=\"border-bottom:none\"" else "") 
+      tag "td" "%s"
+        (if nb_families > 1 then "style=\"border-bottom:none\"" else "")
         begin
         let u = p in
         if nb_families > 0 then
@@ -872,8 +872,8 @@ value print_person_table conf base p lab = do {
           let spouse =
             pget conf base (Gutil.spouse (get_key_index p) cpl)
           in
-          let mplace = 
-            if authorized_age conf base p && authorized_age conf base spouse 
+          let mplace =
+            if authorized_age conf base p && authorized_age conf base spouse
             then
               Util.string_of_place conf (sou base (get_marriage_place cpl))
             else ""
@@ -890,8 +890,8 @@ value print_person_table conf base p lab = do {
          p_getenv conf.env "marr_place" = Some "on" ||
          p_getenv conf.env "marr_date" = Some "on"
       then
-        tag "td" "align=\"center\" %s" 
-          (if nb_families > 1 then "style=\"border-bottom:none\"" else "") 
+        tag "td" "align=\"center\" %s"
+          (if nb_families > 1 then "style=\"border-bottom:none\"" else "")
           begin
           let u = p in
           if nb_families > 0 then
@@ -915,12 +915,12 @@ value print_person_table conf base p lab = do {
           if not p_auth then "&nbsp;"
           else
             match get_death p with
-            [ Death _ d -> 
+            [ Death _ d ->
                 let d = Adef.date_of_cdate d in
                 Date.string_slash_of_date conf d
-            | _ -> 
+            | _ ->
                 match get_burial p with
-                [ Cremated cod | Buried cod -> 
+                [ Cremated cod | Buried cod ->
                     match Adef.od_of_codate cod with
                     [ Some d -> Date.string_slash_of_date conf d
                     | _ -> "&nbsp;" ]
@@ -935,11 +935,11 @@ value print_person_table conf base p lab = do {
           if not p_auth then ""
           else
             match get_death p with
-            [ Death _ d -> 
+            [ Death _ d ->
                 Util.string_of_place conf (sou base (get_death_place p))
-            | _ -> 
+            | _ ->
                 match get_burial p with
-                [ Cremated cod | Buried cod -> 
+                [ Cremated cod | Buried cod ->
                     match Adef.od_of_codate cod with
                     [ Some d ->
                         Util.string_of_place conf (sou base (get_burial_place p))
@@ -951,7 +951,7 @@ value print_person_table conf base p lab = do {
     else ();
     if p_getenv conf.env "death_age" = Some "on" then
       tag "td" "%s" rowspan begin
-        let d = 
+        let d =
           if not p_auth then ""
           else
             match Date.get_birth_death_date p with
@@ -971,7 +971,7 @@ value print_person_table conf base p lab = do {
     else ();
     if p_getenv conf.env "occu" = Some "on" then
       tag "td" "%s" rowspan begin
-        Wserver.wprint 
+        Wserver.wprint
           "%s &nbsp;" (if p_auth then sou base (get_occupation p) else "");
       end
     else ();
@@ -993,17 +993,17 @@ value print_person_table conf base p lab = do {
         let fam = foi base (get_family u).(i) in
         tag "tr" begin
           if p_getenv conf.env "marr" = Some "on" then
-            tag "td" "style=\"border-top:none; %s\"" 
-              (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
+            tag "td" "style=\"border-top:none; %s\""
+              (if (nb_families - 1) <> i then "border-bottom:none;" else "")
               begin
                 Util.print_image_sex conf spouse 11;
-                Wserver.wprint 
+                Wserver.wprint
                   " %s &nbsp;" (referenced_person_text conf base spouse);
             end
           else ();
           if p_getenv conf.env "marr_date" = Some "on" then
-            tag "td" "style=\"border-top:none; %s\"" 
-              (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
+            tag "td" "style=\"border-top:none; %s\""
+              (if (nb_families - 1) <> i then "border-bottom:none;" else "")
               begin
                 let mdate =
                   if authorized_age conf base p &&
@@ -1018,11 +1018,11 @@ value print_person_table conf base p lab = do {
             end
           else ();
           if p_getenv conf.env "marr_place" = Some "on" then
-            tag "td" "style=\"border-top:none; %s\"" 
-              (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
+            tag "td" "style=\"border-top:none; %s\""
+              (if (nb_families - 1) <> i then "border-bottom:none;" else "")
               begin
-                let mplace = 
-                  if authorized_age conf base p && 
+                let mplace =
+                  if authorized_age conf base p &&
                      authorized_age conf base spouse then
                     Util.string_of_place conf (sou base (get_marriage_place cpl))
                   else ""
@@ -1031,8 +1031,8 @@ value print_person_table conf base p lab = do {
             end
           else ();
           if p_getenv conf.env "child" = Some "on" then
-            tag "td" "align=\"center\" style=\"border-top:none; %s\"" 
-              (if (nb_families - 1) <> i then "border-bottom:none;" else "") 
+            tag "td" "align=\"center\" style=\"border-top:none; %s\""
+              (if (nb_families - 1) <> i then "border-bottom:none;" else "")
               begin
                 Wserver.wprint "%d &nbsp;" (Array.length (get_children fam));
             end
@@ -1059,11 +1059,11 @@ value print_person_table conf base p lab = do {
 value build_desc conf base l =
   let rec loop l accu =
     match l with
-    [ [] -> 
+    [ [] ->
         (* Comme on a fait un fold_left pour avoir le bon ordre *)
         (* des enfants, on renverse l'accumulateur pour l'avoir *)
         (* lui aussi dans le bon ordre.                         *)
-        List.rev accu 
+        List.rev accu
     | [(p, lab) :: l] ->
         let cnt = ref 0 in
         let nx_accu =
@@ -1073,7 +1073,7 @@ value build_desc conf base l =
             (fun accu ifam ->
               let fam = foi base ifam in
               List.fold_left
-                (fun accu ip -> 
+                (fun accu ip ->
                   let _ = incr cnt in
                   [(pget conf base ip, lab ^ string_of_int cnt.val ^ ".") :: accu])
                 accu (Array.to_list (get_children fam)))
@@ -1086,9 +1086,9 @@ value build_desc conf base l =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] display_descendant_with_table : 
+(*  [Fonc] display_descendant_with_table :
       config -> base -> int -> person -> unit                             *)
-(** [Description] : Affiche sous la forme d'un tableau la descendance 
+(** [Description] : Affiche sous la forme d'un tableau la descendance
                     d'une personne.
     [Args] :
       - conf    : configuration de la base
@@ -1107,17 +1107,17 @@ value display_descendant_with_table conf base max_lev p =
   (* est vide, on les calcul par rapport à refl)                   *)
   let rec loop lev nb_col first refl l =
     match l with
-    [ [] -> 
+    [ [] ->
         if lev < max_lev then
-          let nl = build_desc conf base refl in 
+          let nl = build_desc conf base refl in
           loop (lev + 1) nb_col True nl nl
         else ()
-    | [(p, lab) :: q] -> 
+    | [(p, lab) :: q] ->
         do {
-          if first && lev > 0 && p_getenv conf.env "gen" = Some "on" then 
+          if first && lev > 0 && p_getenv conf.env "gen" = Some "on" then
             tag "tr" begin
               tag "th" "align=\"left\" colspan=\"%d\"" nb_col begin
-                Wserver.wprint "%s %d" 
+                Wserver.wprint "%s %d"
                   (capitale (transl_nth conf "generation/generations" 0)) lev;
               end;
             end
@@ -1129,7 +1129,7 @@ value display_descendant_with_table conf base max_lev p =
   in
   do {
     header conf (descendants_title conf base p);
-    tag "p" begin 
+    tag "p" begin
       Wserver.wprint "%s." (capitale (text_to conf max_lev));
     end;
     tag "table" "class=descends_table" begin
@@ -1138,10 +1138,10 @@ value display_descendant_with_table conf base max_lev p =
       let nb_col = print_desc_table_header conf base in
       loop 0 nb_col True [(p, "")] [(p, "")];
     end;
-    tag "p" begin 
-      Wserver.wprint "%s: %d %s" 
-        (capitale (transl conf "total")) 
-        nb_pers.val 
+    tag "p" begin
+      Wserver.wprint "%s: %d %s"
+        (capitale (transl conf "total"))
+        nb_pers.val
         (transl_nth conf "person/persons" 1);
     end;
     trailer conf
@@ -1289,7 +1289,7 @@ value make_tree_hts conf base gv p =
     let td =
       match po with
       [ Some (p, auth) ->
-          let ncol = 
+          let ncol =
             if v > 1 then nb_column 0 (v - 1) p
             else Array.length (get_family p)
           in
@@ -1327,7 +1327,7 @@ value make_tree_hts conf base gv p =
             in
             let td =
               let fam = foi base ifam in
-              let ncol = 
+              let ncol =
                 if v > 1 then fam_nb_column 0 (v - 1) fam
                 else 1
               in
@@ -1402,7 +1402,7 @@ value make_tree_hts conf base gv p =
         in
         let tdal =
           let tdl = List.fold_left (spouses_txt v) [] gen in
-          [Array.of_list (List.rev tdl) :: tdal] 
+          [Array.of_list (List.rev tdl) :: tdal]
         in
         if v > 1 then
           loop tdal gen (next_gen gen) (v - 1)
@@ -1469,7 +1469,7 @@ value print_aboville conf base max_level p =
                 if j = Array.length (get_children des) then
                   loop_fam cnt_chil (i + 1)
                 else do {
-                  loop_ind (lev + 1) 
+                  loop_ind (lev + 1)
                     (if num_aboville then lab ^ string_of_int cnt_chil ^ "."
                      else lab ^ "<span class=\"descends_aboville_pipe\">&nbsp;</span>")
                     (pget conf base (get_children des).(j));

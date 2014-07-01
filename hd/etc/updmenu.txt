@@ -29,11 +29,11 @@
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
       <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
+       src="%image_prefix;/left.png"%wid_hei;left.png;
        alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
+    src="%image_prefix;/up.png"%wid_hei;up.png;
     alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
@@ -217,12 +217,12 @@
     %if;(nb_children != 0)
       <br%/>
       <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
-    %end;      
+    %end;
     %if;has_possible_duplications;
       <br%/>
       <a href="%prefix;m=MRG_DUP;ip=%index;">%sq;
       [*merge::possible duplications]</a>
-    %end;      
+    %end;
   </td>
 </tr>
 </table>

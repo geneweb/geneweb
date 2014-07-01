@@ -114,7 +114,7 @@ value print_f_messages base1 base2 ifam1 ifam2 res =
 ;
 
 value print_p_messages base1 base2 iper1 iper2 res =
-  do { 
+  do {
     Printf.printf "%s / %s%s"
       (person_link in_file1.val base1 iper1 "base1")
       (person_link in_file2.val base2 iper2 "base2")
@@ -158,7 +158,7 @@ value dmy_to_sdn_range_l dmy =
         in
     let sdn2 = Calendar.sdn_of_gregorian dmy2 in
     if dmy2.prec = Before then sdn2 - 1 else sdn2
-    in    
+    in
   (sdn, sdn2)
   in
   match dmy.prec with
@@ -256,7 +256,7 @@ value compatible_codates codate1 codate2 =
   let od2 = Adef.od_of_codate codate2 in
   match (od1, od2) with
   [ (Some date1, Some date2) -> compatible_dates date1 date2
-  | (Some _, None) -> False 
+  | (Some _, None) -> False
   | (None, _) -> True ]
 ;
 
@@ -333,7 +333,7 @@ value compatible_persons_ligth base1 base2 p1 p2 =
 
 value compatible_persons base1 base2 p1 p2 =
   compatible_persons_ligth base1 base2 p1 p2
-  @ compatible_sexes base1 base2 p1 p2 
+  @ compatible_sexes base1 base2 p1 p2
   @ compatible_birth base1 base2 p1 p2
   @ compatible_death base1 base2 p1 p2
   @ compatible_occupations base1 base2 p1 p2
@@ -446,12 +446,12 @@ value rec ddiff base1 base2 iper1 iper2 d_tab =
     let fd b1 b2 ip2_list ip1 =
       match find_compatible_persons_ligth b1 b2 ip1 ip2_list with
       [ [ip2] -> ddiff base1 base2 ip1 ip2 d_tab
-      | [] -> 
-          print_p_messages base1 base2 iper1 iper2 [ MsgChildMissing ip1 ] 
+      | [] ->
+          print_p_messages base1 base2 iper1 iper2 [ MsgChildMissing ip1 ]
       | rest_list ->
           match find_compatible_persons b1 b2 ip1 rest_list with
           [ [best_ip2] -> ddiff base1 base2 ip1 best_ip2 d_tab
-          | [] -> 
+          | [] ->
               print_p_messages base1 base2 iper1 iper2 [ MsgBadChild ip1 ]
           | _ ->
               print_p_messages base1 base2 iper1 iper2 [ MsgChildren ip1 ] ] ]
@@ -476,10 +476,10 @@ value rec ddiff base1 base2 iper1 iper2 d_tab =
             (spouse (coi base2 ifam2) iper2);
           udiff b1 b2 iper1 iper2 True ifam1 ifam2
         }
-    | [] -> 
+    | [] ->
         print_p_messages base1 base2 iper1 iper2
-          [ MsgSpouseMissing (spouse (coi base1 ifam1) iper1) ] 
-    | _ -> 
+          [ MsgSpouseMissing (spouse (coi base1 ifam1) iper1) ]
+    | _ ->
         print_p_messages base1 base2 iper1 iper2
           [ MsgSpouses (spouse (coi base1 ifam1) iper1) ]  ]
   in

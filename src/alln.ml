@@ -321,7 +321,7 @@ value select_names conf base is_surnames ini need_whole_list =
                          else [ip :: l])
                       [] my_list
                   else my_list
-                in 
+                in
                 let cnt = List.length my_list in
                 if cnt = 0 then (list, len)
                 else

@@ -37,11 +37,11 @@
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
       <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
+       src="%image_prefix;/left.png"%wid_hei;left.png;
        alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
+    src="%image_prefix;/up.png"%wid_hei;up.png;
     alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
@@ -336,7 +336,7 @@
 %end;
 
 %define;by_list(xx)
-  <p class="not_printable"> 
+  <p class="not_printable">
     %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
       [*see]: <a href="#desc">[*descendants]</a>%sp;%nn;
     %end;

@@ -11,15 +11,15 @@ gwu \- Dump a GeneWeb database
 .br
 .SH DESCRIPTION
 .I
-gwu 
-dumps the contents of the 
-.IR GeneWeb 
+gwu
+dumps the contents of the
+.IR GeneWeb
 database to standard output.
 It's  a  good  way  to  backup  the database in a neutral form, and can
 facilitate upgrades to new software.
 .PP
-The primary documentation of 
-.I gwu 
+The primary documentation of
+.I gwu
 is in the HTML documentation, which
 you  can find in the documentation directory (/usr/share/doc/geneweb on
 Debian systems).
@@ -32,16 +32,16 @@ Please look there for complete and up-to-date documentation.
 .B \-help
 command-line help
 .TP
-.B  \-o <file>    
+.B  \-o <file>
 output file name (else stdout)
 .TP
-.B  \-odir <dir>  
+.B  \-odir <dir>
 create files from original name in directory (else on -o file)
 .TP
-.B  \-mem         
+.B  \-mem
 save memory space, but slower
 .TP
-.B  \-a "<1st_name>" [num] "<surname>" 
+.B  \-a "<1st_name>" [num] "<surname>"
 select ancestors of ...
 .TP
 .B  \-d "<1st_name>" [num] "<surname>"
@@ -50,7 +50,7 @@ select descendants of ...
 .B  \-ad "<1st_name>" [num] "<surname>"
 select ancestors of ... and all their descendants (has no effect if \-a and/or \-d used, option \-nsp is forced).
 .TP
-.B  \-aws "<1st_name>" [num] "<surname>" 
+.B  \-aws "<1st_name>" [num] "<surname>"
 select ancestors with siblings
 .TP
 .B  \-s "<surname>"
