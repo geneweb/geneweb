@@ -4703,7 +4703,7 @@ it: divorzio
 nl: Echtscheiding
 no: Skilsmisse
 pt: divórcio
-sv: Skilsmässa 
+sv: Skilsmässa
 
     divorced
 af: geskei
