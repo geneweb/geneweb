@@ -2,15 +2,8 @@
 (* $Id: util.ml,v 5.130 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Config;
-open Def;
-open Gutil;
-open Gwdb;
-open Mutil;
-open Printf;
-
 value is_hide_names conf p =
-  if conf.hide_names || get_access p = Private then True
+  if conf.Config.hide_names || Gwdb.get_access p = Def.Private then True
   else False
 ;
 
@@ -113,17 +106,17 @@ value rec capitale_utf_8 s =
       match Char.code c with
       [ 0xC3 ->
           let c1 = Char.uppercase (Char.chr (Char.code s.[1] + 0x40)) in
-          sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
+          Printf.sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
             (String.sub s 2 (String.length s - 2))
       | 0xC5 when Char.code s.[1] = 0x93 -> (* oe *)
-          sprintf "%c%c%s" c (Char.chr 0x92)
+          Printf.sprintf "%c%c%s" c (Char.chr 0x92)
             (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 -> (* cyrillic lowercase *)
           let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
-          sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
+          Printf.sprintf "%c%c%s" c c1 (String.sub s 2 (String.length s - 2))
       | 0xD1 when Char.code s.[1] < 0x90 -> (* cyrillic lowercase again *)
           let c1 = Char.chr (Char.code s.[1] - 0x80 + 0xA0) in
-          sprintf "%c%c%s" (Char.chr 0xD0) c1
+          Printf.sprintf "%c%c%s" (Char.chr 0xD0) c1
             (String.sub s 2 (String.length s - 2))
       | _ -> s ]
 ;
@@ -175,17 +168,17 @@ value nth_field w n =
 value tnf s = "[" ^ s ^ "]";
 
 value transl conf w =
-  try Hashtbl.find conf.lexicon w with
+  try Hashtbl.find conf.Config.lexicon w with
   [ Not_found -> tnf w ]
 ;
 
 value transl_nth conf w n =
-  try nth_field (Hashtbl.find conf.lexicon w) n with
+  try nth_field (Hashtbl.find conf.Config.lexicon w) n with
   [ Not_found -> tnf (nth_field w n) ]
 ;
 
 value plus_decl s =
-  match rindex s '+' with
+  match Mutil.rindex s '+' with
   [ Some i ->
       if i > 0 && s.[i - 1] = ' ' then
         let start = String.sub s 0 (i - 1) in
@@ -198,8 +191,8 @@ value plus_decl s =
 value gen_decline wt s =
   let s1 = if s = "" then "" else if wt = "" then s else " " ^ s in
   let len = String.length wt in
-  if rindex wt '/' <> None then
-    match rindex wt '/' with
+  if Mutil.rindex wt '/' <> None then
+    match Mutil.rindex wt '/' with
     [ Some i ->
         (* special case for Spanish *)
         if String.length s > 0 && start_with_hi_i s then
@@ -240,7 +233,7 @@ value gen_decline2 wt s1 s2 =
         | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' ->
             let c = wt.[i + 1] in
             match string_of wt.[i + 4] with
-            [ Some s -> (decline c s, i + 4)
+            [ Some s -> (Mutil.decline c s, i + 4)
             | None -> (":", i) ]
         | '[' ->
             try
@@ -305,11 +298,11 @@ value cftransl conf fmt =
     | [a :: al] as gal ->
         if i + 4 < String.length fmt && fmt.[i] = ':' &&
            fmt.[i + 2] = ':' && fmt.[i + 3] = '%' && fmt.[i + 4] = 's' then
-          decline fmt.[i + 1] a ^ loop (i + 5) al
+          Mutil.decline fmt.[i + 1] a ^ loop (i + 5) al
         else if
           i + 1 < String.length fmt && fmt.[i] = '%' &&
           fmt.[i + 1] = 's' then
-          nominative a ^ loop (i + 2) al
+          Mutil.nominative a ^ loop (i + 2) al
         else if i < String.length fmt then
           String.make 1 fmt.[i] ^ loop (i + 1) gal
         else "" ]
@@ -327,7 +320,7 @@ value fdecline conf w s =
   valid_format w (gen_decline (Obj.magic w : string) s)
 ;
 
-value translate_eval s = Translate.eval (nominative s);
+value translate_eval s = Translate.eval (Mutil.nominative s);
 
 (* *)
 
@@ -339,17 +332,17 @@ value escape_amp s =
 ;
 
 value get_referer conf =
-  let referer = Wserver.extract_param "referer: " '\n' conf.request in
+  let referer = Wserver.extract_param "referer: " '\n' conf.Config.request in
   escape_amp referer
 ;
 
 value begin_centered conf =
   Wserver.wprint
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
-    conf.border;
+    conf.Config.border;
 value end_centered _ = Wserver.wprint "</td></tr></table>\n";
 
-value html_br conf = Wserver.wprint "<br%s>\n" conf.xhs;
+value html_br conf = Wserver.wprint "<br%s>\n" conf.Config.xhs;
 
 value html_p conf = do { Wserver.wprint "<p>"; Wserver.wprint "\n"; };
 
@@ -374,16 +367,17 @@ value month_txt =
 ;
 
 value string_of_ctime conf =
-  let lt = Unix.gmtime conf.ctime in
-  sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
+  let lt = Unix.gmtime conf.Config.ctime in
+  Printf.sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
     (week_day_txt lt.Unix.tm_wday) lt.Unix.tm_mday (month_txt lt.Unix.tm_mon)
     (1900 + lt.Unix.tm_year) lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 ;
 
 value html conf =
-  let charset = if conf.charset = "" then "utf-8" else conf.charset in
+  let charset =
+    if conf.Config.charset = "" then "utf-8" else conf.Config.charset in
   do {
-    if not conf.cgi then do {
+    if not conf.Config.cgi then do {
       Wserver.http "";
       Wserver.wprint "Server: GeneWeb/%s" Version.txt;
       nl ();
@@ -392,7 +386,7 @@ value html conf =
     Wserver.wprint "Date: %s" (string_of_ctime conf); nl ();
     Wserver.wprint "Connection: close"; nl ();
     Wserver.wprint "Content-type: %s; charset=%s"
-      (if conf.pure_xhtml then "application/xhtml+xml" else "text/html")
+      (if conf.Config.pure_xhtml then "application/xhtml+xml" else "text/html")
       charset;
     nl ();
   }
@@ -400,13 +394,13 @@ value html conf =
 
 value unauthorized conf auth_type =
   do {
-    if not conf.cgi then do {
+    if not conf.Config.cgi then do {
       Wserver.http "401 Unauthorized";
       Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
       nl ()
     }
     else ();
-    Wserver.wprint "Content-type: text/html; charset=%s" conf.charset;
+    Wserver.wprint "Content-type: text/html; charset=%s" conf.Config.charset;
     nl ();
     nl ();
     Wserver.wprint "<head><title>Access failed</title></head>\n";
@@ -445,9 +439,9 @@ value redirect_HTML conf status_code url =
 ;
 
 value commd conf =
-  let c = conf.command ^ "?" in
+  let c = conf.Config.command ^ "?" in
   List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
-    (conf.henv @ conf.senv)
+    (conf.Config.henv @ conf.Config.senv)
 ;
 
 value code_varenv = Wserver.encode;
@@ -526,8 +520,8 @@ value hidden_env conf =
   List.iter
     (fun (k, v) ->
        Wserver.wprint "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
-         (quote_escaped (decode_varenv v)) conf.xhs)
-    (conf.henv @ conf.senv)
+         (quote_escaped (decode_varenv v)) conf.Config.xhs)
+    (conf.Config.henv @ conf.Config.senv)
 ;
 
 value p_getenv env label =
@@ -538,81 +532,85 @@ value p_getenv env label =
 value p_getint env label =
   match p_getenv env label with
   [ Some s ->
-      try Some (int_of_string (strip_spaces s)) with
+      try Some (int_of_string (Gutil.strip_spaces s)) with
       [ Failure _ -> None ]
   | None -> None ]
 ;
 
 value nobtit conf base p =
-  Gwdb.nobtit base conf.allowed_titles conf.denied_titles p
+  Gwdb.nobtit base conf.Config.allowed_titles conf.Config.denied_titles p
 ;
 
 value strictly_after_private_years conf a =
-  if a.year > conf.private_years then True
-  else if a.year < conf.private_years then False
-  else a.month > 0 || a.day > 0
+  if a.Def.year > conf.Config.private_years then True
+  else if a.Def.year < conf.Config.private_years then False
+  else a.Def.month > 0 || a.Def.day > 0
 ;
 
 value is_old_person conf p =
   match
-    (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
-     p.death, CheckItem.date_of_death p.death)
+    (Adef.od_of_codate p.Def.birth, Adef.od_of_codate p.Def.baptism,
+     p.Def.death, CheckItem.date_of_death p.Def.death)
   with
-  [ (_, _, NotDead, _) when conf.private_years > 0 -> False
-  | (Some (Dgreg d _), _, _, _) ->
-      let a = CheckItem.time_elapsed d conf.today in
+  [ (_, _, Def.NotDead, _) when conf.Config.private_years > 0 -> False
+  | (Some (Def.Dgreg d _), _, _, _) ->
+      let a = CheckItem.time_elapsed d conf.Config.today in
       strictly_after_private_years conf a
-  | (_, Some (Dgreg d _), _, _) ->
-      let a = CheckItem.time_elapsed d conf.today in
+  | (_, Some (Def.Dgreg d _), _, _) ->
+      let a = CheckItem.time_elapsed d conf.Config.today in
       strictly_after_private_years conf a
-  | (_, _, _, Some (Dgreg d _)) ->
-      let a = CheckItem.time_elapsed d conf.today in
+  | (_, _, _, Some (Def.Dgreg d _)) ->
+      let a = CheckItem.time_elapsed d conf.Config.today in
       strictly_after_private_years conf a
-  | (None, None, DontKnowIfDead, None) ->
-      p.access <> Private && conf.public_if_no_date
+  | (None, None, Def.DontKnowIfDead, None) ->
+      p.Def.access <> Def.Private && conf.Config.public_if_no_date
   | _ -> False ]
 ;
 
 value fast_auth_age conf p =
-  if conf.friend || conf.wizard || get_access p = Public then True
+  if conf.Config.friend || conf.Config.wizard || Gwdb.get_access p = Def.Public
+  then True
   else if
-    conf.public_if_titles && get_access p = IfTitles && get_titles p <> []
+    conf.Config.public_if_titles &&
+    Gwdb.get_access p = Def.IfTitles &&
+    Gwdb.get_titles p <> []
   then
     True
-  else is_old_person conf (gen_person_of_person p)
+  else is_old_person conf (Gwdb.gen_person_of_person p)
 ;
 
-value is_restricted (conf : config) base ip =
+value is_restricted (conf : Config.config) base ip =
   let fct p =
-    not (is_quest_string (get_surname p)) &&
-    not (is_quest_string (get_first_name p)) &&
+    not (Gwdb.is_quest_string (Gwdb.get_surname p)) &&
+    not (Gwdb.is_quest_string (Gwdb.get_first_name p)) &&
     not (fast_auth_age conf p)
   in
-  if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
+  if conf.Config.use_restrict
+  then Gwdb.base_visible_get base fct (Adef.int_of_iper ip)
   else False
 ;
 
-value pget (conf : config) base ip =
+value pget (conf : Config.config) base ip =
   if is_restricted conf base ip then Gwdb.empty_person base ip
-  else poi base ip
+  else Gwdb.poi base ip
 ;
 
 value string_gen_person base p =
-  Futil.map_person_ps (fun p -> p) (sou base) p
+  Futil.map_person_ps (fun p -> p) (Gwdb.sou base) p
 ;
 
 value string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (sou base) fam
+  Futil.map_family_ps (fun p -> p) (Gwdb.sou base) fam
 ;
 
 value parent_has_title conf base p =
-  match get_parents p with
+  match Gwdb.get_parents p with
   [ Some ifam ->
-      let cpl = foi base ifam in
-      let fath = pget conf base (get_father cpl) in
-      let moth = pget conf base (get_mother cpl) in
-      get_access fath <> Private && nobtit conf base fath <> [] ||
-      get_access moth <> Private && nobtit conf base moth <> []
+      let cpl = Gwdb.foi base ifam in
+      let fath = pget conf base (Gwdb.get_father cpl) in
+      let moth = pget conf base (Gwdb.get_mother cpl) in
+      Gwdb.get_access fath <> Def.Private && nobtit conf base fath <> [] ||
+      Gwdb.get_access moth <> Def.Private && nobtit conf base moth <> []
   | _ -> False ]
 ;
 
@@ -645,53 +643,56 @@ value parent_has_title conf base p =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value authorized_age conf base p =
-  if conf.wizard || conf.friend || get_access p = Public then True
+  if conf.Config.wizard || conf.Config.friend || Gwdb.get_access p = Def.Public
+  then True
   else if
-    conf.public_if_titles && get_access p = IfTitles &&
+    conf.Config.public_if_titles && Gwdb.get_access p = Def.IfTitles &&
     (nobtit conf base p <> [] || parent_has_title conf base p) then
     True
   else
     match
-      (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-       get_death p, CheckItem.date_of_death (get_death p))
+      (Adef.od_of_codate (Gwdb.get_birth p),
+       Adef.od_of_codate (Gwdb.get_baptism p),
+       Gwdb.get_death p, CheckItem.date_of_death (Gwdb.get_death p))
     with
-    [ (_, _, NotDead, _) when conf.private_years > 0 -> False
-    | (Some (Dgreg d _), _, _, _) ->
-        let a = CheckItem.time_elapsed d conf.today in
+    [ (_, _, Def.NotDead, _) when conf.Config.private_years > 0 -> False
+    | (Some (Def.Dgreg d _), _, _, _) ->
+        let a = CheckItem.time_elapsed d conf.Config.today in
         strictly_after_private_years conf a
-    | (_, Some (Dgreg d _), _, _) ->
-        let a = CheckItem.time_elapsed d conf.today in
+    | (_, Some (Def.Dgreg d _), _, _) ->
+        let a = CheckItem.time_elapsed d conf.Config.today in
         strictly_after_private_years conf a
-    | (_, _, _, Some (Dgreg d _)) ->
-        let a = CheckItem.time_elapsed d conf.today in
+    | (_, _, _, Some (Def.Dgreg d _)) ->
+        let a = CheckItem.time_elapsed d conf.Config.today in
         strictly_after_private_years conf a
-    | (None, None, DontKnowIfDead, None) ->
-        get_access p <> Private && conf.public_if_no_date
+    | (None, None, Def.DontKnowIfDead, None) ->
+        Gwdb.get_access p <> Def.Private && conf.Config.public_if_no_date
     | _ ->
         let rec loop i =
-          if i >= Array.length (get_family p) then False
+          if i >= Array.length (Gwdb.get_family p) then False
           else
-            let fam = foi base (get_family p).(i) in
-            match Adef.od_of_codate (get_marriage fam) with
-            [ Some (Dgreg d _) ->
-                let a = CheckItem.time_elapsed d conf.today in
+            let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
+            match Adef.od_of_codate (Gwdb.get_marriage fam) with
+            [ Some (Def.Dgreg d _) ->
+                let a = CheckItem.time_elapsed d conf.Config.today in
                 strictly_after_private_years conf a
             | _ -> loop (i + 1) ]
         in
         loop 0 ]
 ;
 
-value is_hidden p = is_empty_string (get_surname p);
+value is_hidden p = Gwdb.is_empty_string (Gwdb.get_surname p);
 
 value know base p =
-  sou base (get_first_name p) <> "?" || sou base (get_surname p) <> "?"
+  Gwdb.sou base (Gwdb.get_first_name p) <> "?" ||
+  Gwdb.sou base (Gwdb.get_surname p) <> "?"
 ;
 
 value is_public conf base p =
-  get_access p = Public ||
-  conf.public_if_titles && get_access p = IfTitles &&
+  Gwdb.get_access p = Def.Public ||
+  conf.Config.public_if_titles && Gwdb.get_access p = Def.IfTitles &&
     nobtit conf base p <> [] ||
-  is_old_person conf (gen_person_of_person p)
+  is_old_person conf (Gwdb.gen_person_of_person p)
 ;
 
 
@@ -711,10 +712,10 @@ value is_public conf base p =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value accessible_by_key conf base p fn sn =
-  conf.access_by_key
+  conf.Config.access_by_key
   && not (fn = "?" || sn = "?")
   && (not (is_hide_names conf p) || is_public conf base p
-      || conf.friend || conf.wizard)
+      || conf.Config.friend || conf.Config.wizard)
 ;
 
 
@@ -731,20 +732,21 @@ value accessible_by_key conf base p fn sn =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value acces_n conf base n x =
-  let first_name = p_first_name base x in
-  let surname = p_surname base x in
+  let first_name = Gwdb.p_first_name base x in
+  let surname = Gwdb.p_surname base x in
   if surname = "" then ""
   (* pX=fn;nX=sn;ocX=occ *)
   else if accessible_by_key conf base x first_name surname then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
-      (if get_occ x > 0 then ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
+      (if Gwdb.get_occ x > 0
+       then ";oc" ^ n ^ "=" ^ string_of_int (Gwdb.get_occ x)
        else "")
   (* iX=index;ocX=occ *)
   else
-    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_key_index x)) ^
-    (if conf.wizard && get_occ x > 0 then
-       ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
+    "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (Gwdb.get_key_index x)) ^
+    (if conf.Config.wizard && Gwdb.get_occ x > 0 then
+       ";oc" ^ n ^ "=" ^ string_of_int (Gwdb.get_occ x)
      else "")
 ;
 
@@ -761,11 +763,12 @@ value acces_n conf base n x =
 (* ********************************************************************** *)
 value acces conf base x = acces_n conf base "" x;
 
-type p_access = (base -> person -> string * base -> person -> string);
-value std_access = (p_first_name, p_surname);
+type p_access =
+  (Gwdb.base -> Gwdb.person -> string * Gwdb.base -> Gwdb.person -> string);
+value std_access = (Gwdb.p_first_name, Gwdb.p_surname);
 value raw_access =
-  (fun base p -> sou base (get_first_name p),
-   fun base p -> sou base (get_surname p))
+  (fun base p -> Gwdb.sou base (Gwdb.get_first_name p),
+   fun base p -> Gwdb.sou base (Gwdb.get_surname p))
 ;
 
 
@@ -797,11 +800,11 @@ value gen_person_text (p_first_name, p_surname) conf base p =
   else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
   else
     let beg =
-      match (sou base (get_public_name p), get_qualifiers p) with
+      match (Gwdb.sou base (Gwdb.get_public_name p), Gwdb.get_qualifiers p) with
       [ ("", [nn :: _]) ->
-          p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
+          p_first_name base p ^ " <em>" ^ Gwdb.sou base nn ^ "</em>"
       | ("", []) -> p_first_name base p
-      | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
+      | (n, [nn :: _]) -> n ^ " <em>" ^ Gwdb.sou base nn ^ "</em>"
       | (n, []) -> n ]
     in
     beg ^ " " ^ p_surname base p
@@ -827,10 +830,10 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
   else
     let beg =
-      match (sou base (get_public_name p), get_qualifiers p) with
-      [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ sou base nn
+      match (Gwdb.sou base (Gwdb.get_public_name p), Gwdb.get_qualifiers p) with
+      [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ Gwdb.sou base nn
       | ("", []) -> p_first_name base p
-      | (n, [nn :: _]) -> n ^ " " ^ sou base nn
+      | (n, [nn :: _]) -> n ^ " " ^ Gwdb.sou base nn
       | (n, []) -> n ]
     in
     beg ^ " " ^ p_surname base p
@@ -859,11 +862,12 @@ value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
     "x x"
   else
     let s =
-      match (sou base (get_public_name p), get_qualifiers p) with
-      [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
+      match (Gwdb.sou base (Gwdb.get_public_name p), Gwdb.get_qualifiers p) with
+      [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ Gwdb.sou base nn ^ "</em>"
       | (n, []) when n <> "" -> n
-      | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-      | (_, []) -> p_first_name base p ]
+      | (_, [nn :: _]) ->
+        p_first_name base p ^ " <em>" ^ Gwdb.sou base nn ^ "</em>"
+      | (_, []) -> Gwdb.p_first_name base p ]
     in
     s
 ;
@@ -896,7 +900,7 @@ value main_title conf base p =
   let rec find_main =
     fun
     [ [] -> None
-    | [x :: l] -> if x.t_name = Tmain then Some x else find_main l ]
+    | [x :: l] -> if x.Def.t_name = Def.Tmain then Some x else find_main l ]
   in
   match find_main (nobtit conf base p) with
   [ None ->
@@ -921,8 +925,8 @@ value main_title conf base p =
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 value titled_person_text conf base p t =
-  let estate = sou base t.t_place in
-  let surname = p_surname base p in
+  let estate = Gwdb.sou base t.Def.t_place in
+  let surname = Gwdb.p_surname base p in
   let elen = String.length estate in
   let slen = String.length surname in
   (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
@@ -931,9 +935,10 @@ value titled_person_text conf base p t =
   (*   - le nom de la personne (donné par son nom de domaine) en       *)
   (*     fonction du nom public et sobriquet                           *)
   if Name.strip_lower estate = Name.strip_lower surname then
-    match (t.t_name, get_qualifiers p) with
-    [ (Tname n, []) -> sou base n
-    | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
+    match (t.Def.t_name, Gwdb.get_qualifiers p) with
+    [ (Def.Tname n, []) -> Gwdb.sou base n
+    | (Def.Tname n, [nn :: _]) ->
+      Gwdb.sou base n ^ " <em>" ^ Gwdb.sou base nn ^ "</em>"
     | _ -> person_text_without_surname conf base p ]
   (* Si le nom de l'individu contient le nom de son domaine, on renvoie : *)
   (*   - le nom du titre                                                  *)
@@ -941,26 +946,27 @@ value titled_person_text conf base p t =
   (*   - le nom de la personne (nom du domaine épuré du patronyme) en     *)
   (*     fonction du nom public et sobriquet                              *)
   else if elen < slen && String.sub surname (slen - elen) elen = estate then
-    match (t.t_name, get_qualifiers p) with
-    [ (Tname n, []) -> sou base n
-    | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
+    match (t.Def.t_name, Gwdb.get_qualifiers p) with
+    [ (Def.Tname n, []) -> Gwdb.sou base n
+    | (Def.Tname n, [nn :: _]) ->
+      Gwdb.sou base n ^ " <em>" ^ Gwdb.sou base nn ^ "</em>"
     | _ ->
         let trunc_surname _ _ =
-          strip_spaces (String.sub surname 0 (slen - elen))
+          Gutil.strip_spaces (String.sub surname 0 (slen - elen))
         in
-        let trunc_access = (p_first_name, trunc_surname) in
+        let trunc_access = (Gwdb.p_first_name, trunc_surname) in
         gen_person_text trunc_access conf base p ]
   (* Sinon, on renvoie :                                              *)
   (*   - le nom du titre                                              *)
   (*   - le nom du titre et le premier sobriquet                      *)
   (*   - le nom de la personne en fonction du nom public et sobriquet *)
   else
-    match t.t_name with
-    [ Tname s ->
-        let s = sou base s in
-        match get_qualifiers p with
+    match t.Def.t_name with
+    [ Def.Tname s ->
+        let s = Gwdb.sou base s in
+        match Gwdb.get_qualifiers p with
         [ [] -> s
-        | [nn :: _] -> s ^ " <em>" ^ sou base nn ^ "</em>" ]
+        | [nn :: _] -> s ^ " <em>" ^ Gwdb.sou base nn ^ "</em>" ]
     | _ -> person_text conf base p ]
 ;
 
@@ -978,13 +984,13 @@ value titled_person_text conf base p t =
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 value one_title_text conf base p t =
-  let place = sou base t.t_place in
-  let s = sou base t.t_ident in
+  let place = Gwdb.sou base t.Def.t_place in
+  let s = Gwdb.sou base t.Def.t_ident in
   let s = if place = "" then s else s ^ " " ^ place in ", <em>" ^ s ^ "</em>"
 ;
 
 value geneweb_link conf href s =
-  if conf.cancel_links then s
+  if conf.Config.cancel_links then s
   else "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
 ;
 
@@ -993,7 +999,7 @@ value wprint_geneweb_link conf href s =
 ;
 
 value reference conf base p s =
-  if conf.cancel_links || is_hidden p then s
+  if conf.Config.cancel_links || is_hidden p then s
   else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
@@ -1015,14 +1021,14 @@ value reference conf base p s =
     [Rem] : Exporté en clair hors de ce module.                              *)
 (* ************************************************************************* *)
 value update_family_loop conf base p s =
-  if conf.cancel_links || is_hidden p then s
+  if conf.Config.cancel_links || is_hidden p then s
   else
-    let iper = get_key_index p in
-    let list = Array.to_list (get_family p) in
-    let list = List.map (fun ifam -> (ifam, foi base ifam)) list in
+    let iper = Gwdb.get_key_index p in
+    let list = Array.to_list (Gwdb.get_family p) in
+    let list = List.map (fun ifam -> (ifam, Gwdb.foi base ifam)) list in
     let list =
       List.map
-        (fun (ifam, fam) -> (ifam, Array.to_list (get_children fam)))
+        (fun (ifam, fam) -> (ifam, Array.to_list (Gwdb.get_children fam)))
         list
     in
     (* [Fonc] : 'a list -> (ifam, iper list) list -> ifam list *)
@@ -1034,14 +1040,15 @@ value update_family_loop conf base p s =
           else loop accu l ]
     in
     let res = loop [] list in
-    if conf.wizard then
+    if conf.Config.wizard then
       (* Si il n'y a pas d'ambiguité, i.e. pas 2 boucles dans 2 familles *)
       (* pour un même individu, alors on renvoit le lien vers la mise à  *)
       (* jour de la famille, sinon, un lien vers le menu de mise à jour. *)
       if List.length res = 1 then
         let iper = string_of_int (Adef.int_of_iper iper) in
         let ifam = string_of_int (Adef.int_of_ifam (List.hd res)) in
-        "<a href=\"" ^ commd conf ^ "m=MOD_FAM;i=" ^ ifam ^ ";ip=" ^ iper ^ "\">" ^ s ^ "</a>"
+        "<a href=\"" ^ commd conf ^ "m=MOD_FAM;i=" ^ ifam ^ ";ip=" ^
+        iper ^ "\">" ^ s ^ "</a>"
       else
         let iper = string_of_int (Adef.int_of_iper iper) in
         "<a href=\"" ^ commd conf ^ "m=U;i=" ^ iper ^ "\">" ^ s ^ "</a>"
@@ -1077,12 +1084,13 @@ value referenced_person_text_without_surname conf base p =
 value gen_person_text_without_title p_access conf base p =
   match main_title conf base p with
   [ Some t ->
-      if eq_istr t.t_place (get_surname p) then
+      if Gwdb.eq_istr t.Def.t_place (Gwdb.get_surname p) then
         gen_person_text_without_surname True p_access conf base p
       else
-        match (t.t_name, get_qualifiers p) with
-        [ (Tname s, [nn :: _]) -> sou base s ^ " <em>" ^ sou base nn ^ "</em>"
-        | (Tname s, _) -> sou base s
+        match (t.Def.t_name, Gwdb.get_qualifiers p) with
+        [ (Def.Tname s, [nn :: _]) ->
+          Gwdb.sou base s ^ " <em>" ^ Gwdb.sou base nn ^ "</em>"
+        | (Def.Tname s, _) -> Gwdb.sou base s
         | _ -> gen_person_text p_access conf base p ]
   | None -> gen_person_text p_access conf base p ]
 ;
@@ -1098,7 +1106,7 @@ value person_title conf base p =
 ;
 
 value old_surname_begin n =
-  let i = initial n in
+  let i = Mutil.initial n in
   if i = 0 then ""
   else
     let i =
@@ -1109,7 +1117,7 @@ value old_surname_begin n =
 ;
 
 value old_surname_end n =
-  let i = initial n in
+  let i = Mutil.initial n in
   if i = 0 then n else String.sub n i (String.length n - i)
 ;
 
@@ -1124,7 +1132,7 @@ value start_with2 s i p =
 ;
 
 value get_particle base s =
-  loop (base_particles base) where rec loop =
+  loop (Gwdb.base_particles base) where rec loop =
     fun
     [ [part :: parts] -> if start_with2 s 0 part then part else loop parts
     | [] -> "" ]
@@ -1166,14 +1174,14 @@ value create_env s =
 ;
 
 value std_color conf s =
-  "<span style=\"color:" ^ conf.highlight ^ "\">" ^ s ^ "</span>"
+  "<span style=\"color:" ^ conf.Config.highlight ^ "\">" ^ s ^ "</span>"
 ;
 
 value index_of_sex =
   fun
-  [ Male -> 0
-  | Female -> 1
-  | Neuter -> 2 ]
+  [ Def.Male -> 0
+  | Def.Female -> 1
+  | Def.Neuter -> 2 ]
 ;
 
 value input_to_semi ic =
@@ -1200,8 +1208,8 @@ value base_len n =
     try Some (Gwdb.open_base n) with [ Sys_error _ -> None ]
   with
   [ Some base ->
-      let len = nb_of_persons base in
-      do { close_base base; string_of_int len }
+      let len = Gwdb.nb_of_persons base in
+      do { Gwdb.close_base base; string_of_int len }
   | _ -> "?" ]
 ;
 
@@ -1224,7 +1232,7 @@ value etc_file_name conf fname =
      - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
   let file_exist dir =
     let base_name_tpl_dir =
-      Filename.concat (base_path ["etc"] conf.bname) (fname ^ ".txt")
+      Filename.concat (base_path ["etc"] conf.Config.bname) (fname ^ ".txt")
     in
     let base_tpl_dir =
       Filename.concat
@@ -1251,7 +1259,7 @@ value etc_file_name conf fname =
   in
   let config_templ =
     try
-      let s = List.assoc "template" conf.base_env in
+      let s = List.assoc "template" conf.Config.base_env in
       let rec loop list i len =
         if i = String.length s then List.rev [Buff.get len :: list]
         else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
@@ -1259,10 +1267,10 @@ value etc_file_name conf fname =
       in
       loop [] 0 0
     with
-    [ Not_found -> [conf.bname; "*"] ]
+    [ Not_found -> [conf.Config.bname; "*"] ]
   in
   let dir =
-    match p_getenv conf.env "templ" with
+    match p_getenv conf.Config.env "templ" with
     [ Some x when List.mem "*" config_templ -> x
     | Some x when List.mem x config_templ -> x
     | Some _ | None ->
@@ -1301,7 +1309,7 @@ value open_hed_trl conf fname =
 value open_templ conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
   [ Sys_error _ ->
-      if (*dir = conf.bname*)True(**) then
+      if (*dir = conf.Config.bname*)True(**) then
         (* template par défaut *)
         let std_fname =
           search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
@@ -1369,7 +1377,7 @@ value rec copy_from_etc env lang imcom ic =
 
 value image_prefix conf =
   if images_url.val <> "" then images_url.val
-  else if conf.cgi then conf.command ^ "?m=IM;v="
+  else if conf.Config.cgi then conf.Config.command ^ "?m=IM;v="
   else "images"
 ;
 
@@ -1390,23 +1398,23 @@ value find_misc_file name =
 
 (* Code mort. Géré par le css
 value default_background conf =
-  sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
+  Printf.sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
 ;
 
 value default_body_prop conf =
   let style =
-    match p_getenv conf.env "size" with
+    match p_getenv conf.Config.env "size" with
     [ Some v -> "font-size:" ^ v ^ ";"
     | None -> "" ]
   in
-  let style = sprintf "%s%s" style (default_background conf) in
+  let style = Printf.sprintf "%s%s" style (default_background conf) in
   " style=\"" ^ style ^ "\""
 ;
    Code mort. Géré par le css *)
 
 value body_prop conf =
   try
-    match List.assoc "body_prop" conf.base_env with
+    match List.assoc "body_prop" conf.Config.base_env with
     [ "" -> ""
     | s -> " " ^ s ]
   with
@@ -1434,22 +1442,25 @@ value get_request_string_aux cgi request =
     script_name ^ "?" ^ query_string
 ;
 
-value get_server_string conf = get_server_string_aux conf.cgi conf.request;
-value get_request_string conf = get_request_string_aux conf.cgi conf.request;
+value get_server_string conf =
+  get_server_string_aux conf.Config.cgi conf.Config.request;
+value get_request_string conf =
+  get_request_string_aux conf.Config.cgi conf.Config.request;
 
 value url_no_index conf base =
-  let scratch s = code_varenv (Name.lower (sou base s)) in
+  let scratch s = code_varenv (Name.lower (Gwdb.sou base s)) in
   let get_a_person v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
-        if i >= 0 && i < nb_of_persons base then
+        if i >= 0 && i < Gwdb.nb_of_persons base then
           let p = pget conf base (Adef.iper_of_int i) in
-          if ((is_hide_names conf p) && not (fast_auth_age conf p)) || is_hidden p
+          if ((is_hide_names conf p) && not (fast_auth_age conf p)) ||
+            is_hidden p
           then None
           else
-            let f = scratch (get_first_name p) in
-            let s = scratch (get_surname p) in
-            let oc = string_of_int (get_occ p) in
+            let f = scratch (Gwdb.get_first_name p) in
+            let s = scratch (Gwdb.get_surname p) in
+            let oc = string_of_int (Gwdb.get_occ p) in
             Some (f, s, oc)
         else None
     | None -> None ]
@@ -1457,20 +1468,20 @@ value url_no_index conf base =
   let get_a_family v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
-        if i >= 0 && i < nb_of_families base then
-          let fam = foi base (Adef.ifam_of_int i) in
-          if is_deleted_family fam then None
+        if i >= 0 && i < Gwdb.nb_of_families base then
+          let fam = Gwdb.foi base (Adef.ifam_of_int i) in
+          if Gwdb.is_deleted_family fam then None
           else
-            let p = pget conf base (get_father fam) in
-            let f = scratch (get_first_name p) in
-            let s = scratch (get_surname p) in
+            let p = pget conf base (Gwdb.get_father fam) in
+            let f = scratch (Gwdb.get_first_name p) in
+            let s = scratch (Gwdb.get_surname p) in
             if f = "" || s = "" then None
             else
-              let oc = string_of_int (get_occ p) in
-              let u = pget conf base (get_father fam) in
+              let oc = string_of_int (Gwdb.get_occ p) in
+              let u = pget conf base (Gwdb.get_father fam) in
               let n =
                 loop 0 where rec loop k =
-                  if (get_family u).(k) = Adef.ifam_of_int i then
+                  if (Gwdb.get_family u).(k) = Adef.ifam_of_int i then
                     string_of_int k
                   else loop (k + 1)
               in
@@ -1507,12 +1518,12 @@ value url_no_index conf base =
           else [(c "p", f); (c "n", s); (c "oc", oc) :: l]
       | None -> [(k, v) :: loop l] ]
     in
-    loop conf.env
+    loop conf.Config.env
   in
   let addr =
     let pref =
       let s = get_request_string conf in
-      match rindex s '?' with
+      match Mutil.rindex s '?' with
       [ Some i -> String.sub s 0 i
       | None -> s ]
     in
@@ -1522,16 +1533,17 @@ value url_no_index conf base =
     List.fold_right
       (fun (x, v) s ->
          let sep = if s = "" then "" else ";" in x ^ "=" ^ v ^ sep ^ s)
-      [("lang", conf.lang) :: env] ""
+      [("lang", conf.Config.lang) :: env] ""
   in
-  let suff = if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff in
+  let suff =
+    if conf.Config.cgi then "b=" ^ conf.Config.bname ^ ";" ^ suff else suff in
   addr ^ "?" ^ suff
 ;
 
 value message_to_wizard conf =
-  if conf.wizard || conf.just_friend_wizard then
+  if conf.Config.wizard || conf.Config.just_friend_wizard then
     let print_file fname =
-      let fname = base_path ["etc"; conf.bname] (fname ^ ".txt") in
+      let fname = base_path ["etc"; conf.Config.bname] (fname ^ ".txt") in
       match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
       [ Some ic ->
           try while True do { Wserver.wprint "%c" (input_char ic); } with
@@ -1540,15 +1552,15 @@ value message_to_wizard conf =
     in
     do {
       print_file "mess_wizard";
-      if conf.user <> "" then
-        print_file ("mess_wizard_" ^ conf.user)
+      if conf.Config.user <> "" then
+        print_file ("mess_wizard_" ^ conf.Config.user)
       else ();
     }
   else ()
 ;
 
 value doctype conf =
-  match p_getenv conf.base_env "doctype" with
+  match p_getenv conf.Config.base_env "doctype" with
   [ Some "html-5" -> "<!DOCTYPE html>"
   | Some "html-4.01-trans" -> "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"
@@ -1720,7 +1732,7 @@ type tag_type = [ In_a_href | In_norm | Out ];
 value expand_env =
   let buff = Buffer.create 30 in
   fun conf s ->
-    match p_getenv conf.base_env "expand_env" with
+    match p_getenv conf.Config.base_env "expand_env" with
     [ Some "yes" ->
         let _ : unit = Buffer.clear buff in
         loop 0 where rec loop i =
@@ -1754,7 +1766,7 @@ value string_with_macros conf env s =
                   let (v, i) =
                     let v =
                       try
-                        let v = List.assoc ("var_" ^ k) conf.base_env in
+                        let v = List.assoc ("var_" ^ k) conf.Config.base_env in
                         Some (expand_env conf v)
                       with
                       [ Not_found -> None ]
@@ -1797,9 +1809,9 @@ value string_with_macros conf env s =
             match http_string conf s i with
             [ Some (x, j) ->
                 do {
-                  bprintf buff "<a href=\"%s\">" x;
+                  Printf.bprintf buff "<a href=\"%s\">" x;
                   expand_ampersand buff x;
-                  bprintf buff "</a>";
+                  Printf.bprintf buff "</a>";
                   loop Out j
                 }
             | None ->
@@ -1807,7 +1819,7 @@ value string_with_macros conf env s =
                 [ Some j ->
                     let x = String.sub s i (j - i) in
                     do {
-                      bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
+                      Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                       loop Out j
                     }
                 | None ->
@@ -1921,7 +1933,7 @@ value check_ampersand s i =
     [ 'a'..'z' ->
         loop_id i where rec loop_id j =
           if j = String.length s then do {
-            let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
+            let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
             Some (a, j)
           }
           else
@@ -1929,12 +1941,12 @@ value check_ampersand s i =
             [ 'a'..'z' -> loop_id (j + 1)
             | ';' -> None
             | _ ->
-                let a = sprintf "&amp;%s" (String.sub s i (j - i)) in
+                let a = Printf.sprintf "&amp;%s" (String.sub s i (j - i)) in
                 Some (a, j) ]
     | _ -> Some ("&amp;", i) ]
 ;
 
-value bad col s = sprintf "<span style=\"color:%s\">%s</span>" col s;
+value bad col s = Printf.sprintf "<span style=\"color:%s\">%s</span>" col s;
 
 value check_ampersands s =
   let b = Buffer.create (String.length s) in
@@ -1972,7 +1984,7 @@ value check_xhtml s =
            let s_aft = String.sub s pos_aft (String.length s - pos_aft) in
            Buffer.clear b;
            Buffer.add_string b s_bef;
-           Buffer.add_string b (bad "red" (sprintf "&lt;%s&gt;" txt));
+           Buffer.add_string b (bad "red" (Printf.sprintf "&lt;%s&gt;" txt));
            Buffer.add_string b s_aft
          })
         tag_stack;
@@ -1983,34 +1995,34 @@ value check_xhtml s =
       [ Some (Btag t a, i) ->
           if t = "br" && a = "" then do {
             (* frequent error *)
-            Buffer.add_string b (sprintf "<%s/>" t);
+            Buffer.add_string b (Printf.sprintf "<%s/>" t);
             loop tag_stack i
           }
           else do {
             match check_ampersands a with
             [ Some a -> do {
-                Buffer.add_string b (sprintf "&lt;%s%s&gt;" t a);
+                Buffer.add_string b (Printf.sprintf "&lt;%s%s&gt;" t a);
                 loop tag_stack i;
               }
             | None -> do {
                 let pos = Buffer.length b in
-                let txt = sprintf "%s%s" t a in
-                Buffer.add_string b (sprintf "<%s>" txt);
+                let txt = Printf.sprintf "%s%s" t a in
+                Buffer.add_string b (Printf.sprintf "<%s>" txt);
                 loop [(pos, txt, t) :: tag_stack] i
               } ]
           }
       | Some (Etag t, i) ->
           match tag_stack with
           [ [(_, _, bt) :: rest] when t = bt -> do {
-              Buffer.add_string b (sprintf "</%s>" t);
+              Buffer.add_string b (Printf.sprintf "</%s>" t);
               loop rest i
             }
           | _ -> do {
-              Buffer.add_string b (bad "red" (sprintf "&lt;/%s&gt;" t));
+              Buffer.add_string b (bad "red" (Printf.sprintf "&lt;/%s&gt;" t));
               loop tag_stack i
             } ]
       | Some (Atag t, i) -> do {
-          Buffer.add_string b (sprintf "<%s/>" t);
+          Buffer.add_string b (Printf.sprintf "<%s/>" t);
           loop tag_stack i
         }
       | None ->
@@ -2035,7 +2047,7 @@ value check_xhtml s =
 
 value compilation_time_hook = ref (fun _ -> "");
 value compilation_time conf =
-  match p_getenv conf.base_env "display_compilation_time" with
+  match p_getenv conf.Config.base_env "display_compilation_time" with
   [ Some "on" -> compilation_time_hook.val conf
   | _ -> "" ]
 ;
@@ -2122,12 +2134,12 @@ value print_alphab_list conf crit print_elem liste = do {
 
 value relation_txt conf sex fam =
   let is = index_of_sex sex in
-  match get_relation fam with
-  [ NotMarried | NoSexesCheckNotMarried ->
+  match Gwdb.get_relation fam with
+  [ Def.NotMarried | Def.NoSexesCheckNotMarried ->
       ftransl_nth conf "relationship%t to" is
-  | Married | NoSexesCheckMarried -> ftransl_nth conf "married%t to" is
-  | Engaged -> ftransl_nth conf "engaged%t to" is
-  | NoMention ->
+  | Def.Married | Def.NoSexesCheckMarried -> ftransl_nth conf "married%t to" is
+  | Def.Engaged -> ftransl_nth conf "engaged%t to" is
+  | Def.NoMention ->
       let s = "%t " ^ transl conf "with" in
       valid_format "%t" s ]
 ;
@@ -2148,23 +2160,23 @@ value child_of_parent conf base p =
   (* Si le père a un nom de famille différent de la personne *)
   (* alors on l'affiche, sinon on n'affiche que le prénom.   *)
   let print_father fath =
-    if not (eq_istr (get_surname p) (get_surname fath)) then
+    if not (Gwdb.eq_istr (Gwdb.get_surname p) (Gwdb.get_surname fath)) then
       person_text conf base fath
     else
-      gen_person_text (p_first_name, (fun _ _ -> "")) conf base fath
+      gen_person_text (Gwdb.p_first_name, (fun _ _ -> "")) conf base fath
   in
-  let a = pget conf base (get_key_index p) in
+  let a = pget conf base (Gwdb.get_key_index p) in
   let ifam =
-    match get_parents a with
+    match Gwdb.get_parents a with
     [ Some ifam ->
-        let cpl = foi base ifam in
+        let cpl = Gwdb.foi base ifam in
         let fath =
-          let fath = pget conf base (get_father cpl) in
-          if p_first_name base fath = "?" then None else Some fath
+          let fath = pget conf base (Gwdb.get_father cpl) in
+          if Gwdb.p_first_name base fath = "?" then None else Some fath
         in
         let moth =
-          let moth = pget conf base (get_mother cpl) in
-          if p_first_name base moth = "?" then None else Some moth
+          let moth = pget conf base (Gwdb.get_mother cpl) in
+          if Gwdb.p_first_name base moth = "?" then None else Some moth
         in
         Some (fath, moth)
     | None -> None ]
@@ -2181,7 +2193,7 @@ value child_of_parent conf base p =
               person_text conf base moth
         | _ -> "" ]
       in
-      let is = index_of_sex (get_sex p) in
+      let is = index_of_sex (Gwdb.get_sex p) in
       translate_eval
         (transl_a_of_gr_eq_gen_lev conf
            (transl_nth conf "son/daughter/child" is) s) ]
@@ -2202,14 +2214,15 @@ value child_of_parent conf base p =
 (* ************************************************************************** *)
 value husband_wife conf base p =
   let rec loop i =
-    if i < Array.length (get_family p) then
-      let fam = foi base (get_family p).(i) in
-      let conjoint = spouse (get_key_index p) fam in
+    if i < Array.length (Gwdb.get_family p) then
+      let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
+      let conjoint = Gutil.spouse (Gwdb.get_key_index p) fam in
       let conjoint = pget conf base conjoint in
-      if p_first_name base conjoint <> "?" || p_surname base conjoint <> "?"
+      if Gwdb.p_first_name base conjoint <> "?" ||
+        Gwdb.p_surname base conjoint <> "?"
       then
         let relation =
-          Printf.sprintf (relation_txt conf (get_sex p) fam) (fun () -> "")
+          Printf.sprintf (relation_txt conf (Gwdb.get_sex p) fam) (fun () -> "")
         in
         translate_eval (relation ^ " " ^ (person_text conf base conjoint))
       else loop (i + 1)
@@ -2231,21 +2244,22 @@ value husband_wife conf base p =
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 value first_child conf base p =
-  let is = index_of_sex (get_sex p) in
+  let is = index_of_sex (Gwdb.get_sex p) in
   let rec loop i =
-    if i < Array.length (get_family p) then
-      let fam = foi base (get_family p).(i) in
-      let ct = get_children fam in
+    if i < Array.length (Gwdb.get_family p) then
+      let fam = Gwdb.foi base (Gwdb.get_family p).(i) in
+      let ct = Gwdb.get_children fam in
       if Array.length ct > 0 then
         let enfant = pget conf base ct.(0) in
         let child =
           if (is_hide_names conf enfant) && not (fast_auth_age conf enfant) then
             "xx"
           else
-            if not (eq_istr (get_surname p) (get_surname enfant)) then
-              person_text conf base enfant
+            if not (Gwdb.eq_istr (Gwdb.get_surname p) (Gwdb.get_surname enfant))
+            then person_text conf base enfant
             else
-              gen_person_text (p_first_name, (fun _ _ -> "")) conf base enfant
+              gen_person_text (Gwdb.p_first_name, (fun _ _ -> "")) conf base
+                enfant
         in
         translate_eval
           (transl_a_of_b conf
@@ -2282,13 +2296,14 @@ value first_child conf base p =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 value specify_homonymous conf base p specify_public_name =
-  match (get_public_name p, get_qualifiers p) with
-  [ (n, [nn :: _]) when sou base n <> "" && specify_public_name ->
-      Wserver.wprint " %s <em>%s</em>" (sou base n) (sou base nn)
+  match (Gwdb.get_public_name p, Gwdb.get_qualifiers p) with
+  [ (n, [nn :: _]) when Gwdb.sou base n <> "" && specify_public_name ->
+      Wserver.wprint " %s <em>%s</em>" (Gwdb.sou base n) (Gwdb.sou base nn)
   | (_, [nn :: _]) when specify_public_name ->
-      Wserver.wprint " %s <em>%s</em>" (p_first_name base p) (sou base nn)
-  | (n, []) when sou base n <> "" && specify_public_name ->
-      Wserver.wprint " %s" (sou base n)
+      Wserver.wprint " %s <em>%s</em>" (Gwdb.p_first_name base p)
+      (Gwdb.sou base nn)
+  | (n, []) when Gwdb.sou base n <> "" && specify_public_name ->
+      Wserver.wprint " %s" (Gwdb.sou base n)
   | (_, _) ->
       (* Le nom public et le qualificatif ne permettent pas de distinguer *)
       (* la personne, donc on affiche les informations sur les parents,   *)
@@ -2306,7 +2321,7 @@ value specify_homonymous conf base p specify_public_name =
 ;
 
 (* fix system bug: string_of_float 17.97 = "17.969999999999" *)
-value my_string_of_float f = sprintf "%.6g" f;
+value my_string_of_float f = Printf.sprintf "%.6g" f;
 
 value string_of_decimal_num conf f =
   let s = my_string_of_float f in
@@ -2449,24 +2464,25 @@ value limited_image_size max_wid max_hei fname size =
 ;
 
 value find_person_in_env conf base suff =
-  match p_getint conf.env ("i" ^ suff) with
+  match p_getint conf.Config.env ("i" ^ suff) with
   [ Some i ->
-      if i >= 0 && i < nb_of_persons base then
+      if i >= 0 && i < Gwdb.nb_of_persons base then
         let p = pget conf base (Adef.iper_of_int i) in
         if is_hidden p then None
         else Some p
       else None
   | None ->
       match
-        (p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff))
+        (p_getenv conf.Config.env ("p" ^ suff),
+         p_getenv conf.Config.env ("n" ^ suff))
       with
       [ (Some p, Some n) ->
           let occ =
-            match p_getint conf.env ("oc" ^ suff) with
+            match p_getint conf.Config.env ("oc" ^ suff) with
             [ Some oc -> oc
             | None -> 0 ]
           in
-          match person_of_key base p n occ with
+          match Gwdb.person_of_key base p n occ with
           [ Some ip ->
               let p = pget conf base ip in
               if is_hidden p then None
@@ -2480,20 +2496,20 @@ value find_person_in_env conf base suff =
 ;
 
 value person_exists conf base (fn, sn, oc) =
-  match p_getenv conf.base_env "red_if_not_exist" with
+  match p_getenv conf.Config.base_env "red_if_not_exist" with
   [ Some "off" -> True
   | Some _ | None ->
-      match person_of_key base fn sn oc with
+      match Gwdb.person_of_key base fn sn oc with
       [ Some ip -> authorized_age conf base (pget conf base ip)
       | None -> False ] ]
 ;
 
 value default_sosa_ref conf base =
-  match p_getenv conf.base_env "default_sosa_ref" with
+  match p_getenv conf.Config.base_env "default_sosa_ref" with
   [ Some n ->
       if n = "" then None
       else
-        match person_ht_find_all base n with
+        match Gutil.person_ht_find_all base n with
         [ [ip] ->
             let p = pget conf base ip in
             if is_hidden p then None
@@ -2509,15 +2525,16 @@ value find_sosa_ref conf base =
 ;
 
 value write_default_sosa conf base key = do {
-  let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
+  let gwf = List.remove_assoc "default_sosa_ref" conf.Config.base_env in
   let gwf = List.rev [("default_sosa_ref", key) :: gwf] in
-  let fname = base_path [] (conf.bname ^ ".gwf") in
+  let fname = base_path [] (conf.Config.bname ^ ".gwf") in
   let tmp_fname = fname ^ "2" in
   let oc =
     try Pervasives.open_out tmp_fname with
     [ Sys_error _ -> failwith "the gwf database is not writable" ]
   in
-  List.iter (fun (k, v) -> Pervasives.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
+  List.iter (fun (k, v) -> Pervasives.output_string oc (k ^ "=" ^ v ^ "\n"))
+    gwf;
   close_out oc ;
   try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
   try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
@@ -2526,14 +2543,14 @@ value write_default_sosa conf base key = do {
 
 value update_gwf_sosa conf base (ip, (fn, sn, occ)) =
   let sosa_ref_key =
-    match snd conf.default_sosa_ref with
+    match snd conf.Config.default_sosa_ref with
     [ Some p ->
-        p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " "
-        ^ p_surname base p
+        Gwdb.p_first_name base p ^ "." ^ string_of_int (Gwdb.get_occ p) ^ " "
+        ^ Gwdb.p_surname base p
     | None -> "" ]
   in
   let new_key = fn ^ "." ^ string_of_int occ ^ " " ^ sn in
-  if ip = fst conf.default_sosa_ref && new_key != sosa_ref_key then
+  if ip = fst conf.Config.default_sosa_ref && new_key != sosa_ref_key then
     (* On met à jour le fichier gwf, la config *)
     (* se mettera à jour par treat_request.    *)
     write_default_sosa conf base new_key
@@ -2541,19 +2558,20 @@ value update_gwf_sosa conf base (ip, (fn, sn, occ)) =
 ;
 
 value create_topological_sort conf base =
-  match p_getenv conf.env "opt" with
+  match p_getenv conf.Config.env "opt" with
   [ Some "no_tsfile" ->
-      let () = load_ascends_array base in
-      let () = load_couples_array base in
+      let () = Gwdb.load_ascends_array base in
+      let () = Gwdb.load_couples_array base in
       Consang.topological_sort base (pget conf)
-  | Some "no_tstab" -> Array.create (nb_of_persons base) 0
+  | Some "no_tstab" -> Array.create (Gwdb.nb_of_persons base) 0
   | _ ->
-      let bfile = base_path [] (conf.bname ^ ".gwb") in
+      let bfile = base_path [] (conf.Config.bname ^ ".gwb") in
       lock (Mutil.lock_file bfile) with
       [ Accept ->
           let tstab_file =
-            if conf.use_restrict && not conf.wizard && not conf.friend then
-              Filename.concat bfile "tstab_visitor"
+            if conf.Config.use_restrict && not conf.Config.wizard &&
+              not conf.Config.friend
+            then Filename.concat bfile "tstab_visitor"
             else Filename.concat bfile "tstab"
           in
           let r =
@@ -2573,12 +2591,13 @@ value create_topological_sort conf base =
           match r with
           [ Some tstab -> tstab
           | None ->
-              let () = load_ascends_array base in
-              let () = load_couples_array base in
+              let () = Gwdb.load_ascends_array base in
+              let () = Gwdb.load_couples_array base in
               let tstab = Consang.topological_sort base (pget conf) in
               do {
-                if conf.use_restrict && not conf.wizard && not conf.friend then
-                  base_visible_write base else ();
+                if conf.Config.use_restrict && not conf.Config.wizard &&
+                  not conf.Config.friend
+                then Gwdb.base_visible_write base else ();
                 match
                   try Some (Secure.open_out_bin tstab_file) with
                   [ Sys_error _ -> None ]
@@ -2592,8 +2611,8 @@ value create_topological_sort conf base =
                 tstab
               } ]
       | Refuse ->
-          let () = load_ascends_array base in
-          let () = load_couples_array base in
+          let () = Gwdb.load_ascends_array base in
+          let () = Gwdb.load_couples_array base in
           Consang.topological_sort base (pget conf) ] ]
 ;
 
@@ -2607,15 +2626,15 @@ value branch_of_sosa conf base ip n =
       fun
       [ [] -> Some [(ip, sp) :: ipl]
       | [goto_fath :: nl] ->
-          match get_parents (pget conf base ip) with
+          match Gwdb.get_parents (pget conf base ip) with
           [ Some ifam ->
-              let cpl = foi base ifam in
+              let cpl = Gwdb.foi base ifam in
               if goto_fath then
-                loop [(ip, sp) :: ipl] (get_father cpl) Male nl
-              else loop [(ip, sp) :: ipl] (get_mother cpl) Female nl
+                loop [(ip, sp) :: ipl] (Gwdb.get_father cpl) Def.Male nl
+              else loop [(ip, sp) :: ipl] (Gwdb.get_mother cpl) Def.Female nl
           | _ -> None ] ]
     in
-    loop [] ip (get_sex (pget conf base ip)) (expand [] n)
+    loop [] ip (Gwdb.get_sex (pget conf base ip)) (expand [] n)
   }
 ;
 
@@ -2627,9 +2646,9 @@ value sosa_of_branch ipl =
       (fun b (ip, sp) ->
          let b = Num.twice b in
          match sp with
-         [ Male -> b
-         | Female -> Num.inc b 1
-         | Neuter -> assert False ])
+         [ Def.Male -> b
+         | Def.Female -> Num.inc b 1
+         | Def.Neuter -> assert False ])
       Num.one ipl
   }
 ;
@@ -2667,13 +2686,13 @@ value default_image_name_of_key fnam surn occ =
     [Rem] : Exporté en clair hors de ce module.                            *)
 (* *********************************************************************** *)
 value default_image_name base p =
-  default_image_name_of_key (p_first_name base p) (p_surname base p)
-    (get_occ p)
+  default_image_name_of_key (Gwdb.p_first_name base p) (Gwdb.p_surname base p)
+    (Gwdb.get_occ p)
 ;
 
 value auto_image_file conf base p =
   let s = default_image_name base p in
-  let f = Filename.concat (base_path ["images"] conf.bname) s in
+  let f = Filename.concat (base_path ["images"] conf.Config.bname) s in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
@@ -2681,8 +2700,8 @@ value auto_image_file conf base p =
 ;
 
 value image_and_size conf base p image_size =
-  if not conf.no_image && authorized_age conf base p then
-    match sou base (get_image p) with
+  if not conf.Config.no_image && authorized_age conf base p then
+    match Gwdb.sou base (Gwdb.get_image p) with
     [ "" ->
         match auto_image_file conf base p with
         [ Some f -> Some (True, f, image_size f None)
@@ -2711,12 +2730,12 @@ value image_and_size conf base p image_size =
           Some (False, s, size)
         else if Filename.is_implicit s then
           match
-            try Some (List.assoc "images_path" conf.base_env) with
+            try Some (List.assoc "images_path" conf.Config.base_env) with
             [ Not_found -> None ]
           with
           [ Some p when p <> "" -> Some (False, p ^ s, size)
           | _ ->
-              let fname = personal_image_file_name conf.bname s in
+              let fname = personal_image_file_name conf.Config.bname s in
               if Sys.file_exists fname then
                 Some (True, fname, image_size fname None)
               else None ]
@@ -2737,8 +2756,9 @@ value image_and_size conf base p image_size =
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value has_image conf base p =
-  if not conf.no_image && authorized_age conf base p then
-    not (is_empty_string (get_image p)) || auto_image_file conf base p <> None
+  if not conf.Config.no_image && authorized_age conf base p then
+    not (Gwdb.is_empty_string (Gwdb.get_image p)) ||
+    auto_image_file conf base p <> None
   else False
 ;
 
@@ -2754,7 +2774,7 @@ value gen_only_printable or_nl s =
           | '\n' -> if or_nl then '\n' else ' '
           | _ -> ' ' ]
     };
-    strip_spaces s'
+    Gutil.strip_spaces s'
   }
 ;
 
@@ -2763,49 +2783,49 @@ value only_printable = gen_only_printable False;
 
 value relation_type_text conf t n =
   match t with
-  [ Adoption ->
+  [ Def.Adoption ->
       transl_nth conf "adoptive father/adoptive mother/adoptive parents" n
-  | Recognition ->
+  | Def.Recognition ->
       transl_nth conf
         "recognizing father/recognizing mother/recognizing parents" n
-  | CandidateParent ->
+  | Def.CandidateParent ->
       transl_nth conf "candidate father/candidate mother/candidate parents" n
-  | GodParent -> transl_nth conf "godfather/godmother/godparents" n
-  | FosterParent ->
+  | Def.GodParent -> transl_nth conf "godfather/godmother/godparents" n
+  | Def.FosterParent ->
       transl_nth conf "foster father/foster mother/foster parents" n ]
 ;
 
 value rchild_type_text conf t n =
   match t with
-  [ Adoption ->
+  [ Def.Adoption ->
       transl_nth conf "adoptive son/adoptive daughter/adoptive child" n
-  | Recognition ->
+  | Def.Recognition ->
       transl_nth conf "recognized son/recognized daughter/recognized child" n
-  | CandidateParent ->
+  | Def.CandidateParent ->
       transl_nth conf "candidate son/candidate daughter/candidate child" n
-  | GodParent -> transl_nth conf "godson/goddaughter/godchild" n
-  | FosterParent ->
+  | Def.GodParent -> transl_nth conf "godson/goddaughter/godchild" n
+  | Def.FosterParent ->
       transl_nth conf "foster son/foster daughter/foster child" n ]
 ;
 
 value wprint_hidden conf pref name valu =
   Wserver.wprint "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n"
-    pref name (quote_escaped valu) conf.xhs
+    pref name (quote_escaped valu) conf.Config.xhs
 ;
 
 value wprint_hidden_person conf base pref p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
+  let first_name = Gwdb.p_first_name base p in
+  let surname = Gwdb.p_surname base p in
   if accessible_by_key conf base p first_name surname then do {
     wprint_hidden conf pref "p" (Name.lower first_name);
     wprint_hidden conf pref "n" (Name.lower surname);
-    if get_occ p > 0 then
-      wprint_hidden conf pref "oc" (string_of_int (get_occ p))
+    if Gwdb.get_occ p > 0 then
+      wprint_hidden conf pref "oc" (string_of_int (Gwdb.get_occ p))
     else ();
   }
   else
     wprint_hidden conf pref "i"
-      (string_of_int (Adef.int_of_iper (get_key_index p)))
+      (string_of_int (Adef.int_of_iper (Gwdb.get_key_index p)))
 ;
 
 exception Ok;
@@ -2813,21 +2833,22 @@ exception Ok;
 value has_nephews_or_nieces conf base p =
   try
     let a = p in
-    match get_parents a with
+    match Gwdb.get_parents a with
     [ Some ifam ->
-        let fam = foi base ifam in
+        let fam = Gwdb.foi base ifam in
         do {
           Array.iter
             (fun ip ->
-               if ip = get_key_index p then ()
+               if ip = Gwdb.get_key_index p then ()
                else
                  Array.iter
                    (fun ifam ->
-                      if Array.length (get_children (foi base ifam)) > 0 then
-                        raise Ok
+                      if Array.length
+                        (Gwdb.get_children (Gwdb.foi base ifam)) > 0
+                      then raise Ok
                       else ())
-                   (get_family (pget conf base ip)))
-            (get_children fam);
+                   (Gwdb.get_family (pget conf base ip)))
+            (Gwdb.get_children fam);
           False
         }
     | _ -> False ]
@@ -2840,26 +2861,29 @@ value max_login_time = 60.0; (* short, just for testing *)
 
 value is_that_user_and_password auth_scheme user passwd =
   match auth_scheme with
-  [ NoAuth -> False
-  | TokenAuth ts -> user = ts.ts_user && passwd = ts.ts_pass
-  | HttpAuth (Basic bs) -> user = bs.bs_user && passwd = bs.bs_pass
-  | HttpAuth (Digest ds) ->
-      if user <> ds.ds_username then False
+  [ Config.NoAuth -> False
+  | Config.TokenAuth ts ->
+    user = ts.Config.ts_user && passwd = ts.Config.ts_pass
+  | Config.HttpAuth (Config.Basic bs) ->
+    user = bs.Config.bs_user && passwd = bs.Config.bs_pass
+  | Config.HttpAuth (Config.Digest ds) ->
+      if user <> ds.Config.ds_username then False
       else
         let that_response_would_be =
-          let a1 = sprintf "%s:%s:%s" user ds.ds_realm passwd in
-          let a2 = sprintf "%s:%s" ds.ds_meth ds.ds_uri in
-          if ds.ds_qop = "auth" || ds.ds_qop = "auth-int" then
-            h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ ds.ds_nc ^ ":" ^
-               ds.ds_cnonce ^ ":" ^ ds.ds_qop ^ ":" ^ h a2)
+          let a1 = Printf.sprintf "%s:%s:%s" user ds.Config.ds_realm passwd in
+          let a2 = Printf.sprintf "%s:%s" ds.Config.ds_meth ds.Config.ds_uri in
+          if ds.Config.ds_qop = "auth" || ds.Config.ds_qop = "auth-int" then
+            h (h a1 ^ ":" ^ ds.Config.ds_nonce ^ ":" ^ ds.Config.ds_nc ^ ":" ^
+               ds.Config.ds_cnonce ^ ":" ^ ds.Config.ds_qop ^ ":" ^ h a2)
           else
-            h (h a1 ^ ":" ^ ds.ds_nonce ^ ":" ^ h a2)
+            h (h a1 ^ ":" ^ ds.Config.ds_nonce ^ ":" ^ h a2)
         in
-        that_response_would_be = ds.ds_response ]
+        that_response_would_be = ds.Config.ds_response ]
 ;
 
 value browser_doesnt_have_tables conf =
-  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  let user_agent =
+    Wserver.extract_param "user-agent: " '/' conf.Config.request in
   String.lowercase user_agent = "lynx"
 ;
 
@@ -2914,8 +2938,8 @@ value print_pre_right sz txt =
 ;
 
 value of_course_died conf p =
-  match Adef.od_of_codate (get_birth p) with
-  [ Some (Dgreg d _) -> conf.today.year - d.year > 120
+  match Adef.od_of_codate (Gwdb.get_birth p) with
+  [ Some (Def.Dgreg d _) -> conf.Config.today.Def.year - d.Def.year > 120
   | _ -> False ]
 ;
 
@@ -2930,9 +2954,9 @@ value adm_file f =
 ;
 
 value std_date conf =
-  let (hour, min, sec) = conf.time in
-  sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
-    conf.today.month conf.today.day hour min sec
+  let (hour, min, sec) = conf.Config.time in
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.Config.today.Def.year
+    conf.Config.today.Def.month conf.Config.today.Def.day hour min sec
 ;
 
 value read_wf_trace fname =
@@ -2950,7 +2974,7 @@ value read_wf_trace fname =
 value write_wf_trace fname wt =
   let oc = Secure.open_out fname in
   do {
-    List.iter (fun (dt, u) -> fprintf oc "%s %s\n" dt u) wt;
+    List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
     close_out oc;
   }
 ;
@@ -2967,10 +2991,10 @@ value update_wf_trace conf fname =
             let u =
               String.sub x (dtlen + 1) (String.length x - dtlen - 1)
             in
-            if u = conf.user then loop True [(dt, u) :: r] l
+            if u = conf.Config.user then loop True [(dt, u) :: r] l
             else loop found [(String.sub x 0 dtlen, u) :: r] l
           else loop found r l
-      | [] -> if found then r else [(dt, conf.user) :: r] ]
+      | [] -> if found then r else [(dt, conf.Config.user) :: r] ]
     in
     loop False [] r
   in
@@ -2980,19 +3004,19 @@ value update_wf_trace conf fname =
 value commit_patches conf base =
   do {
     Gwdb.commit_patches base;
-    conf.henv :=
+    conf.Config.henv :=
       List.map
         (fun (k, v) ->
            if k = "escache" then (k, escache_value base) else (k, v))
-        conf.henv
+        conf.Config.henv
     ;
-    if conf.user <> "" then
+    if conf.Config.user <> "" then
       let wpf =
-        try List.assoc "wizard_passwd_file" conf.base_env with
+        try List.assoc "wizard_passwd_file" conf.Config.base_env with
         [ Not_found -> "" ]
       in
       if wpf <> "" then
-        let fname = adm_file (conf.bname ^ "_u.txt") in
+        let fname = adm_file (conf.Config.bname ^ "_u.txt") in
         update_wf_trace conf fname
       else ()
     else ();
@@ -3262,8 +3286,8 @@ value dispatch_in_columns ncol list order =
 
 value print_in_columns conf ncols len_list list wprint_elem = do {
   begin_centered conf;
-  tag "table" "width=\"95%%\" border=\"%d\"" conf.border begin
-    tag "tr" "align=\"%s\" valign=\"top\"" conf.left begin
+  tag "table" "width=\"95%%\" border=\"%d\"" conf.Config.border begin
+    tag "tr" "align=\"%s\" valign=\"top\"" conf.Config.left begin
       let _ =
         List.fold_left
           (fun (list, first) len ->
@@ -3275,7 +3299,8 @@ value print_in_columns conf ncols len_list list wprint_elem = do {
                else
                  match list with
                  [ [(kind, ord, elem) :: list] -> do {
-                     if n = len then Wserver.wprint "<td width=\"%d\">\n" (100/ncols)
+                     if n = len
+                     then Wserver.wprint "<td width=\"%d\">\n" (100/ncols)
                      else if kind.val <> Elem then Wserver.wprint "</ul>\n"
                      else ();
                      if kind.val <> Elem then do {
@@ -3300,7 +3325,7 @@ value print_in_columns conf ncols len_list list wprint_elem = do {
 
 value wprint_in_columns conf order wprint_elem list =
   let ncols =
-    match p_getint conf.env "ncols" with
+    match p_getint conf.Config.env "ncols" with
     [ Some n -> max 1 n
     | None ->
         let len_list = List.length list in
@@ -3394,8 +3419,8 @@ value gen_print_tips conf s = do {
     [Rem] : Exporté en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value print_tips_relationship conf =
-  if p_getenv conf.env "em" = Some "R" ||
-     p_getenv conf.env "m" = Some "C" then
+  if p_getenv conf.Config.env "em" = Some "R" ||
+     p_getenv conf.Config.env "m" = Some "C" then
     let s =
       (capitale (transl conf "select person to compute relationship"))
     in
@@ -3417,10 +3442,10 @@ value print_tips_relationship conf =
 (* ********************************************************************** *)
 value print_image_sex conf p size =
   let (image, alt) =
-    match get_sex p with
-    [ Male -> ("male.png", "M")
-    | Female -> ("female.png", "F")
-    | Neuter -> ("sexunknown.png", "?") ]
+    match Gwdb.get_sex p with
+    [ Def.Male -> ("male.png", "M")
+    | Def.Female -> ("female.png", "F")
+    | Def.Neuter -> ("sexunknown.png", "?") ]
   in
   xtag
     "img" "src=\"%s/%s\" alt=\"%s\" title=\"sex\" width=\"%d\" heigth=\"%d\""
@@ -3439,20 +3464,20 @@ value print_image_sex conf p size =
 (* ********************************************************************** *)
 value display_options conf =
   let s =
-    if p_getenv conf.env "image" = Some "on" then ";image=on"
+    if p_getenv conf.Config.env "image" = Some "on" then ";image=on"
     else ""
   in
   let s =
-    if p_getenv conf.env "marriage" = Some "on" then s ^ ";marriage=on"
+    if p_getenv conf.Config.env "marriage" = Some "on" then s ^ ";marriage=on"
     else s
   in
   let s =
-    match p_getenv conf.env "bd" with
+    match p_getenv conf.Config.env "bd" with
     [ Some i -> s ^ ";bd=" ^ i
     | None -> s ]
   in
   let s =
-    match p_getenv conf.env "color" with
+    match p_getenv conf.Config.env "color" with
     [ Some c -> s ^ ";color=" ^ c
     | None -> s ]
   in
