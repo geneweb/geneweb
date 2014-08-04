@@ -619,7 +619,7 @@ let select_both_start_with_person conf base ini_n ini_p max_res =
   let ini_n = cut_at_space (code_varenv (Name.lower ini_n)) [] in
   let ini_p = cut_at_space (code_varenv (Name.lower ini_p)) [] in
   let rec loop i list nb_res =
-    if nb_res < max_res && i < nb_of_persons base then
+    if (*nb_res < max_res &&*) i < nb_of_persons base then
       let ip = Adef.iper_of_int i in
       let p = poi base ip in
       let surnames =
