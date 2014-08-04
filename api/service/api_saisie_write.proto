@@ -1,0 +1,758 @@
+package geneweb.api.saisie_write.object;
+
+
+// ***************************************************************************
+// Définitions globales.
+// ***************************************************************************
+
+enum Sosa {
+  SOSA_REF = 0;
+  SOSA = 1;
+  NO_SOSA = 2;
+}
+
+enum Calendar {
+  GREGORIAN = 0;
+  JULIAN = 1;
+  FRENCH = 2;
+  HEBREW = 3;
+}
+
+enum WitnessType {
+  WITNESS = 0;
+  WITNESS_GODPARENT = 1;
+}
+
+enum Precision {
+  SURE = 0;
+  ABOUT = 1;
+  MAYBE = 2;
+  BEFORE = 3;
+  AFTER = 4;
+  ORYEAR = 5;
+  YEARINT = 6;
+}
+
+message Dmy {
+  optional int32 day = 1;
+  optional int32 month = 2;
+  optional sint32 year = 3;
+  optional int32 delta = 4;
+}
+
+message Date {
+  optional Calendar cal = 1;
+  optional Precision prec = 2;
+  optional Dmy dmy = 3;
+  optional Dmy dmy2 = 4;
+  optional string text = 5;
+}
+
+enum Sex {
+  MALE = 0;
+  FEMALE = 1;
+  UNKNOWN = 2;
+}
+
+enum DeathType {
+  NOT_DEAD = 0;
+  DEAD = 1;
+  DEAD_YOUNG = 2;
+  DEAD_DONT_KNOW_WHEN = 3;
+  DONT_KNOW_IF_DEAD = 4;
+  OF_COURSE_DEAD = 5;
+}
+
+
+// ***************************************************************************
+// Objets pour la "lecture" utilisés pour la recherche pour relier des
+// personnes par exemple.
+// ***************************************************************************
+
+message PersonSearch {
+  required int32 index = 1;
+  required Sex sex = 2;
+  required string lastname = 3;
+  required string firstname = 4;
+  optional string dates = 5;
+  optional string image = 6;
+  required Sosa sosa = 7;
+  required string family = 8;
+}
+
+message SimplePerson {
+  required int32 index = 1;
+  required Sex sex = 2;
+  required string lastname = 3;
+  required string firstname = 4;
+  optional string birth_short_date = 5;
+  optional string birth_place = 6;
+  optional string death_short_date = 7;
+  optional string death_place = 8;
+  optional string image = 9;
+  required Sosa sosa = 10;
+}
+
+message WitnessEvent {
+  required WitnessType witness_type = 1;
+  required SimplePerson witness = 2;
+}
+
+message Event {
+  required string name = 1;
+  optional string date = 2;
+  optional string date_conv = 3;
+  optional Calendar date_cal = 4;
+  optional string place = 5;
+  optional string reason = 6;
+  optional string note = 7;
+  optional string src = 8;
+  optional SimplePerson spouse = 9;
+  repeated WitnessEvent witnesses = 10;
+}
+
+enum RelationType {
+  RPARENT_ADOPTION = 0;
+  RPARENT_RECOGNITION = 1;
+  RPARENT_CANDIDATE_PARENT = 2;
+  RPARENT_GOD_PARENT = 3;
+  RPARENT_FOSTER_PARENT = 4;
+  RCHILD_ADOPTION = 5;
+  RCHILD_RECOGNITION = 6;
+  RCHILD_CANDIDATE_PARENT = 7;
+  RCHILD_GOD_PARENT = 8;
+  RCHILD_FOSTER_PARENT = 9;
+}
+
+message RelationPerson {
+  required RelationType r_type = 1;
+  required SimplePerson person = 2;
+}
+
+message WasWitness {
+  required string husband = 1;
+  required string wife = 2;
+}
+
+message PersonSearchInfo {
+  required int32 index = 1;
+  required Sex sex = 2;
+  required string lastname = 3;
+  required string firstname = 4;
+  optional string public_name = 5;
+  repeated string aliases = 6;
+  repeated string qualifiers = 7;
+  repeated string firstname_aliases = 8;
+  repeated string surname_aliases = 9;
+  optional string image = 10;
+  repeated Event events = 11;
+  optional string occupation = 12;
+  optional string notes = 13;
+  optional string psources = 14;
+  required bool has_sources = 15;
+  repeated string titles = 16;
+  repeated RelationPerson related = 17;
+  repeated RelationPerson rparents = 18;
+  repeated WasWitness was_witness = 19;
+  required Sosa sosa = 20;
+}
+
+
+// ***************************************************************************
+// Objets pour la saisie.
+// ***************************************************************************
+
+enum CreateOrLink {
+  CREATE = 0;
+  LINK = 1;
+  CREATE_DEFAULT_OCC = 2;
+}
+
+message PersonLink {
+  required CreateOrLink create_link = 1;
+  required int32 index = 2;
+  required Sex sex = 3;
+  required string lastname = 4;
+  required string firstname = 5;
+  optional int32 occ = 6;
+  optional string dates = 7;
+}
+
+message Witness {
+  required WitnessType witness_type = 1;
+  optional PersonLink person = 2;
+}
+
+enum FeventName {
+  EFAM_MARRIAGE = 0;
+  EFAM_NO_MARRIAGE = 1;
+  EFAM_NO_MENTION = 2;
+  EFAM_ENGAGE = 3;
+  EFAM_DIVORCE = 4;
+  EFAM_SEPARATED = 5;
+  EFAM_ANNULATION = 6;
+  EFAM_MARRIAGE_BANN = 7;
+  EFAM_MARRIAGE_CONTRACT = 8;
+  EFAM_MARRIAGE_LICENSE = 9;
+  EFAM_PACS = 10;
+  EFAM_RESIDENCE = 11;
+}
+
+message Fevent {
+  optional FeventName fevent_type = 1;
+  optional Date date = 2;
+  optional string place = 3;
+  optional string reason = 4;
+  optional string note = 5;
+  optional string src = 6;
+  repeated Witness witnesses = 7;
+  optional string event_perso = 8;
+}
+
+enum RelationParentType {
+  RPT_ADOPTION_FATHER = 0;
+  RPT_ADOPTION_MOTHER = 1;
+  RPT_RECOGNITION_FATHER = 2;
+  RPT_RECOGNITION_MOTHER = 3;
+  RPT_CANDIDATE_PARENT_FATHER = 4;
+  RPT_CANDIDATE_PARENT_MOTHER = 5;
+  RPT_GOD_PARENT_FATHER = 6;
+  RPT_GOD_PARENT_MOTHER = 7;
+  RPT_FOSTER_PARENT_FATHER = 8;
+  RPT_FOSTER_PARENT_MOTHER = 9;
+}
+
+message RelationParent {
+  required RelationParentType rpt_type = 1;
+  optional PersonLink person = 2;
+  optional string source = 3;
+}
+
+message Title {
+  optional string name = 1;
+  optional string title = 2;
+  optional string fief = 3;
+  optional Date date_begin = 4;
+  optional Date date_end = 5;
+  optional int32 nth = 6;
+}
+
+enum PeventName {
+  EPERS_BIRTH = 0;
+  EPERS_BAPTISM = 1;
+  EPERS_DEATH = 2;
+  EPERS_BURIAL = 3;
+  EPERS_CREMATION = 4;
+  EPERS_ACCOMPLISHMENT = 5;
+  EPERS_ACQUISITION = 6;
+  EPERS_ADHESION = 7;
+  EPERS_BAPTISMLDS = 8;
+  EPERS_BARMITZVAH = 9;
+  EPERS_BATMITZVAH = 10;
+  EPERS_BENEDICTION = 11;
+  EPERS_CHANGENAME = 12;
+  EPERS_CIRCUMCISION = 13;
+  EPERS_CONFIRMATION = 14;
+  EPERS_CONFIRMATIONLDS = 15;
+  EPERS_DECORATION = 16;
+  EPERS_DEMOBILISATIONMILITAIRE = 17;
+  EPERS_DIPLOMA = 18;
+  EPERS_DISTINCTION = 19;
+  EPERS_DOTATION = 20;
+  EPERS_DOTATIONLDS = 21;
+  EPERS_EDUCATION = 22;
+  EPERS_ELECTION = 23;
+  EPERS_EMIGRATION = 24;
+  EPERS_EXCOMMUNICATION = 25;
+  EPERS_FAMILYLINKLDS = 26;
+  EPERS_FIRSTCOMMUNION = 27;
+  EPERS_FUNERAL = 28;
+  EPERS_GRADUATE = 29;
+  EPERS_HOSPITALISATION = 30;
+  EPERS_ILLNESS = 31;
+  EPERS_IMMIGRATION = 32;
+  EPERS_LISTEPASSENGER = 33;
+  EPERS_MILITARYDISTINCTION = 34;
+  EPERS_MILITARYPROMOTION = 35;
+  EPERS_MILITARYSERVICE = 36;
+  EPERS_MOBILISATIONMILITAIRE = 37;
+  EPERS_NATURALISATION = 38;
+  EPERS_OCCUPATION = 39;
+  EPERS_ORDINATION = 40;
+  EPERS_PROPERTY = 41;
+  EPERS_RECENSEMENT = 42;
+  EPERS_RESIDENCE = 43;
+  EPERS_RETIRED = 44;
+  EPERS_SCELLENTCHILDLDS = 45;
+  EPERS_SCELLENTPARENTLDS = 46;
+  EPERS_SCELLENTSPOUSELDS = 47;
+  EPERS_VENTEBIEN = 48;
+  EPERS_WILL = 49;
+}
+
+message Pevent {
+  optional PeventName pevent_type = 1;
+  optional Date date = 2;
+  optional string place = 3;
+  optional string reason = 4;
+  optional string note = 5;
+  optional string src = 6;
+  repeated Witness witnesses = 7;
+  optional string event_perso = 8;
+}
+
+enum Access {
+  ACCESS_IFTITLES = 0;
+  ACCESS_PUBLIC = 1;
+  ACCESS_PRIVATE = 2;
+}
+
+message Person {
+  required string digest = 1;
+  required CreateOrLink create_link = 2;
+  required int32 index = 3;
+  required Sex sex = 4;
+  required string lastname = 5;
+  required string firstname = 6;
+  optional int32 occ = 7;
+  optional string public_name = 8;
+  repeated string aliases = 9;
+  repeated string qualifiers = 10;
+  repeated string firstname_aliases = 11;
+  repeated string surname_aliases = 12;
+  optional string image = 13;
+  required DeathType death_type = 14;
+  optional string occupation = 15;
+  optional string psources = 16;
+  optional string notes = 17;
+  repeated Title titles = 18;
+  repeated Pevent pevents = 19;
+  repeated int32 related = 20;
+  repeated RelationParent rparents = 21;
+  optional Access access = 22 [default = ACCESS_IFTITLES];
+  optional int32 parents = 23;
+  repeated int32 families = 24;
+}
+
+message Family {
+  required string digest = 1;
+  required int32 index = 2;
+  repeated Fevent fevents = 3;
+  optional string fsources = 4;
+  optional string origin_file = 5;
+  optional string comment = 6;
+  required Person father = 7;
+  required Person mother = 8;
+  repeated PersonLink children = 9;
+  repeated int32 old_witnesses = 10;
+}
+
+
+// ***************************************************************************
+// Objets après modification de la base.
+// ***************************************************************************
+
+// Erreurs possibles :
+// ***** Erreur ou warning GW
+// ALREADY_DEFINED
+// OWN_ANCESTOR
+// BAD_SEX_OF_MARRIED_PERSON
+// BIG_AGE_BETWEEN_SPOUSES
+// BIRTH_AFTER_DEATH
+// INCOHERENT_SEX
+// CHANGED_ORDER_OF_CHILDREN
+// CHANGED_ORDER_OF_MARRIAGES
+// CHANGED_ORDER_OF_FAMILY_EVENTS
+// CHANGED_ORDER_OF_PERSON_EVENTS
+// CHILDREN_NOT_IN_ORDER
+// CLOSE_CHILDREN
+// DEAD_OLD
+// DEAD_TOO_EARLY_TO_BE_FATHER
+// INCOHERENT_ANCESTOR_DATE
+// MARRIAGE_DATE_AFTER_DEATH
+// MARRIAGE_DATE_BEFORE_BIRTH
+// MOTHER_DEAD_BEFORE_CHILD_BIRTH
+// PARENT_BORN_AFTER_CHILD
+// PARENT_TOO_OLD
+// PARENT_TOO_YOUNG
+// TITLE_DATES_ERROR
+// UNDEFINED_SEX
+// WITNESS_DATE_AFTER_DEATH
+// WITNESS_DATE_BEFORE_BIRTH
+// YOUNG_FOR_MARRIAGE
+// OLD_INDIVIDUAL
+
+// ***** Erreur de modification
+// UNKNOWN_PERSON
+// BASE_CHANGED
+// BAD_DATE_FORMAT
+// CREATE_CONFLICT_OCC
+// PERSON_KEY
+
+// ***** Erreur JS
+// EMPTY_INDEX
+// EMPTY_SURNAME
+// EMPTY_FIRST_NAME
+// EMPTY_SEX
+// REQUIRED_FIELD
+// BIRTH_DATE_AFTER_EVENT
+// DEATH_DATE_BEFORE_EVENT
+
+enum UpdateWarningJS {
+  EMPTY_INDEX = 0;
+  EMPTY_SURNAME = 1;
+  EMPTY_FIRST_NAME = 2;
+  EMPTY_SEX = 3;
+  REQUIRED_FIELD = 4;
+  BIRTH_DATE_AFTER_EVENT = 5;
+  DEATH_DATE_BEFORE_EVENT = 6;
+}
+
+enum PersonOrFamily {
+  PERSON_FORM1 = 0;
+  PERSON_FORM2 = 1;
+  FAMILY_FORM = 2;
+}
+
+message CreateConflict {
+  optional PersonOrFamily form = 1;
+  required bool witness = 2;
+  required bool rparents = 3;
+  required bool event = 4;
+  optional int32 pos = 5;
+  optional int32 pos_witness = 6;
+  required string lastname = 7;
+  required string firstname = 8;
+}
+
+message ModificationStatus {
+  required bool is_base_updated = 1;
+  repeated string base_warnings = 2;
+  optional int32 index_person = 3;
+  required string lastname = 4;
+  required string firstname = 5;
+  optional int32 occ = 6;
+  optional int32 index_family = 7;
+  optional CreateConflict conflict = 8;
+}
+
+
+// ***************************************************************************
+// Objets pour les différentes requêtes (write).
+// ***************************************************************************
+
+message IndexPerson {
+  required int32 index = 1;
+}
+
+message IndexFamily {
+  required int32 index = 1;
+}
+
+message IndexPersonAndFamily {
+  required int32 index_person = 1;
+  required int32 index_family = 2;
+}
+
+message FamilySpouse {
+  required int32 index_family = 1;
+  required int32 index_person = 2;
+  required Sex sex = 3;
+  required string lastname = 4;
+  required string firstname = 5;
+  optional string dates = 6;
+  optional string image = 7;
+  required Sosa sosa = 8;
+}
+
+message AddChildRequest {
+  required int32 index = 1;
+  optional int32 index_family = 2;
+  optional Sex sex = 3;
+}
+
+message AddChild {
+  required string person_lastname = 1;
+  required string person_firstname = 2;
+  repeated FamilySpouse family_spouse = 3;
+  required Person child = 4;
+}
+
+message AddChildOk {
+  required int32 index_person = 1;
+  required int32 index_family = 2;
+  required bool new_family = 3;
+  required Person child = 4;
+}
+
+message AddParents {
+  required string person_lastname = 1;
+  required string person_firstname = 2;
+  required Family family = 3;
+}
+
+message AddParentsOk {
+  required int32 index_person = 1;
+  required Family family = 2;
+}
+
+message AddFamily {
+  required string person_lastname = 1;
+  required string person_firstname = 2;
+  required Family family = 3;
+}
+
+message AddFamilyOk {
+  required int32 index_person = 1;
+  required Family family = 2;
+}
+
+message EditFamilyRequest {
+  repeated FamilySpouse spouses = 1;
+  optional EditFamily first_family = 2;
+}
+
+message EditFamily {
+  required string person_lastname = 1;
+  required string person_firstname = 2;
+  required Family family = 3;
+}
+
+message EditFamilyOk {
+  required int32 index_person = 1;
+  required Family family = 2;
+}
+
+message AddSiblingRequest {
+  required int32 index = 1;
+  optional Sex sex = 2;
+}
+
+message AddSibling {
+  required string person_lastname = 1;
+  required string person_firstname = 2;
+  required Person sibling = 3;
+}
+
+message AddSiblingOk {
+  required int32 index_person = 1;
+  required Person sibling = 2;
+}
+
+
+// ***************************************************************************
+// Objets pour les différentes requêtes (read).
+// ***************************************************************************
+
+enum AutoCompletePlaceField {
+  SUBDIVISION = 0;
+  TOWN = 1;
+  AREA_CODE = 2;
+  COUNTY = 3;
+  REGION = 4;
+  COUNTRY = 5;
+}
+
+enum AutoCompleteField {
+  LASTNAME = 0;
+  FIRSTNAME = 1;
+  PLACE = 2;
+  SOURCE = 3;
+}
+
+message AutoComplete {
+  required AutoCompleteField field = 1;
+  optional AutoCompletePlaceField place_field = 2;
+  required string input = 3;
+  required int32 limit = 4;
+}
+
+message AutoCompleteResult {
+  repeated string result = 1;
+}
+
+message PersonSearchListParams {
+  optional string lastname = 1;
+  optional string firstname = 2;
+  required int32 limit = 3;
+}
+
+message PersonSearchList {
+  repeated PersonSearch persons = 1;
+}
+
+// ***************************************************************************
+// Objets pour les messages de traductions/config  (read).
+// ***************************************************************************
+
+message TranslCalendar {
+  required Calendar pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslCalendar {
+  repeated TranslCalendar msg = 1;
+}
+
+message TranslWitnessType {
+  required WitnessType pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslWitnessType {
+  repeated TranslWitnessType msg = 1;
+}
+
+message TranslPrecision {
+  required Precision pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslPrecision {
+  repeated TranslPrecision msg = 1;
+}
+
+message TranslDeathType {
+  required DeathType pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslDeathType {
+  repeated TranslDeathType msg = 1;
+}
+
+message TranslRelationParentType {
+  required RelationParentType pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslRelationParentType {
+  repeated TranslRelationParentType msg = 1;
+}
+
+message TranslFeventName {
+  required FeventName pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslFeventName {
+  repeated TranslFeventName msg = 1;
+}
+
+message TranslPeventName {
+  required PeventName pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslPeventName {
+  repeated TranslPeventName msg = 1;
+}
+
+message TranslAccess {
+  required Access pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslAccess {
+  repeated TranslAccess msg = 1;
+}
+
+message TranslUpdateWarningJS {
+  required UpdateWarningJS pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslUpdateWarningJS {
+  repeated TranslUpdateWarningJS msg = 1;
+}
+
+enum ShortGregMonth {
+  JANV = 0;
+  FEVR = 1;
+  MARS = 2;
+  AVR = 3;
+  MAI = 4;
+  JUIN = 5;
+  JUIL = 6;
+  AOUT = 7;
+  SEPT = 8;
+  OCT = 9;
+  NOV = 10;
+  DEC = 11;
+}
+
+message TranslShortGregMonth {
+  required ShortGregMonth pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslShortGregMonth {
+  repeated TranslShortGregMonth msg = 1;
+}
+
+enum FrenchMonth {
+  VENDEMIAIRE = 0;
+  BRUMAIRE = 1;
+  FRIMAIRE = 2;
+  NIVOSE = 3;
+  PLUVIOSE = 4;
+  VENTOSE = 5;
+  GERMINAL = 6;
+  FLOREAL = 7;
+  PRAIRIAL = 8;
+  MESSIDOR = 9;
+  THERMIDOR = 10;
+  FRUCTIDOR = 11;
+  COMPLEMENTAIRE = 12;
+}
+
+message TranslFrenchMonth {
+  required FrenchMonth pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslFrenchMonth {
+  repeated TranslFrenchMonth msg = 1;
+}
+
+enum HebrewMonth {
+  TICHRI = 0;
+  MARHECHVAN = 1;
+  KISLEV = 2;
+  TEVET = 3;
+  CHEVAT = 4;
+  ADAR_1 = 5;
+  ADAR_2 = 6;
+  NISSAN = 7;
+  IYAR = 8;
+  SIVAN = 9;
+  TAMOUZ = 10;
+  AV = 11;
+  ELOUL = 12;
+}
+
+message TranslHebrewMonth {
+  required HebrewMonth pos = 1;
+  required string sval = 2;
+}
+
+message ConfigTranslHebrewMonth {
+  repeated TranslHebrewMonth msg = 1;
+}
+
+message Config {
+  required ConfigTranslCalendar transl_cal = 1;
+  required ConfigTranslWitnessType transl_wit = 2;
+  required ConfigTranslPrecision transl_prec = 3;
+  required ConfigTranslDeathType transl_death = 4;
+  required ConfigTranslRelationParentType transl_rel = 5;
+  required ConfigTranslFeventName transl_fevents = 6;
+  required ConfigTranslPeventName transl_pevents = 7;
+  required ConfigTranslAccess transl_access = 8;
+  required ConfigTranslUpdateWarningJS transl_warning = 9;
+  required ConfigTranslShortGregMonth transl_short_greg_month = 10;
+  required ConfigTranslFrenchMonth transl_french_month = 11;
+  required ConfigTranslHebrewMonth transl_hebrew_month = 12;
+  required string gwf_place_format = 13;
+  required string gwf_place_format_placeholder = 14;
+}

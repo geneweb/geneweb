@@ -598,7 +598,7 @@ let print_config conf base =
       - string : le potentiel nom hérité.
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-let infer_surname conf base p =
+let rec infer_surname conf base p ifam =
   let surname = sou base (get_surname p) in
   if surname = "?" then ""
   else
@@ -647,9 +647,7 @@ let infer_surname conf base p =
                 let (primary_surname, secondary_surname) =
                   Metaphone.double_metaphone surname
                 in
-                let (primary_name, secondary_name) =
-                  Metaphone.double_metaphone name
-                in
+                let (primary_name, secondary_name) = Metaphone.double_metaphone name in
                 if primary_surname = primary_name ||
                    secondary_surname = secondary_name
                 then surname
@@ -713,6 +711,18 @@ let infer_surname conf base p =
           | None -> surname
         end
     else
+      (* Si on a envoyé dans l'objet AddChildRequest l'index de la famille,  *)
+      (* et que la personne selectionnée est une femme, on relance le calcul avec *)
+      (* le nom du père.                                                           *)
+      match ifam with
+      | Some ifam ->
+          let ifam = Adef.ifam_of_int (Int32.to_int ifam) in
+          let fam = foi base ifam in
+          let isp = Gutil.spouse (get_key_index p) fam in
+          let sp = poi base isp in
+          if get_sex sp = Male then infer_surname conf base sp None
+          else ""
+      | None ->
       (* On prend le nom de la fratrie parce que y'a de *)
       (* grande chance que ce soit le même.             *)
       let fam = get_family p in
@@ -730,7 +740,7 @@ let infer_surname conf base p =
               let all_children_surname =
                 List.fold_left
                   (fun acc ifam ->
-                    let fam = foi base fam.(0) in
+                    let fam = foi base ifam in
                     let names =
                       List.fold_left
                         (fun accu ip ->
@@ -1940,7 +1950,7 @@ let print_add_parents conf base =
   (* On calcul le nom du père. *)
   let () =
     if get_sex p = Male then
-      let father_surname = infer_surname conf base p in
+      let father_surname = infer_surname conf base p None in
       father.Mwrite.Person.lastname <- father_surname;
     else
       father.Mwrite.Person.lastname <- surname;
@@ -2093,6 +2103,7 @@ let print_add_parents_ok conf base =
 let print_add_child conf base =
   let params = get_params conf Mext_write.parse_add_child_request in
   let ip = Int32.to_int params.Mwrite.Add_child_request.index in
+  let ifam = params.Mwrite.Add_child_request.index_family in
   let ip = Adef.iper_of_int ip in
   let p = poi base ip in
   let family_spouse =
@@ -2183,7 +2194,7 @@ let print_add_child conf base =
         child.Mwrite.Person.death_type <- `not_dead
   in
   (* On prend le nom du père *)
-  let child_surname = infer_surname conf base p in
+  let child_surname = infer_surname conf base p ifam in
   child.Mwrite.Person.lastname <- child_surname;
   let add_child =
     Mwrite.Add_child#{
@@ -2454,7 +2465,7 @@ let print_add_sibling conf base =
   (* On prend le nom du père *)
   let sibling_surname =
     match father with
-    | Some father -> infer_surname conf base father
+    | Some father -> infer_surname conf base father None
     | None -> surname
   in
   sibling.Mwrite.Person.lastname <- sibling_surname;
