@@ -1541,7 +1541,7 @@ let compute_add_family_ok conf base ip mod_family =
             | Api_update_util.UpdateErrorConflict c ->
                 raise (Api_update_util.ModErrApiConflict c)
           in
-          let (all_wl, history_record) =
+          let (all_wl, all_hr) =
             match Api_update_family.print_add
                     conf base ip mod_family mod_father mod_mother
             with
@@ -1591,7 +1591,8 @@ let compute_add_family_ok conf base ip mod_family =
             with
             | Api_update_util.UpdateSuccess (wl, hr) -> (all_wl @ wl, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
+            | Api_update_util.UpdateErrorConflict c ->
+                raise (Api_update_util.ModErrApiConflict c)
           in
           (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
           (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
@@ -1605,15 +1606,17 @@ let compute_add_family_ok conf base ip mod_family =
               match Api_update_person.print_mod conf base mod_father with
               | Api_update_util.UpdateSuccess (wl, hr) -> (all_wl @ wl, all_hr @ hr)
               | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-              | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
+              | Api_update_util.UpdateErrorConflict c ->
+                  raise (Api_update_util.ModErrApiConflict c)
           in
           Api_update_util.UpdateSuccess (all_wl, all_hr)
-      | _ ->
+      | (`link, `link) ->
           let (all_wl, all_hr) =
             match Api_update_person.print_mod conf base mod_father with
             | Api_update_util.UpdateSuccess (wl, hr) -> (wl, hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
+            | Api_update_util.UpdateErrorConflict c ->
+                raise (Api_update_util.ModErrApiConflict c)
           in
           let (all_wl, all_hr) =
             match Api_update_person.print_mod conf base mod_mother with
@@ -1630,7 +1633,50 @@ let compute_add_family_ok conf base ip mod_family =
             with
             | Api_update_util.UpdateSuccess (wl, hr) -> (all_wl @ wl, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
-            | Api_update_util.UpdateErrorConflict c -> raise (Api_update_util.ModErrApiConflict c)
+            | Api_update_util.UpdateErrorConflict c ->
+                raise (Api_update_util.ModErrApiConflict c)
+          in
+          Api_update_util.UpdateSuccess (all_wl, all_hr)
+      | ((`create | `create_default_occ), (`create | `create_default_occ)) ->
+          let (all_wl, all_hr) =
+            match Api_update_family.print_add
+                    conf base ip mod_family mod_father mod_mother
+            with
+            | Api_update_util.UpdateSuccess (wl, hr) -> (wl, hr)
+            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+            | Api_update_util.UpdateErrorConflict c ->
+                raise (Api_update_util.ModErrApiConflict c)
+          in
+          (* Dans le cas d'ajout d'un enfant avec nouveau conjoint, *)
+          (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
+          (* apporter de modifications.                             *)
+          let (all_wl, all_hr) =
+            if mod_father.Mwrite.Person.lastname = "" ||
+               mod_father.Mwrite.Person.firstname = ""
+            then
+              (all_wl, all_hr)
+            else
+              match Api_update_person.print_mod conf base mod_father with
+              | Api_update_util.UpdateSuccess (wl, hr) -> (all_wl @ wl, all_hr @ hr)
+              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+              | Api_update_util.UpdateErrorConflict c ->
+                  (* On dit que c'est le formulaire de la femme. *)
+                  c.Mwrite.Create_conflict.form <- Some `person_form2;
+                  raise (Api_update_util.ModErrApiConflict c)
+          in
+          let (all_wl, all_hr) =
+            if mod_mother.Mwrite.Person.lastname = "" ||
+               mod_mother.Mwrite.Person.firstname = ""
+            then
+              (all_wl, all_hr)
+            else
+              match Api_update_person.print_mod conf base mod_mother with
+              | Api_update_util.UpdateSuccess (wl, hr) -> (all_wl @ wl, all_hr @ hr)
+              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+              | Api_update_util.UpdateErrorConflict c ->
+                  (* On dit que c'est le formulaire de la femme. *)
+                  c.Mwrite.Create_conflict.form <- Some `person_form2;
+                  raise (Api_update_util.ModErrApiConflict c)
           in
           Api_update_util.UpdateSuccess (all_wl, all_hr)
     end
@@ -2655,4 +2701,480 @@ let print_add_sibling_ok conf base =
         let data = compute_modification_status conf base ip (Adef.int_of_ifam ifam) resp in
         print_result conf data
       end
+;;
+
+
+(**/**) (* Fonctions pour la première saisie. *)
+
+
+let check_person conf mod_p =
+  if mod_p.Mwrite.Person.lastname = "" &&
+     mod_p.Mwrite.Person.firstname = ""
+  then ()
+  else
+    if mod_p.Mwrite.Person.lastname <> "" &&
+       mod_p.Mwrite.Person.firstname <> ""
+    then ()
+  else
+    let err =
+      if mod_p.Mwrite.Person.lastname = "" then transl conf "surname missing"
+      else transl conf "first name missing"
+    in
+    raise (Update.ModErrApi err)
+;;
+
+let compute_add_first_fam conf =
+  let add_first_fam = get_params conf Mext_write.parse_add_first_fam in
+  let mod_p = add_first_fam.Mwrite.Add_first_fam.sosa in
+  let mod_father = add_first_fam.Mwrite.Add_first_fam.father in
+  let mod_mother = add_first_fam.Mwrite.Add_first_fam.mother in
+  let mod_spouse = add_first_fam.Mwrite.Add_first_fam.spouse in
+  let mod_children = add_first_fam.Mwrite.Add_first_fam.children in
+
+  (* On ré-initialise un certain nombre de valeurs. *)
+  mod_p.Mwrite.Person.digest <- "";
+  mod_p.Mwrite.Person.create_link <- `create_default_occ;
+  mod_p.Mwrite.Person.index <- Int32.of_int 0;
+  mod_p.Mwrite.Person.occ <- None;
+  mod_p.Mwrite.Person.access <- `access_iftitles;
+
+  mod_father.Mwrite.Person.digest <- "";
+  mod_father.Mwrite.Person.create_link <- `create_default_occ;
+  mod_father.Mwrite.Person.index <- Int32.of_int 0;
+  mod_father.Mwrite.Person.sex <- `male;
+  mod_father.Mwrite.Person.occ <- None;
+  mod_father.Mwrite.Person.access <- `access_iftitles;
+
+  mod_mother.Mwrite.Person.digest <- "";
+  mod_mother.Mwrite.Person.create_link <- `create_default_occ;
+  mod_mother.Mwrite.Person.index <- Int32.of_int 0;
+  mod_mother.Mwrite.Person.sex <- `female;
+  mod_mother.Mwrite.Person.occ <- None;
+  mod_mother.Mwrite.Person.access <- `access_iftitles;
+
+  mod_spouse.Mwrite.Person.digest <- "";
+  mod_spouse.Mwrite.Person.create_link <- `create_default_occ;
+  mod_spouse.Mwrite.Person.index <- Int32.of_int 0;
+  mod_spouse.Mwrite.Person.sex <- `female;
+  mod_spouse.Mwrite.Person.occ <- None;
+  mod_spouse.Mwrite.Person.access <- `access_iftitles;
+
+  List.iter
+    (fun c ->
+      c.Mwrite.Person.digest <- "";
+      c.Mwrite.Person.create_link <- `create_default_occ;
+      c.Mwrite.Person.index <- Int32.of_int 0;
+      c.Mwrite.Person.occ <- None;
+      c.Mwrite.Person.access <- `access_iftitles)
+    mod_children;
+
+  (* On vérifie toutes les erreurs de saisie possibles. *)
+  (* Attention, il faut envoyer dans le même ordre que pour la saisie, *)
+  (* sinon les occurrences seront toutes changées !!!                  *)
+  let resp =
+    try
+      begin
+        (* On vérifie qu'il n'y a pas de problème de nom/prénom. *)
+        check_person conf mod_p;
+        check_person conf mod_father;
+        check_person conf mod_mother;
+        check_person conf mod_spouse;
+        List.iter (check_person conf) mod_children;
+
+        let (all_wl, all_hr) =
+          match Api_update_person.print_add_nobase conf mod_father with
+          | Api_update_util.UpdateSuccess (wl, hr) -> (wl, hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_hr) =
+          match Api_update_person.print_add_nobase conf mod_mother with
+          | Api_update_util.UpdateSuccess (wl, hr) ->
+              (all_wl @ wl, all_hr @ hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_hr) =
+          match Api_update_person.print_add_nobase conf mod_p with
+          | Api_update_util.UpdateSuccess (wl, hr) ->
+              (all_wl @ wl, all_hr @ hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_hr) =
+          match Api_update_person.print_add_nobase conf mod_spouse with
+          | Api_update_util.UpdateSuccess (wl, hr) ->
+              (all_wl @ wl, all_hr @ hr)
+          | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+          | Api_update_util.UpdateErrorConflict c ->
+              raise (Api_update_util.ModErrApiConflict c)
+        in
+        let (all_wl, all_hr) =
+          List.fold_left
+            (fun (all_wl, all_hr) mod_child ->
+              match Api_update_person.print_add_nobase conf mod_child with
+              | Api_update_util.UpdateSuccess (wl, hr) ->
+                  (all_wl @ wl, all_hr @ hr)
+              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+              | Api_update_util.UpdateErrorConflict c ->
+                  raise (Api_update_util.ModErrApiConflict c))
+            (all_wl, all_hr) mod_children
+        in
+        Api_update_util.UpdateSuccess (all_wl, all_hr)
+      end
+    with
+    | Update.ModErrApi s -> Api_update_util.UpdateError s
+    | Api_update_util.ModErrApiConflict c ->
+        Api_update_util.UpdateErrorConflict c
+  in
+  (add_first_fam, resp)
+;;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] print_add_first_fam : config -> ModificationStatus               *)
+(** [Description] :
+    [Args] :
+      - conf : configuration de la base
+    [Retour] :
+      - status : les informations si la modification s'est bien passée.
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let print_add_first_fam conf =
+  let (add_first_fam, resp) = compute_add_first_fam conf in
+  let mod_p = add_first_fam.Mwrite.Add_first_fam.sosa in
+
+  (* compute_modification_status si pas de base, on ne peut *)
+  (* pas avoir ni warnings, ni modification d'historique.   *)
+  let (surname, first_name, occ, index_person) =
+    (mod_p.Mwrite.Person.lastname,
+     mod_p.Mwrite.Person.firstname,
+     mod_p.Mwrite.Person.occ,
+     None)
+  in
+  let index_family = None in
+  let (is_base_updated, warnings, conflict, history_records) =
+    match resp with
+    | Api_update_util.UpdateErrorConflict c -> (false, [], Some c, [])
+    | Api_update_util.UpdateError s -> (false, [s], None, [])
+    | Api_update_util.UpdateSuccess (wl, hr) -> (true, [], None, [])
+  in
+  let response =
+    Mwrite.Modification_status#{
+      is_base_updated = is_base_updated;
+      base_warnings = warnings;
+      index_person = index_person;
+      lastname = surname;
+      firstname = first_name;
+      occ = occ;
+      index_family = index_family;
+      conflict = conflict;
+    }
+  in
+  let data = Mext_write.gen_modification_status response in
+  print_result conf data
+;;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] print_add_first_fam_ok : config -> base -> ModificationStatus    *)
+(** [Description] : Enregistre en base les informations envoyées.
+      On reconstitue toutes les liaisons à la main pour pouvoir les
+      enregistrer en base, i.e. ascendants de la personne (famille) et
+      descendants de la personne (famille), et éventuelle modification des
+      personnes ensuite.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - status : les informations si la modification s'est bien passée.
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let print_add_first_fam_ok conf base =
+  let (add_first_fam, resp) = compute_add_first_fam conf in
+  let mod_p = add_first_fam.Mwrite.Add_first_fam.sosa in
+  let mod_father = add_first_fam.Mwrite.Add_first_fam.father in
+  let mod_mother = add_first_fam.Mwrite.Add_first_fam.mother in
+  let mod_spouse = add_first_fam.Mwrite.Add_first_fam.spouse in
+  let mod_children = add_first_fam.Mwrite.Add_first_fam.children in
+
+  (* Pour l'instant, on a pas d'ip. *)
+  let ip = ref (-1) in
+  let ifam = ref (-1) in
+
+  let resp =
+    try
+      begin
+  (* On crée la famille avec les parents. *)
+  let fam_asc =
+    let family =
+      Api_update_util.piqi_empty_family conf base (Adef.ifam_of_int (-1))
+    in
+          (* On ré-initialise un certain nombre de valeurs, *)
+          (* surtout si c'est des personnes vides.          *)
+          family.Mwrite.Family.father.Mwrite.Person.digest <- "";
+          family.Mwrite.Family.father.Mwrite.Person.create_link <- `create_default_occ;
+          family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_int 0;
+          family.Mwrite.Family.father.Mwrite.Person.occ <- None;
+          family.Mwrite.Family.father.Mwrite.Person.access <- `access_iftitles;
+
+          family.Mwrite.Family.mother.Mwrite.Person.digest <- "";
+          family.Mwrite.Family.mother.Mwrite.Person.create_link <- `create_default_occ;
+          family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_int 0;
+          family.Mwrite.Family.mother.Mwrite.Person.occ <- None;
+          family.Mwrite.Family.mother.Mwrite.Person.access <- `access_iftitles;
+
+    (* On remplace les parents. *)
+    if mod_father.Mwrite.Person.lastname = "" &&
+       mod_father.Mwrite.Person.firstname = ""
+    then ()
+    else family.Mwrite.Family.father <- mod_father;
+    if mod_mother.Mwrite.Person.lastname = "" &&
+       mod_mother.Mwrite.Person.firstname = ""
+    then ()
+    else family.Mwrite.Family.mother <- mod_mother;
+          (* Les index négatifs ne marchent pas ! *)
+          family.Mwrite.Family.index <- Int32.of_int 0;
+          family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_int 0;
+          family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_int 0;
+          (* On met à jour les sexes. *)
+          family.Mwrite.Family.father.Mwrite.Person.sex <- `male;
+          family.Mwrite.Family.mother.Mwrite.Person.sex <- `female;
+    (* On met à jour la famille avec l'enfant. *)
+    let child =
+      Mwrite.Person_link#{
+        create_link = `create_default_occ;
+        index = mod_p.Mwrite.Person.index;
+        sex = mod_p.Mwrite.Person.sex;
+        lastname = mod_p.Mwrite.Person.lastname;
+        firstname = mod_p.Mwrite.Person.firstname;
+        occ = mod_p.Mwrite.Person.occ;
+        dates = None;
+      }
+    in
+    family.Mwrite.Family.children <- [child];
+    family
+  in
+
+        (* Ajout de fam_asc. *)
+        let (all_wl, all_hr) =
+          (* La personne n'a pas de parents. *)
+          if (fam_asc.Mwrite.Family.father.Mwrite.Person.firstname = "" &&
+              fam_asc.Mwrite.Family.father.Mwrite.Person.lastname = "" &&
+              fam_asc.Mwrite.Family.mother.Mwrite.Person.firstname = "" &&
+              fam_asc.Mwrite.Family.mother.Mwrite.Person.lastname = "")
+          then
+            let (all_wl, all_hr) =
+              match Api_update_person.print_add conf base mod_p with
+              | Api_update_util.UpdateSuccess (wl, hr) -> (wl, hr)
+              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+              | Api_update_util.UpdateErrorConflict c ->
+                  raise (Api_update_util.ModErrApiConflict c)
+    in
+            (* On met à jour l'index. *)
+            let () =
+              let (sn, fn) =
+                (mod_p.Mwrite.Person.lastname,
+                 mod_p.Mwrite.Person.firstname)
+  in
+              let occ =
+                match mod_p.Mwrite.Person.occ with
+                | None -> 0
+                | Some occ -> Int32.to_int occ
+              in
+              match person_of_key base fn sn occ with
+              | Some ip ->
+                  mod_p.Mwrite.Person.index <- Int32.of_int (Adef.int_of_iper ip)
+              | None -> failwith "ErrorAddFirstFamNoChildFound"
+            in
+            (all_wl, all_hr)
+          else
+  (* On ajoute la famille avec les parents. *)
+            let (all_wl, all_hr) =
+              match compute_add_family_ok conf base !ip fam_asc with
+              | Api_update_util.UpdateSuccess (wl, hr) -> (wl, hr)
+              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+              | Api_update_util.UpdateErrorConflict c ->
+                  raise (Api_update_util.ModErrApiConflict c)
+            in
+  (* On modifie la personne "principale". *)
+  let (all_wl, all_hr) =
+    match fam_asc.Mwrite.Family.children with
+    | [create_child] ->
+        let (sn, fn) =
+          (mod_p.Mwrite.Person.lastname,
+           mod_p.Mwrite.Person.firstname)
+        in
+        let occ =
+          match create_child.Mwrite.Person_link.occ with
+          | None -> 0
+          | Some occ -> Int32.to_int occ
+        in
+        (match person_of_key base fn sn occ with
+        | Some ip_child ->
+                      mod_p.Mwrite.Person.index <-
+                        Int32.of_int (Adef.int_of_iper ip_child);
+                      mod_p.Mwrite.Person.occ <-
+                        create_child.Mwrite.Person_link.occ;
+            (* On calcul le digest maintenant que l'enfant est créé. *)
+            let child = poi base ip_child in
+                      let digest =
+                        Update.digest_person (UpdateInd.string_person_of base child)
+                      in
+            mod_p.Mwrite.Person.digest <- digest;
+            (match Api_update_person.print_mod conf base mod_p with
+                      | Api_update_util.UpdateSuccess (wl, hr) ->
+                          (all_wl @ wl, all_hr @ hr)
+            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+                      | Api_update_util.UpdateErrorConflict c ->
+                          raise (Api_update_util.ModErrApiConflict c))
+                  | None -> failwith "ErrorAddFirstFamNoChildFound")
+    | _ -> failwith "ErrorAddFirstFamNoChild"
+  in
+            (all_wl, all_hr)
+        in
+
+  (* Normalement, on a réussi à mettre à jour l'ip de la personne. *)
+        let () = ip := Int32.to_int mod_p.Mwrite.Person.index in
+        let () = ifam := Int32.to_int fam_asc.Mwrite.Family.index in
+
+        (* On crée la famille avec les enfants. *)
+        let fam_desc =
+          let family =
+            Api_update_util.piqi_empty_family conf base (Adef.ifam_of_int (-1))
+          in
+          (* On ré-initialise un certain nombre de valeurs, *)
+          (* surtout si c'est des personnes vides.          *)
+          family.Mwrite.Family.father.Mwrite.Person.digest <- "";
+          family.Mwrite.Family.father.Mwrite.Person.create_link <- `create_default_occ;
+          family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_int 0;
+          family.Mwrite.Family.father.Mwrite.Person.occ <- None;
+          family.Mwrite.Family.father.Mwrite.Person.access <- `access_iftitles;
+
+          family.Mwrite.Family.mother.Mwrite.Person.digest <- "";
+          family.Mwrite.Family.mother.Mwrite.Person.create_link <- `create_default_occ;
+          family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_int 0;
+          family.Mwrite.Family.mother.Mwrite.Person.occ <- None;
+          family.Mwrite.Family.mother.Mwrite.Person.access <- `access_iftitles;
+
+          (* On remplace les parents. *)
+          if mod_p.Mwrite.Person.sex = `male then
+            begin
+              family.Mwrite.Family.father <- mod_p;
+              if mod_spouse.Mwrite.Person.lastname = "" &&
+                 mod_spouse.Mwrite.Person.firstname = ""
+              then ()
+              else family.Mwrite.Family.mother <- mod_spouse;
+            end
+          else
+            begin
+              if mod_spouse.Mwrite.Person.lastname = "" &&
+                 mod_spouse.Mwrite.Person.firstname = ""
+              then ()
+              else family.Mwrite.Family.father <- mod_spouse;
+              family.Mwrite.Family.mother <- mod_p;
+            end;
+          (* Les index négatifs ne marchent pas ! *)
+          family.Mwrite.Family.index <- Int32.of_int 0;
+          (* On met les parents en mode Create. *)
+          if mod_p.Mwrite.Person.sex = `male then
+            begin
+              family.Mwrite.Family.father.Mwrite.Person.create_link <- `link;
+              let p = poi base (Adef.iper_of_int !ip) in
+              let digest = Update.digest_person (UpdateInd.string_person_of base p) in
+              family.Mwrite.Family.father.Mwrite.Person.digest <- digest;
+              family.Mwrite.Family.mother.Mwrite.Person.create_link <- `create_default_occ;
+              family.Mwrite.Family.mother.Mwrite.Person.index <- Int32.of_int 0;
+            end
+          else
+            begin
+              family.Mwrite.Family.father.Mwrite.Person.create_link <- `create_default_occ;
+              family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_int 0;
+              family.Mwrite.Family.mother.Mwrite.Person.create_link <- `link;
+              let p = poi base (Adef.iper_of_int !ip) in
+              let digest = Update.digest_person (UpdateInd.string_person_of base p) in
+              family.Mwrite.Family.mother.Mwrite.Person.digest <- digest;
+            end;
+          (* On met à jour les sexes. *)
+          family.Mwrite.Family.father.Mwrite.Person.sex <- `male;
+          family.Mwrite.Family.mother.Mwrite.Person.sex <- `female;
+          (* On met à jour la famille avec les enfants. *)
+          let children =
+            List.map
+              (fun c ->
+                Mwrite.Person_link#{
+                  create_link = `create_default_occ;
+                  index = c.Mwrite.Person.index;
+                  sex = c.Mwrite.Person.sex;
+                  lastname = c.Mwrite.Person.lastname;
+                  firstname = c.Mwrite.Person.firstname;
+                  occ = c.Mwrite.Person.occ;
+                  dates = None;
+                })
+              mod_children
+          in
+          family.Mwrite.Family.children <- children;
+          family
+        in
+
+  (* On ajoute la famille avec les enfants. *)
+        (* S'il n'y a pas de descendance, on ne fait pas l'ajout. *)
+        let (all_wl, all_hr) =
+          if (mod_spouse.Mwrite.Person.firstname = "" &&
+              mod_spouse.Mwrite.Person.lastname = "" &&
+              mod_children = [])
+          then (all_wl, all_hr)
+          else
+            let (all_wl, all_hr) =
+              match compute_add_family_ok conf base ip fam_desc with
+              | Api_update_util.UpdateSuccess (wl, hr) -> (all_wl @ wl, all_hr @ hr)
+              | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+              | Api_update_util.UpdateErrorConflict c ->
+                  raise (Api_update_util.ModErrApiConflict c)
+            in
+            let (all_wl, all_hr) =
+              List.fold_left
+                (fun (all_wl, all_hr) mod_child ->
+                  let (sn, fn) =
+                    (mod_child.Mwrite.Person.lastname,
+                     mod_child.Mwrite.Person.firstname)
+                  in
+                  let occ =
+                    match mod_child.Mwrite.Person.occ with
+                    | None -> 0
+                    | Some occ -> Int32.to_int occ
+                  in
+                  (match person_of_key base fn sn occ with
+                  | Some ip_child ->
+                      mod_child.Mwrite.Person.index <-
+                        Int32.of_int (Adef.int_of_iper ip_child);
+                      (* On calcul le digest maintenant que l'enfant est créé. *)
+                      let child = poi base ip_child in
+                      let digest =
+                        Update.digest_person (UpdateInd.string_person_of base child)
+                      in
+                      mod_child.Mwrite.Person.digest <- digest;
+                      (match Api_update_person.print_mod conf base mod_child with
+                      | Api_update_util.UpdateSuccess (wl, hr) ->
+                          (all_wl @ wl, all_hr @ hr)
+                      | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+                      | Api_update_util.UpdateErrorConflict c ->
+                          raise (Api_update_util.ModErrApiConflict c))
+                  | None -> failwith "ErrorAddFirstFamNoChildFound"))
+                (all_wl, all_hr) mod_children
+            in
+            (all_wl, all_hr)
+        in
+
+        Api_update_util.UpdateSuccess (all_wl, all_hr)
+      end
+    with
+    | Update.ModErrApi s -> Api_update_util.UpdateError s
+    | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
+  in
+  let data = compute_modification_status conf base !ip !ifam resp in
+  print_result conf data
 ;;
