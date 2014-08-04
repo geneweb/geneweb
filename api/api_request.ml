@@ -114,6 +114,7 @@ value family_m conf base =
     | Some "API_ADD_CHILD_OK" when conf.wizard -> Api_saisie_write.print_add_child_ok conf base
     | Some "API_ADD_FAMILY" when conf.wizard -> Api_saisie_write.print_add_family conf base
     | Some "API_ADD_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_add_family_ok conf base
+    | Some "API_ADD_FIRST_FAM_OK" when conf.wizard -> Api_saisie_write.print_add_first_fam_ok conf base
     | Some "API_ADD_PARENTS" when conf.wizard -> Api_saisie_write.print_add_parents conf base
     | Some "API_ADD_PARENTS_OK" when conf.wizard -> Api_saisie_write.print_add_parents_ok conf base
     | Some "API_ADD_PERSON_OK" when conf.wizard -> Api_saisie_write.print_add_ind_ok conf base
@@ -129,6 +130,17 @@ value family_m conf base =
     | Some "API_DEL_PERSON_OK" when conf.wizard -> Api_saisie_write.print_del_ind_ok conf base
 
     | Some "API_CORRESPONDANCE" -> Api_db.print_correspondance conf base
+    | Some mode -> ()
+    | None -> () ]
+  else ()
+;
+
+value family_m_nobase conf =
+  (* On verifie que la signature donnée est  *)
+  (* contenue dans le fichier de signatures. *)
+  if Util.digest_sig conf then
+    match p_getenv conf.env "m" with
+    [ Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
     | Some mode -> ()
     | None -> () ]
   else ()
@@ -252,6 +264,7 @@ value this_request_updates_database conf =
         "API_REMOVE_IMAGE_EXT" | "API_REMOVE_IMAGE_EXT_ALL" |
         "API_DEL_PERSON_OK" | "API_EDIT_PERSON_OK" | "API_ADD_CHILD_OK" |
         "API_ADD_PERSON_OK" | "API_ADD_PARENTS_OK" | "API_ADD_FAMILY_OK" |
+        "API_ADD_FIRST_FAM_OK" |
         "API_EDIT_FAMILY_OK" | "API_DEL_FAMILY_OK" | "API_ADD_SIBLING_OK" |
         "API_ADD_PERSON_START_OK" | "API_PRINT_SYNCHRO" -> True
       | _ -> False ]
@@ -270,11 +283,21 @@ value treat_request_on_base conf log =
   else treat_request_on_possibly_locked_base conf bfile log
 ;
 
-
-
-
-
-
-
-
-
+value treat_request_on_nobase conf log = do {
+  if Mutil.utf_8_db.val then ()
+  else do {
+    Hashtbl.clear conf.lexicon;
+    let fname = Filename.concat "lang" "lexicon.txt" in
+    Mutil.input_lexicon conf.lang conf.lexicon
+      (fun () -> Secure.open_in (Util.search_in_lang_path fname));
+    conf.charset :=
+      try Hashtbl.find conf.lexicon " !charset" with
+      [ Not_found -> "iso-8859-1" ];
+  };
+  try
+    do {
+      family_m_nobase conf;
+      Wserver.wflush ();
+    }
+  with exc -> do { raise exc }
+};

@@ -539,6 +539,14 @@ message AddSiblingOk {
   required Person sibling = 2;
 }
 
+message AddFirstFam {
+  required Person sosa = 1;
+  required Person father = 2;
+  required Person mother = 3;
+  required Person spouse = 4;
+  repeated Person children = 5;
+}
+
 
 // ***************************************************************************
 // Objets pour les différentes requêtes (read).
