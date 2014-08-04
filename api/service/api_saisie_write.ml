@@ -95,6 +95,8 @@ let print_person_search_list conf base =
         else cmp_sn)
       list
   in
+  (* On préfère limiter la liste ici, même si on perd un peu en performance. *)
+  let list = Util.reduce_list max_res list in
   let () = Perso.build_sosa_ht conf base in
   let list =
     List.map
