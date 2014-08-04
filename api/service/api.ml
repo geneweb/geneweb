@@ -232,6 +232,35 @@ let print_list_ref_person conf base =
 ;;
 
 
+(* ******************************************************************** *)
+(*  [Fonc] print_ref_person_from_ip : config -> base -> unit            *)
+(** [Description] : Renvoie à partir de l'ip une référence personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - unit
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
+let print_ref_person_from_ip conf base =
+  let id = get_params conf Mext.parse_index in
+  let ip = Int32.to_int id.M.Index.index in
+  let p = poi base (Adef.iper_of_int ip) in
+  let fn = Name.lower (sou base (get_first_name p)) in
+  let sn = Name.lower (sou base (get_surname p)) in
+  let occ = Int32.of_int (get_occ p) in
+  let ref_p =
+    M.Reference_person#{
+      n = sn;
+      p = fn;
+      oc = occ;
+    }
+  in
+  let data = Mext.gen_reference_person ref_p in
+  print_result conf data
+;;
+
+
 (**/**) (* API_IMAGE *)
 
 let print_img conf base =

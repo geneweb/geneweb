@@ -94,6 +94,7 @@ value family_m conf base =
     | Some "API_PRINT_EXPORT" -> Api.print_export conf base
     | Some "API_PRINT_EXPORT_SEARCH" -> Api.print_export_search conf base
     | Some "API_PRINT_SYNCHRO" -> Api.print_synchro_patch_mobile conf base
+    | Some "API_REF_PERSON_FROM_ID" -> Api.print_ref_person_from_ip conf base
     | Some "API_REMOVE_IMAGE_EXT" when conf.wizard -> Api.print_remove_image_ext conf base
     | Some "API_REMOVE_IMAGE_EXT_ALL" when conf.wizard -> Api.print_remove_image_ext_all conf base
     | Some "API_SEARCH" -> Api_search.print_search conf base
