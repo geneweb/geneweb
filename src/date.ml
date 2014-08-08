@@ -79,15 +79,15 @@ value before_date d d1 =
 
 (* ************************************************************************ *)
 (*  [Fonc] dmy_of_dmy2 dmy2 : dmy2 -> dmy                                   *)
-(** [Description] : Transforme un dmy2 en dmy pour pouvoir utiliser les 
+(** [Description] : Transforme un dmy2 en dmy pour pouvoir utiliser les
       fonctions de traduction des dates sans avoir à les ré-écrire.
     [Args] :
       - dmy2 : la date "ou" ou "entre" que l'on veut ré-écrire/traduire...
     [Retour] : dmy
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-value dmy_of_dmy2 dmy2 = 
-  {day = dmy2.day2; month = dmy2.month2; year = dmy2.year2; 
+value dmy_of_dmy2 dmy2 =
+  {day = dmy2.day2; month = dmy2.month2; year = dmy2.year2;
    prec = Sure; delta = dmy2.delta2}
 ;
 
@@ -226,13 +226,13 @@ value string_of_on_prec_dmy_aux conf code_year sy sy2 d =
       s ^ " " ^ transl conf "or" ^ " " ^ nominative s2
   | YearInt d2 ->
       let s =
-        if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
-        else if d.day = 0 then transl_decline conf "in (month year)" sy
+        if d.day = 0 && d.month = 0 then sy
+        else if d.day = 0 then sy
         else transl_decline conf "on (day month year)" sy
       in
       let s2 =
-        if d2.day2 = 0 && d2.month2 = 0 then transl conf "in (year)" ^ " " ^ sy2
-        else if d2.day2 = 0 then transl_decline conf "in (month year)" sy2
+        if d2.day2 = 0 && d2.month2 = 0 then sy2
+        else if d2.day2 = 0 then sy2
         else transl_decline conf "on (day month year)" sy2
       in
       transl conf "between (date)" ^ " " ^ s ^ " " ^
@@ -253,7 +253,7 @@ value string_of_on_prec_dmy conf code_dmy sy sy2 d =
 
 value string_of_on_dmy conf d =
   let sy = code_dmy conf d in
-  let sy2 = 
+  let sy2 =
     match d.prec with
     [ OrYear d2 | YearInt d2 -> code_dmy conf (dmy_of_dmy2 d2)
     | _ -> "" ]
@@ -263,9 +263,9 @@ value string_of_on_dmy conf d =
 
 value string_of_on_french_dmy conf d =
   let sy = code_french_date conf d.day d.month d.year in
-  let sy2 = 
+  let sy2 =
     match d.prec with
-    [ OrYear d2 | YearInt d2 -> 
+    [ OrYear d2 | YearInt d2 ->
         code_french_date conf d2.day2 d2.month2 d2.year2
     | _ -> "" ]
   in
@@ -274,9 +274,9 @@ value string_of_on_french_dmy conf d =
 
 value string_of_on_hebrew_dmy conf d =
   let sy = code_hebrew_date conf d.day d.month d.year in
-  let sy2 = 
+  let sy2 =
     match d.prec with
-    [ OrYear d2 | YearInt d2 -> 
+    [ OrYear d2 | YearInt d2 ->
         code_hebrew_date conf d2.day2 d2.month2 d2.year2
     | _ -> "" ]
   in
@@ -297,8 +297,8 @@ value string_of_prec_dmy conf s s2 d =
 ;
 
 value string_of_dmy conf d =
-  let sy = code_dmy conf d in 
-  let sy2 = 
+  let sy = code_dmy conf d in
+  let sy2 =
     match d.prec with
     [ OrYear d2 | YearInt d2 -> code_dmy conf (dmy_of_dmy2 d2)
     | _ -> "" ]
@@ -564,12 +564,12 @@ value string_slash_of_date conf date =
         [fst; snd] trd
     in
     match d.prec with
-    [ OrYear d2 -> 
+    [ OrYear d2 ->
         let sy = code fst snd trd in
         let d2 = dmy_of_dmy2 d2 in
         let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
         sy ^ " " ^ transl conf "or" ^ " " ^ sy2
-    | YearInt d2 -> 
+    | YearInt d2 ->
         let sy = code fst snd trd in
         let d2 = dmy_of_dmy2 d2 in
         let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
