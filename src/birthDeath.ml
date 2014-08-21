@@ -654,7 +654,7 @@ value print_population_pyramid conf base = do {
   in
   tag "div" begin
     let c = " cellspacing=\"0\" cellpadding=\"0\"" in
-    tag "table"
+    tag "table id=\"table_pop_pyr\""
       "border=\"%d\"%s style=\"margin: auto\"" conf.border c
     begin
       for i = first_interv downto 0 do {
