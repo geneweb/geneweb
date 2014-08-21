@@ -526,6 +526,15 @@ value is_roman_int x =
   [ Not_found -> False ]
 ;
 
+value start_with_int x =
+  try
+    let s = String.sub x 0 1 in
+    let _ = int_of_string s in
+    True
+  with
+  [ _ -> False ]
+;
+
 value roman_int =
   let p =
     parser [: `("ID", x) when is_roman_int x :] -> Mutil.arabian_of_roman x
@@ -1138,7 +1147,8 @@ value capitalize_name s =
       if j > i then
         let w = String.sub s i (j - i) in
         let w =
-          if is_roman_int w || particle s i || List.mem w public_name_word
+          if is_roman_int w || particle s i || List.mem w public_name_word ||
+             start_with_int w
           then w
           else capitalize_word w
         in
@@ -1161,7 +1171,8 @@ value uppercase_name s =
       if j > i then
         let w = String.sub s i (j - i) in
         let w =
-          if is_roman_int w || particle s i || List.mem w public_name_word
+          if is_roman_int w || particle s i || List.mem w public_name_word ||
+             start_with_int w
           then w
           else uppercase_word w
         in
