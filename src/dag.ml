@@ -191,30 +191,35 @@ value image_normal_txt conf base p fname width height =
   let k = default_image_name base p in
   let r =
     sprintf "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s alt=\"%s\" title=\"%s\" />"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
       (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
       (if height = 0 then "" else " height=\"" ^ string_of_int height ^ "\"")
       image_txt image_txt
+      (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
+      (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;")
   in
   if conf.cancel_links then r
   else sprintf "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k ^ r ^ "</a>"
 ;
 
-value image_url_txt conf base url height =
+value image_url_txt conf base url_p url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
-  sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nheight=%d alt=\"%s\" title=\"%s\" />" url height
-      image_txt image_txt ^
+  sprintf "<a href=\"%s\">" url_p ^
+    sprintf "<img src=\"%s\"\nheight=%d alt=\"%s\" title=\"%s\" style=\"%s\" />"
+      url height image_txt image_txt
+      (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^
     "</a>\n"
 ;
 
-value image_url_txt_with_size conf base url width height =
+value image_url_txt_with_size conf base url_p url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
-  sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" />"
-      url width height image_txt image_txt ^
+  sprintf "<a href=\"%s\">" url_p ^
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
+      url width height image_txt image_txt
+      (if width = 0 then "" else " max-width:" ^ string_of_int width ^ "px;")
+      (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^
     "</a>\n"
 ;
 
@@ -231,14 +236,16 @@ value image_txt conf base p =
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f 0 75 ^ "</td></tr></table></center>\n"
       | Some (False, url, Some (wid, hei)) ->
+          let url_p = (commd conf) ^ (acces conf base p) in
           "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt_with_size conf base url wid hei ^
+            image_url_txt_with_size conf base url_p url wid hei ^
             "</td></tr></table></center>\n"
       | Some (False, url, None) ->
+          let url_p = (commd conf) ^ (acces conf base p) in
           "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt conf base url 75 ^ "</td></tr></table></center>\n"
+            image_url_txt conf base url_p url 75 ^ "</td></tr></table></center>\n"
       | _ -> "" ]
   | _ -> "" ]
 ;
