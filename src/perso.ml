@@ -3778,16 +3778,14 @@ value gen_interp_templ menu title templ_fname conf base p = do {
       | None -> 0 ]
     in
     if size = 0 then Hutil.header conf title
-    else do {
+    else
       Hutil.interp_no_header conf base templ_fname
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl = eval_transl conf;
          Templ.eval_predefined_apply = eval_predefined_apply conf;
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach conf base}
-        env ep;
-      tag "h2" begin title False; end
-    }
+        env ep
   else
     Hutil.interp conf base templ_fname
       {Templ.eval_var = eval_var conf base;
