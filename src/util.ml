@@ -1572,22 +1572,28 @@ value http_string conf s i =
     else (https, start_with s i https)
   in
   if start_with_http then
-    let j =
-      loop (i + String.length http) where rec loop j =
+    let (j, par) =
+      loop (i + String.length http) 0 where rec loop j par =
         if j < String.length s then
           match s.[j] with
           [ 'a'..'z' | 'A'..'Z' | '\128' .. '\255' | '0'..'9' | '!' | '#' |
             '$' | '%' | '&' | '(' | ')' | '*' | '+' | ',' | '-' | '.' | '/' |
-            ':' | ';' | '=' | '?' | '@' | '\\' | '_' | '~' -> loop (j + 1)
-          | '[' | '^' | '{' | '|' -> j + 1
-          | ']' | '}' -> j
-          | _ -> j ]
-        else j
+            ':' | ';' | '=' | '?' | '@' | '\\' | '_' | '~' ->
+              if s.[j] = '(' then loop (j + 1) (par + 1)
+              else if s.[j] = ')' then loop (j + 1) (par - 1)
+              else loop (j + 1) par
+          | '[' | '^' | '{' | '|' -> (j + 1, par)
+          | ']' | '}' -> (j, par)
+          | _ -> (j, par) ]
+        else (j, par)
     in
     let j =
       loop j where rec loop j =
         match s.[j - 1] with
-        [ ')' | ',' |  '.' |  ':' | ';' -> loop (j - 1)
+        [ ')' | ',' |  '.' |  ':' | ';' ->
+            if s.[j - 1] = ')' && par = 0 then j
+            else if s.[j - 1] = ')' && par < 0 then j - 1
+            else loop (j - 1)
         | _ -> j ]
     in
     let s = String.sub s i (j - i) in
