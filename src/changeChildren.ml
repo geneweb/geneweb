@@ -10,10 +10,22 @@ open Hutil;
 open Util;
 
 value print_child_person conf base p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  let occ = get_occ p in
   let var = "c" ^ string_of_int (Adef.int_of_iper (get_key_index p)) in
+  let first_name =
+    match p_getenv conf.env (var ^ "_first_name") with
+    [ Some v -> v
+    | None -> p_first_name base p ]
+  in
+  let surname =
+    match p_getenv conf.env (var ^ "_surname") with
+    [ Some v -> v
+    | None -> p_surname base p ]
+  in
+  let occ =
+    match p_getint conf.env (var ^ "_occ") with
+    [ Some i -> i
+    | None -> get_occ p ]
+  in
   tag "table" "border=\"1\"" begin
     tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
@@ -172,17 +184,43 @@ value print_change_done conf base p =
   }
 ;
 
-value print_conflict conf base p =
+value print_conflict conf base ip_var p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
     Update.print_error conf base (AlreadyDefined p);
-    html_p conf;
-    Wserver.wprint "<ul>\n";
-    html_li conf;
-    Wserver.wprint "%s: %d\n" (capitale (transl conf "first free number"))
-      (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
-    Wserver.wprint "</ul>\n";
+    let free_n =
+      Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
+    in
+    tag "ul" begin
+      stag "li" begin
+        Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
+          free_n;
+        Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+          (transl conf "create");
+        Wserver.wprint "%s.\n" (transl conf " to try again with this number");
+      end;
+      stag "li" begin
+        Wserver.wprint "%s " (capitale (transl conf "or"));
+        Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+          (transl conf "change it (the number) yourself");
+      end;
+    end;
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+      List.iter
+        (fun (x, v) ->
+          xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+            (quote_escaped (decode_varenv v)))
+        (conf.henv @ conf.env);
+      let var = "c" ^ string_of_int (Adef.int_of_iper ip_var) in
+      xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
+      xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
+      xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
+        (capitale (transl conf "create"));
+      xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
+        (capitale (transl conf "back"));
+    end;
     Update.print_same_name conf base p;
     trailer conf;
   }
@@ -198,7 +236,7 @@ value check_conflict conf base p key new_occ ipl =
             name &&
           get_occ p1 = new_occ then
           do {
-         print_conflict conf base p1; raise Update.ModErr
+         print_conflict conf base (get_key_index p) p1; raise Update.ModErr
        }
        else ())
     ipl
@@ -257,8 +295,8 @@ value change_child conf base parent_surname changed ip =
     rename_image_file conf base p (new_first_name, new_surname, new_occ);
     (* On ajoute les enfants dans le type Change_children_name       *)
     (* pour la future mise à jour de l'historique et du fichier gwf. *)
-    changed.val := 
-      [((p_first_name base p, p_surname base p, get_occ p, ip), 
+    changed.val :=
+      [((p_first_name base p, p_surname base p, get_occ p, ip),
         (new_first_name, new_surname, new_occ, ip)) :: changed.val];
     let p =
       {(gen_person_of_person p) with
@@ -276,18 +314,30 @@ value change_child conf base parent_surname changed ip =
   else ()
 ;
 
+value print_update_child conf base p digest =
+  match p_getenv conf.env "m" with
+  [ Some "CHG_CHN_OK" -> print conf base
+  | _ -> incorrect_request conf ]
+;
+
 value print_change_ok conf base p =
   try
     let ipl = select_children_of base p in
     let parent_surname = p_surname base p in
     let changed = ref [] in
-    do {
+    let redisp =
+      match p_getenv conf.env "return" with
+      [ Some _ -> True
+      | _ -> False ]
+    in
+    if redisp then print_update_child conf base p ""
+    else do {
       check_digest conf base (digest_children base ipl);
       List.iter (change_child conf base parent_surname changed) ipl;
       Util.commit_patches conf base;
       let changed =
-        U_Change_children_name 
-          (Util.string_gen_person base (gen_person_of_person p)) 
+        U_Change_children_name
+          (Util.string_gen_person base (gen_person_of_person p))
           changed.val
       in
       History.record conf base changed "cn";
@@ -297,7 +347,8 @@ value print_change_ok conf base p =
   [ Update.ModErr -> () ]
 ;
 
-value print_ok conf base =
+value print_ok o_conf base =
+  let conf = Update.update_conf o_conf in
   match p_getint conf.env "ip" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
