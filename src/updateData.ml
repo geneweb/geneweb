@@ -1283,5 +1283,12 @@ value print_mod conf base =
            Templ.get_vother = get_vother; Templ.set_vother = set_vother;
            Templ.print_foreach = print_foreach conf base}
           env ()
-    | _ -> incorrect_request conf ]
+    | _ ->
+        Hutil.interp conf base "upddatamenu"
+          {Templ.eval_var _ = raise Not_found;
+           Templ.eval_transl _ = Templ.eval_transl conf;
+           Templ.eval_predefined_apply _ = raise Not_found;
+           Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+           Templ.print_foreach _ = raise Not_found}
+          [] () ]
 ;

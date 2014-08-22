@@ -1,0 +1,52 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: upddatamenu.txt,v 0.01 2014-08-22 15:47:06 flh Exp $ -->
+  <!-- Copyright (c) 2006-2007 INRIA -->
+  <title>[*lists]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  %include.css;
+  %base_header;
+</head>
+<body%body_prop;>
+
+%if;not cancel_links;
+  <table style="float:%right;"><tr><td>
+    %if;(referer != "")
+      <a href="%referer;"><img
+       src="%image_prefix;/left.png"%wid_hei;left.png;
+       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+    %end;
+    <a href="%prefix;"><img%sp;
+    src="%image_prefix;/up.png"%wid_hei;up.png;
+    alt="^^" title="^^"%/></a>
+  </td></tr></table>
+%end;
+
+<h1>[*lists]</h1>
+
+<p>
+  <ul>
+    %if;(wizard)
+      <li>
+        <a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a>
+      </li>
+      <li>
+        <a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a>
+      </li>
+      <li>
+        <a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a>
+      </li>
+    %end;
+  </ul>
+</p>
+
+%base_trailer;
+%copyright;
+
+</body>
+</html>
+
