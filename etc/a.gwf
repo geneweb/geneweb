@@ -33,7 +33,7 @@
 # The file stylesheet.css must be in the directory "css".
 # Customize the default.css stylesheet or create your own one and
 # specify it to geneweb by adding this line in your gwf.
-# More about how to customize here : 
+# More about how to customize here :
 # http://opensource.geneanet.org/projects/geneweb/wiki/en_css
 css_prop=stylesheet
 
@@ -187,6 +187,11 @@ allowed_titles_file=
 # After above, file for denied titles/domains
 denied_titles_file=
 
+# Print the tile of individual in an advanced way. Default is print only
+# first_name and surname. In the advanced way, search for the title name,
+# estate ... and print something clever.
+print_advanced_title=yes/no
+
 # Set to no if you don't want that the link "add a family" be added in
 # the welcome page for wizards. In "no", forbid also adding families not
 # connected to the rest.
@@ -242,15 +247,15 @@ always_surname=no
 # it when it is too large, if you prefer.
 history=no
 
-# History: set it to yes to save update traces in database (in a directory 
+# History: set it to yes to save update traces in database (in a directory
 # named "history_d" in the database directory "base.gwb" or the directory
 # specified by history_path (view below)). It allows you to see the differences
 # between two modifications.
-# Warning: this directory grows indefinitively... 
+# Warning: this directory grows indefinitively...
 history_diff=no
 
 # You can define a specific path where to store all the histories. If you
-# don't specify it, it will save the history in your database directory 
+# don't specify it, it will save the history in your database directory
 # (which is juste fine).
 history_path=
 
@@ -354,12 +359,12 @@ expand_env=no
 # is *not* disable
 #disable_forum=yes/no
 
-# If counter is set to no, the counter for visiting geneweb's web pages is 
+# If counter is set to no, the counter for visiting geneweb's web pages is
 # *not* incremented. Default behaviour is that the counter is on (set to yes).
 #counter=yes/no
 
 # Default value if not specified is 5000 (which means that it will
-# take at most 5 seconds to realize a set of modifications (such as the 
+# take at most 5 seconds to realize a set of modifications (such as the
 # "set of places", "set of sources" ...
 #max_nb_update=2000
 
@@ -379,7 +384,7 @@ expand_env=no
 #perso_module_5=notes
 #perso_module_6=sources
 #perso_module_7=arbre_3gen_v_photo
-# And the number of module 
+# And the number of module
 #perso_module_tplnb=8
 # List of available elements :
 # etat_civil
@@ -405,6 +410,6 @@ expand_env=no
 # display the picto sosa on the template perso.txt (individual page).
 #display_sosa=yes/no
 
-# display the individual in his 'own' siblings on the template perso.txt 
+# display the individual in his 'own' siblings on the template perso.txt
 # (individual page).
 #full_siblings=yes/no

@@ -921,47 +921,49 @@ value main_title conf base p =
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 value titled_person_text conf base p t =
-  let estate = sou base t.t_place in
-  let surname = p_surname base p in
-  let elen = String.length estate in
-  let slen = String.length surname in
-  (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
-  (*   - le nom du titre                                               *)
-  (*   - le nom du titre et le premier sobriquet                       *)
-  (*   - le nom de la personne (donné par son nom de domaine) en       *)
-  (*     fonction du nom public et sobriquet                           *)
-  if Name.strip_lower estate = Name.strip_lower surname then
-    match (t.t_name, get_qualifiers p) with
-    [ (Tname n, []) -> sou base n
-    | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
-    | _ -> person_text_without_surname conf base p ]
-  (* Si le nom de l'individu contient le nom de son domaine, on renvoie : *)
-  (*   - le nom du titre                                                  *)
-  (*   - le nom du titre et le premier sobriquet                          *)
-  (*   - le nom de la personne (nom du domaine épuré du patronyme) en     *)
-  (*     fonction du nom public et sobriquet                              *)
-  else if elen < slen && String.sub surname (slen - elen) elen = estate then
-    match (t.t_name, get_qualifiers p) with
-    [ (Tname n, []) -> sou base n
-    | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
-    | _ ->
-        let trunc_surname _ _ =
-          strip_spaces (String.sub surname 0 (slen - elen))
-        in
-        let trunc_access = (p_first_name, trunc_surname) in
-        gen_person_text trunc_access conf base p ]
-  (* Sinon, on renvoie :                                              *)
-  (*   - le nom du titre                                              *)
-  (*   - le nom du titre et le premier sobriquet                      *)
-  (*   - le nom de la personne en fonction du nom public et sobriquet *)
-  else
-    match t.t_name with
-    [ Tname s ->
-        let s = sou base s in
-        match get_qualifiers p with
-        [ [] -> s
-        | [nn :: _] -> s ^ " <em>" ^ sou base nn ^ "</em>" ]
-    | _ -> person_text conf base p ]
+  if p_getenv conf.base_env "print_advanced_title" = Some "yes" then
+    let estate = sou base t.t_place in
+    let surname = p_surname base p in
+    let elen = String.length estate in
+    let slen = String.length surname in
+    (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
+    (*   - le nom du titre                                               *)
+    (*   - le nom du titre et le premier sobriquet                       *)
+    (*   - le nom de la personne (donné par son nom de domaine) en       *)
+    (*     fonction du nom public et sobriquet                           *)
+    if Name.strip_lower estate = Name.strip_lower surname then
+      match (t.t_name, get_qualifiers p) with
+      [ (Tname n, []) -> sou base n
+      | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
+      | _ -> person_text_without_surname conf base p ]
+    (* Si le nom de l'individu contient le nom de son domaine, on renvoie : *)
+    (*   - le nom du titre                                                  *)
+    (*   - le nom du titre et le premier sobriquet                          *)
+    (*   - le nom de la personne (nom du domaine épuré du patronyme) en     *)
+    (*     fonction du nom public et sobriquet                              *)
+    else if elen < slen && String.sub surname (slen - elen) elen = estate then
+      match (t.t_name, get_qualifiers p) with
+      [ (Tname n, []) -> sou base n
+      | (Tname n, [nn :: _]) -> sou base n ^ " <em>" ^ sou base nn ^ "</em>"
+      | _ ->
+          let trunc_surname _ _ =
+            strip_spaces (String.sub surname 0 (slen - elen))
+          in
+          let trunc_access = (p_first_name, trunc_surname) in
+          gen_person_text trunc_access conf base p ]
+    (* Sinon, on renvoie :                                              *)
+    (*   - le nom du titre                                              *)
+    (*   - le nom du titre et le premier sobriquet                      *)
+    (*   - le nom de la personne en fonction du nom public et sobriquet *)
+    else
+      match t.t_name with
+      [ Tname s ->
+          let s = sou base s in
+          match get_qualifiers p with
+          [ [] -> s
+          | [nn :: _] -> s ^ " <em>" ^ sou base nn ^ "</em>" ]
+      | _ -> person_text conf base p ]
+  else person_text conf base p
 ;
 
 
