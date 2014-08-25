@@ -28,8 +28,8 @@ value surname_not_found conf =
 
 (* **********************************************************************)
 (*  [Fonc] print_branch_to_alphabetic : conf -> string -> int -> unit   *)
-(** [Description] : A partir de l'affichage par branches, permet 
-                    d'afficher les liens pour un affichage par ordre 
+(** [Description] : A partir de l'affichage par branches, permet
+                    d'afficher les liens pour un affichage par ordre
                     alphabétique.
     [Args] :
       - conf      : configuration de la base
@@ -44,36 +44,36 @@ value print_branch_to_alphabetic conf x nb_branch = do {
     stag "tr" begin
       stag "td" begin
         stag "b" begin
-          Wserver.wprint "%s" 
+          Wserver.wprint "%s"
             (capitale (transl_nth conf "display by/branch/alphabetic order" 0));
         end;
       end;
       stag "td" begin
-        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"" 
+        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\""
           (Util.image_prefix conf) "picto_branch.png";
       end;
       stag "td" begin
-        Wserver.wprint "%s (%d)" 
+        Wserver.wprint "%s (%d)"
           (transl_nth conf "display by/branch/alphabetic order" 1) nb_branch;
       end;
       stag "td" begin
-        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"" 
+        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\""
           (Util.image_prefix conf) "picto_alphabetic_order.png";
       end;
       (* Ne pas oublier l'attribut nofollow pour les robots *)
       stag "td" begin
         if p_getenv conf.env "t" = Some "A" then
-          stag "a" "href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\"" 
+          stag "a" "href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x ^ ";t=A")
             begin
-              Wserver.wprint "%s" 
+              Wserver.wprint "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 2);
             end
         else
-          stag "a" "href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\"" 
+          stag "a" "href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x ^ ";t=N")
             begin
-              Wserver.wprint "%s" 
+              Wserver.wprint "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 2);
             end;
       end;
@@ -85,7 +85,7 @@ value print_branch_to_alphabetic conf x nb_branch = do {
 
 (* **********************************************************************)
 (*  [Fonc] print_alphabetic_to_branch : conf -> string -> int -> unit   *)
-(** [Description] : A partir de l'affichage alphabétique, permet 
+(** [Description] : A partir de l'affichage alphabétique, permet
                     d'afficher les liens pour un affichage par branches.
     [Args] :
       - conf      : configuration de la base
@@ -99,33 +99,33 @@ value print_alphabetic_to_branch conf x = do {
     stag "tr" begin
       stag "td" begin
         stag "b" begin
-          Wserver.wprint "%s" 
+          Wserver.wprint "%s"
             (capitale (transl_nth conf "display by/branch/alphabetic order" 0));
         end;
       end;
       stag "td" begin
-        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"" 
+        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\""
           (Util.image_prefix conf) "picto_branch.png";
       end;
       (* Ne pas oublier l'attribut nofollow pour les robots *)
       stag "td" begin
         if p_getenv conf.env "t" = Some "A" then
-          stag "a" "href=\"%sm=N;v=%s\" rel=\"nofollow\"" 
+          stag "a" "href=\"%sm=N;v=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x ^ ";t=A")
             begin
-              Wserver.wprint "%s" 
+              Wserver.wprint "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 1);
             end
         else
-          stag "a" "href=\"%sm=NG;sn=%s\" rel=\"nofollow\"" 
+          stag "a" "href=\"%sm=NG;sn=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x)
             begin
-              Wserver.wprint "%s" 
+              Wserver.wprint "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 1);
             end;
       end;
       stag "td" begin
-        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\"" 
+        xtag "img" "src=\"%s/%s\" align=\"middle\" alt=\"\" title=\"\""
           (Util.image_prefix conf) "picto_alphabetic_order.png";
       end;
       stag "td" begin
@@ -211,7 +211,7 @@ value print_elem conf base is_surname (p, xl) =
 
 value first_char s =
   (* Si la personne n'a pas de prénom/nom, on renvoie '?' *)
-  if s = "" then "?" 
+  if s = "" then "?"
   else
     if Mutil.utf_8_db.val then
       let len = Name.nbc s.[0] in
@@ -356,7 +356,7 @@ value first_name_print conf base x =
   in
   let list = List.fold_right merge_insert list [] in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in 
+  let () = Perso.build_sosa_ht conf base in
   match list with
   [ [] -> first_name_not_found conf x
   | [(_, (strl, iperl))] ->
@@ -364,9 +364,9 @@ value first_name_print conf base x =
       let pl = List.map (pget conf base) iperl in
       let pl =
         List.fold_right
-          (fun p pl -> 
+          (fun p pl ->
             if not (is_hide_names conf p) || (fast_auth_age conf p )
-            then [p :: pl] 
+            then [p :: pl]
             else pl)
           pl []
       in
@@ -375,11 +375,11 @@ value first_name_print conf base x =
 ;
 
 value has_children_with_that_name conf base des name =
-  let compare_name n1 n2 = 
+  let compare_name n1 n2 =
     if p_getenv conf.env "t" = Some "A" then n1 = n2
     else Name.lower n1 = Name.lower n2
   in
-  List.exists 
+  List.exists
     (fun ip -> compare_name (p_surname base (pget conf base ip)) name)
     (Array.to_list (get_children des))
 ;
@@ -481,7 +481,7 @@ value print_branch conf base psn name =
                  Perso.print_sosa conf base p False;
                  stag "em" begin
                    Wserver.wprint "%s"
-                     (if (is_hide_names conf p) && not (fast_auth_age conf p) 
+                     (if (is_hide_names conf p) && not (fast_auth_age conf p)
                      then "x"
                      else if not psn && p_surname base p = name then
                        person_text_without_surname conf base p
@@ -498,7 +498,7 @@ value print_branch conf base psn name =
                stag "strong" begin
                  Wserver.wprint "%s"
                    (reference conf base c
-                      (if (is_hide_names conf c) && not (fast_auth_age conf c) 
+                      (if (is_hide_names conf c) && not (fast_auth_age conf c)
 		                   then "x"
                        else person_text conf base c));
                end;
@@ -581,7 +581,7 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
         try List.assoc "always_surname" conf.base_env = "yes" with
         [ Not_found -> False ] ]
   in
-  let title h = 
+  let title h =
     if h || p_getenv conf.env "t" = Some "A" then Wserver.wprint "%s" x
     else
       Mutil.list_iter_first
@@ -849,7 +849,7 @@ value surname_print conf base not_found_fun x =
   in
   let iperl = PerSet.elements iperl in
   (* Construction de la table des sosa de la base *)
-  let () = Perso.build_sosa_ht conf base in 
+  let () = Perso.build_sosa_ht conf base in
   match p_getenv conf.env "o" with
   [ Some "i" ->
       let pl =
@@ -857,14 +857,14 @@ value surname_print conf base not_found_fun x =
       in
       let pl =
         List.fold_right
-          (fun p pl -> 
-	          if not (is_hide_names conf p) || (fast_auth_age conf p) 
-	          then [p :: pl] 
+          (fun p pl ->
+	          if not (is_hide_names conf p) || (fast_auth_age conf p)
+	          then [p :: pl]
 	          else pl)
           pl []
       in
       print_family_alphabetic x conf base pl
-  | _ -> 
+  | _ ->
       let bhl = select_ancestors conf base name_inj iperl in
       let bhl =
         List.map
@@ -876,9 +876,166 @@ value surname_print conf base not_found_fun x =
       in
       match (bhl, list) with
       [ ([], _) -> not_found_fun conf x
-      | (_, [(s, (strl, iperl))]) -> 
+      | (_, [(s, (strl, iperl))]) ->
           print_one_surname_by_branch conf base x strl (bhl, s)
-      | _ -> 
+      | _ ->
           let strl = List.map (fun (s, (strl, _)) -> s) list in
           print_several_possible_surnames x conf base (bhl, strl) ]]
+;
+
+
+(**/**)
+(* TODO: refactoring avec les fonctions ci-dessus !!! *)
+
+
+value search_surname conf base x =
+  let (list, name_inj) =
+    if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+      (persons_of_absolute_surname conf base x, fun x -> x)
+    else if x = "" then ([], fun [])
+    else
+      persons_of_fsname conf base base_strings_of_surname
+        (spi_find (persons_of_surname base)) get_surname x
+  in
+  let list =
+    List.map
+      (fun (str, istr, iperl) ->
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
+      list
+  in
+  let list = List.fold_right merge_insert list [] in
+  let (iperl, strl) =
+    List.fold_right
+      (fun (str, (istr, iperl1)) (iperl, strl) ->
+         let len = List.length iperl1 in
+         let strl =
+           try
+             let len1 = List.assoc str strl in
+             [(str, len + len1) :: List.remove_assoc str strl]
+           with
+           [ Not_found -> [(str, len) :: strl] ]
+         in
+         (List.fold_right PerSet.add iperl1 iperl, strl))
+      list (PerSet.empty, [])
+  in
+  PerSet.elements iperl
+;
+
+value search_surname_print conf base not_found_fun x =
+  let (list, name_inj) =
+    if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+      (persons_of_absolute_surname conf base x, fun x -> x)
+    else if x = "" then ([], fun [])
+    else
+      persons_of_fsname conf base base_strings_of_surname
+        (spi_find (persons_of_surname base)) get_surname x
+  in
+  let list =
+    List.map
+      (fun (str, istr, iperl) ->
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
+      list
+  in
+  let list = List.fold_right merge_insert list [] in
+  let (iperl, strl) =
+    List.fold_right
+      (fun (str, (istr, iperl1)) (iperl, strl) ->
+         let len = List.length iperl1 in
+         let strl =
+           try
+             let len1 = List.assoc str strl in
+             [(str, len + len1) :: List.remove_assoc str strl]
+           with
+           [ Not_found -> [(str, len) :: strl] ]
+         in
+         (List.fold_right PerSet.add iperl1 iperl, strl))
+      list (PerSet.empty, [])
+  in
+  let iperl = PerSet.elements iperl in
+  (* Construction de la table des sosa de la base *)
+  let () = Perso.build_sosa_ht conf base in
+  match p_getenv conf.env "o" with
+  [ Some "i" ->
+      let pl =
+        List.fold_right (fun ip ipl -> [pget conf base ip :: ipl]) iperl []
+      in
+      let pl =
+        List.fold_right
+          (fun p pl ->
+	          if not (is_hide_names conf p) || (fast_auth_age conf p)
+	          then [p :: pl]
+	          else pl)
+          pl []
+      in
+      print_family_alphabetic x conf base pl
+  | _ ->
+      let bhl = select_ancestors conf base name_inj iperl in
+      let bhl =
+        List.map
+          (fun bh ->
+            {bh_ancestor = pget conf base bh.bh_ancestor;
+             bh_well_named_ancestors =
+             List.map (pget conf base) bh.bh_well_named_ancestors})
+          bhl
+      in
+      match (bhl, list) with
+      [ ([], _) -> not_found_fun conf x
+      | (_, [(s, (strl, iperl))]) ->
+          print_one_surname_by_branch conf base x strl (bhl, s)
+      | _ ->
+          let strl = List.map (fun (s, (strl, _)) -> s) list in
+          print_several_possible_surnames x conf base (bhl, strl) ]]
+;
+
+value search_first_name conf base x =
+  let (list, _) =
+    if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+      (persons_of_absolute_first_name conf base x, fun [])
+    else if x = "" then ([], fun [])
+    else
+      persons_of_fsname conf base base_strings_of_first_name
+        (spi_find (persons_of_first_name base)) get_first_name x
+  in
+  let list =
+    List.map
+      (fun (str, istr, iperl) ->
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
+      list
+  in
+  List.fold_right merge_insert list []
+;
+
+value search_first_name_print conf base x =
+  let (list, _) =
+    if Mutil.utf_8_db.val && p_getenv conf.env "t" = Some "A" then
+      (persons_of_absolute_first_name conf base x, fun [])
+    else if x = "" then ([], fun [])
+    else
+      persons_of_fsname conf base base_strings_of_first_name
+        (spi_find (persons_of_first_name base)) get_first_name x
+  in
+  let list =
+    List.map
+      (fun (str, istr, iperl) ->
+         (Name.lower str, (StrSet.add str StrSet.empty, iperl)))
+      list
+  in
+  let list = List.fold_right merge_insert list [] in
+  (* Construction de la table des sosa de la base *)
+  let () = Perso.build_sosa_ht conf base in
+  match list with
+  [ [] -> first_name_not_found conf x
+  | [(_, (strl, iperl))] ->
+      let iperl = list_uniq (List.sort compare iperl) in
+      let pl = List.map (pget conf base) iperl in
+      let pl =
+        List.fold_right
+          (fun p pl ->
+            if not (is_hide_names conf p) || (fast_auth_age conf p )
+            then [p :: pl]
+            else pl)
+          pl []
+      in
+      first_name_print_list conf base x strl pl
+  | _ -> select_first_name conf base x list ]
 ;
