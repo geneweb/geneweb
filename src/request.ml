@@ -613,57 +613,7 @@ value family_m conf base =
       }
   | Some "RL" -> RelationLink.print conf base
   | Some "RLM" -> Relation.print_multi conf base
-  | Some "S" ->
-      (* Recherche comme NG, mais on n'a que deux inputs. *)
-      (* Du coup, l'input nom sert pour la recherche par  *)
-      (* nom, alias, sosa, clé...                         *)
-      (* Récupère le contenu non vide de la recherche. *)
-      let real_input label =
-        match p_getenv conf.env label with
-        [ Some s -> if s = "" then None else Some s
-        | None -> None ]
-      in
-      (* Recherche par clé, sosa, alias ... *)
-      let search n =
-        let (pl, sosa_acc) = find_all conf base n in
-        match pl with
-        [ [] ->
-            (* S'il n'y a pas de résultat, on recherche par nom. *)
-            do {
-              conf.cancel_links := False;
-              Some.surname_print conf base unknown n
-            }
-        | [p] ->
-            if sosa_acc ||
-               Gutil.person_of_string_key base n <> None ||
-               person_is_std_key conf base p n
-            then
-              (* On vérifie que c'est une "vraie" clé. *)
-              if Name.lower (p_surname base p) <> "" &&
-                 Name.lower (p_first_name base p) <> ""
-              then
-                person_selected conf base p
-              else do {
-                conf.cancel_links := False;
-                Some.surname_print conf base unknown n
-              }
-            else specify conf base n pl
-        | pl ->
-            if real_input "p" = None then do {
-              conf.cancel_links := False;
-              Some.surname_print conf base unknown n
-            }
-            else specify conf base n pl ]
-      in
-      match (real_input "p", real_input "n") with
-      [ (Some fn, Some sn) -> search (fn ^ " " ^ sn)
-      | (Some fn, None) ->
-          do {
-            conf.cancel_links := False;
-            Some.first_name_print conf base fn
-          }
-      | (None, Some sn) -> search sn
-      | (None, None) -> incorrect_request conf ]
+  | Some "S" -> SearchName.print conf base specify unknown
   | Some "SND_IMAGE" when conf.wizard && conf.can_send_image ->
       SendImage.print conf base
   | Some "SND_IMAGE_OK" when conf.wizard && conf.can_send_image ->

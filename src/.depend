@@ -288,23 +288,29 @@ request.cmo: adef.cmi advSearchOk.cmo alln.cmo birthDeath.cmo birthday.cmo \
     hutil.cmi image.cmo lock.cmi merge.cmi mergeDup.cmo mergeFam.cmo \
     mergeFamOk.cmo mergeInd.cmo mergeIndOk.cmo mutil.cmi name.cmi notes.cmi \
     num.cmi perso.cmi place.cmo relation.cmo relationLink.cmi secure.cmi \
-    sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
-    updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi wiznotes.cmi \
-    updateData.cmo ../wserver/wserver.cmi request.cmi
+    sendImage.cmo some.cmo searchName.cmo srcfile.cmi title.cmo update.cmi \
+    updateFam.cmi updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
+    wiznotes.cmi updateData.cmo ../wserver/wserver.cmi request.cmi
 request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     buff.cmx changeChildren.cmx config.cmi cousins.cmx dag.cmx date.cmx \
     def.cmi descend.cmx doc.cmx forum.cmx gutil.cmx gwdb.cmx history.cmx \
     hutil.cmx image.cmx lock.cmx merge.cmx mergeDup.cmx mergeFam.cmx \
     mergeFamOk.cmx mergeInd.cmx mergeIndOk.cmx mutil.cmx name.cmx notes.cmx \
     num.cmx perso.cmx place.cmx relation.cmx relationLink.cmx secure.cmx \
-    sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
-    updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx wiznotes.cmx \
-    updateData.cmx ../wserver/wserver.cmx request.cmi
+    sendImage.cmx some.cmx searchName.cmx srcfile.cmx title.cmx update.cmx \
+    updateFam.cmx updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
+    wiznotes.cmx updateData.cmx ../wserver/wserver.cmx request.cmi
 request.cmi: config.cmi
 robot.cmo: config.cmi secure.cmi srcfile.cmi util.cmi templ.cmi \
     ../wserver/wserver.cmi
 robot.cmx: config.cmi secure.cmx srcfile.cmx util.cmx templ.cmx \
     ../wserver/wserver.cmx
+searchName.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi date.cmi def.cmi \
+    gutil.cmi gwdb.cmi hutil.cmi mutil.cmi name.cmi util.cmi \
+    num.cmi perso.cmi ../wserver/wserver.cmi
+searchName.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi date.cmx def.cmi \
+    gutil.cmx gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx \
+    num.cmx perso.cmx ../wserver/wserver.cmx
 secure.cmo: secure.cmi
 secure.cmx: secure.cmi
 select.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi name.cmi
