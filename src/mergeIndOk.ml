@@ -394,21 +394,23 @@ value redirect_relations_of_added_related base p ip2 rel_chil =
                  List.fold_right
                    (fun e (pc_fevents, mod_pc, p_related, mod_p) ->
                       let (e, mod_pc, p_related, mod_p) =
-                        let (witnesses, mod_p, p_related) =
-                          List.fold_right
-                            (fun (ip, k) (witnesses, mod_p, p_related) ->
-                               if ip = ip2 then do {
-                                 let (p_related, mod_p) =
-                                   if List.mem ipc p_related then (p_related, mod_p)
-                                   else ([ipc :: p_related], True)
-                                 in
-                                 ([(p.key_index, k) :: witnesses], mod_p, p_related)
-                               }
-                               else ([(ip, k) :: witnesses], mod_p, p_related))
-                            (Array.to_list e.efam_witnesses) ([], mod_pc, p_related)
-                        in
-                        let e =
-                          {(e) with efam_witnesses = Array.of_list witnesses}
+                        let (p_related, mod_p) =
+                          loop (p_related, mod_p) 0
+                          where rec loop (p_related, mod_p) j =
+                            if j = Array.length e.efam_witnesses then
+                              (p_related, mod_p)
+                            else
+                              let (p_related, mod_p) =
+                                if fst e.efam_witnesses.(j) = ip2 then do {
+                                  let (_, wk) = e.efam_witnesses.(j) in
+                                  e.efam_witnesses.(j) := (p.key_index, wk);
+                                  if List.mem ipc p_related then
+                                    (p_related, mod_p)
+                                  else ([ipc :: p_related], True)
+                                }
+                                else (p_related, mod_p)
+                              in
+                              loop (p_related, mod_p) (j + 1)
                         in
                         (e, True, p_related, mod_p)
                       in
@@ -448,6 +450,20 @@ value redirect_added_families base p ip2 p2_family =
                patch_person base ip w
              else ())
           (get_witnesses fam);
+        List.iter
+          (fun evt ->
+             Array.iter
+               (fun (ip, _) ->
+                 let w = poi base ip in
+                 if not (List.mem p.key_index (get_related w)) then
+                   let w = gen_person_of_person w in
+                   let w =
+                     {(w) with related = [p.key_index :: w.related]}
+                   in
+                   patch_person base ip w
+                 else ())
+               evt.efam_witnesses)
+          (get_fevents fam);
         couple False p.key_index (get_mother fam)
       }
       else if ip2 = get_mother fam then
