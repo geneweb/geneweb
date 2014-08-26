@@ -167,6 +167,129 @@ value date_of_death =
   | _ -> None ]
 ;
 
+type event_name 'string =
+  [ Psort of gen_pers_event_name 'string
+  | Fsort of gen_fam_event_name 'string ]
+;
+
+(*
+   Dans l'ordre de priorité :
+     birth, baptism, ..., death, funeral, burial/cremation.
+   Pour les évènements familiaux, cet ordre est envisageable :
+     engage, marriage bann, marriage contract, marriage, ..., separate, divorce
+*)
+value compare_event_name name1 name2 =
+  match (name1, name2) with
+  [ (Psort Epers_Birth, _) -> -1
+  | (_, Psort Epers_Birth) -> 1
+  | (Psort Epers_Baptism, _) -> -1
+  | (_, Psort Epers_Baptism) -> 1
+  | (Psort Epers_Burial, _) | (Psort Epers_Cremation, _) -> 1
+  | (_, Psort Epers_Burial) | (_, Psort Epers_Cremation) -> -1
+  | (Psort Epers_Funeral, _) -> 1
+  | (_, Psort Epers_Funeral) -> -1
+  | (Psort Epers_Death, _) -> 1
+  | (_, Psort Epers_Death) -> -1
+  | (Fsort Efam_Engage, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_Engage) -> 1
+  | (Fsort Efam_MarriageBann, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_MarriageBann) -> 1
+  | (Fsort Efam_MarriageContract, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_MarriageContract) -> 1
+  | (Fsort Efam_Marriage, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_Marriage) -> 1
+  | (Fsort Efam_Divorce, Fsort _) -> 1
+  | (Fsort _, Fsort Efam_Divorce) -> -1
+  | (Fsort Efam_Separated, Fsort _) -> 1
+  | (Fsort _, Fsort Efam_Separated) -> -1
+  | _ -> 0 ]
+;
+
+value compare_event_date_prec d1 d2 =
+  match (d1.prec, d2.prec) with
+  [ (Before, _) -> -1
+  | (_, Before) -> 1
+  | (After, _) -> 1
+  | (_, After) -> -1
+  | _ -> 0 ]
+;
+
+(* Compare les dates sans prendre en compte les dates textes. *)
+value compare_event_date d1 d2 =
+  match (d1, d2) with
+  [ (Dgreg dmy1 _, Dgreg dmy2 _) ->
+      match Pervasives.compare dmy1.year dmy2.year with
+      [ 0 ->
+          match Pervasives.compare dmy1.month dmy2.month with
+          [ 0 ->
+              (* Si l'une des deux dates n'est pas complète (mois ou jour *)
+              (* égal à zéro), alors on ne distingue pas les deux dates.  *)
+              if dmy1.day = 0 || dmy2.day = 0 then 0
+              else
+                match Pervasives.compare dmy1.day dmy2.day with
+                [ 0 -> compare_event_date_prec dmy1 dmy2
+                | x -> x ]
+          | x ->
+              (* Idem ci-dessus. *)
+              if dmy1.month = 0 || dmy2.month = 0 then 0
+              else x ]
+      | x -> x]
+  | _ -> 0 ]
+;
+
+value sort_events (get_name, get_date) events =
+  (* On tri d'abord par date puis par évènement, pour ça, *)
+  (* on met tous les évènements par date en premier.      *)
+  let events =
+    let rec loop accu accu_nodate events =
+      match events with
+      [ [] -> List.rev_append accu (List.rev accu_nodate)
+      | [evt :: events] ->
+          match Adef.od_of_codate (get_date evt) with
+          [ Some (Dgreg _ _) -> loop [evt :: accu] accu_nodate events
+          | _ -> loop accu [evt :: accu_nodate] events ] ]
+    in
+    loop [] [] events
+  in
+  List.stable_sort
+    (fun e1 e2 ->
+      match
+        (Adef.od_of_codate (get_date e1), Adef.od_of_codate (get_date e2))
+      with
+      [ (Some d1, Some d2) ->
+          (* On utilise compare_event_date parce qu'on ne veut *)
+          (* pas prendre en compte les dates textes, on veut   *)
+          (* que l'évènement soit plus important pour le tri.  *)
+          let comp_date = compare_event_date d1 d2 in
+          if comp_date = 0 then compare_event_name (get_name e1) (get_name e2)
+          else comp_date
+      | _ -> compare_event_name (get_name e1) (get_name e2)] )
+    events
+;
+
+value sort_pevents base warning p =
+  let a =
+    sort_events
+      (fun evt -> Psort evt.epers_name, fun evt -> evt.epers_date)
+      (get_pevents p)
+  in
+  let b = get_pevents p in
+  if b <> a then warning (ChangedOrderOfPersonEvents p b a)
+  else ()
+;
+
+value sort_fevents base warning (ifam, fam) =
+  let a =
+    sort_events
+      (fun evt -> Fsort evt.efam_name, fun evt -> evt.efam_date)
+      (get_fevents fam)
+  in
+  let b = get_fevents fam in
+  if b <> a then warning (ChangedOrderOfFamilyEvents ifam b a)
+  else ()
+;
+
+(* Deprecated avec les pevents. *)
 value birth_before_death base warning p =
   match (Adef.od_of_codate (get_birth p), get_death p) with
   [ (Some d1, Death _ d2) ->
@@ -716,6 +839,61 @@ value child_has_sex warning child =
   if get_sex child = Neuter then warning (UndefinedSex child) else ()
 ;
 
+value check_order_pevents base warning p =
+  (* On tri les évènements pour utiliser la fonction de tri comme astuce. *)
+  let pevents =
+    sort_events
+      (fun evt -> Psort evt.epers_name, fun evt -> evt.epers_date)
+      (get_pevents p)
+  in
+  loop pevents where rec loop pevents =
+    match pevents with
+    [ [] -> ()
+    | [e] -> ()
+    | [e1; e2 :: pevents] ->
+        let cmp =
+          compare_event_name (Psort e1.epers_name) (Psort e2.epers_name)
+        in
+        if cmp = 1 then do {
+          warning (PEventOrder p e1 e2);
+          loop [e2 :: pevents]
+        }
+      else loop [e2 :: pevents] ]
+;
+
+value check_witness_pevents base warning p =
+  List.iter
+    (fun evt ->
+      match Adef.od_of_codate evt.epers_date with
+      [ Some (Dgreg g2 _ as d2) ->
+          Array.iter
+            (fun (iw, _) ->
+              do {
+                let p = poi base iw in
+                match Adef.od_of_codate (get_birth p) with
+                [ Some (Dgreg g1 _ as d1) ->
+                    if strictly_before d2 d1 then
+                      warning (PWitnessEventBeforeBirth p evt)
+                    else ()
+                | _ -> () ];
+                match get_death p with
+                [ Death _ d3 ->
+                    let d3 = Adef.date_of_cdate d3 in
+                    if strictly_after d2 d3 then
+                      warning (PWitnessEventAfterDeath p evt)
+                    else ()
+                | _ -> () ];
+              })
+            (evt.epers_witnesses)
+      | _ -> () ])
+    (get_pevents p)
+;
+
+value check_pevents base warning p = do {
+  check_order_pevents base warning p;
+  check_witness_pevents base warning p
+};
+
 
 (* ************************************************************************* *)
 (*  [Fonc] check_marriage_sex :
@@ -737,13 +915,17 @@ value check_marriage_sex base error warning fam =
   let moth = poi base (get_mother cpl) in
   do {
     match get_sex fath with
-    [ Male -> birth_before_death base warning fath
+    [ Male ->
+       (*birth_before_death base warning fath*)
+       check_pevents base warning fath
     | Female | Neuter ->
         if get_relation fam = NoSexesCheckNotMarried
         || get_relation fam = NoSexesCheckMarried then ()
         else error (BadSexOfMarriedPerson fath) ];
     match get_sex moth with
-    [ Female -> birth_before_death base warning moth
+    [ Female ->
+        (*birth_before_death base warning moth*)
+        check_pevents base warning moth
     | Male | Neuter ->
         if get_relation fam = NoSexesCheckNotMarried ||
            get_relation fam = NoSexesCheckMarried then ()
@@ -774,7 +956,8 @@ value check_children base error warning (ifam, fam) =
       (fun np child ->
          let child = poi base child in
          do {
-           birth_before_death base warning child;
+           (*birth_before_death base warning child;*)
+           check_pevents base warning child;
            born_after_his_elder_sibling base error warning child np ifam
              des;
            close_siblings base error warning child np ifam des;
@@ -833,128 +1016,102 @@ value check_sources base misc ifam fam =
     else misc MissingSources
 ;
 
-
-type event_name 'string =
-  [ Psort of gen_pers_event_name 'string
-  | Fsort of gen_fam_event_name 'string ]
-;
-
-(*
-   Dans l'ordre de priorité :
-     birth, baptism, ..., death, funeral, burial/cremation.
-   Pour les évènements familiaux, cet ordre est envisageable :
-     engage, marraige bann, marriage contract, marriage, ..., separate, divorce
-*)
-value compare_event_name name1 name2 =
-  match (name1, name2) with
-  [ (Psort Epers_Birth, _) -> -1
-  | (_, Psort Epers_Birth) -> 1
-  | (Psort Epers_Baptism, _) -> -1
-  | (_, Psort Epers_Baptism) -> 1
-  | (Psort Epers_Burial, _) | (Psort Epers_Cremation, _) -> 1
-  | (_, Psort Epers_Burial) | (_, Psort Epers_Cremation) -> -1
-  | (Psort Epers_Funeral, _) -> 1
-  | (_, Psort Epers_Funeral) -> -1
-  | (Psort Epers_Death, _) -> 1
-  | (_, Psort Epers_Death) -> -1
-  | (Fsort Efam_Engage, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_Engage) -> 1
-  | (Fsort Efam_MarriageBann, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_MarriageBann) -> 1
-  | (Fsort Efam_MarriageContract, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_MarriageContract) -> 1
-  | (Fsort Efam_Marriage, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_Marriage) -> 1
-  | (Fsort Efam_Divorce, Fsort _) -> 1
-  | (Fsort _, Fsort Efam_Divorce) -> -1
-  | (Fsort Efam_Separated, Fsort _) -> 1
-  | (Fsort _, Fsort Efam_Separated) -> -1
-  | _ -> 0 ]
-;
-
-value compare_event_date_prec d1 d2 =
-  match (d1.prec, d2.prec) with
-  [ (Before, _) -> -1
-  | (_, Before) -> 1
-  | (After, _) -> 1
-  | (_, After) -> -1
-  | _ -> 0 ]
-;
-
-(* Compare les dates sans prendre en compte les dates textes. *)
-value compare_event_date d1 d2 =
-  match (d1, d2) with
-  [ (Dgreg dmy1 _, Dgreg dmy2 _) ->
-      match Pervasives.compare dmy1.year dmy2.year with
-      [ 0 ->
-          match Pervasives.compare dmy1.month dmy2.month with
-          [ 0 ->
-              (* Si l'une des deux dates n'est pas complète (mois ou jour *)
-              (* égal à zéro), alors on ne distingue pas les deux dates.  *)
-              if dmy1.day = 0 || dmy2.day = 0 then 0
-              else
-                match Pervasives.compare dmy1.day dmy2.day with
-                [ 0 -> compare_event_date_prec dmy1 dmy2
-                | x -> x ]
-          | x ->
-              (* Idem ci-dessus. *)
-              if dmy1.month = 0 || dmy2.month = 0 then 0
-              else x ]
-      | x -> x]
-  | _ -> 0 ]
-;
-
-value sort_events (get_name, get_date) events =
-  (* On tri d'abord par date puis par évènement, pour ça, *)
-  (* on met tous les évènements par date en premier.      *)
-  let events =
-    let rec loop accu accu_nodate events =
-      match events with
-      [ [] -> List.rev_append accu (List.rev accu_nodate)
-      | [evt :: events] ->
-          match Adef.od_of_codate (get_date evt) with
-          [ Some (Dgreg _ _) -> loop [evt :: accu] accu_nodate events
-          | _ -> loop accu [evt :: accu_nodate] events ] ]
-    in
-    loop [] [] events
-  in
-  List.stable_sort
-    (fun e1 e2 ->
-      match
-        (Adef.od_of_codate (get_date e1), Adef.od_of_codate (get_date e2))
-      with
-      [ (Some d1, Some d2) ->
-          (* On utilise compare_event_date parce qu'on ne veut *)
-          (* pas prendre en compte les dates textes, on veut   *)
-          (* que l'évènement soit plus important pour le tri.  *)
-          let comp_date = compare_event_date d1 d2 in
-          if comp_date = 0 then compare_event_name (get_name e1) (get_name e2)
-          else comp_date
-      | _ -> compare_event_name (get_name e1) (get_name e2)] )
-    events
-;
-
-value sort_pevents base warning p =
-  let a =
-    sort_events
-      (fun evt -> Psort evt.epers_name, fun evt -> evt.epers_date)
-      (get_pevents p)
-  in
-  let b = get_pevents p in
-  if b <> a then warning (ChangedOrderOfPersonEvents p b a)
-  else ()
-;
-
-value sort_fevents base warning (ifam, fam) =
-  let a =
+value check_order_fevents base warning (ifam, fam) =
+  (* On tri les évènements pour utiliser la fonction de tri comme astuce. *)
+  let p = poi base (get_father fam) in
+  let fevents =
     sort_events
       (fun evt -> Fsort evt.efam_name, fun evt -> evt.efam_date)
       (get_fevents fam)
   in
-  let b = get_fevents fam in
-  if b <> a then warning (ChangedOrderOfFamilyEvents ifam b a)
-  else ()
+  loop fevents where rec loop fevents =
+    match fevents with
+    [ [] -> ()
+    | [e] -> ()
+    | [e1; e2 :: fevents] ->
+        let cmp =
+          compare_event_name (Fsort e1.efam_name) (Fsort e2.efam_name)
+        in
+        if cmp = 1 then do {
+          warning (FEventOrder p e1 e2);
+          loop [e2 :: fevents]
+        }
+        else loop [e2 :: fevents] ]
 ;
+
+value check_witness_fevents base warning (ifam, fam) =
+  List.iter
+    (fun evt ->
+      match Adef.od_of_codate evt.efam_date with
+      [ Some (Dgreg g2 _ as d2) ->
+          Array.iter
+            (fun (iw, _) ->
+              do {
+                let p = poi base iw in
+                match Adef.od_of_codate (get_birth p) with
+                [ Some (Dgreg g1 _ as d1) ->
+                    if strictly_before d2 d1 then
+                      warning (FWitnessEventBeforeBirth p evt)
+                    else ()
+                | _ -> () ];
+                match get_death p with
+                [ Death _ d3 ->
+                    let d3 = Adef.date_of_cdate d3 in
+                    if strictly_after d2 d3 then
+                      warning (FWitnessEventAfterDeath p evt)
+                    else ()
+                | _ -> () ];
+              })
+            (evt.efam_witnesses)
+      | _ -> () ])
+    (get_fevents fam)
+;
+
+value check_marriage_age base warning (ifam, fam) ip =
+  let p = poi base ip in
+  loop (get_fevents fam) where rec loop fevents =
+    match fevents with
+    [ [] -> ()
+    | [e :: l] ->
+        match e.efam_name with
+        [ Efam_Marriage ->
+            match Adef.od_of_codate e.efam_date with
+            [ Some (Dgreg g2 _) ->
+                match Adef.od_of_codate (get_birth p) with
+                [ Some (Dgreg g1 _) ->
+                    if year_of g2 > lim_date_marriage &&
+                       year_of (time_elapsed g1 g2) < min_age_marriage
+                    then
+                      warning (YoungForMarriage p (time_elapsed g1 g2))
+              else
+                      loop l
+                | _ -> loop l ]
+            | _ -> loop l ]
+        | _ -> loop l ] ]
+;
+
+
+value check_reduce_fevents base error warning (ifam, fam) = do {
+  let cpl = foi base ifam in
+  check_order_fevents base warning (ifam, fam);
+  check_order_fevents base warning (ifam, fam);
+  check_marriage_age base warning (ifam, fam) (get_father cpl);
+  check_marriage_age base warning (ifam, fam) (get_mother cpl);
+  check_difference_age_between_cpl base warning
+    (get_father cpl) (get_mother cpl)
+};
+
+value check_fevents base error warning (ifam, fam) = do {
+  let cpl = foi base ifam in
+  check_order_fevents base warning (ifam, fam);
+  check_order_fevents base warning (ifam, fam);
+  check_witness_fevents base warning (ifam, fam);
+  check_witness_fevents base warning (ifam, fam);
+  check_marriage_age base warning (ifam, fam) (get_father cpl);
+  check_marriage_age base warning (ifam, fam) (get_mother cpl);
+  check_difference_age_between_cpl base warning
+    (get_father cpl) (get_mother cpl)
+};
 
 (* main *)
 
@@ -971,7 +1128,8 @@ value sort_fevents base warning (ifam, fam) =
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
 value person base warning p = do {
-  birth_before_death base warning p;
+  (*birth_before_death base warning p;*)
+  check_pevents base warning p;
   check_person_age base warning p;
   List.iter (titles_after_birth base warning p) (get_titles p);
   sort_pevents base warning p;
@@ -1000,14 +1158,16 @@ value person base warning p = do {
 (* ************************************************************************* *)
 value family base error warning ifam fam =
   do {
-    check_marriage_sex base error warning fam;
-    check_normal_marriage_date_for_parent base error warning (ifam, fam);
-    check_normal_marriage_date_for_witness base error warning (ifam, fam);
+    (* Il faudrait faire mieux que pas tester le sex des marraiges. *)
+    (*check_marriage_sex base error warning fam;*)
+    (*check_normal_marriage_date_for_parent base error warning (ifam, fam);*)
+    (*check_normal_marriage_date_for_witness base error warning (ifam, fam);*)
+    check_fevents base error warning (ifam, fam);
     check_children base error warning (ifam, fam);
-    let father = poi base (get_father fam) in
-    let mother = poi base (get_mother fam) in
-    check_marriages_order base warning father;
-    check_marriages_order base warning mother;
+    (*let father = poi base (get_father fam) in*)
+    (*let mother = poi base (get_mother fam) in*)
+    (*check_marriages_order base warning father;*)
+    (*check_marriages_order base warning mother;*)
     sort_fevents base warning (ifam, fam);
   }
 ;
@@ -1033,8 +1193,10 @@ value family base error warning ifam fam =
 (* ************************************************************************* *)
 value reduce_family base error warning ifam fam =
   do {
-    check_marriage_sex base error warning fam;
-    check_normal_marriage_date_for_parent base error warning (ifam, fam);
+    (* Il faudrait faire mieux que pas tester le sex des marraiges. *)
+    (*check_marriage_sex base error warning fam;*)
+    (*check_normal_marriage_date_for_parent base error warning (ifam, fam);*)
+    check_reduce_fevents base error warning (ifam, fam);
     check_children base error warning (ifam, fam)
   }
 ;

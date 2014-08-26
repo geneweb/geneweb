@@ -19,6 +19,78 @@ value designation base p =
   else s
 ;
 
+value string_of_epers_name base epers_name =
+  match epers_name with
+  [ Epers_Birth -> "birth"
+  | Epers_Baptism -> "baptism"
+  | Epers_Death -> "death"
+  | Epers_Burial -> "burial"
+  | Epers_Cremation -> "cremation"
+  | Epers_Accomplishment -> "accomplishment"
+  | Epers_Acquisition -> "acquisition"
+  | Epers_Adhesion -> "adhesion"
+  | Epers_BaptismLDS -> "baptism (LDS)"
+  | Epers_BarMitzvah -> "bar mitzvah"
+  | Epers_BatMitzvah -> "bat mitzvah"
+  | Epers_Benediction -> "benediction"
+  | Epers_ChangeName -> "change name"
+  | Epers_Circumcision -> "circumcision"
+  | Epers_Confirmation -> "confirmation"
+  | Epers_ConfirmationLDS -> "confirmation (LDS)"
+  | Epers_Decoration -> "decoration"
+  | Epers_DemobilisationMilitaire -> "military demobilisation"
+  | Epers_Diploma -> "diploma"
+  | Epers_Distinction -> "distinction"
+  | Epers_Dotation -> "dotation"
+  | Epers_DotationLDS -> "dotation (LDS)"
+  | Epers_Education -> "education"
+  | Epers_Election -> "election"
+  | Epers_Emigration -> "emigration"
+  | Epers_Excommunication -> "excommunication"
+  | Epers_FamilyLinkLDS -> "family link (LDS)"
+  | Epers_FirstCommunion -> "first communion"
+  | Epers_Funeral -> "funeral"
+  | Epers_Graduate -> "graduation"
+  | Epers_Hospitalisation -> "hospitalisation"
+  | Epers_Illness -> "illness"
+  | Epers_Immigration -> "immigration"
+  | Epers_ListePassenger -> "passenger liste"
+  | Epers_MilitaryDistinction -> "military distinction"
+  | Epers_MilitaryPromotion -> "military promotion"
+  | Epers_MilitaryService -> "military service"
+  | Epers_MobilisationMilitaire -> "military mobilisation"
+  | Epers_Naturalisation -> "naturalisation"
+  | Epers_Occupation -> "occupation"
+  | Epers_Ordination -> "ordination"
+  | Epers_Property -> "property"
+  | Epers_Recensement -> "recensement"
+  | Epers_Residence-> "residence"
+  | Epers_Retired ->  "retirement"
+  | Epers_ScellentChildLDS -> "scellent child (LDS)"
+  | Epers_ScellentParentLDS -> "scellent parent (LDS)"
+  | Epers_ScellentSpouseLDS -> "scellent spouse (LDS)"
+  | Epers_VenteBien -> "sell"
+  | Epers_Will -> "will"
+  | Epers_Name n -> sou base n ]
+;
+
+value string_of_efam_name base efam_name =
+  match efam_name with
+  [ Efam_Marriage -> "marriage"
+  | Efam_NoMarriage -> "relation"
+  | Efam_NoMention -> "relation"
+  | Efam_Engage -> "engagement"
+  | Efam_Divorce -> "divorce"
+  | Efam_Separated -> "separation"
+  | Efam_Annulation -> "annulation"
+  | Efam_MarriageBann -> "marriage bann"
+  | Efam_MarriageContract -> "marriage contract"
+  | Efam_MarriageLicense -> "marriage licence"
+  | Efam_PACS -> "PACS"
+  | Efam_Residence -> "residence"
+  | Efam_Name n -> sou base n ]
+;
+
 value print_base_error oc base =
   fun
   [ AlreadyDefined p ->
@@ -60,7 +132,7 @@ value print_base_warning oc base =
         (designation base (poi base (get_mother cpl)));
     }
   | ChangedOrderOfPersonEvents p _ _ ->
-      fprintf oc "Changed order of person's events for %s\n" 
+      fprintf oc "Changed order of person's events for %s\n"
         (designation base p)
   | CloseChildren ifam des elder x -> do {
       let cpl = foi base ifam in
@@ -79,6 +151,21 @@ value print_base_warning oc base =
       fprintf oc
         "  is born more than 2 years after the death of his/her father\n";
       fprintf oc "%s\n" (designation base father)
+    }
+  | FEventOrder p e1 e2 ->
+      fprintf oc "%s's %s before his/her %s\n"
+        (designation base p)
+        (string_of_efam_name base e1.efam_name)
+        (string_of_efam_name base e2.efam_name)
+  | FWitnessEventAfterDeath p e -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s after his/her death\n"
+        (string_of_efam_name base e.efam_name)
+    }
+  | FWitnessEventBeforeBirth p e -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s before his/her birth\n"
+        (string_of_efam_name base e.efam_name)
     }
   | IncoherentSex p fixed not_fixed -> do {
       fprintf oc "%s\n  sex not coherent with relations"
@@ -117,6 +204,21 @@ value print_base_warning oc base =
   | ParentTooYoung p a ->
       fprintf oc "%s was parent at age of %d\n" (designation base p)
         a.year
+  | PEventOrder p e1 e2 ->
+      fprintf oc "%s's %s before his/her %s\n"
+        (designation base p)
+        (string_of_epers_name base e1.epers_name)
+        (string_of_epers_name base e2.epers_name)
+  | PWitnessEventAfterDeath p e -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s after his/her death\n"
+        (string_of_epers_name base e.epers_name)
+    }
+  | PWitnessEventBeforeBirth p e -> do {
+      fprintf oc "%s\n" (designation base p);
+      fprintf oc "witnessed the %s before his/her birth\n"
+        (string_of_epers_name base e.epers_name)
+    }
   | TitleDatesError p t -> do {
       fprintf oc "%s\n" (designation base p);
       fprintf oc "has incorrect title dates as:\n";

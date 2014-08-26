@@ -475,6 +475,27 @@ value print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base father)
              (Date.short_dates_text conf base father))
+  | FEventOrder p e1 e2 ->
+      Wserver.wprint
+        (fcapitale
+           (ftransl conf "%t's %s before his/her %s"))
+        (fun _ -> print_someone_strong conf base p)
+        (Util.string_of_fevent_name conf base e1.efam_name)
+        (Util.string_of_fevent_name conf base e2.efam_name)
+  | FWitnessEventAfterDeath p e ->
+      Wserver.wprint
+        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
+        (fun _ ->
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
+        (Util.string_of_fevent_name conf base e.efam_name)
+  | FWitnessEventBeforeBirth p e ->
+      Wserver.wprint
+        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
+        (fun _ ->
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
+        (Util.string_of_fevent_name conf base e.efam_name)
   | IncoherentSex p _ _ ->
       Wserver.wprint
         (fcapitale
@@ -521,6 +542,27 @@ value print_warning conf base =
           (transl conf "is a very old parent");
         Wserver.wprint "(%s)" (Date.string_of_age conf a);
       }
+  | PEventOrder p e1 e2 ->
+      Wserver.wprint
+        (fcapitale
+           (ftransl conf "%t's %s before his/her %s"))
+        (fun _ -> print_someone_strong conf base p)
+        (Util.string_of_pevent_name conf base e1.epers_name)
+        (Util.string_of_pevent_name conf base e2.epers_name)
+  | PWitnessEventAfterDeath p e ->
+      Wserver.wprint
+        (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
+        (fun _ ->
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
+        (Util.string_of_pevent_name conf base e.epers_name)
+  | PWitnessEventBeforeBirth p e ->
+      Wserver.wprint
+        (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
+        (fun _ ->
+           Printf.sprintf "%s%s" (print_someone_strong conf base p)
+             (Date.short_dates_text conf base p))
+        (Util.string_of_pevent_name conf base e.epers_name)
   | TitleDatesError p t ->
       Wserver.wprint
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
