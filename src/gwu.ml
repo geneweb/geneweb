@@ -29,20 +29,82 @@ value put_events_in_notes base p =
   else False
 ;
 
-value ht = Hashtbl.create 20001;
-value find_free_key key =
-  let key = Name.lower key in
+value ht_dup_occ = Hashtbl.create 20001;
+value ht_orig_occ = Hashtbl.create 20001;
+
+
+value prepare_free_occ base =
+  do {
+    (* Parce qu'on est obligé ... *)
+    let sn = "?" in
+    let fn = "?" in
+    let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
+    Hashtbl.add ht_orig_occ key [0];
+    for i = 0 to nb_of_persons base -1 do {
+      let ip = Adef.iper_of_int i in
+      let p = poi base ip in
+      let sn = sou base (get_surname p) in
+      let fn = sou base (get_first_name p) in
+      if sn = "?" && fn = "?" then ()
+      else if Name.lower sn = "" || Name.lower fn = "" then do {
+        let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
+        let occ = get_occ p in
+        try
+          let l = Hashtbl.find ht_orig_occ key in
+          if List.mem occ l then
+            Hashtbl.add ht_dup_occ ip occ
+          else
+            Hashtbl.replace ht_orig_occ key [occ :: l]
+        with
+        [ Not_found -> Hashtbl.add ht_orig_occ key [occ] ]
+      }
+      else ()
+    };
+    Hashtbl.iter
+      (fun key l ->
+        Hashtbl.replace ht_orig_occ key (List.sort Pervasives.compare l))
+      ht_orig_occ;
+    let concat l1 l2 =
+      let rec loop l1 l2 =
+        match l1 with
+        [ [] -> l2
+        | [x :: l1] -> loop l1 [x :: l2] ]
+      in
+      loop (List.rev l1) l2
+    in
+    Hashtbl.iter
+      (fun ip occ ->
+        let p = poi base ip in
+        let sn = sou base (get_surname p) in
+        let fn = sou base (get_first_name p) in
+        let key = Name.lower fn ^ " #@# " ^ Name.lower sn in
   try
     do {
-      let occ = Hashtbl.find ht key in
-      let free_occ = succ occ in
-      Hashtbl.add ht key free_occ;
-      free_occ
+            let list_occ = Hashtbl.find ht_orig_occ key in
+            let rec loop list init new_list =
+              match list with
+              [ [x; y :: l] ->
+                  if y - x > 1 then
+                    (succ x, concat (concat new_list [x; succ x; y]) l)
+                  else
+                    loop [y :: l] y (concat new_list [x])
+              | [x :: l] -> loop l (succ x) (concat new_list [x])
+              | [] -> (init, [init]) ]
+            in
+            let (new_occ, new_list_occ) = loop list_occ 0 [] in
+            Hashtbl.replace ht_dup_occ ip new_occ;
+            Hashtbl.replace ht_orig_occ key new_list_occ
     }
   with
-  [ Not_found -> do {Hashtbl.add ht key 0; 0} ]
+        [ Not_found -> () ] )
+      ht_dup_occ
+  }
 ;
 
+value get_new_occ p =
+  try Hashtbl.find ht_dup_occ (get_key_index p) with
+  [ Not_found -> get_occ p ]
+;
 
 type mfam =
   { m_ifam : ifam; m_fam : family; m_fath : person; m_moth : person;
@@ -473,13 +535,8 @@ value print_parent oc base gen fam p =
     fprintf oc "%s %s%s" (s_correct_string surname)
       (s_correct_string first_name)
       (if first_name = "?" && surname = "?" then ""
-       else if first_name = "?" || surname = "?" then
-         if get_occ p = 0 then
-           let free_n = find_free_key (first_name ^ " " ^ surname) in
-           "." ^ string_of_int free_n
-         else "." ^ string_of_int (get_occ p)
-       else if get_occ p = 0  then ""
-       else "." ^ string_of_int (get_occ p));
+       else if get_new_occ p = 0 then ""
+       else "." ^ string_of_int (get_new_occ p));
     if pr then
       if has_infos then print_infos oc base False "" "" p
       else if first_name <> "?" && surname <> "?" then fprintf oc " 0"
@@ -497,15 +554,8 @@ value print_child oc base fam_surname csrc cbp p =
     | _ -> () ];
     fprintf oc " %s" (s_correct_string (sou base (get_first_name p)));
     if p_first_name base p = "?" && p_surname base p = "?" then ()
-    else if p_first_name base p = "?" || p_surname base p = "?" then
-      if get_occ p = 0 then
-        let free_n =
-          find_free_key (p_first_name base p ^ " " ^ p_surname base p)
-        in
-        fprintf oc ".%d" free_n
-      else fprintf oc ".%d" (get_occ p)
-    else if get_occ p = 0  then ()
-    else fprintf oc ".%d" (get_occ p);
+    else if get_new_occ p = 0  then ()
+    else fprintf oc ".%d" (get_new_occ p);
     if not (eq_istr (get_surname p) fam_surname) then
       fprintf oc " %s" (s_correct_string_nonum (sou base (get_surname p)))
     else ();
@@ -559,7 +609,7 @@ value print_witness oc base gen p =
   do {
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
-      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
+      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
     if Array.length (get_family p) = 0 && get_parents p = None &&
        not gen.mark.(Adef.int_of_iper (get_key_index p))
     then do {
@@ -694,7 +744,7 @@ value print_pevents_for_person oc base gen p =
   if pevents <> [] && surn <> "?" && fnam <> "?" then do {
     fprintf oc "\n";
     fprintf oc "pevt %s %s%s\n" surn fnam
-      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
+      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
     List.iter (print_pevent oc base gen) pevents;
     fprintf oc "end pevt\n";
   }
@@ -918,8 +968,8 @@ value print_family oc base gen m =
     gen.fam_done.(Adef.int_of_ifam m.m_ifam) := True;
     let f _ =
       sprintf "family \"%s.%d %s\" & \"%s.%d %s\"" (p_first_name base m.m_fath)
-        (get_occ m.m_fath) (p_surname base m.m_fath)
-        (p_first_name base m.m_moth) (get_occ m.m_moth)
+        (get_new_occ m.m_fath) (p_surname base m.m_fath)
+        (p_first_name base m.m_moth) (get_new_occ m.m_moth)
         (p_surname base m.m_moth)
     in
     ignore (add_linked_files gen f fsources [] : list _);
@@ -1020,7 +1070,7 @@ value print_notes_for_person oc base gen p = do {
   then do {
     fprintf oc "\n";
     fprintf oc "notes %s %s%s\n" surn fnam
-      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
+      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
     fprintf oc "beg\n";
     if notes <> "" then fprintf oc "%s\n" notes
     else ();
@@ -1055,7 +1105,7 @@ value print_notes_for_person oc base gen p = do {
   }
   else ();
   let f _ =
-    sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_occ p)
+    sprintf "person \"%s.%d %s\"" (p_first_name base p) (get_new_occ p)
       (p_surname base p)
   in
   ignore (add_linked_files gen f notes [] : list _);
@@ -1077,15 +1127,6 @@ value print_notes_for_person oc base gen p = do {
   in
   ignore (add_linked_files gen f s [] : list _);
 };
-
-value rec list_memf f x =
-  fun
-  [ [] -> False
-  | [a :: l] -> f x a || list_memf f x l ]
-;
-
-value eq_key p1 p2 = get_key_index p1 = get_key_index p2;
-value eq_key_fst (p1, _) (p2, _) = get_key_index p1 = get_key_index p2;
 
 value print_notes oc base gen ml =
   let pl = List.fold_right (get_persons_with_notes base) ml gen.notes_pl_p in
@@ -1181,7 +1222,7 @@ value print_relation_parent oc base mark defined_p p =
   do {
     fprintf oc "%s %s%s" (correct_string base (get_surname p))
       (correct_string base (get_first_name p))
-      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
+      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
     if Array.length (get_family p) = 0 && get_parents p = None &&
        not mark.(Adef.int_of_iper (get_key_index p))
     then do {
@@ -1273,10 +1314,15 @@ value print_relation_for_person oc base gen def_p p r =
         [ (Some fath, None) -> print_relation_parent oc base gen.mark def_p fath
         | (None, Some moth) -> print_relation_parent oc base gen.mark def_p moth
         | (Some fath, Some moth) ->
-            do {
+            if get_sex fath = Male && get_sex moth = Female then do {
               print_relation_parent oc base gen.mark def_p fath;
               fprintf oc " + ";
               print_relation_parent oc base gen.mark def_p moth
+            }
+          else do {
+              print_relation_parent oc base gen.mark def_p moth;
+              fprintf oc " + ";
+              print_relation_parent oc base gen.mark def_p fath
             }
         | _ -> () ];
         fprintf oc "\n"
@@ -1302,7 +1348,7 @@ value print_relations_for_person oc base gen def_p is_definition p =
     gen.mark_rel.(Adef.int_of_iper (get_key_index p)) := True;
     fprintf oc "\n";
     fprintf oc "rel %s %s%s" surn fnam
-      (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
+      (if get_new_occ p = 0 then "" else "." ^ string_of_int (get_new_occ p));
     if is_definition then do {
       gen.mark.(Adef.int_of_iper (get_key_index p)) := True;
       def_p.val := [p :: def_p.val];
@@ -2097,6 +2143,7 @@ value main () =
     in
     if raw_output.val then () else fprintf out_oc "encoding: utf-8\n";
     if old_gw.val then fprintf out_oc "\n" else fprintf out_oc "gwplus\n\n";
+    prepare_free_occ base;
     gwu base in_dir out_dir.val out_oc src_oc_ht anc desc ancdesc;
     Hashtbl.iter (fun _ (oc, _) -> do { flush oc; close_out oc })
       src_oc_ht;
