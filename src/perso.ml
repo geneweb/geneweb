@@ -2865,7 +2865,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             (* on ne prend pas en compte les notes).                       *)
             let events = events_list conf base p in
             let nb_fam = Array.length (get_family p) in
-            loop events 0 where rec loop events nb_marr =
+            let rec loop events nb_birth nb_bapt nb_deat nb_buri nb_marr =
               match events with
               [ [] -> False
               | [(name, d, p, n, s, wl, _) :: events] ->
@@ -2877,7 +2877,21 @@ and eval_bool_person_field conf base env (p, p_auth) =
                         Epers_Death | Epers_Burial |
                         Epers_Cremation ->
                           if Array.length wl > 0 then True
-                          else loop events nb_marr
+                          else
+                            let (nb_birth, nb_bapt, nb_deat, nb_buri) =
+                              match pname with
+                              [ Epers_Birth -> (succ nb_birth, nb_bapt, nb_deat, nb_buri)
+                              | Epers_Baptism -> (nb_birth, succ nb_bapt, nb_deat, nb_buri)
+                              | Epers_Death -> (nb_birth, nb_bapt, succ nb_deat, nb_buri)
+                              | Epers_Burial | Epers_Cremation ->
+                                  (nb_birth, nb_bapt, nb_deat, succ nb_buri)
+                              | _ -> (nb_birth, nb_bapt, nb_deat, nb_buri) ]
+                            in
+                            if List.exists (fun i -> i > 1)
+                                 [nb_birth; nb_bapt; nb_deat; nb_buri]
+                            then True
+                            else
+                              loop events nb_birth nb_bapt nb_deat nb_buri nb_marr
                       | _ -> True ]
                   | Fevent fname ->
                       match fname with
@@ -2885,12 +2899,16 @@ and eval_bool_person_field conf base env (p, p_auth) =
                         Efam_NoMarriage ->
                           let nb_marr = succ nb_marr in
                           if nb_marr > nb_fam then True
-                          else loop events nb_marr
+                          else
+                            loop events nb_birth nb_bapt nb_deat nb_buri nb_marr
                       | Efam_Divorce | Efam_Separated ->
                           if p <> "" || n <> "" || s <> "" || Array.length wl > 0
                           then True
-                          else loop events nb_marr
-                      | _ -> True ] ] ] ]
+                          else
+                            loop events nb_birth nb_bapt nb_deat nb_buri nb_marr
+                      | _ -> True ] ] ]
+            in
+            loop events 0 0 0 0 0 ]
       else False
   | "has_families" -> Array.length (get_family p) > 0
   | "has_first_names_aliases" ->
