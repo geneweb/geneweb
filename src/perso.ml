@@ -2925,7 +2925,6 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_qualifiers" ->
       if not p_auth && (is_hide_names conf p) then False
       else get_qualifiers p <> []
-  | "has_qualifiers" -> p_auth && get_qualifiers p <> []
   | "has_relations" ->
       if p_auth && conf.use_restrict then
         let related =
