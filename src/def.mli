@@ -230,6 +230,9 @@ type warning 'person 'descend 'title 'pevent 'fevent =
   | CloseChildren of ifam and 'descend and 'person and 'person
   | DeadOld of 'person and dmy
   | DeadTooEarlyToBeFather of 'person and 'person
+  | FEventOrder of 'person and 'fevent and 'fevent
+  | FWitnessEventAfterDeath of 'person and 'fevent
+  | FWitnessEventBeforeBirth of 'person and 'fevent
   | IncoherentAncestorDate of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
@@ -237,6 +240,9 @@ type warning 'person 'descend 'title 'pevent 'fevent =
   | ParentBornAfterChild of 'person and 'person
   | ParentTooOld of 'person and dmy
   | ParentTooYoung of 'person and dmy
+  | PEventOrder of 'person and 'pevent and 'pevent
+  | PWitnessEventAfterDeath of 'person and 'pevent
+  | PWitnessEventBeforeBirth of 'person and 'pevent
   | TitleDatesError of 'person and 'title
   | UndefinedSex of 'person
   | WitnessDateAfterDeath of 'person
