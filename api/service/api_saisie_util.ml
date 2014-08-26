@@ -1,9 +1,6 @@
 (*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
-module Msaisie = Api_saisie_piqi
-module Mext_saisie = Api_saisie_piqi_ext
-
 (* Dans un premier temps, ce module dupliques certaines  *)
 (* fonctions déjà présentes, mais c'est pour qu'il reste *)
 (* le plus indépendant possible des autres modules.      *)
