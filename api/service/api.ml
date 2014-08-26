@@ -261,6 +261,59 @@ let print_ref_person_from_ip conf base =
 ;;
 
 
+(**/**) (* API_SOSA *)
+
+(* ************************************************************************ *)
+(*  [Fonc] print_find_sosa : config -> base -> ReferencePerson              *)
+(** [Description] : Cette fonction est utilisée pour la première saisie.
+       Elle prend une référence_person et si elle a des enfants, alors on
+       renvoi le premier enfant, sinon on renvoi la même personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] : ReferencePerson
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let print_find_sosa conf base =
+  let ref_person = get_params conf Mext.parse_reference_person in
+  let sn = ref_person.M.Reference_person.n in
+  let fn = ref_person.M.Reference_person.p in
+  let occ = ref_person.M.Reference_person.oc in
+  let ref_p =
+    match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
+    | Some ip ->
+        let p = poi base ip in
+        let rec loop faml =
+          match faml with
+          | [] -> ref_person
+          | ifam :: faml ->
+              let fam = foi base ifam in
+              match (Array.to_list (get_children fam)) with
+              | [] -> loop faml
+              | ip :: _ ->
+                  let sosa = poi base ip in
+                  let fn = Name.lower (sou base (get_first_name sosa)) in
+                  let sn = Name.lower (sou base (get_surname sosa)) in
+                  let occ = Int32.of_int (get_occ sosa) in
+                  M.Reference_person#{
+                    n = sn;
+                    p = fn;
+                    oc = occ;
+                  }
+        in
+        loop (Array.to_list (get_family p))
+    | None ->
+        M.Reference_person#{
+          n = "";
+          p = "";
+          oc = Int32.of_int 0;
+        }
+  in
+  let data = Mext.gen_reference_person ref_p in
+  print_result conf data
+;;
+
+
 (**/**) (* API_IMAGE *)
 
 let print_img conf base =
