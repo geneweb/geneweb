@@ -315,7 +315,7 @@ value rec reconstitute_events conf ext cnt =
   | _ -> ([], ext) ]
 ;
 
-value reconstitute_from_fevents fevents marr div =
+value reconstitute_from_fevents conf fevents marr div =
   (* On tri les évènements pour être sûr. *)
   let fevents =
     CheckItem.sort_events
@@ -327,6 +327,9 @@ value reconstitute_from_fevents fevents marr div =
   let found_divorce = ref False in
   (* On veut cette fois ci que ce soit le dernier évènement *)
   (* qui soit mis dans les évènements principaux.           *)
+  (* Si le dernier évènement est un mariage, on ignore tous les autres. *)
+  (* Si on trouve un contrat de mariage après le mariage, on veut tout  *)
+  (* quand même que le mariage soit pris par rapport au contrat.        *)
   let rec loop fevents marr div =
     match fevents with
     [ [] -> (marr, div)
@@ -341,27 +344,31 @@ value reconstitute_from_fevents fevents marr div =
               in
               let () = found_marriage.val := True in
               loop l marr div
-        | Efam_Marriage | Efam_MarriageContract ->
+        | Efam_Marriage ->
+              let marr =
+                (Married, evt.efam_date, evt.efam_place,
+                 evt.efam_note, evt.efam_src)
+              in
+              let () = found_marriage.val := True in
+              (marr, div)
+        | Efam_MarriageContract ->
             if found_marriage.val then loop l marr div
             else
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
-                if evt.efam_name = Efam_MarriageContract then
                   match Adef.od_of_codate evt.efam_date with
                   [ Some (Dgreg dmy cal) ->
                       let dmy = {(dmy) with prec = About} in
                       Adef.codate_of_od (Some (Dgreg dmy cal))
                   | _ -> evt.efam_date ]
-                else evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
-              let place =
-                if evt.efam_name = Efam_MarriageContract then ""
-                else evt.efam_place
+              let place = "" in
+              let marr =
+                (Married, date, place, evt.efam_note, evt.efam_src)
               in
-              let marr = (Married, date, place, evt.efam_note, evt.efam_src) in
               let () = found_marriage.val := True in
               loop l marr div
         | Efam_NoMention | Efam_MarriageBann | Efam_MarriageLicense |
@@ -402,6 +409,19 @@ value reconstitute_from_fevents fevents marr div =
   let marr =
     if not found_marriage.val then (NoMention, Adef.codate_None, "", "", "")
     else marr
+  in
+  (* Parents de même sexe. *)
+  let marr =
+    match p_getenv conf.env "nsck" with
+    [ Some "on" ->
+        let (relation, date, place, note, src) = marr in
+        let relation =
+          match relation with
+          [ Married | NoSexesCheckMarried -> NoSexesCheckMarried
+          | _  -> NoSexesCheckNotMarried ]
+        in
+        (relation, date, place, note, src)
+    | _ -> marr ]
   in
   let div =
     if not found_divorce.val then NotDivorced
@@ -526,7 +546,7 @@ value reconstitute_family conf base =
   (* Attention, surtout pas les witnesses, parce que si on en créé un, *)
   (* on le créé aussi dans witness et on ne pourra jamais valider.     *)
   let (marr, div) =
-    reconstitute_from_fevents events
+    reconstitute_from_fevents conf events
       (relation, marriage, marriage_place, marriage_note, marriage_src)
       divorce
   in
@@ -1488,7 +1508,7 @@ value patch_children_with_pevents base des =
 ;
 
 (* TODO merge avec l'autre ... *)
-value reconstitute_from_fevents2 base fevents marr div =
+value reconstitute_from_fevents2 conf base fevents marr div =
   let empty_string = Gwdb.insert_string base "" in
   (* Il faut trier avant de faire un reconstitute ... *)
   let fevents =
@@ -1516,26 +1536,29 @@ value reconstitute_from_fevents2 base fevents marr div =
               let wit = evt.efam_witnesses in
               let () = found_marriage.val := True in
               loop l marr div wit
-        | Efam_Marriage | Efam_MarriageContract ->
+        | Efam_Marriage ->
+            let marr =
+              (Married, evt.efam_date, evt.efam_place,
+               evt.efam_note, evt.efam_src)
+            in
+            let wit = evt.efam_witnesses in
+            let () = found_marriage.val := True in
+            (marr, div, wit)
+        | Efam_MarriageContract ->
             if found_marriage.val then loop l marr div wit
             else
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on met une précision "vers".      *)
               let date =
-                if evt.efam_name = Efam_MarriageContract then
                   match Adef.od_of_codate evt.efam_date with
                   [ Some (Dgreg dmy cal) ->
                       let dmy = {(dmy) with prec = About} in
                       Adef.codate_of_od (Some (Dgreg dmy cal))
                   | _ -> evt.efam_date ]
-                else evt.efam_date
               in
               (* Pour différencier le fait qu'on recopie le *)
               (* mariage, on ne met pas de lieu.            *)
-              let place =
-                if evt.efam_name = Efam_MarriageContract then empty_string
-                else evt.efam_place
-              in
+              let place = empty_string in
               let marr = (Married, date, place, evt.efam_note, evt.efam_src) in
               let wit = evt.efam_witnesses in
               let () = found_marriage.val := True in
@@ -1583,6 +1606,19 @@ value reconstitute_from_fevents2 base fevents marr div =
         empty_string, empty_string), [| |])
     else (marr, wit)
   in
+  (* Parents de même sexe. *)
+  let marr =
+    match p_getenv conf.env "nsck" with
+    [ Some "on" ->
+        let (relation, date, place, note, src) = marr in
+        let relation =
+          match relation with
+          [ Married | NoSexesCheckMarried -> NoSexesCheckMarried
+          | _  -> NoSexesCheckNotMarried ]
+        in
+        (relation, date, place, note, src)
+    | _ -> marr ]
+  in
   let div =
     if not found_divorce.val then NotDivorced
     else div
@@ -1591,9 +1627,9 @@ value reconstitute_from_fevents2 base fevents marr div =
 ;
 
 (* On met à jour les témoins maintenant. *)
-value patch_family_with_fevents base fam =
+value patch_family_with_fevents conf base fam =
   let (marr, div, witnesses) =
-    reconstitute_from_fevents2 base fam.fevents
+    reconstitute_from_fevents2 conf base fam.fevents
       (fam.relation, fam.marriage, fam.marriage_place,
        fam.marriage_note, fam.marriage_src)
       fam.divorce
@@ -1662,7 +1698,7 @@ value print_add o_conf base =
       | (None, None) -> do {
           let (sfam, sdes) = strip_family sfam sdes in
           let (ifam, fam, cpl, des) = effective_add conf base sfam scpl sdes in
-          let fam = patch_family_with_fevents base fam in
+          let fam = patch_family_with_fevents conf base fam in
           let () = patch_parent_with_pevents base cpl in
           let () = patch_children_with_pevents base des in
           let (wl, ml) =
@@ -1785,7 +1821,7 @@ value print_mod o_conf base =
   let callback sfam scpl sdes = do {
     let ofs = family_structure conf base sfam.fam_index in
     let (ifam, fam, cpl, des) = effective_mod conf base sfam scpl sdes in
-    let fam = patch_family_with_fevents base fam in
+    let fam = patch_family_with_fevents conf base fam in
     let () = patch_parent_with_pevents base cpl in
     let () = patch_children_with_pevents base des in
     let s =

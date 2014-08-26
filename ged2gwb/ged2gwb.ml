@@ -2680,12 +2680,12 @@ value treat_fam_fevent gen ifath imoth r =
   List.rev_append prim_events second_events
 ;
 
-value reconstitute_from_fevents fevents marr witn div =
+value reconstitute_from_fevents gen gay fevents marr witn div =
   let found_marriage = ref False in
   let found_divorce = ref False in
   (* On veut cette fois ci que ce soit le dernier évènement *)
   (* qui soit mis dans les évènements principaux.           *)
-  loop (List.rev fevents) marr witn div where rec loop fevents marr witn div =
+  let rec loop fevents marr witn div =
     match fevents with
     [ [] -> (marr, witn, div)
     | [evt :: l] ->
@@ -2700,13 +2700,32 @@ value reconstitute_from_fevents fevents marr witn div =
               in
               let () = found_marriage.val := True in
               loop l marr witn div
-        | Efam_Marriage | Efam_MarriageContract ->
-            if found_marriage.val then loop l marr witn div
-            else
+        | Efam_Marriage ->
               let witn = Array.map fst evt.efam_witnesses in
               let marr =
                 (Married, evt.efam_date, evt.efam_place,
                  evt.efam_note, evt.efam_src)
+            in
+            let () = found_marriage.val := True in
+            (marr, witn, div)
+        | Efam_MarriageContract ->
+            if found_marriage.val then loop l marr witn div
+            else
+              let witn = Array.map fst evt.efam_witnesses in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on met une précision "vers".      *)
+              let date =
+                match Adef.od_of_codate evt.efam_date with
+                [ Some (Dgreg dmy cal) ->
+                    let dmy = {(dmy) with prec = About} in
+                    Adef.codate_of_od (Some (Dgreg dmy cal))
+                | _ -> evt.efam_date ]
+              in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on ne met pas de lieu.            *)
+              let place = add_string gen "" in
+              let marr =
+                (Married, date, place, evt.efam_note, evt.efam_src)
               in
               let () = found_marriage.val := True in
               loop l marr witn div
@@ -2744,6 +2763,19 @@ value reconstitute_from_fevents fevents marr witn div =
               let () = found_divorce.val := True in
               loop l marr witn div
         | _ -> loop l marr witn div ] ]
+  in
+  let (marr, witn, div) = loop (List.rev fevents) marr witn div in
+  (* Parents de même sexe. *)
+  if gay then
+    let (relation, date, place, note, src) = marr in
+    let relation =
+      match relation with
+        [ Married | NoSexesCheckMarried -> NoSexesCheckMarried
+        | _  -> NoSexesCheckNotMarried ]
+    in
+    let marr = (relation, date, place, note, src) in
+    (marr, witn, div)
+  else (marr, witn, div)
 ;
 
 value add_fam_norm gen r adop_list =
@@ -2813,7 +2845,8 @@ value add_fam_norm gen r adop_list =
     let (relation, marr, marr_place, (marr_note, _), (marr_src, marr_nt), witnesses) =
       let (relation, sons) =
         match find_field "MARR" r.rsons with
-        [ Some r -> (Married, Some r)
+        [ Some r ->
+            if gay then (NoSexesCheckMarried, Some r) else (Married, Some r)
         | None ->
             match find_field "ENGA" r.rsons with
             [ Some r -> (Engaged, Some r)
@@ -2960,7 +2993,7 @@ value add_fam_norm gen r adop_list =
         fevents
     in
     let (marr, witn, div) =
-      reconstitute_from_fevents fevents
+      reconstitute_from_fevents gen gay fevents
         (relation, marr, marr_place, marr_note, marr_src)
         witnesses div
     in
