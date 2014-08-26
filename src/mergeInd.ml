@@ -76,7 +76,15 @@ value print_differences conf base branches p1 p2 =
       False (transl conf "number") "number"
       (fun p -> string_of_int (get_occ p));
     string_field True (transl_nth conf "image/images" 0) "image"
-      (fun p -> sou base (get_image p));
+      (fun p ->
+        let v =
+          image_and_size conf base p (limited_image_size 75 100)
+        in
+        match v with
+        [ Some (False, link, _) ->
+            "<img src=\"" ^ link ^
+              "\" style=\"max-width:75px; max-height:100px\" />"
+        | _ -> sou base (get_image p) ]);
     string_field True (transl conf "public name") "public_name"
       (fun p -> sou base (get_public_name p));
     string_field True (transl_nth conf "occupation/occupations" 0) "occupation"
