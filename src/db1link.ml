@@ -227,8 +227,9 @@ value find_person_by_global_name gen first_name surname occ =
     [ [] -> raise Not_found
     | [ip :: ipl] ->
         let p = poi gen.g_base ip in
-        if Name.lower (p_first_name gen.g_base p) = first_name &&
-           Name.lower (p_surname gen.g_base p) = surname && p.m_occ = occ then
+        if p.m_occ = occ &&
+           Name.lower (p_first_name gen.g_base p) = first_name &&
+           Name.lower (p_surname gen.g_base p) = surname then
           ip
         else loop ipl ]
   in
