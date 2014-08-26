@@ -258,10 +258,24 @@ value rec reconstitute_events conf ext cnt =
                   ("e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i)
               with
               [ Some "on" ->
+                  let ins_witn_n =
+                    "e" ^ string_of_int cnt ^ "_ins_witn" ^ string_of_int i ^ "_n"
+                  in
+                  match p_getint conf.env ins_witn_n with
+                  [ Some n when n > 1 ->
+                      loop_witn n witnesses where rec loop_witn n witnesses =
+                        if n = 0 then ([c :: witnesses], True)
+                        else
                   let new_witn =
                     (("", "", 0, Update.Create Neuter None, ""), Witness)
                   in
-                  ([c; new_witn :: witnesses], True)
+                          let witnesses = [new_witn :: witnesses] in
+                          loop_witn (n-1) witnesses
+                  | _ ->
+                    let new_witn =
+                      (("", "", 0, Update.Create Neuter None, ""), Witness)
+                    in
+                    ([c; new_witn :: witnesses], True) ]
               | _ -> ([c :: witnesses], ext) ]
           | None -> ([], ext) ]
       in
@@ -269,10 +283,24 @@ value rec reconstitute_events conf ext cnt =
         let evt_ins = "e" ^ string_of_int cnt ^ "_ins_witn0" in
         match p_getenv conf.env evt_ins with
         [ Some "on" ->
+            let ins_witn_n =
+              "e" ^ string_of_int cnt ^ "_ins_witn0_n"
+            in
+            match p_getint conf.env ins_witn_n with
+            [ Some n when n > 1 ->
+                loop_witn n witnesses where rec loop_witn n witnesses =
+                  if n = 0 then (witnesses, True)
+                  else
             let new_witn =
               (("", "", 0, Update.Create Neuter None, ""), Witness)
             in
-            ([new_witn :: witnesses], True)
+                    let witnesses = [new_witn :: witnesses] in
+                    loop_witn (n-1) witnesses
+            | _ ->
+              let new_witn =
+                (("", "", 0, Update.Create Neuter None, ""), Witness)
+              in
+              ([new_witn :: witnesses], True) ]
         | _ -> (witnesses, ext) ]
       in
       let e =
