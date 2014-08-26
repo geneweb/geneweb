@@ -22,6 +22,20 @@ value get_date conf =
     conf.today.year
 ;
 
+(*
+   On cherche le fichier dans cet ordre :
+    - dans la base (bases/bname/cnt/)
+    - dans le répertoire des bases (bases/)
+*)
+value find_cnt_file conf =
+  let bases_cnt = Filename.concat Util.cnt_dir.val "cnt" in
+  let bname_cnt =
+    List.fold_left Filename.concat Util.cnt_dir.val [conf.bname; "cnt"]
+  in
+  if Sys.file_exists bname_cnt then bname_cnt
+  else bases_cnt
+;
+
 value adm_file f =
   List.fold_right Filename.concat [Util.cnt_dir.val; "cnt"] f
 ;
