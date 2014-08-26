@@ -702,7 +702,10 @@ value short_dates_text conf base p =
       (* affiche tout de même les dates au format Dgreg.           *)
       | (_, _) -> partial_short_dates_text conf birth_date death_date p ]
     in
-    if s <> "" then " <em><bdo dir=\"ltr\">" ^ s ^ "</bdo></em>" else s
+    if s <> "" then
+      (* Pour IE11, il faut specifier le display inline-block. *)
+      " <em><bdo dir=\"ltr\" style=\"display:inline-block\">" ^ s ^ "</bdo></em>"
+    else s
   else ""
 ;
 
