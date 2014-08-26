@@ -563,14 +563,38 @@ value update_family_with_fevents gen fam =
               in
               let () = found_marriage.val := True in
               loop l fam
-        | Efam_Marriage | Efam_MarriageContract ->
-            if found_marriage.val then loop l fam
-            else
+        | Efam_Marriage ->
               let witnesses = Array.map fst evt.efam_witnesses in
               let fam =
                 {(fam) with relation = Married;
                   marriage = evt.efam_date;
                   marriage_place = evt.efam_place;
+                marriage_note = evt.efam_note;
+                marriage_src = evt.efam_src;
+                witnesses = witnesses}
+            in
+            let () = found_marriage.val := True in
+            fam
+        | Efam_MarriageContract ->
+            if found_marriage.val then loop l fam
+            else
+              let witnesses = Array.map fst evt.efam_witnesses in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on met une précision "vers".      *)
+              let date =
+                match Adef.od_of_codate evt.efam_date with
+                [ Some (Dgreg dmy cal) ->
+                    let dmy = {(dmy) with prec = About} in
+                    Adef.codate_of_od (Some (Dgreg dmy cal))
+                | _ -> evt.efam_date ]
+              in
+              (* Pour différencier le fait qu'on recopie le *)
+              (* mariage, on ne met pas de lieu.            *)
+              let place = unique_string gen "" in
+              let fam =
+                {(fam) with relation = Married;
+                  marriage = date;
+                  marriage_place = place;
                   marriage_note = evt.efam_note;
                   marriage_src = evt.efam_src;
                   witnesses = witnesses}
