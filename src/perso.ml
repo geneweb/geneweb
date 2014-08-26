@@ -2462,7 +2462,9 @@ and eval_bool_person_field conf base env (p, p_auth) =
             | _ -> False ]
           else False
       | _ -> raise Not_found ]
-  | "has_aliases" -> p_auth && get_aliases p <> []
+  | "has_aliases" ->
+      if not p_auth && (is_hide_names conf p) then False
+      else get_aliases p <> []
   | "has_baptism_date" -> p_auth && get_baptism p <> Adef.codate_None
   | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
   | "has_birth_date" -> p_auth && get_birth p <> Adef.codate_None
@@ -2498,7 +2500,9 @@ and eval_bool_person_field conf base env (p, p_auth) =
       | _ -> False ]
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
   | "has_families" -> Array.length (get_family p) > 0
-  | "has_first_names_aliases" -> get_first_names_aliases p <> []
+  | "has_first_names_aliases" ->
+      if not p_auth && (is_hide_names conf p) then False
+      else get_first_names_aliases p <> []
   | "has_history" ->
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
@@ -2512,8 +2516,12 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
   | "has_parents" -> get_parents p <> None
   | "has_possible_duplications" -> has_possible_duplications conf base p
-  | "has_public_name" -> p_auth && sou base (get_public_name p) <> ""
-  | "has_qualifiers" -> p_auth && get_qualifiers p <> []
+  | "has_public_name" ->
+      if not p_auth && (is_hide_names conf p) then False
+      else sou base (get_public_name p) <> ""
+  | "has_qualifiers" ->
+      if not p_auth && (is_hide_names conf p) then False
+      else get_qualifiers p <> []
   | "has_relations" ->
       if p_auth && conf.use_restrict then
         let related =
@@ -2546,7 +2554,9 @@ and eval_bool_person_field conf base env (p, p_auth) =
              p_auth && sou base (get_marriage_src fam) <> "" ||
              sou base (get_fsources fam) <> "")
           (Array.to_list (get_family p))
-  | "has_surnames_aliases" -> get_surnames_aliases p <> []
+  | "has_surnames_aliases" ->
+      if not p_auth && (is_hide_names conf p) then False
+      else get_qualifiers p <> []
   | "is_buried" ->
       match get_burial p with
       [ Buried _ -> p_auth
@@ -2583,7 +2593,9 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       | _ -> "" ]
   | "alias" ->
       match get_aliases p with
-      [ [nn :: _] when p_auth -> sou base nn
+      [ [nn :: _] ->
+          if not p_auth && (is_hide_names conf p) then ""
+          else sou base nn
       | _ -> "" ]
   | "auto_image_file_name" ->
       match auto_image_file conf base p with
@@ -2854,10 +2866,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       match get_env "prev_fam" env with
       [ Vfam _ fam (_, imoth, _) _ -> string_of_int (Adef.int_of_iper imoth)
       | _ -> raise Not_found ]
-  | "public_name" -> if not p_auth then "" else sou base (get_public_name p)
+  | "public_name" ->
+      if not p_auth && (is_hide_names conf p) then ""
+      else sou base (get_public_name p)
   | "qualifier" ->
       match get_qualifiers p with
-      [ [nn :: _] when p_auth -> sou base nn
+      [ [nn :: _] ->
+          if not p_auth && (is_hide_names conf p) then ""
+          else sou base nn
       | _ -> "" ]
   | "sex" ->
       (* Pour éviter les traductions bizarre, on ne teste pas p_auth. *)
@@ -3167,14 +3183,14 @@ value print_foreach conf base print_ast eval_expr =
     | "witness_relation" -> print_foreach_witness_relation env al ep
     | _ -> raise Not_found ]
   and print_foreach_alias env al ((p, p_auth) as ep) =
-    if p_auth then
+    if not p_auth && (is_hide_names conf p) then ()
+    else
       list_iter_first
         (fun first a ->
            let env = [("alias", Vstring (sou base a)) :: env] in
            let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_aliases p)
-    else ()
   and print_foreach_ancestor env al ((p, p_auth) as ep) =
     match get_env "gpl" env with
     [ Vgpl gpl ->
@@ -3393,15 +3409,14 @@ value print_foreach conf base print_ast eval_expr =
           List.iter (print_ast env ini_ep) al;
           loop (Some vfam) (i + 1);
         }
-  and print_foreach_first_name_alias env al ((p, p_auth) as ep)
-  =
-    if p_auth then
+  and print_foreach_first_name_alias env al ((p, p_auth) as ep) =
+    if not p_auth && (is_hide_names conf p) then ()
+    else
       List.iter
         (fun s ->
            let env = [("first_name_alias", Vstring (sou base s)) :: env] in
            List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
-    else ()
   and print_foreach_level max_lev env al ((p, _) as ep) =
     let max_level =
       match get_env max_lev env with
@@ -3438,14 +3453,14 @@ value print_foreach conf base print_ast eval_expr =
           (get_parent_array cpl)
     | None -> () ]
   and print_foreach_qualifier env al ((p, p_auth) as ep) =
-    if p_auth then
+    if not p_auth && (is_hide_names conf p) then ()
+    else
       list_iter_first
         (fun first nn ->
            let env = [("qualifier", Vstring (sou base nn)) :: env] in
            let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_qualifiers p)
-    else ()
   and print_foreach_relation env al ((p, p_auth) as ep) =
     if p_auth then
       list_iter_first
@@ -3596,13 +3611,13 @@ value print_foreach conf base print_ast eval_expr =
       | [] -> () ]
     in loop True srcl
   and print_foreach_surname_alias env al ((p, p_auth) as ep) =
-    if p_auth then
+    if not p_auth && (is_hide_names conf p) then ()
+    else
       List.iter
         (fun s ->
            let env = [("surname_alias", Vstring (sou base s)) :: env] in
            List.iter (print_ast env ep) al)
         (get_surnames_aliases p)
-    else ()
   and print_foreach_witness env al ep =
     fun
     [ Vfam _ fam _ True ->
