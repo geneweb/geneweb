@@ -520,7 +520,7 @@ let print_add conf base mod_p =
     (*
     let fn = mod_p.Mwrite.Person.firstname in
     let sn = mod_p.Mwrite.Person.lastname in
-    let occ = Api_update_util.api_find_free_occ base fn sn in
+    let occ = find_free_occ_nobase fn sn in
     let sp = {(sp) with key_index = Adef.iper_of_int (-1); occ = occ } in
     *)
     let sp = {(sp) with key_index = Adef.iper_of_int (-1)} in
@@ -971,7 +971,7 @@ let reconstitute_person_nobase conf mod_p =
       (fun evt pevents ->
         let name =
           match evt.Mwrite.Pevent.event_perso with
-          | Some n -> Epers_name (no_html_tags (only_printable n))
+          | Some n -> Epers_Name (no_html_tags (only_printable n))
           | _ ->
               match evt.Mwrite.Pevent.pevent_type with
               | Some `epers_birth -> Epers_Birth
@@ -1024,7 +1024,7 @@ let reconstitute_person_nobase conf mod_p =
               | Some `epers_scellentspouselds -> Epers_ScellentSpouseLDS
               | Some `epers_ventebien -> Epers_VenteBien
               | Some `epers_will -> Epers_Will
-              | _ -> Epers_name ""
+              | _ -> Epers_Name ""
         in
         let date =
           match evt.Mwrite.Pevent.date with

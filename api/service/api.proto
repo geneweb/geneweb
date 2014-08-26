@@ -1,0 +1,672 @@
+
+package geneweb.api.object;
+
+message InfosBase {
+  required int64 nb_persons = 1;
+  required int64 nb_families = 2;
+  optional ReferencePerson sosa = 3;
+  optional int64 last_modified_person = 4;
+}
+
+message ReferencePerson {
+  required string n = 1;
+  required string p = 2;
+  required int32 oc = 3;
+}
+
+message ListReferencePersons {
+  repeated ReferencePerson list_ref_persons = 1;
+}
+
+enum Sex {
+  MALE = 0;
+  FEMALE = 1;
+  UNKNOWN = 2;
+}
+
+enum DeathType {
+  NOT_DEAD = 0;
+  DEAD = 1;
+  DEAD_YOUNG = 2;
+  DEAD_DONT_KNOW_WHEN = 3;
+  DONT_KNOW_IF_DEAD = 4;
+  OF_COURSE_DEAD = 5;
+}
+
+enum MarriageType {
+  MARRIED = 0;
+  NOT_MARRIED = 1;
+  ENGAGED = 2;
+  NO_SEXES_CHECK_NOT_MARRIED = 3;
+  NO_MENTION = 4;
+  NO_SEXES_CHECK_MARRIED = 5;
+}
+
+enum DivorceType {
+  NOT_DIVORCED = 0;
+  DIVORCED = 1;
+  SEPARATED = 2;
+}
+
+enum RelationParentType {
+  RPT_ADOPTION = 0;
+  RPT_RECOGNITION = 1;
+  RPT_CANDIDATE_PARENT = 2;
+  RPT_GOD_PARENT = 3;
+  RPT_FOSTER_PARENT = 4;
+}
+
+message RelationParent {
+  optional int32 father = 1;
+  optional int32 mother = 2;
+  optional string source = 3;
+  required RelationParentType rpt_type = 4;
+}
+
+enum TitleType {
+  TITLE_MAIN = 0;
+  TITLE_NAME = 1;
+  TITLE_NONE = 2;
+}
+
+message Title {
+  required TitleType title_type = 1;
+  optional string name = 2;
+  optional string title = 3;
+  optional string fief = 4;
+  optional string date_begin = 5;
+  optional string date_end = 6;
+  optional int32 nth = 7;
+}
+
+message Spouse {
+  required string sosa = 1;
+  required string n = 2;
+  required string p = 3;
+  required int32 oc = 4;
+  required Sex sex = 5;
+  required string lastname = 6;
+  required string firstname = 7;
+  optional string public_name = 8;
+  required string image = 9;
+  required string birth_date = 10;
+  required string birth_place = 11;
+  required string baptism_date = 12;
+  required string baptism_place = 13;
+  required string death_date = 14;
+  required string death_place = 15;
+  required DeathType death_type = 16;
+  required string burial_date = 17;
+  required string burial_place = 18;
+  required string marriage_date = 19;
+  required string marriage_place = 20;
+  required DivorceType divorce_type = 21;
+  required bool visible_for_visitors = 22;
+}
+
+message Person {
+  required string sosa = 1;
+  required string n = 2;
+  required string p = 3;
+  required int32 oc = 4;
+  required Sex sex = 5;
+  required string lastname = 6;
+  required string firstname = 7;
+  optional string public_name = 8;
+  required string image = 9;
+  required string birth_date = 10;
+  required string birth_place = 11;
+  required string baptism_date = 12;
+  required string baptism_place = 13;
+  required string death_date = 14;
+  required string death_place = 15;
+  required DeathType death_type = 16;
+  required string burial_date = 17;
+  required string burial_place = 18;
+  repeated Spouse spouses = 19;
+  required bool ascend = 20;
+  required bool descend = 21;
+  required bool visible_for_visitors = 22;
+}
+
+message FullPerson {
+  required string sosa = 1;
+  required string n = 2;
+  required string p = 3;
+  required int32 oc = 4;
+  required int32 index = 5;
+  required Sex sex = 6;
+  required string lastname = 7;
+  required string firstname = 8;
+  optional string public_name = 9;
+  repeated string aliases = 10;
+  repeated string qualifiers = 11;
+  repeated string firstname_aliases = 12;
+  repeated string surname_aliases = 13;
+  optional string image = 15;
+  optional string birth_date = 16;
+  optional string birth_place = 17;
+  optional string birth_src = 18;
+  optional string baptism_date = 19;
+  optional string baptism_place = 20;
+  optional string baptism_src = 21;
+  optional string death_date = 22;
+  optional string death_place = 23;
+  optional string death_src = 24;
+  required DeathType death_type = 25;
+  optional string burial_date = 26;
+  optional string burial_place = 27;
+  optional string burial_src = 28;
+  optional string occupation = 30;
+  optional string psources = 31;
+  repeated Title titles = 32;
+  repeated InternalInt32 related = 33;
+  repeated RelationParent rparents = 34;
+  required bool visible_for_visitors = 35;
+  optional int32 parents = 36;
+  repeated InternalInt32 families = 37;
+}
+
+message FullFamily {
+  optional string fsources = 1;
+  optional string marriage_date = 2;
+  optional string marriage_place = 3;
+  optional string marriage_src = 4;
+  required MarriageType marriage_type = 5;
+  required DivorceType divorce_type = 6;
+  optional string divorce_date = 7;
+  repeated InternalInt32 witnesses = 8;
+  required int32 father = 9;
+  required int32 mother = 10;
+  repeated InternalInt32 children = 11;
+  required int32 index = 12;
+}
+
+message InternalInt32 {
+  required int32 value = 1;
+}
+
+message ListPersons {
+  repeated Person list_persons = 1;
+}
+
+message ListFullPersons {
+  repeated FullPerson persons = 1;
+}
+
+message ListFullFamilies {
+  repeated FullFamily families = 1;
+}
+
+enum SearchType {
+  STARTING_WITH = 0;
+  APPROXIMATIVE = 1;
+  LASTNAME_OR_FIRSTNAME = 2;
+}
+
+message SearchParams {
+  optional SearchType search_type = 1 [default = STARTING_WITH];
+  optional string lastname = 2;
+  optional string firstname = 3;
+  optional bool only_sosa = 4 [default = false];
+  optional bool only_recent = 5 [default = false];
+  optional bool maiden_name = 6 [default = false];
+}
+
+message Image {
+  required Person person = 1;
+  required string img = 2;
+}
+
+message FullImage {
+  required FullPerson person = 1;
+  required string img = 2;
+}
+
+message ListImages {
+  repeated Image list_images = 1;
+}
+
+message ListFullImages {
+  repeated FullImage images = 1;
+}
+
+message PersImg {
+  required ReferencePerson person = 1;
+  required string img = 2;
+}
+
+message ListPersImg {
+  repeated PersImg list_pers_img = 1;
+}
+
+message Index {
+  required int32 index = 1;
+}
+
+message ImageAddress {
+  required string img = 1;
+}
+
+message ClosePersonsParams {
+  required ReferencePerson person = 1;
+  optional int32 nb_gen_asc = 2;
+  optional int32 nb_gen_desc = 3;
+  optional bool spouse_ascend = 4 [default = false];
+  optional bool only_recent = 5 [default = false];
+}
+
+enum RelationType {
+  SELF = 0;
+  SPOUSE = 1;
+  SIBLING = 2;
+  STEP_BROTHER = 3;
+
+  PARENT = 4;
+  STEP_PARENT = 5;
+
+  GRAND_PARENT = 6;
+
+  UNCLE = 7;
+  UNCLE_SPOUSE = 8;
+  COUSIN = 9;
+  COUSIN_SPOUSE = 10;
+
+  CHILD = 11;
+  STEP_CHILD = 12;
+  GRAND_CHILD = 13;
+  GRAND_CHILD_SPOUSE = 14;
+  GREAT_GRAND_CHILD = 15;
+  GREAT_GRAND_CHILD_SPOUSE = 16;
+
+  CHILD_COUSIN = 17;
+  CHILD_COUSIN_SPOUSE = 18;
+  GRAND_CHILD_COUSIN = 19;
+  GRAND_CHILD_COUSIN_SPOUSE = 20;
+  GREAT_GRAND_CHILD_COUSIN = 21;
+  GREAT_GRAND_CHILD_COUSIN_SPOUSE = 22;
+
+  NEPHEW = 23;
+  NEPHEW_SPOUSE = 24;
+  NEPHEW_SPOUSE_SPOUSE = 25;
+  GRAND_NEPHEW = 26;
+  GRAND_NEPHEW_SPOUSE = 27;
+  GRAND_NEPHEW_SPOUSE_SPOUSE = 28;
+  GREAT_GRAND_NEPHEW = 29;
+  GREAT_GRAND_NEPHEW_SPOUSE = 30;
+  GREAT_GRAND_NEPHEW_SPOUSE_SPOUSE = 31;
+
+  ADOPTIVE_PARENT = 32;
+  ADOPTIVE_CHILD = 33;
+  RECOGNIZED_PARENT = 34;
+  RECOGNIZED_CHILD = 35;
+  CANDIDATE_PARENT = 36;
+  CANDIDATE_CHILD = 37;
+  GOD_PARENT = 38;
+  GOD_CHILD = 39;
+  FOSTER_PARENT = 40;
+  FOSTER_CHILD = 41;
+
+  WITNESS = 42;
+
+  NO_RELATION = 43;
+}
+
+message PersonRelation {
+  required Person person = 1;
+  required RelationType relation = 2;
+}
+
+message FullPersonRelation {
+  required FullPerson person = 1;
+  required RelationType relation = 2;
+}
+
+message ListPersonRelation {
+  repeated PersonRelation person_relations = 1;
+}
+
+message ListFullPersonRelation {
+  repeated FullPersonRelation person_relations = 1;
+}
+
+message AnniversaryParams {
+  optional int32 month = 1;
+}
+
+message GraphParams {
+  optional int32 generation = 1;
+  required ReferencePerson person = 2;
+}
+
+message GraphRelParams {
+  required ReferencePerson person1 = 1;
+  required ReferencePerson person2 = 2;
+}
+
+message CplRelParams {
+  required ReferencePerson person1 = 1;
+  required ReferencePerson person2 = 2;
+}
+
+message Node {
+  required int64 id = 1;
+  required Person person = 2;
+}
+
+message FullNode {
+  required int64 id = 1;
+  required FullPerson person = 2;
+}
+
+message Edge {
+  required int64 from_node = 1;
+  required int64 to_node = 2;
+}
+
+message Graph {
+  repeated Node nodes = 1;
+  repeated Edge edges = 2;
+}
+
+message FullGraph {
+  repeated FullNode nodes = 1;
+  repeated Edge edges = 2;
+  repeated FullFamily families = 3;
+}
+
+message AllPersonsParams {
+  optional int32 from = 1;
+  optional int32 limit = 2;
+}
+
+message AllFamiliesParams {
+  optional int32 from = 1;
+  optional int32 limit = 2;
+}
+
+
+message WarningAlreadyDefined {
+  required FullPerson person = 1;
+}
+
+message WarningOwnAncestor {
+  required FullPerson person = 1;
+}
+
+message WarningBadSexOfMarriedPerson {
+  required FullPerson person = 1;
+}
+
+message WarningBirthAfterDeath {
+  required FullPerson person = 1;
+}
+
+message WarningIncoherentSex {
+  required FullPerson person = 1;
+}
+
+message WarningChangedOrderOfChildren {
+  required FullPerson father = 1;
+  required FullPerson mother = 2;
+}
+
+message WarningChangedOrderOfMarriages {
+  required FullPerson person = 1;
+}
+
+message WarningChildrenNotInOrder {
+  required FullPerson father = 1;
+  required FullPerson mother = 2;
+}
+
+message WarningDeadTooEarlyToBeFather {
+  required FullPerson son = 1;
+  required FullPerson father = 2;
+}
+
+message WarningIncoherentAncestorDate {
+  required FullPerson person = 1;
+  required FullPerson ancestor = 2;
+}
+
+message WarningMarriageDateAfterDeath {
+  required FullPerson person = 1;
+}
+
+message WarningMarriageDateBeforeBirth {
+  required FullPerson person = 1;
+}
+
+message WarningMotherDeadBeforeChildBirth {
+  required FullPerson mother = 1;
+  required FullPerson child = 2;
+}
+
+message WarningParentBornAfterChild {
+  required FullPerson parent = 1;
+  required FullPerson child = 2;
+}
+
+message WarningParentTooYoung {
+  required FullPerson parent = 1;
+  required string date = 2;
+}
+
+message WarningTitleDatesError {
+  required FullPerson person = 1;
+}
+
+message WarningUndefinedSex {
+  required FullPerson person = 1;
+}
+
+message WarningYoungForMarriage {
+  required FullPerson person = 1;
+  required string date = 2;
+}
+
+message WarningParentTooOld {
+  required FullPerson parent = 1;
+  required string date = 2;
+}
+
+message WarningCloseChildren {
+  required FullPerson father = 1;
+  required FullPerson mother = 2;
+  required FullPerson child1 = 3;
+  required FullPerson child2 = 4;
+}
+
+message WarningBigAgeBetweenSpouses {
+  required FullPerson father = 1;
+  required FullPerson mother = 2;
+  required string date = 3;
+}
+
+message WarningDeadOld {
+  required FullPerson person = 1;
+  required string date = 3;
+}
+
+message WarningOldIndividual {
+  required FullPerson person = 1;
+  required string date = 3;
+}
+
+message WarningWitnessDateAfterDeath {
+  required FullPerson person = 1;
+}
+
+message WarningWitnessDateBeforeBirth {
+  required FullPerson person = 1;
+}
+
+message WarningChangedOrderOfFamilyEvents {
+  required FullPerson father = 1;
+  required FullPerson mother = 2;
+}
+
+message WarningChangedOrderOfPersonEvents {
+  required FullPerson person = 1;
+}
+
+message WarningFeventOrder {
+  required FullPerson person = 1;
+  required string event1 = 2;
+  required string event2 = 3;
+}
+
+message WarningFwitnessEventAfterDeath {
+  required FullPerson person = 1;
+  required string event = 2;
+}
+
+message WarningFwitnessEventBeforeBirth {
+  required FullPerson person = 1;
+  required string event = 2;
+}
+
+message WarningPeventOrder {
+  required FullPerson person = 1;
+  required string event1 = 2;
+  required string event2 = 3;
+}
+
+message WarningPwitnessEventAfterDeath {
+  required FullPerson person = 1;
+  required string event = 2;
+}
+
+message WarningPwitnessEventBeforeBirth {
+  required FullPerson person = 1;
+  required string event = 2;
+}
+
+message BaseWarnings {
+  repeated WarningAlreadyDefined warning_already_defined = 1;
+  repeated WarningOwnAncestor warning_own_ancestor = 2;
+  repeated WarningBadSexOfMarriedPerson warning_bad_sex_of_married_person = 3;
+  repeated WarningBirthAfterDeath warning_birth_after_death = 4;
+  repeated WarningIncoherentSex warning_incoherent_sex = 5;
+  repeated WarningChangedOrderOfChildren warning_changed_order_of_children = 6;
+  repeated WarningChildrenNotInOrder warning_children_not_in_order = 7;
+  repeated WarningDeadTooEarlyToBeFather warning_dead_too_early_to_be_father = 8;
+  repeated WarningIncoherentAncestorDate warning_incoherent_ancestor_date = 9;
+  repeated WarningMarriageDateAfterDeath warning_marriage_date_after_death = 10;
+  repeated WarningMarriageDateBeforeBirth warning_marriage_date_before_birth = 11;
+  repeated WarningMotherDeadBeforeChildBirth warning_mother_dead_before_child_birth = 12;
+  repeated WarningParentBornAfterChild warning_parent_born_after_child = 13;
+  repeated WarningParentTooYoung warning_parent_too_young = 14;
+  repeated WarningTitleDatesError warning_title_dates_error = 15;
+  repeated WarningUndefinedSex warning_undefined_sex = 16;
+  repeated WarningYoungForMarriage warning_young_for_marriage = 17;
+  repeated WarningCloseChildren warning_close_children = 18;
+  repeated WarningParentTooOld warning_parent_too_old = 19;
+  repeated WarningChangedOrderOfMarriages warning_changed_order_of_marriages = 20;
+  repeated WarningBigAgeBetweenSpouses warning_big_age_between_spouses = 21;
+  repeated WarningDeadOld warning_dead_old = 22;
+  repeated WarningOldIndividual warning_old_individual = 23;
+  repeated WarningWitnessDateAfterDeath warning_witness_date_after_death = 24;
+  repeated WarningWitnessDateBeforeBirth warning_witness_date_before_birth = 25;
+}
+
+message FilterDate {
+  required int32 day = 1;
+  required int32 month = 2;
+  required int32 year = 3;
+}
+
+message FilterDateRange {
+  required FilterDate date_begin = 1;
+  required FilterDate date_end = 2;
+  optional bool only_exact = 3 [default = false];
+}
+
+message Filters {
+  optional bool only_sosa = 1 [default = false];
+  optional bool only_recent = 2 [default = false];
+  optional Sex sex = 3;
+  optional bool nb_results = 4 [default = false];
+  optional FilterDateRange date_birth = 5;
+  optional FilterDateRange date_death = 6;
+}
+
+message ModificationStatus {
+  required bool status = 1;
+  required BaseWarnings base_warnings = 2;
+  optional int32 index = 3;
+}
+
+
+
+enum NotifBirthdayParams {
+  CLOSE_PERSON = 0;
+  DESCEND_GRAND_PARENT = 1;
+  DESCEND_GREAT_GRAND_PARENT = 2;
+}
+
+message NotificationBirthdayParams {
+  required ReferencePerson person = 1;
+  required NotifBirthdayParams params = 2;
+  optional int32 month = 3;
+  optional int32 day = 4;
+}
+
+message NotificationBirthday {
+  required int32 number = 1;
+  required bool has_proprio_birthday = 2;
+  optional string firstname1 = 3;
+  optional string firstname2 = 4;
+  optional string firstname3 = 5;
+}
+
+
+// ***************************************************************************
+// Premiere saisie
+// ***************************************************************************
+
+message PersonStart {
+  required string lastname = 1;
+  required string firstname = 2;
+  required Sex sex = 3;
+  optional int32 birth_date_day = 4;
+  optional int32 birth_date_month = 5;
+  optional int32 birth_date_year = 6;
+}
+
+
+
+// ***************************************************************************
+// Synchro mobile
+// ***************************************************************************
+
+message SynchroParams {
+  required string export_directory = 1;
+  required string timestamp = 2;
+}
+
+
+
+
+
+
+
+
+message CorrespondanceFamily {
+  required int32 index = 1;
+  required Person spouse = 2;
+  repeated Person children = 3;
+}
+
+message Correspondance {
+  required string base = 1;
+  required Person person = 2;
+  optional Person father = 3;
+  optional Person mother = 4;
+  repeated CorrespondanceFamily families = 5;
+}
+
+message CorrespondanceList {
+  repeated Correspondance correspondances = 1;
+}

@@ -889,6 +889,21 @@ let compute_warnings conf base resp =
                 (Gutil.designation base fath ^ "\n" ^ transl_nth conf "and" 0 ^
                      " " ^ Gutil.designation base moth ^ "\n")
                 *)
+            | ChangedOrderOfMarriages (p, before, after) -> wl
+                (* On ignore les messages de changement d'ordre. *)
+                (*
+                (capitale (transl conf "changed order of marriages"))
+                *)
+            | ChangedOrderOfFamilyEvents (ifam, before, after) -> wl
+                (* On ignore les messages de changement d'ordre. *)
+                (*
+                (capitale (transl conf "changed order of family's events"))
+                *)
+            | ChangedOrderOfPersonEvents (p, before, after) -> wl
+                (* On ignore les messages de changement d'ordre. *)
+                (*
+                (capitale (transl conf "changed order of person's events"))
+                *)
             | ChildrenNotInOrder (ifam, des, elder, x) -> wl
                 (* On ignore les messages de changement d'ordre. *)
                 (*
@@ -904,21 +919,6 @@ let compute_warnings conf base resp =
                 ^ ": " ^
                 Gutil.designation base elder ^ (Date.short_dates_text conf base elder) ^
                 Gutil.designation base x ^ (Date.short_dates_text conf base x)
-                *)
-            | ChangedOrderOfMarriages (p, before, after) -> wl
-                (* On ignore les messages de changement d'ordre. *)
-                (*
-                (capitale (transl conf "changed order of marriages"))
-                *)
-            | ChangedOrderOfFamilyEvents (ifam, before, after) -> wl
-                (* On ignore les messages de changement d'ordre. *)
-                (*
-                (capitale (transl conf "changed order of family's events"))
-                *)
-            | ChangedOrderOfPersonEvents (p, before, after) -> wl
-                (* On ignore les messages de changement d'ordre. *)
-                (*
-                (capitale (transl conf "changed order of person's events"))
                 *)
             | CloseChildren (ifam, des, elder, x) ->
                 let cpl = foi base ifam in
@@ -948,6 +948,31 @@ let compute_warnings conf base resp =
           %t is born more than 2 years after the death of his/her father %t")
                   (fun _ -> print_someone_dates child)
                   (fun _ -> print_someone_dates father)
+                in
+                w :: wl
+            | FEventOrder (p, e1, e2) ->
+                let w =
+                  Printf.sprintf
+                    (ftransl conf "%t's %s before his/her %s")
+                    (fun _ -> print_someone_dates p)
+                    (Util.string_of_fevent_name conf base e1.efam_name)
+                    (Util.string_of_fevent_name conf base e2.efam_name)
+                in
+                w :: wl
+            | FWitnessEventAfterDeath (p, e) ->
+                let w =
+                  Printf.sprintf
+                    (ftransl conf "%t witnessed the %s after his/her death")
+                    (fun _ -> print_someone_dates p)
+                    (Util.string_of_fevent_name conf base e.efam_name)
+                in
+                w :: wl
+            | FWitnessEventBeforeBirth (p, e) ->
+                let w =
+                  Printf.sprintf
+                    (ftransl conf "%t witnessed the %s before his/her birth")
+                    (fun _ -> print_someone_dates p)
+                    (Util.string_of_fevent_name conf base e.efam_name)
                 in
                 w :: wl
             | IncoherentSex (p, _, _) ->
@@ -1006,6 +1031,31 @@ let compute_warnings conf base resp =
                 Printf.sprintf "%s\n%s\n" (print_someone p)
                   (transl conf "is a very old parent") ^
                 Printf.sprintf "(%s)" (Date.string_of_age conf a);
+                in
+                w :: wl
+            | PEventOrder (p, e1, e2) ->
+                let w =
+                  Printf.sprintf
+                    (ftransl conf "%t's %s before his/her %s")
+                    (fun _ -> print_someone_dates p)
+                    (Util.string_of_pevent_name conf base e1.epers_name)
+                    (Util.string_of_pevent_name conf base e2.epers_name)
+                in
+                w :: wl
+            | PWitnessEventAfterDeath (p, e) ->
+                let w =
+                  Printf.sprintf
+                    (ftransl conf "%t witnessed the %s after his/her death")
+                    (fun _ -> print_someone_dates p)
+                    (Util.string_of_pevent_name conf base e.epers_name)
+                in
+                w :: wl
+            | PWitnessEventBeforeBirth (p, e) ->
+                let w =
+                  Printf.sprintf
+                    (ftransl conf "%t witnessed the %s before his/her birth")
+                    (fun _ -> print_someone_dates p)
+                    (Util.string_of_pevent_name conf base e.epers_name)
                 in
                 w :: wl
             | TitleDatesError (p, t) ->
@@ -2707,66 +2757,144 @@ let print_add_sibling_ok conf base =
 (**/**) (* Fonctions pour la première saisie. *)
 
 
-let check_person conf mod_p =
+(* ************************************************************************ *)
+(*  [Fonc] check_input_person : config -> Person -> unit                    *)
+(** [Description] : Cette fonction vérifie que les champs obligatoire sont
+                    bien renseignés.
+    [Args] :
+      - conf  : configuration de la base
+      - mod_p : person piqi
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let check_input_person conf mod_p =
+  let designation () =
+    let occ =
+      match mod_p.Mwrite.Person.occ with
+      | Some i -> Int32.to_int i
+      | None -> 0
+    in
+    mod_p.Mwrite.Person.firstname ^ "." ^ string_of_int occ ^
+      " " ^ mod_p.Mwrite.Person.lastname
+  in
+  let () =
   if mod_p.Mwrite.Person.lastname = "" &&
      mod_p.Mwrite.Person.firstname = ""
-  then ()
-  else
-    if mod_p.Mwrite.Person.lastname <> "" &&
+    then
+      List.fold_right
+        (fun evt () ->
+          (match evt.Mwrite.Pevent.date with
+          | Some date ->
+              (match date.Mwrite.Date.dmy with
+              | Some dmy ->
+                  (match
+                     (dmy.Mwrite.Dmy.year,
+                      dmy.Mwrite.Dmy.month,
+                      dmy.Mwrite.Dmy.day)
+                   with
+                   | (None, None, None) -> ()
+                   | _ ->
+                       let err =
+                         transl conf "unknown person" ^ ": " ^ designation ()
+                       in
+                       raise (Update.ModErrApi err))
+              | None -> ())
+          | None -> ()))
+        mod_p.Mwrite.Person.pevents ()
+    else if mod_p.Mwrite.Person.lastname <> "" &&
        mod_p.Mwrite.Person.firstname <> ""
-    then ()
+    then
+      if mod_p.Mwrite.Person.sex = `unknown then
+        let err =
+          Printf.sprintf
+            (ftransl conf "undefined sex for %t") (fun _ -> designation ())
+        in
+        raise (Update.ModErrApi err)
+      else ()
   else
     let err =
-      if mod_p.Mwrite.Person.lastname = "" then transl conf "surname missing"
-      else transl conf "first name missing"
+        if mod_p.Mwrite.Person.lastname = "" then
+          transl conf "surname missing" ^ ": " ^ designation ()
+        else
+          transl conf "first name missing" ^ ": " ^ designation ()
     in
     raise (Update.ModErrApi err)
+  in
+  ()
 ;;
 
+
+(* ************************************************************************ *)
+(*  [Fonc] compute_add_first_fam : config ->
+                                     (AddFirstFam, ModificationStatus)      *)
+(** [Description] : Permet de vérifier qu'à partir de l'objet AddFirstFam,
+      la saisie va bien se passer. C'est elle qui calcul les occ des
+      homonymes pour ne pas avoir de conflit et vérifie que les champs
+      requis sont bien renseignés.
+    [Args] :
+      - conf : configuration de la base
+    [Retour] :
+      - AddFirstFam, ModificationStatus :
+         L'objet AddFirstFam modifié afain de ne pas avoir de conflit de
+         occ et le status de la réponse si l'utilisateur a fait une mauvaise
+         saisie.
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
 let compute_add_first_fam conf =
   let add_first_fam = get_params conf Mext_write.parse_add_first_fam in
+
+  (* On ré-initialise un certain nombre de valeurs. *)
+  add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.digest <- "";
+  add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.create_link <- `create_default_occ;
+  add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.index <- Int32.of_int 0;
+  add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.occ <- None;
+  add_first_fam.Mwrite.Add_first_fam.sosa.Mwrite.Person.access <- `access_iftitles;
+
+  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.digest <- "";
+  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.create_link <- `create_default_occ;
+  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.index <- Int32.of_int 0;
+  (* On n'autorise pas les parents de meme sexe. *)
+  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.sex <- `male;
+  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.occ <- None;
+  add_first_fam.Mwrite.Add_first_fam.father.Mwrite.Person.access <- `access_iftitles;
+
+  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.digest <- "";
+  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.create_link <- `create_default_occ;
+  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.index <- Int32.of_int 0;
+  (* On n'autorise pas les parents de meme sexe. *)
+  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.sex <- `female;
+  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.occ <- None;
+  add_first_fam.Mwrite.Add_first_fam.mother.Mwrite.Person.access <- `access_iftitles;
+
+  add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.digest <- "";
+  add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.create_link <- `create_default_occ;
+  add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.index <- Int32.of_int 0;
+  add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.occ <- None;
+  add_first_fam.Mwrite.Add_first_fam.spouse.Mwrite.Person.access <- `access_iftitles;
+
+  (* On strip aussi les enfants. *)
+  add_first_fam.Mwrite.Add_first_fam.children <-
+    List.fold_right
+      (fun mod_c accu ->
+        if mod_c.Mwrite.Person.lastname = "" &&
+           mod_c.Mwrite.Person.firstname = ""
+        then accu
+        else
+          begin
+            mod_c.Mwrite.Person.digest <- "";
+            mod_c.Mwrite.Person.create_link <- `create_default_occ;
+            mod_c.Mwrite.Person.index <- Int32.of_int 0;
+            mod_c.Mwrite.Person.occ <- None;
+            mod_c.Mwrite.Person.access <- `access_iftitles;
+            mod_c :: accu
+          end)
+      add_first_fam.Mwrite.Add_first_fam.children [];
+
   let mod_p = add_first_fam.Mwrite.Add_first_fam.sosa in
   let mod_father = add_first_fam.Mwrite.Add_first_fam.father in
   let mod_mother = add_first_fam.Mwrite.Add_first_fam.mother in
   let mod_spouse = add_first_fam.Mwrite.Add_first_fam.spouse in
   let mod_children = add_first_fam.Mwrite.Add_first_fam.children in
-
-  (* On ré-initialise un certain nombre de valeurs. *)
-  mod_p.Mwrite.Person.digest <- "";
-  mod_p.Mwrite.Person.create_link <- `create_default_occ;
-  mod_p.Mwrite.Person.index <- Int32.of_int 0;
-  mod_p.Mwrite.Person.occ <- None;
-  mod_p.Mwrite.Person.access <- `access_iftitles;
-
-  mod_father.Mwrite.Person.digest <- "";
-  mod_father.Mwrite.Person.create_link <- `create_default_occ;
-  mod_father.Mwrite.Person.index <- Int32.of_int 0;
-  mod_father.Mwrite.Person.sex <- `male;
-  mod_father.Mwrite.Person.occ <- None;
-  mod_father.Mwrite.Person.access <- `access_iftitles;
-
-  mod_mother.Mwrite.Person.digest <- "";
-  mod_mother.Mwrite.Person.create_link <- `create_default_occ;
-  mod_mother.Mwrite.Person.index <- Int32.of_int 0;
-  mod_mother.Mwrite.Person.sex <- `female;
-  mod_mother.Mwrite.Person.occ <- None;
-  mod_mother.Mwrite.Person.access <- `access_iftitles;
-
-  mod_spouse.Mwrite.Person.digest <- "";
-  mod_spouse.Mwrite.Person.create_link <- `create_default_occ;
-  mod_spouse.Mwrite.Person.index <- Int32.of_int 0;
-  mod_spouse.Mwrite.Person.sex <- `female;
-  mod_spouse.Mwrite.Person.occ <- None;
-  mod_spouse.Mwrite.Person.access <- `access_iftitles;
-
-  List.iter
-    (fun c ->
-      c.Mwrite.Person.digest <- "";
-      c.Mwrite.Person.create_link <- `create_default_occ;
-      c.Mwrite.Person.index <- Int32.of_int 0;
-      c.Mwrite.Person.occ <- None;
-      c.Mwrite.Person.access <- `access_iftitles)
-    mod_children;
 
   (* On vérifie toutes les erreurs de saisie possibles. *)
   (* Attention, il faut envoyer dans le même ordre que pour la saisie, *)
@@ -2775,11 +2903,11 @@ let compute_add_first_fam conf =
     try
       begin
         (* On vérifie qu'il n'y a pas de problème de nom/prénom. *)
-        check_person conf mod_p;
-        check_person conf mod_father;
-        check_person conf mod_mother;
-        check_person conf mod_spouse;
-        List.iter (check_person conf) mod_children;
+        check_input_person conf mod_p;
+        check_input_person conf mod_father;
+        check_input_person conf mod_mother;
+        check_input_person conf mod_spouse;
+        List.iter (check_input_person conf) mod_children;
 
         let (all_wl, all_hr) =
           match Api_update_person.print_add_nobase conf mod_father with
@@ -2836,7 +2964,8 @@ let compute_add_first_fam conf =
 
 (* ************************************************************************ *)
 (*  [Fonc] print_add_first_fam : config -> ModificationStatus               *)
-(** [Description] :
+(** [Description] : Simule l'ajout de la première saisie mais sans
+      l'existence d'une base GeneWeb.
     [Args] :
       - conf : configuration de la base
     [Retour] :
@@ -3079,6 +3208,7 @@ let print_add_first_fam_ok conf base =
             end;
           (* Les index négatifs ne marchent pas ! *)
           family.Mwrite.Family.index <- Int32.of_int 0;
+          (* On n'autorise pas les parents de meme sexe. *)
           (* On met les parents en mode Create. *)
           if mod_p.Mwrite.Person.sex = `male then
             begin
@@ -3098,9 +3228,6 @@ let print_add_first_fam_ok conf base =
               let digest = Update.digest_person (UpdateInd.string_person_of base p) in
               family.Mwrite.Family.mother.Mwrite.Person.digest <- digest;
             end;
-          (* On met à jour les sexes. *)
-          family.Mwrite.Family.father.Mwrite.Person.sex <- `male;
-          family.Mwrite.Family.mother.Mwrite.Person.sex <- `female;
           (* On met à jour la famille avec les enfants. *)
           let children =
             List.map
