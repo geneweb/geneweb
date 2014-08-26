@@ -8,6 +8,10 @@ open Gwdb;
 open Hutil;
 open Util;
 
+value compatible_fevents fevt1 fevt2 =
+  fevt1 = [] && fevt2 = []
+;
+
 value need_differences_selection conf base fam1 fam2 =
   let need_selection proj =
     let x1 = proj fam1 in
@@ -139,7 +143,9 @@ value merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
   let cpl2 = foi base ifam2 in
   if get_father cpl1 = get_father cpl2 && get_mother cpl1 = get_mother cpl2
   then
-    if need_differences_selection conf base fam1 fam2 then
+    if need_differences_selection conf base fam1 fam2 &&
+       compatible_fevents (get_fevents fam1) (get_fevents fam2)
+    then
       merge_fam1 conf base (ifam1, fam1) (ifam2, fam2)
     else
       MergeFamOk.print_merge conf base
