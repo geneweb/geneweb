@@ -86,7 +86,7 @@ value find_br s ini_i =
     else br
 ;
 
-value rec display_note_aux oc s len i =
+value rec display_note_aux oc tagn s len i =
   if i = String.length s then fprintf oc "\n"
   else
     let c = if s.[i] = '\n' then ' ' else s.[i] in
@@ -94,24 +94,30 @@ value rec display_note_aux oc s len i =
     if i <= String.length s - String.length br &&
        String.lowercase (String.sub s i (String.length br)) = br then
        do {
-      fprintf oc "\n2 CONT ";
+      fprintf oc "\n%d CONT " (succ tagn);
       let i = i + String.length br in
       let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
-      display_note_aux oc s (String.length "2 CONT ") i
+      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
+    }
+    else if s.[i] = '\n' then do {
+      fprintf oc "\n%d CONT " (succ tagn);
+      let i = if i < String.length s then i + 1 else i in
+      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     else if
       len = max_len || c <> ' ' && next_char_pair_overflows s len i
     then do {
-      fprintf oc "\n2 CONC %c" c;
-      display_note_aux oc s (String.length "2 CONC .") (i + 1)
+      fprintf oc "\n%d CONC %c" (succ tagn) c;
+      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC .")) (i + 1)
     }
-    else do { output_char oc c; display_note_aux oc s (len + 1) (i + 1) }
+    else do { output_char oc c; display_note_aux oc tagn s (len + 1) (i + 1) }
 ;
 
-value display_note oc s =
+value display_note oc tagn s =
   do {
-    fprintf oc "1 NOTE ";
-    display_note_aux oc (encode s) (String.length "1 NOTE ") 0;
+    let tag = sprintf "%d NOTE " tagn in
+    fprintf oc "%s" tag;
+    display_note_aux oc tagn (encode s) (String.length tag) 0;
   }
 ;
 
@@ -152,7 +158,7 @@ value ged_header base oc ifile ofile =
     if no_notes.val then ()
     else
       let s = base_notes_read base "" in
-      if s = "" then () else display_note oc s;
+      if s = "" then () else display_note oc 1 s;
   }
 ;
 
@@ -286,12 +292,7 @@ value ged_ev_detail oc n typ d pl note src =
         }
     | None -> () ];
     if pl <> "" then fprintf oc "%d PLAC %s\n" n (encode pl) else ();
-    if note <> "" then do {
-      let tag = sprintf "%d NOTE " n in
-      fprintf oc "%s" tag;
-      display_note_aux oc (encode note) (String.length tag) 0;
-    }
-    else ();
+    if note <> "" then display_note oc n note else ();
     if src <> "" then fprintf oc "%d SOUR %s\n" n (encode src) else ();
   }
 ;
@@ -571,7 +572,7 @@ value ged_multimedia_link base oc per =
 value ged_note base oc per =
   match sou base (get_notes per) with
   [ "" -> ()
-  | s -> display_note oc s ]
+  | s -> display_note oc 1 s ]
 ;
 
 value ged_marriage base oc fam =
@@ -680,7 +681,7 @@ value ged_fsource base oc fam =
 value ged_comment base oc fam =
   match sou base (get_comment fam) with
   [ "" -> ()
-  | s -> display_note oc s ]
+  | s -> display_note oc 1 s ]
 ;
 
 value has_personal_infos base per =
