@@ -571,7 +571,6 @@ value make_visible_record_access bname persons =
          * la liste des personnes modifiées
          * la liste des familles modifiées
 *)
-value can_synchro = ref False;
 value synchro_person = ref [];
 value synchro_family = ref [];
 type synchro_patch =
@@ -864,17 +863,6 @@ value opendb bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let patches = input_patches bname in
-  (* synchro que des comptes qu'on veut. *)
-  let () =
-    can_synchro.val :=
-      List.mem
-        (Filename.basename bname)
-        [ "000jlmsosa.gwb"; "arael.gwb"; "beno1.gwb"; "benoitlecluse.gwb";
-          "cbecker.gwb"; "ftbo.gwb"; "galichonj.gwb"; "harrich.gwb"; "jyb.gwb";
-          "lheureuxf.gwb"; "pialoran.gwb"; "sdesportes.gwb"; "setaou.gwb";
-          "syltaug.gwb"; "cofranssen.gwb"; "bossardlabbe.gwb"; "exemple.gwb";
-          "zfabien.gwb"; "zharrich.gwb" ]
-  in
   let synchro = input_synchro bname in
   let particles =
     Mutil.input_particles (Filename.concat bname "particles.txt")
@@ -986,27 +974,24 @@ value opendb bname =
   in
   let cleanup () = cleanup_ref.val () in
   let commit_synchro () = do {
-    if can_synchro.val then do {
-      let tmp_fname = Filename.concat bname "1synchro_patches" in
-      let fname = Filename.concat bname "synchro_patches" in
-      let oc9 =
-        try Secure.open_out_bin tmp_fname with
-        [ Sys_error _ ->
-            raise (Adef.Request_failure "the database is not writable") ]
-      in
-      let synchro =
-        let timestamp = string_of_float (Unix.time ()) in
-        let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
-        let v = (timestamp, synchro_person.val, synchro_family.val) in
-        {synch_list = [v :: synchro.synch_list]}
-      in
-      output_value_no_sharing oc9 (synchro : synchro_patch);
-      close_out oc9;
-      remove_file (fname ^ "~");
-      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
-      try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
-    }
-    else ()
+    let tmp_fname = Filename.concat bname "1synchro_patches" in
+    let fname = Filename.concat bname "synchro_patches" in
+    let oc9 =
+      try Secure.open_out_bin tmp_fname with
+      [ Sys_error _ ->
+          raise (Adef.Request_failure "the database is not writable") ]
+    in
+    let synchro =
+      let timestamp = string_of_float (Unix.time ()) in
+      let timestamp = String.sub timestamp 0 (String.index timestamp '.') in
+      let v = (timestamp, synchro_person.val, synchro_family.val) in
+      {synch_list = [v :: synchro.synch_list]}
+    in
+    output_value_no_sharing oc9 (synchro : synchro_patch);
+    close_out oc9;
+    remove_file (fname ^ "~");
+    try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+    try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
   }
   in
   let commit_patches () = do {
