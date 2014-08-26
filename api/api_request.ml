@@ -80,6 +80,7 @@ value family_m conf base =
     | Some "API_GRAPH_ASC" -> Api_graph.print_graph_asc conf base
     | Some "API_GRAPH_DESC" -> Api_graph.print_graph_desc conf base
     | Some "API_GRAPH_REL" -> Api_graph.print_graph_rel conf base
+    | Some "API_FIND_SOSA" -> Api.print_find_sosa conf base
     | Some "API_INFO_BASE" -> Api.print_info_base conf base
     | Some "API_INFO_IND" -> Api.print_info_ind conf base
     | Some "API_IMAGE" -> Api.print_img conf base
