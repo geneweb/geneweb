@@ -660,7 +660,7 @@ let select_start_with_person conf base get_field max_res ini =
   in
   let ini = cut_at_space (code_varenv (Name.lower ini)) [] in
   let rec loop i list nb_res =
-    if nb_res < max_res && i < nb_of_persons base then
+    if (*nb_res < max_res &&*) i < nb_of_persons base then
       let ip = Adef.iper_of_int i in
       let p = poi base ip in
       let names =
