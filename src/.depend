@@ -180,6 +180,7 @@ image.cmo: config.cmi hutil.cmi mutil.cmi secure.cmi util.cmi \
     ../wserver/wserver.cmi image.cmi
 image.cmx: config.cmi hutil.cmx mutil.cmx secure.cmx util.cmx \
     ../wserver/wserver.cmx image.cmi
+image.cmi: config.cmi gwdb.cmi
 iochan.cmo: iovalue.cmi iochan.cmi
 iochan.cmx: iovalue.cmx iochan.cmi
 iovalue.cmo: iovalue.cmi
