@@ -158,7 +158,7 @@
         <input type="text" name="fn" placeholder="[*first name/first names]0" size="25" maxlength="200"%/>
         <input type="text" name="sn" placeholder="[*surname/surnames]0" size="25" maxlength="200"%/>
         <br%/>
-        <input type="text" name="n" placeholder="[*public name], [*alias] %if;browsing_with_sosa_ref;, [n° Sosa] %end; ..." size="53" maxlength="200"%/>
+        <input type="text" name="v" placeholder="[*public name], [*alias] %if;browsing_with_sosa_ref;, [n° Sosa] %end; ..." size="53" maxlength="200"%/>
       </div>
     </div>
 
