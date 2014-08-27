@@ -762,6 +762,12 @@ value check_person conf base p =
 ;
 
 value error_person conf base p err =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -813,6 +819,21 @@ value strip_person p =
 ;
 
 value print_conflict conf base p =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf
+          (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+          ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+             p_surname base p ^ "\"")
+          (fun _ ->
+             Printf.sprintf "%s %s" (sou base (get_first_name p))
+               (sou base (get_surname p)))
+          (fun _ -> ".")
+      in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -855,6 +876,15 @@ value print_conflict conf base p =
 ;
 
 value print_cannot_change_sex conf base p =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf "%s."
+          (capitale (transl conf "cannot change sex of a married person"))
+      in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
