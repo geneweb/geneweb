@@ -628,6 +628,12 @@ value strip_array_persons pl =
 ;
 
 value error_family conf base err =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -733,6 +739,15 @@ value strip_family fam des =
 ;
 
 value print_err_parents conf base p =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
+          (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p))
+      in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -754,6 +769,15 @@ value print_err_parents conf base p =
 ;
 
 value print_err_father_sex conf base p =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
+          (transl conf "should be male")
+      in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -766,6 +790,15 @@ value print_err_father_sex conf base p =
 ;
 
 value print_err_mother_sex conf base p =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
+          (transl conf "should be female")
+      in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -778,6 +811,12 @@ value print_err_mother_sex conf base p =
 ;
 
 value print_err conf base =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -788,6 +827,14 @@ value print_err conf base =
 ;
 
 value print_error_disconnected conf =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf "%s" (capitale (transl conf "msg error disconnected"))
+      in
+      raise (Update.ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;

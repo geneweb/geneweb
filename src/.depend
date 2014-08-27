@@ -1,3 +1,5 @@
+api_conf.cmo: api_conf.cmi
+api_conf.cmx: api_conf.cmi
 adef.cmo: adef.cmi
 adef.cmx: adef.cmi
 advSearchOk.cmo: adef.cmi checkItem.cmi config.cmi date.cmi def.cmi \

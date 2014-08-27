@@ -59,20 +59,19 @@ value make_senv conf base =
 ;
 
 value family_m conf base =
-  (* On verifie que la signature donnée est  *)
-  (* contenue dans le fichier de signatures. *)
-  if Util.digest_sig conf then
-    match p_getenv conf.env "m" with
-    (*[ Some "API_ADD_FAMILY" -> Api_update_family.print_add conf base
-    | Some "API_ADD_PERSON" -> Api_update_person.print_add conf base*)
-    [ Some "API_ALL_PERSONS" -> Api.print_all_persons conf base
-    | Some "API_ALL_FAMILIES" -> Api.print_all_families conf base
-    | Some "API_ANNIVERSARY" -> Api.print_birthday conf base
-    | Some "API_BASE_WARNINGS" when (conf.wizard || conf.friend) ->
-        (* Pour les flex, on autorise en mode friend. *)
-        Api.print_base_warnings conf base
-    | Some "API_CLOSE_PERSONS" -> Api_graph.print_close_person_relations conf base
-    | Some "API_CPL_REL" -> Api_graph.print_cpl_relation conf base
+  (* On passe en mode API, i.e. que les exceptions API sont levées. *)
+  let () = Api_conf.set_mode_api () in
+  match p_getenv conf.env "m" with
+  (*[ Some "API_ADD_FAMILY" -> Api_update_family.print_add conf base
+  | Some "API_ADD_PERSON" -> Api_update_person.print_add conf base*)
+  [ Some "API_ALL_PERSONS" -> Api.print_all_persons conf base
+  | Some "API_ALL_FAMILIES" -> Api.print_all_families conf base
+  | Some "API_ANNIVERSARY" -> Api.print_birthday conf base
+  | Some "API_BASE_WARNINGS" when (conf.wizard || conf.friend) ->
+      (* Pour les flex, on autorise en mode friend. *)
+      Api.print_base_warnings conf base
+  | Some "API_CLOSE_PERSONS" -> Api_graph.print_close_person_relations conf base
+  | Some "API_CPL_REL" -> Api_graph.print_cpl_relation conf base
 (*
     | Some "API_DELETE_FAMILY" -> Api_update_family.print_del conf base
     | Some "API_DELETE_PERSON" -> Api_update_person.print_del conf base
@@ -137,14 +136,12 @@ value family_m conf base =
 ;
 
 value family_m_nobase conf =
-  (* On verifie que la signature donnée est  *)
-  (* contenue dans le fichier de signatures. *)
-  if Util.digest_sig conf then
-    match p_getenv conf.env "m" with
-    [ Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
-    | Some mode -> ()
-    | None -> () ]
-  else ()
+  (* On passe en mode API, i.e. que les exceptions API sont levées. *)
+  let () = Api_conf.set_mode_api () in
+  match p_getenv conf.env "m" with
+  [ Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
+  | Some mode -> ()
+  | None -> () ]
 ;
 
 value extract_henv conf base =

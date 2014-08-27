@@ -144,6 +144,15 @@ value print_return conf =
 ;
 
 value print_err_unknown conf base (f, s, o) =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf "%s: <strong>%s.%d %s</strong>\n"
+        (capitale (transl conf "unknown person")) f o s
+      in
+      raise (ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -714,6 +723,29 @@ value print_warnings_and_miscs conf base (wl, ml) =
 ;
 
 value error conf base x =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        match x with
+        [ AlreadyDefined p ->
+            Printf.sprintf
+              (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+              ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+                 p_surname base p ^ "\"")
+              (fun _ ->
+                 Printf.sprintf "%s %s" (sou base (get_first_name p))
+                   (sou base (get_surname p)))
+              (fun _ -> ".")
+        | OwnAncestor p ->
+            Printf.sprintf "%s\n%s" (print_someone_strong conf base p)
+              (transl conf "would be his/her own ancestor")
+        | BadSexOfMarriedPerson p ->
+            Printf.sprintf "%s."
+              (capitale (transl conf "cannot change sex of a married person")) ]
+      in
+      raise (ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -788,6 +820,17 @@ value error_locked conf =
 ;
 
 value error_digest conf =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf
+          (fcapitale
+             (ftransl conf "\
+the base has changed; do \"back\", \"reload\", and refill the form"))
+      in
+      raise (ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -816,6 +859,18 @@ value get var key env =
 value get_number var key env = p_getint env (var ^ "_" ^ key);
 
 value bad_date conf d =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        (Printf.sprintf "%s:\n" (capitale (transl conf "incorrect date"))) ^
+        (match d with
+         [ {day = 0; month = 0; year = a} -> Printf.sprintf "%d" a
+         | {day = 0; month = m; year = a} -> Printf.sprintf "%d/%d" m a
+         | {day = j; month = m; year = a} -> Printf.sprintf "%d/%d/%d" j m a ])
+      in
+      raise (ModErrApi err)
+    else ()
+  in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -1008,6 +1063,21 @@ value text_of_var conf =
 ;
 
 value print_create_conflict conf base p var =
+  let _api =
+    if Api_conf.mode_api.val then
+      let err =
+        Printf.sprintf
+          (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+          ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+             p_surname base p ^ "\" (" ^ text_of_var conf var ^ ")")
+          (fun _ ->
+             Printf.sprintf "%s %s" (sou base (get_first_name p))
+               (sou base (get_surname p)))
+          (fun _ -> ".")
+      in
+      raise (ModErrApi err)
+    else ()
+  in
   let text = text_of_var conf var in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
