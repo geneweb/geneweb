@@ -45,3 +45,6 @@ src/update_nldb.opt
 
 tools/Makefile.inc
 tools/Makefile.ocaml
+
+api/service/convert_dico_place.opt
+api/service/lib/piqilib/.gitignore
