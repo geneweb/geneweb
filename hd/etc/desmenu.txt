@@ -70,19 +70,6 @@ function no_options () {
   [*to the %s generation:::xx]%nn;
 %end;
 
-%if;not cancel_links;
-  <table style="float:%right;"><tr><td>
-    %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
-    %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
-%end;
-
 
 
 <form method="get" action="%action;">
