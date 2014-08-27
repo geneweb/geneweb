@@ -9,6 +9,10 @@ open Gwdb;
 open Hutil;
 open Util;
 
+(* Ajout pour l'API *)
+exception ModErrApi of string;
+
+
 exception ModErr;
 type create_info =
   { ci_birth_date : option date;

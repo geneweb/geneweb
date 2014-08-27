@@ -12,3 +12,10 @@ value notify : config -> base -> string -> unit;
 
 value print : config -> base -> unit;
 value print_search : config -> base -> unit;
+
+
+(* Ajout pour l'API *)
+value line_fields :
+  string -> option (string * string * string * option string);
+value rev_input_line :
+  in_channel -> int -> (ref string * ref int) -> (string * int);

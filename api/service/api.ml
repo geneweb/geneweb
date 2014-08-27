@@ -952,7 +952,7 @@ let print_all_full_person conf base =
 
   Util.html conf ;
   Util.nl ();
-  Wserver.wprint "Gagné !!!";
+  WserverApi.wprint "Gagné !!!";
 ;;
 
 

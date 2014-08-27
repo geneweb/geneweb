@@ -2,3 +2,9 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 value opendb : string -> Dbdisk.dsk_base;
+
+(* Ajout pour l'API *)
+type synchro_patch =
+  { synch_list : mutable list (string * list int * list int) }
+;
+value input_synchro : string -> synchro_patch;

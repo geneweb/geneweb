@@ -60,7 +60,7 @@ value make_senv conf base =
 
 value family_m conf base =
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
-  let () = Update.set_mode_api () in
+  let () = Api_conf.set_mode_api () in
   match p_getenv conf.env "m" with
   (*[ Some "API_ADD_FAMILY" -> Api_update_family.print_add conf base
   | Some "API_ADD_PERSON" -> Api_update_person.print_add conf base*)
@@ -136,7 +136,7 @@ value family_m conf base =
 
 value family_m_nobase conf =
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
-  let () = Update.set_mode_api () in
+  let () = Api_conf.set_mode_api () in
   match p_getenv conf.env "m" with
   [ Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
   | Some mode -> ()

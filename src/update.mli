@@ -56,3 +56,23 @@ value reconstitute_date : config -> string -> option date;
 value print_someone : config -> base -> person -> unit;
 
 value update_conf : config -> config;
+
+
+(* Ajout pour l'API *)
+(* Erreurs possibles :
+     - "UnknownPerson"
+     - "AlreadyDefined"
+     - "OwnAncestor"
+     - "BadSexOfMarriedPerson"
+     - "BaseChanged"
+     - "BadDateFormat"
+     - "CreateConflictOcc"
+     - "AlreadyHasParent"
+     - "FatherShouldBeMale"
+     - "MotherShouldBeFemale"
+     - "Disconnected"
+     - "error"
+*)
+exception ModErrApi of string;
+value bad_date : config -> dmy -> 'a;
+value check_greg_day : config -> dmy -> unit;
