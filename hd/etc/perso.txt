@@ -27,23 +27,6 @@
 %( Added a div with an 'empty event' to handle the modify menu.              %)
 <div onclick="void(0);">
 
-%if;not cancel_links;
-  <table style="float:%right;">
-    <tr>
-      <td>
-        %if;(referer != "")
-          <a href="%referer;"><img
-           src="%image_prefix;/left.png"%wid_hei;left.png; 
-           style="border: 0" alt="&lt;&lt;" title="&lt;&lt;"%/></a>
-        %end;
-        <a href="%prefix;"><img%sp;
-        src="%image_prefix;/up.png"%wid_hei;up.png; 
-        style="border: 0" alt="^^" title="^^"%/></a>
-      </td>
-    </tr>
-  </table>
-%end;
-
 
 %import;perso_utils
 

@@ -5,6 +5,23 @@
 
 %include.menubar;
 
+%if;not cancel_links;
+  <table style="float:%right;">
+    <tr>
+      <td>
+        %if;(referer != "")
+          <a href="%referer;"><img
+           src="%image_prefix;/left.png"%wid_hei;left.png; 
+           style="border: 0" alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+        %end;
+        <a href="%prefix;"><img%sp;
+        src="%image_prefix;/up.png"%wid_hei;up.png; 
+        style="border: 0" alt="^^" title="^^"%/></a>
+      </td>
+    </tr>
+  </table>
+%end;
+
 <h1>
   %apply;image_MF("self", "")
   %if;has_public_name;
