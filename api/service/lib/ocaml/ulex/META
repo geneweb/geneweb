@@ -1,0 +1,7 @@
+version = "1.1"
+requires = "camlp4"
+description = "Runtime support for ulex"
+archive(byte) = "ulexing.cma"
+archive(native) = "ulexing.cmxa"
+archive(syntax,toploop) = "pa_ulex.cma ulexing.cma"
+archive(syntax,preprocessor) = "pa_ulex.cma"

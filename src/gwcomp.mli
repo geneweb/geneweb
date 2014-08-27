@@ -33,3 +33,6 @@ value no_fail : ref bool;
 value comp_families : string -> unit;
 value no_picture : ref bool;
 value create_all_keys : ref bool;
+
+(* Ajout pour l'API *)
+value date_of_string : string -> int -> option date;

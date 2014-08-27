@@ -725,61 +725,61 @@ let rec infer_surname conf base p ifam =
           if get_sex sp = Male then infer_surname conf base sp None
           else ""
       | None ->
-      (* On prend le nom de la fratrie parce que y'a de *)
-      (* grande chance que ce soit le même.             *)
-      let fam = get_family p in
-      if Array.length fam > 0 then
-        begin
-          let has_children =
-            List.exists
-              (fun ifam ->
-                let des = foi base ifam in
-                Array.length (get_children des) > 0)
-              (Array.to_list fam)
-          in
-          if has_children then
+          (* On prend le nom de la fratrie parce que y'a de *)
+          (* grande chance que ce soit le même.             *)
+          let fam = get_family p in
+          if Array.length fam > 0 then
             begin
-              let all_children_surname =
-                List.fold_left
-                  (fun acc ifam ->
-                    let fam = foi base ifam in
-                    let names =
-                      List.fold_left
-                        (fun accu ip ->
-                          let child = poi base ip in
-                          sou base (get_surname child) :: accu)
-                        [] (Array.to_list (get_children fam))
-                    in
-                    names :: acc)
-                  [] (Array.to_list fam)
+              let has_children =
+                List.exists
+                  (fun ifam ->
+                    let des = foi base ifam in
+                    Array.length (get_children des) > 0)
+                  (Array.to_list fam)
               in
-              let all_children_surname = List.flatten all_children_surname in
-              let (all_children_surname, name) =
-                match all_children_surname with
-                | [] -> (false, "")
-                | [x] -> (true, x)
-                | x :: l ->
-                    let x_crush = Name.crush_lower x in
-                    if List.for_all (fun n -> Name.crush_lower n = x_crush) l then (true, x)
-                    else (false, "")
-              in
-              (* On ne fait pas de recherche métaphone *)
-              (* car on est dans le cas d'une femme.   *)
-              if all_children_surname then name
-              else ""
+              if has_children then
+                begin
+                  let all_children_surname =
+                    List.fold_left
+                      (fun acc ifam ->
+                        let fam = foi base ifam in
+                        let names =
+                          List.fold_left
+                            (fun accu ip ->
+                              let child = poi base ip in
+                              sou base (get_surname child) :: accu)
+                            [] (Array.to_list (get_children fam))
+                        in
+                        names :: acc)
+                      [] (Array.to_list fam)
+                  in
+                  let all_children_surname = List.flatten all_children_surname in
+                  let (all_children_surname, name) =
+                    match all_children_surname with
+                    | [] -> (false, "")
+                    | [x] -> (true, x)
+                    | x :: l ->
+                        let x_crush = Name.crush_lower x in
+                        if List.for_all (fun n -> Name.crush_lower n = x_crush) l then (true, x)
+                        else (false, "")
+                  in
+                  (* On ne fait pas de recherche métaphone *)
+                  (* car on est dans le cas d'une femme.   *)
+                  if all_children_surname then name
+                  else ""
+                end
+              else
+                if Array.length (get_family p) = 1 then
+                  let fam = get_family p in
+                  let ifam = fam.(0) in
+                  let fam = foi base ifam in
+                  let isp = Gutil.spouse (get_key_index p) fam in
+                  let sp = poi base isp in
+                  if sou base (get_surname sp) = "?" then ""
+                  else sou base (get_surname sp)
+                else ""
             end
-          else
-            if Array.length (get_family p) = 1 then
-              let fam = get_family p in
-              let ifam = fam.(0) in
-              let fam = foi base ifam in
-              let isp = Gutil.spouse (get_key_index p) fam in
-              let sp = poi base isp in
-              if sou base (get_surname sp) = "?" then ""
-              else sou base (get_surname sp)
-            else ""
-        end
-      else ""
+          else ""
 ;;
 
 
@@ -2778,8 +2778,8 @@ let check_input_person conf mod_p =
       " " ^ mod_p.Mwrite.Person.lastname
   in
   let () =
-  if mod_p.Mwrite.Person.lastname = "" &&
-     mod_p.Mwrite.Person.firstname = ""
+    if mod_p.Mwrite.Person.lastname = "" &&
+       mod_p.Mwrite.Person.firstname = ""
     then
       List.fold_right
         (fun evt () ->
@@ -2802,7 +2802,7 @@ let check_input_person conf mod_p =
           | None -> ()))
         mod_p.Mwrite.Person.pevents ()
     else if mod_p.Mwrite.Person.lastname <> "" &&
-       mod_p.Mwrite.Person.firstname <> ""
+            mod_p.Mwrite.Person.firstname <> ""
     then
       if mod_p.Mwrite.Person.sex = `unknown then
         let err =
@@ -2811,14 +2811,14 @@ let check_input_person conf mod_p =
         in
         raise (Update.ModErrApi err)
       else ()
-  else
-    let err =
+    else
+      let err =
         if mod_p.Mwrite.Person.lastname = "" then
           transl conf "surname missing" ^ ": " ^ designation ()
         else
           transl conf "first name missing" ^ ": " ^ designation ()
-    in
-    raise (Update.ModErrApi err)
+      in
+      raise (Update.ModErrApi err)
   in
   ()
 ;;
@@ -3037,11 +3037,11 @@ let print_add_first_fam_ok conf base =
   let resp =
     try
       begin
-  (* On crée la famille avec les parents. *)
-  let fam_asc =
-    let family =
-      Api_update_util.piqi_empty_family conf base (Adef.ifam_of_int (-1))
-    in
+        (* On crée la famille avec les parents. *)
+        let fam_asc =
+          let family =
+            Api_update_util.piqi_empty_family conf base (Adef.ifam_of_int (-1))
+          in
           (* On ré-initialise un certain nombre de valeurs, *)
           (* surtout si c'est des personnes vides.          *)
           family.Mwrite.Family.father.Mwrite.Person.digest <- "";
@@ -3056,15 +3056,15 @@ let print_add_first_fam_ok conf base =
           family.Mwrite.Family.mother.Mwrite.Person.occ <- None;
           family.Mwrite.Family.mother.Mwrite.Person.access <- `access_iftitles;
 
-    (* On remplace les parents. *)
-    if mod_father.Mwrite.Person.lastname = "" &&
-       mod_father.Mwrite.Person.firstname = ""
-    then ()
-    else family.Mwrite.Family.father <- mod_father;
-    if mod_mother.Mwrite.Person.lastname = "" &&
-       mod_mother.Mwrite.Person.firstname = ""
-    then ()
-    else family.Mwrite.Family.mother <- mod_mother;
+          (* On remplace les parents. *)
+          if mod_father.Mwrite.Person.lastname = "" &&
+             mod_father.Mwrite.Person.firstname = ""
+          then ()
+          else family.Mwrite.Family.father <- mod_father;
+          if mod_mother.Mwrite.Person.lastname = "" &&
+             mod_mother.Mwrite.Person.firstname = ""
+          then ()
+          else family.Mwrite.Family.mother <- mod_mother;
           (* Les index négatifs ne marchent pas ! *)
           family.Mwrite.Family.index <- Int32.of_int 0;
           family.Mwrite.Family.father.Mwrite.Person.index <- Int32.of_int 0;
@@ -3072,21 +3072,21 @@ let print_add_first_fam_ok conf base =
           (* On met à jour les sexes. *)
           family.Mwrite.Family.father.Mwrite.Person.sex <- `male;
           family.Mwrite.Family.mother.Mwrite.Person.sex <- `female;
-    (* On met à jour la famille avec l'enfant. *)
-    let child =
-      Mwrite.Person_link#{
-        create_link = `create_default_occ;
-        index = mod_p.Mwrite.Person.index;
-        sex = mod_p.Mwrite.Person.sex;
-        lastname = mod_p.Mwrite.Person.lastname;
-        firstname = mod_p.Mwrite.Person.firstname;
-        occ = mod_p.Mwrite.Person.occ;
-        dates = None;
-      }
-    in
-    family.Mwrite.Family.children <- [child];
-    family
-  in
+          (* On met à jour la famille avec l'enfant. *)
+          let child =
+            Mwrite.Person_link#{
+              create_link = `create_default_occ;
+              index = mod_p.Mwrite.Person.index;
+              sex = mod_p.Mwrite.Person.sex;
+              lastname = mod_p.Mwrite.Person.lastname;
+              firstname = mod_p.Mwrite.Person.firstname;
+              occ = mod_p.Mwrite.Person.occ;
+              dates = None;
+            }
+          in
+          family.Mwrite.Family.children <- [child];
+          family
+        in
 
         (* Ajout de fam_asc. *)
         let (all_wl, all_hr) =
@@ -3102,13 +3102,13 @@ let print_add_first_fam_ok conf base =
               | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
               | Api_update_util.UpdateErrorConflict c ->
                   raise (Api_update_util.ModErrApiConflict c)
-    in
+            in
             (* On met à jour l'index. *)
             let () =
               let (sn, fn) =
                 (mod_p.Mwrite.Person.lastname,
                  mod_p.Mwrite.Person.firstname)
-  in
+              in
               let occ =
                 match mod_p.Mwrite.Person.occ with
                 | None -> 0
@@ -3121,7 +3121,7 @@ let print_add_first_fam_ok conf base =
             in
             (all_wl, all_hr)
           else
-  (* On ajoute la famille avec les parents. *)
+            (* On ajoute la famille avec les parents. *)
             let (all_wl, all_hr) =
               match compute_add_family_ok conf base !ip fam_asc with
               | Api_update_util.UpdateSuccess (wl, hr) -> (wl, hr)
@@ -3129,44 +3129,44 @@ let print_add_first_fam_ok conf base =
               | Api_update_util.UpdateErrorConflict c ->
                   raise (Api_update_util.ModErrApiConflict c)
             in
-  (* On modifie la personne "principale". *)
-  let (all_wl, all_hr) =
-    match fam_asc.Mwrite.Family.children with
-    | [create_child] ->
-        let (sn, fn) =
-          (mod_p.Mwrite.Person.lastname,
-           mod_p.Mwrite.Person.firstname)
-        in
-        let occ =
-          match create_child.Mwrite.Person_link.occ with
-          | None -> 0
-          | Some occ -> Int32.to_int occ
-        in
-        (match person_of_key base fn sn occ with
-        | Some ip_child ->
+            (* On modifie la personne "principale". *)
+            let (all_wl, all_hr) =
+              match fam_asc.Mwrite.Family.children with
+              | [create_child] ->
+                  let (sn, fn) =
+                    (mod_p.Mwrite.Person.lastname,
+                     mod_p.Mwrite.Person.firstname)
+                  in
+                  let occ =
+                    match create_child.Mwrite.Person_link.occ with
+                    | None -> 0
+                    | Some occ -> Int32.to_int occ
+                  in
+                  (match person_of_key base fn sn occ with
+                  | Some ip_child ->
                       mod_p.Mwrite.Person.index <-
                         Int32.of_int (Adef.int_of_iper ip_child);
                       mod_p.Mwrite.Person.occ <-
                         create_child.Mwrite.Person_link.occ;
-            (* On calcul le digest maintenant que l'enfant est créé. *)
-            let child = poi base ip_child in
+                      (* On calcul le digest maintenant que l'enfant est créé. *)
+                      let child = poi base ip_child in
                       let digest =
                         Update.digest_person (UpdateInd.string_person_of base child)
                       in
-            mod_p.Mwrite.Person.digest <- digest;
-            (match Api_update_person.print_mod conf base mod_p with
+                      mod_p.Mwrite.Person.digest <- digest;
+                      (match Api_update_person.print_mod conf base mod_p with
                       | Api_update_util.UpdateSuccess (wl, hr) ->
                           (all_wl @ wl, all_hr @ hr)
-            | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
+                      | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
                       | Api_update_util.UpdateErrorConflict c ->
                           raise (Api_update_util.ModErrApiConflict c))
                   | None -> failwith "ErrorAddFirstFamNoChildFound")
-    | _ -> failwith "ErrorAddFirstFamNoChild"
-  in
+              | _ -> failwith "ErrorAddFirstFamNoChild"
+            in
             (all_wl, all_hr)
         in
 
-  (* Normalement, on a réussi à mettre à jour l'ip de la personne. *)
+        (* Normalement, on a réussi à mettre à jour l'ip de la personne. *)
         let () = ip := Int32.to_int mod_p.Mwrite.Person.index in
         let () = ifam := Int32.to_int fam_asc.Mwrite.Family.index in
 
@@ -3247,7 +3247,7 @@ let print_add_first_fam_ok conf base =
           family
         in
 
-  (* On ajoute la famille avec les enfants. *)
+        (* On ajoute la famille avec les enfants. *)
         (* S'il n'y a pas de descendance, on ne fait pas l'ajout. *)
         let (all_wl, all_hr) =
           if (mod_spouse.Mwrite.Person.firstname = "" &&

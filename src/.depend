@@ -12,6 +12,12 @@ alln.cmo: ../wserver/wserver.cmi buff.cmo config.cmi def.cmi gutil.cmi \
     gwdb.cmi hutil.cmi mutil.cmi name.cmi util.cmi
 alln.cmx: ../wserver/wserver.cmx buff.cmx config.cmi def.cmi gutil.cmx \
     gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx
+api_wiki.cmo: ../wserver/wserver.cmi buff.cmo config.cmi gutil.cmi \
+    hutil.cmi iovalue.cmi mutil.cmi notesLinks.cmi secure.cmi \
+    templ.cmi update.cmi util.cmi \
+api_wiki.cmx: ../wserver/wserver.cmx buff.cmx config.cmi gutil.cmx \
+    hutil.cmx iovalue.cmx mutil.cmx notesLinks.cmx secure.cmx \
+    templ.cmx update.cmx util.cmx \
 birthDeath.cmo: ../wserver/wserver.cmi adef.cmi checkItem.cmi config.cmi \
     date.cmi def.cmi gwdb.cmi hutil.cmi num.cmi templ.cmi util.cmi
 birthDeath.cmx: ../wserver/wserver.cmx adef.cmx checkItem.cmx config.cmi \

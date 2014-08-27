@@ -31,3 +31,13 @@ value before_date : dmy -> dmy -> bool;
 value get_wday : config -> date -> string;
 
 value compare_date : date -> date -> int;
+
+
+(* Ajout pour l'API *)
+value death_symbol : config -> string;
+value string_of_dmy : config -> dmy -> string;
+value string_of_prec_dmy : config -> string -> string -> dmy -> string;
+value gregorian_precision : config -> dmy -> string;
+value french_month : config -> int -> string;
+value code_french_year : config -> int -> string;
+value code_hebrew_date : config -> int -> int -> int -> string;

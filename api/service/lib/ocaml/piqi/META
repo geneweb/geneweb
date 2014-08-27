@@ -1,0 +1,48 @@
+version = "0.5.7-dev"
+description = "Piqi - data serialization system"
+
+package "ulex" (
+  version = "1.1"
+  requires = "camlp4"
+  description = "Runtime support for ulex"
+  archive(byte) = "ulexing.cma"
+  archive(native) = "ulexing.cmxa"
+  archive(syntax,toploop) = "pa_ulex.cma ulexing.cma"
+  archive(syntax,preprocessor) = "pa_ulex.cma"
+)
+
+package "easy-format" (
+  version = "1.0.0"
+  name = "easy-format"
+  description = "Indentation made easy(ier)"
+  archive(byte)    = "easy_format.cmo"
+  archive(native)  = "easy_format.cmx"
+)
+
+package "xmlm" (
+  version = "1.0.2"
+  description = "Streaming XML input/output for OCaml"
+  archive(byte) = "xmlm.cmo"
+  archive(native) = "xmlm.cmx"
+)
+
+package "syntax" (
+  requires = "camlp4"
+  description = "Useful Camlp4 macro for dealing with OCaml types genereated by 'piqic ocaml'"
+  archive(syntax,toploop) = "pa_labelscope.cmo pa_openin.cmo"
+  archive(syntax,preprocessor) = "pa_labelscope.cmo pa_openin.cmo"
+)
+
+package "runtime" (
+  description = "Runtime support for wire parsers and generators produced by 'piqic ocaml'"
+  archive(byte) = "piqirun.cma"
+  archive(native) = "piqirun.cmxa"
+)
+
+package "lib" (
+  description = "The Piqi library"
+  requires = "piqi.ulex piqi.easy-format piqi.xmlm piqi.runtime"
+  archive(byte) = "piqilib.cma"
+  archive(native) = "piqilib.cmxa"
+)
+
