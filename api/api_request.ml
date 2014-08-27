@@ -60,7 +60,7 @@ value make_senv conf base =
 
 value family_m conf base =
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
-  let () = Api_conf.set_mode_api () in
+  let () = Update.set_mode_api () in
   match p_getenv conf.env "m" with
   (*[ Some "API_ADD_FAMILY" -> Api_update_family.print_add conf base
   | Some "API_ADD_PERSON" -> Api_update_person.print_add conf base*)
@@ -73,71 +73,70 @@ value family_m conf base =
   | Some "API_CLOSE_PERSONS" -> Api_graph.print_close_person_relations conf base
   | Some "API_CPL_REL" -> Api_graph.print_cpl_relation conf base
 (*
-    | Some "API_DELETE_FAMILY" -> Api_update_family.print_del conf base
-    | Some "API_DELETE_PERSON" -> Api_update_person.print_del conf base
+  | Some "API_DELETE_FAMILY" -> Api_update_family.print_del conf base
+  | Some "API_DELETE_PERSON" -> Api_update_person.print_del conf base
 *)
-    | Some "API_GRAPH_ASC" -> Api_graph.print_graph_asc conf base
-    | Some "API_GRAPH_DESC" -> Api_graph.print_graph_desc conf base
-    | Some "API_GRAPH_REL" -> Api_graph.print_graph_rel conf base
-    | Some "API_FIND_SOSA" -> Api.print_find_sosa conf base
-    | Some "API_INFO_BASE" -> Api.print_info_base conf base
-    | Some "API_INFO_IND" -> Api.print_info_ind conf base
-    | Some "API_IMAGE" -> Api.print_img conf base
-    | Some "API_IMAGE_EXT" -> Api.print_img_ext conf base
-    | Some "API_IMAGE_ALL" -> Api.print_img_all conf base
-    | Some "API_IMAGE_PERSON" -> Api.print_img_person conf base
-    | Some "API_IMAGE_UPDATE" when conf.wizard -> Api.print_updt_image conf base
-    | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
-    | Some "API_LOOP_BASE" -> Api.print_loop conf base
-    | Some "API_NOTIFICATION_BIRTHDAY" -> Api.print_notification_birthday conf base
-    | Some "API_PRINT_INDEX" -> Api.print_all_full_person conf base
-    | Some "API_PRINT_EXPORT" -> Api.print_export conf base
-    | Some "API_PRINT_EXPORT_SEARCH" -> Api.print_export_search conf base
-    | Some "API_PRINT_SYNCHRO" -> Api.print_synchro_patch_mobile conf base
-    | Some "API_REF_PERSON_FROM_ID" -> Api.print_ref_person_from_ip conf base
-    | Some "API_REMOVE_IMAGE_EXT" when conf.wizard -> Api.print_remove_image_ext conf base
-    | Some "API_REMOVE_IMAGE_EXT_ALL" when conf.wizard -> Api.print_remove_image_ext_all conf base
-    | Some "API_SEARCH" -> Api_search.print_search conf base
+  | Some "API_GRAPH_ASC" -> Api_graph.print_graph_asc conf base
+  | Some "API_GRAPH_DESC" -> Api_graph.print_graph_desc conf base
+  | Some "API_GRAPH_REL" -> Api_graph.print_graph_rel conf base
+  | Some "API_FIND_SOSA" -> Api.print_find_sosa conf base
+  | Some "API_INFO_BASE" -> Api.print_info_base conf base
+  | Some "API_INFO_IND" -> Api.print_info_ind conf base
+  | Some "API_IMAGE" -> Api.print_img conf base
+  | Some "API_IMAGE_EXT" -> Api.print_img_ext conf base
+  | Some "API_IMAGE_ALL" -> Api.print_img_all conf base
+  | Some "API_IMAGE_PERSON" -> Api.print_img_person conf base
+  | Some "API_IMAGE_UPDATE" when conf.wizard -> Api.print_updt_image conf base
+  | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
+  | Some "API_LOOP_BASE" -> Api.print_loop conf base
+  | Some "API_NOTIFICATION_BIRTHDAY" -> Api.print_notification_birthday conf base
+  | Some "API_PRINT_INDEX" -> Api.print_all_full_person conf base
+  | Some "API_PRINT_EXPORT" -> Api.print_export conf base
+  | Some "API_PRINT_EXPORT_SEARCH" -> Api.print_export_search conf base
+  | Some "API_PRINT_SYNCHRO" -> Api.print_synchro_patch_mobile conf base
+  | Some "API_REF_PERSON_FROM_ID" -> Api.print_ref_person_from_ip conf base
+  | Some "API_REMOVE_IMAGE_EXT" when conf.wizard -> Api.print_remove_image_ext conf base
+  | Some "API_REMOVE_IMAGE_EXT_ALL" when conf.wizard -> Api.print_remove_image_ext_all conf base
+  | Some "API_SEARCH" -> Api_search.print_search conf base
 (*
-    | Some "API_UPDATE_PERSON" -> Api_update_person.print_mod conf base
-    | Some "API_UPDATE_FAMILY" -> Api_update_family.print_mod conf base
+  | Some "API_UPDATE_PERSON" -> Api_update_person.print_mod conf base
+  | Some "API_UPDATE_FAMILY" -> Api_update_family.print_mod conf base
 *)
-    | Some "API_GRAPH_TREE" -> Api_saisie_read.print_graph_tree conf base
-    | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
+  | Some "API_GRAPH_TREE" -> Api_saisie_read.print_graph_tree conf base
+  | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
 
-    | Some "API_AUTO_COMPLETE" when conf.wizard -> Api_saisie_write.print_auto_complete conf base
-    | Some "API_GET_CONFIG" when conf.wizard -> Api_saisie_write.print_config conf base
-    | Some "API_PERSON_SEARCH_LIST" when conf.wizard -> Api_saisie_write.print_person_search_list conf base
-    | Some "API_GET_PERSON_SEARCH_INFO" when conf.wizard -> Api_saisie_write.print_person_search_info conf base
+  | Some "API_AUTO_COMPLETE" when conf.wizard -> Api_saisie_write.print_auto_complete conf base
+  | Some "API_GET_CONFIG" when conf.wizard -> Api_saisie_write.print_config conf base
+  | Some "API_PERSON_SEARCH_LIST" when conf.wizard -> Api_saisie_write.print_person_search_list conf base
+  | Some "API_GET_PERSON_SEARCH_INFO" when conf.wizard -> Api_saisie_write.print_person_search_info conf base
 
-    | Some "API_ADD_CHILD" when conf.wizard -> Api_saisie_write.print_add_child conf base
-    | Some "API_ADD_CHILD_OK" when conf.wizard -> Api_saisie_write.print_add_child_ok conf base
-    | Some "API_ADD_FAMILY" when conf.wizard -> Api_saisie_write.print_add_family conf base
-    | Some "API_ADD_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_add_family_ok conf base
-    | Some "API_ADD_FIRST_FAM_OK" when conf.wizard -> Api_saisie_write.print_add_first_fam_ok conf base
-    | Some "API_ADD_PARENTS" when conf.wizard -> Api_saisie_write.print_add_parents conf base
-    | Some "API_ADD_PARENTS_OK" when conf.wizard -> Api_saisie_write.print_add_parents_ok conf base
-    | Some "API_ADD_PERSON_OK" when conf.wizard -> Api_saisie_write.print_add_ind_ok conf base
-    | Some "API_ADD_PERSON_START_OK" when conf.wizard -> Api_saisie_write.print_add_ind_start_ok conf base
-    | Some "API_ADD_SIBLING" when conf.wizard -> Api_saisie_write.print_add_sibling conf base
-    | Some "API_ADD_SIBLING_OK" when conf.wizard -> Api_saisie_write.print_add_sibling_ok conf base
-    | Some "API_EDIT_FAMILY_REQUEST" when conf.wizard -> Api_saisie_write.print_mod_family_request conf base
-    | Some "API_EDIT_FAMILY" when conf.wizard -> Api_saisie_write.print_mod_family conf base
-    | Some "API_EDIT_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_mod_family_ok conf base
-    | Some "API_EDIT_PERSON" when conf.wizard -> Api_saisie_write.print_mod_ind conf base
-    | Some "API_EDIT_PERSON_OK" when conf.wizard -> Api_saisie_write.print_mod_ind_ok conf base
-    | Some "API_DEL_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_del_fam_ok conf base
-    | Some "API_DEL_PERSON_OK" when conf.wizard -> Api_saisie_write.print_del_ind_ok conf base
+  | Some "API_ADD_CHILD" when conf.wizard -> Api_saisie_write.print_add_child conf base
+  | Some "API_ADD_CHILD_OK" when conf.wizard -> Api_saisie_write.print_add_child_ok conf base
+  | Some "API_ADD_FAMILY" when conf.wizard -> Api_saisie_write.print_add_family conf base
+  | Some "API_ADD_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_add_family_ok conf base
+  | Some "API_ADD_FIRST_FAM_OK" when conf.wizard -> Api_saisie_write.print_add_first_fam_ok conf base
+  | Some "API_ADD_PARENTS" when conf.wizard -> Api_saisie_write.print_add_parents conf base
+  | Some "API_ADD_PARENTS_OK" when conf.wizard -> Api_saisie_write.print_add_parents_ok conf base
+  | Some "API_ADD_PERSON_OK" when conf.wizard -> Api_saisie_write.print_add_ind_ok conf base
+  | Some "API_ADD_PERSON_START_OK" when conf.wizard -> Api_saisie_write.print_add_ind_start_ok conf base
+  | Some "API_ADD_SIBLING" when conf.wizard -> Api_saisie_write.print_add_sibling conf base
+  | Some "API_ADD_SIBLING_OK" when conf.wizard -> Api_saisie_write.print_add_sibling_ok conf base
+  | Some "API_EDIT_FAMILY_REQUEST" when conf.wizard -> Api_saisie_write.print_mod_family_request conf base
+  | Some "API_EDIT_FAMILY" when conf.wizard -> Api_saisie_write.print_mod_family conf base
+  | Some "API_EDIT_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_mod_family_ok conf base
+  | Some "API_EDIT_PERSON" when conf.wizard -> Api_saisie_write.print_mod_ind conf base
+  | Some "API_EDIT_PERSON_OK" when conf.wizard -> Api_saisie_write.print_mod_ind_ok conf base
+  | Some "API_DEL_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_del_fam_ok conf base
+  | Some "API_DEL_PERSON_OK" when conf.wizard -> Api_saisie_write.print_del_ind_ok conf base
 
-    | Some "API_CORRESPONDANCE" -> Api_db.print_correspondance conf base
-    | Some mode -> ()
-    | None -> () ]
-  else ()
+  | Some "API_CORRESPONDANCE" -> Api_db.print_correspondance conf base
+  | Some mode -> ()
+  | None -> () ]
 ;
 
 value family_m_nobase conf =
   (* On passe en mode API, i.e. que les exceptions API sont levées. *)
-  let () = Api_conf.set_mode_api () in
+  let () = Update.set_mode_api () in
   match p_getenv conf.env "m" with
   [ Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
   | Some mode -> ()
