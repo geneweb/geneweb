@@ -53,11 +53,11 @@
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
       <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
+       src="%image_prefix;/left.png"%wid_hei;left.png;
        alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
+    src="%image_prefix;/up.png"%wid_hei;up.png;
     alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
@@ -120,7 +120,7 @@
     %apply;togen(xx).
     </p>
     %apply;ancestors_by_list("self", xx)
-  
+
   %elseif;(evar.t = "H")
     %( horizontally %)
     %let;xx;
@@ -134,7 +134,7 @@
     %apply;ancestors_horizontally(
       "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
     </td></tr></table>
-  
+
   %elseif;(evar.t = "E" and evar.sort != "")
     %( list eclair sorted by date begin or number of individuals or number of events %)
     %empty_sorted_list;
@@ -157,7 +157,7 @@
         %and;%ancestor.nb_ind;
         %and;%ancestor.nb_events;
       %end;
-    %end;    
+    %end;
 
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togen(nb_gen).</p>
@@ -204,6 +204,7 @@
     </div>
 
     <table class="list_eclair_table">
+      <thead>
       <tr class="list_eclair_table_header">
         <th>[*surname/surnames]0</th>
         <th>[*place]</th>
@@ -212,6 +213,8 @@
         <th>[*nb individuals]</th>
         <th>[*nb events]</th>
       </tr>
+      </thead>
+      <tbody>
       %foreach;sorted_list_item;
         <tr>
           <td>%item.2;%item.3</td>
@@ -242,6 +245,7 @@
           <td align="center">%item.10;</td>
         </tr>
       %end;
+      </tbody>
     </table>
 
   %elseif;(evar.t = "E")
@@ -275,6 +279,7 @@
     </div>
 
     <table class="list_eclair_table">
+      <thead>
       <tr class="list_eclair_table_header">
         <th>[*surname/surnames]0</th>
         <th>[*place]</th>
@@ -283,6 +288,8 @@
         <th>[*nb individuals]</th>
         <th>[*nb events]</th>
       </tr>
+      </thead>
+      <tbody>
       %foreach;ancestor_surname(evar.v)
         <tr>
           <td>
@@ -317,8 +324,9 @@
           <td align="center">%ancestor.nb_events;</td>
         </tr>
       %end;
+      </tbody>
     </table>
-  
+
   %elseif;(evar.t = "F" and evar.sort = "on")
     %( surnames branch sorted by number of branches %)
     %empty_sorted_list;
@@ -335,11 +343,11 @@
         ancestor.date_begin.year,
         ancestor.date_end.prec,
         ancestor.date_end.year)
-    %end;    
-  
+    %end;
+
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togen(nb_gen).</p>
-  
+
     %if;(count > 100)
       <p>
         <span>[*number of branches] : </span>
@@ -350,7 +358,7 @@
         %end;
       </p>
     %end;
-  
+
     <p>[*help surname branch].</p>
     <div class="not_printable">
       <table class="display_search">
@@ -437,7 +445,7 @@
       %end;
     </ul>
     <p style="clear:both"></p>
-  
+
   %elseif;(evar.t = "F")
     %( surnames branch %)
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
@@ -459,12 +467,15 @@
       </table>
     </div>
     <table class="surname_branch_table">
+      <thead>
       <tr class="surname_branch_table_header">
         <th>[*surname/surnames]0</th>
         <th>[*nb branches]</th>
         <th>[*place]</th>
         <th>[*date/dates]0</th>
       </tr>
+      </thead>
+      <tbody>
       %foreach;ancestor_surname(evar.v)
         <tr>
           <td>
@@ -503,6 +514,7 @@
           </td>
         </tr>
       %end;
+      </tbody>
     </table>
   %end;
 %end;
