@@ -81,12 +81,12 @@
     %if;(count>0 and count>1)
       , [child/children]1%nn;
       %if;(count>1 and count>2)
-        <span style="font-size: 90%%">, [the grandchildren]</span>
+        <span style="font-size: 90%%">, [grandchildren]</span>
       %else
-        <span style="font-size: 90%%"> [and::the grandchildren]</span>
+        <span style="font-size: 90%%"> [and::grandchildren]</span>
       %end;
       %if;(count>2)
-        <span style="font-size: 80%%"> [and::the great-grandchildren]</span>
+        <span style="font-size: 80%%"> [and::great-grandchildren]</span>
       %end;
     %else;
       %if;has_children; [and::child/children]1%end;
@@ -141,7 +141,7 @@
                       <img width="13" height="13"%sp;
                         src="%image_prefix;/1pixel.png"  alt=""%/>%sp;
                       <em>%child;%child.title;%child.dates;</em>
-                    %end;
+                    %end;%sp;
                     <em>&nbsp;%apply;loc_long_married("child")</em>
                     %apply;short_display_person("spouse")
                     %if;(nb_children!=0)
