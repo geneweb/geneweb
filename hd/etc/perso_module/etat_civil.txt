@@ -5,10 +5,13 @@
   <!--  Portrait -->
   %if;has_image;
     <table border="%border;">
-    <tr><td>
-     <a href="%image_url;" target="_blank"><img
-      src="%image_url;"%image_size;
-      alt="[image/images]0" class="fiche_photo"%/></a></td><td valign="top">
+    <tr>
+      <td valign="top">
+        <a href="%image_url;" target="_blank">
+          <img src="%image_url;"%image_size; alt="[image/images]0" class="fiche_photo"%/>
+        </a>
+      </td>
+      <td valign="top">
   %end;
   <!--  <h3 class="etat_civil">[*etat civil]</h3> -->
   <ul>
