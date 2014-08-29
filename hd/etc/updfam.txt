@@ -204,7 +204,6 @@ function changeCalendar(e,v,m,c) {
          $(this).show();
        }
      });
-
   });
 </script>
 
@@ -504,10 +503,14 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;insert_fevent(xcnt)
-  <td>
-    <label>[*insert::|<input name="ins_eventxcnt_n" size="1" maxlength="1" value="1"%/></label>
-    <label> | event/events]<input type="checkbox" name="ins_eventxcnt" value="on"%/></label>
-  </td>
+  <table border="1">
+    <tr>
+      <td>
+        <label>[*insert::|<input name="ins_eventxcnt_n" size="1" maxlength="1" value="1"%/></label>
+        <label> | event/events]<input type="checkbox" name="ins_eventxcnt" value="on"%/></label>
+      </td>
+    </tr>
+  </table>
 %end;
 
 %define;insert_witness(xcnt, wcnt)
@@ -522,12 +525,11 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;one_witness(xcnt, wcnt)
+  <p></p>
   <table border="1" width=700px>
     <tr>
       <td>[*witness/witnesses]0</td>
     </tr>
-  </table>
-  <table border="1" width=700px>
     <tr>
       <td><label for="excnt_witnwcnt_fn">[*first name/first names]0</label></td>
       <td>
@@ -576,14 +578,14 @@ function changeCalendar(e,v,m,c) {
         %apply;selector_fevent(xcnt)
         <label id="fevent_label_selectorxcnt" style="display:none" class="other_evts">
           [or]0 [text]0&nbsp;:&nbsp;
-          <input name="e_namexcnt" size="40" maxlength="200" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt"%/>
+          <input name="e_namexcnt" size="40" maxlength="200" type="text" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt"%/>
         </label>
       </td>
     </tr>
     <tr>
       <td><label for="e_placexcnt">[*place]</label></td>
       <td>
-        <input name="e_placexcnt" size="40" maxlength="200" value="%event.e_place;"  id="e_placexcnt"%/>
+        <input name="e_placexcnt" size="40" maxlength="200" value="%event.e_place;" id="e_placexcnt"%/>
       </td>
     </tr>
   </table>
@@ -605,7 +607,7 @@ function changeCalendar(e,v,m,c) {
   %if;has_fwitness;
     %foreach;fwitness;
       %apply;one_witness(xcnt, wcnt)
-      %apply;insert_witness(xcnt, wcnt)
+      %if;is_last;%apply;insert_witness(xcnt, wcnt)%end;
     %end;
   %else;
     %apply;insert_witness(xcnt, "0")
@@ -769,19 +771,14 @@ function changeCalendar(e,v,m,c) {
   </div>
 
   <input type="checkbox" name="nsck" value="on "%if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/>[*no sexes check]<br%/><br%/>
-  <table border="1">
-    <tr>
-      %apply;insert_fevent("0")
-      %foreach;fevent;
-        </tr>
-        </table>
-        %apply;one_fevent(cnt)
-        <table border="1">
-          <tr>
-            %apply;insert_fevent(cnt)
-      %end
-    </tr>
-  </table>
+  %foreach;fevent;
+    %apply;one_fevent(cnt)
+    <p></p>
+    %if;is_last;
+      %apply;insert_fevent(cnt)
+      <p></p>
+    %end;
+  %end
 
   <h4><label for="comment">[*comment]</label></h4>
 
