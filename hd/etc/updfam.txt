@@ -151,95 +151,204 @@ function changeCalendar(e,v,m,c) {
 -->
 </script>
 
+<script type="text/javascript">
+  function show_label(d) {
+    var d_select = document.getElementById(d+'_select');
+    var d_or = document.getElementById(d+'_oryear');
+    var d_span_or = document.getElementById(d+'_oryear_sp');
+    var d_span_between = document.getElementById(d+'_yearint_sp');
+
+    d_or.style.display = 'none';
+    d_span_or.style.display = 'none';
+    d_span_between.style.display = 'none';
+
+    if (d_select.value == "oryear" || d_select.value == "yearint") {
+      d_or.style.display = 'inline';
+      if (d_select.value == "oryear") {
+        d_span_or.style.display = 'inline';
+      }
+      else {
+        d_span_between.style.display = 'inline';
+      }
+    }
+  }
+
+  function show_fevent_label(xxname, xcnt) {
+    var selector = document.getElementById('fevent_select' + xcnt);
+    var label = document.getElementById('fevent_label_selector' + xcnt);
+    var input = document.getElementById('e_name' + xcnt);
+    if (selector.value == "") {
+      if (xxname.charAt(0) == "#") {
+        input.value = "";
+      }
+      else {
+        input.value = xxname;
+      }
+    }
+    else {
+      input.value = selector.value;
+    }
+    if (selector.value == "" || selector.value.charAt(0) != "#") {
+      label.style.display = 'inline';
+    }
+    else {
+      label.style.display = 'none';
+    }
+  }
+
+  $(document).ready(function(){
+     //show evt perso
+     $(".other_evts").each(function(){
+       var inp = $(this).find("input").first();
+       if(inp.val().charAt(0) != "#" && inp.val() != ""){
+         $(this).show();
+       }
+     });
+
+  });
+</script>
+
 %include_perso_header;
 
-%define;date(xlab,xvar,xdate)
+%define;date(xlab,xvar,xdt,xcond)
   <table border="1" width=700px>
     <tr>
       <td>xlab</td>
       <td>
         %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
           <label>
-          [year/month/day]2
-          <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
-          </label><label>
-          [year/month/day]1
-          <span id="xvar_mm_sel"><input name="xvar_mm" size="2"%sp;
-           maxlength="2" value="%xdate.month;"%/></span></label><label>
-          [year/month/day]0
-          <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-           value="%xdate.year;"%/>
+            [year/month/day]2
+            <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
+          </label>
+          <label>
+            [year/month/day]1
+            <span id="xvar_mm_sel">
+              <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
+            </span>
+          </label>
+          <label>
+            [year/month/day]0
+            <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
           </label>
         %elseif;([ !dates order]0 = "mmddyyyy")
           <label>
-          [year/month/day]1
-          <span id="xvar_mm_sel"><input name="xvar_mm" size="2"%sp;
-           maxlength="2" value="%xdate.month;"%/></span></label>
+            [year/month/day]1
+            <span id="xvar_mm_sel">
+              <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
+            </span>
+          </label>
           <label>
-          [year/month/day]2
-          <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
-          </label><label>
-          [year/month/day]0
-          <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-           value="%xdate.year;"%/>
+            [year/month/day]2
+            <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
+          </label>
+          <label>
+            [year/month/day]0
+            <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
           </label>
         %else;
           <label>
-          [year/month/day]0
-          <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-           value="%xdate.year;"%/>
-          </label><label>
-          [year/month/day]1
-          <span id="xvar_mm_sel"><input name="xvar_mm" size="2"%sp;
-           maxlength="2" value="%xdate.month;"%/></span></label><label>
-          [year/month/day]2
-          <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
+            [year/month/day]0
+            <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
+          </label>
+          <label>
+            [year/month/day]1
+            <span id="xvar_mm_sel">
+              <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
+            </span>
+          </label>
+          <label>
+            [year/month/day]2
+            <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
           </label>
         %end;
       </td>
       <td>
-        <label>...[or]0 [text]0
-        <input name="xvar_text" size="15" maxlength="30"%sp;
-         value="%xdate.text;"%/></label>
+        ...
+        <label>
+          [or]0 [text]0
+          <input name="xvar_text" size="15" maxlength="30" value="%xdt.text;"xcond%/>
+        </label>
       </td>
     </tr>
   </table>
   <table border="1" width=700px>
     <tr>
-      <td>[*calendar/calendars]0
-        <select name="xvar_cal" onchange=%nn;
-         "changeCalendar('xvar_mm_sel','xvar_mm','%xdate.month;',this)">
-          <option value="G"%if;(xdate.calendar = "gregorian")%sp;
-           selected="selected"%end;>[*gregorian/julian/french/hebrew]0</option>
-          <option value="J"%if;(xdate.calendar = "julian")%sp;
-           selected="selected"%end;>[*gregorian/julian/french/hebrew]1</option>
-          <option value="F"%if;(xdate.calendar = "french")%sp;
-           selected="selected"%end;>[*gregorian/julian/french/hebrew]2</option>
-          <option value="H"%if;(xdate.calendar = "hebrew")%sp;
-           selected="selected"%end;>[*gregorian/julian/french/hebrew]3</option>
+      <td>
+        [*calendar/calendars]0
+        <select name="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
+                                          changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)"xcond>
+          <option value="G" %if;(xdt.calendar = "gregorian") selected="selected"%end;>
+            [*gregorian/julian/french/hebrew]0
+          </option>
+          <option value="J" %if;(xdt.calendar = "julian") selected="selected"%end;>
+            [*gregorian/julian/french/hebrew]1
+          </option>
+          <option value="F" %if;(xdt.calendar = "french") selected="selected"%end;>
+            [*gregorian/julian/french/hebrew]2
+          </option>
+          <option value="H" %if;(xdt.calendar = "hebrew") selected="selected"%end;>
+            [*gregorian/julian/french/hebrew]3
+          </option>
         </select>
       </td>
-      <td>[*precision]0
-        <select name="xvar_prec">
-          <option value="-"%if;(xdate.prec = "")%sp;
-           selected="selected"%end;>-</option>
-          <option value="sure"%if;(xdate.prec = "sure")%sp;
-           selected="selected"%end;>[*exact]0</option>
-          <option value="about"%if;(xdate.prec = "about")%sp;
-           selected="selected"%end;>[*about (date)]0</option>
-          <option value="maybe"%if;(xdate.prec = "maybe")%sp;
-           selected="selected"%end;>[*possibly (date)]0</option>
-          <option value="before"%if;(xdate.prec = "before")%sp;
-           selected="selected"%end;>[*before (date)]0</option>
-          <option value="after"%if;(xdate.prec = "after")%sp;
-           selected="selected"%end;>[*after (date)]0</option>
-          <option value="oryear"%if;(xdate.prec = "oryear")%sp;
-           selected="selected"%end;>&lt;- [*or] -&gt;</option>
-          <option value="yearint"%if;(xdate.prec = "yearint")%sp;
-           selected="selected"%end;>&lt;- [*between (date)] -&gt;</option>
+      <td>
+        [*precision]0
+        <select name="xvar_prec"xcond>
+          <option value="-" %if;(xdt.prec = "") selected="selected"%end;>-</option>
+          <option value="sure" %if;(xdt.prec = "sure") selected="selected"%end;>[*exact]0</option>
+          <option value="about" %if;(xdt.prec = "about") selected="selected"%end;>[*about (date)]0</option>
+          <option value="maybe" %if;(xdt.prec = "maybe") selected="selected"%end;>[*possibly (date)]0</option>
+          <option value="before" %if;(xdt.prec = "before") selected="selected"%end;>[*before (date)]0</option>
+          <option value="after" %if;(xdt.prec = "after") selected="selected"%end;>[*after (date)]0</option>
+          <option value="oryear" %if;(xdt.prec = "oryear") selected="selected"%end;>&lt;- [*or] -&gt;</option>
+          <option value="yearint" %if;(xdt.prec = "yearint") selected="selected"%end;>&lt;- [*between (date)] -&gt;</option>
         </select>
-        <input name="xvar_oryear" size="5" maxlength="5"%sp;
-         value="%xdate.oryear;"%/>
+        %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+          <label>
+            [year/month/day]2
+            <input name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
+          </label>
+          <label>
+            [year/month/day]1
+            <span id="xvar_ormonth_sel">
+              <input name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
+            </span>
+          </label>
+          <label>
+            [year/month/day]0
+            <input name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
+          </label>
+        %elseif;([ !dates order]0 = "mmddyyyy")
+          <label>
+            [year/month/day]1
+            <span id="xvar_ormonth_sel">
+              <input name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
+            </span>
+          </label>
+          <label>
+            [year/month/day]2
+            <input name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
+          </label>
+          <label>
+            [year/month/day]0
+            <input name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
+          </label>
+        %else;
+          <label>
+            [year/month/day]0
+            <input name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
+          </label>
+          <label>
+            [year/month/day]1
+            <span id="xvar_ormonth_sel">
+              <input name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
+            </span>
+          </label>
+          <label>
+            [year/month/day]2
+            <input name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
+          </label>
+        %end;
       </td>
     </tr>
   </table>
@@ -249,8 +358,16 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width=700px>
     <tr>
       <td><label for="xvar_src">[*source/sources]0</label></td>
-      <td><input name="xvar_src" size="40" maxlength="200"%sp;
-       value="%xx_src;" id="xvar_src"%/></td>
+      <td><input name="xvar_src" size="50" maxlength="200" value="%xx_src;" id="xvar_src"%/></td>
+    </tr>
+  </table>
+%end;
+
+%define;note(xvar,xx)
+  <table border="1" width=700px>
+    <tr>
+      <td><label for="xvar_note">[*note/notes]0</label></td>
+      <td><input name="xvar_note" size="50" maxlength="200" value="%xx_note;" id="xvar_note"%/></td>
     </tr>
   </table>
 %end;
@@ -259,59 +376,52 @@ function changeCalendar(e,v,m,c) {
   <td>
     %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
       <label>
-      [year/month/day]2
-      <input name="xvar_dd" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_day;"%/>
+        [year/month/day]2
+        <input name="xvar_dd" size="2" maxlength="2" value="%xx.create.kind_day;"%/>
       </label>
       <label>
-      [year/month/day]1
-      <input name="xvar_mm" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_month;"%/>
+        [year/month/day]1
+        <input name="xvar_mm" size="2" maxlength="2" value="%xx.create.kind_month;"%/>
       </label>
       <label>
-      [year/month/day]0
-      <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-       value="%xx.create.kind_year;"%/>
+        [year/month/day]0
+        <input name="xvar_yyyy" size="6" maxlength="6" value="%xx.create.kind_year;"%/>
       </label>
     %elseif;([ !dates order]0 = "mmddyyyy")
       <label>
-      [year/month/day]1
-      <input name="xvar_mm" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_month;"%/>
+        [year/month/day]1
+        <input name="xvar_mm" size="2" maxlength="2" value="%xx.create.kind_month;"%/>
       </label>
       <label>
-      [year/month/day]2
-      <input name="xvar_dd" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_day;"%/>
+        [year/month/day]2
+        <input name="xvar_dd" size="2" maxlength="2" value="%xx.create.kind_day;"%/>
       </label>
       <label>
-      [year/month/day]0
-      <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-       value="%xx.create.kind_year;"%/>
+        [year/month/day]0
+        <input name="xvar_yyyy" size="6" maxlength="6" value="%xx.create.kind_year;"%/>
       </label>
     %else;
       <label>
-      [year/month/day]0
-      <input name="xvar_yyyy" size="6" maxlength="6"%sp;
-       value="%xx.create.kind_year;"%/>
+        [year/month/day]0
+        <input name="xvar_yyyy" size="6" maxlength="6" value="%xx.create.kind_year;"%/>
       </label>
       <label>
-      [year/month/day]1
-      <input name="xvar_mm" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_month;"%/>
+        [year/month/day]1
+        <input name="xvar_mm" size="2" maxlength="2" value="%xx.create.kind_month;"%/>
       </label>
       <label>
-      [year/month/day]2
-      <input name="xvar_dd" size="2" maxlength="2"%sp;
-       value="%xx.create.kind_day;"%/>
+        [year/month/day]2
+        <input name="xvar_dd" size="2" maxlength="2" value="%xx.create.kind_day;"%/>
       </label>
     %end;
   </td>
-  %if;("verbose" = "true")<td><label for="xvar_pl">[*place]</label>%nn;
-  </td>%end;%nl;
+  %if;("verbose" = "true")
+    <td>
+      <label for="xvar_pl">[*place]</label>%nn;
+    </td>
+  %end;%nl;
   <td colspan="2">
-    <input name="xvar_pl" size="20" maxlength="200"%sp;
-     value="%xx.create.kind_place;" id="xvar_pl"%/>
+    <input name="xvar_pl" size="20" maxlength="200" value="%xx.create.kind_place;" id="xvar_pl"%/>
   </td>
 %end;
 
@@ -330,28 +440,23 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="paxcnt_fn">[*first name/first names]0</label></td>
       <td>
-        <input name="paxcnt_fn" size="40" maxlength="200"%sp;
-         value="%xx.first_name;" id="paxcnt_fn"%/>
+        <input name="paxcnt_fn" size="40" maxlength="200" value="%xx.first_name;" id="paxcnt_fn"%/>
       </td>
       <td><label for="paxcnt_occ">[*number]</label></td>
       <td>
-        <input name="paxcnt_occ" size="5" maxlength="8" value="%xx.occ;"%sp;
-         id="paxcnt_occ"%/>
+        <input name="paxcnt_occ" size="5" maxlength="8" value="%xx.occ;" id="paxcnt_occ"%/>
       </td>
       <td>
         <select name="paxcnt_p">
-        <option value="create"%if;(xx.create = "create")%sp;
-         selected="selected"%end;>[*create]0</option>
-        <option value="link"%if;(xx.create = "link")%sp;
-         selected="selected"%end;>[*link]0</option>
+          <option value="create" %if;(xx.create = "create") selected="selected"%end;>[*create]0</option>
+          <option value="link" %if;(xx.create = "link") selected="selected"%end;>[*link]0</option>
         </select>
       </td>
     </tr>
     <tr>
       <td><label for="paxcnt_sn">[*surname/surnames]0</label></td>
       <td colspan="4">
-        <input name="paxcnt_sn" size="40" maxlength="200"%sp;
-         value="%xx.surname" id="paxcnt_sn"%/>
+        <input name="paxcnt_sn" size="40" maxlength="200" value="%xx.surname" id="paxcnt_sn"%/>
       </td>
     </tr>
     <tr>
@@ -370,197 +475,339 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;insert_parent(xcnt)
-  <table border="1">
+  <table border="1" width=700px>
     <tr>
       <td>
-        [*insert::|<input name="ins_paxcnt_n" size="1" maxlength="1"%sp;
-         value="1"%/> | parents]
+        [*insert::|<input name="ins_paxcnt_n" size="1" maxlength="1" value="1"%/> | parents]
         <input type="checkbox" name="ins_paxcnt" value="on"%/>
       </td>
     </tr>
   </table>
 %end;
 
-<h1>%nn;
-%if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
-  [*add::family/families]0
-%elseif;(evar_m = "ADD_PAR")
-  [*add::family/families]0
-%elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
-  [*modify::family/families]0 # %evar_i;
-%elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
-         evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
-  [*merge::family/families]1 # %evar_i;
-%end;
-</h1>
-
-<form method="post" action="%action;">
-<p>
-%hidden;
-<input type="hidden" name="digest" value="%digest;"%/>
-%if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;"%/>%nl;%end;
-%if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;"%/>%nl;%end;
-%if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
-  <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
-%elseif;(evar_m = "ADD_PAR")
-  <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
-%elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
-  <input type="hidden" name="m" value="MOD_FAM_OK"%/>%nl;
-%elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
-         evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
-  <input type="hidden" name="i2" value="%evar_i2;"%/>
-  %if;(evar_ini1 != "" and evar_ini2 != "")
-    <input type="hidden" name="ini1" value="%evar_ini1;"%/>
-    <input type="hidden" name="ini2" value="%evar_ini2;"%/>
-  %end;
-  %if;(evar.iexcl != "")
-    <input type="hidden" name="iexcl" value="%evar.iexcl;"%/>
-  %end;
-  %if;(evar.fexcl != "")
-    <input type="hidden" name="fexcl" value="%evar.fexcl;"%/>
-  %end;
-  <input type="hidden" name="m" value="MRG_MOD_FAM_OK"%/>%nl;
-%end;
-</p>
-
-%foreach;parent;
-%if;(bvar.multi_parents != "yes")<h4>%parent.himher;</h4>%end;%nl;
-%apply;parent(cnt, "parent")
-%if;(bvar.multi_parents = "yes")%apply;insert_parent(cnt)%end;
+%define;selector_fevent(xcnt)
+  <select id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
+    <option value="">-</option>
+    <option value="#marr" %if;(event.e_name = "#marr" or event.e_name="") selected="selected" %end;>[*marriage event]</option>
+    <option value="#nmar" %if;(event.e_name = "#nmar") selected="selected"%end;>[*no marriage event]</option>
+    <option value="#enga" %if;(event.e_name = "#enga") selected="selected"%end;>[*engage event]</option>
+    <option value="#nmen" %if;(event.e_name = "#nmen") selected="selected"%end;>[*no mention]</option>
+    <option value="#marb" %if;(event.e_name = "#marb") selected="selected"%end;>[*marriage bann]</option>
+    <option value="#marc" %if;(event.e_name = "#marc") selected="selected"%end;>[*marriage contract]</option>
+    <option value="#marl" %if;(event.e_name = "#marl") selected="selected"%end;>[*marriage licence]</option>
+    <option value="#pacs" %if;(event.e_name = "#pacs") selected="selected"%end;>[*PACS]</option>
+    <option value="#div"  %if;(event.e_name = "#div")  selected="selected"%end;>[*divorce event]</option>
+    <option value="#sep"  %if;(event.e_name = "#sep")  selected="selected"%end;>[*separate event]</option>
+    <option value="#anul" %if;(event.e_name = "#anul") selected="selected"%end;>[*annulation]</option>
+    <option value="#resi" %if;(event.e_name = "#resi") selected="selected"%end;>[*residence]</option>
+  </select>
 %end;
 
-<h4><a name="marr">[*marriage/marriages]0</a></h4>
-<p>
-<label>
-<input type="radio" name="mrel" value="marr"%nn;
- %if;(mrel = "marr" or mrel = "nsckm") checked="checked"%end;
- %/>[*married]
-</label><label>
-<input type="radio" name="mrel" value="not_marr"%nn;
- %if;(mrel = "not_marr" or mrel = "nsck") checked="checked"%end;
- %/>[*not married]
-</label><label>
-<input type="radio" name="mrel" value="engaged"%if;(mrel = "engaged")
- checked="checked"%end;%/>[*engaged]
-</label><label>
-<input type="checkbox" name="nsck" value="on%nn;
- "%if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;
- %/>[*no sexes check]<br%/>
-</label><label>
-<input type="radio" name="mrel" value="no_ment"%if;(mrel = "no_ment")
- checked="checked"%end;%/>[*no mention]
-</label>
-</p>
-<table border="1" width=700px>
-  <tr>
-    <td><label for="marr_place">[*place]</label></td>
-    <td>
-      <input name="marr_place" size="40" maxlength="200"
-       value="%marriage_place;" id="marr_place"%/>
-    </td>
-  </tr>
-</table>
+%define;insert_fevent(xcnt)
+  <td>
+    <label>[*insert::|<input name="ins_eventxcnt_n" size="1" maxlength="1" value="1"%/></label>
+    <label> | event/events]<input type="checkbox" name="ins_eventxcnt" value="on"%/></label>
+  </td>
+%end;
 
-%apply;date([*date/dates]0, "marr", "marriage")
-%apply;source("marr", "marriage")
+%define;insert_witness(xcnt, wcnt)
+  <table border="1">
+    <tr>
+      <td>
+        <label>[*insert::|<input name="excnt_ins_witnwcnt_n" size="1" maxlength="1" value="1"%/></label>
+        <label> | witness/witnesses]<input type="checkbox" name="excnt_ins_witnwcnt" value="on"%/></label>
+      </td>
+    </tr>
+  </table>
+%end;
 
-<h4>[*witness/witnesses]1</h4>
-
-<table border="1">
-  <tr>
-    <td><label>[*insert::witness/witnesses]0
-      <input type="checkbox" name="ins_witn0" value="on"%/></label></td>
-  </tr>
-</table>
-
-%foreach;witness;
+%define;one_witness(xcnt, wcnt)
   <table border="1" width=700px>
     <tr>
-      <td><label for="witn%cnt;_fn">[*first name/first names]0</label></td>
+      <td>[*witness/witnesses]0</td>
+    </tr>
+  </table>
+  <table border="1" width=700px>
+    <tr>
+      <td><label for="excnt_witnwcnt_fn">[*first name/first names]0</label></td>
       <td>
-        <input name="witn%cnt;_fn" size="40" maxlength="200"%sp;
-         value="%witness.first_name;" id="witn%cnt;_fn"%/>
+        <input name="excnt_witnwcnt_fn" size="40" maxlength="200" value="%fwitness.first_name;" id="excnt_witnwcnt_fn"%/>
       </td>
-      <td align="%right;"><label for="witn%cnt;_occ">[*number]</label></td>
+      <td align="%right;"><label for="excnt_witnwcnt_occ">[*number]</label></td>
       <td>
-        <input name="witn%cnt;_occ" size="5" maxlength="8"%sp;
-         value="%witness.occ;" id="witn%cnt;_occ"%/>
+        <input name="excnt_witnwcnt_occ" type="text" size="5" maxlength="8" value="%fwitness.occ;" id="excnt_witnwcnt_occ"%/>
       </td>
       <td>
-        <select name="witn%cnt;_p">
-          <option value="link"%if;(witness.create = "link")%sp;
-           selected="selected"%end;>[*link]0</option>
-          <option value="create"%if;(witness.create = "create")%sp;
-           selected="selected"%end;>[*create]0</option>
+        <select name="excnt_witnwcnt_p">
+          <option value="link"%if;(fwitness.create = "link") selected="selected"%end;>[*link]0</option>
+          <option value="create"%if;(fwitness.create = "create") selected="selected"%end;>[*create]0</option>
+        </select>
+        <select name="excnt_witnwcnt_kind" style="display:none">
+          <option value="godp" %if;(fwitness_kind = "godp") selected="selected" %end;>[*godfather/godmother/godparents]2</option>
+          <option value="" %if;(fwitness_kind = "") selected="selected" %end;>[*witness/witnesses]0</option>
         </select>
       </td>
     </tr>
     <tr>
-      <td><label for="witn%cnt;_sn">[*surname/surnames]0</label></td>
+      <td><label for="excnt_witnwcnt_sn">[*surname/surnames]0&nbsp;:&nbsp;</label></td>
       <td colspan="3">
-        <input name="witn%cnt;_sn" size="40" maxlength="200"%sp;
-         value="%witness.surname;" id="witn%cnt;_sn"%/>
+        <input name="excnt_witnwcnt_sn" size="40" maxlength="200" value="%fwitness.surname;" id="excnt_witnwcnt_sn"%/>
       </td>
       <td>
         <label>
-        <input type="radio" name="witn%cnt;_sex" value="N"%nn;
-         %if;(witness.create.sex = "neuter") checked="checked"%end;%/>?
-        </label><label>
-        <input type="radio" name="witn%cnt;_sex" value="M"%nn;
-         %if;(witness.create.sex = "male") checked="checked"%end;%/>[M/F]0
-        </label><label>
-        <input type="radio" name="witn%cnt;_sex" value="F"%nn;
-         %if;(witness.create.sex = "female") checked="checked"%end;%/>[M/F]1
+          <input type="radio" name="excnt_witnwcnt_sex" value="N" %if;(fwitness.create.sex = "neuter") checked="checked"%end;%/>?
+        </label>
+        <label>
+          <input type="radio" name="excnt_witnwcnt_sex" value="M" %if;(fwitness.create.sex = "male") checked="checked"%end;%/>[M/F]0
+        </label>
+        <label>
+          <input type="radio" name="excnt_witnwcnt_sex" value="F" %if;(fwitness.create.sex = "female") checked="checked"%end;%/>[M/F]1
         </label>
       </td>
     </tr>
   </table>
-  <table border="1">
-    <tr>
-      <td><label>[*insert::witness/witnesses]0
-      <input type="checkbox" name="ins_witn%cnt;" value="on"%/></label></td>
-    </tr>
-  </table>
 %end;
 
-<h4>[*divorce]</h4>
-<p>
-<label>
-<input type="radio" name="div" value="not_divorced"%nn;
- %if;(divorce = "not_divorced") checked="checked"%end;%/>[*not divorced]
-</label><label>
-<input type="radio" name="div" value="divorced"%nn;
- %if;(divorce = "divorced") checked="checked"%end;%/>[*divorced]
-</label><label>
-<input type="radio" name="div" value="separated"%nn;
- %if;(divorce = "separated") checked="checked"%end;%/>[*separated]
-</label>
-</p>
-%apply;date([*date/dates]0, "div", "divorce")
+%define;one_fevent(xcnt)
+  <table border="1" width=700px>
+    <tr>
+      <td><label for="e_namexcnt">[*event/events]0</label></td>
+      <td>
+        %apply;selector_fevent(xcnt)
+        <label id="fevent_label_selectorxcnt" style="display:none" class="other_evts">
+          [or]0 [text]0&nbsp;:&nbsp;
+          <input name="e_namexcnt" size="40" maxlength="200" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt"%/>
+        </label>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="e_placexcnt">[*place]</label></td>
+      <td>
+        <input name="e_placexcnt" size="40" maxlength="200" value="%event.e_place;"  id="e_placexcnt"%/>
+      </td>
+    </tr>
+  </table>
+  %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
+  <table border="1" width=700px>
+    <tr>
+      <td><label for="e_notexcnt">[*note/notes]0</label></td>
+      <td>
+        <textarea name="e_notexcnt" rows="3" cols="33" id="e_notexcnt">%event.e_note;</textarea>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="e_srcxcnt">[*source/sources]0</label></td>
+      <td>
+        <input name="e_srcxcnt" size="40" maxlength="200" value="%event.e_src;" id="e_srcxcnt" maxlength="800"%/>
+      </td>
+    </tr>
+  </table>
+  %if;has_fwitness;
+    %foreach;fwitness;
+      %apply;one_witness(xcnt, wcnt)
+      %apply;insert_witness(xcnt, wcnt)
+    %end;
+  %else;
+    %apply;insert_witness(xcnt, "0")
+  %end;
+%end
 
-<h4><label for="comment">[*comment]</label></h4>
+<h1>%nn;
+  %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
+    [*add::family/families]0
+  %elseif;(evar_m = "ADD_PAR")
+    [*add::family/families]0
+  %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
+    [*modify::family/families]0 # %evar_i;
+  %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
+           evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+    [*merge::family/families]1 # %evar_i;
+  %end;
+</h1>
 
-<table border="1" width=700px>
-  <tr>
-    <td><input name="comment" size="50" maxlength="200"%sp;
-     value="%comment;" id="comment"%/></td>
-  </tr>
-</table>
+<form method="post" action="%action;">
+  <p>
+    %hidden;
+    <input type="hidden" name="digest" value="%digest;"%/>
+    %if;(evar_ip != "")<input type="hidden" name="ip" value="%evar_ip;"%/>%nl;%end;
+    %if;(evar_i != "")<input type="hidden" name="i" value="%evar_i;"%/>%nl;%end;
+    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
+      <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
+    %elseif;(evar_m = "ADD_PAR")
+      <input type="hidden" name="m" value="ADD_FAM_OK"%/>%nl;
+    %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
+      <input type="hidden" name="m" value="MOD_FAM_OK"%/>%nl;
+    %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
+             evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+      <input type="hidden" name="i2" value="%evar_i2;"%/>
+      %if;(evar_ini1 != "" and evar_ini2 != "")
+        <input type="hidden" name="ini1" value="%evar_ini1;"%/>
+        <input type="hidden" name="ini2" value="%evar_ini2;"%/>
+      %end;
+      %if;(evar.iexcl != "")
+        <input type="hidden" name="iexcl" value="%evar.iexcl;"%/>
+      %end;
+      %if;(evar.fexcl != "")
+        <input type="hidden" name="fexcl" value="%evar.fexcl;"%/>
+      %end;
+      <input type="hidden" name="m" value="MRG_MOD_FAM_OK"%/>%nl;
+    %end;
+  </p>
 
-<h4>[*child/children]1</h4>
+  %foreach;parent;
+    %if;(bvar.multi_parents != "yes")<h4>%parent.himher;</h4>%end;%nl;
+    %apply;parent(cnt, "parent")
+    %if;(bvar.multi_parents = "yes")%apply;insert_parent(cnt)%end;
+  %end;
+
+  <h4><a name="marr">[*marriage/marriages]0</a></h4>
+  <div style="display:none;">
+    <p>
+      <label>
+        <input type="radio" name="mrel" value="marr" %if;(mrel = "marr" or mrel = "nsckm") checked="checked"%end;%/>[*married]
+      </label>
+      <label>
+        <input type="radio" name="mrel" value="not_marr" %if;(mrel = "not_marr" or mrel = "nsck") checked="checked"%end;%/>[*not married]
+      </label>
+      <label>
+        <input type="radio" name="mrel" value="engaged"%if;(mrel = "engaged")checked="checked"%end;%/>[*engaged]
+      </label>
+      %( Déplacé dans les fevents
+      <label>
+        <input type="checkbox" name="nsck" value="on "%if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/>[*no sexes check]<br%/>
+      </label>
+      %)
+      <label>
+        <input type="radio" name="mrel" value="no_ment"%if;(mrel = "no_ment")checked="checked"%end;%/>[*no mention]
+      </label>
+    </p>
+    <table border="1" width=700px>
+      <tr>
+        <td><label for="marr_place">[*place]</label></td>
+        <td>
+          <input name="marr_place" size="40" maxlength="200" value="%marriage_place;" id="marr_place"%/>
+        </td>
+      </tr>
+    </table>
+
+    %apply;date([*date/dates]0, "marr", "marriage", "")
+    %apply;note("marr", "marriage")
+    %apply;source("marr", "marriage")
+
+    <h4>[*witness/witnesses]1</h4>
+
+    <table border="1">
+      <tr>
+        <td>
+          <label>[*insert::witness/witnesses]0
+          <input type="checkbox" name="ins_witn0" value="on"%/></label>
+        </td>
+      </tr>
+    </table>
+
+    %foreach;witness;
+      <table border="1" width=700px>
+        <tr>
+          <td><label for="witn%cnt;_fn">[*first name/first names]0</label></td>
+          <td>
+            <input name="witn%cnt;_fn" size="40" maxlength="200" value="%witness.first_name;" id="witn%cnt;_fn"%/>
+          </td>
+          <td align="%right;"><label for="witn%cnt;_occ">[*number]</label></td>
+          <td>
+            <input name="witn%cnt;_occ" size="5" maxlength="8" value="%witness.occ;" id="witn%cnt;_occ"%/>
+          </td>
+          <td>
+            <select name="witn%cnt;_p">
+              <option value="link"%if;(witness.create = "link") selected="selected"%end;>[*link]0</option>
+              <option value="create"%if;(witness.create = "create") selected="selected"%end;>[*create]0</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td><label for="witn%cnt;_sn">[*surname/surnames]0</label></td>
+          <td colspan="3">
+            <input name="witn%cnt;_sn" size="40" maxlength="200" value="%witness.surname;" id="witn%cnt;_sn"%/>
+          </td>
+          <td>
+            <label>
+              <input type="radio" name="witn%cnt;_sex" value="N" %if;(witness.create.sex = "neuter") checked="checked"%end;%/>?
+            </label>
+            <label>
+              <input type="radio" name="witn%cnt;_sex" value="M" %if;(witness.create.sex = "male") checked="checked"%end;%/>[M/F]0
+            </label>
+            <label>
+              <input type="radio" name="witn%cnt;_sex" value="F" %if;(witness.create.sex = "female") checked="checked"%end;%/>[M/F]1
+            </label>
+          </td>
+        </tr>
+      </table>
+      <table border="1">
+        <tr>
+          <td>
+            <label>
+              [*insert::witness/witnesses]0
+              <input type="checkbox" name="ins_witn%cnt;" value="on"%/>
+            </label>
+          </td>
+        </tr>
+      </table>
+    %end;
+
+    <h4>[*divorce]</h4>
+    <p>
+      <label>
+        <input type="radio" name="div" value="not_divorced" %if;(divorce = "not_divorced") checked="checked"%end;%/>[*not divorced]
+      </label>
+      <label>
+        <input type="radio" name="div" value="divorced" %if;(divorce = "divorced") checked="checked"%end;%/>[*divorced]
+      </label>
+      <label>
+        <input type="radio" name="div" value="separated" %if;(divorce = "separated") checked="checked"%end;%/>[*separated]
+      </label>
+    </p>
+    %apply;date([*date/dates]0, "div", "divorce", "")
+  </div>
+
+  <input type="checkbox" name="nsck" value="on "%if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/>[*no sexes check]<br%/><br%/>
+  <table border="1">
+    <tr>
+      %apply;insert_fevent("0")
+      %foreach;fevent;
+        </tr>
+        </table>
+        %apply;one_fevent(cnt)
+        <table border="1">
+          <tr>
+            %apply;insert_fevent(cnt)
+      %end
+    </tr>
+  </table>
+
+  <h4><label for="comment">[*comment]</label></h4>
+
+  <table border="1" width=700px>
+    <tr>
+      <td>
+        <input name="comment" size="50" maxlength="200" value="%comment;" id="comment"%/>
+      </td>
+    </tr>
+  </table>
+
+  <h4>[*child/children]1</h4>
 
 %define;insert_child(xcnt)
   <td>
-    <label>[*insert::|<input name="ins_chxcnt_n" size="1" maxlength="1"%sp;
-       value="1"%/></label><label> | child/children]
-      <input type="checkbox" name="ins_chxcnt" value="on"%/></label>
+    <label>[*insert::|<input name="ins_chxcnt_n" size="1" maxlength="1" value="1"%/></label>
+    <label> | child/children]<input type="checkbox" name="ins_chxcnt" value="on"%/></label>
   </td>
 %end;
 
 %define;invert_children(xcnt)
   <td>
-    <label>[*invert]
-    <input type="checkbox" name="inv_chxcnt" value="on"%/></label>
+    <label>
+      [*invert]
+      <input type="checkbox" name="inv_chxcnt" value="on"%/>
+    </label>
   </td>
 %end;
 
@@ -569,19 +816,17 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="chxcnt_fn">[*first name/first names]0</label></td>
       <td colspan="2">
-        <input name="chxcnt_fn" size="40" maxlength="200"%sp;
-         value="%child.first_name;" id="chxcnt_fn"%/>
+        <input name="chxcnt_fn" size="40" maxlength="200" value="%child.first_name;" id="chxcnt_fn"%/>
       </td>
       <td><label for="chxcnt_occ">[*number]</label></td>
       <td>
-        <input name="chxcnt_occ" size="5" maxlength="8" value="%child.occ;"%sp;
-         id="chxcnt_occ"%/>
+        <input name="chxcnt_occ" size="5" maxlength="8" value="%child.occ;" id="chxcnt_occ"%/>
       </td>
     </tr>
     <tr>
       <td><label for="chxcnt_sn">[*surname/surnames]0</label></td>
       <td colspan="4">
-        <input name="chxcnt_sn" size="40" maxlength="200"%sp;
+        <input name="chxcnt_sn" size="40" maxlength="200"
          value="%nn;
            %if;
              ((evar_m = "ADD_FAM_OK" or
@@ -594,10 +839,8 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td>
         <select name="chxcnt_p">
-          <option value="link"%if;(child.create = "link")%sp;
-           selected="selected"%end;>[*link]0</option>
-          <option value="create"%if;(child.create = "create")%sp;
-           selected="selected"%end;>[*create]0</option>
+          <option value="link"%if;(child.create = "link") selected="selected"%end;>[*link]0</option>
+          <option value="create"%if;(child.create = "create") selected="selected"%end;>[*create]0</option>
         </select>
       </td>
       %apply;birth("chxcnt", "child", "false")
@@ -605,14 +848,13 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td>
         <label>
-        <input type="radio" name="chxcnt_sex" value="N"%nn;
-         %if;(child.create.sex = "neuter") checked="checked"%end;%/>?
-        </label><label>
-        <input type="radio" name="chxcnt_sex" value="M"%nn;
-         %if;(child.create.sex = "male") checked="checked"%end;%/>[M/F]0
-        </label><label>
-        <input type="radio" name="chxcnt_sex" value="F"%nn;
-         %if;(child.create.sex = "female") checked="checked"%end;%/>[M/F]1
+          <input type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex = "neuter") checked="checked"%end;%/>?
+        </label>
+        <label>
+          <input type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex = "male") checked="checked"%end;%/>[M/F]0
+        </label>
+        <label>
+          <input type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex = "female") checked="checked"%end;%/>[M/F]1
         </label>
       </td>
       %apply;death("chxcnt", "child", "false")
@@ -626,50 +868,51 @@ function changeCalendar(e,v,m,c) {
   </table>
 %end;
 
-<dl><dd>
-<table border="1"><tr>
-%apply;insert_child("0")
-%foreach;child;
-  %if;(cnt != 1)
-    <td>&nbsp;</td>
-    %apply;invert_children(cnt)
+  <dl><dd>
+    <table border="1">
+      <tr>
+        %apply;insert_child("0")
+        %foreach;child;
+          %if;(cnt != 1)
+            <td>&nbsp;</td>
+            %apply;invert_children(cnt)
+          %end;
+          </tr>
+          </table>
+          %apply;child(cnt)
+          <table border="1">
+            <tr>
+              %apply;insert_child(cnt)
+        %end;
+      </tr>
+    </table>
+  </dd></dl>
+
+  <h4>[*source/sources]0</h4>
+
+  <table border="1">
+    <tr>
+      <td><label for="psrc">[[*person/persons]1]</label></td>
+      <td>
+        <input name="psrc" size="70" maxlength="300" value="%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc"%/>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="src">[*family/families]0</label></td>
+      <td>
+        <input name="src" size="70" maxlength="300" value="%fsources;" id="src"%/>
+        <input type="checkbox" name="rdsrc" value="on" %if;(evar_rdsrc = "on") checked="checked"%end;%/>
+      </td>
+    </tr>
+  </table>
+
+  %if;(bvar.origin_file = "on")
+    <input name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
   %end;
-  </tr></table>
-  %apply;child(cnt)
-  <table border="1"><tr>
-  %apply;insert_child(cnt)
-%end;
-</tr></table>
-</dd></dl>
 
-<h4>[*source/sources]0</h4>
-
-<table border="1">
-  <tr>
-    <td><label for="psrc">[[*person/persons]1]</label></td>
-    <td>
-      <input name="psrc" size="70" maxlength="300" value="%nn;
-       %if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc"%/>
-    </td>
-  </tr>
-  <tr>
-    <td><label for="src">[*family/families]0</label></td>
-    <td>
-      <input name="src" size="70" maxlength="300" value="%fsources;"%sp;
-       id="src"%/>
-      <input type="checkbox" name="rdsrc" value="on"%sp;
-       %if;(evar_rdsrc = "on") checked="checked"%end;%/>
-    </td>
-  </tr>
-</table>
-
-%if;(bvar.origin_file = "on")
-  <input name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
-%end;
-
-<p>
-<input type="submit" value="Ok"%/>
-</p>
+  <p>
+    <input type="submit" value="Ok"%/>
+  </p>
 </form>
 
 %base_trailer;
