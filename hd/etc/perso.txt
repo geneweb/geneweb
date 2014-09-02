@@ -38,6 +38,7 @@
   %apply;show_templ("perso_module/union_simple")
   %apply;show_templ("perso_module/freresoeur_simple")
   %apply;show_templ("perso_module/relations")
+  %apply;show_templ("perso_module/timeline")
   %apply;show_templ("perso_module/notes")
   %apply;show_templ("perso_module/sources")
   %apply;show_templ("perso_module/arbre_3gen_v_photo")

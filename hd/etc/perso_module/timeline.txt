@@ -1,0 +1,40 @@
+<!-- timeline -->
+
+%if;has_event;
+  <h3 class="highlight">[*time line] </h3>
+  <table>
+    %foreach;event;
+      <tr>
+        <td valign="top" style="white-space: nowrap;" width="1">
+          <span class="edate">
+            %if;event.has_date;%event.date; :
+            %else;--- :
+            %end;
+          </span>
+        </td>
+        <td valign="top">
+          <span>
+            %apply;capitalize(event.name)%sp;
+            %if;event.has_spouse;([with] %event.spouse;)%end;
+            %if;event.has_place; - %event.place;%end;
+          </span>
+          %if;event.has_witnesses;
+            <p style="margin:0;">
+              %foreach;event_witness;
+                <span>%apply;capitalize(event_witness_kind) :</span>
+                %apply;short_display_person("event_witness")<br/>
+              %end;
+            </p>
+          %end;
+          %if;event.has_note;
+            <div>%event.note;</div>
+          %end;
+          %if;event.has_src;
+            <span><em>[*source/sources]1: %event.src;</em></span>
+          %end;
+        </td>
+      </tr>
+    %end;
+  </table>
+%end;
+

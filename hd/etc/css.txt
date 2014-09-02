@@ -1138,6 +1138,12 @@ li.parent
  margin-bottom: 15px;
 }
 
+/* ----------------------------- timeline.txt ----------------------------- */
+
+.edate {
+ float: right;
+ text-align: right;
+}
 
 /* ------------------ Display by branch/alphabetic order ------------------ */
 
