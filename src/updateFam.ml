@@ -63,6 +63,7 @@ type env 'a =
   [ Vstring of string
   | Vint of int
   | Vother of 'a
+  | Vbool of bool
   | Vnone ]
 ;
 
@@ -144,6 +145,14 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
       eval_date_var d s
   | ["father" :: sl] -> eval_key (father cpl) sl
   | ["fsources"] -> str_val (quote_escaped fam.fsources)
+  | ["is_first"] ->
+      match get_env "first" env with
+      [ Vbool x -> bool_val x
+      | _ -> raise Not_found ]
+  | ["is_last"] ->
+      match get_env "last" env with
+      [ Vbool x -> bool_val x
+      | _ -> raise Not_found ]
   | ["marriage"; s] -> eval_date_var (Adef.od_of_codate fam.marriage) s
   | ["marriage_place"] -> str_val (quote_escaped fam.marriage_place)
   | ["marriage_note"] -> str_val (quote_escaped fam.marriage_note)
@@ -558,14 +567,18 @@ value print_foreach print_ast eval_expr =
       List.iter (print_ast env fcd) al
     }
   and print_foreach_fevent env fcd al list lab =
-    let _ =
-      List.fold_left
-        (fun cnt nn ->
-          let env = [("cnt", Vint cnt) :: env] in
-          do { List.iter (print_ast env fcd) al; cnt + 1 })
-        1 list
-    in
-    ()
+    loop True 1 list where rec loop first cnt =
+      fun
+      [ [nn :: l] ->
+          let env =
+            [("cnt", Vint cnt); ("first", Vbool first);
+             ("last", Vbool (l = [])) :: env]
+          in
+          do {
+            List.iter (print_ast env fcd) al;
+            loop False (cnt + 1) l
+          }
+      | [] -> () ]
   and print_foreach_fwitness env fcd al list lab =
     match get_env "cnt" env with
     [ Vint i ->
@@ -573,10 +586,20 @@ value print_foreach print_ast eval_expr =
           try Some (List.nth list (i - 1)) with [ Failure _ -> None ]
         with
         [ Some e ->
-            for i = 0 to max 1 (Array.length e.efam_witnesses) - 1 do {
-              let env = [("wcnt", Vint (i + 1)) :: env] in
-              List.iter (print_ast env fcd) al
-            }
+            let rec loop first wcnt =
+              fun
+              [ [nn :: l] ->
+                  let env =
+                    [("wcnt", Vint wcnt); ("first", Vbool first);
+                     ("last", Vbool (l = [])) :: env]
+                  in
+                  do {
+                    List.iter (print_ast env fcd) al;
+                    loop False (wcnt + 1) l
+                  }
+              | [] -> () ]
+            in
+            loop True 1 (Array.to_list e.efam_witnesses)
         | None -> () ]
     | _ -> () ]
   and print_foreach_witness env fcd al arr lab =
