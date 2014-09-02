@@ -150,67 +150,39 @@ function update_old () {
     <td class="odd">%after.occupation;</td>
   </tr>
   %apply;empty()
-  <tr>
-    <td class="hist_lbl">[*birth]</td>
-    <td class="odd">%before.birth;</td>
-    <td class="odd">%after.birth;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*birth place]</td>
-    <td class="odd">%before.birth_place;</td>
-    <td class="odd">%after.birth_place;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*birth src]</td>
-    <td class="odd">%before.birth_src;</td>
-    <td class="odd">%after.birth_src;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*baptism]</td>
-    <td class="odd">%before.baptism;</td>
-    <td class="odd">%after.baptism;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*baptism place]</td>
-    <td class="odd">%before.baptism_place;</td>
-    <td class="odd">%after.baptism_place;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*baptism src]</td>
-    <td class="odd">%before.baptism_src;</td>
-    <td class="odd">%after.baptism_src;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*death]</td>
-    <td class="odd">%before.death;</td>
-    <td class="odd">%after.death;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*death place]</td>
-    <td class="odd">%before.death_place;</td>
-    <td class="odd">%after.death_place;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*death src]</td>
-    <td class="odd">%before.death_src;</td>
-    <td class="odd">%after.death_src;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*burial]</td>
-    <td class="odd">%before.burial;</td>
-    <td class="odd">%after.burial;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*burial place]</td>
-    <td class="odd">%before.burial_place;</td>
-    <td class="odd">%after.burial_place;</td>
-  </tr>
-  <tr>
-    <td class="hist_lbl">[*burial src]</td>
-    <td class="odd">%before.burial_src;</td>
-    <td class="odd">%after.burial_src;</td>
-  </tr>
-  %apply;empty()
+  %foreach;pevent;
+    <tr>
+      <td class="hist_label">[*event/events]0</td>
+      <td class="odd">%before.pevent_name;</td>
+      <td class="odd">%after.pevent_name;</td>
+    </tr>
+    <tr>
+      <td class="hist_label">[date/dates]0</td>
+      <td class="odd">%before.pevent_date;</td>
+      <td class="odd">%after.pevent_date;</td>
+    </tr>
+    <tr>
+      <td class="hist_label">[*place]</td>
+      <td class="odd">%before.pevent_place;</td>
+      <td class="odd">%after.pevent_place;</td>
+    </tr>
+    <tr>
+      <td class="hist_label">[*note/notes]0</td>
+      <td class="odd">%before.pevent_note;</td>
+      <td class="odd">%after.pevent_note;</td>
+    </tr>
+    <tr>
+      <td class="hist_label">[*source/sources]0</td>
+      <td class="odd">%before.pevent_src;</td>
+      <td class="odd">%after.pevent_src;</td>
+    </tr>
+    <tr>
+      <td class="hist_label">[*witness/witnesses]1</td>
+      <td class="odd">%before.pevent_witness;</td>
+      <td class="odd">%after.pevent_witness;</td>
+    </tr>
+    %apply;empty()
+  %end;
   <tr>
     <td class="hist_lbl">[*relation/relations]1</td>
     <td class="odd">%before.relations;</td>
@@ -242,47 +214,39 @@ function update_old () {
 
 %define;print_diff_family()
   %foreach;family;
-    <tr>
-      <td class="hist_lbl">[*marriage/marriages]0</td>
-      <td class="odd">%if;(before.marriage_type != "")%before.marriage_type;:%end; %before.spouse;</td>
-      <td class="odd">%if;(after.marriage_type != "")%after.marriage_type;: %end;%after.spouse;</td>
-    </tr>
-    <tr>
-      <td class="hist_lbl">[*marriage date]</td>
-      <td class="odd">%before.marriage;</td>
-      <td class="odd">%after.marriage;</td>
-    </tr>
-    <tr>
-      <td class="hist_lbl">[*marriage place]</td>
-      <td class="odd">%before.marriage_place;</td>
-      <td class="odd">%after.marriage_place;</td>
-    </tr>
-    <tr>
-      <td class="hist_lbl">[*marriage src]</td>
-      <td class="odd">%before.marriage_src;</td>
-      <td class="odd">%after.marriage_src;</td>
-    </tr>
-    <tr>
-      <td class="hist_lbl">[*divorce]</td>
-      <td class="odd">%before.divorce;</td>
-      <td class="odd">%after.divorce;</td>
-    </tr>
-    <tr>
-      <td class="hist_lbl">[*witness/witnesses]1</td>
-      <td class="odd">%before.witnesses;</td>
-      <td class="odd">%after.witnesses;</td>
-    </tr>
-    <tr>
-      <td class="hist_lbl">[*family source]</td>
-      <td class="odd">%before.fsources;</td>
-      <td class="odd">%after.fsources;</td>
-    </tr>
-    <tr>
-      <td class="hist_lbl">[*comment]</td>
-      <td class="odd">%before.comment;</td>
-      <td class="odd">%after.comment;</td>
-    </tr>
+    %foreach;fevent;
+      <tr>
+        <td class="hist_label">[*event/events]0</td>
+        <td class="odd">%before.fevent_name;: %before.spouse;</td>
+        <td class="odd">%after.fevent_name;: %after.spouse;</td>
+      </tr>
+      <tr>
+        <td class="hist_label">[date/dates]0</td>
+        <td class="odd">%before.fevent_date;</td>
+        <td class="odd">%after.fevent_date;</td>
+      </tr>
+      <tr>
+        <td class="hist_label">[*place]</td>
+        <td class="odd">%before.fevent_place;</td>
+        <td class="odd">%after.fevent_place;</td>
+      </tr>
+      <tr>
+        <td class="hist_label">[*note/notes]0</td>
+        <td class="odd">%before.fevent_note;</td>
+        <td class="odd">%after.fevent_note;</td>
+      </tr>
+      <tr>
+        <td class="hist_label">[*source/sources]0</td>
+        <td class="odd">%before.fevent_src;</td>
+        <td class="odd">%after.fevent_src;</td>
+      </tr>
+      <tr>
+        <td class="hist_label">[*witness/witnesses]1</td>
+        <td class="odd">%before.fevent_witness;</td>
+        <td class="odd">%after.fevent_witness;</td>
+      </tr>
     %apply;empty()
+    %end;
     <tr>
       <td class="hist_lbl">[*child/children]1</td>
       <td class="odd">%before.children;</td>
