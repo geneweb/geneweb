@@ -35,16 +35,20 @@
         %apply;short_display_person("related")
       </li>
     %end;
-    %foreach;witness_relation;
-      <li style="list-style-type:disc">%nn;
-        %if;(witness_relation.marriage_date.year>0)
-          <em> %witness_relation.marriage_date.year;</em> :
+    %foreach;event_witness_relation;
+      %apply;li_SDC("event_witness_relation.person")
+        %apply;capitalize(event_witness_relation_kind)%sp;
+        %if;(event_witness_relation.event.date.year>0)
+          <em>(%event_witness_relation.event.date.year;)</em>
         %end;
-        %apply;witness_relation%with;
-          %apply;short_display_person("witness_relation.father")%and;
-          %apply;short_display_person("witness_relation.mother")
+	:%sp;
+        %event_witness_relation.event.name;,%sp;
+        %apply;short_display_person("event_witness_relation.person")
+        %if;(event_witness_relation.event.spouse != "")
+          [and]
+          %apply;short_display_person("event_witness_relation.event.spouse")
         %end;
-      </li>%nl;
+      </li>
     %end;
   </ul>
 %end;
