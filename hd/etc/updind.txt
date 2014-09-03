@@ -281,47 +281,47 @@ function changeCalendar(e,v,m,c) {
         %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
           <label>
             [year/month/day]2
-            <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
+            <input type="text" name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
           </label>
           <label>
             [year/month/day]1
             <span id="xvar_mm_sel">
-              <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
+              <input type="text" name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
             </span>
           </label>
           <label>
             [year/month/day]0
-            <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
+            <input type="text" name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
           </label>
         %elseif;([ !dates order]0 = "mmddyyyy")
           <label>
             [year/month/day]1
             <span id="xvar_mm_sel">
-              <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
+              <input type="text" name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
             </span>
           </label>
           <label>
             [year/month/day]2
-            <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
+            <input type="text" name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
           </label>
           <label>
             [year/month/day]0
-            <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
+            <input type="text" name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
           </label>
         %else;
           <label>
             [year/month/day]0
-            <input name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
+            <input type="text" name="xvar_yyyy" size="5" maxlength="6" value="%xdt.year;"xcond%/>
           </label>
           <label>
             [year/month/day]1
             <span id="xvar_mm_sel">
-              <input name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
+              <input type="text" name="xvar_mm" size="2" maxlength="2" value="%xdt.month;"xcond%/>
             </span>
           </label>
           <label>
             [year/month/day]2
-            <input name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
+            <input type="text" name="xvar_dd" size="2" maxlength="2" value="%xdt.day;"xcond%/>
           </label>
         %end;
       </td>
@@ -329,7 +329,7 @@ function changeCalendar(e,v,m,c) {
         ...
         <label>
           [or]0 [text]0
-          <input name="xvar_text" size="15" maxlength="30" value="%xdt.text;"xcond%/>
+          <input type="text" name="xvar_text" size="15" maxlength="30" value="%xdt.text;"xcond%/>
         </label>
       </td>
     </tr>
@@ -369,47 +369,47 @@ function changeCalendar(e,v,m,c) {
         %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
           <label>
             [year/month/day]2
-            <input name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
+            <input type="text" name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
           </label>
           <label>
             [year/month/day]1
             <span id="xvar_ormonth_sel">
-              <input name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
+              <input type="text" name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
             </span>
           </label>
           <label>
             [year/month/day]0
-            <input name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
+            <input type="text" name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
           </label>
         %elseif;([ !dates order]0 = "mmddyyyy")
           <label>
             [year/month/day]1
             <span id="xvar_ormonth_sel">
-              <input name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
+              <input type="text" name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
             </span>
           </label>
           <label>
             [year/month/day]2
-            <input name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
+            <input type="text" name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
           </label>
           <label>
             [year/month/day]0
-            <input name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
+            <input type="text" name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
           </label>
         %else;
           <label>
             [year/month/day]0
-            <input name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
+            <input type="text" name="xvar_oryear" size="5" maxlength="6" value="%xdt.oryear;"xcond%/>
           </label>
           <label>
             [year/month/day]1
             <span id="xvar_ormonth_sel">
-              <input name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
+              <input type="text" name="xvar_ormonth" size="2" maxlength="2" value="%xdt.ormonth;"xcond%/>
             </span>
           </label>
           <label>
             [year/month/day]2
-            <input name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
+            <input type="text" name="xvar_orday" size="2" maxlength="2" value="%xdt.orday;"xcond%/>
           </label>
         %end;
       </td>
@@ -422,7 +422,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="xx_src">[*source/sources]0</label></td>
       <td>
-        <input name="xx_src" size="50" maxlength="200" value="%xx_src;" id="xx_src"%/>
+        <input type="text" name="xx_src" size="50" maxlength="200" value="%xx_src;" id="xx_src"%/>
       </td>
     </tr>
   </table>
@@ -432,7 +432,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width=700px>
     <tr>
       <td><label for="xx_note">[*note/notes]0</label></td>
-      <td><input name="xx_note" size="50" maxlength="200" value="%xx_note;" id="xx_note"%/></td>
+      <td><input type="text" name="xx_note" size="50" maxlength="200" value="%xx_note;" id="xx_note"%/></td>
     </tr>
   </table>
 %end;
@@ -492,7 +492,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1">
     <tr>
       <td>
-        <label>[*insert::|<input name="ins_eventxcnt_n" size="1" maxlength="1" value="1"%/></label>
+        <label>[*insert::|<input type="text" name="ins_eventxcnt_n" size="1" maxlength="1" value="1"%/></label>
         <label> | event/events]<input type="checkbox" name="ins_eventxcnt" value="on"%/></label>
       </td>
     </tr>
@@ -504,11 +504,11 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td>
         <label>
-        <label>[*insert::|<input name="excnt_ins_witnwcnt_n" size="1" maxlength="1" value="1"%/></label>
+        <label>[*insert::|<input type="text" name="excnt_ins_witnwcnt_n" size="1" maxlength="1" value="1"%/></label>
         <label> | witness/witnesses]<input type="checkbox" name="excnt_ins_witnwcnt" value="on"%/></label>
         %(
         [*insert]&nbsp;
-        <input name="excnt_ins_witnwcnt_n" size="1" maxlength="1" value="1" onkeydown= "if(event.keyCode == 13) document.getElementById('excnt_ins_witnwcnt').value = 'on';" %/>
+        <input type="text" name="excnt_ins_witnwcnt_n" size="1" maxlength="1" value="1" onkeydown= "if(event.keyCode == 13) document.getElementById('excnt_ins_witnwcnt').value = 'on';" %/>
         </label> [nouveau(x)::witness/witnesses]0 %if;("evt_name" = "#bapt")/ [godfather/godmother/godparents]2%end;
         <input type="hidden" name="excnt_ins_witnwcnt" id="excnt_ins_witnwcnt" readonly/>
         <input type="submit" onclick="%if;("evt_name" = "buri_or_crem")set_buri(xcnt);%end; %if;("evt_name" = "#deat")set_insert_death(xcnt);%end; document.forms['form_pers'].action += '#witn';document.getElementById('excnt_ins_witnwcnt').value = 'on'" value="ok" readonly/>
@@ -532,11 +532,11 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="excnt_witnwcnt_fn">[*first name/first names]0</label></td>
       <td>
-        <input name="excnt_witnwcnt_fn" size="40" maxlength="200" value="%witness.first_name;" id="excnt_witnwcnt_fn"%/>
+        <input type="text" name="excnt_witnwcnt_fn" size="40" maxlength="200" value="%witness.first_name;" id="excnt_witnwcnt_fn"%/>
       </td>
       <td align="%right;"><label for="excnt_witnwcnt_occ">[*number]</label></td>
       <td>
-        <input name="excnt_witnwcnt_occ" type="text" size="5" maxlength="8" value="%witness.occ;" id="excnt_witnwcnt_occ"%/>
+        <input type="text" name="excnt_witnwcnt_occ" size="5" maxlength="8" value="%witness.occ;" id="excnt_witnwcnt_occ"%/>
       </td>
       <td>
         <select name="excnt_witnwcnt_p">
@@ -548,7 +548,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="excnt_witnwcnt_sn">[*surname/surnames]0&nbsp;:&nbsp;</label></td>
       <td colspan="3">
-        <input name="excnt_witnwcnt_sn" size="40" maxlength="200" value="%witness.surname;" id="excnt_witnwcnt_sn"%/>
+        <input type="text" name="excnt_witnwcnt_sn" size="40" maxlength="200" value="%witness.surname;" id="excnt_witnwcnt_sn"%/>
       </td>
       <td>
         <label>
@@ -605,19 +605,19 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="excnt_witnwcnt_sn">[*surname/surnames]0&nbsp;:&nbsp;</label></td>
       <td colspan="3">
-        <input name="excnt_witnwcnt_sn" type="text" size="40" maxlength="200"%sp;
+        <input type="text" name="excnt_witnwcnt_sn" size="40" maxlength="200"%sp;
          value="" id="excnt_witnwcnt_sn"%/>
       </td>
     </tr>
     <tr>
       <td><label for="excnt_witnwcnt_fn">[*first name/first names]1&nbsp;:&nbsp;</label></td>
       <td>
-        <input name="excnt_witnwcnt_fn" type="text" size="40" maxlength="200"%sp;
+        <input type="text" name="excnt_witnwcnt_fn" size="40" maxlength="200"%sp;
          value="" id="excnt_witnwcnt_fn"%/>
       </td>
       <td align="%right;"><label for="excnt_witnwcnt_occ">[*number]&nbsp;:&nbsp;</label></td>
       <td>
-        <input name="excnt_witnwcnt_occ" type="text" size="5" maxlength="8"%sp;
+        <input type="text" name="excnt_witnwcnt_occ" size="5" maxlength="8"%sp;
          value="" id="excnt_witnwcnt_occ"%/>
       </td>
     </tr>
@@ -633,14 +633,14 @@ function changeCalendar(e,v,m,c) {
           %apply;selector_pevent(xcnt)
           <label id="pevent_label_selectorxcnt" style="display:none" class="other_evts">
             [or]0 [text]0&nbsp;:&nbsp;
-            <input name="e_namexcnt" size="40" maxlength="200" type="text" value="%event.e_name;" id="e_namexcnt"%/>
+            <input type="text" name="e_namexcnt" size="40" maxlength="200" value="%event.e_name;" id="e_namexcnt"%/>
           </label>
         </td>
       </tr>
       <tr>
         <td><label for="e_placexcnt">[*place]0&nbsp;:&nbsp;</label></td>
         <td>
-          <input name="e_placexcnt" type="text" size="50" value="%event.e_place;"%sp; id="e_placexcnt"%/>
+          <input type="text" name="e_placexcnt" size="50" value="%event.e_place;"%sp; id="e_placexcnt"%/>
           <a class="astuce" onmouseover="show_explain('updind','place',event)" onmouseout="hide_explain('updind',event)">&nbsp;</a>
         </td>
       </tr>
@@ -656,7 +656,7 @@ function changeCalendar(e,v,m,c) {
       <tr>
         <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
         <td>
-          <input name="e_srcxcnt" type="text" size="50" value="%event.e_src;"%sp; id="e_srcxcnt"%/>
+          <input type="text" name="e_srcxcnt" size="50" value="%event.e_src;"%sp; id="e_srcxcnt"%/>
         </td>
       </tr>
     </table>
@@ -681,14 +681,14 @@ function changeCalendar(e,v,m,c) {
         %apply;selector_pevent(xcnt)
         <label id="pevent_label_selectorxcnt" style="display:none">
           [or]0 [text]0&nbsp;:&nbsp;
-          <input name="e_namexcnt" size="40" maxlength="200" type="text" value="%event.e_name;" id="e_namexcnt"%/>
+          <input type="text" name="e_namexcnt" size="40" maxlength="200" value="%event.e_name;" id="e_namexcnt"%/>
         </label>
       </td>
     </tr>
     <tr>
       <td><label for="e_placexcnt">[*place]0&nbsp;:&nbsp;</label></td>
       <td>
-        <input name="e_placexcnt" type="text" size="50" value="" id="e_placexcnt"%/>
+        <input type="text" name="e_placexcnt" size="50" value="" id="e_placexcnt"%/>
         <a class="astuce" onmouseover="show_explain('updind','place',event)" onmouseout="hide_explain('updind',event)">&nbsp;</a>
       </td>
     </tr>
@@ -702,7 +702,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
       <td>
-        <input name="e_srcxcnt" type="text" size="50" value="" id="e_srcxcnt"%/>
+        <input type="text" name="e_srcxcnt" size="50" value="" id="e_srcxcnt"%/>
       </td>
     </tr>
   </table>
@@ -744,13 +744,13 @@ function changeCalendar(e,v,m,c) {
       <tr style = "display:none;">
         <td><label for="e_namexcnt">[*event/events]0&nbsp;:&nbsp;</label></td>
         <td>
-          <input name="e_namexcnt" type="text" size="30" type="text" value="%event.e_name;" id="e_namexcnt"%/>
+          <input type="text" name="e_namexcnt" size="30" value="%event.e_name;" id="e_namexcnt"%/>
         </td>
       </tr>
       <tr>
         <td><label for="e_placexcnt">[*place]</label></td>
         <td>
-          <input name="e_placexcnt" size="40" maxlenght="200" value="%event.e_place;"%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%end;%/>
+          <input type="text" name="e_placexcnt" size="40" maxlenght="200" value="%event.e_place;"%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%end;%/>
         </td>
       </tr>
     </table>
@@ -765,7 +765,7 @@ function changeCalendar(e,v,m,c) {
       <tr>
         <td><label for="e_srcxcnt">[*source/sources]0</label></td>
         <td>
-          <input name="e_srcxcnt" type="text" size="50" value="%event.e_src;" id="e_srcxcnt"%/>
+          <input type="text" name="e_srcxcnt" size="50" value="%event.e_src;" id="e_srcxcnt"%/>
         </td>
       </tr>
     </table>
@@ -815,13 +815,13 @@ function changeCalendar(e,v,m,c) {
     <tr style="display:none;">
       <td><label for="e_namexcnt">[*event/events]0</label></td>
       <td>
-        <input name="e_namexcnt" type="text" size="30" type="text" value="%if;("evt_name" != "buri_or_crem")%if;("evt_name" != "#deat" or (not not_dead and not dont_know_if_dead))evt_name%end;%end;" id="e_namexcnt"%/>
+        <input type="text" name="e_namexcnt" size="30" value="%if;("evt_name" != "buri_or_crem")%if;("evt_name" != "#deat" or (not not_dead and not dont_know_if_dead))evt_name%end;%end;" id="e_namexcnt"%/>
       </td>
     </tr>
     <tr>
       <td><label for="e_placexcnt">[*place]0</label></td>
       <td>
-        <input name="e_placexcnt" size="40" maxlength="200" type="text" value=""%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_burial_focus(xcnt)'%end;%/>
+        <input type="text" name="e_placexcnt" size="40" maxlength="200" value=""%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_burial_focus(xcnt)'%end;%/>
         <a class="astuce" onmouseover="show_explain('updind','place',event)" onmouseout="hide_explain('updind',event)">&nbsp;</a>
       </td>
     </tr>
@@ -843,7 +843,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
       <td>
-        <input name="e_srcxcnt" type="text" size="50" value=""%sp; id="e_srcxcnt"%/>
+        <input type="text" name="e_srcxcnt" size="50" value=""%sp; id="e_srcxcnt"%/>
       </td>
     </tr>
   </table>
@@ -915,17 +915,17 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="first_name">[*first name/first names]0</label></td>
       <td>
-        <input name="first_name" size="40" maxlength="200" value="%first_name;" id="first_name"%/>
+        <input type="text" name="first_name" size="40" maxlength="200" value="%first_name;" id="first_name"%/>
       </td>
       <td><label for="occ">[*number]0</label></td>
       <td>
-        <input name="occ" size="5" maxlength="8" value="%occ;" id="occ"%/>
+        <input type="text" name="occ" size="5" maxlength="8" value="%occ;" id="occ"%/>
       </td>
     </tr>
     <tr>
       <td><label for="surname">[*surname/surnames]0</label></td>
       <td>
-        <input name="surname" size="40" maxlength="200" value="%surname;" id="surname"%/>
+        <input type="text" name="surname" size="40" maxlength="200" value="%surname;" id="surname"%/>
       </td>
       <td>[*sex]</td>
       <td>
@@ -940,13 +940,13 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="public_name">[*public name]</label></td>
       <td colspan="3">
-        <input name="public_name" size="40" value="%public_name;" id="public_name"%/>
+        <input type="text" name="public_name" size="40" value="%public_name;" id="public_name"%/>
       </td>
     </tr>
     <tr>
       <td><label for="image">[*image/images]0</label></td>
       <td colspan="3">
-        <input name="image" size="40" value="%image;" id="image"%/>
+        <input type="text" name="image" size="40" value="%image;" id="image"%/>
       </td>
     </tr>
   </table>
@@ -958,7 +958,7 @@ function changeCalendar(e,v,m,c) {
       %foreach;qualifier;
         <tr>
           <td><label for="qualifier%cnt;">[*qualifier]0</label></td>
-          <td><input name="qualifier%cnt;" size="30" value="%qualifier;" id="qualifier%cnt;"%/></td>
+          <td><input type="text" name="qualifier%cnt;" size="30" value="%qualifier;" id="qualifier%cnt;"%/></td>
           <td><label for="add_qualifier%cnt;">[*insert::qualifier]</label></td>
           <td><input type="checkbox" name="add_qualifier%cnt;" value="on" id="add_qualifier%cnt;"%/></td>
         </tr>
@@ -966,7 +966,7 @@ function changeCalendar(e,v,m,c) {
     %elseif;(bvar.propose_qualifier != "no")
       <tr>
         <td><label for="qualifier0">[*qualifier]0</label></td>
-        <td><input name="qualifier0" size="30" value="" id="qualifier0"%/></td>
+        <td><input type="text" name="qualifier0" size="30" value="" id="qualifier0"%/></td>
         <td><label for="add_qualifier0">[*insert::qualifier]</label></td>
         <td><input type="checkbox" name="add_qualifier0" value="on" id="add_qualifier0"%/></td>
       </tr>
@@ -975,7 +975,7 @@ function changeCalendar(e,v,m,c) {
       %foreach;alias;
         <tr>
           <td><label for="alias%cnt;">[*alias]0</label></td>
-          <td><input name="alias%cnt;" size="30" value="%alias;" id="alias%cnt;"%/></td>
+          <td><input type="text" name="alias%cnt;" size="30" value="%alias;" id="alias%cnt;"%/></td>
           <td><label for="add_alias%cnt;">[*insert::alias]</label></td>
           <td><input type="checkbox" name="add_alias%cnt;" value="on" id="add_alias%cnt;"%/></td>
         </tr>
@@ -983,7 +983,7 @@ function changeCalendar(e,v,m,c) {
     %elseif;(bvar.propose_alias != "no")
       <tr>
         <td><label for="alias0">[*alias]0</label></td>
-        <td><input name="alias0" size="30" value="" id="alias0"%/></td>
+        <td><input type="text" name="alias0" size="30" value="" id="alias0"%/></td>
         <td><label for="add_alias0">[*insert::alias]</label></td>
         <td><input type="checkbox" name="add_alias0" value="on" id="add_alias0"%/></td>
       </tr>
@@ -993,7 +993,7 @@ function changeCalendar(e,v,m,c) {
         <tr>
           <td><label for="first_name_alias%cnt;">[*first name alias]0</label></td>
           <td>
-            <input name="first_name_alias%cnt;" size="30" value="%first_name_alias;" id="first_name_alias%cnt;"%/>
+            <input type="text" name="first_name_alias%cnt;" size="30" value="%first_name_alias;" id="first_name_alias%cnt;"%/>
           </td>
           <td><label for="add_first_name_alias%cnt;">[*insert::first name alias]</label></td>
           <td><input type="checkbox" name="add_first_name_alias%cnt;" value="on" id="add_first_name_alias%cnt;"%/></td>
@@ -1002,7 +1002,7 @@ function changeCalendar(e,v,m,c) {
     %else;
       <tr>
         <td><label for="first_name_alias0">[*first name alias]0</label></td>
-        <td><input name="first_name_alias0" size="30" value="" id="first_name_alias0"%/></td>
+        <td><input type="text" name="first_name_alias0" size="30" value="" id="first_name_alias0"%/></td>
         <td><label for="add_first_name_alias0">[*insert::first name alias]</label></td>
         <td><input type="checkbox" name="add_first_name_alias0" value="on" id="add_first_name_alias0"%/></td>
       </tr>
@@ -1012,7 +1012,7 @@ function changeCalendar(e,v,m,c) {
         <tr>
           <td>[*surname alias]0</td>
           <td>
-            <input name="surname_alias%cnt;" size="30" value="%surname_alias;"%/>
+            <input type="text" name="surname_alias%cnt;" size="30" value="%surname_alias;"%/>
           </td>
           <td>[*insert::surname alias]</td>
           <td><input type="checkbox" name="add_surname_alias%cnt;" value="on"%/></td>
@@ -1021,7 +1021,7 @@ function changeCalendar(e,v,m,c) {
     %else;
       <tr>
         <td><label for="surname_alias0">[*surname alias]0</label></td>
-        <td><input name="surname_alias0" size="30" value="" id="surname_alias0"%/></td>
+        <td><input type="text" name="surname_alias0" size="30" value="" id="surname_alias0"%/></td>
         <td><label for="add_surname_alias0">[*insert::surname alias]</label></td>
         <td><input type="checkbox" name="add_surname_alias0" value="on" id="add_surname_alias0"%/></td>
       </tr>
@@ -1035,7 +1035,7 @@ function changeCalendar(e,v,m,c) {
         <td>[*born]2...</td>
         <td><label for="birth_place">[*place]</label></td>
         <td>
-          <input name="birth_place" size="40" maxlength="200" value="%birth_place;" id="birth_place"%/>
+          <input type="text" name="birth_place" size="40" maxlength="200" value="%birth_place;" id="birth_place"%/>
         </td>
       </tr>
     </table>
@@ -1061,7 +1061,7 @@ function changeCalendar(e,v,m,c) {
         <td>[*baptized]2...</td>
         <td><label for="bapt_place">[*place]</label></td>
         <td>
-          <input name="bapt_place" size="40" maxlength="200" value="%bapt_place;" id="bapt_place"%/>
+          <input type="text" name="bapt_place" size="40" maxlength="200" value="%bapt_place;" id="bapt_place"%/>
         </td>
       </tr>
     </table>
@@ -1096,7 +1096,7 @@ function changeCalendar(e,v,m,c) {
         </td>
         <td>
           <label>[*place]0
-            <input name="death_place" size="40" maxlength="200" value="%death_place;" onfocus='setDead()'%/></label>
+            <input type="text" name="death_place" size="40" maxlength="200" value="%death_place;" onfocus='setDead()'%/></label>
         </td>
       </tr>
     </table>
@@ -1143,7 +1143,7 @@ function changeCalendar(e,v,m,c) {
         </td>
         <td>
           <label>[*place]0
-            <input name="burial_place" size="40" maxlength="200" value="%burial_place;"%/>
+            <input type="text" name="burial_place" size="40" maxlength="200" value="%burial_place;"%/>
           </label>
         </td>
       </tr>
@@ -1173,7 +1173,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width=700px>
     <tr>
       <td>
-        <input name="occu" size="40" maxlength="200" value="%occupation;" id="occu"%/>
+        <input type="text" name="occu" size="40" maxlength="200" value="%occupation;" id="occu"%/>
       </td>
     </tr>
   </table>
@@ -1213,11 +1213,11 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="rxcnt_xvar_fn">[*first name/first names]0</label></td>
       <td>
-        <input name="rxcnt_xvar_fn" size="23" maxlength="200"%sp;value="%relation.xrel.first_name;" id="rxcnt_xvar_fn"%/>
+        <input type="text" name="rxcnt_xvar_fn" size="23" maxlength="200"%sp;value="%relation.xrel.first_name;" id="rxcnt_xvar_fn"%/>
       </td>
       <td align="right"><label for="rxcnt_xvar_occ">[*number]</label></td>
       <td>
-        <input name="rxcnt_xvar_occ" size="5" maxlength="8"%sp;value="%relation.xrel.occ;" id="rxcnt_xvar_occ"%/>
+        <input type="text" name="rxcnt_xvar_occ" size="5" maxlength="8"%sp;value="%relation.xrel.occ;" id="rxcnt_xvar_occ"%/>
       </td>
       <td>
         <select name="rxcnt_xvar_p">
@@ -1229,7 +1229,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="rxcnt_xvar_sn">[*surname/surnames]0</label></td>
       <td colspan="4">
-        <input name="rxcnt_xvar_sn" size="40" maxlength="200"%sp;value="%relation.xrel.surname;" id="rxcnt_xvar_sn"%/>([sex]0 = xsex)
+        <input type="text" name="rxcnt_xvar_sn" size="40" maxlength="200"%sp;value="%relation.xrel.surname;" id="rxcnt_xvar_sn"%/>([sex]0 = xsex)
       </td>
     </tr>
   </table>
@@ -1263,7 +1263,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1">
     <tr>
       <td>
-        <label>[*insert::|<input name="ins_titlexx_n" size="1" maxlength="1"%sp;value="1"%/></label>
+        <label>[*insert::|<input type="text" name="ins_titlexx_n" size="1" maxlength="1"%sp;value="1"%/></label>
         <label> | title/titles]<input type="checkbox" name="ins_titlexx" value="on"%/></label>
       </td>
     </tr>
@@ -1275,21 +1275,21 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="t_identxcnt">[*title/titles]0</label></td>
       <td>
-        <input name="t_identxcnt" size="20" value="%title.t_ident;"%sp;id="t_identxcnt"%/>
+        <input type="text" name="t_identxcnt" size="20" value="%title.t_ident;"%sp;id="t_identxcnt"%/>
       </td>
       <td><label for="t_placexcnt">[*estate]0</label></td>
       <td colspan="2">
-        <input name="t_placexcnt" size="30" value="%title.t_estate;"%sp;id="t_placexcnt"%/>
+        <input type="text" name="t_placexcnt" size="30" value="%title.t_estate;"%sp;id="t_placexcnt"%/>
       </td>
     </tr>
     <tr>
       <td><label for="t_namexcnt">[*name]0</label></td>
       <td>
-        <input name="t_namexcnt" size="20" value="%title.t_name;"%sp;id="t_namexcnt"%/>
+        <input type="text" name="t_namexcnt" size="20" value="%title.t_name;"%sp;id="t_namexcnt"%/>
       </td>
       <td><label for="t_nthxcnt">[*nth]0</label></td>
       <td>
-        <input name="t_nthxcnt" size="3" value="%title.t_nth;"%sp;id="t_nthxcnt"%/>
+        <input type="text" name="t_nthxcnt" size="3" value="%title.t_nth;"%sp;id="t_nthxcnt"%/>
       </td>
       <td>
         <label>
@@ -1381,7 +1381,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width=700px>
     <tr>
       <td>
-        <input name="src" size="70" maxlength="300"%sp; value="%sources;"%sp;id="src"%/>
+        <input type="text" name="src" size="70" maxlength="300"%sp; value="%sources;"%sp;id="src"%/>
       </td>
     </tr>
   </table>
