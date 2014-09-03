@@ -32,7 +32,7 @@
     %apply;capitalize(nth([foster father/foster mother/foster parents], sex))
   %else;
     %apply;capitalize("xx")
-  %end;  
+  %end;
 %end;
 
 %define;relation_txt()
@@ -169,7 +169,7 @@
       </td>
     </tr>
   </table><br/>
-  
+
   %if;(evar.children = "on" and has_children)
     <table class="fp_table_children" cellspacing="0">
       <tr class="fp_grey">
@@ -183,11 +183,12 @@
     </table><br/>
   %end;
 
-  %if;(evar.comm = "on" and has_comment)
+  %if;(evar.comm = "on" and (has_comment or has_marriage_note))
     <table class="fp_marriage_notes">
       <tr>
         <td>
           <span class="textcolor">[*marriage notes]:</span> %comment;
+          %if;has_marriage_note;%marriage_note;%end;
         </td>
       </tr>
     </table><br/>
@@ -221,16 +222,16 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
         %apply;access("16","xx.father.father.father.father")
       %end;
-  
+
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;_____|
-  
+
       %apply;access("8","xx.father.father.father")
-  
+
       %if;xx.father.father.father.has_parents;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -252,14 +253,14 @@
       %end;
     %end;
   %end;
-  
+
   %if;xx.father.has_parents;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
     %apply;access("4","xx.father.father")
   %end;
-  
+
   %if;xx.father.has_parents;
     %if;xx.father.father.has_parents;
       %if;xx.father.father.mother.has_parents;
@@ -281,16 +282,16 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
       %end;
-  
+
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;/
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
-  
+
       %apply;access("9","xx.father.father.mother")
-  
+
       %if;xx.father.father.mother.has_parents;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -313,9 +314,9 @@
       &nbsp;&nbsp;&nbsp;&nbsp;/<br%/>
     %end;
   %end;
-  
+
   |%apply;access("2","xx.father")
-  
+
   %if;xx.father.has_parents;
     %if;xx.father.mother.has_parents;
       %if;xx.father.mother.father.has_parents;
@@ -336,7 +337,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         \<br%/>
       %end;
-  
+
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -344,9 +345,9 @@
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
-  
+
       %apply;access("10","xx.father.mother.father")
-  
+
       %if;xx.father.mother.father.has_parents;
         |
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -375,7 +376,7 @@
       &nbsp;&nbsp;\<br%/>
     %end;
   %end;
-  
+
   %if;xx.father.has_parents;
     |
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -383,7 +384,7 @@
     &nbsp;&nbsp;&nbsp;¯¯¯¯¯|
     %apply;access("5","xx.father.mother")
   %end;
-  
+
   %if;xx.father.has_parents;
     %if;xx.father.mother.has_parents;
       %if;xx.father.mother.mother.has_parents;
@@ -405,16 +406,16 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
       %end;
-  
+
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
-  
+
       %apply;access("11","xx.father.mother.mother")
-  
+
       %if;xx.father.mother.mother.has_parents;
         |
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -429,7 +430,7 @@
       %end;
     %end;
   %end;
-  
+
   |--%apply;access("1","xx")
 
   %if;xx.mother.has_parents;
@@ -446,16 +447,16 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
         %apply;access("24","xx.mother.father.father.father")
       %end;
-  
+
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
-  
+
       %apply;access("12","xx.mother.father.father")
-  
+
       %if;xx.mother.father.father.has_parents;
         |
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -477,7 +478,7 @@
       %end;
     %end;
   %end;
-  
+
   %if;xx.mother.has_parents;
     |
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -485,7 +486,7 @@
     &nbsp;&nbsp;&nbsp;_____|
     %apply;access("6","xx.mother.father")
   %end;
-  
+
   %if;xx.mother.has_parents;
     %if;xx.mother.father.has_parents;
       %if;xx.mother.father.mother.has_parents;
@@ -509,7 +510,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
       %end;
-  
+
       |
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -517,9 +518,9 @@
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
-  
+
       %apply;access("13","xx.mother.father.mother")
-  
+
       %if;xx.mother.father.mother.has_parents;
         |
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -540,9 +541,9 @@
       &nbsp;/<br%/>
     %end;
   %end;
-  
+
   |%apply;access("3","xx.mother")
-  
+
   %if;xx.mother.has_parents;
     %if;xx.mother.mother.has_parents;
       %if;xx.mother.mother.father.has_parents;
@@ -561,16 +562,16 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;\<br%/>
       %end;
-  
+
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;\
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_____|
-  
+
       %apply;access("14","xx.mother.mother.father")
-  
+
       %if;xx.mother.mother.father.has_parents;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -596,14 +597,14 @@
       &nbsp;&nbsp;&nbsp;&nbsp;\<br%/>
     %end;
   %end;
-  
+
   %if;xx.mother.has_parents;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;¯¯¯¯¯|
     %apply;access("7","xx.mother.mother")
   %end;
-  
+
   %if;xx.mother.has_parents;
     %if;xx.mother.mother.has_parents;
       %if;xx.mother.mother.mother.has_parents;
@@ -625,16 +626,16 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         \<br%/>
       %end;
-  
+
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       &nbsp;¯¯¯¯¯|
-  
+
       %apply;access("15","xx.mother.mother.mother")
-  
+
       %if;xx.mother.mother.mother.has_parents;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -706,8 +707,8 @@
             %xx.occupation;
           </li>
         %end;
-        %if;((xx.has_aliases or xx.has_nobility_titles or xx.has_occupation) and 
-             ((xx.has_birth_date or xx.has_birth_place) or (xx.has_baptism_date or xx.has_baptism_place) or 
+        %if;((xx.has_aliases or xx.has_nobility_titles or xx.has_occupation) and
+             ((xx.has_birth_date or xx.has_birth_place) or (xx.has_baptism_date or xx.has_baptism_place) or
              (xx.has_death_date or xx.has_death_place) or (xx.has_burial_date or xx.has_burial_place)))
           <li><hr%/></li>
         %end;
@@ -733,11 +734,18 @@
             %if;xx.has_death_place;%sp;[in (place)]%sp;%xx.death_place;%end;
           </li>
         %end;
-        %if;(xx.has_burial_date or xx.has_burial_place)
+        %if;xx.is_buried;
           <li>
             <span class="fp_grey_italic">%apply;capitalize(nth([buried],xx.sex))</span>
             %xx.on_burial_date;
             %if;xx.has_burial_place;%sp;[in (place)]%sp;%xx.burial_place;%end;
+          </li>
+        %end;
+        %if;xx.is_cremated;
+          <li>
+            <span class="fp_grey_italic">%apply;capitalize(nth([cremated],xx.sex))</span>
+            %xx.on_cremation_date;
+            %if;xx.has_cremation_place;%sp;[in (place)]%sp;%xx.cremation_place;%end;
           </li>
         %end;
       </ul>
@@ -752,7 +760,7 @@
       <tr><th colspan="2">[*parents]</th></tr>
       <tr>
         <td>
-          <span class="fp_grey_italic">[*father/mother]0:</span>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.father.sex)):</span>
           %xx.father;
           %if;(xx.father_age_at_birth != "")%sp;(%xx.father_age_at_birth;)%end;
         </td>
@@ -765,7 +773,7 @@
       </tr>
       <tr>
         <td>
-          <span class="fp_grey_italic">[*father/mother]1:</span>
+          <span class="fp_grey_italic">%apply;capitalize(nth([father/mother],xx.mother.sex)):</span>
           %xx.mother;
           %if;(xx.mother_age_at_birth != "")%sp;(%xx.mother_age_at_birth;)%end;
         </td>
@@ -794,7 +802,7 @@
             %apply;display_siblings("child", child_cnt)
           %end;
         %end;
-  
+
         %if;xx.has_parents;
           %if;(xx.father.nb_families > 1 or xx.mother.nb_families > 1)
             %reset_count;
@@ -926,7 +934,7 @@
               %foreach;witness;
                 <tr>
                   <td class="borderna">
-                    %apply;image_MF("witness", "11") %witness; %sp; 
+                    %apply;image_MF("witness", "11") %witness; %sp;
                     ([*witness/witnesses]0)
                   </td>
                   %apply;display_date("witness", 0)
@@ -934,6 +942,20 @@
               %end;
             %end;
           %end;
+        %end;
+        %foreach;xx.event_witness_relation;
+          <tr class="table_content_relations">
+            <td class="borderna">
+              %apply;image_MF("event_witness_relation.person", "11") %event_witness_relation.person; %sp;
+              %if;(event_witness_relation.event.spouse != "")
+                [and]
+                %apply;image_MF("event_witness_relation.event.spouse", "11") %event_witness_relation.event.spouse; %sp;
+              %end;
+              (%apply;capitalize(event_witness_relation_kind) :%sp;
+              %event_witness_relation.event.name;)
+            </td>
+            %apply;display_date("event_witness_relation.person", 0)
+          </tr>
         %end;
       </table>
     </div>
@@ -959,11 +981,45 @@
     </div>
   %end;
 
-  %if;(evar.note = "on" and xx.has_notes)
+  %if;(evar.note = "on" and (xx.has_notes or xx.has_event))
     <div style="page-break-inside:avoid;">
       <table class="fp_table" cellspacing="0">
         <tr><th>[*note/notes]1</th></tr>
-        <tr><td class="fp_notes">%xx.notes;</td>
+        <tr><td class="fp_notes">
+          %xx.notes;
+          %if;xx.has_event;
+            <table>
+              %foreach;xx.event;
+                <tr>
+                  <td valign="top" style="white-space: nowrap;" width="1">
+                    <span class="edate">
+                      %if;event.has_date;%event.date; :
+                      %else;--- :
+                      %end;
+                    </span>
+                  </td>
+                  <td valign="top">
+                    <span>
+                      %apply;capitalize(event.name)%sp;
+                      %if;event.has_spouse;([with] %event.spouse;)%end;
+                      %if;event.has_place; - %event.place; %end;
+                    </span>
+                    %if;event.has_witnesses;
+                      <p style="margin:0;">
+                        %foreach;event_witness;
+                          <span>%apply;capitalize(event_witness_kind) :</span>
+                          %apply;short_display_person("event_witness")<br/>
+                        %end;
+                      </p>
+                    %end;
+                    %if;event.has_note;<div>%event.note;</div>%end;
+                      %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                  </td>
+                </tr>
+              %end;
+            </table>
+          %end;
+        </td></tr>
       </table>
     </div>
   %end;
@@ -976,7 +1032,7 @@
       </table>
     </div>
   %end;
-  
+
   %if;(evar.src = "on" and xx.has_sources)
     <div style="page-break-inside:avoid;">
       <table class="fp_table" cellspacing="0">
