@@ -50,11 +50,11 @@
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
       <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
+       src="%image_prefix;/left.png"%wid_hei;left.png;
        alt="&lt;&lt;" title="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
+    src="%image_prefix;/up.png"%wid_hei;up.png;
     alt="^^" title="^^"%/></a>
   </td></tr></table>
 %end;
@@ -122,7 +122,7 @@
       <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
            style="border: none" alt="[M/F]1"%/>%nn;
     %else;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png" 
+      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png"
            style="border: none" alt="?" title="?"%/>%nn;
     %end;
     %sp;
@@ -245,8 +245,8 @@
   %xx.title;%xx.dates;
 %end;
 
-%define;my_link(aa, xx, rr)	
-  %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;	
+%define;my_link(aa, xx, rr)
+  %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;
 %end;
 
 %define;somebody_extra_info(xx)
@@ -350,15 +350,49 @@
 %define;child_notes(spec)
   %if;(child.sosa_in_list = "" and
        (evar.src = "on" and child.has_sources or
-        evar.notes = "on" and child.has_notes))
+        evar.notes = "on" and (child.has_notes or child.has_event)))
     <dt><a href="#%ancestor.anc_sosa.v;" name="notes-%ancestor.anc_sosa.v;
     %if;("spec" != "")-spec%end;
     %apply;letter(child_cnt)"><b>%ancestor.anc_sosa;
     %if;("spec" != "")-spec%end;
     %apply;letter(child_cnt)</b></a>:</dt>
     <dd>
-    %if;(evar.notes = "on" and child.has_notes)
-      <table><tr><td>%child.notes;</td></tr></table>
+    %if;(evar.notes = "on" and (child.has_notes or child.has_event))
+      <table><tr><td>
+        %child.notes;
+        %if;child.has_event;
+          <table>
+            %foreach;child.event;
+              <tr>
+                <td valign="top" style="white-space: nowrap;" width="1">
+                  <span class="edate">
+                    %if;event.has_date;%event.date; :
+                    %else;--- :
+                    %end;
+                  </span>
+                </td>
+                <td valign="top">
+                  <span>
+                    %apply;capitalize(event.name)%sp;
+                    %if;event.has_spouse;([with] %event.spouse;)%end;
+                    %if;event.has_place; - %event.place; %end;
+                  </span>
+                  %if;event.has_witnesses;
+                    <p style="margin:0;">
+                      %foreach;event_witness;
+                        <span>%apply;capitalize(event_witness_kind) :</span>
+                        %apply;short_display_person("event_witness")<br/>
+                      %end;
+                    </p>
+                  %end;
+                  %if;event.has_note;<div>%event.note;</div>%end;
+                    %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                </td>
+              </tr>
+            %end;
+          </table>
+        %end;
+      </td></tr></table>
       <br%/>
     %end;
     %if;(evar.src = "on" and child.has_sources)
@@ -384,14 +418,48 @@
          and (evar.only != "on" or level = evar.v))
       %foreach;ancestor;
         %if;((evar.src = "on" and ancestor.has_sources or
-              evar.notes = "on" and ancestor.has_notes)
+              evar.notes = "on" and (ancestor.has_notes or ancestor.has_event))
              and ancestor.same = "")
           <dt><b><a href="#%ancestor.anc_sosa.v;
           " name="notes-%ancestor.anc_sosa.v;
           ">%ancestor.anc_sosa;</a></b>:</dt>
           <dd>
-          %if;(evar.notes = "on" and ancestor.has_notes)
-            <table><tr><td>%ancestor.notes;</td></tr></table>
+          %if;(evar.notes = "on" and (ancestor.has_notes or ancestor.has_event))
+            <table><tr><td>
+              %ancestor.notes;
+              %if;ancestor.has_event;
+                <table>
+                  %foreach;ancestor.event;
+                    <tr>
+                      <td valign="top" style="white-space: nowrap;" width="1">
+                        <span class="edate">
+                          %if;event.has_date;%event.date; :
+                          %else;--- :
+                          %end;
+                        </span>
+                      </td>
+                      <td valign="top">
+                        <span>
+                          %apply;capitalize(event.name)%sp;
+                          %if;event.has_spouse;([with] %event.spouse;)%end;
+                          %if;event.has_place; - %event.place; %end;
+                        </span>
+                        %if;event.has_witnesses;
+                          <p style="margin:0;">
+                            %foreach;event_witness;
+                              <span>%apply;capitalize(event_witness_kind) :</span>
+                              %apply;short_display_person("event_witness")<br/>
+                            %end;
+                          </p>
+                        %end;
+                        %if;event.has_note;<div>%event.note;</div>%end;
+                          %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                      </td>
+                    </tr>
+                  %end;
+                </table>
+              %end;
+            </td></tr></table>
             <br%/>
           %end;
           %if;(evar.src = "on" and ancestor.has_sources)
@@ -472,10 +540,43 @@
       %end;
     %end;
   %end;
-  %if;((evar.notes = "on" and ancestor.has_notes and evar.inline = "on") or (evar.src = "on" and ancestor.has_sources and evar.inline = "on"))
+  %if;((evar.notes = "on" and (ancestor.has_notes or ancestor.has_event) and evar.inline = "on") or (evar.src = "on" and ancestor.has_sources and evar.inline = "on"))
     <p class="asc_notes_src_inline">
-      %if;(evar.notes = "on" and ancestor.has_notes)
+      %if;(evar.notes = "on" and (ancestor.has_notes or ancestor.has_event))
         [*note/notes]0 : %apply;clean_html_tags(ancestor.notes)
+        <br%/>
+        %if;ancestor.has_event;
+          <table>
+            %foreach;ancestor.event;
+              <tr>
+                <td valign="top" style="white-space: nowrap;" width="1">
+                  <span class="edate">
+                    %if;event.has_date;%event.date; :
+                    %else;--- :
+                    %end;
+                  </span>
+                </td>
+                <td valign="top">
+                  <span>
+                    %apply;capitalize(event.name)%sp;
+                    %if;event.has_spouse;([with] %event.spouse;)%end;
+                    %if;event.has_place; - %event.place; %end;
+                  </span>
+                  %if;event.has_witnesses;
+                    <p style="margin:0;">
+                      %foreach;event_witness;
+                        <span>%apply;capitalize(event_witness_kind) :</span>
+                        %apply;short_display_person("event_witness")<br/>
+                      %end;
+                    </p>
+                  %end;
+                  %if;event.has_note;<div>%event.note;</div>%end;
+                    %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                </td>
+              </tr>
+            %end;
+          </table>
+        %end;
         <br%/>
       %end;
       %if;(evar.src = "on" and ancestor.has_sources)
@@ -489,7 +590,7 @@
       %end;
     </p>
   %end;
-  %if;((evar.notes = "on" and ancestor.has_notes or evar.src = "on" and ancestor.has_sources) and evar.inline != "on")
+  %if;((evar.notes = "on" and (ancestor.has_notes or ancestor.has_event) or evar.src = "on" and ancestor.has_sources) and evar.inline != "on")
     %if;(evar.notes = "on")%[[*note/notes]0%sp;
     %else;%[[*source/sources]1%sp;
     %end;
@@ -507,9 +608,9 @@
   %else;
     %apply;somebody_extra_info("child").
     %foreach;child.family;
-      %if;(evar.inline= "on" and ((child.has_notes and evar.notes = "on") or (child.has_sources and evar.src = "on")))
+      %if;(evar.inline= "on" and (((child.has_notes or child.has_event) and evar.notes = "on") or (child.has_sources and evar.src = "on")))
         <br%/>
-      %end; 
+      %end;
       %apply;capitalize%with;
         %apply;married_to%with;
           %child.is_male;
@@ -532,10 +633,43 @@
       %elseif;are_separated;[*separated]0.%nl;
       %end;
     %end;
-    %if;((evar.notes = "on" and child.has_notes and evar.inline = "on") or (evar.src = "on" and child.has_sources and evar.inline = "on"))
+    %if;((evar.notes = "on" and (child.has_notes or child.has_event) and evar.inline = "on") or (evar.src = "on" and child.has_sources and evar.inline = "on"))
       <p class="asc_notes_src_inline">
-        %if;(evar.notes = "on" and child.has_notes)
+        %if;(evar.notes = "on" and (child.has_notes or child.has_event))
           [*note/notes]0 : %apply;clean_html_tags(child.notes)
+          <br%/>
+          %if;child.has_event;
+            <table>
+              %foreach;child.event;
+                <tr>
+                  <td valign="top" style="white-space: nowrap;" width="1">
+                    <span class="edate">
+                      %if;event.has_date;%event.date; :
+                      %else;--- :
+                      %end;
+                    </span>
+                  </td>
+                  <td valign="top">
+                    <span>
+                      %apply;capitalize(event.name)%sp;
+                      %if;event.has_spouse;([with] %event.spouse;)%end;
+                      %if;event.has_place; - %event.place; %end;
+                    </span>
+                    %if;event.has_witnesses;
+                      <p style="margin:0;">
+                        %foreach;event_witness;
+                          <span>%apply;capitalize(event_witness_kind) :</span>
+                          %apply;short_display_person("event_witness")<br/>
+                        %end;
+                      </p>
+                    %end;
+                    %if;event.has_note;<div>%event.note;</div>%end;
+                      %if;event.has_src;<span><em>[*source/sources]1: %event.src;</em></span>%end;
+                  </td>
+                </tr>
+              %end;
+            </table>
+          %end;
           <br%/>
         %end;
         %if;(evar.src = "on" and child.has_sources)
@@ -549,7 +683,7 @@
         %end;
       </p>
     %end;
-    %if;((evar.notes = "on" and child.has_notes or evar.src = "on" and child.has_sources) and evar.inline != "on")
+    %if;((evar.notes = "on" and (child.has_notes or child.has_event) or evar.src = "on" and child.has_sources) and evar.inline != "on")
       %if;(evar.notes = "on")%[[*note/notes]0%sp;
       %else;%[[*source/sources]1%sp;
       %end;
@@ -585,7 +719,12 @@
             %apply;link2(witness.var)
           %end;),
         %end;
-        %if;(evar.comm = "on" and has_comment)(%comment;)%nl;%end;
+        %if;(evar.comm = "on" and (has_comment or has_marriage_note))
+          (%comment;
+           %if;has_marriage_note;
+             %marriage_note;
+           %end;)%nl;
+        %end;
         <i>[having as children]:</i>
         <p>
           <ol style="list-style-type:lower-latin">
@@ -948,7 +1087,7 @@
       %end;
     </ul>
     <p>[*total]: %count; [[person/persons]1@(c)]</p>
-  
+
   %elseif;(evar.t = "N")
     %( short display %)
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
@@ -988,7 +1127,7 @@
       %end;
     </ul>
     <p>[*total]: %count; [[person/persons]1@(c)]</p>
-  
+
   %elseif;(evar.t = "M" and evar.evt = "on")
     %include.miss_evt;
 
@@ -1050,7 +1189,7 @@
         %end;
       %end;
     %end;
-  
+
     %let;nb_ind;%count;%in;
     %reset_count;
     %if;(nb_ind > 100)
@@ -1062,7 +1201,7 @@
         %end;
       </p>
     %end;
-  
+
     <ul class="missing_ancestors_sort">
       %if;(nb_ind <= 100)
         <li>%nn;
@@ -1070,7 +1209,7 @@
         <table class="missing_ancestors_table">
           <tr class="missing_ancestors_table_header">
             <th width="20%%">[*person/persons]0</th>
-            %if;(evar.birth = "on") 
+            %if;(evar.birth = "on")
               <th %if;(evar.death = "on")width="30%%"%else;width="60%%"%end;>[*birth date and birth place]</th>
             %end;
             %if;(evar.death = "on")
@@ -1087,7 +1226,7 @@
           <table class="missing_ancestors_table">
             <tr class="missing_ancestors_table_header">
               <th width="20%%">[*person/persons]0</th>
-              %if;(evar.birth = "on") 
+              %if;(evar.birth = "on")
                 <th %if;(evar.death = "on")width="30%%"%else;width="60%%"%end;>[*birth date and birth place]</th>
               %end;
               %if;(evar.death = "on")
@@ -1098,7 +1237,7 @@
             </tr>
         %end;
         <tr>
-          <td> 
+          <td>
             %if;(evar.cgl = "on")
               %item.5;%item.1;%sp;%item.2;%item.3;
             %else;
@@ -1132,7 +1271,7 @@
       %end;
     </ul>
     <p style="clear:both;">[*total]: %count; [[person/persons]1@(c)]</p>
-  
+
   %elseif;(evar.t = "M")
     %( missing ancestors by generation %)
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
@@ -1244,7 +1383,7 @@
   %elseif;(evar.t = "G" and evar.only= "on")
     %( long display; only the selected generation %)
     %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
-      <p class="not_printable"> 
+      <p class="not_printable">
         [*see]: <a href="#asc">[*ancestors]</a>%sp;%nn;
         %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
           | <a href="#ns">[*note/notes]1</a>
@@ -1279,11 +1418,11 @@
       <p><hr%/></p>
       <p>%apply;long_display_notes()</p>
     %end;
-  
+
   %elseif;(evar.t = "G")
     %( long display %)
     %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
-      <p class="not_printable"> 
+      <p class="not_printable">
         [*see]: <a href="#asc">[*ancestors]</a>%sp;%nn;
         %if;((evar.notes = "on" or evar.src = "on") and evar.inline != "on")
           | <a href="#ns">[*note/notes]1</a>
@@ -1318,7 +1457,7 @@
       <p><hr%/></p>
       <p>%apply;long_display_notes()</p>
     %end;
-  
+
   %elseif;(evar.t = "D")
     %( ancestors up to somebody %)
     %pvar.1.mark_descendants;
@@ -1342,7 +1481,7 @@
         %if;lazy_printed;</ul>%nl;</li>%nl;%end;
       %end;
     </ul>
-  
+
   %elseif;(evar.t = "Z" and evar.only = "on")
     <p>%apply;gen("v").</p>
     %reset_count;
