@@ -152,32 +152,14 @@ function changeCalendar(e,v,m,c) {
 </script>
 
 <script type="text/javascript">
-  function show_label(d) {
-    var d_select = document.getElementById(d+'_select');
-    var d_or = document.getElementById(d+'_oryear');
-    var d_span_or = document.getElementById(d+'_oryear_sp');
-    var d_span_between = document.getElementById(d+'_yearint_sp');
-
-    d_or.style.display = 'none';
-    d_span_or.style.display = 'none';
-    d_span_between.style.display = 'none';
-
-    if (d_select.value == "oryear" || d_select.value == "yearint") {
-      d_or.style.display = 'inline';
-      if (d_select.value == "oryear") {
-        d_span_or.style.display = 'inline';
-      }
-      else {
-        d_span_between.style.display = 'inline';
-      }
-    }
-  }
-
   function show_fevent_label(xxname, xcnt) {
     var selector = document.getElementById('fevent_select' + xcnt);
     var label = document.getElementById('fevent_label_selector' + xcnt);
     var input = document.getElementById('e_name' + xcnt);
     if (selector.value == "") {
+      console.log('IF');
+      console.log('selector.value=' + selector.value);
+      console.log('input.value=' + input.value);
       if (xxname.charAt(0) == "#") {
         input.value = "";
       }
@@ -186,6 +168,9 @@ function changeCalendar(e,v,m,c) {
       }
     }
     else {
+      console.log('ELSE');
+      console.log('selector.value=' + selector.value);
+      console.log('input.value=' + input.value);
       input.value = selector.value;
     }
     if (selector.value == "" || selector.value.charAt(0) != "#") {
@@ -210,7 +195,7 @@ function changeCalendar(e,v,m,c) {
 %include_perso_header;
 
 %define;date(xlab,xvar,xdt,xcond)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>xlab</td>
       <td>
@@ -270,7 +255,7 @@ function changeCalendar(e,v,m,c) {
       </td>
     </tr>
   </table>
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>
         [*calendar/calendars]0
@@ -354,7 +339,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;source(xvar,xx)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="xvar_src">[*source/sources]0</label></td>
       <td><input type="text" name="xvar_src" size="50" maxlength="200" value="%xx_src;" id="xvar_src"%/></td>
@@ -363,7 +348,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;note(xvar,xx)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="xvar_note">[*note/notes]0</label></td>
       <td><input type="text" name="xvar_note" size="50" maxlength="200" value="%xx_note;" id="xvar_note"%/></td>
@@ -435,7 +420,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;parent(xcnt,xx)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="paxcnt_fn">[*first name/first names]0</label></td>
       <td>
@@ -474,7 +459,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;insert_parent(xcnt)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>
         [*insert::|<input type="text" name="ins_paxcnt_n" size="1" maxlength="1" value="1"%/> | parents]
@@ -526,7 +511,7 @@ function changeCalendar(e,v,m,c) {
 
 %define;one_witness(xcnt, wcnt)
   <p></p>
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>[*witness/witnesses]0</td>
     </tr>
@@ -571,7 +556,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;one_fevent(xcnt)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="e_namexcnt">[*event/events]0</label></td>
       <td>
@@ -590,7 +575,7 @@ function changeCalendar(e,v,m,c) {
     </tr>
   </table>
   %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="e_notexcnt">[*note/notes]0</label></td>
       <td>
@@ -683,7 +668,7 @@ function changeCalendar(e,v,m,c) {
         <input type="radio" name="mrel" value="no_ment"%if;(mrel = "no_ment")checked="checked"%end;%/>[*no mention]
       </label>
     </p>
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td><label for="marr_place">[*place]</label></td>
         <td>
@@ -708,7 +693,7 @@ function changeCalendar(e,v,m,c) {
     </table>
 
     %foreach;witness;
-      <table border="1" width=700px>
+      <table border="1" width="700px">
         <tr>
           <td><label for="witn%cnt;_fn">[*first name/first names]0</label></td>
           <td>
@@ -782,7 +767,7 @@ function changeCalendar(e,v,m,c) {
 
   <h4><label for="comment">[*comment]</label></h4>
 
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>
         <input type="text" name="comment" size="50" maxlength="200" value="%comment;" id="comment"%/>
@@ -809,7 +794,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;child(xcnt)
-  <table border="1" width=660px>
+  <table border="1" width="660px">
     <tr>
       <td><label for="chxcnt_fn">[*first name/first names]0</label></td>
       <td colspan="2">

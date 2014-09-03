@@ -148,48 +148,9 @@ function changeCalendar(e,v,m,c) {
 </script>
 
 <script type="text/javascript">
-  function show_label(d) {
-    var d_select = document.getElementById(d+'_select');
-    var d_or = document.getElementById(d+'_oryear');
-    var d_span_or = document.getElementById(d+'_oryear_sp');
-    var d_span_between = document.getElementById(d+'_yearint_sp');
-
-    d_or.style.display = 'none';
-    d_span_or.style.display = 'none';
-    d_span_between.style.display = 'none';
-
-    if (d_select.value == "oryear" || d_select.value == "yearint") {
-      d_or.style.display = 'inline';
-      if (d_select.value == "oryear") {
-        d_span_or.style.display = 'inline';
-      }
-      else {
-        d_span_between.style.display = 'inline';
-      }
-    }
-  }
-
-  function show_pevent_label(xxname, xcnt) {
-    var selector = document.getElementById('pevent_select' + xcnt);
-    var label = document.getElementById('pevent_label_selector' + xcnt);
-    var input = document.getElementById('e_name' + xcnt);
-    if (selector.value == "") {
-      if (xxname.charAt(0) == "#") {
-        input.value = "";
-      }
-      else {
-        input.value = xxname;
-      }
-    }
-    else {
-      input.value = selector.value;
-    }
-    if (selector.value == "" || selector.value.charAt(0) != "#") {
-      label.style.display = 'inline';
-    }
-    else {
-      label.style.display = 'none';
-    }
+  function setDead()
+  {
+    document.forms%[0].death.value = "Death";
   }
 
   function change_buri(xcnt) {
@@ -206,11 +167,6 @@ function changeCalendar(e,v,m,c) {
     }
   }
 
-  function setDead()
-  {
-    document.forms%[0].death.value = "Death";
-  }
-
   function change_death(xcnt) {
     var selector = document.getElementById('death_select' + xcnt);
     var input = document.getElementById('e_name' + xcnt);
@@ -219,14 +175,6 @@ function changeCalendar(e,v,m,c) {
     }
     else {
       input.value = "";
-    }
-  }
-
-  function set_death(xcnt) {
-    var selector = document.getElementById('death_select' + xcnt);
-    if (selector.value == "") {
-      selector.value = "Death";
-      change_death(xcnt);
     }
   }
 
@@ -248,17 +196,35 @@ function changeCalendar(e,v,m,c) {
     change_death(xcnt);
   }
 
-  /*
-  function sort_selector () {
-    var options = $(this.option);
-    var arr = options.map(function(_, o) { return { t: $(o).text(), v: o.value }; }).get();
-    arr.sort(function(o1, o2) { return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0; });
-    options.each(function(i, o) {
-      o.value = arr[i].v;
-      $(o).text(arr[i].t);
-    });
+  function show_pevent_label(xxname, xcnt) {
+    var selector = document.getElementById('pevent_select' + xcnt);
+    var label = document.getElementById('pevent_label_selector' + xcnt);
+    var input = document.getElementById('e_name' + xcnt);
+    if (selector.value == "") {
+      console.log('IF');
+      console.log('selector.value=' + selector.value);
+      console.log('input.value=' + input.value);
+      if (xxname.charAt(0) == "#") {
+        input.value = "";
+      }
+      else {
+        input.value = xxname;
+      }
+    }
+    else {
+      console.log('ELSE');
+      console.log('selector.value=' + selector.value);
+      console.log('input.value=' + input.value);
+      input.value = selector.value;
+    }
+    if (selector.value == "" || selector.value.charAt(0) != "#") {
+      label.style.display = 'inline';
+    }
+    else {
+      label.style.display = 'none';
+    }
   }
-  */
+
 
   $(document).ready(function(){
      //show evt perso
@@ -274,7 +240,7 @@ function changeCalendar(e,v,m,c) {
 %include_perso_header;
 
 %define;date(xlab,xvar,xdt,xcond)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>xlab</td>
       <td>
@@ -334,7 +300,7 @@ function changeCalendar(e,v,m,c) {
       </td>
     </tr>
   </table>
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>
         [*calendar/calendars]0
@@ -418,7 +384,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;source(xx)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="xx_src">[*source/sources]0</label></td>
       <td>
@@ -429,7 +395,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;note(xx)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="xx_note">[*note/notes]0</label></td>
       <td><input type="text" name="xx_note" size="50" maxlength="200" value="%xx_note;" id="xx_note"%/></td>
@@ -439,7 +405,7 @@ function changeCalendar(e,v,m,c) {
 
 %define;selector_pevent(xcnt)
   <select id="pevent_selectxcnt" onchange="show_pevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
-    <option value=" ">-</option>
+    <option value="">-</option>
     <option value="#acco" %if;(event.e_name = "#acco") selected="selected" %end;>[*accomplishment]</option>
     <option value="#acqu" %if;(event.e_name = "#acqu") selected="selected" %end;>[*acquisition]</option>
     <option value="#adhe" %if;(event.e_name = "#adhe") selected="selected" %end;>[*adhesion]</option>
@@ -519,7 +485,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;one_witness(xcnt, wcnt, evt_name)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>[*witness/witnesses]0</td>
       <td>
@@ -566,8 +532,8 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;one_empty_witness(xcnt, wcnt, evt_name)
-  <br/>
-  <table border="1" width=700px>
+  <br%/>
+  <table border="1" width="700px">
     <tr>
       <td><b><i>[*witness/witnesses]0&nbsp;:&nbsp;</i></b></td>
       <td colspan="2">
@@ -626,7 +592,7 @@ function changeCalendar(e,v,m,c) {
 
 %define;one_pevent(xcnt)
   %if;(event.e_name != "#birt" and event.e_name != "#bapt" and event.e_name != "#deat" and event.e_name != "#buri" and event.e_name != "#crem")
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td><label for="e_namexcnt">[*event/events]0&nbsp;:&nbsp;</label></td>
         <td>
@@ -646,7 +612,7 @@ function changeCalendar(e,v,m,c) {
       </tr>
     </table>
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td><label for="e_notexcnt">[*note/notes]1&nbsp;:&nbsp;</label></td>
         <td>
@@ -669,12 +635,12 @@ function changeCalendar(e,v,m,c) {
     %else;
       %apply;insert_witness(xcnt, "0", "")
     %end;
-    <br/><br/>
+    <br%/><br%/>
   %end;
 %end
 
 %define;one_empty_pevent(xcnt)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="e_namexcnt">[*event/events]0&nbsp;:&nbsp;</label></td>
       <td>
@@ -711,7 +677,7 @@ function changeCalendar(e,v,m,c) {
 
 %define;one_specific_pevent(xcnt, evt_name)
   %if;(event.e_name = "evt_name")
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       %if;("evt_name" = "#deat")
         <tr>
           <td>&nbsp;</td>
@@ -755,7 +721,7 @@ function changeCalendar(e,v,m,c) {
       </tr>
     </table>
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", " %if;('evt_name' = '#deat') onfocus='set_death_focus(xcnt)'%end;")
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td><label for="e_notexcnt">[*note/notes]1</label></td>
         <td>
@@ -782,7 +748,7 @@ function changeCalendar(e,v,m,c) {
 %end
 
 %define;one_empty_specific_pevent(xcnt, evt_name)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     %if;("evt_name" = "#deat")
       <tr>
         <td>&nbsp;</td>
@@ -833,7 +799,7 @@ function changeCalendar(e,v,m,c) {
   %else;
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
   %end;
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="e_notexcnt">[*note/notes]1&nbsp;:&nbsp;</label></td>
       <td>
@@ -911,7 +877,7 @@ function changeCalendar(e,v,m,c) {
     %end;
   </p>
 
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="first_name">[*first name/first names]0</label></td>
       <td>
@@ -953,7 +919,7 @@ function changeCalendar(e,v,m,c) {
 
   <p></p>
 
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     %if;has_qualifiers;
       %foreach;qualifier;
         <tr>
@@ -1030,7 +996,7 @@ function changeCalendar(e,v,m,c) {
 
   <h4><a name="birth">[*birth]</a></h4>
   <div style="display:none;">
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td>[*born]2...</td>
         <td><label for="birth_place">[*place]</label></td>
@@ -1056,7 +1022,7 @@ function changeCalendar(e,v,m,c) {
 
   <h4><a name="baptism">[*baptism]</a></h4>
   <div style="display:none;">
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td>[*baptized]2...</td>
         <td><label for="bapt_place">[*place]</label></td>
@@ -1080,7 +1046,7 @@ function changeCalendar(e,v,m,c) {
 
   <h4><a name="death">[*death]</a></h4>
   <div style="display:none;">
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td>
           <select name="death" id="death_selectxcnt" onchange="change_death('xcnt')">
@@ -1101,7 +1067,7 @@ function changeCalendar(e,v,m,c) {
       </tr>
     </table>
     %apply;date([*date/dates]0, "death", "death", " onfocus='setDead()'")
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td>
           <label>
@@ -1132,7 +1098,7 @@ function changeCalendar(e,v,m,c) {
 
   <h4>[*burial]</h4>
   <div style="display:none;">
-    <table border="1" width=700px>
+    <table border="1" width="700px">
       <tr>
         <td>
           <select name="burial">
@@ -1170,7 +1136,7 @@ function changeCalendar(e,v,m,c) {
 
   <h4><label for="occu">[*occupation/occupations]1</label></h4>
 
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>
         <input type="text" name="occu" size="40" maxlength="200" value="%occupation;" id="occu"%/>
@@ -1209,7 +1175,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;one_relation(xcnt,xvar,xrel,xsex)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="rxcnt_xvar_fn">[*first name/first names]0</label></td>
       <td>
@@ -1271,7 +1237,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;one_title(xcnt)
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td><label for="t_identxcnt">[*title/titles]0</label></td>
       <td>
@@ -1378,7 +1344,7 @@ function changeCalendar(e,v,m,c) {
 
   <h4><label for="src">[*source/sources]0</label></h4>
 
-  <table border="1" width=700px>
+  <table border="1" width="700px">
     <tr>
       <td>
         <input type="text" name="src" size="70" maxlength="300"%sp; value="%sources;"%sp;id="src"%/>
