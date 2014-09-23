@@ -1890,7 +1890,10 @@ value treat_indi_pevent gen ip r =
          [ Some rr ->
              if rr.rval <> "" then
                let name =
-                 find_pevent_name_from_tag gen (String.lowercase rr.rval) rr.rval
+                 if List.mem rr.rval primary_pevents then
+                   find_pevent_name_from_tag gen rr.rval rr.rval
+                 else
+                   find_pevent_name_from_tag gen (String.lowercase rr.rval) rr.rval
                in
                let date =
                  match find_field "DATE" r.rsons with
@@ -2626,7 +2629,10 @@ value treat_fam_fevent gen ifath imoth r =
          [ Some rr ->
              if rr.rval <> "" then
                let name =
-                 find_fevent_name_from_tag gen (String.lowercase rr.rval) rr.rval
+                 if List.mem rr.rval primary_fevents then
+                   find_fevent_name_from_tag gen rr.rval rr.rval
+                 else
+                   find_fevent_name_from_tag gen (String.lowercase rr.rval) rr.rval
                in
                let date =
                  match find_field "DATE" r.rsons with
