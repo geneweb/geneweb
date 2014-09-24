@@ -71,11 +71,26 @@ value next_char_pair_overflows s len i =
 ;
 
 value br = "<br>";
+value find_br s ini_i =
+  let ini = "<br" in
+  loop 0 ini_i where rec loop i j =
+    if i = String.length ini then
+      (* Trouvé, maintenant, on regarde comment se ferme la balise. *)
+      loop2 j where rec loop2 j =
+        if j = String.length s then br
+        else if s.[j] = '>' then String.sub s ini_i (j - ini_i + 1)
+        else loop2 (j + 1)
+    else if j = String.length s then br
+    else if String.unsafe_get ini i = String.unsafe_get s j then
+      loop (i + 1) (j + 1)
+    else br
+;
 
 value rec display_note_aux oc s len i =
   if i = String.length s then fprintf oc "\n"
   else
     let c = if s.[i] = '\n' then ' ' else s.[i] in
+    let br = find_br s i in
     if i <= String.length s - String.length br &&
        String.lowercase (String.sub s i (String.length br)) = br then
        do {
