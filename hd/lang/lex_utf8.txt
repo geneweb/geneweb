@@ -5078,7 +5078,7 @@ nl: half broers en zusters
 
     happy birthday to them!
 de: Herzlichen Glückwunsch zum Geburtstag!
-en: happy birthday to them!
+en: happy wedding anniversary to them!
 es: ¡Feliz cumpleaños!
 fi: hyvää syntymäpäivää!
 fr: bon anniversaire !
