@@ -353,6 +353,8 @@ value strip_newlines_after_variables =
         [Afor i min max (loop al) :: loop astl]
     | [(Atransl _ _ _ _ | Awid_hei _ as ast1); (Atext _ _ as ast2) :: astl] ->
         [ast1; ast2 :: loop astl]
+    | [Aimport file al :: astl] ->
+        [Aimport file (loop al) :: loop astl]
     | [ast :: astl] -> [ast :: loop astl]
     | [] -> [] ]
 ;
@@ -461,7 +463,7 @@ value parse_templ conf strm =
           match Util.open_templ conf file with
           [ Some ic ->
               let strm2 = (Stream.of_channel ic) in
-              let (al, _) = parse_astl [] True 0 [] strm2 in
+              let (al, _) = parse_astl [] False 0 [] strm2 in
               Some (Aimport file al)
           | None -> None ]
         in
