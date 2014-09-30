@@ -314,6 +314,115 @@ let print_find_sosa conf base =
 ;;
 
 
+(**/**) (* API_MAX_ANCESTORS *)
+
+(* ************************************************************************ *)
+(*  [Fonc] print_max_ancestors : config -> base -> ReferencePerson          *)
+(** [Description] : Recherche la personne qui a le plus d'ancêtres.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] : ReferencePerson
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let print_max_ancestors conf base =
+  let module IperSet =
+        Set.Make
+          (struct
+            type t = iper;;
+            let compare i1 i2 =
+              Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2);;
+           end)
+  in
+
+  let nb_ind = nb_of_persons base in
+  let ancestors = Array.create nb_ind IperSet.empty in
+  let mark = Array.create nb_ind false in
+
+  let has_children ip =
+    let p = poi base ip in
+    let fam = get_family p in
+    let rec loop fam =
+      match fam with
+      | [] -> false
+      | ifam :: l ->
+          let des = foi base ifam in
+          if Array.length (get_children des) > 0 then true
+          else loop l
+    in
+    loop (Array.to_list fam)
+  in
+
+  let rec nb_ancestors ip =
+    if mark.(Adef.int_of_iper ip) then ancestors.(Adef.int_of_iper ip)
+    else
+      begin
+        let anc =
+          match get_parents (poi base ip) with
+          | Some ifam ->
+              let cpl = foi base ifam in
+              let anc =
+                IperSet.add (get_father cpl) ancestors.(Adef.int_of_iper ip)
+              in
+              let anc =
+                IperSet.add (get_mother cpl) anc
+              in
+              let anc2 =
+                IperSet.union
+                  (nb_ancestors (get_father cpl))
+                  (nb_ancestors (get_mother cpl))
+              in
+              IperSet.union anc anc2
+          | None -> IperSet.empty
+        in
+        ancestors.(Adef.int_of_iper ip) <- anc;
+        mark.(Adef.int_of_iper ip) <- true;
+        anc
+      end
+  in
+
+  (*
+  let () = load_ascends_array base in
+  let () = load_couples_array base in
+  let () = load_descends_array base in
+  let () = load_unions_array base in
+  *)
+  let rec loop i =
+    if i = nb_ind then ()
+    else if has_children (Adef.iper_of_int i) then loop (succ i)
+    else if mark.(i) then loop (succ i)
+    else
+      begin
+        let anc = nb_ancestors (Adef.iper_of_int i) in
+        ancestors.(i) <- anc;
+        mark.(i) <- true;
+        loop (succ i)
+      end
+  in
+  let () = loop 0 in
+  (* ip, nb_anc *)
+  let res = ref (0, 0) in
+  for i = 0 to nb_ind - 1 do
+    let nb = IperSet.cardinal ancestors.(i) in
+    if nb > snd !res then res := (i, nb)
+    else ()
+  done;
+  let p = poi base (Adef.iper_of_int (fst !res)) in
+  let fn = Name.lower (sou base (get_first_name p)) in
+  let sn = Name.lower (sou base (get_surname p)) in
+  let occ = Int32.of_int (get_occ p) in
+  let ref_p =
+    M.Reference_person#{
+      n = sn;
+      p = fn;
+      oc = occ;
+    }
+  in
+  let data = Mext.gen_reference_person ref_p in
+  print_result conf data
+;;
+
+
 (**/**) (* API_IMAGE *)
 
 let print_img conf base =
