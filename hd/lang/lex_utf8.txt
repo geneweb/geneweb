@@ -46,7 +46,7 @@ es: af=Afrikaans/bg=Búlgaro/br=Bretón/ca=Catalán/cs=Checo/da=Danés/de=Alemá
 et: af=afrikaani/bg=bulgaaria/br=bretooni/ca=katalaani/cs=tšehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/pt-br=brasiilia-portugali/ro=rumeenia/ru=vene/sl=sloveenia/sv=rootsi/zh=hiina
 fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pl=puola/pt=portugali/pt-br=brasilianportugali/ru=venäjä/sv=ruotsi/zh=kiina
 fr: af=afrikaans/bg=bulgare/br=breton/ca=catalan/cs=tchèque/da=danois/de=allemand/en=anglais/eo=espéranto/es=espagnol/et=estonien/fi=finnois/fr=français/he=hébreu/is=islandais/it=italien/lv=letton/nl=néerlandais/no=norvégien/pl=polonais/pt=portugais/pt-br=portugais du Brésil/ro=roumain/ru=russe/sl=slovène/sv=suédois/zh=chinois
-he: af=אפריקאנס /cs=צ'כית /da=דנית /de=גרמנית /en=אנגלית /eo=אספרנטו /es=ספרדית /fi=פינית /fr=צרפתית /he=עברית /is=איסלנדית /it=איטלקית /lv=לטווית /no=נורבגית /pt=פורטוגזית /ru=רוסית /sv=שוודית/zh=סינית 
+he: af=אפריקאנס /cs=צ'כית /da=דנית /de=גרמנית /en=אנגלית /eo=אספרנטו /es=ספרדית /fi=פינית /fr=צרפתית /he=עברית /is=איסלנדית /it=איטלקית /lv=לטווית /no=נורבגית /pt=פורטוגזית /ru=רוסית /sv=שוודית/zh=סינית
 is: af=afrikanska/cs=tékkneska/da=danska/de=þýska/en=enska/eo=esperanto/es=spænska/fi=finnska/fr=franska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/nl=hollenska/no=norska/pt=portúgalska/pt-br=Brasil-portúgalska/ru=rússneska/sv=sænska/zh=kínverska
 it: af=afrikaans/bg=bulgaro/ca=catalano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/et=estone/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polacco/pt=portoghese/pt-br=portoghese-brasiliano/ru=russo/sl=sloveno/sv=svedese/zh=cinese
 lv: cs=Čehu/da=Dāņu/de=Vācu/en=Angļu/eo=Esperanto/es=Spāņu/fi=Somu/fr=Franču/he=Ebreju/is=Islandiešū/it=Itāļu/lv=Latviešu/nl=Holandiešu/no=Norvēģu/pt=Portugāļu/pt-br=Brasil-Portugāļu/ru=Krievu/sv=Zviedru/zh=Ķīniešu
@@ -168,7 +168,7 @@ nl: , om dit nummer weer te proberen
 no:  for å prøve igjen med dette nummeret
 pl:  aby ponowić z tym numerem
 pt:  para tentar novamente com este número
-ro:  incearca din nou cu acest numar 
+ro:  incearca din nou cu acest numar
 ru:  для того, чтобы пытаться снова с этим числом
 sk:  skúsiť znovu s týmto číslom
 sl:  za ponoven poskus s to številko
@@ -398,7 +398,7 @@ nl: %1 van %2
 no: %1 til %2/%1 av %2
 pl: %1 :g:%2
 pt: %1 de %2
-ro: %1 pentru %2 
+ro: %1 pentru %2
 ru: %1 :g:%2
 sk: %1 :g:%2
 sl: %1 od :g:%2
@@ -488,7 +488,7 @@ nl: neven en nichten in de %s graad
 no: %s søskenbarn
 pl: kuzyni %s stopnia
 pt: primos em %s grau
-ro: veri de gradul %s 
+ro: veri de gradul %s
 ru: %s кузены
 sk: %s bratranci/sesternice
 sl: %s bratranci/sestrične
@@ -709,7 +709,7 @@ nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 no: %t er født mer enn 2 år etter sin fars død %t
 pl: %t urodził się/urodziła się ponad 2 lata po śmierci swojego ojca: %t
 pt: %t nasceu mais de 2 anos depois do óbito do pai
-ro: %t e nascut mai mult de doi ani dupa decesul tatalui 
+ro: %t e nascut mai mult de doi ani dupa decesul tatalui
 ru: %t родился более, чем через 2 года после смерти его/ее отца %t
 sk: %t narodený/narodená viac ako dva roky po smrti svojho otca: %t
 sl: %t je rojen(a) več kot 2 leti po smrti svojega očeta
@@ -740,13 +740,25 @@ pt: %t foi testemunha antes do seu nascimento
 sv: %t var vittne innan hennes/hans död
 
     %t witnessed the %s after his/her death
+de: %t war Zeuge bei der %s nach seinem Tod
+en: %t was a witness at a %s after their own death
+es: %t ha sido testigo de %s después de su muerte
 fr: %t a été témoin de %s après sa mort
+it: %t è stato testimone del %s dopo la sua morte
 
     %t witnessed the %s before his/her birth
+de: %t war Zeuge bei der %s vor seiner Geburt
+en: %t was a witness at a %s before their own birth
+es: %t ha sido testigo de %s antes de su nacimiento
 fr: %t a été témoin de %s avant sa naissance
+it: %t è stato testimone del %s prima della sua nascita
 
     %t's %s before his/her %s
+de: %t: %s vor seiner/ihrer %s
+en: %t: %s before their %s
+es: %t : %s antes de su %s
 fr: %t : %s avant son/sa %s
+it: %t : %s prima della suo/sua %s
 
     %t's sex is not coherent with his/her relations
 af: %t se geslag stem nie ooreen met sy/haar verwantskap nie
@@ -913,7 +925,7 @@ pt: um primo em 2º grau/uma prima em 2º grau/um(a) primo(a) em 2º grau
 ro: un var de gradul doi
 ru: троюродный брат/троюродная сестра
 sk: bratranec/sesternica z druhého kolena
-sl: bratranec iz drugega kolena/sestrična iz drugega kolena 
+sl: bratranec iz drugega kolena/sestrična iz drugega kolena
 sv: en syssling
 
     a 3rd cousin
@@ -1621,7 +1633,7 @@ nl: gedetailleerd zoeken
 no: avansert søk
 pl: wyszukiwanie zaawansowane
 pt: pesquisa complexa
-ro: consultatie avansata 
+ro: consultatie avansata
 ru: расширенный запрос
 sk: rozšírená požiadavka
 sl: napredno iskanje
@@ -1835,7 +1847,7 @@ nl: niet overleden
 no: lever
 pl: osoba żyjąca
 pt: não falecido/não falecida/não falecido(a)
-ro: in viata 
+ro: in viata
 ru: живой
 sk: žijúci
 sl: živi
@@ -2447,7 +2459,7 @@ es: bautizado/bautizada/bautizado(a)
 et: ristitud
 fi: kastettu
 fr: baptisé/baptisée/baptisé(e)
-he:  לנצרות / נטבלה לנצרות   נטבל 
+he:  לנצרות / נטבלה לנצרות   נטבל
 is: skírð(ur)
 it: battezzato/battezzata/battezzato(a)
 lv: baptized
@@ -2832,7 +2844,7 @@ sv: Förfädersbok
     border
 af: rand
 bg: рамка
-br: bord 
+br: bord
 ca: contorn
 cs: okraj
 da: ramme
@@ -2849,7 +2861,7 @@ it: bordo
 lv: mala
 nl: omranding
 no: kantlinje
-pl: granica 
+pl: granica
 pt: borda
 ro: bordura
 ru: рамка
@@ -3297,7 +3309,7 @@ sv: Utbytt ordning för bröllop
     changed order of person's events
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual facts
-es: cambio del orden de los acontecimientos del individuo 
+es: cambio del orden de los acontecimientos del individuo
 fr: changement de l'ordre des évènements individu
 it: modifica dell'ordine degli eventi individuo
 pt: modificar ordem dos eventos da pessoa
@@ -3451,7 +3463,7 @@ de: Farbe
 en: colour
 en-us: color
 eo: koloro
-es: color 
+es: color
 et: värv
 fi: väri
 fr: couleur
@@ -4252,7 +4264,7 @@ fr: anc&ecirc;tre direct de %s
 it: antenato diretto di %s
 nl: rechtstreeks voorouder van %s
 no: direkte stamfar til %s
-pt: antepassado direto de %s 
+pt: antepassado direto de %s
 sv: direkt förfader till %s
 
     disappeared
@@ -4506,7 +4518,7 @@ it: divorzio
 nl: Echtscheiding
 no: Skilsmisse
 pt: divórcio
-sv: Skilsmässa 
+sv: Skilsmässa
 
     divorced
 af: geskei
@@ -4742,7 +4754,7 @@ nl: verloofd%t met
 no: forlovet%t med
 pl: zaręczony%t z:/zaręczona%t z:
 pt: noivo%t de/noiva%t de
-ro: logodit%t cu/logodita%t cu 
+ro: logodit%t cu/logodita%t cu
 ru: %t помолвлен с
 sk: zasnúbený %t s/zasnúbená %t s
 sl: zaročen z %/zaročena z
@@ -5374,7 +5386,7 @@ no: fosterfar/fostermor/fosterforeldre
 pl: opiekun/opiekunka/opiekunowie
 pt: pai adoptivo/mãe adoptiva/pais adoptivos
 pt-br: pai de criação/mãe de criação/pais de criação
-ro: tata tutelar/mama tutelara/parinti tutelari  
+ro: tata tutelar/mama tutelara/parinti tutelari
 ru: приемный отец/приемная мать/приемный родитель
 sk: pestún/pestúnka/pestúni
 sl: rejnik/rejnica/rejniki
@@ -5783,7 +5795,7 @@ fr: Cliquez sur l’élément de la liste que vous souhaitez corriger : l’ens
 it: Clicca su « l’elemento della lista » che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette
 nl: Kliop op het 'lijstelement" dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd  worden
 no: Klikk 'Oppdater' for å editere og hele ditt slektstre vil automatisk bli oppdatert
-pt: Clique sobre o elemento da lista que pretende corrigir: a totalidade das fichas da sua árvore serão instantaneamente corrigidas 
+pt: Clique sobre o elemento da lista que pretende corrigir: a totalidade das fichas da sua árvore serão instantaneamente corrigidas
 sv: Hjälp att modifiera data
 
     help surname branch
@@ -5917,7 +5929,7 @@ nl: horizontaal
 no: horisontalt
 pl: w poziomie
 pt: horizontalmente
-ro: orizontal 
+ro: orizontal
 ru: горизонтально
 sk: horizontálne
 sl: vodoravno
@@ -6146,7 +6158,7 @@ en: in
 eo: en
 es: en
 et: :s:
-fi: 
+fi:
 fr: en
 he:   ב-
 is: í
@@ -6167,7 +6179,7 @@ zh:  于
 de: in
 en: in
 es: en
-fi: 
+fi:
 fr: à
 it: a
 nl: te
@@ -6186,8 +6198,8 @@ de: im Jahre
 en: in
 eo: en
 es: en
-et: 
-fi:   
+et:
+fi:
 fr: en
 he:  ב-
 is: &nbsp;
@@ -6201,7 +6213,7 @@ ro: in anul
 ru: в
 sk: v
 sl: v letu
-sv: 
+sv:
 zh:  于
 
     include missing spouses
@@ -6396,7 +6408,7 @@ nl: index van afstammelingen
 no: fortegnelse over etterkommere
 pl: lista potomków
 pt: índice dos descendentes
-ro: indice de descendenti 
+ro: indice de descendenti
 ru: индекс потомков
 sk: zoznam potomkov
 sl: seznam potomcev
@@ -6474,7 +6486,7 @@ sv: infoga
 de: der Versionsverlauf von %s ist nicht ausreichend um Vergleiche anzustellen
 en: No history found for %s
 es: el histórico de las revisiones de %s es insuficiente para realizar comparaciones
-fi: Tarkistushistoriaa ei löydetty kohteelle %s 
+fi: Tarkistushistoriaa ei löydetty kohteelle %s
 fr: l'historique des révisions de %s est insuffisant pour réaliser des comparaisons
 it: la cronistoria delle revisioni delle %s è insufficente per realizzare dei paragoni
 nl: historiek van de revisies van %s is onvoldoende om vergelijkingen uit te voeren
@@ -6580,7 +6592,7 @@ es: es
 et: on
 fi: on
 fr: est
-he: 
+he:
 is: er
 it: è
 lv: ir
@@ -6589,7 +6601,7 @@ no: er
 pl: to
 pt: é
 ro: este
-ru: 
+ru:
 sk: je
 sl: je
 sv: är
@@ -6660,7 +6672,7 @@ pt: nasceu depois do seu filho
 ro: este nascut dup copil
 ru: рожден после его/ее ребенка
 sk: narodila/narodila sa po svojom dieťati
-sl: je rojen po tem, ko je imel otroka/je rojena po tem, ko je imela otroka 
+sl: je rojen po tem, ko je imel otroka/je rojena po tem, ko je imela otroka
 sv: är född efter sitt barn
 
     it is the same person!
@@ -6769,7 +6781,7 @@ nl: minder dan een maand oud
 no: mindre enn en måned gammel
 pl: młodszy niż 1 miesiąc/młodsza niż 1 miesiąc
 pt: menos de um mês
-ro: mai putin de o luna 
+ro: mai putin de o luna
 ru: менее чем месячный/менее чем месячная
 sk: mladší ako jeden mesiac
 sl: star manj kot en mesec/stara manj kot en mesec
@@ -6849,7 +6861,7 @@ es: páginas enlazadas
 et: seotud leheküljed
 fi: linkitettyjä sivuja
 fr: pages liées
-he: דפים מקושרים 
+he: דפים מקושרים
 it: pagine collegate
 lv: saistītās lapas
 nl: verbonden pagina's
@@ -7037,7 +7049,7 @@ nl: circulaire referentie in de database: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen ane
 pl: pętla w bazie: %s jest swoim własnym przodkiem
 pt: referência circular no banco de dados: %s é seu próprio ancestral
-ro: referinta circulara: %s este propriul stramos 
+ro: referinta circulara: %s este propriul stramos
 ru: петля в базе данных: %s его/ее совственный предок
 sk: slučka v databáze: %s je svoj predok
 sl: krog v bazi podatkov: %s je svoj(a) prednik
@@ -7471,7 +7483,7 @@ pt: casado com a idade de %t
 ro: casatorit la virsta de %t
 ru: в браке с %t лет
 sk: oženil sa vo veku %t/vydala sa vo veku %t
-sl: se je poročil ko je imel %t/se je poročila ko je imela %t 
+sl: se je poročil ko je imel %t/se je poročila ko je imela %t
 sv: gift vid %t ålder
 
     married%t to
@@ -7590,7 +7602,7 @@ is: sameiningu lokið
 it: fusione terminata
 lv: apvienošana paveikta
 nl: samenvoeging is uitgevoerd
-no: sammenslåing utført 
+no: sammenslåing utført
 pl: scalenie zostało dokonane
 pt: fusão terminada
 ro: executat fuzionarea
@@ -7848,7 +7860,7 @@ sv: saknade källor
 de: Lebenspartner fehlt
 en: Spouse unknown
 es: falta cónyuge
-fi: Puoliso tuntematon 
+fi: Puoliso tuntematon
 fr: conjoint manquant
 it: coniuge mancante
 nl: ontbrekend partner
@@ -8130,7 +8142,7 @@ es: número Sosa respecto a
 et: Sosa number suhtes
 fi: Sosa-numero suhteen
 fr: n° Sosa par rapport à
-he:  מספר Sosa ביחס ל- 
+he:  מספר Sosa ביחס ל-
 is: Sosa númer tengt
 it: Numero Sosa relativo a
 lv: SOSA pakāpe attiecībā pret
@@ -8533,7 +8545,7 @@ nl: niets gevonden
 no: ingen treff
 pl: brak pasującej odpowiedzi
 pt: nenhuma resposta
-ro: nici un rezultat 
+ro: nici un rezultat
 ru: нет совпадений
 sk: nenájdená zhoda
 sl: brez
@@ -8740,7 +8752,7 @@ is: athugasemd gerð
 it: note modificate
 lv: pārveidotas piezīmes
 nl: notities veranderd
-no: notater er endret 
+no: notater er endret
 pl: uwagi zmodyfikowane
 pt: notas modificadas
 ro: nota modificata
@@ -8754,7 +8766,7 @@ bg: резюме на бележките
 de: Zusammenfassung sonstiger Notizen
 en: Notes
 es: sumario de notas diversas
-fi: Merkinnät 
+fi: Merkinnät
 fr: Sommaire des notes diverses
 it: Sommario delle diverse note
 nl: Overzicht van diverse notities
@@ -8814,7 +8826,7 @@ no: n/to/tre/fir/fem/seks/syv/åtte/ni/ti/elleve/tolv/tretten/fjorten/femten/sek
 pl: n-tego/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 pt: n-ésimo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14rto/15to/16to/17mo/18vo/19no/20mo/21ro/22ndo/23ro/24rto/25to/26to/27mo/28vo/29no/30mo/31ro/32ndo/33ro/34rto/35to/36to/37mo/38vo/39no/40mo/41ro/42ndo/43ro/44rto/45to/46to/47mo/48vo/49no/50mo/51ro/52ndo/53ro/54rto/55to/56to/57mo/58vo/59no/60mo/61ro/62ndo/63ro/64rto/65to/66to/67mo/68vo/69no/70mo/71ro/72ndo/73ro/74rto/75to/76to/77mo/78vo/79no/80mo/81ro/82ndo/83ro/84rto/85to/86to/87mo/88vo/89no/90mo/91ro/92ndo/93ro/94rto/95to/96to/97mo/98vo/99no
 pt-br: n-ésimo/1º/2º/3º/4º/5º/6º/7º/8º/9º/10º/11º/12º/13º/14º/15º/16º/17º/18º/19º/20º/21º/22º/23º/24º/25º/26º/27º/28º/29º/30º/31º/32º/33º/34º/35º/36º/37º/38º/39º/40º/41º/42º/43º/44º/45º/46º/47º/48º/49º/50º/51º/52º/53º/54º/55º/56º/57º/58º/59º/60º/61º/62º/63º/64º/65º/66º/67º/68º/69º/70º/71º/72º/73º/74º/75º/76º/77º/78º/79º/80º/81º/82º/83º/84º/85º/86º/87º/88º/89º/90º/91º/92º/93º/94º/95º/96º/97º/98º/99º
-ro: n-elea/primar/de gradul 2/de gradul 3/de gradul 4/de gardul 5/de gradul 6/de gradul 7/de gradul 8/de gradul 9/de gradul 10   
+ro: n-elea/primar/de gradul 2/de gradul 3/de gradul 4/de gardul 5/de gradul 6/de gradul 7/de gradul 8/de gradul 9/de gradul 10
 ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -8965,6 +8977,57 @@ sk: počet žijúcich osôb
 sl: število živih oseb
 sv: antal levande personer:
 
+    n° d'Aboville
+de: Nr. Aboville
+en: d'Aboville System number
+es: N° de Aboville
+fi: Numero
+fr: n° d’Aboville
+it: N° d’Aboville
+nl: Abovillenummer
+no: nummer
+pt: n° de Aboville
+sv: nummer
+
+    n° Sosa
+de: Nr. SOSA
+en: Sosa
+es: nº Sosa
+fi: Sosa-viite
+fr: n° Sosa
+it: n° Sosa
+nl: Sosa nr.
+no: Anenummer
+sv: Annummer
+
+    n° Sosa relative to
+af: Sosa nommer relatief tot
+bg: число на Соса относно
+br: niverenn Sosa e keñver
+ca: número "Sosa"relatiu a
+cs: "Sosa" číslo vztažené k
+da: Sosa-nummer, refererende til
+de: Ahnenkennziffer relativ zu
+en: Sosa relative to
+eo: numero Sosa relative al
+es: número Sosa respecto a
+et: Sosa number suhtes
+fi: Sosa-numero suhteen
+fr: n° Sosa par rapport à
+he:  מספר Sosa ביחס ל-
+is: Sosa númer tengt
+it: Numero Sosa relativo a
+lv: SOSA pakāpe attiecībā pret
+nl: Sosa nummer ten opzichte van
+no: Anenummer i forhold til
+pl: numer "Sosa", odnoszący się do:
+pt: número Sosa em relação a
+ro: numar Sosa in relatie cu
+ru: Sosa номер относительно
+sk: "Sosa" číslo vo vzťahu k
+sl: številka"Sosa", v odnosu z
+sv: annummer med som proband (Kekules system)
+
     occupation/occupations
 af: beroep
 bg: занятие
@@ -9046,7 +9109,7 @@ pl: w %s. pokoleniu
 pt: da %s geração
 ro: de generatia %s
 ru: %s поколения
-sk: zo %s generácie 
+sk: zo %s generácie
 sl: %s generacije
 sv: av den %s generationen
 
@@ -9059,7 +9122,7 @@ ca: el
 cs: dne
 da: den
 de: am
-en: 
+en:
 eo: la
 es: el
 et: :i:
@@ -9074,40 +9137,40 @@ no: den
 pl: dnia
 pt: a
 ro: la
-ru: 
+ru:
 sk: dňa
-sl: 
+sl:
 sv: den
 zh:  于
 
     on (weekday day month year)
-af: 
-bg: 
+af:
+bg:
 br: d'ar
-ca: 
-cs: 
-da: 
-de: 
-en: 
-eo: 
-es: 
+ca:
+cs:
+da:
+de:
+en:
+eo:
+es:
 et: :i:
 fi: :e:
-fr: 
-he: 
-is: 
-it: 
-lv: 
-nl: 
-no: 
+fr:
+he:
+is:
+it:
+lv:
+nl:
+no:
 pl: w :a:
-pt:  
-ro:  
-ru: 
-sk: 
-sl: 
-sv: 
-zh: 
+pt:
+ro:
+ru:
+sk:
+sl:
+sv:
+zh:
 
     on %s's side
 af: aan die kant van %s
@@ -10064,7 +10127,7 @@ nl: verwant door huwelijk
 no: relasjon gjennom ekteskap
 pl: powinowactwo
 pt: relações por casamento
-ro: relatie prin mariaj 
+ro: relatie prin mariaj
 ru: связь браком
 sk: príbuzenské vzťahy cez svadby
 sl: sorodstvo preko poroke
@@ -10109,7 +10172,7 @@ it: modo di calcolo
 nl: berekeningswijze
 no: utregningsmåte
 pt: modo de cálculo
-sv: uträkningssätt 
+sv: uträkningssätt
 
     relationship display options
 de: anzeigeoptionen der Verwandtschafts-Bäume:
@@ -10260,7 +10323,7 @@ it: identico al n° Sosa
 nl: identiek met sosa nr
 no: Samme som Sosa #
 pt: idêntico ao nº Sosa
-sv: Samma ättling som n° Sosa 
+sv: Samma ättling som n° Sosa
 
     scellentChildLDS
 de: HLT Kindes-Siege
@@ -10327,14 +10390,14 @@ sv: sök/skiftlägeskänslig
     searching all
 de: suche alle
 en: Search
-es: buscar todos los 
+es: buscar todos los
 fi: Hae kaikki
 fr: recherche tous les
 it: ricercare tutti i
 nl: zoek alle
 no: Søk
 pt: pesquisar todos os
-sv: Sök alla 
+sv: Sök alla
 
     see
 af: sien
@@ -10515,7 +10578,7 @@ it: scegli una lettera
 nl: kies een letter
 no: Velg en bokstav
 pt: selecione uma letra
-sv: välj en bokstav 
+sv: välj en bokstav
 
     select a month to see all the anniversaries
 de: zum zeigen der Geburtstage den Monat auswählen
@@ -10563,7 +10626,7 @@ it: seleziona le due versioni da paragonare
 nl: selecteer de twee revisies die u wenst te vergelijken
 no: Velg revisjoner for å se på historikk
 pt: selecione as duas revisões que pretende comparar
-sv: Välj de två uppdateringar Du vill jämföra 
+sv: Välj de två uppdateringar Du vill jämföra
 
     send
 af: stuur
@@ -10731,7 +10794,7 @@ es: atajo
 et: lühim tee
 fi: lyhyin reitti
 fr: chemin le plus court
-he:   קשר הכי קרוב 
+he:   קשר הכי קרוב
 is: stysta leið
 it: legame più diretto
 lv: īsākais ceļš
@@ -11095,7 +11158,7 @@ br: stadegoù
 ca: estadístiques
 cs: statistika
 da: statistikker
-de: Statistiken   
+de: Statistiken
 en: statistics
 eo: statistikoj
 es: estadísticas
@@ -11110,7 +11173,7 @@ nl: statistieken
 no: statistikk
 pl: zestawienia
 pt: estatísticas
-ro: statistici 
+ro: statistici
 ru: статистика
 sk: štatistika
 sl: statistike
@@ -11176,7 +11239,7 @@ no: alias for etternavn
 pl: alias nazwiska
 pt: alias do apelido
 pt-br: apelido do sobrenome
-ro: alias de nume 
+ro: alias de nume
 ru: новая:a:--ую фамилия:a:-ю
 sk: alias priezviska
 sl: drug priimek
@@ -11205,7 +11268,7 @@ no: etternavn mangler
 pl: brak nazwiska
 pt: falta o apelido
 pt-br: falta o sobrenome
-ro: prenumele lipseste 
+ro: prenumele lipseste
 ru: фамилия утрачена
 sk: priezvisko chýba
 sl: manjka priimek
@@ -11307,7 +11370,7 @@ no: liste over etternavn
 pl: lista nazwisk
 pt: lista de apelidos
 pt-br: lista de sobrenomes
-ro: lista de nume de familie 
+ro: lista de nume de familie
 ru: список фамилий
 sk: zoznam priezvísk
 sl: seznam priimkov
@@ -11474,7 +11537,7 @@ br: ar %d o deus bevet ar pellañ
 ca: les %d persones que han viscut més anys
 cs: %d osob které žili nejdéle
 da: de %d som har levet længst
-de: die %d Personen, die am längsten lebten  
+de: die %d Personen, die am längsten lebten
 en: the %d who lived the longest
 eo: la %d, kiuj vivis plejlonge
 es: los %d que han vivido más mucho tiempo
@@ -11492,7 +11555,7 @@ pt: os %d que mais viveram
 ro: %d cei mai in virsta
 ru: %d проживших дольше всех
 sk: %d osôb, ktoré žili najdlhšie
-sl: %d oseb, ki so živele najdlje 
+sl: %d oseb, ki so živele najdlje
 sv: de %d personerna som har levt längst
 
     the %s generation
@@ -11573,7 +11636,7 @@ nl: de huwelijksverjaardag
 no: bryllupsdagen
 pl: rocznica ślubu
 pt: o aniversário de casamento
-ro: aniversatia de mariaj 
+ro: aniversatia de mariaj
 ru: годовщина брака
 sk: výročie svadby
 sl: obletnica poroke
@@ -11657,7 +11720,7 @@ nl: de kinderen
 no: barna
 pl: dzieci
 pt: os filhos
-ro: copii 
+ro: copii
 ru: ребенок
 sk: deti
 sl: otroci
@@ -11822,7 +11885,7 @@ nl: de kinderen van %t en %t staan niet in de goede volgorde
 no: følgende barn av %t og %t er ikke i kronologisk rekkefølge
 pl: nastepujące dzieci (rodzice: %t i %t) nie są ułożone w porządku chronologicznym
 pt: os seguintes filhos de %t e %t não estão apresentados em ordem
-ro: urmatori copii a lui %t si %t nu sint in ordine cronologica 
+ro: urmatori copii a lui %t si %t nu sint in ordine cronologica
 ru: следующие дети %t и %t - идут не по порядку
 sk: nasledujúce deti rodičov %t a %t nie sú chronologicky
 sl: naslednji otroci od %t in %t niso po vrstnem redu
@@ -11934,7 +11997,7 @@ nl: de overgrootouders
 no: oldeforeldrene
 pl: pradziadkowie
 pt: os bisavós
-ro: strabunici 
+ro: strabunici
 ru: прапрародитель
 sk: praprarodičia
 sl: prastari starši
@@ -11950,7 +12013,7 @@ da: de seneste %d fødsler
 de: die letzten %d Geburten
 en: latest %d births
 eo: la lastaj %d naskiĝoj
-es: los %d últimos nacimientos 
+es: los %d últimos nacimientos
 et: viimased %d sündi
 fi: viimeiset %d syntymää
 fr: %d dernières naissances
@@ -11991,7 +12054,7 @@ da: de seneste %d bryllupper
 de: die letzten %d Heiraten
 en: latest %d marriages
 eo: la lastaj %d edziĝoj
-es: los %d últimos casamientos 
+es: los %d últimos casamientos
 et: viimased %d pulma
 fi: viimeiset %d avioliittoa
 fr: les %d derniers mariages
@@ -12026,7 +12089,7 @@ sv: Det senast %d registreade äktenskapet
 af: die laaste %t afsterwes
 bg: последните %t умирания
 br: ar %t tremenvan diwezhañ
-ca: les %t defunciones 
+ca: les %t defunciones
 cs: posledních %t úmrtí
 da: de seneste %t dødsfald
 de: die letzten %t Ableben
@@ -12577,7 +12640,7 @@ nl: boom
 no: tre
 pl: drzewo
 pt: árvore
-ro: arbore 
+ro: arbore
 ru: дерево
 sk: strom
 sl: drevo
@@ -12617,7 +12680,7 @@ en: try another computing option
 es: Pulse aquí/para intentar un modo de cálculo diferente
 fi: Napsauta tästä kokeillaksesi toista laskentavaihtoehtoa
 fr: Cliquez ici/pour essayer un mode de calcul différent
-it: Clicca qui/per provare un altro modo di calcolo 
+it: Clicca qui/per provare un altro modo di calcolo
 nl: Hier klikken om een andere berekeningswijze te proberen
 no: forsøk en annen kalkuleringsmulighet
 pt: Clique aqui/para tentar um modo de cálculo diferente
@@ -13067,7 +13130,7 @@ nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
 pl: świadek małżeństwa pomiędzy osobami: %s i %s
 pt: testemunha do casamento de %s e %s
-ro: martor la mariajul lui %s cu %s  
+ro: martor la mariajul lui %s cu %s
 ru: свидетель в браке %s и %s
 sk: svedok na svadbe %s a %s
 sl: priča pri poroki med %s in %s
@@ -13308,7 +13371,7 @@ nl: eerst de twee gezinnen samenvoegen
 no: du må først slå sammen de 2 familiene
 pl: musisz najpierw scalić 2 rodziny
 pt: primeiro tem que fundir as 2 famílias
-ro: trebuie intai sa unesti cele doua familii 
+ro: trebuie intai sa unesti cele doua familii
 ru: вы должны сначала объединить 2 семьи
 sk: najprv musíš spojiť tieto dbe rodiny
 sl: najprej morate združiti obe družini
@@ -13323,7 +13386,7 @@ de: deine Nachricht wartet auf ihre Überprüfung
 en: your message is waiting for validation
 es: tu mensaje espera su validación
 et: teade ootab kinnitamist
-fi: viestisi odottaa tarkistusta 
+fi: viestisi odottaa tarkistusta
 fr: votre message est en attente de validation
 it: il vostro messaggio è in attesa di convalida
 nl: uw bericht wacht op validatie
@@ -13331,7 +13394,7 @@ no: Beskjeden din venter på validering
 pl: twoja wiadomość czeka na potwierdzenie
 pt: a sua mensagem aguarda validação
 ro: mesajul dvs. asteapta sa fie validat
-ru: ваше сообщение ожидает проверки 
+ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
 
