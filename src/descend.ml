@@ -1278,7 +1278,7 @@ value make_tree_hts conf base gv p =
           let txt =
             if bd > 0 || td_prop <> "" then
               Printf.sprintf
-                "<table border=\"%d\"><tr><td align=\"center\"%s>%s</td>\
+                "<table style=\"border: %dpx solid\"><tr><td align=\"center\"%s>%s</td>\
                  </tr></table>"
                 bd td_prop txt
             else txt
@@ -1324,7 +1324,7 @@ value make_tree_hts conf base gv p =
               let s =
                 if bd > 0 || td_prop <> "" then
                   Printf.sprintf
-                    "<table border=\"%d\"><tr>\
+                    "<table style=\"border: %dpx solid\"><tr>\
                      <td align=\"center\"%s>%s</td></tr></table>" bd td_prop s
                 else s
               in
