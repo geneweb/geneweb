@@ -147,7 +147,7 @@ value print_alphabetic_big conf base is_surnames ini list len too_big = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   header conf title;
-  tag "p" begin
+  tag "p" "class=\"search_name\"" begin
     List.iter
       (fun (ini_k, _) ->
          stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
@@ -189,7 +189,7 @@ value print_alphabetic_all conf base is_surnames ini list len = do {
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
   header conf title;
-  tag "p" begin
+  tag "p" "class=\"search_name\"" begin
     List.iter
       (fun (ini_k, _) ->
          let ini = capitalize_if_not_utf8 ini_k in
