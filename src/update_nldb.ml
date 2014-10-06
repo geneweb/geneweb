@@ -208,6 +208,8 @@ value main () =
     let base = Gwdb.open_base fname.val in
     do {
       Sys.catch_break True;
+      let () = load_strings_array base in
+      let () = load_unions_array base in
       try compute base fname.val with
       [ Sys.Break -> do { Printf.eprintf "\n"; flush stderr; () } ];
     }
