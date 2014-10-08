@@ -271,16 +271,12 @@ value get_request_and_content strm =
   let content =
     match extract_param "content-length: " ' ' request with
     [ "" -> ""
-    | x -> do {
-        let str = Bytes.create (int_of_string x) in
-        for i = 0 to String.length str - 1 do {
-          Bytes.set str i
-            (match strm with parser
-             [ [: `x :] -> x
-             | [: :] -> ' ' ]);
-        };
-        str
-      } ]
+    | x -> String.init (int_of_string x) get_next_char
+      where get_next_char _ =
+        match strm with parser
+        [ [: `x :] -> x
+        | [: :] -> ' ' ]
+    ]
   in
   (request, content)
 ;
@@ -353,7 +349,7 @@ value copy_what_necessary t oc =
       (fun _ ->
          do {
            if i.val >= len.val then do {
-             len.val := Unix.read t buff 0 (String.length buff);
+             len.val := Unix.read t buff 0 (Bytes.length buff);
              i.val := 0;
              if len.val > 0 then output oc buff 0 len.val else ();
            }
@@ -589,7 +585,7 @@ let args = Sys.argv in
         do {
           try
             loop () where rec loop () =
-              let len = input ic buff 0 (String.length buff) in
+              let len = input ic buff 0 (Bytes.length buff) in
               if len = 0 then ()
               else do {
                 loop_write 0 where rec loop_write i =
