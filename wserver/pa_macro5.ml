@@ -99,15 +99,13 @@ value rec list_remove x =
   | [] -> [] ]
 ;
 
-value oversion = do {
-  let v = Bytes.copy Sys.ocaml_version in
-  for i = 0 to String.length v - 1 do {
-    match v.[i] with
-    [ '0'..'9' -> ()
-    | _ -> Bytes.set v i '_' ];
-  };
-  v
-};
+value oversion =
+  String.map
+    (fun
+       [ '0'..'9' as c -> c
+       | _ -> '_' ])
+    Sys.ocaml_version
+;
 
 value defined =
   ref
