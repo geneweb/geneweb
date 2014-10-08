@@ -22,6 +22,25 @@ value no_accent =
   | c -> c ]
 ;
 
+value accent_code =
+  fun
+    [ 'À' | 'È' | 'Ì' | 'Ò' | 'Ù'
+    | 'à' | 'è' | 'ì' | 'ò' | 'ù' -> 255
+    | 'Á' | 'É' | 'Í' | 'Ó' | 'Ú' | 'Ý'
+    | 'á' | 'é' | 'í' | 'ó' | 'ú' | 'ý' -> 226
+    | 'Â' | 'Ê' | 'Î' | 'Ô' | 'Û'
+    | 'â' | 'ê' | 'î' | 'ô' | 'û' -> 227
+    | 'Ã' | 'Ñ' | 'Õ' | 'ã' | 'ñ' | 'õ' -> 228
+    | 'Ä' | 'Ë' | 'Ï' | 'Ö' | 'Ü'
+    | 'ä' | 'ë' | 'ï' | 'ö' | 'ü' | 'ÿ' -> 232
+    | 'Å' | 'å' -> 234
+    | 'Ç' | 'ç' -> 240
+    | 'Ø' -> 162
+    | 'ø' -> 178
+    | 'ß' -> 207
+    | _ -> 0 ]
+;
+
 value of_iso_8859_1 s =
   let (len, identical) =
     loop 0 0 True where rec loop i len identical =
@@ -31,62 +50,23 @@ value of_iso_8859_1 s =
         [ 'À'..'Å' | 'Ç'.. 'Ï' | 'Ñ'..'Ö' | 'Ù'..'Ý'
         | 'à'..'å' | 'ç'.. 'ï' | 'ñ'..'ö' | 'ù'..'ý' | 'ÿ' ->
             loop (i + 1) (len + 2) False
-        | 'Ø' -> loop (i + 1) (len + 1) False
-        | 'ø' -> loop (i + 1) (len + 1) False
-        | 'ß' -> loop (i + 1) (len + 1) False
+        | 'Ø' | 'ø' | 'ß' -> loop (i + 1) (len + 1) False
         | _ -> loop (i + 1) (len + 1) identical ]
   in
   if identical then s
   else
     let s' = Bytes.create len in
     loop 0 0 where rec loop i i' =
-      if i = String.length s then s'
+      if i = String.length s then Bytes.unsafe_to_string s'
       else
         let i' =
-          match s.[i] with
-          [ 'À' | 'È' | 'Ì' | 'Ò' | 'Ù'
-          | 'à' | 'è' | 'ì' | 'ò' | 'ù' ->
-              do {
-                Bytes.set s' i' (Char.chr 225); Bytes.set s' (i'+1) (no_accent s.[i]);
-                i' + 1
-              }
-          | 'Á' | 'É' | 'Í' | 'Ó' | 'Ú' | 'Ý'
-          | 'á' | 'é' | 'í' | 'ó' | 'ú' | 'ý' ->
-              do {
-                Bytes.set s' i' (Char.chr 226); Bytes.set s' (i'+1) (no_accent s.[i]);
-                i' + 1
-              }
-          | 'Â' | 'Ê' | 'Î' | 'Ô' | 'Û'
-          | 'â' | 'ê' | 'î' | 'ô' | 'û' ->
-              do {
-                Bytes.set s' i' (Char.chr 227); Bytes.set s' (i'+1) (no_accent s.[i]);
-                i' + 1
-              }
-          | 'Ã' | 'Ñ' | 'Õ' | 'ã' | 'ñ' | 'õ' ->
-              do {
-                Bytes.set s' i' (Char.chr 228); Bytes.set s' (i'+1) (no_accent s.[i]);
-                i' + 1
-              }
-          | 'Ä' | 'Ë' | 'Ï' | 'Ö' | 'Ü'
-          | 'ä' | 'ë' | 'ï' | 'ö' | 'ü' | 'ÿ' ->
-              do {
-                Bytes.set s' i' (Char.chr 232); Bytes.set s' (i'+1) (no_accent s.[i]);
-                i' + 1
-              }
-          | 'Å' | 'å' ->
-              do {
-                Bytes.set s' i' (Char.chr 234); Bytes.set s' (i'+1) (no_accent s.[i]);
-                i' + 1
-              }
-          | 'Ç' | 'ç' ->
-              do {
-                Bytes.set s' i' (Char.chr 240); Bytes.set s' (i'+1) (no_accent s.[i]);
-                i' + 1
-              }
-          | 'Ø' -> do { Bytes.set s' i' (Char.chr 162); i' }
-          | 'ø' -> do { Bytes.set s' i' (Char.chr 178); i' }
-          | 'ß' -> do { Bytes.set s' i' (Char.chr 207); i' }
-          | c -> do { Bytes.set s' i' c; i' } ]
+          let a = accent_code s.[i] in
+          if a > 0 then do {
+            Bytes.set s' i' (Char.chr a);
+            let n = no_accent s.[i] in
+            if n = s.[i] then i'
+            else do { Bytes.set s' (i'+1) n; i'+1 }
+          } else do { Bytes.set s' i' s.[i]; i' } 
         in
         loop (i + 1) (i' + 1)
 ;
@@ -188,32 +168,31 @@ value to_iso_8859_1 s =
         match Char.code s.[i] with
         [ 225 | 226 | 227 | 228 | 232 | 234 | 240 ->
             loop (i + 2) (len + 1) False
-        | 162 -> loop (i + 1) (len + 1) False
-        | 178 -> loop (i + 1) (len + 1) False
-        | 207 -> loop (i + 1) (len + 1) False
+        | 162 | 178 | 207 -> loop (i + 1) (len + 1) False
         | _ -> loop (i + 1) (len + 1) identical]
   in
   if identical then s
   else
     let s' = Bytes.create len in
     loop 0 0 where rec loop i i' =
-      if i = String.length s then s'
+      if i = String.length s then Bytes.unsafe_to_string s'
       else if i = String.length s - 1 then
-        do { Bytes.set s' i' s.[i]; s' }
+        do { Bytes.set s' i' s.[i]; Bytes.unsafe_to_string s' }
       else
-        let i =
+        let (c, i) =
           match Char.code s.[i] with
-          [ 162 -> do { Bytes.set s' i' 'Ø'; i }
-          | 178 -> do { Bytes.set s' i' 'ø'; i }
-          | 207 -> do { Bytes.set s' i' 'ß'; i }
-          | 225 -> do { Bytes.set s' i' (grave s.[i+1]); i + 1 }
-          | 226 -> do { Bytes.set s' i' (acute s.[i+1]); i + 1 }
-          | 227 -> do { Bytes.set s' i' (circum s.[i+1]); i + 1 }
-          | 228 -> do { Bytes.set s' i' (tilde s.[i+1]); i + 1 }
-          | 232 -> do { Bytes.set s' i' (uml s.[i+1]); i + 1 }
-          | 234 -> do { Bytes.set s' i' (circle s.[i+1]); i + 1 }
-          | 240 -> do { Bytes.set s' i' (cedil s.[i+1]); i + 1 }
-          | _ -> do { Bytes.set s' i' s.[i]; i } ]
+          [ 162 -> ('Ø', i)
+          | 178 -> ('ø', i)
+          | 207 -> ('ß', i)
+          | 225 -> (grave s.[i+1], i + 1)
+          | 226 -> (acute s.[i+1], i + 1)
+          | 227 -> (circum s.[i+1], i + 1)
+          | 228 -> (tilde s.[i+1], i + 1)
+          | 232 -> (uml s.[i+1], i + 1)
+          | 234 -> (circle s.[i+1], i + 1)
+          | 240 -> (cedil s.[i+1], i + 1)
+          | _ -> (s.[i], i) ]
         in
-        loop (i + 1) (i' + 1)
+        do { Bytes.set s' i' c;
+             loop (i + 1) (i' + 1) }
 ;
