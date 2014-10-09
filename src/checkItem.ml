@@ -1164,11 +1164,11 @@ value family base error warning ifam fam =
     (*check_normal_marriage_date_for_witness base error warning (ifam, fam);*)
     check_fevents base error warning (ifam, fam);
     check_children base error warning (ifam, fam);
-    (*let father = poi base (get_father fam) in*)
-    (*let mother = poi base (get_mother fam) in*)
-    (*check_marriages_order base warning father;*)
-    (*check_marriages_order base warning mother;*)
     sort_fevents base warning (ifam, fam);
+    let father = poi base (get_father fam) in
+    let mother = poi base (get_mother fam) in
+    check_marriages_order base warning father;
+    check_marriages_order base warning mother;
   }
 ;
 
