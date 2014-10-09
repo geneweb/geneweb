@@ -237,34 +237,30 @@ value compare_event_date d1 d2 =
   | _ -> 0 ]
 ;
 
+value cmp_events (get_name, get_date) e1 e2 =
+  match
+    (Adef.od_of_codate (get_date e1), Adef.od_of_codate (get_date e2))
+  with
+  [ (Some d1, Some d2) ->
+      (* On utilise compare_event_date parce qu'on ne veut *)
+      (* pas prendre en compte les dates textes, on veut   *)
+      (* que l'évènement soit plus important pour le tri.  *)
+      let comp_date = compare_event_date d1 d2 in
+      if comp_date = 0 then compare_event_name (get_name e1) (get_name e2)
+      else comp_date
+  | _ -> compare_event_name (get_name e1) (get_name e2)]
+;
+
 value sort_events (get_name, get_date) events =
-  (* On tri d'abord par date puis par évènement, pour ça, *)
-  (* on met tous les évènements par date en premier.      *)
-  let events =
-    let rec loop accu accu_nodate events =
-      match events with
-      [ [] -> List.rev_append accu (List.rev accu_nodate)
-      | [evt :: events] ->
-          match Adef.od_of_codate (get_date evt) with
-          [ Some (Dgreg _ _) -> loop [evt :: accu] accu_nodate events
-          | _ -> loop accu [evt :: accu_nodate] events ] ]
-    in
-    loop [] [] events
-  in
   List.stable_sort
-    (fun e1 e2 ->
-      match
-        (Adef.od_of_codate (get_date e1), Adef.od_of_codate (get_date e2))
-      with
-      [ (Some d1, Some d2) ->
-          (* On utilise compare_event_date parce qu'on ne veut *)
-          (* pas prendre en compte les dates textes, on veut   *)
-          (* que l'évènement soit plus important pour le tri.  *)
-          let comp_date = compare_event_date d1 d2 in
-          if comp_date = 0 then compare_event_name (get_name e1) (get_name e2)
-          else comp_date
-      | _ -> compare_event_name (get_name e1) (get_name e2)] )
+    (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2)
     events
+;
+
+value merge_events (get_name, get_date) l1 l2 =
+  List.merge
+    (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2)
+    l1 l2
 ;
 
 value sort_pevents base warning p =
