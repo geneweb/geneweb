@@ -2556,7 +2556,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
           (Array.to_list (get_family p))
   | "has_surnames_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
-      else get_qualifiers p <> []
+      else get_surnames_aliases p <> []
   | "is_buried" ->
       match get_burial p with
       [ Buried _ -> p_auth
