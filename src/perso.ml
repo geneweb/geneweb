@@ -1583,9 +1583,9 @@ value get_sosa conf base env r p =
 value events_list conf base p =
   let pevents =
     if authorized_age conf base p then
-      (* fold_left pour le rev_append *)
-      List.fold_left
-        (fun events evt ->
+      (* On conserve l'ordre de tri. *)
+      List.fold_right
+        (fun evt events ->
            let name = Pevent evt.epers_name in
            let date = evt.epers_date in
            let place = evt.epers_place in
@@ -1594,13 +1594,12 @@ value events_list conf base p =
            let wl = evt.epers_witnesses in
            let x = (name, date, place, note, src, wl, None) in
            [x :: events] )
-        [] (get_pevents p)
+        (get_pevents p) []
     else []
   in
   let fevents =
-    (* fold_right pour rev_append *)
-    List.fold_right
-      (fun ifam fevents ->
+    List.fold_left
+      (fun fevents ifam ->
          let fam = foi base ifam in
          let ifath = get_father fam in
          let imoth = get_mother fam in
@@ -1610,8 +1609,8 @@ value events_list conf base p =
              authorized_age conf base (pget conf base imoth)
          in
          if m_auth then
-           List.fold_right
-             (fun evt fevents ->
+           List.fold_left
+             (fun fevents evt ->
                 let name = Fevent evt.efam_name in
                 let date = evt.efam_date in
                 let place = evt.efam_place in
@@ -1620,18 +1619,27 @@ value events_list conf base p =
                 let wl = evt.efam_witnesses in
                 let x = (name, date, place, note, src, wl, Some isp) in
                 [x :: fevents] )
-             (get_fevents fam) fevents
+             fevents (get_fevents fam)
          else fevents)
-      (Array.to_list (get_family p)) []
+      [] (Array.to_list (get_family p))
   in
-  let events = List.rev_append pevents fevents in
-  CheckItem.sort_events
+  (* Il faut trier les fevents, car on fait l'union des familles. *)
+  let fevents =
+    CheckItem.sort_events
+      ((fun (name, _, _, _, _, _, _) ->
+        match name with
+        [ Fevent n -> CheckItem.Fsort n
+        | _ -> failwith "events_list" ]),
+       (fun (_, date, _, _, _, _, _) -> date))
+      fevents
+  in
+  CheckItem.merge_events
     ((fun (name, _, _, _, _, _, _) ->
       match name with
       [ Pevent n -> CheckItem.Psort n
       | Fevent n -> CheckItem.Fsort n ]),
      (fun (_, date, _, _, _, _, _) -> date))
-    events
+    pevents fevents
 ;
 
 value make_ep conf base ip =

@@ -21,8 +21,11 @@ type event_name 'string =
   [ Psort of Def.gen_pers_event_name 'string
   | Fsort of Def.gen_fam_event_name 'string ]
 ;
-value sort_events : 
+value sort_events :
   (('a -> event_name 'string) * ('a -> Adef.codate)) -> list 'a -> list 'a;
+
+value merge_events :
+  (('a -> event_name 'string) * ('a -> Adef.codate)) -> list 'a -> list 'a -> list 'a;
 
 value person :
   base -> (base_warning -> unit) -> person ->
