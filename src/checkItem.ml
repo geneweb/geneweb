@@ -176,7 +176,7 @@ type event_name 'string =
    Dans l'ordre de priorité :
      birth, baptism, ..., death, funeral, burial/cremation.
    Pour les évènements familiaux, cet ordre est envisageable :
-     engage, marriage bann, marriage contract, marriage, ..., separate, divorce
+     engage, PACS, marriage bann, marriage contract, marriage, ..., separate, divorce
 *)
 value compare_event_name name1 name2 =
   match (name1, name2) with
@@ -192,6 +192,8 @@ value compare_event_name name1 name2 =
   | (_, Psort Epers_Death) -> -1
   | (Fsort Efam_Engage, Fsort _) -> -1
   | (Fsort _, Fsort Efam_Engage) -> 1
+  | (Fsort Efam_PACS, Fsort _) -> -1
+  | (Fsort _, Fsort Efam_PACS) -> 1
   | (Fsort Efam_MarriageBann, Fsort _) -> -1
   | (Fsort _, Fsort Efam_MarriageBann) -> 1
   | (Fsort Efam_MarriageContract, Fsort _) -> -1
