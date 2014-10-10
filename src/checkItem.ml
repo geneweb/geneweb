@@ -173,23 +173,30 @@ type event_name 'string =
 ;
 
 (*
+   On ignore les événements personnalisés.
    Dans l'ordre de priorité :
      birth, baptism, ..., death, funeral, burial/cremation.
    Pour les évènements familiaux, cet ordre est envisageable :
-     engage, PACS, marriage bann, marriage contract, marriage, ..., separate, divorce
+     engage, PACS, marriage bann, marriage contract, marriage, ...,
+     separate, divorce
 *)
 value compare_event_name name1 name2 =
   match (name1, name2) with
-  [ (Psort Epers_Birth, _) -> -1
+  [ (Psort (Epers_Name _), _) | (_, Psort (Epers_Name _)) |
+    (Fsort (Efam_Name _), _) | (_, Fsort (Efam_Name _)) -> 0
+
+  | (Psort Epers_Birth, _) -> -1
   | (_, Psort Epers_Birth) -> 1
   | (Psort Epers_Baptism, _) -> -1
   | (_, Psort Epers_Baptism) -> 1
+
   | (Psort Epers_Burial, _) | (Psort Epers_Cremation, _) -> 1
   | (_, Psort Epers_Burial) | (_, Psort Epers_Cremation) -> -1
   | (Psort Epers_Funeral, _) -> 1
   | (_, Psort Epers_Funeral) -> -1
   | (Psort Epers_Death, _) -> 1
   | (_, Psort Epers_Death) -> -1
+
   | (Fsort Efam_Engage, Fsort _) -> -1
   | (Fsort _, Fsort Efam_Engage) -> 1
   | (Fsort Efam_PACS, Fsort _) -> -1
@@ -200,6 +207,7 @@ value compare_event_name name1 name2 =
   | (Fsort _, Fsort Efam_MarriageContract) -> 1
   | (Fsort Efam_Marriage, Fsort _) -> -1
   | (Fsort _, Fsort Efam_Marriage) -> 1
+
   | (Fsort Efam_Divorce, Fsort _) -> 1
   | (Fsort _, Fsort Efam_Divorce) -> -1
   | (Fsort Efam_Separated, Fsort _) -> 1
