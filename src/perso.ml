@@ -1608,30 +1608,30 @@ value events_list conf base p =
            authorized_age conf base (pget conf base ifath) &&
              authorized_age conf base (pget conf base imoth)
          in
-         if m_auth then
-           List.fold_left
-             (fun fevents evt ->
-                let name = Fevent evt.efam_name in
-                let date = evt.efam_date in
-                let place = evt.efam_place in
-                let note = evt.efam_note in
-                let src = evt.efam_src in
-                let wl = evt.efam_witnesses in
-                let x = (name, date, place, note, src, wl, Some isp) in
-                [x :: fevents] )
-             fevents (get_fevents fam)
-         else fevents)
+         let fam_fevents =
+           if m_auth then
+             (* On conserve l'ordre de tri. *)
+             List.fold_right
+               (fun evt fam_fevents ->
+                  let name = Fevent evt.efam_name in
+                  let date = evt.efam_date in
+                  let place = evt.efam_place in
+                  let note = evt.efam_note in
+                  let src = evt.efam_src in
+                  let wl = evt.efam_witnesses in
+                  let x = (name, date, place, note, src, wl, Some isp) in
+                  [x :: fam_fevents] )
+               (get_fevents fam) []
+           else []
+         in
+         CheckItem.merge_events
+           ((fun (name, _, _, _, _, _, _) ->
+             match name with
+             [ Fevent n -> CheckItem.Fsort n
+             | _ -> failwith "events_list" ]),
+            (fun (_, date, _, _, _, _, _) -> date))
+           fam_fevents fevents)
       [] (Array.to_list (get_family p))
-  in
-  (* Il faut trier les fevents, car on fait l'union des familles. *)
-  let fevents =
-    CheckItem.sort_events
-      ((fun (name, _, _, _, _, _, _) ->
-        match name with
-        [ Fevent n -> CheckItem.Fsort n
-        | _ -> failwith "events_list" ]),
-       (fun (_, date, _, _, _, _, _) -> date))
-      fevents
   in
   CheckItem.merge_events
     ((fun (name, _, _, _, _, _, _) ->
