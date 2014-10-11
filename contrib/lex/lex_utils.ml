@@ -223,31 +223,9 @@ let sort_uniq cmp l =
   List.sort cmp (StringSet.elements list)
 ;;
 
-let special =
-  function
-    | '"' | '[' | '\\' -> true
-    | _ -> false
-;;
-
-let escape s =
-  let buff = Buffer.create 1 in
-  let rec loop i =
-    if i >= String.length s then Buffer.contents buff
-    else
-      if special s.[i] then
-        (Buffer.add_char buff '\\';
-         Buffer.add_char buff s.[i];
-         loop (i + 1))
-      else
-        (Buffer.add_char buff s.[i];
-         loop (i + 1))
-  in
-  loop 0
-;;
-
 (* Essaie de chercher tous les identifiants de message du répository et *)
 (* recherche s'il ne sont plus utilisés pour au contraire non trdauit.  *)
-let missing_or_unused_msg lexicon repo =
+let missing_or_unused_msg lexicon repo log =
   let lexicon =
     if Filename.is_relative lexicon then
       Filename.concat (Sys.getcwd ()) lexicon
@@ -267,52 +245,44 @@ let missing_or_unused_msg lexicon repo =
   let msg_src = get_msg_src repo in
   let msg_tpl = get_msg_tpl repo_tpl in
   let msg =
-    sort_uniq Pervasives.compare (List.rev_append msg_src msg_tpl)
+    sort_uniq
+      (fun x y -> Pervasives.compare (String.lowercase x) (String.lowercase y))
+      (List.rev_append msg_src msg_tpl)
   in
 
-  Printf.fprintf stdout
-    "\nMessage not used anymore in %s and %s :\n" repo_src repo_tpl;
-  flush stdout;
-  List.iter
-    (fun w ->
-      if List.mem w msg then ()
-      else print_endline w)
-    lex;
-(* en mode bash...
-  List.iter
-    (fun w ->
-      let cmd =
-        Printf.sprintf "\
-if grep -rq \"%s\" %s || grep -rq \"%s\" %s; then :; \
-else echo \"%s\"; \
-fi"
-           (escape w) repo_src (escape w) repo_tpl (escape w)
-      in
-      ignore (Sys.command cmd))
-    lex;
-*)
+  if log then begin
+    (match try Some (open_out "log_lex") with Sys_error _ -> None with
+    | Some oc ->
+        List.iter (fun w -> Printf.fprintf oc "%s\n" w) lex;
+        close_out oc
+    | None -> ());
+    (match try Some (open_out "log_msg") with Sys_error _ -> None with
+    | Some oc ->
+        List.iter (fun w -> Printf.fprintf oc "%s\n" w) msg;
+        close_out oc
+    | None -> ());
+    print_endline
+      "View log_lex for lexicon msg and log_msg for src and tpl msg."
+  end
+  else begin
+    Printf.fprintf stdout
+      "\nMessage not used anymore in %s and %s :\n" repo_src repo_tpl;
+    flush stdout;
+    List.iter
+      (fun w ->
+        if List.mem w msg then ()
+        else print_endline w)
+      lex;
 
-  Printf.fprintf stdout
-    "\nMessage from %s and %s not in lexicon :\n" repo_src repo_tpl;
-  flush stdout;
-  List.iter
-    (fun w ->
-      if List.mem w lex then ()
-      else print_endline w)
-    msg
-(* en mode bash...
-  List.iter
-    (fun w ->
-      let cmd =
-        Printf.sprintf "\
-if grep -q \"%s\" %s; then :; \
-else echo \"%s\"; \
-fi"
-           (escape w) lexicon (escape w)
-      in
-      ignore (Sys.command cmd))
-    msg;
-*)
+    Printf.fprintf stdout
+      "\nMessage from %s and %s not in lexicon :\n" repo_src repo_tpl;
+    flush stdout;
+    List.iter
+      (fun w ->
+        if List.mem w lex then ()
+        else print_endline w)
+      msg
+  end
 ;;
 
 
@@ -405,7 +375,8 @@ let lexicon = ref "" ;;
 let lex_sort = ref false ;;
 let missing_gw = ref false ;;
 let missing_gnt = ref false ;;
-let repo = ref "";;
+let repo = ref "" ;;
+let log = ref false ;;
 
 let speclist =
   [("-sort", Arg.Set lex_sort, ": sort the lexicon (both key and content).");
@@ -416,7 +387,9 @@ let speclist =
    ("-missing_one", Arg.String (fun x -> lang_cust := x :: !lang_cust),
     ": print missing translation for these languages.");
    ("-repo", Arg.String (fun x -> repo := x),
-    ": check missing or unused key word.")]
+    ": check missing or unused key word.");
+   ("-log", Arg.Set log,
+    ": option for repo. Print in log files instead of stdout.")];
 ;;
 
 let anonfun s = lexicon := s ;;
@@ -429,7 +402,7 @@ let main () =
   else if !missing_gw then missing_translation !lexicon lang_gw
   else if !missing_gnt then missing_translation !lexicon lang_gnt
   else if !lang_cust <> [] then missing_translation !lexicon !lang_cust
-  else if !repo <> "" then missing_or_unused_msg !lexicon !repo
+  else if !repo <> "" then missing_or_unused_msg !lexicon !repo !log
   else ()
 ;;
 
