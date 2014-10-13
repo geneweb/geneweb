@@ -566,9 +566,7 @@ value reconstitute_from_pevents pevents ext bi bp de bu =
   let de =
     if not found_death.val then
       if found_burial.val then (DeadDontKnowWhen, "", "", "")
-      else
-        let (death, _, _, _) = de in
-        (death, "", "", "")
+      else (DontKnowIfDead, "", "", "")
     else de
   in
   let bu =
@@ -674,12 +672,10 @@ value reconstitute_person conf =
   in
   let psources = only_printable (get conf "src") in
   (* Mise à jour des évènements principaux. *)
-  let birth = Adef.codate_of_od birth in
-  let bapt = Adef.codate_of_od bapt in
   let (bi, bp, de, bu, pevents) =
     reconstitute_from_pevents pevents ext
-      (birth, birth_place, birth_note, birth_src)
-      (bapt, bapt_place, bapt_note, bapt_src)
+      (Adef.codate_of_od birth, birth_place, birth_note, birth_src)
+      (Adef.codate_of_od bapt, bapt_place, bapt_note, bapt_src)
       (death, death_place, death_note, death_src)
       (burial, burial_place, burial_note, burial_src)
   in
@@ -692,9 +688,8 @@ value reconstitute_person conf =
   let death =
     match death with
     [ DontKnowIfDead ->
-        reconstitute_death
-          conf (Adef.od_of_codate birth) (Adef.od_of_codate bapt)
-          death_place burial burial_place
+        Update.infer_death conf
+          (Adef.od_of_codate birth) (Adef.od_of_codate bapt)
     | _ -> death ]
   in
   let p =
