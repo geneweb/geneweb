@@ -29,7 +29,10 @@ function long_display_options () {
   /* On décoche toutes les options. */
   $('input[type=checkbox]').prop('checked', false);
 
-  /* On ne coche que celle qu'on veut. */
+  /* On ne coche que celle qu'on veut. */%nn;
+  %if;(bvar.always_surname="yes")
+    $('input[type=checkbox][id=ld_alwsurn]').prop('checked', true);
+  %end;
   $('input[type=checkbox][id=ld_notes]').prop('checked', true);
   $('input[type=checkbox][id=ld_src]').prop('checked', true);
 }
@@ -40,9 +43,12 @@ function table_options () {
 
   /* On ne coche que celle qu'on veut. */
   $('input[type=checkbox][id=t_birth]').prop('checked', true);
+  $('input[type=checkbox][id=t_birth_place]').prop('checked', true);
   $('input[type=checkbox][id=t_marr]').prop('checked', true);
+  $('input[type=checkbox][id=t_marr_place]').prop('checked', true);
   $('input[type=checkbox][id=t_marr_date]').prop('checked', true);
   $('input[type=checkbox][id=t_death]').prop('checked', true);
+  $('input[type=checkbox][id=t_death_place]').prop('checked', true);
   $('input[type=checkbox][id=t_gen]').prop('checked', true);
 }
 
@@ -111,7 +117,8 @@ function no_options () {
       <div class="descends_menu_option_div">
         <p class="descends_menu_option_p">
           <label>
-            <input type="checkbox" name="alwsurn" value="yes"%/>
+            <input type="checkbox" id="ld_alwsurn" name="alwsurn" value="yes"%nn;
+              %if;(bvar.always_surname="yes") checked="checked"%end;%/>
             [*with::surname/surnames]1
           </label>
         </p>
@@ -128,7 +135,7 @@ function no_options () {
         <p class="descends_menu_option_p">
           <label>
             <input type="checkbox" id="ld_notes" name="notes" value="on" checked="checked"%/>
-            [*note/notes]1
+            [*individual notes]
           </label>
           <label>
             <input type="checkbox" id="ld_src" name="src" value="on" checked="checked"%/>
@@ -163,7 +170,7 @@ function no_options () {
             [*date of birth]
           </label>
           <label>
-            <input type="checkbox" name="birth_place" value="on"%/>
+            <input type="checkbox" id="t_birth_place" name="birth_place" value="on"%/>
             [*where born]
           </label>
         </p>
@@ -177,7 +184,7 @@ function no_options () {
             [*date of marriage]
           </label>
           <label>
-            <input type="checkbox" name="marr_place" value="on"%/>
+            <input type="checkbox" id="t_marr_place" name="marr_place" value="on"%/>
             [*where married]
           </label>
           <label>
@@ -191,7 +198,7 @@ function no_options () {
             [*date of death]
           </label>
           <label>
-            <input type="checkbox" name="death_place" value="on"%/>
+            <input type="checkbox" id="t_death_place" name="death_place" value="on"%/>
             [*where dead]
           </label>
           <label>

@@ -388,7 +388,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="xx_src">[*source/sources]0</label></td>
       <td>
-        <input type="text" name="xx_src" size="80" maxlength="200" value="%xx_src;" id="xx_src"%/>
+        <input type="text" name="xx_src" size="90" maxlength="200" value="%xx_src;" id="xx_src"%/>
       </td>
     </tr>
   </table>
@@ -398,7 +398,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td><label for="xx_note">[*note/notes]0</label></td>
-      <td><input type="text" name="xx_note" size="50" maxlength="200" value="%xx_note;" id="xx_note"%/></td>
+      <td><input type="text" name="xx_note" size="74" maxlength="200" value="%xx_note;" id="xx_note"%/></td>
     </tr>
   </table>
 %end;
@@ -512,7 +512,7 @@ function changeCalendar(e,v,m,c) {
       </td>
     </tr>
     <tr>
-      <td><label for="excnt_witnwcnt_sn">[*surname/surnames]0&nbsp;:&nbsp;</label></td>
+      <td><label for="excnt_witnwcnt_sn">[*surname/surnames]0</label></td>
       <td colspan="3">
         <input type="text" name="excnt_witnwcnt_sn" size="40" maxlength="200" value="%witness.surname;" id="excnt_witnwcnt_sn"%/>
       </td>
@@ -535,7 +535,7 @@ function changeCalendar(e,v,m,c) {
   <br%/>
   <table border="1" width="700px">
     <tr>
-      <td><b><i>[*witness/witnesses]0&nbsp;:&nbsp;</i></b></td>
+      <td><b><i>[*witness/witnesses]0</i></b></td>
       <td colspan="2">
         <table border="0" cellspacing="0" cellpadding="0">
           <tr>
@@ -569,19 +569,19 @@ function changeCalendar(e,v,m,c) {
       <td><a class="astuce" onmouseover="show_explain('updind','relcre',event)" onmouseout="hide_explain('updind',event)">&nbsp;</a></td>
     </tr>
     <tr>
-      <td><label for="excnt_witnwcnt_sn">[*surname/surnames]0&nbsp;:&nbsp;</label></td>
+      <td><label for="excnt_witnwcnt_sn">[*surname/surnames]0</label></td>
       <td colspan="3">
         <input type="text" name="excnt_witnwcnt_sn" size="40" maxlength="200"%sp;
          value="" id="excnt_witnwcnt_sn"%/>
       </td>
     </tr>
     <tr>
-      <td><label for="excnt_witnwcnt_fn">[*first name/first names]1&nbsp;:&nbsp;</label></td>
+      <td><label for="excnt_witnwcnt_fn">[*first name/first names]1</label></td>
       <td>
         <input type="text" name="excnt_witnwcnt_fn" size="40" maxlength="200"%sp;
          value="" id="excnt_witnwcnt_fn"%/>
       </td>
-      <td align="%right;"><label for="excnt_witnwcnt_occ">[*number]&nbsp;:&nbsp;</label></td>
+      <td align="%right;"><label for="excnt_witnwcnt_occ">[*number]</label></td>
       <td>
         <input type="text" name="excnt_witnwcnt_occ" size="5" maxlength="8"%sp;
          value="" id="excnt_witnwcnt_occ"%/>
@@ -594,19 +594,19 @@ function changeCalendar(e,v,m,c) {
   %if;(event.e_name != "#birt" and event.e_name != "#bapt" and event.e_name != "#deat" and event.e_name != "#buri" and event.e_name != "#crem")
     <table border="1" width="700px">
       <tr>
-        <td><label for="e_namexcnt">[*event/events]0&nbsp;:&nbsp;</label></td>
+        <td><label for="e_namexcnt">[*event/events]0</label></td>
         <td>
           %apply;selector_pevent(xcnt)
           <label id="pevent_label_selectorxcnt" style="display:none" class="other_evts">
-            [or]0 [text]0&nbsp;:&nbsp;
+            [or]0 [text]0
             <input type="text" name="e_namexcnt" size="40" maxlength="200" value="%event.e_name;" id="e_namexcnt"%/>
           </label>
         </td>
       </tr>
       <tr>
-        <td><label for="e_placexcnt">[*place]0&nbsp;:&nbsp;</label></td>
+        <td><label for="e_placexcnt">[*place]0</label></td>
         <td>
-          <input type="text" name="e_placexcnt" size="50" value="%event.e_place;"%sp; id="e_placexcnt"%/>
+          <input type="text" name="e_placexcnt" size="74" value="%event.e_place;"%sp; id="e_placexcnt"%/>
           <a class="astuce" onmouseover="show_explain('updind','place',event)" onmouseout="hide_explain('updind',event)">&nbsp;</a>
         </td>
       </tr>
@@ -614,15 +614,15 @@ function changeCalendar(e,v,m,c) {
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
     <table border="1" width="700px">
       <tr>
-        <td><label for="e_notexcnt">[*note/notes]1&nbsp;:&nbsp;</label></td>
+        <td><label for="e_notexcnt">[*note/notes]1</label></td>
         <td>
-          <textarea name="e_notexcnt" rows="2" cols="42" id="e_notexcnt">%event.e_note;</textarea>
+          <textarea name="e_notexcnt" rows="2" cols="90" id="e_notexcnt">%event.e_note;</textarea>
         </td>
       </tr>
       <tr>
-        <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
+        <td><label for="e_srcxcnt">[*source/sources]0</label></td>
         <td>
-          <input type="text" name="e_srcxcnt" size="80" value="%event.e_src;"%sp; id="e_srcxcnt"%/>
+          <input type="text" name="e_srcxcnt" size="90" value="%event.e_src;"%sp; id="e_srcxcnt"%/>
         </td>
       </tr>
     </table>
@@ -642,33 +642,33 @@ function changeCalendar(e,v,m,c) {
 %define;one_empty_pevent(xcnt)
   <table border="1" width="700px">
     <tr>
-      <td><label for="e_namexcnt">[*event/events]0&nbsp;:&nbsp;</label></td>
+      <td><label for="e_namexcnt">[*event/events]0</label></td>
       <td>
         %apply;selector_pevent(xcnt)
         <label id="pevent_label_selectorxcnt" style="display:none">
-          [or]0 [text]0&nbsp;:&nbsp;
+          [or]0 [text]0
           <input type="text" name="e_namexcnt" size="40" maxlength="200" value="%event.e_name;" id="e_namexcnt"%/>
         </label>
       </td>
     </tr>
     <tr>
-      <td><label for="e_placexcnt">[*place]0&nbsp;:&nbsp;</label></td>
+      <td><label for="e_placexcnt">[*place]0</label></td>
       <td>
-        <input type="text" name="e_placexcnt" size="50" value="" id="e_placexcnt"%/>
+        <input type="text" name="e_placexcnt" size="90" value="" id="e_placexcnt"%/>
         <a class="astuce" onmouseover="show_explain('updind','place',event)" onmouseout="hide_explain('updind',event)">&nbsp;</a>
       </td>
     </tr>
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
     <tr>
-      <td><label for="e_notexcnt">[*note/notes]1&nbsp;:&nbsp;</label></td>
+      <td><label for="e_notexcnt">[*note/notes]1</label></td>
       <td>
-        <textarea name="e_notexcnt" rows="2" cols="42" id="e_notexcnt"></textarea>
+        <textarea name="e_notexcnt" rows="2" cols="74" id="e_notexcnt"></textarea>
       </td>
     </tr>
     <tr>
-      <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
+      <td><label for="e_srcxcnt">[*source/sources]0</label></td>
       <td>
-        <input type="text" name="e_srcxcnt" size="80" value="" id="e_srcxcnt"%/>
+        <input type="text" name="e_srcxcnt" size="90" value="" id="e_srcxcnt"%/>
       </td>
     </tr>
   </table>
@@ -708,7 +708,7 @@ function changeCalendar(e,v,m,c) {
         </tr>
       %end;
       <tr style = "display:none;">
-        <td><label for="e_namexcnt">[*event/events]0&nbsp;:&nbsp;</label></td>
+        <td><label for="e_namexcnt">[*event/events]0</label></td>
         <td>
           <input type="text" name="e_namexcnt" size="30" value="%event.e_name;" id="e_namexcnt"%/>
         </td>
@@ -716,7 +716,7 @@ function changeCalendar(e,v,m,c) {
       <tr>
         <td><label for="e_placexcnt">[*place]</label></td>
         <td>
-          <input type="text" name="e_placexcnt" size="40" maxlenght="200" value="%event.e_place;"%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%end;%/>
+          <input type="text" name="e_placexcnt" size="90" maxlenght="200" value="%event.e_place;"%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%end;%/>
         </td>
       </tr>
     </table>
@@ -725,13 +725,13 @@ function changeCalendar(e,v,m,c) {
       <tr>
         <td><label for="e_notexcnt">[*note/notes]1</label></td>
         <td>
-          <textarea name="e_notexcnt" rows="2" cols="42" id="e_notexcnt">%event.e_note;</textarea>
+          <textarea name="e_notexcnt" rows="2" cols="74" id="e_notexcnt">%event.e_note;</textarea>
         </td>
       </tr>
       <tr>
         <td><label for="e_srcxcnt">[*source/sources]0</label></td>
         <td>
-          <input type="text" name="e_srcxcnt" size="80" value="%event.e_src;" id="e_srcxcnt"%/>
+          <input type="text" name="e_srcxcnt" size="90" value="%event.e_src;" id="e_srcxcnt"%/>
         </td>
       </tr>
     </table>
@@ -787,7 +787,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="e_placexcnt">[*place]0</label></td>
       <td>
-        <input type="text" name="e_placexcnt" size="40" maxlength="200" value=""%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_burial_focus(xcnt)'%end;%/>
+        <input type="text" name="e_placexcnt" size="90" maxlength="200" value=""%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_burial_focus(xcnt)'%end;%/>
         <a class="astuce" onmouseover="show_explain('updind','place',event)" onmouseout="hide_explain('updind',event)">&nbsp;</a>
       </td>
     </tr>
@@ -801,15 +801,15 @@ function changeCalendar(e,v,m,c) {
   %end;
   <table border="1" width="700px">
     <tr>
-      <td><label for="e_notexcnt">[*note/notes]1&nbsp;:&nbsp;</label></td>
+      <td><label for="e_notexcnt">[*note/notes]1</label></td>
       <td>
-        <textarea name="e_notexcnt" rows="2" cols="42" id="e_notexcnt"></textarea>
+        <textarea name="e_notexcnt" rows="2" cols="74" id="e_notexcnt"></textarea>
       </td>
     </tr>
     <tr>
-      <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
+      <td><label for="e_srcxcnt">[*source/sources]0</label></td>
       <td>
-        <input type="text" name="e_srcxcnt" size="80" value=""%sp; id="e_srcxcnt"%/>
+        <input type="text" name="e_srcxcnt" size="90" value=""%sp; id="e_srcxcnt"%/>
       </td>
     </tr>
   </table>
@@ -1001,7 +1001,7 @@ function changeCalendar(e,v,m,c) {
         <td>[*born]2...</td>
         <td><label for="birth_place">[*place]</label></td>
         <td>
-          <input type="text" name="birth_place" size="40" maxlength="200" value="%birth_place;" id="birth_place"%/>
+          <input type="text" name="birth_place" size="90" maxlength="200" value="%birth_place;" id="birth_place"%/>
         </td>
       </tr>
     </table>
@@ -1027,7 +1027,7 @@ function changeCalendar(e,v,m,c) {
         <td>[*baptized]2...</td>
         <td><label for="bapt_place">[*place]</label></td>
         <td>
-          <input type="text" name="bapt_place" size="40" maxlength="200" value="%bapt_place;" id="bapt_place"%/>
+          <input type="text" name="bapt_place" size="90" maxlength="200" value="%bapt_place;" id="bapt_place"%/>
         </td>
       </tr>
     </table>
@@ -1062,7 +1062,7 @@ function changeCalendar(e,v,m,c) {
         </td>
         <td>
           <label>[*place]0
-            <input type="text" name="death_place" size="40" maxlength="200" value="%death_place;" onfocus='setDead()'%/></label>
+            <input type="text" name="death_place" size="90" maxlength="200" value="%death_place;" onfocus='setDead()'%/></label>
         </td>
       </tr>
     </table>
@@ -1109,7 +1109,7 @@ function changeCalendar(e,v,m,c) {
         </td>
         <td>
           <label>[*place]0
-            <input type="text" name="burial_place" size="40" maxlength="200" value="%burial_place;"%/>
+            <input type="text" name="burial_place" size="90" maxlength="200" value="%burial_place;"%/>
           </label>
         </td>
       </tr>
@@ -1139,7 +1139,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td>
-        <input type="text" name="occu" size="80" maxlength="200" value="%occupation;" id="occu"%/>
+        <input type="text" name="occu" size="90" maxlength="200" value="%occupation;" id="occu"%/>
       </td>
     </tr>
   </table>
@@ -1347,7 +1347,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td>
-        <input type="text" name="src" size="80" maxlength="300"%sp; value="%sources;"%sp;id="src"%/>
+        <input type="text" name="src" size="90" maxlength="300"%sp; value="%sources;"%sp;id="src"%/>
       </td>
     </tr>
   </table>
