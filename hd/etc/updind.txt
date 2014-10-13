@@ -388,7 +388,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="xx_src">[*source/sources]0</label></td>
       <td>
-        <input type="text" name="xx_src" size="50" maxlength="200" value="%xx_src;" id="xx_src"%/>
+        <input type="text" name="xx_src" size="80" maxlength="200" value="%xx_src;" id="xx_src"%/>
       </td>
     </tr>
   </table>
@@ -622,7 +622,7 @@ function changeCalendar(e,v,m,c) {
       <tr>
         <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
         <td>
-          <input type="text" name="e_srcxcnt" size="50" value="%event.e_src;"%sp; id="e_srcxcnt"%/>
+          <input type="text" name="e_srcxcnt" size="80" value="%event.e_src;"%sp; id="e_srcxcnt"%/>
         </td>
       </tr>
     </table>
@@ -668,7 +668,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
       <td>
-        <input type="text" name="e_srcxcnt" size="50" value="" id="e_srcxcnt"%/>
+        <input type="text" name="e_srcxcnt" size="80" value="" id="e_srcxcnt"%/>
       </td>
     </tr>
   </table>
@@ -731,7 +731,7 @@ function changeCalendar(e,v,m,c) {
       <tr>
         <td><label for="e_srcxcnt">[*source/sources]0</label></td>
         <td>
-          <input type="text" name="e_srcxcnt" size="50" value="%event.e_src;" id="e_srcxcnt"%/>
+          <input type="text" name="e_srcxcnt" size="80" value="%event.e_src;" id="e_srcxcnt"%/>
         </td>
       </tr>
     </table>
@@ -809,7 +809,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="e_srcxcnt">[*source/sources]0&nbsp;:&nbsp;</label></td>
       <td>
-        <input type="text" name="e_srcxcnt" size="50" value=""%sp; id="e_srcxcnt"%/>
+        <input type="text" name="e_srcxcnt" size="80" value=""%sp; id="e_srcxcnt"%/>
       </td>
     </tr>
   </table>
@@ -1139,7 +1139,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td>
-        <input type="text" name="occu" size="40" maxlength="200" value="%occupation;" id="occu"%/>
+        <input type="text" name="occu" size="80" maxlength="200" value="%occupation;" id="occu"%/>
       </td>
     </tr>
   </table>
@@ -1347,7 +1347,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td>
-        <input type="text" name="src" size="70" maxlength="300"%sp; value="%sources;"%sp;id="src"%/>
+        <input type="text" name="src" size="80" maxlength="300"%sp; value="%sources;"%sp;id="src"%/>
       </td>
     </tr>
   </table>
