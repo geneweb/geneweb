@@ -342,7 +342,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td><label for="xvar_src">[*source/sources]0</label></td>
-      <td><input type="text" name="xvar_src" size="80" maxlength="200" value="%xx_src;" id="xvar_src"%/></td>
+      <td><input type="text" name="xvar_src" size="90" maxlength="200" value="%xx_src;" id="xvar_src"%/></td>
     </tr>
   </table>
 %end;
@@ -351,7 +351,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td><label for="xvar_note">[*note/notes]0</label></td>
-      <td><input type="text" name="xvar_note" size="50" maxlength="200" value="%xx_note;" id="xvar_note"%/></td>
+      <td><input type="text" name="xvar_note" size="74" maxlength="200" value="%xx_note;" id="xvar_note"%/></td>
     </tr>
   </table>
 %end;
@@ -452,7 +452,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="paxcnt_occupation">[*occupation/occupations]0</label></td>
       <td colspan="4">
-        <input type="text" name="paxcnt_occupation" size="40" maxlength="200" value="%xx.create.occupation" id="paxcnt_occupation"%/>
+        <input type="text" name="paxcnt_occupation" size="74" maxlength="200" value="%xx.create.occupation" id="paxcnt_occupation"%/>
       </td>
     </tr>
   </table>
@@ -579,13 +579,13 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="e_notexcnt">[*note/notes]0</label></td>
       <td>
-        <textarea name="e_notexcnt" rows="3" cols="33" id="e_notexcnt">%event.e_note;</textarea>
+        <textarea name="e_notexcnt" rows="3" cols="74" id="e_notexcnt">%event.e_note;</textarea>
       </td>
     </tr>
     <tr>
       <td><label for="e_srcxcnt">[*source/sources]0</label></td>
       <td>
-        <input type="text" name="e_srcxcnt" size="80" maxlength="200" value="%event.e_src;" id="e_srcxcnt" maxlength="800"%/>
+        <input type="text" name="e_srcxcnt" size="90" maxlength="200" value="%event.e_src;" id="e_srcxcnt" maxlength="800"%/>
       </td>
     </tr>
   </table>
@@ -770,7 +770,7 @@ function changeCalendar(e,v,m,c) {
   <table border="1" width="700px">
     <tr>
       <td>
-        <input type="text" name="comment" size="50" maxlength="200" value="%comment;" id="comment"%/>
+        <input type="text" name="comment" size="90" maxlength="200" value="%comment;" id="comment"%/>
       </td>
     </tr>
   </table>
@@ -844,7 +844,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="chxcnt_occupation">[*occupation/occupations]0</label></td>
       <td colspan="4">
-        <input type="text" name="chxcnt_occupation" size="40" maxlength="200" value="%child.create.occupation;" id="chxcnt_occupation"%/>
+        <input type="text" name="chxcnt_occupation" size="74" maxlength="200" value="%child.create.occupation;" id="chxcnt_occupation"%/>
       </td>
     </tr>
   </table>
@@ -876,13 +876,13 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="psrc">[[*person/persons]1]</label></td>
       <td>
-        <input type="text" name="psrc" size="70" maxlength="300" value="%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc"%/>
+        <input type="text" name="psrc" size="90" maxlength="300" value="%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc"%/>
       </td>
     </tr>
     <tr>
       <td><label for="src">[*family/families]0</label></td>
       <td>
-        <input type="text" name="src" size="70" maxlength="300" value="%fsources;" id="src"%/>
+        <input type="text" name="src" size="90" maxlength="300" value="%fsources;" id="src"%/>
         <input type="checkbox" name="rdsrc" value="on" %if;(evar_rdsrc = "on") checked="checked"%end;%/>
       </td>
     </tr>
