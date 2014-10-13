@@ -240,23 +240,21 @@
             </a> 
           </li>
         %end;
-        %foreach;family;
-          %foreach;witness;
-            <li>
-              <a href="%prefix;em=R;
-                %if;access_by_key;
-                  ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
-                %else;
-                  ei=%index;;
-                %end;
-                m=NG;n=;t=N;select=%witness.index;;et=M;image=on;">
-                %apply;relationship_txt%with;
-                  %witness;%nl;
-                  <i>([witness/witnesses]0)</i>%nl;
-                %end;
-              </a> 
-            </li>
-          %end;
+        %foreach;event_witness_relation;
+          <li>
+            <a href="%prefix;em=R;
+              %if;access_by_key;
+                ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;
+              %else;
+                ei=%index;;
+              %end;
+              m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;image=on;">
+              %apply;relationship_txt%with;
+                %event_witness_relation.person;%nl;
+                <i>([witness/witnesses]0)</i>%nl;
+              %end;
+            </a>
+          </li>
         %end;
       </ul>
     </div>

@@ -276,16 +276,14 @@
           </label>
         </li>
         %end;
-        %foreach;family;
-          %foreach;witness;
+        %foreach;event_witness_relation;
           <li>
             <label>
-              <input type="radio" name="select" value="%witness.index;" onclick="main()"%/>
-              %witness;%nl;
+              <input type="radio" name="select" value="%event_witness_relation.person.index;" onclick="main()"%/>
+              %event_witness_relation.person;%nl;
               ([witness/witnesses]0)%nl;
             </label>
           </li>
-          %end;
         %end;
       </ul>
     </div>
