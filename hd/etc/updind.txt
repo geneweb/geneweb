@@ -616,7 +616,7 @@ function changeCalendar(e,v,m,c) {
       <tr>
         <td><label for="e_notexcnt">[*note/notes]1</label></td>
         <td>
-          <textarea name="e_notexcnt" rows="2" cols="90" id="e_notexcnt">%event.e_note;</textarea>
+          <textarea name="e_notexcnt" rows="2" cols="74" id="e_notexcnt">%event.e_note;</textarea>
         </td>
       </tr>
       <tr>
