@@ -1446,6 +1446,16 @@ hr.full
  padding:2px;
 }
 
+.ascends_table_header th,
+.descends_table_header th,
+.missing_ancestors_table_header th,
+.surname_branch_table_header th,
+.list_eclair_table_header th
+{
+background-color: #e7edb3;
+vertical-align: middle;
+}
+
 /* --- Ascendants/Descendants liste rédigée --- */
 .asc_notes_src_inline, .desc_notes_src_inline
 {
