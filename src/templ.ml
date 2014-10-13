@@ -457,9 +457,9 @@ value parse_templ conf strm =
     (List.rev [ast :: astl], tok)
   and parse_import astl end_list strm =
     let ast =
-      try 
-        let file = get_ident 0 strm in
-        let al = 
+      try
+        let file = get_value 0 strm in
+        let al =
           match Util.open_templ conf file with
           [ Some ic ->
               let strm2 = (Stream.of_channel ic) in

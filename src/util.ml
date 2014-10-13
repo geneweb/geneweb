@@ -1207,6 +1207,17 @@ value base_len n =
   | _ -> "?" ]
 ;
 
+value explode s c =
+  loop [] 0 0 where rec loop list i j =
+    if j = String.length s then
+      let file = String.sub s i (j - i) in
+      List.rev [file :: list]
+    else
+      if s.[j] = c then
+        let file = String.sub s i (j - i) in
+        loop [file :: list] j (j + 1)
+      else loop list i (j + 1)
+;
 
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
@@ -1220,6 +1231,9 @@ value base_len n =
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value etc_file_name conf fname =
+  (* On recherche si dans le nom du fichier, on a specifié son *)
+  (* répertoire, i.e. si fname est écrit comme ceci : dir/file *)
+  let fname = List.fold_left (Filename.concat) "" (explode fname '/') in
   (* On cherche le fichier dans cet ordre :
      - dans la base (bases/etc/base_name/name.txt)
      - dans la base (bases/etc/templx/name.txt)
