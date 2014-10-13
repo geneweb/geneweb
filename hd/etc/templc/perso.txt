@@ -1,8 +1,8 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template c v 6.06b 2012/10/31 12:00:00 ddr/dd Exp $ -->
-  <!-- copyright (c) 1998-2012 INRIA -->
+  <!-- $Id: perso.txt, Template c v 7.00a 2014/09/29 09:00:00 ddr/dd Exp $ -->
+  <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -12,221 +12,25 @@
       %else;%first_name; %surname;%end;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-%include.css;
+  %include.js;
+  %include.css;
   <style type="text/css"><!--
   --></style>
-%base_header;
+  %base_header;
 </head>
 
-%define;include_file(file)
-  %include.file;
-%end;
-
-%define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
-    style="border: none" alt=""%sp;
-    title="%if;(yyy=1)%else;[direct ancestor of %s:::xxx], %end;[*Sosa] yyy"%/>%nn;
-%end;
-
-%define;display_sosa(xx)
-  %if;(bvar.display_sosa="" or bvar.display_sosa="yes")
-    %if;xx.has_sosa;
-      %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-      %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
-                             %sosa_ref.surname_key_strip;
-                        %and;%xx.sosa;%end;
-      %if;not cancel_links;</a>%end;%sp;
-    %end;
-  %end;
-%end;
-
-%define;image_MF(xx,wi_he)
-  %if;(wizard and not cancel_links and not xx.is_restricted)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;">%end;
-  %if;xx.is_male;
-    <img src="%image_prefix;/male.png" title="[M/F]0"%sp;
-  %elseif;xx.is_female;
-    <img src="%image_prefix;/female.png" title="[M/F]1"%sp;
-  %else;
-    <img src="%image_prefix;/sexunknown.png" title="?"%sp;
-  %end;
-         width="wi_he" height="wi_he" style="border: none" alt=""%/>%nn;
-  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
-  %sp;
-%end;
-
-%define;li_SD(xx)
-  <li class="%if;xx.has_parents;goway%else;noway%end;">%nn;
-%end;
-
-%define;li_SDC(xx)
-  %if;xx.has_families;
-    %reset_count;
-    %foreach;family;
-      %if;(nb_children>0)%incr_count;%end;
-    %end;
-  %end;
-  <li class="%if;xx.has_families;%if;(count!=0)desc%else;nodesc%end;%else;nospou%end;">%nn;
-%end;
-
-%define;display_arrows()
-  %if;not cancel_links;
-    <table style="float: %right;" border="%border;"><tr><td>
-      %if;has_referer;
-        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
-          src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
-      %end;
-      <a href="%prefix;"><img style="border-width: thin" alt="" title="^^"%sp;
-        src="%image_prefix;/up.png"%wid_hei;up.png;%/></a>
-      <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
-        src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[cancel GeneWeb links]"%/></a>
-    </td></tr></table>
-  %end;
-%end;
-
-%define;tothegen(xx)
-  [to the %s generation:::xx]%nn;
-%end;
-
-%define;togena(xx)
-  %if;(xx = 1)[specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[to the parents]%nn;
-  %elseif;(xx = 3)[to the grandparents]%nn;
-  %elseif;(xx = 4)[to the great-grandparents]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
-%define;togend(xx)
-  %if;(xx = 0)[specify::generation/generations]0%nn;
-  %elseif;(xx = 1)[to the children]%nn;
-  %elseif;(xx = 2)[to the grandchildren]%nn;
-  %elseif;(xx = 3)[to the great-grandchildren]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
-%define;short_display_person(xx)
-  %apply;display_sosa("xx")
-  %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
-  %end;%sp;
-  %xx.title;%xx.dates;
-%end;
-
-%define;display_vertical(xx)
-  %if;(xx.has_birth_date or xx.has_birth_place or
-       xx.has_baptism_date or xx.has_baptism_place or xx.is_dead or xx.is_buried or
-       xx.is_cremated or (xx.has_consanguinity and bvar.show_consang!="no") or
-       xx.has_occupation or xx.has_linked_page.OCCU !="")
-    <ul>
-      %if;xx.has_birth_date;
-        <li>%apply;capitalize(nth([born],xx.sex)) %xx.on_birth_date;
-        %if;xx.birthday; ([happy birthday to you!])%end;
-        %if;xx.has_birth_place; - %xx.birth_place;%end;</li>%nl;
-      %else;
-        %if;xx.has_birth_place;
-          <li>%apply;capitalize(nth([born],xx.sex)) - %xx.birth_place;</li>%nl;
-        %end;
-      %end;
-      %if;xx.has_baptism_date;
-        <li>%apply;capitalize(nth([baptized],xx.sex)) %xx.on_baptism_date;
-        %if;xx.has_baptism_place; - %xx.baptism_place;%end;</li>%nl;
-      %else;
-        %if;xx.has_baptism_place;
-          <li>%apply;capitalize(nth([baptized],xx.sex)) - %xx.baptism_place;</li>%nl;
-        %end;
-      %end;
-      %if;xx.computable_age;
-        <li>[*age] : %xx.age;</li>%nl;
-      %end;
-      %if;xx.is_dead;
-        <li>%apply;capitalize(xx.died)
-        %if;xx.has_death_date; %xx.on_death_date;%end;
-        %if;xx.has_death_place; - %xx.death_place;%end;
-        %if;(xx.has_linked_page.DEATH !="") %xx.linked_page.DEATH;%end;
-        %if;xx.computable_death_age;, [age at death:] %xx.death_age;%end;</li>%nl;
-        %if;xx.is_buried;
-          <li>%apply;capitalize(nth([buried],xx.sex))
-          %if;xx.has_burial_date; %xx.on_burial_date;%end;
-          %if;xx.has_burial_place; - %xx.burial_place;%end;</li>%nl;
-        %end;
-        %if;xx.is_cremated;
-          <li>%apply;capitalize(nth([cremated],xx.sex))
-          %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
-          %if;xx.has_cremation_place; - %xx.cremation_place;%end;</li>%nl;
-        %end;
-      %end;
-      %if;xx.has_occupation;
-        <li>%apply;capitalize(xx.occupation)</li>%nl;
-      %end;
-      %if;(xx.has_linked_page.OCCU)
-        <li>%apply;capitalize(xx.linked_page.OCCU)</li>%nl;
-      %end;
-      %if;(xx.has_consanguinity and bvar.show_consang!="no")
-        <li>[*consanguinity] : %xx.consanguinity;</li>%nl;
-      %end;
-    </ul>
-  %end;
-%end;
-
-%define;married_to(masc, date_place)
-  %if;masc;
-    %if;are_married;[*married%t to:::date_place]0%nn;
-    %elseif;are_not_married;[*relationship%t to:::date_place]0%nn;
-    %elseif;are_engaged;[*engaged%t to:::date_place]0%nn;
-    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]0%nn;
-    %elseif;is_no_mention;date_place [*with]%nn;
-    %end;
-  %else;
-    %if;are_married;[*married%t to:::date_place]1%nn;
-    %elseif;are_not_married;[*relationship%t to:::date_place]1%nn;
-    %elseif;are_engaged;[*engaged%t to:::date_place]1%nn;
-    %elseif;is_no_sexes_check;[*relationship%t to:::date_place]1%nn;
-    %elseif;is_no_mention;date_place [*with]%nn;
-    %end;
-  %end;
-%end;
-
-%define;long_married(xx)
-  %apply;married_to%with;%xx.is_male%and;
-    %if;(marriage_place="")
-      %if;(on_marriage_date="")
-      %else; <em>%on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-        </em>%end;
-    %else;
-      %if;(on_marriage_date="")<em>, %marriage_place;, </em>
-      %else; <em>%on_marriage_date;
-        %if;wedding_birthday; ([happy birthday to them!])%end;
-        , %marriage_place, </em>%end;
-    %end;
-  %end;
-%end;
-
-%define;witness_relation(xxx,yyy)
-  [*witness at marriage of %s and %s:::xxx:yyy]
-%end;
-
-%define;nav_with_sosa_ref(xxx)
-  [*navigation with %t as Sosa reference:::xxx]%nn;
-%end;
+%import;perso_utils_dd
 
 <body%body_prop;>
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %message_to_wizard;
+
+%apply;include_file("menubar")
 
 <div style="float: %left;">
   %apply;image_MF("self","13")
@@ -337,20 +141,9 @@
   <ul>
     %foreach;family;
       %apply;li_SD("spouse")
-        %apply;long_married("self")%sp;
+        %apply;long_married("self", "UPPER")%sp;
         %apply;image_MF("spouse","13")
         %apply;short_display_person("spouse")
-        %if;has_witnesses;
-          ([witness/witnesses]w :
-          %foreach;witness;
-            %if;not is_first;, %end;
-            %apply;image_MF("witness","13")
-            %apply;short_display_person("witness")%nl;
-          %end;
-        )%end;
-        %if;((wizard or friend or 
-              bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and
-              has_comment) (%comment;)%end;
         %if;are_divorced;, [divorced]0%divorce_date;%end;
         %if;are_separated;, [separated]0%end;
         %if;has_children;
@@ -504,6 +297,7 @@
 
 %apply;include_file("templx/relations")
 %apply;include_file("templx/linked_pages")
+%( %apply;include_file("perso_module/timeline") %)
 %apply;include_file("templx/notes")
 %apply;include_file("templx/sources")
 %apply;include_file("templx/links")

@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt, Template x v 6.07c 2013/02/19 12:00:00 ddr/dd Exp $ -->
+  <!-- $Id: ancsosa.txt, Template x 2014/09/29 09:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -21,144 +21,18 @@
       %end;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-%include.css;
+  %include.js;
+  %include.css;
   <style type="text/css"><!--
   --></style>
-%base_header;
+  %base_header;
 </head>
 
-%define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
-    style="border: none" alt=""%sp;
-    title="%if;(yyy=1)%else;[direct ancestor of %s:::xxx], %end;[*Sosa] yyy"%/>%nn;
-%end;
-
-%define;display_sosa(xx)
-  %if;(bvar.display_sosa="" or bvar.display_sosa="yes")
-    %if;xx.has_sosa;
-      %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-      %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
-                             %sosa_ref.surname_key_strip;
-                        %and;%xx.sosa;%end;
-      %if;not cancel_links;</a>%end;%sp;
-    %end;
-  %end;
-%end;
-
-%define;image_MF(xx,wi_he)
-  %if;(wizard and not cancel_links and not xx.is_restricted)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;">%end;
-  %if;xx.is_male;
-    <img src="%image_prefix;/male.png" title="[M/F]0"%sp;
-  %elseif;xx.is_female;
-    <img src="%image_prefix;/female.png" title="[M/F]1"%sp;
-  %else;
-    <img src="%image_prefix;/sexunknown.png" title="?"%sp;
-  %end;
-         width="wi_he" height="wi_he" style="border: none" alt=""%/>%nn;
-  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
-  %sp;
-%end;
-
-%define;display_arrows()
-  %if;not cancel_links;
-    <table style="float: %right;" border="%border;"><tr><td>
-      %if;has_referer;
-        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
-          src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
-      %end;
-      <a href="%prefix;"><img style="border-width: thin" alt="" title="^^"%sp;
-        src="%image_prefix;/up.png"%wid_hei;up.png;%/></a>
-      <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
-        src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[cancel GeneWeb links]"%/></a>
-    </td></tr></table>
-  %end;
-%end;
-
-%define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
-%end;
-
-%define;thegen(xx)
-  [*the %s generation:::xx]%nn;
-%end;
-
-%define;togena(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
-%define;gena(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*the parents]%nn;
-  %elseif;(xx = 3)[*the grandparents]%nn;
-  %elseif;(xx = 4)[*the great-grandparents]%nn;
-  %else;
-    %apply;thegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
-%define;letter(xx)
-  %apply;nth%with;
-    /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
-  %and;xx%end;
-%end;
-
-%define;married_to(is_male, date_place)
-  %if;("is_male" = 1)
-    %if;are_married;[married%t to:::date_place]0%nn;
-    %elseif;are_not_married;[relationship%t to:::date_place]0%nn;
-    %elseif;are_engaged;[engaged%t to:::date_place]0%nn;
-    %elseif;is_no_sexes_check;[relationship%t to:::date_place]0%nn;
-    %elseif;is_no_mention;date_place [with]%nn;
-    %end;
-  %else;
-    %if;are_married;[married%t to:::date_place]1%nn;
-    %elseif;are_not_married;[relationship%t to:::date_place]1%nn;
-    %elseif;are_engaged;[engaged%t to:::date_place]1%nn;
-    %elseif;is_no_sexes_check;[relationship%t to:::date_place]1%nn;
-    %elseif;is_no_mention;date_place [with]%nn;
-    %end;
-  %end;
-%end;
-
-%define;short_display_person(xx)
-  %apply;display_sosa("xx")
-  %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
-  %end;%sp;
-  %xx.title;%xx.dates;
-%end;
-
-%define;very_short_display_person(xx)
-  %apply;display_sosa("xx")
-  %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
-  %end;
-%end;
-
-%define;very_short_display_person_name(xx)
-  %apply;display_sosa("xx")
-  %if;(xx.index=central_index)<b>%xx_name;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx_name;
-    %else;<a href="%prefix;%xx.access;">%xx_name;</a>%end;
-  %end;
-%end;
+%import;perso_utils_dd
 
 %define;short_display_generations()
   %if;(evar.only != "on")
@@ -355,15 +229,7 @@
   %if;(evar.siblings = "on")
     %foreach;ancestor.family;
       %if;(ancestor.index = index or family.index != ancestor.family.index)
-        %apply;capitalize%with;
-          %apply;married_to%with;
-            %ancestor.is_male;
-          %and;
-            %if;(ancestor.index != index) (%family_cnt;)%end;
-            %if;(on_marriage_date != "") %on_marriage_date;%end;
-            %if;(marriage_place != ""), %marriage_place;, %end;
-          %end;%sp;
-        %end;
+	    %apply;long_married("ancestor", "UPPER")%sp;
         %apply;somebody("spouse")%nn;
         %if;spouse.has_parents;,%sp;
           %apply;a_of_b%with;
@@ -411,14 +277,7 @@
   %else;
     %foreach;child.family;
       %apply;somebody_extra_info("child"),%sp;
-      %apply;capitalize%with;
-        %apply;married_to%with;
-          %child.is_male;
-        %and;
-          %if;(on_marriage_date != "") %on_marriage_date;%end;
-          %if;(marriage_place != ""), %marriage_place;, %end;
-        %end;%sp;
-      %end;
+	  %apply;long_married("child", "lower")%sp;
       %apply;somebody("spouse")%nn;
       %if;spouse.has_parents;,%sp;
         %apply;a_of_b%with;
@@ -462,12 +321,7 @@
     ...
     %foreach;ancestor.family;
       %if;(family.index = ancestor.family.index)
-        %apply;married_to%with
-          %ancestor.is_male;
-        %and;
-          %if;(on_marriage_date != "") %on_marriage_date;%end;
-          %if;(marriage_place != ""), %marriage_place;, %end;
-        %end;...
+	    %apply;long_married("ancestor", "UPPER")...
       %end;
     %end;
   %else;
@@ -651,8 +505,8 @@
 %define;long_display_generations()
   %( long display generations %)
   %let;ns;
-     %if;(evar.notes="on" and evar.src="on")[*note/notes]1 [and] [*source/sources]1%nn;
-      %elseif;(evar.notes="on")[*note/notes]1%nn;
+     %if;(evar.notes="on" and evar.src="on")[*individual notes] [and] [*source/sources]1%nn;
+      %elseif;(evar.notes="on")[*individual notes]%nn;
       %elseif;(evar.src="on")[*source/sources]1%nn;
       %end;
   %in;
@@ -889,50 +743,55 @@
   <table class="missing_ancestors_table">
     %reset_count;
     %nl;
-    <tr class="missing_ancestors_table_header">
-      %incr_count;
-      <th>[*person/persons]0</th>
-      %if;(evar.birth = "on")
+    <thead>
+      <tr class="missing_ancestors_table_header">
         %incr_count;
-        <th>[*birth date and birth place]</th>
-      %end;
-      %if;(evar.death = "on")
-        %incr_count;
-        <th>[*death date and death place]</th>
-      %end;
-      <th>%incr_count;[*missing parents]</th>
-      <th>%incr_count;[*missing spouse]</th>
-    </tr>
-    %let;nb_col;%count;%in;
-    %reset_count;
-    %foreach;sorted_list_item;
-      %incr_count;
-      %if;(initial(prev_item.1) != initial(item.1))
-        %nl;
-        <tr id="a_%apply;hexa(initial(item.1))">
-          <td colspan="%nb_col"><b>%apply;initial(item.1)</b></td>
-        </tr>
-      %end;
-      %nl;
-      <tr>
-        <td>%nn;
-          %if;not cancel_links;
-            %item.5;%item.11;<a href="%prefix;%item.4;">%item.1;%sp;%item.2;</a>%item.3;
-          %else;
-            %item.5;%item.11;%item.1;%sp;%item.2;%item.3;
-          %end;
-          %if;(item.6 != ""), <em>%item.6;</em>%end;
-        </td>
+        <th>[*person/persons]0</th>
         %if;(evar.birth = "on")
-          <td>%item.7;</td>
+          %incr_count;
+          <th>[*birth date and birth place]</th>
         %end;
         %if;(evar.death = "on")
-          <td>%item.8;</td>
+          %incr_count;
+          <th>[*death date and death place]</th>
         %end;
-        <td align="center">%item.9;</td>
-        <td align="center">%item.10;</td>
+        <th>%incr_count;[*missing parents]</th>
+        <th>%incr_count;[*missing spouse]</th>
       </tr>
-    %end;
+    </thead>
+
+    <tbody>
+      %let;nb_col;%count;%in;
+      %reset_count;
+      %foreach;sorted_list_item;
+        %incr_count;
+        %if;(initial(prev_item.1) != initial(item.1))
+          %nl;
+          <tr id="a_%apply;hexa(initial(item.1))">
+            <td colspan="%nb_col"><b>%apply;initial(item.1)</b></td>
+          </tr>
+        %end;
+        %nl;
+        <tr>
+          <td>%nn;
+            %if;not cancel_links;
+              %item.5;%item.11;<a href="%prefix;%item.4;">%item.1;%sp;%item.2;</a>%item.3;
+            %else;
+              %item.5;%item.11;%item.1;%sp;%item.2;%item.3;
+            %end;
+            %if;(item.6 != ""), <em>%item.6;</em>%end;
+          </td>
+          %if;(evar.birth = "on")
+            <td>%item.7;</td>
+          %end;
+          %if;(evar.death = "on")
+            <td>%item.8;</td>
+          %end;
+          <td align="center">%item.9;</td>
+          <td align="center">%item.10;</td>
+        </tr>
+      %end;
+    </tbody>
   </table>
   %empty_sorted_list;
   <p style="clear:both;">[*total] : %count; [[person/persons]1@(c)]</p>
@@ -961,115 +820,120 @@
     </div>
   %end;
   <table class="missing_ancestors_table">
-    <tr class="missing_ancestors_table_header">
-      %reset_count;
-      <th>[*missing sosa]</th>
-      %incr_count;
-      <th>[*missing parents]</th>
-      %incr_count;
-      <th>[*missing spouse]</th>
-      %incr_count;
-      <th>[*person/persons]0</th>
-      %incr_count;
-      %if;(evar.birth = "on")
-        <th>[*birth date and birth place]</th>
+    <thead>
+      <tr class="missing_ancestors_table_header">
+        %reset_count;
+        <th>[*missing sosa]</th>
         %incr_count;
-      %end;
-      %if;(evar.death = "on")
-        <th>[*death date and death place]</th>
+        <th>[*missing parents]</th>
         %incr_count;
-      %end;
-      %if;(evar.spouse = "on")
-        <th>[*spouse/spouses]1</th>
+        <th>[*missing spouse]</th>
         %incr_count;
-      %end;
-      %let;nb_col;%count;%in;
-      %reset_count;
-    </tr>
-    %foreach;ancestor_level(nb_gena - 1)
-      %apply;lazy_print%with;
-        %nl;
-        <tr>
-          <td colspan="%nb_col"><b>[*generation/generations]0 %level;</b></td>
-        </tr>
-      %end;
-      %foreach;ancestor;
-        %if;(ancestor.same = "")
-          %if;(ancestor.first_name != "?" and ancestor.surname != "?")
-            %if;(level < nb_gena)
-              %if;((not ancestor.has_parents) or
-                    ((ancestor.father.first_name = "?" and ancestor.father.surname = "?") or
-                     (ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")))
-                %( missing ancestor(s) %)
+        <th>[*person/persons]0</th>
+        %incr_count;
+        %if;(evar.birth = "on")
+          <th>[*birth date and birth place]</th>
+          %incr_count;
+        %end;
+        %if;(evar.death = "on")
+          <th>[*death date and death place]</th>
+          %incr_count;
+        %end;
+        %if;(evar.spouse = "on")
+          <th>[*spouse/spouses]1</th>
+          %incr_count;
+        %end;
+        %let;nb_col;%count;%in;
+        %reset_count;
+      </tr>
+    </thead>
+
+    <tbody>
+      %foreach;ancestor_level(nb_gena - 1)
+        %apply;lazy_print%with;
+          %nl;
+          <tr>
+            <td colspan="%nb_col"><b>[*generation/generations]0 %level;</b></td>
+          </tr>
+        %end;
+        %foreach;ancestor;
+          %if;(ancestor.same = "")
+            %if;(ancestor.first_name != "?" and ancestor.surname != "?")
+              %if;(level < nb_gena)
+                %if;((not ancestor.has_parents) or
+                      ((ancestor.father.first_name = "?" and ancestor.father.surname = "?") or
+                       (ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")))
+                  %( missing ancestor(s) %)
+                  %if;(0<1) %( todo dates_in_interval %)
+                    %lazy_force;
+                    %nl;
+                    <tr>
+                      %incr_count;
+                      %if;((not ancestor.has_parents) or
+                            ((ancestor.father.first_name = "?" and ancestor.father.surname = "?") and
+                             (ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")))
+                        <td>%expr(ancestor.anc_sosa.v * 2)&nbsp;-&nbsp;%expr(ancestor.anc_sosa.v * 2 + 1)</td>
+                        <td style="text-align:center">[*parents]</td>
+                      %elseif;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
+                        <td>%expr(ancestor.anc_sosa.v * 2)</td>
+                        <td style="text-align:center">[*father/mother]0</td>
+                      %elseif;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
+                        <td>%expr(ancestor.anc_sosa.v * 2 + 1)</td>
+                        <td style="text-align:center">[*father/mother]1</td>
+                      %end;
+                      <td>%sp;</td>
+                      <td>%nn;
+                        %apply;image_MF("ancestor","13")
+                        %apply;very_short_display_person("ancestor")
+                      </td>
+                      %apply;display_missing_ancestor_info("ancestor")
+                    </tr>
+                  %end;
+                %end;
+              %end;
+            %end;
+            %if;(ancestor.has_parents)
+              %if;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
+                %( mother without spouse %)
                 %if;(0<1) %( todo dates_in_interval %)
                   %lazy_force;
+                  %incr_count;
                   %nl;
                   <tr>
-                    %incr_count;
-                    %if;((not ancestor.has_parents) or
-                          ((ancestor.father.first_name = "?" and ancestor.father.surname = "?") and
-                           (ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")))
-                      <td>%expr(ancestor.anc_sosa.v * 2)&nbsp;-&nbsp;%expr(ancestor.anc_sosa.v * 2 + 1)</td>
-                      <td style="text-align:center">[*parents]</td>
-                    %elseif;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
-                      <td>%expr(ancestor.anc_sosa.v * 2)</td>
-                      <td style="text-align:center">[*father/mother]0</td>
-                    %elseif;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
-                      <td>%expr(ancestor.anc_sosa.v * 2 + 1)</td>
-                      <td style="text-align:center">[*father/mother]1</td>
-                    %end;
+                    <td>%expr(ancestor.anc_sosa.v * 2)</td>
                     <td>%sp;</td>
+                    <td style="text-align:center">[*husband/wife]0</td>
                     <td>%nn;
-                      %apply;image_MF("ancestor","13")
-                      %apply;very_short_display_person("ancestor")
+                      %apply;image_MF("ancestor.mother","13")
+                      %apply;very_short_display_person("ancestor.mother")
                     </td>
-                    %apply;display_missing_ancestor_info("ancestor")
+                    %apply;display_missing_ancestor_info("ancestor.mother")
+                  </tr>
+                %end;
+              %end;
+              %if;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
+                %( father without spouse %)
+                %if;(0<1) %( todo dates_in_interval %)
+                  %lazy_force;
+                  %incr_count;
+                  %nl;
+                  <tr>
+                    <td>%expr(ancestor.anc_sosa.v * 2 + 1)</td>
+                    <td>%sp;</td>
+                    <td style="text-align:center">[*husband/wife]1</td>
+                    <td>%nn;
+                      %apply;image_MF("ancestor.father","13")
+                      %apply;very_short_display_person("ancestor.father")
+                    </td>
+                    %apply;display_missing_ancestor_info("ancestor.father")
                   </tr>
                 %end;
               %end;
             %end;
           %end;
-          %if;(ancestor.has_parents)
-            %if;(ancestor.father.first_name = "?" and ancestor.father.surname = "?")
-              %( mother without spouse %)
-              %if;(0<1) %( todo dates_in_interval %)
-                %lazy_force;
-                %incr_count;
-                %nl;
-                <tr>
-                  <td>%expr(ancestor.anc_sosa.v * 2)</td>
-                  <td>%sp;</td>
-                  <td style="text-align:center">[*husband/wife]0</td>
-                  <td>%nn;
-                    %apply;image_MF("ancestor.mother","13")
-                    %apply;very_short_display_person("ancestor.mother")
-                  </td>
-                  %apply;display_missing_ancestor_info("ancestor.mother")
-                </tr>
-              %end;
-            %end;
-            %if;(ancestor.mother.first_name = "?" and ancestor.mother.surname = "?")
-              %( father without spouse %)
-              %if;(0<1) %( todo dates_in_interval %)
-                %lazy_force;
-                %incr_count;
-                %nl;
-                <tr>
-                  <td>%expr(ancestor.anc_sosa.v * 2 + 1)</td>
-                  <td>%sp;</td>
-                  <td style="text-align:center">[*husband/wife]1</td>
-                  <td>%nn;
-                    %apply;image_MF("ancestor.father","13")
-                    %apply;very_short_display_person("ancestor.father")
-                  </td>
-                  %apply;display_missing_ancestor_info("ancestor.father")
-                </tr>
-              %end;
-            %end;
-          %end;
         %end;
       %end;
-    %end;
+    </tbody>
   </table>
   <p style="clear:both;">[*total] : %count; [[person/persons]1@(c)]</p>
 %end;
@@ -1106,52 +970,54 @@
 
 %define;ascend_table_header()
   %nl;
-  <tr class="ascends_table_header">
-    <th>[*Sosa]</th>%nl;
-    %( do not put %incr_count; here to obtain finally nb_col - 1 %)
-    <th>[*person/persons]0</th>%nl;
-    %incr_count;
-    %if;(evar.birth = "on")
-      <th>[*date of birth]</th>%nl;
+  <thead>
+    <tr class="ascends_table_header">
+      <th>[*Sosa]</th>%nl;
+      %( do not put %incr_count; here to obtain finally nb_col - 1 %)
+      <th>[*person/persons]0</th>%nl;
       %incr_count;
-    %end;
-    %if;(evar.birth_place = "on")
-      <th>[*where born]</th>%nl;
-      %incr_count;
-    %end;
-    %if;(evar.marr = "on")
-      <th>[*spouse/spouses]1</th>%nl;
-      %incr_count;
-    %end;
-    %if;(evar.marr_date = "on")
-      <th>[*date of marriage]</th>%nl;
-      %incr_count;
-    %end;
-    %if;(evar.marr_place = "on")
-      <th>[*where married]</th>%nl;
-      %incr_count;
-    %end;
-    %if;(evar.child = "on")
-      <th>[*child/children]1</th>
-      %incr_count;
-    %end;
-    %if;(evar.death = "on")
-      <th>[*date of death]</th>%nl;
-      %incr_count;
-    %end;
-    %if;(evar.death_place = "on")
-      <th>[*where dead]</th>%nl;
-      %incr_count;
-    %end;
-    %if;(evar.death_age = "on")
-      <th>[*age at death]</th>%nl;
-      %incr_count;
-    %end;
-    %if;(evar.occu = "on")
-      <th>[*occupation/occupations]1</th>%nl;
-      %incr_count;
-    %end;
-  </tr>
+      %if;(evar.birth = "on")
+        <th>[*date of birth]</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.birth_place = "on")
+       <th>[*where born]</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.marr = "on")
+        <th>[*spouse/spouses]1</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.marr_date = "on")
+        <th>[*date of marriage]</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.marr_place = "on")
+        <th>[*where married]</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.child = "on")
+        <th>[*child/children]1</th>
+        %incr_count;
+      %end;
+      %if;(evar.death = "on")
+        <th>[*date of death]</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.death_place = "on")
+        <th>[*where dead]</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.death_age = "on")
+        <th>[*age at death]</th>%nl;
+        %incr_count;
+      %end;
+      %if;(evar.occu = "on")
+        <th>[*occupation/occupations]1</th>%nl;
+        %incr_count;
+      %end;
+    </tr>
+  </thead>
 %end;
 
 %define;ascend_table_row(xx)
@@ -1260,21 +1126,24 @@
     %incr_count;
     %let;nb_col;%count;%in;
     %reset_count;
-    %foreach;ancestor_level(nb_gena)
-      %if;(evar.only != "on" or level = nb_gena)
-        %if;(evar.gen = "on")
-          %nl;
-          <tr>
-            <td colspan="%nb_col">%nn;
-              <b>[*generation/generations]0 %level;</b>%nn;
-            </td>
-          </tr>
-        %end;
-        %foreach;ancestor;
-          %apply;ascend_table_row("ancestor")
+
+    <tbody>
+      %foreach;ancestor_level(nb_gena)
+        %if;(evar.only != "on" or level = nb_gena)
+          %if;(evar.gen = "on")
+            %nl;
+            <tr>
+              <td colspan="%nb_col">%nn;
+                <b>[*generation/generations]0 %level;</b>%nn;
+              </td>
+            </tr>
+          %end;
+          %foreach;ancestor;
+            %apply;ascend_table_row("ancestor")
+          %end;
         %end;
       %end;
-    %end;
+    </tbody>
   </table>
   <p style="clear:both;">[*total] : %count; [[person/persons]1@(c)]</p>
 %end;
@@ -1289,6 +1158,8 @@
   %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
 %in;
 %message_to_wizard;
+
+%apply;include_file("menubar")
 
 <h1>%nn;
   %apply;a_of_b%with;

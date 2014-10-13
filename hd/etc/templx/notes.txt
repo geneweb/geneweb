@@ -1,11 +1,71 @@
-﻿%( Template notes v 6.05d 2012/06/02 12:00:00 ddr/dd %)
-%if;((wizard or friend or 
-      bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and
-     (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
-  <h3 id="notes" class="highlight">[*note/notes]1</h3>
-  <dl><dd>
-    %if;(has_linked_page.BNOTE)<p>%apply;capitalize(linked_page.BNOTE).</p>%end;
-    %if;(has_notes)%notes;%end;
-    %if;(has_linked_page.NOTE)<p>%apply;capitalize(linked_page.NOTE).</p>%end;
-  </dd></dl>
-%end;
+﻿%( Template notes v 7.00a 2014/09/29 09:00:00 ddr/dd %)
+  %reset_count;
+  %if;has_linked_page.BNOTE;%incr_count;%end;
+  %if;has_notes;%incr_count;%end;
+  %if;has_birth_note;%incr_count;%end;
+  %if;has_baptism_note;%incr_count;%end;
+  %if;has_death_note;%incr_count;%end;
+  %if;has_burial_note;%incr_count;%end;
+  %if;has_linked_page.NOTE;%incr_count;%end;
+  %foreach;event;
+    %if;event.has_note;%incr_count;%end;
+  %end;
+  %foreach;family;
+    %if;has_comment;%incr_count;%end;
+    %if;has_marriage_note;%incr_count;%end;
+  %end;
+  %if;(count>0)
+    <h3 id="notes" class="highlight">[*note/notes]1</h3>
+    <blockquote>
+      %if;has_linked_page.BNOTE;
+        %apply;capitalize(linked_page.BNOTE).
+      %end; 
+      %if;has_notes;
+        <h5 class="highlight">[*individual notes]</h5>
+        <blockquote>%notes;</blockquote>
+      %end;
+      %if;has_birth_note;
+        <h5 class="highlight">[*birth]</h5>
+        <blockquote>%birth_note;</blockquote>
+      %end;
+      %if;has_baptism_note;
+        <h5 class="highlight">[*baptism]</h5>
+        <blockquote>%baptism_note;</blockquote>
+      %end;
+      %foreach;family;
+        %if;(has_comment or has_marriage_note)
+          <h5 class="highlight">[*marriage notes]0%sp;
+          [with] %spouse.first_name; %spouse.surname;</h5>
+        %end;
+        <blockquote>%nn;
+          %if;has_comment;%comment;%end;
+          %if;(has_comment and has_marriage_note)%nl;%end;
+          %if;has_marriage_note;%marriage_note;%end;
+        </blockquote>
+      %end;
+      %if;has_death_note;
+        <h5 class="highlight">[*death]</h5>
+        <blockquote>%death_note;</blockquote>
+      %end;
+      %if;has_burial_note;
+        <h5 class="highlight">[*burial]</h5>
+        <blockquote>%burial_note;</blockquote>
+      %end;
+      %foreach;event;
+        %if;event.has_note;
+          %if;(event.name!=[birth] and
+               event.name!=[baptism] and
+               event.name!=[marriage event] and
+               event.name!=[death] and
+               event.name!=[burial])
+            <h5 class="highlight">%apply;capitalize(event.name)</h5>
+            <blockquote>%event.note;</blockquote>
+          %end;
+        %end;
+      %end;
+      %if;has_linked_page.NOTE;
+        %apply;capitalize(linked_page.NOTE).
+      %end;
+    </blockquote>
+  %end;
+  %reset_count;
