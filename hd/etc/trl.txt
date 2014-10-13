@@ -1,8 +1,8 @@
-
 %if;(not cancel_links and evar.digest = "")
+  %nl;
   <div id="trl" style="clear:both;">
     <ul>
-      <li><a href="%prefix_no_templ;%suffix;">default</a></li>
+      <li><a href="%prefix_no_templ;templ=;%suffix;">default</a></li>
       <li><a href="%prefix_no_templ;templ=templa;%suffix;">templa</a></li>
       <li><a href="%prefix_no_templ;templ=templb;%suffix;">templb</a></li>
       <li><a href="%prefix_no_templ;templ=templc;%suffix;">templc</a></li>
