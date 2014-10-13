@@ -1,8 +1,8 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anctree.txt, Template x v 6.06b 2012/10/31 12:00:00 ddr/dd Exp $ -->
-  <!-- copyright (c) 1998-2012 INRIA -->
+  <!-- $Id: anctree.txt, Template x 2014/09/29 09:00:00 ddr/dd Exp $ -->
+  <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -12,70 +12,18 @@
       %if;(qualifier != "") %qualifier;%end; %surname;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-%include.css;
+  %include.js;
+  %include.css;
   <style type="text/css"><!--
   --></style>
-%base_header;
+  %base_header;
 </head>
 
-%define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
-    style="border: none" alt=""%sp;
-    title="%if;(yyy=1)%else;[direct ancestor of %s:::xxx], %end;[*Sosa] yyy"%/>%nn;
-%end;
-
-%define;display_sosa(xx)
-  %if;(bvar.display_sosa="" or bvar.display_sosa="yes")
-    %if;xx.has_sosa;
-      %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-      %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
-                             %sosa_ref.surname_key_strip;
-                        %and;%xx.sosa;%end;
-      %if;not cancel_links;</a>%end;%sp;
-    %end;
-  %end;
-%end;
-
-%define;image_MF(xx,wi_he)
-  %if;(wizard and not cancel_links and not xx.is_restricted)
-    <a href="%prefix;m=MOD_IND;i=%xx.index;">%end;
-  %if;xx.is_male;
-    <img src="%image_prefix;/male.png" title="[M/F]0"%sp;
-  %elseif;xx.is_female;
-    <img src="%image_prefix;/female.png" title="[M/F]1"%sp;
-  %else;
-    <img src="%image_prefix;/sexunknown.png" title="?"%sp;
-  %end;
-         width="wi_he" height="wi_he" style="border: none" alt=""%/>%nn;
-  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
-  %sp;
-%end;
-
-%define;display_arrows()
-  %if;not cancel_links;
-    <table style="float: %right;" border="%border;"><tr><td>
-      %if;has_referer;
-        <a href="%referer;"><img style="border-width: thin" alt="" title="&lt;&lt;"%sp;%nn;
-          src="%image_prefix;/left.png"%wid_hei;left.png;%/></a>
-      %end;
-      <a href="%prefix;"><img style="border-width: thin" alt="" title="^^"%sp;
-        src="%image_prefix;/up.png"%wid_hei;up.png;%/></a>
-      <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
-        src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[cancel GeneWeb links]"%/></a>
-    </td></tr></table>
-  %end;
-%end;
-
-%define;short_display_person(xx)
-  %apply;display_sosa("xx")
-  %if;(cancel_links or xx.is_restricted)%xx;
-  %else;<a href="%prefix;%xx.access;">%xx;</a>%end;%sp;
-  %xx.title;%xx.dates;%if;xx.birthday; ([happy birthday to you!])%end;
-%end;
+%import;perso_utils_dd
 
 %define;a_tree_line()
   %if;(not is_first)
@@ -202,10 +150,13 @@
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %let;nb_gena;
-  %if;(bvar.max_anc_tree = "")%apply;min(evar.v, max_anc_level, 7)
-  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_tree)%end;
+  %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
+  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
 %in;
 %message_to_wizard;
+
+%apply;include_file("menubar")
+
 %apply;display_arrows()
 
 %if;(evar.t = "T")

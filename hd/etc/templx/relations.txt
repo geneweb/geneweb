@@ -1,51 +1,91 @@
-﻿%( Template relations v 6.06a 2012/07/30 12:00:00 ddr/dd  %)
-%if;has_relations;
-  <h3 id="relations" class="highlight">[*relation/relations]1</h3>
-  <ul>
-    %foreach;relation;
-      %if;(has_relation_him and has_relation_her)
-        <li>%apply;capitalize(relation_type) :%nl;
-          <ul>
-            %apply;li_SDC("relation_him")
-              %apply;image_MF("relation_him","13")
-              %apply;short_display_person("relation_him")
-            </li>
-            %apply;li_SDC("relation_her")
-              %apply;image_MF("relation_her","13")
-              %apply;short_display_person("relation_her")
-            </li>
-          </ul>
-        </li>
-      %elseif;has_relation_him;
-        %apply;li_SDC("relation_him")%apply;capitalize(relation_type) :%sp;
-          %apply;image_MF("relation_him","13")
-          %apply;short_display_person("relation_him")
-        </li>
-      %elseif;has_relation_her;
-        %apply;li_SDC("relation_her")%apply;capitalize(relation_type) :%sp;
-          %apply;image_MF("relation_her","13")
-          %apply;short_display_person("relation_her")
+﻿%( Template relations v 7.00a 2014/09/29 09:00:00 ddr/dd %)
+  %reset_count;
+  %if;has_relations;%incr_count;%end;
+  %foreach;event;
+    %if;event.has_witnesses;%incr_count;%end;
+  %end;
+  %foreach;family;
+    %if;has_witnesses;%incr_count;%end;
+  %end;
+  %foreach;related;%incr_count;%end;
+  %foreach;event_witness_relation;%incr_count;%end;
+  %if;(count>0)
+    <h3 id="relations" class="highlight">[*relation/relations]1</h3>
+    <ul>
+      %foreach;relation;
+        %if;(has_relation_him and has_relation_her)
+          <li>%apply;capitalize(relation_type) :%nl;
+            <ul>
+              %apply;li_SDC("relation_him")
+                %apply;image_MF("relation_him","13")
+                %apply;short_display_person("relation_him")
+              </li>
+              %apply;li_SDC("relation_her")
+                %apply;image_MF("relation_her","13")
+                %apply;short_display_person("relation_her")
+              </li>
+            </ul>
+          </li>
+        %elseif;has_relation_him;
+          %apply;li_SDC("relation_him")%apply;capitalize(relation_type) :%sp;
+            %apply;image_MF("relation_him","13")
+            %apply;short_display_person("relation_him")
+          </li>
+        %elseif;has_relation_her;
+          %apply;li_SDC("relation_her")%apply;capitalize(relation_type) :%sp;
+            %apply;image_MF("relation_her","13")
+            %apply;short_display_person("relation_her")
+          </li>
+        %end;
+      %end;
+      %foreach;event;
+        %if;event.has_witnesses;
+          %if;(event.name!=[marriage event])
+            %foreach;event_witness;
+              <li>%apply;capitalize(event_witness_kind) : (%event.name;) :%sp;
+                %apply;image_MF("event_witness","13")
+                %apply;short_display_person("event_witness")%nl;
+              </li>
+            %end;
+          %end;
+        %end;
+      %end;
+      %foreach;family;
+        %if;has_witnesses;
+          <li>[*witness/witnesses]w ([marriage/marriages]0 [with]%sp;
+            %apply;image_MF("spouse","13")
+            %apply;short_display_person("spouse")) : %nl;
+            %foreach;witness;
+              %if;not is_first;, %end;
+              %apply;image_MF("witness","13")
+              %apply;short_display_person("witness")%nl;
+            %end;
+          </li>
+        %end;
+      %end;
+      %foreach;related;
+        %apply;li_SDC("related")%apply;capitalize(related_type) :%sp;
+          %apply;image_MF("related","13")
+          %apply;short_display_person("related")
         </li>
       %end;
-    %end;
-    %foreach;related;
-      %apply;li_SDC("related")%apply;capitalize(related_type) :%sp;
-        %apply;image_MF("related","13")
-        %apply;short_display_person("related")
-      </li>
-    %end;
-    %foreach;witness_relation;
-      <li style="list-style-type:disc">%nn;
-        %if;(witness_relation.marriage_date.year>0)
-          <em> %witness_relation.marriage_date.year;</em> :%sp;
-        %end;
-        %apply;witness_relation%with;
-          %apply;image_MF("witness_relation.father","13")%sp;
-          %apply;short_display_person("witness_relation.father")%and;
-          %apply;image_MF("witness_relation.mother","13")%sp;
-          %apply;short_display_person("witness_relation.mother")
-        %end;
-      </li>%nl;
-    %end;
-  </ul>
-%end;
+      %foreach;event_witness_relation;
+        %apply;li_SDC("event_witness_relation.person")
+          %apply;capitalize(event_witness_relation_kind)%sp;
+          %if;(event_witness_relation.event.date.year>0)
+            <em>(%event_witness_relation.event.date.year;)</em>
+          %end;
+          :%sp;
+          %event_witness_relation.event.name;,%sp;
+          %apply;image_MF("event_witness_relation.person","13")%sp;
+          %apply;short_display_person("event_witness_relation.person")
+          %if;(event_witness_relation.event.spouse != "")
+            [and]
+            %apply;image_MF("event_witness_relation.event.spouse","13")%sp;
+            %apply;short_display_person("event_witness_relation.event.spouse")
+          %end;
+        </li>
+      %end;
+    </ul>
+  %end;
+  %reset_count;
