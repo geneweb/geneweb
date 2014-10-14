@@ -15,6 +15,7 @@ value print_search : config -> base -> unit;
 
 
 (* Ajout pour l'API *)
+exception Begin_of_file;
 value line_fields :
   string -> option (string * string * string * option string);
 value rev_input_line :

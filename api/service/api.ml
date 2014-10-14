@@ -314,6 +314,78 @@ let print_find_sosa conf base =
 ;;
 
 
+(**/**) (* API_LAST_MODIFIED_PERSONS *)
+
+(* ******************************************************************** *)
+(*  [Fonc] print_last_modified_persons : config -> base -> persons list *)
+(** [Description] : Retourne la liste des dernières personnes modifiées
+                    par le magicien. Si aucun magicien n'est donné, alors
+                    c'est les dernières personnes.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - persons list : List des personnes modifiées.
+    [Rem] : Non exporté en clair hors de ce module.                     *)
+(* ******************************************************************** *)
+let print_last_modified_persons conf base =
+  let params = get_params conf Mext.parse_last_modifications in
+  let wiz =
+    match params.M.Last_modifications.wizard with
+    | Some wiz -> wiz
+    | None -> ""
+  in
+  let max_res =
+    match params.M.Last_modifications.max_res with
+    | Some i -> Int32.to_int i
+    | None -> 10
+  in
+  let filters = get_filters conf in
+  let list =
+    match
+      try Some (Secure.open_in_bin (History.file_name conf))
+      with Sys_error _ -> None
+    with
+    | Some ic ->
+        let pos = in_channel_length ic in
+        let vv = (ref "", ref 0) in
+        let rec loop list res pos =
+          if res = 0 then list
+          else
+            match
+              try Some (History.rev_input_line ic pos vv)
+              with History.Begin_of_file -> None
+            with
+            | Some (line, pos) ->
+                (match History.line_fields line with
+                | Some (time, user, action, keyo) ->
+                    if wiz = "" || user = wiz then
+                      match keyo with
+                      | Some key ->
+                          (match action with
+                          | "mn" -> loop list res pos
+                          | _ ->
+                              (match Gutil.person_ht_find_all base key with
+                              | [ip] ->
+                                  if List.mem ip list then loop list res pos
+                                  else loop (ip :: list) (res - 1) pos
+                              | _ -> loop list res pos))
+                      | None -> loop list res pos
+                    else loop list res pos
+                | None -> loop list res pos)
+            | None -> list
+        in
+        let list = loop [] max_res pos in
+        close_in ic;
+        list
+    | None -> []
+  in
+  let list = List.rev_map (fun ip -> poi base ip) list in
+  let data = data_list_person conf base filters list in
+  print_result conf data
+;;
+
+
 (**/**) (* API_MAX_ANCESTORS *)
 
 (* ************************************************************************ *)
