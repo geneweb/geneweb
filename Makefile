@@ -28,6 +28,23 @@ opt::
 	cd setup; $(MAKE) opt
 	cd gwtp; $(MAKE) opt
 
+gnt::
+	cd wserver; $(MAKE) opt
+	cd dag2html; $(MAKE) opt
+	cd src; $(MAKE) PREFIX=$(PREFIX) opt
+	cd ged2gwb; $(MAKE) opt
+	cd gwb2ged; $(MAKE) opt
+	cd setup; $(MAKE) opt
+	cd gwtp; $(MAKE) opt
+	cd contrib/gwpublic; $(MAKE)
+	cd contrib/oneshot; $(MAKE)
+	cd contrib/misc; $(MAKE)
+#	cd contrib/dicoplace; $(MAKE)
+	cd contrib/gwFix; $(MAKE) opt
+	cd contrib/history; $(MAKE)
+	cd contrib/wrap; $(MAKE)
+	cd api; $(MAKE) opt
+
 install:
 	mkdir -p $(PREFIX)/bin
 	cp src/gwc $(PREFIX)/bin/gwc$(EXE)
@@ -157,6 +174,14 @@ clean::
 	cd gwb2ged; $(MAKE) clean
 	cd setup; $(MAKE) clean
 	cd gwtp; $(MAKE) clean
+	cd contrib/gwpublic; $(MAKE) clean
+	cd contrib/oneshot; $(MAKE) clean
+	cd contrib/misc; $(MAKE) clean
+#	cd contrib/dicoplace; $(MAKE) clean
+	cd contrib/gwFix; $(MAKE) clean
+	cd contrib/history; $(MAKE) clean
+	cd contrib/wrap; $(MAKE) clean
+	cd api; $(MAKE) clean
 	$(RM) -rf $(DESTDIR)
 	$(RM) -f *~ .#*
 
