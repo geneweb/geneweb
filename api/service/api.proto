@@ -650,6 +650,13 @@ message SynchroParams {
 
 
 
+// ***************************************************************************
+// Dernire modification, historique
+// ***************************************************************************
+message LastModifications {
+  optional string wizard = 1;
+  optional int32 max_res = 2;
+}
 
 
 
