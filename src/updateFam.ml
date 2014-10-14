@@ -379,11 +379,20 @@ and eval_special_var conf base p =
   fun
   [ ["include_perso_header"] ->
       match p_getint conf.env "ip" with
-      [ Some i -> do {
-          let p = poi base (Adef.iper_of_int i) in
-          Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf base p;
-          VVstring ""
-        }
+      [ Some i ->
+          let has_base_loop =
+            try do {
+              let _ = Util.create_topological_sort conf base in
+              False
+            } with [ Consang.TopologicalSortError p -> True ]
+          in
+          if has_base_loop then VVstring ""
+          else do {
+            let p = poi base (Adef.iper_of_int i) in
+            Perso.interp_templ_with_menu
+              (fun _ -> ()) "perso_header" conf base p;
+            VVstring ""
+          }
       | None -> VVstring "" ]
   | _ -> raise Not_found ]
 and eval_int_env var env =
