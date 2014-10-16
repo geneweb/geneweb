@@ -261,6 +261,51 @@ let print_ref_person_from_ip conf base =
 ;;
 
 
+(**/**) (* API_FIRST_AVAILABLE_PERSON *)
+
+(* ************************************************************************ *)
+(*  [Fonc] print_first_available_person : config -> base -> ReferencePerson *)
+(** [Description] : Retourne la "première" personne accessible d'un arbre
+                    et visible.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] : ReferencePerson
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let print_first_available_person conf base =
+  let empty_ref =
+    M.Reference_person#{
+      n = "";
+      p = "";
+      oc = Int32.of_int 0;
+    }
+  in
+  let rec loop i nb_ind =
+    if i = nb_ind then empty_ref
+    else
+      let p = poi base (Adef.iper_of_int i) in
+      if not (is_hide_names conf p) || (fast_auth_age conf p ) then
+        let fn = Name.lower (sou base (get_first_name p)) in
+        let sn = Name.lower (sou base (get_surname p)) in
+        let occ = Int32.of_int (get_occ p) in
+        M.Reference_person#{
+          n = sn;
+          p = fn;
+          oc = occ;
+        }
+      else loop (i + 1) nb_ind
+  in
+  let nb_ind = Gwdb.nb_of_persons base in
+  let ref_p =
+    if nb_ind = 0 then empty_ref
+    else loop 0 nb_ind
+  in
+  let data = Mext.gen_reference_person ref_p in
+  print_result conf data
+;;
+
+
 (**/**) (* API_SOSA *)
 
 (* ************************************************************************ *)
