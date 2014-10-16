@@ -19,6 +19,17 @@ open Api_def
 
 
 
+(* ... utils ... *)
+
+
+let is_empty_or_quest_name p =
+  is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
+  is_empty_string (get_first_name p) || is_quest_string (get_first_name p)
+;;
+
+
+(**/**)
+
 (* *********************************************************************** *)
 (*  [Fonc] p_getenvbin : (string * string) list -> string -> string option *)
 (** [Description] : Renvoie la valeur associée à la clé donnée. Attention,
