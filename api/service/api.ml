@@ -285,7 +285,11 @@ let print_first_available_person conf base =
     if i = nb_ind then empty_ref
     else
       let p = poi base (Adef.iper_of_int i) in
-      if not (is_hide_names conf p) || (fast_auth_age conf p ) then
+      if is_hide_names conf p || is_empty_or_quest_name p ||
+         not (fast_auth_age conf p)
+      then
+        loop (i + 1) nb_ind
+      else
         let fn = Name.lower (sou base (get_first_name p)) in
         let sn = Name.lower (sou base (get_surname p)) in
         let occ = Int32.of_int (get_occ p) in
@@ -294,7 +298,6 @@ let print_first_available_person conf base =
           p = fn;
           oc = occ;
         }
-      else loop (i + 1) nb_ind
   in
   let nb_ind = Gwdb.nb_of_persons base in
   let ref_p =
@@ -462,14 +465,7 @@ let print_last_modified_persons conf base =
                               (match Gutil.person_ht_find_all base key with
                               | [ip] ->
                                   let p = poi base ip in
-                                  let has_name =
-                                    not
-                                      (is_empty_string (get_surname p) ||
-                                       is_quest_string (get_surname p) ||
-                                       is_empty_string (get_first_name p) ||
-                                       is_quest_string (get_first_name p))
-                                  in
-                                  if has_name &&
+                                  if not (is_empty_or_quest_name p) &&
                                      apply_filters_p
                                        conf base filters compute_sosa p &&
                                      not (p_mem ip list)
