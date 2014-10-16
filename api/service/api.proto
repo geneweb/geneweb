@@ -656,6 +656,7 @@ message SynchroParams {
 message LastModifications {
   optional string wizard = 1;
   optional int32 max_res = 2;
+  optional FilterDateRange range = 3;
 }
 
 
