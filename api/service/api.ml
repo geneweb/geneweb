@@ -340,6 +340,43 @@ let print_last_modified_persons conf base =
     | Some i -> Int32.to_int i
     | None -> 10
   in
+  let range =
+    match params.M.Last_modifications.range with
+    | Some range ->
+        let date_begin = range.M.Filter_date_range.date_begin in
+        let dmy1 =
+          { day = Int32.to_int date_begin.M.Filter_date.day;
+            month = Int32.to_int date_begin.M.Filter_date.month;
+            year = Int32.to_int date_begin.M.Filter_date.year;
+            prec = Sure; delta = 0 }
+        in
+        let date_end = range.M.Filter_date_range.date_end in
+        let dmy2 =
+          { day = Int32.to_int date_end.M.Filter_date.day;
+            month = Int32.to_int date_end.M.Filter_date.month;
+            year = Int32.to_int date_end.M.Filter_date.year;
+            prec = Sure; delta = 0 }
+        in
+        let prec = range.M.Filter_date_range.only_exact in
+        Some (dmy1, dmy2, prec)
+    | None -> None
+  in
+  let is_time_included time =
+    match range with
+    | Some (date_begin, date_end, prec) ->
+        (* time : 0000-00-00 00:00:00 *)
+        let date =
+          let y = int_of_string (String.sub time 0 4) in
+          let m = int_of_string (String.sub time 5 2) in
+          let d = int_of_string (String.sub time 8 2) in
+          let dmy =
+            { day = d; month = m; year = y; prec = Sure; delta = 0; }
+          in
+          Some (Dgreg (dmy, Dgregorian))
+        in
+        is_date_included prec date date_begin date_end
+    | None -> true
+  in
   let filters = get_filters conf in
   let list =
     match
@@ -359,7 +396,7 @@ let print_last_modified_persons conf base =
             | Some (line, pos) ->
                 (match History.line_fields line with
                 | Some (time, user, action, keyo) ->
-                    if wiz = "" || user = wiz then
+                    if (wiz = "" || user = wiz) && is_time_included time then
                       match keyo with
                       | Some key ->
                           (match action with
