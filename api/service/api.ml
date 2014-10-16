@@ -330,6 +330,7 @@ let print_find_sosa conf base =
 (* ******************************************************************** *)
 let print_last_modified_persons conf base =
   let params = get_params conf Mext.parse_last_modifications in
+  let filters = get_filters conf in
   let wiz =
     match params.M.Last_modifications.wizard with
     | Some wiz -> wiz
@@ -377,7 +378,17 @@ let print_last_modified_persons conf base =
         is_date_included prec date date_begin date_end
     | None -> true
   in
-  let filters = get_filters conf in
+  let p_mem ip list =
+    let rec loop list =
+      match list with
+      | [] -> false
+      | p :: list ->
+          if ip = get_key_index p then true
+          else loop list
+    in
+    loop list
+  in
+  let compute_sosa = Perso.get_single_sosa in
   let list =
     match
       try Some (Secure.open_in_bin (History.file_name conf))
@@ -400,12 +411,25 @@ let print_last_modified_persons conf base =
                       match keyo with
                       | Some key ->
                           (match action with
-                          | "mn" -> loop list res pos
+                          | "mn" | "dp" | "cp" | "cs" | "co" ->
+                              loop list res pos
                           | _ ->
                               (match Gutil.person_ht_find_all base key with
                               | [ip] ->
-                                  if List.mem ip list then loop list res pos
-                                  else loop (ip :: list) (res - 1) pos
+                                  let p = poi base ip in
+                                  let has_name =
+                                    not
+                                      (is_empty_string (get_surname p) ||
+                                       is_quest_string (get_surname p) ||
+                                       is_empty_string (get_first_name p) ||
+                                       is_quest_string (get_first_name p))
+                                  in
+                                  if has_name &&
+                                     apply_filters_p
+                                       conf base filters compute_sosa p &&
+                                     not (p_mem ip list)
+                                  then loop (p :: list) (res - 1) pos
+                                  else loop list res pos
                               | _ -> loop list res pos))
                       | None -> loop list res pos
                     else loop list res pos
@@ -417,8 +441,7 @@ let print_last_modified_persons conf base =
         list
     | None -> []
   in
-  let list = List.rev_map (fun ip -> poi base ip) list in
-  let data = data_list_person conf base filters list in
+  let data = conv_data_list_person conf base filters list in
   print_result conf data
 ;;
 
