@@ -1,26 +1,44 @@
-#!/bin/sh
+#!/bin/bash
 
-if ocamlc -v >/dev/null 2>&1; then :
+OCAML_MIN_VER="4.01"
+
+verge() {
+    [  "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+
+if ocamlc -v >/dev/null 2>&1; then
+    echo "ocamlc ... OK"
 else
     echo "You need the command ocamlc accessible in the path!"
     echo "Configuration script failed!"
     exit 1
 fi
 
-if camlp5 -v >/dev/null 2>&1; then :
+OCAML_VER="`ocamlc -version`"
+
+if verge "$OCAML_VER" "$OCAML_MIN_VER"; then
+    echo "ocamlc version $OCAML_VER >= $OCAML_MIN_VER ... OK"
+else
+    echo "OCaml version $OCAML_MIN_VER or newer needed"
+    echo "Configuration script failed!"
+    exit 1
+fi
+
+if camlp5 -v >/dev/null 2>&1; then
+    echo "camlp5 ... OK"
 else
     echo "You need the command camlp5 accessible in the path!"
     echo "Configuration script failed!"
     exit 1
 fi
 
-echo "print_endline Sys.os_type;;" > tools/tmp
-if [ "`ocaml tools/tmp`" = "Unix" ]; then
-  cp tools/Makefile.inc.unix tools/Makefile.inc
+if [ "`echo 'print_endline Sys.os_type;;' | ocaml -stdin -noprompt`" = "Unix" ]; then
+    echo "OS type ... Unix"
+    cp tools/Makefile.inc.unix tools/Makefile.inc
 else
-  cp tools/Makefile.inc.win tools/Makefile.inc
+    echo "OS type ... Windows"
+    cp tools/Makefile.inc.win tools/Makefile.inc
 fi
-rm tools/tmp
 
 D_GW_DIR=`pwd`/
 if test -e "tools/Makefile.inc"; then
@@ -42,3 +60,5 @@ if test -e "tools/Makefile.ocaml"; then
   sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
   mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
 fi
+
+echo "Configuration script succeeded!"
