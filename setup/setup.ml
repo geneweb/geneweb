@@ -1274,7 +1274,7 @@ value cleanup_1 conf =
     Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
     let c =
       Filename.concat bin_dir.val "gwc" ^ " tmp.gw -nofail -o " ^ in_base ^
-        " > comm.log "
+        " > comm.log 2&>1"
     in
     eprintf "$ %s\n" c;
     flush stderr;
@@ -1398,7 +1398,7 @@ value merge_1 conf =
               (fun s b ->
                  if s = "" then " " ^ b ^ ".gw" else s ^ " -sep " ^ b ^ ".gw")
               "" bases ^
-            " -f -o " ^ out_file ^ " > comm.log"
+            " -f -o " ^ out_file ^ " > comm.log 2>&1"
         in
         eprintf "$ %s\n" c;
         flush stderr;
