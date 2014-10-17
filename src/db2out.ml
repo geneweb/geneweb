@@ -122,7 +122,8 @@ value output_value_array_compress bdir e _ pad f = do {
 type hashtbl_t 'a 'b =
   { size: mutable int;
     data: mutable array (bucketlist 'a 'b);
-    seed: mutable int }
+    seed: mutable int;
+    initial_size: int }
 and bucketlist 'a 'b =
   [ Empty
   | Cons of 'a and 'b and bucketlist 'a 'b ]
@@ -135,10 +136,12 @@ value output_hashtbl dir file ht = do {
   (* check compatibility with version of Hashtbl of OCaml *)
   assert (Obj.is_block (Obj.repr ht));
   assert (Obj.tag (Obj.repr ht) = 0);
-  assert (Obj.size (Obj.repr ht) = 2 || Obj.size (Obj.repr (ht)) = 3);
+  assert (Obj.size (Obj.repr ht) >= 2 && Obj.size (Obj.repr (ht)) <= 4);
   assert (Obj.is_int (Obj.repr ht.size));
   assert (Obj.is_block (Obj.repr ht.data));
-  if Obj.size (Obj.repr ht) = 3 then assert (Obj.is_int (Obj.repr ht.seed))
+  if Obj.size (Obj.repr ht) >= 3 then assert (Obj.is_int (Obj.repr ht.seed))
+  else ();
+  if Obj.size (Obj.repr ht) >= 4 then assert (Obj.is_int (Obj.repr ht.initial_size))
   else ();
   output_binary_int oc_hta (Array.length ht.data);
 
@@ -156,7 +159,9 @@ value output_hashtbl dir file ht = do {
     output_binary_int oc_hta (pos_out oc_ht);
     Iovalue.output oc_ht ht.data.(i);
   };
-  if Obj.size (Obj.repr ht) = 3 then Iovalue.output oc_ht ht.seed
+  if Obj.size (Obj.repr ht) >= 3 then Iovalue.output oc_ht ht.seed
+  else ();
+  if Obj.size (Obj.repr ht) >= 4 then Iovalue.output oc_ht ht.initial_size
   else ();
   let _ : int = Iovalue.patch_output_value_header oc_ht pos_start in
 
