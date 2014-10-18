@@ -1208,15 +1208,20 @@ value base_len n =
 ;
 
 value explode s c =
-  loop [] 0 0 where rec loop list i j =
-    if j = String.length s then
-      let file = String.sub s i (j - i) in
-      List.rev [file :: list]
+  let rec loop list i j =
+    if i = 0 then
+      if s.[i] = c then ["" :: list]
+      else
+        let ss = String.sub s 0 j in
+        [ss :: list]
     else
-      if s.[j] = c then
-        let file = String.sub s i (j - i) in
-        loop [file :: list] j (j + 1)
-      else loop list i (j + 1)
+      if s.[i] = c then
+        let ss = String.sub s (i + 1) (j - i - 1) in
+        loop [ss :: list] (i - 1) i
+      else loop list (i - 1) j
+  in
+  let len = String.length s in
+  loop [] (len - 1) len
 ;
 
 (* ************************************************************************ *)
