@@ -1,5 +1,1 @@
-%define;include_file(file)
-  %include.file;
-%end;
-
-%apply;include_file("templx/ancsosa")
+%import;templx/ancsosa

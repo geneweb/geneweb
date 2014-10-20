@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: deslist.txt, Template x 2014/09/29 09:00:00 ddr/dd Exp $ -->
+  <!-- $Id: deslist.txt, Template x v 7.00b 2014/10/17 09:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -23,7 +23,7 @@
   %base_header;
 </head>
 
-%import;perso_utils_dd
+%import;templx/mac_util
 
 %define;somebody_long_info(xx)
   %if;xx.has_nobility_titles;
@@ -133,7 +133,7 @@
   %foreach;xx.family;
     %if;(family_cnt=1)<br%/>%end;
     %nl;
-	%apply;long_married("xx", "UPPER")
+    %apply;long_married("xx", "UPPER")
     %apply;image_MF("spouse","13")
     %apply;display_sosa("spouse")
     <span id="person-%ctr;-%family_cnt;">%nn;
@@ -352,7 +352,7 @@
 %in;
 %message_to_wizard;
 
-%apply;include_file("menubar")
+%import;menubar
 
 <h1 id="top">%nn;
   %apply;a_of_b_gr_eq_lev%with;

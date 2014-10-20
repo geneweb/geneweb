@@ -1,8 +1,8 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template f v 7.00a 2014/09/29 09:00:00 ddr/dd Exp $ -->
-  <!-- copyright (c) 1998-2013 INRIA -->
+  <!-- $Id: perso.txt, Template f v 7.00b 2014/10/17 09:00:00 ddr/dd Exp $ -->
+  <!-- copyright (c) 1998-2014 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -23,7 +23,7 @@
   %base_header;
 </head>
 
-%import;perso_utils_dd
+%import;templx/mac_util
 
 %define;age_at_birth_of(xxx)
   [age at %s birth date:::xxx]%sp;
@@ -159,7 +159,7 @@
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %message_to_wizard;
 
-%apply;include_file("menubar")
+%import;menubar
 
 <div style="float: %left;">
   %apply;image_MF("self","13")
@@ -252,7 +252,7 @@
         <tr>
           <td style="text-align: %right;;vertical-align: middle">
             %if;father.has_image;
-              <a href="%father.image_html_url;"><img %father.image_small_size;%sp;
+              <a href="%father.image_html_url;"><img %father.image_middle_size;%sp;
                  src="%father.image_url;" style="border: none" alt="" title="[image/images]0"%/></a>
             %else;&nbsp;%end;
           </td>
@@ -275,7 +275,7 @@
           </td>
           <td style="text-align: %left;;vertical-align: middle">
             %if;mother.has_image;
-              <a href="%mother.image_html_url;"><img %mother.image_small_size;%sp;
+              <a href="%mother.image_html_url;"><img %mother.image_middle_size;%sp;
                  src="%mother.image_url;" style="border: none" alt="" title="[image/images]0"%/></a>
             %else;&nbsp;%end;
           </td>
@@ -346,7 +346,7 @@
           <table border="%border;">
             <tr>
               <td style="vertical-align: middle">
-                 <a href="%spouse.image_html_url;"><img %spouse.image_small_size;%sp;
+                 <a href="%spouse.image_html_url;"><img %spouse.image_middle_size;%sp;
                     src="%spouse.image_url;" style="border: none"%sp;
                     alt="" title="[image/images]0"%/></a>
               </td>
@@ -814,12 +814,12 @@
 </div>
 %end;
 
-%apply;include_file("templx/relations")
-%apply;include_file("templx/linked_pages")
-%( %apply;include_file("perso_module/timeline") %)
-%apply;include_file("templx/notes")
-%apply;include_file("templx/sources")
-%apply;include_file("templx/links")
+%import;templx/relations
+%import;templx/linked_pages
+%( %import;perso_module/timeline %)
+%import;templx/notes
+%import;templx/sources
+%import;templx/links
 
 %if;(evar_opt="misc")%misc_names;%end;
 

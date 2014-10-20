@@ -1,4 +1,4 @@
-﻿%( Template links v v 7.00a 2014/09/29 09:00:00 ddr/dd %)
+﻿%( Template links v v 7.00b 2014/10/17 09:00:00 ddr/dd %)
   %if;not cancel_links;
     <table id="links" border="%border;" style="width: 100%%">
       <tr>
@@ -103,4 +103,5 @@
         %end;
       </tr>
     </table>
+    %nl;
   %end;
