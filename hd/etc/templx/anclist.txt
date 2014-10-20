@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anclist.txt, Template x 2014/09/29 09:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anclist.txt, Template x v 7.00b 2014/10/17 09:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %if;(evar.t = "E")
@@ -37,7 +37,7 @@
   %base_header;
 </head>
 
-%import;perso_utils_dd
+%import;templx/mac_util
 
 %define;list_eclair_by_date_or_events()
   %( list eclair sorted by date begin or number of individuals or number of events %)
@@ -411,7 +411,7 @@
 %in;
 %message_to_wizard;
 
-%apply;include_file("menubar")
+%import;menubar
 
 %apply;display_arrows()
 

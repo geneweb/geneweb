@@ -1,4 +1,4 @@
-﻿%( Template sources v 7.00a 2014/09/29 09:00:00 ddr/dd %)
+﻿%( Template sources v 7.00b 2014/10/17 09:00:00 ddr/dd %)
   %reset_count;
   %if;has_soures;%incr_count;%end;
   %if;has_linked_page.BIBLIO;%incr_count;%end;
@@ -6,7 +6,7 @@
     %if;event.has_src;%incr_count;%end;
   %end;
   %if;(count>0)
-    <em style="font-size:80%%">[*source/sources]1:
+    <em id="src" style="font-size:80%%">[*source/sources]1:
       <ul>
         %foreach;source;
           <li>%apply;capitalize(source_type): %source;</li>
@@ -29,5 +29,6 @@
         %apply;capitalize(linked_page.BIBLIO)
       </p>
     %end;
+    %nl;
   %end;
   %reset_count;

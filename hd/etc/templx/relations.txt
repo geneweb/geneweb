@@ -1,4 +1,4 @@
-﻿%( Template relations v 7.00a 2014/09/29 09:00:00 ddr/dd %)
+﻿%( Template relations v 7.00b 2014/10/17 09:00:00 ddr/dd %)
   %reset_count;
   %if;has_relations;%incr_count;%end;
   %foreach;event;
@@ -42,9 +42,9 @@
         %if;event.has_witnesses;
           %if;(event.name!=[marriage event])
             %foreach;event_witness;
-              <li>%apply;capitalize(event_witness_kind) : (%event.name;) :%sp;
+              <li>%apply;capitalize(event_witness_kind) (%event.name;) :%sp;
                 %apply;image_MF("event_witness","13")
-                %apply;short_display_person("event_witness")%nl;
+                %apply;short_display_person("event_witness")
               </li>
             %end;
           %end;
@@ -72,20 +72,21 @@
       %foreach;event_witness_relation;
         %apply;li_SDC("event_witness_relation.person")
           %apply;capitalize(event_witness_relation_kind)%sp;
+          %event_witness_relation.event.name;%sp;
           %if;(event_witness_relation.event.date.year>0)
-            <em>(%event_witness_relation.event.date.year;)</em>
-          %end;
+            <em>(%event_witness_relation.event.date.year;)</em>%sp;
+          %end;%nn;
           :%sp;
-          %event_witness_relation.event.name;,%sp;
-          %apply;image_MF("event_witness_relation.person","13")%sp;
+          %apply;image_MF("event_witness_relation.person","13")
           %apply;short_display_person("event_witness_relation.person")
           %if;(event_witness_relation.event.spouse != "")
-            [and]
-            %apply;image_MF("event_witness_relation.event.spouse","13")%sp;
+            %sp;[and]
+            %apply;image_MF("event_witness_relation.event.spouse","13")
             %apply;short_display_person("event_witness_relation.event.spouse")
           %end;
         </li>
       %end;
     </ul>
+    %nl;
   %end;
   %reset_count;

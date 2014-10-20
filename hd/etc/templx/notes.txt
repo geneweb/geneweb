@@ -1,4 +1,4 @@
-﻿%( Template notes v 7.00a 2014/09/29 09:00:00 ddr/dd %)
+﻿%( Template notes v 7.00b 2014/10/17 09:00:00 ddr/dd %)
   %reset_count;
   %if;has_linked_page.BNOTE;%incr_count;%end;
   %if;has_notes;%incr_count;%end;
@@ -67,5 +67,6 @@
         %apply;capitalize(linked_page.NOTE).
       %end;
     </blockquote>
+    %nl;
   %end;
   %reset_count;

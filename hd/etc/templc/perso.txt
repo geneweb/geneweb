@@ -1,8 +1,8 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: perso.txt, Template c v 7.00a 2014/09/29 09:00:00 ddr/dd Exp $ -->
-  <!-- copyright (c) 1998-2013 INRIA -->
+  <!-- $Id: perso.txt, Template c v 7.00b 2014/10/17 09:00:00 ddr/dd Exp $ -->
+  <!-- copyright (c) 1998-2014 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -23,14 +23,14 @@
   %base_header;
 </head>
 
-%import;perso_utils_dd
+%import;templx/mac_util
 
 <body%body_prop;>
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %message_to_wizard;
 
-%apply;include_file("menubar")
+%import;menubar
 
 <div style="float: %left;">
   %apply;image_MF("self","13")
@@ -293,14 +293,14 @@
       %end;
     </tr>
   </table></div>
-%end;
+%end
 
-%apply;include_file("templx/relations")
-%apply;include_file("templx/linked_pages")
-%( %apply;include_file("perso_module/timeline") %)
-%apply;include_file("templx/notes")
-%apply;include_file("templx/sources")
-%apply;include_file("templx/links")
+%import;templx/relations
+%import;templx/linked_pages
+%( %import;perso_module/timeline %)
+%import;templx/notes
+%import;templx/sources
+%import;templx/links
 
 %if;(evar_opt="misc")%misc_names;%end;
 
