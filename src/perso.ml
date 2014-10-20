@@ -1548,6 +1548,7 @@ value gen_string_of_img_sz max_wid max_hei conf base env (p, p_auth) =
   else ""
 ;
 value string_of_image_size = gen_string_of_img_sz max_im_wid max_im_wid;
+value string_of_image_medium_size = gen_string_of_img_sz 160 120;
 value string_of_image_small_size = gen_string_of_img_sz 100 75;
 
 value get_sosa conf base env r p =
@@ -2678,6 +2679,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
   | "image" -> if not p_auth then "" else sou base (get_image p)
   | "image_html_url" -> string_of_image_url conf base env ep True
   | "image_size" -> string_of_image_size conf base env ep
+  | "image_medium_size" -> string_of_image_medium_size conf base env ep
   | "image_small_size" -> string_of_image_small_size conf base env ep
   | "image_url" -> string_of_image_url conf base env ep False
   | "ind_access" ->
