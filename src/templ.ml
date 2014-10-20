@@ -359,6 +359,8 @@ value strip_newlines_after_variables =
     | [] -> [] ]
 ;
 
+value imported_files = ref [];
+
 value parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser bp
@@ -459,16 +461,20 @@ value parse_templ conf strm =
     let ast =
       try
         let file = get_value 0 strm in
-        let al =
-          match Util.open_templ conf file with
-          [ Some ic ->
-              let strm2 = (Stream.of_channel ic) in
-              let (al, _) = parse_astl [] False 0 [] strm2 in
-              Some (Aimport file al)
-          | None -> None ]
-        in
-        al
-      with 
+        (* Protection pour ne pas inclure plusieurs fois un même template ? *)
+        if not (List.mem file imported_files.val) then
+          let al =
+            match Util.open_templ conf file with
+            [ Some ic ->
+                let () = imported_files.val := [ file :: imported_files.val] in
+                let strm2 = (Stream.of_channel ic) in
+                let (al, _) = parse_astl [] False 0 [] strm2 in
+                do { close_in ic; Some (Aimport file al) }
+            | None -> None ]
+          in
+          al
+        else None
+      with
       [ Stream.Failure | Stream.Error _ -> None ]
     in
     let (alk, tok) = parse_astl [] False 0 end_list strm in
@@ -1350,9 +1356,6 @@ value include_hed_trl conf base_opt name =
   | None -> old_include_hed_trl conf base_opt ("." ^ name) ]
 ;
 
-value import = ref 0;
-value imported_files = ref [];
-
 value rec interp_ast conf base ifun env =
   let m_env = ref env in
   let rec eval_ast env ep a =
@@ -1491,15 +1494,10 @@ value rec interp_ast conf base ifun env =
     | [Avar _ "sq" []; Atext loc s :: al] ->
         let s = squeeze_spaces s in
         print_ast_list env ep [Atext loc s :: al]
-    | [Aimport templ astl :: al] -> 
-        (* Protection pour ne pas inclure plusieurs fois un même template ? *)
-        if not (List.mem templ imported_files.val) then do {
-          (*incr import;*)
-          print_ast_list env ep astl;
-          (*decr import;*)
-          print_ast_list m_env.val ep al;
-        }
-        else ()
+    | [Aimport templ astl :: al] -> do {
+        print_ast_list env ep astl;
+        print_ast_list m_env.val ep al;
+      }
     | [a] -> print_ast env ep a
     | [a :: al] -> do {
         print_ast env ep a;
