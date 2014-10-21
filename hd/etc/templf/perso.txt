@@ -252,7 +252,7 @@
         <tr>
           <td style="text-align: %right;;vertical-align: middle">
             %if;father.has_image;
-              <a href="%father.image_html_url;"><img %father.image_middle_size;%sp;
+              <a href="%father.image_html_url;"><img %father.image_medium_size;%sp;
                  src="%father.image_url;" style="border: none" alt="" title="[image/images]0"%/></a>
             %else;&nbsp;%end;
           </td>
@@ -275,7 +275,7 @@
           </td>
           <td style="text-align: %left;;vertical-align: middle">
             %if;mother.has_image;
-              <a href="%mother.image_html_url;"><img %mother.image_middle_size;%sp;
+              <a href="%mother.image_html_url;"><img %mother.image_medium_size;%sp;
                  src="%mother.image_url;" style="border: none" alt="" title="[image/images]0"%/></a>
             %else;&nbsp;%end;
           </td>
@@ -346,7 +346,7 @@
           <table border="%border;">
             <tr>
               <td style="vertical-align: middle">
-                 <a href="%spouse.image_html_url;"><img %spouse.image_middle_size;%sp;
+                 <a href="%spouse.image_html_url;"><img %spouse.image_medium_size;%sp;
                     src="%spouse.image_url;" style="border: none"%sp;
                     alt="" title="[image/images]0"%/></a>
               </td>
