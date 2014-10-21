@@ -389,30 +389,31 @@ let date_included d d1 d2 =
   | {day = d1; month = 0; year = 0} ->
       begin
         match d2 with
-        | {day = 0; month = 0; year = 0} -> false
+        | {day = 0; month = m2; year = y2} -> false
         | {day = d2; month = 0; year = 0} -> d > 0 && comp d d1 d2 31
         | _ -> false
       end
   | {day = 0; month = m1; year = 0} ->
       begin
         match d2 with
-        | {day = 0; month = 0; year = 0} -> false
+        | {day = d2; month = 0; year = y2} -> false
         | {day = 0; month = m2; year = 0} -> m > 0 && comp m m1 m2 12
         | _ -> false
       end
   | {day = 0; month = 0; year = y1} ->
       begin
         match d2 with
-        | {day = 0; month = 0; year = 0} -> false
+        | {day = d2; month = m2; year = 0} -> false
         | {day = 0; month = 0; year = y2} -> comp y y1 y2 0
         | _ -> false
       end
+  (* Impossible pour GeneWeb *)
   | {day = d1; month = m1; year = 0} ->
       begin
         match d2 with
-        | {day = 0; month = 0; year = 0} -> false
-        | {day = d2; month = 0; year = 0} -> false
-        | {day = 0; month = m2; year = 0} -> false
+        | {day = 0; month = 0; year = y2} -> false
+        | {day = d2; month = 0; year = y2} -> false
+        | {day = 0; month = m2; year = y2} -> false
         | {day = d2; month = m2; year = 0} ->
             d > 0 && m > 0 &&
               comp (m * 100 + d) (m1 * 100 + d1) (m2 * 100 + d2) (12 * 100 + 31)
@@ -421,19 +422,20 @@ let date_included d d1 d2 =
   | {day = 0; month = m1; year = y1} ->
       begin
         match d2 with
-        | {day = 0; month = 0; year = 0} -> false
-        | {day = 0; month = m2; year = 0} -> false
-        | {day = 0; month = 0; year = y2} -> false
+        | {day = d2; month = 0; year = 0} -> false
+        | {day = d2; month = m2; year = 0} -> false
+        | {day = d2; month = 0; year = y2} -> false
         | {day = 0; month = m2; year = y2} ->
             m > 0 && comp (y * 100 + m) (y1 * 100 + m1) (y2 * 100 + m2) 0
         | _ -> false
       end
+  (* Impossible pour GeneWeb *)
   | {day = d1; month = 0; year = y1} ->
       begin
         match d2 with
-        | {day = 0; month = 0; year = 0} -> false
-        | {day = d2; month = 0; year = 0} -> false
-        | {day = 0; month = 0; year = y2} -> false
+        | {day = 0; month = m2; year = 0} -> false
+        | {day = d2; month = m2; year = 0} -> false
+        | {day = 0; month = m2; year = y2} -> false
         | {day = d2; month = 0; year = y2} ->
             d > 0 && y1 = y2 && comp d d1 d2 31
         | _ -> false
@@ -442,13 +444,12 @@ let date_included d d1 d2 =
       begin
         match d2 with
         | {day = d2; month = m2; year = y2} ->
-            d > 0 && m > 0 &&
-              d2 > 0 && m2 > 0 && y2 <> 0 &&
-                comp
-                  (y * 10000 + m * 100 + d)
-                  (y1 * 10000 + m1 * 100 + d1)
-                  (y2 * 10000 + m2 * 100 + d2)
-                  0
+            y2 <> 0 &&
+              comp
+                (y * 10000 + m * 100 + d)
+                (y1 * 10000 + m1 * 100 + d1)
+                (y2 * 10000 + m2 * 100 + d2)
+                0
       end
 ;;
 
