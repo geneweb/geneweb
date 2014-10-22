@@ -39,15 +39,7 @@ install:
 	cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE)
 	cp ged2gwb/ged2gwb2 $(PREFIX)/bin/ged2gwb2$(EXE)
 	cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE)
-	mkdir -p $(LANGDIR)/lang
-	cp hd/lang/*.txt $(LANGDIR)/lang/.
-	mkdir -p $(LANGDIR)/images
-	mkdir -p $(LANGDIR)/images/flags
-	cp hd/images/flags/*.jpg hd/images/flags/*.png $(LANGDIR)/images/flags/.
-	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(LANGDIR)/images/.
-	mkdir -p $(LANGDIR)/etc
-	cp -R hd/etc/* $(LANGDIR)/etc/.
-	find $(LANGDIR)/etc/ -name .svn -type d -prune -exec rm -rf {} \;
+	cp -R hd/* $(LANGDIR)/.
 	mkdir -p $(MANDIR)
 	cd man; cp $(MANPAGES) $(MANDIR)/.
 
@@ -135,14 +127,7 @@ classical_distrib:
 	cp gwtp/lang/*.txt $(DESTDIR)/gwtp_tmp/lang/.
 	cp etc/a.gwf $(DESTDIR)/.
 	mkdir $(DESTDIR)/lang
-	cp hd/lang/*.txt $(DESTDIR)/lang/.
-	mkdir $(DESTDIR)/images
-	mkdir $(DESTDIR)/images/flags
-	cp hd/images/flags/*.jpg hd/images/flags/*.png $(DESTDIR)/images/flags/.
-	cp hd/images/*.jpg hd/images/*.png hd/images/*.ico $(DESTDIR)/images/.
-	mkdir $(DESTDIR)/etc
-	cp -R hd/etc/* $(DESTDIR)/etc/.
-	find $(DESTDIR)/etc/ -name .svn -type d -prune -exec rm -rf {} \;
+	cp -R hd/* $(DESTDIR)/.
 
 windows_files:
 	@for i in distribution/*.txt distribution/gw/*.txt; do \
@@ -168,8 +153,7 @@ clean_mismatch:
 	rm src/pa_lock.cmo src/pa_html.cmo
 
 depend:
-	cd src; $(MAKE) gwlib.ml
-	cd src; $(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
+	cd src; $(MAKE) gwlib.ml pa_lock.cmo pa_html.cmo q_codes.cmo
 	cd wserver; $(MAKE) depend
 	cd src; $(MAKE) depend
 	cd ged2gwb; $(MAKE) depend

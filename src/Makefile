@@ -155,9 +155,7 @@ i18n: pr_transl.cmo always
 
 always:
 
-depend:
-	$(MAKE) gwlib.ml
-	$(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
+depend: gwlib.ml pa_lock.cmo pa_html.cmo q_codes.cmo
 	export LC_ALL=C; TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) > .depend.new
 	mv .depend.new .depend
 
