@@ -426,7 +426,7 @@ wiznotes.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx gwdb.cmx \
 wiznotes.cmi: config.cmi gwdb.cmi
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo
 alln.cmo alln.cmx: pa_html.cmo
-birthDeath.cmo birthDeath.cmx: def_syn.cmo pa_html.cmo
+birthDeath.cmo birthDeath.cmx: pa_html.cmo
 birthday.cmo birthday.cmx: pa_html.cmo
 changeChildren.cmo changeChildren.cmx: pa_html.cmo
 cousins.cmo cousins.cmx: pa_html.cmo
@@ -451,7 +451,7 @@ perso.cmo perso.cmx: pa_html.cmo
 place.cmo place.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
-request.cmo request.cmx: def_syn.cmo pa_lock.cmo pa_html.cmo
+request.cmo request.cmx: pa_lock.cmo pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_html.cmo
 some.cmo some.cmx: pa_html.cmo
 updateData.cmo updateData.cmx: pa_html.cmo

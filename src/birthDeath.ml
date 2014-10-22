@@ -1,4 +1,4 @@
-(* camlp5r ./def_syn.cmo ./pa_html.cmo *)
+(* camlp5r ./pa_html.cmo *)
 (* $Id: birthDeath.ml,v 5.40 2008-11-03 15:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
