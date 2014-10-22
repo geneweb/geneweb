@@ -72,7 +72,9 @@ value person_selected conf base p =
   match p_getenv conf.senv "em" with
   [ Some "R" -> relation_print conf base p
   | Some mode -> incorrect_request conf
-  | None -> Perso.print conf base p ]
+  | None -> do {
+      record_visited conf (get_key_index p);
+      Perso.print conf base p } ]
 ;
 
 value compact_list conf base xl =
