@@ -89,6 +89,7 @@ value family_m conf base =
   | Some "API_IMAGE_PERSON" -> Api.print_img_person conf base
   | Some "API_IMAGE_UPDATE" when conf.wizard -> Api.print_updt_image conf base
   | Some "API_LAST_MODIFIED_PERSONS" -> Api.print_last_modified_persons conf base
+  | Some "API_LAST_VISITED_PERSONS" -> Api.print_last_visited_persons conf base
   | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
   | Some "API_LOOP_BASE" -> Api.print_loop conf base
   | Some "API_MAX_ANCESTORS" when conf.wizard -> Api.print_max_ancestors conf base

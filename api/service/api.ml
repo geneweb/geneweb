@@ -487,6 +487,63 @@ let print_last_modified_persons conf base =
 ;;
 
 
+(**/**) (* API_LAST_VISITED_PERSONS *)
+
+let delete_outdated_base_file conf file =
+  let bdir =
+    if Filename.check_suffix conf.bname ".gwb" then conf.bname
+    else conf.bname ^ ".gwb"
+  in
+  let fname = Filename.concat bdir file in
+  let fname_cmd = Filename.concat bdir "command.txt" in
+  match
+    try (Some (open_in (Util.base_path [] fname_cmd)),
+         Some (open_in (Util.base_path [] fname)))
+    with Sys_error _ -> (None, None)
+  with
+  | (Some ic_cmd, Some ic_fname) ->
+      let fd_cmd = Unix.descr_of_in_channel ic_cmd in
+      let stats_cmd = Unix.fstat fd_cmd in
+      let fd_fname = Unix.descr_of_in_channel ic_fname in
+      let stats_fname = Unix.fstat fd_fname in
+      close_in ic_cmd;
+      close_in ic_fname;
+      if stats_fname.Unix.st_mtime < stats_cmd.Unix.st_mtime then
+        try Sys.remove fname with Sys_error _ -> ()
+      else ()
+  | _ -> ()
+;;
+
+(* ************************************************************************ *)
+(*  [Fonc] print_last_visited_persons : config -> base -> persons list      *)
+(** [Description] : Retourne la liste des dernières personnes visités
+                    par le user donné en paramètre.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - persons list : Liste des personnes modifiées.
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let print_last_visited_persons conf base =
+  let last_visits = get_params conf Mext.parse_last_visits in
+  let user = last_visits.M.Last_visits.user in
+  let filters = get_filters conf in
+  (* Si l'utilisateur a renvoyé son GEDCOM, on supprime le cache. *)
+  let () = delete_outdated_base_file conf "cache_visited" in
+  let list =
+    if user = "" then []
+    else
+      let ht = Util.read_visited (Util.cache_visited conf) in
+      try Hashtbl.find ht user with
+      Not_found -> []
+  in
+  let list = List.map (fun (ip, _) -> poi base ip) list in
+  let data = data_list_person conf base filters list in
+  print_result conf data
+;;
+
+
 (**/**) (* API_MAX_ANCESTORS *)
 
 (* ************************************************************************ *)
