@@ -1,12 +1,12 @@
-gwtp.cmo: ../src/buff.cmo ../src/dbdisk.cmi httpEnv.cmo iolight.cmo \
-    ../src/lock.cmi ../src/mutil.cmi ../src/outbase.cmi ../src/secure.cmi \
-    ../src/translate.cmi 
-gwtp.cmx: ../src/buff.cmx ../src/dbdisk.cmi httpEnv.cmx iolight.cmx \
-    ../src/lock.cmx ../src/mutil.cmx ../src/outbase.cmx ../src/secure.cmx \
-    ../src/translate.cmx 
+gwtp.cmo: ../src/buff.cmo ../src/dbdisk.cmi ../src/lock.cmi ../src/mutil.cmi \
+    ../src/outbase.cmi ../src/secure.cmi ../src/translate.cmi httpEnv.cmo \
+    iolight.cmo
+gwtp.cmx: ../src/buff.cmx ../src/dbdisk.cmi ../src/lock.cmx ../src/mutil.cmx \
+    ../src/outbase.cmx ../src/secure.cmx ../src/translate.cmx httpEnv.cmx \
+    iolight.cmx
 iolight.cmo: ../src/buff.cmo ../src/dbdisk.cmi ../src/def.cmi \
-    ../src/iovalue.cmi ../src/mutil.cmi ../src/secure.cmi 
+    ../src/iovalue.cmi ../src/mutil.cmi ../src/secure.cmi
 iolight.cmx: ../src/buff.cmx ../src/dbdisk.cmi ../src/def.cmi \
-    ../src/iovalue.cmx ../src/mutil.cmx ../src/secure.cmx 
-recover.cmo: iolight.cmo ../src/outbase.cmi 
-recover.cmx: iolight.cmx ../src/outbase.cmx 
+    ../src/iovalue.cmx ../src/mutil.cmx ../src/secure.cmx
+recover.cmo: ../src/outbase.cmi iolight.cmo
+recover.cmx: ../src/outbase.cmx iolight.cmx
