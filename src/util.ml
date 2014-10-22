@@ -3673,3 +3673,103 @@ value display_options conf =
   in
   s
 ;
+
+
+(* Hashtbl qui associe un user à la liste des dernières personnes visitées. *)
+(* On en profite aussi pour stocker la date de la dernière visite.          *)
+type cache_visited_t = Hashtbl.t string (list (iper * string));
+
+(* ************************************************************************ *)
+(*  [Fonc] read_visited : string -> cache_visited_t                         *)
+(** [Description] : List le fichier de cache des dernières fiches visités.
+    [Args] :
+      - fname : le fichier de cache (qui se trouve dans base.gwb)
+    [Retour] : Hashtbl des user => dernières visites
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value read_visited fname =
+  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let ht : cache_visited_t = input_value ic in
+      do { close_in ic; ht }
+  | None -> Hashtbl.create 1 ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] write_visited : string -> Hashtbl.t string (list iper) -> unit   *)
+(** [Description] : Met à jour le fichier de cache des visites.
+    [Args] :
+      - fname : le fichier de cache (qui se trouve dans base.gwb)
+      - ht    : le compteur de visite
+    [Retour] : unit
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value write_visited fname ht =
+  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
+  [ Some oc -> do { output_value oc ht; close_out oc }
+  | None -> () ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] cache_visited : config -> string                                 *)
+(** [Description] : Renvoie le chemin du fichier de cache.
+    [Args] :
+      - config : configuration de la base
+    [Retour] : unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value cache_visited conf =
+  let bname =
+    if Filename.check_suffix conf.bname ".gwb" then conf.bname
+    else conf.bname ^ ".gwb"
+  in
+  Filename.concat (base_path [] bname) "cache_visited"
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] record_visited : config -> iper -> unit                          *)
+(** [Description] : Vérifie si le user est ami ou magicien et met à jour
+                    le fichier de cache.
+    [Args] :
+      - conf : configuration de la base
+      - ip   : iper
+    [Retour] : unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value record_visited conf ip =
+  if conf.friend || conf.wizard then
+    let fname = cache_visited conf in
+    let ht = read_visited fname in
+    let (hh, mm, ss) = conf.time in
+    let time =
+      Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d"
+      conf.today.year conf.today.month conf.today.day hh mm ss
+    in
+    let () =
+      try
+        let vl = Hashtbl.find ht conf.user in
+        let vl = [ (ip, time) :: vl ] in
+        (* On rend la liste unique sur les ip. *)
+        let uniq =
+          fun
+          [ [_] | [] as l -> l
+          | [((ip, _) as x) :: l] ->
+              loop [] x l where rec loop rl x =
+                fun
+                [ [((ip2, _) as y) :: l] ->
+                    if ip = ip2 then loop rl x l
+                    else loop [x :: rl] y l
+                | [] -> List.rev [x :: rl] ] ]
+        in
+        let vl = uniq vl in
+        let vl = reduce_list 10 vl in
+        Hashtbl.replace ht conf.user vl
+      with
+      [ Not_found -> Hashtbl.add ht conf.user [(ip, time)] ]
+    in
+    write_visited fname ht
+  else ()
+;
