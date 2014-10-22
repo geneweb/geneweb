@@ -6,7 +6,6 @@ open Def;
 open Gwdb;
 
 value add_lang_path : string -> unit;
-value add_doc_path : string -> unit;
 value set_base_dir : string -> unit;
 value cnt_dir : ref string;
 value images_url : ref string;
@@ -16,7 +15,6 @@ value base_path : list string -> string -> string;
 value find_misc_file : string -> string;
 
 value search_in_lang_path : string -> string;
-value search_in_doc_path : string -> string;
 
 value etc_file_name : config -> string -> string;
 

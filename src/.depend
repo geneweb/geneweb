@@ -115,10 +115,6 @@ descend.cmx: ../dag2html/dag2html.cmx ../wserver/wserver.cmx adef.cmx \
     hutil.cmx mutil.cmx perso.cmx util.cmx
 diff.cmo: diff.cmi
 diff.cmx: diff.cmi
-doc.cmo: ../wserver/wserver.cmi buff.cmo config.cmi hutil.cmi notesLinks.cmi \
-    secure.cmi templ.cmi templAst.cmi util.cmi wiki.cmi
-doc.cmx: ../wserver/wserver.cmx buff.cmx config.cmi hutil.cmx notesLinks.cmx \
-    secure.cmx templ.cmx templAst.cmi util.cmx wiki.cmx
 dutil.cmo: adef.cmi dbdisk.cmi def.cmi dutil.cmi futil.cmi mutil.cmi
 dutil.cmx: adef.cmx dbdisk.cmi def.cmi dutil.cmi futil.cmx mutil.cmx
 dutil.cmi: dbdisk.cmi def.cmi
@@ -150,11 +146,11 @@ gwcomp.cmo: adef.cmi calendar.cmi def.cmi gwcomp.cmi mutil.cmi
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi gwcomp.cmi mutil.cmx
 gwcomp.cmi: def.cmi
 gwd.cmo: ../wserver/httpStatus.cmo ../wserver/wserver.cmi adef.cmi argl.cmo \
-    base64.cmo buff.cmo config.cmi def.cmi doc.cmo gutil.cmi hutil.cmi \
+    base64.cmo buff.cmo config.cmi def.cmi gutil.cmi hutil.cmi \
     image.cmi lock.cmi mutil.cmi name.cmi relationLink.cmi request.cmi \
     robot.cmo secure.cmi srcfile.cmi templ.cmi util.cmi version.cmo
 gwd.cmx: ../wserver/httpStatus.cmx ../wserver/wserver.cmx adef.cmx argl.cmx \
-    base64.cmx buff.cmx config.cmi def.cmi doc.cmx gutil.cmx hutil.cmx \
+    base64.cmx buff.cmx config.cmi def.cmi gutil.cmx hutil.cmx \
     image.cmx lock.cmx mutil.cmx name.cmx relationLink.cmx request.cmx \
     robot.cmx secure.cmx srcfile.cmx templ.cmx util.cmx version.cmx
 gwdb.cmo: adef.cmi database.cmi db2disk.cmi dbdisk.cmi def.cmi futil.cmi \
@@ -448,7 +444,6 @@ cousins.cmo cousins.cmx: pa_html.cmo
 dag.cmo dag.cmx: pa_html.cmo
 date.cmo date.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo
-doc.cmo doc.cmx: pa_html.cmo
 gwc.cmo gwc.cmx: pa_lock.cmo
 gwc2.cmo gwc2.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo

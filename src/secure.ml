@@ -7,7 +7,6 @@
 
 value ok_path = ref [];
 value lang_path_r = ref [];
-value doc_path_r = ref [];
 value base_dir_r = ref Filename.current_dir_name;
 
 value decompose =
@@ -30,7 +29,6 @@ value add_path path s =
 ;
 
 value add_lang_path = add_path lang_path_r;
-value add_doc_path = add_path doc_path_r;
 value set_base_dir s =
   do {
     base_dir_r.val := s;
@@ -38,7 +36,6 @@ value set_base_dir s =
   }
 ;
 value lang_path () = lang_path_r.val;
-value doc_path () = doc_path_r.val;
 value base_dir () = base_dir_r.val;
 
 value suffix d df =

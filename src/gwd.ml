@@ -1461,23 +1461,20 @@ value conf_and_connection from (addr, request) script_name contents env =
               unauth_server conf ar;
             }
         | _ ->
-            match mode with
-            [ Some "DOC" -> Doc.print conf
-            | _ ->
-               if conf.bname = "" then general_welcome conf
-               else
-                 match
-                   try Some (List.assoc "renamed" conf.base_env) with
-                   [ Not_found -> None ]
-                 with
-                 [ Some n when n <> "" -> print_renamed conf n
-                 | _ ->
-                     do {
-                       Request.treat_request_on_base conf
-                         (log_file.val, log_oc, flush_log);
-                       if conf.manitou && sleep > 0 then Unix.sleep sleep
-                       else ();
-                     } ] ] ]
+          if conf.bname = "" then general_welcome conf
+          else
+            match
+              try Some (List.assoc "renamed" conf.base_env) with
+              [ Not_found -> None ]
+              with
+              [ Some n when n <> "" -> print_renamed conf n
+              | _ ->
+                do {
+                  Request.treat_request_on_base conf
+                    (log_file.val, log_oc, flush_log);
+                  if conf.manitou && sleep > 0 then Unix.sleep sleep
+                  else ();
+                } ] ]
       } ]
 ;
 
@@ -1921,8 +1918,6 @@ value main () =
     let speclist =
       [("-hd", Arg.String Util.add_lang_path,
         "<dir>\n       Directory where the directory lang is installed.");
-       ("-dd", Arg.String Util.add_doc_path,
-        "<dir>\n       Directory where the documentation is installed.");
        ("-bd", Arg.String Util.set_base_dir,
         "<dir>\n       Directory where the databases are installed.");
        ("-wd", Arg.String make_cnt_dir, "\
@@ -1997,9 +1992,7 @@ Print the failed passwords in log (except if option -digest is set) ");
           ("-conn_tmout", Arg.Int (fun x -> conn_timeout.val := x),
            "<sec>\n       Connection timeout (default " ^
              string_of_int conn_timeout.val ^ "s; 0 means no limit)");
-          ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.");
-          ("-chwd", Arg.String (fun s -> Doc.notify_change_wdoc.val := s),
-           "<comm>\n       Call command when wdoc changed")]
+          ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.")]
        ELSE
          [("-noproc", Arg.Set Wserver.noproc,
            "\n       Do not launch a process at each request.")]
@@ -2037,10 +2030,6 @@ Print the failed passwords in log (except if option -digest is set) ");
         else d
       in
       Util.images_url.val := "file://" ^ slashify abs_dir
-    else ();
-    if Secure.doc_path () = [] then
-      List.iter (fun d -> Util.add_doc_path (Filename.concat d "doc"))
-        (List.rev (Secure.lang_path ()))
     else ();
     if Util.cnt_dir.val = Filename.current_dir_name then
       Util.cnt_dir.val := Secure.base_dir ()

@@ -19,7 +19,6 @@ value sharelib =
 ;
 
 value add_lang_path = Secure.add_lang_path;
-value add_doc_path = Secure.add_doc_path;
 value set_base_dir = Secure.set_base_dir;
 
 add_lang_path sharelib;
@@ -38,7 +37,6 @@ value search_in_path p s =
 ;
 
 value search_in_lang_path = search_in_path Secure.lang_path;
-value search_in_doc_path = search_in_path Secure.doc_path;
 
 (* Internationalization *)
 

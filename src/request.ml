@@ -438,8 +438,6 @@ value family_m conf base =
       SendImage.print_del_ok conf base
   | Some "DEL_IND" when conf.wizard -> UpdateInd.print_del conf base
   | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
-  (* Fonction obsolète, la documentation n'étant plus à jour *)
-  (* | Some "DOC" -> Doc.print conf *)
   | Some "FORUM" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
@@ -509,9 +507,6 @@ value family_m conf base =
   | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
   | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
   | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
-  (* Fonction obsolète, la documentation n'étant plus à jour *)
-  (* | Some "MOD_WDOC" when conf.wizard -> Doc.print_mod_wdoc conf *)
-  (* | Some "MOD_WDOC_OK" when conf.wizard -> Doc.print_mod_wdoc_ok conf base *)
   | Some "MOD_WIZNOTES" when conf.authorized_wizards_notes ->
       Wiznotes.print_mod conf base
   | Some "MOD_WIZNOTES_OK" when conf.authorized_wizards_notes ->
@@ -642,8 +637,6 @@ value family_m conf base =
       | _ -> very_unknown conf ]
   | Some "VIEW_WIZNOTES" when conf.wizard && conf.authorized_wizards_notes ->
       Wiznotes.print_view conf base
-  (* Fonction obsolète, la documentation n'étant plus à jour *)
-  (* | Some "WDOC" -> Doc.print_wdoc conf *)
   | Some "WIZNOTES" when conf.authorized_wizards_notes ->
       Wiznotes.print conf base
   | Some "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
