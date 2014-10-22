@@ -651,7 +651,7 @@ message SynchroParams {
 
 
 // ***************************************************************************
-// Dernire modification, historique
+// Dernières modifications, historique
 // ***************************************************************************
 message LastModifications {
   optional string wizard = 1;
@@ -659,6 +659,12 @@ message LastModifications {
   optional FilterDateRange range = 3;
 }
 
+// ***************************************************************************
+// Dernières visites
+// ***************************************************************************
+message LastVisits {
+  required string user = 1;
+}
 
 
 message CorrespondanceFamily {

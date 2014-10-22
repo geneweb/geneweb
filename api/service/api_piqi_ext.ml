@@ -227,6 +227,8 @@ let _synchro_params_piqtype = Piqirun_ext.find_piqtype "api/synchro-params"
 let _last_modifications_piqtype =
   Piqirun_ext.find_piqtype "api/last-modifications"
   
+let _last_visits_piqtype = Piqirun_ext.find_piqtype "api/last-visits"
+  
 let _correspondance_family_piqtype =
   Piqirun_ext.find_piqtype "api/correspondance-family"
   
@@ -804,6 +806,10 @@ let parse_last_modifications ?opts x (format : Piqirun_ext.input_format) =
     Piqirun_ext.convert _last_modifications_piqtype format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb
   in Api_piqi.parse_last_modifications buf
+  
+let parse_last_visits ?opts x (format : Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _last_visits_piqtype format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in Api_piqi.parse_last_visits buf
   
 let parse_correspondance_family ?opts x (format : Piqirun_ext.input_format) =
   let x_pb =
@@ -1413,6 +1419,11 @@ let gen_last_modifications ?opts x (format : Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf
   in Piqirun_ext.convert _last_modifications_piqtype `pb format x_pb ?opts
   
+let gen_last_visits ?opts x (format : Piqirun_ext.output_format) =
+  let buf = Api_piqi.gen_last_visits x in
+  let x_pb = Piqirun.to_string buf
+  in Piqirun_ext.convert _last_visits_piqtype `pb format x_pb ?opts
+  
 let gen_correspondance_family ?opts x (format : Piqirun_ext.output_format) =
   let buf = Api_piqi.gen_correspondance_family x in
   let x_pb = Piqirun.to_string buf
@@ -1950,6 +1961,10 @@ let print_last_modifications x =
   
 let prerr_last_modifications x =
   Pervasives.prerr_endline (gen_last_modifications x `piq)
+  
+let print_last_visits x = Pervasives.print_endline (gen_last_visits x `piq)
+  
+let prerr_last_visits x = Pervasives.prerr_endline (gen_last_visits x `piq)
   
 let print_correspondance_family x =
   Pervasives.print_endline (gen_correspondance_family x `piq)
