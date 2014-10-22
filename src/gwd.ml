@@ -27,7 +27,7 @@ value log_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
 ;
 IFDEF UNIX THEN
-value max_clients = ref None
+value max_clients = ref None;
 END;
 value robot_xcl = ref None;
 value auth_file = ref "";
@@ -1749,7 +1749,7 @@ value null_reopen flags fd =
 ;
 
 IFDEF SYS_COMMAND THEN
-value wserver_auto_call = ref False
+value wserver_auto_call = ref False;
 END;
 
 value geneweb_server () =
@@ -1810,6 +1810,7 @@ value cgi_timeout tmout _ =
     Wserver.wflush ();
     exit 0;
   }
+;
 END;
 
 IFDEF UNIX THEN
@@ -1819,6 +1820,7 @@ value manage_cgi_timeout tmout =
     let _ = Unix.alarm tmout in
     ()
   else ()
+;
 END;
 
 value geneweb_cgi addr script_name contents =

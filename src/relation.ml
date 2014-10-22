@@ -25,7 +25,7 @@ type famlink =
   | Child ]
 ;
 
-IFDEF OLD THEN declare
+IFDEF OLD THEN
 open Dag2html;
 
 type dag_ind 'a =
@@ -194,11 +194,11 @@ value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
   Dag.print_slices_menu_or_dag_page conf base page_title hts next_txt
 ;
-end ELSE declare
+ELSE
 value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   incorrect_request conf
 ;
-end END;
+END;
 
 value add_common_parent base ip1 ip2 set =
   let a1 = poi base ip1 in
