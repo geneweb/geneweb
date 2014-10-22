@@ -168,7 +168,7 @@ clean_mismatch:
 	rm src/pa_lock.cmo src/pa_html.cmo
 
 depend:
-	cd src; $(MAKE) pr_dep.cmo gwlib.ml
+	cd src; $(MAKE) gwlib.ml
 	cd src; $(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
 	cd wserver; $(MAKE) depend
 	cd src; $(MAKE) depend
