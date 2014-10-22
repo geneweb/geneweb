@@ -10,9 +10,6 @@ value string_sub s i len =
   let len = min (String.length s - i) (max 0 len) in String.sub s i len
 ;
 
-value utf_8_intern_byte c =
-  utf_8_db.val && Char.code c >= 0x80 && Char.code c < 0xC0;
-
 value designation base p =
   let first_name = p_first_name base p in
   let nom = p_surname base p in

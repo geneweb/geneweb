@@ -41,61 +41,6 @@ value list_uniq =
         | [] -> List.rev [x :: rl] ] ]
 ;
 
-IFDEF OLD THEN
-value decline_word case s ibeg iend =
-  let i =
-    loop ibeg where rec loop i =
-      if i + 3 > iend then ibeg
-      else if s.[i] = ':' && s.[i + 1] = case && s.[i + 2] = ':' then i + 3
-      else loop (i + 1)
-  in
-  let j =
-    loop i where rec loop i =
-      if i + 3 > iend then iend
-      else if s.[i] = ':' && s.[i + 2] = ':' then i
-      else loop (i + 1)
-  in
-  if i = ibeg then String.sub s ibeg (j - ibeg)
-  else if s.[i] = '+' then
-    let k =
-      loop ibeg where rec loop i =
-        if i = iend then i else if s.[i] = ':' then i else loop (i + 1)
-    in
-    let i = i + 1 in string_sub s ibeg (k - ibeg) ^ string_sub s i (j - i)
-  else if s.[i] = '-' then
-    let k =
-      loop ibeg where rec loop i =
-        if i = iend then i else if s.[i] = ':' then i else loop (i + 1)
-    in
-    let (i, cnt) =
-      loop i 0 where rec loop i cnt =
-        if i < iend && s.[i] = '-' then
-          let cnt =
-            loop (cnt + 1) where rec loop cnt =
-              if k - cnt = ibeg then cnt
-              else if utf_8_intern_byte s.[k - cnt] then loop (cnt + 1)
-              else cnt
-          in
-          loop (i + 1) cnt
-        else (i, cnt)
-    in
-    string_sub s ibeg (k - cnt - ibeg) ^ string_sub s i (j - i)
-  else string_sub s i (j - i)
-;
-
-value decline case s =
-  loop 0 0 where rec loop ibeg i =
-    if i = String.length s then
-      if i = ibeg then "" else decline_word case s ibeg i
-    else
-      match s.[i] with
-      [ ' ' | '<' | '/' as sep ->
-          decline_word case s ibeg i ^ String.make 1 sep ^
-            loop (i + 1) (i + 1)
-      | '>' -> String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
-      | _ -> loop ibeg (i + 1) ]
-;
-ELSE
 (* [decline] has been deprecated since version 5.00
    compatibility code: *)
 value colon_to_at_word s ibeg iend =
@@ -158,7 +103,6 @@ value decline case s =
     (if not (String.contains s ':') then s else colon_to_at s)
 ;
 (* end compatibility code *)
-END;
 
 value nominative s =
   match rindex s ':' with
