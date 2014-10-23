@@ -13,11 +13,6 @@ value f _ =
   | "CODE_BLOCK64" -> "0x13"
   | "CODE_STRING8" -> "0x9"
   | "CODE_STRING32" -> "0xA"
-(*
-  | "CODE_NZEROS8" -> "0x4"
-  | "CODE_NZEROS32" -> "0x5"
-*)
-  | "CODE_DOUBLE_NATIVE" -> "11"
   | x ->
       Stdpp.raise_with_loc (Token.make_loc (0, String.length x))
         (Failure ("bad code " ^ x)) ]
