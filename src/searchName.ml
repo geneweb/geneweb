@@ -44,6 +44,12 @@ value select_std_approx conf base pl k =
 ;
 *)
 
+value empty_surname_or_firsntame base p =
+  is_empty_string (get_surname p) || is_quest_string (get_surname p) ||
+  is_empty_string (get_first_name p) || is_quest_string (get_first_name p) ||
+  Name.lower (sou base (get_surname p)) = "" ||
+  Name.lower (sou base (get_first_name p)) = ""
+;
 
 value person_is_misc_name conf base p k =
   let k = Name.strip_lower k in
@@ -271,6 +277,13 @@ value search_misc_name conf base an =
         pl []
     else pl
   in
+  let pl =
+    List.fold_right
+      (fun p pl ->
+         if empty_surname_or_firsntame base p then pl
+         else [p :: pl])
+      pl []
+  in
   compact_list conf base pl
 ;
 
@@ -318,6 +331,13 @@ value search_by_key conf base an =
                else pl)
             pl []
         else pl
+      in
+      let pl =
+        List.fold_right
+          (fun p pl ->
+             if empty_surname_or_firsntame base p then pl
+             else [p :: pl])
+          pl []
       in
       compact_list conf base pl ]
 ;
@@ -390,6 +410,7 @@ value search conf base an search_order specify unknown =
         let pl = search_partial_key conf base an in
         match pl with
         [ [] -> loop l
+        | [p] -> Perso.print conf base p
         | pl -> specify conf base an pl ] ]
 ;
 
