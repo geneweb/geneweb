@@ -1,6 +1,6 @@
 ﻿%( Template sources v 7.00b 2014/10/17 09:00:00 ddr/dd %)
   %reset_count;
-  %if;has_soures;%incr_count;%end;
+  %if;has_sources;%incr_count;%end;
   %if;has_linked_page.BIBLIO;%incr_count;%end;
   %foreach;event;
     %if;event.has_src;%incr_count;%end;
