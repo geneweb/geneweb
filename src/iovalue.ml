@@ -2,10 +2,6 @@
 (* $Id: iovalue.ml,v 5.15 2012-01-27 16:27:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-value string_tag = Obj.tag (Obj.repr "a");
-value float_tag = Obj.tag (Obj.repr 3.5);
-value fun_tag = Obj.tag (Obj.repr (fun x -> x));
-
 (* Input:
    read inside a value output by output_value (no headers) must
    match OCaml's input_value system (intern.c) *)
@@ -127,7 +123,7 @@ value gen_output_block_header ofuns oc tag size =
 ;
 
 value rec output_loop ofuns oc x =
-  if not (Obj.is_block x) then
+  if Obj.is_int x then
     if Obj.magic x >= 0 && Obj.magic x < 0x40 then
       ofuns.output_byte oc (<<PREFIX_SMALL_INT>> + Obj.magic x)
     else if Obj.magic x >= -128 && Obj.magic x < 128 then do {
@@ -144,8 +140,7 @@ value rec output_loop ofuns oc x =
       ofuns.output_binary_int oc (Obj.magic x);
     }
   else
-    if Obj.tag x = fun_tag then failwith "Iovalue.output <fun>"
-    else if Obj.tag x = string_tag then do {
+    if Obj.tag x = Obj.string_tag then do {
       let len = String.length (Obj.magic x) in
       if len < 0x20 then
         ofuns.output_byte oc (<<PREFIX_SMALL_STRING>> + len)
@@ -161,18 +156,28 @@ value rec output_loop ofuns oc x =
       size_32.val := size_32.val + 1 + (len + 4) / 4;
       size_64.val := size_64.val + 1 + (len + 8) / 8;
     }
-    else if Obj.tag x = float_tag then
+    else if Obj.tag x = Obj.double_tag || Obj.tag x = Obj.double_array_tag then
       failwith "Iovalue.output: floats not implemented"
+    else if Obj.tag x = Obj.closure_tag then
+      failwith "Iovalue.output <fun>"
+    else if Obj.tag x = Obj.abstract_tag then
+      failwith "Iovalue.output <abstract>"
+    else if Obj.tag x = Obj.infix_tag then
+      failwith "Iovalue.output: <infix>"
+    else if Obj.tag x = Obj.custom_tag then
+      failwith "Iovalue.output: <custom>"
+    else if Obj.tag x = Obj.out_of_heap_tag then
+      failwith "Iovalue.output: abstract value (outside heap)"
     else do {
       gen_output_block_header ofuns oc (Obj.tag x) (Obj.size x);
       (* last case of "for" separated, to make more tail recursive cases
          when last field is itself, to prevent some stacks overflows *)
       if Obj.size x > 0 then do {
         for i = 0 to Obj.size x - 2 do {
-        output_loop ofuns oc (Obj.field x i);
-      };
+          output_loop ofuns oc (Obj.field x i);
+        };
         output_loop ofuns oc (Obj.field x (Obj.size x - 1))
-    }
+      }
       else ();
     }
 ;
@@ -254,7 +259,7 @@ value rec digest_loop v =
     invalid_arg "Iovalue.digest: closure"
   else if Obj.size v = 0 then
     do { dput_char 'T'; dput_int (Obj.tag v) }
-  else if Obj.tag v = string_tag then do {
+  else if Obj.tag v = Obj.string_tag then do {
     let s = (Obj.magic v : string) in
     dput_char 'S'; dput_int (String.length s);
     dput_char '/'; dput_string s;
