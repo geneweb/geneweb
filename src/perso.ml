@@ -2540,10 +2540,10 @@ and eval_bool_person_field conf base env (p, p_auth) =
       | None -> False ]
   | "has_sources" ->
       if (is_hide_names conf p) && not p_auth then False
-      else if sou base (get_psources p) <> "" then True
       else if
         p_auth &&
-        (sou base (get_birth_src p) <> "" ||
+        (sou base (get_psources p) <> "" ||
+         sou base (get_birth_src p) <> "" ||
          sou base (get_baptism_src p) <> "" ||
          sou base (get_death_src p) <> "" ||
          sou base (get_burial_src p) <> "") then
@@ -2552,8 +2552,9 @@ and eval_bool_person_field conf base env (p, p_auth) =
         List.exists
           (fun ifam ->
              let fam = foi base ifam in
-             p_auth && sou base (get_marriage_src fam) <> "" ||
-             sou base (get_fsources fam) <> "")
+             p_auth &&
+             (sou base (get_marriage_src fam) <> "" ||
+              sou base (get_fsources fam) <> ""))
           (Array.to_list (get_family p))
   | "has_surnames_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
