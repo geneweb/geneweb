@@ -438,6 +438,7 @@ value print_del1 conf base p =
   in
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
+    tag "h2" begin title False; end;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;

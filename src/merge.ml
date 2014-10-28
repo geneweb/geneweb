@@ -32,6 +32,7 @@ value print conf base p =
   in
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
+    tag "h2" begin title False; end;
     Wserver.wprint "\n";
     tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       tag "p" begin
