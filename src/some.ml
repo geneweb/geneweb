@@ -918,7 +918,20 @@ value search_surname conf base x =
          (List.fold_right PerSet.add iperl1 iperl, strl))
       list (PerSet.empty, [])
   in
-  PerSet.elements iperl
+  let iperl = PerSet.elements iperl in
+  let bhl = select_ancestors conf base name_inj iperl in
+  let bhl =
+    List.map
+      (fun bh ->
+        {bh_ancestor = pget conf base bh.bh_ancestor;
+         bh_well_named_ancestors =
+         List.map (pget conf base) bh.bh_well_named_ancestors})
+      bhl
+  in
+  match (bhl, list) with
+  [ ([], _) -> []
+  | (_, [(s, (strl, iperl))]) -> iperl
+  | _ -> [] ]
 ;
 
 value search_surname_print conf base not_found_fun x =

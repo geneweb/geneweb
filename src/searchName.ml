@@ -248,7 +248,7 @@ value search_partial_key conf base an =
   compact_list conf base pl
 ;
 
-value search_misc_name conf base an =
+value search_approx_key conf base an =
   let ipl = person_not_a_key_find_all base an in
   let (an, ipl) =
     if ipl = [] then
@@ -266,7 +266,7 @@ value search_misc_name conf base an =
          if is_hidden p then l else [p :: l])
     [] ipl
   in
-  let pl = select_misc_name conf base pl an in
+  let pl = select_approx_key conf base pl an in
   let pl =
     if not conf.wizard && not conf.friend then
       List.fold_right
@@ -303,43 +303,7 @@ value search_by_key conf base an =
              else pl)
           pl []
       else pl
-  | None ->
-      let ipl = person_not_a_key_find_all base an in
-      let (an, ipl) =
-        if ipl = [] then
-          match name_with_roman_number an with
-          [ Some an1 ->
-              let ipl = person_ht_find_all base an1 in
-              if ipl = [] then (an, []) else (an1, ipl)
-          | None -> (an, ipl) ]
-        else (an, ipl)
-      in
-      let pl =
-        List.fold_left
-          (fun l ip ->
-             let p = pget conf base ip in
-             if is_hidden p then l else [p :: l])
-        [] ipl
-      in
-      let pl = select_approx_key conf base pl an in
-      let pl =
-        if not conf.wizard && not conf.friend then
-          List.fold_right
-            (fun p pl ->
-               if not (is_hide_names conf p) || Util.fast_auth_age conf p
-               then [p :: pl]
-               else pl)
-            pl []
-        else pl
-      in
-      let pl =
-        List.fold_right
-          (fun p pl ->
-             if empty_surname_or_firsntame base p then pl
-             else [p :: pl])
-          pl []
-      in
-      compact_list conf base pl ]
+  | None -> [] ]
 ;
 
 value search_approx_surname conf base an =
@@ -353,8 +317,9 @@ value search_approx_first_name conf base an =
 (* main *)
 
 type search_type =
-  [ Sosa | Key | Surname | FirstName | MiscName
-  | ApproxSurname | ApproxFirstName | PartialKey ]
+  [ Sosa | Key | Surname | FirstName | ApproxKey |
+    ApproxSurname | ApproxFirstName | PartialKey |
+    DefaultSurname ]
 ;
 
 value search conf base an search_order specify unknown =
@@ -390,8 +355,8 @@ value search conf base an search_order specify unknown =
               conf.cancel_links := False;
               Some.search_first_name_print conf base an
             }]
-    | [MiscName :: l] ->
-        let pl = search_misc_name conf base an in
+    | [ApproxKey :: l] ->
+        let pl = search_approx_key conf base an in
         match pl with
         [ [] -> loop l
         | [p] -> Perso.print conf base p
@@ -411,7 +376,12 @@ value search conf base an search_order specify unknown =
         match pl with
         [ [] -> loop l
         | [p] -> Perso.print conf base p
-        | pl -> specify conf base an pl ] ]
+        | pl -> specify conf base an pl ]
+    | [DefaultSurname :: l] ->
+        do {
+          conf.cancel_links := False;
+          Some.search_surname_print conf base unknown an
+        }]
 ;
 
 
@@ -434,13 +404,15 @@ value print conf base specify unknown =
   in
   match (real_input "p", real_input "n") with
   [ (Some fn, Some sn) ->
-      let order = [ Key; MiscName; PartialKey ] in
+      let order = [ Key; ApproxKey; PartialKey ] in
       search conf base (fn ^ " " ^ sn) order specify unknown
   | (Some fn, None) ->
-      let order = [ FirstName; ApproxFirstName ] in
+      let order = [ FirstName ] in
       search conf base fn order specify unknown
   | (None, Some sn) ->
-      let order = [ Sosa; Key; MiscName; Surname; ApproxSurname; PartialKey ] in
+      let order =
+        [ Sosa; Key; Surname; ApproxKey; PartialKey; DefaultSurname ]
+      in
       search conf base sn order specify unknown
   | (None, None) -> incorrect_request conf ]
 ;
