@@ -114,6 +114,7 @@ value print_change conf base p =
   let digest = digest_children base children in
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
+    tag "h2" begin title False; end;
     tag "p" begin
       Wserver.wprint "%s" (reference conf base p (person_text conf base p));
       Wserver.wprint "%s\n" (Date.short_dates_text conf base p);

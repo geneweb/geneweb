@@ -461,6 +461,7 @@ value print_del1 conf base ifam =
       | None -> Gwdb.empty_person base (Adef.iper_of_int (-1)) ]
     in
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
+    tag "h2" begin title False; end;
     print_link_to_welcome conf True;
     Wserver.wprint "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
