@@ -728,7 +728,7 @@ value print_request_failure cgi msg =
     Wserver.wprint "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
       msg;
     Wserver.wprint "</body>\n";
-  }    
+  }
 ;
 
 value refresh_url cgi request s i =
@@ -1205,8 +1205,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     [ Not_found -> default_lang.val ]
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  List.iter 
-    (fun fname -> 
+  List.iter
+    (fun fname ->
       add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
     lexicon_list.val;
   (* A l'initialisation de la config, il n'y a pas de sosa_ref. *)
@@ -1562,13 +1562,13 @@ value image_request cgi script_name env =
 (* et que le cache du navigateur puisse prendre le relais.         *)
 type misc_fname =
   [ Css of string
-  | Js of string 
+  | Js of string
   | Other of string ]
 ;
 
 value content_misc cgi len misc_fname = do {
   if not cgi then Wserver.http "" else ();
-  let (fname, t) = 
+  let (fname, t) =
     match misc_fname with
     [ Css fname -> (fname, "text/css")
     | Js fname -> (fname, "text/javascript")
@@ -1588,7 +1588,7 @@ value content_misc cgi len misc_fname = do {
 value print_misc_file cgi misc_fname =
   match misc_fname with
   [ Css fname | Js fname ->
-      match 
+      match
         try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
       with
       [ Some ic ->

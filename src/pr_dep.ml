@@ -44,7 +44,7 @@ value rec ctyp =
   | TyAli _ t1 t2 -> do { ctyp t1; ctyp t2 }
   | TyApp _ t1 t2 -> do { ctyp t1; ctyp t2 }
   | TyAny _ -> ()
-  | TyArr _ t1 t2 -> do { ctyp t1; ctyp t2 }  
+  | TyArr _ t1 t2 -> do { ctyp t1; ctyp t2 }
   | TyLab _ _ t -> ctyp t
   | TyLid _ _ -> ()
   | TyMan _ t1 t2 -> do { ctyp t1; ctyp t2 }
@@ -166,7 +166,7 @@ and let_binding (p, e) = do { patt p; expr e }
 and label_expr (p, e) = do { patt p; expr e }
 and match_case (p, w, e) = do { patt p; vala (option expr) w; expr e; }
 and module_type =
-  fun 
+  fun
   [ <:module_type< $uid:m$ . $_$ >> -> addmodule m
   | <:module_type< functor ($uid:_$ : $mt1$) -> $mt2$ >> -> do {
       module_type mt1;

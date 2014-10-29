@@ -183,9 +183,9 @@ value gen_interp header conf base fname ifun env ep = do {
   Templ.template_file.val := v;
 };
 
-value interp_no_header conf base fname ifun env ep = 
+value interp_no_header conf base fname ifun env ep =
   gen_interp False conf base fname ifun env ep;
 
-value interp conf base fname ifun env ep = 
+value interp conf base fname ifun env ep =
   gen_interp True conf base fname ifun env ep;
 

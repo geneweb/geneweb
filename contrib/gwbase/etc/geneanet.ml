@@ -137,7 +137,7 @@ value country_of_person base p =
       | "de Roumanie" -> "ROM"
       | "de Suède" -> "SWE"
       | "" -> ""
-      | x -> (* do Printf.eprintf "%s\n" x; flush stderr; return *) 
+      | x -> (* do Printf.eprintf "%s\n" x; flush stderr; return *)
           "" ]
   | _ -> "" ]
 ;

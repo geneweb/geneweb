@@ -681,8 +681,8 @@ value print_population_pyramid conf base = do {
                     let n = max 1 (band_size nb_men) in
                     (* On multiplie par 3 parce que c'est *)
                     (* la largeur de l'image : 3 x 14     *)
-                    Wserver.wprint 
-                      ("<img src=\"images/pyr_male.png\" width=%d height=%d />") 
+                    Wserver.wprint
+                      ("<img src=\"images/pyr_male.png\" width=%d height=%d />")
                       (n * 3) 14;
                 end;
               end;
@@ -701,7 +701,7 @@ value print_population_pyramid conf base = do {
                     let n = max 1 (band_size nb_wom) in
                     (* On multiplie par 3 parce que c'est *)
                     (* la largeur de l'image : 3 x 14     *)
-                    Wserver.wprint 
+                    Wserver.wprint
                       ("<img src=\"images/pyr_female.png\" width=%d height=%d />")
                       (n * 3) 14;
                 end;

@@ -283,7 +283,7 @@ value utf_8_of_iso_8859_1 str =
       else if Char.code c < 0xC0 then
         let len = Buff.store len (Char.chr 0xC2) in
         loop (i + 1) (Buff.store len c)
-      else 
+      else
         let len = Buff.store len (Char.chr 0xC3) in
         loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
 ;

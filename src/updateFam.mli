@@ -18,7 +18,7 @@ value print_del : config -> base -> unit;
 value print_inv : config -> base -> unit;
 value print_add_parents : config -> base -> unit;
 
-value change_order : 
+value change_order :
   config -> base -> iper -> person -> ifam -> int -> list ifam;
 value print_change_order : config -> base -> unit;
 

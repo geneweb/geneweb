@@ -319,7 +319,7 @@ value make_name_index base_d nbper = do {
     Printf.eprintf "name index...\n";
     flush stderr;
   }
-  else ();        
+  else ();
   let ic2_list =
     List.map
       (fun (d, f) ->

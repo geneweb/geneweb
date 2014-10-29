@@ -46,7 +46,7 @@ value private_some bname key =
   match Gutil.person_ht_find_all base key with
   [ [ip] ->
       let p = poi base ip in
-      do { 
+      do {
          if get_access p <> Private then
          let p = {(gen_person_of_person p) with access = Private} in
          patch_person base p.key_index p
@@ -57,10 +57,10 @@ value private_some bname key =
       do {
         Printf.eprintf "Bad key %s\n" key;
         flush stderr;
-        (* 
+        (*
            Si on appel private_some sur une liste et qu'il
-           y'a une mauvaise clé, alors on quitte tout le 
-           script, c'est un peu radical. 
+           y'a une mauvaise clé, alors on quitte tout le
+           script, c'est un peu radical.
         *)
         (*exit 2*)
       } ]

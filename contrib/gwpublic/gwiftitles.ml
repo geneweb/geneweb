@@ -26,7 +26,7 @@ value private_some bname key =
   match Gutil.person_ht_find_all base key with
   [ [ip] ->
       let p = poi base ip in
-      do { 
+      do {
          if get_access p <> IfTitles then
          let p = {(gen_person_of_person p) with access = IfTitles} in
          patch_person base p.key_index p

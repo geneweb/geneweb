@@ -223,7 +223,7 @@ value config state title v def select to_string from_string set prev next =
         [ Some (prev_var, prev) -> do {
             let buts = Frame.create frame [] in
             let kont_prev () = do {
-              Pack.forget [gframe]; 
+              Pack.forget [gframe];
               let state =
                 {(state) with
                  config_env =

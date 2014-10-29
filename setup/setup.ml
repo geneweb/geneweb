@@ -754,8 +754,8 @@ value setup_gen conf =
   | _ -> error conf "request needs \"v\" parameter" ]
 ;
 
-value print_default_gwf_file conf = 
-  let gwf = 
+value print_default_gwf_file conf =
+  let gwf =
     [ "access_by_key=yes";
       "disable_forum=yes";
       "hide_private_names=no";
@@ -1203,10 +1203,10 @@ value rmdir dir =
   (* Récupère tous les fichiers et dossier d'un dossier         *)
   (* et renvoie la liste des dossiers et la liste des fichiers. *)
   let read_files_folders fname =
-    let list = 
-      List.map 
+    let list =
+      List.map
         (fun file -> Filename.concat fname file)
-        (Array.to_list (Sys.readdir fname)) 
+        (Array.to_list (Sys.readdir fname))
     in
     List.partition Sys.is_directory list
   in
@@ -1287,7 +1287,7 @@ value cleanup_1 conf =
       print_file conf "bsi_err.htm"
     else print_file conf "clean_ok.htm"
   }
-;  
+;
 
 value rec check_new_names conf l1 l2 =
   match (l1, l2) with
