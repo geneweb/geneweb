@@ -2539,23 +2539,23 @@ and eval_bool_person_field conf base env (p, p_auth) =
       [ Some ifam -> Array.length (get_children (foi base ifam)) > 1
       | None -> False ]
   | "has_sources" ->
-      if (is_hide_names conf p) && not p_auth then False
-      else if
-        p_auth &&
-        (sou base (get_psources p) <> "" ||
-         sou base (get_birth_src p) <> "" ||
-         sou base (get_baptism_src p) <> "" ||
-         sou base (get_death_src p) <> "" ||
-         sou base (get_burial_src p) <> "") then
-        True
-      else
-        List.exists
-          (fun ifam ->
-             let fam = foi base ifam in
-             p_auth &&
-             (sou base (get_marriage_src fam) <> "" ||
-              sou base (get_fsources fam) <> ""))
-          (Array.to_list (get_family p))
+      p_auth &&
+      (sou base (get_psources p) <> "" ||
+       sou base (get_birth_src p) <> "" ||
+       sou base (get_baptism_src p) <> "" ||
+       sou base (get_death_src p) <> "" ||
+       sou base (get_burial_src p) <> "" ||
+       List.exists
+         (fun ifam ->
+           let fam = foi base ifam in
+           let isp = Gutil.spouse (get_key_index p) fam in
+           let sp = poi base isp in
+           (* On sait que p_auth vaut vrai. *)
+           let m_auth = authorized_age conf base sp in
+           m_auth &&
+           (sou base (get_marriage_src fam) <> "" ||
+           sou base (get_fsources fam) <> ""))
+         (Array.to_list (get_family p)))
   | "has_surnames_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
       else get_surnames_aliases p <> []
@@ -3547,19 +3547,15 @@ value print_foreach conf base print_ast eval_expr =
       if src = "" then srcl
       else insert_loop (Util.translate_eval typ) src srcl
     in
-    (* On brise la logique interne de GeneWeb en constituant les     *)
-    (* sources de la personne sans ses informations de décès, puis   *)
-    (* les sources de sa famille et enfin ses informations de décès. *)
-    (* Ce qui évite : naissance, baptême, décès, mariage.            *)
-    let srcl = [] in
-    let srcl =
-      if not (is_hide_names conf p) || p_auth then
-        insert
-          (transl_nth conf "person/persons" 0) (sou base (get_psources p)) srcl
-      else srcl
-    in
     let srcl =
       if p_auth then
+        (* On ajoute les source dans cet ordre :                             *)
+        (* psource, naissance, baptême, mariage, fsource, décès, inhumation. *)
+        let srcl = [] in
+        let srcl =
+          insert (transl_nth conf "person/persons" 0)
+            (sou base (get_psources p)) srcl
+        in
         let srcl =
           insert (transl_nth conf "birth" 0) (sou base (get_birth_src p)) srcl
         in
@@ -3567,29 +3563,28 @@ value print_foreach conf base print_ast eval_expr =
           insert
             (transl_nth conf "baptism" 0) (sou base (get_baptism_src p)) srcl
         in
-        srcl
-      else srcl
-    in
-    let (srcl, _) =
-      Array.fold_left
-        (fun (srcl, i) ifam ->
-           let fam = foi base ifam in
-           let lab =
-             if Array.length (get_family p) = 1 then ""
-             else " " ^ string_of_int i
-           in
-           let srcl =
-             if p_auth then
-               let src_typ = transl_nth conf "marriage/marriages" 0 in
-               insert (src_typ ^ lab) (sou base (get_marriage_src fam)) srcl
-             else srcl
-           in
-           let src_typ = transl_nth conf "family/families" 0 in
-           (insert (src_typ ^ lab) (sou base (get_fsources fam)) srcl, i + 1))
-        (srcl, 1) (get_family p)
-    in
-    let srcl =
-      if p_auth then
+        let (srcl, _) =
+          Array.fold_left
+            (fun (srcl, i) ifam ->
+               let fam = foi base ifam in
+               let isp = Gutil.spouse (get_key_index p) fam in
+               let sp = poi base isp in
+               (* On sait que p_auth vaut vrai. *)
+               let m_auth = authorized_age conf base sp in
+               if m_auth then
+                 let lab =
+                   if Array.length (get_family p) = 1 then ""
+                   else " " ^ string_of_int i
+                 in
+                 let srcl =
+                   let src_typ = transl_nth conf "marriage/marriages" 0 in
+                   insert (src_typ ^ lab) (sou base (get_marriage_src fam)) srcl
+                 in
+                 let src_typ = transl_nth conf "family/families" 0 in
+                 (insert (src_typ ^ lab) (sou base (get_fsources fam)) srcl, i + 1)
+               else (srcl, i + 1))
+            (srcl, 1) (get_family p)
+        in
         let srcl =
           insert (transl_nth conf "death" 0) (sou base (get_death_src p)) srcl
         in
@@ -3597,7 +3592,7 @@ value print_foreach conf base print_ast eval_expr =
           insert (transl_nth conf "burial" 0) (sou base (get_burial_src p)) srcl
         in
         srcl
-      else srcl
+      else []
     in
     (* Affiche les sources et met à jour les variables "first" et "last". *)
     let rec loop first =
