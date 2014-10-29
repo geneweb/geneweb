@@ -96,7 +96,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
       Num.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ ";" ^
       acces_n conf base "2" p2 ^ ";b2=" ^
       Num.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ ";spouse=" ^
-      (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^ 
+      (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^
       ";image=" ^ (if p_getenv conf.env "image" = Some "on" then "on" else "") ^
       ";bd=" ^ (match p_getenv conf.env "bd" with [Some x -> x | None -> "0"]) ^
       "\">" ^ s ^ "</a>"
@@ -109,7 +109,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
       acces_n conf base "2" p2 ^ ";b2=" ^
       Num.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ ";" ^
       acces_n conf base "4" p3 ^ ";spouse=" ^
-      (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^ 
+      (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^
       ";image=" ^ (if p_getenv conf.env "image" = Some "on" then "on" else "") ^
       ";bd=" ^ (match p_getenv conf.env "bd" with [Some x -> x | None -> "0"]) ^
       "\">" ^ s ^ "</a>"
@@ -297,7 +297,7 @@ value print_cousins conf base p lev1 lev2 =
     print_link_to_welcome conf True;
     cnt.val := 0;
     (* Construction de la table des sosa de la base *)
-    let () = Perso.build_sosa_ht conf base in 
+    let () = Perso.build_sosa_ht conf base in
     print_cousins_lev conf base max_cnt p lev1 lev2;
     tag "p" begin
       if cnt.val >= max_cnt then Wserver.wprint "etc...\n"

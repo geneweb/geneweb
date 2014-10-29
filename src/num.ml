@@ -134,7 +134,7 @@ value div x n =
           loop (i - 1) [d :: l] r
     in
     Array.of_list (normalize l)
-;    
+;
 value modl x n =
   let r = sub x (mul0 (div x n) n) in
   if Array.length r = 0 then 0 else r.(0)

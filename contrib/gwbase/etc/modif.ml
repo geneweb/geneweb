@@ -49,7 +49,7 @@ value modif base =
               base.func.patch_name (Name.lower (fn' ^ " " ^ sn')) p.cle_index;
               changes.val := True;
             } ];
-      } 
+      }
       else ()
     };
     if changes.val then do {
@@ -67,7 +67,7 @@ s'il était vide au départ.";
     else ();
     eprintf "\n";
     flush stderr;
-  } 
+  }
 ;
 
 value bname = ref "";

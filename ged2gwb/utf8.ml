@@ -1,9 +1,9 @@
 (* camlp5r *)
 (* $Id: utf8.ml,v 0.1 2012-01-17 17:58:44 flh Exp $ *)
 
-(* 
-   This is a huge utf-8 table converted as (encoding, name) list. For sure, 
-   this is not an optimal solution but it's only used in the process of 
+(*
+   This is a huge utf-8 table converted as (encoding, name) list. For sure,
+   this is not an optimal solution but it's only used in the process of
    converting "first name" and "surname" from a Gedcom file (-lf -ls -us).
 *)
 

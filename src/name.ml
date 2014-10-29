@@ -340,7 +340,7 @@ value unaccent_utf_8 lower s i =
           match Char.code s.[i+1] with
           [ 0x80 ->
             match Char.code s.[i+2] with
-            [ 0x99 -> " " 
+            [ 0x99 -> " "
             | _ -> String.sub s i nbc ]
           | _ -> String.sub s i nbc]
       *)
@@ -440,7 +440,7 @@ value strip s = strip_c s ' ' ;
 (* ******************************************************************** *)
 (*  [Fonc] purge : string -> string                                     *)
 (** [Description] : Supprime tous les caractères interdits (défini par
-                    forbidden_char) présents dans la chaine passée en 
+                    forbidden_char) présents dans la chaine passée en
                     argument.
     [Args] :
       - s : string que l'on veut purger

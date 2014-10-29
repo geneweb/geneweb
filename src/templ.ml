@@ -455,7 +455,7 @@ value parse_templ conf strm =
       [ Stream.Failure | Stream.Error _ ->
           let bp = Stream.count strm - 1 in
           (Atext (bp, bp + 1) "let syntax error", "") ]
-    in        
+    in
     (List.rev [ast :: astl], tok)
   and parse_import astl end_list strm =
     let ast =
@@ -525,7 +525,7 @@ value parse_templ conf strm =
     in
     Aif e al1 al2
   and parse_for strm =
-    try 
+    try
       let iterator = get_ident 0 strm in
         match strm with parser
         [ [: `';' :] ->
@@ -607,13 +607,13 @@ value rec subst sf =
       let s1 = sf s in
       let strm = Stream.of_string s1 in
       let (_, s2, sl2) = get_compound_var strm in
-      let (s, sl) = 
+      let (s, sl) =
         if Stream.peek strm <> None then (s, sl)
         else (s2, sl2 @ sl)
       in
       Aforeach (loc, sf s, List.map sf sl) (List.map (substl sf) pl)
         (substl sf al)
-  | Afor i min max al -> 
+  | Afor i min max al ->
       Afor (sf i) (subst sf min) (subst sf max) (substl sf al)
   | Adefine f xl al alk ->
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
@@ -700,7 +700,7 @@ and eval_time_var conf =
       sprintf "%02d:%02d:%02d" hh mm ss
 | _ -> raise Not_found ]
 and eval_simple_variable conf =
-  fun 
+  fun
   [ "action" -> conf.command
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
@@ -774,10 +774,10 @@ and eval_simple_variable conf =
           (fun accu (k, v) -> List.remove_assoc k accu)
           conf.env (conf.henv @ conf.senv)
       in
-      List.fold_left 
-        (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") 
+      List.fold_left
+        (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";")
         "" l
-  | "url" -> 
+  | "url" ->
       let c = Util.commd conf in
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
       let l =
@@ -785,8 +785,8 @@ and eval_simple_variable conf =
           (fun accu (k, v) -> List.remove_assoc k accu)
           conf.env (conf.henv @ conf.senv)
       in
-      List.fold_left 
-        (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") 
+      List.fold_left
+        (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";")
         c l
   | "version" -> Version.txt
   | "/" -> conf.xhs
@@ -923,7 +923,7 @@ value templ_eval_var conf =
   [ ["cancel_links"] -> VVbool conf.cancel_links
   | ["cgi"] -> VVbool conf.cgi
   | ["false"] -> VVbool False
-  | ["has_referer"] -> (* deprecated since version 5.00 *) 
+  | ["has_referer"] -> (* deprecated since version 5.00 *)
       VVbool (Wserver.extract_param "referer: " '\n' conf.request <> "")
   | ["just_friend_wizard"] -> VVbool conf.just_friend_wizard
   | ["friend"] -> VVbool conf.friend
@@ -1119,7 +1119,7 @@ type interp_fun 'a 'b =
     eval_predefined_apply : env 'a -> string -> list (expr_val 'b) -> string;
     get_vother : 'a -> option (vother 'b);
     set_vother : vother 'b -> 'a;
-    print_foreach : 
+    print_foreach :
       (env 'a -> 'b -> ast -> unit) ->
          (env 'a -> 'b -> ast -> string) ->
          env 'a -> 'b -> loc -> string -> list string ->
@@ -1450,21 +1450,21 @@ value rec interp_ast conf base ifun env =
       if eval_bool_expr conf (eval_var, eval_apply) e then alt else ale
     in
     String.concat "" (List.map eval_ast al)
-  and eval_for env ep iterator min max al = 
+  and eval_for env ep iterator min max al =
     let rec loop env min max accu =
       let new_env = env in
       let v = eval_ast_expr_list new_env ep [min] in
-      let new_env = set_val ifun.set_vother iterator v new_env in 
+      let new_env = set_val ifun.set_vother iterator v new_env in
       let eval_var = eval_var conf ifun new_env ep in
       let eval_apply = eval_apply new_env ep in
       let eval_ast = eval_ast new_env ep in
-      let int_min = 
-        int_of_string (eval_string_expr conf (eval_var, eval_apply) min) 
+      let int_min =
+        int_of_string (eval_string_expr conf (eval_var, eval_apply) min)
       in
-      let int_max = 
-        int_of_string (eval_string_expr conf (eval_var, eval_apply) max) 
+      let int_max =
+        int_of_string (eval_string_expr conf (eval_var, eval_apply) max)
       in
-      if int_min < int_max then 
+      if int_min < int_max then
         let instr = (String.concat "" (List.map eval_ast al)) in
         let accu = accu ^ instr in
         loop new_env (Aop2 (0, 0) "+" min (Aint (0, 0) "1")) max accu
@@ -1528,16 +1528,16 @@ value rec interp_ast conf base ifun env =
     let rec loop env min max =
       let new_env = env in
       let v = eval_ast_expr_list new_env ep [min] in
-      let new_env = set_val ifun.set_vother i v new_env in 
+      let new_env = set_val ifun.set_vother i v new_env in
       let eval_var = eval_var conf ifun new_env ep in
       let eval_apply = eval_apply new_env ep in
-      let int_min = 
-        int_of_string (eval_string_expr conf (eval_var, eval_apply) min) 
+      let int_min =
+        int_of_string (eval_string_expr conf (eval_var, eval_apply) min)
       in
-      let int_max = 
-        int_of_string (eval_string_expr conf (eval_var, eval_apply) max) 
+      let int_max =
+        int_of_string (eval_string_expr conf (eval_var, eval_apply) max)
       in
-      if int_min < int_max then 
+      if int_min < int_max then
         let _ = print_ast_list new_env ep al in
         loop new_env (Aop2 (0, 0) "+" min (Aint (0, 0) "1")) max
       else ()

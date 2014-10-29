@@ -181,7 +181,7 @@ value move base = do {
             flush stdout;
           }
         }
-        else ();        
+        else ();
       }
       else ();
   };

@@ -60,11 +60,11 @@ value print_link_delete_image conf base p =
   if Util.has_image conf base p then
     do {
       tag "p" begin
-        stag "a" "href=\"%sm=DEL_IMAGE;i=%d\"" 
+        stag "a" "href=\"%sm=DEL_IMAGE;i=%d\""
           (commd conf) (Adef.int_of_iper (get_key_index p))
         begin
-          Wserver.wprint "%s %s" 
-            (capitale (transl conf "delete")) 
+          Wserver.wprint "%s %s"
+            (capitale (transl conf "delete"))
             (transl_nth conf "image/images" 0);
         end;
       end;
@@ -328,7 +328,7 @@ value effective_send_ok conf base p file =
       move_file_to_old conf ".png" fname bfname
     else ();
     write_file (fname ^ typ) content;
-    let changed = 
+    let changed =
       U_Send_image (Util.string_gen_person base (gen_person_of_person p))
     in
     History.record conf base changed "si";
@@ -380,7 +380,7 @@ value effective_delete_ok conf base p =
     else if Sys.file_exists (fname ^ ".png") then
       move_file_to_old conf ".png" fname bfname
     else incorrect conf;
-    let changed = 
+    let changed =
       U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
     in
     History.record conf base changed "di";

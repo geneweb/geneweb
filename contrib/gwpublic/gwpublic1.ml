@@ -93,7 +93,7 @@ value mark_ancestors base scanned lim_year is_quest_string =
        	    if y >= lim_year then do {
                      eprintf "Problem of date ! %s %d\n" (Gutil.designation base p) y;
                      flush stderr;
-                   } 
+                   }
        	    else ()
        	| None -> () ];
         let p = {(gen_person_of_person p) with access = Public} in
