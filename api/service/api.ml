@@ -111,6 +111,7 @@ let print_info_base conf base =
       nb_families = Int64.of_int (Gwdb.nb_of_families base);
       sosa = sosa;
       last_modified_person = last_modified_person;
+      real_nb_persons = Some (Int64.of_int (Util.real_nb_of_persons conf base));
     }
   in
   let data = Mext.gen_infos_base info_base in
@@ -534,7 +535,7 @@ let print_last_visited_persons conf base =
   let list =
     if user = "" then []
     else
-      let ht = Util.read_visited (Util.cache_visited conf) in
+      let ht = Util.read_visited conf in
       try Hashtbl.find ht user with
       Not_found -> []
   in

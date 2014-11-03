@@ -496,6 +496,12 @@ value effective_mod_merge conf base o_p1 o_p2 sp =
       redirect_added_families base p ip2 p2_family;
       Update.update_misc_names_of_family base p.sex {family = p_family};
       patch_person base p.key_index p;
+      patch_cache_info conf
+        (fun (k, v) ->
+          if k = Util.cache_nb_base_persons then
+            let v = int_of_string v - 1 in
+            (k, string_of_int v)
+          else (k, v));
       let u = {family = Array.append p_family p2_family} in
       if p2_family <> [| |] then patch_union base p.key_index u else ();
       Consang.check_noloop_for_person_list base (Update.error conf base)

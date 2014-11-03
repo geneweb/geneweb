@@ -552,6 +552,10 @@ value eval_var conf base env () loc =
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
            (Num.of_int (nb_of_persons base)))
+  | ["base"; "real_nb_persons"] ->
+      VVstring
+        (string_of_num (Util.transl conf "(thousand separator)")
+           (Num.of_int (Util.real_nb_of_persons conf base)))
   | ["base"; "title"] ->
       let s = base_notes_read_first_line base "" in
       let len = String.length s in
