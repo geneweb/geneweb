@@ -1406,6 +1406,30 @@ value output_command_line bdir = do {
   close_out oc;
 };
 
+value init_cache_info bdir base = do {
+  (* Reset le nombre réel de personnes d'une base. *)
+  let nb_real_persons = ref 0 in
+  let nb_ind = Gwdb.nb_of_persons base in
+  let is_empty_name p =
+    (Gwdb.is_empty_string (Gwdb.get_surname p) ||
+     Gwdb.is_quest_string (Gwdb.get_surname p)) &&
+    (Gwdb.is_empty_string (Gwdb.get_first_name p) ||
+     Gwdb.is_quest_string (Gwdb.get_first_name p))
+  in
+  for i = 0 to nb_ind - 1 do {
+    let ip = Adef.iper_of_int i in
+    let p = Gwdb.poi base ip in
+    if is_empty_name p then ()
+    else incr nb_real_persons
+  };
+  (* Il faudrait que cache_nb_base_persons ne soit pas dans util.ml *)
+  let list = [("cache_nb_persons", string_of_int nb_real_persons.val)] in
+  let fname = Filename.concat bdir "cache_info" in
+  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
+  [ Some oc -> do { output_value oc list; close_out oc }
+  | None -> () ]
+};
+
 value link next_family_fun bdir = do {
   let tmp_dir = Filename.concat "gw_tmp" bdir in
   try Mutil.mkdir_p tmp_dir with _ -> ();
@@ -1489,6 +1513,7 @@ value link next_family_fun bdir = do {
     try Mutil.remove_dir tmp_dir with _ -> ();
     try Unix.rmdir "gw_tmp" with _ -> ();
     output_command_line bdir;
+    init_cache_info bdir base;
     True
   }
   else False

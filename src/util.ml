@@ -3638,38 +3638,6 @@ value display_options conf =
 (* On en profite aussi pour stocker la date de la dernière visite.          *)
 type cache_visited_t = Hashtbl.t string (list (iper * string));
 
-(* ************************************************************************ *)
-(*  [Fonc] read_visited : string -> cache_visited_t                         *)
-(** [Description] : List le fichier de cache des dernières fiches visités.
-    [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-    [Retour] : Hashtbl des user => dernières visites
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-value read_visited fname =
-  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      let ht : cache_visited_t = input_value ic in
-      do { close_in ic; ht }
-  | None -> Hashtbl.create 1 ]
-;
-
-
-(* ************************************************************************ *)
-(*  [Fonc] write_visited : string -> Hashtbl.t string (list iper) -> unit   *)
-(** [Description] : Met à jour le fichier de cache des visites.
-    [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-      - ht    : le compteur de visite
-    [Retour] : unit
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
-value write_visited fname ht =
-  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
-  [ Some oc -> do { output_value oc ht; close_out oc }
-  | None -> () ]
-;
-
 
 (* ************************************************************************ *)
 (*  [Fonc] cache_visited : config -> string                                 *)
@@ -3689,6 +3657,41 @@ value cache_visited conf =
 
 
 (* ************************************************************************ *)
+(*  [Fonc] read_visited : string -> cache_visited_t                         *)
+(** [Description] : List le fichier de cache des dernières fiches visités.
+    [Args] :
+      - fname : le fichier de cache (qui se trouve dans base.gwb)
+    [Retour] : Hashtbl des user => dernières visites
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value read_visited conf =
+  let fname = cache_visited conf in
+  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let ht : cache_visited_t = input_value ic in
+      do { close_in ic; ht }
+  | None -> Hashtbl.create 1 ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] write_visited : string -> Hashtbl.t string (list iper) -> unit   *)
+(** [Description] : Met à jour le fichier de cache des visites.
+    [Args] :
+      - fname : le fichier de cache (qui se trouve dans base.gwb)
+      - ht    : le compteur de visite
+    [Retour] : unit
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value write_visited conf ht =
+  let fname = cache_visited conf in
+  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
+  [ Some oc -> do { output_value oc ht; close_out oc }
+  | None -> () ]
+;
+
+
+(* ************************************************************************ *)
 (*  [Fonc] record_visited : config -> iper -> unit                          *)
 (** [Description] : Vérifie si le user est ami ou magicien et met à jour
                     le fichier de cache.
@@ -3700,8 +3703,7 @@ value cache_visited conf =
 (* ************************************************************************ *)
 value record_visited conf ip =
   if conf.friend || conf.wizard then
-    let fname = cache_visited conf in
-    let ht = read_visited fname in
+    let ht = read_visited conf in
     let (hh, mm, ss) = conf.time in
     let time =
       Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d"
@@ -3729,6 +3731,141 @@ value record_visited conf ip =
       with
       [ Not_found -> Hashtbl.add ht conf.user [(ip, time)] ]
     in
-    write_visited fname ht
+    write_visited conf ht
   else ()
+;
+
+
+(**/**)
+
+
+(* List associative pour avoir le plus de flexibilité. *)
+(* TODO : il faudrait que ce soit intégrer dans la base directement. *)
+type cache_info_t = list (string * string);
+
+(* valeur dans le cache. *)
+value cache_nb_base_persons = "cache_nb_persons";
+
+
+(* ************************************************************************ *)
+(*  [Fonc] cache_info : config -> string                                    *)
+(** [Description] : Renvoie le chemin du fichier de cache d'info de la base.
+    [Args] :
+      - config : configuration de la base
+    [Retour] : unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value cache_info conf =
+  let bname =
+    if Filename.check_suffix conf.bname ".gwb" then conf.bname
+    else conf.bname ^ ".gwb"
+  in
+  Filename.concat (base_path [] bname) "cache_info"
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] read_cache_info : config -> cache_info_t                         *)
+(** [Description] : Lit le fichier de cache pour les infos d'une base.
+    [Args] :
+      - fname : le fichier de cache (qui se trouve dans base.gwb)
+    [Retour] : list (string * string)
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value read_cache_info conf =
+  let fname = cache_info conf in
+  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let list : cache_info_t = input_value ic in
+      do { close_in ic; list }
+  | None -> [] ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] write_cache_info : config -> cache_info_t -> unit                *)
+(** [Description] : Met à jour le fichier de cache des infos d'une base.
+    [Args] :
+      - fname : le fichier de cache (qui se trouve dans base.gwb)
+      - list  : list asso pour le cache
+    [Retour] : unit
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value write_cache_info conf list =
+  let fname = cache_info conf in
+  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
+  [ Some oc -> do { output_value oc list; close_out oc }
+  | None -> () ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] patch_cache_info :
+             config -> ((string * string) -> (string * string)) -> unit     *)
+(** [Description] : Met à jour le fichier de cache.
+    [Args] :
+      - conf : configuration de la base
+      - (key, value) : la clé et valeur de cache à mettre à jour
+    [Retour] : unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value patch_cache_info conf f =
+  let cache_info = read_cache_info conf in
+  (* On met à jour le cache avec la nouvelle valeur. *)
+  (* Si la clé n'existe pas dans la liste, c'est pas grave, elle sera *)
+  (* ajouté lors de la création du cache.                             *)
+  let cache_info = List.map f cache_info in
+  write_cache_info conf cache_info
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] init_cache_info : config -> unit                                 *)
+(** [Description] : Créé le fichier de cache.
+    [Args] :
+      - conf : configuration de la base
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value init_cache_info conf base = do {
+  let nb_ind = Gwdb.nb_of_persons base in
+  (* Reset le nombre réel de personnes d'une base. *)
+  let nb_real_persons = ref 0 in
+  let is_empty_name p =
+    (is_empty_string (get_surname p) || is_quest_string (get_surname p)) &&
+    (is_empty_string (get_first_name p) || is_quest_string (get_first_name p))
+  in
+  for i = 0 to nb_ind - 1 do {
+    let ip = Adef.iper_of_int i in
+    let p = poi base ip in
+    if is_empty_name p then ()
+    else incr nb_real_persons
+  };
+  let list = [(cache_nb_base_persons, string_of_int nb_real_persons.val)] in
+  write_cache_info conf list;
+};
+
+(* ************************************************************************ *)
+(*  [Fonc] real_nb_of_persons conf : config -> int                          *)
+(** [Description] : Renvoie le nombre de personnes réelles (sans ? ?) d'une
+                    base, à partir du fichier de cache.
+    [Args] :
+      - conf : configuration de la base
+    [Retour] : nombre de personne sans ? ?
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value real_nb_of_persons conf base =
+  try
+    let list = read_cache_info conf in
+    let nb = List.assoc cache_nb_base_persons list in
+    int_of_string nb
+  with Not_found ->
+    try
+      do {
+        init_cache_info conf base;
+        let list = read_cache_info conf in
+        let nb = List.assoc cache_nb_base_persons list in
+        int_of_string nb
+      }
+    with _ -> Gwdb.nb_of_persons base
 ;

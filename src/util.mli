@@ -285,5 +285,17 @@ value display_options : config -> string;
 
 type cache_visited_t = Hashtbl.t string (list (iper * string));
 value cache_visited : config -> string;
-value read_visited : string -> cache_visited_t;
+value read_visited : config -> cache_visited_t;
 value record_visited : config -> iper -> unit;
+
+type cache_info_t = list (string * string);
+
+(* valeur dans le cache. *)
+value cache_nb_base_persons : string;
+
+value cache_info : config -> string;
+value read_cache_info : config -> cache_info_t;
+value patch_cache_info :
+  config -> ((string * string) -> (string * string)) -> unit;
+
+value real_nb_of_persons : config -> base -> int;

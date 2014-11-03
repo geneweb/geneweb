@@ -1998,6 +1998,10 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
            (Num.of_int (nb_of_persons base)))
+  | ["base"; "real_nb_persons"] ->
+      VVstring
+        (string_of_num (Util.transl conf "(thousand separator)")
+           (Num.of_int (Util.real_nb_of_persons conf base)))
   | ["birth_witness" :: sl] ->
       match get_env "birth_witness" env with
       [ Vind p ->

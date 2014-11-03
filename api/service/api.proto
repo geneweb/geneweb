@@ -6,6 +6,7 @@ message InfosBase {
   required int64 nb_families = 2;
   optional ReferencePerson sosa = 3;
   optional int64 last_modified_person = 4;
+  optional int64 real_nb_persons = 5;
 }
 
 message ReferencePerson {

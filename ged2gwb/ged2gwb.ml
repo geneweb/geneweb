@@ -3846,6 +3846,28 @@ value output_command_line bname =
   }
 ;
 
+value init_cache_info bname base (persons, _, _, _) = do {
+  let (persons, _, _) = persons in
+  (* Reset le nombre réel de personnes d'une base. *)
+  let nb_real_persons = ref 0 in
+  for i = 0 to base.data.persons.len - 1 do {
+    let p = persons.(i) in
+    if (sou base (get_surname p) = "" || sou base (get_surname p) = "?") &&
+       (sou base (get_first_name p) = "" || sou base (get_first_name p) = "?")
+    then ()
+    else incr nb_real_persons
+  };
+  (* Il faudrait que cache_nb_base_persons ne soit pas dans util.ml *)
+  let list = [("cache_nb_persons", string_of_int nb_real_persons.val)] in
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let fname = Filename.concat bdir "cache_info" in
+  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
+  [ Some oc -> do { output_value oc list; close_out oc }
+  | None -> () ]
+};
+
 value set_undefined_death_interval s =
   try
     match Stream.of_string s with parser
@@ -3998,7 +4020,8 @@ The database \"%s\" already exists. Use option -f to overwrite it.
     [ Accept ->
         do {
           Outbase.output out_file.val base;
-          output_command_line out_file.val
+          output_command_line out_file.val;
+          init_cache_info out_file.val base arrays;
         }
     | Refuse ->
         do {
