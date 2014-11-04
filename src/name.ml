@@ -72,8 +72,13 @@ value unaccent_utf_8 lower s i =
           | 0xBD | 0xBF -> "y"
           | 0xBE -> "th"
           | _ ->
-              let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
-              String.make 1 c ]
+              (* Si le caractère est en dehors de la table ASCII,
+                 alors on ignore le caratère. Cela peut se produire
+                 si l'entrée est mauvaise, ex: JÃ©rÃÃ¶me /FOO/ *)
+              try
+                let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
+                String.make 1 c
+              with Invalid_argument "Char.chr" -> "" ]
       | 0xC4 ->
           match Char.code s.[i+1] with
           [ 0x80 | 0x82 | 0x84 -> f "A"
