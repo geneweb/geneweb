@@ -1049,7 +1049,7 @@ function changeCalendar(e,v,m,c) {
     <table border="1" width="700px">
       <tr>
         <td>
-          <select name="death" id="death_selectxcnt" onchange="change_death('xcnt')">
+          <select name="old_death" id="death_selectxcnt" onchange="change_death('xcnt')">
             %if;(not has_birth_date and dont_know_if_dead)
               <option value="Auto" selected="selected"> -</option>
             %end;

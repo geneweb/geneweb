@@ -566,7 +566,11 @@ value reconstitute_from_pevents pevents ext bi bp de bu =
   let de =
     if not found_death.val then
       if found_burial.val then (DeadDontKnowWhen, "", "", "")
-      else (DontKnowIfDead, "", "", "")
+      else
+        let (death, _, _, _) = de in
+        match death with
+        [ NotDead -> (NotDead, "", "", "")
+        | _ -> (DontKnowIfDead, "", "", "") ]
     else de
   in
   let bu =
