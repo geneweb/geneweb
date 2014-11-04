@@ -283,7 +283,7 @@ let print_first_available_person conf base =
     }
   in
   let rec loop i nb_ind =
-    if i = nb_ind then empty_ref
+    if i = nb_ind - 1 then empty_ref
     else
       let p = poi base (Adef.iper_of_int i) in
       if is_hide_names conf p || is_empty_or_quest_name p ||
