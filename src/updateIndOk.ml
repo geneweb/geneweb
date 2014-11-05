@@ -109,7 +109,7 @@ value reconstitute_add_relation conf ext cnt rl =
   match get_nth conf "add_relation" cnt with
   [ Some "on" ->
       let r =
-        {r_type = Adoption; r_fath = None; r_moth = None; r_sources = ""}
+        {r_type = GodParent; r_fath = None; r_moth = None; r_sources = ""}
       in
       ([r :: rl], True)
   | _ -> (rl, ext) ]
@@ -166,7 +166,7 @@ value reconstitute_relation conf var =
       | "CandidateParent" -> CandidateParent
       | "GodParent" -> GodParent
       | "FosterParent" -> FosterParent
-      | _ -> Adoption ]
+      | _ -> GodParent ]
     in
     Some {r_type = r_type; r_fath = r_fath; r_moth = r_moth; r_sources = ""}
   with
