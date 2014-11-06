@@ -3739,9 +3739,9 @@ value record_visited conf ip =
 (**/**)
 
 
-(* List associative pour avoir le plus de flexibilité. *)
+(* Hashtbl pour avoir le plus de flexibilité. *)
 (* TODO : il faudrait que ce soit intégrer dans la base directement. *)
-type cache_info_t = list (string * string);
+type cache_info_t = Hashtbl.t string string;
 
 (* valeur dans le cache. *)
 value cache_nb_base_persons = "cache_nb_persons";
@@ -3768,17 +3768,17 @@ value cache_info conf =
 (*  [Fonc] read_cache_info : config -> cache_info_t                         *)
 (** [Description] : Lit le fichier de cache pour les infos d'une base.
     [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-    [Retour] : list (string * string)
+      - conf : configuration de la base
+    [Retour] : Hashtbl cache_info_t
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value read_cache_info conf =
   let fname = cache_info conf in
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let list : cache_info_t = input_value ic in
-      do { close_in ic; list }
-  | None -> [] ]
+      let ht : cache_info_t = input_value ic in
+      do { close_in ic; ht }
+  | None -> Hashtbl.create 1 ]
 ;
 
 
@@ -3786,15 +3786,15 @@ value read_cache_info conf =
 (*  [Fonc] write_cache_info : config -> cache_info_t -> unit                *)
 (** [Description] : Met à jour le fichier de cache des infos d'une base.
     [Args] :
-      - fname : le fichier de cache (qui se trouve dans base.gwb)
-      - list  : list asso pour le cache
+      - conf : configuration de la base
+      - ht   : Hashtbl cache_info_t
     [Retour] : unit
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-value write_cache_info conf list =
+value write_cache_info conf ht =
   let fname = cache_info conf in
   match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
-  [ Some oc -> do { output_value oc list; close_out oc }
+  [ Some oc -> do { output_value oc ht; close_out oc }
   | None -> () ]
 ;
 
@@ -3809,13 +3809,16 @@ value write_cache_info conf list =
     [Retour] : unit
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-value patch_cache_info conf f =
+value patch_cache_info conf k f =
   let cache_info = read_cache_info conf in
   (* On met à jour le cache avec la nouvelle valeur. *)
   (* Si la clé n'existe pas dans la liste, c'est pas grave, elle sera *)
   (* ajouté lors de la création du cache.                             *)
-  let cache_info = List.map f cache_info in
-  write_cache_info conf cache_info
+  try
+    let v = Hashtbl.find cache_info k in
+    let () = Hashtbl.replace cache_info k (f v) in
+    write_cache_info conf cache_info
+  with [ Not_found -> () ]
 ;
 
 
@@ -3841,8 +3844,12 @@ value init_cache_info conf base = do {
     if is_empty_name p then ()
     else incr nb_real_persons
   };
-  let list = [(cache_nb_base_persons, string_of_int nb_real_persons.val)] in
-  write_cache_info conf list;
+  let ht = Hashtbl.create 1 in
+  let () =
+    Hashtbl.add ht
+      cache_nb_base_persons (string_of_int nb_real_persons.val)
+  in
+  write_cache_info conf ht;
 };
 
 (* ************************************************************************ *)
@@ -3856,15 +3863,15 @@ value init_cache_info conf base = do {
 (* ************************************************************************ *)
 value real_nb_of_persons conf base =
   try
-    let list = read_cache_info conf in
-    let nb = List.assoc cache_nb_base_persons list in
+    let ht = read_cache_info conf in
+    let nb = Hashtbl.find ht cache_nb_base_persons in
     int_of_string nb
   with Not_found ->
     try
       do {
         init_cache_info conf base;
-        let list = read_cache_info conf in
-        let nb = List.assoc cache_nb_base_persons list in
+        let ht = read_cache_info conf in
+        let nb = Hashtbl.find ht cache_nb_base_persons in
         int_of_string nb
       }
     with _ -> Gwdb.nb_of_persons base

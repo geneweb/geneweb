@@ -1406,7 +1406,7 @@ value output_command_line bdir = do {
   close_out oc;
 };
 
-value init_cache_info bdir base = do {
+value init_cache_info bname base = do {
   (* Reset le nombre réel de personnes d'une base. *)
   let nb_real_persons = ref 0 in
   let nb_ind = Gwdb.nb_of_persons base in
@@ -1423,10 +1423,17 @@ value init_cache_info bdir base = do {
     else incr nb_real_persons
   };
   (* Il faudrait que cache_nb_base_persons ne soit pas dans util.ml *)
-  let list = [("cache_nb_persons", string_of_int nb_real_persons.val)] in
+  let ht = Hashtbl.create 1 in
+  let () =
+    Hashtbl.add ht
+      "cache_nb_persons" (string_of_int nb_real_persons.val)
+  in
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
   let fname = Filename.concat bdir "cache_info" in
   match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
-  [ Some oc -> do { output_value oc list; close_out oc }
+  [ Some oc -> do { output_value oc ht; close_out oc }
   | None -> () ]
 };
 

@@ -1237,12 +1237,10 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           patch_ascend base p.key_index a;
           patch_union base p.key_index u;
           if f <> "?" && s <> "?" then do {
-            patch_cache_info conf
-              (fun (k, v) ->
-                if k = Util.cache_nb_base_persons then
-                  let v = int_of_string v + 1 in
-                  (k, string_of_int v)
-                else (k, v));
+            patch_cache_info conf Util.cache_nb_base_persons
+              (fun v ->
+                let v = int_of_string v + 1 in
+                string_of_int v);
             let fn = Util.translate_eval f in
             let sn = Util.translate_eval s in
             patch_key base ip fn sn o;

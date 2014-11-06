@@ -1351,12 +1351,10 @@ value print_del conf base =
       let warning _ = () in
       let p = effective_del conf base warning p in
       patch_person base ip p;
-      patch_cache_info conf
-        (fun (k, v) ->
-          if k = Util.cache_nb_base_persons then
-            let v = int_of_string v - 1 in
-            (k, string_of_int v)
-          else (k, v));
+      patch_cache_info conf Util.cache_nb_base_persons
+        (fun v ->
+          let v = int_of_string v - 1 in
+          string_of_int v);
       delete_key base fn sn occ;
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
       Util.commit_patches conf base;
