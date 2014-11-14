@@ -176,11 +176,22 @@ value public_some bname lim_year titled key =
         if changes.val then commit_patches base else ();
       }
   | _ ->
-      do {
-        Printf.eprintf "Bad key %s\n" key;
-        flush stderr;
-        exit 2
-      } ]
+      match Gutil.person_of_string_dot_key base key with
+      [ Some ip ->
+          let p = poi base ip in
+          do {
+             if get_access p <> Private then
+             let p = {(gen_person_of_person p) with access = Private} in
+             patch_person base p.key_index p
+             else ();
+             commit_patches base;
+          }
+      | None ->
+          do {
+            Printf.eprintf "Bad key %s\n" key;
+            flush stderr;
+            exit 2
+          } ] ]
 ;
 
 value lim_year = ref 1900;
