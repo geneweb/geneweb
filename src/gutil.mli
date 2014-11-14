@@ -11,6 +11,8 @@ value person_not_a_key_find_all : base -> string -> list iper;
 value person_ht_find_all : base -> string -> list iper;
 value person_of_string_key : base -> string -> option iper;
 value find_same_name : base -> person -> list person;
+(* Pour les personnes avec plein de '.' dans le prénom ou le nom. *)
+value person_of_string_dot_key : base -> string -> option iper;
 
 value designation : base -> person -> string;
 

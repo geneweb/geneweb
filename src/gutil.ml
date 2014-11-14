@@ -81,6 +81,26 @@ value person_of_string_key base s =
     | None -> None ]
 ;
 
+value rsplit_key s =
+  loop (String.length s - 1) where rec loop i =
+    if i = 0 then None
+    else if s.[i] = '.' then
+      match find_num s (i + 1) with
+      [ Some (occ, j) ->
+          let first_name = String.sub s 0 i in
+          let surname = String.sub s j (String.length s - j) in
+          Some (first_name, occ, surname)
+      | None -> loop (i - 1) ]
+    else loop (i - 1)
+;
+
+value person_of_string_dot_key base s =
+  match rsplit_key s with
+  [ Some (first_name, occ, surname) ->
+      person_of_key base first_name surname occ
+  | None -> None ]
+;
+
 value person_not_a_key_find_all base s =
   let ipl = persons_of_name base s in
   let rec select =
