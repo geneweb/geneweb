@@ -480,7 +480,7 @@ let print_last_modified_persons conf base =
         in
         let list = loop [] max_res pos in
         close_in ic;
-        list
+        List.rev list
     | None -> []
   in
   let data = conv_data_list_person conf base filters list in
