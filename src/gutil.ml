@@ -58,24 +58,27 @@ value find_num s i =
           else Some (int_of_string (String.sub s start (i - start)), i) ]
 ;
 
-value split_key s =
-  loop 0 where rec loop i =
+value split_key s i =
+  loop i where rec loop i =
     if i = String.length s then None
     else if s.[i] = '.' then
       match find_num s (i + 1) with
       [ Some (occ, j) ->
           let first_name = String.sub s 0 i in
           let surname = String.sub s j (String.length s - j) in
-          Some (first_name, occ, surname)
+          Some (i, first_name, occ, surname)
       | None -> loop (i + 1) ]
     else loop (i + 1)
 ;
 
 value person_of_string_key base s =
-  match split_key s with
-  [ Some (first_name, occ, surname) ->
-      person_of_key base first_name surname occ
-  | None -> None ]
+  loop 0 where rec loop i =
+    match split_key s i with
+    [ Some (i, first_name, occ, surname) ->
+        match person_of_key base first_name surname occ with
+        [ Some ip -> Some ip
+        | None -> loop (i + 1) ]
+    | None -> None ]
 ;
 
 value person_not_a_key_find_all base s =
