@@ -1934,8 +1934,14 @@ value treat_indi_pevent gen ip r =
                   epers_src = add_string gen src;
                   epers_witnesses = witnesses}
                in
-               (* On n'ajoute que les évènements non vides. *)
-               if date <> None || place <> "" || note <> "" ||
+               (* On n'ajoute que les évènements non vides, *)
+               (* sauf si évènement personnalisé !          *)
+               let has_epers_name =
+                 match name with
+                 [ Epers_Name n -> n <> string_empty
+                 | _ -> False ]
+               in
+               if has_epers_name || date <> None || place <> "" || note <> "" ||
                   src <> "" || witnesses <> [| |]
                then
                  [ evt :: events ]
