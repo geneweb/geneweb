@@ -440,6 +440,8 @@ message ModificationStatus {
   optional int32 occ = 6;
   optional int32 index_family = 7;
   optional CreateConflict conflict = 8;
+  optional string lastname_str = 9;
+  optional string firstname_str = 10;
 }
 
 
