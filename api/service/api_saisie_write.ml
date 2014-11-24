@@ -1109,8 +1109,8 @@ let compute_warnings conf base resp =
 ;;
 
 let compute_modification_status conf base ip ifam resp =
-  let (surname, first_name, occ, index_person) =
-    if ip < 0 then ("", "", None, None)
+  let (surname, first_name, occ, index_person, surname_str, first_name_str) =
+    if ip < 0 then ("", "", None, None, None, None)
     else
       let p = poi base (Adef.iper_of_int ip) in
       let surname = Name.lower (sou base (get_surname p)) in
@@ -1118,12 +1118,14 @@ let compute_modification_status conf base ip ifam resp =
       let index_person = Some (Int32.of_int ip) in
       let occ = get_occ p in
       let occ = if occ = 0 then None else Some (Int32.of_int occ) in
+      let surname_str = Some (sou base (get_surname p)) in
+      let first_name_str = Some (sou base (get_first_name p)) in
       if not (Util.accessible_by_key conf base p first_name surname) ||
          (surname = "" && first_name = "")
       then
-        ("", "", None, index_person)
+        ("", "", None, index_person, surname_str, first_name_str)
       else
-        (surname, first_name, occ, index_person)
+        (surname, first_name, occ, index_person, surname_str, first_name_str)
   in
   let index_family = if ifam < 0 then None else Some (Int32.of_int ifam) in
   let (is_base_updated, warnings, conflict, history_records) =
@@ -1149,6 +1151,8 @@ let compute_modification_status conf base ip ifam resp =
       occ = occ;
       index_family = index_family;
       conflict = conflict;
+      lastname_str = surname_str;
+      firstname_str = first_name_str;
     }
   in
   let data = Mext_write.gen_modification_status response in
@@ -2978,11 +2982,13 @@ let print_add_first_fam conf =
 
   (* compute_modification_status si pas de base, on ne peut *)
   (* pas avoir ni warnings, ni modification d'historique.   *)
-  let (surname, first_name, occ, index_person) =
+  let (surname, first_name, occ, index_person, surname_str, first_name_str) =
     (mod_p.Mwrite.Person.lastname,
      mod_p.Mwrite.Person.firstname,
      mod_p.Mwrite.Person.occ,
-     None)
+     None,
+     Some mod_p.Mwrite.Person.lastname,
+     Some mod_p.Mwrite.Person.firstname)
   in
   let index_family = None in
   let (is_base_updated, warnings, conflict, history_records) =
@@ -3001,6 +3007,8 @@ let print_add_first_fam conf =
       occ = occ;
       index_family = index_family;
       conflict = conflict;
+      lastname_str = surname_str;
+      firstname_str = first_name_str;
     }
   in
   let data = Mext_write.gen_modification_status response in
