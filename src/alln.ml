@@ -120,7 +120,7 @@ value print_title conf base is_surnames ini len = do {
     Wserver.wprint " %s %s" (transl conf "starting with")
       (capitalize_if_not_utf8 ini)
   else
-    Wserver.wprint " (%d %s)" (nb_of_persons base)
+    Wserver.wprint " (%d %s)" (Util.real_nb_of_persons conf base)
       (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
 };
 
