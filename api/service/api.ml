@@ -1437,7 +1437,7 @@ let print_export_info conf export_directory =
   let fname = Filename.concat export_directory "pb_base_info.dat" in
   match try Some (open_out_bin fname) with Sys_error _ -> None with
   | Some oc ->
-      output_binary_int oc (nb_of_persons base);
+      output_binary_int oc (Util.real_nb_of_persons conf base);
       output_binary_int oc (nb_of_families base);
       let sosa_ref =
         match Util.find_sosa_ref conf base with
@@ -2153,7 +2153,7 @@ let print_synchro_patch_mobile conf base =
             output_binary_int oc (String.length last_timestamp);
             output_string oc last_timestamp;
             (* nb persons et families *)
-            output_binary_int oc (nb_of_persons base);
+            output_binary_int oc (Util.real_nb_of_persons conf base);
             output_binary_int oc (nb_of_families base);
             (* sosa *)
             let sosa_ref =
