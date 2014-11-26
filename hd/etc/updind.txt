@@ -720,7 +720,7 @@ function changeCalendar(e,v,m,c) {
         </td>
       </tr>
     </table>
-    %apply;date([*date/dates]0, "e_datexcnt", "event_date", " %if;('evt_name' = '#deat') onfocus='set_death_focus(xcnt)'%end;")
+    %apply;date([*date/dates]0, "e_datexcnt", "event_date", "%if;('evt_name' = '#deat')onfocus='set_death_focus(xcnt)'%end;")
     <table border="1" width="700px">
       <tr>
         <td><label for="e_notexcnt">[*note/notes]1</label></td>
@@ -793,9 +793,9 @@ function changeCalendar(e,v,m,c) {
     </tr>
   </table>
   %if;("evt_name"="#deat")
-    %apply;date([*date/dates]0, "e_datexcnt", "event_date", " onfocus='set_death_focus(xcnt)'")
+    %apply;date([*date/dates]0, "e_datexcnt", "event_date", "onfocus='set_death_focus(xcnt)'")
   %elseif("evt_name"="buri_or_crem")
-    %apply;date([*date/dates]0, "e_datexcnt", "event_date", " onfocus='set_burial_focus(xcnt)'")
+    %apply;date([*date/dates]0, "e_datexcnt", "event_date", "onfocus='set_burial_focus(xcnt)'")
   %else;
     %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
   %end;
@@ -1066,7 +1066,7 @@ function changeCalendar(e,v,m,c) {
         </td>
       </tr>
     </table>
-    %apply;date([*date/dates]0, "death", "death", " onfocus='setDead()'")
+    %apply;date([*date/dates]0, "death", "death", "onfocus='setDead()'")
     <table border="1" width="700px">
       <tr>
         <td>
