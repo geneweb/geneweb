@@ -369,32 +369,33 @@ and eval_date_var_aux od =
             | _ -> string_of_int d.month ]
       | None -> "" ]
   | "orday" ->
-      match od with
-      [ Some (Dgreg {prec = OrYear d2} _) ->
-          if d2.day2 = 0 then "" else string_of_int d2.day2
-      | Some (Dgreg {prec = YearInt d2} _) ->
-          if d2.day2 = 0 then "" else string_of_int d2.day2
-      | _ -> "" ]
+      match eval_date_field od with
+      [ Some d ->
+          match d.prec with
+          [ OrYear d2 | YearInt d2 ->
+              if d2.day2 = 0 then ""
+              else string_of_int d2.day2
+          | _ -> "" ]
+      | None -> "" ]
   | "ormonth" ->
-      match od with
-      [ Some (Dgreg {prec = OrYear d2} cal) ->
-          if d2.month2 = 0 then ""
-          else
-            match cal with
-            [ Dfrench -> short_f_month d2.month2
-            | _ -> string_of_int d2.month2 ]
-      | Some (Dgreg {prec = YearInt d2} cal) ->
-          if d2.month2 = 0 then ""
-          else
-            match cal with
-            [ Dfrench -> short_f_month d2.month2
-            | _ -> string_of_int d2.month2 ]
-      | _ -> "" ]
+      match eval_date_field od with
+      [ Some d ->
+          match d.prec with
+          [ OrYear d2 | YearInt d2 ->
+              if d2.month2 = 0 then ""
+              else
+                match od with
+                [ Some (Dgreg _ Dfrench) -> short_f_month d2.month2
+                | _ -> string_of_int d2.month2 ]
+          | _ -> "" ]
+      | None -> "" ]
   | "oryear" ->
-      match od with
-      [ Some (Dgreg {prec = OrYear d2} _) -> string_of_int d2.year2
-      | Some (Dgreg {prec = YearInt d2} _) -> string_of_int d2.year2
-      | _ -> "" ]
+      match eval_date_field od with
+      [ Some d ->
+          match d.prec with
+          [ OrYear d2 | YearInt d2 -> string_of_int d2.year2
+          | _ -> "" ]
+      | None -> "" ]
   | "prec" ->
       match od with
       [ Some (Dgreg {prec = Sure} _) -> "sure"
