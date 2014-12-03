@@ -1013,6 +1013,10 @@ value effective_add conf base sp = do {
   check_conflict conf base sp ipl;
   patch_key base pi fn sn sp.occ;
   person_ht_add base key pi;
+  patch_cache_info conf Util.cache_nb_base_persons
+    (fun v ->
+      let v = int_of_string v + 1 in
+      string_of_int v);
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)

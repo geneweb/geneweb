@@ -25,6 +25,37 @@ value anonfun s =
   else raise (Arg.Bad "Cannot treat several databases")
 ;
 
+value init_cache_info bname base = do {
+  (* Reset le nombre réel de personnes d'une base. *)
+  let nb_real_persons = ref 0 in
+  let nb_ind = Gwdb.nb_of_persons base in
+  let is_empty_name p =
+    (Gwdb.is_empty_string (Gwdb.get_surname p) ||
+     Gwdb.is_quest_string (Gwdb.get_surname p)) &&
+    (Gwdb.is_empty_string (Gwdb.get_first_name p) ||
+     Gwdb.is_quest_string (Gwdb.get_first_name p))
+  in
+  for i = 0 to nb_ind - 1 do {
+    let ip = Adef.iper_of_int i in
+    let p = Gwdb.poi base ip in
+    if is_empty_name p then ()
+    else incr nb_real_persons
+  };
+  (* Il faudrait que cache_nb_base_persons ne soit pas dans util.ml *)
+  let ht = Hashtbl.create 1 in
+  let () =
+    Hashtbl.add ht
+      "cache_nb_persons" (string_of_int nb_real_persons.val)
+  in
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let fname = Filename.concat bdir "cache_info" in
+  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
+  [ Some oc -> do { output_value oc ht; close_out oc }
+  | None -> () ]
+};
+
 value rebuild_field_array db2 len pad bdir compress f = do {
   if Mutil.verbose.val then do {
     eprintf "rebuilding %s..." (Filename.basename bdir);
@@ -480,14 +511,16 @@ value simple_output bname base carray =
            }
            else ();
          })
-  | None ->
+  | None -> do {
       Gwdb.apply_base1 base
         (fun base ->
            let bname = base.Dbdisk.data.Dbdisk.bdir in
            let no_patches =
              not (Sys.file_exists (Filename.concat bname "patches"))
            in
-           Outbase.gen_output (no_patches && not indexes.val) bname base) ]
+           Outbase.gen_output (no_patches && not indexes.val) bname base);
+      (* On recalcul le nombre reel de personnes. *)
+      init_cache_info bname base }]
 ;
 
 value designation base p =
