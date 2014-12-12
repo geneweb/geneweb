@@ -530,8 +530,6 @@ let print_last_visited_persons conf base =
   let last_visits = get_params conf Mext.parse_last_visits in
   let user = last_visits.M.Last_visits.user in
   let filters = get_filters conf in
-  (* Si l'utilisateur a renvoyé son GEDCOM, on supprime le cache. *)
-  let () = delete_outdated_base_file conf "cache_visited" in
   let list =
     if user = "" then []
     else
@@ -539,7 +537,13 @@ let print_last_visited_persons conf base =
       try Hashtbl.find ht user with
       Not_found -> []
   in
-  let list = List.map (fun (ip, _) -> poi base ip) list in
+  (* On ne supprime pas le fichier de cache, même après un envoi Gendcom, *)
+  (* donc on vérifie que les personnes existent toujours dans la base.    *)
+  let list =
+    List.fold_right
+      (fun (ip, _) accu -> try poi base ip :: accu with _ -> accu)
+      list []
+  in
   let data = data_list_person conf base filters list in
   print_result conf data
 ;;
