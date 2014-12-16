@@ -1416,8 +1416,9 @@ value make_tree_hts conf base gv p =
 value print_tree conf base v p =
   let gv = min (limit_by_tree conf) v in
   let page_title =
-    Printf.sprintf "%s: %s" (capitale (transl conf "tree"))
-      (person_text_no_html conf base p)
+    Printf.sprintf "%s"
+      (Util.translate_eval
+         (transl_a_of_b conf "descendants" (person_text_no_html conf base p)))
   in
   let hts = make_tree_hts conf base gv p in
   Dag.print_slices_menu_or_dag_page conf base page_title hts ""
