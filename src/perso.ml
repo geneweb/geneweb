@@ -2535,7 +2535,6 @@ and eval_date_field_var conf d =
       match d with
       [ Dgreg dmy _ -> VVstring (Date.year_text dmy)
       | _ -> VVstring "" ]
-  | [] -> VVstring (Date.string_of_date_sep conf "<br/>" d)
   | _ -> raise Not_found ]
 and eval_place_field_var conf place =
   fun
@@ -2631,7 +2630,14 @@ and eval_str_event_field
       | _ -> "" ]
   | "date" ->
       match (p_auth, Adef.od_of_codate date) with
-      [ (True, Some d) -> Date.string_of_date conf d
+      [ (True, Some d) -> Date.string_of_date_sep conf "<br/>" d
+      | _ -> "" ]
+  | "on_date" ->
+      match (p_auth, Adef.od_of_codate date) with
+      [ (True, Some d) ->
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          | _ -> Date.string_of_ondate conf d ]
       | _ -> "" ]
   | "place" ->
        if p_auth then Util.string_of_place conf (sou base place)
@@ -2670,7 +2676,17 @@ and eval_str_event_field
 and eval_event_field_var
       conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc =
   fun
-  [ ["date" :: sl] ->
+  [ [s] ->
+      try
+        bool_val
+          (eval_bool_event_field conf base env (p, p_auth)
+             (name, date, place, note, src, w, isp) s)
+      with
+      [ Not_found ->
+          str_val
+            (eval_str_event_field conf base env (p, p_auth)
+               (name, date, place, note, src, w, isp) s) ]
+  | ["date" :: sl] ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
@@ -2681,16 +2697,6 @@ and eval_event_field_var
           let ep = (sp, authorized_age conf base sp) in
           eval_person_field_var conf base env ep loc sl
       | None -> VVstring "" ]
-  | [s] ->
-      try
-        bool_val
-          (eval_bool_event_field conf base env (p, p_auth)
-             (name, date, place, note, src, w, isp) s)
-      with
-      [ Not_found ->
-          str_val
-            (eval_str_event_field conf base env (p, p_auth)
-               (name, date, place, note, src, w, isp) s) ]
   | _ -> raise Not_found ]
 and eval_event_witness_relation_var conf base env (p, e) loc =
   fun
