@@ -2676,17 +2676,7 @@ and eval_str_event_field
 and eval_event_field_var
       conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc =
   fun
-  [ [s] ->
-      try
-        bool_val
-          (eval_bool_event_field conf base env (p, p_auth)
-             (name, date, place, note, src, w, isp) s)
-      with
-      [ Not_found ->
-          str_val
-            (eval_str_event_field conf base env (p, p_auth)
-               (name, date, place, note, src, w, isp) s) ]
-  | ["date" :: sl] ->
+  [ ["date" :: sl] when sl <> [] ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
@@ -2697,6 +2687,16 @@ and eval_event_field_var
           let ep = (sp, authorized_age conf base sp) in
           eval_person_field_var conf base env ep loc sl
       | None -> VVstring "" ]
+  | [s] ->
+      try
+        bool_val
+          (eval_bool_event_field conf base env (p, p_auth)
+             (name, date, place, note, src, w, isp) s)
+      with
+      [ Not_found ->
+          str_val
+            (eval_str_event_field conf base env (p, p_auth)
+               (name, date, place, note, src, w, isp) s) ]
   | _ -> raise Not_found ]
 and eval_event_witness_relation_var conf base env (p, e) loc =
   fun
