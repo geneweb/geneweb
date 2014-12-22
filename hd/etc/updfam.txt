@@ -756,14 +756,21 @@ function changeCalendar(e,v,m,c) {
   </div>
 
   <input type="checkbox" name="nsck" value="on "%if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/>[*no sexes check]<br%/><br%/>
-  %foreach;fevent;
-    %apply;one_fevent(cnt)
-    <p></p>
-    %if;is_last;
-      %apply;insert_fevent(cnt)
+  %if;has_fevents;
+    %foreach;fevent;
+      %apply;one_fevent(cnt)
       <p></p>
+      %if;is_last;
+        %apply;insert_fevent(cnt)
+        <p></p>
+      %end;
     %end;
-  %end
+  %else;
+    %apply;one_fevent("1")
+    <p></p>
+    %apply;insert_fevent("1")
+    <p></p>
+  %end;
 
   <h4><label for="comment">[*comment]</label></h4>
 
