@@ -335,7 +335,8 @@ value strip_newlines_after_variables =
         let s =
           loop 0 where rec loop i =
             if i = String.length s then s
-            else if s.[i] = ' ' || s.[i] = '\t' then loop (i + 1)
+            else if s.[i] = ' ' || s.[i] = '\t' || s.[i] = '\r' then
+              loop (i + 1)
             else if s.[i] = '\n' then
               String.sub s (i + 1) (String.length s - i - 1)
             else s
