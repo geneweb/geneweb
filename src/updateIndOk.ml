@@ -980,6 +980,14 @@ value effective_mod conf base sp = do {
     if not same_fn_sn then patch_name base key pi else ();
   }
   else ();
+  (* Si on modifie la personne pour lui ajouter un nom/prénom, alors *)
+  (* il faut remettre le compteur du nombre de personne à jour.      *)
+  if ofn = "?" && osn = "?" && sp.first_name <> "?" && sp.surname <> "?" then
+    patch_cache_info conf Util.cache_nb_base_persons
+      (fun v ->
+        let v = int_of_string v + 1 in
+        string_of_int v)
+  else ();
   check_sex_married conf base sp op;
   let created_p = ref [] in
   let np =
@@ -1355,10 +1363,12 @@ value print_del conf base =
       let warning _ = () in
       let p = effective_del conf base warning p in
       patch_person base ip p;
-      patch_cache_info conf Util.cache_nb_base_persons
-        (fun v ->
-          let v = int_of_string v - 1 in
-          string_of_int v);
+      if fn <> "?" && sn <> "?" then
+        patch_cache_info conf Util.cache_nb_base_persons
+          (fun v ->
+            let v = int_of_string v - 1 in
+            string_of_int v)
+      else ();
       delete_key base fn sn occ;
       Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
       Util.commit_patches conf base;
