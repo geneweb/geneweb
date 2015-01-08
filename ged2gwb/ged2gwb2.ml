@@ -2322,7 +2322,7 @@ value find_fevent_name_from_tag gen tag =
   match tag with
   [ "MARR" -> Efam_Marriage
   | "unmarried" -> Efam_NoMarriage
-  | "NOMEN" -> Efam_NoMention
+  | "nomen" -> Efam_NoMention
   | "ENGA" -> Efam_Engage
   | "DIV" -> Efam_Divorce
   | "SEP" -> Efam_Separated
