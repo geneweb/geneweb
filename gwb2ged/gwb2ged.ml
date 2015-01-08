@@ -613,7 +613,7 @@ value ged_tag_fevent base evt =
   match evt.efam_name with
   [ Efam_Marriage -> "MARR"
   | Efam_NoMarriage -> "unmarried"
-  | Efam_NoMention -> "NOMEN"
+  | Efam_NoMention -> "nomen"
   | Efam_Engage -> "ENGA"
   | Efam_Divorce -> "DIV"
   | Efam_Separated -> "SEP"
