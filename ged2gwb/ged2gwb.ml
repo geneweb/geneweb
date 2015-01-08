@@ -1874,9 +1874,10 @@ value treat_indi_pevent gen ip r =
                epers_src = add_string gen src;
                epers_witnesses = witnesses}
             in
-            (* On n'ajoute que les évènements non vides. *)
+            (* On ajoute que les évènements non vides, sauf *)
+            (* s'il est spécifié qu'il faut l'ajouter.      *)
             if date <> None || place <> "" || note <> "" ||
-               src <> "" || witnesses <> [| |]
+               src <> "" || witnesses <> [| |] || r.rval = "Y"
             then
               [ evt :: events ]
             else events )
@@ -1934,8 +1935,8 @@ value treat_indi_pevent gen ip r =
                   epers_src = add_string gen src;
                   epers_witnesses = witnesses}
                in
-               (* On n'ajoute que les évènements non vides, *)
-               (* sauf si évènement personnalisé !          *)
+               (* On ajoute que les évènements non vides, *)
+               (* sauf si évènement personnalisé !        *)
                let has_epers_name =
                  match name with
                  [ Epers_Name n -> n <> string_empty
@@ -2619,12 +2620,11 @@ value treat_fam_fevent gen ifath imoth r =
                efam_src = add_string gen src;
                efam_witnesses = witnesses}
             in
-            (* On n'ajoute que les évènements non vides. *)
-            if date <> None || place <> "" || note <> "" ||
-               src <> "" || witnesses <> [| |]
-            then
-              [ evt :: events ]
-            else events )
+            (* On ajoute toujours les évènements principaux liés à la   *)
+            (* famille, sinon, on peut avoir un problème si on supprime *)
+            (* l'évènement, celui ci sera remplacé par la relation par  *)
+            (* défaut.                                                  *)
+            [ evt :: events ])
           events (find_all_fields tag r.rsons) )
       [] primary_fevents
   in
@@ -2679,8 +2679,14 @@ value treat_fam_fevent gen ifath imoth r =
                   efam_src = add_string gen src;
                   efam_witnesses = witnesses}
                in
-               (* On n'ajoute que les évènements non vides. *)
-               if date <> None || place <> "" || note <> "" ||
+               (* On ajoute que les évènements non vides, *)
+               (* sauf si évènement personnalisé !        *)
+               let has_efam_name =
+                 match name with
+                 [ Efam_Name n -> n <> string_empty
+                 | _ -> False ]
+               in
+               if has_efam_name || date <> None || place <> "" || note <> "" ||
                   src <> "" || witnesses <> [| |]
                then
                  [ evt :: events ]
