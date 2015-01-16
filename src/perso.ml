@@ -553,16 +553,21 @@ value print_sosa conf base p link =
             in
             Wserver.wprint "<a href=\"%s%s\" style=\"text-decoration:none\">"
               (commd conf) sosa_link;
-          Wserver.wprint "<img src=\"%s/%s\" alt=\"sosa\" title=\""
-            (image_prefix conf) "sosa.png";
-          let direct_ancestor =
-            Name.strip_c (p_first_name base ref) '"' ^ " "
-            ^ Name.strip_c (p_surname base ref) '"'
+          let title =
+            if (is_hide_names conf ref) && not (fast_auth_age conf ref) then ""
+            else
+              let direct_ancestor =
+                Name.strip_c (p_first_name base ref) '"' ^ " "
+                ^ Name.strip_c (p_surname base ref) '"'
+              in
+              Printf.sprintf
+                (fcapitale
+                   (ftransl conf "direct ancestor of %s")) direct_ancestor ^
+                Printf.sprintf ", Sosa: %s"
+                  (string_of_num (transl conf "(thousand separator)") sosa_num)
           in
-          Wserver.wprint
-            (fcapitale (ftransl conf "direct ancestor of %s")) direct_ancestor;
-          Wserver.wprint ", Sosa: %s\"/> "
-            (string_of_num (transl conf "(thousand separator)") sosa_num);
+          Wserver.wprint "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/>"
+            (image_prefix conf) title;
           if conf.cancel_links || not link then ()
           else  Wserver.wprint "</a> ";
         }
