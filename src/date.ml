@@ -704,7 +704,7 @@ value short_dates_text conf base p =
     in
     if s <> "" then
       (* Pour IE11, il faut specifier le display inline-block. *)
-      " <em><bdo dir=\"ltr\" style=\"display:inline-block\">" ^ s ^ "</bdo></em>"
+      " <em><bdo dir=\"ltr\" class=\"inline-short-dates-text\">" ^ s ^ "</bdo></em>"
     else s
   else ""
 ;
