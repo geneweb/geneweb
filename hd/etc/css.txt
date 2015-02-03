@@ -1364,6 +1364,12 @@ div.select:hover ul
 
 /* ---------------------- Ascendants and Descendants ---------------------- */
 
+/* -- short dates text: IE11, il faut specifier le display inline-block. -- */
+.inline-short-dates-text
+{
+  display:inline-block;
+}
+
 /* --- Ascendants/Descendants menu --- */
 .ascends_menu_list, .ascends_menu_tree, .ascends_menu_other,
 .descends_menu_list, .descends_menu_tree, .descends_menu_other
