@@ -1598,8 +1598,9 @@ value events_list conf base p =
     else []
   in
   let fevents =
-    List.fold_left
-      (fun fevents ifam ->
+    (* On conserve l'ordre des familles. *)
+    List.fold_right
+      (fun ifam fevents ->
          let fam = foi base ifam in
          let ifath = get_father fam in
          let imoth = get_mother fam in
@@ -1631,7 +1632,7 @@ value events_list conf base p =
              | _ -> failwith "events_list" ]),
             (fun (_, date, _, _, _, _, _) -> date))
            fam_fevents fevents)
-      [] (Array.to_list (get_family p))
+      (Array.to_list (get_family p)) []
   in
   CheckItem.merge_events
     ((fun (name, _, _, _, _, _, _) ->
