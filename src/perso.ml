@@ -1625,23 +1625,14 @@ value events_list conf base p =
                (get_fevents fam) []
            else []
          in
-         [fam_fevents :: fevents])
-      (Array.to_list (get_family p)) []
-  in
-  (* On fait la fusion seulement une fois qu'on a tous les evt, *)
-  (* comme ça on conserve à la fois l'ordre des familles et     *)
-  (* l'ordre des evt.                                           *)
-  let fevents =
-    List.fold_left
-      (fun fevents fam_fevents ->
          CheckItem.merge_events
            ((fun (name, _, _, _, _, _, _) ->
              match name with
              [ Fevent n -> CheckItem.Fsort n
              | _ -> failwith "events_list" ]),
             (fun (_, date, _, _, _, _, _) -> date))
-           fam_fevents fevents)
-      [] fevents
+         fam_fevents fevents)
+      (Array.to_list (get_family p)) []
   in
   CheckItem.merge_events
     ((fun (name, _, _, _, _, _, _) ->
