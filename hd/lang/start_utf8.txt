@@ -8,7 +8,7 @@ af: Genealogie/Familiekunde
 bg: Genealogy
 br: Genealogiezh
 ca: Genealogia
-cs: Genealogy
+cs: Genealogie
 da: Genealogi
 de: Genealogie
 en: Genealogy
@@ -23,6 +23,7 @@ it: Genealogia
 lv: Ģenealoģija
 nl: Genealogie
 no: Genealogi
+oc: Genealogia
 pl: Genealogia
 pt: Genealogia
 ro: Genealogie
@@ -95,6 +96,7 @@ it: Base di dati genealogica
 lv: Ciltsrakstu datu bāze
 nl: Genealogische databank
 no: Genealogisk database
+oc: Basa de donadas genealogica
 pl: Genealogiczna baza danych
 pt: Base de Dados Geneal&oacute;gica
 ro: Baza de date genealogice
@@ -153,6 +155,8 @@ lv: Datu bāze <span class="highlight">"%t"</span> patreiz satur %n personas.
 nl: Deze databank <span class="highlight">"%t"</span> bevat nu %n personen.
 no: Databasen <span class="highlight">"%t"</span> inneholder n&aring; %n
     personer.
+oc: La basa de donadas <span class="highlight">"%t"</span> conten
+    actualament %n personas.
 pl: Baza danych <span class="highlight">"%t"</span> zawiera obecnie osób: %n.
 pt: A base de dados <span class="highlight">"%t"</span> cont&eacute;m
     actualmente %n pessoas.
@@ -214,6 +218,9 @@ nl: Toegang als
     (wachtwoord)
 no: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br%/>
     (passord)
+oc: acc&egrave;s <a %P
+    href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/> %P
+    (mot de Santa Clara).
 pl: <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostęp<br%/>
     (hasło)
 pt: Entrada <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
@@ -249,6 +256,7 @@ it: <a href="%sw=f"><em>amico</em></a> access<br%/> (password)
 lv: <a href="%sw=f"><em>Friend</em></a> access<br%/> (password)
 nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br%/> (wachtwoord)
 no: <a href="%sw=f"><em>Venners</em></a> adgang<br%/> (passord)
+oc: acc&egrave;s <a href="%sw=f"><em>amic</em></a> <br%/> (mot de Santa Clara)
 pl: <a href="%sw=f"><em>"Friend"</em></a> dostęp<br%/> (hasło)
 pt: Entrada <a href="%sw=f"><em>amigo</em></a><br%/> (palavra chave)
 ro: Acces pentru <a href="%sw=f"><em>amici</em></a><br%/> (parola)
@@ -284,6 +292,7 @@ it: Parola d'accesso, per accesso dell' <em>amico</em> o del <em>wizard</em>:
 lv: Password, for <em>friend</em> or <em>wizard</em> access:
 nl: Wachtwoord, voor toegang als <em>vriend</em> of <em>tovenaar</em>:
 no: Passord, for <em>venner</em> eller <em>oppdaterings</em> adgang:
+oc: Mot de Santa Clara, per acc&egrave;s <em>amic</em> o <em>administrator</em>:
 pl: Hasło dla dostępu <em>"friend"</em> lub <em>"wizard"</em> :
 pt: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
 ro: Parola, pentru acces de <em>amic</em> sau <em>magician</em>:
@@ -323,6 +332,7 @@ it: Per sfogliare questa base di dati, si pu&ograve; fare una ricerca:
 lv: Jūs variet meklēt šinī datu bāzē:
 nl: Om deze databank te consulteren, kan u een opzoeking doen:
 no: For &aring; navigere i databasen, kan du s&oslash;ke:
+oc: Per navigar dins aquela basa, pod&egrave;tz far v&ograve;stra rec&egrave;rca:
 pl: Aby poruszać się po bazie, możesz:
 pt: Para consultar esta base de dados, pode procurar:
 ro: pentru folosirea basei de date poti sa selectezi:
@@ -360,6 +370,7 @@ it: per persona
 lv: personas
 nl: op naam
 no: etter person
+oc: per persona
 pl: znaleźć osobę:
 pt: por pessoa
 ro: persoane
@@ -425,6 +436,7 @@ it: per titolo
 lv: tituls
 nl: op titel
 no: etter titel
+oc: per t&iacute;tol
 pl: znaleźć: tytuł
 pt: por t&iacute;tulo
 ro: titlu
@@ -479,6 +491,7 @@ it: <span class="highlight">per la lista</span> di tutti i
 lv: <span class="highlight">visus</span>
 nl: <span class="highlight">via de lijst</span> van alle
 no: <span class="highlight">med liste</span> over alle
+oc: <span class="highlight">per la lista</span> de totes los
 pl: <span class="highlight">przejrzeć listę</span> wszystkich
 pt: <span class="highlight">pela lista</span> de todos os
 ro: <span class="highlight">pe lista</span> tuturor
@@ -509,6 +522,7 @@ it: cognomi
 lv: uzvārdus
 nl: familienamen
 no: etternavn
+oc: noms de familha
 pl: nazwisk
 pt: apelidos
 pt-br: sobrenomes
@@ -523,7 +537,7 @@ af: voorname
 bg: собствени имена
 br: raganvioù
 ca: noms
-cs: křestní jméno
+cs: křestní jména
 da: fornavne
 de: Vornamen
 en: first names
@@ -538,6 +552,7 @@ it: nomi
 lv: vārdus
 nl: voornamen
 no: fornavn
+oc: prenoms
 pl: imion
 pt: nomes pr&oacute;prios
 pt-br: prenomes
@@ -569,6 +584,7 @@ it: in ordine
 lv:
 nl: volgens
 no: sortert
+oc: per
 pl: ułożonych
 pt: por
 ro: in
@@ -599,6 +615,7 @@ it: alfabetico
 lv: alfabētiskā kārtībā
 nl: alfabet
 no: alfabetisk
+oc: &ograve;rdre alfabetic
 pl: w porządku alfabetycznym
 pt: ordem alfab&eacute;tica
 ro: ordine alfabetica
@@ -628,6 +645,7 @@ it: di frequenza
 lv: pēc sastopamības
 nl: aantal
 no: etter frekvens
+oc: frequ&eacute;ncia
 pl: według częstości występowania
 pt: frequ&ecirc;ncia
 ro: dupa frecventa
@@ -668,6 +686,7 @@ it: per
 lv:
 nl: via
 no: etter
+oc: per
 pl: przejrzeć listę:
 pt: por
 ro: cu
@@ -742,6 +761,9 @@ nl: <span class="highlight">via een</span>
 no: <span class="highlight">gjennom</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>avansert
        s&oslash;king</b></font></a>.
+oc: <span class="highlight">per la</span>
+       <a href="%sm=H;v=advanced"><font color="%i"><b>rec&egrave;rca
+       avan&ccedil;ada</b></font></a>.
 pl: <span class="highlight">skorzystać z</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>wyszukiwania
        zaawansowanego</b></font></a>.
@@ -791,6 +813,7 @@ it: Si pu&ograve;
 lv: Izmaiņu veikšana:
 nl: U kunt:
 no: Du kan
+oc: Pod&egrave;tz
 pl: Możesz:
 pt: Pode
 ro: Tu poti
@@ -825,6 +848,7 @@ it: aggiungere una famiglia
 lv: pievienot ģimeni
 nl: een familie toevoegen
 no: legge til en familie
+oc: apondre una familha
 pl: dodać rodzinę (parę)
 pt: acrescentar uma família
 ro: adauga o familie
@@ -859,6 +883,7 @@ it: modificare le note
 lv: labot piezīmes
 nl: de aantekeningen wijzigen
 no: endre notater
+oc: modificar las n&ograve;tas
 pl: zmodyfikować uwagi
 pt: modificar as notas
 ro: modifica nota
@@ -898,6 +923,7 @@ it: Si pu&ograve; anche consultare
 lv: Informācija par:
 nl: U kunt de volgende zaken bekijken:
 no: Du kan ogs&aring; sl&aring; opp
+oc: Tanben pod&egrave;tz consultar
 pl: Możesz także obejrzeć:
 pt: Tamb&eacute;m pode consultar
 ro: poti consulta
@@ -973,6 +999,8 @@ lv: Kopš %D datu bāze ir apmeklēta %q reizes, %c no tiem ir bijuši šinī
 nl: Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
     deze verwelkomingspagina.
 no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
+oc: I a agut %q visitas, mai particularament %c sus aquela pagina, 
+    dempu&egrave;i lo %d.
 pl: Baza została od %d odwiedzona %q razy (w tym %c razy strona tytułowa).
 pt: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
 ro: Au avut loc %q accese din care %c pe aceatsa pagina din %d
@@ -1048,6 +1076,10 @@ nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
 no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
     oppfrisking av den aktuelle siden), prøv da å navigere <a
     href="%sescache=0">herfra</a>.
+oc: Si v&ograve;stre navigaire actualiza pas automaticament las paginas
+    modificadas (e vos f&ograve;r&ccedil;a a actualizar manualament
+    la pagina), ensajatz de navigar a partir d'<a href="%sescache=0">aquela
+    adre&ccedil;a</a>.
 pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron 
     (zmuszając cię do ich ręcznego odświeżania), kliknij <a
     href="%sescache=0">tutaj</a>.
@@ -1095,6 +1127,7 @@ he: לקסיקון
 is: orðasafn
 it: lessico 
 no: leksikon
+oc: lexic
 pl: leksykon
 ro: lexicon
 sl: leksikon
