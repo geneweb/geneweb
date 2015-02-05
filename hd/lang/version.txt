@@ -33,6 +33,7 @@ lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
 nl: U kunt een andere taal kiezen uit een van de volgende mogelijkheden:
 no: Du kan velge sidevisning p&aring; et annet spr&aring;k blant
     f&oslash;lgende:
+oc: Vos pod&egrave;tz causir una autra lengua, dem&egrave;st las que son disponiblas:
 pl: Możesz wybrać inny język spośród następujących:
 ro: poti sa alegi una din urmatoarele limbi pentru afisaj
 sl: Lahko izberete drug jezik:
@@ -175,6 +176,13 @@ sv: Du kan välja ett annat språk bland de följande:
            id="ino" style="border: 0"%/><span>%uno;</span></a>
         </li>
         <li>
+          <a title="%uoc;" href="%glang=oc"
+           onmouseover="if (WorkOnBrowser()) ino.src='%o/t-oc.png'"
+           onmouseout="ioc.src='%o/l-oc.jpg'"><img
+           src="%o/l-oc.jpg" width="36" height="22" alt=""
+           id="ioc" style="border: 0"%/><span>%uoc;</span></a>
+        </li>
+        <li>
           <a title="%upl;" href="%glang=pl"
            onmouseover="if (WorkOnBrowser()) ipl.src='%o/t-pl.png'"
            onmouseout="ipl.src='%o/l-pl.jpg'"><img
@@ -236,6 +244,7 @@ sv: Du kan välja ett annat språk bland de följande:
   <p><strong><font color=red>[
 en: Wizard rights are now suspended for maintenance.
 fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
+oc: Los drreches dels fachilhièrs son suspenduts per ara per mantenença.
 ]</font></strong>
   <p>
 %E
