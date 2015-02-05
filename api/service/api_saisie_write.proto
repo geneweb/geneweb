@@ -442,6 +442,8 @@ message ModificationStatus {
   optional CreateConflict conflict = 8;
   optional string lastname_str = 9;
   optional string firstname_str = 10;
+  optional string n = 11;
+  optional string p = 12;
 }
 
 
