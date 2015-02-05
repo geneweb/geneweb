@@ -334,7 +334,13 @@ let print_find_sosa conf base =
         let p = poi base ip in
         let rec loop faml =
           match faml with
-          | [] -> ref_person
+          | [] ->
+              (* On reconstruit la ref_person pour être sûr des accents. *)
+              M.Reference_person#{
+                n = Name.lower sn;
+                p = Name.lower fn;
+                oc = occ;
+              }
           | ifam :: faml ->
               let fam = foi base ifam in
               match (Array.to_list (get_children fam)) with
