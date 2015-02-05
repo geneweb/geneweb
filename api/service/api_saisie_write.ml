@@ -1127,6 +1127,8 @@ let compute_modification_status conf base ip ifam resp =
       else
         (surname, first_name, occ, index_person, surname_str, first_name_str)
   in
+  let sn = if surname = "" then None else Some (Name.lower surname) in
+  let fn = if first_name = "" then None else Some (Name.lower first_name) in
   let index_family = if ifam < 0 then None else Some (Int32.of_int ifam) in
   let (is_base_updated, warnings, conflict, history_records) =
     compute_warnings conf base resp
@@ -1153,6 +1155,8 @@ let compute_modification_status conf base ip ifam resp =
       conflict = conflict;
       lastname_str = surname_str;
       firstname_str = first_name_str;
+      n = sn;
+      p = fn;
     }
   in
   let data = Mext_write.gen_modification_status response in
@@ -2990,6 +2994,8 @@ let print_add_first_fam conf =
      Some mod_p.Mwrite.Person.lastname,
      Some mod_p.Mwrite.Person.firstname)
   in
+  let sn = if surname = "" then None else Some (Name.lower surname) in
+  let fn = if first_name = "" then None else Some (Name.lower first_name) in
   let index_family = None in
   let (is_base_updated, warnings, conflict, history_records) =
     match resp with
@@ -3009,6 +3015,8 @@ let print_add_first_fam conf =
       conflict = conflict;
       lastname_str = surname_str;
       firstname_str = first_name_str;
+      n = sn;
+      p = fn;
     }
   in
   let data = Mext_write.gen_modification_status response in
