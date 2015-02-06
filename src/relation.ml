@@ -798,7 +798,7 @@ value print_link_name conf base n p1 p2 sol =
       let sp2 = pp2 <> None in
       if x2 = 0 then
         if sp1 && x1 = 1 then
-          (parent_in_law_label conf (get_sex ini_p2) (get_sex ini_p1),
+          (parent_in_law_label conf (get_sex ini_p1) (get_sex ini_p2),
            False, sp2)
         else
           let info = ((info, x1), fun r -> r.Consang.lens1) in
