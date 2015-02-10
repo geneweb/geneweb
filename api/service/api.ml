@@ -1038,6 +1038,22 @@ let print_base_warnings conf base =
   Check.check_base base
     (Api_warnings.set_list errors) (Api_warnings.set_list warnings)
     (fun _ -> true) (fun _ -> ()) false;
+  (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
+  (* levé par plusieurs fonctions différents selon le context.       *)
+  let warnings =
+    let ht = Hashtbl.create 1 in
+    let rec loop wl accu =
+      match wl with
+      | [] -> accu
+      | x :: wl ->
+          if Hashtbl.mem ht (Hashtbl.hash x) then loop wl accu
+          else begin
+            Hashtbl.add ht (Hashtbl.hash x) true;
+            loop wl (x :: accu)
+          end
+    in
+    loop !warnings []
+  in
   let base_loop = has_base_loop conf base in
   let () = Perso.build_sosa_ht conf base in
   let () = load_image_ht conf base in
@@ -1048,7 +1064,7 @@ let print_base_warnings conf base =
   List.iter
     (Api_warnings.add_warning_to_piqi_warning_list
        conf base base_loop Perso.get_sosa_person true)
-    !warnings;
+    warnings;
   (* On propage les modifications pour les warnings ChangedOrderOf... *)
   List.iter
     (fun warn ->
@@ -1058,14 +1074,14 @@ let print_base_warnings conf base =
       | ChangedOrderOfMarriages (p, _, after) ->
           patch_union base (get_key_index p) {family = after}
       | _ -> ()))
-    !warnings;
+    warnings;
   (* Attention, les FLEX peuvent aussi faire un calcul de warning, *)
   (* mais on n'applique pas la modification de la base.            *)
   if conf.wizard then Util.commit_patches conf base
   else ();
   let data =
     if filters.nb_results then
-      let len = List.length !errors + List.length !warnings in
+      let len = List.length !errors + List.length warnings in
       let len = M.Internal_int32#{value = Int32.of_int len} in
       Mext.gen_internal_int32 len
     else
