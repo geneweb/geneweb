@@ -45,7 +45,21 @@ value check_base bname = do {
   Check.check_base base (set_list errors) (set_list warnings)
     (fun _ -> True) changed_p False;
   List.iter (print_error base) (List.rev errors.val);
-  List.iter (print_warning base) (List.rev warnings.val);
+  (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
+  (* levé par plusieurs fonctions différents selon le context.       *)
+  let wl =
+    let ht = Hashtbl.create 1 in
+    loop warnings.val [] where rec loop wl accu =
+      match wl with
+      [ [] -> accu
+      | [x :: wl] ->
+          if Hashtbl.mem ht (Hashtbl.hash x) then loop wl accu
+          else do {
+            Hashtbl.add ht (Hashtbl.hash x) True;
+            loop wl [x :: accu]
+          } ]
+  in
+  List.iter (print_warning base) wl;
   flush stdout;
 };
 

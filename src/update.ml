@@ -473,6 +473,20 @@ value print_warnings conf base wl =
   else do {
     Wserver.wprint "%s\n" (capitale (transl conf "warnings"));
     tag "ul" begin
+      (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
+      (* levé par plusieurs fonctions différents selon le context.       *)
+      let wl =
+        let ht = Hashtbl.create 1 in
+        loop wl [] where rec loop wl accu =
+          match wl with
+          [ [] -> accu
+          | [x :: wl] ->
+              if Hashtbl.mem ht (Hashtbl.hash x) then loop wl accu
+              else do {
+                Hashtbl.add ht (Hashtbl.hash x) True;
+                loop wl [x :: accu]
+              } ]
+      in
       List.iter
         (fun w ->
            do {
