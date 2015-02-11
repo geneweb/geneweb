@@ -175,9 +175,9 @@ value rmdir conf dir =
   (* Toute l'arborescence de dir *)
   let (folders, files) = loop [dir] [] [] in
   do {
-    List.iter Unix.unlink files;
-    List.iter Unix.rmdir folders;
-    Unix.rmdir dir
+    List.iter (fun f -> try Unix.unlink f with [ _ -> () ]) files;
+    List.iter (fun f -> try Unix.rmdir f with [ _ -> () ]) folders;
+    try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ]
   }
 ;
 
