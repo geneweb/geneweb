@@ -109,9 +109,14 @@ let error_conflict_person_link conf base (f, s, o, create, var) =
   match create with
   | Update.Create (_, _) ->
       if f <> "?" && s <> "?" then
+        (match Gwdb.persons_of_name base (f ^ " " ^ s) with
+         | [] -> false
+         | _ -> true)
+        (*
         (match Gwdb.person_of_key base f s o with
          | Some ip -> true
          | None -> false)
+        *)
              (*
              let fn = Util.translate_eval f in
              let sn = Util.translate_eval s in
