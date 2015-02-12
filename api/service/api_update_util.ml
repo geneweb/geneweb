@@ -103,15 +103,39 @@ type update_base_status =
 (* Exception qui gère les conflits de création de personnes. *)
 exception ModErrApiConflict of Mwrite.Create_conflict.t ;;
 
-let error_conflict_person_link conf base (f, s, o, create, var) =
+let error_conflict_person_link conf base (f, s, o, create, var, force_create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
   | Update.Create (_, _) ->
       if f <> "?" && s <> "?" then
-        (match Gwdb.persons_of_name base (f ^ " " ^ s) with
+        if force_create then
+          (* On a dit qu'on voulait forcer la création, donc on a *)
+          (* calculer un occ de libre, si c'est pas le cas, c'est *)
+          (* une erreur, et on doit quitter.                      *)
+          match Gwdb.person_of_key base f s o with
+          | Some ip -> failwith "error_conflict_person_link"
+          | None -> false
+        else
+          match Gwdb.persons_of_name base (f ^ " " ^ s) with
          | [] -> false
-         | _ -> true)
+          | l ->
+              (* On test nom et prénom individuellement, si c'est  *)
+              (* trop gourmand, alors on pourrait juste dire qu'il *)
+              (* y a un conflit.                                   *)
+              let f = Name.lower f in
+              let s = Name.lower s in
+              let rec loop l =
+                match l with
+                | [] -> false
+                | ip :: l ->
+                    let p = poi base ip in
+                    let fn = Name.lower (sou base (get_first_name p)) in
+                    let sn = Name.lower (sou base (get_surname p)) in
+                    if fn = f && sn = s then true
+                    else loop l
+              in
+              loop l
         (*
         (match Gwdb.person_of_key base f s o with
          | Some ip -> true
@@ -182,9 +206,9 @@ let check_person_conflict conf base sp =
         | [] -> ()
         | r :: l ->
             match (r.r_fath, r.r_moth) with
-            | (Some (f, s, o, create, var), None) |
-              (None, Some (f, s, o, create, var)) ->
-                if error_conflict_person_link conf base (f, s, o, create, var) then
+            | (Some (f, s, o, create, var, force_create), None) |
+              (None, Some (f, s, o, create, var, force_create)) ->
+                if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
                   let form = Some `person_form1 in
                   let conflict =
                     Mwrite.Create_conflict#{
@@ -215,8 +239,8 @@ let check_person_conflict conf base sp =
             let rec loop2 witnesses j =
               match witnesses with
               | [] -> ()
-              | ((f, s, o, create, var), _) :: l ->
-                  if error_conflict_person_link conf base (f, s, o, create, var) then
+              | ((f, s, o, create, var, force_create), _) :: l ->
+                  if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
                     let form = Some `person_form1 in
                     let conflict =
                       Mwrite.Create_conflict#{
@@ -247,8 +271,8 @@ let check_family_conflict conf base sfam scpl sdes =
   let rec loop parents i =
     match parents with
     | [] -> ()
-    | (f, s, o, create, var) :: l ->
-        if error_conflict_person_link conf base (f, s, o, create, var) then
+    | (f, s, o, create, var, force_create) :: l ->
+        if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
           let form =
             if i = 0 then Some `person_form1
             else  Some `person_form2
@@ -279,8 +303,8 @@ let check_family_conflict conf base sfam scpl sdes =
         let rec loop2 witnesses j =
           match witnesses with
           | [] -> ()
-          | ((f, s, o, create, var), _) :: l ->
-              if error_conflict_person_link conf base (f, s, o, create, var) then
+          | ((f, s, o, create, var, force_create), _) :: l ->
+              if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
                 let form = Some `family_form in
                 let conflict =
                   Mwrite.Create_conflict#{
@@ -307,8 +331,8 @@ let check_family_conflict conf base sfam scpl sdes =
   let rec loop children i =
     match children with
     | [] -> ()
-    | (f, s, o, create, var) :: l ->
-        if error_conflict_person_link conf base (f, s, o, create, var) then
+    | (f, s, o, create, var, force_create) :: l ->
+        if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
           let form = Some `person_form1 in
           let conflict =
             Mwrite.Create_conflict#{

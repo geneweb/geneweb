@@ -35,7 +35,7 @@ let reconstitute_family conf base mod_f =
           if fn = "?" || sn = "?" then Adef.int_of_iper (get_key_index p)
           else get_occ p
         in
-        (fn, sn, occ, Update.Link, ""))
+        (fn, sn, occ, Update.Link, "", false))
       mod_f.Mwrite.Family.old_witnesses
   in
   let fevents =
@@ -113,7 +113,7 @@ let reconstitute_family conf base mod_f =
                            | Some occ -> Int32.to_int occ
                            | None -> 0
                          in
-                         ((fn, sn, occ, Update.Create (sex, None), ""), wk)
+                         ((fn, sn, occ, Update.Create (sex, None), "", false), wk)
                      | `create ->
                          let sex =
                            match person.Mwrite.Person_link.sex with
@@ -133,7 +133,7 @@ let reconstitute_family conf base mod_f =
                            else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
                          in
                          *)
-                         ((fn, sn, occ, Update.Create (sex, None), ""), wk)
+                         ((fn, sn, occ, Update.Create (sex, None), "", true), wk)
                      | `link ->
                          let ip = Int32.to_int person.Mwrite.Person_link.index in
                          let p = poi base (Adef.iper_of_int ip) in
@@ -154,7 +154,7 @@ let reconstitute_family conf base mod_f =
                                    (Int32.to_int person.Mwrite.Person_link.index)))
                          in
                          *)
-                         ((fn, sn, occ, Update.Link, ""), wk))
+                         ((fn, sn, occ, Update.Link, "", false), wk))
                   in
                   wit :: accu
               | None -> accu)
@@ -202,7 +202,7 @@ let reconstitute_family conf base mod_f =
             | Some occ -> Int32.to_int occ
             | None -> 0
           in
-          (fn, sn, occ, Update.Create (sex, None), "")
+          (fn, sn, occ, Update.Create (sex, None), "", false)
       | `create ->
           let fn = father.Mwrite.Person.firstname in
           let sn = father.Mwrite.Person.lastname in
@@ -216,7 +216,7 @@ let reconstitute_family conf base mod_f =
             if occ = 0 then father.Mwrite.Person.occ <- None
             else father.Mwrite.Person.occ <- Some (Int32.of_int occ)
           in
-          (fn, sn, occ, Update.Create (sex, None), "")
+          (fn, sn, occ, Update.Create (sex, None), "", true)
       | `link ->
           let ip = Int32.to_int father.Mwrite.Person.index in
           let p = poi base (Adef.iper_of_int ip) in
@@ -236,7 +236,7 @@ let reconstitute_family conf base mod_f =
             | None -> 0
           in
           *)
-          (fn, sn, occ, Update.Link, "")
+          (fn, sn, occ, Update.Link, "", false)
     in
     let mother = mod_f.Mwrite.Family.mother in
     let sex =
@@ -255,7 +255,7 @@ let reconstitute_family conf base mod_f =
             | Some occ -> Int32.to_int occ
             | None -> 0
           in
-          (fn, sn, occ, Update.Create (sex, None), "")
+          (fn, sn, occ, Update.Create (sex, None), "", false)
       | `create ->
           let fn = mother.Mwrite.Person.firstname in
           let sn = mother.Mwrite.Person.lastname in
@@ -269,7 +269,7 @@ let reconstitute_family conf base mod_f =
             if occ = 0 then mother.Mwrite.Person.occ <- None
             else mother.Mwrite.Person.occ <- Some (Int32.of_int occ)
           in
-          (fn, sn, occ, Update.Create (sex, None), "")
+          (fn, sn, occ, Update.Create (sex, None), "", true)
       | `link ->
           let ip = Int32.to_int mother.Mwrite.Person.index in
           let p = poi base (Adef.iper_of_int ip) in
@@ -289,7 +289,7 @@ let reconstitute_family conf base mod_f =
             | None -> 0
           in
           *)
-          (fn, sn, occ, Update.Link, "")
+          (fn, sn, occ, Update.Link, "", false)
     in
     [father; mother]
   in
@@ -311,7 +311,7 @@ let reconstitute_family conf base mod_f =
                | Some occ -> Int32.to_int occ
                | None -> 0
              in
-             (fn, sn, occ, Update.Create (sex, None), "")
+             (fn, sn, occ, Update.Create (sex, None), "", false)
          | `create ->
              let sex =
                match child.Mwrite.Person_link.sex with
@@ -331,7 +331,7 @@ let reconstitute_family conf base mod_f =
                if occ = 0 then child.Mwrite.Person_link.occ <- None
                else child.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
              in
-             (fn, sn, occ, Update.Create (sex, None), "")
+             (fn, sn, occ, Update.Create (sex, None), "", true)
          | `link ->
              let ip = Int32.to_int child.Mwrite.Person_link.index in
              let p = poi base (Adef.iper_of_int ip) in
@@ -349,7 +349,7 @@ let reconstitute_family conf base mod_f =
              let child = poi base (Adef.iper_of_int ip_child) in
              let occ = get_occ child in
              *)
-             (fn, sn, occ, Update.Link, ""))
+             (fn, sn, occ, Update.Link, "", false))
       mod_f.Mwrite.Family.children
   in
   (* Attention, surtout pas les witnesses, parce que si on en créé un, *)
@@ -389,6 +389,41 @@ let reconstitute_family conf base mod_f =
   (* de conflits par les autres modules : update,  *)
   (* updateIndOk et updateFamOk.                   *)
   let _err = Api_update_util.check_family_conflict conf base fam cpl des in
+  (* Maintenant qu'on a fini les conflit, on remet l'objet person *)
+  (* tel que pour GeneWeb, c'est à dire qu'on supprime l'option   *)
+  (* force_create.                                                *)
+  let witnesses_gw =
+    List.map
+      (fun (f, s, o, create, var, _) -> (f, s, o, create, var))
+      witnesses
+  in
+  let fevents_gw =
+    List.map
+      (fun e ->
+        let w =
+          Array.map
+            (fun ((f, s, o, create, var, _), wk) ->
+              ((f, s, o, create, var), wk))
+            e.efam_witnesses
+        in
+        {(e) with efam_witnesses = w})
+      fevents
+  in
+  let parents_gw =
+    List.map
+      (fun (f, s, o, create, var, _) -> (f, s, o, create, var))
+      parents
+  in
+  let children_gw =
+    List.map
+      (fun (f, s, o, create, var, _) -> (f, s, o, create, var))
+      children
+  in
+  let fam =
+    {(fam) with witnesses = Array.of_list witnesses_gw; fevents = fevents_gw}
+  in
+  let cpl = Futil.parent conf.multi_parents (Array.of_list parents_gw) in
+  let des = {children = Array.of_list children_gw} in
   (fam, cpl, des)
 ;;
 
