@@ -3134,6 +3134,108 @@ value of_course_died conf p =
   | _ -> False ]
 ;
 
+
+(* Hashtbl pour avoir le plus de flexibilité. *)
+(* TODO : il faudrait que ce soit intégrer dans la base directement. *)
+type cache_info_t = Hashtbl.t string string;
+
+(* valeur dans le cache. *)
+value cache_nb_base_persons = "cache_nb_persons";
+
+(* Hashtbl utilisée tant qu'on a pas commit le patch. *)
+value (ht_cache_info : cache_info_t) = Hashtbl.create 1;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] cache_info : config -> string                                    *)
+(** [Description] : Renvoie le chemin du fichier de cache d'info de la base.
+    [Args] :
+      - config : configuration de la base
+    [Retour] : unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value cache_info conf =
+  let bname =
+    if Filename.check_suffix conf.bname ".gwb" then conf.bname
+    else conf.bname ^ ".gwb"
+  in
+  Filename.concat (base_path [] bname) "cache_info"
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] read_cache_info : config -> cache_info_t                         *)
+(** [Description] : Lit le fichier de cache pour les infos d'une base.
+    [Args] :
+      - conf : configuration de la base
+    [Retour] : Hashtbl cache_info_t
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value read_cache_info conf =
+  let fname = cache_info conf in
+  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let ht : cache_info_t = input_value ic in
+      do { close_in ic; ht }
+  | None -> ht_cache_info ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] write_cache_info : config -> cache_info_t -> unit                *)
+(** [Description] : Met à jour le fichier de cache des infos d'une base.
+    [Args] :
+      - conf : configuration de la base
+      - ht   : Hashtbl cache_info_t
+    [Retour] : unit
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+value write_cache_info conf =
+  let ht_cache = read_cache_info conf in
+  (* On met à jour la table en mémoire, avec toutes les valeurs qui *)
+  (* sont dans le cache fichier mais pas dans celle en mémoire.     *)
+  let () =
+    Hashtbl.iter
+      (fun k v ->
+         if not (Hashtbl.mem ht_cache_info k) then
+           Hashtbl.add ht_cache_info k v
+         else ())
+      ht_cache
+  in
+  let fname = cache_info conf in
+  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
+  [ Some oc -> do { output_value oc ht_cache_info; close_out oc }
+  | None -> () ]
+;
+
+
+(* ************************************************************************ *)
+(*  [Fonc] patch_cache_info :
+             config -> ((string * string) -> (string * string)) -> unit     *)
+(** [Description] : Met à jour le fichier de cache.
+    [Args] :
+      - conf : configuration de la base
+      - (key, value) : la clé et valeur de cache à mettre à jour
+    [Retour] : unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value patch_cache_info conf k f =
+  (* On met à jour le cache avec la nouvelle valeur. *)
+  (* Si la clé n'existe pas dans la liste, c'est pas grave, elle sera *)
+  (* ajouté lors de la création du cache.                             *)
+  try
+    let v = Hashtbl.find ht_cache_info k in
+    Hashtbl.replace ht_cache_info k (f v)
+  with
+  [ Not_found ->
+      try
+        let cache_info = read_cache_info conf in
+        let v = Hashtbl.find cache_info k in
+        Hashtbl.replace ht_cache_info k (f v)
+      with [ Not_found ->  () ] ]
+;
+
+
 value escache_value base =
   let t = Gwdb.date_of_last_change base in
   let v = int_of_float (mod_float t (float_of_int max_int)) in
@@ -3195,6 +3297,7 @@ value update_wf_trace conf fname =
 value commit_patches conf base =
   do {
     Gwdb.commit_patches base;
+    write_cache_info conf;
     conf.henv :=
       List.map
         (fun (k, v) ->
@@ -3780,89 +3883,6 @@ value record_visited conf ip =
 (**/**)
 
 
-(* Hashtbl pour avoir le plus de flexibilité. *)
-(* TODO : il faudrait que ce soit intégrer dans la base directement. *)
-type cache_info_t = Hashtbl.t string string;
-
-(* valeur dans le cache. *)
-value cache_nb_base_persons = "cache_nb_persons";
-
-
-(* ************************************************************************ *)
-(*  [Fonc] cache_info : config -> string                                    *)
-(** [Description] : Renvoie le chemin du fichier de cache d'info de la base.
-    [Args] :
-      - config : configuration de la base
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-value cache_info conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (base_path [] bname) "cache_info"
-;
-
-
-(* ************************************************************************ *)
-(*  [Fonc] read_cache_info : config -> cache_info_t                         *)
-(** [Description] : Lit le fichier de cache pour les infos d'une base.
-    [Args] :
-      - conf : configuration de la base
-    [Retour] : Hashtbl cache_info_t
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-value read_cache_info conf =
-  let fname = cache_info conf in
-  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      let ht : cache_info_t = input_value ic in
-      do { close_in ic; ht }
-  | None -> Hashtbl.create 1 ]
-;
-
-
-(* ************************************************************************ *)
-(*  [Fonc] write_cache_info : config -> cache_info_t -> unit                *)
-(** [Description] : Met à jour le fichier de cache des infos d'une base.
-    [Args] :
-      - conf : configuration de la base
-      - ht   : Hashtbl cache_info_t
-    [Retour] : unit
-    [Rem] : Non exporté en clair hors de ce module.                         *)
-(* ************************************************************************ *)
-value write_cache_info conf ht =
-  let fname = cache_info conf in
-  match try Some (Secure.open_out_bin fname) with [ Sys_error _ -> None ] with
-  [ Some oc -> do { output_value oc ht; close_out oc }
-  | None -> () ]
-;
-
-
-(* ************************************************************************ *)
-(*  [Fonc] patch_cache_info :
-             config -> ((string * string) -> (string * string)) -> unit     *)
-(** [Description] : Met à jour le fichier de cache.
-    [Args] :
-      - conf : configuration de la base
-      - (key, value) : la clé et valeur de cache à mettre à jour
-    [Retour] : unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-value patch_cache_info conf k f =
-  let cache_info = read_cache_info conf in
-  (* On met à jour le cache avec la nouvelle valeur. *)
-  (* Si la clé n'existe pas dans la liste, c'est pas grave, elle sera *)
-  (* ajouté lors de la création du cache.                             *)
-  try
-    let v = Hashtbl.find cache_info k in
-    let () = Hashtbl.replace cache_info k (f v) in
-    write_cache_info conf cache_info
-  with [ Not_found -> () ]
-;
-
-
 (* ************************************************************************ *)
 (*  [Fonc] init_cache_info : config -> unit                                 *)
 (** [Description] : Créé le fichier de cache.
@@ -3885,13 +3905,13 @@ value init_cache_info conf base = do {
     if is_empty_name p then ()
     else incr nb_real_persons
   };
-  let ht = Hashtbl.create 1 in
   let () =
-    Hashtbl.add ht
+    Hashtbl.add ht_cache_info
       cache_nb_base_persons (string_of_int nb_real_persons.val)
   in
-  write_cache_info conf ht;
+  write_cache_info conf;
 };
+
 
 (* ************************************************************************ *)
 (*  [Fonc] real_nb_of_persons conf : config -> int                          *)
@@ -3903,17 +3923,17 @@ value init_cache_info conf base = do {
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value real_nb_of_persons conf base =
-  try
+  let real_nb_person () =
     let ht = read_cache_info conf in
     let nb = Hashtbl.find ht cache_nb_base_persons in
     int_of_string nb
-  with Not_found ->
-    try
-      do {
-        init_cache_info conf base;
-        let ht = read_cache_info conf in
-        let nb = Hashtbl.find ht cache_nb_base_persons in
-        int_of_string nb
-      }
-    with _ -> Gwdb.nb_of_persons base
+  in
+  try real_nb_person () with
+  [ Not_found ->
+      try
+        do {
+          init_cache_info conf base;
+          real_nb_person ()
+        }
+      with [ _ -> Gwdb.nb_of_persons base ] ]
 ;
