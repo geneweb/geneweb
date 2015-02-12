@@ -167,7 +167,7 @@ let reconstitute_person conf base mod_p =
                     | Some occ -> Int32.to_int occ
                     | None -> 0
                   in
-                  (Some (fn, sn, occ, Update.Create (sex, None), ""), None)
+                  (Some (fn, sn, occ, Update.Create (sex, None), "", false), None)
               | `create ->
                   let sex =
                     match person.Mwrite.Person_link.sex with
@@ -187,7 +187,7 @@ let reconstitute_person conf base mod_p =
                     if occ = 0 then person.Mwrite.Person_link.occ <- None
                     else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
                   in
-                  (Some (fn, sn, occ, Update.Create (sex, None), ""), None)
+                  (Some (fn, sn, occ, Update.Create (sex, None), "", true), None)
               | `link ->
                   (match person.Mwrite.Person_link.sex with
                    | `male ->
@@ -209,7 +209,7 @@ let reconstitute_person conf base mod_p =
                               (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
                        in
                        *)
-                       (Some (fn, sn, occ, Update.Link, ""), None)
+                       (Some (fn, sn, occ, Update.Link, "", false), None)
                    | _ ->
                        let ip = Int32.to_int person.Mwrite.Person_link.index in
                        let p = poi base (Adef.iper_of_int ip) in
@@ -229,7 +229,7 @@ let reconstitute_person conf base mod_p =
                               (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
                        in
                        *)
-                       (None, Some (fn, sn, occ, Update.Link, "")))
+                       (None, Some (fn, sn, occ, Update.Link, "", false)))
             in
             let r_sources =
               match r.Mwrite.Relation_parent.source with
@@ -403,7 +403,7 @@ let reconstitute_person conf base mod_p =
                            | Some occ -> Int32.to_int occ
                            | None -> 0
                          in
-                         ((fn, sn, occ, Update.Create (sex, None), ""), wk)
+                         ((fn, sn, occ, Update.Create (sex, None), "", false), wk)
                      | `create ->
                          let sex =
                            match person.Mwrite.Person_link.sex with
@@ -423,7 +423,7 @@ let reconstitute_person conf base mod_p =
                            if occ = 0 then person.Mwrite.Person_link.occ <- None
                            else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
                          in
-                         ((fn, sn, occ, Update.Create (sex, None), ""), wk)
+                         ((fn, sn, occ, Update.Create (sex, None), "", true), wk)
                      | `link ->
                          let ip = Int32.to_int person.Mwrite.Person_link.index in
                          let p = poi base (Adef.iper_of_int ip) in
@@ -444,7 +444,7 @@ let reconstitute_person conf base mod_p =
                                    (Int32.to_int person.Mwrite.Person_link.index)))
                          in
                          *)
-                         ((fn, sn, occ, Update.Link, ""), wk))
+                         ((fn, sn, occ, Update.Link, "", false), wk))
                   in
                   wit :: accu
               | None -> accu)
@@ -506,6 +506,36 @@ let reconstitute_person conf base mod_p =
   (* de conflits par les autres modules : update,  *)
   (* updateIndOk et updateFamOk.                   *)
   let _err = Api_update_util.check_person_conflict conf base p in
+  (* Maintenant qu'on a fini les conflit, on remet l'objet person *)
+  (* tel que pour GeneWeb, c'est à dire qu'on supprime l'option   *)
+  (* force_create.                                                *)
+  let pevents_gw =
+    List.map
+      (fun e ->
+        let w =
+          Array.map
+            (fun ((f, s, o, create, var, _), wk) ->
+              ((f, s, o, create, var), wk))
+            e.epers_witnesses
+        in
+        {(e) with epers_witnesses = w})
+      pevents
+  in
+  let rparents_gw =
+    List.map
+      (fun r ->
+        let (fath, moth) =
+          match (r.r_fath, r.r_moth) with
+          | (Some (f, s, o, create, var, _), None) ->
+              (Some (f, s, o, create, var), None)
+          | (None, Some (f, s, o, create, var, _)) ->
+              (None, Some (f, s, o, create, var))
+          | _ -> failwith "rparents_gw"
+        in
+        {(r) with r_fath = fath; r_moth = moth})
+      rparents
+  in
+  let p = {(p) with rparents = rparents_gw; pevents = pevents_gw } in
   p
 ;;
 
