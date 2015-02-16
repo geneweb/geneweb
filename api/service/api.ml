@@ -80,16 +80,6 @@ let print_info_base conf base =
                               | _ ->
                                   (match Gutil.person_ht_find_all base key with
                                    | [ip] -> Int64.of_int (Adef.int_of_iper ip)
-                                       (*
-                                       let p = pget conf base ip in
-                                       if is_hidden p ||
-                                          ((is_hide_names conf p) &&
-                                           not (fast_auth_age conf p))
-                                       then
-                                         Int64.of_int (Adef.int_of_iper ip)
-                                       else
-                                         sosa_or_first_ind
-                                       *)
                                    | _ -> sosa_or_first_ind))
                          | None -> sosa_or_first_ind
                        else sosa_or_first_ind
