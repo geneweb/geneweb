@@ -2349,12 +2349,14 @@ value pass3 gen fname =
                          [get_father cpl :: get_related p]
                      in
                      gen.g_per.arr.(Adef.int_of_iper ip) := Right3 p a u;
-                   let fam =
-                     family_of_gen_family
-                       {(gen_family_of_family fam) with
-                        witnesses = Array.append (get_witnesses fam) [| ip |]}
-                   in
-                   gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des
+                   if List.mem ip (Array.to_list (get_witnesses fam)) then ()
+                   else
+                     let fam =
+                       family_of_gen_family
+                         {(gen_family_of_family fam) with
+                          witnesses = Array.append (get_witnesses fam) [| ip |]}
+                     in
+                     gen.g_fam.arr.(Adef.int_of_ifam ifam) := Right3 fam cpl des
                  }
              | _ -> () ]
          | _ -> () ])
