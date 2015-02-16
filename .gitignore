@@ -63,6 +63,8 @@ contrib/gwFix/gwFixFromFileAlias
 contrib/gwFix/gwFixFromFileAlias.opt
 contrib/gwFix/gwFixFromFileDomicile
 contrib/gwFix/gwFixFromFileDomicile.opt
+contrib/gwFix/gwFixColon
+contrib/gwFix/gwFixColon.opt
 contrib/gwpublic/gwiftitles
 contrib/gwpublic/gwprivate
 contrib/gwpublic/gwpublic1
