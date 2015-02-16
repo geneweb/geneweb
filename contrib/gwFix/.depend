@@ -46,3 +46,11 @@ gwFixEvtSrc.cmx: ../../src/adef.cmx ../../src/ansel.cmx ../../src/argl.cmx \
     ../../src/buff.cmx ../../src/calendar.cmx ../../src/db2link.cmx ../../src/def.cmi \
     ../../src/futil.cmx ../../src/gwcomp.cmx ../../src/lock.cmx ../../src/mutil.cmx \
     ../../src/name.cmx ../../src/secure.cmx
+gwFixColon.cmo: ../../src/adef.cmi ../../src/ansel.cmo ../../src/argl.cmo \
+    ../../src/buff.cmo ../../src/calendar.cmi ../../src/db2link.cmi ../../src/def.cmi \
+    ../../src/futil.cmi ../../src/gwcomp.cmi ../../src/lock.cmi ../../src/mutil.cmi \
+    ../../src/name.cmi ../../src/secure.cmi
+gwFixColon.cmx: ../../src/adef.cmx ../../src/ansel.cmx ../../src/argl.cmx \
+    ../../src/buff.cmx ../../src/calendar.cmx ../../src/db2link.cmx ../../src/def.cmi \
+    ../../src/futil.cmx ../../src/gwcomp.cmx ../../src/lock.cmx ../../src/mutil.cmx \
+    ../../src/name.cmx ../../src/secure.cmx
