@@ -174,7 +174,10 @@ let string_of_date_and_conv conf d =
           Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
         else ""
       in
-      let date = Date.string_of_dmy conf d1 ^ year_prec in
+      let date =
+        Date.string_of_dmy conf d1 ^ year_prec ^ " " ^
+          transl_nth conf "gregorian/julian/french/hebrew" 1
+      in
       (date_conv, date, Some `julian)
   | Dgreg (d, Dfrench) ->
       let d1 = Calendar.french_of_gregorian d in
