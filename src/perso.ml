@@ -2540,6 +2540,7 @@ and eval_date_field_var conf d =
       match d with
       [ Dgreg dmy _ -> VVstring (Date.year_text dmy)
       | _ -> VVstring "" ]
+  | [] -> VVstring (Date.string_of_date_sep conf "<br/>" d)
   | _ -> raise Not_found ]
 and eval_place_field_var conf place =
   fun
@@ -2635,14 +2636,7 @@ and eval_str_event_field
       | _ -> "" ]
   | "date" ->
       match (p_auth, Adef.od_of_codate date) with
-      [ (True, Some d) -> Date.string_of_date_sep conf "<br/>" d
-      | _ -> "" ]
-  | "on_date" ->
-      match (p_auth, Adef.od_of_codate date) with
-      [ (True, Some d) ->
-          match p_getenv conf.base_env "long_date" with
-          [ Some "yes" -> (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
-          | _ -> Date.string_of_ondate conf d ]
+      [ (True, Some d) -> Date.string_of_date conf d
       | _ -> "" ]
   | "place" ->
        if p_auth then Util.string_of_place conf (sou base place)
@@ -2681,7 +2675,7 @@ and eval_str_event_field
 and eval_event_field_var
       conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc =
   fun
-  [ ["date" :: sl] when sl <> [] ->
+  [ ["date" :: sl] ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
