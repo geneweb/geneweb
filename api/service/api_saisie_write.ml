@@ -1113,8 +1113,8 @@ let compute_modification_status conf base ip ifam resp =
     if ip < 0 then ("", "", None, None, None, None)
     else
       let p = poi base (Adef.iper_of_int ip) in
-      let surname = Name.lower (sou base (get_surname p)) in
-      let first_name = Name.lower (sou base (get_first_name p)) in
+      let surname = sou base (get_surname p) in
+      let first_name = sou base (get_first_name p) in
       let index_person = Some (Int32.of_int ip) in
       let occ = get_occ p in
       let occ = if occ = 0 then None else Some (Int32.of_int occ) in
