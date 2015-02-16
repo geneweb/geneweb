@@ -566,7 +566,7 @@ value print_sosa conf base p link =
                 Printf.sprintf ", Sosa: %s"
                   (string_of_num (transl conf "(thousand separator)") sosa_num)
           in
-          Wserver.wprint "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/>"
+          Wserver.wprint "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
             (image_prefix conf) title;
           if conf.cancel_links || not link then ()
           else  Wserver.wprint "</a> ";
