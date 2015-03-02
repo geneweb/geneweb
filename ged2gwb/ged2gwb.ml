@@ -2539,12 +2539,31 @@ value check_undefined gen =
 ;
 
 value add_parents_to_isolated gen =
+  let ht_missing_children = Hashtbl.create 1001 in
+  (* Parfois, l'enfant n'a pas de tag FAMC, mais il est bien présent
+     dans la famille. Du coup, si on lui ajoute des parents tout de
+     suite, lors du finish base, on va se rendre compte qu'il est en
+     trop dans sa "vraie" famille et on va le supprimer, alors qu'on
+     veut re-créer la liaison. *)
+  let () =
+    loop 0 where rec loop i =
+      if i = gen.g_fam.tlen then ()
+      else
+        match gen.g_fam.arr.(i) with
+        [ Right3 _ _ des -> do {
+            Array.iter
+              (fun ip -> Hashtbl.add ht_missing_children ip True)
+              des.children;
+            loop (i + 1) }
+        | Left3 _ -> loop (i + 1) ]
+  in
   for i = 0 to gen.g_per.tlen - 1 do {
     match gen.g_per.arr.(i) with
     [ Right3 p a u ->
         if get_parents a = None &&
            Array.length (get_family u) = 0 && get_rparents p = [] &&
-           get_related p = []
+           get_related p = [] &&
+           not (Hashtbl.mem ht_missing_children (get_key_index p))
         then
           let fn = gen.g_str.arr.(Adef.int_of_istr (get_first_name p)) in
           let sn = gen.g_str.arr.(Adef.int_of_istr (get_surname p)) in
