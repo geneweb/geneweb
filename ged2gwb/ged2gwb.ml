@@ -1398,23 +1398,33 @@ value notes_from_source_record rl =
 
 value treat_notes gen rl =
   let lines = extract_notes gen rl in
-  let notes =
-    List.fold_left
-      (fun s (lab, n) ->
+  let buf = Buffer.create (List.length lines) in
+  let () =
+    List.iter
+      (fun (lab, n) ->
          let spc = String.length n > 0 && n.[0] = ' ' in
          let end_spc =
            String.length n > 1 && n.[String.length n - 1] = ' '
          in
          let n = strip_spaces n in
-         if s = "" then n ^ (if end_spc then " " else "")
-         else if lab = "CONT" || lab = "NOTE" then
-           s ^ "<br>\n" ^ n ^ (if end_spc then " " else "")
-         else if n = "" then s
-         else
-           s ^ (if spc then "\n" else "") ^ n ^ (if end_spc then " " else ""))
-      "" lines
+         if Buffer.length buf = 0 then do {
+           Buffer.add_string buf n;
+           Buffer.add_string buf (if end_spc then " " else "")
+         }
+         else if lab = "CONT" || lab = "NOTE" then do {
+           Buffer.add_string buf "<br>\n";
+           Buffer.add_string buf n;
+           Buffer.add_string buf (if end_spc then " " else "")
+         }
+         else if n = "" then ()
+         else do {
+           Buffer.add_string buf (if spc then "\n" else "");
+           Buffer.add_string buf n;
+           Buffer.add_string buf (if end_spc then " " else "")
+         })
+      lines
   in
-  strip_newlines notes
+  strip_newlines (Buffer.contents buf)
 ;
 
 value source gen r =
