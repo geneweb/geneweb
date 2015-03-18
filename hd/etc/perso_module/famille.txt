@@ -4,7 +4,7 @@
   <img src="%image_prefix;/not_married_no_descendants.png" alt="[not married],&nbsp;[no descendants]" title="[not married],&nbsp;[no descendants]"%/>
 %end;
 
-%( 
+%(
   définition affichage de la puce d'un individu en compte tenu de ses éventuels enfants
     - aucune union, donc aucun enfant => cercle
     - au moins une union avec en tout aucun enfant => disque
@@ -38,7 +38,7 @@
   %if;(cancel_links or nnn.is_restricted)
     %nnn;
   %else;
-    <a href="%prefix;%nnn.access;">%nnn;</a>%nnn.title;
+    <a %apply;ext_link("nnn") href="%nnn.bname_prefix;%nnn.access;">%nnn;</a>%nnn.title;
   %end;
   %nnn.dates;%nl;
 %end;
@@ -61,10 +61,10 @@
   %end;
 %end;
 
-%( 
-   ATTENTION nb_families ne marche que pour la personne et les boucles sur enfants. 
-   Pour les relations (him, her et related) cela donne le nb_families de la 
-   personne d'où l'affichage sans nb d'enfants si la personne n'a qu'un mariage 
+%(
+   ATTENTION nb_families ne marche que pour la personne et les boucles sur enfants.
+   Pour les relations (him, her et related) cela donne le nb_families de la
+   personne d'où l'affichage sans nb d'enfants si la personne n'a qu'un mariage
 %)
 %define;detail_wedding()
   %apply;type_wedding()
@@ -92,19 +92,7 @@
         %apply;type_puce_desc("child")
         %apply;image_MF("child","11")
         %apply;display_sosa("child")
-        %if;("yyy" = "parhigh")
-          %( comme le code est utilisable dans la descendance des grands 
-             parents on teste father/mother, pour la descendance des parents 
-             on est tjrs dans else %)
-          %if;(child.access = father.access or child.access = mother.access)
-            %( ici on met les parents en gras %)
-            <u><b>%child;</b></u>%child.title;%child.dates;
-          %else;
-            %apply;access_ind("child")
-          %end;
-        %else;
-          %apply;access_ind("child")
-        %end;
+        %apply;access_ind("child")
       </td>
       <td align="right" valign="top">
         %if;child.has_families;
@@ -134,7 +122,7 @@
       %else;
         %mmm.father;%mmm.father.title;%mmm.father.dates;%nl;
       %end;
-      %apply;type_wedding() 
+      %apply;type_wedding()
       %if(family.marriage_date.year != "")<font size="-1">(%family.marriage_date.year;)</font>%end;
       %apply;type_puce_asc("spouse")
       %apply;image_MF("spouse","13")
@@ -181,40 +169,42 @@
   %end;
 %end;
 
-%if;(not (father.has_parents and mother.has_parents))
-  %if;father.has_parents;
-    <h3 class="highlight">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h3>
-  %elseif;mother.has_parents;
-    <h3 class="highlight">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+%if;has_parents;
+  %if;(not (father.has_parents and mother.has_parents))
+    %if;father.has_parents;
+      <h3 class="highlight">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+    %elseif;mother.has_parents;
+      <h3 class="highlight">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+    %end;
   %end;
-%end;
 
-<table border="%border;" width="100%%">
-  <tr>
-      %if;father.has_parents;
+  <table border="%border;" width="100%%">
+    <tr>
+        %if;father.has_parents;
+        <td align="left" valign="top" width="50%%">
+          %if;mother.has_parents;
+            <h3 class="highlight">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+          %end;
+          <ul>
+            %apply;descendancy_grand_fathers("father","parhigh")
+            %apply;descendancy_grand_mothers("father","parhigh")
+          </ul>
+        </td>
+        %end;
       <td align="left" valign="top" width="50%%">
         %if;mother.has_parents;
-          <h3 class="highlight">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+          %if;father.has_parents;
+            <h3 class="highlight">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+          %end;
+          <ul>
+            %apply;descendancy_grand_fathers("mother","parhigh")
+            %apply;descendancy_grand_mothers("mother","parhigh")
+          </ul>
         %end;
-        <ul>
-          %apply;descendancy_grand_fathers("father","parhigh")
-          %apply;descendancy_grand_mothers("father","parhigh")
-        </ul>
       </td>
+      %if;(not father.has_parents)
+        <td align="left" valign="top" width="50%%"></td>
       %end;
-    <td align="left" valign="top" width="50%%">
-      %if;mother.has_parents;
-        %if;father.has_parents;
-          <h3 class="highlight">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h3>
-        %end;
-        <ul>
-          %apply;descendancy_grand_fathers("mother","parhigh")
-          %apply;descendancy_grand_mothers("mother","parhigh")
-        </ul>
-      %end;
-    </td>
-    %if;(not father.has_parents)
-      <td align="left" valign="top" width="50%%"></td>
-    %end;
-  </tr>
-</table>
+    </tr>
+  </table>
+%end;

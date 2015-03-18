@@ -116,6 +116,7 @@ message PersonTree {
   optional string image = 9;
   required Sosa sosa = 10;
   required bool has_more_infos = 11;
+  required string baseprefix = 12;
 }
 
 message SimplePerson {
@@ -132,6 +133,7 @@ message SimplePerson {
   optional string death_place = 11;
   optional string image = 12;
   required Sosa sosa = 13;
+  required string baseprefix = 14;
 }
 
 message RelationPerson {

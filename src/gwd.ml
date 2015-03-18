@@ -1947,7 +1947,11 @@ value main () =
       " [options] where options are:"
     in
     let speclist =
-      [("-hd", Arg.String Util.add_lang_path,
+      [(* links tree*)
+       ("-api_url", Arg.String (fun x -> Link.api_url.val := x),
+        "Url api for links tree");
+       (* normales... *)
+       ("-hd", Arg.String Util.add_lang_path,
         "<dir>\n       Directory where the directory lang is installed.");
        ("-dd", Arg.String Util.add_doc_path,
         "<dir>\n       Directory where the documentation is installed.");

@@ -133,7 +133,8 @@ value family_m conf base =
   | Some "API_DEL_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_del_fam_ok conf base
   | Some "API_DEL_PERSON_OK" when conf.wizard -> Api_saisie_write.print_del_ind_ok conf base
 
-  | Some "API_CORRESPONDANCE" -> Api_db.print_correspondance conf base
+  | Some "API_LINK_TREE" -> Api_link.print_link_tree conf base
+
   | Some mode -> ()
   | None -> () ]
 ;

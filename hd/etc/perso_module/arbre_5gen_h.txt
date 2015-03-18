@@ -4,7 +4,7 @@
   %if;(cancel_links or nnn.is_restricted)
     %nnn;
   %else;
-    <a href="%prefix;%nnn.access;">%nnn;</a>%nnn.title;
+    <a %apply;ext_link("nnn") href="%nnn.bname_prefix;%nnn.access;">%nnn;</a>%nnn.title;
   %end;
   %nnn.dates;%nl;
 %end;
