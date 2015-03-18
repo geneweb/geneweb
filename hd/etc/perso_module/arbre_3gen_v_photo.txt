@@ -6,7 +6,7 @@
     <tr>
       <td style="vertical-align: top;" id="ancestors">
         <table border="%border;" cellspacing="0" cellpadding="0">
-          %if;(max_anc_level>2)
+          %if;has_parents;
             <tr>
               %if;father.has_parents;
                 <td style="font-size: 80%%" class="arbre_pers">%nn;

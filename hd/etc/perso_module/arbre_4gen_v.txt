@@ -7,7 +7,7 @@
       <td id="ancestors" style="vertical-align: top">
         <table border="%border;" style="text-align: center"%sp;
           cellspacing="0" cellpadding="0" width="100%%">
-          %if;(max_anc_level>3)
+          %if;(has_parents and (father.has_parents or mother.has_parents))
             <tr>
               %( line 1 : up to 8 great-grandparents %)
               %if;(father.has_parents and father.father.has_parents)
@@ -132,7 +132,7 @@
             </tr>
           %end;
 
-          %if;(max_anc_level>2)
+          %if;has_parents;
             <tr>
               %( line 5 : up to 4 grandparents %)
               %if;father.has_parents;
