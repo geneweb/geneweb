@@ -30,9 +30,64 @@
 
 %import;perso_utils
 
+
+%define;init_nb_asc(tplnum)
+  %let;templ;%bvar.module_perso_tplnum;%in
+  %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
+    %if;(count < 3)
+      %reset_count;%incr_count;%incr_count;%incr_count;
+    %end;
+  %elseif;(templ = "arbre_4gen_v")
+    %if;(count < 4)
+      %reset_count;%incr_count;%incr_count;%incr_count;%incr_count;
+    %end;
+  %elseif;(templ = "arbre_5gen_h")
+    %if;(count < 5)
+      %reset_count;%incr_count;%incr_count;%incr_count;%incr_count;%incr_count;
+    %end;
+  %else;
+    %if;(count < 1)
+      %reset_count;%incr_count;
+    %end;
+  %end;
+%end
+
+%define;init_nb_desc(tplnum)
+  %let;templ;%bvar.module_perso_tplnum;%in
+  %if;(templ = "union_complet")
+    %if;(count < 3)
+      %reset_count;%incr_count;%incr_count;%incr_count;
+    %end;
+  %else;
+    %if;(count < 1)
+      %reset_count;%incr_count;
+    %end;
+  %end;
+%end
+
+%define;init_from_gen_desc(tplnum)
+  %let;templ;%bvar.module_perso_tplnum;%in
+  %if;(templ = "famille")
+    %if;(count < 3)
+      %reset_count;%incr_count;%incr_count;%incr_count;
+    %end;
+  %else;
+    %if;(count < 1)
+      %reset_count;%incr_count;
+    %end;
+  %end;
+%end
+
+%define;init_cache(nb_asc, from_gen_desc, nb_desc)
+  %init_cache.nb_asc.from_gen_desc.nb_desc;
+%end;
+
 %include.perso_header;
 
-%if;(bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)
+
+%if;(bvar.module_perso_tplnb="" or bvar.module_perso_tplnb=0)
+  %apply;init_cache(3, 2, 2)
+
   %apply;show_templ("perso_module/etat_civil")
   %apply;show_templ("perso_module/parent_simple")
   %apply;show_templ("perso_module/union_simple")
@@ -43,7 +98,28 @@
   %apply;show_templ("perso_module/sources")
   %apply;show_templ("perso_module/arbre_3gen_v_photo")
 %else;
-  %for;i;0;bvar.perso_module_tplnb;
+  %reset_count;
+  %for;i;0;bvar.module_perso_tplnb;
+    %apply;init_nb_asc(i)
+  %end;
+  %let;nb_asc;%count;%in
+
+  %reset_count;
+  %for;i;0;bvar.module_perso_tplnb;
+    %apply;init_from_gen_desc(i)
+  %end;
+  %let;from_gen_desc;%count;%in
+
+  %reset_count;
+  %for;i;0;bvar.module_perso_tplnb;
+    %apply;init_nb_desc(i)
+  %end;
+  %let;nb_desc;%count;%in
+
+  %apply;init_cache(nb_asc, from_gen_desc, nb_desc)
+  %reset_count;
+
+  %for;i;0;bvar.module_perso_tplnb;
     %apply;get_templ(i)
   %end;
 %end;

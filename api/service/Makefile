@@ -5,7 +5,9 @@ CAMLP5F=-DUNIX
 CAMLP5D=~/.opam/system/lib/camlp5/
 MYSQLD=~/.opam/system/lib/mysql/
 OCURL=~/.opam/system/lib/ocurl/
-OCAMLOPT=ocamlfind ocamlopt -warn-error A -annot
+OREDIS=~/.opam/system/lib/redis/
+LREDIS=~/local_devel/ocaml-redis/_build/src/
+OCAMLOPT=ocamlfind ocamlopt -warn-error A -annot -g
 PP_PIQI=-pp "camlp4o -I ~/.opam/system/lib/piqilib pa_labelscope.cmo"
 STRIP=strip
 RM=/bin/rm -f
@@ -51,6 +53,9 @@ api.opt:
 	$(OCAMLOPT) -package piqirun.ext -c api_saisie_read_piqi_ext.ml
 	$(OCAMLOPT) -package piqirun.ext -c api_saisie_write_piqi.ml
 	$(OCAMLOPT) -package piqirun.ext -c api_saisie_write_piqi_ext.ml
+# Compilé dans le Makefile de src
+#	$(OCAMLOPT) -package piqirun.ext -c api_link_tree_piqi.ml
+#	$(OCAMLOPT) -package piqirun.ext -c api_link_tree_piqi_ext.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver metaphone.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_def.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_util.ml
@@ -65,6 +70,7 @@ api.opt:
 	$(OCAMLOPT) -c -pp "camlp5r ../../wserver/pa_macro5.cmo pa_extend.cmo ../../src/pa_lock.cmo $(CAMLP5F)" -I ../../src api_saisie_autocomplete.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_saisie_write.ml
 	$(OCAMLOPT) -package piqirun.ext -package mysql -linkpkg -noautolink -cclib '-Wl,-Bstatic -lmysql_stubs -lmysql -Wl,-Bdynamic -lz' -I $(MYSQLD) mysql.cmxa -c $(PP_PIQI) -I ../../src -I ../../wserver api_db.ml
+	$(OCAMLOPT) -package piqirun.ext -package curl -I $(OCURL) curl.cmxa -I $(LREDIS) -package yojson $(PP_PIQI) -I ../../src -I ../../wserver -c api_link.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver convert_dico_place.ml
 
 
@@ -77,6 +83,8 @@ piqi:
 	piqic-ocaml --ext api_saisie_read.proto.piqi
 	piqi of-proto --normalize api_saisie_write.proto
 	piqic-ocaml --ext api_saisie_write.proto.piqi
+	piqi of-proto --normalize api_link_tree.proto
+	piqic-ocaml --ext api_link_tree.proto.piqi
 	$(RM) *.piqi
 
 depend:

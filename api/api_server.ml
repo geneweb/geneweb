@@ -911,6 +911,11 @@ value basic_authorization from_addr request base_env passwd access_type
       else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
+  let auto = Wserver.extract_param "gw-connection-type: " '\r' request in
+  let uauth =
+    if auto = "auto" then passwd1
+    else uauth
+  in
   let (ok, wizard, friend, username) =
     if (passwd = "w" || passwd = "f") then
       if passwd = "w" then
@@ -960,7 +965,11 @@ value basic_authorization from_addr request base_env passwd access_type
         (base_file ^ "_" ^ pwd_id, "")
       else (base_file, "")
     else
-      if passwd = "" then (base_file, "")
+      if passwd = "" then
+        if auto = "auto" then
+          let suffix = if wizard then "_w" else if friend then "_f" else "" in
+          (base_file ^ suffix, passwd)
+        else (base_file, "")
       else (base_file ^ "_" ^ passwd, passwd)
   in
   let auth_scheme =
@@ -1794,7 +1803,38 @@ value main () =
       " [options] where options are:"
     in
     let speclist =
-      [("-hd", Arg.String Util.add_lang_path,
+      [(* options lien inter arbre *)
+       ("-redis",
+        Arg.String
+          (fun x ->
+            try
+              let host = Unix.gethostbyname x in
+              let url = Unix.string_of_inet_addr host.Unix.h_addr_list.(0) in
+              Api_link.redis_host.val := url
+            with _ -> Api_link.redis_host.val := x),
+        "host redis for links tree");
+       ("-redis_p",
+        Arg.Int (fun x -> Api_link.redis_port.val := x),
+        "redis port for links tree");
+       ("-links_tree_url",
+        Arg.String
+          (fun x ->
+            (* ^[a-z]:gwx:2322 *)
+            let i = String.index x ':' in
+            let j = String.index_from x (i + 1) ':' in
+            let base_regexp = String.sub x 0 i in
+            let host_name = String.sub x (i + 1) (j - i - 1) in
+            let port = String.sub x (j + 1) (String.length x - j - 1) in
+            try
+              let host = Unix.gethostbyname host_name in
+              let url = Unix.string_of_inet_addr host.Unix.h_addr_list.(0) ^ ":" ^ port in
+              Api_link.api_servers.val := [(base_regexp, url) :: Api_link.api_servers.val]
+            with _ ->
+              let url = host_name ^ ":" ^ port in
+              Api_link.api_servers.val := [(base_regexp, url) :: Api_link.api_servers.val]),
+        "api_url for links tree");
+       (* options normales *)
+       ("-hd", Arg.String Util.add_lang_path,
         "<dir>\n       Directory where the directory lang is installed.");
        ("-bd", Arg.String Util.set_base_dir,
         "<dir>\n       Directory where the databases are installed.");
@@ -1832,6 +1872,7 @@ value main () =
 <file>
        Authorization file to restrict access. The file must hold lines
        of the form \"user:password\".");
+       ("-sig", Arg.String (fun _ -> ()), "ignore option.");
        ("-digest", Arg.Set use_auth_digest_scheme, "\n       \
         Use Digest authorization scheme (more secure on passwords)");
        ("-add_lexicon",
