@@ -851,6 +851,7 @@ value print_change_order conf base =
         Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
       in
       Perso.interp_templ_with_menu title "perso_header" conf base p;
+      tag "h2" begin title False; end;
       Wserver.wprint "%s:"
         (capitale (transl conf "invert the order of the following families"));
       tag "table" "style=\"margin:1em\"" begin
