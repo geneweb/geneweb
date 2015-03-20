@@ -26,7 +26,7 @@ open Api_def
     [Rem] : Non exporté en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 let p_getenvbin env label =
-  let decode_varenv = WserverApi.gen_decode false in
+  let decode_varenv = Wserver.gen_decode false in
   try Some (decode_varenv (List.assoc (decode_varenv label) env))
   with Not_found -> None
 ;;
@@ -796,7 +796,7 @@ let print_result conf data =
   let data = data output in
   Util.html conf ;
   Util.nl ();
-  WserverApi.wprint "%s" data
+  Wserver.wprint "%s" data
 ;;
 
 

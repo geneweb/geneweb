@@ -2,7 +2,7 @@
 
 include ../tools/Makefile.inc
 
-OBJS=wserver.cmo wserverApi.cmo
+OBJS=wserver.cmo
 
 all:: pa_macro5.cmo $(OBJS)
 opt:: pa_macro5.cmo $(OBJS:.cmo=.cmx)
