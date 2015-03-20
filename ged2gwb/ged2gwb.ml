@@ -1851,6 +1851,11 @@ value treat_indi_pevent gen ip r =
               [ [] -> ""
               | rl -> treat_notes gen rl ]
             in
+            (* Si le tag 1 XXX a des infos, on les ajoutes. *)
+            let note =
+              let name_info = strip_spaces r.rval in
+              if name_info = "" then note else name_info ^ "<br>\n" ^ note
+            in
             let src =
               match find_all_fields "SOUR" r.rsons with
               [ [] -> ""
@@ -1911,6 +1916,11 @@ value treat_indi_pevent gen ip r =
                  match find_all_fields "NOTE" r.rsons with
                  [ [] -> ""
                  | rl -> treat_notes gen rl ]
+               in
+               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
+               let note =
+                 let name_info = strip_spaces r.rval in
+                 if name_info = "" then note else name_info ^ "<br>\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
@@ -2584,6 +2594,11 @@ value treat_fam_fevent gen ifath imoth r =
               [ [] -> ""
               | rl -> treat_notes gen rl ]
             in
+            (* Si le tag 1 XXX a des infos, on les ajoutes. *)
+            let note =
+              let name_info = strip_spaces r.rval in
+              if name_info = "" then note else name_info ^ "<br>\n" ^ note
+            in
             let src =
               match find_all_fields "SOUR" r.rsons with
               [ [] -> ""
@@ -2655,6 +2670,11 @@ value treat_fam_fevent gen ifath imoth r =
                  match find_all_fields "NOTE" r.rsons with
                  [ [] -> ""
                  | rl -> treat_notes gen rl ]
+               in
+               (* Si le tag 1 XXX a des infos, on les ajoutes. *)
+               let note =
+                 let name_info = strip_spaces r.rval in
+                 if name_info = "" then note else name_info ^ "<br>\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
