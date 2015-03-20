@@ -1,4 +1,2 @@
 wserver.cmo: wserver.cmi
 wserver.cmx: wserver.cmi
-wserverApi.cmo: wserverApi.cmi
-wserverApi.cmx: wserverApi.cmi

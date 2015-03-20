@@ -91,8 +91,8 @@ value print_and_cut_if_too_big oc str =
 ;
 
 value log oc tm conf from gauth request script_name contents =
-  let referer = WserverApi.extract_param "referer: " '\n' request in
-  let user_agent = WserverApi.extract_param "user-agent: " '\n' request in
+  let referer = Wserver.extract_param "referer: " '\n' request in
+  let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   do {
     let tm = Unix.localtime tm in
     fprintf_date oc tm;
@@ -128,8 +128,8 @@ type auth_report =
 ;
 
 value log_passwd_failed ar oc tm from request base_file = do {
-  let referer = WserverApi.extract_param "referer: " '\n' request in
-  let user_agent = WserverApi.extract_param "user-agent: " '\n' request in
+  let referer = Wserver.extract_param "referer: " '\n' request in
+  let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   let tm = Unix.localtime tm in fprintf_date oc tm;
   fprintf oc " (%d)" (Unix.getpid ());
   fprintf oc " %s_%s" base_file ar.ar_passwd;
@@ -148,7 +148,7 @@ value copy_file fname =
   [ Some ic ->
       do {
         try
-          while True do { let c = input_char ic in WserverApi.wprint "%c" c }
+          while True do { let c = input_char ic in Wserver.wprint "%c" c }
         with _ ->
           ();
         close_in ic;
@@ -159,8 +159,8 @@ value copy_file fname =
 
 value http answer =
   do {
-    WserverApi.http answer;
-    WserverApi.wprint "Content-type: text/html; charset=iso-8859-1";
+    Wserver.http answer;
+    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
   }
 ;
 
@@ -169,12 +169,12 @@ value robots_txt () =
   do {
     Printf.fprintf oc "Robot request\n";
     flush_log oc;
-    WserverApi.http "";
-    WserverApi.wprint "Content-type: text/plain"; Util.nl (); Util.nl ();
+    Wserver.http "";
+    Wserver.wprint "Content-type: text/plain"; Util.nl (); Util.nl ();
     if copy_file "robots" then ()
     else do {
-      WserverApi.wprint "User-Agent: *"; nl ();
-      WserverApi.wprint "Disallow: /"; nl ();
+      Wserver.wprint "User-Agent: *"; nl ();
+      Wserver.wprint "Disallow: /"; nl ();
     }
   }
 ;
@@ -187,10 +187,10 @@ value refuse_log from =
     fprintf oc " excluded: %s\n" from;
     close_out oc;
     http "403 Forbidden";
-    WserverApi.wprint "Content-type: text/html";
+    Wserver.wprint "Content-type: text/html";
     Util.nl ();
     Util.nl ();
-    WserverApi.wprint "Your access has been disconnected by administrator.\n";
+    Wserver.wprint "Your access has been disconnected by administrator.\n";
     let _ : bool = copy_file "refuse" in ();
   }
 ;
@@ -208,11 +208,11 @@ value only_log from =
     fprintf oc ")\n";
     flush_log oc;
     http "";
-    WserverApi.wprint "Content-type: text/html; charset=iso-8859-1";
+    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
     Util.nl ();
     Util.nl ();
-    WserverApi.wprint "<head><title>Invalid access</title></head>\n";
-    WserverApi.wprint "<body><h1>Invalid access</h1></body>\n";
+    Wserver.wprint "<head><title>Invalid access</title></head>\n";
+    Wserver.wprint "<body><h1>Invalid access</h1></body>\n";
   }
 ;
 
@@ -350,19 +350,19 @@ value print_renamed conf new_n =
         Templ.copy_from_templ conf env ic;
       }
   | None ->
-      let title _ = WserverApi.wprint "%s -&gt; %s" conf.bname new_n in
+      let title _ = Wserver.wprint "%s -&gt; %s" conf.bname new_n in
       do {
         Hutil.header conf title;
         tag "ul" begin
           Util.html_li conf;
-          tag "a" "href=\"%s\"" link begin WserverApi.wprint "%s" link; end;
+          tag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
         end;
         Hutil.trailer conf;
       } ]
 ;
 
 value log_redirect conf from request req =
-  let referer = WserverApi.extract_param "referer: " '\n' request in
+  let referer = Wserver.extract_param "referer: " '\n' request in
   lock_wait Srcfile.adm_file "geneweb_api.lck" with
   [ Accept ->
       let oc = log_oc () in
@@ -391,14 +391,14 @@ value print_redirected conf from request new_addr =
           Templ.copy_from_templ conf env ic;
         }
     | None ->
-        let title _ = WserverApi.wprint "Address changed" in
+        let title _ = Wserver.wprint "Address changed" in
         do {
           Hutil.header conf title;
-          WserverApi.wprint "Use the following address:\n<p>\n";
+          Wserver.wprint "Use the following address:\n<p>\n";
           tag "ul" begin
             Util.html_li conf;
-            stag "a" "href=\"%s\"" link begin WserverApi.wprint "%s" link; end;
-            WserverApi.wprint "\n";
+            stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
+            Wserver.wprint "\n";
           end;
           Hutil.trailer conf;
         } ]
@@ -406,15 +406,15 @@ value print_redirected conf from request new_addr =
 ;
 
 value propose_base conf =
-  let title _ = WserverApi.wprint "Base" in
+  let title _ = Wserver.wprint "Base" in
   do {
     Hutil.header conf title;
     tag "ul" begin
       Util.html_li conf;
-      WserverApi.wprint "<form method=\"get\" action=\"%s\">\n"
+      Wserver.wprint "<form method=\"get\" action=\"%s\">\n"
         conf.indep_command;
-      WserverApi.wprint "<input name=\"b\" size=\"40\"> =&gt;\n";
-      WserverApi.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      Wserver.wprint "<input name=\"b\" size=\"40\"> =&gt;\n";
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Hutil.trailer conf;
   }
@@ -482,16 +482,16 @@ value trace_auth base_env f = do {
 
 value unauth_server conf ar =  do {
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  WserverApi.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
+  Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
   if use_auth_digest_scheme.val then
     let nonce = digest_nonce conf.ctime in
 let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun oc -> fprintf oc "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n" fprintf_date tm (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) conf.request) ar.ar_passwd nonce ar.ar_can_stale) in
-    WserverApi.wprint
+    Wserver.wprint
       "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\"" typ
       conf.bname (if nonce = "" then "" else sprintf ",nonce=\"%s\"" nonce)
       (if ar.ar_can_stale then ",stale=true" else "")
   else
-    WserverApi.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
+    Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
   Util.nl ();
   Util.nl ();
   let url =
@@ -504,7 +504,7 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
   let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
   let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
   let title h =
-    WserverApi.wprint
+    Wserver.wprint
       (fcapitale (ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
@@ -517,11 +517,11 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
     tag "dd" begin
       tag "ul" begin
         tag "li" begin
-          WserverApi.wprint "%s : <a href=\"%s%s\">%s</a>"
+          Wserver.wprint "%s : <a href=\"%s%s\">%s</a>"
             (transl conf "access") url alt_bind alt_access;
         end;
         tag "li" begin
-          WserverApi.wprint "%s : <a href=\"%s\">%s</a>"
+          Wserver.wprint "%s : <a href=\"%s\">%s</a>"
             (transl conf "access") url (txt 4);
         end;
       end;
@@ -716,17 +716,17 @@ value index_not_name s =
 value print_request_failure msg =
   do {
     http "";
-    WserverApi.wprint "Content-type: text/html";
+    Wserver.wprint "Content-type: text/html";
     Util.nl (); Util.nl ();
-    WserverApi.wprint "<head><title>Request failure</title></head>\n";
-    WserverApi.wprint "\
+    Wserver.wprint "<head><title>Request failure</title></head>\n";
+    Wserver.wprint "\
 <body bgcolor=\"white\">
 <h1 style=\"text-align: center; color: red;\">Request failure</h1>
 <p>The request could not be completed.</p>\n";
-    WserverApi.wprint "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
+    Wserver.wprint "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
       msg;
-    WserverApi.wprint "</body>\n";
-  }    
+    Wserver.wprint "</body>\n";
+  }
 ;
 
 value refresh_url request s i =
@@ -740,10 +740,10 @@ value refresh_url request s i =
   in
   do {
     http "";
-    WserverApi.wprint "Content-type: text/html";
+    Wserver.wprint "Content-type: text/html";
     Util.nl ();
     Util.nl ();
-    WserverApi.wprint "\
+    Wserver.wprint "\
 <head>
 <meta http-equiv=\"REFRESH\"
  content=\"1;URL=%s\">
@@ -757,7 +757,7 @@ value refresh_url request s i =
 ;
 
 value http_preferred_language request =
-  let v = WserverApi.extract_param "accept-language: " '\n' request in
+  let v = Wserver.extract_param "accept-language: " '\n' request in
   if v = "" then ""
   else
     let s = String.lowercase v in
@@ -901,7 +901,7 @@ value basic_authorization from_addr request base_env passwd access_type
     try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
   in
   let passwd1 =
-    let auth = WserverApi.extract_param "authorization: " '\r' request in
+    let auth = Wserver.extract_param "authorization: " '\r' request in
     if auth = "" then ""
     else
       let s = "Basic " in
@@ -1044,11 +1044,11 @@ value digest_authorization request base_env passwd utm base_file command =
      ar_wizard = True; ar_friend = friend_passwd = ""; ar_uauth = "";
      ar_can_stale = False}
   else if passwd = "w" || passwd = "f" then
-    let auth = WserverApi.extract_param "authorization: " '\r' request in
+    let auth = Wserver.extract_param "authorization: " '\r' request in
     if start_with auth 0 "Digest " then
       (* W3C - RFC 2617 - Jun 1999 *)
       let meth =
-        match WserverApi.extract_param "GET " ' ' request with
+        match Wserver.extract_param "GET " ' ' request with
         [ "" -> "POST"
         | s -> "GET" ]
       in
@@ -1193,8 +1193,8 @@ value make_conf from_addr (addr, request) script_name contents env = do {
     [ Not_found -> default_lang.val ]
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in
-  List.iter 
-    (fun fname -> 
+  List.iter
+    (fun fname ->
       add_lexicon fname (if lang = "" then default_lang else lang) lexicon)
     lexicon_list.val;
   let default_sosa_ref = (Adef.iper_of_int (-1), None) in
@@ -1366,7 +1366,7 @@ value is_robot from =
 value auth_err request auth_file =
   if auth_file = "" then (False, "")
   else
-    let auth = WserverApi.extract_param "authorization: " '\r' request in
+    let auth = Wserver.extract_param "authorization: " '\r' request in
     if auth <> "" then
       match
         try Some (Secure.open_in auth_file) with [ Sys_error _ -> None ]
@@ -1398,10 +1398,10 @@ value auth_err request auth_file =
 ;
 
 value no_access conf =
-  let title _ = WserverApi.wprint "Error" in
+  let title _ = Wserver.wprint "Error" in
   do {
     Hutil.rheader conf title;
-    WserverApi.wprint "No access to this database in CGI mode\n";
+    Wserver.wprint "No access to this database in CGI mode\n";
     Hutil.trailer conf;
   }
 ;
@@ -1463,7 +1463,7 @@ value conf_and_connection from (addr, request) script_name contents env =
                 (log_file.val, log_oc, flush_log);
               if conf.manitou && sleep > 0 then Unix.sleep sleep
               else ()
-            } ] ] } 
+            } ] ] }
 ;
 
 value chop_extension name =
@@ -1597,7 +1597,7 @@ value extract_multipart boundary str =
 ;
 
 value build_env request contents =
-  let content_type = WserverApi.extract_param "content-type: " '\n' request in
+  let content_type = Wserver.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
     let boundary = extract_boundary content_type in
     let (str, env) = extract_multipart boundary contents in (str, env)
@@ -1629,7 +1629,7 @@ value connection (addr, request) script_name contents =
         with
         [ Adef.Request_failure msg -> print_request_failure msg
         | Exit -> () ];
-    WserverApi.wflush ();
+    Wserver.wflush ();
   }
 ;
 
@@ -1686,7 +1686,7 @@ Type %s to stop the service
       [ Unix.Unix_error _ _ _ -> () ];
     }
     else ();
-    WserverApi.f selected_addr.val selected_port.val conn_timeout.val
+    Wserver.f selected_addr.val selected_port.val conn_timeout.val
       (IFDEF UNIX THEN max_clients.val ELSE None END) (connection)
   }
 ;
@@ -1774,8 +1774,8 @@ value make_cnt_dir x =
   do {
     mkdir_p x;
     IFDEF WIN95 THEN do {
-      WserverApi.sock_in.val := Filename.concat x "geneweb_api.sin";
-      WserverApi.sock_out.val := Filename.concat x "geneweb_api.sou";
+      Wserver.sock_in.val := Filename.concat x "geneweb_api.sin";
+      Wserver.sock_out.val := Filename.concat x "geneweb_api.sou";
     }
     ELSE () END;
     Util.cnt_dir.val := x;
@@ -1785,8 +1785,8 @@ value make_cnt_dir x =
 value main () =
   do {
     IFDEF WIN95 THEN do {
-      WserverApi.sock_in.val := "geneweb_api.sin";
-      WserverApi.sock_out.val := "geneweb_api.sou";
+      Wserver.sock_in.val := "geneweb_api.sin";
+      Wserver.sock_out.val := "geneweb_api.sou";
     }
     ELSE () END;
     let usage =
@@ -1851,7 +1851,7 @@ value main () =
        ("-login_tmout", Arg.Int (fun x -> login_timeout.val := x), "\
 <sec>
        Login timeout for entries with passwords in CGI mode (default " ^ string_of_int login_timeout.val ^ "\
-s)"); 
+s)");
        ("-trace_failed_passwd", Arg.Set trace_failed_passwd, "\n       \
 Print the failed passwords in log (except if option -digest is set) ");
        ("-nolock", Arg.Set Lock.no_lock_flag,
@@ -1866,7 +1866,7 @@ Print the failed passwords in log (except if option -digest is set) ");
              string_of_int conn_timeout.val ^ "s; 0 means no limit)");
           ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.")]
        ELSE
-         [("-noproc", Arg.Set WserverApi.noproc,
+         [("-noproc", Arg.Set Wserver.noproc,
            "\n       Do not launch a process at each request.") ::
           IFDEF SYS_COMMAND THEN
             [("-wserver", Arg.String (fun _ -> wserver_auto_call.val := True),
@@ -1908,7 +1908,7 @@ Print the failed passwords in log (except if option -digest is set) ");
     if Util.cnt_dir.val = Filename.current_dir_name then
       Util.cnt_dir.val := Secure.base_dir ()
     else ();
-    WserverApi.stop_server.val :=
+    Wserver.stop_server.val :=
       List.fold_left Filename.concat Util.cnt_dir.val ["cnt"; "STOP_SERVER"]
     ;
     geneweb_server ()
