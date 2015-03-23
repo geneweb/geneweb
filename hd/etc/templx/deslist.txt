@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: deslist.txt, Template x v 7.00b 2014/10/17 09:00:00 ddr/dd Exp $ -->
+  <!-- $Id: deslist.txt, Template x v 7.00c 2015/03/16 14:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -354,6 +354,8 @@
 
 %import;menubar
 
+%apply;display_arrows()
+
 <h1 id="top">%nn;
   %apply;a_of_b_gr_eq_lev%with;
     [*descendants]%nn;
@@ -364,8 +366,6 @@
     %if;(alias!="") <em>(%alias;)</em>%end;
   %end;
 </h1>
-
-%apply;display_arrows()
 
 %apply;by_list(nb_gend)
 
