@@ -1,16 +1,17 @@
 %if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anctree.txt, Template x v 7.00b 2014/10/17 09:00:00 ddr/dd Exp $ -->
+  <!-- $Id: anctree.txt, Template x v 7.00c 2015/03/16 14:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
     %else[*tree]%end;
-    %if;(evar.t = "A" or evar.t = "C"):%sp;
-      %if;(public_name != "")%public_name;%else;%first_name;%end;
-      %if;(qualifier != "") %qualifier;%end; %surname;
-    %end;
+    %sp;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") %qualifier;%end;
+    %sp;%surname;
+    %if;(alias != "") (%alias;)%end;
   </title>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -123,8 +124,15 @@
 %define;male_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
-      %apply;image_MF("xx","13")
-      %apply;short_display_person("xx")
+    %apply;image_MF("xx","13")
+    %apply;short_display_person("xx")
+    %if;(evar.image = "on" and xx.has_image)
+      <br%/>
+      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
+      <img src="%xx.image_url;"%xx.image_small_size;%sp;
+           border="0" alt="" title="[image/images]0"%/>
+      %if;not cancel_links;</a>%end;
+    %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;%nl;
   %end;
 %end;
@@ -132,8 +140,15 @@
 %define;female_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
-      %apply;image_MF("xx","13")
-      %apply;short_display_person("xx")
+    %apply;image_MF("xx","13")
+    %apply;short_display_person("xx")
+    %if;(evar.image = "on" and xx.has_image)
+      <br%/>
+      %if;not cancel_links;<a href="%xx.image_html_url;">%end;
+      <img src="%xx.image_url;"%xx.image_small_size;%sp;
+           border="0" alt="" title="[image/images]0"%/>
+      %if;not cancel_links;</a>%end;
+    %end;
     %if;("xx" != "self")<br%/>|<br%/>%end;%nl;
   %end;
 %end;
@@ -150,14 +165,28 @@
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %let;nb_gena;
-  %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %if;(bvar.max_anc_tree = "")
+    %apply;min(evar.v, max_anc_level, 7)
+  %else;
+    %apply;min(evar.v, max_anc_level, bvar.max_anc_tree)
+  %end;
 %in;
 %message_to_wizard;
 
 %import;menubar
 
 %apply;display_arrows()
+
+<h1>%nn;
+  %if;(evar.t = "A")[*male line/female line]0%nn;
+  %elseif;(evar.t = "C")[*male line/female line]1%nn;
+  %else[*tree]%end;
+  %sp;
+  %if;(public_name != "")%public_name;%else;%first_name;%end;
+  %if;(qualifier != "") <em>%qualifier;</em>%end;
+  %sp;%surname;
+  %if;(alias != "") <em>(%alias;)</em>%end;
+</h1>
 
 %if;(evar.t = "T")
   <div style="text-align:%right;">%nn;

@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt, Template x v 7.00b 2014/10/17 09:00:00 ddr/dd Exp $ -->
+  <!-- $Id: ancsosa.txt, Template x v 7.00c 2015/03/16 14:00:00 ddr/dd Exp $ -->
   <!-- copyright (c) 1998-2013 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -1154,12 +1154,17 @@
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 %let;nb_gena;
-  %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
-  %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
+  %if;(bvar.max_anc_level = "")
+    %apply;min(evar.v, max_anc_level, 7)
+  %else;
+    %apply;min(evar.v, max_anc_level, bvar.max_anc_level)
+  %end;
 %in;
 %message_to_wizard;
 
 %import;menubar
+
+%apply;display_arrows()
 
 <h1>%nn;
   %apply;a_of_b%with;
@@ -1175,8 +1180,6 @@
   %end;
   %if;(evar.t = "D") [up to] %pvar.1;%end;
 </h1>
-
-%apply;display_arrows()
 
 %if;(evar.v <= 1)
   [*specify::generation/generations]0.
