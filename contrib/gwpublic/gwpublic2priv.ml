@@ -20,7 +20,11 @@ value year_of p =
 
 value find_dated_ancestor base p =
   loop 1 [get_key_index p] where rec loop nb_gen iplist =
-    if iplist = [] then None
+    (* Dans le pire des cas, la personne a 70 générations d'ancetres   *)
+    (* sans dates, on va donc tous les parcourirs, pour rien.          *)
+    (* On triche un peu et on dit que si ça fait plus de 5 générations *)
+    (* on ne trouvera pas d'ancetre avec une date.                     *)
+    if iplist = [] || nb_gen = 5 then None
     else
       let anc_list =
         List.fold_left
