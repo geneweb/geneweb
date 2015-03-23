@@ -252,12 +252,12 @@ function changeCalendar(e,v,m,c) {
 %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
   [*merge::person/persons]1 : %first_name; %surname;
   %if;(first_name != "?" and surname != "?")
-    %sp;<span class="reference">([reference key]: %first_name;.%occ; %surname)</span>
+    %sp;<span class="reference">([reference key]: %first_name;.%if;(occ = "")0%else;%occ;%end; %surname)</span>
   %end;
 %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
   [*modify::person/persons]0 : %first_name; %surname;
   %if;(first_name != "?" and surname != "?")
-    %sp;<span class="reference">([reference key]: %first_name;.%occ; %surname)</span>
+    %sp;<span class="reference">([reference key]: %first_name;.%if;(occ = "")0%else;%occ;%end; %surname)</span>
   %end;
 %else;
   [*add::person/persons]0%end;
