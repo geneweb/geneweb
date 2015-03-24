@@ -19,12 +19,9 @@ value year_of p =
 ;
 
 value find_dated_ancestor base p =
+  let mark = Array.make (nb_of_persons base) False in
   loop 1 [get_key_index p] where rec loop nb_gen iplist =
-    (* Dans le pire des cas, la personne a 70 générations d'ancetres   *)
-    (* sans dates, on va donc tous les parcourirs, pour rien.          *)
-    (* On triche un peu et on dit que si ça fait plus de 5 générations *)
-    (* on ne trouvera pas d'ancetre avec une date.                     *)
-    if iplist = [] || nb_gen = 5 then None
+    if iplist = [] then None
     else
       let anc_list =
         List.fold_left
@@ -40,6 +37,12 @@ value find_dated_ancestor base p =
       (* peut être très long car on le refait plusieurs fois pour les  *)
       (* mêmes personnes. On rend donc la liste unique.                *)
       let anc_list = Mutil.list_uniq anc_list in
+      let anc_list =
+        List.filter (fun ip -> not mark.(Adef.int_of_iper ip)) anc_list
+      in
+      let () =
+        List.iter (fun ip -> mark.(Adef.int_of_iper ip) := True) anc_list
+      in
       loop_ind anc_list where rec loop_ind =
         fun
         [ [ip :: iplist] ->
