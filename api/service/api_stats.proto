@@ -1,0 +1,127 @@
+
+package geneweb.api.stats.object;
+
+enum Title {
+  ST_IND_LONGEVITY = 0;
+  ST_IND_BIRTH_MONTH = 1;
+  ST_IND_PARENT_AGE = 2;
+  ST_IND_LASTNAME = 3;
+  ST_IND_FIRSTNAME = 4;
+  ST_IND_OCCUPATION = 5;
+  ST_IND_YOUNGEST_PARENT = 6;
+  ST_IND_OLDEST = 7;
+  ST_IND_ASTRO = 8;
+  ST_IND_MOON = 9;
+
+  ST_FAM_FIRST_MARR_PARENT_AGE = 10;
+  ST_FAM_MARR_DAY = 11;
+  ST_FAM_MARR_MONTH = 12;
+  ST_FAM_AVG_MARR_NB = 13;
+  ST_FAM_AVG_MARR_DURATION = 14;
+  ST_FAM_AVG_NB_CHILDREN = 15;
+  ST_FAM_INT_BTW_CHILDREN = 16;
+  ST_FAM_DIFF_AGE_BTW_CHILDREN = 17;
+  ST_FAM_DIFF_AGE_BTW_CPL = 18;
+  ST_FAM_LONGUEST_MARR = 19;
+  ST_FAM_SHORTEST_MARR = 20;
+
+  ST_ASC = 21;
+  ST_DESC = 22;
+  ST_DESC_MAN_WOMAN = 23;
+  ST_ASC_LASTNAME = 24;
+  ST_ASC_FIRSTNAME = 25;
+  ST_ASC_OCCUPATION = 26;
+  ST_DESC_LASTNAME = 27;
+  ST_DESC_FIRSTNAME = 28;
+  ST_DESC_OCCUPATION = 29;
+}
+
+enum Serie {
+  SERIE_MALE = 0;
+  SERIE_FEMALE = 1;
+
+  SERIE_MONTH_1 = 2;
+  SERIE_MONTH_2 = 3;
+  SERIE_MONTH_3 = 4;
+  SERIE_MONTH_4 = 5;
+  SERIE_MONTH_5 = 6;
+  SERIE_MONTH_6 = 7;
+  SERIE_MONTH_7 = 8;
+  SERIE_MONTH_8 = 9;
+  SERIE_MONTH_9 = 10;
+  SERIE_MONTH_10 = 11;
+  SERIE_MONTH_11 = 12;
+  SERIE_MONTH_12 = 13;
+
+  SERIE_DAY_1 = 14;
+  SERIE_DAY_2 = 15;
+  SERIE_DAY_3 = 16;
+  SERIE_DAY_4 = 17;
+  SERIE_DAY_5 = 18;
+  SERIE_DAY_6 = 19;
+  SERIE_DAY_7 = 20;
+
+  SERIE_MALE_AGE_FIRST_CHILD = 21;
+  SERIE_MALE_AGE_LAST_CHILD = 22;
+  SERIE_FEMALE_AGE_FIRST_CHILD = 23;
+  SERIE_FEMALE_AGE_LAST_CHILD = 24;
+
+  SERIE_ALL = 25;
+
+  SERIE_IND_FOUND = 26;
+  SERIE_IND_UNIQ = 27;
+
+  SERIE_TOP_10_1 = 28;
+  SERIE_TOP_10_2 = 29;
+  SERIE_TOP_10_3 = 30;
+  SERIE_TOP_10_4 = 31;
+  SERIE_TOP_10_5 = 32;
+  SERIE_TOP_10_6 = 33;
+  SERIE_TOP_10_7 = 34;
+  SERIE_TOP_10_8 = 35;
+  SERIE_TOP_10_9 = 36;
+  SERIE_TOP_10_10 = 37;
+
+  SERIE_ARIES = 38;
+  SERIE_TAURUS = 39;
+  SERIE_GEMINI = 40;
+  SERIE_CANCER = 41;
+  SERIE_LEO = 42;
+  SERIE_VIRGO = 43;
+  SERIE_LIBRA = 44;
+  SERIE_SCORPIO = 45;
+  SERIE_SAGITTARIUS = 46;
+  SERIE_CAPRICORN = 47;
+  SERIE_AQUARIUS = 48;
+  SERIE_PISCES = 49;
+
+  SERIE_MOON_NEW = 50;
+  SERIE_MOON_FIRST_QUARTER = 51;
+  SERIE_MOON_FULL = 52;
+  SERIE_MOON_LAST_QUARTER = 53;
+}
+
+message Data {
+  required int32 nb = 1;
+  required int32 value = 2;
+}
+
+message DataL {
+  repeated Data data = 1;
+}
+
+message Stat {
+  required Title title = 1;
+  repeated int32 labels = 2;
+  repeated Serie series = 3;
+  repeated string series_string = 4;
+  repeated DataL datas = 5;
+}
+
+message Stats {
+  repeated Stat stats = 1;
+}
+
+message StatsParams {
+  optional int32 i = 1;
+}

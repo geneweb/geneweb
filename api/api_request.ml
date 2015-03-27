@@ -135,6 +135,8 @@ value family_m conf base =
 
   | Some "API_LINK_TREE" -> Api_link.print_link_tree conf base
 
+  | Some "API_STATS" -> Api_stats.print_stats conf base
+
   | Some mode -> ()
   | None -> () ]
 ;
