@@ -2700,3 +2700,4 @@ let print_notification_birthday conf base =
   let data = Mext.gen_notification_birthday notification_birthday in
   print_result conf data
 ;;
+

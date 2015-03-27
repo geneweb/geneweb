@@ -36,6 +36,7 @@ api.out:
 	ocamlfind ocamlc -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_search.ml
 	ocamlfind ocamlc -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_graph.ml
 	ocamlfind ocamlc -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_warnings.ml
+	ocamlfind ocamlc -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_stats.ml
 	ocamlfind ocamlc -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api.ml
 	ocamlfind ocamlc -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_saisie_read.ml
 	ocamlfind ocamlc -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_update_util.ml
@@ -47,6 +48,8 @@ api.out:
 api.opt:
 	$(OCAMLOPT) -package piqirun.ext -c api_piqi.ml
 	$(OCAMLOPT) -package piqirun.ext -c api_piqi_ext.ml
+	$(OCAMLOPT) -package piqirun.ext -c api_stats_piqi.ml
+	$(OCAMLOPT) -package piqirun.ext -c api_stats_piqi_ext.ml
 	$(OCAMLOPT) -package piqirun.ext -c api_app_piqi.ml
 	$(OCAMLOPT) -package piqirun.ext -c api_app_piqi_ext.ml
 	$(OCAMLOPT) -package piqirun.ext -c api_saisie_read_piqi.ml
@@ -62,6 +65,7 @@ api.opt:
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_search.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_graph.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_warnings.ml
+	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_stats.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_saisie_read.ml
 	$(OCAMLOPT) -package piqirun.ext -c $(PP_PIQI) -I ../../src -I ../../wserver api_update_util.ml
@@ -85,6 +89,8 @@ piqi:
 	piqic-ocaml --ext api_saisie_write.proto.piqi
 	piqi of-proto --normalize api_link_tree.proto
 	piqic-ocaml --ext api_link_tree.proto.piqi
+	piqi of-proto --normalize api_stats.proto
+	piqic-ocaml --ext api_stats.proto.piqi
 	$(RM) *.piqi
 
 depend:
