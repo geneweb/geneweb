@@ -1152,7 +1152,7 @@ value reconstitute_from_fevents2 conf base fevents marr div =
 ;
 
 (* On met à jour les témoins maintenant. *)
-value patch_family_with_fevents conf base fam =
+value update_family_with_fevents conf base fam =
   let (marr, div, witnesses) =
     reconstitute_from_fevents2 conf base fam.fevents
       (fam.relation, fam.marriage, fam.marriage_place,
@@ -1171,7 +1171,6 @@ value patch_family_with_fevents conf base fam =
      relation = relation; divorce = divorce;
      witnesses = Array.of_list witnesses}
   in
-  let () = patch_family base fam.fam_index fam in
   fam
   (*
   let rec loop fevents =
@@ -1220,7 +1219,7 @@ value effective_mod conf base sfam scpl sdes = do {
   in
   let nfath = poi base (Adef.father ncpl) in
   let nmoth = poi base (Adef.mother ncpl) in
-  let nfam = patch_family_with_fevents conf base nfam in
+  let nfam = update_family_with_fevents conf base nfam in
   let sfam = {(sfam) with relation = nfam.relation} in
   if sfam.relation <> NoSexesCheckNotMarried &&
      sfam.relation <> NoSexesCheckMarried then do {
@@ -1355,7 +1354,7 @@ value effective_add conf base sfam scpl sdes =
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
-  let nfam = patch_family_with_fevents conf base nfam in
+  let nfam = update_family_with_fevents conf base nfam in
   let sfam = {(sfam) with relation = nfam.relation} in
   do {
     if sfam.relation <> NoSexesCheckNotMarried &&
