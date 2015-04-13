@@ -457,7 +457,6 @@ let print_add conf base ip mod_f mod_fath mod_moth =
             let (ifam, fam, cpl, des) =
               UpdateFamOk.effective_add conf base sfam scpl sdes
             in
-            let fam = UpdateFamOk.patch_family_with_fevents conf base fam in
             let () = UpdateFamOk.patch_parent_with_pevents base cpl in
             let () = UpdateFamOk.patch_children_with_pevents base des in
             (* On met à jour les index ! et le digest ! *)
@@ -618,7 +617,6 @@ let print_mod conf base ip mod_f =
       let (ifam, fam, cpl, des) =
         UpdateFamOk.effective_mod conf base sfam scpl sdes
       in
-      let fam = UpdateFamOk.patch_family_with_fevents conf base fam in
       let () = UpdateFamOk.patch_parent_with_pevents base cpl in
       let () = UpdateFamOk.patch_children_with_pevents base des in
       let s =
