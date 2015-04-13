@@ -99,6 +99,11 @@ value gen_print conf base mois f_scan dead_people =
     [ Not_found -> () ];
     header conf title;
     print_link_to_welcome conf True;
+    if List.for_all (fun l -> List.length l = 0) (Array.to_list tab) then
+      tag "p" begin
+        Wserver.wprint "%s.\n" (capitale (transl conf "no anniversary"));
+      end
+    else ();
     Wserver.wprint "<ul>\n";
     for j = 1 to 31 do {
       if tab.(pred j) <> [] then do {
