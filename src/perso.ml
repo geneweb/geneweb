@@ -3519,7 +3519,11 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
               string_of_int n ] ]
   | "nb_families" ->
       match get_env "p_link" env with
-      [ Vbool _ -> (* ERROR TODO *) "2"
+      [ Vbool _ ->
+          string_of_int
+            (List.length
+              (Perso_link.get_family_correspondance
+                 conf.command (get_key_index p)))
       | _ -> string_of_int (Array.length (get_family p)) ]
   | "notes" ->
       if p_auth && not conf.no_note then
