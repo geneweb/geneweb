@@ -3043,7 +3043,48 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | _ -> True ]
       in*)
       match get_env "fam" env with
-      [ Vfam _ fam _ _ -> Array.length (get_children fam) > 0
+      [ Vfam _ fam _ _ ->
+          if Array.length (get_children fam) > 0 then True
+          else
+            let faml =
+              Perso_link.get_family_link conf.command (get_key_index p)
+            in
+            loop faml where rec loop faml =
+              match faml with
+              [ [] -> False
+              | [fam_link :: faml] ->
+                  let (ifath, imoth, ifam) =
+                    (Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.ifath),
+                     Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.imoth),
+                     Adef.ifam_of_int (Int32.to_int fam_link.MLink.Family.ifam))
+                  in
+                  let cpl =
+                    let ip = get_key_index p in
+                    if ip <> ifath && ip <> imoth then
+                      match
+                        Perso_link.get_person_link_with_base
+                          conf.command ip fam_link.MLink.Family.baseprefix
+                      with
+                      [ Some p ->
+                          let ip = Adef.iper_of_int (Int32.to_int p.MLink.Person.ip) in
+                          (ifath, imoth, if ip = ifath then imoth else ifath)
+                      | None -> (ifath, imoth, if ip = ifath then imoth else ifath) ]
+                    else (ifath, imoth, if ip = ifath then imoth else ifath)
+                  in
+                  let can_merge =
+                    Perso_link.can_merge_family
+                      conf.command (get_key_index p) [fam] fam_link cpl
+                  in
+                  if can_merge then
+                    let (ifam, ifath, imoth) =
+                      (Adef.ifam_of_int (Int32.to_int fam_link.MLink.Family.ifam),
+                       Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.ifath),
+                       Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.imoth))
+                    in
+                    List.length
+                      (Perso_link.get_children_of_parents
+                         fam_link.MLink.Family.baseprefix ifam ifath imoth) > 0
+                  else loop faml ]
       | _ ->
           let b =
             List.exists
