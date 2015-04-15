@@ -257,7 +257,7 @@ value make_ep_link conf base p_link =
     | None -> empty_string ]
   in
   let gen_p =
-    {(gen_p) with first_name = first_name; surname = surname;
+    {(gen_p) with access = IfTitles; first_name = first_name; surname = surname;
       key_index = key_index; occ = occ; image = image; occupation = occupation;
       public_name = public_name; qualifiers = qualifiers; titles = titles;
       aliases = aliases; sex = sex; birth = birth; birth_place = birth_place;
