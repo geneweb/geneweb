@@ -2151,8 +2151,13 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
       [ Vcell cell -> eval_cell_field_var conf base env ep cell loc sl
       | _ -> raise Not_found ]
   | ["child" :: sl] ->
+      let mode_local =
+        match get_env "p_link" env with
+        [ Vbool _ -> False
+        | _ -> True ]
+      in
       match get_env "child" env with
-      [ Vind p ->
+      [ Vind p when mode_local ->
           let auth = authorized_age conf base p in
           let ep = (p, auth) in
           eval_person_field_var conf base env ep loc sl
