@@ -1925,6 +1925,46 @@ let print_graph_tree conf base =
           (Array.to_list (get_children fam)) []
     | None -> []
   in
+  let (nodes_siblings_before, nodes_siblings_after) =
+    match get_parents p with
+    | Some ifam ->
+        let fam = foi base ifam in
+        let children = Array.to_list (get_children fam) in
+        let rec split_at_person before after l =
+          match l with
+          | [] -> (List.rev before, after)
+          | ic :: l ->
+              if ic = ip then
+                let after =
+                  List.map
+                    (fun ic ->
+                      let c = poi base ic in
+                      let id = Int64.of_int (Adef.int_of_iper ic) in
+                      let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
+                      Mread.Node#{
+                        id = id;
+                        person = c;
+                        ifam = None;
+                      })
+                    l
+                in
+                (List.rev before, after)
+              else
+                let c = poi base ic in
+                let id = Int64.of_int (Adef.int_of_iper ic) in
+                let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
+                let node =
+                  Mread.Node#{
+                    id = id;
+                    person = c;
+                    ifam = None;
+                  }
+                in
+                split_at_person (node :: before) after l
+        in
+        split_at_person [] [] children
+    | None -> ([], [])
+  in
   let graph =
     Mread.Graph_tree#{
       nodes_asc = nodes_asc;
@@ -1932,6 +1972,8 @@ let print_graph_tree conf base =
       nodes_desc = nodes_desc;
       edges_desc = edges_desc;
       nodes_siblings = nodes_siblings;
+      nodes_siblings_before = nodes_siblings_before;
+      nodes_siblings_after = nodes_siblings_after;
     }
   in
   let data = Mext_read.gen_graph_tree graph in
