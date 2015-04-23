@@ -209,8 +209,8 @@ value main () =
     gcc.Gc.max_overhead := 100;
     Gc.set gcc;
     if everybody.val then public_everybody bname.val
-    else if ind.val = "" then public_all bname.val lim_year.val check_titled.val
-    else public_some bname.val lim_year.val check_titled.val ind.val
+    else if ind.val = "" then public_all bname.val lim_year.val titled.val
+    else public_some bname.val lim_year.val titled.val ind.val
   }
 ;
 
