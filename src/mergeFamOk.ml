@@ -72,17 +72,14 @@ value merge_events conf base l1 l2 =
   in
   let field x1 x2 null = if null x1 then x2 else x1 in
   let need_selection x1 x2 = x1 <> "" && x2 <> "" && x1 <> x2 in
+  let string_event_date e =
+    match Adef.od_of_codate e.efam_date with
+    [ None -> ""
+    | Some d -> Date.string_of_ondate conf d ]
+  in
   let can_merge_event e1 e2 =
     not
-      (need_selection
-         ((fun e ->
-           match Adef.od_of_codate e1.efam_date with
-           [ None -> ""
-           | Some d -> Date.string_of_ondate conf d ]) e1)
-         ((fun e ->
-           match Adef.od_of_codate e1.efam_date with
-           [ None -> ""
-           | Some d -> Date.string_of_ondate conf d ]) e2) ||
+      (need_selection (string_event_date e1) (string_event_date e2) ||
        need_selection e1.efam_place e2.efam_place ||
        need_selection e1.efam_note e2.efam_note ||
        need_selection e1.efam_src e2.efam_src)
