@@ -278,8 +278,8 @@ value ged_date oc =
 
 value ged_ev_detail oc n typ d pl note src =
   do {
-    match (typ, d, pl) with
-    [ ("", None, "") -> fprintf oc " Y"
+    match (typ, d, pl, note, src) with
+    [ ("", None, "", "", "") -> fprintf oc " Y"
     | _ -> () ];
     fprintf oc "\n";
     if typ = "" then () else fprintf oc "%d TYPE %s\n" n typ;

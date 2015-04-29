@@ -1854,7 +1854,8 @@ value treat_indi_pevent gen ip r =
             (* Si le tag 1 XXX a des infos, on les ajoutes. *)
             let note =
               let name_info = strip_spaces r.rval in
-              if name_info = "" then note else name_info ^ "<br>\n" ^ note
+              if name_info = "" || r.rval = "Y" then note
+              else name_info ^ "<br>\n" ^ note
             in
             let src =
               match find_all_fields "SOUR" r.rsons with
@@ -1920,7 +1921,8 @@ value treat_indi_pevent gen ip r =
                (* Si le tag 1 XXX a des infos, on les ajoutes. *)
                let note =
                  let name_info = strip_spaces r.rval in
-                 if name_info = "" then note else name_info ^ "<br>\n" ^ note
+                 if name_info = "" || r.rval = "Y" then note
+                 else name_info ^ "<br>\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
@@ -2214,13 +2216,8 @@ value add_indi gen r =
     [ Some r -> Some (fam_index gen r.rval)
     | None -> None ]
   in
-  let occupation =
-    match find_all_fields "OCCU" r.rsons with
-    [ [r :: rl] ->
-        List.fold_left (fun s r -> s ^ ", " ^ strip_spaces r.rval)
-          (strip_spaces r.rval) rl
-    | [] -> "" ]
-  in
+  (* Les professions seront importées dans les événements. *)
+  let occupation = "" in
   let notes =
     match find_all_fields "NOTE" r.rsons with
     [ [] -> ""
@@ -2597,7 +2594,8 @@ value treat_fam_fevent gen ifath imoth r =
             (* Si le tag 1 XXX a des infos, on les ajoutes. *)
             let note =
               let name_info = strip_spaces r.rval in
-              if name_info = "" then note else name_info ^ "<br>\n" ^ note
+              if name_info = "" || r.rval = "Y" then note
+              else name_info ^ "<br>\n" ^ note
             in
             let src =
               match find_all_fields "SOUR" r.rsons with
@@ -2674,7 +2672,8 @@ value treat_fam_fevent gen ifath imoth r =
                (* Si le tag 1 XXX a des infos, on les ajoutes. *)
                let note =
                  let name_info = strip_spaces r.rval in
-                 if name_info = "" then note else name_info ^ "<br>\n" ^ note
+                 if name_info = "" || r.rval = "Y" then note
+                 else name_info ^ "<br>\n" ^ note
                in
                let src =
                  match find_all_fields "SOUR" r.rsons with
