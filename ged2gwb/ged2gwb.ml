@@ -1885,7 +1885,11 @@ value treat_indi_pevent gen ip r =
             if date <> None || place <> "" || note <> "" ||
                src <> "" || witnesses <> [| |] || r.rval = "Y"
             then
-              [ evt :: events ]
+              (* On ajoute les professions que s'il y a des info en plus. *)
+              if name = Epers_Occupation then
+                if r.rsons <> [] then [ evt :: events ]
+                else events
+              else [ evt :: events ]
             else events )
           events (find_all_fields tag r.rsons) )
       [] primary_pevents
@@ -2216,8 +2220,17 @@ value add_indi gen r =
     [ Some r -> Some (fam_index gen r.rval)
     | None -> None ]
   in
-  (* Les professions seront importées dans les événements. *)
-  let occupation = "" in
+  (* On ne prend que les professions sans info supplémentaires. *)
+  let occupation =
+    let l =
+      List.fold_right
+        (fun r l ->
+          if r.rsons = [] then [strip_spaces r.rval :: l]
+          else l)
+        (find_all_fields "OCCU" r.rsons) []
+    in
+    String.concat ", " l
+  in
   let notes =
     match find_all_fields "NOTE" r.rsons with
     [ [] -> ""
