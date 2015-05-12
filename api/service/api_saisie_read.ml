@@ -941,7 +941,10 @@ let pers_to_piqi_person conf base p =
                   if conf.no_note || String.length (sou base note) > 100 then
                     (Util.string_of_pevent_name conf base Epers_Occupation, false)
                   else
-                    (sou base note, true)
+                    let s = sou base note in
+                    (* Si il y a des <br>, on les supprime. *)
+                    let s = Str.global_replace (Str.regexp "<br */?>") "" s in
+                    (s, true)
               | Perso.Pevent name -> (Util.string_of_pevent_name conf base name, false)
               | Perso.Fevent name -> (Util.string_of_fevent_name conf base name, false)
             in
