@@ -1,0 +1,33 @@
+OVERVIEW:
+
+GeneWeb is a genealogy software with a Web interface. It can be used
+off-line or as a Web service.
+
+This is an API which works just like GeneWeb (e.g. it's a web server).
+The difference is that instead of sending HTML, it uses the Google
+Protocol Buffer to exchange informations encoded as pb, json, xml.
+
+DEPENDANCIES:
+
+  OCaml
+  Camlp5
+  ocamlfind
+  piqi
+  piqilib
+  protobuf
+  mysql
+  ocurl
+  ocaml-redis (https://github.com/0xffea/ocaml-redis)
+  js_of_ocaml
+
+NOTE 1: While the issue about the Hashtbl is not fixed, use OCaml 3.12
+
+CONTENTS:
+
+  api_request.ml        module for the requests
+  api_server.ml         module for the configuration of the server
+  Makefile              main Makefile
+  README.md             this file
+  package               deprecated (local dependancies)
+  service               all the modules that computes the requests' results
+  service/lib           deprecated (local dependancies)
