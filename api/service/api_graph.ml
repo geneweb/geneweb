@@ -15,10 +15,10 @@ open Api_util
 
 (**/**) (* TRY WITH COMPUTE RELATION *)
 (*
-module Iper2 = 
+module Iper2 =
   struct
     type t = (Adef.iper * int)
-    let compare (i1, _) (i2, _) = 
+    let compare (i1, _) (i2, _) =
       Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
   end
 
@@ -27,7 +27,7 @@ module IperSet2 = Set.Make(Iper2) ;;
 
 let close_persons conf base ip nb_gen_asc nb_gen_desc spouse_ascend =
   let _ = load_descends_array base in
-  let _ = load_unions_array base in 
+  let _ = load_unions_array base in
   (* On construit la liste des plus vieux ancêtre pour obtenir *)
   (* toute la descendances correspondant aux proches.          *)
   let ascends = ref [] in
@@ -41,9 +41,9 @@ let close_persons conf base ip nb_gen_asc nb_gen_desc spouse_ascend =
           | Some ifam ->
               let cpl = foi base ifam in
               let father = (get_father cpl, (gen + 1)) in
-              let mother = (get_mother cpl, (gen + 1)) in 
-              loop l (father :: mother :: next_gen) 
-          | None -> 
+              let mother = (get_mother cpl, (gen + 1)) in
+              loop l (father :: mother :: next_gen)
+          | None ->
               let _ = ascends := (ip, gen) :: !ascends in
               loop l next_gen
     in
@@ -56,24 +56,24 @@ let close_persons conf base ip nb_gen_asc nb_gen_desc spouse_ascend =
     in loop l 0
   in
   (* Liste de la personne et conjoints dont on veut les proches *)
-  let gen_0 = 
+  let gen_0 =
     if spouse_ascend then
       let p = poi base ip in
-      let spl = 
-        List.map 
-          (fun ifam -> 
+      let spl =
+        List.map
+          (fun ifam ->
             let fam = foi base ifam in
-            (spouse ip fam, 0) ) 
+            (spouse ip fam, 0) )
           (Array.to_list (get_family p))
       in
       build_ascend ((ip, 0) :: spl) nb_gen_asc
     else
       let p = poi base ip in
-      let spl = 
-        List.map 
-          (fun ifam -> 
+      let spl =
+        List.map
+          (fun ifam ->
             let fam = foi base ifam in
-            (spouse ip fam, 0) ) 
+            (spouse ip fam, 0) )
           (Array.to_list (get_family p))
       in
       let spl = build_ascend spl 1 in
@@ -88,11 +88,11 @@ let close_persons conf base ip nb_gen_asc nb_gen_desc spouse_ascend =
     let rec loop curr_gen next_gen =
       match curr_gen with
       | [] -> IperSet2.elements !next_gen
-      | (ip, gen) :: l -> 
+      | (ip, gen) :: l ->
           close_persons := IperSet.add ip !close_persons;
           (* Si la génération suivante est trop 'basse', on ne l'ajoute pas *)
           if gen <= nb_gen_desc then loop l next_gen
-          else 
+          else
             begin
               let p = poi base ip in
               Array.iter
@@ -102,7 +102,7 @@ let close_persons conf base ip nb_gen_asc nb_gen_desc spouse_ascend =
                     begin
                       Array.set mark_fam (Adef.int_of_ifam ifam) true;
                       let fam = foi base ifam in
-                      next_gen := IperSet2.add (spouse ip fam, gen) !next_gen; 
+                      next_gen := IperSet2.add (spouse ip fam, gen) !next_gen;
                       Array.iter
                         (fun ip -> next_gen := IperSet2.add (ip, gen-1) !next_gen)
                         (get_children fam);
@@ -127,21 +127,21 @@ let print_close_person_relations2 conf base =
   let sn = ref_person.M.Reference_person.n in
   let fn = ref_person.M.Reference_person.p in
   let occ = ref_person.M.Reference_person.oc in
-  let asc = 
+  let asc =
     match cpp.M.Close_persons_params.nb_gen_asc with
     | Some n -> max 1 (Int32.to_int n)
     | None -> 2
   in
-  let desc = 
+  let desc =
     match cpp.M.Close_persons_params.nb_gen_asc with
     | Some n -> (- (max 1 (Int32.to_int n)))
     | None -> (-3)
   in
   let spouse = cpp.M.Close_persons_params.spouse_ascend in
   let only_recent = cpp.M.Close_persons_params.only_recent in
-  let list = 
+  let list =
     match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
-    | Some ip -> 
+    | Some ip ->
         close_person_relation conf base ip asc desc spouse
     | None -> []
   in
@@ -151,8 +151,8 @@ let print_close_person_relations2 conf base =
     else List.map (fun ip -> poi base ip) list
   in
   let list = M.List_person_relation#{person_relations = list} in
-  let data = Mext.gen_list_person_relation list in 
-  print_result conf data 
+  let data = Mext.gen_list_person_relation list in
+  print_result conf data
 ;;
 
 *)
@@ -163,10 +163,10 @@ let print_close_person_relations2 conf base =
 
 (**/**)
 
-module Iper3 = 
+module Iper3 =
   struct
     type t = (Adef.iper * int * M.relation_type)
-    let compare (i1, _, _) (i2, _, _) = 
+    let compare (i1, _, _) (i2, _, _) =
       Pervasives.compare (Adef.int_of_iper i1) (Adef.int_of_iper i2)
   end
 
@@ -174,27 +174,27 @@ module IperSet3 = Set.Make(Iper3) ;;
 
 let compute_related r_type level =
   match r_type with
-  | Adoption -> 
+  | Adoption ->
       (match level with
       | 1 -> `adoptive_parent
       | (-1) -> `adoptive_child
       | _ -> `no_relation)
-  | Recognition -> 
+  | Recognition ->
       (match level with
       | 1 -> `recognized_parent
       | (-1) -> `recognized_child
       | _ -> `no_relation)
-  | CandidateParent -> 
+  | CandidateParent ->
       (match level with
       | 1 -> `candidate_parent
       | (-1) -> `candidate_child
       | _ -> `no_relation)
-  | GodParent -> 
+  | GodParent ->
       (match level with
       | 1 -> `god_parent
       | (-1) -> `god_child
       | _ -> `no_relation)
-  | FosterParent -> 
+  | FosterParent ->
       (match level with
       | 1 -> `foster_parent
       | (-1) -> `foster_child
@@ -227,24 +227,24 @@ let compute_rel_sp r_type =
 
 let compute_rel r_type level =
   match r_type with
-  | `self -> 
+  | `self ->
       (match level with
       | 0 -> `sibling
       | 1 -> `parent
       | (-1) -> `child
       | _ -> `no_relation)
-  | `spouse -> 
+  | `spouse ->
       (match level with
       | 0 -> `step_brother
       | 1 -> `step_parent
       | (-1) -> `great_grand_child_cousin
       | _ -> `no_relation)
-  | `parent -> 
+  | `parent ->
       (match level with
       | 0 -> `uncle
       | 1 -> `grand_parent
       | _ -> `no_relation)
-  | `uncle -> 
+  | `uncle ->
       (match level with
       | (-1) -> `cousin
       | _ -> `no_relation)
@@ -274,15 +274,15 @@ let compute_rel r_type level =
       (match level with
       | (-1) -> `great_grand_nephew_spouse
       | _ -> `no_relation)
-  | `cousin -> 
+  | `cousin ->
       (match level with
       | (-1) -> `child_cousin
       | _ -> `no_relation)
-  | `child_cousin -> 
+  | `child_cousin ->
       (match level with
       | (-1) -> `grand_child_cousin
       | _ -> `no_relation)
-  | `grand_child_cousin -> 
+  | `grand_child_cousin ->
       (match level with
       | (-1) -> `great_grand_child_cousin
       | _ -> `no_relation)
@@ -301,7 +301,7 @@ let compute_rel r_type level =
 let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only_recent base_loop =
 (*
   let () = load_descends_array base in
-  let () = load_unions_array base in 
+  let () = load_unions_array base in
   let () = load_couples_array base in
 *)
   (* On construit la liste des plus vieux ancêtre pour obtenir *)
@@ -318,17 +318,17 @@ let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only
           | Some ifam ->
               let cpl = foi base ifam in
               let father = (get_father cpl, (gen + 1), compute_rel r_type 1) in
-              let mother = (get_mother cpl, (gen + 1), compute_rel r_type 1) in 
-              let child = 
-                List.map 
-                  (fun ip_c -> 
-                    if ip_c = ip then (ip, gen, r_type) 
-                    else (ip_c, gen, compute_rel r_type 0)) 
+              let mother = (get_mother cpl, (gen + 1), compute_rel r_type 1) in
+              let child =
+                List.map
+                  (fun ip_c ->
+                    if ip_c = ip then (ip, gen, r_type)
+                    else (ip_c, gen, compute_rel r_type 0))
                   (Array.to_list (get_children cpl))
               in
               ascends := List.append !ascends child;
-              loop l (father :: mother :: next_gen) 
-          | None -> 
+              loop l (father :: mother :: next_gen)
+          | None ->
               ascends := (ip, gen, r_type) :: !ascends;
               loop l next_gen
     in
@@ -342,26 +342,26 @@ let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only
     in loop l 0
   in
   (* Liste de la personne et conjoints dont on veut les proches *)
-  let _ = 
+  let _ =
     (* on veut les ascendants de la personne et ses conjoints *)
     if spouse_ascend then
       let p = ref_close_person in
-      let spl = 
-        List.map 
-          (fun ifam -> 
+      let spl =
+        List.map
+          (fun ifam ->
             let fam = foi base ifam in
-            (Gutil.spouse ip fam, 0, `spouse) ) 
+            (Gutil.spouse ip fam, 0, `spouse) )
           (Array.to_list (get_family p))
       in
       build_ascend ((ip, 0, `self) :: spl) nb_gen_asc
     (* on ne veut que les parents du conjoint *)
     else
       let p = ref_close_person in
-      let spl = 
-        List.map 
-          (fun ifam -> 
+      let spl =
+        List.map
+          (fun ifam ->
             let fam = foi base ifam in
-            (Gutil.spouse ip fam, 0, `spouse) ) 
+            (Gutil.spouse ip fam, 0, `spouse) )
           (Array.to_list (get_family p))
       in
       let spl = build_ascend spl 1 in
@@ -376,11 +376,11 @@ let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only
     let rec loop curr_gen next_gen =
       match curr_gen with
       | [] -> IperSet3.elements !next_gen
-      | (ip, gen, r_type) :: l -> 
+      | (ip, gen, r_type) :: l ->
           close_persons := IperSet3.add (ip, gen, r_type) !close_persons;
           (* Si la génération suivante est trop 'basse', on ne l'ajoute pas *)
           if gen <= nb_gen_desc then loop l next_gen
-          else 
+          else
             begin
               let p = poi base ip in
               Array.iter
@@ -390,20 +390,20 @@ let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only
                     begin
                       Array.set mark_fam (Adef.int_of_ifam ifam) true;
                       let fam = foi base ifam in
-                      next_gen := 
-                        IperSet3.add 
-                          (Gutil.spouse ip fam, gen, compute_rel_sp r_type) 
+                      next_gen :=
+                        IperSet3.add
+                          (Gutil.spouse ip fam, gen, compute_rel_sp r_type)
                           !next_gen;
-                      (* On marque la famille du conjoint sinon, en cas de multi 
+                      (* On marque la famille du conjoint sinon, en cas de multi
                          marriage, on a la descendance de chaque conjoint *)
                       Array.iter
                         (fun ifam -> Array.set mark_fam (Adef.int_of_ifam ifam) true)
                         (get_family (poi base (Gutil.spouse ip fam)));
                       Array.iter
-                        (fun ip -> 
-                          next_gen := 
-                            IperSet3.add 
-                              (ip, gen-1, compute_rel r_type (-1)) 
+                        (fun ip ->
+                          next_gen :=
+                            IperSet3.add
+                              (ip, gen-1, compute_rel r_type (-1))
                               !next_gen)
                         (get_children fam);
                     end)
@@ -420,7 +420,7 @@ let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only
   let _ = build_descend (List.rev !ascends) in
   let _ =
     List.iter
-      (fun r -> 
+      (fun r ->
         (match r.r_fath with
         | Some ip ->
             close_persons := IperSet3.add (ip, 0, compute_related r.r_type 1) !close_persons
@@ -431,12 +431,12 @@ let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only
         | None -> ()))
       (get_rparents ref_close_person)
   in
-  let _ = 
+  let _ =
     List.iter
       (fun ip ->
         let p = poi base ip in
         List.iter
-          (fun r -> 
+          (fun r ->
             (match r.r_fath with
             | Some _ ->
                 close_persons := IperSet3.add (ip, 0, compute_related r.r_type (-1)) !close_persons
@@ -454,7 +454,7 @@ let close_person_relation conf base ip nb_gen_asc nb_gen_desc spouse_ascend only
       (fun ifam ->
         let fam = foi base ifam in
         List.iter
-          (fun ip -> 
+          (fun ip ->
             close_persons := IperSet3.add (ip, 0, `witness) !close_persons)
           (Array.to_list (get_witnesses fam)))
       (Array.to_list (ifam))
@@ -471,21 +471,21 @@ let print_close_person_relations conf base =
   let sn = ref_person.M.Reference_person.n in
   let fn = ref_person.M.Reference_person.p in
   let occ = ref_person.M.Reference_person.oc in
-  let asc = 
+  let asc =
     match cpp.M.Close_persons_params.nb_gen_asc with
     | Some n -> max 1 (Int32.to_int n)
     | None -> 2
   in
-  let desc = 
+  let desc =
     match cpp.M.Close_persons_params.nb_gen_asc with
     | Some n -> (- (max 1 (Int32.to_int n)))
     | None -> (-3)
   in
   let spouse = cpp.M.Close_persons_params.spouse_ascend in
   let only_recent = cpp.M.Close_persons_params.only_recent in
-  let list = 
+  let list =
     match Gwdb.person_of_key base fn sn (Int32.to_int occ) with
-    | Some ip -> 
+    | Some ip ->
         close_person_relation conf base ip asc desc spouse only_recent base_loop
     | None -> []
   in
@@ -493,11 +493,11 @@ let print_close_person_relations conf base =
   let () = load_image_ht conf base in
   if p_getenvbin conf.env "full_infos" = Some "1" then
     begin
-      let list = 
-        List.fold_left 
-          (fun accu (ip, _, r_type) -> 
+      let list =
+        List.fold_left
+          (fun accu (ip, _, r_type) ->
             let p = poi base ip in
-            if apply_filters_p conf base filters Perso.get_sosa_person p then 
+            if apply_filters_p conf base filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
               let p =
                 M.Full_person_relation#{
@@ -510,7 +510,7 @@ let print_close_person_relations conf base =
           [] list
       in
       let data =
-        if filters.nb_results then 
+        if filters.nb_results then
           let len = M.Internal_int32#{value = Int32.of_int (List.length list)} in
           Mext.gen_internal_int32 len
         else
@@ -519,15 +519,15 @@ let print_close_person_relations conf base =
             Mext.gen_list_full_person_relation list
           end
       in
-      print_result conf data 
+      print_result conf data
     end
   else
     begin
-      let list = 
-        List.fold_left 
-          (fun accu (ip, _, r_type) -> 
+      let list =
+        List.fold_left
+          (fun accu (ip, _, r_type) ->
             let p = poi base ip in
-            if apply_filters_p conf base filters Perso.get_sosa_person p then 
+            if apply_filters_p conf base filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
               let p =
                 M.Person_relation#{
@@ -540,16 +540,16 @@ let print_close_person_relations conf base =
           [] list
       in
       let data =
-        if filters.nb_results then 
+        if filters.nb_results then
           let len = M.Internal_int32#{value = Int32.of_int (List.length list)} in
           Mext.gen_internal_int32 len
         else
           begin
             let list = M.List_person_relation#{person_relations = list} in
-            Mext.gen_list_person_relation list 
+            Mext.gen_list_person_relation list
           end
       in
-      print_result conf data 
+      print_result conf data
     end
 ;;
 
@@ -570,21 +570,21 @@ let build_graph_asc conf base p max_gen base_loop =
       to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
     }
   in
-  let create_family ifam families = 
+  let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
       families := (fam_to_piqi_family conf base ifam) :: !families
-  in 
+  in
   let rec loop l nodes edges families =
     match l with
-    | [] -> 
+    | [] ->
         (* On retourne la liste pour avoir les noeuds dans l'ordre *)
         (* la référence, suivi du père suivi, puis de la mère ...  *)
         (!nodes, List.rev !edges, List.rev !families)
     | (p, gen) :: l ->
-        try 
+        try
           let _ = Hashtbl.find ht (get_key_index p) in
           loop l nodes edges families
-        with Not_found -> 
+        with Not_found ->
           begin
             if gen >= max_gen then
               loop l nodes edges families
@@ -601,10 +601,10 @@ let build_graph_asc conf base p max_gen base_loop =
                     edges := (create_edge p moth) :: !edges;
                     create_family ifam families;
                     loop ((fath, gen + 1) :: (moth, gen + 1) :: l) nodes edges families
-                | None -> loop l nodes edges families 
+                | None -> loop l nodes edges families
               end
           end
-  in 
+  in
   let nodes = ref [] in
   let edges = ref [] in
   let families = ref [] in
@@ -618,11 +618,11 @@ let print_graph_asc conf base =
   let filters = get_filters conf in
   let base_loop = has_base_loop conf base in
   let ref_person = params.M.Graph_params.person in
-  let (nodes, edges, families) = 
+  let (nodes, edges, families) =
     match piqi_ref_person_to_person base ref_person with
-    | Some p -> 
+    | Some p ->
         let max_gen = 12 in
-        let nb_gen = 
+        let nb_gen =
           match params.M.Graph_params.generation with
           | Some n -> min max_gen (max (Int32.to_int n) 1)
           | None -> max_gen
@@ -630,7 +630,7 @@ let print_graph_asc conf base =
         build_graph_asc conf base p nb_gen base_loop
     | None -> ([], [], [])
   in
-  let data = 
+  let data =
     if filters.nb_results then
       let len = M.Internal_int32#{value = Int32.of_int (List.length nodes)} in
       Mext.gen_internal_int32 len
@@ -638,15 +638,15 @@ let print_graph_asc conf base =
       let nodes = person_node_map conf base nodes in
       match nodes with
       | PFull nodes ->
-          let graph = 
-            M.Full_graph#{nodes = nodes; edges = edges; families = families} 
+          let graph =
+            M.Full_graph#{nodes = nodes; edges = edges; families = families}
           in
           Mext.gen_full_graph graph
       | PLight nodes ->
           let graph = M.Graph#{nodes = nodes; edges = edges;} in
           Mext.gen_graph graph
   in
-  print_result conf data 
+  print_result conf data
 ;;
 
 (* Graphe de descendance *)
@@ -665,21 +665,21 @@ let build_graph_desc conf base p max_gen base_loop =
       to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
     }
   in
-  let create_family ifam families = 
+  let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
       families := (fam_to_piqi_family conf base ifam) :: !families
-  in 
+  in
   let rec loop l nodes edges families =
     match l with
-    | [] -> 
+    | [] ->
         (* On retourne la liste pour avoir les noeuds dans l'ordre *)
         (* la référence, suivi du père suivi, puis de la mère ...  *)
         (!nodes, List.rev !edges, !families)
     | (p, gen) :: l ->
-        try 
+        try
           let _ = Hashtbl.find ht (get_key_index p) in
           loop l nodes edges families
-        with Not_found -> 
+        with Not_found ->
           begin
             if gen >= max_gen then
               loop l nodes edges families
@@ -693,21 +693,21 @@ let build_graph_desc conf base p max_gen base_loop =
                     (fun ifam accu ->
                       let fam = foi base ifam in
                       let sp = poi base (Gutil.spouse (get_key_index p) fam) in
-                      let children = 
-                        List.map (poi base) (Array.to_list (get_children fam)) 
+                      let children =
+                        List.map (poi base) (Array.to_list (get_children fam))
                       in
                       nodes := sp :: !nodes;
                       if gen <> max_gen then
                         begin
                           nodes := children @ !nodes;
-                          List.iter 
-                            (fun c -> 
+                          List.iter
+                            (fun c ->
                               edges := (create_edge p c) :: !edges;
                               edges := (create_edge sp c) :: !edges)
                             children;
                           create_family ifam families;
-                          List.fold_right 
-                            (fun c accu -> (c, gen + 1) :: accu) 
+                          List.fold_right
+                            (fun c accu -> (c, gen + 1) :: accu)
                             children accu
                         end
                       else accu)
@@ -716,7 +716,7 @@ let build_graph_desc conf base p max_gen base_loop =
                 loop l nodes edges families
               end
           end
-  in 
+  in
   let nodes = ref [] in
   let edges = ref [] in
   let families = ref [] in
@@ -730,11 +730,11 @@ let print_graph_desc conf base =
   let filters = get_filters conf in
   let base_loop = has_base_loop conf base in
   let ref_person = params.M.Graph_params.person in
-  let (nodes, edges, families) = 
+  let (nodes, edges, families) =
     match piqi_ref_person_to_person base ref_person with
-    | Some p -> 
+    | Some p ->
         let max_gen = 12 in
-        let nb_gen = 
+        let nb_gen =
           match params.M.Graph_params.generation with
           | Some n -> min max_gen (max (Int32.to_int n) 1)
           | None -> max_gen
@@ -742,7 +742,7 @@ let print_graph_desc conf base =
         build_graph_desc conf base p nb_gen base_loop
     | None -> ([], [], [])
   in
-  let data = 
+  let data =
     if filters.nb_results then
       let len = M.Internal_int32#{value = Int32.of_int (List.length nodes)} in
       Mext.gen_internal_int32 len
@@ -750,15 +750,15 @@ let print_graph_desc conf base =
       let nodes = person_node_map conf base nodes in
       match nodes with
       | PFull nodes ->
-          let graph = 
-            M.Full_graph#{nodes = nodes; edges = edges; families = families} 
+          let graph =
+            M.Full_graph#{nodes = nodes; edges = edges; families = families}
           in
           Mext.gen_full_graph graph
       | PLight nodes ->
           let graph = M.Graph#{nodes = nodes; edges = edges;} in
           Mext.gen_graph graph
   in
-  print_result conf data 
+  print_result conf data
 ;;
 
 
@@ -769,8 +769,8 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
   let () = Perso.build_sosa_ht conf base in
   let person_to_node p =
     let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
-    let person = 
-      pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person 
+    let person =
+      pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person
     in
     M.Node#{
       id = id;
@@ -784,16 +784,16 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
       to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
     }
   in
-  let create_family ifam families = 
+  let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
       families := (fam_to_piqi_family conf base ifam) :: !families
-  in 
+  in
   let nodes = ref [] in
   let edges = ref [] in
   let families = ref [] in
   let create_link a =
     let ip = get_key_index a in
-    let p1 = 
+    let p1 =
       match pp1 with
       | Some p1 -> p1
       | _ -> p1
@@ -814,7 +814,7 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
         nodes := a :: !nodes;
         let _ =
           List.fold_left
-            (fun last_node (ip, _) -> 
+            (fun last_node (ip, _) ->
               let p = poi base ip in
               nodes := p :: !nodes;
               edges := (create_edge p last_node) :: !edges;
@@ -823,15 +823,15 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
         in
         let _ =
           List.fold_left
-            (fun last_node (ip, _) -> 
+            (fun last_node (ip, _) ->
               let p = poi base ip in
               nodes := p :: !nodes;
               edges := (create_edge p last_node) :: !edges;
               p)
             a b2;
         in
-        List.iter 
-          (fun ifam -> create_family ifam families) 
+        List.iter
+          (fun ifam -> create_family ifam families)
           (Array.to_list (get_family a))
     | _ -> ()
   in
@@ -847,14 +847,14 @@ let print_graph_rel conf base =
   let filters = get_filters conf in
   let ref_p1 = params.M.Graph_rel_params.person1 in
   let ref_p2 = params.M.Graph_rel_params.person2 in
-  let (nodes, edges, families) = 
+  let (nodes, edges, families) =
     match (piqi_ref_person_to_person base ref_p1,
            piqi_ref_person_to_person base ref_p2) with
     | (Some p1, Some p2) ->
         let by_marr = true in
-        let (rel, base_loop) = 
+        let (rel, base_loop) =
           match
-            try Left (Relation.compute_relationship conf base by_marr p1 p2) 
+            try Left (Relation.compute_relationship conf base by_marr p1 p2)
             with Consang.TopologicalSortError p -> Right p
           with
           | Left rel -> (rel, false)
@@ -868,7 +868,7 @@ let print_graph_rel conf base =
         | None -> ([], [], []))
     | _ -> ([], [], [])
   in
-  let data = 
+  let data =
     if filters.nb_results then
       let len = M.Internal_int32#{value = Int32.of_int (List.length nodes)} in
       Mext.gen_internal_int32 len
@@ -876,19 +876,19 @@ let print_graph_rel conf base =
       let nodes = person_node_map conf base nodes in
       match nodes with
       | PFull nodes ->
-          let graph = 
-            M.Full_graph#{nodes = nodes; edges = edges; families = families} 
+          let graph =
+            M.Full_graph#{nodes = nodes; edges = edges; families = families}
           in
           Mext.gen_full_graph graph
       | PLight nodes ->
           let graph = M.Graph#{nodes = nodes; edges = edges;} in
           Mext.gen_graph graph
   in
-  print_result conf data 
+  print_result conf data
 (*
   let graph = M.Graph#{nodes = nodes; edges = edges} in
-  let data = Mext.gen_graph graph in 
-  print_result conf data 
+  let data = Mext.gen_graph graph in
+  print_result conf data
 *)
 ;;
 
@@ -899,22 +899,22 @@ let print_cpl_relation conf base =
   let ref_p1 = params.M.Cpl_rel_params.person1 in
   let ref_p2 = params.M.Cpl_rel_params.person2 in
 (*  let base_loop = has_base_loop conf base in*)
-  let list = 
+  let list =
     match (piqi_ref_person_to_person base ref_p1,
            piqi_ref_person_to_person base ref_p2) with
     | (Some p1, Some p2) ->
         let by_marr = true in
-        let (rel, base_loop) = 
+        let (rel, base_loop) =
           match
-            try Left (Relation.compute_relationship conf base by_marr p1 p2) 
+            try Left (Relation.compute_relationship conf base by_marr p1 p2)
             with Consang.TopologicalSortError p -> Right p
           with
           | Left rel -> (rel, false)
           | Right p -> (None, true)
         in
         (match rel with
-        | Some (rl, total, relation) -> 
-            let list = 
+        | Some (rl, total, relation) ->
+            let list =
               (function (_, _, (_, _, list), _) -> list) (List.hd rl)
             in
             List.map (fun (p, _) -> p) (list)
