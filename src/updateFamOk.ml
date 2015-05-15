@@ -1267,6 +1267,11 @@ value effective_mod conf base sfam scpl sdes = do {
   let nfath = poi base (Adef.father ncpl) in
   let nmoth = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
+  let nfam =
+    (* En mode api, on gère directement la relation de même sexe. *)
+    if Api_conf.mode_api.val then {(nfam) with relation = sfam.relation}
+    else nfam
+  in
   let sfam = {(sfam) with relation = nfam.relation} in
   if sfam.relation <> NoSexesCheckNotMarried &&
      sfam.relation <> NoSexesCheckMarried then do {
@@ -1402,6 +1407,11 @@ value effective_add conf base sfam scpl sdes =
   let nfath_p = poi base (Adef.father ncpl) in
   let nmoth_p = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
+  let nfam =
+    (* En mode api, on gère directement la relation de même sexe. *)
+    if Api_conf.mode_api.val then {(nfam) with relation = sfam.relation}
+    else nfam
+  in
   let sfam = {(sfam) with relation = nfam.relation} in
   do {
     if sfam.relation <> NoSexesCheckNotMarried &&
