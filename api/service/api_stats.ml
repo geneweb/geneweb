@@ -972,7 +972,7 @@ let print_ind_stats conf base =
           Mstats.Stat#{
             title = `st_asc;
             labels = labels;
-            series = [`serie_ind_found; `serie_ind_uniq];
+            series = [`serie_asc_found; `serie_asc_uniq];
             series_string = [];
             datas = datas;
           }
@@ -1057,7 +1057,7 @@ let print_ind_stats conf base =
           Mstats.Stat#{
             title = `st_desc;
             labels = labels;
-            series = [`serie_ind_found; `serie_ind_uniq];
+            series = [`serie_desc_found; `serie_desc_uniq];
             series_string = [];
             datas = datas;
           }
