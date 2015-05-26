@@ -77,6 +77,7 @@ value family_m conf base =
   | Some "API_DELETE_PERSON" -> Api_update_person.print_del conf base
 *)
   | Some "API_GRAPH_ASC" -> Api_graph.print_graph_asc conf base
+  | Some "API_GRAPH_ASC_LIA" -> Api_graph.print_graph_asc_lia conf base
   | Some "API_GRAPH_DESC" -> Api_graph.print_graph_desc conf base
   | Some "API_GRAPH_REL" -> Api_graph.print_graph_rel conf base
   | Some "API_FIRST_AVAILABLE_PERSON" -> Api.print_first_available_person conf base

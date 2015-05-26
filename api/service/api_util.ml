@@ -1614,6 +1614,68 @@ let fam_to_piqi_family conf base ifam =
 ;;
 
 
+(* *********************************************************************** *)
+(*  [Fonc] fam_to_piqi_family_link : config -> base -> ifam -> Full_family *)
+(** [Description] :
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnÃ©e
+      - ifam  : ifam
+    [Retour] :
+      -
+    [Rem] : Non exportÃ© en clair hors de ce module.                        *)
+(* *********************************************************************** *)
+let fam_to_piqi_family_link conf base (ifath, imoth) ifam fam =
+  let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
+  let index = Int32.of_int (Adef.int_of_ifam ifam) in
+  let fsources = None in
+  let marriage =
+    match Adef.od_of_codate gen_f.marriage with
+    | Some d -> Some (string_of_date conf d)
+    | _ -> None
+  in
+  let marriage_place = Some gen_f.marriage_place in
+  let marriage_src = Some gen_f.marriage_src in
+  let marriage_type =
+    match gen_f.relation with
+    | Married -> `married
+    | NotMarried -> `not_married
+    | Engaged -> `engaged
+    | NoSexesCheckNotMarried -> `no_sexes_check_not_married
+    | NoMention -> `no_mention
+    | NoSexesCheckMarried -> `no_sexes_check_married
+  in
+  let (divorce_type, divorce_date) =
+    match gen_f.divorce with
+    | NotDivorced -> (`not_divorced, None)
+    | Divorced cod ->
+        (match Adef.od_of_codate cod with
+         | Some d -> (`divorced, Some (string_of_date conf d))
+         | _ -> (`divorced, None))
+    | Separated -> (`separated, None)
+  in
+  let witnesses = [] in
+  let father = Int32.of_int (Adef.int_of_iper ifath) in
+  let mother = Int32.of_int (Adef.int_of_iper imoth) in
+  (* TODO ? *)
+  let children = [] in
+  M.Full_family#{
+    fsources = fsources;
+    marriage_date = marriage;
+    marriage_place = marriage_place;
+    marriage_src = marriage_src;
+    marriage_type = marriage_type;
+    divorce_type = divorce_type;
+    divorce_date = divorce_date;
+    witnesses = witnesses;
+    father = father;
+    mother = mother;
+    children = children;
+    index = index;
+  }
+;;
+
+
 (**/**) (* Fonctions de transformation person <=> piqi person pour l'app *)
 
 let piqi_event_of_fevent evt_name =
@@ -2171,6 +2233,43 @@ let person_node_map conf base l =
       Perso.get_sosa_person
     else Perso.get_single_sosa
   in
+  let load_img =
+    if List.length l > 20 then
+      let () = load_image_ht conf base in true
+    else false
+  in
+  let base_loop = has_base_loop conf base in
+  if p_getenvbin conf.env "full_infos" = Some "1" then
+    PFull
+      (List.rev_map
+         (fun p ->
+           let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
+           let p =
+             pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
+           in
+           M.Full_node#{
+             id = id;
+             person = p;
+           })
+         l)
+  else
+    PLight
+      (List.rev_map
+         (fun p ->
+           let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
+           let p =
+             pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
+           in
+           M.Node#{
+             id = id;
+             person = p;
+           })
+         l)
+;;
+
+let person_node_map_lia conf base l =
+  let compute_sosa = (fun _ _ _ -> Num.zero) in
+  (* TODO ? *)
   let load_img =
     if List.length l > 20 then
       let () = load_image_ht conf base in true
