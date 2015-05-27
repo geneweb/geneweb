@@ -246,3 +246,90 @@ message GraphTreeParams {
   optional int32 nb_asc = 2;
   optional int32 nb_desc = 3;
 }
+
+
+// ***************************************************************************
+// Version identique mais avec des personnes full
+// ***************************************************************************
+
+
+enum TitleType {
+  TITLE_MAIN = 0;
+  TITLE_NAME = 1;
+  TITLE_NONE = 2;
+}
+
+message Title {
+  required TitleType title_type = 1;
+  optional string name = 2;
+  optional string title = 3;
+  optional string fief = 4;
+  optional string date_begin = 5;
+  optional string date_end = 6;
+  optional int32 nth = 7;
+}
+
+message PersonTreeFull {
+  required int32 index = 1;
+  required Sex sex = 2;
+  required string lastname = 3;
+  required string firstname = 4;
+  required string n = 5;
+  required string p = 6;
+  required int32 occ = 7;
+  optional string image = 8;
+  required Sosa sosa = 9;
+  optional string public_name = 10;
+  repeated string aliases = 11;
+  repeated string qualifiers = 12;
+  repeated string firstname_aliases = 13;
+  repeated string surname_aliases = 14;
+  optional string birth_date = 15;
+  optional string birth_place = 16;
+  optional string birth_src = 17;
+  optional string baptism_date = 18;
+  optional string baptism_place = 19;
+  optional string baptism_src = 20;
+  optional string death_date = 21;
+  optional string death_place = 22;
+  optional string death_src = 23;
+  required DeathType death_type = 24;
+  optional string burial_date = 25;
+  optional string burial_place = 26;
+  optional string burial_src = 27;
+  optional string occupation = 28;
+  optional string psources = 29;
+  repeated Title titles = 30;
+  required bool visible_for_visitors = 31;
+  required bool has_more_infos = 32;
+  required string baseprefix = 33;
+}
+
+message FamilyTreeFull {
+  optional string fsources = 1;
+  optional string marriage_date = 2;
+  optional string marriage_place = 3;
+  optional string marriage_src = 4;
+  required MarriageType marriage_type = 5;
+  required DivorceType divorce_type = 6;
+  optional string divorce_date = 7;
+  required int32 index = 8;
+}
+
+message NodeFull {
+  required int64 id = 1;
+  required PersonTreeFull person = 2;
+  optional int64 ifam = 3;
+}
+
+message GraphTreeFull {
+  repeated NodeFull nodes_asc = 1;
+  repeated Edge edges_asc = 2;
+  repeated FamilyTreeFull families_asc = 3;
+  repeated NodeFull nodes_desc = 4;
+  repeated Edge edges_desc = 5;
+  repeated FamilyTreeFull families_desc = 6;
+  repeated NodeFull nodes_siblings = 7;
+  repeated NodeFull nodes_siblings_before = 8;
+  repeated NodeFull nodes_siblings_after = 9;
+}
