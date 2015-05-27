@@ -19,6 +19,11 @@ let _node_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/node"
 let _edge_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/edge"
 let _graph_tree_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/graph-tree"
 let _graph_tree_params_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/graph-tree-params"
+let _title_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/title"
+let _person_tree_full_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/person-tree-full"
+let _family_tree_full_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/family-tree-full"
+let _node_full_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/node-full"
+let _graph_tree_full_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/graph-tree-full"
 let _sosa_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/sosa"
 let _calendar_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/calendar"
 let _precision_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/precision"
@@ -28,6 +33,7 @@ let _marriage_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/marri
 let _divorce_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/divorce-type"
 let _relation_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/relation-type"
 let _witness_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/witness-type"
+let _title_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/title-type"
 
 
 let parse_dmy ?opts x (format :Piqirun_ext.input_format) =
@@ -105,6 +111,31 @@ let parse_graph_tree_params ?opts x (format :Piqirun_ext.input_format) =
   let buf = Piqirun.init_from_string x_pb in
   Api_saisie_read_piqi.parse_graph_tree_params buf
 
+let parse_title ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _title_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_title buf
+
+let parse_person_tree_full ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _person_tree_full_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_person_tree_full buf
+
+let parse_family_tree_full ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _family_tree_full_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_family_tree_full buf
+
+let parse_node_full ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _node_full_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_node_full buf
+
+let parse_graph_tree_full ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _graph_tree_full_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_graph_tree_full buf
+
 let parse_sosa ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _sosa_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
@@ -149,6 +180,11 @@ let parse_witness_type ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _witness_type_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
   Api_saisie_read_piqi.parse_witness_type buf
+
+let parse_title_type ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _title_type_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_title_type buf
 
 
 let gen_dmy ?opts x (format :Piqirun_ext.output_format) =
@@ -226,6 +262,31 @@ let gen_graph_tree_params ?opts x (format :Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _graph_tree_params_piqi_type `pb format x_pb ?opts
 
+let gen_title ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_title x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _title_piqi_type `pb format x_pb ?opts
+
+let gen_person_tree_full ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_person_tree_full x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _person_tree_full_piqi_type `pb format x_pb ?opts
+
+let gen_family_tree_full ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_family_tree_full x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _family_tree_full_piqi_type `pb format x_pb ?opts
+
+let gen_node_full ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_node_full x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _node_full_piqi_type `pb format x_pb ?opts
+
+let gen_graph_tree_full ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_graph_tree_full x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _graph_tree_full_piqi_type `pb format x_pb ?opts
+
 let gen_sosa ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_saisie_read_piqi.gen_sosa x in
   let x_pb = Piqirun.to_string buf in
@@ -270,6 +331,11 @@ let gen_witness_type ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_saisie_read_piqi.gen_witness_type x in
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _witness_type_piqi_type `pb format x_pb ?opts
+
+let gen_title_type ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_title_type x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _title_type_piqi_type `pb format x_pb ?opts
 
 
 let print_dmy ?opts x =
@@ -347,6 +413,31 @@ let print_graph_tree_params ?opts x =
 let prerr_graph_tree_params ?opts x =
   Pervasives.prerr_endline (gen_graph_tree_params x `piq ?opts)
 
+let print_title ?opts x =
+  Pervasives.print_endline (gen_title x `piq ?opts)
+let prerr_title ?opts x =
+  Pervasives.prerr_endline (gen_title x `piq ?opts)
+
+let print_person_tree_full ?opts x =
+  Pervasives.print_endline (gen_person_tree_full x `piq ?opts)
+let prerr_person_tree_full ?opts x =
+  Pervasives.prerr_endline (gen_person_tree_full x `piq ?opts)
+
+let print_family_tree_full ?opts x =
+  Pervasives.print_endline (gen_family_tree_full x `piq ?opts)
+let prerr_family_tree_full ?opts x =
+  Pervasives.prerr_endline (gen_family_tree_full x `piq ?opts)
+
+let print_node_full ?opts x =
+  Pervasives.print_endline (gen_node_full x `piq ?opts)
+let prerr_node_full ?opts x =
+  Pervasives.prerr_endline (gen_node_full x `piq ?opts)
+
+let print_graph_tree_full ?opts x =
+  Pervasives.print_endline (gen_graph_tree_full x `piq ?opts)
+let prerr_graph_tree_full ?opts x =
+  Pervasives.prerr_endline (gen_graph_tree_full x `piq ?opts)
+
 let print_sosa ?opts x =
   Pervasives.print_endline (gen_sosa x `piq ?opts)
 let prerr_sosa ?opts x =
@@ -391,5 +482,10 @@ let print_witness_type ?opts x =
   Pervasives.print_endline (gen_witness_type x `piq ?opts)
 let prerr_witness_type ?opts x =
   Pervasives.prerr_endline (gen_witness_type x `piq ?opts)
+
+let print_title_type ?opts x =
+  Pervasives.print_endline (gen_title_type x `piq ?opts)
+let prerr_title_type ?opts x =
+  Pervasives.prerr_endline (gen_title_type x `piq ?opts)
 
 

@@ -73,6 +73,12 @@ module rec Api_saisie_read_piqi:
         | `witness
         | `witness_godparent
       ]
+    type title_type =
+      [
+        | `title_main
+        | `title_name
+        | `title_none
+      ]
     type dmy = Dmy.t
     type date = Date.t
     type witness_event = Witness_event.t
@@ -88,6 +94,11 @@ module rec Api_saisie_read_piqi:
     type edge = Edge.t
     type graph_tree = Graph_tree.t
     type graph_tree_params = Graph_tree_params.t
+    type title = Title.t
+    type person_tree_full = Person_tree_full.t
+    type family_tree_full = Family_tree_full.t
+    type node_full = Node_full.t
+    type graph_tree_full = Graph_tree_full.t
   end = Api_saisie_read_piqi
 and Dmy:
   sig
@@ -295,6 +306,91 @@ and Graph_tree_params:
       mutable nb_desc: Api_saisie_read_piqi.protobuf_int32 option;
     }
   end = Graph_tree_params
+and Title:
+  sig
+    type t = {
+      mutable title_type: Api_saisie_read_piqi.title_type;
+      mutable name: string option;
+      mutable title: string option;
+      mutable fief: string option;
+      mutable date_begin: string option;
+      mutable date_end: string option;
+      mutable nth: Api_saisie_read_piqi.protobuf_int32 option;
+    }
+  end = Title
+and Person_tree_full:
+  sig
+    type t = {
+      mutable index: Api_saisie_read_piqi.protobuf_int32;
+      mutable sex: Api_saisie_read_piqi.sex;
+      mutable lastname: string;
+      mutable firstname: string;
+      mutable n: string;
+      mutable p: string;
+      mutable occ: Api_saisie_read_piqi.protobuf_int32;
+      mutable image: string option;
+      mutable sosa: Api_saisie_read_piqi.sosa;
+      mutable public_name: string option;
+      mutable aliases: string list;
+      mutable qualifiers: string list;
+      mutable firstname_aliases: string list;
+      mutable surname_aliases: string list;
+      mutable birth_date: string option;
+      mutable birth_place: string option;
+      mutable birth_src: string option;
+      mutable baptism_date: string option;
+      mutable baptism_place: string option;
+      mutable baptism_src: string option;
+      mutable death_date: string option;
+      mutable death_place: string option;
+      mutable death_src: string option;
+      mutable death_type: Api_saisie_read_piqi.death_type;
+      mutable burial_date: string option;
+      mutable burial_place: string option;
+      mutable burial_src: string option;
+      mutable occupation: string option;
+      mutable psources: string option;
+      mutable titles: Api_saisie_read_piqi.title list;
+      mutable visible_for_visitors: bool;
+      mutable has_more_infos: bool;
+      mutable baseprefix: string;
+    }
+  end = Person_tree_full
+and Family_tree_full:
+  sig
+    type t = {
+      mutable fsources: string option;
+      mutable marriage_date: string option;
+      mutable marriage_place: string option;
+      mutable marriage_src: string option;
+      mutable marriage_type: Api_saisie_read_piqi.marriage_type;
+      mutable divorce_type: Api_saisie_read_piqi.divorce_type;
+      mutable divorce_date: string option;
+      mutable index: Api_saisie_read_piqi.protobuf_int32;
+    }
+  end = Family_tree_full
+and Node_full:
+  sig
+    type t = {
+      mutable id: Api_saisie_read_piqi.protobuf_int64;
+      mutable person: Api_saisie_read_piqi.person_tree_full;
+      mutable ifam: Api_saisie_read_piqi.protobuf_int64 option;
+    }
+  end = Node_full
+and Graph_tree_full:
+  sig
+    type t = {
+      mutable nodes_asc: Api_saisie_read_piqi.node_full list;
+      mutable edges_asc: Api_saisie_read_piqi.edge list;
+      mutable families_asc: Api_saisie_read_piqi.family_tree_full list;
+      mutable nodes_desc: Api_saisie_read_piqi.node_full list;
+      mutable edges_desc: Api_saisie_read_piqi.edge list;
+      mutable families_desc: Api_saisie_read_piqi.family_tree_full list;
+      mutable nodes_siblings: Api_saisie_read_piqi.node_full list;
+      mutable nodes_siblings_before: Api_saisie_read_piqi.node_full list;
+      mutable nodes_siblings_after: Api_saisie_read_piqi.node_full list;
+    }
+  end = Graph_tree_full
 
 
 let rec parse_int32 x = Piqirun.int32_of_zigzag_varint x
@@ -666,6 +762,156 @@ and parse_graph_tree_params x =
     Graph_tree_params.nb_desc = _nb_desc;
   }
 
+and parse_title x =
+  let x = Piqirun.parse_record x in
+  let _title_type, x = Piqirun.parse_required_field 1 parse_title_type x in
+  let _name, x = Piqirun.parse_optional_field 2 parse_string x in
+  let _title, x = Piqirun.parse_optional_field 3 parse_string x in
+  let _fief, x = Piqirun.parse_optional_field 4 parse_string x in
+  let _date_begin, x = Piqirun.parse_optional_field 5 parse_string x in
+  let _date_end, x = Piqirun.parse_optional_field 6 parse_string x in
+  let _nth, x = Piqirun.parse_optional_field 7 parse_protobuf_int32 x in
+  Piqirun.check_unparsed_fields x;
+  {
+    Title.title_type = _title_type;
+    Title.name = _name;
+    Title.title = _title;
+    Title.fief = _fief;
+    Title.date_begin = _date_begin;
+    Title.date_end = _date_end;
+    Title.nth = _nth;
+  }
+
+and parse_person_tree_full x =
+  let x = Piqirun.parse_record x in
+  let _index, x = Piqirun.parse_required_field 1 parse_protobuf_int32 x in
+  let _sex, x = Piqirun.parse_required_field 2 parse_sex x in
+  let _lastname, x = Piqirun.parse_required_field 3 parse_string x in
+  let _firstname, x = Piqirun.parse_required_field 4 parse_string x in
+  let _n, x = Piqirun.parse_required_field 5 parse_string x in
+  let _p, x = Piqirun.parse_required_field 6 parse_string x in
+  let _occ, x = Piqirun.parse_required_field 7 parse_protobuf_int32 x in
+  let _image, x = Piqirun.parse_optional_field 8 parse_string x in
+  let _sosa, x = Piqirun.parse_required_field 9 parse_sosa x in
+  let _public_name, x = Piqirun.parse_optional_field 10 parse_string x in
+  let _aliases, x = Piqirun.parse_repeated_field 11 parse_string x in
+  let _qualifiers, x = Piqirun.parse_repeated_field 12 parse_string x in
+  let _firstname_aliases, x = Piqirun.parse_repeated_field 13 parse_string x in
+  let _surname_aliases, x = Piqirun.parse_repeated_field 14 parse_string x in
+  let _birth_date, x = Piqirun.parse_optional_field 15 parse_string x in
+  let _birth_place, x = Piqirun.parse_optional_field 16 parse_string x in
+  let _birth_src, x = Piqirun.parse_optional_field 17 parse_string x in
+  let _baptism_date, x = Piqirun.parse_optional_field 18 parse_string x in
+  let _baptism_place, x = Piqirun.parse_optional_field 19 parse_string x in
+  let _baptism_src, x = Piqirun.parse_optional_field 20 parse_string x in
+  let _death_date, x = Piqirun.parse_optional_field 21 parse_string x in
+  let _death_place, x = Piqirun.parse_optional_field 22 parse_string x in
+  let _death_src, x = Piqirun.parse_optional_field 23 parse_string x in
+  let _death_type, x = Piqirun.parse_required_field 24 parse_death_type x in
+  let _burial_date, x = Piqirun.parse_optional_field 25 parse_string x in
+  let _burial_place, x = Piqirun.parse_optional_field 26 parse_string x in
+  let _burial_src, x = Piqirun.parse_optional_field 27 parse_string x in
+  let _occupation, x = Piqirun.parse_optional_field 28 parse_string x in
+  let _psources, x = Piqirun.parse_optional_field 29 parse_string x in
+  let _titles, x = Piqirun.parse_repeated_field 30 parse_title x in
+  let _visible_for_visitors, x = Piqirun.parse_required_field 31 parse_bool x in
+  let _has_more_infos, x = Piqirun.parse_required_field 32 parse_bool x in
+  let _baseprefix, x = Piqirun.parse_required_field 33 parse_string x in
+  Piqirun.check_unparsed_fields x;
+  {
+    Person_tree_full.index = _index;
+    Person_tree_full.sex = _sex;
+    Person_tree_full.lastname = _lastname;
+    Person_tree_full.firstname = _firstname;
+    Person_tree_full.n = _n;
+    Person_tree_full.p = _p;
+    Person_tree_full.occ = _occ;
+    Person_tree_full.image = _image;
+    Person_tree_full.sosa = _sosa;
+    Person_tree_full.public_name = _public_name;
+    Person_tree_full.aliases = _aliases;
+    Person_tree_full.qualifiers = _qualifiers;
+    Person_tree_full.firstname_aliases = _firstname_aliases;
+    Person_tree_full.surname_aliases = _surname_aliases;
+    Person_tree_full.birth_date = _birth_date;
+    Person_tree_full.birth_place = _birth_place;
+    Person_tree_full.birth_src = _birth_src;
+    Person_tree_full.baptism_date = _baptism_date;
+    Person_tree_full.baptism_place = _baptism_place;
+    Person_tree_full.baptism_src = _baptism_src;
+    Person_tree_full.death_date = _death_date;
+    Person_tree_full.death_place = _death_place;
+    Person_tree_full.death_src = _death_src;
+    Person_tree_full.death_type = _death_type;
+    Person_tree_full.burial_date = _burial_date;
+    Person_tree_full.burial_place = _burial_place;
+    Person_tree_full.burial_src = _burial_src;
+    Person_tree_full.occupation = _occupation;
+    Person_tree_full.psources = _psources;
+    Person_tree_full.titles = _titles;
+    Person_tree_full.visible_for_visitors = _visible_for_visitors;
+    Person_tree_full.has_more_infos = _has_more_infos;
+    Person_tree_full.baseprefix = _baseprefix;
+  }
+
+and parse_family_tree_full x =
+  let x = Piqirun.parse_record x in
+  let _fsources, x = Piqirun.parse_optional_field 1 parse_string x in
+  let _marriage_date, x = Piqirun.parse_optional_field 2 parse_string x in
+  let _marriage_place, x = Piqirun.parse_optional_field 3 parse_string x in
+  let _marriage_src, x = Piqirun.parse_optional_field 4 parse_string x in
+  let _marriage_type, x = Piqirun.parse_required_field 5 parse_marriage_type x in
+  let _divorce_type, x = Piqirun.parse_required_field 6 parse_divorce_type x in
+  let _divorce_date, x = Piqirun.parse_optional_field 7 parse_string x in
+  let _index, x = Piqirun.parse_required_field 8 parse_protobuf_int32 x in
+  Piqirun.check_unparsed_fields x;
+  {
+    Family_tree_full.fsources = _fsources;
+    Family_tree_full.marriage_date = _marriage_date;
+    Family_tree_full.marriage_place = _marriage_place;
+    Family_tree_full.marriage_src = _marriage_src;
+    Family_tree_full.marriage_type = _marriage_type;
+    Family_tree_full.divorce_type = _divorce_type;
+    Family_tree_full.divorce_date = _divorce_date;
+    Family_tree_full.index = _index;
+  }
+
+and parse_node_full x =
+  let x = Piqirun.parse_record x in
+  let _id, x = Piqirun.parse_required_field 1 parse_protobuf_int64 x in
+  let _person, x = Piqirun.parse_required_field 2 parse_person_tree_full x in
+  let _ifam, x = Piqirun.parse_optional_field 3 parse_protobuf_int64 x in
+  Piqirun.check_unparsed_fields x;
+  {
+    Node_full.id = _id;
+    Node_full.person = _person;
+    Node_full.ifam = _ifam;
+  }
+
+and parse_graph_tree_full x =
+  let x = Piqirun.parse_record x in
+  let _nodes_asc, x = Piqirun.parse_repeated_field 1 parse_node_full x in
+  let _edges_asc, x = Piqirun.parse_repeated_field 2 parse_edge x in
+  let _families_asc, x = Piqirun.parse_repeated_field 3 parse_family_tree_full x in
+  let _nodes_desc, x = Piqirun.parse_repeated_field 4 parse_node_full x in
+  let _edges_desc, x = Piqirun.parse_repeated_field 5 parse_edge x in
+  let _families_desc, x = Piqirun.parse_repeated_field 6 parse_family_tree_full x in
+  let _nodes_siblings, x = Piqirun.parse_repeated_field 7 parse_node_full x in
+  let _nodes_siblings_before, x = Piqirun.parse_repeated_field 8 parse_node_full x in
+  let _nodes_siblings_after, x = Piqirun.parse_repeated_field 9 parse_node_full x in
+  Piqirun.check_unparsed_fields x;
+  {
+    Graph_tree_full.nodes_asc = _nodes_asc;
+    Graph_tree_full.edges_asc = _edges_asc;
+    Graph_tree_full.families_asc = _families_asc;
+    Graph_tree_full.nodes_desc = _nodes_desc;
+    Graph_tree_full.edges_desc = _edges_desc;
+    Graph_tree_full.families_desc = _families_desc;
+    Graph_tree_full.nodes_siblings = _nodes_siblings;
+    Graph_tree_full.nodes_siblings_before = _nodes_siblings_before;
+    Graph_tree_full.nodes_siblings_after = _nodes_siblings_after;
+  }
+
 and parse_sosa x =
   match Piqirun.int32_of_signed_varint x with
     | 0l -> `sosa_ref
@@ -815,6 +1061,19 @@ and packed_parse_witness_type x =
   match Piqirun.int32_of_packed_signed_varint x with
     | 0l -> `witness
     | 1l -> `witness_godparent
+    | x -> Piqirun.error_enum_const x
+
+and parse_title_type x =
+  match Piqirun.int32_of_signed_varint x with
+    | 0l -> `title_main
+    | 1l -> `title_name
+    | 2l -> `title_none
+    | x -> Piqirun.error_enum_const x
+and packed_parse_title_type x =
+  match Piqirun.int32_of_packed_signed_varint x with
+    | 0l -> `title_main
+    | 1l -> `title_name
+    | 2l -> `title_none
     | x -> Piqirun.error_enum_const x
 
 
@@ -1011,6 +1270,81 @@ and gen__graph_tree_params code x =
   let _nb_desc = Piqirun.gen_optional_field 3 gen__protobuf_int32 x.Graph_tree_params.nb_desc in
   Piqirun.gen_record code (_index :: _nb_asc :: _nb_desc :: [])
 
+and gen__title code x =
+  let _title_type = Piqirun.gen_required_field 1 gen__title_type x.Title.title_type in
+  let _name = Piqirun.gen_optional_field 2 gen__string x.Title.name in
+  let _title = Piqirun.gen_optional_field 3 gen__string x.Title.title in
+  let _fief = Piqirun.gen_optional_field 4 gen__string x.Title.fief in
+  let _date_begin = Piqirun.gen_optional_field 5 gen__string x.Title.date_begin in
+  let _date_end = Piqirun.gen_optional_field 6 gen__string x.Title.date_end in
+  let _nth = Piqirun.gen_optional_field 7 gen__protobuf_int32 x.Title.nth in
+  Piqirun.gen_record code (_title_type :: _name :: _title :: _fief :: _date_begin :: _date_end :: _nth :: [])
+
+and gen__person_tree_full code x =
+  let _index = Piqirun.gen_required_field 1 gen__protobuf_int32 x.Person_tree_full.index in
+  let _sex = Piqirun.gen_required_field 2 gen__sex x.Person_tree_full.sex in
+  let _lastname = Piqirun.gen_required_field 3 gen__string x.Person_tree_full.lastname in
+  let _firstname = Piqirun.gen_required_field 4 gen__string x.Person_tree_full.firstname in
+  let _n = Piqirun.gen_required_field 5 gen__string x.Person_tree_full.n in
+  let _p = Piqirun.gen_required_field 6 gen__string x.Person_tree_full.p in
+  let _occ = Piqirun.gen_required_field 7 gen__protobuf_int32 x.Person_tree_full.occ in
+  let _image = Piqirun.gen_optional_field 8 gen__string x.Person_tree_full.image in
+  let _sosa = Piqirun.gen_required_field 9 gen__sosa x.Person_tree_full.sosa in
+  let _public_name = Piqirun.gen_optional_field 10 gen__string x.Person_tree_full.public_name in
+  let _aliases = Piqirun.gen_repeated_field 11 gen__string x.Person_tree_full.aliases in
+  let _qualifiers = Piqirun.gen_repeated_field 12 gen__string x.Person_tree_full.qualifiers in
+  let _firstname_aliases = Piqirun.gen_repeated_field 13 gen__string x.Person_tree_full.firstname_aliases in
+  let _surname_aliases = Piqirun.gen_repeated_field 14 gen__string x.Person_tree_full.surname_aliases in
+  let _birth_date = Piqirun.gen_optional_field 15 gen__string x.Person_tree_full.birth_date in
+  let _birth_place = Piqirun.gen_optional_field 16 gen__string x.Person_tree_full.birth_place in
+  let _birth_src = Piqirun.gen_optional_field 17 gen__string x.Person_tree_full.birth_src in
+  let _baptism_date = Piqirun.gen_optional_field 18 gen__string x.Person_tree_full.baptism_date in
+  let _baptism_place = Piqirun.gen_optional_field 19 gen__string x.Person_tree_full.baptism_place in
+  let _baptism_src = Piqirun.gen_optional_field 20 gen__string x.Person_tree_full.baptism_src in
+  let _death_date = Piqirun.gen_optional_field 21 gen__string x.Person_tree_full.death_date in
+  let _death_place = Piqirun.gen_optional_field 22 gen__string x.Person_tree_full.death_place in
+  let _death_src = Piqirun.gen_optional_field 23 gen__string x.Person_tree_full.death_src in
+  let _death_type = Piqirun.gen_required_field 24 gen__death_type x.Person_tree_full.death_type in
+  let _burial_date = Piqirun.gen_optional_field 25 gen__string x.Person_tree_full.burial_date in
+  let _burial_place = Piqirun.gen_optional_field 26 gen__string x.Person_tree_full.burial_place in
+  let _burial_src = Piqirun.gen_optional_field 27 gen__string x.Person_tree_full.burial_src in
+  let _occupation = Piqirun.gen_optional_field 28 gen__string x.Person_tree_full.occupation in
+  let _psources = Piqirun.gen_optional_field 29 gen__string x.Person_tree_full.psources in
+  let _titles = Piqirun.gen_repeated_field 30 gen__title x.Person_tree_full.titles in
+  let _visible_for_visitors = Piqirun.gen_required_field 31 gen__bool x.Person_tree_full.visible_for_visitors in
+  let _has_more_infos = Piqirun.gen_required_field 32 gen__bool x.Person_tree_full.has_more_infos in
+  let _baseprefix = Piqirun.gen_required_field 33 gen__string x.Person_tree_full.baseprefix in
+  Piqirun.gen_record code (_index :: _sex :: _lastname :: _firstname :: _n :: _p :: _occ :: _image :: _sosa :: _public_name :: _aliases :: _qualifiers :: _firstname_aliases :: _surname_aliases :: _birth_date :: _birth_place :: _birth_src :: _baptism_date :: _baptism_place :: _baptism_src :: _death_date :: _death_place :: _death_src :: _death_type :: _burial_date :: _burial_place :: _burial_src :: _occupation :: _psources :: _titles :: _visible_for_visitors :: _has_more_infos :: _baseprefix :: [])
+
+and gen__family_tree_full code x =
+  let _fsources = Piqirun.gen_optional_field 1 gen__string x.Family_tree_full.fsources in
+  let _marriage_date = Piqirun.gen_optional_field 2 gen__string x.Family_tree_full.marriage_date in
+  let _marriage_place = Piqirun.gen_optional_field 3 gen__string x.Family_tree_full.marriage_place in
+  let _marriage_src = Piqirun.gen_optional_field 4 gen__string x.Family_tree_full.marriage_src in
+  let _marriage_type = Piqirun.gen_required_field 5 gen__marriage_type x.Family_tree_full.marriage_type in
+  let _divorce_type = Piqirun.gen_required_field 6 gen__divorce_type x.Family_tree_full.divorce_type in
+  let _divorce_date = Piqirun.gen_optional_field 7 gen__string x.Family_tree_full.divorce_date in
+  let _index = Piqirun.gen_required_field 8 gen__protobuf_int32 x.Family_tree_full.index in
+  Piqirun.gen_record code (_fsources :: _marriage_date :: _marriage_place :: _marriage_src :: _marriage_type :: _divorce_type :: _divorce_date :: _index :: [])
+
+and gen__node_full code x =
+  let _id = Piqirun.gen_required_field 1 gen__protobuf_int64 x.Node_full.id in
+  let _person = Piqirun.gen_required_field 2 gen__person_tree_full x.Node_full.person in
+  let _ifam = Piqirun.gen_optional_field 3 gen__protobuf_int64 x.Node_full.ifam in
+  Piqirun.gen_record code (_id :: _person :: _ifam :: [])
+
+and gen__graph_tree_full code x =
+  let _nodes_asc = Piqirun.gen_repeated_field 1 gen__node_full x.Graph_tree_full.nodes_asc in
+  let _edges_asc = Piqirun.gen_repeated_field 2 gen__edge x.Graph_tree_full.edges_asc in
+  let _families_asc = Piqirun.gen_repeated_field 3 gen__family_tree_full x.Graph_tree_full.families_asc in
+  let _nodes_desc = Piqirun.gen_repeated_field 4 gen__node_full x.Graph_tree_full.nodes_desc in
+  let _edges_desc = Piqirun.gen_repeated_field 5 gen__edge x.Graph_tree_full.edges_desc in
+  let _families_desc = Piqirun.gen_repeated_field 6 gen__family_tree_full x.Graph_tree_full.families_desc in
+  let _nodes_siblings = Piqirun.gen_repeated_field 7 gen__node_full x.Graph_tree_full.nodes_siblings in
+  let _nodes_siblings_before = Piqirun.gen_repeated_field 8 gen__node_full x.Graph_tree_full.nodes_siblings_before in
+  let _nodes_siblings_after = Piqirun.gen_repeated_field 9 gen__node_full x.Graph_tree_full.nodes_siblings_after in
+  Piqirun.gen_record code (_nodes_asc :: _edges_asc :: _families_asc :: _nodes_desc :: _edges_desc :: _families_desc :: _nodes_siblings :: _nodes_siblings_before :: _nodes_siblings_after :: [])
+
 and gen__sosa code x =
   Piqirun.int32_to_signed_varint code (match x with
     | `sosa_ref -> 0l
@@ -1162,6 +1496,19 @@ and packed_gen__witness_type x =
     | `witness_godparent -> 1l
   )
 
+and gen__title_type code x =
+  Piqirun.int32_to_signed_varint code (match x with
+    | `title_main -> 0l
+    | `title_name -> 1l
+    | `title_none -> 2l
+  )
+and packed_gen__title_type x =
+  Piqirun.int32_to_packed_signed_varint (match x with
+    | `title_main -> 0l
+    | `title_name -> 1l
+    | `title_none -> 2l
+  )
+
 
 let gen_int32 x = gen__int32 (-1) x
 let gen_int64 x = gen__int64 (-1) x
@@ -1184,6 +1531,11 @@ let gen_node x = gen__node (-1) x
 let gen_edge x = gen__edge (-1) x
 let gen_graph_tree x = gen__graph_tree (-1) x
 let gen_graph_tree_params x = gen__graph_tree_params (-1) x
+let gen_title x = gen__title (-1) x
+let gen_person_tree_full x = gen__person_tree_full (-1) x
+let gen_family_tree_full x = gen__family_tree_full (-1) x
+let gen_node_full x = gen__node_full (-1) x
+let gen_graph_tree_full x = gen__graph_tree_full (-1) x
 let gen_sosa x = gen__sosa (-1) x
 let gen_calendar x = gen__calendar (-1) x
 let gen_precision x = gen__precision (-1) x
@@ -1193,6 +1545,7 @@ let gen_marriage_type x = gen__marriage_type (-1) x
 let gen_divorce_type x = gen__divorce_type (-1) x
 let gen_relation_type x = gen__relation_type (-1) x
 let gen_witness_type x = gen__witness_type (-1) x
+let gen_title_type x = gen__title_type (-1) x
 
 
 let rec default_int32 () = 0l
@@ -1377,6 +1730,81 @@ and default_graph_tree_params () =
     Graph_tree_params.nb_asc = None;
     Graph_tree_params.nb_desc = None;
   }
+and default_title () =
+  {
+    Title.title_type = default_title_type ();
+    Title.name = None;
+    Title.title = None;
+    Title.fief = None;
+    Title.date_begin = None;
+    Title.date_end = None;
+    Title.nth = None;
+  }
+and default_person_tree_full () =
+  {
+    Person_tree_full.index = default_protobuf_int32 ();
+    Person_tree_full.sex = default_sex ();
+    Person_tree_full.lastname = default_string ();
+    Person_tree_full.firstname = default_string ();
+    Person_tree_full.n = default_string ();
+    Person_tree_full.p = default_string ();
+    Person_tree_full.occ = default_protobuf_int32 ();
+    Person_tree_full.image = None;
+    Person_tree_full.sosa = default_sosa ();
+    Person_tree_full.public_name = None;
+    Person_tree_full.aliases = [];
+    Person_tree_full.qualifiers = [];
+    Person_tree_full.firstname_aliases = [];
+    Person_tree_full.surname_aliases = [];
+    Person_tree_full.birth_date = None;
+    Person_tree_full.birth_place = None;
+    Person_tree_full.birth_src = None;
+    Person_tree_full.baptism_date = None;
+    Person_tree_full.baptism_place = None;
+    Person_tree_full.baptism_src = None;
+    Person_tree_full.death_date = None;
+    Person_tree_full.death_place = None;
+    Person_tree_full.death_src = None;
+    Person_tree_full.death_type = default_death_type ();
+    Person_tree_full.burial_date = None;
+    Person_tree_full.burial_place = None;
+    Person_tree_full.burial_src = None;
+    Person_tree_full.occupation = None;
+    Person_tree_full.psources = None;
+    Person_tree_full.titles = [];
+    Person_tree_full.visible_for_visitors = default_bool ();
+    Person_tree_full.has_more_infos = default_bool ();
+    Person_tree_full.baseprefix = default_string ();
+  }
+and default_family_tree_full () =
+  {
+    Family_tree_full.fsources = None;
+    Family_tree_full.marriage_date = None;
+    Family_tree_full.marriage_place = None;
+    Family_tree_full.marriage_src = None;
+    Family_tree_full.marriage_type = default_marriage_type ();
+    Family_tree_full.divorce_type = default_divorce_type ();
+    Family_tree_full.divorce_date = None;
+    Family_tree_full.index = default_protobuf_int32 ();
+  }
+and default_node_full () =
+  {
+    Node_full.id = default_protobuf_int64 ();
+    Node_full.person = default_person_tree_full ();
+    Node_full.ifam = None;
+  }
+and default_graph_tree_full () =
+  {
+    Graph_tree_full.nodes_asc = [];
+    Graph_tree_full.edges_asc = [];
+    Graph_tree_full.families_asc = [];
+    Graph_tree_full.nodes_desc = [];
+    Graph_tree_full.edges_desc = [];
+    Graph_tree_full.families_desc = [];
+    Graph_tree_full.nodes_siblings = [];
+    Graph_tree_full.nodes_siblings_before = [];
+    Graph_tree_full.nodes_siblings_after = [];
+  }
 and default_sosa () = `sosa_ref
 and default_calendar () = `gregorian
 and default_precision () = `sure
@@ -1386,7 +1814,8 @@ and default_marriage_type () = `married
 and default_divorce_type () = `not_divorced
 and default_relation_type () = `rparent_adoption
 and default_witness_type () = `witness
+and default_title_type () = `title_main
 
 
-let piqi = "\226\202\2304\015api_saisie_read\226\231\249\238\001\026api_saisie_read.proto.piqi\162\244\146\155\011\030geneweb.api.saisie_read.object\218\244\134\182\012\217\001\138\233\142\251\014\210\001\210\203\242$,\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003day\210\171\158\194\006\014protobuf-int32\210\203\242$.\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005month\210\171\158\194\006\014protobuf-int32\210\203\242$-\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004year\210\171\158\194\006\014protobuf-int32\210\203\242$.\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005delta\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\003dmy\218\244\134\182\012\224\001\138\233\142\251\014\217\001\210\203\242$&\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\003cal\210\171\158\194\006\bcalendar\210\203\242$(\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004prec\210\171\158\194\006\tprecision\210\203\242$!\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\003dmy\210\171\158\194\006\003dmy\210\203\242$\"\232\146\150q\n\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004dmy2\210\171\158\194\006\003dmy\210\203\242$%\232\146\150q\012\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004text\210\171\158\194\006\006string\218\164\238\191\004\004date\218\244\134\182\012\133\001\138\233\142\251\014\127\210\203\242$3\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\012witness-type\210\171\158\194\006\012witness-type\210\203\242$/\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\007witness\210\171\158\194\006\rsimple-person\218\164\238\191\004\rwitness-event\218\244\134\182\012\216\003\138\233\142\251\014\209\003\210\203\242$%\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004name\210\171\158\194\006\006string\210\203\242$%\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004date\210\171\158\194\006\006string\210\203\242$*\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tdate-conv\210\171\158\194\006\006string\210\203\242$+\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bdate-cal\210\171\158\194\006\bcalendar\210\203\242$&\232\146\150q\n\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005place\210\171\158\194\006\006string\210\203\242$'\232\146\150q\012\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006reason\210\171\158\194\006\006string\210\203\242$%\232\146\150q\014\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004note\210\171\158\194\006\006string\210\203\242$$\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\003src\210\171\158\194\006\006string\210\203\242$.\232\146\150q\018\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006spouse\210\171\158\194\006\rsimple-person\210\203\242$1\232\146\150q\020\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\twitnesses\210\171\158\194\006\rwitness-event\218\164\238\191\004\005event\218\244\134\182\012\173\004\138\233\142\251\014\166\004\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$!\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003sex\210\171\158\194\006\003sex\210\203\242$)\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\blastname\210\171\158\194\006\006string\210\203\242$*\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfirstname\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001n\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001p\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003occ\210\171\158\194\006\014protobuf-int32\210\203\242$&\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005dates\210\171\158\194\006\006string\210\203\242$&\232\146\150q\018\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005image\210\171\158\194\006\006string\210\203\242$#\232\146\150q\020\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004sosa\210\171\158\194\006\004sosa\210\203\242$-\232\146\150q\022\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\014has-more-infos\210\171\158\194\006\004bool\210\203\242$+\232\146\150q\024\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\nbaseprefix\210\171\158\194\006\006string\218\164\238\191\004\011person-tree\218\244\134\182\012\160\005\138\233\142\251\014\153\005\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$!\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003sex\210\171\158\194\006\003sex\210\203\242$)\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\blastname\210\171\158\194\006\006string\210\203\242$*\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfirstname\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001n\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001p\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003occ\210\171\158\194\006\014protobuf-int32\210\203\242$1\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016birth-short-date\210\171\158\194\006\006string\210\203\242$,\232\146\150q\018\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011birth-place\210\171\158\194\006\006string\210\203\242$1\232\146\150q\020\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016death-short-date\210\171\158\194\006\006string\210\203\242$,\232\146\150q\022\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011death-place\210\171\158\194\006\006string\210\203\242$&\232\146\150q\024\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005image\210\171\158\194\006\006string\210\203\242$#\232\146\150q\026\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004sosa\210\171\158\194\006\004sosa\210\203\242$+\232\146\150q\028\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\nbaseprefix\210\171\158\194\006\006string\218\164\238\191\004\rsimple-person\218\244\134\182\012\129\001\138\233\142\251\014{\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006r-type\210\171\158\194\006\rrelation-type\210\203\242$.\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006person\210\171\158\194\006\rsimple-person\218\164\238\191\004\015relation-person\218\244\134\182\012\183\001\138\233\142\251\014\176\001\210\203\242$3\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\018event-witness-type\210\171\158\194\006\006string\210\203\242$/\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\007husband\210\171\158\194\006\rsimple-person\210\203\242$,\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004wife\210\171\158\194\006\rsimple-person\218\164\238\191\004\revent-witness\218\244\134\182\012\145\018\138\233\142\251\014\138\018\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$!\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003sex\210\171\158\194\006\003sex\210\203\242$)\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\blastname\210\171\158\194\006\006string\210\203\242$*\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfirstname\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001n\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001p\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003occ\210\171\158\194\006\014protobuf-int32\210\203\242$,\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011public-name\210\171\158\194\006\006string\210\203\242$(\232\146\150q\018\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\007aliases\210\171\158\194\006\006string\210\203\242$+\232\146\150q\020\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nqualifiers\210\171\158\194\006\006string\210\203\242$2\232\146\150q\022\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\017firstname-aliases\210\171\158\194\006\006string\210\203\242$0\232\146\150q\024\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\015surname-aliases\210\171\158\194\006\006string\210\203\242$&\232\146\150q\026\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005image\210\171\158\194\006\006string\210\203\242$+\232\146\150q\028\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\nbirth-date\210\171\158\194\006\006string\210\203\242$0\232\146\150q\030\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\015birth-date-conv\210\171\158\194\006\006string\210\203\242$1\232\146\150q \152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\014birth-date-cal\210\171\158\194\006\bcalendar\210\203\242$,\232\146\150q\"\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011birth-place\210\171\158\194\006\006string\210\203\242$*\232\146\150q$\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tbirth-src\210\171\158\194\006\006string\210\203\242$-\232\146\150q&\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012baptism-date\210\171\158\194\006\006string\210\203\242$2\232\146\150q(\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\017baptism-date-conv\210\171\158\194\006\006string\210\203\242$3\232\146\150q*\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016baptism-date-cal\210\171\158\194\006\bcalendar\210\203\242$.\232\146\150q,\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\rbaptism-place\210\171\158\194\006\006string\210\203\242$,\232\146\150q.\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011baptism-src\210\171\158\194\006\006string\210\203\242$+\232\146\150q0\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\ndeath-date\210\171\158\194\006\006string\210\203\242$0\232\146\150q2\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\015death-date-conv\210\171\158\194\006\006string\210\203\242$1\232\146\150q4\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\014death-date-cal\210\171\158\194\006\bcalendar\210\203\242$,\232\146\150q6\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011death-place\210\171\158\194\006\006string\210\203\242$*\232\146\150q8\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tdeath-src\210\171\158\194\006\006string\210\203\242$/\232\146\150q:\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\ndeath-type\210\171\158\194\006\ndeath-type\210\203\242$,\232\146\150q<\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011burial-date\210\171\158\194\006\006string\210\203\242$1\232\146\150q>\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016burial-date-conv\210\171\158\194\006\006string\210\203\242$2\232\146\150q@\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\015burial-date-cal\210\171\158\194\006\bcalendar\210\203\242$-\232\146\150qB\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012burial-place\210\171\158\194\006\006string\210\203\242$+\232\146\150qD\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\nburial-src\210\171\158\194\006\006string\210\203\242$+\232\146\150qF\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\noccupation\210\171\158\194\006\006string\210\203\242$&\232\146\150qH\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005notes\210\171\158\194\006\006string\210\203\242$)\232\146\150qJ\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bpsources\210\171\158\194\006\006string\210\203\242$*\232\146\150qL\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\011has-sources\210\171\158\194\006\004bool\210\203\242$'\232\146\150qN\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\006titles\210\171\158\194\006\006string\210\203\242$1\232\146\150qP\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\007related\210\171\158\194\006\015relation-person\210\203\242$2\232\146\150qR\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\brparents\210\171\158\194\006\015relation-person\210\203\242$.\232\146\150qT\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006father\210\171\158\194\006\rsimple-person\210\203\242$.\232\146\150qV\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006mother\210\171\158\194\006\rsimple-person\210\203\242$)\232\146\150qX\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\bfamilies\210\171\158\194\006\006family\210\203\242$#\232\146\150qZ\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004sosa\210\171\158\194\006\004sosa\210\203\242$&\232\146\150q\\\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\006events\210\171\158\194\006\005event\210\203\242$8\232\146\150q^\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\016events-witnesses\210\171\158\194\006\revent-witness\218\164\238\191\004\006person\218\244\134\182\012\218\006\138\233\142\251\014\211\006\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$.\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006spouse\210\171\158\194\006\rsimple-person\210\203\242$.\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\rmarriage-date\210\171\158\194\006\006string\210\203\242$3\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\018marriage-date-conv\210\171\158\194\006\006string\210\203\242$4\232\146\150q\n\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\017marriage-date-cal\210\171\158\194\006\bcalendar\210\203\242$/\232\146\150q\012\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\014marriage-place\210\171\158\194\006\006string\210\203\242$-\232\146\150q\014\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012marriage-src\210\171\158\194\006\006string\210\203\242$5\232\146\150q\016\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\rmarriage-type\210\171\158\194\006\rmarriage-type\210\203\242$3\232\146\150q\018\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\012divorce-type\210\171\158\194\006\012divorce-type\210\203\242$-\232\146\150q\020\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012divorce-date\210\171\158\194\006\006string\210\203\242$2\232\146\150q\022\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\017divorce-date-conv\210\171\158\194\006\006string\210\203\242$3\232\146\150q\024\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016divorce-date-cal\210\171\158\194\006\bcalendar\210\203\242$1\232\146\150q\026\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\twitnesses\210\171\158\194\006\rsimple-person\210\203\242$&\232\146\150q\028\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005notes\210\171\158\194\006\006string\210\203\242$)\232\146\150q\030\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bfsources\210\171\158\194\006\006string\210\203\242$0\232\146\150q \152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\bchildren\210\171\158\194\006\rsimple-person\218\164\238\191\004\006family\218\244\134\182\012K\138\233\142\251\014E\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\012index-person\218\244\134\182\012\164\001\138\233\142\251\014\157\001\210\203\242$+\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\002id\210\171\158\194\006\014protobuf-int64\210\203\242$,\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006person\210\171\158\194\006\011person-tree\210\203\242$-\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004ifam\210\171\158\194\006\014protobuf-int64\218\164\238\191\004\004node\218\244\134\182\012|\138\233\142\251\014v\210\203\242$2\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfrom-node\210\171\158\194\006\014protobuf-int64\210\203\242$0\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\007to-node\210\171\158\194\006\014protobuf-int64\218\164\238\191\004\004edge\218\244\134\182\012\240\002\138\233\142\251\014\233\002\210\203\242$(\232\146\150q\002\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\tnodes-asc\210\171\158\194\006\004node\210\203\242$(\232\146\150q\004\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\tedges-asc\210\171\158\194\006\004edge\210\203\242$)\232\146\150q\006\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nnodes-desc\210\171\158\194\006\004node\210\203\242$)\232\146\150q\b\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nedges-desc\210\171\158\194\006\004edge\210\203\242$-\232\146\150q\n\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\014nodes-siblings\210\171\158\194\006\004node\210\203\242$4\232\146\150q\012\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\021nodes-siblings-before\210\171\158\194\006\004node\210\203\242$3\232\146\150q\014\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\020nodes-siblings-after\210\171\158\194\006\004node\218\164\238\191\004\ngraph-tree\218\244\134\182\012\186\001\138\233\142\251\014\179\001\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$/\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006nb-asc\210\171\158\194\006\014protobuf-int32\210\203\242$0\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\007nb-desc\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\017graph-tree-params\218\244\134\182\012V\138\176\205\197\001P\218\164\238\191\004\004sosa\170\183\218\222\005\019\232\146\150q\000\218\164\238\191\004\bsosa-ref\170\183\218\222\005\015\232\146\150q\002\218\164\238\191\004\004sosa\170\183\218\222\005\018\232\146\150q\004\218\164\238\191\004\007no-sosa\218\244\134\182\012s\138\176\205\197\001m\218\164\238\191\004\bcalendar\170\183\218\222\005\020\232\146\150q\000\218\164\238\191\004\tgregorian\170\183\218\222\005\017\232\146\150q\002\218\164\238\191\004\006julian\170\183\218\222\005\017\232\146\150q\004\218\164\238\191\004\006french\170\183\218\222\005\017\232\146\150q\006\218\164\238\191\004\006hebrew\218\244\134\182\012\179\001\138\176\205\197\001\172\001\218\164\238\191\004\tprecision\170\183\218\222\005\015\232\146\150q\000\218\164\238\191\004\004sure\170\183\218\222\005\016\232\146\150q\002\218\164\238\191\004\005about\170\183\218\222\005\016\232\146\150q\004\218\164\238\191\004\005maybe\170\183\218\222\005\017\232\146\150q\006\218\164\238\191\004\006before\170\183\218\222\005\016\232\146\150q\b\218\164\238\191\004\005after\170\183\218\222\005\017\232\146\150q\n\218\164\238\191\004\006oryear\170\183\218\222\005\018\232\146\150q\012\218\164\238\191\004\007yearint\218\244\134\182\012S\138\176\205\197\001M\218\164\238\191\004\003sex\170\183\218\222\005\015\232\146\150q\000\218\164\238\191\004\004male\170\183\218\222\005\017\232\146\150q\002\218\164\238\191\004\006female\170\183\218\222\005\018\232\146\150q\004\218\164\238\191\004\007unknown\218\244\134\182\012\197\001\138\176\205\197\001\190\001\218\164\238\191\004\ndeath-type\170\183\218\222\005\019\232\146\150q\000\218\164\238\191\004\bnot-dead\170\183\218\222\005\015\232\146\150q\002\218\164\238\191\004\004dead\170\183\218\222\005\021\232\146\150q\004\218\164\238\191\004\ndead-young\170\183\218\222\005\030\232\146\150q\006\218\164\238\191\004\019dead-dont-know-when\170\183\218\222\005\028\232\146\150q\b\218\164\238\191\004\017dont-know-if-dead\170\183\218\222\005\025\232\146\150q\n\218\164\238\191\004\014of-course-dead\218\244\134\182\012\211\001\138\176\205\197\001\204\001\218\164\238\191\004\rmarriage-type\170\183\218\222\005\018\232\146\150q\000\218\164\238\191\004\007married\170\183\218\222\005\022\232\146\150q\002\218\164\238\191\004\011not-married\170\183\218\222\005\018\232\146\150q\004\218\164\238\191\004\007engaged\170\183\218\222\005%\232\146\150q\006\218\164\238\191\004\026no-sexes-check-not-married\170\183\218\222\005\021\232\146\150q\b\218\164\238\191\004\nno-mention\170\183\218\222\005!\232\146\150q\n\218\164\238\191\004\022no-sexes-check-married\218\244\134\182\012h\138\176\205\197\001b\218\164\238\191\004\012divorce-type\170\183\218\222\005\023\232\146\150q\000\218\164\238\191\004\012not-divorced\170\183\218\222\005\019\232\146\150q\002\218\164\238\191\004\bdivorced\170\183\218\222\005\020\232\146\150q\004\218\164\238\191\004\tseparated\218\244\134\182\012\131\003\138\176\205\197\001\252\002\218\164\238\191\004\rrelation-type\170\183\218\222\005\027\232\146\150q\000\218\164\238\191\004\016rparent-adoption\170\183\218\222\005\030\232\146\150q\002\218\164\238\191\004\019rparent-recognition\170\183\218\222\005#\232\146\150q\004\218\164\238\191\004\024rparent-candidate-parent\170\183\218\222\005\029\232\146\150q\006\218\164\238\191\004\018rparent-god-parent\170\183\218\222\005 \232\146\150q\b\218\164\238\191\004\021rparent-foster-parent\170\183\218\222\005\026\232\146\150q\n\218\164\238\191\004\015rchild-adoption\170\183\218\222\005\029\232\146\150q\012\218\164\238\191\004\018rchild-recognition\170\183\218\222\005\"\232\146\150q\014\218\164\238\191\004\023rchild-candidate-parent\170\183\218\222\005\028\232\146\150q\016\218\164\238\191\004\017rchild-god-parent\170\183\218\222\005\031\232\146\150q\018\218\164\238\191\004\020rchild-foster-parent\218\244\134\182\012R\138\176\205\197\001L\218\164\238\191\004\012witness-type\170\183\218\222\005\018\232\146\150q\000\218\164\238\191\004\007witness\170\183\218\222\005\028\232\146\150q\002\218\164\238\191\004\017witness-godparent"
+let piqi = "\226\202\2304\015api_saisie_read\226\231\249\238\001\026api_saisie_read.proto.piqi\162\244\146\155\011\030geneweb.api.saisie_read.object\218\244\134\182\012\217\001\138\233\142\251\014\210\001\210\203\242$,\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003day\210\171\158\194\006\014protobuf-int32\210\203\242$.\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005month\210\171\158\194\006\014protobuf-int32\210\203\242$-\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004year\210\171\158\194\006\014protobuf-int32\210\203\242$.\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005delta\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\003dmy\218\244\134\182\012\224\001\138\233\142\251\014\217\001\210\203\242$&\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\003cal\210\171\158\194\006\bcalendar\210\203\242$(\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004prec\210\171\158\194\006\tprecision\210\203\242$!\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\003dmy\210\171\158\194\006\003dmy\210\203\242$\"\232\146\150q\n\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004dmy2\210\171\158\194\006\003dmy\210\203\242$%\232\146\150q\012\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004text\210\171\158\194\006\006string\218\164\238\191\004\004date\218\244\134\182\012\133\001\138\233\142\251\014\127\210\203\242$3\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\012witness-type\210\171\158\194\006\012witness-type\210\203\242$/\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\007witness\210\171\158\194\006\rsimple-person\218\164\238\191\004\rwitness-event\218\244\134\182\012\216\003\138\233\142\251\014\209\003\210\203\242$%\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004name\210\171\158\194\006\006string\210\203\242$%\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004date\210\171\158\194\006\006string\210\203\242$*\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tdate-conv\210\171\158\194\006\006string\210\203\242$+\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bdate-cal\210\171\158\194\006\bcalendar\210\203\242$&\232\146\150q\n\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005place\210\171\158\194\006\006string\210\203\242$'\232\146\150q\012\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006reason\210\171\158\194\006\006string\210\203\242$%\232\146\150q\014\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004note\210\171\158\194\006\006string\210\203\242$$\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\003src\210\171\158\194\006\006string\210\203\242$.\232\146\150q\018\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006spouse\210\171\158\194\006\rsimple-person\210\203\242$1\232\146\150q\020\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\twitnesses\210\171\158\194\006\rwitness-event\218\164\238\191\004\005event\218\244\134\182\012\173\004\138\233\142\251\014\166\004\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$!\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003sex\210\171\158\194\006\003sex\210\203\242$)\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\blastname\210\171\158\194\006\006string\210\203\242$*\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfirstname\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001n\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001p\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003occ\210\171\158\194\006\014protobuf-int32\210\203\242$&\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005dates\210\171\158\194\006\006string\210\203\242$&\232\146\150q\018\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005image\210\171\158\194\006\006string\210\203\242$#\232\146\150q\020\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004sosa\210\171\158\194\006\004sosa\210\203\242$-\232\146\150q\022\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\014has-more-infos\210\171\158\194\006\004bool\210\203\242$+\232\146\150q\024\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\nbaseprefix\210\171\158\194\006\006string\218\164\238\191\004\011person-tree\218\244\134\182\012\160\005\138\233\142\251\014\153\005\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$!\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003sex\210\171\158\194\006\003sex\210\203\242$)\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\blastname\210\171\158\194\006\006string\210\203\242$*\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfirstname\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001n\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001p\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003occ\210\171\158\194\006\014protobuf-int32\210\203\242$1\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016birth-short-date\210\171\158\194\006\006string\210\203\242$,\232\146\150q\018\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011birth-place\210\171\158\194\006\006string\210\203\242$1\232\146\150q\020\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016death-short-date\210\171\158\194\006\006string\210\203\242$,\232\146\150q\022\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011death-place\210\171\158\194\006\006string\210\203\242$&\232\146\150q\024\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005image\210\171\158\194\006\006string\210\203\242$#\232\146\150q\026\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004sosa\210\171\158\194\006\004sosa\210\203\242$+\232\146\150q\028\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\nbaseprefix\210\171\158\194\006\006string\218\164\238\191\004\rsimple-person\218\244\134\182\012\129\001\138\233\142\251\014{\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006r-type\210\171\158\194\006\rrelation-type\210\203\242$.\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006person\210\171\158\194\006\rsimple-person\218\164\238\191\004\015relation-person\218\244\134\182\012\183\001\138\233\142\251\014\176\001\210\203\242$3\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\018event-witness-type\210\171\158\194\006\006string\210\203\242$/\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\007husband\210\171\158\194\006\rsimple-person\210\203\242$,\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004wife\210\171\158\194\006\rsimple-person\218\164\238\191\004\revent-witness\218\244\134\182\012\145\018\138\233\142\251\014\138\018\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$!\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003sex\210\171\158\194\006\003sex\210\203\242$)\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\blastname\210\171\158\194\006\006string\210\203\242$*\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfirstname\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001n\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001p\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003occ\210\171\158\194\006\014protobuf-int32\210\203\242$,\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011public-name\210\171\158\194\006\006string\210\203\242$(\232\146\150q\018\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\007aliases\210\171\158\194\006\006string\210\203\242$+\232\146\150q\020\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nqualifiers\210\171\158\194\006\006string\210\203\242$2\232\146\150q\022\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\017firstname-aliases\210\171\158\194\006\006string\210\203\242$0\232\146\150q\024\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\015surname-aliases\210\171\158\194\006\006string\210\203\242$&\232\146\150q\026\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005image\210\171\158\194\006\006string\210\203\242$+\232\146\150q\028\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\nbirth-date\210\171\158\194\006\006string\210\203\242$0\232\146\150q\030\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\015birth-date-conv\210\171\158\194\006\006string\210\203\242$1\232\146\150q \152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\014birth-date-cal\210\171\158\194\006\bcalendar\210\203\242$,\232\146\150q\"\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011birth-place\210\171\158\194\006\006string\210\203\242$*\232\146\150q$\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tbirth-src\210\171\158\194\006\006string\210\203\242$-\232\146\150q&\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012baptism-date\210\171\158\194\006\006string\210\203\242$2\232\146\150q(\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\017baptism-date-conv\210\171\158\194\006\006string\210\203\242$3\232\146\150q*\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016baptism-date-cal\210\171\158\194\006\bcalendar\210\203\242$.\232\146\150q,\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\rbaptism-place\210\171\158\194\006\006string\210\203\242$,\232\146\150q.\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011baptism-src\210\171\158\194\006\006string\210\203\242$+\232\146\150q0\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\ndeath-date\210\171\158\194\006\006string\210\203\242$0\232\146\150q2\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\015death-date-conv\210\171\158\194\006\006string\210\203\242$1\232\146\150q4\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\014death-date-cal\210\171\158\194\006\bcalendar\210\203\242$,\232\146\150q6\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011death-place\210\171\158\194\006\006string\210\203\242$*\232\146\150q8\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tdeath-src\210\171\158\194\006\006string\210\203\242$/\232\146\150q:\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\ndeath-type\210\171\158\194\006\ndeath-type\210\203\242$,\232\146\150q<\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011burial-date\210\171\158\194\006\006string\210\203\242$1\232\146\150q>\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016burial-date-conv\210\171\158\194\006\006string\210\203\242$2\232\146\150q@\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\015burial-date-cal\210\171\158\194\006\bcalendar\210\203\242$-\232\146\150qB\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012burial-place\210\171\158\194\006\006string\210\203\242$+\232\146\150qD\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\nburial-src\210\171\158\194\006\006string\210\203\242$+\232\146\150qF\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\noccupation\210\171\158\194\006\006string\210\203\242$&\232\146\150qH\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005notes\210\171\158\194\006\006string\210\203\242$)\232\146\150qJ\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bpsources\210\171\158\194\006\006string\210\203\242$*\232\146\150qL\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\011has-sources\210\171\158\194\006\004bool\210\203\242$'\232\146\150qN\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\006titles\210\171\158\194\006\006string\210\203\242$1\232\146\150qP\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\007related\210\171\158\194\006\015relation-person\210\203\242$2\232\146\150qR\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\brparents\210\171\158\194\006\015relation-person\210\203\242$.\232\146\150qT\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006father\210\171\158\194\006\rsimple-person\210\203\242$.\232\146\150qV\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006mother\210\171\158\194\006\rsimple-person\210\203\242$)\232\146\150qX\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\bfamilies\210\171\158\194\006\006family\210\203\242$#\232\146\150qZ\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004sosa\210\171\158\194\006\004sosa\210\203\242$&\232\146\150q\\\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\006events\210\171\158\194\006\005event\210\203\242$8\232\146\150q^\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\016events-witnesses\210\171\158\194\006\revent-witness\218\164\238\191\004\006person\218\244\134\182\012\218\006\138\233\142\251\014\211\006\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$.\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006spouse\210\171\158\194\006\rsimple-person\210\203\242$.\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\rmarriage-date\210\171\158\194\006\006string\210\203\242$3\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\018marriage-date-conv\210\171\158\194\006\006string\210\203\242$4\232\146\150q\n\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\017marriage-date-cal\210\171\158\194\006\bcalendar\210\203\242$/\232\146\150q\012\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\014marriage-place\210\171\158\194\006\006string\210\203\242$-\232\146\150q\014\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012marriage-src\210\171\158\194\006\006string\210\203\242$5\232\146\150q\016\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\rmarriage-type\210\171\158\194\006\rmarriage-type\210\203\242$3\232\146\150q\018\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\012divorce-type\210\171\158\194\006\012divorce-type\210\203\242$-\232\146\150q\020\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012divorce-date\210\171\158\194\006\006string\210\203\242$2\232\146\150q\022\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\017divorce-date-conv\210\171\158\194\006\006string\210\203\242$3\232\146\150q\024\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\016divorce-date-cal\210\171\158\194\006\bcalendar\210\203\242$1\232\146\150q\026\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\twitnesses\210\171\158\194\006\rsimple-person\210\203\242$&\232\146\150q\028\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005notes\210\171\158\194\006\006string\210\203\242$)\232\146\150q\030\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bfsources\210\171\158\194\006\006string\210\203\242$0\232\146\150q \152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\bchildren\210\171\158\194\006\rsimple-person\218\164\238\191\004\006family\218\244\134\182\012K\138\233\142\251\014E\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\012index-person\218\244\134\182\012\164\001\138\233\142\251\014\157\001\210\203\242$+\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\002id\210\171\158\194\006\014protobuf-int64\210\203\242$,\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006person\210\171\158\194\006\011person-tree\210\203\242$-\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004ifam\210\171\158\194\006\014protobuf-int64\218\164\238\191\004\004node\218\244\134\182\012|\138\233\142\251\014v\210\203\242$2\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfrom-node\210\171\158\194\006\014protobuf-int64\210\203\242$0\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\007to-node\210\171\158\194\006\014protobuf-int64\218\164\238\191\004\004edge\218\244\134\182\012\240\002\138\233\142\251\014\233\002\210\203\242$(\232\146\150q\002\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\tnodes-asc\210\171\158\194\006\004node\210\203\242$(\232\146\150q\004\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\tedges-asc\210\171\158\194\006\004edge\210\203\242$)\232\146\150q\006\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nnodes-desc\210\171\158\194\006\004node\210\203\242$)\232\146\150q\b\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nedges-desc\210\171\158\194\006\004edge\210\203\242$-\232\146\150q\n\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\014nodes-siblings\210\171\158\194\006\004node\210\203\242$4\232\146\150q\012\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\021nodes-siblings-before\210\171\158\194\006\004node\210\203\242$3\232\146\150q\014\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\020nodes-siblings-after\210\171\158\194\006\004node\218\164\238\191\004\ngraph-tree\218\244\134\182\012\186\001\138\233\142\251\014\179\001\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$/\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\006nb-asc\210\171\158\194\006\014protobuf-int32\210\203\242$0\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\007nb-desc\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\017graph-tree-params\218\244\134\182\012\212\002\138\233\142\251\014\205\002\210\203\242$/\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\ntitle-type\210\171\158\194\006\ntitle-type\210\203\242$%\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004name\210\171\158\194\006\006string\210\203\242$&\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005title\210\171\158\194\006\006string\210\203\242$%\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004fief\210\171\158\194\006\006string\210\203\242$+\232\146\150q\n\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\ndate-begin\210\171\158\194\006\006string\210\203\242$)\232\146\150q\012\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bdate-end\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\003nth\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\005title\218\244\134\182\012\191\012\138\233\142\251\014\184\012\210\203\242$.\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\210\203\242$!\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003sex\210\171\158\194\006\003sex\210\203\242$)\232\146\150q\006\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\blastname\210\171\158\194\006\006string\210\203\242$*\232\146\150q\b\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\tfirstname\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001n\210\171\158\194\006\006string\210\203\242$\"\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\001p\210\171\158\194\006\006string\210\203\242$,\232\146\150q\014\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\003occ\210\171\158\194\006\014protobuf-int32\210\203\242$&\232\146\150q\016\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\005image\210\171\158\194\006\006string\210\203\242$#\232\146\150q\018\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\004sosa\210\171\158\194\006\004sosa\210\203\242$,\232\146\150q\020\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011public-name\210\171\158\194\006\006string\210\203\242$(\232\146\150q\022\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\007aliases\210\171\158\194\006\006string\210\203\242$+\232\146\150q\024\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nqualifiers\210\171\158\194\006\006string\210\203\242$2\232\146\150q\026\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\017firstname-aliases\210\171\158\194\006\006string\210\203\242$0\232\146\150q\028\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\015surname-aliases\210\171\158\194\006\006string\210\203\242$+\232\146\150q\030\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\nbirth-date\210\171\158\194\006\006string\210\203\242$,\232\146\150q \152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011birth-place\210\171\158\194\006\006string\210\203\242$*\232\146\150q\"\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tbirth-src\210\171\158\194\006\006string\210\203\242$-\232\146\150q$\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012baptism-date\210\171\158\194\006\006string\210\203\242$.\232\146\150q&\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\rbaptism-place\210\171\158\194\006\006string\210\203\242$,\232\146\150q(\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011baptism-src\210\171\158\194\006\006string\210\203\242$+\232\146\150q*\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\ndeath-date\210\171\158\194\006\006string\210\203\242$,\232\146\150q,\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011death-place\210\171\158\194\006\006string\210\203\242$*\232\146\150q.\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\tdeath-src\210\171\158\194\006\006string\210\203\242$/\232\146\150q0\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\ndeath-type\210\171\158\194\006\ndeath-type\210\203\242$,\232\146\150q2\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\011burial-date\210\171\158\194\006\006string\210\203\242$-\232\146\150q4\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012burial-place\210\171\158\194\006\006string\210\203\242$+\232\146\150q6\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\nburial-src\210\171\158\194\006\006string\210\203\242$+\232\146\150q8\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\noccupation\210\171\158\194\006\006string\210\203\242$)\232\146\150q:\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bpsources\210\171\158\194\006\006string\210\203\242$&\232\146\150q<\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\006titles\210\171\158\194\006\005title\210\203\242$3\232\146\150q>\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\020visible-for-visitors\210\171\158\194\006\004bool\210\203\242$-\232\146\150q@\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\014has-more-infos\210\171\158\194\006\004bool\210\203\242$+\232\146\150qB\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\nbaseprefix\210\171\158\194\006\006string\218\164\238\191\004\016person-tree-full\218\244\134\182\012\187\003\138\233\142\251\014\180\003\210\203\242$)\232\146\150q\002\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\bfsources\210\171\158\194\006\006string\210\203\242$.\232\146\150q\004\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\rmarriage-date\210\171\158\194\006\006string\210\203\242$/\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\014marriage-place\210\171\158\194\006\006string\210\203\242$-\232\146\150q\b\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012marriage-src\210\171\158\194\006\006string\210\203\242$5\232\146\150q\n\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\rmarriage-type\210\171\158\194\006\rmarriage-type\210\203\242$3\232\146\150q\012\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\012divorce-type\210\171\158\194\006\012divorce-type\210\203\242$-\232\146\150q\014\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\012divorce-date\210\171\158\194\006\006string\210\203\242$.\232\146\150q\016\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\005index\210\171\158\194\006\014protobuf-int32\218\164\238\191\004\016family-tree-full\218\244\134\182\012\174\001\138\233\142\251\014\167\001\210\203\242$+\232\146\150q\002\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\002id\210\171\158\194\006\014protobuf-int64\210\203\242$1\232\146\150q\004\152\182\154\152\004\223\162\138\147\001\218\164\238\191\004\006person\210\171\158\194\006\016person-tree-full\210\203\242$-\232\146\150q\006\152\182\154\152\004\160\223\186\243\001\218\164\238\191\004\004ifam\210\171\158\194\006\014protobuf-int64\218\164\238\191\004\tnode-full\218\244\134\182\012\135\004\138\233\142\251\014\128\004\210\203\242$-\232\146\150q\002\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\tnodes-asc\210\171\158\194\006\tnode-full\210\203\242$(\232\146\150q\004\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\tedges-asc\210\171\158\194\006\004edge\210\203\242$7\232\146\150q\006\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\012families-asc\210\171\158\194\006\016family-tree-full\210\203\242$.\232\146\150q\b\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nnodes-desc\210\171\158\194\006\tnode-full\210\203\242$)\232\146\150q\n\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\nedges-desc\210\171\158\194\006\004edge\210\203\242$8\232\146\150q\012\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\rfamilies-desc\210\171\158\194\006\016family-tree-full\210\203\242$2\232\146\150q\014\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\014nodes-siblings\210\171\158\194\006\tnode-full\210\203\242$9\232\146\150q\016\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\021nodes-siblings-before\210\171\158\194\006\tnode-full\210\203\242$8\232\146\150q\018\152\182\154\152\004\250\248\214\130\001\218\164\238\191\004\020nodes-siblings-after\210\171\158\194\006\tnode-full\218\164\238\191\004\015graph-tree-full\218\244\134\182\012V\138\176\205\197\001P\218\164\238\191\004\004sosa\170\183\218\222\005\019\232\146\150q\000\218\164\238\191\004\bsosa-ref\170\183\218\222\005\015\232\146\150q\002\218\164\238\191\004\004sosa\170\183\218\222\005\018\232\146\150q\004\218\164\238\191\004\007no-sosa\218\244\134\182\012s\138\176\205\197\001m\218\164\238\191\004\bcalendar\170\183\218\222\005\020\232\146\150q\000\218\164\238\191\004\tgregorian\170\183\218\222\005\017\232\146\150q\002\218\164\238\191\004\006julian\170\183\218\222\005\017\232\146\150q\004\218\164\238\191\004\006french\170\183\218\222\005\017\232\146\150q\006\218\164\238\191\004\006hebrew\218\244\134\182\012\179\001\138\176\205\197\001\172\001\218\164\238\191\004\tprecision\170\183\218\222\005\015\232\146\150q\000\218\164\238\191\004\004sure\170\183\218\222\005\016\232\146\150q\002\218\164\238\191\004\005about\170\183\218\222\005\016\232\146\150q\004\218\164\238\191\004\005maybe\170\183\218\222\005\017\232\146\150q\006\218\164\238\191\004\006before\170\183\218\222\005\016\232\146\150q\b\218\164\238\191\004\005after\170\183\218\222\005\017\232\146\150q\n\218\164\238\191\004\006oryear\170\183\218\222\005\018\232\146\150q\012\218\164\238\191\004\007yearint\218\244\134\182\012S\138\176\205\197\001M\218\164\238\191\004\003sex\170\183\218\222\005\015\232\146\150q\000\218\164\238\191\004\004male\170\183\218\222\005\017\232\146\150q\002\218\164\238\191\004\006female\170\183\218\222\005\018\232\146\150q\004\218\164\238\191\004\007unknown\218\244\134\182\012\197\001\138\176\205\197\001\190\001\218\164\238\191\004\ndeath-type\170\183\218\222\005\019\232\146\150q\000\218\164\238\191\004\bnot-dead\170\183\218\222\005\015\232\146\150q\002\218\164\238\191\004\004dead\170\183\218\222\005\021\232\146\150q\004\218\164\238\191\004\ndead-young\170\183\218\222\005\030\232\146\150q\006\218\164\238\191\004\019dead-dont-know-when\170\183\218\222\005\028\232\146\150q\b\218\164\238\191\004\017dont-know-if-dead\170\183\218\222\005\025\232\146\150q\n\218\164\238\191\004\014of-course-dead\218\244\134\182\012\211\001\138\176\205\197\001\204\001\218\164\238\191\004\rmarriage-type\170\183\218\222\005\018\232\146\150q\000\218\164\238\191\004\007married\170\183\218\222\005\022\232\146\150q\002\218\164\238\191\004\011not-married\170\183\218\222\005\018\232\146\150q\004\218\164\238\191\004\007engaged\170\183\218\222\005%\232\146\150q\006\218\164\238\191\004\026no-sexes-check-not-married\170\183\218\222\005\021\232\146\150q\b\218\164\238\191\004\nno-mention\170\183\218\222\005!\232\146\150q\n\218\164\238\191\004\022no-sexes-check-married\218\244\134\182\012h\138\176\205\197\001b\218\164\238\191\004\012divorce-type\170\183\218\222\005\023\232\146\150q\000\218\164\238\191\004\012not-divorced\170\183\218\222\005\019\232\146\150q\002\218\164\238\191\004\bdivorced\170\183\218\222\005\020\232\146\150q\004\218\164\238\191\004\tseparated\218\244\134\182\012\131\003\138\176\205\197\001\252\002\218\164\238\191\004\rrelation-type\170\183\218\222\005\027\232\146\150q\000\218\164\238\191\004\016rparent-adoption\170\183\218\222\005\030\232\146\150q\002\218\164\238\191\004\019rparent-recognition\170\183\218\222\005#\232\146\150q\004\218\164\238\191\004\024rparent-candidate-parent\170\183\218\222\005\029\232\146\150q\006\218\164\238\191\004\018rparent-god-parent\170\183\218\222\005 \232\146\150q\b\218\164\238\191\004\021rparent-foster-parent\170\183\218\222\005\026\232\146\150q\n\218\164\238\191\004\015rchild-adoption\170\183\218\222\005\029\232\146\150q\012\218\164\238\191\004\018rchild-recognition\170\183\218\222\005\"\232\146\150q\014\218\164\238\191\004\023rchild-candidate-parent\170\183\218\222\005\028\232\146\150q\016\218\164\238\191\004\017rchild-god-parent\170\183\218\222\005\031\232\146\150q\018\218\164\238\191\004\020rchild-foster-parent\218\244\134\182\012R\138\176\205\197\001L\218\164\238\191\004\012witness-type\170\183\218\222\005\018\232\146\150q\000\218\164\238\191\004\007witness\170\183\218\222\005\028\232\146\150q\002\218\164\238\191\004\017witness-godparent\218\244\134\182\012g\138\176\205\197\001a\218\164\238\191\004\ntitle-type\170\183\218\222\005\021\232\146\150q\000\218\164\238\191\004\ntitle-main\170\183\218\222\005\021\232\146\150q\002\218\164\238\191\004\ntitle-name\170\183\218\222\005\021\232\146\150q\004\218\164\238\191\004\ntitle-none"
 include Api_saisie_read_piqi
