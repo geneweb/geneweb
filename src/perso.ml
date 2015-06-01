@@ -598,7 +598,30 @@ value max_ancestor_level conf base ip max_lev =
               loop (succ level) (get_father cpl);
               loop (succ level) (get_mother cpl)
             }
-        | _ -> () ]
+        | _ ->
+            (* lia *)
+            let rec loop_lia level (ip, base_prefix) = do {
+              x.val := max x.val level;
+              if x.val = max_lev then ()
+              else
+                match Perso_link.get_parents_link base_prefix ip with
+                [ Some family ->
+                    do {
+                      let (ifath, imoth, base_prefix) =
+                        (Adef.iper_of_int (Int32.to_int family.MLink.Family.ifath),
+                         Adef.iper_of_int (Int32.to_int family.MLink.Family.imoth),
+                         family.MLink.Family.baseprefix)
+                      in
+                      match Perso_link.get_person_link base_prefix ifath with
+                      [ Some fath -> loop_lia (succ level) (ifath, base_prefix)
+                      | None -> ()];
+                      match Perso_link.get_person_link base_prefix imoth with
+                      [ Some fath -> loop_lia (succ level) (imoth, base_prefix)
+                      | None -> ()]
+                    }
+                | None -> () ]}
+            in
+            loop_lia level (ip, conf.bname) ]
     }
   in
   do { loop 0 ip; x.val }
@@ -864,7 +887,7 @@ value get_all_generations conf base p =
 
 type pos = [ Left | Right | Center | Alone ];
 type cell =
-  [ Cell of person and option ifam and pos and bool and int
+  [ Cell of person and option ifam and pos and bool and int and string
   | Empty ]
 ;
 
@@ -872,14 +895,14 @@ value rec enrich lst1 lst2 =
   match (lst1, lst2) with
   [ (_, []) -> []
   | ([], lst) -> lst
-  | ([Cell _ _ Right _ s1 :: l1], [Cell p f d u s2 :: l2]) ->
-      [Cell p f d u (s1 + s2 + 1) :: enrich l1 l2]
-  | ([Cell _ _ Left _ s :: l1], [Cell p f d u _ :: l2]) ->
-      enrich l1 [Cell p f d u s :: l2]
-  | ([Cell _ _ _ _ s :: l1], [Cell p f d u _ :: l2]) ->
-     [Cell p f d u s :: enrich l1 l2]
-  | ([Empty :: l1], [Cell p f d _ s :: l2]) ->
-     [Cell p f d False s :: enrich l1 l2]
+  | ([Cell _ _ Right _ s1 _ :: l1], [Cell p f d u s2 b :: l2]) ->
+      [Cell p f d u (s1 + s2 + 1) b :: enrich l1 l2]
+  | ([Cell _ _ Left _ s _ :: l1], [Cell p f d u _ b :: l2]) ->
+      enrich l1 [Cell p f d u s b :: l2]
+  | ([Cell _ _ _ _ s _ :: l1], [Cell p f d u _ b :: l2]) ->
+     [Cell p f d u s b :: enrich l1 l2]
+  | ([Empty :: l1], [Cell p f d _ s b :: l2]) ->
+     [Cell p f d False s b :: enrich l1 l2]
   | ([_ :: l1], [Empty :: l2]) -> [Empty :: enrich l1 l2] ]
 ;
 
@@ -908,7 +931,7 @@ value tree_generation_list conf base gv p =
       (fun po list ->
          match po with
          [ Empty -> [Empty :: list]
-         | Cell p _ _ _ _ ->
+         | Cell p _ _ _ _ base_prefix ->
              match get_parents p with
              [ Some ifam ->
                  let cpl = foi base ifam in
@@ -921,19 +944,70 @@ value tree_generation_list conf base gv p =
                    if know base p then Some p else None
                  in
                  let fo = Some ifam in
+                 let base_prefix = conf.bname in
                  match (fath, moth) with
                  [ (Some f, Some m) ->
-                     [Cell f fo Left True 1; Cell m fo Right True 1 :: list]
-                 | (Some f, None) -> [Cell f fo Alone True 1 :: list]
-                 | (None, Some m) -> [Cell m fo Alone True 1 :: list]
+                     [Cell f fo Left True 1 base_prefix;
+                      Cell m fo Right True 1 base_prefix :: list]
+                 | (Some f, None) -> [Cell f fo Alone True 1 base_prefix :: list]
+                 | (None, Some m) -> [Cell m fo Alone True 1 base_prefix :: list]
                  | (None, None) -> [Empty :: list] ]
-             | _ -> [Empty :: list] ] ])
+             | _ ->
+                 match Perso_link.get_parents_link base_prefix (get_key_index p) with
+                 [ Some family ->
+                     let (ifath, imoth, ifam) =
+                       (Adef.iper_of_int (Int32.to_int family.MLink.Family.ifath),
+                        Adef.iper_of_int (Int32.to_int family.MLink.Family.imoth),
+                        Adef.ifam_of_int (Int32.to_int family.MLink.Family.ifam))
+                     in
+                     match
+                       (Perso_link.get_person_link
+                         family.MLink.Family.baseprefix ifath,
+                        Perso_link.get_person_link
+                         family.MLink.Family.baseprefix imoth)
+                     with
+                     [ (Some fath, Some moth) ->
+                         let (fath, _) = Perso_link.make_ep_link conf base fath in
+                         let fath = if know base fath then Some fath else None in
+                         let (moth, _) = Perso_link.make_ep_link conf base moth in
+                         let moth = if know base moth then Some moth else None in
+                         let fo = Some ifam in
+                         let base_prefix = family.MLink.Family.baseprefix in
+                         match (fath, moth) with
+                         [ (Some f, Some m) ->
+                             [Cell f fo Left True 1 base_prefix;
+                              Cell m fo Right True 1 base_prefix :: list]
+                         | (Some f, None) ->
+                             [Cell f fo Alone True 1 base_prefix :: list]
+                         | (None, Some m) ->
+                             [Cell m fo Alone True 1 base_prefix :: list]
+                         | (None, None) -> [Empty :: list] ]
+                     | (Some fath, None) ->
+                         let (fath, _) = Perso_link.make_ep_link conf base fath in
+                         let fath = if know base fath then Some fath else None in
+                         let fo = Some ifam in
+                         let base_prefix = family.MLink.Family.baseprefix in
+                         match fath with
+                         [ Some f -> [Cell f fo Alone True 1 base_prefix :: list]
+                         | None -> [Empty :: list] ]
+                     | (None, Some moth) ->
+                         let (moth, _) = Perso_link.make_ep_link conf base moth in
+                         let moth = if know base moth then Some moth else None in
+                         let fo = Some ifam in
+                         let base_prefix = family.MLink.Family.baseprefix in
+                         match moth with
+                         [ Some f -> [Cell f fo Alone True 1 base_prefix :: list]
+                         | None -> [Empty :: list] ]
+                     | (None, None) -> [Empty :: list] ]
+                 | None -> [Empty :: list] ] ] ])
       pol []
   in
   let gen =
-    loop (gv - 1) [Cell p None Center True 1] [] where rec loop i gen list =
+    let rec loop i gen list =
       if i = 0 then [gen :: list]
       else loop (i - 1) (next_gen gen) [gen :: list]
+    in
+    loop (gv - 1) [Cell p None Center True 1 conf.bname] []
   in
   enrich_tree gen
 ;
@@ -2391,16 +2465,62 @@ and eval_cell_field_var conf base env ep cell loc =
   [ ["colspan"] ->
       match cell with
       [ Empty -> VVstring "1"
-      | Cell _ _ _ _ s -> VVstring (string_of_int s) ]
+      | Cell _ _ _ _ s _ -> VVstring (string_of_int s) ]
   | ["family" :: sl] ->
       match cell with
-      [ Cell p (Some ifam) _ _ _ ->
-          let (f, c, a) = make_efam conf base (get_key_index p) ifam in
-          eval_family_field_var conf base env (ifam, f, c, a) loc sl
+      [ Cell p (Some ifam) _ _ _ base_prefix ->
+          if conf.bname = base_prefix then
+            let (f, c, a) = make_efam conf base (get_key_index p) ifam in
+            eval_family_field_var conf base env (ifam, f, c, a) loc sl
+          else
+            (* lia *)
+            let conf = {(conf) with command = base_prefix} in
+            let (f, c, a) =
+              let rec loop l =
+                match l with
+                [ [] -> failwith "lia"
+                | [fam_link :: l] ->
+                    let fam_link_ifam =
+                      Adef.ifam_of_int (Int32.to_int fam_link.MLink.Family.ifam)
+                    in
+                    if fam_link_ifam = ifam then
+                      let (_, fam, _, _) =
+                        Perso_link.make_efam_link
+                          conf base (get_key_index p) fam_link
+                      in
+                      let (ifath, imoth) =
+                        (Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.ifath),
+                         Adef.iper_of_int (Int32.to_int fam_link.MLink.Family.imoth))
+                      in
+                      let cpl =
+                        let ip = get_key_index p in
+                        if ip <> ifath && ip <> imoth then
+                          match
+                            Perso_link.get_person_link_with_base
+                              conf.command ip base_prefix
+                          with
+                          [ Some p ->
+                              let ip =
+                                Adef.iper_of_int (Int32.to_int p.MLink.Person.ip)
+                              in
+                              (ifath, imoth, if ip = ifath then imoth else ifath)
+                          | None ->
+                              (ifath, imoth, if ip = ifath then imoth else ifath) ]
+                        else (ifath, imoth, if ip = ifath then imoth else ifath)
+                      in
+                      (fam, cpl, True)
+                    else loop l ]
+              in
+              let faml =
+                Perso_link.get_family_link conf.command (get_key_index p)
+              in
+              loop faml
+            in
+            eval_family_field_var conf base env (ifam, f, c, a) loc sl
       | _ -> VVstring "" ]
   | ["is_center"] ->
       match cell with
-      [ Cell _ _ Center _ _ -> VVbool True
+      [ Cell _ _ Center _ _ _ -> VVbool True
       | _ -> VVbool False ]
   | ["is_empty"] ->
       match cell with
@@ -2408,21 +2528,27 @@ and eval_cell_field_var conf base env ep cell loc =
       | _ -> VVbool False ]
   | ["is_left"] ->
       match cell with
-      [ Cell _ _ Left _ _ -> VVbool True
+      [ Cell _ _ Left _ _ _ -> VVbool True
       | _ -> VVbool False ]
   | ["is_right"] ->
       match cell with
-      [ Cell _ _ Right _ _ -> VVbool True
+      [ Cell _ _ Right _ _ _ -> VVbool True
       | _ -> VVbool False ]
   | ["is_top"] ->
       match cell with
-      [ Cell _ _ _ False _ -> VVbool True
+      [ Cell _ _ _ False _ _ -> VVbool True
       | _ -> VVbool False ]
   | ["person" :: sl] ->
       match cell with
-      [ Cell p _ _ _ _ ->
-          let ep = make_ep conf base (get_key_index p) in
-          eval_person_field_var conf base env ep loc sl
+      [ Cell p _ _ _ _ base_prefix ->
+          if conf.bname = base_prefix then
+            let ep = make_ep conf base (get_key_index p) in
+            eval_person_field_var conf base env ep loc sl
+          else
+            (* lia *)
+            let conf = {(conf) with command = base_prefix} in
+            let ep = (p, True) in
+            eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 and eval_ancestor_field_var conf base env gp loc =
