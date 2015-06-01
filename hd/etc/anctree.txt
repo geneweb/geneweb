@@ -22,6 +22,22 @@
 <body%body_prop;>
 %message_to_wizard;
 
+%define;init_cache(nb_asc, from_gen_desc, nb_desc)
+  %init_cache.nb_asc.from_gen_desc.nb_desc;
+%end;
+
+%define;ext_link(xx)
+  %if;(xx.bname_prefix != prefix)
+    style="background:linear-gradient(transparent,transparent),url(data:image/svg+xml,%%3C%%3Fxml%%20version%%3D%%221.0%%22%%20encoding%%3D%%22UTF-8%%22%%3F%%3E%%3Csvg%%20xmlns%%3D%%22http%%3A%%2F%%2Fwww.w3.org%%2F2000%%2Fsvg%%22%%20width%%3D%%2210%%22%%20height%%3D%%2210%%22%%3E%%3Cg%%20transform%%3D%%22translate%%28-826.429%%20-698.791%%29%%22%%3E%%3Crect%%20width%%3D%%225.982%%22%%20height%%3D%%225.982%%22%%20x%%3D%%22826.929%%22%%20y%%3D%%22702.309%%22%%20fill%%3D%%22%%23fff%%22%%20stroke%%3D%%22%%2306c%%22%%2F%%3E%%3Cg%%3E%%3Cpath%%20d%%3D%%22M831.194%%20698.791h5.234v5.391l-1.571%%201.545-1.31-1.31-2.725%%202.725-2.689-2.689%%202.808-2.808-1.311-1.311z%%22%%20fill%%3D%%22%%2306f%%22%%2F%%3E%%3Cpath%%20d%%3D%%22M835.424%%20699.795l.022%%204.885-1.817-1.817-2.881%%202.881-1.228-1.228%%202.881-2.881-1.851-1.851z%%22%%20fill%%3D%%22%%23fff%%22%%2F%%3E%%3C%%2Fg%%3E%%3C%%2Fg%%3E%%3C%%2Fsvg%%3E) no-repeat right; padding-right:15px;" target="_blank"
+  %end;
+%end;
+
+%define;ext_link2(xx)
+  %if;(xx.bname_prefix != prefix)
+    style="text-decoration:none; background:linear-gradient(transparent,transparent),url(data:image/svg+xml,%%3C%%3Fxml%%20version%%3D%%221.0%%22%%20encoding%%3D%%22UTF-8%%22%%3F%%3E%%3Csvg%%20xmlns%%3D%%22http%%3A%%2F%%2Fwww.w3.org%%2F2000%%2Fsvg%%22%%20width%%3D%%2210%%22%%20height%%3D%%2210%%22%%3E%%3Cg%%20transform%%3D%%22translate%%28-826.429%%20-698.791%%29%%22%%3E%%3Crect%%20width%%3D%%225.982%%22%%20height%%3D%%225.982%%22%%20x%%3D%%22826.929%%22%%20y%%3D%%22702.309%%22%%20fill%%3D%%22%%23fff%%22%%20stroke%%3D%%22%%2306c%%22%%2F%%3E%%3Cg%%3E%%3Cpath%%20d%%3D%%22M831.194%%20698.791h5.234v5.391l-1.571%%201.545-1.31-1.31-2.725%%202.725-2.689-2.689%%202.808-2.808-1.311-1.311z%%22%%20fill%%3D%%22%%2306f%%22%%2F%%3E%%3Cpath%%20d%%3D%%22M835.424%%20699.795l.022%%204.885-1.817-1.817-2.881%%202.881-1.228-1.228%%202.881-2.881-1.851-1.851z%%22%%20fill%%3D%%22%%23fff%%22%%2F%%3E%%3C%%2Fg%%3E%%3C%%2Fg%%3E%%3C%%2Fsvg%%3E) no-repeat right; padding-right:15px;" target="_blank"
+  %end;
+%end;
+
 %define;a_tree_line()
   %if;(not is_first)
     <tr>
@@ -50,7 +66,7 @@
       %end;
       %if;(evar.cgl = "on")%cell.person;
       %else;
-        <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
+        <a %apply;ext_link("cell.person") href="%cell.person.bname_prefix;%cell.person.access;">%cell.person;</a>%nn;
       %end;
       %cell.person.title;%cell.person.dates;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")
@@ -100,10 +116,7 @@
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
       %elseif;(evar.cgl = "on")|%nn;
       %else;
-        <a style="text-decoration:none" href="%prefix;
-        m=A;t=T;v=%evar.v;;%cell.person.access;
-        %if;(evar.image = "on");image=on%end;
-        %if;(evar.marriage = "on");marriage=on%end;">|</a>%nn;
+        <a %apply;ext_link2("cell.person") href="%cell.person.bname_prefix;m=A;t=T;v=%evar.v;;%cell.person.access;%if;(evar.image = "on");image=on%end;%if;(evar.marriage = "on");marriage=on%end;"">|</a>%nn;
       %end;
       </td>
     %end;
@@ -133,7 +146,7 @@
 %define;male_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
-    <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
+    <a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
     %if;(evar.image = "on" and xx.has_image)
       <br%/>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
@@ -148,7 +161,7 @@
 %define;female_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
-    <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
+    <a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
     %if;(evar.image = "on" and xx.has_image)
       <br%/>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
@@ -173,6 +186,8 @@
   %end;
   </table>
 %end;
+
+%apply;init_cache(evar.v, 0, 0)
 
 %if;(evar.t = "T")
   %apply;tree%with;
