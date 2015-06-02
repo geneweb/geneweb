@@ -1,4 +1,0 @@
-description = "The Piqi library"
-requires = "piqi.ulex piqi.easy-format piqi.xmlm piqi.runtime"
-archive(byte) = "piqilib.cma"
-archive(native) = "piqilib.cmxa"

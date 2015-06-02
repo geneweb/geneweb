@@ -1,1 +1,0 @@
-[int64] int piqi_strtoull ([string] char str []);
