@@ -1,4 +1,4 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
+
 
 module M = Api_piqi
 module Mext = Api_piqi_ext
@@ -41,9 +41,9 @@ let print_auto_complete conf base =
       Api_search.search_auto_complete conf base mode place_mode max_res s
   in
   let result =
-    Mwrite.Auto_complete_result#{
+    Mwrite.Auto_complete_result.({
       result = list;
-    }
+    })
   in
   let data = Mext_write.gen_auto_complete_result result in
   print_result conf data
@@ -105,7 +105,7 @@ let print_person_search_list conf base =
         Api_update_util.pers_to_piqi_person_search conf base p)
       list
   in
-  let result = Mwrite.Person_search_list#{ persons = list; } in
+  let result = Mwrite.Person_search_list.({ persons = list; }) in
   let data = Mext_write.gen_person_search_list result in
   print_result conf data
 ;;
@@ -233,10 +233,10 @@ let print_config conf base =
           | `hebrew ->
               (cal, transl_nth conf "gregorian/julian/french/hebrew" 3)
         in
-        Mwrite.Transl_calendar#{pos = pos; sval = sval;})
+        Mwrite.Transl_calendar.({pos = pos; sval = sval;}))
       [ `gregorian; `julian; `french; `hebrew ]
   in
-  let transl_cal = Mwrite.Config_transl_calendar#{msg = transl_cal;} in
+  let transl_cal = Mwrite.Config_transl_calendar.({msg = transl_cal;}) in
   let transl_wit =
     List.map
       (fun wit ->
@@ -248,10 +248,10 @@ let print_config conf base =
               (`witness_godparent,
                transl_nth conf "godfather/godmother/godparents" 2)
         in
-        Mwrite.Transl_witness_type#{pos = pos; sval = sval;})
+        Mwrite.Transl_witness_type.({pos = pos; sval = sval;}))
       [ `witness; `witness_godparent ]
   in
-  let transl_wit = Mwrite.Config_transl_witness_type#{msg = transl_wit;} in
+  let transl_wit = Mwrite.Config_transl_witness_type.({msg = transl_wit;}) in
   let transl_prec =
     List.map
       (fun prec ->
@@ -265,10 +265,10 @@ let print_config conf base =
           | `oryear -> (prec, transl conf "or")
           | `yearint -> (prec, transl conf "between (date)")
         in
-        Mwrite.Transl_precision#{pos = pos; sval = sval;})
+        Mwrite.Transl_precision.({pos = pos; sval = sval;}))
       [ `sure; `about; `maybe; `before; `after; `oryear; `yearint ]
   in
-  let transl_prec = Mwrite.Config_transl_precision#{msg = transl_prec;} in
+  let transl_prec = Mwrite.Config_transl_precision.({msg = transl_prec;}) in
   let transl_death =
     List.map
       (fun death ->
@@ -281,10 +281,10 @@ let print_config conf base =
           | `of_course_dead -> (death, transl conf "of course dead")
           | _ -> failwith "transl_death"
         in
-        Mwrite.Transl_death_type#{pos = pos; sval = sval;})
+        Mwrite.Transl_death_type.({pos = pos; sval = sval;}))
       [ `not_dead; `dead; `dead_young; `dont_know_if_dead; `of_course_dead ]
   in
-  let transl_death = Mwrite.Config_transl_death_type#{msg = transl_death;} in
+  let transl_death = Mwrite.Config_transl_death_type.({msg = transl_death;}) in
   let transl_rel =
     List.map
       (fun rel ->
@@ -311,7 +311,7 @@ let print_config conf base =
           | `rpt_foster_parent_mother ->
               (rel, transl_nth conf "foster father/foster mother/foster parents" 1)
         in
-        Mwrite.Transl_relation_parent_type#{pos = pos; sval = sval;})
+        Mwrite.Transl_relation_parent_type.({pos = pos; sval = sval;}))
       [ `rpt_adoption_father; `rpt_adoption_mother;
         `rpt_recognition_father; `rpt_recognition_mother;
         `rpt_candidate_parent_father; `rpt_candidate_parent_mother;
@@ -319,7 +319,7 @@ let print_config conf base =
         `rpt_foster_parent_father; `rpt_foster_parent_mother ]
   in
   let transl_rel =
-    Mwrite.Config_transl_relation_parent_type#{msg = transl_rel;}
+    Mwrite.Config_transl_relation_parent_type.({msg = transl_rel;})
   in
   let transl_fevent =
     List.map
@@ -327,17 +327,17 @@ let print_config conf base =
         let (pos, sval) =
           (piqi_event_of_fevent evt, Util.string_of_fevent_name conf base evt)
         in
-        Mwrite.Transl_fevent_name#{
+        Mwrite.Transl_fevent_name.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ Efam_Marriage; Efam_NoMarriage; Efam_Engage;
         Efam_Divorce ; Efam_Separated;
         Efam_Annulation; Efam_MarriageBann; Efam_MarriageContract;
         Efam_MarriageLicense; Efam_PACS; Efam_Residence ]
   in
   let transl_fevent =
-    Mwrite.Config_transl_fevent_name#{msg = transl_fevent;}
+    Mwrite.Config_transl_fevent_name.({msg = transl_fevent;})
   in
   (* On tri les évènements. Les 4 principaux en premier, *)
   (* les autres et les LDS en derniers.                  *)
@@ -347,10 +347,10 @@ let print_config conf base =
         let (pos, sval) =
           (piqi_event_of_pevent evt, Util.string_of_pevent_name conf base evt)
         in
-        Mwrite.Transl_pevent_name#{
+        Mwrite.Transl_pevent_name.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ Epers_Birth; Epers_Baptism; Epers_Death; Epers_Burial ]
   in
   let transl_pevent_sec =
@@ -359,10 +359,10 @@ let print_config conf base =
         let (pos, sval) =
           (piqi_event_of_pevent evt, Util.string_of_pevent_name conf base evt)
         in
-        Mwrite.Transl_pevent_name#{
+        Mwrite.Transl_pevent_name.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ Epers_Accomplishment; Epers_Acquisition; Epers_Adhesion;
         Epers_BarMitzvah; Epers_BatMitzvah; Epers_Benediction; Epers_Cremation;
         Epers_ChangeName; Epers_Circumcision; Epers_Confirmation;
@@ -390,10 +390,10 @@ let print_config conf base =
         let (pos, sval) =
           (piqi_event_of_pevent evt, Util.string_of_pevent_name conf base evt)
         in
-        Mwrite.Transl_pevent_name#{
+        Mwrite.Transl_pevent_name.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ Epers_BaptismLDS; Epers_ConfirmationLDS; Epers_DotationLDS;
         Epers_FamilyLinkLDS; Epers_ScellentChildLDS; Epers_ScellentParentLDS;
         Epers_ScellentSpouseLDS ]
@@ -408,7 +408,7 @@ let print_config conf base =
   in
   let transl_pevent = transl_pevent_prim @ transl_pevent_sec @ transl_pevent_LDS in
   let transl_pevent =
-    Mwrite.Config_transl_pevent_name#{msg = transl_pevent;}
+    Mwrite.Config_transl_pevent_name.({msg = transl_pevent;})
   in
   let transl_access =
     List.map
@@ -419,13 +419,13 @@ let print_config conf base =
           | Public -> (`access_public, transl conf "public")
           | Private -> (`access_private, transl conf "private")
         in
-        Mwrite.Transl_access#{
+        Mwrite.Transl_access.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ IfTitles; Public; Private ]
   in
-  let transl_access = Mwrite.Config_transl_access#{msg = transl_access;} in
+  let transl_access = Mwrite.Config_transl_access.({msg = transl_access;}) in
   let transl_warning =
     List.map
       (fun warn ->
@@ -440,15 +440,15 @@ let print_config conf base =
           | `birth_date_after_event -> (warn, transl conf "birth date after event")
           | `death_date_before_event -> (warn, transl conf "death date before event")
         in
-        Mwrite.Transl_update_warning_js#{
+        Mwrite.Transl_update_warning_js.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ `empty_index; `empty_surname; `empty_first_name;
         `empty_sex; `required_field; `birth_date_after_event;
         `death_date_before_event ]
   in
-  let transl_warning = Mwrite.Config_transl_update_warning_js#{msg = transl_warning;} in
+  let transl_warning = Mwrite.Config_transl_update_warning_js.({msg = transl_warning;}) in
   let transl_short_greg_month =
     List.map
       (fun month ->
@@ -467,14 +467,14 @@ let print_config conf base =
           | `nov -> (month, transl_nth conf "(short month)" 10)
           | `dec -> (month, transl_nth conf "(short month)" 11)
         in
-        Mwrite.Transl_short_greg_month#{
+        Mwrite.Transl_short_greg_month.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ `janv; `fevr; `mars; `avr; `mai; `juin;
         `juil; `aout; `sept; `oct; `nov; `dec ]
   in
-  let transl_short_greg_month = Mwrite.Config_transl_short_greg_month#{msg = transl_short_greg_month;} in
+  let transl_short_greg_month = Mwrite.Config_transl_short_greg_month.({msg = transl_short_greg_month;}) in
   let transl_french_month =
     List.map
       (fun month ->
@@ -494,15 +494,15 @@ let print_config conf base =
           | `fructidor -> (month, transl_nth conf "(french revolution month)" 11)
           | `complementaire -> (month, transl_nth conf "(french revolution month)" 12)
         in
-        Mwrite.Transl_french_month#{
+        Mwrite.Transl_french_month.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ `vendemiaire; `brumaire; `frimaire; `nivose; `pluviose; `ventose;
         `germinal; `floreal; `prairial; `messidor; `thermidor; `fructidor;
         `complementaire ]
   in
-  let transl_french_month = Mwrite.Config_transl_french_month#{msg = transl_french_month;} in
+  let transl_french_month = Mwrite.Config_transl_french_month.({msg = transl_french_month;}) in
   let transl_hebrew_month =
     List.map
       (fun month ->
@@ -522,14 +522,14 @@ let print_config conf base =
           | `av -> (month, transl_nth conf "(hebrew month)" 11)
           | `eloul -> (month, transl_nth conf "(hebrew month)" 12)
         in
-        Mwrite.Transl_hebrew_month#{
+        Mwrite.Transl_hebrew_month.({
           pos = pos;
           sval = sval;
-        })
+        }))
       [ `tichri; `marhechvan; `kislev; `tevet; `chevat; `adar_1;
         `adar_2; `nissan; `iyar; `sivan; `tamouz; `av; `eloul ]
   in
-  let transl_hebrew_month = Mwrite.Config_transl_hebrew_month#{msg = transl_hebrew_month;} in
+  let transl_hebrew_month = Mwrite.Config_transl_hebrew_month.({msg = transl_hebrew_month;}) in
   let (gwf_place_format, gwf_place_format_placeholder) =
     match p_getenv conf.base_env "places_format" with
     | Some s ->
@@ -562,7 +562,7 @@ let print_config conf base =
     | None -> ("", "")
   in
   let config =
-    Mwrite.Config#{
+    Mwrite.Config.({
       transl_cal = transl_cal;
       transl_wit = transl_wit;
       transl_prec = transl_prec;
@@ -577,7 +577,7 @@ let print_config conf base =
       transl_hebrew_month = transl_hebrew_month;
       gwf_place_format = gwf_place_format;
       gwf_place_format_placeholder = gwf_place_format_placeholder;
-    }
+    })
   in
   let data = Mext_write.gen_config config in
   print_result conf data
@@ -1144,7 +1144,7 @@ let compute_modification_status conf base ip ifam resp =
     else ()
   in
   let response =
-    Mwrite.Modification_status#{
+    Mwrite.Modification_status.({
       is_base_updated = is_base_updated;
       base_warnings = warnings;
       index_person = index_person;
@@ -1157,7 +1157,7 @@ let compute_modification_status conf base ip ifam resp =
       firstname_str = first_name_str;
       n = sn;
       p = fn;
-    }
+    })
   in
   let data = Mext_write.gen_modification_status response in
   data
@@ -1187,11 +1187,11 @@ let print_add_ind_start_ok conf base =
   let ref_p =
     match resp with
     | Api_update_util.UpdateError _  | Api_update_util.UpdateErrorConflict _ ->
-        M.Reference_person#{
+        M.Reference_person.({
           n = "";
           p = "";
           oc = Int32.of_int 0;
-        }
+        })
     | Api_update_util.UpdateSuccess _ ->
         Util.commit_patches conf base;
         let ip = Int32.to_int mod_p.Mwrite.Person.index in
@@ -1199,11 +1199,11 @@ let print_add_ind_start_ok conf base =
         let fn = Name.lower (sou base (get_first_name p)) in
         let sn = Name.lower (sou base (get_surname p)) in
         let occ = Int32.of_int (get_occ p) in
-        M.Reference_person#{
+        M.Reference_person.({
           n = sn;
           p = fn;
           oc = occ;
-        }
+        })
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
@@ -1469,7 +1469,7 @@ let compute_add_family conf base p =
   (* On calcul si le conjoint est décédé et ajoute les évènements nécessaires. *)
   let () =
     let death =
-      Mwrite.Pevent#{
+      Mwrite.Pevent.({
         pevent_type = Some `epers_death;
         date = None;
         place = None;
@@ -1478,7 +1478,7 @@ let compute_add_family conf base p =
         src = None;
         witnesses = [];
         event_perso = None;
-      }
+      })
     in
     match compute_infer_death conf base p with
     | Compute_dead | Compute_dont_know_if_dead ->
@@ -1524,11 +1524,11 @@ let print_add_family conf base =
   let first_name = sou base (get_first_name p) in
   let family = compute_add_family conf base p in
   let add_family =
-    Mwrite.Add_family#{
+    Mwrite.Add_family.({
       person_lastname = surname;
       person_firstname = first_name;
       family = family;
-    }
+    })
   in
   let data = Mext_write.gen_add_family add_family in
   print_result conf data
@@ -1812,7 +1812,7 @@ let print_mod_family_request conf base =
            else `sosa
          in
          let family_spouse =
-           Mwrite.Family_spouse#{
+           Mwrite.Family_spouse.({
              index_family = index_family;
              index_person = index_person;
              sex = sex;
@@ -1821,7 +1821,7 @@ let print_mod_family_request conf base =
              dates = if dates = "" then None else Some dates;
              image = if image = "" then None else Some image;
              sosa = sosa;
-           }
+           })
          in
          family_spouse :: accu)
       (Array.to_list (get_family p)) []
@@ -1846,19 +1846,19 @@ let print_mod_family_request conf base =
           family.Mwrite.Family.mother <- mother;
         in
         let edit_family =
-          Mwrite.Edit_family#{
+          Mwrite.Edit_family.({
             person_lastname = surname;
             person_firstname = first_name;
             family = family;
-          }
+          })
         in
         Some edit_family
   in
   let spouses =
-    Mwrite.Edit_family_request#{
+    Mwrite.Edit_family_request.({
       spouses = family_spouse;
       first_family = first_family;
-    }
+    })
   in
   let data = Mext_write.gen_edit_family_request spouses in
   print_result conf data
@@ -1898,11 +1898,11 @@ let print_mod_family conf base =
     family.Mwrite.Family.mother <- mother;
   in
   let edit_family =
-    Mwrite.Edit_family#{
+    Mwrite.Edit_family.({
       person_lastname = surname;
       person_firstname = first_name;
       family = family;
-    }
+    })
   in
   let data = Mext_write.gen_edit_family edit_family in
   print_result conf data
@@ -2028,7 +2028,7 @@ let print_add_parents conf base =
      et ajoute les évènements nécessaires. *)
   let () =
     let death =
-      Mwrite.Pevent#{
+      Mwrite.Pevent.({
         pevent_type = Some `epers_death;
         date = None;
         place = None;
@@ -2037,7 +2037,7 @@ let print_add_parents conf base =
         src = None;
         witnesses = [];
         event_perso = None;
-      }
+      })
     in
     match compute_infer_death conf base p with
     | Compute_dead | Compute_dont_know_if_dead ->
@@ -2062,11 +2062,11 @@ let print_add_parents conf base =
       father.Mwrite.Person.lastname <- surname;
   in
   let add_parents =
-    Mwrite.Add_parents#{
+    Mwrite.Add_parents.({
       person_lastname = surname;
       person_firstname = first_name;
       family = family;
-    }
+    })
   in
   let data = Mext_write.gen_add_parents add_parents in
   print_result conf data
@@ -2244,7 +2244,7 @@ let print_add_child conf base =
            else `sosa
          in
          let family_spouse =
-           Mwrite.Family_spouse#{
+           Mwrite.Family_spouse.({
              index_family = index_family;
              index_person = index_person;
              sex = sex;
@@ -2253,7 +2253,7 @@ let print_add_child conf base =
              dates = if dates = "" then None else Some dates;
              image = if image = "" then None else Some image;
              sosa = sosa;
-           }
+           })
          in
          family_spouse :: accu)
       (Array.to_list (get_family p)) []
@@ -2279,7 +2279,7 @@ let print_add_child conf base =
   (* On calcul si l'enfant est décédé. *)
   let () =
     let death =
-      Mwrite.Pevent#{
+      Mwrite.Pevent.({
         pevent_type = Some `epers_death;
         date = None;
         place = None;
@@ -2288,7 +2288,7 @@ let print_add_child conf base =
         src = None;
         witnesses = [];
         event_perso = None;
-      }
+      })
     in
     match compute_infer_death conf base p with
     | Compute_dead | Compute_dont_know_if_dead ->
@@ -2303,12 +2303,12 @@ let print_add_child conf base =
   let child_surname = infer_surname conf base p ifam in
   child.Mwrite.Person.lastname <- child_surname;
   let add_child =
-    Mwrite.Add_child#{
+    Mwrite.Add_child.({
       person_lastname = surname;
       person_firstname = first_name;
       family_spouse = family_spouse;
       child = child;
-    }
+    })
   in
   let data = Mext_write.gen_add_child add_child in
   print_result conf data
@@ -2370,7 +2370,7 @@ let print_add_child_ok conf base =
   let sn = mod_c.Mwrite.Person.lastname in
   let occ = mod_c.Mwrite.Person.occ in
   let create_child =
-    Mwrite.Person_link#{
+    Mwrite.Person_link.({
       create_link = mod_c.Mwrite.Person.create_link;
       index = mod_c.Mwrite.Person.index;
       sex = mod_c.Mwrite.Person.sex;
@@ -2378,7 +2378,7 @@ let print_add_child_ok conf base =
       firstname = fn;
       occ = occ; (* Directement mis à jour dans update_family *)
       dates = None;
-    }
+    })
   in
   if add_child_ok.Mwrite.Add_child_ok.new_family then
     begin
@@ -2545,7 +2545,7 @@ let print_add_sibling conf base =
   (* On calcul si l'enfant est décédé. *)
   let () =
     let death =
-      Mwrite.Pevent#{
+      Mwrite.Pevent.({
         pevent_type = Some `epers_death;
         date = None;
         place = None;
@@ -2554,7 +2554,7 @@ let print_add_sibling conf base =
         src = None;
         witnesses = [];
         event_perso = None;
-      }
+      })
     in
     match father with
     | Some father ->
@@ -2576,11 +2576,11 @@ let print_add_sibling conf base =
   in
   sibling.Mwrite.Person.lastname <- sibling_surname;
   let add_sibling =
-    Mwrite.Add_sibling#{
+    Mwrite.Add_sibling.({
       person_lastname = surname;
       person_firstname = first_name;
       sibling = sibling;
-    }
+    })
   in
   let data = Mext_write.gen_add_sibling add_sibling in
   print_result conf data
@@ -2610,7 +2610,7 @@ let print_add_sibling_ok conf base =
   let sn = mod_c.Mwrite.Person.lastname in
   let occ = mod_c.Mwrite.Person.occ in
   let create_sibling =
-    Mwrite.Person_link#{
+    Mwrite.Person_link.({
       create_link = mod_c.Mwrite.Person.create_link;
       index = mod_c.Mwrite.Person.index;
       sex = mod_c.Mwrite.Person.sex;
@@ -2618,7 +2618,7 @@ let print_add_sibling_ok conf base =
       firstname = fn;
       occ = occ; (* Directement mis à jour dans update_family *)
       dates = None;
-    }
+    })
   in
   (* Si il n'y a pas de parent, on veut créer la famille *)
   match get_parents p with
@@ -3004,7 +3004,7 @@ let print_add_first_fam conf =
     | Api_update_util.UpdateSuccess (wl, hr) -> (true, [], None, [])
   in
   let response =
-    Mwrite.Modification_status#{
+    Mwrite.Modification_status.({
       is_base_updated = is_base_updated;
       base_warnings = warnings;
       index_person = index_person;
@@ -3017,7 +3017,7 @@ let print_add_first_fam conf =
       firstname_str = first_name_str;
       n = sn;
       p = fn;
-    }
+    })
   in
   let data = Mext_write.gen_modification_status response in
   print_result conf data
@@ -3090,7 +3090,7 @@ let print_add_first_fam_ok conf base =
           family.Mwrite.Family.mother.Mwrite.Person.sex <- `female;
           (* On met à jour la famille avec l'enfant. *)
           let child =
-            Mwrite.Person_link#{
+            Mwrite.Person_link.({
               create_link = `create_default_occ;
               index = mod_p.Mwrite.Person.index;
               sex = mod_p.Mwrite.Person.sex;
@@ -3098,7 +3098,7 @@ let print_add_first_fam_ok conf base =
               firstname = mod_p.Mwrite.Person.firstname;
               occ = mod_p.Mwrite.Person.occ;
               dates = None;
-            }
+            })
           in
           family.Mwrite.Family.children <- [child];
           family
@@ -3248,7 +3248,7 @@ let print_add_first_fam_ok conf base =
           let children =
             List.map
               (fun c ->
-                Mwrite.Person_link#{
+                Mwrite.Person_link.({
                   create_link = `create_default_occ;
                   index = c.Mwrite.Person.index;
                   sex = c.Mwrite.Person.sex;
@@ -3256,7 +3256,7 @@ let print_add_first_fam_ok conf base =
                   firstname = c.Mwrite.Person.firstname;
                   occ = c.Mwrite.Person.occ;
                   dates = None;
-                })
+                }))
               mod_children
           in
           family.Mwrite.Family.children <- children;

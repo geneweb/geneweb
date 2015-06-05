@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 module M = Api_piqi
@@ -239,7 +238,7 @@ let piqi_date_of_date date =
           (Int32.of_int dmy.day, Int32.of_int dmy.month,
            Int32.of_int dmy.year, Int32.of_int dmy.delta)
         in
-        let dmy1 = Mapp.Dmy#{day = d; month = m; year = y; delta = delta;} in
+        let dmy1 = Mapp.Dmy.({day = d; month = m; year = y; delta = delta;}) in
         let (prec, dmy2) =
           match dmy.prec with
           | Sure -> (`sure, None)
@@ -249,42 +248,42 @@ let piqi_date_of_date date =
           | After -> (`after, None)
           | OrYear d2 ->
               let dmy2 =
-                Mapp.Dmy#{
+                Mapp.Dmy.({
                   day = Int32.of_int 0;
                   month = Int32.of_int 0;
                   year = Int32.of_int d2.year2;
                   delta = Int32.of_int 0;
-                }
+                })
               in
               (`oryear, Some dmy2)
           | YearInt d2 ->
               let dmy2 =
-                Mapp.Dmy#{
+                Mapp.Dmy.({
                   day = Int32.of_int 0;
                   month = Int32.of_int 0;
                   year = Int32.of_int d2.year2;
                   delta = Int32.of_int 0;
-                }
+                })
               in
               (`yearint, Some dmy2)
         in
         (prec, dmy1, dmy2)
       in
-      Mapp.Date#{
+      Mapp.Date.({
         cal = Some cal;
         prec = Some prec;
         dmy = Some dmy;
         dmy2 = dmy2;
         text = None;
-      }
+      })
   | Dtext txt ->
-      Mapp.Date#{
+      Mapp.Date.({
         cal = None;
         prec = None;
         dmy = None;
         dmy2 = None;
         text = Some txt;
-      }
+      })
 ;;
 
 
@@ -804,7 +803,7 @@ let empty_piqi_person_light conf ref_person base_loop =
   let sn = ref_person.M.Reference_person.n in
   let fn = ref_person.M.Reference_person.p in
   let occ = ref_person.M.Reference_person.oc in
-  M.Person#{
+  M.Person.({
     sosa = if base_loop then "-1" else "0";
     n = sn;
     p = fn;
@@ -827,7 +826,7 @@ let empty_piqi_person_light conf ref_person base_loop =
     ascend = false;
     descend = false;
     visible_for_visitors = false;
-  }
+  })
 ;;
 
 
@@ -845,7 +844,7 @@ let empty_piqi_person_full conf ref_person base_loop =
   let sn = ref_person.M.Reference_person.n in
   let fn = ref_person.M.Reference_person.p in
   let occ = ref_person.M.Reference_person.oc in
-  M.Full_person#{
+  M.Full_person.({
     sosa = if base_loop then "-1" else "0";
     n = sn;
     p = fn;
@@ -881,7 +880,7 @@ let empty_piqi_person_full conf ref_person base_loop =
     visible_for_visitors = false;
     parents = None;
     families = [];
-  }
+  })
 ;;
 
 
@@ -1048,7 +1047,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
     else `not_divorced
   in
   let visible = is_visible conf base p in
-  M.Spouse#{
+  M.Spouse.({
     sosa = sosa_p;
     n = sn;
     p = fn;
@@ -1071,7 +1070,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
     marriage_place = marriage_place;
     divorce_type = divorce_type;
     visible_for_visitors = visible;
-  }
+  })
 ;;
 
 
@@ -1215,7 +1214,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
       (List.map (foi base) faml)
   in
   let visible = is_visible conf base p in
-  M.Person#{
+  M.Person.({
     sosa = sosa_p;
     n = sn;
     p = fn;
@@ -1238,7 +1237,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
     ascend = ascend;
     descend = descend;
     visible_for_visitors = visible;
-  }
+  })
 ;;
 
 
@@ -1399,7 +1398,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
           | None -> None
         in
         let nth = Some (Int32.of_int t.t_nth) in
-        M.Title#{
+        M.Title.({
           title_type = title_type;
           name = if name = "" then None else Some name;
           title = if title = "" then None else Some title;
@@ -1407,7 +1406,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
           date_begin = date_begin;
           date_end = date_end;
           nth = nth;
-        })
+        }))
       gen_p.titles
   in
   let occupation =
@@ -1420,7 +1419,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   in
   let related =
     List.map
-      (fun ip -> M.Internal_int32#{value=Int32.of_int (Adef.int_of_iper ip);})
+      (fun ip -> M.Internal_int32.({value=Int32.of_int (Adef.int_of_iper ip);}))
       (get_related p)
   in
   let rparents =
@@ -1445,18 +1444,18 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
           | GodParent -> `rpt_god_parent
           | FosterParent -> `rpt_foster_parent
         in
-        M.Relation_parent#{
+        M.Relation_parent.({
           father = father;
           mother = mother;
           source = if source = "" then None else Some source;
           rpt_type = rpt_type;
-        })
+        }))
       gen_p.rparents
   in
   let families =
     List.map
       (fun ifam ->
-        M.Internal_int32#{value = Int32.of_int (Adef.int_of_ifam ifam);})
+        M.Internal_int32.({value = Int32.of_int (Adef.int_of_ifam ifam);}))
       (Array.to_list (get_family p))
   in
   let parents =
@@ -1465,7 +1464,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
      | None -> None
   in
   let visible = is_visible conf base p in
-  M.Full_person#{
+  M.Full_person.({
     sosa = sosa_p;
     n = sn;
     p = fn;
@@ -1501,7 +1500,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
     visible_for_visitors = visible;
     parents = parents;
     families = families;
-  }
+  })
 ;;
 
 
@@ -1587,17 +1586,17 @@ let fam_to_piqi_family conf base ifam =
   in
   let witnesses =
     List.map
-      (fun ip -> M.Internal_int32#{value= Int32.of_int (Adef.int_of_iper ip);})
+      (fun ip -> M.Internal_int32.({value= Int32.of_int (Adef.int_of_iper ip);}))
       (Array.to_list gen_f.witnesses)
   in
   let father = Int32.of_int (Adef.int_of_iper ifath) in
   let mother = Int32.of_int (Adef.int_of_iper imoth) in
   let children =
     List.map
-      (fun ip -> M.Internal_int32#{value= Int32.of_int (Adef.int_of_iper ip);})
+      (fun ip -> M.Internal_int32.({value= Int32.of_int (Adef.int_of_iper ip);}))
       (Array.to_list (get_children fam))
   in
-  M.Full_family#{
+  M.Full_family.({
     fsources = fsources;
     marriage_date = marriage;
     marriage_place = marriage_place;
@@ -1610,7 +1609,7 @@ let fam_to_piqi_family conf base ifam =
     mother = mother;
     children = children;
     index = index;
-  }
+  })
 ;;
 
 
@@ -1659,7 +1658,7 @@ let fam_to_piqi_family_link conf base (ifath, imoth) ifam fam =
   let mother = Int32.of_int (Adef.int_of_iper imoth) in
   (* TODO ? *)
   let children = [] in
-  M.Full_family#{
+  M.Full_family.({
     fsources = fsources;
     marriage_date = marriage;
     marriage_place = marriage_place;
@@ -1672,7 +1671,7 @@ let fam_to_piqi_family_link conf base (ifath, imoth) ifam fam =
     mother = mother;
     children = children;
     index = index;
-  }
+  })
 ;;
 
 
@@ -1847,7 +1846,7 @@ let pers_to_piqi_app_person conf base p =
           | None -> None
         in
         let nth = Some (Int32.of_int t.t_nth) in
-        Mapp.Title#{
+        Mapp.Title.({
           title_type = title_type;
           name = if name = "" then None else Some name;
           title = if title = "" then None else Some title;
@@ -1855,7 +1854,7 @@ let pers_to_piqi_app_person conf base p =
           date_begin = date_begin;
           date_end = date_end;
           nth = nth;
-        })
+        }))
       gen_p.titles
   in
   let related =
@@ -1885,12 +1884,12 @@ let pers_to_piqi_app_person conf base p =
           | GodParent -> `rpt_god_parent
           | FosterParent -> `rpt_foster_parent
         in
-        Mapp.Relation_parent#{
+        Mapp.Relation_parent.({
           father = father;
           mother = mother;
           source = if source = "" then None else Some source;
           rpt_type = rpt_type;
-        })
+        }))
       gen_p.rparents
   in
   let access =
@@ -1940,10 +1939,10 @@ let pers_to_piqi_app_person conf base p =
                  | Witness_GodParent -> `witness_godparent
                in
                let index = Int32.of_int (Adef.int_of_iper ip) in
-               Mapp.Witness_event#{
+               Mapp.Witness_event.({
                  witness_type = witness_type;
                  witness = index;
-               })
+               }))
             (Array.to_list w)
         in
         let index_spouse =
@@ -1951,7 +1950,7 @@ let pers_to_piqi_app_person conf base p =
           | Some ip -> Some (Int32.of_int (Adef.int_of_iper ip))
           | None -> None
         in
-        Mapp.Event#{
+        Mapp.Event.({
           name = name;
           text = text;
           date = date;
@@ -1961,10 +1960,10 @@ let pers_to_piqi_app_person conf base p =
           src = if src= "" then None else Some src;
           witnesses = witnesses;
           index_spouse = index_spouse;
-        })
+        }))
       (Perso.events_list conf base p)
   in
-  Mapp.Person#{
+  Mapp.Person.({
     index = index;
     sex = sex;
     lastname = surname;
@@ -1998,7 +1997,7 @@ let pers_to_piqi_app_person conf base p =
     parents = parents;
     families = families;
     events = events;
-  }
+  })
 ;;
 
 
@@ -2058,7 +2057,7 @@ let fam_to_piqi_app_family conf base ifam =
       (fun ip -> Int32.of_int (Adef.int_of_iper ip))
       (Array.to_list (get_children fam))
   in
-  Mapp.Family#{
+  Mapp.Family.({
     index = index;
     marriage_date = marriage;
     marriage_place = if marriage_place = "" then None else Some marriage_place;
@@ -2071,7 +2070,7 @@ let fam_to_piqi_app_family conf base ifam =
     father = father;
     mother = mother;
     children = children;
-  }
+  })
 ;;
 
 
@@ -2100,7 +2099,7 @@ let person_map conf base l base_loop compute_sosa load_img =
 
 let conv_data_list_person conf base filters l =
   if filters.nb_results then
-    let len = M.Internal_int32#{value = Int32.of_int (List.length l)} in
+    let len = M.Internal_int32.({value = Int32.of_int (List.length l)}) in
     Mext.gen_internal_int32 len
   else
     let compute_sosa =
@@ -2118,10 +2117,10 @@ let conv_data_list_person conf base filters l =
     let l = person_map conf base l base_loop compute_sosa load_img in
     match l with
     | PLight pl ->
-        let list = M.List_persons#{list_persons = pl} in
+        let list = M.List_persons.({list_persons = pl}) in
         Mext.gen_list_persons list
     | PFull pl ->
-        let list = M.List_full_persons#{persons = pl} in
+        let list = M.List_full_persons.({persons = pl}) in
         Mext.gen_list_full_persons list
 ;;
 
@@ -2139,17 +2138,17 @@ let data_list_person conf base filters l =
   in
   let l = List.filter (apply_filters_p conf base filters compute_sosa) l in
   if filters.nb_results then
-    let len = M.Internal_int32#{value = Int32.of_int (List.length l)} in
+    let len = M.Internal_int32.({value = Int32.of_int (List.length l)}) in
     Mext.gen_internal_int32 len
   else
     let base_loop = has_base_loop conf base in
     let l = person_map conf base l base_loop compute_sosa load_img in
     match l with
     | PLight pl ->
-        let list = M.List_persons#{list_persons = pl} in
+        let list = M.List_persons.({list_persons = pl}) in
         Mext.gen_list_persons list
     | PFull pl ->
-        let list = M.List_full_persons#{persons = pl} in
+        let list = M.List_full_persons.({persons = pl}) in
         Mext.gen_list_full_persons list
 ;;
 
@@ -2166,7 +2165,7 @@ let data_list_person_option conf base filters l =
     else false
   in
   if filters.nb_results then
-    let len = M.Internal_int32#{value = Int32.of_int (List.length l)} in
+    let len = M.Internal_int32.({value = Int32.of_int (List.length l)}) in
     Mext.gen_internal_int32 len
   else
     let base_loop = has_base_loop conf base in
@@ -2184,11 +2183,11 @@ let data_list_person_option conf base filters l =
                     let sn = Name.lower (sou base (get_surname p)) in
                     let occ = Int32.of_int (get_occ p) in
                     let ref_p =
-                      M.Reference_person#{
+                      M.Reference_person.({
                         n = sn;
                         p = fn;
                         oc = occ;
-                      }
+                      })
                     in
                     empty_piqi_person_full conf ref_p base_loop
               | PLight ref_p -> empty_piqi_person_full conf ref_p base_loop )
@@ -2206,11 +2205,11 @@ let data_list_person_option conf base filters l =
                     let sn = Name.lower (sou base (get_surname p)) in
                     let occ = Int32.of_int (get_occ p) in
                     let ref_p =
-                      M.Reference_person#{
+                      M.Reference_person.({
                         n = sn;
                         p = fn;
                         oc = occ;
-                      }
+                      })
                     in
                     empty_piqi_person_light conf ref_p base_loop
               | PLight ref_p -> empty_piqi_person_light conf ref_p base_loop )
@@ -2218,10 +2217,10 @@ let data_list_person_option conf base filters l =
     in
     match l with
     | PLight pl ->
-        let list = M.List_persons#{list_persons = pl} in
+        let list = M.List_persons.({list_persons = pl}) in
         Mext.gen_list_persons list
     | PFull pl ->
-        let list = M.List_full_persons#{persons = pl} in
+        let list = M.List_full_persons.({persons = pl}) in
         Mext.gen_list_full_persons list
 ;;
 
@@ -2247,10 +2246,10 @@ let person_node_map conf base l =
            let p =
              pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
            in
-           M.Full_node#{
+           M.Full_node.({
              id = id;
              person = p;
-           })
+           }))
          l)
   else
     PLight
@@ -2260,10 +2259,10 @@ let person_node_map conf base l =
            let p =
              pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
            in
-           M.Node#{
+           M.Node.({
              id = id;
              person = p;
-           })
+           }))
          l)
 ;;
 
@@ -2284,10 +2283,10 @@ let person_node_map_lia conf base l =
            let p =
              pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
            in
-           M.Full_node#{
+           M.Full_node.({
              id = id;
              person = p;
-           })
+           }))
          l)
   else
     PLight
@@ -2297,10 +2296,10 @@ let person_node_map_lia conf base l =
            let p =
              pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
            in
-           M.Node#{
+           M.Node.({
              id = id;
              person = p;
-           })
+           }))
          l)
 ;;
 

@@ -3,7 +3,6 @@
 include ../tools/Makefile.inc
 
 OCURL=~/.opam/system/lib/ocurl/
-PP_PIQI=-pp "camlp4o -I ~/.opam/system/lib/piqilib pa_labelscope.cmo"
 
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html -I ../api/service
@@ -100,7 +99,7 @@ consang.opt: $(CONSANG_OBJS:.cmo=.cmx)
 link.opt:
 	$(OCAMLOPT) -I ../api/service -c ../api/service/api_link_tree_piqi.ml
 	$(OCAMLOPT) -I ../api/service -c ../api/service/api_link_tree_piqi_ext.ml
-	$(OCAMLOPT) $(PP_PIQI) -I ../api/service -package curl -I $(OCURL) curl.cmxa -I ../wserver -c link.ml
+	$(OCAMLOPT) -I ../api/service -package curl -I $(OCURL) curl.cmxa -I ../wserver -c link.ml
 
 gwd.out: $(GWD_OBJS)
 	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma str.cma -I $(CAMLP5D) gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
