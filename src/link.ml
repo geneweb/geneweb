@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 module MLink = Api_link_tree_piqi
@@ -121,7 +120,7 @@ let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
   let index = Some (Int32.of_int (Adef.int_of_iper ip)) in
   let base_prefix = chop_base_prefix base_prefix in
   let data =
-    MLink.Link_tree_params#{
+    MLink.Link_tree_params.({
       basename = base_prefix;
       ip = index;
       ref_person = None;
@@ -129,7 +128,7 @@ let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
       nb_asc = Int32.of_int nb_asc;
       from_gen_desc = Int32.of_int from_gen_desc;
       nb_desc = Int32.of_int nb_desc;
-    }
+    })
   in
   let data = MLinkext.gen_link_tree_params data `pb in
   let url =

@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 module M = Api_piqi
@@ -153,7 +152,7 @@ let print_close_person_relations2 conf base =
       reduce_to_recent conf (List.map (fun ip -> poi base ip) list)
     else List.map (fun ip -> poi base ip) list
   in
-  let list = M.List_person_relation#{person_relations = list} in
+  let list = M.List_person_relation.({person_relations = list}) in
   let data = Mext.gen_list_person_relation list in
   print_result conf data
 ;;
@@ -503,10 +502,10 @@ let print_close_person_relations conf base =
             if apply_filters_p conf base filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
               let p =
-                M.Full_person_relation#{
+                M.Full_person_relation.({
                   person = p;
                   relation = r_type;
-                }
+                })
               in
               p :: accu
             else accu )
@@ -514,11 +513,11 @@ let print_close_person_relations conf base =
       in
       let data =
         if filters.nb_results then
-          let len = M.Internal_int32#{value = Int32.of_int (List.length list)} in
+          let len = M.Internal_int32.({value = Int32.of_int (List.length list)}) in
           Mext.gen_internal_int32 len
         else
           begin
-            let list = M.List_full_person_relation#{person_relations = list} in
+            let list = M.List_full_person_relation.({person_relations = list}) in
             Mext.gen_list_full_person_relation list
           end
       in
@@ -533,10 +532,10 @@ let print_close_person_relations conf base =
             if apply_filters_p conf base filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
               let p =
-                M.Person_relation#{
+                M.Person_relation.({
                   person = p;
                   relation = r_type;
-                }
+                })
               in
               p :: accu
             else accu )
@@ -544,11 +543,11 @@ let print_close_person_relations conf base =
       in
       let data =
         if filters.nb_results then
-          let len = M.Internal_int32#{value = Int32.of_int (List.length list)} in
+          let len = M.Internal_int32.({value = Int32.of_int (List.length list)}) in
           Mext.gen_internal_int32 len
         else
           begin
-            let list = M.List_person_relation#{person_relations = list} in
+            let list = M.List_person_relation.({person_relations = list}) in
             Mext.gen_list_person_relation list
           end
       in
@@ -568,10 +567,10 @@ let build_graph_asc conf base p max_gen base_loop =
 *)
   let ht = Hashtbl.create 42 in
   let create_edge p_from p_to =
-    M.Edge#{
+    M.Edge.({
       from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));
       to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
-    }
+    })
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
@@ -635,18 +634,18 @@ let print_graph_asc conf base =
   in
   let data =
     if filters.nb_results then
-      let len = M.Internal_int32#{value = Int32.of_int (List.length nodes)} in
+      let len = M.Internal_int32.({value = Int32.of_int (List.length nodes)}) in
       Mext.gen_internal_int32 len
     else
       let nodes = person_node_map conf base nodes in
       match nodes with
       | PFull nodes ->
           let graph =
-            M.Full_graph#{nodes = nodes; edges = edges; families = families}
+            M.Full_graph.({nodes = nodes; edges = edges; families = families})
           in
           Mext.gen_full_graph graph
       | PLight nodes ->
-          let graph = M.Graph#{nodes = nodes; edges = edges;} in
+          let graph = M.Graph.({nodes = nodes; edges = edges;}) in
           Mext.gen_graph graph
   in
   print_result conf data
@@ -672,10 +671,10 @@ let build_graph_asc_lia conf base p max_gen base_loop =
     let id_to =
       Int64.of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to))
     in
-    M.Edge#{
+    M.Edge.({
       from_node = id_from;
       to_node = id_to;
-    }
+    })
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
@@ -795,18 +794,18 @@ let print_graph_asc_lia conf base =
   in
   let data =
     if filters.nb_results then
-      let len = M.Internal_int32#{value = Int32.of_int (List.length nodes)} in
+      let len = M.Internal_int32.({value = Int32.of_int (List.length nodes)}) in
       Mext.gen_internal_int32 len
     else
       let nodes = person_node_map_lia conf base nodes in
       match nodes with
       | PFull nodes ->
           let graph =
-            M.Full_graph#{nodes = nodes; edges = edges; families = families}
+            M.Full_graph.({nodes = nodes; edges = edges; families = families})
           in
           Mext.gen_full_graph graph
       | PLight nodes ->
-          let graph = M.Graph#{nodes = nodes; edges = edges;} in
+          let graph = M.Graph.({nodes = nodes; edges = edges;}) in
           Mext.gen_graph graph
   in
   print_result conf data
@@ -823,10 +822,10 @@ let build_graph_desc conf base p max_gen base_loop =
 *)
   let ht = Hashtbl.create 42 in
   let create_edge p_from p_to =
-    M.Edge#{
+    M.Edge.({
       from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));
       to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
-    }
+    })
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
@@ -907,18 +906,18 @@ let print_graph_desc conf base =
   in
   let data =
     if filters.nb_results then
-      let len = M.Internal_int32#{value = Int32.of_int (List.length nodes)} in
+      let len = M.Internal_int32.({value = Int32.of_int (List.length nodes)}) in
       Mext.gen_internal_int32 len
     else
       let nodes = person_node_map conf base nodes in
       match nodes with
       | PFull nodes ->
           let graph =
-            M.Full_graph#{nodes = nodes; edges = edges; families = families}
+            M.Full_graph.({nodes = nodes; edges = edges; families = families})
           in
           Mext.gen_full_graph graph
       | PLight nodes ->
-          let graph = M.Graph#{nodes = nodes; edges = edges;} in
+          let graph = M.Graph.({nodes = nodes; edges = edges;}) in
           Mext.gen_graph graph
   in
   print_result conf data
@@ -935,17 +934,17 @@ let build_rel_graph conf base p1 p2 (pp1, pp2, (l1, l2, list), _) =
     let person =
       pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person
     in
-    M.Node#{
+    M.Node.({
       id = id;
       person = person;
-    }
+    })
   in
 *)
   let create_edge p_from p_to =
-    M.Edge#{
+    M.Edge.({
       from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));
       to_node = Int64.of_int (Adef.int_of_iper (get_key_index p_to));
-    }
+    })
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
@@ -1033,23 +1032,23 @@ let print_graph_rel conf base =
   in
   let data =
     if filters.nb_results then
-      let len = M.Internal_int32#{value = Int32.of_int (List.length nodes)} in
+      let len = M.Internal_int32.({value = Int32.of_int (List.length nodes)}) in
       Mext.gen_internal_int32 len
     else
       let nodes = person_node_map conf base nodes in
       match nodes with
       | PFull nodes ->
           let graph =
-            M.Full_graph#{nodes = nodes; edges = edges; families = families}
+            M.Full_graph.({nodes = nodes; edges = edges; families = families})
           in
           Mext.gen_full_graph graph
       | PLight nodes ->
-          let graph = M.Graph#{nodes = nodes; edges = edges;} in
+          let graph = M.Graph.({nodes = nodes; edges = edges;}) in
           Mext.gen_graph graph
   in
   print_result conf data
 (*
-  let graph = M.Graph#{nodes = nodes; edges = edges} in
+  let graph = M.Graph.({nodes = nodes; edges = edges}) in
   let data = Mext.gen_graph graph in
   print_result conf data
 *)

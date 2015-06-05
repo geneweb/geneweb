@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 module M = Api_piqi
@@ -41,11 +40,11 @@ let print_info_base conf base =
          let sn = Name.lower (sou base (get_surname p)) in
          let occ = Int32.of_int (get_occ p) in
          let sosa =
-           Some M.Reference_person#{
+           Some M.Reference_person.({
              n = sn;
              p = fn;
              oc = occ;
-           }
+           })
          in
          (Some p, sosa)
      | None -> (None, None)
@@ -96,13 +95,13 @@ let print_info_base conf base =
     else Some last_modified_person
   in
   let info_base =
-    M.Infos_base#{
+    M.Infos_base.({
       nb_persons = Int64.of_int (Gwdb.nb_of_persons base);
       nb_families = Int64.of_int (Gwdb.nb_of_families base);
       sosa = sosa;
       last_modified_person = last_modified_person;
       real_nb_persons = Some (Int64.of_int (Util.real_nb_of_persons conf base));
-    }
+    })
   in
   let data = Mext.gen_infos_base info_base in
   print_result conf data
@@ -142,11 +141,11 @@ let print_loop conf base =
       pers_to_piqi_person conf base !pers !base_loop Perso.get_single_sosa false
     else
       let ref_pers =
-        M.Reference_person#{
+        M.Reference_person.({
           n = "";
           p = "";
           oc = Int32.of_int 0;
-        }
+        })
       in
       empty_piqi_person conf ref_pers false
   in
@@ -241,11 +240,11 @@ let print_ref_person_from_ip conf base =
   let sn = Name.lower (sou base (get_surname p)) in
   let occ = Int32.of_int (get_occ p) in
   let ref_p =
-    M.Reference_person#{
+    M.Reference_person.({
       n = sn;
       p = fn;
       oc = occ;
-    }
+    })
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
@@ -266,11 +265,11 @@ let print_ref_person_from_ip conf base =
 (* ************************************************************************ *)
 let print_first_available_person conf base =
   let empty_ref =
-    M.Reference_person#{
+    M.Reference_person.({
       n = "";
       p = "";
       oc = Int32.of_int 0;
-    }
+    })
   in
   let rec loop i nb_ind =
     if i = nb_ind - 1 then empty_ref
@@ -284,11 +283,11 @@ let print_first_available_person conf base =
         let fn = Name.lower (sou base (get_first_name p)) in
         let sn = Name.lower (sou base (get_surname p)) in
         let occ = Int32.of_int (get_occ p) in
-        M.Reference_person#{
+        M.Reference_person.({
           n = sn;
           p = fn;
           oc = occ;
-        }
+        })
   in
   let nb_ind = Gwdb.nb_of_persons base in
   let ref_p =
@@ -326,11 +325,11 @@ let print_find_sosa conf base =
           match faml with
           | [] ->
               (* On reconstruit la ref_person pour être sûr des accents. *)
-              M.Reference_person#{
+              M.Reference_person.({
                 n = Name.lower sn;
                 p = Name.lower fn;
                 oc = occ;
-              }
+              })
           | ifam :: faml ->
               let fam = foi base ifam in
               match (Array.to_list (get_children fam)) with
@@ -340,19 +339,19 @@ let print_find_sosa conf base =
                   let fn = Name.lower (sou base (get_first_name sosa)) in
                   let sn = Name.lower (sou base (get_surname sosa)) in
                   let occ = Int32.of_int (get_occ sosa) in
-                  M.Reference_person#{
+                  M.Reference_person.({
                     n = sn;
                     p = fn;
                     oc = occ;
-                  }
+                  })
         in
         loop (Array.to_list (get_family p))
     | None ->
-        M.Reference_person#{
+        M.Reference_person.({
           n = "";
           p = "";
           oc = Int32.of_int 0;
-        }
+        })
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
@@ -643,11 +642,11 @@ let print_max_ancestors conf base =
   let sn = Name.lower (sou base (get_surname p)) in
   let occ = Int32.of_int (get_occ p) in
   let ref_p =
-    M.Reference_person#{
+    M.Reference_person.({
       n = sn;
       p = fn;
       oc = occ;
-    }
+    })
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
@@ -669,15 +668,15 @@ let print_img conf base =
         match Api_util.find_image_file conf base p with
         | Some f ->
             let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
-            l := M.Full_image#{person = p; img = f;} :: !l
+            l := M.Full_image.({person = p; img = f;}) :: !l
         | None -> ()
       done;
       if filters.nb_results then
-        let len = M.Internal_int32#{value = Int32.of_int (List.length !l)} in
+        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
         let data = Mext.gen_internal_int32 len in
         print_result conf data
       else
-        let list = M.List_full_images#{images = !l} in
+        let list = M.List_full_images.({images = !l}) in
         let data = Mext.gen_list_full_images list in
         print_result conf data
     end
@@ -692,15 +691,15 @@ let print_img conf base =
         match Api_util.find_image_file conf base p with
         | Some f ->
             let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
-            l := M.Image#{person = p; img = f;} :: !l
+            l := M.Image.({person = p; img = f;}) :: !l
         | None -> ()
       done;
       if filters.nb_results then
-        let len = M.Internal_int32#{value = Int32.of_int (List.length !l)} in
+        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
         let data = Mext.gen_internal_int32 len in
         print_result conf data
       else
-        let list = M.List_images#{list_images = !l} in
+        let list = M.List_images.({list_images = !l}) in
         let data = Mext.gen_list_images list in
         print_result conf data
     end
@@ -725,14 +724,14 @@ let print_img_ext conf base =
                String.sub img 0 (String.length http) = http
         then
           let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
-          l := M.Full_image#{person = p; img = img;} :: !l
+          l := M.Full_image.({person = p; img = img;}) :: !l
       done;
       if filters.nb_results then
-        let len = M.Internal_int32#{value = Int32.of_int (List.length !l)} in
+        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
         let data = Mext.gen_internal_int32 len in
         print_result conf data
       else
-        let list = M.List_full_images#{images = !l} in
+        let list = M.List_full_images.({images = !l}) in
         let data = Mext.gen_list_full_images list in
         print_result conf data
     end
@@ -751,14 +750,14 @@ let print_img_ext conf base =
                String.sub img 0 (String.length http) = http
         then
           let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
-          l := M.Image#{person = p; img = img;} :: !l
+          l := M.Image.({person = p; img = img;}) :: !l
       done;
       if filters.nb_results then
-        let len = M.Internal_int32#{value = Int32.of_int (List.length !l)} in
+        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
         let data = Mext.gen_internal_int32 len in
         print_result conf data
       else
-        let list = M.List_images#{list_images = !l} in
+        let list = M.List_images.({list_images = !l}) in
         let data = Mext.gen_list_images list in
         print_result conf data
     end
@@ -782,20 +781,20 @@ let print_img_all conf base =
           let img = sou base (get_image p) in
           (* On commente pour la migration des portraits true => false *)
           let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person false in
-          l := M.Full_image#{person = p; img = img;} :: !l
+          l := M.Full_image.({person = p; img = img;}) :: !l
         else
           match Api_util.find_image_file conf base p with
           | Some f ->
               let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person false in
-              l := M.Full_image#{person = p; img = f;} :: !l
+              l := M.Full_image.({person = p; img = f;}) :: !l
           | None -> ()
       done;
       if filters.nb_results then
-        let len = M.Internal_int32#{value = Int32.of_int (List.length !l)} in
+        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
         let data = Mext.gen_internal_int32 len in
         print_result conf data
       else
-        let list = M.List_full_images#{images = !l} in
+        let list = M.List_full_images.({images = !l}) in
         let data = Mext.gen_list_full_images list in
         print_result conf data
     end
@@ -811,20 +810,20 @@ let print_img_all conf base =
         if not (is_empty_string (get_image p)) then
           let img = sou base (get_image p) in
           let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person false in
-          l := M.Image#{person = p; img = img;} :: !l
+          l := M.Image.({person = p; img = img;}) :: !l
         else
           match Api_util.find_image_file conf base p with
           | Some f ->
               let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person false in
-              l := M.Image#{person = p; img = f;} :: !l
+              l := M.Image.({person = p; img = f;}) :: !l
           | None -> ()
       done;
       if filters.nb_results then
-        let len = M.Internal_int32#{value = Int32.of_int (List.length !l)} in
+        let len = M.Internal_int32.({value = Int32.of_int (List.length !l)}) in
         let data = Mext.gen_internal_int32 len in
         print_result conf data
       else
-        let list = M.List_images#{list_images = !l} in
+        let list = M.List_images.({list_images = !l}) in
         let data = Mext.gen_list_images list in
         print_result conf data
     end
@@ -845,7 +844,7 @@ let print_img_person conf base =
         | None -> "")
     | s -> s
   in
-  let img_from_ip = M.Image_address#{img = img_addr} in
+  let img_from_ip = M.Image_address.({img = img_addr}) in
   let data = Mext.gen_image_address img_from_ip in
   print_result conf data
 ;;
@@ -1072,7 +1071,7 @@ let print_base_warnings conf base =
   let data =
     if filters.nb_results then
       let len = List.length !errors + List.length warnings in
-      let len = M.Internal_int32#{value = Int32.of_int len} in
+      let len = M.Internal_int32.({value = Int32.of_int len}) in
       Mext.gen_internal_int32 len
     else
       let base_warnings = Api_warnings.create_piqi_warnings () in
@@ -1131,10 +1130,10 @@ let print_all_families conf base =
   done;
   let data =
     if filters.nb_results then
-      let len = M.Internal_int32#{value = Int32.of_int (List.length !list)} in
+      let len = M.Internal_int32.({value = Int32.of_int (List.length !list)}) in
       Mext.gen_internal_int32 len
     else
-      let list = M.List_full_families#{families = !list} in
+      let list = M.List_full_families.({families = !list}) in
       Mext.gen_list_full_families list
   in
   print_result conf data
@@ -2689,13 +2688,13 @@ let print_notification_birthday conf base =
          Some (sou base (get_first_name p3)))
   in
   let notification_birthday =
-    M.Notification_birthday#{
+    M.Notification_birthday.({
       number = Int32.of_int (List.length list);
       has_proprio_birthday = has_proprio_birthday;
       firstname1 = fn1;
       firstname2 = fn2;
       firstname3 = fn3;
-    }
+    })
   in
   let data = Mext.gen_notification_birthday notification_birthday in
   print_result conf data

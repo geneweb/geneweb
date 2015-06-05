@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 module MLink = Api_link_tree_piqi
@@ -154,7 +153,7 @@ let piqi_date_of_date date =
         let m = Some (Int32.of_int dmy.month) in
         let y = Some (Int32.of_int dmy.year) in
         let delta = Some (Int32.of_int dmy.delta) in
-        let dmy1 = MLink.Dmy#{day = d; month = m; year = y; delta = delta;} in
+        let dmy1 = MLink.Dmy.({day = d; month = m; year = y; delta = delta;}) in
         let (prec, dmy2) =
           match dmy.prec with
           | Sure -> (`sure, None)
@@ -168,7 +167,7 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                MLink.Dmy#{day = d; month = m; year = y; delta = delta;}
+                MLink.Dmy.({day = d; month = m; year = y; delta = delta;})
               in
               (`oryear, Some dmy2)
           | YearInt dmy2 ->
@@ -177,27 +176,27 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                MLink.Dmy#{day = d; month = m; year = y; delta = delta;}
+                MLink.Dmy.({day = d; month = m; year = y; delta = delta;})
               in
               (`yearint, Some dmy2)
         in
         (prec, dmy1, dmy2)
       in
-      MLink.Date#{
+      MLink.Date.({
         cal = cal;
         prec = Some prec;
         dmy = Some dmy;
         dmy2 = dmy2;
         text = None;
-      }
+      })
   | Dtext txt ->
-      MLink.Date#{
+      MLink.Date.({
         cal = None;
         prec = None;
         dmy = None;
         dmy2 = None;
         text = Some txt;
-      }
+      })
 ;;
 
 let p_to_piqi_full_person conf base ip ip_spouse =
@@ -296,16 +295,16 @@ let p_to_piqi_full_person conf base ip ip_spouse =
           let baseprefix = conf.command in
           let index = Int32.of_int (Adef.int_of_ifam ifam) in
           let fl =
-            MLink.Family_link#{
+            MLink.Family_link.({
               baseprefix = baseprefix;
               ifam = index;
-            }
+            })
           in
           fl :: accu
         else accu)
       (Array.to_list (get_family p)) []
   in
-  MLink.Person#{
+  MLink.Person.({
     baseprefix = baseprefix;
     ip = index;
     n = sn;
@@ -330,7 +329,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
     burial_date = burial;
     burial_place = burial_place;
     families = families;
-  }
+  })
 ;;
 
 let fam_to_piqi_full_family conf base ip ifam add_children =
@@ -380,22 +379,22 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
       List.map
         (fun ip ->
           let ip = Int32.of_int (Adef.int_of_iper ip) in
-          MLink.Person_link#{
+          MLink.Person_link.({
             baseprefix = baseprefix;
             ip = ip;
-          })
+          }))
         (Array.to_list (get_children fam))
     else
       let pl =
         let ip = Int32.of_int (Adef.int_of_iper ip) in
-        MLink.Person_link#{
+        MLink.Person_link.({
           baseprefix = baseprefix;
           ip = ip;
-        }
+        })
       in
       [pl]
   in
-  MLink.Family#{
+  MLink.Family.({
     baseprefix = baseprefix;
     ifam = index;
     ifath = ifath;
@@ -406,7 +405,7 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
     divorce_type = divorce_type;
     divorce_date = divorce_date;
     children = children;
-  }
+  })
 ;;
 
 
@@ -511,7 +510,7 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
   in
   let index = Some (Int32.of_int (Adef.int_of_iper ip)) in
   let data =
-    MLink.Link_tree_params#{
+    MLink.Link_tree_params.({
       basename = basename;
       ip = index;
       ref_person = Some s;
@@ -519,7 +518,7 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
       nb_asc = Int32.of_int nb_asc;
       from_gen_desc = Int32.of_int from_gen_desc;
       nb_desc = Int32.of_int nb_desc;
-    }
+    })
   in
   let data = MLinkext.gen_link_tree_params data `pb in
   let url =
@@ -773,12 +772,12 @@ let print_link_tree conf base =
                    | [s] ->
                        let from_ref = redis_p_key conf base ip in
                        let corresp =
-                         MLink.Connection#{
+                         MLink.Connection.({
                            from_baseprefix = conf.bname;
                            from_ref = from_ref;
                            to_baseprefix = bname_link;
                            to_ref = s;
-                         }
+                         })
                        in
                        corresp :: accu
                    | _ -> accu
@@ -826,12 +825,12 @@ let print_link_tree conf base =
                               in
                               let corr =
                                 let from_ref = redis_p_key conf base ip in
-                                MLink.Connection#{
+                                MLink.Connection.({
                                   from_baseprefix = conf.bname;
                                   from_ref = from_ref;
                                   to_baseprefix = bname_link;
                                   to_ref = s;
-                                }
+                                })
                               in
                               let (accu_fam, accu_pers, accu_conn) =
                                 (fam.MLink.Link_tree.families @ accu_fam,
@@ -888,12 +887,12 @@ let print_link_tree conf base =
                                in
                                let corr =
                                  let from_ref = redis_p_key conf base ip in
-                                 MLink.Connection#{
+                                 MLink.Connection.({
                                    from_baseprefix = conf.bname;
                                    from_ref = from_ref;
                                    to_baseprefix = bname_link;
                                    to_ref = s;
-                                 }
+                                 })
                                in
                                (fam.MLink.Link_tree.families @ accu_fam,
                                 fam.MLink.Link_tree.persons @ accu_pers,
@@ -915,11 +914,11 @@ let print_link_tree conf base =
   let connections = local_connections @ distant_asc_conn @ distant_desc_conn in
 
   let data =
-    MLink.Link_tree#{
+    MLink.Link_tree.({
       families = families;
       persons = persons;
       connections = connections;
-    }
+    })
   in
   let data = MLinkext.gen_link_tree data in
   Api_util.print_result conf data

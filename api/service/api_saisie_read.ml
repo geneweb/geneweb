@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 module Mread = Api_saisie_read_piqi
@@ -251,7 +250,7 @@ type graph_more_info =
 (* ************************************************************************** *)
 let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
   if is_restricted conf base (get_key_index p) then
-    Mread.Person_tree#{
+    Mread.Person_tree.({
       index = Int32.of_int (-1);
       sex = `unknown;
       lastname = "x";
@@ -264,7 +263,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
       sosa = `no_sosa;
       has_more_infos = false;
       baseprefix = "";
-    }
+    })
   else
     let p_auth = authorized_age conf base p in
     let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
@@ -345,7 +344,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
           in
           has_parents || Array.length (get_family p) > 1
     in
-    Mread.Person_tree#{
+    Mread.Person_tree.({
       index = index;
       sex = sex;
       lastname = surname;
@@ -358,7 +357,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
       sosa = sosa;
       has_more_infos = has_more_infos;
       baseprefix = base_prefix
-    }
+    })
 ;;
 
 
@@ -377,7 +376,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
 (* ************************************************************************** *)
 let pers_to_piqi_simple_person conf base p base_prefix =
   if is_restricted conf base (get_key_index p) then
-    Mread.Simple_person#{
+    Mread.Simple_person.({
       index = Int32.of_int (-1);
       sex = `unknown;
       lastname = "x";
@@ -392,7 +391,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       image = None;
       sosa = `no_sosa;
       baseprefix = "";
-    }
+    })
   else
     let p_auth = authorized_age conf base p in
     let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
@@ -461,7 +460,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
           | None -> ""
       else ""
     in
-    Mread.Simple_person#{
+    Mread.Simple_person.({
       index = index;
       sex = sex;
       lastname = surname;
@@ -476,7 +475,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       image = if image = "" then None else Some image;
       sosa = sosa;
       baseprefix = base_prefix
-    }
+    })
 ;;
 
 
@@ -578,7 +577,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
         pers_to_piqi_simple_person conf base p base_prefix)
       (Perso_link.get_children_of_parents base_prefix ifam ifath imoth)
   in
-  Mread.Family#{
+  Mread.Family.({
     index = index;
     spouse = spouse;
     marriage_date = if marriage_date = "" then None else Some marriage_date;
@@ -597,7 +596,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     notes = if notes = "" then None else Some notes;
     fsources = if fsources = "" then None else Some fsources;
     children = children;
-  }
+  })
 ;;
 
 
@@ -734,7 +733,7 @@ let fam_to_piqi_family conf base p ifam =
       family_link []
   in
   let children = children @ children_link in
-  Mread.Family#{
+  Mread.Family.({
     index = index;
     spouse = spouse;
     marriage_date = if marriage_date = "" then None else Some marriage_date;
@@ -753,7 +752,7 @@ let fam_to_piqi_family conf base p ifam =
     notes = if notes = "" then None else Some notes;
     fsources = if fsources = "" then None else Some fsources;
     children = children;
-  }
+  })
 ;;
 
 
@@ -771,7 +770,7 @@ let fam_to_piqi_family conf base p ifam =
 (* ************************************************************************** *)
 let pers_to_piqi_person conf base p =
   if is_restricted conf base (get_key_index p) then
-    Mread.Person#{
+    Mread.Person.({
       index = Int32.of_int (-1);
       sex = `unknown;
       lastname = "x";
@@ -819,7 +818,7 @@ let pers_to_piqi_person conf base p =
       sosa = `no_sosa;
       events = [];
       events_witnesses = [];
-    }
+    })
   else
     let base_prefix = conf.command in
     let p_auth = authorized_age conf base p in
@@ -1007,13 +1006,13 @@ let pers_to_piqi_person conf base p =
                    let witness =
                      pers_to_piqi_simple_person conf base witness base_prefix
                    in
-                   Mread.Witness_event#{
+                   Mread.Witness_event.({
                      witness_type = witness_type;
                      witness = witness;
-                   })
+                   }))
                 (Array.to_list w)
             in
-            Mread.Event#{
+            Mread.Event.({
               name = name;
               date = if date = "" then None else Some date;
               date_conv = if date_conv = "" then None else Some date_conv;
@@ -1024,7 +1023,7 @@ let pers_to_piqi_person conf base p =
               src = if src= "" then None else Some src;
               spouse = spouse;
               witnesses = witnesses;
-            })
+            }))
           (Perso.events_list conf base p)
       else []
     in
@@ -1118,11 +1117,11 @@ let pers_to_piqi_person conf base p =
                     Some (pers_to_piqi_simple_person conf base sp base_prefix)
                 | None -> None
               in
-              Mread.Event_witness#{
+              Mread.Event_witness.({
                 event_witness_type = event_witness_type;
                 husband = husband;
                 wife = wife;
-              } )
+              }) )
             events_witnesses
         end
       else []
@@ -1228,10 +1227,10 @@ let pers_to_piqi_person conf base p =
               | GodParent -> `rchild_god_parent
               | FosterParent -> `rchild_foster_parent
             in
-            Mread.Relation_person#{
+            Mread.Relation_person.({
               r_type = r_type;
               person = p;
-            } )
+            }) )
           list
       else []
     in
@@ -1253,10 +1252,10 @@ let pers_to_piqi_person conf base p =
                   let p = poi base ip in
                   let p = pers_to_piqi_simple_person conf base p base_prefix in
                   let p =
-                    Mread.Relation_person#{
+                    Mread.Relation_person.({
                       r_type = r_type;
                       person = p;
-                    }
+                    })
                   in
                   p :: rl
               | None -> rl
@@ -1267,10 +1266,10 @@ let pers_to_piqi_person conf base p =
                   let p = poi base ip in
                   let p = pers_to_piqi_simple_person conf base p base_prefix in
                   let p =
-                    Mread.Relation_person#{
+                    Mread.Relation_person.({
                       r_type = r_type;
                       person = p;
-                    }
+                    })
                   in
                   p :: rl
               | None -> rl
@@ -1338,10 +1337,10 @@ let pers_to_piqi_person conf base p =
            let husband = pers_to_piqi_simple_person conf base father in
            let wife = pers_to_piqi_simple_person conf base mother in
            *)
-           Mread.Was_witness#{
+           Mread.Was_witness.({
              husband = husband;
              wife = wife;
-           } )
+           }) )
         list
     in
     *)
@@ -1445,7 +1444,7 @@ let pers_to_piqi_person conf base p =
         families []
     in
     let families = families @ families_link in
-    Mread.Person#{
+    Mread.Person.({
       index = index;
       sex = sex;
       lastname = surname;
@@ -1493,7 +1492,7 @@ let pers_to_piqi_person conf base p =
       sosa = sosa;
       events = events;
       events_witnesses = events_witnesses;
-    }
+    })
 ;;
 
 
@@ -1541,10 +1540,10 @@ let build_graph_asc conf base p max_gen =
     let id_to =
       Int64.of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
     in
-    Mread.Edge#{
+    Mread.Edge.({
       from_node = id_from;
       to_node = id_to;
-    }
+    })
   in
   let create_node p gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
@@ -1552,11 +1551,11 @@ let build_graph_asc conf base p max_gen =
     let uniq_id = Hashtbl.hash (base_prefix, get_key_index p, factor) in
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
-    Mread.Node#{
+    Mread.Node.({
       id = id;
       person = p;
       ifam = None;
-    }
+    })
   in
 (*
   let create_family ifam families =
@@ -1691,10 +1690,10 @@ let build_graph_desc conf base p max_gen =
     let id_to =
       Int64.of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
     in
-    Mread.Edge#{
+    Mread.Edge.({
       from_node = id_from;
       to_node = id_to;
-    }
+    })
   in
   let create_node p ifam gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
@@ -1703,11 +1702,11 @@ let build_graph_desc conf base p max_gen =
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix in
     let ifam = Int64.of_int (Adef.int_of_ifam ifam) in
-    Mread.Node#{
+    Mread.Node.({
       id = id;
       person = p;
       ifam = Some ifam;
-    }
+    })
   in
 (*
   let create_family ifam families =
@@ -1997,11 +1996,11 @@ let print_graph_tree conf base =
       (fun p ->
         let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
         let p = pers_to_piqi_person_tree conf base p in
-        Mread.Node#{
+        Mread.Node.({
           id = id;
           person = p;
           ifam = None;
-        })
+        }))
       nodes_asc
   in
   *)
@@ -2027,11 +2026,11 @@ let print_graph_tree conf base =
               let id = Int64.of_int uniq_id in
               let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
               let node =
-                Mread.Node#{
+                Mread.Node.({
                   id = id;
                   person = c;
                   ifam = None;
-                }
+                })
               in
               node :: accu)
           (Array.to_list (get_children fam)) []
@@ -2056,11 +2055,11 @@ let print_graph_tree conf base =
                       let uniq_id = Hashtbl.hash (conf.command, ic) in
                       let id = Int64.of_int uniq_id in
                       let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
-                      Mread.Node#{
+                      Mread.Node.({
                         id = id;
                         person = c;
                         ifam = None;
-                      })
+                      }))
                     l
                 in
                 (List.rev before, after)
@@ -2072,11 +2071,11 @@ let print_graph_tree conf base =
                 let id = Int64.of_int uniq_id in
                 let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
                 let node =
-                  Mread.Node#{
+                  Mread.Node.({
                     id = id;
                     person = c;
                     ifam = None;
-                  }
+                  })
                 in
                 split_at_person (node :: before) after l
         in
@@ -2084,7 +2083,7 @@ let print_graph_tree conf base =
     | None -> ([], [])
   in
   let graph =
-    Mread.Graph_tree#{
+    Mread.Graph_tree.({
       nodes_asc = nodes_asc;
       edges_asc = edges_asc;
       nodes_desc = nodes_desc;
@@ -2092,7 +2091,7 @@ let print_graph_tree conf base =
       nodes_siblings = nodes_siblings;
       nodes_siblings_before = nodes_siblings_before;
       nodes_siblings_after = nodes_siblings_after;
-    }
+    })
   in
   let data = Mext_read.gen_graph_tree graph in
   print_result conf data
@@ -2117,7 +2116,7 @@ let print_graph_tree conf base =
 (* ************************************************************************** *)
 let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix =
   if is_restricted conf base (get_key_index p) then
-    Mread.Person_tree_full#{
+    Mread.Person_tree_full.({
       index = Int32.of_int (-1);
       sex = `unknown;
       lastname = "x";
@@ -2151,7 +2150,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
       visible_for_visitors = false;
       has_more_infos = false;
       baseprefix = "";
-    }
+    })
   else
     let gen_p = Util.string_gen_person base (gen_person_of_person p) in
     let p_auth = authorized_age conf base p in
@@ -2287,7 +2286,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
             | None -> None
           in
           let nth = Some (Int32.of_int t.t_nth) in
-          Mread.Title#{
+          Mread.Title.({
             title_type = title_type;
             name = if name = "" then None else Some name;
             title = if title = "" then None else Some title;
@@ -2295,7 +2294,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
             date_begin = date_begin;
             date_end = date_end;
             nth = nth;
-          })
+          }))
         gen_p.titles
     in
     let occupation =
@@ -2348,7 +2347,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
           in
           has_parents || Array.length (get_family p) > 1
     in
-    Mread.Person_tree_full#{
+    Mread.Person_tree_full.({
       index = index;
       sex = sex;
       lastname = surname;
@@ -2382,7 +2381,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
       visible_for_visitors = visible;
       has_more_infos = has_more_infos;
       baseprefix = base_prefix
-    }
+    })
 ;;
 
 
@@ -2443,7 +2442,7 @@ let fam_to_piqi_family_tree conf base ifam =
          | _ -> (`divorced, None))
     | Separated -> (`separated, None)
   in
-  Mread.Family_tree_full#{
+  Mread.Family_tree_full.({
     fsources = fsources;
     marriage_date = marriage;
     marriage_place = marriage_place;
@@ -2452,7 +2451,7 @@ let fam_to_piqi_family_tree conf base ifam =
     divorce_type = divorce_type;
     divorce_date = divorce_date;
     index = index;
-  }
+  })
 ;;
 
 
@@ -2497,7 +2496,7 @@ let fam_to_piqi_family_tree_link conf base (ifath, imoth) ifam fam =
          | _ -> (`divorced, None))
     | Separated -> (`separated, None)
   in
-  Mread.Family_tree_full#{
+  Mread.Family_tree_full.({
     fsources = fsources;
     marriage_date = marriage;
     marriage_place = marriage_place;
@@ -2506,7 +2505,7 @@ let fam_to_piqi_family_tree_link conf base (ifath, imoth) ifam fam =
     divorce_type = divorce_type;
     divorce_date = divorce_date;
     index = index;
-  }
+  })
 ;;
 
 
@@ -2529,10 +2528,10 @@ let build_graph_asc_full conf base p max_gen =
     let id_to =
       Int64.of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
     in
-    Mread.Edge#{
+    Mread.Edge.({
       from_node = id_from;
       to_node = id_to;
-    }
+    })
   in
   let create_node p gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
@@ -2540,11 +2539,11 @@ let build_graph_asc_full conf base p max_gen =
     let uniq_id = Hashtbl.hash (base_prefix, get_key_index p, factor) in
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix in
-    Mread.Node_full#{
+    Mread.Node_full.({
       id = id;
       person = p;
       ifam = None;
-    }
+    })
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
@@ -2685,10 +2684,10 @@ let build_graph_desc_full conf base p max_gen =
     let id_to =
       Int64.of_int (Hashtbl.hash (baseprefix_to, get_key_index p_to, factor_to))
     in
-    Mread.Edge#{
+    Mread.Edge.({
       from_node = id_from;
       to_node = id_to;
-    }
+    })
   in
   let create_node p ifam gen more_info base_prefix factor =
     (* Pour les liens inter arbres, on rend l'id unique avec *)
@@ -2697,11 +2696,11 @@ let build_graph_desc_full conf base p max_gen =
     let id = Int64.of_int uniq_id in
     let p = pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix in
     let ifam = Int64.of_int (Adef.int_of_ifam ifam) in
-    Mread.Node_full#{
+    Mread.Node_full.({
       id = id;
       person = p;
       ifam = Some ifam;
-    }
+    })
   in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
@@ -3004,11 +3003,11 @@ let print_graph_tree_full conf base =
       (fun p ->
         let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
         let p = pers_to_piqi_person_tree_full conf base p in
-        Mread.Node_full#{
+        Mread.Node_full.({
           id = id;
           person = p;
           ifam = None;
-        })
+        }))
       nodes_asc
   in
   *)
@@ -3036,11 +3035,11 @@ let print_graph_tree_full conf base =
               let id = Int64.of_int uniq_id in
               let c = pers_to_piqi_person_tree_full conf base c Siblings 1 1 conf.command in
               let node =
-                Mread.Node_full#{
+                Mread.Node_full.({
                   id = id;
                   person = c;
                   ifam = None;
-                }
+                })
               in
               node :: accu)
           (Array.to_list (get_children fam)) []
@@ -3065,11 +3064,11 @@ let print_graph_tree_full conf base =
                       let uniq_id = Hashtbl.hash (conf.command, ic) in
                       let id = Int64.of_int uniq_id in
                       let c = pers_to_piqi_person_tree_full conf base c Siblings 1 1 conf.command in
-                      Mread.Node_full#{
+                      Mread.Node_full.({
                         id = id;
                         person = c;
                         ifam = None;
-                      })
+                      }))
                     l
                 in
                 (List.rev before, after)
@@ -3081,11 +3080,11 @@ let print_graph_tree_full conf base =
                 let id = Int64.of_int uniq_id in
                 let c = pers_to_piqi_person_tree_full conf base c Siblings 1 1 conf.command in
                 let node =
-                  Mread.Node_full#{
+                  Mread.Node_full.({
                     id = id;
                     person = c;
                     ifam = None;
-                  }
+                  })
                 in
                 split_at_person (node :: before) after l
         in
@@ -3093,7 +3092,7 @@ let print_graph_tree_full conf base =
     | None -> ([], [])
   in
   let graph =
-    Mread.Graph_tree_full#{
+    Mread.Graph_tree_full.({
       nodes_asc = nodes_asc;
       edges_asc = edges_asc;
       families_asc = families_asc;
@@ -3103,7 +3102,7 @@ let print_graph_tree_full conf base =
       nodes_siblings = nodes_siblings;
       nodes_siblings_before = nodes_siblings_before;
       nodes_siblings_after = nodes_siblings_after;
-    }
+    })
   in
   let data = Mext_read.gen_graph_tree_full graph in
   print_result conf data

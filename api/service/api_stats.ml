@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 module Mstats = Api_stats_piqi
@@ -151,23 +150,23 @@ let format_stats_all l title series =
     List.fold_right
       (fun (k, ((nb_m, am), (nb_f, af))) (labels, datas_all) ->
         let data =
-          Mstats.Data#{
+          Mstats.Data.({
             nb = Int32.of_int nb_f;
             value = Int32.of_int af;
-          }
+          })
         in
         (Int32.of_int k :: labels, (data :: datas_all)))
       l ([], [])
   in
-  let datas_all = Mstats.Data_l#{data = datas_all;} in
+  let datas_all = Mstats.Data_l.({data = datas_all;}) in
   let datas = [datas_all] in
-  Mstats.Stat#{
+  Mstats.Stat.({
     title = title;
     labels = labels;
     series = series;
     series_string = [];
     datas = datas;
-  }
+  })
 ;;
 
 let format_stats_m_f l title series =
@@ -180,31 +179,31 @@ let format_stats_m_f l title series =
     List.fold_right
       (fun (k, ((nb_m, am), (nb_f, af))) (labels, (datas_male, datas_female)) ->
         let data_male =
-          Mstats.Data#{
+          Mstats.Data.({
             nb = Int32.of_int nb_m;
             value = Int32.of_int am;
-          }
+          })
         in
         let data_female =
-          Mstats.Data#{
+          Mstats.Data.({
             nb = Int32.of_int nb_f;
             value = Int32.of_int af;
-          }
+          })
         in
         (Int32.of_int k :: labels,
          (data_male :: datas_male, data_female :: datas_female)))
       l ([], ([], []))
   in
-  let datas_male = Mstats.Data_l#{data = datas_male;} in
-  let datas_female = Mstats.Data_l#{data = datas_female;} in
+  let datas_male = Mstats.Data_l.({data = datas_male;}) in
+  let datas_female = Mstats.Data_l.({data = datas_female;}) in
   let datas = [datas_male; datas_female] in
-  Mstats.Stat#{
+  Mstats.Stat.({
     title = title;
     labels = labels;
     series = series;
     series_string = [];
     datas = datas;
-  }
+  })
 ;;
 
 let format_stats_m_f2 l1 l2 title series1 series2 =
@@ -234,10 +233,10 @@ let format_stats_m_f2 l1 l2 title series1 series2 =
     Array.map
       (fun a ->
         Array.make (List.length labels)
-          (Mstats.Data#{
+          (Mstats.Data.({
             nb = Int32.zero;
             value = Int32.zero;
-          }))
+          })))
       data
   in
   let () =
@@ -246,16 +245,16 @@ let format_stats_m_f2 l1 l2 title series1 series2 =
         try
           let pos = Hashtbl.find ht_labels k in
           let data_male =
-            Mstats.Data#{
+            Mstats.Data.({
               nb = Int32.of_int nb_m;
               value = Int32.of_int am;
-            }
+            })
           in
           let data_female =
-            Mstats.Data#{
+            Mstats.Data.({
               nb = Int32.of_int nb_f;
               value = Int32.of_int af;
-            }
+            })
           in
           data.(0).(pos) <- data_male;
           data.(1).(pos) <- data_female;
@@ -268,16 +267,16 @@ let format_stats_m_f2 l1 l2 title series1 series2 =
         try
           let pos = Hashtbl.find ht_labels k in
           let data_male =
-            Mstats.Data#{
+            Mstats.Data.({
               nb = Int32.of_int nb_m;
               value = Int32.of_int am;
-            }
+            })
           in
           let data_female =
-            Mstats.Data#{
+            Mstats.Data.({
               nb = Int32.of_int nb_f;
               value = Int32.of_int af;
-            }
+            })
           in
           data.(2).(pos) <- data_male;
           data.(3).(pos) <- data_female;
@@ -286,17 +285,17 @@ let format_stats_m_f2 l1 l2 title series1 series2 =
   in
   let datas =
     List.map
-      (fun s -> Mstats.Data_l#{data = Array.to_list s;})
+      (fun s -> Mstats.Data_l.({data = Array.to_list s;}))
       (Array.to_list data)
   in
   let labels = List.map Int32.of_int labels in
-  Mstats.Stat#{
+  Mstats.Stat.({
     title = title;
     labels = labels;
     series = series1 @ series2;
     series_string = [];
     datas = datas;
-  }
+  })
 ;;
 
 let format_stats_dmy l title series =
@@ -317,10 +316,10 @@ let format_stats_dmy l title series =
     Array.map
       (fun a ->
         Array.make (List.length labels)
-          (Mstats.Data#{
+          (Mstats.Data.({
             nb = Int32.zero;
             value = Int32.zero;
-          }))
+          })))
       data
   in
   let rec loop i l =
@@ -330,10 +329,10 @@ let format_stats_dmy l title series =
         List.iter
           (fun (md, nb_m, nb_f) ->
              let v =
-               Mstats.Data#{
+               Mstats.Data.({
                  nb = Int32.of_int (nb_m + nb_f);
                  value = Int32.zero;
-               }
+               })
              in
              data.(md).(i) <- v)
           (Hashtbl.find_all ht year);
@@ -342,18 +341,18 @@ let format_stats_dmy l title series =
   let () = loop 0 labels in
   let datas =
     List.map
-      (fun s -> Mstats.Data_l#{data = Array.to_list s;})
+      (fun s -> Mstats.Data_l.({data = Array.to_list s;}))
       (Array.to_list data)
   in
   let labels = List.map Int32.of_int labels in
   let stats =
-    Mstats.Stat#{
+    Mstats.Stat.({
       title = title;
       labels = labels;
       series = series;
       series_string = [];
       datas = datas;
-    }
+    })
   in
   stats
 ;;
@@ -379,16 +378,16 @@ let format_stats_day l title =
                (data_mon, data_tue, data_wed, data_thu,
                 data_fri, data_sat, data_sun) ->
             let data =
-              Mstats.Data#{
+              Mstats.Data.({
                 nb = Int32.of_int (nb_m + nb_f);
                 value = Int32.zero;
-              }
+              })
             in
             let zero_data =
-              Mstats.Data#{
+              Mstats.Data.({
                 nb = Int32.zero;
                 value = Int32.zero;
-              }
+              })
             in
             let data_sun =
               if md = 0 then data :: data_sun else zero_data :: data_sun
@@ -416,13 +415,13 @@ let format_stats_day l title =
           (Hashtbl.find_all ht year) data)
       labels ([], [], [], [], [], [], [])
   in
-  let datas_mon = Mstats.Data_l#{data = data_mon;} in
-  let datas_tue = Mstats.Data_l#{data = data_tue;} in
-  let datas_wed = Mstats.Data_l#{data = data_wed;} in
-  let datas_thu = Mstats.Data_l#{data = data_thu;} in
-  let datas_fri = Mstats.Data_l#{data = data_fri;} in
-  let datas_sat = Mstats.Data_l#{data = data_sat;} in
-  let datas_sun = Mstats.Data_l#{data = data_sun;} in
+  let datas_mon = Mstats.Data_l.({data = data_mon;}) in
+  let datas_tue = Mstats.Data_l.({data = data_tue;}) in
+  let datas_wed = Mstats.Data_l.({data = data_wed;}) in
+  let datas_thu = Mstats.Data_l.({data = data_thu;}) in
+  let datas_fri = Mstats.Data_l.({data = data_fri;}) in
+  let datas_sat = Mstats.Data_l.({data = data_sat;}) in
+  let datas_sun = Mstats.Data_l.({data = data_sun;}) in
   let datas =
     [datas_mon; datas_tue; datas_wed; datas_thu;
      datas_fri; datas_sat; datas_sun]
@@ -433,13 +432,13 @@ let format_stats_day l title =
      `serie_day_5; `serie_day_6; `serie_day_7;]
   in
   let stats =
-    Mstats.Stat#{
+    Mstats.Stat.({
       title = title;
       labels = labels;
       series = series;
       series_string = [];
       datas = datas;
-    }
+    })
   in
   stats
 ;;
@@ -468,16 +467,16 @@ let format_stats_month l title =
                 data_may, data_jun, data_jul, data_aug,
                 data_sep, data_oct, data_nov, data_dec) ->
             let data =
-              Mstats.Data#{
+              Mstats.Data.({
                 nb = Int32.of_int (nb_m + nb_f);
                 value = Int32.zero;
-              }
+              })
             in
             let zero_data =
-              Mstats.Data#{
+              Mstats.Data.({
                 nb = Int32.zero;
                 value = Int32.zero;
-              }
+              })
             in
             let data_jan =
               if md = 1 then data :: data_jan else zero_data :: data_jan
@@ -521,18 +520,18 @@ let format_stats_month l title =
           (Hashtbl.find_all ht k) data)
       labels ([], [], [], [], [], [], [], [], [], [], [], [])
   in
-  let datas_jan = Mstats.Data_l#{data = data_jan;} in
-  let datas_feb = Mstats.Data_l#{data = data_feb;} in
-  let datas_mar = Mstats.Data_l#{data = data_mar;} in
-  let datas_apr = Mstats.Data_l#{data = data_apr;} in
-  let datas_may = Mstats.Data_l#{data = data_may;} in
-  let datas_jun = Mstats.Data_l#{data = data_jun;} in
-  let datas_jul = Mstats.Data_l#{data = data_jul;} in
-  let datas_aug = Mstats.Data_l#{data = data_aug;} in
-  let datas_sep = Mstats.Data_l#{data = data_sep;} in
-  let datas_oct = Mstats.Data_l#{data = data_oct;} in
-  let datas_nov = Mstats.Data_l#{data = data_nov;} in
-  let datas_dec = Mstats.Data_l#{data = data_dec;} in
+  let datas_jan = Mstats.Data_l.({data = data_jan;}) in
+  let datas_feb = Mstats.Data_l.({data = data_feb;}) in
+  let datas_mar = Mstats.Data_l.({data = data_mar;}) in
+  let datas_apr = Mstats.Data_l.({data = data_apr;}) in
+  let datas_may = Mstats.Data_l.({data = data_may;}) in
+  let datas_jun = Mstats.Data_l.({data = data_jun;}) in
+  let datas_jul = Mstats.Data_l.({data = data_jul;}) in
+  let datas_aug = Mstats.Data_l.({data = data_aug;}) in
+  let datas_sep = Mstats.Data_l.({data = data_sep;}) in
+  let datas_oct = Mstats.Data_l.({data = data_oct;}) in
+  let datas_nov = Mstats.Data_l.({data = data_nov;}) in
+  let datas_dec = Mstats.Data_l.({data = data_dec;}) in
   let datas =
     [datas_jan; datas_feb; datas_mar; datas_apr;
      datas_may; datas_jun; datas_jul; datas_aug;
@@ -544,13 +543,13 @@ let format_stats_month l title =
      `serie_month_5; `serie_month_6; `serie_month_7; `serie_month_8;
      `serie_month_9; `serie_month_10; `serie_month_11; `serie_month_12]
   in
-  Mstats.Stat#{
+  Mstats.Stat.({
     title = title;
     labels = labels;
     series = series;
     series_string = [];
     datas = datas;
-  }
+  })
 ;;
 
 let format_top_stats ht title =
@@ -567,20 +566,20 @@ let format_top_stats ht title =
       (fun (s, n) (series, datas) ->
          let serie = s in
          let data =
-           Mstats.Data#{
+           Mstats.Data.({
              nb = Int32.of_int n;
              value = Int32.one;
-           }
+           })
          in
          (serie :: series, data :: datas))
       l ([], [])
   in
   let datas =
     List.map
-      (fun datas -> Mstats.Data_l#{data = [datas];})
+      (fun datas -> Mstats.Data_l.({data = [datas];}))
       datas
   in
-  Mstats.Stat#{
+  Mstats.Stat.({
     title = title;
     labels = [Int32.zero];
     series =
@@ -589,7 +588,7 @@ let format_top_stats ht title =
        `serie_top_10_9; `serie_top_10_10];
     series_string = series_string;
     datas = datas;
-  }
+  })
 ;;
 
 let format_stats_astro l title =
@@ -661,124 +660,124 @@ let format_stats_astro l title =
   in
   let data_aries =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_aries);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_taurus =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_taurus);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_gemini =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_gemini);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_cancer =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_cancer);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_leo =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_leo);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_virgo =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_virgo);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_libra =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_libra);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_scorpio =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_scorpio);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_sagittarius =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_sagittarius);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_capricorn =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_capricorn);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_aquarius =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_aquarius);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_pisces =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_pisces);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
-  let datas_aries = Mstats.Data_l#{data = data_aries;} in
-  let datas_taurus = Mstats.Data_l#{data = data_taurus;} in
-  let datas_gemini = Mstats.Data_l#{data = data_gemini;} in
-  let datas_cancer = Mstats.Data_l#{data = data_cancer;} in
-  let datas_leo = Mstats.Data_l#{data = data_leo;} in
-  let datas_virgo = Mstats.Data_l#{data = data_virgo;} in
-  let datas_libra = Mstats.Data_l#{data = data_libra;} in
-  let datas_scorpio = Mstats.Data_l#{data = data_scorpio;} in
-  let datas_sagittarius = Mstats.Data_l#{data = data_sagittarius;} in
-  let datas_capricorn = Mstats.Data_l#{data = data_capricorn;} in
-  let datas_aquarius = Mstats.Data_l#{data = data_aquarius;} in
-  let datas_pisces = Mstats.Data_l#{data = data_pisces;} in
+  let datas_aries = Mstats.Data_l.({data = data_aries;}) in
+  let datas_taurus = Mstats.Data_l.({data = data_taurus;}) in
+  let datas_gemini = Mstats.Data_l.({data = data_gemini;}) in
+  let datas_cancer = Mstats.Data_l.({data = data_cancer;}) in
+  let datas_leo = Mstats.Data_l.({data = data_leo;}) in
+  let datas_virgo = Mstats.Data_l.({data = data_virgo;}) in
+  let datas_libra = Mstats.Data_l.({data = data_libra;}) in
+  let datas_scorpio = Mstats.Data_l.({data = data_scorpio;}) in
+  let datas_sagittarius = Mstats.Data_l.({data = data_sagittarius;}) in
+  let datas_capricorn = Mstats.Data_l.({data = data_capricorn;}) in
+  let datas_aquarius = Mstats.Data_l.({data = data_aquarius;}) in
+  let datas_pisces = Mstats.Data_l.({data = data_pisces;}) in
   let datas =
     [datas_aries; datas_taurus; datas_gemini; datas_cancer;
      datas_leo; datas_virgo; datas_libra; datas_scorpio;
@@ -790,13 +789,13 @@ let format_stats_astro l title =
      `serie_sagittarius; `serie_capricorn; `serie_aquarius;
      `serie_pisces]
   in
-  Mstats.Stat#{
+  Mstats.Stat.({
     title = title;
     labels = [Int32.zero];
     series = series;
     series_string = [];
     datas = datas;
-  }
+  })
 ;;
 
 let format_stats_moon l title =
@@ -837,44 +836,44 @@ let format_stats_moon l title =
   in
   let data_new =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_new);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_first =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_first);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_full =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_full);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
   let data_last =
     let data =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int (List.fold_left (+) 0 data_last);
         value = Int32.zero;
-      }
+      })
     in
     [data]
   in
-  let datas_new = Mstats.Data_l#{data = data_new;} in
-  let datas_first = Mstats.Data_l#{data = data_first;} in
-  let datas_full = Mstats.Data_l#{data = data_full;} in
-  let datas_last = Mstats.Data_l#{data = data_last;} in
+  let datas_new = Mstats.Data_l.({data = data_new;}) in
+  let datas_first = Mstats.Data_l.({data = data_first;}) in
+  let datas_full = Mstats.Data_l.({data = data_full;}) in
+  let datas_last = Mstats.Data_l.({data = data_last;}) in
   let datas =
     [datas_new; datas_first; datas_full; datas_last]
   in
@@ -883,13 +882,13 @@ let format_stats_moon l title =
      `serie_moon_last_quarter ]
   in
   let stats =
-    Mstats.Stat#{
+    Mstats.Stat.({
       title = title;
       labels = [Int32.zero];
       series = series;
       series_string = [];
       datas = datas;
-    }
+    })
   in
   stats
 ;;
@@ -939,16 +938,16 @@ let print_ind_stats conf base =
                   0 l
               in
               let data_found =
-                Mstats.Data#{
+                Mstats.Data.({
                   nb = Int32.of_int found;
                   value = Int32.one;
-                }
+                })
               in
               let data_diss =
-                Mstats.Data#{
+                Mstats.Data.({
                   nb = Int32.of_int diss;
                   value = Int32.one;
-                }
+                })
               in
               (data_found :: datas_found, data_diss :: datas_diss))
             ([], []) ancestors
@@ -965,28 +964,28 @@ let print_ind_stats conf base =
           List.rev (loop 0 ancestors [])
         in
         let datas =
-          [Mstats.Data_l#{data = datas_found;};
-           Mstats.Data_l#{data = datas_diss;}]
+          [Mstats.Data_l.({data = datas_found;});
+           Mstats.Data_l.({data = datas_diss;})]
         in
         let stats =
-          Mstats.Stat#{
+          Mstats.Stat.({
             title = `st_asc;
             labels = labels;
             series = [`serie_asc_found; `serie_asc_uniq];
             series_string = [];
             datas = datas;
-          }
+          })
         in
         (ancestors, stats)
     | None ->
         let stats =
-          Mstats.Stat#{
+          Mstats.Stat.({
             title = `st_asc;
             labels = [];
             series = [];
             series_string = [];
             datas = [];
-          }
+          })
         in
         ([], stats)
   in
@@ -1029,16 +1028,16 @@ let print_ind_stats conf base =
                   0 l
               in
               let data_found =
-                Mstats.Data#{
+                Mstats.Data.({
                   nb = Int32.of_int found;
                   value = Int32.one;
-                }
+                })
               in
               let data_diss =
-                Mstats.Data#{
+                Mstats.Data.({
                   nb = Int32.of_int diss;
                   value = Int32.one;
-                }
+                })
               in
               (data_found :: datas_found, data_diss :: datas_diss))
             ([], []) descendants
@@ -1052,26 +1051,26 @@ let print_ind_stats conf base =
           in
           List.rev (loop 0 descendants [])
         in
-        let datas = [Mstats.Data_l#{data = datas_found;}; Mstats.Data_l#{data = datas_diss;}] in
+        let datas = [Mstats.Data_l.({data = datas_found;}); Mstats.Data_l.({data = datas_diss;})] in
         let stats =
-          Mstats.Stat#{
+          Mstats.Stat.({
             title = `st_desc;
             labels = labels;
             series = [`serie_desc_found; `serie_desc_uniq];
             series_string = [];
             datas = datas;
-          }
+          })
         in
         (descendants, stats)
     | None ->
         let stats =
-          Mstats.Stat#{
+          Mstats.Stat.({
             title = `st_desc;
             labels = [];
             series = [];
             series_string = [];
             datas = [];
-          }
+          })
         in
         ([], stats)
   in
@@ -1098,26 +1097,26 @@ let print_ind_stats conf base =
         (0, 0) descendants
     in
     let data_male =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int nb_male;
         value = Int32.one;
-      }
+      })
     in
     let data_female =
-      Mstats.Data#{
+      Mstats.Data.({
         nb = Int32.of_int nb_female;
         value = Int32.one;
-      }
+      })
     in
-    let datas_male = Mstats.Data_l#{data = [data_male];} in
-    let datas_female = Mstats.Data_l#{data = [data_female];} in
-    Mstats.Stat#{
+    let datas_male = Mstats.Data_l.({data = [data_male];}) in
+    let datas_female = Mstats.Data_l.({data = [data_female];}) in
+    Mstats.Stat.({
       title = `st_desc_man_woman;
       labels = [Int32.zero];
       series = [`serie_male; `serie_female];
       series_string = [];
       datas = [datas_male; datas_female];
-    }
+    })
   in
 
   (* calcul de fréquence de nom/prénom *)
@@ -1162,20 +1161,20 @@ let print_ind_stats conf base =
         (fun (s, n) (series, datas) ->
            let serie = s in
            let data =
-             Mstats.Data#{
+             Mstats.Data.({
                nb = Int32.of_int n;
                value = Int32.one;
-             }
+             })
            in
            (serie :: series, data :: datas))
         l ([], [])
     in
     let datas =
       List.map
-        (fun datas -> Mstats.Data_l#{data = [datas];})
+        (fun datas -> Mstats.Data_l.({data = [datas];}))
         datas
     in
-    Mstats.Stat#{
+    Mstats.Stat.({
       title = title;
       labels = [Int32.zero];
       series =
@@ -1184,7 +1183,7 @@ let print_ind_stats conf base =
          `serie_top_10_9; `serie_top_10_10];
       series_string = series_string;
       datas = datas;
-    }
+    })
   in
 
   (* calcul de fréquence des occupation *)
@@ -1241,20 +1240,20 @@ let print_ind_stats conf base =
         (fun (s, n) (series, datas) ->
            let serie = s in
            let data =
-             Mstats.Data#{
+             Mstats.Data.({
                nb = Int32.of_int n;
                value = Int32.one;
-             }
+             })
            in
            (serie :: series, data :: datas))
         l ([], [])
     in
     let datas =
       List.map
-        (fun datas -> Mstats.Data_l#{data = [datas];})
+        (fun datas -> Mstats.Data_l.({data = [datas];}))
         datas
     in
-    Mstats.Stat#{
+    Mstats.Stat.({
       title = title;
       labels = [Int32.zero];
       series =
@@ -1263,7 +1262,7 @@ let print_ind_stats conf base =
          `serie_top_10_9; `serie_top_10_10];
       series_string = series_string;
       datas = datas;
-    }
+    })
   in
 
   (* fréquence nom sur l'ascendance *)
@@ -1303,9 +1302,9 @@ let print_ind_stats conf base =
   in
 
   let stats =
-    Mstats.Stats#{
+    Mstats.Stats.({
       stats = all_stats;
-    }
+    })
   in
 
   let data = Mext_stats.gen_stats stats in
@@ -2657,9 +2656,9 @@ let print_all_stats conf base =
   let all_stats = stats :: all_stats in
 
   let stats =
-    Mstats.Stats#{
+    Mstats.Stats.({
       stats = all_stats;
-    }
+    })
   in
 
   let data = Mext_stats.gen_stats stats in

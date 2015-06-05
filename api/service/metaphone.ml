@@ -1,4 +1,3 @@
-(*pp camlp4o -I `ocamlfind query piqi.syntax` pa_labelscope.cmo pa_openin.cmo *)
 
 
 let slavo_Germanic sstring =
@@ -7,7 +6,7 @@ let slavo_Germanic sstring =
     else
       match (String.sub sstring i 1) with
       | "W" | "K" -> true
-      | "C" -> 
+      | "C" ->
           if (i+1) < String.length sstring then
             if (String.sub sstring (i+1) 1) = "Z" then true else loop (i+1)
           else false
@@ -31,10 +30,10 @@ let string_at sstring start length list =
       else
         begin
           for i = 0 to Array.length list - 1 do
-            if (list.(i) = String.sub sstring start length) then 
-              begin 
-                ret:= true; 
-                raise Exit; 
+            if (list.(i) = String.sub sstring start length) then
+              begin
+                ret:= true;
+                raise Exit;
               end
             else ()
           done;
@@ -47,7 +46,7 @@ let double_metaphone sstring =
   let primary   = ref "" in
   let secondary = ref "" in
   let current   = ref 0 in
-  	
+
   let length   = String.length (sstring) in
   let last     = length - 1 in
   let original = sstring ^ "     " in
@@ -55,11 +54,11 @@ let double_metaphone sstring =
   let original = String.uppercase original in
 
 (*    // skip this at beginning of word*)
-    
+
   if (string_at original 0 2 [|"GN"; "KN"; "PN"; "WR"; "PS"|]) then incr current;
 
 (*    // Initial "X" is pronounced "Z" e.g. "Xavier"*)
-    
+
     if (String.sub original 0 1 = "X") then
     begin
       primary   := !primary ^ "S";  (* // "Z" maps to "S"*)
@@ -71,7 +70,7 @@ let double_metaphone sstring =
 (*    // main loop*)
     while (String.length !primary < 4 || String.length !secondary < 4) do
       if (!current >= length) then raise Exit;
-      
+
       begin
 (try
       match (String.sub original !current 1) with
@@ -104,7 +103,7 @@ let double_metaphone sstring =
 
         | "C" ->
 (*          // various gremanic*)
-          if ((!current > 1) 
+          if ((!current > 1)
               && not (is_vowel original (!current - 2))
               && string_at original (!current - 1) 3 [| "ACH" |]
               && ((String.sub original (!current + 2)  1 <> "I")
@@ -118,7 +117,7 @@ let double_metaphone sstring =
           end;
 
 (*          // special case "caesar"*)
-          if ((!current = 0) 
+          if ((!current = 0)
               && string_at original !current 6 [|"CAESAR"|]) then begin
           primary   := !primary ^ "S";
           secondary := !secondary ^ "S";
@@ -171,7 +170,7 @@ let double_metaphone sstring =
                     && string_at original (!current + 2) 1 [|"L";"R";"N";"M";"B";"H";"F";"V";"W";" "|] then begin
                       primary   := !primary ^ "K";
                       secondary := !secondary ^ "K";
-                    end 
+                    end
             else begin
               if (!current > 0) then begin
                 if string_at original 0 2 [|"MC"|] then begin
@@ -192,7 +191,7 @@ let double_metaphone sstring =
           end;
 
 (*          // e.g. "czerny"*)
-          if string_at original !current 2 [|"CZ"|] && 
+          if string_at original !current 2 [|"CZ"|] &&
             not (string_at original (!current - 2) 4 [|"WICZ"|]) then begin
             primary := !primary ^ "S";
             secondary := !secondary ^ "X";
@@ -209,7 +208,7 @@ let double_metaphone sstring =
           end;
 (*          // double "C", but not McClellan*)
           if string_at original !current 2 [|"CC"|]
-              && not ((!current = 1) 
+              && not ((!current = 1)
                    && (String.sub original 0 1) = "M") then begin
 (*            // "bellocchio" but not "bacchus"*)
             if string_at original (!current + 2) 1                       [|"I";"E";"H"|]
@@ -315,7 +314,7 @@ let double_metaphone sstring =
 
         | "G" ->
           if (String.sub original (!current + 1) 1) = "H" then begin
-            if (!current > 0) 
+            if (!current > 0)
                 && not (is_vowel original (!current - 1)) then begin
               primary := !primary ^ "K";
               secondary := !secondary ^ "K";
@@ -424,7 +423,7 @@ let double_metaphone sstring =
 (*            // obvious germanic*)
             if (string_at original  0 4 [|"VAN "; "VON "|])
                  || string_at original 0 3 [|"SCH"|]
-                || string_at original (!current + 1) 2 
+                || string_at original (!current + 1) 2
                           [|"ET"|] then begin
               primary := !primary ^ "K";
               secondary := !secondary ^ "K";
@@ -454,7 +453,7 @@ let double_metaphone sstring =
 
         | "H" ->
 (*          // only keep if first & before vowel or btw. 2 vowels*)
-          if (((!current = 0) || 
+          if (((!current = 0) ||
                is_vowel original (!current - 1))
               && is_vowel original (!current + 1)) then begin
             primary := !primary ^ "H";
@@ -509,7 +508,7 @@ let double_metaphone sstring =
 
           if (String.sub original (!current + 1) 1) = "J" then begin (*  it could happen *)
             incr current; incr current; end
-          else 
+          else
             incr current;
           raise Exit
 
@@ -526,13 +525,13 @@ let double_metaphone sstring =
           if (String.sub original (!current + 1) 1) = "L" then begin
             (*  spanish e.g. "cabrillo" "gallegos" *)
             if ((!current = (length - 3))
-                 && string_at original (!current - 1) 4 
+                 && string_at original (!current - 1) 4
                            [|"ILLO";"ILLA";"ALLE"|]
-                || (string_at original  (last-1) 2 
+                || (string_at original  (last-1) 2
                             [|"AS";"OS"|])
-                  || string_at original last 1 
+                  || string_at original last 1
                             [|"A";"O"|]
-                 && string_at original (!current - 1) 4 
+                 && string_at original (!current - 1) 4
                            [|"ALLE"|]) then begin
               primary := !primary ^ "L";
               secondary := !secondary ^ "";
@@ -540,17 +539,17 @@ let double_metaphone sstring =
               raise Exit
             end;
             incr current; incr current;
-          end else 
+          end else
             incr current;
           primary := !primary ^ "L";
           secondary := !secondary ^ "L";
           raise Exit
 
         | "M" ->
-          if (string_at original  (!current - 1) 3 
+          if (string_at original  (!current - 1) 3
                      [|"UMB"|])
                && ((((!current + 1)) = last)
-                   || string_at original (!current + 2) 2 
+                   || string_at original (!current + 2) 2
                             [|"ER"|])
               (*  "dumb" "thumb" *)
               || (String.sub original (!current + 1) 1) = "M" then begin
@@ -586,7 +585,7 @@ let double_metaphone sstring =
           end;
 
           (*  also account for "campbell" and "raspberry" *)
-          if string_at original  (!current + 1) 1 
+          if string_at original  (!current + 1) 1
                      [|"P";"B"|] then begin
             incr current; incr current; end
           else
@@ -598,7 +597,7 @@ let double_metaphone sstring =
         | "Q" ->
           if (String.sub original (!current + 1) 1) = "Q" then begin
             incr current; incr current; end
-          else 
+          else
             incr current;
           primary := !primary ^ "K";
           secondary := !secondary ^ "K";
@@ -624,7 +623,7 @@ let double_metaphone sstring =
 
         | "S" ->
           (*  special |s "island" "isle" "carlisle" "carlysle" *)
-          if string_at original  (!current - 1) 3 
+          if string_at original  (!current - 1) 3
                      [|"ISL";"YSL"|] then begin
             incr current;
             raise Exit
@@ -641,7 +640,7 @@ let double_metaphone sstring =
 
           if string_at original  !current 2  [|"SH"|] then begin
             (*  germanic *)
-            if string_at original  (!current + 1) 4 
+            if string_at original  (!current + 1) 4
                        [|"HEIM";"HOEK";"HOLM";"HOLZ"|] then begin
               primary := !primary ^ "S";
               secondary := !secondary ^ "S";
@@ -674,7 +673,7 @@ let double_metaphone sstring =
               || string_at original (!current + 1) 1 [|"Z"|] then begin
             primary := !primary ^ "S";
             secondary := !secondary ^ "X";
-            if string_at original  (!current + 1) 1 
+            if string_at original  (!current + 1) 1
                         [|"Z"|] then begin
               incr current; incr current; end
             else
@@ -698,7 +697,7 @@ let double_metaphone sstring =
                 incr current; incr current; incr current;
                 raise Exit
               end else begin
-                if ((!current = 0) 
+                if ((!current = 0)
                     && not (is_vowel original 3)
                     && (String.sub original (!current + 3) 1) <> "W") then begin
                   primary := !primary ^ "X";
@@ -738,12 +737,12 @@ let double_metaphone sstring =
 
           if string_at original  (!current + 1) 1  [|"S";"Z"|] then begin
             incr current; incr current; end
-          else 
+          else
             incr current;
           raise Exit
 
         | "T" ->
-          if string_at original  !current 4 
+          if string_at original  !current 4
                      [|"TION"|] then begin
             primary := !primary ^ "X";
             secondary := !secondary ^ "X";
@@ -751,7 +750,7 @@ let double_metaphone sstring =
             raise Exit
                      end;
 
-          if string_at original  !current 3 
+          if string_at original  !current 3
                      [|"TIA";"TCH"|] then begin
             primary := !primary ^ "X";
             secondary := !secondary ^ "X";
@@ -759,12 +758,12 @@ let double_metaphone sstring =
             raise Exit
                      end;
 
-          if string_at original  !current 2 
+          if string_at original  !current 2
                      [|"TH"|]
-              || string_at original !current 3 
+              || string_at original !current 3
                             [|"TTH"|] then begin
             (*  special | "thomas" "thames" or germanic *)
-            if string_at original  (!current + 2) 2 
+            if string_at original  (!current + 2) 2
                        [|"OM";"AM"|]
                 || string_at original 0 4 [|"VAN ";"VON "|]
                 || string_at original 0 3 [|"SCH"|] then begin
@@ -778,7 +777,7 @@ let double_metaphone sstring =
             raise Exit
                             end;
 
-          if string_at original  (!current + 1) 1 
+          if string_at original  (!current + 1) 1
                      [|"T";"D"|] then begin
             incr current; incr current; end
           else
@@ -788,7 +787,7 @@ let double_metaphone sstring =
           raise Exit
 
         | "V" ->
-          if (String.sub original (!current + 1) 1) = "V" then begin 
+          if (String.sub original (!current + 1) 1) = "V" then begin
             incr current; incr current;end
           else
             incr current;
@@ -807,7 +806,7 @@ let double_metaphone sstring =
 
           if (!current = 0)
               && (is_vowel original (!current + 1)
-                  || string_at original !current 2 
+                  || string_at original !current 2
                             [|"WH"|]) then begin
             (*  Wasserman should match Vasserman  *)
             if (is_vowel original (!current + 1)) then begin
@@ -821,9 +820,9 @@ let double_metaphone sstring =
               end;
 
           (*  Arnow should match Arnoff *)
-          if (((!current = last) 
+          if (((!current = last)
                 && is_vowel original (!current - 1))
-              || string_at original (!current - 1) 5 
+              || string_at original (!current - 1) 5
                         [|"EWSKI";"EWSKY";"OWSKI";"OWSKY"|]
               || string_at original 0 3 [|"SCH"|]) then begin
             primary := !primary ^ "";
@@ -833,7 +832,7 @@ let double_metaphone sstring =
           end;
 
           (*  polish e.g. "filipowicz" *)
-          if string_at original  !current 4 
+          if string_at original  !current 4
                      [|"WICZ";"WITZ"|] then begin
             primary := !primary ^ "TS";
             secondary := !secondary ^ "FX";
@@ -899,7 +898,7 @@ with Exit -> ())
 
     done; (*(*  end while*) *)
 with Exit -> ());
-  
+
 (*
     if String.length !primary > 4 then
       primary   := String.sub !primary   0 4;
@@ -909,26 +908,26 @@ with Exit -> ());
     print_endline original;
     print_endline (!primary);
     print_endline (!secondary);
-    
+
     if( !primary = !secondary ) then begin
-    	secondary := "" 
+    	secondary := ""
     end;
 *)
 
     (!primary, !secondary)
 
-(*    
+(*
     $result["primary"] = $primary ;
     $result["secondary"] = $secondary ;
 *)
 
-(*    
+(*
     return $result ;
 *)
 
 (*  end (*  end of function MetaPhone*) *)
-;;  
-  
+;;
+
 
 (*
 double_metaphone "LHEUREUX";print_endline " ";
