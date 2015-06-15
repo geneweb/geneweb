@@ -42,7 +42,6 @@ api.out:
 	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_update_person.ml
 	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_update_family.ml
 	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_saisie_write.ml
-	ocamlfind ocamlc -package piqirun.ext -package mysql -linkpkg -noautolink -cclib '-Wl,-Bstatic -lmysql_stubs -lmysql -Wl,-Bdynamic -lz' -I $(MYSQLD) mysql.cmxa -annot -c -I ../../src -I ../../wserver api_db.ml
 
 api.opt:
 	$(OCAMLOPT) -package piqirun.ext -c api_piqi.ml
@@ -72,7 +71,6 @@ api.opt:
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_update_family.ml
 	$(OCAMLOPT) -c -pp "camlp5r ../../wserver/pa_macro5.cmo pa_extend.cmo ../../src/pa_lock.cmo $(CAMLP5F)" -I ../../src api_saisie_autocomplete.ml
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_saisie_write.ml
-	$(OCAMLOPT) -package piqirun.ext -package mysql -linkpkg -noautolink -cclib '-Wl,-Bstatic -lmysql_stubs -lmysql -Wl,-Bdynamic -lz' -I $(MYSQLD) mysql.cmxa -c -I ../../src -I ../../wserver api_db.ml
 	$(OCAMLOPT) -package piqirun.ext -package curl -I $(OCURL) curl.cmxa -I $(LREDIS) -package yojson -I ../../src -I ../../wserver -c api_link.ml
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver convert_dico_place.ml
 
