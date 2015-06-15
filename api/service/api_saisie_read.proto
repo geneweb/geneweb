@@ -237,6 +237,14 @@ message GraphTree {
   repeated Node nodes_desc = 3;
   repeated Edge edges_desc = 4;
   repeated Node nodes_siblings = 5;
+}
+
+message GraphTreeNew {
+  repeated Node nodes_asc = 1;
+  repeated Edge edges_asc = 2;
+  repeated Node nodes_desc = 3;
+  repeated Edge edges_desc = 4;
+  repeated Node nodes_siblings = 5;
   repeated Node nodes_siblings_before = 6;
   repeated Node nodes_siblings_after = 7;
 }
