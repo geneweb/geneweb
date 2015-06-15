@@ -18,6 +18,7 @@ let _index_person_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/index-
 let _node_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/node"
 let _edge_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/edge"
 let _graph_tree_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/graph-tree"
+let _graph_tree_new_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/graph-tree-new"
 let _graph_tree_params_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/graph-tree-params"
 let _title_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/title"
 let _person_tree_full_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/person-tree-full"
@@ -105,6 +106,11 @@ let parse_graph_tree ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _graph_tree_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
   Api_saisie_read_piqi.parse_graph_tree buf
+
+let parse_graph_tree_new ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _graph_tree_new_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_graph_tree_new buf
 
 let parse_graph_tree_params ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _graph_tree_params_piqi_type format `pb x ?opts in
@@ -257,6 +263,11 @@ let gen_graph_tree ?opts x (format :Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _graph_tree_piqi_type `pb format x_pb ?opts
 
+let gen_graph_tree_new ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_graph_tree_new x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _graph_tree_new_piqi_type `pb format x_pb ?opts
+
 let gen_graph_tree_params ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_saisie_read_piqi.gen_graph_tree_params x in
   let x_pb = Piqirun.to_string buf in
@@ -407,6 +418,11 @@ let print_graph_tree ?opts x =
   Pervasives.print_endline (gen_graph_tree x `piq ?opts)
 let prerr_graph_tree ?opts x =
   Pervasives.prerr_endline (gen_graph_tree x `piq ?opts)
+
+let print_graph_tree_new ?opts x =
+  Pervasives.print_endline (gen_graph_tree_new x `piq ?opts)
+let prerr_graph_tree_new ?opts x =
+  Pervasives.prerr_endline (gen_graph_tree_new x `piq ?opts)
 
 let print_graph_tree_params ?opts x =
   Pervasives.print_endline (gen_graph_tree_params x `piq ?opts)

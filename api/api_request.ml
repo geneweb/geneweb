@@ -108,6 +108,7 @@ value family_m conf base =
   | Some "API_UPDATE_FAMILY" -> Api_update_family.print_mod conf base
 *)
   | Some "API_GRAPH_TREE" -> Api_saisie_read.print_graph_tree conf base
+  | Some "API_GRAPH_TREE_V2" -> Api_saisie_read.print_graph_tree_v2 conf base
   | Some "API_GRAPH_TREE_FULL" -> Api_saisie_read.print_graph_tree_full conf base
   | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
 
