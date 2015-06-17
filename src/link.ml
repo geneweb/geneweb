@@ -143,13 +143,25 @@ let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
     and errorBuffer = ref "" in
     try
       let connection = Curl.init () in
-      (* On ajoute dans les headers les informations pour l'auto-connection. *)
-      (* Les droits wizard/friend suivront automatiquement.                  *)
-      let auth = Wserver.extract_param "authorization: " '\r' request in
-      if auth <> "" then
-        Curl.set_httpheader connection
-          [("Authorization: " ^ auth); ("Gw-Connection-Type: auto")]
-      else ();
+      let headers = [] in
+      let headers =
+        (* On ajoute dans les headers les informations pour l'auto-connection. *)
+        (* Les droits wizard/friend suivront automatiquement.                  *)
+        let auth = Wserver.extract_param "authorization: " '\r' request in
+        if auth <> "" then
+          ("Authorization: " ^ auth) :: ("Gw-Connection-Type: auto") :: headers
+        else headers
+      in
+      let headers =
+        (* On ajoute dans les headers la base redis que l'on veut utiliser. *)
+        let redis_moderate =
+          Wserver.extract_param "redis-moderate: " '\r' request
+        in
+        if redis_moderate <> "" then
+          ("Redis-Moderate: " ^ redis_moderate) :: headers
+        else headers
+      in
+      Curl.set_httpheader connection headers;
       Curl.set_errorbuffer connection errorBuffer;
       Curl.set_writefunction connection (writer result);
       Curl.set_followlocation connection true;

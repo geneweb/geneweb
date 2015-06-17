@@ -12,8 +12,15 @@ open Redis
 open Redis_sync.Client
 
 
-let redis_host = ref "127.0.0.1" ;;
-let redis_port = ref 6379 ;;
+(* base redis contenant tous les liens. *)
+let redis_host_all = ref "127.0.0.1" ;;
+let redis_port_all = ref 6379 ;;
+(* base redis contenant tous les liens modérés. *)
+let redis_host_moderate = ref "127.0.0.1" ;;
+let redis_port_moderate = ref 6379 ;;
+(* base redis utilisée. *)
+let redis_host = ref !redis_host_all ;;
+let redis_port = ref !redis_port_all ;;
 let api_servers = ref [] ;;
 
 
@@ -532,12 +539,23 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
     let result = Buffer.create 16384
     and errorBuffer = ref "" in
     try
-      let auth = Wserver.extract_param "authorization: " '\r' request in
       let connection = Curl.init () in
-      if auth <> "" then
-        Curl.set_httpheader connection
-          [("Authorization: " ^ auth); ("Gw-Connection-Type: auto")]
-      else ();
+      let headers = [] in
+      let headers =
+        let auth = Wserver.extract_param "authorization: " '\r' request in
+        if auth <> "" then
+          ("Authorization: " ^ auth) :: ("Gw-Connection-Type: auto") ::headers
+        else headers
+      in
+      let headers =
+        let redis_moderate =
+          Wserver.extract_param "redis-moderate: " '\r' request
+        in
+        if redis_moderate <> "" then
+          ("Redis-Moderate: " ^ redis_moderate) :: headers
+        else headers
+      in
+      Curl.set_httpheader connection headers;
       Curl.set_errorbuffer connection errorBuffer;
       Curl.set_writefunction connection (writer result);
       Curl.set_followlocation connection true;
@@ -577,6 +595,21 @@ let print_link_tree conf base =
   let nb_asc = Int32.to_int params.MLink.Link_tree_params.nb_asc in
   let from_gen_desc = Int32.to_int params.MLink.Link_tree_params.from_gen_desc in
   let nb_desc = Int32.to_int params.MLink.Link_tree_params.nb_desc in
+
+  (* Choix de la base redis en fonction du header envoyé. *)
+  let redis_moderate =
+    Wserver.extract_param "redis-moderate: " '\r' conf.request
+  in
+  if redis_moderate <> "" then
+    begin
+      redis_host := !redis_host_moderate;
+      redis_port := !redis_port_moderate;
+    end
+  else
+    begin
+      redis_host := !redis_host_all;
+      redis_port := !redis_port_all;
+    end;
 
   let redis = create_redis_connection () in
 
