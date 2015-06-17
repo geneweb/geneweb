@@ -19,6 +19,7 @@ DEPENDANCIES:
   ocurl
   ocaml-redis (https://github.com/0xffea/ocaml-redis)
   js_of_ocaml
+  yojson
 
 NOTE 1: While the issue about the Hashtbl is not fixed, use OCaml 3.12
 
