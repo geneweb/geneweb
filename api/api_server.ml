@@ -1810,11 +1810,23 @@ value main () =
             try
               let host = Unix.gethostbyname x in
               let url = Unix.string_of_inet_addr host.Unix.h_addr_list.(0) in
-              Api_link.redis_host.val := url
-            with _ -> Api_link.redis_host.val := x),
+              Api_link.redis_host_all.val := url
+            with _ -> Api_link.redis_host_all.val := x),
         "host redis for links tree");
        ("-redis_p",
-        Arg.Int (fun x -> Api_link.redis_port.val := x),
+        Arg.Int (fun x -> Api_link.redis_port_all.val := x),
+        "redis port for links tree");
+       ("-redis_moderate",
+        Arg.String
+          (fun x ->
+            try
+              let host = Unix.gethostbyname x in
+              let url = Unix.string_of_inet_addr host.Unix.h_addr_list.(0) in
+              Api_link.redis_host_moderate.val := url
+            with _ -> Api_link.redis_host_moderate.val := x),
+        "host redis for links tree");
+       ("-redis_p_moderate",
+        Arg.Int (fun x -> Api_link.redis_port_moderate.val := x),
         "redis port for links tree");
        ("-links_tree_url",
         Arg.String
