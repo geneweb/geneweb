@@ -10,16 +10,18 @@ Protocol Buffer to exchange informations encoded as pb, json, xml.
 DEPENDANCIES:
 
   OCaml
-  Camlp5
+  camlp5
+  lwt
+  mysql
   ocamlfind
+  ocurl
   piqi
   piqilib
   protobuf
-  mysql
-  ocurl
-  ocaml-redis (https://github.com/0xffea/ocaml-redis)
-  js_of_ocaml
+  re
+  uuidm
   yojson
+  ocaml-redis (https://github.com/geneanet/ocaml-redis)
 
 NOTE 1: While the issue about the Hashtbl is not fixed, use OCaml 3.12
 
