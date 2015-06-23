@@ -44,3 +44,4 @@ src/update_nldb
 src/update_nldb.opt
 
 tools/Makefile.inc
+tools/Makefile.ocaml

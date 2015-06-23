@@ -29,14 +29,17 @@ else
     exit 1
 fi
 
-D_CAMLP5D=`ocamlfind query camlp5`/
+D_GW_DIR=`pwd`/
 
 if test -e "tools/Makefile.inc"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.inc > tools/Makefile.inc.tmp
+  sed "s|^\(GW_DIR=\).*|\1$D_GW_DIR|" tools/Makefile.inc > tools/Makefile.inc.tmp
   mv tools/Makefile.inc.tmp tools/Makefile.inc
 fi
 
-if test -e "contrib/history/build.sh"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" contrib/history/build.sh > contrib/history/build.sh.tmp
-  mv contrib/history/build.sh.tmp contrib/history/build.sh
+D_CAMLP5D=`ocamlfind query camlp5`/
+
+cp tools/Makefile.ocaml.inc tools/Makefile.ocaml
+if test -e "tools/Makefile.ocaml"; then
+  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
 fi
