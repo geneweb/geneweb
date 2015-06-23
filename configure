@@ -21,3 +21,22 @@ else
   cp tools/Makefile.inc.win tools/Makefile.inc
 fi
 rm tools/tmp
+
+if ocamlfind printconf >/dev/null 2>&1; then :
+else
+    echo "Could not find ocamlfind in the path."
+    echo "You may need to update the various Makefiles by hand."
+    exit 1
+fi
+
+D_CAMLP5D=`ocamlfind query camlp5`/
+
+if test -e "tools/Makefile.inc"; then
+  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.inc > tools/Makefile.inc.tmp
+  mv tools/Makefile.inc.tmp tools/Makefile.inc
+fi
+
+if test -e "contrib/history/build.sh"; then
+  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" contrib/history/build.sh > contrib/history/build.sh.tmp
+  mv contrib/history/build.sh.tmp contrib/history/build.sh
+fi
