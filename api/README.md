@@ -38,6 +38,4 @@ CONTENTS:
   api_server.ml         module for the configuration of the server
   Makefile              main Makefile
   README.md             this file
-  package               deprecated (local dependancies)
   service               all the modules that computes the requests' results
-  service/lib           deprecated (local dependancies)
