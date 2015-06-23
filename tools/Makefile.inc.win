@@ -1,5 +1,6 @@
 # $Id: Makefile.inc.win,v 5.7 2007-09-12 09:58:44 ddr Exp $
 
+GW_DIR=
 TOP=..
 CAMLP5_COMM=TOP=$(TOP) $(TOP)/tools/camlp5_comm.sh
 CAMLP5F=-DWIN95
@@ -14,6 +15,8 @@ RM=rm -f
 EXE=.exe
 STATIC=
 TEST_DIR=test $$(basename "$<") = "$<" || { echo "Please run 'make' in directory '$$(dirname "$<")' first"; exit 1; }
+
+include $(GW_DIR)/tools/Makefile.ocaml
 
 all::
 opt::
