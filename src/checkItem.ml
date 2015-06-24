@@ -1174,8 +1174,8 @@ value family base error warning ifam fam =
   do {
     (* Il faudrait faire mieux que pas tester le sex des marraiges. *)
     (*check_marriage_sex base error warning fam;*)
-    (*check_normal_marriage_date_for_parent base error warning (ifam, fam);*)
-    (*check_normal_marriage_date_for_witness base error warning (ifam, fam);*)
+    check_normal_marriage_date_for_parent base error warning (ifam, fam);
+    check_normal_marriage_date_for_witness base error warning (ifam, fam);
     check_fevents base error warning (ifam, fam);
     check_children base error warning (ifam, fam);
     sort_fevents base warning (ifam, fam);
@@ -1209,7 +1209,7 @@ value reduce_family base error warning ifam fam =
   do {
     (* Il faudrait faire mieux que pas tester le sex des marraiges. *)
     (*check_marriage_sex base error warning fam;*)
-    (*check_normal_marriage_date_for_parent base error warning (ifam, fam);*)
+    check_normal_marriage_date_for_parent base error warning (ifam, fam);
     check_reduce_fevents base error warning (ifam, fam);
     check_children base error warning (ifam, fam)
   }
