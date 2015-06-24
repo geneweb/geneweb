@@ -1,18 +1,9 @@
 # $Id: Makefile,v 0.001 2014-02-21 16:47:52 flh Exp $
 
 include ../../tools/Makefile.inc
+
 TOP=../..
 CAMLP5_COMM=TOP=$(TOP) $(TOP)/tools/camlp5_comm.sh
-CAMLP5F=-DUNIX
-CAMLP5D=~/.opam/system/lib/camlp5/
-LIBUNIX=-cclib -lunix
-OCAMLC=ocamlc.opt -warn-error A
-OCAMLOPT=ocamlopt.opt -warn-error A -annot -g
-STRIP=strip
-RM=/bin/rm -f
-STATIC=-ccopt -static
-STATIC=
-TEST_DIR=test $$(basename "$<") = "$<" || { echo "Please run 'make' in directory '$$(dirname "$<")' first"; exit 1; }
 
 GW=../..
 OCAMLI=-I $(GW)/src

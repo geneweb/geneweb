@@ -1,7 +1,7 @@
 # $Id: Makefile.gwpublic,v 1.4 2008/03/31 11:36:28 deraugla Exp $
 
+include ../../tools/Makefile.ocaml
 
-CAMLP5D=~/.opam/system/lib/camlp5/
 LIBUNIX=-cclib -lunix
 
 GW=../../src

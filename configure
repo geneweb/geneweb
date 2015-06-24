@@ -42,52 +42,15 @@ D_MYSQL=`ocamlfind query mysql`/
 D_OCURL=`ocamlfind query curl`/
 D_OREDIS=`ocamlfind query redis`/
 D_RE=`ocamlfind query re`/
-
 if test -e "tools/Makefile.ocaml"; then
   sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
   mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-fi
-
-if test -e "src/Makefile"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" src/Makefile > src/Makefile.tmp
-  mv src/Makefile.tmp src/Makefile
-fi
-
-if test -e "contrib/gwFix/Makefile"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" contrib/gwFix/Makefile > contrib/gwFix/Makefile.tmp
-  mv contrib/gwFix/Makefile.tmp contrib/gwFix/Makefile
-fi
-
-if test -e "contrib/wrap/Makefile"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" contrib/wrap/Makefile > contrib/wrap/Makefile.tmp
-  mv contrib/wrap/Makefile.tmp contrib/wrap/Makefile
-fi
-
-if test -e "contrib/history/build.sh"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" contrib/history/build.sh > contrib/history/build.sh.tmp
-  mv contrib/history/build.sh.tmp contrib/history/build.sh
-fi
-
-if test -e "api/Makefile"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-  sed "s|^\(MYSQLD=\).*|\1$D_MYSQL|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-  sed "s|^\(OCURL=\).*|\1$D_OCURL|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-  sed "s|^\(OREDIS=\).*|\1$D_OREDIS|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-  sed "s|^\(RE=\).*|\1$D_RE|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-fi
-
-if test -e "api/service/Makefile"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-  sed "s|^\(MYSQLD=\).*|\1$D_MYSQL|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-  sed "s|^\(OCURL=\).*|\1$D_OCURL|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
-  sed "s|^\(OREDIS=\).*|\1$D_OREDIS|" api/Makefile > api/Makefile.tmp
-  mv api/Makefile.tmp api/Makefile
+  sed "s|^\(MYSQL=\).*|\1$D_MYSQL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+  sed "s|^\(OCURL=\).*|\1$D_OCURL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+  sed "s|^\(OREDIS=\).*|\1$D_OREDIS|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+  sed "s|^\(RE=\).*|\1$D_RE|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
 fi
