@@ -1,13 +1,8 @@
 # $Id: Makefile,v 5.18 2007-09-12 09:58:44 ddr Exp $
 
+include ../tools/Makefile.ocaml
 
 CAMLP5F=-DUNIX
-CAMLP5D=~/.opam/system/lib/camlp5/
-MYSQLD=~/.opam/system/lib/mysql/
-OCURL=~/.opam/system/lib/ocurl/
-OREDIS=~/.opam/system/lib/redis/
-RE=~/.opam/system/lib/re/
-LREDIS=~/local_devel/ocaml-redis/_build/src/
 OCAMLOPT=ocamlfind ocamlopt -warn-error A -annot -g
 DEPEND_REDIS=utils.cmx mutex.cmx client.cmx cache.cmx redis_sync.cmx
 STRIP=strip

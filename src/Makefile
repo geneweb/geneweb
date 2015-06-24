@@ -2,8 +2,6 @@
 
 include ../tools/Makefile.inc
 
-OCURL=~/.opam/system/lib/ocurl/
-
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html -I ../api/service
 GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo db1link.cmo gwc.cmo
