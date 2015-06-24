@@ -23,14 +23,10 @@ DEPENDANCIES:
   yojson
   ocaml-redis (https://github.com/geneanet/ocaml-redis)
 
-NOTE 1: While the issue about the Hashtbl is not fixed, use OCaml 3.12
-
-NOTE 2: Don't forget to edit the Makefile (tools/Makefile and api/Makefile)
-and change the values to mirror your installation. For example, change
-CAMLP5D=~/.opam/system/lib/camlp5/ into CAMLP5D=~/.opam/3.12.1/lib/camlp5/
-
-NOTE 3: Following the previous note, if you build ocaml-redis from sources,
-change the value to point to your own installation (api/Makefile).
+NOTE : Run the configure script to update the ocaml variables
+(tools/Makefile.ocaml). You need to build ocaml-redis from source
+(see link), and then update tools/Makefile.ocaml and change the
+variable LREDIS to point to your own installation.
 
 CONTENTS:
 
