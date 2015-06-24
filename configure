@@ -22,23 +22,22 @@ else
 fi
 rm tools/tmp
 
-if ocamlfind printconf >/dev/null 2>&1; then :
-else
-    echo "Could not find ocamlfind in the path."
-    echo "You may need to update the various Makefiles by hand."
-    exit 1
-fi
-
 D_GW_DIR=`pwd`/
-
 if test -e "tools/Makefile.inc"; then
   sed "s|^\(GW_DIR=\).*|\1$D_GW_DIR|" tools/Makefile.inc > tools/Makefile.inc.tmp
   mv tools/Makefile.inc.tmp tools/Makefile.inc
 fi
 
-D_CAMLP5D=`ocamlfind query camlp5`/
-
 cp tools/Makefile.ocaml.inc tools/Makefile.ocaml
+
+if ocamlfind printconf >/dev/null 2>&1; then :
+else
+    echo "Could not find ocamlfind in the path."
+    echo "You may need to update Makefile.ocaml by hand."
+    exit 1
+fi
+
+D_CAMLP5D=`ocamlfind query camlp5`/
 if test -e "tools/Makefile.ocaml"; then
   sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
   mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
