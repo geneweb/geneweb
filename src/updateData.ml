@@ -80,6 +80,8 @@ value get_data conf =
          ("ma", Family get_marriage_src); 
          ("fe", Fevent (fun evt -> evt.efam_src));
          ("f", Family get_fsources) ], True)
+  | Some "surname" ->
+      ([ ("surname", Person get_surname) ], False)
   | _ -> ([], False) ]
 ;
 
@@ -385,6 +387,7 @@ value translate_title conf =
     [ Some "occu" -> transl_nth conf "occupation/occupations" 1
     | Some "place" -> transl conf "places"
     | Some "src" -> transl_nth conf "source/sources" 1
+    | Some "surname" -> transl_nth conf "surname/surnames" 1
     | _ -> "" ]
   in
   (Printf.sprintf (ftransl conf "book of %s") title, title)
@@ -547,7 +550,14 @@ value print_long conf base list len =
                             xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
                             xtag "input" "type=\"text\" name=\"nx_input\" size=\"80\" maxlength=\"%d\" value=\"%s\" id=\"nx_input\""
                               (if data = "src" then 300 else 200) (quote_escaped (only_printable s)) ;
+                            if data = "surname" then
+                                tag "input" "type=\"checkbox\" name=\"surname_aliases\" value=\"true\"" begin
+                                    Wserver.wprint "%s" (capitale (transl conf "add the previous name as a surname alias"));
+                                end
+                            else
+                                ();
                           end;
+
                           tag "td" begin
                             xtag "input" "type=\"submit\" value=\"Ok\"" ;
                           end;
@@ -788,6 +798,40 @@ value update_person conf base old new_input p =
         baptism_src = baptism_src; death_src = death_src;
         burial_src = burial_src; psources = psources_src;
         pevents = pevents }
+  | Some "surname" ->
+        let new_istr = Gwdb.insert_string base (only_printable new_input) in
+        let surname = get_surname p in
+        let s_surname = sou base surname in
+        let surnames_aliases = get_surnames_aliases p in
+        let surname_lower = Name.lower s_surname in
+        let surnames_aliases =
+            if p_getenv conf.env "surname_aliases" = Some "true" then
+                let lower_exists =
+                    List.fold_left
+                        (fun result alias ->
+                            result ||
+                                (surname_lower = (Name.lower (sou base alias)))
+                        )
+                        False
+                        surnames_aliases
+                in
+                if lower_exists
+                then
+                    surnames_aliases
+                else
+                    [surname :: surnames_aliases]
+            else
+                surnames_aliases
+        in
+        let (surname, occ) =
+            if old = s_surname then
+                (new_istr, Gutil.find_free_occ base (p_first_name base p) s_surname 0)
+            else (surname, get_occ p)
+        in
+        { (gen_person_of_person p) with surname = surname;
+            surnames_aliases = surnames_aliases;
+            occ = occ}
+
   | _ ->  gen_person_of_person p ]
 ;
 
@@ -867,6 +911,7 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
     [ Some "occu" -> "co"
     | Some "place" -> "cp"
     | Some "src" -> "cs"
+    | Some "surname" -> "sn"
     | _ -> "" ]
   in
   let list =
@@ -890,7 +935,17 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
           else ();
           (* On met aussi à jour l'historique. *)
           let changed = U_Multi (Util.string_gen_person base np) in
-          History.record conf base changed action; } )
+          History.record conf base changed action;
+
+          if (action = "sn") then do {
+            delete_key base (sou base (get_surname p)) (sou base (get_first_name p)) (get_occ p);
+            patch_key base (get_key_index p) (sou base np.first_name) (sou base np.surname) np.occ;
+            let key = sou base (np.first_name) ^ " " ^ (sou base np.surname) in
+            patch_name base key (get_key_index p);
+            Update.update_misc_names_of_family base (get_sex p) {family = get_family p}
+          } else
+            ();
+        } )
         perl } )
     list;
   Util.commit_patches conf base;
@@ -1359,7 +1414,7 @@ value print_mod conf base =
   if p_getenv conf.env "old" = Some "on" then print_mod_old conf base
   else
     match p_getenv conf.env "data" with
-    [ Some ("place" | "src" | "occu") ->
+    [ Some ("place" | "src" | "occu" | "surname") ->
         let list = build_list conf base in
         let env = [("list", Vlist_data list)] in
         Hutil.interp conf base "upddata"
