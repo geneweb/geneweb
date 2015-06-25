@@ -623,9 +623,8 @@ value parent_has_title conf base p =
       fonction de son age.
       Renvoie (dans l'ordre des tests) :
         - Vrai si : magicien ou ami ou la personne est public
-        - Vrai si : la personne est en si_titre, qu'elle ou ses parents
-                    ont au moins un titre et que public_if_title = yes
-                    dans le fichier gwf
+        - Vrai si : la personne est en si_titre, si elle a au moins un
+                    titre et que public_if_title = yes dans le fichier gwf
         - Faux si : la personne n'est pas décédée et private_years > 0
         - Vrai si : la personne est plus agée (en fonction de la date de
                     naissance ou de la date de baptème) que privates_years
@@ -648,7 +647,7 @@ value authorized_age conf base p =
   if conf.wizard || conf.friend || get_access p = Public then True
   else if
     conf.public_if_titles && get_access p = IfTitles &&
-    (nobtit conf base p <> [] || parent_has_title conf base p) then
+    nobtit conf base p <> [] then
     True
   else
     match
