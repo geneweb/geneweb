@@ -552,7 +552,7 @@ value print_long conf base list len =
                               (if data = "src" then 300 else 200) (quote_escaped (only_printable s)) ;
                             if data = "surname" then
                                 tag "input" "type=\"checkbox\" name=\"surname_aliases\" value=\"true\"" begin
-                                    Wserver.wprint "Add the previous name as a surname alias";
+                                    Wserver.wprint "%s" (capitale (transl conf "add the previous name as a surname alias"));
                                 end
                             else
                                 ();
@@ -929,20 +929,16 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
           (* On met aussi à jour l'historique. *)
           let changed = U_Multi (Util.string_gen_person base np) in
           History.record conf base changed action;
-         
-          let sp = UpdateInd.string_person_of base (poi base np.key_index)
-          in
-          let p' = UpdateIndOk.effective_mod conf base sp
-          in
-          patch_person base np.key_index p';
-          
-          if (action = "sn") then 
-            let f = get_family (poi base p'.key_index)
-            in
-              Update.update_misc_names_of_family base Male {family = f}
-            else ();
 
-          } )
+          if (action = "sn") then do {
+            delete_key base (sou base (get_surname p)) (sou base (get_first_name p)) (get_occ p);
+            patch_key base (get_key_index p) (sou base np.first_name) (sou base np.surname) np.occ;
+            let key = sou base (np.first_name) ^ " " ^ (sou base np.surname) in
+            patch_name base key (get_key_index p);
+            Update.update_misc_names_of_family base (get_sex p) {family = get_family p}
+          } else
+            ();
+        } )
         perl } )
     list;
   Util.commit_patches conf base;
