@@ -550,13 +550,12 @@ value print_long conf base list len =
                             xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
                             xtag "input" "type=\"text\" name=\"nx_input\" size=\"80\" maxlength=\"%d\" value=\"%s\" id=\"nx_input\""
                               (if data = "src" then 300 else 200) (quote_escaped (only_printable s)) ;
-                            (* Won't compile!
                             if data = "surname" then
                                 tag "input" "type=\"checkbox\" name=\"surname_aliases\" value=\"true\"" begin
-                                    Wserver.print "Add the previous name as a surname alias"
+                                    Wserver.wprint "Add the previous name as a surname alias";
                                 end
-                            end
-                            *)
+                            else
+                                ();
                           end;
 
                           tag "td" begin
@@ -804,12 +803,24 @@ value update_person conf base old new_input p =
         let surname = get_surname p in
         let s_surname = sou base surname in
         let surnames_aliases = get_surnames_aliases p in
-        let surnames_aliases = do {
+        let surname_lower = Name.lower s_surname in
+        let surnames_aliases =
             if p_getenv conf.env "surname_aliases" = Some "true" then
-                [surname :: surnames_aliases]
+                if
+                    List.fold_left
+                        (fun result alias ->
+                            result ||
+                                (surname_lower = (Name.lower (sou base alias)))
+                        )
+                        False
+                        surnames_aliases
+                then 
+                    surnames_aliases
+                else
+                    [surname :: surnames_aliases]
             else
                 surnames_aliases
-        } in
+        in
         let surname = if old = s_surname then new_istr else surname in
         { (gen_person_of_person p) with surname = surname;
             surnames_aliases = surnames_aliases }
@@ -917,7 +928,21 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
           else ();
           (* On met aussi à jour l'historique. *)
           let changed = U_Multi (Util.string_gen_person base np) in
-          History.record conf base changed action; } )
+          History.record conf base changed action;
+         
+          let sp = UpdateInd.string_person_of base (poi base np.key_index)
+          in
+          let p' = UpdateIndOk.effective_mod conf base sp
+          in
+          patch_person base np.key_index p';
+          
+          if (action = "sn") then 
+            let f = get_family (poi base p'.key_index)
+            in
+              Update.update_misc_names_of_family base Male {family = f}
+            else ();
+
+          } )
         perl } )
     list;
   Util.commit_patches conf base;

@@ -929,6 +929,8 @@ value effective_mod conf base sp = do {
   let pi = sp.key_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
+  let () = print_string key in
+  let () = print_newline () in
   let ofn = p_first_name base op in
   let osn = p_surname base op in
   let oocc = get_occ op in
@@ -945,6 +947,7 @@ value effective_mod conf base sp = do {
   if sp.first_name <> "?" && sp.surname <> "?" &&
      (not same_fn_sn || oocc <> sp.occ)
   then do {
+    print_string "updating the indexes!\n";
     delete_key base ofn osn oocc;
     patch_key base pi sp.first_name sp.surname sp.occ;
     if not same_fn_sn then patch_name base key pi else ();
