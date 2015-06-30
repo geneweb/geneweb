@@ -430,7 +430,13 @@ value reconstitute_from_fevents conf fevents marr div =
   (marr, div)
 ;
 
-value reconstitute_family conf base =
+value reconstitute_family: config -> base ->
+         (gen_family Update.key string *
+          gen_couple Update.key *
+          gen_descend (string * string * int * Update.create * string)  *
+          bool)
+
+= fun conf base ->
   let ext = False in
   let relation =
     match (p_getenv conf.env "mrel", p_getenv conf.env "nsck") with
@@ -595,6 +601,7 @@ value reconstitute_family conf base =
   (fam, cpl, des, ext)
 ;
 
+(* Removes events without a name and withnessess without a name *)
 value strip_events fevents =
   let strip_array_witness pl =
     let pl =
@@ -618,6 +625,7 @@ value strip_events fevents =
     fevents []
 ;
 
+(* remove persons with empty firstname *)
 value strip_array_persons pl =
   let pl =
     List.fold_right
@@ -645,7 +653,7 @@ value check_event_witnesses conf base witnesses =
     [ [] -> None
     | [((fn, sn, _, _, _), _) :: l] ->
         if fn = "" && sn = "" then
-          (* Champs non renseigné, il faut passer au suivant *)
+          (* If fields are empty go next *)
           loop l
         else if fn = "" || fn = "?" then
           Some ((transl_nth conf "witness/witnesses" 0) ^ (" : ")
@@ -699,7 +707,7 @@ value check_parents conf base cpl =
 ;
 
 value check_family conf base fam cpl =
-  (* N'est plus nécessaire avec les évènements. Est fait dans fevents. *)
+  (* Not necessary to deal with events. It's done in fevents. *)
   (*let err_witness = check_witnesses conf base fam in*)
   let err_parents = check_parents conf base cpl in
   let err_fevent_witness =
@@ -1159,8 +1167,7 @@ value update_family_with_fevents conf base fam =
        fam.marriage_note, fam.marriage_src)
       fam.divorce
   in
-  let (relation, marriage, marriage_place,
-       marriage_note, marriage_src) =
+  let (relation, marriage, marriage_place, marriage_note, marriage_src) =
     marr
   in
   let divorce = div in
@@ -1332,7 +1339,12 @@ value effective_mod conf base sfam scpl sdes = do {
   (fi, nfam, ncpl, ndes)
 };
 
-value effective_add conf base sfam scpl sdes =
+value effective_add: config -> base ->
+                     gen_family Update.key string ->
+                     gen_couple Update.key  ->
+                     gen_descend Update.key ->
+                     (ifam * gen_family iper istr * gen_couple iper * gen_descend iper)
+= fun conf base sfam scpl sdes ->
   let fi = Adef.ifam_of_int (nb_of_families base) in
   let created_p = ref [] in
   let psrc =
@@ -1374,29 +1386,73 @@ value effective_add conf base sfam scpl sdes =
     }
     else if Adef.father ncpl = Adef.mother ncpl then print_err conf base
     else ();
-    let nfam = {(nfam) with origin_file = origin_file; fam_index = fi} in
-    patch_family base fi nfam;
-    patch_couple base fi ncpl;
-    patch_descend base fi ndes;
-    let nfath_u = {family = Array.append (get_family nfath_p) [| fi |]} in
-    let nmoth_u = {family = Array.append (get_family nmoth_p) [| fi |]} in
-    patch_union base (Adef.father ncpl) nfath_u;
-    patch_union base (Adef.mother ncpl) nmoth_u;
-    Array.iter
-      (fun ip ->
-         let p = poi base ip in
-         match get_parents p with
-         [ Some _ -> print_err_parents conf base p
-         | None ->
-             let a = {parents = Some fi; consang = Adef.fix (-1)} in
-             patch_ascend base (get_key_index p) a ])
-      ndes.children;
+
+    let family_exists =
+      try
+        let xs = Array.to_list (get_family nfath_p) in
+        let f ifam =
+          let fam = foi base ifam in
+          let mom = poi base (get_mother fam) in
+          eq_istr (get_first_name mom) (get_first_name nmoth_p) &&
+            eq_istr (get_surname mom) (get_surname nmoth_p)
+        in
+        Some (List.find f xs)
+      with [ Not_found -> None ]
+    in
+
+    let fi =
+      match family_exists with
+      [ Some fi -> do {
+        Array.iter
+          (fun ip ->
+             let p = poi base ip in
+             match get_parents p with
+             [ Some _ -> print_err_parents conf base p
+             | None ->
+                let a = {parents = Some fi; consang = Adef.fix (-1)} in
+                patch_ascend base (get_key_index p) a ])
+          ndes.children;
+
+       let fam = foi base fi in
+       let fam_ch = gen_descend_of_descend fam in
+       patch_descend base fi { children = Array.append fam_ch.children ndes.children };
+       patch_couple base fi ncpl;
+
+       fi
+      }
+      | None -> do {
+          let nfam = {(nfam) with origin_file = origin_file; fam_index = fi } in
+          patch_family base fi nfam;
+          patch_couple base fi ncpl;
+          patch_descend base fi ndes;
+
+          let nfath_u = {family = Array.append (get_family nfath_p) [| fi |]} in
+          let nmoth_u = {family = Array.append (get_family nmoth_p) [| fi |]} in
+          patch_union base (Adef.father ncpl) nfath_u;
+          patch_union base (Adef.mother ncpl) nmoth_u;
+
+          Array.iter (fun ip ->
+            let p = poi base ip in
+            match get_parents p with
+              [ Some _ -> print_err_parents conf base p
+              | None ->
+                let a = {parents = Some fi; consang = Adef.fix (-1)} in
+                patch_ascend base (get_key_index p) a ])
+          ndes.children;
+
+          Update.update_misc_names_of_family base Male nfath_u;
+        fi
+        }
+      ]
+    in
     Update.add_misc_names_for_new_persons base created_p.val;
-    Update.update_misc_names_of_family base Male nfath_u;
-    let nl_witnesses = Array.to_list nfam.witnesses in
-    let nl_fevents = fwitnesses_of nfam.fevents in
-    let nl = List.append nl_witnesses nl_fevents in
-    Update.update_related_pointers base (Adef.father ncpl) [] nl;
+
+    let () =
+      let nl_witnesses = Array.to_list nfam.witnesses in
+      let nl_fevents = fwitnesses_of nfam.fevents in
+      let nl = List.append nl_witnesses nl_fevents in
+      Update.update_related_pointers base (Adef.father ncpl) [] nl
+    in
     (fi, nfam, ncpl, ndes)
   }
 ;
@@ -1776,7 +1832,12 @@ value print_del conf base =
   | _ -> incorrect_request conf ]
 ;
 
-value print_mod_aux conf base callback =
+value print_mod_aux
+  : config -> base ->
+    (gen_family Update.key string ->
+     gen_couple Update.key -> gen_descend Update.key -> unit) ->
+    unit
+= fun conf base callback ->
   try
     let (sfam, scpl, sdes, ext) = reconstitute_family conf base in
     let redisp =

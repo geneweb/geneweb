@@ -9,6 +9,9 @@ type cdate = 'a;
 type codate = 'a;
 type gen_couple 'person = 'a;
 
+value string_of_ifam : ifam -> string;
+value string_of_iper : iper -> string;
+
 type date =
   [ Dgreg of dmy and calendar
   | Dtext of string ]

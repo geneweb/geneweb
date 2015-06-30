@@ -18,6 +18,8 @@ type create_info =
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 
+value string_of_key: key -> string;
+
 value infer_death : config -> option date -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
 
