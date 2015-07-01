@@ -676,6 +676,13 @@ let build_graph_asc_lia conf base p max_gen base_loop =
       to_node = id_to;
     })
   in
+  let create_node p base_prefix =
+    (* Pour les liens inter arbres, on rend l'id unique avec *)
+    (* le prefix de la base et l'index de la personne.       *)
+    let uniq_id = Hashtbl.hash (base_prefix, get_key_index p) in
+    let id = Int64.of_int uniq_id in
+    (id, p)
+  in
   let create_family ifam families =
     if p_getenv conf.env "full_infos" = Some "1" then
       families := (fam_to_piqi_family conf base ifam) :: !families
@@ -706,7 +713,8 @@ let build_graph_asc_lia conf base p max_gen base_loop =
                     let cpl = foi base ifam in
                     let fath = poi base (get_father cpl) in
                     let moth = poi base (get_mother cpl) in
-                    nodes := moth :: fath :: !nodes;
+                    nodes := create_node fath conf.command :: !nodes;
+                    nodes := create_node moth conf.command :: !nodes;
                     edges := (create_edge conf.command p conf.command fath) :: !edges;
                     edges := (create_edge conf.command p conf.command moth) :: !edges;
                     create_family ifam families;
@@ -745,7 +753,8 @@ let build_graph_asc_lia conf base p max_gen base_loop =
                                         | (Some pfath, Some pmoth, Some c) ->
                                             let (fath, _) = Perso_link.make_ep_link conf base pfath in
                                             let (moth, _) = Perso_link.make_ep_link conf base pmoth in
-                                            nodes := moth :: fath :: !nodes;
+                                            nodes := create_node fath pfath.MLink.Person.baseprefix :: !nodes;
+                                            nodes := create_node moth pmoth.MLink.Person.baseprefix :: !nodes;
                                             edges := create_edge base_prefix p pfath.MLink.Person.baseprefix fath :: !edges;
                                             edges := create_edge base_prefix p pmoth.MLink.Person.baseprefix moth :: !edges;
                                             let ifath = get_key_index fath in
@@ -770,7 +779,7 @@ let build_graph_asc_lia conf base p max_gen base_loop =
   let nodes = ref [] in
   let edges = ref [] in
   let families = ref [] in
-  nodes := p :: !nodes;
+  nodes := create_node p conf.command :: !nodes;
   loop [(p, 1)] nodes edges families
 ;;
 
