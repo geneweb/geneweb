@@ -2278,8 +2278,7 @@ let person_node_map_lia conf base l =
   if p_getenvbin conf.env "full_infos" = Some "1" then
     PFull
       (List.rev_map
-         (fun p ->
-           let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
+         (fun (id, p) ->
            let p =
              pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
            in
@@ -2291,8 +2290,7 @@ let person_node_map_lia conf base l =
   else
     PLight
       (List.rev_map
-         (fun p ->
-           let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
+         (fun (id, p) ->
            let p =
              pers_to_piqi_person_light conf base p base_loop compute_sosa load_img
            in
