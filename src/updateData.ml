@@ -806,7 +806,7 @@ value update_person conf base old new_input p =
         let surname_lower = Name.lower s_surname in
         let surnames_aliases =
             if p_getenv conf.env "surname_aliases" = Some "true" then
-                if
+                let lower_exists =
                     List.fold_left
                         (fun result alias ->
                             result ||
@@ -814,7 +814,9 @@ value update_person conf base old new_input p =
                         )
                         False
                         surnames_aliases
-                then 
+                in
+                if lower_exists
+                then
                     surnames_aliases
                 else
                     [surname :: surnames_aliases]
