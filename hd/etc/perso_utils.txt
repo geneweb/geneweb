@@ -75,6 +75,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
+	%elseif;(xx = "x x" and cancel_private_links)<a>%xx</a>
     %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
   %end;
   %xx.title;%xx.dates;
