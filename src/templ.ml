@@ -921,7 +921,8 @@ value loc_of_expr =
 
 value templ_eval_var conf =
   fun
-  [ ["cancel_links"] -> VVbool conf.cancel_links
+  [ ["cancel_private_links"] -> VVbool conf.cancel_private_links
+  | ["cancel_links"] -> VVbool conf.cancel_links
   | ["cgi"] -> VVbool conf.cgi
   | ["false"] -> VVbool False
   | ["has_referer"] -> (* deprecated since version 5.00 *)
