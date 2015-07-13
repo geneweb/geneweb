@@ -1341,7 +1341,10 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
         year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
      today_wd = tm.Unix.tm_wday;
      time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
-     ctime = utm}
+     ctime = utm;
+     cancel_private_links =
+       try List.assoc "cancel_private_links" base_env = "yes" with
+         [ Not_found -> False ]}
   in
   (conf, sleep, ar)
 };
