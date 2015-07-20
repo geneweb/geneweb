@@ -611,7 +611,8 @@ value check_normal_marriage_date_for_parent base error warning (ifam, fam) =
  *     if order is ... B2 G B G G1 ... no change (a warning appears).
  *)
 
-value semi_sort base a before comp di =
+value semi_sort: base -> array iper -> ref (option (array iper)) -> (date -> date -> bool) -> int -> int -> unit
+= fun base a before comp di ->
   loop where rec loop i =
     if i < 0 || i >= Array.length a then ()
     else
