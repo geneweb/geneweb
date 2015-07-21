@@ -3019,7 +3019,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "is_private" -> get_access p = Private
   | "is_public" -> get_access p = Public
   | "is_restricted" -> is_hidden p
-  | "is_obfuscated" ->  not p_auth &&   (is_hide_names conf p)
+  | "is_obfuscated" ->  not p_auth && (is_hide_names conf p)
   | _ -> raise Not_found ]
 and eval_str_person_field conf base env ((p, p_auth) as ep) =
   fun
