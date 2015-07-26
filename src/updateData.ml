@@ -823,14 +823,16 @@ value update_person conf base old new_input p =
             else
                 surnames_aliases
         in
-        let (surname, occ) =
+        let surname =
             if old = s_surname then
-                (new_istr, Gutil.find_free_occ base (p_first_name base p) s_surname 0)
-            else (surname, get_occ p)
+                new_istr
+            else surname
+        in
+        let occ = Gutil.find_free_occ base (p_first_name base p) (sou base surname) 0
         in
         { (gen_person_of_person p) with surname = surname;
             surnames_aliases = surnames_aliases;
-            occ = occ}
+            occ = occ }
 
   | _ ->  gen_person_of_person p ]
 ;
