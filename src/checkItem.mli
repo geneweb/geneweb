@@ -43,5 +43,8 @@ value reduce_family :
 value sort_children :
   base -> array Adef.iper -> option (array Adef.iper * array Adef.iper);
 
+value insert_child :
+  base -> Adef.iper -> array Adef.iper -> array Adef.iper;
+
 value check_other_fields :
   base -> (base_misc -> unit) -> Def.ifam -> family -> unit;

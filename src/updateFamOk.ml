@@ -1415,8 +1415,14 @@ value effective_add: config -> base ->
 
        let fam = foi base fi in
        let fam_ch = gen_descend_of_descend fam in
+(*
        let children = Array.append fam_ch.children ndes.children in
        let _ : option (array iper * array iper) = CheckItem.sort_children base children in
+ *)
+       let children = Array.fold_left
+             (fun children person -> CheckItem.insert_child base person children)
+             fam_ch.children ndes.children
+       in
        patch_descend base fi { children = children };
        patch_couple base fi ncpl;
 

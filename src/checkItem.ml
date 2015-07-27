@@ -91,6 +91,7 @@ value time_elapsed d1 d2 =
           {day = day; month = month; year = year; prec = prec; delta = 0} ] ]
 ;
 
+(* True when 1st argument before the 2nd *)
 value strictly_before_dmy d1 d2 =
   let {day = d; month = m; year = y; prec = p} = time_elapsed d2 d1 in
   if y < 0 then True
@@ -599,6 +600,69 @@ value check_normal_marriage_date_for_parent base error warning (ifam, fam) =
 ;
 
 
+value get_date_info p =
+  match Adef.od_of_codate (get_birth p) with
+    [ Some d -> Some d
+    | None -> Adef.od_of_codate (get_baptism p) ]
+;
+
+type insert_result =
+  [ ToTheEnd
+  | ToPos of int ]
+;
+value insert_child base newip arr =
+  let arrlen = Array.length arr in
+  let newp = poi base newip in
+  let new_date = get_date_info newp in
+
+  match new_date with
+    [ Some newd ->
+       let rec find i =
+         if i>= arrlen then ToTheEnd
+         else let curpi = arr.(i) in
+              let curp = poi base curpi in
+              let curd = get_date_info curp in
+              match curd with
+                [ Some curd ->
+                  match compare_date newd curd  with
+                    [ -1 -> (* new person born earlier then current one*)
+                      ToPos i
+                    | 0  -> ToPos i
+                    | _  -> find (i+1)
+                    ]
+                | None -> ToPos i ]
+       in
+       match find 0 with
+         [ ToTheEnd -> Array.append arr [| newip |]
+         | ToPos k  -> Array.init (arrlen+1) (fun i ->
+                                              match compare i k with
+                                                [ 0 -> newip
+                                                | x when x<0 -> arr.(i)
+                                                | _ -> arr.(i-1) ] )
+         ]
+    | None ->
+       let rec find i =
+         if i>= arrlen then ToTheEnd
+         else let curpi = arr.(i) in
+              let curp = poi base curpi in
+              let curd = get_date_info curp in
+              match curd with
+                [ Some _ -> find (i+1)
+                | None ->   ToPos i ]
+       in
+       match find 0 with
+         [ ToTheEnd -> Array.append arr [| newip |]
+         | ToPos k  -> Array.init (arrlen+1) (fun i ->
+                                              match compare i k with
+                                                [ 0 -> newip
+                                                | x when x<0 -> arr.(i)
+                                                | _ -> arr.(i-1) ] )
+         ]
+    ]
+
+;
+
+
 (*
  * Semi sort children by birth dates.
  * If all children have birth dates, no problem.
@@ -613,26 +677,25 @@ value check_normal_marriage_date_for_parent base error warning (ifam, fam) =
 
 value semi_sort: base -> array iper -> ref (option (array iper)) -> (date -> date -> bool) -> int -> int -> unit
 = fun base a before comp di ->
+  let get_date p =
+    match Adef.od_of_codate (get_birth p) with
+      [ Some d -> Some d
+      | None -> Adef.od_of_codate (get_baptism p) ]
+  in
+  let arr_len = Array.length a in
+
   loop where rec loop i =
     if i < 0 || i >= Array.length a then ()
     else
       let p1 = poi base a.(i) in
-      let d1 =
-        match Adef.od_of_codate (get_birth p1) with
-        [ Some d1 -> Some d1
-        | None -> Adef.od_of_codate (get_baptism p1) ]
-      in
+      let d1 = get_date p1 in
       match d1 with
       [ Some d1 ->
           loop_j None (i - di) where rec loop_j sex_interm_sib j =
-            if j < 0 || j >= Array.length a then loop (i + di)
+            if j < 0 || j >= arr_len then loop (i + di)
             else
               let p2 = poi base a.(j) in
-              let d2 =
-                match Adef.od_of_codate (get_birth p2) with
-                [ Some d2 -> Some d2
-                | None -> Adef.od_of_codate (get_baptism p2) ]
-              in
+              let d2 = get_date p2 in
               match d2 with
               [ Some d2 ->
                   if comp d1 d2 then do {
@@ -648,14 +711,10 @@ value semi_sort: base -> array iper -> ref (option (array iper)) -> (date -> dat
                     [ Some j ->
                         let k =
                           loop_k (j - di) where rec loop_k k =
-                            if k < 0 || k >= Array.length a then k + di
+                            if k < 0 || k >= arr_len then k + di
                             else
                               let p3 = poi base a.(k) in
-                              let d3 =
-                                match Adef.od_of_codate (get_birth p3) with
-                                [ Some d3 -> Some d3
-                                | None -> Adef.od_of_codate (get_baptism p3) ]
-                              in
+                              let d3 = get_date p3 in
                               match d3 with
                               [ Some d3 ->
                                   if comp d1 d3 then loop_k (k - di)
