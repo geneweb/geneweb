@@ -91,7 +91,7 @@ value time_elapsed d1 d2 =
           {day = day; month = month; year = year; prec = prec; delta = 0} ] ]
 ;
 
-(* True when 1st argument before the 2nd *)
+(* True when 1st argument is before than the 2nd one *)
 value strictly_before_dmy d1 d2 =
   let {day = d; month = m; year = y; prec = p} = time_elapsed d2 d1 in
   if y < 0 then True
@@ -610,6 +610,7 @@ type insert_result =
   [ ToTheEnd
   | ToPos of int ]
 ;
+
 value insert_child base newip arr =
   let arrlen = Array.length arr in
   let newp = poi base newip in
@@ -677,25 +678,20 @@ value insert_child base newip arr =
 
 value semi_sort: base -> array iper -> ref (option (array iper)) -> (date -> date -> bool) -> int -> int -> unit
 = fun base a before comp di ->
-  let get_date p =
-    match Adef.od_of_codate (get_birth p) with
-      [ Some d -> Some d
-      | None -> Adef.od_of_codate (get_baptism p) ]
-  in
   let arr_len = Array.length a in
 
   loop where rec loop i =
     if i < 0 || i >= Array.length a then ()
     else
       let p1 = poi base a.(i) in
-      let d1 = get_date p1 in
+      let d1 = get_date_info p1 in
       match d1 with
       [ Some d1 ->
           loop_j None (i - di) where rec loop_j sex_interm_sib j =
             if j < 0 || j >= arr_len then loop (i + di)
             else
               let p2 = poi base a.(j) in
-              let d2 = get_date p2 in
+              let d2 = get_date_info p2 in
               match d2 with
               [ Some d2 ->
                   if comp d1 d2 then do {
@@ -714,7 +710,7 @@ value semi_sort: base -> array iper -> ref (option (array iper)) -> (date -> dat
                             if k < 0 || k >= arr_len then k + di
                             else
                               let p3 = poi base a.(k) in
-                              let d3 = get_date p3 in
+                              let d3 = get_date_info p3 in
                               match d3 with
                               [ Some d3 ->
                                   if comp d1 d3 then loop_k (k - di)
