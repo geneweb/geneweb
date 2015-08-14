@@ -1,4 +1,4 @@
-%( $Id: ancsosa_same.txt mickroue(a)yahoo.fr 20140614 templ=templm %)
+<!-- $Id: anclist_same.txt,v 7.00 2014/11/12 14:33:31 mr Exp $ -->
 
 %define;same()
   %if;(ancestor.same != "")
@@ -14,7 +14,7 @@
 %define;same_consang()
   %reset_count;
   <p class="highlight">[*display smallest sosa number relative to ancestor] + [*consanguinity]</p>
-  <p>%apply;togen(l_v).</p>
+  %apply;togen()
   <ul>
   %foreach;ancestor_level(l_v)
     <li><span class="highlight">[*generation/generations]0 %level;</span>
@@ -43,7 +43,7 @@
 %define;same_same()
   %reset_count;
   <p class="highlight">[*display smallest sosa number relative to ancestor]</p>
-  <p>%apply;togen(l_v).</p>
+  %apply;togen()
   <ul>
   %foreach;ancestor_level(l_v)
     <li><span class="highlight">[*generation/generations]0 %level;</span>

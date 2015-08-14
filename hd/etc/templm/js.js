@@ -1,17 +1,16 @@
-/* js.js mickroue(a)yahoo.fr 20140919 templ=templm */
+/* $Id: js.js,v 7.00 2015/03/08 22:24:48 mr Exp $ */
 
   function adv(z1,z2)
   {
-    var x2 = z2.firstChild.nodeValue;
-    var  h = encodeURI(z1 + x2);
+    var v = z2.firstChild.nodeValue;
+    var h = encodeURI(z1 + v);
     window.open(h);
   }
   function adv1(z1,z2)
   {
-    var x2 = z2.firstChild.nodeValue;
-    var x3 = x2.charAt(0);
-    var  h = encodeURI(z1 + x3 + x2);
-    window.open(h); 
+    var v = z2.firstChild.nodeValue;
+    var h = encodeURI(z1 + v + "ss");
+    window.open(h);
   }
   function changeDate(add,del,text,i0,i1,e1,i2,e2)
   {
@@ -45,26 +44,6 @@
         case "/" : x.value = parseInt(x.value / 2); return false; break;
       }
     }
-  }
-  function computeAge(id,z1)
-  {
-    var y1 = z1 / 365.25;
-    var y2 = parseInt(y1);
-    var m1 = z1 % 365.25;
-    var m2 = m1 / 30.4375;
-    var m3 = parseInt(m2);
-    var d1 = m1 % 30.4375;
-    var d2 = parseInt(d1);
-    var n1 = z1.toString(10);
-    var n2 = n1.length;
-    var n3 = n2 < 4 ? n1 : n1.substr(0, n2 - 3) + "&nbsp;" + n1.substr(n2 - 3, n2);
-    var y = y2 == "0" ? "" : y2 == "1" ? y2 + "&nbsp;an" : y2 + "&nbsp;ans";
-    var m = m3 == "0" ? "" : m3 + "&nbsp;mois";
-    var d = d2 == "0" ? "" : d2 == "1" ? d2 + "&nbsp;jour" : d2 + "&nbsp;jours";
-    var n = z1 < 31 ? "" : n3 + "&nbsp;jours";
-    var c1 = y == "" ? "" : m == "" && d == "" ? "" : ", ";
-    var c2 = m == "" ? "" : d == "" ? "" : ", ";
-    document.getElementById(id).outerHTML = '<abbr class="abbr1" title="' + n + '">' + y + c1 + m + c2 + d + '<\/abbr>';
   }
   function deleted(x)
   {
@@ -156,5 +135,5 @@
         e2.appendChild(t1);
         document.getElementById(z1).appendChild(e1);
       }
-    }  
+    }
   }

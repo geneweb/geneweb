@@ -1,9 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: updind.txt,v 5.10 2007/01/19 01:53:16 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20140923 templ=templm -->
+  <!-- $Id: updind.txt,v 7.00 2015/03/27 12:09:38 mr Exp $ -->
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       [*merge::person/persons]1 # %index;
@@ -17,129 +15,33 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
-  %include.js_upd;
+  %import;js_upd
   %base_header;
-  %let;ldmy;%if;([ !dates order]0 = "ddmmyyyy")dd%elseif;([ !dates order]0 = "mmddyyyy")mm%else;yy%end;%in;
   %define;load_focus()
+    onload="oL1(); %nn;
     %if;(evar_m = "MOD_IND")
       %if;(not is_male and not is_female)
-        onload="sIV('sex1')"%nn;
+        sIV('sex1')%nn;
       %elseif;(birth.prec != "sure")
-        onload="sIV('birth_%ldmy;')"%nn;
+        sIV('lpc2')%nn;
       %elseif;(birth.year < "1900" and death.prec != "sure")
-        onload="sIV('death_%ldmy;')"%nn;
+        sIV('lpc3')%nn;
       %else;
-        onload="sIV('notes')"%nn;
+        sIV('notes')%nn;
       %end;
     %end;
+    "%nn;
   %end;
-
-%(<!-- Begin define (used in updind.txt, updfam.txt)  -->%)
-  %let;ak1;[link]
-             [number]
-           [create]
-  %in;
-  %let;ak2;  (M) masculin
-             (F) féminin
-             (N) neutre
-  %in;
-  %let;ak3;[tools]
-             (R) remonter
-             (D) descendre
-             (H) haut
-             (B) bas
-             (A) ajouter
-             (I) insérer
-  %in;
-  %let;ak4;  (P) patronyme afficher/masquer%in;
-  %let;ak5;  (V) [*godfather/godmother/godparents]2
-             (W) [*adoptive father/adoptive mother/adoptive parents]2
-             (X) [*recognizing father/recognizing mother/recognizing parents]2
-             (Y) [*candidate father/candidate mother/candidate parents]2
-             (Z) [*foster father/foster mother/foster parents]2
-  %in;
-  %let;lty;
-    title="[*year/month/day]0
-             3 [exact]0
-             /3/, //3 [about (date)]0
-             3 + 2 = /5/
-             3 - 2 = /1/
-             ?3, .3 [possibly (date)]0
-             /3 [before (date)]0
-             3/ [after (date)]0
-             3/4 [or]
-             3..4, 3.4 [between (date)]
-             [text]"
-  %in;
-  %define;date(z1,z2)
-    <input type="hidden" id="z1_cal" name="z1_cal" value="%z2.calendar;"
-    %/><input type="hidden" id="z1_text" name="z1_text" value="%z2.text;"
-    %/><input type="hidden" id="z1_yyyy" name="z1_yyyy" value="%z2.year;"
-    %/><input type="hidden" id="z1_prec" name="z1_prec" value="%z2.prec;"
-    %/><input type="hidden" id="z1_oryear" name="z1_oryear" value="%z2.oryear;"%/>%nn;
-    %let;l1;%z2.prec;%in;
-    %let;l2;%z2.year;%in;
-    %let;l3;%z2.oryear;%in;
-    %let;l_dd;%if;(z2.day != "" and z2.day < 10)0%end;%z2.day;%in;
-    %let;l_mm;%if;(z2.month != "" and z2.month < 10)0%end;%z2.month;%in;
-    %let;l_yy;
-      %if;(l1 = "sure")%z2.year;%nn;
-      %elseif;(l1 = "about")/%l2;/%nn;
-      %elseif;(l1 = "maybe")?%l2;%nn;
-      %elseif;(l1 = "before")/%l2;%nn;
-      %elseif;(l1 = "after")%l2;/%nn;
-      %elseif;(l1 = "oryear")%l2;/%l3;%nn;
-      %elseif;(l1 = "yearint")%l2;..%l3;%nn;
-      %elseif;(z2.text != "")%z2.text;%nn;
-      %else;%l2;%nn;
-      %end;
-    %in;
-    %if;([ !dates order]0 = "ddmmyyyy")
-      <input id=z1_dd name=z1_dd class=d autocomplete=off size=1 maxlength=2 value="%l_dd;" title="[year/month/day]2" %apply;accesskey("z1") onkeypress="javascript:return oKPdd(event,'z1','_dd','_mm');"%/>%nn;
-      <input id=z1_mm name=z1_mm class=m autocomplete=off size=1 maxlength=2 value="%l_mm;" title="[year/month/day]1" list=dlmonth onkeypress="javascript:return oKPmm(event,'z1','_mm','_yy');" onkeyup="javascript:return oKU1(event,'z1_mm','z1_dd')"%/>%nn;
-      <input id=z1_yy name=z1_yy class=y autocomplete=off size=8 maxlength=50 value="%l_yy;" %lty; onkeydown="if(event.keyCode == 13)javascript:evD('z1')" onkeyup="javascript:return oKU1(event,'z1_yy','z1_mm')" onblur="javascript:evD('z1')"%/>%nn;
-    %elseif;([ !dates order]0 = "mmddyyyy")
-      <input id=z1_mm name=z1_mm class=m autocomplete=off size=1 maxlength=2 value="%l_mm;" title="[year/month/day]1" %apply;accesskey("z1") list=dlmonth onkeypress="javascript:return oKPmm(event,'z1','_mm','_dd');"%/>%nn;
-      <input id=z1_dd name=z1_dd class=d autocomplete=off size=1 maxlength=2 value="%l_dd;" title="[year/month/day]2" onkeypress="javascript:return oKPdd(event,'z1','_dd','_yy');" onkeyup="javascript:return oKU1(event,'z1_dd','z1_mm')"%/>%nn;
-      <input id=z1_yy name=z1_yy class=y autocomplete=off size=8 maxlength=50 value="%l_yy;" %lty; onkeydown="if(event.keyCode == 13)javascript:evD('z1')" onkeyup="javascript:return oKU1(event,'z1_yy','z1_dd')" onblur="javascript:evD('z1')"%/>%nn;
-    %else;
-      <input id=z1_yy name=z1_yy class=y autocomplete=off size=8 maxlength=50 value="%l_yy;" %lty; %apply;accesskey("z1") onkeypress="javascript:return cF1(event,'z1_mm');" onkeydown="if(event.keyCode == 13)javascript:evD('z1')" onblur="javascript:evD('z1')"%/>%nn;
-      <input id=z1_mm name=z1_mm class=m autocomplete=off size=1 maxlength=2 value="%l_mm;" title="[year/month/day]1" list=dlmonth onkeypress="javascript:return oKPmm(event,'z1','_mm','_dd');" onkeyup="javascript:return oKU1(event,'z1_mm','z1_yy')"%/>%nn;
-      <input id=z1_dd name=z1_dd class=d autocomplete=off size=1 maxlength=2 value="%l_dd;" title="[year/month/day]2" onkeypress="javascript:return oKPdd(event,'z1','_dd','_place');" onkeyup="javascript:return oKU1(event,'z1_dd','z1_mm')"%/>%nn;
-    %end;
-  %end;
-  %define;source(z1,xx)
-    <label>[source/sources]0 <input name="z1_src" size="44" maxlength="200" value="%xx_src;" id="z1_src" %l_on6;%/></label>
-  %end;
-%(<!-- End define (used in updind.txt, updfam.txt)  -->%)
-
+</head>
+<body%body_prop; id="upd" %apply;load_focus()>
+%message_to_wizard;
 
 %(<!-- Begin define  -->%)
 
-%let;lc1;<code>(1)</code>%in;%let;la1;accesskey="1"%in; %( prénom %)
-%let;lc2;<code>(2)</code>%in;%let;la2;accesskey="2"%in; %( naissance %)
-%let;lc3;<code>(3)</code>%in;%let;la3;accesskey="3"%in; %( décès %)
-%let;lc4;<code>(4)</code>%in;%let;la4;accesskey="4"%in; %( notes %)
-%let;lc5;<code>(5)</code>%in;%let;la5;accesskey="5"%in; %( titres %)
-%let;lc6;<code>(6)</code>%in;%let;la6;accesskey="6"%in; %( relations %)
-%let;lc7;<code>(P)</code>%in;%let;la7;accesskey="P"%in; %( profession %)
+%import;updind_updfam
 
-%let;l_on2; onblur="tUC(this)" onkeydown="if(event.keyCode == 13)tUC(this)"%in;
-%let;l_on3; onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"%in;
-%let;l_on4;%if;(bvar.datalist_occu > 0) list="dloccu"%if;(bvar.datalist_occu = 2) onkeyup="ldl(this,'occu',event)"%end;%end;%in;
-%let;l_on5;%if;(bvar.datalist_place > 0) list="dlplace"%if;(bvar.datalist_place = 2) onkeyup="ldl(this,'place',event)"%end;%end;%in;
-%let;l_on6;%if;(bvar.datalist_src > 0) list="dlsrc"%if;(bvar.datalist_src = 2) onkeyup="ldl(this,'src',event)"%end;%end;%in;
-%let;l_on7; onfocus="oF5(this)" onblur="oB5()" %in;
 %let;l_r_father; placeholder="M" %in;
 %let;l_r_mother; placeholder="F" %in;
-
-%define;accesskey(z1)
-  %if;("z1"="birth") %la2; %elseif;("z1"="death") %la3; %end;
-%end;
-
-%define;place(xx)
-  <label>[place]<input id="xx_place" name="xx_place" size="44" maxlength="200" title="[place] : 2=[birth], 3=[death]" value="%xx_place;" onblur="fillPlaceInd(this)" %l_on5;%/></label>
-%end;
 
 %define;one_title(z1)
   <tr id="tz1">
@@ -148,8 +50,8 @@
     <td><input id="t_placez1" name="t_placez1" size="30" value="%title.t_estate;" %/></td>
     <td><input id="t_namez1" name="t_namez1" size="30" value="%title.t_name;" %/></td>
     <td><input autocomplete="off" class="number" id="t_nthz1" name="t_nthz1" size="3" value="%title.t_nth;"%/></td>
-    <td><span class="dmyt">%apply;date("t_date_startz1","title_date_start")</span>
-        <span class="dmyt">%apply;date("t_date_endz1","title_date_end")</span></td>
+    <td><span class="dmyt">%apply;date("t_date_startz1","title_date_start","","")</span>
+        <span class="dmyt">%apply;date("t_date_endz1","title_date_end","","")</span></td>
   </tr>
 %end;
 
@@ -179,22 +81,22 @@
 %end;
 
 %define;one_relation(z1,z2,z3,z4)
+    %let;l1;rz1_z2%in;
     <td>
-        <input type="hidden" id="rz1_z2_p" name="rz1_z2_p" value="%if;(relation.z3.create)create%else;link%end;"%/>
-        <input id="rz1_z2_occ" name="rz1_z2_occ" class="occz4" autocomplete="off" %l_z3; size="3" maxlength="8"
+        <input type="hidden" id="%l1;_p" name="%l1;_p" value="%if;(relation.z3.create)create%else;link%end;"%/>
+        <input id="%l1;_occ" name="%l1;_occ" class="occz4" autocomplete="off" %l_z3; size="3" maxlength="8"
         value="%if;(relation.z3.link and relation.z3.occ = "")0%else;%relation.z3.occ;%end;"
         onkeypress="javascript:return oKP2(event,'r',z1,'_fath_occ')"
-        onblur="oB3('rz1_z2')"%/></td>
-    <td><input id="rz1_z2_fn" name="rz1_z2_fn" class="ar" size="30" maxlength="200" value="%relation.z3.first_name;" %l_on3;%/></td>
-    <td><input id="rz1_z2_sn" name="rz1_z2_sn" size="30" maxlength="200" value="%relation.z3.surname;" %l_on2;%/></td>
+        onblur="oB3('%l1;')"%/></td>
+    <td><input id="%l1;_fn" name="%l1;_fn" class="ar fn" size="30" maxlength="200" value="%relation.z3.first_name;" %l_on3;%/></td>
+    <td><input id="%l1;_sn" name="%l1;_sn" class="sn" size="30" maxlength="200" value="%relation.z3.surname;"
+         %apply;onjq1(l1,z4)%/></dt><td><span id="%l1;_jq1"> </span></td>
 %end;
 
 %(<!-- End define  -->%)
-</head>
-<body%body_prop; id="upd" %apply;load_focus()>
-%message_to_wizard;
 
 <form name="upd" method="post" action="%action;">
+<div id="jq" style="display:none"> </div>
 <p style="display:none;">
   <span id=dmy>[ !dates order]0</span>
   %hidden;
@@ -224,34 +126,37 @@
   %else;
     <input type="hidden" name="m" value="ADD_IND_OK"%/>
   %end;
-  %let;l_bapt_cal;%if;(bapt.calendar="gregorian")G%elseif;(bapt.calendar="julian")J%elseif;(bapt.calendar="french")F%else;H%end;%in;
-  %let;l_burial_cal;%if;(burial.calendar="gregorian")G%elseif;(burial.calendar="julian")J%elseif;(burial.calendar="french")F%else;H%end;%in;
   %let;l_s;%if;(is_male)M%elseif;(is_female)F%else;N%end;%in;
   %let;l_s1;%if;(is_male)0%elseif;(is_female)1%else;2%end;%in;
   %let;l_s2;%if;(is_male)M%elseif;(is_female)F%else;N%end;%in;
-  %let;lt1;
-    title="%if;([ !dates order]0 = "ddmmyyyy")
-             [*year/month/day]2 [year/month/day]1 [year/month/day]0
-           %elseif;([ !dates order]0 = "mmddyyyy")
-             [*year/month/day]1 [year/month/day]2 [year/month/day]0
-           %else;
-             [*year/month/day]0 [year/month/day]1 [year/month/day]2
-           %end;
-           [*year/month/day]0
-             3 [exact]0
-             /3/, //3 [about (date)]0
-             3 + 2 = /5/
-             3 - 2 = /1/
-             ?3, .3 [possibly (date)]0
-             /3 [before (date)]0
-             3/ [after (date)]0"
-  %in;
-  %let;lt2;title="%ak2;"%in;
-  %let;lt3;title="%ak1;%ak3;%ak5;"%in;
-  %let;lt4;title="%ak3;"%in;
-  <input type="hidden" id="sex" name="sex" value="%l_s;" %/>
+  %let;lt1;<abbr title="%ak1;%ak2;%ak3;%ak7;">#</abbr>%in;
+  %let;lt2;<abbr title="%lta;%ltb;%ltc;">[date/dates]0</abbr>%in;
+  %let;lt3;title="%ak2;"%in;
+  %let;lt4;title="%ak1;%ak3;%ak5;"%in;
+  %let;lt5;title="%ak3;%ak7;"%in;
+  <input id="sex" name="sex" value="%l_s;" %/>
+  %apply;hevent("birth","birth")
+  %apply;hevent("bapt","bapt")
+  %apply;hevent("death","death")
+  %apply;hevent("burial","burial")
+  <input name="death" value=""%/> 
+ %( marche pas :
+    "NotDead"
+    "DontKnowIfDead
+    "Death"
+    "DeadYoung"
+    "OfCourseDead"
+    <input name="death_reason"
+      %if;dr_killed; value="Killed"
+      %elseif;dr_murdered; value="Murdered"
+      %elseif;dr_executed; value="Executed"
+      %elseif;dr_disappeared; value="Disappeared"
+      %elseif;dr_unspecified; value="Unspecified"
+      %end;
+    %/>
+  %)
 </p>
-<fieldset class="c">
+<fieldset class="f1">
   <legend>
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
     [*merge::person/persons]1 # %index;
@@ -263,12 +168,17 @@
     &nbsp;&nbsp;<input type="submit" value="Ok" %/></h1>
   </legend>
   <div>
-    <label>[sex]<input id="sex1" name="sex1" class="occ%l_s1;" size="3" maxlength="8" %lt2; autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
-    <label>[number]0<input name="occ" style="text-align:center" autocomplete="off" size="1" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label><br
-    %/>%lc1; <label %la1;>[first name/first names]0<input name="first_name" size="30" maxlength="200" value="%first_name;" id="first_name" %l_on3;%/></label><br
-    %/><label>[surname/surnames]0<input name="surname" size="30" maxlength="200" value="%surname;" id="surname" %l_on2;%/></label></div>
-  <div><label>[public name]<input name="public_name" size="30" value="%public_name;" id="public_name"%/></label></div>
-  <div>
+    <label><abbr %lt3;>[sex]</abbr><input id="sex1" name="sex1" class="occ%l_s1;" size="3" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
+    <label>[number]0<input name="occ" style="text-align:center" autocomplete="off" size="1" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label>
+  </div>
+  <div class="w1">
+    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3;%/></label>
+    <label>[surname/surnames]0<input id="surname" name="surname" size="30" maxlength="200" value="%surname;" %l_on2;%/></label>
+  </div>
+  <div class="w1">  
+    <label>[public name]<input name="public_name" size="30" value="%public_name;" id="public_name" %/></label>
+  </div>
+  <div class="w2">
     %if;has_qualifiers;
       %foreach;qualifier;
         %let;cnt1;%expr(cnt+1)%in;
@@ -305,71 +215,23 @@
       <label>[surname alias]0 1<input id="surname_alias0" name="surname_alias0" size="30" value=""%/></label><a href="javascript:addItem('surname_alias',1,'[surname alias]0')"> + </a>
     %end;
     <span id="new_surname_alias"></span>
-    <p>
-      <span class="dmy">%lc2; [birth] %apply;date("birth","birth")</span>
-      %apply;place("birth")
-      %apply;source("birth","birth")
-    </p>
-    <p>
-      <select name="death" id="death">
-        <option value="NotDead"%if;not_dead; selected="selected"%end;
-         >[*alive]2</option>
-        <option value="DontKnowIfDead"%if;(dont_know_if_dead and has_birth_date)%sp;
-         selected="selected"%end;>[*don't know]0%nl;</option>
-        <option value="Death"%if;(death.year != "" or death.text != "" or
-         dead_dont_know_when) selected="selected"%end;
-         >[*died]2</option>
-        <option value="DeadYoung"%if;died_young; selected="selected"%end;
-         >[*died young]2</option>
-        <option value="OfCourseDead"%if;of_course_dead; selected="selected"%end;
-         >[*of course dead]</option>
-        %if;(not has_birth_date and dont_know_if_dead)
-        <option value="Auto" selected="selected"> -</option>
-        %end;
-      </select>
-    </p>
-   <p>
-      <span class="dmy">%lc3; [death] %apply;date("death","death")</span>
-      %apply;place("death")
-      %apply;source("death","death")
-    </p>
-    <fieldset id="dsp1">
-      <legend><a id="dsp1a" href="javascript:dsp1('dsp')">…</a></legend>
-    </fieldset>
-    <fieldset id="dsp0" style="display:none">
-      <legend><a id="dsp0a" href="javascript:dsp0('dsp')"> - </a></legend>
-      <p>
-        <span class="dmy">[baptism] %apply;date("bapt","bapt")</span>
-        %apply;place("bapt")
-        %apply;source("bapt","bapt")
-      </p>
-      <p>
-        <span class="dmy">[burial] %apply;date("burial","burial")</span>
-        %apply;place("burial")
-        %apply;source("burial","burial")
-      </p>
-      <p
-      ><label><input type="radio" name="death_reason" value="Unspecified"%if;dr_unspecified; checked="checked"%end; %/>-</label
-      ><label><input type="radio" name="death_reason" value="Killed"%if;dr_killed; checked="checked"%end;%/>[*killed (in action)]0</label
-      ><label><input type="radio" name="death_reason" value="Murdered"%if;dr_murdered; checked="checked"%end; %/>[*murdered]0</label
-      ><label><input type="radio" name="death_reason" value="Executed"%if;dr_executed; checked="checked"%end; %/>[*executed (legally killed)]0</label
-      ><label><input type="radio" name="death_reason" value="Disappeared"%if;dr_disappeared; checked="checked"%end; %/>[*disappeared]0</label
-      ></p><p
-      ><label><input type="radio" name="burial" value="UnknownBurial"%if;bt_unknown_burial; checked="checked"%end; %/>-</label
-      ><label><input type="radio" name="burial" value="Buried"%if;bt_buried; checked="checked"%end; %/>[*buried]0</label
-      ><label><input type="radio" name="burial" value="Cremated"%if;bt_cremated; checked="checked"%end; %/>[*cremated]0</label
-      ></p>
-      <p>[*access]0 : <label><input type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked="checked"%end;%/>[*if titles]0</label
-      ><label><input type="radio" name="access" value="Public"%if;acc_public; checked="checked"%end;%/>[*public]0</label
-      ><label><input type="radio" name="access" value="Private"%if;acc_private; checked="checked"%end;%/>[*private]0</label
-      ></p>
-      <p><label>[*image/images]0<input name="image" size="40" value="%image;"%/></label></p>
-    </fieldset>
+  </div>
+  <div class="w1">
+    <label>%lpcP;[occupation/occupations]0<input name="occu" size="36" maxlength="200" value="%occupation;" id="occu" %lpaP; %l_on4;%/></label>
+  </div>
+  <div class="w1">
+    <label>[source/sources]0 ([person/persons]0)<input name="src" size="36" maxlength="300" value="%sources;" id="src" %l_on6;%/></label>
+    <label>[image/images]0<input name="image" size="36" value="%image;" %/></label>
+  </div>
+  <div>
+    [*access]0 : 
+    <label><input type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked="checked"%end;%/>[*if titles]0</label>
+    <label><input type="radio" name="access" value="Public"%if;acc_public; checked="checked"%end;%/>[*public]0</label>
+    <label><input type="radio" name="access" value="Private"%if;acc_private; checked="checked"%end;%/>[*private]0</label>
   </div>
 </fieldset>
-<fieldset id="notes1" class="c">
-  <legend>%lc4;<label style="font-size:inherit" for="notes" %la4;> [*note/notes]1</label>
-  </legend>
+<fieldset id="notes1">
+  <legend>%lpc5;<label style="font-size:inherit;" for="notes" %lpa5;> [*note/notes]1</label></legend>
   <textarea name="notes" id="notes">%notes;%sq;</textarea>
   <fieldset id="accent2">
     <legend>
@@ -378,36 +240,29 @@
     </legend>
     <div id="accent" style="display:none;">%include.accent;</div>
   </fieldset>
-  <fieldset id="notes2">
-    <label>%lc7;[occupation/occupations]0<input name="occu" size="36" maxlength="200" value="%occupation;" id="occu" %la7; %l_on4;%/></label>
-    <label>[source/sources]0 ([person/persons]0)<input name="src" size="36" maxlength="300" value="%sources;" id="src" %l_on6;%/></label>
-  </fieldset>
 </fieldset>
-<fieldset class="t">
-<legend>%lc5; [*title/titles]1</legend>
-  <table summary="titles" cellspacing=0 cellpadding=0>
-    <tr>
-    <td class="bd0"><abbr %lt4;>#</abbr></td>
-    <td class="bg7">[title/titles]0</td>
-    <td class="bg7">[estate]</td>
-    <td class="bg7">[name]</td>
-    <td class="bg7">[nth]0</td>
-    <td class="bg7">[begin] / [end] : <abbr %lt1;>[date/dates]0</abbr></td>
-    </tr>
-    %if;has_titles;
-      %foreach;title;%apply;one_title(cnt)%end;
-    %else;
-      %apply;one_title("1")
-    %end;
-    <tr id="new_title"></tr>
-    <tr><td class="bg7"><a href="javascript:addTitle(1,1)" %la5; %l_on7;> + </a></td></tr>
-  </table>
+<fieldset class="event">
+  <legend>%lpc4; [*event/events]1</legend>
+    <dl>
+      %if;(not has_pevent_birth)%apply;one_event(next_pevent,"#birt","witness")%incr_next_pevent;%end;
+      %if;has_pevents;%foreach;pevent;%apply;one_event(cnt,"","witness")%end;%end;
+      %if;(not has_pevent_death)%apply;one_event(next_pevent,"-","witness")%incr_next_pevent;%end;
+      <dt id="new_event"></dt>
+      <dt><a href="javascript:addEvent()" %lpa4;> + [event/events]0</a></dt>
+      %incr_next_pevent;
+    </dl>
+    <dl>
+      <dt><abbr title="(+) [*death]">[*event/events]0</abbr> %lt2; [place]</dt>
+        <dd>[note/notes]0</dd>
+        <dd><em>[source/sources]0</em></dd>
+        <dd>[witness/witnesses]0 : %lt1; [first name/first names]0 [surname/surnames]0</dd>
+    </dl>
 </fieldset>
-<fieldset class="t">
-  <legend>%lc6; [*relation/relations]1</legend>
+<fieldset class="f2 t">
+  <legend>%lpc6; [*relation/relations]1</legend>
   <table summary="relations" cellspacing=0 cellpadding=0>
     <tr>
-      <td class="bg7"><abbr %lt3;>#</abbr></td>
+      <td class="bg7"><abbr %lt4;>#</abbr></td>
       <td class="bg7">[first name/first names]0</td>
       <td class="bg7">[surname/surnames]0</td>
       <td class="bd0"><div style="display:none"><span id="rM">M</span><span id="rF">F</span></div></td>
@@ -418,11 +273,31 @@
       %apply;relations("1")
     %end;
     <tr id="new_relation"></tr>
-    <tr><td class="bg7"><a href="javascript:addRelation(1,1)" %la6; %l_on7;> + </a></td></tr>
+    <tr><td class="bg7"><a href="javascript:addRelation(1,1)" %lpa6;> + </a></td></tr>
+  </table>
+</fieldset>
+<fieldset class="t">
+<legend>%lpc7; [*title/titles]1</legend>
+  <table summary="titles" cellspacing=0 cellpadding=0>
+    <tr>
+    <td class="bg7"><abbr %lt5;>#</abbr></td>
+    <td class="bg7">[title/titles]0</td>
+    <td class="bg7">[estate]</td>
+    <td class="bg7">[name]</td>
+    <td class="bg7">[nth]0</td>
+    <td class="bg7">[begin] / [end] : %lt2;</td>
+    </tr>
+    %if;has_titles;
+      %foreach;title;%apply;one_title(cnt)%end;
+    %else;
+      %apply;one_title("1")
+    %end;
+    <tr id="new_title"></tr>
+    <tr><td class="bg7"><a href="javascript:addTitle(1,1)" %lpa7;> + </a></td></tr>
   </table>
 </fieldset>
 </form>
-<div style="height:20px;clear:both;"> </div>
+<div style="height:300px;clear:both;"> </div>
   %base_trailer;
   %copyright;
 </body>

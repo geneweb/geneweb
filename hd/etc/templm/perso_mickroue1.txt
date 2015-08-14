@@ -1,66 +1,54 @@
-%( $Id: perso_mickroue1.txt mickroue(a)yahoo.fr 20140614 templ=templm %)
-%( <!-- relations - photos --> %)
-%if;(has_relations)
-  %apply;lazy_print%with;
-    <div class = "relations">
-    <h3>[*relation/relations]1</h3>
-    <ul class="ul_0">
-  %end;
-  %foreach;relation;
-    %if;(relation_type != [foster father/foster mother/foster parents]0
-    and relation_type != [foster father/foster mother/foster parents]1
-    and relation_type != [foster father/foster mother/foster parents]2)
-      %lazy_force;
-      <li class="sheet"><em>%apply;relation_computing()</em>
-        <ul class="ul_0">
-          %if;has_relation_him;
-            <li class="li_0 li_%relation_him.has_families;%relation_him.has_sosa;">%apply;somebody("relation_him")</li>
-          %end;
-          %if;has_relation_her;
-            <li class="li_1 li_%relation_her.has_families;%relation_her.has_sosa;">%apply;somebody("relation_her")</li>
-          %end;
-        </ul>
-      </li>
-    %end;
-  %end;
-  %foreach;related;
-    %if;(related_type != [foster son/foster daughter/foster child]0
-    and related_type != [foster son/foster daughter/foster child]1
-    and related_type != [foster son/foster daughter/foster child]2)
-      %lazy_force;
-      <li class="sheet"><em>%apply;related_computing()</em>
-        <ul class="ul_0">
-          <li class="li_%related.sex; li_%related.has_families;%related.has_sosa;">%apply;somebody("related")</li>
-        </ul>
-      </li>
-    %end;
-  %end;
-  %reset_count;
-  %foreach;witness_relation;
+<!-- $Id: perso_mickroue1.txt,v 7.00 2014/12/01 11:48:10 mr Exp $ -->
+%(<!-- relations - photos -->%)
+
+%apply;lazy_print%with;
+  <div class = "relations">
+  <h2 class="ch2">[*relation/relations]1</h2>
+  <ol>
+%end;
+%foreach;relation;
+  %if;(relation_type != [foster father/foster mother/foster parents]0
+   and relation_type != [foster father/foster mother/foster parents]1
+   and relation_type != [foster father/foster mother/foster parents]2)
     %lazy_force;
-    %if;(count = 0)
-      <li class="sheet"><em>%apply;witness_computing()</em>
-      <table class="t_witness" summary="[witness at marriage of %s and %s:::x:y]">
-    %end;
-    <tr>
-      <td>%apply;somebody("witness_relation.father")</td>
-      <td>%apply;link_marriage("witness_relation.father")</td>
-      <td>%apply;somebody("witness_relation.mother")</td>
-    </tr>
-    %incr_count;
-  %end;
-  %if;(count > 0)
-    </table>
-    %if;(count > 5)
-      <em>[*total] : %count;</em>
-    %end;
+    <li><em>%apply;capitalize(relation_type)</em> :
+        %if;has_relation_him;
+          %apply;somebody("relation_him")
+          %if;has_relation_her; [and] %end;
+        %end;
+        %if;has_relation_her;
+          %apply;somebody("relation_her")
+        %end;
     </li>
   %end;
-  %if;lazy_printed;</ul></div>%end;
+%end;
+%foreach;related;
+  %if;(related_type != [foster son/foster daughter/foster child]0
+   and related_type != [foster son/foster daughter/foster child]1
+   and related_type != [foster son/foster daughter/foster child]2)
+    %lazy_force;
+    <li><em>%apply;capitalize(related_type)</em> :
+      %apply;somebody("related")
+    </li>
+  %end;
+%end;
+%foreach;event_witness_relation;
+  %lazy_force;
+  <li><em>%apply;capitalize(event_witness_relation.event.name)
+    %if;event_witness_relation.event.has_date; %apply;on_edate("event_witness_relation.event")%end;
+    %if;event_witness_relation.event.has_place; · %event_witness_relation.event.place;%end;</em> :
+    %apply;somebody("event_witness_relation.person")
+    %if;(event_witness_relation.event.spouse != "") [and] %apply;somebody("event_witness_relation.event.spouse")%end;
+  </li>
+%end;
+%if;lazy_printed;
+  </ol>
+  </div>
+  %if;not cancel_links;<div class="menu" style="position:relative">%apply;relations_tree(l_ref)</div>%end;
 %end;
 %apply;lazy_print%with;
   <div class = "relations">
-  <h3>Photos</h3>
+  <h2 class="ch2">Photos</h2>
   <ul class="ul_0">
 %end;
 %foreach;relation;
@@ -97,4 +85,4 @@
     </li>
   %end;
 %end;
-%if;lazy_printed;</ul></div>%end;
+%if;lazy_printed;</ul></div>%end;%nl;
