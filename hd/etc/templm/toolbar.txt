@@ -1,5 +1,4 @@
-<!-- $Id: toolbar.txt,v x.x 2011-08-31 16:17:36 flh Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 20140402 templ=templm -->
+<!-- $Id: toolbar.txt,v 7.00 2014/11/13 10:52:29 mr Exp $ -->
 <!-- How to : Copy this file to bases/etc/ -->
 
 <div style="text-align:%left;">

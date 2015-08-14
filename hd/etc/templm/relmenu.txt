@@ -1,280 +1,58 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <!-- $Id: relmenu.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20140510 templ=templm -->
-  <!-- cousmenu.txt is included in relmenu.txt -->
-  <title>[*link between]%sp;
-    %if;(public_name != "")%public_name;
-    %else;%first_name; %surname;%end; [and]0…%nn;
-  </title>
-  <meta name="robots" content="none"%/>
-  <meta name="format-detection" content="telephone=no"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  %include.css;
-  %base_header;
-</head>
-<body%body_prop; id="menutxt">
-%message_to_wizard;
-
-%let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.relmenu.submit();"%in;
-
-%define;relative_sosa(sosa_link)
-  [<em>Sosa number</em> relative to %t:::sosa_link]
-%end;
-
-%define;navsosa(xx)
-  [*navigation with %t as Sosa reference:::xx].
-%end;
-
-%define;nth_cousins(xx)
-  [*%s cousins:::xx]%nn;
-%end;
-
-<h1>[*link between]%sp;
-  %if;(public_name != "")%public_name;%else;%first_name;%end;
-  %if;(qualifier != "") <em>%qualifier;</em>%end;
-  %sp;%surname;
-  %if;(alias != "") <em>(%alias;)</em>%end;
-  %sp;[and]0…%nn;
-</h1>
-
-%if;not cancel_links;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
-
-<form name="relmenu" method="get" action="%action;">
-  <p>
-    %hidden;
-    <input type="hidden" name="em" value="R"%/>
-    %if;access_by_key;
-      <input type="hidden" name="ep" value="%first_name_key_val;"%/>
-      <input type="hidden" name="en" value="%surname_key_val;"%/>
-      %if;(occ != "0")
-        <input type="hidden" name="eoc" value="%occ;"%/>
-      %end;
-    %else
-      <input type="hidden" name="ei" value="%index;"%/>
-    %end;
-  </p>
-  <fieldset style="width: auto;">
-    <input type="hidden" name="m" value="NG"%/>
-    <input type="radio" name="select" value="input" checked="checked" %l_on;%/>
-    <input name="n" size="40" maxlength="200"%/>
-    <input type="submit" value="Ok"%/>
-    <br%/>&nbsp;&nbsp;&nbsp;
-    <label>
-      <input type="radio" name="t" value="PN" checked="checked" %l_on;%/>
-      <em>[first name/first names]0 [surname/surnames]0</em>
-      [or] <em>[public name]</em>
-      [or] <em>[alias]</em>
-      %if;browsing_with_sosa_ref;[or]
-        %apply;relative_sosa%with
-          <a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>
+%(<!-- $Id: relmenu.txt,v 7.00 2014/12/13 16:42:10 mr Exp $ -->%)
+%( used for jquery. old relmenu.txt is in relmenu1.txt %)
+%define;jq2()
+  %( display consang nb ancestors nb descendants %)
+  %if;(bvar.show_consang != "no")
+    %if;(has_parents)
+      %reset_count;
+      %foreach;ancestor_level
+        %if;(level = max_anc_level)
+          %number_of_ancestors; [ancestors] / %level; [generation/generations]1%nn;
         %end;
-      %end;
-    </label>
-    <br%/>&nbsp;&nbsp;&nbsp;
-    <label>
-        <input type="radio" name="t" value="P" %l_on;%/>
-        <em>[first name/first names]0</em>
-    </label>
-    <br%/>&nbsp;&nbsp;&nbsp;
-    <label>
-        <input type="radio" name="t" value="N" %l_on;%/>
-        <em>[surname/surnames]0</em>
-    </label>
-    %foreach;family;
-      %if;(spouse != "? ?")
-        <br%/>
-        <label>
-          <input type="radio" name="select" value="%spouse.index;" %l_on;%/>
-          %apply;capitalize(nth([husband/wife],spouse.sex))%nl;:%nl;%spouse;
-          %if;spouse.has_nobility_titles;,%sp;
-          <em>%spouse.nobility_title;</em>%end;%nl;
-        </label>
-      %end;
-    %end;
-    %foreach;relation;
-      %if;has_relation_him;
-        <br%/>
-        <label>
-          <input type="radio" name="select" value="%relation_him.index;" %l_on;%/>
-          %apply;capitalize(relation_him.type)%nl;:%nl;%relation_him;
-          %if;relation_him.has_nobility_titles;,%sp;
-          <em>%relation_him.nobility_title;</em>%end;%nl;
-        </label>
-      %end;
-      %if;has_relation_her;
-        <br%/>
-        <label>
-          <input type="radio" name="select" value="%relation_her.index;" %l_on;%/>
-          %apply;capitalize(relation_her.type)%nl;:%nl;%relation_her;
-          %if;relation_her.has_nobility_titles;,%sp;
-          <em>%relation_her.nobility_title;</em>%end;%nl;
-        </label>
-      %end;
-    %end;
-    %foreach;related;
-      <br%/>
-      <label>
-        <input type="radio" name="select" value="%related.index;" %l_on;%/>
-        %apply;capitalize(related.type)%nl;:%nl;%related;
-        %if;related.has_nobility_titles;,%sp;
-        <em>%related.nobility_title;</em>%end;%nl;
-      </label>
-    %end;
-    %foreach;family;
-      %foreach;witness;
-        <br%/>
-        <label>
-          <input type="radio" name="select" value="%witness.index;" %l_on;%/>
-          [*witness/witnesses]0%nl;:%nl;%witness;%nl;
-        </label>
-      %end;
-    %end;
-    <ul><li><a href="%prefix;%access;;m=A;t=F;fam7=on;tf1=fam73;v=3;maxv=4">7 [family/families]1</a></li></ul>
-    %if;(has_siblings or father.has_parents or mother.has_parents)
-      <ul>
-        %let;l;%if;(bvar.max_cousins_level < 10)%bvar.max_cousins_level;%else;10%end;%in;
-        %foreach;cousin_level;
-          %if;(level <= l)
-            %if;(level = 1)
-              %if;has_siblings;<li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*siblings]</a></li>%end;
-              %if;has_nephews_or_nieces;
-                <li><a href="%prefix;%access;;m=C;v1=1;v2=2;spouse=on;">[*nephews and nieces]</a></li>
-              %end;
-            %elseif;(level = 2)
-              %if;(father.has_siblings or mother.has_siblings)
-                <li><a href="%prefix;%access;;m=C;v1=2;v2=1;spouse=on;">[*uncles and aunts]</a></li>
-              %end;
-              %if;(father.has_nephews_or_nieces or mother.has_nephews_or_nieces)
-                <li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*cousins]</a></li>
-              %end;
-            %elseif;(level = 3)
-              %reset_count;
-              %foreach;ancestor_level(3)
-                %if;(level = 3)
-                  %foreach;ancestor;
-                    %if;(count = 0)%if;ancestor.has_nephews_or_nieces;%incr_count;%end;%end;
-                  %end;
-                %end;
-              %end;
-              %if;(count > 0)<li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*2nd cousins]</a></li>%end;    
-            %elseif;(level = 4)
-              %reset_count;
-              %foreach;ancestor_level(4)
-                %if;(level = 4)
-                  %foreach;ancestor;
-                    %if;(count = 0)%if;ancestor.has_nephews_or_nieces;%incr_count;%end;%end;
-                  %end;
-                %end;
-              %end;
-              %if;(count > 0)<li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*3rd cousins]</a></li>%end;
-            %else;
-              %reset_count;
-              %let;l;%level;%in;
-              %foreach;ancestor_level(l)
-                %if;(level = l)
-                  %foreach;ancestor;
-                    %if;(count = 0 and ancestor.has_nephews_or_nieces)%incr_count;%end;
-                  %end;
-                %end;
-              %end;
-              %if;(count > 0)
-                <li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">
-                  %apply;nth_cousins%with;
-                    %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
-                  %end;
-                </a></li>
-              %end;
-            %end;
+        %foreach;ancestor
+          %if;(ancestor.same != "")
+            %incr_count;
           %end;
         %end;
-      </ul>
+      %end;
+      %if;(has_consanguinity or count != 0)
+        , <span class="nobr">
+        %if;(cancel_links)
+          [consanguinity] : %consanguinity;
+        %else;
+          <a href="%prefix;em=R;ei=%mother.index;;m=NG;t=PN;select=%father.index;;et=A;spouse=on;image=on" 
+             title="[relationship computing], [parents]">[consanguinity] : %consanguinity;</a>
+        %end;
+        %if;(count != 0) (%nn;
+          %if;(not cancel_links)
+            <a href="%prefix;m=A;t=N;v=%max_anc_level;;i=%index;;same=%count;"
+               title="[display smallest sosa number relative to ancestor]">%count; ==</a>%nn;
+          %else;
+            %count; ==%nn;
+          %end;)
+        %end;
+      %end;
+      </span>
+      <br%/>
     %end;
-  </fieldset>
-  <fieldset>
-    <label>
-      <input type="radio" name="et" value="A" %l_on;%/>
-      [*ancestors]
-    </label>
-    <br%/>
-    <label>
-      <input type="radio" name="et" value="M" %l_on;%/>
-      [*relationship by marriage]
-    </label>
-    <br%/>
-    <label>
-      <input type="radio" name="et" value="S" checked="checked" %l_on;%/>
-      [*shortest path]
-    </label>
-    <br%/>
-    <label>
-      <input type="checkbox" name="long" value="on" %l_on;%/>
-      [long display]
-    </label>
-    <br%/>
-    <label>
-      <input type="checkbox" name="spouse" value="on" checked="checked" %l_on;%/>
-      [include spouses]
-    </label>
-    <br%/>
-    <label>
-      <input type="checkbox" name="cgl" value="on" %l_on;%/>
-      [cancel GeneWeb links]
-    </label>
-    <br%/>
-    <label>
-      <input type="checkbox" name="image" value="on" %l_on;%/>
-      [image/images]1
-    </label>
-    <br%/>
-    <label>
-      [border]
-      <input name="bd" size="1" maxlength="2" value="0"%/>
-    </label>
-    <br%/>
-    <table summary="colors" cellpadding="0" cellspacing="0">
-      <tr>
-        <td align="%left;">[color]&nbsp;</td>
-        <td>
-          <input type="radio" name="color" value="" checked="checked" %l_on;%/>
-        </td>
-        <td class="bg1">
-          <input type="radio" name="color" value="bg1" %l_on;%/>
-        </td>
-        <td class="bg2">
-          <input type="radio" name="color" value="bg2" %l_on;%/>
-        </td>
-        <td class="bg3">
-          <input type="radio" name="color" value="bg3" %l_on;%/>
-        </td>
-        <td class="bg4">
-          <input type="radio" name="color" value="bg4" %l_on;%/>
-        </td>
-        <td class="bg5">
-          <input type="radio" name="color" value="bg5" %l_on;%/>
-        </td>
-        <td class="bg6">
-          <input type="radio" name="color" value="bg6" %l_on;%/>
-        </td>
-      </tr>
-    </table>
-  </fieldset>
-</form>
-  <div style ="clear: both;">
-    %apply;navsosa%with;
-      <a href="%prefix_no_iz;iz=%index;">%self;</a>%nn;
-      %if;has_nobility_titles;, <em>%nobility_title;</em>%end;%nl;
+    %if;(has_children)
+      %foreach;descendant_level;
+        %if;(level = max_desc_level)
+          %if;(number_of_descendants = "1")
+            [a descendant]0 / %nn;
+          %else;
+            %number_of_descendants; [descendants] / %nn;
+          %end;
+          %level;
+          %if;(level = "1") [generation/generations]0 %else; [generation/generations]1%end;
+        %end;
+      %end;
+      <br%/>
     %end;
-  </div>
-  %base_trailer;
-  %copyright;
-</body>
-</html>
+  %end;
+%end;
+%if(evar.jq2 = "on")
+  %apply;jq2()
+%else;
+  %include.relmenu1;
+%end;

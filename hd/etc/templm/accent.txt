@@ -1,6 +1,5 @@
-<!-- $Id: accent.txt,v 5.6 2007-04-04 02:17:36 ddr Exp $ -->
-<!-- Modified mickroue(a)yahoo.fr 20140405 templ=templm -->
-<!-- How to : Copy this file to bases/etc/ -->
+<!-- $Id: accent.txt,v 7.00 2015/01/13 15:52:31 mr Exp $ -->
+%( How to : Copy this file to bases/etc/ %)
 
 <script type="text/javascript"><!--
 
@@ -136,6 +135,21 @@ document.getElementsByName("notes")[0].onkeypress =
   <a onclick="return insertTags('×','','')" href="javascript:;">×</a>
   <a onclick="return insertTags('†','','')" href="javascript:;">†</a>
 </p>
+%if;(evar.m = "MOD_NOTES" and evar.templ != "templm" and bvar.template != "templm")
+  <style type="text/css">
+  .menu{margin:1em;padding:0;border:0;position:relative;top:0;left:0;font-size:14px;line-height:14px;}
+  .menu span{position:relative;display:inline-block;float:left;}
+  .menu span a{float:left;}
+  .menu span:hover > .s_menu{display:block;position:absolute;left:0;top:24px;z-index:10;background-color:#d1c9cc;}
+  .menu .s_menu{display:none;float:left;margin-left:0;margin-top:0;padding:4px;border:0;width:210px;}
+  .menu .s_menu a{width:200px;}
+  .menu a,.menu1 a{vertical-align:middle;background-color:#e2e2e2;border:solid 1px #cdc3c6;margin:0 -1px -1px 0;padding:4px;color:#51464a;text-decoration:none;}
+  .menu a:hover,.menu1 a:hover{background-color:#d1c9cc;}
+  .menu1{font-size:14px;line-height:24px;}
+  .menu1{clear:both;padding:5px;margin:5px;border-top:solid 1px #888;}
+  .menu1 > span{display:block;margin:10px;}
+  </style>
+%end;
 <div class="menu" style="text-align:left;clear:both;position:relative;margin-bottom:7em;">
   <span>
     <a href="#">&lt;html&gt;</a>
@@ -196,6 +210,7 @@ document.getElementsByName("notes")[0].onkeypress =
       <a onclick="return insertTags('DEATH=','','')" href="javascript:;">DEATH=</a>
       <a onclick="return insertTags('OCCU=','','')" href="javascript:;">OCCU=</a>
       <a onclick="return insertTags('BNOTE=','','')" href="javascript:;">BNOTE=</a>
+      <a onclick="return insertTags('NOTE=','','')" href="javascript:;">NOTE=</a>
       <a onclick="return insertTags('BIBLIO=','','')" href="javascript:;">BIBLIO=</a>
     </span>
   </span>

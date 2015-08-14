@@ -1,4 +1,4 @@
-%( $Id: anclist_csv.txt mickroue(a)yahoo.fr 20131202 templ=templm %)
+<!-- $Id: anclist_csv.txt,v 7.00 2014/11/12 14:33:31 mr Exp $ -->
 
 %define;csv_line3(xx,yy,zz)
   ;%xx.index;
