@@ -1,10 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20140913 templ=templm -->
-  <title>Geneweb - %base.name;</title>
+  <!-- $Id: welcome.txt,v 7.00 2015/08/14 16:19:14 mr Exp $ -->
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -27,76 +24,53 @@
 
 %define;lang(xx)
   %apply;nth%with;
-    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
+    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
   %and;xx%end;
 %end;
 
 %define;link_lang()
-  %for;i;1;29;
-    <a href="%prefix_base;lang=%apply;lang(i)">%apply;lang(i)</a>
+  %for;i;1;30;
+    %let;l1;%apply;lang(i)%in;
+    <a href="%prefix_base;lang=%l1;" title="%apply;language_name(l1)">%l1;</a>
   %end;
 %end;
 
 %define;disconnect(xx,yy)
-  %if;(just_friend_wizard or bvar.xx_passwd != "" or bvar.xx_passwd_file != "")
-      <em>yy
-        %if;(user.ident != "")
-          %sp;:%sp;%user.ident;
-        %end;
-      </em>
-      <span style="font-size:70%%">(<a href="%prefix;w=">[disconnect]</a>)</span>
+  yy
+  %if;(user.ident != "")
+    %sp;:%sp;
+    %if;("xx" = "wizard" and bvar.authorized_wizards_notes = "yes")
+      <a href="%prefix;m=WIZNOTES;v=%user.ident;">%user.ident;</a>
+    %else;
+      %user.ident;
+    %end;
   %end;
+  <span style="font-size:70%%">  (<a href="%prefix;w=">[disconnect]</a>)</span>
 %end;
 
-<body%body_prop; id="welcome" onload="javascript:document.getElementById('NGn').focus();">
-<table style="width:100%%">
-  <tr>
-    <td align=left>
-      <img src="%image_prefix;/gwlogo.png" width=150 height=41 alt="GeneWeb"%/>
-    </td>
-    <td align=right>
-      %if;(not friend and not wizard)
-        %if;(not cgi and bvar.auth_file = "")
-          [*access] : <a href="%prefix;w=w">[wizard/wizards/friend/friends/exterior]0</a>
-            - <a href="%prefix;w=f">[wizard/wizards/friend/friends/exterior]2</a>
-        %else;
-          <form method="post" action="%action;">
-            <div>
-              %hidden;
-              [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0) :
-              <input name="w" type="password" size="10" maxlength="200"%/>
-              <input type="submit" value="Ok"%/>
-            </div>
-          </form>
-        %end;
-      %elseif;(bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "")
-        %if;(friend and (bvar.friend_passwd = "" and bvar.friend_passwd_file = ""))
-          %if;(not cgi and bvar.auth_file = "")
-            [*access] : <a href="%prefix;w=w">[wizard/wizards/friend/friends/exterior]0</a>
-          %elseif;(not just_friend_wizard)
-            <form method="post" action="%action;">
-              <div>
-                %hidden;
-                [*user/password/cancel]1 ([wizard/wizards/friend/friends/exterior]0) :
-                <input name="w" type="password" size="10" maxlength="200"%/>
-                <input type="submit" value="Ok"%/>
-              </div>
-            </form>
-          %end;
-        %end;
-      %end; 
-      %if;(wizard or friend)
-        %if;(friend)
-          %apply;disconnect("friend",[wizard/wizards/friend/friends/exterior]2)
-        %else;
-          %apply;disconnect("wizard",[wizard/wizards/friend/friends/exterior]0)
-          %if;(bvar.setup_link != "no")%setup_link;%end;
-        %end;
-      %end;
-    </td>
-  </tr>
-</table>
-%if;(bvar.motd != "")<div class="div2">%apply;interp(bvar.motd)</div>%end;
+<body%body_prop; id="welcome" onload="javascript:document.getElementById('mSn').focus();">
+<div>
+  <img src="%image_prefix;/gwlogo.png" width=150 height=41 alt="GeneWeb"%/>
+</div>
+<div>
+  %if;(wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "" or bvar.auth_file != ""))
+    %apply;disconnect("wizard",[*wizard/wizards/friend/friends/exterior]0)
+  %elseif;(friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != "" or bvar.auth_file != ""))
+    %apply;disconnect("friend",[*wizard/wizards/friend/friends/exterior]2)
+  %elseif;(bvar.friend_passwd = "" and bvar.friend_passwd_file = ""
+       and bvar.wizard_passwd = "" and bvar.wizard_passwd_file = "" and bvar.auth_file = "")
+  %else;
+    <form method="post" action="%action;">
+      %hidden;
+      [*access] <input name="w" type="password" size="25" maxlength="200" placeholder="[user/password/cancel]0:[user/password/cancel]1"%/>
+      <input type="submit" value="Ok"%/>
+    </form>
+  %end;
+</div>
+
+%if;(bvar.motd != "")
+  <div class="div2">%apply;interp(bvar.motd)</div>
+%end;
 %if;just_friend_wizard;
   <div class="div1" style="color:#FF0000;font-weight:700;">
     [
@@ -111,8 +85,9 @@ fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
     <h1>%apply;capitalize(base.name)</h1>
     %if;(browsing_with_sosa_ref)<h3>%sosa_ref;</h3>%end;
     <div>(%base.nb_persons; [person/persons]1)</div>
-    <div>
-  %apply;interp([
+    %if;(bvar.counter = "yes")
+      <div>
+        %apply;interp([
 af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
 bg: От %start_date; насам е имало %nb_accesses; посещения, от които
@@ -168,7 +143,8 @@ sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
 zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     次访问本主页， 自从 %start_date;。
 ])%nl;
-</div>
+      </div>
+    %end;
     </td>
   </tr><tr>
     <td>
@@ -217,6 +193,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
             <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a></li>
             <li><a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a></li>
             <li><a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a></li>
+            <li><a href="%prefix;m=MOD_DATA;data=surname">%apply;book_of([surname/surnames]1)</a></li>
           %end;
         %end;
       </ul>

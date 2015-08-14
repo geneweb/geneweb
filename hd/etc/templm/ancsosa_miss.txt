@@ -1,4 +1,8 @@
-%( $Id: ancsosa_miss.txt mickroue(a)yahoo.fr 20131203 templ=templm %)
+<!-- $Id: anclist_miss.txt,v 7.00 2014/11/13 10:20:05 mr Exp $ -->
+
+%define;link(aa, xx)
+  %if;(cancel_links)xx%else;<a href="%prefix;aa">xx</a>%end;
+%end;
 
 %define;sorted_list_birth(xx)
   %incr_count;
@@ -154,7 +158,7 @@
 
 %define;miss1(xx,bb,mm,dd)
   %if;("bb" = "b" or "mm" = "m" or "dd" = "d")
-    %apply;gen()
+    %apply;togen()
     %empty_sorted_list;
     %reset_count;
     %foreach;ancestor_level(l_v)
@@ -193,7 +197,7 @@
         %else;%sp;
         %end;
       %end;
-      %item.4;%item.2; - <a href="%prefix;%item.7;">%item.3;</a> - %item.5; - %item.6;
+      %item.4;%item.2; · <a href="%prefix;%item.7;">%item.3;</a> · %item.5; · %item.6;
     </li>
     %if;(prev_item.1 = item.1 and number_of_subitems = 1 and item.1 != "")
       </ul></li>
@@ -206,9 +210,10 @@
   <p>[*total] = %count;</p>
 %end;
 
+%( main %)
 %if;(evar.miss = "M1" and evar.al = "on")
   %( missing ancestors alphabetically %)
-  %apply;gen()
+  %apply;togen()
   %empty_sorted_list;
   %reset_count;
   %foreach;ancestor_level(l_v)
@@ -302,7 +307,7 @@
 %elseif;(evar.miss = "M1")
   %( missing ancestors in ancestors order %)
   %if;(evar.only != "on")
-    <p>%apply;togen(l_v)</p>
+    %apply;togen()
   %end;
   %if;(evar.ms != "on")
     <p>%apply;a_of_b([*parents], "…")</p>
@@ -348,7 +353,7 @@
   %end;
   </ul>
   <p>[*total] = %count;</p>
-%elseif;(bvar.var_img_ext != "" and evar.miss="M2")
+%elseif;(bvar.mickroue2 = "yes" and evar.miss="M2")
   %( missing BIRTHA MARRIAGEA DEATHA %)
   %apply;miss1(evar.miss,evar.M2b,evar.M2m,evar.M2d)
   %apply;miss2()

@@ -1,5 +1,11 @@
-%( $Id: perso_mickroue2.txt mickroue(a)yahoo.fr 20131203 templ=templm %)
-%( <!-- display linked pages : Images --> %)
+<!-- $Id: perso_mickroue2.txt,v 7.00 2014/11/28 11:48:40 mr Exp $ -->
+%(<!-- linked pages : Images --> %)
+
+%define;letter(xx)
+  %apply;nth%with;
+    /A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z%and;
+    xx%end;
+%end;
 
 %define;display_images_him_her(xx, yy, zz, hhim, hher)
   %if;(has_linked_page.xxyy and spouse.has_linked_page.xxyy)
@@ -122,20 +128,11 @@
   %end;
 %end;
 
-%if;(not cancel_links)
-  <ul>
-    <li>
-      <a href="http://fr.wikiwix.com/people/timeline.php?born=%birth_date.year;&dead=%death_date.year;">
-         Wikiwix Frise %birth_date.year;-%death_date.year;</a>
-    </li>
-  </ul>
-%end;
-
-<div>
+<div style="clear:both;">
   %empty_sorted_list;
   %let;focus_cnt;%count;%in;
   %reset_count;
-  <ul class="ul_0">
+  <ul class="ul_0" style="padding:1em 0">
     %if;(bvar.var_n_BIRTH > 0)
       %if;(has_birth_date)
         %apply;display_images("BIRTH","A","birth",0,bvar.var_n_BIRTH)
@@ -167,16 +164,18 @@
   </ul>
   %apply;init_count(focus_cnt)
   %if;(wizard and not cancel_links)
-    <div id="l_images" class="menu" style="margin-left: 2em; clear: both; position: relative;">
+    <div style="clear:both;padding:1em 0">
+    <div id="l_images" class="menu" style="position:relative;">
       %foreach;sorted_list_item;
         %if;(item.2 != "")
-          <span><a href="#l_images" title="[add] [linked pages]">%item.2;</a>
+          <span><a href="#l_images" title="[add::] [linked pages]">%item.2;</a>
           <span class="s_menu">
         %end;
         %item.3;
         %if;(next_item.2 != "")</span></span>%end;
       %end;
       </span></span>
+    </div>
     </div>
   %end;
 </div>

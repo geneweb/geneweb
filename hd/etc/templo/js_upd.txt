@@ -1,2 +1,0 @@
-<script type="text/javascript" src="jquery_1_9_1_min.js"></script>
-<script type="text/javascript" src="templo/js_upd.js"></script>

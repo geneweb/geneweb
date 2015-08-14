@@ -1,4 +1,4 @@
-    /* perso_accesskey.js mickroue(a)yahoo.fr 20140910 templ=templm */
+/* $Id: js_perso_accesskey.js,v 7.00 2015/02/12 21:59:05 mr Exp $ */
     function acc_key(thi,event,xsib,xspo,xchi,xmod_ind,xadd_par,xadd_fam,xmod_fam) {
       var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
       var charKey = String.fromCharCode(key);
@@ -61,8 +61,8 @@
       switch (charKey)
       {
         //shift = on
-        case "W": acckey.focus(); break;  // menu2 (w)
-        case "²": NGn.focus(); break;      // trl : search input
+        case "Z": acckey.focus(); break;  // menu2 (z)
+        case "W": mSn.focus(); break;     // trl : search input
         case "2": par_2.focus(); break;
         case "3": par_3.focus(); break;
         case "4": par_4.focus(); break;
@@ -84,10 +84,11 @@
         case "R": rela_comp.click(); break;
         case "S": nav_sosa_ref.click(); break;
         case "U": upd.click(); break;
+        case "X": maxlev.select(); break;
         case "Y": anc_tree.click(); break;
         //shift = off
-        case "w": acckey.focus(); break;  // menu2 (w)
-        case "²": NGn.focus(); break;      // trl : search input
+        case "z": acckey.focus(); break;  // menu2 (z)
+        case "w": mSn.focus(); break;     // trl : search input
         case "é": par_2.focus(); break;
         case "\"": par_3.focus(); break;
         case "'": par_4.focus(); break;
@@ -110,6 +111,7 @@
         case "r": rela_comp.click(); break;
         case "s": nav_sosa_ref.click(); break;
         case "u": upd.click(); break;
+        case "x": maxlev.select(); break;
         case "y": anc_tree.click(); break;
         default: return true; break;
       }

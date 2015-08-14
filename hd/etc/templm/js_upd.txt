@@ -1,2 +1,8 @@
-<script type="text/javascript" src="jquery_1_9_1_min.js"></script>
-<script type="text/javascript" src="templm/js_upd.js"></script>
+<!-- $Id: js_upd.txt,v 7.00 2014/11/18 10:17:06 mr Exp $ --> 
+<script type="text/javascript" src="/templm/js_upd.js"></script>
+%if;(bvar.jquery = "no")
+  <script type="text/javascript" src="/templm/js_upd_jq_no.js"></script>
+%else;
+  <script type="text/javascript" src="/jquery_1_9_1_min.js"></script>
+  <script type="text/javascript" src="/templm/js_upd_jq.js"></script>
+%end;

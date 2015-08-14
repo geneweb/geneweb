@@ -1,131 +1,84 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <!-- $Id: updmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20120712 templ=templm -->
-  <title>[*update]</title>
-  <meta name="robots" content="none"%/>
-  <meta name="format-detection" content="telephone=no"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  %include.css;
-  <style type="text/css">
-    tr {
-     text-align: left;
-    }
-  </style>
-  %base_header;
-</head>
-<body%body_prop; id="menutxt">
-%message_to_wizard;
-
-%if;not cancel_links;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+%(<!-- $Id: updmenu.txt,v 7.00 2015/04/20 22:06:07 mr Exp $ -->%)
+%( used for jquery. old updmenu.txt is in updmenu1.txt %)
+%define;jq1()
+  <div id="jql">
+  %if;has_birth_date; %slash_birth_date;
+  %elseif;has_baptism_date; %slash_baptism_date;
+  %end;
+   - %nn;
+  %if;has_death_date;%slash_death_date; 
+  %elseif;has_burial_date;%slash_burial_date; 
+  %elseif;has_cremation_date;%slash_cremation_date; 
+  %end;
   </div>
+  <div id="jq7">%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end;</div>
+  <div id="jq8">%first_name;</div>
+  <div id="jq9">%surname;</div>
+  <div id="jq10">%index;</div>
+  <div id="jq11">%sex;</div>
 %end;
-
-<h1>%nn;
-  [*update]<br%/>
-  %first_name;
-  .%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end; %surname;
-</h1>
-
-<table border="%border;" width="90%%">
-<tr>
-  <th>[*person/persons]0</th>
-  <th>[*family/families]1</th>
-</tr>
-<tr>
-  <td>
-    <br%/>
-    <a href="%prefix;m=MOD_IND;i=%index;" title="[*modify::person/persons]0 (P)" accesskey="P">[*modify::] (P)</a>
-    <br%/>
-    %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
-         and surname != "?")
-      <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
-      <br%/>
-      %if;(auto_image_file_name != "")
-        <a href="%prefix;m=DEL_IMAGE;i=%index;">[*delete::image/images]0</a>
-        <br%/>
+%define;jq1a(z1,z2)
+  %let;lbp;
+    %if;z1.has_birth_place;%z1.birth_place;
+    %elseif;z1.has_baptism_place;%z1.baptism_place;
+    %end;
+  %in;
+  %let;ldp;
+    %if;z1.is_dead;
+      %if;z1.has_death_place;%z1.death_place;
+      %elseif;z1.has_burial_place;%z1.burial_place;
+      %elseif;z1.has_cremation_place;%z1.cremation_place;
       %end;
     %end;
-    <br%/>
-    <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a>
-    <br%/>
-    <br%/>
-    <a href="%prefix;m=MRG;i=%index;">[*merge::]</a>
-    <br%/>
-    %if;(not has_parents and first_name != "?" and surname != "?")
-      <br%/>
-      <a href="%prefix;m=ADD_PAR;ip=%index;">[*add::parents]</a>
-      <br%/>
+  %in;
+  <div id="jql"> </div>
+  <div id="z2jq2">
+    %if;z1.has_birth_date; %z1.slash_birth_date;
+    %elseif;z1.has_baptism_date; %z1.slash_baptism_date;
     %end;
-  </td>
-  <td>
-    %foreach;family;
-      %if;(family_cnt != 1)
-        <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;">[*invert]</a>
-        <br%/>
-        %if;(family.father.index = prev_family.father.index
-         and family.mother.index = prev_family.mother.index)
-          <a href=%nn;
-          "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;">%nn;
-          [*merge::]</a>
-          <br%/>
+     · %lbp;%nn;
+  </div>
+  <div id="z2jq3">
+    %if;z1.is_dead;
+      %if;z1.has_death_date; %z1.slash_death_date;
+      %elseif;z1.has_burial_date; %z1.slash_burial_date;
+      %elseif;z1.has_cremation_date; %z1.slash_cremation_date;
+      %end;
+       · %ldp;%nn;
+    %end;
+  </div>
+  <div id="z2jq4"> %z1.occupation; </div>
+  <div id="z2jq5">%lbp; </div>
+  <div id="z2jq6">%ldp; </div>
+  <div id="z2jq7">%if;(z1.first_name = "?" or z1.surname = "?")%z1.index;%else;%z1.occ;%end;</div>
+  <div id="z2jq8">%z1.first_name;</div>
+  <div id="z2jq9">%z1.surname;</div>
+  <div id="z2jq11">%z1.sex;</div>
+%end;
+%define;jq1b()
+  %apply;jq1a("self","pa1")
+  %if;has_families;
+    %foreach;family()
+      %if;(family.index = evar.ifam)
+        %apply;jq1a("spouse","pa2")
+        %if;has_children;
+          %foreach;child;
+            %let;l1;ch%child_cnt;%in;
+            %apply;jq1a("child",l1)
+          %end;
         %end;
       %end;
-      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
-       " %if;(nb_families = 1) title="[*modify::family/families]0 (F)" accesskey="F"%end;>%nn;
-      [*modify::family/families]0%if;(nb_families = 1) (F)%end;</a>
-      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br%/>
-      <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
-      [*delete::family/families]0</a>
-      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br%/>
     %end;
-    <br%/>
-    %if;((first_name = "?" or surname = "?") and
-         (nb_families != 0 or has_parents))
-    %elseif;(not is_male and not is_female)
-      <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;
-      [*add::family/families]0 ([M/F]0)</a>
-      <br%/>
-      <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;
-      [*add::family/families]0 ([M/F]1)</a>
-      <br%/>
-    %else;
-      <a href="%prefix;m=ADD_FAM;ip=%index;" title="[add::family/families]0 (A)" accesskey="A">%nn;
-      [*add::family/families]0 (A)</a>
-      <br%/>
-    %end;
-    %if;(nb_children != 0)
-      <br%/>
-      <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
-    %end;
-    %if;has_possible_duplications;
-      <br%/>
-      <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
-    %end;
-  </td>
-</tr>
-</table>
-
-%define;hint(xx)
-  [*to add a child to a family, use "%s":::xx]
+  %end;
 %end;
-
-%if;(nb_families != 0)
-  <p>
-    %apply;hint([*modify::family/families]0)
-    <br%/>
-  </p>
+%if;(evar.jq1 = "on")
+  %apply;jq1()
+%elseif(evar.jq1a = "on")
+  %apply;jq1a("self","")
+%elseif(evar.jq1b = "on")
+  %apply;jq1b()
+%elseif(evar.upddag = "on")
+  %include.upddag;
+%else;
+  %include.updmenu1;
 %end;
-
-  %base_trailer;
-  %copyright;
-</body>
-</html>

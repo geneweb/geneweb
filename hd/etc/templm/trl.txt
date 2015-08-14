@@ -1,5 +1,5 @@
-<!-- trl.txt Modified mickroue(a)yahoo.fr 20140910 templ=templm -->
-%if;(not cancel_links)
+<!-- $Id: trl.txt,v 7.00 2015/02/12 22:06:44 mr Exp $ -->
+%if;(not cancel_links and evar.m != "MOD_DATA_OK" and evar.m != "DEL_IND_OK" and evar.m != "DEL_FAM_OK")
   %if;(evar.em = "R" and (evar.et = "A" or evar.et = "M") and evar.select = "")
     <div class="menu">
       <span>
@@ -14,27 +14,38 @@
       </span>
     </div>
   %end;
-  <div id="trl" class="div2">
-    <form method="get" action="%action;" onSubmit="return os1();">
-       %hidden;
-       <input id="NGm" type="hidden" name="m" value="NG" %/>
-       <input type="search" id="NGn" name="n" accesskey="²" placeholder="[public name], [alias], Sosa*/" size="25" 
-       title="Sosa* = Sosa x 2, Sosa/ = Sosa / 2" maxlength="200" onkeypress="javascript:return computeSosa(event,'NGn')"
-       %/><input type="search" id="NGfn" name="fn" placeholder="[first name/first names]0*" size="25" maxlength="200" title="* = [starting with]"
-       %/><input type="search" id="NGsn" name="sn" placeholder="[surname/surnames]0*" size="25" maxlength="200" title="* = [starting with]"
-       %/><input type="submit" value="[*search/case sensitive]0 (²)"%/>
-       %if;(bvar.hide_advanced_request != "yes")
-         <span class="button nobr"><a href="%prefix;m=H;v=advanced">[*advanced request]</a></span>
-       %end;
-    </form>
+  <div id="trl">
+    %if;(evar.digest = "")
+      <form method="get" action="%action;" onsubmit="return oS3();">
+         %hidden;
+         <input id="mS" type="hidden" name="m" value="S" %/>
+         <input type="search" id="mSn" name="n" accesskey="W" size="40" maxlength="200"
+           title="* = [starting with]%nl;Sosa* = Sosa x 2%nl;Sosa/ = Sosa / 2"
+           placeholder="[surname/surnames]0*, Sosa*/, [public name], [alias]"
+           onkeypress="javascript:return computeSosa(event,'mSn')"
+         %/><input type="search" id="mSp" name="p" size="40" maxlength="200"
+           placeholder="[first name/first names]0*, N° index"
+           title="* = [starting with]"
+         %/><input type="submit" value="[*search/case sensitive]0 (W)"%/>
+         %if;(bvar.hide_advanced_request != "yes")
+           <span class="button nobr"><a href="%prefix;m=H;v=advanced">[*advanced request]</a></span>
+         %end;
+      </form>
+      <div id="templ">
+        <a href="%prefix_no_templ;templ=;%suffix;">default</a>
+        <a href="%prefix_no_templ;templ=templa;%suffix;">templa</a>
+        <a href="%prefix_no_templ;templ=templb;%suffix;">templb</a>
+        <a href="%prefix_no_templ;templ=templc;%suffix;">templc</a>
+        <a href="%prefix_no_templ;templ=templd;%suffix;">templd</a>
+        <a href="%prefix_no_templ;templ=templf;%suffix;">templf</a>
+        <a href="%prefix_no_templ;templ=templh;%suffix;">templh</a>
+        <a href="%prefix_no_templ;templ=templm;%suffix;">templm</a>
+        %if;(wizard or bvar.wizard_passwd = "")
+          <strong><a href="%prefix;m=H;v=doc_templm">doc_templm</a></strong>
+        %end;
+      </div>
+    %end;
   </div>
-  %if;(evar.digest = "")
-    <div id="templ">
-      <a href="%prefix_no_templ;templ=;%suffix;">default</a>
-      <a href="%prefix_no_templ;templ=templm;%suffix;"><span style="background-color:#EEE;color:#22B;">   templm   </span></a>
-      <a href="%prefix_no_templ;templ=templo;%suffix;"><span style="background-color:#000;;color:#EE8;">   templo   </span></a>
-    </div>
-  %end;
   %if;(wizard)
     <script type="text/javascript">
     <!--
@@ -61,5 +72,4 @@
     -->
     </script>
   %end;
-%end;
-<!-- end trl.txt -->
+%end;%nl;
