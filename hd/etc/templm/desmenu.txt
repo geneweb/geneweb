@@ -1,9 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20140818 templ=templm -->
+  <!-- $Id: desmenu.txt,v 7.00 2015/05/17 11:13:56 mr Exp $ -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -109,8 +107,13 @@
            %/>[index of the descendants]</label><br%/>
     <label><input type="radio" name="t" value="C" %l_on2; %l_on;
            %/>[index of the spouses (non descendants)]</label><br%/>
-    <label><input type="radio" name="tl1" value="dbvl" %l_on1; %l_on;
-           %/>d’Aboville</label><br%/>
+    <label><input type="radio" name="t" value="A" %l_on2; %l_on;
+           %/>d'Aboville</label><br%/>
+           <input type="hidden" name="num" value="on" %/>
+    <label><input type="radio" name="tl1" value="hrztl" %l_on1; %l_on;
+           %/>[horizontally]</label><br%/>
+    <label><input type="radio" name="tl1" value="tag" %l_on1; %l_on;
+           %/>étiquette</label><br%/>
   </fieldset>
   <fieldset>
     <legend>
@@ -129,13 +132,6 @@
     %end;
     <label><input type="checkbox" name="always_surname" value="no" checked="checked" %l_on1; %l_on;
            %/>[first name/first names]0 <span style="text-decoration:line-through;">[surname/surnames]0</span></label><br%/>
-    <label>
-      <input type="checkbox" name="sd" value="on" %l_on1; %l_on;%/>[date/dates]0 :
-      %if;([ !dates order]0 = "ddmmyyyy")[year/month/day]2/[year/month/day]1/[year/month/day]0
-      %elseif;([ !dates order]0 = "mmddyyyy")[year/month/day]1/[year/month/day]2/[year/month/day]0
-      %else;[year/month/day]0/[year/month/day]1/[year/month/day]2
-      %end;%if;(wizard) (&gt; [update])%end;
-    </label><br%/>
     <label><input type="checkbox" name="alias" value="on" checked="checked" %l_on1; %l_on;
            %/>[surname alias], [first name alias]</label><br%/>
     <label><input type="checkbox" name="spouse" value="on" checked="checked" %l_on1; %l_on;
@@ -144,12 +140,16 @@
            %/>[parents]</label><br%/>
     <label><input type="checkbox" name="rel" value="on" checked="checked" %l_on1; %l_on;
            %/>[relation/relations]1</label><br%/>
+    <label><input type="checkbox" name="witn" value="on" checked="checked" %l_on1; %l_on;
+           %/>[witness/witnesses]1</label><br%/>
     <label><input type="checkbox" name="notes" value="on" checked="checked" %l_on1; %l_on;
            %/>[note/notes]1</label><br%/>
     <label><input type="checkbox" name="src" value="on" checked="checked" %l_on1; %l_on;
            %/>[source/sources]1</label><br%/>
-    <label><input type="checkbox" name="inline" value="on" %l_on1; %l_on;
-           %/>[display notes/sources inline]</label>
+    <label><input type="checkbox" name="upd" value="on" %l_on1; %l_on;
+           %/>[update]</label><br%/>
+    <label><input type="checkbox" name="hide" value="on" %l_on1; %l_on;
+           %/>[visualize/show/hide/summary]2 … </label>
   </fieldset>
   <fieldset>
     %let;l_on1;onchange="valid('tT')"%in;
@@ -182,8 +182,8 @@
     <legend>[*statistics]</legend>
     <label><input type="radio" id="tCAL" name="tl1" value="cal" %l_on1; %l_on;
            %/>[calendar/calendars]0</label><br%/>
-    <label><input type="radio" id="tMOON" name="tl1" value="moon" %l_on1; %l_on;
-           %/>[moon age/new moon/first quarter/full moon/last quarter]0</label><br%/>
+    <label><input type="radio" id="tBMDM" name="tl1" value="bmdm" %l_on1; %l_on;
+           %/>[year/month/day]1</label><br%/>
     <label><input type="radio" id="tAFM" name="tl1" value="afm" %l_on1; %l_on;
            %/>[age] ([father/mother]0, [father/mother]1)</label><br%/>
     <label><input type="radio" id="tAAX" name="tl1" value="aax" %l_on1; %l_on;
@@ -192,7 +192,7 @@
            %/>[year/month/day]0 [death] - [year/month/day]0 [death] x</label><br%/>
     <label><input type="radio" id="tAAD" name="tl1" value="aad" %l_on1; %l_on;
            %/>[age at death]</label><br%/>
-    <label><input type="radio" id="tMONTHS" name="tl1" value="months" %l_on1; %l_on;
+    <label><input type="radio" id="tMM" name="tl1" value="mm" %l_on1; %l_on;
            %/>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</label><br%/>
     <label><input type="radio" id="tARS" name="tl1" value="ars" %l_on1; %l_on;
            %/>Αἰθήρ</label>

@@ -1,7 +1,0 @@
-<link href="templo/css.css" media="all" rel="stylesheet" type="text/css" %/>
-<script src="templo/js.js" type="text/javascript"></script>
-%if;(bvar.uppercase = "yes")
-  <script src="templo/uppercase.js" type="text/javascript"></script>
-%else;
-  <script src="templo/no_uppercase.js" type="text/javascript"></script>
-%end;

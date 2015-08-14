@@ -1,4 +1,5 @@
-<!-- $Id: anclist_fam7_timeline.txt mickroue(a)yahoo.fr 20140916 templ=templm -->
+<!-- $Id: anclist_fam7_timeline.txt,v 7.00 2014/11/12 14:33:31 mr Exp $ -->
+
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;lurl;%prefix;m=A;t=F;fam7=on;tf1=fam73;cousins=%evar.cousins;;spouse=%evar.spouse;;maxv=%evar.maxv;;v=%evar.v;;%in;
 %define;fam7_somebody1(xx,yy,lexa,lexb,sss)
@@ -289,12 +290,12 @@
 %let;lw2;%if;(lby != 9999)%expr(lby + lw1 + 4)%else;0%end;%in;
 %let;l1s;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
 %let;l1i;%index;%in;
-%let;l2i;%father.index;%in;
-%let;l3i;%mother.index;%in;
-%let;l4i;%father.father.index;%in;
-%let;l5i;%father.mother.index;%in;
-%let;l6i;%mother.father.index;%in;
-%let;l7i;%mother.mother.index;%in;
+%let;l2i;%if;(has_parents)%father.index;%end;%in;
+%let;l3i;%if;(has_parents)%mother.index;%end;%in;
+%let;l4i;%if;(has_parents and father.has_parents)%father.father.index;%end;%in;
+%let;l5i;%if;(has_parents and father.has_parents)%father.mother.index;%end;%in;
+%let;l6i;%if;(has_parents and mother.has_parents)%mother.father.index;%end;%in;
+%let;l7i;%if;(has_parents and mother.has_parents)%mother.mother.index;%end;%in;
 %apply;fam7()
 <table summary="family life dates" class="fam7_table">
 <colgroup>

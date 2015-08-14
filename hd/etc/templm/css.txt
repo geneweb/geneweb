@@ -1,7 +1,23 @@
-<link href="templm/css.css" media="all" rel="stylesheet" type="text/css" %/>
-<script src="templm/js.js" type="text/javascript"></script>
+<!-- $Id: css.txt,v 7.00 2015/03/30 13:00:31 mr Exp $ -->
+
+<link type="text/css" href="/templm/css%bvar.css;.css" media="all" rel="stylesheet" %/>
+<link type="text/css" href="/templm/css.css" media="all" rel="alternate stylesheet" title="css"%/>
+<link type="text/css" href="/templm/css1.css" media="all" rel="alternate stylesheet" title="css1"%/>
+
+<script type="text/javascript" src="/templm/js.js"></script>
 %if;(bvar.uppercase = "yes")
-  <script src="templm/uppercase.js" type="text/javascript"></script>
+  <script type="text/javascript">
+  <!--
+    %if;(bvar.uppercase = "yes")
+      %if;(bvar.particles != "")
+        var p_a = new Array(%bvar.particles;);
+      %else;
+        var p_a = new Array("AF","AV","D","DAL","DE","DEN","DES","DI","DU","OF","UND","VAN","VON","ZU","ZUR");
+      %end;
+    %end;
+  -->
+  </script>
+  <script type="text/javascript" src="/templm/js_uppercase.js"></script>
 %else;
-  <script src="templm/no_uppercase.js" type="text/javascript"></script>
+  <script type="text/javascript" src="/templm/js_uppercase_no.js"></script>
 %end;

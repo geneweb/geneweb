@@ -1,9 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: dag.txt,v 5.4 2007/01/19 01:53:16 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20140912 templ=templm -->
+  <!-- $Id: dag.txt,v 7.00 2015/04/30 11:14:09 mr Exp $ -->
   <title>%head_title;</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -16,11 +14,13 @@
 <body%body_prop; id="dag">
 %message_to_wizard;
 
-%define;menu2()
+%define;tools()
   %if;(not cancel_links or evar.notab = "on")
-    <div class="menu2">
-      %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
-      <form id="tools" name="tools" style="display:inline" method="get" action="%action;">
+    %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
+    <hr %/>
+    <form id="tools" name="tools" method="get" action="%action;">
+      <fieldset>
+        <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>
         %hidden;
         %foreach;env_binding;
           %if;(
@@ -29,7 +29,10 @@
                env.key = "cgl" or
                env.key = "color" or
                env.key = "image" or
+               env.key = "invert" or
+               env.key = "lim" or
                env.key = "opt" or
+               env.key = "new" or
                env.key = "spouse" or
                env.key = "v" or
                env.key = "dpos" or env.key = "pos1" or env.key = "pos2" or env.key = "nogroup" or env.key = "notab" or env.key = "overlap" or
@@ -40,92 +43,105 @@
             <input type="hidden" name="%env.key;" value="%env.val.decoded;" %/>
           %end;
         %end;
-        <div><a href="#">[*tools]</a>
-        <div class="s_menu">
-          %if;(evar.notab = "on")
-            <fieldset>
-              <legend>
-                <label><input type="checkbox" name="notab" value="on" checked="checked" %l_on;
-                      %/>[*display by slices/slice width/overlap/total width]0</label>
-              </legend>
-              <label><input type="checkbox" name="nogroup" value="on" %l_on;
-                     %if;(evar.nogroup = "on") checked="checked"%end;
-                     %/>[don't group the common branches together]</label>
-              <label><input name="dpos" size="5" value="%if;(evar.dpos != "")%evar.dpos;%else;78%end;"
-                     %/>[display by slices/slice width/overlap/total width]1</label>
-              <label><input name="overlap" size="5" value="%if;(evar.overlap != "")%evar.overlap;%else;10%end;"
-                     %/>[display by slices/slice width/overlap/total width]2</label>
-              <label><input name="width" size="5" value="%nn;
-                     %if;(evar.width != "")%evar.width;
-                     %elseif;(dag.max_wid <= 78)%dag.max_wid;
-                     %elseif;(dag.min_wid >= 78)%dag.min_wid;
-                     %else;78%end;"
-                     %/>[display by slices/slice width/overlap/total width]3 (%dag.min_wid;-%dag.max_wid;)</label>
-            </fieldset>
-          %else;
-            <a href="%prefix;%suffix;notab=on" accesskey="/" 
-               title="[display by slices/slice width/overlap/total width]0 (/)"
-               >[*display by slices/slice width/overlap/total width]0</a>
-          %end;
+        %if;(evar.t = "T")
+          <p>
+            %let;l_emaxv;
+              %if;(evar.m = "A")
+                %if;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;
+              %else;
+                %if;(bvar.max_desc_tree = "")4%else;%bvar.max_desc_tree;%end;
+              %end;
+            %in;
+            <input type="hidden" name="maxv" value="%evar.maxv;"%/>
+            <label>[*generation/generations]0 <code>(X)</code> <input id="v" name="v" class="number" size="1" value="%evar.v;"
+              autocomplete="off" autocomplete="off" title="[generation/generations]0 (X)" accesskey="X" %/> / %l_emaxv;</label>
+          </p>
+        %end;
+        %if;(evar.notab = "on")
           <fieldset>
-            %if;(evar.m = "RLM" or evar.m = "RL" or evar.em = "R")
-                <label><input type="checkbox" name="spouse" value="on" %l_on;
-                       %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
-            %end;
-            <label><input type="checkbox" name="opt" value="no_index" %l_on;
-                   %if;(evar.opt = "no_index") checked="checked"%end;%/>[link to use]</label>
-            <label><input type="checkbox" name="cgl" value="on" %l_on;
-                   %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
-            %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-              <label><input type="checkbox" name="image" value="on" %l_on;
-                     %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
-            %end;
-            <label>[border]<input name="bd" size="1" maxlength="2" style="width:1em;" value="%evar.bd;" %/></label>
-            <table summary="colors" cellspacing="0" cellpadding="0">
-              <tr>
-                <td align="%left;">[color] </td>
-                <td align="%left;">
-                  <input type="radio" name="color" value="" %l_on;
-                    %if;(evar.color="") checked="checked"%end;%/></td>
-                %for;i;1;7;
-                  %let;bgi;bg%i;%in;
-                  <td class="%bgi;"><input type="radio" name="color" value="%bgi;" %l_on;
-                                    %if;(evar.color=bgi) checked="checked"%end;%/></td>
-                %end;
-              </tr>
-            </table>
+            <legend>
+              <label><input type="checkbox" name="notab" value="on" checked="checked" %l_on;
+                    %/>[*display by slices/slice width/overlap/total width]0</label>
+            </legend>
+            <label><input type="checkbox" name="nogroup" value="on" %l_on;
+                   %if;(evar.nogroup = "on") checked="checked"%end;
+                   %/>[don't group the common branches together]</label>
+            <label><input name="dpos" size="5" value="%if;(evar.dpos != "")%evar.dpos;%else;78%end;"
+                   %/>[display by slices/slice width/overlap/total width]1</label>
+            <label><input name="overlap" size="5" value="%if;(evar.overlap != "")%evar.overlap;%else;10%end;"
+                   %/>[display by slices/slice width/overlap/total width]2</label>
+            <label><input name="width" size="5" value="%nn;
+                   %if;(evar.width != "")%evar.width;
+                   %elseif;(dag.max_wid <= 78)%dag.max_wid;
+                   %elseif;(dag.min_wid >= 78)%dag.min_wid;
+                   %else;78%end;"
+                   %/>[display by slices/slice width/overlap/total width]3 (%dag.min_wid;-%dag.max_wid;)</label>
           </fieldset>
-          %if;(evar.t = "T")
-            <fieldset><legend>[*generation/generations]0</legend>
-              <div class="v">
-                %let;l_emaxv;
-                  %if;(evar.m = "A")
-                    %if;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;
-                  %else;
-                    %if;(bvar.max_desc_tree = "")4%else;%bvar.max_desc_tree;%end;
-                  %end;
-                %in;
-                %let;l_maxv;%expr(l_emaxv + 1)%in;
-                %let;l_minv;%if;(evar.m = "D")1%else;2%end;%in;
-                %for;i;l_minv;l_maxv;
-                  <label>%i;<br%/>
-                    <input type="radio" name="v" value="%i;" %l_on;%if;(evar.v = i) checked="checked"%end;%/>
-                  </label>
-                %end;
-              </div>
-            </fieldset>
+        %else;
+          <ul>
+            %if;(wizard and evar.m = "RLM")
+              <li><a href="%prefix_no_iz;i=0;upddag=on;%nn;
+                    %foreach;env_binding;
+                      %if;(env.key = "m")m=U;%nn;
+                      %elseif;(env.key = "templ")
+                      %else;%env.key;=%env.val.decoded;;%nn;
+                      %end;
+                    %end;">[*modify::tree]</a></li>
+            %end;
+            <li><a href="%prefix;%suffix;notab=on" accesskey="/" 
+               title="[display by slices/slice width/overlap/total width]0 (/)"
+               >[*display by slices/slice width/overlap/total width]0</a></li>
+          </ul>
+        %end;
+        <fieldset>
+          %if;(evar.m = "RLM" or evar.m = "RL" or evar.em = "R")
+              <label><input type="checkbox" name="spouse" value="on" %l_on;
+                     %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
           %end;
-          <div class="ok"><input type="submit" value="ok"%/></div>
-        </div>
-        </div>
-      </form>
-      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-    </div>
+          <label><input type="checkbox" name="opt" value="no_index" %l_on;
+                 %if;(evar.opt = "no_index") checked="checked"%end;%/>[link to use]</label>
+          <label><input type="checkbox" name="cgl" value="on" %l_on;
+                 %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
+          %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+            <label><input type="checkbox" name="image" value="on" %l_on;
+                   %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
+          %end;
+          <label>[border]<input name="bd" size="1" maxlength="2" style="width:1em;" value="%evar.bd;" %/></label>
+          <table summary="colors" cellspacing="0" cellpadding="0">
+            <tr>
+              <td align="%left;">[color] </td>
+              <td align="%left;">
+                <input type="radio" name="color" value="" %l_on;
+                  %if;(evar.color="") checked="checked"%end;%/></td>
+              %for;i;1;7;
+                %let;bgi;bg%i;%in;
+                <td class="%bgi;"><input type="radio" name="color" value="%bgi;" %l_on;
+                                  %if;(evar.color=bgi) checked="checked"%end;%/></td>
+              %end;
+            </tr>
+          </table>
+        </fieldset>
+        %if;(evar.m = "RLM")
+          <fieldset>
+            <label><input type="checkbox" name="invert" value="on" %l_on;
+                   %if;(evar.invert = "on") checked="checked"%end;%/>invert</label>
+            <label><input type="checkbox" name="new" value="on" %l_on;
+                   %if;(evar.new = "on") checked="checked"%end;%/>new</label>
+            <label>lim<input name="lim" value="%evar.lim;" size="1"%/></label>
+          </fieldset>
+        %end;
+      </fieldset>
+    </form>
   %end;
 %end;
+%define;menu2()
+  <div class="menu2">
+    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+  </div>
+%end;
 
-%if;(not cancel_links and evar.notab != "on")
-  %let;l_o;image=%evar.image;;bd=%evar.bd;;color=%evar.color;%in;
+%if;(not cancel_links and evar.notab != "on" )
+  %let;l_o;image=%evar.image;;bd=%evar.bd;;color=%evar.color;;invert=%evar.invert;;new=%evar.new;%in;
   <div class="menu">
     %if;(link_next != "")
       <span>
@@ -160,7 +176,7 @@
         </span>
       %end;
     %end;
-    %if;(evar.m = "RLM" and evar.i6 = "" and evar.t1 != "1")
+    %if;(evar.m = "RLM" and evar.i6 = "" and evar.p6 = "" and evar.t1 != "1")
       <span>
         %let;l_i;i=%evar.i1;;ei=%evar.i2;%in;
         <a href="%prefix;em=R;et=S;spouse=on;%l_i;;%l_o;">[*shortest path]</a>
@@ -248,6 +264,7 @@
   </table>
   </td></tr></table>
 %end;
+%apply;tools()
 %base_trailer;
 %copyright;
 </body>
