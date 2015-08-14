@@ -1,1 +1,59 @@
-<script type="text/javascript" src="templm/js_perso_accesskey.js"></script>
+<!-- $Id: js_perso_accesskey.txt,v 7.00 2015/02/12 22:01:17 mr Exp $ -->
+
+<script type="text/javascript" src="/templm/js_perso_accesskey.js"></script>
+%let;laA;title="[add::family/families]0 (A)" accesskey="A"%in;
+%let;laD;title="[difference between the two revisions] (D)" accesskey="D"%in;
+%let;laI;title="[send::image/images]0 (I)" accesskey="I"%in;
+%let;laL;title="[add::parents] (L)" accesskey="L"%in;
+%let;laP;title="[modify::person/persons]0 (P)" accesskey="P"%in;
+%let;laR;title="[relationship computing] (R)" accesskey="R"%in;
+%let;laU;title="[update] (U)" accesskey="U"%in;
+%let;laS;title="[navigation with %t as Sosa reference:::xx] (S)" accesskey="S"%in;
+%let;lcS;<code>(S)</code>%in; %( Sosa reference %)
+%let;laX;autocomplete="off" title="[generation/generations]0 (X)" accesskey="X"%in;
+%let;lcX;<code>(X)</code>%in; %( generation %)
+%let;laY;title="[tree] (Y)" accesskey="Y"%in;
+%let;laZ;title="[navigation] OnKeyPress (Z)" accesskey="Z"%in;
+%define;menu2()
+  %if;not cancel_links;
+    <div class="menu2">
+      <form id="ak" method="get" action="" style="display:inline;">
+        <div style="display:inline;"><input id="acckey" style="width:15px;text-align:center;"
+         name="acckey" %laZ; value="" size="1" maxlength="1"
+         placeholder="?"
+         onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"
+         %/>
+          <div class="s_menu">
+            <h3>[*navigation] OnKeyPress (Z)</h3>
+            <p>
+              (0) [spouse/spouses]1<br%/>
+              (1) [siblings]<br%/>
+              (2 3 4 5 6 7) Sosa - [ancestors]<br%/>
+              (8) [child/children]1<br%/>
+              (9) Sosa - [child/children]0<br%/>
+              (D) [difference between the two revisions]<br%/>
+              (R) [relationship computing]<br%/>
+              (S) [navigation with %t as Sosa reference:::xx]<br%/>
+              (W) [search/case sensitive]0<br%/>
+              (X) [generation/generations]0<br%/>
+              (Y) [tree]<br%/>
+              (Z) [navigation] OnKeyPress<br%/>
+              <br%/> 
+              %if;wizard;
+              (A) [add::family/families]0<br%/>
+              (F) [modify::family/families]0 1<br%/>
+              (G) [modify::family/families]0 2<br%/>
+              (H) [modify::family/families]0 3<br%/>
+              (I) [send::image/images]0<br%/>
+              (L) [add::parents]<br%/>
+              (P) [modify::person/persons]0<br%/>
+              (U) [update]
+              %end;
+            </p>
+          </div>
+        </div>
+      </form>
+      <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
+    </div>
+  %end;
+%end;

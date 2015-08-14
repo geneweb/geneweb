@@ -1,4 +1,4 @@
-/* upd.js mickroue(a)yahoo.fr 20140923 templ=templm */
+/* $Id: js_upd.js,v 7.00 2015/04/20 22:05:13 mr Exp $ */
   function oKP1(event)
   {
     var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
@@ -11,15 +11,16 @@
       var e2 = document.getElementById("first_name");
       switch(charKey)
       {
-        case "M": e1.value = "M"; e2.focus(); break;
-        case "F": e1.value = "F"; e2.focus(); break;
-        case "N": e1.value = "N"; e2.focus(); break;
+        case "M": e1.value = "M"; e2.select(); break;
+        case "F": e1.value = "F"; e2.select(); break;
+        case "N": e1.value = "N"; e2.select(); break;
       }
       return false;
     }
   }
-  function oKP2(event,z1,z2,z3)
+  function oKP2(event,z1,z2,z3,z4)
   {
+    var t1 = (z1 == "witn") ? z4: z1;
     var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
     var charKey = String.fromCharCode(key).toUpperCase();
     if (z1 == "ch" || z1 == "witn")
@@ -28,31 +29,32 @@
       var t = r.test(charKey);
       if (t == true)
       {
-          var e1 = document.getElementById(z1 + z2 + "_occ");
-          var e2 = document.getElementById(z1 + z2 + "_fn");
-          var a1 = (e1.value == "") ? e1.getAttribute("placeHolder","false"): e1.value;
-          switch(charKey)
-          {
-            case "M": e1.value = "M"; e2.focus(); break;/* masculin */
-            case "F": e1.value = "F"; e2.focus(); break;/* féminin */
-            case "N": e1.value = "N"; e2.focus(); break;/* neutre */
-            case "P": if(z1 == "ch")visHid(z1,'_sn'); break;/* afficher/masquer patronyme de l'enfant*/
-          }
+        var e1 = document.getElementById(t1 + z2 + "_occ");
+        var e2 = document.getElementById(t1 + z2 + "_fn");
+        var a1 = (e1.value == "") ? e1.getAttribute("placeHolder","false"): e1.value;
+        switch(charKey)
+        {
+          case "M": e1.value = "M"; e2.select(); break;/* masculin */
+          case "F": e1.value = "F"; e2.select(); break;/* féminin */
+          case "N": e1.value = "N"; e2.select(); break;/* neutre */
+          case "P": if(z1 == "ch")visHid(t1,'_sn'); break;/* afficher/masquer patronyme de l'enfant*/
+        }
         return false;
       }
     }
-    var r = /[RDIAHB]/; /* lettres choisies */
+    var r = /[RDIAHBX]/; /* lettres choisies */
     var t = r.test(charKey);
     if (t == true)
     {
       switch(charKey)
       {
-        case "R": invertS(z1,z2,z3,0,1); break;/* remonter (permuter 3 et 2) */
-        case "D": invertS(z1,z2,z3,1,1); break;/* descendre (permuter 4 et 3) */
-        case "I": addS(z1,z2,0); break;/* insérer une ligne sur place */
-        case "A": addS(z1,z2,1); break;/* ajouter une ligne à la fin */
-        case "H": invertS(z1,z2,z3,0,0); break;/* haut (position sur la ligne précédente) */
-        case "B": invertS(z1,z2,z3,1,0); break;/* bas (position sur la ligne suivante) */
+        case "R": invertS(z1,z2,z3,0,1,z4); break;/* remonter (permuter 3 et 2) */
+        case "D": invertS(z1,z2,z3,1,1,z4); break;/* descendre (permuter 4 et 3) */
+        case "I": addS(z1,z2,0,z4); break;/* insérer une ligne sur place */
+        case "A": addS(z1,z2,1,z4); break;/* ajouter une ligne à la fin */
+        case "H": invertS(z1,z2,z3,0,0,z4); break;/* haut (position sur la ligne précédente) */
+        case "B": invertS(z1,z2,z3,1,0,z4); break;/* bas (position sur la ligne suivante) */
+        case "X": delS(z1,z2,z3,1,0,z4); break;/* supprimer */
       }
       return false;
     }
@@ -75,64 +77,49 @@
       }
     }
   }
+  function oKP3(event,e)
+  {
+    var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
+    var charKey = String.fromCharCode(key).toUpperCase();
+    var e1 = e.nextSibling;
+    var e2 = e1.nextSibling;
+    if (charKey == "+")
+    {
+      e.value = "#deat";
+      e2.focus();
+      return false;
+    }
+  }
   function accent0()
   {
-    var v1=document.getElementById('notes');
-    v1.style.width="369px";
-    v1.style.height="299px";
+    var e1=document.getElementById('notes');
+    e1.style.width="405px";
+    e1.style.height="270px";
     document.getElementById('accent').style.display="none";
     document.getElementById('accent0').style.display="none";
-    document.getElementById('accent1').style.display="inline";
-    document.getElementById('notes1').style.width="375px";
+    document.getElementById('accent1').style.display="block";
+    document.getElementById('notes1').style.width="420px";
     document.getElementById('accent2').style.width="auto";
-    document.getElementById('notes2').style.width="auto";
-    document.getElementById('death_src').focus();
-    v1.focus();
+    window.scrollBy(0,-300);
+    e1.focus();
   }
   function accent1()
   {
-    var v1=document.getElementById('notes');
-    v1.style.width="99%";    
-    v1.style.height="400px";
+    var e1=document.getElementById('notes');
+    e1.style.width="99%";
+    e1.style.height="400px";
     document.getElementById('accent').style.display="block";
-    document.getElementById('accent0').style.display="inline";
+    document.getElementById('accent0').style.display="block";
     document.getElementById('accent1').style.display="none";
     document.getElementById('notes1').style.width="99%";
-    document.getElementById('accent2').style.width="99%";
-    document.getElementById('notes2').style.width="99%";
-    document.getElementById('occu').focus();
-    v1.focus();
+    document.getElementById('accent2').style.width="98%";
+    window.scrollBy(0,300);
+    e1.focus();
   }
   function itemMaxCnt(item,cnt)
   {
     while (document.getElementById(item + cnt)){cnt++}
     return cnt;
-  }
-  var ldlLen = 0;
-  var ldlTim;
-  var ldlVal = "";
-  function ldl(z1,z2,z3)
-  {
-    var a1 = "o" + z2;
-    var a2 = z1.value.length;
-    var a3 = document.getElementById(a1).value;
-    var a4 = z1.value.slice(0,3);
-    var key = z3.keyCode ? z3.keyCode : z3.which ? z3.which : z3.charCode;
-    if(a3 > 20 && ldlVal == a4)ldlVal = "";
-    if(ldlVal != a4 && a2 != ldlLen && a2 > 2 && key != "8" && key != "46")
-    {
-      clearTimeout(ldlTim); 
-      ldlVal = a4;
-      ldlLen = a2;
-      ldlTim = setTimeout(
-      function()
-      { 
-        var b1 = encodeURI(z1.value);
-        var b2 = "#dl" + z2;
-        var b3 = "?m=MOD_DATA;data=" + z2 + ";s=" + b1 + ";datalist=on;";
-        $(b2).load(b3);
-      },1000);
-    }
   }
   function addItem(item,cnt,lex)
   {
@@ -160,6 +147,38 @@
       document.getElementById(item + cnt).value = v1;
     }
   }
+  function addEvent()
+  {
+    var c0 = itemMaxCnt("e",1);
+    var c1 = c0 + 1;
+    var c2 = c0 - 1;
+    var dc0 = "e_date" + c0;
+    var d = dmyDate(dc0);
+    var hd = hDate(dc0);
+    var v1 = document.getElementById("e_place" + c2).value;
+    var t1 = document.getElementById("aw1").firstChild.data;
+    document.getElementById("new_event").outerHTML = '\
+      <dt id="e'+ c0 +'">\n\
+      <input id="e_name'+ c0 +'" name="e_name'+ c0 +'" value="" type="hidden">\n\
+      <input id="e_name'+ c0 +'_dl" name="e_name'+ c0 +'_dl" class="e" size="20" maxlength="200" value=""\n\
+      list="dlevent" autocomplete="off"\n\
+      onkeypress="javascript:return oKP3(event,this)" onblur="oB6(\''+ c0 +'\')"\n\
+      onkeydown="if(event.keyCode == 13)oB6(\''+ c0 +'\')"\n\
+      ><code>   <\/code>'+ d +'\n\
+      '+ hd +'\n\
+      <input id="e_place'+ c0 +'" name="e_place'+ c0 +'" class="pl" size="70" value="'+ v1 +'"\n\
+      list="dlplace"\n\
+      onkeyup="ldl(this,\'place\',event)"><\/dt>\n\
+      <dd><textarea id="e_note'+ c0 +'" name="e_note'+ c0 +'" class="enote"><\/textarea><\/dd>\n\
+      <dd><input id="e_src'+ c0 +'" name="e_src'+ c0 +'" class="esrc" value=""\n\
+      list="dlsrc"\n\
+      onkeyup="ldl(this,\'src\',event)"><\/dd>\n\
+      <dd id="new_e'+ c0 +'_witn"><\/dd>\n\
+      <dd><a href="javascript:addWitness(1,1,\'e'+ c0 +'_witn\')">'+ t1 +'<\/a><\/dd>\n\
+      <\/dt>\n\
+      <dt id="new_event"></dt>';
+    sIV("e_name"+ c0 +"_dl");
+  }
   function addRelation(z1,z2)
   {
     var c0 = z1;
@@ -183,8 +202,9 @@
       <tr id="' + t1 + '">\n\
         <td><input type="hidden" id="' + t1f + '_p" name="' + t1f + '_p" value="create">\n\
             <input id="' + t1f + '_occ" name="' + t1f + '_occ" class="occ0" autocomplete="off" placeholder="' + l12 + '" size="3" maxlength="8" value="" onkeypress="javascript:return oKP2(event,\'r\',' + c1 + ',\'_fath_occ\')" onblur="oB3(\'' + t1f + '\')"><\/td>\n\
-        <td><input id="' + t1f + '_fn" name="' + t1f + '_fn" class="ar" size="30" maxlength="200" value="" onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"><\/td>\n\
-        <td><input id="' + t1f + '_sn" name="' + t1f + '_sn" size="30" maxlength="200" value="" onblur="tUC(this)" onkeydown="if(event.keyCode == 13)tUC(this)"><\/td>\n\
+        <td><input id="' + t1f + '_fn" name="' + t1f + '_fn" class="fn ar" size="30" maxlength="200" value="" onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"><\/td>\n\
+        <td><input id="' + t1f + '_sn" name="' + t1f + '_sn" class="sn" size="30" maxlength="200" value="" onblur="tUC(this);jq1(\''+ t1f +'\',\'0\')" onkeydown="if(event.keyCode == 13)tUC(this)"><\/td>\n\
+        <td><span id="'+ t1f +'_jq1"> <\/span><\/td>\n\
         <td rowspan="2" class="bg7"><select id="' + t1 + '_type" name="' + t1 + '_type">\n\
         <option value="GodParent" selected="selected">' + l2 + '<\/option>\n\
         <option value="Adoption">' + l3 + '<\/option>\n\
@@ -196,8 +216,9 @@
         <tr>\n\
         <td><input type="hidden" id="' + t1m + '_p" name="' + t1m + '_p" value="create">\n\
             <input id="' + t1m + '_occ" name="' + t1m + '_occ" class="occ1" autocomplete="off" placeholder="' + l13 + '" size="3" maxlength="8" value="" onkeypress="javascript:return oKP2(event,\'r\',\'' + c1 + '\',\'_moth_occ\')" onblur="oB3(\'' + t1m + '\')"><\/td>\n\
-        <td><input id="' + t1m + '_fn" name="' + t1m + '_fn" class="ar" size="30" maxlength="200" value="" onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"><\/td>\n\
-        <td><input id="' + t1m + '_sn" name="' + t1m + '_sn" size="30" maxlength="200" value="" onblur="tUC(this)" onkeydown="if(event.keyCode == 13)tUC(this)"><\/td>\n\
+        <td><input id="' + t1m + '_fn" name="' + t1m + '_fn" class="fn ar" size="30" maxlength="200" value="" onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"><\/td>\n\
+        <td><input id="' + t1m + '_sn" name="' + t1m + '_sn" class="sn" size="30" maxlength="200" value="" onblur="tUC(this);jq1(\''+ t1m +'\',\'1\')" onkeydown="if(event.keyCode == 13)tUC(this)"><\/td>\n\
+        <td><span id="'+ t1m +'_jq1"> <\/span><\/td>\n\
       <\/tr>\n\
       <tr id="new_relation"><\/tr>';
       if(z2 == 0)
@@ -227,6 +248,8 @@
       a[0]["e16"]= t0 + "_moth_occ";
       a[0]["e17"]= t0 + "_fath_p";
       a[0]["e18"]= t0 + "_moth_p";
+      a[0]["e19"]= t0 + "_fath_jq1";
+      a[0]["e20"]= t0 + "_moth_jq1";
       
       a[1] = new Array();
       a[1]["e10"]= t1 + "_type";
@@ -238,6 +261,8 @@
       a[1]["e16"]= t1 + "_moth_occ";
       a[1]["e17"]= t1 + "_fath_p";
       a[1]["e18"]= t1 + "_moth_p";
+      a[1]["e19"]= t1 + "_fath_jq1";
+      a[1]["e20"]= t1 + "_moth_jq1";
       
       var n0 = document.getElementsByName(a[0]["e10"])[0];
       var n1 = document.getElementsByName(a[1]["e10"])[0];
@@ -255,12 +280,63 @@
          
       for (var i = 11; i <= 18; i++)
       {
-        var v0 = document.getElementById(a[0]["e" + i]).value; 
+        var v0 = document.getElementById(a[0]["e" + i]).value;
         var v1 = document.getElementById(a[1]["e" + i]).value;
         document.getElementById(a[0]["e" + i]).value = v1;
         document.getElementById(a[1]["e" + i]).value = v0;
       }
+      for (var i = 19; i <= 20; i++)
+      {
+        var e0 = document.getElementById(a[0]["e" + i]);
+        var v0 = e0.firstChild ? e0.firstChild.data : "";
+        var e1 = document.getElementById(a[1]["e" + i]);
+        var v1 = e1.firstChild ? e1.firstChild.data : "";
+        document.getElementById(a[0]["e" + i]).innerHTML = v1;
+        document.getElementById(a[1]["e" + i]).innerHTML = v0;
+        var v0 = e0.title;
+        var v1 = e1.title;
+        document.getElementById(a[0]["e" + i]).title = v1;
+        document.getElementById(a[1]["e" + i]).title = v0;
+      }
     }
+  }
+  function dmyDate(z1)
+  {
+      var dmy = document.getElementById("dmy").firstChild.data;
+      if (dmy == "ddmmyyyy")
+      {
+        var d ="\
+<input id=" + z1 + "_dd name=" + z1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + z1 + "','_dd','_mm');\"\/>\
+<input id=" + z1 + "_mm name=" + z1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + z1 + "','_mm','_yy');\" onkeydown=\"javascript:return oKD1(event,'" + z1 + "_mm','" + z1 + "_dd');\"\/>\
+<input id=" + z1 + "_yy name=" + z1 + "_yy class=y autocomplete=off size=12 maxlength=50 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + z1 + "');return oKD1(event,'" + z1 + "_yy','" + z1 + "_mm');\" onblur=\"javascript:evD('" + z1 + "')\"\/>"
+      }
+      if (dmy == "mmddyyyy")
+      {
+        var d ="\
+<input id=" + z1 + "_mm name=" + z1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + z1 + "','_mm','_dd');\"\/>\
+<input id=" + z1 + "_dd name=" + z1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + z1 + "','_dd','_yy');\" onkeydown=\"javascript:return oKD1(event,'" + z1 + "_dd','" + z1 + "_mm');\"\/>\
+<input id=" + z1 + "_yy name=" + z1 + "_yy class=y autocomplete=off size=12 maxlength=50 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + z1 + "');return oKD1(event,'" + z1 + "_yy','" + z1 + "_dd');\" onblur=\"javascript:evD('" + z1 + "')\"\/>"
+      }
+      if (dmy == "yyyymmdd")
+      {
+        var d ="\
+<input id=" + z1 + "_yy name=" + z1 + "_yy class=y autocomplete=off size=12 maxlength=50 value=\"\" onkeypress=\"javascript:return cF1(event,'" + z1 + "_mm');\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + z1 + "')\" onblur=\"javascript:evD('" + z1 + "')\"\/>\
+<input id=" + z1 + "_mm name=" + z1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + z1 + "','_mm','_dd');\" onkeydown=\"javascript:return oKD1(event,'" + z1 + "_mm','" + z1 + "_yy');\"\/>\
+<input id=" + z1 + "_dd name=" + z1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + z1 + "','_dd','_place');\" onkeydown=\"javascript:return oKD1(event,'" + z1 + "_dd','" + z1 + "_mm');\"\/>"
+      }
+      return d;
+  }
+  function hDate(z1)
+  {
+    var d ="\n\
+      <input type=hidden id=" + z1 + "_cal name=" + z1 + "_cal value=\"\" \/>\n\
+      <input type=hidden id=" + z1 + "_yyyy name=" + z1 + "_yyyy value=\"\" \/>\n\
+      <input type=hidden id=" + z1 + "_oryear name=" + z1 + "_oryear value=\"\" \/>\n\
+      <input type=hidden id=" + z1 + "_ormonth name=" + z1 + "_ormonth value=\"\" \/>\n\
+      <input type=hidden id=" + z1 + "_orday name=" + z1 + "_orday value=\"\" \/>\n\
+      <input type=hidden id=" + z1 + "_text name=" + z1 + "_text value=\"\" \/>\n\
+      <input type=hidden id=" + z1 + "_prec name=" + z1 + "_prec value=\"\" \/>"
+    return d;
   }
   function addTitle(z1,z2)
   {
@@ -271,40 +347,10 @@
     var v = document.getElementById("t_ident1").value;
     if(v != "")
     {
-      var dmy = document.getElementById("dmy").firstChild.data;
-      if (dmy == "ddmmyyyy")
-      {
-        var d_start ="\
-<input id=" + sc1 + "_dd name=" + sc1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + sc1 + "','_dd','_mm');\"\/>\
-<input id=" + sc1 + "_mm name=" + sc1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + sc1 + "','_mm','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + sc1 + "_mm','" + sc1 + "_dd');\"\/>\
-<input id=" + sc1 + "_yy name=" + sc1 + "_yy class=y autocomplete=off size=8 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + sc1 + "')\" onkeyup=\"javascript:return oKU1(event,'" + sc1 + "_yy','" + sc1 + "_mm');\" onblur=\"javascript:evD('" + sc1 + "')\"\/>"
-        var d_end ="\
-<input id=" + ec1 + "_dd name=" + ec1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + ec1 + "','_dd','_mm');\"\/>\
-<input id=" + ec1 + "_mm name=" + ec1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + ec1 + "','_mm','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + ec1 + "_mm','" + ec1 + "_dd');\"\/>\
-<input id=" + ec1 + "_yy name=" + ec1 + "_yy class=y autocomplete=off size=8 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + ec1 + "')\" onkeyup=\"javascript:return oKU1(event,'" + ec1 + "_yy','" + ec1 + "_mm');\" onblur=\"javascript:evD('" + ec1 + "')\"\/>"
-      }
-      if (dmy == "mmddyyyy")
-      {
-        var d_start ="\
-<input id=" + sc1 + "_mm name=" + sc1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + sc1 + "','_mm','_dd');\"\/>\
-<input id=" + sc1 + "_dd name=" + sc1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + sc1 + "','_dd','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + sc1 + "_dd','" + sc1 + "_mm');\"\/>\
-<input id=" + sc1 + "_yy name=" + sc1 + "_yy class=y autocomplete=off size=8 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + sc1 + "')\" onkeyup=\"javascript:return oKU1(event,'" + sc1 + "_yy','" + sc1 + "_dd');\" onblur=\"javascript:evD('" + sc1 + "')\"\/>"
-        var d_end ="\
-<input id=" + ec1 + "_mm name=" + ec1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + ec1 + "','_mm','_dd');\"\/>\
-<input id=" + ec1 + "_dd name=" + ec1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + ec1 + "','_dd','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + ec1 + "_dd','" + ec1 + "_mm');\"\/>\
-<input id=" + ec1 + "_yy name=" + ec1 + "_yy class=y autocomplete=off size=8 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + ec1 + "')\" onkeyup=\"javascript:return oKU1(event,'" + ec1 + "_yy','" + ec1 + "_dd');\" onblur=\"javascript:evD('" + ec1 + "')\"\/>"
-      }
-      if (dmy == "yyyymmdd")
-      {
-        var d_start ="\
-<input id=" + sc1 + "_yy name=" + sc1 + "_yy class=y autocomplete=off size=8 maxlength=12 value=\"\" onkeypress=\"javascript:return cF1(event,'" + sc1 + "_mm');\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + sc1 + "')\" onblur=\"javascript:evD('" + sc1 + "')\"\/>\
-<input id=" + sc1 + "_mm name=" + sc1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + sc1 + "','_mm','_dd');\" onkeyup=\"javascript:return oKU1(event,'" + sc1 + "_mm','" + sc1 + "_yy');\"\/>\
-<input id=" + sc1 + "_dd name=" + sc1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + sc1 + "','_dd','_place');\" onkeyup=\"javascript:return oKU1(event,'" + sc1 + "_dd','" + sc1 + "_mm');\"\/>"
-        var d_end ="\
-<input id=" + ec1 + "_yy name=" + ec1 + "_yy class=y autocomplete=off size=8 maxlength=12 value=\"\" onkeypress=\"javascript:return cF1(event,'" + ec1 + "_mm');\" onkeydown=\"if(event.keyCode == 13)javascript:evD('" + ec1 + "')\" onblur=\"javascript:evD('" + ec1 + "')\"\/>\
-<input id=" + ec1 + "_mm name=" + ec1 + "_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + ec1 + "','_mm','_dd');\" onkeyup=\"javascript:return oKU1(event,'" + ec1 + "_mm','" + ec1 + "_yy');\"\/>\
-<input id=" + ec1 + "_dd name=" + ec1 + "_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + ec1 + "','_dd','_place');\" onkeyup=\"javascript:return oKU1(event,'" + ec1 + "_dd','" + ec1 + "_mm2');\"\/>"
-      }
+      var d_start = dmyDate(sc1);
+      var hd_start = hDate(sc1);
+      var d_end = dmyDate(ec1);
+      var hd_end = hDate(ec1);
       document.getElementById("new_title").outerHTML = '\
       <tr id="t' + c1 + '">\n\
       <td class="bg7"><input id="t' + c1 + '_occ" name="t' + c1 + '_occ" class="t_occ" size=1 maxlength=1 placeholder="&bull;" onkeypress="javascript:return oKP2(event,\'t\',' + c1 + ',\'_occ\')" onblur="this.value=\'\';"%/></td>\n\
@@ -312,17 +358,9 @@
       <td><input id="t_place' + c1 + '" name="t_place' + c1 + '" size="30" value=""><\/td>\n\
       <td><input id="t_name' + c1 + '" name="t_name' + c1 + '" size="30" value=""><\/td>\n\
       <td><input autocomplete="off" class="number" id="t_nth' + c1 + '" name="t_nth' + c1 + '" size="3" value=""><\/td>\n\
-      <input type=hidden id="' + sc1 + '_cal" name="' + sc1 + '_cal" value="" >\n\
-      <input type=hidden id="' + sc1 + '_yyyy" name="' + sc1 + '_yyyy" value="" >\n\
-      <input type=hidden id="' + sc1 + '_oryear" name="' + sc1 + '_oryear" value="" >\n\
-      <input type=hidden id="' + sc1 + '_text" name="' + sc1 + '_text" value="" >\n\
-      <input type=hidden id="' + sc1 + '_prec" name="' + sc1 + '_prec" value="" >\n\
-      <input type=hidden id="' + ec1 + '_cal" name="' + ec1 + '_cal" value="" >\n\
-      <input type=hidden id="' + ec1 + '_yyyy" name="' + ec1 + '_yyyy" value="" >\n\
-      <input type=hidden id="' + ec1 + '_oryear" name="' + ec1 + '_oryear" value="" >\n\
-      <input type=hidden id="' + ec1 + '_text" name="' + ec1 + '_text" value="" >\n\
-      <input type=hidden id="' + ec1 + '_prec" name="' + ec1 + '_prec" value="" >\n\
       <td><span class="dmyt">' + d_start + '<\/span><span class="dmyt">' + d_end + '<\/span><\/td>\n\
+      ' + hd_start + '\n\
+      ' + hd_end + '\n\
       <\/tr>\n\
       <tr id="new_title"><\/tr>';
       if(z2 == 0)
@@ -407,45 +445,50 @@
     var c0 = z1;
     var c1 = itemMaxCnt('ch',c0);
     var v = document.getElementById("ch1_fn").value;
+    var e1 = document.getElementById("ch1b_pl");
+    var a1 = e1.getAttribute("onkeyup","false");
+    var a2 = a1 == null ? "" : "onkeyup=\"" + a1 + "\"";
     if(v != "")
     {
+      var e2 = document.getElementById("ch1_sn");
       var t0 = "ch" + c0;
       var t1 = "ch" + c1;
       var v1 = document.getElementById("pa1_sn").value;
-      var v2 = document.getElementById("ch1_sn").type;
+      var v2 = e2.type;
+      var v3 = e2.value == "?" ? document.getElementById("pa2_sn").value : e2.value;
       var dmy = document.getElementById("dmy").firstChild.data;
       if (dmy == "ddmmyyyy")
       {
         var d_b ="\
 <input id=" + t1 + "b_dd name=" + t1 + "b_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "b','_dd','_mm');\"\/>\
-<input id=" + t1 + "b_mm name=" + t1 + "b_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "b','_mm','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "b_mm','" + t1 + "b_dd');\"\/>\
-<input id=" + t1 + "b_yy name=" + t1 + "b_yyyy class=y autocomplete=off size=4 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "b')\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'b_yy\');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "b_yy','" + t1 + "b_mm');\" onblur=\"javascript:evSD('" + t1 + "b')\"\/>"
+<input id=" + t1 + "b_mm name=" + t1 + "b_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "b','_mm','_yy');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "b_mm','" + t1 + "b_dd');\"\/>\
+<input id=" + t1 + "b_yy name=" + t1 + "b_yyyy class=ys autocomplete=off size=4 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "b');return oKD1(event,'" + t1 + "b_yy','" + t1 + "b_mm');\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'b_yy\');\" onblur=\"javascript:evSD('" + t1 + "b')\"\/>"
         var d_d ="\
 <input id=" + t1 + "d_dd name=" + t1 + "d_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "d','_dd','_mm');\"\/>\
-<input id=" + t1 + "d_mm name=" + t1 + "d_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "d','_mm','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "d_mm','" + t1 + "d_dd');\"\/>\
-<input id=" + t1 + "d_yy name=" + t1 + "d_yyyy class=y autocomplete=off size=4 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "d')\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'d_yy\');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "d_yy','" + t1 + "d_mm');\" onblur=\"javascript:evSD('" + t1 + "d')\"\/>"
+<input id=" + t1 + "d_mm name=" + t1 + "d_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "d','_mm','_yy');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "d_mm','" + t1 + "d_dd');\"\/>\
+<input id=" + t1 + "d_yy name=" + t1 + "d_yyyy class=ys autocomplete=off size=4 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "d');return oKD1(event,'" + t1 + "d_yy','" + t1 + "d_mm');\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'d_yy\');\" onblur=\"javascript:evSD('" + t1 + "d')\"\/>"
       }
       if (dmy == "mmddyyyy")
       {
         var d_b ="\
 <input id=" + t1 + "b_mm name=" + t1 + "b_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "b','_mm','_dd');\"\/>\
-<input id=" + t1 + "b_dd name=" + t1 + "b_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "b','_dd','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "b_dd','" + t1 + "b_mm');\"\/>\
-<input id=" + t1 + "b_yy name=" + t1 + "b_yyyy class=y autocomplete=off size=4 maxlength=12 value=\"\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'b_yy\');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "b_yy','" + t1 + "b_dd');\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "b')\" onblur=\"javascript:evSD('" + t1 + "b')\"\/>"
+<input id=" + t1 + "b_dd name=" + t1 + "b_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "b','_dd','_yy');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "b_dd','" + t1 + "b_mm');\"\/>\
+<input id=" + t1 + "b_yy name=" + t1 + "b_yyyy class=ys autocomplete=off size=4 maxlength=12 value=\"\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'b_yy\');\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "b');return oKD1(event,'" + t1 + "b_yy','" + t1 + "b_dd');\" onblur=\"javascript:evSD('" + t1 + "b')\"\/>"
         var d_d ="\
 <input id=" + t1 + "d_mm name=" + t1 + "d_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "d','_mm','_dd');\"\/>\
-<input id=" + t1 + "d_dd name=" + t1 + "d_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "d','_dd','_yy');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "d_dd','" + t1 + "d_mm');\"\/>\
-<input id=" + t1 + "d_yy name=" + t1 + "d_yyyy class=y autocomplete=off size=4 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "d')\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'d_yy\');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "d_yy','" + t1 + "d_dd');\" onblur=\"javascript:evSD('" + t1 + "d')\"\/>"
+<input id=" + t1 + "d_dd name=" + t1 + "d_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "d','_dd','_yy');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "d_dd','" + t1 + "d_mm');\"\/>\
+<input id=" + t1 + "d_yy name=" + t1 + "d_yyyy class=ys autocomplete=off size=4 maxlength=12 value=\"\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "d');return oKD1(event,'" + t1 + "d_yy','" + t1 + "d_dd');\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'d_yy\');\" onblur=\"javascript:evSD('" + t1 + "d')\"\/>"
       }
       if (dmy == "yyyymmdd")
       {
         var d_b ="\
-<input id=" + t1 + "b_yy name=" + t1 + "b_yyyy class=y autocomplete=off size=4 maxlength=12 value=\"\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'b_yy\');\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "b')\" onblur=\"javascript:evSD('" + t1 + "b')\"\/>\
-<input id=" + t1 + "b_mm name=" + t1 + "b_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "b','_mm','_dd');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "b_mm','" + t1 + "b_yy');\"\/>\
-<input id=" + t1 + "b_dd name=" + t1 + "b_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "b','_dd','_pl');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "b_dd','" + t1 + "b_mm');\"\/>"
+<input id=" + t1 + "b_yy name=" + t1 + "b_yyyy class=ys autocomplete=off size=4 maxlength=12 value=\"\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'b_yy\');\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "b')\" onblur=\"javascript:evSD('" + t1 + "b')\"\/>\
+<input id=" + t1 + "b_mm name=" + t1 + "b_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "b','_mm','_dd');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "b_mm','" + t1 + "b_yy');\"\/>\
+<input id=" + t1 + "b_dd name=" + t1 + "b_dd class=d autocomplete=off size=1 maxlength=2 value=\"\" onkeypress=\"javascript:return oKPdd(event,'" + t1 + "b','_dd','_pl');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "b_dd','" + t1 + "b_mm');\"\/>"
         var d_d ="\
-<input id=" + t1 + "d_yy name=" + t1 + "d_yyyy class=y autocomplete=off size=4 maxlength=12 value=\"\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'d_yy\');\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "d')\" onblur=\"javascript:evSD('" + t1 + "d')\"\/>\
-<input id=" + t1 + "d_mm name=" + t1 + "d_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "d','_mm','_dd');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "d_mm','" + t1 + "d_yy');\"\/>\
-<input id=" + t1 + "d_dd name=" + t1 + "d_dd class=d autocomplete=off size=1 maxlength=2 value=\"\"\ onkeypress=\"javascript:return oKPdd(event,'" + t1 + "d','_dd','_pl');\" onkeyup=\"javascript:return oKU1(event,'" + t1 + "d_dd','" + t1 + "d_mm');\"/>"
+<input id=" + t1 + "d_yy name=" + t1 + "d_yyyy class=ys autocomplete=off size=4 maxlength=12 value=\"\" onkeypress=\"javascript:return cF2(event,\'ch\'," + c1 + ",\'d_yy\');\" onkeydown=\"if(event.keyCode == 13)javascript:evSD('" + t1 + "d')\" onblur=\"javascript:evSD('" + t1 + "d')\"\/>\
+<input id=" + t1 + "d_mm name=" + t1 + "d_mm class=m autocomplete=off size=1 maxlength=2 value=\"\" list=\"dlmonth\" onkeypress=\"javascript:return oKPmm(event,'" + t1 + "d','_mm','_dd');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "d_mm','" + t1 + "d_yy');\"\/>\
+<input id=" + t1 + "d_dd name=" + t1 + "d_dd class=d autocomplete=off size=1 maxlength=2 value=\"\"\ onkeypress=\"javascript:return oKPdd(event,'" + t1 + "d','_dd','_pl');\" onkeydown=\"javascript:return oKD1(event,'" + t1 + "d_dd','" + t1 + "d_mm');\"/>"
       }
       document.getElementById("new_child").outerHTML = '\
       <tr id="' + t1 + '">\n\
@@ -453,14 +496,16 @@
           <input type="hidden" id="' + t1 + '_sex" name="' + t1 + '_sex" value="N">\n\
           <input type="hidden" id="' + t1 + '_p" name="' + t1 + '_p" value="create">\n\
           <input id="' + t1 + '_occ" name="' + t1 + '_occ" class="occ2" autocomplete="off" size="5" maxlength="8" placeholder="N" value="" onkeypress="javascript:return oKP2(event,\'ch\',' + c1 + ',\'_occ\')" onblur="oB2(\'' + t1 + '\')">\n\
+          <div id="' + t1 + '_jq1"> <\/div>\n\
         <\/td>\n\
-        <td><input id="' + t1 + '_fn" name="' + t1 + '_fn" size="30" maxlength="200" value="" onkeypress="javascript:return cF2(event,\'ch\',' + c1 + ',\'_fn\');" onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"><br>\
-            <input type="' + v2 + '" id="' + t1 + '_sn" name="' + t1 + '_sn" class="ar" size="30" maxlength="200" value="" placeholder="' + v1 + '" onkeypress="javascript:return cF2(event,\'ch\',' + c1 + ',\'_sn\');" onblur="tUC(this)" onkeydown="if(event.keyCode == 13)tUC(this)"><\/td>\n\
-        <td><span id="dp' + t1 + '" class="vis">\n\
-              <span class="dmyt">' + d_b + '<input id="' + t1 + 'b_pl" name="' + t1 + 'b_pl" class="pl" size="44" maxlength="200" value="" onblur="fillPlaceFam(this)" list="dlplace"><\/span>\n\
-              <span class="dmyt">' + d_d + '<input id="' + t1 + 'd_pl" name="' + t1 + 'd_pl" class="pl" size="44" maxlength="200" value="" onblur="fillPlaceFam(this)" list="dlplace"><\/span>\n\
+        <td><input id="' + t1 + '_fn" name="' + t1 + '_fn" size="30" maxlength="200" value="" onkeypress="javascript:return cF2(event,\'ch\',' + c1 + ',\'_fn\');" onkeydown="if(event.keyCode == 13)tUC1(this)" onblur="tUC1(this);jq1a(\'' + t1 + '\')"><br>\
+            <input type="' + v2 + '" id="' + t1 + '_sn" name="' + t1 + '_sn" class="ar" size="30" maxlength="200" value="' + v3 + '" placeholder="' + v1 + '" onkeypress="javascript:return cF2(event,\'ch\',' + c1 + ',\'_sn\');" onblur="tUC(this);jq1a(\'' + t1 + '\')" onkeydown="if(event.keyCode == 13)tUC(this)"><\/td>\n\
+        <td class="jq2"><div id="' + t1 + '_jq2"> <\/div><div id="' + t1 + '_jq3"> <\/div>\n\
+            <span id="dp' + t1 + '" class="vis">\n\
+              <span class="dmyt">' + d_b + '<input id="' + t1 + 'b_pl" name="' + t1 + 'b_pl" class="pl" size="44" maxlength="200" value="" onblur="fillPlaceFam(this)" list="dlplace" ' + a2 + '><\/span>\n\
+              <span class="dmyt">' + d_d + '<input id="' + t1 + 'd_pl" name="' + t1 + 'd_pl" class="pl" size="44" maxlength="200" value="" onblur="fillPlaceFam(this)" list="dlplace" ' + a2 + '><\/span>\n\
             <\/span><\/td>\n\
-        <td><input id="' + t1 + '_occupation" name="' + t1 + '_occupation" class="vis" size="40" maxlength="200" value="" list="dloccu"><\/td>\n\
+        <td class="jq4"><div id="' + t1 + '_jq4"> <\/div><input id="' + t1 + '_occupation" name="' + t1 + '_occupation" class="occu vis" size="40" maxlength="200" value="" list="dloccu"><\/td>\n\
       <\/tr>\n\
       <tr id="new_child"><\/tr>';
       if(z2 == 0)
@@ -498,6 +543,10 @@
       a[0]["e24"]= "dp" + t0;
       a[0]["e25"]= t0 + "_occupation";
       a[0]["e26"]= t0 + "_occ";
+      a[0]["e27"]= t0 + "_jq1";
+      a[0]["e28"]= t0 + "_jq2";
+      a[0]["e29"]= t0 + "_jq3";
+      a[0]["e30"]= t0 + "_jq4";
 
       a[1] = new Array();
       a[1]["e10"]= t1 + "_fn";
@@ -517,6 +566,10 @@
       a[1]["e24"]= "dp" + t1;
       a[1]["e25"]= t1 + "_occupation";
       a[1]["e26"]= t1 + "_occ";
+      a[1]["e27"]= t1 + "_jq1";
+      a[1]["e28"]= t1 + "_jq2";
+      a[1]["e29"]= t1 + "_jq3";
+      a[1]["e30"]= t1 + "_jq4";
 
       for (var i = 10; i <= 23; i++)
       {
@@ -536,48 +589,50 @@
       var v1 = document.getElementById(a[1]["e26"]).getAttribute("placeholder","false");
       document.getElementById(a[0]["e26"]).setAttribute("placeholder",v1,"false");
       document.getElementById(a[1]["e26"]).setAttribute("placeholder",v0,"false");
-    }
-  }
-  function addWitness(z1,z2)
-  {
-    var c0 = z1;
-    var c1 = itemMaxCnt('witn',c0);
-    var v1 = document.getElementById("witn1_fn").value;
-    var v2 = document.getElementById("witn2_fn").value;
-    if(v1 != "" && v2 != "")
-    {
-      var t0 = "witn" + c0;
-      var t1 = "witn" + c1;
-      document.getElementById("new_witness").outerHTML = '\
-      <tr id="' + t1 + '">\n\
-        <td>\n\
-          <input type="hidden" id="' + t1 + '_sex" name="' + t1 + '_sex" value="N">\n\
-          <input type="hidden" id="' + t1 + '_p" name="' + t1 + '_p" value="create">\n\
-          <input id="' + t1 + '_occ" name="' + t1 + '_occ" class="occ2" autocomplete="off" size="5" maxlength="8" value="" placeholder="N" onkeypress="javascript:return oKP2(event,\'witn\',' + c1 + ',\'_occ\')" onblur="oB2(\'' + t1 + '\')">\n\
-        <\/td>\n\
-        <td><input id="' + t1 + '_fn" name="' + t1 + '_fn" class="ar" size="30" maxlength="200" value="" onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"><\/td>\n\
-        <td><input id="' + t1 + '_sn" name="' + t1 + '_sn" size="30" maxlength="200" value="" onblur="tUC(this)" onkeydown="if(event.keyCode == 13)tUC(this)"><\/td>\n\
-      <\/tr>\n\
-      <tr id="new_witness"><\/tr>';
-      if(z2 == 0)
+      var v0 = document.getElementById(a[0]["e27"]).title;
+      var v1 = document.getElementById(a[1]["e27"]).title;
+      document.getElementById(a[0]["e27"]).title = v1;
+      document.getElementById(a[1]["e27"]).title = v0;
+      for (var i = 27; i <= 30; i++)
       {
-        for(var i = c1; i > c0; i--){invertWitness(i);}
-        sIV(t0 + "_occ");
+        var e0 = document.getElementById(a[0]["e" + i]);
+        var v0 = e0.firstChild ? e0.firstChild.data : "";
+        var e1 = document.getElementById(a[1]["e" + i]);
+        var v1 = e1.firstChild ? e1.firstChild.data : "";
+        document.getElementById(a[0]["e" + i]).innerHTML = v1;
+        document.getElementById(a[1]["e" + i]).innerHTML = v0;
       }
-      else sIV(t1 + "_occ");
-    }
-    else
-    {
-     if(v2 == "")sIV("witn2_occ");
-     if(v1 == "")sIV("witn1_occ");
     }
   }
-  function invertWitness(cnt)
+  function addWitness(z1,z2,z3)
+  {
+    var t3 = z3;
+    var c0 = z1;
+    var c1 = itemMaxCnt(t3,c0);
+    var t0 = t3 + c0;
+    var t1 = t3 + c1;
+    document.getElementById("new_" + t3).outerHTML = '\
+    <dd id="' + t1 + '"\n\
+    ><input type="hidden" id="' + t1 + '_kind" name="' + t1 + '_kind" value=""\n\
+    ><input type="hidden" id="' + t1 + '_sex" name="' + t1 + '_sex" value="N"\n\
+    ><input type="hidden" id="' + t1 + '_p" name="' + t1 + '_p" value="create"\n\
+    ><input id="' + t1 + '_occ" name="' + t1 + '_occ" class="occ2" autocomplete="off" size="5" maxlength="8" value="" placeholder="N" onkeypress="javascript:return oKP2(event,\'witn\',' + c1 + ',\'_occ\',\'' + t3 + '\')" onblur="oB2(\'' + t1 + '\')"\n\
+    ><input id="' + t1 + '_fn" name="' + t1 + '_fn" class="fn ar" size="30" maxlength="200" value="" onblur="tUC1(this)" onkeydown="if(event.keyCode == 13)tUC1(this)"\n\
+    ><input id="' + t1 + '_sn" name="' + t1 + '_sn" class="sn" size="30" maxlength="200" value="" onblur="tUC(this);jq1(\''+ t1 +'\',\'\')" onkeydown="if(event.keyCode == 13)tUC(this)"><span id="'+ t1 +'_jq1"> <\/span><\/dd>\n\
+    <dd id="new_' + t3 + '"><\/dd>';
+    if(z2 == 0)
+    {
+      for(var i = c1; i > c0; i--){invertWitness(i,t3);}
+      sIV(t0 + "_occ");
+    }
+    else sIV(t1 + "_occ");
+  }
+  function invertWitness(cnt,z1)
   {
     if (cnt > 0)
     {
-      var t0 = "witn" + (cnt - 1);
-      var t1 = "witn" + cnt;
+      var t0 = z1 + (cnt - 1);
+      var t1 = z1 + cnt;
       var a = new Array();
       
       a[0] = new Array();
@@ -586,7 +641,9 @@
       a[0]["e12"]= t0 + "_occ";
       a[0]["e13"]= t0 + "_sex";
       a[0]["e14"]= t0 + "_p";
-      a[0]["e15"]= t0 + "_occ";
+      a[0]["e15"]= t0 + "_kind";
+      a[0]["e16"]= t0 + "_occ";
+      a[0]["e17"]= t0 + "_jq1";
       
       a[1] = new Array();
       a[1]["e10"]= t1 + "_fn";
@@ -594,25 +651,107 @@
       a[1]["e12"]= t1 + "_occ";
       a[1]["e13"]= t1 + "_sex";
       a[1]["e14"]= t1 + "_p";
-      a[1]["e15"]= t1 + "_occ";
+      a[1]["e15"]= t1 + "_kind";
+      a[1]["e16"]= t1 + "_occ";
+      a[1]["e17"]= t1 + "_jq1";
 
-      for (var i = 10; i <= 14; i++)
+      for (var i = 10; i <= 15; i++)
       {
         var v0 = document.getElementById(a[0]["e" + i]).value;
         var v1 = document.getElementById(a[1]["e" + i]).value;
         document.getElementById(a[0]["e" + i]).value = v1;
         document.getElementById(a[1]["e" + i]).value = v0;
       }
-      var v0 = document.getElementById(a[0]["e15"]).className;
-      var v1 = document.getElementById(a[1]["e15"]).className;
-      document.getElementById(a[0]["e15"]).className = v1;
-      document.getElementById(a[1]["e15"]).className = v0;
-      var v0 = document.getElementById(a[0]["e15"]).getAttribute("placeholder","false");
-      var v1 = document.getElementById(a[1]["e15"]).getAttribute("placeholder","false");
-      document.getElementById(a[0]["e15"]).setAttribute("placeholder",v1,"false");
-      document.getElementById(a[1]["e15"]).setAttribute("placeholder",v0,"false");
+      var v0 = document.getElementById(a[0]["e16"]).className;
+      var v1 = document.getElementById(a[1]["e16"]).className;
+      document.getElementById(a[0]["e16"]).className = v1;
+      document.getElementById(a[1]["e16"]).className = v0;
+      var v0 = document.getElementById(a[0]["e16"]).getAttribute("placeholder","false");
+      var v1 = document.getElementById(a[1]["e16"]).getAttribute("placeholder","false");
+      document.getElementById(a[0]["e16"]).setAttribute("placeholder",v1,"false");
+      document.getElementById(a[1]["e16"]).setAttribute("placeholder",v0,"false");
+      var v0 = document.getElementById(a[0]["e17"]).title;
+      var v1 = document.getElementById(a[1]["e17"]).title;
+      document.getElementById(a[0]["e17"]).title = v1;
+      document.getElementById(a[1]["e17"]).title = v0;
+      for (var i = 17; i <= 17; i++)
+      {
+        var e0 = document.getElementById(a[0]["e" + i]);
+        var v0 = e0.firstChild ? e0.firstChild.data : "";
+        var e1 = document.getElementById(a[1]["e" + i]);
+        var v1 = e1.firstChild ? e1.firstChild.data : "";
+        document.getElementById(a[0]["e" + i]).innerHTML = v1;
+        document.getElementById(a[1]["e" + i]).innerHTML = v0;
+      }
     }
   }
+  function addPvar(z1,z2)
+  {
+    var c0 = z1;
+    var c1 = itemMaxCnt('p',c0);
+    var t0 = "p" + c0;
+    var t1 = "p" + c1;  
+    document.getElementById("new_pvar").outerHTML = '\
+    <tr id="' + t1 + '"\n\
+    ><td class="b1"><a tabindex="10000" href="javascript:addPvar(' + c1 + ',\'0\');">+<\/a\n\
+    ><\/td><td><input id="' + t1 + '_occ" name="oc' + c1 + '" class="occ3" autocomplete="off" size="5" maxlength="8" value="" onkeypress="javascript:return oKP2(event,\'p\',' + c1 + ',\'_occ\',\'\')"\n\
+    ><td class="b1"><a tabindex="10000" href="javascript:delS(\'p\',' + c1 + ',\'_occ\',1,0,\'\');">x<\/a\n\
+    ><\/td><td><input id="' + t1 + '_fn" name="p' + c1 + '" class="ar" size="30" maxlength="200" value="" onblur="tUC1(this)"\n\
+    ><\/td><td><input id="' + t1 + '_sn" name="n' + c1 + '" size="30" maxlength="200" value="" onblur="tUC(this);jq1(\''+ t1 +'\',\'\')"\n\
+    ><td class="b1"><a tabindex="10000" href="javascript:invertS(\'p\',' + c1 + ',\'_occ\',0,1,\'\');">&uarr;<\/a\n\
+    ><\/td><td class="b1"><span id="'+ t1 +'_jq1"> <\/span\n\
+    ><td class="b1"><a tabindex="10000" href="javascript:invertS(\'p\',' + c1 + ',\'_occ\',1,1,\'\');">&darr;<\/a\n\
+    ><\/td><td><input id="' + t1 + '_t" name="t' + c1 + '" size="30" maxlength="200" value=""\n\
+    ><input type="hidden" id="' + t1 + '_i" name="i' + c1 + '" size="5" value=""\n\
+    ><\/td><\/tr><tr id="new_pvar"><\/tr>';
+    if(z2 == 0)
+    {
+      for(var i = c1; i > c0; i--){invertPvar(i);}
+      sIV(t0 + "_occ");
+    }
+    else sIV(t1 + "_occ");
+  }
+  function invertPvar(cnt)
+  {
+    if (cnt > 0)
+    {
+      var t0 = "p" + (cnt - 1);
+      var t1 = "p" + cnt;
+      var a = new Array();
+      a[0] = new Array();
+      a[0]["e10"]= t0 + "_fn";
+      a[0]["e11"]= t0 + "_sn";
+      a[0]["e12"]= t0 + "_occ";
+      a[0]["e13"]= t0 + "_t";
+      a[0]["e14"]= t0 + "_i";
+      a[0]["e20"]= t0 + "_jq1";
+
+      a[1] = new Array();
+      a[1]["e10"]= t1 + "_fn";
+      a[1]["e11"]= t1 + "_sn";
+      a[1]["e12"]= t1 + "_occ";
+      a[1]["e13"]= t1 + "_t";
+      a[1]["e14"]= t1 + "_i";
+      a[1]["e20"]= t1 + "_jq1";
+
+      for (var i = 10; i <= 14; i++)
+      {
+        var v0 = document.getElementById(a[0]["e" + i]).value; 
+        var v1 = document.getElementById(a[1]["e" + i]).value;
+        document.getElementById(a[0]["e" + i]).value = v1;
+        document.getElementById(a[1]["e" + i]).value = v0;
+      }
+      for (var i = 20; i <= 20; i++)
+      {
+        var e0 = document.getElementById(a[0]["e" + i]);
+        var v0 = e0.firstChild ? e0.firstChild.data : "";
+        var e1 = document.getElementById(a[1]["e" + i]);
+        var v1 = e1.firstChild ? e1.firstChild.data : "";
+        document.getElementById(a[0]["e" + i]).innerHTML = v1;
+        document.getElementById(a[1]["e" + i]).innerHTML = v0;
+      }
+    }
+  } 
   function cF1(event,id)
   {
     var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
@@ -637,7 +776,8 @@
     var l = v.length;
     if (charKey >= 0 && charKey <= 9)
     {
-      var ev = eval(v + charKey);
+      var s = v + charKey;
+      var ev = eval(s);
       if (l == 1)
       {
         if (ev > 0 && ev < 32)
@@ -648,11 +788,11 @@
             var t = r.test(v3);
             if (t == true)
             {
-              e1.value = ""; return false;
+              e1.value = "";
             }
             else
             {
-              e2.select(); return true;
+              e1.value = s; e2.select();
             }
           }
           else
@@ -661,30 +801,31 @@
             {
               if (ev > 29)
               {
-                e1.value = ""; return false;
+                e1.value = "";
               }
               else
               { 
                 if ((v4 != "") && ((v4 < 1582) || ((v4 % 4 != 0) || ((v4 % 100 == 0) && (v4 % 400 != 0)))))
                 {
-                  e1.value = ""; return false;
+                  e1.value = "";
                 }
                 else
                 {
-                  e2.select(); return true;
+                  e1.value = s; e2.select();
                 }
               }
             }
             else
             {
-              e2.select(); return true;
+              e1.value = s; e2.select();
             }
           }
         }
         else
         {
-          e1.value = ""; return false;
+          e1.value = "";
         }
+        return false;
       }
     }
     else
@@ -714,14 +855,11 @@
         var t1 = r1.test(s1);
         if (t1 == true)
         {
-          e1.value = s1;
-          e2.select();
-          return false;
+          e1.value = s1; e2.select();
         }
         else
         {
           e1.value = "";
-          return false;
         }
       }
       else
@@ -735,11 +873,11 @@
             var t = r.test(ev);
             if (t == true)
             {
-              e1.value = ""; return false;
+              e1.value = "";
             }
             else
             {
-              e2.select(); return true;
+              e1.value = s; e2.select();
             }
           }
           else
@@ -748,34 +886,35 @@
             {
               if (v3 > 29)
               {
-                e1.value = ""; return false;
+                e1.value = "";
               }
               else
               {  
                 if ((v4 != "") && ((v4 < 1582) || ((v4 % 4 != 0) || ((v4 % 100 == 0) && (v4 % 400 != 0)))))
                 {
-                  e1.value = ""; return false;
+                  e1.value = "";
                 }
                 else
                 {
-                  e2.select(); return true;
+                  e1.value = s; e2.select();
                 }
               }
             }
             else
             {
-              e2.select(); return true;
+              e1.value = s; e2.select();
             }
           }
         }
         else
         {
-          e1.value = ""; return false;
+          e1.value = "";
         }
       }
+      return false;
     }
   }
-  function oKU1(event,z1,z2)
+  function oKD1(event,z1,z2)
   {
     var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
     var e1 = document.getElementById(z1);
@@ -842,62 +981,81 @@
   {
     var e = document.getElementById(z1 + "_yy");
     var e1 = document.getElementById(z1 + "_yyyy");
-    var e2 = document.getElementById(z1 + "_prec");
-    var e3 = document.getElementById(z1 + "_oryear");
-    var e4 = document.getElementById(z1 + "_text");
-    var e5 = document.getElementById(z1 + "_dd");
-    var e6 = document.getElementById(z1 + "_mm");
-    var n = document.getElementsByName("death")[0];
+    var e2 = document.getElementById(z1 + "_mm");
+    var e3 = document.getElementById(z1 + "_dd");
+    var e4 = document.getElementById(z1 + "_oryear");
+    var e5 = document.getElementById(z1 + "_ormonth");
+    var e6 = document.getElementById(z1 + "_orday");
+    var e7 = document.getElementById(z1 + "_prec");
+    var e8 = document.getElementById(z1 + "_text");
+    var dmy = document.getElementById("dmy").firstChild.data;
     var v = e.value;
-    var v5 = e5.value;
-    var v6 = e6.value;
+    var v3 = e3.value;
+    var v2 = e2.value;
     var r1 = /(^-\d*$|^\d*$)/;
     var t1 = r1.test(v);
-    if ((v5 == "29" && v6 == "02") && ((v < 1582) || ((v % 4 != 0) || ((v % 100 == 0) && (v % 400 != 0)))))
-    { 
+    if ((v3 == "29" && v2 == "02") && ((v < 1582) || ((v % 4 != 0) || ((v % 100 == 0) && (v % 400 != 0)))))
+    {
       e.value = ""; return false;
     }
-    if(v == "-") {e.value = ""; e1.value = ""; e2.value = ""; e3.value = ""; e4.value = ""; n.options[0].selected = true;}
+    if(v == "-" || v == "+"){e1.value = ""; e2.value = ""; e3.value = ""; e4.value = ""; e7.value = ""; e8.value = v;}
     else
     {
-      if(v != "" && z1 == "death") {n.options[2].selected = true;}
-      if(v == "+") {e.value = ""; e1.value = ""; e2.value = ""; e3.value = ""; e4.value = ""; n.options[2].selected = true;}
+      if(t1 == true) {e1.value = RegExp.$1; e7.value = "sure"; e8.value = "";}
       else
       {
-        if(t1 == true) {e1.value = RegExp.$1; e2.value = "sure"; e3.value = ""; e4.value = "";}
+        r1 = /(^\/)(-\d*$|\d*$)/; t1 = r1.test(v);
+        if(t1 == true) {e1.value = RegExp.$2; e7.value = "before"; e8.value = "";}
         else
         {
-          r1 = /(^\/)(-\d*$|\d*$)/; t1 = r1.test(v);
-          if(t1 == true) {e1.value = RegExp.$2; e2.value = "before"; e3.value = ""; e4.value = "";}
+          r1 = /(^-\d*|^\d*)(\/$)/; t1 = r1.test(v);
+          if(t1 == true) {e1.value = RegExp.$1; e7.value = "after"; e8.value = "";}
           else
           {
-            r1 = /(^-\d*|^\d*)(\/$)/; t1 = r1.test(v);
-            if(t1 == true) {e1.value = RegExp.$1; e2.value = "after"; e3.value = ""; e4.value = "";}
+            r1 = /(^|^\?|^\.|^\.\.)(-\d*|\d*)($|\?$|\.$|\.\.$)/; t1 = r1.test(v);
+            if(t1 == true){e.value = "?" + RegExp.$2; e1.value = RegExp.$2; e7.value = "maybe"; e8.value = "";}
             else
             {
-              r1 = /(^|^\?|^\.|^\.\.)(-\d*|\d*)($|\?$|\.$|\.\.$)/; t1 = r1.test(v);
-              if(t1 == true){e.value = "?" + RegExp.$2; e1.value = RegExp.$2; e2.value = "maybe"; e3.value = ""; e4.value = "";}
+              r1 = /(^|^\/|^\/\/)(-\d*|\d*)($|\/$|\/\/$)/; t1 = r1.test(v);
+              if(t1 == true){e.value = "/" + RegExp.$2 + "/"; e1.value = RegExp.$2; e7.value = "about"; e8.value = "";}
               else
               {
-                r1 = /(^|^\/|^\/\/)(-\d*|\d*)($|\/$|\/\/$)/; t1 = r1.test(v);
-                if(t1 == true){e.value = "/" + RegExp.$2 + "/"; e1.value = RegExp.$2; e2.value = "about"; e3.value = ""; e4.value = "";}
-                else
+                r1 = /(^-\d*|^\d*)(\+|-)(\d*$)/; t1 = r1.test(v);
+                if(t1 == true)
                 {
-                  r1 = /(^-\d*|^\d*)(\+|-)(\d*$)/; t1 = r1.test(v);
+                  var ev = eval(v);
+                  e.value = "/" + ev + "/"; e1.value = ev; e7.value = "about"; e8.value = "";}
+                else
+                { /* or/int year */
+                  r1 = /(^-\d*|^\d*)(\/|\.|\.\.)(-\d*$|\d*$)/; t1 = r1.test(v);
                   if(t1 == true)
-                  {
-                    var ev = eval(v);
-                    e.value = "/" + ev + "/"; e1.value = ev; e2.value = "about"; e3.value = ""; e4.value = "";}
-                  else
-                  {
-                    r1 = /(^-\d*|^\d*)(\/)(-\d*$|\d*$)/; t1 = r1.test(v);
-                    if(t1 == true){e1.value = RegExp.$1; e2.value = "oryear"; e3.value = RegExp.$3; e4.value = "";}
-                    else
                     {
-                      r1 = /(^-\d*|^\d*)(\.|\.\.)(-\d*$|\d*$)/; t1 = r1.test(v);
-                      if(t1 == true){e.value = RegExp.$1 + ".." + RegExp.$3; e1.value = RegExp.$1; e2.value = "yearint"; e3.value = RegExp.$3; e4.value = "";}
-                      else {e1.value = ""; e2.value = ""; e3.value = ""; e4.value = v;} 
-                    } 
+                      e1.value = RegExp.$1; e4.value = RegExp.$3; e5.value = ""; e6.value = ""; e8.value = "";
+                      if(RegExp.$2 == "/") e7.value = "oryear"; else{e7.value = "yearint";}
+                    }
+                  else
+                  { /* or/int month/year */
+                    r1 = /(^-\d*|^\d*)(\/|\.|\.\.)(\w*)(\W)(\w*$)/; t1 = r1.test(v);
+                    if(t1 == true)
+                    {
+                      e1.value = RegExp.$1; e6.value = ""; e8.value = "";
+                      if(dmy != "yyyymmdd"){e4.value = RegExp.$5; e5.value = RegExp.$3;}
+                      else{e4.value = RegExp.$3; e5.value = RegExp.$5;}
+                      if(RegExp.$2 == "/") e7.value = "oryear"; else{e7.value = "yearint";}
+                    }
+                    else
+                    { /* or/int day/month/year */
+                      r1 = /(^-\d*|^\d*)(\/|\.|\.\.)(\w*)(\W)(\w*)(\W)(\w*$)/; t1 = r1.test(v);
+                      if(t1 == true)
+                      {
+                        e1.value = RegExp.$1; e8.value = "";
+                        if(dmy == "ddmmyyyy"){e4.value = RegExp.$7; e5.value = RegExp.$5; e6.value = RegExp.$3;}
+                        if(dmy == "mmddyyyy"){e4.value = RegExp.$7; e5.value = RegExp.$3; e6.value = RegExp.$5;}
+                        if(dmy == "yyyymmdd"){e4.value = RegExp.$3; e5.value = RegExp.$5; e6.value = RegExp.$7;}
+                        if(RegExp.$2 == "/") e7.value = "oryear"; else{e7.value = "yearint";}
+                      }
+                      else{e1.value = ""; e7.value = ""; e4.value = ""; e8.value = v; e3.value = ""; e2.value = ""}
+                    }
                   }
                 }
               }
@@ -927,25 +1085,30 @@
       if(t1 == true) {e.value = RegExp.$1;}
       else
       {
-        r1 = /(^\/)(-\d*$|\d*$)/; t1 = r1.test(v);
+        r1 = /(^\/|^<)(-\d*$|\d*$)/; t1 = r1.test(v);
         if(t1 == true) {e.value = "/" + RegExp.$2}
         else
         {
-          r1 = /(^-\d*|^\d*)(\/$)/; t1 = r1.test(v);
-          if(t1 == true) {e.value = RegExp.$1 + "/"}
+          r1 = /(^>)(-\d*$|\d*$)/; t1 = r1.test(v);
+          if(t1 == true) {e.value = RegExp.$2 + "/"}
           else
           {
-            r1 = /(^|^\?|^\.|^\.\.)(-\d*|\d*)($|\?$|\.$|\.\.$)/; t1 = r1.test(v);
-            if(t1 == true) {e.value = "?" + RegExp.$2}
+            r1 = /(^-\d*|^\d*)(\/$)/; t1 = r1.test(v);
+            if(t1 == true) {e.value = RegExp.$1 + "/"}
             else
             {
-              r1 = /(^|^\/|^\/\/)(-\d*|\d*)($|\/$|\/\/$)/; t1 = r1.test(v);
-              if(t1 == true) {e.value = "/" + RegExp.$2 + "/"}
+              r1 = /(^|^\?|^\.|^\.\.)(-\d*|\d*)($|\?$|\.$|\.\.$)/; t1 = r1.test(v);
+              if(t1 == true) {e.value = "?" + RegExp.$2}
               else
               {
-                r1 = /(^-\d*|^\d*)(\+|-)(\d*$)/; t1 = r1.test(v);
-                if(t1 == true) {var ev = eval(v); e.value = "/" + ev + "/"}
-                else e.value = "";
+                r1 = /(^|^\/|^\/\/)(-\d*|\d*)($|\/$|\/\/$)/; t1 = r1.test(v);
+                if(t1 == true) {e.value = "/" + RegExp.$2 + "/"}
+                else
+                {
+                  r1 = /(^-\d*|^\d*)(\+|-)(\d*$)/; t1 = r1.test(v);
+                  if(t1 == true) {var ev = eval(v); e.value = "/" + ev + "/"}
+                  else e.value = "";
+                }
               }
             }
           }
@@ -973,23 +1136,25 @@
       {document.getElementById(z1 + i + z2).type = "hidden";i++}
     }
   }
-  function addS(z1,z2,z3)
+  function addS(z1,z2,z3,z4)
   {
     switch(z1)
     {
       case "ch": addChild(z2,z3); break;
-      case "witn": addWitness(z2,z3); break;
+      case "witn": addWitness(z2,z3,z4); break;
       case "r": addRelation(z2,z3); break;
       case "t": addTitle(z2,z3); break;
+      case "p": addPvar(z2,z3); break;
     }
   }
-  function invertS(z1,z2,z3,z4,z5)
-  { 
+  function invertS(z1,z2,z3,z4,z5,z6)
+  {
+    var t1 = (z1 == "witn") ? z6: z1;
     var n = Number(z2);
     var i1 = (z4 == 0) ? n: n + 1;
     var i2 = (z4 == 0) ? n - 1: n + 1;
-    var e1 = (document.getElementById(z1 + i1 + z3)) ? document.getElementById(z1 + i1 + z3) : "";
-    var e2 = (document.getElementById(z1 + i2 + z3)) ? document.getElementById(z1 + i2 + z3) : "";
+    var e1 = (document.getElementById(t1 + i1 + z3)) ? document.getElementById(t1 + i1 + z3) : "";
+    var e2 = (document.getElementById(t1 + i2 + z3)) ? document.getElementById(t1 + i2 + z3) : "";
     if (e1 != "" && e2 != "")
     {
       if (z5 == 1)
@@ -997,12 +1162,38 @@
         switch(z1)
         {
           case "ch": invertChild(i1); break;
-          case "witn": invertWitness(i1); break;
+          case "p": invertPvar(i1); break;
           case "r": invertRelation(i1); break;
           case "t": invertTitle(i1); break;
+          case "witn": invertWitness(i1,z6); break;
         }
       }
-      document.getElementById(z1 + i2 + z3).focus();
+      document.getElementById(t1 + i2 + z3).focus();
+    }
+  }
+  function delS(z1,z2,z3,z4,z5,z6)
+  {
+    var t1 = z1 == "witn" ? z6: z1;
+    if (z1 != "r")
+    {
+      var i = z2;
+      while (document.getElementById(t1 + i + z3))
+      {
+        var e = document.getElementById(t1 + i + z3);
+        invertS(z1,i,z3,1,1,z6);
+        i++;
+      }
+      var j = i - 1;
+      if (j == 1)
+      {
+        addS(z1,z2,0,z6);
+        j++;
+      }
+      var e1 = (document.getElementById(t1 + j)) ? document.getElementById(t1 + j): "";
+      if (e1 != "") e1.outerHTML = '';
+      var k = j > 1 ? j - 1: 1;
+      var f = z2 == j ? document.getElementById(t1 + k + "_occ"):document.getElementById(t1 + z2 + "_occ");
+      f.focus();
     }
   }
   function oB1()
@@ -1031,7 +1222,7 @@
     if(v != "" && t == true)
     {
       e3.className='occ'; e1.value = ""; e2.value = "link";
-      if(e4 != ""){e4.className='hid'; e5.className='hid';}
+      if(e4 != ""){e4.className='hid'; e5.className='occu hid';}
     }
     else
     {
@@ -1042,7 +1233,7 @@
         case "N": e3.className='occ2'; e1.value = "N"; e3.setAttribute("placeholder","N","false"); break;
       }
       e2.value = "create"; e3.value="";
-      if(e4 != ""){e4.className='vis'; e5.className='vis';}
+      if(e4 != ""){e4.className='vis'; e5.className='occu vis';}
     }
   }
   function oB3(z1)
@@ -1085,6 +1276,41 @@
     clearTimeout(Tim1);
     Tim1 = setTimeout(function(){z1.click();},500);
   }
+  function oB6(z1)
+  {
+    var e1 = document.getElementById("e_name" + z1);
+    var e2 = document.getElementById("e_name" + z1 + "_dl");
+    var v1 = e1.value;
+    var v2 = e2.value;
+    var n1 = document.getElementById("dlevent").childNodes;
+    for(var i = 0; i < n1.length; i++)
+    {
+      var n1v = n1[i].value;
+      var n1i = n1[i].id;
+      if (v2 == n1v || v2 == n1i)
+      {
+        e1.value = n1i;
+        e2.value = n1v;
+        i = 1000;
+      }
+    }
+    if (i != 1001) e1.value = v2;
+  }
+  function oL1()
+  {
+    var i = 1;
+    while(document.getElementById("e_name" + i))
+    {
+      oB6(i);
+      i++;
+    }
+  }
+  function oL2()
+  {
+    var v1 = document.getElementById("pa1_sn").value;
+    var v2 = document.getElementById("ch1_sn").value;
+    if (v2 != "" && v1 != v2) visHid('ch','_sn');
+  }
   function fillPlaceFam(xx)
   {
     switch(xx.value)
@@ -1121,7 +1347,38 @@
   function sIV(id)
   {
     var e = document.getElementById(id);
-    e.scrollIntoView("true");
-    window.scrollBy(0,-100);
-    e.select();
+    var s = e.nodeName == "INPUT" || e.nodeName == "TEXTAREA" ? document.getElementById(id): document.getElementById(e.nextSibling.id);
+    s.scrollIntoView("true");
+    window.scrollBy(0,-430);
+    if(s.nodeName == "TEXTAREA")s.focus();else s.select();
+  }
+  function oS1()
+  {
+    var i = 1;
+    while (document.getElementById("p" + i))
+    {
+      document.getElementById("p" + i + "_occ").setAttribute("disabled","");
+      document.getElementById("p" + i + "_fn").setAttribute("disabled","");
+      document.getElementById("p" + i + "_sn").setAttribute("disabled","");
+      var e = document.getElementById("p" + i + "_t");
+      if (e.value == "") e.setAttribute("disabled","");
+      i++;
+    }
+    document.getElementById("upd").target = "blank";
+    document.getElementById("upd").submit();
+    clearTimeout(Tim1);
+    Tim1 = setTimeout(function(){oU1();},500);
+  }
+  function oU1()
+  {
+    var i = 1;
+    while (document.getElementById("p" + i))
+    {
+      document.getElementById("p" + i + "_occ").removeAttribute("disabled","");
+      document.getElementById("p" + i + "_fn").removeAttribute("disabled","");
+      document.getElementById("p" + i + "_sn").removeAttribute("disabled","");
+      var e = document.getElementById("p" + i + "_t");
+      if (e.value == "") e.removeAttribute("disabled","");
+      i++;
+    }
   }

@@ -1,9 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
-  <!-- Modified mickroue(a)yahoo.fr 20140907 templ=templm -->
+  <!-- $Id: calendar.txt,v 7.00 2015/03/09 11:13:43 mr Exp $ -->
   <title>[*calendar/calendars]1</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -28,6 +26,53 @@
   %apply;nth%with;
     /Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi/Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi/Primidi/Duodi/Tridi/Quartidi/Quintidi/Sextidi/Septidi/Octidi/Nonidi/Décadi/
   %and;xx%end;
+%end;
+
+%define;nb_days(xx)
+  %apply;nth%with;
+    /31/28/31/30/31/30/31/31/30/31/30/31%and;
+    xx%end;
+%end;
+
+%define;compute_age1(z1,z2,z3)
+  %if;(z1 > 0)
+    %if;(z1 = 1)[one year old]%else;z1 [years old]%end;
+    %if;(z2 > 0 or z3 > 0), %end;
+  %end;
+  %if;(z2 > 0)
+    %if;(z2 = 1)[one month old]%else;z2 [months old]%end;
+    %if;(z3 > 0), %end;
+  %end;
+  %if;(z3 > 0)
+    %if;(z3 = 1)[one day old]%else;z3 [days old]%end;
+  %end;
+%end;
+
+%define;compute_age(z1,z2)
+  %let;l1;%apply;nb_days(z2.month)%in;
+  %let;l2;%expr(z1.julian_day - z2.julian_day)%in;
+  %if;(z1.month > z2.month)
+    %if;(z1.day >= z2.day)
+      %apply;compute_age1(z1.year - z2.year,z1.month - z2.month,z1.day - z2.day)
+    %else;
+      %apply;compute_age1(z1.year - z2.year,z1.month - z2.month - 1,l1 + z1.day - z2.day)
+    %end;
+  %end;
+  %if;(z1.month = z2.month)
+    %if;(z1.day >= z2.day)
+      %apply;compute_age1(z1.year - z2.year,0,z1.day - z2.day)
+    %else;
+      %apply;compute_age1(z1.year - z2.year - 1,11,l1 + z1.day - z2.day)
+    %end;
+  %end;
+  %if;(z1.month < z2.month)
+    %if;(z1.day >= z2.day)
+      %apply;compute_age1(z1.year - z2.year - 1,12 + z1.month - z2.month,z1.day - z2.day)
+    %else;
+      %apply;compute_age1(z1.year - z2.year - 1,11 + z1.month - z2.month,l1 + z1.day - z2.day)
+    %end;
+  %end;
+  %if;(l2 > 31) (%l2; [days old])%end;
 %end;
 
 %define;fun_day(ccc, nnn)
@@ -157,6 +202,15 @@
         %end;
       %end;
     </li>
+    %if;(date.julian_day > 1721425 and today.julian_day != date.julian_day)
+      <li>[*age] :
+        %if;(today.julian_day > date.julian_day)
+          %apply;compute_age("today","date")
+        %else;
+          -%apply;compute_age("date","today")
+        %end;
+      </li>
+    %end;
     <li>
       [*julian day] :%sp;
       %if;(date.julian_day < 1000)%date.julian_day;

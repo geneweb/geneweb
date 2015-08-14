@@ -1,4 +1,7 @@
-%( $Id: anclist_fam7_img.txt mickroue(a)yahoo.fr 20140916 templ=templm %)
+<!-- $Id: anclist_fam7_img.txt,v 7.00 2015/01/07 11:39:17 mr Exp $ -->
+
+%let;ref_index;%index;%in;
+%let;ref_sex;%if(is_male)[him/her]0%elseif;(is_female)[him/her]1%else;0%end;%in;
 
 %define;fam7_img_somebody1(xx,lexa,lexb,sss)
   %let;relationship;
@@ -69,7 +72,7 @@
             %elseif;(curlev = 1)
               %if;(evar.spouse = "on")
                 %apply;fam7_img_somebody("spouse","a son-in-law/a daughter-in-law","a great-uncle/a great-aunt","sss")
-              %end;            
+              %end;
               %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a 2nd cousin","",sex)
             %elseif;(curlev = 2)
               %if;(evar.spouse = "on")
@@ -79,7 +82,7 @@
             %elseif;(curlev = 3)
               %if;(evar.spouse = "on")
                 %apply;fam7_img_somebody("spouse","a son-in-law/a daughter-in-law","a 2nd cousin","sss")
-              %end;            
+              %end;
               %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a grandson/a granddaughter/a grandchild","a 2nd cousin","sss")
             %elseif;(curlev = 4)
               %apply;fam7_img_2nd_cousin(curlev+1,maxlev,"a great-grandson/a great-granddaughter/a great-grandchild","a 2nd cousin","sss")
@@ -133,7 +136,7 @@
             %elseif;(curlev = 1 and maxlev > 2)
               %if;(evar.spouse = "on")
                 %apply;fam7_img_somebody("spouse","the spouse","lexa",sex)
-              %end;            
+              %end;
               %apply;fam7_img_nephew(curlev+1,maxlev,"a great-nephew/a great-niece","","")
             %elseif;(curlev = 2 and maxlev > 3)
               %if;(evar.spouse = "on")
@@ -199,23 +202,23 @@
 
 %( 7 families with images %)
 %let;l1i;%index;%in;
-%let;l2i;%father.index;%in;
-%let;l3i;%mother.index;%in;
-%let;l4i;%father.father.index;%in;
-%let;l5i;%father.mother.index;%in;
-%let;l6i;%mother.father.index;%in;
-%let;l7i;%mother.mother.index;%in;
+%let;l2i;%if;(has_parents)%father.index;%end;%in;
+%let;l3i;%if;(has_parents)%mother.index;%end;%in;
+%let;l4i;%if;(has_parents and father.has_parents)%father.father.index;%end;%in;
+%let;l5i;%if;(has_parents and father.has_parents)%father.mother.index;%end;%in;
+%let;l6i;%if;(has_parents and mother.has_parents)%mother.father.index;%end;%in;
+%let;l7i;%if;(has_parents and mother.has_parents)%mother.mother.index;%end;%in;
 %apply;fam7_img()
 %if;(evar.tf1 = "fam71")
   %( images (long display) %)
   %foreach;sorted_list_item;
     <div class="fam71">
       <img alt="img" src="%item.5;"%/>
-      <a style="color:white"
-         onfocus="style.color='black'"
-         onblur="style.color='white'"
-         onmouseover="style.color='black'"
-         onmouseout="style.color='white'"
+      <a style="color:transparent;"
+         onfocus="style.color='#000'"
+         onblur="style.color='transparent'"
+         onmouseover="style.color='#000'"
+         onmouseout="style.color='transparent'"
          %if;(browsing_with_sosa_ref)
            href="%prefix;m=RLM;et=S;spouse=on;image=%evar.image;;%nn;
                 i1=%ref_index;;
