@@ -87,6 +87,10 @@ wrappers:
 	   echo 'cd bases'; \
 	   echo 'exec ../gw/gwsetup -gd ../gw "$$@"') > $(DESTDIR)/gwsetup; \
 	  chmod +x $(DESTDIR)/gwd $(DESTDIR)/gwsetup; \
+	  if test "$(shell uname -s)" = "Darwin"; then \
+	    cp etc/MacOSX/GeneWeb.command $(DESTDIR); \
+	    chmod +x $(DESTDIR)/GeneWeb.command; \
+	  fi \
 	fi
 
 new_distrib: classical_distrib
