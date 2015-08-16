@@ -26,19 +26,26 @@
   </td></tr></table>
 %end;
 
+%define;list_of(xx)
+  [*list of %s:::xx]
+%end;
+
 <h1>[*lists]</h1>
 
 <p>
   <ul>
     %if;(wizard)
       <li>
-        <a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a>
+        <a href="%prefix;m=MOD_DATA;data=sn">%apply;list_of([surname/surnames]1)</a>
       </li>
       <li>
-        <a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a>
+        <a href="%prefix;m=MOD_DATA;data=place">%apply;list_of([places])</a>
       </li>
       <li>
-        <a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a>
+        <a href="%prefix;m=MOD_DATA;data=src">%apply;list_of([source/sources]1)</a>
+      </li>
+      <li>
+        <a href="%prefix;m=MOD_DATA;data=occu">%apply;list_of([occupation/occupations]1)</a>
       </li>
     %end;
   </ul>
