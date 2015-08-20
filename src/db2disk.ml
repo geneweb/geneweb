@@ -392,7 +392,7 @@ value load_array2 bdir nb_ini nb def f1 f2 get =
       let ic_dat =
         open_in_bin (List.fold_left Filename.concat bdir [f1; f2; "data"])
       in
-      let tab = Array.create nb def in
+      let tab = Array.make nb def in
       for i = 0 to nb_ini - 1 do {
         tab.(i) := get ic_dat (input_binary_int ic_acc);
       };
@@ -443,7 +443,7 @@ value load_couples_array2 db2 = do {
 
 value parents_array2 db2 nb_ini nb = do {
   let arr =
-    if nb_ini = 0 then Array.create nb None
+    if nb_ini = 0 then Array.make nb None
     else
       load_array2 db2.bdir2 nb_ini nb None "person" "parents"
         (fun ic_dat pos ->
@@ -542,7 +542,7 @@ value read_notes db2 fnotes rn_mode =
 ;
 
 value check_magic ic magic id = do {
-  let b = String.create (String.length magic) in
+  let b = Bytes.create (String.length magic) in
   really_input ic b 0 (String.length b);
   if b <> magic then failwith (sprintf "bad %s magic number" id)
   else ();

@@ -14,7 +14,7 @@ type descend = dsk_descend;
 value magic_gwb = "GnWb0020";
 
 value check_magic =
-  let b = String.create (String.length magic_gwb) in
+  let b = Bytes.create (String.length magic_gwb) in
   fun ic ->
     do {
       really_input ic b 0 (String.length b);
@@ -49,7 +49,7 @@ value apply_patches tab plist plen =
   else do {
     let new_tab =
       if plen > Array.length tab then do {
-        let new_tab = Array.create plen (Obj.magic 0) in
+        let new_tab = Array.make plen (Obj.magic 0) in
         Array.blit tab 0 new_tab 0 (Array.length tab);
         new_tab
       }

@@ -55,7 +55,7 @@ value dsk_person_misc_names base p nobtit =
 ;
 
 value check_magic =
-  let b = String.create (String.length magic_gwb) in
+  let b = Bytes.create (String.length magic_gwb) in
   fun ic ->
     do {
       really_input ic b 0 (String.length b);

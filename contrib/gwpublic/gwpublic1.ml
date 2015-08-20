@@ -141,9 +141,9 @@ value public_all bname lim_year titled = do {
              exit 2
            }
          | _ -> assert False ]);
-  let old = Array.create (nb_of_persons base) False in
+  let old = Array.make (nb_of_persons base) False in
   do {
-    let scanned = Array.create (nb_of_persons base) False in
+    let scanned = Array.make (nb_of_persons base) False in
     for i = 0 to nb_of_persons base - 1 do {
       if not scanned.(i) then do {
         let p = poi base (Adef.iper_of_int i) in
@@ -151,7 +151,7 @@ value public_all bname lim_year titled = do {
       }
       else ();
     };
-    let scanned = Array.create (nb_of_persons base) False in
+    let scanned = Array.make (nb_of_persons base) False in
     for i = 0 to nb_of_persons base - 1 do {
       if old.(i) && not scanned.(i) then do {
         let p = poi base (Adef.iper_of_int i) in
@@ -168,7 +168,7 @@ value public_some bname lim_year titled key =
   match Gutil.person_ht_find_all base key with
   [ [ip] ->
       let p = poi base ip in
-      let scanned = Array.create (nb_of_persons base) False in
+      let scanned = Array.make (nb_of_persons base) False in
       let () = load_ascends_array base in
       let () = load_couples_array base in
       do {

@@ -57,11 +57,11 @@ value gen_decode strip_spaces s =
         match s.[i] with
         [ '%' when i + 2 < String.length s -> do {
             let v = hexa_val s.[i+1] * 16 + hexa_val s.[i+2] in
-            s1.[i1] := Char.chr v;
+            Bytes.set s1 i1 (Char.chr v);
             i + 3
           }
-        | '+' -> do { s1.[i1] := ' '; succ i }
-        | x -> do { s1.[i1] := x; succ i } ]
+        | '+' -> do { Bytes.set s1 i1 ' '; succ i }
+        | x -> do { Bytes.set s1 i1 x; succ i } ]
       in
       copy_decode_in s1 i (succ i1)
     else s1
@@ -79,7 +79,7 @@ value gen_decode strip_spaces s =
   in
   if need_decode 0 then
     let len = compute_len 0 0 in
-    let s1 = String.create len in
+    let s1 = Bytes.create len in
     let s = copy_decode_in s1 0 0 in
     if strip_spaces then strip_heading_and_trailing_spaces s else s
   else s
@@ -114,22 +114,22 @@ value encode s =
     if i < String.length s then
       let i1 =
         match s.[i] with
-        [ ' ' -> do { s1.[i1] := '+'; succ i1 }
+        [ ' ' -> do { Bytes.set s1 i1 '+'; succ i1 }
         | c ->
             if special c then do {
-              s1.[i1] := '%';
-              s1.[i1+1] := hexa_digit (Char.code c / 16);
-              s1.[i1+2] := hexa_digit (Char.code c mod 16);
+              Bytes.set s1 i1 '%';
+              Bytes.set s1 (i1+1) (hexa_digit (Char.code c / 16));
+              Bytes.set s1 (i1+2) (hexa_digit (Char.code c mod 16));
               i1 + 3
             }
-            else do { s1.[i1] := c; succ i1 } ]
+            else do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
     else s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in
-    copy_code_in (String.create len) 0 0
+    copy_code_in (Bytes.create len) 0 0
   else s
 ;
 
@@ -219,12 +219,12 @@ value rec extract_param name stop_char =
   | [] -> "" ]
 ;
 
-value buff = ref (String.create 80);
+value buff = ref (Bytes.create 80);
 value store len x = do {
   if len >= String.length buff.val then
-    buff.val := buff.val ^ String.create (String.length buff.val)
+    buff.val := buff.val ^ Bytes.create (String.length buff.val)
   else ();
-  buff.val.[len] := x;
+  Bytes.set buff.val len x;
   succ len
 };
 value get_buff len = String.sub buff.val 0 len;
@@ -272,12 +272,12 @@ value get_request_and_content strm =
     match extract_param "content-length: " ' ' request with
     [ "" -> ""
     | x -> do {
-        let str = String.create (int_of_string x) in
+        let str = Bytes.create (int_of_string x) in
         for i = 0 to String.length str - 1 do {
-          str.[i] :=
-            match strm with parser
-            [ [: `x :] -> x
-            | [: :] -> ' ' ];
+          Bytes.set str i
+            (match strm with parser
+             [ [: `x :] -> x
+             | [: :] -> ' ' ]);
         };
         str
       } ]
@@ -342,7 +342,7 @@ value treat_connection tmout callback addr fd = do {
   try flush stderr with _ -> ();
 };
 
-value buff = String.create 1024;
+value buff = Bytes.create 1024;
 
 IFDEF WIN95 THEN
 value copy_what_necessary t oc =

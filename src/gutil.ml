@@ -165,7 +165,7 @@ value alphabetic_utf_8 n1 n2 =
 ;
 
 value alphabetic_value =
-  let tab = Array.create 256 0 in
+  let tab = Array.make 256 0 in
   do {
     for i = 0 to 255 do { tab.(i) := 10 * i };
     tab.(Char.code 'à') := tab.(Char.code 'a') + 1;

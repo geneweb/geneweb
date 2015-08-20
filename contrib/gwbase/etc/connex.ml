@@ -120,7 +120,7 @@ value move base = do {
   load_couples_array base;
   load_descends_array base;
   let nb_fam = nb_of_families base in
-  let mark = Array.create nb_fam False in
+  let mark = Array.make nb_fam False in
   let min = ref max_int in
   let max = ref 0 in
   for i = 0 to nb_fam - 1 do {

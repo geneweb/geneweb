@@ -2,7 +2,7 @@
 (* $Id: translate.ml,v 5.9 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Buff = Buff.Make (struct value buff = ref (String.create 80); end);
+module Buff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
 
 value skip_lang s =
   loop where rec loop i =
@@ -209,11 +209,11 @@ value rec eval_shift s =
           if to_the_end then
             let rec loop i j =
               if i < String.length s then do {
-                t.[j] := s.[i]; loop (i + 1) (j + 1)
+                Bytes.set t j s.[i]; loop (i + 1) (j + 1)
               }
               else do {
                 let j =
-                  if j > 0 && t.[j - 1] <> ' ' then do { t.[j] := ' '; j + 1 }
+                  if j > 0 && t.[j - 1] <> ' ' then do { Bytes.set t j ' '; j + 1 }
                   else j
                 in
                 String.blit s l t j len;
@@ -225,22 +225,22 @@ value rec eval_shift s =
             let rec loop i j =
               if i < String.length s then
                 if s.[i] = ' ' then do {
-                  t.[j] := ' ';
+                  Bytes.set t j ' ';
                   String.blit s l t (j + 1) len;
                   (i, j + 1 + len)
                 }
-                else do { t.[j] := s.[i]; loop (i + 1) (j + 1) }
+                else do { Bytes.set t j s.[i]; loop (i + 1) (j + 1) }
               else if k < String.length s && s.[k] = ' ' then do {
-                t.[j] := ' '; String.blit s l t (j + 1) len; (i, j + 1 + len)
+                Bytes.set t j ' '; String.blit s l t (j + 1) len; (i, j + 1 + len)
               }
               else do { String.blit s l t j len; (i, j + len) }
             in
             loop i j
         in
         loop True i j
-      else do { t.[j] := s.[i]; loop changed (i + 1) (j + 1) }
+      else do { Bytes.set t j s.[i]; loop changed (i + 1) (j + 1) }
     else if i < String.length s then do {
-      t.[j] := s.[i]; loop changed (i + 1) (j + 1)
+      Bytes.set t j s.[i]; loop changed (i + 1) (j + 1)
     }
     else if changed then eval_shift (String.sub t 0 j)
     else String.sub t 0 j

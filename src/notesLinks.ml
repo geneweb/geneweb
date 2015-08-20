@@ -146,7 +146,7 @@ value read_db_from_file fname =
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do {
-        let b = String.create (String.length magic_notes_links) in
+        let b = Bytes.create (String.length magic_notes_links) in
         really_input ic b 0 (String.length b);
         let r =
           if b <> magic_notes_links then []

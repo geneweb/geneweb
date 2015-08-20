@@ -317,8 +317,8 @@ value notify conf base action =
 exception Begin_of_file;
 
 value buff_get_rev len =
-  let s = String.create len in
-  do { for i = 0 to len - 1 do { s.[i] := Buff.buff.val.[len - 1 - i] }; s }
+  let s = Bytes.create len in
+  do { for i = 0 to len - 1 do { Bytes.set s i Buff.buff.val.[len - 1 - i] }; s }
 ;
 
 value rev_input_char ic (rbuff, rpos) pos =
@@ -328,7 +328,7 @@ value rev_input_char ic (rbuff, rpos) pos =
         let len =
           if rbuff.val = "" then 1024 else 2 * String.length rbuff.val
         in
-        rbuff.val := String.create len
+        rbuff.val := Bytes.create len
       else ();
       let ppos = max (pos - String.length rbuff.val) 0 in
       seek_in ic ppos;

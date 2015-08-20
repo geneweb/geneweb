@@ -90,7 +90,7 @@ value is_printable =
 value spaces_to_underscore s =
   do {
     for i = 0 to String.length s - 1 do {
-      if s.[i] = ' ' then s.[i] := '_' else ()
+      if s.[i] = ' ' then Bytes.set s i '_' else ()
     };
     s
   }
@@ -105,13 +105,13 @@ value starting_char no_num s =
 ;
 
 value no_newlines s =
-  let s' = String.create (String.length s) in
+  let s' = Bytes.create (String.length s) in
   do {
     for i = 0 to String.length s - 1 do {
-      s'.[i] :=
-        match s.[i] with
-        [ '\n' | '\r' -> ' '
-        | _ -> s.[i] ]
+      Bytes.set s' i
+        (match s.[i] with
+         [ '\n' | '\r' -> ' '
+         | _ -> s.[i] ])
     };
     s'
   }
@@ -1579,7 +1579,7 @@ value separate base =
   match List.rev separate_list.val with
   [ [] -> fun _ -> False
   | list ->
-      let mark = Array.create (nb_of_families base) NotScanned in
+      let mark = Array.make (nb_of_families base) NotScanned in
       do {
         List.iter (mark_someone base mark) list;
         add_small_connex_components base mark;
@@ -1649,12 +1649,12 @@ value gwu base in_dir out_dir out_oc src_oc_ht anc desc ancdesc =
           } ]
   in
   let gen =
-    let mark = Array.create (nb_of_persons base) False in
+    let mark = Array.make (nb_of_persons base) False in
     let (per_sel, fam_sel) =
       Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
         censor.val with_siblings.val maxlev.val
     in
-    let fam_done = Array.create (nb_of_families base) False in
+    let fam_done = Array.make (nb_of_families base) False in
     {mark = mark; per_sel = per_sel; fam_sel = fam_sel;
      fam_done = fam_done; notes_pl_p = []; ext_files = [];
      notes_alias = notes_aliases in_dir; pevents_pl_p = []}

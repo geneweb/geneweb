@@ -434,7 +434,7 @@ value general_welcome conf =
 ;
 
 value nonce_private_key =
-  Lazy.lazy_from_fun
+  Lazy.from_fun
     (fun () ->
        let cnt_dir = Filename.concat Util.cnt_dir.val "cnt" in
        let fname = Filename.concat cnt_dir "gwd_private.txt" in
@@ -1314,8 +1314,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
          (if lang = "" then [] else [("lang", lang)]) @
          (if from = "" then [] else [("opt", from)]);
      base_env = base_env;
-     allowed_titles = Lazy.lazy_from_fun (allowed_titles env base_env);
-     denied_titles = Lazy.lazy_from_fun (denied_titles env base_env);
+     allowed_titles = Lazy.from_fun (allowed_titles env base_env);
+     denied_titles = Lazy.from_fun (denied_titles env base_env);
      request = request; lexicon = lexicon;
      xhs =
        match p_getenv base_env "doctype" with
@@ -1592,7 +1592,7 @@ value print_misc_file cgi misc_fname =
         try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
       with
       [ Some ic ->
-          let buf = String.create 1024 in
+          let buf = Bytes.create 1024 in
           let len = in_channel_length ic in
           do {
             content_misc cgi len misc_fname;
@@ -1846,7 +1846,7 @@ value geneweb_cgi addr script_name contents =
 
 value read_input len =
   if len >= 0 then do {
-    let buff = String.create len in really_input stdin buff 0 len; buff
+    let buff = Bytes.create len in really_input stdin buff 0 len; buff
   }
   else do {
     let buff = ref "" in
@@ -1911,13 +1911,13 @@ value robot_exclude_arg s =
 ;
 
 value slashify s =
-  let s1 = String.copy s in
+  let s1 = Bytes.copy s in
   do {
     for i = 0 to String.length s - 1 do {
-      s1.[i] :=
-        match s.[i] with
-        [ '\\' -> '/'
-        | x -> x ]
+      Bytes.set s1 i
+        (match s.[i] with
+         [ '\\' -> '/'
+         | x -> x ])
     };
     s1
   }

@@ -481,13 +481,13 @@ value quote_escaped s =
         | '&' -> do { String.blit "&amp;" 0 s1 i1 5; i1 + 5 }
         | '<' -> do { String.blit "&lt;" 0 s1 i1 4; i1 + 4 }
         | '>' -> do { String.blit "&gt;" 0 s1 i1 4; i1 + 4 }
-        | c -> do { s1.[i1] := c; succ i1 } ]
+        | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
     else s1
   in
   if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
+    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
   else s
 ;
 
@@ -1787,10 +1787,10 @@ value good_tag_list_fun () =
   else default_good_tag_list
 ;
 
-value good_tags_list = Lazy.lazy_from_fun good_tag_list_fun;
+value good_tags_list = Lazy.from_fun good_tag_list_fun;
 value good_tag s i = List.mem (tag_id s i) (Lazy.force good_tags_list);
 
-module Lbuff = Buff.Make (struct value buff = ref (String.create 80); end);
+module Lbuff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
 
 value filter_html_tags s =
   loop 0 0 where rec loop len i =
@@ -2223,11 +2223,11 @@ value is_number t =
 ;
 
 value hexa_string s =
-  let s' = String.create (2 * String.length s) in
+  let s' = Bytes.create (2 * String.length s) in
   do {
     for i = 0 to String.length s - 1 do {
-      s'.[2*i] := "0123456789ABCDEF".[Char.code s.[i] / 16];
-      s'.[2*i+1] := "0123456789ABCDEF".[Char.code s.[i] mod 16];
+      Bytes.set s' (2*i) "0123456789ABCDEF".[Char.code s.[i] / 16];
+      Bytes.set s' (2*i+1) "0123456789ABCDEF".[Char.code s.[i] mod 16];
     };
     s'
   }
@@ -2522,7 +2522,7 @@ value image_file_name str =
 ;
 
 value png_image_size ic =
-  let magic = let s = String.create 4 in do { really_input ic s 0 4; s } in
+  let magic = let s = Bytes.create 4 in do { really_input ic s 0 4; s } in
   if magic = "\137PNG" then do {
     seek_in ic 16;
     let wid = input_binary_int ic in
@@ -2533,7 +2533,7 @@ value png_image_size ic =
 ;
 
 value gif_image_size ic =
-  let magic = let s = String.create 4 in do { really_input ic s 0 4; s } in
+  let magic = let s = Bytes.create 4 in do { really_input ic s 0 4; s } in
   if magic = "GIF8" then do {
     seek_in ic 6;
     let wid = let x = input_byte ic in input_byte ic * 256 + x in
@@ -2545,7 +2545,7 @@ value gif_image_size ic =
 
 value jpeg_image_size ic =
   let magic =
-    let str = String.create 10 in do { really_input ic str 0 10; str }
+    let str = Bytes.create 10 in do { really_input ic str 0 10; str }
   in
   if Char.code magic.[0] = 0xff && Char.code magic.[1] = 0xd8 &&
      (let m = String.sub magic 6 4 in m = "JFIF" || m = "Exif") then
@@ -2720,7 +2720,7 @@ value create_topological_sort conf base =
       let () = load_ascends_array base in
       let () = load_couples_array base in
       Consang.topological_sort base (pget conf)
-  | Some "no_tstab" -> Array.create (nb_of_persons base) 0
+  | Some "no_tstab" -> Array.make (nb_of_persons base) 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
       lock (Mutil.lock_file bfile) with
@@ -2917,16 +2917,16 @@ value has_image conf base p =
 ;
 
 value gen_only_printable or_nl s =
-  let s' = String.create (String.length s) in
+  let s' = Bytes.create (String.length s) in
   do {
     for i = 0 to String.length s - 1 do {
-      s'.[i] :=
-        if Mutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
-        else
-          match s.[i] with
-          [ ' '..'~' | '\160'..'\255' -> s.[i]
-          | '\n' -> if or_nl then '\n' else ' '
-          | _ -> ' ' ]
+      Bytes.set s' i
+        (if Mutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
+         else
+           match s.[i] with
+           [ ' '..'~' | '\160'..'\255' -> s.[i]
+           | '\n' -> if or_nl then '\n' else ' '
+           | _ -> ' ' ])
     };
     strip_spaces s'
   }

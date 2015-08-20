@@ -588,8 +588,8 @@ value print_population_pyramid conf base = do {
   in
   let at_year = at_date.year in
   let nb_intervals = 150 / interval in
-  let men = Array.create (nb_intervals + 1) 0 in
-  let wom = Array.create (nb_intervals + 1) 0 in
+  let men = Array.make (nb_intervals + 1) 0 in
+  let wom = Array.make (nb_intervals + 1) 0 in
   for i = 0 to nb_of_persons base - 1 do {
     let p = pget conf base (Adef.iper_of_int i) in
     let sex = get_sex p in

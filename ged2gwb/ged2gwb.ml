@@ -230,7 +230,7 @@ value rec line_start num =
 ;
 
 value ascii_of_msdos s =
-  let s' = String.create (String.length s) in
+  let s' = Bytes.create (String.length s) in
   do {
     for i = 0 to String.length s - 1 do {
       let cc =
@@ -288,14 +288,14 @@ value ascii_of_msdos s =
         | 0o375 -> 0o262
         | c -> c ]
       in
-      s'.[i] := Char.chr cc
+      Bytes.set s' i (Char.chr cc)
     };
     s'
   }
 ;
 
 value ascii_of_macintosh s =
-  let s' = String.create (String.length s) in
+  let s' = Bytes.create (String.length s) in
   do {
     for i = 0 to String.length s - 1 do {
       let cc =
@@ -374,7 +374,7 @@ value ascii_of_macintosh s =
         | 0o364 -> 0o331
         | c -> c ]
       in
-      s'.[i] := Char.chr cc
+      Bytes.set s' i (Char.chr cc)
     };
     s'
   }
@@ -517,14 +517,14 @@ value less_greater_escaped s =
         match s.[i] with
         [ '<' -> do { String.blit "&lt;" 0 s1 i1 4; i1 + 4 }
         | '>' -> do { String.blit "&gt;" 0 s1 i1 4; i1 + 4 }
-        | c -> do { s1.[i1] := c; succ i1 } ]
+        | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
     else s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in
-    copy_code_in (String.create len) 0 0
+    copy_code_in (Bytes.create len) 0 0
   else s
 ;
 
@@ -920,7 +920,7 @@ type gen =
 value assume_tab name tab none =
   if tab.tlen = Array.length tab.arr then do {
     let new_len = 2 * Array.length tab.arr + 1 in
-    let new_arr = Array.create new_len none in
+    let new_arr = Array.make new_len none in
     Array.blit tab.arr 0 new_arr 0 (Array.length tab.arr);
     tab.arr := new_arr
   }
@@ -1180,12 +1180,12 @@ value gen_lowercase_uppercase_utf8_letter lower s =
       let l = list_of_encodings new_encoding in
       (l, List.length l)
     in
-    let s = String.create len in
+    let s = Bytes.create len in
     loop 0 el s where rec loop i el s =
       match el with
       [ [] -> s
       | [e :: ell] ->
-          let _s = String.set s i (Char.chr e) in
+          let _s = Bytes.set s i (Char.chr e) in
           loop (i + 1) ell s ]
   with [ Not_found -> s ]
 ;
@@ -1194,7 +1194,7 @@ value lowercase_utf8_letter = gen_lowercase_uppercase_utf8_letter True;
 value uppercase_utf8_letter = gen_lowercase_uppercase_utf8_letter False;
 
 value capitalize_word s =
-  let s = String.copy s in
+  let s = Bytes.copy s in
   copy False 0 0 (particle s 0) where rec copy special i len uncap =
     if i = String.length s then Buff.get len
     else
@@ -1229,7 +1229,7 @@ value capitalize_word s =
 ;
 
 value uppercase_word s =
-  let s = String.copy s in
+  let s = Bytes.copy s in
   copy False 0 0 (particle s 0) where rec copy special i len uncap =
     if i = String.length s then Buff.get len
     else
@@ -1260,7 +1260,7 @@ value uppercase_word s =
               copy False j (Buff.mstore len t) False ]
 ;
 
-module Buff2 = Buff.Make (struct value buff = ref (String.create 80); end);
+module Buff2 = Buff.Make (struct value buff = ref (Bytes.create 80); end);
 
 value capitalize_name s =
   (* On initialise le buffer à la valeur de s. *)
@@ -3432,9 +3432,9 @@ value make_arrays in_file =
 
 value make_subarrays (g_per, g_fam, g_str, g_bnot) =
   let persons =
-    let pa = Array.create g_per.tlen (Obj.magic 0) in
-    let aa = Array.create g_per.tlen (Obj.magic 0) in
-    let ua = Array.create g_per.tlen (Obj.magic 0) in
+    let pa = Array.make g_per.tlen (Obj.magic 0) in
+    let aa = Array.make g_per.tlen (Obj.magic 0) in
+    let ua = Array.make g_per.tlen (Obj.magic 0) in
     do {
       for i = 0 to g_per.tlen - 1 do {
         match g_per.arr.(i) with
@@ -3445,9 +3445,9 @@ value make_subarrays (g_per, g_fam, g_str, g_bnot) =
     }
   in
   let families =
-    let fa = Array.create g_fam.tlen (Obj.magic 0) in
-    let ca = Array.create g_fam.tlen (Obj.magic 0) in
-    let da = Array.create g_fam.tlen (Obj.magic 0) in
+    let fa = Array.make g_fam.tlen (Obj.magic 0) in
+    let ca = Array.make g_fam.tlen (Obj.magic 0) in
+    let da = Array.make g_fam.tlen (Obj.magic 0) in
     do {
       for i = 0 to g_fam.tlen - 1 do {
         match g_fam.arr.(i) with

@@ -6,9 +6,9 @@ module Make (B : sig value buff : ref string; end) =
     value store len x =
       do {
         if len >= String.length buff.val then
-          buff.val := buff.val ^ String.create (String.length buff.val)
+          buff.val := buff.val ^ Bytes.create (String.length buff.val)
         else ();
-        buff.val.[len] := x;
+        Bytes.set buff.val len x;
         succ len
       }
     ;
@@ -27,7 +27,7 @@ module Make (B : sig value buff : ref string; end) =
   end
 ;
 
-module BB = Make (struct value buff = ref (String.create 80); end);
+module BB = Make (struct value buff = ref (Bytes.create 80); end);
 
 value get = BB.get;
 value store = BB.store;

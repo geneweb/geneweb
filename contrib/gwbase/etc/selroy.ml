@@ -34,7 +34,7 @@ value print_date_dmy oc d =
 value spaces_to_underscore s =
   do {
     for i = 0 to String.length s - 1 do {
-      if s.[i] = ' ' then s.[i] := '_' else ()
+      if s.[i] = ' ' then Bytes.set s i '_' else ()
     };
     s
   }
@@ -732,8 +732,8 @@ value gwu base out_dir out_oc src_oc_list anc desc =
   let ((per_sel, fam_sel) as sel) =
     Select.functions base anc desc surnames.val no_spouses_parents.val
   in
-  let fam_done = Array.create (nb_of_families base) False in
-  let mark = Array.create (nb_of_persons base) False in
+  let fam_done = Array.make (nb_of_families base) False in
+  let mark = Array.make (nb_of_persons base) False in
   let out_oc_first = ref True in
   let origin_file fname =
     if out_dir = "" then (out_oc, out_oc_first)

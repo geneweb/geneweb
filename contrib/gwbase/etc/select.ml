@@ -102,8 +102,8 @@ value rec select_closure base per_tab fam_tab flag ip =
 ;
 
 value functions base anc desc surnames no_spouses_parents =
-  let per_tab = Array.create (nb_of_persons base) 0 in
-  let fam_tab = Array.create (nb_of_families base) 0 in
+  let per_tab = Array.make (nb_of_persons base) 0 in
+  let fam_tab = Array.make (nb_of_families base) 0 in
   do {
     for i = 0 to nb_of_persons base - 1 do {
       let p = poi base (Adef.iper_of_int i) in

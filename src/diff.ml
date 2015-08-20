@@ -131,7 +131,7 @@ value make_indexer a b = do {
        try b.(i) := Hashtbl.find htb e with
        [ Not_found -> Hashtbl.add htb e e ])
     b;
-  let ai = Array.create n 0 in
+  let ai = Array.make n 0 in
   let k =
     loop 0 0 where rec loop i k =
       if i = n then k

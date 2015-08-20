@@ -108,7 +108,7 @@ value nb_desc bname date = do {
   printf "nombre de personnes vivantes en %s : %d\n" (string_of_date date)
     nb_liv;
   flush stdout;
-  let mark = Array.create nb_fam 0 in
+  let mark = Array.make nb_fam 0 in
   let nb_desc = ref [] in
   ProgrBar.start ();
   ignore
