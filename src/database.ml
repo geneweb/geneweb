@@ -518,7 +518,7 @@ value make_visible_record_access bname persons =
             close_in ic;
             visible
           }
-      | None -> Array.create persons.len VsNone ]
+      | None -> Array.make persons.len VsNone ]
     in
     do { visible_ref.val := Some visible; visible }
   in
@@ -569,7 +569,7 @@ value apply_patches tab f patches plen =
   else do {
     let new_tab =
       if plen > Array.length tab then do {
-        let new_tab = Array.create plen (Obj.magic 0) in
+        let new_tab = Array.make plen (Obj.magic 0) in
         Array.blit tab 0 new_tab 0 (Array.length tab);
         new_tab
       }
@@ -747,7 +747,7 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
 
 value magic_patch = "GnPa0001";
 value check_patch_magic =
-  let b = String.create (String.length magic_patch) in
+  let b = Bytes.create (String.length magic_patch) in
   fun ic -> do {
     really_input ic b 0 (String.length b);
     b = magic_patch

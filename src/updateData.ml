@@ -267,7 +267,7 @@ value combine_by_ini ini list =
             else k ^ String.make (String.length ini + 1 - String.length k) '_'
           in
           for i = 0 to String.length ini_k - 1 do {
-            if ini_k.[i] = ' ' then ini_k.[i] := '_' else ()
+            if ini_k.[i] = ' ' then Bytes.set ini_k i '_' else ()
           };
           let new_list =
             if ini_k = "_" then new_list

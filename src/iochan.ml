@@ -52,17 +52,17 @@ value iochan_in_funs =
 value input_value_no_header = Iovalue.gen_input iochan_in_funs;
 
 value output_byte ioc w = do {
-  ib.[0] := Char.chr (w land 0xFF);
+  Bytes.set ib 0 (Char.chr (w land 0xFF));
   let len = Unix.write ioc.iofd ib 0 1 in
   if len <> 1 then failwith "iochan_output_byte" else ();
   ioc.iopos := ioc.iopos + 1;
 };
 
 value output_binary_int ioc w = do {
-  ib.[0] := Char.chr (w lsr 24 land 0xFF);
-  ib.[1] := Char.chr (w lsr 16 land 0xFF);
-  ib.[2] := Char.chr (w lsr 8 land 0xFF);
-  ib.[3] := Char.chr (w land 0xFF);
+  Bytes.set ib 0 (Char.chr (w lsr 24 land 0xFF));
+  Bytes.set ib 1 (Char.chr (w lsr 16 land 0xFF));
+  Bytes.set ib 2 (Char.chr (w lsr 8 land 0xFF));
+  Bytes.set ib 3 (Char.chr (w land 0xFF));
   let len = Unix.write ioc.iofd ib 0 4 in
   if len <> 4 then failwith "iochan_output_binary_int" else ();
   ioc.iopos := ioc.iopos + 4;

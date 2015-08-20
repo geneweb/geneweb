@@ -97,7 +97,7 @@ value just_copy bname what oc oc_acc =
 ;
 
 value make_name_index base =
-  let t = Array.create table_size [| |] in
+  let t = Array.make table_size [| |] in
   let add_name key valu =
     let key = Name.crush (Name.abbrev key) in
     let i = Hashtbl.hash key mod Array.length t in
@@ -148,7 +148,7 @@ value add_name t key valu =
 ;
 
 value make_strings_of_fsname base =
-  let t = Array.create table_size [| |] in
+  let t = Array.make table_size [| |] in
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let p = poi base (Adef.iper_of_int i) in
@@ -191,12 +191,12 @@ value output_strings_hash oc2 base =
   let () = base.data.strings.load_array () in
   let strings_array = base.data.strings in
   let taba =
-    Array.create
+    Array.make
       (min Sys.max_array_length
         (prime_after (max 2 (10 * strings_array.len))))
       (-1)
   in
-  let tabl = Array.create strings_array.len (-1) in
+  let tabl = Array.make strings_array.len (-1) in
   do {
     for i = 0 to strings_array.len - 1 do {
       let ia = Hashtbl.hash (base.data.strings.get i) mod Array.length taba in

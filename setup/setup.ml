@@ -11,13 +11,13 @@ value lang_param = ref "";
 value only_file = ref "";
 
 value slashify s =
-  let s1 = String.copy s in
+  let s1 = Bytes.copy s in
   do {
     for i = 0 to String.length s - 1 do {
-      s1.[i] :=
-        match s.[i] with
-        [ '\\' -> '/'
-        | x -> x ]
+      Bytes.set s1 i
+        (match s.[i] with
+         [ '\\' -> '/'
+         | x -> x ])
     };
     s1
   }
@@ -51,13 +51,13 @@ value quote_escaped s =
         | '&' -> do { String.blit "&amp;" 0 s1 i1 5; i1 + 5 }
         | '<' -> do { String.blit "&lt;" 0 s1 i1 4; i1 + 4 }
         | '>' -> do { String.blit "&gt;" 0 s1 i1 4; i1 + 4 }
-        | c -> do { s1.[i1] := c; succ i1 } ]
+        | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
     else s1
   in
   if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
+    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
   else s
 ;
 

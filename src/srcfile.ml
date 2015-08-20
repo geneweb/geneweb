@@ -292,7 +292,7 @@ value macro conf base =
   | c -> "%" ^ String.make 1 c ]
 ;
 
-module Lbuff = Buff.Make (struct value buff = ref (String.create 80); end);
+module Lbuff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
 
 value rec lexicon_translate conf base nomin strm first_c =
   let (upp, s) =
@@ -614,7 +614,7 @@ value print_start conf base =
     let env =
       let sosa_ref_l =
         let sosa_ref () = Util.find_sosa_ref conf base in
-        Lazy.lazy_from_fun sosa_ref
+        Lazy.from_fun sosa_ref
       in
       [("sosa_ref", Vsosa_ref sosa_ref_l)]
     in

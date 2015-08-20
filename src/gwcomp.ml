@@ -31,7 +31,7 @@ value copy_decode s i1 i2 =
   in
   let rec loop_copy t i j =
     if i >= i2 then t
-    else if i = i2 - 1 && s.[i] <> '_' then do { t.[j] := s.[i]; t }
+    else if i = i2 - 1 && s.[i] <> '_' then do { Bytes.set t j s.[i]; t }
     else do {
       let (c, i) =
         match s.[i] with
@@ -39,11 +39,11 @@ value copy_decode s i1 i2 =
         | '\\' -> (s.[i + 1], i + 1)
         | x -> (x, i) ]
       in
-      t.[j] := c;
+      Bytes.set t j c;
       loop_copy t (succ i) (succ j)
     }
   in
-  loop_copy (String.create len) i1 0
+  loop_copy (Bytes.create len) i1 0
 ;
 
 value fields str =

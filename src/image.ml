@@ -49,7 +49,7 @@ value content cgi t len fname =
 value print_image_type cgi fname itype =
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let buf = String.create 1024 in
+      let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
       do {
         content cgi itype len fname;

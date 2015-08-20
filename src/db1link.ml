@@ -122,7 +122,7 @@ value unique_string gen x =
         if gen.g_scnt = Array.length gen.g_base.c_strings then do {
           let arr = gen.g_base.c_strings in
           let new_size = 2 * Array.length arr + 1 in
-          let new_arr = Array.create new_size (no_string gen) in
+          let new_arr = Array.make new_size (no_string gen) in
           Array.blit arr 0 new_arr 0 (Array.length arr);
           gen.g_base.c_strings := new_arr;
         }
@@ -162,10 +162,10 @@ value new_iper gen =
     let uni_arr = gen.g_base.c_unions in
     let new_size = 2 * Array.length per_arr + 1 in
     let (phony_per, phony_asc, phony_uni) = no_person gen in
-    let new_per_arr = Array.create new_size phony_per in
-    let new_asc_arr = Array.create new_size phony_asc in
-    let new_uni_arr = Array.create new_size phony_uni in
-    let new_def = Array.create new_size False in
+    let new_per_arr = Array.make new_size phony_per in
+    let new_asc_arr = Array.make new_size phony_asc in
+    let new_uni_arr = Array.make new_size phony_uni in
+    let new_def = Array.make new_size False in
     Array.blit per_arr 0 new_per_arr 0 (Array.length per_arr);
     gen.g_base.c_persons := new_per_arr;
     Array.blit asc_arr 0 new_asc_arr 0 (Array.length asc_arr);
@@ -184,8 +184,8 @@ value new_ifam gen =
     let des_arr = gen.g_base.c_descends in
     let new_size = 2 * Array.length cpl_arr + 1 in
     let (phony_cpl, phony_des) = no_family gen in
-    let new_cpl_arr = Array.create new_size phony_cpl in
-    let new_des_arr = Array.create new_size phony_des in
+    let new_cpl_arr = Array.make new_size phony_cpl in
+    let new_des_arr = Array.make new_size phony_des in
     Array.blit cpl_arr 0 new_cpl_arr 0 (Array.length cpl_arr);
     gen.g_base.c_couples := new_cpl_arr;
     Array.blit des_arr 0 new_des_arr 0 (Array.length des_arr);

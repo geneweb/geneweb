@@ -37,7 +37,7 @@ value print_anniversary_day conf base dead_people liste =
 ;
 
 value gen_print conf base mois f_scan dead_people =
-  let tab = Array.create 31 [] in
+  let tab = Array.make 31 [] in
   let title _ =
     let lab =
       if dead_people then transl conf "anniversaries"
@@ -281,7 +281,7 @@ value print_marriage conf base month =
       (transl_decline conf "in (month year)"
          (transl_nth conf "(month)" (month - 1)))
   in
-  let tab = Array.create 31 [] in
+  let tab = Array.make 31 [] in
   do {
     header conf title;
     print_link_to_welcome conf True;

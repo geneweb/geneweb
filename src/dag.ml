@@ -1308,7 +1308,7 @@ value print_slices_menu_or_dag_page conf base page_title hts next_txt =
         Vdag (tmincol, tcol, colminsz, colsz, ncol)
       }
     in
-    [("dag", Vlazy (Lazy.lazy_from_fun table_pre_dim))]
+    [("dag", Vlazy (Lazy.from_fun table_pre_dim))]
   in
   Hutil.interp conf base "dag"
     {Templ.eval_var = eval_var conf page_title next_txt;

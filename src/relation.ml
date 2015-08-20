@@ -307,8 +307,8 @@ type node =
 ;
 
 value get_shortest_path_relation conf base ip1 ip2 excl_faml =
-  let mark_per = Array.create (nb_of_persons base) NotVisited in
-  let mark_fam = Array.create (nb_of_families base) False in
+  let mark_per = Array.make (nb_of_persons base) NotVisited in
+  let mark_fam = Array.make (nb_of_families base) False in
   do {
     List.iter
       (fun i ->

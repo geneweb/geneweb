@@ -26,7 +26,7 @@ value filename_basename str =
 
 value read_input len =
   if len >= 0 then do {
-    let buff = String.create len in really_input stdin buff 0 len; buff
+    let buff = Bytes.create len in really_input stdin buff 0 len; buff
   }
   else do {
     let buff = ref "" in
@@ -109,13 +109,13 @@ value quote_escaped s =
         | '&' -> do { String.blit "&amp;" 0 s1 i1 5; i1 + 5 }
         | '<' -> do { String.blit "&lt;" 0 s1 i1 4; i1 + 4 }
         | '>' -> do { String.blit "&gt;" 0 s1 i1 4; i1 + 4 }
-        | c -> do { s1.[i1] := c; succ i1 } ]
+        | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
     else s1
   in
   if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
+    let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
   else s
 ;
 

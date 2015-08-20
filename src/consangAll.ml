@@ -48,10 +48,10 @@ value compute base tlim from_scratch quiet = do {
       let ts = Consang.topological_sort base poi in
       Consang.make_relationship_info base ts
     in
-    let consang_tab = Array.create (nb_of_families base) Adef.no_consang in
+    let consang_tab = Array.make (nb_of_families base) Adef.no_consang in
     let cnt = ref 0 in
     if not from_scratch then
-      let mark = Array.create (nb_of_persons base) False in
+      let mark = Array.make (nb_of_persons base) False in
       match patched_ascends base with
       [ [] -> ()
       | list ->

@@ -244,7 +244,7 @@ value rec check_ancestors base warning year year_tab ip ini_p =
 value check_base_aux base error warning changed_p = do {
   eprintf "check persons\n";
   let nb_ind = nb_of_persons base in
-  let year_tab = Array.create nb_ind (max_int, False) in
+  let year_tab = Array.make nb_ind (max_int, False) in
   ProgrBar.start ();
   for i = 0 to nb_ind - 1 do {
     ProgrBar.run i nb_ind;

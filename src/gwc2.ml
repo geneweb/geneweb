@@ -17,7 +17,7 @@ open Printf;
     [Rem] : Non exporté en clair hors de ce module.                     *)
 (* ******************************************************************** *)
 value check_magic =
-  let b = String.create (String.length magic_gwo) in
+  let b = Bytes.create (String.length magic_gwo) in
   fun fname ic ->
     do {
       really_input ic b 0 (String.length b);

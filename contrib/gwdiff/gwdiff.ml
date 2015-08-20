@@ -535,7 +535,7 @@ value addiff base1 base2 iper1 iper2 d_tab =
 (* Main *)
 
 value gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
-  let desc_tab = Array.create base1.data.persons.len [] in
+  let desc_tab = Array.make base1.data.persons.len [] in
   match (d_mode, ad_mode) with
   [ (True, _)
   | (False, False) -> ddiff base1 base2 iper1 iper2 desc_tab

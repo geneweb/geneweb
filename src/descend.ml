@@ -445,8 +445,8 @@ value display_descendants_with_numbers conf base max_level ancestor =
            (transl_a_of_gr_eq_gen_lev conf
               (transl conf "descendants") (person_text conf base ancestor)))
   in
-  let marks = Array.create (nb_of_persons base) False in
-  let paths = Array.create (nb_of_persons base) [] in
+  let marks = Array.make (nb_of_persons base) False in
+  let paths = Array.make (nb_of_persons base) [] in
   do {
     header conf title;
     total.val := 0;
@@ -597,8 +597,8 @@ value display_descendant_index conf base max_level ancestor =
   in
   do {
     header conf title;
-    let marks = Array.create (nb_of_persons base) False in
-    let paths = Array.create (nb_of_persons base) [] in
+    let marks = Array.make (nb_of_persons base) False in
+    let paths = Array.make (nb_of_persons base) [] in
     mark_descendants conf base marks max_level (get_key_index ancestor);
     label_descendants conf base marks paths max_level ancestor;
     let list = ref [] in
@@ -625,8 +625,8 @@ value display_spouse_index conf base max_level ancestor =
   in
   do {
     header conf title;
-    let marks = Array.create (nb_of_persons base) False in
-    let paths = Array.create (nb_of_persons base) [] in
+    let marks = Array.make (nb_of_persons base) False in
+    let paths = Array.make (nb_of_persons base) [] in
     mark_descendants conf base marks max_level (get_key_index ancestor);
     label_descendants conf base marks paths max_level ancestor;
     let list = ref [] in

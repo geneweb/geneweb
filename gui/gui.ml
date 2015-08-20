@@ -85,7 +85,7 @@ value channel_redirector channel callback = do {
   Unix.dup2 cin channel ;
   let chan = GMain.Io.channel_of_descr cout in
   let len = 80 in
-  let buf = String.create len in
+  let buf = Bytes.create len in
   GMain.Io.add_watch chan ~prio:0 ~cond:[`IN; `HUP; `ERR] ~callback:
     do { fun cond ->
       try

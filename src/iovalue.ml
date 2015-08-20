@@ -34,7 +34,7 @@ value rec input_loop ifuns ic =
     else Obj.magic (code land 0x3f)
   else if code >= <<PREFIX_SMALL_STRING>> then
     let len = code land 0x1F in
-    let s = String.create len in
+    let s = Bytes.create len in
     do { ifuns.input ic s 0 len; Obj.magic s }
   else
     match code with
@@ -58,16 +58,16 @@ value rec input_loop ifuns ic =
         else failwith "input bad code block 64"
     | <<CODE_STRING8>> ->
         let len = ifuns.input_byte ic in
-        let s = String.create len in
+        let s = Bytes.create len in
         do { ifuns.input ic s 0 len; Obj.magic s }
     | <<CODE_STRING32>> ->
         let len = ifuns.input_binary_int ic in
-        let s = String.create len in
+        let s = Bytes.create len in
         do { ifuns.input ic s 0 len; Obj.magic s }
     | code -> failwith (Printf.sprintf "input bad code 0x%x" code) ]
 and input_block ifuns ic tag size =
   let v =
-    if tag = 0 then Obj.magic (Array.create size (Obj.magic 0))
+    if tag = 0 then Obj.magic (Array.make size (Obj.magic 0))
     else Obj.new_block tag size
   in
   do {
@@ -203,17 +203,17 @@ value size v =
 
 (* Digest *)
 
-value dbuf = ref (String.create 256);
+value dbuf = ref (Bytes.create 256);
 value dlen = ref 0;
 value dput_char c =
   do {
     if dlen.val = String.length dbuf.val then do {
       let nlen = 2 * dlen.val in
-      let ndbuf = String.create nlen in
+      let ndbuf = Bytes.create nlen in
       String.blit dbuf.val 0 ndbuf 0 dlen.val; dbuf.val := ndbuf;
     }
     else ();
-    dbuf.val.[dlen.val] := c;
+    Bytes.set dbuf.val dlen.val c;
     incr dlen;
   }
 ;
@@ -236,11 +236,11 @@ value hexchar i =
 ;
 
 value string_code s =
-  let r = String.create (String.length s * 2) in
+  let r = Bytes.create (String.length s * 2) in
   do {
     for i = 0 to String.length s - 1 do {
-      r.[2*i] := hexchar (Char.code s.[i] / 16);
-      r.[2*i+1] := hexchar (Char.code s.[i] mod 16);
+      Bytes.set r (2*i) (hexchar (Char.code s.[i] / 16));
+      Bytes.set r (2*i+1) (hexchar (Char.code s.[i] mod 16));
     };
     r
   }

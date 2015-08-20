@@ -24,7 +24,7 @@ type excl =
 ;
 
 value input_excl =
-  let b = String.create (String.length magic_robot) in
+  let b = Bytes.create (String.length magic_robot) in
   fun ic ->
     do {
       really_input ic b 0 (String.length b);

@@ -8,7 +8,7 @@ open Printf;
 value make_table base =
   let _ = load_ascends_array base in
   let _ = load_couples_array base in
-  let fpla = Array.create (nb_of_persons base) None in
+  let fpla = Array.make (nb_of_persons base) None in
   let cnt = ref (nb_of_persons base) in
   do {
     while cnt.val > 0 do {

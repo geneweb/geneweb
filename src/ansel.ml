@@ -38,7 +38,7 @@ value of_iso_8859_1 s =
   in
   if identical then s
   else
-    let s' = String.create len in
+    let s' = Bytes.create len in
     loop 0 0 where rec loop i i' =
       if i = String.length s then s'
       else
@@ -47,46 +47,46 @@ value of_iso_8859_1 s =
           [ 'À' | 'È' | 'Ì' | 'Ò' | 'Ù'
           | 'à' | 'è' | 'ì' | 'ò' | 'ù' ->
               do {
-                s'.[i'] := Char.chr 225; s'.[i'+1] := no_accent s.[i];
+                Bytes.set s' i' (Char.chr 225); Bytes.set s' (i'+1) (no_accent s.[i]);
                 i' + 1
               }
           | 'Á' | 'É' | 'Í' | 'Ó' | 'Ú' | 'Ý'
           | 'á' | 'é' | 'í' | 'ó' | 'ú' | 'ý' ->
               do {
-                s'.[i'] := Char.chr 226; s'.[i'+1] := no_accent s.[i];
+                Bytes.set s' i' (Char.chr 226); Bytes.set s' (i'+1) (no_accent s.[i]);
                 i' + 1
               }
           | 'Â' | 'Ê' | 'Î' | 'Ô' | 'Û'
           | 'â' | 'ê' | 'î' | 'ô' | 'û' ->
               do {
-                s'.[i'] := Char.chr 227; s'.[i'+1] := no_accent s.[i];
+                Bytes.set s' i' (Char.chr 227); Bytes.set s' (i'+1) (no_accent s.[i]);
                 i' + 1
               }
           | 'Ã' | 'Ñ' | 'Õ' | 'ã' | 'ñ' | 'õ' ->
               do {
-                s'.[i'] := Char.chr 228; s'.[i'+1] := no_accent s.[i];
+                Bytes.set s' i' (Char.chr 228); Bytes.set s' (i'+1) (no_accent s.[i]);
                 i' + 1
               }
           | 'Ä' | 'Ë' | 'Ï' | 'Ö' | 'Ü'
           | 'ä' | 'ë' | 'ï' | 'ö' | 'ü' | 'ÿ' ->
               do {
-                s'.[i'] := Char.chr 232; s'.[i'+1] := no_accent s.[i];
+                Bytes.set s' i' (Char.chr 232); Bytes.set s' (i'+1) (no_accent s.[i]);
                 i' + 1
               }
           | 'Å' | 'å' ->
               do {
-                s'.[i'] := Char.chr 234; s'.[i'+1] := no_accent s.[i];
+                Bytes.set s' i' (Char.chr 234); Bytes.set s' (i'+1) (no_accent s.[i]);
                 i' + 1
               }
           | 'Ç' | 'ç' ->
               do {
-                s'.[i'] := Char.chr 240; s'.[i'+1] := no_accent s.[i];
+                Bytes.set s' i' (Char.chr 240); Bytes.set s' (i'+1) (no_accent s.[i]);
                 i' + 1
               }
-          | 'Ø' -> do { s'.[i'] := Char.chr 162; i' }
-          | 'ø' -> do { s'.[i'] := Char.chr 178; i' }
-          | 'ß' -> do { s'.[i'] := Char.chr 207; i' }
-          | c -> do { s'.[i'] := c; i' } ]
+          | 'Ø' -> do { Bytes.set s' i' (Char.chr 162); i' }
+          | 'ø' -> do { Bytes.set s' i' (Char.chr 178); i' }
+          | 'ß' -> do { Bytes.set s' i' (Char.chr 207); i' }
+          | c -> do { Bytes.set s' i' c; i' } ]
         in
         loop (i + 1) (i' + 1)
 ;
@@ -195,25 +195,25 @@ value to_iso_8859_1 s =
   in
   if identical then s
   else
-    let s' = String.create len in
+    let s' = Bytes.create len in
     loop 0 0 where rec loop i i' =
       if i = String.length s then s'
       else if i = String.length s - 1 then
-        do { s'.[i'] := s.[i]; s' }
+        do { Bytes.set s' i' s.[i]; s' }
       else
         let i =
           match Char.code s.[i] with
-          [ 162 -> do { s'.[i'] := 'Ø'; i }
-          | 178 -> do { s'.[i'] := 'ø'; i }
-          | 207 -> do { s'.[i'] := 'ß'; i }
-          | 225 -> do { s'.[i'] := grave s.[i+1]; i + 1 }
-          | 226 -> do { s'.[i'] := acute s.[i+1]; i + 1 }
-          | 227 -> do { s'.[i'] := circum s.[i+1]; i + 1 }
-          | 228 -> do { s'.[i'] := tilde s.[i+1]; i + 1 }
-          | 232 -> do { s'.[i'] := uml s.[i+1]; i + 1 }
-          | 234 -> do { s'.[i'] := circle s.[i+1]; i + 1 }
-          | 240 -> do { s'.[i'] := cedil s.[i+1]; i + 1 }
-          | _ -> do { s'.[i'] := s.[i]; i } ]
+          [ 162 -> do { Bytes.set s' i' 'Ø'; i }
+          | 178 -> do { Bytes.set s' i' 'ø'; i }
+          | 207 -> do { Bytes.set s' i' 'ß'; i }
+          | 225 -> do { Bytes.set s' i' (grave s.[i+1]); i + 1 }
+          | 226 -> do { Bytes.set s' i' (acute s.[i+1]); i + 1 }
+          | 227 -> do { Bytes.set s' i' (circum s.[i+1]); i + 1 }
+          | 228 -> do { Bytes.set s' i' (tilde s.[i+1]); i + 1 }
+          | 232 -> do { Bytes.set s' i' (uml s.[i+1]); i + 1 }
+          | 234 -> do { Bytes.set s' i' (circle s.[i+1]); i + 1 }
+          | 240 -> do { Bytes.set s' i' (cedil s.[i+1]); i + 1 }
+          | _ -> do { Bytes.set s' i' s.[i]; i } ]
         in
         loop (i + 1) (i' + 1)
 ;

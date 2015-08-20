@@ -6,7 +6,7 @@ open Gwcomp;
 open Printf;
 
 value check_magic =
-  let b = String.create (String.length magic_gwo) in
+  let b = Bytes.create (String.length magic_gwo) in
   fun fname ic ->
     do {
       really_input ic b 0 (String.length b);

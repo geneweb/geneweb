@@ -413,7 +413,7 @@ value effective_merge_ind conf base warning p1 p2 =
 ;
 
 value is_ancestor base ip1 ip2 =
-  let visited = Array.create (nb_of_persons base) False in
+  let visited = Array.make (nb_of_persons base) False in
   let rec loop ip =
     if visited.(Adef.int_of_iper ip) then False
     else if ip = ip1 then True

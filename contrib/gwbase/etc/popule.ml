@@ -132,8 +132,8 @@ value mkcelib size =
 ;
 
 value popule bname size ngen gyear =
-  let h = Array.create size (Adef.iper_of_int 0, "", "") in
-  let f = Array.create size (Adef.iper_of_int 0, "", "") in
+  let h = Array.make size (Adef.iper_of_int 0, "", "") in
+  let f = Array.make size (Adef.iper_of_int 0, "", "") in
   let base = ref (Gwdb.open_base bname) in
   let base_info = (base, ref 0, bname) in
   let d =

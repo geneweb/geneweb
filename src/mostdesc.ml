@@ -68,8 +68,8 @@ value most_desc base p =
 *)
   let _ = load_descends_array base in
   let _ = load_unions_array base in
-  let tab = Array.create (nb_of_persons base) Num.zero in
-  let entered = Array.create (nb_of_persons base) False in
+  let tab = Array.make (nb_of_persons base) Num.zero in
+  let entered = Array.make (nb_of_persons base) False in
   let q = ref Pq.empty in
   do {
     q.val := Pq.add (get_key_index p) q.val;

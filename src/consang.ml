@@ -46,7 +46,7 @@ value new_mark () = do { incr mark; mark.val };
 type visit = [ NotVisited | BeingVisited | Visited ];
 
 value check_noloop base error =
-  let tab = Array.create (nb_of_persons base) NotVisited in
+  let tab = Array.make (nb_of_persons base) NotVisited in
   let rec noloop i =
     match tab.(i) with
     [ NotVisited -> do {
@@ -85,7 +85,7 @@ exception TopologicalSortError of person;
 *)
 
 value topological_sort base poi =
-  let tab = Array.create (nb_of_persons base) 0 in
+  let tab = Array.make (nb_of_persons base) 0 in
   let todo = ref [] in
   let cnt = ref 0 in
   do {
@@ -150,7 +150,7 @@ value topological_sort base poi =
 ;
 
 value check_noloop_for_person_list base error ipl =
-  let tab = Array.create (nb_of_persons base) NotVisited in
+  let tab = Array.make (nb_of_persons base) NotVisited in
   let rec noloop ip =
     let i = Adef.int_of_iper ip in
     match tab.(i) with
@@ -179,7 +179,7 @@ value phony_rel =
 ;
 
 value make_relationship_info base tstab =
-  let tab = Array.create (nb_of_persons base) phony_rel in
+  let tab = Array.make (nb_of_persons base) phony_rel in
   {tstab = tstab; reltab = tab; queue = [| |]}
 ;
 
@@ -238,7 +238,7 @@ value relationship_and_links base ri b ip1 ip2 =
         reset u;
         if v >= Array.length ri.queue then
           let len = Array.length ri.queue in
-          ri.queue := Array.append ri.queue (Array.create (v + 1 - len) [])
+          ri.queue := Array.append ri.queue (Array.make (v + 1 - len) [])
         else ();
         if qmax.val < 0 then do {
           for i = qi.val to v - 1 do { ri.queue.(i) := [] };
