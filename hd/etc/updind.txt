@@ -592,6 +592,7 @@ function changeCalendar(e,v,m,c) {
 
 %define;one_pevent(xcnt)
   %if;(event.e_name != "#birt" and event.e_name != "#bapt" and event.e_name != "#deat" and event.e_name != "#buri" and event.e_name != "#crem")
+    <input type="hidden" name="e_weightxcnt" size="30" value="%event_weight;" id="e_weightxcnt" />
     <table border="1" width="700px">
       <tr>
         <td><label for="e_namexcnt">[*event/events]0</label></td>
@@ -711,6 +712,7 @@ function changeCalendar(e,v,m,c) {
         <td><label for="e_namexcnt">[*event/events]0</label></td>
         <td>
           <input type="text" name="e_namexcnt" size="30" value="%event.e_name;" id="e_namexcnt"%/>
+          <input type="hidden" name="e_weightxcnt" size="30" value="%event_weight;" id="e_weightxcnt"%/>
         </td>
       </tr>
       <tr>

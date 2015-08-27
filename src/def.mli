@@ -6,7 +6,6 @@ type choice 'a 'b = [ Left of 'a | Right of 'b ];
 type iper = Adef.iper;
 type ifam = Adef.ifam;
 
-type cdate = Adef.cdate;
 type codate = Adef.codate;
 
 type date = Adef.date ==
@@ -44,7 +43,7 @@ type death_reason =
 ;
 type death =
   [ NotDead
-  | Death of death_reason and cdate
+  | Death of death_reason and codate
   | DeadYoung
   | DeadDontKnowWhen
   | DontKnowIfDead
@@ -225,7 +224,7 @@ type warning 'person 'descend 'title 'pevent 'fevent =
   | ChangedOrderOfChildren of ifam and 'descend and array iper and array iper
   | ChangedOrderOfMarriages of 'person and array ifam and array ifam
   | ChangedOrderOfFamilyEvents of ifam and list 'fevent and list 'fevent
-  | ChangedOrderOfPersonEvents of 'person and list 'pevent and list 'pevent
+  (* | ChangedOrderOfPersonEvents of 'person and list 'pevent and list 'pevent *)
   | ChildrenNotInOrder of ifam and 'descend and 'person and 'person
   | CloseChildren of ifam and 'descend and 'person and 'person
   | DeadOld of 'person and dmy

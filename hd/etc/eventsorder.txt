@@ -1,0 +1,122 @@
+%doctype;
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <!-- $Id: perso.txt,v 5.15 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2007 INRIA -->
+  <title>%nn;
+    %if;has_public_name;
+      %if;has_qualifiers;%public_name; %qualifier;
+      %else;%public_name; %surname;%end;
+    %else;
+      %if;has_qualifiers;%first_name; %qualifier;
+      %else;%first_name; %surname;%end;
+    %end;
+  </title>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  %include.js;
+  %include.css;
+  %base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+
+<script type="text/javascript">
+function update_href() {
+  var new_order = $.map( $("table tr"), function (x) { return $(x).attr('oldpos'); } ).join(",");
+  $(".submit_form").attr( "href", "%prefix;m=MOD_EVENT_ORDER_OK;i=%index;;v=" + new_order);
+}
+
+function on_move_down(x) {
+  var $tr = x.parent();
+  //var curpos = $("table tr").index($tr);
+  var can_swap = true;
+
+  if ($tr.is('[textdate]') ) {
+    // we have textdate field. It means there is event with same date nearby
+    if ($tr.next('tr').attr('textdate') != $tr.attr('textdate') )
+       can_swap = false;
+  }
+  if (can_swap) {
+    $tr.next('tr').after($tr);
+    update_href();
+  }
+}
+function on_move_up(x) {
+  var $tr = x.parent();
+
+  var can_swap = true;
+
+  if ($tr.is('[textdate]') ) {
+    // we have textdate field. It means there is event with same date nearby
+    if ($tr.prev('tr').attr('textdate') != $tr.attr('textdate') )
+       can_swap = false;
+  }
+  if (can_swap) {
+    $tr.prev("tr").before($tr);
+    update_href();
+  }
+}
+</script>
+
+%( Because Safari mobile is just a great browser that can't handle events... %)
+%( Added a div with an 'empty event' to handle the modify menu.              %)
+<div onclick="void(0);">
+
+  <h3 class="highlight">[*time line] </h3>
+  <table>
+    %foreach;pevent;
+      <tr %if;event.has_date;textdate="%event.date" %else %end; oldpos="%event.pos;">
+        %if;event.is_reordable;
+          <td onclick="on_move_up($(this));">Move up</td>
+          <td onclick="on_move_down($(this));">Move down</td>
+        %else;
+          <td></td>
+          <td></td>
+        %end;
+        <td valign="top" style="white-space: nowrap;" width="1">
+          <span class="edate">
+            %if;event.has_date;%event.date; :
+            %else;--- :
+            %end;
+          </span>
+        </td>
+        <td valign="top">
+          <span>
+            %apply;capitalize(event.name)%sp;
+            %if;event.has_spouse;([with] %event.spouse;)%end;
+            %if;event.has_place; - %event.place;%end;
+          </span>
+          %if;event.has_witnesses;
+            <p style="margin:0;">
+              %foreach;event_witness;
+                <span>%apply;capitalize(event_witness_kind) :</span>
+                %apply;short_display_person("event_witness")<br/>
+              %end;
+            </p>
+          %end;
+          %if;event.has_note;
+            %event.note;
+          %end;
+          %if;event.has_src;
+            <span><em>[*source/sources]1: %event.src;</em></span>
+          %end;
+        </td>
+      </tr>
+    %end;
+  </table>
+
+  <a class="submit_form" href="">Apply changes</a>
+
+%base_trailer;
+%copyright;
+
+</div> %( the magic Safari div %)
+<script type="text/javascript">
+update_href();
+</script>
+
+</body>
+</html>

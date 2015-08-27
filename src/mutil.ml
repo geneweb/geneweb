@@ -31,6 +31,13 @@ value list_iter_first f al =
   ()
 ;
 
+value list_iteri_first f al =
+  let _ =
+    List.fold_left (fun (first,n) a -> let () = f first n a in (False,n+1) ) (True,0) al
+  in
+  ()
+;
+
 value list_uniq =
   fun
   [ [_] | [] as l -> l

@@ -130,6 +130,14 @@ value od_of_codate od =
 
 value codate_None = codate_of_od None;
 
+(* True when date can not be sorted automatically *)
+value is_reordable = fun
+  [ Cnone -> True
+  | Ctext _ -> True
+  | _ -> False
+  ]
+;
+
 exception Request_failure of string;
 
 type gen_couple 'person =

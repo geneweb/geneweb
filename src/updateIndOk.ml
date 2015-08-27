@@ -10,6 +10,7 @@ open Gwdb;
 open Hutil;
 open Mutil;
 open Util;
+open Printf;
 
 (* Liste des string dont on a supprimé un caractère.       *)
 (* Utilisé pour le message d'erreur lors de la validation. *)
@@ -144,7 +145,8 @@ value reconstitute_insert_pevent conf ext cnt el =
     | (Some "on", _) -> 1
     | _ -> 0 ]
   in
-  if n > 0 then
+  if n <= 0 then (el, ext)
+  else
     let el =
       loop el n where rec loop el n =
         if n > 0 then
@@ -153,11 +155,10 @@ value reconstitute_insert_pevent conf ext cnt el =
              epers_place = ""; epers_reason = ""; epers_note = "";
              epers_src = ""; epers_witnesses = [| |]}
           in
-          loop [e1 :: el] (n - 1)
+          loop [ (None,e1) :: el] (n - 1)
         else el
     in
     (el, True)
-  else (el, ext)
 ;
 
 value rec reconstitute_pevents conf ext cnt =
@@ -235,6 +236,12 @@ value rec reconstitute_pevents conf ext cnt =
         [ Some src -> only_printable src
         | _ -> "" ]
       in
+      let weight =
+        match get_nth conf "e_weight" cnt with
+          [ Some "" -> None
+          | None -> None
+          | Some s -> Some (int_of_string s) ]
+      in
       (* Type du témoin par défaut lors de l'insertion de nouveaux témoins. *)
       let wk =
         if epers_name = Epers_Baptism then Witness_GodParent
@@ -272,9 +279,9 @@ value rec reconstitute_pevents conf ext cnt =
                       loop_witn n witnesses where rec loop_witn n witnesses =
                         if n = 0 then ([c :: witnesses], True)
                         else
-                  let new_witn =
+                          let new_witn =
                             (("", "", 0, Update.Create Neuter None, ""), wk)
-                  in
+                          in
                           let witnesses = [new_witn :: witnesses] in
                           loop_witn (n-1) witnesses
                   | _ ->
@@ -297,9 +304,9 @@ value rec reconstitute_pevents conf ext cnt =
                 loop_witn n witnesses where rec loop_witn n witnesses =
                   if n = 0 then (witnesses, True)
                   else
-            let new_witn =
+                    let new_witn =
                       (("", "", 0, Update.Create Neuter None, ""), wk)
-            in
+                    in
                     let witnesses = [new_witn :: witnesses] in
                     loop_witn (n-1) witnesses
             | _ ->
@@ -316,8 +323,7 @@ value rec reconstitute_pevents conf ext cnt =
          epers_witnesses = Array.of_list witnesses}
       in
       let (el, ext) = reconstitute_pevents conf ext (cnt + 1) in
-      let (el, ext) = reconstitute_insert_pevent conf ext (cnt +1) el in
-      ([e :: el], ext)
+      ([ (weight,e) :: el ], ext)
   | _ -> ([], ext) ]
 ;
 
@@ -437,22 +443,55 @@ value reconstitute_burial conf burial_place =
   | Some x -> failwith ("bad burial type " ^ x) ]
 ;
 
+value sort_by_weights xs =
+  List.stable_sort (fun (w1,_) (w2,_) ->
+                    match (w1,w2) with
+                      [ (Some m, Some n) -> compare m n
+                      | (Some _, None) -> -1
+                      | (None, Some _) -> 1
+                      | (None, None) -> 0 ]
+                   ) xs
+;
+
+
 value reconstitute_from_pevents pevents ext bi bp de bu =
-  (* On tri les évènements pour être sûr. *)
-  let pevents =
-    CheckItem.sort_events
-      ((fun evt -> CheckItem.Psort evt.epers_name),
-       (fun evt -> evt.epers_date))
-      pevents
+  (* There we get some events reconstituted from POST data. New events have weight = None,
+     old ones hace Some _. A few events are special birth, death, baptism, burial/cremation.
+     They have dedicated controls on the input form and are always sent to the server.
+
+     In this function we restore person info while parsing special events. Also we
+     remove some special events if they are empty (they appear because of dedicated controls
+     on the form.
+
+     We shall not pass newly created events there beacuse they will be removed.
+   *)
+  let is_empty_event (w,e)  =
+    (match e.epers_name with
+       [ Epers_Name "" | Epers_Baptism | Epers_Death | Epers_Burial
+       | Epers_Birth -> True
+       | Epers_Cremation -> True
+       | _ -> False]) &&
+    (Adef.od_of_codate e.epers_date = None) &&
+    (e.epers_place = "") &&
+    (e.epers_reason = "") &&
+    (e.epers_note = "") &&
+    (e.epers_src = "") &&
+    (Array.length e.epers_witnesses = 0)
   in
+
+  let pevents = List.filter (fun e -> not (is_empty_event e)) pevents in
+
+  (* New events go to the end of the list *)
+  let pevents = sort_by_weights pevents in
   let found_birth = ref False in
   let found_baptism = ref False in
   let found_death = ref False in
   let found_burial = ref False in
+
   let rec loop pevents bi bp de bu =
     match pevents with
     [ [] -> (bi, bp, de, bu)
-    | [evt :: l] ->
+    | [(w,evt) :: l] ->
         match evt.epers_name with
         [ Epers_Birth ->
             if found_birth.val then loop l bi bp de bu
@@ -514,46 +553,7 @@ value reconstitute_from_pevents pevents ext bi bp de bu =
         | _ -> loop l bi bp de bu ] ]
   in
   let (bi, bp, de, bu) = loop pevents bi bp de bu in
-  (* Hack *)
-  let pevents =
-    if not found_death.val then
-      let remove_evt = ref False in
-      List.fold_left
-        (fun accu evt ->
-           if not remove_evt.val then
-             if evt.epers_name = Epers_Name "" then
-               do { remove_evt.val := True; accu }
-             else [evt :: accu]
-           else [evt :: accu])
-        [] (List.rev pevents)
-    else pevents
-  in
-  let pevents =
-    if not found_burial.val then
-      let remove_evt = ref False in
-      List.fold_left
-        (fun accu evt ->
-           if not remove_evt.val then
-             if evt.epers_name = Epers_Name "" then
-               do { remove_evt.val := True; accu }
-             else [evt :: accu]
-           else [evt :: accu])
-        [] (List.rev pevents)
-    else pevents
-  in
-  let pevents =
-    if not ext then
-      let remove_evt = ref False in
-      List.fold_left
-        (fun accu evt ->
-           if not remove_evt.val then
-             if evt.epers_name = Epers_Name "" then
-               do { remove_evt.val := True; accu }
-             else [evt :: accu]
-           else [evt :: accu])
-        [] (List.rev pevents)
-    else pevents
-  in
+
   (* Il faut gérer le cas où l'on supprime délibérément l'évènement. *)
   let bi =
     if not found_birth.val then (Adef.codate_None, "", "", "")
@@ -668,21 +668,33 @@ value reconstitute_person conf =
     [ (NotDead | DontKnowIfDead, Buried _ | Cremated _) -> DeadDontKnowWhen
     | _ -> death ]
   in
-  let (pevents, ext) = reconstitute_pevents conf ext 1 in
-  let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
-  let notes =
-    if first_name = "?" || surname = "?" then ""
-    else only_printable_or_nl (strip_all_trailing_spaces (get conf "notes"))
-  in
-  let psources = only_printable (get conf "src") in
+
+  let (events_n_weights, ext) = reconstitute_pevents conf ext 1 in
+  (* We will not pass newly generated events to reconstitute_from_pevents because we
+     can't exptract any useful information fro mjust created events *)
+  let (new_events, ext) =
+    reconstitute_insert_pevent conf ext (1+List.length events_n_weights) [] in
+
   (* Mise à jour des évènements principaux. *)
-  let (bi, bp, de, bu, pevents) =
-    reconstitute_from_pevents pevents ext
+  let (bi, bp, de, bu, events_n_weights) =
+    reconstitute_from_pevents events_n_weights ext
       (Adef.codate_of_od birth, birth_place, birth_note, birth_src)
       (Adef.codate_of_od bapt, bapt_place, bapt_note, bapt_src)
       (death, death_place, death_note, death_src)
       (burial, burial_place, burial_note, burial_src)
   in
+
+  let events_n_weights = events_n_weights @ new_events in
+
+  let ww = List.map fst events_n_weights in
+  let pevents = List.map snd events_n_weights in
+
+  let notes =
+    if first_name = "?" || surname = "?" then ""
+    else only_printable_or_nl (strip_all_trailing_spaces (get conf "notes"))
+  in
+  let psources = only_printable (get conf "src") in
+
   let (birth, birth_place, birth_note, birth_src) = bi in
   let (bapt, bapt_place, bapt_note, bapt_src) = bp in
   let (death, death_place, death_note, death_src) = de in
@@ -711,7 +723,7 @@ value reconstitute_person conf =
      burial_src = burial_src; pevents = pevents; notes = notes;
      psources = psources; key_index = Adef.iper_of_int key_index}
   in
-  (p, ext)
+  (ww, p, ext)
 ;
 
 value check_event_witnesses conf base witnesses =
@@ -761,7 +773,7 @@ value error_person conf base p err =
   }
 ;
 
-value strip_pevents p =
+value strip_pevents es =
   let strip_array_witness pl =
     let pl =
       List.fold_right
@@ -771,7 +783,7 @@ value strip_pevents p =
     Array.of_list pl
   in
   List.fold_right
-    (fun e accu ->
+    (fun (w,e) accu ->
        let (has_infos, witnesses) =
          match e.epers_name with
          [ Epers_Name s -> (s <> "", strip_array_witness e.epers_witnesses)
@@ -782,23 +794,32 @@ value strip_pevents p =
          | _ -> (True, strip_array_witness e.epers_witnesses) ]
        in
        if (has_infos || Array.length witnesses > 0) then
-         [ {(e) with epers_witnesses = witnesses} :: accu ]
+         [ (w, {(e) with epers_witnesses = witnesses}) :: accu ]
        else accu)
-    p.pevents []
+    es []
 ;
 
 value strip_list = List.filter (fun s -> s <> "");
 
-value strip_person p =
-  {(p) with
-   first_names_aliases = strip_list p.first_names_aliases;
-   surnames_aliases = strip_list p.surnames_aliases;
-   qualifiers = strip_list p.qualifiers;
-   aliases = strip_list p.aliases;
-   titles = List.filter (fun t -> t.t_ident <> "") p.titles;
-   pevents = strip_pevents p;
-   rparents =
-     List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
+value strip_person weights p =
+  let () = assert (List.length weights = List.length p.pevents) in
+  let (ws, es) =
+    let xs = List.map2 (fun a b -> (a,b)) weights p.pevents in
+    let xs = strip_pevents xs in
+    (List.map fst xs, List.map snd xs)
+  in
+
+  let p = {(p) with
+            first_names_aliases = strip_list p.first_names_aliases;
+            surnames_aliases = strip_list p.surnames_aliases;
+            qualifiers = strip_list p.qualifiers;
+            aliases = strip_list p.aliases;
+            titles = List.filter (fun t -> t.t_ident <> "") p.titles;
+            pevents = es;
+            rparents =
+              List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
+  in
+  (ws, p)
 ;
 
 value print_conflict conf base p =
@@ -1206,7 +1227,7 @@ value relation_sex_is_coherent base warning p =
     p.rparents
 ;
 
-value all_checks_person conf base p a u = do {
+value all_checks_person conf base p a u =
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
@@ -1214,6 +1235,7 @@ value all_checks_person conf base p a u = do {
     let p = person_of_gen_person base (p, a, u) in
     CheckItem.person base warning p
   in
+  do {
   relation_sex_is_coherent base warning p;
   match a.parents with
   [ Some ifam -> CheckItem.reduce_family base error warning ifam (foi base ifam)
@@ -1225,8 +1247,8 @@ value all_checks_person conf base p a u = do {
     (fun
      [ ChangedOrderOfChildren ifam des _ after ->
          patch_descend base ifam {children = after}
-     | ChangedOrderOfPersonEvents _ _ after ->
-         patch_person base p.key_index {(p) with pevents = after}
+     (* | ChangedOrderOfPersonEvents _ _ after -> *)
+     (*     patch_person base p.key_index {(p) with pevents = after} *)
      | _ -> () ])
     wl.val;
   List.rev wl.val
@@ -1275,24 +1297,80 @@ value print_del_ok conf base wl =
   }
 ;
 
+value merge_new_event es e =
+  let rec insert_after_or_in_head cond e xs =
+    match xs with
+      [ [ x::xs ] when cond x -> [ x :: insert_after_or_in_head cond e xs ]
+                                   (* we will have max 2 events for skipping so
+                                      stack is not a problem for a while        *)
+      | _ -> [ e :: xs ]
+      ]
+  in
+  let rec insert_before_or_to_tail cond e xs =
+    List.rev (insert_after_or_in_head cond e (List.rev xs))
+    (* Not very good implementation but short *)
+  in
+  let snoc x xs = List.rev [ x :: List.rev xs ] in
+
+  let is_dated_event e = None<>Adef.od_of_codate e.epers_date in
+  let undated = not (is_dated_event e) in
+
+  let is_burial_crem_death e =
+    List.mem e.epers_name [Epers_Burial; Epers_Cremation; Epers_Death]
+  in
+  match e with
+  [ _ when e.epers_name=Epers_Birth && undated -> [e::es]
+  | _ when e.epers_name=Epers_Baptism && undated ->
+     insert_after_or_in_head (fun e -> e.epers_name=Epers_Birth) e es
+  | _ when e.epers_name=Epers_Burial && undated    -> snoc e es
+  | _ when e.epers_name=Epers_Cremation && undated ->  snoc e es
+  | _ when e.epers_name=Epers_Death     && undated ->
+     insert_before_or_to_tail
+       (fun e -> e.epers_name=Epers_Burial || e.epers_name=Epers_Cremation) e es
+  | _ when undated ->
+     insert_before_or_to_tail is_burial_crem_death e es
+  | newe when not (List.exists is_dated_event es) ->
+     (* dated event without other dated events goes first *)
+     [ newe :: es ]
+  | newe ->
+     let \< l r = CheckItem.strictly_before (Adef.date_of_cdate l.epers_date)
+                                               (Adef.date_of_cdate r.epers_date)
+     in
+     (* new dated event in presence of other dated events in worst case goes to the end *)
+     let insert_pos =
+       list_fold_left_i (fun n acc e ->
+                         if not (is_dated_event e) then acc
+                         else
+                           if e < newe then acc
+                           else
+                             min acc n
+                        )
+                        (List.length es) es
+     in
+     list_insert_after_n insert_pos newe es
+  ]
+;
+
 value print_add o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
   let () = removed_string.val := [] in
   let conf = Update.update_conf o_conf in
   try
-    let (sp, ext) = reconstitute_person conf in
+    let (weights, sp, ext) = reconstitute_person conf in
     let redisp =
       match p_getenv conf.env "return" with
       [ Some _ -> True
       | _ -> False ]
     in
-    if ext || redisp then UpdateInd.print_update_ind conf base sp ""
+    if ext || redisp then UpdateInd.print_update_ind conf base (weights,sp) ""
     else do {
-      let sp = strip_person sp in
+      let (_,sp) = strip_person weights sp in
       match check_person conf base sp with
       [ Some err -> error_person conf base sp err
       | None ->
+          let sorted_pevents = List.fold_left merge_new_event [] sp.pevents in
+          let sp = { (sp) with pevents=sorted_pevents } in
           let (p, a) = effective_add conf base sp in
           let u = {family = get_family (poi base p.key_index)} in
           let wl = all_checks_person conf base p a u in
@@ -1333,7 +1411,7 @@ value print_del conf base =
 
 value print_mod_aux conf base callback =
   try
-    let (p, ext) = reconstitute_person conf in
+    let (ww, p, ext) = reconstitute_person conf in
     let redisp =
       match p_getenv conf.env "return" with
       [ Some _ -> True
@@ -1342,17 +1420,56 @@ value print_mod_aux conf base callback =
     let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
     let digest = Update.digest_person ini_ps in
     if digest = raw_get conf "digest" then
-      if ext || redisp then UpdateInd.print_update_ind conf base p digest
-      else do {
-        let p = strip_person p in
+      if ext || redisp then UpdateInd.print_update_ind conf base (ww,p) digest
+      else
+        let (ww,p) = strip_person ww p in
         match check_person conf base p with
         [ Some err -> error_person conf base p err
-        | None -> callback p ]
-      }
+        | None -> callback ww p ]
+
     else Update.error_digest conf
   with
   [ Update.ModErr -> () ]
 ;
+
+value fix_event_order conf base ww (gp: gen_person Update.key string) =
+  let base_pevents =
+    let base_p = poi base gp.key_index in
+    (gen_person_of_person base_p).pevents
+  in
+  let base_pevents_count = List.length base_pevents in
+
+  let () = assert (List.length ww = List.length gp.pevents) in
+  let () = List.iter (fun [ Some n -> assert (n<base_pevents_count)
+                          | None -> () ] ) ww
+  in
+  (* All new events have weight = None, old ones -- Some _. Also old events with changed
+     date should be considered as new.
+     We need to sort old events and insert new ones to that list. *)
+
+  let paired = List.map2 (fun a b -> (a,b)) ww gp.pevents in
+
+  let (old_events, new_events) =
+    let f = fun
+        [ (None,_) -> False
+        | (Some n,e) when e.epers_date <> (List.nth base_pevents n).epers_date ->
+           False
+        | (Some _,_) -> True
+        ]
+    in
+    List.partition f paired
+  in
+
+  let old_events =
+    let old_events = sort_by_weights old_events in
+    list_filter_map (fun [ (Some _,x) -> Some x | (None,_) -> None]) old_events
+  in
+
+  let new_events = List.map snd new_events in
+  let ans = List.fold_left merge_new_event old_events new_events in
+  { (gp) with pevents = ans }
+;
+
 
 value print_mod o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
@@ -1370,7 +1487,8 @@ value print_mod o_conf base =
           (gen_person_of_person (poi base (Adef.iper_of_int (-1)))) ]
   in
   let conf = Update.update_conf o_conf in
-  let callback sp = do {
+  let callback ww sp = do {
+    let sp = fix_event_order conf base ww sp in
     let p = effective_mod conf base sp in
     let op = poi base p.key_index in
     let u = {family = get_family op} in
