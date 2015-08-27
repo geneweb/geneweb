@@ -3632,3 +3632,39 @@ value display_options conf =
   in
   s
 ;
+
+value list_init count (f: int -> 'a) =
+  let rec helper n xs =
+    (* let () = Printf.printf "list_init, n=%d, len=%d\n%!" n (List.length xs) in *)
+    if n>=0 then helper (n-1) [ (f n) :: xs ]
+    else let () = assert (List.length xs = count) in
+         xs
+  in
+  helper (count-1) []
+;
+
+value list_filter_map f xs =
+  let xs = List.map f xs in
+  let xs = List.filter (fun [ Some _ -> True | None -> False ]) xs in
+  List.map (fun [Some x -> x | None -> failwith "list_filter_map" ]) xs
+;
+
+
+value list_fold_left_i f init xs =
+  let i = ref (-1) in
+  List.fold_left (fun acc x -> let () = incr i in f i.val acc x) init xs
+;
+
+value list_insert_after_n n x xs =
+  if n > List.length xs then failwith "Bad_argument: list_insert_after_n"
+  else
+    let rec helper n left xs =
+      if n>0 then helper (n-1) [ List.hd xs :: left ] (List.tl xs)
+      else List.fold_left (fun acc y -> [ y :: acc ]) [ x :: xs ] left
+    in
+    helper n [] xs
+;
+
+value list_count cond xs =
+  List.fold_left (fun acc x -> if cond x then acc+1 else acc) 0  xs
+;

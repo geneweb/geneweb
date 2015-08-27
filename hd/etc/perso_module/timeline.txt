@@ -36,5 +36,7 @@
       </tr>
     %end;
   </table>
+  <br>
+  <a href="%prefix;m=MOD_EVENT_ORDER;i=%index;">Edit person events order</a><br>
+  <br>
 %end;
-

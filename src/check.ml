@@ -131,9 +131,9 @@ value print_base_warning oc base =
       fprintf oc "Changed order of family's events for %s\n"
         (designation base (poi base (get_mother cpl)));
     }
-  | ChangedOrderOfPersonEvents p _ _ ->
-      fprintf oc "Changed order of person's events for %s\n"
-        (designation base p)
+  (* | ChangedOrderOfPersonEvents p _ _ -> *)
+  (*     fprintf oc "Changed order of person's events for %s\n" *)
+  (*       (designation base p) *)
   | CloseChildren ifam des elder x -> do {
       let cpl = foi base ifam in
       fprintf oc

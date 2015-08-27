@@ -1580,6 +1580,23 @@ value get_sosa conf base env r p =
     } ]
 ;
 
+value pevents_list conf base p =
+    if authorized_age conf base p then
+      (* On conserve l'ordre de tri. *)
+      List.fold_right
+        (fun evt events ->
+           let name = Pevent evt.epers_name in
+           let date = evt.epers_date in
+           let place = evt.epers_place in
+           let note = evt.epers_note in
+           let src = evt.epers_src in
+           let wl = evt.epers_witnesses in
+           let x = (name, date, place, note, src, wl, None) in
+           [x :: events] )
+        (get_pevents p) []
+    else []
+;
+
 value events_list conf base p =
   let pevents =
     if authorized_age conf base p then
@@ -2586,6 +2603,15 @@ and eval_bool_event_field
   fun
   [ "has_date" -> p_auth && date <> Adef.codate_None
   | "has_place" -> p_auth && sou base place <> ""
+  | "is_reordable" ->
+     p_auth && ((Adef.is_reordable date) ||
+                  (match date with
+                    [ _ when date = Adef.codate_None -> True
+                    | d ->
+                       let gp = gen_person_of_person p in
+                       list_count (fun e -> e.epers_date = d) gp.pevents > 1
+                    ])
+               )
   | "has_note" -> p_auth && sou base note <> ""
   | "has_src" -> p_auth && sou base src <> ""
   | "has_witnesses" -> p_auth && Array.length w > 0
@@ -2673,6 +2699,10 @@ and eval_str_event_field
         in
         string_with_macros conf env src
       else ""
+  | "pos" ->
+     match get_env "pos" env with
+       [ Vint n -> string_of_int n
+       | _ -> raise Not_found ]
   | _ -> raise Not_found ]
 and eval_event_field_var
       conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc =
@@ -3674,6 +3704,7 @@ value print_foreach conf base print_ast eval_expr =
     | "death_witness" -> print_foreach_death_witness env al ep
     | "descendant_level" -> print_foreach_descendant_level env al ep
     | "event" -> print_foreach_event env al ep
+    | "pevent" -> print_foreach_pevent env al ep
     | "event_witness" -> print_foreach_event_witness env al ep
     | "event_witness_relation" ->
         print_foreach_event_witness_relation env al ep
@@ -3966,6 +3997,15 @@ value print_foreach conf base print_ast eval_expr =
       (fun first evt ->
          let env = [("event", Vevent p evt) :: env] in
          let env = [("first", Vbool first) :: env] in
+         List.iter (print_ast env ep) al)
+      events
+  and print_foreach_pevent env al ((p, _) as ep) =
+    let events = pevents_list conf base p in
+    list_iteri_first
+      (fun first pos evt ->
+         let env = [("event", Vevent p evt) :: env] in
+         let env = [("first", Vbool first) :: env] in
+         let env = [("pos", Vint pos) :: env] in
          List.iter (print_ast env ep) al)
       events
   and print_foreach_event_witness env al ((p, p_auth) as ep) =
@@ -4491,6 +4531,10 @@ value print conf base p =
       Util.unauthorized conf src
   | _ ->
       interp_templ "perso" conf base p ]
+;
+
+value print_events_reorder conf base p =
+  interp_templ "eventsorder" conf base p
 ;
 
 value limit_by_tree conf =

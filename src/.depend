@@ -291,6 +291,7 @@ request.cmo: adef.cmi advSearchOk.cmo alln.cmo birthDeath.cmo birthday.cmo \
     num.cmi perso.cmi place.cmo relation.cmo relationLink.cmi secure.cmi \
     sendImage.cmo some.cmo searchName.cmo srcfile.cmi title.cmo update.cmi \
     updateFam.cmi updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
+    updateEventOrderOk.cmo \
     wiznotes.cmi updateData.cmo ../wserver/wserver.cmi request.cmi
 request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     buff.cmx changeChildren.cmx config.cmi cousins.cmx dag.cmx date.cmx \
@@ -300,6 +301,7 @@ request.cmx: adef.cmx advSearchOk.cmx alln.cmx birthDeath.cmx birthday.cmx \
     num.cmx perso.cmx place.cmx relation.cmx relationLink.cmx secure.cmx \
     sendImage.cmx some.cmx searchName.cmx srcfile.cmx title.cmx update.cmx \
     updateFam.cmx updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
+    updateEventOrderOk.cmx \
     wiznotes.cmx updateData.cmx ../wserver/wserver.cmx request.cmi
 request.cmi: config.cmi
 robot.cmo: config.cmi secure.cmi srcfile.cmi util.cmi templ.cmi \
@@ -388,6 +390,10 @@ updateInd.cmx: adef.cmx calendar.cmx config.cmi def.cmi futil.cmx gwdb.cmx \
     hutil.cmx templ.cmx templAst.cmi update.cmx util.cmx perso.cmx \
     ../wserver/wserver.cmx updateInd.cmi
 updateInd.cmi: config.cmi def.cmi gwdb.cmi update.cmi
+
+updateEventOrderOk.cmo: util.cmi def.cmi
+updateEventOrderOk.cmx: util.cmi def.cmi gwdb.cmx
+
 updateIndOk.cmo: adef.cmi checkItem.cmi config.cmi def.cmi futil.cmi \
     gutil.cmi gwdb.cmi history.cmi hutil.cmi mutil.cmi name.cmi notes.cmi \
     notesLinks.cmi update.cmi updateInd.cmi util.cmi ../wserver/wserver.cmi \

@@ -276,7 +276,8 @@ value print_merge conf base =
       let p = reconstitute conf base p1 p2 in
       let sp = UpdateInd.string_person_of base p1 in
       let digest = Update.digest_person sp in
-      UpdateInd.print_update_ind conf base p digest
+      (* TODO: check that marking all events as new is OK *)
+      UpdateInd.print_update_ind conf base ([],p) digest
   | _ -> incorrect_request conf ]
 ;
 
@@ -474,7 +475,7 @@ value redirect_added_families base p ip2 p2_family =
   }
 ;
 
-value effective_mod_merge conf base o_p1 o_p2 sp =
+value effective_mod_merge conf base o_p1 o_p2 _ sp =
   match p_getint conf.env "i2" with
   [ Some i2 -> do {
       let ip2 = Adef.iper_of_int i2 in
@@ -531,4 +532,3 @@ value print_mod_merge o_conf base =
   let conf = Update.update_conf o_conf in
   UpdateIndOk.print_mod_aux conf base (effective_mod_merge conf base o_p1 o_p2)
 ;
-

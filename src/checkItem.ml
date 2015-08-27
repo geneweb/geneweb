@@ -280,7 +280,7 @@ value merge_events (get_name, get_date) l1 l2 =
     (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2)
     l1 l2
 ;
-
+(*
 value sort_pevents base warning p =
   let a =
     sort_events
@@ -291,7 +291,7 @@ value sort_pevents base warning p =
   if b <> a then warning (ChangedOrderOfPersonEvents p b a)
   else ()
 ;
-
+*)
 value sort_fevents base warning (ifam, fam) =
   let a =
     sort_events
@@ -1146,7 +1146,6 @@ value person base warning p = do {
   check_pevents base warning p;
   check_person_age base warning p;
   List.iter (titles_after_birth base warning p) (get_titles p);
-  sort_pevents base warning p;
   related_sex_is_coherent base warning p;
 };
 

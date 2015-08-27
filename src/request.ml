@@ -491,6 +491,12 @@ value family_m conf base =
   | Some "LEX" -> Srcfile.print_lexicon conf base
   | Some "MISC_NOTES" -> Notes.print_misc_notes conf base
   | Some "MISC_NOTES_SEARCH" -> Notes.print_misc_notes_search conf base
+  | Some "MOD_EVENT_ORDER" when conf.wizard ->
+      match find_person_in_env conf base "" with
+      [ Some p -> Perso.print_events_reorder conf base p
+      | _ -> very_unknown conf ]
+  | Some "MOD_EVENT_ORDER_OK"  -> UpdateEventOrderOk.print_mod conf base
+
   | Some "MOD_DATA" when conf.wizard -> UpdateData.print_mod conf base
   | Some "MOD_DATA_OK" when conf.wizard -> UpdateData.print_mod_ok conf base
   | Some "MOD_FAM" when conf.wizard -> UpdateFam.print_mod conf base

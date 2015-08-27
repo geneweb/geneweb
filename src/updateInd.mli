@@ -7,11 +7,12 @@ open Gwdb;
 
 value string_person_of : base -> person -> gen_person Update.key string;
 
+type event_weights = list (option int);
+
 value print_update_ind :
-  config -> base -> gen_person Update.key string -> string -> unit
+  config -> base -> (event_weights * gen_person Update.key string) -> string -> unit
 ;
 
 value print_add : config -> base -> unit;
 value print_del : config -> base -> unit;
 value print_mod : config -> base -> unit;
-
