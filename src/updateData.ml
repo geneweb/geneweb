@@ -924,7 +924,11 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
             patch_key base pi (sou base np.first_name) (sou base np.surname) np.occ;
             patch_name base key pi;
             Update.update_misc_names_of_family
-              base (get_sex p) {family = get_family p}
+              base (get_sex p) {family = get_family p};
+            let sp =
+              Futil.map_person_ps (fun ip -> ip) (fun istr -> sou base istr) np
+            in
+            UpdateIndOk.rename_image_file conf base op sp;
           }
           else ();
           patch_person base np.key_index np;
