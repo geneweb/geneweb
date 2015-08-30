@@ -15,7 +15,8 @@ value all_checks_person :
 value print_mod_aux :
   config -> base -> (gen_person Update.key string -> unit) -> unit;
 
+value rename_image_file : config -> base -> person -> gen_person iper string -> unit;
+
 value print_add : config -> base -> unit;
 value print_del : config -> base -> unit;
 value print_mod : config -> base -> unit;
-
