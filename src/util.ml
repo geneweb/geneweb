@@ -142,7 +142,7 @@ value capitale s =
 type format2 'a 'b = format4 'a unit string 'b;
 
 value fcapitale (a : format4 'a 'b 'c 'd) : format4 'a 'b 'c 'd =
-  Obj.magic capitale a
+  Scanf.format_from_string (capitale (string_of_format a)) a
 ;
 
 value nth_field_abs w n =
@@ -272,7 +272,7 @@ value transl_a_of_gr_eq_gen_lev conf x y =
 ;
 
 value check_format ini_fmt (r : string) =
-  let s : string = Obj.magic (ini_fmt : format4 'a 'b 'c 'd) in
+  let s = string_of_format ini_fmt in
   let rec loop i j =
     if i < String.length s - 1 && j < String.length r - 1 then
       match (s.[i], s.[i + 1], r.[j], r.[j + 1]) with
@@ -286,7 +286,7 @@ value check_format ini_fmt (r : string) =
     else if j < String.length r - 1 then
       if r.[j] = '%' then None else loop i (j + 1)
     else
-      Some (Obj.magic r : format4 'a 'b 'c 'd)
+      Some (Scanf.format_from_string r ini_fmt)
   in
   loop 0 0
 ;
@@ -294,7 +294,7 @@ value check_format ini_fmt (r : string) =
 value valid_format ini_fmt r =
   match check_format ini_fmt r with
   [ Some fmt -> fmt
-  | None -> Obj.magic (tnf (Obj.magic ini_fmt)) ]
+  | None -> Scanf.format_from_string (tnf r) ini_fmt ]
 ;
 
 value cftransl conf fmt =
@@ -317,14 +317,14 @@ value cftransl conf fmt =
   loop 0
 ;
 
-value ftransl conf s = valid_format s (transl conf (Obj.magic s : string));
+value ftransl conf s = valid_format s (transl conf (string_of_format s));
 
 value ftransl_nth conf s p =
-  valid_format s (transl_nth conf (Obj.magic s : string) p)
+  valid_format s (transl_nth conf (string_of_format s) p)
 ;
 
 value fdecline conf w s =
-  valid_format w (gen_decline (Obj.magic w : string) s)
+  valid_format w (gen_decline (string_of_format w) s)
 ;
 
 value translate_eval s = Translate.eval (nominative s);
