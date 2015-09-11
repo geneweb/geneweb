@@ -8,6 +8,7 @@ open Gwdb;
 open Hutil;
 open TemplAst;
 open Util;
+open Printf;
 
 value bogus_person_index = Adef.iper_of_int (-1);
 
@@ -20,6 +21,8 @@ value string_person_of base p =
   Futil.map_person_ps fp (sou base) (gen_person_of_person p)
 ;
 
+type event_weights = list (option int);
+
 (* Interpretation of template file 'updind.txt' *)
 
 type env 'a =
@@ -28,10 +31,19 @@ type env 'a =
   | Vother of 'a
   | Vcnt of ref int
   | Vbool of bool
+  | Vevent_weights of event_weights
   | Vnone ]
 ;
 
+value pevent_weight_str = "pevent_weights";
+
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+value get_env_weights v env =
+  try match List.assoc v env with
+        [ Vevent_weights xs -> xs
+        | _ -> failwith (sprintf "Event weights variable '%s' has bad type" v) ]
+  with [ Not_found ->failwith (sprintf "Event weights variable '%s' is not found" v) ]
+;
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
@@ -113,6 +125,11 @@ and eval_simple_var conf base env p loc =
   | ["dr_killed"] -> eval_is_death_reason Killed p.death
   | ["dr_murdered"] -> eval_is_death_reason Murdered p.death
   | ["dr_unspecified"] -> eval_is_death_reason Unspecified p.death
+  | ["event_weight"] ->
+     match get_env "weight" env with
+       [ Vstring s -> str_val s
+       | _         -> failwith "weight variable is not found" ]
+
   | ["event" :: sl] ->
       let e =
         match get_env "cnt" env with
@@ -674,18 +691,21 @@ value print_foreach print_ast eval_expr =
     in
     ()
   and print_foreach_pevent env p al list =
-    loop True 1 list where rec loop first cnt =
+    let weights = get_env_weights pevent_weight_str env in
+    let () = assert (List.length weights = List.length list) in
+    loop True 1 (weights,list) where rec loop first cnt =
       fun
-      [ [nn :: l] ->
+        [ ([w :: ww],[n :: nn]) ->
           let env =
             [("cnt", Vint cnt); ("first", Vbool first);
-             ("last", Vbool (l = [])) :: env]
+             ("weight", Vstring (match w with [Some x -> string_of_int x|None -> ""]));
+             ("last", Vbool (nn = [])) :: env]
           in
           do {
             List.iter (print_ast env p) al;
-            loop False (cnt + 1) l
+            loop False (cnt + 1) (ww,nn)
           }
-      | [] -> () ]
+      | _ -> () ]
   and print_foreach_witness env p al list =
     match get_env "cnt" env with
     [ Vint i ->
@@ -713,13 +733,15 @@ value print_foreach print_ast eval_expr =
   print_foreach
 ;
 
-value print_update_ind conf base p digest =
+value print_update_ind conf base (weights,p) digest =
   match p_getenv conf.env "m" with
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
       let env =
         [("digest", Vstring digest);
-         ("next_pevent", Vcnt (ref (List.length p.pevents + 1)))]
+         ("next_pevent", Vcnt (ref (List.length p.pevents + 1)));
+         (pevent_weight_str, Vevent_weights weights)
+        ]
       in
       Hutil.interp conf base "updind"
         {Templ.eval_var = eval_var conf base;
@@ -765,7 +787,9 @@ value print_add conf base =
      burial_place = ""; burial_note = ""; burial_src = ""; pevents = [];
      notes = ""; psources = ""; key_index = bogus_person_index}
   in
-  print_update_ind conf base p ""
+  let weights = [] in
+  let () = assert (List.length weights = List.length p.pevents) in
+  print_update_ind conf base (weights,p) ""
 ;
 
 value print_mod conf base =
@@ -774,7 +798,8 @@ value print_mod conf base =
       let p = poi base (Adef.iper_of_int i) in
       let sp = string_person_of base p in
       let digest = Update.digest_person sp in
-      print_update_ind conf base sp digest
+      let weights = list_init (List.length sp.pevents) (fun x -> Some x) in
+      print_update_ind conf base (weights,sp) digest
   | _ -> incorrect_request conf ]
 ;
 
