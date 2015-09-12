@@ -467,10 +467,14 @@ value reconstitute_from_pevents pevents ext bi bp de bu =
    *)
   let is_empty_event (w,e)  =
     (match e.epers_name with
-       [ Epers_Name "" | Epers_Baptism | Epers_Death | Epers_Burial
-       | Epers_Birth -> True
-       | Epers_Cremation -> True
-       | _ -> False]) &&
+       [ Epers_Death -> False
+       (* death events are a little bit special. If person is dead but is not known when it
+          is still significant information and should not be removed. *)
+       | Epers_Baptism | Epers_Burial
+       | Epers_Birth
+       | Epers_Cremation
+       | Epers_Name "" -> True
+       | _ -> False ]) &&
     (Adef.od_of_codate e.epers_date = None) &&
     (e.epers_place = "") &&
     (e.epers_reason = "") &&
