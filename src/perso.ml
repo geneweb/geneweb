@@ -2603,10 +2603,12 @@ and eval_bool_event_field
   fun
   [ "has_date" -> p_auth && date <> Adef.codate_None
   | "has_place" -> p_auth && sou base place <> ""
+  | "is_texted_date" -> p_auth && Adef.is_texted_codate date
   | "is_reordable" ->
      p_auth && ((Adef.is_reordable date) ||
                   (match date with
                     [ _ when date = Adef.codate_None -> True
+                    | _ when Adef.is_texted_codate date -> True
                     | d ->
                        let gp = gen_person_of_person p in
                        list_count (fun e -> e.epers_date = d) gp.pevents > 1

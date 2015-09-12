@@ -42,6 +42,7 @@ value date_of_cdate : codate -> date;
 value cdate_of_date : date -> codate;
 
 value codate_None : codate;
+value is_texted_codate : codate -> bool;
 value od_of_codate : codate -> option date;
 value codate_of_od : option date -> codate;
 

@@ -68,7 +68,9 @@ function on_move_up(x) {
   <h3 class="highlight">[*time line] </h3>
   <table>
     %foreach;pevent;
-      <tr %if;event.has_date;textdate="%event.date" %else %end; oldpos="%event.pos;">
+      <tr %if;(event.has_date and not event.is_texted_date)
+            textdate="%event.date" %else %end;
+          oldpos="%event.pos;">
         %if;event.is_reordable;
           <td onclick="on_move_up($(this));">Move up</td>
           <td onclick="on_move_down($(this));">Move down</td>

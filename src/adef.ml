@@ -138,6 +138,13 @@ value is_reordable = fun
   ]
 ;
 
+value is_texted_codate = fun
+  [ Ctext _ -> True
+  | _ -> False
+  ]
+;
+
+
 exception Request_failure of string;
 
 type gen_couple 'person =
