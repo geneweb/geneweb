@@ -1,9 +1,11 @@
 #!/bin/bash
 
-OCAML_MIN_VER="4.01"
+OCAML_MIN_VER="4.02"
 
 verge() {
-    [  "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+    # osx doesn't have sort -V
+    # [  "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+    [ "$2" = "`echo -e "$1\n$2" | tr ' ' '\n' | sort -n | head -n1`" ]
 }
 
 if ocamlc -v >/dev/null 2>&1; then
