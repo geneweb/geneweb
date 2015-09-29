@@ -1,19 +1,6 @@
 <?php
 /**
  * Classe de gestion de l'API de Geneweb
- * GenewebAPI
- * GenewebAPI.cls.php
- *
- * @author
- * @version: 0.21
- *
- * Rev 0.21 du 2013/04/30
- * Fix bug #1524: Gestion de l'oc négatif
- * Rev 0.2 du 2012/03/15
- * - Ajout de getLoopBase()
- * Rev 0.1 du 2011/11/23
- * - Version initiale
- *
  */
 namespace geneweb\api;
 require_once('protocolbuffers.inc.php');
@@ -55,7 +42,7 @@ class GenewebAPI {
 
     protected static $instances = array();
 
-	public    $lastUrl;
+    public    $lastUrl;
 
     /**
      * Constructeur privé

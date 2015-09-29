@@ -1,13 +1,6 @@
 <?php
 /**
- *
- * Filter
- *
- * @author
- * @version 0.1
- *
- * Rev 0.1 du 2012/09/27
- * - version initiale
+ * FilterDateDeath
  */
 
 namespace geneweb\api\filters;
@@ -16,7 +9,7 @@ require_once("FilterDate.cls.php");
 
 class FilterDateDeath extends FilterDate {
 
-	public function __construct(){
-	}
+    public function __construct(){
+    }
 }
 ?>
