@@ -448,10 +448,10 @@ value print conf base p =
   in
   match (p_getint conf.env "v1", p_getenv conf.env "t") with
   [ (Some lev1, _) ->
-      let lev1 = min (max 1 lev1) 10 in
+      let lev1 = min (max 1 lev1) max_lev in
       let lev2 =
         match p_getint conf.env "v2" with
-        [ Some lev2 -> min (max 1 lev2) 10
+        [ Some lev2 -> min (max 1 lev2) max_lev
         | None -> lev1 ]
       in
       print_cousins conf base p lev1 lev2
