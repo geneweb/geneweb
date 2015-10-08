@@ -638,22 +638,20 @@ value strip_array_persons pl =
   Array.of_list pl
 ;
 
-value error_family conf base err =
-  let _api =
+value error_family conf base err = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "%s\n" (capitale err);
-    Update.print_return conf;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Wserver.wprint "%s\n" (capitale err);
+  Update.print_return conf;
+  trailer conf;
+  raise Update.ModErr
+};
 
 value check_event_witnesses conf base witnesses =
   let wl = Array.to_list witnesses in
@@ -749,8 +747,8 @@ value strip_family fam des =
   (fam, des)
 ;
 
-value print_err_parents conf base p =
-  let _api =
+value print_err_parents conf base p = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf (fcapitale (ftransl conf "%t already has parents"))
@@ -758,29 +756,27 @@ value print_err_parents conf base p =
       in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "\n";
-    Wserver.wprint (fcapitale (ftransl conf "%t already has parents"))
-      (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p));
-    Wserver.wprint "\n";
-    html_p conf;
-    tag "ul" begin
-      html_li conf;
-      Wserver.wprint "%s: %d" (capitale (transl conf "first free number"))
-        (Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
-           0);
-    end;
-    Update.print_return conf;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Wserver.wprint "\n";
+  Wserver.wprint (fcapitale (ftransl conf "%t already has parents"))
+    (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p));
+  Wserver.wprint "\n";
+  html_p conf;
+  tag "ul" begin
+    html_li conf;
+    Wserver.wprint "%s: %d" (capitale (transl conf "first free number"))
+      (Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
+         0);
+  end;
+  Update.print_return conf;
+  trailer conf;
+  raise Update.ModErr
+};
 
-value print_err_father_sex conf base p =
-  let _api =
+value print_err_father_sex conf base p = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
@@ -788,20 +784,18 @@ value print_err_father_sex conf base p =
       in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    Wserver.wprint "\n%s\n" (transl conf "should be male");
-    Update.print_return conf;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Wserver.wprint "\n%s" (referenced_person_text conf base p);
+  Wserver.wprint "\n%s\n" (transl conf "should be male");
+  Update.print_return conf;
+  trailer conf;
+  raise Update.ModErr
+};
 
-value print_err_mother_sex conf base p =
-  let _api =
+value print_err_mother_sex conf base p = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf "\n%s\n%s\n" (referenced_person_text conf base p)
@@ -809,52 +803,46 @@ value print_err_mother_sex conf base p =
       in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    Wserver.wprint "\n%s\n" (transl conf "should be female");
-    Update.print_return conf;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Wserver.wprint "\n%s" (referenced_person_text conf base p);
+  Wserver.wprint "\n%s\n" (transl conf "should be female");
+  Update.print_return conf;
+  trailer conf;
+  raise Update.ModErr
+};
 
-value print_err conf base =
-  let _api =
+value print_err conf base = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Update.print_return conf;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Update.print_return conf;
+  trailer conf;
+  raise Update.ModErr
+};
 
-value print_error_disconnected conf =
-  let _api =
+value print_error_disconnected conf = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf "%s" (capitale (transl conf "msg error disconnected"))
       in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Hutil.print_link_to_welcome conf True;
-    Wserver.wprint "%s" (capitale (transl conf "msg error disconnected"));
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Hutil.print_link_to_welcome conf True;
+  Wserver.wprint "%s" (capitale (transl conf "msg error disconnected"));
+  trailer conf;
+  raise Update.ModErr
+};
 
 value family_exclude pfams efam =
   let pfaml =
@@ -1279,9 +1267,11 @@ value effective_mod conf base sfam scpl sdes = do {
   let nmoth = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
   let nfam =
-    (* En mode api, on gère directement la relation de même sexe. *)
-    if Api_conf.mode_api.val then {(nfam) with relation = sfam.relation}
-    else nfam
+    IFDEF API THEN
+      (* En mode api, on gère directement la relation de même sexe. *)
+      if Api_conf.mode_api.val then {(nfam) with relation = sfam.relation}
+      else nfam
+    ELSE nfam END
   in
   let sfam = {(sfam) with relation = nfam.relation} in
   if sfam.relation <> NoSexesCheckNotMarried &&
@@ -1419,9 +1409,11 @@ value effective_add conf base sfam scpl sdes =
   let nmoth_p = poi base (Adef.mother ncpl) in
   let nfam = update_family_with_fevents conf base nfam in
   let nfam =
-    (* En mode api, on gère directement la relation de même sexe. *)
-    if Api_conf.mode_api.val then {(nfam) with relation = sfam.relation}
-    else nfam
+    IFDEF API THEN
+      (* En mode api, on gère directement la relation de même sexe. *)
+      if Api_conf.mode_api.val then {(nfam) with relation = sfam.relation}
+      else nfam
+    ELSE nfam END
   in
   let sfam = {(sfam) with relation = nfam.relation} in
   do {

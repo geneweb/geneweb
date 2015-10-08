@@ -65,14 +65,21 @@ D_RE=`ocamlfind query re`/
 if test -e "tools/Makefile.ocaml"; then
   sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
   mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-  sed "s|^\(MYSQL=\).*|\1$D_MYSQL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-  sed "s|^\(OCURL=\).*|\1$D_OCURL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-  sed "s|^\(OREDIS=\).*|\1$D_OREDIS|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-  sed "s|^\(RE=\).*|\1$D_RE|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+  # Conditional compilation: ./configure --api
+  if test -e "tools/Makefile.inc"; then
+    if [ "$1" = "--api" ]; then
+      sed "s|^\(CAMLP5F=.*\)|\1 -DAPI|" tools/Makefile.inc > tools/Makefile.inc.tmp
+      mv tools/Makefile.inc.tmp tools/Makefile.inc
+      sed "s|^\(MYSQL=\).*|\1$D_MYSQL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+      sed "s|^\(OCURL=\).*|\1$D_OCURL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+      sed "s|^\(OREDIS=\).*|\1$D_OREDIS|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+      sed "s|^\(RE=\).*|\1$D_RE|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
+      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+    fi
+  fi
 fi
 
 echo "Configuration script succeeded!"

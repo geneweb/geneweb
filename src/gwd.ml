@@ -1942,11 +1942,7 @@ value main () =
       " [options] where options are:"
     in
     let speclist =
-      [(* links tree*)
-       ("-api_url", Arg.String (fun x -> Link.api_url.val := x),
-        "Url api for links tree");
-       (* normales... *)
-       ("-hd", Arg.String Util.add_lang_path,
+      [("-hd", Arg.String Util.add_lang_path,
         "<dir>\n       Directory where the directory lang is installed.");
        ("-dd", Arg.String Util.add_doc_path,
         "<dir>\n       Directory where the documentation is installed.");
@@ -2034,7 +2030,13 @@ Print the failed passwords in log (except if option -digest is set) ");
             [("-wserver", Arg.String (fun _ -> wserver_auto_call.val := True),
               "\n       (internal feature)")]
           ELSE [] END]
-       END]
+       END ]
+    in
+    let speclist =
+      IFDEF API THEN
+        [("-api_url", Arg.String (fun x -> Link.api_url.val := x),
+          "Url api for links tree") :: speclist]
+      ELSE speclist END
     in
     let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
     IFDEF UNIX THEN

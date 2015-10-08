@@ -9,9 +9,9 @@ open Gwdb;
 open Hutil;
 open Util;
 
-(* Ajout pour l'API *)
+IFDEF API THEN
 exception ModErrApi of string;
-
+END;
 
 exception ModErr;
 type create_info =
@@ -147,8 +147,8 @@ value print_return conf =
   end
 ;
 
-value print_err_unknown conf base (f, s, o) =
-  let _api =
+value print_err_unknown conf base (f, s, o) = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf "%s: <strong>%s.%d %s</strong>\n"
@@ -156,17 +156,15 @@ value print_err_unknown conf base (f, s, o) =
       in
       raise (ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
-      (capitale (transl conf "unknown person")) f o s;
-    print_return conf;
-    trailer conf;
-    raise ModErr
-  }
-;
+  rheader conf title;
+  Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
+    (capitale (transl conf "unknown person")) f o s;
+  print_return conf;
+  trailer conf;
+  raise ModErr
+};
 
 value update_misc_names_of_family base p_sex u =
   match p_sex with
@@ -726,16 +724,17 @@ value print_warnings_and_miscs conf base (wl, ml) =
   }
 ;
 
-value error conf base x =
-  let _api =
+value error conf base x = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         match x with
         [ AlreadyDefined p ->
             Printf.sprintf
-              (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-              ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-                 p_surname base p ^ "\"")
+              (fcapitale
+                 (ftransl conf "name %s already used by %tthis person%t"))
+              ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^
+               " " ^ p_surname base p ^ "\"")
               (fun _ ->
                  Printf.sprintf "%s %s" (sou base (get_first_name p))
                    (sou base (get_surname p)))
@@ -749,17 +748,15 @@ value error conf base x =
       in
       raise (ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    print_error conf base x;
-    Wserver.wprint "\n";
-    print_return conf;
-    trailer conf;
-    raise ModErr
-  }
-;
+  rheader conf title;
+  print_error conf base x;
+  Wserver.wprint "\n";
+  print_return conf;
+  trailer conf;
+  raise ModErr
+};
 
 value error_locked conf =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
@@ -823,8 +820,8 @@ value error_locked conf =
   }
 ;
 
-value error_digest conf =
-  let _api =
+value error_digest conf = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf
@@ -834,22 +831,20 @@ the base has changed; do \"back\", \"reload\", and refill the form"))
       in
       raise (ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    print_link_to_welcome conf True;
-    tag "p" begin
-      Wserver.wprint
-        (fcapitale
-           (ftransl conf "\
+  rheader conf title;
+  print_link_to_welcome conf True;
+  tag "p" begin
+    Wserver.wprint
+      (fcapitale
+         (ftransl conf "\
 the base has changed; do \"back\", \"reload\", and refill the form"));
-      Wserver.wprint ".\n";
-    end;
-    trailer conf;
-    raise ModErr
-  }
-;
+    Wserver.wprint ".\n";
+  end;
+  trailer conf;
+  raise ModErr
+};
 
 value digest_person p = Iovalue.digest p;
 value digest_family (fam, cpl, des) = Iovalue.digest (fam, cpl, des);
@@ -862,8 +857,8 @@ value get var key env =
 
 value get_number var key env = p_getint env (var ^ "_" ^ key);
 
-value bad_date conf d =
-  let _api =
+value bad_date conf d = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         (Printf.sprintf "%s:\n" (capitale (transl conf "incorrect date"))) ^
@@ -874,19 +869,17 @@ value bad_date conf d =
       in
       raise (ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "%s:\n" (capitale (transl conf "incorrect date"));
-    match d with
-    [ {day = 0; month = 0; year = a} -> Wserver.wprint "%d" a
-    | {day = 0; month = m; year = a} -> Wserver.wprint "%d/%d" m a
-    | {day = j; month = m; year = a} -> Wserver.wprint "%d/%d/%d" j m a ];
-    trailer conf;
-    raise ModErr
-  }
-;
+  rheader conf title;
+  Wserver.wprint "%s:\n" (capitale (transl conf "incorrect date"));
+  match d with
+  [ {day = 0; month = 0; year = a} -> Wserver.wprint "%d" a
+  | {day = 0; month = m; year = a} -> Wserver.wprint "%d/%d" m a
+  | {day = j; month = m; year = a} -> Wserver.wprint "%d/%d/%d" j m a ];
+  trailer conf;
+  raise ModErr
+};
 
 value int_of_field s =
   try Some (int_of_string (strip_spaces s)) with [ Failure _ -> None ]
@@ -1066,8 +1059,8 @@ value text_of_var conf =
       | [: :] -> var ] ]
 ;
 
-value print_create_conflict conf base p var =
-  let _api =
+value print_create_conflict conf base p var = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf
@@ -1081,68 +1074,66 @@ value print_create_conflict conf base p var =
       in
       raise (ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let text = text_of_var conf var in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint
-      (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-      ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-         p_surname base p ^ "\" (" ^ text ^ ")")
-      (fun _ ->
-         Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
-      (fun _ -> "</a>.");
-    let free_n =
-      find_free_occ base (p_first_name base p) (p_surname base p) 0
-    in
-    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      List.iter
-        (fun (x, v) ->
-           (* Seul un textarea peut contenir des sauts de ligne. *)
-           (* On remplace donc l'input par un textarea.          *)
-           if x = "notes" || is_label_note x then
-             tag "textarea" "style=\"display:none;\" name=\"%s\"" x
-               begin
-                 Wserver.wprint "%s" (quote_escaped (decode_varenv v));
-               end
-           else
-             xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-               (quote_escaped (decode_varenv v)))
-        (conf.henv @ conf.env);
-      xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
-      xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
-      tag "ul" begin
-        stag "li" begin
-          Wserver.wprint "%s: %d. \n"
-            (capitale (transl conf "first free number")) free_n;
-          Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
-            (transl conf "create");
-          Wserver.wprint "%s." (transl conf " to try again with this number");
-        end;
-        stag "li" begin
-          Wserver.wprint "%s " (capitale (transl conf "or"));
-          Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-          Wserver.wprint " %s %s." (transl_nth conf "and" 0)
-            (transl conf "change it (the number) yourself");
-        end;
-        stag "li" begin
-          Wserver.wprint "%s " (capitale (transl conf "or"));
-          Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-          Wserver.wprint " %s %s." (transl_nth conf "and" 0)
-            (transl conf "use \"link\" instead of \"create\"");
-        end;
-      end;
-      xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
-        (capitale (transl conf "create"));
-      xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
-        (capitale (transl conf "back"));
-    end;
-    print_same_name conf base p;
-    trailer conf;
-    raise ModErr
-  }
-;
+ rheader conf title;
+ Wserver.wprint
+   (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
+   ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
+      p_surname base p ^ "\" (" ^ text ^ ")")
+   (fun _ ->
+      Printf.sprintf "<a href=\"%s%s\">" (commd conf) (acces conf base p))
+   (fun _ -> "</a>.");
+ let free_n =
+   find_free_occ base (p_first_name base p) (p_surname base p) 0
+ in
+ tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+   List.iter
+     (fun (x, v) ->
+        (* Seul un textarea peut contenir des sauts de ligne. *)
+        (* On remplace donc l'input par un textarea.          *)
+        if x = "notes" || is_label_note x then
+          tag "textarea" "style=\"display:none;\" name=\"%s\"" x
+            begin
+              Wserver.wprint "%s" (quote_escaped (decode_varenv v));
+            end
+        else
+          xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+            (quote_escaped (decode_varenv v)))
+     (conf.henv @ conf.env);
+   xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
+   xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
+   tag "ul" begin
+     stag "li" begin
+       Wserver.wprint "%s: %d. \n"
+         (capitale (transl conf "first free number")) free_n;
+       Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+         (transl conf "create");
+       Wserver.wprint "%s." (transl conf " to try again with this number");
+     end;
+     stag "li" begin
+       Wserver.wprint "%s " (capitale (transl conf "or"));
+       Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+       Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+         (transl conf "change it (the number) yourself");
+     end;
+     stag "li" begin
+       Wserver.wprint "%s " (capitale (transl conf "or"));
+       Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+       Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+         (transl conf "use \"link\" instead of \"create\"");
+     end;
+   end;
+   xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
+     (capitale (transl conf "create"));
+   xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
+     (capitale (transl conf "back"));
+ end;
+ print_same_name conf base p;
+ trailer conf;
+ raise ModErr
+};
 
 value add_misc_names_for_new_persons base new_persons =
   List.iter

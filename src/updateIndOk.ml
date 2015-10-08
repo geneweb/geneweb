@@ -761,22 +761,20 @@ value check_person conf base p =
           | _ -> loop l ] ]
 ;
 
-value error_person conf base p err =
-  let _api =
+value error_person conf base p err = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Wserver.wprint "%s\n" (capitale err);
-    Update.print_return conf;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Wserver.wprint "%s\n" (capitale err);
+  Update.print_return conf;
+  trailer conf;
+  raise Update.ModErr
+};
 
 value strip_pevents p =
   let strip_array_witness pl =
@@ -818,8 +816,8 @@ value strip_person p =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 ;
 
-value print_conflict conf base p =
-  let _api =
+value print_conflict conf base p = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf
@@ -833,50 +831,48 @@ value print_conflict conf base p =
       in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Update.print_error conf base (AlreadyDefined p);
-    let free_n =
-      Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
-    in
-    tag "ul" begin
-      stag "li" begin
-        Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
-          free_n;
-        Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
-          (transl conf "create");
-        Wserver.wprint "%s.\n" (transl conf " to try again with this number");
-      end;
-      stag "li" begin
-        Wserver.wprint "%s " (capitale (transl conf "or"));
-        Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
-          (transl conf "change it (the number) yourself");
-      end;
-    end;
-    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      List.iter
-        (fun (x, v) ->
-           xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-             (quote_escaped (decode_varenv v)))
-        (conf.henv @ conf.env);
-      xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\""
+  rheader conf title;
+  Update.print_error conf base (AlreadyDefined p);
+  let free_n =
+    Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
+  in
+  tag "ul" begin
+    stag "li" begin
+      Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
         free_n;
-      xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
-        (capitale (transl conf "create"));
-      xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
-        (capitale (transl conf "back"));
+      Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+        (transl conf "create");
+      Wserver.wprint "%s.\n" (transl conf " to try again with this number");
     end;
-    Update.print_same_name conf base p;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+    stag "li" begin
+      Wserver.wprint "%s " (capitale (transl conf "or"));
+      Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
+      Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+        (transl conf "change it (the number) yourself");
+    end;
+  end;
+  tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+    List.iter
+      (fun (x, v) ->
+         xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
+           (quote_escaped (decode_varenv v)))
+      (conf.henv @ conf.env);
+    xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\""
+      free_n;
+    xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
+      (capitale (transl conf "create"));
+    xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
+      (capitale (transl conf "back"));
+  end;
+  Update.print_same_name conf base p;
+  trailer conf;
+  raise Update.ModErr
+};
 
-value print_cannot_change_sex conf base p =
-  let _api =
+value print_cannot_change_sex conf base p = do {
+  IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
         Printf.sprintf "%s."
@@ -884,21 +880,19 @@ value print_cannot_change_sex conf base p =
       in
       raise (Update.ModErrApi err)
     else ()
-  in
+  ELSE () END;
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Update.print_error conf base (BadSexOfMarriedPerson p);
-    tag "ul" begin
-      html_li conf;
-      Wserver.wprint "\n%s" (referenced_person_text conf base p);
-      Wserver.wprint "\n";
-    end;
-    Update.print_return conf;
-    trailer conf;
-    raise Update.ModErr
-  }
-;
+  rheader conf title;
+  Update.print_error conf base (BadSexOfMarriedPerson p);
+  tag "ul" begin
+    html_li conf;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
+    Wserver.wprint "\n";
+  end;
+  Update.print_return conf;
+  trailer conf;
+  raise Update.ModErr
+};
 
 value check_conflict conf base sp ipl =
   let name = Name.lower (sp.first_name ^ " " ^ sp.surname) in

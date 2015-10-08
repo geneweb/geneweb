@@ -260,12 +260,12 @@ outbase.cmi: dbdisk.cmi
 perso.cmo: ../wserver/wserver.cmi adef.cmi buff.cmo checkItem.cmi config.cmi \
     consang.cmi dag.cmi date.cmi def.cmi futil.cmi gutil.cmi gwdb.cmi \
     history_diff.cmo hutil.cmi mutil.cmi name.cmi notes.cmi notesLinks.cmi \
-    num.cmi perso.cmi perso_link.cmo srcfile.cmi templ.cmi templAst.cmi \
+    num.cmi perso.cmi srcfile.cmi templ.cmi templAst.cmi \
     update.cmi util.cmi wiki.cmi
 perso.cmx: ../wserver/wserver.cmx adef.cmx buff.cmx checkItem.cmx config.cmi \
     consang.cmx dag.cmx date.cmx def.cmi futil.cmx gutil.cmx gwdb.cmx \
     history_diff.cmx hutil.cmx mutil.cmx name.cmx notes.cmx notesLinks.cmx \
-    num.cmx perso.cmi perso_link.cmx srcfile.cmx templ.cmx templAst.cmi \
+    num.cmx perso.cmi srcfile.cmx templ.cmx templAst.cmi \
     update.cmx util.cmx wiki.cmx
 perso.cmi: adef.cmi config.cmi def.cmi gwdb.cmi num.cmi
 perso_link.cmo: ../wserver/wserver.cmi adef.cmi calendar.cmi config.cmi \

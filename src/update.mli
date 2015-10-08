@@ -1,3 +1,4 @@
+(* camlp5r *)
 (* $Id: update.mli,v 5.12 2008-01-08 02:08:00 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
@@ -58,7 +59,7 @@ value print_someone : config -> base -> person -> unit;
 value update_conf : config -> config;
 
 
-(* Ajout pour l'API *)
+IFDEF API THEN
 (* Erreurs possibles :
      - "UnknownPerson"
      - "AlreadyDefined"
@@ -76,3 +77,4 @@ value update_conf : config -> config;
 exception ModErrApi of string;
 value bad_date : config -> dmy -> 'a;
 value check_greg_day : config -> dmy -> unit;
+END;
