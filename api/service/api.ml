@@ -566,8 +566,8 @@ let print_max_ancestors conf base =
   in
 
   let nb_ind = nb_of_persons base in
-  let ancestors = Array.create nb_ind IperSet.empty in
-  let mark = Array.create nb_ind false in
+  let ancestors = Array.make nb_ind IperSet.empty in
+  let mark = Array.make nb_ind false in
 
   let has_children ip =
     let p = poi base ip in
@@ -949,7 +949,7 @@ let f_scan conf base =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let build_anniversary_pers_list conf base month f_scan =
-  let tab = Array.create 31 [] in
+  let tab = Array.make 31 [] in
   (try
     while true do
       let p = f_scan () in
@@ -1422,7 +1422,7 @@ module NameSortMap =
      end)
 ;;
 
-let intSetTab = ref (Array.create 1 0);;
+let intSetTab = ref (Array.make 1 0);;
 
 module IntSet =
   Set.Make
@@ -1801,7 +1801,7 @@ let print_index_search conf export_directory =
           end
       done;
 
-      intSetTab := Array.create (nb_of_persons base) 0;
+      intSetTab := Array.make (nb_of_persons base) 0;
       let nb_tab = ref 0 in
 
       let oc_name_inx = open_out_bin fname_inx in

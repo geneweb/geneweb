@@ -7,16 +7,16 @@ open Printf;
 
 (* Copie de util.ml *)
 value gen_only_printable or_nl s =
-  let s' = String.create (String.length s) in
+  let s' = Bytes.create (String.length s) in
   do {
     for i = 0 to String.length s - 1 do {
-      s'.[i] :=
-        if Mutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
-        else
-          match s.[i] with
-          [ ' '..'~' | '\160'..'\255' -> s.[i]
-          | '\n' -> if or_nl then '\n' else ' '
-          | _ -> ' ' ]
+      Bytes.set s' i
+        (if Mutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
+         else
+           match s.[i] with
+           [ ' '..'~' | '\160'..'\255' -> s.[i]
+           | '\n' -> if or_nl then '\n' else ' '
+           | _ -> ' ' ])
     };
     Gutil.strip_spaces s'
   }

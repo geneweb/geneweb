@@ -28,7 +28,7 @@ let string_start_with ini s =
 (* Algo de Knuth-Morris-Pratt *)
 let init_next p =
   let m = String.length p in
-  let next = Array.create m 0 in
+  let next = Array.make m 0 in
   let i = ref 1 and j = ref 0 in
   while !i < m - 1 do
     if p.[!i] = p.[!j] then begin incr i; incr j; next.(!i) <- !j end

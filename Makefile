@@ -28,7 +28,7 @@ opt::
 	cd setup; $(MAKE) opt
 	cd gwtp; $(MAKE) opt
 
-gnt::
+api::
 	cd wserver; $(MAKE) opt
 	cd dag2html; $(MAKE) opt
 	cd src; $(MAKE) PREFIX=$(PREFIX) opt

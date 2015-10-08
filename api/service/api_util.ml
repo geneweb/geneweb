@@ -189,7 +189,7 @@ let string_of_dmy d =
 let string_of_date2 date =
   let spaces_to_underscore s =
     for i = 0 to String.length s - 1 do
-      if s.[i] = ' ' then s.[i] <- '_' else ()
+      if s.[i] = ' ' then Bytes.set s i '_' else ()
     done;
     s
   in

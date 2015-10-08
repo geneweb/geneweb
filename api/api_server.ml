@@ -432,7 +432,7 @@ value general_welcome conf =
 ;
 
 value nonce_private_key =
-  Lazy.lazy_from_fun
+  Lazy.from_fun
     (fun () ->
        let cnt_dir = Filename.concat Util.cnt_dir.val "cnt" in
        let fname = Filename.concat cnt_dir "geneweb_api_private.txt" in
@@ -1307,8 +1307,8 @@ value make_conf from_addr (addr, request) script_name contents env = do {
          (if lang = "" then [] else [("lang", lang)]) @
          (if from = "" then [] else [("opt", from)]);
      base_env = base_env;
-     allowed_titles = Lazy.lazy_from_fun (allowed_titles env base_env);
-     denied_titles = Lazy.lazy_from_fun (denied_titles env base_env);
+     allowed_titles = Lazy.from_fun (allowed_titles env base_env);
+     denied_titles = Lazy.from_fun (denied_titles env base_env);
      request = request; lexicon = lexicon;
      xhs =
        match p_getenv base_env "doctype" with
@@ -1702,7 +1702,7 @@ Type %s to stop the service
 
 value read_input len =
   if len >= 0 then do {
-    let buff = String.create len in really_input stdin buff 0 len; buff
+    let buff = Bytes.create len in really_input stdin buff 0 len; buff
   }
   else do {
     let buff = ref "" in
@@ -1767,13 +1767,13 @@ value robot_exclude_arg s =
 ;
 
 value slashify s =
-  let s1 = String.copy s in
+  let s1 = Bytes.of_string s in
   do {
     for i = 0 to String.length s - 1 do {
-      s1.[i] :=
-        match s.[i] with
-        [ '\\' -> '/'
-        | x -> x ]
+      Bytes.set s1 i
+        (match s.[i] with
+         [ '\\' -> '/'
+         | x -> x ])
     };
     s1
   }
