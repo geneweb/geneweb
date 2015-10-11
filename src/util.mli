@@ -144,6 +144,11 @@ value old_surname_end : string -> string;
 
 value specify_homonymous : config -> base -> person -> bool -> unit;
 
+value get_approx_birth_date_place :
+  config -> base -> person -> (option date * string);
+value get_approx_death_date_place :
+  config -> base -> person -> (option date * string);
+
 type format2 'a 'b = format4 'a unit string 'b;
 
 value check_format : format2 'a 'b -> string -> option (format2 'a 'b);

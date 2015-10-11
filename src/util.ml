@@ -2479,6 +2479,53 @@ value specify_homonymous conf base p specify_public_name =
       Wserver.wprint "%s" s ]
 ;
 
+
+(* ************************************************************************** *)
+(*  [Fonc] get_approx_date_place :
+             codate -> string -> codate -> string -> (codate, string)         *)
+(** [Description] : Renvoi la date et le lieu le mieux correspondant.
+    [Args] :
+      - d1   : date (naissance/décès)
+      - p1   : lieu (naissance/décès)
+      - d2   : date (baptème/inhumation)
+      - p2   : lieu (baptème/inhumation)
+    [Retour] : (codate, string)
+    [Rem] : None exporté en clair hors de ce module.                          *)
+(* ************************************************************************** *)
+value get_approx_date_place d1 p1 d2 p2 =
+  match (d1, p1, d2, p2) with
+  [ (Some d, "", None, y) -> (Some d, y)
+  | (Some d, "", Some x, y) -> (Some x, y)
+  | (Some d, p, None, x) -> (Some d, p)
+  | (Some d, p, Some x, y) -> (Some d, p)
+  | (None, "", None, p) -> (None, p)
+  | (None, "", Some x, y) -> (Some x, y)
+  | (None, p, None, x) -> (None, p)
+  | (None, p, Some x, y) -> (Some x, y) ]
+;
+
+value get_approx_birth_date_place conf base p =
+  let birth = Adef.od_of_codate (get_birth p) in
+  let birth_place = string_of_place conf (sou base (get_birth_place p)) in
+  let baptism = Adef.od_of_codate (get_baptism p) in
+  let baptism_place = string_of_place conf (sou base (get_baptism_place p)) in
+  get_approx_date_place birth birth_place baptism baptism_place
+;
+
+value get_approx_death_date_place conf base p =
+  let death = CheckItem.date_of_death (get_death p) in
+  let death_place = string_of_place conf (sou base (get_death_place p)) in
+  let buri =
+    match get_burial p with
+    [ Buried cd -> Adef.od_of_codate cd
+    | Cremated cd -> Adef.od_of_codate cd
+    | _ -> None ]
+  in
+  let buri_place = string_of_place conf (sou base (get_burial_place p)) in
+  get_approx_date_place death death_place buri buri_place
+;
+
+
 (* fix system bug: string_of_float 17.97 = "17.969999999999" *)
 value my_string_of_float f = sprintf "%.6g" f;
 
