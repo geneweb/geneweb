@@ -825,63 +825,48 @@ value pevent_name_unique_string gen =
   | Epers_Name n -> Epers_Name (unique_string gen n)]
 ;
 
-value insert_pevents fname gen key pevtl =
-  let occ = key.pk_occ + gen.g_file_info.f_shift in
-  match
-    try
-      Some (find_person_by_name gen key.pk_first_name key.pk_surname occ)
-    with
-    [ Not_found -> None ]
-  with
-  [ Some ip ->
-      let p = poi gen.g_base ip in
-      if p.m_pevents <> [] then do {
-        printf "\nFile \"%s\"\n" fname;
-        printf "Individual events already defined for \"%s%s %s\"\n"
-          key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
-          key.pk_surname;
-        check_error gen
-      }
-      else do {
-        (* On tri les évènements pour être sûr. *)
-        let pevents =
-          CheckItem.sort_events
-            ((fun (name, _, _, _, _, _, _) -> CheckItem.Psort name),
-             (fun (_, date, _, _, _, _, _) -> date))
-            pevtl
-        in
-        let pevents =
-          List.map
-            (fun (name, date, place, reason, src, notes, witl) ->
-              let witnesses =
-                List.map
-                  (fun (wit, sex, wk) -> do {
-                    let (wp, wip) = insert_somebody gen wit in
-                    notice_sex gen wp sex;
-                    wp.m_related := [ip :: wp.m_related];
-                    (wip, wk)
-                  })
-                  witl
-              in
-              {epers_name = pevent_name_unique_string gen name;
-               epers_date = date;
-               epers_place = unique_string gen place;
-               epers_reason = unique_string gen reason;
-               epers_note = unique_string gen notes;
-               epers_src = unique_string gen src;
-               epers_witnesses = Array.of_list witnesses})
-            pevents
-        in
-        p.m_pevents := pevents
-      }
-  | None ->
-      do {
-        printf "File \"%s\"\n" fname;
-        printf "*** warning: undefined person: \"%s%s %s\"\n"
-          key.pk_first_name (if occ = 0 then "" else "." ^ string_of_int occ)
-          key.pk_surname;
-        flush stdout;
-      } ]
+value insert_pevents fname gen sb sex pevtl =
+  let (p, ip) = insert_somebody gen sb in
+  if p.m_pevents <> [] then do {
+    printf "\nFile \"%s\"\n" fname;
+    printf "Individual events already defined for \"%s%s %s\"\n"
+      (sou gen.g_base p.m_first_name)
+      (if p.m_occ = 0 then "" else "." ^ string_of_int p.m_occ)
+      (sou gen.g_base p.m_surname);
+    check_error gen
+  }
+  else do {
+    (* On tri les évènements pour être sûr. *)
+    let pevents =
+      CheckItem.sort_events
+        ((fun (name, _, _, _, _, _, _) -> CheckItem.Psort name),
+         (fun (_, date, _, _, _, _, _) -> date))
+        pevtl
+    in
+    let pevents =
+      List.map
+        (fun (name, date, place, reason, src, notes, witl) ->
+          let witnesses =
+            List.map
+              (fun (wit, sex, wk) -> do {
+                let (wp, wip) = insert_somebody gen wit in
+                notice_sex gen wp sex;
+                wp.m_related := [ip :: wp.m_related];
+                (wip, wk)
+              })
+              witl
+          in
+          {epers_name = pevent_name_unique_string gen name;
+           epers_date = date;
+           epers_place = unique_string gen place;
+           epers_reason = unique_string gen reason;
+           epers_note = unique_string gen notes;
+           epers_src = unique_string gen src;
+           epers_witnesses = Array.of_list witnesses})
+        pevents
+    in
+    p.m_pevents := pevents
+  }
 ;
 
 value insert_notes fname gen key str =
@@ -980,7 +965,7 @@ value insert_syntax fname gen =
       insert_family gen cpl fs ms witl fevents fam des
   | Notes key str -> insert_notes fname gen key str
   | Relations sb sex rl -> insert_relations fname gen sb sex rl
-  | Pevent key pevents -> insert_pevents fname gen key pevents
+  | Pevent sb sex pevents -> insert_pevents fname gen sb sex pevents
   | Bnotes nfname str -> insert_bnotes fname gen nfname str
   | Wnotes wizid str -> insert_wiznote fname gen wizid str ]
 ;

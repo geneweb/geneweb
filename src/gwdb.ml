@@ -393,11 +393,19 @@ value person2_fun =
        let pos = get_field_acc db2 i ("person", "pevents") in
        if pos = -1 then []
        else
-         let pevtl = get_field_data db2 pos ("person", "pevents") "data" in
+         let list = get_field_data db2 pos ("person", "pevents") "data" in
          List.map
-           (map_pers_event
-              (fun x -> x) (fun pos -> Istr2 db2 ("person", "pevents") pos))
-           pevtl;
+           (map_pers_event (fun x -> x) (fun _ -> Istr2 db2 ("", "") (-1)))
+           list;
+     (*
+     get_pevents (db2, i) =
+       let list = get_list_field db2 i ("person", "pevents") in
+       List.map
+         (map_fam_event
+           (fun x -> x)
+           (fun pos -> Istr2 db2 ("person", "pevents") pos))
+         list;
+        *)
      gen_person_of_person pp =
        {first_name = self.get_first_name pp; surname = self.get_surname pp;
         occ = self.get_occ pp; image = self.get_image pp;
@@ -799,14 +807,12 @@ value family2_fun =
      get_divorce (db2, i) = get_field db2 i ("family", "divorce");
      get_fsources (db2, i) = make_istr2 db2 ("family", "fsources") i;
      get_fevents (db2, i) =
-       let pos = get_field_acc db2 i ("family", "fevents") in
-       if pos = -1 then []
-       else
-         let fevtl = get_field_data db2 pos ("family", "fevents") "data" in
-         List.map
-           (map_fam_event
-              (fun x -> x) (fun pos -> Istr2 db2 ("family", "fevents") pos))
-           fevtl;
+       let list = get_list_field db2 i ("family", "fevents") in
+       List.map
+         (map_fam_event
+           (fun x -> x)
+           (fun pos -> Istr2 db2 ("family", "fevents") pos))
+         list;
      get_marriage (db2, i) = get_field db2 i ("family", "marriage");
      get_marriage_place (db2, i) =
        make_istr2 db2 ("family", "marriage_place") i;

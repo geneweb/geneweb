@@ -20,7 +20,7 @@ type gw_syntax =
   | Notes of key and string
   | Relations of somebody and sex and list (gen_relation somebody string)
   | Pevent of 
-      key and 
+      somebody and sex and 
         list (gen_pers_event_name string * codate * string * 
                 string * string * string * list (somebody * sex * witness_kind))
   | Bnotes of string and string

@@ -1458,17 +1458,17 @@ value note gen r =
 ;
 
 value treat_source gen r =
-      if String.length r.rval > 0 && r.rval.[0] = '@' then
-        match find_sources_record gen r.rval with
-        [ Some v -> (strip_spaces v.rcont, v.rsons)
-        | None ->
-            do {
-              print_location r.rpos;
-              fprintf log_oc.val "Source %s not found\n" r.rval;
-              flush log_oc.val;
-              ("", [])
-            } ]
-      else (strip_spaces r.rval, r.rsons)
+  if String.length r.rval > 0 && r.rval.[0] = '@' then
+    match find_sources_record gen r.rval with
+    [ Some v -> (strip_spaces v.rcont, v.rsons)
+    | None ->
+        do {
+          print_location r.rpos;
+          fprintf log_oc.val "Source %s not found\n" r.rval;
+          flush log_oc.val;
+          ("", [])
+        } ]
+  else (strip_spaces r.rval, r.rsons)
 ;
 
 value source gen r =
@@ -2303,7 +2303,7 @@ value add_indi gen r =
           match find_all_fields "NOTE" r.rsons with
           [ [] -> ""
           | rl -> treat_notes gen rl ]
-  in
+        in
         (d, p, (note, []), source gen r)
     | None -> (None, "", ("", []), ("", [])) ]
   in
@@ -2329,7 +2329,7 @@ value add_indi gen r =
           match find_all_fields "NOTE" r.rsons with
           [ [] -> ""
           | rl -> treat_notes gen rl ]
-  in
+        in
         (d, p, (note, []), source gen r)
     | None -> (None, "", ("", []),  ("", [])) ]
   in
@@ -2353,12 +2353,12 @@ value add_indi gen r =
             [ Some r -> strip_spaces r.rval
             | _ -> "" ]
           in
-        let note =
-          match find_all_fields "NOTE" r.rsons with
-          [ [] -> ""
-          | rl -> treat_notes gen rl ]
-  in
-        (d, p, (note, []), source gen r)
+          let note =
+            match find_all_fields "NOTE" r.rsons with
+            [ [] -> ""
+            | rl -> treat_notes gen rl ]
+          in
+          (d, p, (note, []), source gen r)
     | None -> (infer_death birth bapt, "", ("", []),  ("", [])) ]
   in
   let (burial, burial_place, (burial_note, _), (burial_src, burial_nt)) =
@@ -2384,7 +2384,7 @@ value add_indi gen r =
               match find_all_fields "NOTE" r.rsons with
               [ [] -> ""
               | rl -> treat_notes gen rl ]
-    in
+            in
             (Buried (Adef.codate_of_od d), p, (note, []), source gen r)
       | None -> (UnknownBurial, "", ("", []), ("", [])) ]
     in

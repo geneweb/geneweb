@@ -23,7 +23,7 @@ type gw_syntax =
   | Notes of key and string
   | Relations of somebody and sex and list (gen_relation somebody string)
   | Pevent of
-      key and
+      somebody and sex and
         list (gen_pers_event_name string * codate * string *
                 string * string * string * list (somebody * sex * witness_kind))
   | Bnotes of string and string
@@ -1112,8 +1112,7 @@ value read_family ic fname =
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
   | Some (str, ["pevt" :: l]) ->
-      let (surname, l) = get_name str l in
-      let (first_name, occ, l) = get_fst_name str l in
+      let (sb, _, l) = parse_parent str l in
       if l <> [] then failwith str
       else
         let pevents =
@@ -1176,10 +1175,7 @@ value read_family ic fname =
                 loop [evt :: pevents] line } ]
         in
         let pevents = List.rev pevents in
-        let key =
-          {pk_first_name = first_name; pk_surname = surname; pk_occ = occ}
-        in
-        F_some (Pevent key pevents, read_line ic)
+        F_some (Pevent sb Neuter pevents, read_line ic)
   | Some (str, l) -> failwith str
   | None -> F_none ]
 ;

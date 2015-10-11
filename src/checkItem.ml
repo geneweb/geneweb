@@ -283,7 +283,7 @@ value sort_pevents base warning p =
       (get_pevents p)
   in
   let b = get_pevents p in
-  if b <> a then warning (ChangedOrderOfPersonEvents p b a)
+  if compare b a <> 0 then warning (ChangedOrderOfPersonEvents p b a)
   else ()
 ;
 
@@ -294,7 +294,7 @@ value sort_fevents base warning (ifam, fam) =
       (get_fevents fam)
   in
   let b = get_fevents fam in
-  if b <> a then warning (ChangedOrderOfFamilyEvents ifam b a)
+  if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents ifam b a)
   else ()
 ;
 
