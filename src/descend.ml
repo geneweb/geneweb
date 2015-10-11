@@ -761,6 +761,34 @@ value print_desc_table_header conf base = do {
 value print_person_table conf base p lab = do {
   let p_auth = Util.authorized_age conf base p in
   let nb_families = Array.length (get_family p) in
+  let (birth, birth_place) =
+    if (p_getenv conf.env "birth" = Some "on" ||
+        p_getenv conf.env "birth_place" = Some "on") &&
+       p_auth
+    then
+      let (date, place) = Util.get_approx_birth_date_place conf base p in
+      let date =
+        match date with
+        [ Some d -> Date.string_slash_of_date conf d
+        | None -> "" ]
+      in
+      (date , place)
+    else ("&nbsp;", "")
+  in
+  let (death, death_place) =
+    if (p_getenv conf.env "death" = Some "on" ||
+        p_getenv conf.env "death_place" = Some "on") &&
+       p_auth
+    then
+      let (date, place) = Util.get_approx_death_date_place conf base p in
+      let date =
+        match date with
+        [ Some d -> Date.string_slash_of_date conf d
+        | None -> "" ]
+      in
+      (date , place)
+    else ("&nbsp;", "")
+  in
   (* On calcul le nombre de rowspan pour avoir un affichage joli. *)
   let rowspan =
     if nb_families > 1 &&
@@ -782,34 +810,12 @@ value print_person_table conf base p lab = do {
     end;
     if p_getenv conf.env "birth" = Some "on" then
       tag "td" "%s" rowspan begin
-        if get_birth p <> Adef.codate_None then
-          let d =
-            match Adef.od_of_codate (get_birth p) with
-            [ Some d when p_auth -> Date.string_slash_of_date conf d
-            | _ -> "&nbsp;" ]
-          in
-          Wserver.wprint "%s" d
-        else
-          let d =
-            match Adef.od_of_codate (get_baptism p) with
-            [ Some d when p_auth -> Date.string_slash_of_date conf d
-            | _ -> "&nbsp;" ]
-          in
-          Wserver.wprint "%s" d;
+        Wserver.wprint "%s" birth;
       end
     else ();
     if p_getenv conf.env "birth_place" = Some "on" then
       tag "td" "%s" rowspan begin
-        if get_birth p <> Adef.codate_None then
-          Wserver.wprint "%s &nbsp;"
-            (if p_auth then
-              Util.string_of_place conf (sou base (get_birth_place p))
-             else "")
-        else
-          Wserver.wprint "%s &nbsp;"
-            (if p_auth then
-              Util.string_of_place conf (sou base (get_baptism_place p))
-             else "");
+        Wserver.wprint "%s &nbsp;" birth_place;
       end
     else ();
     (* On affiche que la première famille (get_family u).(0). *)
@@ -911,42 +917,12 @@ value print_person_table conf base p lab = do {
     else ();
     if p_getenv conf.env "death" = Some "on" then
       tag "td" "%s" rowspan begin
-        let d =
-          if not p_auth then "&nbsp;"
-          else
-            match get_death p with
-            [ Death _ d ->
-                let d = Adef.date_of_cdate d in
-                Date.string_slash_of_date conf d
-            | _ ->
-                match get_burial p with
-                [ Cremated cod | Buried cod ->
-                    match Adef.od_of_codate cod with
-                    [ Some d -> Date.string_slash_of_date conf d
-                    | _ -> "&nbsp;" ]
-                | _ -> "&nbsp;" ] ]
-        in
-        Wserver.wprint "%s" d;
+        Wserver.wprint "%s" death;
       end
     else ();
     if p_getenv conf.env "death_place" = Some "on" then
       tag "td" "%s" rowspan begin
-        let d =
-          if not p_auth then ""
-          else
-            match get_death p with
-            [ Death _ d ->
-                Util.string_of_place conf (sou base (get_death_place p))
-            | _ ->
-                match get_burial p with
-                [ Cremated cod | Buried cod ->
-                    match Adef.od_of_codate cod with
-                    [ Some d ->
-                        Util.string_of_place conf (sou base (get_burial_place p))
-                    | _ -> "" ]
-                | _ -> "" ] ]
-        in
-        Wserver.wprint "%s &nbsp;" d;
+        Wserver.wprint "%s &nbsp;" death_place;
       end
     else ();
     if p_getenv conf.env "death_age" = Some "on" then

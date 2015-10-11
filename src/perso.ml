@@ -2779,6 +2779,18 @@ and eval_bool_person_field conf base env (p, p_auth) =
             | _ -> False ]
           else False
       | _ -> raise Not_found ]
+  | "has_approx_birth_date" ->
+      p_auth &&
+        fst (Util.get_approx_birth_date_place conf base p) <> None
+  | "has_approx_birth_place" ->
+      p_auth &&
+        snd (Util.get_approx_birth_date_place conf base p) <> ""
+  | "has_approx_death_date" ->
+      p_auth &&
+        fst (Util.get_approx_death_date_place conf base p) <> None
+  | "has_approx_death_place" ->
+      p_auth &&
+        snd (Util.get_approx_death_date_place conf base p) <> ""
   | "has_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
       else get_aliases p <> []
@@ -3034,6 +3046,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       [ [nn :: _] ->
           if not p_auth && (is_hide_names conf p) then ""
           else sou base nn
+      | _ -> "" ]
+  | "approx_birth_place" ->
+      match (p_auth, snd (Util.get_approx_birth_date_place conf base p)) with
+      [ (True, place) -> place
+      | _ -> "" ]
+  | "approx_death_place" ->
+      match (p_auth, snd (Util.get_approx_death_date_place conf base p)) with
+      [ (True, place) -> place
       | _ -> "" ]
   | "auto_image_file_name" ->
       match auto_image_file conf base p with
@@ -3305,6 +3325,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       match (p_auth, Adef.od_of_codate (get_birth p)) with
       [ (True, Some d) -> Date.string_slash_of_date conf d
       | _ -> "" ]
+  | "slash_approx_birth_date" ->
+      match (p_auth, fst (Util.get_approx_birth_date_place conf base p)) with
+      [ (True, Some d) -> Date.string_slash_of_date conf d
+      | _ -> "" ]
   | "on_burial_date" ->
       match get_burial p with
       [ Buried cod ->
@@ -3352,6 +3376,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       [ (True, Death _ d) ->
           let d = Adef.date_of_cdate d in
           Date.string_slash_of_date conf d
+      | _ -> "" ]
+  | "slash_approx_death_date" ->
+      match (p_auth, fst (Util.get_approx_death_date_place conf base p)) with
+      [ (True, Some d) -> Date.string_slash_of_date conf d
       | _ -> "" ]
   | "prev_fam_father" ->
       match get_env "prev_fam" env with

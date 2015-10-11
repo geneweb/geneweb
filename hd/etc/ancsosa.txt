@@ -881,10 +881,8 @@
   </td>
   %if;(evar.birth = "on")
     <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
-      %if;ancestor.has_birth_date;
-        %ancestor.slash_birth_date;
-      %elseif;ancestor.has_baptism_date;
-        %ancestor.slash_baptism_date;
+      %if;ancestor.has_approx_birth_date;
+        %ancestor.slash_approx_birth_date;
       %else;
         &nbsp;
       %end;
@@ -892,10 +890,8 @@
   %end;
   %if;(evar.birth_place = "on")
     <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
-      %if;ancestor.has_birth_date;
-        %ancestor.birth_place;
-      %elseif;ancestor.has_baptism_date;
-        %ancestor.baptism_place;
+      %if;ancestor.has_approx_birth_place;
+        %ancestor.approx_birth_place;
       %else;
         &nbsp;
       %end;
@@ -970,10 +966,8 @@
   %end;
   %if;(evar.death = "on")
     <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
-      %if;ancestor.has_death_date;
-        %ancestor.slash_death_date;
-      %elseif;ancestor.has_burial_date;
-        %ancestor.slash_burial_date;
+      %if;ancestor.has_approx_death_date;
+        %ancestor.slash_approx_death_date;
       %else;
         &nbsp;
       %end;
@@ -981,10 +975,8 @@
   %end;
   %if;(evar.death_place = "on")
     <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
-      %if;ancestor.has_death_date;
-        %ancestor.death_place;
-      %elseif;ancestor.has_burial_date;
-        %ancestor.burial_place;
+      %if;ancestor.has_approx_death_date;
+        %ancestor.approx_death_place;
       %else;
         &nbsp;
       %end;
