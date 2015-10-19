@@ -2495,13 +2495,13 @@ value specify_homonymous conf base p specify_public_name =
 value get_approx_date_place d1 p1 d2 p2 =
   match (d1, p1, d2, p2) with
   [ (Some d, "", None, y) -> (Some d, y)
-  | (Some d, "", Some x, y) -> (Some x, y)
+  | (Some d, "", Some x, y) -> if y = "" then (Some d, "") else (Some x, y)
   | (Some d, p, None, x) -> (Some d, p)
   | (Some d, p, Some x, y) -> (Some d, p)
   | (None, "", None, p) -> (None, p)
   | (None, "", Some x, y) -> (Some x, y)
   | (None, p, None, x) -> (None, p)
-  | (None, p, Some x, y) -> (Some x, y) ]
+  | (None, p, Some x, y) -> if y = "" then (Some x, p) else (Some x, y) ]
 ;
 
 value get_approx_birth_date_place conf base p =
