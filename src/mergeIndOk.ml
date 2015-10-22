@@ -276,8 +276,10 @@ value print_merge conf base =
       let p = reconstitute conf base p1 p2 in
       let sp = UpdateInd.string_person_of base p1 in
       let digest = Update.digest_person sp in
-      (* TODO: check that marking all events as new is OK *)
-      UpdateInd.print_update_ind conf base ([],p) digest
+      (* On merging form we can't do anything with evens, so all of the are left as
+         they are, i.e. without reordering *)
+      let weights = List.map (fun  _ -> None) p.pevents in
+      UpdateInd.print_update_ind conf base (weights, p) digest
   | _ -> incorrect_request conf ]
 ;
 

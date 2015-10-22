@@ -331,9 +331,9 @@ some.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx \
     num.cmx perso.cmx ../wserver/wserver.cmx
 updateData.cmo: adef.cmi config.cmi def.cmi gwdb.cmi hutil.cmi mutil.cmi util.cmi \
-    history.cmi ../wserver/wserver.cmi
+    history.cmi ../wserver/wserver.cmi updateIndOk.cmo
 updateData.cmx: adef.cmx config.cmi def.cmi gwdb.cmx hutil.cmx mutil.cmx util.cmx \
-    history.cmx ../wserver/wserver.cmx
+    history.cmx ../wserver/wserver.cmx updateIndOk.cmx
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gwdb.cmi history.cmi \
     hutil.cmi lock.cmi mutil.cmi notesLinks.cmi num.cmi secure.cmi templ.cmi \
     templAst.cmi translate.cmi util.cmi version.cmo wiznotes.cmi \
@@ -391,8 +391,8 @@ updateInd.cmx: adef.cmx calendar.cmx config.cmi def.cmi futil.cmx gwdb.cmx \
     ../wserver/wserver.cmx updateInd.cmi
 updateInd.cmi: config.cmi def.cmi gwdb.cmi update.cmi
 
-updateEventOrderOk.cmo: util.cmi def.cmi
-updateEventOrderOk.cmx: util.cmi def.cmi gwdb.cmx
+updateEventOrderOk.cmo: util.cmi def.cmi gwdb.cmo hutil.cmo
+updateEventOrderOk.cmx: util.cmi def.cmi gwdb.cmx hutil.cmo
 
 updateIndOk.cmo: adef.cmi checkItem.cmi config.cmi def.cmi futil.cmi \
     gutil.cmi gwdb.cmi history.cmi hutil.cmi mutil.cmi name.cmi notes.cmi \
