@@ -1,7 +1,7 @@
 # GeneWeb
 
-GeneWeb is a genealogy software with a Web interface. It can be used
-off-line or as a Web service.
+GeneWeb is an open source genealogy software written in OCaml. It comes
+with a Web interface and can be used off-line or as a Web service.
 
 ## This branch: master
 
@@ -10,16 +10,16 @@ last improvements.
 
 ## Documentation
 
-The documentation is available online: http://geneweb.tuxfamily.org/wiki
+The documentation is available online: http://geneweb.tuxfamily.org/
 
 ## Getting involved
 
 We encourage you to participate in this open source project. We love
-Pull Requests, Bugs reports, ideas...
+pull requests, bugs reports, ideas...
 
 * Mailing list: https://groups.yahoo.com/neo/groups/GeneWeb/info
 * IRC: irc://irc.freenode.net/geneweb
-* Git: https://github.com/geneanet/geneweb
+* Git: https://github.com/geneweb/geneweb
 * Forum: http://www.geneanet.org/forum/GeneWeb-85
 * Facebook group: http://www.facebook.com/geneweb
 * Wikipedia: https://en.wikipedia.org/wiki/GeneWeb
@@ -28,21 +28,25 @@ Pull Requests, Bugs reports, ideas...
 
 1. Install OCaml (http://ocaml.org/)
   1. Install opam (https://opam.ocaml.org/)
-  2. Install camlp5
-  3. Optional: install ocamlfind
+  2. Install camlp5 (with opam)
+  3. (Optional) Install ocamlfind (with opam)
 2. Clone the repository
 ```
 git clone https://github.com/geneweb/geneweb
 ```
-5. Run configure
-6. Run make
+3. Compil GeneWeb
+```
+./configure
+make
+make distrib
+```
 
 ## Contributor guidelines
 
 ### Creating a pull request
 
 Use the bug number/title as the name of pull request. Exemple of
-commit message "PR #XXX: Title of the PR/Bug"
+commit message "PR #XXX: Title of the PR/Bug".
 
 ### Coding style
 
@@ -68,7 +72,7 @@ commit message "PR #XXX: Title of the PR/Bug"
 | INSTALL   | installation file                                       |
 | contrib   | users contributions                                     |
 | dag2html  | library to create html trees                            |
-| doc       | users' html documentation                               |
+| doc       | users’ html documentation                               |
 | etc       | additional files for distribution                       |
 | ged2gwb   | converter GEDCOM -> GeneWeb                             |
 | gwb2ged   | converter GeneWeb -> GEDCOM                             |
@@ -83,7 +87,7 @@ commit message "PR #XXX: Title of the PR/Bug"
 
 ## COPYRIGHT
 
-All files marked in this distribution are Copyright (c) 1998-2011 INRIA
+All files marked in this distribution are Copyright (c) 1998-2016 INRIA
 (Institut National de Recherche en Informatique et Automatique) and
 distributed under the conditions stated in file LICENSE. They can be
 freely redistributed for non-commercial purposes, provided the
@@ -91,5 +95,5 @@ copyright notice remains attached.
 
 ## INSTALLATION
 
-You can compile on Unix, Windows or MacOS X machines. See the file INSTALL
-for installation instructions.
+You can compile on Unix, Windows or Mac OS X machines.
+See the file INSTALL for installation instructions.
