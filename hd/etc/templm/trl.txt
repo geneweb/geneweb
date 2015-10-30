@@ -33,6 +33,7 @@
       </form>
       <div id="templ">
         <a href="%prefix_no_templ;templ=;%suffix;">default</a>
+        <a href="%prefix_no_templ;templ=templ502;%suffix;">templ502</a>
         <a href="%prefix_no_templ;templ=templa;%suffix;">templa</a>
         <a href="%prefix_no_templ;templ=templb;%suffix;">templb</a>
         <a href="%prefix_no_templ;templ=templc;%suffix;">templc</a>
@@ -41,7 +42,7 @@
         <a href="%prefix_no_templ;templ=templh;%suffix;">templh</a>
         <a href="%prefix_no_templ;templ=templm;%suffix;">templm</a>
         %if;(wizard or bvar.wizard_passwd = "")
-          <strong><a href="%prefix;m=H;v=doc_templm">doc_templm</a></strong>
+          <small><sup><strong><a href="%prefix;m=H;v=doc_templm">doc</a></strong></sup></small>
         %end;
       </div>
     %end;

@@ -3,6 +3,7 @@
   <div id="trl" style="clear:both;">
     <ul>
       <li><a href="%prefix_no_templ;templ=;%suffix;">default</a></li>
+      <li><a href="%prefix_no_templ;templ=templ502;%suffix;">templ502</a></li>
       <li><a href="%prefix_no_templ;templ=templa;%suffix;">templa</a></li>
       <li><a href="%prefix_no_templ;templ=templb;%suffix;">templb</a></li>
       <li><a href="%prefix_no_templ;templ=templc;%suffix;">templc</a></li>
@@ -10,7 +11,6 @@
       <li><a href="%prefix_no_templ;templ=templf;%suffix;">templf</a></li>
       <li><a href="%prefix_no_templ;templ=templh;%suffix;">templh</a></li>
       <li><a href="%prefix_no_templ;templ=templm;%suffix;">templm</a></li>
-      <li><a href="%prefix_no_templ;templ=templ502;%suffix;">templ502</a></li>
     </ul>
   </div>
 %end;
