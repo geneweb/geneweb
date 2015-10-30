@@ -20,7 +20,7 @@ Utilizzate:<p>
 <a href="%l">%l</a>
 </ul>
 
-<p><hr><font size=-1><em>Copyright (c) 1998-2007 INRIA -
+<p><hr><font size=-1><em>Copyright (c) 1998-2016 INRIA -
 <a href="http://www.geneweb.org/">
 GeneWeb %v</a></em></font><br>
 </body>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2016 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -45,10 +45,10 @@
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
       <a href="%referer;"><img
-       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+       src="%image_prefix;/left.png"%wid_hei;left.png; alt="&lt;&lt;"%/></a>
     %end;
     <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
+    src="%image_prefix;/up.png"%wid_hei;up.png; alt="^^"%/></a>
   </td></tr></table>
 %end;
 
@@ -227,11 +227,6 @@
 </table>
 </td></tr></table>
 
-<div>
-<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:%right;"%/></a>
-<br%/>
-</div>
 %copyright;
 %base_trailer;
 </body>

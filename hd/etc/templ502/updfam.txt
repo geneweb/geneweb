@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: updfam.txt,v 5.12 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2016 INRIA -->
   <meta name="robots" content="none"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <title>%nn;
@@ -633,9 +633,7 @@ function changeCalendar(e,v,m,c) {
 </p>
 </form>
 
-<div><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:%right;"%/></a><br%/>
-</div>
+
 %copyright;
 %base_trailer;
 </body>

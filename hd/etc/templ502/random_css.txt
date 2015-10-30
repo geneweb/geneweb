@@ -1,5 +1,5 @@
 /* $Id: random_css.txt,v 1.10 2007-01-19 01:53:16 ddr Exp $ */
-/* Copyright (c) 2006-2007 INRIA */
+/* Copyright (c) 2006-2016 INRIA */
 
 %define;bright_pastel_color()
   %let;h;%random.255;%in;

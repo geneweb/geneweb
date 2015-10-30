@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: welcome.txt,v 1.40 2007-08-04 07:22:30 ddr Exp $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
+  <!-- Copyright (c) 2006-2016 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
 bg: Genealogy
@@ -111,7 +111,7 @@ sv: Genealogi
    style="text-decoration:none">+</a>
   %if;(referer != "")
     <a href="%referer;"><img%sp;
-    src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
+    src="%image_prefix;/left.png"%wid_hei;left.png; alt="&lt;&lt;"%/></a>
   %end;
   <a href="%prefix_base;suicide=x"> </a>
 </div>

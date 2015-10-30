@@ -16,7 +16,7 @@
 alt=GeneWeb width=64 height=72 align=right>
 <br>
 
-<p><hr><font size=-1><em>Copyright (c) 1998-2007 INRIA -
+<p><hr><font size=-1><em>Copyright (c) 1998-2016 INRIA -
 <a href="http://www.geneweb.org/">
 GeneWeb %v</a></em></font><br>
 </body>
