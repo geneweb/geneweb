@@ -24,20 +24,19 @@
          onkeypress="javascript:return acc_key(this,event,'sib_1','spo_1','chi_1_1','mod_ind','add_par','add_fam','mod_fam_1');"
          %/>
           <div class="s_menu">
-            <h3>[*navigation] OnKeyPress (Z)</h3>
+            <h3>[*navigation] OnKeyPress (Alt+Z)</h3>
             <p>
               (0) [spouse/spouses]1<br%/>
               (1) [siblings]<br%/>
-              (2 3 4 5 6 7) Sosa - [ancestors]<br%/>
+              (2 3 4 5 6 7) [n° Sosa] [ancestors]<br%/>
               (8) [child/children]1<br%/>
-              (9) Sosa - [child/children]0<br%/>
+              (9) [child/children]1 Sosa<br%/>
               (D) [difference between the two revisions]<br%/>
               (R) [relationship computing]<br%/>
               (S) [navigation with %t as Sosa reference:::xx]<br%/>
               (W) [search/case sensitive]0<br%/>
               (X) [generation/generations]0<br%/>
               (Y) [tree]<br%/>
-              (Z) [navigation] OnKeyPress<br%/>
               <br%/> 
               %if;wizard;
               (A) [add::family/families]0<br%/>

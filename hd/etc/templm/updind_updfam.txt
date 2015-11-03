@@ -19,17 +19,21 @@
 %let;lfc6;<code>(6)</code>%in;%let;lfa6;accesskey="6"%in; %( sources %)
 
 %(updind and updfam %)
-%let;ak1;[*link]
-           [number] oc
-           [number] index
-         [*create]
+%let;ak1;[*link] [any individual in the base] [with][:]
+           [number] occurence (oc=), [first name/first names]0, [surname/surnames]0
+         [or]
+           [number] index (i=)
+         
+         [*create]/[add] [person/persons]0
 %in;
-%let;ak2;[*sex]
-          (M) [male/female/neuter]0
-          (F) [male/female/neuter]1
-          (N) [male/female/neuter]2
+%let;ak2;  [sex], [select a letter][:]
+           (M) [male/female/neuter]0
+           (F) [male/female/neuter]1
+           (N) [male/female/neuter]2
+         
 %in;
-%let;ak3;[*tools]
+%let;ak3; 
+         [*tools] [and] [relationship shortcut]
            (R) [move up/down]0
            (D) [move up/down]1
            (H) [move up/down]2
@@ -37,7 +41,7 @@
            (A) [add::]
            (I) [insert]
 %in;
-%let;ak4;  (P) [surname/surnames]0 [visualize/show/hide/summary]1/[visualize/show/hide/summary]2
+%let;ak4;  (P) [visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [surname/surnames]0
 %in;
 %let;ak5;  (V) [godfather/godmother/godparents]2
            (W) [adoptive father/adoptive mother/adoptive parents]2
@@ -45,9 +49,9 @@
            (Y) [candidate father/candidate mother/candidate parents]2
            (Z) [foster father/foster mother/foster parents]2
 %in;
-%let;ak6;[link]
-           [number] oc
-           [number] index
+%let;ak6;[link] [any individual in the base] [with][:]
+           [number] occurence oc
+           [number] index i
 %in;
 %let;ak7;  (X) [delete::]
 %in;
