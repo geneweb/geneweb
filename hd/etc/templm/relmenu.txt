@@ -18,10 +18,10 @@
       %if;(has_consanguinity or count != 0)
         , <span class="nobr">
         %if;(cancel_links)
-          [consanguinity] : %consanguinity;
+          [consanguinity][:] %consanguinity;
         %else;
           <a href="%prefix;em=R;ei=%mother.index;;m=NG;t=PN;select=%father.index;;et=A;spouse=on;image=on" 
-             title="[relationship computing], [parents]">[consanguinity] : %consanguinity;</a>
+             title="[relationship computing], [parents]">[consanguinity][:] %consanguinity;</a>
         %end;
         %if;(count != 0) (%nn;
           %if;(not cancel_links)
