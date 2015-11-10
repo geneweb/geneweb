@@ -15,6 +15,7 @@ value interp_notempl_with_menu :
 value print : config -> base -> person -> unit;
 value print_ascend : config -> base -> person -> unit;
 value print_what_links : config -> base -> person -> unit;
+value print_events_reorder : config -> base -> person -> unit;
 
 value build_sosa_ht : config -> base -> unit;
 value get_sosa_person : config -> base -> person -> Num.t;
