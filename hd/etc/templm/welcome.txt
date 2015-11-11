@@ -92,7 +92,7 @@ af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
 bg: От %start_date; насам е имало %nb_accesses; посещения, от които
     %nb_accesses_to_welcome; са на настоящата страница.
-br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :
+br: gweladennoù a zo bet : %nb_accesses;, er bajenn-mañ :
     %nb_accesses_to_welcome;, abaoe an deiz-mañ : %start_date;.
 ca: Hi ha hagut %nb_accesses; consultes, de les quals
     %nb_accesses_to_welcome; en aquesta pàgina, des del %start_date;.
@@ -204,7 +204,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
           <li>
             <form method="get" action="%prefix;">
               %hidden;
-              [*place] :
+              [*place][:]
               <input type="hidden" name="m" value="PS"%/>
               <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
               <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>
@@ -215,10 +215,10 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
             </form>
           </li>
         %end;
-        <li>[*first name/first names]1 :
+        <li>[*first name/first names]1[:]
           <a href="%prefix;m=P;tri=A">ABC</a>
           <a href="%prefix;m=P;tri=F">987</a></li>
-        <li>[*surname/surnames]1 :
+        <li>[*surname/surnames]1[:]
           <a href="%prefix;m=N;tri=A">ABC</a>
           <a href="%prefix;m=N;tri=F">987</a>
         </li>

@@ -19,31 +19,31 @@
 %let;lfc6;<code>(6)</code>%in;%let;lfa6;accesskey="6"%in; %( sources %)
 
 %(updind and updfam %)
-%let;ak1;[link]
+%let;ak1;[*link]
            [number] oc
            [number] index
-         [create]
+         [*create]
 %in;
-%let;ak2;[sex]
-          (M) masculin
-          (F) féminin
-          (N) neutre
+%let;ak2;[*sex]
+          (M) [male/female/neuter]0
+          (F) [male/female/neuter]1
+          (N) [male/female/neuter]2
 %in;
-%let;ak3;[tools]
-           (R) remonter
-           (D) descendre
-           (H) haut
-           (B) bas
+%let;ak3;[*tools]
+           (R) [move up/down]0
+           (D) [move up/down]1
+           (H) [move up/down]2
+           (B) [move up/down]3
            (A) [add::]
-           (I) insérer
+           (I) [insert]
 %in;
-%let;ak4;  (P) patronyme afficher/masquer
+%let;ak4;  (P) [surname/surnames]0 [visualize/show/hide/summary]1/[visualize/show/hide/summary]2
 %in;
-%let;ak5;  (V) [*godfather/godmother/godparents]2
-           (W) [*adoptive father/adoptive mother/adoptive parents]2
-           (X) [*recognizing father/recognizing mother/recognizing parents]2
-           (Y) [*candidate father/candidate mother/candidate parents]2
-           (Z) [*foster father/foster mother/foster parents]2
+%let;ak5;  (V) [godfather/godmother/godparents]2
+           (W) [adoptive father/adoptive mother/adoptive parents]2
+           (X) [recognizing father/recognizing mother/recognizing parents]2
+           (Y) [candidate father/candidate mother/candidate parents]2
+           (Z) [foster father/foster mother/foster parents]2
 %in;
 %let;ak6;[link]
            [number] oc

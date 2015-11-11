@@ -266,7 +266,7 @@
           %let;l_maxvd;%if;(has_children and max_desc_level > 1)%expr(max_desc_level + 1)%else;3%end;%in;
           <label>[*generation/generations]0 %lcX; <input id="maxlev" name="maxlev" class="number" size="1" value="%l_maxlev;" %l_on2; %laX;%/> / %l_maxvd;</label>
           %if;(wizard)
-            <label>[*source/sources]0 : [person/persons]1 ([create])
+            <label>[*source/sources]0[:] [person/persons]1 ([create])
             <input name="dsrc" value="%evar.dsrc;" size="40" maxlength="300" /></label>
           %end;
         </p>
@@ -661,7 +661,7 @@
           %if;(spouse.index != mother.index)
             %if;has_children;
               <ol>
-                <li>[*on %s's side:::] %father; [and] %apply;somebody("spouse") :</li>
+                <li>[*on %s's side:::] %father; [and] %apply;somebody("spouse")[:]</li>
                 %foreach;child;
                   <li class="li_%sex; li_%has_families;%has_sosa;">
                     %if;is_self;<em>%end;
@@ -682,7 +682,7 @@
           %if;(spouse.index != father.index)
             %if;has_children;
               <ol>
-                <li>[*on %s's side:::] %mother; [and] %apply;somebody("spouse") :</li>
+                <li>[*on %s's side:::] %mother; [and] %apply;somebody("spouse")[:]</li>
                 %foreach;child;
                   <li class="li_%sex; li_%has_families;%has_sosa;">
                     %if;is_self;<em>%end;
@@ -923,7 +923,7 @@
   %else;%apply;other_event()
   %end;
   %if;event.has_witnesses;
-    <dd>[*witness/witnesses]1 :
+    <dd>[*witness/witnesses]1[:]
     %foreach;event_witness;
       %if;(not is_first), %nl;%end;
       %apply;somebody("event_witness")
@@ -1072,7 +1072,7 @@
         <h2 class="ch2">[*relation/relations]1</h2>
         <ul>
           %foreach;relation;
-            <li><em>%apply;capitalize(relation_type)</em> :
+            <li><em>%apply;capitalize(relation_type)</em>[:]
                 %if;has_relation_him;
                   %apply;somebody("relation_him")
                   %if;has_relation_her; [and] %end;
@@ -1083,14 +1083,14 @@
             </li>
           %end;
           %foreach;related;
-            <li><em>%apply;capitalize(related_type)</em> :
+            <li><em>%apply;capitalize(related_type)</em>[:]
               %apply;somebody("related")
             </li>
           %end;
           %foreach;event_witness_relation;
             <li><em>%apply;capitalize(event_witness_relation.event.name)
               %if;event_witness_relation.event.has_date; %apply;on_edate("event_witness_relation.event")%end;
-              %if;event_witness_relation.event.has_place; · %event_witness_relation.event.place;%end;</em> :
+              %if;event_witness_relation.event.has_place; · %event_witness_relation.event.place;%end;</em>[:]
               %apply;somebody("event_witness_relation.person")
               %if;(event_witness_relation.event.spouse != "") [and] %apply;somebody("event_witness_relation.event.spouse")%end;
             </li>
@@ -1132,7 +1132,7 @@
     %foreach;source;
       %if;(source_type = [person/persons]0 or source_type = [family/families]0)
         %lazy_force;
-        <li><em>%apply;capitalize(source_type)</em> : %source;</li>
+        <li><em>%apply;capitalize(source_type)</em>[:] %source;</li>
       %end;
     %end;
   %end;
@@ -1141,7 +1141,7 @@
       %lazy_force;
       <li>
         <em>%apply;capitalize(event.name)
-        %if;(event.has_spouse) [with] %event.spouse;%end;</em> :
+        %if;(event.has_spouse) [with] %event.spouse;%end;</em>[:]
         %event.src;
       </li>
     %end;
@@ -1176,7 +1176,7 @@
     %end;
     %if;(bvar.jquery = "no")
       %if;(bvar.show_consang != "no" and has_consanguinity)
-        [*consanguinity] : %consanguinity;
+        [*consanguinity][:] %consanguinity;
       %end;
     %else;
       <div id="jq2">%if;has_parents;<br%/>%end;%if;has_children;<br%/>%end;</div>

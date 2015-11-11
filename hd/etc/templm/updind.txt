@@ -165,14 +165,14 @@
     %else;
       [*add::person/persons]0
     %end;
-    &nbsp;&nbsp;<input type="submit" value="Ok" %/></h1>
+    &nbsp;&nbsp;<input type="submit" value="OK" %/></h1>
   </legend>
   <div>
-    <label><abbr %lt3;>[sex]</abbr><input id="sex1" name="sex1" class="occ%l_s1;" size="3" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
-    <label>[number]0<input name="occ" style="text-align:center" autocomplete="off" size="1" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label>
+    <label><abbr %lt3;>[sex]</abbr><input id="sex1" name="sex1" class="occ%l_s1;" size="2" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
+    <label>[number]0<input name="occ" style="text-align:center" autocomplete="off" size="2" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label>
   </div>
   <div class="w1">
-    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3;%/></label>
+    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3;%/></label>
     <label>[surname/surnames]0<input id="surname" name="surname" size="30" maxlength="200" value="%surname;" %l_on2;%/></label>
   </div>
   <div class="w1">  
@@ -217,21 +217,21 @@
     <span id="new_surname_alias"></span>
   </div>
   <div class="w1">
-    <label>%lpcP;[occupation/occupations]0<input name="occu" size="36" maxlength="200" value="%occupation;" id="occu" %lpaP; %l_on4;%/></label>
+    <label>%lpcP; [occupation/occupations]0<input name="occu" size="36" maxlength="200" value="%occupation;" id="occu" %lpaP; %l_on4;%/></label>
   </div>
   <div class="w1">
-    <label>[source/sources]0 ([person/persons]0)<input name="src" size="36" maxlength="300" value="%sources;" id="src" %l_on6;%/></label>
+    <label>[source/sources]0 [person/persons]0<input name="src" size="36" maxlength="300" value="%sources;" id="src" %l_on6;%/></label>
     <label>[image/images]0<input name="image" size="36" value="%image;" %/></label>
   </div>
   <div>
-    [*access]0 : 
-    <label><input type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked="checked"%end;%/>[*if titles]0</label>
-    <label><input type="radio" name="access" value="Public"%if;acc_public; checked="checked"%end;%/>[*public]0</label>
-    <label><input type="radio" name="access" value="Private"%if;acc_private; checked="checked"%end;%/>[*private]0</label>
+    [access]0
+    <label><input type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked="checked"%end;%/>[if titles]0</label>
+    <label><input type="radio" name="access" value="Public"%if;acc_public; checked="checked"%end;%/>[public]0</label>
+    <label><input type="radio" name="access" value="Private"%if;acc_private; checked="checked"%end;%/>[private]0</label>
   </div>
 </fieldset>
 <fieldset id="notes1">
-  <legend>%lpc5;<label style="font-size:inherit;" for="notes" %lpa5;> [*note/notes]1</label></legend>
+  <legend>%lpc5; <label style="font-size:inherit;" for="notes" %lpa5;>[*note/notes]1</label></legend>
   <textarea name="notes" id="notes">%notes;%sq;</textarea>
   <fieldset id="accent2">
     <legend>
@@ -242,7 +242,7 @@
   </fieldset>
 </fieldset>
 <fieldset class="event">
-  <legend>%lpc4; [*event/events]1</legend>
+  <legend>%lpc4; [*event/events]1</legend>
     <dl>
       %if;(not has_pevent_birth)%apply;one_event(next_pevent,"#birt","witness")%incr_next_pevent;%end;
       %if;has_pevents;%foreach;pevent;%apply;one_event(cnt,"","witness")%end;%end;
@@ -255,11 +255,11 @@
       <dt><abbr title="(+) [*death]">[*event/events]0</abbr> %lt2; [place]</dt>
         <dd>[note/notes]0</dd>
         <dd><em>[source/sources]0</em></dd>
-        <dd>[witness/witnesses]0 : %lt1; [first name/first names]0 [surname/surnames]0</dd>
+        <dd>[witness/witnesses]0[:] %lt1; [first name/first names]0 [surname/surnames]0</dd>
     </dl>
 </fieldset>
 <fieldset class="f2 t">
-  <legend>%lpc6; [*relation/relations]1</legend>
+  <legend>%lpc6; [*relation/relations]1</legend>
   <table summary="relations" cellspacing=0 cellpadding=0>
     <tr>
       <td class="bg7"><abbr %lt4;>#</abbr></td>
@@ -277,7 +277,7 @@
   </table>
 </fieldset>
 <fieldset class="t">
-<legend>%lpc7; [*title/titles]1</legend>
+<legend>%lpc7; [*title/titles]1</legend>
   <table summary="titles" cellspacing=0 cellpadding=0>
     <tr>
     <td class="bg7"><abbr %lt5;>#</abbr></td>
@@ -285,7 +285,7 @@
     <td class="bg7">[estate]</td>
     <td class="bg7">[name]</td>
     <td class="bg7">[nth]0</td>
-    <td class="bg7">[begin] / [end] : %lt2;</td>
+    <td class="bg7">[begin] / [end][:] %lt2;</td>
     </tr>
     %if;has_titles;
       %foreach;title;%apply;one_title(cnt)%end;

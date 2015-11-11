@@ -51,13 +51,13 @@
 %let;lt2;<abbr title="%lta;%ltb;%ltc;">[date/dates]0</abbr>%in;
 %let;lt3;
   <abbr title="[*place]
-           1 : [birth] [father/mother]0
-           2 : [death] [father/mother]0
-           3 : [birth] [father/mother]1
-           4 : [death] [father/mother]1
-           * : [marriage/marriages]0
-           0 : [birth] [child/children]0 1
-           + : [death] [child/children]0 1">
+           1[:] [birth] [father/mother]0
+           2[:] [death] [father/mother]0
+           3[:] [birth] [father/mother]1
+           4[:] [death] [father/mother]1
+           *[:] [marriage/marriages]0
+           0[:] [birth] [child/children]0 1
+           +[:] [death] [child/children]0 1">
          [place]</abbr>
 %in;
 %let;lt4;title="%ak1;%ak2;%ak3;%ak7;%ak4;"%in;
@@ -192,7 +192,7 @@
   %apply;hevent("div","divorce")
 </p>
 <fieldset>
-  <legend>%lfc1;
+  <legend>%lfc1; 
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0
     %elseif;(evar_m = "ADD_PAR")
@@ -210,14 +210,14 @@
   </table>
 </fieldset>
 <fieldset>
-  <legend>%lfc2; [*child/children]1</legend>
+  <legend>%lfc2; [*child/children]1</legend>
   <table summary="children" cellspacing=0 cellpadding=0>
     <tr>
       <td class="bg7"><abbr %lt4;>#</abbr></td>
       <td class="bg7">[first name/first names]0 /
         <a id="ch_hid" style="display:none;" href="javascript:visHid('ch','_sn')" title="[visualize/show/hide/summary]2 [surname/surnames]0">[surname/surnames]0</a>
         <a id="ch_vis" style="display:inline;" href="javascript:visHid('ch','_sn')" title="[visualize/show/hide/summary]1 [surname/surnames]0"><em>[surname/surnames]0</em></a></td>
-      <td class="bg7">[birth] / [death] : %lt5; %lt3;</td>
+      <td class="bg7">[birth] / [death][:] %lt5; %lt3;</td>
       <td class="bg7">[occupation/occupations]0</td>
       <td class="bd0"></td>
     </tr>
@@ -227,7 +227,7 @@
   </table>
 </fieldset>
 <fieldset class="event">
-  <legend>%lfc4; [*event/events]1</legend>
+  <legend>%lfc4; [*event/events]1</legend>
   <dl>
     %if;has_fevents;%foreach;fevent;%apply;one_event(cnt,"","fwitness")%end;%else;%apply;one_event(1,"#marr","fwitness")%end;
     <dt id="new_event"></dt>
@@ -237,12 +237,12 @@
     <dt>[*event/events]0 %lt2; [place]</dt>
       <dd>[note/notes]0</dd>
       <dd><em>[source/sources]0</em></dd>
-      <dd>[witness/witnesses]0 : %lt1; [first name/first names]0 [surname/surnames]0</dd>
+      <dd>[witness/witnesses]0[:] %lt1; [first name/first names]0 [surname/surnames]0</dd>
   </dl>
 </fieldset>
 <fieldset class="f2 al">
-  <legend>%lfc5;
-    <label style="font-size:inherit" for="comment" %lfa5;> [*marriage notes]0</label>
+  <legend>%lfc5; 
+    <label style="font-size:inherit" for="comment" %lfa5;>[*marriage notes]0</label>
   </legend>
   <textarea id="comment" name="comment" style="overflow:hidden;" onkeydown="%l_on1;">
     %if;(comment != "" and bvar.move_comment = "yes")
@@ -257,7 +257,7 @@
     %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/>[no sexes check]</label></div>
 </fieldset>
 <fieldset class="f2 w3">
-  <legend>%lfc6; [*source/sources]1</legend>
+  <legend>%lfc6; [*source/sources]1</legend>
     <label>[family/families]0<input id="src" name="src" size="100" maxlength="300" value="%fsources;" %lfa6; %l_on6;%/></label>
     <label>[person/persons]1<input id="psrc" name="psrc" size="100" maxlength="300" value="%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" %l_on6;%/></label>
     %if;(bvar.origin_file = "on")
