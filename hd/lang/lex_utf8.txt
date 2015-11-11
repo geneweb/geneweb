@@ -13919,3 +13919,24 @@ ru: :
 sk: :
 sl: :
 sv: :
+
+    move up/down
+en: move up/move down/move up cursor/move down cursor
+fr: remonter/descendre/remonter le curseur/descendre le curseur
+
+    insert
+de: einfügen
+en: insert
+es: insertar
+it: inserire
+fr: insérer
+pt: inserir
+
+    label
+de: Etikett
+en: label
+es: etiqueta
+it: etichetta
+fr: étiquette
+nl: etiketje
+pt: etiqueta
