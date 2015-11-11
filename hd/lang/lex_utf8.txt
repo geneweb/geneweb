@@ -196,7 +196,7 @@ fr: %1 d[e']%2
 he: %1 של %2
 is: %1 %2
 it: %1 d[i']%2
-lv: %1 -&gt; %2
+lv: %1 -> %2
 nl: %1 van %2
 no: %1 til %2/%1 av %2
 oc: %1 de %2
@@ -457,7 +457,7 @@ eo: la nobeltitolaj datoj de %t estas malkorektaj: %t
 es: las fechas de un título de %t son incorrectas: %t
 et: isiku %t tiitli kuupäev %t on vigane
 fi: henkilön %t arvonimen päivämäärässä %t on virhe
-fr: %t a des dates de titre incorrectes : %t
+fr: %t a des dates de titre incorrectes : %t
 he:  תאריכים לתארים של %t אינם נכונים: %t
 is: %t hefur vitlausa dagsetningu %t
 it: alcune date dei titoli di %t sono incorrette: %t
@@ -576,7 +576,7 @@ it: %t è stato testimone del %s prima della sua nascita
 de: %t: %s vor seiner/ihrer %s
 en: %t: %s before their %s
 es: %t : %s antes de su %s
-fr: %t : %s avant son/sa %s
+fr: %t : %s avant son/sa %s
 it: %t : %s prima della suo/sua %s
 
     %t's sex is not coherent with his/her relations
@@ -757,32 +757,32 @@ sv: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november
 zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
 
     (thousand separator)
-af: &nbsp;
+af:  
 ar: .
-bg: &nbsp;
+bg:  
 br: .
 ca: .
-cs: &nbsp;
+cs:  
 da: .
 de: .
 en: ,
 eo: .
 es: .
-et: &nbsp;
+et:  
 fi: .
-fr: &#8239;
+fr:  
 he: ,
 is: .
 it: .
 lv: '
 nl: .
 no: .
-oc: &nbsp;
+oc:  
 pl: .
 pt: .
 ro: .
 ru: '
-sk: &nbsp;
+sk:  
 sl: .
 sv: .
 zh: .
@@ -974,7 +974,7 @@ en: a 3rd cousin
 eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 et: kolmanda astme nõbu:g:--o
-fi: kolmas serkku:g:nnen&nbsp;serkun
+fi: kolmas serkku:g:nnen serkun
 fr: un cousin issu d’issus de germains/une cousine issue d’issus de germains/un(e) cousin(e) issu(e) d’issus de germains
 he:  בן-דוד שלישי/ בת-דוד שלישית
 is: fjórmenningur
@@ -1581,7 +1581,7 @@ eo: aldoni :a: bildo:a:+n
 es: agregar imagen
 et: lisa pilt
 fi: lisää kuva
-fr: ajouter portrait
+fr: ajouter un portrait
 he:  תמונה  הוספה
 is: bæta við mynd
 it: aggiungere immagine
@@ -2163,7 +2163,7 @@ da: og
 de: und
 en: and
 eo: kaj
-es: y/e&nbsp;
+es: y/e 
 et: ja
 fi: ja
 fr: et
@@ -2320,7 +2320,7 @@ de: jede beliebige Person im Stammbaum
 en: any individual in the family tree
 es: cualquier individuo del árbol
 fi: yksi henkilö sukupuussasi
-fr: n'importe quel individu de l'arbre
+fr: n’importe quel individu de l’arbre
 it: un qualsiasi individuo dell’albero
 nl: om het even welk individu van de stamboom
 no: en person i ditt tre
@@ -3070,7 +3070,7 @@ de: Ort der Bestattung
 en: Place of burial
 es: lugar de inhumación
 fi: Hautauspaikka
-fr: lieu d'inhumation
+fr: lieu d’inhumation
 it: luogo di sepoltura
 nl: begraafplaats
 no: Begravelsessted
@@ -3324,7 +3324,7 @@ eo: ŝanĝi nomojn de la idoj
 es: cambiar los nombres de los hijos
 et: muuda laste nimed
 fi: muuta lasten nimiä
-fr: changer noms des enfants
+fr: changer les noms des enfants
 he:  עדכן שמות הילדים
 is: breyta nafni barna
 it: cambiare i nomi dei figli
@@ -3415,7 +3415,7 @@ sv: ändrade ordningen för barnen
 de: ändern der Reihenfolge familiäre Ereignisse
 en: change order of family facts
 es: cambio del orden de los acontecimientos familiares
-fr: changement de l'ordre des évènements familiaux
+fr: changement de l’ordre des évènements familiaux
 it: modifica dell'ordine degli eventi di famiglia
 oc: cambiament de l'òrdre dels eveniments familials
 pt: modificar a ordem dos eventos familiares
@@ -3437,7 +3437,7 @@ sv: Utbytt ordning för bröllop
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual facts
 es: cambio del orden de los acontecimientos del individuo
-fr: changement de l'ordre des évènements individu
+fr: changement de l’ordre des évènements individu
 it: modifica dell'ordine degli eventi individuo
 oc: cambiament de l'òrdre dels eveniments d'un individú
 pt: modificar ordem dos eventos da pessoa
@@ -3556,7 +3556,7 @@ eo: kliku "%s"
 es: cliquear "%s"
 et: klõpsa "%s"
 fi: napsauta "%s"
-fr: cliquez sur « %s »
+fr: cliquez sur « %s »
 he:   לחץ "%s"
 is: Ýtið "%s"
 it: seleziona "%s"
@@ -4096,7 +4096,7 @@ de: Hochzeitstag
 en: Date of marriage
 es: fecha de matrimonio
 fi: vihkipäivämäärä
-fr: date de l'union
+fr: date de l’union
 it: data dell'unione
 nl: huwelijksdatum
 no: dato for vielse
@@ -4429,7 +4429,7 @@ de: direkter Vorfahre von %s
 en: direct ancestor of %s
 es: antepasado directo de %s
 fi: %s:n suora esivanhempi
-fr: anc&ecirc;tre direct de %s
+fr: ancêtre direct de %s
 it: antenato diretto di %s
 nl: rechtstreeks voorouder van %s
 no: direkte stamfar til %s
@@ -4550,7 +4550,7 @@ de: anzuzeigen/nach Zweigen/alphabetisch geordnet
 en: display by:/line/alphabetical order
 es: edición por:/ramas/orden alfabético
 fi: näytetään:/sukuhaaroittain/aakkosjärjestyksessä
-fr: affichage par :/branches/ordre alphabétique
+fr: affichage par :/branches/ordre alphabétique
 it: visualizzazione per:/rami/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
@@ -5897,7 +5897,7 @@ de: halbbrüder und-schwestern
 en: half-siblings
 es: hermanastros y hermanastras
 fi: puolisisarukset
-fr: demi frères et demi sœurs
+fr: demi-frères et demi-sœurs
 it: fratellastri e sorellastre
 nl: half broers en zusters
 no: halvbrødre/halvsøstre/halvsøsken
@@ -5910,7 +5910,7 @@ de: Halbgeschwister
 en: Half-siblings
 es: hermanastros/as
 fi: Puolisisarukset
-fr: demi frères et demi sœurs
+fr: demi-frères et demi-sœurs
 it: fratellastri e sorellastre
 nl: half broers en zusters
 no: Halvsøsken
@@ -5923,7 +5923,7 @@ de: Herzlichen Glückwunsch zum Geburtstag!
 en: happy birthday to them!
 es: ¡Feliz cumpleaños!
 fi: hyvää syntymäpäivää!
-fr: bon anniversaire !
+fr: bon anniversaire !
 it: buon compleanno!
 nl: van harte gefeliciteerd met Uw verjaardag!
 no: gratulerer med dagen!
@@ -5944,7 +5944,7 @@ eo: feliĉan datrevenon!
 es: ¡Feliz cumpleaños!
 et: palju õnne sünnipäevaks!
 fi: hyvää syntymäpäivää!
-fr: bon anniversaire!
+fr: bon anniversaire !
 he:   יום הולדת שמח
 is: til hamingju með afmælið !
 it: buon compleanno!
@@ -6008,7 +6008,7 @@ de: hat weder Kinder noch einen Lebenspartner
 en: Spouse and children are unknown
 es: no tiene hijos ni cónyuge
 fi: Puoliso ja lapset tuntemattomia
-fr: n'ayant pas de famille
+fr: n’ayant pas de famille
 it: senza figli né coniuge
 nl: zonder familie
 no: Ektefell og barn er ukjent
@@ -6021,7 +6021,7 @@ de: Klicken Sie auf das zu korrigierende "Listen-Element": alle Dateien Ihres Ba
 en: Click 'Update' to edit and your entire family tree will be automatically updated
 es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente
 fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti
-fr: Cliquez sur l’élément de la liste que vous souhaitez corriger : l’ensemble des fiches de votre arbre sera instantanément corrigé
+fr: Cliquez sur l’élément de la liste que vous souhaitez corriger : l’ensemble des fiches de votre arbre sera instantanément corrigé
 it: Clicca su « l’elemento della lista » che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette
 nl: Kliop op het 'lijstelement" dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd  worden
 no: Klikk 'Oppdater' for å editere og hele ditt slektstre vil automatisk bli oppdatert
@@ -6034,7 +6034,7 @@ de: um die Zweige Ihres Stammbaums zu den Nachnamen zu erhalten, klicken Sie auf
 en: click a number to view family tree
 es: para obtener el árbol de las ramas patrónimicas, pulse en el número de las ramas
 fi: napsauta numeroa katsoksesi sukupuuta
-fr: pour obtenir l'arbre des branches patronymiques, cliquez sur le nombre de branches
+fr: pour obtenir l’arbre des branches patronymiques, cliquez sur le nombre de branches
 it: per ottenere l'albero dei rami patronimici, clicca sul numero di rami
 nl: om het aantal familietakken te bekomen, klikken op het aantal takken
 no: klikk på et nummer for å se slektstre
@@ -6448,7 +6448,7 @@ et:
 fi:
 fr: en
 he:  ב-
-is: &nbsp;
+is:  
 it: nel
 lv: gads:
 nl: in
@@ -6744,7 +6744,7 @@ de: der Versionsverlauf von %s ist nicht ausreichend um Vergleiche anzustellen
 en: No history found for %s
 es: el histórico de las revisiones de %s es insuficiente para realizar comparaciones
 fi: Tarkistushistoriaa ei löydetty kohteelle %s
-fr: l'historique des révisions de %s est insuffisant pour réaliser des comparaisons
+fr: l’historique des révisions de %s est insuffisant pour réaliser des comparaisons
 it: la cronistoria delle revisioni delle %s è insufficente per realizzare dei paragoni
 nl: historiek van de revisies van %s is onvoldoende om vergelijkingen uit te voeren
 no: Ingen revisjonshistorikk funnet for %s
@@ -6953,7 +6953,7 @@ eo: estas la sama persono!
 es: ¡es la misma persona!
 et: see on ju sama isik!
 fi: yksi ja sama henkilö!
-fr: c’est la même personne !
+fr: c’est la même personne !
 he:  אותו האדם
 is: þetta er sama manneskjan !
 it: è la stessa persona!
@@ -7326,7 +7326,7 @@ eo: estas maŝo en la datenbazo: %s estas sia propra avo
 es: referencia circulár en la base de datos: %s es su propio ancestro
 et: silmus andmebaasis: %s on iseenda esivanem
 fi: silmukka tietokannassa: %s on oma esivanhempansa
-fr: boucle dans la base de données : %s est son propre ancêtre
+fr: boucle dans la base de données : %s est son propre ancêtre
 he:  מעגל במאגר הנתונים: %s  צאצא(ה) לאצמו/לאצמה
 is: villa í gagnagrunni: %s er sinn eigin forfaðir/afkomandi
 it: loop nel data-base: %s è antenato(a) di se stesso(a)
@@ -7471,7 +7471,7 @@ de: Hochzeitstag
 en: Date of marriage
 es: fecha de matrimonio
 fi: Vihkiaika
-fr: date de l'union
+fr: date de l’union
 it: data dell'unione
 nl: huwelijksdatum
 no: Ekteskapsdato
@@ -7568,7 +7568,7 @@ de: notizen zu den Ehen
 en: marriage Notes
 es: notas de matrionios
 fi: lisämerkintöjä vihkimisestä
-fr: notes concernant l'union
+fr: notes concernant l’union
 it: note di matrimoni
 nl: Aantekeningen
 no: notater om ekteskapet
@@ -7639,7 +7639,7 @@ de: Ort der Eheschließung
 en: Place of marriage
 es: lugar de matrimonio
 fi: Vihkipaikka
-fr: lieu de l'union
+fr: lieu de l’union
 it: luogo dell'unione
 nl: huwelijksplaats
 no: Ekteskapssted
@@ -8524,7 +8524,7 @@ fr: navigation avec %t comme référence Sosa
 he:  ניוות עם %t כאזכור Sosa
 is: leiðsögn með %t sem Sosa tilvísun
 it: percorso con %t come riferimento Sosa
-lv: meklēt senčus -&gt; %t pēc Sosa pakāpes
+lv: meklēt senčus -> %t pēc Sosa pakāpes
 nl: navigatie met %t als proband
 no: navigering med %t som Anenummer
 oc: navigacion amb %t coma numèro Sosa de referéncia
@@ -8593,7 +8593,7 @@ de: zögern Sie nicht eine neue Berechnung auf einer anderen Basis zu beginnen
 en: you can try another computing option
 es: puede relanzar un cálculo eligiendo otro modo de cálculo
 fi: valitse toinen laskutapa ja laske uudelleen
-fr: n'hésitez pas à recommencer en utilisant un autre mode de calcul
+fr: n’hésitez pas à recommencer en utilisant un autre mode de calcul
 it: non esitare a riavviare un calcolo scegliendo un altro modo di calcolo
 nl: aarzel niet opnieuw te berekenen via een andere berekeningswijze
 no: velg en annen utregningsmåte og beregn påny
@@ -9219,7 +9219,7 @@ de: Anzahl der Ereignisse
 en: Number of Facts
 es: número de eventos
 fi: Tapahtumien lukumäärä
-fr: nombre d'événements
+fr: nombre d’événements
 it: numero d'eventi
 nl: aantal evenementen
 no: Antall hendelser
@@ -9232,7 +9232,7 @@ de: Anzahl der Individuen
 en: Number of Individuals
 es: número de individuos
 fi: Henkilöiden lukumäärä
-fr: nombre d'individus
+fr: nombre d’individus
 it: numero d'individui
 nl: aantal personen
 no: Antall individer
@@ -9250,7 +9250,7 @@ eo: nombro de la vivantaj personoj:
 es: número de personas vivas:
 et: elavaid inimesi:
 fi: elossa olevien lukumäärä:
-fr: nombre de personnes vivantes :
+fr: nombre de personnes vivantes :
 he: מספר האנשים שעודם בחיים
 it: numero di persone viventi:
 lv: dzīvo personu skaits:
@@ -9452,7 +9452,7 @@ et: :i:
 fi: :e:
 fr: le
 he:   ב-
-is: &nbsp;
+is:  
 it: il
 lv: datums:
 nl: op
@@ -10106,7 +10106,7 @@ de: überblick vom Stammbaum
 en: Preview Family Tree
 es: ver ärbol
 fi: Yleiskatsaus sukutauluun
-fr: aperçu de l'arbre
+fr: aperçu de l’arbre
 it: anteprima dell’albero
 nl: overzicht van de stamboom
 no: oversikt over
@@ -10515,7 +10515,7 @@ de: anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
 es: opciones de edición de los árboles de parentesco:
 fi: näyttötapa:
-fr: options d’affichage des arbres de parenté :
+fr: options d’affichage des arbres de parenté :
 it: opzioni di visualizzazione degli alberi di parentela:
 nl: toonopties van de verwantschapsstambomen
 no: visningsmåte
@@ -10570,7 +10570,7 @@ de: Verknüpfungen :
 en: Shortcuts:
 es: atajos :
 fi: oikotie:
-fr: raccourcis :
+fr: raccourcis :
 it: scorciatoie :
 nl: binnenweg :
 no: snarvei:
@@ -10675,7 +10675,7 @@ de: HLT Kindes-Siege
 en: Sealing Child (LDS)
 es: sellamiento de hijo LDS
 fi: Sinetöity lapsi (LDS)
-fr: scellage d'enfant LDS
+fr: scellage d’enfant LDS
 it: Legame eterno di figli
 nl: Kindverbinding (LDS)
 no: Besegling med barn (LDS)
@@ -10711,7 +10711,7 @@ bg: търсене/с различаване на главни и малки б�
 ca: recerca/coincidir maj_min
 cs: hledat/citlivý na velikost písma
 da: søg/følsom overfor store og små bogstaver
-de: suchen/Groß- &amp; Kleinschreibung beachten
+de: suchen/Groß- & Kleinschreibung beachten
 en: search/case sensitive
 eo: search/dependema de la grandaj-malgrandaj literoj
 es: buscar/fijarse en mayúsculas&#047;menúsculas
@@ -10917,7 +10917,7 @@ de: auswählen :
 en: select:
 es: elegir:
 fi: valitse:
-fr: choisir :
+fr: choisir :
 it: scegliere:
 nl: kiezen:
 no: velg
@@ -10956,7 +10956,7 @@ de: Partner auswählen
 en: Select spouse
 es: elija un cónyuge
 fi: Valitse puoliso
-fr: choisissez un conjoint :
+fr: choisissez un conjoint :
 it: scegli un coniuge
 nl: kies een partner
 no: Velg ektefelle
@@ -11322,7 +11322,7 @@ de: sortieren nach: /Zweige/Alphabet
 en: Sort by:/Line/Alphabetical order
 es: organizar por: ramas/orden alfabético
 fi: Lajittelu:/Sukulinja/Aakkosjärjestys
-fr: trier par :/branches/ordre alphabétique
+fr: trier par :/branches/ordre alphabétique
 it: smistare per :/rami/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
@@ -11335,7 +11335,7 @@ de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Erei
 en: Sort by:/Date/Alphabetical order/Number of individuals/Number of facts
 es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
 fi: Lajittelu:/Päivämäärä/Aakkosjärjestys/Henkilöiden lukumäärä/Tapahtumien lukumäärä
-fr: trier par:/date de début/ordre alphabétique/nombre d'individus/nombre d'événements
+fr: trier par :/date de début/ordre alphabétique/nombre d’individus/nombre d’événements
 it: smistare per : data d'inizio/ordine alfabetico/numero d'individui/numero d'eventi
 nl: sorteren per:/begindatum/alfabetisch/aantal personen/aantal evenementen
 no: Sorter etter:/Dato/alfabetisk rekkefølge/antall individer/antall hendelser
@@ -11348,7 +11348,7 @@ de: sortieren nach: /Generationen/Alphabet
 en: Sort by:/Generation/Alphabetical order
 es: organizar por: generación/orden alfabético
 fi: Lajittelu:/Sukupolvi/Aakkosjärjestys
-fr: trier par:/génération/ordre alphabétique
+fr: trier par :/génération/ordre alphabétique
 it: smistare per : /generazione/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
@@ -11394,7 +11394,7 @@ eo: Sosa referenco: %t
 es: referencia Sosa: %t
 et: Sosa viidet: %t
 fi: Sosa-viitteenä: %t
-fr: référence Sosa : %t
+fr: référence Sosa : %t
 he:  כאזכור Sosa: %t
 it: riferimento Sosa : %t
 lv: Sosa pakāpes: %t
@@ -12058,7 +12058,7 @@ eo: la bazo ŝangis; faru "malantaŭe", "reŝargi", kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud: mine tagasi, värskenda lehekülg ja täida vorm uuesti
 fi: tietokanta on muuttunut; valitse "takaisin", "lataa uudelleen" ja täytä lomake uudelleen
-fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
+fr: la base a changé : revenez à la page précédente, actualisez la et resaisissez le formulaire
 he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerðu "Back", "Reload", og settu aftur í formið
 it: la base è cambiata; fate "back", "reload" e rifate la scheda
@@ -12246,7 +12246,7 @@ eo: la sliparo estas provizore riglata: provu denove. Se tio ne funkcios, atendu
 es: la base está temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar nuevamente
 et: fail on ajutiselt lukustatud: proovi uuesti
 fi: tiedosto on lukkiutunut, yritä hetken kuluttua uudelleen
-fr: le fichier est temporairement verrouillé : essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
+fr: le fichier est temporairement verrouillé : essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de réessayer
 he:  הקובץ נעול זמנית: לחקות ולנסות שוב
 is: skjalið er læst í augnablikinu, reyndu aftur
 it: l'archivio è temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
@@ -12540,7 +12540,7 @@ de: die Änderung ist erfolgt: %d Datei(en) wurden korrigiert
 en: %d entries have been successfully updated
 es: la modificación ha sido hecha: %d ficha/s corregida/s
 fi: %d tietuetta on onnistuneesti päivitetty
-fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
+fr: la modification a bien été effectuée : %d fiche(s) corrigée(s)
 it: la modifica è stata effettuata : %d scheda/e corretta/e
 nl: wijziging goed uitgevoerd : %d fiche(n) verbeterd
 no: %d registreringer er blitt oppdatert
@@ -12714,7 +12714,7 @@ eo: por aldoni infanon al familio, uzu "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 et: lapse lisamiseks perre kasuta "%st"
 fi: lisätäksesi perheeseen lapsen käytä "%s"
-fr: pour ajouter un enfant à une famille, utiliser « %s »
+fr: pour ajouter un enfant à une famille, utiliser « %s »
 he:  להוסיף ילד למשפחה, השתמש ב-"%s"
 is: til að bæta barni við fjölskyldu, notaðu "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
@@ -12770,7 +12770,7 @@ eo: ĝis la %s generacio
 es: hasta la %s generación
 et: %s sugupõlveni
 fi: %s sukupolveen
-fr: jusqu'à la %s génération
+fr: jusqu’à la %s génération
 he:  לדור ה%s
 is: til %s kynslóðar
 it: fino alla %s generazione
@@ -13347,7 +13347,7 @@ eo: uzu "bindi" anstataù ol "krei"
 es: utilise "reunir" en lugar de "crear"
 et: vali "loo" asemel "viita"
 fi: käytä toimintoa "linkitä" toiminnon "luo" sijaan
-fr: utilisez « relier » au lieu de « créer »
+fr: utilisez « relier » au lieu de « créer »
 he:  להשתמש ב-"קשר" במקום "עשה"
 is: notaðu "tengja" í stað "búa til"
 it: usare "link" invece di "create"
@@ -13412,7 +13412,7 @@ de: Verkauf von Besitztum
 en: Sale of Property
 es: venta de un bien
 fi: Omaisuuden myynti
-fr: vente d'un bien
+fr: vente d’un bien
 it: Vendita di un bene
 nl: Verkoop van eigendom
 no: Salg av eiendom
@@ -13537,7 +13537,7 @@ de: Ort der Trauung
 en: Where married
 es: lugar de matrimonio
 fi: vihkipaikka
-fr: lieu de l'union
+fr: lieu de l’union
 it: luogo dell'unione
 nl: huwelijksplaats
 no: sted for vigsel
