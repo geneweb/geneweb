@@ -75,9 +75,9 @@
         99%nn;
       %end;
     %in;
-    %let;l_mal1;%if;(l_mal0 != 99)([maximum] %l_mal0; [generation/generations]1)%end;%in;
+    %let;l_mal1;%if;(l_mal0 != 99)([maximum] %l_mal0; [generation/generations]1)%end;%in;
     <legend><input type="submit" value="OK"%/></legend>
-    <label>[*specify::generation/generations]0%l_mal1;[:]<br%/>
+    <label>[*specify::generation/generations]0 %l_mal1;[:]<br%/>
       <select style="text-align:center" name="v" size="%expr(max_anc_level-1)">
         %foreach;ancestor_level;
           %if;(level != 1)
@@ -104,9 +104,9 @@
       </select>
     </label>
     <br%/>
-    <label>      <input type="checkbox" name="only" value="on" %l_on;
+    <label>    <input type="checkbox" name="only" value="on" %l_on;
            %/>[only the generation selected]</label><br%/>
-    <label>      <input type="checkbox" name="cgl" value="on" %l_on;
+    <label>    <input type="checkbox" name="cgl" value="on" %l_on;
            %/>[cancel GeneWeb links]</label><br%/>
     <label><input type="radio" id="tZ" name="t" value="Z" %l_on;
            %/>[table]</label><br%/>
@@ -165,19 +165,18 @@
     %let;l_on1;onchange="valid('tT')"%in;
     <legend>
       <label>
-        <input type="radio" id="tT" name="t" value="T" %l_on;%/>
-        [*tree]
+        <input type="radio" id="tT" name="t" value="T" %l_on;%/>[*tree]
         %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
-          ([maximum] 7 [generation/generations]1)
+          ([maximum] 7 [generation/generations]1)
         %elseif;(bvar.max_anc_tree != "" and max_anc_level >= bvar.max_anc_tree)
-          ([maximum] %bvar.max_anc_tree; [generation/generations]1)
+          ([maximum] %bvar.max_anc_tree; [generation/generations]1)
         %end;
-      </label>
-    </legend>
+      </label><br%/>
     <label><input type="radio" name="t" value="A" %l_on;
-           %/>[male line/female line]0</label><br%/>
+           %/>[*male line/female line]0</label><br%/>
     <label><input type="radio" name="t" value="C" %l_on;
-           %/>[male line/female line]1</label><br%/>
+           %/>[*male line/female line]1</label>
+    </legend><br%/><br%/><br%/>
     <label>      <input type="checkbox" name="dag" value="on" %l_on1; %l_on;
            %/>dag=on</label><br%/>
     <label>      <input type="checkbox" name="marriage" value="on" %l_on1; %l_on;

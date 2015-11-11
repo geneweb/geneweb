@@ -118,12 +118,12 @@
   <fieldset>
     <legend>
       <label><input type="radio" id="tL" name="t" value="L" checked="checked" %l_on2; %l_on;
-             %/>[*long display]0</label>
+             %/>[*long display]0</label><br%/>
     <label><input type="radio" name="t" value="M" %l_on2; %l_on;
-           %/>[male line/female line]0</label><br%/>
+           %/>[*male line/female line]0</label><br%/>
     <label><input type="radio" name="t" value="F" %l_on2; %l_on;
-           %/>[male line/female line]1</label><br%/>
-    </legend>
+           %/>[*male line/female line]1</label><br%/>
+    </legend><br%/><br%/><br%/>
     %if;(has_sosa)
       <label style = "display:inline" ><input type="checkbox" name="t1" value="1" %l_on1;
              %if;(evar.t1= "1") checked="checked"%end;%/>[branch/branches]0[:] Sosa</label>
