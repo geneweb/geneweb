@@ -36,15 +36,15 @@
 
 %define;compute_age1(z1,z2,z3)
   %if;(z1 > 0)
-    %if;(z1 = 1)[one year old]%else;z1 [years old]%end;
+    %if;(z1 = 1)[one year old]%else;z1 [years old]%end;
     %if;(z2 > 0 or z3 > 0), %end;
   %end;
   %if;(z2 > 0)
-    %if;(z2 = 1)[one month old]%else;z2 [months old]%end;
+    %if;(z2 = 1)[one month old]%else;z2 [months old]%end;
     %if;(z3 > 0), %end;
   %end;
   %if;(z3 > 0)
-    %if;(z3 = 1)[one day old]%else;z3 [days old]%end;
+    %if;(z3 = 1)[one day old]%else;z3 [days old]%end;
   %end;
 %end;
 
@@ -72,7 +72,7 @@
       %apply;compute_age1(z1.year - z2.year - 1,11 + z1.month - z2.month,l1 + z1.day - z2.day)
     %end;
   %end;
-  %if;(l2 > 31) (%l2; [days old])%end;
+  %if;(l2 > 31) (%l2; [days old])%end;
 %end;
 
 %define;fun_day(ccc, nnn)
@@ -181,47 +181,49 @@
 <td>
   <ul>
     <li>
-      %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
-      %if;(date.julian_day = today.julian_day)%sp;%time;%end;
+      [*year/month/day]2[:] %apply;nth([(week day)], date.week_day)
+      %if;(date.julian_day = today.julian_day)%sp;%time;%end;.
     </li>
     %if;(date.julian_day > 2375839)
       <li %if;(date.julian_day < 2380688)style="font-weight:bold;"%end;>
-        %apply;french_day(date.french.day),%sp;%date.french.day;
-        %sp;%apply;nth([(french revolution month)], date.french.month -1)
-        %sp;an %date.french.year.roman; 
+        [*gregorian/julian/french/hebrew]2[:] %apply;french_day(date.french.day),%sp;%date.french.day;
+         %apply;nth([(french revolution month)], date.french.month -1)
+        %sp;an %date.french.year.roman;.
       </li>
     %end;
     <li>
-      [*moon age/new moon/first quarter/full moon/last quarter]0 : %date.moon_age;
+      [*moon age/new moon/first quarter/full moon/last quarter]0[:] %date.moon_age;
+      %if;(date.moon_age = 1) [year/month/day]2. %else; [year/month/day]2s.%end;
       %if;(date.moon_phase.index != 0)
-        %sp;-%sp;
+          <li>
         %apply;capitalize%with;
           %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
-                     date.moon_phase.index) :%sp;
-           %date.moon_phase.hour;:%date.moon_phase.minute; UT
+                     date.moon_phase.index)[:]%sp;
+           %date.moon_phase.hour; h %date.moon_phase.minute; min UT.
         %end;
+     </li>
       %end;
     </li>
     %if;(date.julian_day > 1721425 and today.julian_day != date.julian_day)
-      <li>[*age] :
+      <li>[*age][:]
         %if;(today.julian_day > date.julian_day)
-          %apply;compute_age("today","date")
+          %apply;compute_age("today","date").
         %else;
-          -%apply;compute_age("date","today")
+          -%apply;compute_age("date","today").
         %end;
       </li>
     %end;
     <li>
-      [*julian day] :%sp;
-      %if;(date.julian_day < 1000)%date.julian_day;
-      %else;%date.julian_day.sep1000;
+      [*julian day][:]%sp;
+      %if;(date.julian_day < 1000)%date.julian_day;.
+      %else;%date.julian_day.sep1000;.
       %end;
     </li>
   </ul>
   %if;(wizard or friend)
     <form method="get" action="%action;">
       <p>
-      <a href="%prefix;m=STAT">[*statistics] :</a>%sp;
+      <a href="%prefix;m=STAT">[*statistics][:]</a>%sp;
       %hidden;
       <input name="k" value="%if;(bvar.latest_event != "")%bvar.latest_event;%else;20%end;" size="5" maxlength="5" %/>
       <label>
@@ -234,23 +236,23 @@
       </label>
       <label>
         <input type="radio" name="m" value="LD" %/>
-        [death]
+        [death],
       </label>
-      … ([before (date)]…
+      [before (date)]
         %if;([ !dates order]0 = "ddmmyyyy")
-          <input name="bd" value="%expr(date.gregorian.day + 1)" size="2" maxlength="2" %/>
+          <input name="bd" value="%expr(date.gregorian.day)" size="2" maxlength="2" %/>
           <input name="bm" value="%date.gregorian.month;" size="2" maxlength="2" %/>
-          <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>
+          <input name="by" value="%date.gregorian.year;" size="2" maxlength="4" %/>
         %elseif;([ !dates order]0 = "mmddyyyy")
           <input name="bm" value="%date.gregorian.month;" size="2" maxlength="2" %/>
-          <input name="bd" value="%expr(date.gregorian.day + 1)" size="2" maxlength="2" %/>
-          <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>
+          <input name="bd" value="%expr(date.gregorian.day)" size="2" maxlength="2" %/>
+          <input name="by" value="%date.gregorian.year;" size="2" maxlength="4" %/>
         %else;
-          <input name="by" value="%date.gregorian.year;" size="4" maxlength="4" %/>
+          <input name="by" value="%date.gregorian.year;" size="2" maxlength="4" %/>
           <input name="bm" value="%date.gregorian.month;" size="2" maxlength="2" %/>
-          <input name="bd" value="%expr(date.gregorian.day + 1)" size="2" maxlength="2" %/>
-        %end;)
-      <input type="submit" value="Ok" %/>
+          <input name="bd" value="%expr(date.gregorian.day)" size="2" maxlength="2" %/>)
+        %end;
+      <input type="submit" value="OK" %/>
       </p>
     </form>
     %let;lang;
@@ -264,22 +266,22 @@
     <ul>
       <li>
         <a href="%prefix;m=POP_PYR;int=5;lim=0;y=%date.gregorian.year;">
-          [population pyramid] (%date.gregorian.year;)
+          [*population pyramid] (%date.gregorian.year;).
         </a>
       </li>
       <li>
         <a href="%prefix;m=AN;v=%date.gregorian.month;">
-          [birthdays] (%apply;nth([(month)], date.gregorian.month-1))
+          [*birthdays] (%apply;nth([(month)], date.gregorian.month-1)).
         </a>
       </li>
       <li>
         <a href="%prefix;m=AD;v=%date.gregorian.month;">
-          [anniversaries of dead people] (%apply;nth([(month)], date.gregorian.month-1))
+          [*anniversaries of dead people] (%apply;nth([(month)], date.gregorian.month-1)).
         </a>
       </li>
       <li>
         <a href="%prefix;m=AM;v=%date.gregorian.month;">
-          [anniversaries of marriage] (%apply;nth([(month)], date.gregorian.month-1))
+          [*anniversaries of marriage] (%apply;nth([(month)], date.gregorian.month-1)).
         </a>
       </li>
     </ul>
