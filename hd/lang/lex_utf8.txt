@@ -1576,7 +1576,7 @@ ca: afegir imatge
 cs: přidat :a: obrázek
 da: tilføj billede
 de: hinzufügen Bild
-en: add Picture
+en: add picture
 eo: aldoni :a: bildo:a:+n
 es: agregar imagen
 et: lisa pilt
@@ -1789,7 +1789,7 @@ zh:  年龄
 
     age at %s birth date
 de: Alter bei der Geburt von %s
-en: Age at birth of %s
+en: age at birth of %s
 es: edad al nacimiento de %s
 fi: Ikä %s :n syntyessä
 fr: âge à la naissance de %s
@@ -2101,7 +2101,7 @@ ca: ascendents
 cs: předkové
 da: forfædre
 de: Vorfahren
-en: ancestry
+en: ancestors
 eo: prapatro
 es: ascendientes
 et: esivanemad
@@ -2281,7 +2281,7 @@ ca: aniversaris de casament
 cs: výročí sňatků
 da: årsdage for bryllupper
 de: Hochzeitstage
-en: wedding Anniversaries
+en: wedding anniversaries
 eo: datrevenoj de edziĝo
 es: aniversarios de casamiento
 et: pulma-aastapäevad
@@ -4315,13 +4315,13 @@ zh:  后代
 
     descendants at the generation
 de: Generation der Nachkommen ...
-en: List by name
+en: list by name
 es: descendientes en la generación...
 fi: Nimilista
 fr: descendants à la génération...
 it: discendenti fino alla generazione...
 nl: nakomelingen tot de ... generatie
-no: Liste etter navn
+no: liste etter navn
 oc: descendents a la ... generacion
 pt: descendentes na geração...
 sv: Ättlingar från denna generation
@@ -4572,7 +4572,7 @@ pt: exibir sempre as imagens
 sv: Visa tom bild
 
     display generation
-de: nummer der Generation anzeigen
+de: Nummer der Generation anzeigen
 en: display generation
 es: editar el número de generación
 fi: näytä sukupolvinumero
@@ -5395,7 +5395,7 @@ ca: àlies del nom
 cs: alias křestního jména
 da: fornavns alias
 de: Vornamen-Alias
-en: alternate First Name
+en: alternate first name
 eo: aliasa:a:+n propra:a:+n nomo:a:+n
 es: nombre alias
 et: muu eesnimi
@@ -6079,7 +6079,7 @@ ca: ell/ella
 cs: on/ona
 da: han/hun
 de: er/sie
-en: father or individual/mother or individual
+en: him/her
 eo: li/ŝi
 es: él/ella
 et: mees/naine
@@ -6699,7 +6699,7 @@ sv: förteckning över makarna (icke ättlingar)
 
     individual notes
 de: Hinweis zur Person
-en: individual Note
+en: individual note
 es: nota individual
 fi: merkintöjä henkilöstä
 fr: notes individuelles
@@ -6977,7 +6977,7 @@ ca: dia julià
 cs: juliánský den
 da: juliansk dag
 de: Julianisch
-en: Julian Day
+en: julian day
 eo: tago juliana
 es: día julian
 et: juuliuse päev
@@ -7150,7 +7150,7 @@ sv: länkade sidor
 
     list eclair
 de: Blitzliste
-en: List by name, place & date
+en: list by name, place & date
 es: lista rápida
 fi: Index
 fr: liste-éclair
@@ -7279,12 +7279,12 @@ ca: presentació extensa
 cs: dlouhý seznam
 da: udvidet rapport
 de: Lange Ansicht
-en: full
+en: full display
 eo: longa afiŝado
 es: presentación extensa
 et: põhjalik raport
 fi: laaja esitys
-fr: affichage long
+fr: affichage complet
 he:  תצוגה ארוכה
 is: löng skýrsla
 it: display esteso
@@ -7413,7 +7413,7 @@ eo: vira linio /virina linio
 es: línea masculina/línea femenina
 et: meesliin/naisliin
 fi: mieslinja/naislinja
-fr: lignée agnatique (homme)/lignée cognatique (femme)
+fr: lignée agnatique/lignée cognatique
 he:  קו זכרי / קו נקבי
 is: karllegg/kvenlegg
 it: linea agnatizia/linea cognatizia
@@ -8325,7 +8325,7 @@ eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
 es: edad de la luna/luna nueva/cuarto cresciente/luna llena/cuarto menguante
 et: kuu vanus/noorkuu/esimene veerand/täiskuu/viimane veerand
 fi: kuun kierto/uusi kuu/ensimmäinen neljännes/täysikuu/viimeinen neljännes
-fr: âge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
+fr: âge de la Lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
 he: גיל הירח/ירח חדש/רביע ראשון/ירח מלא/רביע אחרון
 is: tunglaldur/nýtt tungl/vaxandi tungl/fullt tungl/minnkandi tungl
 it: fasi della luna/luna nuova/primo quarto/luna piena/ultimo quarto
@@ -8515,7 +8515,7 @@ ca: navegació amb %t amb referència de "número Sosa"
 cs: prohlížení s %t jako "sosa" referencí
 da: navigering med %t som reference for fortløbende anenummerering (Sosa o.a.)
 de: Navigation mit %t als Proband für die Ahnenkennziffern
-en: browse using %t as Family Tree Root
+en: browse using %t as Sosa reference
 eo: navigado kun %t kiel Sosa referenco
 es: navegación con %t como referencia de Sosa
 et: navigeerimine kasutades %t Sosa viidet
@@ -9203,16 +9203,16 @@ sv: antal grenar
 
     number of children
 de: Anzahl der Kinder
-en: Number of children
+en: number of children
 es: número de hijos
-fi: Lasten lukumäärä
+fi: lasten lukumäärä
 fr: nombre d’enfants
 it: numero di figli
 nl: aantal kinderen
-no: Antall barn
+no: antall barn
 oc: nombre d'enfants
 pt: número de filhos
-sv: Antal barn
+sv: antal barn
 
     number of events
 de: Anzahl der Ereignisse
@@ -10633,7 +10633,7 @@ sv: Pesnionering
 
     revision history
 de: Verlauf der Revisionen
-en: Revision history
+en: revision history
 es: histórico de las revisiones
 fi: Tarkastushistoria
 fr: historique des révisions
@@ -10939,17 +10939,17 @@ pt: selecione uma letra
 sv: välj en bokstav
 
     select a month to see all the anniversaries
-de: zum zeigen der Geburtstage den Monat auswählen
-en: select month
-es: elegir un mes para ver todos los cumpleaños
-fi: valitse kuukausi nähdäksesi kaikki syntymäpäivät
-fr: sélectionnez un mois pour voir tous les anniversaires
-it: scegliere un mese per vedere tutti i comlpeanni
-nl: een maand kiezen om alle verjaardagen te zien
-no: velg en måned for å vise alle fødselsdager
-oc: causissètz-vos un mes per veire los aniversaris
-pt: selecione um mês para ver todos os aniversários
-sv: välj en månad för att visa alla födelsedagar
+de: zum zeigen der Geburtstage den Monat auswählen.
+en: select a month to see all the anniversaries.
+es: elegir un mes para ver todos los cumpleaños.
+fi: valitse kuukausi nähdäksesi kaikki syntymäpäivät.
+fr: sélectionnez un mois pour voir tous les anniversaires.
+it: scegliere un mese per vedere tutti i comlpeanni.
+nl: een maand kiezen om alle verjaardagen te zien.
+no: velg en måned for å vise alle fødselsdager.
+oc: causissètz-vos un mes per veire los aniversaris.
+pt: selecione um mês para ver todos os aniversários.
+sv: välj en månad för att visa alla födelsedagar.
 
     select a spouse
 de: Partner auswählen
@@ -10965,30 +10965,30 @@ pt: selecione um cônjuge:
 sv: Välj maka/make
 
     select person to compute relationship
-de: auf die Person klicken, zu der Sie das Verwandtschaftsverhältnis berechnen möchten
-en: click an individual below to calculate the family link
-es: pulse en la persona con la que quiere realizar un cálculo de parentesco
-fi: napsauta henkilöä, jonka sukulaisuusasteen haluat laskea
-fr: cliquez sur la personne avec laquelle vous souhaitez réaliser un calcul de parenté
-it: clicca sulla persona per la quale vuoi fare un calcolo di parentela
-nl: op de persoon klikken van waaruit u een verwantschapsberekening wenst
-no: klikk på personen som du vil beregne slektskapsgraden til
-oc: causissètz-vos la persona de calcular la parentat
-pt: selecione a pessoa sobre a qual pretende realizar um cálculo de parentesco
-sv: klicka på personen som du vill räkna ut släktskapsgraden med
+de: auf die Person klicken, zu der Sie das Verwandtschaftsverhältnis berechnen möchten.
+en: click an individual below to calculate the family link.
+es: pulse en la persona con la que quiere realizar un cálculo de parentesco.
+fi: napsauta henkilöä, jonka sukulaisuusasteen haluat laskea.
+fr: cliquez sur la personne avec laquelle vous souhaitez réaliser un calcul de parenté.
+it: clicca sulla persona per la quale vuoi fare un calcolo di parentela.
+nl: op de persoon klikken van waaruit u een verwantschapsberekening wenst.
+no: klikk på personen som du vil beregne slektskapsgraden til.
+oc: causissètz-vos la persona de calcular la parentat.
+pt: selecione a pessoa sobre a qual pretende realizar um cálculo de parentesco.
+sv: klicka på personen som du vill räkna ut släktskapsgraden med.
 
     select the two revisions you want to compare
-de: wählen Sie zwei zu vergleichende Revisionen
-en: Select revisions to view history
-es: seleccione las dos revisiones que quiere comparar
-fi: Valitse kaksi vertailtavaa versiota
-fr: sélectionnez les deux révisions que vous voulez comparer
-it: seleziona le due versioni da paragonare
-nl: selecteer de twee revisies die u wenst te vergelijken
-no: Velg revisjoner for å se på historikk
-oc: causissètz-vos las doás revisions de comparar
-pt: selecione as duas revisões que pretende comparar
-sv: Välj de två uppdateringar Du vill jämföra
+de: wählen Sie zwei zu vergleichende Revisionen.
+en: Select revisions to view history.
+es: seleccione las dos revisiones que quiere comparar.
+fi: Valitse kaksi vertailtavaa versiota.
+fr: sélectionnez les deux révisions que vous voulez comparer.
+it: seleziona le due versioni da paragonare.
+nl: selecteer de twee revisies die u wenst te vergelijken.
+no: Velg revisjoner for å se på historikk.
+oc: causissètz-vos las doás revisions de comparar.
+pt: selecione as duas revisões que pretende comparar.
+sv: Välj de två uppdateringar Du vill jämföra.
 
     send
 af: stuur
@@ -11566,29 +11566,29 @@ sv: statistik
     statistics and anniversaries
 bg: статистика и годишнини
 de: Statistik und Geburtstage
-en: Statistics and Family Facts
+en: statistics and family facts
 es: Estadísticas y aniversarios
 fi: tilastot ja vuosipäivät
-fr: Statistiques et anniversaires
-it: Statistiche e compleanni
-nl: Statistieken en verjaardagen
-no: Statistikk og familehendelser
-oc: Estatisticas e aniversaris
-pt: Estatísticas e aniversários
-sv: Statistik och årsdagar
+fr: statistiques et anniversaires
+it: statistiche e compleanni
+nl: statistieken en verjaardagen
+no: statistikk og familehendelser
+oc: estatisticas e aniversaris
+pt: estatísticas e aniversários
+sv: statistik och årsdagar
 
     subdivision
 de: Ort
-en: Suburb
-es: Lugar llamado
-fi: Kylä
-fr: Lieu-dit
-it: Località
-nl: Gehucht
-no: Sted
-oc: Lòc
-pt: Localidade
-sv: Ort
+en: suburb
+es: lugar llamado
+fi: kylä
+fr: lieu-dit
+it: località
+nl: gehucht
+no: sted
+oc: lòc
+pt: localidade
+sv: ort
 
     summary book ascendants
 de: liste der Dateien
@@ -11611,7 +11611,7 @@ ca: nom de casa
 cs: alias příjmení
 da: efternavns alias
 de: Nachnamen-Alias
-en: alternate Surname
+en: alternate surname
 eo: familia:a:+n nomo:a:+n aliasa:a:+n
 es: apellido alias
 et: muu perekonnanimi
