@@ -270,7 +270,7 @@
           %if;(bvar.history_diff = "yes" and has_history)
             <li class="menubar_separateur">&nbsp;</li>
             <li>
-              <a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;">[*individual history]</a>
+              <a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;">[*revision history]</a>
             </li>
           %end;
 
