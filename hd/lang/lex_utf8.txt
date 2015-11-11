@@ -13889,3 +13889,33 @@ sv: ditt meddelande väntar på giltighet
     add the previous name as a surname alias
 en: add the previous name as a surname alias
 fr: ajouter le nom précédent comme un alias de nom
+
+    :
+af: :
+ar: :
+bg: :
+br:  :
+ca: :
+cs: :
+da: :
+de: :
+en: :
+eo: :
+es: :
+et: :
+fi: :
+fr:  :
+he: :
+is: :
+it: :
+lv: :
+nl: :
+no: :
+oc: :
+pl: :
+pt: :
+ro: :
+ru: :
+sk: :
+sl: :
+sv: :
