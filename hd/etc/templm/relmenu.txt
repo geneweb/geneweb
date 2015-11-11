@@ -7,7 +7,7 @@
       %reset_count;
       %foreach;ancestor_level
         %if;(level = max_anc_level)
-          %number_of_ancestors; [ancestors] / %level; [generation/generations]1%nn;
+          %number_of_ancestors; [ancestors] [up to] %level; [generation/generations]1%nn;
         %end;
         %foreach;ancestor
           %if;(ancestor.same != "")
@@ -41,7 +41,7 @@
           %if;(number_of_descendants = "1")
             [a descendant]0 / %nn;
           %else;
-            %number_of_descendants; [descendants] / %nn;
+            %number_of_descendants; [descendants] [up to] %nn;
           %end;
           %level;
           %if;(level = "1") [generation/generations]0 %else; [generation/generations]1%end;

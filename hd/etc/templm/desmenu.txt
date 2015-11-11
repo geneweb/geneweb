@@ -76,8 +76,8 @@
       %end;
     %in;
     %let;l_mdl1;%if;(l_mdl0 != 99)([maximum] %l_mdl0; [generation/generations]1)%end;%in;
-    <legend><input type="submit" value="Ok"%/></legend>
-    <label>[*specify::generation/generations]0 %l_mdl1; :<br%/>
+    <legend><input type="submit" value="OK"%/></legend>
+    <label>[*specify::generation/generations]0%l_mdl1;[:]<br%/>
       <select style="text-align:center" name="v" size="%max_desc_level;">
         %foreach;descendant_level;
           %if;(level != 0)
@@ -97,7 +97,7 @@
     <br%/>
     %let;l_on1;onchange="valid('tL')"%in;
     %let;l_on2;onchange="valid('tL1')"%in;
-    <label><input type="checkbox" name="cgl" value="on" %l_on2; %l_on;
+    <label>      <input type="checkbox" name="cgl" value="on" %l_on2; %l_on;
            %/>[cancel GeneWeb links]</label><br%/>
     <label><input type="radio" name="t" value="S" %l_on2; %l_on;
            %/>[descendants at the generation]</label><br%/>
@@ -113,22 +113,22 @@
     <label><input type="radio" name="tl1" value="hrztl" %l_on1; %l_on;
            %/>[horizontally]</label><br%/>
     <label><input type="radio" name="tl1" value="tag" %l_on1; %l_on;
-           %/>étiquette</label><br%/>
+           %/>[label]</label><br%/>
   </fieldset>
   <fieldset>
     <legend>
       <label><input type="radio" id="tL" name="t" value="L" checked="checked" %l_on2; %l_on;
              %/>[*long display]0</label>
-    </legend>
     <label><input type="radio" name="t" value="M" %l_on2; %l_on;
            %/>[male line/female line]0</label><br%/>
     <label><input type="radio" name="t" value="F" %l_on2; %l_on;
            %/>[male line/female line]1</label><br%/>
+    </legend>
     %if;(has_sosa)
       <label style = "display:inline" ><input type="checkbox" name="t1" value="1" %l_on1;
-             %if;(evar.t1= "1") checked="checked"%end;%/>[branch/branches]0 : Sosa</label>
+             %if;(evar.t1= "1") checked="checked"%end;%/>[branch/branches]0[:] Sosa</label>
       <label style = "display:inline" >(<input type="checkbox" name="siblings" value="on" %l_on1;
-         %if;(evar.siblings = "on") checked="checked"%end;%/>[siblings])</label>
+         %if;(evar.siblings = "on") checked="checked"%end;%/>[siblings])</label><br%/>
     %end;
     <label><input type="checkbox" name="always_surname" value="no" checked="checked" %l_on1; %l_on;
            %/>[first name/first names]0 <span style="text-decoration:line-through;">[surname/surnames]0</span></label><br%/>
@@ -149,7 +149,7 @@
     <label><input type="checkbox" name="upd" value="on" %l_on1; %l_on;
            %/>[update]</label><br%/>
     <label><input type="checkbox" name="hide" value="on" %l_on1; %l_on;
-           %/>[visualize/show/hide/summary]2 … </label>
+           %/>[visualize/show/hide/summary]2… </label>
   </fieldset>
   <fieldset>
     %let;l_on1;onchange="valid('tT')"%in;
@@ -195,7 +195,7 @@
     <label><input type="radio" id="tMM" name="tl1" value="mm" %l_on1; %l_on;
            %/>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</label><br%/>
     <label><input type="radio" id="tARS" name="tl1" value="ars" %l_on1; %l_on;
-           %/>Αἰθήρ</label>
+           %/>αἰθήρ</label>
   </fieldset>
   <fieldset>
     %let;l_on1;onchange="valid('tH')" checked="checked"%in;

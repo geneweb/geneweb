@@ -76,8 +76,8 @@
       %end;
     %in;
     %let;l_mal1;%if;(l_mal0 != 99)([maximum] %l_mal0; [generation/generations]1)%end;%in;
-    <legend><input type="submit" value="Ok"%/></legend>
-    <label>[*specify::generation/generations]0 %l_mal1; :<br%/>
+    <legend><input type="submit" value="OK"%/></legend>
+    <label>[*specify::generation/generations]0%l_mal1;[:]<br%/>
       <select style="text-align:center" name="v" size="%expr(max_anc_level-1)">
         %foreach;ancestor_level;
           %if;(level != 1)
@@ -104,9 +104,9 @@
       </select>
     </label>
     <br%/>
-    <label><input type="checkbox" name="only" value="on" %l_on;
+    <label>      <input type="checkbox" name="only" value="on" %l_on;
            %/>[only the generation selected]</label><br%/>
-    <label><input type="checkbox" name="cgl" value="on" %l_on;
+    <label>      <input type="checkbox" name="cgl" value="on" %l_on;
            %/>[cancel GeneWeb links]</label><br%/>
     <label><input type="radio" id="tZ" name="t" value="Z" %l_on;
            %/>[table]</label><br%/>
@@ -121,14 +121,15 @@
       <label><input type="radio" id="tF" name="t" value="F" %l_on;%/>[*list/list (ancestors)]0</label>
     </legend>
     <fieldset>
+      <legend>[*list eclair]0</legend>
       <label><input type="radio" id="tSB" name="tf1" value="sb" %l_on1; %l_on;
              %/>[surnames branch]</label><br%/>
       <label><input type="radio" id="tSURN" name="tf1" value="surn" %l_on1; %l_on;
-             %/>[list eclair]0 - [surname/surnames]1 / [places]</label><br%/>
+             %/>[surname/surnames]1 -- [places] ([event/events]1)</label><br%/>
       <label><input type="radio" id="tPLACE" name="tf1" value="place" %l_on1; %l_on;
-             %/>[list eclair]0 - [places]</label><br%/>
+             %/>[places] ([event/events]1)</label><br%/>
       <label><input type="radio" id="tTAG" name="tf1" value="tag" %l_on1; %l_on;
-             %/>étiquette</label><br%/>
+             %/>[label]</label><br%/>
     </fieldset>
     <fieldset>
       <legend>[*statistics]</legend>
@@ -147,7 +148,7 @@
       <label><input type="radio" id="tMM" name="tf1" value="mm" %l_on1; %l_on;
              %/>[year/month/day]1 [birth] = [year/month/day]1 [death] ?</label><br%/>
       <label><input type="radio" id="tARS" name="tf1" value="ars" %l_on1; %l_on;
-             %/>Αἰθήρ</label>
+             %/>αἰθήρ</label>
     </fieldset>
     %if;(wizard)
       <fieldset>
@@ -177,11 +178,11 @@
            %/>[male line/female line]0</label><br%/>
     <label><input type="radio" name="t" value="C" %l_on;
            %/>[male line/female line]1</label><br%/>
-    <label><input type="checkbox" name="dag" value="on" %l_on1; %l_on;
+    <label>      <input type="checkbox" name="dag" value="on" %l_on1; %l_on;
            %/>dag=on</label><br%/>
-    <label><input type="checkbox" name="marriage" value="on" %l_on1; %l_on;
+    <label>      <input type="checkbox" name="marriage" value="on" %l_on1; %l_on;
            %/>[marriage/marriages]0</label><br%/>
-    <label><input type="checkbox" name="image" value="on" %l_on1; %l_on;
+    <label>      <input type="checkbox" name="image" value="on" %l_on1; %l_on;
            %/>[image/images]1</label><br%/>
     <label>[border]<input name="bd" size="1" maxlength="2" value="0" %l_on1; %/></label><br%/>
     <table summary="colors" cellspacing="0" cellpadding="0">
@@ -219,7 +220,7 @@
     <label><input type="checkbox" name="upd" value="on" %l_on1; %l_on;
            %/>[update]</label><br%/>
     <label><input type="checkbox" name="hide" value="on" %l_on1; %l_on;
-           %/>[visualize/show/hide/summary]2 … </label>
+           %/>[visualize/show/hide/summary]2… </label>
   </fieldset>
   <fieldset>
     %let;l_on1;onchange="valid('tM');valid('tM1')"%in;
