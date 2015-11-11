@@ -1,15 +1,15 @@
 <!-- $Id: menubar.txt,v 1.0 2013/03/15 15:53:12 flh Exp $ -->
 
 %define;marriage_with_txt(xx)
-  [*marriage with %s:::xx]
+  [*marriage with] xx
 %end;
 
 %define;relationship_txt(xx)
-  [*relationship by marriage with %s:::xx]
+  [*relationship by marriage] [with] xx
 %end;
 
 %define;navsosa(xx)
-  [*navigation with %t as Sosa reference:::xx].
+  [*navigation with %t as Sosa reference:::xx]
 %end;
 
 %if;(not cancel_links and evar.digest = "")
@@ -66,14 +66,14 @@
             %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
             %elseif;(not is_male and not is_female)
               <li>
-                <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">[*add::marriage/marriages]0 ([M/F]0)</a>
+                <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">[*add::relation/relations]0 ([M/F]0)</a>
               </li>
               <li>
-                <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">[*add::marriage/marriages]0 ([M/F]1)</a>
+                <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">[*add::relation/relations]0 ([M/F]1)</a>
               </li>
             %else;
               <li>
-                <a href="%prefix;m=ADD_FAM;ip=%index;">[*add::marriage/marriages]0</a>
+                <a href="%prefix;m=ADD_FAM;ip=%index;">[*add::relation/relations]0</a>
               </li>
             %end;
 
