@@ -2193,7 +2193,8 @@ let build_graph_desc_v2 conf base p max_gen =
                                     try Hashtbl.find ht (base_prefix, get_key_index p) with Not_found -> 1
                                   in
                                   let family_link =
-                                    Perso_link.get_family_link base_prefix (get_key_index p)
+                                    Perso_link.get_families_of_parents
+                                      base_prefix (get_key_index p) (get_key_index sp)
                                   in
                                   let children_link =
                                     List.fold_left
@@ -3191,7 +3192,8 @@ let build_graph_desc_full conf base p max_gen =
                                     try Hashtbl.find ht (base_prefix, get_key_index p) with Not_found -> 1
                                   in
                                   let family_link =
-                                    Perso_link.get_family_link base_prefix (get_key_index p)
+                                    Perso_link.get_families_of_parents
+                                      base_prefix (get_key_index p) (get_key_index sp)
                                   in
                                   let children_link =
                                     List.fold_left
