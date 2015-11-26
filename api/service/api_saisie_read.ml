@@ -2068,7 +2068,7 @@ let build_graph_asc_v2 conf base p max_gen =
                               end
                           | None -> loop_parents l
                   in
-                  loop_parents [(conf.bname, p, gen)]
+                  loop_parents [(conf.command, p, gen)]
                 in
                 loop l
           end
@@ -2257,7 +2257,7 @@ let build_graph_desc_v2 conf base p max_gen =
                                   loop_child children_link;
                                 end
                         in
-                        loop_child [(conf.bname, p, gen)]
+                        loop_child [(conf.command, p, gen)]
                       in
                       child_local
                     end
@@ -2363,7 +2363,7 @@ let build_graph_desc_v2 conf base p max_gen =
                         loop_desc l
                       end
               in
-              loop_desc [(conf.bname, p, gen)]
+              loop_desc [(conf.command, p, gen)]
             in
 
             loop l
@@ -3062,7 +3062,7 @@ let build_graph_asc_full conf base p max_gen =
                               end
                           | None -> loop_parents l
                   in
-                  loop_parents [(conf.bname, p, gen)]
+                  loop_parents [(conf.command, p, gen)]
                 in
                 loop l
           end
@@ -3256,7 +3256,7 @@ let build_graph_desc_full conf base p max_gen =
                                   loop_child children_link;
                                 end
                         in
-                        loop_child [(conf.bname, p, gen)]
+                        loop_child [(conf.command, p, gen)]
                       in
                       child_local
                     end
@@ -3368,7 +3368,7 @@ let build_graph_desc_full conf base p max_gen =
                         loop_desc l
                       end
               in
-              loop_desc [(conf.bname, p, gen)]
+              loop_desc [(conf.command, p, gen)]
             in
 
             loop l
