@@ -131,7 +131,7 @@
     %if;(has_parents)
       %if;(has_siblings or father.has_parents or mother.has_parents)
         <ul>
-          %let;l;%if;(bvar.max_cousins_level < 10)%bvar.max_cousins_level;%else;10%end;%in;
+          %let;l;%bvar.max_cousins_level;%in; 
           %foreach;cousin_level;
             %if;(level <= l)
               %if;(level = 1)
