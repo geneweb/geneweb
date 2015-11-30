@@ -74,7 +74,7 @@
           <br%/>
           <input name="sn" placeholder="[*surname/surnames]0" %l1;%/>
           <br%/>
-          <input name="n" placeholder="[*public name], [*alias]%if;browsing_with_sosa_ref;, [n° Sosa] %end;..."  %l1;%/>
+          <input name="n" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa] %end;…"  %l1;%/>
         </p>
       %foreach;event;
         %if;(event.has_spouse and event.spouse != "? ?")
@@ -88,7 +88,7 @@
           %foreach;event_witness;
           <label>
             <input type="radio" name="select" value="%event_witness.index;" %l_on;%/>
-            %apply;capitalize%with;%apply;a_of_b(event_witness_kind,event.name)%end; : %event_witness;
+            %apply;capitalize%with;%apply;a_of_b(event_witness_kind,event.name)%end;[:]%nl;%event_witness;
           </label>
           <br%/>
           %end;
@@ -105,14 +105,14 @@
         %if;has_relation_him;
           <label>
             <input type="radio" name="select" value="%relation_him.index;" %l_on;%/>
-            %apply;capitalize(relation_him.type)%nl;:%nl;%relation_him;
+            %apply;capitalize(relation_him.type)[:]%nl;%relation_him;
           </label>
           <br%/>
         %end;
         %if;has_relation_her;
           <label>
             <input type="radio" name="select" value="%relation_her.index;" %l_on;%/>
-            %apply;capitalize(relation_her.type)%nl;:%nl;%relation_her;
+            %apply;capitalize(relation_her.type)[:]%nl;%relation_her;
           </label>
           <br%/>
         %end;
@@ -120,7 +120,7 @@
       %foreach;related;
         <label>
           <input type="radio" name="select" value="%related.index;" %l_on;%/>
-          %apply;capitalize(related.type)%nl;:%nl;%related;
+          %apply;capitalize(related.type)[:]%nl;%related;
         </label>
         <br%/>
       %end;
