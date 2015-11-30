@@ -2317,10 +2317,10 @@ sv: Upphävande
 
     any individual in the base
 de: jede beliebige Person im Stammbaum
-en: any individual in the family tree
+en: any individual in the base
 es: cualquier individuo del árbol
 fi: yksi henkilö sukupuussasi
-fr: n’importe quel individu de l’arbre
+fr: n’importe quel individu de la base
 it: un qualsiasi individuo dell’albero
 nl: om het even welk individu van de stamboom
 no: en person i ditt tre
@@ -4401,7 +4401,7 @@ sv: dog ung
 
     difference between the two revisions
 de: Unterschied zwischen den zwei Revisionen
-en: Revision history
+en: revision history
 es: diferencia entre las dos revisiones
 fi: Tarkistushistoria
 fr: différence entre les deux révisions
@@ -7430,17 +7430,17 @@ sl: moška linija/ženska linija
 sv: manliga linjen/kvinnliga linjen
 
     male/female/neuter
-de: Mann/Frau/Unbekannt
-en: Male/Female/Unknown
-es: hombre/mujer/no específicado
-fi: mies/nainen/tuntematon
-fr: homme/femme/non spécifié
-it: maschio/femmina/non specificato
-nl: man/vrouw/onbepaald
-no: Man/Kvinne/Ukjent
-oc: òme/femna/se sap pas
-pt: masculino/feminino/não especificado
-sv: manling/kvinnlig/okänt
+de: Mann/Frau/neutral&#047;Unbekannt
+en: male/female/neuter&#047;unknown
+es: hombre/mujer/neutro&#047;no específicado
+fi: mies/nainen/neutraal&#047;tuntematon
+fr: homme/femme/neutre&#047;inconnu
+it: maschio/femmina/neutro&#047;non specificato
+nl: man/vrouw/neutraal&#047;onbepaald
+no: Man/Kvinne/nøytrale&#047;Ukjent
+oc: òme/femna/neutra&#047;se sap pas
+pt: masculino/feminino/neutro&#047;não especificado
+sv: manling/kvinnlig/neutral&#047;okänt
 
     marriage bann
 de: Aufgebot
@@ -10567,7 +10567,7 @@ sv: anlinje/anlinjer
 
     relationship shortcut
 de: Verknüpfungen :
-en: Shortcuts:
+en: shortcuts:
 es: atajos :
 fi: oikotie:
 fr: raccourcis :
