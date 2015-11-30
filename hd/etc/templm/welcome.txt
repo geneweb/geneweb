@@ -193,7 +193,7 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
             <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a></li>
             <li><a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a></li>
             <li><a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a></li>
-            <li><a href="%prefix;m=MOD_DATA;data=surname">%apply;book_of([surname/surnames]1)</a></li>
+            <li><a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a></li>
           %end;
         %end;
       </ul>
