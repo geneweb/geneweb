@@ -350,7 +350,7 @@
       %end;
       %if;(xx.computable_age)
         %let;l1;%today.year;%in;
-        %birth_symbol;%l1; (%xx.age;)%nn;
+        %birth_symbol; %l1; (%xx.age;)%nn;
         %apply;a_title1("xx",l1)
         %apply;a_title2("xx",l1)
       %end;
@@ -362,7 +362,7 @@
       %end;
       %if;(xx.computable_age)
         %let;l1;%today.year;%in;
-        %birth_symbol;%l1; (%xx.age;)%nn;
+        %birth_symbol; %l1; (%xx.age;)%nn;
         %apply;a_title2("xx",l1)
       %end;
     %elseif;(xx.computable_death_age) %death_symbol; %xx.death_age;%nl;
