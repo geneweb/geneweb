@@ -194,6 +194,7 @@ message Person {
   optional string psources = 37;
   required bool has_sources = 38;
   repeated string titles = 39;
+  repeated string titles_links = 53;
   repeated RelationPerson related = 40;
   repeated RelationPerson rparents = 41;
   optional SimplePerson father = 42;

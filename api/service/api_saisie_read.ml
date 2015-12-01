@@ -911,6 +911,7 @@ let pers_to_piqi_person conf base p =
       psources = None;
       has_sources = false;
       titles = [];
+      titles_links = [];
       related = [];
       rparents = [];
       father = None;
@@ -1274,6 +1275,10 @@ let pers_to_piqi_person conf base p =
       else false
     in
     let titles = Perso.nobility_titles_list conf base p in
+    let titles_links =
+      let tmp_conf = {(conf) with cancel_links = false} in
+      List.map (Perso.string_of_title tmp_conf base "" p) titles
+    in
     let titles =
       let tmp_conf = {(conf) with cancel_links = true} in
       List.map (Perso.string_of_title tmp_conf base "" p) titles
@@ -1591,6 +1596,7 @@ let pers_to_piqi_person conf base p =
       psources = if psources = "" then None else Some psources;
       has_sources = has_sources;
       titles = titles;
+      titles_links = titles_links;
       related = related;
       rparents = rparents;
       father = father;
