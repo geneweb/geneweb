@@ -140,6 +140,49 @@ let string_of_dmy conf d =
   Date.string_of_prec_dmy conf sy sy2 d
 ;;
 
+(* ************************************************************************** *)
+(*  [Fonc] string_of_dmy_raw : Def.dmy -> string                              *)
+(** [Description] : Renvoie la date dans un format texte brut (analysable)
+    [Args] :
+      - d : date
+    [Retour] :
+      - date
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+let string_of_dmy_raw d =
+  let prec =
+    match d.prec with
+    | About -> "~"
+    | Maybe -> "?"
+    | Before -> "<"
+    | After -> ">"
+    | _ -> ""
+  in
+  let date =
+    Printf.sprintf "%d/%d/%d" d.year d.month d.day
+  in
+  let delta =
+    match d.prec with
+    | OrYear d2 -> Printf.sprintf "|/%d/%d/%d" d2.year2 d2.month2 d2.day2
+    | YearInt d2 -> Printf.sprintf "../%d/%d/%d" d2.year2 d2.month2 d2.day2
+    | _ -> ""
+  in
+  prec ^ "/" ^ date ^ "#" ^ delta
+;;
+(* ************************************************************************** *)
+(*  [Fonc] string_of_date_raw : Def.date -> string                            *)
+(** [Description] : Renvoie la date dans un format texte brut (analysable)
+    [Args] :
+      - d : date
+    [Retour] :
+      - date
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+let string_of_date_raw = function
+    Dgreg (d, _) -> string_of_dmy_raw d
+  | Dtext t -> t
+;;
+
 let gregorian_precision conf d =
   if d.delta = 0 then string_of_dmy conf d
   else
@@ -200,7 +243,43 @@ let string_of_date_and_conv conf d =
           (date, "", Some `hebrew))
   | Dtext t -> ("(" ^ string_with_macros conf [] t ^ ")", "", None)
 ;;
-
+(* Ajout des champs raw *)
+let string_of_date_and_conv_raw conf d =
+  match d with
+  | Dgreg (d, Dgregorian) ->
+      (string_of_dmy conf d, "", Some `gregorian, string_of_dmy_raw d)
+  | Dgreg (dt, Djulian) ->
+      let date_conv =
+        if dt.year < 1582 then "" else gregorian_precision conf dt
+      in
+      let d1 = Calendar.julian_of_gregorian dt in
+      let year_prec =
+        if d1.month > 0 && d1.month < 3 ||
+           d1.month = 3 && d1.day > 0 && d1.day < 25 then
+          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
+        else ""
+      in
+      let date =
+        Date.string_of_dmy conf d1 ^ year_prec ^ " " ^
+          transl_nth conf "gregorian/julian/french/hebrew" 1
+      in
+      (date_conv, date, Some `julian, string_of_dmy_raw dt)
+  | Dgreg (dt, Dfrench) ->
+      let d1 = Calendar.french_of_gregorian dt in
+      let date = string_of_french_dmy conf d1 in
+      (match dt.prec with
+      | Sure -> (gregorian_precision conf dt, date, Some `french, string_of_dmy_raw dt)
+      | About | Before | After | Maybe | OrYear _ | YearInt _ ->
+          (date, "", Some `french, string_of_dmy_raw dt))
+  | Dgreg (d, Dhebrew) ->
+      let d1 = Calendar.hebrew_of_gregorian d in
+      let date = string_of_hebrew_dmy conf d1 in
+      (match d.prec with
+      | Sure -> (gregorian_precision conf d, date, Some `hebrew, string_of_dmy_raw d)
+      | About | Before | After | Maybe | OrYear _ | YearInt _ ->
+          (date, "", Some `hebrew, string_of_dmy_raw d))
+  | Dtext t -> ("(" ^ string_with_macros conf [] t ^ ")", "", None, string_with_macros conf [] t)
+;;
 
 (**/**) (* Affichage nom/prénom *)
 
@@ -385,8 +464,10 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       p = "";
       occ = Int32.of_int 0;
       birth_short_date = None;
+      birth_date_raw = None;
       birth_place = None;
       death_short_date = None;
+      death_date_raw = None;
       death_place = None;
       image = None;
       sosa = `no_sosa;
@@ -420,12 +501,17 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       if not p_auth && (is_hide_names conf p) then ("x", "x")
       else person_firstname_surname_txt conf base p
     in
-    let (birth_short, birth_place, death_short, death_place) =
+    let (birth_short, birth_raw, birth_place, death_short, death_raw, death_place) =
       if p_auth then
-        let (birth, death, _) = Date.get_birth_death_date p in
+        let (birth_date, death_date, _) = Date.get_birth_death_date p in
         let birth =
-          match birth with
+          match birth_date with
           | Some d -> Date.string_slash_of_date conf d
+          | None -> ""
+        in
+        let birth_raw =
+          match birth_date with
+          | Some d -> string_of_date_raw d
           | None -> ""
         in
         let birth_place =
@@ -436,8 +522,13 @@ let pers_to_piqi_simple_person conf base p base_prefix =
             Util.string_of_place conf baptism_place
         in
         let death =
-          match death with
+          match death_date with
           | Some d -> Date.string_slash_of_date conf d
+          | None -> ""
+        in
+        let death_raw =
+          match death_date with
+          | Some d -> string_of_date_raw d
           | None -> ""
         in
         let death_place =
@@ -447,8 +538,8 @@ let pers_to_piqi_simple_person conf base p base_prefix =
             let burial_place = sou base (get_burial_place p) in
             Util.string_of_place conf burial_place
         in
-        (birth, birth_place, death, death_place)
-      else ("", "", "", "")
+        (birth, birth_raw, birth_place, death, death_raw, death_place)
+      else ("", "", "", "", "", "")
     in
     let image =
       if not conf.no_image && p_auth then
@@ -469,8 +560,10 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       p = fn;
       occ = occ;
       birth_short_date = if birth_short = "" then None else Some birth_short;
+      birth_date_raw = if birth_raw = "" then None else Some birth_raw;
       birth_place = if birth_place = "" then None else Some birth_place;
       death_short_date = if death_short = "" then None else Some death_short;
+      death_date_raw = if death_raw = "" then None else Some death_raw;
       death_place = if death_place = "" then None else Some death_place;
       image = if image = "" then None else Some image;
       sosa = sosa;
@@ -498,10 +591,10 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
   let m_auth = true in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let index = Int32.of_int (Adef.int_of_ifam gen_f.fam_index) in
-  let (marriage_date, marriage_date_conv, marriage_cal) =
+  let (marriage_date, marriage_date_conv, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_codate gen_f.marriage) with
-    | (true, Some d) -> string_of_date_and_conv conf d
-    | _ -> ("", "", None)
+    | (true, Some d) -> string_of_date_and_conv_raw conf d
+    | _ -> ("", "", None, "")
   in
   let marriage_place =
     if m_auth then Util.string_of_place conf gen_f.marriage_place else ""
@@ -516,18 +609,18 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
   in
-  let (divorce_type, divorce_date, divorce_date_conv, divorce_cal) =
+  let (divorce_type, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
     match gen_f.divorce with
-    | NotDivorced -> (`not_divorced, "", "", None)
+    | NotDivorced -> (`not_divorced, "", "", None, "")
     | Divorced cod ->
         (match Adef.od_of_codate cod with
          | Some d when m_auth ->
-             let (divorce_date, divorce_date_conv, divorce_cal) =
-               string_of_date_and_conv conf d
+             let (divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
+               string_of_date_and_conv_raw conf d
              in
-             (`divorced, divorce_date, divorce_date_conv, divorce_cal)
-         | _ -> (`divorced, "", "", None))
-    | Separated -> (`separated, "", "", None)
+             (`divorced, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw)
+         | _ -> (`divorced, "", "", None, ""))
+    | Separated -> (`separated, "", "", None, "")
   in
   let witnesses =
     List.map
@@ -581,6 +674,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     index = index;
     spouse = spouse;
     marriage_date = if marriage_date = "" then None else Some marriage_date;
+    marriage_date_raw = if marriage_date_raw = "" then None else Some marriage_date_raw;
     marriage_date_conv =
       if marriage_date_conv = "" then None else Some marriage_date_conv;
     marriage_date_cal = marriage_cal;
@@ -589,6 +683,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     marriage_type = marriage_type;
     divorce_type = divorce_type;
     divorce_date = if divorce_date = "" then None else Some divorce_date;
+    divorce_date_raw = if divorce_date_raw = "" then None else Some divorce_date_raw;
     divorce_date_conv =
       if divorce_date_conv = "" then None else Some divorce_date_conv;
     divorce_date_cal = divorce_cal;
@@ -626,10 +721,10 @@ let fam_to_piqi_family conf base p ifam =
   in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let index = Int32.of_int (Adef.int_of_ifam gen_f.fam_index) in
-  let (marriage_date, marriage_date_conv, marriage_cal) =
+  let (marriage_date, marriage_date_conv, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_codate gen_f.marriage) with
-    | (true, Some d) -> string_of_date_and_conv conf d
-    | _ -> ("", "", None)
+    | (true, Some d) -> string_of_date_and_conv_raw conf d
+    | _ -> ("", "", None, "")
   in
   let marriage_place =
     if m_auth then Util.string_of_place conf gen_f.marriage_place else ""
@@ -644,18 +739,18 @@ let fam_to_piqi_family conf base p ifam =
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
   in
-  let (divorce_type, divorce_date, divorce_date_conv, divorce_cal) =
+  let (divorce_type, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
     match gen_f.divorce with
-    | NotDivorced -> (`not_divorced, "", "", None)
+    | NotDivorced -> (`not_divorced, "", "", None, "")
     | Divorced cod ->
         (match Adef.od_of_codate cod with
          | Some d when m_auth ->
-             let (divorce_date, divorce_date_conv, divorce_cal) =
-               string_of_date_and_conv conf d
+             let (divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
+               string_of_date_and_conv_raw conf d
              in
-             (`divorced, divorce_date, divorce_date_conv, divorce_cal)
-         | _ -> (`divorced, "", "", None))
-    | Separated -> (`separated, "", "", None)
+             (`divorced, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw)
+         | _ -> (`divorced, "", "", None, ""))
+    | Separated -> (`separated, "", "", None, "")
   in
   let witnesses =
     List.map
@@ -737,6 +832,7 @@ let fam_to_piqi_family conf base p ifam =
     index = index;
     spouse = spouse;
     marriage_date = if marriage_date = "" then None else Some marriage_date;
+    marriage_date_raw = if marriage_date_raw = "" then None else Some marriage_date_raw;
     marriage_date_conv =
       if marriage_date_conv = "" then None else Some marriage_date_conv;
     marriage_date_cal = marriage_cal;
@@ -745,6 +841,7 @@ let fam_to_piqi_family conf base p ifam =
     marriage_type = marriage_type;
     divorce_type = divorce_type;
     divorce_date = if divorce_date = "" then None else Some divorce_date;
+    divorce_date_raw = if divorce_date_raw = "" then None else Some divorce_date_raw;
     divorce_date_conv =
       if divorce_date_conv = "" then None else Some divorce_date_conv;
     divorce_date_cal = divorce_cal;
@@ -785,22 +882,26 @@ let pers_to_piqi_person conf base p =
       surname_aliases = [];
       image = None;
       birth_date = None;
+      birth_date_raw = None;
       birth_date_conv = None;
       birth_date_cal = None;
       birth_place = None;
       birth_src = None;
       baptism_date = None;
+      baptism_date_raw = None;
       baptism_date_conv = None;
       baptism_date_cal = None;
       baptism_place = None;
       baptism_src = None;
       death_date = None;
+      death_date_raw = None;
       death_date_conv = None;
       death_date_cal = None;
       death_place = None;
       death_src = None;
       death_type = `dont_know_if_dead;
       burial_date = None;
+      burial_date_raw = None;
       burial_date_conv = None;
       burial_date_cal = None;
       burial_place = None;
@@ -868,48 +969,48 @@ let pers_to_piqi_person conf base p =
           | None -> ""
       else ""
     in
-    let (birth, birth_conv, birth_cal) =
+    let (birth, birth_conv, birth_cal, birth_date_raw) =
       match (p_auth, Adef.od_of_codate gen_p.birth) with
-      | (true, Some d) -> string_of_date_and_conv conf d
-      | _ -> ("", "", None)
+      | (true, Some d) -> string_of_date_and_conv_raw conf d
+      | _ -> ("", "", None, "")
     in
     let birth_place =
       if p_auth then Util.string_of_place conf gen_p.birth_place else ""
     in
     let birth_src = if p_auth then gen_p.birth_src else "" in
-    let (baptism, baptism_conv, baptism_cal) =
+    let (baptism, baptism_conv, baptism_cal, baptism_date_raw) =
       match (p_auth, Adef.od_of_codate gen_p.baptism) with
-      | (true, Some d) -> string_of_date_and_conv conf d
-      | _ -> ("", "", None)
+      | (true, Some d) -> string_of_date_and_conv_raw conf d
+      | _ -> ("", "", None, "")
     in
     let baptism_place =
       if p_auth then Util.string_of_place conf gen_p.baptism_place else ""
     in
     let baptism_src = if p_auth then gen_p.baptism_src else "" in
-    let (death_type, death, death_conv, death_cal) =
+    let (death_type, death, death_conv, death_cal, death_date_raw) =
       match (p_auth, gen_p.death) with
-      | (true, NotDead) -> (`not_dead, "", "", None)
+      | (true, NotDead) -> (`not_dead, "", "", None, "")
       | (true, Death (_, cd)) ->
           let d = Adef.date_of_cdate cd in
-          let (death, death_conv, death_cal) = string_of_date_and_conv conf d in
-          (`dead, death, death_conv, death_cal)
-      | (true, DeadYoung) -> (`dead_young, "", "", None)
-      | (true, DeadDontKnowWhen) -> (`dead_dont_know_when, "", "", None)
-      | (true, DontKnowIfDead) -> (`dont_know_if_dead, "", "", None)
-      | (true, OfCourseDead) -> (`of_course_dead, "", "", None)
-      | _ -> (`dont_know_if_dead, "", "", None)
+          let (death, death_conv, death_cal, death_date_raw) = string_of_date_and_conv_raw conf d in
+          (`dead, death, death_conv, death_cal, death_date_raw)
+      | (true, DeadYoung) -> (`dead_young, "", "", None, "")
+      | (true, DeadDontKnowWhen) -> (`dead_dont_know_when, "", "", None, "")
+      | (true, DontKnowIfDead) -> (`dont_know_if_dead, "", "", None, "")
+      | (true, OfCourseDead) -> (`of_course_dead, "", "", None, "")
+      | _ -> (`dont_know_if_dead, "", "", None, "")
     in
     let death_place =
       if p_auth then Util.string_of_place conf gen_p.death_place else ""
     in
     let death_src = if p_auth then gen_p.death_src else "" in
-    let (burial, burial_conv, burial_cal) =
+    let (burial, burial_conv, burial_cal, burial_date_raw) =
       match (p_auth, gen_p.burial) with
       | (true, Buried cod) | (true, Cremated cod) ->
           (match Adef.od_of_codate cod with
-          | Some d -> string_of_date_and_conv conf d
-          | _ -> ("", "", None))
-      | _ -> ("", "", None)
+          | Some d -> string_of_date_and_conv_raw conf d
+          | _ -> ("", "", None, ""))
+      | _ -> ("", "", None, "")
     in
     let burial_place =
       if p_auth then Util.string_of_place conf gen_p.burial_place else ""
@@ -947,10 +1048,10 @@ let pers_to_piqi_person conf base p =
               | Perso.Pevent name -> (Util.string_of_pevent_name conf base name, false)
               | Perso.Fevent name -> (Util.string_of_fevent_name conf base name, false)
             in
-            let (date, date_conv, date_cal) =
+            let (date, date_conv, date_cal, date_raw) =
               match Adef.od_of_codate date with
-              | Some d -> string_of_date_and_conv conf d
-              | _ -> ("", "", None)
+              | Some d -> string_of_date_and_conv_raw conf d
+              | _ -> ("", "", None, "")
             in
             let place = Util.string_of_place conf (sou base place) in
             let note =
@@ -1015,6 +1116,7 @@ let pers_to_piqi_person conf base p =
             Mread.Event.({
               name = name;
               date = if date = "" then None else Some date;
+              date_raw = if date_raw = "" then None else Some date_raw;
               date_conv = if date_conv = "" then None else Some date_conv;
               date_cal = date_cal;
               place = if place = "" then None else Some place;
@@ -1459,22 +1561,26 @@ let pers_to_piqi_person conf base p =
       surname_aliases = surname_aliases;
       image = if image = "" then None else Some image;
       birth_date = if birth = "" then None else Some birth;
+      birth_date_raw = if birth_date_raw = "" then None else Some birth_date_raw;
       birth_date_conv = if birth_conv = "" then None else Some birth_conv;
       birth_date_cal = birth_cal;
       birth_place = if birth_place = "" then None else Some birth_place;
       birth_src = if birth_src = "" then None else Some birth_src;
       baptism_date = if baptism = "" then None else Some baptism;
+      baptism_date_raw = if baptism_date_raw = "" then None else Some baptism_date_raw;
       baptism_date_conv = if baptism_conv = "" then None else Some baptism_conv;
       baptism_date_cal = baptism_cal;
       baptism_place = if baptism_place = "" then None else Some baptism_place;
       baptism_src = if baptism_src = "" then None else Some baptism_src;
       death_date = if death = "" then None else Some death;
+      death_date_raw = if death_date_raw = "" then None else Some death_date_raw;
       death_date_conv = if death_conv = "" then None else Some death_conv;
       death_date_cal = death_cal;
       death_place = if death_place = "" then None else Some death_place;
       death_src = if death_src = "" then None else Some death_src;
       death_type = death_type;
       burial_date = if burial = "" then None else Some burial;
+      burial_date_raw = if burial_date_raw = "" then None else Some burial_date_raw;
       burial_date_conv = if burial_conv = "" then None else Some burial_conv;
       burial_date_cal = burial_cal;
       burial_place = if burial_place = "" then None else Some burial_place;

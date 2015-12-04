@@ -94,6 +94,7 @@ message WitnessEvent {
 message Event {
   required string name = 1;
   optional string date = 2;
+  optional string date_raw = 11;
   optional string date_conv = 3;
   optional Calendar date_cal = 4;
   optional string place = 5;
@@ -128,8 +129,10 @@ message SimplePerson {
   required string p = 6;
   required int32 occ = 7;
   optional string birth_short_date = 8;
+  optional string birth_date_raw = 15;
   optional string birth_place = 9;
   optional string death_short_date = 10;
+  optional string death_date_raw = 16;
   optional string death_place = 11;
   optional string image = 12;
   required Sosa sosa = 13;
@@ -164,20 +167,24 @@ message Person {
   optional string birth_date = 14;
   optional string birth_date_conv = 15;
   optional Calendar birth_date_cal = 16;
+  optional string birth_date_raw = 48;
   optional string birth_place = 17;
   optional string birth_src = 18;
   optional string baptism_date = 19;
+  optional string baptism_date_raw = 49;
   optional string baptism_date_conv = 20;
   optional Calendar baptism_date_cal = 21;
   optional string baptism_place = 22;
   optional string baptism_src = 23;
   optional string death_date = 24;
+  optional string death_date_raw = 50;
   optional string death_date_conv = 25;
   optional Calendar death_date_cal = 26;
   optional string death_place = 27;
   optional string death_src = 28;
   required DeathType death_type = 29;
   optional string burial_date = 30;
+  optional string burial_date_raw = 51;
   optional string burial_date_conv = 31;
   optional Calendar burial_date_cal = 32;
   optional string burial_place = 33;
@@ -201,6 +208,7 @@ message Family {
   required int32 index = 1;
   required SimplePerson spouse = 2;
   optional string marriage_date = 3;
+  optional string marriage_date_raw = 17;
   optional string marriage_date_conv = 4;
   optional Calendar marriage_date_cal = 5;
   optional string marriage_place = 6;
@@ -208,6 +216,7 @@ message Family {
   required MarriageType marriage_type = 8;
   required DivorceType divorce_type = 9;
   optional string divorce_date = 10;
+  optional string divorce_date_raw = 18;
   optional string divorce_date_conv = 11;
   optional Calendar divorce_date_cal = 12;
   repeated SimplePerson witnesses = 13;
