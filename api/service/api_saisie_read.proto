@@ -200,6 +200,7 @@ message Person {
   optional SimplePerson mother = 43;
   repeated Family families = 44;
   required Sosa sosa = 45;
+  optional string sosa_nb = 52;
   repeated Event events = 46;
   repeated EventWitness events_witnesses = 47;
 }
