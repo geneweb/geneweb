@@ -917,6 +917,7 @@ let pers_to_piqi_person conf base p =
       mother = None;
       families = [];
       sosa = `no_sosa;
+      sosa_nb = None;
       events = [];
       events_witnesses = [];
     })
@@ -931,11 +932,11 @@ let pers_to_piqi_person conf base p =
       | Female -> `female
       | Neuter -> `unknown
     in
-    let sosa =
+    let (sosa, sosa_nb) =
       let sosa_nb = Perso.get_sosa_person conf base p in
-      if Num.eq sosa_nb Num.zero then `no_sosa
-      else if Num.eq sosa_nb Num.one then `sosa_ref
-      else `sosa
+      if Num.eq sosa_nb Num.zero then (`no_sosa, None)
+      else if Num.eq sosa_nb Num.one then (`sosa_ref, Some (Num.to_string sosa_nb))
+      else (`sosa, Some (Num.to_string sosa_nb))
     in
     let sn =
       if (is_hide_names conf p) && not p_auth then ""
@@ -1596,6 +1597,7 @@ let pers_to_piqi_person conf base p =
       mother = mother;
       families = families;
       sosa = sosa;
+      sosa_nb = sosa_nb;
       events = events;
       events_witnesses = events_witnesses;
     })
