@@ -50,6 +50,7 @@ value nobility_titles_list :
        list (option Adef.date * option Adef.date));
 
 value has_history : config -> base -> person -> bool -> bool;
+value has_possible_duplications : config -> base -> person -> bool;
 
 value string_of_title :
   config -> base -> string -> person ->

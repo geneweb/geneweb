@@ -205,6 +205,7 @@ message Person {
   repeated Event events = 46;
   repeated EventWitness events_witnesses = 47;
   required bool has_history = 54;
+  required bool has_possible_duplications = 55;
 }
 
 message Family {
