@@ -923,6 +923,7 @@ let pers_to_piqi_person conf base p =
       events_witnesses = [];
       has_history = false;
       has_possible_duplications = false;
+      ref_index = None;
     })
   else
     let base_prefix = conf.command in
@@ -940,6 +941,14 @@ let pers_to_piqi_person conf base p =
       if Num.eq sosa_nb Num.zero then (`no_sosa, None)
       else if Num.eq sosa_nb Num.one then (`sosa_ref, Some (Num.to_string sosa_nb))
       else (`sosa, Some (Num.to_string sosa_nb))
+    in
+    let ref_index =
+      let sosa_nb = Perso.get_sosa_person conf base p in
+      if Num.gt sosa_nb Num.zero then
+        match Util.find_sosa_ref conf base with
+          | Some ref -> Some (Int32.of_int (Adef.int_of_iper (get_key_index ref)))
+          | None -> None
+      else None
     in
     let sn =
       if (is_hide_names conf p) && not p_auth then ""
@@ -1612,6 +1621,7 @@ let pers_to_piqi_person conf base p =
       events_witnesses = events_witnesses;
       has_history = has_history;
       has_possible_duplications = has_possible_duplications;
+      ref_index = ref_index;
     })
 ;;
 
