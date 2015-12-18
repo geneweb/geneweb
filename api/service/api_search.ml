@@ -86,42 +86,82 @@ let name_key_compatible base s =
 ;;
 
 
-let select_both_start_with conf base ini_n ini_p need_whole_list =
-  let ini_n = name_key_compatible base ini_n in
-  let name = persons_of_surname base in
-  let list_maj =
-    let start_n = Mutil.tr '_' ' ' ini_n in
-    let letter = String.uppercase (String.sub start_n 0 1) in
+(* ************************************************************************** *)
+(*  [Fonc] get_list_of_select_start_with :
+    config -> base -> bool -> string -> bool -> name -> letter                *)
+(** [Description] : Fonction qui scanne l'ensemble des noms de la base
+    pour une lettre donnée et retourne une liste de personne.
+    [Args] :
+      - conf            : configuration de la base
+      - base            : base de donnée
+      - is_surnames     : si True recherche sur les noms de famille
+      - ini_p           : début du nom
+      - ini_n           : début du prénom
+      - need_whole_list : si True, remonte tout
+      - letter          : la première lettre des noms/prénoms concernés
+    [Retour] :
+      - ListPersons : Retourne une liste de personnes.
+                                                                              *)
+(* ************************************************************************** *)
+let get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter =
+    let name =
+    (* Si le nom est défini, on parcourt un tableau de noms *)
+    if "" <> ini_n
+    then
+        persons_of_surname base
+    else
+        (* Sinon, on parcourt un tableau de prénoms *)
+        persons_of_first_name base
+    in
     match
+      (* Itère sur chaque entrée du tableau qui commence par la lettre letter *)
       try Some (spi_first name letter) with
+        (* Retourne None si rien trouvé, qui deviendra une sortie [] lors du with *)
         Not_found -> None
     with
-     | Some istr_n ->
-        let rec loop istr_n list =
-          let s = Mutil.nominative (sou base istr_n) in
+     | Some istr ->
+        let rec loop istr list =
+          let s = Mutil.nominative (sou base istr) in
           let k = name_key_compatible base s in
-          if (String.sub k 0 1) = letter then
-            if string_start_with (Name.lower ini_n) (Name.lower k) then
+            (* Vérifie que le début du nom de famille de la personne correspond à celui demandé *)
+            if "" = ini_n || string_start_with (Name.lower ini_n) (Name.lower k) then
               let list =
                 if s <> "?" then
-                  let my_list = spi_find name istr_n in
+                  let my_list = spi_find name istr in
                   let my_list =
                     List.fold_left
-                      (fun l ip ->
-                        if is_patched_person base ip then
-                          let p = poi base ip in
-                          let isn = get_surname p in
-                          let isp = sou base (get_first_name p) in
-                          if (eq_istr isn istr_n) &&
-                            (string_start_with (Name.lower ini_p) (Name.lower isp))
-                          then (ip :: l) else l
+                     (fun l ip ->
+                        let p = poi base ip in
+                        let isn = get_surname p in
+                        if "" <> ini_n
+                        then
+                            if eq_istr isn istr then
+                                if "" <> ini_p
+                                then
+                                    let isp = sou base (get_first_name p) in
+                                    if eq_istr isn istr && string_start_with (Name.lower ini_p) (Name.lower isp)
+                                    then
+                                        (* Prénom===Prénom && Nom===Nom *)
+                                        (ip :: l)
+                                    else l
+                                else
+                                    (* Prénom===* && Nom===Nom *)
+                                    (ip :: l)
+                            else l
                         else
-                          let p = poi base ip in
-                          let isp = sou base (get_first_name p) in
-                          if string_start_with (Name.lower ini_p) (Name.lower isp) then
-                            (ip :: l)
-                          else  l )
-                      [] my_list
+                            if "" <> ini_p
+                            then
+                                let isp = sou base (get_first_name p) in
+                                if string_start_with (Name.lower ini_p) (Name.lower isp)
+                                then
+                                    (* Prénom===Prénom && Nom===* *)
+                                    (ip :: l)
+                                else l
+                            else
+                                (* Prénom===* && Nom===* *)
+                                (ip :: l)
+                        )
+                     [] my_list
                   in
                   let my_list =
                     if conf.use_restrict then
@@ -132,88 +172,62 @@ let select_both_start_with conf base ini_n ini_p need_whole_list =
                         [] my_list
                     else my_list
                   in
+                  (* Ajoute à list les personnes trouvées *)
                   List.rev_append my_list list
+                (* Sort totalement de l'itération puisque les personnes ne sont plus définies *)
                 else list
               in
               match
-                try Some (spi_next name istr_n need_whole_list) with
+                (* Passe à la personne suivante *)
+                try Some (spi_next name istr need_whole_list) with
                   Not_found -> None
               with
-               | Some (istr_n, _) -> loop istr_n list
+               | Some (istr, _) -> loop istr list
                | None -> list
             else
               match
-                try Some (spi_next name istr_n need_whole_list) with
+                (* Passe à la personne suivante *)
+                try Some (spi_next name istr need_whole_list) with
                   Not_found -> None
               with
-               | Some (istr_n, _) -> loop istr_n list
+               | Some (istr, _) -> loop istr list
                | None -> list
-          else list
-        in loop istr_n []
+        (* Première itération, on initialise au passage list comme tableau vide *)
+        in loop istr []
     | None -> []
+;;
+
+(* ************************************************************************** *)
+(*  [Fonc] select_start_with :
+    config -> base -> string -> string -> bool                                  *)
+(** [Description] : Retourne une liste de personne dont le nom OU le prénom
+    commence par 'ini_n' ou 'ini_p'.
+    [Args] :
+      - conf            : configuration de la base
+      - base            : base de donnée
+      - ini_n           : début du nom à chercher
+      - ini_p           : début du nom à chercher
+      - need_whole_list : si True, remonte tout
+    [Retour] :
+      - ListPersons : Retourne une liste de personnes.
+                                                                              *)
+(* ************************************************************************** *)
+let select_start_with conf base ini_n ini_p need_whole_list =
+  let ini_n = name_key_compatible base ini_n in
+  let start =
+    if ini_n <> ""
+    then
+      Mutil.tr '_' ' ' ini_n
+    else
+      Mutil.tr '_' ' ' ini_p
   in
   let list_min =
-    let start_n = Mutil.tr '_' ' ' ini_n in
-    let letter = String.lowercase (String.sub start_n 0 1) in
-    match
-      try Some (spi_first name letter) with
-        Not_found -> None
-    with
-     | Some istr_n ->
-        let rec loop istr_n list =
-          let s = Mutil.nominative (sou base istr_n) in
-          let k = name_key_compatible base s in
-          if (String.sub k 0 1) = letter then
-            if string_start_with (Name.lower ini_n) (Name.lower k) then
-              let list =
-                if s <> "?" then
-                  let my_list = spi_find name istr_n in
-                  let my_list =
-                    List.fold_left
-                      (fun l ip ->
-                        if is_patched_person base ip then
-                          let p = poi base ip in
-                          let isn = get_surname p in
-                          let isp = sou base (get_first_name p) in
-                          if (eq_istr isn istr_n) &&
-                            (string_start_with (Name.lower ini_p) (Name.lower isp))
-                          then (ip :: l) else l
-                        else
-                          let p = poi base ip in
-                          let isp = sou base (get_first_name p) in
-                          if string_start_with (Name.lower ini_p) (Name.lower isp) then
-                            (ip :: l)
-                          else  l )
-                      [] my_list
-                  in
-                  let my_list =
-                    if conf.use_restrict then
-                      List.fold_left
-                        (fun l ip ->
-                          if is_restricted conf base ip then l
-                          else (ip :: l) )
-                        [] my_list
-                    else my_list
-                  in
-                  List.rev_append my_list list
-                else list
-              in
-              match
-                try Some (spi_next name istr_n need_whole_list) with
-                  Not_found -> None
-              with
-               | Some (istr_n, _) -> loop istr_n list
-               | None -> list
-            else
-              match
-                try Some (spi_next name istr_n need_whole_list) with
-                 Not_found -> None
-              with
-               | Some (istr_n, _) -> loop istr_n list
-               | None -> list
-          else list
-        in loop istr_n []
-    | None -> []
+    let letter = String.lowercase (String.sub start 0 1) in
+    get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter
+  in
+  let list_maj =
+    let letter = String.uppercase (String.sub start 0 1) in
+    get_list_of_select_start_with conf base ini_n ini_p need_whole_list letter
   in
   List.rev_append list_maj list_min
 ;;
@@ -308,136 +322,6 @@ let select_both_all conf base ini_n ini_p need_whole_list maiden_name =
   !list
 ;;
 
-
-let select_start_with conf base is_surnames ini need_whole_list =
-  let ini =
-    if is_surnames then name_key_compatible base ini
-    else ini
-  in
-  let name =
-    if is_surnames then persons_of_surname base
-    else persons_of_first_name base
-  in
-  let list_maj =
-    let start_k = Mutil.tr '_' ' ' ini  in
-    let letter = String.uppercase (String.sub start_k 0 1) in
-    match
-      try Some (spi_first name letter) with
-       Not_found -> None
-    with
-     | Some istr ->
-        let rec loop istr list =
-          let s = (sou base istr) in
-          let k = (name_key_compatible base s) in
-          if (String.sub k 0 1) = letter then
-            if string_start_with (Name.lower ini) (Name.lower k) then
-              let list =
-                if s <> "?" then
-                  let my_list = spi_find name istr in
-                  let my_list =
-                    List.fold_left
-                      (fun l ip ->
-                        if is_patched_person base ip then
-                          let p = poi base ip in
-                          let isn =
-                            if is_surnames then get_surname p
-                            else get_first_name p
-                          in
-                          if eq_istr isn istr then (ip :: l) else l
-                        else (ip :: l) )
-                      [] my_list
-                  in
-                  let my_list =
-                    if conf.use_restrict then
-                      List.fold_left
-                        (fun l ip ->
-                          if is_restricted conf base ip then l
-                          else (ip :: l) )
-                        [] my_list
-                    else my_list
-                  in
-                  List.rev_append my_list list
-                else list
-              in
-              match
-                try Some (spi_next name istr need_whole_list) with
-                 Not_found -> None
-              with
-               | Some (istr, dlen) -> loop istr list
-               | None -> list
-            else
-              match
-                try Some (spi_next name istr need_whole_list) with
-                 Not_found -> None
-              with
-               | Some (istr, dlen) -> loop istr list
-               | None -> list
-          else list
-        in loop istr []
-     | None -> []
-  in
-  let list_min =
-    let start_k = Mutil.tr '_' ' ' ini  in
-    let letter = String.lowercase (String.sub start_k 0 1) in
-    match
-      try Some (spi_first name letter) with
-       Not_found -> None
-    with
-     | Some istr ->
-        let rec loop istr list =
-          let s =  (sou base istr) in
-          let k =  (name_key_compatible base s) in
-          if (String.sub k 0 1) = letter then
-            if string_start_with (Name.lower ini) (Name.lower k) then
-              let list =
-                if s <> "?" then
-                  let my_list = spi_find name istr in
-                  let my_list =
-                    List.fold_left
-                      (fun l ip ->
-                        if is_patched_person base ip then
-                          let p = poi base ip in
-                          let isn =
-                            if is_surnames then get_surname p
-                            else get_first_name p
-                          in
-                          if eq_istr isn istr then (ip :: l) else l
-                        else (ip :: l) )
-                      [] my_list
-                  in
-                  let my_list =
-                    if conf.use_restrict then
-                      List.fold_left
-                        (fun l ip ->
-                          if is_restricted conf base ip then l
-                          else (ip :: l) )
-                        [] my_list
-                    else my_list
-                  in
-                  List.rev_append my_list list
-                else list
-              in
-              match
-                try Some (spi_next name istr need_whole_list) with
-                  Not_found -> None
-              with
-               | Some (istr, dlen) -> loop istr list
-               | None -> list
-            else
-              match
-                try Some (spi_next name istr need_whole_list) with
-                  Not_found -> None
-              with
-               | Some (istr, dlen) -> loop istr list
-               | None -> list
-          else list
-        in loop istr []
-     | None -> []
-  in
-  List.rev_append list_maj list_min
-;;
-
-
 let select_all conf base is_surnames ini =
   let find p x =
     if is_surnames then kmp x (sou base (get_surname p))
@@ -509,7 +393,7 @@ let print_list conf base filters list =
    La différence entre la recherche approximative et lastname_or_surname est
    si on cherche un nom ET un prénom (dans les autres cas, on obtient les
    mêmes résultats.
-   De se fait, on utilise list_n = select_all n, list_p = select_all p et on
+   De ce fait, on utilise list_n = select_all n, list_p = select_all p et on
    fait l'union des deux ce qui est beaucoup plus efficace.
 *)
 let print_search conf base =
@@ -527,7 +411,7 @@ let print_search conf base =
         else
           let maiden_name = search_params.M.Search_params.maiden_name in
           match search_params.M.Search_params.search_type with
-          | `starting_with -> select_both_start_with conf base n fs true
+          | `starting_with -> select_start_with conf base n fs true
           | `approximative -> select_both_all conf base n fs true maiden_name
           | `lastname_or_firstname ->
                let list_n = select_all conf base true n in
@@ -542,7 +426,7 @@ let print_search conf base =
           []
         else
           match search_params.M.Search_params.search_type with
-          | `starting_with -> select_start_with conf base true n true
+          | `starting_with -> select_start_with conf base n "" true
           | `approximative -> select_all conf base true n
           | `lastname_or_firstname -> select_all conf base true n
       in
@@ -554,7 +438,7 @@ let print_search conf base =
           []
         else
           match search_params.M.Search_params.search_type with
-          | `starting_with -> select_start_with conf base false fs true
+          | `starting_with -> select_start_with conf base "" fs true
           | `approximative -> select_all conf base false fs
           | `lastname_or_firstname -> select_all conf base false fs
       in
