@@ -243,7 +243,9 @@ let string_of_date_and_conv conf d =
           (date, "", Some `hebrew))
   | Dtext t -> ("(" ^ string_with_macros conf [] t ^ ")", "", None)
 ;;
-(* Ajout des champs raw *)
+(* Ajout des champs raw
+let (birth, birth_conv, birth_cal, birth_date_raw) =
+ *)
 let string_of_date_and_conv_raw conf d =
   match d with
   | Dgreg (d, Dgregorian) ->
@@ -270,7 +272,7 @@ let string_of_date_and_conv_raw conf d =
       (match dt.prec with
       | Sure -> (gregorian_precision conf dt, date, Some `french, string_of_dmy_raw dt)
       | About | Before | After | Maybe | OrYear _ | YearInt _ ->
-          (date, "", Some `french, string_of_dmy_raw dt))
+          (Date.string_of_ondate conf d, "", Some `french, string_of_dmy_raw dt))
   | Dgreg (d, Dhebrew) ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let date = string_of_hebrew_dmy conf d1 in
@@ -983,6 +985,8 @@ let pers_to_piqi_person conf base p =
           | None -> ""
       else ""
     in
+    (* Date.string_of_ondate conf Adef.od_of_codate (get_birth p)
+    Date.string_of_ondate d *)
     let (birth, birth_conv, birth_cal, birth_date_raw) =
       match (p_auth, Adef.od_of_codate gen_p.birth) with
       | (true, Some d) -> string_of_date_and_conv_raw conf d
