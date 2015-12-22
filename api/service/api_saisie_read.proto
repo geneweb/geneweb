@@ -53,6 +53,12 @@ enum DeathType {
   OF_COURSE_DEAD = 5;
 }
 
+enum BurialType {
+  DONT_KNOW = 0;
+  BURIED = 1;
+  CREMATED = 2;
+}
+
 enum MarriageType {
   MARRIED = 0;
   NOT_MARRIED = 1;
@@ -186,6 +192,7 @@ message Person {
   optional string burial_date = 30;
   optional string burial_date_raw = 51;
   optional string burial_date_conv = 31;
+  required BurialType burial_type = 57;
   optional Calendar burial_date_cal = 32;
   optional string burial_place = 33;
   optional string burial_src = 34;

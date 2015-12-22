@@ -906,6 +906,7 @@ let pers_to_piqi_person conf base p =
       burial_date_cal = None;
       burial_place = None;
       burial_src = None;
+      burial_type = `dont_know;
       occupation = None;
       notes = None;
       psources = None;
@@ -1017,6 +1018,14 @@ let pers_to_piqi_person conf base p =
       if p_auth then Util.string_of_place conf gen_p.death_place else ""
     in
     let death_src = if p_auth then gen_p.death_src else "" in
+    let burial_type =
+        if p_auth then
+        match (gen_p.burial) with
+          | Buried cod -> `buried
+          | Cremated cod -> `cremated
+          | _ -> `dont_know
+        else  `dont_know
+    in
     let (burial, burial_conv, burial_cal, burial_date_raw) =
       match (p_auth, gen_p.burial) with
       | (true, Buried cod) | (true, Cremated cod) ->
@@ -1604,6 +1613,7 @@ let pers_to_piqi_person conf base p =
       burial_date_cal = burial_cal;
       burial_place = if burial_place = "" then None else Some burial_place;
       burial_src = if burial_src = "" then None else Some burial_src;
+      burial_type = burial_type;
       occupation = if occupation = "" then None else Some occupation;
       notes = if notes = "" then None else Some notes;
       psources = if psources = "" then None else Some psources;

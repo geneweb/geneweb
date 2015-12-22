@@ -30,6 +30,7 @@ let _calendar_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/calendar"
 let _precision_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/precision"
 let _sex_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/sex"
 let _death_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/death-type"
+let _burial_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/burial-type"
 let _marriage_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/marriage-type"
 let _divorce_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/divorce-type"
 let _relation_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/relation-type"
@@ -166,6 +167,11 @@ let parse_death_type ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _death_type_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
   Api_saisie_read_piqi.parse_death_type buf
+
+let parse_burial_type ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _burial_type_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_burial_type buf
 
 let parse_marriage_type ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _marriage_type_piqi_type format `pb x ?opts in
@@ -323,6 +329,11 @@ let gen_death_type ?opts x (format :Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _death_type_piqi_type `pb format x_pb ?opts
 
+let gen_burial_type ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_burial_type x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _burial_type_piqi_type `pb format x_pb ?opts
+
 let gen_marriage_type ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_saisie_read_piqi.gen_marriage_type x in
   let x_pb = Piqirun.to_string buf in
@@ -478,6 +489,11 @@ let print_death_type ?opts x =
   Pervasives.print_endline (gen_death_type x `piq ?opts)
 let prerr_death_type ?opts x =
   Pervasives.prerr_endline (gen_death_type x `piq ?opts)
+
+let print_burial_type ?opts x =
+  Pervasives.print_endline (gen_burial_type x `piq ?opts)
+let prerr_burial_type ?opts x =
+  Pervasives.prerr_endline (gen_burial_type x `piq ?opts)
 
 let print_marriage_type ?opts x =
   Pervasives.print_endline (gen_marriage_type x `piq ?opts)
