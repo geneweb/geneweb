@@ -266,7 +266,7 @@ let string_of_date_and_conv_raw conf d =
       (date_conv, date, Some `julian, string_of_dmy_raw dt)
   | Dgreg (dt, Dfrench) ->
       let d1 = Calendar.french_of_gregorian dt in
-      let date = string_of_french_dmy conf d1 in
+      let date = Date.string_of_on_french_dmy conf d1 in
       (match dt.prec with
       | Sure -> (gregorian_precision conf dt, date, Some `french, string_of_dmy_raw dt)
       | About | Before | After | Maybe | OrYear _ | YearInt _ ->
