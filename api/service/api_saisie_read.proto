@@ -214,6 +214,11 @@ message Person {
   required bool has_history = 54;
   required bool has_possible_duplications = 55;
   optional int32 ref_index = 56;
+  required string linked_page_biblio = 58;
+  required string linked_page_bnote = 59;
+  required string linked_page_death = 60;
+  required string linked_page_head = 61;
+  required string linked_page_occu = 62;
 }
 
 message Family {

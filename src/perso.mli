@@ -22,6 +22,7 @@ value get_single_sosa : config -> base -> person -> Num.t;
 value print_sosa : config -> base -> person -> bool -> unit;
 
 value string_of_num : string -> Num.t -> string;
+value get_linked_page : config -> base -> person -> string -> string;
 
 (**)
 

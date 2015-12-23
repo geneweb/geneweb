@@ -1677,6 +1677,30 @@ value get_sosa conf base env r p =
     } ]
 ;
 
+(* ************************************************************************** *)
+(*  [Fonc] get_linked_page : config -> base -> person -> string -> string     *)
+(** [Description] : Permet de récupérer un lien de la chronique familiale.
+    [Args] :
+      - conf : configuration
+      - base : base de donnée
+      - p    : person
+      - s    : nom du lien (eg. "HEAD", "OCCU", "BIBLIO", "BNOTE", "DEATH")
+    [Retour] : string : "<a href="xxx">description du lien</a>"
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
+value get_linked_page conf base p s =
+    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let fname = Filename.concat bdir "notes_links" in
+    let db = NotesLinks.read_db_from_file fname in
+    let db = Notes.merge_possible_aliases conf db in
+    let key =
+        let fn = Name.lower (sou base (get_first_name p)) in
+        let sn = Name.lower (sou base (get_surname p)) in
+        (fn, sn, get_occ p)
+    in
+    List.fold_left (linked_page_text conf base p s key) "" db
+;
+
 value events_list conf base p =
   let pevents =
     if authorized_age conf base p then

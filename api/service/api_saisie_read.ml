@@ -925,6 +925,11 @@ let pers_to_piqi_person conf base p =
       has_history = false;
       has_possible_duplications = false;
       ref_index = None;
+      linked_page_biblio = "";
+      linked_page_bnote = "";
+      linked_page_death = "";
+      linked_page_head = "";
+      linked_page_occu = "";
     })
   else
     let base_prefix = conf.command in
@@ -982,6 +987,22 @@ let pers_to_piqi_person conf base p =
           | Some s -> "1"
           | None -> ""
       else ""
+    in
+    (* Liens de la chronicle familiale *)
+    let linked_page_biblio =
+        Perso.get_linked_page conf base p "BIBLIO"
+    in
+    let linked_page_bnote =
+        Perso.get_linked_page conf base p "BNOTE"
+    in
+    let linked_page_death =
+        Perso.get_linked_page conf base p "DEATH"
+    in
+    let linked_page_head =
+        Perso.get_linked_page conf base p "HEAD"
+    in
+    let linked_page_occu =
+        Perso.get_linked_page conf base p "OCCU"
     in
     let (birth, birth_conv, birth_cal, birth_date_raw) =
       match (p_auth, Adef.od_of_codate gen_p.birth) with
@@ -1632,6 +1653,11 @@ let pers_to_piqi_person conf base p =
       has_history = has_history;
       has_possible_duplications = has_possible_duplications;
       ref_index = ref_index;
+      linked_page_biblio = linked_page_biblio;
+      linked_page_bnote = linked_page_bnote;
+      linked_page_death = linked_page_death;
+      linked_page_head = linked_page_head;
+      linked_page_occu = linked_page_occu;
     })
 ;;
 
