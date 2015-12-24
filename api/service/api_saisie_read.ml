@@ -2056,7 +2056,7 @@ let fam_to_piqi_family_tree conf base ifam =
 
 (* Graphe d'ascendance *)
 
-let build_graph_asc_main pers_to_piqi make_node_helper conf base p max_gen =
+let build_graph_asc_main pers_to_piqi make_node_helper full_infos conf base p max_gen =
 (*
   let () = load_ascends_array base in
   let () = load_unions_array base in
@@ -2087,11 +2087,11 @@ let build_graph_asc_main pers_to_piqi make_node_helper conf base p max_gen =
     make_node_helper id p None
   in
   let create_family ifam families =
-    if p_getenv conf.env "full_infos" = Some "1" then
+    if full_infos then
       families := (fam_to_piqi_family_tree conf base ifam) :: !families
   in
   let create_family_link (ifath, imoth) ifam fam families =
-    if p_getenv conf.env "full_infos" = Some "1" then
+    if full_infos then
       families :=
         (fam_to_piqi_family_tree_link conf base (ifath, imoth) ifam fam) :: !families
   in
@@ -2207,7 +2207,7 @@ let build_graph_asc_main pers_to_piqi make_node_helper conf base p max_gen =
 
 (* Graphe de descendance *)
 
-let build_graph_desc_main pers_to_piqi make_node_helper conf base p max_gen =
+let build_graph_desc_main pers_to_piqi make_node_helper use_full_infos conf base p max_gen =
 (*
   let () = load_descends_array base in
   let () = load_unions_array base in
@@ -2239,11 +2239,11 @@ let build_graph_desc_main pers_to_piqi make_node_helper conf base p max_gen =
     make_node_helper id p (Some ifam)
   in
   let create_family ifam families =
-    if p_getenv conf.env "full_infos" = Some "1" then
+    if use_full_infos then
       families := (fam_to_piqi_family_tree conf base ifam) :: !families
   in
   let create_family_link (ifath, imoth) ifam fam families =
-    if p_getenv conf.env "full_infos" = Some "1" then
+    if use_full_infos then
       families :=
         (fam_to_piqi_family_tree_link conf base (ifath, imoth) ifam fam) :: !families
   in
@@ -2510,11 +2510,13 @@ let build_graph_desc_main pers_to_piqi make_node_helper conf base p max_gen =
 
 let make_node_v2 id p ifam = Mread.Node.({ id = id; person = p; ifam = ifam; })
 
-let build_graph_asc_v2 =
-  build_graph_asc_main pers_to_piqi_person_tree make_node_v2
+(* for V2 we don't need full info about families because it is kind of lightweight
+ * and fast algorithm *)
+let build_graph_asc_v2 _use_full_infos =
+  build_graph_asc_main pers_to_piqi_person_tree make_node_v2 false
 
-let build_graph_desc_v2 =
-  build_graph_desc_main pers_to_piqi_person_tree make_node_v2
+let build_graph_desc_v2 _use_full_infos =
+  build_graph_desc_main pers_to_piqi_person_tree make_node_v2 false
 
 (* ********************************************************************* *)
 (*  [Fonc] print_tree_v2 : conf -> base -> todo                          *)
@@ -2538,7 +2540,12 @@ let print_graph_tree_v2 conf base =
   in
   (* cache lien inter arbre *)
   let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let (nodes_asc, edges_asc,_) = build_graph_asc_v2 conf base p nb_asc in
+  let use_full_infos =
+    match p_getenv conf.env "full_infos" with
+    | Some "1" -> true
+    | _ -> false
+  in
+  let (nodes_asc, edges_asc,_) = build_graph_asc_v2 use_full_infos conf base p nb_asc in
   (*
   let nodes_asc =
     List.rev_map
@@ -2559,7 +2566,7 @@ let print_graph_tree_v2 conf base =
     | Some n -> min max_desc (max (Int32.to_int n) 1)
     | None -> max_desc
   in
-  let (nodes_desc, edges_desc,_) = build_graph_desc_v2 conf base p nb_desc in
+  let (nodes_desc, edges_desc,_) = build_graph_desc_v2 use_full_infos conf base p nb_desc in
   let nodes_siblings =
     match get_parents p with
     | Some ifam ->
@@ -2961,9 +2968,14 @@ let print_graph_tree_full conf base =
     | None -> max_asc
   in
   (* cache lien inter arbre *)
+  let use_full_infos =
+    match p_getenv conf.env "full_infos" with
+    | Some "1" -> true
+    | _ -> false
+  in
   let () = Perso_link.init_cache conf base ip 1 1 1 in
   let (nodes_asc, edges_asc, families_asc) =
-    build_graph_asc_full conf base p nb_asc
+    build_graph_asc_full use_full_infos conf base p nb_asc
   in
   (*
   let nodes_asc =
@@ -2986,7 +2998,7 @@ let print_graph_tree_full conf base =
     | None -> max_desc
   in
   let (nodes_desc, edges_desc, families_desc) =
-    build_graph_desc_full conf base p nb_desc
+    build_graph_desc_full use_full_infos conf base p nb_desc
   in
   let nodes_siblings =
     match get_parents p with
