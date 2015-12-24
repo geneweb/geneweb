@@ -83,7 +83,7 @@
   
   <option value="cursive">
   <option value="Comic Sans MS">
-  <option value="Lucida Caligraphy">
+  <option value="Lucida Calligraphy">
   <option value="Monotype Corsiva">
   </datalist>
   <form>

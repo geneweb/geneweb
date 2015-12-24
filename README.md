@@ -45,7 +45,7 @@ make distrib
 
 ### Creating a pull request
 
-Use the bug number/title as the name of pull request. Exemple of
+Use the bug number/title as the name of pull request. Example of
 commit message "PR #XXX: Title of the PR/Bug".
 
 ### Coding style
