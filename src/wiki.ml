@@ -332,7 +332,7 @@ value summary_of_tlsw_lines conf short lines =
       ([], 0, first_cnt, sections_nums) lines
   in
   if cnt <= first_cnt + 2 then
-    (* less that 3 paragraphs : summary abandonned *)
+    (* less that 3 paragraphs : summary abandoned *)
     ([], [])
   else
     let rev_summary =

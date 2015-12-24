@@ -21,7 +21,7 @@
 #		    e. g. 12 for december    (optional)
 # 
 # crontab usage:
-#   put the script in your home path (or whereever your sysadmin
+#   put the script in your home path (or wherever your sysadmin
 #   permitted you to do so) and put the following two lines
 #   (without the  "#", fill in your correct link) into your crontab:
 #
