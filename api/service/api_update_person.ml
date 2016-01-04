@@ -167,7 +167,10 @@ let reconstitute_person conf base mod_p =
                     | Some occ -> Int32.to_int occ
                     | None -> 0
                   in
-                  (Some (fn, sn, occ, Update.Create (sex, None), "", false), None)
+                  let r_parent = Some (fn, sn, occ, Update.Create (sex, None), "", false) in
+                  (match sex with
+                  | Female -> (None, r_parent)
+                  | _ -> (r_parent, None))
               | `create ->
                   let sex =
                     match person.Mwrite.Person_link.sex with
@@ -187,49 +190,24 @@ let reconstitute_person conf base mod_p =
                     if occ = 0 then person.Mwrite.Person_link.occ <- None
                     else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
                   in
-                  (Some (fn, sn, occ, Update.Create (sex, None), "", true), None)
+                  let r_parent = Some (fn, sn, occ, Update.Create (sex, None), "", true) in
+                  (match sex with
+                  | Female -> (None, r_parent)
+                  | _ -> (r_parent, None))
               | `link ->
+                  let ip = Int32.to_int person.Mwrite.Person_link.index in
+                  let p = poi base (Adef.iper_of_int ip) in
+                  let fn = sou base (get_first_name p) in
+                  let sn = sou base (get_surname p) in
+                  let occ =
+                    if fn = "?" || sn = "?" then
+                      Adef.int_of_iper (get_key_index p)
+                    else get_occ p
+                  in
+                  let r_parent = Some (fn, sn, occ, Update.Link, "", false) in
                   (match person.Mwrite.Person_link.sex with
-                   | `male ->
-                       let ip = Int32.to_int person.Mwrite.Person_link.index in
-                       let p = poi base (Adef.iper_of_int ip) in
-                       let fn = sou base (get_first_name p) in
-                       let sn = sou base (get_surname p) in
-                       let occ =
-                         if fn = "?" || sn = "?" then
-                           Adef.int_of_iper (get_key_index p)
-                         else get_occ p
-                       in
-                       (*
-                       let fn = person.Mwrite.Person_link.firstname in
-                       let sn = person.Mwrite.Person_link.lastname in
-                       let occ =
-                         get_occ
-                           (poi base
-                              (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
-                       in
-                       *)
-                       (Some (fn, sn, occ, Update.Link, "", false), None)
-                   | _ ->
-                       let ip = Int32.to_int person.Mwrite.Person_link.index in
-                       let p = poi base (Adef.iper_of_int ip) in
-                       let fn = sou base (get_first_name p) in
-                       let sn = sou base (get_surname p) in
-                       let occ =
-                         if fn = "?" || sn = "?" then
-                           Adef.int_of_iper (get_key_index p)
-                         else get_occ p
-                       in
-                       (*
-                       let fn = person.Mwrite.Person_link.firstname in
-                       let sn = person.Mwrite.Person_link.lastname in
-                       let occ =
-                         get_occ
-                           (poi base
-                              (Adef.iper_of_int (Int32.to_int person.Mwrite.Person_link.index)))
-                       in
-                       *)
-                       (None, Some (fn, sn, occ, Update.Link, "", false)))
+                  | `female -> (None, r_parent)
+                  | _ -> (r_parent, None))
             in
             let r_sources =
               match r.Mwrite.Relation_parent.source with
