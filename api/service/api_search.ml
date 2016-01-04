@@ -75,11 +75,12 @@ let new_name_key base s =
       | [] -> ""
       | x :: _ -> x) parts
   in
-  if part = "" then s
+  let i = String.length part in
+  if part = "" || i > String.length s then s
   else
-    let i = String.length part in
     String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
 ;;
+
 
 let name_key_compatible base s =
   if !Mutil.utf_8_db then new_name_key base s else Mutil.name_key s
