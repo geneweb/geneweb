@@ -182,15 +182,9 @@ type event_name 'string =
 *)
 value compare_event_name name1 name2 =
   match (name1, name2) with
-  [ (Psort (Epers_Name _), e) | (e, Psort (Epers_Name _)) |
-    (Fsort (Efam_Name _), e) | (e, Fsort (Efam_Name _)) when
-      e <> Psort Epers_Birth && e <> Psort Epers_Baptism &&
-      e <> Psort Epers_Death && e <> Psort Epers_Funeral &&
-      e <> Psort Epers_Burial && e <> Psort Epers_Cremation &&
-      e <> Fsort Efam_Engage && e <> Fsort Efam_PACS &&
-      e <> Fsort Efam_MarriageBann && e <> Fsort Efam_MarriageContract &&
-      e <> Fsort Efam_Marriage && e <> Fsort Efam_Separated &&
-      e <> Fsort Efam_Divorce -> 0
+  [ (* Les évènements libres ne sont pas comparés. *)
+    (Psort (Epers_Name _), e) | (e, Psort (Epers_Name _)) |
+    (Fsort (Efam_Name _), e) | (e, Fsort (Efam_Name _)) -> 0
 
   | (Psort Epers_Birth, _) -> -1
   | (_, Psort Epers_Birth) -> 1
