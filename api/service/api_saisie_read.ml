@@ -930,6 +930,7 @@ let pers_to_piqi_person conf base p =
       linked_page_death = "";
       linked_page_head = "";
       linked_page_occu = "";
+      visible_for_visitors = false;
     })
   else
     let base_prefix = conf.command in
@@ -1595,6 +1596,7 @@ let pers_to_piqi_person conf base p =
         families []
     in
     let families = families @ families_link in
+    let visible_for_visitors = is_visible conf base p in
     Mread.Person.({
       index = index;
       sex = sex;
@@ -1658,6 +1660,7 @@ let pers_to_piqi_person conf base p =
       linked_page_death = linked_page_death;
       linked_page_head = linked_page_head;
       linked_page_occu = linked_page_occu;
+      visible_for_visitors = visible_for_visitors;
     })
 ;;
 

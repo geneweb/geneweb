@@ -219,6 +219,7 @@ message Person {
   required string linked_page_death = 60;
   required string linked_page_head = 61;
   required string linked_page_occu = 62;
+  required bool visible_for_visitors = 63;
 }
 
 message Family {
