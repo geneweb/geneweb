@@ -23,6 +23,11 @@ value print_sosa : config -> base -> person -> bool -> unit;
 
 value string_of_num : string -> Num.t -> string;
 value get_linked_page : config -> base -> person -> string -> string;
+value get_birth_text : config -> base -> person -> bool -> string;
+value get_baptism_text : config -> base -> person -> bool -> string;
+value get_death_text : config -> base -> person -> bool -> string;
+value get_burial_text : config -> base -> person -> bool -> string;
+value get_cremation_text : config -> base -> person -> bool -> string;
 
 (**)
 

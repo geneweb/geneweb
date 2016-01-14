@@ -598,6 +598,177 @@ value print_sosa conf base p link =
   else ()
 ;
 
+(* ************************************************************************ *)
+(*  [Fonc] get_death_text : config -> base -> person -> bool -> string      *)
+(** [Description] : Retourne une description de la mort de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_death_text conf base p p_auth =
+  let died =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      match get_death p with
+      [ Death dr _ ->
+          match dr with
+          [ Unspecified -> transl_nth conf "died" is
+          | Murdered -> transl_nth conf "murdered" is
+          | Killed -> transl_nth conf "killed (in action)" is
+          | Executed -> transl_nth conf "executed (legally killed)" is
+          | Disappeared -> transl_nth conf "disappeared" is ]
+      | DeadYoung -> transl_nth conf "died young" is
+      | DeadDontKnowWhen -> transl_nth conf "died" is
+      | _ -> "" ]
+    else ""
+  in
+  let on_death_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match (p_auth, get_death p) with
+          [ (True, Death _ d) ->
+              let d = Adef.date_of_cdate d in
+              match p_getenv conf.base_env "long_date" with
+              [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+              | _ -> Date.string_of_ondate tmp_conf d ]
+          | _ -> "" ]
+  in
+  died ^ " " ^ on_death_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_baptism_text : config -> base -> person -> bool -> string    *)
+(** [Description] : Retourne le texte sur le baptême de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_baptism_text conf base p p_auth =
+  let baptized =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "baptized" is
+    else ""
+  in
+  let on_baptism_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match (p_auth, Adef.od_of_codate (get_baptism p)) with
+      [ (True, Some d) ->
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+          | _ -> Date.string_of_ondate tmp_conf d ]
+      | _ -> "" ]
+  in
+  baptized ^ " " ^ on_baptism_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_birth_text : config -> base -> person -> bool -> string    *)
+(** [Description] : Retourne le texte sur la naissance de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_birth_text conf base p p_auth =
+  let born =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "born" is
+    else ""
+  in
+  let on_birth_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match (p_auth, Adef.od_of_codate (get_birth p)) with
+      [ (True, Some d) ->
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+          | _ -> Date.string_of_ondate tmp_conf d ]
+      | _ -> "" ]
+  in
+  born ^ " " ^ on_birth_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_burial_text : config -> base -> person -> bool -> string     *)
+(** [Description] : Retourne le texte sur l'incinération de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_burial_text conf base p p_auth =
+  let buried =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "buried" is
+    else ""
+  in
+  let on_burial_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match get_burial p with
+      [ Buried cod ->
+        match (p_auth, Adef.od_of_codate cod) with
+        [ (True, Some d) ->
+            match p_getenv conf.base_env "long_date" with
+            [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+            | _ -> Date.string_of_ondate tmp_conf d ]
+        | _ -> "" ]
+      | _ -> "" ]
+  in
+  buried ^ " " ^ on_burial_date
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_burial_text : config -> base -> person -> bool -> string     *)
+(** [Description] : Retourne le texte sur l'incinération de la personne
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : la personne que l'on veut afficher
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_cremation_text conf base p p_auth =
+  let cremated =
+    if p_auth then
+      let is = index_of_sex (get_sex p) in
+      transl_nth conf "cremated" is
+    else ""
+  in
+  let on_cremation_date =
+    let tmp_conf = {(conf) with cancel_links = True} in
+    match get_burial p with
+      [ Cremated cod ->
+          match (p_auth, Adef.od_of_codate cod) with
+          [ (True, Some d) ->
+              match p_getenv conf.base_env "long_date" with
+              [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+              | _ -> Date.string_of_ondate tmp_conf d ]
+          | _ -> "" ]
+      | _ -> "" ]
+  in
+  cremated ^ " " ^ on_cremation_date
+;
 
 value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in

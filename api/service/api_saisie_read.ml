@@ -887,18 +887,21 @@ let pers_to_piqi_person conf base p =
       birth_date_cal = None;
       birth_place = None;
       birth_src = None;
+      birth_text = None;
       baptism_date = None;
       baptism_date_raw = None;
       baptism_date_conv = None;
       baptism_date_cal = None;
       baptism_place = None;
       baptism_src = None;
+      baptism_text = None;
       death_date = None;
       death_date_raw = None;
       death_date_conv = None;
       death_date_cal = None;
       death_place = None;
       death_src = None;
+      death_text = None;
       death_type = `dont_know_if_dead;
       burial_date = None;
       burial_date_raw = None;
@@ -906,6 +909,8 @@ let pers_to_piqi_person conf base p =
       burial_date_cal = None;
       burial_place = None;
       burial_src = None;
+      burial_text = None;
+      cremation_text = None;
       burial_type = `dont_know;
       occupation = None;
       notes = None;
@@ -1019,6 +1024,9 @@ let pers_to_piqi_person conf base p =
       | (true, Some d) -> string_of_date_and_conv_raw conf d
       | _ -> ("", "", None, "")
     in
+    let birth_text =
+        Perso.get_birth_text conf base p p_auth
+    in
     let baptism_place =
       if p_auth then Util.string_of_place conf gen_p.baptism_place else ""
     in
@@ -1036,6 +1044,9 @@ let pers_to_piqi_person conf base p =
       | (true, OfCourseDead) -> (`of_course_dead, "", "", None, "")
       | _ -> (`dont_know_if_dead, "", "", None, "")
     in
+    let baptism_text =
+        Perso.get_baptism_text conf base p p_auth
+    in
     let death_place =
       if p_auth then Util.string_of_place conf gen_p.death_place else ""
     in
@@ -1048,6 +1059,9 @@ let pers_to_piqi_person conf base p =
           | _ -> `dont_know
         else  `dont_know
     in
+    let death_text =
+        Perso.get_death_text conf base p p_auth
+    in
     let (burial, burial_conv, burial_cal, burial_date_raw) =
       match (p_auth, gen_p.burial) with
       | (true, Buried cod) | (true, Cremated cod) ->
@@ -1058,6 +1072,12 @@ let pers_to_piqi_person conf base p =
     in
     let burial_place =
       if p_auth then Util.string_of_place conf gen_p.burial_place else ""
+    in
+    let burial_text =
+        Perso.get_burial_text conf base p p_auth
+    in
+    let cremation_text =
+        Perso.get_cremation_text conf base p p_auth
     in
     let burial_src = if p_auth then gen_p.burial_src else "" in
     let occupation =
@@ -1617,18 +1637,21 @@ let pers_to_piqi_person conf base p =
       birth_date_cal = birth_cal;
       birth_place = if birth_place = "" then None else Some birth_place;
       birth_src = if birth_src = "" then None else Some birth_src;
+      birth_text = if birth_text = "" then None else Some birth_text;
       baptism_date = if baptism = "" then None else Some baptism;
       baptism_date_raw = if baptism_date_raw = "" then None else Some baptism_date_raw;
       baptism_date_conv = if baptism_conv = "" then None else Some baptism_conv;
       baptism_date_cal = baptism_cal;
       baptism_place = if baptism_place = "" then None else Some baptism_place;
       baptism_src = if baptism_src = "" then None else Some baptism_src;
+      baptism_text = if baptism_text = "" then None else Some baptism_text;
       death_date = if death = "" then None else Some death;
       death_date_raw = if death_date_raw = "" then None else Some death_date_raw;
       death_date_conv = if death_conv = "" then None else Some death_conv;
       death_date_cal = death_cal;
       death_place = if death_place = "" then None else Some death_place;
       death_src = if death_src = "" then None else Some death_src;
+      death_text = if death_text = "" then None else Some death_text;
       death_type = death_type;
       burial_date = if burial = "" then None else Some burial;
       burial_date_raw = if burial_date_raw = "" then None else Some burial_date_raw;
@@ -1636,6 +1659,8 @@ let pers_to_piqi_person conf base p =
       burial_date_cal = burial_cal;
       burial_place = if burial_place = "" then None else Some burial_place;
       burial_src = if burial_src = "" then None else Some burial_src;
+      burial_text = if burial_text = "" then None else Some burial_text;
+      cremation_text = if cremation_text = "" then None else Some cremation_text;
       burial_type = burial_type;
       occupation = if occupation = "" then None else Some occupation;
       notes = if notes = "" then None else Some notes;
