@@ -13,6 +13,8 @@ let _simple_person_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/simpl
 let _relation_person_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/relation-person"
 let _event_witness_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/event-witness"
 let _person_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/person"
+let _person_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/person-type"
+let _fiche_person_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/fiche-person"
 let _family_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/family"
 let _index_person_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/index-person"
 let _node_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/node"
@@ -82,6 +84,16 @@ let parse_person ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _person_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
   Api_saisie_read_piqi.parse_person buf
+
+let parse_person_type ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _person_type_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_person_type buf
+
+let parse_fiche_person ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _fiche_person_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_fiche_person buf
 
 let parse_family ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _family_piqi_type format `pb x ?opts in
@@ -244,6 +256,16 @@ let gen_person ?opts x (format :Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _person_piqi_type `pb format x_pb ?opts
 
+let gen_person_type ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_person_type x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _person_type_piqi_type `pb format x_pb ?opts
+
+let gen_fiche_person ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_fiche_person x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _fiche_person_piqi_type `pb format x_pb ?opts
+
 let gen_family ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_saisie_read_piqi.gen_family x in
   let x_pb = Piqirun.to_string buf in
@@ -404,6 +426,16 @@ let print_person ?opts x =
   Pervasives.print_endline (gen_person x `piq ?opts)
 let prerr_person ?opts x =
   Pervasives.prerr_endline (gen_person x `piq ?opts)
+
+let print_person_type ?opts x =
+  Pervasives.print_endline (gen_person_type x `piq ?opts)
+let prerr_person_type ?opts x =
+  Pervasives.prerr_endline (gen_person_type x `piq ?opts)
+
+let print_fiche_person ?opts x =
+  Pervasives.print_endline (gen_fiche_person x `piq ?opts)
+let prerr_fiche_person ?opts x =
+  Pervasives.prerr_endline (gen_fiche_person x `piq ?opts)
 
 let print_family ?opts x =
   Pervasives.print_endline (gen_family x `piq ?opts)

@@ -1,12 +1,8 @@
-
-
 module Mread = Api_saisie_read_piqi
 module Mext_read = Api_saisie_read_piqi_ext
 
-
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
-
 
 open Config
 open Def
@@ -14,8 +10,6 @@ open Gwdb
 open Util
 open Api_def
 open Api_util
-
-
 
 (**/**) (* Conversion de dates *)
 
@@ -38,7 +32,6 @@ let short_prec_year_text conf d =
   in
   prec ^ string_of_int d.year
 ;;
-
 
 let partial_short_dates_text conf birth_date death_date p =
   match (birth_date, death_date) with
@@ -169,18 +162,21 @@ let string_of_dmy_raw d =
   in
   prec ^ "/" ^ date ^ "#" ^ delta
 ;;
+
 (* ************************************************************************** *)
 (*  [Fonc] string_of_date_raw : Def.date -> string                            *)
 (** [Description] : Renvoie la date dans un format texte brut (analysable)
     [Args] :
+      - conf : configuration de la base
       - d : date
     [Retour] :
       - date
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let string_of_date_raw = function
-    Dgreg (d, _) -> string_of_dmy_raw d
-  | Dtext t -> t
+let string_of_date_raw conf d =
+  match d with
+  | Dgreg (d, _) -> string_of_dmy_raw d
+  | Dtext t -> string_with_macros conf [] t
 ;;
 
 let gregorian_precision conf d =
@@ -243,43 +239,6 @@ let string_of_date_and_conv conf d =
           (date, "", Some `hebrew))
   | Dtext t -> ("(" ^ string_with_macros conf [] t ^ ")", "", None)
 ;;
-(* Ajout des champs raw *)
-let string_of_date_and_conv_raw conf d =
-  match d with
-  | Dgreg (d, Dgregorian) ->
-      (string_of_dmy conf d, "", Some `gregorian, string_of_dmy_raw d)
-  | Dgreg (dt, Djulian) ->
-      let date_conv =
-        if dt.year < 1582 then "" else gregorian_precision conf dt
-      in
-      let d1 = Calendar.julian_of_gregorian dt in
-      let year_prec =
-        if d1.month > 0 && d1.month < 3 ||
-           d1.month = 3 && d1.day > 0 && d1.day < 25 then
-          Printf.sprintf " (%d/%d)" (d1.year - 1) (d1.year mod 10)
-        else ""
-      in
-      let date =
-        Date.string_of_dmy conf d1 ^ year_prec ^ " " ^
-          transl_nth conf "gregorian/julian/french/hebrew" 1
-      in
-      (date_conv, date, Some `julian, string_of_dmy_raw dt)
-  | Dgreg (dt, Dfrench) ->
-      let d1 = Calendar.french_of_gregorian dt in
-      let date = string_of_french_dmy conf d1 in
-      (match dt.prec with
-      | Sure -> (gregorian_precision conf dt, date, Some `french, string_of_dmy_raw dt)
-      | About | Before | After | Maybe | OrYear _ | YearInt _ ->
-          (date, "", Some `french, string_of_dmy_raw dt))
-  | Dgreg (d, Dhebrew) ->
-      let d1 = Calendar.hebrew_of_gregorian d in
-      let date = string_of_hebrew_dmy conf d1 in
-      (match d.prec with
-      | Sure -> (gregorian_precision conf d, date, Some `hebrew, string_of_dmy_raw d)
-      | About | Before | After | Maybe | OrYear _ | YearInt _ ->
-          (date, "", Some `hebrew, string_of_dmy_raw d))
-  | Dtext t -> ("(" ^ string_with_macros conf [] t ^ ")", "", None, string_with_macros conf [] t)
-;;
 
 (**/**) (* Affichage nom/prénom *)
 
@@ -303,9 +262,7 @@ let person_firstname_surname_txt conf base p =
     (fn, sn)
 ;;
 
-
 (**/**) (* Fonctions de transformation person <=> piqi person *)
-
 
 type graph_more_info =
   | Root
@@ -314,7 +271,6 @@ type graph_more_info =
   | Ancestor
   | Spouse
 ;;
-
 
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_person_tree : config -> base -> person -> PersonTree  *)
@@ -455,24 +411,11 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
 (* ************************************************************************** *)
 let pers_to_piqi_simple_person conf base p base_prefix =
   if is_restricted conf base (get_key_index p) then
-    Mread.Simple_person.({
-      index = Int32.of_int (-1);
-      sex = `unknown;
-      lastname = "x";
-      firstname = "x";
-      n = "";
-      p = "";
-      occ = Int32.of_int 0;
-      birth_short_date = None;
-      birth_date_raw = None;
-      birth_place = None;
-      death_short_date = None;
-      death_date_raw = None;
-      death_place = None;
-      image = None;
-      sosa = `no_sosa;
-      baseprefix = "";
-    })
+    let restricted_person = Mread.default_simple_person() in
+    restricted_person.Mread.Simple_person.index <- Int32.of_int (-1);
+    restricted_person.Mread.Simple_person.lastname <- "x";
+    restricted_person.Mread.Simple_person.firstname <- "x";
+    restricted_person
   else
     let p_auth = authorized_age conf base p in
     let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
@@ -511,7 +454,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
         in
         let birth_raw =
           match birth_date with
-          | Some d -> string_of_date_raw d
+          | Some d -> (string_of_date_raw conf d)
           | None -> ""
         in
         let birth_place =
@@ -528,7 +471,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
         in
         let death_raw =
           match death_date with
-          | Some d -> string_of_date_raw d
+          | Some d -> string_of_date_raw conf d
           | None -> ""
         in
         let death_place =
@@ -593,7 +536,9 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
   let index = Int32.of_int (Adef.int_of_ifam gen_f.fam_index) in
   let (marriage_date, marriage_date_conv, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_codate gen_f.marriage) with
-    | (true, Some d) -> string_of_date_and_conv_raw conf d
+    | (true, Some d) ->
+      let (marriage_date, marriage_date_conv, marriage_cal) = string_of_date_and_conv conf d in
+      (marriage_date, marriage_date_conv, marriage_cal, string_of_date_raw conf d)
     | _ -> ("", "", None, "")
   in
   let marriage_place =
@@ -615,10 +560,10 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     | Divorced cod ->
         (match Adef.od_of_codate cod with
          | Some d when m_auth ->
-             let (divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
-               string_of_date_and_conv_raw conf d
+             let (divorce_date, divorce_date_conv, divorce_cal) =
+               string_of_date_and_conv conf d
              in
-             (`divorced, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw)
+             (`divorced, divorce_date, divorce_date_conv, divorce_cal, string_of_date_raw conf d)
          | _ -> (`divorced, "", "", None, ""))
     | Separated -> (`separated, "", "", None, "")
   in
@@ -723,7 +668,9 @@ let fam_to_piqi_family conf base p ifam =
   let index = Int32.of_int (Adef.int_of_ifam gen_f.fam_index) in
   let (marriage_date, marriage_date_conv, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_codate gen_f.marriage) with
-    | (true, Some d) -> string_of_date_and_conv_raw conf d
+    | (true, Some d) ->
+      let (marriage_date, marriage_date_conv, marriage_cal) = string_of_date_and_conv conf d in
+      (marriage_date, marriage_date_conv, marriage_cal, string_of_date_raw conf d)
     | _ -> ("", "", None, "")
   in
   let marriage_place =
@@ -745,10 +692,10 @@ let fam_to_piqi_family conf base p ifam =
     | Divorced cod ->
         (match Adef.od_of_codate cod with
          | Some d when m_auth ->
-             let (divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
-               string_of_date_and_conv_raw conf d
+             let (divorce_date, divorce_date_conv, divorce_cal) =
+               string_of_date_and_conv conf d
              in
-             (`divorced, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw)
+             (`divorced, divorce_date, divorce_date_conv, divorce_cal, string_of_date_raw conf d)
          | _ -> (`divorced, "", "", None, ""))
     | Separated -> (`separated, "", "", None, "")
   in
@@ -852,7 +799,6 @@ let fam_to_piqi_family conf base p ifam =
   })
 ;;
 
-
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_person : config -> base -> person -> Person           *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person (piqi)
@@ -867,76 +813,11 @@ let fam_to_piqi_family conf base p ifam =
 (* ************************************************************************** *)
 let pers_to_piqi_person conf base p =
   if is_restricted conf base (get_key_index p) then
-    Mread.Person.({
-      index = Int32.of_int (-1);
-      sex = `unknown;
-      lastname = "x";
-      firstname = "x";
-      n = "";
-      p = "";
-      occ = Int32.of_int 0;
-      public_name = None;
-      aliases = [];
-      qualifiers = [];
-      firstname_aliases = [];
-      surname_aliases = [];
-      image = None;
-      birth_date = None;
-      birth_date_raw = None;
-      birth_date_conv = None;
-      birth_date_cal = None;
-      birth_place = None;
-      birth_src = None;
-      birth_text = None;
-      baptism_date = None;
-      baptism_date_raw = None;
-      baptism_date_conv = None;
-      baptism_date_cal = None;
-      baptism_place = None;
-      baptism_src = None;
-      baptism_text = None;
-      death_date = None;
-      death_date_raw = None;
-      death_date_conv = None;
-      death_date_cal = None;
-      death_place = None;
-      death_src = None;
-      death_text = None;
-      death_type = `dont_know_if_dead;
-      burial_date = None;
-      burial_date_raw = None;
-      burial_date_conv = None;
-      burial_date_cal = None;
-      burial_place = None;
-      burial_src = None;
-      burial_text = None;
-      cremation_text = None;
-      burial_type = `dont_know;
-      occupation = None;
-      notes = None;
-      psources = None;
-      has_sources = false;
-      titles = [];
-      titles_links = [];
-      related = [];
-      rparents = [];
-      father = None;
-      mother = None;
-      families = [];
-      sosa = `no_sosa;
-      sosa_nb = None;
-      events = [];
-      events_witnesses = [];
-      has_history = false;
-      has_possible_duplications = false;
-      ref_index = None;
-      linked_page_biblio = "";
-      linked_page_bnote = "";
-      linked_page_death = "";
-      linked_page_head = "";
-      linked_page_occu = "";
-      visible_for_visitors = false;
-    })
+    let restricted_person = Mread.default_person() in
+    restricted_person.Mread.Person.index <- Int32.of_int (-1);
+    restricted_person.Mread.Person.lastname <- "x";
+    restricted_person.Mread.Person.firstname <- "x";
+    restricted_person
   else
     let base_prefix = conf.command in
     let p_auth = authorized_age conf base p in
@@ -948,19 +829,11 @@ let pers_to_piqi_person conf base p =
       | Female -> `female
       | Neuter -> `unknown
     in
-    let (sosa, sosa_nb) =
+    let sosa =
       let sosa_nb = Perso.get_sosa_person conf base p in
-      if Num.eq sosa_nb Num.zero then (`no_sosa, None)
-      else if Num.eq sosa_nb Num.one then (`sosa_ref, Some (Num.to_string sosa_nb))
-      else (`sosa, Some (Num.to_string sosa_nb))
-    in
-    let ref_index =
-      let sosa_nb = Perso.get_sosa_person conf base p in
-      if Num.gt sosa_nb Num.zero then
-        match Util.find_sosa_ref conf base with
-          | Some ref -> Some (Int32.of_int (Adef.int_of_iper (get_key_index ref)))
-          | None -> None
-      else None
+      if Num.eq sosa_nb Num.zero then `no_sosa
+      else if Num.eq sosa_nb Num.one then `sosa_ref
+      else `sosa
     in
     let sn =
       if (is_hide_names conf p) && not p_auth then ""
@@ -994,90 +867,51 @@ let pers_to_piqi_person conf base p =
           | None -> ""
       else ""
     in
-    (* Liens de la chronicle familiale *)
-    let linked_page_biblio =
-        Perso.get_linked_page conf base p "BIBLIO"
-    in
-    let linked_page_bnote =
-        Perso.get_linked_page conf base p "BNOTE"
-    in
-    let linked_page_death =
-        Perso.get_linked_page conf base p "DEATH"
-    in
-    let linked_page_head =
-        Perso.get_linked_page conf base p "HEAD"
-    in
-    let linked_page_occu =
-        Perso.get_linked_page conf base p "OCCU"
-    in
-    let (birth, birth_conv, birth_cal, birth_date_raw) =
+    let (birth, birth_conv, birth_cal) =
       match (p_auth, Adef.od_of_codate gen_p.birth) with
-      | (true, Some d) -> string_of_date_and_conv_raw conf d
-      | _ -> ("", "", None, "")
+      | (true, Some d) -> string_of_date_and_conv conf d
+      | _ -> ("", "", None)
     in
     let birth_place =
       if p_auth then Util.string_of_place conf gen_p.birth_place else ""
     in
     let birth_src = if p_auth then gen_p.birth_src else "" in
-    let (baptism, baptism_conv, baptism_cal, baptism_date_raw) =
+    let (baptism, baptism_conv, baptism_cal) =
       match (p_auth, Adef.od_of_codate gen_p.baptism) with
-      | (true, Some d) -> string_of_date_and_conv_raw conf d
-      | _ -> ("", "", None, "")
-    in
-    let birth_text =
-        Perso.get_birth_text conf base p p_auth
+      | (true, Some d) -> string_of_date_and_conv conf d
+      | _ -> ("", "", None)
     in
     let baptism_place =
       if p_auth then Util.string_of_place conf gen_p.baptism_place else ""
     in
     let baptism_src = if p_auth then gen_p.baptism_src else "" in
-    let (death_type, death, death_conv, death_cal, death_date_raw) =
+    let (death_type, death, death_conv, death_cal) =
       match (p_auth, gen_p.death) with
-      | (true, NotDead) -> (`not_dead, "", "", None, "")
+      | (true, NotDead) -> (`not_dead, "", "", None)
       | (true, Death (_, cd)) ->
           let d = Adef.date_of_cdate cd in
-          let (death, death_conv, death_cal, death_date_raw) = string_of_date_and_conv_raw conf d in
-          (`dead, death, death_conv, death_cal, death_date_raw)
-      | (true, DeadYoung) -> (`dead_young, "", "", None, "")
-      | (true, DeadDontKnowWhen) -> (`dead_dont_know_when, "", "", None, "")
-      | (true, DontKnowIfDead) -> (`dont_know_if_dead, "", "", None, "")
-      | (true, OfCourseDead) -> (`of_course_dead, "", "", None, "")
-      | _ -> (`dont_know_if_dead, "", "", None, "")
-    in
-    let baptism_text =
-        Perso.get_baptism_text conf base p p_auth
+          let (death, death_conv, death_cal) = string_of_date_and_conv conf d in
+          (`dead, death, death_conv, death_cal)
+      | (true, DeadYoung) -> (`dead_young, "", "", None)
+      | (true, DeadDontKnowWhen) -> (`dead_dont_know_when, "", "", None)
+      | (true, DontKnowIfDead) -> (`dont_know_if_dead, "", "", None)
+      | (true, OfCourseDead) -> (`of_course_dead, "", "", None)
+      | _ -> (`dont_know_if_dead, "", "", None)
     in
     let death_place =
       if p_auth then Util.string_of_place conf gen_p.death_place else ""
     in
     let death_src = if p_auth then gen_p.death_src else "" in
-    let burial_type =
-        if p_auth then
-        match (gen_p.burial) with
-          | Buried cod -> `buried
-          | Cremated cod -> `cremated
-          | _ -> `dont_know
-        else  `dont_know
-    in
-    let death_text =
-        Perso.get_death_text conf base p p_auth
-    in
-    let (burial, burial_conv, burial_cal, burial_date_raw) =
+    let (burial, burial_conv, burial_cal) =
       match (p_auth, gen_p.burial) with
       | (true, Buried cod) | (true, Cremated cod) ->
           (match Adef.od_of_codate cod with
-          | Some d -> string_of_date_and_conv_raw conf d
-          | _ -> ("", "", None, ""))
-      | _ -> ("", "", None, "")
+          | Some d -> string_of_date_and_conv conf d
+          | _ -> ("", "", None))
+      | _ -> ("", "", None)
     in
     let burial_place =
       if p_auth then Util.string_of_place conf gen_p.burial_place else ""
-    in
-    let burial_text =
-        Perso.get_burial_text conf base p p_auth
-    in
-    let cremation_text =
-        Perso.get_cremation_text conf base p p_auth
     in
     let burial_src = if p_auth then gen_p.burial_src else "" in
     let occupation =
@@ -1114,7 +948,9 @@ let pers_to_piqi_person conf base p =
             in
             let (date, date_conv, date_cal, date_raw) =
               match Adef.od_of_codate date with
-              | Some d -> string_of_date_and_conv_raw conf d
+              | Some d ->
+                let (date, date_conv, date_cal) = string_of_date_and_conv conf d in
+                (date, date_conv, date_cal, string_of_date_raw conf d)
               | _ -> ("", "", None, "")
             in
             let place = Util.string_of_place conf (sou base place) in
@@ -1336,16 +1172,9 @@ let pers_to_piqi_person conf base p =
       then true
       else false
     in
-    let has_history = Perso.has_history conf base p p_auth in
-    let has_possible_duplications = Perso.has_possible_duplications conf base p in
-    let titles = Perso.nobility_titles_list conf base p in
-    let titles_links =
-      let tmp_conf = {(conf) with cancel_links = false} in
-      List.map (Perso.string_of_title tmp_conf base "" p) titles
-    in
     let titles =
       let tmp_conf = {(conf) with cancel_links = true} in
-      List.map (Perso.string_of_title tmp_conf base "" p) titles
+      List.map (Perso.string_of_title tmp_conf base "" p) (Perso.nobility_titles_list conf base p)
     in
     let related =
       if has_relations then
@@ -1616,8 +1445,8 @@ let pers_to_piqi_person conf base p =
         families []
     in
     let families = families @ families_link in
-    let visible_for_visitors = is_visible conf base p in
     Mread.Person.({
+      type_ = `simple;
       index = index;
       sex = sex;
       lastname = surname;
@@ -1632,67 +1461,178 @@ let pers_to_piqi_person conf base p =
       surname_aliases = surname_aliases;
       image = if image = "" then None else Some image;
       birth_date = if birth = "" then None else Some birth;
-      birth_date_raw = if birth_date_raw = "" then None else Some birth_date_raw;
       birth_date_conv = if birth_conv = "" then None else Some birth_conv;
       birth_date_cal = birth_cal;
       birth_place = if birth_place = "" then None else Some birth_place;
       birth_src = if birth_src = "" then None else Some birth_src;
-      birth_text = if birth_text = "" then None else Some birth_text;
       baptism_date = if baptism = "" then None else Some baptism;
-      baptism_date_raw = if baptism_date_raw = "" then None else Some baptism_date_raw;
       baptism_date_conv = if baptism_conv = "" then None else Some baptism_conv;
       baptism_date_cal = baptism_cal;
       baptism_place = if baptism_place = "" then None else Some baptism_place;
       baptism_src = if baptism_src = "" then None else Some baptism_src;
-      baptism_text = if baptism_text = "" then None else Some baptism_text;
       death_date = if death = "" then None else Some death;
-      death_date_raw = if death_date_raw = "" then None else Some death_date_raw;
       death_date_conv = if death_conv = "" then None else Some death_conv;
       death_date_cal = death_cal;
       death_place = if death_place = "" then None else Some death_place;
       death_src = if death_src = "" then None else Some death_src;
-      death_text = if death_text = "" then None else Some death_text;
       death_type = death_type;
       burial_date = if burial = "" then None else Some burial;
-      burial_date_raw = if burial_date_raw = "" then None else Some burial_date_raw;
       burial_date_conv = if burial_conv = "" then None else Some burial_conv;
       burial_date_cal = burial_cal;
       burial_place = if burial_place = "" then None else Some burial_place;
       burial_src = if burial_src = "" then None else Some burial_src;
-      burial_text = if burial_text = "" then None else Some burial_text;
-      cremation_text = if cremation_text = "" then None else Some cremation_text;
-      burial_type = burial_type;
       occupation = if occupation = "" then None else Some occupation;
       notes = if notes = "" then None else Some notes;
       psources = if psources = "" then None else Some psources;
       has_sources = has_sources;
       titles = titles;
-      titles_links = titles_links;
       related = related;
       rparents = rparents;
       father = father;
       mother = mother;
       families = families;
       sosa = sosa;
-      sosa_nb = sosa_nb;
       events = events;
       events_witnesses = events_witnesses;
-      has_history = has_history;
-      has_possible_duplications = has_possible_duplications;
-      ref_index = ref_index;
-      linked_page_biblio = linked_page_biblio;
-      linked_page_bnote = linked_page_bnote;
-      linked_page_death = linked_page_death;
-      linked_page_head = linked_page_head;
-      linked_page_occu = linked_page_occu;
-      visible_for_visitors = visible_for_visitors;
+      fiche_person_person = None;
     })
 ;;
 
+(* ************************************************************************** *)
+(*  [Fonc] pers_to_piqi_fiche_person : config -> base -> person -> Person     *)
+(** [Description] : Retourne à partir d'une person (gwdb) une Person fiche
+                    (piqi) dont tous les champs sont complétés.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] :
+      - Person
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+let pers_to_piqi_fiche_person conf base p =
+  (* Récupère une personne. *)
+  let piqi_person = pers_to_piqi_person conf base p in
+  (* Génère une personne fiche par défaut. *)
+  let piqi_fiche_person = Mread.default_fiche_person() in
+  (* Ajoute la personne fiche à la personne. *)
+  piqi_person.Mread.Person.type_ <- `fiche;
+  piqi_person.Mread.Person.fiche_person_person <- Some piqi_fiche_person;
+  (* Si l'accès est restreint, retourne la personne avec les champs par défaut. *)
+  if is_restricted conf base (get_key_index p) then
+    piqi_person
+  else
+    let p_auth = authorized_age conf base p in
+    let gen_p = Util.string_gen_person base (gen_person_of_person p) in
+    let sosa_nb = Perso.get_sosa_person conf base p in
+
+    let birth_date_raw =
+      match (p_auth, Adef.od_of_codate gen_p.birth) with
+      | (true, Some d) -> string_of_date_raw conf d
+      | _ -> ""
+    in
+    let baptism_date_raw =
+      match (p_auth, Adef.od_of_codate gen_p.baptism) with
+      | (true, Some d) -> string_of_date_raw conf d
+      | _ -> ""
+    in
+    let death_date_raw =
+      match (p_auth, gen_p.death) with
+      | (true, Death (_, cd)) ->
+          let d = Adef.date_of_cdate cd in
+          string_of_date_raw conf d
+      | _ -> ""
+    in
+    let burial_date_raw =
+      match (p_auth, gen_p.burial) with
+      | (true, Buried cod) | (true, Cremated cod) ->
+          (match Adef.od_of_codate cod with
+          | Some d -> string_of_date_raw conf d
+          | _ -> "")
+      | _ -> ""
+    in
+    let birth_text =
+        Perso.get_birth_text conf base p p_auth
+    in
+    let baptism_text =
+        Perso.get_baptism_text conf base p p_auth
+    in
+    let death_text =
+        Perso.get_death_text conf base p p_auth
+    in
+    let burial_text =
+        Perso.get_burial_text conf base p p_auth
+    in
+    let cremation_text =
+        Perso.get_cremation_text conf base p p_auth
+    in
+    let burial_type =
+        if p_auth then
+        match (gen_p.burial) with
+          | Buried cod -> `buried
+          | Cremated cod -> `cremated
+          | _ -> `dont_know
+        else `dont_know
+    in
+    let titles_links =
+      let tmp_conf = {(conf) with cancel_links = false} in
+      List.map (Perso.string_of_title tmp_conf base "" p) (Perso.nobility_titles_list conf base p)
+    in
+    let has_history = Perso.has_history conf base p p_auth in
+    let has_possible_duplications = Perso.has_possible_duplications conf base p in
+    let ref_index =
+      if Num.gt sosa_nb Num.zero then
+        match Util.find_sosa_ref conf base with
+          | Some ref -> Some (Int32.of_int (Adef.int_of_iper (get_key_index ref)))
+          | None -> None
+      else None
+    in
+    (* Liens de la chronique familiale *)
+    let linked_page_biblio =
+      Perso.get_linked_page conf base p "BIBLIO"
+    in
+    let linked_page_bnote =
+      Perso.get_linked_page conf base p "BNOTE"
+    in
+    let linked_page_death =
+      Perso.get_linked_page conf base p "DEATH"
+    in
+    let linked_page_head =
+      Perso.get_linked_page conf base p "HEAD"
+    in
+    let linked_page_occu =
+      Perso.get_linked_page conf base p "OCCU"
+    in
+    let visible_for_visitors = is_visible conf base p in
+
+    piqi_fiche_person.Mread.Fiche_person.birth_date_raw <- if birth_date_raw = "" then None else Some birth_date_raw;
+    piqi_fiche_person.Mread.Fiche_person.baptism_date_raw <- if baptism_date_raw = "" then None else Some baptism_date_raw;
+    piqi_fiche_person.Mread.Fiche_person.death_date_raw <- if death_date_raw = "" then None else Some death_date_raw;
+    piqi_fiche_person.Mread.Fiche_person.burial_date_raw <- if burial_date_raw = "" then None else Some burial_date_raw;
+    piqi_fiche_person.Mread.Fiche_person.birth_text <- if birth_text = "" then None else Some birth_text;
+    piqi_fiche_person.Mread.Fiche_person.baptism_text <- if baptism_text = "" then None else Some baptism_text;
+    piqi_fiche_person.Mread.Fiche_person.death_text <- if death_text = "" then None else Some death_text;
+    piqi_fiche_person.Mread.Fiche_person.burial_text <- if burial_text = "" then None else Some burial_text;
+    piqi_fiche_person.Mread.Fiche_person.cremation_text <- if cremation_text = "" then None else Some cremation_text;
+    piqi_fiche_person.Mread.Fiche_person.burial_type <- burial_type;
+    piqi_fiche_person.Mread.Fiche_person.titles_links <- titles_links;
+    piqi_fiche_person.Mread.Fiche_person.sosa_nb <- if sosa_nb = Num.zero then None else Some (Num.to_string sosa_nb);
+    piqi_fiche_person.Mread.Fiche_person.has_history <- has_history;
+    piqi_fiche_person.Mread.Fiche_person.has_possible_duplications <- has_possible_duplications;
+    piqi_fiche_person.Mread.Fiche_person.ref_index <- ref_index;
+    piqi_fiche_person.Mread.Fiche_person.linked_page_biblio <- linked_page_biblio;
+    piqi_fiche_person.Mread.Fiche_person.linked_page_bnote <- linked_page_bnote;
+    piqi_fiche_person.Mread.Fiche_person.linked_page_death <- linked_page_death;
+    piqi_fiche_person.Mread.Fiche_person.linked_page_head <- linked_page_head;
+    piqi_fiche_person.Mread.Fiche_person.linked_page_occu <- linked_page_occu;
+    piqi_fiche_person.Mread.Fiche_person.visible_for_visitors <- visible_for_visitors;
+
+    piqi_person
+;;
 
 (* ********************************************************************* *)
 (*  [Fonc] print_person_tree : conf -> base -> unit                      *)
-(** [Description] : Renvoie un objet personne qui servira a afficher
+(** [Description] : Renvoie un objet personne qui servira à afficher
       toutes les informations sur le panneau latéral de l'arbre de
       navigation.
     [Args] :
@@ -1713,6 +1653,27 @@ let print_person_tree conf base =
   print_result conf data
 ;;
 
+(* ********************************************************************* *)
+(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
+(** [Description] : Renvoie un objet personne contenant les données de
+      la fiche.
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnée
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_fiche_person conf base =
+  let ip = get_params conf Mext_read.parse_index_person in
+  let ip = Adef.iper_of_int (Int32.to_int ip.Mread.Index_person.index) in
+  let () = Perso.build_sosa_ht conf base in
+  let p = poi base ip in
+  (* cache lien inter arbre *)
+  let () = Perso_link.init_cache conf base ip 1 1 1 in
+  let pers_piqi = pers_to_piqi_fiche_person conf base p in
+  let data = Mext_read.gen_person pers_piqi in
+  print_result conf data
+;;
 
 (**/**) (* V1 *)
 
