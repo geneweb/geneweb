@@ -393,6 +393,9 @@ sv: <span class="highlight" style="margin-left:10px">genom
     %end;
     %if;(wizard)
       <li>
+        <a href="%prefix;m=MOD_DATA;data=fn">%apply;book_of([first name/first names]1)</a>
+      </li>
+      <li>
         <a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a>
       </li>
       <li>

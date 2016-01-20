@@ -36,6 +36,9 @@
   <ul>
     %if;(wizard)
       <li>
+        <a href="%prefix;m=MOD_DATA;data=fn">%apply;list_of([first name/first names]1)</a>
+      </li>
+      <li>
         <a href="%prefix;m=MOD_DATA;data=sn">%apply;list_of([surname/surnames]1)</a>
       </li>
       <li>

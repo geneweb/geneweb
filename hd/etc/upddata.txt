@@ -81,6 +81,9 @@
                 %else;
                   <input type="text" id="nx_input" name="nx_input" size="80" maxlength="200" value="%escape.printable.entry_value;">
                 %end;
+                %if;(evar.data = "fn")
+                  <input type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes">[*add the previous name as a first name alias]</input>
+                %end;
                 %if;(evar.data = "sn")
                   <input type="checkbox" id="surname_aliases" name="surname_aliases" value="yes">[*add the previous name as a surname alias]</input>
                 %end;

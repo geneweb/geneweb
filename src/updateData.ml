@@ -80,6 +80,7 @@ value get_data conf =
          ("ma", Family get_marriage_src);
          ("fe", Fevent (fun evt -> evt.efam_src));
          ("f", Family get_fsources) ], True)
+  | Some "fn" -> ([ ("fn", Person get_first_name) ], False)
   | Some "sn" -> ([ ("sn", Person get_surname) ], False)
   | _ -> ([], False) ]
 ;
@@ -386,6 +387,7 @@ value translate_title conf =
     [ Some "occu" -> transl_nth conf "occupation/occupations" 1
     | Some "place" -> transl conf "places"
     | Some "src" -> transl_nth conf "source/sources" 1
+    | Some "fn" -> transl_nth conf "first name/first names" 1
     | Some "sn" -> transl_nth conf "surname/surnames" 1
     | _ -> "" ]
   in
@@ -552,6 +554,11 @@ value print_long conf base list len =
                             if data = "sn" then
                               tag "input" "type=\"checkbox\" name=\"surname_aliases\" value=\"yes\"" begin
                                 Wserver.wprint "%s" (capitale (transl conf "add the previous name as a surname alias"));
+                              end
+                            else ();
+                            if data = "fn" then
+                              tag "input" "type=\"checkbox\" name=\"firstname_aliases\" value=\"yes\"" begin
+                                Wserver.wprint "%s" (capitale (transl conf "add the previous name as a first name alias"));
                               end
                             else ();
                           end;
@@ -795,6 +802,33 @@ value update_person conf base old new_input p =
         baptism_src = baptism_src; death_src = death_src;
         burial_src = burial_src; psources = psources_src;
         pevents = pevents }
+  | Some "fn" ->
+      let new_istr = Gwdb.insert_string base (only_printable new_input) in
+      let first_name = get_first_name p in
+      let s_first_name = sou base first_name in
+      let s_first_name_lower = Name.lower s_first_name in
+      let (first_name, occ) =
+        if old = s_first_name then
+          (new_istr,
+           Gutil.find_free_occ
+             base (sou base new_istr) (sou base (get_surname p)) 0)
+        else (first_name, get_occ p)
+      in
+      let first_names_aliases = get_first_names_aliases p in
+      let first_names_aliases =
+        if p_getenv conf.env "first_name_aliases" = Some "yes" then
+          let has_first_name_alias =
+            List.fold_left
+              (fun has_first_name alias ->
+                 has_first_name || s_first_name_lower = Name.lower (sou base alias))
+              False first_names_aliases
+          in
+          if has_first_name_alias then first_names_aliases
+          else [get_first_name p :: first_names_aliases]
+        else first_names_aliases
+      in
+      { (gen_person_of_person p) with first_name = first_name; occ = occ;
+          first_names_aliases = first_names_aliases }
   | Some "sn" ->
       let new_istr = Gwdb.insert_string base (only_printable new_input) in
       let surname = get_surname p in
@@ -817,7 +851,7 @@ value update_person conf base old new_input p =
               False surnames_aliases
           in
           if has_surname_alias then surnames_aliases
-          else [surname :: surnames_aliases]
+          else [get_surname p :: surnames_aliases]
         else surnames_aliases
       in
       { (gen_person_of_person p) with surname = surname; occ = occ;
@@ -901,6 +935,7 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
     [ Some "occu" -> "co"
     | Some "place" -> "cp"
     | Some "src" -> "cs"
+    | Some "fn" -> "fn"
     | Some "sn" -> "sn"
     | _ -> "" ]
   in
@@ -913,7 +948,7 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
       List.iter
         (fun p -> do {
           let np = update_person conf base old new_input p in
-          if (action = "sn") then do {
+          if (action = "fn" || action = "sn") then do {
             let pi = np.key_index in
             let op = poi base pi in
             let key = sou base (np.first_name) ^ " " ^ (sou base np.surname) in
@@ -1412,7 +1447,7 @@ value print_mod conf base =
   if p_getenv conf.env "old" = Some "on" then print_mod_old conf base
   else
     match p_getenv conf.env "data" with
-    [ Some ("place" | "src" | "occu" | "sn") ->
+    [ Some ("place" | "src" | "occu" | "fn" | "sn") ->
         let list = build_list conf base in
         let env = [("list", Vlist_data list)] in
         Hutil.interp conf base "upddata"
