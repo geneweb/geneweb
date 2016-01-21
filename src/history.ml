@@ -141,7 +141,7 @@ value diff_person conf base changed =
           Array.append
             accu (diff_key (Diff_string (ofn, osn, oocc) (fn, sn, occ))))
         [| |] l
-  | U_Multi _
+  | U_Multi o n modified_key -> diff_key (Diff_person o n)
   | U_Notes _ _ | U_Kill_ancestors _ -> [| |] ]
 ;
 
@@ -168,7 +168,7 @@ value notify_change conf base changed action =
           | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p
           | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _
           | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _
-          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p ->
+          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi _ p _ ->
               let key = slash_name_of_key p.first_name p.surname p.occ in
               [| key; string_of_int (Adef.int_of_iper (p.key_index)) |]
           | U_Notes (Some num) file -> [| file; string_of_int num |]
@@ -214,7 +214,7 @@ value gen_record conf base changed action =
           | U_Merge_person _ _ p | U_Send_image p | U_Delete_image p
           | U_Add_family p _ | U_Modify_family p _ _ | U_Delete_family p _
           | U_Invert_family p _ | U_Merge_family p _ _ _ | U_Add_parent p _
-          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi p ->
+          | U_Kill_ancestors p | U_Change_children_name p _ | U_Multi _ p _ ->
               p.first_name ^ "." ^ string_of_int p.occ ^ " " ^ p.surname
           | U_Notes (Some num) file ->
               let s = string_of_int num in
@@ -242,7 +242,7 @@ value gen_record conf base changed action =
     (* Pour éviter cela, on n'appelle jamais notify_change lors de la *)
     (* mise à jour de l'historique.                                   *)
     match changed with
-    [ U_Multi _ -> ()
+    [ U_Multi _ _ _ -> ()
     | _ -> notify_change conf base changed action ]
   }
 ;
@@ -308,7 +308,7 @@ value notify conf base action =
   let empty_person =
     Util.string_gen_person base (gen_person_of_person empty_person)
   in
-  notify_change conf base (U_Multi empty_person) action
+  notify_change conf base (U_Multi empty_person empty_person False) action
 ;
 
 

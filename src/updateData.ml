@@ -947,6 +947,7 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
       (* Mise à jour de toutes les personnes concernées. *)
       List.iter
         (fun p -> do {
+          let o_p = Util.string_gen_person base (gen_person_of_person p) in
           let np = update_person conf base old new_input p in
           if (action = "fn" || action = "sn") then do {
             let pi = np.key_index in
@@ -977,7 +978,10 @@ value update_person_list conf base new_input list nb_pers max_updates = do {
               fam
           else ();
           (* On met aussi à jour l'historique. *)
-          let changed = U_Multi (Util.string_gen_person base np) in
+          let changed =
+            U_Multi o_p (Util.string_gen_person base np)
+              (if action = "fn" || action = "sn" then True else False)
+          in
           History.record conf base changed action } )
         perl } )
     list;
