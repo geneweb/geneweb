@@ -159,7 +159,10 @@ value record_diff conf base changed =
           do {
             (* La clé a changé, on reprend l'ancien historique. *)
             if o_person_file <> person_file && Sys.file_exists ofname then
-              try Sys.rename ofname fname with [ Sys_error _ -> () ]
+              try
+                let () = create_history_dirs conf person_file in
+                Sys.rename ofname fname
+              with [ Sys_error _ -> () ]
             else ();
             let gr = make_gen_record conf base False p in
             if Sys.file_exists fname then
@@ -179,7 +182,10 @@ value record_diff conf base changed =
           (* La clé a changé avec la fusion, on reprend l'ancien historique. *)
           if o_person_file <> person_file then do {
             let ofname = history_path conf o_person_file in
-            try Sys.rename ofname fname with [ Sys_error _ -> () ];
+            try
+              let () = create_history_dirs conf person_file in
+              Sys.rename ofname fname
+            with [ Sys_error _ -> () ];
             write_history_file conf person_file fname gr
           }
           else write_history_file conf person_file fname gr
