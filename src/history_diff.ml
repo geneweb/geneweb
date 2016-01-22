@@ -145,34 +145,38 @@ value make_gen_record conf base first gen_p =
 value record_diff conf base changed =
   match p_getenv conf.base_env "history_diff" with
   [ Some "yes" when not conf.manitou ->
-      match changed with
-      [ U_Add_person p ->
-          let person_file = history_file p.first_name p.surname p.occ in
-          let fname = history_path conf person_file in
+      let print_ind_add p =
+        let person_file = history_file p.first_name p.surname p.occ in
+        let fname = history_path conf person_file in
+        let gr = make_gen_record conf base False p in
+        write_history_file conf person_file fname gr
+      in
+      let print_ind_mod o p =
+        let o_person_file = history_file o.first_name o.surname o.occ in
+        let person_file = history_file p.first_name p.surname p.occ in
+        let ofname = history_path conf o_person_file in
+        let fname = history_path conf person_file in
+        do {
+          (* La clé a changé, on reprend l'ancien historique. *)
+          if o_person_file <> person_file && Sys.file_exists ofname then
+            try
+              let () = create_history_dirs conf person_file in
+              Sys.rename ofname fname
+            with [ Sys_error _ -> () ]
+          else ();
           let gr = make_gen_record conf base False p in
-          write_history_file conf person_file fname gr
-      | U_Modify_person o p ->
-          let o_person_file = history_file o.first_name o.surname o.occ in
-          let person_file = history_file p.first_name p.surname p.occ in
-          let ofname = history_path conf o_person_file in
-          let fname = history_path conf person_file in
-          do {
-            (* La clé a changé, on reprend l'ancien historique. *)
-            if o_person_file <> person_file && Sys.file_exists ofname then
-              try
-                let () = create_history_dirs conf person_file in
-                Sys.rename ofname fname
-              with [ Sys_error _ -> () ]
-            else ();
-            let gr = make_gen_record conf base False p in
-            if Sys.file_exists fname then
-              write_history_file conf person_file fname gr
-            else do {
-              let o_gr = make_gen_record conf base True o in
-              write_history_file conf person_file fname o_gr;
-              write_history_file conf person_file fname gr;
-            }
+          if Sys.file_exists fname then
+            write_history_file conf person_file fname gr
+          else do {
+            let o_gr = make_gen_record conf base True o in
+            write_history_file conf person_file fname o_gr;
+            write_history_file conf person_file fname gr;
           }
+        }
+      in
+      match changed with
+      [ U_Add_person p -> print_ind_add p
+      | U_Modify_person o p -> print_ind_mod o p
       | U_Delete_person _ -> () (* Faut-il supprimer l'historique ? *)
       | U_Merge_person _ o p ->
           let o_person_file = history_file o.first_name o.surname o.occ in
@@ -251,33 +255,8 @@ value record_diff conf base changed =
                else ())
             list
       | U_Multi o p modified_key ->
-          if modified_key then
-            let o_person_file = history_file o.first_name o.surname o.occ in
-            let person_file = history_file p.first_name p.surname p.occ in
-            let ofname = history_path conf o_person_file in
-            let fname = history_path conf person_file in
-            do {
-              (* La clé a changé, on reprend l'ancien historique. *)
-              if o_person_file <> person_file && Sys.file_exists ofname then
-                try
-                  let () = create_history_dirs conf person_file in
-                  Sys.rename ofname fname
-                with [ Sys_error _ -> () ]
-              else ();
-              let gr = make_gen_record conf base False p in
-              if Sys.file_exists fname then
-                write_history_file conf person_file fname gr
-              else do {
-                let o_gr = make_gen_record conf base True o in
-                write_history_file conf person_file fname o_gr;
-                write_history_file conf person_file fname gr;
-              }
-            }
-          else
-            let person_file = history_file p.first_name p.surname p.occ in
-            let fname = history_path conf person_file in
-            let gr = make_gen_record conf base False p in
-            write_history_file conf person_file fname gr
+          if modified_key then print_ind_mod o p
+          else print_ind_add p
       | _ -> () ]
   | _ -> () ]
 ;
