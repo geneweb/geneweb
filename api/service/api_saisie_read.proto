@@ -242,6 +242,8 @@ message FichePerson {
   required string linked_page_head = 19;
   required string linked_page_occu = 20;
   required bool visible_for_visitors = 21;
+  optional Person father = 22;
+  optional Person mother = 23;
 }
 
 message Family {
@@ -394,4 +396,15 @@ message GraphTreeFull {
 message IdentifierPerson {
   optional int32 index = 1;
   optional string sosa_nb = 2;
+}
+
+message Error {
+  enum Code {
+    BAD_REQUEST = 400;
+    UNAUTHORIZED = 401;
+    FORBIDDEN = 403;
+    NOT_FOUND = 404;
+  }
+  required Code code = 998;
+  optional string message = 999;
 }

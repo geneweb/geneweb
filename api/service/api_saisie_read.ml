@@ -11,6 +11,26 @@ open Util
 open Api_def
 open Api_util
 
+(* ********************************************************************* *)
+(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
+(** [Description] : Retourne une erreur compréhensible par l'appelant.
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnée
+      - code  : code d'erreur
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_error conf code =
+    let piqi_error = Mread.default_error() in
+        piqi_error.Mread.Error.code <- code;
+    let data = Mext_read.gen_error piqi_error in
+    begin
+        Wserver.wprint "HTTP/1.0 400\013\010";
+        print_result conf data
+    end
+;;
+
 (**/**) (* Conversion de dates *)
 
 (* Copie de date.ml sans les balises HTML => on devrait créer *)
@@ -1499,18 +1519,20 @@ let pers_to_piqi_person conf base p =
 ;;
 
 (* ************************************************************************** *)
-(*  [Fonc] pers_to_piqi_fiche_person : config -> base -> person -> Person     *)
+(*  [Fonc] pers_to_piqi_fiche_person :
+    config -> base -> person -> bool -> Person                                *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person fiche
                     (piqi) dont tous les champs sont complétés.
     [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-      - p    : person
+      - conf         : configuration de la base
+      - base         : base de donnée
+      - p            : person
+      - with_parents : bool
     [Retour] :
       - Person
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let pers_to_piqi_fiche_person conf base p =
+let rec pers_to_piqi_fiche_person conf base p with_parents =
   (* Récupère une personne. *)
   let piqi_person = pers_to_piqi_person conf base p in
   (* Génère une personne fiche par défaut. *)
@@ -1604,7 +1626,58 @@ let pers_to_piqi_fiche_person conf base p =
       Perso.get_linked_page conf base p "OCCU"
     in
     let visible_for_visitors = is_visible conf base p in
-
+    let (father, mother) =
+      if with_parents = true
+      then
+        match get_parents p with
+        | Some ifam ->
+            let cpl = foi base ifam in
+            let ifath = get_father cpl in
+            let imoth = get_mother cpl in
+            let father =
+              if (Adef.int_of_iper ifath) < 0 then None
+              else
+                let father = poi base ifath in
+                Some (pers_to_piqi_fiche_person conf base father false)
+            in
+            let mother =
+              if (Adef.int_of_iper imoth) < 0 then None
+              else
+                let mother = poi base imoth in
+                Some (pers_to_piqi_fiche_person conf base mother false)
+            in
+            (father, mother)
+        | None ->
+            (* lien inter arbre *)
+            let ip = get_key_index p in
+            let base_prefix = conf.command in
+            match Perso_link.get_parents_link base_prefix ip with
+            | Some family ->
+                begin
+                  let ifath = Adef.iper_of_int (Int32.to_int family.MLink.Family.ifath) in
+                  let imoth = Adef.iper_of_int (Int32.to_int family.MLink.Family.imoth) in
+                  let fam_base_prefix = family.MLink.Family.baseprefix in
+                  match
+                    (Perso_link.get_person_link fam_base_prefix ifath,
+                     Perso_link.get_person_link fam_base_prefix imoth,
+                     Perso_link.get_person_link base_prefix ip)
+                  with
+                  | (Some pfath, Some pmoth, Some c) ->
+                      let (fath, _) = Perso_link.make_ep_link conf base pfath in
+                      let (moth, _) = Perso_link.make_ep_link conf base pmoth in
+                      let father =
+                        Some (pers_to_piqi_fiche_person conf base fath false)
+                      in
+                      let mother =
+                        Some (pers_to_piqi_fiche_person conf base moth false)
+                      in
+                      (father, mother)
+                  | _ -> (None, None)
+                end
+            | None -> (None, None)
+          else
+            (None, None)
+    in
     piqi_fiche_person.Mread.Fiche_person.birth_date_raw <- if birth_date_raw = "" then None else Some birth_date_raw;
     piqi_fiche_person.Mread.Fiche_person.baptism_date_raw <- if baptism_date_raw = "" then None else Some baptism_date_raw;
     piqi_fiche_person.Mread.Fiche_person.death_date_raw <- if death_date_raw = "" then None else Some death_date_raw;
@@ -1626,7 +1699,8 @@ let pers_to_piqi_fiche_person conf base p =
     piqi_fiche_person.Mread.Fiche_person.linked_page_head <- linked_page_head;
     piqi_fiche_person.Mread.Fiche_person.linked_page_occu <- linked_page_occu;
     piqi_fiche_person.Mread.Fiche_person.visible_for_visitors <- visible_for_visitors;
-
+    piqi_fiche_person.Mread.Fiche_person.father <- father;
+    piqi_fiche_person.Mread.Fiche_person.mother <- mother;
     piqi_person
 ;;
 
@@ -1692,7 +1766,7 @@ let print_result_fiche_person conf base ip =
   let p = poi base ip in
   (* cache lien inter arbre *)
   let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let pers_piqi = pers_to_piqi_fiche_person conf base p in
+  let pers_piqi = pers_to_piqi_fiche_person conf base p true in
   let data = Mext_read.gen_person pers_piqi in
   print_result conf data
 ;;
@@ -1723,10 +1797,12 @@ let print_fiche_person conf base =
           (
           match get_index_by_sosa conf base sosa_nb with
           | Some ip ->
-              print_result_fiche_person conf base ip
-          | None -> ()
+            print_result_fiche_person conf base ip
+          | None ->
+            print_error conf `not_found
           )
-      | None -> ()
+      | None ->
+          print_error conf `bad_request
       in
       result
   in
