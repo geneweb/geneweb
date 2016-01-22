@@ -932,14 +932,14 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       else ("", "")
   | "birth_note" ->
       if p_auth then
-        let b = bef.gen_p.birth_note in
-        let a = aft.gen_p.birth_note in
+        let b = quote_escaped bef.gen_p.birth_note in
+        let a = quote_escaped aft.gen_p.birth_note in
         diff_string b a
       else ("", "")
   | "birth_src" ->
       if p_auth then
-        let b = bef.gen_p.birth_src in
-        let a = aft.gen_p.birth_src in
+        let b = quote_escaped bef.gen_p.birth_src in
+        let a = quote_escaped aft.gen_p.birth_src in
         diff_string b a
       else ("", "")
   | "baptism" ->
@@ -956,14 +956,14 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       else ("", "")
   | "baptism_note" ->
       if p_auth then
-        let b = bef.gen_p.baptism_note in
-        let a = aft.gen_p.baptism_note in
+        let b = quote_escaped bef.gen_p.baptism_note in
+        let a = quote_escaped aft.gen_p.baptism_note in
         diff_string b a
       else ("", "")
   | "baptism_src" ->
       if p_auth then
-        let b = bef.gen_p.baptism_src in
-        let a = aft.gen_p.baptism_src in
+        let b = quote_escaped bef.gen_p.baptism_src in
+        let a = quote_escaped aft.gen_p.baptism_src in
         diff_string b a
       else ("", "")
   | "death" ->
@@ -980,14 +980,14 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       else ("", "")
   | "death_note" ->
       if p_auth then
-        let b = bef.gen_p.death_note in
-        let a = aft.gen_p.death_note in
+        let b = quote_escaped bef.gen_p.death_note in
+        let a = quote_escaped aft.gen_p.death_note in
         diff_string b a
       else ("", "")
   | "death_src" ->
       if p_auth then
-        let b = bef.gen_p.death_src in
-        let a = aft.gen_p.death_src in
+        let b = quote_escaped bef.gen_p.death_src in
+        let a = quote_escaped aft.gen_p.death_src in
         diff_string b a
       else ("", "")
   | "burial" ->
@@ -1004,14 +1004,14 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       else ("", "")
   | "burial_note" ->
       if p_auth then
-        let b = bef.gen_p.burial_note in
-        let a = aft.gen_p.burial_note in
+        let b = quote_escaped bef.gen_p.burial_note in
+        let a = quote_escaped aft.gen_p.burial_note in
         diff_string b a
       else ("", "")
   | "burial_src" ->
       if p_auth then
-        let b = bef.gen_p.burial_src in
-        let a = aft.gen_p.burial_src in
+        let b = quote_escaped bef.gen_p.burial_src in
+        let a = quote_escaped aft.gen_p.burial_src in
         diff_string b a
       else ("", "")
   | "pevent_name" ->
@@ -1062,11 +1062,11 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if p_auth && not conf.no_note then
             match (bef, aft) with
             [ (Some b, Some a) ->
-                let b = b.epers_note in
-                let a = a.epers_note in
+                let b = quote_escaped b.epers_note in
+                let a = quote_escaped a.epers_note in
                 diff_string b a
-            | (None, Some a) -> ("", a.epers_note)
-            | (Some b, None) -> (b.epers_note, "")
+            | (None, Some a) -> ("", quote_escaped a.epers_note)
+            | (Some b, None) -> (quote_escaped b.epers_note, "")
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
@@ -1076,11 +1076,11 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if p_auth then
             match (bef, aft) with
             [ (Some b, Some a) ->
-                let b = b.epers_src in
-                let a = a.epers_src in
+                let b = quote_escaped b.epers_src in
+                let a = quote_escaped a.epers_src in
                 diff_string b a
-            | (None, Some a) -> ("", a.epers_src)
-            | (Some b, None) -> (b.epers_src, "")
+            | (None, Some a) -> ("", quote_escaped a.epers_src)
+            | (Some b, None) -> (quote_escaped b.epers_src, "")
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
@@ -1102,8 +1102,8 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
       | _ -> raise Not_found ]
   | "notes" ->
       if p_auth && not conf.no_note then
-        let b = bef.gen_p.notes in
-        let a = aft.gen_p.notes in
+        let b = quote_escaped bef.gen_p.notes in
+        let a = quote_escaped aft.gen_p.notes in
         diff_string b a
       else ("", "")
   | "psources" ->
@@ -1154,11 +1154,11 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if m_auth then
             match (bef, aft) with
             [ (Some b, Some a) ->
-                let b = b.marriage_src in
-                let a = a.marriage_src in
+                let b = quote_escaped b.marriage_src in
+                let a = quote_escaped a.marriage_src in
                 diff_string b a
-            | (None, Some a) -> ("", a.marriage_src)
-            | (Some b, None) -> (b.marriage_src, "")
+            | (None, Some a) -> ("", quote_escaped a.marriage_src)
+            | (Some b, None) -> (quote_escaped b.marriage_src, "")
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
@@ -1258,11 +1258,11 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if m_auth && not conf.no_note then
             match (bef, aft) with
             [ (Some b, Some a) ->
-                let b = b.efam_note in
-                let a = a.efam_note in
+                let b = quote_escaped b.efam_note in
+                let a = quote_escaped a.efam_note in
                 diff_string b a
-            | (None, Some a) -> ("", a.efam_note)
-            | (Some b, None) -> (b.efam_note, "")
+            | (None, Some a) -> ("", quote_escaped a.efam_note)
+            | (Some b, None) -> (quote_escaped b.efam_note, "")
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
@@ -1272,11 +1272,11 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if m_auth then
             match (bef, aft) with
             [ (Some b, Some a) ->
-                let b = b.efam_src in
-                let a = a.efam_src in
+                let b = quote_escaped b.efam_src in
+                let a = quote_escaped a.efam_src in
                 diff_string b a
-            | (None, Some a) -> ("", a.efam_src)
-            | (Some b, None) -> (b.efam_src, "")
+            | (None, Some a) -> ("", quote_escaped a.efam_src)
+            | (Some b, None) -> (quote_escaped b.efam_src, "")
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
@@ -1302,11 +1302,11 @@ and eval_str_gen_record conf base env (bef, aft, p_auth) =
           if m_auth && not conf.no_note then
             match (bef, aft) with
             [ (Some b, Some a) ->
-                let b = b.comment in
-                let a = a.comment in
+                let b = quote_escaped b.comment in
+                let a = quote_escaped a.comment in
                 diff_string b a
-            | (None, Some a) -> ("", a.comment)
-            | (Some b, None) -> (b.comment, "")
+            | (None, Some a) -> ("", quote_escaped a.comment)
+            | (Some b, None) -> (quote_escaped b.comment, "")
             | (None, None) -> ("", "") ]
           else ("", "")
       | _ -> raise Not_found ]
