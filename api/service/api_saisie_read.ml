@@ -1654,18 +1654,40 @@ let print_person_tree conf base =
 ;;
 
 (* ********************************************************************* *)
-(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
-(** [Description] : Renvoie un objet personne contenant les données de
-      la fiche.
+(*  [Fonc] get_index_by_sosa : conf -> base -> sosa -> ip                *)
+(** [Description] : Retourne l'index d'un sosa donné
     [Args] :
       - conf  : configuration de la base
       - base  : base de donnée
+      - sosa  : numéro de sosa
+    [Retour] : index|None
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let get_index_by_sosa conf base sosa =
+  let sosa_nb = Num.of_string sosa in
+  let sosa_ref = Util.find_sosa_ref conf base in
+  match (sosa_ref, sosa_nb) with
+  | (Some sr, n) ->
+    if n <> Num.zero then
+      match Util.branch_of_sosa conf base (get_key_index sr) n with
+      | Some ((x,_)::xs) -> Some x
+      | _ -> None
+    else None
+  | _ -> None
+;;
+
+(* ********************************************************************* *)
+(*  [Fonc] print_result_fiche_person : conf -> base -> ip -> unit        *)
+(** [Description] : Renvoie un objet personne contenant les données de
+      la fiche en fonction d'un index.
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnée
+      - ip    : l'index de la personne
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let print_fiche_person conf base =
-  let ip = get_params conf Mext_read.parse_index_person in
-  let ip = Adef.iper_of_int (Int32.to_int ip.Mread.Index_person.index) in
+let print_result_fiche_person conf base ip =
   let () = Perso.build_sosa_ht conf base in
   let p = poi base ip in
   (* cache lien inter arbre *)
@@ -1674,6 +1696,44 @@ let print_fiche_person conf base =
   let data = Mext_read.gen_person pers_piqi in
   print_result conf data
 ;;
+
+(* ********************************************************************* *)
+(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
+(** [Description] : Renvoie un objet personne contenant les données de
+      la fiche en fonction d'un identifiant (index ou sosa).
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnée
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_fiche_person conf base =
+  let identifier_person = get_params conf Mext_read.parse_identifier_person in
+  let result =
+  match identifier_person.Mread.Identifier_person.index with
+  | Some index ->
+      (* Traite l'index *)
+      let ip = Adef.iper_of_int (Int32.to_int index) in
+      print_result_fiche_person conf base ip
+  | None ->
+      (* Traite le numéro de sosa *)
+      let result =
+      match identifier_person.Mread.Identifier_person.sosa_nb with
+      | Some sosa_nb ->
+          (
+          match get_index_by_sosa conf base sosa_nb with
+          | Some ip ->
+              print_result_fiche_person conf base ip
+          | None -> ()
+          )
+      | None -> ()
+      in
+      result
+  in
+  result
+;;
+
+
 
 (**/**) (* V1 *)
 

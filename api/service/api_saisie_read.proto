@@ -390,3 +390,8 @@ message GraphTreeFull {
   repeated NodeFull nodes_siblings_before = 8;
   repeated NodeFull nodes_siblings_after = 9;
 }
+
+message IdentifierPerson {
+  optional int32 index = 1;
+  optional string sosa_nb = 2;
+}
