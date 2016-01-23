@@ -14,4 +14,5 @@ value print_update_ind :
 value print_add : config -> base -> unit;
 value print_del : config -> base -> unit;
 value print_mod : config -> base -> unit;
+value print_change_event_order : config -> base -> unit;
 

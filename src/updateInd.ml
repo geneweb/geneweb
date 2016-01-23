@@ -133,6 +133,35 @@ and eval_simple_var conf base env p loc =
         | _ -> None ]
       in
       eval_date_var od s
+  | ["event_str"] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          try
+            let p = poi base p.key_index in
+            let e = List.nth (get_pevents p) (i - 1) in
+            let name =
+              capitale (Util.string_of_pevent_name conf base e.epers_name)
+            in
+            let date =
+              match Adef.od_of_codate e.epers_date with
+              [ Some d -> Date.string_of_date conf d
+              | None -> "" ]
+            in
+            let place = Util.string_of_place conf (sou base e.epers_place) in
+            let note = sou base e.epers_note in
+            let src = sou base e.epers_src in
+            let wit =
+              List.fold_right
+                (fun (w, wk) accu ->
+                   [Util.string_of_witness_kind conf p wk ^ ": " ^
+                     Util.person_text conf base (poi base w) :: accu])
+                (Array.to_list e.epers_witnesses) []
+            in
+            let s = String.concat ", " [name; date; place; note; src] in
+            let sw = String.concat ", " wit in
+            str_val (s ^ ", " ^ sw)
+          with [ Failure _ -> str_val "" ]
+      | _ -> str_val "" ]
   | ["first_name"] -> str_val (quote_escaped p.first_name)
   | ["first_name_alias"] -> eval_string_env "first_name_alias" env
   | ["has_aliases"] -> bool_val (p.aliases <> [])
@@ -783,5 +812,19 @@ value print_del conf base =
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
       print_del1 conf base p
+  | _ -> incorrect_request conf ]
+;
+
+value print_change_event_order conf base =
+  match p_getint conf.env "i" with
+  [ Some i ->
+      let p = string_person_of base (poi base (Adef.iper_of_int i)) in
+      Hutil.interp conf base "updindevt"
+        {Templ.eval_var = eval_var conf base;
+         Templ.eval_transl _ = Templ.eval_transl conf;
+         Templ.eval_predefined_apply _ = raise Not_found;
+         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+         Templ.print_foreach = print_foreach}
+        [] p
   | _ -> incorrect_request conf ]
 ;

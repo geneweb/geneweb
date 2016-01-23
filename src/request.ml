@@ -410,6 +410,14 @@ value family_m conf base =
   | Some "CAL" -> Date.print_calendar conf base
   | Some "CHG_CHN" when conf.wizard -> ChangeChildren.print conf base
   | Some "CHG_CHN_OK" when conf.wizard -> ChangeChildren.print_ok conf base
+  | Some "CHG_EVT_IND_ORD" when conf.wizard ->
+      UpdateInd.print_change_event_order conf base
+  | Some "CHG_EVT_IND_ORD_OK" when conf.wizard ->
+      UpdateIndOk.print_change_event_order conf base
+  | Some "CHG_EVT_FAM_ORD" when conf.wizard ->
+      UpdateFam.print_change_event_order conf base
+  | Some "CHG_EVT_FAM_ORD_OK" when conf.wizard ->
+      UpdateFamOk.print_change_event_order conf base
   | Some "CHG_FAM_ORD" when conf.wizard ->
       UpdateFam.print_change_order conf base
   | Some "CHG_FAM_ORD_OK" when conf.wizard ->
@@ -877,6 +885,7 @@ value this_request_updates_database conf =
   | Some x when conf.wizard ->
       match x with
       [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHANGE_WIZ_VIS" | "CHG_CHN_OK" |
+        "CHG_EVT_IND_ORD_OK" | "CHG_EVT_FAM_ORD_OK" |
         "CHG_FAM_ORD_OK" | "DEL_FAM_OK" | "DEL_IMAGE_OK" | "DEL_IND_OK" |
         "INV_FAM_OK" | "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" |
         "MOD_NOTES_OK" | "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" |

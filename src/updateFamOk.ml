@@ -315,6 +315,17 @@ value rec reconstitute_events conf ext cnt =
   | _ -> ([], ext) ]
 ;
 
+value rec reconstitute_sorted_fevents conf cnt =
+  match (get_nth conf "e_id" cnt, get_nth conf "e_pos" cnt) with
+  [ (Some id, Some pos) ->
+      let (id, pos) =
+        try (int_of_string id, int_of_string pos) with [ Failure _ -> (0, 0) ]
+      in
+      let el = reconstitute_sorted_fevents conf (cnt + 1) in
+      [(id, pos) :: el]
+  | _ -> [] ]
+;
+
 value reconstitute_from_fevents conf fevents marr div =
   (* On tri les évènements pour être sûr. *)
   let fevents =
@@ -1601,6 +1612,18 @@ value print_mod_ok conf base (wl, ml) cpl des =
   }
 ;
 
+value print_change_event_order_ok conf base (wl, ml) cpl des =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "family modified"))
+  in
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    print_family conf base (wl, ml) cpl des;
+    trailer conf
+  }
+;
+
 value print_add_ok conf base (wl, ml) cpl des =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "family added")) in
   do {
@@ -1908,5 +1931,77 @@ value print_change_order_ok conf base =
         }
       with
       [ Update.ModErr -> () ]
+  | _ -> incorrect_request conf ]
+;
+
+value print_change_event_order conf base =
+  match p_getint conf.env "i" with
+  [ Some ifam ->
+    try
+      do {
+        let fam = foi base (Adef.ifam_of_int ifam) in
+        let o_f =
+          Util.string_gen_family base (gen_family_of_family fam)
+        in
+        let ht = Hashtbl.create 50 in
+        let _ =
+          List.fold_left
+            (fun id evt ->
+               do { Hashtbl.add ht id evt; succ id })
+            1 (get_fevents fam)
+        in
+        let sorted_fevents =
+          List.sort
+            (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
+            (reconstitute_sorted_fevents conf 1)
+        in
+        let fevents =
+          List.fold_right
+            (fun (id, _) accu ->
+               try [Hashtbl.find ht id :: accu]
+               with [ Not_found -> failwith "Sorting event"])
+            sorted_fevents []
+        in
+        let fam = gen_family_of_family fam in
+        let fam = {(fam) with fevents = fevents} in
+        let fam = update_family_with_fevents conf base fam in
+        patch_family base fam.fam_index fam;
+        let a = foi base fam.fam_index in
+        let cpl = parent conf.multi_parents (get_parent_array a) in
+        let des = {children = get_children a} in
+        let wl =
+          do {
+            let wl = ref [] in
+            let error = Update.error conf base in
+            let warning w = wl.val := [w :: wl.val] in
+            let nfam = family_of_gen_family base (fam, cpl, des) in
+            CheckItem.family base error warning fam.fam_index nfam;
+            List.iter
+              (fun
+               [ ChangedOrderOfFamilyEvents ifam  _ after ->
+                  patch_family base ifam {(fam) with fevents = after}
+               | _ -> () ])
+             wl.val;
+            List.rev wl.val
+          }
+        in
+        Util.commit_patches conf base;
+        let changed =
+          let ip =
+            match p_getint conf.env "ip" with
+            [ Some i -> Adef.iper_of_int i
+            | None -> Adef.iper_of_int (-1) ]
+          in
+          let p =
+            Util.string_gen_person base (gen_person_of_person (poi base ip))
+          in
+          let n_f = Util.string_gen_family base fam in
+          U_Modify_family p o_f n_f
+        in
+        History.record conf base changed "mf";
+        print_change_event_order_ok conf base (wl, []) cpl des
+      }
+    with
+    [ Update.ModErr -> () ]
   | _ -> incorrect_request conf ]
 ;

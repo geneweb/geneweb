@@ -20,3 +20,4 @@ value rename_image_file : config -> base -> person -> gen_person iper string -> 
 value print_add : config -> base -> unit;
 value print_del : config -> base -> unit;
 value print_mod : config -> base -> unit;
+value print_change_event_order : config -> base -> unit;

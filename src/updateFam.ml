@@ -208,6 +208,35 @@ and eval_simple_var conf base env (fam, cpl, des) loc =
         | _ -> None ]
       in
       eval_date_var od s
+  | ["event_str"] ->
+      match get_env "cnt" env with
+      [ Vint i ->
+          try
+            let fam = foi base fam.fam_index in
+            let e = List.nth (get_fevents fam) (i - 1) in
+            let name =
+              capitale (Util.string_of_fevent_name conf base e.efam_name)
+            in
+            let date =
+              match Adef.od_of_codate e.efam_date with
+              [ Some d -> Date.string_of_date conf d
+              | None -> "" ]
+            in
+            let place = Util.string_of_place conf (sou base e.efam_place) in
+            let note = sou base e.efam_note in
+            let src = sou base e.efam_src in
+            let wit =
+              List.fold_right
+                (fun (w, wk) accu ->
+                   [transl_nth conf "witness/witnesses" 0 ^ ": " ^
+                     Util.person_text conf base (poi base w) :: accu])
+                (Array.to_list e.efam_witnesses) []
+            in
+            let s = String.concat ", " [name; date; place; note; src] in
+            let sw = String.concat ", " wit in
+            str_val (s ^ ", " ^ sw)
+          with [ Failure _ -> str_val "" ]
+      | _ -> str_val "" ]
   | ["has_fwitness"] ->
       match get_env "cnt" env with
       [ Vint i ->
@@ -883,5 +912,19 @@ value print_change_order conf base =
       Wserver.wprint "\n";
       trailer conf
     }
+  | _ -> incorrect_request conf ]
+;
+
+value print_change_event_order conf base =
+  match p_getint conf.env "i" with
+  [ Some i ->
+      let sfam = string_family_of conf base (Adef.ifam_of_int i) in
+      Hutil.interp conf base "updfamevt"
+        {Templ.eval_var = eval_var conf base;
+         Templ.eval_transl _ = Templ.eval_transl conf;
+         Templ.eval_predefined_apply _ = raise Not_found;
+         Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+         Templ.print_foreach = print_foreach}
+        [] sfam
   | _ -> incorrect_request conf ]
 ;

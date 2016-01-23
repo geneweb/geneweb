@@ -321,6 +321,17 @@ value rec reconstitute_pevents conf ext cnt =
   | _ -> ([], ext) ]
 ;
 
+value rec reconstitute_sorted_pevents conf cnt =
+  match (get_nth conf "e_id" cnt, get_nth conf "e_pos" cnt) with
+  [ (Some id, Some pos) ->
+      let (id, pos) =
+        try (int_of_string id, int_of_string pos) with [ Failure _ -> (0, 0) ]
+      in
+      let el = reconstitute_sorted_pevents conf (cnt + 1) in
+      [(id, pos) :: el]
+  | _ -> [] ]
+;
+
 value reconstitute_add_relation conf ext cnt rl =
   match get_nth conf "add_relation" cnt with
   [ Some "on" ->
@@ -1275,6 +1286,22 @@ value print_del_ok conf base wl =
   }
 ;
 
+value print_change_event_order_ok conf base wl p =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "person modified"))
+  in
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Update.print_warnings conf base wl;
+    Wserver.wprint "\n%s"
+      (referenced_person_text conf base (poi base p.key_index));
+    Wserver.wprint "\n";
+    trailer conf;
+  }
+;
+
+
 value print_add o_conf base =
   (* Attention ! On pense à remettre les compteurs à *)
   (* zéro pour la détection des caractères interdits *)
@@ -1414,4 +1441,50 @@ value print_mod o_conf base =
   }
   in
   print_mod_aux conf base callback
+;
+
+value print_change_event_order conf base =
+  match p_getint conf.env "i" with
+  [ Some ip ->
+    try
+      do {
+        let p = poi base (Adef.iper_of_int ip) in
+        let o_p = Util.string_gen_person base (gen_person_of_person p) in
+        let ht = Hashtbl.create 50 in
+        let _ =
+          List.fold_left
+            (fun id evt ->
+               do { Hashtbl.add ht id evt; succ id })
+            1 (get_pevents p)
+        in
+        let sorted_pevents =
+          List.sort
+            (fun (_, pos1) (_, pos2) -> compare pos1 pos2)
+            (reconstitute_sorted_pevents conf 1)
+        in
+        let pevents =
+          List.fold_right
+            (fun (id, _) accu ->
+               try [Hashtbl.find ht id :: accu]
+               with [ Not_found -> failwith "Sorting event"])
+            sorted_pevents []
+        in
+        let p = gen_person_of_person p in
+        let p = {(p) with pevents = pevents} in
+        patch_person base p.key_index p;
+        let wl =
+          let a = poi base p.key_index in
+          let a = {parents = get_parents a; consang = get_consang a} in
+          let u = poi base p.key_index in
+          let u = {family = get_family u} in
+          all_checks_person conf base p a u
+        in
+        Util.commit_patches conf base;
+        let changed = U_Modify_person o_p (Util.string_gen_person base p) in
+        History.record conf base changed "mp";
+        print_change_event_order_ok conf base wl p;
+      }
+    with
+    [ Update.ModErr -> () ]
+  | _ -> incorrect_request conf ]
 ;
