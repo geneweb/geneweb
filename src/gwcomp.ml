@@ -69,6 +69,22 @@ value fields str =
     else [copy_decode str beg i]
 ;
 
+value cut_space x =
+  let len = String.length x in
+  if len = 0 then x
+  else if x = " " then ""
+  else
+    let start = if x.[0] = ' ' then 1 else 0 in
+    let stop = if x.[len - 1] = ' ' then len - 1 else len in
+    if start = 0 && stop = len then x else String.sub x start (stop - start)
+;
+
+value get_field lab l =
+  match l with
+  [ [lab1; x :: l'] when lab1 = lab -> (cut_space x, l')
+  | _ -> ("", l) ]
+;
+
 value date_of_string s i =
   let champ i =
     let (neg, i) =
@@ -155,6 +171,7 @@ value date_of_string s i =
           if i = String.length s then None
           else if s.[i] = '(' && s.[String.length s - 1] = ')' then
             let txt = String.sub s (i + 1) (String.length s - i - 2) in
+            let txt = cut_space txt in
             Some (Dtext txt, String.length s)
           else failwith ("date_of_string " ^ s)
         else
@@ -323,22 +340,6 @@ value get_burial l =
           (Cremated (Adef.codate_of_od od), l)
       | [] -> (Cremated Adef.codate_None, l) ]
   | _ -> (UnknownBurial, l) ]
-;
-
-value cut_space x =
-  let len = String.length x in
-  if len = 0 then x
-  else if x = " " then ""
-  else
-    let start = if x.[0] = ' ' then 1 else 0 in
-    let stop = if x.[len - 1] = ' ' then len - 1 else len in
-    if start = 0 && stop = len then x else String.sub x start (stop - start)
-;
-
-value get_field lab l =
-  match l with
-  [ [lab1; x :: l'] when lab1 = lab -> (cut_space x, l')
-  | _ -> ("", l) ]
 ;
 
 value get_optional_sexe =
