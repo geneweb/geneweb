@@ -792,16 +792,16 @@ value print_comment_for_family oc base gen fam =
     old_gw.val && (fevents <> [] || sou base (get_marriage_note fam) <> "")
   in
   if (comm <> "" || has_evt) then do {
-    fprintf oc "comm ";
-    if comm <> "" then fprintf oc "%s " (no_newlines comm)
+    fprintf oc "comm";
+    if comm <> "" then fprintf oc " %s" (no_newlines comm)
     else ();
     if old_gw.val then do {
       if sou base (get_marriage_note fam) <> "" then
-        fprintf oc "marriage: %s "
+        fprintf oc " marriage: %s"
           (no_newlines (sou base (get_marriage_note fam)))
       else ();
       List.iter
-        (fun e -> do {print_fevent oc base gen True e; fprintf oc " "})
+        (fun e -> do {fprintf oc " "; print_fevent oc base gen True e})
         fevents;
     }
     else ();
