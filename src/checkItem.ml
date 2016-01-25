@@ -1108,7 +1108,6 @@ value check_marriage_age base warning (ifam, fam) ip =
 value check_reduce_fevents base error warning (ifam, fam) = do {
   let cpl = foi base ifam in
   check_order_fevents base warning (ifam, fam);
-  check_order_fevents base warning (ifam, fam);
   check_marriage_age base warning (ifam, fam) (get_father cpl);
   check_marriage_age base warning (ifam, fam) (get_mother cpl);
   check_difference_age_between_cpl base warning
@@ -1118,8 +1117,6 @@ value check_reduce_fevents base error warning (ifam, fam) = do {
 value check_fevents base error warning (ifam, fam) = do {
   let cpl = foi base ifam in
   check_order_fevents base warning (ifam, fam);
-  check_order_fevents base warning (ifam, fam);
-  check_witness_fevents base warning (ifam, fam);
   check_witness_fevents base warning (ifam, fam);
   check_marriage_age base warning (ifam, fam) (get_father cpl);
   check_marriage_age base warning (ifam, fam) (get_mother cpl);
