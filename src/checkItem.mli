@@ -45,3 +45,6 @@ value sort_children :
 
 value check_other_fields :
   base -> (base_misc -> unit) -> Def.ifam -> family -> unit;
+
+value list_uniq : list 'a -> list 'a;
+value stable_list_uniq : list 'a -> list 'a;

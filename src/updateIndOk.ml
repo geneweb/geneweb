@@ -1232,6 +1232,7 @@ value all_checks_person conf base p a u = do {
   Array.iter
     (fun ifam -> CheckItem.reduce_family base error warning ifam (foi base ifam))
     u.family;
+  let wl = CheckItem.list_uniq wl.val in
   List.iter
     (fun
      [ ChangedOrderOfChildren ifam des _ after ->
@@ -1239,8 +1240,8 @@ value all_checks_person conf base p a u = do {
      | ChangedOrderOfPersonEvents _ _ after ->
          patch_person base p.key_index {(p) with pevents = after}
      | _ -> () ])
-    wl.val;
-  List.rev wl.val
+    wl;
+  wl
 };
 
 value print_add_ok conf base wl p =

@@ -1537,6 +1537,7 @@ value all_checks_family conf base ifam gen_fam cpl des scdo = do {
   let fam = family_of_gen_family base (gen_fam, cpl, des) in
   CheckItem.family base error warning ifam fam;
   CheckItem.check_other_fields base misc ifam fam;
+  let (wl, ml) = (CheckItem.list_uniq wl.val, CheckItem.list_uniq ml.val) in
   List.iter
     (fun
      [ ChangedOrderOfMarriages p _ after ->
@@ -1544,8 +1545,8 @@ value all_checks_family conf base ifam gen_fam cpl des scdo = do {
      | ChangedOrderOfFamilyEvents ifam  _ after ->
          patch_family base ifam {(gen_fam) with fevents = after}
      | _ -> () ])
-    wl.val;
-  (List.rev wl.val, List.rev ml.val)
+    wl;
+  (wl, ml)
 };
 
 value print_family conf base (wl, ml) cpl des = do {
