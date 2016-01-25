@@ -182,20 +182,15 @@ type event_name 'string =
 *)
 value compare_event_name name1 name2 =
   match (name1, name2) with
-  [ (Psort (Epers_Name _), e) | (e, Psort (Epers_Name _)) |
-    (Fsort (Efam_Name _), e) | (e, Fsort (Efam_Name _)) when
-      e <> Psort Epers_Birth && e <> Psort Epers_Baptism &&
-      e <> Psort Epers_Death && e <> Psort Epers_Funeral &&
-      e <> Psort Epers_Burial && e <> Psort Epers_Cremation &&
-      e <> Fsort Efam_Engage && e <> Fsort Efam_PACS &&
-      e <> Fsort Efam_MarriageBann && e <> Fsort Efam_MarriageContract &&
-      e <> Fsort Efam_Marriage && e <> Fsort Efam_Separated &&
-      e <> Fsort Efam_Divorce -> 0
-
-  | (Psort Epers_Birth, _) -> -1
+  [ (Psort Epers_Birth, _) -> -1
   | (_, Psort Epers_Birth) -> 1
-  | (Psort Epers_Baptism, _) -> -1
-  | (_, Psort Epers_Baptism) -> 1
+
+  | (Psort Epers_Baptism, e) when
+      e = Psort Epers_Death || e = Psort Epers_Funeral ||
+      e = Psort Epers_Burial || e = Psort Epers_Cremation -> -1
+  | (e, Psort Epers_Baptism) when
+      e = Psort Epers_Death || e = Psort Epers_Funeral ||
+      e = Psort Epers_Burial || e = Psort Epers_Cremation -> 1
 
   | (Psort Epers_Burial, _) | (Psort Epers_Cremation, _) -> 1
   | (_, Psort Epers_Burial) | (_, Psort Epers_Cremation) -> -1
@@ -203,22 +198,6 @@ value compare_event_name name1 name2 =
   | (_, Psort Epers_Funeral) -> -1
   | (Psort Epers_Death, _) -> 1
   | (_, Psort Epers_Death) -> -1
-
-  | (Fsort Efam_Engage, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_Engage) -> 1
-  | (Fsort Efam_PACS, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_PACS) -> 1
-  | (Fsort Efam_MarriageBann, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_MarriageBann) -> 1
-  | (Fsort Efam_MarriageContract, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_MarriageContract) -> 1
-  | (Fsort Efam_Marriage, Fsort _) -> -1
-  | (Fsort _, Fsort Efam_Marriage) -> 1
-
-  | (Fsort Efam_Divorce, Fsort _) -> 1
-  | (Fsort _, Fsort Efam_Divorce) -> -1
-  | (Fsort Efam_Separated, Fsort _) -> 1
-  | (Fsort _, Fsort Efam_Separated) -> -1
 
   | _ -> 0 ]
 ;
