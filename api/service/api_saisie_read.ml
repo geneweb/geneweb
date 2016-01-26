@@ -1,6 +1,5 @@
 module Mread = Api_saisie_read_piqi
 module Mext_read = Api_saisie_read_piqi_ext
-
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
 
@@ -1728,26 +1727,57 @@ let print_person_tree conf base =
 ;;
 
 (* ********************************************************************* *)
-(*  [Fonc] get_index_by_sosa : conf -> base -> sosa -> ip                *)
-(** [Description] : Retourne l'index d'un sosa donné
+(*  [Fonc] search_index : conf -> base -> key -> search_index_type list  *)
+(** [Description] : Retourne l'index d'une personne en fonction de mots clé
     [Args] :
       - conf  : configuration de la base
       - base  : base de donnée
-      - sosa  : numéro de sosa
+      - key  : mot clé
+      - list  : liste du type de recherche à faire
     [Retour] : index|None
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let get_index_by_sosa conf base sosa =
-  let sosa_nb = Num.of_string sosa in
-  let sosa_ref = Util.find_sosa_ref conf base in
-  match (sosa_ref, sosa_nb) with
-  | (Some sr, n) ->
-    if n <> Num.zero then
-      match Util.branch_of_sosa conf base (get_key_index sr) n with
-      | Some ((x,_)::xs) -> Some x
-      | _ -> None
-    else None
-  | _ -> None
+type search_index_type =  Sosa | Key | ApproxKey | PartialKey;;
+let search_index conf base an search_order =
+  let rec loop l =
+  (
+    match l with
+    | Sosa::le ->
+        let pl = SearchName.search_by_sosa conf base an in
+        (
+        match pl with
+        | [] ->  loop le
+        | [p] -> Some (get_key_index p)
+        | pl -> None
+        )
+    | Key::le ->
+        let pl = SearchName.search_by_key conf base an in
+        (
+        match pl with
+        | [] ->  loop le
+        | [p] -> Some (get_key_index p)
+        | pl -> None
+        )
+    | ApproxKey::le ->
+        let pl = SearchName.search_approx_key conf base an in
+        (
+        match pl with
+        | [] ->  loop le
+        | [p] -> Some (get_key_index p)
+        | pl -> None
+        )
+    | PartialKey::le ->
+        let pl = SearchName.search_partial_key conf base an in
+        (
+        match pl with
+        | [] ->  loop le
+        | [p] -> Some (get_key_index p)
+        | pl -> None
+        )
+    | _ -> None
+  )
+  in
+  loop search_order
 ;;
 
 (* ********************************************************************* *)
@@ -1790,21 +1820,29 @@ let print_fiche_person conf base =
       let ip = Adef.iper_of_int (Int32.to_int index) in
       print_result_fiche_person conf base ip
   | None ->
-      (* Traite le numéro de sosa *)
-      let result =
-      match identifier_person.Mread.Identifier_person.sosa_nb with
-      | Some sosa_nb ->
-          (
-          match get_index_by_sosa conf base sosa_nb with
-          | Some ip ->
-            print_result_fiche_person conf base ip
-          | None ->
-            print_error conf `not_found
-          )
-      | None ->
-          print_error conf `bad_request
-      in
-      result
+    (* Fait une recherche par mots-clé *)
+    let result =
+    (
+    match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n)  with
+    | (Some fn, Some sn) ->
+      let order = [ Key; ApproxKey; PartialKey ] in
+      (
+      match search_index conf base (fn ^ " " ^ sn) order with
+      | Some ip -> print_result_fiche_person conf base ip
+      | None -> print_error conf `not_found
+      )
+    | (None, Some sn) ->
+      let order = [ Sosa; Key; ApproxKey; PartialKey ] in
+      (
+      match search_index conf base sn order with
+      | Some ip -> print_result_fiche_person conf base ip
+      | None -> print_error conf `not_found
+      )
+    | (Some fn, None) -> print_error conf `bad_request
+    | (None, None) -> print_error conf `bad_request
+    )
+    in
+    result
   in
   result
 ;;

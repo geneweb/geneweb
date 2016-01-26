@@ -395,7 +395,8 @@ message GraphTreeFull {
 
 message IdentifierPerson {
   optional int32 index = 1;
-  optional string sosa_nb = 2;
+  optional string n = 2;
+  optional string p = 3;
 }
 
 message Error {

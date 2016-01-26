@@ -316,10 +316,11 @@ robot.cmx: config.cmi secure.cmx srcfile.cmx util.cmx templ.cmx \
     ../wserver/wserver.cmx
 searchName.cmo: adef.cmi buff.cmo checkItem.cmi config.cmi date.cmi def.cmi \
     gutil.cmi gwdb.cmi hutil.cmi mutil.cmi name.cmi util.cmi \
-    num.cmi perso.cmi ../wserver/wserver.cmi
+    num.cmi perso.cmi ../wserver/wserver.cmi searchName.cmi
 searchName.cmx: adef.cmx buff.cmx checkItem.cmx config.cmi date.cmx def.cmi \
     gutil.cmx gwdb.cmx hutil.cmx mutil.cmx name.cmx util.cmx \
-    num.cmx perso.cmx ../wserver/wserver.cmx
+    num.cmx perso.cmx ../wserver/wserver.cmx searchName.cmi
+searchName.cmi: config.cmi gwdb.cmi
 secure.cmo: secure.cmi
 secure.cmx: secure.cmi
 select.cmo: adef.cmi def.cmi gutil.cmi gwdb.cmi name.cmi
