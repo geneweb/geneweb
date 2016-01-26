@@ -105,7 +105,7 @@ gwd.out: $(GWD_OBJS)
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
 	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
-	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) unix.cmxa str.cmxa -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) -linkpkg -package curl,unix,str -I $(OCURL) curl.cmxa $(STATIC) -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out

@@ -22,6 +22,7 @@ DEPENDANCIES:
   uuidm
   yojson
   ocaml-redis (https://github.com/geneanet/ocaml-redis)
+  uuidm (for ocaml-redis)
 
 NOTE : Run the configure script to update the ocaml variables
 (tools/Makefile.ocaml). You need to build ocaml-redis from source
