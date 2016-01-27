@@ -1813,6 +1813,7 @@ let print_result_fiche_person conf base ip =
 (* ********************************************************************* *)
 let print_fiche_person conf base =
   let identifier_person = get_params conf Mext_read.parse_identifier_person in
+  try
   let result =
   match identifier_person.Mread.Identifier_person.index with
   | Some index ->
@@ -1845,6 +1846,7 @@ let print_fiche_person conf base =
     result
   in
   result
+  with _ -> print_error conf `not_found
 ;;
 
 
