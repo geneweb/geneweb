@@ -1904,6 +1904,24 @@ let print_fiche_person conf base =
       let ip = Adef.iper_of_int (Int32.to_int index) in
       print_result_fiche_person conf base ip
   | None ->
+    match (identifier_person.Mread.Identifier_person.oc)  with
+    | (Some oc) ->
+      let result =
+      (
+      match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n)  with
+      | (Some fn, Some sn) ->
+        (* Retourne une personne en fonction de son npoc *)
+          (
+          match Gwdb.person_of_key base fn sn (Int32.to_int oc) with
+          | Some ip ->
+            print_result_fiche_person conf base ip
+          | None ->
+            print_error conf `not_found
+          )
+      | _ -> print_error conf `bad_request
+      )
+      in result
+    | None ->
     (* Fait une recherche par mots-clé *)
     let result =
     (

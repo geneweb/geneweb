@@ -466,6 +466,7 @@ message IdentifierPerson {
   optional int32 index = 1;
   optional string n = 2;
   optional string p = 3;
+  optional int32 oc = 4;
 }
 
 message Error {
