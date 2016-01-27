@@ -40,6 +40,7 @@ let _marriage_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/marri
 let _divorce_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/divorce-type"
 let _relation_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/relation-type"
 let _witness_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/witness-type"
+let _event_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/event-type"
 let _title_type_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/title-type"
 
 
@@ -222,6 +223,11 @@ let parse_witness_type ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _witness_type_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
   Api_saisie_read_piqi.parse_witness_type buf
+
+let parse_event_type ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _event_type_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_event_type buf
 
 let parse_title_type ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _title_type_piqi_type format `pb x ?opts in
@@ -409,6 +415,11 @@ let gen_witness_type ?opts x (format :Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _witness_type_piqi_type `pb format x_pb ?opts
 
+let gen_event_type ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_event_type x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _event_type_piqi_type `pb format x_pb ?opts
+
 let gen_title_type ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_saisie_read_piqi.gen_title_type x in
   let x_pb = Piqirun.to_string buf in
@@ -594,6 +605,11 @@ let print_witness_type ?opts x =
   Pervasives.print_endline (gen_witness_type x `piq ?opts)
 let prerr_witness_type ?opts x =
   Pervasives.prerr_endline (gen_witness_type x `piq ?opts)
+
+let print_event_type ?opts x =
+  Pervasives.print_endline (gen_event_type x `piq ?opts)
+let prerr_event_type ?opts x =
+  Pervasives.prerr_endline (gen_event_type x `piq ?opts)
 
 let print_title_type ?opts x =
   Pervasives.print_endline (gen_title_type x `piq ?opts)
