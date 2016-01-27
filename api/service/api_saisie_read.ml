@@ -292,6 +292,88 @@ type graph_more_info =
 ;;
 
 (* ************************************************************************** *)
+(*  [Fonc] event_to_piqi_event : string -> event_type                         *)
+(** [Description] : Retourne à partir d'un évènement (gwdb) un évènement (piqi)
+    [Args] :
+      - evt_name : nom de l'évènement
+    [Retour] :
+      - event_type : évènement piqi
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+let event_to_piqi_event pevt_name fevt_name =
+  match pevt_name with
+  (* Évènements personnels *)
+  | Some Epers_Birth -> `epers_birth
+  | Some Epers_Baptism -> `epers_baptism
+  | Some Epers_Death -> `epers_death
+  | Some Epers_Burial -> `epers_burial
+  | Some Epers_Cremation -> `epers_cremation
+  | Some Epers_Accomplishment -> `epers_accomplishment
+  | Some Epers_Acquisition -> `epers_acquisition
+  | Some Epers_Adhesion -> `epers_adhesion
+  | Some Epers_BaptismLDS -> `epers_baptismlds
+  | Some Epers_BarMitzvah -> `epers_barmitzvah
+  | Some Epers_BatMitzvah -> `epers_batmitzvah
+  | Some Epers_Benediction -> `epers_benediction
+  | Some Epers_ChangeName -> `epers_changename
+  | Some Epers_Circumcision-> `epers_circumcision
+  | Some Epers_Confirmation -> `epers_confirmation
+  | Some Epers_ConfirmationLDS -> `epers_confirmationlds
+  | Some Epers_Decoration -> `epers_decoration
+  | Some Epers_DemobilisationMilitaire -> `epers_demobilisationmilitaire
+  | Some Epers_Diploma -> `epers_diploma
+  | Some Epers_Distinction -> `epers_distinction
+  | Some Epers_Dotation -> `epers_dotation
+  | Some Epers_DotationLDS -> `epers_dotationlds
+  | Some Epers_Education -> `epers_education
+  | Some Epers_Election -> `epers_election
+  | Some Epers_Emigration -> `epers_emigration
+  | Some Epers_Excommunication -> `epers_excommunication
+  | Some Epers_FamilyLinkLDS -> `epers_familylinklds
+  | Some Epers_FirstCommunion -> `epers_firstcommunion
+  | Some Epers_Funeral -> `epers_funeral
+  | Some Epers_Graduate -> `epers_graduate
+  | Some Epers_Hospitalisation -> `epers_hospitalisation
+  | Some Epers_Illness -> `epers_illness
+  | Some Epers_Immigration-> `epers_immigration
+  | Some Epers_ListePassenger -> `epers_listepassenger
+  | Some Epers_MilitaryDistinction -> `epers_militarydistinction
+  | Some Epers_MilitaryPromotion -> `epers_militarypromotion
+  | Some Epers_MilitaryService -> `epers_militaryservice
+  | Some Epers_MobilisationMilitaire -> `epers_mobilisationmilitaire
+  | Some Epers_Naturalisation -> `epers_naturalisation
+  | Some Epers_Occupation -> `epers_occupation
+  | Some Epers_Ordination -> `epers_ordination
+  | Some Epers_Property -> `epers_property
+  | Some Epers_Recensement -> `epers_recensement
+  | Some Epers_Residence -> `epers_residence
+  | Some Epers_Retired -> `epers_retired
+  | Some Epers_ScellentChildLDS -> `epers_scellentchildlds
+  | Some Epers_ScellentParentLDS -> `epers_scellentparentlds
+  | Some Epers_ScellentSpouseLDS -> `epers_scellentspouselds
+  | Some Epers_VenteBien -> `epers_ventebien
+  | Some Epers_Will -> `epers_will
+  | Some _ -> `epers_custom
+  | None ->
+  match fevt_name with
+  (* Évènements familiaux *)
+  | Some Efam_Marriage -> `efam_marriage
+  | Some Efam_NoMarriage -> `efam_no_marriage
+  | Some Efam_NoMention -> `efam_no_mention
+  | Some Efam_Engage -> `efam_engage
+  | Some Efam_Divorce -> `efam_divorce
+  | Some Efam_Separated -> `efam_separated
+  | Some Efam_Annulation -> `efam_annulation
+  | Some Efam_MarriageBann -> `efam_marriage_bann
+  | Some Efam_MarriageContract -> `efam_marriage_contract
+  | Some Efam_MarriageLicense -> `efam_marriage_license
+  | Some Efam_PACS -> `efam_pacs
+  | Some Efam_Residence -> `efam_residence
+  | Some _ -> `efam_custom
+  | None -> failwith "event_to_piqi_event"
+;;
+
+(* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_person_tree : config -> base -> person -> PersonTree  *)
 (** [Description] : Retourne à partir d'une person (gwdb) une PersonTree (piqi)
     [Args] :
@@ -952,18 +1034,18 @@ let pers_to_piqi_person conf base p =
       if p_auth then
         List.map
           (fun (name, date, place, note, src, w, isp) ->
-            let (name, is_occu) =
+            let (name, type_, is_occu) =
               match name with
               | Perso.Pevent Epers_Occupation ->
                   if conf.no_note || String.length (sou base note) > 100 then
-                    (Util.string_of_pevent_name conf base Epers_Occupation, false)
+                    (Util.string_of_pevent_name conf base Epers_Occupation, event_to_piqi_event (Some Epers_Occupation) None, false)
                   else
                     let s = sou base note in
                     (* Si il y a des <br>, on les supprime. *)
                     let s = Str.global_replace (Str.regexp "<br */?>") "" s in
-                    (s, true)
-              | Perso.Pevent name -> (Util.string_of_pevent_name conf base name, false)
-              | Perso.Fevent name -> (Util.string_of_fevent_name conf base name, false)
+                    (s, event_to_piqi_event (Some Epers_Occupation) None, true)
+              | Perso.Pevent name -> (Util.string_of_pevent_name conf base name, event_to_piqi_event (Some name) None, false)
+              | Perso.Fevent name -> (Util.string_of_fevent_name conf base name, event_to_piqi_event None (Some name), false)
             in
             let (date, date_conv, date_cal, date_raw) =
               match Adef.od_of_codate date with
@@ -1034,6 +1116,7 @@ let pers_to_piqi_person conf base p =
             in
             Mread.Event.({
               name = name;
+              type_ = type_;
               date = if date = "" then None else Some date;
               date_raw = if date_raw = "" then None else Some date_raw;
               date_conv = if date_conv = "" then None else Some date_conv;
