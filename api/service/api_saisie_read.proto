@@ -169,15 +169,16 @@ message Event {
   required string name = 1;
   required EventType type = 2;
   optional string date = 3;
-  optional string date_raw = 12;
-  optional string date_conv = 4;
-  optional Calendar date_cal = 5;
-  optional string place = 6;
-  optional string reason = 7;
-  optional string note = 8;
-  optional string src = 9;
-  optional SimplePerson spouse = 10;
-  repeated WitnessEvent witnesses = 11;
+  optional string date_long = 4;
+  optional string date_raw = 13;
+  optional string date_conv = 5;
+  optional Calendar date_cal = 6;
+  optional string place = 7;
+  optional string reason = 8;
+  optional string note = 9;
+  optional string src = 10;
+  optional SimplePerson spouse = 11;
+  repeated WitnessEvent witnesses = 12;
 }
 
 message PersonTree {
@@ -319,21 +320,23 @@ message Family {
   required int32 index = 1;
   required SimplePerson spouse = 2;
   optional string marriage_date = 3;
-  optional string marriage_date_raw = 17;
-  optional string marriage_date_conv = 4;
-  optional Calendar marriage_date_cal = 5;
-  optional string marriage_place = 6;
-  optional string marriage_src = 7;
-  required MarriageType marriage_type = 8;
-  required DivorceType divorce_type = 9;
-  optional string divorce_date = 10;
-  optional string divorce_date_raw = 18;
-  optional string divorce_date_conv = 11;
-  optional Calendar divorce_date_cal = 12;
-  repeated SimplePerson witnesses = 13;
-  optional string notes = 14;
-  optional string fsources = 15;
-  repeated SimplePerson children = 16;
+  optional string marriage_date_long = 4;
+  optional string marriage_date_raw = 19;
+  optional string marriage_date_conv = 5;
+  optional Calendar marriage_date_cal = 6;
+  optional string marriage_place = 7;
+  optional string marriage_src = 8;
+  required MarriageType marriage_type = 9;
+  required DivorceType divorce_type = 10;
+  optional string divorce_date = 11;
+  optional string divorce_date_long = 12;
+  optional string divorce_date_raw = 20;
+  optional string divorce_date_conv = 13;
+  optional Calendar divorce_date_cal = 14;
+  repeated SimplePerson witnesses = 15;
+  optional string notes = 16;
+  optional string fsources = 17;
+  repeated SimplePerson children = 18;
 }
 
 message IndexPerson {

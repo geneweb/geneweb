@@ -125,12 +125,13 @@ let string_of_hebrew_dmy conf d =
   Date.code_hebrew_date conf d.day d.month d.year
 ;;
 
-let encode_dmy conf d m y =
+let encode_dmy conf d m y is_long =
   let date = if d != 0 then string_of_int d else "" in
   let date =
     if m != 0 then
-      if date = "" then transl_nth conf "(short month)" (m - 1)
-      else date ^ " " ^ transl_nth conf "(short month)" (m - 1)
+      let date_keyword = if is_long then "(month)" else "(short month)" in
+      if date = "" then transl_nth conf date_keyword (m - 1)
+      else date ^ " " ^ transl_nth conf date_keyword (m - 1)
     else date
   in
   let date =
@@ -140,13 +141,13 @@ let encode_dmy conf d m y =
   date
 ;;
 
-let string_of_dmy conf d =
-  let sy = encode_dmy conf d.day d.month d.year in
+let string_of_dmy conf d is_long =
+  let sy = encode_dmy conf d.day d.month d.year is_long in
   let sy2 =
     match d.prec with
     | OrYear d2 | YearInt d2 ->
         let d2 = Date.dmy_of_dmy2 d2 in
-        encode_dmy conf d2.day d2.month d2.year
+        encode_dmy conf d2.day d2.month d2.year is_long
     | _ -> ""
   in
   Date.string_of_prec_dmy conf sy sy2 d
@@ -198,37 +199,37 @@ let string_of_date_raw conf d =
   | Dtext t -> string_with_macros conf [] t
 ;;
 
-let gregorian_precision conf d =
-  if d.delta = 0 then string_of_dmy conf d
+let gregorian_precision conf d is_long =
+  if d.delta = 0 then string_of_dmy conf d is_long
   else
     let d2 =
       Calendar.gregorian_of_sdn d.prec (Calendar.sdn_of_gregorian d + d.delta)
     in
-    transl conf "between (date)" ^ " " ^ string_of_dmy conf d ^ " " ^
-      transl_nth conf "and" 0 ^ " " ^ string_of_dmy conf d2
+    transl conf "between (date)" ^ " " ^ string_of_dmy conf d is_long ^ " " ^
+      transl_nth conf "and" 0 ^ " " ^ string_of_dmy conf d2 is_long
 ;;
 
 
 (* ************************************************************************** *)
 (*  [Fonc] string_of_date_and_conv :
-             config -> Def.date -> (string * string * cal)                    *)
+             ?bool -> config -> Def.date -> (string * string * cal)           *)
 (** [Description] : Renvoie la date, la date traduite et le calendrier au
                     format texte.
     [Args] :
-      - conf      : configuration de la base
-      - base      : base de donnée
-      - d         : date
+      - is_long : définit si la date doit être au format long
+      - conf : configuration de la base
+      - d : date
     [Retour] :
       - (date greg * date * calendar option)
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let string_of_date_and_conv conf d =
+let string_of_date_and_conv ?(is_long = false) conf d =
   match d with
   | Dgreg (d, Dgregorian) ->
-      (string_of_dmy conf d, "", Some `gregorian)
+      (string_of_dmy conf d is_long, "", Some `gregorian)
   | Dgreg (d, Djulian) ->
       let date_conv =
-        if d.year < 1582 then "" else gregorian_precision conf d
+        if d.year < 1582 then "" else gregorian_precision conf d is_long
       in
       let d1 = Calendar.julian_of_gregorian d in
       let year_prec =
@@ -246,14 +247,14 @@ let string_of_date_and_conv conf d =
       let d1 = Calendar.french_of_gregorian d in
       let date = string_of_french_dmy conf d1 in
       (match d.prec with
-      | Sure -> (gregorian_precision conf d, date, Some `french)
+      | Sure -> (gregorian_precision conf d is_long, date, Some `french)
       | About | Before | After | Maybe | OrYear _ | YearInt _ ->
           (date, "", Some `french))
   | Dgreg (d, Dhebrew) ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let date = string_of_hebrew_dmy conf d1 in
       (match d.prec with
-      | Sure -> (gregorian_precision conf d, date, Some `hebrew)
+      | Sure -> (gregorian_precision conf d is_long, date, Some `hebrew)
       | About | Before | After | Maybe | OrYear _ | YearInt _ ->
           (date, "", Some `hebrew))
   | Dtext t -> ("(" ^ string_with_macros conf [] t ^ ")", "", None)
@@ -635,12 +636,13 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
   let m_auth = true in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let index = Int32.of_int (Adef.int_of_ifam gen_f.fam_index) in
-  let (marriage_date, marriage_date_conv, marriage_cal, marriage_date_raw) =
+  let (marriage_date, marriage_date_long, marriage_date_conv, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_codate gen_f.marriage) with
     | (true, Some d) ->
+      let (marriage_date_long, _, _) = string_of_date_and_conv conf d ~is_long:true in
       let (marriage_date, marriage_date_conv, marriage_cal) = string_of_date_and_conv conf d in
-      (marriage_date, marriage_date_conv, marriage_cal, string_of_date_raw conf d)
-    | _ -> ("", "", None, "")
+      (marriage_date, marriage_date_long, marriage_date_conv, marriage_cal, string_of_date_raw conf d)
+    | _ -> ("", "", "", None, "")
   in
   let marriage_place =
     if m_auth then Util.string_of_place conf gen_f.marriage_place else ""
@@ -655,18 +657,21 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
   in
-  let (divorce_type, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
+  let (divorce_type, divorce_date, divorce_date_long, divorce_date_conv, divorce_cal, divorce_date_raw) =
     match gen_f.divorce with
-    | NotDivorced -> (`not_divorced, "", "", None, "")
+    | NotDivorced -> (`not_divorced, "", "", "", None, "")
     | Divorced cod ->
         (match Adef.od_of_codate cod with
          | Some d when m_auth ->
+             let (divorce_date_long, _, _) =
+               string_of_date_and_conv conf d ~is_long:true
+             in
              let (divorce_date, divorce_date_conv, divorce_cal) =
                string_of_date_and_conv conf d
              in
-             (`divorced, divorce_date, divorce_date_conv, divorce_cal, string_of_date_raw conf d)
-         | _ -> (`divorced, "", "", None, ""))
-    | Separated -> (`separated, "", "", None, "")
+             (`divorced, divorce_date, divorce_date_long, divorce_date_conv, divorce_cal, string_of_date_raw conf d)
+         | _ -> (`divorced, "", "", "", None, ""))
+    | Separated -> (`separated, "", "", "", None, "")
   in
   let witnesses =
     List.map
@@ -720,6 +725,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     index = index;
     spouse = spouse;
     marriage_date = if marriage_date = "" then None else Some marriage_date;
+    marriage_date_long = if marriage_date_long = "" then None else Some marriage_date_long;
     marriage_date_raw = if marriage_date_raw = "" then None else Some marriage_date_raw;
     marriage_date_conv =
       if marriage_date_conv = "" then None else Some marriage_date_conv;
@@ -729,6 +735,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     marriage_type = marriage_type;
     divorce_type = divorce_type;
     divorce_date = if divorce_date = "" then None else Some divorce_date;
+    divorce_date_long = if divorce_date_long = "" then None else Some divorce_date_long;
     divorce_date_raw = if divorce_date_raw = "" then None else Some divorce_date_raw;
     divorce_date_conv =
       if divorce_date_conv = "" then None else Some divorce_date_conv;
@@ -767,12 +774,13 @@ let fam_to_piqi_family conf base p ifam =
   in
   let gen_f = Util.string_gen_family base (gen_family_of_family fam) in
   let index = Int32.of_int (Adef.int_of_ifam gen_f.fam_index) in
-  let (marriage_date, marriage_date_conv, marriage_cal, marriage_date_raw) =
+  let (marriage_date, marriage_date_long, marriage_date_conv, marriage_cal, marriage_date_raw) =
     match (m_auth, Adef.od_of_codate gen_f.marriage) with
     | (true, Some d) ->
+      let (marriage_date_long, _, _) = string_of_date_and_conv conf d ~is_long:true in
       let (marriage_date, marriage_date_conv, marriage_cal) = string_of_date_and_conv conf d in
-      (marriage_date, marriage_date_conv, marriage_cal, string_of_date_raw conf d)
-    | _ -> ("", "", None, "")
+      (marriage_date, marriage_date_long, marriage_date_conv, marriage_cal, string_of_date_raw conf d)
+    | _ -> ("", "", "", None, "")
   in
   let marriage_place =
     if m_auth then Util.string_of_place conf gen_f.marriage_place else ""
@@ -787,18 +795,21 @@ let fam_to_piqi_family conf base p ifam =
     | NoMention -> `no_mention
     | NoSexesCheckMarried -> `no_sexes_check_married
   in
-  let (divorce_type, divorce_date, divorce_date_conv, divorce_cal, divorce_date_raw) =
+  let (divorce_type, divorce_date, divorce_date_long, divorce_date_conv, divorce_cal, divorce_date_raw) =
     match gen_f.divorce with
-    | NotDivorced -> (`not_divorced, "", "", None, "")
+    | NotDivorced -> (`not_divorced, "", "", "", None, "")
     | Divorced cod ->
         (match Adef.od_of_codate cod with
          | Some d when m_auth ->
+           let (divorce_date_long, _, _) =
+             string_of_date_and_conv conf d ~is_long:true
+           in
              let (divorce_date, divorce_date_conv, divorce_cal) =
                string_of_date_and_conv conf d
              in
-             (`divorced, divorce_date, divorce_date_conv, divorce_cal, string_of_date_raw conf d)
-         | _ -> (`divorced, "", "", None, ""))
-    | Separated -> (`separated, "", "", None, "")
+             (`divorced, divorce_date, divorce_date_long, divorce_date_conv, divorce_cal, string_of_date_raw conf d)
+         | _ -> (`divorced, "", "", "", None, ""))
+    | Separated -> (`separated, "", "", "", None, "")
   in
   let witnesses =
     List.map
@@ -880,6 +891,7 @@ let fam_to_piqi_family conf base p ifam =
     index = index;
     spouse = spouse;
     marriage_date = if marriage_date = "" then None else Some marriage_date;
+    marriage_date_long = if marriage_date_long = "" then None else Some marriage_date_long;
     marriage_date_raw = if marriage_date_raw = "" then None else Some marriage_date_raw;
     marriage_date_conv =
       if marriage_date_conv = "" then None else Some marriage_date_conv;
@@ -889,6 +901,7 @@ let fam_to_piqi_family conf base p ifam =
     marriage_type = marriage_type;
     divorce_type = divorce_type;
     divorce_date = if divorce_date = "" then None else Some divorce_date;
+    divorce_date_long = if divorce_date_long = "" then None else Some divorce_date_long;
     divorce_date_raw = if divorce_date_raw = "" then None else Some divorce_date_raw;
     divorce_date_conv =
       if divorce_date_conv = "" then None else Some divorce_date_conv;
@@ -1047,6 +1060,11 @@ let pers_to_piqi_person conf base p =
               | Perso.Pevent name -> (Util.string_of_pevent_name conf base name, event_to_piqi_event (Some name) None, false)
               | Perso.Fevent name -> (Util.string_of_fevent_name conf base name, event_to_piqi_event None (Some name), false)
             in
+            let date_long =
+              match Adef.od_of_codate date with
+              | Some d -> let (date_long, _, _) = string_of_date_and_conv conf d ~is_long:true in date_long
+              | _ -> ""
+            in
             let (date, date_conv, date_cal, date_raw) =
               match Adef.od_of_codate date with
               | Some d ->
@@ -1118,6 +1136,7 @@ let pers_to_piqi_person conf base p =
               name = name;
               type_ = type_;
               date = if date = "" then None else Some date;
+              date_long = if date_long = "" then None else Some date_long;
               date_raw = if date_raw = "" then None else Some date_raw;
               date_conv = if date_conv = "" then None else Some date_conv;
               date_cal = date_cal;
