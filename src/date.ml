@@ -749,41 +749,6 @@ value get_birth_death_date p =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] print_partial_short_dates_text :
-             config -> date option -> date option -> person -> string     *)
-(** [Description] : Quand une date de naissance/décès est au format texte,
-      alors on n'affiche que la partie de la date qui est au format Dgreg.
-      Cette fonction complète short_dates_text ci-dessous.
-    [Args] :
-      - conf : configuration de la base
-      - birth_date : date de naissance/baptème
-      - death_date : date de décès/inhumation
-      - p : person
-    [Retour] : string
-    [Rem] : Non exporté en clair hors de ce module.                       *)
-(* ********************************************************************** *)
-value partial_short_dates_text conf birth_date death_date p =
-  match (birth_date, death_date) with
-  [ (Some (Dgreg b _), Some (Dtext _)) -> prec_year_text conf b ^ "-"
-  | (Some (Dgreg b _), None) ->
-      (* La personne peut être décédée mais ne pas avoir de date. *)
-      match get_death p with
-      [ Death _ _ | DeadDontKnowWhen | DeadYoung -> prec_year_text conf b ^ "-"
-      | _ -> prec_year_text conf b ]
-  | (None, Some (Dtext _)) ->
-      match get_death p with
-      [ Death _ _ | DeadDontKnowWhen | DeadYoung -> death_symbol conf
-      | _ -> "" ]
-  | (None, None) ->
-      (* La personne peut être décédée mais ne pas avoir de date. *)
-      match get_death p with
-      [ Death _ _ | DeadDontKnowWhen | DeadYoung -> death_symbol conf
-      | _ -> "" ]
-  | (_, _) -> "" ]
-;
-
-
-(* ********************************************************************** *)
 (*  [Fonc] short_dates_text : config -> base -> person -> string          *)
 (** [Description] : Renvoie la concatenation de l'année de naissance et
       l'année de décès (si trouvée par get_birth_death_date). La précision
@@ -808,25 +773,20 @@ value short_dates_text conf base p =
       match (birth_date, death_date) with
       [ (Some (Dgreg b _), Some (Dgreg d _)) ->
           prec_year_text conf b ^ "-" ^ prec_year_text conf d
-      | (Some (Dgreg b _), None) ->
+      | (Some (Dgreg b _), _) ->
           (* La personne peut être décédée mais ne pas avoir de date. *)
           match get_death p with
           [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
               prec_year_text conf b ^ "-"
           | _ -> prec_year_text conf b ]
-      | (None, Some (Dgreg d _)) ->
-          match get_death p with
-          [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
-              death_symbol conf ^ prec_year_text conf d
-          | _ -> "" ]
-      | (None, None) ->
+      | (_, Some (Dgreg d _)) ->
+          "-" ^ prec_year_text conf d
+      | (_, _) ->
           (* La personne peut être décédée mais ne pas avoir de date. *)
           match get_death p with
-          [ Death _ _ | DeadDontKnowWhen | DeadYoung -> death_symbol conf
-          | _ -> "" ]
-      (* On ne peut pas traiter les dates au format texte, mais on *)
-      (* affiche tout de même les dates au format Dgreg.           *)
-      | (_, _) -> partial_short_dates_text conf birth_date death_date p ]
+          [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
+              death_symbol conf
+          | _ -> "" ] ]
     in
     if s <> "" then
       (* Pour IE11, il faut specifier le display inline-block. *)
