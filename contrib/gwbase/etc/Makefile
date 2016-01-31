@@ -2,7 +2,7 @@
 
 include Makefile.inc
 
-GWB=../../../
+GWB=../../..
 OCAMLI=-I $(GWB)/src
 STD_OBJS=$(GWB)/src/adef.cmo $(GWB)/src/buff.cmo $(GWB)/src/name.cmo $(GWB)/src/iovalue.cmo $(GWB)/src/mutil.cmo $(GWB)/src/futil.cmo $(GWB)/src/dutil.cmo $(GWB)/src/btree.cmo $(GWB)/src/secure.cmo $(GWB)/src/database.cmo $(GWB)/src/db2.cmo $(GWB)/src/db2disk.cmo $(GWB)/src/diff.cmo $(GWB)/src/gwdb.cmo $(GWB)/src/checkItem.cmo $(GWB)/src/gutil.cmo
 GENEANET_OBJS=$(GWB)/src/adef.cmo $(GWB)/src/iovalue.cmo $(GWB)/src/buff.cmo $(GWB)/src/name.cmo $(GWB)/src/ansel.cmo $(GWB)/src/mutil.cmo $(GWB)/src/futil.cmo $(GWB)/src/dutil.cmo $(GWB)/src/btree.cmo $(GWB)/src/secure.cmo $(GWB)/src/database.cmo $(GWB)/src/db2.cmo $(GWB)/src/db2disk.cmo $(GWB)/src/diff.cmo $(GWB)/src/gwdb.cmo $(GWB)/src/checkItem.cmo $(GWB)/src/gutil.cmo $(GWB)/src/argl.cmo geneanet.cmo
