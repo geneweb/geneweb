@@ -126,7 +126,7 @@ value trailer conf =
     Wserver.wprint "<hr />\n";
     Wserver.wprint "<div>\n";
     Wserver.wprint "<em>\n";
-    Wserver.wprint "<a href=\"http://opensource.geneanet.org/projects/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2012\n</em>\n" Version.txt;
+    Wserver.wprint "<a href=\"http://opensource.geneanet.org/projects/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2016\n</em>\n" Version.txt;
     Wserver.wprint "</div>\n" ;
     Wserver.wprint "</div>\n" ;
     (* finish the html page *)
