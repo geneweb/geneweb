@@ -213,6 +213,7 @@ message SimplePerson {
   optional string image = 12;
   required Sosa sosa = 13;
   required string baseprefix = 14;
+  optional string sosa_nb = 17;
 }
 
 message RelationPerson {

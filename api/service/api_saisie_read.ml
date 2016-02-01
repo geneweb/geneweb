@@ -527,11 +527,16 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       | Female -> `female
       | Neuter -> `unknown
     in
+    let sosa_nb_num = Perso.get_sosa_person conf base p in
     let sosa =
-      let sosa_nb = Perso.get_sosa_person conf base p in
-      if Num.eq sosa_nb Num.zero then `no_sosa
-      else if Num.eq sosa_nb Num.one then `sosa_ref
+      if Num.eq sosa_nb_num Num.zero then `no_sosa
+      else if Num.eq sosa_nb_num Num.one then `sosa_ref
       else `sosa
+    in
+    let sosa_nb =
+        if sosa_nb_num = Num.zero
+        then None
+        else Some (Num.to_string sosa_nb_num)
     in
     let sn =
       if (is_hide_names conf p) && not p_auth then ""
@@ -612,6 +617,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       death_place = if death_place = "" then None else Some death_place;
       image = if image = "" then None else Some image;
       sosa = sosa;
+      sosa_nb = sosa_nb;
       baseprefix = base_prefix
     })
 ;;
