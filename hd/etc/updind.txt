@@ -201,9 +201,6 @@ function changeCalendar(e,v,m,c) {
     var label = document.getElementById('pevent_label_selector' + xcnt);
     var input = document.getElementById('e_name' + xcnt);
     if (selector.value == "") {
-      console.log('IF');
-      console.log('selector.value=' + selector.value);
-      console.log('input.value=' + input.value);
       if (xxname.charAt(0) == "#") {
         input.value = "";
       }
@@ -212,9 +209,6 @@ function changeCalendar(e,v,m,c) {
       }
     }
     else {
-      console.log('ELSE');
-      console.log('selector.value=' + selector.value);
-      console.log('input.value=' + input.value);
       input.value = selector.value;
     }
     if (selector.value == "" || selector.value.charAt(0) != "#") {
