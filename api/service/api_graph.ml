@@ -565,7 +565,6 @@ let build_graph_asc conf base p max_gen base_loop =
   let () = load_couples_array base in
   let () = Perso.build_sosa_ht conf base in
 *)
-  let ht = Hashtbl.create 42 in
   let create_edge p_from p_to =
     M.Edge.({
       from_node = Int64.of_int (Adef.int_of_iper (get_key_index p_from));

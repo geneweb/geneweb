@@ -1053,18 +1053,10 @@ let pers_to_piqi_person conf base p =
       if p_auth then
         List.map
           (fun (name, date, place, note, src, w, isp) ->
-            let (name, type_, is_occu) =
+            let (name, type_) =
               match name with
-              | Perso.Pevent Epers_Occupation ->
-                  if conf.no_note || String.length (sou base note) > 100 then
-                    (Util.string_of_pevent_name conf base Epers_Occupation, event_to_piqi_event (Some Epers_Occupation) None, false)
-                  else
-                    let s = sou base note in
-                    (* Si il y a des <br>, on les supprime. *)
-                    let s = Str.global_replace (Str.regexp "<br */?>") "" s in
-                    (s, event_to_piqi_event (Some Epers_Occupation) None, true)
-              | Perso.Pevent name -> (Util.string_of_pevent_name conf base name, event_to_piqi_event (Some name) None, false)
-              | Perso.Fevent name -> (Util.string_of_fevent_name conf base name, event_to_piqi_event None (Some name), false)
+              | Perso.Pevent name -> (Util.string_of_pevent_name conf base name, event_to_piqi_event (Some name) None)
+              | Perso.Fevent name -> (Util.string_of_fevent_name conf base name, event_to_piqi_event None (Some name))
             in
             let date_long =
               match Adef.od_of_codate date with
@@ -1080,8 +1072,7 @@ let pers_to_piqi_person conf base p =
             in
             let place = Util.string_of_place conf (sou base place) in
             let note =
-              if is_occu then ""
-              else if not conf.no_note then
+              if not conf.no_note then
                 begin
                   let env = [('i', fun () -> Util.default_image_name base p)] in
                   let s = sou base note in
