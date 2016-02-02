@@ -172,6 +172,7 @@ message Event {
   optional string date_long = 4;
   optional string date_raw = 13;
   optional string date_conv = 5;
+  optional string date_conv_long = 14;
   optional Calendar date_cal = 6;
   optional string place = 7;
   optional string reason = 8;
@@ -324,6 +325,7 @@ message Family {
   optional string marriage_date_long = 4;
   optional string marriage_date_raw = 19;
   optional string marriage_date_conv = 5;
+  optional string marriage_date_conv_long = 21;
   optional Calendar marriage_date_cal = 6;
   optional string marriage_place = 7;
   optional string marriage_src = 8;
@@ -333,6 +335,7 @@ message Family {
   optional string divorce_date_long = 12;
   optional string divorce_date_raw = 20;
   optional string divorce_date_conv = 13;
+  optional string divorce_date_conv_long = 22;
   optional Calendar divorce_date_cal = 14;
   repeated SimplePerson witnesses = 15;
   optional string notes = 16;

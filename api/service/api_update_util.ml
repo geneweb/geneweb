@@ -904,10 +904,10 @@ let pers_to_piqi_person_search_info conf base p =
           | Perso.Pevent name -> Util.string_of_pevent_name conf base name
           | Perso.Fevent name -> Util.string_of_fevent_name conf base name
         in
-        let (date, date_conv, date_cal) =
+        let (date, _, date_conv, _, date_cal) =
           match Adef.od_of_codate date with
           | Some d -> Api_saisie_read.string_of_date_and_conv conf d
-          | _ -> ("", "", None)
+          | _ -> ("", "", "", "", None)
         in
         let place = Util.string_of_place conf (sou base place) in
         let note =
