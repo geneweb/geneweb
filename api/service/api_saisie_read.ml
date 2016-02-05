@@ -528,10 +528,12 @@ let pers_to_piqi_simple_person conf base p base_prefix =
     restricted_person.Mread.Simple_person.index <- Int32.of_int (-1);
     restricted_person.Mread.Simple_person.lastname <- "x";
     restricted_person.Mread.Simple_person.firstname <- "x";
+    restricted_person.Mread.Simple_person.visible_for_visitors <- false;
     restricted_person
   else
     let p_auth = authorized_age conf base p in
     let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
+    let visible_for_visitors = is_visible conf base p in
     let sex =
       match get_sex p with
       | Male -> `male
@@ -629,6 +631,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       image = if image = "" then None else Some image;
       sosa = sosa;
       sosa_nb = sosa_nb;
+      visible_for_visitors = visible_for_visitors;
       baseprefix = base_prefix
     })
 ;;
