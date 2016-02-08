@@ -36,9 +36,11 @@ fi
 
 if [ "`echo 'print_endline Sys.os_type;;' | ocaml -stdin -noprompt`" = "Unix" ]; then
     echo "OS type ... Unix"
+    cp wserver/Makefile.unix wserver/Makefile
     cp tools/Makefile.inc.unix tools/Makefile.inc
 else
     echo "OS type ... Windows"
+    cp wserver/Makefile.win wserver/Makefile
     cp tools/Makefile.inc.win tools/Makefile.inc
 fi
 
