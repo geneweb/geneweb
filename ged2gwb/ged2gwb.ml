@@ -159,6 +159,7 @@ type case =
 ;
 
 value lowercase_first_names = ref False;
+value track_ged2gw_id = ref False;
 value case_surnames = ref NoCase;
 value extract_first_names = ref False;
 value extract_public_names = ref True;
@@ -950,6 +951,14 @@ value extract_addr addr =
   else addr
 ;
 
+(* Output Pindex in file *)
+value output_pindex i str =
+    if track_ged2gw_id.val then
+        Printf.printf "IDGED2IDPERS %i %s\n" i str
+    else
+        ()
+;
+
 value per_index gen lab =
   let lab = extract_addr lab in
   try Hashtbl.find gen.g_hper lab with
@@ -960,6 +969,7 @@ value per_index gen lab =
         gen.g_per.arr.(i) := Left3 lab;
         gen.g_per.tlen := gen.g_per.tlen + 1;
         Hashtbl.add gen.g_hper lab (Adef.iper_of_int i);
+        output_pindex i lab;
         Adef.iper_of_int i
       } ]
 ;
@@ -3906,6 +3916,9 @@ value speclist =
 - Lowercase first names -
        Convert first names to lowercase letters, with initials in
        uppercase.");
+    ("-trackid", Arg.Set track_ged2gw_id, "   \
+- Keep track of gedcom ids -
+       Print gedcom id to gw id matches.");
    ("-ls", Arg.Unit (fun () -> case_surnames.val := LowerCase), "   \
 - Lowercase surnames -
        Convert surnames to lowercase letters, with initials in
