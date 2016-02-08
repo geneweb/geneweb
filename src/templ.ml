@@ -1053,29 +1053,26 @@ value template_file = ref "";
 value print_error conf (bp, ep) exc =
   do {
     incr nb_errors;
-    IFDEF UNIX THEN do {
-      if nb_errors.val <= 10 then do {
-        if template_file.val = "" then eprintf "*** <W> template file"
-        else eprintf "File \"%s.txt\"" template_file.val;
-        let line =
-          if template_file.val = "" then None
-          else line_of_loc conf template_file.val (bp, ep)
-        in
-        eprintf ", ";
-        match line with
-        [ Some (lin, col1, col2) ->
-            eprintf "line %d, characters %d-%d:\n" lin col1 col2
-        | None ->
-            eprintf "characters %d-%d:\n" bp ep ];
-        match exc with
-        [ Failure s -> eprintf "Failed - %s" s
-        | _ -> eprintf "%s" (Printexc.to_string exc) ];
-        eprintf "\n\n";
-        flush stderr;
-      }
-      else ();
+    if nb_errors.val <= 10 then do {
+      if template_file.val = "" then eprintf "*** <W> template file"
+      else eprintf "File \"%s.txt\"" template_file.val;
+      let line =
+        if template_file.val = "" then None
+        else line_of_loc conf template_file.val (bp, ep)
+      in
+      eprintf ", ";
+      match line with
+      [ Some (lin, col1, col2) ->
+          eprintf "line %d, characters %d-%d:\n" lin col1 col2
+      | None ->
+          eprintf "characters %d-%d:\n" bp ep ];
+      match exc with
+      [ Failure s -> eprintf "Failed - %s" s
+      | _ -> eprintf "%s" (Printexc.to_string exc) ];
+      eprintf "\n\n";
+      flush stderr;
     }
-    ELSE () END;
+    else ();
   }
 ;
 
