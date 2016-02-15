@@ -1273,7 +1273,7 @@ let pers_to_piqi_person conf base p =
       else ""
     in
     let psources =
-      if not (is_hide_names conf p) || p_auth then
+      if p_auth then
         let s = gen_p.psources in
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s =
@@ -1291,7 +1291,7 @@ let pers_to_piqi_person conf base p =
       else ""
     in
     let has_sources =
-      if (is_hide_names conf p) && not p_auth then false
+      if not p_auth then false
       else if psources <> "" then true
       else if
         p_auth &&
