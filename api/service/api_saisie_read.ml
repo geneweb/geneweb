@@ -1711,11 +1711,9 @@ let rec pers_to_piqi_fiche_person conf base p with_parents =
     let has_history = Perso.has_history conf base p p_auth in
     let has_possible_duplications = Perso.has_possible_duplications conf base p in
     let ref_index =
-      if Num.gt sosa_nb Num.zero then
-        match Util.find_sosa_ref conf base with
-          | Some ref -> Some (Int32.of_int (Adef.int_of_iper (get_key_index ref)))
-          | None -> None
-      else None
+      match Util.find_sosa_ref conf base with
+        | Some ref -> Some (Int32.of_int (Adef.int_of_iper (get_key_index ref)))
+        | None -> None
     in
     (* Liens de la chronique familiale *)
     let linked_page_biblio =
