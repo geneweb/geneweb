@@ -956,7 +956,13 @@ let pers_to_piqi_person conf base p =
     let base_prefix = conf.command in
     let p_auth = authorized_age conf base p in
     let gen_p = Util.string_gen_person base (gen_person_of_person p) in
-    let index = Int32.of_int (Adef.int_of_iper (get_key_index p)) in
+    let index =
+      if not p_auth && (is_hide_names conf p)
+      then
+        Int32.of_int (-1)
+      else
+        Int32.of_int (Adef.int_of_iper (get_key_index p))
+    in
     let sex =
       match get_sex p with
       | Male -> `male
