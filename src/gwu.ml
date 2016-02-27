@@ -114,7 +114,7 @@ value gen_print_date no_colon oc =
       }
   | Dtext t ->
       (* Dans le cas d'une date texte pour un titre, on échappe les ':' *)
-      let t = gen_correct_string False no_colon (spaces_to_underscore t) in
+      let t = gen_correct_string False no_colon t in
       fprintf oc "0(%s)" t ]
 ;
 
