@@ -16,7 +16,7 @@ value wserver_oc = ref stdout;
 value wrap_string = ref (fun s -> s);
 
 value wprint fmt =
-  kprintf (fun s -> output_string wserver_oc.val (wrap_string.val s)) fmt
+  ksprintf (fun s -> output_string wserver_oc.val (wrap_string.val s)) fmt
 ;
 value wflush () = flush wserver_oc.val;
 
