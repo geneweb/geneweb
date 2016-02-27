@@ -23,6 +23,9 @@ value f :
 value wprint : format4 'a unit string unit -> 'a;
     (* To be called to print page contents. *)
 
+value nl : unit -> unit;
+    (* To print an end of line *)
+
 value wflush : unit -> unit;
     (* To flush page contents print. *)
 

@@ -355,7 +355,7 @@ value html_p conf = do { Wserver.wprint "<p>"; Wserver.wprint "\n"; };
 
 value html_li conf = do { Wserver.wprint "<li>"; Wserver.wprint "\n"; };
 
-value nl () = Wserver.wprint "\013\010";
+value nl = Wserver.nl;
 
 value week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in

@@ -1799,10 +1799,9 @@ Type %s to stop the service
 
 IFDEF UNIX THEN
 value cgi_timeout tmout _ =
-  let nl () = Wserver.wprint "\013\010" in
   do {
     Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
-    nl (); nl ();
+    Wserver.nl (); Wserver.nl ();
     Wserver.wprint "<head><title>Time out</title></head>\n";
     Wserver.wprint "<body><h1>Time out</h1>\n";
     Wserver.wprint "Computation time > %d second(s)\n" tmout;
