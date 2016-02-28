@@ -168,7 +168,7 @@ value rec get_token =
   | [: s = get_ident 0 :] ep -> Tok (bp, ep) (IDENT s) ]
 ;
 
-module Buff2 = Buff.Make (struct value buff = ref (Bytes.create 80); end);
+module Buff2 = Buff.Make (struct end);
 
 value rec parse_var =
   parser

@@ -1134,7 +1134,7 @@ value uppercase_word s =
               copy False j (Buff.mstore len t) False ]
 ;
 
-module Buff2 = Buff.Make (struct value buff = ref (Bytes.create 80); end);
+module Buff2 = Buff.Make (struct end);
 
 value capitalize_name s =
   (* On initialise le buffer à la valeur de s. *)
