@@ -295,7 +295,7 @@
         %apply;link(witness.var)
       %end;)%sq;
     %end;
-    %if;(evar.comm = "on" and (has_comment or has_marriage_note)
+    %if;(evar.comm = "on" and (has_comment or has_marriage_note))
       (%comment;%nn;
        %if;has_marriage_note;
          %apply;clean_html_tags(marriage_note)
