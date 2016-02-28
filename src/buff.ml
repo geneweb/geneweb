@@ -5,25 +5,31 @@ module Make(B : sig end) = (* camlp5 does not support generative functors? *)
     value buff = ref (Bytes.create 80);
     value store len x =
       do {
-        if len >= String.length buff.val then
-          buff.val := buff.val ^ Bytes.create (String.length buff.val)
+        if len >= Bytes.length buff.val then
+          buff.val := Bytes.extend buff.val 0 (Bytes.length buff.val)
         else ();
         Bytes.set buff.val len x;
         succ len
       }
     ;
+    value unsafe_gstore len s si slen =
+      do {
+        let newlen = len + slen in
+        if newlen > Bytes.length buff.val then
+          let more = max slen (Bytes.length buff.val) in
+          buff.val := Bytes.extend buff.val 0 more
+        else ();
+        Bytes.blit_string s si buff.val len slen;
+        newlen
+      }
+    ;
     value mstore len s =
-      add_rec len 0 where rec add_rec len i =
-        if i = String.length s then len
-        else add_rec (store len s.[i]) (succ i)
+      unsafe_gstore len s 0 (String.length s)
     ;
     value gstore len s si slen =
-      let iend = si + slen in
-      add_rec len si where rec add_rec len i =
-        if i = iend || i = String.length s then len
-        else add_rec (store len s.[i]) (succ i)
+      unsafe_gstore len s si (min slen (String.length s - si))
     ;
-    value get len = String.sub buff.val 0 len;
+    value get len = Bytes.sub_string buff.val 0 len;
   end
 ;
 
