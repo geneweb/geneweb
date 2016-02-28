@@ -4,7 +4,7 @@
 value input : in_channel -> 'a;
 value output : out_channel -> 'a -> unit;
 
-value digest : 'a -> Digest.t;
+value digest : 'a -> string;
 
 value sizeof_long : int;
 value sign_extend : int -> int;
