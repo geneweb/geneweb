@@ -235,22 +235,6 @@ value dput_string s =
   }
 ;
 
-value hexchar i =
-  if i <= 9 then Char.chr (Char.code '0' + i)
-  else Char.chr (Char.code 'A' + i - 10)
-;
-
-value string_code s =
-  let r = Bytes.create (String.length s * 2) in
-  do {
-    for i = 0 to String.length s - 1 do {
-      Bytes.set r (2*i) (hexchar (Char.code s.[i] / 16));
-      Bytes.set r (2*i+1) (hexchar (Char.code s.[i] mod 16));
-    };
-    r
-  }
-;
-
 value rec digest_loop v =
   if not (Obj.is_block v) then
     let n = (Obj.magic v : int) in
@@ -278,7 +262,7 @@ value digest v =
   do {
     dlen.val := 0;
     digest_loop (Obj.repr v);
-    string_code (Digest.substring dbuf.val 0 dlen.val)
+    Digest.to_hex (Digest.subbytes dbuf.val 0 dlen.val)
   }
 ;
 
