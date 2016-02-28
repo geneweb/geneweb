@@ -1711,7 +1711,7 @@ value good_tag_list_fun () =
 value good_tags_list = Lazy.from_fun good_tag_list_fun;
 value good_tag s i = List.mem (tag_id s i) (Lazy.force good_tags_list);
 
-module Lbuff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
+module Lbuff = Buff.Make (struct end);
 
 value filter_html_tags s =
   loop 0 0 where rec loop len i =

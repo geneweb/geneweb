@@ -2,7 +2,7 @@
 (* $Id: translate.ml,v 5.9 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-module Buff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
+module Buff = Buff.Make (struct end);
 
 value skip_lang s =
   loop where rec loop i =

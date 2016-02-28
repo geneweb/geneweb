@@ -1,8 +1,8 @@
 (* $Id: buff.ml,v 5.1 2006-10-15 15:39:39 ddr Exp $ *)
 
-module Make (B : sig value buff : ref string; end) =
+module Make(B : sig end) = (* camlp5 does not support generative functors? *)
   struct
-    value buff = B.buff;
+    value buff = ref (Bytes.create 80);
     value store len x =
       do {
         if len >= String.length buff.val then
@@ -27,7 +27,7 @@ module Make (B : sig value buff : ref string; end) =
   end
 ;
 
-module BB = Make (struct value buff = ref (Bytes.create 80); end);
+module BB = Make(struct end);
 
 value get = BB.get;
 value store = BB.store;

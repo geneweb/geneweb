@@ -36,8 +36,8 @@ open Util;
    __SHORT_TOC__ : short summary (unnumbered)
    __NOTOC__ : no (automatic) numbered summary *)
 
-module Buff2 = Buff.Make (struct value buff = ref (Bytes.create 80); end);
-module Buff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
+module Buff2 = Buff.Make (struct end);
+module Buff = Buff.Make (struct end);
 
 value first_cnt = 1;
 
