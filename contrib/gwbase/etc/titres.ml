@@ -5,7 +5,7 @@ open Def;
 open Gwdb;
 open Printf;
 
-module Buff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
+module Buff = Buff.Make (struct end);
 
 value lower_utf_8 s =
   loop 0 0 where rec loop i len =

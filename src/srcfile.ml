@@ -292,7 +292,7 @@ value macro conf base =
   | c -> "%" ^ String.make 1 c ]
 ;
 
-module Lbuff = Buff.Make (struct value buff = ref (Bytes.create 80); end);
+module Lbuff = Buff.Make (struct end);
 
 value rec lexicon_translate conf base nomin strm first_c =
   let (upp, s) =
