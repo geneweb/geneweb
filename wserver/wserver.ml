@@ -64,7 +64,7 @@ value gen_decode strip_spaces s =
         | x -> do { Bytes.set s1 i1 x; succ i } ]
       in
       copy_decode_in s1 i (succ i1)
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   let rec strip_heading_and_trailing_spaces s =
     if String.length s > 0 then
@@ -125,7 +125,7 @@ value encode s =
             else do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in
@@ -221,13 +221,13 @@ value rec extract_param name stop_char =
 
 value buff = ref (Bytes.create 80);
 value store len x = do {
-  if len >= String.length buff.val then
-    buff.val := buff.val ^ Bytes.create (String.length buff.val)
+  if len >= Bytes.length buff.val then
+    buff.val := Bytes.extend buff.val 0 (Bytes.length buff.val)
   else ();
   Bytes.set buff.val len x;
   succ len
 };
-value get_buff len = String.sub buff.val 0 len;
+value get_buff len = Bytes.sub_string buff.val 0 len;
 
 value get_request strm =
   let rec loop len =
@@ -312,9 +312,9 @@ value treat_connection tmout callback addr fd = do {
   let (request, script_name, contents) =
     let (request, contents) =
       let strm =
-        let c = " " in
+        let c = Bytes.create 1 in
         Stream.from
-          (fun _ -> if Unix.read fd c 0 1 = 1 then Some c.[0] else None)
+          (fun _ -> if Unix.read fd c 0 1 = 1 then Some (Bytes.get c 0) else None)
       in
       get_request_and_content strm
     in
@@ -446,13 +446,13 @@ value wait_and_compact s =
 
 value skip_possible_remaining_chars fd =
   do {
-    let b = "..." in
+    let b = Bytes.create 3 in
     try
       loop () where rec loop () =
         match Unix.select [fd] [] [] 5.0 with
         [ ([_], [], []) ->
-            let len = Unix.read fd b 0 (String.length b) in
-            if len = String.length b then loop () else ()
+            let len = Unix.read fd b 0 (Bytes.length b) in
+            if len = Bytes.length b then loop () else ()
         | _ -> () ]
     with
     [ Unix.Unix_error Unix.ECONNRESET _ _ -> () ]

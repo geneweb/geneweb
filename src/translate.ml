@@ -184,7 +184,7 @@ value eval_app set str =
  *)
 
 value rec eval_shift s =
-  let t = String.make (String.length s) '#' in
+  let t = Bytes.make (String.length s) '#' in
   let rec loop changed i j =
     if i + 4 < String.length s && s.[i] = '@' && s.[i + 1] = '(' &&
        s.[i + 3] = '-'
@@ -213,7 +213,7 @@ value rec eval_shift s =
               }
               else do {
                 let j =
-                  if j > 0 && t.[j - 1] <> ' ' then do { Bytes.set t j ' '; j + 1 }
+                  if j > 0 && (Bytes.get t (j - 1)) <> ' ' then do { Bytes.set t j ' '; j + 1 }
                   else j
                 in
                 String.blit s l t j len;
@@ -242,8 +242,8 @@ value rec eval_shift s =
     else if i < String.length s then do {
       Bytes.set t j s.[i]; loop changed (i + 1) (j + 1)
     }
-    else if changed then eval_shift (String.sub t 0 j)
-    else String.sub t 0 j
+    else if changed then eval_shift (Bytes.sub_string t 0 j)
+    else Bytes.sub_string t 0 j
   in
   loop False 0 0
 ;

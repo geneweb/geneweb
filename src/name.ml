@@ -495,7 +495,7 @@ value crush s =
             utf_8_db.val && (i = String.length s - 1 || s.[i + 1] = ' ') ->
               let len =
                 loop (i - 1) (len - 1) where rec loop i len =
-                  if i > 0 && len > 0 && s.[i] = Buff.buff.val.[len] &&
+                  if i > 0 && len > 0 && s.[i] = Bytes.get Buff.buff.val len &&
                     (s.[i] = 's' || s.[i] = 'z') then
                     loop (i - 1) (len - 1)
                   else len + 1

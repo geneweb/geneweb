@@ -54,20 +54,18 @@ value dsk_person_misc_names base p nobtit =
     (father_titles_places base p nobtit)
 ;
 
-value check_magic =
-  let b = Bytes.create (String.length magic_gwb) in
-  fun ic ->
-    do {
-      really_input ic b 0 (String.length b);
-      Mutil.utf_8_db.val := True;
-      if b <> magic_gwb then
-        if b = magic_gwb_iso_8859_1 then Mutil.utf_8_db.val := False
-        else if String.sub magic_gwb 0 4 = String.sub b 0 4 then
-          failwith "this is a GeneWeb base, but not compatible"
-        else
-          failwith "this is not a GeneWeb base, or it is a very old version"
+value check_magic ic =
+  do {
+    let b = really_input_string ic (String.length magic_gwb) in
+    Mutil.utf_8_db.val := True;
+    if b <> magic_gwb then
+      if b = magic_gwb_iso_8859_1 then Mutil.utf_8_db.val := False
+      else if String.sub magic_gwb 0 4 = String.sub b 0 4 then
+        failwith "this is a GeneWeb base, but not compatible"
+      else
+        failwith "this is not a GeneWeb base, or it is a very old version"
       else ()
-    }
+  }
 ;
 
 value unaccent =

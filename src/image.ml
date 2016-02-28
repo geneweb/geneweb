@@ -56,9 +56,9 @@ value print_image_type cgi fname itype =
         let rec loop len =
           if len = 0 then ()
           else do {
-            let olen = min (String.length buf) len in
+            let olen = min (Bytes.length buf) len in
             really_input ic buf 0 olen;
-            Wserver.wprint "%s" (String.sub buf 0 olen);
+            Wserver.wprint "%s" (Bytes.sub_string buf 0 olen);
             loop (len - olen)
           }
         in

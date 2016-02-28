@@ -230,9 +230,8 @@ value rec line_start num =
 ;
 
 value ascii_of_msdos s =
-  let s' = Bytes.create (String.length s) in
-  do {
-    for i = 0 to String.length s - 1 do {
+  String.init (String.length s) conv_char
+    where conv_char i =
       let cc =
         match Char.code s.[i] with
         [ 0o200 -> 0o307
@@ -288,16 +287,12 @@ value ascii_of_msdos s =
         | 0o375 -> 0o262
         | c -> c ]
       in
-      Bytes.set s' i (Char.chr cc)
-    };
-    s'
-  }
+      Char.chr cc
 ;
 
 value ascii_of_macintosh s =
-  let s' = Bytes.create (String.length s) in
-  do {
-    for i = 0 to String.length s - 1 do {
+  String.init (String.length s) conv_char
+    where conv_char i =
       let cc =
         match Char.code s.[i] with
         [ 0o200 -> 0o304
@@ -374,10 +369,7 @@ value ascii_of_macintosh s =
         | 0o364 -> 0o331
         | c -> c ]
       in
-      Bytes.set s' i (Char.chr cc)
-    };
-    s'
-  }
+      Char.chr cc
 ;
 
 value utf8_of_string s =
@@ -520,7 +512,7 @@ value less_greater_escaped s =
         | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in
@@ -1183,7 +1175,7 @@ value gen_lowercase_uppercase_utf8_letter lower s =
     let s = Bytes.create len in
     loop 0 el s where rec loop i el s =
       match el with
-      [ [] -> s
+      [ [] -> Bytes.unsafe_to_string s
       | [e :: ell] ->
           let _s = Bytes.set s i (Char.chr e) in
           loop (i + 1) ell s ]
@@ -1194,7 +1186,6 @@ value lowercase_utf8_letter = gen_lowercase_uppercase_utf8_letter True;
 value uppercase_utf8_letter = gen_lowercase_uppercase_utf8_letter False;
 
 value capitalize_word s =
-  let s = Bytes.copy s in
   copy False 0 0 (particle s 0) where rec copy special i len uncap =
     if i = String.length s then Buff.get len
     else
@@ -1229,7 +1220,6 @@ value capitalize_word s =
 ;
 
 value uppercase_word s =
-  let s = Bytes.copy s in
   copy False 0 0 (particle s 0) where rec copy special i len uncap =
     if i = String.length s then Buff.get len
     else

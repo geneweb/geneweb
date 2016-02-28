@@ -5,21 +5,19 @@
 open Gwcomp;
 open Printf;
 
-value check_magic =
-  let b = Bytes.create (String.length magic_gwo) in
-  fun fname ic ->
-    do {
-      really_input ic b 0 (String.length b);
-      if b <> magic_gwo then
-        if String.sub magic_gwo 0 4 = String.sub b 0 4 then
-          failwith
-            ("\"" ^ fname ^ "\" is a GeneWeb object file, but not compatible")
-        else
-          failwith
-            ("\"" ^ fname ^
-               "\" is not a GeneWeb object file, or it is a very old version")
-      else ()
-    }
+value check_magic fname ic =
+  do {
+    let b = really_input_string ic (String.length magic_gwo) in
+    if b <> magic_gwo then
+      if String.sub magic_gwo 0 4 = String.sub b 0 4 then
+        failwith
+          ("\"" ^ fname ^ "\" is a GeneWeb object file, but not compatible")
+      else
+        failwith
+          ("\"" ^ fname ^
+              "\" is not a GeneWeb object file, or it is a very old version")
+    else ()
+  }
 ;
 
 value next_family_fun_templ gwo_list fi = do {

@@ -194,7 +194,7 @@ value to_string_sep_base sep base x =
           })
        (0, 0) digits
   in
-  s
+  Bytes.unsafe_to_string s
 ;
 
 value to_string_sep sep = to_string_sep_base sep 10;
