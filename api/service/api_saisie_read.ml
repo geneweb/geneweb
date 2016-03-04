@@ -1267,14 +1267,13 @@ let pers_to_piqi_person conf base p =
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = gen_p.notes in
         let s = string_with_macros conf env s in
-        let lines = Api_wiki.html_of_tlsw conf s in
         let wi =
           {Api_wiki.wi_mode = "NOTES"; Api_wiki.wi_cancel_links = conf.cancel_links;
            Api_wiki.wi_file_path = Notes.file_path conf base;
            Api_wiki.wi_person_exists = person_exists conf base;
            Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
-        let s = Api_wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Api_wiki.syntax_links conf wi s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
     in
