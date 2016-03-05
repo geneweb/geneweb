@@ -4,7 +4,7 @@ set -uex
 PKG_DEP="ocamlfind camlp5"
 
 # Install packages
-opam install $PKG_DEP
+echo Y | opam install $PKG_DEP
 
 # Build GeneWeb
 ./configure
