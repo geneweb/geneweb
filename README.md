@@ -1,12 +1,9 @@
+[![Build Status](https://travis-ci.org/geneweb/geneweb.png?branch=master)](https://travis-ci.org/geneweb/geneweb)
+
 # GeneWeb
 
 GeneWeb is an open source genealogy software written in OCaml. It comes
 with a Web interface and can be used off-line or as a Web service.
-
-## This branch: master
-
-This branch is the stable branch, i.e. that it may not contain the
-last improvements.
 
 ## Documentation
 

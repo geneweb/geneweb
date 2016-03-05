@@ -1,0 +1,12 @@
+language: c
+sudo: required
+install:
+  - wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-ocaml.sh
+  - wget https://raw.githubusercontent.com/geneweb/geneweb/master/.travis-ci.sh
+script: bash -ex .travis-ocaml.sh && bash -ex .travis-ci.sh
+env:
+   - OCAML_VERSION=4.02
+   - OCAML_VERSION=latest
+os:
+  - linux
+  - osx
