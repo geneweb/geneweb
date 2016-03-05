@@ -1,10 +1,8 @@
 set -uex
 
-# Package dependencies
-PKG_DEP="ocamlfind camlp5"
-
-# Install packages
-echo Y | opam install $PKG_DEP
+# Install packages dependencies
+export OPAMYES=1
+opam install ocamlfind camlp5
 
 # Build GeneWeb
 ./configure
