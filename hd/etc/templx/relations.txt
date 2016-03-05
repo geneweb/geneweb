@@ -73,7 +73,7 @@
         %apply;li_SDC("event_witness_relation.person")
           %apply;capitalize(event_witness_relation_kind)%sp;
           %event_witness_relation.event.name;%sp;
-          %if;(event_witness_relation.event.date.year>0)
+          %if;(event_witness_relation.event.date.year != "")
             <em>(%event_witness_relation.event.date.year;)</em>%sp;
           %end;%nn;
           :%sp;

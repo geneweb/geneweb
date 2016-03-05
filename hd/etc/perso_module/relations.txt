@@ -38,14 +38,14 @@
     %foreach;event_witness_relation;
       %apply;li_SDC("event_witness_relation.person")
         %apply;capitalize(event_witness_relation_kind)%sp;
-        %if;(event_witness_relation.event.date.year>0)
+        %if;(event_witness_relation.event.date.year != "")
           <em>(%event_witness_relation.event.date.year;)</em>
         %end;
 	:%sp;
         %event_witness_relation.event.name;,%sp;
         %apply;short_display_person("event_witness_relation.person")
         %if;(event_witness_relation.event.spouse != "")
-          [and]
+          %sp;[and]
           %apply;short_display_person("event_witness_relation.event.spouse")
         %end;
       </li>

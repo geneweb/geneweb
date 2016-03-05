@@ -22,6 +22,8 @@
 <body%body_prop;>
 %message_to_wizard;
 
+%import;perso_utils
+
 <h1>%nn;
   %apply;a_of_b_gr_eq_lev%with;
     [*descendants]%nn;
@@ -118,14 +120,14 @@
     %foreach;event_witness_relation;
       %sp;
       (%apply;capitalize(event_witness_relation_kind)%sp;
-      %if;(event_witness_relation.event.date.year>0)
+      %if;(event_witness_relation.event.date.year != "")
         <em>(%event_witness_relation.event.date.year;)</em>
       %end;
       :%sp;
       %event_witness_relation.event.name;,%sp;
       %apply;short_display_person("event_witness_relation.person")
       %if;(event_witness_relation.event.spouse != "")
-        [and]
+        %sp;[and]
         %apply;short_display_person("event_witness_relation.event.spouse")
       %end;
       %nn;)
