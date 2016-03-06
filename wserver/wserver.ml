@@ -339,9 +339,9 @@ value treat_connection tmout callback addr fd = do {
   try flush stderr with _ -> ();
 };
 
+IFDEF WIN95 THEN
 value buff = Bytes.create 1024;
 
-IFDEF WIN95 THEN
 value copy_what_necessary t oc =
   let strm =
     let len = ref 0 in
@@ -356,7 +356,7 @@ value copy_what_necessary t oc =
            }
            else ();
            if len.val = 0 then None
-           else do { incr i; Some buff.[i.val - 1] }
+           else do { incr i; Some (Bytes.get buff (i.val - 1)) }
          })
   in
   let _ = get_request_and_content strm in
