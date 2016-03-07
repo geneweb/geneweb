@@ -614,6 +614,21 @@ let pers_to_piqi_simple_person conf base p base_prefix =
           | None -> ""
       else ""
     in
+    let has_parent =
+        match get_parents p with
+        | Some ifam -> true
+        | _ -> false
+    in
+    let has_spouse = Array.length (get_family p) >= 1
+    in
+    let has_child =
+    (List.fold_left
+        (fun has_children ifam ->
+          let fam = foi base ifam in
+          let children = get_children fam in
+          (has_children || Array.length children >= 1))
+        false (Array.to_list (get_family p)))
+    in
     Mread.Simple_person.({
       index = index;
       sex = sex;
@@ -632,7 +647,10 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       sosa = sosa;
       sosa_nb = sosa_nb;
       visible_for_visitors = visible_for_visitors;
-      baseprefix = base_prefix
+      baseprefix = base_prefix;
+      has_parent = has_parent;
+      has_spouse = has_spouse;
+      has_child = has_child
     })
 ;;
 

@@ -216,6 +216,9 @@ message SimplePerson {
   required string baseprefix = 14;
   optional string sosa_nb = 17;
   required bool visible_for_visitors = 18;
+  required bool has_parent = 19;
+  required bool has_spouse = 20;
+  required bool has_child = 21;
 }
 
 message RelationPerson {
