@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/geneweb/geneweb.png?branch=master)](https://travis-ci.org/geneweb/geneweb)
+[![Build Status](https://ci.appveyor.com/api/projects/status/csi18sh2ev6dwfl1?svg=true)](https://ci.appveyor.com/project/ipfix/geneweb)
 
 # GeneWeb
 
