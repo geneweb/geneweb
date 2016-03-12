@@ -33,7 +33,7 @@ value wrap_string : ref (string -> string);
     (* To specify a function which may transform the string printed by
        [sprint] below. *)
 
-value http : string -> unit;
+value http : HttpStatus.t -> unit;
     (* [Wserver.http answer] sends the http header where [answer]
        represents the answer status. If empty string, "200 OK" is assumed. *)
 
@@ -82,7 +82,8 @@ value cgi : ref bool;
    - Source program "foo.ml":
         Wserver.f None 2371 60 None
            (fun _ s _ ->
-              Wserver.http ""; Wserver.printf "You said: %s...\n" s);;
+              Wserver.http HttpStatus.OK;
+              Wserver.printf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
    - Run:

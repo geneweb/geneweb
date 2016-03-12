@@ -28,7 +28,7 @@ type excl =
 
 value robot_error conf from cnt sec =
   do {
-    Wserver.http "403 Forbidden";
+    Wserver.http HttpStatus.Forbidden;
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
     let env =
       [("cnt", string_of_int cnt) ; ("sec", string_of_int sec)]

@@ -159,9 +159,9 @@ value copy_file fname =
   | None -> False ]
 ;
 
-value http answer =
+value http status =
   do {
-    Wserver.http answer;
+    Wserver.http status;
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
   }
 ;
@@ -171,7 +171,7 @@ value robots_txt () =
   do {
     Printf.fprintf oc "Robot request\n";
     flush_log oc;
-    Wserver.http "";
+    Wserver.http HttpStatus.OK;
     Wserver.header "Content-type: text/plain";
     if copy_file "robots" then ()
     else do {
@@ -188,7 +188,7 @@ value refuse_log from cgi =
     fprintf_date oc tm;
     fprintf oc " excluded: %s\n" from;
     close_out oc;
-    http "403 Forbidden";
+    http HttpStatus.Forbidden;
     Wserver.header "Content-type: text/html";
     Wserver.printf "Your access has been disconnected by administrator.\n";
     let _ : bool = copy_file "refuse" in ();
@@ -207,7 +207,7 @@ value only_log from cgi =
       only_addresses.val;
     fprintf oc ")\n";
     flush_log oc;
-    http "";
+    http HttpStatus.OK;
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
     Wserver.printf "<head><title>Invalid access</title></head>\n";
     Wserver.printf "<body><h1>Invalid access</h1></body>\n";
@@ -477,7 +477,7 @@ value trace_auth base_env f = do {
 
 value unauth_server conf ar =  do {
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Wserver.http "401 Unauthorized";
+  Wserver.http HttpStatus.Unauthorized;
   if use_auth_digest_scheme.val then
     let nonce = digest_nonce conf.ctime in
 let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun oc -> fprintf oc "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n" fprintf_date tm (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) conf.request) ar.ar_passwd nonce ar.ar_can_stale) in
@@ -708,7 +708,7 @@ value index_not_name s =
 
 value print_request_failure cgi msg =
   do {
-    http "";
+    http HttpStatus.OK;
     Wserver.header "Content-type: text/html";
     Wserver.printf "<head><title>Request failure</title></head>\n";
     Wserver.printf "\
@@ -735,7 +735,7 @@ value refresh_url cgi request s i =
     serv ^ req
   in
   do {
-    http "";
+    http HttpStatus.OK;
     Wserver.header "Content-type: text/html";
     Wserver.printf "\
 <head>
@@ -1555,7 +1555,7 @@ type misc_fname =
 ;
 
 value content_misc cgi len misc_fname = do {
-  http "";
+  Wserver.http HttpStatus.OK;
   let (fname, t) =
     match misc_fname with
     [ Css fname -> (fname, "text/css")

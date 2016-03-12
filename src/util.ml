@@ -381,7 +381,7 @@ value string_of_ctime conf =
 value html conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
   do {
-    Wserver.http "";
+    Wserver.http HttpStatus.OK;
     if not Wserver.cgi.val then
       Wserver.header "Server: GeneWeb/%s" Version.txt
     else ();
@@ -395,7 +395,7 @@ value html conf =
 
 value unauthorized conf auth_type =
   do {
-    Wserver.http "401 Unauthorized";
+    Wserver.http HttpStatus.Unauthorized;
     if not Wserver.cgi.val then
       Wserver.header "WWW-Authenticate: Basic realm=\"%s\"" auth_type
     else ();

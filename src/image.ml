@@ -18,7 +18,7 @@ open Config;
 (* ************************************************************************** *)
 value content cgi t len fname =
   do {
-    Wserver.http "";
+    Wserver.http HttpStatus.OK;
     Wserver.header "Content-type: image/%s" t;
     Wserver.header "Content-length: %d" len;
     Wserver.header "Content-disposition: inline; filename=%s"

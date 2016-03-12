@@ -3,7 +3,7 @@
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver -I ../src
-OBJS=../wserver/wserver.cmo ../src/version.cmo ../src/argl.cmo ../src/buff.cmo ../src/translate.cmo setup.cmo
+OBJS=../wserver/httpStatus.cmo ../wserver/wserver.cmo ../src/version.cmo ../src/argl.cmo ../src/buff.cmo ../src/translate.cmo setup.cmo
 
 all:: out
 

@@ -29,13 +29,13 @@ type printing_state =
 
 value printing_state = ref Nothing;
 
-value http answer = do {
+value http status = do {
   if printing_state.val <> Nothing then
     failwith "HTTP Status already sent"
   else ();
   printing_state.val := Status;
-  if answer <> "" || not cgi.val then
-    let answer = if answer = "" then "200 OK" else answer in
+  if status <> HttpStatus.OK || not cgi.val then
+    let answer = HttpStatus.to_string status in
     if cgi.val then
       printnl "Status: %s" answer
     else
@@ -46,7 +46,7 @@ value http answer = do {
 value header fmt = do {
   if printing_state.val <> Status then
     if printing_state.val = Nothing then
-      http ""
+      http HttpStatus.OK
     else
       failwith "Cannot write HTTP headers: page contents already started"
   else ();
@@ -58,7 +58,7 @@ value wrap_string = ref (fun s -> s);
 value printf fmt = do {
   if printing_state.val <> Contents then do {
     if printing_state.val = Nothing then
-      http ""
+      http HttpStatus.OK
     else ();
     printnl "";
     printing_state.val := Contents
@@ -289,7 +289,7 @@ value timeout tmout spid _ =
     let pid = Unix.fork () in
     if pid = 0 then
       if Unix.fork () = 0 then do {
-        http "";
+        http HttpStatus.OK;
         printnl "Content-type: text/html; charset=iso-8859-1";
         printnl "";
         printf "<head><title>Time out</title></head>\n";

@@ -89,7 +89,7 @@ value charset conf =
 
 value header_no_page_title conf title =
   do {
-    Wserver.http "";
+    Wserver.http HttpStatus.OK;
     Wserver.header "Content-type: text/html; charset=%s" (charset conf);
     Wserver.printf "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
@@ -669,7 +669,7 @@ value print_file conf bname =
   match ic_opt with
   [ Some ic ->
       do {
-        Wserver.http "";
+        Wserver.http HttpStatus.OK;
         Wserver.header "Content-type: text/html; charset=%s" (charset conf);
         copy_from_stream conf (fun x -> Wserver.printf "%s" x)
           (Stream.of_channel ic);
@@ -1658,7 +1658,7 @@ value print_typed_file conf typ fname =
   match ic_opt with
   [ Some ic ->
       do {
-        Wserver.http "";
+        Wserver.http HttpStatus.OK;
         Wserver.header "Content-type: %s" typ;
         Wserver.header "Content-length: %d" (in_channel_length ic);
         try

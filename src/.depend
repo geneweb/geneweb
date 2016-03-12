@@ -149,14 +149,14 @@ gwc2.cmx: argl.cmx db2link.cmx gwcomp.cmx lock.cmx mutil.cmx progrBar.cmx \
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi gwcomp.cmi mutil.cmi
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi gwcomp.cmi mutil.cmx
 gwcomp.cmi: def.cmi
-gwd.cmo: ../wserver/wserver.cmi adef.cmi argl.cmo base64.cmo buff.cmo \
-    config.cmi def.cmi doc.cmo gutil.cmi hutil.cmi image.cmi lock.cmi \
-    mutil.cmi name.cmi relationLink.cmi request.cmi robot.cmo secure.cmi \
-    srcfile.cmi templ.cmi util.cmi version.cmo
-gwd.cmx: ../wserver/wserver.cmx adef.cmx argl.cmx base64.cmx buff.cmx \
-    config.cmi def.cmi doc.cmx gutil.cmx hutil.cmx image.cmx lock.cmx \
-    mutil.cmx name.cmx relationLink.cmx request.cmx robot.cmx secure.cmx \
-    srcfile.cmx templ.cmx util.cmx version.cmx
+gwd.cmo: ../wserver/httpStatus.cmo ../wserver/wserver.cmi adef.cmi argl.cmo \
+    base64.cmo buff.cmo config.cmi def.cmi doc.cmo gutil.cmi hutil.cmi \
+    image.cmi lock.cmi mutil.cmi name.cmi relationLink.cmi request.cmi \
+    robot.cmo secure.cmi srcfile.cmi templ.cmi util.cmi version.cmo
+gwd.cmx: ../wserver/httpStatus.cmx ../wserver/wserver.cmx adef.cmx argl.cmx \
+    base64.cmx buff.cmx config.cmi def.cmi doc.cmx gutil.cmx hutil.cmx \
+    image.cmx lock.cmx mutil.cmx name.cmx relationLink.cmx request.cmx \
+    robot.cmx secure.cmx srcfile.cmx templ.cmx util.cmx version.cmx
 gwdb.cmo: adef.cmi database.cmi db2disk.cmi dbdisk.cmi def.cmi futil.cmi \
     gwdb.cmi mutil.cmi name.cmi secure.cmi
 gwdb.cmx: adef.cmx database.cmx db2disk.cmx dbdisk.cmi def.cmi futil.cmx \
@@ -182,10 +182,10 @@ history_diff.cmx: ../wserver/wserver.cmx adef.cmx config.cmi date.cmx def.cmi \
 hutil.cmo: ../wserver/wserver.cmi config.cmi hutil.cmi templ.cmi util.cmi
 hutil.cmx: ../wserver/wserver.cmx config.cmi hutil.cmi templ.cmx util.cmx
 hutil.cmi: config.cmi gwdb.cmi templ.cmi
-image.cmo: ../wserver/wserver.cmi config.cmi hutil.cmi image.cmi mutil.cmi \
-    secure.cmi util.cmi
-image.cmx: ../wserver/wserver.cmx config.cmi hutil.cmx image.cmi mutil.cmx \
-    secure.cmx util.cmx
+image.cmo: ../wserver/httpStatus.cmo ../wserver/wserver.cmi config.cmi \
+    hutil.cmi image.cmi mutil.cmi secure.cmi util.cmi
+image.cmx: ../wserver/httpStatus.cmx ../wserver/wserver.cmx config.cmi \
+    hutil.cmx image.cmi mutil.cmx secure.cmx util.cmx
 image.cmi: config.cmi gwdb.cmi
 iochan.cmo: iochan.cmi iovalue.cmi
 iochan.cmx: iochan.cmi iovalue.cmx
