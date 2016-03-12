@@ -28,7 +28,7 @@ type excl =
 
 value robot_error conf from cnt sec =
   do {
-    if not conf.cgi then Wserver.http "403 Forbidden" else ();
+    if not Wserver.cgi.val then Wserver.http "403 Forbidden" else ();
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
     Wserver.header "";
     let env =

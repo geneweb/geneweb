@@ -91,7 +91,7 @@ value print_image_file cgi fname =
 value print_personal_image conf base p =
   match Util.image_and_size conf base p (fun x y -> Some (1, 1)) with
   [ Some (True, f, _) ->
-      if print_image_file conf.cgi f then () else Hutil.incorrect_request conf
+      if print_image_file Wserver.cgi.val f then () else Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf ]
 ;
 
@@ -111,7 +111,7 @@ value print_source_image conf f =
   in
   if fname = Filename.basename fname then
     let fname = Util.source_image_file_name conf.bname fname in
-    if print_image_file conf.cgi fname then () else Hutil.incorrect_request conf
+    if print_image_file Wserver.cgi.val fname then () else Hutil.incorrect_request conf
   else Hutil.incorrect_request conf
 ;
 

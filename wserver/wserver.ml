@@ -7,6 +7,7 @@ value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
 value stop_server = ref "STOP_SERVER";
 value noproc = ref False;
+value cgi = ref False;
 
 value wserver_sock = ref Unix.stdout;
 value wsocket () = wserver_sock.val;

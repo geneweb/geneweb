@@ -1243,7 +1243,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name;
-     auth_scheme = ar.ar_scheme; cgi = cgi; command = ar.ar_command;
+     auth_scheme = ar.ar_scheme; command = ar.ar_command;
      indep_command = (if cgi then ar.ar_command else "geneweb") ^ "?";
      pure_xhtml =
        try List.assoc "pure_xhtml" env = "on" with
@@ -1341,7 +1341,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
 };
 
 value log_and_robot_check conf auth from request script_name contents =
-  if conf.cgi && log_file.val = "" && robot_xcl.val = None then ()
+  if Wserver.cgi.val && log_file.val = "" && robot_xcl.val = None then ()
   else
     let tm = Unix.time () in
     lock_wait Srcfile.adm_file "gwd.lck" with
@@ -1357,7 +1357,7 @@ value log_and_robot_check conf auth from request script_name contents =
                   conf.n_connect :=
                     Some (Robot.check oc tm from cnt sec conf suicide)
               | _ -> () ];
-              if conf.cgi && log_file.val = "" then ()
+              if Wserver.cgi.val && log_file.val = "" then ()
               else log oc tm conf from auth request script_name contents;
             }
           with e ->
@@ -2070,7 +2070,8 @@ Print the failed passwords in log (except if option -digest is set) ");
       try (Sys.getenv "QUERY_STRING", True) with
       [ Not_found -> ("", cgi.val) ]
     in
-    if cgi then
+    if cgi then do {
+      Wserver.cgi.val := True;
       let is_post =
         try Sys.getenv "REQUEST_METHOD" = "POST" with [ Not_found -> False ]
       in
@@ -2093,7 +2094,7 @@ Print the failed passwords in log (except if option -digest is set) ");
         try Sys.getenv "SCRIPT_NAME" with [ Not_found -> Sys.argv.(0) ]
       in
       geneweb_cgi addr (Filename.basename script) query
-    else geneweb_server ()
+    } else geneweb_server ()
   }
 ;
 

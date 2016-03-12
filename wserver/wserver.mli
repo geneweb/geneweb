@@ -75,6 +75,7 @@ value stop_server : ref string;
        that this file exits. Default "STOP_SERVER". Can have relative
        or absolute path. *)
 value noproc : ref bool;
+value cgi : ref bool;
 
 (* Example:
 

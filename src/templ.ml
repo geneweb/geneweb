@@ -747,7 +747,7 @@ and eval_simple_variable conf =
   | "nn" -> ""
   | "prefix" -> Util.commd conf
   | "prefix_base" ->
-      conf.command ^ "?" ^ (if conf.cgi then "b=" ^ conf.bname ^ ";" else "")
+      conf.command ^ "?" ^ (if Wserver.cgi.val then "b=" ^ conf.bname ^ ";" else "")
   | "prefix_no_iz" ->
       let henv =
         List.fold_left
@@ -922,7 +922,7 @@ value loc_of_expr =
 value templ_eval_var conf =
   fun
   [ ["cancel_links"] -> VVbool conf.cancel_links
-  | ["cgi"] -> VVbool conf.cgi
+  | ["cgi"] -> VVbool Wserver.cgi.val
   | ["false"] -> VVbool False
   | ["has_referer"] -> (* deprecated since version 5.00 *)
       VVbool (Wserver.extract_param "referer: " '\n' conf.request <> "")

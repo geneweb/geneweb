@@ -250,7 +250,7 @@ value macro conf base =
   | 'e' -> conf.charset
   | 'f' -> conf.command
   | 'g' ->
-      conf.command ^ "?" ^ (if conf.cgi then "b=" ^ conf.bname ^ ";" else "")
+      conf.command ^ "?" ^ (if Wserver.cgi.val then "b=" ^ conf.bname ^ ";" else "")
   | 'i' -> conf.highlight
   | 'k' -> conf.indep_command
   | 'l' -> conf.lang
@@ -377,7 +377,7 @@ value rec copy_from_stream conf base strm mode =
     fun
     [ 'N' -> not (if_expr (Stream.next strm))
     | 'a' -> conf.auth_file <> ""
-    | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
+    | 'c' -> Wserver.cgi.val || browser_cannot_handle_passwords conf
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard

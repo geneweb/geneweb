@@ -381,7 +381,7 @@ value string_of_ctime conf =
 value html conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
   do {
-    if not conf.cgi then do {
+    if not Wserver.cgi.val then do {
       Wserver.http "";
       Wserver.header "Server: GeneWeb/%s" Version.txt
     }
@@ -397,7 +397,7 @@ value html conf =
 
 value unauthorized conf auth_type =
   do {
-    if not conf.cgi then do {
+    if not Wserver.cgi.val then do {
       Wserver.http "401 Unauthorized";
       Wserver.header "WWW-Authenticate: Basic realm=\"%s\"" auth_type
     }
@@ -1437,7 +1437,7 @@ value rec copy_from_etc env lang imcom ic =
 
 value image_prefix conf =
   if images_url.val <> "" then images_url.val
-  else if conf.cgi then conf.command ^ "?m=IM;v="
+  else if Wserver.cgi.val then conf.command ^ "?m=IM;v="
   else "images"
 ;
 
@@ -1502,8 +1502,8 @@ value get_request_string_aux cgi request =
     script_name ^ "?" ^ query_string
 ;
 
-value get_server_string conf = get_server_string_aux conf.cgi conf.request;
-value get_request_string conf = get_request_string_aux conf.cgi conf.request;
+value get_server_string conf = get_server_string_aux Wserver.cgi.val conf.request;
+value get_request_string conf = get_request_string_aux Wserver.cgi.val conf.request;
 
 value url_no_index conf base =
   let scratch s = code_varenv (Name.lower (sou base s)) in
@@ -1592,7 +1592,7 @@ value url_no_index conf base =
          let sep = if s = "" then "" else ";" in x ^ "=" ^ v ^ sep ^ s)
       [("lang", conf.lang) :: env] ""
   in
-  let suff = if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff in
+  let suff = if Wserver.cgi.val then "b=" ^ conf.bname ^ ";" ^ suff else suff in
   addr ^ "?" ^ suff
 ;
 

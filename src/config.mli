@@ -30,7 +30,6 @@ type config =
     user : string;
     username : string;
     auth_scheme : auth_scheme_kind;
-    cgi : bool;
     pure_xhtml : bool;
     command : string;
     indep_command : string;

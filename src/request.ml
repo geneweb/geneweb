@@ -729,7 +729,7 @@ value set_owner conf =
 value thousand oc x = Num.print (output_string oc) "," (Num.of_int x);
 
 value log_count conf (log_file, log_oc, flush_log) r =
-  if conf.cgi && log_file = "" then ()
+  if Wserver.cgi.val && log_file = "" then ()
   else
     match r with
     [ Some (welcome_cnt, request_cnt, start_date) ->
