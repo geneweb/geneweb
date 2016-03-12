@@ -65,7 +65,7 @@ api.opt:
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_update_util.ml
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_update_person.ml
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_update_family.ml
-	$(OCAMLOPT) -c -pp "camlp5r ../../wserver/pa_macro5.cmo pa_extend.cmo ../../src/pa_lock.cmo $(CAMLP5F)" -I ../../src api_saisie_autocomplete.ml
+	$(OCAMLOPT) -c -pp "camlp5r pa_macro.cmo pa_extend.cmo ../../src/pa_lock.cmo $(CAMLP5F)" -I ../../src api_saisie_autocomplete.ml
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_saisie_write.ml
 	$(OCAMLOPT) -package piqirun.ext -package curl -I $(OCURL) curl.cmxa -I $(LREDIS) -package yojson -I ../../src -I ../../wserver -c api_link.ml
 	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver convert_dico_place.ml
