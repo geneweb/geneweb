@@ -44,37 +44,37 @@ value gen_print_link_to_welcome f conf right_aligned =
       | None -> "" ]
     in
     if right_aligned then
-      Wserver.wprint "<div style=\"float:%s\">\n" conf.right
-    else Wserver.wprint "<p>\n";
+      Wserver.printf "<div style=\"float:%s\">\n" conf.right
+    else Wserver.printf "<p>\n";
     f ();
     let str = link_to_referer conf in
-    if str = "" then () else Wserver.wprint "%s" str;
-    Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\" title=\"^^\"%s>"
+    if str = "" then () else Wserver.printf "%s" str;
+    Wserver.printf "<a href=\"%s\">" (commd_no_params conf);
+    Wserver.printf "<img src=\"%s/%s\"%s alt=\"^^\" title=\"^^\"%s>"
       (Util.image_prefix conf) fname wid_hei conf.xhs;
-    Wserver.wprint "</a>\n";
-    if right_aligned then Wserver.wprint "</div>\n"
-    else Wserver.wprint "</p>\n"
+    Wserver.printf "</a>\n";
+    if right_aligned then Wserver.printf "</div>\n"
+    else Wserver.printf "</p>\n"
   }
 ;
 
 value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
 
 value header_without_http conf title = do {
-  Wserver.wprint "%s\n" (Util.doctype conf);
-  Wserver.wprint "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
-  Wserver.wprint "<head>\n";
-  Wserver.wprint "  <title>";
+  Wserver.printf "%s\n" (Util.doctype conf);
+  Wserver.printf "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
+  Wserver.printf "<head>\n";
+  Wserver.printf "  <title>";
   title True;
-  Wserver.wprint "</title>\n";
-  Wserver.wprint "  <meta name=\"robots\" content=\"none\"%s>\n" conf.xhs;
-  Wserver.wprint "  <meta http-equiv=\"Content-Type\" \
+  Wserver.printf "</title>\n";
+  Wserver.printf "  <meta name=\"robots\" content=\"none\"%s>\n" conf.xhs;
+  Wserver.printf "  <meta http-equiv=\"Content-Type\" \
                     content=\"text/html; charset=%s\"%s>\n"
     conf.charset conf.xhs;
-  Wserver.wprint
+  Wserver.printf
     "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
     conf.xhs;
-  Wserver.wprint
+  Wserver.printf
     "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\"%s>\n"
     (Util.image_prefix conf) conf.xhs;
   match Util.open_templ conf "css" with
@@ -84,79 +84,78 @@ value header_without_http conf title = do {
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
   Templ.include_hed_trl conf None "hed";
-  Wserver.wprint "</head>\n";
+  Wserver.printf "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
     [ Not_found -> "" ]
   in
-  let s = s ^ Util.body_prop conf in Wserver.wprint "<body%s>" s;
-  Wserver.wprint "\n";
+  let s = s ^ Util.body_prop conf in Wserver.printf "<body%s>" s;
+  Wserver.printf "\n";
   Util.message_to_wizard conf;
 };
 
 value header_without_page_title conf title = do {
   Util.html conf;
-  Util.nl ();
   header_without_http conf title;
 };
 
 value header_link_welcome conf title = do {
   header_without_page_title conf title;
   print_link_to_welcome conf True;
-  Wserver.wprint "<h1>";
+  Wserver.printf "<h1>";
   title False;
-  Wserver.wprint "</h1>\n";
+  Wserver.printf "</h1>\n";
 };
 
 value header_no_page_title conf title = do {
   header_without_page_title conf title;
   match Util.p_getenv conf.env "title" with
   [ None | Some "" -> ()
-  | Some x -> Wserver.wprint "<h1>%s</h1>\n" x ];
+  | Some x -> Wserver.printf "<h1>%s</h1>\n" x ];
 };
 
 value header conf title = do {
   header_without_page_title conf title;
-  Wserver.wprint "<h1>";
+  Wserver.printf "<h1>";
   title False;
-  Wserver.wprint "</h1>\n";
+  Wserver.printf "</h1>\n";
 };
 
 value red_color = "red";
 
 value rheader conf title = do {
   header_without_page_title conf title;
-  Wserver.wprint "<h1 class=\"error\">";
+  Wserver.printf "<h1 class=\"error\">";
   title False;
-  Wserver.wprint "</h1>\n";
+  Wserver.printf "</h1>\n";
 };
 
 value gen_trailer with_logo conf = do {
   Templ.include_hed_trl conf None "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
-  Wserver.wprint "</body>\n</html>\n";
+  Wserver.printf "</body>\n</html>\n";
 };
 
 value trailer = gen_trailer True;
 
 value incorrect_request conf = do {
   let title _ =
-    Wserver.wprint "%s" (Util.capitale (Util.transl conf "incorrect request"))
+    Wserver.printf "%s" (Util.capitale (Util.transl conf "incorrect request"))
   in
   header conf title;
-  Wserver.wprint "<p>\n";
+  Wserver.printf "<p>\n";
   print_link_to_welcome conf False;
-  Wserver.wprint "</p>\n";
+  Wserver.printf "</p>\n";
   trailer conf
 };
 
 value error_cannot_access conf fname = do {
-  let title _ = Wserver.wprint "Error" in
+  let title _ = Wserver.printf "Error" in
   header conf title;
   tag "ul" begin
     tag "li" begin
-      Wserver.wprint "Cannot access file \"%s.txt\".\n"
+      Wserver.printf "Cannot access file \"%s.txt\".\n"
         fname;
     end;
   end;
@@ -171,7 +170,6 @@ value gen_interp header conf base fname ifun env ep = do {
     [ Some astl -> do {
         if header then do {
           Util.html conf;
-          Util.nl ();
         }
         else ();
         Templ.interp_ast conf (Some base) ifun env ep astl

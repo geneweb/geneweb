@@ -219,23 +219,23 @@ value print_someone_and_spouse conf base info in_tab ip n ipl =
   let (s, d, spo) = spouse_text conf base n ip ipl in
   do {
     if in_tab && (info.bd > 0 || info.td_prop <> "") then
-      Wserver.wprint "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>"
+      Wserver.printf "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>"
         info.bd info.td_prop
     else ();
-    Wserver.wprint "%s\n" (someone_text conf base ip);
-    Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip));
+    Wserver.printf "%s\n" (someone_text conf base ip);
+    Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip));
     if s <> "" then do {
       xtag "br";
-      Wserver.wprint "&amp;%s" d;
-      Wserver.wprint " %s\n" s;
+      Wserver.printf "&amp;%s" d;
+      Wserver.printf " %s\n" s;
       match spo with
       [ Some ip ->
-          Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
+          Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip))
       | _ -> () ]
     }
     else ();
     if in_tab && (info.bd > 0 || info.td_prop <> "") then
-      Wserver.wprint "</td></tr></table>"
+      Wserver.printf "</td></tr></table>"
     else ();
   }
 ;
@@ -256,30 +256,30 @@ value rec print_both_branches conf base info pl1 pl2 =
     tag "tr" "align=\"%s\"" conf.left begin
       stag "td" "align=\"center\"" begin
         match p1 with
-        [ Some p1 -> Wserver.wprint "|"
-        | None -> Wserver.wprint "&nbsp;" ];
+        [ Some p1 -> Wserver.printf "|"
+        | None -> Wserver.printf "&nbsp;" ];
       end;
-      stag "td" begin Wserver.wprint "&nbsp;"; end;
+      stag "td" begin Wserver.printf "&nbsp;"; end;
       stag "td" "align=\"center\"" begin
         match p2 with
-        [ Some p2 -> Wserver.wprint "|"
-        | None -> Wserver.wprint "&nbsp;" ];
+        [ Some p2 -> Wserver.printf "|"
+        | None -> Wserver.printf "&nbsp;" ];
       end;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
     end;
     tag "tr" "align=\"%s\"" conf.left begin
       tag "td" "valign=\"top\" align=\"center\"" begin
         match p1 with
         [ Some p1 ->
             print_someone_and_spouse conf base info True p1 info.sp1 pl1
-        | None -> Wserver.wprint "&nbsp;" ];
+        | None -> Wserver.printf "&nbsp;" ];
       end;
-      tag "td" begin Wserver.wprint "&nbsp;"; end;
+      tag "td" begin Wserver.printf "&nbsp;"; end;
       tag "td" "valign=\"top\" align=\"center\"" begin
         match p2 with
         [ Some p2 ->
             print_someone_and_spouse conf base info True p2 info.sp2 pl2
-        | None -> Wserver.wprint "&nbsp;" ];
+        | None -> Wserver.printf "&nbsp;" ];
       end;
     end;
     print_both_branches conf base info pl1 pl2
@@ -317,7 +317,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
           let (s, d, _) = spouse_text conf base info.sp1 p1 pl1 in
           if s <> "" then print_pre_left sz ("&amp;" ^ d ^ " " ^ s) else ()
         }
-    | None -> Wserver.wprint "\n" ];
+    | None -> Wserver.printf "\n" ];
     match p2 with
     [ Some p2 ->
         do {
@@ -325,7 +325,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
           let (s, d, _) = spouse_text conf base info.sp2 p2 pl2 in
           if s <> "" then print_pre_right sz ("&amp;" ^ d ^ " " ^ s) else ()
         }
-    | None -> Wserver.wprint "\n" ];
+    | None -> Wserver.printf "\n" ];
     print_both_branches_pre conf base info sz pl1 pl2
   }
 ;
@@ -407,11 +407,11 @@ value prev_next_2_text conf base info pb nb =
 ;
 
 value print_prev_next_1 conf base info pb nb =
-  Wserver.wprint "%s\n" (prev_next_1_text conf base info pb nb)
+  Wserver.printf "%s\n" (prev_next_1_text conf base info pb nb)
 ;
 
 value print_prev_next_2 conf base info pb nb =
-  Wserver.wprint "%s\n" (prev_next_2_text conf base info pb nb)
+  Wserver.printf "%s\n" (prev_next_2_text conf base info pb nb)
 ;
 
 value other_parent_text_if_same conf base info =
@@ -448,21 +448,21 @@ value other_parent_text_if_same conf base info =
 value print_someone_and_other_parent_if_same conf base info =
   do {
     if info.bd > 0 || info.td_prop <> "" then
-      Wserver.wprint "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>"
+      Wserver.printf "<table style=\"border:%dpx solid\"><tr><td align=\"center\"%s>"
         info.bd info.td_prop
     else ();
-    Wserver.wprint "%s\n" (someone_text conf base info.ip);
-    Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base info.ip));
+    Wserver.printf "%s\n" (someone_text conf base info.ip);
+    Wserver.printf "%s" (Dag.image_txt conf base (pget conf base info.ip));
     match other_parent_text_if_same conf base info with
     [ Some (s, ip) ->
         do {
           xtag "br";
-          Wserver.wprint "%s" s;
-          Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
+          Wserver.printf "%s" s;
+          Wserver.printf "%s" (Dag.image_txt conf base (pget conf base ip))
         }
     | None -> () ];
     if info.bd > 0 || info.td_prop <> "" then
-      Wserver.wprint "</td></tr></table>"
+      Wserver.printf "</td></tr></table>"
     else ();
   }
 ;
@@ -482,7 +482,7 @@ value print_one_branch_no_table conf base info =
     list_iter_hd_tl
       (fun (ip1, _) ipl1 ->
          do {
-           Wserver.wprint "|";
+           Wserver.printf "|";
            xtag "br";
            print_someone_and_spouse conf base info False ip1 sp ipl1;
            xtag "br";
@@ -507,7 +507,7 @@ value print_one_branch_with_table conf base info =
            do {
              tag "tr" begin
                tag "td" "align=\"center\"" begin
-                 Wserver.wprint "|";
+                 Wserver.printf "|";
                end;
              end;
              tag "tr" begin
@@ -534,7 +534,7 @@ value print_two_branches_with_pre conf base info =
     if info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
        info.nb2 <> None then
        do {
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       if info.pb1 <> None || info.nb1 <> None then
         let s = prev_next_1_text conf base info info.pb1 info.nb1 in
         print_pre_left sz s
@@ -559,7 +559,7 @@ value print_two_branches_with_table conf base info =
       end;
     end;
     tag "tr" "align=\"%s\"" "left" begin
-      stag "td" "colspan=\"3\" align=\"center\"" begin Wserver.wprint "|"; end;
+      stag "td" "colspan=\"3\" align=\"center\"" begin Wserver.printf "|"; end;
     end;
     tag "tr" "align=\"%s\"" "left" begin
       stagn "td" "align=\"%s\"" conf.right begin
@@ -581,14 +581,14 @@ value print_two_branches_with_table conf base info =
           if info.pb1 <> None || info.nb1 <> None then do {
             xtag "br"; print_prev_next_1 conf base info info.pb1 info.nb1
           }
-          else Wserver.wprint "&nbsp;";
+          else Wserver.printf "&nbsp;";
         end;
-        tag "td" begin Wserver.wprint "&nbsp;"; end;
+        tag "td" begin Wserver.printf "&nbsp;"; end;
         tag "td" begin
           if info.pb2 <> None || info.nb2 <> None then do {
             xtag "br"; print_prev_next_2 conf base info info.pb2 info.nb2
           }
-          else Wserver.wprint "&nbsp;";
+          else Wserver.printf "&nbsp;";
         end;
       end
     else ();
@@ -628,14 +628,14 @@ value print_relation_path conf base info =
 value print_relation_ok conf base info =
   let title _ =
     do {
-      Wserver.wprint "%s"
+      Wserver.printf "%s"
         (capitale (transl_nth conf "relationship link/relationship links" 0));
       match (info.pb1, info.nb1) with
       [ (None, None) -> ()
-      | _ -> Wserver.wprint " %d" info.c1 ];
+      | _ -> Wserver.printf " %d" info.c1 ];
       match (info.pb2, info.nb2) with
       [ (None, None) -> ()
-      | _ -> Wserver.wprint " %d" info.c2 ]
+      | _ -> Wserver.printf " %d" info.c2 ]
     }
   in
   do {

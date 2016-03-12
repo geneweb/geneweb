@@ -64,15 +64,15 @@ value print_same_name conf base p =
         do {
           stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
           begin
-            Wserver.wprint "%s.%d %s" (p_first_name base p)
+            Wserver.printf "%s.%d %s" (p_first_name base p)
               (get_occ p) (p_surname base p);
           end;
-          Wserver.wprint "%s" (Date.short_dates_text conf base p)
+          Wserver.printf "%s" (Date.short_dates_text conf base p)
         }
       in
       let pl = restrict_to_small_list pl in
       tag "p" begin
-        Wserver.wprint "%s:\n"
+        Wserver.printf "%s:\n"
           (capitale (transl conf "persons having the same name"));
         tag "ul" begin
           List.iter
@@ -87,12 +87,12 @@ value print_same_name conf base p =
                        let fam = foi base ifam in
                        let sp = spouse (get_key_index p) fam in
                        let sp = poi base sp in
-                       Wserver.wprint ", &amp; ";
+                       Wserver.printf ", &amp; ";
                        print_person sp } )
                      (Array.to_list ifam);
-                   Wserver.wprint "\n"
+                   Wserver.printf "\n"
                  }
-               | None -> Wserver.wprint "...\n" ];
+               | None -> Wserver.printf "...\n" ];
              end)
             pl;
         end;
@@ -134,7 +134,7 @@ value print_return conf =
            if x = "notes" || x = "comment" || is_label_note x then
              tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                begin
-                 Wserver.wprint "%s" (quote_escaped (decode_varenv v));
+                 Wserver.printf "%s" (quote_escaped (decode_varenv v));
                end
            else
              xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
@@ -157,9 +157,9 @@ value print_err_unknown conf base (f, s, o) = do {
       raise (ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
+  Wserver.printf "%s: <strong>%s.%d %s</strong>\n"
     (capitale (transl conf "unknown person")) f o s;
   print_return conf;
   trailer conf;
@@ -203,13 +203,13 @@ value delete_topological_sort conf base =
 ;
 
 value print_someone conf base p =
-  Wserver.wprint "%s%s %s" (p_first_name base p)
+  Wserver.printf "%s%s %s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 ;
 
 value print_first_name conf base p =
-  Wserver.wprint "%s%s" (p_first_name base p)
+  Wserver.printf "%s%s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 ;
 
@@ -220,14 +220,14 @@ value print_someone_strong conf base p =
 ;
 
 value print_first_name_strong conf base p =
-  Wserver.wprint "<strong>%s%s</strong>" (p_first_name base p)
+  Wserver.printf "<strong>%s%s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 ;
 
 value print_error conf base =
   fun
   [ AlreadyDefined p ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
         ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
            p_surname base p ^ "\"")
@@ -236,15 +236,15 @@ value print_error conf base =
              (acces conf base p))
         (fun _ -> "</a>.")
   | OwnAncestor p ->
-      Wserver.wprint "%s\n%s" (print_someone_strong conf base p)
+      Wserver.printf "%s\n%s" (print_someone_strong conf base p)
         (transl conf "would be his/her own ancestor")
   | BadSexOfMarriedPerson p ->
-      Wserver.wprint "%s."
+      Wserver.printf "%s."
         (capitale (transl conf "cannot change sex of a married person")) ]
 ;
 
 value print_someone_ref conf base p =
-  Wserver.wprint "<a href=\"%s%s\">\n%s%s %s</a>" (commd conf)
+  Wserver.printf "<a href=\"%s%s\">\n%s%s %s</a>" (commd conf)
     (acces conf base p) (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
@@ -258,23 +258,23 @@ value someone_ref_text conf base p =
 ;
 
 value print_first_name_ref conf base p =
-  Wserver.wprint "%s" (someone_ref_text conf base p)
+  Wserver.printf "%s" (someone_ref_text conf base p)
 ;
 
 value print_warning conf base =
   fun
   [ BigAgeBetweenSpouses fath moth a ->
       do {
-        Wserver.wprint
+        Wserver.printf
           (fcapitale
              (ftransl conf
                 "the difference of age between %t and %t is quite important"))
           (fun _ -> print_someone_strong conf base fath)
           (fun _ -> print_someone_strong conf base moth);
-        Wserver.wprint ": %s" (Date.string_of_age conf a)
+        Wserver.printf ": %s" (Date.string_of_age conf a)
       }
   | BirthAfterDeath p ->
-      Wserver.wprint (ftransl conf "%t died before his/her birth")
+      Wserver.printf (ftransl conf "%t died before his/her birth")
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
@@ -282,10 +282,10 @@ value print_warning conf base =
       let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
-      Wserver.wprint "%s\n"
+      Wserver.printf "%s\n"
         (capitale (transl conf "changed order of children"));
-      Wserver.wprint "-&gt;\n";
-      Wserver.wprint "%s"
+      Wserver.printf "-&gt;\n";
+      Wserver.printf "%s"
         (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
            " " ^ someone_ref_text conf base moth ^ "\n");
       let print_list arr diff_arr =
@@ -298,8 +298,8 @@ value print_warning conf base =
                if eq_istr (get_surname p) (get_surname fath) then
                  print_first_name conf base p
                else print_someone conf base p;
-               Wserver.wprint "%s" (Date.short_dates_text conf base p);
-               Wserver.wprint "\n";
+               Wserver.printf "%s" (Date.short_dates_text conf base p);
+               Wserver.printf "\n";
              end)
           arr
       in
@@ -322,7 +322,7 @@ value print_warning conf base =
   | ChildrenNotInOrder ifam des elder x ->
       let cpl = foi base ifam in
       do {
-        Wserver.wprint
+        Wserver.printf
           (fcapitale
              (ftransl conf
                 "the following children of %t and %t are not in order"))
@@ -330,22 +330,22 @@ value print_warning conf base =
              print_someone_strong conf base (poi base (get_father cpl)))
           (fun _ ->
              print_someone_strong conf base (poi base (get_mother cpl)));
-        Wserver.wprint ":\n";
+        Wserver.printf ":\n";
         tag "ul" begin
           stag "li" begin
             print_first_name_strong conf base elder;
-            Wserver.wprint "%s" (Date.short_dates_text conf base elder);
+            Wserver.printf "%s" (Date.short_dates_text conf base elder);
           end;
           stag "li" begin
             print_first_name_strong conf base x;
-            Wserver.wprint "%s" (Date.short_dates_text conf base x);
+            Wserver.printf "%s" (Date.short_dates_text conf base x);
           end;
         end;
       }
   | ChangedOrderOfMarriages p before after -> do {
-      Wserver.wprint "%s\n"
+      Wserver.printf "%s\n"
         (capitale (transl conf "changed order of marriages"));
-      Wserver.wprint "-&gt;\n";
+      Wserver.printf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i ifam ->
@@ -356,11 +356,11 @@ value print_warning conf base =
                (if diff_arr.(i) then "style=\"background:pink\"" else "")
              begin
                print_first_name conf base p;
-               Wserver.wprint "  &amp;";
-               Wserver.wprint "%s\n"
+               Wserver.printf "  &amp;";
+               Wserver.printf "%s\n"
                  (Date.short_marriage_date_text conf base fam p sp);
                print_someone conf base sp;
-               Wserver.wprint "\n";
+               Wserver.printf "\n";
              end)
           arr
       in
@@ -381,9 +381,9 @@ value print_warning conf base =
       end
     }
   | ChangedOrderOfFamilyEvents ifam before after -> do {
-      Wserver.wprint "%s\n"
+      Wserver.printf "%s\n"
         (capitale (transl conf "changed order of family's events"));
-      Wserver.wprint "-&gt;\n";
+      Wserver.printf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
@@ -391,7 +391,7 @@ value print_warning conf base =
              tag "li" "%s"
                (if diff_arr.(i) then "style=\"background:pink\"" else "")
              begin
-               Wserver.wprint "%s\n" name;
+               Wserver.printf "%s\n" name;
              end)
           arr
       in
@@ -414,9 +414,9 @@ value print_warning conf base =
       end
     }
   | ChangedOrderOfPersonEvents p before after -> do {
-      Wserver.wprint "%s\n"
+      Wserver.printf "%s\n"
         (capitale (transl conf "changed order of person's events"));
-      Wserver.wprint "-&gt;\n";
+      Wserver.printf "-&gt;\n";
       let print_list arr diff_arr =
         Array.iteri
           (fun i evt ->
@@ -424,7 +424,7 @@ value print_warning conf base =
              tag "li" "%s"
                (if diff_arr.(i) then "style=\"background:pink\"" else "")
              begin
-               Wserver.wprint "%s\n" name;
+               Wserver.printf "%s\n" name;
              end)
           arr
       in
@@ -449,7 +449,7 @@ value print_warning conf base =
   | CloseChildren ifam des elder x ->
       let cpl = foi base ifam in
       do {
-        Wserver.wprint
+        Wserver.printf
           (fcapitale
              (ftransl conf
                 "the following children of %t and %t are born very close"))
@@ -457,27 +457,27 @@ value print_warning conf base =
              print_someone_strong conf base (poi base (get_father cpl)))
           (fun _ ->
              print_someone_strong conf base (poi base (get_mother cpl)));
-        Wserver.wprint ":\n";
+        Wserver.printf ":\n";
         tag "ul" begin
           stag "li" begin
             print_first_name_strong conf base elder;
-            Wserver.wprint "%s" (Date.short_dates_text conf base elder);
+            Wserver.printf "%s" (Date.short_dates_text conf base elder);
           end;
           stag "li" begin
             print_first_name_strong conf base x;
-            Wserver.wprint "%s" (Date.short_dates_text conf base x);
+            Wserver.printf "%s" (Date.short_dates_text conf base x);
           end;
         end;
       }
   | DeadOld p a ->
       do {
-        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
+        Wserver.printf "%s\n%s\n" (print_someone_strong conf base p)
           (transl_nth
              conf "died at an advanced age" (index_of_sex (get_sex p)));
-        Wserver.wprint "(%s)" (Date.string_of_age conf a);
+        Wserver.printf "(%s)" (Date.string_of_age conf a);
       }
   | DeadTooEarlyToBeFather father child ->
-      Wserver.wprint
+      Wserver.printf
         (ftransl conf "\
 %t is born more than 2 years after the death of his/her father %t")
         (fun _ ->
@@ -487,49 +487,49 @@ value print_warning conf base =
            Printf.sprintf "%s%s" (print_someone_strong conf base father)
              (Date.short_dates_text conf base father))
   | FEventOrder p e1 e2 ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale
            (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> print_someone_strong conf base p)
         (Util.string_of_fevent_name conf base e1.efam_name)
         (Util.string_of_fevent_name conf base e2.efam_name)
   | FWitnessEventAfterDeath p e ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
         (Util.string_of_fevent_name conf base e.efam_name)
   | FWitnessEventBeforeBirth p e ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
         (Util.string_of_fevent_name conf base e.efam_name)
   | IncoherentSex p _ _ ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale
            (ftransl conf "%t's sex is not coherent with his/her relations"))
         (fun _ -> print_someone_strong conf base p)
   | IncoherentAncestorDate anc p ->
-      Wserver.wprint "%s has a younger ancestor %s"
+      Wserver.printf "%s has a younger ancestor %s"
         (print_someone_strong conf base p)
         (print_someone_strong conf base anc)
   | MarriageDateAfterDeath p ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "marriage had occurred after the death of %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
   | MarriageDateBeforeBirth p ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "marriage had occurred before the birth of %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
   | MotherDeadAfterChildBirth mother child ->
-      Wserver.wprint
+      Wserver.printf
         (ftransl conf "%t is born after the death of his/her mother %t")
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base child)
@@ -538,44 +538,44 @@ value print_warning conf base =
            Printf.sprintf "%s%s" (print_someone_strong conf base mother)
              (Date.short_dates_text conf base mother))
   | ParentBornAfterChild p c ->
-      Wserver.wprint "%s\n%s\n%s" (print_someone_strong conf base p)
+      Wserver.printf "%s\n%s\n%s" (print_someone_strong conf base p)
         (transl conf "is born after his/her child")
         (print_someone_strong conf base c)
   | ParentTooYoung p a ->
       do {
-        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
+        Wserver.printf "%s\n%s\n" (print_someone_strong conf base p)
           (transl conf "is a very young parent");
-        Wserver.wprint "(%s)" (Date.string_of_age conf a);
+        Wserver.printf "(%s)" (Date.string_of_age conf a);
       }
   | ParentTooOld p a ->
       do {
-        Wserver.wprint "%s\n%s\n" (print_someone_strong conf base p)
+        Wserver.printf "%s\n%s\n" (print_someone_strong conf base p)
           (transl conf "is a very old parent");
-        Wserver.wprint "(%s)" (Date.string_of_age conf a);
+        Wserver.printf "(%s)" (Date.string_of_age conf a);
       }
   | PEventOrder p e1 e2 ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale
            (ftransl conf "%t's %s before his/her %s"))
         (fun _ -> print_someone_strong conf base p)
         (Util.string_of_pevent_name conf base e1.epers_name)
         (Util.string_of_pevent_name conf base e2.epers_name)
   | PWitnessEventAfterDeath p e ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "%t witnessed the %s after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
         (Util.string_of_pevent_name conf base e.epers_name)
   | PWitnessEventBeforeBirth p e ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "%t witnessed the %s before his/her birth"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
         (Util.string_of_pevent_name conf base e.epers_name)
   | TitleDatesError p t ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "%t has incorrect title dates: %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
@@ -590,24 +590,24 @@ value print_warning conf base =
               [ Some d -> Date.string_of_date conf d
               | _ -> "" ]))
   | UndefinedSex p ->
-      Wserver.wprint (fcapitale (ftransl conf "undefined sex for %t"))
+      Wserver.printf (fcapitale (ftransl conf "undefined sex for %t"))
         (fun _ -> print_someone_strong conf base p)
   | WitnessDateAfterDeath p ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "%t was witness after his/her death"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
   | WitnessDateBeforeBirth p ->
-      Wserver.wprint
+      Wserver.printf
         (fcapitale (ftransl conf "%t was witness before his/her birth"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
   | YoungForMarriage p a ->
      do {
-        Wserver.wprint "%s\n" (print_someone_strong conf base p);
-        Wserver.wprint (ftransl conf "married at age %t")
+        Wserver.printf "%s\n" (print_someone_strong conf base p);
+        Wserver.printf (ftransl conf "married at age %t")
           (fun _ -> Date.string_of_age conf a);
       } ]
 ;
@@ -615,7 +615,7 @@ value print_warning conf base =
 value print_warnings conf base wl =
   if wl = [] then ()
   else do {
-    Wserver.wprint "%s\n" (capitale (transl conf "warnings"));
+    Wserver.printf "%s\n" (capitale (transl conf "warnings"));
     tag "ul" begin
       (* On rend la liste unique, parce qu'il se peut qu'un warning soit *)
       (* levé par plusieurs fonctions différents selon le context.       *)
@@ -634,7 +634,7 @@ value print_warnings conf base wl =
       List.iter
         (fun w ->
            do {
-             html_li conf; print_warning conf base w; Wserver.wprint "\n"
+             html_li conf; print_warning conf base w; Wserver.printf "\n"
            })
         wl;
     end
@@ -657,7 +657,7 @@ value print_misc conf base =
   fun
   [ MissingSources ->
       stag "em" begin
-        Wserver.wprint "%s\n" (capitale (transl conf "missing sources"));
+        Wserver.printf "%s\n" (capitale (transl conf "missing sources"));
       end ]
 ;
 
@@ -676,12 +676,12 @@ value print_misc conf base =
 value print_miscs conf base ml =
   if ml = [] then ()
   else do {
-    Wserver.wprint "%s\n" (capitale (transl conf "miscellaneous informations"));
+    Wserver.printf "%s\n" (capitale (transl conf "miscellaneous informations"));
     tag "ul" begin
       List.iter
         (fun m ->
           do {
-            html_li conf; print_misc conf base m; Wserver.wprint "\n"
+            html_li conf; print_misc conf base m; Wserver.printf "\n"
           })
         ml;
     end
@@ -706,18 +706,18 @@ value print_miscs conf base ml =
 value print_warnings_and_miscs conf base (wl, ml) =
   if wl = [] && ml = [] then ()
   else do {
-    Wserver.wprint "%s\n" (capitale (transl conf "warnings"));
+    Wserver.printf "%s\n" (capitale (transl conf "warnings"));
     tag "ul" begin
       List.iter
         (fun w ->
            do {
-             html_li conf; print_warning conf base w; Wserver.wprint "\n"
+             html_li conf; print_warning conf base w; Wserver.printf "\n"
            })
         wl;
       List.iter
         (fun m ->
           do {
-            html_li conf; print_misc conf base m; Wserver.wprint "\n"
+            html_li conf; print_misc conf base m; Wserver.printf "\n"
           })
         ml;
     end
@@ -749,24 +749,24 @@ value error conf base x = do {
       raise (ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   print_error conf base x;
-  Wserver.wprint "\n";
+  Wserver.printf "\n";
   print_return conf;
   trailer conf;
   raise ModErr
 };
 
 value error_locked conf =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
     tag "p" begin
-      Wserver.wprint
+      Wserver.printf
         (fcapitale
            (ftransl conf "the file is temporarily locked: please try again"));
-      Wserver.wprint ".\n";
+      Wserver.printf ".\n";
     end;
     tag "table" begin
       tag "tr" begin
@@ -781,7 +781,7 @@ value error_locked conf =
                    if x = "notes" || is_label_note x then
                      tag "textarea" "style=\"display:none;\" name=\"%s\"" x
                        begin
-                         Wserver.wprint "%s" (quote_escaped (decode_varenv v));
+                         Wserver.printf "%s" (quote_escaped (decode_varenv v));
                        end
                    else
                      xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
@@ -832,15 +832,15 @@ the base has changed; do \"back\", \"reload\", and refill the form"))
       raise (ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   print_link_to_welcome conf True;
   tag "p" begin
-    Wserver.wprint
+    Wserver.printf
       (fcapitale
          (ftransl conf "\
 the base has changed; do \"back\", \"reload\", and refill the form"));
-    Wserver.wprint ".\n";
+    Wserver.printf ".\n";
   end;
   trailer conf;
   raise ModErr
@@ -870,13 +870,13 @@ value bad_date conf d = do {
       raise (ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.wprint "%s:\n" (capitale (transl conf "incorrect date"));
+  Wserver.printf "%s:\n" (capitale (transl conf "incorrect date"));
   match d with
-  [ {day = 0; month = 0; year = a} -> Wserver.wprint "%d" a
-  | {day = 0; month = m; year = a} -> Wserver.wprint "%d/%d" m a
-  | {day = j; month = m; year = a} -> Wserver.wprint "%d/%d/%d" j m a ];
+  [ {day = 0; month = 0; year = a} -> Wserver.printf "%d" a
+  | {day = 0; month = m; year = a} -> Wserver.printf "%d/%d" m a
+  | {day = j; month = m; year = a} -> Wserver.printf "%d/%d/%d" j m a ];
   trailer conf;
   raise ModErr
 };
@@ -1076,9 +1076,9 @@ value print_create_conflict conf base p var = do {
     else ()
   ELSE () END;
   let text = text_of_var conf var in
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
  rheader conf title;
- Wserver.wprint
+ Wserver.printf
    (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
    ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
       p_surname base p ^ "\" (" ^ text ^ ")")
@@ -1096,7 +1096,7 @@ value print_create_conflict conf base p var = do {
         if x = "notes" || is_label_note x then
           tag "textarea" "style=\"display:none;\" name=\"%s\"" x
             begin
-              Wserver.wprint "%s" (quote_escaped (decode_varenv v));
+              Wserver.printf "%s" (quote_escaped (decode_varenv v));
             end
         else
           xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
@@ -1106,22 +1106,22 @@ value print_create_conflict conf base p var = do {
    xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
    tag "ul" begin
      stag "li" begin
-       Wserver.wprint "%s: %d. \n"
+       Wserver.printf "%s: %d. \n"
          (capitale (transl conf "first free number")) free_n;
-       Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+       Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
          (transl conf "create");
-       Wserver.wprint "%s." (transl conf " to try again with this number");
+       Wserver.printf "%s." (transl conf " to try again with this number");
      end;
      stag "li" begin
-       Wserver.wprint "%s " (capitale (transl conf "or"));
-       Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-       Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+       Wserver.printf "%s " (capitale (transl conf "or"));
+       Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
+       Wserver.printf " %s %s." (transl_nth conf "and" 0)
          (transl conf "change it (the number) yourself");
      end;
      stag "li" begin
-       Wserver.wprint "%s " (capitale (transl conf "or"));
-       Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-       Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+       Wserver.printf "%s " (capitale (transl conf "or"));
+       Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
+       Wserver.printf " %s %s." (transl_nth conf "and" 0)
          (transl conf "use \"link\" instead of \"create\"");
      end;
    end;

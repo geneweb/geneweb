@@ -128,12 +128,12 @@ value print_birth conf base =
     select conf base (fun p -> Adef.od_of_codate (get_birth p)) False
   in
   let title _ =
-    Wserver.wprint (fcapitale (ftransl conf "the latest %d births")) len
+    Wserver.printf (fcapitale (ftransl conf "the latest %d births")) len
   in
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<ul>\n";
+    Wserver.printf "<ul>\n";
     let _ =
       List.fold_left
         (fun (last_month_txt, was_future) (p, d, cal) ->
@@ -144,27 +144,27 @@ value print_birth conf base =
            let future = CheckItem.strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
-               Wserver.wprint "</li>\n</ul>\n</li>\n</ul>\n<p>\n<ul>\n";
-               Wserver.wprint "<li>%s\n" month_txt;
-               Wserver.wprint "<ul>\n";
+               Wserver.printf "</li>\n</ul>\n</li>\n</ul>\n<p>\n<ul>\n";
+               Wserver.printf "<li>%s\n" month_txt;
+               Wserver.printf "<ul>\n";
              }
              else if month_txt <> last_month_txt then do {
                if last_month_txt = "" then ()
-               else Wserver.wprint "</ul>\n</li>\n";
-               Wserver.wprint "<li>%s\n" month_txt;
-               Wserver.wprint "<ul>\n";
+               else Wserver.printf "</ul>\n</li>\n";
+               Wserver.printf "<li>%s\n" month_txt;
+               Wserver.printf "<ul>\n";
              }
              else ();
              stagn "li" begin
                stag "b" begin
-                 Wserver.wprint "%s" (referenced_person_text conf base p);
+                 Wserver.printf "%s" (referenced_person_text conf base p);
                end;
-               Wserver.wprint ",\n";
+               Wserver.printf ",\n";
                if future then
-                 Wserver.wprint "<em>%s</em>.\n"
+                 Wserver.printf "<em>%s</em>.\n"
                    (Date.string_of_date conf (Dgreg d cal))
                else
-                 Wserver.wprint "%s <em>%s</em>.\n"
+                 Wserver.printf "%s <em>%s</em>.\n"
                    (transl_nth conf "born" (index_of_sex (get_sex p)))
                    (Date.string_of_ondate conf (Dgreg d cal));
              end;
@@ -172,7 +172,7 @@ value print_birth conf base =
            })
         ("", False) list
     in
-    Wserver.wprint "</ul>\n</li>\n</ul>\n";
+    Wserver.printf "</ul>\n</li>\n</ul>\n";
     trailer conf;
   }
 ;
@@ -186,14 +186,14 @@ value death_date p =
 value print_death conf base =
   let (list, len) = select conf base death_date False in
   let title _ =
-    Wserver.wprint (fcapitale (ftransl conf "the latest %t deaths"))
+    Wserver.printf (fcapitale (ftransl conf "the latest %t deaths"))
       (fun _ -> string_of_int len)
   in
   do {
     header conf title;
     print_link_to_welcome conf True;
     if list <> [] then do {
-      Wserver.wprint "<ul>\n";
+      Wserver.printf "<ul>\n";
       let (_, ages_sum, ages_nb) =
         List.fold_left
           (fun (last_month_txt, ages_sum, ages_nb) (p, d, cal) ->
@@ -204,9 +204,9 @@ value print_death conf base =
              do {
                if month_txt <> last_month_txt then do {
                  if last_month_txt = "" then ()
-                 else Wserver.wprint "</ul>\n</li>\n";
-                 Wserver.wprint "<li>%s\n" month_txt;
-                 Wserver.wprint "<ul>\n";
+                 else Wserver.printf "</ul>\n</li>\n";
+                 Wserver.printf "<li>%s\n" month_txt;
+                 Wserver.printf "<ul>\n";
                }
                else ();
                let (age, ages_sum, ages_nb) =
@@ -233,15 +233,15 @@ value print_death conf base =
                  | _ -> (None, ages_sum, ages_nb) ]
                in
                stagn "li" begin
-                 Wserver.wprint "<b>";
-                 Wserver.wprint "%s" (referenced_person_text conf base p);
-                 Wserver.wprint "</b>";
-                 Wserver.wprint ", %s <em>%s</em>"
+                 Wserver.printf "<b>";
+                 Wserver.printf "%s" (referenced_person_text conf base p);
+                 Wserver.printf "</b>";
+                 Wserver.printf ", %s <em>%s</em>"
                    (transl_nth conf "died" (index_of_sex (get_sex p)))
                    (Date.string_of_ondate conf (Dgreg d cal));
                  match age with
                  [ Some a ->
-                     Wserver.wprint " <em>(%s)</em>"
+                     Wserver.printf " <em>(%s)</em>"
                        (Date.string_of_age conf a)
                  | None -> () ];
                end;
@@ -249,9 +249,9 @@ value print_death conf base =
              })
           ("", (0, 0), (0, 0)) list
       in
-      Wserver.wprint "</ul>\n</li>\n</ul>\n";
+      Wserver.printf "</ul>\n</li>\n</ul>\n";
       if fst ages_nb >= 3 then
-        Wserver.wprint "%s (%s) : %s<br%s>\n"
+        Wserver.printf "%s (%s) : %s<br%s>\n"
           (capitale (transl conf "average age at death"))
           (transl_nth conf "M/F" 0)
           (Date.string_of_age conf
@@ -260,7 +260,7 @@ value print_death conf base =
           conf.xhs
       else ();
       if snd ages_nb >= 3 then
-        Wserver.wprint "%s (%s) : %s<br%s>\n"
+        Wserver.printf "%s (%s) : %s<br%s>\n"
           (capitale (transl conf "average age at death"))
           (transl_nth conf "M/F" 1)
           (Date.string_of_age conf
@@ -297,16 +297,16 @@ value print_death conf base =
               "<input name=\"k\" value=\"%d\" size=\"4\" maxlength=\"4\"%s>"
               len conf.xhs
           in
-          Wserver.wprint (fcapitale (ftransl conf "the latest %t deaths"))
+          Wserver.printf (fcapitale (ftransl conf "the latest %t deaths"))
             (fun _ -> ds);
-          Wserver.wprint "\n... (%s...\n" (transl conf "before");
+          Wserver.printf "\n... (%s...\n" (transl conf "before");
           xtag "input"
             "name=\"by\" value=\"%s\" size=\"4\" maxlength=\"4\"" by;
           xtag "input"
             "name=\"bm\" value=\"%s\" size=\"2\" maxlength=\"2\"" bm;
           xtag "input"
             "name=\"bd\" value=\"%s\" size=\"2\" maxlength=\"2\"" bd;
-          Wserver.wprint ")\n";
+          Wserver.printf ")\n";
           xtag "input" "type=\"submit\" value=\"Ok\"";
         end;
       end;
@@ -333,7 +333,7 @@ value print_oldest_alive conf base =
   in
   let (list, len) = select conf base get_oldest_alive True in
   let title _ =
-    Wserver.wprint
+    Wserver.printf
       (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
   in
   do {
@@ -343,17 +343,17 @@ value print_oldest_alive conf base =
       List.iter
         (fun (p, d, cal) ->
            tag "li" begin
-             Wserver.wprint "<b>%s</b>,\n"
+             Wserver.printf "<b>%s</b>,\n"
                (referenced_person_text conf base p);
-             Wserver.wprint "%s <em>%s</em>"
+             Wserver.printf "%s <em>%s</em>"
                (transl_nth conf "born" (index_of_sex (get_sex p)))
                (Date.string_of_ondate conf (Dgreg d cal));
              if get_death p = NotDead && d.prec = Sure then do {
                let a = CheckItem.time_elapsed d conf.today in
-               Wserver.wprint " <em>(%s)</em>" (Date.string_of_age conf a);
+               Wserver.printf " <em>(%s)</em>" (Date.string_of_age conf a);
              }
              else ();
-             Wserver.wprint ".";
+             Wserver.printf ".";
            end)
         list;
     end;
@@ -375,24 +375,24 @@ value print_longest_lived conf base =
   in
   let (list, len) = select conf base get_longest False in
   let title _ =
-    Wserver.wprint (fcapitale (ftransl conf "the %d who lived the longest"))
+    Wserver.printf (fcapitale (ftransl conf "the %d who lived the longest"))
       len
   in
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<ul>\n";
+    Wserver.printf "<ul>\n";
     List.iter
       (fun (p, d, cal) ->
          tag "li" begin
-           Wserver.wprint "<strong>\n";
-           Wserver.wprint "%s" (referenced_person_text conf base p);
-           Wserver.wprint "</strong>%s" (Date.short_dates_text conf base p);
-           Wserver.wprint "\n(%d %s)" d.year (transl conf "years old");
-           Wserver.wprint ".";
+           Wserver.printf "<strong>\n";
+           Wserver.printf "%s" (referenced_person_text conf base p);
+           Wserver.printf "</strong>%s" (Date.short_dates_text conf base p);
+           Wserver.printf "\n(%d %s)" d.year (transl conf "years old");
+           Wserver.printf ".";
          end)
       list;
-    Wserver.wprint "</ul>\n\n";
+    Wserver.printf "</ul>\n\n";
     trailer conf;
   }
 ;
@@ -401,7 +401,7 @@ value print_marr_or_eng conf base title list len =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<ul>\n";
+    Wserver.printf "<ul>\n";
     let _ =
       List.fold_left
         (fun (last_month_txt, was_future) (ifam, fam, d, cal) ->
@@ -413,35 +413,35 @@ value print_marr_or_eng conf base title list len =
            let future = CheckItem.strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
-               Wserver.wprint "</ul>\n</li>\n</ul>\n<ul>\n";
-               Wserver.wprint "<li>%s\n" month_txt;
-               Wserver.wprint "<ul>\n";
+               Wserver.printf "</ul>\n</li>\n</ul>\n<ul>\n";
+               Wserver.printf "<li>%s\n" month_txt;
+               Wserver.printf "<ul>\n";
              }
              else if month_txt <> last_month_txt then do {
                if last_month_txt = "" then () else
-               Wserver.wprint "</ul>\n</li>\n";
-               Wserver.wprint "<li>%s\n" month_txt;
-               Wserver.wprint "<ul>\n";
+               Wserver.printf "</ul>\n</li>\n";
+               Wserver.printf "<li>%s\n" month_txt;
+               Wserver.printf "<ul>\n";
              }
              else ();
              stagn "li" begin
                stagn "b" begin
-                 Wserver.wprint "%s"
+                 Wserver.printf "%s"
                    (referenced_person_text conf base
                       (pget conf base (get_father cpl)));
                end;
-               Wserver.wprint "%s\n" (transl_nth conf "and" 0);
+               Wserver.printf "%s\n" (transl_nth conf "and" 0);
                stag "b" begin
-                 Wserver.wprint "%s"
+                 Wserver.printf "%s"
                    (referenced_person_text conf base
                       (pget conf base (get_mother cpl)));
                end;
-               Wserver.wprint ",\n";
+               Wserver.printf ",\n";
                if future then
-                 Wserver.wprint "<em>%s</em>."
+                 Wserver.printf "<em>%s</em>."
                    (Date.string_of_date conf (Dgreg d cal))
                else
-                 Wserver.wprint "%s <em>%s</em>."
+                 Wserver.printf "%s <em>%s</em>."
                    (match get_relation fam with
                     [ NotMarried | NoSexesCheckNotMarried ->
                         transl_nth conf "relation/relations" 0
@@ -454,7 +454,7 @@ value print_marr_or_eng conf base title list len =
            })
         ("", False) list
     in
-    Wserver.wprint "</ul>\n</li>\n</ul>\n";
+    Wserver.printf "</ul>\n</li>\n</ul>\n";
     trailer conf;
   }
 ;
@@ -469,7 +469,7 @@ value print_marriage conf base =
       False
   in
   let title _ =
-    Wserver.wprint (fcapitale (ftransl conf "the latest %d marriages")) len
+    Wserver.printf (fcapitale (ftransl conf "the latest %d marriages")) len
   in
   print_marr_or_eng conf base title list len
 ;
@@ -489,7 +489,7 @@ value print_oldest_engagements conf base =
       True
   in
   let title _ =
-    Wserver.wprint
+    Wserver.printf
      (fcapitale
        (ftransl conf "the %d oldest couples perhaps still alive and engaged"))
      len
@@ -498,7 +498,7 @@ value print_oldest_engagements conf base =
 ;
 
 value old_print_statistics conf base =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "statistics")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "statistics")) in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env) with
     [ Not_found | Failure _ -> 20 ]
@@ -509,39 +509,39 @@ value old_print_statistics conf base =
     tag "ul" begin
       if conf.wizard || conf.friend then do {
         stagn "li" begin
-          Wserver.wprint "<a href=\"%sm=LB;k=%d\">" (commd conf) n;
-          Wserver.wprint (ftransl conf "the latest %d births") n;
-          Wserver.wprint "</a>";
+          Wserver.printf "<a href=\"%sm=LB;k=%d\">" (commd conf) n;
+          Wserver.printf (ftransl conf "the latest %d births") n;
+          Wserver.printf "</a>";
         end;
         stagn "li" begin
-          Wserver.wprint "<a href=\"%sm=LD;k=%d\">" (commd conf) n;
-          Wserver.wprint (ftransl conf "the latest %t deaths")
+          Wserver.printf "<a href=\"%sm=LD;k=%d\">" (commd conf) n;
+          Wserver.printf (ftransl conf "the latest %t deaths")
             (fun _ -> string_of_int n);
-          Wserver.wprint "</a>";
+          Wserver.printf "</a>";
         end;
         stagn "li" begin
-          Wserver.wprint "<a href=\"%sm=LM;k=%d\">" (commd conf) n;
-          Wserver.wprint (ftransl conf "the latest %d marriages") n;
-          Wserver.wprint "</a>";
+          Wserver.printf "<a href=\"%sm=LM;k=%d\">" (commd conf) n;
+          Wserver.printf (ftransl conf "the latest %d marriages") n;
+          Wserver.printf "</a>";
         end;
         stagn "li" begin
-          Wserver.wprint "<a href=\"%sm=OE;k=%d\">" (commd conf) n;
-          Wserver.wprint
+          Wserver.printf "<a href=\"%sm=OE;k=%d\">" (commd conf) n;
+          Wserver.printf
             (ftransl conf
                "the %d oldest couples perhaps still alive and engaged") n;
-          Wserver.wprint "</a>";
+          Wserver.printf "</a>";
         end;
         stagn "li" begin
-          Wserver.wprint "<a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
-          Wserver.wprint (ftransl conf "the %d oldest perhaps still alive") n;
-          Wserver.wprint "</a>";
+          Wserver.printf "<a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
+          Wserver.printf (ftransl conf "the %d oldest perhaps still alive") n;
+          Wserver.printf "</a>";
         end
       }
       else ();
       stagn "li" begin
-        Wserver.wprint "<a href=\"%sm=LL;k=%d\">" (commd conf) n;
-        Wserver.wprint (ftransl conf "the %d who lived the longest") n;
-        Wserver.wprint "</a>";
+        Wserver.printf "<a href=\"%sm=LL;k=%d\">" (commd conf) n;
+        Wserver.printf (ftransl conf "the %d who lived the longest") n;
+        Wserver.printf "</a>";
       end;
     end;
     trailer conf;
@@ -625,7 +625,7 @@ value print_population_pyramid conf base = do {
       (Num.of_int n)
   in
   let title _ =
-    Wserver.wprint "%s (%d)" (capitale (transl conf "population pyramid"))
+    Wserver.printf "%s (%d)" (capitale (transl conf "population pyramid"))
       at_year
   in
   let print_image doit sex iname =
@@ -633,7 +633,7 @@ value print_population_pyramid conf base = do {
       if doit then
         xtag "img" "src=\"%s/%s\" alt=\"%s\" title=\"%s\""
           (Util.image_prefix conf) iname (transl_nth conf "M/F" sex) (transl_nth conf "M/F" sex)
-      else Wserver.wprint "&nbsp;";
+      else Wserver.printf "&nbsp;";
     end
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
@@ -662,18 +662,18 @@ value print_population_pyramid conf base = do {
         let nb_wom = wom.(i) in
         tag "tr" begin
           stagn "td" "class=\"pyramid_year\"" begin
-            Wserver.wprint "%d" (at_year - i * interval);
+            Wserver.printf "%d" (at_year - i * interval);
           end;
-          stagn "td" begin Wserver.wprint "&nbsp;"; end;
+          stagn "td" begin Wserver.printf "&nbsp;"; end;
           print_image (i = 0) 0 "male.png";
-          stagn "td" begin Wserver.wprint "&nbsp;"; end;
+          stagn "td" begin Wserver.printf "&nbsp;"; end;
           tag "td" "align=\"right\"" begin
             tag "table" "%s" c begin
               tag "tr" begin
                 stagn "td" "class=\"pyramid_nb\""
                 begin
-                  if nb_men <> 0 then Wserver.wprint "%d" nb_men else ();
-                  Wserver.wprint "&nbsp;";
+                  if nb_men <> 0 then Wserver.printf "%d" nb_men else ();
+                  Wserver.printf "&nbsp;";
                 end;
                 stagn "td" begin
                   if nb_men = 0 then ()
@@ -681,7 +681,7 @@ value print_population_pyramid conf base = do {
                     let n = max 1 (band_size nb_men) in
                     (* On multiplie par 3 parce que c'est *)
                     (* la largeur de l'image : 3 x 14     *)
-                    Wserver.wprint
+                    Wserver.printf
                       ("<img src=\"images/pyr_male.png\" width=%d height=%d />")
                       (n * 3) 14;
                 end;
@@ -689,8 +689,8 @@ value print_population_pyramid conf base = do {
             end;
           end;
           stagn "td" "align=\"center\"" begin
-            if i = nb_intervals then Wserver.wprint "&nbsp;"
-            else Wserver.wprint "%d" ((i + 1) * interval);
+            if i = nb_intervals then Wserver.printf "&nbsp;"
+            else Wserver.printf "%d" ((i + 1) * interval);
           end;
           tag "td" "align=\"left\"" begin
             tag "table" "%s" c begin
@@ -701,23 +701,23 @@ value print_population_pyramid conf base = do {
                     let n = max 1 (band_size nb_wom) in
                     (* On multiplie par 3 parce que c'est *)
                     (* la largeur de l'image : 3 x 14     *)
-                    Wserver.wprint
+                    Wserver.printf
                       ("<img src=\"images/pyr_female.png\" width=%d height=%d />")
                       (n * 3) 14;
                 end;
                 stagn "td" "class=\"pyramid_nb\""
                 begin
-                  Wserver.wprint "&nbsp;";
-                  if nb_wom <> 0 then Wserver.wprint "%d" nb_wom else ();
+                  Wserver.printf "&nbsp;";
+                  if nb_wom <> 0 then Wserver.printf "%d" nb_wom else ();
                 end;
               end;
             end;
           end;
-          stagn "td" begin Wserver.wprint "&nbsp;"; end;
+          stagn "td" begin Wserver.printf "&nbsp;"; end;
           print_image (i = 0) 1 "female.png";
-          stagn "td" begin Wserver.wprint "&nbsp;"; end;
+          stagn "td" begin Wserver.printf "&nbsp;"; end;
           stagn "td" "class=\"pyramid_year\"" begin
-            Wserver.wprint "%d" (at_year - i * interval);
+            Wserver.printf "%d" (at_year - i * interval);
           end;
         end;
       };
@@ -726,7 +726,7 @@ value print_population_pyramid conf base = do {
   let sum_men = Array.fold_left \+ 0 men in
   let sum_wom = Array.fold_left \+ 0 wom in
   tag "p" begin
-    Wserver.wprint "%s %s"
+    Wserver.printf "%s %s"
       (capitale (transl conf "number of living persons:"))
       (string_of_nb (sum_men + sum_wom));
   end;
@@ -736,7 +736,7 @@ value print_population_pyramid conf base = do {
       xtag "input" "type=\"hidden\" name=\"m\" value=\"POP_PYR\"";
       xtag "input" "type=\"hidden\" name=\"int\" value=\"%d\"" interval;
       xtag "input" "type=\"hidden\" name=\"lim\" value=\"%d\"" limit;
-      Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 0);
+      Wserver.printf "%s\n" (transl_nth conf "year/month/day" 0);
       xtag "input" "name=\"y\" value=\"%d\" size=\"5\"" at_year;
     end;
   end;

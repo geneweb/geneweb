@@ -11,7 +11,7 @@ open Mutil;
 open Util;
 
 value not_found conf txt x =
-  let title _ = Wserver.wprint "%s: \"%s\"" (capitale txt) x in
+  let title _ = Wserver.printf "%s: \"%s\"" (capitale txt) x in
   do {
     rheader conf title; print_link_to_welcome conf False; trailer conf;
   }
@@ -44,7 +44,7 @@ value print_branch_to_alphabetic conf x nb_branch = do {
     stag "tr" begin
       stag "td" begin
         stag "b" begin
-          Wserver.wprint "%s"
+          Wserver.printf "%s"
             (capitale (transl_nth conf "display by/branch/alphabetic order" 0));
         end;
       end;
@@ -53,7 +53,7 @@ value print_branch_to_alphabetic conf x nb_branch = do {
           (Util.image_prefix conf) "picto_branch.png";
       end;
       stag "td" begin
-        Wserver.wprint "%s (%d)"
+        Wserver.printf "%s (%d)"
           (transl_nth conf "display by/branch/alphabetic order" 1) nb_branch;
       end;
       stag "td" begin
@@ -66,14 +66,14 @@ value print_branch_to_alphabetic conf x nb_branch = do {
           stag "a" "href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x ^ ";t=A")
             begin
-              Wserver.wprint "%s"
+              Wserver.printf "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 2);
             end
         else
           stag "a" "href=\"%sm=N;o=i;v=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x ^ ";t=N")
             begin
-              Wserver.wprint "%s"
+              Wserver.printf "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 2);
             end;
       end;
@@ -99,7 +99,7 @@ value print_alphabetic_to_branch conf x = do {
     stag "tr" begin
       stag "td" begin
         stag "b" begin
-          Wserver.wprint "%s"
+          Wserver.printf "%s"
             (capitale (transl_nth conf "display by/branch/alphabetic order" 0));
         end;
       end;
@@ -113,14 +113,14 @@ value print_alphabetic_to_branch conf x = do {
           stag "a" "href=\"%sm=N;v=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x ^ ";t=A")
             begin
-              Wserver.wprint "%s"
+              Wserver.printf "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 1);
             end
         else
           stag "a" "href=\"%sm=NG;sn=%s\" rel=\"nofollow\""
             (commd conf) (code_varenv x)
             begin
-              Wserver.wprint "%s"
+              Wserver.printf "%s"
                 (transl_nth conf "display by/branch/alphabetic order" 1);
             end;
       end;
@@ -129,7 +129,7 @@ value print_alphabetic_to_branch conf x = do {
           (Util.image_prefix conf) "picto_alphabetic_order.png";
       end;
       stag "td" begin
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (transl_nth conf "display by/branch/alphabetic order" 2);
       end;
     end;
@@ -194,14 +194,14 @@ value print_elem conf base is_surname (p, xl) =
   list_iter_first
     (fun first x ->
        do {
-         if not first then Wserver.wprint "</li>\n<li>\n  " else ();
+         if not first then Wserver.printf "</li>\n<li>\n  " else ();
          Perso.print_sosa conf base x True;
-         Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
+         Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
-           Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p)
-         else Wserver.wprint "%s" (if p = "" then "?" else p);
-         Wserver.wprint "</a>";
-         Wserver.wprint "%s" (Date.short_dates_text conf base x);
+           Wserver.printf "%s%s" (surname_end base p) (surname_begin base p)
+         else Wserver.printf "%s" (if p = "" then "?" else p);
+         Wserver.printf "</a>";
+         Wserver.printf "%s" (Date.short_dates_text conf base x);
          stag "em" begin
            specify_homonymous conf base x True;
          end;
@@ -255,11 +255,11 @@ value first_name_print_list conf base x1 xl liste = do {
       [] l
   in
   let title h =
-    if h || p_getenv conf.env "t" = Some "A" then Wserver.wprint "%s" x1
+    if h || p_getenv conf.env "t" = Some "A" then Wserver.printf "%s" x1
     else
       Mutil.list_iter_first
         (fun first x ->
-           Wserver.wprint "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
+           Wserver.printf "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
         (StrSet.elements xl)
   in
@@ -284,28 +284,28 @@ value first_name_print_list conf base x1 xl liste = do {
 
 value select_first_name conf base n list =
   let title _ =
-    Wserver.wprint "%s \"%s\" : %s"
+    Wserver.printf "%s \"%s\" : %s"
       (capitale (transl_nth conf "first name/first names" 0)) n
       (transl conf "specify")
   in
   do {
     header conf title;
-    Wserver.wprint "<ul>";
+    Wserver.printf "<ul>";
     List.iter
       (fun (sstr, (strl, _)) ->
          do {
-           Wserver.wprint "\n";
+           Wserver.printf "\n";
            html_li conf;
-           Wserver.wprint "<a href=\"%sm=P;v=%s\">" (commd conf)
+           Wserver.printf "<a href=\"%sm=P;v=%s\">" (commd conf)
              (code_varenv sstr);
            list_iter_first
              (fun first str ->
-                Wserver.wprint "%s%s" (if first then "" else ", ") str)
+                Wserver.printf "%s%s" (if first then "" else ", ") str)
              (StrSet.elements strl);
-           Wserver.wprint "</a>\n";
+           Wserver.printf "</a>\n";
          })
       list;
-    Wserver.wprint "</ul>\n";
+    Wserver.printf "</ul>\n";
     trailer conf;
   }
 ;
@@ -403,14 +403,14 @@ value print_selection_bullet conf =
       in
       if conf.cancel_links then ()
       else
-        Wserver.wprint "<a id=\"i%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt (commd conf) req
+        Wserver.printf "<a id=\"i%s\" href=\"%s%s%s%s\" rel=\"nofollow\">" txt (commd conf) req
           (if sel then ";u=" ^ txt else "")
           (if sel || List.mem_assoc "u" conf.env then "#i" ^ txt else "");
-      Wserver.wprint "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
-      if conf.cancel_links then () else Wserver.wprint "</a>";
-      Wserver.wprint "\n";
+      Wserver.printf "%s" (if sel then bullet_sel_txt else bullet_unsel_txt);
+      if conf.cancel_links then () else Wserver.printf "</a>";
+      Wserver.printf "\n";
     }
-  | None -> Wserver.wprint "%s\n" bullet_nosel_txt ]
+  | None -> Wserver.printf "%s\n" bullet_nosel_txt ]
 ;
 
 value unselected_bullets conf =
@@ -459,15 +459,15 @@ value print_branch conf base psn name =
     print_selection_bullet conf first_select;
     Perso.print_sosa conf base p True;
     stag "strong" begin
-      Wserver.wprint "%s"
+      Wserver.printf "%s"
         (Util.reference conf base p
            (if (is_hide_names conf p) && not (fast_auth_age conf p) then "x"
             else if not psn && p_surname base p = name then
               person_text_without_surname conf base p
             else person_text conf base p));
     end;
-    Wserver.wprint "%s" (Date.short_dates_text conf base p);
-    Wserver.wprint "\n";
+    Wserver.printf "%s" (Date.short_dates_text conf base p);
+    Wserver.printf "\n";
     if Array.length (get_family u) = 0 then ()
     else
       let _ =
@@ -475,35 +475,35 @@ value print_branch conf base psn name =
           (fun first (fam, c, select) ->
              do {
                if not first then do {
-                 if is_first_level then Wserver.wprint "<br%s>\n" conf.xhs
-                 else Wserver.wprint "</dd>\n<dd>\n";
+                 if is_first_level then Wserver.printf "<br%s>\n" conf.xhs
+                 else Wserver.printf "</dd>\n<dd>\n";
                  print_selection_bullet conf select;
                  Perso.print_sosa conf base p False;
                  stag "em" begin
-                   Wserver.wprint "%s"
+                   Wserver.printf "%s"
                      (if (is_hide_names conf p) && not (fast_auth_age conf p)
                      then "x"
                      else if not psn && p_surname base p = name then
                        person_text_without_surname conf base p
                      else person_text conf base p);
                  end;
-                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
-                 Wserver.wprint "\n";
+                 Wserver.printf "%s" (Date.short_dates_text conf base p);
+                 Wserver.printf "\n";
                }
                else ();
-               Wserver.wprint "  &amp;";
-               Wserver.wprint "%s\n"
+               Wserver.printf "  &amp;";
+               Wserver.printf "%s\n"
                  (Date.short_marriage_date_text conf base fam p c);
                Perso.print_sosa conf base c True;
                stag "strong" begin
-                 Wserver.wprint "%s"
+                 Wserver.printf "%s"
                    (reference conf base c
                       (if (is_hide_names conf c) && not (fast_auth_age conf c)
 		                   then "x"
                        else person_text conf base c));
                end;
-               Wserver.wprint "%s" (Date.short_dates_text conf base c);
-               Wserver.wprint "\n";
+               Wserver.printf "%s" (Date.short_dates_text conf base c);
+               Wserver.printf "\n";
                let children = get_children fam in
                match select with
                [ Some (_, True) ->
@@ -517,7 +517,7 @@ value print_branch conf base psn name =
                | None ->
                    if Array.length children <> 0 then
                      stagn "dl" begin
-                       stag "dd" begin Wserver.wprint "..."; end;
+                       stag "dd" begin Wserver.printf "..."; end;
                      end
                    else () ];
                False
@@ -535,11 +535,11 @@ value print_one_branch conf base bh psn lev =
       let x = sou base (get_surname p) in
       print_branch conf base psn x lev p
   | pl -> do {
-      if is_hidden p then Wserver.wprint "&lt;&lt;"
+      if is_hidden p then Wserver.printf "&lt;&lt;"
       else
         let href = Util.acces conf base p in
         wprint_geneweb_link conf href "&lt;&lt;";
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       List.iter
         (fun p ->
            let x = sou base (get_surname p) in
@@ -582,11 +582,11 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
         [ Not_found -> False ] ]
   in
   let title h =
-    if h || p_getenv conf.env "t" = Some "A" then Wserver.wprint "%s" x
+    if h || p_getenv conf.env "t" = Some "A" then Wserver.printf "%s" x
     else
       Mutil.list_iter_first
         (fun first x ->
-           Wserver.wprint "%s<a href=\"%sm=N;v=%s;t=A\">%s</a>"
+           Wserver.printf "%s<a href=\"%sm=N;v=%s;t=A\">%s</a>"
              (if first then "" else ", ") (commd conf) (code_varenv x) x)
         (StrSet.elements xl)
   in
@@ -607,11 +607,11 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
           List.fold_left
             (fun n bh -> do {
                stagn "dt" begin
-                 if conf.cancel_links then Wserver.wprint "%d." n
+                 if conf.cancel_links then Wserver.printf "%d." n
                  else
                    stag "a" "href=\"%sm=N;v=%s;br=%d\" rel=\"nofollow\"" (commd conf)
                        (Util.code_varenv str) n begin
-                     Wserver.wprint "%d." n;
+                     Wserver.printf "%d." n;
                    end;
                end;
                tag "dd" begin
@@ -647,7 +647,7 @@ value print_several_possible_surnames x conf base (bhl, homonymes) = do {
     | _ -> x ]
   in
   let title h =
-    Wserver.wprint "%s \"%s\" : %s"
+    Wserver.printf "%s \"%s\" : %s"
       (capitale (transl_nth conf "surname/surnames" 0)) fx
       (transl conf "specify")
   in
@@ -667,17 +667,17 @@ value print_several_possible_surnames x conf base (bhl, homonymes) = do {
   in
   Util.wprint_in_columns conf
     (fun (ord, _, _) -> ord)
-    (fun (_, txt, sn) -> Wserver.wprint "%s" (access txt sn)) list;
+    (fun (_, txt, sn) -> Wserver.printf "%s" (access txt sn)) list;
   tag "p" begin
-    Wserver.wprint "<em style=\"font-size:80%%\">\n";
-    Wserver.wprint "%s " (capitale (transl conf "click"));
-    Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+    Wserver.printf "<em style=\"font-size:80%%\">\n";
+    Wserver.printf "%s " (capitale (transl conf "click"));
+    Wserver.printf "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
       (if List.length homonymes = 1 then code_varenv x ^ ";t=A"
        else code_varenv fx)
       (transl conf "here");
-    Wserver.wprint "%s"
+    Wserver.printf "%s"
       (transl conf "for the first names by alphabetic order");
-    Wserver.wprint ".</em>\n";
+    Wserver.printf ".</em>\n";
   end;
   trailer conf;
 };
@@ -726,7 +726,7 @@ value print_family_alphabetic x conf base liste =
         in
         list_iter_first
           (fun first x ->
-             Wserver.wprint "%s%s" (if first then "" else ", ") (access x))
+             Wserver.printf "%s%s" (if first then "" else ", ") (access x))
           homonymes
       in
       do {

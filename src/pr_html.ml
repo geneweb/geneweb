@@ -32,7 +32,7 @@ value get_tag =
   fun
   [ [e :: el] ->
       match List.rev el with
-      [ [<:expr< Wserver.wprint $str:t$ >> :: el]
+      [ [<:expr< Wserver.printf $str:t$ >> :: el]
         when start_with t "</" && (end_with t ">\n" || end_with t ">") ->
           let stag = end_with t ">" in
           let elen = if stag then 1 else 2 in
@@ -40,7 +40,7 @@ value get_tag =
           let pl =
             loop e where rec loop =
               fun
-              [ <:expr< Wserver.wprint $str:s$ >> ->
+              [ <:expr< Wserver.printf $str:s$ >> ->
                   if start_with s "<"
                   && (stag && end_with s ">" || end_with s ">\n") then
                     let ptg = String.sub s 1 (String.length s - elen - 1) in

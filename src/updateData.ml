@@ -411,12 +411,12 @@ value translate_title conf =
 (* ************************************************************************** *)
 value print_title conf base ini len = do {
   let (book_of, title) = translate_title conf in
-  Wserver.wprint "%s" (capitale book_of);
+  Wserver.printf "%s" (capitale book_of);
   if ini = "" then
-    Wserver.wprint " (%d %s)" len title
+    Wserver.printf " (%d %s)" len title
   else do {
-    Wserver.wprint " - ";
-    Wserver.wprint
+    Wserver.printf " - ";
+    Wserver.printf
       (fcapitale (ftransl conf "%d %s starting with %s")) len title ini }
 };
 
@@ -487,7 +487,7 @@ value print_long conf base list len =
       tag "table" begin
         tag "tr" begin
           tag "td" begin
-            Wserver.wprint "%s" (capitale (transl conf "help modify data")) ;
+            Wserver.printf "%s" (capitale (transl conf "help modify data")) ;
           end;
         end;
       end;
@@ -500,7 +500,7 @@ value print_long conf base list len =
           (fun (ini, _) ->
              stag "td" begin
                stagn "a" "href=\"#%s\"" ini begin
-                 Wserver.wprint "%s" (no_html_tags ini);
+                 Wserver.printf "%s" (no_html_tags ini);
                end;
              end)
         list;
@@ -513,7 +513,7 @@ value print_long conf base list len =
           (fun (ini_k, list) -> do {
             tag "li" begin
               stagn "a" "id=\"%s\"" ini_k begin
-                Wserver.wprint "%s" (no_html_tags ini_k);
+                Wserver.printf "%s" (no_html_tags ini_k);
             end;
             tag "ul" "class=\"mod_data_ul\"" begin
               let list =
@@ -535,13 +535,13 @@ value print_long conf base list len =
                       stag "a" "href=\"%sm=MOD_DATA;data=%s;%s;s=%s#mod\""
                         (commd conf) data k (code_varenv ini)
                         begin
-                          Wserver.wprint "%s" (quote_escaped s);
+                          Wserver.printf "%s" (quote_escaped s);
                         end
                     else
                       tag "table" "class=\"mod_data_table\"" begin
                         tag "tr" begin
                           tag "td" begin
-                            Wserver.wprint "<a name=\"mod\">&nbsp;</a>";
+                            Wserver.printf "<a name=\"mod\">&nbsp;</a>";
                             (* envoie les données de façon masquée *)
                             Util.hidden_env conf;
                             List.iter
@@ -555,12 +555,12 @@ value print_long conf base list len =
                               (if data = "src" then 300 else 200) (quote_escaped (only_printable s)) ;
                             if data = "sn" then
                               tag "input" "type=\"checkbox\" name=\"surname_aliases\" value=\"yes\"" begin
-                                Wserver.wprint "%s" (capitale (transl conf "add the previous name as a surname alias"));
+                                Wserver.printf "%s" (capitale (transl conf "add the previous name as a surname alias"));
                               end
                             else ();
                             if data = "fn" then
                               tag "input" "type=\"checkbox\" name=\"firstname_aliases\" value=\"yes\"" begin
-                                Wserver.wprint "%s" (capitale (transl conf "add the previous name as a first name alias"));
+                                Wserver.printf "%s" (capitale (transl conf "add the previous name as a first name alias"));
                               end
                             else ();
                           end;
@@ -641,14 +641,14 @@ value print_short conf base list len =
     let title _ = print_title conf base (Mutil.tr '_' ' ' ini) len in
     Hutil.header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "%s :" (capitale (transl conf "select a letter"));
+    Wserver.printf "%s :" (capitale (transl conf "select a letter"));
     tag "p" "class=\"list_ini\"" begin
       List.iter
         (fun s ->
           stagn "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\""
             (commd conf) data (code_varenv s)
             begin
-              Wserver.wprint "%s" (no_html_tags s);
+              Wserver.printf "%s" (no_html_tags s);
             end)
         ini_list;
     end;
@@ -1055,23 +1055,23 @@ value print_mod_ok conf base = do {
   if nb_pers <> 0 && data_modified then do {
     update_person_list conf base new_input list nb_pers max_updates;
     let title _ =
-      Wserver.wprint "%s" (capitale (transl conf "modification successful"))
+      Wserver.printf "%s" (capitale (transl conf "modification successful"))
     in
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
       (* En attendant mieux ... *)
-      Wserver.wprint "%s: %d "
+      Wserver.printf "%s: %d "
         (capitale (transl conf "modification successful"))
         (min nb_pers max_updates);
       if p_getenv conf.base_env "history" = Some "yes" then
         stag "a" "href=\"%sm=HIST;k=20\"" (commd conf) begin
-          Wserver.wprint "%s."
+          Wserver.printf "%s."
             (transl_nth conf "modification/modifications"
                (if nb_pers > 1 then 1 else 0));
         end
       else
-        Wserver.wprint "%s."
+        Wserver.printf "%s."
           (transl_nth conf "modification/modifications"
              (if nb_pers > 1 then 1 else 0));
     end;
@@ -1088,7 +1088,7 @@ value print_mod_ok conf base = do {
           xtag "input" "type=\"hidden\" name=\"s\" value=\"%s\"" ini;
           xtag "input" "type=\"hidden\" name=\"nx_input\" size=\"80\" maxlength=\"200\" value=\"%s\" id=\"data\""
             (quote_escaped (only_printable new_input));
-          Wserver.wprint
+          Wserver.printf
             "%s" (capitale (transl conf "continue correcting")) ;
           xtag "input" "type=\"submit\" value=\"Ok\"" ;
         end;
@@ -1097,19 +1097,19 @@ value print_mod_ok conf base = do {
     else ();
     tag "p" begin
       stag "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" (commd conf) data ini begin
-        Wserver.wprint "%s" (capitale (transl conf "new modification"));
+        Wserver.printf "%s" (capitale (transl conf "new modification"));
       end;
     end;
     Hutil.trailer conf }
   else do {
     let title _ =
-      Wserver.wprint "%s" (capitale (transl conf "no modification"))
+      Wserver.printf "%s" (capitale (transl conf "no modification"))
     in
     Hutil.header conf title;
     print_link_to_welcome conf True;
     tag "p" begin
       stag "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" (commd conf) data ini begin
-        Wserver.wprint "%s" (capitale (transl conf "new modification"));
+        Wserver.printf "%s" (capitale (transl conf "new modification"));
       end;
     end;
     Hutil.trailer conf

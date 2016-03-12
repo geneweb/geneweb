@@ -155,12 +155,12 @@ value print_html_places_surnames conf base list =
   in
   let print_sn len p sn sep =
     do {
-      Wserver.wprint "%s<a href=\"%s" sep (commd conf);
+      Wserver.printf "%s<a href=\"%s" sep (commd conf);
       if link_to_ind then
-        Wserver.wprint "%s" (acces conf base p)
+        Wserver.printf "%s" (acces conf base p)
       else
-        Wserver.wprint "m=N;v=%s" (code_varenv sn);
-      Wserver.wprint "\">%s</a> (%d)" sn len
+        Wserver.printf "m=N;v=%s" (code_varenv sn);
+      Wserver.printf "\">%s</a> (%d)" sn len
     }
   in
   let print_sn_list snl =
@@ -197,7 +197,7 @@ value print_html_places_surnames conf base list =
       List.iter
         (fun (len, p, sn) -> print_sn len p sn ",\n")
         snl;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
     end
   in
   let rec loop prev =
@@ -205,11 +205,11 @@ value print_html_places_surnames conf base list =
     [ [(pl, snl) :: list] ->
         let rec loop1 prev pl =
           match (prev, pl) with
-          [ ([], l2) -> List.iter (fun x -> Wserver.wprint "<li>%s<ul>\n" x) l2
+          [ ([], l2) -> List.iter (fun x -> Wserver.printf "<li>%s<ul>\n" x) l2
           | ([x1 :: l1], [x2 :: l2]) ->
               if x1 = x2 then loop1 l1 l2
               else do {
-                List.iter (fun _ -> Wserver.wprint "</ul></li>\n") [x1 :: l1];
+                List.iter (fun _ -> Wserver.printf "</ul></li>\n") [x1 :: l1];
                 loop1 [] [x2 :: l2]
               }
           | _ -> assert False ]
@@ -220,7 +220,7 @@ value print_html_places_surnames conf base list =
           loop pl list
         }
     | [] -> do {
-        List.iter (fun _ -> Wserver.wprint "</ul></li>\n") prev
+        List.iter (fun _ -> Wserver.printf "</ul></li>\n") prev
       } ]
   in
   tag "ul" begin
@@ -229,7 +229,7 @@ value print_html_places_surnames conf base list =
 ;
 
 value print_all_places_surnames_short conf list =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "place")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "place")) in
   let list =
     List.map
       (fun (s, len, ip) ->
@@ -266,7 +266,7 @@ value print_all_places_surnames_short conf list =
     print_link_to_welcome conf True;
     tag "p" begin
       stag "a" "href=\"%sm=PS%s;k=\"" (commd conf) opt begin
-        Wserver.wprint "%s" (transl conf "long display");
+        Wserver.printf "%s" (transl conf "long display");
       end;
     end;
     tag "p" begin
@@ -275,9 +275,9 @@ value print_all_places_surnames_short conf list =
           stag "a" "href=\"%sm=PS%s;k=%s\""
             (commd conf) opt (Util.code_varenv s)
           begin
-            Wserver.wprint "%s" s;
+            Wserver.printf "%s" s;
           end;
-          Wserver.wprint " (%d),\n" len; } )
+          Wserver.printf " (%d),\n" len; } )
         list;
     end;
     Hutil.trailer conf
@@ -306,7 +306,7 @@ value print_all_places_surnames_long conf base list =
     List.sort (fun (pl1, _) (pl2, _) -> sort_place_utf8 pl1 pl2) list
   in
   let title _ =
-    Wserver.wprint "%s / %s" (capitale (transl conf "place"))
+    Wserver.printf "%s / %s" (capitale (transl conf "place"))
       (capitale (transl_nth conf "surname/surnames" 0))
   in
   do {

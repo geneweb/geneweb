@@ -268,29 +268,29 @@ IFDEF OLD THEN
 value print_table conf hts =
   do {
     begin_centered conf;
-    Wserver.wprint "<table border=\"%d\"" conf.border;
-    Wserver.wprint " cellspacing=\"0\" cellpadding=\"0\">\n";
+    Wserver.printf "<table border=\"%d\"" conf.border;
+    Wserver.printf " cellspacing=\"0\" cellpadding=\"0\">\n";
     for i = 0 to Array.length hts - 1 do {
       tag "tr" "align=\"left\"" begin
         for j = 0 to Array.length hts.(i) - 1 do {
           let (colspan, align, td) = hts.(i).(j) in
-          Wserver.wprint "<td";
+          Wserver.printf "<td";
           if colspan = 1 && (td = TDnothing || td = TDhr CenterA) then
             ()
-          else Wserver.wprint " colspan=\"%d\"" colspan;
+          else Wserver.printf " colspan=\"%d\"" colspan;
           match (align, td) with
-          [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=\"%s\"" conf.left
+          [ (LeftA, TDhr LeftA) -> Wserver.printf " align=\"%s\"" conf.left
           | (LeftA, _) -> ()
-          | (CenterA, _) -> Wserver.wprint " align=\"center\""
-          | (RightA, _) -> Wserver.wprint " align=\"%s\"" conf.right ];
-          Wserver.wprint ">";
+          | (CenterA, _) -> Wserver.printf " align=\"center\""
+          | (RightA, _) -> Wserver.printf " align=\"%s\"" conf.right ];
+          Wserver.printf ">";
           match td with
-          [ TDitem s -> Wserver.wprint "%s" s
-          | TDtext s -> Wserver.wprint "%s" s
-          | TDnothing -> Wserver.wprint "&nbsp;"
-          | TDbar None -> Wserver.wprint "|"
+          [ TDitem s -> Wserver.printf "%s" s
+          | TDtext s -> Wserver.printf "%s" s
+          | TDnothing -> Wserver.printf "&nbsp;"
+          | TDbar None -> Wserver.printf "|"
           | TDbar (Some s) ->
-              Wserver.wprint
+              Wserver.printf
                 "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
           | TDhr align ->
               match align with
@@ -300,11 +300,11 @@ value print_table conf hts =
                   xtag "hr" "class=\"%s\"" conf.right
               | _ ->
                   xtag "hr" "class=\"full\"" ] ];
-          Wserver.wprint "</td>\n"
+          Wserver.printf "</td>\n"
         };
       end;
     };
-    Wserver.wprint "</table>\n";
+    Wserver.printf "</table>\n";
     end_centered conf;
   }
 ;
@@ -664,24 +664,24 @@ value print_next_pos conf pos1 pos2 tcol =
            | _ -> [(k, v) :: env] ])
         conf.env []
     in
-    Wserver.wprint "<div style=\"text-align:right\">\n";
-    if pos1 = 0 then Wserver.wprint "&nbsp;"
+    Wserver.printf "<div style=\"text-align:right\">\n";
+    if pos1 = 0 then Wserver.printf "&nbsp;"
     else do {
-      Wserver.wprint "<a href=\"%s" (commd conf);
-      List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-      Wserver.wprint "pos1=%d;pos2=%d" (pos1 + overlap - dpos)
+      Wserver.printf "<a href=\"%s" (commd conf);
+      List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) env;
+      Wserver.printf "pos1=%d;pos2=%d" (pos1 + overlap - dpos)
         (pos1 + overlap);
-      Wserver.wprint "\">&lt;&lt;</a>\n"
+      Wserver.printf "\">&lt;&lt;</a>\n"
     };
-    if pos2 >= tcol then Wserver.wprint "&nbsp;"
+    if pos2 >= tcol then Wserver.printf "&nbsp;"
     else do {
-      Wserver.wprint "<a href=\"%s" (commd conf);
-      List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-      Wserver.wprint "pos1=%d;pos2=%d" (pos2 - overlap)
+      Wserver.printf "<a href=\"%s" (commd conf);
+      List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) env;
+      Wserver.printf "pos1=%d;pos2=%d" (pos2 - overlap)
         (pos2 - overlap + dpos);
-      Wserver.wprint "\">&gt;&gt;</a>\n"
+      Wserver.printf "\">&gt;&gt;</a>\n"
     };
-    Wserver.wprint "</div>\n"
+    Wserver.printf "</div>\n"
   }
   else ()
 ;
@@ -713,7 +713,7 @@ value print_table_pre conf hts =
       | x -> x ]
     in
     print_next_pos conf pos1 pos2 (Array.fold_left \+ 0 colsz);
-    Wserver.wprint "<pre>\n";
+    Wserver.printf "<pre>\n";
     for i = 0 to Array.length hts - 1 do {
       let (stra, max_row) =
         let (stral, max_row) =
@@ -739,7 +739,7 @@ value print_table_pre conf hts =
       in
       for row = 0 to max_row - 1 do {
         let rec loop pos col j =
-          if j = Array.length hts.(i) then Wserver.wprint "\n"
+          if j = Array.length hts.(i) then Wserver.printf "\n"
           else do {
             let (colspan, align, td) = hts.(i).(j) in
             let sz =
@@ -805,14 +805,14 @@ value print_table_pre conf hts =
                 else if pos1 < pos then displayed_sub outs 0 (pos2 - pos)
                 else displayed_sub outs (pos1 - pos) (pos2 - pos1)
             in
-            Wserver.wprint "%s" clipped_outs;
+            Wserver.printf "%s" clipped_outs;
             loop (pos + sz) (col + colspan) (j + 1)
           }
         in
         loop 0 0 0
       }
     };
-    Wserver.wprint "</pre>\n"
+    Wserver.printf "</pre>\n"
   }
 ;
 
@@ -822,11 +822,11 @@ value print_html_table conf hts =
   do {
     if Util.p_getenv conf.env "notab" <> Some "on" then
       tag "p" begin
-        Wserver.wprint "<div style=\"text-align:%s\"><a href=\"%s" conf.right
+        Wserver.printf "<div style=\"text-align:%s\"><a href=\"%s" conf.right
           (commd conf);
-        List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
-        Wserver.wprint "notab=on;slices=on";
-        Wserver.wprint "\"><tt>//</tt></a></div>\n";
+        List.iter (fun (k, v) -> Wserver.printf "%s=%s;" k v) conf.env;
+        Wserver.printf "notab=on;slices=on";
+        Wserver.printf "\"><tt>//</tt></a></div>\n";
       end
     else ();
     if Util.p_getenv conf.env "notab" = Some "on" ||
@@ -943,7 +943,7 @@ value print_slices_menu conf hts =
     Util.capitale
       (transl_nth conf "display by slices/slice width/overlap/total width" n)
   in
-  let title _ = Wserver.wprint "%s" (txt 0) in
+  let title _ = Wserver.printf "%s" (txt 0) in
   do {
     Hutil.header conf title;
     Hutil.print_link_to_welcome conf True;
@@ -954,50 +954,50 @@ value print_slices_menu conf hts =
         (fun (k, v) ->
            if k = "slices" then ()
            else
-             Wserver.wprint
+             Wserver.printf
                "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
                (decode_varenv k) (decode_varenv v))
         conf.env;
       tag "table" begin
         tag "tr" "align=\"left\"" begin
           tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n"
+            Wserver.printf "%s\n"
               (Util.capitale
                  (transl conf "don't group the common branches together"));
-            Wserver.wprint
+            Wserver.printf
               "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
           end;
         end;
         tag "tr" "align=\"left\"" begin
           tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n" (txt 1);
-            Wserver.wprint "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
+            Wserver.printf "%s\n" (txt 1);
+            Wserver.printf "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
           end;
         end;
         tag "tr" "align=\"left\"" begin
           tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n" (txt 2);
-            Wserver.wprint
+            Wserver.printf "%s\n" (txt 2);
+            Wserver.printf
               "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
           end;
         end;
         tag "tr" "align=\"left\"" begin
           tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n" (txt 3);
+            Wserver.printf "%s\n" (txt 3);
             let wid =
               let (min_wid, max_wid, _, _, _) = table_pre_dim conf hts in
               do {
-                Wserver.wprint "(%d-%d)\n" min_wid max_wid;
+                Wserver.printf "(%d-%d)\n" min_wid max_wid;
                 max min_wid (min max_wid 78)
               }
             in
-            Wserver.wprint "<input name=\"width\" size=\"5\" value=\"%d\">\n"
+            Wserver.printf "<input name=\"width\" size=\"5\" value=\"%d\">\n"
               wid;
           end;
         end;
       end;
       html_p conf;
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Hutil.trailer conf
   }
@@ -1014,13 +1014,13 @@ value print_dag_page conf base page_title hts next_txt =
     in
     {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
   in
-  let title _ = Wserver.wprint "%s" page_title in
+  let title _ = Wserver.printf "%s" page_title in
   do {
     Hutil.header_no_page_title conf title;
     print_html_table conf hts;
     if next_txt <> "" then
       tag "p" begin
-        Wserver.wprint "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
+        Wserver.printf "<a href=\"%s%s\">&gt;&gt;</a>\n" (commd conf) next_txt;
       end
     else ();
     Hutil.trailer conf

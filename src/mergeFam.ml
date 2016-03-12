@@ -48,39 +48,39 @@ value print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
     if x1 <> "" && x2 <> "" && x1 <> x2 then do {
-      Wserver.wprint "<h4>%s</h4>\n" (capitale title);
+      Wserver.printf "<h4>%s</h4>\n" (capitale title);
       tag "ul" begin
         html_li conf;
-        Wserver.wprint
+        Wserver.printf
           "<input type=\"radio\" name=\"%s\" value=\"1\" checked>\n"
           name;
-        Wserver.wprint "%s\n" x1;
+        Wserver.printf "%s\n" x1;
         html_li conf;
-        Wserver.wprint "<input type=\"radio\" name=\"%s\" value=\"2\">\n" name;
-        Wserver.wprint "%s\n" x2;
+        Wserver.printf "<input type=\"radio\" name=\"%s\" value=\"2\">\n" name;
+        Wserver.printf "%s\n" x2;
       end;
     }
     else ()
   in
   tag "form" "method=\"post\" action=\"%s\"" conf.command begin
     Util.hidden_env conf;
-    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
-    Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
+    Wserver.printf "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
+    Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
       (Adef.int_of_ifam ifam1);
-    Wserver.wprint "<input type=\"hidden\" name=\"i2\" value=\"%d\">\n"
+    Wserver.printf "<input type=\"hidden\" name=\"i2\" value=\"%d\">\n"
       (Adef.int_of_ifam ifam2);
     match p_getenv conf.env "ip" with
     [ Some ip ->
-        Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
+        Wserver.printf "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
     | None -> () ];
     let rec loop =
       fun
       [ [(ip1, ip2)] ->
           do {
-            Wserver.wprint
+            Wserver.printf
               "<input type=\"hidden\" name=\"ini1\" value=\"%d\">\n"
               (Adef.int_of_iper ip1);
-            Wserver.wprint
+            Wserver.printf
               "<input type=\"hidden\" name=\"ini2\" value=\"%d\">\n"
               (Adef.int_of_iper ip2);
           }
@@ -122,14 +122,14 @@ value print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
              in
              transl conf "divorced" ^ ds ]);
     html_p conf;
-    Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+    Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
   end
 ;
 
 value merge_fam1 conf base fam1 fam2 =
   let title h =
     let s = transl_nth conf "family/families" 1 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "merge" s))
+    Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
   do {
     header conf title;

@@ -272,7 +272,7 @@ value print_result conf base max_answers (list, len) =
     else list
   in
   if len = 0 then
-    Wserver.wprint "%s\n" (capitale (transl conf "no match"))
+    Wserver.printf "%s\n" (capitale (transl conf "no match"))
   else
     (* Construction de la table des sosa de la base *)
     let () = Perso.build_sosa_ht conf base in
@@ -282,14 +282,14 @@ value print_result conf base max_answers (list, len) =
            do {
              html_li conf;
              Perso.print_sosa conf base p True;
-             Wserver.wprint "\n%s" (referenced_person_text conf base p);
-             Wserver.wprint "%s" (Date.short_dates_text conf base p);
+             Wserver.printf "\n%s" (referenced_person_text conf base p);
+             Wserver.printf "%s" (Date.short_dates_text conf base p);
              stag "em" begin
                specify_homonymous conf base p False;
              end;
            })
         list;
-      if len > max_answers then do { html_li conf; Wserver.wprint "...\n"; }
+      if len > max_answers then do { html_li conf; Wserver.printf "...\n"; }
       else ();
     end
 ;
@@ -387,7 +387,7 @@ value searching_fields conf base =
 
 value print conf base =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "advanced request"))
+    Wserver.printf "%s" (capitale (transl conf "advanced request"))
   in
   let max_answers =
     match p_getint conf.env "max" with
@@ -397,7 +397,7 @@ value print conf base =
   do {
     header conf title;
     tag "p" begin
-      Wserver.wprint "%s: %s."
+      Wserver.printf "%s: %s."
         (capitale (transl conf "searching all")) (searching_fields conf base);
     end;
     let list = advanced_search conf base max_answers in

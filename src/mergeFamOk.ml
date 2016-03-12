@@ -226,7 +226,7 @@ value print_merge conf base =
 ;
 
 value print_mod_merge_ok conf base wl cpl des = do {
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "merge done")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
   header conf title;
    print_link_to_welcome conf True;
   UpdateFamOk.print_family conf base wl cpl des;

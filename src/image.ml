@@ -19,17 +19,13 @@ open Config;
 value content cgi t len fname =
   do {
     if not cgi then Wserver.http "" else ();
-    Wserver.wprint "Content-type: image/%s" t;
-    Util.nl ();
-    Wserver.wprint "Content-length: %d" len;
-    Util.nl ();
-    Wserver.wprint "Content-disposition: inline; filename=%s"
+    Wserver.header "Content-type: image/%s" t;
+    Wserver.header "Content-length: %d" len;
+    Wserver.header "Content-disposition: inline; filename=%s"
       (Filename.basename fname);
-    Util.nl ();
     (* TODO: Utiliser un cache public pour les images non personelles. *)
-    Wserver.wprint "Cache-control: private, max-age=%d" (60 * 60 * 24 * 30);
-    Util.nl ();
-    Util.nl ();
+    Wserver.header "Cache-control: private, max-age=%d" (60 * 60 * 24 * 30);
+    Wserver.header "";
     Wserver.wflush ();
   }
 ;
@@ -58,7 +54,7 @@ value print_image_type cgi fname itype =
           else do {
             let olen = min (Bytes.length buf) len in
             really_input ic buf 0 olen;
-            Wserver.wprint "%s" (Bytes.sub_string buf 0 olen);
+            Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
             loop (len - olen)
           }
         in
@@ -137,18 +133,17 @@ value print conf base =
 value print_html conf base =
   do {
     Util.html conf;
-    Util.nl ();
-    Wserver.wprint "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
-    Wserver.wprint "<head>\n";
-    Wserver.wprint "  <title>%s</title>\n"
+    Wserver.printf "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
+    Wserver.printf "<head>\n";
+    Wserver.printf "  <title>%s</title>\n"
       (Util.transl_nth conf "image/images" 0);
-    Wserver.wprint "</head>\n<body>\n";
-    Wserver.wprint "<img src=\"%s" (Util.commd conf);
+    Wserver.printf "</head>\n<body>\n";
+    Wserver.printf "<img src=\"%s" (Util.commd conf);
     Mutil.list_iter_first
       (fun first (k, v) ->
          let v = if k = "m" then "IM" else v in
-         Wserver.wprint "%s%s=%s" (if first then "" else ";") k v)
+         Wserver.printf "%s%s=%s" (if first then "" else ";") k v)
       conf.env;
-    Wserver.wprint "\"%s>\n</body>\n</html>" conf.xhs;
+    Wserver.printf "\"%s>\n</body>\n</html>" conf.xhs;
   }
 ;

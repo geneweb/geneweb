@@ -9,25 +9,25 @@ open Util;
 
 value print_link conf base p = do {
   stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-    Wserver.wprint "%s.%d %s" (sou base (get_first_name p))
+    Wserver.printf "%s.%d %s" (sou base (get_first_name p))
       (get_occ p) (sou base (get_surname p));
   end;
-  Wserver.wprint "%s" (Date.short_dates_text conf base p);
+  Wserver.printf "%s" (Date.short_dates_text conf base p);
   match main_title conf base p with
-  [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
+  [ Some t -> Wserver.printf "%s" (one_title_text conf base p t)
   | None -> () ];
 };
 
 value print_no_candidate conf base (ip, p) = do {
   let title _ =
-    Wserver.wprint "%s\n"
+    Wserver.printf "%s\n"
       (capitale
          (transl_decline conf "merge" (transl conf "possible duplications")))
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf True;
-  Wserver.wprint "%s\n" (capitale (transl conf "not found"));
+  Wserver.printf "%s\n" (capitale (transl conf "not found"));
   tag "ul" begin
     tag "li" begin print_link conf base p; end;
   end;
@@ -52,7 +52,7 @@ value print_input_excl conf int_of_i excl excl_name =
 
 value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
   let title _ =
-    Wserver.wprint "%s\n" (capitale (transl conf "merge"))
+    Wserver.printf "%s\n" (capitale (transl conf "merge"))
   in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
@@ -63,7 +63,7 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
     tag "li" begin print_link conf base (poi base ip2); end;
   end;
   tag "p" begin
-    Wserver.wprint "%s ?\n" (capitale (transl conf "merge"));
+    Wserver.printf "%s ?\n" (capitale (transl conf "merge"));
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       Util.hidden_env conf;
       xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_DUP_IND_Y_N\"";
@@ -86,7 +86,7 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
 
 value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
   let title _ =
-    Wserver.wprint "%s\n"
+    Wserver.printf "%s\n"
       (capitale
          (transl_decline conf "merge" (transl_nth conf "family/families" 1)))
   in
@@ -101,17 +101,17 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
   tag "ul" begin
     tag "li" begin
       print_link conf base (poi base ip1);
-      Wserver.wprint "\n&amp;\n";
+      Wserver.printf "\n&amp;\n";
       print_link conf base (poi base ip2);
     end;
     tag "li" begin
       print_link conf base (poi base ip1);
-      Wserver.wprint "\n&amp;\n";
+      Wserver.printf "\n&amp;\n";
       print_link conf base (poi base ip2);
     end;
   end;
   tag "p" begin
-    Wserver.wprint "%s ?\n" (capitale (transl conf "merge"));
+    Wserver.printf "%s ?\n" (capitale (transl conf "merge"));
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       Util.hidden_env conf;
       xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_DUP_FAM_Y_N\"";

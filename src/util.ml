@@ -344,18 +344,16 @@ value get_referer conf =
 ;
 
 value begin_centered conf =
-  Wserver.wprint
+  Wserver.printf
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
     conf.border;
-value end_centered _ = Wserver.wprint "</td></tr></table>\n";
+value end_centered _ = Wserver.printf "</td></tr></table>\n";
 
-value html_br conf = Wserver.wprint "<br%s>\n" conf.xhs;
+value html_br conf = Wserver.printf "<br%s>\n" conf.xhs;
 
-value html_p conf = do { Wserver.wprint "<p>"; Wserver.wprint "\n"; };
+value html_p conf = do { Wserver.printf "<p>"; Wserver.printf "\n"; };
 
-value html_li conf = do { Wserver.wprint "<li>"; Wserver.wprint "\n"; };
-
-value nl = Wserver.nl;
+value html_li conf = do { Wserver.printf "<li>"; Wserver.printf "\n"; };
 
 value week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
@@ -385,16 +383,15 @@ value html conf =
   do {
     if not conf.cgi then do {
       Wserver.http "";
-      Wserver.wprint "Server: GeneWeb/%s" Version.txt;
-      nl ();
+      Wserver.header "Server: GeneWeb/%s" Version.txt
     }
     else ();
-    Wserver.wprint "Date: %s" (string_of_ctime conf); nl ();
-    Wserver.wprint "Connection: close"; nl ();
-    Wserver.wprint "Content-type: %s; charset=%s"
+    Wserver.header "Date: %s" (string_of_ctime conf);
+    Wserver.header "Connection: close";
+    Wserver.header "Content-type: %s; charset=%s"
       (if conf.pure_xhtml then "application/xhtml+xml" else "text/html")
       charset;
-    nl ();
+    Wserver.header ""
   }
 ;
 
@@ -402,17 +399,15 @@ value unauthorized conf auth_type =
   do {
     if not conf.cgi then do {
       Wserver.http "401 Unauthorized";
-      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
-      nl ()
+      Wserver.header "WWW-Authenticate: Basic realm=\"%s\"" auth_type
     }
     else ();
-    Wserver.wprint "Content-type: text/html; charset=%s" conf.charset;
-    nl ();
-    nl ();
-    Wserver.wprint "<head><title>Access failed</title></head>\n";
-    Wserver.wprint "<body><h1>Access failed</h1>\n";
-    Wserver.wprint "<ul><li>%s</ul>\n" auth_type;
-    Wserver.wprint "</body>\n";
+    Wserver.header "Content-type: text/html; charset=%s" conf.charset;
+    Wserver.header "";
+    Wserver.printf "<head><title>Access failed</title></head>\n";
+    Wserver.printf "<body><h1>Access failed</h1>\n";
+    Wserver.printf "<ul><li>%s</ul>\n" auth_type;
+    Wserver.printf "</body>\n";
   }
 ;
 
@@ -498,7 +493,7 @@ value clean_html_tags s l =
 value hidden_env conf =
   List.iter
     (fun (k, v) ->
-       Wserver.wprint "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
+       Wserver.printf "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
          (quote_escaped (decode_varenv v)) conf.xhs)
     (conf.henv @ conf.senv)
 ;
@@ -963,7 +958,7 @@ value geneweb_link conf href s =
 ;
 
 value wprint_geneweb_link conf href s =
-  Wserver.wprint "%s" (geneweb_link conf href s)
+  Wserver.printf "%s" (geneweb_link conf href s)
 ;
 
 value reference conf base p s =
@@ -1406,16 +1401,16 @@ value rec copy_from_etc env lang imcom ic =
           let c = input_char ic in
           match c with
           [ '+' -> incr cnt
-          | '#' -> Wserver.wprint "%d" cnt.val
-          | 'n' -> Wserver.wprint "%s" (base_len (input_to_semi ic))
+          | '#' -> Wserver.printf "%d" cnt.val
+          | 'n' -> Wserver.printf "%s" (base_len (input_to_semi ic))
           | 'r' ->
               let name = input_line ic in
               match open_etc_file name with
               [ Some ic -> copy_from_etc env lang imcom ic
               | None ->
-                  Wserver.wprint
+                  Wserver.printf
                     "<em>... file not found: \"%s.txt\"</em><br>" name ]
-          | c -> Wserver.wprint "%s" (macro_etc env imcom c) ]
+          | c -> Wserver.printf "%s" (macro_etc env imcom c) ]
       | '[' ->
           let c = input_char ic in
           if c = '\n' then
@@ -1426,10 +1421,10 @@ value rec copy_from_etc env lang imcom ic =
             in
             let (s, alt) = Translate.inline lang '%' (macro_etc env imcom) s in
             let s = if alt then tnf s else s in
-            Wserver.wprint "%s" s
+            Wserver.printf "%s" s
           else
-            Wserver.wprint "[%c" c
-      | c -> Wserver.wprint "%c" c ]
+            Wserver.printf "[%c" c
+      | c -> Wserver.printf "%c" c ]
     }
   with exc ->
     do {
@@ -1607,7 +1602,7 @@ value message_to_wizard conf =
       let fname = base_path ["etc"; conf.bname] (fname ^ ".txt") in
       match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
       [ Some ic ->
-          try while True do { Wserver.wprint "%c" (input_char ic); } with
+          try while True do { Wserver.printf "%c" (input_char ic); } with
           [ End_of_file -> close_in ic ]
       | None -> () ]
     in
@@ -2221,7 +2216,7 @@ value print_alphab_list conf crit print_elem liste = do {
              in
              do {
                if not same_than_last then
-                 Wserver.wprint "<a href=\"#i%s\">%s</a>\n" (hexa_string t) t
+                 Wserver.printf "<a href=\"#i%s\">%s</a>\n" (hexa_string t) t
                else ();
                Some t
              })
@@ -2243,26 +2238,26 @@ value print_alphab_list conf crit print_elem liste = do {
            if len > menu_threshold || is_number t then do {
              match last with
              [ Some _ ->
-                 if not same_than_last then Wserver.wprint "</ul>\n</li>\n"
+                 if not same_than_last then Wserver.printf "</ul>\n</li>\n"
                  else ()
              | _ -> () ];
              if not same_than_last then do {
-               Wserver.wprint "<li>\n";
-               Wserver.wprint "<a id=\"i%s\">%s</a>\n" (hexa_string t) t;
-               Wserver.wprint "<ul>\n";
+               Wserver.printf "<li>\n";
+               Wserver.printf "<a id=\"i%s\">%s</a>\n" (hexa_string t) t;
+               Wserver.printf "<ul>\n";
              }
              else ();
            }
            else ();
-           Wserver.wprint "<li>\n  ";
+           Wserver.printf "<li>\n  ";
            print_elem e;
-           Wserver.wprint "</li>\n";
+           Wserver.printf "</li>\n";
            Some t
          })
         None liste
     in
     ();
-    if len > menu_threshold then Wserver.wprint "</ul>\n</li>\n" else ();
+    if len > menu_threshold then Wserver.printf "</ul>\n</li>\n" else ();
   end;
 };
 
@@ -2431,11 +2426,11 @@ value first_child conf base p =
 value specify_homonymous conf base p specify_public_name =
   match (get_public_name p, get_qualifiers p) with
   [ (n, [nn :: _]) when sou base n <> "" && specify_public_name ->
-      Wserver.wprint " %s <em>%s</em>" (sou base n) (sou base nn)
+      Wserver.printf " %s <em>%s</em>" (sou base n) (sou base nn)
   | (_, [nn :: _]) when specify_public_name ->
-      Wserver.wprint " %s <em>%s</em>" (p_first_name base p) (sou base nn)
+      Wserver.printf " %s <em>%s</em>" (p_first_name base p) (sou base nn)
   | (n, []) when sou base n <> "" && specify_public_name ->
-      Wserver.wprint " %s" (sou base n)
+      Wserver.printf " %s" (sou base n)
   | (_, _) ->
       (* Le nom public et le qualificatif ne permettent pas de distinguer *)
       (* la personne, donc on affiche les informations sur les parents,   *)
@@ -2449,7 +2444,7 @@ value specify_homonymous conf base p specify_public_name =
             if fc = "" then "" else ", " ^ fc
            else ", " ^ hw)
       in
-      Wserver.wprint "%s" s ]
+      Wserver.printf "%s" s ]
 ;
 
 
@@ -2977,7 +2972,7 @@ value rchild_type_text conf t n =
 ;
 
 value wprint_hidden conf pref name valu =
-  Wserver.wprint "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n"
+  Wserver.printf "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n"
     pref name (quote_escaped valu) conf.xhs
 ;
 
@@ -3073,8 +3068,8 @@ value pre_text_size txt =
 
 value print_pre_center sz txt =
   do {
-    for i = 1 to (sz - pre_text_size txt) / 2 do { Wserver.wprint " " };
-    Wserver.wprint "%s\n" txt;
+    for i = 1 to (sz - pre_text_size txt) / 2 do { Wserver.printf " " };
+    Wserver.printf "%s\n" txt;
   }
 ;
 
@@ -3082,9 +3077,9 @@ value print_pre_left sz txt =
   let tsz = pre_text_size txt in
   do {
     if tsz < sz / 2 - 1 then
-      for i = 2 to (sz / 2 - 1 - tsz) / 2 do { Wserver.wprint " " }
+      for i = 2 to (sz / 2 - 1 - tsz) / 2 do { Wserver.printf " " }
     else ();
-    Wserver.wprint " %s\n" txt;
+    Wserver.printf " %s\n" txt;
   }
 ;
 
@@ -3092,12 +3087,12 @@ value print_pre_right sz txt =
   let tsz = pre_text_size txt in
   do {
     if tsz < sz / 2 - 1 then do {
-      for i = 1 to sz / 2 do { Wserver.wprint " " };
-      for i = 1 to (sz / 2 - 1 - tsz) / 2 do { Wserver.wprint " " };
+      for i = 1 to sz / 2 do { Wserver.printf " " };
+      for i = 1 to (sz / 2 - 1 - tsz) / 2 do { Wserver.printf " " };
       ()
     }
-    else for i = 1 to sz - pre_text_size txt - 1 do { Wserver.wprint " " };
-    Wserver.wprint " %s\n" txt;
+    else for i = 1 to sz - pre_text_size txt - 1 do { Wserver.printf " " };
+    Wserver.printf " %s\n" txt;
   }
 ;
 
@@ -3560,21 +3555,21 @@ value print_in_columns conf ncols len_list list wprint_elem = do {
           (fun (list, first) len ->
              loop len list where rec loop n list =
                if n = 0 then do {
-                 Wserver.wprint "</ul>\n</td>\n";
+                 Wserver.printf "</ul>\n</td>\n";
                  (list, False)
                }
                else
                  match list with
                  [ [(kind, ord, elem) :: list] -> do {
-                     if n = len then Wserver.wprint "<td width=\"%d\">\n" (100/ncols)
-                     else if kind.val <> Elem then Wserver.wprint "</ul>\n"
+                     if n = len then Wserver.printf "<td width=\"%d\">\n" (100/ncols)
+                     else if kind.val <> Elem then Wserver.printf "</ul>\n"
                      else ();
                      if kind.val <> Elem then do {
-                       Wserver.wprint "<h3 class=\"subtitle\">%s%s</h3>\n"
+                       Wserver.printf "<h3 class=\"subtitle\">%s%s</h3>\n"
                          (if ord = "" then "..." else String.make 1 ord.[0])
                          (if kind.val = HeadElem then ""
                           else " (" ^ transl conf "continued" ^ ")");
-                       Wserver.wprint "<ul>\n";
+                       Wserver.printf "<ul>\n";
                      }
                      else ();
                      stagn "li" begin wprint_elem elem; end;
@@ -3645,7 +3640,7 @@ value reduce_list size list =
 (* ********************************************************************** *)
 value print_reference conf fn occ sn =
   stag "span" "class=\"reference\"" begin
-    Wserver.wprint " (%s %s.%d %s)"
+    Wserver.printf " (%s %s.%d %s)"
       (transl conf "reference key") (Name.lower fn) occ (Name.lower sn);
   end
 ;
@@ -3665,7 +3660,7 @@ value gen_print_tips conf s = do {
     tag "table" begin
       tag "tr" begin
         tag "td" begin
-          Wserver.wprint "%s" s;
+          Wserver.printf "%s" s;
         end;
       end;
     end;

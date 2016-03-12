@@ -29,7 +29,7 @@ value print_child_person conf base p =
   tag "table" "border=\"1\"" begin
     tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (capitale (transl_nth conf "first name/first names" 0));
       end;
       tag "td" "colspan=\"3\"" begin
@@ -38,7 +38,7 @@ value print_child_person conf base p =
           var (quote_escaped first_name);
       end;
       tag "td" "align=\"%s\"" conf.right begin
-        let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
+        let s = capitale (transl conf "number") in Wserver.printf "%s" s;
       end;
       tag "td" begin
         xtag "input" "name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s" var
@@ -47,7 +47,7 @@ value print_child_person conf base p =
     end;
     tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
-        Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
+        Wserver.printf "%s" (capitale (transl_nth conf "surname/surnames" 0));
       end;
       tag "td" "colspan=\"5\"" begin
         xtag "input"
@@ -88,16 +88,16 @@ value check_digest conf base digest =
 value print_children conf base ipl =
   do {
     stagn "h4" begin
-      Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
+      Wserver.printf "%s" (capitale (transl_nth conf "child/children" 1));
     end;
     tag "ul" begin
       List.iter
         (fun ip ->
            let p = poi base ip in
            tag "li" begin
-             Wserver.wprint "%s"
+             Wserver.printf "%s"
                (reference conf base p (person_text conf base p));
-             Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
+             Wserver.printf "%s\n" (Date.short_dates_text conf base p);
              print_child_person conf base p;
            end)
         ipl;
@@ -108,7 +108,7 @@ value print_children conf base ipl =
 value print_change conf base p =
   let title _ =
     let s = transl conf "change children's names" in
-    Wserver.wprint "%s" (capitale s)
+    Wserver.printf "%s" (capitale s)
   in
   let children = select_children_of base p in
   let digest = digest_children base children in
@@ -116,8 +116,8 @@ value print_change conf base p =
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
     tag "h2" begin title False; end;
     tag "p" begin
-      Wserver.wprint "%s" (reference conf base p (person_text conf base p));
-      Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
+      Wserver.printf "%s" (reference conf base p (person_text conf base p));
+      Wserver.printf "%s\n" (Date.short_dates_text conf base p);
     end;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
@@ -128,12 +128,12 @@ value print_change conf base p =
         xtag "input" "type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\"";
       end;
       print_children conf base children;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       tag "p" begin
         xtag "input" "type=\"submit\" value=\"Ok\"";
       end;
     end;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf;
   }
 ;
@@ -149,9 +149,9 @@ value print conf base =
 value print_children_list conf base u =
   do {
     stag "h4" begin
-      Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
+      Wserver.printf "%s" (capitale (transl_nth conf "child/children" 1));
     end;
-    Wserver.wprint "\n<p>\n";
+    Wserver.printf "\n<p>\n";
     tag "ul" begin
       Array.iter
         (fun ifam ->
@@ -161,9 +161,9 @@ value print_children_list conf base u =
                 let p = poi base ip in
                 do {
                   html_li conf;
-                  Wserver.wprint "\n%s"
+                  Wserver.printf "\n%s"
                     (reference conf base p (person_text conf base p));
-                  Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
+                  Wserver.printf "%s\n" (Date.short_dates_text conf base p);
                 })
              (get_children des))
         (get_family u);
@@ -174,19 +174,19 @@ value print_children_list conf base u =
 value print_change_done conf base p =
   let title _ =
     let s = transl conf "children's names changed" in
-    Wserver.wprint "%s" (capitale s)
+    Wserver.printf "%s" (capitale s)
   in
   do {
     header conf title;
-    Wserver.wprint "\n%s" (reference conf base p (person_text conf base p));
-    Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
+    Wserver.printf "\n%s" (reference conf base p (person_text conf base p));
+    Wserver.printf "%s\n" (Date.short_dates_text conf base p);
     print_children_list conf base p;
     trailer conf;
   }
 ;
 
 value print_conflict conf base ip_var p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
     Update.print_error conf base (AlreadyDefined p);
@@ -195,16 +195,16 @@ value print_conflict conf base ip_var p =
     in
     tag "ul" begin
       stag "li" begin
-        Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
+        Wserver.printf "%s: %d.\n" (capitale (transl conf "first free number"))
           free_n;
-        Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+        Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
           (transl conf "create");
-        Wserver.wprint "%s.\n" (transl conf " to try again with this number");
+        Wserver.printf "%s.\n" (transl conf " to try again with this number");
       end;
       stag "li" begin
-        Wserver.wprint "%s " (capitale (transl conf "or"));
-        Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+        Wserver.printf "%s " (capitale (transl conf "or"));
+        Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
+        Wserver.printf " %s %s." (transl_nth conf "and" 0)
           (transl conf "change it (the number) yourself");
       end;
     end;
@@ -244,10 +244,10 @@ value check_conflict conf base p key new_occ ipl =
 ;
 
 value error_person conf base p err =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    Wserver.wprint "%s\n" (capitale err);
+    Wserver.printf "%s\n" (capitale err);
     trailer conf;
     raise Update.ModErr
   }

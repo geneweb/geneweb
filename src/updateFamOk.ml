@@ -645,9 +645,9 @@ value error_family conf base err = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.wprint "%s\n" (capitale err);
+  Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
   trailer conf;
   raise Update.ModErr
@@ -757,16 +757,16 @@ value print_err_parents conf base p = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.wprint "\n";
-  Wserver.wprint (fcapitale (ftransl conf "%t already has parents"))
+  Wserver.printf "\n";
+  Wserver.printf (fcapitale (ftransl conf "%t already has parents"))
     (fun _ -> Printf.sprintf "\n%s" (referenced_person_text conf base p));
-  Wserver.wprint "\n";
+  Wserver.printf "\n";
   html_p conf;
   tag "ul" begin
     html_li conf;
-    Wserver.wprint "%s: %d" (capitale (transl conf "first free number"))
+    Wserver.printf "%s: %d" (capitale (transl conf "first free number"))
       (Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
          0);
   end;
@@ -785,10 +785,10 @@ value print_err_father_sex conf base p = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.wprint "\n%s" (referenced_person_text conf base p);
-  Wserver.wprint "\n%s\n" (transl conf "should be male");
+  Wserver.printf "\n%s" (referenced_person_text conf base p);
+  Wserver.printf "\n%s\n" (transl conf "should be male");
   Update.print_return conf;
   trailer conf;
   raise Update.ModErr
@@ -804,10 +804,10 @@ value print_err_mother_sex conf base p = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.wprint "\n%s" (referenced_person_text conf base p);
-  Wserver.wprint "\n%s\n" (transl conf "should be female");
+  Wserver.printf "\n%s" (referenced_person_text conf base p);
+  Wserver.printf "\n%s\n" (transl conf "should be female");
   Update.print_return conf;
   trailer conf;
   raise Update.ModErr
@@ -820,7 +820,7 @@ value print_err conf base = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Update.print_return conf;
   trailer conf;
@@ -836,10 +836,10 @@ value print_error_disconnected conf = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Hutil.print_link_to_welcome conf True;
-  Wserver.wprint "%s" (capitale (transl conf "msg error disconnected"));
+  Wserver.printf "%s" (capitale (transl conf "msg error disconnected"));
   trailer conf;
   raise Update.ModErr
 };
@@ -1614,11 +1614,11 @@ value print_family conf base (wl, ml) cpl des = do {
   | None -> () ];
   tag "ul" begin
     stag "li" begin
-      Wserver.wprint "%s" (referenced_person_text conf base (poi base (Adef.father cpl)));
+      Wserver.printf "%s" (referenced_person_text conf base (poi base (Adef.father cpl)));
     end;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     stag "li" begin
-      Wserver.wprint "%s" (referenced_person_text conf base (poi base (Adef.mother cpl)));
+      Wserver.printf "%s" (referenced_person_text conf base (poi base (Adef.mother cpl)));
     end;
   end;
   if des.children <> [| |] then do {
@@ -1626,7 +1626,7 @@ value print_family conf base (wl, ml) cpl des = do {
       Array.iter
         (fun ip ->
           stag "li" begin
-            Wserver.wprint "%s" (referenced_person_text conf base (poi base ip));
+            Wserver.printf "%s" (referenced_person_text conf base (poi base ip));
           end
         )
         des.children;
@@ -1638,7 +1638,7 @@ value print_family conf base (wl, ml) cpl des = do {
 
 value print_mod_ok conf base (wl, ml) cpl des =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "family modified"))
+    Wserver.printf "%s" (capitale (transl conf "family modified"))
   in
   do {
     header conf title;
@@ -1646,15 +1646,15 @@ value print_mod_ok conf base (wl, ml) cpl des =
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
-         Wserver.wprint "<h3 class=\"error\">" ;
-         Wserver.wprint
+         Wserver.printf "<h3 class=\"error\">" ;
+         Wserver.printf
            (fcapitale (ftransl conf "%s forbidden char"))
            (List.fold_left
               (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
               " "
               Name.forbidden_char);
-         Wserver.wprint "</h3>\n" ;
-         List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
+         Wserver.printf "</h3>\n" ;
+         List.iter (Wserver.printf "<p>%s</p>") removed_string.val
       }
     else ();
     print_family conf base (wl, ml) cpl des;
@@ -1664,7 +1664,7 @@ value print_mod_ok conf base (wl, ml) cpl des =
 
 value print_change_event_order_ok conf base (wl, ml) cpl des =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "family modified"))
+    Wserver.printf "%s" (capitale (transl conf "family modified"))
   in
   do {
     header conf title;
@@ -1675,15 +1675,15 @@ value print_change_event_order_ok conf base (wl, ml) cpl des =
 ;
 
 value print_add_ok conf base (wl, ml) cpl des =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "family added")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "family added")) in
   do {
     header conf title;
     print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
-         Wserver.wprint "<h2 class=\"error\">%s</h2>\n" (capitale (transl conf "forbidden char"));
-         List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
+         Wserver.printf "<h2 class=\"error\">%s</h2>\n" (capitale (transl conf "forbidden char"));
+         List.iter (Wserver.printf "<p>%s</p>") removed_string.val
       }
     else ();
     print_family conf base (wl, ml) cpl des;
@@ -1693,7 +1693,7 @@ value print_add_ok conf base (wl, ml) cpl des =
 
 value print_del_ok conf base wl =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "family deleted"))
+    Wserver.printf "%s" (capitale (transl conf "family deleted"))
   in
   do {
     header conf title;
@@ -1702,8 +1702,8 @@ value print_del_ok conf base wl =
     [ Some i ->
         let p = poi base (Adef.iper_of_int i) in
         tag "ul" begin
-          Wserver.wprint "<li>\n";
-          Wserver.wprint "%s\n"
+          Wserver.printf "<li>\n";
+          Wserver.printf "%s\n"
             (reference conf base p (person_text conf base p));
         end
     | _ -> () ];
@@ -1714,13 +1714,13 @@ value print_del_ok conf base wl =
 
 value print_inv_ok conf base p =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "inversion done"))
+    Wserver.printf "%s" (capitale (transl conf "inversion done"))
   in
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    Wserver.wprint "\n";
+    Wserver.printf "\n%s" (referenced_person_text conf base p);
+    Wserver.printf "\n";
     trailer conf
   }
 ;

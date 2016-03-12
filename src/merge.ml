@@ -10,7 +10,7 @@ open Hutil;
 open Util;
 
 value print_someone conf base p =
-  Wserver.wprint "%s%s %s" (p_first_name base p)
+  Wserver.printf "%s%s %s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 ;
@@ -18,9 +18,9 @@ value print_someone conf base p =
 value print conf base p =
   let title h =
     do {
-      Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
+      Wserver.printf "%s" (capitale (transl_decline conf "merge" ""));
       if h then ()
-      else do { Wserver.wprint ": "; print_someone conf base p; };
+      else do { Wserver.printf ": "; print_someone conf base p; };
     }
   in
   let list = Gutil.find_same_name base p in
@@ -33,29 +33,29 @@ value print conf base p =
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
     tag "h2" begin title False; end;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
         xtag "input" "type=\"hidden\" name=\"m\" value=\"MRG_IND\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
           (Adef.int_of_iper (get_key_index p));
-        Wserver.wprint "%s " (capitale (transl_decline conf "with" ""));
+        Wserver.printf "%s " (capitale (transl_decline conf "with" ""));
         if list <> [] then do {
-          Wserver.wprint ":";
+          Wserver.printf ":";
           xtag "br";
           xtag "input" "\
 type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
         }
         else ();
-        Wserver.wprint "(%s . %s %s):\n"
+        Wserver.printf "(%s . %s %s):\n"
           (transl_nth conf "first name/first names" 0) (transl conf "number")
           (transl_nth conf "surname/surnames" 0);
         xtag "input" "name=\"n\" size=\"30\" maxlength=\"200\"";
         xtag "br";
       end;
       if list <> [] then
-        Wserver.wprint
+        Wserver.printf
           "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
       else ();
       List.iter
@@ -67,17 +67,17 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
              end;
              tag "td" begin
                stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-                 Wserver.wprint "%s.%d %s" (sou base (get_first_name p))
+                 Wserver.printf "%s.%d %s" (sou base (get_first_name p))
                    (get_occ p) (sou base (get_surname p));
                end;
-               Wserver.wprint "%s" (Date.short_dates_text conf base p);
+               Wserver.printf "%s" (Date.short_dates_text conf base p);
                match main_title conf base p with
-               [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
+               [ Some t -> Wserver.printf "%s" (one_title_text conf base p t)
                | None -> () ];
                match get_parents p with
                [ Some ifam ->
                    let cpl = foi base ifam in
-                   Wserver.wprint ",\n%s"
+                   Wserver.printf ",\n%s"
                      (Util.translate_eval
                        (transl_a_of_b conf
                           (transl_nth conf "son/daughter/child"
@@ -92,7 +92,7 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
              end;
            end)
         list;
-      if list <> [] then Wserver.wprint "</table>\n" else ();
+      if list <> [] then Wserver.printf "</table>\n" else ();
       tag "p" begin
         xtag "input" "type=\"submit\" value=\"Ok\"";
       end;
@@ -106,16 +106,16 @@ value print_possible_continue_merging conf base =
   [ (Some ini1, Some ini2) -> do {
       let p1 = poi base (Adef.iper_of_int ini1) in
       let p2 = poi base (Adef.iper_of_int ini2) in
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       html_p conf;
       stag "a" "href=%sm=MRG_IND;i=%d;i2=%d" (commd conf) ini1 ini2 begin
-        Wserver.wprint "%s" (capitale (transl conf "continue merging"));
+        Wserver.printf "%s" (capitale (transl conf "continue merging"));
       end;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       print_someone conf base p1;
-      Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
+      Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
       print_someone conf base p2;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
     }
   | _ ->
       match p_getint conf.env "ip" with
@@ -134,10 +134,10 @@ value print_possible_continue_merging conf base =
             tag "p" begin
               stag "a" "href=%sm=MRG_DUP;ip=%d%s%s" (commd conf) ip s1 s2
               begin
-                Wserver.wprint "%s"
+                Wserver.printf "%s"
                   (capitale (transl conf "continue merging"));
               end;
-              Wserver.wprint "\n(%s)\n"
+              Wserver.printf "\n(%s)\n"
                 (transl_a_of_b conf
                    (transl conf "possible duplications")
                    (referenced_person_text conf base

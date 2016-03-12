@@ -20,11 +20,11 @@ value f :
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)
 
-value wprint : format4 'a unit string unit -> 'a;
+value printf : format4 'a unit string unit -> 'a;
     (* To be called to print page contents. *)
 
-value nl : unit -> unit;
-    (* To print an end of line *)
+value header : format4 'a unit string unit -> 'a;
+    (* To print an http header line *)
 
 value wflush : unit -> unit;
     (* To flush page contents print. *)
@@ -81,7 +81,7 @@ value noproc : ref bool;
    - Source program "foo.ml":
         Wserver.f None 2371 60 None
            (fun _ s _ ->
-              Wserver.html ""; Wserver.wprint "You said: %s...\n" s);;
+              Wserver.http ""; Wserver.printf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
    - Run:

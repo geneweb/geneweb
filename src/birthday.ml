@@ -16,8 +16,8 @@ value print_anniversary_day conf base dead_people liste =
       (fun (p, a, date_event, txt_of) ->
          let is = index_of_sex (get_sex p) in
          tag "li" begin
-           Wserver.wprint "%s\n" (txt_of conf base p);
-           if not dead_people then Wserver.wprint " <em>%d</em>\n" a
+           Wserver.printf "%s\n" (txt_of conf base p);
+           if not dead_people then Wserver.printf " <em>%d</em>\n" a
            else
              let txt =
                match date_event with
@@ -29,7 +29,7 @@ value print_anniversary_day conf base dead_people liste =
                    transl_nth conf "executed (legally killed)" is
                | DeDeath Disappeared -> transl_nth conf "disappeared" is ]
              in
-             Wserver.wprint ", <em>%s %s %d</em>\n" txt
+             Wserver.printf ", <em>%s %s %d</em>\n" txt
                (transl conf "in (year)") a;
          end)
       liste;
@@ -43,7 +43,7 @@ value gen_print conf base mois f_scan dead_people =
       if dead_people then transl conf "anniversaries"
       else transl conf "birthdays"
     in
-    Wserver.wprint "%s %s" (capitale lab)
+    Wserver.printf "%s %s" (capitale lab)
       (Util.translate_eval (transl_nth conf "(month)" (mois - 1)))
   in
   do {
@@ -101,14 +101,14 @@ value gen_print conf base mois f_scan dead_people =
     print_link_to_welcome conf True;
     if List.for_all (fun l -> List.length l = 0) (Array.to_list tab) then
       tag "p" begin
-        Wserver.wprint "%s.\n" (capitale (transl conf "no anniversary"));
+        Wserver.printf "%s.\n" (capitale (transl conf "no anniversary"));
       end
     else ();
-    Wserver.wprint "<ul>\n";
+    Wserver.printf "<ul>\n";
     for j = 1 to 31 do {
       if tab.(pred j) <> [] then do {
         tag "li" begin
-          Wserver.wprint "%d\n" j;
+          Wserver.printf "%d\n" j;
           let liste =
             List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
               tab.(pred j)
@@ -118,7 +118,7 @@ value gen_print conf base mois f_scan dead_people =
       }
       else ()
     };
-    Wserver.wprint "</ul>\n";
+    Wserver.printf "</ul>\n";
     trailer conf;
   }
 ;
@@ -130,31 +130,31 @@ value print_anniversary_list conf base dead_people dt liste =
       (fun (p, a, date_event, txt_of) ->
          stagn "li" begin
            if dead_people then do {
-             Wserver.wprint "<em>";
+             Wserver.printf "<em>";
              match date_event with
-             [ DeBirth -> Wserver.wprint "%s" (transl conf "birth")
-             | DeDeath _ -> Wserver.wprint "%s" (transl conf "death") ];
-             Wserver.wprint "</em>\n";
-             Wserver.wprint "-&gt; ";
-             Wserver.wprint "%s" (txt_of conf base p);
-             Wserver.wprint "\n<em>%s %d" (transl conf "in (year)") a;
-             Wserver.wprint " (";
-             Wserver.wprint (ftransl conf "%d years ago")
+             [ DeBirth -> Wserver.printf "%s" (transl conf "birth")
+             | DeDeath _ -> Wserver.printf "%s" (transl conf "death") ];
+             Wserver.printf "</em>\n";
+             Wserver.printf "-&gt; ";
+             Wserver.printf "%s" (txt_of conf base p);
+             Wserver.printf "\n<em>%s %d" (transl conf "in (year)") a;
+             Wserver.printf " (";
+             Wserver.printf (ftransl conf "%d years ago")
                (conf.today.year - a);
-             Wserver.wprint ")</em>";
+             Wserver.printf ")</em>";
            }
            else do {
-             Wserver.wprint "%s" (txt_of conf base p);
+             Wserver.printf "%s" (txt_of conf base p);
              match get_death p with
              [ NotDead ->
                  do {
-                   Wserver.wprint " <em>";
+                   Wserver.printf " <em>";
                    match a_ref - a with
-                   [ 0 -> Wserver.wprint "%s" (transl conf "birth")
-                   | 1 -> Wserver.wprint "%s" (transl conf "one year old")
+                   [ 0 -> Wserver.printf "%s" (transl conf "birth")
+                   | 1 -> Wserver.printf "%s" (transl conf "one year old")
                    | n ->
-                       Wserver.wprint "%d %s" n (transl conf "years old") ];
-                   Wserver.wprint "</em>";
+                       Wserver.printf "%d %s" n (transl conf "years old") ];
+                   Wserver.printf "</em>";
                  }
              | _ -> () ];
            };
@@ -185,7 +185,7 @@ value print_birth_day conf base day_name fphrase wd dt list =
   match list with
   [ [] ->
       tag "p" begin
-        Wserver.wprint "%s %s.\n" (capitale (transl conf "no birthday"))
+        Wserver.printf "%s %s.\n" (capitale (transl conf "no birthday"))
           day_name;
       end
   | _ ->
@@ -195,10 +195,10 @@ value print_birth_day conf base day_name fphrase wd dt list =
             transl_decline conf "on (weekday day month year)"
               (transl_nth conf "(week day)" wd ^ " " ^ Date.code_dmy conf dt)
           in
-          Wserver.wprint fphrase
+          Wserver.printf fphrase
             (capitale day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
             (transl conf "the birthday");
-          Wserver.wprint "...\n";
+          Wserver.printf "...\n";
         end;
         print_anniversary_list conf base False dt list;
       } ]
@@ -208,7 +208,7 @@ value propose_months conf mode =
   do {
     begin_centered conf;
     stag "span" begin
-      Wserver.wprint "%s"
+      Wserver.printf "%s"
         (capitale (transl conf "select a month to see all the anniversaries"));
     end;
     tag "table" "border=\"%d\"" conf.border begin
@@ -224,7 +224,7 @@ value propose_months conf mode =
                     (if i = conf.today.month then " selected=\"selected\""
                      else "")
                   begin
-                    Wserver.wprint "%s"
+                    Wserver.printf "%s"
                       (capitale
                          (Util.translate_eval
                             (transl_nth conf "(month)" (i - 1))));
@@ -255,7 +255,7 @@ value print_anniv conf base day_name fphrase wd dt list =
   match list with
   [ [] ->
       tag "p" begin
-        Wserver.wprint "%s %s.\n" (capitale (transl conf "no anniversary"))
+        Wserver.printf "%s %s.\n" (capitale (transl conf "no anniversary"))
           day_name;
       end
   | _ ->
@@ -265,10 +265,10 @@ value print_anniv conf base day_name fphrase wd dt list =
             transl_decline conf "on (weekday day month year)"
               (transl_nth conf "(week day)" wd ^ " " ^ Date.code_dmy conf dt)
           in
-          Wserver.wprint fphrase
+          Wserver.printf fphrase
             (capitale day_name ^ ",\n" ^ std_color conf ("<b>" ^ txt ^ "</b>"))
             (transl conf "the anniversary");
-          Wserver.wprint "...\n";
+          Wserver.printf "...\n";
         end;
         print_anniversary_list conf base True dt list;
       } ]
@@ -277,7 +277,7 @@ value print_anniv conf base day_name fphrase wd dt list =
 value print_marriage conf base month =
   let title _ =
     let lab = transl conf "anniversaries of marriage" in
-    Wserver.wprint "%s %s" (capitale lab)
+    Wserver.printf "%s %s" (capitale lab)
       (transl_decline conf "in (month year)"
          (transl_nth conf "(month)" (month - 1)))
   in
@@ -301,35 +301,35 @@ value print_marriage conf base month =
             else ()
         | _ -> () ]
     };
-    Wserver.wprint "<ul>";
+    Wserver.printf "<ul>";
     for i = 1 to 31 do {
       match tab.(i - 1) with
       [ [] -> ()
       | l ->
           let l = List.sort (fun (fam1, y1) (fam2, y2) -> compare y1 y2) l in
           do {
-            Wserver.wprint "\n";
+            Wserver.printf "\n";
             html_li conf;
-            Wserver.wprint "%d\n<ul>" i;
+            Wserver.printf "%d\n<ul>" i;
             List.iter
               (fun (fam, year) ->
                  do {
                    html_li conf;
-                   Wserver.wprint "%s"
+                   Wserver.printf "%s"
                      (referenced_person_title_text conf base
                         (pget conf base (get_father fam)));
-                   Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
-                   Wserver.wprint "%s"
+                   Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
+                   Wserver.printf "%s"
                      (referenced_person_title_text conf base
                         (pget conf base (get_mother fam)));
-                   Wserver.wprint ", <em>%s %d</em>\n"
+                   Wserver.printf ", <em>%s %d</em>\n"
                      (transl conf "in (year)") year;
                  })
               l;
-            Wserver.wprint "</ul>\n";
+            Wserver.printf "</ul>\n";
           } ]
     };
-    Wserver.wprint "</ul>\n";
+    Wserver.printf "</ul>\n";
     trailer conf;
   }
 ;
@@ -339,17 +339,17 @@ value print_anniversaries_of_marriage conf base y list =
     List.iter
       (fun (fam, year) ->
          stagn "li" begin
-           Wserver.wprint "%s\n"
+           Wserver.printf "%s\n"
              (referenced_person_title_text conf base
                 (pget conf base (get_father fam)));
-           Wserver.wprint "%s\n" (transl_nth conf "and" 0);
-           Wserver.wprint "%s"
+           Wserver.printf "%s\n" (transl_nth conf "and" 0);
+           Wserver.printf "%s"
              (referenced_person_title_text conf base
                 (pget conf base (get_mother fam)));
-           Wserver.wprint ", <em>%s %d\n(" (transl conf "in (year)") year;
-           Wserver.wprint (ftransl conf "%d years ago")
+           Wserver.printf ", <em>%s %d\n(" (transl conf "in (year)") year;
+           Wserver.printf (ftransl conf "%d years ago")
              (conf.today.year - year);
-           Wserver.wprint "</em>)";
+           Wserver.printf "</em>)";
          end)
       list;
   end
@@ -359,13 +359,13 @@ value print_marriage_day conf base day_name fphrase wd dt list =
   match list with
   [ [] ->
       tag "p" begin
-        Wserver.wprint "%s %s.\n" (capitale (transl conf "no anniversary"))
+        Wserver.printf "%s %s.\n" (capitale (transl conf "no anniversary"))
           day_name;
       end
   | _ ->
       do {
         tag "p" begin
-          Wserver.wprint fphrase
+          Wserver.printf fphrase
             (capitale day_name ^ ",\n" ^
              std_color conf
                 ("<b>" ^
@@ -374,7 +374,7 @@ value print_marriage_day conf base day_name fphrase wd dt list =
                         Date.code_dmy conf dt) ^
                    "</b>"))
             (transl conf "the anniversary of marriage");
-          Wserver.wprint "...\n";
+          Wserver.printf "...\n";
         end;
         print_anniversaries_of_marriage conf base dt.year list;
       } ]
@@ -390,7 +390,7 @@ value match_dates conf base p d1 d2 =
 ;
 
 value gen_print_menu_birth conf base f_scan mode =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "birthdays")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "birthdays")) in
   let tom = day_after conf.today in
   let aft = day_after tom in
   let list_tod = ref [] in
@@ -435,9 +435,9 @@ value gen_print_menu_birth conf base f_scan mode =
     print_birth_day conf base (transl conf "the day after tomorrow")
       (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     propose_months conf mode;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf;
   }
 ;
@@ -460,7 +460,7 @@ value print_menu_birth conf base =
 
 value gen_print_menu_dead conf base f_scan mode =
   let title _ =
-    Wserver.wprint "%s"
+    Wserver.printf "%s"
       (capitale (transl conf "anniversaries of dead people"))
   in
   let tom = day_after conf.today in
@@ -529,9 +529,9 @@ value gen_print_menu_dead conf base f_scan mode =
     print_anniv conf base (transl conf "the day after tomorrow")
       (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     propose_months conf mode;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf;
   }
 ;
@@ -565,7 +565,7 @@ value match_mar_dates conf base cpl d1 d2 =
 
 value print_menu_marriage conf base =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "anniversaries of marriage"))
+    Wserver.printf "%s" (capitale (transl conf "anniversaries of marriage"))
   in
   let tom = day_after conf.today in
   let aft = day_after tom in
@@ -611,10 +611,10 @@ value print_menu_marriage conf base =
     print_marriage_day conf base (transl conf "the day after tomorrow")
       (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     let mode () = xtag "input" "type=\"hidden\" name=\"m\" value=\"AM\"" in
     propose_months conf mode;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf;
   }
 ;

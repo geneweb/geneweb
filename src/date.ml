@@ -828,33 +828,33 @@ value print_dates conf base p =
     match Adef.od_of_codate (get_birth p)with
     [ Some d ->
         do {
-          Wserver.wprint "%s " (cap (transl_nth conf "born" is));
-          Wserver.wprint "%s" (string_of_ondate conf d);
-          if birth_place <> "" then Wserver.wprint ",\n" else ();
+          Wserver.printf "%s " (cap (transl_nth conf "born" is));
+          Wserver.printf "%s" (string_of_ondate conf d);
+          if birth_place <> "" then Wserver.printf ",\n" else ();
         }
     | None ->
         if birth_place <> "" then
-          Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
+          Wserver.printf "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
         else () ];
     if birth_place <> "" then
-      Wserver.wprint "%s" (string_of_place conf birth_place)
+      Wserver.printf "%s" (string_of_place conf birth_place)
     else ();
     let baptism = Adef.od_of_codate (get_baptism p) in
     let baptism_place = sou base (get_baptism_place p) in
     match baptism with
     [ Some d ->
         do {
-          Wserver.wprint "%s " (cap (transl_nth conf "baptized" is));
-          Wserver.wprint "%s" (string_of_ondate conf d);
-          if baptism_place <> "" then Wserver.wprint ",\n" else ();
+          Wserver.printf "%s " (cap (transl_nth conf "baptized" is));
+          Wserver.printf "%s" (string_of_ondate conf d);
+          if baptism_place <> "" then Wserver.printf ",\n" else ();
         }
     | None ->
         if baptism_place <> "" then
-          Wserver.wprint "%s\n-&nbsp;"
+          Wserver.printf "%s\n-&nbsp;"
             (cap (transl_nth conf "baptized" is))
         else () ];
     if baptism_place <> "" then
-      Wserver.wprint "%s" (string_of_place conf baptism_place)
+      Wserver.printf "%s" (string_of_place conf baptism_place)
     else ();
     let death_place = sou base (get_death_place p) in
     match get_death p with
@@ -869,27 +869,27 @@ value print_dates conf base p =
         in
         let d = Adef.date_of_cdate d in
         do {
-          Wserver.wprint "%s " (cap dr_w);
-          Wserver.wprint "%s" (string_of_ondate conf d);
-          if death_place <> "" then Wserver.wprint ",\n" else ();
+          Wserver.printf "%s " (cap dr_w);
+          Wserver.printf "%s" (string_of_ondate conf d);
+          if death_place <> "" then Wserver.printf ",\n" else ();
         }
     | DeadYoung ->
         do {
-          Wserver.wprint "%s" (cap (transl_nth conf "died young" is));
-          if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
+          Wserver.printf "%s" (cap (transl_nth conf "died young" is));
+          if death_place <> "" then Wserver.printf "\n-&nbsp;" else ();
         }
     | DeadDontKnowWhen ->
         match (death_place, get_burial p) with
         [ ("", Buried _ | Cremated _) -> ()
         | _ ->
             if death_place <> "" || not (of_course_died conf p) then do {
-              Wserver.wprint "%s" (cap (transl_nth conf "died" is));
-              if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
+              Wserver.printf "%s" (cap (transl_nth conf "died" is));
+              if death_place <> "" then Wserver.printf "\n-&nbsp;" else ();
             }
             else () ]
     | DontKnowIfDead | NotDead | OfCourseDead -> () ];
     if death_place <> "" then
-      Wserver.wprint "%s" (string_of_place conf death_place)
+      Wserver.printf "%s" (string_of_place conf death_place)
     else ();
     let burial_date_place cod =
       let place = sou base (get_burial_place p) in
@@ -897,24 +897,24 @@ value print_dates conf base p =
          match Adef.od_of_codate cod with
          [ Some d ->
              do {
-               Wserver.wprint " %s" (string_of_ondate conf d);
-               if place <> "" then Wserver.wprint ",\n" else ();
+               Wserver.printf " %s" (string_of_ondate conf d);
+               if place <> "" then Wserver.printf ",\n" else ();
              }
-         | None -> if place <> "" then Wserver.wprint " -&nbsp;" else () ];
+         | None -> if place <> "" then Wserver.printf " -&nbsp;" else () ];
          if place <> "" then
-           Wserver.wprint "%s" (string_of_place conf place)
+           Wserver.printf "%s" (string_of_place conf place)
          else ();
       }
     in
     match get_burial p with
     [ Buried cod ->
         do {
-          Wserver.wprint "%s" (cap (transl_nth conf "buried" is));
+          Wserver.printf "%s" (cap (transl_nth conf "buried" is));
           burial_date_place cod;
         }
     | Cremated cod ->
         do {
-          Wserver.wprint "%s" (cap (transl_nth conf "cremated" is));
+          Wserver.printf "%s" (cap (transl_nth conf "cremated" is));
           burial_date_place cod;
         }
     | UnknownBurial -> () ];
@@ -926,12 +926,12 @@ value print_dates conf base p =
         let a = CheckItem.time_elapsed d1 d2 in
         if a.year < 0 || a.year = 0 && a.month = 0 then ()
         else do {
-          Wserver.wprint "\n(";
-          Wserver.wprint "%s " (transl conf "age at death:");
+          Wserver.printf "\n(";
+          Wserver.printf "%s " (transl conf "age at death:");
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
           else
-            Wserver.wprint "%s " (transl_decline conf "possibly (date)" "");
-          Wserver.wprint "%s)" (string_of_age conf a);
+            Wserver.printf "%s " (transl_decline conf "possibly (date)" "");
+          Wserver.printf "%s)" (string_of_age conf a);
         }
     | _ -> () ];
   }
@@ -1067,7 +1067,7 @@ value print_month conf date month_name n_months var =
           stagn "option" "value=\"%d\"%s" i
             (if date.month = i then " selected=\"selected\"" else "")
           begin
-            Wserver.wprint "%s" (month_name conf (i - 1));
+            Wserver.printf "%s" (month_name conf (i - 1));
           end
         };
       end;
@@ -1095,13 +1095,13 @@ value print_day conf date var =
 
 value print_some_calendar conf order date cal n month_name n_months var =
   do {
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     tag "tr" "align=\"%s\"" conf.left begin
       stag "th" begin
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
       end;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       match order with
       [ "yymmdd" | "yyyymmdd" ->
           do {
@@ -1131,40 +1131,40 @@ value print_some_calendar conf order date cal n month_name n_months var =
 
 value print_calendar_head conf order =
   tag "tr" "align=\"%s\"" conf.left begin
-    stag "td" begin Wserver.wprint "&nbsp;"; end;
-    Wserver.wprint "\n";
+    stag "td" begin Wserver.printf "&nbsp;"; end;
+    Wserver.printf "\n";
     match order with
     [ "yymmdd" | "yyyymmdd" ->
       for i = 0 to 2 do {
         stag "th" "align=\"center\" colspan=\"3\"" begin
-          Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
+          Wserver.printf "%s" (capitale (transl_nth conf "year/month/day" i));
         end;
-        Wserver.wprint "\n";
+        Wserver.printf "\n";
       }
     | "mmddyyyy" ->
         for i = 0 to 2 do {
           let nth = abs (-i*i + max i 1) in
           stag "th" "align=\"center\" colspan=\"3\"" begin
-            Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" nth));
+            Wserver.printf "%s" (capitale (transl_nth conf "year/month/day" nth));
           end;
-          Wserver.wprint "\n";
+          Wserver.printf "\n";
         }
     | _ ->
         for i = 2 downto 0 do {
           stag "th" "align=\"center\" colspan=\"3\"" begin
-            Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
+            Wserver.printf "%s" (capitale (transl_nth conf "year/month/day" i));
           end;
-          Wserver.wprint "\n";
+          Wserver.printf "\n";
         }
     ];
-    stag "td" begin Wserver.wprint "&nbsp;"; end;
-    Wserver.wprint "\n";
+    stag "td" begin Wserver.printf "&nbsp;"; end;
+    Wserver.printf "\n";
   end
 ;
 
 value old_print_calendar conf base =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl_nth conf "calendar/calendars" 1))
+    Wserver.printf "%s" (capitale (transl_nth conf "calendar/calendars" 1))
   in
   let sdn = eval_julian_day conf in
   let date = Calendar.gregorian_of_sdn Sure sdn in
@@ -1181,18 +1181,18 @@ value old_print_calendar conf base =
       stag "tbody" begin
         stag "tr" begin
           tag "td" "align=\"%s\"" conf.left begin
-            Wserver.wprint "- %s -"
+            Wserver.printf "- %s -"
               (capitale (nominative (transl_nth conf "(week day)" wday)));
             if date = conf.today then
               let (hh, mm, ss) = conf.time in
-              Wserver.wprint " <tt>%02d:%02d:%02d</tt>" hh mm ss
+              Wserver.printf " <tt>%02d:%02d:%02d</tt>" hh mm ss
             else ();
-            Wserver.wprint "\n";
+            Wserver.printf "\n";
           end;
         end;
         stag "tr" begin
           stag "td" "align=\"%s\"" conf.left begin
-            Wserver.wprint "&nbsp;";
+            Wserver.printf "&nbsp;";
           end;
         end;
         stag "tr" begin
@@ -1239,29 +1239,29 @@ value old_print_calendar conf base =
                   match mp with
                   [ None -> ()
                   | Some (Calendar.NewMoon, hh, mm) ->
-                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                      Wserver.printf "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 1)) hh mm
                   | Some (Calendar.FirstQuarter, hh, mm) ->
-                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                      Wserver.printf "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 2)) hh mm
                   | Some (Calendar.FullMoon, hh, mm) ->
-                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                      Wserver.printf "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 3)) hh mm
                   | Some (Calendar.LastQuarter, hh, mm) ->
-                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                      Wserver.printf "%s - <tt>%02d:%02d</tt> UT"
                         (capitale (moon_txt 4)) hh mm ];
                   xtag "br";
                   stag "span" "style=\"font-size:80%%\"" begin
-                    Wserver.wprint "(%s = %d)" (moon_txt 0) md;
+                    Wserver.printf "(%s = %d)" (moon_txt 0) md;
                   end;
                 }
             | None -> () ];
             xtag "br";
             xtag "br";
-            Wserver.wprint "%s: " (capitale (transl conf "julian day"));
-            if sdn < 0 then Wserver.wprint "%d" sdn
+            Wserver.printf "%s: " (capitale (transl conf "julian day"));
+            if sdn < 0 then Wserver.printf "%d" sdn
             else
-              Num.print (fun x -> Wserver.wprint "%s" x)
+              Num.print (fun x -> Wserver.printf "%s" x)
                 (transl conf "(thousand separator)") (Num.of_int sdn);
           end;
         end;

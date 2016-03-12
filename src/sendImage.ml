@@ -11,18 +11,18 @@ open Util;
 value incorrect conf = do { incorrect_request conf; raise Update.ModErr };
 
 value incorrect_content_type conf base p s =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
     print_link_to_welcome conf True;
     tag "p" begin
-      Wserver.wprint "<em style=\"font-size:smaller\">";
-      Wserver.wprint "Error: incorrect image content type: %s" s;
-      Wserver.wprint "</em>\n";
+      Wserver.printf "<em style=\"font-size:smaller\">";
+      Wserver.printf "Error: incorrect image content type: %s" s;
+      Wserver.printf "</em>\n";
     end;
     tag "ul" begin
       tag "li" begin
-        Wserver.wprint "%s" (referenced_person_title_text conf base p);
+        Wserver.printf "%s" (referenced_person_title_text conf base p);
       end;
     end;
     trailer conf;
@@ -31,19 +31,19 @@ value incorrect_content_type conf base p s =
 ;
 
 value error_too_big_image conf base p len max_len =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<p><em style=\"font-size:smaller\">";
-    Wserver.wprint "Error: this image is too big: %d bytes<br%s>\n" len
+    Wserver.printf "<p><em style=\"font-size:smaller\">";
+    Wserver.printf "Error: this image is too big: %d bytes<br%s>\n" len
       conf.xhs;
-    Wserver.wprint "Maximum authorized in this database: %d bytes<br%s>\n"
+    Wserver.printf "Maximum authorized in this database: %d bytes<br%s>\n"
       max_len conf.xhs;
-    Wserver.wprint "</em></p>\n";
+    Wserver.printf "</em></p>\n";
     tag "ul" begin
       tag "li" begin
-        Wserver.wprint "%s" (referenced_person_title_text conf base p);
+        Wserver.printf "%s" (referenced_person_title_text conf base p);
       end;
     end;
     trailer conf;
@@ -63,7 +63,7 @@ value print_link_delete_image conf base p =
         stag "a" "href=\"%sm=DEL_IMAGE;i=%d\""
           (commd conf) (Adef.int_of_iper (get_key_index p))
         begin
-          Wserver.wprint "%s %s"
+          Wserver.printf "%s %s"
             (capitale (transl conf "delete"))
             (transl_nth conf "image/images" 0);
         end;
@@ -78,19 +78,19 @@ value print_send_image conf base p =
   let title h =
     do {
       if Util.has_image conf base p then
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (capitale
              (transl_decline conf "modify" (transl_nth conf "image/images" 0)))
       else
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (capitale
              (transl_decline conf "add" (transl_nth conf "image/images" 0)));
       if h then ()
       else do {
         let fn = p_first_name base p in
         let sn = p_surname base p in
-        Wserver.wprint ": ";
-        Wserver.wprint "%s %s" fn sn;
+        Wserver.printf ": ";
+        Wserver.printf "%s %s" fn sn;
         Util.print_reference conf fn (get_occ p) sn
       }
     }
@@ -108,14 +108,14 @@ value print_send_image conf base p =
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
           (Adef.int_of_iper (get_key_index p));
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
-        Wserver.wprint "%s:\n" (capitale (transl conf "file"));
+        Wserver.printf "%s:\n" (capitale (transl conf "file"));
         xtag "input" "\
 type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
       end;
       match p_getint conf.base_env "max_images_size" with
       [ Some len ->
           tag "p" begin
-            Wserver.wprint "(maximum authorized size = %d bytes)\n" len;
+            Wserver.printf "(maximum authorized size = %d bytes)\n" len;
           end
       | None -> () ];
       tag "p" begin
@@ -144,7 +144,7 @@ value print conf base =
 value print_delete_image conf base p =
   let title h =
     do {
-      Wserver.wprint "%s"
+      Wserver.printf "%s"
         (capitale
            (transl_decline conf "delete" (transl_nth conf "image/images" 0)));
       if h then ()
@@ -155,26 +155,26 @@ value print_delete_image conf base p =
           if fn = "?" || sn = "?" then Adef.int_of_iper (get_key_index p)
           else get_occ p
         in
-        Wserver.wprint ": ";
-        Wserver.wprint "%s.%d %s" fn occ sn
+        Wserver.printf ": ";
+        Wserver.printf "%s.%d %s" fn occ sn
       }
     }
   in
   do {
     header conf title;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint
+      Wserver.printf
         "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
-      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
+      Wserver.printf "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
         (Adef.int_of_iper (get_key_index p));
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       html_p conf;
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
     end;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf
   }
 ;
@@ -195,13 +195,13 @@ value print_del conf base =
 
 value print_sent conf base p =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "image received"))
+    Wserver.printf "%s" (capitale (transl conf "image received"))
   in
   do {
     header conf title;
     tag "ul" begin
       stag "li" begin
-        Wserver.wprint "%s" (referenced_person_text conf base p);
+        Wserver.printf "%s" (referenced_person_text conf base p);
       end;
     end;
     trailer conf
@@ -357,14 +357,14 @@ value print_send_ok conf base =
 
 value print_deleted conf base p =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "image deleted"))
+    Wserver.printf "%s" (capitale (transl conf "image deleted"))
   in
   do {
     header conf title;
     tag "ul" begin
       html_li conf;
-      Wserver.wprint "\n%s" (referenced_person_text conf base p);
-      Wserver.wprint "\n";
+      Wserver.printf "\n%s" (referenced_person_text conf base p);
+      Wserver.printf "\n";
     end;
     trailer conf
   }

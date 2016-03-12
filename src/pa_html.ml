@@ -29,9 +29,9 @@ value tag_encloser loc tag newl enewl a el =
       | None -> ("", []) ]
     in
     List.fold_left (fun f e -> <:expr< $f$ $e$ >>)
-      <:expr< Wserver.wprint $str:"<" ^ tag ^ frm ^ ">" ^ s$ >> al
+      <:expr< Wserver.printf $str:"<" ^ tag ^ frm ^ ">" ^ s$ >> al
   in
-  [e :: el @ [<:expr< Wserver.wprint $str:"</" ^ tag ^ ">" ^ se$ >>]]
+  [e :: el @ [<:expr< Wserver.printf $str:"</" ^ tag ^ ">" ^ se$ >>]]
 ;
 
 value tag_alone loc tag a =
@@ -52,7 +52,7 @@ value tag_alone loc tag a =
       | None -> ("", []) ]
     in
     List.fold_left (fun f e -> <:expr< $f$ $e$ >>)
-      <:expr< Wserver.wprint $str:"<" ^ tag ^ frm ^ "%s>" ^ s$ >> al
+      <:expr< Wserver.printf $str:"<" ^ tag ^ frm ^ "%s>" ^ s$ >> al
   in
   <:expr< $e$ conf.xhs >>
 ;

@@ -29,7 +29,6 @@ value get_referer : config -> string;
 value no_html_tags : string -> string;
 value clean_html_tags : string -> list string -> string;
 
-value nl : unit -> unit;
 value html : config -> unit;
 value html_br : config -> unit;
 value html_p : config -> unit;

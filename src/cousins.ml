@@ -117,7 +117,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   let print_nospouse _ =
     do {
       Perso.print_sosa conf base p2 True;
-      Wserver.wprint "%s%s"
+      Wserver.printf "%s%s"
         (gen_person_title_text reference std_access conf base p2)
         (Date.short_dates_text conf base p2)
     }
@@ -126,15 +126,15 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
     do {
       if first then do {
         Perso.print_sosa conf base p2 True;
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (gen_person_title_text reference std_access conf base p2)
       }
       else do {
-        Wserver.wprint "<br%s>%s" conf.xhs (person_title_text conf base p2)
+        Wserver.printf "<br%s>%s" conf.xhs (person_title_text conf base p2)
       };
-      Wserver.wprint "%s &amp; " (Date.short_dates_text conf base p2);
+      Wserver.printf "%s &amp; " (Date.short_dates_text conf base p2);
       Perso.print_sosa conf base sp True;
-      Wserver.wprint "%s%s"
+      Wserver.printf "%s%s"
         (gen_person_title_text (reference_sp sp) std_access conf base sp)
         (Date.short_dates_text conf base sp)
     }
@@ -166,7 +166,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
 
 value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
   if lev > 0 && cnt.val < max_cnt then do {
-    if lev <= 2 then Wserver.wprint "<ul>\n" else ();
+    if lev <= 2 then Wserver.printf "<ul>\n" else ();
     List.iter
       (fun (ip, ia_asex, rev_br) ->
          let p = pget conf base ip in
@@ -175,7 +175,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
          if is_valid_rel && cnt.val < max_cnt && has_desc_lev conf base lev p
          then do {
            if lev <= 2 then do {
-             Wserver.wprint "<li>\n";
+             Wserver.printf "<li>\n";
              if lev = 1 then do {
                give_access conf base ia_asex ini_p ini_br p br; incr cnt
              }
@@ -185,8 +185,8 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    (transl_nth conf "child/children" 1)
                    (person_title_text conf base p)
                in
-               Wserver.wprint "%s" (capitale (Util.translate_eval s));
-               Wserver.wprint ":"
+               Wserver.printf "%s" (capitale (Util.translate_eval s));
+               Wserver.printf ":"
              }
            }
            else ();
@@ -198,11 +198,11 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
            in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
              children;
-           if lev <= 2 then Wserver.wprint "</li>\n" else ()
+           if lev <= 2 then Wserver.printf "</li>\n" else ()
          }
          else ())
       children;
-    if lev <= 2 then Wserver.wprint "</ul>\n" else ()
+    if lev <= 2 then Wserver.printf "</ul>\n" else ()
   }
   else ()
 ;
@@ -217,8 +217,8 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
     if tips then Util.print_tips_relationship conf
     else ();
     if lev1 > 1 then do {
-      Wserver.wprint "<li>\n";
-      Wserver.wprint "%s:\n"
+      Wserver.printf "<li>\n";
+      Wserver.printf "%s:\n"
         (capitale
            (cftransl conf "on %s's side"
               [gen_person_title_text no_reference raw_access conf base a]))
@@ -226,7 +226,7 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
     else ();
     let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
     print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
-    if lev1 > 1 then Wserver.wprint "</li>\n" else ();
+    if lev1 > 1 then Wserver.printf "</li>\n" else ();
     True
   }
   else False
@@ -239,7 +239,7 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
   in
   let last_sosa = Num.twice first_sosa in
   do {
-    if lev1 > 1 then Wserver.wprint "<ul>\n" else ();
+    if lev1 > 1 then Wserver.printf "<ul>\n" else ();
     let some =
       loop first_sosa False True where rec loop sosa some print_tips =
         if cnt.val < max_cnt && Num.gt last_sosa sosa then
@@ -256,8 +256,8 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
     in
     if some then ()
     else
-      Wserver.wprint "%s.\n" (capitale (transl conf "no match"));
-    if lev1 > 1 then Wserver.wprint "</ul>\n" else ()
+      Wserver.printf "%s.\n" (capitale (transl conf "no match"));
+    if lev1 > 1 then Wserver.printf "</ul>\n" else ()
   }
 ;
 
@@ -271,21 +271,21 @@ value print_cousins conf base p lev1 lev2 =
         transl_a_of_gr_eq_gen_lev conf
           (brother_label conf lev1) (txt_fun raw_access conf base p)
       in
-      Wserver.wprint "%s" (capitale (Util.translate_eval s))
+      Wserver.printf "%s" (capitale (Util.translate_eval s))
     else if lev1 = 2 && lev2 = 1 then
       let s =
         transl_a_of_b conf (transl conf "uncles and aunts")
           (txt_fun raw_access conf base p)
       in
-      Wserver.wprint "%s" (capitale (Util.translate_eval s))
+      Wserver.printf "%s" (capitale (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 2 then
       let s =
         transl_a_of_gr_eq_gen_lev conf
           (transl conf "nephews and nieces") (txt_fun raw_access conf base p)
       in
-      Wserver.wprint "%s" (capitale (Util.translate_eval s))
+      Wserver.printf "%s" (capitale (Util.translate_eval s))
     else
-      Wserver.wprint "%s %d / %s %d" (capitale (transl conf "ancestors")) lev1
+      Wserver.printf "%s %d / %s %d" (capitale (transl conf "ancestors")) lev1
         (capitale (transl conf "descendants")) lev2
   in
   let max_cnt =
@@ -300,9 +300,9 @@ value print_cousins conf base p lev1 lev2 =
     let () = Perso.build_sosa_ht conf base in
     print_cousins_lev conf base max_cnt p lev1 lev2;
     tag "p" begin
-      if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
+      if cnt.val >= max_cnt then Wserver.printf "etc...\n"
       else if cnt.val > 1 then
-        Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val
+        Wserver.printf "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val
           (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
       else ();
     end;

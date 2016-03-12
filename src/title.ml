@@ -347,46 +347,46 @@ value give_access_someone conf base (x, t) list =
     | _ -> False ]
   in
   do {
-    if has_dates then Wserver.wprint "<em>" else ();
+    if has_dates then Wserver.printf "<em>" else ();
     match t_date_start with
-    [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
+    [ Some (Dgreg d _) -> Wserver.printf "%d" d.year
     | _ -> () ];
     match t_date_end with
-    [ Some (Dgreg d _) -> Wserver.wprint "-%d" d.year
+    [ Some (Dgreg d _) -> Wserver.printf "-%d" d.year
     | _ -> () ];
-    if has_dates then Wserver.wprint "</em>: " else ();
-    if List.mem x list then Wserver.wprint "<em>"
-    else Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
+    if has_dates then Wserver.printf "</em>: " else ();
+    if List.mem x list then Wserver.printf "<em>"
+    else Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base x);
     match (t.t_name, get_public_name x, get_qualifiers x) with
     [ (Tmain, pn, [nn :: _]) when sou base pn <> "" ->
-        Wserver.wprint "%s <em>%s</em> %s" (sou base pn) (sou base nn)
+        Wserver.printf "%s <em>%s</em> %s" (sou base pn) (sou base nn)
           (p_surname base x)
     | (Tmain, pn, []) when sou base pn <> "" ->
-        Wserver.wprint "%s %s" (sou base pn) (p_surname base x)
+        Wserver.printf "%s %s" (sou base pn) (p_surname base x)
     | (Tname n, _, [nn :: _]) ->
-        Wserver.wprint "%s <em>%s</em> %s" (sou base n) (sou base nn)
+        Wserver.printf "%s <em>%s</em> %s" (sou base n) (sou base nn)
           (p_surname base x)
     | (Tname n, _, []) ->
-        Wserver.wprint "%s %s" (sou base n) (p_surname base x)
-    | _ -> Wserver.wprint "%s" (person_text conf base x) ];
-    Wserver.wprint "\n";
-    Wserver.wprint "%s" (Date.short_dates_text conf base x);
+        Wserver.printf "%s %s" (sou base n) (p_surname base x)
+    | _ -> Wserver.printf "%s" (person_text conf base x) ];
+    Wserver.printf "\n";
+    Wserver.printf "%s" (Date.short_dates_text conf base x);
     if t.t_nth <> 0 then
-      Wserver.wprint " (%s)"
+      Wserver.printf " (%s)"
         (if t.t_nth >= 100 then string_of_int t.t_nth
          else transl_nth conf "nth" t.t_nth)
     else ();
-    if List.mem x list then Wserver.wprint "</em>"
-    else Wserver.wprint "</a>";
+    if List.mem x list then Wserver.printf "</em>"
+    else Wserver.printf "</a>";
   }
 ;
 
 value give_access_title conf t p =
   do {
-    Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
+    Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
       (code_varenv t) (code_varenv p);
-    Wserver.wprint "%s" (capitale t);
-    Wserver.wprint "</a>\n";
+    Wserver.printf "%s" (capitale t);
+    Wserver.printf "</a>\n";
   }
 ;
 
@@ -394,16 +394,16 @@ value give_access_all_titles conf t absolute =
   stag "a" "href=\"%sm=TT;sm=S;t=%s%s\"" (commd conf) (code_varenv t)
     (if absolute then ";a=A" else "")
   begin
-    Wserver.wprint "%s" (if absolute then t else capitale t);
+    Wserver.printf "%s" (if absolute then t else capitale t);
   end
 ;
 
 value give_access_all_places conf t =
   do {
-    Wserver.wprint "<a href=\"%sm=TT;sm=S;p=%s\">" (commd conf)
+    Wserver.printf "<a href=\"%sm=TT;sm=S;p=%s\">" (commd conf)
       (code_varenv t);
-    Wserver.wprint "... %s" t;
-    Wserver.wprint "</a>\n";
+    Wserver.printf "... %s" t;
+    Wserver.printf "</a>\n";
   }
 ;
 
@@ -411,20 +411,20 @@ value print_title_place_list conf base t p t_equiv list =
   let absolute = p_getenv conf.env "a" = Some "A" in
   let title h =
     if h || absolute then do {
-      Wserver.wprint "%s" t;
-      if p <> "" then Wserver.wprint " %s" p else ()
+      Wserver.printf "%s" t;
+      if p <> "" then Wserver.printf " %s" p else ()
     }
     else
       list_iter_first
         (fun first t -> do {
-           if not first then Wserver.wprint ",\n" else ();
-           Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;a=A\">" (commd conf)
+           if not first then Wserver.printf ",\n" else ();
+           Wserver.printf "<a href=\"%sm=TT;sm=S;t=%s;a=A\">" (commd conf)
              (code_varenv t);
-           Wserver.wprint "%s</a>" t;
+           Wserver.printf "%s</a>" t;
            if p <> "" then do {
-             Wserver.wprint "\n<a href=\"%sm=TT;sm=S;p=%s;a=A\">" (commd conf)
+             Wserver.printf "\n<a href=\"%sm=TT;sm=S;p=%s;a=A\">" (commd conf)
                (code_varenv p);
-             Wserver.wprint "%s</a>" p;
+             Wserver.printf "%s</a>" p;
            }
            else ()
          })
@@ -458,18 +458,18 @@ value print_title_place_list conf base t p t_equiv list =
     match List.rev list with
     [ [_; _ :: _] as list ->
         tag "p" begin
-          Wserver.wprint "<a href=\"%sm=RLM" (commd conf);
+          Wserver.printf "<a href=\"%sm=RLM" (commd conf);
           let _ =
             List.fold_left
               (fun i (p, n) ->
                  do {
-                   Wserver.wprint ";i%d=%d;t%d=%d" i
+                   Wserver.printf ";i%d=%d;t%d=%d" i
                      (Adef.int_of_iper (get_key_index p)) i n;
                    i + 1
                  })
               1 list
           in
-          Wserver.wprint ";lim=6\">%s</a>\n" (capitale (transl conf "tree"));
+          Wserver.printf ";lim=6\">%s</a>\n" (capitale (transl conf "tree"));
         end
     | _ -> () ];
     trailer conf;
@@ -477,23 +477,23 @@ value print_title_place_list conf base t p t_equiv list =
 ;
 
 value print_all_with_place_list conf base p list =
-  let title _ = Wserver.wprint "... %s\n" p in
+  let title _ = Wserver.printf "... %s\n" p in
   do {
     header conf title;
-    Wserver.wprint "<ul>\n";
+    Wserver.printf "<ul>\n";
     let _ =
       List.fold_left
         (fun list ((p, t) as x) ->
            do {
              html_li conf;
              give_access_someone conf base x [];
-             Wserver.wprint ", %s\n" (sou base t.t_ident);
-             Wserver.wprint "\n";
+             Wserver.printf ", %s\n" (sou base t.t_ident);
+             Wserver.printf "\n";
              [fst x :: list]
            })
         [] list
     in
-    Wserver.wprint "</ul>\n";
+    Wserver.printf "</ul>\n";
     trailer conf;
   }
 ;
@@ -512,11 +512,11 @@ value print_all_with_place conf base p =
 
 value print_places_list conf base t t_equiv list = do {
   let title h =
-    if h || List.length t_equiv = 1 then Wserver.wprint "%s" t
+    if h || List.length t_equiv = 1 then Wserver.printf "%s" t
     else
       list_iter_first
         (fun first t -> do {
-           Wserver.wprint "%s" (if first then "" else ", ");
+           Wserver.printf "%s" (if first then "" else ", ");
            give_access_all_titles conf t True;
          })
         t_equiv
@@ -528,8 +528,8 @@ value print_places_list conf base t t_equiv list = do {
     stag "a" "href=\"%sm=TT;sm=S;t=%s;p=%s%s\"" (commd conf) (code_varenv t)
       (code_varenv p) (if absolute then ";a=A" else "")
     begin
-      if p = "" then Wserver.wprint "..."
-      else Wserver.wprint "%s%s" (surname_end base p) (surname_begin base p);
+      if p = "" then Wserver.printf "..."
+      else Wserver.printf "%s%s" (surname_end base p) (surname_begin base p);
     end
   in
   header conf title;
@@ -548,7 +548,7 @@ value print_places conf base t =
 value print_titles conf base p =
   let (l, p) = select_place conf base p in
   let list = string_list_uniq (List.sort compare_titles l) in
-  let title _ = Wserver.wprint "... %s" p in
+  let title _ = Wserver.printf "... %s" p in
   do {
     header conf title;
     tag "ul" begin
@@ -557,7 +557,7 @@ value print_titles conf base p =
     end;
     if List.length list > 1 then
       stagn "a" "href=\"%sm=TT;sm=A;p=%s\"" (commd conf) (code_varenv p) begin
-        Wserver.wprint "%s" (capitale (transl conf "the whole list"));
+        Wserver.printf "%s" (capitale (transl conf "the whole list"));
       end
     else ();
     trailer conf;
@@ -566,7 +566,7 @@ value print_titles conf base p =
 
 value print_all_titles conf base = do {
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "all the titles"))
+    Wserver.printf "%s" (capitale (transl conf "all the titles"))
   in
   let list =
     let l = select_all_titles conf base in
@@ -575,7 +575,7 @@ value print_all_titles conf base = do {
   let order (s, _) = capitale (Name.lower s) in
   let wprint_elem (t, cnt) = do {
     give_access_all_titles conf t False;
-    Wserver.wprint " (%d)" cnt;
+    Wserver.printf " (%d)" cnt;
   }
   in
   header conf title;
@@ -585,7 +585,7 @@ value print_all_titles conf base = do {
 
 value print_all_places conf base = do {
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "all the estates"))
+    Wserver.printf "%s" (capitale (transl conf "all the estates"))
   in
   let list =
     let l = select_all_places conf base in

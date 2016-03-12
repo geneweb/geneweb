@@ -285,7 +285,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
 value print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path = [] then do {
     let title _ =
-      Wserver.wprint "%s" (capitale (transl conf "relationship"))
+      Wserver.printf "%s" (capitale (transl conf "relationship"))
     in
     header_no_page_title conf title;
     trailer conf
@@ -457,10 +457,10 @@ value print_shortest_path conf base p1 p2 =
   let ip2 = get_key_index p2 in
   if ip1 = ip2 then do {
     let title _ =
-      Wserver.wprint "%s" (capitale (transl conf "relationship"))
+      Wserver.printf "%s" (capitale (transl conf "relationship"))
     in
     header conf title;
-    Wserver.wprint "%s\n" (capitale (transl conf "it is the same person!"));
+    Wserver.printf "%s\n" (capitale (transl conf "it is the same person!"));
     trailer conf
   }
   else
@@ -495,7 +495,7 @@ value print_shortest_path conf base p1 p2 =
             | None -> list ] ]
     in
     let title _ =
-      Wserver.wprint "%s" (capitale (transl conf "relationship"))
+      Wserver.printf "%s" (capitale (transl conf "relationship"))
     in
     match get_shortest_path_relation conf base ip1 ip2 excl_faml with
     [ Some (path, ifam) ->
@@ -506,11 +506,11 @@ value print_shortest_path conf base p1 p2 =
         do {
           header_no_page_title conf title;
           if excl_faml = [] then do {
-            Wserver.wprint "<h1>";
+            Wserver.printf "<h1>";
             title False;
-            Wserver.wprint "</h1>\n";
+            Wserver.printf "</h1>\n";
             Hutil.print_link_to_welcome conf True;
-            Wserver.wprint "%s.\n"
+            Wserver.printf "%s.\n"
               (capitale
                  (cftransl conf "no known relationship link between %s and %s"
                     [s1; s2]));
@@ -519,20 +519,20 @@ value print_shortest_path conf base p1 p2 =
               stag "span" begin
                 stag "a" "href=\"%s;m=R;%s\"" (commd conf) (acces conf base p1)
                   begin
-                    Wserver.wprint "%s"
+                    Wserver.printf "%s"
                       (capitale
                          (transl_nth conf "try another/relationship computing" 0));
                   end;
-                Wserver.wprint " %s.\n"
+                Wserver.printf " %s.\n"
                   (transl_nth conf "try another/relationship computing" 1);
               end;
             end;
           }
           else do {
-            Wserver.wprint "<ul>\n";
-            Wserver.wprint "<li>%s</li>\n" s1;
-            Wserver.wprint "<li>%s</li>\n" s2;
-            Wserver.wprint "</ul>\n"
+            Wserver.printf "<ul>\n";
+            Wserver.printf "<li>%s</li>\n" s1;
+            Wserver.printf "<li>%s</li>\n" s2;
+            Wserver.printf "</ul>\n"
           };
           trailer conf
         } ]
@@ -775,12 +775,12 @@ value print_link_name conf base n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   let info = (reltab, list) in
   do {
-    Wserver.wprint "%s"
+    Wserver.printf "%s"
       (if (is_hide_names conf p2) && not (fast_auth_age conf p2) then "x x"
        else person_title_text conf base p2);
-    Wserver.wprint " %s" (transl conf "is");
-    if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
-    Wserver.wprint "\n";
+    Wserver.printf " %s" (transl conf "is");
+    if n > 1 then Wserver.printf " %s" (transl conf "also") else ();
+    Wserver.printf "\n";
     let (s, sp1, sp2) =
       let ini_p1 = p1
       and ini_p2 = p2 in
@@ -868,12 +868,12 @@ value print_link_name conf base n p1 p2 sol =
       if x2 < x1 then transl_a_of_b conf s1 s2
       else transl_a_of_gr_eq_gen_lev conf s1 s2
     in
-    Wserver.wprint "%s.\n" (Util.translate_eval s)
+    Wserver.printf "%s.\n" (Util.translate_eval s)
   }
 ;
 
 value wprint_num conf n =
-  Num.print (fun x -> Wserver.wprint "%s" x)
+  Num.print (fun x -> Wserver.printf "%s" x)
     (transl conf "(thousand separator)") n
 ;
 
@@ -899,13 +899,13 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
     List.iter
       (fun (a, n) ->
          stag "li" begin
-           Wserver.wprint "<em>%s %s"
+           Wserver.printf "<em>%s %s"
              (if n < 0 then "***" else string_of_big_int conf n)
              (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
-           Wserver.wprint "</em>\n";
+           Wserver.printf "</em>\n";
            if not long then do {
              let propose_dag = n > 1 && n <= 10 in
-             Wserver.wprint ":\n ";
+             Wserver.printf ":\n ";
              let dp1 =
                match pp1 with
                [ Some p -> p
@@ -925,9 +925,9 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
                (if propose_dag then ";dag=on" else "") image_opt
                begin
-                 Wserver.wprint "%s" (capitale (transl conf "see"));
+                 Wserver.printf "%s" (capitale (transl conf "see"));
                  if n > 1 && not propose_dag then
-                   Wserver.wprint "%s" (transl conf " the first branch")
+                   Wserver.printf "%s" (transl conf " the first branch")
                  else ();
                end;
            }
@@ -946,17 +946,17 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
   in
   tag "ul" "class=li_relationship" begin
     tag "li" begin
-      Wserver.wprint "%s\n" (capitale (transl conf "indeed,"));
+      Wserver.printf "%s\n" (capitale (transl conf "indeed,"));
       tag "ul" begin
         List.iter
           (fun (a, n) ->
              tag "li" begin
-               Wserver.wprint "%s" (person_title_text conf base a);
-               Wserver.wprint "\n<em>(";
-               Wserver.wprint "%d %s" n
+               Wserver.printf "%s" (person_title_text conf base a);
+               Wserver.printf "\n<em>(";
+               Wserver.printf "%d %s" n
                  (transl_nth conf "relationship link/relationship links"
                     (if n = 1 then 0 else 1));
-               Wserver.wprint ")</em>\n&nbsp;";
+               Wserver.printf ")</em>\n&nbsp;";
                if not long then do {
                  let propose_dag = n > 1 && n <= 10 in
                  let dp1 =
@@ -978,7 +978,7 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
                  (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
                  (if propose_dag then ";dag=on" else "") image_opt
                  begin
-                   Wserver.wprint "%s" (capitale (transl conf "see"));
+                   Wserver.printf "%s" (capitale (transl conf "see"));
                  end;
                }
                else ();
@@ -990,7 +990,7 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
         [ [_] -> transl conf "is"
         | _ -> transl conf "are" ]
       in
-      Wserver.wprint "%s %s\n" is_are (transl conf "at the same time");
+      Wserver.printf "%s %s\n" is_are (transl conf "at the same time");
       let lab proj x =
         let info = (((reltab, list), x), proj) in
         match list with
@@ -1008,7 +1008,7 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
                    (transl_nth conf "the spouse" (index_of_sex (get_sex pp))))
                 s ]
         in
-        Wserver.wprint "%s\n" (Util.translate_eval s)
+        Wserver.printf "%s\n" (Util.translate_eval s)
       in
       tag "ul" begin
         tag "li" begin
@@ -1033,7 +1033,7 @@ value print_solution conf base long n p1 p2 sol =
     if x1 = 0 || x2 = 0 then
       print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
     else print_solution_not_ancestor conf base long p1 p2 sol;
-    Wserver.wprint "\n"
+    Wserver.printf "\n"
   }
 ;
 
@@ -1076,7 +1076,7 @@ value print_dag_links conf base p1 p2 rl =
     if is_anc then
       xtag "img" "src=\"%s/%s\" alt=\"\""
         (Util.image_prefix conf) "picto_fleche_bleu.png"
-    else Wserver.wprint "<ul>\n";
+    else Wserver.printf "<ul>\n";
     M.iter
       (fun ip (pp1, pp2, nn, nt, maxlev) ->
          let dp1 =
@@ -1091,18 +1091,18 @@ value print_dag_links conf base p1 p2 rl =
          in
          if nt > 1 && nn > 1 && nn < max_br then do {
            let a = pget conf base ip in
-           if is_anc then () else Wserver.wprint "<li>\n";
+           if is_anc then () else Wserver.printf "<li>\n";
            if not is_anc then
-             Wserver.wprint "%s:\n" (person_title_text conf base a)
+             Wserver.printf "%s:\n" (person_title_text conf base a)
            else ();
-           Wserver.wprint "<a href=\"%sm=RL" (commd conf);
-           Wserver.wprint ";%s" (acces conf base a);
-           Wserver.wprint ";%s" (acces_n conf base "1" dp1);
-           Wserver.wprint ";%s" (acces_n conf base "2" dp2);
+           Wserver.printf "<a href=\"%sm=RL" (commd conf);
+           Wserver.printf ";%s" (acces conf base a);
+           Wserver.printf ";%s" (acces_n conf base "1" dp1);
+           Wserver.printf ";%s" (acces_n conf base "2" dp2);
            if pp1 = None then ()
-           else Wserver.wprint ";%s" (acces_n conf base "2" p1);
+           else Wserver.printf ";%s" (acces_n conf base "2" p1);
            if pp2 = None then ()
-           else Wserver.wprint ";%s" (acces_n conf base "4" p2);
+           else Wserver.printf ";%s" (acces_n conf base "4" p2);
            let (l1, l2) =
              List.fold_left
                (fun (l1, l2) (_, _, (x1, x2, list), _) ->
@@ -1117,15 +1117,15 @@ value print_dag_links conf base p1 p2 rl =
                ([], []) rl
            in
            do {
-             Wserver.wprint ";l1=";
+             Wserver.printf ";l1=";
              let _ =
                List.fold_right
-                 (fun x sep -> do { Wserver.wprint "%s%d" sep x; "," }) l1 ""
+                 (fun x sep -> do { Wserver.printf "%s%d" sep x; "," }) l1 ""
              in
-             Wserver.wprint ";l2=";
+             Wserver.printf ";l2=";
              let _ =
                List.fold_right
-                 (fun x sep -> do { Wserver.wprint "%s%d" sep x; "," }) l2 ""
+                 (fun x sep -> do { Wserver.printf "%s%d" sep x; "," }) l2 ""
              in
              ()
            };
@@ -1139,18 +1139,18 @@ value print_dag_links conf base p1 p2 rl =
              [ Some "on" -> ";bd=on"
              | _ -> "" ]
            in
-           Wserver.wprint ";dag=on%s%s\">" image_opt border;
-           if is_anc then Wserver.wprint "%s" (transl conf "tree")
+           Wserver.printf ";dag=on%s%s\">" image_opt border;
+           if is_anc then Wserver.printf "%s" (transl conf "tree")
            else
-             Wserver.wprint "%d %s" nn
+             Wserver.printf "%d %s" nn
                (transl_nth conf "relationship link/relationship links" 1);
-           Wserver.wprint "</a>";
-           if is_anc then () else Wserver.wprint "\n</li>\n"
+           Wserver.printf "</a>";
+           if is_anc then () else Wserver.printf "\n</li>\n"
          }
          else rest.val := True)
       anc_map;
-    if rest.val then stagn "li" begin Wserver.wprint "..."; end else ();
-    if is_anc then Wserver.wprint "\n" else Wserver.wprint "</ul>\n"
+    if rest.val then stagn "li" begin Wserver.printf "..."; end else ();
+    if is_anc then Wserver.printf "\n" else Wserver.printf "</ul>\n"
   }
   else ()
 ;
@@ -1166,25 +1166,25 @@ value print_propose_upto conf base p1 p2 rl =
       tag "p" begin
         xtag "img" "src=\"%s/%s\" alt=\"\""
           (Util.image_prefix conf) "picto_fleche_bleu.png";
-        Wserver.wprint "<span class=\"smaller\">";
-        Wserver.wprint "%s"
+        Wserver.printf "<span class=\"smaller\">";
+        Wserver.printf "%s"
           (capitale
              (translate_eval
                 (transl_a_of_b conf (transl conf "ancestors")
                    (person_title_text conf base p))));
-        Wserver.wprint " %s"
+        Wserver.printf " %s"
           (transl_decline conf "up to" (person_title_text conf base a));
-        Wserver.wprint "\n&nbsp;";
+        Wserver.printf "\n&nbsp;";
         xtag "img" "src=\"%s/%s\" alt=\"\""
           (Util.image_prefix conf) "picto_rel_asc.png";
         stag "a" "href=\"%sm=A;t=D;%s;%s;l=%d\""
           (commd conf) (acces conf base p)
           (acces_n conf base "1" a) maxlen
           begin
-            Wserver.wprint "%s" (capitale (transl conf "see"));
+            Wserver.printf "%s" (capitale (transl conf "see"));
           end;
 
-        Wserver.wprint "</span>\n";
+        Wserver.printf "</span>\n";
       end
   | _ -> () ]
 ;
@@ -1400,7 +1400,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       in
       if List.mem (b1, b2) found.val then ()
       else do {
-        Wserver.wprint "<table width=\"100%%\"><tr><td align=\"center\">\n";
+        Wserver.printf "<table width=\"100%%\"><tr><td align=\"center\">\n";
         tag "table" begin
           tag "tr" begin
             tag "td" begin
@@ -1408,7 +1408,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
             end;
           end;
         end;
-        Wserver.wprint "</td></tr></table>\n";
+        Wserver.printf "</td></tr></table>\n";
         found.val := [(b1, b2) :: found.val]
       }
   | _ -> () ]
@@ -1420,7 +1420,7 @@ value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list), _) =
     List.iter
       (fun (a, n) -> print_one_path conf base found a p1 p2 pp1 pp2 l1 l2)
       list;
-    Wserver.wprint "\n"
+    Wserver.printf "\n"
   }
 ;
 
@@ -1431,12 +1431,12 @@ value print_main_relationship conf base long p1 p2 rel =
     | Some (_, total, _) -> total ]
   in
   let title _ = do {
-    Wserver.wprint "%s" (capitale (transl conf "relationship"));
+    Wserver.printf "%s" (capitale (transl conf "relationship"));
     if Num.eq total Num.zero then ()
     else do {
-      Wserver.wprint " (";
+      Wserver.printf " (";
       wprint_num conf total;
-      Wserver.wprint " %s)"
+      Wserver.printf " %s)"
         (transl_nth conf "relationship link/relationship links"
            (if Num.eq total Num.one then 0 else 1))
     }
@@ -1472,10 +1472,10 @@ value print_main_relationship conf base long p1 p2 rel =
     match rel with
     [ None ->
         if get_key_index p1 = get_key_index p2 then
-          Wserver.wprint "%s\n"
+          Wserver.printf "%s\n"
             (capitale (transl conf "it is the same person!"))
         else do {
-          Wserver.wprint "%s.\n"
+          Wserver.printf "%s.\n"
             (capitale
                (cftransl conf "no known relationship link between %s and %s"
                   [gen_person_title_text reference raw_access conf base p1;
@@ -1485,11 +1485,11 @@ value print_main_relationship conf base long p1 p2 rel =
             stag "span" begin
               stag "a" "href=\"%s;m=R;%s\"" (commd conf) (acces conf base p1)
                 begin
-                  Wserver.wprint "%s"
+                  Wserver.printf "%s"
                     (capitale
                        (transl_nth conf "try another/relationship computing" 0));
                 end;
-              Wserver.wprint " %s.\n"
+              Wserver.printf " %s.\n"
                 (transl_nth conf "try another/relationship computing" 1);
             end;
           end;
@@ -1515,14 +1515,14 @@ value print_main_relationship conf base long p1 p2 rel =
             1 rl
         in
         do {
-          Wserver.wprint "\n";
+          Wserver.printf "\n";
           if long then () else print_dag_links conf base p1 p2 rl;
           if not all_by_marr && authorized_age conf base p1 &&
              authorized_age conf base p2 && get_consang a1 != Adef.fix (-1) &&
              get_consang a2 != Adef.fix (-1)
           then
             tag "p" begin
-              Wserver.wprint "<em>%s: %s%%</em>"
+              Wserver.printf "<em>%s: %s%%</em>"
                 (capitale (transl conf "relationship"))
                 (string_of_decimal_num conf
                    (round_2_dec
@@ -1563,13 +1563,13 @@ value multi_relation_next_txt conf pl2 lim assoc_txt =
 ;
 
 value print_no_relationship conf base pl =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "tree")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "tree")) in
   do {
     header conf title;
     tag "ul" begin
       List.iter
         (fun p ->
-           Wserver.wprint "<li>%s\n"
+           Wserver.printf "<li>%s\n"
              (referenced_person_title_text conf base p))
         pl;
     end;
@@ -1628,14 +1628,14 @@ value print_multi_relation conf base pl lim assoc_txt =
 ;
 
 value print_base_loop conf base p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    Wserver.wprint
+    Wserver.printf
       (fcapitale
          (ftransl conf "loop in database: %s is his/her own ancestor"))
       (Util.update_family_loop conf base p (designation base p));
-    Wserver.wprint ".\n";
+    Wserver.printf ".\n";
     trailer conf
   }
 ;

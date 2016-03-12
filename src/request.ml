@@ -32,7 +32,7 @@ value very_unknown conf =
   match (p_getenv conf.env "n", p_getenv conf.env "p") with
   [ (Some nom, Some prenom) ->
       let title _ =
-        Wserver.wprint "%s: \"%s %s\"" (capitale (transl conf "not found"))
+        Wserver.printf "%s: \"%s %s\"" (capitale (transl conf "not found"))
           prenom nom
       in
       do {
@@ -43,7 +43,7 @@ value very_unknown conf =
 
 value unknown conf n =
   let title _ =
-    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found")) n
+    Wserver.printf "%s: \"%s\"" (capitale (transl conf "not found")) n
   in
   do {
     rheader conf title; print_link_to_welcome conf False; trailer conf;
@@ -214,7 +214,7 @@ value find_all conf base an =
 ;
 
 value specify conf base n pl =
-  let title _ = Wserver.wprint "%s : %s" n (transl conf "specify") in
+  let title _ = Wserver.printf "%s : %s" n (transl conf "specify") in
   let n = Name.crush_lower n in
   let ptll =
     List.map
@@ -263,7 +263,7 @@ value specify conf base n pl =
     (* Si on est dans un calcul de parenté, on affiche *)
     (* l'aide sur la sélection d'un individu.          *)
     Util.print_tips_relationship conf;
-    Wserver.wprint "<ul>\n";
+    Wserver.printf "<ul>\n";
     (* Construction de la table des sosa de la base *)
     let () = Perso.build_sosa_ht conf base in
     List.iter
@@ -272,33 +272,33 @@ value specify conf base n pl =
            Perso.print_sosa conf base p True;
            match tl with
            [ [] ->
-               Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
+               Wserver.printf "\n%s" (referenced_person_title_text conf base p)
            | [t :: _] ->
                do {
                  tag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
                  begin
-                   Wserver.wprint "%s" (titled_person_text conf base p t);
+                   Wserver.printf "%s" (titled_person_text conf base p t);
                  end;
                  List.iter
                    (fun t ->
-                      Wserver.wprint "%s" (one_title_text conf base p t))
+                      Wserver.printf "%s" (one_title_text conf base p t))
                    tl;
                } ];
-           Wserver.wprint "%s" (Date.short_dates_text conf base p);
+           Wserver.printf "%s" (Date.short_dates_text conf base p);
            if authorized_age conf base p then
              match get_first_names_aliases p with
              [ [] -> ()
              | fnal ->
                  do {
-                   Wserver.wprint "\n<em>(";
+                   Wserver.printf "\n<em>(";
                    Mutil.list_iter_first
                      (fun first fna ->
                         do {
-                          if not first then Wserver.wprint ", " else ();
-                          Wserver.wprint "%s" (sou base fna);
+                          if not first then Wserver.printf ", " else ();
+                          Wserver.printf "%s" (sou base fna);
                         })
                      fnal;
-                   Wserver.wprint ")</em>";
+                   Wserver.printf ")</em>";
                  } ]
            else ();
            let spouses =
@@ -320,10 +320,10 @@ value specify conf base n pl =
                    (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
                    (person_title_text conf base h) hl
                in
-               Wserver.wprint ", <em>&amp; %s</em>\n" s ];
+               Wserver.printf ", <em>&amp; %s</em>\n" s ];
          end)
       ptll;
-    Wserver.wprint "</ul>\n";
+    Wserver.printf "</ul>\n";
     trailer conf;
   }
 ;
@@ -616,9 +616,9 @@ value family_m conf base =
       let title _ = () in
       do {
         header conf title;
-        Wserver.wprint "<pre>\n";
-        List.iter (Wserver.wprint "%s\n") conf.request;
-        Wserver.wprint "</pre>\n";
+        Wserver.printf "<pre>\n";
+        List.iter (Wserver.printf "%s\n") conf.request;
+        Wserver.printf "</pre>\n";
         trailer conf;
       }
   | Some "RL" -> RelationLink.print conf base
@@ -656,13 +656,13 @@ value family_m conf base =
 ;
 
 value print_no_index conf base =
-  let title _ = Wserver.wprint "%s" (Util.capitale (transl conf "link to use")) in
+  let title _ = Wserver.printf "%s" (Util.capitale (transl conf "link to use")) in
   let link = url_no_index conf base in
   do {
     header conf title;
     tag "ul" begin
       html_li conf;
-      tag "a" "href=\"http://%s\"" link begin Wserver.wprint "%s" link; end;
+      tag "a" "href=\"http://%s\"" link begin Wserver.printf "%s" link; end;
     end;
     print_link_to_welcome conf False;
     trailer conf;
@@ -749,17 +749,16 @@ value print_moved conf base s =
       let env = [("bname", conf.bname)] in
       do {
         Util.html conf;
-        Util.nl ();
         Templ.copy_from_templ conf env ic;
       }
   | None ->
-      let title _ = Wserver.wprint "%s -&gt; %s" conf.bname s in
+      let title _ = Wserver.printf "%s -&gt; %s" conf.bname s in
       do {
         Hutil.header_no_page_title conf title;
-        Wserver.wprint "The database %s has moved to:\n<dl><dt><dd>\n"
+        Wserver.printf "The database %s has moved to:\n<dl><dt><dd>\n"
           conf.bname;
-        stag "a" "href=\"%s\"" s begin Wserver.wprint "%s" s; end;
-        Wserver.wprint "\n</dd></dt></dl>\n";
+        stag "a" "href=\"%s\"" s begin Wserver.printf "%s" s; end;
+        Wserver.printf "\n</dd></dt></dl>\n";
         Hutil.trailer conf;
       } ]
 ;
@@ -862,19 +861,19 @@ value treat_request_on_possibly_locked_base conf bfile log =
         try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
       in
       let title _ =
-        Wserver.wprint "%s" (Util.capitale (transl conf "error"))
+        Wserver.printf "%s" (Util.capitale (transl conf "error"))
       in
       do {
         Hutil.rheader conf title;
-        Wserver.wprint "<ul>";
+        Wserver.printf "<ul>";
         Util.html_li conf;
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (Util.capitale (transl conf "cannot access base"));
-        Wserver.wprint " \"%s\".</ul>\n" conf.bname;
+        Wserver.printf " \"%s\".</ul>\n" conf.bname;
         match e with
         [ Sys_error _ -> ()
         | _ ->
-            Wserver.wprint
+            Wserver.printf
               "<em><font size=\"-1\">Internal message: %s</font></em>\n"
               (Printexc.to_string e) ];
         Hutil.trailer conf;

@@ -51,7 +51,7 @@ value print_search_form conf from_note =
                 (match p_getenv conf.env "c" with
                  [ Some "on" -> " checked=\"checked\""
                  | Some _ | None -> "" ]);
-              Wserver.wprint "%s\n"
+              Wserver.printf "%s\n"
                 (transl_nth conf "search/case sensitive" 1);
             end;
             xtag "input" "type=\"submit\" value=\"%s\""
@@ -65,11 +65,11 @@ value print_search_form conf from_note =
 
 value print_whole_notes conf base fnotes title s ho = do {
   header_no_page_title conf
-    (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
+    (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
       stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
-        Wserver.wprint "(%s)" (transl conf "linked pages");
+        Wserver.printf "(%s)" (transl conf "linked pages");
       end
     else ()
   in
@@ -84,7 +84,7 @@ value print_whole_notes conf base fnotes title s ho = do {
       [ Some (case_sens, h) -> html_highlight case_sens h title
       | None -> title ]
     in
-    Wserver.wprint "<h1>%s</h1>\n" title
+    Wserver.printf "<h1>%s</h1>\n" title
   else ();
   match Util.open_etc_file "summary" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
@@ -106,7 +106,7 @@ value print_whole_notes conf base fnotes title s ho = do {
     [ Some (case_sens, h) -> html_highlight case_sens h s
     | None -> s ]
   in
-  Wserver.wprint "%s\n" s;
+  Wserver.printf "%s\n" s;
   match ho with
   [ Some _ -> print_search_form conf (Some fnotes)
   | None -> () ];
@@ -116,7 +116,7 @@ value print_whole_notes conf base fnotes title s ho = do {
 value print_notes_part conf base fnotes title s cnt0 =
   do {
     header_no_page_title conf
-      (fun _ -> Wserver.wprint "%s" (if title = "" then fnotes else title));
+      (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
     print_link_to_welcome conf True;
     match Util.open_etc_file "summary" with
     [ Some ic -> Templ.copy_from_templ conf [] ic
@@ -124,7 +124,7 @@ value print_notes_part conf base fnotes title s cnt0 =
     if cnt0 = 0 && title <> "" then do {
       xtag "br";
       xtag "br";
-      Wserver.wprint "<h1>%s</h1>\n" title
+      Wserver.printf "<h1>%s</h1>\n" title
     }
     else ();
     let s = string_with_macros conf [] s in
@@ -261,43 +261,43 @@ value print_linked_list conf base pgl =
            match pg with
            [ NotesLinks.PgInd ip ->
                let p = pget conf base ip in
-               Wserver.wprint "%s%s"
+               Wserver.printf "%s%s"
                  (Util.referenced_person_title_text conf base p)
                  (Date.short_dates_text conf base p)
            | NotesLinks.PgFam ifam ->
                let fam = foi base ifam in
                let fath = pget conf base (get_father fam) in
                let moth = pget conf base (get_mother fam) in
-               Wserver.wprint "%s%s &amp; %s %s"
+               Wserver.printf "%s%s &amp; %s %s"
                  (Util.referenced_person_title_text conf base fath)
                  (Date.short_dates_text conf base fath)
                  (Util.referenced_person_title_text conf base moth)
                  (Date.short_dates_text conf base moth)
            | NotesLinks.PgNotes ->
                stagn "a" "href=\"%sm=NOTES\"" (commd conf) begin
-                 Wserver.wprint "%s" (transl_nth conf "note/notes" 1);
+                 Wserver.printf "%s" (transl_nth conf "note/notes" 1);
                end
            | NotesLinks.PgMisc fnotes ->
                stagn "tt" begin
-                 Wserver.wprint "[";
+                 Wserver.printf "[";
                  stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes
                  begin
-                   Wserver.wprint "%s" fnotes;
+                   Wserver.printf "%s" fnotes;
                  end;
-                 Wserver.wprint "]";
+                 Wserver.printf "]";
                end
            | NotesLinks.PgWizard wizname ->
                stagn "tt" begin
                  stag "i" begin
-                   Wserver.wprint "%s"
+                   Wserver.printf "%s"
                      (transl_nth conf
                         "wizard/wizards/friend/friends/exterior" 0);
                  end;
-                 Wserver.wprint " ";
+                 Wserver.printf " ";
                  stag "a" "href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
                    (code_varenv wizname)
                  begin
-                   Wserver.wprint "%s" wizname;
+                   Wserver.printf "%s" wizname;
                  end;
                end ];
          end)
@@ -308,15 +308,15 @@ value print_linked_list conf base pgl =
 value print_what_links conf base fnotes =  do {
   let title h =
     do {
-      Wserver.wprint "%s " (capitale (transl conf "linked pages"));
-      if h then Wserver.wprint "[%s]" fnotes
+      Wserver.printf "%s " (capitale (transl conf "linked pages"));
+      if h then Wserver.printf "[%s]" fnotes
       else
         stag "tt" begin
-          Wserver.wprint "[";
+          Wserver.printf "[";
           stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes begin
-            Wserver.wprint "%s" fnotes;
+            Wserver.printf "%s" fnotes;
           end;
-          Wserver.wprint "]";
+          Wserver.printf "]";
         end
     }
   in
@@ -352,7 +352,7 @@ value print_mod conf base =
     | None -> "" ]
   in
   let title _ =
-    Wserver.wprint "%s - %s%s" (capitale (transl conf "base notes"))
+    Wserver.printf "%s - %s%s" (capitale (transl conf "base notes"))
       conf.bname (if fnotes = "" then "" else " (" ^ fnotes ^ ")")
   in
   let (env, s) = read_notes base fnotes in
@@ -450,7 +450,7 @@ value print_misc_notes conf base =
     | None -> "" ]
   in
   let title h =
-    Wserver.wprint "%s"
+    Wserver.printf "%s"
       (if d = "" then
          capitale (Util.translate_eval (transl conf "miscellaneous notes"))
        else if h then "- " ^ d ^ " -"
@@ -498,7 +498,7 @@ value print_misc_notes conf base =
                with
                [ Not_found -> "" ])
             begin
-              Wserver.wprint "<tt>&lt;--</tt>";
+              Wserver.printf "<tt>&lt;--</tt>";
             end;
           end
         else ();
@@ -518,11 +518,11 @@ value print_misc_notes conf base =
                    if Sys.file_exists f then "" else " style=\"color:red\""
                  in
                  tag "li" "class=\"file\"" begin
-                   Wserver.wprint "<tt>[";
+                   Wserver.printf "<tt>[";
                    stag "a" "href=\"%sm=NOTES;f=%s\"%s" (commd conf) f c begin
-                     Wserver.wprint "%s" r;
+                     Wserver.printf "%s" r;
                    end;
-                   Wserver.wprint "]</tt>%s\n"
+                   Wserver.printf "]</tt>%s\n"
                      (if txt = "" then "" else " : " ^ txt);
                  end
              | None ->
@@ -532,8 +532,8 @@ value print_misc_notes conf base =
                        (if d = "" then r else
                         d ^ String.make 1 NotesLinks.char_dir_sep ^ r)
                      begin
-                       Wserver.wprint "%s " r;
-                       Wserver.wprint "--&gt;";
+                       Wserver.printf "%s " r;
+                       Wserver.printf "--&gt;";
                      end;
                    end;
                  end ])

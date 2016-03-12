@@ -1101,7 +1101,7 @@ value print_body_prop conf =
     try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
     [ Not_found -> "" ]
   in
-  Wserver.wprint "%s" (s ^ Util.body_prop conf)
+  Wserver.printf "%s" (s ^ Util.body_prop conf)
 ;
 
 type vother 'a =
@@ -1287,7 +1287,7 @@ value print_foreach conf ifun print_ast eval_expr env ep loc s sl el al =
 
 value print_wid_hei env fname =
   match Util.image_size (Util.image_file_name fname) with
-  [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei
+  [ Some (wid, hei) -> Wserver.printf " width=\"%d\" height=\"%d\"" wid hei
   | None -> () ]
 ;
 
@@ -1301,7 +1301,7 @@ value print_copyright conf =
       xtag "hr" "style=\"margin:0\"";
       tag "div" "style=\"font-size: 80%%\"" begin
         stag "em" begin
-          Wserver.wprint
+          Wserver.printf
             "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
         end;
       end;
@@ -1480,12 +1480,12 @@ value rec interp_ast conf base ifun env =
           print_foreach conf ifun print_ast eval_expr env ep loc s sl el al
         with
         [ Not_found ->
-            Wserver.wprint " %%foreach;%s?" (String.concat "." [s :: sl]) ]
+            Wserver.printf " %%foreach;%s?" (String.concat "." [s :: sl]) ]
     | Adefine f xl al alk -> print_define env ep f xl al alk
     | Aapply loc f ell -> print_apply env ep loc f ell
     | Alet k v al -> print_let env ep k v al
     | Afor i min max al -> print_for env ep i min max al
-    | x -> Wserver.wprint "%s" (eval_ast env ep x) ]
+    | x -> Wserver.printf "%s" (eval_ast env ep x) ]
   and print_ast_list env ep =
     fun
     [ [] -> m_env.val := env
@@ -1510,7 +1510,7 @@ value rec interp_ast conf base ifun env =
     [ Some (xl, al) ->
         templ_print_apply loc f ifun.set_vother print_ast env ep xl al vl
     | None ->
-        Wserver.wprint "%s" (eval_apply env ep loc f vl) ]
+        Wserver.printf "%s" (eval_apply env ep loc f vl) ]
   and print_let env ep k v al =
     let v = eval_ast_expr_list env ep v in
     let env = set_val ifun.set_vother k v env in
@@ -1546,9 +1546,9 @@ and print_var print_ast_list conf base ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try
       match eval_var sl with
-      [ VVstring s -> Wserver.wprint "%s" s
-      | VVbool True -> Wserver.wprint "1"
-      | VVbool False -> Wserver.wprint "0"
+      [ VVstring s -> Wserver.printf "%s" s
+      | VVbool True -> Wserver.printf "1"
+      | VVbool False -> Wserver.printf "0"
       | VVother f -> print_var1 f [] ]
     with
     [ Not_found ->
@@ -1556,7 +1556,7 @@ and print_var print_ast_list conf base ifun env ep loc sl =
         [ ["include"; templ] ->
             match input_templ conf templ with
             [ Some astl -> print_ast_list env ep astl
-            | None ->  Wserver.wprint " %%%s?" (String.concat "." sl) ]
+            | None ->  Wserver.printf " %%%s?" (String.concat "." sl) ]
         | sl ->
             print_variable conf base sl ] ]
   in
@@ -1573,14 +1573,14 @@ and print_simple_variable conf base_opt =
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found ]
 and print_variable conf base_opt sl =
-  try Wserver.wprint "%s" (eval_variable conf sl) with
+  try Wserver.printf "%s" (eval_variable conf sl) with
   [ Not_found ->
       try
         match sl with
         [ [s] -> print_simple_variable conf base_opt s
         | _ -> raise Not_found ]
       with
-      [ Not_found -> Wserver.wprint " %%%s?" (String.concat "." sl) ] ]
+      [ Not_found -> Wserver.printf " %%%s?" (String.concat "." sl) ] ]
 ;
 
 value copy_from_templ conf env ic = do {

@@ -768,9 +768,9 @@ value error_person conf base p err = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.wprint "%s\n" (capitale err);
+  Wserver.printf "%s\n" (capitale err);
   Update.print_return conf;
   trailer conf;
   raise Update.ModErr
@@ -832,7 +832,7 @@ value print_conflict conf base p = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Update.print_error conf base (AlreadyDefined p);
   let free_n =
@@ -840,16 +840,16 @@ value print_conflict conf base p = do {
   in
   tag "ul" begin
     stag "li" begin
-      Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
+      Wserver.printf "%s: %d.\n" (capitale (transl conf "first free number"))
         free_n;
-      Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+      Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
         (transl conf "create");
-      Wserver.wprint "%s.\n" (transl conf " to try again with this number");
+      Wserver.printf "%s.\n" (transl conf " to try again with this number");
     end;
     stag "li" begin
-      Wserver.wprint "%s " (capitale (transl conf "or"));
-      Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-      Wserver.wprint " %s %s." (transl_nth conf "and" 0)
+      Wserver.printf "%s " (capitale (transl conf "or"));
+      Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
+      Wserver.printf " %s %s." (transl_nth conf "and" 0)
         (transl conf "change it (the number) yourself");
     end;
   end;
@@ -881,13 +881,13 @@ value print_cannot_change_sex conf base p = do {
       raise (Update.ModErrApi err)
     else ()
   ELSE () END;
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Update.print_error conf base (BadSexOfMarriedPerson p);
   tag "ul" begin
     html_li conf;
-    Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    Wserver.wprint "\n";
+    Wserver.printf "\n%s" (referenced_person_text conf base p);
+    Wserver.printf "\n";
   end;
   Update.print_return conf;
   trailer conf;
@@ -1183,7 +1183,7 @@ value effective_del conf base warning p = do {
 
 value print_mod_ok conf base wl p =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "person modified"))
+    Wserver.printf "%s" (capitale (transl conf "person modified"))
   in
   do {
     header conf title;
@@ -1191,15 +1191,15 @@ value print_mod_ok conf base wl p =
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
-         Wserver.wprint "<h3 class=\"error\">" ;
-         Wserver.wprint
+         Wserver.printf "<h3 class=\"error\">" ;
+         Wserver.printf
            (fcapitale (ftransl conf "%s forbidden char"))
            (List.fold_left
               (fun acc c -> acc ^ "'" ^ Char.escaped c ^ "' ")
               " "
               Name.forbidden_char);
-         Wserver.wprint "</h3>\n" ;
-         List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
+         Wserver.printf "</h3>\n" ;
+         List.iter (Wserver.printf "<p>%s</p>") removed_string.val
       }
     else ();
     (* Si on a supprimé des relations, on les mentionne *)
@@ -1209,20 +1209,20 @@ value print_mod_ok conf base wl p =
         do {
           tag "p"
             begin
-              Wserver.wprint "%s, %s %s %s :"
+              Wserver.printf "%s, %s %s %s :"
                 (capitale (transl_nth conf "relation/relations" 0))
                 (transl conf "first name missing")
                 (transl conf "or")
                 (transl conf "surname missing") ;
               tag "ul" begin
                 List.iter
-                  (fun s -> do {stag "li" begin Wserver.wprint "%s" s; end;})
+                  (fun s -> do {stag "li" begin Wserver.printf "%s" s; end;})
                   deleted_relation.val;
               end;
             end; } ] ;
-    Wserver.wprint "\n<p>%s</p>"
+    Wserver.printf "\n<p>%s</p>"
       (referenced_person_text conf base (poi base p.key_index));
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     Update.print_warnings conf base wl;
     trailer conf;
   }
@@ -1281,24 +1281,24 @@ value all_checks_person conf base p a u = do {
 };
 
 value print_add_ok conf base wl p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "person added")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "person added")) in
   do {
     header conf title;
     print_link_to_welcome conf True;
     (* Si on a supprimé des caractères interdits *)
     if List.length removed_string.val > 0 then
       do {
-         Wserver.wprint "<h2 class=\"error\">%s</h2>\n" (capitale (transl conf "forbidden char"));
-         List.iter (Wserver.wprint "<p>%s</p>") removed_string.val
+         Wserver.printf "<h2 class=\"error\">%s</h2>\n" (capitale (transl conf "forbidden char"));
+         List.iter (Wserver.printf "<p>%s</p>") removed_string.val
       }
     else ();
     (* Si on a supprimé des relations, on les mentionne *)
     List.iter
-      (fun s -> Wserver.wprint "%s -> %s\n" s (transl conf "forbidden char"))
+      (fun s -> Wserver.printf "%s -> %s\n" s (transl conf "forbidden char"))
       deleted_relation.val;
-    Wserver.wprint "\n%s"
+    Wserver.printf "\n%s"
       (referenced_person_text conf base (poi base p.key_index));
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     Update.print_warnings conf base wl;
     trailer conf;
   }
@@ -1313,7 +1313,7 @@ value print_add_ok conf base wl p =
 
 value print_del_ok conf base wl =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "person deleted"))
+    Wserver.printf "%s" (capitale (transl conf "person deleted"))
   in
   do {
     header conf title;
@@ -1325,15 +1325,15 @@ value print_del_ok conf base wl =
 
 value print_change_event_order_ok conf base wl p =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "person modified"))
+    Wserver.printf "%s" (capitale (transl conf "person modified"))
   in
   do {
     header conf title;
     print_link_to_welcome conf True;
     Update.print_warnings conf base wl;
-    Wserver.wprint "\n%s"
+    Wserver.printf "\n%s"
       (referenced_person_text conf base (poi base p.key_index));
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf;
   }
 ;

@@ -1,7 +1,7 @@
 (* $Id: wserver.ml,v 5.15 2007-09-12 09:42:26 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Printf;
+value eprintf = Printf.eprintf;
 
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
@@ -15,9 +15,16 @@ value wserver_oc = ref stdout;
 
 value wrap_string = ref (fun s -> s);
 
-value wprint fmt =
-  ksprintf (fun s -> output_string wserver_oc.val (wrap_string.val s)) fmt
+value printf fmt =
+  Printf.ksprintf (fun s -> output_string wserver_oc.val (wrap_string.val s)) fmt
 ;
+value printnl fmt =
+  Printf.ksprintf (fun s -> do {
+    output_string wserver_oc.val s;
+    output_string wserver_oc.val "\013\010"
+  }) fmt
+;
+value header = printnl;
 value wflush () = flush wserver_oc.val;
 
 value hexa_digit x =
@@ -133,12 +140,9 @@ value encode s =
   else s
 ;
 
-value nl () = wprint "\013\010";
-
 value http answer = do {
   let answer = if answer = "" then "200 OK" else answer in
-  wprint "HTTP/1.0 %s" answer;
-  nl ()
+  printnl "HTTP/1.0 %s" answer
 };
 
 value print_exc exc =
@@ -251,11 +255,12 @@ value timeout tmout spid _ =
     if pid = 0 then
       if Unix.fork () = 0 then do {
         http "";
-        wprint "Content-type: text/html; charset=iso-8859-1"; nl (); nl ();
-        wprint "<head><title>Time out</title></head>\n";
-        wprint "<body><h1>Time out</h1>\n";
-        wprint "Computation time > %d second(s)\n" tmout;
-        wprint "</body>\n";
+        printnl "Content-type: text/html; charset=iso-8859-1";
+        printnl "";
+        printf "<head><title>Time out</title></head>\n";
+        printf "<body><h1>Time out</h1>\n";
+        printf "Computation time > %d second(s)\n" tmout;
+        printf "</body>\n";
         wflush ();
         exit 0;
       }

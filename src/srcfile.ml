@@ -398,7 +398,7 @@ value rec copy_from_stream conf base strm mode =
     | '&' ->
         let a = if_expr (Stream.next strm) in
         let b = if_expr (Stream.next strm) in a && b
-    | c -> do { Wserver.wprint "!!!!!%c!!!!!" c; True } ]
+    | c -> do { Wserver.printf "!!!!!%c!!!!!" c; True } ]
   in
   try
     while True do {
@@ -423,15 +423,15 @@ value rec copy_from_stream conf base strm mode =
                 | _ -> loop (Stream.next strm) ]
               in
               loop c
-          | _ -> Wserver.wprint "<%s%s%c" slash atag c ]
+          | _ -> Wserver.printf "<%s%s%c" slash atag c ]
       | '%' ->
           let c = Stream.next strm in
           match c with
           [ 'I' -> push_echo (echo.val && if_expr (Stream.next strm))
           | 'E' -> pop_echo ()
           | _ when not echo.val -> ()
-          | '%' -> Wserver.wprint "%%"
-          | '[' | ']' -> Wserver.wprint "%c" c
+          | '%' -> Wserver.printf "%%"
+          | '[' | ']' -> Wserver.printf "%c" c
           | 'h' -> hidden_env conf
           | 'j' -> Templ.include_hed_trl conf (Some base) "hed"
           | 'P' -> let _ = Stream.next strm in ()
@@ -443,15 +443,15 @@ value rec copy_from_stream conf base strm mode =
                   if c = ';' then Buff.get len else loop (Buff.store len c)
               in
               let lang_def = transl conf " !languages" in
-              Wserver.wprint "%s" (Translate.language_name lang lang_def)
+              Wserver.printf "%s" (Translate.language_name lang lang_def)
           | 'V' ->
               let txt =
                 try List.assoc (get_variable strm) conf.base_env with
                 [ Not_found -> "" ]
               in
               copy_from_string conf base txt mode
-          | c -> Wserver.wprint "%s" (macro conf base c) ]
-      | c -> if echo.val then Wserver.wprint "%c" c else () ]
+          | c -> Wserver.printf "%s" (macro conf base c) ]
+      | c -> if echo.val then Wserver.printf "%c" c else () ]
     }
   with
   [ Stream.Failure -> () ]
@@ -472,7 +472,7 @@ and src_translate conf base nomin strm echo mode =
     else copy_from_stream conf base (Stream.of_string s) mode
   else
     let s = lexicon_translate conf base nomin strm c in
-    if not echo.val then () else Wserver.wprint "%s" s
+    if not echo.val then () else Wserver.printf "%s" s
 and copy_from_file conf base name mode =
   let fname =
     match mode with
@@ -483,7 +483,7 @@ and copy_from_file conf base name mode =
   [ Some ic -> copy_from_channel conf base ic mode
   | None ->
       do {
-        Wserver.wprint "<em>... file not found: \"%s.txt\"</em>" name;
+        Wserver.printf "<em>... file not found: \"%s.txt\"</em>" name;
         html_br conf;
       } ]
 and copy_from_channel conf base ic mode =
@@ -511,17 +511,16 @@ value gen_print with_logo mode conf base fname =
   [ Some ic ->
       do {
         Util.html conf;
-        Util.nl ();
         copy_from_channel conf base ic mode;
         Hutil.gen_trailer with_logo conf;
       }
   | _ ->
-      let title _ = Wserver.wprint "Error" in
+      let title _ = Wserver.printf "Error" in
       do {
         Hutil.header conf title;
         tag "ul" begin
           html_li conf;
-          Wserver.wprint "Cannot access file \"%s.txt\".\n" fname;
+          Wserver.printf "Cannot access file \"%s.txt\".\n" fname;
         end;
         Hutil.gen_trailer with_logo conf;
         raise Exit
@@ -659,7 +658,7 @@ value print conf base fname =
 (* lexicon (info) *)
 
 value print_lexicon conf base =
-  let title _ = Wserver.wprint "Lexicon" in
+  let title _ = Wserver.printf "Lexicon" in
   let fname =
     let f = if Mutil.utf_8_db.val then "lex_utf8.txt" else "lexicon.txt" in
     search_in_lang_path (Filename.concat "lang" f)
@@ -669,21 +668,21 @@ value print_lexicon conf base =
     match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         do {
-          Wserver.wprint "<pre dir=\"ltr\">\n";
+          Wserver.printf "<pre dir=\"ltr\">\n";
           try
             while True do {
               match input_char ic with
-              [ '<' -> Wserver.wprint "&lt;"
-              | c -> Wserver.wprint "%c" c ];
+              [ '<' -> Wserver.printf "&lt;"
+              | c -> Wserver.printf "%c" c ];
             }
           with
           [ End_of_file -> () ];
-          Wserver.wprint "</pre>\n";
+          Wserver.printf "</pre>\n";
           close_in ic;
         }
     | None ->
         do {
-          Wserver.wprint "<em>... file not found: \"%s.txt\"</em>" "lexicon";
+          Wserver.printf "<em>... file not found: \"%s.txt\"</em>" "lexicon";
           html_br conf;
         } ];
     Hutil.trailer conf;

@@ -29,22 +29,21 @@ type excl =
 value robot_error conf from cnt sec =
   do {
     if not conf.cgi then Wserver.http "403 Forbidden" else ();
-    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
-    Util.nl ();
-    Util.nl ();
+    Wserver.header "Content-type: text/html; charset=iso-8859-1";
+    Wserver.header "";
     let env =
       [("cnt", string_of_int cnt) ; ("sec", string_of_int sec)]
     in
     match open_etc_file "robot" with
     [ Some ic -> Templ.copy_from_templ conf env ic
     | None ->
-        let title _ = Wserver.wprint "Access refused" in
+        let title _ = Wserver.printf "Access refused" in
         do {
-          Wserver.wprint "<head><title>";
+          Wserver.printf "<head><title>";
           title True;
-          Wserver.wprint "</title>\n<body>\n<h1>";
+          Wserver.printf "</title>\n<body>\n<h1>";
           title False;
-          Wserver.wprint "</body>\n";
+          Wserver.printf "</body>\n";
         } ];
     raise Exit
   }

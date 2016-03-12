@@ -71,15 +71,15 @@ value copy conf pref_doc pref_img s =
   loop 0 where rec loop i =
     if i = String.length s then ()
     else if last_is s i "<a href=" then do {
-      let i = do { Wserver.wprint "="; i + 1 } in
-      let i = if s.[i] = '"' then do { Wserver.wprint "\""; i + 1 } else i in
+      let i = do { Wserver.printf "="; i + 1 } in
+      let i = if s.[i] = '"' then do { Wserver.printf "\""; i + 1 } else i in
       if s.[i] = '#' || start_with s i http || start_with s i "mailto:" then
         ()
-      else Wserver.wprint "%s" pref_doc;
+      else Wserver.printf "%s" pref_doc;
       loop i
     }
     else if last_is s i " src=" || last_is s i " background=" then do {
-      let i = do { Wserver.wprint "="; i + 1 } in
+      let i = do { Wserver.printf "="; i + 1 } in
       let (img, i) =
         if s.[i] = '"' then
           let rec loop i len =
@@ -97,13 +97,13 @@ value copy conf pref_doc pref_img s =
           loop (i + 1) 0
       in
       let img = url_basename img in
-      Wserver.wprint "\"%s%s\"" pref_img img;
+      Wserver.printf "\"%s%s\"" pref_img img;
       loop i
     }
     else if last_is s i "<body>" then do {
-      Wserver.wprint "%s>" (Util.body_prop conf); loop (i + 1)
+      Wserver.printf "%s>" (Util.body_prop conf); loop (i + 1)
     }
-    else do { Wserver.wprint "%c" s.[i]; loop (i + 1) }
+    else do { Wserver.printf "%c" s.[i]; loop (i + 1) }
 ;
 
 value mac_name_of_url_name s =
@@ -130,7 +130,6 @@ value print conf =
     [ Some ic ->
         do {
           Util.html conf;
-          Util.nl ();
           let s =
             let len = ref 0 in
             do {
@@ -215,17 +214,16 @@ value print_whole_wdoc conf fdoc title s =
   [ Some ic ->
       do {
         Util.html conf;
-        Util.nl ();
         let env = [("title", title); ("doc", s); ("page", fdoc)] in
         Templ.copy_from_templ conf env ic;
       }
   | None ->
-      let title _ = Wserver.wprint "Error" in
+      let title _ = Wserver.printf "Error" in
       do {
         Hutil.header conf title;
-        Wserver.wprint "<ul>\n<li>\n";
-        Wserver.wprint "Cannot access file \"wdoc.txt\".\n";
-        Wserver.wprint "</li>\n</ul>\n";
+        Wserver.printf "<ul>\n<li>\n";
+        Wserver.printf "Cannot access file \"wdoc.txt\".\n";
+        Wserver.printf "</li>\n</ul>\n";
         Hutil.trailer conf;
         raise Exit
       } ]
@@ -233,7 +231,7 @@ value print_whole_wdoc conf fdoc title s =
 
 value print_part_wdoc conf fdoc title s cnt0 =
   do {
-    Hutil.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    Hutil.header_no_page_title conf (fun _ -> Wserver.printf "%s" title);
     let s = Util.filter_html_tags s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
@@ -315,7 +313,7 @@ value print_mod_wdoc conf =
     | None -> "" ]
   in
   let title _ =
-    Wserver.wprint "%s - (%s)"
+    Wserver.printf "%s - (%s)"
       (Util.capitale (Util.transl_decline conf "modify" ""))
       (fname ^ (if cnt = "" then "" else " #" ^ cnt))
   in

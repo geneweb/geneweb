@@ -784,7 +784,7 @@ value print_add_ok conf base =
   else if mess.m_ident = "" || mess.m_text = "" then print conf base
   else
     let title _ =
-      Wserver.wprint "%s" (capitale (transl conf "message added"))
+      Wserver.printf "%s" (capitale (transl conf "message added"))
     in
     try
       do {
@@ -793,12 +793,12 @@ value print_add_ok conf base =
         header conf title;
         print_link_to_welcome conf True;
         if mods <> [] then do {
-          Wserver.wprint "<p>%s. %s.</p>"
+          Wserver.printf "<p>%s. %s.</p>"
             (capitale (transl conf "this forum is moderated"))
             (capitale (transl conf "your message is waiting for validation"));
         }
         else ();
-        Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+        Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
           (capitale (transl conf "database forum"));
         trailer conf;
       }
@@ -819,17 +819,17 @@ value forum_del conf base pos =
 
 value print_del_ok conf base next_pos =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "message deleted"))
+    Wserver.printf "%s" (capitale (transl conf "message deleted"))
   in
   do {
     header conf title;
     print_link_to_welcome conf True;
     match next_pos with
     [ Some pos ->
-        Wserver.wprint "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
+        Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
           (MF.string_of_pos pos) (capitale (message_txt conf 3))
     | None ->
-        Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+        Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
           (capitale (transl conf "database forum")) ];
     trailer conf;
   }
@@ -906,17 +906,17 @@ value print_valid_ok conf base pos del =
     if del then transl conf "message deleted"
     else transl conf "message added"
   in
-  let title _ = Wserver.wprint "%s" (capitale mess) in
+  let title _ = Wserver.printf "%s" (capitale mess) in
   let next_pos = find_next_pos conf pos in
   do {
     header conf title;
     print_link_to_welcome conf True;
     match next_pos with
     [ Some pos ->
-        Wserver.wprint "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
+        Wserver.printf "<a href=\"%sm=FORUM;p=%s\">%s</a>\n" (commd conf)
          (MF.string_of_pos pos) (capitale (message_txt conf 3))
     | None ->
-        Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+        Wserver.printf "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
          (capitale (transl conf "database forum")) ];
     trailer conf;
   }

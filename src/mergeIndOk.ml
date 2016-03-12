@@ -281,10 +281,10 @@ value print_merge conf base =
 ;
 
 value print_mod_merge_ok conf base wl p = do {
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "merge done")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
   header conf title;
   print_link_to_welcome conf True;
-  Wserver.wprint "\n%s\n"
+  Wserver.printf "\n%s\n"
     (referenced_person_text conf base (poi base p.key_index));
   Update.print_warnings conf base wl;
   Merge.print_possible_continue_merging conf base;

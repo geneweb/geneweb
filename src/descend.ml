@@ -50,7 +50,7 @@ value descendants_title conf base p h =
       (transl_a_of_gr_eq_gen_lev conf
          (transl conf "descendants") (txt_fun raw_access conf base p))
   in
-  Wserver.wprint "%s" (capitale s)
+  Wserver.printf "%s" (capitale s)
 ;
 
 value display_descendants_level conf base max_level ancestor =
@@ -105,12 +105,12 @@ value display_descendants_level conf base max_level ancestor =
   in
   do {
     header conf (descendants_title conf base ancestor);
-    Wserver.wprint "%s" (capitale (text_level conf max_level));
+    Wserver.printf "%s" (capitale (text_level conf max_level));
     if len.val > 1 then
-      Wserver.wprint " (%d %s)" len.val
+      Wserver.printf " (%d %s)" len.val
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
     else ();
-    Wserver.wprint ".\n";
+    Wserver.printf ".\n";
     html_p conf;
     print_alphab_list conf
       (fun (p, _) ->
@@ -118,12 +118,12 @@ value display_descendants_level conf base max_level ancestor =
          String.sub (p_surname base p) (initial (p_surname base p)) 1)
       (fun (p, c) ->
          do {
-           Wserver.wprint "\n%s" (referenced_person_title_text conf base p);
-           Wserver.wprint "%s" (Date.short_dates_text conf base p);
+           Wserver.printf "\n%s" (referenced_person_title_text conf base p);
+           Wserver.printf "%s" (Date.short_dates_text conf base p);
            if not (is_hidden p) && c > 1 then
-             Wserver.wprint " <em>(%d)</em>" c
+             Wserver.printf " <em>(%d)</em>" c
            else ();
-           Wserver.wprint "\n"
+           Wserver.printf "\n"
          })
       list;
     trailer conf
@@ -230,11 +230,11 @@ value print_child conf base p1 p2 e = do {
     if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
        get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
     then
-      Wserver.wprint "%s"
+      Wserver.printf "%s"
         (referenced_person_text_without_surname conf base e)
-    else Wserver.wprint "\n%s" (referenced_person_text conf base e);
+    else Wserver.printf "\n%s" (referenced_person_text conf base e);
   end;
-  Wserver.wprint "%s" (Date.short_dates_text conf base e)
+  Wserver.printf "%s" (Date.short_dates_text conf base e)
 };
 
 value print_repeat_child conf base p1 p2 e =
@@ -242,22 +242,22 @@ value print_repeat_child conf base p1 p2 e =
     if get_sex p1 = Male && eq_istr (get_surname e) (get_surname p1) ||
        get_sex p2 = Male && eq_istr (get_surname e) (get_surname p2)
     then
-      Wserver.wprint "%s" (person_text_without_surname conf base e)
-    else Wserver.wprint "%s" (person_text conf base e);
+      Wserver.printf "%s" (person_text_without_surname conf base e)
+    else Wserver.printf "%s" (person_text conf base e);
   end
 ;
 
 value display_spouse conf base marks paths fam p c =
   do {
-    Wserver.wprint "\n&amp;";
-    Wserver.wprint "%s" (Date.short_marriage_date_text conf base fam p c);
-    Wserver.wprint " ";
+    Wserver.printf "\n&amp;";
+    Wserver.printf "%s" (Date.short_marriage_date_text conf base fam p c);
+    Wserver.printf " ";
     stag "strong" begin
-      Wserver.wprint "\n%s" (referenced_person_text conf base c);
+      Wserver.printf "\n%s" (referenced_person_text conf base c);
     end;
     if marks.(Adef.int_of_iper (get_key_index c)) then
-      Wserver.wprint " (<tt><b>%s</b></tt>)" (label_of_path paths c)
-    else Wserver.wprint "%s" (Date.short_dates_text conf base c)
+      Wserver.printf " (<tt><b>%s</b></tt>)" (label_of_path paths c)
+    else Wserver.printf "%s" (Date.short_dates_text conf base c)
   }
 ;
 
@@ -277,13 +277,13 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                if need_br then html_br conf else ();
                if not first then print_repeat_child conf base p1 c1 p else ();
                display_spouse conf base marks paths fam p c;
-               Wserver.wprint "\n";
+               Wserver.printf "\n";
                let print_children =
                  get_sex p = Male ||
                  not marks.(Adef.int_of_iper (get_key_index c))
                in
                if print_children then
-                 Wserver.wprint "<ol start=\"%d\">\n" (succ cnt)
+                 Wserver.printf "<ol start=\"%d\">\n" (succ cnt)
                else ();
                let cnt =
                  List.fold_left
@@ -291,9 +291,9 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                       let e = pget conf base ie in
                       do {
                         if print_children then do {
-                          Wserver.wprint "<li type=\"A\"> ";
+                          Wserver.printf "<li type=\"A\"> ";
                           print_child conf base p c e;
-                          Wserver.wprint "\n";
+                          Wserver.printf "\n";
                           incr total;
                           if succ lev = max_lev then
                             list_iter_first
@@ -311,9 +311,9 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                    display_spouse conf base marks paths fam e
                                      c1;
                                    if Array.length el <> 0 then
-                                     Wserver.wprint "....."
+                                     Wserver.printf "....."
                                    else ();
-                                   Wserver.wprint "\n"
+                                   Wserver.printf "\n"
                                  })
                               (Array.to_list (get_family (pget conf base ie)))
                           else loop (succ lev) e
@@ -323,7 +323,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                       })
                    cnt (Array.to_list el)
                in
-               if print_children then Wserver.wprint "</ol>\n" else ();
+               if print_children then Wserver.printf "</ol>\n" else ();
                (cnt, False, not print_children)
              })
           (0, True, False) (Array.to_list (get_family p))
@@ -337,7 +337,7 @@ value last_label = ref "";
 value print_family conf base marks paths max_lev lev p =
   do {
     if lev <> 0 then do {
-      Wserver.wprint "<tt><b>%s</b></tt>." (label_of_path paths p);
+      Wserver.printf "<tt><b>%s</b></tt>." (label_of_path paths p);
       html_br conf
     }
     else ();
@@ -353,10 +353,10 @@ value print_family conf base marks paths max_lev lev p =
            let c = pget conf base c in
            do {
              stag "strong" begin
-               Wserver.wprint "\n%s" (referenced_person_text conf base p);
+               Wserver.printf "\n%s" (referenced_person_text conf base p);
              end;
              display_spouse conf base marks paths fam p c;
-             Wserver.wprint "<ol start=\"%d\">\n" (succ cnt);
+             Wserver.printf "<ol start=\"%d\">\n" (succ cnt);
              let cnt =
                List.fold_left
                  (fun cnt ie ->
@@ -365,12 +365,12 @@ value print_family conf base marks paths max_lev lev p =
                       if get_sex p = Male ||
                          not marks.(Adef.int_of_iper (get_key_index c))
                       then do {
-                        Wserver.wprint "<li type=\"A\">";
+                        Wserver.printf "<li type=\"A\">";
                         print_child conf base p c e;
                         incr total;
-                        Wserver.wprint "\n";
+                        Wserver.printf "\n";
                         if labelled conf base marks max_lev lev ie then
-                          Wserver.wprint " => <tt><b>%s</b></tt>\n"
+                          Wserver.printf " => <tt><b>%s</b></tt>\n"
                             (label_of_path paths e)
                         else if succ lev = max_lev then
                           Array.iter
@@ -383,9 +383,9 @@ value print_family conf base marks paths max_lev lev p =
                                  display_spouse conf base marks paths fam e
                                    c;
                                  if Array.length el <> 0 then
-                                   Wserver.wprint "....."
+                                   Wserver.printf "....."
                                  else ();
-                                 Wserver.wprint "\n"
+                                 Wserver.printf "\n"
                                })
                             (get_family (pget conf base ie))
                         else
@@ -397,7 +397,7 @@ value print_family conf base marks paths max_lev lev p =
                     })
                  cnt (Array.to_list el)
              in
-             Wserver.wprint "</ol>\n";
+             Wserver.printf "</ol>\n";
              cnt
            })
         0 (Array.to_list (get_family p))
@@ -450,26 +450,26 @@ value display_descendants_with_numbers conf base max_level ancestor =
   do {
     header conf title;
     total.val := 0;
-    Wserver.wprint "%s" (Date.short_dates_text conf base ancestor);
+    Wserver.printf "%s" (Date.short_dates_text conf base ancestor);
     let p = ancestor in
     if authorized_age conf base p then
       match (Adef.od_of_codate (get_birth p), get_death p) with
       [ (Some _, _) | (_, Death _ _) -> html_br conf
       | _ -> () ]
     else ();
-    Wserver.wprint "%s." (capitale (text_to conf max_level));
+    Wserver.printf "%s." (capitale (text_to conf max_level));
     html_p conf;
     mark_descendants conf base marks max_level (get_key_index ancestor);
     label_descendants conf base marks paths max_level ancestor;
     print_families conf base marks paths max_level ancestor;
     if total.val > 1 then do {
       html_p conf;
-      Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) total.val
+      Wserver.printf "%s: %d %s" (capitale (transl conf "total")) total.val
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
       if max_level > 1 then
-        Wserver.wprint " (%s)" (transl conf "spouses not included")
+        Wserver.printf " (%s)" (transl conf "spouses not included")
       else ();
-      Wserver.wprint ".\n"
+      Wserver.printf ".\n"
     }
     else ();
     trailer conf
@@ -478,14 +478,14 @@ value display_descendants_with_numbers conf base max_level ancestor =
 
 value print_ref conf base paths p =
   if paths.(Adef.int_of_iper (get_key_index p)) <> [] then
-    Wserver.wprint " => <tt><b>%s</b></tt>" (label_of_path paths p)
+    Wserver.printf " => <tt><b>%s</b></tt>" (label_of_path paths p)
   else
     Array.iter
       (fun ifam ->
          let c = spouse (get_key_index p) (foi base ifam) in
          if paths.(Adef.int_of_iper c) <> [] then
            let c = pget conf base c in
-           Wserver.wprint " => %s %s <tt><b>%s</b></tt>" (p_first_name base c)
+           Wserver.printf " => %s %s <tt><b>%s</b></tt>" (p_first_name base c)
              (p_surname base c) (label_of_path paths c)
          else ())
       (get_family p)
@@ -497,16 +497,16 @@ value print_elem conf base paths precision (n, pll) =
     match List.rev pll with
     [ [[p]] ->
         do {
-          Wserver.wprint "<strong>%s %s %s</strong>" (surname_end base n)
+          Wserver.printf "<strong>%s %s %s</strong>" (surname_end base n)
             (reference conf base p (person_text_without_surname conf base p))
             (surname_begin base n);
-          Wserver.wprint "%s" (Date.short_dates_text conf base p);
+          Wserver.printf "%s" (Date.short_dates_text conf base p);
           print_ref conf base paths p;
-          Wserver.wprint "\n"
+          Wserver.printf "\n"
         }
     | pll ->
         do {
-          Wserver.wprint "<strong>%s%s</strong>\n" (surname_end base n)
+          Wserver.printf "<strong>%s%s</strong>\n" (surname_end base n)
             (surname_begin base n);
           tag "ul" begin
             List.iter
@@ -530,10 +530,10 @@ value print_elem conf base paths precision (n, pll) =
                           end;
                         }
                         else ();
-                        Wserver.wprint "%s"
+                        Wserver.printf "%s"
                           (Date.short_dates_text conf base p);
                         print_ref conf base paths p;
-                        Wserver.wprint "\n"
+                        Wserver.printf "\n"
                       })
                    pl)
               pll;
@@ -593,7 +593,7 @@ value display_descendant_index conf base max_level ancestor =
            string_of_int (Adef.int_of_iper (get_key_index ancestor)) ^
            ";v=" ^ string_of_int max_level ^ ";t=C")
         txt
-    else Wserver.wprint "%s" txt
+    else Wserver.printf "%s" txt
   in
   do {
     header conf title;
@@ -620,7 +620,7 @@ value display_descendant_index conf base max_level ancestor =
 value display_spouse_index conf base max_level ancestor =
   let max_level = min (Perso.limit_desc conf) max_level in
   let title _ =
-    Wserver.wprint "%s"
+    Wserver.printf "%s"
       (capitale (transl conf "index of the spouses (non descendants)"))
   in
   do {
@@ -674,69 +674,69 @@ value print_desc_table_header conf base = do {
   let nb_col = ref 2 in
   tag "tr" "class=\"descends_table_header\"" begin
     tag "th" begin
-      Wserver.wprint "%s" (capitale (transl conf "n° d'Aboville"));
+      Wserver.printf "%s" (capitale (transl conf "n° d'Aboville"));
     end;
     tag "th" begin
-      Wserver.wprint "%s" (capitale (transl_nth conf "person/persons" 0));
+      Wserver.printf "%s" (capitale (transl_nth conf "person/persons" 0));
     end;
     if p_getenv conf.env "birth" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "date of birth"));
+        Wserver.printf "%s" (capitale (transl conf "date of birth"));
       end
     else ();
     if p_getenv conf.env "birth_place" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "where born"));
+        Wserver.printf "%s" (capitale (transl conf "where born"));
       end
     else ();
     if p_getenv conf.env "marr" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl_nth conf "spouse/spouses" 1));
+        Wserver.printf "%s" (capitale (transl_nth conf "spouse/spouses" 1));
       end
     else ();
     if p_getenv conf.env "marr_date" = Some "on" then
       tag "th" begin
-        Wserver.wprint "%s" (capitale (transl conf "date of marriage"));
+        Wserver.printf "%s" (capitale (transl conf "date of marriage"));
         incr nb_col;
       end
     else ();
     if p_getenv conf.env "marr_place" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "where married"));
+        Wserver.printf "%s" (capitale (transl conf "where married"));
       end
     else ();
     if p_getenv conf.env "child" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "nb children"));
+        Wserver.printf "%s" (capitale (transl conf "nb children"));
       end
     else ();
     if p_getenv conf.env "death" = Some "on" then
       tag "th" begin
-        Wserver.wprint "%s" (capitale (transl conf "date of death"));
+        Wserver.printf "%s" (capitale (transl conf "date of death"));
         incr nb_col;
       end
     else ();
     if p_getenv conf.env "death_place" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "where dead"));
+        Wserver.printf "%s" (capitale (transl conf "where dead"));
       end
     else ();
     if p_getenv conf.env "death_age" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s" (capitale (transl conf "age at death"));
+        Wserver.printf "%s" (capitale (transl conf "age at death"));
       end
     else ();
     if p_getenv conf.env "occu" = Some "on" then
       tag "th" begin
         incr nb_col;
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (capitale (transl_nth conf "occupation/occupations" 1));
       end
     else ();
@@ -802,20 +802,20 @@ value print_person_table conf base p lab = do {
   (* afficher est vide, comme ça, on ne casse pas le rowspan.     *)
   tag "tr" begin
     tag "td" "%s" rowspan begin
-      Wserver.wprint "%s" lab;
+      Wserver.printf "%s" lab;
     end;
     tag "td" "%s" rowspan begin
       Util.print_image_sex conf p 11;
-      Wserver.wprint " %s &nbsp;" (referenced_person_title_text conf base p);
+      Wserver.printf " %s &nbsp;" (referenced_person_title_text conf base p);
     end;
     if p_getenv conf.env "birth" = Some "on" then
       tag "td" "%s" rowspan begin
-        Wserver.wprint "%s" birth;
+        Wserver.printf "%s" birth;
       end
     else ();
     if p_getenv conf.env "birth_place" = Some "on" then
       tag "td" "%s" rowspan begin
-        Wserver.wprint "%s &nbsp;" birth_place;
+        Wserver.printf "%s &nbsp;" birth_place;
       end
     else ();
     (* On affiche que la première famille (get_family u).(0). *)
@@ -833,10 +833,10 @@ value print_person_table conf base p lab = do {
               pget conf base (Gutil.spouse (get_key_index p) cpl)
             in
             Util.print_image_sex conf spouse 11;
-            Wserver.wprint
+            Wserver.printf
               " %s &nbsp;" (referenced_person_text conf base spouse);
           }
-        else Wserver.wprint "&nbsp;";
+        else Wserver.printf "&nbsp;";
       end
     else ();
     (* On affiche que la première famille (get_family u).(0). *)
@@ -861,8 +861,8 @@ value print_person_table conf base p lab = do {
               | _ -> "&nbsp;" ]
             else "&nbsp;"
           in
-          Wserver.wprint "%s" mdate
-        else Wserver.wprint "&nbsp;";
+          Wserver.printf "%s" mdate
+        else Wserver.printf "&nbsp;";
       end
     else ();
     (* On affiche que la première famille (get_family u).(0). *)
@@ -884,8 +884,8 @@ value print_person_table conf base p lab = do {
               Util.string_of_place conf (sou base (get_marriage_place cpl))
             else ""
           in
-          Wserver.wprint "%s &nbsp;" mplace
-        else Wserver.wprint "&nbsp;";
+          Wserver.printf "%s &nbsp;" mplace
+        else Wserver.printf "&nbsp;";
       end
     else ();
     (* On affiche que la première famille (get_family u).(0). *)
@@ -902,8 +902,8 @@ value print_person_table conf base p lab = do {
           let u = p in
           if nb_families > 0 then
             let fam = foi base (get_family u).(0) in
-            Wserver.wprint "%d &nbsp;" (Array.length (get_children fam))
-          else Wserver.wprint "&nbsp;";
+            Wserver.printf "%d &nbsp;" (Array.length (get_children fam))
+          else Wserver.printf "&nbsp;";
           end
       else
         let n =
@@ -912,17 +912,17 @@ value print_person_table conf base p lab = do {
             0 (Array.to_list (get_family p))
         in
         tag "td" begin
-          Wserver.wprint "%d &nbsp;" n;
+          Wserver.printf "%d &nbsp;" n;
         end
     else ();
     if p_getenv conf.env "death" = Some "on" then
       tag "td" "%s" rowspan begin
-        Wserver.wprint "%s" death;
+        Wserver.printf "%s" death;
       end
     else ();
     if p_getenv conf.env "death_place" = Some "on" then
       tag "td" "%s" rowspan begin
-        Wserver.wprint "%s &nbsp;" death_place;
+        Wserver.printf "%s &nbsp;" death_place;
       end
     else ();
     if p_getenv conf.env "death_age" = Some "on" then
@@ -942,12 +942,12 @@ value print_person_table conf base p lab = do {
                 s ^ Date.string_of_age conf a
             | _ -> "" ]
         in
-        Wserver.wprint "%s &nbsp;" d;
+        Wserver.printf "%s &nbsp;" d;
       end
     else ();
     if p_getenv conf.env "occu" = Some "on" then
       tag "td" "%s" rowspan begin
-        Wserver.wprint
+        Wserver.printf
           "%s &nbsp;" (if p_auth then sou base (get_occupation p) else "");
       end
     else ();
@@ -973,7 +973,7 @@ value print_person_table conf base p lab = do {
               (if (nb_families - 1) <> i then "border-bottom:none;" else "")
               begin
                 Util.print_image_sex conf spouse 11;
-                Wserver.wprint
+                Wserver.printf
                   " %s &nbsp;" (referenced_person_text conf base spouse);
             end
           else ();
@@ -990,7 +990,7 @@ value print_person_table conf base p lab = do {
                     | _ -> "&nbsp;" ]
                   else "&nbsp;"
                 in
-                Wserver.wprint "%s" mdate;
+                Wserver.printf "%s" mdate;
             end
           else ();
           if p_getenv conf.env "marr_place" = Some "on" then
@@ -1003,14 +1003,14 @@ value print_person_table conf base p lab = do {
                     Util.string_of_place conf (sou base (get_marriage_place cpl))
                   else ""
                 in
-                Wserver.wprint "%s &nbsp;" mplace;
+                Wserver.printf "%s &nbsp;" mplace;
             end
           else ();
           if p_getenv conf.env "child" = Some "on" then
             tag "td" "align=\"center\" style=\"border-top:none; %s\""
               (if (nb_families - 1) <> i then "border-bottom:none;" else "")
               begin
-                Wserver.wprint "%d &nbsp;" (Array.length (get_children fam));
+                Wserver.printf "%d &nbsp;" (Array.length (get_children fam));
             end
           else ();
         end
@@ -1093,7 +1093,7 @@ value display_descendant_with_table conf base max_lev p =
           if first && lev > 0 && p_getenv conf.env "gen" = Some "on" then
             tag "tr" begin
               tag "th" "align=\"left\" colspan=\"%d\"" nb_col begin
-                Wserver.wprint "%s %d"
+                Wserver.printf "%s %d"
                   (capitale (transl_nth conf "generation/generations" 0)) lev;
               end;
             end
@@ -1106,7 +1106,7 @@ value display_descendant_with_table conf base max_lev p =
   do {
     header conf (descendants_title conf base p);
     tag "p" begin
-      Wserver.wprint "%s." (capitale (text_to conf max_lev));
+      Wserver.printf "%s." (capitale (text_to conf max_lev));
     end;
     tag "table" "class=descends_table" begin
       (* On affiche l'entête et on en profite pour récupèrer *)
@@ -1115,7 +1115,7 @@ value display_descendant_with_table conf base max_lev p =
       loop 0 nb_col True [(p, "")] [(p, "")];
     end;
     tag "p" begin
-      Wserver.wprint "%s: %d %s"
+      Wserver.printf "%s: %d %s"
         (capitale (transl conf "total"))
         nb_pers.val
         (transl_nth conf "person/persons" 1);
@@ -1406,12 +1406,12 @@ value print_aboville conf base max_level p =
   do {
     Hutil.header conf (descendants_title conf base p);
     print_link_to_welcome conf True;
-    Wserver.wprint "%s.<br><p>" (capitale (text_to conf max_level));
+    Wserver.printf "%s.<br><p>" (capitale (text_to conf max_level));
     let rec loop_ind lev lab p =
       do {
-        if num_aboville then Wserver.wprint "<tt>%s</tt>\n" lab
-        else Wserver.wprint "%s\n" lab;
-        Wserver.wprint "%s%s\n" (referenced_person_title_text conf base p)
+        if num_aboville then Wserver.printf "<tt>%s</tt>\n" lab
+        else Wserver.printf "%s\n" lab;
+        Wserver.printf "%s%s\n" (referenced_person_title_text conf base p)
           (Date.short_dates_text conf base p);
         let u = p in
         if lev < max_level then
@@ -1431,12 +1431,12 @@ value print_aboville conf base max_level p =
                 | _ -> "" ]
               else ""
             in
-            Wserver.wprint "&amp;%s %s%s\n" mdate
+            Wserver.printf "&amp;%s %s%s\n" mdate
               (referenced_person_title_text conf base spouse)
               (Date.short_dates_text conf base spouse)
           }
         else ();
-        Wserver.wprint "<br>\n";
+        Wserver.printf "<br>\n";
         if lev < max_level then
           let rec loop_fam cnt_chil i =
             if i = Array.length (get_family u) then ()

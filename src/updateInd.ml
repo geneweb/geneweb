@@ -763,7 +763,7 @@ value print_update_ind conf base p digest =
 value print_del1 conf base p =
   let title _ =
     let s = transl_nth conf "person/persons" 0 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
+    Wserver.printf "%s" (capitale (transl_decline conf "delete" s))
   in
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;

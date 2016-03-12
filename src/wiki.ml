@@ -638,16 +638,16 @@ value print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     if cnt0 >= first_cnt then
       stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 - 1)
       begin
-        Wserver.wprint "&lt;&lt;";
+        Wserver.printf "&lt;&lt;";
       end
     else ();
     stagn "a" "href=\"%sm=%s%s\"" (commd conf) edit_mode sfn begin
-      Wserver.wprint "^^";
+      Wserver.printf "^^";
     end;
     if not is_empty then
       stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 + 1)
       begin
-        Wserver.wprint "&gt;&gt;";
+        Wserver.printf "&gt;&gt;";
       end
     else ();
   end
@@ -672,7 +672,7 @@ value print_sub_part_text conf wi edit_opt cnt0 lines =
       s2 ^ s
     else s
   in
-  Wserver.wprint "%s\n" s
+  Wserver.printf "%s\n" s
 ;
 
 value print_sub_part conf wi can_edit edit_mode sub_fname cnt0
@@ -705,13 +705,13 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
     tag "div" "style=\"font-size:80%%;float:%s;margin-%s:3em\"" conf.right
       conf.left
     begin
-      Wserver.wprint "(";
+      Wserver.printf "(";
       stag "a" "href=\"%sm=%s%s%s\"" (commd conf) mode
         (if has_v then ";v=" ^ string_of_int v else "") sfn
       begin
-        Wserver.wprint "%s" (message_txt conf 0);
+        Wserver.printf "%s" (message_txt conf 0);
       end;
-      Wserver.wprint ")\n";
+      Wserver.printf ")\n";
     end
   else ();
   print_link_to_welcome conf (if can_edit then False else True);
@@ -752,7 +752,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
                   stag "textarea" "name=\"notes\" rows=\"25\" cols=\"110\"%s"
                     (if can_edit then "" else " readonly=\"readonly\"")
                   begin
-                    Wserver.wprint "%s" (quote_escaped sub_part);
+                    Wserver.printf "%s" (quote_escaped sub_part);
                   end;
                 end;
               end;
@@ -868,14 +868,14 @@ value split_title_and_text s =
 
 value print_ok conf wi edit_mode fname title_is_1st s =
   let title _ =
-    Wserver.wprint "%s" (Util.capitale (Util.transl conf "notes modified"))
+    Wserver.printf "%s" (Util.capitale (Util.transl conf "notes modified"))
   in
   do {
     Hutil.header_no_page_title conf title;
     tag "div" "style=\"text-align:center\"" begin
-      Wserver.wprint "--- ";
+      Wserver.printf "--- ";
       title ();
-      Wserver.wprint " ---\n";
+      Wserver.printf " ---\n";
     end;
     Hutil.print_link_to_welcome conf True;
     let get_v = Util.p_getint conf.env "v" in

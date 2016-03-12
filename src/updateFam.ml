@@ -84,7 +84,7 @@ value not_impl func x =
       "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
     else "int_val = " ^ string_of_int (Obj.magic x)
   in
-  Wserver.wprint ">%s<p>\n" ("UpdateFam." ^ func ^ ": not impl " ^ desc)
+  Wserver.printf ">%s<p>\n" ("UpdateFam." ^ func ^ ": not impl " ^ desc)
 ;
 
 value obsolete_list = ref [];
@@ -665,7 +665,7 @@ value print_update_fam conf base fcd digest =
 value print_del1 conf base ifam =
   let title _ =
     let s = transl_nth conf "family/families" 0 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
+    Wserver.printf "%s" (capitale (transl_decline conf "delete" s))
   in
   do {
     let p =
@@ -676,7 +676,7 @@ value print_del1 conf base ifam =
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
     tag "h2" begin title False; end;
     print_link_to_welcome conf True;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
@@ -691,34 +691,34 @@ value print_del1 conf base ifam =
         xtag "input" "type=\"submit\" value=\"Ok\"";
       end;
     end;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf
   }
 ;
 
 value print_inv1 conf base p ifam1 ifam2 =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
+    Wserver.printf "%s" (capitale (transl_decline conf "invert" ""))
   in
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
-    Wserver.wprint "%s:"
+    Wserver.printf "%s:"
       (capitale (transl conf "invert the order of the following families"));
     tag "ul" begin
       tag "li" begin
         Update.print_someone conf base (poi base (get_father cpl1));
-        Wserver.wprint " %s " (transl_nth conf "and" 0);
+        Wserver.printf " %s " (transl_nth conf "and" 0);
         Update.print_someone conf base (poi base (get_mother cpl1));
       end;
       tag "li" begin
         Update.print_someone conf base (poi base (get_father cpl2));
-        Wserver.wprint " %s " (transl_nth conf "and" 0);
+        Wserver.printf " %s " (transl_nth conf "and" 0);
         Update.print_someone conf base (poi base (get_mother cpl2));
       end;
     end;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
@@ -732,7 +732,7 @@ value print_inv1 conf base p ifam1 ifam2 =
         xtag "input" "type=\"submit\" value=\"Ok\"";
       end;
     end;
-    Wserver.wprint "\n";
+    Wserver.printf "\n";
     trailer conf
   }
 ;
@@ -859,15 +859,15 @@ value print_change_order conf base =
              tag "li" "%s"
                (if diff_arr.(i) then "style=\"background:pink\"" else "")
              begin
-               Wserver.wprint "%s%s" (p_first_name base p)
+               Wserver.printf "%s%s" (p_first_name base p)
                  (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p));
-               Wserver.wprint "  &amp;";
-               Wserver.wprint "%s\n"
+               Wserver.printf "  &amp;";
+               Wserver.printf "%s\n"
                  (Date.short_marriage_date_text conf base fam p sp);
-               Wserver.wprint "%s%s %s" (p_first_name base sp)
+               Wserver.printf "%s%s %s" (p_first_name base sp)
                  (if get_occ sp = 0 then "" else "." ^ string_of_int (get_occ sp))
                  (p_surname base sp);
-               Wserver.wprint "\n";
+               Wserver.printf "\n";
              end)
           arr
       in
@@ -877,11 +877,11 @@ value print_change_order conf base =
       let (before, after) = (get_family p, Array.of_list after) in
       let (bef_d, aft_d) = Diff.f before after in
       let title _ =
-        Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
+        Wserver.printf "%s" (capitale (transl_decline conf "invert" ""))
       in
       Perso.interp_templ_with_menu title "perso_header" conf base p;
       tag "h2" begin title False; end;
-      Wserver.wprint "%s:"
+      Wserver.printf "%s:"
         (capitale (transl conf "invert the order of the following families"));
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
@@ -909,7 +909,7 @@ value print_change_order conf base =
           xtag "input" "type=\"submit\" value=\"Ok\"";
         end;
       end;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
       trailer conf
     }
   | _ -> incorrect_request conf ]

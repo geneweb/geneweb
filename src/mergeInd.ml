@@ -14,15 +14,15 @@ value print_differences conf base branches p1 p2 =
     let x1 = proj p1 in
     let x2 = proj p2 in
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then do {
-      Wserver.wprint "<h4>%s</h4>\n" (capitale title);
+      Wserver.printf "<h4>%s</h4>\n" (capitale title);
       tag "ul" begin
         tag "li" begin
           xtag "input" "type=\"radio\" name=\"%s\" value=\"1\"%s" name chk1;
-          Wserver.wprint "%s\n" x1;
+          Wserver.printf "%s\n" x1;
         end;
         tag "li" begin
           xtag "input" "type=\"radio\" name=\"%s\" value=\"2\"%s" name chk2;
-          Wserver.wprint "%s\n" x2;
+          Wserver.printf "%s\n" x2;
         end;
       end;
     }
@@ -155,7 +155,7 @@ value print_differences conf base branches p1 p2 =
     string_field True (transl conf "burial" ^ " / " ^ transl conf "place")
       "burial_place" (fun p -> sou base (get_burial_place p));
     html_p conf;
-    Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+    Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
   end
 ;
 
@@ -256,22 +256,22 @@ value compatible_fam base fam1 fam2 =
 value propose_merge_ind conf base branches p1 p2 =
   let title h =
     let s = transl_nth conf "person/persons" 1 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "merge" s))
+    Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
   do {
     header conf title;
     if branches <> [] then do {
-      Wserver.wprint "%s:\n" (capitale (transl conf "you must first merge"));
+      Wserver.printf "%s:\n" (capitale (transl conf "you must first merge"));
       tag "ul" begin
         html_li conf;
         stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
           Merge.print_someone conf base p1;
         end;
-        Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
+        Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
         stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p2) begin
           Merge.print_someone conf base p2;
         end;
-        Wserver.wprint "\n";
+        Wserver.printf "\n";
       end;
       html_p conf;
     }
@@ -281,7 +281,7 @@ value propose_merge_ind conf base branches p1 p2 =
       html_p conf;
       xtag "hr";
       html_p conf;
-      Wserver.wprint "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
+      Wserver.printf "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
       html_p conf;
       tag "table" begin
         List.iter
@@ -291,12 +291,12 @@ value propose_merge_ind conf base branches p1 p2 =
              do {
                tag "tr" "align=\"%s\"" conf.left begin
                  tag "td" begin
-                   Wserver.wprint "\n%s" (referenced_person_text conf base p1);
-                   Wserver.wprint "%s" (Date.short_dates_text conf base p1);
+                   Wserver.printf "\n%s" (referenced_person_text conf base p1);
+                   Wserver.printf "%s" (Date.short_dates_text conf base p1);
                  end;
                  tag "td" begin
-                   Wserver.wprint "\n%s" (referenced_person_text conf base p2);
-                   Wserver.wprint "%s" (Date.short_dates_text conf base p2);
+                   Wserver.printf "\n%s" (referenced_person_text conf base p2);
+                   Wserver.printf "%s" (Date.short_dates_text conf base p2);
                  end;
                end;
              })
@@ -447,15 +447,15 @@ value is_ancestor base ip1 ip2 =
 ;
 
 value error_loop conf base p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<strong>%s%s %s</strong>" (p_first_name base p)
+    Wserver.printf "<strong>%s%s %s</strong>" (p_first_name base p)
       (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
       (p_surname base p);
-    Wserver.wprint "\n%s\n" (transl conf "would be his/her own ancestor");
-    Wserver.wprint "\n";
+    Wserver.printf "\n%s\n" (transl conf "would be his/her own ancestor");
+    Wserver.printf "\n";
     trailer conf;
   }
 ;
@@ -484,22 +484,22 @@ value merge_ind conf base warning branches ip1 ip2 changes_done =
 value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   let title h =
     let s = transl_nth conf "family/families" 1 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "merge" s))
+    Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
   do {
     header conf title;
-    Wserver.wprint "%s:\n"
+    Wserver.printf "%s:\n"
       (capitale (transl conf "you must first merge the 2 families"));
     tag "ul" begin
       html_li conf;
       stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
         Merge.print_someone conf base p1;
       end;
-      Wserver.wprint "\n%s\n" (transl conf "with");
+      Wserver.printf "\n%s\n" (transl conf "with");
       stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p2) begin
         Merge.print_someone conf base p2;
       end;
-      Wserver.wprint "\n";
+      Wserver.printf "\n";
     end;
     html_p conf;
     MergeFam.print_differences conf base branches fam1 fam2;
@@ -558,10 +558,10 @@ value merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
 ;
 
 value not_found_or_incorrect conf =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    Wserver.wprint "%s %s %s %s %s\n" (capitale (transl conf "not found"))
+    Wserver.printf "%s %s %s %s %s\n" (capitale (transl conf "not found"))
       (transl conf "or") (transl conf "several answers") (transl conf "or")
       (transl conf "incorrect request");
     trailer conf;
@@ -569,19 +569,19 @@ value not_found_or_incorrect conf =
 ;
 
 value same_person conf =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    Wserver.wprint "%s\n" (capitale (transl conf "it is the same person!"));
+    Wserver.printf "%s\n" (capitale (transl conf "it is the same person!"));
     trailer conf;
   }
 ;
 
 value different_sexes conf =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
-    Wserver.wprint "%s.\n" (capitale (transl conf "incompatible sexes"));
+    Wserver.printf "%s.\n" (capitale (transl conf "incompatible sexes"));
     trailer conf;
   }
 ;
@@ -628,13 +628,13 @@ value rec try_merge conf base warning branches ip1 ip2 changes_done =
 ;
 
 value print_merged conf base wl p = do {
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "merge done")) in
+  let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
   Wserver.wrap_string.val := Util.xml_pretty_print;
   header conf title;
   print_link_to_welcome conf True;
   tag "ul" begin
     tag "li" begin
-      Wserver.wprint "%s\n" (referenced_person_text conf base p);
+      Wserver.printf "%s\n" (referenced_person_text conf base p);
     end;
   end;
   match (p_getenv conf.env "m", p_getint conf.env "ip") with
@@ -651,9 +651,9 @@ value print_merged conf base wl p = do {
       in
       tag "p" begin
         stag "a" "href=%sm=MRG_DUP;ip=%d%s%s" (commd conf) ip s1 s2 begin
-          Wserver.wprint "%s" (capitale (transl conf "continue merging"));
+          Wserver.printf "%s" (capitale (transl conf "continue merging"));
         end;
-        Wserver.wprint "\n(%s)\n"
+        Wserver.printf "\n(%s)\n"
           (Util.transl_a_of_b conf (transl conf "possible duplications")
              (referenced_person_text conf base
                 (poi base (Adef.iper_of_int ip))));
@@ -747,12 +747,12 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
 ;
 
 value print_killed conf base p nb_ind nb_fam =
-  let title _ = Wserver.wprint "Ancestors killed" in
+  let title _ = Wserver.printf "Ancestors killed" in
   do {
     Hutil.header conf title;
-    Wserver.wprint "%s's ancestors killed.<br>\n"
+    Wserver.printf "%s's ancestors killed.<br>\n"
       (referenced_person_title_text conf base p);
-    Wserver.wprint "%d persons and %d families deleted<p>\n" nb_ind nb_fam;
+    Wserver.printf "%d persons and %d families deleted<p>\n" nb_ind nb_fam;
     Hutil.trailer conf;
   }
 ;

@@ -87,24 +87,22 @@ value charset conf =
   [ Not_found -> "iso-8859-1" ]
 ;
 
-value nl () = Wserver.wprint "\013\010";
-
 value header_no_page_title conf title =
   do {
     Wserver.http "";
-    Wserver.wprint "Content-type: text/html; charset=%s" (charset conf);
-    nl (); nl ();
-    Wserver.wprint "\
+    Wserver.header "Content-type: text/html; charset=%s" (charset conf);
+    Wserver.header "";
+    Wserver.printf "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
 \"http://www.w3.org/TR/REC-html40/loose.dtd\">
 ";
-    Wserver.wprint "<head>\n";
-    Wserver.wprint "  <meta name=\"robots\" content=\"none\">\n";
-    Wserver.wprint "  <title>";
+    Wserver.printf "<head>\n";
+    Wserver.printf "  <meta name=\"robots\" content=\"none\">\n";
+    Wserver.printf "  <title>";
     title True;
-    Wserver.wprint "</title>\n";
-    Wserver.wprint "</head>\n";
-    Wserver.wprint "<body>\n"
+    Wserver.printf "</title>\n";
+    Wserver.printf "</head>\n";
+    Wserver.printf "<body>\n"
   }
 ;
 
@@ -116,26 +114,26 @@ value abs_setup_dir () =
 
 value trailer conf =
   do {
-    Wserver.wprint "\n<br />\n";
-    Wserver.wprint "<div id=\"footer\">\n" ;
-    Wserver.wprint "<hr />\n";
-    Wserver.wprint "<div>\n";
-    Wserver.wprint "<em>\n";
-    Wserver.wprint "<a href=\"https://github.com/geneweb/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2016\n</em>\n" Version.txt;
-    Wserver.wprint "</div>\n" ;
-    Wserver.wprint "</div>\n" ;
+    Wserver.printf "\n<br />\n";
+    Wserver.printf "<div id=\"footer\">\n" ;
+    Wserver.printf "<hr />\n";
+    Wserver.printf "<div>\n";
+    Wserver.printf "<em>\n";
+    Wserver.printf "<a href=\"https://github.com/geneweb/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2016\n</em>\n" Version.txt;
+    Wserver.printf "</div>\n" ;
+    Wserver.printf "</div>\n" ;
     (* finish the html page *)
-    Wserver.wprint "</body>\n";
-    Wserver.wprint "</html>\n";
+    Wserver.printf "</body>\n";
+    Wserver.printf "</html>\n";
   }
 ;
 
 value header conf title =
   do {
     header_no_page_title conf title;
-    Wserver.wprint "<h1>";
+    Wserver.printf "<h1>";
     title False;
-    Wserver.wprint "</h1>\n";
+    Wserver.printf "</h1>\n";
   }
 ;
 
@@ -673,20 +671,20 @@ value print_file conf bname =
   [ Some ic ->
       do {
         Wserver.http "";
-        Wserver.wprint "Content-type: text/html; charset=%s" (charset conf);
-        nl (); nl ();
-        copy_from_stream conf (fun x -> Wserver.wprint "%s" x)
+        Wserver.header "Content-type: text/html; charset=%s" (charset conf);
+        Wserver.header "";
+        copy_from_stream conf (fun x -> Wserver.printf "%s" x)
           (Stream.of_channel ic);
         close_in ic;
         trailer conf
       }
   | None ->
-      let title _ = Wserver.wprint "Error" in
+      let title _ = Wserver.printf "Error" in
       do {
         header conf title;
-        Wserver.wprint "<ul><li>\n";
-        Wserver.wprint "Cannot access file \"%s\".\n" fname;
-        Wserver.wprint "</ul>\n";
+        Wserver.printf "<ul><li>\n";
+        Wserver.printf "Cannot access file \"%s\".\n" fname;
+        Wserver.printf "</ul>\n";
         trailer conf;
         raise Exit
       } ]
@@ -694,8 +692,8 @@ value print_file conf bname =
 
 value error conf str =
   do {
-    header conf (fun _ -> Wserver.wprint "Incorrect request");
-    Wserver.wprint "<em>%s</em>\n" (String.capitalize str);
+    header conf (fun _ -> Wserver.printf "Incorrect request");
+    Wserver.printf "<em>%s</em>\n" (String.capitalize str);
     trailer conf
   }
 ;
@@ -1663,25 +1661,24 @@ value print_typed_file conf typ fname =
   [ Some ic ->
       do {
         Wserver.http "";
-        Wserver.wprint "Content-type: %s" typ;
-        nl ();
-        Wserver.wprint "Content-length: %d" (in_channel_length ic);
-        nl (); nl ();
+        Wserver.header "Content-type: %s" typ;
+        Wserver.header "Content-length: %d" (in_channel_length ic);
+        Wserver.header "";
         try
           while True do {
             let c = input_char ic in
-            Wserver.wprint "%c" c
+            Wserver.printf "%c" c
           }
         with [ End_of_file -> () ];
         close_in ic;
       }
   | None ->
-      let title _ = Wserver.wprint "Error" in
+      let title _ = Wserver.printf "Error" in
       do {
         header conf title;
-        Wserver.wprint "<ul><li>\n";
-        Wserver.wprint "Cannot access file \"%s\".\n" fname;
-        Wserver.wprint "</ul>\n";
+        Wserver.printf "<ul><li>\n";
+        Wserver.printf "Cannot access file \"%s\".\n" fname;
+        Wserver.printf "</ul>\n";
         trailer conf;
         raise Exit
       } ]

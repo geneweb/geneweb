@@ -184,11 +184,11 @@ value string_of_num sep num =
 
 value print_base_loop conf base p =
   do {
-    Wserver.wprint
+    Wserver.printf
       (fcapitale
          (ftransl conf "loop in database: %s is his/her own ancestor"))
       (Util.update_family_loop conf base p (designation base p));
-    Wserver.wprint ".\n";
+    Wserver.printf ".\n";
     Hutil.trailer conf;
     exit 2
   }
@@ -296,7 +296,7 @@ value init_sosa_t conf base sosa_ref =
       (* que si la boucle n'est pas à une génération d'écart, alors on *)
       (* boucle sur l'interprétation du template.                      *)
       do {
-        let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+        let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
         Hutil.rheader conf title;
         print_base_loop conf base p
       } ]
@@ -556,7 +556,7 @@ value print_sosa conf base p link =
               let b2 = Num.to_string sosa_num in
               "m=RL;i1=" ^ i1 ^ ";i2=" ^ i2 ^ ";b1=1;b2=" ^ b2
             in
-            Wserver.wprint "<a href=\"%s%s\" style=\"text-decoration:none\">"
+            Wserver.printf "<a href=\"%s%s\" style=\"text-decoration:none\">"
               (commd conf) sosa_link;
           let title =
             if (is_hide_names conf ref) && not (fast_auth_age conf ref) then ""
@@ -571,10 +571,10 @@ value print_sosa conf base p link =
                 Printf.sprintf ", Sosa: %s"
                   (string_of_num (transl conf "(thousand separator)") sosa_num)
           in
-          Wserver.wprint "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
+          Wserver.printf "<img src=\"%s/sosa.png\" alt=\"sosa\" title=\"%s\"/> "
             (image_prefix conf) title;
           if conf.cancel_links || not link then ()
-          else  Wserver.wprint "</a> ";
+          else  Wserver.printf "</a> ";
         }
     | None -> () ]
   else ()
@@ -5330,10 +5330,10 @@ value print_what_links conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h = do {
-      Wserver.wprint "%s: " (capitale (transl conf "linked pages"));
-      if h then Wserver.wprint "%s" (simple_person_text conf base p True)
+      Wserver.printf "%s: " (capitale (transl conf "linked pages"));
+      if h then Wserver.printf "%s" (simple_person_text conf base p True)
       else
-        Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
+        Wserver.printf "<a href=\"%s%s\">%s</a>" (commd conf)
           (acces conf base p) (simple_person_text conf base p True)
     }
     in

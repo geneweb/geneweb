@@ -321,7 +321,7 @@ value print_clean conf base =
   [ Some f when f <> "" ->
       do {
         let title _ =
-          Wserver.wprint "%s" (capitale (transl conf "clean history"))
+          Wserver.printf "%s" (capitale (transl conf "clean history"))
         in
         Hutil.header conf title;
         Hutil.print_link_to_welcome conf True;
@@ -341,7 +341,7 @@ value print_clean conf base =
                     tag "li" begin
                       tag "label" begin
                         xtag "input" "type=\"checkbox\" name=\"i%d\" value=\"on\"" i;
-                        Wserver.wprint "%s %s" gr.date gr.wizard;
+                        Wserver.printf "%s %s" gr.date gr.wizard;
                       end;
                     end;
                     loop (i + 1) l
@@ -391,7 +391,7 @@ value print_clean_ok conf base =
   [ Some f when f <> "" ->
       do {
         let title _ =
-          Wserver.wprint "%s" (capitale (transl conf "history cleaned"))
+          Wserver.printf "%s" (capitale (transl conf "history cleaned"))
         in
         Hutil.header conf title;
         Hutil.print_link_to_welcome conf True;

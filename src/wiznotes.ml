@@ -103,7 +103,7 @@ value print_wizards_by_alphabetic_order conf list =
       conf.manitou
     in
     if with_link then
-      Wserver.wprint
+      Wserver.printf
         "<a href=\"%sm=WIZNOTES;f=%s%t\">"
         (commd conf) (Util.code_varenv wz)
         (fun _ ->
@@ -127,10 +127,10 @@ value print_wizards_by_alphabetic_order conf list =
         String.sub wname islash
           (String.length wname - islash)
       in
-      Wserver.wprint "%s (%s)" s2 s1
+      Wserver.printf "%s (%s)" s2 s1
     else
-      Wserver.wprint "%s" wname;
-    if with_link then Wserver.wprint "</a>"
+      Wserver.printf "%s" wname;
+    if with_link then Wserver.printf "</a>"
     else ()
   }
   in
@@ -146,16 +146,16 @@ value print_wizards_by_date conf list = do {
           {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1;
            day = 0; prec = Sure; delta = 0}
         in
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (capitale (Date.string_of_ondate conf (Dgreg dmy Dgregorian))));
      (fun tm -> tm.Unix.tm_year,
-      fun tm -> Wserver.wprint "%d" (tm.Unix.tm_year + 1900))]
+      fun tm -> Wserver.printf "%d" (tm.Unix.tm_year + 1900))]
   in
   let list =
     List.sort (fun (_, _, _, mtm1) (_, _, _, mtm2) -> compare mtm2 mtm1)
       list
   in
-  Wserver.wprint "<dl>\n<dt>";
+  Wserver.printf "<dl>\n<dt>";
   let _ =
     List.fold_left
       (fun (spl, prev) (wz, (wname, _), wfile, stm) -> do {
@@ -169,7 +169,7 @@ value print_wizards_by_date conf list = do {
                  | [] -> assert False ]
                in
                if sep_period tm <> sep_period prev_tm then do {
-                 Wserver.wprint "</dd>\n<dt>";
+                 Wserver.printf "</dd>\n<dt>";
                  let spl =
                    match spl with
                    [ [_; (next_sp, _) :: _] ->
@@ -183,15 +183,15 @@ value print_wizards_by_date conf list = do {
            | None -> (True, spl) ]
          in
          if new_item then
-           if stm = 0.0 then Wserver.wprint "....."
+           if stm = 0.0 then Wserver.printf "....."
            else
              match spl with
              [ [(_, disp_sep_period) :: _] -> disp_sep_period tm
              | [] -> () ]
          else ();
-         if new_item then Wserver.wprint "</dt>\n<dd>\n" else ();
+         if new_item then Wserver.printf "</dt>\n<dd>\n" else ();
          let wname = if wname = "" then wz else wname in
-         Wserver.wprint "%s%t"
+         Wserver.printf "%s%t"
            (if prev = None || new_item then "" else ",\n")
            (fun _ ->
               if conf.wizard && conf.user = wz || wfile <> "" then
@@ -209,7 +209,7 @@ value print_wizards_by_date conf list = do {
       (sep_period_list, None) list
   in
   ();
-  Wserver.wprint "</dd></dl>\n"
+  Wserver.printf "</dd></dl>\n"
 };
 
 value print_old_wizards conf list =
@@ -217,23 +217,23 @@ value print_old_wizards conf list =
   else do {
     tag "dl" begin
       tag "dd" "style=\"list-style-type:circle\"" begin
-        Wserver.wprint "%s..." (transl_nth conf "and" 0);
+        Wserver.printf "%s..." (transl_nth conf "and" 0);
         tag "dl" begin
           tag "dd" begin
             Mutil.list_iter_first
               (fun first wz -> do {
-                 if not first then Wserver.wprint ",\n" else ();
+                 if not first then Wserver.printf ",\n" else ();
                  stag "a" "href=\"%sm=WIZNOTES;f=%s\"" (commd conf)
                    (Util.code_varenv wz)
                  begin
                    for i = 0 to String.length wz - 1 do {
-                     if wz.[i] = ' ' then Wserver.wprint "&nbsp;"
-                     else Wserver.wprint "%c" wz.[i];
+                     if wz.[i] = ' ' then Wserver.printf "&nbsp;"
+                     else Wserver.printf "%c" wz.[i];
                    };
                  end
                })
               list;
-            Wserver.wprint "\n";
+            Wserver.printf "\n";
           end;
         end;
       end;
@@ -279,7 +279,7 @@ value print_search_form conf from_wiz =
                 (match p_getenv conf.env "c" with
                  [ Some "on" -> " checked=\"checked\""
                  | Some _ | None -> "" ]);
-              Wserver.wprint "%s\n"
+              Wserver.printf "%s\n"
                 (transl_nth conf "search/case sensitive" 1);
             end;
             xtag "input" "type=\"submit\" value=\"%s\""
@@ -297,7 +297,7 @@ value print_main conf base auth_file =
       (transl_nth conf "wizard/wizards/friend/friends/exterior" 1)
   in
   let title _ =
-    Wserver.wprint "%s - %s" (capitale wiztxt)
+    Wserver.printf "%s - %s" (capitale wiztxt)
       (Util.translate_eval (transl_nth conf "note/notes" 1))
   in
   let by_alphab_order = p_getenv conf.env "o" <> Some "H" in
@@ -314,9 +314,9 @@ value print_main conf base auth_file =
   do {
     Hutil.header_no_page_title conf title; (* mouais... *)
     print_link_to_welcome conf True;
-    Wserver.wprint "<h1>";
+    Wserver.printf "<h1>";
     title False;
-    Wserver.wprint "</h1>\n";
+    Wserver.printf "</h1>\n";
     let list =
       List.map
         (fun (wz, wname) ->
@@ -330,21 +330,21 @@ value print_main conf base auth_file =
     in
     if by_alphab_order then do {
       tag "p" begin
-        Wserver.wprint "%d %s<br%s>\n" (List.length wizdata) wiztxt conf.xhs;
-        Wserver.wprint "<em style=\"font-size:80%%\">\n";
-        Wserver.wprint "%s " (capitale (transl conf "click"));
-        Wserver.wprint "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (commd conf)
+        Wserver.printf "%d %s<br%s>\n" (List.length wizdata) wiztxt conf.xhs;
+        Wserver.printf "<em style=\"font-size:80%%\">\n";
+        Wserver.printf "%s " (capitale (transl conf "click"));
+        Wserver.printf "<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n" (commd conf)
           (transl conf "here");
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (transl conf
              "for the list ordered by the date of the last modification");
-        Wserver.wprint ".</em>\n";
+        Wserver.printf ".</em>\n";
       end;
       print_wizards_by_alphabetic_order conf list;
     }
     else do {
       tag "p" begin
-        Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
+        Wserver.printf "%d %s\n" (List.length wizdata) wiztxt;
       end;
       print_wizards_by_date conf list;
     };
@@ -358,7 +358,7 @@ value print_main conf base auth_file =
 ;
 
 value wizard_page_title conf wz wizname h =
-  Wserver.wprint "%s" wizname
+  Wserver.printf "%s" wizname
 ;
 
 value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
@@ -374,9 +374,9 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
   let title = wizard_page_title conf wz wizname in
   header_no_page_title conf title;
   print_link_to_welcome conf True;
-  Wserver.wprint "<h1>";
+  Wserver.printf "<h1>";
   title False;
-  Wserver.wprint "</h1>\n";
+  Wserver.printf "</h1>\n";
   match Util.open_etc_file "summary" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
@@ -399,7 +399,7 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
           [ Some (case_sens, h) -> html_highlight case_sens h s
           | None -> s ]
         in
-        Wserver.wprint "%s\n"
+        Wserver.printf "%s\n"
           (if conf.pure_xhtml then Util.check_xhtml s else s);
       end;
     end;
@@ -411,7 +411,7 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
        year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
     in
     tag "p" begin
-      Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n"
+      Wserver.printf "<tt>(%s %02d:%02d)</tt>\n"
         (Date.string_of_ondate conf (Dgreg dmy Dgregorian))
         tm.Unix.tm_hour tm.Unix.tm_min;
     end
@@ -426,7 +426,7 @@ value print_whole_wiznote conf base auth_file wz wfile (s, date) ho = do {
 value print_part_wiznote conf base wz s cnt0 =
   let title = wz in
   do {
-    Hutil.header_no_page_title conf (fun _ -> Wserver.wprint "%s" title);
+    Hutil.header_no_page_title conf (fun _ -> Wserver.printf "%s" title);
     let s = string_with_macros conf [] s in
     let lines = Wiki.extract_sub_part s cnt0 in
     let lines = if cnt0 = 0 then [title; "<br /><br />" :: lines] else lines in
@@ -595,23 +595,23 @@ value print_connected_wizard conf first wddir wz tm_user = do {
            tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
            tm.Unix.tm_sec)
     begin
-      Wserver.wprint "%s" wz;
+      Wserver.printf "%s" wz;
     end
-  else Wserver.wprint "%s" wz;
-  Wserver.wprint " ";
+  else Wserver.printf "%s" wz;
+  Wserver.printf " ";
   stag "a" "href=\"%sm=HIST;k=20;wiz=%s\" style=\"text-decoration:none\""
     (commd conf) (Util.code_varenv wz)
   begin
-    Wserver.wprint "(*)";
+    Wserver.printf "(*)";
   end;
   let d = conf.ctime -. tm_user in
   if d = 0.0 then ()
   else do {
-    Wserver.wprint " - %.0f s" d;
+    Wserver.printf " - %.0f s" d;
     if first then do {
-      Wserver.wprint " ";
+      Wserver.printf " ";
       stag "span" "style=\"font-size:80%%\"" begin
-        Wserver.wprint "(%s)" (transl conf "since the last click");
+        Wserver.printf "(%s)" (transl conf "since the last click");
       end;
     }
     else ();
@@ -620,7 +620,7 @@ value print_connected_wizard conf first wddir wz tm_user = do {
 
 value do_connected_wizards conf base (_, _, _, wl) = do {
   let title _ =
-    Wserver.wprint "%s"
+    Wserver.printf "%s"
       (capitale (transl_nth conf "wizard/wizards/friend/friends/exterior" 1))
   in
   header conf title;
@@ -648,23 +648,23 @@ value do_connected_wizards conf base (_, _, _, wl) = do {
              begin
                print_connected_wizard conf first wddir wz tm_user;
                if wz = conf.user then do {
-                 Wserver.wprint " :\n%s;"
+                 Wserver.printf " :\n%s;"
                    (transl_nth conf "you are visible/you are not visible"
                       (if is_visible then 0 else 1));
-                 Wserver.wprint " %s %s%s%s %s" (transl conf "click")
+                 Wserver.printf " %s %s%s%s %s" (transl conf "click")
                    (Printf.sprintf "<a href=\"%sm=CHANGE_WIZ_VIS;v=%d\">"
                       (commd conf) (if is_visible then 0 else 1))
                    (transl conf "here") "</a>" (transl conf "to change");
-                 Wserver.wprint ".";
+                 Wserver.printf ".";
                }
                else ();
-               Wserver.wprint "\n";
+               Wserver.printf "\n";
              end;
              (not_everybody, False)
            })
         (False, True) wl
     in
-    if not_everybody then tag "li" begin Wserver.wprint "..."; end else ();
+    if not_everybody then tag "li" begin Wserver.printf "..."; end else ();
   end;
   trailer conf;
 };
