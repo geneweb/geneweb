@@ -4,9 +4,9 @@
   <hr />
   <div>
     <em>
-      <a href="http://opensource.geneanet.org/projects/geneweb/" target="_blank">
-      <img src="%image_prefix;/logo_bas.png" 
-      style="vertical-align: middle; border: 0" 
+      <a href="https://github.com/geneweb/geneweb" target="_blank">
+      <img src="%image_prefix;/logo_bas.png"
+      style="vertical-align: middle; border: 0"
       alt="GeneWeb" title="GeneWeb"%/></a>%sp;
       Version %version; %compilation_time;%sp;
       Copyright &copy; 1998-2016 INRIA%connections;%sq;

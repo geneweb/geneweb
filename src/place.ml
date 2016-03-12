@@ -10,8 +10,8 @@ open Util;
 
 
 value fold_place inverted s =
-  (* petit hack (pour GeneaNet) en attendant une vraie gestion des lieux *)
-  (* transforme "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)"    *)
+  (* petit hack en attendant une vraie gestion des lieux transforme
+     "[foo-bar] - boobar (baz)" en "foo-bar, boobar (baz)" *)
   let s =
    Str.global_replace (Str.regexp "^\[\([^]]+\)\] *- *\(.*\)") "\1, \2" s
   in

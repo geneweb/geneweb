@@ -17,7 +17,7 @@
   <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
 </div>
 <h2>Aide en ligne</h2>
-<ul><li><a href="http://opensource.geneanet.org/projects/geneweb/wiki/Fr_templm">http://opensource.geneanet.org/projects/geneweb/wiki/Fr_templm</a></li></ul>
+<ul><li><a href="http://geneweb.tuxfamily.org/wiki/Templm">http://geneweb.tuxfamily.org/wiki/Templm</a></li></ul>
 <h2>Options pour l'habillage templm</h2>
 <h3>[*file] : bases/%base.name;.gwf</h3>
 %let;l1;%if;(bvar.setup_http != "")%bvar.setup_http;%else;http://localhost:2316/%end;%in;
