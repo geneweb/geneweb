@@ -86,8 +86,7 @@ value channel_redirector channel callback = do {
   let chan = GMain.Io.channel_of_descr cout in
   let len = 80 in
   let buf = Bytes.create len in
-  GMain.Io.add_watch chan ~prio:0 ~cond:[`IN; `HUP; `ERR] ~callback:
-    do { fun cond ->
+  GMain.Io.add_watch chan ~{ prio = 0; cond = [`IN; `HUP; `ERR]; callback cond =
       try
         if List.mem `IN cond then do {
 	        (* On Windows, you must use Io.read *)
