@@ -3,6 +3,7 @@
 
 value eprintf = Printf.eprintf;
 
+
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
 value stop_server = ref "STOP_SERVER";
@@ -14,18 +15,56 @@ value wsocket () = wserver_sock.val;
 
 value wserver_oc = ref stdout;
 
-value wrap_string = ref (fun s -> s);
-
-value printf fmt =
-  Printf.ksprintf (fun s -> output_string wserver_oc.val (wrap_string.val s)) fmt
-;
 value printnl fmt =
   Printf.ksprintf (fun s -> do {
     output_string wserver_oc.val s;
     output_string wserver_oc.val "\013\010"
   }) fmt
 ;
-value header = printnl;
+
+type printing_state =
+[ Nothing
+| Status
+| Contents ];
+
+value printing_state = ref Nothing;
+
+value http answer = do {
+  if printing_state.val <> Nothing then
+    failwith "HTTP Status already sent"
+  else ();
+  printing_state.val := Status;
+  if answer <> "" or not cgi.val then
+    let answer = if answer = "" then "200 OK" else answer in
+    if cgi.val then
+      printnl "Status: %s" answer
+    else
+      printnl "HTTP/1.0 %s" answer
+  else ()
+};
+
+value header fmt = do {
+  if printing_state.val <> Status then
+    if printing_state.val = Nothing then
+      http ""
+    else
+      failwith "Cannot write HTTP headers: page contents already started"
+  else ();
+  printnl fmt
+};
+
+value wrap_string = ref (fun s -> s);
+
+value printf fmt = do {
+  if printing_state.val <> Contents then do {
+    if printing_state.val = Nothing then
+      http ""
+    else ();
+    printnl "";
+    printing_state.val := Contents
+  } else ();
+  Printf.ksprintf (fun s -> output_string wserver_oc.val (wrap_string.val s)) fmt
+};
 value wflush () = flush wserver_oc.val;
 
 value hexa_digit x =
@@ -140,11 +179,6 @@ value encode s =
     copy_code_in (Bytes.create len) 0 0
   else s
 ;
-
-value http answer = do {
-  let answer = if answer = "" then "200 OK" else answer in
-  printnl "HTTP/1.0 %s" answer
-};
 
 value print_exc exc =
   match exc with

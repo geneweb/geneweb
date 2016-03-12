@@ -391,7 +391,6 @@ value html conf =
     Wserver.header "Content-type: %s; charset=%s"
       (if conf.pure_xhtml then "application/xhtml+xml" else "text/html")
       charset;
-    Wserver.header ""
   }
 ;
 
@@ -403,7 +402,6 @@ value unauthorized conf auth_type =
     }
     else ();
     Wserver.header "Content-type: text/html; charset=%s" conf.charset;
-    Wserver.header "";
     Wserver.printf "<head><title>Access failed</title></head>\n";
     Wserver.printf "<body><h1>Access failed</h1>\n";
     Wserver.printf "<ul><li>%s</ul>\n" auth_type;

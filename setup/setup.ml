@@ -91,7 +91,6 @@ value header_no_page_title conf title =
   do {
     Wserver.http "";
     Wserver.header "Content-type: text/html; charset=%s" (charset conf);
-    Wserver.header "";
     Wserver.printf "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
 \"http://www.w3.org/TR/REC-html40/loose.dtd\">
@@ -672,7 +671,6 @@ value print_file conf bname =
       do {
         Wserver.http "";
         Wserver.header "Content-type: text/html; charset=%s" (charset conf);
-        Wserver.header "";
         copy_from_stream conf (fun x -> Wserver.printf "%s" x)
           (Stream.of_channel ic);
         close_in ic;
@@ -1663,7 +1661,6 @@ value print_typed_file conf typ fname =
         Wserver.http "";
         Wserver.header "Content-type: %s" typ;
         Wserver.header "Content-length: %d" (in_channel_length ic);
-        Wserver.header "";
         try
           while True do {
             let c = input_char ic in

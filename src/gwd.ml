@@ -173,7 +173,6 @@ value robots_txt () =
     flush_log oc;
     Wserver.http "";
     Wserver.header "Content-type: text/plain";
-    Wserver.header "";
     if copy_file "robots" then ()
     else do {
       Wserver.printf "User-Agent: *\n";
@@ -191,7 +190,6 @@ value refuse_log from cgi =
     close_out oc;
     if not cgi then http "403 Forbidden" else ();
     Wserver.header "Content-type: text/html";
-    Wserver.header "";
     Wserver.printf "Your access has been disconnected by administrator.\n";
     let _ : bool = copy_file "refuse" in ();
   }
@@ -211,7 +209,6 @@ value only_log from cgi =
     flush_log oc;
     if not cgi then http "" else ();
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
-    Wserver.header "";
     Wserver.printf "<head><title>Invalid access</title></head>\n";
     Wserver.printf "<body><h1>Invalid access</h1></body>\n";
   }
@@ -490,7 +487,6 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
       (if ar.ar_can_stale then ",stale=true" else "")
   else
     Wserver.header "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
-  Wserver.header "";
   let url =
     conf.bname ^ "?" ^
       List.fold_left
@@ -714,7 +710,6 @@ value print_request_failure cgi msg =
   do {
     if not cgi then http "" else ();
     Wserver.header "Content-type: text/html";
-    Wserver.header "";
     Wserver.printf "<head><title>Request failure</title></head>\n";
     Wserver.printf "\
 <body bgcolor=\"white\">
@@ -742,7 +737,6 @@ value refresh_url cgi request s i =
   do {
     if not cgi then http "" else ();
     Wserver.header "Content-type: text/html";
-    Wserver.header "";
     Wserver.printf "\
 <head>
 <meta http-equiv=\"REFRESH\"
@@ -1572,7 +1566,6 @@ value content_misc cgi len misc_fname = do {
   Wserver.header "Content-length: %d" len;
   Wserver.header "Content-disposition: inline; filename=%s"
     (Filename.basename fname);
-  Wserver.header "";
   Wserver.wflush ();
 };
 
@@ -1792,7 +1785,6 @@ IFDEF UNIX THEN
 value cgi_timeout tmout _ =
   do {
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
-    Wserver.header "";
     Wserver.printf "<head><title>Time out</title></head>\n";
     Wserver.printf "<body><h1>Time out</h1>\n";
     Wserver.printf "Computation time > %d second(s)\n" tmout;

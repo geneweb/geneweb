@@ -25,7 +25,6 @@ value content cgi t len fname =
       (Filename.basename fname);
     (* TODO: Utiliser un cache public pour les images non personelles. *)
     Wserver.header "Cache-control: private, max-age=%d" (60 * 60 * 24 * 30);
-    Wserver.header "";
     Wserver.wflush ();
   }
 ;
