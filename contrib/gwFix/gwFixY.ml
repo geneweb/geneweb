@@ -18,7 +18,7 @@ value gen_only_printable or_nl s =
            | '\n' -> if or_nl then '\n' else ' '
            | _ -> ' ' ])
     };
-    Gutil.strip_spaces s'
+    Gutil.strip_spaces (Bytes.unsafe_to_string s')
   }
 ;
 

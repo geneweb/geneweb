@@ -3,7 +3,7 @@
 include ../tools/Makefile.ocaml
 
 CAMLP5F=-DUNIX
-OCAMLOPT=ocamlfind ocamlopt -warn-error A -annot -g
+OCAMLOPT=ocamlfind ocamlopt -warn-error A -safe-string -annot -g
 DEPEND_REDIS=utils.cmx mutex.cmx client.cmx cache.cmx redis_sync.cmx
 STRIP=strip
 RM=/bin/rm -f

@@ -62,7 +62,7 @@ let print_info_base conf base =
     | Some ic ->
         (try
            let (k, pos, wiz) = (1, in_channel_length ic, "") in
-           let vv = (ref "", ref 0) in
+           let vv = (ref (Bytes.create 0), ref 0) in
            let last_modified_person =
              (match
                 try Some (History.rev_input_line ic pos vv)
@@ -440,7 +440,7 @@ let print_last_modified_persons conf base =
     with
     | Some ic ->
         let pos = in_channel_length ic in
-        let vv = (ref "", ref 0) in
+        let vv = (ref (Bytes.create 0), ref 0) in
         let rec loop list res pos =
           if res = 0 then list
           else

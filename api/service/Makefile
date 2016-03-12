@@ -3,7 +3,7 @@
 include ../../tools/Makefile.ocaml
 
 CAMLP5F=-DUNIX
-OCAMLOPT=ocamlfind ocamlopt -warn-error A -annot -g
+OCAMLOPT=ocamlfind ocamlopt -warn-error A -safe-string -annot -g
 STRIP=strip
 RM=/bin/rm -f
 

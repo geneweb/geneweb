@@ -19,4 +19,4 @@ exception Begin_of_file;
 value line_fields :
   string -> option (string * string * string * option string);
 value rev_input_line :
-  in_channel -> int -> (ref string * ref int) -> (string * int);
+  in_channel -> int -> (ref bytes * ref int) -> (string * int);

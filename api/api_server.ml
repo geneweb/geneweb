@@ -1701,16 +1701,15 @@ Type %s to stop the service
 ;
 
 value read_input len =
-  if len >= 0 then do {
-    let buff = Bytes.create len in really_input stdin buff 0 len; buff
-  }
+  if len >= 0 then
+    really_input_string stdin len
   else do {
-    let buff = ref "" in
+    let buff = Buffer.create 0 in
     try
-      while True do { let l = input_line stdin in buff.val := buff.val ^ l }
+      while True do { let l = input_line stdin in Buffer.add_string buff l }
     with
     [ End_of_file -> () ];
-    buff.val
+    Buffer.contents buff
   }
 ;
 
@@ -1767,16 +1766,11 @@ value robot_exclude_arg s =
 ;
 
 value slashify s =
-  let s1 = Bytes.of_string s in
-  do {
-    for i = 0 to String.length s - 1 do {
-      Bytes.set s1 i
-        (match s.[i] with
-         [ '\\' -> '/'
-         | x -> x ])
-    };
-    s1
-  }
+  String.init (String.length s) conv_char
+    where conv_char i =
+      match s.[i] with
+      [ '\\' -> '/'
+      | x -> x ]
 ;
 
 value make_cnt_dir x =
