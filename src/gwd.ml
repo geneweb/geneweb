@@ -188,7 +188,7 @@ value refuse_log from cgi =
     fprintf_date oc tm;
     fprintf oc " excluded: %s\n" from;
     close_out oc;
-    if not cgi then http "403 Forbidden" else ();
+    http "403 Forbidden";
     Wserver.header "Content-type: text/html";
     Wserver.printf "Your access has been disconnected by administrator.\n";
     let _ : bool = copy_file "refuse" in ();
@@ -207,7 +207,7 @@ value only_log from cgi =
       only_addresses.val;
     fprintf oc ")\n";
     flush_log oc;
-    if not cgi then http "" else ();
+    http "";
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
     Wserver.printf "<head><title>Invalid access</title></head>\n";
     Wserver.printf "<body><h1>Invalid access</h1></body>\n";
@@ -708,7 +708,7 @@ value index_not_name s =
 
 value print_request_failure cgi msg =
   do {
-    if not cgi then http "" else ();
+    http "";
     Wserver.header "Content-type: text/html";
     Wserver.printf "<head><title>Request failure</title></head>\n";
     Wserver.printf "\
@@ -735,7 +735,7 @@ value refresh_url cgi request s i =
     serv ^ req
   in
   do {
-    if not cgi then http "" else ();
+    http "";
     Wserver.header "Content-type: text/html";
     Wserver.printf "\
 <head>
@@ -1555,7 +1555,7 @@ type misc_fname =
 ;
 
 value content_misc cgi len misc_fname = do {
-  if not cgi then Wserver.http "" else ();
+  http "";
   let (fname, t) =
     match misc_fname with
     [ Css fname -> (fname, "text/css")

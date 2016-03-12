@@ -34,7 +34,7 @@ value http answer = do {
     failwith "HTTP Status already sent"
   else ();
   printing_state.val := Status;
-  if answer <> "" or not cgi.val then
+  if answer <> "" || not cgi.val then
     let answer = if answer = "" then "200 OK" else answer in
     if cgi.val then
       printnl "Status: %s" answer
