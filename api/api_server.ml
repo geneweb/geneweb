@@ -148,7 +148,7 @@ value copy_file fname =
   [ Some ic ->
       do {
         try
-          while True do { let c = input_char ic in Wserver.wprint "%c" c }
+          while True do { let c = input_char ic in Wserver.printf "%c" c }
         with _ ->
           ();
         close_in ic;
@@ -157,10 +157,10 @@ value copy_file fname =
   | None -> False ]
 ;
 
-value http answer =
+value http status =
   do {
-    Wserver.http answer;
-    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
+    Wserver.http status;
+    Wserver.header "Content-type: text/html; charset=iso-8859-1";
   }
 ;
 
@@ -169,12 +169,12 @@ value robots_txt () =
   do {
     Printf.fprintf oc "Robot request\n";
     flush_log oc;
-    Wserver.http "";
-    Wserver.wprint "Content-type: text/plain"; Util.nl (); Util.nl ();
+    Wserver.http HttpStatus.OK;
+    Wserver.header "Content-type: text/plain";
     if copy_file "robots" then ()
     else do {
-      Wserver.wprint "User-Agent: *"; nl ();
-      Wserver.wprint "Disallow: /"; nl ();
+      Wserver.printf "User-Agent: *\n";
+      Wserver.printf "Disallow: /\n";
     }
   }
 ;
@@ -186,11 +186,9 @@ value refuse_log from =
     fprintf_date oc tm;
     fprintf oc " excluded: %s\n" from;
     close_out oc;
-    http "403 Forbidden";
-    Wserver.wprint "Content-type: text/html";
-    Util.nl ();
-    Util.nl ();
-    Wserver.wprint "Your access has been disconnected by administrator.\n";
+    http HttpStatus.Forbidden;
+    Wserver.header "Content-type: text/html";
+    Wserver.printf "Your access has been disconnected by administrator.\n";
     let _ : bool = copy_file "refuse" in ();
   }
 ;
@@ -207,12 +205,10 @@ value only_log from =
       only_addresses.val;
     fprintf oc ")\n";
     flush_log oc;
-    http "";
-    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
-    Util.nl ();
-    Util.nl ();
-    Wserver.wprint "<head><title>Invalid access</title></head>\n";
-    Wserver.wprint "<body><h1>Invalid access</h1></body>\n";
+    http HttpStatus.OK;
+    Wserver.header "Content-type: text/html; charset=iso-8859-1";
+    Wserver.printf "<head><title>Invalid access</title></head>\n";
+    Wserver.printf "<body><h1>Invalid access</h1></body>\n";
   }
 ;
 
@@ -346,16 +342,15 @@ value print_renamed conf new_n =
   [ Some ic ->
       do {
         Util.html conf;
-        Util.nl ();
         Templ.copy_from_templ conf env ic;
       }
   | None ->
-      let title _ = Wserver.wprint "%s -&gt; %s" conf.bname new_n in
+      let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
       do {
         Hutil.header conf title;
         tag "ul" begin
           Util.html_li conf;
-          tag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
+          tag "a" "href=\"%s\"" link begin Wserver.printf "%s" link; end;
         end;
         Hutil.trailer conf;
       } ]
@@ -387,18 +382,17 @@ value print_redirected conf from request new_addr =
     [ Some ic ->
         do {
           Util.html conf;
-          Util.nl ();
           Templ.copy_from_templ conf env ic;
         }
     | None ->
-        let title _ = Wserver.wprint "Address changed" in
+        let title _ = Wserver.printf "Address changed" in
         do {
           Hutil.header conf title;
-          Wserver.wprint "Use the following address:\n<p>\n";
+          Wserver.printf "Use the following address:\n<p>\n";
           tag "ul" begin
             Util.html_li conf;
-            stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
-            Wserver.wprint "\n";
+            stag "a" "href=\"%s\"" link begin Wserver.printf "%s" link; end;
+            Wserver.printf "\n";
           end;
           Hutil.trailer conf;
         } ]
@@ -406,15 +400,15 @@ value print_redirected conf from request new_addr =
 ;
 
 value propose_base conf =
-  let title _ = Wserver.wprint "Base" in
+  let title _ = Wserver.printf "Base" in
   do {
     Hutil.header conf title;
     tag "ul" begin
       Util.html_li conf;
-      Wserver.wprint "<form method=\"get\" action=\"%s\">\n"
+      Wserver.printf "<form method=\"get\" action=\"%s\">\n"
         conf.indep_command;
-      Wserver.wprint "<input name=\"b\" size=\"40\"> =&gt;\n";
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
+      Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Hutil.trailer conf;
   }
@@ -425,7 +419,6 @@ value general_welcome conf =
   [ Some ic ->
       do {
         Util.html conf;
-        Util.nl ();
         Templ.copy_from_templ conf [] ic;
       }
   | None -> propose_base conf ]
@@ -482,18 +475,16 @@ value trace_auth base_env f = do {
 
 value unauth_server conf ar =  do {
   let typ = if ar.ar_passwd = "w" then "Wizard" else "Friend" in
-  Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
+  Wserver.http HttpStatus.Unauthorized;
   if use_auth_digest_scheme.val then
     let nonce = digest_nonce conf.ctime in
 let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun oc -> fprintf oc "\n401 unauthorized\n- date: %a\n- request:\n%t- passwd: %s\n- nonce: \"%s\"\n- can_stale: %b\n" fprintf_date tm (fun oc -> List.iter (fun s -> fprintf oc "  * %s\n" s) conf.request) ar.ar_passwd nonce ar.ar_can_stale) in
-    Wserver.wprint
+    Wserver.header
       "WWW-Authenticate: Digest realm=\"%s %s\"%s%s,qop=\"auth\"" typ
       conf.bname (if nonce = "" then "" else sprintf ",nonce=\"%s\"" nonce)
       (if ar.ar_can_stale then ",stale=true" else "")
   else
-    Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
-  Util.nl ();
-  Util.nl ();
+    Wserver.header "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
   let url =
     conf.bname ^ "?" ^
       List.fold_left
@@ -504,7 +495,7 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
   let txt i = transl_nth conf "wizard/wizards/friend/friends/exterior" i in
   let typ = txt (if ar.ar_passwd = "w" then 0 else 2) in
   let title h =
-    Wserver.wprint
+    Wserver.printf
       (fcapitale (ftransl conf "%s access cancelled for that page"))
       (if not h then "<em>" ^ typ ^ "</em>" else typ)
   in
@@ -517,11 +508,11 @@ let _ = let tm = Unix.localtime (Unix.time ()) in trace_auth conf.base_env (fun 
     tag "dd" begin
       tag "ul" begin
         tag "li" begin
-          Wserver.wprint "%s : <a href=\"%s%s\">%s</a>"
+          Wserver.printf "%s : <a href=\"%s%s\">%s</a>"
             (transl conf "access") url alt_bind alt_access;
         end;
         tag "li" begin
-          Wserver.wprint "%s : <a href=\"%s\">%s</a>"
+          Wserver.printf "%s : <a href=\"%s\">%s</a>"
             (transl conf "access") url (txt 4);
         end;
       end;
@@ -715,17 +706,16 @@ value index_not_name s =
 
 value print_request_failure msg =
   do {
-    http "";
-    Wserver.wprint "Content-type: text/html";
-    Util.nl (); Util.nl ();
-    Wserver.wprint "<head><title>Request failure</title></head>\n";
-    Wserver.wprint "\
+    http HttpStatus.OK;
+    Wserver.header "Content-type: text/html";
+    Wserver.printf "<head><title>Request failure</title></head>\n";
+    Wserver.printf "\
 <body bgcolor=\"white\">
 <h1 style=\"text-align: center; color: red;\">Request failure</h1>
 <p>The request could not be completed.</p>\n";
-    Wserver.wprint "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
+    Wserver.printf "<p><em style=\"font-size: smaller;\">Internal message: %s</em></p>\n"
       msg;
-    Wserver.wprint "</body>\n";
+    Wserver.printf "</body>\n";
   }
 ;
 
@@ -739,11 +729,9 @@ value refresh_url request s i =
     serv ^ req
   in
   do {
-    http "";
-    Wserver.wprint "Content-type: text/html";
-    Util.nl ();
-    Util.nl ();
-    Wserver.wprint "\
+    http HttpStatus.OK;
+    Wserver.header "Content-type: text/html";
+    Wserver.printf "\
 <head>
 <meta http-equiv=\"REFRESH\"
  content=\"1;URL=%s\">
@@ -1240,7 +1228,6 @@ value make_conf from_addr (addr, request) script_name contents env = do {
     {from = from_addr;
      manitou = manitou;
      supervisor = supervisor;
-     cgi = False;
      wizard = ar.ar_wizard && not wizard_just_friend;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
@@ -1407,10 +1394,10 @@ value auth_err request auth_file =
 ;
 
 value no_access conf =
-  let title _ = Wserver.wprint "Error" in
+  let title _ = Wserver.printf "Error" in
   do {
     Hutil.rheader conf title;
-    Wserver.wprint "No access to this database in CGI mode\n";
+    Wserver.printf "No access to this database in CGI mode\n";
     Hutil.trailer conf;
   }
 ;
@@ -1521,7 +1508,7 @@ value image_request script_name env =
       in
       let fname = Filename.basename fname in
       let fname = Util.image_file_name fname in
-      let _ = Image.print_image_file False fname in True
+      let _ = Image.print_image_file fname in True
   | _ ->
       let s = script_name in
       if Util.start_with s 0 "images/" then
@@ -1529,7 +1516,7 @@ value image_request script_name env =
         let fname = String.sub s i (String.length s - i) in
         let fname = Filename.basename fname in
         let fname = Util.image_file_name fname in
-        let _ = Image.print_image_file False fname in
+        let _ = Image.print_image_file fname in
         True
       else False ]
 ;

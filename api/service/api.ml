@@ -1306,8 +1306,7 @@ let print_all_full_person conf base =
 *)
 
   Util.html conf ;
-  Util.nl ();
-  Wserver.wprint "Gagné !!!";
+  Wserver.printf "Gagné !!!";
 ;;
 
 
@@ -2005,7 +2004,6 @@ let print_export conf base =
 
 
   Util.html conf ;
-  Util.nl ()
 ;;
 
 
@@ -2330,7 +2328,6 @@ let print_synchro_patch_mobile conf base =
   in
 
   Util.html conf ;
-  Util.nl ()
 ;;
 
 
@@ -2373,7 +2370,6 @@ let print_export_search conf base =
   in
 
   Util.html conf ;
-  Util.nl ()
 ;;
 
 
@@ -2551,7 +2547,6 @@ let print_export conf base =
 
 
   Util.html conf ;
-  Util.nl ()
 ;;
 *)
 

@@ -760,8 +760,7 @@ let print_result conf data =
   in
   let data = data output in
   Util.html conf ;
-  Util.nl ();
-  Wserver.wprint "%s" data
+  Wserver.printf "%s" data
 ;;
 
 
