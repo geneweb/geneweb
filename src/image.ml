@@ -5,18 +5,17 @@
 open Config;
 
 (* ************************************************************************** *)
-(*  [Fonc] content : bool -> string -> int -> string -> unit                  *)
+(*  [Fonc] content : string -> int -> string -> unit                          *)
 (** [Description] : Envoie les en-têtes de contenu et de cache pour une image
                     sur le flux HTTP sortant de Wserver.
     [Args] :
-      - cgi : True en mode CGI, False en serveur autonome
       - t : le type MIME de l'image, par exemple "png", "jpeg" ou "gif"
       - len : la taille en octet de l'image
       - fname : le nom du fichier image
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value content cgi t len fname =
+value content t len fname =
   do {
     Wserver.http HttpStatus.OK;
     Wserver.header "Content-type: image/%s" t;
@@ -30,24 +29,23 @@ value content cgi t len fname =
 ;
 
 (* ************************************************************************** *)
-(*  [Fonc] print_image_type : bool -> string -> string -> bool                *)
+(*  [Fonc] print_image_type : string -> string -> bool                        *)
 (** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
                     utilisant Wserver.
     [Args] :
-      - cgi : True en mode CGI, False en serveur autonome
       - fname : le chemin vers le fichier image
       - itype : le type MIME de l'image, par exemple "png", "jpeg" ou "gif"
     [Retour] : True si le fichier image existe et qu'il a été servi en réponse
                HTTP.
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value print_image_type cgi fname itype =
+value print_image_type fname itype =
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
       do {
-        content cgi itype len fname;
+        content itype len fname;
         let rec loop len =
           if len = 0 then ()
           else do {
@@ -65,14 +63,14 @@ value print_image_type cgi fname itype =
 ;
 
 (* ************************************************************************** *)
-(*  [Fonc] print_image_file : bool -> string -> bool                          *)
+(*  [Fonc] print_image_file : string -> bool                                  *)
 (* ************************************************************************** *)
-value print_image_file cgi fname =
+value print_image_file fname =
   List.exists
     (fun (suff, itype) ->
        if Filename.check_suffix fname suff ||
           Filename.check_suffix fname (String.uppercase suff) then
-         print_image_type cgi fname itype
+         print_image_type fname itype
        else False)
     [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg"); (".gif", "gif")]
 ;
@@ -90,7 +88,7 @@ value print_image_file cgi fname =
 value print_personal_image conf base p =
   match Util.image_and_size conf base p (fun x y -> Some (1, 1)) with
   [ Some (True, f, _) ->
-      if print_image_file Wserver.cgi.val f then () else Hutil.incorrect_request conf
+      if print_image_file f then () else Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf ]
 ;
 
@@ -110,7 +108,7 @@ value print_source_image conf f =
   in
   if fname = Filename.basename fname then
     let fname = Util.source_image_file_name conf.bname fname in
-    if print_image_file Wserver.cgi.val fname then () else Hutil.incorrect_request conf
+    if print_image_file fname then () else Hutil.incorrect_request conf
   else Hutil.incorrect_request conf
 ;
 

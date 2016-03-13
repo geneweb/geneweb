@@ -181,7 +181,7 @@ value robots_txt () =
   }
 ;
 
-value refuse_log from cgi =
+value refuse_log from =
   let oc = Secure.open_out_gen log_flags 0o644 "refuse_log" in
   do {
     let tm = Unix.localtime (Unix.time ()) in
@@ -195,7 +195,7 @@ value refuse_log from cgi =
   }
 ;
 
-value only_log from cgi =
+value only_log from =
   let oc = log_oc () in
   do {
     let tm = Unix.localtime (Unix.time ()) in
@@ -706,7 +706,7 @@ value index_not_name s =
       | _ -> i ]
 ;
 
-value print_request_failure cgi msg =
+value print_request_failure msg =
   do {
     http HttpStatus.OK;
     Wserver.header "Content-type: text/html";
@@ -1519,7 +1519,7 @@ value excluded from =
   | None -> False ]
 ;
 
-value image_request cgi script_name env =
+value image_request script_name env =
   match (Util.p_getenv env "m", Util.p_getenv env "v") with
   [ (Some "IM", Some fname) ->
       let fname =
@@ -1528,7 +1528,7 @@ value image_request cgi script_name env =
       in
       let fname = Filename.basename fname in
       let fname = Util.image_file_name fname in
-      let _ = Image.print_image_file cgi fname in True
+      let _ = Image.print_image_file fname in True
   | _ ->
       let s = script_name in
       if Util.start_with s 0 "images/" then
@@ -1539,7 +1539,7 @@ value image_request cgi script_name env =
         (* image. Si on ne fait pas de basename, alors ça marche.       *)
         (* let fname = Filename.basename fname in *)
         let fname = Util.image_file_name fname in
-        let _ = Image.print_image_file cgi fname in
+        let _ = Image.print_image_file fname in
         True
       else False ]
 ;
@@ -1554,7 +1554,7 @@ type misc_fname =
   | Other of string ]
 ;
 
-value content_misc cgi len misc_fname = do {
+value content_misc len misc_fname = do {
   Wserver.http HttpStatus.OK;
   let (fname, t) =
     match misc_fname with
@@ -1569,7 +1569,7 @@ value content_misc cgi len misc_fname = do {
   Wserver.wflush ();
 };
 
-value print_misc_file cgi misc_fname =
+value print_misc_file misc_fname =
   match misc_fname with
   [ Css fname | Js fname ->
       match
@@ -1579,7 +1579,7 @@ value print_misc_file cgi misc_fname =
           let buf = Bytes.create 1024 in
           let len = in_channel_length ic in
           do {
-            content_misc cgi len misc_fname;
+            content_misc len misc_fname;
             let rec loop len =
               if len = 0 then ()
               else do {
@@ -1597,7 +1597,7 @@ value print_misc_file cgi misc_fname =
   | Other _ -> False ]
 ;
 
-value misc_request cgi fname =
+value misc_request fname =
   let fname = Util.find_misc_file fname in
   if fname <> "" then
     let misc_fname =
@@ -1605,7 +1605,7 @@ value misc_request cgi fname =
       else if Filename.check_suffix fname ".js" then Js fname
       else Other fname
     in
-    print_misc_file cgi misc_fname
+    print_misc_file misc_fname
   else False
 ;
 
@@ -1701,23 +1701,23 @@ value connection cgi (addr, request) script_name contents =
   in
   do {
     if not cgi && script_name = "robots.txt" then robots_txt ()
-    else if excluded from then refuse_log from cgi
+    else if excluded from then refuse_log from
     else
       let accept =
         if only_addresses.val = [] then True
         else List.mem from only_addresses.val
       in
-      if not accept then only_log from cgi
+      if not accept then only_log from
       else
         try
           let (contents, env) = build_env request contents in
-          if image_request cgi script_name env then ()
-          else if misc_request cgi script_name then ()
+          if image_request script_name env then ()
+          else if misc_request script_name then ()
           else
             conf_and_connection cgi from (addr, request) script_name contents
               env
         with
-        [ Adef.Request_failure msg -> print_request_failure cgi msg
+        [ Adef.Request_failure msg -> print_request_failure msg
         | Exit -> () ];
     Wserver.wflush ();
   }

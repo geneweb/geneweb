@@ -2,10 +2,9 @@
                     utilisant Wserver. Le type MIME de l'image est deviné à
                     partir de l'extension contenu dans le nom du fichier.
     [Args] :
-      - cgi : True en mode CGI, False en serveur autonome
       - fname : le nom du fichier image
     [Retour] : True si l'image a pu être affichée                           *)
-value print_image_file : bool -> string -> bool;
+value print_image_file : string -> bool;
 
 (** [Description] : Traite une requête image.
     [Args] :
