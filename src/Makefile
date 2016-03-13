@@ -36,7 +36,8 @@ out:: ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out ch
 	cp update_nldb.out update_nldb
 	cp check_base.out check_base
 
-opt:: ansel.cmx gwc1.opt gwc2.opt consang.opt link.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
+#opt:: ansel.cmx gwc1.opt gwc2.opt consang.opt link.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
+opt:: ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	$(RM) gwc consang gwd gwu
 	cp gwc1.opt gwc
 	cp gwc1.opt gwc1
@@ -106,7 +107,8 @@ gwd.out: $(GWD_OBJS)
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
 	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
-	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
+#	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa str.cmxa -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
