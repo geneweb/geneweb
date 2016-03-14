@@ -28,6 +28,7 @@ value get_baptism_text : config -> base -> person -> bool -> string;
 value get_death_text : config -> base -> person -> bool -> string;
 value get_burial_text : config -> base -> person -> bool -> string;
 value get_cremation_text : config -> base -> person -> bool -> string;
+value get_marriage_date_text : config -> base -> family -> bool -> string;
 
 (**)
 

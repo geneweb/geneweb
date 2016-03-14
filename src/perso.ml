@@ -703,6 +703,28 @@ value get_birth_text conf base p p_auth =
 ;
 
 (* ************************************************************************ *)
+(*  [Fonc] get_marriage_text : config -> base -> fam -> bool -> string      *)
+(** [Description] : Retourne le texte sur la date de l'union.
+    [Args] :
+      - conf   : configuration de la base
+      - base   : base de donnée
+      - family : la famille concernée
+      - p_auth : authentifié ou non
+    [Retour] :
+      - string
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value get_marriage_date_text conf base fam p_auth =
+  let tmp_conf = {(conf) with cancel_links = True} in
+  match (p_auth, Adef.od_of_codate (get_marriage fam)) with
+    [ (True, Some d) ->
+        match p_getenv conf.base_env "long_date" with
+        [ Some "yes" -> (Date.string_of_ondate tmp_conf d) ^ (Date.get_wday tmp_conf d)
+        | _ -> Date.string_of_ondate tmp_conf d ]
+    | _ -> "" ]
+;
+
+(* ************************************************************************ *)
 (*  [Fonc] get_burial_text : config -> base -> person -> bool -> string     *)
 (** [Description] : Retourne le texte sur l'incinération de la personne
     [Args] :

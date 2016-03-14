@@ -330,6 +330,7 @@ message Family {
   optional string marriage_date_raw = 19;
   optional string marriage_date_conv = 5;
   optional string marriage_date_conv_long = 21;
+  optional string marriage_date_text = 23;
   optional Calendar marriage_date_cal = 6;
   optional string marriage_place = 7;
   optional string marriage_src = 8;

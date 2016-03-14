@@ -681,6 +681,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
       (marriage_date, marriage_date_long, marriage_date_conv, marriage_date_conv_long, marriage_cal, string_of_date_raw conf d)
     | _ -> ("", "", "", "", None, "")
   in
+  let marriage_date_text = Perso.get_marriage_date_text conf base fam p_auth in
   let marriage_place =
     if m_auth then Util.string_of_place conf gen_f.marriage_place else ""
   in
@@ -766,6 +767,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
     marriage_date_conv_long =
       if marriage_date_conv_long = "" then None else Some marriage_date_conv_long;
     marriage_date_cal = marriage_cal;
+    marriage_date_text = if marriage_date_text = "" then None else Some marriage_date_text;
     marriage_place = if marriage_place = "" then None else Some marriage_place;
     marriage_src = if marriage_src = "" then None else Some marriage_src;
     marriage_type = marriage_type;
@@ -819,6 +821,7 @@ let fam_to_piqi_family conf base p ifam =
       (marriage_date, marriage_date_long, marriage_date_conv, marriage_date_conv_long, marriage_cal, string_of_date_raw conf d)
     | _ -> ("", "", "", "", None, "")
   in
+  let marriage_date_text = Perso.get_marriage_date_text conf base fam p_auth in
   let marriage_place =
     if m_auth then Util.string_of_place conf gen_f.marriage_place else ""
   in
@@ -932,6 +935,7 @@ let fam_to_piqi_family conf base p ifam =
     marriage_date_conv_long =
       if marriage_date_conv_long = "" then None else Some marriage_date_conv_long;
     marriage_date_cal = marriage_cal;
+    marriage_date_text = if marriage_date_text = "" then None else Some marriage_date_text;
     marriage_place = if marriage_place = "" then None else Some marriage_place;
     marriage_src = if marriage_src = "" then None else Some marriage_src;
     marriage_type = marriage_type;
