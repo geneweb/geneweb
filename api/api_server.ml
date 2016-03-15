@@ -1638,15 +1638,9 @@ value null_reopen flags fd =
   ELSE () END
 ;
 
-IFDEF SYS_COMMAND THEN
-value wserver_auto_call = ref False;
-END;
-
 value geneweb_server () =
   let auto_call =
-    IFDEF SYS_COMMAND THEN wserver_auto_call.val
-    ELSE try let _ = Sys.getenv "WSERVER" in True with [ Not_found -> False ]
-    END
+    try let _ = Sys.getenv "WSERVER" in True with [ Not_found -> False ]
   in
   do {
     if not auto_call then do {
@@ -1901,11 +1895,7 @@ Print the failed passwords in log (except if option -digest is set) ");
           ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.")]
        ELSE
          [("-noproc", Arg.Set Wserver.noproc,
-           "\n       Do not launch a process at each request.") ::
-          IFDEF SYS_COMMAND THEN
-            [("-wserver", Arg.String (fun _ -> wserver_auto_call.val := True),
-              "\n       (internal feature)")]
-          ELSE [] END]
+           "\n       Do not launch a process at each request.")]
        END]
     in
     let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in

@@ -554,18 +554,7 @@ value accept_connection tmout max_clients callback s =
       [ Unix.Unix_error _ _ _ -> ()
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
-      IFDEF SYS_COMMAND THEN
-        let comm =
-          let stringify_if_spaces s =
-            try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
-            [ Not_found -> s ]
-          in
-          List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
-            (Array.to_list Sys.argv) ^
-          "-wserver " ^ string_of_sockaddr addr
-        in
-        let _ = Sys.command comm in ()
-      ELSE if noproc.val then do {
+      if noproc.val then do {
         let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in
         wserver_oc.val := oc;
@@ -590,8 +579,7 @@ let args = Sys.argv in
         in
         let _ = Unix.waitpid [] pid in
         let ic = open_in_bin sock_in.val in
-        close_in ic
-      END;
+        close_in ic;
       let cleanup () =
         do {
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
@@ -631,14 +619,7 @@ let args = Sys.argv in
 value f addr_opt port tmout max_clients g =
   match
     IFDEF WIN95 THEN
-      IFDEF SYS_COMMAND THEN
-        let len = Array.length Sys.argv in
-        if len > 2 && Sys.argv.(len - 2) = "-wserver" then
-          Some Sys.argv.(len - 1)
-        else None
-      ELSE
-        try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
-      END
+      try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
     ELSE None END
   with
   [ Some s ->

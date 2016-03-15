@@ -1959,10 +1959,7 @@ value speclist =
    ("-gd", Arg.String (fun x -> setup_dir.val := x),
     "<string>: gwsetup directory");
    ("-bindir", Arg.String (fun x -> bin_dir.val := x),
-    "<string>: binary directory (default = value of option -gd)") ::
-   IFDEF SYS_COMMAND THEN
-     [("-wserver", Arg.String (fun _ -> ()), " (internal feature)")]
-   ELSE [] END]
+    "<string>: binary directory (default = value of option -gd)") ]
 ;
 value anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s));
 
@@ -2044,12 +2041,9 @@ value intro () =
 value main () =
   do {
     IFDEF UNIX THEN intro ()
-    ELSE IFDEF SYS_COMMAND THEN
-      let len = Array.length Sys.argv in
-      if len > 2 && Sys.argv.(len - 2) = "-wserver" then () else intro ()
     ELSE
       try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ]
-    END END;
+    END;
     Wserver.f None port.val 0 None wrap_setup
   }
 ;
