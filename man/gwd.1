@@ -1,4 +1,4 @@
-.TH GENEWEB 1 "2004 Aug 12" "GeneWeb"
+.TH GENEWEB 1 "2016 Mar 15" "GeneWeb"
 .UC 4
 .SH NAME
 gwd \- Launches the GeneWeb Process
@@ -24,17 +24,15 @@ using the following:
 .br
 where "base" is the name of the database file.
 .br
-GeneWeb is coded in the functional language Objective CAML, 
+GeneWeb is coded in the functional language OCaml,
 and can be extended with byte-code or compiled code written 
 in that language.
 .PP
 The primary documentation of
 .I gwd 
-is in the
-.I HTML
-.IR  ,
-documentation, which you can find in the documentation directory (/usr/share/doc/geneweb on
-Debian systems).
+is on 
+.B http://geneweb.tuxfamily.org/wiki/GeneWeb
+.
 .br
 Please look there for complete and up-to-date documentation.
 .PP
@@ -47,9 +45,6 @@ Show possible options and switches
 .B \-hd <dir>
 Path to the 'lang' directory
 .TP 8
-.B \-dd <dir>
-Path to the documentation directory
-.TP 8
 .B \-bd <dir>
 Path to the GeneWeb database.
 .TP 8
@@ -57,7 +52,7 @@ Path to the GeneWeb database.
 Path to the socket communications (Windows) and access count.
 .TP 8
 .B \-cgi
-Force cgi mode.
+Force CGI mode.
 .TP 8
 .B \-images_url <url>
 URL for GeneWeb images (default: gwd send them)
@@ -86,7 +81,7 @@ Wizard just friend (permanently)
 .B \-lang <lang>
 Set a default language (default: en).
 .TP 8
-.B \-blang <lang>
+.B \-blang
 Select the user browser language if any.
 .TP 8
 .B \-only <address>
@@ -140,4 +135,4 @@ copyrighted by the Free Software Foundation, but the instance of code
 that it refers to (the software GeneWeb) is copyrighted by 
 .I INRIA.
 
-.\" This manual page was extended extended by Debian developers. 
+.\" This manual page was extended by Debian developers. 

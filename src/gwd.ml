@@ -1923,7 +1923,7 @@ value main () =
        ("-wd", Arg.String make_cnt_dir, "\
 <dir>
        Directory for socket communication (Windows) and access count.");
-       ("-cgi", Arg.Set force_cgi, "\n       Force cgi mode.");
+       ("-cgi", Arg.Set force_cgi, "\n       Force CGI mode.");
        ("-images_url", Arg.String (fun x -> Util.images_url.val := x),
         "<url>\n       URL for GeneWeb images (default: gwd send them)");
        ("-images_dir", Arg.String (fun x -> images_dir.val := x), "\
