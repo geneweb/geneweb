@@ -191,11 +191,8 @@ value update_gwf_sosa :
 
 value quote_escaped : string -> string;
 
-value get_server_string : config -> string;
-value get_request_string : config -> string;
-
-value get_server_string_aux : bool -> list string -> string;
-value get_request_string_aux : bool -> list string -> string;
+value get_server_string : list string -> string;
+value get_request_string : list string -> string;
 
 value create_topological_sort : config -> base -> array int;
 

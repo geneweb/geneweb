@@ -304,7 +304,7 @@ value strip_trailing_spaces s =
   String.sub s 0 len
 ;
 
-value read_base_env cgi bname =
+value read_base_env bname =
   let fname = Util.base_path [] (bname ^ ".gwf") in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -323,7 +323,7 @@ value read_base_env cgi bname =
 
 value print_renamed conf new_n =
   let link =
-    let req = Util.get_request_string conf in
+    let req = Util.get_request_string conf.request in
     let new_req =
       let len = String.length conf.bname in
       let rec loop i =
@@ -335,7 +335,7 @@ value print_renamed conf new_n =
       in
       loop 0
     in
-    "http://" ^ Util.get_server_string conf ^ new_req
+    "http://" ^ Util.get_server_string conf.request ^ new_req
   in
   let env =
     [("old", conf.bname) ; ("new", new_n) ; ("link", link)]
@@ -375,7 +375,7 @@ value log_redirect conf from request req =
 ;
 
 value print_redirected conf from request new_addr =
-  let req = Util.get_request_string conf in
+  let req = Util.get_request_string conf.request in
   let link = "http://" ^ new_addr ^ req in
   let env = [("link", link)] in
   do {
@@ -721,13 +721,13 @@ value print_request_failure msg =
   }
 ;
 
-value refresh_url cgi request s i =
+value refresh_url request s i =
   let url =
-    let serv = "http://" ^ Util.get_server_string_aux cgi request in
+    let serv = "http://" ^ Util.get_server_string request in
     let req =
       let bname = String.sub s 0 i in
-      let str = Util.get_request_string_aux cgi request in
-      if cgi then
+      let str = Util.get_request_string request in
+      if Wserver.cgi.val then
         let cginame = String.sub str 0 (String.index str '?') in
         cginame ^ "?b=" ^ bname
       else "/" ^ bname ^ "?"
@@ -1138,7 +1138,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
       in
       let i = index_not_name s in
       if i = String.length s then s
-      else refresh_url cgi request s i
+      else refresh_url request s i
     in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
@@ -1184,7 +1184,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
     let (x, env) = extract_assoc "sleep" env in
     (if x = "" then 0 else int_of_string x, env)
   in
-  let base_env = read_base_env cgi base_file in
+  let base_env = read_base_env base_file in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in

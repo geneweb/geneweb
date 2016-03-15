@@ -1477,8 +1477,8 @@ value body_prop conf =
   [ Not_found -> "" ]
 ;
 
-value get_server_string_aux cgi request =
-  if not cgi then Wserver.extract_param "host: " '\r' request
+value get_server_string request =
+  if not Wserver.cgi.val then Wserver.extract_param "host: " '\r' request
   else
     let server_name = try Sys.getenv "SERVER_NAME" with [ Not_found -> "" ] in
     let server_port =
@@ -1488,8 +1488,8 @@ value get_server_string_aux cgi request =
     else server_name ^ ":" ^ server_port
 ;
 
-value get_request_string_aux cgi request =
-  if not cgi then Wserver.extract_param "GET " ' ' request
+value get_request_string request =
+  if not Wserver.cgi.val then Wserver.extract_param "GET " ' ' request
   else
     let script_name = try Sys.getenv "SCRIPT_NAME" with [ Not_found -> "" ] in
     let query_string =
@@ -1497,9 +1497,6 @@ value get_request_string_aux cgi request =
     in
     script_name ^ "?" ^ query_string
 ;
-
-value get_server_string conf = get_server_string_aux Wserver.cgi.val conf.request;
-value get_request_string conf = get_request_string_aux Wserver.cgi.val conf.request;
 
 value url_no_index conf base =
   let scratch s = code_varenv (Name.lower (sou base s)) in
@@ -1575,12 +1572,12 @@ value url_no_index conf base =
   in
   let addr =
     let pref =
-      let s = get_request_string conf in
+      let s = get_request_string conf.request in
       match rindex s '?' with
       [ Some i -> String.sub s 0 i
       | None -> s ]
     in
-    get_server_string conf ^ pref
+    get_server_string conf.request ^ pref
   in
   let suff =
     List.fold_right

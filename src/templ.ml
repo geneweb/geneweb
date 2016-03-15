@@ -1327,7 +1327,7 @@ value old_include_hed_trl conf base_opt suff =
       let url () =
         match base_opt with
         [ Some base -> Util.url_no_index conf base
-        | None -> Util.get_server_string conf ^ Util.get_request_string conf ]
+        | None -> Util.get_server_string conf.request ^ Util.get_request_string conf.request ]
       in
       let pref () =
         let s = url () in

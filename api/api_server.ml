@@ -321,7 +321,7 @@ value read_base_env bname =
 
 value print_renamed conf new_n =
   let link =
-    let req = Util.get_request_string conf in
+    let req = Util.get_request_string conf.request in
     let new_req =
       let len = String.length conf.bname in
       let rec loop i =
@@ -333,7 +333,7 @@ value print_renamed conf new_n =
       in
       loop 0
     in
-    "http://" ^ Util.get_server_string conf ^ new_req
+    "http://" ^ Util.get_server_string conf.request ^ new_req
   in
   let env =
     [("old", conf.bname) ; ("new", new_n) ; ("link", link)]
@@ -373,7 +373,7 @@ value log_redirect conf from request req =
 ;
 
 value print_redirected conf from request new_addr =
-  let req = Util.get_request_string conf in
+  let req = Util.get_request_string conf.request in
   let link = "http://" ^ new_addr ^ req in
   let env = [("link", link)] in
   do {
@@ -721,7 +721,7 @@ value print_request_failure msg =
 
 value refresh_url request s i =
   let url =
-    let serv = "http://" ^ Util.get_server_string_aux False request in
+    let serv = "http://" ^ Util.get_server_string request in
     let req =
       let bname = String.sub s 0 i in
       "/" ^ bname ^ "?"
