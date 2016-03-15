@@ -17,7 +17,6 @@ value wizard_passwd = ref "";
 value friend_passwd = ref "";
 value wizard_just_friend = ref False;
 value only_addresses = ref [];
-value cgi = ref False;
 value default_lang = ref "fr";
 value setup_link = ref False;
 value choose_browser_lang = ref False;
@@ -878,7 +877,7 @@ value parse_digest s =
   parse_main (Stream.of_string s)
 ;
 
-value basic_authorization cgi from_addr request base_env passwd access_type
+value basic_authorization from_addr request base_env passwd access_type
     utm base_file command =
   let wizard_passwd =
     try List.assoc "wizard_passwd" base_env with
@@ -906,7 +905,7 @@ value basic_authorization cgi from_addr request base_env passwd access_type
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
   let (ok, wizard, friend, username) =
-    if not cgi && (passwd = "w" || passwd = "f") then
+    if not Wserver.cgi.val && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
         if wizard_passwd = "" && wizard_passwd_file = "" then
           (True, True, friend_passwd = "", "")
@@ -948,16 +947,16 @@ value basic_authorization cgi from_addr request base_env passwd access_type
     if access_type = ATset then
       if wizard then
         let pwd_id = set_token utm from_addr base_file 'w' user in
-        if cgi then (command, pwd_id)
+        if Wserver.cgi.val then (command, pwd_id)
         else (base_file ^ "_" ^ pwd_id, "")
       else if friend then
         let pwd_id = set_token utm from_addr base_file 'f' user in
-        if cgi then (command, pwd_id)
+        if Wserver.cgi.val then (command, pwd_id)
         else (base_file ^ "_" ^ pwd_id, "")
-      else if cgi then (command, "")
+      else if Wserver.cgi.val then (command, "")
       else (base_file, "")
     else
-      if cgi then (command, passwd)
+      if Wserver.cgi.val then (command, passwd)
       else if passwd = "" then (base_file, "")
       else (base_file ^ "_" ^ passwd, passwd)
   in
@@ -1020,7 +1019,7 @@ value test_passwd ds nonce command wf_passwd wf_passwd_file passwd_char wiz =
          ar_can_stale = False} ]
 ;
 
-value digest_authorization cgi request base_env passwd utm base_file command =
+value digest_authorization request base_env passwd utm base_file command =
   let wizard_passwd =
     try List.assoc "wizard_passwd" base_env with
     [ Not_found -> wizard_passwd.val ]
@@ -1035,7 +1034,7 @@ value digest_authorization cgi request base_env passwd utm base_file command =
   let friend_passwd_file =
     try List.assoc "friend_passwd_file" base_env with [ Not_found -> "" ]
   in
-  let command = if cgi then command else base_file in
+  let command = if Wserver.cgi.val then command else base_file in
   if wizard_passwd = "" && wizard_passwd_file = "" then
     {ar_ok = True; ar_command = command; ar_passwd = "";
      ar_scheme = NoAuth; ar_user = ""; ar_name = "";
@@ -1081,12 +1080,12 @@ let _ = trace_auth base_env (fun oc -> fprintf oc "\nanswer\n- date: %a\n- reque
      ar_friend = friend; ar_uauth = ""; ar_can_stale = False}
 ;
 
-value authorization cgi from_addr request base_env passwd access_type utm
+value authorization from_addr request base_env passwd access_type utm
     base_file command =
   match access_type with
   [ ATwizard user ->
       let (command, passwd) =
-        if cgi then (command, passwd)
+        if Wserver.cgi.val then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1097,7 +1096,7 @@ value authorization cgi from_addr request base_env passwd access_type utm
        ar_can_stale = False}
   | ATfriend user ->
       let (command, passwd) =
-        if cgi then (command, passwd)
+        if Wserver.cgi.val then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd)
       in
@@ -1108,26 +1107,26 @@ value authorization cgi from_addr request base_env passwd access_type utm
        ar_can_stale = False}
   | ATnormal ->
       let (command, passwd) =
-        if cgi then (command, "") else (base_file, "")
+        if Wserver.cgi.val then (command, "") else (base_file, "")
       in
       {ar_ok = True; ar_command = command; ar_passwd = passwd;
        ar_scheme = NoAuth; ar_user = ""; ar_name = ""; ar_wizard = False;
        ar_friend = False; ar_uauth = ""; ar_can_stale = False}
   | ATnone | ATset ->
       if use_auth_digest_scheme.val then
-        digest_authorization cgi request base_env passwd utm base_file command
+        digest_authorization request base_env passwd utm base_file command
       else
-        basic_authorization cgi from_addr request base_env passwd access_type
+        basic_authorization from_addr request base_env passwd access_type
           utm base_file command ]
 ;
 
-value make_conf cgi from_addr (addr, request) script_name contents env = do {
+value make_conf from_addr (addr, request) script_name contents env = do {
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
   let (command, base_file, passwd, env, access_type) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
-      if x <> "" || cgi then (x, env) else (script_name, env)
+      if x <> "" || Wserver.cgi.val then (x, env) else (script_name, env)
     in
     let ip = index '_' base_passwd in
     let base_file =
@@ -1201,7 +1200,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
   (* Il sera mis à jour par effet de bord dans request.ml       *)
   let default_sosa_ref = (Adef.iper_of_int (-1), None) in
   let ar =
-    authorization cgi from_addr request base_env passwd access_type utm
+    authorization from_addr request base_env passwd access_type utm
       base_file command
   in
   let wizard_just_friend =
@@ -1238,7 +1237,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name;
      auth_scheme = ar.ar_scheme; command = ar.ar_command;
-     indep_command = (if cgi then ar.ar_command else "geneweb") ^ "?";
+     indep_command = (if Wserver.cgi.val then ar.ar_command else "geneweb") ^ "?";
      pure_xhtml =
        try List.assoc "pure_xhtml" env = "on" with
        [ Not_found -> False ];
@@ -1296,7 +1295,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env = do {
          [ Not_found -> False ];
      bname = base_file; env = env; senv = [];
      henv =
-       (if not cgi then []
+       (if not Wserver.cgi.val then []
         else if ar.ar_passwd = "" then [("b", base_file)]
         else [("b", base_file ^ "_" ^ ar.ar_passwd)]) @
          (if lang = "" then [] else [("lang", lang)]) @
@@ -1413,16 +1412,16 @@ value no_access conf =
   }
 ;
 
-value conf_and_connection cgi from (addr, request) script_name contents env =
+value conf_and_connection from (addr, request) script_name contents env =
   let (conf, sleep, passwd_err) =
-    make_conf cgi from (addr, request) script_name contents env
+    make_conf from (addr, request) script_name contents env
   in
   match redirected_addr.val with
   [ Some addr -> print_redirected conf from request addr
   | None ->
       let (auth_err, auth) =
         if conf.auth_file = "" then (False, "")
-        else if cgi then (True, "")
+        else if Wserver.cgi.val then (True, "")
         else auth_err request conf.auth_file
       in
       let mode = Util.p_getenv conf.env "m" in
@@ -1433,7 +1432,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
           in
           log_and_robot_check conf auth from request script_name contents
         else ();
-        match (cgi, auth_err, passwd_err) with
+        match (Wserver.cgi.val, auth_err, passwd_err) with
         [ (True, True, _) ->
             if is_robot from then Robot.robot_error conf from 0 0
             else no_access conf
@@ -1688,7 +1687,7 @@ value build_env request contents =
   else (contents, Util.create_env contents)
 ;
 
-value connection cgi (addr, request) script_name contents =
+value connection (addr, request) script_name contents =
   let from =
     match addr with
     [ Unix.ADDR_UNIX x -> x
@@ -1700,7 +1699,7 @@ value connection cgi (addr, request) script_name contents =
             Unix.string_of_inet_addr iaddr ]
   in
   do {
-    if not cgi && script_name = "robots.txt" then robots_txt ()
+    if not Wserver.cgi.val && script_name = "robots.txt" then robots_txt ()
     else if excluded from then refuse_log from
     else
       let accept =
@@ -1714,7 +1713,7 @@ value connection cgi (addr, request) script_name contents =
           if image_request script_name env then ()
           else if misc_request script_name then ()
           else
-            conf_and_connection cgi from (addr, request) script_name contents
+            conf_and_connection from (addr, request) script_name contents
               env
         with
         [ Adef.Request_failure msg -> print_request_failure msg
@@ -1777,7 +1776,7 @@ Type %s to stop the service
     }
     else ();
     Wserver.f selected_addr.val selected_port.val conn_timeout.val
-      (IFDEF UNIX THEN max_clients.val ELSE None END) (connection False)
+      (IFDEF UNIX THEN max_clients.val ELSE None END) connection
   }
 ;
 
@@ -1824,7 +1823,7 @@ value geneweb_cgi addr script_name contents =
     let request = add "accept-language" "HTTP_ACCEPT_LANGUAGE" request in
     let request = add "referer" "HTTP_REFERER" request in
     let request = add "user-agent" "HTTP_USER_AGENT" request in
-    connection True (Unix.ADDR_UNIX addr, request) script_name contents
+    connection (Unix.ADDR_UNIX addr, request) script_name contents
   }
 ;
 
@@ -1924,6 +1923,7 @@ value main () =
       "Usage: " ^ Filename.basename Sys.argv.(0) ^
       " [options] where options are:"
     in
+    let force_cgi = ref False in
     let speclist =
       [("-hd", Arg.String Util.add_lang_path,
         "<dir>\n       Directory where the directory lang is installed.");
@@ -1934,7 +1934,7 @@ value main () =
        ("-wd", Arg.String make_cnt_dir, "\
 <dir>
        Directory for socket communication (Windows) and access count.");
-       ("-cgi", Arg.Set cgi, "\n       Force cgi mode.");
+       ("-cgi", Arg.Set force_cgi, "\n       Force cgi mode.");
        ("-images_url", Arg.String (fun x -> Util.images_url.val := x),
         "<url>\n       URL for GeneWeb images (default: gwd send them)");
        ("-images_dir", Arg.String (fun x -> images_dir.val := x), "\
@@ -2060,7 +2060,7 @@ Print the failed passwords in log (except if option -digest is set) ");
     ;
     let (query, cgi) =
       try (Sys.getenv "QUERY_STRING", True) with
-      [ Not_found -> ("", cgi.val) ]
+      [ Not_found -> ("", force_cgi.val) ]
     in
     if cgi then do {
       Wserver.cgi.val := True;
