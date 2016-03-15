@@ -330,8 +330,7 @@ value string_of_sockaddr =
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr fd = do {
-  IFDEF NOFORK THEN ()
-  ELSE IFDEF UNIX THEN
+  IFDEF UNIX THEN
     if tmout > 0 then
       let spid = Unix.fork () in
       if spid > 0 then do {
@@ -348,7 +347,7 @@ value treat_connection tmout callback addr fd = do {
       }
       else ()
     else ()
-  ELSE () END END;
+  ELSE () END;
   let (request, script_name, contents) =
     let (request, contents) =
       let strm =
@@ -410,7 +409,6 @@ value rec list_remove x =
   | [y :: l] -> if x = y then l else [y :: list_remove x l] ]
 ;
 
-IFNDEF NOFORK THEN
 value pids = ref [];
 
 value cleanup_verbose = ref True;
@@ -440,9 +438,7 @@ value cleanup_sons () =
        else pids.val := list_remove pid pids.val)
      pids.val
 ;
-END;
 
-IFNDEF NOFORK THEN
 value wait_available max_clients s =
   match max_clients with
   [ Some m ->
@@ -473,7 +469,6 @@ eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup
       }
   | None -> () ]
 ;
-END;
 
 value wait_and_compact s =
   if Unix.select [s] [] [] 15.0 = ([], [], []) then do {
@@ -512,28 +507,12 @@ value check_stopping () =
 
 value accept_connection tmout max_clients callback s =
   do {
-    IFDEF NOFORK THEN wait_and_compact s
-    ELSE if noproc.val then wait_and_compact s
-    else wait_available max_clients s
-    END;
+    if noproc.val then wait_and_compact s
+    else wait_available max_clients s;
     let (t, addr) = Unix.accept s in
     check_stopping ();
     Unix.setsockopt t Unix.SO_KEEPALIVE True;
-    IFDEF NOFORK THEN
-      let cleanup () =
-        do {
-          try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
-          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
-          try Unix.close t with _ -> ();
-        }
-      in
-      do {
-        wserver_sock.val := t;
-        wserver_oc.val := Unix.out_channel_of_descr t;
-        treat_connection tmout callback addr t;
-        cleanup ();
-      }
-    ELSE IFDEF UNIX THEN
+    IFDEF UNIX THEN
       match try Some (Unix.fork ()) with _ -> None with
       [ Some 0 ->
           do {
@@ -645,14 +624,13 @@ let args = Sys.argv in
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
     }
-    END END
+    END
   }
 ;
 
 value f addr_opt port tmout max_clients g =
   match
-    IFDEF NOFORK THEN None
-    ELSE IFDEF WIN95 THEN
+    IFDEF WIN95 THEN
       IFDEF SYS_COMMAND THEN
         let len = Array.length Sys.argv in
         if len > 2 && Sys.argv.(len - 2) = "-wserver" then
@@ -661,11 +639,10 @@ value f addr_opt port tmout max_clients g =
       ELSE
         try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
       END
-    ELSE None END END
+    ELSE None END
   with
   [ Some s ->
-      IFDEF NOFORK THEN ()
-      ELSE IFDEF WIN95 THEN do {
+      IFDEF WIN95 THEN do {
         let addr = sockaddr_of_string s in
         let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in
@@ -673,7 +650,7 @@ value f addr_opt port tmout max_clients g =
         ignore (treat_connection tmout g addr fd);
         exit 0
       }
-      ELSE () END END
+      ELSE () END
   | None ->
       do {
         check_stopping ();
@@ -688,9 +665,8 @@ value f addr_opt port tmout max_clients g =
         Unix.setsockopt s Unix.SO_REUSEADDR True;
         Unix.bind s (Unix.ADDR_INET addr port);
         Unix.listen s 4;
-        IFDEF NOFORK THEN Sys.set_signal Sys.sigpipe Sys.Signal_ignore
-        ELSE IFDEF UNIX THEN let _ = Unix.nice 1 in ()
-        ELSE () END END;
+        IFDEF UNIX THEN let _ = Unix.nice 1 in ()
+        ELSE () END;
         let tm = Unix.localtime (Unix.time ()) in
         eprintf "Ready %4d-%02d-%02d %02d:%02d port"
           (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
