@@ -30,42 +30,34 @@ value action_arg s sl =
         [ [s :: sl] -> do { f (float_of_string s); Some sl }
         | [] -> None ]
       else do { f (float_of_string s); Some sl }
-  | x ->
-      IFDEF OCAML_307 THEN
-        match x with
-        [ Arg.Unit f -> if s = "" then do { f (); Some sl } else None
-        | Arg.Set_string r ->
-            if s = "" then
-              match sl with
-              [ [s :: sl] -> do { r.val := s; Some sl }
-              | [] -> None ]
-            else do { r.val := s; Some sl }
-        | Arg.Set_int r ->
-            if s = "" then
-              match sl with
-              [ [s :: sl] ->
-                  try do { r.val := (int_of_string s); Some sl } with
-                  [ Failure "int_of_string" -> None ]
-              | [] -> None ]
-            else
-              try do { r.val := (int_of_string s); Some sl } with
-              [ Failure "int_of_string" -> None ]
-        | Arg.Set_float r ->
-            if s = "" then
-              match sl with
-              [ [s :: sl] -> do { r.val := (float_of_string s); Some sl }
-              | [] -> None ]
-            else do { r.val := (float_of_string s); Some sl }
-        | Arg.Symbol syms f ->
-            match (if s = "" then sl else [s :: sl]) with
-            [ [s :: sl] when List.mem s syms -> do { f s; Some sl }
-            | _ -> None ]
-        | x -> assert False ]
-      ELSE
-        match x with
-        [ Arg.Unit f -> if s = "" then do { f (); Some sl } else None
-        | x -> assert False ]
-      END ]
+  | Arg.Unit f -> if s = "" then do { f (); Some sl } else None
+  | Arg.Set_string r ->
+    if s = "" then
+      match sl with
+      [ [s :: sl] -> do { r.val := s; Some sl }
+      | [] -> None ]
+    else do { r.val := s; Some sl }
+  | Arg.Set_int r ->
+    if s = "" then
+      match sl with
+      [ [s :: sl] ->
+        try do { r.val := (int_of_string s); Some sl } with
+        [ Failure "int_of_string" -> None ]
+      | [] -> None ]
+    else
+      try do { r.val := (int_of_string s); Some sl } with
+      [ Failure "int_of_string" -> None ]
+  | Arg.Set_float r ->
+    if s = "" then
+      match sl with
+      [ [s :: sl] -> do { r.val := (float_of_string s); Some sl }
+      | [] -> None ]
+    else do { r.val := (float_of_string s); Some sl }
+  | Arg.Symbol syms f ->
+    match (if s = "" then sl else [s :: sl]) with
+    [ [s :: sl] when List.mem s syms -> do { f s; Some sl }
+    | _ -> None ]
+  | _ -> assert False ]
 ;
 
 value common_start s1 s2 =

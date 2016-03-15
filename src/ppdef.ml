@@ -274,15 +274,3 @@ Pcaml.add_option "-D" (Arg.String (define None))
 Pcaml.add_option "-U" (Arg.String undef)
   "<string> Undefine for IFDEF instruction."
 ;
-
-if Sys.ocaml_version >= "3.07" then
-  defined.val := [("OCAML_307", None) :: defined.val]
-else ();
-
-if Sys.ocaml_version >= "3.08" then
-  defined.val := [("OCAML_308", None) :: defined.val]
-else ();
-
-if Sys.ocaml_version >= "3.09" then
-  defined.val := [("OCAML_309", None) :: defined.val]
-else ();
