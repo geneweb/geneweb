@@ -1445,8 +1445,7 @@ value conf_and_connection from (addr, request) script_name contents env =
         }
     | _ ->
         match mode with
-        [ Some "DOC" -> Doc.print conf
-        | Some "API_ADD_FIRST_FAM" ->
+        [ Some "API_ADD_FIRST_FAM" ->
             do {
               Api_request.treat_request_on_nobase conf
                 (log_file.val, log_oc, flush_log);
@@ -1924,10 +1923,6 @@ Print the failed passwords in log (except if option -digest is set) ");
         else d
       in
       Util.images_url.val := "file://" ^ slashify abs_dir
-    else ();
-    if Secure.doc_path () = [] then
-      List.iter (fun d -> Util.add_doc_path (Filename.concat d "doc"))
-        (List.rev (Secure.lang_path ()))
     else ();
     if Util.cnt_dir.val = Filename.current_dir_name then
       Util.cnt_dir.val := Secure.base_dir ()

@@ -244,19 +244,19 @@ value treat_request_on_possibly_locked_base conf bfile log =
         try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
       in
       let title _ =
-        Wserver.wprint "%s" (Util.capitale (transl conf "error"))
+        Wserver.printf "%s" (Util.capitale (transl conf "error"))
       in
       do {
         Hutil.rheader conf title;
-        Wserver.wprint "<ul>";
+        Wserver.printf "<ul>";
         Util.html_li conf;
-        Wserver.wprint "%s"
+        Wserver.printf "%s"
           (Util.capitale (transl conf "cannot access base"));
-        Wserver.wprint " \"%s\".</ul>\n" conf.bname;
+        Wserver.printf " \"%s\".</ul>\n" conf.bname;
         match e with
         [ Sys_error _ -> ()
         | _ ->
-            Wserver.wprint
+            Wserver.printf
               "<em><font size=\"-1\">Internal message: %s</font></em>\n"
               (Printexc.to_string e) ];
         Hutil.trailer conf;
