@@ -2998,6 +2998,14 @@ and eval_str_event_field
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> Date.string_of_date conf d
       | _ -> "" ]
+  | "on_date" ->
+      match (p_auth, Adef.od_of_codate date) with
+      [ (True, Some d) ->
+          match p_getenv conf.base_env "long_date" with
+          [ Some "yes" ->
+              (Date.string_of_ondate conf d) ^ (Date.get_wday conf d)
+          | _ -> Date.string_of_ondate conf d ]
+      | _ -> "" ]
   | "place" ->
        if p_auth then Util.string_of_place conf (sou base place)
        else ""
@@ -3035,7 +3043,7 @@ and eval_str_event_field
 and eval_event_field_var
       conf base env (p, p_auth) (name, date, place, note, src, w, isp) loc =
   fun
-  [ ["date" :: sl] ->
+  [ ["date" :: sl] when sl <> [] ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
