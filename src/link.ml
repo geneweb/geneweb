@@ -1,4 +1,4 @@
-
+(* camlp5o *)
 
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
