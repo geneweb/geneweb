@@ -115,10 +115,6 @@ descend.cmx: ../dag2html/dag2html.cmx ../wserver/wserver.cmx adef.cmx \
     hutil.cmx mutil.cmx perso.cmx util.cmx
 diff.cmo: diff.cmi
 diff.cmx: diff.cmi
-doc.cmo: ../wserver/wserver.cmi buff.cmo config.cmi hutil.cmi notesLinks.cmi \
-    secure.cmi templ.cmi templAst.cmi util.cmi wiki.cmi
-doc.cmx: ../wserver/wserver.cmx buff.cmx config.cmi hutil.cmx notesLinks.cmx \
-    secure.cmx templ.cmx templAst.cmi util.cmx wiki.cmx
 dutil.cmo: adef.cmi dbdisk.cmi def.cmi dutil.cmi futil.cmi mutil.cmi
 dutil.cmx: adef.cmx dbdisk.cmi def.cmi dutil.cmi futil.cmx mutil.cmx
 dutil.cmi: dbdisk.cmi def.cmi
@@ -450,7 +446,6 @@ cousins.cmo cousins.cmx: pa_html.cmo
 dag.cmo dag.cmx: pa_html.cmo
 date.cmo date.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo
-doc.cmo doc.cmx: pa_html.cmo
 gwc.cmo gwc.cmx: pa_lock.cmo
 gwc2.cmo gwc2.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo
