@@ -1,13 +1,21 @@
-# $Id: Makefile,v 5.2 2010-09-23 17:16:49 ddr Exp $
+ROOT=..
+include $(ROOT)/tools/Makefile.config
 
-include ../tools/Makefile.inc
+# First rule 'all' is defined in Makefile.config.
+
+.PHONY: out opt clean depend
 
 OBJS=wserver.cmo
 
-all:: $(OBJS)
-opt:: $(OBJS:.cmo=.cmx)
+out: $(OBJS:.cmo=.cmx)
+
+opt: $(OBJS:.cmo=.cmx)
+
+clean:
+	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.a *.obj *.lib \
+	*.lck *.bak *~ .#* *.annot
 
 depend:
-	TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
+	$(ROOT)/tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
 
 include .depend

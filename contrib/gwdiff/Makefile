@@ -1,6 +1,6 @@
 # $Id: Makefile,v 5.1 2007-09-12 09:58:44 ddr Exp $
 
-include ../../tools/Makefile.inc
+include ../../tools/Makefile.config
 TOP=../..
 
 OCAMLI=-I $(TOP)/src
@@ -15,7 +15,6 @@ gwdiff.opt: $(GWDIFF_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(GWDIFF_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwdiff.opt
 
 depend:
-	TOP=$(TOP) $(TOP)/tools/camlp5_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
-	mv .depend.new .depend
+	TOP=$(TOP) $(TOP)/tools/camlp5_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend
 
 include .depend

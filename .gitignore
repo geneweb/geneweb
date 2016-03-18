@@ -43,8 +43,7 @@ src/gwu.opt
 src/update_nldb
 src/update_nldb.opt
 
-tools/Makefile.inc
-tools/Makefile.ocaml
+tools/Makefile.config
 
 api/service/convert_dico_place.opt
 api/service/lib/piqilib/.gitignore

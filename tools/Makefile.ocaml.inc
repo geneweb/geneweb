@@ -1,6 +1,0 @@
-CAMLP5D=+camlp5
-MYSQL=
-OCURL=
-OREDIS=
-RE=
-LREDIS=

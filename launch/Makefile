@@ -17,8 +17,7 @@ clean:
 	rm -f *.cm[io] *.out *.log
 
 depend:
-	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend.new
-	mv .depend.new .depend
+	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
 
 %.cmo: %.ml
 	@$(TEST_DIR)

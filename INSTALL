@@ -11,20 +11,13 @@ They freely distributed at address:
 1- In the top directory, do:
       ./configure
 
-2- If the command ocamlc.opt is not installed, edit the file
-   "tools/Makefile.inc" and change:
-       OCAMLC=ocamlc.opt
-       OCAMLOPT=ocamlopt.opt
-   into
-       OCAMLC=ocamlc
-       OCAMLOPT=ocamlopt
-
-3- If your platform has the command ocamlopt, do:
+2- Do:
       make
-   Otherwise do (warning: slower executables):
-      make out
 
-4- Do:
+   If your platform does not have the command ocamlopt, the
+   executables will be slower.
+
+3- Do:
       make distrib
 
    This creates a directory "distribution" where all executables programs
@@ -33,7 +26,7 @@ They freely distributed at address:
    This can constitute a "distribution" directory if you want to distribute
    executables.
 
-5- To use GeneWeb, move the directory "distribution" to another place, or
+4- To use GeneWeb, move the directory "distribution" to another place, or
    rename it.
 
    Go to this directory and launch the command "./gwsetup".

@@ -118,7 +118,6 @@ clavier.out: $(CLAVIER_OBJS)
 	$(OCAMLC) -custom $(CLAVIER_OBJS) -o clavier.out
 
 depend:
-	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.ml) | sed -e 's|$(GWB)|$$(GWB)|g' > .depend.new
-	mv .depend.new .depend
+	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.ml) | sed -e 's|$(GWB)|$$(GWB)|g' > .depend
 
 include .depend

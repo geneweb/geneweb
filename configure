@@ -1,85 +1,460 @@
 #!/bin/bash
 
-OCAML_MIN_VER="4.02"
+PROG_NAME=${0##*/}
 
-verge() {
-    # osx doesn't have sort -V
-    # [  "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
-    [ "$2" = "`echo -e "$1\n$2" | tr ' ' '\n' | sort -n | head -n1`" ]
+# Output for the generated file
+MAKEFILE=tools/Makefile.config
+
+help() {
+  cat << EOF
+$PROG_NAME generates $MAKEFILE.
+usage: $PROG_NAME [<options>]
+
+options:
+  -h|--help
+      show this help
+  --api
+      build the API
+  -d|--debug
+      add debugging symbols to the build command
+  -i|--interactive
+      run $PROG_NAME interactively
+EOF
 }
 
-if ocamlc -v >/dev/null 2>&1; then
-    echo "ocamlc ... OK"
-else
+# Parse options
+# Options for Makefile
+OCAMLC=
+OCAMLOPT=
+OFLAGS="-safe-string"
+PPFLAGS=
+PP=
+
+CFLAGS="-safe-string"
+LDFLAGS=
+PPFLAGS=
+CAMLP5F=
+CAMLP5=
+MYSQL=
+CURL=
+REDIS=
+LREDIS=
+RE=
+WARN="-warn-error A"
+API_OPT=
+STRIP=
+RM=
+EXE=
+STATIC=
+OS_TYPE=
+
+# Options for configure
+BUILD_DIR="_build"
+API=n
+DEBUG=
+INTERACTIVE=n
+NATIVE=
+
+while [[ $# -ne 0 ]]; do
+  case $1 in
+    -h|--help)
+      help; exit ;;
+    --api)
+      API=y ;;
+    -bd|--build-dir)
+      BUILD_DIR="$2";
+      shift ;;
+    -d|--debug)
+      DEBUG="-g -annot" ;;
+    -i|--interactive)
+      INTERACTIVE=y ;;
+    -r|--redis_path)
+      LREDIS="$2";
+      shift ;;
+    -nw|--no-warn-error)
+      WARN= ;;
+    -*|--*)
+      echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
+    *)
+      echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
+  esac
+  [[ $# -gt 0 ]] && shift
+done
+
+# Functions that print the checked information
+
+# Length of line for print_check_*
+LINE_WIDTH=60
+
+print_check_ok() {
+  n=$(( $LINE_WIDTH-${#1}-8 ))
+  printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
+  printf ".%.0s" $(eval "echo {1.."$(($n))"}")
+  printf " \\x1b[32m%s\\x1b[0m" "$2"
+  echo
+}
+
+print_check_warn() {
+  n=$(( $LINE_WIDTH-${#1}-8 ))
+  printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
+  printf ".%.0s" $(eval "echo {1.."$(($n))"}")
+  printf " \\x1b[33m%s\\x1b[0m" "$2"
+  echo
+}
+
+print_check_err() {
+  n=$(( $LINE_WIDTH-${#1}-8 ))
+  printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
+  printf ".%.0s" $(eval "echo {1.."$(($n))"}")
+  printf " \\x1b[31m%s\\x1b[0m" "$2"
+  echo
+}
+
+# Functions to check the environment
+
+check_os() {
+  OS_TYPE=`uname -s`
+  if [[ $OS_TYPE == "Darwin" ]] || [[ $OS_TYPE == "Linux" ]] ; then
+    print_check_ok "Checking OS type" "UNIX"
+    CAMLP5F=UNIX
+    STRIP=strip
+    RM="/bin/rm -f"
+    EXE=
+    STATIC="-ccopt -static"
+    STATIC=
+  else
+    print_check_ok "Checking OS type" "WINDOWS"
+    CAMLP5F=WIN95
+    STRIP=true
+    RM="rm -f"
+    EXE=".exe"
+    STATIC=
+  fi
+}
+
+check_ocaml() {
+  if ocamlc -v >/dev/null 2>&1; then
+    print_check_ok "Checking OCaml compiler" "OK"
+    OCAMLC=ocamlc
+    OCAMLOPT=ocamlopt
+  else
+    print_check_err "Checking OCaml compiler" "ERROR"
     echo "You need the command ocamlc accessible in the path!"
     echo "Configuration script failed!"
     exit 1
-fi
+  fi
+}
 
-OCAML_VER="`ocamlc -version`"
+check_native_ocaml() {
+  if ocamlc.opt -v >/dev/null 2>&1; then
+    print_check_ok "Checking OCaml native compiler" "OK"
+    OCAMLC=ocamlc.opt
+    OCAMLOPT=ocamlopt.opt
+    NATIVE=y
+  else
+    print_check_warn "Checking OCaml native compiler" "NOT FOUND"
+  fi
+}
 
-if verge "$OCAML_VER" "$OCAML_MIN_VER"; then
-    echo "ocamlc version $OCAML_VER >= $OCAML_MIN_VER ... OK"
-else
-    echo "OCaml version $OCAML_MIN_VER or newer needed"
+verge() {
+    # osx doesn't have sort -V
+    # [ "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+    [ "$2" = "`echo -e "$1\n$2" | tr ' ' '\n' | sort -n | head -n1`" ]
+}
+
+check_ocaml_version() {
+  OCAML_MIN_VER="4.02"
+  OCAML_VER="`ocamlc -version`"
+  if verge "$OCAML_VER" "$OCAML_MIN_VER"; then
+    print_check_ok \
+      "Checking OCaml compiler version $OCAML_VER >= $OCAML_MIN_VER" \
+      "OK"
+  else
+    print_check_err "Checking OCaml compiler version $OCAML_VER" "ERROR"
+    echo "OCaml version $OCAML_MIN_VER or newer needed."
     echo "Configuration script failed!"
     exit 1
-fi
+  fi
+}
 
-if camlp5 -v >/dev/null 2>&1; then
-    echo "camlp5 ... OK"
-else
+check_camlp5() {
+  if camlp5 -v >/dev/null 2>&1; then
+    print_check_ok "Checking Camlp5" "OK"
+    CAMLP5="+camlp5"
+  else
+    print_check_err "Checking Camlp5" "ERROR"
     echo "You need the command camlp5 accessible in the path!"
     echo "Configuration script failed!"
     exit 1
-fi
+  fi
+}
 
-if [ "`echo 'print_endline Sys.os_type;;' | ocaml -stdin -noprompt`" = "Unix" ]; then
-    echo "OS type ... Unix"
-    cp tools/Makefile.inc.unix tools/Makefile.inc
-else
-    echo "OS type ... Windows"
-    cp tools/Makefile.inc.win tools/Makefile.inc
-fi
-
-D_GW_DIR=`pwd`/
-if test -e "tools/Makefile.inc"; then
-  sed "s|^\(GW_DIR=\).*|\1$D_GW_DIR|" tools/Makefile.inc > tools/Makefile.inc.tmp
-  mv tools/Makefile.inc.tmp tools/Makefile.inc
-fi
-
-cp tools/Makefile.ocaml.inc tools/Makefile.ocaml
-
-if ocamlfind printconf >/dev/null 2>&1; then :
-else
-    echo "Could not find ocamlfind in the path."
-    echo "You may need to update Makefile.ocaml by hand."
-    exit 1
-fi
-
-D_CAMLP5D=`ocamlfind query camlp5`/
-D_MYSQL=`ocamlfind query mysql`/
-D_OCURL=`ocamlfind query curl`/
-D_OREDIS=`ocamlfind query redis`/
-D_RE=`ocamlfind query re`/
-if test -e "tools/Makefile.ocaml"; then
-  sed "s|^\(CAMLP5D=\).*|\1$D_CAMLP5D|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-  mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-  # Conditional compilation: ./configure --api
-  if test -e "tools/Makefile.inc"; then
-    if [ "$1" = "--api" ]; then
-      sed "s|^\(CAMLP5F=.*\)|\1 -DAPI|" tools/Makefile.inc > tools/Makefile.inc.tmp
-      mv tools/Makefile.inc.tmp tools/Makefile.inc
-      sed "s|^\(MYSQL=\).*|\1$D_MYSQL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-      sed "s|^\(OCURL=\).*|\1$D_OCURL|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-      sed "s|^\(OREDIS=\).*|\1$D_OREDIS|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
-      sed "s|^\(RE=\).*|\1$D_RE|" tools/Makefile.ocaml > tools/Makefile.ocaml.tmp
-      mv tools/Makefile.ocaml.tmp tools/Makefile.ocaml
+check_ocamlfind() {
+  if [[ $API == y ]]; then
+    if ocamlfind printconf >/dev/null 2>&1; then
+      print_check_ok "Checking ocamlfind" "OK"
+      OCAMLC="ocamlfind ocamlc"
+      OCAMLOPT="ocamlfind ocamlopt"
+      CAMLP5=`ocamlfind query camlp5`/
+    else
+      print_check_err "Checking ocamlfind" "ERROR"
+      echo "You need the command ocamlfind accessible in the path!"
+      echo "Configuration script failed!"
+      exit 1
+    fi
+  else
+    if ocamlfind printconf >/dev/null 2>&1; then
+      print_check_ok "Checking ocamlfind" "OK"
+      OCAMLC="ocamlfind ocamlc"
+      OCAMLOPT="ocamlfind ocamlopt"
+      CAMLP5=`ocamlfind query camlp5`/
+    else
+      print_check_warn "Checking ocamlfind" "NOT FOUND"
     fi
   fi
-fi
+}
 
-echo "Configuration script succeeded!"
+check_api() {
+  if [[ $API == y ]]; then
+    API_OPT=" -package piqirun.ext"
+    CAMLP5="$CAMLP5F -DAPI"
+  fi
+}
+
+check_mysql() {
+  if [[ $API == y ]]; then
+    if ocamlfind query mysql >/dev/null 2>&1; then
+      print_check_ok "Checking OCaml mysql" "OK"
+      MYSQL=`ocamlfind query mysql`/
+    else
+      print_check_err "Checking OCaml mysql" "ERREUR"
+      echo "You need the OCaml dependency mysql!"
+      echo "Configuration script failed!"
+      exit 1
+    fi
+  fi
+}
+
+check_curl() {
+  if [[ $API == y ]]; then
+    if ocamlfind query curl >/dev/null 2>&1; then
+      print_check_ok "Checking OCaml curl" "OK"
+      CURL=`ocamlfind query curl`/
+    else
+      print_check_err "Checking OCaml curl" "ERREUR"
+      echo "You need the OCaml dependency curl!"
+      echo "Configuration script failed!"
+      exit 1
+    fi
+  fi
+}
+
+check_redis() {
+  if [[ $API == y ]]; then
+    if ocamlfind query redis >/dev/null 2>&1 \
+       && [[ -e "${LREDIS}/_build/src/redis.cmxs" ]]; then
+      print_check_ok "Checking OCaml redis" "OK"
+      REDIS=`ocamlfind query redis`/
+      LREDIS="${LREDIS}/_build/src/"
+    else
+      print_check_err "Checking OCaml redis" "ERREUR"
+      if ! [[ -e "${LREDIS}/_build/src/redis.cmxs" ]]; then
+        echo "You need to provide a valid redis path!"
+        echo "Configuration script failed!"
+      else
+        echo "You need the OCaml dependency redis!"
+        echo "Configuration script failed!"
+      fi
+      exit 1
+    fi
+  fi
+}
+
+check_re() {
+  if [[ $API == y ]]; then
+    if ocamlfind query re >/dev/null 2>&1; then
+      print_check_ok "Checking OCaml re" "OK"
+      RE=`ocamlfind query re`/
+    else
+      print_check_err "Checking OCaml re" "ERREUR"
+      echo "You need the OCaml dependency re!"
+      echo "Configuration script failed!"
+      exit 1
+    fi
+  fi
+}
+
+check_environment() {
+  check_os
+  check_ocaml
+  check_ocaml_version
+  check_native_ocaml
+  check_camlp5
+  check_ocamlfind
+  check_api
+  check_mysql
+  check_curl
+  check_redis
+  check_re
+}
+
+# Functions to print Makefile.config.
+
+# Print common options, should be called first.
+print_common_header() {
+  (echo "# This file is generated by $0."
+   echo
+   echo "# For echo and colors."
+   echo "SHELL:=/bin/bash"
+   echo
+   echo "# Formatting and colors."
+   echo "GREEN:=\"\\\\x1b[32m\""
+   echo "YELLOW:=\"\\\\x1b[33m\""
+   echo "RED:=\"\\\\x1b[31m\""
+   echo "MAGENTA:=\"\\\\x1b[35m\""
+   echo "CYAN:=\"\\\\x1b[36m\""
+   echo "BOLD:=\"\\\\x1b[1m\""
+   echo "CLEAR:=\"\\\\x1b[0m\""
+   echo
+   echo "# ! Careful ! ROOT must be define in each Makefile before \
+it is included."
+   echo
+   echo "# Variables for packagers."
+   echo "PREFIX=/usr"
+   echo "LANGDIR=\$(PREFIX)/share/geneweb"
+   echo "MANDIR=\$(PREFIX)/man/man1"
+   echo "DESTDIR=distribution"
+   echo "MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwc2.1 gwu.1 gwd.1 consang.1 \
+gwsetup.1"
+   echo
+   echo "# Build directory."
+   echo "BUILD_DIR=\${ROOT}/${BUILD_DIR}"
+  ) > $MAKEFILE
+}
+
+print_tools() {
+  (echo
+   echo "GW_DIR=`pwd`/"
+   echo "TOP=.."
+   echo "CAMLP5_COMM=TOP=\$(TOP) \$(TOP)/tools/camlp5_comm.sh"
+   echo "STRIP=${STRIP}"
+   echo "RM=${RM}"
+   echo "EXE=${EXE}"
+   echo "STATIC=${STATIC}"
+   echo "TEST_DIR=test \$\$(basename \"\$<\") = \"\$<\" || \
+{ echo \"Please run 'make' in directory '\$\$(dirname \"\$<\")' first\"; \
+exit 1; }"
+  ) >> $MAKEFILE
+}
+
+print_compiler() {
+  (echo
+   echo "# Compiler options."
+   echo "CFLAGS=${WARN} -safe-string${API_OPT} ${DEBUG}"
+   echo "OCAMLC=${OCAMLC} \$(CFLAGS)"
+   echo "OCAMLOPT=${OCAMLOPT} \$(CFLAGS)"
+   echo "OFLAGS=${OFLAGS} ${WARN} ${API_OPT} ${DEBUG}"
+   echo "CAMLP5F=-D${CAMLP5F}"
+   echo "LIBUNIX=-cclib -lunix"
+   echo
+   echo "OCAMLI="
+   echo "OCAMLD="
+   echo
+   echo "# Compiler dependencies."
+   echo "CAMLP5D=${CAMLP5}"
+   if [[ $API == y ]]; then
+     echo "MYSQL=${MYSQL}"
+     echo "OCURL=${CURL}"
+     echo "OREDIS=${REDIS}"
+     echo "RE=${RE}"
+     echo "LREDIS=${LREDIS}"
+   fi
+   ) >> $MAKEFILE
+}
+
+print_common_target() {
+  (echo
+   echo "# The first target 'all' is defined here."
+   if [[ $NATIVE == y ]]; then
+     (echo
+      echo ".PHONY: all"
+      echo "all: opt"
+     ) >> $MAKEFILE
+   else
+     (echo
+      echo ".PHONY: all"
+      echo "all: out"
+     ) >> $MAKEFILE
+   fi
+   echo
+   echo ".SUFFIXES: .ml .mli .cmo .cmi .cmx"
+   echo
+   echo "%.cmi: %.mli"
+   echo "	@\$(TEST_DIR)"
+   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$*.ppi"
+   echo "	\$(OCAMLC) \$(OCAMLI) -I \$(CAMLP5D) -c -intf \$*.ppi"
+   echo "	\$(RM) \$*.ppi"
+   echo
+   echo "%.cmo: %.ml"
+   echo "	@\$(TEST_DIR)"
+   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$*.ppo"
+   echo "	\$(OCAMLC) \$(OCAMLI) \$(OCAMLD) -I \$(CAMLP5D) -c -impl \$*.ppo"
+   echo "	\$(RM) \$*.ppo"
+   echo
+   echo "%.cmx: %.ml"
+   echo "	@\$(TEST_DIR)"
+   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$*.ppo"
+   echo "	\$(OCAMLOPT) \$(OCAMLI) -I \$(CAMLP5D) -c -impl \$*.ppo"
+   echo "	\$(RM) \$*.ppo"
+  ) >> $MAKEFILE
+}
+
+print_makefile() {
+  print_common_header
+  print_tools
+  print_compiler
+  print_common_target
+}
+
+# main
+
+echo -e "\\x1b[36m=-=-\\x1b[0m Configure GeneWeb \\x1b[36m\
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\\x1b[0m"
+
+if [[ $INTERACTIVE == y ]]; then
+  echo "Do you want to specify the build directory (default = _build) ? [Y/n]"
+  read -r answer
+  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    BUILD_DIR="${answer}"
+  fi
+  echo "Do you want to build the API (default = no) ? [Y/n]"
+  read -r answer
+  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    API=y
+  fi
+  if [[ $API == y ]]; then
+    echo "Please provide the absolute path of your redis"
+    read -r answer
+    if [[ -e "${answer}/_build/src/redis.cmxs" ]]; then
+      LREDIS="${answer}/_build/src/"
+    else
+      echo "You need to provide a valid redis path!"
+      echo "Configuration script failed!"
+      exit 1
+    fi
+  fi
+  echo "Do you want to remove compilation warnings (default = no) ? [Y/n]"
+  read -r answer
+  if ! [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    WARN=
+  fi
+  echo "Do you want compilation debugging symbols (default = no) ? [Y/n]"
+  read -r answer
+  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    DEBUG="-g -annot"
+  fi
+fi
+# Check the environment
+check_environment
+# Print Makefile
+print_makefile

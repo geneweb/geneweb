@@ -1,6 +1,6 @@
 # $Id: Makefile,v 0.001 2014-02-21 16:47:52 flh Exp $
 
-include ../../tools/Makefile.inc
+include ../../tools/Makefile.config
 
 TOP=../..
 CAMLP5_COMM=TOP=$(TOP) $(TOP)/tools/camlp5_comm.sh
@@ -17,9 +17,9 @@ OBJS_FIX_COLON_SRC=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $
 OBJS_CPL=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFindCpl.cmo
 OBJS_OCCU=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixY.cmo
 
-all:: opt
+all: opt
 
-out:: gwFixBase.out gwFixFromFile.out gwFixFromFileDomicile.out gwFixFromFileAlias.out gwFixBurial.out gwFixEvtSrc.out gwFixColon.out gwFindCpl.out gwFixY.out
+out: gwFixBase.out gwFixFromFile.out gwFixFromFileDomicile.out gwFixFromFileAlias.out gwFixBurial.out gwFixEvtSrc.out gwFixColon.out gwFindCpl.out gwFixY.out
 	$(RM) gwFixBase gwFixFromFile gwFixFromFileDomicile gwFixFromFileAlias gwFixBurial gwFixEvtSrc gwFixColon gwFindCpl gwFixY
 	cp gwFixBase.out gwFixBase
 	cp gwFixFromFile.out gwFixFromFile
@@ -31,7 +31,7 @@ out:: gwFixBase.out gwFixFromFile.out gwFixFromFileDomicile.out gwFixFromFileAli
 	cp gwFindCpl.out gwFindCpl
 	cp gwFixY.out gwFixY
 
-opt:: gwFixBase.opt gwFixFromFile.opt gwFixFromFileDomicile.opt gwFixFromFileAlias.opt gwFixBurial.opt gwFixEvtSrc.opt gwFixColon.opt gwFindCpl.opt gwFixY.opt
+opt: gwFixBase.opt gwFixFromFile.opt gwFixFromFileDomicile.opt gwFixFromFileAlias.opt gwFixBurial.opt gwFixEvtSrc.opt gwFixColon.opt gwFindCpl.opt gwFixY.opt
 	$(RM) gwFixBase gwFixFromFile gwFixFromFileDomicile gwFixFromFileAlias gwFixBurial gwFixEvtSrc gwFixColon gwFindCpl gwFixY
 	cp gwFixBase.opt gwFixBase
 	cp gwFixFromFile.opt gwFixFromFile
@@ -44,7 +44,10 @@ opt:: gwFixBase.opt gwFixFromFile.opt gwFixFromFileDomicile.opt gwFixFromFileAli
 	cp gwFixY.opt gwFixY
 	$(STRIP) gwFixBase gwFixFromFile gwFixFromFileDomicile gwFixFromFileAlias gwFixBurial gwFixEvtSrc gwFixColon gwFindCpl gwFixY
 
-clean::
+.PHONY: clean
+clean:
+	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.a *.obj *.lib \
+	*.lck *.bak *~ .#* *.annot
 	$(RM) gwFixBase gwFixFromFile gwFixFromFileDomicile gwFixFromFileAlias gwFixBurial gwFixEvtSrc gwFixColon gwFindCpl gwFixY
 
 gwFixBase.out: $(OBJS)

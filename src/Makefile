@@ -1,9 +1,11 @@
-# $Id: Makefile,v 5.53 2008-11-03 15:40:10 ddr Exp $
+ROOT=..
+include $(ROOT)/tools/Makefile.config
 
-include ../tools/Makefile.inc
+# First rule 'all' is defined in Makefile.config.
 
-PREFIX=/usr
+# Overwrite variables.
 OCAMLI=-I ../wserver -I ../dag2html -I ../api/service
+
 GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo db1link.cmo gwc.cmo
 GWC2_OBJS=calendar.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwcomp.cmo argl.cmo lock.cmo progrBar.cmo secure.cmo iochan.cmo futil.cmo db2.cmo db2out.cmo notesLinks.cmo db2disk.cmo dutil.cmo btree.cmo database.cmo gwdb.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo db2link.cmo gwc2.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo progrBar.cmo database.cmo db2.cmo db2disk.cmo db2out.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
@@ -20,13 +22,9 @@ FPLA_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo f
 UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo iovalue.cmo mutil.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
 CHECK_BASE_OBJS=buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo secure.cmo dutil.cmo btree.cmo database.cmo db2.cmo db2disk.cmo gwdb.cmo progrBar.cmo checkItem.cmo consang.cmo check.cmo check_base.cmo
 
-all:: out
 
-out:: gwlib.ml
-opt:: gwlib.ml
-
-out:: ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out i18n_check.out
-	$(RM) gwc gwc2 consang gwd gwu check_base
+.PHONY: out
+out: gwlib.ml ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out
 	cp gwc1.out gwc
 	cp gwc1.out gwc1
 	cp gwc2.out gwc2
@@ -36,9 +34,9 @@ out:: ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out ch
 	cp update_nldb.out update_nldb
 	cp check_base.out check_base
 
-#opt:: ansel.cmx gwc1.opt gwc2.opt consang.opt link.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
-opt:: ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
-	$(RM) gwc consang gwd gwu
+.PHONY: opt
+#opt: ansel.cmx gwc1.opt gwc2.opt consang.opt link.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
+opt: gwlib.ml ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	cp gwc1.opt gwc
 	cp gwc1.opt gwc1
 	cp gwc2.opt gwc2
@@ -67,9 +65,6 @@ compilation.ml: always
 	echo "value (wd, d, h) = ($$(date "+%u, {day=%d;month=%m;year=%Y;prec=Sure;delta=0}, \"%T %Z\""));" >> compilation.ml
 	echo "value ct conf = Printf.sprintf \" (%4d-%02d-%02d %s)\" d.year d.month d.day h;" >> compilation.ml
 	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
-
-clean::
-	$(RM) gwc gwc1 gwc2 consang gwd gwu update_nldb check_base gwlib.ml
 
 gwlib.ml:
 	echo "value prefix =" > gwlib.ml
@@ -162,10 +157,16 @@ i18n: pr_transl.cmo always
 	) | \
 	sort | uniq | grep -v '^$$' > i18n
 
+.PHONY: clean
+clean:
+	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.a *.obj *.lib \
+	*.lck *.bak *~ .#* *.annot
+	$(RM) gwc gwc1 gwc2 consang gwd gwu update_nldb check_base gwlib.ml
+
 always:
 
+.PHONY: depend
 depend: gwlib.ml pa_lock.cmo pa_html.cmo q_codes.cmo
-	export LC_ALL=C; TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) > .depend.new
-	mv .depend.new .depend
+	export LC_ALL=C; $(ROOT)/tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
 
 include .depend

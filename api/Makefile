@@ -1,6 +1,6 @@
 # $Id: Makefile,v 5.18 2007-09-12 09:58:44 ddr Exp $
 
-include ../tools/Makefile.ocaml
+#include ../tools/Makefile.ocaml
 
 CAMLP5F=-DUNIX
 OCAMLOPT=ocamlfind ocamlopt -warn-error A -safe-string -annot -g

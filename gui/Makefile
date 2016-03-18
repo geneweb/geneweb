@@ -1,7 +1,7 @@
 # $Id: Makefile,v 1.6 2007-09-12 09:58:44 ddr Exp $
 # Copyright (c) 2006-2007 INRIA
 
-include ../tools/Makefile.inc
+include ../tools/Makefile.config
 
 LABLGTK2=+lablgtk2
 OCAMLC=ocamlc.opt
@@ -31,8 +31,7 @@ clean::
 	$(RM) gui
 
 depend:
-	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend.new
-	mv .depend.new .depend
+	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
 
 %.cmo: %.ml
 	@$(TEST_DIR)
