@@ -21,10 +21,6 @@ value default_lang = ref "fr";
 value setup_link = ref False;
 value choose_browser_lang = ref False;
 value images_dir = ref "";
-value log_file = ref "";
-value log_flags =
-  [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
-;
 IFDEF UNIX THEN
 value max_clients = ref None;
 END;
@@ -37,22 +33,6 @@ value trace_failed_passwd = ref False;
 value use_auth_digest_scheme = ref False;
 value no_host_address = ref False;
 value lexicon_list = ref [];
-
-value log_oc () =
-  if log_file.val <> "" then
-    match
-      try Some (open_out_gen log_flags 0o644 log_file.val) with
-      [ Sys_error _ -> None ]
-    with
-    [ Some oc -> do {
-        Unix.dup2 (Unix.descr_of_out_channel oc) Unix.stderr;
-        oc
-      }
-    | None -> do { log_file.val := ""; stderr } ]
-  else stderr
-;
-
-value flush_log oc = if log_file.val <> "" then close_out oc else flush oc;
 
 value is_multipart_form =
   let s = "multipart/form-data" in
@@ -166,10 +146,8 @@ value http status =
 ;
 
 value robots_txt () =
-  let oc = log_oc () in
   do {
-    Printf.fprintf oc "Robot request\n";
-    flush_log oc;
+    Log.with_log (fun oc -> Printf.fprintf oc "Robot request\n");
     Wserver.http HttpStatus.OK;
     Wserver.header "Content-type: text/plain";
     if copy_file "robots" then ()
@@ -181,12 +159,12 @@ value robots_txt () =
 ;
 
 value refuse_log from =
-  let oc = Secure.open_out_gen log_flags 0o644 "refuse_log" in
   do {
-    let tm = Unix.localtime (Unix.time ()) in
-    fprintf_date oc tm;
-    fprintf oc " excluded: %s\n" from;
-    close_out oc;
+    Log.with_file ~{file = "refuse_log"} (fun oc -> do {
+      let tm = Unix.localtime (Unix.time ()) in
+      fprintf_date oc tm;
+      fprintf oc " excluded: %s\n" from
+    });
     http HttpStatus.Forbidden;
     Wserver.header "Content-type: text/html";
     Wserver.printf "Your access has been disconnected by administrator.\n";
@@ -195,17 +173,16 @@ value refuse_log from =
 ;
 
 value only_log from =
-  let oc = log_oc () in
   do {
-    let tm = Unix.localtime (Unix.time ()) in
-    fprintf_date oc tm;
-    fprintf oc " Connection refused from %s " from;
-    fprintf oc "(only ";
-    list_iter_first
-      (fun first s -> fprintf oc "%s%s" (if not first then "," else "") s)
-      only_addresses.val;
-    fprintf oc ")\n";
-    flush_log oc;
+    Log.with_log (fun oc -> do {
+      let tm = Unix.localtime (Unix.time ()) in
+      fprintf_date oc tm;
+      fprintf oc " Connection refused from %s " from;
+      fprintf oc "(only ";
+      list_iter_first
+        (fun first s -> fprintf oc "%s%s" (if not first then "," else "") s)
+        only_addresses.val;
+      fprintf oc ")\n" });
     http HttpStatus.OK;
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
     Wserver.printf "<head><title>Invalid access</title></head>\n";
@@ -214,15 +191,14 @@ value only_log from =
 ;
 
 value refuse_auth conf from auth auth_type =
-  let oc = log_oc () in
   do {
-    let tm = Unix.localtime (Unix.time ()) in
-    fprintf_date oc tm;
-    fprintf oc " Access failed\n";
-    fprintf oc "  From: %s\n" from;
-    fprintf oc "  Basic realm: %s\n" auth_type;
-    fprintf oc "  Response: %s\n" auth;
-    flush_log oc;
+    Log.with_log (fun oc -> do {
+      let tm = Unix.localtime (Unix.time ()) in
+      fprintf_date oc tm;
+      fprintf oc " Access failed\n";
+      fprintf oc "  From: %s\n" from;
+      fprintf oc "  Basic realm: %s\n" auth_type;
+      fprintf oc "  Response: %s\n" auth });
     Util.unauthorized conf auth_type;
   }
 ;
@@ -358,18 +334,15 @@ value print_renamed conf new_n =
 ;
 
 value log_redirect conf from request req =
-  let referer = Wserver.extract_param "referer: " '\n' request in
   lock_wait Srcfile.adm_file "gwd.lck" with
   [ Accept ->
-      let oc = log_oc () in
-      do {
-        let tm = Unix.localtime (Unix.time ()) in
-        fprintf_date oc tm;
-        fprintf oc " %s\n" req;
-        fprintf oc "  From: %s\n" from;
-        fprintf oc "  Referer: %s\n" referer;
-        flush_log oc;
-      }
+    Log.with_log (fun oc -> do {
+      let referer = Wserver.extract_param "referer: " '\n' request in
+      let tm = Unix.localtime (Unix.time ()) in
+      fprintf_date oc tm;
+      fprintf oc " %s\n" req;
+      fprintf oc "  From: %s\n" from;
+      fprintf oc "  Referer: %s\n" referer })
   | Refuse -> () ]
 ;
 
@@ -1343,29 +1316,27 @@ value make_conf from_addr (addr, request) script_name contents env = do {
 };
 
 value log_and_robot_check conf auth from request script_name contents =
-  if Wserver.cgi.val && log_file.val = "" && robot_xcl.val = None then ()
+  if robot_xcl.val = None then
+    Log.with_log (fun oc ->
+      let tm = Unix.time () in
+      log oc tm conf from auth request script_name contents)
   else
-    let tm = Unix.time () in
     lock_wait Srcfile.adm_file "gwd.lck" with
     [ Accept ->
-        let oc = log_oc () in
-        do {
-          try
-            do {
-              match robot_xcl.val with
-              [ Some (cnt, sec) ->
-                  let s = "suicide" in
-                  let suicide = Util.p_getenv conf.env s <> None in
-                  conf.n_connect :=
-                    Some (Robot.check oc tm from cnt sec conf suicide)
-              | _ -> () ];
-              if Wserver.cgi.val && log_file.val = "" then ()
-              else log oc tm conf from auth request script_name contents;
-            }
-          with e ->
-            do { flush_log oc; raise e };
-          flush_log oc;
-        }
+      Log.with_log_opt (fun oc_opt -> do {
+        let tm = Unix.time () in
+        match robot_xcl.val with
+        [ Some (cnt, sec) ->
+          let s = "suicide" in
+          let suicide = Util.p_getenv conf.env s <> None in
+          conf.n_connect :=
+            Some (Robot.check oc_opt tm from cnt sec conf suicide)
+        | _ -> () ];
+        match oc_opt with
+        [ Some oc ->
+          log oc tm conf from auth request script_name contents
+        | None -> () ]
+      })
     | Refuse -> () ]
 ;
 
@@ -1461,19 +1432,15 @@ value conf_and_connection from (addr, request) script_name contents env =
             else do {
               let tm = Unix.time () in
               lock_wait Srcfile.adm_file "gwd.lck" with
-              [ Accept -> do {
-                  let oc = log_oc () in
-                  log_passwd_failed ar oc tm from request conf.bname;
-                  flush_log oc;
-                }
+              [ Accept ->
+                Log.with_log (fun oc -> log_passwd_failed ar oc tm from request conf.bname)
               | Refuse -> () ];
               unauth_server conf ar;
             }
         | _ ->
           if mode = Some "API_ADD_FIRST_FAM" then
             do {
-              Request.treat_request_on_nobase conf
-                (log_file.val, log_oc, flush_log);
+              Request.treat_request_on_nobase conf;
               if conf.manitou && sleep > 0 then Unix.sleep sleep
               else ()
             }
@@ -1486,8 +1453,7 @@ value conf_and_connection from (addr, request) script_name contents env =
               [ Some n when n <> "" -> print_renamed conf n
               | _ ->
                 do {
-                  Request.treat_request_on_base conf
-                    (log_file.val, log_oc, flush_log);
+                  Request.treat_request_on_base conf;
                   if conf.manitou && sleep > 0 then Unix.sleep sleep
                   else ();
                 } ] ]
@@ -1813,6 +1779,7 @@ END;
 
 value geneweb_cgi addr script_name contents =
   do {
+    Log.fallback_to_stderr.val := False;
     IFDEF UNIX THEN manage_cgi_timeout conn_timeout.val ELSE () END;
     try Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755 with
     [ Unix.Unix_error _ _ _ -> () ];
@@ -1982,7 +1949,7 @@ value main () =
        ("-add_lexicon",
         Arg.String (fun x -> lexicon_list.val := [x :: lexicon_list.val]),
         "<lexicon>\n       Add file as lexicon.");
-       ("-log", Arg.String (fun x -> log_file.val := x),
+       ("-log", Arg.Set_string Log.file,
         "<file>\n       Redirect log trace to this file.");
        ("-robot_xcl", Arg.String robot_exclude_arg, "\
 <cnt>,<sec>

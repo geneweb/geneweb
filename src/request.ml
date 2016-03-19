@@ -822,19 +822,14 @@ value set_owner conf =
 
 value thousand oc x = Sosa.print (output_string oc) "," (Sosa.of_int x);
 
-value log_count conf (log_file, log_oc, flush_log) r =
-  if Wserver.cgi.val && log_file = "" then ()
-  else
-    match r with
-    [ Some (welcome_cnt, request_cnt, start_date) ->
-        let oc = log_oc () in
-        do {
-          Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
-            thousand (welcome_cnt + request_cnt) thousand welcome_cnt
-            start_date;
-          flush_log oc;
-        }
-    | None -> () ]
+value log_count conf r =
+  match r with
+  [ Some (welcome_cnt, request_cnt, start_date) ->
+    Log.with_log (fun oc ->
+      Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
+          thousand (welcome_cnt + request_cnt) thousand welcome_cnt
+          start_date)
+  | None -> () ]
 ;
 
 value print_moved conf base s =
@@ -887,7 +882,7 @@ value trace_keys base (fn, sn, occ) ipo = do {
       } ];
 };
 
-value treat_request conf base log = do {
+value treat_request conf base = do {
   match
     (p_getenv conf.base_env "moved",
      p_getenv conf.env "opt",
@@ -912,7 +907,7 @@ value treat_request conf base log = do {
           [ Some "no" -> ()
           | _ ->
               let r = Srcfile.incr_welcome_counter conf in
-              log_count conf log r ];
+              log_count conf r ];
           Srcfile.print_start conf base
         }
         else do {
@@ -920,7 +915,7 @@ value treat_request conf base log = do {
           [ Some "no" -> ()
           | _ ->
               let r = Srcfile.incr_request_counter conf in
-              log_count conf log r ] ;
+              log_count conf r ] ;
           match p_getenv conf.env "ptempl" with
           [ Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
               match find_person_in_env conf base "" with
@@ -932,7 +927,7 @@ value treat_request conf base log = do {
    Wserver.wflush ();
 };
 
-value treat_request_on_possibly_locked_base conf bfile log =
+value treat_request_on_possibly_locked_base conf bfile =
   match try Left (Gwdb.open_base bfile) with e -> Right e with
   [ Left base ->
       do {
@@ -946,7 +941,7 @@ value treat_request_on_possibly_locked_base conf bfile log =
             try Hashtbl.find conf.lexicon " !charset" with
             [ Not_found -> "iso-8859-1" ];
         };
-        try treat_request conf base log with exc ->
+        try treat_request conf base with exc ->
           do { close_base base; raise exc };
         close_base base;
       }
@@ -1000,16 +995,16 @@ value this_request_updates_database conf =
   | _ -> False ]
 ;
 
-value treat_request_on_base conf log =
+value treat_request_on_base conf =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   if this_request_updates_database conf then
     lock Mutil.lock_file bfile with
-    [ Accept -> treat_request_on_possibly_locked_base conf bfile log
+    [ Accept -> treat_request_on_possibly_locked_base conf bfile
     | Refuse -> Update.error_locked conf ]
-  else treat_request_on_possibly_locked_base conf bfile log
+  else treat_request_on_possibly_locked_base conf bfile
 ;
 
-value treat_request_on_nobase conf log = do {
+value treat_request_on_nobase conf = do {
   if Mutil.utf_8_db.val then ()
   else do {
     Hashtbl.clear conf.lexicon;

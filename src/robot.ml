@@ -96,7 +96,7 @@ value robot_excl () =
 
 value min_disp_req = ref 6;
 
-value check oc tm from max_call sec conf suicide =
+value check oc_opt tm from max_call sec conf suicide =
   let nfw =
     if conf.wizard then Wizard conf.user
     else if conf.friend then Friend conf.user
@@ -108,15 +108,16 @@ value check oc tm from max_call sec conf suicide =
     [ Some att ->
         do {
           incr att;
-          if att.val mod max_call = 0 then do {
+          match (att.val mod max_call, oc_opt) with
+          [ (0, Some oc) -> do {
             fprintf_date oc (Unix.localtime tm);
             fprintf oc "\n";
             fprintf oc "  From: %s\n" from;
             fprintf oc "  %d refused attempts;" att.val;
             fprintf oc " to restore access, delete file \"%s\"\n"
-              fname;
-          }
-          else ();
+              fname
+            }
+          | _ -> () ];
           True
         }
     | None ->
@@ -147,14 +148,17 @@ value check oc tm from max_call sec conf suicide =
               xcl.who;
           let refused =
             if suicide || cnt > max_call then do {
-              fprintf oc "--- %s is a robot" from;
-              if suicide then
-                fprintf oc " (called the \"suicide\" request)\n"
-              else
-                fprintf oc
-                  " (%d > %d connections in %g <= %d seconds)\n" cnt max_call
-                  (tm -. tm0) sec;
-              flush Pervasives.stderr;
+              match oc_opt with
+              [ Some oc -> do {
+                fprintf oc "--- %s is a robot" from;
+                if suicide then
+                  fprintf oc " (called the \"suicide\" request)\n"
+                else
+                  fprintf oc
+                    " (%d > %d connections in %g <= %d seconds)\n" cnt max_call
+                    (tm -. tm0) sec
+                }
+              | None -> () ];
               xcl.excl := [(from, ref 1) :: xcl.excl];
               xcl.who := W.remove from xcl.who;
               xcl.max_conn := (0, "");
@@ -162,7 +166,8 @@ value check oc tm from max_call sec conf suicide =
             }
             else False
           in
-          if xcl.excl <> [] then do {
+          match (xcl.excl, oc_opt) with
+          [ ([_;_], Some oc) -> do {
             List.iter
               (fun (s, att) ->
                  do {
@@ -172,9 +177,9 @@ value check oc tm from max_call sec conf suicide =
                  })
               xcl.excl;
             fprintf oc "--- to restore access, delete file \"%s\"\n"
-              fname;
-          }
-          else ();
+              fname
+            }
+          | _ -> () ];
           let (list, nconn) =
             W.fold
               (fun k w (list, nconn) ->
@@ -197,13 +202,17 @@ value check oc tm from max_call sec conf suicide =
                  | x -> x ])
               list
           in
-          List.iter
-            (fun (k, tm0, nb) ->
-               fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
-                 (tm -. tm0) k)
-            list;
-          fprintf oc "--- max %d req by %s / conn %d\n"
-            (fst xcl.max_conn) (snd xcl.max_conn) nconn;
+          match oc_opt with
+          [ Some oc -> do {
+            List.iter
+              (fun (k, tm0, nb) ->
+                fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
+                  (tm -. tm0) k)
+              list;
+            fprintf oc "--- max %d req by %s / conn %d\n"
+              (fst xcl.max_conn) (snd xcl.max_conn) nconn
+            }
+          | None -> () ];
           refused
         } ]
   in
