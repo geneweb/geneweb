@@ -1678,7 +1678,7 @@ value connection (addr, request) script_name contents =
             Unix.string_of_inet_addr iaddr ]
   in
   do {
-    if not Wserver.cgi.val && script_name = "robots.txt" then robots_txt ()
+    if script_name = "robots.txt" then robots_txt ()
     else if excluded from then refuse_log from
     else
       let accept =
