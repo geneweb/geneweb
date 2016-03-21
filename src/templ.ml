@@ -746,8 +746,7 @@ and eval_simple_variable conf =
   | "nl" -> "\n"
   | "nn" -> ""
   | "prefix" -> Util.commd conf
-  | "prefix_base" ->
-      conf.command ^ "?" ^ (if Wserver.cgi.val then "b=" ^ conf.bname ^ ";" else "")
+  | "prefix_base" -> Util.prefix_base conf
   | "prefix_no_iz" ->
       let henv =
         List.fold_left

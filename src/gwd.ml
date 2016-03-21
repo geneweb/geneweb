@@ -693,15 +693,14 @@ value print_request_failure msg =
   }
 ;
 
-value refresh_url request s i =
+value refresh_url request b_arg_for_basename bname =
   let url =
     let serv = "http://" ^ Util.get_server_string request in
     let req =
-      let bname = String.sub s 0 i in
-      let str = Util.get_request_string request in
-      if Wserver.cgi.val then
-        let cginame = String.sub str 0 (String.index str '?') in
-        cginame ^ "?b=" ^ bname
+      if b_arg_for_basename then
+        let str = Util.get_request_string request in
+        let scriptname = String.sub str 0 (String.index str '?') in
+        scriptname ^ "?b=" ^ bname
       else "/" ^ bname ^ "?"
     in
     serv ^ req
@@ -1105,10 +1104,11 @@ value authorization from_addr request base_env passwd access_type utm
 value make_conf from_addr (addr, request) script_name contents env = do {
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
+  let b_arg_for_basename = Wserver.cgi.val in
   let (command, base_file, passwd, env, access_type) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
-      if x <> "" || Wserver.cgi.val then (x, env) else (script_name, env)
+      if x <> "" || b_arg_for_basename then (x, env) else (script_name, env)
     in
     let ip = index '_' base_passwd in
     let base_file =
@@ -1119,7 +1119,7 @@ value make_conf from_addr (addr, request) script_name contents env = do {
       in
       let i = index_not_name s in
       if i = String.length s then s
-      else refresh_url request s i
+      else refresh_url request b_arg_for_basename (String.sub s 0 i)
     in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
@@ -1310,7 +1310,8 @@ value make_conf from_addr (addr, request) script_name contents env = do {
         year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0};
      today_wd = tm.Unix.tm_wday;
      time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
-     ctime = utm}
+     ctime = utm;
+     b_arg_for_basename = b_arg_for_basename}
   in
   (conf, sleep, ar)
 };

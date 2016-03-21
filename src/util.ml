@@ -412,6 +412,13 @@ value commd conf =
     (conf.henv @ conf.senv)
 ;
 
+value prefix_base conf =
+  if conf.b_arg_for_basename then
+    conf.command ^ "?b=" ^ conf.bname ^ ";"
+  else
+    conf.command ^ "?"
+;
+
 value code_varenv = Wserver.encode;
 value decode_varenv = Wserver.decode;
 
@@ -1583,8 +1590,10 @@ value url_no_index conf base =
          let sep = if s = "" then "" else ";" in x ^ "=" ^ v ^ sep ^ s)
       [("lang", conf.lang) :: env] ""
   in
-  let suff = if Wserver.cgi.val then "b=" ^ conf.bname ^ ";" ^ suff else suff in
-  addr ^ "?" ^ suff
+  if conf.b_arg_for_basename then
+    addr ^ "?b=" ^ conf.bname ^ ";" ^ suff
+  else
+    addr ^ "?" ^ suff
 ;
 
 value message_to_wizard conf =

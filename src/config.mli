@@ -70,5 +70,10 @@ type config =
     today : dmy;
     today_wd : int;
     time : (int * int * int);
-    ctime : float }
+    ctime : float;
+
+(* if true, the base name is in the b argument of the query string: ?b=BASE&...
+   if false, the base name is the last element of the uri path: .../base?... *)
+    b_arg_for_basename : bool
+}
 ;

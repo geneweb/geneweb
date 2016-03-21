@@ -249,8 +249,7 @@ value macro conf base =
   | 'D' -> (count conf).start_date
   | 'e' -> conf.charset
   | 'f' -> conf.command
-  | 'g' ->
-      conf.command ^ "?" ^ (if Wserver.cgi.val then "b=" ^ conf.bname ^ ";" else "")
+  | 'g' -> Util.prefix_base conf
   | 'i' -> conf.highlight
   | 'k' -> conf.indep_command
   | 'l' -> conf.lang
