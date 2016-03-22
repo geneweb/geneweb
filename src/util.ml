@@ -1226,12 +1226,6 @@ value string_of_witness_kind conf p witness_kind =
       transl_nth conf "godfather/godmother/godparents" n ]
 ;
 
-value input_to_semi ic =
-  loop 0 where rec loop len =
-    let c = input_char ic in
-    if c = ';' then Buff.get len else loop (Buff.store len c)
-;
-
 value base_path pref bname =
   let pref = [Secure.base_dir () :: pref] in
   let bfile = List.fold_right Filename.concat pref bname in
@@ -1242,17 +1236,6 @@ value base_path pref bname =
     List.fold_right Filename.concat dirs bname
   else bfile
   END
-;
-
-value base_len n =
-  let n = base_path [] (n ^ ".gwb") in
-  match
-    try Some (Gwdb.open_base n) with [ Sys_error _ -> None ]
-  with
-  [ Some base ->
-      let len = nb_of_persons base in
-      do { close_base base; string_of_int len }
-  | _ -> "?" ]
 ;
 
 value explode s c =
@@ -1377,63 +1360,6 @@ value open_templ conf fname =
         in
         try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
       else None ]
-;
-
-value macro_etc env imcom c =
-  try List.assoc c env () with
-  [ Not_found ->
-      match c with
-      [ '%' -> "%"
-      | 'k' -> imcom
-      | 'o' ->
-          if images_url.val <> "" then images_url.val else imcom ^ "m=IM;v="
-      | 'v' -> Version.txt
-      | '/' -> ""
-      | c -> "%" ^ String.make 1 c ] ]
-;
-
-(* "copy_from_etc" is old method; rather use "Templ.copy_from_templ" *)
-value rec copy_from_etc env lang imcom ic =
-  let cnt = ref 0 in
-  try
-    while True do {
-      match input_char ic with
-      [ '%' ->
-          let c = input_char ic in
-          match c with
-          [ '+' -> incr cnt
-          | '#' -> Wserver.printf "%d" cnt.val
-          | 'n' -> Wserver.printf "%s" (base_len (input_to_semi ic))
-          | 'r' ->
-              let name = input_line ic in
-              match open_etc_file name with
-              [ Some ic -> copy_from_etc env lang imcom ic
-              | None ->
-                  Wserver.printf
-                    "<em>... file not found: \"%s.txt\"</em><br>" name ]
-          | c -> Wserver.printf "%s" (macro_etc env imcom c) ]
-      | '[' ->
-          let c = input_char ic in
-          if c = '\n' then
-            let s =
-              loop 0 (input_char ic) where rec loop len c =
-                if c = ']' then Buff.get len
-                else loop (Buff.store len c) (input_char ic)
-            in
-            let (s, alt) = Translate.inline lang '%' (macro_etc env imcom) s in
-            let s = if alt then tnf s else s in
-            Wserver.printf "%s" s
-          else
-            Wserver.printf "[%c" c
-      | c -> Wserver.printf "%c" c ]
-    }
-  with exc ->
-    do {
-      close_in ic;
-      match exc with
-      [ End_of_file -> ()
-      | exc -> raise exc ]
-    }
 ;
 
 value image_prefix conf =

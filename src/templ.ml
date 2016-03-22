@@ -1315,42 +1315,10 @@ value print_copyright_with_logo conf =
   print_copyright conf
 ;
 
-value old_include_hed_trl conf base_opt suff =
-  let hed_fname =
-    let fname = Util.base_path ["lang"; conf.lang] (conf.bname ^ suff) in
-    if Sys.file_exists fname then fname
-    else Util.base_path ["lang"] (conf.bname ^ suff)
-  in
-  match try Some (Secure.open_in hed_fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      let url () =
-        match base_opt with
-        [ Some base -> Util.url_no_index conf base
-        | None -> Util.get_server_string conf.request ^ Util.get_request_string conf.request ]
-      in
-      let pref () =
-        let s = url () in
-        match Mutil.rindex s '?' with
-        [ Some i -> String.sub s 0 (i + 1)
-        | None -> s ]
-      in
-      let suff () =
-        let s = url () in
-        match Mutil.rindex s '?' with
-        [ Some i -> String.sub s (i + 1) (String.length s - i - 1)
-        | None -> "" ]
-      in
-      Util.copy_from_etc
-        [('p', pref); ('s', suff); ('t', fun _ -> Util.commd conf);
-          ('/', fun _ -> conf.xhs)]
-        conf.lang conf.indep_command ic
-  | None -> () ]
-;
-
 value include_hed_trl conf base_opt name =
   match Util.open_hed_trl conf name with
   [ Some ic -> copy_from_templ conf [] ic
-  | None -> old_include_hed_trl conf base_opt ("." ^ name) ]
+  | None -> () ]
 ;
 
 value rec interp_ast conf base ifun env =
