@@ -1315,13 +1315,13 @@ value print_copyright_with_logo conf =
   print_copyright conf
 ;
 
-value include_hed_trl conf base_opt name =
+value include_hed_trl conf name =
   match Util.open_hed_trl conf name with
   [ Some ic -> copy_from_templ conf [] ic
   | None -> () ]
 ;
 
-value rec interp_ast conf base ifun env =
+value rec interp_ast conf ifun env =
   let m_env = ref env in
   let rec eval_ast env ep a =
     string_of_expr_val (eval_ast_expr env ep a)
@@ -1439,7 +1439,7 @@ value rec interp_ast conf base ifun env =
   let rec print_ast env ep =
     fun
     [ Avar loc s sl ->
-        print_var print_ast_list conf base ifun env ep loc [s :: sl]
+        print_var print_ast_list conf ifun env ep loc [s :: sl]
     | Awid_hei s -> print_wid_hei env s
     | Aif e alt ale -> print_if env ep e alt ale
     | Aforeach (loc, s, sl) el al ->
@@ -1509,7 +1509,7 @@ value rec interp_ast conf base ifun env =
     in loop env min max
   in
   print_ast_list env
-and print_var print_ast_list conf base ifun env ep loc sl =
+and print_var print_ast_list conf ifun env ep loc sl =
   let rec print_var1 eval_var sl =
     try
       match eval_var sl with
@@ -1525,26 +1525,26 @@ and print_var print_ast_list conf base ifun env ep loc sl =
             [ Some astl -> print_ast_list env ep astl
             | None ->  Wserver.printf " %%%s?" (String.concat "." sl) ]
         | sl ->
-            print_variable conf base sl ] ]
+            print_variable conf sl ] ]
   in
   let eval_var = eval_var conf ifun env ep loc in
   print_var1 eval_var sl
-and print_simple_variable conf base_opt =
+and print_simple_variable conf =
   fun
-  [ "base_header" -> include_hed_trl conf base_opt "hed"
-  | "base_trailer" -> include_hed_trl conf base_opt "trl"
+  [ "base_header" -> include_hed_trl conf "hed"
+  | "base_trailer" -> include_hed_trl conf "trl"
   | "body_prop" -> print_body_prop conf
   | "copyright" -> print_copyright_with_logo conf
   | "copyright_nologo" -> print_copyright conf
   | "hidden" -> Util.hidden_env conf
   | "message_to_wizard" -> Util.message_to_wizard conf
   | _ -> raise Not_found ]
-and print_variable conf base_opt sl =
+and print_variable conf sl =
   try Wserver.printf "%s" (eval_variable conf sl) with
   [ Not_found ->
       try
         match sl with
-        [ [s] -> print_simple_variable conf base_opt s
+        [ [s] -> print_simple_variable conf s
         | _ -> raise Not_found ]
       with
       [ Not_found -> Wserver.printf " %%%s?" (String.concat "." sl) ] ]
@@ -1566,7 +1566,7 @@ value copy_from_templ conf env ic = do {
   in
   let v = template_file.val in
   template_file.val := "";
-  try interp_ast conf None ifun env () astl with e ->
+  try interp_ast conf ifun env () astl with e ->
     do { template_file.val := v; raise e };
   template_file.val := v;
 };

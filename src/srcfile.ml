@@ -432,7 +432,7 @@ value rec copy_from_stream conf base strm mode =
           | '%' -> Wserver.printf "%%"
           | '[' | ']' -> Wserver.printf "%c" c
           | 'h' -> hidden_env conf
-          | 'j' -> Templ.include_hed_trl conf (Some base) "hed"
+          | 'j' -> Templ.include_hed_trl conf "hed"
           | 'P' -> let _ = Stream.next strm in ()
           | 'r' -> copy_from_file conf base (stream_line strm) mode
           | 'u' ->
@@ -621,7 +621,7 @@ value print_start conf base =
       [("sosa_ref", Vsosa_ref sosa_ref_l)]
     in
     Wserver.wrap_string.val := Util.xml_pretty_print;
-    Hutil.interp conf base "welcome"
+    Hutil.interp conf "welcome"
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl env = Templ.eval_transl conf;
        Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -643,7 +643,7 @@ value print_start conf base =
 value print conf base fname =
   if Sys.file_exists (Util.etc_file_name conf fname) then do {
     Wserver.wrap_string.val := Util.xml_pretty_print;
-    Hutil.interp conf base fname
+    Hutil.interp conf fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl env = Templ.eval_transl conf;
        Templ.eval_predefined_apply = eval_predefined_apply conf;

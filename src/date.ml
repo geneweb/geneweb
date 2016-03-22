@@ -1074,8 +1074,8 @@ value print_foreach conf print_ast eval_expr =
   print_foreach
 ;
 
-value print_calendar conf base =
-  Hutil.interp conf base "calendar"
+value print_calendar conf =
+  Hutil.interp conf "calendar"
     {Templ.eval_var = eval_var conf;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

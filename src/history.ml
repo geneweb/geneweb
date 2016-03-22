@@ -623,7 +623,7 @@ value gen_print conf base hoo =
     [ Some ho -> [("search", Vsearch ho) :: env]
     | None -> env ]
   in
-  Hutil.interp conf base "updhist"
+  Hutil.interp conf "updhist"
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

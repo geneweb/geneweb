@@ -654,7 +654,7 @@ value print_forum_message conf base r so =
           [("pos", Vpos (ref MF.not_a_pos))]
     | None -> [("pos", Vpos (ref MF.not_a_pos))] ]
   in
-  Hutil.interp conf base "forum"
+  Hutil.interp conf "forum"
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;
@@ -674,7 +674,7 @@ value print conf base =
 
 value print_forum_headers conf base =
   let env = [("pos", Vpos (ref MF.not_a_pos))] in
-  Hutil.interp conf base "forum"
+  Hutil.interp conf "forum"
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;
@@ -750,7 +750,7 @@ value forum_add conf base moderated mess =
 value visualize conf base mess =
   let vmess = Vmess mess None MF.not_a_pos MF.not_a_pos None in
   let env = [("mess", vmess)] in
-  Hutil.interp conf base "forum"
+  Hutil.interp conf "forum"
     {Templ.eval_var = eval_var conf base;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

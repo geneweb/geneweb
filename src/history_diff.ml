@@ -1569,7 +1569,7 @@ value print conf base =
           let env =
             [("history_file", Vstring file); ("history_len", Vint len)]
           in
-          Hutil.interp conf base "updhist_diff"
+          Hutil.interp conf "updhist_diff"
             {Templ.eval_var = eval_var conf base;
              Templ.eval_transl _ = Templ.eval_transl conf;
              Templ.eval_predefined_apply = eval_predefined_apply conf;

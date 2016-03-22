@@ -561,7 +561,7 @@ value set_vother x = Vother x;
 value print_statistics conf base =
   if p_getenv conf.env "old" = Some "on" then old_print_statistics conf base
   else
-  Hutil.interp conf base "stats"
+  Hutil.interp conf "stats"
     {Templ.eval_var _ = raise Not_found;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

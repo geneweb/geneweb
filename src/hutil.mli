@@ -19,9 +19,9 @@ value gen_trailer : bool -> config -> unit;
 value incorrect_request : config -> unit;
 
 value interp :
-  config -> base -> string -> Templ.interp_fun 'a 'b -> Templ.env 'a -> 'b ->
+  config -> string -> Templ.interp_fun 'a 'b -> Templ.env 'a -> 'b ->
     unit;
 
 value interp_no_header :
-  config -> base -> string -> Templ.interp_fun 'a 'b -> Templ.env 'a -> 'b ->
+  config -> string -> Templ.interp_fun 'a 'b -> Templ.env 'a -> 'b ->
     unit;

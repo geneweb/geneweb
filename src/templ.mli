@@ -25,7 +25,7 @@ type interp_fun 'a 'b =
 ;
 
 value interp_ast :
-  config -> option base -> interp_fun 'a 'b -> env 'a -> 'b -> list ast ->
+  config -> interp_fun 'a 'b -> env 'a -> 'b -> list ast ->
     unit;
 
 (**)
@@ -34,4 +34,4 @@ value template_file : ref string;
 value input_templ : config -> string -> option (list ast);
 value print_copyright : config -> unit;
 value print_copyright_with_logo : config -> unit;
-value include_hed_trl : config -> option base -> string -> unit;
+value include_hed_trl : config -> string -> unit;

@@ -750,7 +750,7 @@ value print_update_ind conf base p digest =
         [("digest", Vstring digest);
          ("next_pevent", Vcnt (ref (List.length p.pevents + 1)))]
       in
-      Hutil.interp conf base "updind"
+      Hutil.interp conf "updind"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl _ = Templ.eval_transl conf;
          Templ.eval_predefined_apply _ = raise Not_found;
@@ -819,7 +819,7 @@ value print_change_event_order conf base =
   match p_getint conf.env "i" with
   [ Some i ->
       let p = string_person_of base (poi base (Adef.iper_of_int i)) in
-      Hutil.interp conf base "updindevt"
+      Hutil.interp conf "updindevt"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl _ = Templ.eval_transl conf;
          Templ.eval_predefined_apply _ = raise Not_found;

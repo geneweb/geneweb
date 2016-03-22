@@ -21,7 +21,7 @@ value short_dates_text : config -> base -> person -> string;
 value short_marriage_date_text :
   config -> base -> family -> person -> person -> string;
 value print_dates : config -> base -> person -> unit;
-value print_calendar : config -> base -> unit;
+value print_calendar : config -> unit;
 value get_birth_death_date : person -> (option date * option date * bool);
 
 value before_date : dmy -> dmy -> bool;

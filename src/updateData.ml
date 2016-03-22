@@ -1456,7 +1456,7 @@ value print_mod conf base =
     [ Some ("place" | "src" | "occu" | "fn" | "sn") ->
         let list = build_list conf base in
         let env = [("list", Vlist_data list)] in
-        Hutil.interp conf base "upddata"
+        Hutil.interp conf "upddata"
           {Templ.eval_var = eval_var conf base;
            Templ.eval_transl _ = Templ.eval_transl conf;
            Templ.eval_predefined_apply _ = raise Not_found;
@@ -1464,7 +1464,7 @@ value print_mod conf base =
            Templ.print_foreach = print_foreach conf base}
           env ()
     | _ ->
-        Hutil.interp conf base "upddatamenu"
+        Hutil.interp conf "upddatamenu"
           {Templ.eval_var _ = raise Not_found;
            Templ.eval_transl _ = Templ.eval_transl conf;
            Templ.eval_predefined_apply _ = raise Not_found;

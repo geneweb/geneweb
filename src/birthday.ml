@@ -628,10 +628,10 @@ type env 'a =
 value get_vother = fun [ Vother x -> Some x | _ -> None ];
 value set_vother x = Vother x;
 
-value print_anniversaries conf base =
+value print_anniversaries conf =
   if p_getenv conf.env "old" = Some "on" then ()
   else
-  Hutil.interp conf base "annivmenu"
+  Hutil.interp conf "annivmenu"
     {Templ.eval_var _ = raise Not_found;
      Templ.eval_transl _ = Templ.eval_transl conf;
      Templ.eval_predefined_apply _ = raise Not_found;

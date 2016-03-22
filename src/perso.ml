@@ -5231,7 +5231,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     in
     if size = 0 then Hutil.header conf title
     else
-      Hutil.interp_no_header conf base templ_fname
+      Hutil.interp_no_header conf templ_fname
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl = eval_transl conf;
          Templ.eval_predefined_apply = eval_predefined_apply conf;
@@ -5239,7 +5239,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
          Templ.print_foreach = print_foreach conf base}
         env ep
   else
-    Hutil.interp conf base templ_fname
+    Hutil.interp conf templ_fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = eval_transl conf;
        Templ.eval_predefined_apply = eval_predefined_apply conf;

@@ -389,7 +389,7 @@ value family_m conf base =
   | Some "ADD_IND" when conf.wizard -> UpdateInd.print_add conf base
   | Some "ADD_IND_OK" when conf.wizard -> UpdateIndOk.print_add conf base
   | Some "ADD_PAR" when conf.wizard -> UpdateFam.print_add_parents conf base
-  | Some "ANM" -> Birthday.print_anniversaries conf base
+  | Some "ANM" -> Birthday.print_anniversaries conf
   | Some "AN" ->
       match p_getenv conf.env "v" with
       [ Some x -> Birthday.print_birth conf base (int_of_string x)
@@ -409,7 +409,7 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> Cousins.print conf base p
       | _ -> very_unknown conf ]
-  | Some "CAL" -> Date.print_calendar conf base
+  | Some "CAL" -> Date.print_calendar conf
   | Some "CHG_CHN" when conf.wizard -> ChangeChildren.print conf base
   | Some "CHG_CHN_OK" when conf.wizard -> ChangeChildren.print_ok conf base
   | Some "CHG_EVT_IND_ORD" when conf.wizard ->

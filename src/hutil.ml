@@ -83,7 +83,7 @@ value header_without_http conf title = do {
   match Util.open_templ conf "js" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
-  Templ.include_hed_trl conf None "hed";
+  Templ.include_hed_trl conf "hed";
   Wserver.printf "</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
@@ -131,7 +131,7 @@ value rheader conf title = do {
 };
 
 value gen_trailer with_logo conf = do {
-  Templ.include_hed_trl conf None "trl";
+  Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
   Wserver.printf "</body>\n</html>\n";
@@ -162,7 +162,7 @@ value error_cannot_access conf fname = do {
   trailer conf;
 };
 
-value gen_interp header conf base fname ifun env ep = do {
+value gen_interp header conf fname ifun env ep = do {
   let v = Templ.template_file.val in
   Templ.template_file.val := fname;
   try
@@ -172,7 +172,7 @@ value gen_interp header conf base fname ifun env ep = do {
           Util.html conf;
         }
         else ();
-        Templ.interp_ast conf (Some base) ifun env ep astl
+        Templ.interp_ast conf ifun env ep astl
       }
     | None ->
         error_cannot_access conf fname ]
@@ -181,9 +181,9 @@ value gen_interp header conf base fname ifun env ep = do {
   Templ.template_file.val := v;
 };
 
-value interp_no_header conf base fname ifun env ep =
-  gen_interp False conf base fname ifun env ep;
+value interp_no_header conf fname ifun env ep =
+  gen_interp False conf fname ifun env ep;
 
-value interp conf base fname ifun env ep =
-  gen_interp True conf base fname ifun env ep;
+value interp conf fname ifun env ep =
+  gen_interp True conf fname ifun env ep;
 

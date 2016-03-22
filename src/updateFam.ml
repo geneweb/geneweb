@@ -652,7 +652,7 @@ value print_update_fam conf base fcd digest =
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_DUP_FAM_Y_N" | "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let env = [("digest", Vstring digest)] in
-      Hutil.interp conf base "updfam"
+      Hutil.interp conf "updfam"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl _ = Templ.eval_transl conf;
          Templ.eval_predefined_apply _ = raise Not_found;
@@ -919,7 +919,7 @@ value print_change_event_order conf base =
   match p_getint conf.env "i" with
   [ Some i ->
       let sfam = string_family_of conf base (Adef.ifam_of_int i) in
-      Hutil.interp conf base "updfamevt"
+      Hutil.interp conf "updfamevt"
         {Templ.eval_var = eval_var conf base;
          Templ.eval_transl _ = Templ.eval_transl conf;
          Templ.eval_predefined_apply _ = raise Not_found;
