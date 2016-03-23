@@ -859,7 +859,6 @@ let fam_to_piqi_family conf base p ifam =
     if m_auth && not conf.no_note then
       let s = gen_f.comment in
       let s = string_with_macros conf [] s in
-      let lines = Api_wiki.html_of_tlsw conf s in
       let wi =
         {Api_wiki.wi_mode = "NOTES";
          Api_wiki.wi_cancel_links = conf.cancel_links;
@@ -867,8 +866,7 @@ let fam_to_piqi_family conf base p ifam =
          Api_wiki.wi_person_exists = person_exists conf base;
          Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
       in
-      let s = Api_wiki.syntax_links conf wi (String.concat "\n" lines) in
-      if conf.pure_xhtml then Util.check_xhtml s else s
+        Api_wiki.syntax_links conf wi s
     else ""
   in
   let fsources =
