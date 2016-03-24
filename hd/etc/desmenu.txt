@@ -364,6 +364,6 @@ function no_options () {
 </td></tr></table>
 
 %base_trailer;
-%copyright;
+%include.copyr;
 </body>
 </html>

@@ -55,7 +55,7 @@
 </p>
 
 %base_trailer;
-%copyright;
+%include.copyr;
 
 </body>
 </html>

@@ -61,7 +61,7 @@
 %apply;print_event()
 
 %base_trailer;
-%copyright;
+%include.copyr;
 
 <script type="text/javascript">
  $('.up').click(function () {

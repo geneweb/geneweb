@@ -21,6 +21,6 @@ fr: La base de données "%bname;" se trouve maintenant à l'adresse:
 </p>
 
 %base_trailer;
-%copyright;
+%include.copyr;
 </body>
 </html>

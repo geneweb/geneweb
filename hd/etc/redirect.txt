@@ -26,6 +26,6 @@ it: L'indirizzo di questo service è cambiato.
 </p>
 
 %base_trailer;
-%copyright;
+%include.copyr;
 </body>
 </html>
