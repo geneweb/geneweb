@@ -904,6 +904,11 @@ value basic_authorization from_addr request base_env passwd access_type
       else ""
   in
   let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
+  let auto = Wserver.extract_param "gw-connection-type: " '\r' request in
+  let uauth =
+    if auto = "auto" then passwd1
+    else uauth
+  in
   let (ok, wizard, friend, username) =
     if not Wserver.cgi.val && (passwd = "w" || passwd = "f") then
       if passwd = "w" then
@@ -957,7 +962,11 @@ value basic_authorization from_addr request base_env passwd access_type
       else (base_file, "")
     else
       if Wserver.cgi.val then (command, passwd)
-      else if passwd = "" then (base_file, "")
+      else if passwd = "" then
+        if auto = "auto" then
+          let suffix = if wizard then "_w" else if friend then "_f" else "" in
+          (base_file ^ suffix, passwd)
+        else (base_file, "")
       else (base_file ^ "_" ^ passwd, passwd)
   in
   let auth_scheme =
@@ -1461,7 +1470,14 @@ value conf_and_connection from (addr, request) script_name contents env =
               unauth_server conf ar;
             }
         | _ ->
-          if conf.bname = "" then general_welcome conf
+          if mode = Some "API_ADD_FIRST_FAM" then
+            do {
+              Request.treat_request_on_nobase conf
+                (log_file.val, log_oc, flush_log);
+              if conf.manitou && sleep > 0 then Unix.sleep sleep
+              else ()
+            }
+          else if conf.bname = "" then general_welcome conf
           else
             match
               try Some (List.assoc "renamed" conf.base_env) with
@@ -2001,7 +2017,50 @@ Print the failed passwords in log (except if option -digest is set) ");
     let speclist =
       IFDEF API THEN
         [("-api_url", Arg.String (fun x -> Link.api_url.val := x),
-          "Url api for links tree") :: speclist]
+          "Url api for links tree");
+         ("-sig", Arg.String (fun _ -> ()), "ignore option.");
+       (* options lien inter arbre *)
+         ("-redis",
+          Arg.String
+            (fun x ->
+              try
+                let host = Unix.gethostbyname x in
+                let url = Unix.string_of_inet_addr host.Unix.h_addr_list.(0) in
+                Api_link.redis_host_all.val := url
+              with _ -> Api_link.redis_host_all.val := x),
+          "host redis for links tree");
+         ("-redis_p",
+          Arg.Int (fun x -> Api_link.redis_port_all.val := x),
+          "redis port for links tree");
+         ("-redis_moderate",
+          Arg.String
+            (fun x ->
+              try
+                let host = Unix.gethostbyname x in
+                let url = Unix.string_of_inet_addr host.Unix.h_addr_list.(0) in
+                Api_link.redis_host_moderate.val := url
+              with _ -> Api_link.redis_host_moderate.val := x),
+          "host redis for links tree");
+         ("-redis_p_moderate",
+          Arg.Int (fun x -> Api_link.redis_port_moderate.val := x),
+          "redis port for links tree");
+         ("-links_tree_url",
+          Arg.String
+            (fun x ->
+            (* ^[a-z]:gwx:2322 *)
+              let i = String.index x ':' in
+              let j = String.index_from x (i + 1) ':' in
+              let base_regexp = String.sub x 0 i in
+              let host_name = String.sub x (i + 1) (j - i - 1) in
+              let port = String.sub x (j + 1) (String.length x - j - 1) in
+              try
+                let host = Unix.gethostbyname host_name in
+                let url = Unix.string_of_inet_addr host.Unix.h_addr_list.(0) ^ ":" ^ port in
+                Api_link.api_servers.val := [(base_regexp, url) :: Api_link.api_servers.val]
+              with _ ->
+                let url = host_name ^ ":" ^ port in
+                Api_link.api_servers.val := [(base_regexp, url) :: Api_link.api_servers.val]),
+          "api_url for links tree") :: speclist]
       ELSE speclist END
     in
     let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in

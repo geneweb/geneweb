@@ -641,6 +641,94 @@ value family_m conf base =
       Wiznotes.print conf base
   | Some "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
       Wiznotes.print_search conf base
+  | Some mode when Util.start_with mode 0 "API_" ->
+IFDEF API THEN
+    (* On passe en mode API, i.e. que les exceptions API sont levées. *)
+    let () = Api_conf.set_mode_api () in
+    match Some mode with
+  (*[ Some "API_ADD_FAMILY" -> Api_update_family.print_add conf base
+  | Some "API_ADD_PERSON" -> Api_update_person.print_add conf base*)
+  [ Some "API_ALL_PERSONS" -> Api.print_all_persons conf base
+  | Some "API_ALL_FAMILIES" -> Api.print_all_families conf base
+  | Some "API_ANNIVERSARY" -> Api.print_birthday conf base
+  | Some "API_BASE_WARNINGS" when (conf.wizard || conf.friend) ->
+      (* Pour les flex, on autorise en mode friend. *)
+      Api.print_base_warnings conf base
+  | Some "API_CLOSE_PERSONS" -> Api_graph.print_close_person_relations conf base
+  | Some "API_CPL_REL" -> Api_graph.print_cpl_relation conf base
+(*
+  | Some "API_DELETE_FAMILY" -> Api_update_family.print_del conf base
+  | Some "API_DELETE_PERSON" -> Api_update_person.print_del conf base
+*)
+  | Some "API_GRAPH_ASC" -> Api_graph.print_graph_asc conf base
+  | Some "API_GRAPH_ASC_LIA" -> Api_graph.print_graph_asc_lia conf base
+  | Some "API_GRAPH_DESC" -> Api_graph.print_graph_desc conf base
+  | Some "API_GRAPH_REL" -> Api_graph.print_graph_rel conf base
+  | Some "API_FIRST_AVAILABLE_PERSON" -> Api.print_first_available_person conf base
+  | Some "API_FIND_SOSA" -> Api.print_find_sosa conf base
+  | Some "API_INFO_BASE" -> Api.print_info_base conf base
+  | Some "API_INFO_IND" -> Api.print_info_ind conf base
+  | Some "API_IMAGE" -> Api.print_img conf base
+  | Some "API_IMAGE_EXT" -> Api.print_img_ext conf base
+  | Some "API_IMAGE_ALL" -> Api.print_img_all conf base
+  | Some "API_IMAGE_PERSON" -> Api.print_img_person conf base
+  | Some "API_IMAGE_UPDATE" when conf.wizard -> Api.print_updt_image conf base
+  | Some "API_LAST_MODIFIED_PERSONS" -> Api.print_last_modified_persons conf base
+  | Some "API_LAST_VISITED_PERSONS" -> Api.print_last_visited_persons conf base
+  | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
+  | Some "API_LOOP_BASE" -> Api.print_loop conf base
+  | Some "API_MAX_ANCESTORS" when conf.wizard -> Api.print_max_ancestors conf base
+  | Some "API_NOTIFICATION_BIRTHDAY" -> Api.print_notification_birthday conf base
+  | Some "API_PRINT_INDEX" -> Api.print_all_full_person conf base
+  | Some "API_PRINT_EXPORT" -> Api.print_export conf base
+  | Some "API_PRINT_EXPORT_SEARCH" -> Api.print_export_search conf base
+  | Some "API_PRINT_SYNCHRO" -> Api.print_synchro_patch_mobile conf base
+  | Some "API_REF_PERSON_FROM_ID" -> Api.print_ref_person_from_ip conf base
+  | Some "API_REMOVE_IMAGE_EXT" when conf.wizard -> Api.print_remove_image_ext conf base
+  | Some "API_REMOVE_IMAGE_EXT_ALL" when conf.wizard -> Api.print_remove_image_ext_all conf base
+  | Some "API_SEARCH" -> Api_search.print_search conf base
+(*
+  | Some "API_UPDATE_PERSON" -> Api_update_person.print_mod conf base
+  | Some "API_UPDATE_FAMILY" -> Api_update_family.print_mod conf base
+*)
+  | Some "API_GRAPH_TREE" -> Api_saisie_read.print_graph_tree conf base
+  | Some "API_GRAPH_TREE_V2" -> Api_saisie_read.print_graph_tree_v2 conf base
+  | Some "API_GRAPH_TREE_FULL" -> Api_saisie_read.print_graph_tree_full conf base
+  | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
+
+  | Some "API_AUTO_COMPLETE" when conf.wizard -> Api_saisie_write.print_auto_complete conf base
+  | Some "API_GET_CONFIG" when conf.wizard -> Api_saisie_write.print_config conf base
+  | Some "API_PERSON_SEARCH_LIST" when conf.wizard -> Api_saisie_write.print_person_search_list conf base
+  | Some "API_GET_PERSON_SEARCH_INFO" when conf.wizard -> Api_saisie_write.print_person_search_info conf base
+
+  | Some "API_ADD_CHILD" when conf.wizard -> Api_saisie_write.print_add_child conf base
+  | Some "API_ADD_CHILD_OK" when conf.wizard -> Api_saisie_write.print_add_child_ok conf base
+  | Some "API_ADD_FAMILY" when conf.wizard -> Api_saisie_write.print_add_family conf base
+  | Some "API_ADD_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_add_family_ok conf base
+  | Some "API_ADD_FIRST_FAM_OK" when conf.wizard -> Api_saisie_write.print_add_first_fam_ok conf base
+  | Some "API_ADD_PARENTS" when conf.wizard -> Api_saisie_write.print_add_parents conf base
+  | Some "API_ADD_PARENTS_OK" when conf.wizard -> Api_saisie_write.print_add_parents_ok conf base
+  | Some "API_ADD_PERSON_OK" when conf.wizard -> Api_saisie_write.print_add_ind_ok conf base
+  | Some "API_ADD_PERSON_START_OK" when conf.wizard -> Api_saisie_write.print_add_ind_start_ok conf base
+  | Some "API_ADD_SIBLING" when conf.wizard -> Api_saisie_write.print_add_sibling conf base
+  | Some "API_ADD_SIBLING_OK" when conf.wizard -> Api_saisie_write.print_add_sibling_ok conf base
+  | Some "API_EDIT_FAMILY_REQUEST" when conf.wizard -> Api_saisie_write.print_mod_family_request conf base
+  | Some "API_EDIT_FAMILY" when conf.wizard -> Api_saisie_write.print_mod_family conf base
+  | Some "API_EDIT_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_mod_family_ok conf base
+  | Some "API_EDIT_PERSON" when conf.wizard -> Api_saisie_write.print_mod_ind conf base
+  | Some "API_EDIT_PERSON_OK" when conf.wizard -> Api_saisie_write.print_mod_ind_ok conf base
+  | Some "API_DEL_FAMILY_OK" when conf.wizard -> Api_saisie_write.print_del_fam_ok conf base
+  | Some "API_DEL_PERSON_OK" when conf.wizard -> Api_saisie_write.print_del_ind_ok conf base
+
+  | Some "API_LINK_TREE" -> Api_link.print_link_tree conf base
+
+  | Some "API_STATS" -> Api_stats.print_stats conf base
+
+  | Some mode -> ()
+  | None -> () ]
+ELSE
+    incorrect_request conf
+END
   | Some mode -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with
@@ -660,6 +748,19 @@ value print_no_index conf base =
     print_link_to_welcome conf False;
     trailer conf;
   }
+;
+
+value family_m_nobase conf =
+IFDEF API THEN
+  (* On passe en mode API, i.e. que les exceptions API sont levées. *)
+  let () = Api_conf.set_mode_api () in
+  match p_getenv conf.env "m" with
+  [ Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
+  | Some mode -> ()
+  | None -> () ]
+ELSE
+  incorrect_request conf
+END
 ;
 
 value special_vars =
@@ -876,6 +977,9 @@ value treat_request_on_possibly_locked_base conf bfile log =
 value this_request_updates_database conf =
   match p_getenv conf.env "m" with
   [ Some ("FORUM_ADD_OK" | "FORUM_DEL" | "FORUM_VAL") -> True
+  | Some "API_PRINT_SYNCHRO" -> True
+      (* Dans la synchro, on bloque la base parce que les friend *)
+      (* peuvent aussi mettre à jour le fichier synchro.         *)
   | Some x when conf.wizard ->
       match x with
       [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHANGE_WIZ_VIS" | "CHG_CHN_OK" |
@@ -885,22 +989,41 @@ value this_request_updates_database conf =
         "MOD_NOTES_OK" | "MOD_WIZNOTES_OK" | "MRG_DUP_IND_Y_N" |
         "MRG_DUP_FAM_Y_N" | "MRG_IND" | "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" |
         "MOD_DATA_OK" | "SND_IMAGE_OK" -> True
+      | "API_BASE_WARNINGS" | "API_IMAGE_UPDATE" |
+        "API_REMOVE_IMAGE_EXT" | "API_REMOVE_IMAGE_EXT_ALL" |
+        "API_DEL_PERSON_OK" | "API_EDIT_PERSON_OK" | "API_ADD_CHILD_OK" |
+        "API_ADD_PERSON_OK" | "API_ADD_PARENTS_OK" | "API_ADD_FAMILY_OK" |
+        "API_ADD_FIRST_FAM_OK" |
+        "API_EDIT_FAMILY_OK" | "API_DEL_FAMILY_OK" | "API_ADD_SIBLING_OK" |
+        "API_ADD_PERSON_START_OK" | "API_PRINT_SYNCHRO" -> True
       | _ -> False ]
   | _ -> False ]
 ;
 
-(*
-type t = [ Accept | Refuse ];
-*)
 value treat_request_on_base conf log =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   if this_request_updates_database conf then
-(**)
     lock Mutil.lock_file bfile with
-(*
-    match if Sys.file_exists "refuse" then Refuse else Accept with
-*)
     [ Accept -> treat_request_on_possibly_locked_base conf bfile log
     | Refuse -> Update.error_locked conf ]
   else treat_request_on_possibly_locked_base conf bfile log
 ;
+
+value treat_request_on_nobase conf log = do {
+  if Mutil.utf_8_db.val then ()
+  else do {
+    Hashtbl.clear conf.lexicon;
+    let fname = Filename.concat "lang" "lexicon.txt" in
+    Mutil.input_lexicon conf.lang conf.lexicon
+      (fun () -> Secure.open_in (Util.search_in_lang_path fname));
+    conf.charset :=
+      try Hashtbl.find conf.lexicon " !charset" with
+      [ Not_found -> "iso-8859-1" ];
+  };
+  try
+    do {
+      family_m_nobase conf;
+      Wserver.wflush ();
+    }
+  with exc -> do { raise exc }
+};

@@ -85,13 +85,5 @@ api.opt:
 #	ocamlfind ocamlopt -package piqi.lib -linkpkg -I +camlp5 gramlib.cmxa -I ../src -I ./service -I ../wserver api_piqi.cmx api_piqi_ext.cmx api.cmx api_request.cmx api_server.cmx -o api.opt
 	$(OCAMLOPT) -linkpkg str.cmxa -I $(CAMLP5D) gramlib.cmxa $(OCAMLI) -package curl -I $(OCURL) curl.cmxa -package re -I $(RE) re_emacs.cmxa re_str.cmxa -package uuidm -I $(LREDIS) $(DEPEND_REDIS) -package yojson -linkpkg $(OBJS_DICO_PLACE) -o service/convert_dico_place.opt
 
-.PHONY: depend
 depend:
-	$(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
-
-.depend:
-	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
-
-ifeq ($(filter $(MAKECMDGOALS),clean depend),)
-  include .depend
-endif
+# Nothing here

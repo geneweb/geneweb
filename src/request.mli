@@ -5,3 +5,6 @@ open Config;
 
 value treat_request_on_base :
   config -> (string * unit -> out_channel * out_channel -> unit) -> unit;
+
+value treat_request_on_nobase :
+  config -> (string * unit -> out_channel * out_channel -> unit) -> unit;

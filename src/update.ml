@@ -9,9 +9,7 @@ open Gwdb;
 open Hutil;
 open Util;
 
-IFDEF API THEN
 exception ModErrApi of string;
-END;
 
 exception ModErr;
 type create_info =
