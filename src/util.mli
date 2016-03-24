@@ -8,7 +8,6 @@ open Gwdb;
 value add_lang_path : string -> unit;
 value set_base_dir : string -> unit;
 value cnt_dir : ref string;
-value images_url : ref string;
 value image_prefix : config -> string;
 value base_path : list string -> string -> string;
 

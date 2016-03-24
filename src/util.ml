@@ -25,7 +25,6 @@ add_lang_path sharelib;
 add_lang_path Filename.current_dir_name;
 
 value cnt_dir = ref Filename.current_dir_name;
-value images_url = ref "";
 
 value search_in_path p s =
   loop (p ()) where rec loop =
@@ -1362,11 +1361,7 @@ value open_templ conf fname =
       else None ]
 ;
 
-value image_prefix conf =
-  if images_url.val <> "" then images_url.val
-  else if Wserver.cgi.val then conf.command ^ "?m=IM;v="
-  else "images"
-;
+value image_prefix conf = conf.image_prefix;
 
 
 (*

@@ -21,6 +21,7 @@ value default_lang = ref "fr";
 value setup_link = ref False;
 value choose_browser_lang = ref False;
 value images_dir = ref "";
+value images_url = ref "";
 IFDEF UNIX THEN
 value max_clients = ref None;
 END;
@@ -1311,6 +1312,10 @@ value make_conf from_addr (addr, request) script_name contents env = do {
      today_wd = tm.Unix.tm_wday;
      time = (tm.Unix.tm_hour, tm.Unix.tm_min, tm.Unix.tm_sec);
      ctime = utm;
+     image_prefix =
+       if images_url.val <> "" then images_url.val
+       else if Wserver.cgi.val then ar.ar_command ^ "?m=IM;v="
+       else "images";
      b_arg_for_basename = b_arg_for_basename}
   in
   (conf, sleep, ar)
@@ -1908,7 +1913,7 @@ value main () =
 <dir>
        Directory for socket communication (Windows) and access count.");
        ("-cgi", Arg.Set force_cgi, "\n       Force CGI mode.");
-       ("-images_url", Arg.String (fun x -> Util.images_url.val := x),
+       ("-images_url", Arg.String (fun x -> images_url.val := x),
         "<url>\n       URL for GeneWeb images (default: gwd send them)");
        ("-images_dir", Arg.String (fun x -> images_dir.val := x), "\
 <dir>
@@ -2056,7 +2061,7 @@ Print the failed passwords in log (except if option -digest is set) ");
         if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d
         else d
       in
-      Util.images_url.val := "file://" ^ slashify abs_dir
+      images_url.val := "file://" ^ slashify abs_dir
     else ();
     if Util.cnt_dir.val = Filename.current_dir_name then
       Util.cnt_dir.val := Secure.base_dir ()
