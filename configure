@@ -37,7 +37,7 @@ CAMLP5F=
 CAMLP5D=
 MYSQL=
 CURL=
-REDIS=
+OREDIS=
 LREDIS=
 RE=
 WARN="-warn-error A"
@@ -249,24 +249,34 @@ check_curl() {
   fi
 }
 
+check_redis_path() {
+  if [[ -e "${LREDIS}/_build/src/redis.cmxs" ]]; then
+    LREDIS="${LREDIS}/_build/src/"
+    return 0
+  elif [[ -e "${LREDIS}/src/redis.cmxs" ]]; then
+    LREDIS="${LREDIS}/src/"
+    return 0
+  elif [[ -e "${LREDIS}/redis.cmxs" ]]; then
+    return 0
+  fi
+  return 1
+}
+
 check_redis() {
   if [[ $API == y ]]; then
-    if ocamlfind query redis >/dev/null 2>&1 \
-       && [[ -e "${LREDIS}/_build/src/redis.cmxs" ]]; then
-      print_check_ok "Checking OCaml redis" "OK"
-      REDIS=`ocamlfind query redis`/
-      LREDIS="${LREDIS}/_build/src/"
-    else
+    if ! ocamlfind query redis >/dev/null 2>&1; then
       print_check_err "Checking OCaml redis" "ERREUR"
-      if ! [[ -e "${LREDIS}/_build/src/redis.cmxs" ]]; then
-        echo "You need to provide a valid redis path!"
-        echo "Configuration script failed!"
-      else
-        echo "You need the OCaml dependency redis!"
-        echo "Configuration script failed!"
-      fi
+      echo "You need the OCaml dependency redis!"
+      echo "Configuration script failed!"
+      exit 1
+    elif ! check_redis_path; then
+      print_check_err "Checking OCaml redis" "ERREUR"
+      echo "You need to provide a valid redis path!"
+      echo "Configuration script failed!"
       exit 1
     fi
+    print_check_ok "Checking OCaml redis" "OK"
+    OREDIS=`ocamlfind query redis`/
   fi
 }
 
@@ -365,7 +375,7 @@ print_compiler() {
    if [[ $API == y ]]; then
      echo "MYSQL=${MYSQL}"
      echo "OCURL=${CURL}"
-     echo "OREDIS=${REDIS}"
+     echo "OREDIS=${OREDIS}"
      echo "RE=${RE}"
      echo "LREDIS=${LREDIS}"
    fi
@@ -433,15 +443,15 @@ if [[ $INTERACTIVE == y ]]; then
     API=y
   fi
   if [[ $API == y ]]; then
-    echo "Please provide the absolute path of your redis"
-    read -r answer
-    if [[ -e "${answer}/_build/src/redis.cmxs" ]]; then
-      LREDIS="${answer}/_build/src/"
-    else
-      echo "You need to provide a valid redis path!"
-      echo "Configuration script failed!"
-      exit 1
-    fi
+    while [ -z "$LREDIS" ]; do
+      echo "Please provide the absolute path of your redis"
+      read -r answer
+      LREDIS="${answer}"
+      if ! check_redis_path; then
+        echo "Invalid redis path!"
+        LREDIS=
+      fi
+    done
   fi
   echo "Do you want to remove compilation warnings (default = no) ? [Y/n]"
   read -r answer
