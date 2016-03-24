@@ -34,7 +34,7 @@ CFLAGS="-safe-string"
 LDFLAGS=
 PPFLAGS=
 CAMLP5F=
-CAMLP5=
+CAMLP5D=
 MYSQL=
 CURL=
 REDIS=
@@ -180,7 +180,7 @@ check_ocaml_version() {
 check_camlp5() {
   if camlp5 -v >/dev/null 2>&1; then
     print_check_ok "Checking Camlp5" "OK"
-    CAMLP5="+camlp5"
+    CAMLP5D="+camlp5"
   else
     print_check_err "Checking Camlp5" "ERROR"
     echo "You need the command camlp5 accessible in the path!"
@@ -195,7 +195,7 @@ check_ocamlfind() {
       print_check_ok "Checking ocamlfind" "OK"
       OCAMLC="ocamlfind ocamlc"
       OCAMLOPT="ocamlfind ocamlopt"
-      CAMLP5=`ocamlfind query camlp5`/
+      CAMLP5D=`ocamlfind query camlp5`/
     else
       print_check_err "Checking ocamlfind" "ERROR"
       echo "You need the command ocamlfind accessible in the path!"
@@ -207,7 +207,7 @@ check_ocamlfind() {
       print_check_ok "Checking ocamlfind" "OK"
       OCAMLC="ocamlfind ocamlc"
       OCAMLOPT="ocamlfind ocamlopt"
-      CAMLP5=`ocamlfind query camlp5`/
+      CAMLP5D=`ocamlfind query camlp5`/
     else
       print_check_warn "Checking ocamlfind" "NOT FOUND"
     fi
@@ -217,7 +217,7 @@ check_ocamlfind() {
 check_api() {
   if [[ $API == y ]]; then
     API_OPT=" -package piqirun.ext"
-    CAMLP5="$CAMLP5F -DAPI"
+    CAMLP5F="$CAMLP5F -DAPI"
   fi
 }
 
@@ -361,7 +361,7 @@ print_compiler() {
    echo "OCAMLD="
    echo
    echo "# Compiler dependencies."
-   echo "CAMLP5D=${CAMLP5}"
+   echo "CAMLP5D=${CAMLP5D}"
    if [[ $API == y ]]; then
      echo "MYSQL=${MYSQL}"
      echo "OCURL=${CURL}"
