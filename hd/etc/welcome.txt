@@ -9,7 +9,6 @@
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.js;
-  <script type="text/javascript" src="jquery_placeholder_min.js"></script>
   %include.css;
   %base_header;
 </head>
@@ -393,7 +392,7 @@ sv: <span class="highlight" style="margin-left:10px">genom
     %end;
     %if;(wizard)
       <li>
-        <a href="%prefix;m=MOD_DATA;data=fn">%apply;book_of([first name/first names]1)</a>
+        <a href="%prefix;m=MOD_DATA;data=fn">%apply;book_of([first name/first names]1)</a> 
       </li>
       <li>
         <a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a>
