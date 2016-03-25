@@ -1,3 +1,5 @@
+(* nocamlp5 *)
+
 module rec Api_piqi:
   sig
     type protobuf_int64 = int64

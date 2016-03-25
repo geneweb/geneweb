@@ -1,3 +1,4 @@
+(* nocamlp5 *)
 
 
 let slavo_Germanic sstring =

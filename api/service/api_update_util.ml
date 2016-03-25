@@ -1,3 +1,4 @@
+(* nocamlp5 *)
 
 
 module M = Api_piqi

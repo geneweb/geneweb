@@ -1,3 +1,5 @@
+(* nocamlp5 *)
+
 let piqi = Api_saisie_read_piqi.piqi
 
 

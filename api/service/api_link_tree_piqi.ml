@@ -1,3 +1,5 @@
+(* nocamlp5 *)
+
 module rec Api_link_tree_piqi:
   sig
     type protobuf_int32 = int32

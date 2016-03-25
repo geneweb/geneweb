@@ -1,3 +1,5 @@
+(* nocamlp5 *)
+
 module rec Api_saisie_write_piqi:
   sig
     type protobuf_int32 = int32
