@@ -1,27 +1,31 @@
-#!/bin/sh
-# $Id: camlp5_comm.sh,v 5.2 2010-09-23 17:16:49 ddr Exp $
+#!/bin/bash
 
-ARGS1="pa_macro.cmo"
+ARGS="pa_macro.cmo"
+OUTPUT=
 FILE=
-while test "" != "$1"; do
-	case $1 in
-	*.ml*) FILE=$1;;
-	*) ARGS1="$ARGS1 $1";;
-	esac
-	shift
+while [ -n "$1" ]; do
+    case $1 in
+    *.ml*) FILE=$1;;
+    -o) OUTPUT=$2; ARGS="$ARGS $1";;
+    *) ARGS="$ARGS $1";;
+    esac
+    shift
 done
 
 head -1 $FILE >/dev/null || exit 1
 
 set - $(head -1 $FILE)
-if test "$2" = "camlp5r" -o "$2" = "camlp5o" -o "$2" = "camlp5"; then
-	COMM=$(echo "$2" | sed -e 's/camlp5/camlp5/g')
-	shift; shift
-	ARGS2=$(echo $* | sed -e "s/[()*]//g")
-else
-	COMM=camlp5r
-	ARGS2=
-fi
+case "$2" in
+nocamlp5)
+  COMMAND="ln -fs $FILE $OUTPUT";;
+camlp5|camlp5r|camlp5o)
+  COMMAND="$2"
+  shift; shift
+  MORE_ARGS=$(echo $* | sed -e "s/[()*]//g")
+  COMMAND="$COMMAND $MORE_ARGS $ARGS $FILE";;
+*)
+  COMMAND="camlp5r $ARGS $FILE";;
+esac
 
-echo $COMM $ARGS2 $ARGS1 $FILE 1>&2
-$COMM $ARGS2 $ARGS1 $FILE
+echo $COMMAND 1>&2
+$COMMAND

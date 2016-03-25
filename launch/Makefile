@@ -22,7 +22,7 @@ clean:
 
 .PHONY: depend
 depend:
-	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
+	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi

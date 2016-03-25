@@ -119,7 +119,7 @@ clavier.out: $(CLAVIER_OBJS)
 
 .PHONY: depend
 depend:
-	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.ml) | sed -e 's|$(GWB)|$$(GWB)|g' > .depend
+	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- $$(ls *.ml) | sed -e 's|$(GWB)|$$(GWB)|g' > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi

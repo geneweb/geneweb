@@ -16,7 +16,7 @@ gwdiff.opt: $(GWDIFF_OBJS:.cmo=.cmx)
 
 .PHONY: depend
 depend:
-	TOP=$(TOP) $(TOP)/tools/camlp5_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend
+	TOP=$(TOP) $(TOP)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi

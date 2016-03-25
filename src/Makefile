@@ -167,7 +167,7 @@ always:
 
 .PHONY: depend
 depend: gwlib.ml pa_lock.cmo pa_html.cmo q_codes.cmo
-	export LC_ALL=C; $(ROOT)/tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
+	export LC_ALL=C; $(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi

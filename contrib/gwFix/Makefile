@@ -106,7 +106,7 @@ gwFixY.opt: $(OBJS_OCCU:.cmo=.cmx)
 
 .PHONY: depend
 depend:
-	TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
+	TOP=.. ../tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi

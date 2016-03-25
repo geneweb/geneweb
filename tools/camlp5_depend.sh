@@ -1,50 +1,63 @@
-#!/bin/sh -e
-# $Id: camlp5_depend.sh,v 5.2 2009-03-11 10:56:09 ddr Exp $
+#!/bin/bash -e
 
+usage() {
+  PROG_NAME=${0##*/}
+  if [ -n "$1" ]; then
+    echo "Unexpected argument '$1'" >&2
+    echo >&2
+  fi
+  echo "Usage: $PROG_NAME [<camlp5 flags>] [-I incdir] -- <files>" >&2
+  exit 1
+}
+
+ARGTYPE=CAMLP5_OTHER_OPTIONS
 FILES=
-DEPARGS=
-while [ "$1" != "" ]; do
+CAMLP5_OTHER_OPTIONS=
+INC=
+while [ -n "$1" ]; do
     case $1 in
-    *.ml*) FILES="$FILES $1";;
-    *) DEPARGS="$DEPARGS $1";;
+    -h|--help) usage;;
+    --) [ $ARGTYPE != "FILES" ] || usage "$1"
+        ARGTYPE=FILES;;
+    -I) [ $ARGTYPE != "FILES" ] || usage "$1"
+        shift
+        [ -n "$1" ] || usage
+        INC="$INC -I $1";;
+    *) declare $ARGTYPE="${!ARGTYPE} $1";;
     esac
     shift
 done
-PR_DEP="pr_depend.cmo"
+
+[ -n "$FILES" ] || usage;
+
+CAMLP5_LOAD_OPTIONS="pr_depend.cmo pa_macro.cmo $INC"
 
 for FILE in $FILES; do
     head -1 $FILE >/dev/null || exit 1
     set - $(head -1 $FILE)
-    if test "$2" = "camlp5r" -o "$2" = "camlp5o" -o "$2" = "camlp5"; then
-	COMM=$(echo "$2" | sed -e 's/camlp5/camlp5/g')
-        shift; shift
-        ARGS=$(echo $* | sed -e "s/[()*]//g")
-    else
-        COMM=camlp5r
-        ARGS=
-    fi
-    ARGS2="$DEPARGS"
-    echo $COMM $PR_DEP pa_macro.cmo $ARGS -- $ARGS2 $FILE >&2
-    $COMM $PR_DEP pa_macro.cmo $ARGS -- $ARGS2 $FILE
-done
-
-for FILE in $FILES; do
-    head -1 $FILE >/dev/null || exit 1
-    set - $(head -1 $FILE)
-    if test "$2" = "camlp5r" -o "$2" = "camlp5o" -o "$2" = "camlp5"; then
-	COMM=$(echo "$2" | sed -e 's/camlp5/camlp5/g')
-	shift; shift
-        ARGS=$(echo $* | sed -e "s/[()*]//g")
-	DEPS=
-	for i in $ARGS; do
-	    if test $(echo $i | sed "s/^\(..\).*$/\1/") = "./"; then
-		DEP=$(echo $i | sed "s/^..\(.*\)$/\1/")
-		DEPS="$DEPS $DEP"
-	    fi
-	done
-        if test "$DEPS" != ""; then
-	    BASE=$(basename $FILE .ml)
-	    echo $BASE.cmo $BASE.cmx: $DEPS
+    case "$2" in
+    nocamlp5)
+      COMMAND="ocamldep $INC $FILE";;
+    camlp5|camlp5r|camlp5o)
+      COMMAND="$2"
+      shift; shift
+      ARGS=$(echo $* | sed -e "s/[()*]//g")
+      DEPS=
+      for i in $ARGS; do
+        if [[ $i =~ ^\./ ]]; then
+          DEPS="$DEPS ${i:2}"
         fi
-    fi
+      done
+      if [ -n "$DEPS" ]; then
+        case $FILE in
+        *.ml)  BASE=$(basename $FILE .ml);  echo $BASE.cmo $BASE.cmx: $DEPS;;
+        *.mli) BASE=$(basename $FILE .mli); echo $BASE.cmi: $DEPS;;
+        esac
+      fi
+      COMMAND="$COMMAND $CAMLP5_LOAD_OPTIONS $ARGS -- $CAMLP5_OTHER_OPTIONS $FILE";;
+    *)
+      COMMAND="camlp5r $CAMLP5_LOAD_OPTIONS $ARGS -- $CAMLP5_OTHER_OPTIONS $FILE";;
+    esac
+    echo $COMMAND $FILE >&2
+    $COMMAND $FILE
 done

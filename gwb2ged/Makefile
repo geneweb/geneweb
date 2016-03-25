@@ -31,7 +31,7 @@ clean:
 
 .PHONY: depend
 depend:
-	$(ROOT)/tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
+	$(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
