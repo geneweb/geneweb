@@ -1,77 +1,70 @@
-# $Id: Makefile,v 0.1 2007-09-12 09:58:44 Exp $
+ROOT=../..
+include $(ROOT)/tools/Makefile.config
 
-#include ../../tools/Makefile.ocaml
+OCAMLI=-I $(ROOT)/src -I $(ROOT)/wserver
 
-CAMLP5F=-DUNIX
-OCAMLOPT=ocamlfind ocamlopt -warn-error A -safe-string -annot -g
-STRIP=strip
-RM=/bin/rm -f
+.PHONY: out opt clean
 
-# TODO remove when including Makefile.config
-SHELL=/bin/bash
+out: api.out
 
-all:: opt
+opt: api.opt
 
-out:: api.out
-
-opt:: api.opt
-
-clean::
+clean:
 	$(RM) *.cm[oixa] *.cmxa *.o *.a *.obj *.lib *.lck *.bak *~ .#* *.annot .depend
 
 api.out:
-	ocamlfind ocamlc -package piqirun.ext -c api_piqi.ml
-	ocamlfind ocamlc -package piqirun.ext -c api_piqi_ext.ml
-	ocamlfind ocamlc -package piqirun.ext -c api_app_piqi.ml
-	ocamlfind ocamlc -package piqirun.ext -c api_app_piqi_ext.ml
-	ocamlfind ocamlc -package piqirun.ext -c api_saisie_read_piqi.ml
-	ocamlfind ocamlc -package piqirun.ext -c api_saisie_read_piqi_ext.ml
-	ocamlfind ocamlc -package piqirun.ext -c api_saisie_write_piqi.ml
-	ocamlfind ocamlc -package piqirun.ext -c api_saisie_write_piqi_ext.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver metaphone.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_def.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_util.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_search.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_graph.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_warnings.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_stats.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_saisie_read.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_update_util.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_update_person.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_update_family.ml
-	ocamlfind ocamlc -package piqirun.ext -c -I ../../src -I ../../wserver api_saisie_write.ml
+	$(OCAMLC) -c api_piqi.ml
+	$(OCAMLC) -c api_piqi_ext.ml
+	$(OCAMLC) -c api_app_piqi.ml
+	$(OCAMLC) -c api_app_piqi_ext.ml
+	$(OCAMLC) -c api_saisie_read_piqi.ml
+	$(OCAMLC) -c api_saisie_read_piqi_ext.ml
+	$(OCAMLC) -c api_saisie_write_piqi.ml
+	$(OCAMLC) -c api_saisie_write_piqi_ext.ml
+	$(OCAMLC) -c $(OCAMLI) metaphone.ml
+	$(OCAMLC) -c $(OCAMLI) api_def.ml
+	$(OCAMLC) -c $(OCAMLI) api_util.ml
+	$(OCAMLC) -c $(OCAMLI) api_search.ml
+	$(OCAMLC) -c $(OCAMLI) api_graph.ml
+	$(OCAMLC) -c $(OCAMLI) api_warnings.ml
+	$(OCAMLC) -c $(OCAMLI) api_stats.ml
+	$(OCAMLC) -c $(OCAMLI) api.ml
+	$(OCAMLC) -c $(OCAMLI) api_saisie_read.ml
+	$(OCAMLC) -c $(OCAMLI) api_update_util.ml
+	$(OCAMLC) -c $(OCAMLI) api_update_person.ml
+	$(OCAMLC) -c $(OCAMLI) api_update_family.ml
+	$(OCAMLC) -c $(OCAMLI) api_saisie_write.ml
 
 api.opt:
-	$(OCAMLOPT) -package piqirun.ext -c api_piqi.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_piqi_ext.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_stats_piqi.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_stats_piqi_ext.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_app_piqi.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_app_piqi_ext.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_saisie_read_piqi.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_saisie_read_piqi_ext.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_saisie_write_piqi.ml
-	$(OCAMLOPT) -package piqirun.ext -c api_saisie_write_piqi_ext.ml
+	$(OCAMLOPT) -c api_piqi.ml
+	$(OCAMLOPT) -c api_piqi_ext.ml
+	$(OCAMLOPT) -c api_stats_piqi.ml
+	$(OCAMLOPT) -c api_stats_piqi_ext.ml
+	$(OCAMLOPT) -c api_app_piqi.ml
+	$(OCAMLOPT) -c api_app_piqi_ext.ml
+	$(OCAMLOPT) -c api_saisie_read_piqi.ml
+	$(OCAMLOPT) -c api_saisie_read_piqi_ext.ml
+	$(OCAMLOPT) -c api_saisie_write_piqi.ml
+	$(OCAMLOPT) -c api_saisie_write_piqi_ext.ml
 # Compilé dans le Makefile de src
-#	$(OCAMLOPT) -package piqirun.ext -c api_link_tree_piqi.ml
-#	$(OCAMLOPT) -package piqirun.ext -c api_link_tree_piqi_ext.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver metaphone.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_def.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_util.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_search.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_graph.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_warnings.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_stats.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_saisie_read.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_update_util.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_update_person.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_update_family.ml
-	$(OCAMLOPT) -c -pp "camlp5r pa_macro.cmo pa_extend.cmo ../../src/pa_lock.cmo $(CAMLP5F)" -I ../../src api_saisie_autocomplete.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver api_saisie_write.ml
-	$(OCAMLOPT) -package piqirun.ext -package curl -I $(OCURL) curl.cmxa -I $(LREDIS) -package yojson -I ../../src -I ../../wserver -c api_link.ml
-	$(OCAMLOPT) -package piqirun.ext -c -I ../../src -I ../../wserver convert_dico_place.ml
+	$(OCAMLOPT) -c api_link_tree_piqi.ml
+	$(OCAMLOPT) -c api_link_tree_piqi_ext.ml
+	$(OCAMLOPT) -c $(OCAMLI) metaphone.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_def.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_util.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_search.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_graph.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_warnings.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_stats.ml
+	$(OCAMLOPT) -c $(OCAMLI) api.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_saisie_read.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_update_util.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_update_person.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_update_family.ml
+	$(OCAMLOPT) -c -pp "camlp5r pa_macro.cmo pa_extend.cmo ../../src/pa_lock.cmo $(CAMLP5F)" $(OCAMLI) api_saisie_autocomplete.ml
+	$(OCAMLOPT) -c $(OCAMLI) api_saisie_write.ml
+	$(OCAMLOPT) -package curl -I $(OCURL) curl.cmxa -I $(LREDIS) -package yojson $(OCAMLI) -c api_link.ml
+	$(OCAMLOPT) -c $(OCAMLI) convert_dico_place.ml
 
 
 piqi:
@@ -105,7 +98,8 @@ piqi:
 depend:
 #	ocamlfind ocamldep api_piqi.ml > .depend
 #	ocamlfind ocamldep api_piqi_ext.ml >> .depend
-	ocamlfind ocamldep -I ../../src -I ../../wserver *.mli *.ml > .depend
+#	ocamlfind ocamldep $(OCAMLI) *.mli *.ml > .depend
+	$(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
