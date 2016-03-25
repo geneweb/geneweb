@@ -35,8 +35,8 @@
   <li>
     <input type="hidden" name="e_idxcnt" value="xcnt"%/>
     <input type="hidden" class="pos" name="e_posxcnt" size="2" maxlength="2" value="xcnt"%/>
-    <button type="button" class="up">[*move up/down]0</button>
-    <button type="button" class="down">[*move up/down]1</button>
+    <button type="button" class="up" title="[*move up/down]0">⇧</button>
+    <button type="button" class="down" title="[*move up/down]1">⇩</button>
     %event_str;
   </li>
 %end;
