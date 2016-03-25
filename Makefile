@@ -155,7 +155,7 @@ clean:
 	$(RM) *~ .#*
 
 depend:
-	cd src && $(MAKE) gwlib.ml pa_lock.cmo pa_html.cmo q_codes.cmo
+	cd src && $(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
 	cd wserver && $(MAKE) $@
 	cd src && $(MAKE) $@
 	cd ged2gwb && $(MAKE) $@

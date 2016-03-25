@@ -24,7 +24,7 @@ CHECK_BASE_OBJS=buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.
 
 
 .PHONY: out
-out: gwlib.ml ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out
+out: ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out
 	cp gwc1.out gwc
 	cp gwc1.out gwc1
 	cp gwc2.out gwc2
@@ -36,7 +36,7 @@ out: gwlib.ml ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nld
 
 .PHONY: opt
 #opt: ansel.cmx gwc1.opt gwc2.opt consang.opt link.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
-opt: gwlib.ml ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
+opt: ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	cp gwc1.opt gwc
 	cp gwc1.opt gwc1
 	cp gwc2.opt gwc2
@@ -51,11 +51,10 @@ compilation.ml: always
 	echo "Util.compilation_time_hook.val := \" ($$(date "+%Y-%m-%d %T %Z"))\";" > $@
 
 gwlib.ml:
-	echo "value prefix =" > gwlib.ml
-	echo "  try Sys.getenv \"GWPREFIX\" with" >> gwlib.ml
-	echo "  [ Not_found -> \"$(PREFIX)\" ]" | \
-	sed -e 's|\\|/|g' >> gwlib.ml
-	echo ";" >> gwlib.ml
+	echo "value prefix =" > $@
+	echo "  try Sys.getenv \"GWPREFIX\" with" >> $@
+	echo "  [ Not_found -> \"$(PREFIX)\" ]" | sed -e 's|\\|/|g' >> $@
+	echo ";" >> $@
 
 gwc1.out: $(GWC_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc1.out
@@ -148,7 +147,7 @@ clean:
 always:
 
 .PHONY: depend
-depend: gwlib.ml pa_lock.cmo pa_html.cmo q_codes.cmo
+depend: pa_lock.cmo pa_html.cmo q_codes.cmo
 	export LC_ALL=C; $(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
 .depend:
