@@ -2166,10 +2166,12 @@ value check_xhtml s =
           } ]
 ;
 
-value compilation_time_hook = ref (fun _ -> "");
+(* There is a hook to avoid a dependency on compilation.ml which is
+   recompiled every time *)
+value compilation_time_hook = ref "";
 value compilation_time conf =
   match p_getenv conf.base_env "display_compilation_time" with
-  [ Some "on" -> compilation_time_hook.val conf
+  [ Some "on" -> compilation_time_hook.val
   | _ -> "" ]
 ;
 

@@ -10,8 +10,8 @@ GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secu
 GWC2_OBJS=calendar.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwcomp.cmo argl.cmo lock.cmo progrBar.cmo secure.cmo iochan.cmo futil.cmo db2.cmo db2out.cmo notesLinks.cmo db2disk.cmo dutil.cmo btree.cmo database.cmo gwdb.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo db2link.cmo gwc2.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo progrBar.cmo database.cmo db2.cmo db2disk.cmo db2out.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
 GWD_OBJS_LINK=../api/service/api_link_tree_piqi.cmo ../api/service/api_link_tree_piqi_ext.cmo link.cmo
-GWD_OBJS_API=api_conf.cmo ../api/service/api_link_tree_piqi.cmo ../api/service/api_link_tree_piqi_ext.cmo link.cmo api_wiki.cmo perso_link.cmo
-GWD_OBJS1=../wserver/httpStatus.cmo ../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo updateData.cmo
+GWD_OBJS_API=../api/service/api_link_tree_piqi.cmo ../api/service/api_link_tree_piqi_ext.cmo link.cmo api_wiki.cmo perso_link.cmo
+GWD_OBJS1=api_conf.cmo ../wserver/httpStatus.cmo ../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo updateData.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo mergeDup.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo searchName.cmo advSearchOk.cmo birthDeath.cmo title.cmo forum.cmo image.cmo request.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo calendar.cmo notesLinks.cmo progrBar.cmo gwu.cmo
@@ -47,24 +47,8 @@ opt: gwlib.ml ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nld
 	cp check_base.opt check_base
 	$(STRIP) gwc gwc2 consang gwd gwu update_nldb check_base
 
-compilation.cmo: $(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
-	$(MAKE) compilation.ml
-	@$(CAMLP5_COMM) compilation.ml -o compilation.ppo
-	$(OCAMLC) -c -impl compilation.ppo
-	$(RM) compilation.ppo
-
-compilation.cmx: $(GWD_OBJS1:.cmo=.cmx) $(GWD_OBJS2.cmo=.cmx) gwd.cmx
-	$(MAKE) compilation.ml
-	@$(CAMLP5_COMM) compilation.ml -o compilation.ppo
-	$(OCAMLOPT) -c -impl compilation.ppo
-	$(RM) compilation.ppo
-
 compilation.ml: always
-	> compilation.ml
-	echo "open Def;" >> compilation.ml
-	echo "value (wd, d, h) = ($$(date "+%u, {day=%d;month=%m;year=%Y;prec=Sure;delta=0}, \"%T %Z\""));" >> compilation.ml
-	echo "value ct conf = Printf.sprintf \" (%4d-%02d-%02d %s)\" d.year d.month d.day h;" >> compilation.ml
-	echo "Util.compilation_time_hook.val := ct;" >> compilation.ml
+	echo "Util.compilation_time_hook.val := \" ($$(date "+%Y-%m-%d %T %Z"))\";" > $@
 
 gwlib.ml:
 	echo "value prefix =" > gwlib.ml
@@ -100,10 +84,8 @@ gwd.out: $(GWD_OBJS)
 	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma str.cma -I $(CAMLP5D) gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
 
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) $(GWD_OBJS1:.cmo=.cmx) -a -o x1.cmxa
-	$(OCAMLOPT) $(GWD_OBJS2:.cmo=.cmx) -a -o x2.cmxa
-#	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
-	$(OCAMLOPT) $(STATIC) unix.cmxa str.cmxa -I $(CAMLP5D) gramlib.cmxa x1.cmxa x2.cmxa compilation.cmx gwd.cmx $(LIBUNIX) -o gwd.opt
+#	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o gwd.opt
+	$(OCAMLOPT) $(STATIC) unix.cmxa str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o gwd.opt
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out

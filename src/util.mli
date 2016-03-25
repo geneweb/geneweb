@@ -240,7 +240,7 @@ value print_pre_right : int -> string -> unit;
 
 value short_f_month : int -> string;
 
-value compilation_time_hook : ref (config -> string);
+value compilation_time_hook : ref string;
 value compilation_time : config -> string;
 
 (* Reading password file *)
