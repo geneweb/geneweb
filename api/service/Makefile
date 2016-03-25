@@ -101,9 +101,15 @@ piqi:
 	@echo -e "(* nocamlp5 *)\n" | cat - api_stats_piqi_ext.ml > tmp && mv tmp api_stats_piqi_ext.ml
 	$(RM) *.piqi
 
+.PHONY: depend
 depend:
 #	ocamlfind ocamldep api_piqi.ml > .depend
 #	ocamlfind ocamldep api_piqi_ext.ml >> .depend
 	ocamlfind ocamldep -I ../../src -I ../../wserver *.mli *.ml > .depend
 
--include .depend
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

@@ -14,7 +14,13 @@ gwdiff.out: $(GWDIFF_OBJS)
 gwdiff.opt: $(GWDIFF_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(GWDIFF_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwdiff.opt
 
+.PHONY: depend
 depend:
 	TOP=$(TOP) $(TOP)/tools/camlp5_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend
 
-include .depend
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

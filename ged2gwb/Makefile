@@ -40,4 +40,9 @@ clean:
 depend:
 	$(ROOT)/tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
 
-include .depend
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

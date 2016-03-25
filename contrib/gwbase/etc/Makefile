@@ -117,7 +117,13 @@ nbdesc.opt: $(NBDESC_OBJS:.cmo=.cmx)
 clavier.out: $(CLAVIER_OBJS)
 	$(OCAMLC) -custom $(CLAVIER_OBJS) -o clavier.out
 
+.PHONY: depend
 depend:
 	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.ml) | sed -e 's|$(GWB)|$$(GWB)|g' > .depend
 
-include .depend
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

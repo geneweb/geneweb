@@ -104,7 +104,13 @@ gwFixY.out: $(OBJS_OCCU)
 gwFixY.opt: $(OBJS_OCCU:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa str.cmxa $(LIBUNIX) -I $(CAMLP5D) gramlib.cmxa $(OBJS_OCCU:.cmo=.cmx) -o gwFixY.opt
 
+.PHONY: depend
 depend:
 	TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
 
-include .depend
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

@@ -27,14 +27,20 @@ gui.out: $(OBJS)
 gui.opt: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) -I $(LABLGTK2) lablgtk.cmxa unix.cmxa $(OBJS:.cmo=.cmx) -o gui.opt
 
-clean::
-	$(RM) gui
-
-depend:
-	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
-
 %.cmo: %.ml
 	@$(TEST_DIR)
 	ocamlc -pp camlp5r $(OCAMLI) -I +lablgtk2 -c $<
 
-include .depend
+clean::
+	$(RM) gui
+
+.PHONY: depend
+depend:
+	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
+
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

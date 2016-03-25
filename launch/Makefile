@@ -13,14 +13,20 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	ocamlc -I +labltk labltk.cma unix.cma $(OBJS) -o $(TARGET)
 
-clean:
-	rm -f *.cm[io] *.out *.log
-
-depend:
-	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
-
 %.cmo: %.ml
 	@$(TEST_DIR)
 	ocamlc -pp camlp5r $(OCAMLI) -I +labltk -c $<
 
-include .depend
+clean:
+	rm -f *.cm[io] *.out *.log
+
+.PHONY: depend
+depend:
+	export LC_ALL=C; TOP=$(GWB) $(GWB)/tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) | sed -e 's|\.\.|$$(GWB)|g' > .depend
+
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

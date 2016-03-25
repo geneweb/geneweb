@@ -169,4 +169,9 @@ always:
 depend: gwlib.ml pa_lock.cmo pa_html.cmo q_codes.cmo
 	export LC_ALL=C; $(ROOT)/tools/camlp5_depend.sh $(OCAMLI) *.ml* > .depend
 
-include .depend
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
+
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

@@ -9,7 +9,7 @@ LIBS=str.cma
 
 SOURCES = lex_utils.ml
 
-all: depend $(EXEC).opt
+all: .depend $(EXEC).opt
 
 OPTOBJS = $(SOURCES:.ml=.cmx)
 
@@ -26,7 +26,9 @@ clean:
 	rm -f $(EXEC)
 	rm -f $(EXEC).opt
 
-depend:
-	$(CAMLDEP) *.mli *.ml > .depend
+.depend: *.ml*
+	$(CAMLDEP) $^ > $@
 
-include .depend
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif
