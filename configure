@@ -216,7 +216,7 @@ check_ocamlfind() {
 
 check_api() {
   if [[ $API == y ]]; then
-    API_OPT=" -package piqirun.ext"
+    API_OPT=" -package piqirun.ext -package curl"
     CAMLP5F="$CAMLP5F -DAPI"
   fi
 }
@@ -326,8 +326,10 @@ print_common_header() {
    echo "BOLD:=\"\\\\x1b[1m\""
    echo "CLEAR:=\"\\\\x1b[0m\""
    echo
-   echo "# ! Careful ! ROOT must be define in each Makefile before \
-it is included."
+   echo "ifeq (\$(ROOT),'')"
+   echo "  \$(error Variable ROOT must be defined in each Makefile before \
+it is included.)"
+   echo "endif"
    echo
    echo "# Variables for packagers."
    echo "PREFIX=/usr"
@@ -378,6 +380,7 @@ print_compiler() {
      echo "OREDIS=${OREDIS}"
      echo "RE=${RE}"
      echo "LREDIS=${LREDIS}"
+     echo "WITH_API=y"
    fi
    ) >> $MAKEFILE
 }

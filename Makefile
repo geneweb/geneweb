@@ -18,27 +18,20 @@ opt:
 	cd wserver && $(MAKE) $@
 	cd dag2html && $(MAKE) $@
 	cd src && $(MAKE) $@
-	cd ged2gwb && $(MAKE) $@
-	cd gwb2ged && $(MAKE) $@
-	cd setup && $(MAKE) $@
-	cd gwtp && $(MAKE) $@
-
-api:
-	cd wserver && $(MAKE) $@
-	cd dag2html && $(MAKE) $@
-	cd src && $(MAKE) PREFIX=$(PREFIX) $@
-	cd ged2gwb && $(MAKE) $@
-	cd gwb2ged && $(MAKE) $@
-	cd setup && $(MAKE) $@
-	cd gwtp && $(MAKE) $@
-	cd contrib/gwpublic && $(MAKE) $@
-	cd contrib/oneshot && $(MAKE) $@
-	cd contrib/misc && $(MAKE) $@
-#	cd contrib/dicoplace && $(MAKE) $@
-	cd contrib/gwFix && $(MAKE) $@
-	cd contrib/history && $(MAKE) $@
-#	cd contrib/wrap && $(MAKE) $@
+ifeq ($(WITHAPI),y)
 	cd api && $(MAKE) $@
+endif
+	cd ged2gwb && $(MAKE) $@
+	cd gwb2ged && $(MAKE) $@
+	cd setup && $(MAKE) $@
+	cd gwtp && $(MAKE) $@
+	cd contrib/gwpublic && $(MAKE) all
+	cd contrib/oneshot && $(MAKE) all
+	cd contrib/misc && $(MAKE) all
+#	cd contrib/dicoplace && $(MAKE) $@
+	cd contrib/gwFix && $(MAKE) all
+	cd contrib/history && $(MAKE) all
+#	cd contrib/wrap && $(MAKE) $@
 
 install:
 	mkdir -p $(PREFIX)/bin
@@ -150,7 +143,7 @@ clean:
 	cd contrib/gwFix && $(MAKE) $@
 	cd contrib/history && $(MAKE) $@
 	cd contrib/wrap && $(MAKE) $@
-#	cd api && $(MAKE) $@
+	cd api && $(MAKE) $@
 	$(RM) -r $(DESTDIR)
 	$(RM) *~ .#*
 
@@ -162,5 +155,5 @@ depend:
 	cd gwb2ged && $(MAKE) $@
 	cd setup && $(MAKE) $@
 	cd gwtp && $(MAKE) $@
-#	cd api && $(MAKE) $@
-#	cd api/service && $(MAKE) $@
+	cd api && $(MAKE) $@
+	cd api/service && $(MAKE) $@

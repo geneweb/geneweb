@@ -9,11 +9,15 @@ OCAMLI=-I ../wserver -I ../dag2html -I ../api/service
 GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo db1link.cmo gwc.cmo
 GWC2_OBJS=calendar.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwcomp.cmo argl.cmo lock.cmo progrBar.cmo secure.cmo iochan.cmo futil.cmo db2.cmo db2out.cmo notesLinks.cmo db2disk.cmo dutil.cmo btree.cmo database.cmo gwdb.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo db2link.cmo gwc2.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo progrBar.cmo database.cmo db2.cmo db2disk.cmo db2out.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS_LINK=../api/service/api_link_tree_piqi.cmo ../api/service/api_link_tree_piqi_ext.cmo link.cmo
-GWD_OBJS_API=../api/service/api_link_tree_piqi.cmo ../api/service/api_link_tree_piqi_ext.cmo link.cmo api_wiki.cmo perso_link.cmo
-GWD_OBJS1=api_conf.cmo ../wserver/httpStatus.cmo ../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo updateData.cmo
-GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo mergeDup.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo searchName.cmo advSearchOk.cmo birthDeath.cmo title.cmo forum.cmo image.cmo request.cmo base64.cmo robot.cmo
-GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) compilation.cmo gwd.cmo
+GWD_OBJS_API1=api_conf.cmo
+GWD_OBJS_API2=../api/service/api_link_tree_piqi.cmo ../api/service/api_link_tree_piqi_ext.cmo link.cmo api_wiki.cmo perso_link.cmo
+GWD_OBJS1=../wserver/httpStatus.cmo ../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo
+GWD_OBJS2=perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo updateData.cmo merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo mergeDup.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo searchName.cmo advSearchOk.cmo birthDeath.cmo title.cmo forum.cmo image.cmo request.cmo base64.cmo robot.cmo compilation.cmo gwd.cmo
+ifeq ($(WITH_API),y)
+  GWD_OBJS=$(GWD_OBJS_API1) $(GWD_OBJS1) $(GWD_OBJS_API2) $(GWD_OBJS2)
+else
+  GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2)
+endif
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo calendar.cmo notesLinks.cmo progrBar.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
@@ -35,7 +39,9 @@ out: ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out che
 	cp check_base.out check_base
 
 .PHONY: opt
-#opt: ansel.cmx gwc1.opt gwc2.opt consang.opt link.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
+ifeq ($(WITH_API),y)
+opt: link.opt
+endif
 opt: ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	cp gwc1.opt gwc
 	cp gwc1.opt gwc1
@@ -83,8 +89,11 @@ gwd.out: $(GWD_OBJS)
 	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma str.cma -I $(CAMLP5D) gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
 
 gwd.opt: $(GWD_OBJS:.cmo=.cmx)
-#	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o gwd.opt
+ifeq ($(WITH_API),y)
+	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o gwd.opt
+else
 	$(OCAMLOPT) $(STATIC) unix.cmxa str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o gwd.opt
+endif
 
 gwu.out: $(GWU_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(GWU_OBJS) -o gwu.out
