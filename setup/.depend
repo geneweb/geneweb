@@ -1,4 +1,0 @@
-setup.cmo: ../src/argl.cmo ../src/buff.cmo ../src/translate.cmi \
-    ../src/version.cmo ../wserver/httpStatus.cmo ../wserver/wserver.cmi
-setup.cmx: ../src/argl.cmx ../src/buff.cmx ../src/translate.cmx \
-    ../src/version.cmx ../wserver/httpStatus.cmx ../wserver/wserver.cmx

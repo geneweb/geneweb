@@ -1,6 +1,0 @@
-gwdiff.cmo: ../../src/adef.cmi ../../src/argl.cmo ../../src/calendar.cmi \
-    ../../src/def.cmi ../../src/gutil.cmi ../../src/iobase.cmi \
-    ../../src/name.cmi 
-gwdiff.cmx: ../../src/adef.cmx ../../src/argl.cmx ../../src/calendar.cmx \
-    ../../src/def.cmi ../../src/gutil.cmx ../../src/iobase.cmx \
-    ../../src/name.cmx 

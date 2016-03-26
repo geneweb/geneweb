@@ -1,6 +1,0 @@
-gwb2ged.cmoÄ ::src:adef.cmi ::src:ansel.cmo ::src:argl.cmo ¶
-    ::src:calendar.cmo ::src:def.cmi ::src:gutil.cmi ::src:iobase.cmi ¶
-    ::src:select.cmo ::src:version.cmo 
-gwb2ged.cmxÄ ::src:adef.cmx ::src:ansel.cmx ::src:argl.cmx ¶
-    ::src:calendar.cmx ::src:def.cmi ::src:gutil.cmx ::src:iobase.cmx ¶
-    ::src:select.cmx ::src:version.cmx 

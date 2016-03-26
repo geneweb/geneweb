@@ -8,6 +8,7 @@
 *.cmxs
 *.cmxa
 *.ppo
+.depend
 distribution
 
 ged2gwb/ged2gwb
@@ -76,7 +77,6 @@ contrib/gwpublic/gwpublic2priv
 contrib/history/convert_hist
 contrib/history/fix_hist
 contrib/history/is_gw_plus
-contrib/lex/.depend
 contrib/lex/log_lex
 contrib/lex/log_msg
 contrib/misc/lower_string

@@ -1,3 +1,0 @@
-wserver.cmo: httpStatus.cmo wserver.cmi
-wserver.cmx: httpStatus.cmx wserver.cmi
-wserver.cmi: httpStatus.cmo

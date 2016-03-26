@@ -1,2 +1,0 @@
-gui.cmo: $(GWB)/src/mutil.cmi 
-gui.cmx: $(GWB)/src/mutil.cmx 
