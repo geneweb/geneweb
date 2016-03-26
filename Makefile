@@ -31,7 +31,6 @@ endif
 #	cd contrib/dicoplace && $(MAKE) $@
 	cd contrib/gwFix && $(MAKE) all
 	cd contrib/history && $(MAKE) all
-#	cd contrib/wrap && $(MAKE) $@
 
 install:
 	mkdir -p $(PREFIX)/bin
@@ -142,7 +141,6 @@ clean:
 #	cd contrib/dicoplace && $(MAKE) $@
 	cd contrib/gwFix && $(MAKE) $@
 	cd contrib/history && $(MAKE) $@
-	cd contrib/wrap && $(MAKE) $@
 	cd api && $(MAKE) $@
 	$(RM) -r $(DESTDIR)
 	$(RM) *~ .#*
