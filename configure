@@ -5,6 +5,9 @@ PROG_NAME=${0##*/}
 # Output for the generated file
 MAKEFILE=tools/Makefile.config
 
+# Separate compilation
+BUILD_DIR="_build"
+
 help() {
   cat << EOF
 $PROG_NAME generates $MAKEFILE.
@@ -15,10 +18,16 @@ options:
       show this help
   --api
       build the API
+  -bd|--build-dir
+      separate directory for build (default: $BUILD_DIR)
   -d|--debug
       add debugging symbols to the build command
   -i|--interactive
       run $PROG_NAME interactively
+  -nw|--no-warn-error
+      do not treat warning as error
+  -r|--redis_path
+      path for the redis library (necessary if building the API)
 EOF
 }
 
@@ -49,7 +58,6 @@ STATIC=
 OS_TYPE=
 
 # Options for configure
-BUILD_DIR="_build"
 API=n
 DEBUG=
 INTERACTIVE=n
@@ -68,11 +76,11 @@ while [[ $# -ne 0 ]]; do
       DEBUG="-g -annot" ;;
     -i|--interactive)
       INTERACTIVE=y ;;
+    -nw|--no-warn-error)
+      WARN= ;;
     -r|--redis_path)
       LREDIS="$2";
       shift ;;
-    -nw|--no-warn-error)
-      WARN= ;;
     -*|--*)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
     *)
@@ -157,9 +165,9 @@ check_native_ocaml() {
 }
 
 verge() {
-    # osx doesn't have sort -V
-    # [ "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
-    [ "$2" = "`echo -e "$1\n$2" | tr ' ' '\n' | sort -n | head -n1`" ]
+  # osx doesn't have sort -V
+  # [ "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+  [ "$2" = "`echo -e "$1\n$2" | tr ' ' '\n' | sort -n | head -n1`" ]
 }
 
 check_ocaml_version() {
@@ -340,7 +348,9 @@ it is included.)"
 gwsetup.1"
    echo
    echo "# Build directory."
-   echo "BUILD_DIR=\${ROOT}/${BUILD_DIR}"
+   echo "BUILD_DIR=\$(ROOT)/${BUILD_DIR}"
+   echo
+   echo "OS_TYPE=${OS_TYPE}"
   ) > $MAKEFILE
 }
 
