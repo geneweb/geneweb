@@ -28,7 +28,6 @@ endif
 	cd contrib/gwpublic && $(MAKE) all
 	cd contrib/oneshot && $(MAKE) all
 	cd contrib/misc && $(MAKE) all
-#	cd contrib/dicoplace && $(MAKE) $@
 	cd contrib/gwFix && $(MAKE) all
 	cd contrib/history && $(MAKE) all
 
@@ -138,7 +137,6 @@ clean:
 	cd contrib/gwpublic && $(MAKE) $@
 	cd contrib/oneshot && $(MAKE) $@
 	cd contrib/misc && $(MAKE) $@
-#	cd contrib/dicoplace && $(MAKE) $@
 	cd contrib/gwFix && $(MAKE) $@
 	cd contrib/history && $(MAKE) $@
 	cd api && $(MAKE) $@
