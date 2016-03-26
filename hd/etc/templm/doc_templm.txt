@@ -1,27 +1,24 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="fr">
 <head>
-  <!-- $Id: doc_templm.txt,v 7.00 2015/03/30 13:03:18 mr Exp $ -->
-  <title>doc_templm</title>
+  <!-- $Id: doc_templm.txt,v 7.00 07/02/2016 23:04:55 A2 $ -->
+  <title>Config templm</title>
   <meta name="robots" content="none"%/>
   <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="content-style-type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<h1>Documentation de templm</h1>
-<div class="menu2">
-  <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-</div>
-<h2>Aide en ligne</h2>
-<ul><li><a href="http://geneweb.tuxfamily.org/wiki/Templm">http://geneweb.tuxfamily.org/wiki/Templm</a></li></ul>
-<h2>Options pour l'habillage templm</h2>
-<h3>[*file] : bases/%base.name;.gwf</h3>
+<h1>Configuration de templm dans /bases/%base.name;.gwf</h1>
+<h2>Documentation en ligne</h2>
+<ul>
+<li><a href="http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;">http://geneweb.tuxfamily.org/wiki/templm%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr%end;</a></li>
+<li><a href="http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_suppl.C3.A9mentaires_de_templm%else;#Templm_additional_shortcuts%end;">http://geneweb.tuxfamily.org/wiki/shortcuts%if;((bvar.defaut_lang="fr" and evar.lang="") or evar.lang="fr")/fr#Raccourcis_claviers_supplémentaires_de_templm%else;#templm_additional_shortcuts%end;</a></li>
+</ul>
 %let;l1;%if;(bvar.setup_http != "")%bvar.setup_http;%else;http://localhost:2316/%end;%in;
-<p class="button"><a href="%l1;gwf?lang=fr&anon=%base.name;#a_3">[modify] (gwstp)</a></p>
+<p class="button"><a href="%l1;gwf?lang=fr;anon=%base.name;#a_3">[*modify] les options par défaut de %base.name;.gwf [with] gwsetup</a></p>
 <table class="gwf">
 <tr>
   <td>css=%bvar.css;</td>
@@ -34,43 +31,33 @@
   </td>
 </tr>
 <tr>
-  <td>datalist_occu=%bvar.datalist_occu;</td>
+  <td>datalist_fn=%bvar.datalist_fn;<br%/>
+      datalist_sn=%bvar.datalist_sn;<br%/>
+      datalist_occu=%bvar.datalist_occu;<br%/>
+      datalist_place=%bvar.datalist_place;<br%/>
+      datalist_src=%bvar.datalist_src;</td>
   <td>
-    Liste des professions sur le formulaire individu et famille :
+    Saisie semi-automatique sur le formulaire individu et famille :
     <ul>
-      <li>datalist_occu= : ne fait rien</li>
-      <li>datalist_occu=1 : charge toute la liste en une fois</li>
-      <li>datalist_occu=2 : charge une petite liste après la saisie de 3 caractères</li>
+      <li>datalist_xx= : ne fait rien</li>
+      <li>datalist_xx=1 : charge toute la liste en une fois</li>
+      <li>datalist_xx=2 : charge la liste filtrée après la saisie de trois caractères</li>
     </ul>
-  </td>
-</tr>
-<tr>
-  <td>datalist_place=%bvar.datalist_place;</td>
-  <td>
-    Liste des lieux sur le formulaire individu et famille :
+    Listes possibles :  
     <ul>
-      <li>datalist_place= : ne fait rien</li>
-      <li>datalist_place=1 : charge toute la liste en une fois</li>
-      <li>datalist_place=2 : charge une petite liste après la saisie de 3 caractères</li>
-    </ul>
-  </td>
-</tr>
-<tr>
-  <td>datalist_src=%bvar.datalist_src;</td>
-  <td>
-    Liste des sources sur le formulaire individu et famille :
-    <ul>
-      <li>datalist_src= : ne fait rien</li>
-      <li>datalist_src=1 : charge toute la liste en une fois</li>
-      <li>datalist_src=2 : charge une petite liste après la saisie de 3 caractères</li>
+      <li>datalist_fn : prénoms</li>
+      <li>datalist_sn : patronymes</li>
+      <li>datalist_place : lieux</li>
+      <li>datalist_src : sources</li>
+      <li>datalist_occu : professions</li>
     </ul>
   </td>
 </tr>
 <tr>
   <td>event_age=%bvar.event_age;</td>
   <td>
-    Sur la page d'une personne, affiche l'âge des parents à la naissance et 
-    l'âge de la personne pour chaque événement.
+    Sur la page d’une personne, affiche l’âge des parents à la naissance et 
+    l’âge de la personne pour chaque événement.
   </td>
 </tr>
 <tr>
@@ -164,8 +151,25 @@
     </ul>
   </td>
 </tr>
+<tr>
+  <td>show_flag=%bvar.show_flag;</td>
+  <td>
+    <ul>
+      <li>show_flag=yes : affiche les drapeaux dans le menu de choix de la langue.</li>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td>static_path=%bvar.static_path;</td>
+  <td>
+    En mode CGI :
+    <ul>
+      <li>static_path=…/ : chemin statique des fichiers CSS et js</li>
+    </ul>
+  </td>
+</tr>
 </table>
 %base_trailer;
-%copyright;
+%include.copyr;
 </body>
 </html>

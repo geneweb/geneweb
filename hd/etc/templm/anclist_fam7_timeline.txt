@@ -356,7 +356,7 @@
             %end;
            %end;
            %incr_count;
-           i%count;=%index;;t%count;=*;">[*tree] &darr;&uarr;&darr;&uarr;</a>
+           i%count;=%index;;t%count;=*;">[*tree] 7 [family/families]1</a>
         </span>
       </div>
     %end;

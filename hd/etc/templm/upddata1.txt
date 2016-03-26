@@ -3,7 +3,7 @@
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: upddata1.txt,v 7.00 2015/04/03 11:35:14 mr Exp $ -->
+  <!-- $Id: upddata1.txt,v 7.00 2016/01/31 00:01:16 mr Exp $ -->
   <title>%title;</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
@@ -19,14 +19,18 @@
    var x1 = document.getElementById('nx_a');
    var x2 = "%prefix;m=MOD_DATA_OK;data=%evar.data;;s=%encode.evar.s;;"
    var x3 = x1.title;
-   var x4 = "nx_input="
+   var x4 = "nx_input=";
    var x5 = document.getElementById('nx_input').value;
-   var x6 = document.getElementById('nx_span');
-   parent.ifr.location.href = x2 + x3 + x4 + x5;
+   var x60 = "%if;(evar.data = "sn")surname_aliases%elseif;(evar.data = "fn")first_name_aliases%end;"
+   var x61 = (x60 == "") ? "": document.getElementById(x60).checked;
+   var x62 = (x61 == true) ? "=yes;": "=;";
+   var x63 = ";" + x60 + x62;
+   var x7 = document.getElementById('nx_span');
+   parent.ifr.location.href = x2 + x3 + x4 + x5 + x63;
    x1.firstChild.nodeValue = x5;
    x1.setAttribute("style","color:#C0C0C0;font-style:italic;","false");
    x1.focus();
-   x6.setAttribute("style","visibility:hidden","false");
+   x7.setAttribute("style","visibility:hidden","false");
    return false;
   }
   function lhr()
@@ -47,7 +51,12 @@
       document.getElementById('nx_span').outerHTML = "";
       var x4 = x2.firstChild.nodeValue;
       var x5 = "<span id=\"nx_span\" class=\"button\">"
-                +"<input type=\"text\" id=\"nx_input\" name=\"nx_input\" size=\"80\" maxlength=\"%maxl;\" \/>"
+                +"<input type=\"text\" id=\"nx_input\" name=\"nx_input\" size=\"%if;(evar.data="sn" or evar.data="fn")50%else;80%end;\" maxlength=\"%maxl;\" \/>"
+                %if;(evar.data = "sn")
+                  +"<input type=\"checkbox\" id=\"surname_aliases\" name=\"surname_aliases\" value=\"yes\">[*add the previous name as a surname alias] <\/input>"
+                %elseif;(evar.data = "fn")
+                  +"<input type=\"checkbox\" id=\"first_name_aliases\" name=\"first_name_aliases\" value=\"yes\">[*add the previous first name as a first name alias] <\/input>"
+                %end;
                 +"<input type=\"submit\" value=\"ok\"\/>"
                 %if;(bvar.hide_advanced_request != "yes" and evar.data = "occu")
                   +"<a href=\"javascript:lhr()\"> [*advanced request] <\/a>"
@@ -128,12 +137,7 @@
 <div id="nx_a" style="display:none">a</div>
 
 <h1>%title;</h1>
-%if;not cancel_links;
-  %if;(evar.s != "")<p><a href="%prefix;m=MOD_DATA;data=%evar.data;">^^</a></p>%end;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
+%if;(not cancel_links and evar.s != "")<p><a href="%prefix;m=MOD_DATA;data=%evar.data;">^^</a></p>%end;
 
 <iframe name="ifr" style="position:fixed;bottom:0px;right:0px;width:400px;height:120px;background-color:#AAA;">
 <p>The browser does not like IFRAME !</p>
@@ -145,7 +149,7 @@
   %apply;print_long()
 %end;
 %base_trailer;
-%copyright;
+%include.copyr;
 
 </body>
 </html>

@@ -1,14 +1,19 @@
-%if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
+﻿%if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = "CT"))%doctype_transitional;%else;%doctype;%end;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: anctree.txt,v 7.00 2015/03/16 10:31:40 mr Exp $ -->
-  %let;l_v0;%if;(evar.v > evar.maxv)%evar.maxv;%else;%evar.v;%end;%in;
+  <!-- $Id: anctree.txt,v 7.00 2015/12/10 21:34:32 mr Exp $ -->
+  %let;l_v0;%if;(evar.maxv!="" and evar.v > evar.maxv)%evar.maxv;%else;%evar.v;%end;%in;
   %let;l_v;%if;(bvar.max_anc_tree = "" or evar.t != "T")%l_v0;%elseif;(bvar.max_anc_tree > l_v0)%l_v0;%else;%bvar.max_anc_tree;%end;%in;
   <title>%nn;
-    %if;(evar.t = "A")[*male line/female line]0%nn;
-    %elseif;(evar.t = "C")[*male line/female line]1%nn;
-    %else[*tree]%end;
-    %if;(evar.t = "A" or evar.t = "C"):%sp;
+    %if;(evar.t = "A" or evar.t1 = "A")[*male line/female line]0%nn;
+    %elseif;(evar.t = "C" or evar.t1 = "C")[*male line/female line]1%nn;
+    %elseif;(evar.t1 = "ht" or evar.t1 = "h")[*htree]
+    %elseif;(evar.t1 = "it" or evar.t1 = "i") [*itree]
+    %elseif;(evar.m = "A") [*ascendants tree]
+    %elseif;(evar.m = "D") [*descendants tree]
+    %elseif;(evar.t1 = "m")mix 9 g
+    %end;
+    %if;(evar.t != "")[:]%sp;
       %if;(public_name != "")%public_name;%else;%first_name;%end;
       %if;(qualifier != "") %qualifier;%end; %surname;
     %end;
@@ -23,8 +28,7 @@
 </head>
 
 %define;symbol(xx)
-  <span %if;(xx.has_sosa)class="color_sosa"%end;
-  >        %if;(xx.has_siblings)&diams;%elseif;(xx.has_parents)&loz;%else;|%end;        </span>
+  <span %if;(xx.has_sosa)class="color_sosa"%end;>│</span>
 %end;
 
 %define;a_tree_line()
@@ -35,7 +39,7 @@
         <td colspan="1" align="center"><tt>&nbsp;</tt></td>
       %end;
       <td colspan="%cell.colspan;" align="center">%nn;
-        %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;|%end;
+        %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;│%end;
       </td>
     %end;
     </tr>
@@ -93,7 +97,7 @@
       %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
       %elseif;(evar.cgl = "on")%apply;symbol("cell.person")%nn;
       %else;
-        <a style="text-decoration:none;" title="[tree]" href="%prefix_no_iz;%cell.person.access;;%nn;
+        <a style="text-decoration:none;" title="[*navigation]" href="%prefix_no_iz;%cell.person.access;;%nn;
         %foreach;env_binding;
           %if;(env.key = "" or env.key = "p" or env.key = "n" or env.key = "oc" or env.key = "i" or env.key = "templ")
           %else;%env.key;=%env.val.decoded;;%nn;
@@ -108,17 +112,17 @@
       %if;(not is_first)
         <td colspan="1" align="center">%nn;
         %if;(cell.is_right)<hr class="full"%/>%nn;
-        %else;<tt>&nbsp;</tt>%end;
+        %end;
         </td>
       %end;
       <td colspan="%cell.colspan;" align="%nn;
          %if;cell.is_left;%right;
          %elseif;cell.is_right;%left;
          %else;center%end;">%nn;
-      %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+      %if;cell.is_empty;%nn;
       %elseif;cell.is_left;<hr class="%right;"%/>%nn;
       %elseif;cell.is_right;<hr class="%left;"%/>%nn;
-      %else;|%end;
+      %end;
       </td>
     %end;
     </tr>
@@ -128,16 +132,24 @@
 %define;male_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", nn - 1)%end;
-    <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>|<br%/>%end;
+    %if;(evar.cgl="on")%xx;
+    %else;
+    <a href="%prefix;%xx.access">%xx;</a>
+    %end;
+    %xx.title;%xx.dates;
+    %if;("xx" != "self")<br%/>│<br%/>%end;
   %end;%nl;
 %end;
 
 %define;female_line(xx, nn)
   %if;(nn > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", nn - 1)%end;
-    <a href="%prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;("xx" != "self")<br%/>|<br%/>%end;
+    %if;(evar.cgl="on")%xx;
+    %else;
+    <a href="%prefix;%xx.access">%xx;</a>
+    %end;
+    %xx.title;%xx.dates;
+    %if;("xx" != "self")<br%/>│<br%/>%end;
   %end;%nl;
 %end;
 
@@ -149,106 +161,79 @@
   </table>
 %end;
 
-%define;tools()
-  %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
-  <hr %/>
-  <form id="tools" name="tools" method="get" action="%action;">
-    <fieldset>
-      <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>
-      %hidden;
-      <input type="hidden" name="m" value="A"%/>
-      %if;(evar.p != "" or evar.n != "" or evar.oc != "")
-        <input type="hidden" name="p" value="%evar.p;"%/>
-        <input type="hidden" name="n" value="%evar.n;"%/>
-        <input type="hidden" name="oc" value="%evar.oc;"%/>
-      %end;
-      %if;(evar.i != "")
-        <input type="hidden" name="i" value="%evar.i;"%/>
-      %end;
-      <p>
-        %let;l_emaxv;%if;(evar.t != "T")%evar.maxv;%elseif;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;%in;
-        <input type="hidden" name="maxv" value="%evar.maxv;"%/>
-        <label>[*generation/generations]0 <code>(X)</code> <input id="v" name="v" class="number" size="1" value="%l_v;"
-          autocomplete="off" autocomplete="off" title="[generation/generations]0 (X)" accesskey="X" %/> / %l_emaxv;</label>
-      </p>
-      %if;(evar.t = "T")
-      <p>
-        &bull; <a href="%prefix;m=A;t=T;v=%l_v;;%access;;dag=on;notab=on" accesskey="/" 
-           title="[display by slices/slice width/overlap/total width]0 (/)"
-           >[*display by slices/slice width/overlap/total width]0</a>
-      </p>
-      %end;
-      <p>
-        <label><input type="checkbox" name="cgl" value="on" %l_on;
-               %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
-        %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-          <label><input type="checkbox" name="image" value="on" %l_on;
-                 %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
-        %end;
-      </p>
-      <fieldset>
-        <legend>
-          <label><input type="radio" name="t" value="T" %l_on;
-                 %if;(evar.t = "T") checked="checked"%end;%/>[*tree]</label>
-        </legend>
-        <label><input type="radio" name="t" value="A" %l_on;
-               %if;(evar.t = "A") checked="checked"%end;%/>[male line/female line]0</label>
-        <label><input type="radio" name="t" value="C" %l_on;
-               %if;(evar.t = "C") checked="checked"%end;%/>[male line/female line]1</label>
-        <label><input type="checkbox" name="marriage" value="on" %l_on;
-               %if;(evar.marriage = "on") checked="checked"%end;%/>[marriage/marriages]0</label>
-        <label><input type="checkbox" name="dag" value="on" %l_on;
-               %if;(evar.dag = "on") checked="checked"%end;%/>dag=on</label>
-        <label>[border]<input name="bd" size="1" maxlength="2" style="width:1em;" value="%evar.bd;" %/></label>
-        <table summary="colors" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="%left;">[color] </td>
-            <td align="%left;">
-              <input type="radio" name="color" value=""
-                %if;(evar.color="") checked="checked"%end;%/></td>
-            %for;i;1;7;
-              %let;bgi;bg%i;%in;
-              <td class="%bgi;"><input type="radio" name="color" value="%bgi;" %l_on;
-                                %if;(evar.color=bgi) checked="checked"%end;%/></td>
-            %end;
-          </tr>
-        </table>
-      </fieldset>
-    </fieldset>
-  </form>
+%define;togen1(xx) %( togen1/togen/tothegen needed for HT %)
+  %if;(xx = 1)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[*to the parents]%nn;
+  %elseif;(xx = 3)[*to the grandparents]%nn;
+  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+%define;togen()
+  <p>
+    %if;(evar.only != "on")
+      %apply;togen1(l_v)
+    %else;
+      [*generation/generations]0 %l_v;
+    %end;
+  </p>
+%end;
+%define;tothegen(xx)
+  [*to the %s generation:::xx]%nn;
 %end;
 
 <body%body_prop; id="anctree">
 %message_to_wizard;
 
 %if;not cancel_links;
-  %if;(evar.t = "T")
+  %if;(evar.t = "T" and evar.t1 != "HT")
     <div class="menu">
-      <span>
+      %if;has_children;
+        <span>
         <a title="[tree] (Y)" accesskey="Y" href="%prefix_no_iz;%nn;
           %foreach;env_binding;
             %if;(env.key = "m")m=D;%nn;
             %elseif;(env.key = "templ")
             %else;%env.key;=%env.val.decoded;;%nn;
             %end;
-          %end;">[*tree] &darr;&darr;&darr;</a>
+          %end;">[*descendants tree]</a>
+        </span>
+      %end;
+      <span>
+        <a href="%prefix;m=A;t=H;v=%evar.v;;maxv=%max_anc_level;;i=%index;">[*horizontal tree]</a>%nn;
+      <span>
+        <a href="%prefix;%access;;m=A;t=F;fam7=on;tf1=fam73;v=%if;(evar.v=3 or evar.v=4)%evar.v;%else;3%end;;maxv=4">[*family time line]</a>%nn;
       </span>
     </div>
   %end;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
 %end;
 
-%if;(evar.t = "T")
-  %apply;tree(l_v)
-%elseif;(evar.t = "A")
-  <div style="text-align: center">%apply;male_line("self",l_v0)</div>
-%elseif;(evar.t = "C")
-  <div style="text-align: center">%apply;female_line("self",l_v0)</div>
+%define;show_templ(z1)
+  %include.anctree_z1;
 %end;
-  %if;not cancel_links;%apply;tools()%end;
+
+%if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = ""))
+  %apply;tree(l_v)
+%elseif;(evar.t = "A" or evar.t1 = "A")
+  <div style="text-align: center">%apply;male_line("self",l_v0)</div>
+%elseif;(evar.t = "C" or evar.t1 = "C")
+  <div style="text-align: center">%apply;female_line("self",l_v0)</div>
+%elseif;(evar.t1= "CT")
+  %include.anctree_hi;
+%elseif;(evar.t1 = "HT")
+  %include.anclist_hrztl;
+%elseif;(evar.t1 != "")
+  %apply;show_templ(evar.t1)
+%end;
+
+%if;not cancel_links;
+  %import;tools;
+  %apply;tools_anctree()
   %base_trailer;
-  %copyright;
+  %include.copyr;
+%end;
 </body>
 </html>

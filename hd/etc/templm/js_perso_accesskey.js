@@ -23,7 +23,6 @@
       var snd_image = (document.getElementById("snd_image")) ? document.getElementById("snd_image") : thi;
       var spo = (document.getElementById(xspo)) ? document.getElementById(xspo) : thi;
       var NGn = (document.getElementById("NGn")) ? document.getElementById("NGn") : thi;
-      var upd = (document.getElementById("upd")) ? document.getElementById("upd") : thi;
       if(document.getElementById(xsib))
         {var sib = document.getElementById(xsib);}
       else
@@ -83,7 +82,6 @@
         case "I": snd_image.click(); break;
         case "R": rela_comp.click(); break;
         case "S": nav_sosa_ref.click(); break;
-        case "U": upd.click(); break;
         case "X": maxlev.select(); break;
         case "Y": anc_tree.click(); break;
         //shift = off
@@ -110,7 +108,6 @@
         case "i": snd_image.click(); break;
         case "r": rela_comp.click(); break;
         case "s": nav_sosa_ref.click(); break;
-        case "u": upd.click(); break;
         case "x": maxlev.select(); break;
         case "y": anc_tree.click(); break;
         default: return true; break;

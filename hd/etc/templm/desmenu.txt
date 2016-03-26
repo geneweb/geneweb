@@ -42,12 +42,6 @@
   %end;
 </h1>
 
-%if;not cancel_links;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
-
 %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.desmenu.submit();"%in;
 <form name="desmenu" method="get" action="%action;">
   <p>
@@ -227,6 +221,6 @@
   </fieldset>
 </form>
   %base_trailer;
-  %copyright;
+  %include.copyr;
 </body>
 </html>

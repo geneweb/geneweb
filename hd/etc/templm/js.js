@@ -41,7 +41,9 @@
       switch (string)
       {
         case "*" : x.value = x.value * 2; return false; break;
-        case "/" : x.value = parseInt(x.value / 2); return false; break;
+        case "/" : if (x.value != '1') {x.value = parseInt(x.value / 2)}; return false; break;
+        case "+" : x.value = x.value * 2 + 1; return false; break;
+        case "-" : x.value = parseInt(x.value / 2) + 1; return false; break;
       }
     }
   }

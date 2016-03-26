@@ -46,12 +46,6 @@
 <body%body_prop; id="upd" %if;(evar.focus != "")onload="javascript:document.getElementById('%evar.focus;').focus();%ol1;"%end;>
 %message_to_wizard;
 
-%if;not cancel_links;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
-
 %if;(evar.birth1_yyyy != "" or evar.death2_yyyy != "")
   <p class="button">
   %let;text;
@@ -118,6 +112,6 @@
   </fieldset>
 </form>
 %base_trailer;
-%copyright;
+%include.copyr;
 </body>
 </html>

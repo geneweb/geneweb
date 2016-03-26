@@ -38,7 +38,7 @@
     %if;(not cancel_links)
       <tt>ss2%l1;<a href="%if;(xx.has_parents)%l_url;%else;%l_url1;%end;i=%xx.index;">%l2;</a></tt>%nn;
       %if;(xx.has_parents and curlev > 1)
-        %if;(evar.marriage = "on")
+        %if;(evar.marriage2 = "on")
           %foreach;xx.father.family;
             %if;(spouse.index = xx.mother.index and marriage_date.year != "")
               &amp;<small>%marriage_date.prec;%marriage_date.year;</small> -%nn;
@@ -50,7 +50,7 @@
     %else;
       <tt>ss2%l1;%l2;</tt>%nn;
       %if;(xx.has_parents and curlev > 1)
-        %if;(evar.marriage = "on")
+        %if;(evar.marriage2 = "on")
           %foreach;xx.father.family;
             %if;(spouse.index = xx.mother.index and marriage_date.year != "")
               &amp;<small>%marriage_date.prec;%marriage_date.year;</small> -%nn;
@@ -283,13 +283,17 @@
 %( main %)
 %let;l_sosa;%if;(evar.sosa = "on")1%else;0%end;%in;
 %let;l_has_sosa;%has_sosa;%in;
-%let;l_url;%prefix;m=A;t=H;v=%l_v;;maxv=%evar.maxv;;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
-%let;l_url1;%prefix;m=D;t=L;tl1=hrztl;v=%evar.v;;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
+%let;l_url;%prefix;m=A;t=%evar.t;;%if;(evar.t="H")tl1=hrztl;%elseif;(evar.t="T")t1=HT;%end;v=%l_v;;maxv=%evar.maxv;;marriage2=%evar.marriage2;;sosa=%evar.sosa;;xy=%evar.xy;;siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
+%let;l_url1;%prefix;m=D;t=L;tl1=hrztl;v=%evar.v;;marriage2=%evar.marriage2;;sosa=%evar.sosa;;xy=%evar.xy;;siblings=%evar.siblings;;timeline=%evar.timeline;;gen=%evar.gen;;%in;
 %if;(not cancel_links and has_children)
   <div class="menu">
     <span>
-      <a href="%l_url1;i=%index;" title="(Y)" accesskey="Y">[*descendants]0</a>
+      <a href="%l_url1;i=%index;" title="(Y)" accesskey="Y">[*descendant tree view]0</a>
     </span>
+    <span>
+    <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;" %laY;>[*ascendants tree]</a>%nn;
+    </span>
+    
   </div>
 %end;
 %apply;togen()

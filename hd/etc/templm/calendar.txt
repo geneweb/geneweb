@@ -14,12 +14,6 @@
 <body%body_prop;>
 %message_to_wizard;
 
-%if;not cancel_links;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
-
 <h1>[*calendar/calendars]1</h1>
 
 %define;french_day(xx)
@@ -302,6 +296,6 @@
 </tr>
 </table>
 %base_trailer;
-%copyright;
+%include.copyr;
 </body>
 </html>

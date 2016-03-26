@@ -1,14 +1,11 @@
-<!-- $Id: accent.txt,v 7.00 2015/01/13 15:52:31 mr Exp $ -->
+<!-- $Id: accent.txt,v 7.00 2016/02/04 21:32:06 mr Exp $ -->
 %( How to : Copy this file to bases/etc/ %)
-
-<script type="text/javascript"><!--
-
+<script ><!--
 document.getElementsByName("notes")[0].onkeypress = 
   function(o){o=o||event;if(o.shiftKey && o.keyCode == 13)return insertTags('<br/>\n','','');}
-
 --></script>
-<div style="text-align:%left;">
-<input type="submit" value="Ok"></input>
+<div style="text-align:left">
+<input type="submit" value="Ok"/>
 <p style="font-size: 120%%;margin:5px;">
   <a onclick="return insertTags('Á','','')" href="javascript:;">Á</a>
   <a onclick="return insertTags('á','','')" href="javascript:;">á</a>
@@ -157,7 +154,7 @@ document.getElementsByName("notes")[0].onkeypress =
       <a onclick="return insertTags('<br/>\n','','')"
          href="javascript:;" title="= shift + enter">&lt;br/&gt;</a>
       <a onclick="return insertTags('\n<hr/>\n','','')" href="javascript:;">&lt;hr/&gt;
-        ( <tt style="text-decoration:line-through;">            </tt> )</a>
+        (————————)</a>
       <a onclick="return insertTags('','<table border>\n<tr>\n<th>A1</th>\n<th>B1</th>\n</tr><tr>\n<td>A2</td>\n<td>B2</td>\n</tr><tr>\n<td>A3</td>\n<td>B3</td>\n</tr>\n</table>','')" href="javascript:;">&lt;table&gt;</a>
       <a onclick="return insertTags('&lt;img alt=&quot;?&quot; src=&quot;%%sm=IM;s=xxx.jpg&quot;%/&gt;','','')"
          href="javascript:;"><small>&lt;img alt="?" src="%%sm=IM;s=xxx.jpg"/&gt;</small></a>

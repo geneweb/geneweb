@@ -1,51 +1,42 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-  <!-- $Id: updind.txt,v 7.00 2015/03/27 12:09:38 mr Exp $ -->
-  <title>%nn;
-    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
-      [*merge::person/persons]1 # %index;
-    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
-      [*modify::person/persons]0 # %index;
-    %else;[*add::person/persons]0%end;
-  </title>
-  <meta name="robots" content="none"%/>
-  <meta name="format-detection" content="telephone=no"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  %include.css;
-  %import;js_upd
-  %base_header;
-  %define;load_focus()
-    onload="oL1(); %nn;
-    %if;(evar_m = "MOD_IND")
-      %if;(not is_male and not is_female)
-        sIV('sex1')%nn;
-      %elseif;(birth.prec != "sure")
-        sIV('lpc2')%nn;
-      %elseif;(birth.year < "1900" and death.prec != "sure")
-        sIV('lpc3')%nn;
-      %else;
-        sIV('notes')%nn;
-      %end;
-    %end;
-    "%nn;
-  %end;
-</head>
-<body%body_prop; id="upd" %apply;load_focus()>
-%message_to_wizard;
-
-%(<!-- Begin define  -->%)
-
+<!-- $Id: updind.txt,v 7.00 2016/03/21 15:22:41 a2 mr Exp$ -->
+<title>%nn;
+  %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
+    [*merge::person/persons]1 # %index;
+  %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
+    [*modify::person/persons]0 # %index;
+  %else;[*add::person/persons]0%end;
+</title>
+<meta name="robots" content="none"/>
+<meta charset=%charset;>
+<link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"/>
+%include.css;
+%import;js_upd
 %import;updind_updfam
-
+%base_header;
+%(<!-- Begin define -->%)
 %let;l_r_father; placeholder="M" %in;
 %let;l_r_mother; placeholder="F" %in;
-
+%define;load_focus()
+  onload="oL1(); %nn;
+  %if;(evar_m = "MOD_IND")
+    %if;(not is_male and not is_female)
+      sIV('sex1')%nn;
+    %elseif;(birth.prec != "sure")
+      sIV('lpc2')%nn;
+    %elseif;(birth.year < "1900" and death.prec != "sure")
+      sIV('lpc3')%nn;
+    %else;
+      sIV('notes')%nn;
+    %end;
+  %end;
+  "%nn;
+%end;
 %define;one_title(z1)
   <tr id="tz1">
-    <td class="bg7"><input id="tz1_occ" name="tz1_occ" class="t_occ" maxlength="1" placeholder="&bull;" onkeypress="javascript:return oKP2(event,'t',z1,'_occ')" onblur="this.value='';"%/></td>
+    <td class="bg7"><input id="tz1_occ" name="tz1_occ" class="t_occ" maxlength="1" placeholder="&bull;" onkeypress="javascript:return oKP2(event,'t',z1,'_occ','')" onblur="this.value='';"%/></td>
     <td><input id="t_identz1" name="t_identz1" size="30" value="%title.t_ident;"%/></td>
     <td><input id="t_placez1" name="t_placez1" size="30" value="%title.t_estate;" %/></td>
     <td><input id="t_namez1" name="t_namez1" size="30" value="%title.t_name;" %/></td>
@@ -54,7 +45,6 @@
         <span class="dmyt">%apply;date("t_date_endz1","title_date_end","","")</span></td>
   </tr>
 %end;
-
 %define;relations(z1)
   <tr id="rz1">
     %apply;one_relation("z1","fath","r_father","0")
@@ -64,7 +54,6 @@
     %apply;one_relation("z1","moth","r_mother","1")
   </tr>
 %end;
-
 %define;relation_type(z1)
   <select id="rz1_type" name="rz1_type">
     <option value="GodParent"%if;relation.rt_godparent;%sp;selected="selected"%end;>
@@ -79,22 +68,23 @@
       %sp;[*foster father/foster mother/foster parents]2</option>
   </select>
 %end;
-
 %define;one_relation(z1,z2,z3,z4)
     %let;l1;rz1_z2%in;
     <td>
         <input type="hidden" id="%l1;_p" name="%l1;_p" value="%if;(relation.z3.create)create%else;link%end;"%/>
         <input id="%l1;_occ" name="%l1;_occ" class="occz4" autocomplete="off" %l_z3; size="3" maxlength="8"
         value="%if;(relation.z3.link and relation.z3.occ = "")0%else;%relation.z3.occ;%end;"
-        onkeypress="javascript:return oKP2(event,'r',z1,'_fath_occ')"
+        onkeypress="javascript:return oKP2(event,'r',z1,'_fath_occ','')"
         onblur="oB3('%l1;')"%/></td>
-    <td><input id="%l1;_fn" name="%l1;_fn" class="ar fn" size="30" maxlength="200" value="%relation.z3.first_name;" %l_on3;%/></td>
+    <td><input id="%l1;_fn" name="%l1;_fn" class="ar fn" size="30" maxlength="200" value="%relation.z3.first_name;" %l_on3; %l_on8;%/></td>
     <td><input id="%l1;_sn" name="%l1;_sn" class="sn" size="30" maxlength="200" value="%relation.z3.surname;"
-         %apply;onjq1(l1,z4)%/></dt><td><span id="%l1;_jq1"> </span></td>
+         %apply;onjq1(l1,z4) %l_on7;%/></td>
+    <td style="width:auto"><span id="%l1;_jq1"></span></td>
 %end;
-
-%(<!-- End define  -->%)
-
+%(<!-- End define -->%)
+</head>
+<body%body_prop; id="upd" %apply;load_focus()>
+%message_to_wizard;
 <form name="upd" method="post" action="%action;">
 <div id="jq" style="display:none"> </div>
 <p style="display:none;">
@@ -142,7 +132,7 @@
   <input name="death" value=""%/> 
  %( marche pas :
     "NotDead"
-    "DontKnowIfDead
+    "DontKnowIfDead"
     "Death"
     "DeadYoung"
     "OfCourseDead"
@@ -165,17 +155,15 @@
     %else;
       [*add::person/persons]0
     %end;
-    &nbsp;&nbsp;<input type="submit" value="OK" %/></h1>
+    &nbsp;&nbsp;<input type="submit" value="Ok"/>
+    <span style="float:right"><label><input id="sex1" name="sex1" class="occ%l_s1;" %lt3; size="2" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
+    <label><input name="occ" style="text-align:center;" title="[*number] oc" autocomplete="off" size="2" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label></span>
   </legend>
-  <div>
-    <label><abbr %lt3;>[sex]</abbr><input id="sex1" name="sex1" class="occ%l_s1;" size="2" maxlength="8" autocomplete="off" placeholder="%l_s2;" onkeypress="javascript:return oKP1(event)" onblur="oB1()"%/></label>
-    <label>[number]0<input name="occ" style="text-align:center" autocomplete="off" size="2" maxlength="8" value="%if(occ="")0%else;%occ;%end;" id="occ"%/></label>
+  <div class="w1">
+    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3; %l_on8;%/></label>
+    <label>[surname/surnames]0<input id="surname" name="surname" size="30" maxlength="200" value="%surname;" %l_on2; %l_on7;%/></label>
   </div>
   <div class="w1">
-    %lpc1; <label %lpa1;>[first name/first names]0<input id="first_name" name="first_name" size="30" maxlength="200" value="%first_name;" %l_on3;%/></label>
-    <label>[surname/surnames]0<input id="surname" name="surname" size="30" maxlength="200" value="%surname;" %l_on2;%/></label>
-  </div>
-  <div class="w1">  
     <label>[public name]<input name="public_name" size="30" value="%public_name;" id="public_name" %/></label>
   </div>
   <div class="w2">
@@ -200,28 +188,38 @@
     %if;has_first_names_aliases;
       %foreach;first_name_alias;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[first name alias]0 %cnt1;<input id="first_name_alias%cnt;" name="first_name_alias%cnt;" size="30" value="%first_name_alias;"%/></label><a href="javascript:addItem('first_name_alias',%cnt1;,'[first name alias]0')"> + </a>
+        <label>[first name alias]0 %cnt1;<input id="first_name_alias%cnt;" name="first_name_alias%cnt;" size="30" value="%first_name_alias;" %l_on8;%/></label><a href="javascript:addItem('first_name_alias',%cnt1;,'[first name alias]0')"> + </a>
       %end;
     %else;
-      <label>[first name alias]0 1<input id="first_name_alias0" name="first_name_alias0" size="30" value=""%/></label><a href="javascript:addItem('first_name_alias',1,'[first name alias]0')"> + </a>
+      <label>[first name alias]0 1<input id="first_name_alias0" name="first_name_alias0" size="30" value="" %l_on8;%/></label><a href="javascript:addItem('first_name_alias',1,'[first name alias]0')"> + </a>
     %end;
     <span id="new_first_name_alias"></span>
     %if;has_surnames_aliases;
       %foreach;surname_alias;
         %let;cnt1;%expr(cnt+1)%in;
-        <label>[surname alias]0 %cnt1;<input id="surname_alias%cnt;" name="surname_alias%cnt;" size="30" value="%surname_alias;"%/></label><a href="javascript:addItem('surname_alias',%cnt1;,'[surname alias]0')"> + </a>
+        <label>[surname alias]0 %cnt1;<input id="surname_alias%cnt;" name="surname_alias%cnt;" size="30" value="%surname_alias;" %l_on7;%/></label><a href="javascript:addItem('surname_alias',%cnt1;,'[surname alias]0')"> + </a>
       %end;
     %else;
-      <label>[surname alias]0 1<input id="surname_alias0" name="surname_alias0" size="30" value=""%/></label><a href="javascript:addItem('surname_alias',1,'[surname alias]0')"> + </a>
+      <label>[surname alias]0 1<input id="surname_alias0" name="surname_alias0" size="30" value="" %l_on7;%/></label><a href="javascript:addItem('surname_alias',1,'[surname alias]0')"> + </a>
     %end;
     <span id="new_surname_alias"></span>
   </div>
   <div class="w1">
-    <label>%lpcP; [occupation/occupations]0<input name="occu" size="36" maxlength="200" value="%occupation;" id="occu" %lpaP; %l_on4;%/></label>
+    %if;(occupation="")
+    <label>%lpcP; [occupation/occupations]0<input name="occu" rows="1" maxlength="300" id="occu" %lpaP; %l_on4; %l_on1;/></label>
+    %else;
+    <label>%lpcP; [occupation/occupations]0<textarea name="occu" rows="1" maxlength="300" id="occu" %lpaP; %l_on1s;>%occupation;</textarea></label>
+    %end;
   </div>
   <div class="w1">
-    <label>[source/sources]0 [person/persons]0<input name="src" size="36" maxlength="300" value="%sources;" id="src" %l_on6;%/></label>
-    <label>[image/images]0<input name="image" size="36" value="%image;" %/></label>
+    <label>[source/sources]0 [person/persons]0
+    %if;(sources="")
+      <input name="src" maxlength="800" id="src" %l_on6; %l_on1s; value="%sources;"/>
+    %else;
+      <textarea name="src" rows="1" maxlength="800" id="src" %l_on1s;>%sources;</textarea>
+    %end;
+    </label>
+    <label>[image/images]0<input name="image" size="36" value="%image;"/></label>
   </div>
   <div>
     [access]0
@@ -231,54 +229,45 @@
   </div>
 </fieldset>
 <fieldset id="notes1">
-  <legend>%lpc5; <label style="font-size:inherit;" for="notes" %lpa5;>[*note/notes]1</label></legend>
+  <legend><label style="font-size:inherit;" for="notes" %lpa5;>[*note/notes]1 </label></legend>
   <textarea name="notes" id="notes">%notes;%sq;</textarea>
-  <fieldset id="accent2">
-    <legend>
-      <a style="display:none;" id="accent0" href="javascript:accent0()"> - </a>
-      <a id="accent1" href="javascript:accent1()">…</a>
-    </legend>
-    <div id="accent" style="display:none;">%include.accent;</div>
-  </fieldset>
+    <div id="accent2">
+      <a style="display:none" id="accent0" href="javascript:accent0()" title="[visualize/show/hide/summary]2 [tools]"> – </a>
+      <a id="accent1" href="javascript:accent1()" title="[full width/columns]0"> … </a>
+    </div>
+    <div id="accent" style="display:none">%include.accent;</div>
 </fieldset>
 <fieldset class="event">
-  <legend>%lpc4; [*event/events]1</legend>
-    <dl>
-      %if;(not has_pevent_birth)%apply;one_event(next_pevent,"#birt","witness")%incr_next_pevent;%end;
-      %if;has_pevents;%foreach;pevent;%apply;one_event(cnt,"","witness")%end;%end;
-      %if;(not has_pevent_death)%apply;one_event(next_pevent,"-","witness")%incr_next_pevent;%end;
-      <dt id="new_event"></dt>
-      <dt><a href="javascript:addEvent()" %lpa4;> + [event/events]0</a></dt>
-      %incr_next_pevent;
-    </dl>
-    <dl>
-      <dt><abbr title="(+) [*death]">[*event/events]0</abbr> %lt2; [place]</dt>
-        <dd>[note/notes]0</dd>
-        <dd><em>[source/sources]0</em></dd>
-        <dd>[witness/witnesses]0[:] %lt1; [first name/first names]0 [surname/surnames]0</dd>
-    </dl>
+  <legend style="display:inline-block">[*event/events]1 <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %lpaO; title="[*invert::event/events]1 (Alt+%lpcOk;)">⇳</a></legend>
+    %if;(not has_pevent_birth)%apply;one_event(next_pevent,"#birt","witness")%incr_next_pevent;%end;
+    %if;has_pevents;%foreach;pevent;%apply;one_event(cnt,"","witness")%end;%end;
+    %if;(not has_pevent_death)%apply;one_event(next_pevent,"","witness")%incr_next_pevent;%end;
+    <dl id="new_event"></dl>
+    <dl><dt><a href="javascript:addEvent(1,1)" title="(+) [*death]" %lpa4;> + [event/events]0</a> %lpc4; <abbr %lt5;>#</abbr> %lt2; [place] [note/notes]1 [source/sources]1</dt></dl>
+    %incr_next_pevent;
 </fieldset>
-<fieldset class="f2 t">
-  <legend>%lpc6; [*relation/relations]1</legend>
-  <table summary="relations" cellspacing=0 cellpadding=0>
+<fieldset class="f2">
+  <legend>[*relation/relations]1</legend>
+  <table>
     <tr>
       <td class="bg7"><abbr %lt4;>#</abbr></td>
       <td class="bg7">[first name/first names]0</td>
       <td class="bg7">[surname/surnames]0</td>
       <td class="bd0"><div style="display:none"><span id="rM">M</span><span id="rF">F</span></div></td>
+      <td style="display:none"></td>
     </tr>
     %if;has_relations;
       %foreach;relation;%apply;relations(cnt)%end;
     %else;
       %apply;relations("1")
     %end;
-    <tr id="new_relation"></tr>
-    <tr><td class="bg7"><a href="javascript:addRelation(1,1)" %lpa6;> + </a></td></tr>
+    <tr id="new_relation" style="display:none"><td colspan=5></td></tr>
+    <tr><td class="bg7"><a href="javascript:addRelation(1,1)" %lpa6;> + </a></td><td colspan=4 style="display:none"></td></tr>
   </table>
 </fieldset>
 <fieldset class="t">
-<legend>%lpc7; [*title/titles]1</legend>
-  <table summary="titles" cellspacing=0 cellpadding=0>
+<legend>[*title/titles]1</legend>
+  <table>
     <tr>
     <td class="bg7"><abbr %lt5;>#</abbr></td>
     <td class="bg7">[title/titles]0</td>
@@ -292,13 +281,14 @@
     %else;
       %apply;one_title("1")
     %end;
-    <tr id="new_title"></tr>
-    <tr><td class="bg7"><a href="javascript:addTitle(1,1)" %lpa7;> + </a></td></tr>
+    <tr id="new_title" style="display:none"><td colspan=6></td></tr>
+    <tr><td class="bg7"><a href="javascript:addTitle(1,1)" %lpa7;> + </a></td><td colspan=5 style="display:none"></td></tr>
   </table>
 </fieldset>
 </form>
-<div style="height:300px;clear:both;"> </div>
-  %base_trailer;
-  %copyright;
+%base_trailer;
+%include.copyr;
+<script src=%bvar.static_path;templm/autosize.min.js></script>
+<script>autosize(document.querySelectorAll('textarea'));</script>
 </body>
 </html>

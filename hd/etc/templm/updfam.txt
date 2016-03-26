@@ -1,7 +1,7 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-  <!-- $Id: updfam.txt,v 7.00 2015/04/20 22:05:31 mr Exp $ -->
+  <!-- $Id: updfam.txt,v 7.00 2016/03/21 22:16:53 a2 mr Exp $ -->
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0%nn;
@@ -13,40 +13,14 @@
       [*merge::family/families]1 - #%evar_i;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta name="format-detection" content="telephone=no"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none"/>
+  <meta charset="%charset;"/>
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"/>
   %include.css;
   %import;js_upd
   %base_header;
-  %define;load_focus()
-    onload="oL1();oL2();%nn;
-    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_PAR" or evar_m = "MOD_FAM")
-      jq1b('%evar.i;');%nn;
-      %if;(evar_m = "ADD_FAM" or evar_m = "ADD_PAR")
-        %if;(father.first_name = "")
-          sIV('pa1_fn')%nn;
-        %else;
-          sIV('pa2_fn')%nn;
-        %end;
-      %elseif;(marriage.prec != "sure")
-        sIV('lfc3')%nn;
-      %else;
-        addChild(1,1)%nn;
-      %end;
-    %end;
-    "%nn;
-  %end;
-</head>
-<body%body_prop; id="upd" %apply;load_focus()>
-%message_to_wizard;
-
+  %import;updind_updfam
 %( <!-- Begin define  --> %)
-
-%import;updind_updfam
-
 %let;lt1;<abbr title="%ak1;%ak2;%ak3;%ak7;">#</abbr>%in;
 %let;lt2;<abbr title="%lta;%ltb;%ltc;">[date/dates]0</abbr>%in;
 %let;lt3;
@@ -61,7 +35,26 @@
          [place]</abbr>
 %in;
 %let;lt4;title="%ak1;%ak2;%ak3;%ak7;%ak4;"%in;
-%let;lt5;<abbr title="%lta;%ltb;">[date/dates]0</abbr>%in;
+%let;lt5;<abbr title="%ak3;%ak7;">#</abbr>%in;
+%let;lt6;<abbr title="%lta;%ltb;">[date/dates]0</abbr>%in;
+%define;load_focus()
+  onload="oL1();oL2();%nn;
+  %if;(evar_m = "ADD_FAM" or evar_m = "ADD_PAR" or evar_m = "MOD_FAM")
+    jq1b('%evar.i;');%nn;
+    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_PAR")
+      %if;(father.first_name = "")
+        sIV('pa1_fn')%nn;
+      %else;
+        sIV('pa2_fn')%nn;
+      %end;
+    %elseif;(marriage.prec != "sure")
+      sIV('lfc3')%nn;
+    %else;
+      addChild(1,1)%nn;
+    %end;
+  %end;
+  "%nn;
+%end;
 %define;onjq1a(z1) onkeydown="if(event.keyCode == 13)tUC(this)" onblur="tUC(this);jq1a('z1')"%end;
 %define;onjq1a1(z1) onkeydown="if(event.keyCode == 13)tUC1(this)" onblur="tUC1(this);jq1a('z1')"%end;
 %define;accesskey(z1)
@@ -104,7 +97,7 @@
   %let;l2;%if;(xx.create="create")%if;(l="male")0%elseif;(l="female")1%else;2%end;%end;%in;
   <input type="hidden" id="z1z2_sex" name="z1z2_sex" value="%l1;"%/>
   <input type="hidden" id="z1z2_p" name="z1z2_p" value="%xx.create;"%/>
-  <input id="z1z2_occ" name="z1z2_occ" class="occ%l2;" placeholder="%l1;" autocomplete="off" size="5" maxlength="8" onkeypress="javascript:return oKP2(event,'z1','z2','_occ')" onblur="oB2('z1z2')"
+  <input id="z1z2_occ" name="z1z2_occ" class="occ%l2;" placeholder="%l1;" autocomplete="off" size="5" maxlength="8" onkeypress="javascript:return oKP2(event,'z1','z2','_occ','')" onblur="oB2('z1z2')"
    %if;(xx.create="create") value="" %elseif;(xx.occ = "") value="0" %else; value="%xx.occ;" %end;>
 %end;
 %define;one_parent(z1)
@@ -113,9 +106,9 @@
     <tr>
       <td>%apply;link_create1("pa","z1","0","parent")<div id="pa1_jq1"> </div></td>
       <td><input id="pa1_fn" name="pa1_fn" size="30" maxlength="200" placeholder="[first name/first names]0" value="%parent.first_name;" %lfa1;
-           %sp;onkeypress="javascript:return cF2(event,'pa',1,'_fn');" %l_on3;%/><br
+           %sp;onkeypress="javascript:return cF2(event,'pa',1,'_fn');" %l_on3; %l_on8;%/><br
        %/><input id="pa1_sn" name="pa1_sn" class="ar" size="30" maxlength="200" placeholder="[surname/surnames]0" value="%parent.surname;"
-           onkeypress="javascript:return cF2(event,'pa',1,'_sn');" %apply;onjq1a("pa1")%/></td>
+           onkeypress="javascript:return cF2(event,'pa',1,'_sn');" %apply;onjq1a("pa1") %l_on7;%/></td>
       <td class="jq2"><div id="pa1_jq2"></div><div id="pa1_jq3"></div>
         <span id="dppa1" class="%l1;">%nn;
           %apply;date_place("parent","birth","pa1b","pa","1","b_yy")
@@ -127,9 +120,9 @@
     <tr>
       <td>%apply;link_create1("pa","z1","1","parent")<div id="pa2_jq1"> </div></td>
       <td><input id="pa2_fn" name="pa2_fn" size="30" maxlength="200" placeholder="[first name/first names]0" value="%parent.first_name;"
-           onkeypress="javascript:return cF2(event,'pa',2,'_fn');" %l_on3;%/><br
+           onkeypress="javascript:return cF2(event,'pa',2,'_fn');" %l_on3; %l_on8;%/><br
        %/><input id="pa2_sn" name="pa2_sn" class="ar" size="30" maxlength="200" placeholder="[surname/surnames]0" value="%parent.surname;"
-           onkeypress="javascript:return cF2(event,'pa',2,'_sn');" %apply;onjq1a("pa2")%/></td>
+           onkeypress="javascript:return cF2(event,'pa',2,'_sn');" %apply;onjq1a("pa2") %l_on7;%/></td>
       <td class="jq2"><div id="pa2_jq2"></div><div id="pa2_jq3"></div>
         <span id="dppa2" class="%l1;">%nn;
           %apply;date_place("parent","birth","pa2b","pa","2","b_yy")
@@ -144,8 +137,8 @@
   <tr id="chz1">
     <td>%apply;link_create2("ch","z1","child")<div id="chz1_jq1"> </div></td>
     <td><input id="chz1_fn" name="chz1_fn" size="30" maxlength="200" value="%child.first_name;"
-         onkeypress="javascript:return cF2(event,'ch',z1,'_fn');" %apply;onjq1a1("chz1")%/><br
-     %/><input type="hidden" id="chz1_sn" name="chz1_sn" class="ar" size="30" maxlength="200" value="%child.surname;"
+         onkeypress="javascript:return cF2(event,'ch',z1,'_fn');" %apply;onjq1a1("chz1") %l_on8;%/><br
+     %/><input type="hidden" id="chz1_sn" name="chz1_sn" class="ar" value="%child.surname;"
          onkeypress="javascript:return cF2(event,'ch',z1,'_sn');" %apply;onjq1a("chz1")%/></td>
     <td class="jq2"><div id="chz1_jq2"> </div><div id="chz1_jq3"> </div>
       <span id="dpchz1" class="%l2;">%nn;
@@ -154,9 +147,10 @@
     <td class="jq4"><div id="chz1_jq4"> </div><input id="chz1_occupation" name="chz1_occupation" class="occu %l2;" size="40" maxlength="200" value="%child.create.occupation" %l_on4;%/></td>
   </tr>
 %end;
-
 %( <!-- End define --> %)
-
+</head>
+<body%body_prop; id="upd" %apply;load_focus()>
+%message_to_wizard;
 <form name="upd" method="post" action="%action;">
 <div id="jq" style="display:none"> </div>
 <p style="display:none;">
@@ -192,7 +186,7 @@
   %apply;hevent("div","divorce")
 </p>
 <fieldset>
-  <legend>%lfc1; 
+  <legend>
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
       [*add::family/families]0
     %elseif;(evar_m = "ADD_PAR")
@@ -203,70 +197,67 @@
          evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
       [*merge::family/families]1 # %evar_i;
     %end;
-    &nbsp;<input type="submit" value="Ok"%/>
+    &nbsp;&nbsp;<input type="submit" value="Ok"%/>
   </legend>
-  <table summary="parents" cellspacing=0 cellpadding=0>
+  <table>
     %foreach;parent;%apply;one_parent(cnt)%end;
+ <tr><td colspan=4 style="border:0;text-align:left;padding:5px"><label><input type="checkbox" id="nsck" name="nsck" value="on"
+    %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/> [no sexes check]</label></td></tr>
   </table>
 </fieldset>
 <fieldset>
-  <legend>%lfc2; [*child/children]1</legend>
-  <table summary="children" cellspacing=0 cellpadding=0>
+  <legend>[*child/children]1</legend>
+  <table>
     <tr>
       <td class="bg7"><abbr %lt4;>#</abbr></td>
       <td class="bg7">[first name/first names]0 /
         <a id="ch_hid" style="display:none;" href="javascript:visHid('ch','_sn')" title="[visualize/show/hide/summary]2 [surname/surnames]0">[surname/surnames]0</a>
         <a id="ch_vis" style="display:inline;" href="javascript:visHid('ch','_sn')" title="[visualize/show/hide/summary]1 [surname/surnames]0"><em>[surname/surnames]0</em></a></td>
-      <td class="bg7">[birth] / [death][:] %lt5; %lt3;</td>
+      <td class="bg7">[birth] / [death][:] %lt6; %lt3;</td>
       <td class="bg7">[occupation/occupations]0</td>
-      <td class="bd0"></td>
     </tr>
     %foreach;child;%apply;one_child(cnt)%end;
-    <tr id="new_child"></tr>
-    <tr><td class="bg7"><a id="ach" href="javascript:addChild(1,1)" %lfa2;> + </a></td></tr>
+    <tr id="new_child"><td colspan=4 style="display:none"></td></tr>
+    <tr><td class="bg7"><a id="ach" href="javascript:addChild(1,1)" %lfa2;> + </a></td><td colspan=3 style="text-align:left;border:0"> %lfc2;</td></tr>
   </table>
 </fieldset>
 <fieldset class="event">
-  <legend>%lfc4; [*event/events]1</legend>
-  <dl>
-    %if;has_fevents;%foreach;fevent;%apply;one_event(cnt,"","fwitness")%end;%else;%apply;one_event(1,"#marr","fwitness")%end;
-    <dt id="new_event"></dt>
-    <dt><a href="javascript:addEvent()" %lfa4;> + [event/events]0</a></dt>
-  </dl>
-  <dl>
-    <dt>[*event/events]0 %lt2; [place]</dt>
-      <dd>[note/notes]0</dd>
-      <dd><em>[source/sources]0</em></dd>
-      <dd>[witness/witnesses]0[:] %lt1; [first name/first names]0 [surname/surnames]0</dd>
-  </dl>
+  <legend>[*event/events]1 %if;(evar.m!="ADD_FAM")<a id="chg_evt_fam" href="%prefix;m=CHG_EVT_FAM_ORD;i=%evar.i;;ip=%evar.ip;" %lpaO; title="[*invert::event/events]1 [family/families]0 (Alt+%lpcOk;)">⇳</a>%end;</legend>
+  %if;has_fevents;%foreach;fevent;%apply;one_event(cnt,"","fwitness")%end;%else;%apply;one_event(1,"#marr","fwitness")%end;
+  <dl id="new_event"></dl>
+  <dl><dt><a href="javascript:addEvent(1,1)" %lfa4;>+ [event/events]0</a> %lfc4; %lt5; %lt2; [place] [note/notes]1 [source/sources]1</dt></dl>
 </fieldset>
 <fieldset class="f2 al">
-  <legend>%lfc5; 
+  <legend>
     <label style="font-size:inherit" for="comment" %lfa5;>[*marriage notes]0</label>
   </legend>
-  <textarea id="comment" name="comment" style="overflow:hidden;" onkeydown="%l_on1;">
+  <label><textarea id="comment" name="comment" placeholder="[*comment]" rows="1" %l_on1s;>
     %if;(comment != "" and bvar.move_comment = "yes")
       %foreach;fevent;
-        %if;(fevent.e_name = "#marr" and fevent.e_note != "")%comment;%sq;%end;
+        %if;((fevent.e_name = "#marr" or fevent.e_name = "#nmar" or fevent.e_name = "#nmen" or fevent.e_name ="#enga") and fevent.e_note != "")%comment;%end;
       %end;
     %else;
       %comment;%sq;
     %end;
-  </textarea>
-  <div><label><input type="checkbox" id="nsck" name="nsck" value="on"
-    %if;(mrel = "nsck" or mrel = "nsckm") checked="checked"%end;%/>[no sexes check]</label></div>
+  </textarea></label>
 </fieldset>
 <fieldset class="f2 w3">
-  <legend>%lfc6; [*source/sources]1</legend>
-    <label>[family/families]0<input id="src" name="src" size="100" maxlength="300" value="%fsources;" %lfa6; %l_on6;%/></label>
-    <label>[person/persons]1<input id="psrc" name="psrc" size="100" maxlength="300" value="%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" %l_on6;%/></label>
+  <legend>[*source/sources]1</legend>
+    <label>
+    %if;(fsources="")
+    <input id="src" name="src" placeholder="[*source/sources]1 [family/families]0" maxlength="800" %lfa6; %l_on6; %l_on1s; value="%fsources;"/></label>
+    %else;
+    <textarea id="src" name="src" placeholder="[*source/sources]1 [family/families]0" rows="1" maxlength="800" %lfa6; %l_on1s;>%fsources;</textarea></label>
+    %end;
+    <label><textarea id="psrc" name="psrc" placeholder="[*source/sources]1 [person/persons]0" rows="1" maxlength="800" %l_on1s;>%if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;</textarea></label>
     %if;(bvar.origin_file = "on")
       <label>[file]<input name="origin_file" size="50" maxlength="200" value="%origin_file;"%/></label>
     %end;
 </fieldset>
 </form>
-<div style="height:20px;clear:both;"> </div>
 %base_trailer;
-%copyright;
+%include.copyr;
+<script src=%bvar.static_path;templm/autosize.min.js></script>
+<script>autosize(document.querySelectorAll('textarea'));</script>
 </body>
 </html>

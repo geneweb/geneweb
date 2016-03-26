@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: upddag.txt,v 7.00 2015/04/30 14:58:16 mr Exp $ -->
+  <!-- $Id: upddag.txt,v 7.00 2016/01/26 10:48:00 mr Exp $ -->
   <title>[*modify::tree]</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
@@ -19,9 +19,9 @@
 %let;lt4;title="%ak6;%ak3;%ak7;"%in;
 
 %define;one_pvar(z1)
-  %if;(pvar.z1 != "")
+  %if;(evar_iz1 != "")
     <tr id="pz1">
-      <td class="b1"><a tabindex="10000" href="javascript:addPvar('z1','0');">+</a></td>
+      <td class="b1"><a tabindex="10000" href="javascript:addPvar(z1,0);">+</a></td>
       <td><input id="pz1_occ" name="ocz1" class="occ3" autocomplete="off" size="5" maxlength="8" value="%pvar.z1.occ;"
            onkeypress="javascript:return oKP2(event,'p','z1','_occ','')"%/></td>
       <td class="b1"><a tabindex="10000" href="javascript:delS('p','z1','_occ',1,0,'');">x</a></td>
@@ -42,6 +42,7 @@
       <td><input id="pz1_t" name="tz1" size="30" maxlength="200" value="%evar.tz1;"
           %/><input type="hidden" id="pz1_i" name="iz1" size="5" value="%pvar.z1.index;" %/></td>
     </tr>
+    %apply;one_pvar(z1+1)
   %end;
 %end;
 
@@ -72,13 +73,7 @@
         <td class="b1"><abbr title="[invert::] 2..3">&darr;</abbr></td>
         <td class="bg7">[text]</td>
       </tr>
-      %reset_count;
-      %foreach;env_binding;
-        %incr_count;
-      %end;
-      %for;i;1;count;
-        %apply;one_pvar(i)
-      %end;
+      %apply;one_pvar(1)
       <tr id="new_pvar"></tr>
       <tr><td class="b1"><a id="add_pvar" style="display:block" href="javascript:addPvar(1,1)">+</a></td>
           <td colspan="8" class="b1"> </td>
@@ -88,17 +83,18 @@
 </form>
 
 %define;sosa_dag(z1)
-  %if;(pvar.z1.has_sosa)
-    %apply;add_in_sorted_list(pvar.z1.sosa.v)
+  %if;(evar_iz1 != "")
+    %if;(pvar.z1.has_sosa)
+      %apply;add_in_sorted_list(pvar.z1.sosa.v)
+    %end;
+    %apply;sosa_dag(z1+1)
   %end;
 %end;
 
 %if;(browsing_with_sosa_ref)
   <div class="menu"><span><a href="%prefix;m=DAG;i1=%sosa_ref.index;%nn;
   %empty_sorted_list;
-  %for;i;1;count;
-    %apply;sosa_dag(i)
-  %end;
+  %apply;sosa_dag(1)
   %reset_count;
   %foreach;sorted_list_item;
     %incr_count;
@@ -109,6 +105,6 @@
 
 <div style="height:300px;clear:both;"> </div>
   %base_trailer;
-  %copyright;
+  %include.copyr;
 </body>
 </html>

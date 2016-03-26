@@ -19,12 +19,6 @@
 <body%body_prop; id="menutxt">
 %message_to_wizard;
 
-%if;not cancel_links;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
-
 <h1>%nn;
   [*update]<br%/>
   %first_name;
@@ -115,6 +109,6 @@
   </p>
 %end;
   %base_trailer;
-  %copyright;
+  %include.copyr;
 </body>
 </html>

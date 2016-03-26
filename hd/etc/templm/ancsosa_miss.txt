@@ -1,4 +1,4 @@
-<!-- $Id: anclist_miss.txt,v 7.00 2014/11/13 10:20:05 mr Exp $ -->
+<!-- $Id: anclist_miss.txt,v 7.00 2016/02/04 21:21:37 mr Exp $ -->
 
 %define;link(aa, xx)
   %if;(cancel_links)xx%else;<a href="%prefix;aa">xx</a>%end;
@@ -353,10 +353,6 @@
   %end;
   </ul>
   <p>[*total] = %count;</p>
-%elseif;(bvar.mickroue2 = "yes" and evar.miss="M2")
-  %( missing BIRTHA MARRIAGEA DEATHA %)
-  %apply;miss1(evar.miss,evar.M2b,evar.M2m,evar.M2d)
-  %apply;miss2()
 %elseif;(evar.miss="M3")
   %( date != exact %)
   %apply;miss1(evar.miss,evar.M3b,evar.M3m,evar.M3d)

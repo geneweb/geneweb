@@ -1,7 +1,7 @@
 %doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <!-- $Id: ancsosa.txt,v 7.00 2015/01/05 14:43:58 mr Exp $ -->
+  <!-- $Id: ancsosa.txt,v 7.00 2016/02/04 21:20:57 mr Exp $ -->
   %let;l_v0;%if;(evar.v != "")%if;(evar.v > max_anc_level)%max_anc_level;%else;%evar.v;%end;%else;1%end;%in;
   %let;l_v;%if;(bvar.max_anc_level = "")%l_v0;%elseif;(bvar.max_anc_level > l_v0)%l_v0;%else;%bvar.max_anc_level;%end;%in;
   %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
@@ -59,127 +59,11 @@
   </p>
 %end;
 
-%define;tools()
-  %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
-  <hr %/>
-  <form id="tools" name="tools" method="get" action="%action;">
-    <fieldset>
-      <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>
-      %hidden;
-      <input type="hidden" name="m" value="A"%/>
-      %if;(evar.p != "" or evar.n != "" or evar.oc != "")
-        <input type="hidden" name="p" value="%evar.p;"%/>
-        <input type="hidden" name="n" value="%evar.n;"%/>
-        <input type="hidden" name="oc" value="%evar.oc;"%/>
-      %end;
-      %if;(evar.i != "")
-        <input type="hidden" name="i" value="%evar.i;"%/>
-      %end;
-      <input type="hidden" name="t" value="%evar.t;"%/>
-      %if;(evar.lang != "")<input type="hidden" name="lang" value="%evar.lang;" %/>%end;
-      %if;(l_up = "")
-        <p>
-        %let;l_bmaxv;%if;(bvar.max_anc_level = "")9%else;%bvar.max_anc_level;%end;%in;
-        %let;l_emaxv;%if;(evar.maxv = "")%l_bmaxv;%elseif;(evar.maxv < l_bmaxv)%evar.maxv;%else;%l_bmaxv;%end;%in;
-        <input type="hidden" name="maxv" value="%evar.maxv;"%/>
-        <label>[*generation/generations]0 <code>(X)</code> <input id="v" name="v" class="number" size="1" value="%l_v;"
-          autocomplete="off" title="[generation/generations]0 (X)" accesskey="X" %/> / %l_emaxv;</label>
-        <label><input type="checkbox" name="only" value="on" %l_on;
-                 %if;(evar.only = "on") checked="checked"%end;%/>[only the generation selected]</label>
-        </p>
-      %end;
-      %if;(evar.t = "D" or evar.t = "G" or evar.t = "Z")
-        <p>
-        %if;(evar.i1 != "")<input type="hidden" name="i1" value="%evar.i1;" %/>%end;
-        %if;(evar.l != "")<input type="hidden" name="l" value="%evar.l;" %/>%end;
-        <label><input type="checkbox" name="cgl" value="on" %l_on;
-               %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
-        %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-          <label><input type="checkbox" name="image" value="on" %l_on;
-                 %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
-        %end;
-        </p>
-      %end;
-      %if;(evar.t = "G")
-        <fieldset><legend>[*long display]</legend>
-          <label><input type="checkbox" name="siblings" value="on" %l_on;
-                 %if;(evar.siblings = "on") checked="checked"%end;%/>[siblings]</label>
-          <label><input type="checkbox" name="nosurn" value="on" %l_on;
-            %if;(evar.nosurn = "no") checked="checked"%end;%/>[first name/first names]0
-            <span style="text-decoration:line-through;"> [surname/surnames]0</span></label>
-          <label><input type="checkbox" name="alias" value="on" %l_on;
-                 %if;(evar.alias = "on") checked="checked"%end;%/>[surname alias], [first name alias]</label>
-          <label><input type="checkbox" name="spouse" value="on" %l_on;
-                 %if;(evar.spouse = "on") checked="checked"%end;%/>[include spouses]</label>
-          <label><input type="checkbox" name="parents" value="on" %l_on;
-                 %if;(evar.parents = "on") checked="checked"%end;%/>[parents]</label>
-          <label><input type="checkbox" name="rel" value="on" %l_on;
-                 %if;(evar.rel = "on") checked="checked"%end;%/>[relation/relations]1</label>
-          <label><input type="checkbox" name="witn" value="on" %l_on;
-                 %if;(evar.witn = "on") checked="checked"%end;%/>[witness/witnesses]1</label>
-          <label><input type="checkbox" name="notes" value="on" %l_on;
-                 %if;(evar.notes = "on") checked="checked"%end;%/>[note/notes]1</label>
-          <label><input type="checkbox" name="src" value="on" %l_on;
-                 %if;(evar.src = "on") checked="checked"%end;%/>[source/sources]1</label>
-          <label><input type="checkbox" name="upd" value="on" %l_on;
-                 %if;(evar.upd = "on") checked="checked"%end;%/>[update]</label>
-          <label><input type="checkbox" name="hide" value="on" %l_on;
-                 %if;(evar.hide = "on") checked="checked"%end;%/>[visualize/show/hide/summary]2 … </label>
-        </fieldset>
-      %end;
-      %if;(evar.t = "M")
-        <fieldset>
-          <legend>
-            <label><input type="radio" name="miss" value="M1" id="M1" %l_on;
-                    %if;(evar.miss = "M1") checked="checked"%end;%/>[*missing ancestors]</label>
-          </legend>
-          <label><input type="checkbox" name="al" value="on" onchange="valid('M1')" %l_on;
-                  %if;(evar.al = "on") checked="checked"%end;%/>[alphabetic order]</label>
-          <label><input type="checkbox" name="ms" value="on" onchange="valid('M1')" %l_on;
-                  %if;(evar.ms = "on") checked="checked"%end;%/>[first name/first names]1, [surname/surnames]1 = ??</label>
-        </fieldset>
-        %if;(bvar.mickroue2 = "yes")
-          <fieldset>
-            <legend>
-              <label><input type="radio" name="miss" value="M2" id="M2" %l_on;
-                      %if;(evar.miss = "M2") checked="checked"%end;%/>[*miscellaneous notes]</label>
-            </legend>
-            <label><input type="checkbox" name="M2b" value="b" onchange="valid('M2')" %l_on;
-                    %if;(evar.M2b = "b") checked="checked"%end;%/>%bvar.var_t_BIRTHA;</label>
-            <label><input type="checkbox" name="M2m" value="m" onchange="valid('M2')" %l_on;
-                    %if;(evar.M2m = "m") checked="checked"%end;%/>%bvar.var_t_MARRIAGEA;</label>
-            <label><input type="checkbox" name="M2d" value="d" onchange="valid('M2')" %l_on;
-                    %if;(evar.M2d = "d") checked="checked"%end;%/>%bvar.var_t_DEATHA;</label>
-          </fieldset>
-        %end;
-        <fieldset>
-          <legend>
-            <label><input type="radio" name="miss" value="M3" id="M3" %l_on;
-                    %if;(evar.miss = "M3") checked="checked"%end;%/>[*date/dates]0 &lt;&gt; [exact]</label>
-          </legend>
-          <label><input type="checkbox" name="M3b" value="b" onchange="valid('M3')" %l_on;
-                  %if;(evar.M3b = "b") checked="checked"%end;%/>[birth]</label>
-          <label><input type="checkbox" name="M3m" value="m" onchange="valid('M3')" %l_on;
-                  %if;(evar.M3m = "m") checked="checked"%end;%/>[marriage/marriages]0</label>
-          <label><input type="checkbox" name="M3d" value="d" onchange="valid('M3')" %l_on;
-                  %if;(evar.M3d = "d") checked="checked"%end;%/>[death]</label>
-        </fieldset>
-      %end;
-    </fieldset>
-  </form>
-%end;
-
 %( <!-- End define --> %)
 
 %(   Main   %)
 <body%body_prop; id="ancsosa">
 %message_to_wizard;
-
-%if;not cancel_links;
-  <div class="menu2">
-    <a href="%prefix;" title="[visualize/show/hide/summary]3">^^</a>
-  </div>
-%end;
 
 <h1>%nn;
   %apply;a_of_b%with;
@@ -215,24 +99,19 @@
 </dl>
 
 %if;(evar.t = "G")
-  %if;(bvar.mickroue1 = "yes")
-    %include.ancsosa_tg_mickroue1;
-  %else;
-    %include.ancsosa_tg;
-  %end;
+  %include.ancsosa_tg;
 %elseif;(evar.t = "N" and evar.same != "")
   %include.ancsosa_same;
 %elseif;(evar.t = "M")
   %include.ancsosa_miss;
 %elseif;(evar.t = "D" or evar.t = "Z")
-  %if;(bvar.mickroue2 = "yes")
-    %include.ancsosa_tdz_mickroue2;
-  %else;
-    %include.ancsosa_tdz;
-  %end;
+  %include.ancsosa_tdz;
 %end;
-%if;not cancel_links;%apply;tools()%end;
-%base_trailer;
-%copyright;
+%if;not cancel_links;
+  %import;tools;
+  %apply;tools_ancsosa()
+  %base_trailer;
+  %include.copyr;
+%end;
 </body>
 </html>

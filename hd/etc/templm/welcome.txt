@@ -1,11 +1,10 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
 <head>
   <!-- $Id: welcome.txt,v 7.00 2015/08/14 16:19:14 mr Exp $ -->
+  <title>GeneWeb - %apply;capitalize(base.name)</title>
   <meta name="robots" content="none"%/>
   <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   %base_header;
@@ -22,72 +21,21 @@
   [<em>Sosa number</em> relative to %t:::xx]
 %end;
 
-%define;lang(xx)
-  %apply;nth%with;
-    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
-  %and;xx%end;
-%end;
-
-%define;link_lang()
-  %for;i;1;30;
-    %let;l1;%apply;lang(i)%in;
-    <a href="%prefix_base;lang=%l1;" title="%apply;language_name(l1)">%l1;</a>
-  %end;
-%end;
-
 %define;disconnect(xx,yy)
-  yy
-  %if;(user.ident != "")
-    %sp;:%sp;
+  yy[:] %if;(user.ident != "")
     %if;("xx" = "wizard" and bvar.authorized_wizards_notes = "yes")
       <a href="%prefix;m=WIZNOTES;v=%user.ident;">%user.ident;</a>
     %else;
       %user.ident;
     %end;
   %end;
-  <span style="font-size:70%%">  (<a href="%prefix;w=">[disconnect]</a>)</span>
+  <span > (<a href="%prefix;w=">[disconnect]</a>)</span>
 %end;
 
-<body%body_prop; id="welcome" onload="javascript:document.getElementById('mSn').focus();">
-<div>
-  <img src="%image_prefix;/gwlogo.png" width=150 height=41 alt="GeneWeb"%/>
-</div>
-<div>
-  %if;(wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "" or bvar.auth_file != ""))
-    %apply;disconnect("wizard",[*wizard/wizards/friend/friends/exterior]0)
-  %elseif;(friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != "" or bvar.auth_file != ""))
-    %apply;disconnect("friend",[*wizard/wizards/friend/friends/exterior]2)
-  %elseif;(bvar.friend_passwd = "" and bvar.friend_passwd_file = ""
-       and bvar.wizard_passwd = "" and bvar.wizard_passwd_file = "" and bvar.auth_file = "")
-  %else;
-    <form method="post" action="%action;">
-      %hidden;
-      [*access] <input name="w" type="password" size="25" maxlength="200" placeholder="[user/password/cancel]0:[user/password/cancel]1"%/>
-      <input type="submit" value="Ok"%/>
-    </form>
-  %end;
-</div>
-
-%if;(bvar.motd != "")
-  <div class="div2">%apply;interp(bvar.motd)</div>
-%end;
-%if;just_friend_wizard;
-  <div class="div1" style="color:#FF0000;font-weight:700;">
-    [
-en: Wizard rights are now suspended for maintenance.
-fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
-]
-  </div>
-%end;
-<table style="margin:auto;">
-  <tr>
-    <td align=center colspan=3>
-    <h1>%apply;capitalize(base.name)</h1>
-    %if;(browsing_with_sosa_ref)<h3>%sosa_ref;</h3>%end;
-    <div>(%base.nb_persons; [person/persons]1)</div>
-    %if;(bvar.counter = "yes")
-      <div>
-        %apply;interp([
+%define;counter()
+  %if;(bvar.counter = "yes")
+    <div>
+    %apply;interp([
 af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
 bg: От %start_date; насам е имало %nb_accesses; посещения, от които
@@ -123,7 +71,7 @@ is: Það hafa verið %nb_accesses; heimsóknir, %nb_accesses_to_welcome;
 it: Dal %start_date; ci sono stati %nb_accesses; accessi,
     %nb_accesses_to_welcome; dei quali a questa pagina.
 lv: Kopš %D datu bāze ir apmeklēta %nb_accesses; reizes,
-    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē. 
+    %nb_accesses_to_welcome; no tiem ir bijuši šinī lappusē.
 nl: Deze paginas zijn sinds %start_date; reeds %nb_accesses; maal
     bezocht, waaronder %nb_accesses_to_welcome; maal deze verwelkomingspagina.
 no: Det har vært %nb_accesses; aksesser, %nb_accesses_to_welcome;
@@ -143,8 +91,81 @@ sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
 zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     次访问本主页， 自从 %start_date;。
 ])%nl;
-      </div>
-    %end;
+    </div>
+  %end;
+%end;
+
+%define;login()
+  %if;(wizard and (bvar.wizard_passwd != "" or bvar.wizard_passwd_file != "" or bvar.auth_file != ""))
+    %apply;disconnect("wizard",[*wizard/wizards/friend/friends/exterior]0)
+  %elseif;(friend and (bvar.friend_passwd != "" or bvar.friend_passwd_file != "" or bvar.auth_file != ""))
+    %apply;disconnect("friend",[*wizard/wizards/friend/friends/exterior]2)
+  %elseif;(bvar.friend_passwd = "" and bvar.friend_passwd_file = ""
+       and bvar.wizard_passwd = "" and bvar.wizard_passwd_file = "" and bvar.auth_file = "")
+  %else;
+    <form class="login" method="post" action="%action;">
+      %hidden;
+      [*access] [wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0[:] <input name="w" type="password" size="20" maxlength="100" placeholder="[user/password/cancel]0:[user/password/cancel]1" autofocus="on"%/>
+    </form>
+  %end;
+%end;
+
+<body%body_prop; id="welcome">
+<div style="float:right;margin-top:1.8em;margin-right:1.8em;">
+%apply;login()
+</div>
+<div style="margin-top:1.7em;margin-left:1.7em">
+  <img src="%image_prefix;/gwlogo.png" width="280" alt="GeneWeb logo"%/>
+</div>
+<div style="margin-left:7.5em">
+%if;(bvar.motd != "")%apply;interp(bvar.motd)%end;
+</div>
+<div>
+%if;just_friend_wizard;
+  <div class="div1" style="color:#FF0000;font-weight:700;">
+    [
+en: Wizard rights are now suspended for maintenance.
+fr: Les droits des magiciens sont actuellement suspendus pour maintenance.
+]
+  </div>
+%end;
+<table style="margin:auto;">
+  <tr>
+    <td style="text-align:center" colspan=3>
+    <h1>
+    %apply;interp([
+af: Genealogiese databasis
+ar: قاعدة المعلومات العائلية (جينيالوجيا)
+bg: Родословна база от данни
+br: Bon roadoù genealogiezh
+ca: Base de dades genealògica
+cs: Genealogická databáze
+da: Genealogisk database
+de: Genealogische Datenbank
+en: Genealogical database
+eo: Datenbazo genealogia
+es: Base de datos genealógica
+et: Genealoogiline andmebaas
+fi: Sukutietokanta
+fr: Base de données généalogique
+he: מאגר מידע תולדותי
+is: Ættfræði gagnagrunnur
+it: Base di dati genealogica
+lv: Ciltsrakstu datu bāze
+nl: Genealogische databank
+no: Genealogisk database
+oc: Basa de donadas genealogica
+pl: Genealogiczna baza danych
+pt: Base de Dados Genealógica
+ro: Baza de date genealogice
+ru: Генеaлогическая база данных
+sl: Genealoška baza podatkov
+sv: Genealogisk databas
+zh: 网络家谱
+]) %apply;capitalize(base.name)</h1>
+<h2>%base.nb_persons; [person/persons]1</h2>
+    %if;(browsing_with_sosa_ref)<h3>%sosa_ref;</h3>%end;
+    %apply;counter()
     </td>
   </tr><tr>
     <td>
@@ -170,9 +191,6 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
         %if;(bvar.disable_forum != "yes")
           <li><a href="%prefix;m=FORUM">[*database forum]</a></li>
         %end;
-      </ul>
-    </td><td>
-      <ul>
         <li><a href="%prefix;m=STAT">[*statistics]</a></li>
         <li><a href="%prefix;m=CAL">[*calendar/calendars]1</a></li>
         <li><a href="%prefix;m=ANM">[*anniversaries]</a></li>
@@ -180,65 +198,61 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     </td><td>
       <ul>
         %if;has_history;%nl;
-          <li><a href="%prefix;m=HIST;k=20">[*history of updates]</a></li>%sq;
+          <li><a href="%prefix;m=HIST;k=20">[*history of updates]</a></li>
         %end;%nl;
-        %if;(wizard and (not base.has_notes or bvar.propose_add_family != "no"))
-          %if;(bvar.propose_add_family != "no")
-            <li><a href="%prefix;m=ADD_FAM" onclick="window.open(this.href); return false;">[*add::family/families]0</a></li>
-          %end;
-          %if;(not base.has_notes)
-            <li><a href="%prefix;m=MOD_NOTES">[*add base notes]</a></li>
-          %end;
-          %if;(wizard)
-            <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a></li>
-            <li><a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a></li>
-            <li><a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a></li>
-            <li><a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a></li>
-          %end;
+        %if;(not base.has_notes)
+          <li><a href="%prefix;m=MOD_NOTES">[*add base notes]</a></li>
+        %end;
+        %if;(wizard)
+          <li><a href="%prefix;m=MOD_DATA;data=fn">%apply;book_of([first name/first names]1)</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=sn">%apply;book_of([surname/surnames]1)</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=place">%apply;book_of([places])</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=src">%apply;book_of([source/sources]1)</a></li>
+          <li><a href="%prefix;m=MOD_DATA;data=occu">%apply;book_of([occupation/occupations]1)</a></li>
         %end;
       </ul>
-    </td></tr>
-    <tr><td colspan="3">
-      <ul>
-        %if;(bvar.propose_place_surnames != "no")%nl;
-          <li>
-            <form method="get" action="%prefix;">
-              %hidden;
-              [*place][:]
-              <input type="hidden" name="m" value="PS"%/>
-              <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
-              <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>
-              <label><input type="checkbox" name="de" value="on" checked="checked" %l_on1;%/>[death]</label>
-              <label><input type="checkbox" name="bp" value="on" %l_on1;%/>[baptism]</label>
-              <label><input type="checkbox" name="bu" value="on" %l_on1;%/>[burial]</label>
-              <input type="submit" value="Ok"%/>
-            </form>
-          </li>
-        %end;
-        <li>[*first name/first names]1[:]
-          <a href="%prefix;m=P;tri=A">ABC</a>
-          <a href="%prefix;m=P;tri=F">987</a></li>
-        <li>[*surname/surnames]1[:]
-          <a href="%prefix;m=N;tri=A">ABC</a>
-          <a href="%prefix;m=N;tri=F">987</a>
-        </li>
-        %if;(bvar.propose_titles != "no")
-          <li><a href="%prefix;m=TT;t=">[*all the titles]</a>,
-              <a href="%prefix;m=TT;p=*">[all the estates]</a></li>
-          <li><form method="get" action="%action;">
+    </td>
+        <td>
+        <ul>
+          %if;(wizard and bvar.propose_add_family != "no")
+            <li><a href="%prefix;m=ADD_FAM" target="_blank">[*add::family/families]0</a></li>
+          %end;
+        <li>
+          <a href="%prefix;m=P;tri=A" title="[*first name/first names]1, [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*first name/first names]1</a>
+          <a href="%prefix;m=P;tri=F" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">🔢</a></li>
+        <li>
+          <a href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*surname/surnames]1</a>
+          <a href="%prefix;m=N;tri=F" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3">🔢</a></li>
+        </ul>%if;(bvar.propose_titles != "no")<form method="get" action="%action;">
                   %hidden;
-                  <input type="hidden" name="m" value="TT"%/>
-                  <input name="t" size="25" maxlength="200" placeholder="[*title/titles]0"
-                  %/><input name="p" size="25" maxlength="200" placeholder="[*estate]0"
-                  %/><input type="submit" value="Ok"%/>
-            </form>
-          </li>
+                  <input id="mTT" type="hidden" name="m" value="TT"/>
+                  <ul><li><a href="%prefix;m=TT;t=" title="[*all the titles], [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*title/titles]1</a><input type="text" name="t" size="10" maxlength="100" title="[*search/case sensitive]0 [title/titles]0"%/></li>
+                  <li><a href="%prefix;m=TT;p=*" title="[*all the estates], [display by/branch/alphabetic order]0 [display by/branch/alphabetic order]2">[*estate]0s</a><input type="text" name="p" size="10" maxlength="100" title="[*search/case sensitive]0 [estate]0"%/>
+                  <input id="hide_ie2" tabindex="-1" type="submit" value="Ok"/>
+                  </li></ul>
+          </form>
         %end;
-      </ul>
-    </td></tr>
+        </td>
+        </tr><tr>
+        <td colspan="3">
+        %if;(bvar.propose_place_surnames != "no")%nl;
+          <form method="get" action="%prefix;">
+            %hidden;
+            [*place] / [event/events]1[:]
+            <input type="hidden" name="m" value="PS"%/>
+            <label><input type="checkbox" name="bi" value="on" checked="checked" %l_on1;%/>[birth]</label>
+            <label><input type="checkbox" name="ma" value="on" checked="checked" %l_on1;%/>[marriage/marriages]0</label>
+            <label><input type="checkbox" name="de" value="on" checked="checked" %l_on1;%/>[death]</label>
+            <label><input type="checkbox" name="bp" value="on" %l_on1;%/>[baptism]</label>
+            <label><input type="checkbox" name="bu" value="on" %l_on1;%/>[burial]</label>
+            <input type="submit" value="Ok"%/>
+          </form>
+        %end;
+     </td></tr>
   </table>
-  %base_trailer;
-%copyright;
-<p>lang= %apply;link_lang()</p>
+<br/>
+%base_trailer;
+%include.copyr;
+</div>
 </body>
 </html>

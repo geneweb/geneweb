@@ -1,7 +1,7 @@
 <!-- $Id: deslist_hrztl.txt,v 7.00 2015/05/19 12:17:57 mr Exp $ -->
 
 %let;l_url;%prefix;m=D;t=L;tl1=hrztl;v=%l_v;;maxv=%evar.maxv;;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
-%let;l_url1;%prefix;m=A;t=H;v=5;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
+%let;l_url1;%prefix;m=A;t=T;t1=HT;v=5;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
 
 %define;letter(z1)
   %apply;nth%with;
@@ -10,22 +10,22 @@
 %end;
 
 %define;desc1(z1,z2,z3,z4,curlev,maxlev)
-  %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ¦%else;   %end;%in;
+  %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
   %let;l2;
     %if;(curlev != 0)
       %if;(z2 = 0)
-        %if;(z4 = 1)%l1;└%elseif;(z4 = 0)%l1;├%end;%if;(child_cnt < 10)─%end;%nn;
+        %if;(z4 = 1)%l1;┗%elseif;(z4 = 0)%l1;┣%end;%if;(child_cnt < 10)━%end;%nn;
       %else;
-        %if;(z4 = 1)%l1;╚%elseif;(z4 = 0)%l1;╠%end;%if;(child_cnt < 10)═%end;%nn;
+        %if;(z4 = 1)%l1;└%elseif;(z4 = 0)%l1;├%end;%if;(child_cnt < 10)─%end;%nn;
       %end;
     %end;
   %in;
   %let;zl1;
     %if;(curlev != 0)
       %if;(z2 = 0)
-        %if;(z4 = 1)z1%l1; %else;z1%l1;│%end;
+        %if;(z4 = 1)z1%l1; %else;z1%l1;┃%end;
       %else;
-        %if;(z4 = 1)z1%l1; %else;z1%l1;║%end;
+        %if;(z4 = 1)z1%l1; %else;z1%l1;│%end;
       %end;
     %end;
   %in;
@@ -51,17 +51,17 @@
         %let;l3;
           %if;(curlev != 0 and family_cnt > 1)
             %if;(z2 = 0)
-              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;│%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
+              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;┃%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
             %else;
-              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;║%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
+              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;│%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
             %end;
           %else;
             %l2;%l21;%nn;
           %end;
         %in;
-        <tt>z1%l3;%apply;letter(family_cnt)%if;(is_male)%if;(curlev < maxlev and has_children)┬%else;─%end;%else;%if;(curlev < maxlev and has_children)╦%else;═%end;%end;%l22;</tt>
+        <span style="border:px solid #008CD2;"><tt style="background-color:">z1%l3;%apply;letter(family_cnt)%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt></span>
       %else;
-        <tt>z1%l2;%l21;%if;(is_male)─%if;(curlev < maxlev and has_children)┬%else;─%end;%else;═%if;(curlev < maxlev and has_children)╦%else;═%end;%end;%l22;</tt>
+        <tt style="background-color:">z1%l2;%l21;%if;(is_male)━%if;(curlev < maxlev and has_children)┳%else;━%end;%else;─%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt>
       %end;
       %if;(family_cnt > 1)
         %self;%nn;
@@ -100,7 +100,7 @@
         %if;(has_siblings)◀%else;◁%end;
       %end;
     %in;
-    <tt>z1%l2;%l23;%if;(is_male)──%elseif(is_female)══%else;◦◦%end;%l24;</tt>
+    <tt>z1%l2;%l23;%if;(is_male)━━%elseif(is_female)──%else;┈┈%end;%l24;</tt>
     %if;(not cancel_links)
       <a href="%prefix;;i=%index;">%self;</a> %dates;<br%/>
     %else;
@@ -112,9 +112,12 @@
 %if;(not cancel_links and has_parents)
   <div class="menu">
     <span>
-      <a href="%l_url1;i=%index;" title="(Y)" accesskey="Y">[*ancestors]0</a>
+      <a href="%l_url1;i=%index;" title="(Y)" accesskey="Y">[*horizontal tree]0</a>
+    </span>
+    <span>
+      <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[*descendants tree]</a>%nn;
     </span>
   </div>
 %end;
 %apply;togen()
-<p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"","",0,l_v)</p>
+<p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>

@@ -1,4 +1,4 @@
-<!-- $Id: upddata.txt,v 7.00 2014/11/12 14:33:31 mr Exp $ -->
+<!-- $Id: upddata.txt,v 7.00 2016/01/12 23:13:52 mr Exp $ -->
 
 %define;ldl()
   <option></option>
@@ -26,6 +26,8 @@
 %if;(evar.datalist = "on")
   %if;(evar.data = "occu")%apply;ldl0(bvar.datalist_occu)
   %elseif;(evar.data = "place")%apply;ldl0(bvar.datalist_place)
+  %elseif;(evar.data = "sn")%apply;ldl0(bvar.datalist_sn)
+  %elseif;(evar.data = "fn")%apply;ldl0(bvar.datalist_fn)
   %elseif;(evar.data = "src")%apply;ldl0(bvar.datalist_src)
   %end;
 %else;
