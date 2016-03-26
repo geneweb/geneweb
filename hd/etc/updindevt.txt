@@ -85,7 +85,7 @@
  $('.down').click(function () {
    var $li = $(this).parent();
    $li.find('.pos').val(function(i, old){return ++old});
-   $li.prev().find('.pos').val(function(i, old){return --old});
+   $li.next().find('.pos').val(function(i, old){return --old});
    if ($li.is(':last-child'))
      $('#sort_list').prepend($li);
    else
