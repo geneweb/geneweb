@@ -1,5 +1,4 @@
-# $Id: Makefile,v 0.001 2014-02-21 16:47:52 flh Exp $
-
+ROOT=../..
 include ../../tools/Makefile.config
 
 TOP=../..
@@ -106,7 +105,7 @@ gwFixY.opt: $(OBJS_OCCU:.cmo=.cmx)
 
 .PHONY: depend
 depend:
-	TOP=.. ../tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
+	$(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
