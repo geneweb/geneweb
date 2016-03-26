@@ -4,9 +4,18 @@ include $(ROOT)/tools/Makefile.config
 # First rule 'all' is defined in Makefile.config.
 
 OCAMLI=-I ../src
-GWTP_OTHER=../src/lock.cmo ../src/buff.cmo ../src/name.cmo ../src/iovalue.cmo ../src/adef.cmo ../src/mutil.cmo ../src/futil.cmo ../src/dutil.cmo ../src/secure.cmo ../src/btree.cmo ../src/database.cmo ../src/db2.cmo ../src/db2disk.cmo ../src/diff.cmo ../src/outbase.cmo ../src/gwdb.cmo ../src/checkItem.cmo ../src/gutil.cmo ../src/translate.cmo
+
+GWTP_OTHER=../src/lock.cmo ../src/buff.cmo ../src/name.cmo \
+../src/iovalue.cmo ../src/adef.cmo ../src/mutil.cmo ../src/futil.cmo \
+../src/dutil.cmo ../src/secure.cmo ../src/btree.cmo \
+../src/database.cmo ../src/db2.cmo ../src/db2disk.cmo ../src/diff.cmo \
+../src/outbase.cmo ../src/gwdb.cmo ../src/checkItem.cmo \
+../src/gutil.cmo ../src/translate.cmo \
+
 GWTP_OBJS=httpEnv.cmo iolight.cmo gwtp.cmo
+
 OBJS=$(GWTP_OTHER) $(GWTP_OBJS)
+
 RECOVER_OBJS=$(GWTP_OTHER) iolight.cmo recover.cmo
 
 out: gwtp.out

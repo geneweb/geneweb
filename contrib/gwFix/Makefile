@@ -6,15 +6,96 @@ CAMLP5_COMM=TOP=$(TOP) $(TOP)/tools/camlp5_comm.sh
 
 GW=../..
 OCAMLI=-I $(GW)/src
-OBJS=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixBase.cmo
-OBJS_FIX_FILE=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixFromFile.cmo
-OBJS_FIX_FILE_DOMICILE=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixFromFileDomicile.cmo
-OBJS_FIX_FILE_ALIAS=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixFromFileAlias.cmo
-OBJS_FIX_BURIAL=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixBurial.cmo
-OBJS_FIX_EVT_SRC=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixEvtSrc.cmo
-OBJS_FIX_COLON_SRC=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixColon.cmo
-OBJS_CPL=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFindCpl.cmo
-OBJS_OCCU=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixY.cmo
+
+OBJS=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo \
+$(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo \
+$(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo \
+$(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo \
+$(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo \
+$(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo \
+$(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo \
+$(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo \
+gwFixBase.cmo
+
+OBJS_FIX_FILE=$(GW)/src/argl.cmo $(GW)/src/adef.cmo \
+$(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo \
+$(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo \
+$(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo \
+$(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo \
+$(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo \
+$(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo \
+$(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo \
+$(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixFromFile.cmo
+
+OBJS_FIX_FILE_DOMICILE=$(GW)/src/argl.cmo $(GW)/src/adef.cmo \
+$(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo \
+$(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo \
+$(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo \
+$(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo \
+$(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo \
+$(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo \
+$(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo \
+$(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixFromFileDomicile.cmo
+
+OBJS_FIX_FILE_ALIAS=$(GW)/src/argl.cmo $(GW)/src/adef.cmo \
+$(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo \
+$(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo \
+$(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo \
+$(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo \
+$(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo \
+$(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo \
+$(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo \
+$(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixFromFileAlias.cmo
+
+OBJS_FIX_BURIAL=$(GW)/src/argl.cmo $(GW)/src/adef.cmo \
+$(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo \
+$(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo \
+$(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo \
+$(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo \
+$(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo \
+$(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo \
+$(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo \
+$(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixBurial.cmo
+
+OBJS_FIX_EVT_SRC=$(GW)/src/argl.cmo $(GW)/src/adef.cmo \
+$(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo \
+$(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo \
+$(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo \
+$(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo \
+$(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo \
+$(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo \
+$(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo \
+$(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixEvtSrc.cmo
+
+OBJS_FIX_COLON_SRC=$(GW)/src/argl.cmo $(GW)/src/adef.cmo \
+$(GW)/src/iovalue.cmo $(GW)/src/buff.cmo $(GW)/src/name.cmo \
+$(GW)/src/ansel.cmo $(GW)/src/mutil.cmo $(GW)/src/futil.cmo \
+$(GW)/src/dutil.cmo $(GW)/src/secure.cmo $(GW)/src/btree.cmo \
+$(GW)/src/database.cmo $(GW)/src/db2.cmo $(GW)/src/db2disk.cmo \
+$(GW)/src/diff.cmo $(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo \
+$(GW)/src/checkItem.cmo $(GW)/src/gutil.cmo $(GW)/src/calendar.cmo \
+$(GW)/src/lock.cmo $(GW)/src/progrBar.cmo $(GW)/src/consang.cmo \
+$(GW)/src/consangAll.cmo $(GW)/src/check.cmo gwFixColon.cmo
+
+OBJS_CPL=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo \
+$(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo \
+$(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo \
+$(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo \
+$(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo \
+$(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo \
+$(GW)/src/calendar.cmo $(GW)/src/lock.cmo $(GW)/src/progrBar.cmo \
+$(GW)/src/consang.cmo $(GW)/src/consangAll.cmo $(GW)/src/check.cmo \
+gwFindCpl.cmo
+
+OBJS_OCCU=$(GW)/src/argl.cmo $(GW)/src/adef.cmo $(GW)/src/iovalue.cmo \
+$(GW)/src/buff.cmo $(GW)/src/name.cmo $(GW)/src/ansel.cmo \
+$(GW)/src/mutil.cmo $(GW)/src/futil.cmo $(GW)/src/dutil.cmo \
+$(GW)/src/secure.cmo $(GW)/src/btree.cmo $(GW)/src/database.cmo \
+$(GW)/src/db2.cmo $(GW)/src/db2disk.cmo $(GW)/src/diff.cmo \
+$(GW)/src/outbase.cmo $(GW)/src/gwdb.cmo $(GW)/src/checkItem.cmo \
+$(GW)/src/gutil.cmo $(GW)/src/calendar.cmo $(GW)/src/lock.cmo \
+$(GW)/src/progrBar.cmo $(GW)/src/consang.cmo $(GW)/src/consangAll.cmo \
+$(GW)/src/check.cmo gwFixY.cmo
 
 all: opt
 

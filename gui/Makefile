@@ -7,7 +7,10 @@ LABLGTK2=+lablgtk2
 OCAMLC=ocamlc.opt
 OCAMLOPT=ocamlopt.opt -annot
 GWB=..
-OBJS=../src/version.cmo ../src/iovalue.cmo ../src/buff.cmo ../src/name.cmo ../src/mutil.cmo gui.cmo
+
+OBJS=../src/version.cmo ../src/iovalue.cmo ../src/buff.cmo \
+../src/name.cmo ../src/mutil.cmo gui.cmo
+
 OCAMLI=-I ../src -I $(LABLGTK2)
 TEST_DIR=test $$(basename "$<") = "$<" || { echo "Please run 'make' in directory '$$(dirname "$<")' first"; exit 1; }
 

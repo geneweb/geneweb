@@ -4,7 +4,14 @@ include $(ROOT)/tools/Makefile.config
 # First rule 'all' is defined in Makefile.config.
 
 OCAMLI=-I ../src
-SRC_OBJS=../src/argl.cmo ../src/adef.cmo ../src/buff.cmo ../src/name.cmo ../src/ansel.cmo ../src/iovalue.cmo ../src/mutil.cmo ../src/futil.cmo ../src/dutil.cmo ../src/secure.cmo ../src/btree.cmo ../src/database.cmo ../src/db2.cmo ../src/db2disk.cmo ../src/diff.cmo ../src/gwdb.cmo ../src/checkItem.cmo ../src/gutil.cmo ../src/select.cmo ../src/version.cmo ../src/calendar.cmo
+
+SRC_OBJS=../src/argl.cmo ../src/adef.cmo ../src/buff.cmo \
+../src/name.cmo ../src/ansel.cmo ../src/iovalue.cmo ../src/mutil.cmo \
+../src/futil.cmo ../src/dutil.cmo ../src/secure.cmo ../src/btree.cmo \
+../src/database.cmo ../src/db2.cmo ../src/db2disk.cmo ../src/diff.cmo \
+../src/gwdb.cmo ../src/checkItem.cmo ../src/gutil.cmo \
+../src/select.cmo ../src/version.cmo ../src/calendar.cmo
+
 OBJS=$(SRC_OBJS) gwb2ged.cmo
 
 out: gwb2ged.out

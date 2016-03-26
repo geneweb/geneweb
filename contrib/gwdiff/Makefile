@@ -4,7 +4,11 @@ include ../../tools/Makefile.config
 TOP=../..
 
 OCAMLI=-I $(TOP)/src
-GWDIFF_OBJS=$(TOP)/src/argl.cmo $(TOP)/src/adef.cmo $(TOP)/src/name.cmo $(TOP)/src/buff.cmo $(TOP)/src/gutil.cmo $(TOP)/src/btree.cmo $(TOP)/src/iovalue.cmo $(TOP)/src/iobase.cmo $(TOP)/src/calendar.cmo gwdiff.cmo
+
+GWDIFF_OBJS=$(TOP)/src/argl.cmo $(TOP)/src/adef.cmo \
+$(TOP)/src/name.cmo $(TOP)/src/buff.cmo $(TOP)/src/gutil.cmo \
+$(TOP)/src/btree.cmo $(TOP)/src/iovalue.cmo $(TOP)/src/iobase.cmo \
+$(TOP)/src/calendar.cmo gwdiff.cmo
 
 all:: gwdiff.opt
 

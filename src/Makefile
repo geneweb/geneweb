@@ -6,25 +6,79 @@ include $(ROOT)/tools/Makefile.config
 # Overwrite variables.
 OCAMLI=-I ../wserver -I ../dag2html -I ../api/service
 
-GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo calendar.cmo notesLinks.cmo gwcomp.cmo db1link.cmo gwc.cmo
-GWC2_OBJS=calendar.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo gwcomp.cmo argl.cmo lock.cmo progrBar.cmo secure.cmo iochan.cmo futil.cmo db2.cmo db2out.cmo notesLinks.cmo db2disk.cmo dutil.cmo btree.cmo database.cmo gwdb.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo db2link.cmo gwc2.cmo
-CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo progrBar.cmo database.cmo db2.cmo db2disk.cmo db2out.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
+GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo \
+mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo \
+db2.cmo db2disk.cmo diff.cmo outbase.cmo gwdb.cmo pqueue.cmo \
+progrBar.cmo consang.cmo consangAll.cmo checkItem.cmo check.cmo \
+calendar.cmo notesLinks.cmo gwcomp.cmo db1link.cmo gwc.cmo
+
+GWC2_OBJS=calendar.cmo adef.cmo iovalue.cmo buff.cmo name.cmo \
+mutil.cmo gwcomp.cmo argl.cmo lock.cmo progrBar.cmo secure.cmo \
+iochan.cmo futil.cmo db2.cmo db2out.cmo notesLinks.cmo db2disk.cmo \
+dutil.cmo btree.cmo database.cmo gwdb.cmo consang.cmo consangAll.cmo \
+checkItem.cmo check.cmo db2link.cmo gwc2.cmo
+
+CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo \
+mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo progrBar.cmo \
+database.cmo db2.cmo db2disk.cmo db2out.cmo diff.cmo outbase.cmo \
+gwdb.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
+
 GWD_OBJS_API1=api_conf.cmo
-GWD_OBJS_API2=../api/service/api_link_tree_piqi.cmo ../api/service/api_link_tree_piqi_ext.cmo link.cmo api_wiki.cmo perso_link.cmo
-GWD_OBJS1=../wserver/httpStatus.cmo ../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo notes.cmo wiznotes.cmo srcfile.cmo dag.cmo
-GWD_OBJS2=perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo updateData.cmo merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo mergeDup.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo searchName.cmo advSearchOk.cmo birthDeath.cmo title.cmo forum.cmo image.cmo request.cmo base64.cmo robot.cmo compilation.cmo gwd.cmo
+
+GWD_OBJS_API2=../api/service/api_link_tree_piqi.cmo \
+../api/service/api_link_tree_piqi_ext.cmo link.cmo api_wiki.cmo \
+perso_link.cmo
+
+GWD_OBJS1=../wserver/httpStatus.cmo ../wserver/wserver.cmo \
+../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo \
+buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo \
+database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo \
+gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo \
+gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo \
+hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo \
+notes.cmo wiznotes.cmo srcfile.cmo dag.cmo
+
+GWD_OBJS2=perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo \
+updateFamOk.cmo place.cmo updateData.cmo merge.cmo mergeFamOk.cmo \
+mergeFam.cmo mergeInd.cmo mergeIndOk.cmo mergeDup.cmo \
+changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo \
+descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo searchName.cmo \
+advSearchOk.cmo birthDeath.cmo title.cmo forum.cmo image.cmo \
+request.cmo base64.cmo robot.cmo compilation.cmo gwd.cmo
+
 ifeq ($(WITH_API),y)
   GWD_OBJS=$(GWD_OBJS_API1) $(GWD_OBJS1) $(GWD_OBJS_API2) $(GWD_OBJS2)
 else
   GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2)
 endif
-GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo calendar.cmo notesLinks.cmo progrBar.cmo gwu.cmo
+
+GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo \
+secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo \
+db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo \
+calendar.cmo notesLinks.cmo progrBar.cmo gwu.cmo
+
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
+
 PROBOT_OBJS=probot.cmo
-MOSTDESC_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo db2.cmo db2disk.cmo gwdb.cmo consang.cmo pqueue.cmo num.cmo mostdesc.cmo
-FPLA_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo db2.cmo db2disk.cmo gwdb.cmo fpla.cmo
-UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo iovalue.cmo mutil.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo argl.cmo notesLinks.cmo progrBar.cmo update_nldb.cmo
-CHECK_BASE_OBJS=buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo futil.cmo diff.cmo secure.cmo dutil.cmo btree.cmo database.cmo db2.cmo db2disk.cmo gwdb.cmo progrBar.cmo checkItem.cmo consang.cmo check.cmo check_base.cmo
+
+MOSTDESC_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo \
+mutil.cmo adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo \
+db2.cmo db2disk.cmo gwdb.cmo consang.cmo pqueue.cmo num.cmo \
+mostdesc.cmo
+
+FPLA_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo mutil.cmo \
+adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo db2.cmo \
+db2disk.cmo gwdb.cmo fpla.cmo
+
+UPDATE_NLDB_OBJS=secure.cmo buff.cmo name.cmo adef.cmo iovalue.cmo \
+mutil.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo \
+db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo argl.cmo \
+notesLinks.cmo progrBar.cmo update_nldb.cmo
+
+CHECK_BASE_OBJS=buff.cmo name.cmo iovalue.cmo mutil.cmo adef.cmo \
+futil.cmo diff.cmo secure.cmo dutil.cmo btree.cmo database.cmo db2.cmo \
+db2disk.cmo gwdb.cmo progrBar.cmo checkItem.cmo consang.cmo check.cmo \
+check_base.cmo
 
 
 .PHONY: out

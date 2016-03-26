@@ -4,7 +4,9 @@ include $(ROOT)/tools/Makefile.config
 # First rule 'all' is defined in Makefile.config.
 
 OCAMLI=-I ../wserver -I ../src
-OBJS=../wserver/httpStatus.cmo ../wserver/wserver.cmo ../src/version.cmo ../src/argl.cmo ../src/buff.cmo ../src/translate.cmo setup.cmo
+OBJS=../wserver/httpStatus.cmo ../wserver/wserver.cmo \
+../src/version.cmo ../src/argl.cmo ../src/buff.cmo \
+../src/translate.cmo setup.cmo
 
 out: setup.out
 	$(RM) gwsetup
