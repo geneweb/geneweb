@@ -2372,7 +2372,7 @@ sv: Postnummer
 
     ascendants tree
 de: Stammbaum der Vorfahren
-en: Family Tree
+en: family tree
 es: árbol de ascendencia
 fi: Esipolvitaulu
 fr: arbre d’ascendance
@@ -2585,7 +2585,7 @@ ca: notes
 cs: poznámky
 da: noter
 de: Notizen
-en: notes
+en: notes index
 eo: notoj:a:+n
 es: notas
 et: märkused:g:-id
@@ -2621,7 +2621,7 @@ eo: notoj:a:+n
 es: notas
 et: märkused:g:-id
 fi: lisätietoja
-fr: chronique familiale
+fr: notes
 he:  הערות
 is: athugasemdum
 it: note
@@ -2923,10 +2923,10 @@ zh:  出生于今日的记录
 
     book of %s
 de: %s
-en: %s
+en: book of %s
 es: lista de %s
 fi: lista %s
-fr: liste des %s
+fr: dictionnaire des %s
 it: lista dei %s
 nl: lijst der %s
 no: liste over %s
@@ -3163,7 +3163,7 @@ eo: nuligi GeneWeb-ajn ligilojn
 es: anular los lazos GeneWeb
 et: ilma GeneWebi viideteta
 fi: ei GeneWeb-linkkejä
-fr: annuler les liens GeneWeb
+fr: masquer les liens
 he:  בטל קשרי GeneWeb
 is: án GeneWeb tengla
 it: annullare i links
@@ -3413,7 +3413,7 @@ sv: ändrade ordningen för barnen
 
     changed order of family's events
 de: ändern der Reihenfolge familiäre Ereignisse
-en: change order of family facts
+en: change order of family events
 es: cambio del orden de los acontecimientos familiares
 fr: changement de l’ordre des évènements familiaux
 it: modifica dell'ordine degli eventi di famiglia
@@ -3435,7 +3435,7 @@ sv: Utbytt ordning för bröllop
 
     changed order of person's events
 de: ändern der Reihenfolge bei Ereignissen des Individuums
-en: change order of individual facts
+en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
 fr: changement de l’ordre des évènements individu
 it: modifica dell'ordine degli eventi individuo
@@ -4400,16 +4400,16 @@ sl: umrl mlad/umrla mlada/umrl(a) mlad(a)
 sv: dog ung
 
     difference between the two revisions
-de: Unterschied zwischen den zwei Revisionen
-en: revision history
-es: diferencia entre las dos revisiones
+de: Unterschied zwischen den Revisionen
+en: difference between the revisions
+es: diferencia entre las revisiones
 fi: Tarkistushistoria
-fr: différence entre les deux révisions
-it: divario tra le due versioni
-nl: verschil tussen de twee revisies
+fr: différence entre les révisions
+it: divario tra le versioni
+nl: verschil tussen de revisies
 no: Revisjonshistorikk
-oc: diferéncia entre las doas revisions
-pt: diferença entre as duas revisões
+oc: diferéncia entre las revisions
+pt: diferença entre as revisões
 sv: skillnad mellan två uppdateringar
 
     diploma
@@ -4509,7 +4509,7 @@ de: rahmen in den Bäumen zeigen
 en: display frame
 es: editar los marcos a los árboles
 fi: näytä rajat
-fr: afficher les bordures aux arbres
+fr: afficher les bordures
 it: visualizzare i bordi degli alberi
 nl: rand van de stambomen tonen
 no: vis kantlinje
@@ -4547,10 +4547,10 @@ sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
     display by/branch/alphabetic order
 de: anzuzeigen/nach Zweigen/alphabetisch geordnet
-en: display by:/line/alphabetical order
+en: display by/line/alphabetical order
 es: edición por:/ramas/orden alfabético
 fi: näytetään:/sukuhaaroittain/aakkosjärjestyksessä
-fr: affichage par :/branches/ordre alphabétique
+fr: affichage par/branches/ordre alphabétique
 it: visualizzazione per:/rami/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
@@ -4605,7 +4605,7 @@ de: Porträt zeigen
 en: display family picture
 es: editar retrato
 fi: näytä kuvat
-fr: afficher les photos
+fr: afficher les images
 it: visualizzare il ritratto
 nl: de foto's tonen
 no: vis bilder
@@ -5013,7 +5013,7 @@ zh:  地点
 
     event/events
 de: Ereignis/Ereignisse
-en: fact/facts
+en: event/events
 es: evento/eventos
 fi: tapahtuma/tapahtuma
 fr: événement/événements
@@ -6017,17 +6017,17 @@ pt: não tem cônjuge nem filhos
 sv: Har ingen familj
 
     help modify data
-de: Klicken Sie auf das zu korrigierende "Listen-Element": alle Dateien Ihres Baumes werden sofort korrigiert
-en: Click 'Update' to edit and your entire family tree will be automatically updated
-es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente
-fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti
-fr: Cliquez sur l’élément de la liste que vous souhaitez corriger : l’ensemble des fiches de votre arbre sera instantanément corrigé
-it: Clicca su « l’elemento della lista » che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette
-nl: Kliop op het 'lijstelement" dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd  worden
-no: Klikk 'Oppdater' for å editere og hele ditt slektstre vil automatisk bli oppdatert
-oc: CLicatz sus l'element de modificar e totas las fichas del seu arbre seràn corregidas sulpic
-pt: Clique sobre o elemento da lista que pretende corrigir: a totalidade das fichas da sua árvore serão instantaneamente corrigidas
-sv: Hjälp att modifiera data
+de: Klicken Sie auf das zu korrigierende "Listen-Element": alle Dateien Ihres Baumes werden sofort korrigiert.
+en: Click 'Update' to edit and your entire family tree will be automatically updated.
+es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente.
+fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti.
+fr: Attention ! Les corrections dans le dictionnaire modifient l’ensemble des données correspondantes dans la base.
+it: Clicca su « l’elemento della lista » che vuoi correggere : l'insieme delle schede del tuo albero saranno istantaneamente corrette.
+nl: Kliop op het 'lijstelement" dat gewijzigd moet worden: het geheel van de fichen van uw stamboom zullen onmiddellijk verbeterd  worden.
+no: Klikk 'Oppdater' for å editere og hele ditt slektstre vil automatisk bli oppdatert.
+oc: CLicatz sus l'element de modificar e totas las fichas del seu arbre seràn corregidas sulpic.
+pt: Clique sobre o elemento da lista que pretende corrigir: a totalidade das fichas da sua árvore serão instantaneamente corrigidas.
+sv: Hjälp att modifiera data.
 
     help surname branch
 de: um die Zweige Ihres Stammbaums zu den Nachnamen zu erhalten, klicken Sie auf die Zahlenangabe der Baumzweige
@@ -6121,7 +6121,7 @@ ca: històric de les actualitzacions
 cs: historie změn
 da: opdateringers historie
 de: verlauf der Updates
-en: history of Updates
+en: history of updates
 eo: historio de la ĝisdatigoj
 es: histórico de las actualizaciones
 et: muudatuste ajalugu
@@ -8097,7 +8097,7 @@ sv: anor som saknas
 
     missing events
 de: Fehlende Ereignisse
-en: missing facts
+en: missing events
 es: faltan eventos
 fi: Puuttuvat asiatiedot
 fr: événements manquants
@@ -8123,10 +8123,10 @@ sv: Saknade föräldrar
 
     missing sosa
 de: Fehlende SOSA
-en: Sosa Number
+en: missing Sosa numbers
 es: falta sosa
 fi: Sosa-numero
-fr: sosa manquants
+fr: Sosa manquants
 it: sosa mancante
 nl: ontbrekende sosa's
 no: Sosa-nummer
@@ -8520,7 +8520,7 @@ eo: navigado kun %t kiel Sosa referenco
 es: navegación con %t como referencia de Sosa
 et: navigeerimine kasutades %t Sosa viidet
 fi: navigointi käyttäen %t Sosa-viitteenä
-fr: navigation avec %t comme référence Sosa
+fr: naviguer avec %t comme Sosa racine
 he:  ניוות עם %t כאזכור Sosa
 is: leiðsögn með %t sem Sosa tilvísun
 it: percorso con %t come riferimento Sosa
@@ -8564,7 +8564,7 @@ sv: nb barn
 
     nb events
 de: Ereignisse
-en: Facts
+en: nb events
 es: núm. eventos
 fi: Tapahtumat
 fr: nb. événements
@@ -8876,7 +8876,7 @@ eo: sen kontrolo pri seksoj
 es: pareja homosexual (sin comprobación de sexo)
 et: ära kontrolli sugude sobivust
 fi: samaa sukupuolta oleva pariskunta (sukupuolta ei vahvistettu)
-fr: union homosexuelle (pas de vérification des sexes)
+fr: relation homosexuelle (pas de vérification des sexes)
 he:  בלי לוודא מין
 is: ekki athuga kyn
 it: coppia omosessuale (senza verifica del sesso)
@@ -9216,7 +9216,7 @@ sv: antal barn
 
     number of events
 de: Anzahl der Ereignisse
-en: Number of Facts
+en: number of events
 es: número de eventos
 fi: Tapahtumien lukumäärä
 fr: nombre d’événements
@@ -9229,7 +9229,7 @@ sv: Antal händelser
 
     number of individuals
 de: Anzahl der Individuen
-en: Number of Individuals
+en: number of individuals
 es: número de individuos
 fi: Henkilöiden lukumäärä
 fr: nombre d’individus
@@ -11319,10 +11319,10 @@ sv: son/dotter/barn
 
     sort by/branch/alphabetic order
 de: sortieren nach: /Zweige/Alphabet
-en: Sort by:/Line/Alphabetical order
+en: sort by/line/alphabetical order
 es: organizar por: ramas/orden alfabético
 fi: Lajittelu:/Sukulinja/Aakkosjärjestys
-fr: trier par :/branches/ordre alphabétique
+fr: trier par/branches/ordre alphabétique
 it: smistare per :/rami/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
@@ -11332,10 +11332,10 @@ sv: visas efter:/grenar/alfabetisk ordning
 
     sort by/date begin/alphabetic order/nb individuals/nb events
 de: sortieren nach: /Anfangsdatum/Alphabet/Anzahl der Individuen/Anzahl der Ereignisse
-en: Sort by:/Date/Alphabetical order/Number of individuals/Number of facts
+en: sort by/date/alphabetical order/number of individuals/number of events
 es: organizar por: fecha de inicio/orden alfabético/numero de individuos/número de eventos
 fi: Lajittelu:/Päivämäärä/Aakkosjärjestys/Henkilöiden lukumäärä/Tapahtumien lukumäärä
-fr: trier par :/date de début/ordre alphabétique/nombre d’individus/nombre d’événements
+fr: trier par/date de début/ordre alphabétique/nombre d’individus/nombre d’événements
 it: smistare per : data d'inizio/ordine alfabetico/numero d'individui/numero d'eventi
 nl: sorteren per:/begindatum/alfabetisch/aantal personen/aantal evenementen
 no: Sorter etter:/Dato/alfabetisk rekkefølge/antall individer/antall hendelser
@@ -11345,10 +11345,10 @@ sv: Sortera efter datum börja alfabetisk ordning/nb individer/nb haändelser
 
     sort by/generation/alphabetic order
 de: sortieren nach: /Generationen/Alphabet
-en: Sort by:/Generation/Alphabetical order
+en: sort by/generation/alphabetical order
 es: organizar por: generación/orden alfabético
 fi: Lajittelu:/Sukupolvi/Aakkosjärjestys
-fr: trier par :/génération/ordre alphabétique
+fr: trier par/génération/ordre alphabétique
 it: smistare per : /generazione/ordine alfabetico
 nl: tonen per:/tak/alfabetische volgorde
 no: vises etter:/grener/alfabetisk orden
@@ -11566,7 +11566,7 @@ sv: statistik
     statistics and anniversaries
 bg: статистика и годишнини
 de: Statistik und Geburtstage
-en: statistics and family facts
+en: statistics and anniversaries
 es: Estadísticas y aniversarios
 fi: tilastot ja vuosipäivät
 fr: statistiques et anniversaires
@@ -12662,15 +12662,15 @@ sv: detta forum är ändrat
 
     time line
 de: Chronologie
-en: Timeline
-es: Cronología
-fi: Aikajana
-fr: Chronologie
-it: Cronologia
-nl: Tijdlijn
-no: Kronologi
-pt: Cronologia
-sv: Kronologi
+en: timeline
+es: cronología
+fi: aikajana
+fr: chronologie
+it: cronologia
+nl: tijdlijn
+no: kronologi
+pt: cronologia
+sv: kronologi
 
     title/titles
 af: titel/titels
@@ -13848,7 +13848,7 @@ eo: vi devas unue kunigi la 2 familiojn
 es: debe primero fusionar las 2 familias
 et: kõigepealt peab ühendama mõlemad pered
 fi: yhdistä ensin molemmat perheet
-fr: vous devez d’abord fusionner les 2 familles
+fr: vous devez d’abord fusionner les deux familles
 he:  צריך לאחד קודם את 2 המשפחות
 is: þú verður fyrst að sameina þessar 2 fjölskyldur
 it: dovete in primo luogo fondere le 2 famiglie
@@ -13944,3 +13944,111 @@ it: etichetta
 fr: étiquette
 nl: etiketje
 pt: etiqueta
+
+    full tree
+en: full tree
+fr: arbre complet
+
+    compact tree
+en: compact tree
+fr: arbre compact
+
+    implex/implexes
+en: implex/implexes
+fr: implexe/implexes
+
+    implex links
+en: link implexes
+fr: relier les implexes
+
+    dag
+en: fusion implexes
+fr: fusionner les implexes
+
+    htree
+en: H-Tree
+fr: arbre en H
+
+    itree
+en: I-Tree
+fr: arbre en I
+
+    mtree
+en: mixed tree
+fr: arbre mixte
+
+    descendants tree
+en: descendants tree
+fr: arbre de descendance
+
+    by couple
+en: by couple
+fr: par couple
+
+    navigate on tree
+en: navigate on the tree
+fr: naviguer sur l’arbre
+
+    font size
+en: font size
+fr: taille de police
+
+    horizontal tree
+en: horizontal tree
+fr: arborescence ascendante
+
+    tree of witnesses
+en: tree of witnesses
+fr: arbre des témoins
+
+    shortcuts
+en: keyboard shortcuts
+fr: raccourcis clavier
+
+    family time line
+en: time line of the family
+fr: chronologie de la famille
+
+    witness at %s of
+en: witness at %s of
+fr: témoin au %s de
+
+    relations tree
+en: tree of relations
+fr: arbre des relations
+
+    events tree
+en: tree of events
+fr: arbre des événements
+
+    descendant tree view
+en: descendant tree view
+fr: arborescence descendante
+
+    home
+en: home
+fr: accueil
+
+    last diff
+en: last revision
+fr: dernière révision
+
+    intermediate revisions not shown
+en: intermediate revisions not shown
+fr: révisions intermédiaires masquées
+
+    previous/next diff
+en: previous revision/next revision
+fr: révision précédente/révision suivante
+
+    modify person event order
+en: permute personnal events
+fr: permuter les événéments individuels
+
+    modify family %s event order
+en: permute the events of family %s
+fr: permuter les événements de la famille %s
+
+    full width/columns
+en: full width display/columns display
+fr: affichage pleine largeur/affichage sur deux colonnes
