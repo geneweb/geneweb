@@ -364,6 +364,7 @@ print_tools() {
    echo "EXE=${EXE}"
    echo "STATIC=${STATIC}"
    echo "TEST_DIR=test \$\$(basename \"\$<\") = \"\$<\" || \
+test \$\$(dirname \"\$<\") = \"../api/service\" || \
 { echo \"Please run 'make' in directory '\$\$(dirname \"\$<\")' first\"; \
 exit 1; }"
   ) >> $MAKEFILE
