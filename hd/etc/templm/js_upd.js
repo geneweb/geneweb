@@ -1,4 +1,4 @@
-/* $Id: js_upd.js,v 7.00 2016/03/09 16:25:19 mr Exp $ */
+/* $Id: js_upd.js,v 7.00 2016/03/29 22:37:43 mr Exp $ */
   function oKP1(event)
   {
     var key = event.keyCode ? event.keyCode : event.which ? event.which : event.charCode;
@@ -876,7 +876,7 @@
     if (charKey >= 0 && charKey <= 9)
     {
       var s = v + charKey;
-      var ev = eval(s);
+      var ev = isFinite(s) ? eval(s): 0;
       if (l == 1)
       {
         if (ev > 0 && ev < 32)
@@ -926,10 +926,6 @@
         }
         return false;
       }
-    }
-    else
-    {
-      if (key != "8" && key != "37" && key != "39"&& key != "46") return false;
     }
   }
   function oKPmm(event,z2,z3,z4)
