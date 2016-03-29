@@ -18,7 +18,7 @@ opt:
 	cd wserver && $(MAKE) $@
 	cd dag2html && $(MAKE) $@
 	cd src && $(MAKE) $@
-ifeq ($(WITHAPI),y)
+ifeq ($(WITH_API),y)
 	cd api && $(MAKE) $@
 endif
 	cd ged2gwb && $(MAKE) $@
