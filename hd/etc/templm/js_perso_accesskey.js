@@ -62,16 +62,16 @@
         //shift = on
         case "Z": acckey.focus(); break;  // menu2 (z)
         case "W": mSn.focus(); break;     // trl : search input
+        case "1": sib.focus(); break;
         case "2": par_2.focus(); break;
         case "3": par_3.focus(); break;
         case "4": par_4.focus(); break;
         case "5": par_5.focus(); break;
         case "6": par_6.focus(); break;
         case "7": par_7.focus(); break;
-        case "1": sib.focus(); break;
-        case "0": spo.focus(); break;
         case "8": chi.focus(); break;
         case "9": sosa.focus(); break;
+        case "0": spo.focus(); break;
         case "D": hist.click(); break;
         case "P": mod_ind.click(); break;
         case "L": add_par.click(); break;
@@ -87,6 +87,7 @@
         //shift = off
         case "z": acckey.focus(); break;  // menu2 (z)
         case "w": mSn.focus(); break;     // trl : search input
+        case "&": sib.focus(); break; break; 
         case "é": par_2.focus(); break;
         case "\"": par_3.focus(); break;
         case "'": par_4.focus(); break;
@@ -94,10 +95,10 @@
         case "-": par_6.focus(); break;
         case "§": par_6.focus(); break;   // macbook key
         case "è": par_7.focus(); break;
-        case "&": sib.focus(); break; break; 
-        case "à": spo.focus(); break;
         case "_": chi.focus(); break;
+        case "!": chi.focus(); break;     // macbook key
         case "ç": sosa.focus(); break;
+        case "à": spo.focus(); break;
         case "d": hist.click(); break;
         case "p": mod_ind.click(); break;
         case "l": add_par.click(); break;
