@@ -64,7 +64,6 @@ api.opt:
 	$(OCAMLOPT) -c -pp "camlp5r pa_macro.cmo pa_extend.cmo ../../src/pa_lock.cmo $(CAMLP5F)" $(OCAMLI) api_saisie_autocomplete.ml
 	$(OCAMLOPT) -c $(OCAMLI) api_saisie_write.ml
 	$(OCAMLOPT) -package curl -I $(OCURL) curl.cmxa -I $(LREDIS) -package yojson $(OCAMLI) -c api_link.ml
-	$(OCAMLOPT) -c $(OCAMLI) convert_dico_place.ml
 
 
 piqi:
