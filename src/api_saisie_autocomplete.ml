@@ -1,4 +1,4 @@
-(* camlp5r ../../src/pa_lock.cmo *)
+(* camlp5r ./pa_lock.cmo *)
 
 
 (* !!! C'est écrit en camlp5 pour "profiter" de la définition de lock. *)
