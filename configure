@@ -81,8 +81,6 @@ while [[ $# -ne 0 ]]; do
     -r|--redis_path)
       LREDIS="$2";
       shift ;;
-    -*|--*)
-      echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
@@ -114,8 +112,11 @@ print_check_err() {
   n=$(( $LINE_WIDTH-${#1}-8 ))
   printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
   printf ".%.0s" $(eval "echo {1.."$(($n))"}")
-  printf " \\x1b[31m%s\\x1b[0m" "$2"
+  printf " \\x1b[31m%s\\x1b[0m" "ERROR"
   echo
+  echo "$2"
+  echo "Configuration script failed!"
+  exit 1
 }
 
 # Functions to check the environment
@@ -146,10 +147,8 @@ check_ocaml() {
     OCAMLC=ocamlc
     OCAMLOPT=ocamlopt
   else
-    print_check_err "Checking OCaml compiler" "ERROR"
-    echo "You need the command ocamlc accessible in the path!"
-    echo "Configuration script failed!"
-    exit 1
+    print_check_err "Checking OCaml compiler" \
+        "You need the command ocamlc accessible in the path!"
   fi
 }
 
@@ -178,10 +177,8 @@ check_ocaml_version() {
       "Checking OCaml compiler version $OCAML_VER >= $OCAML_MIN_VER" \
       "OK"
   else
-    print_check_err "Checking OCaml compiler version $OCAML_VER" "ERROR"
-    echo "OCaml version $OCAML_MIN_VER or newer needed."
-    echo "Configuration script failed!"
-    exit 1
+    print_check_err "Checking OCaml compiler version $OCAML_VER" \
+        "OCaml version $OCAML_MIN_VER or newer needed."
   fi
 }
 
@@ -190,10 +187,8 @@ check_camlp5() {
     print_check_ok "Checking Camlp5" "OK"
     CAMLP5D="+camlp5"
   else
-    print_check_err "Checking Camlp5" "ERROR"
-    echo "You need the command camlp5 accessible in the path!"
-    echo "Configuration script failed!"
-    exit 1
+    print_check_err "Checking Camlp5" \
+        "You need the command camlp5 accessible in the path!"
   fi
 }
 
@@ -205,10 +200,8 @@ check_ocamlfind() {
       OCAMLOPT="ocamlfind ocamlopt"
       CAMLP5D=`ocamlfind query camlp5`/
     else
-      print_check_err "Checking ocamlfind" "ERROR"
-      echo "You need the command ocamlfind accessible in the path!"
-      echo "Configuration script failed!"
-      exit 1
+      print_check_err "Checking ocamlfind" \
+          "You need the command ocamlfind accessible in the path!"
     fi
   else
     if ocamlfind printconf >/dev/null 2>&1; then
@@ -235,10 +228,8 @@ check_mysql() {
       print_check_ok "Checking OCaml mysql" "OK"
       MYSQL=`ocamlfind query mysql`/
     else
-      print_check_err "Checking OCaml mysql" "ERREUR"
-      echo "You need the OCaml dependency mysql!"
-      echo "Configuration script failed!"
-      exit 1
+      print_check_err "Checking OCaml mysql" \
+          "You need the OCaml dependency mysql!"
     fi
   fi
 }
@@ -249,10 +240,8 @@ check_curl() {
       print_check_ok "Checking OCaml curl" "OK"
       CURL=`ocamlfind query curl`/
     else
-      print_check_err "Checking OCaml curl" "ERREUR"
-      echo "You need the OCaml dependency curl!"
-      echo "Configuration script failed!"
-      exit 1
+      print_check_err "Checking OCaml curl" \
+          "You need the OCaml dependency curl!"
     fi
   fi
 }
@@ -273,15 +262,11 @@ check_redis_path() {
 check_redis() {
   if [[ $API == y ]]; then
     if ! ocamlfind query redis >/dev/null 2>&1; then
-      print_check_err "Checking OCaml redis" "ERREUR"
-      echo "You need the OCaml dependency redis!"
-      echo "Configuration script failed!"
-      exit 1
+      print_check_err "Checking OCaml redis" \
+          "You need the OCaml dependency redis!"
     elif ! check_redis_path; then
-      print_check_err "Checking OCaml redis" "ERREUR"
-      echo "You need to provide a valid redis path!"
-      echo "Configuration script failed!"
-      exit 1
+      print_check_err "Checking OCaml redis" \
+          "You need to provide a valid redis path!"
     fi
     print_check_ok "Checking OCaml redis" "OK"
     OREDIS=`ocamlfind query redis`/
@@ -294,10 +279,8 @@ check_re() {
       print_check_ok "Checking OCaml re" "OK"
       RE=`ocamlfind query re`/
     else
-      print_check_err "Checking OCaml re" "ERREUR"
-      echo "You need the OCaml dependency re!"
-      echo "Configuration script failed!"
-      exit 1
+      print_check_err "Checking OCaml re" \
+          "You need the OCaml dependency re!"
     fi
   fi
 }
@@ -446,20 +429,20 @@ echo -e "\\x1b[36m=-=-\\x1b[0m Configure GeneWeb \\x1b[36m\
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\\x1b[0m"
 
 if [[ $INTERACTIVE == y ]]; then
-  echo "Do you want to specify the build directory (default = _build) ? [Y/n]"
-  read -r answer
-  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
+  echo "Specify the build directory (default = ${BUILD_DIR})"
+  read -re answer
+  if [[ -n $answer ]]; then
     BUILD_DIR="${answer}"
   fi
-  echo "Do you want to build the API (default = no) ? [Y/n]"
-  read -r answer
+  echo "Do you want to build the API (default = no)? [y/N]"
+  read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
     API=y
   fi
   if [[ $API == y ]]; then
     while [ -z "$LREDIS" ]; do
       echo "Please provide the absolute path of your redis"
-      read -r answer
+      read -re answer
       LREDIS="${answer}"
       if ! check_redis_path; then
         echo "Invalid redis path!"
@@ -467,13 +450,13 @@ if [[ $INTERACTIVE == y ]]; then
       fi
     done
   fi
-  echo "Do you want to remove compilation warnings (default = no) ? [Y/n]"
-  read -r answer
-  if ! [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
+  echo "Do you want to remove compilation warnings (default = no)? [y/N]"
+  read -re answer
+  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
     WARN=
   fi
-  echo "Do you want compilation debugging symbols (default = no) ? [Y/n]"
-  read -r answer
+  echo "Do you want compilation debugging symbols (default = no)? [y/N]"
+  read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
     DEBUG="-g -annot"
   fi
