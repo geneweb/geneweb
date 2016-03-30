@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 5.3 2007-01-19 01:53:16 ddr Exp $ *)
+(* camlp5r *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 type t = array int;
@@ -88,7 +88,7 @@ value sub x y =
     loop 0 0 where rec loop i r =
       if i >= Array.length x && i >= Array.length y then
         if r = 0 then []
-        else invalid_arg "Num.sub"
+        else invalid_arg "Sosa.sub"
       else
         let (d, r) =
           let xi = if i >= Array.length x then 0 else x.(i) in
@@ -101,7 +101,7 @@ value sub x y =
   Array.of_list (normalize l)
 ;
 value mul0 x n =
-  if n > max_mul_base then invalid_arg "Num.mul"
+  if n > max_mul_base then invalid_arg "Sosa.mul"
   else
     let l =
       loop 0 0 where rec loop i r =
@@ -123,7 +123,7 @@ value mul x n =
           (mul0 x max_mul_base) (n / max_mul_base)
 ;
 value div x n =
-  if n > max_mul_base then invalid_arg "Num.div"
+  if n > max_mul_base then invalid_arg "Sosa.div"
   else
     let l =
       loop (Array.length x - 1) [] 0 where rec loop i l r =
@@ -141,7 +141,7 @@ value modl x n =
 ;
 
 value of_int i =
-  if i < 0 then invalid_arg "Num.of_int"
+  if i < 0 then invalid_arg "Sosa.of_int"
   else if i = 0 then zero
   else if i < base then [| i |]
   else [| i mod base; i / base |]
@@ -207,5 +207,5 @@ value of_string s =
       match s.[i] with
       [ '0'..'9' ->
           loop (inc (mul0 n 10) (Char.code s.[i] - Char.code '0')) (i + 1)
-      | _ -> failwith "Num.of_string" ]
+      | _ -> failwith "Sosa.of_string" ]
 ;

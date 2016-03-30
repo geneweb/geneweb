@@ -1808,8 +1808,8 @@ let print_mod_family_request conf base =
          in
          let sosa =
            let sosa_nb = Perso.get_single_sosa conf base sp in
-           if Num.eq sosa_nb Num.zero then `no_sosa
-           else if Num.eq sosa_nb Num.one then `sosa_ref
+           if Sosa.eq sosa_nb Sosa.zero then `no_sosa
+           else if Sosa.eq sosa_nb Sosa.one then `sosa_ref
            else `sosa
          in
          let family_spouse =
@@ -2240,8 +2240,8 @@ let print_add_child conf base =
          in
          let sosa =
            let sosa_nb = Perso.get_single_sosa conf base sp in
-           if Num.eq sosa_nb Num.zero then `no_sosa
-           else if Num.eq sosa_nb Num.one then `sosa_ref
+           if Sosa.eq sosa_nb Sosa.zero then `no_sosa
+           else if Sosa.eq sosa_nb Sosa.one then `sosa_ref
            else `sosa
          in
          let family_spouse =

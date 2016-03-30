@@ -150,10 +150,10 @@ value name_with_roman_number str =
 
 value find_all conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Num.of_string an) with [ Failure _ -> None ] in
+  let sosa_nb = try Some (Sosa.of_string an) with [ Failure _ -> None ] in
   match (sosa_ref, sosa_nb) with
   [ (Some p, Some n) ->
-      if n <> Num.zero then
+      if n <> Sosa.zero then
         match Util.branch_of_sosa conf base (get_key_index p) n with
         [ Some [(ip, _) :: _] -> ([pget conf base ip], True)
         | _ -> ([], False) ]
@@ -719,7 +719,7 @@ value set_owner conf =
   ELSE () END
 ;
 
-value thousand oc x = Num.print (output_string oc) "," (Num.of_int x);
+value thousand oc x = Sosa.print (output_string oc) "," (Sosa.of_int x);
 
 value log_count conf (log_file, log_oc, flush_log) r =
   if Wserver.cgi.val && log_file = "" then ()

@@ -2779,9 +2779,9 @@ value create_topological_sort conf base =
 
 value branch_of_sosa conf base ip n =
   do {
-    if Num.eq n Num.zero then invalid_arg "branch_of_sosa" else ();
+    if Sosa.eq n Sosa.zero then invalid_arg "branch_of_sosa" else ();
     let rec expand bl n =
-      if Num.eq n Num.one then bl else expand [Num.even n :: bl] (Num.half n)
+      if Sosa.eq n Sosa.one then bl else expand [Sosa.even n :: bl] (Sosa.half n)
     in
     let rec loop ipl ip sp =
       fun
@@ -2805,12 +2805,12 @@ value sosa_of_branch ipl =
     let ipl = List.tl (List.rev ipl) in
     List.fold_left
       (fun b (ip, sp) ->
-         let b = Num.twice b in
+         let b = Sosa.twice b in
          match sp with
          [ Male -> b
-         | Female -> Num.inc b 1
+         | Female -> Sosa.inc b 1
          | Neuter -> assert False ])
-      Num.one ipl
+      Sosa.one ipl
   }
 ;
 

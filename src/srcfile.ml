@@ -224,7 +224,7 @@ value string_of_start_date conf =
 value string_of_num sep num =
   let len = ref 0 in
   do {
-    Num.print (fun x -> len.val := Buff.mstore len.val x) sep num;
+    Sosa.print (fun x -> len.val := Buff.mstore len.val x) sep num;
     Buff.get len.val
   }
 ;
@@ -244,7 +244,7 @@ value macro conf base =
   | 'c' ->
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
-        (Num.of_int r.welcome_cnt)
+        (Sosa.of_int r.welcome_cnt)
   | 'd' -> string_of_start_date conf
   | 'D' -> (count conf).start_date
   | 'e' -> conf.charset
@@ -263,7 +263,7 @@ value macro conf base =
       [ Not_found -> "20" ]
   | 'n' ->
       string_of_num (transl conf "(thousand separator)")
-        (Num.of_int (nb_of_persons base))
+        (Sosa.of_int (nb_of_persons base))
   | 'N' ->
       let s = base_notes_read_first_line base "" in
       let len = String.length s in
@@ -275,7 +275,7 @@ value macro conf base =
   | 'q' ->
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
-        (Num.of_int (r.welcome_cnt + r.request_cnt))
+        (Sosa.of_int (r.welcome_cnt + r.request_cnt))
   | 'R' -> conf.right
   | 's' -> commd conf
   | 't' -> conf.bname
@@ -550,11 +550,11 @@ value eval_var conf base env () loc =
   | ["base"; "nb_persons"] ->
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
-           (Num.of_int (nb_of_persons base)))
+           (Sosa.of_int (nb_of_persons base)))
   | ["base"; "real_nb_persons"] ->
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
-           (Num.of_int (Util.real_nb_of_persons conf base)))
+           (Sosa.of_int (Util.real_nb_of_persons conf base)))
   | ["base"; "title"] ->
       let s = base_notes_read_first_line base "" in
       let len = String.length s in
@@ -575,14 +575,14 @@ value eval_var conf base env () loc =
       let r = count conf in
       let s =
         string_of_num (transl conf "(thousand separator)")
-          (Num.of_int (r.welcome_cnt + r.request_cnt))
+          (Sosa.of_int (r.welcome_cnt + r.request_cnt))
       in
       VVstring s
   | ["nb_accesses_to_welcome"] ->
       let r = count conf in
       let s =
         string_of_num (transl conf "(thousand separator)")
-          (Num.of_int r.welcome_cnt)
+          (Sosa.of_int r.welcome_cnt)
       in
       VVstring s
   | ["random"; "init"] -> do {

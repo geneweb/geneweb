@@ -278,8 +278,8 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
       if conf.bname <> Link.chop_base_prefix base_prefix then `no_sosa
       else
         let sosa_nb = Perso.get_sosa_person conf base p in
-        if Num.eq sosa_nb Num.zero then `no_sosa
-        else if Num.eq sosa_nb Num.one then `sosa_ref
+        if Sosa.eq sosa_nb Sosa.zero then `no_sosa
+        else if Sosa.eq sosa_nb Sosa.one then `sosa_ref
         else `sosa
     in
     let sn =
@@ -404,8 +404,8 @@ let pers_to_piqi_simple_person conf base p base_prefix =
     in
     let sosa =
       let sosa_nb = Perso.get_sosa_person conf base p in
-      if Num.eq sosa_nb Num.zero then `no_sosa
-      else if Num.eq sosa_nb Num.one then `sosa_ref
+      if Sosa.eq sosa_nb Sosa.zero then `no_sosa
+      else if Sosa.eq sosa_nb Sosa.one then `sosa_ref
       else `sosa
     in
     let sn =
@@ -833,8 +833,8 @@ let pers_to_piqi_person conf base p =
     in
     let sosa =
       let sosa_nb = Perso.get_sosa_person conf base p in
-      if Num.eq sosa_nb Num.zero then `no_sosa
-      else if Num.eq sosa_nb Num.one then `sosa_ref
+      if Sosa.eq sosa_nb Sosa.zero then `no_sosa
+      else if Sosa.eq sosa_nb Sosa.one then `sosa_ref
       else `sosa
     in
     let sn =
@@ -2577,8 +2577,8 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
       if conf.bname <> Link.chop_base_prefix base_prefix then `no_sosa
       else
         let sosa_nb = Perso.get_sosa_person conf base p in
-        if Num.eq sosa_nb Num.zero then `no_sosa
-        else if Num.eq sosa_nb Num.one then `sosa_ref
+        if Sosa.eq sosa_nb Sosa.zero then `no_sosa
+        else if Sosa.eq sosa_nb Sosa.one then `sosa_ref
         else `sosa
     in
     let sn =

@@ -195,8 +195,8 @@ value get_request_string : list string -> string;
 value create_topological_sort : config -> base -> array int;
 
 value branch_of_sosa :
-  config -> base -> iper -> Num.t -> option (list (iper * sex));
-value sosa_of_branch : list (iper * sex) -> Num.t;
+  config -> base -> iper -> Sosa.t -> option (list (iper * sex));
+value sosa_of_branch : list (iper * sex) -> Sosa.t;
 
 value has_image : config -> base -> person -> bool;
 value image_file_name : string -> string;

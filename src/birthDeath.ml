@@ -621,8 +621,8 @@ value print_population_pyramid conf base = do {
     else ()
   };
   let string_of_nb n =
-    Num.to_string_sep (transl conf "(thousand separator)")
-      (Num.of_int n)
+    Sosa.to_string_sep (transl conf "(thousand separator)")
+      (Sosa.of_int n)
   in
   let title _ =
     Wserver.printf "%s (%d)" (capitale (transl conf "population pyramid"))

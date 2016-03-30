@@ -33,7 +33,7 @@ GWD_OBJS1=../wserver/httpStatus.cmo ../wserver/wserver.cmo \
 ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo \
 buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo \
 database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo \
-gutil.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo \
+gutil.cmo pqueue.cmo consang.cmo sosa.cmo version.cmo translate.cmo \
 gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo \
 hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo \
 notes.cmo wiznotes.cmo srcfile.cmo dag.cmo
@@ -63,7 +63,7 @@ PROBOT_OBJS=probot.cmo
 
 MOSTDESC_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo \
 mutil.cmo adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo \
-db2.cmo db2disk.cmo gwdb.cmo consang.cmo pqueue.cmo num.cmo \
+db2.cmo db2disk.cmo gwdb.cmo consang.cmo pqueue.cmo sosa.cmo \
 mostdesc.cmo
 
 FPLA_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo mutil.cmo \

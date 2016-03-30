@@ -5,18 +5,18 @@ open Def;
 open Gwdb;
 
 value print_result base tab =
-  let m_val = ref Num.zero in
+  let m_val = ref Sosa.zero in
   let m_list = ref [] in
   loop () where rec loop () =
     do {
-      m_val.val := Num.zero;
+      m_val.val := Sosa.zero;
       m_list.val := [];
       for i = 0 to Array.length tab - 1 do {
-        if Num.eq tab.(i) Num.zero then ()
-        else if Num.gt tab.(i) m_val.val then do {
+        if Sosa.eq tab.(i) Sosa.zero then ()
+        else if Sosa.gt tab.(i) m_val.val then do {
           m_val.val := tab.(i); m_list.val := [i];
         }
-        else if Num.eq tab.(i) m_val.val then m_list.val := [i :: m_list.val]
+        else if Sosa.eq tab.(i) m_val.val then m_list.val := [i :: m_list.val]
         else ()
       };
       if m_list.val <> [] then do {
@@ -34,7 +34,7 @@ value print_result base tab =
               compare f1 f2
           in
           List.sort f m_list.val;
-        Num.print print_string "." m_val.val;
+        Sosa.print print_string "." m_val.val;
         print_newline ();
         List.iter
           (fun i ->
@@ -45,7 +45,7 @@ value print_result base tab =
                flush stdout;
              })
           m_list.val;
-        List.iter (fun i -> tab.(i) := Num.zero) m_list.val;
+        List.iter (fun i -> tab.(i) := Sosa.zero) m_list.val;
         loop ()
       }
       else ()
@@ -68,12 +68,12 @@ value most_desc base p =
 *)
   let _ = load_descends_array base in
   let _ = load_unions_array base in
-  let tab = Array.make (nb_of_persons base) Num.zero in
+  let tab = Array.make (nb_of_persons base) Sosa.zero in
   let entered = Array.make (nb_of_persons base) False in
   let q = ref Pq.empty in
   do {
     q.val := Pq.add (get_key_index p) q.val;
-    tab.(Adef.int_of_iper (get_key_index p)) := Num.one;
+    tab.(Adef.int_of_iper (get_key_index p)) := Sosa.one;
     while not (Pq.is_empty q.val) do {
       let (ip, nq) = Pq.take q.val in
       q.val := nq;
@@ -83,7 +83,7 @@ value most_desc base p =
         let des = doi base (get_family u).(i) in
         for j = 0 to Array.length (get_children des) - 1 do {
           let ip = (get_children des).(j) in
-          tab.(Adef.int_of_iper ip) := Num.add tab.(Adef.int_of_iper ip) n;
+          tab.(Adef.int_of_iper ip) := Sosa.add tab.(Adef.int_of_iper ip) n;
           if not entered.(Adef.int_of_iper ip) then do {
             q.val := Pq.add ip q.val;
             entered.(Adef.int_of_iper ip) := True;

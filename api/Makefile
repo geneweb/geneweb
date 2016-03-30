@@ -16,7 +16,7 @@ api_saisie_write_piqi.cmx api_saisie_write_piqi_ext.cmx \
 ../src/futil.cmx ../src/dutil.cmx ../src/database.cmx ../src/db2.cmx \
 ../src/db2disk.cmx ../src/diff.cmx ../src/gwdb.cmx ../src/progrBar.cmx \
 ../src/consang.cmx ../src/checkItem.cmx ../src/check.cmx \
-../src/gutil.cmx ../src/pqueue.cmx ../src/num.cmx ../src/version.cmx \
+../src/gutil.cmx ../src/pqueue.cmx ../src/sosa.cmx ../src/version.cmx \
 ../src/translate.cmx ../src/gwlib.cmx ../src/notesLinks.cmx \
 ../src/util.cmx ../src/calendar.cmx ../src/gwcomp.cmx \
 ../src/templDate.cmx ../src/templ.cmx ../src/hutil.cmx ../src/date.cmx \
@@ -46,7 +46,7 @@ api_saisie_write_piqi.cmx api_saisie_write_piqi_ext.cmx \
 ../src/futil.cmx ../src/dutil.cmx ../src/database.cmx ../src/db2.cmx \
 ../src/db2disk.cmx ../src/diff.cmx ../src/gwdb.cmx ../src/progrBar.cmx \
 ../src/consang.cmx ../src/checkItem.cmx ../src/check.cmx \
-../src/gutil.cmx ../src/pqueue.cmx ../src/num.cmx ../src/version.cmx \
+../src/gutil.cmx ../src/pqueue.cmx ../src/sosa.cmx ../src/version.cmx \
 ../src/translate.cmx ../src/gwlib.cmx ../src/notesLinks.cmx \
 ../src/util.cmx ../src/calendar.cmx ../src/gwcomp.cmx \
 ../src/templDate.cmx ../src/templ.cmx ../src/hutil.cmx ../src/date.cmx \

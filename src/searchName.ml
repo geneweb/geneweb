@@ -159,10 +159,10 @@ value name_with_roman_number str =
 
 value search_by_sosa conf base an =
   let sosa_ref = Util.find_sosa_ref conf base in
-  let sosa_nb = try Some (Num.of_string an) with [ Failure _ -> None ] in
+  let sosa_nb = try Some (Sosa.of_string an) with [ Failure _ -> None ] in
   match (sosa_ref, sosa_nb) with
   [ (Some p, Some n) ->
-      if n <> Num.zero then
+      if n <> Sosa.zero then
         match Util.branch_of_sosa conf base (get_key_index p) n with
         [ Some [(ip, _) :: _] -> [pget conf base ip]
         | _ -> [] ]

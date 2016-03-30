@@ -873,7 +873,7 @@ value print_link_name conf base n p1 p2 sol =
 ;
 
 value wprint_num conf n =
-  Num.print (fun x -> Wserver.printf "%s" x)
+  Sosa.print (fun x -> Wserver.printf "%s" x)
     (transl conf "(thousand separator)") n
 ;
 
@@ -1203,14 +1203,14 @@ value compute_simple_relationship conf base tstab ip1 ip2 =
              let u = tab.Consang.reltab.(i) in
              List.fold_left
                (fun n (_, n1, _) ->
-                  let n1 = if n1 < 0 then raise Exit else Num.of_int n1 in
+                  let n1 = if n1 < 0 then raise Exit else Sosa.of_int n1 in
                   List.fold_left
-                    (fun n (_, n2, _) -> Num.add n (Num.mul n1 n2)) n
+                    (fun n (_, n2, _) -> Sosa.add n (Sosa.mul n1 n2)) n
                     u.Consang.lens1)
                n u.Consang.lens2)
-          Num.zero ancestors
+          Sosa.zero ancestors
       with
-      [ Exit -> Num.zero ]
+      [ Exit -> Sosa.zero ]
     in
     let rl =
       List.fold_left
@@ -1349,8 +1349,8 @@ value compute_relationship conf base by_marr p1 p2 =
            let rl1 =
              List.map (fun (po1, po2, list) -> (po1, po2, list, reltab)) rl1
            in
-           (merge_relations rl1 rl, Num.add total1 total))
-        all_sol ([], Num.zero)
+           (merge_relations rl1 rl, Sosa.add total1 total))
+        all_sol ([], Sosa.zero)
     in
     if sl = [] then None else Some (sl, total, rel)
 ;
@@ -1427,18 +1427,18 @@ value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list), _) =
 value print_main_relationship conf base long p1 p2 rel =
   let total =
     match rel with
-    [ None -> Num.zero
+    [ None -> Sosa.zero
     | Some (_, total, _) -> total ]
   in
   let title _ = do {
     Wserver.printf "%s" (capitale (transl conf "relationship"));
-    if Num.eq total Num.zero then ()
+    if Sosa.eq total Sosa.zero then ()
     else do {
       Wserver.printf " (";
       wprint_num conf total;
       Wserver.printf " %s)"
         (transl_nth conf "relationship link/relationship links"
-           (if Num.eq total Num.one then 0 else 1))
+           (if Sosa.eq total Sosa.one then 0 else 1))
     }
   }
   in

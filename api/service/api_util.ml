@@ -474,7 +474,7 @@ let reduce_to_sosa conf base compute_sosa l =
     | [] -> accu
     | p :: l ->
         let sosa = compute_sosa conf base p in
-        if Num.gt sosa Num.zero then loop l (p :: accu)
+        if Sosa.gt sosa Sosa.zero then loop l (p :: accu)
         else loop l accu
   in loop l []
 ;;
@@ -535,7 +535,7 @@ let is_visible conf base p =
 (* ********************************************************************* *)
 let is_sosa conf base compute_sosa p =
   let sosa = compute_sosa conf base p in
-  Num.gt sosa Num.zero
+  Sosa.gt sosa Sosa.zero
 ;;
 
 
@@ -912,7 +912,7 @@ let empty_piqi_person conf ref_person base_loop =
 (* ************************************************************************** *)
 (*  [Fonc] spouse_to_piqi_spouse :
              config -> base -> person -> family -> bool ->
-               (config -> base -> person -> Num.t) -> Perso                   *)
+               (config -> base -> person -> Sosa.t) -> Perso                   *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Spouse (piqi)
                     dont tous les champs sont complétés.
                     Les tests de droits d'accès sont fait dans cette fonction.
@@ -943,7 +943,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
     if base_loop then "-1"
     else
       let sosa_p = compute_sosa conf base p in
-      Num.to_string sosa_p
+      Sosa.to_string sosa_p
   in
   let sex =
     match gen_p.sex with
@@ -1078,7 +1078,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_person_light :
              config -> base -> person -> bool ->
-               (config -> base -> person -> Num.t) -> Person                  *)
+               (config -> base -> person -> Sosa.t) -> Person                  *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person (piqi)
                     (piqi) dont tous les champs sont complétés.
                     Les tests de droits d'accès sont fait dans cette fonction.
@@ -1102,7 +1102,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
     if base_loop then "-1"
     else
       let sosa_p = compute_sosa conf base p in
-      Num.to_string sosa_p
+      Sosa.to_string sosa_p
   in
   let sex =
     match gen_p.sex with
@@ -1245,7 +1245,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_person_full :
              config -> base -> person -> bool ->
-               (config -> base -> person -> Num.t) -> FullPerson              *)
+               (config -> base -> person -> Sosa.t) -> FullPerson              *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person (piqi)
                     (piqi) dont tous les champs sont complétés.
                     Les tests de droits d'accès sont fait dans cette fonction.
@@ -1269,7 +1269,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
     if base_loop then "-1"
     else
       let sosa_p = compute_sosa conf base p in
-      Num.to_string sosa_p
+      Sosa.to_string sosa_p
   in
   let sex =
     match gen_p.sex with
@@ -2268,7 +2268,7 @@ let person_node_map conf base l =
 ;;
 
 let person_node_map_lia conf base l =
-  let compute_sosa = (fun _ _ _ -> Num.zero) in
+  let compute_sosa = (fun _ _ _ -> Sosa.zero) in
   (* TODO ? *)
   let load_img =
     if List.length l > 20 then

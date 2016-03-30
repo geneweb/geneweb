@@ -177,7 +177,7 @@ value string_of_titles conf base cap and_txt p =
 value string_of_num sep num =
   let len = ref 0 in
   do {
-    Num.print (fun x -> len.val := Buff.mstore len.val x) sep num;
+    Sosa.print (fun x -> len.val := Buff.mstore len.val x) sep num;
     Buff.get len.val
   }
 ;
@@ -219,11 +219,11 @@ value find_sosa_aux conf base a p =
             match get_parents asc with
             [ Some ifam ->
                 let cpl = foi base ifam in
-                let z = Num.twice z in
+                let z = Sosa.twice z in
                 match gene_find zil with
                 [ Left zil ->
                     Left
-                      [(z, get_father cpl); (Num.inc z 1, (get_mother cpl)) ::
+                      [(z, get_father cpl); (Sosa.inc z 1, (get_mother cpl)) ::
                        zil]
                 | Right z -> Right z ]
             | None -> gene_find zil ]
@@ -235,7 +235,7 @@ value find_sosa_aux conf base a p =
     | Left zil -> find zil
     | Right z -> Some (z, p) ]
   in
-  find [(Num.one, get_key_index p)]
+  find [(Sosa.one, get_key_index p)]
 ;
 (* Male version
 value find_sosa_aux conf base a p =
@@ -249,21 +249,21 @@ value find_sosa_aux conf base a p =
       match asc.parents with
       [ Some ifam ->
           let cpl = coi base ifam in
-          let z = Num.twice z in
+          let z = Sosa.twice z in
           match find z (father cpl) with
           [ Some z -> Some z
-          | None -> find (Num.inc z 1) (mother cpl) ]
+          | None -> find (Sosa.inc z 1) (mother cpl) ]
       | None -> None ]
     }
   in
-  find Num.one (get_key_index p)
+  find Sosa.one (get_key_index p)
 ;
 *)
 
 value find_sosa conf base a sosa_ref_l =
   match Lazy.force sosa_ref_l with
   [ Some p ->
-      if get_key_index a = get_key_index p then Some (Num.one, p)
+      if get_key_index a = get_key_index p then Some (Sosa.one, p)
       else
         let u = pget conf base (get_key_index a) in
         if has_children base u then find_sosa_aux conf base a p else None
@@ -280,8 +280,8 @@ value find_sosa conf base a sosa_ref_l =
 type sosa_t =
   { tstab : array int;
     mark : array bool;
-    last_zil : mutable list (Def.iper * Num.t);
-    sosa_ht : Hashtbl.t Def.iper (option (Num.t * Gwdb.person))
+    last_zil : mutable list (Def.iper * Sosa.t);
+    sosa_ht : Hashtbl.t Def.iper (option (Sosa.t * Gwdb.person))
   }
 ;
 
@@ -302,10 +302,10 @@ value init_sosa_t conf base sosa_ref =
       } ]
   in
   let mark = Array.make (nb_of_persons base) False in
-  let last_zil = [(get_key_index sosa_ref, Num.one)] in
+  let last_zil = [(get_key_index sosa_ref, Sosa.one)] in
   let sosa_ht = Hashtbl.create 5003 in
   let () =
-    Hashtbl.add sosa_ht (get_key_index sosa_ref) (Some (Num.one, sosa_ref))
+    Hashtbl.add sosa_ht (get_key_index sosa_ref) (Some (Sosa.one, sosa_ref))
   in
   let t_sosa =
     { tstab = tstab;
@@ -323,7 +323,7 @@ value find_sosa_aux conf base a p t_sosa =
   let ht_add ht k v new_sosa =
     match try Hashtbl.find ht k with [ Not_found -> v ] with
     [ Some (z, _) ->
-        if not (Num.gt new_sosa z) then Hashtbl.replace ht k v
+        if not (Sosa.gt new_sosa z) then Hashtbl.replace ht k v
         else ()
     | _ -> () ]
   in
@@ -345,11 +345,11 @@ value find_sosa_aux conf base a p t_sosa =
             match get_parents asc with
             [ Some ifam ->
                 let cpl = foi base ifam in
-                let z = Num.twice z in
+                let z = Sosa.twice z in
                 match gene_find zil with
                 [ Left zil ->
                     Left
-                      [(get_father cpl, z); (get_mother cpl, Num.inc z 1) ::
+                      [(get_father cpl, z); (get_mother cpl, Sosa.inc z 1) ::
                        zil]
                 | Right z -> Right z ]
             | None -> gene_find zil ]
@@ -397,7 +397,7 @@ value find_sosa_aux conf base a p t_sosa =
 value find_sosa conf base a sosa_ref_l t_sosa =
   match Lazy.force sosa_ref_l with
   [ Some p ->
-      if get_key_index a = get_key_index p then Some (Num.one, p)
+      if get_key_index a = get_key_index p then Some (Sosa.one, p)
       else
         let u = pget conf base (get_key_index a) in
         if has_children base u then
@@ -408,7 +408,7 @@ value find_sosa conf base a sosa_ref_l t_sosa =
 ;
 
 
-(* [Type]: (Def.iper, Num.t) Hashtbl.t *)
+(* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
 value sosa_ht = Hashtbl.create 5003;
 
 
@@ -437,16 +437,16 @@ value build_sosa_ht conf base =
       (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
       (* commence à l'indice 1 !                                            *)
       let sosa_accu =
-        Array.make (nb_persons + 1) (Num.zero, Adef.iper_of_int 0)
+        Array.make (nb_persons + 1) (Sosa.zero, Adef.iper_of_int 0)
       in
-      let () = Array.set sosa_accu 1 (Num.one, get_key_index sosa_ref) in
+      let () = Array.set sosa_accu 1 (Sosa.one, get_key_index sosa_ref) in
       let rec loop i len =
         if i > nb_persons then ()
         else
           let (sosa_num, ip) = Array.get sosa_accu i in
           (* Si la personne courante n'a pas de numéro de sosa, alors il n'y *)
           (* a plus d'ancêtres car ils ont été ajoutés par ordre croissant.  *)
-          if Num.eq sosa_num Num.zero then ()
+          if Sosa.eq sosa_num Sosa.zero then ()
           else do {
             Hashtbl.add sosa_ht ip sosa_num;
             let asc = pget conf base ip in
@@ -454,7 +454,7 @@ value build_sosa_ht conf base =
             match get_parents asc with
             [ Some ifam ->
                 let cpl = foi base ifam in
-                let z = Num.twice sosa_num in
+                let z = Sosa.twice sosa_num in
                 let len =
                   if not mark.(Adef.int_of_iper (get_father cpl)) then do {
                     Array.set sosa_accu (len + 1) (z, get_father cpl) ;
@@ -464,7 +464,7 @@ value build_sosa_ht conf base =
                 in
                 let len =
                   if not mark.(Adef.int_of_iper (get_mother cpl)) then do {
-                    Array.set sosa_accu (len + 1) (Num.inc z 1, get_mother cpl);
+                    Array.set sosa_accu (len + 1) (Sosa.inc z 1, get_mother cpl);
                     mark.(Adef.int_of_iper (get_mother cpl)) := True ;
                     len + 1 }
                 else len
@@ -479,7 +479,7 @@ value build_sosa_ht conf base =
 
 
 (* ******************************************************************** *)
-(*  [Fonc] get_sosa_person : config -> base -> person -> Num.t          *)
+(*  [Fonc] get_sosa_person : config -> base -> person -> Sosa.t          *)
 (** [Description] : Recherche si la personne passée en argument a un
                     numéro de sosa.
     [Args] :
@@ -487,18 +487,18 @@ value build_sosa_ht conf base =
       - base : base de donnée
       - p    : personne dont on cherche si elle a un numéro sosa
     [Retour] :
-      - Num.t : retourne Num.zero si la personne n'a pas de numéro de
+      - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
                 sosa, ou retourne son numéro de sosa sinon
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
 value get_sosa_person conf base p =
   try Hashtbl.find sosa_ht (get_key_index p) with
-  [ Not_found -> Num.zero ]
+  [ Not_found -> Sosa.zero ]
 ;
 
 
 (* ******************************************************************** *)
-(*  [Fonc] get_single_sosa : config -> base -> person -> Num.t          *)
+(*  [Fonc] get_single_sosa : config -> base -> person -> Sosa.t          *)
 (** [Description] : Recherche si la personne passée en argument a un
                     numéro de sosa.
     [Args] :
@@ -506,7 +506,7 @@ value get_sosa_person conf base p =
       - base : base de donnée
       - p    : personne dont on cherche si elle a un numéro sosa
     [Retour] :
-      - Num.t : retourne Num.zero si la personne n'a pas de numéro de
+      - Sosa.t : retourne Sosa.zero si la personne n'a pas de numéro de
                 sosa, ou retourne son numéro de sosa sinon
     [Rem] : Exporté en clair hors de ce module.                         *)
 (* ******************************************************************** *)
@@ -521,8 +521,8 @@ value get_single_sosa conf base p =
       let t_sosa = init_sosa_t conf base p_sosa in
       match find_sosa conf base p sosa_ref_l t_sosa with
       [ Some (z, p) -> z
-      | None -> Num.zero ]
-  | None -> Num.zero ]
+      | None -> Sosa.zero ]
+  | None -> Sosa.zero ]
 ;
 
 
@@ -544,7 +544,7 @@ value get_single_sosa conf base p =
 (* ************************************************************************ *)
 value print_sosa conf base p link =
   let sosa_num = get_sosa_person conf base p in
-  if Num.gt sosa_num Num.zero then
+  if Sosa.gt sosa_num Sosa.zero then
     match Util.find_sosa_ref conf base with
     [ Some ref ->
         do {
@@ -553,7 +553,7 @@ value print_sosa conf base p link =
             let sosa_link =
               let i1 = string_of_int (Adef.int_of_iper (get_key_index p)) in
               let i2 = string_of_int (Adef.int_of_iper (get_key_index ref)) in
-              let b2 = Num.to_string sosa_num in
+              let b2 = Sosa.to_string sosa_num in
               "m=RL;i1=" ^ i1 ^ ";i2=" ^ i2 ^ ";b1=1;b2=" ^ b2
             in
             Wserver.printf "<a href=\"%s%s\" style=\"text-decoration:none\">"
@@ -726,10 +726,10 @@ value max_descendant_level conf base desc_level_table_l =
 (* ancestors by list *)
 
 type generation_person =
-  [ GP_person of Num.t and iper and option ifam
-  | GP_same of Num.t and Num.t and iper
-  | GP_interv of option (Num.t * Num.t * option (Num.t * Num.t))
-  | GP_missing of Num.t and iper ]
+  [ GP_person of Sosa.t and iper and option ifam
+  | GP_same of Sosa.t and Sosa.t and iper
+  | GP_interv of option (Sosa.t * Sosa.t * option (Sosa.t * Sosa.t))
+  | GP_missing of Sosa.t and iper ]
 ;
 
 value next_generation conf base mark gpl =
@@ -738,8 +738,8 @@ value next_generation conf base mark gpl =
       (fun gp gpl ->
          match gp with
          [ GP_person n ip _ ->
-             let n_fath = Num.twice n in
-             let n_moth = Num.inc n_fath 1 in
+             let n_fath = Sosa.twice n in
+             let n_moth = Sosa.inc n_fath 1 in
              let a = pget conf base ip in
              match get_parents a with
              [ Some ifam ->
@@ -751,10 +751,10 @@ value next_generation conf base mark gpl =
          | GP_interv (Some (n1, n2, x)) ->
              let x =
                match x with
-               [ Some (m1, m2) -> Some (Num.twice m1, Num.twice m2)
+               [ Some (m1, m2) -> Some (Sosa.twice m1, Sosa.twice m2)
                | None -> None ]
              in
-             let gp = GP_interv (Some (Num.twice n1, Num.twice n2, x)) in
+             let gp = GP_interv (Some (Sosa.twice n1, Sosa.twice n2, x)) in
              [gp :: gpl]
          | _ -> gpl ])
       gpl []
@@ -766,7 +766,7 @@ value next_generation conf base mark gpl =
          [ GP_person n ip _ ->
              let i = Adef.int_of_iper ip in
              let m = mark.(i) in
-             if Num.eq m Num.zero then do { mark.(i) := n; [gp :: gpl] }
+             if Sosa.eq m Sosa.zero then do { mark.(i) := n; [gp :: gpl] }
              else [GP_same n m ip :: gpl]
          | _ -> [gp :: gpl] ])
       [] gpl
@@ -780,7 +780,7 @@ value next_generation2 conf base mark gpl =
       (fun gp ->
          match gp with
          [ GP_same n m ip ->
-             GP_interv (Some (n, Num.inc n 1, Some (m, Num.inc m 1)))
+             GP_interv (Some (n, Sosa.inc n 1, Some (m, Sosa.inc m 1)))
          | _ -> gp ])
       gpl
   in
@@ -790,11 +790,11 @@ value next_generation2 conf base mark gpl =
        match (gp, gpl) with
        [ (GP_interv (Some (n1, n2, x)),
           [GP_interv (Some (n3, n4, y)) :: gpl1]) ->
-           if Num.eq n2 n3 then
+           if Sosa.eq n2 n3 then
              let z =
                match (x, y) with
                [ (Some (m1, m2), Some (m3, m4)) ->
-                   if Num.eq m2 m3 then Some (m1, m4) else None
+                   if Sosa.eq m2 m3 then Some (m1, m4) else None
                | _ -> None ]
              in
              [GP_interv (Some (n1, n4, z)) :: gpl1]
@@ -810,7 +810,7 @@ value sosa_is_present all_gp n1 =
   loop all_gp where rec loop =
     fun
     [ [GP_person n _ _ :: gpl]
-    | [GP_same n _ _ :: gpl] -> if Num.eq n n1 then True else loop gpl
+    | [GP_same n _ _ :: gpl] -> if Sosa.eq n n1 then True else loop gpl
     | [gp :: gpl] -> loop gpl
     | [] -> False ]
 ;
@@ -825,12 +825,12 @@ value get_link all_gp ip =
 ;
 
 value parent_sosa conf base ip all_gp n parent =
-  if sosa_is_present all_gp n then Num.to_string n
+  if sosa_is_present all_gp n then Sosa.to_string n
   else
     match get_parents (pget conf base ip) with
     [ Some ifam ->
         match get_link all_gp (parent (foi base ifam)) with
-        [ Some (GP_person n _ _) -> Num.to_string n
+        [ Some (GP_person n _ _) -> Sosa.to_string n
         | _ -> "" ]
     | None -> "" ]
 ;
@@ -848,7 +848,7 @@ value get_all_generations conf base p =
     [ Some v -> v (* + 1 *)
     | None -> 0 ]
   in
-  let mark = Array.make (nb_of_persons base) Num.zero in
+  let mark = Array.make (nb_of_persons base) Sosa.zero in
   let rec get_generations level gpll gpl =
     let gpll = [gpl :: gpll] in
     if level < max_level then
@@ -859,7 +859,7 @@ value get_all_generations conf base p =
     else gpll
   in
   let gpll =
-    get_generations 1 [] [GP_person Num.one (get_key_index p) None]
+    get_generations 1 [] [GP_person Sosa.one (get_key_index p) None]
   in
   let gpll = List.rev gpll in
   List.flatten gpll
@@ -1231,12 +1231,12 @@ value build_surnames_list conf base v p =
             then
               add_surname sosa p surn dp
             else ();
-            let sosa = Num.twice sosa in
+            let sosa = Sosa.twice sosa in
             if not (is_hidden fath) then
               let dp1 = merge_date_place conf base surn dp fath in
               loop (lev + 1) sosa fath (get_surname fath) dp1
             else ();
-            let sosa = Num.inc sosa 1 in
+            let sosa = Sosa.inc sosa 1 in
             if not (is_hidden moth) then
               let dp2 = merge_date_place conf base surn dp moth in
               loop (lev + 1) sosa moth (get_surname moth) dp2
@@ -1246,7 +1246,7 @@ value build_surnames_list conf base v p =
     }
   in
   do {
-    loop 1 Num.one p (get_surname p) (get_date_place conf base auth p);
+    loop 1 Sosa.one p (get_surname p) (get_date_place conf base auth p);
     let list = ref [] in
     Hashtbl.iter
       (fun i dp ->
@@ -1527,7 +1527,7 @@ module IperSet =
 *)
 type ancestor_surname_info =
   [ Branch of
-      (string * option date * option date * string * person * list Num.t * loc)
+      (string * option date * option date * string * person * list Sosa.t * loc)
   | Eclair of
       (string * string * option date * option date * person * list iper * loc) ]
 ;
@@ -1552,7 +1552,7 @@ type env 'a =
   | Vnldb of NotesLinks.notes_links_db
   | Vstring of string
   | Vsosa_ref of Lazy.t (option person)
-  | Vsosa of ref (list (iper * option (Num.t * person)))
+  | Vsosa of ref (list (iper * option (Sosa.t * person)))
   | Vt_sosa of sosa_t
   | Vtitle of person and title_item
   | Vevent of person and event_item
@@ -2207,11 +2207,11 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
   | ["base"; "nb_persons"] ->
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
-           (Num.of_int (nb_of_persons base)))
+           (Sosa.of_int (nb_of_persons base)))
   | ["base"; "real_nb_persons"] ->
       VVstring
         (string_of_num (Util.transl conf "(thousand separator)")
-           (Num.of_int (Util.real_nb_of_persons conf base)))
+           (Sosa.of_int (Util.real_nb_of_persons conf base)))
   | ["birth_witness" :: sl] ->
       match get_env "birth_witness" env with
       [ Vind p ->
@@ -2348,7 +2348,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
       | _ -> raise Not_found ]
   | ["number_of_ancestors" :: sl] ->
       match get_env "n" env with
-      [ Vint n -> VVstring (eval_num conf (Num.of_int (n - 1)) sl)
+      [ Vint n -> VVstring (eval_num conf (Sosa.of_int (n - 1)) sl)
       | _ -> raise Not_found ]
   | ["number_of_descendants" :: sl] ->
       match get_env "level" env with
@@ -2359,7 +2359,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
                 Array.fold_left (fun cnt v -> if v <= i then cnt + 1 else cnt)
                   0 (fst (Lazy.force t))
               in
-              VVstring (eval_num conf (Num.of_int (cnt - 1)) sl)
+              VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
   | ["parent" :: sl] ->
@@ -2602,25 +2602,25 @@ and eval_ancestor_field_var conf base env gp loc =
   | ["father_sosa"] ->
       match (gp, get_env "all_gp" env) with
       [ (GP_person n ip _ | GP_same n _ ip, Vallgp all_gp) ->
-          let n = Num.twice n in
+          let n = Sosa.twice n in
           VVstring (parent_sosa conf base ip all_gp n get_father)
       | _ -> VVstring "" ]
   | ["interval"] ->
       match gp with
       [ GP_interv (Some (n1, n2, Some (n3, n4))) ->
-          let n2 = Num.sub n2 Num.one in
-          let n4 = Num.sub n4 Num.one in
+          let n2 = Sosa.sub n2 Sosa.one in
+          let n4 = Sosa.sub n4 Sosa.one in
           let sep = transl conf "(thousand separator)" in
           let r =
-            Num.to_string_sep sep n1 ^ "-" ^ Num.to_string_sep sep n2 ^ " = " ^
-            Num.to_string_sep sep n3 ^ "-" ^ Num.to_string_sep sep n4
+            Sosa.to_string_sep sep n1 ^ "-" ^ Sosa.to_string_sep sep n2 ^ " = " ^
+            Sosa.to_string_sep sep n3 ^ "-" ^ Sosa.to_string_sep sep n4
           in
           VVstring r
       | GP_interv (Some (n1, n2, None)) ->
-          let n2 = Num.sub n2 Num.one in
+          let n2 = Sosa.sub n2 Sosa.one in
           let sep = transl conf "(thousand separator)" in
           let r =
-            Num.to_string_sep sep n1 ^ "-" ^ Num.to_string_sep sep n2 ^
+            Sosa.to_string_sep sep n1 ^ "-" ^ Sosa.to_string_sep sep n2 ^
             " = ..."
           in
           VVstring r
@@ -2629,7 +2629,7 @@ and eval_ancestor_field_var conf base env gp loc =
   | ["mother_sosa"] ->
       match (gp, get_env "all_gp" env) with
       [ (GP_person n ip _ | GP_same n _ ip, Vallgp all_gp) ->
-          let n = Num.inc (Num.twice n) 1 in
+          let n = Sosa.inc (Sosa.twice n) 1 in
           VVstring (parent_sosa conf base ip all_gp n get_mother)
       | _ -> VVstring "" ]
   | ["same" :: sl] ->
@@ -2672,7 +2672,7 @@ and eval_anc_by_surnl_field_var conf base env ep info =
             List.fold_right
               (fun sosa (str, n) ->
                  let str =
-                   str ^ ";s" ^ string_of_int n ^ "=" ^ Num.to_string sosa
+                   str ^ ";s" ^ string_of_int n ^ "=" ^ Sosa.to_string sosa
                  in
                  (str, n + 1))
               sosa_list ("", 1)
@@ -2705,10 +2705,10 @@ and eval_anc_by_surnl_field_var conf base env ep info =
           eval_person_field_var conf base env ep loc sl ] ]
 and eval_num conf n =
   fun
-  [ ["hexa"] -> "0x" ^ Num.to_string_sep_base "" 16 n
-  | ["octal"] -> "0o" ^ Num.to_string_sep_base "" 8 n
-  | ["v"] -> Num.to_string n
-  | [] -> Num.to_string_sep (transl conf "(thousand separator)") n
+  [ ["hexa"] -> "0x" ^ Sosa.to_string_sep_base "" 16 n
+  | ["octal"] -> "0o" ^ Sosa.to_string_sep_base "" 8 n
+  | ["v"] -> Sosa.to_string n
+  | [] -> Sosa.to_string_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found ]
 and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
   fun
@@ -3907,7 +3907,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
       match get_env "all_gp" env with
       [ Vallgp all_gp ->
           match get_link all_gp (get_key_index p) with
-          [ Some (GP_person s _ _) -> Num.to_string s
+          [ Some (GP_person s _ _) -> Sosa.to_string s
           | _ -> "" ]
       | _ -> raise Not_found ]
   | "sosa_link" ->
@@ -3918,7 +3918,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
               Printf.sprintf "m=RL;i1=%d;i2=%d;b1=1;b2=%s"
                 (Adef.int_of_iper (get_key_index p))
                 (Adef.int_of_iper (get_key_index q))
-                (Num.to_string n)
+                (Sosa.to_string n)
           | None -> "" ]
       | _ -> raise Not_found ]
   | "source" ->
@@ -4344,8 +4344,8 @@ value print_foreach conf base print_ast eval_expr =
           | _ -> 0 ]
       | _ -> raise Not_found ]
     in
-    let mark = Array.make (nb_of_persons base) Num.zero in
-    loop [GP_person Num.one (get_key_index p) None] 1 0 where rec loop gpl i n =
+    let mark = Array.make (nb_of_persons base) Sosa.zero in
+    loop [GP_person Sosa.one (get_key_index p) None] 1 0 where rec loop gpl i n =
       if i > max_level then ()
       else
         let n =
@@ -4371,14 +4371,14 @@ value print_foreach conf base print_ast eval_expr =
       [ Vint n -> n
       | _ -> 0 ]
     in
-    let mark = Array.make (nb_of_persons base) Num.zero in
-    loop [GP_person Num.one (get_key_index p) None] 1 where rec loop gpl i =
+    let mark = Array.make (nb_of_persons base) Sosa.zero in
+    loop [GP_person Sosa.one (get_key_index p) None] 1 where rec loop gpl i =
       if i > max_level then ()
       else
         let env = [("gpl", Vgpl gpl); ("level", Vint i) :: env] in
         do {
           List.iter (print_ast env ep) al;
-          for i = 0 to nb_of_persons base - 1 do { mark.(i) := Num.zero };
+          for i = 0 to nb_of_persons base - 1 do { mark.(i) := Sosa.zero };
           let gpl = next_generation2 conf base mark gpl in
           loop gpl (succ i)
         }

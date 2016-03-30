@@ -963,7 +963,7 @@ value int_of e =
 value num_of e =
   fun
   [ VVstring s ->
-      try Num.of_string s with
+      try Sosa.of_string s with
       [ Failure _ ->
           raise_with_loc (loc_of_expr e)
             (Failure ("num value expected\nFound = " ^ s)) ]
@@ -1017,11 +1017,11 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
       | "!=" -> VVbool (eval_expr ceva e1 <> eval_expr ceva e2)
       | "<=" -> VVbool (int e1 <= int e2)
       | ">=" -> VVbool (int e1 >= int e2)
-      | "+" -> VVstring (Num.to_string (Num.add (num e1) (num e2)))
-      | "-" -> VVstring (Num.to_string (Num.sub (num e1) (num e2)))
-      | "*" -> VVstring (Num.to_string (Num.mul (num e1) (int e2)))
-      | "/" -> VVstring (Num.to_string (Num.div (num e1) (int e2)))
-      | "%" -> VVstring (string_of_int (Num.modl (num e1) (int e2)))
+      | "+" -> VVstring (Sosa.to_string (Sosa.add (num e1) (num e2)))
+      | "-" -> VVstring (Sosa.to_string (Sosa.sub (num e1) (num e2)))
+      | "*" -> VVstring (Sosa.to_string (Sosa.mul (num e1) (int e2)))
+      | "/" -> VVstring (Sosa.to_string (Sosa.div (num e1) (int e2)))
+      | "%" -> VVstring (string_of_int (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\"")) ]
   | Aint loc s -> VVstring s
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e)) ]
