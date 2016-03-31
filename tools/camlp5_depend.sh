@@ -30,7 +30,8 @@ done
 
 [ -n "$FILES" ] || usage;
 
-CAMLP5_LOAD_OPTIONS="pr_depend.cmo pa_macro.cmo $INC"
+CAMLP5_LOAD_OPTIONS="pr_depend.cmo pa_macro.cmo"
+CAMLP5_OTHER_OPTIONS="$CAMLP5_OTHER_OPTIONS $INC"
 
 for FILE in $FILES; do
     head -1 $FILE >/dev/null || exit 1
