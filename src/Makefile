@@ -4,7 +4,7 @@ include $(ROOT)/tools/Makefile.config
 # First rule 'all' is defined in Makefile.config.
 
 # Overwrite variables.
-OCAMLI=-I ../wserver -I ../dag2html -I ../api/service
+OCAMLI=-I ../wserver -I ../dag2html
 
 GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo buff.cmo name.cmo \
 mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo \
@@ -23,34 +23,10 @@ mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo progrBar.cmo \
 database.cmo db2.cmo db2disk.cmo db2out.cmo diff.cmo outbase.cmo \
 gwdb.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
 
-GWD_OBJS_API1=api_conf.cmo
+DEPEND_REDIS=utils.cmx mutex.cmx client.cmx cache.cmx redis_sync.cmx
 
-GWD_OBJS_API2=../api/service/api_link_tree_piqi.cmo \
-../api/service/api_link_tree_piqi_ext.cmo link.cmo api_wiki.cmo \
-perso_link.cmo
-
-GWD_OBJS1=../wserver/httpStatus.cmo ../wserver/wserver.cmo \
-../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo \
-buff.cmo name.cmo mutil.cmo secure.cmo btree.cmo futil.cmo dutil.cmo \
-database.cmo db2.cmo db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo \
-gutil.cmo pqueue.cmo consang.cmo sosa.cmo version.cmo translate.cmo \
-gwlib.cmo notesLinks.cmo util.cmo calendar.cmo templDate.cmo templ.cmo \
-hutil.cmo date.cmo update.cmo wiki.cmo history_diff.cmo history.cmo \
-notes.cmo wiznotes.cmo srcfile.cmo dag.cmo
-
-GWD_OBJS2=perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo \
-updateFamOk.cmo place.cmo updateData.cmo merge.cmo mergeFamOk.cmo \
-mergeFam.cmo mergeInd.cmo mergeIndOk.cmo mergeDup.cmo \
-changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo \
-descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo searchName.cmo \
-advSearchOk.cmo birthDeath.cmo title.cmo forum.cmo image.cmo \
-request.cmo base64.cmo robot.cmo compilation.cmo gwd.cmo
-
-ifeq ($(WITH_API),y)
-  GWD_OBJS=$(GWD_OBJS_API1) $(GWD_OBJS1) $(GWD_OBJS_API2) $(GWD_OBJS2)
-else
-  GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2)
-endif
+GWD_DEPS_OPT=$(filter %.cmx,$(shell $(ROOT)/tools/transitive_depend.sh $(OCAMLI) gwd.cmx))
+GWD_OBJS_OPT=gwlib.cmx $(GWD_DEPS_OPT) compilation.cmx gwd.cmx
 
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo buff.cmo name.cmo mutil.cmo \
 secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo \
@@ -93,9 +69,6 @@ out: ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out che
 	cp check_base.out check_base
 
 .PHONY: opt
-ifeq ($(WITH_API),y)
-opt: link.opt
-endif
 opt: ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	cp gwc1.opt gwc
 	cp gwc1.opt gwc1
@@ -116,6 +89,12 @@ gwlib.ml:
 	echo "  [ Not_found -> \"$(PREFIX)\" ]" | sed -e 's|\\|/|g' >> $@
 	echo ";" >> $@
 
+api_link.cmx: api_link.ml
+	$(OCAMLOPT) -I $(OCURL) -I $(LREDIS) -package yojson $(OCAMLI) -c $<
+
+api_link.cmo: api_link.ml
+	$(OCAMLC) -I $(OCURL) -I $(LREDIS) -package yojson $(OCAMLI) -c $<
+
 gwc1.out: $(GWC_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc1.out
 
@@ -134,19 +113,18 @@ consang.out: $(CONSANG_OBJS)
 consang.opt: $(CONSANG_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(CONSANG_OBJS:.cmo=.cmx) -o consang.opt
 
-link.opt:
-	$(OCAMLOPT) -I ../api/service -c ../api/service/api_link_tree_piqi.ml
-	$(OCAMLOPT) -I ../api/service -c ../api/service/api_link_tree_piqi_ext.ml
-	$(OCAMLOPT) -I ../api/service -package curl -I $(OCURL) curl.cmxa -I ../wserver -c link.ml
-
-gwd.out: $(GWD_OBJS)
-	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma str.cma -I $(CAMLP5D) gramlib.cma $(GWD_OBJS) $(LIBUNIX) -o gwd.out
-
-gwd.opt: $(GWD_OBJS:.cmo=.cmx)
+gwd.out: $(GWD_OBJS_OPT:.cmx=.cmo)
 ifeq ($(WITH_API),y)
-	$(OCAMLOPT) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o gwd.opt
+	$(OCAMLC) $(OCAMLI) -linkpkg -package curl -I $(OCURL) curl.cma $(STATIC) str.cma -I $(CAMLP5D) gramlib.cma -package re -I $(RE) re_emacs.cma re_str.cma -package uuidm -I $(LREDIS) $(DEPEND_REDIS:.cmx=.cmo) -package yojson $^ $(LIBUNIX) -o $@
 else
-	$(OCAMLOPT) $(STATIC) unix.cmxa str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o gwd.opt
+	$(OCAMLC) -custom $(STATIC) $(OCAMLD) unix.cma str.cma -I $(CAMLP5D) gramlib.cma $^ $(LIBUNIX) -o $@
+endif
+
+gwd.opt: $(GWD_OBJS_OPT)
+ifeq ($(WITH_API),y)
+	$(OCAMLOPT) $(OCAMLI) -linkpkg -package curl -I $(OCURL) curl.cmxa $(STATIC) str.cmxa -I $(CAMLP5D) gramlib.cmxa -package re -I $(RE) re_emacs.cmxa re_str.cmxa -package uuidm -I $(LREDIS) $(DEPEND_REDIS) -package yojson $^ $(LIBUNIX) -o $@
+else
+	$(OCAMLOPT) $(STATIC) unix.cmxa str.cmxa -I $(CAMLP5D) gramlib.cmxa $^ $(LIBUNIX) -o $@
 endif
 
 gwu.out: $(GWU_OBJS)
@@ -240,6 +218,11 @@ always:
 .PHONY: depend
 depend: pa_lock.cmo pa_html.cmo q_codes.cmo
 	export LC_ALL=C; $(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
+# HACK: hardcoded because there seems to be a bug in dependencies computed with camlp5 (in case of let module in)
+	echo "birthDeath.cmo cousins.cmo relationLink.cmo: pqueue.cmo pqueue.cmi" >> .depend
+	echo "birthDeath.cmx cousins.cmx relationLink.cmx: pqueue.cmx pqueue.cmi" >> .depend
+	echo "database.cmo: btree.cmo btree.cmi" >> .depend
+	echo "database.cmx: btree.cmx btree.cmi" >> .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi

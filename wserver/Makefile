@@ -7,7 +7,7 @@ include $(ROOT)/tools/Makefile.config
 
 OBJS=wserver.cmo
 
-out: $(OBJS:.cmo=.cmx)
+out: $(OBJS)
 
 opt: $(OBJS:.cmo=.cmx)
 

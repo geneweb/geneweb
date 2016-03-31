@@ -3,7 +3,7 @@ include $(ROOT)/tools/Makefile.config
 
 # First rule 'all' is defined in Makefile.config.
 
-.PHONY: out opt api install uninstall distrib clean depend
+.PHONY: out opt install uninstall distrib clean depend
 
 out:
 	cd wserver && $(MAKE) $@
@@ -18,9 +18,6 @@ opt:
 	cd wserver && $(MAKE) $@
 	cd dag2html && $(MAKE) $@
 	cd src && $(MAKE) $@
-ifeq ($(WITH_API),y)
-	cd api && $(MAKE) $@
-endif
 	cd ged2gwb && $(MAKE) $@
 	cd gwb2ged && $(MAKE) $@
 	cd setup && $(MAKE) $@
@@ -139,7 +136,6 @@ clean:
 	cd contrib/misc && $(MAKE) $@
 	cd contrib/gwFix && $(MAKE) $@
 	cd contrib/history && $(MAKE) $@
-	cd api && $(MAKE) $@
 	$(RM) -r $(DESTDIR)
 	$(RM) *~ .#*
 
@@ -152,5 +148,3 @@ depend:
 	cd gwb2ged && $(MAKE) $@
 	cd setup && $(MAKE) $@
 	cd gwtp && $(MAKE) $@
-	cd api && $(MAKE) $@
-	cd api/service && $(MAKE) $@
