@@ -1,10 +1,7 @@
-# $Id: Makefile,v 5.1 2007-07-11 16:15:21 ddr Exp $
+ROOT=..
+include $(ROOT)/tools/Makefile.config
 
-BINDIR=/usr/local/bin
-MANDIR=/usr/local/share/man/man1
-OCAMLC=ocamlc
-OCAMLOPT=ocamlopt
-OCARGS=
+BINDIR=$(PREFIX)/bin
 OBJS=dag2html.cmo main.cmo
 
 all: dag2html
@@ -22,23 +19,13 @@ dag2html: $(OBJS)
 clean:
 	rm -f dag2html *.cm[oix] *.o
 
-.SUFFIXES: .ml .mli .cmo .cmx .cmi
+.PHONY: depend
+depend:
+	$(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- *.ml* > .depend
 
-.ml.cmo:
-	camlp5r $< -o $*.ppo
-	$(OCAMLC) $(OCARGS) -c -impl $*.ppo
-	rm -f $*.ppo
+.depend:
+	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
 
-.ml.cmx:
-	camlp5r $< -o $*.ppo
-	$(OCAMLOPT) $(OCARGS) -c -impl $*.ppo
-	rm -f $*.ppo
-
-.mli.cmi:
-	camlp5r $< -o $*.ppi
-	$(OCAMLC) $(OCARGS) -c -intf $*.ppi
-	rm -f $*.ppi
-
-main.cmo: dag2html.cmo
-dag2html.cmo: dag2html.cmi
-dag2html.cmx: dag2html.cmi
+ifeq ($(filter $(MAKECMDGOALS),clean depend),)
+  include .depend
+endif

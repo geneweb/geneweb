@@ -146,6 +146,7 @@ clean:
 depend:
 	cd src && $(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
 	cd wserver && $(MAKE) $@
+	cd dag2html && $(MAKE) $@
 	cd src && $(MAKE) $@
 	cd ged2gwb && $(MAKE) $@
 	cd gwb2ged && $(MAKE) $@
