@@ -958,7 +958,7 @@ value (ht_e_n, ht_n_e) =
           Hashtbl.add ht_n_e name encoding;
           Hashtbl.add ht_e_n encoding name;
         })
-      Utf8.utf8_list;
+      Utf8List.utf8_list;
     (ht_e_n, ht_n_e)
 };
 

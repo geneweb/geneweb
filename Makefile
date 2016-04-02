@@ -1,11 +1,9 @@
-ROOT=.
+ROOT := .
 include $(ROOT)/tools/Makefile.config
 
-# First rule 'all' is defined in Makefile.config.
+.PHONY: install uninstall distrib
 
-.PHONY: out opt install uninstall distrib clean depend
-
-out:
+opt out: $(DEPEND_DEPEND)
 	cd wserver && $(MAKE) $@
 	cd dag2html && $(MAKE) $@
 	cd src && $(MAKE) $@
@@ -13,20 +11,11 @@ out:
 	cd gwb2ged && $(MAKE) $@
 	cd setup && $(MAKE) $@
 	cd gwtp && $(MAKE) $@
-
-opt:
-	cd wserver && $(MAKE) $@
-	cd dag2html && $(MAKE) $@
-	cd src && $(MAKE) $@
-	cd ged2gwb && $(MAKE) $@
-	cd gwb2ged && $(MAKE) $@
-	cd setup && $(MAKE) $@
-	cd gwtp && $(MAKE) $@
-	cd contrib/gwpublic && $(MAKE) all
-	cd contrib/oneshot && $(MAKE) all
-	cd contrib/misc && $(MAKE) all
-	cd contrib/gwFix && $(MAKE) all
-	cd contrib/history && $(MAKE) all
+	cd contrib/gwpublic && $(MAKE) $@
+	cd contrib/oneshot && $(MAKE) $@
+	cd contrib/misc && $(MAKE) $@
+	cd contrib/gwFix && $(MAKE) $@
+	cd contrib/history && $(MAKE) $@
 
 install:
 	mkdir -p $(PREFIX)/bin
@@ -39,7 +28,7 @@ install:
 	cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE)
 	cp ged2gwb/ged2gwb2 $(PREFIX)/bin/ged2gwb2$(EXE)
 	cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE)
-	cp setup/gwsetup $(PREFIX)/bin/gwsetup$(EXE)
+	cp setup/setup $(PREFIX)/bin/gwsetup$(EXE)
 	cp src/update_nldb $(PREFIX)/bin/update_nldb$(EXE)
 	cp -R hd/* $(LANGDIR)/.
 	mkdir -p $(MANDIR)
@@ -105,7 +94,7 @@ distrib:
 	cp ged2gwb/ged2gwb $(DESTDIR)/gw/ged2gwb$(EXE)
 	cp ged2gwb/ged2gwb2 $(DESTDIR)/gw/ged2gwb2$(EXE)
 	cp gwb2ged/gwb2ged $(DESTDIR)/gw/gwb2ged$(EXE)
-	cp setup/gwsetup $(DESTDIR)/gw/gwsetup$(EXE)
+	cp setup/setup $(DESTDIR)/gw/gwsetup$(EXE)
 	mkdir $(DESTDIR)/gw/gwtp_tmp
 	mkdir $(DESTDIR)/gw/gwtp_tmp/lang
 	cp gwtp/README $(DESTDIR)/gw/gwtp_tmp/.
@@ -123,7 +112,7 @@ distrib:
 	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
 	cp -R hd/* $(DESTDIR)/gw/.
 
-clean:
+clean: clean-tmp
 	cd wserver && $(MAKE) $@
 	cd dag2html && $(MAKE) $@
 	cd src && $(MAKE) $@
@@ -137,10 +126,11 @@ clean:
 	cd contrib/gwFix && $(MAKE) $@
 	cd contrib/history && $(MAKE) $@
 	$(RM) -r $(DESTDIR)
-	$(RM) *~ .#*
 
-depend:
-	cd src && $(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
+$(DEPEND_DEPEND):
+	cd $(dir $@) && $(MAKE) $(notdir $@)
+
+depend: $(DEPEND_DEPEND)
 	cd wserver && $(MAKE) $@
 	cd dag2html && $(MAKE) $@
 	cd src && $(MAKE) $@

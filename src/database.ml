@@ -1,6 +1,8 @@
 (* $Id: database.ml,v 5.19 2007-06-06 15:22:35 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+module type HACK_FOR_DEPEND = sig open Btree; end;
+
 open Dbdisk;
 open Def;
 open Dutil;

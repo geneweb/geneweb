@@ -1,6 +1,8 @@
 (* $Id: outbase.ml,v 5.21 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
+module type HACK_FOR_DEPEND = sig open Btree; end;
+
 open Dbdisk;
 open Dutil;
 open Def;

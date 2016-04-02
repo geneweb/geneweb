@@ -49,13 +49,13 @@ value read_file fname =
               exit 2;
             }]
         in
-        (sn; fn; occ)
+        (sn, fn, occ)
     | _ ->
         do {
           eprintf "*** Error key: %s" name;
           flush stderr;
           exit 2;
-        }
+        } ]
   in
   let list = ref [] in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
@@ -92,7 +92,7 @@ value update_database_with_file bname fname =
   let empty = Gwdb.insert_string base "" in
   let list = read_file fname in
   List.iter
-    (fun ((sn; fn; occ), note) ->
+    (fun ((sn, fn, occ), note) ->
        do {
          match Gwdb.person_of_key fn sn occ with
          [ Some ip ->
@@ -151,6 +151,7 @@ value usage = "Usage: " ^ Sys.argv.(0) ^ " base <file>";
 value main () = do {
   Arg.parse speclist anonfun usage;
   if bname.val = "" || fname.val = "" then do { Arg.usage speclist usage; exit 2; } else ();
+  lock Mutil.lock_file bname.val with
   [ Accept ->
       let base = Gwdb.open_base bname.val in
       update_database_with_file bname fname.val

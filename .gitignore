@@ -9,6 +9,7 @@
 *.cmxa
 *.ppo
 .depend
+.objs
 distribution
 
 ged2gwb/ged2gwb
@@ -22,12 +23,11 @@ gwb2ged/gwb2ged.opt
 gwtp/gwtp
 gwtp/gwtp.opt
 
-setup/gwsetup
+setup/setup
 setup/setup.opt
 
 src/compilation.ml
 src/gwlib.ml
-src/.objs
 
 src/check_base
 src/check_base.opt

@@ -2,6 +2,8 @@
 (* $Id: birthDeath.ml,v 5.40 2008-11-03 15:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+module type HACK_FOR_DEPEND = sig open Pqueue; end;
+
 open Config;
 open Def;
 open Gwdb;
