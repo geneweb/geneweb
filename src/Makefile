@@ -33,8 +33,6 @@ secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo \
 db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo \
 calendar.cmo notesLinks.cmo progrBar.cmo gwu.cmo
 
-PROBOT_OBJS=probot.cmo
-
 MOSTDESC_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo \
 mutil.cmo adef.cmo futil.cmo diff.cmo dutil.cmo btree.cmo database.cmo \
 db2.cmo db2disk.cmo gwdb.cmo consang.cmo pqueue.cmo sosa.cmo \
@@ -130,9 +128,6 @@ gwu.out: $(GWU_OBJS)
 
 gwu.opt: $(GWU_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(GWU_OBJS:.cmo=.cmx) -o gwu.opt
-
-probot.out: $(PROBOT_OBJS)
-	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(PROBOT_OBJS) -o probot.out
 
 mostdesc.out: $(MOSTDESC_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(MOSTDESC_OBJS) -o mostdesc.out
