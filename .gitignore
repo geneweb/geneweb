@@ -27,12 +27,12 @@ setup/setup.opt
 
 src/compilation.ml
 src/gwlib.ml
+src/.objs
 
 src/check_base
 src/check_base.opt
 src/consang
 src/consang.opt
-src/gwc
 src/gwc1
 src/gwc1.opt
 src/gwc2

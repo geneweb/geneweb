@@ -30,7 +30,7 @@ opt:
 
 install:
 	mkdir -p $(PREFIX)/bin
-	cp src/gwc $(PREFIX)/bin/gwc$(EXE)
+	cp src/gwc1 $(PREFIX)/bin/gwc$(EXE)
 	cp src/gwc1 $(PREFIX)/bin/gwc1$(EXE)
 	cp src/gwc2 $(PREFIX)/bin/gwc2$(EXE)
 	cp src/consang $(PREFIX)/bin/consang$(EXE)
@@ -95,7 +95,7 @@ distrib:
 	cp etc/a.gwf $(DESTDIR)/gw/.
 	echo "127.0.0.1" > $(DESTDIR)/gw/only.txt
 	echo "-setup_link" > $(DESTDIR)/gw/gwd.arg
-	cp src/gwc $(DESTDIR)/gw/gwc$(EXE)
+	cp src/gwc1 $(DESTDIR)/gw/gwc$(EXE)
 	cp src/gwc1 $(DESTDIR)/gw/gwc1$(EXE)
 	cp src/gwc2 $(DESTDIR)/gw/gwc2$(EXE)
 	cp src/consang $(DESTDIR)/gw/consang$(EXE)
