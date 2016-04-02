@@ -33,8 +33,6 @@ secure.cmo btree.cmo futil.cmo dutil.cmo database.cmo db2.cmo \
 db2disk.cmo diff.cmo gwdb.cmo checkItem.cmo gutil.cmo select.cmo \
 calendar.cmo notesLinks.cmo progrBar.cmo gwu.cmo
 
-PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
-
 PROBOT_OBJS=probot.cmo
 
 MOSTDESC_OBJS=argl.cmo secure.cmo buff.cmo name.cmo iovalue.cmo \
@@ -132,9 +130,6 @@ gwu.out: $(GWU_OBJS)
 
 gwu.opt: $(GWU_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(GWU_OBJS:.cmo=.cmx) -o gwu.opt
-
-phonygwd.out: $(PHONYGWD_OBJS)
-	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(PHONYGWD_OBJS) -o phonygwd.out
 
 probot.out: $(PROBOT_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(PROBOT_OBJS) -o probot.out
