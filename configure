@@ -192,6 +192,7 @@ check_ocamlfind() {
     OCAMLC="ocamlfind ocamlc"
     OCAMLOPT="ocamlfind ocamlopt"
     CAMLP5D=`ocamlfind query camlp5`/
+    STATIC="-linkpkg"
   elif [[ $API == y ]]; then
     print_check_err "Checking ocamlfind" \
         "You need the command ocamlfind accessible in the path!"
@@ -359,8 +360,8 @@ print_compiler() {
    echo "OCAMLFLAGS=${OCAMLFLAGS} ${WARN} ${DEBUG}"
    echo "OCAMLC=${OCAMLC} \$(OCAMLFLAGS)"
    echo "OCAMLOPT=${OCAMLOPT} \$(OCAMLFLAGS)"
-   echo "OCAML_opt_LINK=\$(OCAMLOPT) \$(STATIC) -linkpkg"
-   echo "OCAML_out_LINK=\$(OCAMLC) \$(STATIC) -linkpkg -custom"
+   echo "OCAML_opt_LINK=\$(OCAMLOPT) \$(STATIC)"
+   echo "OCAML_out_LINK=\$(OCAMLC) \$(STATIC) -custom"
    echo "CAMLP5F=${CAMLP5F}"
    echo "LINKUNIX=-cclib -lunix"
    echo "STATIC=${STATIC}"
