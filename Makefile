@@ -1,4 +1,8 @@
 ROOT := .
+
+$(ROOT)/tools/Makefile.config:
+	$(error Please run ./configure first)
+
 include $(ROOT)/tools/Makefile.config
 
 .PHONY: install uninstall distrib
