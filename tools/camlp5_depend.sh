@@ -60,5 +60,6 @@ for FILE in $FILES; do
       COMMAND="camlp5r $CAMLP5_LOAD_OPTIONS $ARGS -- $CAMLP5_OTHER_OPTIONS $FILE";;
     esac
     echo $COMMAND $FILE >&2
-    $COMMAND $FILE
+    # camlp5 on Windows generates backslashes -> replace them with slashes
+    $COMMAND $FILE | sed "s/[\\\\]\(.\)/\/\\1/g"
 done
