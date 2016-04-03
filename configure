@@ -28,6 +28,8 @@ options:
       do not treat warning as error
   -r|--redis_path
       path for the redis library (necessary if building the API)
+  -s|--static
+      statically link libraries
 EOF
 }
 
@@ -45,13 +47,15 @@ OREDIS=
 LREDIS=
 RE=
 WARN="-warn-error A"
-STRIP=
+STRIP=true
 RM=
 EXE=
-STATIC=
+LINKSTATIC=
+LINKSTATIC_OUT=
 OS_TYPE=
 
 # Options for configure
+STATIC=n
 API=n
 DEBUG=
 INTERACTIVE=n
@@ -75,6 +79,8 @@ while [[ $# -ne 0 ]]; do
     -r|--redis_path)
       LREDIS="$2";
       shift ;;
+    -s|--static)
+      STATIC=y ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
@@ -120,18 +126,20 @@ check_os() {
   if [[ $OS_TYPE == "Darwin" ]] || [[ $OS_TYPE == "Linux" ]] ; then
     print_check_ok "Checking OS type" "UNIX"
     CAMLP5F+=" -D UNIX"
-    STRIP=strip
     RM="/bin/rm -f"
     EXE=
-#   STATIC="-ccopt -static"
-    STATIC=
+    if [[ $STATIC == y ]]; then
+      LINKSTATIC+=" -ccopt -static -ccopt -static-libgcc"
+      STRIP=true
+    else
+      STRIP=strip
+    fi
   else
     print_check_ok "Checking OS type" "WINDOWS"
     CAMLP5F+=" -D WIN95"
     STRIP=true
     RM="rm -f"
     EXE=".exe"
-    STATIC=
   fi
 }
 
@@ -140,6 +148,9 @@ check_ocaml() {
     print_check_ok "Checking OCaml compiler" "OK"
     OCAMLC=ocamlc
     OCAMLOPT=ocamlopt
+    if [[ $STATIC == y ]]; then
+      LINKSTATIC_OUT+=" -custom"
+    fi
   else
     print_check_err "Checking OCaml compiler" \
         "You need the command ocamlc accessible in the path!"
@@ -192,7 +203,9 @@ check_ocamlfind() {
     OCAMLC="ocamlfind ocamlc"
     OCAMLOPT="ocamlfind ocamlopt"
     CAMLP5D=`ocamlfind query camlp5`/
-    STATIC="-linkpkg"
+    if [[ $STATIC == y ]]; then
+      LINKSTATIC+=" -linkpkg"
+    fi
   elif [[ $API == y ]]; then
     print_check_err "Checking ocamlfind" \
         "You need the command ocamlfind accessible in the path!"
@@ -360,11 +373,12 @@ print_compiler() {
    echo "OCAMLFLAGS=${OCAMLFLAGS} ${WARN} ${DEBUG}"
    echo "OCAMLC=${OCAMLC} \$(OCAMLFLAGS)"
    echo "OCAMLOPT=${OCAMLOPT} \$(OCAMLFLAGS)"
-   echo "OCAML_opt_LINK=\$(OCAMLOPT) \$(STATIC)"
-   echo "OCAML_out_LINK=\$(OCAMLC) \$(STATIC) -custom"
+   echo "OCAML_opt_LINK=\$(OCAMLOPT) \$(LINKSTATIC)"
+   echo "OCAML_out_LINK=\$(OCAMLC) \$(LINKSTATIC) \$(LINKSTATIC_OUT)"
    echo "CAMLP5F=${CAMLP5F}"
    echo "LINKUNIX=-cclib -lunix"
-   echo "STATIC=${STATIC}"
+   echo "LINKSTATIC=${LINKSTATIC}"
+   echo "LINKSTATIC_OUT=${LINKSTATIC_OUT}"
    echo
    echo "# Compiler dependencies."
    echo "CAMLP5D=${CAMLP5D}"
@@ -517,6 +531,11 @@ if [[ $INTERACTIVE == y ]]; then
   read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
     DEBUG="-g -annot"
+  fi
+  echo "Do you want to statically link libraries (default = no)? [y/N]"
+  read -re answer
+  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    STATIC=y
   fi
 fi
 # Check the environment
