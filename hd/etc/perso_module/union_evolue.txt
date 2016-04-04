@@ -47,9 +47,9 @@
           </a>
         %end;
         %apply;long_married("self")%sp;
-        %apply;short_display_person("spouse")%sp;
+        %apply;short_display_person("spouse")
         %if;spouse.has_parents;
-          <span style="font-size: 90%%"><em> ([*parents] :
+          <span style="font-size: 90%%"><em> ([parents][:]
             %apply;short_display_person("spouse.father")
             &nbsp;&amp;&nbsp;
             %apply;short_display_person("spouse.mother"))</em>%nn;
@@ -59,16 +59,16 @@
           &nbsp;([witness/witnesses]w :
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;short_display_person("witness")%nl;
+            %apply;short_display_person("witness")
           %end;)
         %end;
-        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
-          ([see] <a href="#note-wed-%count;" name="wed-note-%count;" id="wed-note-%count;">[note/notes]0</a>)
+        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
+          &nbsp;%[[see] <a href="#note-wed-%count;" name="wed-note-%count;" id="wed-note-%count;">[note/notes]0</a>]%nn;
           %incr_count;
         %end;
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
         %if;are_separated;, [separated]0%sp;%end;
-        %if;has_children;[having as children]0
+        %if;has_children;%sp;[having as children]0[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
           <ul>

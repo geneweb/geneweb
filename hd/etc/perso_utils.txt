@@ -81,7 +81,8 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%end;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%nn;
+    %end;
   %end;
   %xx.title;%xx.dates;
 %end;
@@ -90,7 +91,7 @@
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
     %if;(cancel_links or xx.is_restricted)%xx;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%nn;
     %end;
     %if;xx.has_nobility_titles;
       %foreach;xx.nobility_title;, %nobility_title;%end;
@@ -108,7 +109,7 @@
     %else;
       %if;xx.has_baptism_place;, %apply;nth([baptized],xx.sex) - %xx.baptism_place;%end;
     %end;
-    %if;xx.computable_age;, [age] : %xx.age; %end;
+    %if;xx.computable_age;, [age] : %xx.age;%end;
     %if;xx.is_dead;, %xx.died;
       %if;xx.has_death_date; %xx.on_death_date;%end;
       %if;xx.has_death_place; - %xx.death_place;%end;
@@ -122,10 +123,10 @@
       %if;xx.has_cremation_date; %xx.on_cremation_date;%end;
       %if;xx.has_cremation_place; - %xx.cremation_place;%end;
     %end;
-    %if;xx.has_occupation;, %apply;capitalize(xx.occupation)%end;
+    %if;xx.has_occupation;, %xx.occupation;%end;
     %if;(xx.has_consanguinity and bvar.show_consang!="no"),%sp;
       [consanguinity] : %xx.consanguinity;%end;
-  </span>
+  </span>%nn;
 %end;
 
 %define;married_to(sexx, date_place)
