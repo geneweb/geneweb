@@ -479,6 +479,7 @@ message IdentifierPerson {
   optional string n = 2;
   optional string p = 3;
   optional int32 oc = 4;
+  optional bool track_visit = 5;
 }
 
 message Error {
