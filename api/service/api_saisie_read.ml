@@ -1951,6 +1951,7 @@ let print_fiche_person conf base =
   | Some index ->
       (* Traite l'index *)
       let ip = Adef.iper_of_int (Int32.to_int index) in
+      if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
       print_result_fiche_person conf base ip
   | None ->
     match (identifier_person.Mread.Identifier_person.oc)  with
@@ -1963,6 +1964,7 @@ let print_fiche_person conf base =
           (
           match Gwdb.person_of_key base fn sn (Int32.to_int oc) with
           | Some ip ->
+            if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
             print_result_fiche_person conf base ip
           | None ->
             print_error conf `not_found
@@ -1979,14 +1981,18 @@ let print_fiche_person conf base =
       let order = [ Key; ApproxKey; PartialKey ] in
       (
       match search_index conf base (fn ^ " " ^ sn) order with
-      | Some ip -> print_result_fiche_person conf base ip
+      | Some ip ->
+        if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+        print_result_fiche_person conf base ip
       | None -> print_error conf `not_found
       )
     | (None, Some sn) ->
       let order = [ Sosa; Key; ApproxKey; PartialKey ] in
       (
       match search_index conf base sn order with
-      | Some ip -> print_result_fiche_person conf base ip
+      | Some ip ->
+        if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+        print_result_fiche_person conf base ip
       | None -> print_error conf `not_found
       )
     | (Some fn, None) -> print_error conf `bad_request
