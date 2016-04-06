@@ -6,7 +6,7 @@ ALL_EXE := gwc1 gwc2 consang gwd gwu update_nldb check_base
 gwd_PREPEND_OBJS := gwlib
 gwd_APPEND_OBJS := compilation
 LIBS = $(LIBUNIX)
-LINKFLAGS = $(LINKUNIX) -I $(CAMLP5D)
+LINKFLAGS = -I $(CAMLP5D)
 REDIS_OBJS := utils mutex client cache redis_sync
 
 include $(ROOT)/tools/Makefile.config

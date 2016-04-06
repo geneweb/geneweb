@@ -50,8 +50,8 @@ WARN="-warn-error A"
 STRIP=true
 RM=
 EXE=
-LINKSTATIC=
-LINKSTATIC_OUT=
+LINKSTATIC_opt=
+LINKSTATIC_out=
 OS_TYPE=
 
 # Options for configure
@@ -128,12 +128,7 @@ check_os() {
     CAMLP5F+=" -D UNIX"
     RM="/bin/rm -f"
     EXE=
-    if [[ $STATIC == y ]]; then
-      LINKSTATIC+=" -ccopt -static -ccopt -static-libgcc"
-      STRIP=true
-    else
-      STRIP=strip
-    fi
+    STRIP=strip
   else
     print_check_ok "Checking OS type" "WINDOWS"
     CAMLP5F+=" -D WIN95"
@@ -149,7 +144,8 @@ check_ocaml() {
     OCAMLC=ocamlc
     OCAMLOPT=ocamlopt
     if [[ $STATIC == y ]]; then
-      LINKSTATIC_OUT+=" -custom"
+      LINKSTATIC_out+=" -ccopt -static -custom"
+      LINKSTATIC_opt+=" -ccopt -static"
     fi
   else
     print_check_err "Checking OCaml compiler" \
@@ -373,12 +369,11 @@ print_compiler() {
    echo "OCAMLFLAGS=${OCAMLFLAGS} ${WARN} ${DEBUG}"
    echo "OCAMLC=${OCAMLC} \$(OCAMLFLAGS)"
    echo "OCAMLOPT=${OCAMLOPT} \$(OCAMLFLAGS)"
-   echo "OCAML_opt_LINK=\$(OCAMLOPT) \$(LINKSTATIC)"
-   echo "OCAML_out_LINK=\$(OCAMLC) \$(LINKSTATIC) \$(LINKSTATIC_OUT)"
+   echo "OCAML_opt_LINK=\$(OCAMLOPT) \$(LINKSTATIC_opt)"
+   echo "OCAML_out_LINK=\$(OCAMLC) \$(LINKSTATIC_out)"
    echo "CAMLP5F=${CAMLP5F}"
-   echo "LINKUNIX=-cclib -lunix"
-   echo "LINKSTATIC=${LINKSTATIC}"
-   echo "LINKSTATIC_OUT=${LINKSTATIC_OUT}"
+   echo "LINKSTATIC_opt=${LINKSTATIC_opt}"
+   echo "LINKSTATIC_out=${LINKSTATIC_out}"
    echo
    echo "# Compiler dependencies."
    echo "CAMLP5D=${CAMLP5D}"
