@@ -90,7 +90,7 @@ done
 # Functions that print the checked information
 
 # Length of line for print_check_*
-LINE_WIDTH=60
+LINE_WIDTH=65
 
 print_check_ok() {
   local n=$(( $LINE_WIDTH-${#1}-8 ))
@@ -182,6 +182,24 @@ check_os() {
     STRIP=true
     RM="rm -f"
     EXE=".exe"
+  fi
+}
+
+check_make() {
+  MAKE_MIN_VER="GNU Make 3.81"
+  if ! make -v >/dev/null 2>&1; then
+    print_check_err "Checking make" "\
+      make needed."
+  else
+    MAKE_VER=`make -v|head -n 1`
+    if testversion "$MAKE_VER" ">=" "$MAKE_MIN_VER"; then
+      print_check_ok \
+        "Checking GNU make version $MAKE_VER >= $MAKE_MIN_VER"
+    else
+      print_check_warn \
+        "Checking make version $MAKE_VER" \
+        "$MAKE_MIN_VER or compatible needed."
+    fi
   fi
 }
 
@@ -322,6 +340,7 @@ check_re() {
 
 check_environment() {
   check_os
+  check_make
   check_ocaml
   check_ocaml_version
   check_native_ocaml
