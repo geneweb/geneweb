@@ -93,10 +93,10 @@ done
 LINE_WIDTH=60
 
 print_check_ok() {
-  n=$(( $LINE_WIDTH-${#1}-8 ))
+  local n=$(( $LINE_WIDTH-${#1}-8 ))
   printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
   printf ".%.0s" $(eval "echo {1.."$(($n))"}")
-  printf " \\x1b[32m%s\\x1b[0m" "$2"
+  printf " \\x1b[32m%s\\x1b[0m" "${2:-OK}"
   echo
 }
 
@@ -140,7 +140,7 @@ check_os() {
 
 check_ocaml() {
   if ocamlc -v >/dev/null 2>&1; then
-    print_check_ok "Checking OCaml compiler" "OK"
+    print_check_ok "Checking OCaml compiler"
     OCAMLC=ocamlc
     OCAMLOPT=ocamlopt
     if [[ $STATIC == y ]]; then
@@ -155,7 +155,7 @@ check_ocaml() {
 
 check_native_ocaml() {
   if ocamlc.opt -v >/dev/null 2>&1; then
-    print_check_ok "Checking OCaml native compiler" "OK"
+    print_check_ok "Checking OCaml native compiler"
     OCAMLC=ocamlc.opt
     OCAMLOPT=ocamlopt.opt
     NATIVE=y
@@ -175,8 +175,7 @@ check_ocaml_version() {
   OCAML_VER="`ocamlc -version`"
   if verge "$OCAML_VER" "$OCAML_MIN_VER"; then
     print_check_ok \
-      "Checking OCaml compiler version $OCAML_VER >= $OCAML_MIN_VER" \
-      "OK"
+      "Checking OCaml compiler version $OCAML_VER >= $OCAML_MIN_VER"
   else
     print_check_err "Checking OCaml compiler version $OCAML_VER" \
         "OCaml version $OCAML_MIN_VER or newer needed."
@@ -185,7 +184,7 @@ check_ocaml_version() {
 
 check_camlp5() {
   if camlp5 -v >/dev/null 2>&1; then
-    print_check_ok "Checking Camlp5" "OK"
+    print_check_ok "Checking Camlp5"
     CAMLP5D="+camlp5"
   else
     print_check_err "Checking Camlp5" \
@@ -195,7 +194,7 @@ check_camlp5() {
 
 check_ocamlfind() {
   if ocamlfind printconf >/dev/null 2>&1; then
-    print_check_ok "Checking ocamlfind" "OK"
+    print_check_ok "Checking ocamlfind"
     OCAMLC="ocamlfind ocamlc"
     OCAMLOPT="ocamlfind ocamlopt"
     CAMLP5D=`ocamlfind query camlp5`/
@@ -220,7 +219,7 @@ check_api() {
 check_mysql() {
   if [[ $API == y ]]; then
     if ocamlfind query mysql >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml mysql" "OK"
+      print_check_ok "Checking OCaml mysql"
       MYSQL=`ocamlfind query mysql`/
     else
       print_check_err "Checking OCaml mysql" \
@@ -232,7 +231,7 @@ check_mysql() {
 check_curl() {
   if [[ $API == y ]]; then
     if ocamlfind query curl >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml curl" "OK"
+      print_check_ok "Checking OCaml curl"
       CURL=`ocamlfind query curl`/
     else
       print_check_err "Checking OCaml curl" \
@@ -263,7 +262,7 @@ check_redis() {
       print_check_err "Checking OCaml redis" \
           "You need to provide a valid redis path!"
     fi
-    print_check_ok "Checking OCaml redis" "OK"
+    print_check_ok "Checking OCaml redis"
     OREDIS=`ocamlfind query redis`/
   fi
 }
@@ -271,7 +270,7 @@ check_redis() {
 check_re() {
   if [[ $API == y ]]; then
     if ocamlfind query re >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml re" "OK"
+      print_check_ok "Checking OCaml re"
       RE=`ocamlfind query re`/
     else
       print_check_err "Checking OCaml re" \
