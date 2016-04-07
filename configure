@@ -119,6 +119,53 @@ print_check_err() {
   exit 1
 }
 
+# Helpers functions to compare version numbers
+
+cmpversion() {
+# 0: A = B, 1: A < B, 2: A > B, 3: err
+  [ -n "$1" ] && [ -n "$2" ] && [ -z "$4" ] || return 3
+  [ -z "$3" ] || [ "$3" = "V" ] || return 3
+  [ "$3" != "V" ] || local IFS=.-
+  local A=($1) B=($2)
+  local i n=${#A[@]} a b
+  [ ${#B[@]} -ge $n ] || n=${#B[@]}
+  for (( i=0; i<n; i++ )); do
+    a="${A[$i]}"; b="${B[$i]}"
+    if [[ "$a" =~ ^[0-9] ]]; then
+      [[ "$b" =~ ^[0-9] ]] || return 1
+      if [ "$3" = "V" ]; then
+        [ "$a" -lt "$b" ] && return 1
+        [ "$a" -gt "$b" ] && return 2
+      else
+        cmpversion "$a" "$b" "V" || return $?
+      fi
+    else
+        [[ "$b" =~ ^[0-9] ]] && return 2
+        [[ "$a" < "$b" ]] && return 1
+        [[ "$a" > "$b" ]] && return 2
+    fi
+  done
+  [ ${#A[@]} -le $n ] || return 2
+  [ ${#B[@]} -le $n ] || return 1
+  return 0
+}
+
+testversion() {
+# 0: true, 1: false, 2: err
+  [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -z "$4" ] || return 2
+  cmpversion "$1" "$3"; local c=$?
+  [ $c -lt 3 ] || return 2
+  case $2 in
+  "<"|"-lt") return $(($c != 1));;
+  "<="|"-le") return $(($c == 2));;
+  ">"|"-gt") return $(($c != 2));;
+  ">="|"-ge") return $(($c == 1));;
+  "="|"=="|"-eq") return $(($c != 0));;
+  "!="|"-ne") return $(($c == 0));;
+  esac
+  return 2
+}
+
 # Functions to check the environment
 
 check_os() {
@@ -164,16 +211,10 @@ check_native_ocaml() {
   fi
 }
 
-verge() {
-  # osx doesn't have sort -V
-  # [ "$2" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
-  [ "$2" = "`echo -e "$1\n$2" | tr ' ' '\n' | sort -n | head -n1`" ]
-}
-
 check_ocaml_version() {
   OCAML_MIN_VER="4.02"
   OCAML_VER="`ocamlc -version`"
-  if verge "$OCAML_VER" "$OCAML_MIN_VER"; then
+  if testversion "$OCAML_VER" ">=" "$OCAML_MIN_VER"; then
     print_check_ok \
       "Checking OCaml compiler version $OCAML_VER >= $OCAML_MIN_VER"
   else
