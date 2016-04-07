@@ -244,7 +244,7 @@ check_ocaml_version() {
 check_camlp5() {
   if camlp5 -v >/dev/null 2>&1; then
     print_check_ok "Checking Camlp5"
-    CAMLP5D="+camlp5"
+    CAMLP5D=`camlp5 -where`
   else
     print_check_err "Checking Camlp5" \
         "You need the command camlp5 accessible in the path!"
