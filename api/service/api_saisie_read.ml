@@ -1964,8 +1964,19 @@ let print_fiche_person conf base =
           (
           match Gwdb.person_of_key base fn sn (Int32.to_int oc) with
           | Some ip ->
-            if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-            print_result_fiche_person conf base ip
+            let p = pget conf base ip in
+            if is_hidden p 
+            then 
+                print_error conf `not_found
+            else
+                if not (is_hide_names conf p) || authorized_age conf base p
+                then
+                (
+                    if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+                    print_result_fiche_person conf base ip
+                )
+                else
+                    print_error conf `not_found
           | None ->
             print_error conf `not_found
           )
