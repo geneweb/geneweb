@@ -1,10 +1,17 @@
-<style type="text/css">
+<style>
 /* Put here only properties that uses variables */
 
-html {
- background: url('%image_prefix;/gwback.jpg');
+/* Temp fix for Bootstrap CSS in GeneWeb */
+div.card-block
+{
+  padding-bottom: 0;
+}
+a
+{
+  word-wrap: break-word
 }
 
+/* OLD CSS */
 #menuBar {
  background-image:url('%image_prefix;/menubar_background.png');
 }
@@ -72,4 +79,5 @@ li.female
 }
 
 </style>
-<link rel="stylesheet" type="text/css" href="css.css" %/>
+<link rel="stylesheet" href="%bvar.static_path;css.css">
+<link rel="stylesheet" href="%bvar.static_path;bootstrap.min.css">

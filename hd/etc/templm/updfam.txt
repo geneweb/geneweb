@@ -257,7 +257,6 @@
 </form>
 %base_trailer;
 %include.copyr;
-<script src=%bvar.static_path;templm/autosize.min.js></script>
-<script>autosize(document.querySelectorAll('textarea'));</script>
+%include.js;
 </body>
 </html>

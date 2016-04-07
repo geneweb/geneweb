@@ -1,2 +1,8 @@
-<script type="text/javascript" src="jquery-2.2.0.min.js"></script>
-<script type="text/javascript" src="jquery.placeholder.min.js"></script>
+%if;(evar.m="MOD_IND" or evar.m="MOD_FAM")
+  <script src=%bvar.static_path;autosize.min.js></script>
+  <script>autosize(document.querySelectorAll('textarea'));</script>
+%end;
+<script src=%bvar.static_path;jquery.min.js></script>
+%( <script src=%bvar.static_path;jquery.placeholder.min.js></script> semble inutile avec Bootstrap 4 + jquery 3 on restreint déjà l'utilisation à des navigateurs qui supportent bien les placeholder %)
+<script src=%bvar.static_path;tether.min.js></script>
+<script src=%bvar.static_path;bootstrap.min.js></script>

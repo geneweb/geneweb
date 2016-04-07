@@ -1,12 +1,14 @@
 <!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: welcome.txt,v 7.00 2015/08/14 16:19:14 mr Exp $ -->
   <title>GeneWeb - %apply;capitalize(base.name)</title>
-  <meta name="robots" content="none"%/>
-  <meta name="format-detection" content="telephone=no"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
+  <meta name="robots" content="none"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="stylesheet" href="%bvar.static_path/bootstrap/css/bootstrap.css">
   %include.css;
   %base_header;
 </head>
@@ -106,12 +108,13 @@ zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
   %else;
     <form class="login" method="post" action="%action;">
       %hidden;
-      [*access] [wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0[:] <input name="w" type="password" size="20" maxlength="100" placeholder="[user/password/cancel]0:[user/password/cancel]1" autofocus="on"%/>
+      [*access] [wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0[:] <input name="w" type="password" size="20" maxlength="100" placeholder="[user/password/cancel]0:[user/password/cancel]1" autofocus%/>
     </form>
   %end;
 %end;
 
 <body%body_prop; id="welcome">
+<div class="container">
 <div style="float:right;margin-top:1.8em;margin-right:1.8em;">
 %apply;login()
 </div>
@@ -255,5 +258,7 @@ zh: 网络家谱
 %base_trailer;
 %include.copyr;
 </div>
+</div>
+%include.js;
 </body>
 </html>

@@ -32,15 +32,37 @@
     %end;
   %end;
 %end;
-<div id="footer">
- <div>
-  <a href="http://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;"
-  title="Manual of GeneWeb on Mediawiki" target="_blank">
-  <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
-  <a href="http://opensource.geneanet.org/projects/geneweb/" 
-  title="GeneWeb version %version; %compilation_time;%sp;%nl;
-  &copy; INRIA 1998-2016" target="_blank">
-  <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
+%define;lang(x)
+  %apply;nth%with;
+    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
+  %and;x%end;
+%end;
+%define;language_link()
+  %for;i;1;30;
+    %let;l1;%apply;lang(i)%in;
+    <a class="dropdown-item" href="%prefix_base;lang=%l1;;templ=%evar.templ;;%suffix;">%l1; %apply;language_name(l1)</a>
+  %end;
+%end;
+<div id="footer" class="row m-t-1">
+  <div class="btn-group pull-xs-right m-r-1">
+    v. %version; %compilation_time;%sp;
+    &copy; INRIA 1998-2016 %connections;%sq;
+    <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
+    <img src="%image_prefix;/logo_bas.png"></a>
+    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb MediaWiki">
+    <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
   </div>
-  <div>%connections;</div>
+  <div class="btn-group dropup m-l-1">
+    <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Language
+      <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+      %apply;language_link()
+    </div>
+  </div>
+  %if;(not cancel_links and evar.digest = "")
+    <a type="button" class="btn btn-secondary" href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
+    title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template</a>
+  %end;
 </div>

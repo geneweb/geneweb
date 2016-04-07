@@ -20,7 +20,7 @@
   %else;en%end;
 %in;
 %define;bg(xx)
-  style="%if;(evar.templ="xx")background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;%end;"
+  %if;(evar.templ="xx")style="background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;"%end;
 %end;
 %if;(not cancel_links and evar.m != "MOD_DATA_OK" and evar.m != "DEL_IND_OK" and evar.m != "DEL_FAM_OK" and evar.m != "NOTES" and evar.m != "MISC_NOTES" and evar.templ="templm" and evar.m!="RL")
   <div class="menu3" id="menu_search">
