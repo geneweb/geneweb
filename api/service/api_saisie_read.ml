@@ -1941,6 +1941,21 @@ let print_result_fiche_person conf base ip =
 ;;
 
 (* ********************************************************************* *)
+(*  [Fonc] is_private_person : conf -> base -> ip -> bool                 *)
+(** [Description] : Indique si une personne est privée ou non.
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnée
+      - ip    : index de la personne
+    [Retour] : Bool
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let is_private_person conf base ip =
+    let p = pget conf base ip in
+    is_hidden p || ((is_hide_names conf p) && not(authorized_age conf base p))
+;;
+
+(* ********************************************************************* *)
 (*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
 (** [Description] : Renvoie un objet personne contenant les données de
       la fiche en fonction d'un identifiant (index ou sosa).
@@ -1958,8 +1973,14 @@ let print_fiche_person conf base =
   | Some index ->
       (* Traite l'index *)
       let ip = Adef.iper_of_int (Int32.to_int index) in
-      if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-      print_result_fiche_person conf base ip
+      if is_private_person conf base ip
+      then 
+        print_error conf `not_found
+      else
+      (
+        if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+        print_result_fiche_person conf base ip
+      )
   | None ->
     match (identifier_person.Mread.Identifier_person.oc)  with
     | (Some oc) ->
@@ -1971,19 +1992,14 @@ let print_fiche_person conf base =
           (
           match Gwdb.person_of_key base fn sn (Int32.to_int oc) with
           | Some ip ->
-            let p = pget conf base ip in
-            if is_hidden p 
+            if is_private_person conf base ip
             then 
-                print_error conf `not_found
+              print_error conf `not_found
             else
-                if not (is_hide_names conf p) || authorized_age conf base p
-                then
-                (
-                    if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-                    print_result_fiche_person conf base ip
-                )
-                else
-                    print_error conf `not_found
+            (
+              if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+              print_result_fiche_person conf base ip
+            )
           | None ->
             print_error conf `not_found
           )
