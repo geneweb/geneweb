@@ -408,6 +408,8 @@ print_tools() {
 echo \"Please run 'make' in directory '\$(dir \$<)' first\"; \
 exit 1; }"
    echo "DEP_OBJS=\$2 \$(patsubst %.cmx,%,\$(filter %.cmx,\$(shell \$(ROOT)/tools/transitive_depend.sh \$(OCAMLI) \$1.cmx))) \$3 \$1"
+   echo "extension=\$(subst .,,\$(suffix \$1))"
+   echo "EXT=\$(call extension,\$@)"
    echo
    echo ".PHONY: always"
    echo "always:"
@@ -455,6 +457,7 @@ print_common_target() {
    echo "# Target 'all' is defined here."
    echo
    echo ".SUFFIXES:"
+   echo "MAKEFLAGS += --no-builtin-rules"
    echo ".PHONY: all clean clean-comp clean-depend clean-exe clean-tmp depend opt out"
    echo ".DEFAULT_GOAL := all"
    echo
@@ -482,11 +485,10 @@ print_common_target() {
    echo "	\$(foreach EXE,\$(ALL_EXE),ln -fs \$(EXE).\$@ \$(EXE) \$(\\n))"
    echo "	\$(if \$(ALL_EXE),\$(STRIP) \$(ALL_EXE))"
    echo
-   echo "%.opt: EXT = opt"
-   echo "%.out: EXT = out"
-   echo
-   echo "%.out %.opt:"
-   echo "	\$(OCAML_\$(EXT)_LINK) \$(OCAMLI) \$(LIBS:=\$(LIB_\$(EXT)_EXT)) \$(LINKFLAGS) \$^ -o \$@"
+   echo "%.opt:"
+   echo "	\$(OCAML_opt_LINK) \$(OCAMLI) \$(LIBS:=\$(LIB_opt_EXT)) \$(LINKFLAGS) \$^ -o \$@"
+   echo "%.out:"
+   echo "	\$(OCAML_out_LINK) \$(OCAMLI) \$(LIBS:=\$(LIB_out_EXT)) \$(LINKFLAGS) \$^ -o \$@"
    echo
    echo "depend: \$(DEPEND_DEPEND)"
    echo "	\$(ROOT)/tools/camlp5_depend.sh \$(CAMLP5F) \$(OCAMLI) -- \$(wildcard *.ml *.mli) > .depend"
