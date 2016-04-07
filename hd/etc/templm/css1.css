@@ -68,7 +68,7 @@ h1{text-align:center;margin-top:28px}
 .login input[type="password"],.menu3 input[type="text"]{line-height:15px;padding:4px;transition:box-shadow 0.3s,border 0.3s;color:black}
 .login input[type="password"]:focus,.login input[type="password"].focus,.menu3 input[type="text"]:focus,.menu3 input[type="search"].focus{border:solid 1px #707070;box-shadow:0 0 5px 1px #969696;background-color:white;}
 .menu3 a{float:none;margin:0 -1px -1px 0;color:#000;}
-.menu3 a,.menu3 .s_menu{float:left;border:solid 0px #DDD;margin:0 -1px -1px 0;padding:3px;color:#000;}
+.menu3 a,.menu3 .s_menu{float:left;border:solid 0px #DDD;margin:0 -1px -1px 0;padding:3px;color:#EE9;}
 .menu span a,.menu3 span a{height:17px;margin-right:0}
 .menu3 input{margin:0;border:0}
 .menu3 .s_menu{display:none;float:left;margin:0 -1px 0 -1px;padding:0px;border:0;color:#000;}
@@ -139,7 +139,7 @@ hr.full{margin-left:0;margin-right:0;}
 .menu span{position:relative;display:block;float:left;}
 .menu span a{float:left;border:none;}
 .menu .s_menu{display:none;float:left;margin-left:0;margin-top:0;padding:0;border:0;}
-.menu span:hover > .s_menu{display:block;position:absolute;left:0;top:23px;z-index:10;background-color:black;color:#EE9;}
+.menu span:hover > .s_menu{display:block;position:absolute;left:0px;top:0px;z-index:10;background-color:black;color:#EE9;}
 .menu .s_menu a{width:260px;}
 .menu1,.button{font-size:14px;line-height:24px;}
 .menu1{clear:both;padding:5px;margin:5px;border-top:solid 1px #333;}
@@ -182,7 +182,7 @@ input[type='submit']{line-height:14px;height:24px;}
 #upd #pa1_jq4,#upd #ch1_jq4{width:282px;}
 #upd .occu{width:275px;}
 #upd .pl{width:440px;}
-#upd .e{width:162px;}
+#upd .e{width:166px;}
 #upd .jq2,#upd .jq4{text-align:left;}
 code{font-size:12px;color:#999;font-family:monospace;}
 #upd #notes{min-height:270px;max-height:540px;width:415px;height:270px;}
@@ -219,7 +219,7 @@ code{font-size:12px;color:#999;font-family:monospace;}
 .occ0{background-color:#36C;}
 .occ1{background-color:#F6C;}
 .occ2{background-color:#999;}
-e_occ,.t_occ{width:10px;text-align:center;background-color:#000;color:#CCC;}
+.e_occ,.t_occ{width:10px;text-align:center;background-color:#000;color:#CCC;}
 #upd .vis{display:inline;}
 #upd .hid{display:none;}
 input,select,textarea{padding:3px;border:solid 1px #CCC;background-color:#EEE;color:#000;}
