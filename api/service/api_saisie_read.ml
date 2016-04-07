@@ -1869,7 +1869,7 @@ let print_person_tree conf base =
     [Retour] : index|None
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-type search_index_type =  Sosa | Key | ApproxKey | PartialKey;;
+type search_index_type =  Sosa | Key | Surname | ApproxKey | PartialKey;;
 let search_index conf base an search_order =
   let rec loop l =
   (
@@ -1888,6 +1888,13 @@ let search_index conf base an search_order =
         match pl with
         | [] ->  loop le
         | [p] -> Some (get_key_index p)
+        | pl -> None
+        )
+    | Surname::le ->
+        let pl = Some.search_surname conf base an in
+        (
+        match pl with
+        | [] ->  loop le
         | pl -> None
         )
     | ApproxKey::le ->
@@ -1998,7 +2005,7 @@ let print_fiche_person conf base =
       | None -> print_error conf `not_found
       )
     | (None, Some sn) ->
-      let order = [ Sosa; Key; ApproxKey; PartialKey ] in
+      let order = [ Sosa; Key; Surname; ApproxKey; PartialKey ] in
       (
       match search_index conf base sn order with
       | Some ip ->
