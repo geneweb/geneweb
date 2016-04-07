@@ -4,7 +4,7 @@
   <!-- $Id: perso.txt,v7 29/02/2016 11:08:07 A2 Exp$ -->
   <title>%apply;capitalize(self.first_name) %apply;capitalize(self.surname)%if(occ!=0) (%occ;)%end; - #%index;</title>
   <meta name="robots" content="none"%/>
-  <meta charset=%charset;%/>
+  <meta charset="utf-8">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
@@ -30,11 +30,11 @@
   %if;(is_dead and computable_death_age
                and birth_date.day != "" and birth_date.prec = ""
                and death_date.day != "" and death_date.prec = "")
-    %if;(version = l_version and death_date.date.julian_day > birth_date.date.julian_day)
+    %if;(death_date.date.julian_day > birth_date.date.julian_day)
       %expr(death_date.date.julian_day - birth_date.date.julian_day)
     %else;0%end;
   %elseif;(computable_age and has_birth_date and birth_date.day != "" and birth_date.prec = "")
-    %if;(version = l_version and today.julian_day > birth_date.date.julian_day)
+    %if;(today.julian_day > birth_date.date.julian_day)
       %expr(today.julian_day - birth_date.date.julian_day)
     %else;0%end;
   %end;
@@ -1011,7 +1011,7 @@
     </span>
   %end;
   %if;event.has_note;
-    <div style="margin-left:30px;margin-top:-15px">%event.note;</div>
+    <div style="margin-left:30px">%event.note;</div>
   %end;
 %end;
 %define;witness_at_event(xx)
@@ -1083,8 +1083,8 @@
   %end;
 %end;
 %( <!-- End define --> %)
-<body%body_prop; id="perso">%nn;
-<div onclick="void(0);">%( the magic Safari div %)
+<body%body_prop; id="perso">
+<div class="container" onclick="void(0);">
 %message_to_wizard;
 %if;(evar.del = "on")<h1 class="del">[*delete::]… [person/persons]1… [family/families]1…</h1>
   %if;(wizard and bvar.can_kill_ancestors="yes")
@@ -1107,7 +1107,7 @@
       %sp;
       %if;has_qualifiers;<em>%qualifier;</em> %end;
       %if;cancel_links;%surname;
-      %else;<a href="%prefix;m=S;n=%surname_key;">%surname;</a>
+      %else;<a style="font-variant: small-caps;" href="%prefix;m=S;n=%surname_key;">%surname;</a>
       %end;
       <small>%apply;link_dates("self")</small>
     </h1>
@@ -1371,9 +1371,10 @@
     %apply;menu()
     %apply;buttons()
   </div>
-  %base_trailer;
-  %include.copyr
+  %include.trl;
+  %include.copyr;
 %end;
-</div>%( the magic Safari div %)
+</div>
+%include.js;
 </body>
 </html>

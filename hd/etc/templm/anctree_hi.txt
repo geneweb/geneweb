@@ -23,7 +23,7 @@
 </script>
 
 %if;(evar.implx = "on")
-<script type="text/javascript" src="%bvar.static_path;jquery-2.2.0.min.js"></script>
+<script type="text/javascript" src="%bvar.static_path;templm/jquery.min.js"></script>
 <script type="text/javascript" src="%bvar.static_path;templm/jquery.line.js"></script>
 %end;
 
