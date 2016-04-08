@@ -730,7 +730,7 @@ value diff_string before after =
   else
     let aa = array_of_string after in
     let bb = array_of_string before in
-    let (bef_d, aft_d) = Diff.f bb aa in
+    let (bef_d, aft_d) = Difference.f bb aa in
     let bef_s = highlight_diff bb bef_d in
     let aft_s = highlight_diff aa aft_d in
     (bef_s, aft_s)

@@ -3,7 +3,7 @@
 (** Differences between two arrays. *)
 
 value f : array 'a -> array 'a -> (array bool * array bool);
-(** [Diff.f a1 a2] returns a couple of two arrays of booleans [(d1, d2)].
+(** [Difference.f a1 a2] returns a couple of two arrays of booleans [(d1, d2)].
       [d1] has the same size as [a1].
       [d2] has the same size as [a2].
       [d1.(i)] is [True] if [a1.(i)] has no corresponding value in [a2].

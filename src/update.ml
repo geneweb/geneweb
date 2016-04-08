@@ -301,7 +301,7 @@ value print_warning conf base =
              end)
           arr
       in
-      let (bef_d, aft_d) = Diff.f before after in
+      let (bef_d, aft_d) = Difference.f before after in
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
           tag "td" begin
@@ -362,7 +362,7 @@ value print_warning conf base =
              end)
           arr
       in
-      let (bef_d, aft_d) = Diff.f before after in
+      let (bef_d, aft_d) = Difference.f before after in
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
           tag "td" begin
@@ -395,7 +395,7 @@ value print_warning conf base =
       in
       let before = Array.of_list before in
       let after = Array.of_list after in
-      let (bef_d, aft_d) = Diff.f before after in
+      let (bef_d, aft_d) = Difference.f before after in
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
           tag "td" begin
@@ -428,7 +428,7 @@ value print_warning conf base =
       in
       let before = Array.of_list before in
       let after = Array.of_list after in
-      let (bef_d, aft_d) = Diff.f before after in
+      let (bef_d, aft_d) = Difference.f before after in
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
           tag "td" begin

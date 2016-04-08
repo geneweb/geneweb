@@ -875,7 +875,7 @@ value print_change_order conf base =
         change_order conf base (get_key_index p) p (Adef.ifam_of_int ifam) n
       in
       let (before, after) = (get_family p, Array.of_list after) in
-      let (bef_d, aft_d) = Diff.f before after in
+      let (bef_d, aft_d) = Difference.f before after in
       let title _ =
         Wserver.printf "%s" (capitale (transl_decline conf "invert" ""))
       in
