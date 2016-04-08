@@ -5,21 +5,33 @@ $(ROOT)/tools/Makefile.config:
 
 include $(ROOT)/tools/Makefile.config
 
-.PHONY: install uninstall distrib
+# ALL: directories needed to make distribution
+ALL_TARGETS := wserver dag2html src ged2gwb gwb2ged setup gwtp
+# EVERYTHING: any other maintained project
+EVERYTHING_TARGETS := contrib/gwpublic contrib/oneshot contrib/misc contrib/gwFix contrib/history
 
-opt out: $(DEPEND_DEPEND)
-	cd wserver && $(MAKE) $@
-	cd dag2html && $(MAKE) $@
-	cd src && $(MAKE) $@
-	cd ged2gwb && $(MAKE) $@
-	cd gwb2ged && $(MAKE) $@
-	cd setup && $(MAKE) $@
-	cd gwtp && $(MAKE) $@
-	cd contrib/gwpublic && $(MAKE) $@
-	cd contrib/oneshot && $(MAKE) $@
-	cd contrib/misc && $(MAKE) $@
-	cd contrib/gwFix && $(MAKE) $@
-	cd contrib/history && $(MAKE) $@
+suffixed_TARGETS := $(foreach suffix,all clean depend everything opt out,$(ALL_TARGETS:=?$(suffix)) $(EVERYTHING_TARGETS:=?$(suffix)))
+
+.PHONY: $(suffixed_TARGETS)
+
+all depend opt out: $(DEPEND_DEPEND)
+all: $(ALL_TARGETS:=?all)
+clean: $(ALL_TARGETS:=?clean) $(EVERYTHING_TARGETS:=?clean)
+depend: $(ALL_TARGETS:=?depend)
+everything: $(ALL_TARGETS:=?everything) $(EVERYTHING_TARGETS:=?everything)
+opt: $(ALL_TARGETS:=?opt)
+out: $(ALL_TARGETS:=?out)
+
+$(suffixed_TARGETS):
+	$(MAKE) -C $(firstword $(subst ?, ,$@)) $(lastword $(subst ?, ,$@))
+
+clean: clean-tmp
+	$(RM) -r $(DESTDIR)
+
+$(DEPEND_DEPEND):
+	$(MAKE) -C $(dir $@) $(notdir $@)
+
+.PHONY: install uninstall distrib
 
 install:
 	mkdir -p $(PREFIX)/bin
@@ -115,30 +127,3 @@ distrib:
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
 	cp -R hd/* $(DESTDIR)/gw/.
-
-clean: clean-tmp
-	cd wserver && $(MAKE) $@
-	cd dag2html && $(MAKE) $@
-	cd src && $(MAKE) $@
-	cd ged2gwb && $(MAKE) $@
-	cd gwb2ged && $(MAKE) $@
-	cd setup && $(MAKE) $@
-	cd gwtp && $(MAKE) $@
-	cd contrib/gwpublic && $(MAKE) $@
-	cd contrib/oneshot && $(MAKE) $@
-	cd contrib/misc && $(MAKE) $@
-	cd contrib/gwFix && $(MAKE) $@
-	cd contrib/history && $(MAKE) $@
-	$(RM) -r $(DESTDIR)
-
-$(DEPEND_DEPEND):
-	cd $(dir $@) && $(MAKE) $(notdir $@)
-
-depend: $(DEPEND_DEPEND)
-	cd wserver && $(MAKE) $@
-	cd dag2html && $(MAKE) $@
-	cd src && $(MAKE) $@
-	cd ged2gwb && $(MAKE) $@
-	cd gwb2ged && $(MAKE) $@
-	cd setup && $(MAKE) $@
-	cd gwtp && $(MAKE) $@

@@ -2,7 +2,8 @@ ROOT := ..
 
 INCDIRS := $(ROOT)/wserver $(ROOT)/dag2html
 ALL_OBJS := ansel
-ALL_EXE := gwc1 gwc2 consang gwd gwu update_nldb check_base
+ALL_EXE := gwc1 gwc2 consang gwd gwu update_nldb
+EVERYTHING_EXE := check_base
 gwd_PREPEND_OBJS := gwlib
 gwd_APPEND_OBJS := compilation
 LIBS = $(LIBUNIX)

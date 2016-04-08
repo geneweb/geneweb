@@ -1,6 +1,6 @@
 ROOT := ..
 
-ALL_EXE := main
 ALL_OBJS := dag2html
+EVERYTHING_EXE := main
 
 include $(ROOT)/tools/Makefile.config
