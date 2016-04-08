@@ -1973,14 +1973,8 @@ let print_fiche_person conf base =
   | Some index ->
       (* Traite l'index *)
       let ip = Adef.iper_of_int (Int32.to_int index) in
-      if is_private_person conf base ip
-      then 
-        print_error conf `not_found
-      else
-      (
-        if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-        print_result_fiche_person conf base ip
-      )
+      if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+      print_result_fiche_person conf base ip
   | None ->
     match (identifier_person.Mread.Identifier_person.oc)  with
     | (Some oc) ->
