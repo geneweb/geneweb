@@ -35,9 +35,11 @@ EOF
 
 # Parse options
 # Options for Makefile
+OCAMLFIND=false
 OCAMLC=
 OCAMLOPT=
 OCAMLFLAGS="-safe-string"
+NATIVE=false
 
 CAMLP5F=
 CAMLP5D=
@@ -55,32 +57,33 @@ LINKSTATIC_out=
 OS_TYPE=
 
 # Options for configure
-STATIC=n
-API=n
+STATIC=false
+API=false
 DEBUG=
-INTERACTIVE=n
-NATIVE=
+INTERACTIVE=false
+TRY_NATIVE=true
+TRY_OCAMLFIND=true
 
 while [[ $# -ne 0 ]]; do
   case $1 in
     -h|--help)
       help; exit ;;
     --api)
-      API=y ;;
+      API=true ;;
     -bd|--build-dir)
       BUILD_DIR="$2";
       shift ;;
     -d|--debug)
       DEBUG="-g -annot" ;;
     -i|--interactive)
-      INTERACTIVE=y ;;
+      INTERACTIVE=true ;;
     -nw|--no-warn-error)
       WARN= ;;
     -r|--redis_path)
       LREDIS="$2";
       shift ;;
     -s|--static)
-      STATIC=y ;;
+      STATIC=true ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
@@ -92,28 +95,24 @@ done
 # Length of line for print_check_*
 LINE_WIDTH=65
 
-print_check_ok() {
-  local n=$(( $LINE_WIDTH-${#1}-8 ))
-  printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
+print_check_gen() {
+  local n=$(( $LINE_WIDTH-${#2}-8 ))
+  printf "\\x1b[36m[INFO]\\x1b[0m %s " "$2"
   printf ".%.0s" $(eval "echo {1.."$(($n))"}")
-  printf " \\x1b[32m%s\\x1b[0m" "${2:-OK}"
+  printf " \\x1b[%sm%s\\x1b[0m" "$1" "$3"
   echo
+}
+
+print_check_ok() {
+  print_check_gen "32" "$1" "${2:-OK}"
 }
 
 print_check_warn() {
-  n=$(( $LINE_WIDTH-${#1}-8 ))
-  printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
-  printf ".%.0s" $(eval "echo {1.."$(($n))"}")
-  printf " \\x1b[33m%s\\x1b[0m" "$2"
-  echo
+  print_check_gen "33" "$1" "$2"
 }
 
 print_check_err() {
-  n=$(( $LINE_WIDTH-${#1}-8 ))
-  printf "\\x1b[36m[INFO]\\x1b[0m %s " "$1"
-  printf ".%.0s" $(eval "echo {1.."$(($n))"}")
-  printf " \\x1b[31m%s\\x1b[0m" "ERROR"
-  echo
+  print_check_gen "31" "$1" "ERROR"
   echo "$2"
   echo "Configuration script failed!"
   exit 1
@@ -186,15 +185,15 @@ check_os() {
 }
 
 check_make() {
-  MAKE_MIN_VER="GNU Make 3.81"
   if ! make -v >/dev/null 2>&1; then
     print_check_err "Checking make" "\
       make needed."
   else
-    MAKE_VER=`make -v|head -n 1`
+    local MAKE_MIN_VER="GNU Make 3.81"
+    local MAKE_VER=`make -v|head -n 1`
     if testversion "$MAKE_VER" ">=" "$MAKE_MIN_VER"; then
       print_check_ok \
-        "Checking GNU make version $MAKE_VER >= $MAKE_MIN_VER"
+        "Checking make version $MAKE_VER >= $MAKE_MIN_VER"
     else
       print_check_warn \
         "Checking make version $MAKE_VER" \
@@ -204,40 +203,76 @@ check_make() {
 }
 
 check_ocaml() {
-  if ocamlc -v >/dev/null 2>&1; then
-    print_check_ok "Checking OCaml compiler"
+# depends on check_ocamlfind
+  if $OCAMLFIND; then
+    OCAMLC="ocamlfind ocamlc"
+    OCAMLOPT="ocamlfind ocamlopt"
+  else
     OCAMLC=ocamlc
     OCAMLOPT=ocamlopt
-    if [[ $STATIC == y ]]; then
-      LINKSTATIC_out+=" -ccopt -static -custom"
-      LINKSTATIC_opt+=" -ccopt -static"
-    fi
+  fi
+  if $OCAMLC -v >/dev/null 2>&1; then
+    print_check_ok "Checking OCaml compiler ($OCAMLC)"
   else
-    print_check_err "Checking OCaml compiler" \
+    print_check_err "Checking OCaml compiler ($OCAMLC)" \
         "You need the command ocamlc accessible in the path!"
+  fi
+  if $TRY_NATIVE && $OCAMLOPT -v >/dev/null 2>&1; then
+    print_check_ok "Checking OCaml native compiler ($OCAMLOPT)"
+    NATIVE=true
+  elif $TRY_NATIVE; then
+    print_check_warn "Checking OCaml native compiler ($OCAMLOPT)" "NOT FOUND"
+  else
+    print_check_ok "Checking OCaml native compiler" "SKIPPED"
   fi
 }
 
-check_native_ocaml() {
-  if ocamlc.opt -v >/dev/null 2>&1; then
-    print_check_ok "Checking OCaml native compiler"
-    OCAMLC=ocamlc.opt
-    OCAMLOPT=ocamlopt.opt
-    NATIVE=y
+check_optimized_ocaml() {
+# depends on check_ocamlfind and check_ocaml
+  if ! $OCAMLFIND; then
+    local TRYOCAMLC=ocamlc.opt
+    local TRYOCAMLOPT=ocamlopt.opt
+    if $TRYOCAMLC -v >/dev/null 2>&1; then
+      print_check_ok "Checking OCaml optimized compiler ($TRYOCAMLC)"
+      OCAMLC=$TRYOCAMLC
+    else
+      print_check_warn "Checking OCaml optimized compiler ($TRYOCAMLC)" "NOT FOUND"
+    fi
+    if $TRY_NATIVE && $TRYOCAMLOPT -v >/dev/null 2>&1; then
+      print_check_ok "Checking OCaml optimized native compiler ($TRYOCAMLOPT)"
+      OCAMLOPT=$TRYOCAMLOPT
+      NATIVE=true
+    elif $TRY_NATIVE; then
+      print_check_warn "Checking OCaml optimized native compiler ($TRYOCAMLOPT)" "NOT FOUND"
+    else
+      print_check_ok "Checking OCaml optimized native compiler" "SKIPPED"
+    fi
   else
-    print_check_warn "Checking OCaml native compiler" "NOT FOUND"
+    print_check_ok "Check OCaml optimized compilers" "SKIPPED"
   fi
 }
 
 check_ocaml_version() {
-  OCAML_MIN_VER="4.02"
-  OCAML_VER="`ocamlc -version`"
+# depends on check_ocaml and check_optimized_ocaml
+  local OCAML_MIN_VER="4.02"
+  local OCAML_VER="`$OCAMLC -version`"
   if testversion "$OCAML_VER" ">=" "$OCAML_MIN_VER"; then
     print_check_ok \
       "Checking OCaml compiler version $OCAML_VER >= $OCAML_MIN_VER"
   else
     print_check_err "Checking OCaml compiler version $OCAML_VER" \
         "OCaml version $OCAML_MIN_VER or newer needed."
+  fi
+  if $NATIVE; then
+    OCAML_VER="`$OCAMLOPT -version`"
+    if testversion "$OCAML_VER" ">=" "$OCAML_MIN_VER"; then
+      print_check_ok \
+        "Checking OCaml native compiler version $OCAML_VER >= $OCAML_MIN_VER"
+    else
+      print_check_warn "Checking Ocaml compiler version $OCAML_VER" \
+          "OCaml version $OCAML_MIN_VER or newer needed."
+      NATIVE=false
+    fi
   fi
 }
 
@@ -252,31 +287,38 @@ check_camlp5() {
 }
 
 check_ocamlfind() {
-  if ocamlfind printconf >/dev/null 2>&1; then
-    print_check_ok "Checking ocamlfind"
-    OCAMLC="ocamlfind ocamlc"
-    OCAMLOPT="ocamlfind ocamlopt"
-    CAMLP5D=`ocamlfind query camlp5`/
-    if [[ $STATIC == y ]]; then
+  if $TRY_OCAMLFIND && ocamlfind printconf >/dev/null 2>&1; then
+    print_check_ok "Checking ocamlfind" "FOUND"
+    OCAMLFIND=true
+    if $STATIC; then
       LINKSTATIC+=" -linkpkg"
     fi
-  elif [[ $API == y ]]; then
+  elif $API; then
     print_check_err "Checking ocamlfind" \
         "You need the command ocamlfind accessible in the path!"
-  else
+  elif $TRY_OCAMLFIND; then
     print_check_warn "Checking ocamlfind" "NOT FOUND"
+  else
+    print_check_ok "Checking ocamlfind" "SKIPPED"
   fi
 }
 
 check_api() {
-  if [[ $API == y ]]; then
+  if $API; then
     OCAMLFLAGS+=" -package piqirun.ext -package curl"
     CAMLP5F+=" -DAPI"
   fi
 }
 
+check_static() {
+  if $STATIC; then
+    LINKSTATIC_out+=" -ccopt -static -custom"
+    LINKSTATIC_opt+=" -ccopt -static"
+  fi
+}
+
 check_mysql() {
-  if [[ $API == y ]]; then
+  if $API; then
     if ocamlfind query mysql >/dev/null 2>&1; then
       print_check_ok "Checking OCaml mysql"
       MYSQL=`ocamlfind query mysql`/
@@ -288,7 +330,7 @@ check_mysql() {
 }
 
 check_curl() {
-  if [[ $API == y ]]; then
+  if $API; then
     if ocamlfind query curl >/dev/null 2>&1; then
       print_check_ok "Checking OCaml curl"
       CURL=`ocamlfind query curl`/
@@ -313,7 +355,7 @@ check_redis_path() {
 }
 
 check_redis() {
-  if [[ $API == y ]]; then
+  if $API; then
     if ! ocamlfind query redis >/dev/null 2>&1; then
       print_check_err "Checking OCaml redis" \
           "You need the OCaml dependency redis!"
@@ -327,7 +369,7 @@ check_redis() {
 }
 
 check_re() {
-  if [[ $API == y ]]; then
+  if $API; then
     if ocamlfind query re >/dev/null 2>&1; then
       print_check_ok "Checking OCaml re"
       RE=`ocamlfind query re`/
@@ -341,12 +383,13 @@ check_re() {
 check_environment() {
   check_os
   check_make
-  check_ocaml
-  check_ocaml_version
-  check_native_ocaml
-  check_camlp5
   check_ocamlfind
+  check_ocaml
+  check_optimized_ocaml
+  check_ocaml_version
+  check_camlp5
   check_api
+  check_static
   check_mysql
   check_curl
   check_redis
@@ -357,7 +400,7 @@ check_environment() {
 
 # Print common options, should be called first.
 print_common_header() {
-  (echo "# This file is generated by $0."
+   echo "# This file is generated by $0."
    echo
    echo "ifeq (\$(ROOT),'')"
    echo "  \$(error Variable ROOT must be defined in each Makefile before \
@@ -394,18 +437,17 @@ gwsetup.1"
    echo "BUILD_DIR=\$(ROOT)/${BUILD_DIR}"
    echo
    echo "OS_TYPE=${OS_TYPE}"
-  ) > $MAKEFILE
 }
 
 print_tools() {
-  (echo
+   echo
    echo "CAMLP5_COMM=\$(ROOT)/tools/camlp5_comm.sh"
    echo "STRIP=${STRIP}"
    echo "RM=${RM}"
    echo "EXE=${EXE}"
    echo "TEST_DIR=[ \"\$(abspath \$<)\" = \"\$(abspath ./\$(notdir \$<))\" ] || \
-{ echo \"Cannot build target '\$@'\"; \
-echo \"Please run 'make' in directory '\$(dir \$<)' first\"; \
+{ printf \"\$(RED)Cannot build target '\$@'\"; \
+printf \"Please run 'make' in directory '\$(dir \$<)' first\$(CLEAR)\"; \
 exit 1; }"
    echo "DEP_OBJS=\$2 \$(patsubst %.cmx,%,\$(filter %.cmx,\$(shell \$(ROOT)/tools/transitive_depend.sh \$(OCAMLI) \$1.cmx))) \$3 \$1"
    echo "extension=\$(subst .,,\$(suffix \$1))"
@@ -414,11 +456,10 @@ exit 1; }"
    echo ".PHONY: always"
    echo "always:"
    echo
-  ) >> $MAKEFILE
 }
 
 print_compiler() {
-  (echo
+   echo
    echo "# File extensions."
    echo "LIB_opt_EXT := .cmxa"
    echo "LIB_out_EXT := .cma"
@@ -438,7 +479,7 @@ print_compiler() {
    echo
    echo "# Compiler dependencies."
    echo "CAMLP5D=${CAMLP5D}"
-   if [[ $API == y ]]; then
+   if $API; then
      echo "LIBUNIX="
      echo "MYSQL=${MYSQL}"
      echo "OCURL=${CURL}"
@@ -449,22 +490,22 @@ print_compiler() {
    else
      echo "LIBUNIX=unix"
    fi
-   ) >> $MAKEFILE
 }
 
 print_common_target() {
-  (echo
+   echo
    echo "# Target 'all' is defined here."
    echo
    echo ".SUFFIXES:"
    echo "MAKEFLAGS += --no-builtin-rules"
    echo ".PHONY: all clean clean-comp clean-depend clean-exe clean-tmp depend opt out"
-   echo ".DEFAULT_GOAL := all"
    echo
-   if [[ $NATIVE == y ]]; then
-     echo "all: opt" >> $MAKEFILE
+   if $NATIVE; then
+     echo ".DEFAULT_GOAL := opt"
+     echo "all: out opt"
    else
-     echo "all: out" >> $MAKEFILE
+     echo ".DEFAULT_GOAL := out"
+     echo "all: out"
    fi
    echo "DEPEND_DEPEND_NAMES := pa_lock.cmo pa_html.cmo q_codes.cmo"
    echo "DEPEND_DEPEND := \$(addprefix \$(ROOT)/src/,\$(DEPEND_DEPEND_NAMES))"
@@ -541,14 +582,14 @@ print_common_target() {
    echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$*.ppo"
    echo "	\$(OCAMLOPT) \$(OCAMLI) -I \$(CAMLP5D) -c -impl \$*.ppo"
    echo "	\$(RM) \$*.ppo"
-  ) >> $MAKEFILE
 }
 
 print_makefile() {
-  print_common_header
-  print_tools
-  print_compiler
-  print_common_target
+  (print_common_header
+   print_tools
+   print_compiler
+   print_common_target
+  ) > $MAKEFILE
 }
 
 # main
@@ -556,7 +597,7 @@ print_makefile() {
 echo -e "\\x1b[36m=-=-\\x1b[0m Configure GeneWeb \\x1b[36m\
 =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\\x1b[0m"
 
-if [[ $INTERACTIVE == y ]]; then
+if $INTERACTIVE; then
   echo "Specify the build directory (default = ${BUILD_DIR})"
   read -re answer
   if [[ -n $answer ]]; then
@@ -565,9 +606,9 @@ if [[ $INTERACTIVE == y ]]; then
   echo "Do you want to build the API (default = no)? [y/N]"
   read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    API=y
+    API=true
   fi
-  if [[ $API == y ]]; then
+  if $API; then
     while [ -z "$LREDIS" ]; do
       echo "Please provide the absolute path of your redis"
       read -re answer
@@ -591,7 +632,7 @@ if [[ $INTERACTIVE == y ]]; then
   echo "Do you want to statically link libraries (default = no)? [y/N]"
   read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    STATIC=y
+    STATIC=true
   fi
 fi
 # Check the environment
