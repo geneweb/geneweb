@@ -14,7 +14,7 @@ suffixed_TARGETS := $(foreach suffix,all clean depend everything opt out,$(ALL_T
 
 .PHONY: $(suffixed_TARGETS)
 
-all depend opt out: $(DEPEND_DEPEND)
+all depend everything opt out: $(DEPEND_DEPEND)
 all: $(ALL_TARGETS:=?all)
 clean: $(ALL_TARGETS:=?clean) $(EVERYTHING_TARGETS:=?clean)
 depend: $(ALL_TARGETS:=?depend)
