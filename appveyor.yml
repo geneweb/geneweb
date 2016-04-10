@@ -15,4 +15,4 @@ install:
   - '%CYG_BASH% "eval `opam config env`"'
 
 build_script:
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make && make distrib"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make everything && make distrib"'

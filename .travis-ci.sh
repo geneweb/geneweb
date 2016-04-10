@@ -7,5 +7,5 @@ opam install ocamlfind camlp5
 
 # Build GeneWeb
 ./configure
-make
+make everything
 make distrib
