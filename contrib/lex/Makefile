@@ -1,34 +1,6 @@
-# $Id: Makefile.lex, v 0.1 2014-10-10 23:25:31 ipfix Exp $
+ROOT := ../..
 
-EXEC = lex_utils
+ALL_EXE := lex_utils
+LIBS := str
 
-CAMLOPT = ocamlopt.opt
-CAMLDEP = ocamldep
-
-LIBS=str.cma
-
-SOURCES = lex_utils.ml
-
-all: .depend $(EXEC).opt
-
-OPTOBJS = $(SOURCES:.ml=.cmx)
-
-$(EXEC).opt: $(OPTOBJS)
-	$(CAMLOPT) $(LIBS:.cma=.cmxa) $(OPTOBJS) -o $(EXEC)
-
-.SUFFIXES: .ml .mli .cmo .cmi .cmx
-
-.ml.cmx:
-	$(CAMLOPT) -c $<
-
-clean:
-	rm -f *.cm[iox] *~ .*~ *.o *.annot #*#
-	rm -f $(EXEC)
-	rm -f $(EXEC).opt
-
-.depend: *.ml*
-	$(CAMLDEP) $^ > $@
-
-ifeq ($(filter $(MAKECMDGOALS),clean depend),)
-  include .depend
-endif
+include $(ROOT)/tools/Makefile.config

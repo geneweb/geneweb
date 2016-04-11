@@ -1,4 +1,4 @@
-(* Build : ocamlopt.opt lex_utils.ml -o lex_utils *)
+(* nocamlp5 *)
 
 
 (**/**) (* Utils. *)
