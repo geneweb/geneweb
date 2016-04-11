@@ -2,62 +2,61 @@
 
 usage() {
   PROG_NAME=${0##*/}
-  echo "Usage: $PROG_NAME [-simp] [-I incdir] <target>" >&2
-  echo "Usage 2: $PROG_NAME -graph [-simp] [-noext] [-filter <pattern>] [-I incdir] [<target>]" >&2
+  (echo "Usage  : $PROG_NAME <options> [<targets>]"
+   echo "Usage 2: $PROG_NAME -graph <options> [<targets>]"
+   echo
+   echo "General options:"
+   echo "  -I <incdir>         consider <incdir>/.depend file"
+   echo "  -filter <pattern>   filter files according to <pattern>"
+   echo "  -noext              remove extensions of files"
+   echo
+   echo "Non-graph option:"
+   echo "  -varname <varname>  if specified write '<varname> :=' before each line (%s will be replaced by the name of the target)"
+  ) >&2
   exit 1
 }
 
 INCDIRS=
-TARGET=
+TARGETS=
 GRAPH=false
-SIMP=false
 NOEXT=false
 FILTER=
+VARNAME=
 while [ -n "$1" ]; do
   case $1 in
   -h|--help) usage;;
   -graph) GRAPH=true;;
-  -simp) SIMP=true;;
   -noext) NOEXT=true;;
   -filter)
     shift
     [ -n "$1" ] && [ -z "$FILTER" ] || usage
     FILTER="$1";;
+  -varname)
+    shift
+    [ -n "$1" ] && [ -z "$VARNAME" ] || usage
+    VARNAME="$1";;
   -I) shift
       [ -n "$1" ] || usage
       INCDIRS+="${1%/} ";;
-  *) [ -z "$TARGET" ] || usage
-     TARGET="$1";;
+  *) TARGETS+="$1 ";;
   esac
   shift
 done
-
-$GRAPH || [ -n "$TARGET" ] || usage
 
 DEPEND=".depend"
 
 # Collect all dependencies as an associative array
 declare -A DEPS
 
-simppath() {
-# Simplify path by removing subdir/..
-# It's an option because it's pretty slow
-  local pc c b res=
-  IFS='/' read -ra pc <<< "$1"
-  for c in "${pc[@]}"; do
-    [ -n "$c" ] && [ "$c" != "." ] || continue
-    if [ -n "$res" ] && [ "$c" = ".." ]; then
-      b=$(basename $res)
-      if [ "$b" != ".." ]; then
-        res=$(dirname $res)
-        [ "$res" != "." ] || res=
-        continue
-      fi
-    fi
-    res="${res}${res:+/}$c"
+concatpath() {
+# concatpath "A/B" "../C/D" gives "A/C/D"
+  local pre="$1" post="$2"
+  while [ -n "$pre" ] && [[ $post =~ ^\.\.\/ ]]; do
+    pre=$(dirname $pre)
+    [ "$pre" != "." ] || pre=
+    post=${post:3}
   done
-  [[ ! "$1" =~ ^\/ ]] || res="/${res}"
-  echo "$res"
+  echo "${pre%/}${pre:+/}$post"
 }
 
 treat_line() {
@@ -72,25 +71,17 @@ treat_line() {
   fi
   if [ "${#words[@]}" -eq 2 ]; then
     local rhs lhs prefixed_rhs=
-    if $SIMP || [ -n "$FILTER" ]; then
-      for rhs in ${words[1]}; do
-        [ -z "$FILTER" ] || [[ $rhs == $FILTER ]] || continue
-        rhs="$PREFIX$rhs"
-        $SIMP && rhs=$(simppath "$rhs")
-        $NOEXT && rhs="${rhs%.*}"
-        prefixed_rhs+="$rhs "
-      done
-      prefixed_rhs="${prefixed_rhs% }"
-    else
-      rhs=(${words[1]})
-      $NOEXT && rhs=("$(rhs[@]%.*)")
-      prefixed_rhs="${rhs[@]/#/$PREFIX}"
-    fi
+    for rhs in ${words[1]}; do
+      [ -z "$FILTER" ] || [[ $rhs == $FILTER ]] || continue
+      rhs=$(concatpath "$PREFIX" "$rhs")
+      $NOEXT && rhs="${rhs%.*}"
+      prefixed_rhs+="$rhs "
+    done
+    prefixed_rhs="${prefixed_rhs% }"
     [ -n "$prefixed_rhs" ] || return 0
     for lhs in ${words[0]}; do
       [ -z "$FILTER" ] || [[ $lhs == $FILTER ]] || continue
-      lhs="$PREFIX$lhs"
-      $SIMP && lhs=$(simppath "$lhs")
+      lhs=$(concatpath "$PREFIX" "$lhs")
       $NOEXT && lhs="${lhs%.*}"
       DEPS[$lhs]+="$prefixed_rhs "
     done
@@ -119,14 +110,13 @@ for d in $INCDIRS; do
   read_depend "$d/"
 done
 
-declare -A INRES
-declare -A INSTACK
+[ -n "$TARGETS" ] || TARGETS="${!DEPS[@]}"
 
 if $GRAPH; then
 
   add() {
-    if [[ ${INRES[$1]} != y ]]; then
-      INRES[$1]=y
+    if [[ ${INGRAPH[$1]} != y ]]; then
+      INGRAPH[$1]=y
       if [ -z "${DEPS[$1]}" ]; then
         printf "\"$1\"\n"
       else
@@ -141,15 +131,13 @@ if $GRAPH; then
     fi
   }
 
+  declare -A INGRAPH
+
   echo "digraph {"
 
-  if [ -n "$TARGET" ]; then
-    add "$TARGET"
-  else
-    for target in "${!DEPS[@]}"; do
-      add "$target"
-    done
-  fi
+  for target in $TARGETS; do
+    add "$target"
+  done
 
   echo "}"
 
@@ -157,8 +145,6 @@ else
   # Compute the transitive closure of dependencies from $TARGET
   # + avoid infinite loops in case of cyclic dependencies
   # + do not add duplicates
-
-  RES=
 
   add() {
     if [ -z "$1" ]; then
@@ -178,8 +164,13 @@ else
     fi
   }
 
-  INRES[$TARGET]=y
-  add "$TARGET"
+  for target in $TARGETS; do
+    declare -A INRES=([$target]=y) INSTACK=()
+    RES=
 
-  echo "$RES"
+    add "$target"
+
+    [ -z "$VARNAME" ] || printf "$VARNAME := " "$target"
+    echo "$RES"
+  done
 fi
