@@ -22,7 +22,7 @@ while [ -n "$1" ]; do
     -I) [ $ARGTYPE != "FILES" ] || usage "$1"
         shift
         [ -n "$1" ] || usage
-        INC="$INC -I $1";;
+        INC+="-I ${1%/} ";;
     *) declare $ARGTYPE="${!ARGTYPE} $1";;
     esac
     shift
@@ -57,7 +57,7 @@ for FILE in $FILES; do
       fi
       COMMAND="$COMMAND $CAMLP5_LOAD_OPTIONS $ARGS -- $CAMLP5_OTHER_OPTIONS $FILE";;
     *)
-      COMMAND="camlp5r $CAMLP5_LOAD_OPTIONS $ARGS -- $CAMLP5_OTHER_OPTIONS $FILE";;
+      COMMAND="camlp5r $CAMLP5_LOAD_OPTIONS -- $CAMLP5_OTHER_OPTIONS $FILE";;
     esac
     echo $COMMAND $FILE >&2
     # camlp5 on Windows generates backslashes -> replace them with slashes
