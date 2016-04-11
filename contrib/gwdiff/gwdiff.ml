@@ -2,7 +2,7 @@
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
 open Def;
-open Gutil;
+open Gwdb;
 
 (*= TODO =====================================================================
   - Improve the way not to check several time the same persons.
@@ -36,11 +36,11 @@ type messages =
 
 value person_string base iper =
   let p = poi base iper in
-  let fn = sou base p.first_name in
-  let sn = sou base p.surname in
+  let fn = sou base (get_first_name p) in
+  let sn = sou base (get_surname p) in
   if sn = "?" || fn = "?" then
     fn ^ " " ^ sn ^ " (#" ^ string_of_int (Adef.int_of_iper iper) ^ ")"
-  else fn ^ "." ^ (string_of_int p.occ) ^ " " ^ sn
+  else fn ^ "." ^ (string_of_int (get_occ p)) ^ " " ^ sn
 ;
 
 value person_link bname base iper target =
@@ -99,15 +99,15 @@ value print_message base1 base2 msg =
 ;
 
 value print_f_messages base1 base2 ifam1 ifam2 res =
-  let c1 = coi base1 ifam1 in
-  let c2 = coi base2 ifam2 in
+  let f1 = foi base1 ifam1 in
+  let f2 = foi base2 ifam2 in
   do {
     Printf.printf "%s x %s%s/ %s x %s%s"
-      (person_link in_file1.val base1 c1.father "base1")
-      (person_link in_file1.val base1 c1.mother "base1")
+      (person_link in_file1.val base1 (get_father f1) "base1")
+      (person_link in_file1.val base1 (get_mother f1) "base1")
       cr.val
-      (person_link in_file2.val base2 c2.father "base2")
-      (person_link in_file2.val base2 c2.mother "base2")
+      (person_link in_file2.val base2 (get_father f2) "base2")
+      (person_link in_file2.val base2 (get_father f2) "base2")
       cr.val;
     List.iter (print_message base1 base2) res
   }
@@ -130,7 +130,7 @@ value compatible_names src_name dest_name_list =
 ;
 
 value compatible_str_field istr1 istr2 =
-  (Adef.int_of_istr istr1 = 0) || (Adef.int_of_istr istr2 != 0)
+  (is_empty_string istr1) || not (is_empty_string istr2)
 ;
 
 value dmy_to_sdn_range_l dmy =
@@ -178,27 +178,13 @@ value dmy_to_sdn_range_l dmy =
   | After ->
       let (sdn1, sdn2) = sdn_of_dmy dmy in
       [ (Some sdn1, None) ]
-  | OrYear y ->
-      let dmy2 =
-        { year = y + 1;
-          month = 0;
-          day = 0;
-          prec = Sure;
-          delta = 0 }
-      in
+  | OrYear dmy2 ->
       let (sdn11, sdn12) = sdn_of_dmy dmy in
-      let (sdn21, sdn22) = sdn_of_dmy dmy2 in
+      let (sdn21, sdn22) = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
       [ (Some sdn11, Some sdn12) ; (Some sdn21, Some sdn22) ]
-  | YearInt y ->
-      let dmy2 =
-        { year = y + 1;
-          month = 0;
-          day = 0;
-          prec = Sure;
-          delta = 0 }
-      in
+  | YearInt dmy2 ->
       let (sdn11, sdn12) = sdn_of_dmy dmy in
-      let (sdn21, sdn22) = sdn_of_dmy dmy2 in
+      let (sdn21, sdn22) = sdn_of_dmy (Date.dmy_of_dmy2 dmy2) in
       [ (Some sdn11, Some sdn22) ] ]
 ;
 
@@ -343,8 +329,8 @@ value rec find_compatible_persons_ligth base1 base2 iper1 iper2_list =
   match iper2_list with
   [ [] -> []
   | [ head :: rest ] ->
-       let p1 = poi base1 iper1 in
-       let p2 = poi base2 head in
+       let p1 = gen_person_of_person (poi base1 iper1) in
+       let p2 = gen_person_of_person (poi base2 head) in
        let c_rest = find_compatible_persons_ligth base1 base2 iper1 rest in
        if compatible_persons_ligth base1 base2 p1 p2 = [] then [ head :: c_rest ]
        else c_rest ]
@@ -354,8 +340,8 @@ value rec find_compatible_persons base1 base2 iper1 iper2_list =
   match iper2_list with
   [ [] -> []
   | [ head :: rest ] ->
-       let p1 = poi base1 iper1 in
-       let p2 = poi base2 head in
+       let p1 = gen_person_of_person (poi base1 iper1) in
+       let p2 = gen_person_of_person (poi base2 head) in
        let c_rest = find_compatible_persons base1 base2 iper1 rest in
        if compatible_persons base1 base2 p1 p2 = [] then [ head :: c_rest ]
        else c_rest ]
@@ -363,12 +349,12 @@ value rec find_compatible_persons base1 base2 iper1 iper2_list =
 
 value compatible_unions base1 base2 iper1 iper2 ifam1 ifam2 =
   let get_spouse base iper ifam =
-    let c = coi base ifam in
-      if iper = c.father then poi base c.mother
-      else poi base c.father
+    let f = foi base ifam in
+      if iper = get_father f then poi base (get_mother f)
+      else poi base (get_father f)
   in
-  let spouse1 = get_spouse base1 iper1 ifam1 in
-  let spouse2 = get_spouse base2 iper2 ifam2 in
+  let spouse1 = gen_person_of_person (get_spouse base1 iper1 ifam1) in
+  let spouse2 = gen_person_of_person (get_spouse base2 iper2 ifam2) in
   compatible_persons_ligth base1 base2 spouse1 spouse2
 ;
 
@@ -391,8 +377,8 @@ value compatible_divorces d1 d2 =
 ;
 
 value compatible_marriages base1 base2 ifam1 ifam2 =
-  let f1 = foi base1 ifam1 in
-  let f2 = foi base2 ifam2 in
+  let f1 = gen_family_of_family (foi base1 ifam1) in
+  let f2 = gen_family_of_family (foi base2 ifam2) in
   let res1 =
     if compatible_codates f1.marriage f2.marriage then []
     else [ MsgMarriageDate ]
@@ -411,22 +397,22 @@ value compatible_marriages base1 base2 ifam1 ifam2 =
 ;
 
 value pdiff base1 base2 iper1 iper2 =
-  let p1 = poi base1 iper1 in
-  let p2 = poi base2 iper2 in
+  let p1 = gen_person_of_person (poi base1 iper1) in
+  let p2 = gen_person_of_person (poi base2 iper2) in
   let res = compatible_persons base1 base2 p1 p2 in
   if res = [] then ()
   else print_p_messages base1 base2 iper1 iper2 res
 ;
 
 value compatible_parents base1 base2 iper1 iper2 =
-  let a1 = (aoi base1 iper1).parents in
-  let a2 = (aoi base2 iper2).parents in
+  let a1 = get_parents (poi base1 iper1) in
+  let a2 = get_parents (poi base2 iper2) in
   match (a1, a2) with
   [ (Some ifam1, Some ifam2) ->
-       let c1 = coi base1 ifam1 in
-       let c2 = coi base2 ifam2 in
-       let _ = pdiff base1 base2 c1.father c2.father in
-       let _ = pdiff base1 base2 c1.mother c2.mother in
+       let f1 = foi base1 ifam1 in
+       let f2 = foi base2 ifam2 in
+       let _ = pdiff base1 base2 (get_father f1) (get_father f2) in
+       let _ = pdiff base1 base2 (get_mother f1) (get_mother f2) in
        compatible_marriages base1 base2 ifam1 ifam2
   | (None, _) -> ()
   | (Some _, None) ->
@@ -438,9 +424,9 @@ value rec ddiff base1 base2 iper1 iper2 d_tab =
   if List.mem iper2 d_check then ()
   else
     let _ = d_tab.(Adef.int_of_iper iper1) := [iper2 :: d_check ] in
-  let spouse c iper =
-    if iper = c.father then c.mother
-    else c.father
+  let spouse f iper =
+    if iper = get_father f then get_mother f
+    else get_father f
   in
   let rec udiff base1 base2 iper1 iper2 r ifam1 ifam2 =
     let fd b1 b2 ip2_list ip1 =
@@ -456,12 +442,12 @@ value rec ddiff base1 base2 iper1 iper2 d_tab =
           | _ ->
               print_p_messages base1 base2 iper1 iper2 [ MsgChildren ip1 ] ] ]
     in
-    let c1 = coi base1 ifam1 in
-    let c2 = coi base2 ifam2 in
-    let p1 = spouse c1 iper1 in
-    let p2 = spouse c2 iper2 in
-    let d1 = Array.to_list (doi base1 ifam1).children in
-    let d2 = Array.to_list (doi base2 ifam2).children in
+    let f1 = foi base1 ifam1 in
+    let f2 = foi base2 ifam2 in
+    let p1 = spouse f1 iper1 in
+    let p2 = spouse f2 iper2 in
+    let d1 = Array.to_list (get_children (foi base1 ifam1)) in
+    let d2 = Array.to_list (get_children (foi base2 ifam2)) in
     do {
       pdiff base1 base2 p1 p2;
       List.iter (fd base1 base2 d2) d1
@@ -472,19 +458,19 @@ value rec ddiff base1 base2 iper1 iper2 d_tab =
     [ [ifam2] ->
         do {
           compatible_marriages b1 b2 ifam1 ifam2;
-          compatible_parents b1 b2 (spouse (coi base1 ifam1) iper1)
-            (spouse (coi base2 ifam2) iper2);
+          compatible_parents b1 b2 (spouse (foi base1 ifam1) iper1)
+            (spouse (foi base2 ifam2) iper2);
           udiff b1 b2 iper1 iper2 True ifam1 ifam2
         }
     | [] ->
         print_p_messages base1 base2 iper1 iper2
-          [ MsgSpouseMissing (spouse (coi base1 ifam1) iper1) ]
+          [ MsgSpouseMissing (spouse (foi base1 ifam1) iper1) ]
     | _ ->
         print_p_messages base1 base2 iper1 iper2
-          [ MsgSpouses (spouse (coi base1 ifam1) iper1) ]  ]
+          [ MsgSpouses (spouse (foi base1 ifam1) iper1) ]  ]
   in
-  let u1 = Array.to_list (uoi base1 iper1).family in
-  let u2 = Array.to_list (uoi base2 iper2).family in
+  let u1 = Array.to_list (get_family (poi base1 iper1)) in
+  let u2 = Array.to_list (get_family (poi base2 iper2)) in
   do {
     pdiff base1 base2 iper1 iper2;
     List.iter (fu base1 base2 u2) u1
@@ -492,17 +478,17 @@ value rec ddiff base1 base2 iper1 iper2 d_tab =
 ;
 
 value rec find_top base1 base2 iper1 iper2 =
-  let p1 = poi base1 iper1 in
-  let p2 = poi base2 iper2 in
+  let p1 = gen_person_of_person (poi base1 iper1) in
+  let p2 = gen_person_of_person (poi base2 iper2) in
   if compatible_persons_ligth base1 base2 p1 p2 = [] then
-    let a1 = (aoi base1 iper1).parents in
-    let a2 = (aoi base2 iper2).parents in
+    let a1 = get_parents (poi base1 iper1) in
+    let a2 = get_parents (poi base2 iper2) in
     match (a1, a2) with
     [ (Some ifam1, Some ifam2) ->
-         let c1 = coi base1 ifam1 in
-         let c2 = coi base2 ifam2 in
-         let f_top_list = find_top base1 base2 c1.father c2.father in
-         let m_top_list = find_top base1 base2 c1.mother c2.mother in
+         let f1 = foi base1 ifam1 in
+         let f2 = foi base2 ifam2 in
+         let f_top_list = find_top base1 base2 (get_father f1) (get_father f2) in
+         let m_top_list = find_top base1 base2 (get_mother f1) (get_mother f2) in
          f_top_list @ m_top_list
     | _ -> [(iper1, iper2)] ]
   else do {
@@ -535,7 +521,7 @@ value addiff base1 base2 iper1 iper2 d_tab =
 (* Main *)
 
 value gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
-  let desc_tab = Array.make base1.data.persons.len [] in
+  let desc_tab = Array.make (nb_of_persons base1) [] in
   match (d_mode, ad_mode) with
   [ (True, _)
   | (False, False) -> ddiff base1 base2 iper1 iper2 desc_tab
@@ -667,48 +653,39 @@ value main () =
     if not html.val then cr.val := "\n"
     else cr.val := "<BR>\n"
   in
-  (* Reference base *)
-  let base1 = Iobase.input in_file1.val in
-  let _ = base1.data.ascends.array () in
-  let _ = base1.data.strings.array () in
-  let _ =
-    if not mem.val then
-      let _ = base1.data.persons.array () in
-      let _ = base1.data.families.array () in
-      let _ = base1.data.couples.array () in
-      let _ = base1.data.unions.array () in
-      let _ = base1.data.descends.array () in
-      ()
-    else ()
+  let load_base file =
+    let base = open_base file in
+    let () = load_ascends_array base in
+    let () = load_strings_array base in
+    let () =
+      if not mem.val then
+        let () = load_unions_array base in
+        let () = load_couples_array base in
+        let () = load_descends_array base in
+        ()
+      else ()
+    in base
   in
+  (* Reference base *)
+  let base1 = load_base in_file1.val in
   (* Destination base *)
   let base2 =
-     if in_file1.val != in_file2.val then
-       let base2 = Iobase.input in_file2.val in
-       let _ = base2.data.ascends.array () in
-       let _ = base2.data.strings.array () in
-       let _ =
-         if not mem.val then
-           let _ = base2.data.persons.array () in
-           let _ = base2.data.families.array () in
-           let _ = base2.data.couples.array () in
-           let _ = base2.data.unions.array () in
-           let _ = base2.data.descends.array () in
-           ()
-         else ()
-       in
-       base2
-     else
-       (* Reference = Destination *)
-       base1
+    if in_file1.val != in_file2.val then
+      load_base in_file2.val
+    else
+      (* Reference = Destination *)
+      base1
   in
-  let iper1 = person_ht_find_unique base1 p1_fn.val p1_sn.val p1_occ.val in
-  let iper2 = person_ht_find_unique base2 p2_fn.val p2_sn.val p2_occ.val in
+  let iper1 = person_of_key base1 p1_fn.val p1_sn.val p1_occ.val in
+  let iper2 = person_of_key base2 p2_fn.val p2_sn.val p2_occ.val in
   do {
     if html.val then
       Printf.printf "<BODY>\n"
     else ();
-    gwdiff base1 base2 iper1 iper2 d_mode.val ad_mode.val;
+    match (iper1, iper2) with
+    [ (None, _) -> Printf.printf "Cannot find person %s.%d %s in reference base" p1_fn.val p1_occ.val p1_sn.val
+    | (_, None) -> Printf.printf "Cannot find person %s.%d %s in destination base" p2_fn.val p2_occ.val p2_sn.val
+    | (Some iper1, Some iper2) -> gwdiff base1 base2 iper1 iper2 d_mode.val ad_mode.val ];
     if html.val then
       Printf.printf "</BODY>\n"
     else ()
