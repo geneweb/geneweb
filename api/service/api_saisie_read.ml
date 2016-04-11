@@ -2023,7 +2023,7 @@ let print_fiche_person conf base =
         print_result_fiche_person conf base ip
       | None -> print_error conf `not_found
       )
-    | (Some fn, None) -> print_error conf `bad_request
+    | (Some fn, None) -> print_error conf `not_found
     | (None, None) -> print_error conf `bad_request
     )
     in
