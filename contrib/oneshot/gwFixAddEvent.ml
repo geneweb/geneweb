@@ -58,26 +58,28 @@ value read_file fname =
         } ]
   in
   let list = ref [] in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  let () = match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do {
         try
           while True do {
             let name = input_line ic in
             let note = input_line ic in
-            let empty = input_line ic in
+            let _empty = input_line ic in
             let (sn, fn, occ) = split_name name in
             list.val := [((sn, fn, occ), note) :: list.val]
           }
         with [ End_of_file -> () ];
         close_in ic
       }
-  | None -> () ]
+  | None -> () ] in
   List.rev list.val
 ;
 
+value toc_list = []; (* ?? *)
+
 value lines_list_of_string s =
-  loop False [] 0 0 where rec loop no_toc lines len i =
+  fst (loop False [] 0 0) where rec loop no_toc lines len i =
     if i = String.length s then
       (List.rev (if len = 0 then lines else [Buff.get len :: lines]), no_toc)
     else if s.[i] = '\n' then
@@ -88,13 +90,13 @@ value lines_list_of_string s =
       loop no_toc lines (Buff.store len s.[i]) (i + 1)
 ;
 
-value update_database_with_file bname fname =
+value update_database_with_file base fname =
   let empty = Gwdb.insert_string base "" in
   let list = read_file fname in
   List.iter
     (fun ((sn, fn, occ), note) ->
        do {
-         match Gwdb.person_of_key fn sn occ with
+         match Gwdb.person_of_key base fn sn occ with
          [ Some ip ->
              do {
                let p = poi base ip in
@@ -121,7 +123,9 @@ value update_database_with_file bname fname =
                let notes = String.concat "\n" notes in
                let pevents = (get_pevents p) @ [evt] in
                let gp =
-                 {(gen_person_of_person p) with pevents = pevents; notes = notes}
+                 {(gen_person_of_person p) with
+                   pevents = pevents;
+                   notes = Gwdb.insert_string base notes}
                in
                patch_person base gp.key_index gp;
              }
@@ -154,7 +158,8 @@ value main () = do {
   lock Mutil.lock_file bname.val with
   [ Accept ->
       let base = Gwdb.open_base bname.val in
-      update_database_with_file bname fname.val
+      let () = update_database_with_file base fname.val in
+      close_base base
   | Refuse -> do {
       eprintf "Cannot lock database. Try again.\n";
       flush stderr;
