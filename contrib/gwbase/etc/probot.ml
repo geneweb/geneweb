@@ -1,36 +1,8 @@
-(* camlp4r *)
+(* camlp5r *)
 (* $Id: probot.ml,v 1.7 2006-10-05 13:37:58 deraugla Exp $ *)
 
 open Printf;
-
-value magic_robot = "GWRB0007";
-
-module W = Map.Make (struct type t = string; value compare = compare; end);
-
-type norfriwiz = [ Normal | Friend of string | Wizard of string ];
-
-type who =
-  { acc_times : list float;
-    oldest_time : float;
-    nb_connect : int;
-    nbase : string;
-    utype : norfriwiz }
-;
-
-type excl =
-  { excl : mutable list (string * ref int);
-    who : mutable W.t who;
-    max_conn : mutable (int * string) }
-;
-
-value input_excl =
-  let b = Bytes.create (String.length magic_robot) in
-  fun ic ->
-    do {
-      really_input ic b 0 (String.length b);
-      if b <> magic_robot then raise Not_found else (input_value ic : excl)
-    }
-;
+open Robot;
 
 value main () =
   let xcl = input_excl (open_in_bin "cnt/robot") in
@@ -48,7 +20,7 @@ value main () =
     List.iter
       (fun (k, w) ->
          let tml = w.acc_times in
-	 let tm0 = w.oldest_time in
+	 let _tm0 = w.oldest_time in
 	 let cnt = w.nb_connect in
 	 let bn = w.nbase in
 	 let nfw = w.utype in

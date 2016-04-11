@@ -101,7 +101,7 @@ value rec select_closure base per_tab fam_tab flag ip =
   else ()
 ;
 
-value functions base anc desc surnames no_spouses_parents =
+value functions base anc desc surnames no_spouses_parents _ _ _ _ =
   let per_tab = Array.make (nb_of_persons base) 0 in
   let fam_tab = Array.make (nb_of_families base) 0 in
   do {

@@ -1,4 +1,4 @@
-(* camlp4r *)
+(* camlp5r *)
 (* $Id: popule.ml,v 4.31 2007-02-16 10:35:39 deraugla Exp $ *)
 
 open Def;
@@ -118,7 +118,7 @@ value add_indi (base, cnt, bname) (fn, sn1, sn2, oc) sex =
     else ();
     incr cnt;
     let sn = if sn2 = "" then sn1 else sn1 ^ " " ^ sn2 in
-    Gwlib.add_indi base.val (fn, sn, oc) sex
+    GwBaseLib.add_indi base.val (fn, sn, oc) sex
   }
 ;
 
@@ -239,7 +239,7 @@ else do {
               if h_before_f then list @ [ip] else [ip :: list];
             }
           in
-          let _ : ifam = Gwlib.add_fam base.val ifath imoth list in
+          let _ : ifam = GwBaseLib.add_fam base.val ifath imoth list in
           ();
         };
 };

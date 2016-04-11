@@ -1,4 +1,4 @@
-(* camlp4r *)
+(* camlp5r *)
 (* $Id: lune.ml,v 4.7 2006-10-30 09:37:58 deraugla Exp $ *)
 
 open Def;

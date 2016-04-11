@@ -2,15 +2,7 @@
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
-open Gutil;
 open Printf;
-
-value insert_string base s =
-  try base.func.index_of_string s with
-  [ Not_found ->
-      let i = Adef.istr_of_int base.data.strings.len in
-      do { base.func.patch_string i s; i } ]
-;
 
 value has_infos p =
   match p.death with [ Death _ _ -> True | _ -> False ]
@@ -19,10 +11,11 @@ value has_infos p =
 value modif base =
   let changes = ref False in
   do {
-    for i = 0 to base.data.persons.len - 1 do {
-      let p = base.data.persons.get i in
-      let fn = p_first_name base p in
-      let sn = p_surname base p in
+    let (get_person, _) = Gwdb.persons_array base in
+    for i = 0 to (Gwdb.nb_of_persons base) - 1 do {
+      let p = get_person i in
+      let fn = Gwdb.p_first_name base p in
+      let sn = Gwdb.p_surname base p in
       if match fn with [ "ne" -> True | _ -> False ] then do {
         eprintf ".";
         flush stderr;
@@ -43,8 +36,8 @@ value modif base =
         with
         [ Not_found ->
   	  do {
-              p.first_name := insert_string base fn';
-              p.surname := insert_string base sn';
+              p.first_name := Gwdb.insert_string base fn';
+              p.surname := Gwdb.insert_string base sn';
               base.func.patch_person p.cle_index p;
               base.func.patch_name (Name.lower (fn' ^ " " ^ sn')) p.cle_index;
               changes.val := True;

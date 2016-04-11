@@ -9,8 +9,8 @@ value consmoy bname base =
   let cons = ref 0.0 in
   do {
     for i = 0 to nb_of_persons base - 1 do {
-      let a = aoi base (Adef.iper_of_int i) in
-      cons.val := cons.val +. Adef.float_of_fix (get_consang a)
+      let p = poi base (Adef.iper_of_int i) in
+      cons.val := cons.val +. Adef.float_of_fix (get_consang p)
     };
     printf "average consanguinity: %f\n"
       (cons.val /. float (nb_of_persons base));
@@ -26,7 +26,7 @@ value speclist = [];
 value main () =
   do {
     Argl.parse speclist (fun s -> bname.val := s) usage;
-    let base = Gwdb.make_base (Iobase.input bname.val) in
+    let base = Gwdb.open_base bname.val in
     consmoy bname.val base
   }
 ;

@@ -1,4 +1,4 @@
-(* camlp4r *)
+(* camlp5r *)
 (* $Id: nbdesc.ml,v 4.7 2007-10-28 06:57:31 deraugla Exp $ *)
 
 open Def;

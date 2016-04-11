@@ -242,23 +242,23 @@ value print_line line =
     ()
 ;
 
-value order_lines l1 l2 =
-  if l1.name <> l2.name then Gutil.alphabetic l1.name l2.name < 0
-  else if l1.info < l2.info then True
-  else if l1.info > l2.info then False
-  else if l1.dbeg < l2.dbeg then True
-  else if l1.dbeg > l2.dbeg then False
-  else if l1.dend < l2.dend then True
-  else if l1.dend > l2.dend then False
-  else if l1.place < l2.place then True
-  else if l1.place > l2.place then False
-  else if l1.subregion < l2.subregion then True
-  else if l1.subregion > l2.subregion then False
-  else if l1.region < l2.region then True
-  else if l1.region > l2.region then False
-  else if l1.country < l2.country then True
-  else if l1.country > l2.country then False
-  else True
+value cmp_lines l1 l2 =
+  if l1.name <> l2.name then Gutil.alphabetic l1.name l2.name
+  else if l1.info < l2.info then -1
+  else if l1.info > l2.info then 1
+  else if l1.dbeg < l2.dbeg then -1
+  else if l1.dbeg > l2.dbeg then 1
+  else if l1.dend < l2.dend then -1
+  else if l1.dend > l2.dend then 1
+  else if l1.place < l2.place then -1
+  else if l1.place > l2.place then 1
+  else if l1.subregion < l2.subregion then -1
+  else if l1.subregion > l2.subregion then 1
+  else if l1.region < l2.region then -1
+  else if l1.region > l2.region then 1
+  else if l1.country < l2.country then -1
+  else if l1.country > l2.country then 1
+  else 0
 ;
 
 value geneanet base =
@@ -295,7 +295,7 @@ value geneanet base =
       else ()
     };
     (let list = Line.fold (fun _ line list -> [line :: list]) lines.val [] in
-     let list = Sort.list order_lines list in
+     let list = List.sort cmp_lines list in
      List.iter print_line list);
     ()
   }

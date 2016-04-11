@@ -1,7 +1,5 @@
-(* camlp5r *)
+(* camlp5r ../../../src/pa_lock.cmo *)
 (* $Id: gwck.ml,v 4.13 2009-03-11 10:58:51 deraugla Exp $ *)
-
-#load "pa_lock.cmo";
 
 open Def;
 open Gwdb;
