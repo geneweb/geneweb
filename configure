@@ -293,9 +293,7 @@ check_ocamlfind() {
   if $TRY_OCAMLFIND && ocamlfind printconf >/dev/null 2>&1; then
     print_check_ok "Checking ocamlfind" "FOUND"
     OCAMLFIND=true
-    if $STATIC; then
-      LINKSTATIC+=" -linkpkg"
-    fi
+    OCAMLFLAGS+=" -linkpkg"
   elif $API; then
     print_check_err "Checking ocamlfind" \
         "You need the command ocamlfind accessible in the path!"
@@ -308,7 +306,6 @@ check_ocamlfind() {
 
 check_api() {
   if $API; then
-    OCAMLFLAGS+=" -package piqirun.ext -package curl"
     CAMLP5F+=" -DAPI"
   fi
 }
@@ -513,15 +510,12 @@ print_compiler() {
    echo "LABLGTK2D=${LABLGTK2D}"
    echo "LABLTKD=${LABLTKD}"
    if $API; then
-     echo "LIBUNIX="
      echo "MYSQL=${MYSQL}"
      echo "OCURL=${CURL}"
      echo "OREDIS=${OREDIS}"
      echo "RE=${RE}"
      echo "LREDIS=${LREDIS}"
      echo "WITH_API=y"
-   else
-     echo "LIBUNIX=unix"
    fi
 }
 

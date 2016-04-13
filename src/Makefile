@@ -6,7 +6,7 @@ ALL_EXE := gwc1 gwc2 consang gwd gwu update_nldb
 EVERYTHING_EXE := check_base
 gwd_PREPEND_OBJS := gwlib
 gwd_APPEND_OBJS := compilation
-LIBS = $(LIBUNIX)
+LIBS = unix
 LINKFLAGS = -I $(CAMLP5D)
 REDIS_OBJS := utils mutex client cache redis_sync
 
@@ -23,14 +23,15 @@ gwlib.ml:
 
 api_link.cmx api_link.cmo: OCAMLFLAGS += -I $(OCURL) -I $(LREDIS) -package yojson
 
-gwd.out gwd.opt: LIBS += str gramlib
-
 ifeq ($(WITH_API),y)
-gwd.out gwd.opt: LIBS += re_emacs re_str
+gwd.out gwd.opt: OCAMLFLAGS += -package piqirun.ext -package curl
+gwd.out gwd.opt: LIBS = re_emacs re_str #removes unix
 gwd.out gwd.opt: LINKFLAGS += -I $(OCURL) -I $(RE) -I $(LREDIS) \
 	-package re -package uuidm -package yojson \
 	$(REDIS_OBJS:=$(OBJ_$(EXT)_EXT))
 endif
+
+gwd.out gwd.opt: LIBS += str gramlib
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out

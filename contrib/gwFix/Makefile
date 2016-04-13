@@ -3,7 +3,7 @@ ROOT := ../..
 INCDIRS := $(ROOT)/src
 ALL_EXE := gwFixBase gwFixFromFile gwFixFromFileDomicile gwFixFromFileAlias \
            gwFixBurial gwFixEvtSrc gwFixColon gwFindCpl gwFixY
-LIBS = $(LIBUNIX) str gramlib
+LIBS = unix str gramlib
 LINKFLAGS = -I $(CAMLP5D)
 
 include $(ROOT)/tools/Makefile.config
