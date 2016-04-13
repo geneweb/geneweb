@@ -367,7 +367,15 @@ check_curl() {
   fi
 }
 
+absdirpath() {
+  (
+    cd $1 || return 1
+    echo "$PWD"
+  ) 2> /dev/null
+}
+
 check_redis_path() {
+  LREDIS=$(absdirpath $LREDIS) || return 1
   LREDIS="${LREDIS%/}"
   if [[ -e "${LREDIS}/_build/src/redis.cmxs" ]]; then
     LREDIS="${LREDIS}/_build/src"
@@ -646,7 +654,7 @@ if $INTERACTIVE; then
   fi
   if $API; then
     while [ -z "$LREDIS" ]; do
-      echo "Please provide the absolute path of your redis"
+      echo "Please provide the path of your redis"
       read -re answer
       LREDIS="${answer}"
       if ! check_redis_path; then
