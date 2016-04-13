@@ -85,12 +85,12 @@ value channel_redirector channel callback = do {
   Unix.dup2 cin channel ;
   let chan = GMain.Io.channel_of_descr cout in
   let len = 80 in
-  let buf = Bytes.create len in
+  let buf = String.make len ' ' in
   GMain.Io.add_watch chan ~{ prio = 0; cond = [`IN; `HUP; `ERR]; callback cond =
       try
         if List.mem `IN cond then do {
 	        (* On Windows, you must use Io.read *)
-	        let len = GMain.Io.read chan ~buf ~pos:0 ~len in
+	        let len = GMain.Io.read chan ~{ buf; pos = 0; len } in
 	        len >= 1 && (callback (String.sub buf 0 len))
         }
         else False
@@ -106,29 +106,26 @@ value exec prog args out err =
 value exec_wait conf prog args =
   do {
     let wnd = GWindow.window
-      ~title:(capitale (transl "Processing"))
-      ~position:`CENTER
-      ~resizable:True
-      ~width:600 ~height:300 ()
-    in
-    ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
+      ~{ title = capitale (transl "Processing");
+         position = `CENTER;
+         resizable = True;
+         width = 600;
+         height = 300 } () in
+    ignore (wnd#connect#destroy ~{ callback _ = () });
     wnd#show();
-    let vbox = GPack.vbox
-      ~spacing:5
-      ~packing:wnd#add ()
-    in
-    let scrolled_window = GBin.scrolled_window ~border_width: 10
-      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~packing:vbox#add ()
-    in
+    let vbox = GPack.vbox ~{ spacing = 5; packing = wnd#add } () in
+    let scrolled_window = GBin.scrolled_window
+      ~{ border_width = 10;
+         hpolicy = `AUTOMATIC;
+         vpolicy = `AUTOMATIC;
+         packing = vbox#add } () in
     let vvbox = GPack.hbox
-      ~border_width: 10
-      ~packing:scrolled_window#add_with_viewport ()
-    in
+      ~{ border_width = 10;
+         packing = scrolled_window#add_with_viewport } () in
     vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
     let redirect channel =
       let buffer = GText.buffer () in
-      let _text = GText.view ~buffer ~editable:False ~packing:vvbox#add () in
+      let _text = GText.view ~{ buffer; editable = False; packing = vvbox#add } () in
       channel_redirector channel (fun c -> do {buffer#insert c; True})
     in
     ignore (redirect Unix.stderr);
@@ -307,9 +304,7 @@ value close_server conf =
 (**/**) (* Autres interfaces graphique ou utilitaires. *)
 
 value select_dir parent initial_dir = do {
-  let dialog = GWindow.file_chooser_dialog
-    ~action:`SELECT_FOLDER
-    ~parent () in
+  let dialog = GWindow.file_chooser_dialog ~{ action = `SELECT_FOLDER; parent } () in
   dialog#add_button_stock `CANCEL `CANCEL ;
   dialog#add_select_button_stock `OPEN `OPEN ;
   let new_dir =
@@ -324,9 +319,7 @@ value select_dir parent initial_dir = do {
 };
 
 value select_file parent initial_file = do {
-  let dialog = GWindow.file_chooser_dialog
-    ~action:`OPEN
-    ~parent () in
+  let dialog = GWindow.file_chooser_dialog ~{ action = `OPEN; parent } () in
   dialog#add_button_stock `CANCEL `CANCEL ;
   dialog#add_select_button_stock `OPEN `OPEN ;
   let new_file =
@@ -342,52 +335,36 @@ value select_file parent initial_file = do {
 
 value error_popup msg = do {
   let wnd = GWindow.window
-    ~title:(capitale (transl "error"))
-    ~position:`CENTER
-    ~resizable:True ()
-  in
-  ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:wnd#add ()
-  in
-  let _label = GMisc.label
-    ~text:msg
-    ~packing:vbox#pack ()
-  in
+    ~{ title = capitale (transl "error");
+       position = `CENTER;
+       resizable = True } () in
+  ignore (wnd#connect#destroy ~{ callback _ = () });
+  let vbox = GPack.vbox ~{ spacing = 5; packing = wnd#add } () in
+  let _label = GMisc.label ~{ text = msg; packing = vbox#pack } () in
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: vbox#pack ()
-  in
-  let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack ()
-  in
+    ~{ border_width = 5; layout = `SPREAD; packing = vbox#pack } () in
+  let btn_ok = GButton.button ~{ label = transl "OK"; packing = bbox#pack } () in
   ignore (btn_ok#connect#clicked (fun () -> wnd#destroy ()));
   wnd#show ();
 };
 
 value display_log conf = do {
   let wnd = GWindow.window
-    ~title:(capitale (transl "log"))
-    ~position:`CENTER
-    ~resizable:True
-    ~width:600 ~height:300 ()
-  in
-  ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:wnd#add ()
-  in
-  let scrolled_window = GBin.scrolled_window ~border_width: 10
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:vbox#add ()
-  in
+    ~{ title = capitale (transl "log");
+       position = `CENTER;
+       resizable = True;
+       width = 600;
+       height = 300 } () in
+  ignore (wnd#connect#destroy ~{ callback _ = () });
+  let vbox = GPack.vbox ~{ spacing = 5; packing = wnd#add } () in
+  let scrolled_window = GBin.scrolled_window
+    ~{ border_width = 10;
+       hpolicy = `AUTOMATIC;
+       vpolicy = `AUTOMATIC;
+       packing = vbox#add } () in
   let vvbox = GPack.hbox
-    ~border_width: 10
-    ~packing:scrolled_window#add_with_viewport ()
-  in
+    ~{ border_width = 10;
+       packing = scrolled_window#add_with_viewport } () in
   vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
   match try Some (open_in conf.log) with [Sys_error _ -> None] with
   [ Some ic ->
@@ -398,7 +375,7 @@ value display_log conf = do {
           do {
             let buf = Buffer.create len in
             Buffer.add_channel buf ic len;
-            let text = GText.view ~packing:vvbox#add () in
+            let text = GText.view ~{ packing = vvbox#add } () in
             text#buffer#set_text (Buffer.contents buf)
           }
         else ();
@@ -406,13 +383,10 @@ value display_log conf = do {
       }
   | None -> () ];
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `EDGE
-    ~packing: vbox#pack ()
-  in
-  let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack ()
+    ~{ border_width = 5;
+       layout = `EDGE;
+       packing = vbox#pack } () in
+  let btn_ok = GButton.button ~{ label = transl "OK"; packing = bbox#pack } ()
   in
   ignore (btn_ok#connect#clicked (fun () -> wnd#destroy ()));
   wnd#show();
@@ -420,28 +394,21 @@ value display_log conf = do {
 
 value delete_base conf bname = do {
   let wnd = GWindow.window
-    ~title:(capitale (transl "Confirm"))
-    ~position:`CENTER
-    ~resizable:True
-    ~width:300 ~height:50 ()
-  in
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:wnd#add ()
-  in
+    ~{ title = capitale (transl "Confirm");
+       position = `CENTER;
+       resizable = True;
+       width = 300;
+       height = 50 } () in
+  let vbox = GPack.vbox ~{ spacing = 5; packing = wnd#add } () in
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: vbox#pack ()
-  in
+    ~{ border_width = 5;
+       layout = `SPREAD;
+       packing = vbox#pack } () in
   let btn_cancel = GButton.button
-    ~label:(capitale (transl "cancel"))
-    ~packing:bbox#pack ()
-  in
+    ~{ label = capitale (transl "cancel");
+       packing = bbox#pack } () in
   ignore (btn_cancel#connect#clicked (fun () -> wnd#destroy ()));
-  let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack ()
+  let btn_ok = GButton.button ~{ label = transl "OK"; packing = bbox#pack } ()
   in
   ignore
     (btn_ok#connect#clicked
@@ -670,43 +637,31 @@ value import_all_bases conf = ()
 (**/**) (* UI pratique *)
 value tmp_wnd conf bname f = do {
   let wnd = GWindow.window
-    ~title:(capitale (transl "confirm"))
-    ~position:`CENTER
-    ~resizable:True ()
-  in
-  ignore (wnd#connect#destroy ~callback:(fun _ -> ()));
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:wnd#add ()
-  in
-  let hbox = GPack.hbox
-    ~spacing:5
-    ~packing:vbox#pack ()
-  in
+    ~{ title = capitale (transl "confirm");
+       position = `CENTER;
+       resizable = True } () in
+  ignore (wnd#connect#destroy ~{ callback _ = () });
+  let vbox = GPack.vbox ~{ spacing = 5; packing = wnd#add } () in
+  let hbox = GPack.hbox ~{ spacing = 5; packing = vbox#pack } () in
   let _label = GMisc.label
-    ~text:(transl "enter a name")
-    ~packing:hbox#pack ()
-  in
+    ~{ text = transl "enter a name";
+       packing = hbox#pack } () in
   let fname = ref "" in
   let entry = GEdit.entry
-    ~text:""
-    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
-  in
+    ~{ text = "";
+       packing = hbox#pack ~{ expand = False; fill = False; padding = 5 } } () in
   ignore (entry#connect#changed (fun () -> fname.val := entry#text));
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: vbox#pack ()
-  in
+    ~{ border_width = 5;
+       layout = `SPREAD;
+       packing = vbox#pack } () in
   let btn_cancel = GButton.button
-    ~label:(capitale (transl "cancel"))
-    ~packing:bbox#pack ()
-  in
+    ~{ label = capitale (transl "cancel");
+       packing = bbox#pack } () in
   ignore (btn_cancel#connect#clicked (fun () -> wnd#destroy ()));
   let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack ()
-  in
+    ~{ label = transl "OK";
+       packing = bbox#pack } () in
   ignore (btn_ok#connect#clicked (fun () -> do {
     wnd#destroy ();
     let fname = if fname.val = "" then "a" else fname.val in
@@ -720,20 +675,20 @@ value tmp_wnd conf bname f = do {
 value main_window = do {
   ignore (GMain.init ());
   let wnd = GWindow.window
-    ~title:("GeneWeb - " ^ Version.txt)
-    ~position:`CENTER
-    ~resizable:True
-    ~width:640 ~height:480 ()
-  in
+    ~{ title = "GeneWeb - " ^ Version.txt;
+       position = `CENTER;
+       resizable = True;
+       width = 640;
+       height = 480 } () in
   (* TODO : faire un close_server *)
-  ignore (wnd#connect#destroy ~callback:GMain.quit);
+  ignore (wnd#connect#destroy ~{ callback = GMain.quit });
   wnd
 };
 
 value rec show_main conf = do {
   ignore
     (main_window#connect#destroy
-       ~callback:(fun () -> do {close_server conf; GMain.quit ()}));
+       ~{ callback () = do {close_server conf; GMain.quit ()} });
   main_window#show ();
   clean_waiting_pids conf;
   let databases =
@@ -741,30 +696,25 @@ value rec show_main conf = do {
       (List.filter (fun fn -> Filename.check_suffix fn ".gwb")
          (Array.to_list (Sys.readdir conf.bases_dir)))
   in
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:main_window#add ()
-  in
+  let vbox = GPack.vbox ~{ spacing = 5; packing = main_window#add } () in
   let toolbar = GButton.toolbar
-    ~orientation:`HORIZONTAL
-    ~style:`BOTH
-    ~packing:vbox#pack ()
-  in
+    ~{ orientation = `HORIZONTAL;
+       style = `BOTH;
+       packing = vbox#pack } () in
   let icon name =
     let file =
       List.fold_left Filename.concat bin_dir ["images"; name]
     in
-    let info = GDraw.pixmap_from_xpm ~file:file () in
+    let info = GDraw.pixmap_from_xpm ~{ file } () in
     (GMisc.pixmap info ())#coerce
   in
   let inser_toolbar text tooltip icon_file callback =
     toolbar#insert_button
-      ~text:text
-      ~tooltip:tooltip
-      ~tooltip_private:"Private"
-      ~icon:(icon icon_file)
-      ~callback:callback ()
-  in
+      ~{ text;
+         tooltip;
+         tooltip_private = "Private";
+         icon = icon icon_file;
+         callback } () in
   ignore
     (inser_toolbar
        (capitale (transl "create")) (capitale (transl "create a database"))
@@ -804,40 +754,39 @@ value rec show_main conf = do {
   if databases = [] then
     ignore
       (GMisc.label
-         ~text:(capitale (transl "no databases."))
-         ~packing:vbox#pack ())
+         ~{ text = capitale (transl "no databases.");
+            packing = vbox#pack } ())
   else do {
     let _label = GMisc.label
-      ~text:((capitale (transl "available databases")) ^
-              " (" ^ (string_of_int (List.length databases) ^ "):"))
-      ~packing:vbox#pack ()
-    in
-    let scrolled_window = GBin.scrolled_window ~border_width: 10
-      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~packing:vbox#add () in
-    let vvbox = GPack.vbox ~border_width: 10
-      ~packing:scrolled_window#add_with_viewport () in
+      ~{ text = (capitale (transl "available databases")) ^
+                " (" ^ (string_of_int (List.length databases) ^ "):");
+         packing = vbox#pack } () in
+    let scrolled_window = GBin.scrolled_window
+      ~{ border_width = 10;
+         hpolicy = `AUTOMATIC;
+         vpolicy = `AUTOMATIC;
+         packing = vbox#add } () in
+    let vvbox = GPack.vbox
+      ~{ border_width = 10;
+         packing = scrolled_window#add_with_viewport } () in
     vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
     let table = GPack.table
-      ~rows:3
-      ~columns:3
-      ~row_spacings: 5
-      ~col_spacings: 5
-      ~packing:vvbox#pack ()
-    in
+      ~{ rows = 3;
+         columns = 3;
+         row_spacings = 5;
+         col_spacings = 5;
+         packing = vvbox#pack } () in
     loop 0 databases where rec loop i =
       fun
       [ [] -> ()
       | [bname :: l] -> do {
            let bn = Filename.chop_extension bname in
            let _label = GMisc.label
-             ~text:bn
-             ~packing:(table#attach ~left:0 ~top:i) ()
-           in
+             ~{ text = bn;
+                packing = table#attach ~{ left = 0; top = i } } () in
            let bbut = GButton.button
-             ~label:(capitale (transl "browse"))
-             ~packing:(table#attach ~left:1 ~top:i) ()
-           in
+             ~{ label = capitale (transl "browse");
+                packing = table#attach ~{ left = 1; top = i} } () in
            ignore
              (bbut#connect#clicked
                (fun () ->
@@ -846,9 +795,8 @@ value rec show_main conf = do {
                  in
                  ignore (browse conf url)));
            let bbut = GButton.button
-             ~label:(capitale (transl "tools"))
-             ~packing:(table#attach ~left:2 ~top:i) ()
-           in
+             ~{ label = capitale (transl "tools");
+                packing = table#attach ~{ left = 2; top = i} } () in
            ignore
              (bbut#connect#clicked
                (fun () -> do { vbox#destroy (); tools conf bn }));
@@ -857,58 +805,41 @@ value rec show_main conf = do {
 }
 
 and new_database conf = do {
-  let vbox = GPack.box `VERTICAL
-    ~spacing:5
-    ~packing:main_window#add ()
-  in
+  let vbox = GPack.box `VERTICAL ~{ spacing = 5; packing = main_window#add } () in
   let table = GPack.table
-    ~rows:2
-    ~columns:2
-    ~row_spacings: 5
-    ~col_spacings: 5
-    ~packing:vbox#pack ()
-  in
+    ~{ rows = 2;
+       columns = 2;
+       row_spacings = 5;
+       col_spacings = 5;
+       packing = vbox#pack } () in
   let _label = GMisc.label
-    ~text:(capitale (transl "name of the database:"))
-    ~packing:(table#attach ~left:0 ~top:0) ()
+    ~{ text = capitale (transl "name of the database:");
+       packing = table#attach ~{ left = 0; top = 0 } } ()
   in
   let entry = GEdit.entry
-    ~text:""
-    ~packing:(table#attach ~left:1 ~top:0) ()
-  in
+    ~{ text = "";
+       packing = table#attach ~{ left = 1; top = 0} } () in
   let _label= GMisc.label
-    ~text:(capitale (transl "select a file"))
-    ~packing:(table#attach ~left:0 ~top:1) ()
-  in
+    ~{ text = capitale (transl "select a file");
+       packing = table#attach ~{ left = 0; top = 1} } () in
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: (table#attach ~left:1 ~top:1) ()
-  in
-  let select = GButton.button
-    ~stock:`OPEN
-    ~packing:bbox#pack ()
-  in
+    ~{ border_width = 5;
+       layout = `SPREAD;
+       packing = table#attach ~{ left = 1; top = 1 } } () in
+  let select = GButton.button ~{ stock = `OPEN; packing = bbox#pack } () in
   let file = ref "" in
   ignore
     (select#connect#clicked
        (fun () -> file.val := select_file main_window ""));
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: vbox#pack ()
-  in
+    ~{ border_width = 5; layout = `SPREAD; packing = vbox#pack } () in
   let btn_cancel = GButton.button
-    ~label:(capitale (transl "cancel"))
-    ~packing:bbox#pack ()
-  in
+    ~{ label = capitale (transl "cancel");
+       packing = bbox#pack } () in
   ignore
     (btn_cancel#connect#clicked
       (fun () -> do { vbox#destroy (); show_main conf } ) );
-  let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack ()
-  in
+  let btn_ok = GButton.button ~{ label = transl "OK"; packing = bbox#pack } () in
   ignore
     (btn_ok#connect#clicked
       (fun () ->
@@ -927,41 +858,25 @@ and setup_gui conf = do {
       server_running = conf.server_running;
       waiting_pids = conf.waiting_pids }
   in
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:main_window#add ()
-  in
+  let vbox = GPack.vbox ~{ spacing = 5; packing = main_window#add } () in
+  let _label = GMisc.label ~{ text = transl "setup GeneWeb"; packing = vbox#pack } () in
+  let hbox = GPack.hbox ~{ spacing = 5; packing = vbox#pack } () in
   let _label = GMisc.label
-    ~text:(transl "setup GeneWeb")
-    ~packing:vbox#pack ()
-  in
-  let hbox = GPack.hbox
-    ~spacing:5
-    ~packing:vbox#pack ()
-  in
-  let _label = GMisc.label
-    ~text:("Bases dir : " ^ conf.bases_dir)
-    ~packing:hbox#pack ()
-  in
+    ~{ text = "Bases dir : " ^ conf.bases_dir;
+       packing = hbox#pack } () in
   let select = GButton.button
-    ~stock:`OPEN
-    ~packing:(hbox#pack ~expand:False) ()
-  in
+    ~{ stock = `OPEN;
+       packing = hbox#pack ~{ expand = False } } () in
   ignore
     (select#connect#clicked
        (fun () -> conf.bases_dir := select_dir main_window conf.bases_dir)) ;
-  let hbox = GPack.hbox
-    ~spacing:5
-    ~packing:vbox#pack ()
-  in
+  let hbox = GPack.hbox ~{ spacing = 5; packing = vbox#pack } () in
   let _label = GMisc.label
-    ~text:"Port :"
-    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
-  in
+    ~{ text = "Port :";
+       packing = hbox#pack ~{ expand = False; fill = False; padding = 5 } } () in
   let entry = GEdit.entry
-    ~text:(string_of_int conf.port)
-    ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
-  in
+    ~{ text = string_of_int conf.port;
+       packing = hbox#pack ~{ expand = False; fill = False; padding = 5 } } () in
   ignore
     (entry#connect#changed
        (fun () -> conf.port := int_of_string entry#text));
@@ -970,18 +885,11 @@ and setup_gui conf = do {
     [ Some browser -> browser
     | None -> "" ]
   in
-  let hbox = GPack.hbox
-    ~spacing:5
-    ~packing:vbox#pack ()
-  in
-  let _label = GMisc.label
-    ~text:("Browser : " ^ browser)
-    ~packing:hbox#pack ()
-  in
+  let hbox = GPack.hbox ~{ spacing = 5; packing = vbox#pack } () in
+  let _label = GMisc.label ~{ text = "Browser : " ^ browser; packing = hbox#pack } () in
   let select = GButton.button
-    ~stock:`OPEN
-    ~packing:(hbox#pack ~expand:False) ()
-  in
+    ~{ stock = `OPEN;
+       packing = hbox#pack ~{ expand = False } } () in
   ignore
     (select#connect#clicked
        (fun () ->
@@ -989,21 +897,14 @@ and setup_gui conf = do {
          let browser = if browser = "" then None else Some browser in
          conf.browser := browser)) ;
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: vbox#pack ()
-  in
-  let btn_cancel = GButton.button
-    ~label:(transl "Cancel")
-    ~packing:bbox#pack ()
-  in
+    ~{ border_width = 5;
+       layout = `SPREAD;
+       packing = vbox#pack } () in
+  let btn_cancel = GButton.button ~{ label = transl "Cancel"; packing = bbox#pack } () in
   ignore
     (btn_cancel#connect#clicked
        (fun () -> do { vbox#destroy (); show_main old_conf } ) ) ;
-  let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack ()
-  in
+  let btn_ok = GButton.button ~{ label = transl "OK"; packing = bbox#pack } () in
   ignore
     (btn_ok#connect#clicked
       (fun () -> do {
@@ -1024,42 +925,31 @@ and setup_gui conf = do {
 }
 
 and config_gwf conf bname = do {
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:main_window#add ()
-  in
+  let vbox = GPack.vbox ~{ spacing = 5; packing = main_window#add } () in
   let _label = GMisc.label
-    ~text:(transl "Configuration gwf file of " ^ bname)
-    ~packing:vbox#pack ()
-  in
-  let scrolled_window = GBin.scrolled_window ~border_width: 10
-      ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-      ~packing:vbox#add () in
-  let vvbox = GPack.vbox ~border_width: 10
-      ~packing:scrolled_window#add_with_viewport () in
+    ~{ text = transl "Configuration gwf file of " ^ bname;
+       packing = vbox#pack } () in
+  let scrolled_window = GBin.scrolled_window
+    ~{ border_width = 10;
+       hpolicy = `AUTOMATIC;
+       vpolicy = `AUTOMATIC;
+       packing = vbox#add } () in
+  let vvbox = GPack.vbox
+    ~{ border_width = 10;
+       packing = scrolled_window#add_with_viewport } () in
   vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
-  let hbox = GPack.hbox
-    ~spacing:5
-    ~packing:vvbox#pack ()
-  in
-  let vbox_list = GPack.vbox
-    ~spacing:5
-    ~packing:hbox#pack ()
-  in
+  let hbox = GPack.hbox ~{ spacing = 5; packing = vvbox#pack } () in
+  let vbox_list = GPack.vbox ~{ spacing = 5; packing = hbox#pack } () in
   let benv = read_base_env conf bname in
   let benv_new = ref (List.map (fun (k, v) -> (k, ref v)) benv) in
   List.iter
     (fun (k, v) ->
       do {
-        let hbox = GPack.hbox
-          ~spacing:5
-          ~packing:vbox_list#pack ()
-        in
+        let hbox = GPack.hbox ~{ spacing = 5; packing = vbox_list#pack } () in
         let _label = GMisc.label
-          ~text: (k ^ " : ")
-          ~width: 200
-          ~packing:hbox#pack ()
-        in
+          ~{ text = k ^ " : ";
+             width = 200;
+             packing = hbox#pack } () in
         (*
           TODO :
           si la valeur vaut "yes" ou "no", on ajoute un bouton radio
@@ -1068,28 +958,20 @@ and config_gwf conf bname = do {
         *)
         let entry =
           GEdit.entry
-            ~text: v.val
-            ~packing:(hbox#pack ~expand:False ~fill:False ~padding:5) ()
-        in
+            ~{ text = v.val;
+               packing = hbox#pack ~{ expand = False; fill = False; padding = 5 } } () in
         ignore (entry#connect#changed (fun () -> v.val := entry#text))
       } )
     benv_new.val;
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `SPREAD
-    ~packing: vbox#pack ()
-  in
-  let btn_cancel = GButton.button
-    ~label:(transl "Cancel")
-    ~packing:bbox#pack ()
-  in
+    ~{ border_width = 5;
+       layout = `SPREAD;
+       packing = vbox#pack } () in
+  let btn_cancel = GButton.button ~{ label = transl "Cancel"; packing = bbox#pack } () in
   ignore
     (btn_cancel#connect#clicked
        (fun () -> do { vbox#destroy (); show_main conf } ) );
-  let btn_ok = GButton.button
-    ~label:(transl "OK")
-    ~packing:bbox#pack ()
-  in
+  let btn_ok = GButton.button ~{ label = transl "OK"; packing = bbox#pack } () in
   ignore
     (btn_ok#connect#clicked
        (fun () -> do {
@@ -1100,73 +982,61 @@ and config_gwf conf bname = do {
 }
 
 and tools conf bname = do {
-  let vbox = GPack.vbox
-    ~spacing:5
-    ~packing:main_window#add ()
-  in
+  let vbox = GPack.vbox ~{ spacing = 5; packing = main_window#add } () in
   let _label = GMisc.label
-    ~text:(transl "toolbox" ^ " " ^ bname)
-    ~packing:vbox#pack ()
-  in
-  let scrolled_window = GBin.scrolled_window ~border_width: 10
-    ~hpolicy: `AUTOMATIC ~vpolicy: `AUTOMATIC
-    ~packing:vbox#add () in
-  let vvbox = GPack.hbox ~border_width: 10
-    ~packing:scrolled_window#add_with_viewport () in
+    ~{ text = transl "toolbox" ^ " " ^ bname;
+       packing = vbox#pack } () in
+  let scrolled_window = GBin.scrolled_window
+    ~{ border_width = 10;
+       hpolicy = `AUTOMATIC;
+       vpolicy = `AUTOMATIC;
+       packing = vbox#add } () in
+  let vvbox = GPack.hbox
+    ~{ border_width = 10;
+       packing = scrolled_window#add_with_viewport } () in
   vvbox #focus#set_vadjustment (Some scrolled_window#vadjustment);
   let table = GPack.table
-    ~rows:2
-    ~columns:2
-    ~row_spacings: 5
-    ~col_spacings: 5
-    ~packing:vvbox#pack ()
-  in
+    ~{ rows = 2;
+       columns = 2;
+       row_spacings = 5;
+       col_spacings = 5;
+       packing = vvbox#pack } () in
   let _label = GMisc.label
-    ~text:(transl "extract gw file")
-    ~packing:(table#attach ~left:0 ~top:0) ()
-  in
+    ~{ text = transl "extract gw file";
+       packing = table#attach ~{ left = 0; top = 0 } } () in
   let bbut = GButton.button
-    ~label:(transl "Extract GW")
-    ~packing:(table#attach ~left:1 ~top:0) ()
-  in
+    ~{ label = transl "Extract GW";
+       packing = table#attach ~{ left = 1; top = 0 } } () in
   ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwu));
   let _label = GMisc.label
-    ~text:(transl "extract ged file")
-    ~packing:(table#attach ~left:0 ~top:1) ()
-  in
+    ~{ text = transl "extract ged file";
+       packing = table#attach ~{ left = 0; top = 1 } } () in
   let bbut = GButton.button
-    ~label:(transl "Extract GED")
-    ~packing:(table#attach ~left:1 ~top:1) ()
-  in
+    ~{ label = transl "Extract GED";
+       packing = table#attach ~{ left = 1; top = 1 } } () in
   ignore (bbut#connect#clicked (fun () -> tmp_wnd conf bname gwb2ged));
   let _label = GMisc.label
-    ~text:(transl "setup base options")
-    ~packing:(table#attach ~left:0 ~top:2) ()
-  in
+    ~{ text = transl "setup base options";
+       packing = table#attach ~{ left = 0; top = 2 } } () in
   let bbut = GButton.button
-    ~label:(transl "setup gwf file")
-    ~packing:(table#attach ~left:1 ~top:2) ()
-  in
+    ~{ label = transl "setup gwf file";
+       packing = table#attach ~{ left = 1; top = 2 } } () in
   ignore
     (bbut#connect#clicked
       (fun () -> do { vbox#destroy (); config_gwf conf bname })) ;
   let _label = GMisc.label
-    ~text:(transl "Clean database")
-    ~packing:(table#attach ~left:0 ~top:3) ()
-  in
+    ~{ text = transl "Clean database";
+       packing = table#attach ~{ left = 0; top = 3 } } () in
   let bbut = GButton.button
-    ~label:(transl "Clean")
-    ~packing:(table#attach ~left:1 ~top:3) ()
-  in
+    ~{ label = transl "Clean";
+       packing = table#attach ~{ left = 1; top = 3 } } () in
   ignore (bbut#connect#clicked (fun () -> clean_database conf bname));
   let _label = GMisc.label
-    ~text:(transl "Rename")
-    ~packing:(table#attach ~left:0 ~top:4) ()
-  in
+    ~{ text = transl "Rename";
+       packing = table#attach ~{ left = 0; top = 4 } } () in
   let bbut = GButton.button
-    ~label:(transl "Rename")
-    ~packing:(table#attach ~left:1 ~top:4) ()
-  in
+    ~{ label = transl "Rename";
+       packing = table#attach ~{ left = 1; top = 4 } } () in
   ignore
     (bbut#connect#clicked
        (fun () -> do {
@@ -1174,13 +1044,11 @@ and tools conf bname = do {
          vbox#destroy ();
          show_main conf}));
   let _label = GMisc.label
-    ~text:(transl "Delete")
-    ~packing:(table#attach ~left:0 ~top:5) ()
-  in
+    ~{ text = transl "Delete";
+       packing = table#attach ~{ left = 0; top = 5 } } () in
   let bbut = GButton.button
-    ~label:(transl "Delete")
-    ~packing:(table#attach ~left:1 ~top:5) ()
-  in
+    ~{ label = transl "Delete";
+       packing = table#attach ~{ left = 1; top = 5 } } () in
   ignore (bbut#connect#clicked (fun () -> delete_base conf bname));
 (* TODO
   GMisc.label
@@ -1195,32 +1063,26 @@ and tools conf bname = do {
       (fun () -> ()));
 *)
   let _label = GMisc.label
-    ~text:(transl "Consang")
-    ~packing:(table#attach ~left:0 ~top:6) ()
-  in
+    ~{ text = transl "Consang";
+       packing = table#attach ~{ left = 0; top = 6 } } () in
   let bbut = GButton.button
-    ~label:(transl "Consang")
-    ~packing:(table#attach ~left:1 ~top:6) ()
-  in
+    ~{ label = transl "Consang";
+       packing = table#attach ~{ left = 1; top = 6 } } () in
   ignore (bbut#connect#clicked (fun () -> consang conf bname));
   let _label = GMisc.label
-    ~text:(transl "Update_nldb")
-    ~packing:(table#attach ~left:0 ~top:7) ()
-  in
+    ~{ text = transl "Update_nldb";
+       packing = table#attach ~{ left = 0; top = 7 } } () in
   let bbut = GButton.button
-    ~label:(transl "Update_nldb")
-    ~packing:(table#attach ~left:1 ~top:7) ()
-  in
+    ~{ label = transl "Update_nldb";
+       packing = table#attach ~{ left = 1; top = 7 } } () in
   ignore (bbut#connect#clicked (fun () -> update_nldb conf bname));
   let bbox = GPack.button_box `HORIZONTAL
-    ~border_width: 5
-    ~layout: `EDGE
-    ~packing: vbox#pack ()
-  in
+    ~{ border_width = 5;
+       layout = `EDGE;
+       packing = vbox#pack } () in
   let btn_cancel = GButton.button
-    ~label:(transl "Home")
-    ~packing:bbox#pack ()
-  in
+    ~{ label = transl "Home";
+       packing = bbox#pack } () in
   ignore
     (btn_cancel#connect#clicked
        (fun () -> do { vbox#destroy (); show_main conf } ) );
@@ -1280,26 +1142,22 @@ value launch_config () =
     launch_server conf
   else do {
     let assistant = GAssistant.assistant () in
-    assistant#misc#set_size_request ~width:450 ~height:300 ();
+    assistant#misc#set_size_request ~{ width = 450; height = 300 } ();
     assistant#set_title (transl "Setup GeneWeb");
     let page_0 = GMisc.label
-      ~text:(transl "This assistant will help you to setup GeneWeb") ()
-    in
+      ~{ text = transl "This assistant will help you to setup GeneWeb" } () in
     let bases_dir = ref "" in
-    let page_1 = GPack.hbox ~spacing:5 () in
+    let page_1 = GPack.hbox ~{ spacing = 5 } () in
     let _label = GMisc.label
-      ~text:(transl "select bases directory")
-      ~packing:(page_1#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ text = transl "select bases directory";
+         packing = page_1#pack ~{ expand = False; fill = False; padding = 5 } } () in
     let bbox = GPack.button_box `HORIZONTAL
-      ~border_width: 5
-      ~layout: `SPREAD
-      ~packing:(page_1#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ border_width = 5;
+         layout = `SPREAD;
+         packing = page_1#pack ~{ expand = False; fill = False; padding = 5 } } () in
     let select = GButton.button
-      ~stock:`OPEN
-      ~packing:(bbox#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ stock = `OPEN;
+         packing = bbox#pack ~{ expand = False; fill = False; padding = 5 } } () in
     ignore
       (select#connect#clicked
          (fun () -> do {
@@ -1308,15 +1166,13 @@ value launch_config () =
            let page = assistant#nth_page num in
            assistant#set_page_complete page (bases_dir.val <> "") }));
     let port = ref 2317 in
-    let page_2 = GPack.hbox ~homogeneous:False ~spacing:5 () in
+    let page_2 = GPack.hbox ~{ homogeneous = False; spacing = 5 } () in
     let _label = GMisc.label
-      ~text:(transl "enter port")
-      ~packing:(page_2#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ text = transl "enter port";
+         packing = page_2#pack ~{ expand = False; fill = False; padding = 5 } } () in
     let entry = GEdit.entry
-      ~text:(string_of_int port.val)
-      ~packing:(page_2#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ text = string_of_int port.val;
+         packing = page_2#pack ~{ expand = False; fill = False; padding = 5 } } () in
     ignore
       (entry#connect#changed
          (fun () -> do {
@@ -1326,20 +1182,17 @@ value launch_config () =
            let page = assistant#nth_page num in
            assistant#set_page_complete page (String.length txt > 0) }));
     let browser = ref "" in
-    let page_3 = GPack.hbox ~homogeneous:False ~spacing:5 () in
+    let page_3 = GPack.hbox ~{ homogeneous = False; spacing = 5 } () in
     let _label = GMisc.label
-      ~text:(transl "select browser")
-      ~packing:(page_3#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ text = transl "select browser";
+         packing = page_3#pack ~{ expand = False; fill = False; padding = 5 } } () in
     let bbox = GPack.button_box `HORIZONTAL
-      ~border_width: 5
-      ~layout: `SPREAD
-      ~packing:(page_3#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ border_width = 5;
+         layout = `SPREAD;
+         packing = page_3#pack ~{ expand = False; fill = False; padding = 5 } } () in
     let select = GButton.button
-      ~stock:`OPEN
-      ~packing:(bbox#pack ~expand:False ~fill:False ~padding:5) ()
-    in
+      ~{ stock = `OPEN;
+         packing = bbox#pack ~{ expand = False; fill = False; padding = 5 } } () in
     ignore
       (select#connect#clicked
          (fun () -> do {
@@ -1350,47 +1203,44 @@ value launch_config () =
     match config_browser () with
     [ Some b ->
         let btn = GButton.check_button
-          ~label:b
-          ~packing:(page_3#pack ~expand:False ~fill:False ~padding:5) ()
-        in
+          ~{ label = b;
+             packing = page_3#pack ~{ expand = False; fill = False; padding = 5 } } () in
         ignore
           (btn#connect#toggled
-             ~callback:(fun () -> do {
+             ~{ callback () = do {
                browser.val := b;
                let num = assistant#current_page in
                let page = assistant#nth_page num in
-               assistant#set_page_complete page btn#active }))
+               assistant#set_page_complete page btn#active } })
     | None -> () ];
-    let page_4 = GMisc.label
-      ~text:(transl "save preferences") ()
-    in
+    let page_4 = GMisc.label ~{ text = transl "save preferences" } () in
     ignore
       (assistant#append_page
-         ~title:(transl "Introduction")
-         ~page_type:`INTRO
-         ~complete:True
+         ~{ title = transl "Introduction";
+            page_type = `INTRO;
+            complete = True }
          page_0#as_widget);
     ignore
       (assistant#append_page
-         ~title:(transl "Setup bases directory")
-         ~page_type:`CONTENT
+         ~{ title = transl "Setup bases directory";
+            page_type = `CONTENT }
          page_1#as_widget);
     ignore
       (assistant#append_page
-         ~title:(transl "Setup port")
-         ~page_type:`CONTENT
-         ~complete:True
+         ~{ title = transl "Setup port";
+            page_type = `CONTENT;
+            complete = True }
          page_2#as_widget);
     ignore
       (assistant#append_page
-         ~title:(transl "Setup browser")
-         ~page_type:`CONTENT
+         ~{ title = transl "Setup browser";
+            page_type = `CONTENT }
          page_3#as_widget);
     ignore
       (assistant#append_page
-         ~title:(transl "Finnish")
-         ~page_type: `CONFIRM
-         ~complete:True
+         ~{ title = transl "Finnish";
+            page_type = `CONFIRM;
+            complete = True }
          page_4#as_widget);
     let save_config () = do {
       let gui_arg =
@@ -1410,8 +1260,8 @@ value launch_config () =
       assistant#destroy ();
       launch_server conf }
     in
-    ignore (assistant#connect#cancel ~callback:GMain.quit);
-    ignore (assistant#connect#close ~callback:save_config);
+    ignore (assistant#connect#cancel ~{ callback = GMain.quit });
+    ignore (assistant#connect#close ~{ callback = save_config });
     assistant#show ();
 };
 
