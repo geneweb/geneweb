@@ -11,8 +11,8 @@ install:
   - '%CYG_BASH% "tar -xf opam64.tar.xz"'
   - '%CYG_BASH% "opam64/install.sh"'
   - '%CYG_BASH% "opam init -a mingw https://github.com/fdopen/opam-repository-mingw.git" --comp 4.02.3+mingw64c --switch 4.02.3+mingw64c"'
-  - '%CYG_BASH% "opam install -y ocamlfind camlp5 lablgtk"'
   - '%CYG_BASH% "eval `opam config env`"'
+  - '%CYG_BASH% "opam install -y ocamlfind camlp5 lablgtk"'
 
 build_script:
   - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make everything && make distrib"'
