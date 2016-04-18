@@ -460,6 +460,12 @@ value reconstitute_from_pevents pevents ext bi bp de bu =
   let found_baptism = ref False in
   let found_death = ref False in
   let found_burial = ref False in
+  let death_reason_std_fields =
+    let (death_std_fields, _, _, _) = de in
+    match death_std_fields with
+    [ Death dr _ -> dr
+    | _ -> Unspecified ]
+  in
   let rec loop pevents bi bp de bu =
     match pevents with
     [ [] -> (bi, bp, de, bu)
@@ -488,7 +494,7 @@ value reconstitute_from_pevents pevents ext bi bp de bu =
             else
               let death =
                 match Adef.od_of_codate evt.epers_date with
-                [ Some d -> Death Unspecified (Adef.cdate_of_date d)
+                [ Some d -> Death death_reason_std_fields (Adef.cdate_of_date d)
                 | None ->
                     let (death, _, _, _) = de in
                     (* On ajoute DontKnowIfDead dans le cas où tous les *)
