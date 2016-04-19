@@ -373,6 +373,18 @@ value month_txt =
     txt.(i)
 ;
 
+(* Returns true if sub is a substring of str or false otherwise. *)
+value string_exists str sub =
+  let re = Str.regexp_string sub in
+  try
+    do {
+      ignore (Str.search_forward re str 0);
+      True
+    }
+  with
+    Not_found -> False
+;
+
 value string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
   sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
@@ -2898,7 +2910,6 @@ value image_and_size conf base p image_size =
   else None
 ;
 
-
 (* ********************************************************************** *)
 (*  [Fonc] has_image : config -> base -> person -> bool                   *)
 (** [Description] : Renvoie Vrai si la personne a une photo et qu'on a les
@@ -2912,8 +2923,12 @@ value image_and_size conf base p image_size =
 (* ********************************************************************** *)
 value has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
-    not (is_empty_string (get_image p)) || auto_image_file conf base p <> None
-  else False
+    (not (is_empty_string (get_image p)) &&
+    (* Gestion des médias privés (contenant "private" dans leur URL) dans le cas du mode visiteur. *)
+     (conf.wizard || conf.friend || not (string_exists (sou base (get_image p)) "/private/"))
+    ) || auto_image_file conf base p <> None
+  else
+    False
 ;
 
 value gen_only_printable or_nl s =
