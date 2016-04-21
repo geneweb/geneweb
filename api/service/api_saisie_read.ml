@@ -305,6 +305,32 @@ type graph_more_info =
 
 (* ************************************************************************** *)
 (*  [Fonc] event_to_piqi_event : string -> event_type                         *)
+(** [Description] : Convertit les balises wiki des notes en html.
+    [Args] :
+      - conf
+      - base
+      - env
+      - wiki_notes       : les notes au format wiki
+      - separator_string : caractère de séparations entre les lignes
+    [Retour] :
+      - html_notes : les notes au format html                                 *)
+(* ************************************************************************** *)
+let convert_wiki_notes_to_html_notes conf base env wiki_notes separator_string =
+    let html_notes = string_with_macros conf env wiki_notes in
+    let lines = Api_wiki.html_of_tlsw conf html_notes in
+    let wi =
+        {Api_wiki.wi_mode = "NOTES";
+        Api_wiki.wi_cancel_links = conf.cancel_links;
+        Api_wiki.wi_file_path = Notes.file_path conf base;
+        Api_wiki.wi_person_exists = person_exists conf base;
+        Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
+    in
+    let html_notes = Api_wiki.syntax_links conf wi (String.concat separator_string lines) in
+    if conf.pure_xhtml then Util.check_xhtml html_notes else html_notes
+;;
+
+(* ************************************************************************** *)
+(*  [Fonc] event_to_piqi_event : string -> event_type                         *)
 (** [Description] : Retourne à partir d'un évènement (gwdb) un évènement (piqi)
     [Args] :
       - evt_name : nom de l'évènement
@@ -718,17 +744,7 @@ let fam_to_piqi_family_link conf base ip ifath imoth sp ifam fam fam_link =
   let notes =
     if m_auth && not conf.no_note then
       let s = gen_f.comment in
-      let s = string_with_macros conf [] s in
-      let lines = Api_wiki.html_of_tlsw conf s in
-      let wi =
-        {Api_wiki.wi_mode = "NOTES";
-         Api_wiki.wi_cancel_links = conf.cancel_links;
-         Api_wiki.wi_file_path = Notes.file_path conf base;
-         Api_wiki.wi_person_exists = person_exists conf base;
-         Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
-      in
-      let s = Api_wiki.syntax_links conf wi (String.concat "\n" lines) in
-      if conf.pure_xhtml then Util.check_xhtml s else s
+      convert_wiki_notes_to_html_notes conf base [] s "\n"
     else ""
   in
   let fsources =
@@ -858,15 +874,7 @@ let fam_to_piqi_family conf base p ifam =
   let notes =
     if m_auth && not conf.no_note then
       let s = gen_f.comment in
-      let s = string_with_macros conf [] s in
-      let wi =
-        {Api_wiki.wi_mode = "NOTES";
-         Api_wiki.wi_cancel_links = conf.cancel_links;
-         Api_wiki.wi_file_path = Notes.file_path conf base;
-         Api_wiki.wi_person_exists = person_exists conf base;
-         Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
-      in
-        Api_wiki.syntax_links conf wi s
+      convert_wiki_notes_to_html_notes conf base [] s ""
     else ""
   in
   let fsources =
@@ -1111,16 +1119,7 @@ let pers_to_piqi_person conf base p =
                 begin
                   let env = [('i', fun () -> Util.default_image_name base p)] in
                   let s = sou base note in
-                  let s = string_with_macros conf env s in
-                  let lines = Api_wiki.html_of_tlsw conf s in
-                  let wi =
-                    {Api_wiki.wi_mode = "NOTES"; Api_wiki.wi_cancel_links = conf.cancel_links;
-                     Api_wiki.wi_file_path = Notes.file_path conf base;
-                     Api_wiki.wi_person_exists = person_exists conf base;
-                     Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
-                  in
-                  let s = Api_wiki.syntax_links conf wi (String.concat "\n" lines) in
-                  if conf.pure_xhtml then Util.check_xhtml s else s
+                  convert_wiki_notes_to_html_notes conf base env s "\n"
                 end
               else ""
             in
@@ -1286,15 +1285,7 @@ let pers_to_piqi_person conf base p =
       if p_auth && not conf.no_note then
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = gen_p.notes in
-        let s = string_with_macros conf env s in
-        let wi =
-          {Api_wiki.wi_mode = "NOTES"; Api_wiki.wi_cancel_links = conf.cancel_links;
-           Api_wiki.wi_file_path = Notes.file_path conf base;
-           Api_wiki.wi_person_exists = person_exists conf base;
-           Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
-        in
-        let s = Api_wiki.syntax_links conf wi s in
-        if conf.pure_xhtml then Util.check_xhtml s else s
+        convert_wiki_notes_to_html_notes conf base env s ""
       else ""
     in
     let psources =
@@ -1987,7 +1978,7 @@ let print_fiche_person conf base =
           match Gwdb.person_of_key base fn sn (Int32.to_int oc) with
           | Some ip ->
             if is_private_person conf base ip
-            then 
+            then
               print_error conf `not_found
             else
             (
