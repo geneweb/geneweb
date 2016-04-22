@@ -470,7 +470,7 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
     in
     let dates = short_dates_text conf base p in
     let image =
-      if not conf.no_image && p_auth then
+      if has_image conf base p then
         let img = sou base (get_image p) in
         if img <> "" then img
         else
@@ -631,7 +631,7 @@ let pers_to_piqi_simple_person conf base p base_prefix =
       else ("", "", "", "", "", "")
     in
     let image =
-      if not conf.no_image && p_auth then
+      if has_image conf base p then
         let img = sou base (get_image p) in
         if img <> "" then img
         else
@@ -1026,7 +1026,7 @@ let pers_to_piqi_person conf base p =
     in
     let surname_aliases = if not p_auth then [] else gen_p.surnames_aliases in
     let image =
-      if not conf.no_image && p_auth then
+      if has_image conf base p then
         let img = sou base (get_image p) in
         if img <> "" then img
         else
@@ -3100,7 +3100,7 @@ let pers_to_piqi_person_tree_full conf base p more_info gen max_gen base_prefix 
       else person_firstname_surname_txt conf base p
     in
     let image =
-      if not conf.no_image && p_auth then
+      if has_image conf base p then
         let img = gen_p.image in
         if img <> "" then img
         else
