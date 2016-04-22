@@ -413,3 +413,6 @@ expand_env=no
 # display the individual in his 'own' siblings on the template perso.txt
 # (individual page).
 #full_siblings=yes/no
+
+#display a default man/woman/neuter image when individual image is missing
+#default_image=yes

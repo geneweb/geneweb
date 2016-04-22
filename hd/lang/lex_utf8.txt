@@ -8066,6 +8066,10 @@ sk: rôzne poznámky
 sl: razni zaznamki
 sv: blandade noteringar
 
+    missing image
+en: missing image
+fr: image manquante
+
     missing ancestors
 af: ontbrekende voorsate
 bg: липсващи предци

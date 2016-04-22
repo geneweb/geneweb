@@ -3,13 +3,18 @@
      is_cremated or (has_consanguinity and bvar.show_consang!="no") or
      has_occupation or has_linked_page.OCCU !="")
   <!--  Portrait -->
-  %if;has_image;
+  %if;(has_image or bvar.default_image="yes")
     <table border="%border;">
     <tr>
       <td valign="top">
-        <a href="%image_url;" target="_blank">
-          <img src="%image_url;"%image_size; alt="[image/images]0" class="fiche_photo"%/>
-        </a>
+        %if;has_image;
+          <a href="%image_url;" target="_blank">
+            <img src="%image_url;"%image_size; alt="[image/images]0" class="fiche_photo"%/>
+          </a>
+        %elseif;(bvar.default_image="yes")
+          <img src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; 
+           alt="[missing image]" class="fiche_photo"%/>
+        %end;
       </td>
       <td valign="top">
   %end;
@@ -60,7 +65,7 @@
       <li>[*consanguinity] : %consanguinity;</li>%nl;
     %end;
   </ul>
-  %if;has_image;
+  %if;(has_image or bvar.default_image="yes")
     </td></tr></table>
   %end;
 %end;
