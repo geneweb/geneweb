@@ -874,7 +874,7 @@ let fam_to_piqi_family conf base p ifam =
   let notes =
     if m_auth && not conf.no_note then
       let s = gen_f.comment in
-      convert_wiki_notes_to_html_notes conf base [] s ""
+      convert_wiki_notes_to_html_notes conf base [] s "\n"
     else ""
   in
   let fsources =
