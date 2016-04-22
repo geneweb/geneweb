@@ -963,8 +963,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
   let occ = Int32.of_int (get_occ p) in
   let publicname = if gen_p.public_name = "" then None else Some gen_p.public_name in
   let image =
-    if conf.no_image then ""
-    else if p_auth then
+    if has_image conf base p then
       begin
         if not (gen_p.image = "") then gen_p.image
         else
@@ -1122,8 +1121,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
   let occ = Int32.of_int (get_occ p) in
   let publicname = if gen_p.public_name = "" then None else Some gen_p.public_name in
   let image =
-    if conf.no_image then ""
-    else if p_auth then
+    if has_image conf base p then
       begin
         if not (gen_p.image = "") then gen_p.image
         else
@@ -1294,8 +1292,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   let firstname_aliases = gen_p.first_names_aliases in
   let surname_aliases = gen_p.surnames_aliases in
   let image =
-    if conf.no_image then ""
-    else if p_auth then
+    if has_image conf base p then
       begin
         if not (gen_p.image = "") then gen_p.image
         else
