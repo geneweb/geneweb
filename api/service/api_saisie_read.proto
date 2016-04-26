@@ -290,6 +290,7 @@ message Person {
   required Sosa sosa = 46;
   repeated Event events = 47;
   repeated EventWitness events_witnesses = 48;
+  required string baseprefix = 49;
 }
 
 message FichePerson {

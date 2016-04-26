@@ -412,12 +412,14 @@ let event_to_piqi_event pevt_name fevt_name =
 ;;
 
 (* ************************************************************************** *)
-(*  [Fonc] pers_to_piqi_person_tree : config -> base -> person -> PersonTree  *)
+(*  [Fonc] pers_to_piqi_person_tree :
+            config -> base -> person -> string -> PersonTree                  *)
 (** [Description] : Retourne à partir d'une person (gwdb) une PersonTree (piqi)
     [Args] :
-      - conf      : configuration de la base
-      - base      : base de donnée
-      - p         : person
+      - conf        : configuration de la base
+      - base        : base de donnée
+      - p           : person
+      - base_prefix : nom de l'arbre (différent de base dans le cas des LIA)
     [Retour] :
       - Person : Retourne une personne dont tous les champs sont complétés.
     [Rem] : Non exporté en clair hors de ce module.                           *)
@@ -537,13 +539,14 @@ let pers_to_piqi_person_tree conf base p more_info gen max_gen base_prefix =
 
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_simple_person :
-             config -> base -> person -> SimplePerson                         *)
+             config -> base -> person -> string -> SimplePerson               *)
 (** [Description] : Retourne à partir d'une person (gwdb) une SimplePerson
                     (piqi).
     [Args] :
-      - conf      : configuration de la base
-      - base      : base de donnée
-      - p         : person
+      - conf        : configuration de la base
+      - base        : base de donnée
+      - p           : person
+      - base_prefix : nom de l'arbre (différent de base dans le cas des LIA)
     [Retour] :
       - Person : Retourne une personne dont tous les champs sont complétés.
     [Rem] : Non exporté en clair hors de ce module.                           *)
@@ -962,18 +965,19 @@ let fam_to_piqi_family conf base p ifam =
 ;;
 
 (* ************************************************************************** *)
-(*  [Fonc] pers_to_piqi_person : config -> base -> person -> Person           *)
+(*  [Fonc] pers_to_piqi_person : config -> base -> person -> string -> Person *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person (piqi)
                     dont tous les champs sont complétés.
     [Args] :
-      - conf      : configuration de la base
-      - base      : base de donnée
-      - p         : person
+      - conf        : configuration de la base
+      - base        : base de donnée
+      - p           : person
+      - base_prefix : nom de l'arbre (différent de base dans le cas des LIA)
     [Retour] :
       - Person : Retourne une personne dont tous les champs sont complétés.
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let pers_to_piqi_person conf base p =
+let pers_to_piqi_person conf base p base_prefix =
   if is_restricted conf base (get_key_index p) then
     let restricted_person = Mread.default_person() in
     restricted_person.Mread.Person.index <- Int32.of_int (-1);
@@ -981,7 +985,6 @@ let pers_to_piqi_person conf base p =
     restricted_person.Mread.Person.firstname <- "x";
     restricted_person
   else
-    let base_prefix = conf.command in
     let p_auth = authorized_age conf base p in
     let gen_p = Util.string_gen_person base (gen_person_of_person p) in
     let index =
@@ -1638,27 +1641,29 @@ let pers_to_piqi_person conf base p =
       sosa = sosa;
       events = events;
       events_witnesses = events_witnesses;
+      baseprefix = base_prefix;
       fiche_person_person = None;
     })
 ;;
 
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_fiche_person :
-    config -> base -> person -> bool -> Person                                *)
+    config -> base -> person -> base_prefix -> bool -> Person                 *)
 (** [Description] : Retourne à partir d'une person (gwdb) une Person fiche
                     (piqi) dont tous les champs sont complétés.
     [Args] :
       - conf         : configuration de la base
       - base         : base de donnée
       - p            : person
+      - base_prefix  : nom de l'arbre (différent de base dans le cas des LIA)
       - with_parents : bool
     [Retour] :
       - Person
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let rec pers_to_piqi_fiche_person conf base p with_parents =
+let rec pers_to_piqi_fiche_person conf base p base_prefix with_parents =
   (* Récupère une personne. *)
-  let piqi_person = pers_to_piqi_person conf base p in
+  let piqi_person = pers_to_piqi_person conf base p base_prefix in
   (* Génère une personne fiche par défaut. *)
   let piqi_fiche_person = Mread.default_fiche_person() in
   (* Ajoute la personne fiche à la personne. *)
@@ -1725,7 +1730,13 @@ let rec pers_to_piqi_fiche_person conf base p with_parents =
       List.map (Perso.string_of_title tmp_conf base "" p) (Perso.nobility_titles_list conf base p)
     in
     let has_history = Perso.has_history conf base p p_auth in
-    let has_possible_duplications = Perso.has_possible_duplications conf base p in
+    (* Les doublons ne sont pas testés pour les LIA. *)
+    let has_possible_duplications =
+      if with_parents then
+        Perso.has_possible_duplications conf base p
+      else
+        false
+    in
     let ref_index =
       match Util.find_sosa_ref conf base with
         | Some ref -> Some (Int32.of_int (Adef.int_of_iper (get_key_index ref)))
@@ -1760,13 +1771,13 @@ let rec pers_to_piqi_fiche_person conf base p with_parents =
               if (Adef.int_of_iper ifath) < 0 then None
               else
                 let father = poi base ifath in
-                Some (pers_to_piqi_fiche_person conf base father false)
+                Some (pers_to_piqi_fiche_person conf base father base_prefix false)
             in
             let mother =
               if (Adef.int_of_iper imoth) < 0 then None
               else
                 let mother = poi base imoth in
-                Some (pers_to_piqi_fiche_person conf base mother false)
+                Some (pers_to_piqi_fiche_person conf base mother base_prefix false)
             in
             (father, mother)
         | None ->
@@ -1788,10 +1799,10 @@ let rec pers_to_piqi_fiche_person conf base p with_parents =
                       let (fath, _) = Perso_link.make_ep_link conf base pfath in
                       let (moth, _) = Perso_link.make_ep_link conf base pmoth in
                       let father =
-                        Some (pers_to_piqi_fiche_person conf base fath false)
+                        Some (pers_to_piqi_fiche_person conf base fath fam_base_prefix false)
                       in
                       let mother =
-                        Some (pers_to_piqi_fiche_person conf base moth false)
+                        Some (pers_to_piqi_fiche_person conf base moth fam_base_prefix false)
                       in
                       (father, mother)
                   | _ -> (None, None)
@@ -1823,6 +1834,7 @@ let rec pers_to_piqi_fiche_person conf base p with_parents =
     piqi_fiche_person.Mread.Fiche_person.visible_for_visitors <- visible_for_visitors;
     piqi_fiche_person.Mread.Fiche_person.father <- father;
     piqi_fiche_person.Mread.Fiche_person.mother <- mother;
+    piqi_person.Mread.Person.baseprefix <- base_prefix;
     piqi_person
 ;;
 
@@ -1844,7 +1856,7 @@ let print_person_tree conf base =
   let p = poi base ip in
   (* cache lien inter arbre *)
   let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let pers_piqi = pers_to_piqi_person conf base p in
+  let pers_piqi = pers_to_piqi_person conf base p conf.command in
   let data = Mext_read.gen_person pers_piqi in
   print_result conf data
 ;;
@@ -1926,7 +1938,7 @@ let print_result_fiche_person conf base ip =
   let p = poi base ip in
   (* cache lien inter arbre *)
   let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let pers_piqi = pers_to_piqi_fiche_person conf base p true in
+  let pers_piqi = pers_to_piqi_fiche_person conf base p conf.command true in
   let data = Mext_read.gen_person pers_piqi in
   print_result conf data
 ;;
