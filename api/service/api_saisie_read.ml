@@ -1288,7 +1288,7 @@ let pers_to_piqi_person conf base p base_prefix =
       if p_auth && not conf.no_note then
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = gen_p.notes in
-        convert_wiki_notes_to_html_notes conf base env s ""
+        convert_wiki_notes_to_html_notes conf base env s " "
       else ""
     in
     let psources =
