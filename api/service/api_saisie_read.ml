@@ -1656,12 +1656,13 @@ let pers_to_piqi_person conf base p base_prefix =
       - base         : base de donnée
       - p            : person
       - base_prefix  : nom de l'arbre (différent de base dans le cas des LIA)
-      - with_parents : bool
+      - from_gen_asc : génération ascendante en cours
+      - max_gen_asc  : nombre de générations ascendantes à parcourir
     [Retour] :
       - Person
     [Rem] : Non exporté en clair hors de ce module.                           *)
 (* ************************************************************************** *)
-let rec pers_to_piqi_fiche_person conf base p base_prefix with_parents =
+let rec pers_to_piqi_fiche_person conf base p base_prefix from_gen_asc max_gen_asc =
   (* Récupère une personne. *)
   let piqi_person = pers_to_piqi_person conf base p base_prefix in
   (* Génère une personne fiche par défaut. *)
@@ -1732,7 +1733,7 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix with_parents =
     let has_history = Perso.has_history conf base p p_auth in
     (* Les doublons ne sont pas testés pour les LIA. *)
     let has_possible_duplications =
-      if with_parents then
+      if from_gen_asc == 0 then
         Perso.has_possible_duplications conf base p
       else
         false
@@ -1760,10 +1761,11 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix with_parents =
     in
     let visible_for_visitors = is_visible conf base p in
     let (father, mother) =
-      if with_parents = true
+      if from_gen_asc < max_gen_asc
       then
         match get_parents p with
         | Some ifam ->
+            Printf.eprintf "Présence de parents normaux pour %s\n" (Name.lower (sou base (get_first_name p)));
             let cpl = foi base ifam in
             let ifath = get_father cpl in
             let imoth = get_mother cpl in
@@ -1771,19 +1773,18 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix with_parents =
               if (Adef.int_of_iper ifath) < 0 then None
               else
                 let father = poi base ifath in
-                Some (pers_to_piqi_fiche_person conf base father base_prefix false)
+                Some (pers_to_piqi_fiche_person conf base father base_prefix (from_gen_asc+1) max_gen_asc)
             in
             let mother =
               if (Adef.int_of_iper imoth) < 0 then None
               else
                 let mother = poi base imoth in
-                Some (pers_to_piqi_fiche_person conf base mother base_prefix false)
+                Some (pers_to_piqi_fiche_person conf base mother base_prefix (from_gen_asc+1) max_gen_asc)
             in
             (father, mother)
         | None ->
             (* lien inter arbre *)
             let ip = get_key_index p in
-            let base_prefix = conf.command in
             match Perso_link.get_parents_link base_prefix ip with
             | Some family ->
                 begin
@@ -1799,10 +1800,10 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix with_parents =
                       let (fath, _) = Perso_link.make_ep_link conf base pfath in
                       let (moth, _) = Perso_link.make_ep_link conf base pmoth in
                       let father =
-                        Some (pers_to_piqi_fiche_person conf base fath fam_base_prefix false)
+                        Some (pers_to_piqi_fiche_person conf base fath fam_base_prefix (from_gen_asc+1) max_gen_asc)
                       in
                       let mother =
-                        Some (pers_to_piqi_fiche_person conf base moth fam_base_prefix false)
+                        Some (pers_to_piqi_fiche_person conf base moth fam_base_prefix (from_gen_asc+1) max_gen_asc)
                       in
                       (father, mother)
                   | _ -> (None, None)
@@ -1937,8 +1938,9 @@ let print_result_fiche_person conf base ip =
   let () = Perso.build_sosa_ht conf base in
   let p = poi base ip in
   (* cache lien inter arbre *)
-  let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let pers_piqi = pers_to_piqi_fiche_person conf base p conf.command true in
+  let max_gen_asc = 2 in
+  let () = Perso_link.init_cache conf base ip max_gen_asc 1 1 in
+  let pers_piqi = pers_to_piqi_fiche_person conf base p conf.command 0 max_gen_asc in
   let data = Mext_read.gen_person pers_piqi in
   print_result conf data
 ;;
