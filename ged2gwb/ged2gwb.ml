@@ -882,17 +882,36 @@ EXTEND
   ;
 END;
 
+(* Perform a regular expression match. *)
+value preg_match pattern subject =
+  let re = Str.regexp pattern in
+  try
+    do {
+      ignore (Str.search_forward re subject 0);
+      True
+    }
+  with
+    Not_found -> False
+;
+
 value date_of_field pos d =
   if d = "" then None
-  else do {
-    let s = Stream.of_string (String.uppercase d) in
-    date_str.val := d;
-    try Some (Grammar.Entry.parse date_value s) with
-    [ Ploc.Exc loc (Stream.Error _) ->
+  else
+    (* Vérifie si la date ne dépasse pas 8 caractères (DDMMYYYY) *)
+    if (preg_match "^[0-9]+$" d && (String.length d) > 8)
+    then
+        (* Passe la date en saisie libre txt *)
+        Some (Dtext d)
+    else do {
         let s = Stream.of_string (String.uppercase d) in
-        try Some (Grammar.Entry.parse date_value_recover s) with
-        [ Ploc.Exc loc (Stream.Error _) -> Some (Dtext d) ] ]
-  }
+        date_str.val := d;
+        try Some (Grammar.Entry.parse date_value s) with
+        [ Ploc.Exc loc (Stream.Error _) ->
+            let s = Stream.of_string (String.uppercase d) in
+            try Some (Grammar.Entry.parse date_value_recover s) with
+            [ Ploc.Exc loc (Stream.Error _) -> Some (Dtext d) ]
+        ]
+    }
 ;
 
 (* Creating base *)
