@@ -270,7 +270,9 @@ value has_infos_not_dates base p =
   get_aliases p <> [] || get_titles p <> [] ||
   sou base (get_occupation p) <> "" || sou base (get_birth_place p) <> "" ||
   sou base (get_baptism_place p) <> "" ||
-  sou base (get_death_place p) <> "" || sou base (get_psources p) <> ""
+  sou base (get_death_place p) <> "" || sou base (get_psources p) <> "" ||
+  get_access p <> IfTitles ||
+  (sou base (get_image p) <> "" && not no_picture.val)
 ;
 
 value has_infos base p =
