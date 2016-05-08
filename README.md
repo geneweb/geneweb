@@ -39,6 +39,27 @@ make
 make distrib
 ```
 
+### Building the API
+
+The API uses the Google Protocol Buffer to exchange informations
+encoded as pb, json, xml.
+
+It has the following dependancies:
+
+- OCaml
+- camlp5
+- lwt
+- mysql
+- ocamlfind
+- ocurl
+- piqi
+- piqilib
+- protobuf
+- re
+- uuidm
+- yojson
+- ocaml-redis (https://github.com/geneweb/ocaml-redis)
+
 ## Contributor guidelines
 
 ### Creating a pull request
