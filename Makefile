@@ -64,34 +64,20 @@ uninstall:
 distrib:
 	$(RM) -r $(DESTDIR)
 	mkdir $(DESTDIR)
+	mkdir -p $(DESTDIR)/bases
 	cp CHANGES $(DESTDIR)/CHANGES.txt
 	cp LICENSE $(DESTDIR)/LICENSE.txt
 	cp etc/START.htm $(DESTDIR)/.
 	if test $(OS_TYPE) = "Win"; then \
-	  echo -ne 'setlocal enableextensions\r\n' > $(DESTDIR)/gwd.bat; \
-	  echo -ne 'md bases\r\n' >> $(DESTDIR)/gwd.bat; \
-	  echo -ne 'endlocal\r\n' >> $(DESTDIR)/gwd.bat; \
-	  echo -ne 'cd bases\r\n' >> $(DESTDIR)/gwd.bat; \
-	  echo -ne 'start /MIN ..\\gw\\gwd -hd ..\\gw\r\n' >> $(DESTDIR)/gwd.bat; \
-	  echo -ne 'setlocal enableextensions\r\n' > $(DESTDIR)/gwsetup.bat; \
-	  echo -ne 'md bases\r\n' >> $(DESTDIR)/gwsetup.bat; \
-	  echo -ne 'endlocal\r\n' >> $(DESTDIR)/gwsetup.bat; \
-	  echo -ne 'cd bases\r\n' >> $(DESTDIR)/gwsetup.bat; \
-	  echo -ne 'start /MIN ..\\gw\\gwsetup -lang fr -gd ..\\gw\r\n' >> $(DESTDIR)/gwsetup.bat; \
+	  cp etc/Windows/gwd.bat $(DESTDIR); \
+	  cp etc/Windows/gwsetup.bat $(DESTDIR); \
+	elif test $(OS_TYPE) = "Darwin"; then \
+	  cp etc/macOS/geneweb.command $(DESTDIR); \
+	  cp etc/gwd $(DESTDIR)/gwd.command; \
+	  cp etc/gwsetup $(DESTDIR)/gwsetup.command; \
 	else \
-	  (echo '#!/bin/sh'; \
-	   echo 'mkdir -p bases'; \
-	   echo 'cd bases'; \
-	   echo 'exec ../gw/gwd -hd ../gw "$$@"') > $(DESTDIR)/gwd; \
-	  (echo '#!/bin/sh'; \
-	   echo 'mkdir -p bases'; \
-	   echo 'cd bases'; \
-	   echo 'exec ../gw/gwsetup -gd ../gw "$$@"') > $(DESTDIR)/gwsetup; \
-	  chmod +x $(DESTDIR)/gwd $(DESTDIR)/gwsetup; \
-	fi
-	if test $(OS_TYPE) = "Darwin"; then \
-	  cp etc/MacOSX/GeneWeb.command $(DESTDIR); \
-	  chmod +x $(DESTDIR)/GeneWeb.command; \
+	  cp etc/gwd $(DESTDIR); \
+	  cp etc/gwsetup $(DESTDIR); \
 	fi
 	mkdir $(DESTDIR)/gw
 	cp etc/a.gwf $(DESTDIR)/gw/.
