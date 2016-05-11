@@ -186,6 +186,7 @@ check_os() {
     STRIP=strip
   else
     print_check_ok "Checking OS type" "WINDOWS"
+    OS_TYPE="Win"
     CAMLP5F+=" -D WINDOWS"
     EXE=".exe"
     RM="rm -f"
