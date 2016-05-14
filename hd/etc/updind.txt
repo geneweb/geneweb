@@ -153,6 +153,12 @@ function changeCalendar(e,v,m,c) {
     document.forms%[0].death.value = "Death";
   }
 
+  function setDead_for_death_reason()
+  {
+    document.forms%[0].death.value = "Death";
+    document.forms%[0].death_text.value = "dummy text date";
+  }
+
   function change_buri(xcnt) {
     var selector = document.getElementById('buri_select' + xcnt);
     var input = document.getElementById('e_name' + xcnt);
@@ -688,6 +694,22 @@ function changeCalendar(e,v,m,c) {
             </select>
           </td>
         </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>
+            <label>
+              <input type="radio" name="death_reason" value="Killed"%if;dr_killed; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*killed (in action)]2
+            </label><label>
+              <input type="radio" name="death_reason" value="Murdered"%if;dr_murdered; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*murdered]2
+            </label><label>
+              <input type="radio" name="death_reason" value="Executed"%if;dr_executed; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*executed (legally killed)]2
+            </label><label>
+              <input type="radio" name="death_reason" value="Disappeared"%if;dr_disappeared; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*disappeared]2
+            </label><label>
+              <input type="radio" name="death_reason" value="Unspecified"%if;dr_unspecified; checked="checked"%end; onclick='setDead()'%/>[*unspecified]2
+            </label>
+          </td>
+        </tr>
       %end;
       %if;("evt_name" = "#buri" or "evt_name" = "#crem")
         <tr>
@@ -757,6 +779,22 @@ function changeCalendar(e,v,m,c) {
             <option value="DeadYoung" %if;died_young; selected="selected"%end;>[*died young]2</option>
             <option value="OfCourseDead" %if;of_course_dead; selected="selected"%end;>[*of course dead]</option>
           </select>
+        </td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>
+          <label>
+            <input type="radio" name="death_reason" value="Killed"%if;dr_killed; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*killed (in action)]2
+          </label><label>
+            <input type="radio" name="death_reason" value="Murdered"%if;dr_murdered; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*murdered]2
+          </label><label>
+            <input type="radio" name="death_reason" value="Executed"%if;dr_executed; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*executed (legally killed)]2
+          </label><label>
+            <input type="radio" name="death_reason" value="Disappeared"%if;dr_disappeared; checked="checked"%end; onclick='setDead_for_death_reason()'%/>[*disappeared]2
+          </label><label>
+            <input type="radio" name="death_reason" value="Unspecified"%if;dr_unspecified; checked="checked"%end; onclick='setDead()'%/>[*unspecified]2
+          </label>
         </td>
       </tr>
     %end;
