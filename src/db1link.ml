@@ -526,7 +526,7 @@ value notice_sex gen p s =
   else do {
     printf "\nInconcistency about the sex of\n  %s %s\n"
       (p_first_name gen.g_base p) (p_surname gen.g_base p);
-    ()
+    check_error gen
   }
 ;
 
