@@ -794,10 +794,14 @@ value get_cremation_text conf base p p_auth =
 
 value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
+  (* Construit un tableau d'index dont chaque valeur est False *)
   let mark = Array.create (nb_of_persons base) False in
   let rec loop level ip =
+    (* Ne traite pas l'index s'il a déjà été traité. *)
+    (* Pose surement probleme pour des implexes. *)
     if mark.(Adef.int_of_iper ip) then ()
     else do {
+      (* Met à jour le tableau d'index pour indiquer que l'index est traité. *)
       mark.(Adef.int_of_iper ip) := True;
       x.val := max x.val level;
       if x.val = max_lev then ()
@@ -811,6 +815,8 @@ value max_ancestor_level conf base ip max_lev =
             }
         | _ ->
             (* lia *)
+            (* Charge le cache *)
+            let () = Perso_link.init_cache conf base ip max_lev 0 0 in
             let rec loop_lia level (ip, base_prefix) = do {
               x.val := max x.val level;
               if x.val = max_lev then ()
