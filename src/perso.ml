@@ -5328,7 +5328,8 @@ value gen_interp_templ menu title templ_fname conf base p = do {
       Vint (max_ancestor_level conf base (get_key_index p) emal + 1)
     in
     let mcl () = Vint (max_cousin_level conf base p) in
-    let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
+    (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres. *)
+    let mdl () = Vint (max (max_descendant_level conf base desc_level_table_l) (Perso_link.max_interlinks_descendancy_level conf base (get_key_index p) emal)) in
     let nldb () =
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
       let fname = Filename.concat bdir "notes_links" in
