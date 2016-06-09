@@ -1,4 +1,4 @@
-/* $Id: uppercase.js,v 7.00 2015/04/11 00:21:31 mr Exp $ */
+/* $Id: js_uppercase.js,v 7.00 2016/06/09 17:53:56 mr Exp $ */
 
   function tUC(id)
   {
@@ -18,7 +18,7 @@
   }
   function tUC1(id)
   {
-    id.value = id.value.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase();} );
+    id.value = id.value.replace( /(^|\s|-)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase();} );
     return id.value;
   }
   function oS3()
