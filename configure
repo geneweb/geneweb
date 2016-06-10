@@ -667,3 +667,7 @@ fi
 check_environment
 # Print Makefile
 print_makefile
+
+# TODO: add a rule in tools/Makefile.config for this, so that it
+# handles both ocamlc and ocamlopt.
+ocamlopt tools/transitive_depend.ml -o tools/transitive_depend
