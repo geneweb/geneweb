@@ -579,7 +579,7 @@ function changeCalendar(e,v,m,c) {
     <tr>
       <td><label for="e_srcxcnt">[*source/sources]0</label></td>
       <td>
-        <input type="text" name="e_srcxcnt" size="90" maxlength="200" value="%event.e_src;" id="e_srcxcnt" maxlength="800"%/>
+        <input type="text" name="e_srcxcnt" size="90" maxlength="200" value="%event.e_src;" id="e_srcxcnt"%/>
       </td>
     </tr>
   </table>
