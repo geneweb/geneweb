@@ -91,12 +91,10 @@ commit message "PR #XXX: Title of the PR/Bug".
 | INSTALL   | installation file                                       |
 | contrib   | users contributions                                     |
 | dag2html  | library to create html trees                            |
-| doc       | users’ html documentation                               |
 | etc       | additional files for distribution                       |
 | ged2gwb   | converter GEDCOM -> GeneWeb                             |
 | gwb2ged   | converter GeneWeb -> GEDCOM                             |
 | gwtp      | CGI to upload and download databases                    |
-| launch    | a launcher of the geneweb server                        |
 | hd        | html and image files for GeneWeb program                |
 | rpm       | files to create Linux rpm packages                      |
 | setup     | service (gwsetup) to launch commands in a Web navigator |
