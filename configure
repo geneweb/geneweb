@@ -61,7 +61,7 @@ OS_TYPE=
 # Options for configure
 STATIC=false
 API=false
-DEBUG=
+DEBUG=false
 INTERACTIVE=false
 TRY_NATIVE=true
 TRY_OCAMLFIND=true
@@ -76,7 +76,7 @@ while [[ $# -ne 0 ]]; do
       BUILD_DIR="$2";
       shift ;;
     -d|--debug)
-      DEBUG="-g -annot" ;;
+      DEBUG=true ;;
     -i|--interactive)
       INTERACTIVE=true ;;
     -nw|--no-warn-error)
@@ -309,10 +309,13 @@ check_api() {
   fi
 }
 
-check_static() {
+check_flags() {
   if $STATIC; then
     LINKSTATIC_out+=" -ccopt -static -custom"
     LINKSTATIC_opt+=" -ccopt -static"
+  fi
+  if $DEBUG; then
+    OCAMLFLAGS+=" -g -annot -bin-annot -keep-locs"
   fi
 }
 
@@ -411,7 +414,7 @@ check_environment() {
   check_camlp5
   check_lablgtk2
   check_api
-  check_static
+  check_flags
   check_mysql
   check_curl
   check_redis
@@ -489,7 +492,7 @@ print_compiler() {
    echo
    echo "# Compiler options."
    echo "OCAMLI=\$(foreach d,\$(INCDIRS),-I \$d)"
-   echo "OCAMLFLAGS=${OCAMLFLAGS} ${WARN} ${DEBUG}"
+   echo "OCAMLFLAGS=${OCAMLFLAGS} ${WARN}"
    echo "OCAMLC=${OCAMLC} \$(OCAMLFLAGS)"
    echo "OCAMLOPT=${OCAMLOPT} \$(OCAMLFLAGS)"
    echo "OCAML_opt_LINK=\$(OCAMLOPT) \$(LINKSTATIC_opt)"
@@ -655,7 +658,7 @@ if $INTERACTIVE; then
   echo "Do you want compilation debugging symbols (default = no)? [y/N]"
   read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    DEBUG="-g -annot"
+    DEBUG=true
   fi
   echo "Do you want to statically link libraries (default = no)? [y/N]"
   read -re answer
