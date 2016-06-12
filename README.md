@@ -49,7 +49,6 @@ It has the following dependancies:
 - OCaml
 - camlp5
 - lwt
-- mysql
 - ocamlfind
 - ocurl
 - piqi

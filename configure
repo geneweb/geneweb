@@ -46,7 +46,6 @@ CAMLP5D=
 CURL=
 LABLGTK2D=+lablgtk2
 LREDIS=
-MYSQL=
 OREDIS=
 RE=
 
@@ -332,18 +331,6 @@ check_lablgtk2() {
   fi
 }
 
-check_mysql() {
-  if $API; then
-    if ocamlfind query mysql >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml mysql"
-      MYSQL=`ocamlfind query mysql`
-    else
-      print_check_err "Checking OCaml mysql" \
-          "You need the OCaml dependency mysql!"
-    fi
-  fi
-}
-
 check_curl() {
   if $API; then
     if ocamlfind query curl >/dev/null 2>&1; then
@@ -415,7 +402,6 @@ check_environment() {
   check_lablgtk2
   check_api
   check_flags
-  check_mysql
   check_curl
   check_redis
   check_re
@@ -505,7 +491,6 @@ print_compiler() {
    echo "CAMLP5D=${CAMLP5D}"
    echo "LABLGTK2D=${LABLGTK2D}"
    if $API; then
-     echo "MYSQL=${MYSQL}"
      echo "OCURL=${CURL}"
      echo "OREDIS=${OREDIS}"
      echo "RE=${RE}"
