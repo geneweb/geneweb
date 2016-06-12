@@ -581,23 +581,22 @@ print_common_target() {
    echo "clean-tmp:"
    echo "	\$(RM) *~ .#*"
    echo
-   echo "%.cmi: %.mli"
+   echo "%.ppi: %.mli"
    echo "	@\$(TEST_DIR)"
-   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$*.ppi"
-   echo "	\$(OCAMLC) \$(OCAMLI) -I \$(CAMLP5D) -c -intf \$*.ppi"
-   echo "	\$(RM) \$*.ppi"
+   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$@"
    echo
-   echo "%.cmo: %.ml"
-   echo "	@\$(TEST_DIR)"
-   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$*.ppo"
-   echo "	\$(OCAMLC) \$(OCAMLI) -I \$(CAMLP5D) -c -impl \$*.ppo"
-   echo "	\$(RM) \$*.ppo"
+   echo "%.cmi: %.ppi"
+   echo "	\$(OCAMLC) \$(OCAMLI) -I \$(CAMLP5D) -c -intf \$<"
    echo
-   echo "%.cmx: %.ml"
+   echo "%.ppo: %.ml"
    echo "	@\$(TEST_DIR)"
-   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$*.ppo"
-   echo "	\$(OCAMLOPT) \$(OCAMLI) -I \$(CAMLP5D) -c -impl \$*.ppo"
-   echo "	\$(RM) \$*.ppo"
+   echo "	@\$(CAMLP5_COMM) \$(CAMLP5F) \$< -o \$@"
+   echo
+   echo "%.cmo: %.ppo"
+   echo "	\$(OCAMLC) \$(OCAMLI) -I \$(CAMLP5D) -c -impl \$<"
+   echo
+   echo "%.cmx: %.ppo"
+   echo "	\$(OCAMLOPT) \$(OCAMLI) -I \$(CAMLP5D) -c -impl \$<"
 }
 
 print_makefile() {
