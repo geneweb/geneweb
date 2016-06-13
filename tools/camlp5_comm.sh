@@ -17,8 +17,7 @@ head -1 $FILE >/dev/null || exit 1
 set - $(head -1 $FILE)
 case "$2" in
 nocamlp5)
-  FILE=`basename $FILE`
-  COMMAND="ln -fs $FILE $OUTPUT";;
+  COMMAND="(echo '# 1 \"$FILE\"'; cat $FILE) > $OUTPUT";;
 camlp5|camlp5r|camlp5o)
   COMMAND="$2"
   shift; shift
@@ -28,5 +27,5 @@ camlp5|camlp5r|camlp5o)
   COMMAND="camlp5r $ARGS $FILE";;
 esac
 
-echo $COMMAND 1>&2
-$COMMAND
+echo "$COMMAND" 1>&2
+eval "$COMMAND"
