@@ -10,7 +10,7 @@ LIBS = unix
 LINKFLAGS = -I $(CAMLP5D)
 REDIS_OBJS := utils mutex client cache redis_sync
 
-include $(ROOT)/tools/Makefile.config
+include $(ROOT)/tools/Makefile.common
 
 compilation.ml: always
 	echo "Util.compilation_time_hook.val := \" ($$(date "+%Y-%m-%d %T %Z"))\";" > $@

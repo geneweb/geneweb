@@ -10,4 +10,4 @@ probot.opt probot.out: LIBS += str gramlib
 probot.opt probot.out: LINKFLAGS += -I $(CAMLP5D)
 probot_PREPEND_OBJS := $(ROOT)/src/gwlib
 
-include $(ROOT)/tools/Makefile.config
+include $(ROOT)/tools/Makefile.common

@@ -3,4 +3,4 @@ ROOT := ..
 ALL_OBJS := dag2html
 EVERYTHING_EXE := main
 
-include $(ROOT)/tools/Makefile.config
+include $(ROOT)/tools/Makefile.common

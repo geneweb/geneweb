@@ -1,9 +1,6 @@
 ROOT := .
 
-$(ROOT)/tools/Makefile.config:
-	$(error Please run ./configure first)
-
-include $(ROOT)/tools/Makefile.config
+include $(ROOT)/tools/Makefile.common
 
 # ALL: directories needed to make distribution
 ALL_TARGETS := wserver dag2html src ged2gwb gwb2ged setup gwtp

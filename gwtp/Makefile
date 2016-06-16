@@ -5,4 +5,4 @@ ALL_EXE := gwtp
 EVERYTHING_EXE := recover
 LIBS = unix
 
-include $(ROOT)/tools/Makefile.config
+include $(ROOT)/tools/Makefile.common
