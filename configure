@@ -48,6 +48,7 @@ LABLGTK2D=+lablgtk2
 LREDIS=
 OREDIS=
 RE=
+PACKAGES=
 
 WARN="-warn-error A"
 STRIP=true
@@ -305,6 +306,7 @@ check_ocamlfind() {
 check_api() {
   if $API; then
     CAMLP5F+=" -DAPI"
+    PACKAGES+=" curl piqirun.ext re uuidm yojson"
   fi
 }
 
@@ -496,6 +498,7 @@ print_compiler() {
      echo "RE=${RE}"
      echo "LREDIS=${LREDIS}"
      echo "WITH_API=y"
+     echo "PACKAGES=${PACKAGES}"
    fi
 }
 

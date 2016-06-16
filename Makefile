@@ -127,3 +127,7 @@ distrib:
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
 	cp -R hd/* $(DESTDIR)/gw/.
+
+.merlin:
+	echo "PKG $(PACKAGES)" > $@
+	$(foreach target,$(ALL_TARGETS) $(EVERYTHING_TARGETS),printf "S $(target)\nB $(target)\n" >> $@$(\n))
