@@ -1293,7 +1293,10 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   let index = Int32.of_int (Adef.int_of_iper gen_p.key_index) in
   let publicname = if gen_p.public_name = "" then None else Some gen_p.public_name in
   let aliases = gen_p.aliases in
-  let qualifiers = gen_p.qualifiers in
+  let qualifiers =
+    if not p_auth && (is_hide_names conf p) then []
+    else gen_p.qualifiers
+  in
   let firstname_aliases = gen_p.first_names_aliases in
   let surname_aliases = gen_p.surnames_aliases in
   let image =
