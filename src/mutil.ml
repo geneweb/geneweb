@@ -153,7 +153,7 @@ value initial n =
     if i = String.length n then 0
     else
       match n.[i] with
-      [ 'A'..'Z' | 'À'..'Ý' -> i
+      [ 'A'..'Z' | '\192'..'\221' -> i
       | _ -> loop (succ i) ]
 ;
 

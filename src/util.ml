@@ -84,7 +84,9 @@ value rec capitale_iso_8859_1 s =
   if String.length s = 0 then ""
   else
     match s.[0] with
-    [ 'a'..'z' | 'à'..'ö' | 'ø'..'ý' ->
+    [ 'a'..'z'
+    | '\224'..'\246' (* `a to ''o *)
+    | '\248'..'\253' (* /o to 'y *) ->
         String.make 1
           (Char.chr (Char.code s.[0] - Char.code 'a' + Char.code 'A')) ^
           String.sub s 1 (String.length s - 1)
