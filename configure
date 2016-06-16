@@ -174,15 +174,15 @@ check_os() {
   if [[ $OS_TYPE == "Darwin" ]] || [[ $OS_TYPE == "Linux" ]] ; then
     print_check_ok "Checking OS type" "UNIX"
     CAMLP5F+=" -D UNIX"
-    RM="/bin/rm -f"
     EXE=
+    RM="/bin/rm -f"
     STRIP=strip
   else
     print_check_ok "Checking OS type" "WINDOWS"
-    CAMLP5F+=" -D WIN95"
-    STRIP=true
-    RM="rm -f"
+    CAMLP5F+=" -D WINDOWS"
     EXE=".exe"
+    RM="rm -f"
+    STRIP=true
   fi
 }
 

@@ -3,7 +3,6 @@
 
 value eprintf = Printf.eprintf;
 
-
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
 value stop_server = ref "STOP_SERVER";
@@ -378,7 +377,7 @@ value treat_connection tmout callback addr fd = do {
   try flush stderr with _ -> ();
 };
 
-IFDEF WIN95 THEN
+IFDEF WINDOWS THEN
 value buff = Bytes.create 1024;
 
 value copy_what_necessary t oc =
@@ -618,12 +617,12 @@ let args = Sys.argv in
 
 value f addr_opt port tmout max_clients g =
   match
-    IFDEF WIN95 THEN
+    IFDEF WINDOWS THEN
       try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
     ELSE None END
   with
   [ Some s ->
-      IFDEF WIN95 THEN do {
+      IFDEF WINDOWS THEN do {
         let addr = sockaddr_of_string s in
         let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in

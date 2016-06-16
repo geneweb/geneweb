@@ -543,7 +543,7 @@ and print_selector conf print =
   in
   let list =
     let sel =
-      IFDEF WIN95 THEN
+      IFDEF WINDOWS THEN
         if String.length sel = 3 && sel.[1] = ':' && sel.[2] = '\\' then
           sel ^ "."
         else sel
@@ -577,7 +577,7 @@ and print_selector conf print =
         (fun x ->
            let d =
              if x = ".." then
-               IFDEF WIN95 THEN
+               IFDEF WINDOWS THEN
                  if sel.[String.length sel - 1] <> '\\' then
                    Filename.dirname sel ^ "\\"
                  else Filename.dirname sel
@@ -908,7 +908,7 @@ value ged2gwb2_check conf =
   gwc2_or_ged2gwb2 out_name_of_ged conf
 ;
 
-(*ifdef WIN95 then*)
+(*ifdef WINDOWS then*)
 value infer_rc conf rc =
   if rc > 0 then rc
   else
@@ -923,7 +923,7 @@ value gwc conf =
     let comm = stringify (Filename.concat bin_dir.val "gwc") in
     exec_f (comm ^ parameters conf.env)
   in
-  let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+  let rc = IFDEF WINDOWS THEN infer_rc conf rc ELSE rc END in
   do {
     let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
     try Sys.remove gwo with [ Sys_error _ -> () ];
@@ -942,7 +942,7 @@ value gwc2 conf =
     let comm = stringify (Filename.concat bin_dir.val "gwc2") in
     exec_f (comm ^ parameters conf.env)
   in
-  let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+  let rc = IFDEF WINDOWS THEN infer_rc conf rc ELSE rc END in
   do {
     let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
     try Sys.remove gwo with [ Sys_error _ -> () ];
@@ -1177,7 +1177,7 @@ value recover_2 conf =
       eprintf "$ %s\n" c;
       flush stderr;
       let rc = Sys.command c in
-      let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+      let rc = IFDEF WINDOWS THEN infer_rc conf rc ELSE rc END in
       eprintf "\n";
       flush stderr;
       rc
@@ -1270,7 +1270,7 @@ value cleanup_1 conf =
     eprintf "$ %s\n" c;
     flush stderr;
     let rc = Sys.command c in
-    let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+    let rc = IFDEF WINDOWS THEN infer_rc conf rc ELSE rc END in
     eprintf "\n";
     flush stderr;
     if rc > 1 then
@@ -1574,7 +1574,7 @@ value ged2gwb conf =
     let comm = stringify (Filename.concat bin_dir.val conf.comm) in
     exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
-  let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+  let rc = IFDEF WINDOWS THEN infer_rc conf rc ELSE rc END in
   do {
     eprintf "\n";
     flush stderr;
@@ -1591,7 +1591,7 @@ value ged2gwb2 conf =
     let comm = stringify (Filename.concat bin_dir.val conf.comm) in
     exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
-  let rc = IFDEF WIN95 THEN infer_rc conf rc ELSE rc END in
+  let rc = IFDEF WINDOWS THEN infer_rc conf rc ELSE rc END in
   do {
     eprintf "\n";
     flush stderr;
@@ -1884,7 +1884,7 @@ value setup (addr, req) comm env_str =
 
 value wrap_setup a b c =
   do {
-    IFDEF WIN95 THEN do {
+    IFDEF WINDOWS THEN do {
       (* another process have been launched, therefore we lost variables;
          and we cannot parse the arg list again, because of possible spaces
          in arguments which may appear as separators *)
@@ -2029,7 +2029,7 @@ value intro () =
     in
     set_gwd_default_language_if_absent gwd_lang;
     default_lang.val := setup_lang;
-    IFDEF WIN95 THEN do {
+    IFDEF WINDOWS THEN do {
       Unix.putenv "GWLANG" setup_lang; Unix.putenv "GWGD" setup_dir.val
     }
     ELSE () END;

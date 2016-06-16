@@ -1883,7 +1883,7 @@ value slashify s =
 value make_cnt_dir x =
   do {
     mkdir_p x;
-    IFDEF WIN95 THEN do {
+    IFDEF WINDOWS THEN do {
       Wserver.sock_in.val := Filename.concat x "gwd.sin";
       Wserver.sock_out.val := Filename.concat x "gwd.sou";
     }
@@ -1894,7 +1894,7 @@ value make_cnt_dir x =
 
 value main () =
   do {
-    IFDEF WIN95 THEN do {
+    IFDEF WINDOWS THEN do {
       Wserver.sock_in.val := "gwd.sin";
       Wserver.sock_out.val := "gwd.sou";
     }
