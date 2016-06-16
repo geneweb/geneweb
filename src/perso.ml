@@ -1201,7 +1201,13 @@ value merge_date_place conf base surn ((d1, d2, pl), auth) p =
 
 value build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
-  let mark = Array.make (nb_of_persons base) 5 in
+  let mark =
+    try
+      let n = (int_of_string (List.assoc "max_ancestor_implex" conf.base_env)) in
+      Array.make (nb_of_persons base) n
+    with
+    [ Not_found | Failure _ -> Array.make (nb_of_persons base) 5 ]
+  in
   let auth = conf.wizard || conf.friend in
   let add_surname sosa p surn dp =
     let r =

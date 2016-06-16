@@ -416,3 +416,6 @@ expand_env=no
 
 #display a default man/woman/neuter image when individual image is missing
 #default_image=yes
+
+# Maximum number to see an identical ancerstor in the surname list.
+#max_ancestor_implex=5
