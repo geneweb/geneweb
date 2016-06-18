@@ -38,20 +38,26 @@ let treat_line ~filter_map ~deps line =
 
 let rec read_non_comment_line ich =
   let line = input_line ich in
-  if String.length line > 0 && line.[0] == '#' then
+  if String.length line > 0 && line.[0] = '#' then
     read_non_comment_line ich
   else
-    line
+    String.trim line
 
 let rec read_depend_line ich =
   let line = read_non_comment_line ich in
   if String.length line > 0 && line.[String.length line - 1] = '\\' then
-    line ^ (read_depend_line ich)
+    String.sub line 0 (String.length line - 1) ^ " " ^ (read_depend_line ich)
   else
     line
 
-let parent_prefix = Filename.parent_dir_name ^ Filename.dir_sep
-let parent_prefix_len = String.length parent_prefix
+let is_parent_prefix =
+  match Sys.os_type with
+  | "Win32" | "Cygwin" ->
+    (function s -> s = "../" || s = "..\\")
+  | "Unix" ->
+    (function s -> s = "../")
+  | _ -> assert false
+let parent_prefix_len = 3
 
 (* concatpath "A/B" "../C/D" gives "A/C/D" *)
 let rec concat_path pre post =
@@ -60,7 +66,7 @@ let rec concat_path pre post =
   else
     match String.sub post 0 parent_prefix_len with
     | exception Invalid_argument _ -> post
-    | x when x = parent_prefix ->
+    | x when is_parent_prefix x ->
       let pre = Filename.dirname pre
       and post = String.sub post parent_prefix_len (String.length post - parent_prefix_len) in
       concat_path pre post
