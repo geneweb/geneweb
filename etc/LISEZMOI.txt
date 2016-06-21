@@ -1,19 +1,15 @@
-GeneWeb 5.01
+GeneWeb 7.00
 
-Pour demarrer avec GeneWeb, suivez les instructions suivantes:
+Ouvrez la page START.htm
 
-Si vous etes sous Windows:
-   Double-cliquez sur le fichier "index.htm" du repertoire "doc",
-   et suivez les instructions.
+Si vous avez l'intention d'ouvrir une base, vous devez avoir démarré le programme gwd
+en double cliquant sur l'icone gwd.bat (Windows), gwd.command (macOS) or gwd (Linux).
+Si vous avez l'intention de gérer ou créer une base, vous devez avoir démarré le programme gwsetup
+en double cliquant sur l'icone gwsetup.bat (Windows), gwsetup.command (macOS) or gwsetup (Linux).
 
-Si vous etes sous Unix ou Mac:
-   Lancez votre navigateur Web.
-   Si vous avez installe GeneWeb, par exemple dans
-        /home/dupont/geneweb
-   ouvrez la location:
-        file:/home/dupont/geneweb/gw/doc/index.htm
-   et suivez les instructions.
-
+Sur macOS, geneweb.command tue les versions précédentes, ouvre les deux programmes et
+minimise la fenêtre correspondante.
+   
      -----------------
 
 Voir le fichier CHANGES (en anglais) dans ce repertoire-ci pour les
@@ -21,11 +17,14 @@ changements par rapport aux versions precedentes.
 
      -----------------
 
-GeneWeb est Copyright (c) 1998-2007 INRIA.
+GeneWeb est Copyright (c) 1998-2016 INRIA.
+Créateur d'origine Daniel de Rauglaudre
 
-Remarques, suggestions, questions, rapports d'anomalie a:
-	daniel.de_rauglaudre@inria.fr
-	http://pauillac.inria.fr/~ddr/
+Remarques, suggestions, questions, rapports d'erreur sur:
+	https://github.com/geneweb/geneweb/issues
+	or
+	https://groups.yahoo.com/neo/groups/GeneWeb/info
 
 Veuillez preciser le numero de version ci-dessus et le systeme sur lequel
 vous tournez (Unix, Windows, Mac).
+

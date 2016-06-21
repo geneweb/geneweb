@@ -31,21 +31,28 @@ $(DEPEND_DEPEND):
 .PHONY: install uninstall distrib
 
 install:
-	mkdir -p $(PREFIX)/bin
-	cp src/gwc1 $(PREFIX)/bin/gwc$(EXE)
-	cp src/gwc1 $(PREFIX)/bin/gwc1$(EXE)
-	cp src/gwc2 $(PREFIX)/bin/gwc2$(EXE)
-	cp src/consang $(PREFIX)/bin/consang$(EXE)
-	cp src/gwd $(PREFIX)/bin/gwd$(EXE)
-	cp src/gwu $(PREFIX)/bin/gwu$(EXE)
-	cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE)
-	cp ged2gwb/ged2gwb2 $(PREFIX)/bin/ged2gwb2$(EXE)
-	cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE)
-	cp setup/setup $(PREFIX)/bin/gwsetup$(EXE)
-	cp src/update_nldb $(PREFIX)/bin/update_nldb$(EXE)
-	cp -R hd/* $(LANGDIR)/.
-	mkdir -p $(MANDIR)
-	cd man; cp $(MANPAGES) $(MANDIR)/.
+	PWD=`pwd`
+	if test "$(OS_TYPE)" = "Darwin"; then \
+	    etc/macOS/install.command $(PWD) $(DESTDIR) etc/macOS; \
+	elif test "$(OS_TYPE)" = "Win"; then \
+		echo "No install for Window" \
+	else \
+		mkdir -p $(PREFIX)/bin; \
+		cp src/gwc1 $(PREFIX)/bin/gwc$(EXE); \
+		cp src/gwc1 $(PREFIX)/bin/gwc1$(EXE); \
+		cp src/gwc2 $(PREFIX)/bin/gwc2$(EXE); \
+		cp src/consang $(PREFIX)/bin/consang$(EXE); \
+		cp src/gwd $(PREFIX)/bin/gwd$(EXE); \
+		cp src/gwu $(PREFIX)/bin/gwu$(EXE); \
+		cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE); \
+		cp ged2gwb/ged2gwb2 $(PREFIX)/bin/ged2gwb2$(EXE); \
+		cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE); \
+		cp setup/setup $(PREFIX)/bin/gwsetup$(EXE); \
+		cp src/update_nldb $(PREFIX)/bin/update_nldb$(EXE); \
+		cp -R hd/* $(LANGDIR)/.; \
+		mkdir -p $(MANDIR); \
+		cd man; cp $(MANPAGES) $(MANDIR)/.; \
+	fi
 
 uninstall:
 	$(RM) $(PREFIX)/bin/gwc$(EXE)
@@ -61,20 +68,25 @@ uninstall:
 	$(RM) -r $(PREFIX)/share/geneweb
 	cd $(MANDIR); $(RM) $(MANPAGES)
 
+distribution: distrib
 distrib:
 	$(RM) -r $(DESTDIR)
 	mkdir $(DESTDIR)
 	mkdir -p $(DESTDIR)/bases
 	cp CHANGES $(DESTDIR)/CHANGES.txt
 	cp LICENSE $(DESTDIR)/LICENSE.txt
+	cp etc/README.txt $(DESTDIR)/.
+	cp etc/LISEZMOI.txt $(DESTDIR)/.
 	cp etc/START.htm $(DESTDIR)/.
 	if test $(OS_TYPE) = "Win"; then \
 	  cp etc/Windows/gwd.bat $(DESTDIR); \
 	  cp etc/Windows/gwsetup.bat $(DESTDIR); \
+	  cp -f etc/Windows/README.txt $(DESTDIR)/README.txt; \
+	  cp -f etc/Windows/LISEZMOI.txt $(DESTDIR)/LISEZMOI.txt; \
 	elif test $(OS_TYPE) = "Darwin"; then \
-	  cp etc/macOS/geneweb.command $(DESTDIR); \
 	  cp etc/gwd $(DESTDIR)/gwd.command; \
 	  cp etc/gwsetup $(DESTDIR)/gwsetup.command; \
+	  cp etc/macOS/geneweb.command $(DESTDIR); \
 	else \
 	  cp etc/gwd $(DESTDIR); \
 	  cp etc/gwsetup $(DESTDIR); \

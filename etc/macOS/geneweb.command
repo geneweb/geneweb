@@ -79,4 +79,6 @@ fi
 
 open "$DIR/START.htm"
 
+/usr/bin/osascript -e 'tell application "Terminal" to set miniaturized of first window whose name contains "GeneWeb" to true'
+
 cat
