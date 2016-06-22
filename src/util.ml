@@ -2866,6 +2866,20 @@ value auto_image_file conf base p =
   else None
 ;
 
+(* ********************************************************************** *)
+(*  [Fonc] image_and_size : config -> base -> person -> image_size        *)
+(** [Description] : Renvoie la source de l'image ainsi que sa taille.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de données
+      - p    : personne
+      [Retour] :
+        - is_filename : indique si la source de l'image est un nom de
+                        fichier ou une URL.
+        - source
+        - image_size
+    [Rem] : Exporté en clair hors de ce module.                            *)
+(* *********************************************************************** *)
 value image_and_size conf base p image_size =
   if not conf.no_image && authorized_age conf base p then
     match sou base (get_image p) with
