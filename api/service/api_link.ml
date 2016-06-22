@@ -489,7 +489,7 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
               (fun pl ifam ->
                 let fam = foi base ifam in
                 List.fold_left
-                  (fun pl ic -> (ic, gen - 1) :: pl)
+                  (fun pl ic -> if gen - 1 <= -nb_desc then pl else (ic, gen - 1) :: pl)
                   pl (Array.to_list (get_children fam)))
               pl fam
           in
