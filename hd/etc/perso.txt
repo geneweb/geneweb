@@ -16,6 +16,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.js;
   %include.css;
   %base_header;

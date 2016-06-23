@@ -6,6 +6,7 @@
   <meta name="format-detection" content="telephone=no"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   %base_header;
 </head>

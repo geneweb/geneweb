@@ -6,6 +6,7 @@
   <meta name="robots" content="none"%/>
   <meta charset=%charset;%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.css;
   %import;js_perso_accesskey;
   <style type="text/css">

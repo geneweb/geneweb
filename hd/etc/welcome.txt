@@ -8,6 +8,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="robots" content="none"%/>
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
   %include.js;
   %include.css;
   %base_header;
