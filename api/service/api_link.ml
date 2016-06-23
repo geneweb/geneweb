@@ -456,6 +456,8 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
                   ((ip, gen) :: accu)
             | None -> loop_asc pl accu
     in
+    (* Récupère les ascendants jusqu'au nombre de générations from_gen_desc. *)
+    (* Utile pour le template affichant les parents des conjoints. *)
     let ipl = loop_asc [(ip, 0)] [] in
     let ipl =
       match ipl with
@@ -464,7 +466,7 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
     in
     let rec loop_desc pl accu =
       match pl with
-      | [] -> accu
+      | [] -> accu (* Retourne accu lorsqu'il n'y a plus rien à parcourir. *)
       | (ip, gen) :: pl ->
           let fam = Array.to_list (get_family (poi base ip)) in
           let fam =
@@ -478,6 +480,7 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
             else fam
           in
           let accu =
+            (* Si la génération est inférieure à celle demandée, les données ne sont pas retournées. *)
             if gen <= -nb_desc then accu
             else
               List.fold_left
@@ -489,6 +492,7 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
               (fun pl ifam ->
                 let fam = foi base ifam in
                 List.fold_left
+                  (* Ne récupère pas les descendants si la génération suivante est inférieure à celle demandée. *)
                   (fun pl ic -> if gen - 1 <= -nb_desc then pl else (ic, gen - 1) :: pl)
                   pl (Array.to_list (get_children fam)))
               pl fam
