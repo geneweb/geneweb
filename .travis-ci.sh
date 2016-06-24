@@ -7,6 +7,6 @@ opam install ocamlfind camlp5 depext
 opam depext -i lablgtk
 
 # Build GeneWeb
-./configure
+./configure -cibrew
 make everything
 make distrib
