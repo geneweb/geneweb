@@ -44,6 +44,8 @@ NATIVE=false
 CAMLP5F=
 CAMLP5D=
 CURL=
+PIQI=
+YOJSON=
 LABLGTK2D=+lablgtk2
 LREDIS=
 OREDIS=
@@ -328,7 +330,7 @@ check_flags() {
 check_lablgtk2() {
   if $OCAMLFIND; then
     if ocamlfind query lablgtk2 >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml lablgtk2"
+      print_check_ok "Checking OCaml lablgtk2 (only needed to build gui)"
       LABLGTK2D=`ocamlfind query lablgtk2`
     else
       print_check_warn "Checking OCaml lablgtk2" "NOT FOUND"
@@ -346,6 +348,30 @@ check_curl() {
     else
       print_check_err "Checking OCaml curl" \
           "You need the OCaml dependency curl!"
+    fi
+  fi
+}
+
+check_piqi() {
+  if $API; then
+    if ocamlfind query piqirun >/dev/null 2>&1; then
+      print_check_ok "Checking OCaml piqi"
+      PIQI=`ocamlfind query piqirun`
+    else
+      print_check_err "Checking OCaml piqi" \
+          "You need the OCaml dependency piqi!"
+    fi
+  fi
+}
+
+check_yojson() {
+  if $API; then
+    if ocamlfind query yojson >/dev/null 2>&1; then
+      print_check_ok "Checking OCaml yojson"
+      YOJSON=`ocamlfind query yojson`
+    else
+      print_check_err "Checking OCaml yojson" \
+          "You need the OCaml dependency yojson!"
     fi
   fi
 }
@@ -410,6 +436,8 @@ check_environment() {
   check_api
   check_flags
   check_curl
+  check_piqi
+  check_yojson
   check_redis
   check_re
 }
