@@ -98,7 +98,7 @@
         "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
         "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
     %end;
-    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br%/>
+    <tt>ss2</tt>%if;(evar.cgl != "on")<a href="%prefix;%pp.access;">%end;%pp;%if;(evar.cgl != "on")</a>%end;%pp.title;%pp.dates;<br%/>
     %if;(pp.has_parents)
       %apply;ancestors_horizontally(
         "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
