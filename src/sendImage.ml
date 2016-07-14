@@ -8,6 +8,16 @@ open Gwdb;
 open Hutil;
 open Util;
 
+type image_type = [ JPEG | GIF | PNG ];
+
+value image_types = [ JPEG; GIF; PNG ];
+
+value extension_of_type = fun
+  [ JPEG -> ".jpg"
+  | GIF -> ".gif"
+  | PNG -> ".png" ]
+;
+
 value incorrect conf = do { incorrect_request conf; raise Update.ModErr };
 
 value incorrect_content_type conf base p s =
@@ -213,31 +223,29 @@ value write_file fname content =
   do { output_string oc content; flush oc; close_out oc }
 ;
 
-value move_file_to_old conf typ fname bfname =
-  let old_dir =
-    Filename.concat (Util.base_path ["images"] conf.bname) "old"
-  in
-  if Sys.file_exists (Filename.concat old_dir bfname ^ ".gif") ||
-     Sys.file_exists (Filename.concat old_dir bfname ^ ".jpg") ||
-     Sys.file_exists (Filename.concat old_dir bfname ^ ".png")
-  then
-    try Sys.remove (fname ^ typ) with [ Sys_error _ -> () ]
-  else do {
-    try Unix.mkdir old_dir 0o777 with [ Unix.Unix_error _ _ _ -> () ];
-    try Unix.rename (fname ^ typ) (Filename.concat old_dir bfname ^ typ) with
-    [ Unix.Unix_error _ _ _ -> () ]
-  }
+(* Move fname to old_dir if it exists with some extension.
+   Returns the number of moved files *)
+value move_file_to_old conf fname bfname =
+  List.fold_left (fun cnt typ ->
+    let ext = extension_of_type typ in
+    let new_file = fname ^ ext in
+    if Sys.file_exists new_file then do {
+      let old_dir = Filename.concat (Util.base_path ["images"] conf.bname) "old" in
+      let old_file = Filename.concat old_dir bfname ^ ext in
+      if Sys.file_exists old_file then
+        try Sys.remove old_file with [ Sys_error _ -> () ]
+      else ();
+      try Unix.mkdir old_dir 0o777 with [ Unix.Unix_error _ _ _ -> () ];
+      try Unix.rename new_file old_file with [ Unix.Unix_error _ _ _ -> () ];
+      cnt + 1
+    } else cnt) 0 image_types
 ;
 
 value normal_image_type s =
-  if String.length s > 10 && Char.code s.[0] = 0xff &&
-     Char.code s.[1] = 0xd8 &&
-     (let m = String.sub s 6 4 in m = "JFIF" || m = "Exif")
-  then
-    ".jpg"
-  else if String.length s > 4 && String.sub s 0 4 = "\137PNG" then ".png"
-  else if String.length s > 4 && String.sub s 0 4 = "GIF8" then ".gif"
-  else ""
+  if String.length s > 10 && Char.code s.[0] = 0xff && Char.code s.[1] = 0xd8 then Some JPEG
+  else if String.length s > 4 && String.sub s 0 4 = "\137PNG" then Some PNG
+  else if String.length s > 4 && String.sub s 0 4 = "GIF8" then Some GIF
+  else None
 ;
 
 value string_search s v =
@@ -251,24 +259,24 @@ value string_search s v =
 (* get the image type, possibly removing spurious header *)
 
 value image_type s =
-  let r = normal_image_type s in
-  if r <> "" then (r, s)
-  else
+  match normal_image_type s with
+  [ Some t -> Some (t, s)
+  | None ->
     match string_search s "JFIF" with
     [ Some i when i > 6 ->
         let s = String.sub s (i - 6) (String.length s - i + 6) in
-        (normal_image_type s, s)
+        Some (JPEG, s)
     | _ ->
         match string_search s "\137PNG" with
         [ Some i ->
             let s = String.sub s i (String.length s - i) in
-            (normal_image_type s, s)
+            Some (PNG, s)
         | _ ->
             match string_search s "GIF8" with
             [ Some i ->
                 let s = String.sub s i (String.length s - i) in
-                (normal_image_type s, s)
-            | None -> ("", s) ] ] ]
+                Some (GIF, s)
+            | None -> None ] ] ] ]
 ;
 
 value dump_bad_image conf s =
@@ -295,17 +303,17 @@ value effective_send_ok conf base p file =
     content ^ s
   in
   let (typ, content) =
-    let (x, c) = image_type content in
-    if x = "" then do {
+    match image_type content with
+    [ None -> do {
       let ct = Wserver.extract_param "content-type: " '\n' request in
       dump_bad_image conf content;
       incorrect_content_type conf base p ct
     }
-    else
+    | Some (typ, content) ->
       match p_getint conf.base_env "max_images_size" with
       [ Some len when String.length content > len ->
           error_too_big_image conf base p (String.length content) len
-      | _ -> (x, c) ]
+      | _ -> (typ, content) ] ]
   in
   let bfname = default_image_name base p in
   let bfdir =
@@ -321,14 +329,8 @@ value effective_send_ok conf base p file =
   in
   let fname = Filename.concat bfdir bfname in
   do {
-    if Sys.file_exists (fname ^ ".gif") then
-      move_file_to_old conf ".gif" fname bfname
-    else if Sys.file_exists (fname ^ ".jpg") then
-      move_file_to_old conf ".jpg" fname bfname
-    else if Sys.file_exists (fname ^ ".png") then
-      move_file_to_old conf ".png" fname bfname
-    else ();
-    write_file (fname ^ typ) content;
+    let _moved = move_file_to_old conf fname bfname in
+    write_file (fname ^ (extension_of_type typ)) content;
     let changed =
       U_Send_image (Util.string_gen_person base (gen_person_of_person p))
     in
@@ -374,13 +376,9 @@ value effective_delete_ok conf base p =
   let bfname = default_image_name base p in
   let fname = Filename.concat (Util.base_path ["images"] conf.bname) bfname in
   do {
-    if Sys.file_exists (fname ^ ".gif") then
-      move_file_to_old conf ".gif" fname bfname
-    else if Sys.file_exists (fname ^ ".jpg") then
-      move_file_to_old conf ".jpg" fname bfname
-    else if Sys.file_exists (fname ^ ".png") then
-      move_file_to_old conf ".png" fname bfname
-    else incorrect conf;
+    if move_file_to_old conf fname bfname = 0 then
+      incorrect conf
+    else ();
     let changed =
       U_Delete_image (Util.string_gen_person base (gen_person_of_person p))
     in
