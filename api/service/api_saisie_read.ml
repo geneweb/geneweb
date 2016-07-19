@@ -2908,7 +2908,14 @@ let build_graph_desc_v2 conf base p max_gen =
 let print_graph_tree_v2 conf base =
   let params = get_params conf Mext_read.parse_graph_tree_params in
   let ip = Adef.iper_of_int (Int32.to_int params.Mread.Graph_tree_params.index) in
-  let () = Perso.build_sosa_ht conf base in
+  (* Construction de la base avec calcul des sosas           *)
+  (* Si iz présent, on prend iz comme souche pour le calcul  *)
+  (* Sinon on prend la souche de l'arbre                     *)
+  let () =
+    match params.Mread.Graph_tree_params.indexz with
+      | Some n -> Perso.build_sosa_person_ht conf base (poi base (Adef.iper_of_int (Int32.to_int n)))
+      | None -> Perso.build_sosa_ht conf base
+    in
   let p = poi base ip in
   let max_asc = 12 in
   let nb_asc =
