@@ -17,6 +17,7 @@ value print_ascend : config -> base -> person -> unit;
 value print_what_links : config -> base -> person -> unit;
 
 value build_sosa_ht : config -> base -> unit;
+value build_sosa_person_ht : config -> base -> person -> unit;
 value get_sosa_person : config -> base -> person -> Num.t;
 value get_single_sosa : config -> base -> person -> Num.t;
 value print_sosa : config -> base -> person -> bool -> unit;

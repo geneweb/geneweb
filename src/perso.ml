@@ -411,11 +411,10 @@ value find_sosa conf base a sosa_ref_l t_sosa =
 (* [Type]: (Def.iper, Num.t) Hashtbl.t *)
 value sosa_ht = Hashtbl.create 5003;
 
-
 (* ************************************************************************ *)
-(*  [Fonc] build_sosa_ht : config -> base -> unit                           *)
-(** [Description] : Construit à partir du sosa de référence de la base, la
-      liste de tous ces ancêtres directs et la stocke dans une hashtbl. La
+(*  [Fonc] build_sosa_tree_ht : config -> base -> person -> unit            *)
+(** [Description] : Construit à partir d'une personne la base, la
+      liste de tous ses ancêtres directs et la stocke dans une hashtbl. La
       clé de la table est l'iper de la personne et on lui associe son numéro
       de sosa. Les sosa multiples ne sont représentés qu'une seule fois par
       leur plus petit numéro sosa.
@@ -426,57 +425,86 @@ value sosa_ht = Hashtbl.create 5003;
       - unit
     [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
-value build_sosa_ht conf base =
+value build_sosa_tree_ht conf base person =
   let () = load_ascends_array base in
   let () = load_couples_array base in
+  let nb_persons = nb_of_persons base in
+    let mark = Array.create nb_persons False in
+    (* Tableau qui va socker au fur et à mesure les ancêtres du person. *)
+    (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
+    (* commence à l'indice 1 !                                            *)
+    let sosa_accu =
+      Array.create (nb_persons + 1) (Num.zero, Adef.iper_of_int 0)
+    in
+    let () = Array.set sosa_accu 1 (Num.one, get_key_index person) in
+    let rec loop i len =
+      if i > nb_persons then ()
+      else
+        let (sosa_num, ip) = Array.get sosa_accu i in
+        (* Si la personne courante n'a pas de numéro de sosa, alors il n'y *)
+        (* a plus d'ancêtres car ils ont été ajoutés par ordre croissant.  *)
+        if Num.eq sosa_num Num.zero then ()
+        else do {
+          Hashtbl.add sosa_ht ip sosa_num;
+          let asc = pget conf base ip in
+          (* Ajoute les nouveaux ascendants au tableau des ancêtres. *)
+          match get_parents asc with
+          [ Some ifam ->
+              let cpl = foi base ifam in
+              let z = Num.twice sosa_num in
+              let len =
+                if not mark.(Adef.int_of_iper (get_father cpl)) then do {
+                  Array.set sosa_accu (len + 1) (z, get_father cpl) ;
+                  mark.(Adef.int_of_iper (get_father cpl)) := True ;
+                  len + 1 }
+                else len
+              in
+              let len =
+                if not mark.(Adef.int_of_iper (get_mother cpl)) then do {
+                  Array.set sosa_accu (len + 1) (Num.inc z 1, get_mother cpl);
+                  mark.(Adef.int_of_iper (get_mother cpl)) := True ;
+                  len + 1 }
+              else len
+              in
+              loop (i + 1) len
+          | None -> loop (i + 1) len ]
+        }
+    in
+    loop 1 1
+;
+
+(* ************************************************************************ *)
+(*  [Fonc] build_sosa_ht : config -> base -> unit                           *)
+(** [Description] : Fait appel à la construction de la
+      liste de tous les ancêtres directs de la souche de l'arbre
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value build_sosa_ht conf base =
   match Util.find_sosa_ref conf base with
   [ Some sosa_ref ->
-      let nb_persons = nb_of_persons base in
-      let mark = Array.create nb_persons False in
-      (* Tableau qui va socker au fur et à mesure les ancêtres du sosa_ref. *)
-      (* Attention, on créé un tableau de la longueur de la base + 1 car on *)
-      (* commence à l'indice 1 !                                            *)
-      let sosa_accu =
-        Array.create (nb_persons + 1) (Num.zero, Adef.iper_of_int 0)
-      in
-      let () = Array.set sosa_accu 1 (Num.one, get_key_index sosa_ref) in
-      let rec loop i len =
-        if i > nb_persons then ()
-        else
-          let (sosa_num, ip) = Array.get sosa_accu i in
-          (* Si la personne courante n'a pas de numéro de sosa, alors il n'y *)
-          (* a plus d'ancêtres car ils ont été ajoutés par ordre croissant.  *)
-          if Num.eq sosa_num Num.zero then ()
-          else do {
-            Hashtbl.add sosa_ht ip sosa_num;
-            let asc = pget conf base ip in
-            (* Ajoute les nouveaux ascendants au tableau des ancêtres. *)
-            match get_parents asc with
-            [ Some ifam ->
-                let cpl = foi base ifam in
-                let z = Num.twice sosa_num in
-                let len =
-                  if not mark.(Adef.int_of_iper (get_father cpl)) then do {
-                    Array.set sosa_accu (len + 1) (z, get_father cpl) ;
-                    mark.(Adef.int_of_iper (get_father cpl)) := True ;
-                    len + 1 }
-                  else len
-                in
-                let len =
-                  if not mark.(Adef.int_of_iper (get_mother cpl)) then do {
-                    Array.set sosa_accu (len + 1) (Num.inc z 1, get_mother cpl);
-                    mark.(Adef.int_of_iper (get_mother cpl)) := True ;
-                    len + 1 }
-                else len
-                in
-                loop (i + 1) len
-            | None -> loop (i + 1) len ]
-          }
-      in
-      loop 1 1
+    build_sosa_tree_ht conf base sosa_ref
    | None -> () ]
 ;
 
+(* ************************************************************************ *)
+(*  [Fonc] build_sosa_person_ht : config -> base -> person -> unit          *)
+(** [Description] : Fait appel à la construction de la
+      liste de tous ces ancêtres de la personne passée en argument.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+    [Retour] :
+      - unit
+    [Rem] : Exporté en clair hors de ce module.                             *)
+(* ************************************************************************ *)
+value build_sosa_person_ht conf base person =
+  build_sosa_tree_ht conf base person
+;
 
 (* ******************************************************************** *)
 (*  [Fonc] get_sosa_person : config -> base -> person -> Num.t          *)
