@@ -1850,9 +1850,16 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix with_parents =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let print_person_tree conf base =
-  let ip = get_params conf Mext_read.parse_index_person in
-  let ip = Adef.iper_of_int (Int32.to_int ip.Mread.Index_person.index) in
-  let () = Perso.build_sosa_ht conf base in
+  let params = get_params conf Mext_read.parse_index_person in
+  let ip = Adef.iper_of_int (Int32.to_int params.Mread.Index_person.index) in
+  (* Construction de la base avec calcul des sosas           *)
+  (* Si iz présent, on prend iz comme souche pour le calcul  *)
+  (* Sinon on prend la souche de l'arbre                     *)
+  let () =
+    match params.Mread.Index_person.indexz with
+      | Some n -> Perso.build_sosa_person_ht conf base (poi base (Adef.iper_of_int (Int32.to_int n)))
+      | None -> Perso.build_sosa_ht conf base
+    in
   let p = poi base ip in
   (* cache lien inter arbre *)
   let () = Perso_link.init_cache conf base ip 1 1 1 in
