@@ -491,21 +491,6 @@ value build_sosa_ht conf base =
    | None -> () ]
 ;
 
-(* ************************************************************************ *)
-(*  [Fonc] build_sosa_person_ht : config -> base -> person -> unit          *)
-(** [Description] : Fait appel à la construction de la
-      liste de tous ces ancêtres de la personne passée en argument.
-    [Args] :
-      - conf : configuration de la base
-      - base : base de donnée
-    [Retour] :
-      - unit
-    [Rem] : Exporté en clair hors de ce module.                             *)
-(* ************************************************************************ *)
-value build_sosa_person_ht conf base person =
-  build_sosa_tree_ht conf base person
-;
-
 (* ******************************************************************** *)
 (*  [Fonc] get_sosa_person : config -> base -> person -> Num.t          *)
 (** [Description] : Recherche si la personne passée en argument a un
