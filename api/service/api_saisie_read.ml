@@ -1857,7 +1857,7 @@ let print_person_tree conf base =
   (* Sinon on prend la souche de l'arbre                     *)
   let () =
     match params.Mread.Index_person.indexz with
-      | Some n -> Perso.build_sosa_person_ht conf base (poi base (Adef.iper_of_int (Int32.to_int n)))
+      | Some n -> Perso.build_sosa_tree_ht conf base (poi base (Adef.iper_of_int (Int32.to_int n)))
       | None -> Perso.build_sosa_ht conf base
     in
   let p = poi base ip in
@@ -2920,7 +2920,7 @@ let print_graph_tree_v2 conf base =
   (* Sinon on prend la souche de l'arbre                     *)
   let () =
     match params.Mread.Graph_tree_params.indexz with
-      | Some n -> Perso.build_sosa_person_ht conf base (poi base (Adef.iper_of_int (Int32.to_int n)))
+      | Some n -> Perso.build_sosa_tree_ht conf base (poi base (Adef.iper_of_int (Int32.to_int n)))
       | None -> Perso.build_sosa_ht conf base
     in
   let p = poi base ip in
