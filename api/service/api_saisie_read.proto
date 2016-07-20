@@ -386,6 +386,7 @@ message GraphTreeParams {
   required int32 index = 1;
   optional int32 nb_asc = 2;
   optional int32 nb_desc = 3;
+  optional int32 indexz = 4;
 }
 
 
