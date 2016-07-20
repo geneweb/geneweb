@@ -351,6 +351,7 @@ message Family {
 
 message IndexPerson {
   required int32 index = 1;
+  optional int32 indexz = 2;
 }
 
 message Node {
