@@ -298,3 +298,5 @@ value read_cache_info : config -> cache_info_t;
 value patch_cache_info : config -> string -> (string -> string) -> unit;
 
 value real_nb_of_persons : config -> base -> int;
+
+value get_request_port : list string -> int;
