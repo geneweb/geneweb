@@ -1,5 +1,3 @@
-
-
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
 
@@ -133,8 +131,8 @@ let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
   let data = MLinkext.gen_link_tree_params data `pb in
   let url =
     Printf.sprintf
-      "http://127.0.0.1:2322/%s?m=API_LINK_TREE&input=pb&output=pb&sig=azerty&data=%s"
-      base_prefix (Wserver.encode data)
+      "http://127.0.0.1:%d/%s?m=API_LINK_TREE&input=pb&output=pb&sig=azerty&data=%s"
+      (Util.get_request_port request) base_prefix (Wserver.encode data)
   in
   let res = ref "" in
   Curl.global_init Curl.CURLINIT_GLOBALALL;
