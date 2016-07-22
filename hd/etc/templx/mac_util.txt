@@ -25,14 +25,15 @@
 %define;image_MF(xx,wi_he)
   %if;(wizard and not cancel_links and not xx.is_restricted)
     <a href="%prefix;m=MOD_IND;i=%xx.index;">%end;
-  %if;xx.is_male;
+  %if;(xx.is_male and (not xx.is_obfuscated or not cancel_private_links))
     <img src="%image_prefix;/male.png" title="[M/F]0"%sp;
-  %elseif;xx.is_female;
+  %elseif;(xx.is_female and (not xx.is_obfuscated or not cancel_private_links))
     <img src="%image_prefix;/female.png" title="[M/F]1"%sp;
   %else;
     <img src="%image_prefix;/sexunknown.png" title="?"%sp;
   %end;
-         width="wi_he" height="wi_he" style="border: none" alt=""%/>%nn;
+        width="wi_he" height="wi_he" style="border: none" alt=""%/>%nn;
+  %end;		
   %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
   %sp;
 %end;
@@ -119,7 +120,7 @@
 %define;very_short_display_person(xx)
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
+    %if;(cancel_links or xx.is_restricted or (xx.is_obfuscated and cancel_private_links))%xx;
     %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
   %end;
 %end;
@@ -127,7 +128,7 @@
 %define;very_short_display_person_name(xx)
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx_name;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx_name;
+    %if;(cancel_links or xx.is_restricted or (xx.is_obfuscated and cancel_private_links))%xx_name;
     %else;<a href="%prefix;%xx.access;">%xx_name;</a>%end;
   %end;
 %end;
@@ -150,7 +151,7 @@
         <li>
           %apply;image_MF("xx","13")
           %apply;display_sosa("xx")
-          %if;(cancel_links or xx.is_restricted)%xx;
+          %if;(cancel_links or xx.is_restricted or (xx.is_obfuscated and cancel_private_links))%xx;
           %else;<a href="%prefix;%xx.access;">%xx;</a>%end;%sp;
         </li>%nl;
         %if;xx.has_nobility_titles;

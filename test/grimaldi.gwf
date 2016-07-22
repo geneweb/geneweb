@@ -73,3 +73,4 @@ use_restrict=no
 #public_if_no_date=yes
 #public_if_titles=no
 #use_restrict=no
+#cancel_private_links=no

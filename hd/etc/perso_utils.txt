@@ -74,7 +74,7 @@
 %define;short_display_person(xx)
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
+    %if;(cancel_links or xx.is_restricted or (xx.is_obfuscated and cancel_private_links))%xx;
     %else;<a href="%prefix;%xx.access;">%xx;</a>%end;
   %end;
   %xx.title;%xx.dates;
@@ -83,7 +83,7 @@
 %define;long_display_person(xx)
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%xx;</b>%else;
-    %if;(cancel_links or xx.is_restricted)%xx;
+    %if;(cancel_links or xx.is_restricted or (xx.is_obfuscated and cancel_private_links))%xx;
     %else;<a href="%prefix;%xx.access;">%xx;</a>
     %end;
     %if;xx.has_nobility_titles;

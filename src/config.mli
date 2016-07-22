@@ -71,5 +71,6 @@ type config =
     today : dmy;
     today_wd : int;
     time : (int * int * int);
-    ctime : float }
+    ctime : float;
+    cancel_private_links: mutable bool}
 ;
