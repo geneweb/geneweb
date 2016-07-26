@@ -101,7 +101,6 @@ value log oc tm conf from gauth request script_name contents =
     print_and_cut_if_too_big oc contents;
     output_char oc '\n';
     fprintf oc "  From: %s\n" from;
-    fprintf oc "  Port: %d\n" (Util.get_request_port conf.request);
     if gauth <> "" then fprintf oc "  User: %s\n" gauth else ();
     if conf.wizard && not conf.friend then
       fprintf oc "  User: %s%s(wizard)\n" conf.user
