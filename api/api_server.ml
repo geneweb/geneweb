@@ -1237,8 +1237,15 @@ value make_conf from_addr (addr, request) script_name contents env = do {
     [ Not_found -> False ]
   in
   let wizard_just_friend = if manitou then False else wizard_just_friend in
+  let host =
+    match selected_addr.val with
+    [ Some addr -> addr
+    | None -> try Unix.gethostname () with _ -> "127.0.0.1" ]
+  in
   let conf =
     {from = from_addr;
+     api_host = host;
+     api_port = selected_port.val;
      manitou = manitou;
      supervisor = supervisor;
      cgi = False;

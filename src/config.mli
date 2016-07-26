@@ -22,6 +22,8 @@ and digest_auth_scheme =
 
 type config =
   { from : string;
+    api_host: string;
+    api_port: int;
     manitou : bool;
     supervisor : bool;
     wizard : bool;
