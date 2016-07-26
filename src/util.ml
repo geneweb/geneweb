@@ -3870,19 +3870,6 @@ value record_visited conf ip =
 
 (**/**)
 
-(* request -> int *)
-(* Get the port used by the request to call the server. *)
-(* -1 if the port is not found. *)
-value get_request_port request =
-  (* s: ip:port *)
-  let s = Wserver.extract_param "host: " '\r' request in
-  try
-    let i = String.rindex s ':' in
-    int_of_string (String.sub s (i + 1) ((String.length s) - i - 1))
-  with
-  [ Not_found -> -1 ]
-;
-
 
 (* ************************************************************************ *)
 (*  [Fonc] init_cache_info : config -> unit                                 *)

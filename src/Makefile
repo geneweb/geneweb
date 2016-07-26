@@ -94,7 +94,7 @@ consang.out: $(CONSANG_OBJS)
 consang.opt: $(CONSANG_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) $(STATIC) unix.cmxa $(LIBUNIX) $(CONSANG_OBJS:.cmo=.cmx) -o consang.opt
 
-link.opt: util.cmi
+link.opt: config.cmi
 	$(OCAMLOPT) -I ../api/service -c ../api/service/api_link_tree_piqi.ml
 	$(OCAMLOPT) -I ../api/service -c ../api/service/api_link_tree_piqi_ext.ml
 	$(OCAMLOPT) -I ../api/service -package curl -I $(OCURL) curl.cmxa -I ../wserver -c link.ml

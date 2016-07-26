@@ -101,7 +101,6 @@ value log oc tm conf from gauth request script_name contents =
     print_and_cut_if_too_big oc contents;
     output_char oc '\n';
     fprintf oc "  From: %s\n" from;
-    fprintf oc "  Port: %d\n" (Util.get_request_port conf.request);
     if gauth <> "" then fprintf oc "  User: %s\n" gauth else ();
     if conf.wizard && not conf.friend then
       fprintf oc "  User: %s%s(wizard)\n" conf.user
@@ -1237,8 +1236,15 @@ value make_conf from_addr (addr, request) script_name contents env = do {
     [ Not_found -> False ]
   in
   let wizard_just_friend = if manitou then False else wizard_just_friend in
+  let host =
+    match selected_addr.val with
+    [ Some addr -> addr
+    | None -> try Unix.gethostname () with _ -> "127.0.0.1" ]
+  in
   let conf =
     {from = from_addr;
+     api_host = host;
+     api_port = selected_port.val;
      manitou = manitou;
      supervisor = supervisor;
      cgi = False;
