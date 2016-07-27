@@ -81,6 +81,12 @@ let findKeyBySourcenameAndIdGlinks redis bname i =
   filter_bulk l
 ;;
 
+(* connection -> string -> string -> string option *)
+(* Cherche les données d'un bridge en fonction du sourcename et de l'ID du bridge. *)
+let findBridgeDataBySourcenameAndBridgeId redis bname bridge_id =
+  hget redis ("lia.bridges_data." ^ bname) bridge_id
+;;
+
 let json_list_of_string s =
   Yojson.Basic.Util.filter_string
     (Yojson.Basic.Util.to_list
@@ -93,8 +99,25 @@ let get_bridges conf base redis ip =
     findKeyBySourcenameAndRef redis conf.bname (redis_p_key conf base ip)
   with
   | Some s ->
-      (* on récupère tous les ids de ponts *)
-      findBridgesBySourcenameAndIdGlinks redis conf.bname (int_of_string s)
+      (* Récupère tous les IDs de ponts. *)
+      let bridge_ids = findBridgesBySourcenameAndIdGlinks redis conf.bname (int_of_string s) in
+      (* Filtre sur les ponts validés. *)
+      List.fold_left
+        (fun accu bridge_id ->
+          (* Récupère les données du pont. *)
+          match findBridgeDataBySourcenameAndBridgeId redis conf.bname bridge_id
+          with
+           | Some bridge_data ->
+              (* Parsing du JSON. *)
+              let is_validated_bridge = List.hd (Yojson.Basic.Util.filter_string
+                (Yojson.Basic.Util.filter_member "validated" [Yojson.Basic.from_string bridge_data])) in
+              (* Ajoute l'ID du pont à la liste seulement s'il est validé. *)
+              if ((int_of_string is_validated_bridge) == 1) then
+                bridge_id::accu
+              else
+                accu
+           | None -> accu)
+        [] bridge_ids
   | None -> []
 ;;
 
