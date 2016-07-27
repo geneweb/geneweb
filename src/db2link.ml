@@ -96,6 +96,7 @@ value person_fields_arr =
   ("burial_place", fun so -> Obj.repr so.burial_place);
   ("burial_note", fun so -> Obj.repr so.burial_note);
   ("burial_src", fun so -> Obj.repr so.burial_src);
+  ("pevents", fun so -> Obj.repr so.pevents);
   ("psources", fun so -> Obj.repr so.psources)]
 ;
 
@@ -430,6 +431,7 @@ value insert_person1 gen so = do {
         Iochan.output_binary_int (fst gen.g_person_related) (-1);
         Iochan.seek (fst gen.g_person_notes) (int_size * gen.g_pcnt);
         Iochan.output_binary_int (fst gen.g_person_notes) (-1);
+        (*
         Iochan.seek (fst gen.g_person_pevents) (int_size * gen.g_pcnt);
         if so.pevents = [] then
           Iochan.output_binary_int (fst gen.g_person_pevents) (-1)
@@ -438,6 +440,7 @@ value insert_person1 gen so = do {
           let pos = pos_out (snd gen.g_person_pevents) in
           Iochan.output_binary_int (fst gen.g_person_pevents) pos;
         };
+        *)
         gen.g_pcnt := gen.g_pcnt + 1;
       } ]
   }
@@ -1194,6 +1197,38 @@ value compress_type_list_title len field_d e ic = do {
   close_out oc_acc;
 };
 
+value compress_type_list_pevents len field_d e ic = do {
+  let oc_acc = open_out_bin (Filename.concat field_d ("access" ^ e)) in
+  let oc_dat = open_out_bin (Filename.concat field_d ("data" ^ e)) in
+  let oc_ext = open_out_bin (Filename.concat field_d "data2.ext") in
+  let ht = Hashtbl.create 1 in
+  seek_in ic (Db2.first_item_pos len);
+  try
+    let items_cnt = ref 0 in
+    while True do {
+      let pl : list (gen_pers_event int string) = Iovalue.input ic in
+      match pl with
+      [ [_ :: _] -> do {
+          output_binary_int oc_acc (pos_out oc_ext);
+          let pl =
+            List.map
+              (map_pers_event
+                 (fun id -> id)
+                 (Db2out.output_item_compress_return_pos oc_dat ht items_cnt))
+              pl
+          in
+          Iovalue.output oc_ext (pl : list (gen_pers_event int int))
+        }
+      | [] ->
+          output_binary_int oc_acc (-1) ]
+    }
+  with
+  [ End_of_file -> () ];
+  close_out oc_ext;
+  close_out oc_dat;
+  close_out oc_acc;
+};
+
 value compress_type_list_fevents len field_d e ic = do {
   let oc_acc = open_out_bin (Filename.concat field_d ("access" ^ e)) in
   let oc_dat = open_out_bin (Filename.concat field_d ("data" ^ e)) in
@@ -1203,18 +1238,18 @@ value compress_type_list_fevents len field_d e ic = do {
   try
     let items_cnt = ref 0 in
     while True do {
-      let tl : list (gen_fam_event int string) = Iovalue.input ic in
-      match tl with
+      let fl : list (gen_fam_event int string) = Iovalue.input ic in
+      match fl with
       [ [_ :: _] -> do {
           output_binary_int oc_acc (pos_out oc_ext);
-          let tl =
+          let fl =
             List.map
               (map_fam_event
                  (fun id -> id)
                  (Db2out.output_item_compress_return_pos oc_dat ht items_cnt))
-              tl
+              fl
           in
-          Iovalue.output oc_ext (tl : list (gen_fam_event int int))
+          Iovalue.output oc_ext (fl : list (gen_fam_event int int))
         }
       | [] ->
           output_binary_int oc_acc (-1) ]
@@ -1283,6 +1318,7 @@ value compress_fields nper nfam tmp_dir =
      ("person", "qualifiers", compress_type_list_string, nper);
      ("person", "surnames_aliases", compress_type_list_string, nper);
      ("person", "titles", compress_type_list_title, nper);
+     ("person", "pevents", compress_type_list_pevents, nper);
      ("family", "fevents", compress_type_list_fevents, nfam)]
 ;
 

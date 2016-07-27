@@ -390,22 +390,12 @@ value person2_fun =
          (map_title_strings (fun pos -> Istr2 db2 ("person", "titles") pos))
          list;
      get_pevents (db2, i) =
-       let pos = get_field_acc db2 i ("person", "pevents") in
-       if pos = -1 then []
-       else
-         let list = get_field_data db2 pos ("person", "pevents") "data" in
-         List.map
-           (map_pers_event (fun x -> x) (fun _ -> Istr2 db2 ("", "") (-1)))
-           list;
-     (*
-     get_pevents (db2, i) =
        let list = get_list_field db2 i ("person", "pevents") in
        List.map
-         (map_fam_event
+         (map_pers_event
            (fun x -> x)
            (fun pos -> Istr2 db2 ("person", "pevents") pos))
          list;
-        *)
      gen_person_of_person pp =
        {first_name = self.get_first_name pp; surname = self.get_surname pp;
         occ = self.get_occ pp; image = self.get_image pp;
