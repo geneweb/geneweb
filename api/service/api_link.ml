@@ -12,15 +12,9 @@ open Redis
 open Redis_sync.Client
 
 
-(* base redis contenant tous les liens. *)
-let redis_host_all = ref "127.0.0.1" ;;
-let redis_port_all = ref 6379 ;;
-(* base redis contenant tous les liens modérés. *)
-let redis_host_moderate = ref "127.0.0.1" ;;
-let redis_port_moderate = ref 6379 ;;
 (* base redis utilisée. *)
-let redis_host = ref !redis_host_all ;;
-let redis_port = ref !redis_port_all ;;
+let redis_host = ref "127.0.0.1" ;;
+let redis_port = ref 6379 ;;
 let api_servers = ref [] ;;
 
 
@@ -93,7 +87,10 @@ let json_list_of_string s =
        (Yojson.Basic.from_string s))
 ;;
 
-let get_bridges conf base redis ip =
+(* conf -> base -> connection -> ip -> bool *)
+(* Permet de récupérer les ponts d'une personne (en utilisant son index). *)
+(* include_not_validated : booléen indiquant l'inclusion ou non des ponts non validés. *)
+let get_bridges conf base redis ip include_not_validated =
   (* on récupère la clé *)
   match
     findKeyBySourcenameAndRef redis conf.bname (redis_p_key conf base ip)
@@ -108,21 +105,30 @@ let get_bridges conf base redis ip =
           match findBridgeDataBySourcenameAndBridgeId redis conf.bname bridge_id
           with
            | Some bridge_data ->
-              (* Parsing du JSON. *)
-              let is_validated_bridge = List.hd (Yojson.Basic.Util.filter_string
-                (Yojson.Basic.Util.filter_member "validated" [Yojson.Basic.from_string bridge_data])) in
-              (* Ajoute l'ID du pont à la liste seulement s'il est validé. *)
-              if ((int_of_string is_validated_bridge) == 1) then
+              (* Les ponts ne sont pas filtrés si les ponts non validés sont inclus. *)
+              if include_not_validated then
                 bridge_id::accu
               else
-                accu
+                (* Parsing du JSON. *)
+                let is_validated_bridge = List.hd (Yojson.Basic.Util.filter_string
+                  (Yojson.Basic.Util.filter_member "validated" [Yojson.Basic.from_string bridge_data])) in
+                (* Ajoute l'ID du pont à la liste seulement s'il est validé. *)
+                if ((int_of_string is_validated_bridge) == 1) then
+                  bridge_id::accu
+                else
+                  accu
            | None -> accu)
         [] bridge_ids
   | None -> []
 ;;
 
-let get_links conf base redis ip =
-  match get_bridges conf base redis ip with
+(* conf -> base -> connection -> ip -> bool *)
+(* Permet de récupérer les liens d'une personne (en utilisant son index). *)
+(* include_not_validated : booléen indiquant l'inclusion ou non des liens non validés. *)
+let get_links conf base redis ip include_not_validated =
+  (* L'inclusion ou non des liens non validés se fait lors de la récupération des ponts. *)
+  (* On pourrait aussi le faire au niveau des liens puisqu'ils contiennent également l'information validated. *)
+  match get_bridges conf base redis ip include_not_validated with
   | [] -> []
   | l ->
       (* on récupère les liens associées *)
@@ -575,11 +581,11 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
         else headers
       in
       let headers =
-        let redis_moderate =
-          Wserver.extract_param "redis-moderate: " '\r' request
+        let include_not_validated =
+          Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' request
         in
-        if redis_moderate <> "" then
-          ("Redis-Moderate: " ^ redis_moderate) :: headers
+        if include_not_validated <> "" then
+          ("Inter-Tree-Links-Include-Not-Validated: " ^ include_not_validated) :: headers
         else headers
       in
       Curl.set_httpheader connection headers;
@@ -623,20 +629,11 @@ let print_link_tree conf base =
   let from_gen_desc = Int32.to_int params.MLink.Link_tree_params.from_gen_desc in
   let nb_desc = Int32.to_int params.MLink.Link_tree_params.nb_desc in
 
-  (* Choix de la base redis en fonction du header envoyé. *)
-  let redis_moderate =
-    Wserver.extract_param "redis-moderate: " '\r' conf.request
+  (* Gestion de l'inclusion des not validated. *)
+  let include_not_validated =
+    let h_include_not_validated = Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' conf.request in
+    if h_include_not_validated = "1" then true else false
   in
-  if redis_moderate <> "" then
-    begin
-      redis_host := !redis_host_moderate;
-      redis_port := !redis_port_moderate;
-    end
-  else
-    begin
-      redis_host := !redis_host_all;
-      redis_port := !redis_port_all;
-    end;
 
   let redis = create_redis_connection () in
 
@@ -819,7 +816,7 @@ let print_link_tree conf base =
     List.fold_left
       (fun accu p ->
         let ip = Adef.iper_of_int (Int32.to_int p.MLink.Person.ip) in
-        let bl = get_bridges conf base redis ip in
+        let bl = get_bridges conf base redis ip include_not_validated in
         List.fold_left
           (fun accu s ->
              match Link.nsplit s ':' with
@@ -861,7 +858,7 @@ let print_link_tree conf base =
         else
           begin
             Hashtbl.add ht_request ip ();
-            let links = get_links conf base redis ip in
+            let links = get_links conf base redis ip include_not_validated in
             List.fold_left
               (fun (accu_fam, accu_pers, accu_conn) s ->
                 List.fold_left
@@ -927,7 +924,7 @@ let print_link_tree conf base =
       let persons = loop [(ip_local, 0)] [] in
       List.fold_left
         (fun (accu_fam, accu_pers, accu_conn) (ip, gen) ->
-           let links = get_links conf base redis ip in
+           let links = get_links conf base redis ip include_not_validated in
            List.fold_left
              (fun (accu_fam, accu_pers, accu_conn) s ->
                 List.fold_left
