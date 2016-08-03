@@ -155,12 +155,12 @@ let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
         else headers
       in
       let headers =
-        (* On ajoute dans les headers la base redis que l'on veut utiliser. *)
-        let redis_moderate =
-          Wserver.extract_param "redis-moderate: " '\r' request
+        (* On ajoute dans les headers l'inclusion des not validated. *)
+        let include_not_validated =
+          Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' request
         in
-        if redis_moderate <> "" then
-          ("Redis-Moderate: " ^ redis_moderate) :: headers
+        if include_not_validated <> "" then
+          ("Inter-Tree-Links-Include-Not-Validated: " ^ include_not_validated) :: headers
         else headers
       in
       Curl.set_httpheader connection headers;
