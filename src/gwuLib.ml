@@ -21,6 +21,7 @@ open Printf;
 
 (* Backward compatibility option before the additional fields. *)
 value old_gw = ref False;
+value std_fields = ref True;
 
 value put_events_in_notes base p =
   (* Si on est en mode old_gw, on mets tous les évènements *)
@@ -363,6 +364,7 @@ value print_title oc base t =
 ;
 
 value print_infos oc base is_child csrc cbp p =
+  let use_std_fields = old_gw.val || std_fields.val in
   do {
     List.iter (print_first_name_alias oc base) (get_first_names_aliases p);
     List.iter (print_surname_alias oc base) (get_surnames_aliases p);
@@ -382,9 +384,10 @@ value print_infos oc base is_child csrc cbp p =
     | Private -> fprintf oc " #apriv" ];
     print_if_no_empty oc base "#occu" (get_occupation p);
     print_if_not_equal_to csrc oc base "#src" (get_psources p);
-    match Adef.od_of_codate (get_birth p) with
-    [ Some d -> do { fprintf oc " "; print_date oc d }
-    | _ ->
+    if use_std_fields then do {
+      match Adef.od_of_codate (get_birth p) with
+      [ Some d -> do { fprintf oc " "; print_date oc d }
+      | _ ->
         if get_baptism p <> Adef.codate_None then ()
         else
           match get_death p with
@@ -396,13 +399,20 @@ value print_infos oc base is_child csrc cbp p =
               p_first_name base p <> "?" && p_surname base p <> "?" ->
               fprintf oc " 0"
           | _ -> () ] ];
-    print_if_not_equal_to cbp oc base "#bp" (get_birth_place p);
-    print_if_no_empty oc base "#bs" (get_birth_src p);
-    match Adef.od_of_codate (get_baptism p) with
-    [ Some d -> do { fprintf oc " !"; print_date oc d }
-    | _ -> () ];
-    print_if_no_empty oc base "#pp" (get_baptism_place p);
-    print_if_no_empty oc base "#ps" (get_baptism_src p);
+      print_if_not_equal_to cbp oc base "#bp" (get_birth_place p);
+      print_if_no_empty oc base "#bs" (get_birth_src p);
+      match Adef.od_of_codate (get_baptism p) with
+      [ Some d -> do { fprintf oc " !"; print_date oc d }
+      | _ -> () ];
+      print_if_no_empty oc base "#pp" (get_baptism_place p);
+      print_if_no_empty oc base "#ps" (get_baptism_src p)
+    } else
+      match Adef.od_of_codate (get_birth p) with
+      [ Some d ->
+          fprintf oc " 0(B)"
+      | _ when p_first_name base p <> "?" && p_surname base p <> "?" ->
+          fprintf oc " 0"
+      | _ -> ()];
     match get_death p with
     [ Death dr d ->
         do {
@@ -413,7 +423,10 @@ value print_infos oc base is_child csrc cbp p =
           | Executed -> fprintf oc "e"
           | Disappeared -> fprintf oc "s"
           | _ -> () ];
-          print_date oc (Adef.date_of_cdate d)
+          if use_std_fields then
+            print_date oc (Adef.date_of_cdate d)
+          else
+            fprintf oc "0(D)"
         }
     | DeadYoung -> fprintf oc " mj"
     | DeadDontKnowWhen -> fprintf oc " 0"
@@ -425,11 +438,13 @@ value print_infos oc base is_child csrc cbp p =
         | _ -> () ]
     | OfCourseDead -> fprintf oc " od"
     | NotDead -> () ];
-    print_if_no_empty oc base "#dp" (get_death_place p);
-    print_if_no_empty oc base "#ds" (get_death_src p);
-    print_burial oc base (get_burial p);
-    print_if_no_empty oc base "#rp" (get_burial_place p);
-    print_if_no_empty oc base "#rs" (get_burial_src p)
+    if use_std_fields then do {
+      print_if_no_empty oc base "#dp" (get_death_place p);
+      print_if_no_empty oc base "#ds" (get_death_src p);
+      print_burial oc base (get_burial p);
+      print_if_no_empty oc base "#rp" (get_burial_place p);
+      print_if_no_empty oc base "#rs" (get_burial_src p)
+    } else ()
   }
 ;
 
@@ -880,11 +895,14 @@ value has_infos_isolated base p =
 
 value print_family oc base gen m =
   let fam = m.m_fam in
+  let use_std_fields = old_gw.val || std_fields.val in
   do {
     fprintf oc "fam ";
     print_parent oc base gen fam m.m_fath;
     fprintf oc " +";
-    print_date_option oc (Adef.od_of_codate (get_marriage fam));
+    if use_std_fields then
+      print_date_option oc (Adef.od_of_codate (get_marriage fam))
+    else ();
     match get_relation fam with
     [ NotMarried -> fprintf oc " #nm"
     | Married -> ()
@@ -906,32 +924,36 @@ value print_family oc base gen m =
         in
         fprintf oc " #nsckm %c%c" (c m.m_fath) (c m.m_moth)
     | NoMention -> fprintf oc " #noment" ];
-    print_if_no_empty oc base "#mp" (get_marriage_place fam);
-    print_if_no_empty oc base "#ms" (get_marriage_src fam);
-    match get_divorce fam with
-    [ NotDivorced -> ()
-    | Separated -> fprintf oc " #sep"
-    | Divorced d ->
+    if use_std_fields then do {
+      print_if_no_empty oc base "#mp" (get_marriage_place fam);
+      print_if_no_empty oc base "#ms" (get_marriage_src fam);
+      match get_divorce fam with
+      [ NotDivorced -> ()
+      | Separated -> fprintf oc " #sep"
+      | Divorced d ->
         let d = Adef.od_of_codate d in
         do { fprintf oc " -"; print_date_option oc d } ];
+    } else ();
     fprintf oc " ";
     print_parent oc base gen fam m.m_moth;
     fprintf oc "\n";
-    Array.iter
-      (fun ip ->
-         if gen.per_sel ip then do {
-           let p = poi base ip in
-           fprintf oc "wit";
-           match get_sex p with
-           [ Male -> fprintf oc " m"
-           | Female -> fprintf oc " f"
-           | _ -> () ];
-           fprintf oc ": ";
-           print_witness oc base gen p;
-           fprintf oc "\n"
-         }
-         else ())
-      (get_witnesses fam);
+    if use_std_fields then do {
+      Array.iter
+        (fun ip ->
+           if gen.per_sel ip then do {
+             let p = poi base ip in
+             fprintf oc "wit";
+             match get_sex p with
+             [ Male -> fprintf oc " m"
+             | Female -> fprintf oc " f"
+             | _ -> () ];
+             fprintf oc ": ";
+             print_witness oc base gen p;
+             fprintf oc "\n"
+           }
+           else ())
+        (get_witnesses fam);
+    } else ();
     let fsources = sou base (get_fsources fam) in
     match fsources with
     [ "" -> ()
@@ -942,9 +964,11 @@ value print_family oc base gen m =
       | _ -> "" ]
     in
     let cbp =
+    if use_std_fields then
       match common_children_birth_place base m.m_chil with
       [ Some s -> do { fprintf oc "cbp %s\n" (s_correct_string s); s }
       | _ -> "" ]
+    else ""
     in
     print_comment_for_family oc base gen fam;
     if not old_gw.val && (get_fevents fam) <> [] then do {
@@ -2004,8 +2028,9 @@ value speclist =
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
      it is Public. All the spouses and descendants are also censored.");
-   ("-old_gw", Arg.Set old_gw, ": Do not export additional fields \
+   ("-old_gw", Arg.Set old_gw, ": Do not export additional fields (events)\
 (for backward compatibility: < 7.00)");
+   ("-no_std_fields", Arg.Clear std_fields, ": Do not export redundant standard fields");
    ("-raw", Arg.Set raw_output,
     "raw output (without possible utf-8 conversion)");
    ("-v", Arg.Set Mutil.verbose, "verbose");
