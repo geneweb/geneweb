@@ -672,7 +672,8 @@ value reconstitute_person conf =
   let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
   let notes =
     if first_name = "?" || surname = "?" then ""
-    else only_printable_or_nl (strip_all_trailing_spaces (get conf "notes"))
+    else
+      Util.sanitize_html (only_printable_or_nl (strip_all_trailing_spaces (get conf "notes")))
   in
   let psources = only_printable (get conf "src") in
   (* Mise à jour des évènements principaux. *)
