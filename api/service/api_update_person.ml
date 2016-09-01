@@ -265,7 +265,7 @@ let reconstitute_person conf base mod_p =
   in
   let notes =
     match mod_p.Mwrite.Person.notes with
-    | Some s -> only_printable_or_nl (Mutil.strip_all_trailing_spaces s)
+    | Some s -> Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces s))
     | None -> ""
   in
   let pevents =
