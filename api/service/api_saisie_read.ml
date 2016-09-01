@@ -11,11 +11,10 @@ open Api_def
 open Api_util
 
 (* ********************************************************************* *)
-(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
+(*  [Fonc] print_error : conf -> code -> unit                            *)
 (** [Description] : Retourne une erreur compréhensible par l'appelant.
     [Args] :
       - conf  : configuration de la base
-      - base  : base de donnée
       - code  : code d'erreur
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                      *)
