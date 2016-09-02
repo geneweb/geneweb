@@ -346,7 +346,7 @@ let reconstitute_person conf base mod_p =
         let note =
           match evt.Mwrite.Pevent.note with
           | Some note ->
-              only_printable_or_nl (Mutil.strip_all_trailing_spaces note)
+              Util.sanitize_html (only_printable_or_nl (Mutil.strip_all_trailing_spaces note))
           | None -> ""
         in
         let src =
