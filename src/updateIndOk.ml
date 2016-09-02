@@ -227,7 +227,7 @@ value rec reconstitute_pevents conf ext cnt =
       in
       let epers_note =
         match get_nth conf "e_note" cnt with
-        [ Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
+        [ Some note -> Util.sanitize_html (only_printable_or_nl (strip_all_trailing_spaces note))
         | _ -> "" ]
       in
       let epers_src =
