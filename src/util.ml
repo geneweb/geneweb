@@ -534,6 +534,20 @@ value clean_html_tags s l =
     s l
 ;
 
+(* ********************************************************************* *)
+(*  [Fonc] value sanitize_html : string -> string                        *)
+(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
+                    les éléments dangereux.
+    [Args] :
+      - html_str : Chaîne de caractères à assainir.
+    [Retour] : La chaîne de caractères assainie.                         *)
+(* ********************************************************************* *)
+value sanitize_html html_str =
+  (* Enlève les évènements DOM. *)
+  let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
+  Str.global_replace regexp_dom_events "" html_str
+;
+
 value hidden_env conf =
   List.iter
     (fun (k, v) ->
