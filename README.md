@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/geneweb/geneweb.png?branch=master)](https://travis-ci.org/geneweb/geneweb)
-[![Build status](https://ci.appveyor.com/api/projects/status/k7e1c67m4hc22491?svg=true)](https://ci.appveyor.com/project/ipfix/geneweb)
-
 # GeneWeb
 
 GeneWeb is an open source genealogy software written in OCaml. It comes
@@ -23,6 +20,19 @@ pull requests, bugs reports, ideas...
 * Wikipedia: https://en.wikipedia.org/wiki/GeneWeb
 
 ## Building the code
+
+### Build status
+
+| [Linux/OSX][lin-link] | [Windows][win-link] |
+| :-------------------: | :-----------------: |
+| ![lin-badge]          | ![win-badge]        |
+
+[lin-link]:  https://travis-ci.org/geneweb/geneweb "Travis build status"
+[lin-badge]: https://travis-ci.org/geneweb/geneweb.svg?branch=master "Travis build status"
+[win-link]:  https://ci.appveyor.com/project/ipfix/geneweb "AppVeyor build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/k7e1c67m4hc22491/branch/master?svg=true "AppVeyor build status"
+
+### Build instructions
 
 1. Install OCaml (http://ocaml.org/)
   1. Install opam (https://opam.ocaml.org/)
