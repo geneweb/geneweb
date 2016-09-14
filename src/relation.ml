@@ -2,14 +2,13 @@
 (* $Id: relation.ml,v 5.22 2008-01-12 01:49:50 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-DEFINE OLD;
-
 open Config;
 open Def;
 open Gutil;
 open Gwdb;
 open Hutil;
 open Util;
+open Dag2html;
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
@@ -24,9 +23,6 @@ type famlink =
   | Mate
   | Child ]
 ;
-
-IFDEF OLD THEN
-open Dag2html;
 
 type dag_ind 'a =
   { di_val : 'a; di_famc : mutable dag_fam 'a; di_fams : mutable dag_fam 'a }
@@ -194,11 +190,6 @@ value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   let hts = Dag.make_tree_hts conf base elem_txt vbar_txt invert set [] d in
   Dag.print_slices_menu_or_dag_page conf base page_title hts next_txt
 ;
-ELSE
-value old_print_relationship_dag conf base elem_txt vbar_txt path next_txt =
-  incorrect_request conf
-;
-END;
 
 value add_common_parent base ip1 ip2 set =
   let a1 = poi base ip1 in

@@ -1,8 +1,6 @@
 (* camlp5r ./pa_html.cmo *)
 (* $Id: dag.ml,v 5.20 2007-09-12 09:58:44 ddr Exp $ *)
 
-DEFINE OLD;
-
 open Config;
 open Dag2html;
 open Def;
@@ -264,7 +262,6 @@ value string_of_item conf base =
 
 (* Print with HTML table tags: <table> <tr> <td> *)
 
-IFDEF OLD THEN
 value print_table conf hts =
   do {
     begin_centered conf;
@@ -308,7 +305,6 @@ value print_table conf hts =
     end_centered conf;
   }
 ;
-END;
 
 (*
  * Print without HTML table tags: using <pre>
@@ -629,7 +625,6 @@ value table_pre_dim conf hts =
   }
 ;
 
-IFDEF OLD THEN
 value print_next_pos conf pos1 pos2 tcol =
   let doit = p_getenv conf.env "notab" = Some "on" in
   if doit then do {
@@ -837,7 +832,6 @@ value print_html_table conf hts =
     else print_table conf hts
   }
 ;
-END;
 
 value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
@@ -937,7 +931,6 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
-IFDEF OLD THEN
 value print_slices_menu conf hts =
   let txt n =
     Util.capitale
@@ -1026,7 +1019,6 @@ value print_dag_page conf base page_title hts next_txt =
     Hutil.trailer conf
   }
 ;
-END;
 
 (* *)
 
@@ -1270,16 +1262,10 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
   }
 ;
 
-IFDEF OLD THEN
 value old_print_slices_menu_or_dag_page conf base page_title hts next_txt =
   if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
   else print_dag_page conf base page_title hts next_txt
 ;
-ELSE
-value old_print_slices_menu_or_dag_page conf base page_title hts next_txt =
-  incorrect_request conf
-;
-END;
 
 value print_slices_menu_or_dag_page conf base page_title hts next_txt =
 (**)
