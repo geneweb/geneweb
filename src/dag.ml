@@ -22,32 +22,6 @@ module Pset =
  end
 ;
 
-(* testing *)
-
-IFDEF TESTING THEN
-value map_dag f d =
-  let a =
-    Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
-  in
-  {dag = a}
-;
-
-value tag_dag d =
-  let c = ref 'A' in
-  map_dag
-    (fun v ->
-       let v = c.val in
-       do {
-         c.val :=
-           if c.val = 'Z' then 'a'
-           else if c.val = 'z' then '1'
-           else Char.chr (Char.code c.val + 1);
-         v
-       })
-    d
-;
-END;
-
 (* input dag *)
 
 value get_dag_elems conf base =
