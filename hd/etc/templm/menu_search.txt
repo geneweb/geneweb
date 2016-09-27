@@ -154,32 +154,4 @@
       </span>
     </div>
   %end;
-  <div id="X_trl"></div>
-  %if;(wizard)
-    <script>
-    <!--
-    function reloadClose()
-    {
-      window.opener.location.reload();
-      parent.close();
-    }
-    var htmlTitle = document.title;
-    if
-    (
-      htmlTitle == "[*person modified]" ||
-      htmlTitle == "[*family modified]" ||
-      htmlTitle == "[*person added]" ||
-      htmlTitle == "[*family added]"
-    )
-    {
-      if (window.opener && !window.opener.closed) 
-      {
-        document.getElementById("menu_search").innerHTML = "";
-        document.getElementById("X_trl").innerHTML = "<a id=\"reloadclose\" href=\"javascript:reloadClose()\">[X]</a>";
-        document.getElementById("reloadclose").focus();
-      }
-    }
-    -->
-    </script>
-  %end;
 %end;

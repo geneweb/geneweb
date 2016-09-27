@@ -1,8 +1,7 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: anclist.txt,v 5.5 2007-07-25 13:15:18 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames branch] -%nn;
     %else
@@ -15,14 +14,16 @@
       %end;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="content-style-type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
+<div class="container-fluid">
 %message_to_wizard;
 
 <h1>%nn;
@@ -98,7 +99,7 @@
         "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
         "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
     %end;
-    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br%/>
+    <samp>ss2</samp><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br%/>
     %if;(pp.has_parents)
       %apply;ancestors_horizontally(
         "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
@@ -521,5 +522,7 @@
 
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

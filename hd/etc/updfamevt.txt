@@ -1,33 +1,20 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: updfamevt.txt,v 0.01 2016-01-24 22:15:30 flh Exp $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
+  <!-- Copyright (c) 1998-2016 INRIA -->
   <title>[*modify::family/families]0</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  %include.js;
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
-
-%if;not cancel_links;
-  <table style="float:%right;">
-    <tr><td>
-      %if;(referer != "")
-        <a href="%referer;">
-          <img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
-        </a>
-      %end;
-      <a href="%prefix;">
-        <img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="^^"%/>
-      </a>
-    </td></tr>
-  </table>
-%end;
+<div class="container">
+%include_perso_header;
 
 <h1>[*changed order of family's events]</h1>
 
@@ -62,8 +49,9 @@
 
 %base_trailer;
 %include.copyr;
-
-<script type="text/javascript">
+</div>
+%include.js;
+<script>
  $('.up').click(function () {
    var $li = $(this).parent();
    $li.find('.pos').val(function(i, old){return --old});
@@ -115,6 +103,5 @@
    });
  });
 </script>
-
 </body>
 </html>

@@ -236,7 +236,9 @@
       <a style="display:none" id="accent0" href="javascript:accent0()" title="[visualize/show/hide/summary]2 [tools]"> – </a>
       <a id="accent1" href="javascript:accent1()" title="[full width/columns]0"> … </a>
     </div>
-    <div id="accent" style="display:none">%include.accent;</div>
+    <div id="accent" style="display:none">
+      %include.accent;
+    </div>
 </fieldset>
 <fieldset class="event">
   <legend style="display:inline-block">[*event/events]1 <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %lpaO; title="[*invert::event/events]1 (Alt+%lpcOk;)">⇳</a></legend>

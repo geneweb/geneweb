@@ -1,5 +1,5 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: forum.txt,v 5.19 2008-01-07 13:29:47 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
@@ -17,16 +17,17 @@
       %message.subject.cut.50;%nn;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
+<div class="container">
 %if;not cancel_links;
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
@@ -338,9 +339,9 @@
       <tr align="%left;"><td colspan="4">%message.date;</td></tr>
     %end;
     <tr align="%left;"%col;>
-    <td><tt>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
-            &nbsp;</tt></td>
-    <td><tt>%message.hour;</tt></td>
+    <td><samp>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
+            &nbsp;</samp></td>
+    <td><samp>%message.hour;</samp></td>
     <td><a href="%prefix;m=FORUM;p=%message.pos;
          "%if;(message.prev_date = "") accesskey="1"%end;%col;
 	 ><b>%message.ident.cut.26;
@@ -365,5 +366,7 @@
 
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

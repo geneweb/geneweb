@@ -20,12 +20,6 @@
       <div id="trl" style="clear:both;">
         <ul>
           <li><a href="%prefix_no_templ;templ=;%suffix;">default</a></li>
-          <li><a href="%prefix_no_templ;templ=templa;%suffix;">templa</a></li>
-          <li><a href="%prefix_no_templ;templ=templb;%suffix;">templb</a></li>
-          <li><a href="%prefix_no_templ;templ=templc;%suffix;">templc</a></li>
-          <li><a href="%prefix_no_templ;templ=templd;%suffix;">templd</a></li>
-          <li><a href="%prefix_no_templ;templ=templf;%suffix;">templf</a></li>
-          <li><a href="%prefix_no_templ;templ=templh;%suffix;">templh</a></li>
           <li><a href="%prefix_no_templ;templ=templm;%suffix;">templm</a></li>
         </ul>
       </div>
@@ -43,8 +37,14 @@
     <a class="dropdown-item" href="%prefix_base;lang=%l1;;templ=%evar.templ;;%suffix;">%l1; %apply;language_name(l1)</a>
   %end;
 %end;
-<div id="footer" class="row m-t-1">
-  <div class="btn-group pull-xs-right m-r-1">
+
+<div id="footer" class="row mt-1">
+  <div class="col-xs-6">
+   <a href="%prefix_no_templ;%end;%suffix;"
+      title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template</a>
+   </div>
+  <div class="col-xs-6">
+  <div class="btn-group pull-right mr-1">
     v. %version; %compilation_time;%sp;
     &copy; INRIA 1998-2016 %connections;%sq;
     <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
@@ -52,17 +52,23 @@
     <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb MediaWiki">
     <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
   </div>
-  <div class="btn-group dropup m-l-1">
-    <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Language
-      <span class="caret"></span>
-    </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-      %apply;language_link()
-    </div>
   </div>
-  %if;(not cancel_links and evar.digest = "")
-    <a type="button" class="btn btn-secondary" href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
-    title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template</a>
+  
+  %if;(not evar.templ="templm")
+    <div class="col-xs-6">
+    <div class="btn-group dropup ml-1">
+      <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Language
+        <span class="caret"></span>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
+        %apply;language_link()
+      </div>
+    </div>
+    %if;(not cancel_links and evar.digest = "")
+      <a type="button" class="btn btn-secondary" href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
+      title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template</a>
+    %end;
+  </div>
   %end;
 </div>

@@ -1,59 +1,59 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: calendar.txt,v 5.9 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
   <title>[*calendar/calendars]1</title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
+<div class="container-fluid">
 
-%if;not cancel_links;
-  <table style="float:%right;"><tr><td>
-    %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
-    %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+%define;arrows()
+  %if;not cancel_links;
+    <table class="col-xs-2 float-xs-%right; mt-2"><tr><td>
+      %if;(referer != "")
+        <a href="%referer;"><img
+         src="%image_prefix;/left.png"%wid_hei;left.png;
+         alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      %end;
+      <a href="%prefix;"><img%sp;
+      src="%image_prefix;/up.png"%wid_hei;up.png;
+      alt="^^" title="^^"%/></a>
+    </td></tr></table>
+  %end;
 %end;
 
-<h1>[*calendar/calendars]1</h1>
-
 %define;fun_day(ccc, nnn)
-  <td><input type="submit" name="dccc1" value=" &lt; "%/></td>
-  <td><input name="dccc" size="2" maxlength="2" value="%date.nnn.day;"%/></td>
-  <td><input type="submit" name="dccc2" value=" &gt; "%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="dccc2">&lt;</button></td>
+  <td><input type="number" class="form-control text-xs-center" name="dccc" min="1" max="31" value="%date.nnn.day;"%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="dccc2">&gt;</button></td>
 %end;
 
 %define;fun_month(ccc, nnn, vvv, lll)
-  <td><input type="submit" name="mccc1" value=" &lt; "%/></td>
-  <td align="center">
-    <select name="mccc">
-      %foreach;integer_range(1, vvv)
-        <option value="%integer;"%nn;
-         %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
-           %apply;capitalize%with;%apply;nth("lll", integer-1)%end;
-        </option>
-      %end;
-    </select>
-  </td>
-  <td><input type="submit" name="mccc2" value=" &gt; "%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="mccc1">&lt;</button></td>
+  <td><select class="form-control" style="width:150px;text-align-last:center;" name="mccc">
+        %foreach;integer_range(1, vvv)
+          <option value="%integer;"%nn;
+           %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
+             %apply;capitalize%with;%apply;nth("lll", integer-1)%end;
+          </option>
+        %end;
+      </select></td>
+  <td><button class="btn btn-secondary" type="submit" name="mccc2">&gt;</button></td>
 %end;
 
 %define;fun_year(ccc, nnn)
-  <td><input type="submit" name="yccc1" value=" &lt; "%/></td>
-  <td><input name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
-  <td><input type="submit" name="yccc2" value=" &gt; "%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="yccc1">&lt;</button></td>
+  <td><input class="form-control text-xs-center" name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="yccc2">&gt;</button></td>
 %end;
 
 %define;fun_julian_year(ccc, nnn)
@@ -63,9 +63,9 @@
       %expr(date.nnn.year - 1)/%expr(date.nnn.year % 10)
     %else;%date.nnn.year;%end;
   %in;
-  <td><input type="submit" name="yccc1" value=" &lt; "%/></td>
-  <td><input name="yccc" size="6" maxlength="6" value="%year;"%/></td>
-  <td><input type="submit" name="yccc2" value=" &gt; "%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="yccc1">&lt;</button></td>
+  <td><input class="form-control text-xs-center" name="yccc" size="6" maxlength="6" value="%year;"%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="yccc2">&gt;</button></td>
 %end;
 
 %define;calendar(ccc, nnn, vvv, lll, fun_yyy)
@@ -82,88 +82,83 @@
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_day("ccc", "nnn")
   %end;
-  <td><input type="submit" name="tccc" value=" = "%/></td>
+  <td><button class="btn btn-secondary" type="submit" name="tccc">=</button></td>
 %end;
 
-<table border="%border;" width="100%%"><tr><td align="center">
-
-<table border="%border;">
-<tr>
-<td align="%left;">
-  - %apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end; -
-  %if;(date.julian_day = today.julian_day)<tt>%time;</tt>%end;
-</td>
-</tr>
-<tr><td align="%left;">&nbsp;</td></tr>
-<tr>
-<td align="center">
-  <form method="get" action="%action;">
-  <p>
-  %hidden;
-  <input type="hidden" name="m" value="CAL"%/>
-  </p>
-  <table border="1">
-  <tr align="%left;">
-  <td>&nbsp;</td>
-  %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
-    <th align="center" colspan="3">[*year/month/day]2</th>
-    <th align="center" colspan="3">[*year/month/day]1</th>
-    <th align="center" colspan="3">[*year/month/day]0</th>
-  %elseif;([ !dates order] = "mmddyyyy")
-    <th align="center" colspan="3">[*year/month/day]1</th>
-    <th align="center" colspan="3">[*year/month/day]2</th>
-    <th align="center" colspan="3">[*year/month/day]0</th>
-  %else;
-    <th align="center" colspan="3">[*year/month/day]0</th>
-    <th align="center" colspan="3">[*year/month/day]1</th>
-    <th align="center" colspan="3">[*year/month/day]2</th>
-  %end;
-  <td>&nbsp;</td>
-  </tr>
-  <tr align="%left;">
-  <th>[*gregorian/julian/french/hebrew]0</th>
-  %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
-  </tr>
-  <tr align="%left;">
-  <th>[*gregorian/julian/french/hebrew]1</th>
-  %apply;calendar("j", "julian", 12, [(month)], "fun_julian_year")
-  </tr>
-  <tr align="%left;">
-  <th>[*gregorian/julian/french/hebrew]2</th>
-  %apply;calendar("f", "french", 13, [(french revolution month)], "fun_year")
-  </tr>
-  <tr align="%left;">
-  <th>[*gregorian/julian/french/hebrew]3</th>
-  %apply;calendar("h", "hebrew", 13, [(hebrew month)], "fun_year")
-  </tr>
-  </table>
-  </form>
-</td>
-</tr>
-<tr>
-<td align="center">
-  %if;(date.moon_phase.index != 0)
-    %apply;capitalize%with;
-      %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
-                 date.moon_phase.index) -%sp;
-      <tt>%date.moon_phase.hour;:%date.moon_phase.minute;</tt> UT
+<div class="row mt-4">
+  <div class="col-xs-8 offset-xs-2 text-xs-center">
+    <h1><span class="fa fa-calendar"></span> [*calendar/calendars]1</h1>
+    <h3 class="mt-4">%apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
+    %if;(date.julian_day = today.julian_day) - <samp>%time;</samp>%end;</h3>
+  </div>
+  %apply;arrows()
+</div>
+<div class="row mt-3">
+  <div class="text-xs-center">
+    <form method="get" action="%action;">
+      <div class="form-inline">
+        %hidden;
+        <input type="hidden" name="m" value="CAL"%/>
+        <table class="table-bordered mx-auto">
+          <thead>
+            <tr>
+              <th></th>
+            %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+              <th class="text-xs-center" colspan="3">[*year/month/day]2</th>
+              <th class="text-xs-center" colspan="3">[*year/month/day]1</th>
+              <th class="text-xs-center" colspan="3">[*year/month/day]0</th>
+            %elseif;([ !dates order] = "mmddyyyy")
+              <th class="text-xs-center" colspan="3">[*year/month/day]1</th>
+              <th class="text-xs-center" colspan="3">[*year/month/day]2</th>
+              <th class="text-xs-center" colspan="3">[*year/month/day]0</th>
+            %else;
+              <th class="text-xs-center" colspan="3">[*year/month/day]0</th>
+              <th class="text-xs-center" colspan="3">[*year/month/day]1</th>
+              <th class="text-xs-center" colspan="3">[*year/month/day]2</th>
+            %end;
+            <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">[*gregorian/julian/french/hebrew]0</th>
+              %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
+            </tr>
+            <tr>
+              <th scope="row">[*gregorian/julian/french/hebrew]1</th>
+              %apply;calendar("j", "julian", 12, [(month)], "fun_julian_year")
+            </tr>
+            <tr>
+              <th scope="row">[*gregorian/julian/french/hebrew]2</th>
+              %apply;calendar("f", "french", 13, [(french revolution month)], "fun_year")
+            </tr>
+            <tr>
+              <th scope="row">[*gregorian/julian/french/hebrew]3</th>
+              %apply;calendar("h", "hebrew", 13, [(hebrew month)], "fun_year")
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </form>
+    %if;(date.moon_phase.index != 0)
+      %apply;capitalize%with;
+        %apply;nth([moon age/new moon/first quarter/full moon/last quarter],
+                   date.moon_phase.index) -%sp;
+        <samp>%date.moon_phase.hour;[:]%date.moon_phase.minute;</samp> UT
+      %end;
     %end;
-  %end;
-  <br%/>
-  <span style="font-size:80%%">(%nn;
-    [moon age/new moon/first quarter/full moon/last quarter]0%sp;
-    = %date.moon_age;)</span>
-  <br%/><br%/>
-  [*julian day]:%sp;
-    %if;(date.julian_day < 1000)%date.julian_day;
-    %else;%date.julian_day.sep1000;%end;
-</td>
-</tr>
-</table>
-
-</td></tr></table>
-
+    <br>
+    <span>%nn;[*moon age/new moon/first quarter/full moon/last quarter]0[:]%sp;
+      %date.moon_age;</span>
+    <br><br>
+    [*julian day][:]%sp;
+      %if;(date.julian_day < 1000)%date.julian_day;
+      %else;%date.julian_day.sep1000;%end;
+  </div>
+</div>
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

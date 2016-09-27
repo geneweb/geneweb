@@ -1,18 +1,18 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: annivmenu.txt,v 0.01 2012-05-31 147:40:30 flh Exp $ -->
   <!-- Copyright (c) 2006-2007 INRIA -->
-  <title>[*anniversaries]</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
-
+<div class="container">
 %if;not cancel_links;
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
@@ -44,6 +44,7 @@
 
 %base_trailer;
 %include.copyr;
-
+</div>
+%include.js;
 </body>
 </html>

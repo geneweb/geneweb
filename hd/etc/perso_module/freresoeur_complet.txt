@@ -1,4 +1,4 @@
-<!--  Freres et soeurs simple -->
+<!--  perso_module/freresoeur_complet -->
 
 %if;has_siblings;
   <h3 class="highlight">
@@ -11,11 +11,9 @@
   <ul>
     %let;cur;%index;%in;
     %foreach;father.child;
-      %if;(bvar.full_siblings="yes")
-        %apply;long_display_siblings()
-      %else;
-        %if;(index!=cur)
-          %apply;long_display_siblings()
+      %if;(bvar.full_siblings="yes" or index!=cur)
+        %if;(father.nb_families > 1 or mother.nb_families > 1)<li class="list-unstyled"><ul>%apply;long_display_siblings()</ul></li>
+        %else;%apply;long_display_siblings()
         %end;
       %end;
     %end;
@@ -40,15 +38,15 @@
     %let;half_mother;%count;%in;
     %if;(half_father != 0 or half_mother != 0)
       <h3 class="highlight">[*half siblings]</h3>
-      <table border="%border;" width="100%%">
+      <table style="border:%border;;width:100%">
         <tr>
           %if;(half_father != 0)
-            <td width="50%%">
+            <td style="width:50%">
               [*on %s's side:::] %apply;long_display_person("father")
             </td>
           %end;
           %if;(half_mother != 0)
-            <td width="50%%">
+            <td style="width:50%">
               [*on %s's side:::] %apply;long_display_person("mother")
             </td>
           %end;
@@ -61,14 +59,14 @@
                   <ul>
                     %apply;li_SD("spouse")
                       [with] %apply;long_display_person("spouse")
-                      %if;has_children;
-                        <ul>
-                          %foreach;child;
-                            %apply;long_display_siblings()
-                          %end;
-                        </ul>
-                      %end;
                     </li>
+                    %if;has_children;
+                      <li class="list-unstyled"><ul>
+                        %foreach;child;
+                          %apply;long_display_siblings()
+                        %end;
+                      </ul></li>
+                    %end;
                   </ul>
                 %end;
               %end;
@@ -81,14 +79,14 @@
                   <ul>
                     %apply;li_SD("spouse")
                       [with] %apply;long_display_person("spouse")
-                      %if;has_children;
-                        <ul>
-                          %foreach;child;
-                            %apply;long_display_siblings()
-                          %end;
-                        </ul>
-                      %end;
                     </li>
+                    %if;has_children;
+                      <li class="list-unstyled"><ul>
+                        %foreach;child;
+                          %apply;long_display_siblings()
+                        %end;
+                      </ul></li>
+                      %end;
                   </ul>
                 %end;
               %end;

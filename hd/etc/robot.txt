@@ -1,12 +1,16 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <title>Access refused</title>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta name="robots" content="none"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+%include.css;
 </head>
 <body>
+<div class="container">
 <h1>Access refused</h1>
 
 <p>This address has been considered to be a robot and its access has
@@ -14,5 +18,6 @@ been automatically disconnected.</p>
 <p>Contact the site administrator to restore it.</p>
 
 %copyright_nologo;
+</div>
 </body>
 </html>

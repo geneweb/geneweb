@@ -1,4 +1,10 @@
-﻿%( Template notes v 7.00b 2014/10/17 09:00:00 ddr/dd %)
+﻿%( Template perso_module/notes_events.txt v 7.00b 2014/10/17 09:00:00 ddr/dd %)
+<div id ="link_pages">
+  %if;(not cancel_links and has_linked_pages)
+    (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
+  %end;
+</div>
+
   %reset_count;
   %if;has_linked_page.BNOTE;%incr_count;%end;
   %if;has_notes;%incr_count;%end;
@@ -16,9 +22,8 @@
   %end;
   %if;(count>0)
     <h3 id="notes" class="highlight">[*note/notes]1</h3>
-    <blockquote>
-      %if;has_linked_page.BNOTE;
-        %apply;capitalize(linked_page.BNOTE).
+      %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
+        <blockquote>%apply;capitalize(linked_page.BNOTE).</blockquote>
       %end; 
       %if;has_notes;
         <h5 class="highlight">[*individual notes]</h5>
@@ -34,7 +39,7 @@
       %end;
       %foreach;family;
         %if;(has_comment or has_marriage_note)
-          <h5 class="highlight">[*marriage notes]0%sp;
+          <h5 class="highlight">[*marriage notes/marriages notes]0%sp;
           [with] %spouse.first_name; %spouse.surname;</h5>
         %end;
         <blockquote>%nn;
@@ -63,10 +68,9 @@
           %end;
         %end;
       %end;
-      %if;has_linked_page.NOTE;
-        %apply;capitalize(linked_page.NOTE).
+      %if;(has_linked_page.NOTE and linked_page.NOTE!="")
+        <blockquote>%apply;capitalize(linked_page.NOTE).</blockquote>
       %end;
-    </blockquote>
     %nl;
   %end;
   %reset_count;

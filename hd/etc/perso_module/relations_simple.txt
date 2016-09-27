@@ -1,0 +1,102 @@
+%( Template perso_module/relations.txt v 7.00b 27/09/2016 16:21:08 %)
+
+%define;relations_tree(z1)
+    %reset_count;
+     href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
+      %foreach;relation;
+        %if;(has_relation_him)
+          %incr_count;i%count;=%relation_him.index;;t%count;=%relation_him.type;;%nn;
+          %incr_count;%nn;
+          i%count;=z1;%nn;
+        %end;
+        %if;(has_relation_her)
+          %incr_count;i%count;=%relation_her.index;;t%count;=%relation_her.type;;%nn;
+          %incr_count;%nn;
+          i%count;=z1;%nn;
+        %end;
+      %end;
+      %foreach;related;
+        %incr_count;i%count;=%related.index;;t%count;=%related_type;;%nn;
+        %incr_count;%nn;
+        i%count;=z1;%nn;
+      %end;
+      %foreach;event_witness_relation;
+        %incr_count;%nn;
+        i%count;=%event_witness_relation.person.index;;%nn;
+        t%count;=%event_witness_relation.event.name;;%nn;
+        %incr_count;%nn;
+        i%count;=z1;%nn;
+      %end;
+      %incr_count;%nn;
+      i%count;=%index;;%nn;
+      t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
+      %if;browsing_with_sosa_ref;
+        %incr_count;%nn;
+        i%count;=%sosa_ref.index;;%nn;
+        t%count;=sosa_1;%nn;
+      %end;
+    " title="[*relations tree]"
+     %reset_count;
+%end;
+
+%if;has_relations;
+  %reset_count;
+  %foreach;relation;%if;(has_relation_him or has_relation_her)%incr_count;%end;%end;
+  %foreach;related;%incr_count;%end;
+  %foreach;event_witness_relation;%incr_count;%end;
+  %let;cnt;%count;%in;
+  %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
+  <h3 class="highlight">[*relation/relations]1%nn;
+    %if;(not cancel_links and cnt>1)
+      <a %apply;relations_tree(l_ref)>%nn;
+        <img class="ml-2" src="%image_prefix;/gui_create.png" height="20" alt="Tree"%/>%nn;
+      </a>%nn;
+    %end;
+  </h3>
+  <ul>
+  %foreach;relation;
+    %if;(has_relation_him and has_relation_her)
+      <li>%apply;capitalize(relation_type)[:]%nl;
+        <ul>
+          %apply;li_SDC("relation_him")
+            %apply;image_MF("relation_him","13")
+            %apply;short_display_person("relation_him")
+          </li>
+          %apply;li_SDC("relation_her")
+            %apply;image_MF("relation_her","13")
+            %apply;short_display_person("relation_her")
+          </li>
+        </ul>
+      </li>
+    %elseif;has_relation_him;
+      %apply;li_SDC("relation_him")%apply;capitalize(relation_type)[:]%sp;
+        %apply;image_MF("relation_him","13")
+        %apply;short_display_person("relation_him")
+      </li>
+    %elseif;has_relation_her;
+      %apply;li_SDC("relation_her")%apply;capitalize(relation_type)[:]%sp;
+        %apply;image_MF("relation_her","13")
+        %apply;short_display_person("relation_her")
+      </li>
+    %end;
+  %end;
+  %foreach;related;
+    %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
+      %apply;image_MF("related","13")
+      %apply;short_display_person("related")
+    </li>
+  %end;
+  %foreach;event_witness_relation;
+    %apply;li_SDC("event_witness_relation.person")
+      %apply;capitalize(event_witness_relation_kind)%sp;
+      %if;(event_witness_relation.event.date.year != "")
+        <em>(%event_witness_relation.event.date.year;)</em>%end;
+      [:]%sp;%event_witness_relation.event.name;,%sp;
+      %apply;short_display_person("event_witness_relation.person")
+      %if;(event_witness_relation.event.spouse != "")
+        %sp;[and]
+        %apply;short_display_person("event_witness_relation.event.spouse")
+      %end;
+    </li>
+  %end;</ul>
+%end;

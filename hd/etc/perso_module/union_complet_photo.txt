@@ -1,0 +1,126 @@
+﻿<!--  Union complet photo (from templf) -->
+
+%if;has_families;
+  <h3 id="families" class="highlight">[*marriage/marriages]1%sp;
+   %if;(max_desc_level>0)
+     [and::child/children]1%end;
+   %if;(max_desc_level>1)
+     <span style="font-size: 90%%">, [the grandchildren]</span>%end;
+   %if;(max_desc_level>2)
+     <span style="font-size: 80%%">, [the great-grandchildren]</span>%end;
+  </h3>
+  <ul>
+    %foreach;family;
+      %apply;li_SD("spouse")
+        %if;spouse.has_image;
+          <table style="border-width:%border;">
+            <tr>
+              <td style="vertical-align: middle">
+                 <a href="%spouse.image_html_url;"><img %spouse.image_medium_size;%sp;
+                    src="%spouse.image_url;" style="border: none"%sp;
+                    alt="" title="[image/images]0"%/></a>
+              </td>
+              <td style="vertical-align: middle">
+        %end;
+        %apply;long_married_f("self", "UPPER")%sp;
+        %apply;image_MF("spouse","13")
+        %apply;display_horizontal("spouse")
+        <span style="font-size: 90%%">
+          %if;spouse.has_parents;<em> ([parents][:]
+            %apply;image_MF("spouse.father","13")
+            %apply;short_display_person_f("spouse.father")
+            &nbsp;&amp;&nbsp;
+            %apply;image_MF("spouse.mother","13")
+            %apply;short_display_person_f("spouse.mother"))</em>%nn;
+          %end;
+        </span>%nn;
+        %if;are_divorced;, [divorced]0%divorce_date;%end;
+        %if;are_separated;, [separated]0%end;
+        %if;spouse.has_image;
+              </td>
+            </tr>
+          </table>
+        %end;
+        %if;has_children;
+          %nl;
+          [having as children]0
+          <ul>
+            %foreach;child;
+              %apply;li_SDC("child")
+                %if;child.has_image;
+                  <table style="border-width:%border;">
+                    <tr>
+                      <td style="vertical-align: middle">
+                        <a href="%child.image_html_url;"><img %child.image_small_size;%sp;
+                          src="%child.image_url;" style="border: none"%sp;
+                          alt="" title="[image/images]0"%/></a>
+                      </td>
+                      <td style="vertical-align: middle">
+                %end;
+                %apply;image_MF("child","13")
+                %apply;short_display_person_f("child")
+                %if;child.has_families;
+                  %foreach;child.family;
+                    %if;(family_cnt!=1)
+                      <img width="13" height="13"%sp;
+                        src="%image_prefix;/1pixel.png" alt="1px" title=""%/>%sp;
+                      <em>%child;%child.title;%child.dates;</em>%end;
+                    <em>&nbsp;%apply;long_married_f("child", "lower")</em>
+                    %apply;image_MF("spouse","13")
+                    %apply;short_display_person_f("spouse")%nn;
+                    %if;are_divorced; [divorced]0%divorce_date;%end;
+                    %if;are_separated; [separated]0%end;
+                    %if;(nb_children!=0)
+                      &nbsp;[having as children]0
+                      %if;(child.has_image and family_cnt=1)</td></tr></table>%end;%nl;
+                      <div style="font-size: 90%%">
+                        <ul>
+                          %foreach;child;
+                            %apply;li_SDC("child")
+                              %apply;image_MF("child","11")
+                              %apply;short_display_person_f("child")
+                              %if;child.has_families;
+                                %foreach;child.family;
+                                  %if;(family_cnt!=1)
+                                    <br%/><img width="10" height="10"%sp;
+                                            src="%image_prefix;/1pixel.png" alt="1px" title=""%/>
+                                    <em>%child;%child.title;%child.dates;</em>%nl;%end;
+                                  <em>&nbsp;%apply;long_married_f("child", "lower")</em>
+                                  %apply;image_MF("spouse","11")
+                                  %apply;short_display_person_f("spouse")
+                                  %if;are_divorced; [divorced]0%divorce_date;%end;
+                                  %if;are_separated; [separated]0%end;
+                                  %if;(nb_children!=0)
+                                    &nbsp;[having as children]0[:]
+                                    <div style="font-size: 90%%">%nn;
+                                      %foreach;child;
+                                        %if;(child_cnt!=1) , %end;
+                                          %apply;image_MF("child","10")
+                                          %apply;short_display_person_f("child")
+                                      %end;
+                                    </div>
+                                  %end;
+                                %end;
+                              %end;
+                            </li>
+                          %end;
+                        </ul>
+                      </div>
+                    %else;
+                      %if;(child.has_image and family_cnt=1)
+                        </td></tr></table>
+                      %else;<br%/>%nl;%end;
+                    %end;
+                  %end;
+                %else;
+                  %if;child.has_image;</td></tr></table>%nl;%end;
+                %end;
+              </li>
+            %end;
+          </ul>
+        %end;
+        %if;(evar_opt="from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
+      </li>
+    %end;
+  </ul>
+%end;

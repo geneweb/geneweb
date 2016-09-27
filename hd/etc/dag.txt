@@ -1,5 +1,5 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: dag.txt,v 5.5 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2007 INRIA -->
@@ -8,16 +8,17 @@
       [*display by slices/slice width/overlap/total width]0%nn;
     %else;%head_title;%end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
+<div class="container-fluid">
 %if;not cancel_links;
   <table style="float:%right;"><tr><td>
     %if;(referer != "")
@@ -89,9 +90,8 @@
   </form>
 %else;
   %if;(evar.notab != "on")
-    <div style="text-align:%right;
-    "><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
-       notab=on;slices=on" accesskey="/"><tt>//</tt></a></div>
+    <div class="text-xs-%right"><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
+       notab=on;slices=on" accesskey="/" title="[*display by slices/slice width/overlap/total width]0"><samp>//</sapm></a></div>
   %end;
   %if;(link_next != "")
     <p>
@@ -173,5 +173,7 @@
 
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>
