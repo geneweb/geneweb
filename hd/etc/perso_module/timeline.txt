@@ -1,40 +1,208 @@
-<!-- timeline -->
+<!-- perso_module/timeline -->
 
-%if;has_event;
-  <h3 class="highlight">[*time line] </h3>
+%define;event_tree(z1)
+  %reset_count;
+  href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
+    %foreach;event_witness;
+      %let;enamex;%if;(event_witness_kind=[officer/officer/officers]0)
+                    %if;(event_witness.sex=1)[officer/officer/officers]1%nn;
+                    %else;[officer/officer/officers]0%nn;
+                    %end;
+                  %else;
+                    %event.name;
+                  %end;
+      %in;
+      %incr_count;i%count;=%event_witness.index;;t%count;=%enamex;;%nn;
+      %incr_count;%nn;
+      i%count;=z1;%nn;
+    %end;
+    %if;has_relations;
+      %foreach;relation;
+        %if;(has_relation_him and has_relation_her)
+          %if;(relation_type=[godfather/godmother/godparents]2 and event.name=[baptism])
+            %incr_count;i%count;=%relation_him.index;;t%count;=[godfather/godmother/godparents]0;%nn;
+            %incr_count;%nn;
+            i%count;=z1;%nn;
+            %incr_count;i%count;=%relation_her.index;;t%count;=[godfather/godmother/godparents]1;%nn;
+            %incr_count;%nn;
+            i%count;=z1;%nn;
+          %end;
+        %elseif;has_relation_him;
+          %if;(relation_type=[godfather/godmother/godparents]0 and event.name=[baptism])
+            %incr_count;i%count;=%relation_him.index;;t%count;=[godfather/godmother/godparents]0;%nn;
+            %incr_count;%nn;
+            i%count;=z1;%nn;
+          %end;
+        %elseif;has_relation_her;
+          %if;(relation_type=[godfather/godmother/godparents]1 and event.name=[baptism])
+            %incr_count;i%count;=%relation_him.index;;t%count;=[godfather/godmother/godparents]1;%nn;
+            %incr_count;%nn;
+            i%count;=z1;%nn;
+          %end;
+        %end;
+      %end;
+    %end;
+  %incr_count;%nn;
+  i%count;=%index;;%nn;
+  t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
+  %if;browsing_with_sosa_ref;
+    %incr_count;%nn;
+    i%count;=%sosa_ref.index;;%nn;
+    t%count;=sosa_1;%nn;
+  %end;
+  "%if;(count < 3) style="display:none;"%end; title="[*witness tree]"%nn;
+  %reset_count;
+%end;
+
+%define;relations_tree(z1)
+  %reset_count;
+  href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
+  %foreach;relation;
+    %if;(has_relation_him)
+      %incr_count;i%count;=%relation_him.index;;t%count;=%relation_him.type;;%nn;
+      %incr_count;%nn;
+      i%count;=z1;%nn;
+    %end;
+    %if;(has_relation_her)
+      %incr_count;i%count;=%relation_her.index;;t%count;=%relation_her.type;;%nn;
+      %incr_count;%nn;
+      i%count;=z1;%nn;
+    %end;
+  %end;
+  %foreach;related;
+    %incr_count;i%count;=%related.index;;t%count;=%related_type;;%nn;
+    %incr_count;i%count;=z1;%nn;
+  %end;
+  %foreach;event_witness_relation;
+    %incr_count;i%count;=%event_witness_relation.person.index;;t%count;=%event_witness_relation.event.name;;%nn;
+    %incr_count;i%count;=z1;%nn;
+  %end;
+  %foreach;event;
+    %foreach;event_witness;
+      %incr_count;i%count;=%event_witness.index;;t%count;=%event.name;;%nn;
+      %incr_count;i%count;=z1;%nn;
+    %end;
+  %end;
+  %incr_count;i%count;=%index;;t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
+  %if;browsing_with_sosa_ref;
+    %incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;
+  %end;
+  " title="[*relations tree]"
+   %reset_count;
+%end;
+
+%define;list_witness_of_kind(kindx)
+  %reset_count;
+  %foreach;event_witness;
+    %if;(event_witness_kind = [kindx]0)
+      %incr_count;
+    %end;
+  %end;
+  %let;k_cnt;%count;%in;
+
+  %reset_count;
+  %foreach;event_witness;
+    %incr_count;
+  %end;
+  %let;w_cnt;%count;%in;
+
+  %if;(k_cnt>1)
+    [*kindx]2[:]
+  %elseif(k_cnt=1)
+    %foreach;event_witness
+      %if;(event_witness_kind=[kindx]0)
+        %if;(event_witness.sex=1)[*kindx]1%else;[*kindx]0%end;[:]
+      %end;
+    %end;
+  %end;
+  %reset_count
+  %foreach;event_witness;
+  %if;(event_witness_kind = [kindx]0)
+    %incr_count;
+    %apply;short_display_person("event_witness")
+    %if;(count=k_cnt).
+    %else;
+      %if;(count=k_cnt-1)%sp;[and]%sp;%else;,%sp;%end;
+    %end;
+  %end;
+  %end;
+%end;
+
+%if;(has_event or has_families)
+  %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
+  <h3 class="highlight">[*time line]
+      %if;(not cancel_links)
+        &nbsp;<a %apply;relations_tree(l_ref)><img src="%image_prefix;/gui_create.png" height="20" alt="Tree"/></a>
+      %end;
+  </h3>
   <table>
     %foreach;event;
       <tr>
-        <td valign="top" style="white-space: nowrap;" width="1">
+        <td style="vertical-align:top;white-space: nowrap;">
           <span class="edate">
-            %if;event.has_date;%event.date; :
-            %else;--- :
+            %if;event.has_date;%event.date; - 
+            %else;--- - 
             %end;
           </span>
         </td>
-        <td valign="top">
+        <td style="vertical-align:top;">
           <span>
-            %apply;capitalize(event.name)%sp;
-            %if;event.has_spouse;([with] %event.spouse;)%end;
-            %if;event.has_place; - %event.place;%end;
+            %apply;capitalize(event.name)
+            %if;event.has_spouse;%sp;[with] %event.spouse;%end;
+            %if;(event.has_witnesses and not cancel_links) &nbsp;
+              <a %apply;event_tree(index)>
+              <img src="%image_prefix;/gui_create.png" height="15" alt="Tree"/>
+              </a>
+            %end;
           </span>
-          %if;event.has_witnesses;
-            <p style="margin:0;">
-              %foreach;event_witness;
-                <span>%apply;capitalize(event_witness_kind) :</span>
-                %apply;short_display_person("event_witness")<br/>
+        </td>
+        <td style="vertical-align:top;white-space: nowrap;">
+          <span class="eplace">
+            %if;event.has_place;%event.place;%end;
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2">
+          <span>
+            %if;(event.name=[baptism]) %( %if;(event.e_name="#bapt") ???   %)
+              %if;has_relations;
+                %foreach;relation;
+                  %if;(has_relation_him and has_relation_her)
+                  %if;(relation_type=[godfather/godmother/godparents]2)
+                    [*godfather/godmother/godparents]0%sp;
+                    %apply;short_display_person("relation_him")
+                    %sp;[and]%sp;[godfather/godmother/godparents]1%sp;
+                    %apply;short_display_person("relation_her")
+                  %end;
+                  %elseif;has_relation_him;
+                  %if;(relation_type=[godfather/godmother/godparents]0)
+                    %apply;capitalize(relation_type)[:]%sp;
+                    %apply;short_display_person("relation_him")
+                  %end;
+                  %elseif;has_relation_her;
+                  %if;(relation_type=[godfather/godmother/godparents]1)
+                    %apply;capitalize(relation_type)[:]%sp;
+                    %apply;short_display_person("relation_her")
+                  %end;
+                  %end;
+                %end;
               %end;
-            </p>
+            %end;
+          %if;event.has_witnesses;
+            %apply;list_witness_of_kind("witness/witness/witnesses")
+            %apply;list_witness_of_kind("officer/officer/officers")
           %end;
           %if;event.has_note;
-            <div>%event.note;</div>
+            <div>%apply;capitalize(event.note)</div>  %(supprimer le <p> </p> intégré dans l'Ocaml sans quoi la capitalisation n’est pas possible%)
           %end;
-          %if;event.has_src;
-            <span><em>[*source/sources]1: %event.src;</em></span>
-          %end;
+          </span>
+          <!--%if;event.has_src;
+            <span><em>[*source/sources]1[:]%sp; %event.src;</em></span>  %(mettre les sources dans les sources, non ?! Chronologie bien plus claire sans%)
+          %end;-->
         </td>
       </tr>
     %end;
   </table>
 %end;
-

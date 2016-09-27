@@ -1,8 +1,8 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: perso.txt,v 5.15 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- $Id: perso.txt,v7 10/10/2016 01:22:34 $ -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -12,28 +12,22 @@
       %else;%first_name; %surname;%end;
     %end;
   </title>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
-  %include.js;
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
-%( Because Safari mobile is just a great browser that can't handle events... %)
-%( Added a div with an 'empty event' to handle the modify menu.              %)
-<div onclick="void(0);">
-
-
-%import;perso_utils
-
+<div class="container-fluid">
+%import;perso_header;
 
 %define;init_nb_asc(tplnum)
-  %let;templ;%bvar.module_perso_tplnum;%in
+  %let;templ;%bvar.perso_module_tplnum;%in
   %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
@@ -54,7 +48,7 @@
 %end
 
 %define;init_nb_desc(tplnum)
-  %let;templ;%bvar.module_perso_tplnum;%in
+  %let;templ;%bvar.perso_module_tplnum;%in
   %if;(templ = "union_complet")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
@@ -67,7 +61,7 @@
 %end
 
 %define;init_from_gen_desc(tplnum)
-  %let;templ;%bvar.module_perso_tplnum;%in
+  %let;templ;%bvar.perso_module_tplnum;%in
   %if;(templ = "famille")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
@@ -83,55 +77,141 @@
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;
 
-%include.perso_header;
-
-
-%if;(bvar.module_perso_tplnb="" or bvar.module_perso_tplnb=0)
+%if;(bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)
   %apply;init_cache(3, 2, 2)
-
-  %apply;show_templ("perso_module/etat_civil")
-  %apply;show_templ("perso_module/parent_simple")
-  %apply;show_templ("perso_module/union_simple")
-  %apply;show_templ("perso_module/freresoeur_simple")
-  %apply;show_templ("perso_module/relations")
-  %apply;show_templ("perso_module/timeline")
-  %apply;show_templ("perso_module/notes")
-  %apply;show_templ("perso_module/sources")
-  %apply;show_templ("perso_module/arbre_3gen_v_photo")
+  %if;(has_parents and (father.has_parents or mother.has_parents))
+    <div class="row">
+      %apply;module_collapse%with;<i class="fa fa-list"></i>%and;ancestor%and;active%and;center%end;
+          %if;father.has_parents;
+            <div class="col-xs-%if;(not has_siblings)6%else;4%end;">
+              <h3 class="highlight">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+              <ul class="list-unstyled small">
+                %apply;descendancy_grand_fathers("father","parhigh")
+                %apply;descendancy_grand_mothers("father","parhigh")
+              </ul>
+            </div>
+          %end;
+          <div class="col-xs-4 %if;(not father.has_parents)offset-xs-4%end;">
+            %if;(has_parents and has_siblings)
+              <h3 class="highlight">[*parents], [full siblings]</h3>
+              <ul class="list-unstyled small">
+                %apply;descendancy_grand_fathers("self","parhigh")
+                %apply;descendancy_grand_mothers("self","parhigh")
+              </ul>
+            %end;
+          </div>
+          %if;mother.has_parents;
+            <div class="col-xs-%if;(not has_siblings)6%else;4%end;">
+              <h3 class="highlight">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h3>
+              <ul class="list-unstyled small">
+                %apply;descendancy_grand_fathers("mother","parhigh")
+                %apply;descendancy_grand_mothers("mother","parhigh")
+             </ul>
+            </div>
+          %end;
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      %apply;module_collapse%with;<i class="fa fa-sitemap fa-rotate-180"></i>%and;tree%and;%and;center%end;
+          <div class="col-xs-6 offset-xs-3">
+            %(%apply;show_templ("perso_module/arbre_3gen_v_photo_header") %)
+          </div>
+        </div>
+      </div>
+    </div>
+  %end;
+  <div class="row">
+    <div class="hidden-sm-down">
+      <div class="col-lg-3 push-xs-6 push-md-0">
+        %apply;show_templ("perso_module/parent_simple")
+        %apply;show_templ("perso_module/freresoeur_simple")
+     %( %apply;show_templ("perso_module/fratrie") %)
+      </div>
+    </div>
+    <div class="col-lg-6 pull-xs-3 pull-md-0">
+      %apply;show_templ("perso_module/etat_civil")
+      %( %if;(father.nb_families > 1 and mother.nb_families > 1)%apply;show_templ("perso_module/demifratries")%end; %)
+      %if;(nb_families > 3)
+        %apply;show_templ("perso_module/union_simple")
+      %end;
+      %apply;show_templ("perso_module/timeline")
+    </div>
+        <div class="hidden-sm-up">
+      <div class="col-lg-3">
+        %apply;show_templ("perso_module/parent_simple")
+        %apply;show_templ("perso_module/freresoeur_simple")
+      </div>
+    </div>
+    <div class="col-lg-3">
+      %if;(nb_families < 4)
+        %apply;show_templ("perso_module/union_simple")
+        %apply;show_templ("perso_module/relations_simple")
+   %( %apply;show_templ("perso_module/union_boite")
+      %end;
+      %if;((father.nb_families > 1 and mother.nb_families = 1) or (mother.nb_families > 1 and father.nb_families = 1))
+          %apply;show_templ("perso_module/demifratries")
+      %end; %)
+      %end;
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-10 offset-lg-1">
+      %apply;show_templ("perso_module/notes_simple")
+      %apply;show_templ("perso_module/parent_evolue")
+      %apply;show_templ("perso_module/parent_photo")
+      %apply;show_templ("perso_module/parent_complet")
+      %apply;show_templ("perso_module/parent_complet_photo")
+      %apply;show_templ("perso_module/freresoeur_complet")
+      %apply;show_templ("perso_module/freresoeur_complet_photo")
+      %apply;show_templ("perso_module/union_evolue")
+      %apply;show_templ("perso_module/union_photo")
+      %apply;show_templ("perso_module/union_complet")
+      %apply;show_templ("perso_module/union_complet_photo")
+      %apply;show_templ("perso_module/sources_simple")
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-10 offset-lg-1">
+      %(%apply;show_templ("perso_module/arbre_7gen_v") %)
+    </div>
+  </div>
 %else;
   %reset_count;
-  %for;i;0;bvar.module_perso_tplnb;
+  %for;i;0;bvar.perso_module_tplnb;
     %apply;init_nb_asc(i)
   %end;
   %let;nb_asc;%count;%in
 
   %reset_count;
-  %for;i;0;bvar.module_perso_tplnb;
+  %for;i;0;bvar.perso_module_tplnb;
     %apply;init_from_gen_desc(i)
   %end;
   %let;from_gen_desc;%count;%in
 
   %reset_count;
-  %for;i;0;bvar.module_perso_tplnb;
+  %for;i;0;bvar.perso_module_tplnb;
     %apply;init_nb_desc(i)
   %end;
   %let;nb_desc;%count;%in
 
   %apply;init_cache(nb_asc, from_gen_desc, nb_desc)
   %reset_count;
-
-  %for;i;0;bvar.module_perso_tplnb;
-    %apply;get_templ(i)
-  %end;
+  <div class="row">
+    <div class="col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+      %for;i;0;bvar.perso_module_tplnb;
+        %apply;get_templ(i)
+      %end;
+    </div>
+  </div>
 %end;
 
-<p></p>
-
 %if;(evar.opt = "misc")%misc_names;<p>%end;
-
-%base_trailer;
-%include.copyr;
-
-</div> %( the magic Safari div %)
+%if;(not cancel_links)
+  %include.trl;
+  %include.copyr;
+%end;
+</div>
+%include.js;
 </body>
 </html>

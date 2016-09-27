@@ -1,22 +1,21 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: updmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>[*update]</title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.favicon;
-  %include.js;
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
-%import;perso_utils
-
+<div class="container">
 %include.perso_header;
 
 <h1>%nn;
@@ -135,7 +134,7 @@
   %end;
 </div>
 
-<script type="text/javascript">
+<script>
   function main(ifam) {
     var div_marr = $('div.one_marriage');
     /* Est-ce qu'il y a des familles à masquer ? */
@@ -228,5 +227,7 @@
 
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

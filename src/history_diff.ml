@@ -696,7 +696,7 @@ value highlight_diff arr diff_arr =
     else if diff_arr.(i) then do {
       let j = ref i in
       let accu = ref s in
-      accu.val := accu.val ^ "<span class=\"diff_highlight\">";
+      accu.val := accu.val ^ "<span class=\"mark\">";
       while j.val < Array.length diff_arr && diff_arr.(j.val) do {
         accu.val := accu.val ^ Printf.sprintf "%c" arr.(j.val);
         incr j
@@ -723,9 +723,9 @@ value highlight_diff arr diff_arr =
 value diff_string before after =
   if before = after then (before, after)
   else if before = "" then
-    (before, "<span class=\"diff_highlight\">" ^ after ^ "</span>")
+    (before, "<span class=\"mark\">" ^ after ^ "</span>")
   else if after = "" then
-    ("<span class=\"diff_highlight\">" ^ before ^ "</span>", after)
+    ("<span class=\"mark\">" ^ before ^ "</span>", after)
   else
     let aa = array_of_string after in
     let bb = array_of_string before in

@@ -1,71 +1,124 @@
-%if;(has_birth_date or has_birth_place or
-     has_baptism_date or has_baptism_place or is_dead or is_buried or
-     is_cremated or (has_consanguinity and bvar.show_consang!="no") or
-     has_occupation or has_linked_page.OCCU !="")
-  <!--  Portrait -->
-  %if;(has_image or bvar.default_image="yes")
-    <table border="%border;">
-    <tr>
-      <td valign="top">
-        %if;has_image;
-          <a href="%image_url;" target="_blank">
-            <img src="%image_url;"%image_size; alt="[image/images]0" class="fiche_photo"%/>
-          </a>
-        %elseif;(bvar.default_image="yes")
-          <img src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; 
-           alt="[missing image]" class="fiche_photo"%/>
+<!-- etat_civil -->
+
+<div class="col-md-12">
+  %if;(evar.m!="MOD_IND")
+    <h1 class="display-5">
+      %if;has_public_name;
+        %if;has_qualifiers;%public_name; <em>%qualifier;</em>
+        %else;%public_name; %surname;%end;
+      %else;
+        %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+        %else;
+          %if;cancel_links;%first_name; %surname;
+          %else;
+            <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+            <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+          %end;
         %end;
-      </td>
-      <td valign="top">
-  %end;
-  <!--  <h3 class="etat_civil">[*etat civil]</h3> -->
-  <ul>
-    %if;has_birth_date;
-      <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
-      %if;birthday; ([happy birthday to you!])%end;
-      %if;has_birth_place; - %birth_place;%end;</li>%nl;
-      %if;computable_age;<li>[*age] : %age;</li>%end;
-    %else;
-      %if;has_birth_place;
-        <li>%apply;capitalize(nth([born],sex)) - %birth_place;</li>%nl;
       %end;
-    %end;
-    %if;has_baptism_date;
-      <li>%apply;capitalize(nth([baptized],sex)) %on_baptism_date;
-      %if;has_baptism_place; - %baptism_place;%end;</li>%nl;
-    %else;
-      %if;has_baptism_place;
-        <li>%apply;capitalize(nth([baptized],sex)) - %baptism_place;</li>%nl;
+    </h1>
+    <div class="text-xs-center">
+      %if;has_sosa;
+        <span class="fa fa-dot-circle-o text-success"></span>
+        [*Sosa]
+        %if;cancel_links;%sosa;
+        %else;<a href="%prefix;%sosa_link;">%sosa;</a>
+        %end;
+        <br>
       %end;
-    %end;
-    %if;is_dead;
-      <li>%apply;capitalize(died)
-      %if;has_death_date; %on_death_date;%end;
-      %if;has_death_place; - %death_place;%end;
-      %if;(has_linked_page.DEATH !="") %linked_page.DEATH;%end;
-      %if;computable_death_age;, [age at death:] %death_age;%end;</li>%nl;
-    %end;
-    %if;is_buried;
-      <li>%apply;capitalize(nth([buried],sex))
-      %if;has_burial_date; %on_burial_date;%end;
-      %if;has_burial_place; - %burial_place;%end;</li>%nl;
-    %end;
-    %if;is_cremated;
-      <li>%apply;capitalize(nth([cremated],sex))
-      %if;has_cremation_date; %on_cremation_date;%end;
-      %if;has_cremation_place; - %cremation_place;%end;</li>%nl;
-    %end;
-    %if;has_occupation;
-      <li>%apply;capitalize(occupation)</li>%nl;
-    %end;
-    %if;(has_linked_page.OCCU)
-      <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
-    %end;
-    %if;(has_consanguinity and bvar.show_consang!="no")
-      <li>[*consanguinity] : %consanguinity;</li>%nl;
-    %end;
-  </ul>
-  %if;(has_image or bvar.default_image="yes")
-    </td></tr></table>
+      <!--  Portrait -->
+      %if;(has_image or bvar.default_image="yes")
+        %if;has_image;
+          <a class="rounded" href="%image_url;" target="_blank">
+            <img src="%image_url;"%image_size; class="rounded" alt="[image/images]0"%/>%nn;
+          </a>%nn;
+        %elseif;(bvar.default_image="yes")X
+          <img class="" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; 
+           class="rounded" alt="[missing image]"%/>
+        %end;<br>
+      %end;
+      %if;(has_qualifiers or has_aliases or has_nobility_titles or
+           has_public_name or has_surnames_aliases or has_first_names_aliases or
+           has_linked_page.HEAD)
+        %foreach;qualifier;
+          %if;not is_first;
+            %if;has_public_name;%public_name; %qualifier;
+            %else;%first_name; %qualifier;%end;<br>
+          %end;
+        %end;
+        %foreach;alias;
+          <em><strong>%alias;</strong></em><br>
+        %end;
+        %if;has_nobility_titles;
+          <em>
+          %foreach;nobility_title;
+            %if;not is_first;,
+            %end;
+            %nobility_title;
+          %end;
+          </em><br>
+        %end;
+        %if;(has_linked_page.HEAD and linked_page.HEAD!="")%linked_page.HEAD;<br>%end;
+        %if;(has_public_name or has_qualifiers)
+          <em>(%if;cancel_links;%first_name; %surname;
+               %else;
+                 <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+                 <a href="%prefix;m=N;v=%surname_key;">%surname;</a>%nn;
+               %end;)</em><br%/>
+        %end;
+        %foreach;surname_alias;
+          <em>(%first_name; %surname_alias;)</em><br%/>
+        %end;
+        %foreach;first_name_alias;
+          <em>(%first_name_alias; %surname;)</em><br%/>
+        %end;
+      %end;
+    </div>
+    <ul %if;(not has_image)class="mt-3"%end;>
+      %if;has_birth_date;
+        <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
+        %if;birthday; ([happy birthday to you!])%end;
+        %if;has_birth_place; - %birth_place;%end;</li>%nl;
+        %if;computable_age;<li>[*age][:] %age;</li>%end;
+      %else;
+        %if;has_birth_place;
+          <li>%apply;capitalize(nth([born],sex)) - %birth_place;</li>%nl;
+        %end;
+      %end;
+      %if;has_baptism_date;
+        <li>%apply;capitalize(nth([baptized],sex)) %on_baptism_date;
+        %if;has_baptism_place; - %baptism_place;%end;</li>%nl;
+      %else;
+        %if;has_baptism_place;
+          <li>%apply;capitalize(nth([baptized],sex)) - %baptism_place;</li>%nl;
+        %end;
+      %end;
+      %if;is_dead;
+        <li>%apply;capitalize(died)
+        %if;has_death_date; %on_death_date;%end;
+        %if;has_death_place; - %death_place;%end;
+        %if;computable_death_age;, [age at death:] %death_age;%end;
+        %if;(has_linked_page.DEATH and linked_page.DEATH!="") (%linked_page.DEATH;)%end;</li>%nl;
+      %end;
+      %if;is_buried;
+        <li>%apply;capitalize(nth([buried],sex))
+        %if;has_burial_date; %on_burial_date;%end;
+        %if;has_burial_place; - %burial_place;%end;</li>%nl;
+      %end;
+      %if;is_cremated;
+        <li>%apply;capitalize(nth([cremated],sex))
+        %if;has_cremation_date; %on_cremation_date;%end;
+        %if;has_cremation_place; - %cremation_place;%end;</li>%nl;
+      %end;
+      %if;has_occupation;
+        <li>%apply;capitalize(occupation)</li>%nl;
+      %end;
+      %if;(has_linked_page.OCCU and linked_page.OCCU!="")
+        <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
+      %end;
+      %if;(has_consanguinity and bvar.show_consang!="no")
+        <li>[*consanguinity][:] %consanguinity;</li>%nl;
+      %end;
+    </ul>
   %end;
-%end;
+</div>

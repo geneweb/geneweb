@@ -5,11 +5,11 @@
   <ul>
     %apply;li_SD("father")
       %apply;short_display_person("father")%sp;
-      %if;father.has_occupation;(%apply;capitalize(father.occupation))%nl;%end;
+      %if;father.has_occupation;(%father.occupation;)%nl;%end;
     </li>
     %apply;li_SD("mother")
       %apply;short_display_person("mother")%sp;
-      %if;mother.has_occupation;(%apply;capitalize(mother.occupation))%nl;%end;
+      %if;mother.has_occupation;(%mother.occupation;)%nl;%end;
     </li>
   </ul>
 %end;

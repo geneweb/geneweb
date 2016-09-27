@@ -381,11 +381,15 @@ expand_env=no
 #perso_module_2=union_simple
 #perso_module_3=freresoeur_simple
 #perso_module_4=relations
-#perso_module_5=notes
-#perso_module_6=sources
-#perso_module_7=arbre_3gen_v_photo
+#perso_module_4=relations_events
+#perso_module_5=timeline
+#perso_module_6=notes
+#perso_module_6=notes_events
+#perso_module_7=sources
+#perso_module_7=sources_events
+#perso_module_8=arbre_3gen_v_photo
 # And the number of module
-#perso_module_tplnb=8
+#perso_module_tplnb=9
 # List of available elements :
 # etat_civil
 # parent_simple

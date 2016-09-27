@@ -1,15 +1,41 @@
-
-<div id="footer">
-  <br />
-  <hr />
-  <div>
-    <em>
-      <a href="https://github.com/geneweb/geneweb" target="_blank">
-      <img src="%image_prefix;/logo_bas.png"
-      style="vertical-align: middle; border: 0"
-      alt="GeneWeb" title="GeneWeb"%/></a>%sp;
-      Version %version; %compilation_time;%sp;
-      Copyright &copy; 1998-2016 INRIA%connections;%sq;
-    </em><br%/>
+%define;lang(x)
+  %apply;nth%with;
+    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
+  %and;x%end;
+%end;
+%define;language_link()
+  %for;i;1;30;
+    %let;l1;%apply;lang(i)%in;
+    %if;(l1!=evar.lang)
+      <a class="dropdown-item" href="%prefix_base;lang=%l1;;templ=%evar.templ;;%suffix;">%l1; %apply;language_name(l1)</a>
+    %end;
+  %end;
+%end;
+%define;template_link(xx,yy)
+  <a class="dropdown-item" href="%prefix_no_templ;templ=xx;%suffix;">yy</a>
+%end;
+%if;(not cancel_links and evar.m != "MOD_DATA_OK" and evar.m != "DEL_IND_OK" and evar.m != "DEL_FAM_OK")
+<div class="mt-3 mx-5">
+  <div class="btn-group float-right">
+    v. %version; %compilation_time;%sp;
+    &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2016 %connections;%sq;
+    <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
+    <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
+    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb documentation MediaWiki">
+    <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb Mediawiki"/></a>
+  </div>
+  %if;(not cancel_links and evar.digest = "")
+    <a class="btn btn-secondary" role="button" href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
+     title="[Switch to] %if(evar.templ!="templm")template m%else;defaut template%end;"><span class="fa fa-id-card"></span></a>
+  %end;
+  <div class="btn-group dropup">
+    <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="%if;(evar.lang!="")%apply;capitalize%with;%apply;language_name(evar.lang)%end;%end;">
+      <span class="fa fa-language"></span>
+      <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
+      %apply;language_link()
+    </div>
   </div>
 </div>
+%end;
