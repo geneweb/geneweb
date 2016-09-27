@@ -1,4 +1,4 @@
-<!--  Freres et soeurs simple -->
+<!--  Frères et sœurs simple -->
 
 %if;has_siblings;
   <h3 class="highlight">
@@ -6,6 +6,22 @@
       [*full siblings]
     %else;
       [*siblings]
+    %end;
+    %reset_count;
+    %if;(evar.cgl!="on")
+      %foreach;father.child;
+        %if;is_sibling_before;
+          %incr_count;
+          <a href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))"><span class="fa fa-caret-left text-success"></span></a>%nn;
+        %end;
+      %end;
+      %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
+      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on"><img class="mx-1" src="%image_prefix;/gui_create.png" height="20" style="margin-bottom:6px" alt="Tree"/></a>%nn;
+      %foreach;father.child;
+        %if;is_sibling_after;
+            <a href="%prefix;%child.access;" title="%apply;capitalize(nth([next sibling],sex))"><span class="fa fa-caret-right text-success"></span></a>
+        %end;
+      %end;
     %end;
   </h3>
   <ul>
@@ -40,62 +56,48 @@
     %let;half_mother;%count;%in;
     %if;(half_father != 0 or half_mother != 0)
       <h3 class="highlight">[*half siblings]</h3>
-      <table border="%border;" width="100%%">
-        <tr>
-          %if;(half_father != 0)
-            <td width="50%%">
-              [*on %s's side:::] %apply;short_display_person("father")
-            </td>
-          %end;
-          %if;(half_mother != 0)
-            <td width="50%%">
-              [*on %s's side:::] %apply;short_display_person("mother")
-            </td>
-          %end;
-        </tr>
-        <tr>
-          %if;(father.nb_families > 1 and half_father != 0)
-            <td style="vertical-align: top">
-              %foreach;father.family;
-                %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
-                  <ul>
-                    %apply;li_SD("spouse")
-                      [with] %apply;short_display_person("spouse")
-                      %if;has_children;
-                        <ul>
-                          %foreach;child;
-                            %apply;short_display_siblings()
-                          %end;
-                        </ul>
+      %if;(half_father != 0)
+          [*on %s's side:::] %apply;short_display_person("father")
+        %if;(father.nb_families > 1 and half_father != 0)
+          %foreach;father.family;
+            %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
+              <ul>
+                %apply;li_SD("spouse")
+                  [with] %apply;short_display_person("spouse")
+                  %if;has_children;
+                    <ul>
+                      %foreach;child;
+                        %apply;short_display_siblings()
                       %end;
-                    </li>
-                  </ul>
-                %end;
-              %end;
-            </td>
+                    </ul>
+                  %end;
+                </li>
+              </ul>
+            %end;
           %end;
-          %if;(mother.nb_families > 1 and half_mother != 0)
-            <td style="vertical-align: top">
-              %foreach;mother.family;
-                %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
-                  <ul>
-                    %apply;li_SD("spouse")
-                      [with] %apply;short_display_person("spouse")
-                      %if;has_children;
-                        <ul>
-                          %foreach;child;
-                            %apply;short_display_siblings()
-                          %end;
-                        </ul>
+        %end;
+      %end;
+      %if;(half_mother != 0)
+          [*on %s's side:::] %apply;short_display_person("mother")
+        %if;(mother.nb_families > 1 and half_mother != 0)
+          %foreach;mother.family;
+            %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
+              <ul>
+                %apply;li_SD("spouse")
+                  [with] %apply;short_display_person("spouse")
+                  %if;has_children;
+                    <ul>
+                      %foreach;child;
+                        %apply;short_display_siblings()
                       %end;
-                    </li>
-                  </ul>
-                %end;
-              %end;
-            </td>
+                    </ul>
+                  %end;
+                </li>
+              </ul>
+            %end;
           %end;
-        </tr>
-      </table>
+        %end;
+      %end;
     %end;
   %end;
 %end;

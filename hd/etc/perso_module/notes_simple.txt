@@ -1,4 +1,4 @@
-<!-- notes -->
+%( Template perso_module/notes.txt v 7.00b 27/09/2016 16:36:01 %)
 
 <div id ="link_pages">
   %if;(not cancel_links and has_linked_pages)
@@ -10,12 +10,12 @@
     (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
   <h3 class="highlight">[*note/notes]1</h3>
   <h5 class="highlight">[*individual notes]</h5>
-  <dl><dd>
-    %if;(has_linked_page.BNOTE)
+  <dl><dt></dt><dd>
+    %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
       <p>%apply;capitalize(linked_page.BNOTE).</p>
     %end;
     %notes;
-    %if;(has_linked_page.NOTE)
+    %if;(has_linked_page.NOTE and linked_page.NOTE!="")
       <p>%apply;capitalize(linked_page.NOTE).</p>
     %end;
   </dd></dl>
@@ -30,14 +30,14 @@
     %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
       %if;((count=1) and ((wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
           (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))) 
-        <h5 class="highlight">[*marriage notes]0</h5>
+        <h5 class="highlight">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h5>
       %elseif;(count=1)
-          <h3 class="highlight">[*marriage notes]0</h3>
+          <h3 class="highlight">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h3>
       %end;
-      <dl> 
+      <dl>
         <dt>
           [*marriage with] %spouse.first_name; %spouse.surname;
-          <a href="#wed-note-%count;" name="note-wed-%count;" id="note-wed-%count;" style="text-decoration:none"><sup><font size="3" title="[see] [marriage/marriages]0"> ↑ </font></sup></a>: 
+          <a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0"> ^</a>[:]
         </dt>
         <dd>%comment;</dd>
       </dl>

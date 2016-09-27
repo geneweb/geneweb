@@ -1,6 +1,6 @@
 <!-- $Id: accent.txt,v 5.6 2007-04-04 02:17:36 ddr Exp $ -->
 
-<script type="text/javascript"><!--
+<script><!--
 function write_version_ie(t, v)
 {
   sel = document.selection.createRange();
@@ -39,15 +39,15 @@ function write_ch(v) {
 <a onclick="return write_ch('ä')" href="#">ä</a>
 <a onclick="return write_ch('Ą')" href="#">Ą</a>
 <a onclick="return write_ch('ą')" href="#">ą</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ć')" href="#">Ć</a>
 <a onclick="return write_ch('ć')" href="#">ć</a>
 <a onclick="return write_ch('Ç')" href="#">Ç</a>
 <a onclick="return write_ch('ç')" href="#">ç</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ð')" href="#">Ð</a>
 <a onclick="return write_ch('ð')" href="#">ð</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('É')" href="#">É</a>
 <a onclick="return write_ch('é')" href="#">é</a>
 <a onclick="return write_ch('Ê')" href="#">Ê</a>
@@ -58,7 +58,7 @@ function write_ch(v) {
 <a onclick="return write_ch('ë')" href="#">ë</a>
 <a onclick="return write_ch('Ę')" href="#">Ę</a>
 <a onclick="return write_ch('ę')" href="#">ę</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Í')" href="#">Í</a>
 <a onclick="return write_ch('í')" href="#">í</a>
 <a onclick="return write_ch('Î')" href="#">Î</a>
@@ -67,10 +67,10 @@ function write_ch(v) {
 <a onclick="return write_ch('ì')" href="#">ì</a>
 <a onclick="return write_ch('Ï')" href="#">Ï</a>
 <a onclick="return write_ch('ï')" href="#">ï</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ł')" href="#">Ł</a>
 <a onclick="return write_ch('ł')" href="#">ł</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ń')" href="#">Ń</a>
 <a onclick="return write_ch('ń')" href="#">ń</a>
 <a onclick="return write_ch('Ñ')" href="#">Ñ</a>
@@ -90,14 +90,14 @@ function write_ch(v) {
 <a onclick="return write_ch('õ')" href="#">õ</a>
 <a onclick="return write_ch('Ö')" href="#">Ö</a>
 <a onclick="return write_ch('ö')" href="#">ö</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ś')" href="#">Ś</a>
 <a onclick="return write_ch('ś')" href="#">ś</a>
 <a onclick="return write_ch('ſ')" href="#">ſ</a>
 <a onclick="return write_ch('ß')" href="#">ß</a>
 <a onclick="return write_ch('Þ')" href="#">Þ</a>
 <a onclick="return write_ch('þ')" href="#">þ</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ú')" href="#">Ú</a>
 <a onclick="return write_ch('ú')" href="#">ú</a>
 <a onclick="return write_ch('Ù')" href="#">Ù</a>
@@ -106,12 +106,12 @@ function write_ch(v) {
 <a onclick="return write_ch('û')" href="#">û</a>
 <a onclick="return write_ch('Ü')" href="#">Ü</a>
 <a onclick="return write_ch('ü')" href="#">ü</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ý')" href="#">Ý</a>
 <a onclick="return write_ch('ý')" href="#">ý</a>
 <a onclick="return write_ch('Ÿ')" href="#">Ÿ</a>
 <a onclick="return write_ch('ÿ')" href="#">ÿ</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('Ź')" href="#">Ź</a>
 <a onclick="return write_ch('ź')" href="#">ź</a>
 <a onclick="return write_ch('Ż')" href="#">Ż</a>
@@ -120,14 +120,14 @@ function write_ch(v) {
 <a onclick="return write_ch('½')" href="#">½</a>
 <a onclick="return write_ch('¼')" href="#">¼</a>
 <a onclick="return write_ch('¾')" href="#">¾</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('º')" href="#">º</a>
 <a onclick="return write_ch('¹')" href="#">¹</a>
 <a onclick="return write_ch('²')" href="#">²</a>
 <a onclick="return write_ch('³')" href="#">³</a>
 <a onclick="return write_ch('°')" href="#">°</a>
 <a onclick="return write_ch('ª')" href="#">ª</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('¡')" href="#">¡</a>
 <a onclick="return write_ch('¿')" href="#">¿</a>
 <a onclick="return write_ch('µ')" href="#">µ</a>
@@ -144,7 +144,7 @@ function write_ch(v) {
 <a onclick="return write_ch('«')" href="#">«</a>
 <a onclick="return write_ch('»')" href="#">»</a>
 <a onclick="return write_ch('¶')" href="#">¶</a>
-&nbsp
+&nbsp;
 <a onclick="return write_ch('‡')" href="#">‡</a>
 <a onclick="return write_ch('№')" href="#">№</a>
 <a onclick="return write_ch('×')" href="#">×</a>

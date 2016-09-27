@@ -4,7 +4,7 @@
   <h3 class="highlight">[*parents]</h3>
   <table>
     <tr>
-      <td width="50%%">
+      <td style="width:50%">
         <table>
           <tr>
             <td style="text-align:left; vertical-align: middle">
@@ -26,7 +26,7 @@
           </tr>
         </table>
       </td>
-      <td width="50%%">
+      <td style="width:50%">
         <table>
           <tr>
             <td style="text-align:left; vertical-align: middle">

@@ -1,0 +1,131 @@
+﻿<!--  Arbre 3 générations vertical avec photos ancêtres, sans individu principal -->
+
+%if;has_parents;
+  <div class="text-xs-center" style="line-height:1.25">
+    <table>
+      <tr>
+        %if;father.has_parents;
+          <td>%nn;
+            %if;father.father.has_image;
+              <img class="rounded" %father.father.image_small_size;%sp;src="%father.father.image_url;" alt="[image/images]0"%/>
+              <br%/>
+            %end;
+            %apply;short_display_person("father.father")</td>
+          <td>&nbsp;</td>
+          <td >%nn;
+            %if;father.mother.has_image;
+              <img class="rounded" %father.mother.image_small_size;%sp;src="%father.mother.image_url;" alt="[image/images]0"%/>
+              <br%/>
+            %end;
+            %apply;short_display_person("father.mother")</td>
+        %else;
+          <td style="colspan:3;rowspan:4">&nbsp;</td>
+        %end;
+        <td>&nbsp;</td>
+        %if;mother.has_parents;
+          <td >%nn;
+            %if;mother.father.has_image;
+              <img class="rounded" %mother.father.image_small_size;%sp;src="%mother.father.image_url;" alt="[image/images]0"%/>
+              <br%/>
+            %end;
+            %apply;short_display_person("mother.father")</td>
+          <td>&nbsp;</td>
+          <td >%nn;
+            %if;mother.mother.has_image;
+              <img class="rounded" %mother.mother.image_small_size;%sp;src="%mother.mother.image_url;" alt="[image/images]0"%/>
+              <br%/>
+            %end;
+            %apply;short_display_person("mother.mother")</td>
+        %else;
+          <td style="colspan:3;rowspan:4">&nbsp;</td>
+        %end;
+      </tr>
+      <tr>
+        %if;father.has_parents;
+          <td><span>│</span></td>
+          <td></td>
+          <td><span>│</span></td>
+        %end;
+        <td></td>
+        %if;mother.has_parents;
+          <td><span>│</span></td>
+          <td></td>
+          <td><span>│</span></td>
+        %end;
+      </tr>
+      <tr>
+        %if;father.has_parents;
+          <td style="padding:0" align="%right;">
+            <hr dir="ltr" width="50%%" align="%right;"%/>
+          </td>
+            <td style="padding:0"><hr width="100%%"%/>
+          </td>
+          <td style="padding:0" align="%left;">
+            <hr dir="ltr" width="50%%" align="%left;"%/>
+          </td>
+        %end;
+        <td></td>
+        %if;mother.has_parents;
+          <td style="padding:0" align="%right;">
+            <hr dir="ltr" width="50%%" align="%right;"%/>
+          </td>
+          <td style="padding:0">
+            <hr width="100%%"%/>
+          </td>
+          <td  style="padding:0" align="%left;">
+            <hr dir="ltr" width="50%%" align="%left;"%/>
+          </td>
+        %end;
+      </tr>
+      <tr>
+        %if;father.has_parents;
+         <td></td><td><span>│</span></td><td></td>
+        %end;
+        <td></td>
+        %if;mother.has_parents;
+          <td></td><td><span>│</span></td><td></td>
+        %end;
+      </tr>
+      <tr>
+        <td></td>
+        <td >%nn;
+          %if;father.has_image;
+            <img class="rounded" %father.image_small_size;%sp;src="%father.image_url;" alt="[image/images]0"%/>
+            <br%/>
+          %end;
+          %apply;short_display_person("father")</td>
+        <td></td>
+        <td>&nbsp;</td>
+        <td></td><td >%nn;
+          %if;mother.has_image;
+            <img class="rounded" %mother.image_small_size;%sp;src="%mother.image_url;" alt="[image/images]0"%/>
+            <br%/>
+          %end;
+          %apply;short_display_person("mother")</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td><td><span>│</span></td><td></td>
+        <td></td>
+        <td></td><td><span>│</span></td><td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td style="padding:0" align="%right;">
+          <hr dir="ltr" width="50%%" align="%right;"%/>
+        </td>
+        <td style="padding:0" colspan="3">
+          <hr width="100%%"%/>
+        </td>
+        <td style="padding:0" align="%left;">
+          <hr dir="ltr" width="50%%" align="%left;"%/>
+        </td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="3"></td><td><span>│</span></td>
+        <td colspan="3"></td>
+      </tr>
+    </table>
+  </div>
+%end;
