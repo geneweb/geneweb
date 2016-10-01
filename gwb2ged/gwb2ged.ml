@@ -392,7 +392,8 @@ value ged_pevent base oc per per_sel evt =
            fprintf oc "3 TYPE INDI\n";
            match wk with
            [ Witness -> fprintf oc "3 RELA witness\n"
-           | Witness_GodParent -> fprintf oc "3 RELA GODP\n" ]
+           | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
+           | Witness_Officer   -> fprintf oc "3 ROLE OFFI\n" ]
          }
          else ())
       evt.epers_witnesses
@@ -677,7 +678,8 @@ value ged_fevent base oc ifam fam_sel evt =
            fprintf oc "3 TYPE INDI\n";
            match wk with
            [ Witness -> fprintf oc "3 RELA witness\n"
-           | Witness_GodParent -> fprintf oc "3 RELA GODP\n" ]
+           | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
+           | Witness_Officer   -> fprintf oc "3 ROLE OFFI\n" ]
          }
          else ())
       evt.efam_witnesses

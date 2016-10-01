@@ -954,6 +954,7 @@ let pers_to_piqi_person_search_info conf base p =
                  match wk with
                  | Witness -> `witness
                  | Witness_GodParent -> `witness_godparent
+                 | Witness_Officer   -> `witness_officer
                in
                let witness = poi base ip in
                let witness =
@@ -1410,6 +1411,7 @@ let pers_to_piqi_mod_person conf base p =
                   match wk with
                   | Witness -> `witness
                   | Witness_GodParent -> `witness_godparent
+                  | Witness_Officer   -> `witness_officer
                 in
                 let p = poi base ip in
                 let person_link = pers_to_piqi_person_link conf base p in
@@ -1663,6 +1665,7 @@ let fam_to_piqi_mod_family conf base ifam fam =
                   match wk with
                   | Witness -> `witness
                   | Witness_GodParent -> `witness_godparent
+                  | Witness_Officer   -> `witness_officer
                 in
                 let p = poi base ip in
                 let person_link = pers_to_piqi_person_link conf base p in

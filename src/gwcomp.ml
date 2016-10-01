@@ -611,6 +611,7 @@ value get_optional_event_date l =
 value get_event_witness_kind str l =
   match l with
   [ ["#godp" :: l'] -> (Witness_GodParent, l')
+  | ["#offi" :: l'] -> (Witness_Officer, l')
   | _ -> (Witness, l) ]
 ;
 

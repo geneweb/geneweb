@@ -700,6 +700,7 @@ value print_pevent oc base gen e = do {
          fprintf oc ": ";
          match wk with
          [ Witness_GodParent -> fprintf oc "#godp "
+         | Witness_Officer   -> fprintf oc "#offi "
          | _ -> () ];
          print_witness oc base gen p;
          fprintf oc "\n"
@@ -811,6 +812,7 @@ value print_fevent oc base gen in_comment e = do {
          fprintf oc ": ";
          match wk with
          [ Witness_GodParent -> fprintf oc "#godp "
+         | Witness_Officer   -> fprintf oc "#offi "
          | _ -> () ];
          print_witness oc base gen p;
          print_sep ();
@@ -1054,6 +1056,7 @@ value print_notes_for_person oc base gen p = do {
          fprintf oc ": ";
          match wk with
          [ Witness_GodParent -> fprintf oc "#godp "
+         | Witness_Officer   -> fprintf oc "#offi "
          | _ -> () ];
          print_witness oc base gen p;
          fprintf oc "\n"
