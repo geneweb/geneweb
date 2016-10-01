@@ -1220,7 +1220,8 @@ value string_of_fevent_name conf base efam_name =
 
 value string_of_witness_kind conf p witness_kind =
   match witness_kind with
-  [ Witness -> transl_nth conf "witness/witnesses" 0
+  [ Witness -> transl_nth conf "witness/witness/witnesses" 0
+  | Witness_Officer -> transl_nth conf "officer/officer/officers" 0
   | Witness_GodParent ->
       let n = index_of_sex (get_sex p) in
       transl_nth conf "godfather/godmother/godparents" n ]
