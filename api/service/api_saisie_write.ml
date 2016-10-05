@@ -935,9 +935,11 @@ let compute_warnings conf base resp =
                 w :: wl
             | DeadOld (p, a) ->
                 let w =
-                print_someone p ^
+                print_someone p
+                  ^ " " ^
                   (transl_nth
-                     conf "died at an advanced age" (index_of_sex (get_sex p))) ^
+                     conf "died at an advanced age" (index_of_sex (get_sex p)))
+                  ^ " " ^
                   (Date.string_of_age conf a)
                 in
                 w :: wl
