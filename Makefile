@@ -41,7 +41,8 @@ install:
 		cp src/gwc1 $(PREFIX)/bin/gwc$(EXE); \
 		cp src/gwc1 $(PREFIX)/bin/gwc1$(EXE); \
 		cp src/gwc2 $(PREFIX)/bin/gwc2$(EXE); \
-		cp src/consang $(PREFIX)/bin/consang$(EXE); \
+		cp src/mk_consang $(PREFIX)/bin/mk_consang$(EXE); \
+		cp src/mk_consang $(PREFIX)/bin/consang$(EXE); \
 		cp src/gwd $(PREFIX)/bin/gwd$(EXE); \
 		cp src/gwu $(PREFIX)/bin/gwu$(EXE); \
 		cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE); \
@@ -58,6 +59,7 @@ uninstall:
 	$(RM) $(PREFIX)/bin/gwc$(EXE)
 	$(RM) $(PREFIX)/bin/gwc1$(EXE)
 	$(RM) $(PREFIX)/bin/gwc2$(EXE)
+	$(RM) $(PREFIX)/bin/mk_consang$(EXE)
 	$(RM) $(PREFIX)/bin/consang$(EXE)
 	$(RM) $(PREFIX)/bin/gwd$(EXE)
 	$(RM) $(PREFIX)/bin/gwu$(EXE)
@@ -98,7 +100,8 @@ distrib:
 	cp src/gwc1 $(DESTDIR)/gw/gwc$(EXE)
 	cp src/gwc1 $(DESTDIR)/gw/gwc1$(EXE)
 	cp src/gwc2 $(DESTDIR)/gw/gwc2$(EXE)
-	cp src/consang $(DESTDIR)/gw/consang$(EXE)
+	cp src/mk_consang $(DESTDIR)/gw/mk_consang$(EXE)
+	cp src/mk_consang $(DESTDIR)/gw/consang$(EXE)
 	cp src/gwd $(DESTDIR)/gw/gwd$(EXE)
 	cp src/gwu $(DESTDIR)/gw/gwu$(EXE)
 	cp src/update_nldb $(DESTDIR)/gw/update_nldb$(EXE)
