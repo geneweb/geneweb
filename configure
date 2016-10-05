@@ -25,11 +25,13 @@ options:
   -i|--interactive
       run $PROG_NAME interactively
   -nw|--no-warn-error
-      do not treat warning as error
+      do not treat warnings as errors (default)
   -r|--redis_path
       path for the redis library (necessary if building the API)
   -s|--static
       statically link libraries
+  --warn-error
+      treat warnings as errors
 EOF
 }
 
@@ -52,7 +54,7 @@ OREDIS=
 RE=
 PACKAGES=
 
-WARN="-warn-error A"
+WARNERROR=false
 STRIP=true
 RM=
 EXE=
@@ -85,12 +87,14 @@ while [[ $# -ne 0 ]]; do
     -i|--interactive)
       INTERACTIVE=true ;;
     -nw|--no-warn-error)
-      WARN= ;;
+      WARNERROR=false ;;
     -r|--redis_path)
       LREDIS="$2";
       shift ;;
     -s|--static)
       STATIC=true ;;
+    --warn-error)
+      WARNERROR=true ;;
     -cibrew)
       CI_BREW=true ;;
     *)
@@ -326,6 +330,9 @@ check_flags() {
   if $DEBUG; then
     OCAMLFLAGS+=" -g -annot -bin-annot -keep-locs"
   fi
+  if $WARNERROR; then
+    OCAMLFLAGS+=" -warn-error A"
+  fi
 }
 
 check_lablgtk2() {
@@ -466,7 +473,7 @@ print_tools() {
 print_compiler() {
    echo
    echo "# Compiler options."
-   echo "OCAMLFLAGS=${OCAMLFLAGS} ${WARN}"
+   echo "OCAMLFLAGS=${OCAMLFLAGS}"
    echo "OCAMLC_PATH=${OCAMLC}"
    echo "OCAMLOPT_PATH=${OCAMLOPT}"
    echo "CAMLP5F=${CAMLP5F}"
@@ -523,10 +530,10 @@ if $INTERACTIVE; then
       fi
     done
   fi
-  echo "Do you want to remove compilation warnings (default = no)? [y/N]"
+  echo "Do you want to treat compilation warnings as errors (default = no)? [y/N]"
   read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    WARN=
+    WARNERROR=true
   fi
   echo "Do you want compilation debugging symbols (default = no)? [y/N]"
   read -re answer
