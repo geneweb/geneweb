@@ -23,7 +23,7 @@ all:: out
 out:: gwlib.ml
 opt:: gwlib.ml
 
-out:: def_syn.cmo ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out i18n_check.out
+out:: ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update_nldb.out check_base.out i18n_check.out
 	$(RM) gwc gwc2 consang gwd gwu check_base
 	cp gwc1.out gwc
 	cp gwc1.out gwc1
@@ -34,7 +34,7 @@ out:: def_syn.cmo ansel.cmo gwc1.out gwc2.out consang.out gwd.out gwu.out update
 	cp update_nldb.out update_nldb
 	cp check_base.out check_base
 
-opt:: def_syn.cmo ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
+opt:: ansel.cmx gwc1.opt gwc2.opt consang.opt gwd.opt gwu.opt update_nldb.opt check_base.opt
 	$(RM) gwc consang gwd gwu
 	cp gwc1.opt gwc
 	cp gwc1.opt gwc1
@@ -156,7 +156,7 @@ i18n: pr_transl.cmo always
 always:
 
 depend:
-	$(MAKE) pr_dep.cmo def_syn.cmo gwlib.ml
+	$(MAKE) gwlib.ml
 	$(MAKE) pa_lock.cmo pa_html.cmo q_codes.cmo
 	export LC_ALL=C; TOP=.. ../tools/camlp5_depend.sh $(OCAMLI) $$(ls *.mli *.ml) > .depend.new
 	mv .depend.new .depend

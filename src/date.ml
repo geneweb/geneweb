@@ -1069,7 +1069,7 @@ value eval_julian_day conf =
      ("h", Dhebrew, Calendar.sdn_of_hebrew, 13)]
 ;
 
-IFDEF OLD THEN declare
+IFDEF OLD THEN
 value gregorian_month_name conf n =
   capitale (nominative (transl_nth conf "(month)" n))
 ;
@@ -1311,7 +1311,7 @@ value old_print_calendar conf base =
     trailer conf;
   }
 ;
-end END;
+END;
 
 (* *)
 
@@ -1360,14 +1360,14 @@ value print_foreach conf print_ast eval_expr =
   print_foreach
 ;
 
-IFDEF OLD THEN declare
+IFDEF OLD THEN
 value print_calendar conf base =
   if p_getenv conf.env "old" = Some "on" then old_print_calendar conf base else
   Templ.interp conf base "calendar" (eval_var conf)
     (fun _ -> Templ.eval_transl conf) (fun _ -> raise Not_found)
     get_vother set_vother (print_foreach conf) [] (eval_julian_day conf)
 ;
-end ELSE declare
+ELSE
 value print_calendar conf base =
   Hutil.interp conf base "calendar"
     {Templ.eval_var = eval_var conf;
@@ -1377,4 +1377,4 @@ value print_calendar conf base =
      Templ.print_foreach = print_foreach conf}
     [] (eval_julian_day conf)
 ;
-end END;
+END;

@@ -26,7 +26,7 @@ module Pset =
 
 (* testing *)
 
-IFDEF TESTING THEN declare
+IFDEF TESTING THEN
 value map_dag f d =
   let a =
     Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
@@ -48,7 +48,7 @@ value tag_dag d =
        })
     d
 ;
-end END;
+END;
 
 (* input dag *)
 
@@ -267,7 +267,7 @@ value string_of_item conf base =
 
 (* Print with HTML table tags: <table> <tr> <td> *)
 
-IFDEF OLD THEN declare
+IFDEF OLD THEN
 value print_table conf hts =
   do {
     begin_centered conf;
@@ -311,7 +311,7 @@ value print_table conf hts =
     end_centered conf;
   }
 ;
-end END;
+END;
 
 (*
  * Print without HTML table tags: using <pre>
@@ -632,7 +632,7 @@ value table_pre_dim conf hts =
   }
 ;
 
-IFDEF OLD THEN declare
+IFDEF OLD THEN
 value print_next_pos conf pos1 pos2 tcol =
   let doit = p_getenv conf.env "notab" = Some "on" in
   if doit then do {
@@ -840,7 +840,7 @@ value print_html_table conf hts =
     else print_table conf hts
   }
 ;
-end END;
+END;
 
 value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
@@ -940,7 +940,7 @@ value make_tree_hts conf base elem_txt vbar_txt invert set spl d =
   else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
-IFDEF OLD THEN declare
+IFDEF OLD THEN
 value print_slices_menu conf hts =
   let txt n =
     Util.capitale
@@ -1029,7 +1029,7 @@ value print_dag_page conf base page_title hts next_txt =
     Hutil.trailer conf
   }
 ;
-end END;
+END;
 
 (* *)
 
@@ -1273,16 +1273,16 @@ and print_foreach_dag_line_pre conf hts print_ast env al =
   }
 ;
 
-IFDEF OLD THEN declare
+IFDEF OLD THEN
 value old_print_slices_menu_or_dag_page conf base page_title hts next_txt =
   if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf hts
   else print_dag_page conf base page_title hts next_txt
 ;
-end ELSE declare
+ELSE
 value old_print_slices_menu_or_dag_page conf base page_title hts next_txt =
   incorrect_request conf
 ;
-end END;
+END;
 
 value print_slices_menu_or_dag_page conf base page_title hts next_txt =
 (**)

@@ -10,7 +10,7 @@ while [ "$1" != "" ]; do
     esac
     shift
 done
-PR_DEP="-I $TOP/src pr_dep.cmo"
+PR_DEP="pr_depend.cmo"
 
 for FILE in $FILES; do
     head -1 $FILE >/dev/null || exit 1
