@@ -1965,19 +1965,21 @@ let is_private_person conf base ip =
 ;;
 
 (* ********************************************************************* *)
-(*  [Fonc] print_from_identifier_person : conf -> base -> unit           *)
+(*  [Fonc] print_from_identifier_person : conf -> base ->                *)
+(*   print_result_from_ip -> Identifier_person -> unit                   *)
 (** [Description] : Utilise un identifiant de personne pour appeler une
     fonction qui utilise l'ip (index de la personne) récupéré.
     Affiche des erreurs si la personne n'est pas trouvée
     ou si les paramètres sont incorrects.
     [Args] :
-      - conf  : configuration de la base
-      - base  : base de donnée
+      - conf                 : configuration de la base
+      - base                 : base de donnée
+      - print_result_from_ip : fonction permettant d'afficher les resultats
+      - identifier_person    : Objet identifiant une personne
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let print_from_identifier_person conf base print_result_from_ip =
-  let identifier_person = get_params conf Mext_read.parse_identifier_person in
+let print_from_identifier_person conf base print_result_from_ip identifier_person =
   try
   let result =
   match identifier_person.Mread.Identifier_person.index with
@@ -2055,7 +2057,7 @@ let print_from_identifier_person conf base print_result_from_ip =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let print_fiche_person conf base =
-  print_from_identifier_person conf base print_result_fiche_person
+  print_from_identifier_person conf base print_result_fiche_person (get_params conf Mext_read.parse_identifier_person)
 ;;
 
 
@@ -3928,5 +3930,5 @@ let print_result_nb_ancestors conf base ip =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let print_nb_ancestors conf base =
-  print_from_identifier_person conf base print_result_nb_ancestors
+  print_from_identifier_person conf base print_result_nb_ancestors (get_params conf Mext_read.parse_identifier_person)
 ;;
