@@ -495,3 +495,7 @@ message Error {
   required Code code = 998;
   optional string message = 999;
 }
+
+message NbAncestors {
+  required int32 nb = 1;
+}

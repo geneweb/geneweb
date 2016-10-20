@@ -1965,16 +1965,18 @@ let is_private_person conf base ip =
 ;;
 
 (* ********************************************************************* *)
-(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
-(** [Description] : Renvoie un objet personne contenant les données de
-      la fiche en fonction d'un identifiant (index ou sosa).
+(*  [Fonc] print_from_identifier_person : conf -> base -> unit           *)
+(** [Description] : Utilise un identifiant de personne pour appeler une
+    fonction qui utilise l'ip (index de la personne) récupéré.
+    Affiche des erreurs si la personne n'est pas trouvée
+    ou si les paramètres sont incorrects.
     [Args] :
       - conf  : configuration de la base
       - base  : base de donnée
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let print_fiche_person conf base =
+let print_from_identifier_person conf base print_result_from_ip =
   let identifier_person = get_params conf Mext_read.parse_identifier_person in
   try
   let result =
@@ -1983,7 +1985,7 @@ let print_fiche_person conf base =
       (* Traite l'index *)
       let ip = Adef.iper_of_int (Int32.to_int index) in
       if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-      print_result_fiche_person conf base ip
+      print_result_from_ip conf base ip
   | None ->
     match (identifier_person.Mread.Identifier_person.oc)  with
     | (Some oc) ->
@@ -2001,7 +2003,7 @@ let print_fiche_person conf base =
             else
             (
               if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-              print_result_fiche_person conf base ip
+              print_result_from_ip conf base ip
             )
           | None ->
             print_error conf `not_found
@@ -2020,7 +2022,7 @@ let print_fiche_person conf base =
       match search_index conf base (fn ^ " " ^ sn) order with
       | Some ip ->
         if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-        print_result_fiche_person conf base ip
+        print_result_from_ip conf base ip
       | None -> print_error conf `not_found
       )
     | (None, Some sn) ->
@@ -2029,7 +2031,7 @@ let print_fiche_person conf base =
       match search_index conf base sn order with
       | Some ip ->
         if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-        print_result_fiche_person conf base ip
+        print_result_from_ip conf base ip
       | None -> print_error conf `not_found
       )
     | (Some fn, None) -> print_error conf `not_found
@@ -2042,6 +2044,19 @@ let print_fiche_person conf base =
   with _ -> print_error conf `not_found
 ;;
 
+(* ********************************************************************* *)
+(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
+(** [Description] : Affiche une fiche personne en fonction
+    d'un identifiant.
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnée
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_fiche_person conf base =
+  print_from_identifier_person conf base print_result_fiche_person
+;;
 
 
 (**/**) (* V1 *)
@@ -4049,4 +4064,91 @@ let print_graph_tree_full conf base =
   in
   let data = Mext_read.gen_graph_tree_full graph in
   print_result conf data
+;;
+
+(* ************************************************************************ *)
+(*  [Fonc] get_nb_ancestors : config -> base -> ip -> int                   *)
+(** [Description] : Retourne le nombre d'ascendants d'une personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - ip   : l'index de la personne
+    [Retour] : int
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let get_nb_ancestors conf base ip =
+  let rec count_nb_ancestors base visited_ips not_visited_ips nb_visited_ips =
+    match not_visited_ips with
+      [] -> nb_visited_ips
+      | current_ip::not_visited_ips ->
+        if visited_ips.(Adef.int_of_iper current_ip) then
+          (* Passe au noeud suivant si le noeud courant a déjà été visité. *)
+          count_nb_ancestors base visited_ips not_visited_ips nb_visited_ips
+        else
+          begin
+            let not_visited_ips =
+              match get_parents (poi base current_ip) with
+              | Some ifam ->
+                let cpl = foi base ifam in
+                (* Ajoute les index des parents au tableau des noeuds à parcourir. *)
+                not_visited_ips@[get_father cpl]@[get_mother cpl]
+              | None ->
+                (* Si pas de parents, le tableau des noeuds à visiter ne change pas. *)
+                not_visited_ips
+            in
+            (* Met à jour le tableau des noeuds parcourus. *)
+            visited_ips.(Adef.int_of_iper current_ip) <- true;
+            (* Passe au noeud suivant en incrémentant le nombre de noeuds. *)
+            count_nb_ancestors base visited_ips not_visited_ips (nb_visited_ips + 1)
+          end
+  in
+  (* Tableau qui conserve les index des personnes déjà parcourues. *)
+  let visited_ips = Array.make (nb_of_persons base) false in
+  (* Le nombre d'ascendants d'un individu est le nombre de personnes parcourues moins 1 (lui-même). *)
+  count_nb_ancestors base visited_ips [ip] (-1)
+;;
+
+(* ************************************************************************** *)
+(*  [Fonc] pers_to_piqi_nb_ancestors : conf -> base -> int -> NbAncestors     *)
+(** [Description] : Retourne à partir d'un nombre un NbAncestors (piqi).
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - nb   : nombre d'ascendants
+    [Retour] : NbAncestors
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+let nb_to_piqi_nb_ancestors conf base nb =
+    let piqi_nb_ancestors = Mread.default_nb_ancestors() in
+        piqi_nb_ancestors.Mread.Nb_ancestors.nb <- Int32.of_int nb;
+    Mext_read.gen_nb_ancestors piqi_nb_ancestors
+;;
+
+(* ********************************************************************* *)
+(*  [Fonc] print_result_nb_ancestors : conf -> base -> ip -> unit        *)
+(** [Description] : Retourne le nombre d'ascendants d'un individu.
+    [Args] :
+      - conf : configuration de la base.
+      - base : base.
+      - ip   : l'index de la personne.
+    [Retour] : unit
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_result_nb_ancestors conf base ip =
+    let data = nb_to_piqi_nb_ancestors conf base (get_nb_ancestors conf base ip) in
+    print_result conf data
+;;
+
+(* ********************************************************************* *)
+(*  [Fonc] print_nb_ancestors : conf -> base -> unit                     *)
+(** [Description] : Retourne le nombre d'ascendants d'un individu.
+    [Args] :
+      - conf : configuration de la base.
+      - base : base.
+      - ip   : l'index de la personne.
+    [Retour] : unit (NbAncestors | Error)
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_nb_ancestors conf base =
+  print_from_identifier_person conf base print_result_nb_ancestors
 ;;
