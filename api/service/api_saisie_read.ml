@@ -2834,7 +2834,7 @@ let build_graph_desc_v2 conf base p max_gen =
 
 
 (* ********************************************************************* *)
-(*  [Fonc] print_tree_v2 : conf -> base -> todo                          *)
+(*  [Fonc] print_graph_tree_v2 : conf -> base -> todo                    *)
 (** [Description] :
     [Args] :
       - conf  : configuration de la base
@@ -2842,9 +2842,8 @@ let build_graph_desc_v2 conf base p max_gen =
     [Retour] :
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let print_graph_tree_v2 conf base =
+let print_graph_tree_v2 conf base ip =
   let params = get_params conf Mext_read.parse_graph_tree_params in
-  let ip = Adef.iper_of_int (Int32.to_int params.Mread.Graph_tree_params.index) in
   (* Construction de la base avec calcul des sosas           *)
   (* Si iz présent, on prend iz comme souche pour le calcul  *)
   (* Sinon on prend la souche de l'arbre                     *)
@@ -3930,4 +3929,20 @@ let print_result_nb_ancestors conf base ip =
 (* ********************************************************************* *)
 let print_nb_ancestors conf base =
   print_from_identifier_person conf base print_result_nb_ancestors (get_params conf Mext_read.parse_identifier_person)
+;;
+
+(* ********************************************************************* *)
+(*  [Fonc] print_result_graph_v2 : conf -> base -> unit                  *)
+(** [Description] : Retourne un graph d'ascendance et de descendance
+       d'une personne
+    [Args] :
+      - conf : configuration de la base.
+      - base : base.
+    [Retour] : unit (graph | Error)
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_result_graph_v2 conf base =
+  let params = get_params conf Mext_read.parse_graph_tree_params in
+  let identifier_person = params.Mread.Graph_tree_params.identifier_person in
+  print_from_identifier_person conf base print_graph_tree_v2 identifier_person
 ;;
