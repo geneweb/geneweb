@@ -3,14 +3,11 @@
 
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
-
+module RC = Redis_sync.Client
 
 open Config
 open Def
 open Gwdb
-
-open Redis
-open Redis_sync.Client
 
 
 (* base redis contenant tous les liens. *)
@@ -28,8 +25,8 @@ let api_servers = ref [] ;;
 (**/**) (* Redis. *)
 
 let create_redis_connection () =
-  let connection_spec = {host = !redis_host; port = !redis_port} in
-  connect connection_spec
+  let connection_spec = {RC.host = !redis_host; RC.port = !redis_port} in
+  RC.IO.run (RC.connect connection_spec)
 ;;
 
 let redis_p_key conf base ip =
@@ -65,21 +62,21 @@ let filter_string l =
 
 (* Trouve une key en fonction de l'utilisateur et d'une référence GW *)
 let findKeyBySourcenameAndRef redis bname geneweb_key =
-  zscore redis ("lia.keys." ^ bname) geneweb_key
+  RC.IO.run (RC.zscore redis ("lia.keys." ^ bname) geneweb_key)
 ;;
 
-let findBridgesBySourcenameAndIdGlinks redis bname i =
-  let l = zrangebyscore redis ("lia.bridges." ^ bname) i i in
-  filter_bulk l
+let findBridgesBySourcenameAndIdGlinks redis bname fb =
+  let l = RC.zrangebyscore redis ("lia.bridges." ^ bname) fb fb in
+  filter_bulk (RC.IO.run l)
 ;;
 
 let findLinksBySourcenameAndBridge redis bname s =
-  hget redis ("lia.links." ^ bname) s
+  RC.IO.run (RC.hget redis ("lia.links." ^ bname) s)
 ;;
 
-let findKeyBySourcenameAndIdGlinks redis bname i =
-  let l = zrangebyscore redis ("lia.keys." ^ bname) i i in
-  filter_bulk l
+let findKeyBySourcenameAndIdGlinks redis bname fb =
+  let l = RC.zrangebyscore redis ("lia.keys." ^ bname) fb fb in
+  filter_bulk (RC.IO.run l)
 ;;
 
 let json_list_of_string s =
@@ -93,9 +90,10 @@ let get_bridges conf base redis ip =
   match
     findKeyBySourcenameAndRef redis conf.bname (redis_p_key conf base ip)
   with
-  | Some s ->
+  | Some f ->
       (* on récupère tous les ids de ponts *)
-      findBridgesBySourcenameAndIdGlinks redis conf.bname (int_of_string s)
+      findBridgesBySourcenameAndIdGlinks
+        redis conf.bname (RC.FloatBound.Inclusive f)
   | None -> []
 ;;
 
@@ -800,8 +798,8 @@ let print_link_tree conf base =
              | [_; bname_link; id_link] ->
                  begin
                    match
-                     findKeyBySourcenameAndIdGlinks
-                       redis bname_link (int_of_string id_link)
+                     findKeyBySourcenameAndIdGlinks redis bname_link
+                       (RC.FloatBound.Inclusive (float_of_string id_link))
                    with
                    | [s] ->
                        let from_ref = redis_p_key conf base ip in
@@ -844,11 +842,11 @@ let print_link_tree conf base =
                     | [_; bname_link; id_link; "spouse-children"; id_link_spouse] ->
                         let pl =
                           findKeyBySourcenameAndIdGlinks redis bname_link
-                            (int_of_string id_link)
+                            (RC.FloatBound.Inclusive (float_of_string id_link))
                         in
                         let pl2 =
                           findKeyBySourcenameAndIdGlinks redis bname_link
-                            (int_of_string id_link_spouse)
+                            (RC.FloatBound.Inclusive (float_of_string id_link_spouse))
                         in
                         begin
                           match (pl, pl2) with
@@ -909,7 +907,8 @@ let print_link_tree conf base =
                      match Link.nsplit x ':' with
                      | [_; bname_link; id_link; "parents"] ->
                          let pl =
-                           findKeyBySourcenameAndIdGlinks redis bname_link (int_of_string id_link)
+                           findKeyBySourcenameAndIdGlinks redis bname_link
+                             (RC.FloatBound.Inclusive (float_of_string id_link))
                          in
                          begin
                            match pl with

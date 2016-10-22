@@ -8,7 +8,6 @@ gwd_PREPEND_OBJS := gwlib
 gwd_APPEND_OBJS := compilation
 LIBS = unix
 LINKFLAGS = -I $(CAMLP5D)
-REDIS_OBJS := utils mutex client cache redis_sync
 
 include $(ROOT)/tools/Makefile.common
 
@@ -21,14 +20,13 @@ gwlib.ml:
 	echo "  [ Not_found -> \"$(PREFIX)\" ]" | sed -e 's|\\|/|g' >> $@
 	echo ";" >> $@
 
-api_link.cmx api_link.cmo: OCAMLFLAGS += -I $(OCURL) -I $(LREDIS) -package yojson
+api_link.cmx api_link.cmo: OCAMLFLAGS += -I $(OCURL) -I $(LREDIS) -package yojson -package redis
 
 ifeq ($(WITH_API),y)
-gwd.out gwd.opt: OCAMLFLAGS += -package piqirun.ext -package curl
-gwd.out gwd.opt: LIBS = re_emacs re_str #removes unix
+gwd.out gwd.opt: OCAMLFLAGS += -package piqirun.ext -package curl -package redis
+gwd.out gwd.opt: LIBS = re_emacs re_str redis_sync #removes unix
 gwd.out gwd.opt: LINKFLAGS += -I $(OCURL) -I $(RE) -I $(LREDIS) \
-	-package re -package uuidm -package yojson \
-	$(REDIS_OBJS:=$(OBJ_$(EXT)_EXT))
+	-package re -package uuidm -package yojson -package redis
 endif
 
 gwd.out gwd.opt: LIBS += str gramlib

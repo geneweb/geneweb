@@ -67,7 +67,7 @@ It has the following dependancies:
 - re
 - uuidm
 - yojson
-- ocaml-redis (https://github.com/geneweb/ocaml-redis)
+- redis
 
 ## Contributor guidelines
 

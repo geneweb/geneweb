@@ -26,8 +26,6 @@ options:
       run $PROG_NAME interactively
   -nw|--no-warn-error
       do not treat warnings as errors (default)
-  -r|--redis_path
-      path for the redis library (necessary if building the API)
   -s|--static
       statically link libraries
   --warn-error
@@ -50,7 +48,6 @@ PIQI=
 YOJSON=
 LABLGTK2D=+lablgtk2
 LREDIS=
-OREDIS=
 RE=
 PACKAGES=
 
@@ -88,9 +85,6 @@ while [[ $# -ne 0 ]]; do
       INTERACTIVE=true ;;
     -nw|--no-warn-error)
       WARNERROR=false ;;
-    -r|--redis_path)
-      LREDIS="$2";
-      shift ;;
     -s|--static)
       STATIC=true ;;
     --warn-error)
@@ -318,7 +312,7 @@ check_ocamlfind() {
 check_api() {
   if $API; then
     CAMLP5F+=" -DAPI"
-    PACKAGES+=" curl piqirun.ext re uuidm yojson"
+    PACKAGES+=" curl piqirun.ext re uuidm yojson redis"
   fi
 }
 
@@ -391,32 +385,24 @@ absdirpath() {
   ) 2> /dev/null
 }
 
-check_redis_path() {
-  LREDIS=$(absdirpath $LREDIS) || return 1
-  LREDIS="${LREDIS%/}"
-  if [[ -e "${LREDIS}/_build/src/redis.cmxs" ]]; then
-    LREDIS="${LREDIS}/_build/src"
-    return 0
-  elif [[ -e "${LREDIS}/src/redis.cmxs" ]]; then
-    LREDIS="${LREDIS}/src"
-    return 0
-  elif [[ -e "${LREDIS}/redis.cmxs" ]]; then
-    return 0
-  fi
-  return 1
-}
-
 check_redis() {
   if $API; then
-    if ! ocamlfind query redis >/dev/null 2>&1; then
+    if ocamlfind query redis >/dev/null 2>&1; then
+      local REDIS_MIN_VER="0.3.3"
+      local REDIS_VER=`opam show -f version redis`
+      if testversion "$REDIS_VER" ">=" "$REDIS_MIN_VER"; then
+        print_check_ok \
+          "Checking Ocaml redis version $REDIS_VER >= $REDIS_MIN_VER"
+        LREDIS=`ocamlfind query redis`
+      else
+        print_check_warn \
+          "Checking ocaml redis version $REDIS_VER" \
+          "$REDIS_MIN_VER or compatible needed."
+      fi
+    else
       print_check_err "Checking OCaml redis" \
           "You need the OCaml dependency redis!"
-    elif ! check_redis_path; then
-      print_check_err "Checking OCaml redis" \
-          "You need to provide a valid redis path!"
     fi
-    print_check_ok "Checking OCaml redis"
-    OREDIS=`ocamlfind query redis`
   fi
 }
 
@@ -488,7 +474,6 @@ print_compiler() {
    echo "LABLGTK2D=${LABLGTK2D}"
    if $API; then
      echo "OCURL=${CURL}"
-     echo "OREDIS=${OREDIS}"
      echo "RE=${RE}"
      echo "LREDIS=${LREDIS}"
      echo "WITH_API=y"
@@ -518,17 +503,6 @@ if $INTERACTIVE; then
   read -re answer
   if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
     API=true
-  fi
-  if $API; then
-    while [ -z "$LREDIS" ]; do
-      echo "Please provide the path of your redis"
-      read -re answer
-      LREDIS="${answer}"
-      if ! check_redis_path; then
-        echo "Invalid redis path!"
-        LREDIS=
-      fi
-    done
   fi
   echo "Do you want to treat compilation warnings as errors (default = no)? [y/N]"
   read -re answer
