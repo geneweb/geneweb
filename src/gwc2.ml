@@ -58,7 +58,8 @@ value next_family_fun_templ gwo_list fi = do {
         [ Some ic ->
             match
               try Some (input_value ic : gw_syntax) with
-              [ End_of_file -> None ]
+              [ End_of_file -> None
+              | Failure "input_value: truncated object" -> None ] (* https://caml.inria.fr/mantis/view.php?id=7142 *)
             with
             [ Some fam -> Some fam
             | None -> do {
