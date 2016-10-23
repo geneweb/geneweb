@@ -189,7 +189,7 @@ value print_exc =
   fun
   [ Failure txt ->
       do { printf "Failed: %s\n" txt; flush stdout; exit 2 }
-  | exc -> Printexc.catch raise exc ]
+  | exc -> Printexc.print raise exc ]
 ;
 
 try main () with exc -> print_exc exc;

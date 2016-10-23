@@ -31,4 +31,4 @@ value main () =
   }
 ;
 
-Printexc.catch main ();
+Printexc.print main ();

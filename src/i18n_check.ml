@@ -34,4 +34,4 @@ value main () =
     [ End_of_file -> () ]
 ;
 
-Printexc.catch main ();
+Printexc.print main ();

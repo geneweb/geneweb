@@ -2150,6 +2150,6 @@ value main () =
   }
 ;
 
-value run_main = Printexc.catch main;
+value run_main = Printexc.print main;
 
 end;

@@ -216,9 +216,7 @@ value print_exc =
   fun
   [ Failure txt ->
       do { printf "Failed: %s\n" txt; flush stdout; exit 2 }
-  (* FIX ME : Printexc.catch is deprecated *)
-  (* use Printexc.print raise exc instead  *)
-  | exc -> Printexc.catch raise exc ]
+  | exc -> Printexc.print raise exc ]
 ;
 
 try main () with exc -> print_exc exc;

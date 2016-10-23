@@ -9,5 +9,5 @@ value main () = do {
   flush stdout;
 };
 
-Printexc.catch main ();
+Printexc.print main ();
 

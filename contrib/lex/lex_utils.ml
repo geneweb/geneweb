@@ -406,4 +406,4 @@ let main () =
   else ()
 ;;
 
-Printexc.catch main ()
+Printexc.print main ()
