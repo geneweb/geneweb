@@ -1003,6 +1003,12 @@ value update_person_with_pevents gen p =
   let found_baptism = ref False in
   let found_death = ref False in
   let found_burial = ref False in
+  let death_std_fields = p.death in
+  let death_reason_std_fields =
+    match death_std_fields with
+    [ Death dr _ -> dr
+    | _ -> Unspecified ]
+  in
   loop p.pevents p where rec loop pevents p =
     match pevents with
     [ [] -> p
@@ -1035,8 +1041,12 @@ value update_person_with_pevents gen p =
             else
               let death =
                 match Adef.od_of_codate evt.epers_date with
-                [ Some d -> Death Unspecified (Adef.cdate_of_date d)
-                | None -> DeadDontKnowWhen ]
+                [ Some d -> Death death_reason_std_fields (Adef.cdate_of_date d)
+                | None ->
+                  match death_std_fields with
+                    [ OfCourseDead -> OfCourseDead
+                    | DeadYoung -> DeadYoung
+                    | _ -> DeadDontKnowWhen ] ]
               in
               let p =
                 {(p) with death = death;
