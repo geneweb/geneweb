@@ -19,11 +19,9 @@ options:
       add debugging symbols to the build command
   -i|--interactive
       run $PROG_NAME interactively
-  -nw|--no-warn-error
-      do not treat warnings as errors (default)
   -s|--static
       statically link libraries
-  --warn-error
+  -we|--warn-error
       treat warnings as errors
 EOF
 }
@@ -75,8 +73,6 @@ while [[ $# -ne 0 ]]; do
       DEBUG=true ;;
     -i|--interactive)
       INTERACTIVE=true ;;
-    -nw|--no-warn-error)
-      WARNERROR=false ;;
     -s|--static)
       STATIC=true ;;
     --warn-error)
