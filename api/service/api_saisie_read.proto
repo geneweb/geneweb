@@ -499,3 +499,7 @@ message Error {
 message NbAncestors {
   required int32 nb = 1;
 }
+
+message ConfBase {
+  required string configuration = 1;
+}
