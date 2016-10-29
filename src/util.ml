@@ -2418,12 +2418,8 @@ value get_approx_death_date_place conf base p =
   get_approx_date_place death death_place buri buri_place
 ;
 
-
-(* fix system bug: string_of_float 17.97 = "17.969999999999" *)
-value my_string_of_float f = sprintf "%.6g" f;
-
 value string_of_decimal_num conf f =
-  let s = my_string_of_float f in
+  let s = string_of_float f in
   let b = Buffer.create 20 in
   let rec loop i =
     if i = String.length s then Buffer.contents b
