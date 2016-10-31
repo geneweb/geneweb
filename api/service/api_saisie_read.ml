@@ -3947,3 +3947,18 @@ let print_graph_tree_v2 conf base =
   let identifier_person = params.Mread.Graph_tree_params.identifier_person in
   print_from_identifier_person conf base print_result_graph_tree_v2 identifier_person
 ;;
+
+(* ******************************************************************** *)
+(*  [Fonc] print_conf_base : file_path -> string base                   *)
+(** [Description] : Lit un fichier puis le retourne sous format string.
+    [Args] :
+      - file_path : chemin du fichier                                   *)
+(* ******************************************************************** *)
+let rec read_base_file file_path =
+  let ic = open_in file_path in
+  let n = in_channel_length ic in
+  let s = String.create n in
+  really_input ic s 0 n;
+  close_in ic;
+  (s)
+;;
