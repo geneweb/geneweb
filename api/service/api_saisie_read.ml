@@ -3962,3 +3962,30 @@ let rec read_base_file file_path =
   close_in ic;
   (s)
 ;;
+
+(* ******************************************************************** *)
+(*  [Fonc] print_conf_base : config -> base_file -> ConfBase            *)
+(** [Description] : Construit l'objet piqi conf_base.
+    [Args] :
+      - conf : configuration de la base                                 *)
+(* ******************************************************************** *)
+let construct_conf_base conf base_file =
+  let conf_base = Mread.default_conf_base() in
+    conf_base.Mread.Conf_base.configuration <- base_file;
+  conf_base
+;;
+
+(* ******************************************************************** *)
+(*  [Fonc] print_conf_base : config -> base -> InfosBase                *)
+(** [Description] : Retourne les configurations d'une base.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de données                                          *)
+(* ******************************************************************** *)
+let print_conf_base conf base =
+  let fname = Util.base_path [] (conf.bname ^ ".gwf") in
+  let base_file = read_base_file fname in
+  let base_conf = construct_conf_base conf base_file in
+  let data = Mext_read.gen_conf_base base_conf in
+  print_result conf data
+;;
