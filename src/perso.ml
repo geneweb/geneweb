@@ -809,6 +809,9 @@ value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
   (* Construit un tableau d'index dont chaque valeur est False *)
   let mark = Array.create (nb_of_persons base) False in
+  (* Charge le cache des LIA. *)
+  (* On limite à 10 le nombre de générations ascendantes à charger pour les LIA. *)
+  let () = Perso_link.init_cache conf base ip 10 0 0 in
   let rec loop level ip =
     (* Ne traite pas l'index s'il a déjà été traité. *)
     (* Pose surement probleme pour des implexes. *)
@@ -828,8 +831,6 @@ value max_ancestor_level conf base ip max_lev =
             }
         | _ ->
             (* lia *)
-            (* Charge le cache *)
-            let () = Perso_link.init_cache conf base ip max_lev 0 0 in
             let rec loop_lia level (ip, base_prefix) = do {
               x.val := max x.val level;
               if x.val = max_lev then ()

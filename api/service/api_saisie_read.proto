@@ -384,7 +384,7 @@ message GraphTreeNew {
 }
 
 message GraphTreeParams {
-  required int32 index = 1;
+  required IdentifierPerson identifier_person = 1;
   optional int32 nb_asc = 2;
   optional int32 nb_desc = 3;
   optional int32 indexz = 4;
@@ -494,4 +494,12 @@ message Error {
   }
   required Code code = 998;
   optional string message = 999;
+}
+
+message NbAncestors {
+  required int32 nb = 1;
+}
+
+message ConfBase {
+  required string configuration = 1;
 }

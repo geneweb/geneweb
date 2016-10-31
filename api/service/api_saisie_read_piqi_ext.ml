@@ -30,6 +30,8 @@ let _graph_tree_full_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/gra
 let _identifier_person_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/identifier-person"
 let _error_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/error"
 let _error_code_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/error-code"
+let _nb_ancestors_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/nb-ancestors"
+let _conf_base_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/conf-base"
 let _sosa_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/sosa"
 let _calendar_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/calendar"
 let _precision_piqi_type = Piqirun_ext.find_piqi_type "api_saisie_read/precision"
@@ -173,6 +175,16 @@ let parse_error_code ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _error_code_piqi_type format `pb x ?opts in
   let buf = Piqirun.init_from_string x_pb in
   Api_saisie_read_piqi.parse_error_code buf
+
+let parse_nb_ancestors ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _nb_ancestors_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_nb_ancestors buf
+
+let parse_conf_base ?opts x (format :Piqirun_ext.input_format) =
+  let x_pb = Piqirun_ext.convert _conf_base_piqi_type format `pb x ?opts in
+  let buf = Piqirun.init_from_string x_pb in
+  Api_saisie_read_piqi.parse_conf_base buf
 
 let parse_sosa ?opts x (format :Piqirun_ext.input_format) =
   let x_pb = Piqirun_ext.convert _sosa_piqi_type format `pb x ?opts in
@@ -365,6 +377,16 @@ let gen_error_code ?opts x (format :Piqirun_ext.output_format) =
   let x_pb = Piqirun.to_string buf in
   Piqirun_ext.convert _error_code_piqi_type `pb format x_pb ?opts
 
+let gen_nb_ancestors ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_nb_ancestors x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _nb_ancestors_piqi_type `pb format x_pb ?opts
+
+let gen_conf_base ?opts x (format :Piqirun_ext.output_format) =
+  let buf = Api_saisie_read_piqi.gen_conf_base x in
+  let x_pb = Piqirun.to_string buf in
+  Piqirun_ext.convert _conf_base_piqi_type `pb format x_pb ?opts
+
 let gen_sosa ?opts x (format :Piqirun_ext.output_format) =
   let buf = Api_saisie_read_piqi.gen_sosa x in
   let x_pb = Piqirun.to_string buf in
@@ -555,6 +577,16 @@ let print_error_code ?opts x =
   Pervasives.print_endline (gen_error_code x `piq ?opts)
 let prerr_error_code ?opts x =
   Pervasives.prerr_endline (gen_error_code x `piq ?opts)
+
+let print_nb_ancestors ?opts x =
+  Pervasives.print_endline (gen_nb_ancestors x `piq ?opts)
+let prerr_nb_ancestors ?opts x =
+  Pervasives.prerr_endline (gen_nb_ancestors x `piq ?opts)
+
+let print_conf_base ?opts x =
+  Pervasives.print_endline (gen_conf_base x `piq ?opts)
+let prerr_conf_base ?opts x =
+  Pervasives.prerr_endline (gen_conf_base x `piq ?opts)
 
 let print_sosa ?opts x =
   Pervasives.print_endline (gen_sosa x `piq ?opts)

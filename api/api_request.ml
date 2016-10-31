@@ -94,6 +94,7 @@ value family_m conf base =
   | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
   | Some "API_LOOP_BASE" -> Api.print_loop conf base
   | Some "API_MAX_ANCESTORS" when conf.wizard -> Api.print_max_ancestors conf base
+  | Some "API_NB_ANCESTORS" -> Api_saisie_read.print_nb_ancestors conf base
   | Some "API_NOTIFICATION_BIRTHDAY" -> Api.print_notification_birthday conf base
   | Some "API_PRINT_INDEX" -> Api.print_all_full_person conf base
   | Some "API_PRINT_EXPORT" -> Api.print_export conf base
@@ -107,11 +108,10 @@ value family_m conf base =
   | Some "API_UPDATE_PERSON" -> Api_update_person.print_mod conf base
   | Some "API_UPDATE_FAMILY" -> Api_update_family.print_mod conf base
 *)
-  | Some "API_GRAPH_TREE" -> Api_saisie_read.print_graph_tree conf base
   | Some "API_GRAPH_TREE_V2" -> Api_saisie_read.print_graph_tree_v2 conf base
-  | Some "API_GRAPH_TREE_FULL" -> Api_saisie_read.print_graph_tree_full conf base
   | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
   | Some "API_FICHE_PERSON" -> Api_saisie_read.print_fiche_person conf base
+  | Some "API_CONF_BASE" -> Api_saisie_read.print_conf_base conf base
 
   | Some "API_AUTO_COMPLETE" when conf.wizard -> Api_saisie_write.print_auto_complete conf base
   | Some "API_GET_CONFIG" when conf.wizard -> Api_saisie_write.print_config conf base

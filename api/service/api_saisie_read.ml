@@ -1965,17 +1965,21 @@ let is_private_person conf base ip =
 ;;
 
 (* ********************************************************************* *)
-(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
-(** [Description] : Renvoie un objet personne contenant les données de
-      la fiche en fonction d'un identifiant (index ou sosa).
+(*  [Fonc] print_from_identifier_person : conf -> base ->                *)
+(*   print_result_from_ip -> Identifier_person -> unit                   *)
+(** [Description] : Utilise un identifiant de personne pour appeler une
+    fonction qui utilise l'ip (index de la personne) récupéré.
+    Affiche des erreurs si la personne n'est pas trouvée
+    ou si les paramètres sont incorrects.
     [Args] :
-      - conf  : configuration de la base
-      - base  : base de donnée
+      - conf                 : configuration de la base
+      - base                 : base de donnée
+      - print_result_from_ip : fonction permettant d'afficher les resultats
+      - identifier_person    : Objet identifiant une personne
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let print_fiche_person conf base =
-  let identifier_person = get_params conf Mext_read.parse_identifier_person in
+let print_from_identifier_person conf base print_result_from_ip identifier_person =
   try
   let result =
   match identifier_person.Mread.Identifier_person.index with
@@ -1983,7 +1987,7 @@ let print_fiche_person conf base =
       (* Traite l'index *)
       let ip = Adef.iper_of_int (Int32.to_int index) in
       if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-      print_result_fiche_person conf base ip
+      print_result_from_ip conf base ip
   | None ->
     match (identifier_person.Mread.Identifier_person.oc)  with
     | (Some oc) ->
@@ -2001,7 +2005,7 @@ let print_fiche_person conf base =
             else
             (
               if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-              print_result_fiche_person conf base ip
+              print_result_from_ip conf base ip
             )
           | None ->
             print_error conf `not_found
@@ -2020,7 +2024,7 @@ let print_fiche_person conf base =
       match search_index conf base (fn ^ " " ^ sn) order with
       | Some ip ->
         if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-        print_result_fiche_person conf base ip
+        print_result_from_ip conf base ip
       | None -> print_error conf `not_found
       )
     | (None, Some sn) ->
@@ -2029,7 +2033,7 @@ let print_fiche_person conf base =
       match search_index conf base sn order with
       | Some ip ->
         if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-        print_result_fiche_person conf base ip
+        print_result_from_ip conf base ip
       | None -> print_error conf `not_found
       )
     | (Some fn, None) -> print_error conf `not_found
@@ -2042,6 +2046,19 @@ let print_fiche_person conf base =
   with _ -> print_error conf `not_found
 ;;
 
+(* ********************************************************************* *)
+(*  [Fonc] print_fiche_person : conf -> base -> unit                     *)
+(** [Description] : Affiche une fiche personne en fonction
+    d'un identifiant.
+    [Args] :
+      - conf  : configuration de la base
+      - base  : base de donnée
+    [Retour] : Néant
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_fiche_person conf base =
+  print_from_identifier_person conf base print_result_fiche_person (get_params conf Mext_read.parse_identifier_person)
+;;
 
 
 (**/**) (* V1 *)
@@ -2369,91 +2386,6 @@ let build_graph_desc conf base p max_gen base_loop =
   nodes := create_node p (Adef.ifam_of_int (-1)) 1 Root conf.command :: !nodes;
   loop [(p, 1)] nodes edges families
 ;;
-
-
-(* ********************************************************************* *)
-(*  [Fonc] print_tree : conf -> base -> todo                             *)
-(** [Description] :
-    [Args] :
-      - conf  : configuration de la base
-      - base  : base de donnée
-    [Retour] :
-    [Rem] : Non exporté en clair hors de ce module.                      *)
-(* ********************************************************************* *)
-let print_graph_tree conf base =
-  let params = get_params conf Mext_read.parse_graph_tree_params in
-  let ip = Adef.iper_of_int (Int32.to_int params.Mread.Graph_tree_params.index) in
-  let () = Perso.build_sosa_ht conf base in
-  let p = poi base ip in
-  let max_asc = 12 in
-  let nb_asc =
-    match params.Mread.Graph_tree_params.nb_asc with
-    | Some n -> min max_asc (max (Int32.to_int n) 1)
-    | None -> max_asc
-  in
-  (* cache lien inter arbre *)
-  let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let (nodes_asc, edges_asc, _) = build_graph_asc conf base p nb_asc false in
-  (*
-  let nodes_asc =
-    List.rev_map
-      (fun p ->
-        let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
-        let p = pers_to_piqi_person_tree conf base p in
-        Mread.Node.({
-          id = id;
-          person = p;
-          ifam = None;
-        })
-      nodes_asc
-  in
-  *)
-  let max_desc = 12 in
-  let nb_desc =
-    match params.Mread.Graph_tree_params.nb_desc with
-    | Some n -> min max_desc (max (Int32.to_int n) 1)
-    | None -> max_desc
-  in
-  let (nodes_desc, edges_desc, _) =
-    build_graph_desc conf base p nb_desc false
-  in
-  let nodes_siblings =
-    match get_parents p with
-    | Some ifam ->
-        let fam = foi base ifam in
-        List.fold_right
-          (fun c accu ->
-            if c = ip then accu
-            else
-              let c = poi base c in
-              let id = Int64.of_int (Adef.int_of_iper (get_key_index c)) in
-              let c = pers_to_piqi_person_tree conf base c Siblings 1 1 conf.command in
-              let node =
-                Mread.Node.({
-                  id = id;
-                  person = c;
-                  ifam = None;
-                })
-              in
-              node :: accu)
-          (Array.to_list (get_children fam)) []
-    | None -> []
-  in
-  let graph =
-    Mread.Graph_tree.({
-      nodes_asc = nodes_asc;
-      edges_asc = edges_asc;
-      nodes_desc = nodes_desc;
-      edges_desc = edges_desc;
-      nodes_siblings = nodes_siblings;
-    })
-  in
-  let data = Mext_read.gen_graph_tree graph in
-  print_result conf data
-;;
-
-
-(**/**) (* V2 *)
 
 (* Graphe d'ascendance v2 *)
 
@@ -2903,7 +2835,7 @@ let build_graph_desc_v2 conf base p max_gen =
 
 
 (* ********************************************************************* *)
-(*  [Fonc] print_tree_v2 : conf -> base -> todo                          *)
+(*  [Fonc] print_result_graph_tree_v2 : conf -> base -> todo                    *)
 (** [Description] :
     [Args] :
       - conf  : configuration de la base
@@ -2911,9 +2843,8 @@ let build_graph_desc_v2 conf base p max_gen =
     [Retour] :
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let print_graph_tree_v2 conf base =
+let print_result_graph_tree_v2 conf base ip =
   let params = get_params conf Mext_read.parse_graph_tree_params in
-  let ip = Adef.iper_of_int (Int32.to_int params.Mread.Graph_tree_params.index) in
   (* Construction de la base avec calcul des sosas           *)
   (* Si iz présent, on prend iz comme souche pour le calcul  *)
   (* Sinon on prend la souche de l'arbre                     *)
@@ -3914,139 +3845,147 @@ let build_graph_desc_full conf base p max_gen =
   (List.rev !nodes, List.rev !edges, List.rev !families)
 ;;
 
+(* ************************************************************************ *)
+(*  [Fonc] get_nb_ancestors : config -> base -> ip -> int                   *)
+(** [Description] : Retourne le nombre d'ascendants d'une personne.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - ip   : l'index de la personne
+    [Retour] : int
+    [Rem] : Non exporté en clair hors de ce module.                         *)
+(* ************************************************************************ *)
+let get_nb_ancestors conf base ip =
+  let rec count_nb_ancestors base visited_ips not_visited_ips nb_visited_ips =
+    match not_visited_ips with
+      [] -> nb_visited_ips
+      | current_ip::not_visited_ips ->
+        if visited_ips.(Adef.int_of_iper current_ip) then
+          (* Passe au noeud suivant si le noeud courant a déjà été visité. *)
+          count_nb_ancestors base visited_ips not_visited_ips nb_visited_ips
+        else
+          begin
+            let not_visited_ips =
+              match get_parents (poi base current_ip) with
+              | Some ifam ->
+                let cpl = foi base ifam in
+                (* Ajoute les index des parents au tableau des noeuds à parcourir. *)
+                not_visited_ips@[get_father cpl]@[get_mother cpl]
+              | None ->
+                (* Si pas de parents, le tableau des noeuds à visiter ne change pas. *)
+                not_visited_ips
+            in
+            (* Met à jour le tableau des noeuds parcourus. *)
+            visited_ips.(Adef.int_of_iper current_ip) <- true;
+            (* Passe au noeud suivant en incrémentant le nombre de noeuds. *)
+            count_nb_ancestors base visited_ips not_visited_ips (nb_visited_ips + 1)
+          end
+  in
+  (* Tableau qui conserve les index des personnes déjà parcourues. *)
+  let visited_ips = Array.make (nb_of_persons base) false in
+  (* Le nombre d'ascendants d'un individu est le nombre de personnes parcourues moins 1 (lui-même). *)
+  count_nb_ancestors base visited_ips [ip] (-1)
+;;
+
+(* ************************************************************************** *)
+(*  [Fonc] pers_to_piqi_nb_ancestors : conf -> base -> int -> NbAncestors     *)
+(** [Description] : Retourne à partir d'un nombre un NbAncestors (piqi).
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - nb   : nombre d'ascendants
+    [Retour] : NbAncestors
+    [Rem] : Non exporté en clair hors de ce module.                           *)
+(* ************************************************************************** *)
+let nb_to_piqi_nb_ancestors conf base nb =
+    let piqi_nb_ancestors = Mread.default_nb_ancestors() in
+        piqi_nb_ancestors.Mread.Nb_ancestors.nb <- Int32.of_int nb;
+    Mext_read.gen_nb_ancestors piqi_nb_ancestors
+;;
 
 (* ********************************************************************* *)
-(*  [Fonc] print_graph_tree_full : conf -> base ->                       *)
-(** [Description] :
+(*  [Fonc] print_result_nb_ancestors : conf -> base -> ip -> unit        *)
+(** [Description] : Retourne le nombre d'ascendants d'un individu.
     [Args] :
-      - conf  : configuration de la base
-      - base  : base de donnée
-    [Retour] :
+      - conf : configuration de la base.
+      - base : base.
+      - ip   : l'index de la personne.
+    [Retour] : unit
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-let print_graph_tree_full conf base =
+let print_result_nb_ancestors conf base ip =
+    let data = nb_to_piqi_nb_ancestors conf base (get_nb_ancestors conf base ip) in
+    print_result conf data
+;;
+
+(* ********************************************************************* *)
+(*  [Fonc] print_nb_ancestors : conf -> base -> unit                     *)
+(** [Description] : Retourne le nombre d'ascendants d'un individu.
+    [Args] :
+      - conf : configuration de la base.
+      - base : base.
+      - ip   : l'index de la personne.
+    [Retour] : unit (NbAncestors | Error)
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_nb_ancestors conf base =
+  print_from_identifier_person conf base print_result_nb_ancestors (get_params conf Mext_read.parse_identifier_person)
+;;
+
+(* ********************************************************************* *)
+(*  [Fonc] print_graph_tree_v2 : conf -> base -> unit                    *)
+(** [Description] : Retourne un graph d'ascendance et de descendance
+       d'une personne
+    [Args] :
+      - conf : configuration de la base.
+      - base : base.
+    [Retour] : unit (graph | Error)
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+let print_graph_tree_v2 conf base =
   let params = get_params conf Mext_read.parse_graph_tree_params in
-  let ip = Adef.iper_of_int (Int32.to_int params.Mread.Graph_tree_params.index) in
-  let () = Perso.build_sosa_ht conf base in
-  let p = poi base ip in
-  let max_asc = 12 in
-  let nb_asc =
-    match params.Mread.Graph_tree_params.nb_asc with
-    | Some n -> min max_asc (max (Int32.to_int n) 1)
-    | None -> max_asc
-  in
-  (* cache lien inter arbre *)
-  let () = Perso_link.init_cache conf base ip 1 1 1 in
-  let (nodes_asc, edges_asc, families_asc) =
-    build_graph_asc_full conf base p nb_asc
-  in
-  (*
-  let nodes_asc =
-    List.rev_map
-      (fun p ->
-        let id = Int64.of_int (Adef.int_of_iper (get_key_index p)) in
-        let p = pers_to_piqi_person_tree_full conf base p in
-        Mread.Node_full.({
-          id = id;
-          person = p;
-          ifam = None;
-        }))
-      nodes_asc
-  in
-  *)
-  let max_desc = 12 in
-  let nb_desc =
-    match params.Mread.Graph_tree_params.nb_desc with
-    | Some n -> min max_desc (max (Int32.to_int n) 1)
-    | None -> max_desc
-  in
-  let (nodes_desc, edges_desc, families_desc) =
-    build_graph_desc_full conf base p nb_desc
-  in
-  let nodes_siblings =
-    match get_parents p with
-    | Some ifam ->
-        let fam = foi base ifam in
-        List.fold_right
-          (fun ic accu ->
-            if ic = ip then accu
-            else
-              let c = poi base ic in
-              (* Pour les liens inter arbres, on rend l'id unique avec *)
-              (* le prefix de la base et l'index de la personne.       *)
-              let uniq_id = Hashtbl.hash (conf.command, ic) in
-              let id = Int64.of_int uniq_id in
-              let c = pers_to_piqi_person_tree_full conf base c Siblings 1 1 conf.command in
-              let node =
-                Mread.Node_full.({
-                  id = id;
-                  person = c;
-                  ifam = None;
-                })
-              in
-              node :: accu)
-          (Array.to_list (get_children fam)) []
-    | None -> []
-  in
-  let (nodes_siblings_before, nodes_siblings_after) =
-    match get_parents p with
-    | Some ifam ->
-        let fam = foi base ifam in
-        let children = Array.to_list (get_children fam) in
-        let rec split_at_person before after l =
-          match l with
-          | [] -> (List.rev before, after)
-          | ic :: l ->
-              if ic = ip then
-                let after =
-                  List.map
-                    (fun ic ->
-                      let c = poi base ic in
-                      (* Pour les liens inter arbres, on rend l'id unique avec *)
-                      (* le prefix de la base et l'index de la personne.       *)
-                      let uniq_id = Hashtbl.hash (conf.command, ic) in
-                      let id = Int64.of_int uniq_id in
-                      let c = pers_to_piqi_person_tree_full conf base c Siblings 1 1 conf.command in
-                      Mread.Node_full.({
-                        id = id;
-                        person = c;
-                        ifam = None;
-                      }))
-                    l
-                in
-                (List.rev before, after)
-              else
-                let c = poi base ic in
-                (* Pour les liens inter arbres, on rend l'id unique avec *)
-                (* le prefix de la base et l'index de la personne.       *)
-                let uniq_id = Hashtbl.hash (conf.command, ic) in
-                let id = Int64.of_int uniq_id in
-                let c = pers_to_piqi_person_tree_full conf base c Siblings 1 1 conf.command in
-                let node =
-                  Mread.Node_full.({
-                    id = id;
-                    person = c;
-                    ifam = None;
-                  })
-                in
-                split_at_person (node :: before) after l
-        in
-        split_at_person [] [] children
-    | None -> ([], [])
-  in
-  let graph =
-    Mread.Graph_tree_full.({
-      nodes_asc = nodes_asc;
-      edges_asc = edges_asc;
-      families_asc = families_asc;
-      nodes_desc = nodes_desc;
-      edges_desc = edges_desc;
-      families_desc = families_desc;
-      nodes_siblings = nodes_siblings;
-      nodes_siblings_before = nodes_siblings_before;
-      nodes_siblings_after = nodes_siblings_after;
-    })
-  in
-  let data = Mext_read.gen_graph_tree_full graph in
+  let identifier_person = params.Mread.Graph_tree_params.identifier_person in
+  print_from_identifier_person conf base print_result_graph_tree_v2 identifier_person
+;;
+
+(* ******************************************************************** *)
+(*  [Fonc] print_conf_base : file_path -> string base                   *)
+(** [Description] : Lit un fichier puis le retourne sous format string.
+    [Args] :
+      - file_path : chemin du fichier                                   *)
+(* ******************************************************************** *)
+let rec read_base_file file_path =
+  let ic = open_in file_path in
+  let n = in_channel_length ic in
+  let s = String.create n in
+  really_input ic s 0 n;
+  close_in ic;
+  (s)
+;;
+
+(* ******************************************************************** *)
+(*  [Fonc] print_conf_base : config -> base_file -> ConfBase            *)
+(** [Description] : Construit l'objet piqi conf_base.
+    [Args] :
+      - conf : configuration de la base                                 *)
+(* ******************************************************************** *)
+let construct_conf_base conf base_file =
+  let conf_base = Mread.default_conf_base() in
+    conf_base.Mread.Conf_base.configuration <- base_file;
+  conf_base
+;;
+
+(* ******************************************************************** *)
+(*  [Fonc] print_conf_base : config -> base -> InfosBase                *)
+(** [Description] : Retourne les configurations d'une base.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de données                                          *)
+(* ******************************************************************** *)
+let print_conf_base conf base =
+  let fname = Util.base_path [] (conf.bname ^ ".gwf") in
+  let base_file = read_base_file fname in
+  let base_conf = construct_conf_base conf base_file in
+  let data = Mext_read.gen_conf_base base_conf in
   print_result conf data
 ;;
