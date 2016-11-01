@@ -233,7 +233,9 @@ value print_exc exc =
         prerr_char ')';
       }
       else ();
-      prerr_char '\n'
+      prerr_char '\n';
+      prerr_string "Wserver: full backtrace: ";
+      Printexc.print_backtrace stderr;
     } ]
 ;
 
