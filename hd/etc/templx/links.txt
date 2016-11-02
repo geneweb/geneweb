@@ -7,10 +7,10 @@
           <li><a href="%prefix;m=R;%access;" class="highlight">%nn
                  [*relationship computing]</a></li>
           %if;(browsing_with_sosa_ref and sosa_ref.index!=central_index)
-            <li><a href="%prefix;em=R;ei=%index;;m=NG;v=1;%nn;
+            <li><a href="%prefix;em=R;ei=%index;;m=NG;n=1;%nn;
                    long=on;image=on;spouse=on;et=M" class="highlight">%nn;
                    [*relationship computing::with]</a> %sosa_ref;</li>
-            <li><a href="%prefix;em=R;ei=%index;;m=NG;v=1;%nn;
+            <li><a href="%prefix;em=R;ei=%index;;m=NG;n=1;%nn;
                    long=on;image=on;spouse=on;et=S" class="highlight">%nn;
                    [*shortest path::with]</a> %sosa_ref;</li>
           %end;
