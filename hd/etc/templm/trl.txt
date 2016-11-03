@@ -39,7 +39,7 @@
       <a href="%prefix_no_templ;templ=templ502;%suffix;">templ502</a>
     </div>
     <div class="button" style="margin-top:-1.3em;margin-left:2px;">
-      <a href="http://opensource.geneanet.org/projects/geneweb/wiki/Fr_templm">Doc templm</a>
+      <a href="http://geneweb.tuxfamily.org/wiki/templm">Doc templm</a>
     </div>
    %end;
   %if;(wizard)

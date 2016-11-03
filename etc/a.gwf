@@ -34,7 +34,7 @@
 # Customize the default.css stylesheet or create your own one and
 # specify it to geneweb by adding this line in your gwf.
 # More about how to customize here :
-# http://opensource.geneanet.org/projects/geneweb/wiki/en_css
+# http://geneweb.tuxfamily.org/wiki/CSS
 css_prop=stylesheet
 
 
@@ -372,7 +372,7 @@ expand_env=no
 #authorized_wizards_notes=yes/no
 
 # Custom the individual page.
-# Full documentation here http://opensource.geneanet.org/projects/geneweb/wiki/Fr_Template#Personnalisation-de-toutes-les-pages
+# Full documentation here http://geneweb.tuxfamily.org/wiki/Templates
 #
 # Basic explanation :
 # Add the element you want like this :

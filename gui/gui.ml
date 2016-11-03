@@ -780,7 +780,7 @@ value rec show_main conf = do {
     (inser_toolbar
        (capitale (transl "doc")) (capitale (transl "view doc")) "gui_doc.png"
        (fun () ->
-         let url = "http://opensource.geneanet.org/projects/geneweb/wiki" in
+         let url = "http://geneweb.tuxfamily.org/wiki/GeneWeb" in
          ignore (browse conf url)) );
   toolbar#insert_space ();
 (* TOTO : gérer le restart
