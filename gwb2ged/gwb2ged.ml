@@ -16,6 +16,7 @@ type charset =
 value charset = ref Utf8;
 value no_notes = ref False;
 value no_picture = ref False;
+value picture_path = ref False;
 
 value month_txt =
   [| "JAN"; "FEB"; "MAR"; "APR"; "MAY"; "JUN"; "JUL"; "AUG"; "SEP"; "OCT";
@@ -560,9 +561,26 @@ value ged_psource base oc per =
   | s -> fprintf oc "1 SOUR %s\n" (encode s) ]
 ;
 
+value img_base_path = ref "";
+
+value has_image_file base p =
+  let s = Util.default_image_name base p in
+  let f = Filename.concat img_base_path.val s in
+  if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
+  else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
+  else None
+;
+
 value ged_multimedia_link base oc per =
   match sou base (get_image per) with
-  [ "" -> ()
+  [ "" ->
+      if not no_picture.val && picture_path.val then
+        match has_image_file base per with
+        [ Some s ->
+            do {fprintf oc "1 OBJE\n"; fprintf oc "2 FILE %s\n" s;}
+        | None -> () ]
+      else ()
   | s ->
       if not no_picture.val then
         do {fprintf oc "1 OBJE\n"; fprintf oc "2 FILE %s\n" s;}
@@ -754,6 +772,17 @@ value no_spouses_parents = ref False;
 value censor = ref 0;
 value with_siblings = ref False;
 
+value set_img_base_path bname =
+  if not no_picture.val && picture_path.val then
+    let old_dir = Sys.getcwd () in
+    let () = Sys.chdir (Secure.base_dir ()) in
+    let img_dir = Sys.getcwd () in
+    let () = Sys.chdir old_dir in
+    let path = List.fold_left Filename.concat img_dir [ "images"; bname ] in
+    img_base_path.val := path
+  else ()
+;
+
 value gwb2ged base ifile ofile anc desc mem =
   let anc =
     match anc with
@@ -773,6 +802,7 @@ value gwb2ged base ifile ofile anc desc mem =
       load_descends_array base;
     }
     else ();
+    let () = set_img_base_path ifile in
     let oc = if ofile = "" then stdout else open_out ofile in
     let ((per_sel, fam_sel) as sel) =
       Select.functions base anc desc surnames.val None no_spouses_parents.val
@@ -864,6 +894,7 @@ value speclist =
     ": no spouses' parents (for options -s and -d)");
    ("-nn", Arg.Set no_notes, ": no (database) notes");
    ("-nopicture", Arg.Set no_picture, ": Don't extract individual picture.");
+   ("-picture-path", Arg.Set picture_path, ": Extract pictures path.");
    ("-c", Arg.Int (fun i -> censor.val := i), "\
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
@@ -940,4 +971,4 @@ value main () =
   }
 ;
 
-Printexc.print main ();
+Printexc.catch main ();
