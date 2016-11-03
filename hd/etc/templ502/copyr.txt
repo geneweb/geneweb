@@ -13,6 +13,6 @@ it: Pagina visualizzata da
 sl: Strani ustvarjene z:
     <a href="http://www.geneweb.org/">GeneWeb %version;</a>
 ])%compilation_time;%sp;
-Copyright &copy; 1998-2007 INRIA%connections;%sq;
+Copyright &copy; 1998-2016 INRIA%connections;%sq;
 %if;(not cancel_links) - <a href="%prefix;m=DOC">DOC</a>%end;%sq;
 %setup_link;</em><br%/><br%/></div>
