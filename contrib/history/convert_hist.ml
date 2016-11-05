@@ -82,7 +82,9 @@ value load_old_person_history fname = do {
             let v : old_gen_record = input_value ic in
             history.val := [v :: history.val]
           }
-        with [ End_of_file -> () ];
+        with
+          [ End_of_file -> ()
+          | Failure "input_value: truncated object" -> () ];
         close_in ic
       }
   | None -> () ];
