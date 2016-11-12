@@ -7563,12 +7563,12 @@ no: Vielsesattest
 pt: licença de casamento
 sv: Äktenskapslicens
 
-    marriage notes
+    marriage notes/marriages notes
 de: notizen zu den Ehen
-en: marriage Notes
+en: marriage Notes//marriages Notes
 es: notas de matrionios
 fi: lisämerkintöjä vihkimisestä
-fr: notes concernant l’union
+fr: notes concernant l’union/notes concernant les unions
 it: note di matrimoni
 nl: Aantekeningen
 no: notater om ekteskapet
