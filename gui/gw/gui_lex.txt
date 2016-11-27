@@ -145,9 +145,9 @@ fr: Configuration du port
 en: Setup browser
 fr: Configuration du navigateur
 
-    Finnish
-en: Finnish
-fr: Terminer
+    Completed
+en: Completed!
+fr: Terminé!
 
     Home
 en: Home

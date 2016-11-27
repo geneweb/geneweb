@@ -1243,7 +1243,7 @@ value launch_config () =
          page_3#as_widget);
     ignore
       (assistant#append_page
-         ~{ title = transl "Finnish";
+         ~{ title = transl "Completed";
             page_type = `CONFIRM;
             complete = True }
          page_4#as_widget);
