@@ -126,6 +126,10 @@ distrib:
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
 	cp -R hd/* $(DESTDIR)/gw/.
+	if [ -a gui/gui ]; then \
+	  cp gui/gw/gui_lex.txt $(DESTDIR)/gw/.; \
+	  cp gui/gui $(DESTDIR)/gw/gui$(EXE); \
+	fi
 
 .merlin:
 	echo "PKG $(PACKAGES)" > $@
