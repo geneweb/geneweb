@@ -1,4 +1,4 @@
-<!-- perso_module/timeline -->
+<!-- perso_module/timeline v7.00 11/03/2017 01:50:02 -->
 
 %define;event_tree(z1)
   %reset_count;
@@ -50,7 +50,7 @@
     i%count;=%sosa_ref.index;;%nn;
     t%count;=sosa_1;%nn;
   %end;
-  "%if;(count < 3) style="display:none;"%end; title="[*witness tree]"%nn;
+  "%if;(count < 3) style="display:none;"%end; title="[*witness tree] (witness to my events and godparents)"%nn;
   %reset_count;
 %end;
 
@@ -87,7 +87,7 @@
   %if;browsing_with_sosa_ref;
     %incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;
   %end;
-  " title="[*relations tree]"
+  " class="ml-2" title="[*relations tree] (all)"
    %reset_count;
 %end;
 
@@ -130,40 +130,66 @@
 
 %if;(has_event or has_families)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h3 class="highlight">[*time line]
+  <h3 class="highlight my-1">[*time line]%nn;
       %if;(not cancel_links)
-        &nbsp;<a %apply;relations_tree(l_ref)><img src="%image_prefix;/gui_create.png" height="20" alt="Tree"/></a>
+        <a %apply;relations_tree(l_ref)><img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/></a>
       %end;
   </h3>
-  <table>
+  <table class="w-100">
     %foreach;event;
       <tr>
-        <td style="vertical-align:top;white-space: nowrap;">
-          <span class="edate">
-            %if;event.has_date;%event.date; - 
-            %else;--- - 
+        <td class="w-25">
+          <span class="edate">%nn;
+            %if;event.has_date;%event.date;
+            %else;---
             %end;
           </span>
         </td>
-        <td style="vertical-align:top;">
-          <span>
+        <td class="px-2">–</td>
+        %if;(event.name="special" and (event.has_note or event.has_src ))
+          <td>
+            <div>%apply;capitalize(event.src)</div>
+          </td>
+          <td class="text-right">
+            <div>%apply;capitalize(event.note)</div>
+          </td>
+        %elseif;(event.name="special1" and has_linked_page.TIMELINE)
+          <td>
+            <div>%apply;capitalize(linked_page.TIMELINE)</div>
+          </td>
+          <td class="text-right">
+            <span class="eplace">
+            %if;event.has_place;%event.place;%end;
+            </span>
+          </td>
+        %elseif;(event.name="special2" and has_linked_page.TIMELINE)
+          <td>
+            <div>%apply;capitalize(linked_page.TIMELINE)</div>
+          </td>
+          <td class="text-right">
+            <div>%apply;capitalize(event.note)</div>
+          </td>
+        %else;
+          <td>
+            <span>
             %apply;capitalize(event.name)
             %if;event.has_spouse;%sp;[with] %event.spouse;%end;
-            %if;(event.has_witnesses and not cancel_links) &nbsp;
-              <a %apply;event_tree(index)>
-              <img src="%image_prefix;/gui_create.png" height="15" alt="Tree"/>
+            %if;(event.has_witnesses and not cancel_links)
+              <a %apply;event_tree(index)>%sq;
+                <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"/>
               </a>
             %end;
-          </span>
-        </td>
-        <td style="vertical-align:top;white-space: nowrap;">
-          <span class="eplace">
+            </span>
+          </td>
+          <td class="text-right">
+            <span class="eplace">
             %if;event.has_place;%event.place;%end;
-          </span>
-        </td>
+            </span>
+          </td>
+        %end;
       </tr>
       <tr>
-        <td></td>
+        <td colspan="2"></td>
         <td colspan="2">
           <span>
             %if;(event.name=[baptism]) %( %if;(event.e_name="#bapt") ???   %)
@@ -194,7 +220,8 @@
             %apply;list_witness_of_kind("witness/witness/witnesses")
             %apply;list_witness_of_kind("officer/officer/officers")
           %end;
-          %if;event.has_note;
+          %if;(event.has_note and event.name!="special"
+                              and event.name!="special2")
             <div>%apply;capitalize(event.note)</div>  %(supprimer le <p> </p> intégré dans l'Ocaml sans quoi la capitalisation n’est pas possible%)
           %end;
           </span>

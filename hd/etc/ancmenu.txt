@@ -2,7 +2,7 @@
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: ancmenu.txt,v 5.11 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %apply;a_of_b%with;
       [*ancestors]%nn;
@@ -14,8 +14,7 @@
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.favicon;
   %include.css;
@@ -47,8 +46,10 @@ function table_options () {
   $('input[type=checkbox][id=t_marr]').prop('checked', true);
   $('input[type=checkbox][id=t_marr_date]').prop('checked', true);
   $('input[type=checkbox][id=t_marr_place]').prop('checked', true);
+  $('input[type=checkbox][id=t_child]').prop('checked', true);
   $('input[type=checkbox][id=t_death]').prop('checked', true);
   $('input[type=checkbox][id=t_death_place]').prop('checked', true);
+  $('input[type=checkbox][id=t_occu]').prop('checked', true);
   $('input[type=checkbox][id=t_gen]').prop('checked', true);
   $('input[type=checkbox][id=t_repeat]').prop('checked', true);
 }
@@ -93,7 +94,7 @@ function no_options () {
 
 --></script>
 
-<h1>%nn;
+<h1 class="text-center my-3">%nn;
   %apply;a_of_b%with;
     [*ancestors]%nn;
   %and;
@@ -108,9 +109,8 @@ function no_options () {
   [*to the %s generation:::xx]%nn;
 %end;
 
-
 <form method="get" action="%action;">
-  <div class="row">
+  <div class="row mx-5 mt-2">
     <p>
       %hidden;
       <input type="hidden" name="m" value="A"%/>
@@ -125,337 +125,333 @@ function no_options () {
       %end;
       <input type="hidden" name="sosab" value="10"%/>
     </p>
-    <div class="offset-xs-1">
-      <div class="col-md-4">
-        <div class="radio">
-        <label>
-          <input type="radio" name="t" value="N" checked onclick="no_options()"%/> <span class="fa fa-align-left fa-fw"></span> [*short display]*
-        </label>
-        </div>
-  %( Positionne directement l'affiche du numéro sosa en base 10 %)
-  %(
-        <div>
-          Sosa base
-          <label><input type="radio" class="form-control" name="sosab" value="8"%/>8</label>
-          <label><input type="radio" class="form-control" name="sosab" value="10"%/>10</label>
-          <label><input type="radio" class="form-control" name="sosab" value="16"%/>16</label>
-        </div>
-  %)
-        <label>
-          <input type="radio" name="t" value="G" onclick="long_display_options()"%/> <span class="fa fa-align-justify fa-fw"></span> [*long display]*
-        </label>
-        <div class="offset-xs-1">
-          <p>
-            <label>
-              <input type="checkbox" id="ld_siblings" name="siblings"/> [*siblings]
-            </label>
-            <label>
-              <input type="checkbox" name="rel" value="on"%/>
-              [*relation/relations]1
-            </label>
-            <label>
-              <input type="checkbox" name="witn" value="on"%/>
-              [*witness/witnesses]1 ([marriage/marriages]1)
-            </label>
-          </p>
-          <p>
-            <label>
-              <input type="checkbox" id="ld_notes" name="notes" value="on"%/>
-              [*individual notes]
-            </label>
-            <label>
-              <input type="checkbox" id="ld_src" name="src" value="on"%/>
-              [*source/sources]1
-            </label>
-            <label>
-              <input type="checkbox" name="inline" value="on"%/>
-              [*display notes/sources inline]
-            </label>
-          </p>
-          <p>
-            <label>
-              <input type="checkbox" name="comm" value="on"%/>
-              [*comment] ([marriage/marriages]1)
-            </label>
-          </p>
-        </div>
-
-        <label>
-          <input type="radio" name="t" value="Z" onclick="table_options()"%/> <span class="fa fa-table fa-fw"></span> [*table]*
-        </label>
-        <div class="offset-xs-1">
+    <div class="col-md-5">
+      <div class="radio">
+      <label>
+        <input type="radio" name="t" value="N" checked onclick="no_options()"%/> <span class="fa fa-align-left fa-fw"></span> [*short display]*
+      </label>
+      </div>
+%( Positionne directement l'affiche du numéro sosa en base 10 %)
+%(
+      <div>
+        Sosa base
+        <label><input type="radio" class="form-control" name="sosab" value="8"%/>8</label>
+        <label><input type="radio" class="form-control" name="sosab" value="10"%/>10</label>
+        <label><input type="radio" class="form-control" name="sosab" value="16"%/>16</label>
+      </div>
+%)
+      <label>
+        <input type="radio" name="t" value="G" onclick="long_display_options()"%/> <span class="fa fa-align-justify fa-fw"></span> [*long display]*
+      </label>
+      <div class="offset-1">
         <p>
           <label>
-            <input type="checkbox" id="t_birth" name="birth" value="on"%/>
-            [*date of birth]
+            <input type="checkbox" id="ld_siblings" name="siblings"/> [*siblings]
           </label>
           <label>
-            <input type="checkbox" id="t_birth_place" name="birth_place" value="on"%/>
-            [*where born]
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" id="t_marr" name="marr" value="on"%/>
-            [*spouse/spouses]1
-          </label>
-          <label>
-            <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>
-            [*date of marriage]
-          </label>
-          <label>
-            <input type="checkbox" id="t_marr_place" name="marr_place" value="on"%/>
-            [*where married]
-          </label>
-          <label>
-            <input type="checkbox" name="child" value="on"%/>
-            [*number of children]
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" id="t_death" name="death" value="on"%/>
-            [*date of death]
-          </label>
-          <label>
-            <input type="checkbox" id="t_death_place" name="death_place" value="on"%/>
-            [*where dead]
-          </label>
-          <label>
-            <input type="checkbox" name="death_age" value="on"%/>
-            [*age at death]
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" name="occu" value="on"%/>
-            [*occupation/occupations]1
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" id="t_gen" name="gen" value="on"%/>
-            [*display generation]
-          </label>
-          <label>
-            <input type="checkbox" id="t_repeat" name="repeat" value="on"%/>
-            [*display smallest sosa number relative to ancestor]
-          </label>
-        </p>
-        </div><br><br>
-     </div>
-     <div class="col-md-4">
-        <label>
-          <input type="radio" name="t" value="P" onclick="book_of_ascendants_options()"%/> <span class="fa fa-newspaper-o fa-fw"></span> [*book of ascendants]
-        </label>
-        <div class="offset-xs-1">
-        <p>
-          <label>
-            <input type="checkbox" id="boa_person"%/>
-            [*person/persons]0
-          </label>
-          <label>
-            <input type="checkbox" name="image" value="on"%/>
-            [*image/images]0
-          </label>
-          <label>
-            <input type="checkbox" name="sosa" value="on"%/>
-            [*Sosa]
-          </label>
-          <label>
-            <input type="checkbox" name="note" value="on"%/>
-            [*note/notes]1
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" id="boa_parents" name="parents" value="on"%/>
-            [*parents]
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" id="boa_siblings" name="siblings" value="on"%/>
-            [*full siblings]
-          </label>
-        </p>
-        <p>
-          <label>
-            <input type="checkbox" id="boa_relations" name="rel" value="on"%/>
+            <input type="checkbox" name="rel" value="on"%/>
             [*relation/relations]1
           </label>
-        </p>
-        <p>
           <label>
-            <input type="checkbox" id="boa_marr" name="marr" value="on"%/>
-            [*marriage/marriages]1
-          </label>
-          <label>
-            <input type="checkbox" name="children" value="on"%/>
-            [*child/children]1
-          </label>
-          <label>
-            <input type="checkbox" name="comm" value="on"%/>
-            [*marriage notes/marriages notes]0
+            <input type="checkbox" name="witn" value="on"%/>
+            [*witness/witnesses]1 ([marriage/marriages]1)
           </label>
         </p>
         <p>
           <label>
-            <input type="checkbox" name="asc" value="on"%/>
-            [*ascendants tree]
+            <input type="checkbox" id="ld_notes" name="notes" value="on"%/>
+            [*individual notes]
           </label>
-        </p>
-        <p>
           <label>
-            <input type="checkbox" name="src" value="on"%/>
+            <input type="checkbox" id="ld_src" name="src" value="on"%/>
             [*source/sources]1
           </label>
+          <label>
+            <input type="checkbox" name="inline" value="on"%/>
+            [*display notes/sources inline]
+          </label>
         </p>
-        </div>
+        <p>
+          <label>
+            <input type="checkbox" name="comm" value="on"%/>
+            [*comment] ([marriage/marriages]1)
+          </label>
+        </p>
       </div>
-      <div class="col-md-4">
+
+      <label>
+        <input type="radio" name="t" value="Z" onclick="table_options()"%/> <span class="fa fa-table fa-fw"></span> [*table]*
+      </label>
+      <div class="offset-1">
+      <p>
         <label>
-          <input type="radio" name="t" value="T" onclick="no_options()"%/> <span class="fa fa-sitemap fa-rotate-180 fa-fw"></span> [*tree]
-          %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
-            ([maximum] 7 [generation/generations]1)
-          %elseif;(bvar.max_anc_tree != "" and max_anc_level >= bvar.max_anc_tree)
-            ([maximum] %bvar.max_anc_tree; [generation/generations]1)
-          %end;
+          <input type="checkbox" id="t_birth" name="birth" value="on"%/>
+          [*date of birth]
         </label>
-        <br%/>
         <label>
-          <input type="radio" name="t" value="A" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
+          <input type="checkbox" id="t_birth_place" name="birth_place" value="on"%/>
+          [*where born]
         </label>
-        <br%/>
+      </p>
+      <p>
         <label>
-          <input type="radio" name="t" value="C" onclick="no_options()"%/> <span class="fa fa-female fa-fw"></span> [*male line/female line]1
+          <input type="checkbox" id="t_marr" name="marr" value="on"%/>
+          [*spouse/spouses]1
         </label>
-        <br%/>
-        <div class="offset-xs-1">
-          <label>
-            <input type="checkbox" name="image" value="on"%/>
-            [*image/images]1
-          </label>
-          <br%/>
-          <label>
-            <input type="checkbox" name="marriage" value="on"%/>
-            [*marriage/marriages]0
-          </label>
-          <br%/>
-          <label>
-            [*border]
-            <input name="bd" size="1" maxlength="2" value="0"%/>
-          </label>
-          <br%/>
-          <table style="border-width:%border;;border-spacing:0;">
-            <tr>
-              <td class="text-%left;">[*color]</td>
-              <td class="text-%left;">
-                <input type="radio" name="color" value="" checked%/>
-              </td>
-              <td class="bg1">
-                <input type="radio" name="color" value="bg1"%/>
-              </td>
-              <td class="bg2">
-                <input type="radio" name="color" value="bg2"%/>
-              </td>
-              <td class="bg3">
-                <input type="radio" name="color" value="bg3"%/>
-              </td>
-              <td class="bg4">
-                <input type="radio" name="color" value="bg4"%/>
-              </td>
-              <td class="bg5">
-                <input type="radio" name="color" value="bg5"%/>
-              </td>
-              <td class="bg6">
-                <input type="radio" name="color" value="bg6"%/>
-              </td>
-            </tr>
-          </table>
-        </div>
+        <label>
+          <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>
+          [*date of marriage]
+        </label>
+        <label>
+          <input type="checkbox" id="t_marr_place" name="marr_place" value="on"%/>
+          [*where married]
+        </label>
+        <label>
+          <input type="checkbox" id="t_child" name="child" value="on"%/>
+          [*number of children]
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="t_death" name="death" value="on"%/>
+          [*date of death]
+        </label>
+        <label>
+          <input type="checkbox" id="t_death_place" name="death_place" value="on"%/>
+          [*where dead]
+        </label>
+        <label>
+          <input type="checkbox" id="t_death_age" name="death_age" value="on"%/>
+          [*age at death]
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="t_occu" name="occu" value="on"%/>
+          [*occupation/occupations]1
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="t_gen" name="gen" value="on"%/>
+          [*display generation]
+        </label>
+        <label>
+          <input type="checkbox" id="t_repeat" name="repeat" value="on"%/>
+          [*display smallest sosa number relative to ancestor]
+        </label>
+      </p>
+      </div><br><br>
+   </div>
+   <div class="col-md-4">
+      <label>
+        <input type="radio" name="t" value="P" onclick="book_of_ascendants_options()"%/> <span class="fa fa-newspaper-o fa-fw"></span> [*book of ascendants]
+      </label>
+      <div class="offset-1">
+      <p>
+        <label>
+          <input type="checkbox" id="boa_person"%/>
+          [*person/persons]0
+        </label>
+        <label>
+          <input type="checkbox" name="image" value="on"%/>
+          [*image/images]0
+        </label>
+        <label>
+          <input type="checkbox" name="sosa" value="on"%/>
+          [*Sosa]
+        </label>
+        <label>
+          <input type="checkbox" name="note" value="on"%/>
+          [*note/notes]1
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="boa_parents" name="parents" value="on"%/>
+          [*parents]
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="boa_siblings" name="siblings" value="on"%/>
+          [*full siblings]
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="boa_relations" name="rel" value="on"%/>
+          [*relation/relations]1
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="boa_marr" name="marr" value="on"%/>
+          [*marriage/marriages]1
+        </label>
+        <label>
+          <input type="checkbox" name="children" value="on"%/>
+          [*child/children]1
+        </label>
+        <label>
+          <input type="checkbox" name="comm" value="on"%/>
+          [*marriage notes/marriages notes]0
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" name="asc" value="on"%/>
+          [*ascendants tree]
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" name="src" value="on"%/>
+          [*source/sources]1
+        </label>
+      </p>
       </div>
-      <div class="col-md-4">
+    </div>
+    <div class="col-md-3">
+      <label>
+        <input type="radio" name="t" value="T" onclick="no_options()"%/> <span class="fa fa-sitemap fa-rotate-180 fa-fw"></span> [*tree]
+        %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
+          ([maximum] 7 [generation/generations]1)
+        %elseif;(bvar.max_anc_tree != "" and max_anc_level >= bvar.max_anc_tree)
+          ([maximum] %bvar.max_anc_tree; [generation/generations]1)
+        %end;
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="A" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
+      </label>
+      <br%/>
+      <label>
+        <input type="radio" name="t" value="C" onclick="no_options()"%/> <span class="fa fa-female fa-fw"></span> [*male line/female line]1
+      </label>
+      <br%/>
+      <div class="offset-1">
         <label>
-          <input type="radio" name="t" value="L" onclick="no_options()"%/> <span class="fa fa-share-alt fa-fw"></span> [*list/list (ancestors)]1
-          %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
-            ([maximum] 8 [generation/generations]1)
-          %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
-            ([maximum] %bvar.max_anc_level; [generation/generations]1)
-          %end;
-        </label><br%/>
-        <label>
-          <input type="radio" name="t" value="H" onclick="no_options()"%/> <span class="fa fa-sitemap fa-rotate-270 fa-fw"></span> [*horizontally]
-          %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
-            ([maximum] 8 [generation/generations]1)
-          %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
-            ([maximum] %bvar.max_anc_level; [generation/generations]1)
-          %end;
-        </label><br%/>
-        <label>
-          <input type="radio" name="t" value="E" onclick="no_options()"%/> <span class="fa fa-table fa-fw"></span> [*list eclair]
-        </label><br%/>
-        <label>
-          <input type="radio" name="t" value="F" onclick="no_options()"%/> <span class="fa fa-table fa-fw"></span> [*surnames branch]
-        </label><br%/>
-        <label>
-          <input type="radio" name="t" value="M" onclick="missing_ancestors_options()"%/> <span class="fa fa-question fa-fw"></span> [*missing ancestors]
+          <input type="checkbox" name="image" value="on"%/>
+          [*image/images]1
         </label>
-        <div class="offset-xs-1">
-          <label>
-            <input type="checkbox" id="ma_birth" name="birth" value="on"%/>
-            [*birth date and birth place]
-          </label>
-          <br%/>
-          <label>
-            <input type="checkbox" id="ma_death" name="death" value="on"%/>
-            [*death date and death place]
-          </label>
-          <br%/>
-          <label>
-            <input type="checkbox" name="spouse" value="on"%/>
-            [*spouse/spouses]1
-          </label>
-          <br%/>
-  %(
-          <label>
-            [*living from/to]0 %sp;
-            <input type="text" name="after" size="4" maxlength="4" value=""%/>
-            [living from/to]1 %sp;
-            <input type="text" name="before" size="4" maxlength="4" value=""%/>
-          </label>
-  %)
-        </div>
+        <br%/>
         <label>
-          <input type="radio" name="t" value="M" onclick="missing_events_options()"%/> <span class="fa fa-question fa-fw"></span> [*missing events]
+          <input type="checkbox" name="marriage" value="on"%/>
+          [*marriage/marriages]0
         </label>
-        <div class="offset-xs-1">
-          <input type="hidden" name="evt" value="on"%/>
-          <label>
-            <input type="checkbox" name="marr" value="on"%/>
-            [*compute all marriages]
-          </label>
-          <br%/>
-          <label>
-            <input type="checkbox" id="me_date" name="date" value="on"%/>
-            [*compute approximatives dates]
-          </label>
-          <br%/>
-          <label>
-            <input type="checkbox" id="me_gen" name="gen" value="on"%/>
-            [*display generation]
-          </label>
-          <br%/>
-          <label>
-            <input type="checkbox" id="me_repeat" name="repeat" value="on"%/>
-            [*display smallest sosa number relative to ancestor]
-          </label>
-        </div>
+        <br%/>
+        <label>
+          [*border]
+          <input name="bd" size="1" maxlength="2" value="0"%/>
+        </label>
+        <br%/>
+        <table style="border-width:%border;;border-spacing:0;">
+          <tr>
+            <td class="text-%left;">[*color]</td>
+            <td class="text-%left;">
+              <input type="radio" name="color" value="" checked%/>
+            </td>
+            <td class="bg1">
+              <input type="radio" name="color" value="bg1"%/>
+            </td>
+            <td class="bg2">
+              <input type="radio" name="color" value="bg2"%/>
+            </td>
+            <td class="bg3">
+              <input type="radio" name="color" value="bg3"%/>
+            </td>
+            <td class="bg4">
+              <input type="radio" name="color" value="bg4"%/>
+            </td>
+            <td class="bg5">
+              <input type="radio" name="color" value="bg5"%/>
+            </td>
+            <td class="bg6">
+              <input type="radio" name="color" value="bg6"%/>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <label class="mt-2">
+        <input type="radio" name="t" value="L" onclick="no_options()"%/> <span class="fa fa-share-alt fa-fw"></span> [*list/list (ancestors)]1
+        %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
+          ([maximum] 8 [generation/generations]1)
+        %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
+          ([maximum] %bvar.max_anc_level; [generation/generations]1)
+        %end;
+      </label><br%/>
+      <label>
+        <input type="radio" name="t" value="H" onclick="no_options()"%/> <span class="fa fa-sitemap fa-rotate-270 fa-fw"></span> [*horizontally]
+        %if;(bvar.max_anc_level = "" and max_anc_level >= 8)
+          ([maximum] 8 [generation/generations]1)
+        %elseif;(bvar.max_anc_level != "" and max_anc_level >= bvar.max_anc_level)
+          ([maximum] %bvar.max_anc_level; [generation/generations]1)
+        %end;
+      </label><br%/>
+      <label>
+        <input type="radio" name="t" value="E" onclick="no_options()"%/> <span class="fa fa-table fa-fw"></span> [*list eclair]
+      </label><br%/>
+      <label>
+        <input type="radio" name="t" value="F" onclick="no_options()"%/> <span class="fa fa-table fa-fw"></span> [*surnames branch]
+      </label><br%/>
+      <label>
+        <input type="radio" name="t" value="M" onclick="missing_ancestors_options()"%/> <span class="fa fa-question fa-fw"></span> [*missing ancestors]
+      </label>
+      <div class="offset-1">
+        <label>
+          <input type="checkbox" id="ma_birth" name="birth" value="on"%/>
+          [*birth date and birth place]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" id="ma_death" name="death" value="on"%/>
+          [*death date and death place]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" name="spouse" value="on"%/>
+          [*spouse/spouses]1
+        </label>
+        <br%/>
+%(
+        <label>
+          [*living from/to]0 %sp;
+          <input type="text" name="after" size="4" maxlength="4" value=""%/>
+          [living from/to]1 %sp;
+          <input type="text" name="before" size="4" maxlength="4" value=""%/>
+        </label>
+%)
+      </div>
+      <label>
+        <input type="radio" name="t" value="M" onclick="missing_events_options()"%/> <span class="fa fa-question fa-fw"></span> [*missing events]
+      </label>
+      <div class="offset-1">
+        <input type="hidden" name="evt" value="on"%/>
+        <label>
+          <input type="checkbox" name="marr" value="on"%/>
+          [*compute all marriages]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" id="me_date" name="date" value="on"%/>
+          [*compute approximatives dates]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" id="me_gen" name="gen" value="on"%/>
+          [*display generation]
+        </label>
+        <br%/>
+        <label>
+          <input type="checkbox" id="me_repeat" name="repeat" value="on"%/>
+          [*display smallest sosa number relative to ancestor]
+        </label>
       </div>
     </div>
   </div>
   <div class="row">
-    <div class="text-xs-center form-group">
+    <div class="form-group  text-center mx-auto">
       <label>
         <input type="checkbox" name="cgl"%/> [*cancel GeneWeb links]
       </label><br>

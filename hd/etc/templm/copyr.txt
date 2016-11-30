@@ -38,37 +38,13 @@
   %end;
 %end;
 
-<div id="footer" class="row mt-1">
-  <div class="col-xs-6">
-   <a href="%prefix_no_templ;%end;%suffix;"
-      title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template</a>
-   </div>
-  <div class="col-xs-6">
-  <div class="btn-group pull-right mr-1">
-    v. %version; %compilation_time;%sp;
-    &copy; INRIA 1998-2016 %connections;%sq;
-    <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
-    <img src="%image_prefix;/logo_bas.png"></a>
-    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb MediaWiki">
-    <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
-  </div>
-  </div>
-  
-  %if;(not evar.templ="templm")
-    <div class="col-xs-6">
-    <div class="btn-group dropup ml-1">
-      <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Language
-        <span class="caret"></span>
-      </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownMenu1">
-        %apply;language_link()
-      </div>
-    </div>
-    %if;(not cancel_links and evar.digest = "")
-      <a type="button" class="btn btn-secondary" href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
-      title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template</a>
-    %end;
-  </div>
-  %end;
+<div id="footer">
+  <a href="%prefix_no_templ;%suffix;"
+     title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template -</a>
+  v. %version; %compilation_time;%sp;
+  &copy; INRIA 1998-2016 %connections;%sq;
+  <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
+  <img src="%image_prefix;/logo_bas.png"></a>
+  <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb MediaWiki">
+  <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
 </div>
