@@ -772,7 +772,9 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
             end;
             if can_edit then do {
               xtag "br";
-              xtag "input" "type=\"submit\" value=\"Ok\"";
+              tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+                Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+              end;
             }
             else ();
           end;

@@ -383,7 +383,9 @@ value propose_base conf =
       Wserver.printf "<form method=\"get\" action=\"%s\">\n"
         conf.indep_command;
       Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
-      Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+ 				Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+			end;
     end;
     Hutil.trailer conf;
   }

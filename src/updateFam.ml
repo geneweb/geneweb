@@ -676,7 +676,7 @@ value print_del1 conf base ifam =
     in
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
     tag "h2" begin title False; end;
-    print_link_to_welcome conf True;
+    (*print_link_to_welcome conf True;*)
     Wserver.printf "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin
@@ -689,7 +689,9 @@ value print_del1 conf base ifam =
         xtag "input" "type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\"";
       end;
       tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
+        tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+          Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+        end;
       end;
     end;
     Wserver.printf "\n";
@@ -730,7 +732,9 @@ value print_inv1 conf base p ifam1 ifam2 =
         xtag "input" "type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"";
       end;
       tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
+        tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+          Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+        end;
       end;
     end;
     Wserver.printf "\n";
@@ -907,7 +911,9 @@ value print_change_order conf base =
           xtag "input" "type=\"hidden\" name=\"m\" value=\"CHG_FAM_ORD_OK\"";
         end;
         tag "p" begin
-          xtag "input" "type=\"submit\" value=\"Ok\"";
+          tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+            Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+          end;
         end;
       end;
       Wserver.printf "\n";

@@ -54,8 +54,9 @@ value print_search_form conf from_note =
               Wserver.printf "%s\n"
                 (transl_nth conf "search/case sensitive" 1);
             end;
-            xtag "input" "type=\"submit\" value=\"%s\""
-              (capitale (transl_nth conf "search/case sensitive" 0));
+            tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+                Wserver.printf "%s" (capitale (transl_nth conf "search/case sensitive" 0));
+            end;
           end;
         end;
       end;
@@ -68,24 +69,22 @@ value print_whole_notes conf base fnotes title s ho = do {
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
-      stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\"" (commd conf) fnotes begin
+      stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\" class=\"mx-2\"" (commd conf) fnotes begin
         Wserver.printf "(%s)" (transl conf "linked pages");
       end
     else ()
   in
   gen_print_link_to_welcome what_links_page conf True;
-  tag "p" begin
-    xtag "br";
-    xtag "br";
-  end;
+  Wserver.printf "<div class=\"d-flex justify-content-between\">\n";
   if title <> "" then
     let title =
       match ho with
       [ Some (case_sens, h) -> html_highlight case_sens h title
       | None -> title ]
     in
-    Wserver.printf "<h1>%s</h1>\n" title
+      Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
   else ();
+  Wserver.printf "</div>\n";
   match Util.open_etc_file "summary" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
@@ -280,7 +279,7 @@ value print_linked_list conf base pgl =
            | NotesLinks.PgMisc fnotes ->
                stagn "tt" begin
                  Wserver.printf "[";
-                 stag "a" "href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes
+                 stag "a" "class=\"mx-2\" href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes
                  begin
                    Wserver.printf "%s" fnotes;
                  end;
@@ -484,8 +483,8 @@ value print_misc_notes conf base =
       db []
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    header_link_welcome conf title;
+    (*print_link_to_welcome conf True;*)
     if db <> [] then
       tag "ul" begin
         if d <> "" then

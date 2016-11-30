@@ -508,8 +508,9 @@ value gen_print with_logo mode conf base fname =
   in
   match channel with
   [ Some ic ->
+      let title _ = Wserver.printf "%s" fname in
       do {
-        Util.html conf;
+        Hutil.header_no_h1 conf title;
         copy_from_channel conf base ic mode;
         Hutil.gen_trailer with_logo conf;
       }
