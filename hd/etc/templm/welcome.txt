@@ -5,10 +5,8 @@
   <title>GeneWeb - %apply;capitalize(base.name)</title>
   <meta name="robots" content="none"/>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
   <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="stylesheet" href="%bvar.static_path/bootstrap/css/bootstrap.css">
   %include.css;
   %base_header;
 </head>

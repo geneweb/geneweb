@@ -23,8 +23,7 @@
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
@@ -47,17 +46,13 @@
   %if;(evar.t = "D") [up to] %pvar.1;%end;
 </h1>
 
-%if;(evar.cgl != "on")
-  <table style="float:%right;"><tr><td>
+%if;not cancel_links;
+  <div class="btn-group float-%right; mt-2">
     %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png;
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png;
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
 %end;
 
 %let;central_index;%index;%in;
@@ -394,15 +389,15 @@
           </table>
         %end;
       </td></tr></table>
-      <br%/>
+      <br>
     %end;
     %if;(evar.src = "on" and child.has_sources)
-      <em style="font-size:80%%">[*source/sources]1:<br%/>
+      <em style="font-size:80%%">[*source/sources]1:<br>
       %foreach;child.source;
-        - %source_type;: %source;<br%/>
+        - %source_type;: %source;<br>
       %end;
       </em>
-      <br%/>
+      <br>
     %end;
     </dd>
   %end;
@@ -461,20 +456,20 @@
                 </table>
               %end;
             </td></tr></table>
-            <br%/>
+            <br>
           %end;
           %if;(evar.src = "on" and ancestor.has_sources)
-            <em style="font-size:80%%">[*source/sources]1:<br%/>
+            <em style="font-size:80%%">[*source/sources]1:<br>
             %foreach;ancestor.source;
-              - %source_type;: %source;<br%/>
+              - %source_type;: %source;<br>
             %end;
             </em>
-            <br%/>
+            <br>
           %end;
           </dd>
         %end;
         %if;(evar.siblings = "on" and
-	     ancestor.is_female and ancestor.same = "")
+       ancestor.is_female and ancestor.same = "")
           %( siblings %)
           %if;(ancestor.index != self.index)
             %foreach;ancestor.family;
@@ -545,7 +540,7 @@
     <p class="asc_notes_src_inline">
       %if;(evar.notes = "on" and (ancestor.has_notes or ancestor.has_event))
         [*note/notes]0 : %apply;clean_html_tags(ancestor.notes)
-        <br%/>
+        <br>
         %if;ancestor.has_event;
           <table>
             %foreach;ancestor.event;
@@ -578,7 +573,7 @@
             %end;
           </table>
         %end;
-        <br%/>
+        <br>
       %end;
       %if;(evar.src = "on" and ancestor.has_sources)
         <em>
@@ -610,7 +605,7 @@
     %apply;somebody_extra_info("child").
     %foreach;child.family;
       %if;(evar.inline= "on" and (((child.has_notes or child.has_event) and evar.notes = "on") or (child.has_sources and evar.src = "on")))
-        <br%/>
+        <br>
       %end;
       %apply;capitalize%with;
         %apply;married_to%with;
@@ -638,7 +633,7 @@
       <p class="asc_notes_src_inline">
         %if;(evar.notes = "on" and (child.has_notes or child.has_event))
           [*note/notes]0 : %apply;clean_html_tags(child.notes)
-          <br%/>
+          <br>
           %if;child.has_event;
             <table>
               %foreach;child.event;
@@ -671,7 +666,7 @@
               %end;
             </table>
           %end;
-          <br%/>
+          <br>
         %end;
         %if;(evar.src = "on" and child.has_sources)
           <em>
@@ -1466,7 +1461,7 @@
               %lazy_force;
               <li>[Sosa] %ancestor.anc_sosa; -%sp;
                 <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
-    	          %ancestor.title;%ancestor.dates;
+                %ancestor.title;%ancestor.dates;
               </li>
             %end;
           %end;
@@ -1530,7 +1525,7 @@
   %end;
 %end;
 
-%base_trailer;
+%include.trl;
 %include.copyr;
 </div>
 %include.js;

@@ -443,7 +443,7 @@
   <tbody>
     %foreach;ancestor_level(nb_gena)
       %if;(evar.gen = "on")
-		<tr>
+    <tr>
           <th align="left" colspan="9">[*generation/generations]0 %level;</th>
         </tr>
       %end;

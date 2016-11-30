@@ -2,23 +2,22 @@
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: updhist.txt,v 5.12 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>[*history of updates]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body %body_prop;>
 %message_to_wizard;
-<div class="container-fluid">
+<div class="container">
 %define;search_form(xxx)
   %if;(wizard or friend)
     <form method="get" action="%action;">
-      <div class="col-xs-6 form-group form-inline">
+      <div class="col-6 form-group form-inline">
         %hidden;
         <input type="hidden" name="m" value="HIST_SEARCH"%/>
         <input type="hidden" name="k" value="%evar.k;"%/>
@@ -27,7 +26,7 @@
         %end;
         <div class="input-group">
           <input type="text" class="form-control" placeholder="[*search/case sensitive]0" 
-           name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
+           name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br>
           <span class="input-group-btn">
             <button type="submit" class="btn btn-default">Ok</button>
           </span>
@@ -104,19 +103,6 @@
   </table>
 %end;
 
-%if;not cancel_links;
-  <table class="float-%right; mt-2"><tr><td class="text-xs-%right;">
-    %if;(referer != "")
-      <a href="%referer;">
-        <img src="%image_prefix;/left.png"%wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
-      </a>
-    %end;
-    <a href="%prefix;">
-      <img src="%image_prefix;/up.png"%wid_hei;up.png; alt="^^" title="^^"%/>
-    </a>
-  </td></tr></table>
-%end;
-
 %define;update_text(uu)
   %if;(uu = "ap")[add::person/persons]0%nn;
   %elseif;(uu = "mp")[modify::person/persons]0%nn;
@@ -159,6 +145,16 @@
 %end;
 
 <h1>[*history of updates]</h1>
+
+%if;not cancel_links;
+  <div class="btn-group float-right mt-2">
+    %if;(referer != "")
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+    %end;
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
+%end;
+
 %if;(not cancel_links and (evar.m != "HIST_SEARCH" or not found))
   %apply;search_form("")
   <div class="hidden-xs-up">%apply;table()</div>
@@ -172,7 +168,7 @@
   %apply;nav()
 %end;
 
-%base_trailer;
+%include.trl;
 %include.copyr;
 </div>
 %include.js;

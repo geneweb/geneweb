@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: perso.txt,v7.00 20/11/2016 06:22:34 $ -->
-  <!-- Copyright (c) 1998-2016 INRIA -->
+  <!-- $Id: perso.txt,v7.00 15/01/2017 06:06:34 $ -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -14,19 +14,16 @@
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
-  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
 <div class="container">
-%(include.perso_header;%)
-%include.perso_utils;
-%import;perso_m_options;
+%import;perso_utils;
 %include.menubar;
 
 %define;init_nb_asc(tplnum)
@@ -80,59 +77,44 @@
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;
 
-%if;(bvar.p_mod="" and evar.p_mod="" and (bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0))
-  %(Statique %)
+%(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
+%if;(evar.p_mod="zz" or (bvar.p_mod="" and evar.p_mod="" and (bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)))
+  %(Statique%)
   %apply;init_cache(3, 2, 2)
   %if;(has_parents and (father.has_parents or mother.has_parents))
-    %let;op_m;3%in;%apply;show_templ("perso_module/gr_parents")
-    <div class="row">
-      %apply;module_collapse%with;<i class="fa fa-sitemap fa-rotate-180"></i>%and;tree%and;%and;center%end;
-        <div class="col-xs-6 offset-xs-3">
-          %apply;show_templ("perso_module/tree_3gen_v_photo_header")
-        </div>
-      </div>
-      </div>
-    </div>
+     <div class="collapse" id="collapseExample1">
+        %let;op_m;1%in;%apply;show_templ("perso_module/gr_parents")
+     </div>
   %end;
-  <div class="row">
-    <div class="hidden-sm-down">
-      <div class="col-lg-3 push-xs-6 push-md-0">
-        %let;op_m;1%in;%apply;show_templ("perso_module/parents")
-        %let;op_m;1%in;%apply;show_templ("perso_module/siblings")
-      </div>
+ <div class="row">
+    <div class="col-8 mx-auto">%(testing tree on 1st col%)
+      %if;has_parents;
+        <div class="collapse" id="collapseExample2">
+          %let;op_m;1%in;%apply;show_templ("perso_module/tree_3gen_v_photo_header")
+        </div>
+      %end;
     </div>
-    <div class="col-lg-6 pull-xs-3 pull-md-0">
-      %apply;show_templ("perso_module/personnal_data")
+    %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> is inside personnal_data %)
+      %let;op_m;3%in;%apply;show_templ("perso_module/personnal_data")
       %if;(nb_families > 3)
         %let;op_m;1%in;%apply;show_templ("perso_module/unions")
       %end;
       %let;op_m;1%in;%apply;show_templ("perso_module/timeline")
-    </div>
-        <div class="hidden-sm-up">
-      <div class="col-lg-3">
-        %let;op_m;1%in;%apply;show_templ("perso_module/parents")
-        %let;op_m;1%in;%apply;show_templ("perso_module/siblings")
-      </div>
-    </div>
-    <div class="col-lg-3">
+      %let;op_m;1%in;%apply;show_templ("perso_module/notes")
+      %let;op_m;1%in;%apply;show_templ("perso_module/sources")
+    %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from personnal_data %)
+    <div class="col-4">
+      %if;has_parents;
+        <div class="collapse show" id="collapseExample2">
+          %let;op_m;2%in;%apply;show_templ("perso_module/tree_3gen_v_photo_header")
+        </div>
+      %end;
+      %let;op_m;1%in;%apply;show_templ("perso_module/parents")
+      %let;op_m;1%in;%apply;show_templ("perso_module/siblings")
       %if;(nb_families < 4)
         %let;op_m;1%in;%apply;show_templ("perso_module/unions")
         %let;op_m;1%in;%apply;show_templ("perso_module/relations")
       %end;
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-lg-10 offset-lg-1">
-      %let;op_m;1%in;%apply;show_templ("perso_module/notes")
-      %let;op_m;2%in;%apply;show_templ("perso_module/parents")
-      %let;op_m;2%in;%apply;show_templ("perso_module/siblings")
-      %let;op_m;3%in;%apply;show_templ("perso_module/unions")
-      %let;op_m;1%in;%apply;show_templ("perso_module/sources")
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-lg-10 offset-lg-1">
-      %let;op_m;8%in;%apply;show_templ("perso_module/trees")
     </div>
   </div>
 %elseif;(bvar.perso_module_tplnb!="" and bvar.perso_module_tplnb>0)
@@ -164,16 +146,20 @@
       %end;
     </div>
   </div>
-%elseif;(bvar.p_mod!="" or evar.p_mod!="")
-  %(Dynamique avec bvar.p_mod ou evar.p_mod%)
+%elseif;((evar.p_mod!="" and evar.p_mod!="zz") or bvar.p_mod!="")
+  %(Dynamic %)
   %apply;init_cache(3, 2, 2)
-  %for;i;0;p_mod_nbr;
-    %let;mmi;%apply;mm(i)%in;
-    %let;ooi;%apply;oo(i)%in;
-    %if;(mmi!="" and ooi!=0)
-      %apply;get_mod(mmi, ooi)
-    %end
-  %end;
+  <div class="mt-2">
+    %for;i;0;p_mod_nbr;
+      %let;mmi;%apply;mm(i)%in;
+      %let;ooi;%apply;oo(i)%in;
+      %if;(mmi!="" and ooi!=0)
+        %apply;get_mod(mmi, ooi)
+      %end
+    %end;
+  </div>
+%else;
+%(Nothing %)
 %end;
 
 %if;(evar.opt = "misc")

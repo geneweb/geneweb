@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt,v 7.00 20/11/2016 03:25:14 a2/hg -->
+<!-- $Id: menubar.txt,v 7.00 13/01/2017 18:11:04 -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*send::image/images]0 (I)" accesskey="I"%in;
@@ -8,7 +8,7 @@
 %let;laU;title="[*update] (U)" accesskey="U"%in;
 %let;laS;accesskey="S"%in;
 %let;laY;title="[tree] (Y)" accesskey="Y"%in;
-%let;acc;%if;access_by_key;ep=%first_name_key;;en=%surname_key;;%if;(occ != "0")eoc=%occ;;%end;%else;ei=%index;;%end;%in;
+%let;acc;%if;access_by_key;ep=%first_name_key;;en=%surname_key;;%if;(occ!= "0")eoc=%occ;;%end;%else;ei=%index;;%end;%in;
 %let;sexcolor;text-%if;is_male;primary%elseif;is_female;danger%else;muted%end;%in;
 %define;spousesexcolor()
   %foreach;family;
@@ -17,44 +17,17 @@
      %end;
   %end;
 %end;
-%(import;perso_utils;%)
-%( TODO: center navbar, independantly of right buttons %)
 %if;(not cancel_links)
-  <nav class="navbar navbar-light %if;(evar.m="MOD_IND")mt-4%end;" style="background-color: white">
-    <div class="btn-group float-right">
-      %if;(evar.m !="MOD_IND" and referer != "")
-        <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
+  <div class="d-flex justify-content-between">
+    <div class="col-1 float-left mt-1">
+      %if;((p_mod="" or p_mod="zz") and has_parents and (father.has_parents or mother.has_parents))
+          <a data-toggle="collapse" href="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 module">
+            <i class="fa fa-list"></i>
+          </a>
       %end;
-      <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><i class="fa fa-home fa-lg" title="[*home]"></i></a>%nn;
-      %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
-        <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
-      %end;
-      %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
-        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;iz=%self.index;;%self.access;" %laS; title="%apply;nav_with_sosa_ref(self)"><i class="fa fa-dot-circle-o  fa-lg %sexcolor;"></i></a>%nn;
-      %end;
-      <a role="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>%nn;
     </div>
-    <div class="modal fade text-xs-center" id="myModal" tabindex="-1" role="dialog" aria-labelledby="ModalSearch" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-body" id="ModalSearch">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <form id="collapse_search" class="form-inline" method="get" action="%prefix;">
-            %hidden;
-            <input type="hidden" name="m" value="NG">
-            <input type="search" id="v" class="form-control" name="v" placeholder="[*public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip%end;" maxlength="200">
-            <label class="sr-only" for="firstname">Search firstname</label>
-            <input type="search" id="firstname" class="form-control" name="fn" placeholder="[*first name/first names]0">
-            <label class="sr-only" for="surname">Search surname</label>
-            <input type="search" id="surname" class="form-control" name="sn" placeholder="[*surname/surnames]0">
-            <button class="btn btn-outline-primary" type="submit"><span class="fa fa-search"></span></button>
-          </form>
-        </div>
-      </div>
-    </div>
-    <div class="container text-xs-center">
-      <ul class="nav nav-tabs d-inline-block">
+    <nav class="navbar navbar-light  %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK")mt-4%end;" style="background-color: white">
+      <ul class="nav nav-tabs">
         %if;(not(bvar.wizard_just_friend = "yes") and wizard)
           %if;(not has_parents and first_name != "?" and surname != "?")
             <li class="nav-item">
@@ -65,45 +38,30 @@
         <li class="nav-item">
           <a class="nav-link %if;(evar.m="")active%end;" href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;"><span class="fa fa-user fa-fw %sexcolor;"></span></a>
         </li>
-        %( module selction  menu %)
+        %( personnal modules selection menu %)
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
-          <div class="dropdown-menu">
+          <div class="dropdown-menu p_mod">
             <form name="upd_url" method="get" action="%action;">
-              <div class="dropdown-item form-inline ">
-                <input type="hidden" name="b" value="%evar.b;">
-                <input type="hidden" name="lang" value="%evar.lang;">
-                <input type="text" name="p_mod" class="form-control" size="30" maxlength="30" value="%if;(evar.p_mod!="")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod;%else;Personnal modules (p_mod)%end;">
+              <div class="dropdown-item">
+                <div class="form-inline input-group">
+                %if;(evar.b!="")
+                  <input type="hidden" name="b" value="%evar.b;">
+                %end;
+                %if;(evar.lang!="")
+                  <input type="hidden" name="lang" value="%evar.lang;">
+                %end;
+                <input type="text" name="p_mod" class="form-control" value="%if;(evar.p_mod!="")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod;%else;Personnal modules (p_mod)%end;">
                 <input type="hidden" name="p" value="%first_name;">
                 <input type="hidden" name="n" value="%surname;">
                 <input type="hidden" name="oc" value="%occ;">
-                <div class="form-group">
-                  <select class="form-control" id="mod_list">
-                  <option>[
-en: List of available modules
-fr: Liste des modules disponibles
-                  ]</option>
-                  %for;i;1;27;
-                    %let;modn;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
-                    %if;(modn!="")
-                      <option disabled>%apply;letter(i)[:] %modn;</option>
-                    %end;
-                  %end;
-                  </select>
-                </div>
                 <button type="submit" class="btn btn-secondary" title="[ok]0">OK</button>
+                </div>
               </div>
               <p class="mx-2 mt-2">
               [
 en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear. For example: a1b1j1c1d1e1f1g1h1i3.
 fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules. Par exemple : a1b1j1c1d1e1f1g1h1i3.
-              ]
-              </p>
-              %if;(bvar.p_mod!="" or evar.p_mod!="")
-              <p class="mx-2">
-              [
-en: The current ranking is shown according to the current value of p_mod.
-fr: L’ordre du tableau ci-dessous est celui de la variable p_mod actuelle.
               ]
               </p>
                 %reset_count;
@@ -116,56 +74,37 @@ fr: L’ordre du tableau ci-dessous est celui de la variable p_mod actuelle.
                 %let;p_m_n;%count;%in;
                 <table class="table table-sm mt-3">
                   <thead class="thead-default"><tr>
-                    <th>
-                  [
-en: Rank
-fr: Rang
-                  ]</th>
-                   <th>
-                  [
-en: Module
-fr: Module
-                  ]</th>
-                    <th>Options</th>
+                    <th>[*module]</th>
+                    <th>[*options]</th>
                   </tr></thead>
-                  %reset_count;
-                  %for;i;0;p_m_n;
-                    %let;m_ltr;%apply;nth_c%with;%p_mod;%and;%expr(2*i)%end;%in;
-                    %let;m_opt;%apply;nth_c%with;%p_mod;%and;%expr(2*i+1)%end;%in;
-                    %let;m_nam;%apply;get_mod_nam(m_ltr)%in;
-                    %let;m_opt_nb;%apply;get_mod_opt(m_nam)%in;
-                    %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
+                  %for;i;1;27;
+                    %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
                     %if;(m_nam!="")
-                      <tr>
-                      <th scope="row" class="text-xs-center">
-                        %expr(i+1)
-                      </th>
-                      <td>
-                        %m_ltr;[:]&nbsp;%m_nam;
-                      </td>
-                      <td><small><i>
-                      %for;j;0;m_opt_nb;
-                         %let;k;%expr(j+1)%in;
-                         %let;o;%apply;oo(i)%in
-                         %if;(o=k)</i></small>%end;
-                         %let;m_opt_nam_1;%apply;get_opt_nam_1(m_nam, k)%in;
-                         %let;m_opt_nam_2;%apply;get_opt_nam_2(m_nam, k)%in;
-                         %k;%if;(m_opt_nam_1!="")[:]&nbsp;%m_opt_nam_1;%end;%if;(m_opt_nam_2!="")[:]&nbsp;%m_opt_nam_2;%end;
-                         %if;(k<m_opt_nb), %end;
-                         %if;(o=k)<small><i>%end;%sp;
+                      %let;m_ltr;%apply;letter(i)%in;                   
+                      %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
+                      %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
+                      %if;(m_nam!="")
+                        <tr>
+                        <td>
+                          %m_ltr;[:]&nbsp;%m_nam;
+                        </td>
+                        <td><small><i>
+                        %for;j;0;m_opt_nb;
+                           %let;k;%expr(j+1)%in;
+                           %let;m_opt_nam;%apply;get_opt_nam(m_nam, k)%in;
+                           %k;%if;(m_opt_nam!="")[:]&nbsp;%m_opt_nam;%end;
+                           %if;(k<m_opt_nb), %end;
+                        %end;
+                        </i></small></td>
+                        </tr>
                       %end;
-                      </i></small></td>
-                      </tr>
-                      %incr_count;
                     %end;
                   %end;
-                  %incr_count;
                 </table>
-              %end;
             </form>
           </div>
         </li>
-				%(end module selection menu  %)
+        %(end personnal modules selection menu %)
         %if;(not(bvar.wizard_just_friend = "yes") and wizard)
           <li class="nav-item">
             <a class="nav-link %if;(evar.m="MOD_IND")active%end;" href="%prefix;m=MOD_IND;i=%index;" %laP;><span class="fa fa-user-plus fa-fw %sexcolor;"></span></a>
@@ -186,8 +125,8 @@ fr: Module
               %end;
               %if;(bvar.history_diff="yes" and has_history)
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;"><span class="fa fa-archive fa-fw"></span> [*revision history]</a>
-                <a class="dropdown-item" id="hist" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;> [*last diff]</a>
+                <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;"><span class="fa fa-archive fa-fw" aria-hidden="true"></span> [*revision history]</a>
+                <a class="dropdown-item" id="hist" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;><span class="fa fa-history fa-fw" aria-hidden="true"></span> [*last diff]</a>
               %end;
             </div>
           </li>
@@ -206,7 +145,7 @@ fr: Module
             %foreach;family;
               <li class="nav-item">
                 %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%else;%end;%in;
-                <a class="nav-link %if;(evar.m="MOD_FAM")active%end;" id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
+                <a class="nav-link %if;(evar.m="MOD_FAM" and evar.i=family.index)active%end;" id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
                   title="[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
                   accesskey="%a_k;"><span class="fa fa-user-plus %sexcolor;"></span><span class="fa fa-user %apply;spousesexcolor()"></span><sup class="small">%if;(nb_families!=1)%family_cnt;%end;</sup></a>
               </li>
@@ -223,6 +162,10 @@ fr: Module
                 %end;
                 %foreach;family;
                   <div class="dropdown-divider"></div>
+                  %if;(family_cnt != 1)
+                    <a class="dropdown-item" href="%prefix;m=INV_FAM;i=%index;;f=%family.index;" title="[*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;"><span class="fa fa-arrow-up fa-fw"></span> [*invert::family/families]1</a>
+                    <div class="dropdown-divider"></div>
+                  %end;
                   <h6 class="dropdown-header">[*marriage with] %spouse;</h6>
                   <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;" title="[*changed order of family's events]"><span class="fa fa-unsorted fa-fw"></span> [*invert::event/events]1</a>
                   <a class="dropdown-item" href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index"><span class="fa fa-trash fa-fw text-danger"></span> [*delete::family/families]0</a>
@@ -273,21 +216,21 @@ fr: Module
             <div class="dropdown-divider"></div>
             %if;(browsing_with_sosa_ref)
               %if;(sosa_ref.index != "" and sosa_ref.index != index)
-                <h6 class="dropdown-header">[*shortest path] [with][:]</h6>
-                <a class="dropdown-item" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;image=on;et=S" title="[*shortest path] [with] %sosa_ref;">
-                  %sosa_ref; <i>(Sosa 1)</i>
+                <h6 class="dropdown-header">[*shortest path] [with]…</h6>
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;image=on;et=S" title="[*shortest path] [with] %sosa_ref;">
+                  %sosa_ref; <i>(Sosa 1)</i>
                 </a>
               %end;
             %end;
-            <h6 class="dropdown-header">[*relationship by marriage] [with][:]</h6>
+            <h6 class="dropdown-header">[*relationship by marriage] [with]…</h6>
             %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
-              <a class="dropdown-item" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;image=on;">
+              <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;image=on;">
                   %sosa_ref; <i>(sosa 1)</i>
               </a>
             %end;
             %foreach;family;
               %if;(spouse != "? ?")
-                <a class="dropdown-item" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;image=on;">
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;image=on;">
                     %spouse;
                     %if;spouse.has_nobility_titles;,%sp;
                     <em>%spouse.nobility_title;</em>%end;%nl;
@@ -297,7 +240,7 @@ fr: Module
             %end;
             %foreach;relation;
               %if;has_relation_him;
-                <a class="dropdown-item" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;image=on;">
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;image=on;">
                     %relation_him;
                     %if;relation_him.has_nobility_titles;,%sp;
                     <em>%relation_him.nobility_title;</em>%end;%nl;
@@ -305,7 +248,7 @@ fr: Module
                 </a>
               %end;
               %if;has_relation_her;
-                <a class="dropdown-item" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;image=on;">
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;image=on;">
                     %relation_her;
                     %if;relation_her.has_nobility_titles;,%sp;
                     <em>%relation_her.nobility_title;</em>%end;%nl;
@@ -314,7 +257,7 @@ fr: Module
               %end;
             %end;
             %foreach;related;
-              <a class="dropdown-item" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;image=on;">
+              <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;image=on;">
                   %related;
                   %if;related.has_nobility_titles;,%sp;
                   <em>%related.nobility_title;</em>%end;%nl;
@@ -322,16 +265,16 @@ fr: Module
               </a>
             %end;
             %foreach;event_witness_relation;
-              <a class="dropdown-item" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;image=on;">
+              <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;image=on;">
                   %event_witness_relation.person;%nl;
                   <i>([witness/witnesses]0)</i>%nl;
               </a>
             %end;
             %if;(has_parents and (father.has_siblings or mother.has_siblings))
-                <a class="dropdown-item" href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
+                <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
             %end;
             %if;has_nephews_or_nieces;
-              <a class="dropdown-item" href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
+              <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
             %end;
             %if;(died = "" and (wizard or friend))
               <div class="dropdown-divider"></div>
@@ -340,6 +283,45 @@ fr: Module
           </div>
         </li>
       </ul>
+    </nav>
+    <div class="btn-group mt-2 mr-0 push-right">
+      %if;(evar.m !="MOD_IND" and referer != "")
+        <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
+      %end;
+      <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><i class="fa fa-home fa-lg" title="[*home]"></i></a>%nn;
+      %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
+        <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
+      %end;
+      %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
+        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;iz=%self.index;;%self.access;" %laS; title="%apply;nav_with_sosa_ref(self)"><i class="fa fa-dot-circle-o  fa-lg %sexcolor;"></i></a>%nn;
+      %end;
+      <a role="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>%nn;
     </div>
-  </nav>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="ModalSearch" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-body" id="ModalSearch">
+          <form id="collapse_search" method="get" action="%prefix;">
+            %hidden;
+            <input type="hidden" name="m" value="S">
+            <div class="row">
+              <div class="col-6 offset-3">
+              <h4 class="rounded modal-title my-3 bg-faded text-center">[*search/case sensitive]0 [person/persons]0</h4>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-8 offset-2">
+                <label class="sr-only" for="p">Search firstname</label>
+                <input type="search" id="p" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]0">
+                <label class="sr-only" for="n">Search public name</label>
+                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
+              </div>
+              <div class="col-2 mt-2">
+                <button class="btn btn-primary" type="submit"><span class="fa fa-search fa-fw my-4"></span></button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 %end;

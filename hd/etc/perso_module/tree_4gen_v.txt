@@ -34,7 +34,7 @@
                 <td style="text-align: center;font-size: 80%%">%nn;
                   %apply;short_display_person("mother.father.father")</td>
                 <td>&nbsp;</td>
-		<td style="text-align: center;font-size: 80%%">%nn;
+                <td style="text-align: center;font-size: 80%%">%nn;
                   %apply;short_display_person("mother.father.mother")</td>
               %else;
                 <td colspan="3" rowspan="4">&nbsp;</td>

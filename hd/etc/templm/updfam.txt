@@ -229,7 +229,7 @@
 </fieldset>
 <fieldset class="f2 al">
   <legend>
-    <label style="font-size:inherit" for="comment" %lfa5;>[*marriage notes]0</label>
+    <label style="font-size:inherit" for="comment" %lfa5;>[*marriage notes/marriages notes]0</label>
   </legend>
   <label><textarea id="comment" name="comment" placeholder="[*comment]" rows="1" %l_on1s;>
     %if;(comment != "" and bvar.move_comment = "yes")

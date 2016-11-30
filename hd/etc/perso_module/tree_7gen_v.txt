@@ -82,11 +82,10 @@
              <td style="width:5"></td>
            </tr>
            <tr>%apply;one_heading("the parents", 10, "&#x25CF;")</tr>
-	       <tr>%apply;one_heading("the grandparents", 6, "&#x25C7;")</tr>
+           <tr>%apply;one_heading("the grandparents", 6, "&#x25C7;")</tr>
            <tr>%apply;one_heading("the great-grandparents", 2, "&#x25A0;")</tr>
          </table>
        </td>
-    
        <td style="width:%sbcol;">
          <table style="border:0;width:100%%;cellspacing:0;cellpading:0">
            <tr><td>&nbsp;</td></tr>
@@ -98,11 +97,11 @@
            <tr>
              <td align=center valign=middle>
                %if;(nb_families>1)%family_cnt;&nbsp;%end;
-               &amp;&nbsp;%marriage_date.year;<br />
+               &amp;&nbsp;%marriage_date.year;<br>
                %if;(nb_families!=1)
                  %family_cnt;
                %end;
-               <!-- <a href="%prefix;%spouse.access;"> %spouse;</a><br />%spouse.dates;&nbsp; -->
+               <!-- <a href="%prefix;%spouse.access;"> %spouse;</a><br>%spouse.dates;&nbsp; -->
                %apply;short_display_person("spouse")
              </td>
            </tr>

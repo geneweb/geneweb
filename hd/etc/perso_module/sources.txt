@@ -1,7 +1,7 @@
 <!-- $Id: perso_module/sources.txt v 7.00 20/11/2016 06:10:01 hg -->
 %( op_m=1 Sources  %)
 %( op_m=2 Sources complete (events) %)
-%let;op_m;%if;("op_m"!="")%op_m;%else;1%end;%in;
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 
 %reset_count;
 %if;has_sources;%incr_count;%end;
@@ -17,7 +17,7 @@
   %end;
   <ul>
   %foreach;source;
-    <li><em>%apply;capitalize(source_type): %source;</em></li>
+    <li><em>%apply;capitalize(source_type)[:] %source;</em></li>
   %end;
   %if;(op_m=2)
     %foreach;event;
@@ -27,7 +27,7 @@
           event.name!=[marriage event] and
           event.name!=[death] and
           event.name!=[burial])
-          <li><em>%apply;capitalize(event.name) : %event.src;</em></li>
+          <li><em>%apply;capitalize(event.name)[:] %event.src;</em></li>
         %end;
       %end;
     %end;

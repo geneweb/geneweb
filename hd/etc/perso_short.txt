@@ -1070,9 +1070,9 @@
           %if;(ancestor.same = "")
             <li>
               <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
-    	        %if;(evar.sosa = "on" and ancestor.has_sosa)
+              %if;(evar.sosa = "on" and ancestor.has_sosa)
                 ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
-    	        %end;
+              %end;
             </li>
           %end;
         %end;

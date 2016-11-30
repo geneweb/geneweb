@@ -1,10 +1,10 @@
-﻿<!-- $Id: perso_module/notes.txt v 7.00 20/11/2016 06:10:01 hg -->
+<!-- $Id: perso_module/parents.txt v 7.00 20/11/2016 06:10:01 hg -->
 %( op_m=1 simple: name %)
-%( op_m=2 evolved: name (occupation) %)
+%( op_m=2 evolved: name, occupation %)
 %( op_m=3 photos: evolved with photo in 2 cols %)
 %( op_m=4 complete: name, birth, death, occupation, marriages %)
 %( op_m=5 photos: complete with photo in 2 centered cols %)
-%let;op_m;%if;("op_m"!="")%op_m;%else;1%end;%in;
+%let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %let;op_ph;%if;has_parents;
              %if;(father.has_image or mother.has_image)1%else;0%end;
            %else;nn;
@@ -16,8 +16,8 @@
   <ul>
   %apply;li_SD("father")
   %if;(op_m=1 or op_m=2)
-    %apply;short_display_person("father")%sp;
-    %if;(op_m=2 and father.has_occupation)(%father.occupation;)%nl;%end;
+    %apply;short_display_person("father")%nn;
+    %if;(op_m=2 and father.has_occupation), %father.occupation;%nl;%end;
   %elseif(op_m=4)
     %apply;long_display_person("father")%sp;
   %elseif;(op_m=5)
@@ -35,10 +35,10 @@
     %end;
   %end;
   </li>
-
+  %apply;li_SD("mother")
   %if;(op_m=1 or op_m=2)
-    %apply;short_display_person("mother")%sp;
-    %if;(op_m=2 and mother.has_occupation)(%mother.occupation;)%nl;%end;
+    %apply;short_display_person("mother")%nn;
+    %if;(op_m=2 and mother.has_occupation), %mother.occupation;%nl;%end;
   %end;
   %if;(op_m=4 or op_m=5)
     %if;(op_m=4)
