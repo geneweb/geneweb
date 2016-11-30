@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: perso.txt,v7 10/10/2016 01:22:34 $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
+  <!-- $Id: perso.txt,v7.00 20/11/2016 06:22:34 $ -->
+  <!-- Copyright (c) 1998-2016 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -23,8 +23,11 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container-fluid">
-%import;perso_header;
+<div class="container">
+%(include.perso_header;%)
+%include.perso_utils;
+%import;perso_m_options;
+%include.menubar;
 
 %define;init_nb_asc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
@@ -49,7 +52,7 @@
 
 %define;init_nb_desc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
-  %if;(templ = "union_complet")
+  %if;(templ = "unions")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
     %end;
@@ -62,7 +65,7 @@
 
 %define;init_from_gen_desc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
-  %if;(templ = "famille")
+  %if;(templ = "family")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
     %end;
@@ -77,106 +80,63 @@
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;
 
-%if;(bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)
+%if;(bvar.p_mod="" and evar.p_mod="" and (bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0))
+  %(Statique %)
   %apply;init_cache(3, 2, 2)
   %if;(has_parents and (father.has_parents or mother.has_parents))
-    <div class="row">
-      %apply;module_collapse%with;<i class="fa fa-list"></i>%and;ancestor%and;active%and;center%end;
-          %if;father.has_parents;
-            <div class="col-xs-%if;(not has_siblings)6%else;4%end;">
-              <h3 class="highlight">[*paternal grand-parents],&nbsp;[uncles and aunts]1</h3>
-              <ul class="list-unstyled small">
-                %apply;descendancy_grand_fathers("father","parhigh")
-                %apply;descendancy_grand_mothers("father","parhigh")
-              </ul>
-            </div>
-          %end;
-          <div class="col-xs-4 %if;(not father.has_parents)offset-xs-4%end;">
-            %if;(has_parents and has_siblings)
-              <h3 class="highlight">[*parents], [full siblings]</h3>
-              <ul class="list-unstyled small">
-                %apply;descendancy_grand_fathers("self","parhigh")
-                %apply;descendancy_grand_mothers("self","parhigh")
-              </ul>
-            %end;
-          </div>
-          %if;mother.has_parents;
-            <div class="col-xs-%if;(not has_siblings)6%else;4%end;">
-              <h3 class="highlight">[*maternal grand-parents],&nbsp;[uncles and aunts]1</h3>
-              <ul class="list-unstyled small">
-                %apply;descendancy_grand_fathers("mother","parhigh")
-                %apply;descendancy_grand_mothers("mother","parhigh")
-             </ul>
-            </div>
-          %end;
-        </div>
-      </div>
-    </div>
+    %let;op_m;3%in;%apply;show_templ("perso_module/gr_parents")
     <div class="row">
       %apply;module_collapse%with;<i class="fa fa-sitemap fa-rotate-180"></i>%and;tree%and;%and;center%end;
-          <div class="col-xs-6 offset-xs-3">
-            %(%apply;show_templ("perso_module/arbre_3gen_v_photo_header") %)
-          </div>
+        <div class="col-xs-6 offset-xs-3">
+          %apply;show_templ("perso_module/tree_3gen_v_photo_header")
         </div>
+      </div>
       </div>
     </div>
   %end;
   <div class="row">
     <div class="hidden-sm-down">
       <div class="col-lg-3 push-xs-6 push-md-0">
-        %apply;show_templ("perso_module/parent_simple")
-        %apply;show_templ("perso_module/freresoeur_simple")
-     %( %apply;show_templ("perso_module/fratrie") %)
+        %let;op_m;1%in;%apply;show_templ("perso_module/parents")
+        %let;op_m;1%in;%apply;show_templ("perso_module/siblings")
       </div>
     </div>
     <div class="col-lg-6 pull-xs-3 pull-md-0">
-      %apply;show_templ("perso_module/etat_civil")
-      %( %if;(father.nb_families > 1 and mother.nb_families > 1)%apply;show_templ("perso_module/demifratries")%end; %)
+      %apply;show_templ("perso_module/personnal_data")
       %if;(nb_families > 3)
-        %apply;show_templ("perso_module/union_simple")
+        %let;op_m;1%in;%apply;show_templ("perso_module/unions")
       %end;
-      %apply;show_templ("perso_module/timeline")
+      %let;op_m;1%in;%apply;show_templ("perso_module/timeline")
     </div>
         <div class="hidden-sm-up">
       <div class="col-lg-3">
-        %apply;show_templ("perso_module/parent_simple")
-        %apply;show_templ("perso_module/freresoeur_simple")
+        %let;op_m;1%in;%apply;show_templ("perso_module/parents")
+        %let;op_m;1%in;%apply;show_templ("perso_module/siblings")
       </div>
     </div>
     <div class="col-lg-3">
       %if;(nb_families < 4)
-        %apply;show_templ("perso_module/union_simple")
-        %apply;show_templ("perso_module/relations_simple")
-   %( %apply;show_templ("perso_module/union_boite")
-      %end;
-      %if;((father.nb_families > 1 and mother.nb_families = 1) or (mother.nb_families > 1 and father.nb_families = 1))
-          %apply;show_templ("perso_module/demifratries")
-      %end; %)
+        %let;op_m;1%in;%apply;show_templ("perso_module/unions")
+        %let;op_m;1%in;%apply;show_templ("perso_module/relations")
       %end;
     </div>
   </div>
   <div class="row">
     <div class="col-lg-10 offset-lg-1">
-      %apply;show_templ("perso_module/notes_simple")
-      %apply;show_templ("perso_module/parent_evolue")
-      %apply;show_templ("perso_module/parent_photo")
-      %apply;show_templ("perso_module/parent_complet")
-      %apply;show_templ("perso_module/parent_complet_photo")
-      %apply;show_templ("perso_module/freresoeur_complet")
-      %apply;show_templ("perso_module/freresoeur_complet_photo")
-      %apply;show_templ("perso_module/union_evolue")
-      %apply;show_templ("perso_module/union_photo")
-      %apply;show_templ("perso_module/union_complet")
-      %apply;show_templ("perso_module/union_complet_photo")
-      %apply;show_templ("perso_module/sources_simple")
+      %let;op_m;1%in;%apply;show_templ("perso_module/notes")
+      %let;op_m;2%in;%apply;show_templ("perso_module/parents")
+      %let;op_m;2%in;%apply;show_templ("perso_module/siblings")
+      %let;op_m;3%in;%apply;show_templ("perso_module/unions")
+      %let;op_m;1%in;%apply;show_templ("perso_module/sources")
     </div>
   </div>
   <div class="row">
     <div class="col-lg-10 offset-lg-1">
-      %(%apply;show_templ("perso_module/arbre_7gen_v") %)
+      %let;op_m;8%in;%apply;show_templ("perso_module/trees")
     </div>
   </div>
-%else;
+%elseif;(bvar.perso_module_tplnb!="" and bvar.perso_module_tplnb>0)
+  %(Dynamique, perso_module_tplnb : %bvar.perso_module_tplnb;<br>%)
   %reset_count;
   %for;i;0;bvar.perso_module_tplnb;
     %apply;init_nb_asc(i)
@@ -204,9 +164,21 @@
       %end;
     </div>
   </div>
+%elseif;(bvar.p_mod!="" or evar.p_mod!="")
+  %(Dynamique avec bvar.p_mod ou evar.p_mod%)
+  %apply;init_cache(3, 2, 2)
+  %for;i;0;p_mod_nbr;
+    %let;mmi;%apply;mm(i)%in;
+    %let;ooi;%apply;oo(i)%in;
+    %if;(mmi!="" and ooi!=0)
+      %apply;get_mod(mmi, ooi)
+    %end
+  %end;
 %end;
 
-%if;(evar.opt = "misc")%misc_names;<p>%end;
+%if;(evar.opt = "misc")
+  %misc_names;<p>
+%end;
 %if;(not cancel_links)
   %include.trl;
   %include.copyr;

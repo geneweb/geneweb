@@ -1,8 +1,12 @@
 <!-- etat_civil -->
+%( options
+0: skip
+1: standard
+%)
 
 <div class="col-md-12">
   %if;(evar.m!="MOD_IND")
-    <h1 class="display-5">
+    <h1 class="display-5 %if;(bvar.p_mod="" and evar.p_mod="")text-xs-center%end;">
       %if;has_public_name;
         %if;has_qualifiers;%public_name; <em>%qualifier;</em>
         %else;%public_name; %surname;%end;
@@ -17,7 +21,7 @@
         %end;
       %end;
     </h1>
-    <div class="text-xs-center">
+    <div class="%if;(bvar.p_mod="" and evar.p_mod="")text-xs-center%end;">
       %if;has_sosa;
         <span class="fa fa-dot-circle-o text-success"></span>
         [*Sosa]
@@ -33,7 +37,7 @@
             <img src="%image_url;"%image_size; class="rounded" alt="[image/images]0"%/>%nn;
           </a>%nn;
         %elseif;(bvar.default_image="yes")X
-          <img class="" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; 
+          <img class="" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size;
            class="rounded" alt="[missing image]"%/>
         %end;<br>
       %end;
