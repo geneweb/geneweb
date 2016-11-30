@@ -2,7 +2,7 @@
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
       [*descendants]%nn;
@@ -14,15 +14,14 @@
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container-fluid">
+<div class="container">
 %import;perso_utils
 
 <h1>%nn;
@@ -37,16 +36,12 @@
 </h1>
 
 %if;not cancel_links;
-  <table style="float:%right;"><tr><td>
+  <div class="btn-group float-%right; mt-2">
     %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png;
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png;
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
 %end;
 
 %define;tothegen(xx)
@@ -166,7 +161,7 @@
     <p class="desc_notes_src_inline">
       %if;(evar.notes = "on" and (xx.has_notes or xx.has_event))
         [*note/notes]0 : %apply;clean_html_tags(xx.notes)
-          <br%/>
+          <br>
           %if;xx.has_event;
             <table>
               %foreach;xx.event;
@@ -199,7 +194,7 @@
               %end;
             </table>
           %end;
-        <br%/>
+        <br>
       %end;
       %if;(evar.src = "on" and xx.has_sources)
         <em>
@@ -218,7 +213,7 @@
     %[[*note/notes]0%sp;<a href="#note-%ctr;">%nn;%ctr;</a>%]%nn;
   %end
   %incr_count;
-  %apply;lazy_print%with;<br%/>%nl;%end;
+  %apply;lazy_print%with;<br>%nl;%end;
   %foreach;xx.family;
     %if;(family_cnt != 1 and curlev = 0)<p>%nl;%end;
     %lazy_force;
@@ -240,7 +235,7 @@
       <p class="desc_notes_src_inline">
         %if;(evar.notes = "on" and (spouse.has_notes or spouse.has_event))
           [*note/notes]0 : %apply;clean_html_tags(spouse.notes)
-              <br%/>
+              <br>
               %if;spouse.has_event;
                 <table>
                   %foreach;spouse.event;
@@ -273,7 +268,7 @@
                   %end;
                 </table>
               %end;
-          <br%/>
+          <br>
         %end;
         %if;(evar.src = "on" and spouse.has_sources)
           <em>
@@ -313,10 +308,10 @@
            evar.t = "L")
       %if;(family.desc_level < famlev)
         <i>, [see further]</i>.
-        %apply;lazy_print%with;<br%/>%nl;%end;
+        %apply;lazy_print%with;<br>%nl;%end;
       %elseif;(family.desc_level > famlev)
         <i>, [see above]</i>.
-        %apply;lazy_print%with;<br%/>%nl;%end;
+        %apply;lazy_print%with;<br>%nl;%end;
       %elseif;has_children;<p>... <i>[having as children]</i></p>
           %family.set_infinite_desc_level;
           %if;(curlev = 0)</p>%nl;%end;
@@ -334,14 +329,14 @@
           %apply;lazy_print%with;%end;
         %else;.
           %if;(curlev = 0)%nl;</p>%nl;
-          %else;%apply;lazy_print%with;<br%/>%nl;%end;
+          %else;%apply;lazy_print%with;<br>%nl;%end;
           %end;
         %end;
       %elseif;has_children;, ...
       %else;.
       %end;
     %else;.%nl;
-      %apply;lazy_print%with;<br%/>%nl;%end;
+      %apply;lazy_print%with;<br>%nl;%end;
     %end;
   %end;
 %end;
@@ -399,14 +394,14 @@
             </table>
           %end;
         </td></tr></table>
-        <br%/>
+        <br>
       %end;
       %if;(evar.src="on" and xx.has_sources)
-        <em style="font-size:80%%">[*source/sources]1:<br%/>
+        <em style="font-size:80%%">[*source/sources]1:<br>
           %foreach;xx.source;
-            - %source_type;: %source;<br%/>
+            - %source_type;: %source;<br>
           %end;
-          <br%/>
+          <br>
         </em>
       %end;
     </dd>
@@ -464,14 +459,14 @@
               </table>
             %end;
           </td></tr></table>
-          <br%/>
+          <br>
         %end;
         %if;(evar.src="on" and spouse.has_sources)
-          <em style="font-size:80%%">[*source/sources]1:<br%/>
+          <em style="font-size:80%%">[*source/sources]1:<br>
             %foreach;spouse.source;
-              - %source_type;: %source;<br%/>
+              - %source_type;: %source;<br>
             %end;
-            <br%/>
+            <br>
           </em>
         %end;
       </dd>
@@ -534,7 +529,7 @@
   %else;%apply;min(evar.v, max_desc_level, bvar.max_desc_level)%end;
 %end;
 
-%base_trailer;
+%include.trl;
 %include.copyr;
 </div>
 %include.js;

@@ -6,14 +6,13 @@
   <title>[*revision history]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
-<div class="container-fluid">
+<div class="container">
 <script><!--
 
 function update_new () {
@@ -37,31 +36,22 @@ function update_old () {
 }
 --></script>
 
-<div class="row mt-2">
-  <div class="col-xs-2 float-%right;">
-%if;not cancel_links;
-  <table class="">
-    <tr><td>
-      %if;(referer != "")
-        <a href="%referer;">
-          <img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
-        </a>
-      %end;
-      <a href="%prefix;">
-        <img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="^^"%/>
-      </a>
-    </td></tr>
-  </table>
-%end;
-  </div>
-
-<h1 class="col-xs-8 offset-xs-2 text-xs-center">
+<h1 class="col-8 offset-2 text-center">
   <a href="%prefix;%acces;">%person;</a>%nn;
   %if;(evar.t = "SUM"), [revision history]
-  %else;<br />[difference between the two revisions]
+  %else;<br>[difference between the two revisions]
   %end;
 </h1>
-</div>
+
+%if;(not cancel_links)
+  <div class="btn-group float-%right; mt-2">
+    %if;(referer != "")
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+    %end;
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
+%end;
+
 %define;no_diff(xx)
   [*insufficient revision history for %s:::xx]
 %end;
@@ -73,7 +63,7 @@ function update_old () {
     <input type="hidden" name="t" value="DIFF"%/>
     <input type="hidden" name="f" value="%evar.f;"%/>
     %if;(history_len >= 2)
-      <button type="submit" class="btn btn-secondary">[*compare selected revisions]</button>
+      <button type="submit" class="btn btn-secondary mb-2">[*compare selected revisions]</button>
     %else;
       %apply;no_diff(person)
     %end;
@@ -86,9 +76,9 @@ function update_old () {
       %foreach;history_line;
         <tr>
           <td %if;(line % 2 != 0) class="odd" %end;>
-            <div class="form-inline mx-auto">
+            <div class="form-inline">
               <input type="radio" class="form-control" name="old" value="%line;" onclick="update_old()" %if;(line = 0)style="visibility: hidden"%elseif;(line = 1)checked%end;%/>
-              <input type="radio" class="form-control" name="new" value="%line;" onclick="update_new()" %if;(line = 0)checked%elseif;(line = history_len - 1)style="visibility: hidden"%end;%/>
+              <input type="radio" class="form-control ml-2" name="new" value="%line;" onclick="update_new()" %if;(line = 0)checked%elseif;(line = history_len - 1)style="visibility: hidden"%end;%/>
             </div>
           </td>
           <td %if;(line % 2 != 0) class="odd" %end;>%apply;transl_date%with;%date;%end;</td>
@@ -167,13 +157,6 @@ function update_old () {
       <th scope="row" class="table-success text-nowrap">[*occupation/occupations]1</th>
       <td class="odd">%before.occupation;</td>
       <td class="odd">%after.occupation;</td>
-    </tr>
-  %end;
-  %if;(before.death_reason!=after.death_reason)
-    <tr>
-      <th scope="row" class="table-success text-nowrap">death_reason</th>
-      <td class="odd">%before.death_reason;</td>
-      <td class="odd">%after.death_reason;</td>
     </tr>
   %end;
   %foreach;pevent;
@@ -323,7 +306,7 @@ function update_old () {
 %end;
 
 %define;print_diff()
-  %( à transformer en 3 boutons centrés %)
+  %( â€¡ transformer en 3 boutonsâ€ centrÃˆs %)
   <table class="table-sm mx-auto">
     <tr>
       <td style="width:20%"><a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;;m=%evar.m;;t=%evar.t;;f=%evar.f;;new=%evar.old;;old=%expr(evar.old+1)" title="[*previous diff]"><span class="fa fa-arrow-left"></span> [previous/next diff]0</a> |</td>
@@ -357,7 +340,7 @@ function update_old () {
     </colgroup>
     <tr>
       <td colspan="3">
-        <h2 class="highlight text-xs-center">
+        <h2 class="highlight text-center">
           [*person/persons]0
         </h2>
       </td>
@@ -366,7 +349,7 @@ function update_old () {
     %if;(nb_families > 0)
       <tr>
         <td colspan="3">
-          <h2 class="highlight text-xs-center">
+          <h2 class="highlight text-center">
             [*family/families]0
           </h2>
         </td>
@@ -385,7 +368,7 @@ function update_old () {
   %end;
   </div>
 </div>
-%base_trailer;
+%include.trl;
 %include.copyr;
 </div>
 %include.js;

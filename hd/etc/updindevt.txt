@@ -2,12 +2,11 @@
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: updindevt.txt,v 0.01 2016-01-24 22:15:30 flh Exp $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
+  <!-- Copyright (c) 2006-2017 INRIA -->
   <title>[*modify::person/persons]0</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;

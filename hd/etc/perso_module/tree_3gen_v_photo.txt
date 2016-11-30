@@ -52,7 +52,7 @@
               %end;
               <td></td>
               %if;mother.has_parents;
-		<td class="arbre_separateur"><span>|</span></td>
+                <td class="arbre_separateur"><span>|</span></td>
                 <td></td>
                 <td class="arbre_separateur"><span>|</span></td>
               %end;
@@ -76,11 +76,11 @@
             </tr>
             <tr>
               %if;father.has_parents;
-		<td></td><td class="arbre_separateur"><span>|</span></td><td></td>
+    <td></td><td class="arbre_separateur"><span>|</span></td><td></td>
               %end;
               <td></td>
               %if;mother.has_parents;
-		<td></td><td class="arbre_separateur"><span>|</span></td><td></td>
+    <td></td><td class="arbre_separateur"><span>|</span></td><td></td>
               %end;
             </tr>
           %end;
@@ -104,18 +104,18 @@
           <tr>
             <td></td><td class="arbre_separateur"><span>|</span></td><td></td>
             <td></td>
-	    <td></td><td class="arbre_separateur"><span>|</span></td><td></td>
+      <td></td><td class="arbre_separateur"><span>|</span></td><td></td>
           </tr>
           <tr>
             <td></td><td align="%right;">
               <hr dir="ltr" width="50%%" align="%right;"%/></td>
-	    <td colspan="3"><hr width="100%%"%/></td>
+      <td colspan="3"><hr width="100%%"%/></td>
             <td align="%left;">
               <hr dir="ltr" width="50%%" align="%left;"%/></td>
             <td></td>
           </tr>
           <tr>
-	    <td colspan="3"></td><td class="arbre_separateur"><span>|</span></td>
+      <td colspan="3"></td><td class="arbre_separateur"><span>|</span></td>
             <td colspan="3"></td>
           </tr>
           <tr>
@@ -125,7 +125,7 @@
                 <br%/>
               %end;
               %apply;short_display_person("self")</td>
-	    <td colspan="3"></td>
+      <td colspan="3"></td>
           </tr>
         </table>
       </td>
