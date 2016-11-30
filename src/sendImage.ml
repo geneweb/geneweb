@@ -120,7 +120,7 @@ value print_send_image conf base p =
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
         Wserver.printf "%s:\n" (capitale (transl conf "file"));
         xtag "input" "\
-type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
+type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
       end;
       match p_getint conf.base_env "max_images_size" with
       [ Some len ->
@@ -128,8 +128,8 @@ type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
             Wserver.printf "(maximum authorized size = %d bytes)\n" len;
           end
       | None -> () ];
-      tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg mt-2\"" begin 
+        Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
       end;
     end;
     print_link_delete_image conf base p;
@@ -182,7 +182,9 @@ value print_delete_image conf base p =
         (Adef.int_of_iper (get_key_index p));
       Wserver.printf "\n";
       html_p conf;
-      Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+        Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+      end;
     end;
     Wserver.printf "\n";
     trailer conf
@@ -397,4 +399,3 @@ value print_del_ok conf base =
   with
   [ Update.ModErr -> () ]
 ;
-

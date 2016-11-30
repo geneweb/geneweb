@@ -775,7 +775,9 @@ value print_del1 conf base p =
         xtag "input" "type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
           (Adef.int_of_iper (get_key_index p));
-        xtag "input" "type=\"submit\" value=\"Ok\"";
+        tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+          Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+        end;
       end;
     end;
     trailer conf;

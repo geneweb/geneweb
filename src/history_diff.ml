@@ -346,7 +346,9 @@ value print_clean conf base =
                     loop (i + 1) l
                   } ];
           end;
-          xtag "input" "type=\"submit\" value=\"Ok\"";
+          tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+ 						Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+					end;
         end;
         Hutil.trailer conf
       }
