@@ -638,16 +638,16 @@ value print_sub_part_links conf edit_mode sfn cnt0 is_empty =
     if cnt0 >= first_cnt then
       stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 - 1)
       begin
-        Wserver.printf "&lt;&lt;";
+        Wserver.printf "<span class=\"fa fa-arrow-left  fa-lg\" title=\"<<\"></span>";
       end
     else ();
     stagn "a" "href=\"%sm=%s%s\"" (commd conf) edit_mode sfn begin
-      Wserver.printf "^^";
+      Wserver.printf "<span class=\"fa fa-arrow-up  fa-lg\" title=\"^^\"></span>";
     end;
     if not is_empty then
       stagn "a" "href=\"%sm=%s%s;v=%d\"" (commd conf) edit_mode sfn (cnt0 + 1)
       begin
-        Wserver.printf "&gt;&gt;";
+        Wserver.printf "<span class=\"fa fa-arrow-right  fa-lg\" title=\">>\"></span>";
       end
     else ();
   end
@@ -714,7 +714,7 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
       Wserver.printf ")\n";
     end
   else ();
-  print_link_to_welcome conf (if can_edit then False else True);
+  print_link_to_welcome conf True;
   if can_edit && has_v then
     print_sub_part_links conf (mode_pref ^ mode) sfn v is_empty
   else ();
@@ -767,7 +767,9 @@ value print_mod_view_page conf can_edit mode fname title env s = do {
             end;
             if can_edit then do {
               xtag "br";
-              xtag "input" "type=\"submit\" value=\"Ok\"";
+              tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+                Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+              end;
             }
             else ();
           end;

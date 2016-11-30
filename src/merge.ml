@@ -45,13 +45,13 @@ value print conf base p =
           Wserver.printf ":";
           xtag "br";
           xtag "input" "\
-type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
+type=\"radio\" class=\"form-control\" name=\"select\" value=\"input\" checked";
         }
         else ();
-        Wserver.printf "(%s . %s %s):\n"
+        Wserver.printf "(%s.%s %s):\n"
           (transl_nth conf "first name/first names" 0) (transl conf "number")
           (transl_nth conf "surname/surnames" 0);
-        xtag "input" "name=\"n\" size=\"30\" maxlength=\"200\"";
+        xtag "input" "class=\"form-control\" name=\"n\" size=\"30\" maxlength=\"200\"";
         xtag "br";
       end;
       if list <> [] then
@@ -93,8 +93,8 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
            end)
         list;
       if list <> [] then Wserver.printf "</table>\n" else ();
-      tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+        Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
       end;
     end;
     trailer conf;

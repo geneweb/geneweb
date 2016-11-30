@@ -130,7 +130,6 @@ value print conf base =
 value print_html conf base =
   do {
     Util.html conf;
-    Wserver.printf "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
     Wserver.printf "<head>\n";
     Wserver.printf "  <title>%s</title>\n"
       (Util.transl_nth conf "image/images" 0);

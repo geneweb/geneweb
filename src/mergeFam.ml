@@ -52,11 +52,11 @@ value print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
       tag "ul" begin
         html_li conf;
         Wserver.printf
-          "<input type=\"radio\" name=\"%s\" value=\"1\" checked>\n"
+          "<input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"1\" checked>\n"
           name;
         Wserver.printf "%s\n" x1;
         html_li conf;
-        Wserver.printf "<input type=\"radio\" name=\"%s\" value=\"2\">\n" name;
+        Wserver.printf "<input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"2\">\n" name;
         Wserver.printf "%s\n" x2;
       end;
     }
@@ -122,7 +122,9 @@ value print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
              in
              transl conf "divorced" ^ ds ]);
     html_p conf;
-    Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
+    tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+      Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+    end;
   end
 ;
 

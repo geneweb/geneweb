@@ -766,7 +766,7 @@ END
 value special_vars =
   ["alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
    "iz"; "log_cnl"; "log_pwd"; "log_uid"; "long"; "manitou"; "nz"; "ocz";
-   "pz"; "pure_xhtml"; "size"; "spouse"; "templ"]
+   "pz"; "pure_xhtml"; "size"; "spouse"; "templ"; "p_mod"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);
@@ -809,6 +809,9 @@ value extract_henv conf base =
     match p_getenv conf.env "manitou" with
     [ Some "off" -> conf.henv := conf.henv @ [("manitou", "off")]
     | Some _ | None -> () ];
+    match p_getenv conf.env "p_mod" with
+    [ Some x -> conf.henv := conf.henv @ [("p_mod", x)]
+    | None -> () ];
   }
 ;
 

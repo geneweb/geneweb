@@ -214,11 +214,11 @@ value propose_months conf mode =
     tag "table" "border=\"%d\"" conf.border begin
       tag "tr" begin
         tag "td" begin
-          tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+          tag "form" "class=\"form-inline\" method=\"get\" action=\"%s\"" conf.command begin
             tag "p" begin
               Util.hidden_env conf;
               mode ();
-              tag "select" "name=\"v\"" begin
+              tag "select" "class=\"form-control form-control-lg\" name=\"v\"" begin
                 for i = 1 to 12 do {
                   stagn "option" "value=\"%d\"%s" i
                     (if i = conf.today.month then " selected=\"selected\""
@@ -231,7 +231,9 @@ value propose_months conf mode =
                   end
                 };
               end;
-              xtag "input" "type=\"submit\" value=\"Ok\"";
+              tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+                Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+              end;
             end;
           end;
         end;
@@ -469,8 +471,8 @@ value gen_print_menu_dead conf base f_scan mode =
   let list_tom = ref [] in
   let list_aft = ref [] in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    Hutil.header conf title;
+    Hutil.print_link_to_welcome conf True;
     try
       while True do {
         let (p, txt_of) = f_scan () in

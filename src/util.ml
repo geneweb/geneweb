@@ -560,23 +560,23 @@ value fast_auth_age conf p =
         - Vrai si : magicien ou ami ou la personne est public
         - Vrai si : la personne est en si_titre, si elle a au moins un
                     titre et que public_if_title = yes dans le fichier gwf
-        - Faux si : la personne n'est pas dÈcÈdÈe et private_years > 0
-        - Vrai si : la personne est plus agÈe (en fonction de la date de
-                    naissance ou de la date de baptËme) que privates_years
+        - Faux si : la personne n'est pas d√©c√©d√©e et private_years > 0
+        - Vrai si : la personne est plus ag√©e (en fonction de la date de
+                    naissance ou de la date de bapt√®me) que privates_years
         - Faux si : la personne est plus jeune (en fonction de la date de
-                    naissance ou de la date de baptËme) que privates_years
-        - Vrai si : la personne est dÈcÈdÈe depuis plus de privates_years
-        - Faux si : la personne est dÈcÈdÈe depuis moins de privates_years
+                    naissance ou de la date de bapt√®me) que privates_years
+        - Vrai si : la personne est d√©c√©d√©e depuis plus de privates_years
+        - Faux si : la personne est d√©c√©d√©e depuis moins de privates_years
         - Vrai si : la personne a entre 80 et 120 ans et qu'elle n'est pas
-                    privÈe et public_if_no_date = yes
-        - Vrai si : la personne s'est mariÈe depuis plus de private_years
+                    priv√©e et public_if_no_date = yes
+        - Vrai si : la personne s'est mari√©e depuis plus de private_years
         - Faux dans tous les autres cas
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : Vrai si on a les droits, Faux sinon.
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value authorized_age conf base p =
   if conf.wizard || conf.friend || get_access p = Public then True
@@ -666,17 +666,17 @@ value is_public conf base p =
 (* ********************************************************************** *)
 (*  [Fonc] accessible_by_key :
              config -> base -> person -> string -> string -> bool         *)
-(** [Description] : Vrai si la personne est accessible par sa clÈ,
+(** [Description] : Vrai si la personne est accessible par sa cl√©,
                     Faux sinon.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
-      - fn   : prÈnom de la personne
+      - fn   : pr√©nom de la personne
       - sn   : patronyme de la personne
     [Retour] :
-      - bool : Vrai si la personne est accessible par sa clÈ, faux sinon.
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+      - bool : Vrai si la personne est accessible par sa cl√©, faux sinon.
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value accessible_by_key conf base p fn sn =
   conf.access_by_key
@@ -688,15 +688,15 @@ value accessible_by_key conf base p fn sn =
 
 (* ********************************************************************** *)
 (*  [Fonc] acces_n : config -> base -> string -> person -> string         *)
-(** [Description] : Renvoie les paramËtres URL pour l'accËs ‡ la niËme
+(** [Description] : Renvoie les param√®tres URL pour l'acc√®s √† la ni√®me
                     personne.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
-      - n    : la niËme personne (e.g. : calcul de parentÈ entre p1 et p2)
+      - base : base de donn√©e
+      - n    : la ni√®me personne (e.g. : calcul de parent√© entre p1 et p2)
       - p    : person
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value acces_n conf base n x =
   let first_name = p_first_name base x in
@@ -719,13 +719,13 @@ value acces_n conf base n x =
 
 (* ********************************************************************** *)
 (*  [Fonc] acces : config -> base -> person -> string                     *)
-(** [Description] : Renvoie les paramËtres URL pour l'accËs ‡ la personne.
+(** [Description] : Renvoie les param√®tres URL pour l'acc√®s √† la personne.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value acces conf base x = acces_n conf base "" x;
 
@@ -738,7 +738,7 @@ value raw_access =
 
 
 (**/**)
-(* Fonctions d'Ècriture du nom et prÈnom d'un individu en fonction de : *)
+(* Fonctions d'√©criture du nom et pr√©nom d'un individu en fonction de : *)
 (*   - son/ses titre de noblesse                                        *)
 (*   - son/ses nom public                                               *)
 (*   - son/ses sobriquets                                               *)
@@ -749,16 +749,16 @@ value restricted_txt conf = ".....";
 
 (* ************************************************************************** *)
 (*  [Fonc] gen_person_text : fun -> fun -> config -> base -> person -> string *)
-(** [Description] : Renvoie le prÈnom et nom d'un individu en fonction
+(** [Description] : Renvoie le pr√©nom et nom d'un individu en fonction
                     de son nom public et sobriquet.
     [Args] :
-      - p_first_name : renvoie le prÈnom d'un individu (string)
+      - p_first_name : renvoie le pr√©nom d'un individu (string)
       - p_surname    : renvoie le nom d'un individu (string)
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                               *)
+    [Rem] : Export√© en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 value gen_person_text (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
@@ -779,16 +779,16 @@ value gen_person_text (p_first_name, p_surname) conf base p =
 (* ************************************************************************** *)
 (*  [Fonc] gen_person_text_no_html :
              fun -> fun -> config -> base -> person -> string                 *)
-(** [Description] : Renvoie le prÈnom et nom d'un individu en fonction
+(** [Description] : Renvoie le pr√©nom et nom d'un individu en fonction
                     de son nom public et sobriquet (sans balise html <em>).
     [Args] :
-      - p_first_name : renvoie le prÈnom d'un individu (string)
+      - p_first_name : renvoie le pr√©nom d'un individu (string)
       - p_surname    : renvoie le nom d'un individu (string)
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                               *)
+    [Rem] : Export√© en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
@@ -808,16 +808,16 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
 (* ************************************************************************** *)
 (*  [Fonc] gen_person_text_without_surname :
              fun -> fun -> config -> base -> person -> string                 *)
-(** [Description] : Renvoie le prÈnom d'un individu en fonction de son
+(** [Description] : Renvoie le pr√©nom d'un individu en fonction de son
                     nom public et sobriquet.
     [Args] :
-      - p_first_name : renvoie le prÈnom d'un individu (string)
+      - p_first_name : renvoie le pr√©nom d'un individu (string)
       - p_surname    : renvoie le nom d'un individu (string)
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                               *)
+    [Rem] : Export√© en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
     base p
@@ -850,14 +850,14 @@ value person_text_no_surn_no_acc_chk =
 (* *********************************************************************** *)
 (*  [Fonc] main_title : config -> base -> person -> title option           *)
 (** [Description] : Renvoie le titre principal d'une personne. Si aucun
-                    titre principal n'est trouvÈ mais que la personne a
+                    titre principal n'est trouv√© mais que la personne a
                     plusieurs titre, alors on renvoie le premier titre.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : title option
-    [Rem] : ExportÈ en clair hors de ce module.                            *)
+    [Rem] : Export√© en clair hors de ce module.                            *)
 (* *********************************************************************** *)
 value main_title conf base p =
   (* Fonction de recherche du titre principal. *)
@@ -868,7 +868,7 @@ value main_title conf base p =
   in
   match find_main (nobtit conf base p) with
   [ None ->
-      (* Aucun titre trouvÈ, on renvoie le premier (s'il existe). *)
+      (* Aucun titre trouv√©, on renvoie le premier (s'il existe). *)
       match nobtit conf base p with
       [ [x :: _] -> Some x
       | _ -> None ]
@@ -878,15 +878,15 @@ value main_title conf base p =
 
 (* *********************************************************************** *)
 (*  [Fonc] titled_person_text : config -> base -> person -> istr gen_title *)
-(** [Description] : Renvoie la chaÓne de caractËre de la personne en
+(** [Description] : Renvoie la cha√ìne de caract√®re de la personne en
                     fonction de son titre.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
       - t    : gen_title
     [Retour] : string
-    [Rem] : Non exportÈ en clair hors de ce module.                        *)
+    [Rem] : Non export√© en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 value titled_person_text conf base p t =
   if p_getenv conf.base_env "print_advanced_title" = Some "yes" then
@@ -894,10 +894,10 @@ value titled_person_text conf base p t =
     let surname = p_surname base p in
     let elen = String.length estate in
     let slen = String.length surname in
-    (* Si le nom de l'individu est le mÍme que son domaine, on renvoie : *)
+    (* Si le nom de l'individu est le m√çme que son domaine, on renvoie : *)
     (*   - le nom du titre                                               *)
     (*   - le nom du titre et le premier sobriquet                       *)
-    (*   - le nom de la personne (donnÈ par son nom de domaine) en       *)
+    (*   - le nom de la personne (donn√© par son nom de domaine) en       *)
     (*     fonction du nom public et sobriquet                           *)
     if Name.strip_lower estate = Name.strip_lower surname then
       match (t.t_name, get_qualifiers p) with
@@ -907,7 +907,7 @@ value titled_person_text conf base p t =
     (* Si le nom de l'individu contient le nom de son domaine, on renvoie : *)
     (*   - le nom du titre                                                  *)
     (*   - le nom du titre et le premier sobriquet                          *)
-    (*   - le nom de la personne (nom du domaine ÈpurÈ du patronyme) en     *)
+    (*   - le nom de la personne (nom du domaine √©pur√© du patronyme) en     *)
     (*     fonction du nom public et sobriquet                              *)
     else if elen < slen && String.sub surname (slen - elen) elen = estate then
       match (t.t_name, get_qualifiers p) with
@@ -937,15 +937,15 @@ value titled_person_text conf base p t =
 
 (* *********************************************************************** *)
 (*  [Fonc] one_title_text : config -> base -> person -> istr gen_title     *)
-(** [Description] : Renvoie la chaÓne de caractËre du titre ainsi que le
+(** [Description] : Renvoie la cha√ìne de caract√®re du titre ainsi que le
                     domaine.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : la personne dont on veut le titre
       - t    : le titre de noblesse que l'on veut afficher
     [Retour] : string
-    [Rem] : Non exportÈ en clair hors de ce module.                        *)
+    [Rem] : Non export√© en clair hors de ce module.                        *)
 (* *********************************************************************** *)
 value one_title_text conf base p t =
   let place = sou base t.t_place in
@@ -970,19 +970,19 @@ value reference conf base p s =
 
 (* ************************************************************************* *)
 (*  [Fonc] update_family_loop : config -> base -> person -> string -> string *)
-(** [Description] : Essaie de dÈterminer dans quelle famille il peut y avoir
-                    une boucle. Si il n'y a pas d'ambiguitÈ, alors on renvoie
-                    un lien vers la famille ‡ modifier, sinon, on renvoie un
-                    lien vers le menu gÈnÈral de mise ‡ jour.
+(** [Description] : Essaie de d√©terminer dans quelle famille il peut y avoir
+                    une boucle. Si il n'y a pas d'ambiguit√©, alors on renvoie
+                    un lien vers la famille √† modifier, sinon, on renvoie un
+                    lien vers le menu g√©n√©ral de mise √† jour.
     [Args] :
       - conf : configuration
       - base : base
       - p    : person
-      - s    : la clÈ de la personne sous forme de string
+      - s    : la cl√© de la personne sous forme de string
     [Retour] :
-      - string : retourne un lien de mise ‡ jour soit vers la famille
-                 contenant la boucle, soit vers le menu de mise ‡ jour.
-    [Rem] : ExportÈ en clair hors de ce module.                              *)
+      - string : retourne un lien de mise √† jour soit vers la famille
+                 contenant la boucle, soit vers le menu de mise √† jour.
+    [Rem] : Export√© en clair hors de ce module.                              *)
 (* ************************************************************************* *)
 value update_family_loop conf base p s =
   if conf.cancel_links || is_hidden p then s
@@ -1005,9 +1005,9 @@ value update_family_loop conf base p s =
     in
     let res = loop [] list in
     if conf.wizard then
-      (* Si il n'y a pas d'ambiguitÈ, i.e. pas 2 boucles dans 2 familles *)
-      (* pour un mÍme individu, alors on renvoit le lien vers la mise ‡  *)
-      (* jour de la famille, sinon, un lien vers le menu de mise ‡ jour. *)
+      (* Si il n'y a pas d'ambiguit√©, i.e. pas 2 boucles dans 2 familles *)
+      (* pour un m√çme individu, alors on renvoit le lien vers la mise √†  *)
+      (* jour de la famille, sinon, un lien vers le menu de mise √† jour. *)
       if List.length res = 1 then
         let iper = string_of_int (Adef.int_of_iper iper) in
         let ifam = string_of_int (Adef.int_of_ifam (List.hd res)) in
@@ -1258,23 +1258,23 @@ value explode s c =
 
 (* ************************************************************************ *)
 (*  [Fonc] etc_file_name : config -> string -> string                       *)
-(** [Description] : Renvoie le chemin vers le fichier de template passÈ
-                    en paramËtre.
+(** [Description] : Renvoie le chemin vers le fichier de template pass√©
+                    en param√®tre.
     [Args] :
       - conf  : configuration de la base
       - fname : le fichier de template
     [Retour] :
       - string : le chemin vers le fichier de template
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value etc_file_name conf fname =
-  (* On recherche si dans le nom du fichier, on a specifiÈ son *)
-  (* rÈpertoire, i.e. si fname est Ècrit comme ceci : dir/file *)
+  (* On recherche si dans le nom du fichier, on a specifi√© son *)
+  (* r√©pertoire, i.e. si fname est √©crit comme ceci : dir/file *)
   let fname = List.fold_left (Filename.concat) "" (explode fname '/') in
   (* On cherche le fichier dans cet ordre :
      - dans la base (bases/etc/base_name/name.txt)
      - dans la base (bases/etc/templx/name.txt)
-     - dans le rÈpertoire des programmes (gw/etc/templx/name.txt) *)
+     - dans le r√©pertoire des programmes (gw/etc/templx/name.txt) *)
   let file_exist dir =
     let base_name_tpl_dir =
       Filename.concat (base_path ["etc"] conf.bname) (fname ^ ".txt")
@@ -1292,7 +1292,7 @@ value etc_file_name conf fname =
     else if Sys.file_exists etc_tpl_dir then etc_tpl_dir
     else ""
   in
-  (* Recherche le template par dÈfaut en fonction de la variable gwf *)
+  (* Recherche le template par d√©faut en fonction de la variable gwf *)
   (* template = templ1,templ2,*                                      *)
   let rec default_templ config_templ std_fname =
     match config_templ with
@@ -1323,13 +1323,13 @@ value etc_file_name conf fname =
         [ [] | ["*"] -> ""
         | [x :: _] -> x ] ]
   in
-  (* template par dÈfaut *)
+  (* template par d√©faut *)
   let std_fname =
     search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
   in
   (* On cherche le template dans l'ordre de file_exist.         *)
   (* Si on ne trouve rien, alors on cherche le premier template *)
-  (* par dÈfaut tel que dÈfini par la variable template du gwf  *)
+  (* par d√©faut tel que d√©fini par la variable template du gwf  *)
   match file_exist dir with
   [ "" -> default_templ config_templ std_fname
   | s -> s ]
@@ -1355,7 +1355,7 @@ value open_templ conf fname =
   try Some (Secure.open_in (etc_file_name conf fname)) with
   [ Sys_error _ ->
       if (*dir = conf.bname*)True(**) then
-        (* template par dÈfaut *)
+        (* template par d√©faut *)
         let std_fname =
           search_in_lang_path (Filename.concat "etc" (fname ^ ".txt"))
         in
@@ -1369,7 +1369,7 @@ value image_prefix conf = conf.image_prefix;
 (*
    On cherche le fichier dans cet ordre :
     - dans la base (bases/etc/name.txt)
-    - dans le rÈpertoire des programmes (gw/etc/name.txt)
+    - dans le r√©pertoire des programmes (gw/etc/name.txt)
 *)
 value find_misc_file name =
   let base_tpl_dir = Filename.concat (base_path ["etc"] "") name in
@@ -1380,7 +1380,7 @@ value find_misc_file name =
     else ""
 ;
 
-(* Code mort. GÈrÈ par le css
+(* Code mort. G√©r√© par le css
 value default_background conf =
   sprintf "background:url('%s/gwback.jpg')" (image_prefix conf)
 ;
@@ -1394,7 +1394,7 @@ value default_body_prop conf =
   let style = sprintf "%s%s" style (default_background conf) in
   " style=\"" ^ style ^ "\""
 ;
-   Code mort. GÈrÈ par le css *)
+   Code mort. G√©r√© par le css *)
 
 value body_prop conf =
   try
@@ -1899,13 +1899,13 @@ value place_of_string conf place =
 (*  [Fonc] string_of_place : config -> string -> string                   *)
 (** [Description] : Astuce temporaire pour supprimer les crochets dans
                     un lieu-dit. A l'avenir, il faudra revoir comment sont
-                    implÈmentÈs les lieux.
+                    impl√©ment√©s les lieux.
     [Args] :
       - conf  : configuration de la base
       - place : lieu dont on veut supprimer les crochets
     [Retour] :
       - string : lieu sans les crochets du lieu-dit.
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value string_of_place conf place =
   List.fold_left
@@ -2206,14 +2206,14 @@ value relation_txt conf sex fam =
                       * fils/fille de Jean (et) Jeanne
     [Args] :
       - conf : configuration
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : Non exportÈ en clair hors de ce module.                           *)
+    [Rem] : Non export√© en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 value child_of_parent conf base p =
-  (* Si le pËre a un nom de famille diffÈrent de la personne *)
-  (* alors on l'affiche, sinon on n'affiche que le prÈnom.   *)
+  (* Si le p√®re a un nom de famille diff√©rent de la personne *)
+  (* alors on l'affiche, sinon on n'affiche que le pr√©nom.   *)
   let print_father fath =
     if not (eq_istr (get_surname p) (get_surname fath)) then
       person_text conf base fath
@@ -2258,14 +2258,14 @@ value child_of_parent conf base p =
 (* ************************************************************************** *)
 (*  [Fonc] husband_wife : config -> base -> person -> unit                    *)
 (** [Description] : Traduction selon l'existence du premier conjoint
-                    diffÈrent de ?? :
-                      * Èpoux/Èpouse de Jean/Jeanne
+                    diff√©rent de ?? :
+                      * √©poux/√©pouse de Jean/Jeanne
     [Args] :
       - conf : configuration
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : Non exportÈ en clair hors de ce module.                           *)
+    [Rem] : Non export√© en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 value husband_wife conf base p =
   let rec loop i =
@@ -2289,13 +2289,13 @@ value husband_wife conf base p =
 (* ************************************************************************** *)
 (*  [Fonc] first_child : config -> base -> person -> unit                     *)
 (** [Description] : Traduction selon l'existence du premier enfants :
-                      * pËre/mËre de Jean
+                      * p√®re/m√®re de Jean
     [Args] :
       - conf : configuration
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : Non exportÈ en clair hors de ce module.                           *)
+    [Rem] : Non export√© en clair hors de ce module.                           *)
 (* ************************************************************************** *)
 value first_child conf base p =
   let is = index_of_sex (get_sex p) in
@@ -2327,26 +2327,26 @@ value first_child conf base p =
 
 (* ************************************************************************** *)
 (*  [Fonc] specify_homonymous : config -> base -> person -> bool -> string    *)
-(** [Description] : Permet d'afficher des informations supplÈmentaires sur la
+(** [Description] : Permet d'afficher des informations suppl√©mentaires sur la
       personne en cas d'homonymes (par exemple sur la recherche par ordre
-      alphabÈtique).
-      L'affichage se fait de faÁon similaire ‡ gen_person_text, i.e. en
-      fonction du nom publique et sobriquet si on valorise le paramËtre
-      specify_public_name ‡ True :
+      alphab√©tique).
+      L'affichage se fait de fa√Åon similaire √† gen_person_text, i.e. en
+      fonction du nom publique et sobriquet si on valorise le param√®tre
+      specify_public_name √† True :
         * Louis VI le gros (nom publique sobriquet)
-        * Louis le gros    (prÈnom sobriquet)
+        * Louis le gros    (pr√©nom sobriquet)
         * Louis VI         (nom publique)
-        * Louis CapÈtiens, fils de Philippe et Berthe, mariÈ avec AdËlaÔde,
-            pËre de Philippe
+        * Louis Cap√©tiens, fils de Philippe et Berthe, mari√© avec Ad√®la√îde,
+            p√®re de Philippe
     [Args] :
       - conf : configuration
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
-      - specify_public_name : en fonction des affichages, on peut dÈj‡ avoir
-          affichÈ le nom public de la personne, et dans ce cas, on ne veut pas
+      - specify_public_name : en fonction des affichages, on peut d√©j√† avoir
+          affich√© le nom public de la personne, et dans ce cas, on ne veut pas
           l'afficher de nouveau.
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                               *)
+    [Rem] : Export√© en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 value specify_homonymous conf base p specify_public_name =
   match (get_public_name p, get_qualifiers p) with
@@ -2378,12 +2378,12 @@ value specify_homonymous conf base p specify_public_name =
              codate -> string -> codate -> string -> (codate, string)         *)
 (** [Description] : Renvoi la date et le lieu le mieux correspondant.
     [Args] :
-      - d1   : date (naissance/dÈcËs)
-      - p1   : lieu (naissance/dÈcËs)
-      - d2   : date (baptËme/inhumation)
-      - p2   : lieu (baptËme/inhumation)
+      - d1   : date (naissance/d√©c√®s)
+      - p1   : lieu (naissance/d√©c√®s)
+      - d2   : date (bapt√®me/inhumation)
+      - p2   : lieu (bapt√®me/inhumation)
     [Retour] : (codate, string)
-    [Rem] : None exportÈ en clair hors de ce module.                          *)
+    [Rem] : None export√© en clair hors de ce module.                          *)
 (* ************************************************************************** *)
 value get_approx_date_place d1 p1 d2 p2 =
   match (d1, p1, d2, p2) with
@@ -2642,8 +2642,8 @@ value update_gwf_sosa conf base (ip, (fn, sn, occ)) =
   in
   let new_key = fn ^ "." ^ string_of_int occ ^ " " ^ sn in
   if ip = fst conf.default_sosa_ref && new_key != sosa_ref_key then
-    (* On met ‡ jour le fichier gwf, la config *)
-    (* se mettera ‡ jour par treat_request.    *)
+    (* On met √† jour le fichier gwf, la config *)
+    (* se mettera √† jour par treat_request.    *)
     write_default_sosa conf base new_key
   else ()
 ;
@@ -2747,15 +2747,15 @@ value space_to_unders = Mutil.tr ' ' '_';
 
 (* ************************************************************************** *)
 (*  [Fonc] default_image_name_of_key : string -> string -> int -> string      *)
-(** [Description] : Renvoie ‡ partir de la clÈ d'une personne, le nom par
-                    dÈfaut de son image (portrait).
+(** [Description] : Renvoie √† partir de la cl√© d'une personne, le nom par
+                    d√©faut de son image (portrait).
                     Par exemple, Jean Claude DUPOND 3 => jean_claude.3.dupond
     [Args] :
       - fnam : first name
       - snam : surname
       - occ  : occ
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                               *)
+    [Rem] : Export√© en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 value default_image_name_of_key fnam surn occ =
   let f = space_to_unders (Name.lower fnam) in
@@ -2766,13 +2766,13 @@ value default_image_name_of_key fnam surn occ =
 
 (* *********************************************************************** *)
 (*  [Fonc] default_image_name : base -> person -> string                   *)
-(** [Description] : Renvoie ‡ partir d'une personne, le nom par dÈfaut de
+(** [Description] : Renvoie √† partir d'une personne, le nom par d√©faut de
                     son image (portrait) => voir default_image_name_of_key.
     [Args] :
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                            *)
+    [Rem] : Export√© en clair hors de ce module.                            *)
 (* *********************************************************************** *)
 value default_image_name base p =
   default_image_name_of_key (p_first_name base p) (p_surname base p)
@@ -2839,10 +2839,10 @@ value image_and_size conf base p image_size =
                     droits pour la voir, Faux sinon.
     [Args] :
       - conf : configuration de la base
-      - base : base de donnÈe
+      - base : base de donn√©e
       - p    : person
     [Retour] : Vrai si la personne a une image, Faux sinon.
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
@@ -3024,14 +3024,14 @@ value of_course_died conf p =
 ;
 
 
-(* Hashtbl pour avoir le plus de flexibilitÈ. *)
-(* TODO : il faudrait que ce soit intÈgrer dans la base directement. *)
+(* Hashtbl pour avoir le plus de flexibilit√©. *)
+(* TODO : il faudrait que ce soit int√©grer dans la base directement. *)
 type cache_info_t = Hashtbl.t string string;
 
 (* valeur dans le cache. *)
 value cache_nb_base_persons = "cache_nb_persons";
 
-(* Hashtbl utilisÈe tant qu'on a pas commit le patch. *)
+(* Hashtbl utilis√©e tant qu'on a pas commit le patch. *)
 value (ht_cache_info : cache_info_t) = Hashtbl.create 1;
 
 
@@ -3041,7 +3041,7 @@ value (ht_cache_info : cache_info_t) = Hashtbl.create 1;
     [Args] :
       - config : configuration de la base
     [Retour] : unit
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value cache_info conf =
   let bname =
@@ -3058,7 +3058,7 @@ value cache_info conf =
     [Args] :
       - conf : configuration de la base
     [Retour] : Hashtbl cache_info_t
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value read_cache_info conf =
   let fname = cache_info conf in
@@ -3072,17 +3072,17 @@ value read_cache_info conf =
 
 (* ************************************************************************ *)
 (*  [Fonc] write_cache_info : config -> cache_info_t -> unit                *)
-(** [Description] : Met ‡ jour le fichier de cache des infos d'une base.
+(** [Description] : Met √† jour le fichier de cache des infos d'une base.
     [Args] :
       - conf : configuration de la base
       - ht   : Hashtbl cache_info_t
     [Retour] : unit
-    [Rem] : Non exportÈ en clair hors de ce module.                         *)
+    [Rem] : Non export√© en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 value write_cache_info conf =
   let ht_cache = read_cache_info conf in
-  (* On met ‡ jour la table en mÈmoire, avec toutes les valeurs qui *)
-  (* sont dans le cache fichier mais pas dans celle en mÈmoire.     *)
+  (* On met √† jour la table en m√©moire, avec toutes les valeurs qui *)
+  (* sont dans le cache fichier mais pas dans celle en m√©moire.     *)
   let () =
     Hashtbl.iter
       (fun k v ->
@@ -3101,17 +3101,17 @@ value write_cache_info conf =
 (* ************************************************************************ *)
 (*  [Fonc] patch_cache_info :
              config -> ((string * string) -> (string * string)) -> unit     *)
-(** [Description] : Met ‡ jour le fichier de cache.
+(** [Description] : Met √† jour le fichier de cache.
     [Args] :
       - conf : configuration de la base
-      - (key, value) : la clÈ et valeur de cache ‡ mettre ‡ jour
+      - (key, value) : la cl√© et valeur de cache √† mettre √† jour
     [Retour] : unit
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value patch_cache_info conf k f =
-  (* On met ‡ jour le cache avec la nouvelle valeur. *)
-  (* Si la clÈ n'existe pas dans la liste, c'est pas grave, elle sera *)
-  (* ajoutÈ lors de la crÈation du cache.                             *)
+  (* On met √† jour le cache avec la nouvelle valeur. *)
+  (* Si la cl√© n'existe pas dans la liste, c'est pas grave, elle sera *)
+  (* ajout√© lors de la cr√©ation du cache.                             *)
   try
     let v = Hashtbl.find ht_cache_info k in
     Hashtbl.replace ht_cache_info k (f v)
@@ -3525,14 +3525,14 @@ value wprint_in_columns conf order wprint_elem list =
 
 (* ********************************************************************** *)
 (*  [Fonc] reduce_list : int -> list 'a -> list 'a                        *)
-(** [Description] : Retourne la sous liste de taille size composÈe des
-                    ÈlÈments 0 ‡ (size - 1)
+(** [Description] : Retourne la sous liste de taille size compos√©e des
+                    √©l√©ments 0 √† (size - 1)
     [Args] :
       - size : la taille de la nouvelle liste
       - list : la liste originiale
     [Retour] :
       - list : la nouvelle liste de taille size
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value reduce_list size list =
   let rec loop size cnt reduced_list list =
@@ -3549,7 +3549,7 @@ value reduce_list size list =
 
 (* ********************************************************************** *)
 (*  [Fonc] print_reference : config -> string -> int -> string -> unit    *)
-(** [Description] : Affiche la rÈfÈrence d'une personne
+(** [Description] : Affiche la r√©f√©rence d'une personne
     [Args] :
       - conf : configuration de la base
       - fn   : first name
@@ -3557,7 +3557,7 @@ value reduce_list size list =
       - sn   : surname
     [Retour] :
       - unit
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value print_reference conf fn occ sn =
   stag "span" "class=\"reference\"" begin
@@ -3573,8 +3573,8 @@ value print_reference conf fn occ sn =
     [Args] :
       - conf : configuration de la base
       - s    : le contenu du tips
-    [Retour] : NÈant
-    [Rem] : Non exportÈ en clair hors de ce module.                       *)
+    [Retour] : N√©ant
+    [Rem] : Non export√© en clair hors de ce module.                       *)
 (* ********************************************************************** *)
 value gen_print_tips conf s = do {
   tag "div" "class=\"tips\"" begin
@@ -3591,14 +3591,14 @@ value gen_print_tips conf s = do {
 
 (* ********************************************************************** *)
 (*  [Fonc] print_tips_relationship : conf -> unit                         *)
-(** [Description] : Lors d'un calcul de parentÈ, il n'est pas Èvident de
+(** [Description] : Lors d'un calcul de parent√©, il n'est pas √©vident de
       savoir qu'il faut cliquer sur la personne pour lancer le calcul.
       On affiche donc une petite aide pour l'utilisateur.
     [Args] :
       - conf : configuration de la base
     [Retour] :
       - unit
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value print_tips_relationship conf =
   if p_getenv conf.env "em" = Some "R" ||
@@ -3613,14 +3613,14 @@ value print_tips_relationship conf =
 
 (* ********************************************************************** *)
 (*  [Fonc] print_image_sex : conf -> person -> int -> unit                *)
-(** [Description] : Affiche l'image du sexe correspondant ‡ la personne.
+(** [Description] : Affiche l'image du sexe correspondant √† la personne.
     [Args] :
       - conf : configuration de la base
       - p    : person
       - size : taille de l'image
     [Retour] :
       - unit
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value print_image_sex conf p size =
   let (image, alt) =
@@ -3638,11 +3638,11 @@ value print_image_sex conf p size =
 (* ********************************************************************** *)
 (*  [Fonc] display_options : config -> string                             *)
 (** [Description] : Recherche dans l'URL les options d'affichage qui sont
-                    donnÈes et renvoie la concatÈnation de ces options.
+                    donn√©es et renvoie la concat√©nation de ces options.
     [Args] :
       - conf : configuration de la base
     [Retour] : string
-    [Rem] : ExportÈ en clair hors de ce module.                           *)
+    [Rem] : Export√© en clair hors de ce module.                           *)
 (* ********************************************************************** *)
 value display_options conf =
   let s =
@@ -3667,8 +3667,8 @@ value display_options conf =
 ;
 
 
-(* Hashtbl qui associe un user ‡ la liste des derniËres personnes visitÈes. *)
-(* On en profite aussi pour stocker la date de la derniËre visite.          *)
+(* Hashtbl qui associe un user √† la liste des derni√®res personnes visit√©es. *)
+(* On en profite aussi pour stocker la date de la derni√®re visite.          *)
 type cache_visited_t = Hashtbl.t string (list (iper * string));
 
 
@@ -3678,7 +3678,7 @@ type cache_visited_t = Hashtbl.t string (list (iper * string));
     [Args] :
       - config : configuration de la base
     [Retour] : unit
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value cache_visited conf =
   let bname =
@@ -3691,11 +3691,11 @@ value cache_visited conf =
 
 (* ************************************************************************ *)
 (*  [Fonc] read_visited : string -> cache_visited_t                         *)
-(** [Description] : List le fichier de cache des derniËres fiches visitÈs.
+(** [Description] : List le fichier de cache des derni√®res fiches visit√©s.
     [Args] :
       - fname : le fichier de cache (qui se trouve dans base.gwb)
-    [Retour] : Hashtbl des user => derniËres visites
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Retour] : Hashtbl des user => derni√®res visites
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value read_visited conf =
   let fname = cache_visited conf in
@@ -3709,12 +3709,12 @@ value read_visited conf =
 
 (* ************************************************************************ *)
 (*  [Fonc] write_visited : string -> Hashtbl.t string (list iper) -> unit   *)
-(** [Description] : Met ‡ jour le fichier de cache des visites.
+(** [Description] : Met √† jour le fichier de cache des visites.
     [Args] :
       - fname : le fichier de cache (qui se trouve dans base.gwb)
       - ht    : le compteur de visite
     [Retour] : unit
-    [Rem] : Non exportÈ en clair hors de ce module.                         *)
+    [Rem] : Non export√© en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 value write_visited conf ht =
   let fname = cache_visited conf in
@@ -3726,13 +3726,13 @@ value write_visited conf ht =
 
 (* ************************************************************************ *)
 (*  [Fonc] record_visited : config -> iper -> unit                          *)
-(** [Description] : VÈrifie si le user est ami ou magicien et met ‡ jour
+(** [Description] : V√©rifie si le user est ami ou magicien et met √† jour
                     le fichier de cache.
     [Args] :
       - conf : configuration de la base
       - ip   : iper
     [Retour] : unit
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value record_visited conf ip =
   if conf.friend || conf.wizard then
@@ -3774,15 +3774,15 @@ value record_visited conf ip =
 
 (* ************************************************************************ *)
 (*  [Fonc] init_cache_info : config -> unit                                 *)
-(** [Description] : CrÈÈ le fichier de cache.
+(** [Description] : Cr√©√© le fichier de cache.
     [Args] :
       - conf : configuration de la base
-    [Retour] : NÈant
-    [Rem] : Non exportÈ en clair hors de ce module.                         *)
+    [Retour] : N√©ant
+    [Rem] : Non export√© en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 value init_cache_info conf base = do {
   let nb_ind = Gwdb.nb_of_persons base in
-  (* Reset le nombre rÈel de personnes d'une base. *)
+  (* Reset le nombre r√©el de personnes d'une base. *)
   let nb_real_persons = ref 0 in
   let is_empty_name p =
     (is_empty_string (get_surname p) || is_quest_string (get_surname p)) &&
@@ -3804,12 +3804,12 @@ value init_cache_info conf base = do {
 
 (* ************************************************************************ *)
 (*  [Fonc] real_nb_of_persons conf : config -> int                          *)
-(** [Description] : Renvoie le nombre de personnes rÈelles (sans ? ?) d'une
-                    base, ‡ partir du fichier de cache.
+(** [Description] : Renvoie le nombre de personnes r√©elles (sans ? ?) d'une
+                    base, √† partir du fichier de cache.
     [Args] :
       - conf : configuration de la base
     [Retour] : nombre de personne sans ? ?
-    [Rem] : ExportÈ en clair hors de ce module.                             *)
+    [Rem] : Export√© en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value real_nb_of_persons conf base =
   let real_nb_person () =
