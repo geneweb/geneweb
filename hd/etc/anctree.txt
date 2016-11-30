@@ -2,7 +2,7 @@
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: anctree.txt,v 5.9 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -14,8 +14,7 @@
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
@@ -170,7 +169,7 @@
 %end;
 
 %if;(evar.t = "T")%nn;
-  <div class="text-xs-%right">%nn;
+  <div class="text-%right">%nn;
   <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
   ;dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
 %end;

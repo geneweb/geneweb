@@ -2,7 +2,7 @@
 #
 # Using body_prop to customize background, color is deprecated !!!
 # Please, use instead css_prop or customize default.css
-# Parameters in "<body>" (background, color, etc)
+# Parameters in "<body>" (background, color, etc.)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
 # body_prop=bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900
@@ -41,16 +41,22 @@ css_prop=stylesheet
 # Highlight color
 highlight_color=#2f6400
 
+# Welcome logo. The designated file should be in bases/src/mybase/images
+# Called with <img src="%prefix;m=IM;v=welcome_logo"
+#   	             style="welcome_logo_style">
+#welcome_logo=
+#welcome_logo_style=
+
 # Friend can see all dates
 # Choose a password or leave it empty
 # Form: "user_id:password" or just "password"
 friend_passwd=
 
 # Alternative way for friend entry: authorization file.
-# The file must hold lines of the form "user:password".
+# The file must hold lines of the form “user:password”.
 friend_passwd_file=
 
-# Wizard can see all dates and update the base
+# Wizards can see all dates and update the base
 # Choose a password or leave it empty
 # Form: "user_id:password" or just "password"
 wizard_passwd=
@@ -64,11 +70,11 @@ wizard_passwd=
 # alphabetic order and in wizard pages. If the wizard line contains
 # no complete name, the "user" is used.
 #   The alphabetic order can be changed by adding a slash in the "complete
-# name" at the position you want the alphabetic comparison take place. For
+# name" at the position you want the alphabetic comparison to take place. For
 # example, with "Daniel de /Rauglaudre" as "complete name", it is ordered
-# at letter "R" (like "Rauglaudre") and in the form:
+# at the letter ‹R› (like “Rauglaudre”) and in the form:
 #    Rauglaudre (Daniel de)
-# but it his wizard page, it is displayed as "Daniel de Rauglaudre" without
+# but it his wizard page, it is displayed as “Daniel de Rauglaudre” without
 # the slash.
 wizard_passwd_file=
 
@@ -80,7 +86,7 @@ wizard_passwd_file=
 # - stay wizard even when wizard_just_friend is set
 # - can apply a request "sleep=xx" to sleep xx seconds after a request
 #   (useful e.g. to have time to look at the memory used)
-# Hir changes in database are not recorded in the history.
+#   His changes in database are not recorded in the history.
 #   The variable must contain the wizard's user name:
 # manitou=
 
@@ -99,7 +105,7 @@ supervisor=
 # Notify change program (e.g. shell script) to be executed for each
 # database change. First argument is the name of the base, then the
 # individual and finally the action performed.
-# If you want to test a specific change, such as, delete an individual,
+# If you want to test a specific change, such as delete an individual,
 # you should test the fourth argument as equal to dp (delete person).
 # You can check the list of possible modifications in the updhist.txt file
 # (see update_text).
@@ -109,11 +115,17 @@ supervisor=
 # Set it to "yes" or "no"
 wizard_just_friend=no
 
+# Restrict access to friends and wizards
+# Default is yes
+# You may define several messages, each postfixed with the two letters code for a language
+# visitor_access=no
+# visitor_access_msg_en=Access to the base is restricted to friends.
+
 # Generates pages with DOCTYPE HTML 4.01 (default XHTML 1.1)
-# doctype=html-4.01
+#doctype=html-4.01
 
 # File recording a black list for the database forum.
-# forum_exclude_file=
+#forum_exclude_file=
 
 # Number of years for private access. Dates of persons whose age < this value
 # are not displayed (except for wizards, friends and public persons).
@@ -136,16 +148,16 @@ can_send_image=yes
 
 # Maximum images size in bytes (which can be accepted in "send image").
 # Default: no limit
-# max_images_size=...
+#max_images_size=...
 
 # Show consanguinity (if computed) in personal pages
 show_consang=yes
 
 # Death symbol in dates (default: christians' one)
-# death_symbol=†
+#death_symbol=†
 
 # Birth symbol in dates (default: christians' one)
-# birth_symbol=°
+#birth_symbol=°
 
 # Allow the usage of the request m=KILL_ANC
 can_kill_ancestors=no
@@ -187,12 +199,12 @@ allowed_titles_file=
 # After above, file for denied titles/domains
 denied_titles_file=
 
-# Print the tile of individual in an advanced way. Default is print only
+# Print the title of individual in an advanced way. Default prints only
 # first_name and surname. In the advanced way, search for the title name,
 # estate ... and print something clever.
 print_advanced_title=yes/no
 
-# Set to no if you don't want that the link "add a family" be added in
+# Set to no if you don't want the link "add a family" to be added in
 # the welcome page for wizards. In "no", forbid also adding families not
 # connected to the rest.
 propose_add_family=yes
@@ -203,7 +215,7 @@ propose_place_surname=yes
 
 # Set to yes if you want that the access to surnames and first names by
 # alphabetic order be fast (interesting for very big databases). Drawback:
-# the first page does not display the number of surname or first names
+# the first page does not display the number of surnames or first names
 fast_alphabetic=no
 
 # Link in the display place/surname point to some individual concerned
@@ -235,9 +247,9 @@ max_cousins_level=5
 latest_event=20
 
 # Always display the children surnames even if same than father.
-# Applies in descendants page and in surname displaying page.
-# "yes" = do it; "no" = don't
-always_surname=no
+# Applies in descendants page, in surname displaying page,
+# also in siblings and union modules.
+#always_surname=yes
 
 # History: set it to yes to save update traces in database (in file named
 # "history" in the database directory "base.gwb"). When such a file exists,
@@ -264,13 +276,13 @@ history_path=
 public_if_titles=no
 
 # Consider all persons having no date (birth, baptism, death, burial) as
-# public (except if their access is explicitely set to "private");
+# public (except if their access is explicitly set to "private");
 # "yes" = consider; "no" = don't consider
 public_if_no_date=no
 
 # Tell that in this database the order of places are registered inverted
 # (being more general to less general), e.g. "USA, New York" instead of
-# "New York, USA". Set it to "yes" if it is the case. Important for display
+# "New-York, USA". Set it to "yes" if it is the case. Important for display
 # by places/surnames.
 places_inverted=no
 
@@ -284,7 +296,7 @@ places_inverted=no
 
 # Uncomment the following definition to specify that the present database has
 # been moved to another site:
-#moved=http://newaddress/and-so-on/
+#moved=http://new.address.com/and-so-on/
 
 # Templates.
 #
@@ -293,7 +305,7 @@ places_inverted=no
 # - the personal page, perso.txt
 # - the update person form, updind.txt
 # - the update family form, updfam.txt
-# The standard templates are located in the etc directory of the GeneWeb
+# The standard templates are located in the /etc/ directory of the GeneWeb
 # distribution.
 #
 # Other templates can be added in the databases directory in a subdirectory
@@ -344,13 +356,13 @@ expand_env=no
 # gwd. Check that before putting "expand_env" to "yes".
 
 # Message of the day. If set, display this message in the welcome page.
-# Can contain html tags.
+# Can contain HTML tags.
 #motd=
 
 # Display the compilation time at bottom of pages.
 # display_compilation_time=off
 
-# Display the date with the explicit day in parenthesis.
+# Display the date with the explicit day in parentheses.
 # Only works if the date is "exact" and *not* enter in "text mode"
 #long_date=yes/no
 
@@ -372,7 +384,7 @@ expand_env=no
 #authorized_wizards_notes=yes/no
 
 # Custom the individual page.
-# Full documentation here http://geneweb.tuxfamily.org/wiki/Templates
+# Full documentation here https://geneweb.tuxfamily.org/wiki/templates
 #
 # Basic explanation :
 # Add the element you want like this :
@@ -412,64 +424,60 @@ expand_env=no
 # tree_5gen_h
 # tree_7gen_v
 
-
-# An alternative to module assembly (under development)
-# Define the set of modules of interest by selecting a single letter 
+# An alternative to module assembly
+# Define the set of modules of interest by selecting a single letter
 # as in the list below:
 # Any unique letter between a-z can be chosen
 # Warning: no spaces or comments after module name!!!
-#
+# The options_module_i= line defines the number of possible options (default is 1)
+
 perso_module_a=personnal_data
-
+options_module_a=2
 perso_module_b=parents
-options_parents=5
-
+options_module_b=5
 perso_module_c=unions
-options_unions=5
-
+options_module_c=5
 perso_module_d=siblings
-options_siblings=3
-
+options_module_d=3
 perso_module_e=relations
-options_relations=2
-
+options_module_e=2
 perso_module_f=timeline
-options_timeline=2
-
+options_module_f=2
 perso_module_g=notes
-options_notes=2
-
+options_module_g=2
 perso_module_h=sources
-options_sources=2
-
+options_module_h=2
 perso_module_i=trees
-options_trees=8
-
+options_module_i=8
 perso_module_j=gr_parents
-options_gr_parents=3
+options_module_j=2
+perso_module_k=data_3col
 
 perso_module_z=divider
 
-# The display on perso pages will be governed by a vector defining 
+# The display on perso pages will be governed by a vector defining
 # a selection of modules, and the order in which they are displayed
 #
 # The vector appears as a string of letters and digits
-# Each pair "letter, digit" identifies a module amongst the list above, 
-# and the value of its display options 
-# The modules are display in the order in which they appear in "mod"
-# In the example below, "gd_parents", "etat_civil", parents", "unino", ...
+# Each pair "letter, digit" identifies a module amongst the list above,
+# and the value of its display option
+# The modules are displayed in the order in which they appear in "p_mod"
+# In the example below, "gd_parents", "personnal_data", parents", "unions"…
+p_mod=j1a1b1c3d1e1f1g1h1i3
 
-p_mod=j1a1b1c1d1e1f1g1h1i3
-
-# display the picto sosa on the template perso.txt (individual page).
+# display the picto Sosa on the template perso.txt (individual page).
 #display_sosa=yes/no
 
 # display the individual in his 'own' siblings on the template perso.txt
 # (individual page).
-#full_siblings=yes/no
+#full_siblings=yes
 
 #display a default man/woman/neuter image when individual image is missing
 #default_image=yes
 
-# Maximum number to see an identical ancerstor in the surname list.
+# Maximum number to see an identical ancestor in the surname list.
 #max_ancestor_implex=5
+
+# Use distant CDN (content delivery network) to load Bootstrap CSS/js files
+# and not the local GWD server.
+#use_cdn=yes

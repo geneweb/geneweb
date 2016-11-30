@@ -1,60 +1,51 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: upddata.txt,v 7 14/06/2016 18:51:19 A2 Exp $ -->
+  <!-- $Id: upddata.txt,v 7 25/12/2016 07:20:32 Exp $ -->
   <!-- Copyright (c) 2006-2017 INRIA -->
   <title>%title;</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 <div class="container">
+<h1 class="text-center mt-1">%title;</h1>
+
 %if;not cancel_links;
-  <div class="pull-%right; mt-1">
-  <table >
-    <tr><td>
-      %if;(referer != "")
-        <a href="%referer;">
-          <img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
-        </a>
-      %end;
-      <a href="%prefix;">
-        <img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="^^"%/>
-      </a>
-    </td></tr>
-  </table>
+  <div class="btn-group float-%right; mt-2">
+    %if;(referer != "")
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+    %end;
+    <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
   </div>
 %end;
 
-<h1>%title;</h1>
-
 %define;print_short()
-  <p class="m-t-1">[*select a letter][:]</p>
   <div class="col-sm-10 offset-sm-1">
-    <div class="btn-group" role="toolbar" aria-label="First character selection">
+    <p class="mt-2 font-weight-bold">%if;(evar.s="")[*select a letter]%else;[*select]%end;[:]</p>
+    <div class="flex-wrap" role="toolbar" aria-label="First character selection">
       %foreach;initial;
-        <a class="btn btn-secondary btn-lg mb-1" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
+        <a class="btn btn-secondary btn-lg mb-1 %if;(evar.s="")book-char%else;book-2chars%end; text-center" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
       %end;
     </div>
   </div>
 %end;
 
 %define;print_long()
-  <div class="alert alert-danger alert-dismissible fade in text-xs-center mt-1" role="alert">
+  <div class="alert alert-danger alert-dismissible fade show mx-auto mt-1" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
-    [*help modify data]
+    [*help modify data]%nn;
   </div>
-  <div class="center-block">
+  <div class="col-12 mb-1">
     <div class="btn-group" role="toolbar" aria-label="Second character selection">
       <div class="btn-group">
-        <a class="btn btn-secondary mr-1" href="%prefix;m=MOD_DATA;data=%evar.data;;s=" title="[Back to first letter selection]">A-z</a> <!-- add left arrow icon instead of A-z ?-->
+        <a class="btn btn-secondary mr-1" href="%prefix;m=MOD_DATA;data=%evar.data;;s=" title="[*back] index"><span class="fa fa-book fa-fw" title=""></span></a>
       </div>
       <div class="btn-group">
         %foreach;entry;
@@ -63,13 +54,13 @@
       </div>
     </div>
   </div>
-  <form method="post" action="%action;">
+  <form class="col-12" method="post" action="%action;">
     %hidden;
     <ul class="list-group">
       %foreach;entry;
-        <li class="list-group-item list-group-item-info mt-1">
+        <li class="list-group-item list-group-item-info mt-1 justify-content-between">
           <strong><a id="%entry_ini;">%html_encode.entry_ini;</a></strong>
-          <a class="btn btn-sm btn-info-outline pull-right" href="#top" title="Return to top">^</a><!-- add return to top icon -->
+          <a class="btn" href="#top" title="Return to top"><span class="fa fa-arrow-up fa-fw"></span></a>
         </li>
         <li style="list-style-type:none">
           <ul class="list-group">
@@ -84,7 +75,7 @@
                   <input type="hidden" name="m" value="MOD_DATA_OK">
                   <input type="hidden" name="data" value="%evar.data;">
                   <input type="hidden" name="s" value="%evar.s;">
-                  <div class="col-xs-10 col-md-%if;(evar.data = "fn" or evar.data= "sn")6%else;11%end;">
+                  <div class="col-10 col-md-%if;(evar.data = "fn" or evar.data= "sn")6%else;11%end;">
                     <input type="text" class="form-control" id="nx_input" name="nx_input" size="80" maxlength="%if;(evar.data = "src")300%else;200%end;" value="%escape.printable.entry_value;" autofocus onfocus="this.value = this.value;">
                   </div>
                   %if;(evar.data = "fn")
@@ -108,13 +99,15 @@
   </form>
 %end;
 
+<div class="row">
 %if;(nb_results > 1000)
   %apply;print_short()
 %else;
   %apply;print_long()
 %end;
+</div>
 
-%base_trailer;
+%include.trl;
 %include.copyr;
 </div>
 %include.js;

@@ -1,30 +1,10 @@
 <style>
 /* Put here only properties that uses variables */
-
-/* Temp fix for Bootstrap CSS in GeneWeb */
-a
-{
-  word-wrap: break-word
-}
-
-
-li.li-spouse {
- list-style-type: none;
- list-style-image: url('%image_prefix;/married.png');
-}
-
-/* Old CSS */
-
 div.tips {
  background-image:url('%image_prefix;/picto_ampoule.png');
 }
 
-div.select > span {
- background-image:url('%image_prefix;/picto_fleche_blanche.png');
-}
-
-/* --------------------------------- notes -------------------------------- */
-
+/* Notes */
 li.folder {
  list-style-type: disc;
  list-style-image: url('%image_prefix;/folder.png');
@@ -52,9 +32,14 @@ li.female
  list-style-type: circle;
  list-style-image: url('%image_prefix;/female.png');
 }
-
 </style>
-<link rel="stylesheet" href="%bvar.static_path;css.css">
-<link rel="stylesheet" href="%bvar.static_path;bootstrap.min.css">
-<link rel="stylesheet" href="%bvar.static_path;font-awesome.min.css">
-<!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+%if;(evar.templ="")
+  %if;(bvar.use_cdn="yes")
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  %else;
+    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;bootstrap.min.css">
+    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;font-awesome.min.css">
+  %end;
+%end;
+<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css.css">

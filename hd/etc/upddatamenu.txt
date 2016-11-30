@@ -2,36 +2,32 @@
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: upddatamenu.txt,v 0.01 2014-08-22 15:47:06 flh Exp $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
+  <!-- Copyright (c) 2006-2017 INRIA -->
   <title>[*lists]</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
-<div class="container-fluid">
-%if;not cancel_links;
-  <table style="float:%right;"><tr><td>
-    %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png;
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
-    %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png;
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
-%end;
+<div class="container">
 
 %define;list_of(xx)
   [*list of %s:::xx]
 %end;
 
 <h1>[*lists]</h1>
+
+%if;not cancel_links;
+  <div class="btn-group float-%right; mt-2">
+    %if;(referer != "")
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+    %end;
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
+%end;
 
 <p>
   <ul>
@@ -55,7 +51,7 @@
   </ul>
 </p>
 
-%base_trailer;
+%include.trl;
 %include.copyr;
 </div>
 %include.js;
