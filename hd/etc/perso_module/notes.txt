@@ -1,0 +1,116 @@
+<!-- $Id: perso_module/notes.txt v 7.00 20/11/2016 06:10:01 hg -->
+%( op_m=1 Notes and marriage comments %)
+%( op_m=2 Notes and event notes (+comments for marriages) %)
+%let;op_m;%if;("op_m"!="")%op_m;%else;1%end;%in;
+
+%reset_count;
+%if;has_linked_page.BNOTE;%incr_count;%end;
+%if;has_notes;%incr_count;%end;
+%if;has_birth_note;%incr_count;%end;
+%if;has_baptism_note;%incr_count;%end;
+%if;has_death_note;%incr_count;%end;
+%if;has_burial_note;%incr_count;%end;
+%if;has_linked_page.NOTE;%incr_count;%end;
+%foreach;event;
+    %if;event.has_note;%incr_count;%end;
+%end;
+%foreach;family;
+  %if;has_comment;%incr_count;%end;
+  %if;has_marriage_note;%incr_count;%end;
+%end;
+
+<div id ="link_pages">
+  %if;(not cancel_links and has_linked_pages)
+    (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
+  %end;
+</div>
+
+%if;(count>0 and op_m=1 and (wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
+      (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
+  <h3 class="highlight">[*note/notes]1</h3>
+  <h5 class="highlight">[*individual notes]</h5>
+  <dl><dt></dt><dd>
+  %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
+    <p>%apply;capitalize(linked_page.BNOTE).</p>
+  %end;
+  </dd></dl>
+  %notes;
+  <p style="clear:both"></p>
+  %if;has_families;
+    %( On remet les compteurs à zéro et on commence à compter à 0 (synchro avec union.txt) %)
+    %reset_count;
+    %foreach;family;
+      %if;(has_comment)
+        %if;(count=0 and (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
+          <h5 class="highlight">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h5>
+        %elseif;(count=0)
+          <h3 class="highlight">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h3>
+        %end;
+        <dl>
+          <dt>
+          [*marriage with] %spouse.first_name; %spouse.surname;
+            <a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0"> ^</a>[:]
+          </dt>
+          <dd>%comment;</dd>
+        </dl>
+        %incr_count;
+      %end;
+    %end;
+  %end;
+  %if;(has_linked_page.NOTE and linked_page.NOTE!="")
+    <p>%apply;capitalize(linked_page.NOTE).</p>
+  %end;
+%elseif;(count>0 and op_m=2)
+  <h3 id="notes" class="highlight">[*note/notes]1</h3>
+    %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
+      <blockquote>%apply;capitalize(linked_page.BNOTE).</blockquote>
+    %end;
+    %if;has_notes;
+      <h5 class="highlight">[*individual notes]</h5>
+      <blockquote>%notes;</blockquote>
+    %end;
+    %if;has_birth_note;
+      <h5 class="highlight">[*birth]</h5>
+      <blockquote>%birth_note;</blockquote>
+    %end;
+    %if;has_baptism_note;
+      <h5 class="highlight">[*baptism]</h5>
+      <blockquote>%baptism_note;</blockquote>
+    %end;
+    %foreach;family;
+      %if;(has_comment or has_marriage_note)
+        <h5 class="highlight">[*marriage notes/marriages notes]0%sp;
+        [with] %spouse.first_name; %spouse.surname;</h5>
+      %end;
+      <blockquote>%nn;
+        %if;has_comment;%comment;%end;
+        %if;(has_comment and has_marriage_note)%nl;%end;
+        %if;has_marriage_note;%marriage_note;%end;
+      </blockquote>
+    %end;
+    %if;has_death_note;
+      <h5 class="highlight">[*death]</h5>
+      <blockquote>%death_note;</blockquote>
+    %end;
+    %if;has_burial_note;
+      <h5 class="highlight">[*burial]</h5>
+      <blockquote>%burial_note;</blockquote>
+    %end;
+    %foreach;event;
+      %if;event.has_note;
+        %if;(event.name!=[birth] and
+             event.name!=[baptism] and
+             event.name!=[marriage event] and
+             event.name!=[death] and
+             event.name!=[burial])
+          <h5 class="highlight">%apply;capitalize(event.name)</h5>
+          <blockquote>%event.note;</blockquote>
+        %end;
+      %end;
+    %end;
+    %if;(has_linked_page.NOTE and linked_page.NOTE!="")
+      <blockquote>%apply;capitalize(linked_page.NOTE).</blockquote>
+    %end;
+  %nl;
+%end;
+%reset_count;
