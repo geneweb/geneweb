@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt,v 7.0 05/11/2016 03:25:14 $ -->
+<!-- $Id: menubar.txt,v 7.00 20/11/2016 03:25:14 a2/hg -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*send::image/images]0 (I)" accesskey="I"%in;
@@ -17,22 +17,22 @@
      %end;
   %end;
 %end;
-%include.perso_utils;
+%(import;perso_utils;%)
 %( TODO: center navbar, independantly of right buttons %)
 %if;(not cancel_links)
   <nav class="navbar navbar-light %if;(evar.m="MOD_IND")mt-4%end;" style="background-color: white">
     <div class="btn-group float-right">
       %if;(evar.m !="MOD_IND" and referer != "")
-        <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left" title="<<"></i></a>%nn;
+        <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
       %end;
-      <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><i class="fa fa-home" title="[*home]"></i></a>%nn;
+      <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><i class="fa fa-home fa-lg" title="[*home]"></i></a>%nn;
       %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
-        <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken" title="[*cancel GeneWeb links]"></i></a>%nn;
+        <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
       %end;
       %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
-        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;iz=%self.index;;%self.access;" %laS; title="%apply;nav_with_sosa_ref(self)"><i class="fa fa-dot-circle-o %sexcolor;"></i></a>%nn;
+        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;iz=%self.index;;%self.access;" %laS; title="%apply;nav_with_sosa_ref(self)"><i class="fa fa-dot-circle-o  fa-lg %sexcolor;"></i></a>%nn;
       %end;
-      <a role="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search" title="[*search/case sensitive]0"></i></a>%nn;
+      <a role="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>%nn;
     </div>
     <div class="modal fade text-xs-center" id="myModal" tabindex="-1" role="dialog" aria-labelledby="ModalSearch" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
@@ -65,6 +65,107 @@
         <li class="nav-item">
           <a class="nav-link %if;(evar.m="")active%end;" href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;"><span class="fa fa-user fa-fw %sexcolor;"></span></a>
         </li>
+        %( module selction  menu %)
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+          <div class="dropdown-menu">
+            <form name="upd_url" method="get" action="%action;">
+              <div class="dropdown-item form-inline ">
+                <input type="hidden" name="b" value="%evar.b;">
+                <input type="hidden" name="lang" value="%evar.lang;">
+                <input type="text" name="p_mod" class="form-control" size="30" maxlength="30" value="%if;(evar.p_mod!="")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod;%else;Personnal modules (p_mod)%end;">
+                <input type="hidden" name="p" value="%first_name;">
+                <input type="hidden" name="n" value="%surname;">
+                <input type="hidden" name="oc" value="%occ;">
+                <div class="form-group">
+                  <select class="form-control" id="mod_list">
+                  <option>[
+en: List of available modules
+fr: Liste des modules disponibles
+                  ]</option>
+                  %for;i;1;27;
+                    %let;modn;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
+                    %if;(modn!="")
+                      <option disabled>%apply;letter(i)[:] %modn;</option>
+                    %end;
+                  %end;
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-secondary" title="[ok]0">OK</button>
+              </div>
+              <p class="mx-2 mt-2">
+              [
+en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear. For example: a1b1j1c1d1e1f1g1h1i3.
+fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules. Par exemple : a1b1j1c1d1e1f1g1h1i3.
+              ]
+              </p>
+              %if;(bvar.p_mod!="" or evar.p_mod!="")
+              <p class="mx-2">
+              [
+en: The current ranking is shown according to the current value of p_mod.
+fr: L’ordre du tableau ci-dessous est celui de la variable p_mod actuelle.
+              ]
+              </p>
+                %reset_count;
+                %for;i;1;27;
+                  %let;modn;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
+                  %if;(modn!="")
+                    %incr_count;
+                  %end;
+                %end;
+                %let;p_m_n;%count;%in;
+                <table class="table table-sm mt-3">
+                  <thead class="thead-default"><tr>
+                    <th>
+                  [
+en: Rank
+fr: Rang
+                  ]</th>
+                   <th>
+                  [
+en: Module
+fr: Module
+                  ]</th>
+                    <th>Options</th>
+                  </tr></thead>
+                  %reset_count;
+                  %for;i;0;p_m_n;
+                    %let;m_ltr;%apply;nth_c%with;%p_mod;%and;%expr(2*i)%end;%in;
+                    %let;m_opt;%apply;nth_c%with;%p_mod;%and;%expr(2*i+1)%end;%in;
+                    %let;m_nam;%apply;get_mod_nam(m_ltr)%in;
+                    %let;m_opt_nb;%apply;get_mod_opt(m_nam)%in;
+                    %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
+                    %if;(m_nam!="")
+                      <tr>
+                      <th scope="row" class="text-xs-center">
+                        %expr(i+1)
+                      </th>
+                      <td>
+                        %m_ltr;[:]&nbsp;%m_nam;
+                      </td>
+                      <td><small><i>
+                      %for;j;0;m_opt_nb;
+                         %let;k;%expr(j+1)%in;
+                         %let;o;%apply;oo(i)%in
+                         %if;(o=k)</i></small>%end;
+                         %let;m_opt_nam_1;%apply;get_opt_nam_1(m_nam, k)%in;
+                         %let;m_opt_nam_2;%apply;get_opt_nam_2(m_nam, k)%in;
+                         %k;%if;(m_opt_nam_1!="")[:]&nbsp;%m_opt_nam_1;%end;%if;(m_opt_nam_2!="")[:]&nbsp;%m_opt_nam_2;%end;
+                         %if;(k<m_opt_nb), %end;
+                         %if;(o=k)<small><i>%end;%sp;
+                      %end;
+                      </i></small></td>
+                      </tr>
+                      %incr_count;
+                    %end;
+                  %end;
+                  %incr_count;
+                </table>
+              %end;
+            </form>
+          </div>
+        </li>
+				%(end module selection menu  %)
         %if;(not(bvar.wizard_just_friend = "yes") and wizard)
           <li class="nav-item">
             <a class="nav-link %if;(evar.m="MOD_IND")active%end;" href="%prefix;m=MOD_IND;i=%index;" %laP;><span class="fa fa-user-plus fa-fw %sexcolor;"></span></a>

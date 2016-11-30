@@ -99,7 +99,7 @@
              <td align=center valign=middle>
                %if;(nb_families>1)%family_cnt;&nbsp;%end;
                &amp;&nbsp;%marriage_date.year;<br />
-               %if;(not nb_families=1)
+               %if;(nb_families!=1)
                  %family_cnt;
                %end;
                <!-- <a href="%prefix;%spouse.access;"> %spouse;</a><br />%spouse.dates;&nbsp; -->
