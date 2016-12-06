@@ -115,7 +115,8 @@ value rheader conf title = do {
 };
 
 value gen_trailer with_logo conf = do {
-  Templ.include_hed_trl conf "trl";
+  let conf = {(conf) with template = False} in (* set to False so we can detect *)
+	Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
   Wserver.printf "</div>\n"; (* balances header_without_http *)
