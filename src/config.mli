@@ -25,6 +25,7 @@ type config =
     manitou : bool;
     supervisor : bool;
     wizard : bool;
+    template : bool;
     friend : bool;
     just_friend_wizard : bool;
     user : string;

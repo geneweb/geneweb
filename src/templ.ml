@@ -931,6 +931,7 @@ value templ_eval_var conf =
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool True
   | ["wizard"] -> VVbool conf.wizard
+  | ["template"] -> VVbool conf.template
   | _ -> raise Not_found ]
 ;
 
