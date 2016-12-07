@@ -65,7 +65,7 @@ CI_BREW=false
 
 while [[ $# -ne 0 ]]; do
   case $1 in
-    -h|--help)
+    -h|-help|--help)
       help; exit ;;
     --api)
       API=true ;;
@@ -75,7 +75,7 @@ while [[ $# -ne 0 ]]; do
       INTERACTIVE=true ;;
     -s|--static)
       STATIC=true ;;
-    --warn-error)
+    -we|--warn-error)
       WARNERROR=true ;;
     -cibrew)
       CI_BREW=true ;;
