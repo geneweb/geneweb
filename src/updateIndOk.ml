@@ -932,7 +932,8 @@ value rename_image_file conf base op sp =
   match auto_image_file conf base op with
   [ Some old_f ->
       let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
-      let f = Filename.concat (Util.base_path ["images"] conf.bname) s in
+      (*let f = Filename.concat (Util.base_path ["images"] conf.bname) s in*)
+      let f = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb/portraits")) s in
       let new_f =
         if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
       in

@@ -894,7 +894,7 @@ value titled_person_text conf base p t =
     let surname = p_surname base p in
     let elen = String.length estate in
     let slen = String.length surname in
-    (* Si le nom de l'individu est le mÍme que son domaine, on renvoie : *)
+    (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
     (*   - le nom du titre                                               *)
     (*   - le nom du titre et le premier sobriquet                       *)
     (*   - le nom de la personne (donné par son nom de domaine) en       *)
@@ -937,7 +937,7 @@ value titled_person_text conf base p t =
 
 (* *********************************************************************** *)
 (*  [Fonc] one_title_text : config -> base -> person -> istr gen_title     *)
-(** [Description] : Renvoie la chaÓne de caractère du titre ainsi que le
+(** [Description] : Renvoie la chaîne de caractère du titre ainsi que le
                     domaine.
     [Args] :
       - conf : configuration de la base
@@ -1006,7 +1006,7 @@ value update_family_loop conf base p s =
     let res = loop [] list in
     if conf.wizard then
       (* Si il n'y a pas d'ambiguité, i.e. pas 2 boucles dans 2 familles *)
-      (* pour un mÍme individu, alors on renvoit le lien vers la mise à  *)
+      (* pour un même individu, alors on renvoit le lien vers la mise à  *)
       (* jour de la famille, sinon, un lien vers le menu de mise à jour. *)
       if List.length res = 1 then
         let iper = string_of_int (Adef.int_of_iper iper) in
@@ -1272,12 +1272,14 @@ value etc_file_name conf fname =
   (* répertoire, i.e. si fname est écrit comme ceci : dir/file *)
   let fname = List.fold_left (Filename.concat) "" (explode fname '/') in
   (* On cherche le fichier dans cet ordre :
-     - dans la base (bases/etc/base_name/name.txt)
+     (*- dans la base (bases/etc/base_name/name.txt)*)
+     - dans la base (bases/base_name/etc/name.txt)
      - dans la base (bases/etc/templx/name.txt)
      - dans le répertoire des programmes (gw/etc/templx/name.txt) *)
   let file_exist dir =
     let base_name_tpl_dir =
-      Filename.concat (base_path ["etc"] conf.bname) (fname ^ ".txt")
+      (*Filename.concat (base_path ["etc"] conf.bname) (fname ^ ".txt")*)
+      Filename.concat (base_path [] (conf.bname ^ ".gwb/etc")) (fname ^ ".txt")
     in
     let base_tpl_dir =
       Filename.concat
@@ -1336,7 +1338,8 @@ value etc_file_name conf fname =
 ;
 
 value open_etc_file fname =
-  let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
+  (*let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in*)
+  let fname1 = base_path [] (Filename.basename  ".gwb" ^ fname ^ ".txt") in
   let fname2 =
     search_in_lang_path
       (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
@@ -1522,6 +1525,7 @@ value url_no_index conf base =
 value message_to_wizard conf =
   if conf.wizard || conf.just_friend_wizard then
     let print_file fname =
+      (*let fname = base_path ["etc"; conf.bname] (fname ^ ".txt") in*)
       let fname = base_path ["etc"; conf.bname] (fname ^ ".txt") in
       match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
       [ Some ic ->
@@ -2330,13 +2334,13 @@ value first_child conf base p =
 (** [Description] : Permet d'afficher des informations supplémentaires sur la
       personne en cas d'homonymes (par exemple sur la recherche par ordre
       alphabétique).
-      L'affichage se fait de faÁon similaire à gen_person_text, i.e. en
+      L'affichage se fait de façon similaire à gen_person_text, i.e. en
       fonction du nom publique et sobriquet si on valorise le paramètre
       specify_public_name à True :
         * Louis VI le gros (nom publique sobriquet)
         * Louis le gros    (prénom sobriquet)
         * Louis VI         (nom publique)
-        * Louis Capétiens, fils de Philippe et Berthe, marié avec AdèlaÔde,
+        * Louis Capétiens, fils de Philippe et Berthe, marié avec Adèlaïde,
             père de Philippe
     [Args] :
       - conf : configuration
@@ -2436,15 +2440,15 @@ value string_of_decimal_num conf f =
 ;
 
 value personal_image_file_name bname str =
-  Filename.concat (base_path ["images"] bname) str
+  Filename.concat (base_path [] (bname ^ ".gwb/portraits")) str
 ;
 
 value source_image_file_name bname str =
   let fname1 =
-    List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
+    List.fold_right Filename.concat [base_path [](bname ^ ".gwb/documents")] str
   in
   let fname2 =
-    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str
+    List.fold_right Filename.concat [Secure.base_dir (); bname ^ ".gwb/documents"] str
   in
   if Sys.file_exists fname1 then fname1 else fname2
 ;
@@ -2619,11 +2623,11 @@ value find_sosa_ref conf base =
 value write_default_sosa conf base key = do {
   let gwf = List.remove_assoc "default_sosa_ref" conf.base_env in
   let gwf = List.rev [("default_sosa_ref", key) :: gwf] in
-  let fname = base_path [] (conf.bname ^ ".gwf") in
+	let fname = base_path [] (conf.bname ^ ".gwb/params.gwf") in  
   let tmp_fname = fname ^ "2" in
   let oc =
     try Pervasives.open_out tmp_fname with
-    [ Sys_error _ -> failwith "the gwf database is not writable" ]
+    [ Sys_error _ -> failwith "the params.gwf2 file is not writable" ]
   in
   List.iter (fun (k, v) -> Pervasives.output_string oc (k ^ "=" ^ v ^ "\n")) gwf;
   close_out oc ;
@@ -2781,7 +2785,7 @@ value default_image_name base p =
 
 value auto_image_file conf base p =
   let s = default_image_name base p in
-  let f = Filename.concat (base_path ["images"] conf.bname) s in
+  let f = Filename.concat (base_path [] (conf.bname ^ ".gwb/portraits")) s in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")

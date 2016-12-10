@@ -19,6 +19,7 @@ value gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit;
 value gen_trailer : bool -> config -> unit;
 
 value incorrect_request : config -> unit;
+value error_cannot_access : config -> string -> unit;
 
 value interp :
   config -> string -> Templ.interp_fun 'a 'b -> Templ.env 'a -> 'b ->
