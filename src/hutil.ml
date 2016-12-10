@@ -144,7 +144,7 @@ value error_cannot_access conf fname = do {
   header conf title;
   tag "ul" begin
     tag "li" begin
-      Wserver.printf "Cannot access file \"%s.txt\".\n"
+      Wserver.printf "Cannot access (2) file \"%s\".\n"
         fname;
     end;
   end;

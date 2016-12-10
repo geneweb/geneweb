@@ -894,6 +894,8 @@ value treat_request conf base = do {
   [ (Some s, _, _) -> print_moved conf base s
   | (_, Some "no_index", _) -> print_no_index conf base
   | (_, _, Some "IM") -> Image.print conf base
+  | (_, _, Some "PDF") -> Image.print conf base
+  | (_, _, Some "HTML") -> Image.print conf base
   | _ ->
       do {
         set_owner conf;

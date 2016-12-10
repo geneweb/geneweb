@@ -18,7 +18,12 @@ open Config;
 value content t len fname =
   do {
     Wserver.http HttpStatus.OK;
-    Wserver.header "Content-type: image/%s" t;
+    if t = "pdf" then
+    	Wserver.header "Content-type: application/pdf"
+    else if t = "html" then
+    	Wserver.header "Content-type: text/html"
+    else
+    	Wserver.header "Content-type: image/%s" t;
     Wserver.header "Content-length: %d" len;
     Wserver.header "Content-disposition: inline; filename=%s"
       (Filename.basename fname);
@@ -72,7 +77,8 @@ value print_image_file fname =
           Filename.check_suffix fname (String.uppercase suff) then
          print_image_type fname itype
        else False)
-    [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg"); (".gif", "gif")]
+    [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg"); (".pjpeg", "jpeg");
+     (".gif", "gif"); (".pdf", "pdf"); (".htm", "html"); (".html", "html")]
 ;
 
 (* ************************************************************************** *)
@@ -106,10 +112,12 @@ value print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  if fname = Filename.basename fname then
+  (*if fname = Filename.basename fname then*)
     let fname = Util.source_image_file_name conf.bname fname in
-    if print_image_file fname then () else Hutil.incorrect_request conf
-  else Hutil.incorrect_request conf
+    if print_image_file fname then () 
+    else 
+    	Hutil.error_cannot_access conf fname
+  (*else Hutil.incorrect_request conf*)
 ;
 
 (* ************************************************************************** *)

@@ -281,7 +281,7 @@ value strip_trailing_spaces s =
 ;
 
 value read_base_env bname =
-  let fname = Util.base_path [] (bname ^ ".gwf") in
+  let fname = Util.base_path [] (bname ^ ".gwb/params.gwf") in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =

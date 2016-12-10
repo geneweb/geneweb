@@ -232,7 +232,8 @@ value move_file_to_old conf fname bfname =
     let ext = extension_of_type typ in
     let new_file = fname ^ ext in
     if Sys.file_exists new_file then do {
-      let old_dir = Filename.concat (Util.base_path ["images"] conf.bname) "old" in
+      (*let old_dir = Filename.concat (Util.base_path ["images"] conf.bname) "old" in*)
+      let old_dir = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb/portraits")) "old" in
       let old_file = Filename.concat old_dir bfname ^ ext in
       if Sys.file_exists old_file then
         try Sys.remove old_file with [ Sys_error _ -> () ]
@@ -319,14 +320,18 @@ value effective_send_ok conf base p file =
   in
   let bfname = default_image_name base p in
   let bfdir =
-    let bfdir = Util.base_path ["images"] conf.bname in
+    (*let bfdir = Util.base_path ["images"] conf.bname in*)
+    let bfdir = Util.base_path [] (conf.bname ^ ".gwb/portraits") in
     if Sys.file_exists bfdir then bfdir
     else do {
-      let d = Filename.concat (Secure.base_dir ()) "images" in
+      (*let d = Filename.concat (Secure.base_dir ()) "images" in
       let d1 = Filename.concat d conf.bname in
       try Unix.mkdir d 0o777 with [ Unix.Unix_error _ _ _ -> () ];
-      try Unix.mkdir d1 0o777 with [ Unix.Unix_error _ _ _ -> () ];
-      d1
+      try Unix.mkdir d1 0o777 with [ Unix.Unix_error _ _ _ -> () ];*)
+      let d = Filename.concat (Secure.base_dir ()) (conf.bname ^ ".gwb/portraits") in
+      try Unix.mkdir d 0o777 with [ Unix.Unix_error _ _ _ -> () ];
+      (* I assume that bname.gwb exists!! *)
+      d
     }
   in
   let fname = Filename.concat bfdir bfname in
@@ -376,7 +381,8 @@ value print_deleted conf base p =
 
 value effective_delete_ok conf base p =
   let bfname = default_image_name base p in
-  let fname = Filename.concat (Util.base_path ["images"] conf.bname) bfname in
+  (*let fname = Filename.concat (Util.base_path ["images"] conf.bname) bfname in*)
+  let fname = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb/portraits")) bfname in
   do {
     if move_file_to_old conf fname bfname = 0 then
       incorrect conf
