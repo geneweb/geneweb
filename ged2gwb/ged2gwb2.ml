@@ -3242,6 +3242,16 @@ value pass2 gen fname =
                gen.g_per.arr.(Adef.int_of_iper ipp) := Right3 p a u
          | _ -> () ])
       gen.g_godp;
+    List.iter
+      (fun (ipp, ip) ->
+         match gen.g_per.arr.(Adef.int_of_iper ipp) with
+         [ Right3 p a u ->
+               if List.mem ip (get_related p) then ()
+               else
+                 let p = person_with_related p [ip :: get_related p] in
+                 gen.g_per.arr.(Adef.int_of_iper ipp) := Right3 p a u
+         | _ -> () ])
+      gen.g_prelated;
     close_in ic
   }
 ;
@@ -3307,6 +3317,16 @@ value pass3 gen fname =
              | _ -> () ]
          | _ -> () ])
       gen.g_witn;
+    List.iter
+      (fun (ipp, ip) ->
+         match gen.g_per.arr.(Adef.int_of_iper ipp) with
+         [ Right3 p a u ->
+             if List.mem ip (get_related p) then ()
+             else
+               let p = person_with_related p [ip :: get_related p] in
+               gen.g_per.arr.(Adef.int_of_iper ipp) := Right3 p a u
+         | _ -> () ])
+      gen.g_frelated;
     close_in ic
   }
 ;
@@ -3484,12 +3504,34 @@ value make_gwsyntax ((pa, aa, ua), (fa, ca, da), sa, g_bnot) = do {
       List.map (somebody_of_person def pa sa)
         (Array.to_list fa.(ifam).witnesses)
     in
-    (* TODO *)
     let fevents =
-      []
+      List.map
+        (fun evt ->
+           let name =
+             match evt.efam_name with
+             [ Efam_Name n -> Efam_Name sa.(Adef.int_of_istr n)
+             | Efam_Marriage | Efam_NoMarriage | Efam_NoMention | Efam_Engage |
+               Efam_Divorce  | Efam_Separated | Efam_Annulation |
+               Efam_MarriageBann | Efam_MarriageContract |
+               Efam_MarriageLicense | Efam_PACS | Efam_Residence as e -> e ]
+           in
+           let witl =
+             List.map
+               (fun (ip, wk) ->
+                  let (sb, sex) = somebody_of_person def pa sa ip in
+                  (sb, sex, wk))
+               (Array.to_list evt.efam_witnesses)
+           in
+           (name, evt.efam_date,
+            sa.(Adef.int_of_istr evt.efam_place),
+            sa.(Adef.int_of_istr evt.efam_reason),
+            sa.(Adef.int_of_istr evt.efam_note),
+            sa.(Adef.int_of_istr evt.efam_src),
+            witl))
+        fa.(ifam).fevents
     in
     let fam =
-      let fam = {(fa.(ifam)) with witnesses = [| |]} in
+      let fam = {(fa.(ifam)) with witnesses = [| |]; fevents = []} in
       Futil.map_family_ps (fun p -> failwith "make_gwsyntax 1")
         (fun i -> sa.(Adef.int_of_istr i)) fam
     in
