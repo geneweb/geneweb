@@ -85,15 +85,15 @@ value advanced_search conf base max_answers =
         in
         do { Hashtbl.add hs x v; v } ]
   in
-  let test x cmp =
+  (* Search type can be AND or OR. *)
+  let search_type = gets "search_type" in
+  (* Return empty_field_value if the field is empty. Apply function cmp to the field value. Also check the authorization. *)
+  let apply_to_field_value p x cmp empty_default_value =
     let y = gets x in
-    if y = "" then True else cmp y
+    if y = "" then empty_default_value else if fast_auth_age conf p then cmp y else False
   in
-  let test_auth p x cmp =
-    let y = gets x in
-    if y = "" then True else if fast_auth_age conf p then cmp y else False
-  in
-  let test_date p x df =
+  (* Check if the date matches with the person event. *)
+  let match_date p x df empty_default_value =
     let (d1, d2) =
       try Hashtbl.find hd x with
       [ Not_found ->
@@ -121,9 +121,63 @@ value advanced_search conf base max_answers =
         [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
             if CheckItem.strictly_after d d2 then False else True
         | _ -> False ]
-    | _ -> True ]
+    | _ -> empty_default_value ]
   in
-  let test_marriage p x y =
+  let match_sex p empty_default_value = apply_to_field_value p
+    "sex"
+    (fun
+     [ "M" -> get_sex p = Male
+     | "F" -> get_sex p = Female
+     | _ -> True ])
+    empty_default_value
+  in
+  let match_baptism_date p empty_default_value = match_date p "bapt" (fun () -> Adef.od_of_codate (get_baptism p)) empty_default_value in
+  let match_birth_date p empty_default_value = match_date p "birth" (fun () -> Adef.od_of_codate (get_birth p)) empty_default_value in
+  let match_death_date p empty_default_value =
+    (apply_to_field_value p
+      "death"
+      (fun d ->
+        match (d, get_death p) with
+        [ ("Dead", NotDead | DontKnowIfDead) -> False
+        | ("Dead", _) -> True
+        | ("NotDead", NotDead) -> True
+        | ("NotDead", _) -> False
+        | _ -> empty_default_value ])
+      True
+    )
+    &&
+    (match_date p
+      "death"
+      (fun () ->
+       match get_death p with
+       [ Death _ cd -> Some (Adef.date_of_cdate cd)
+       | _ -> None ])
+      empty_default_value
+     )
+  in
+  let match_burial_date p empty_default_value = match_date p "burial"
+        (fun () ->
+           match get_burial p with
+           [ Buried cod -> Adef.od_of_codate cod
+           | Cremated cod -> Adef.od_of_codate cod
+           | _ -> None ]) empty_default_value
+  in
+  let match_baptism_place p empty_default_value = apply_to_field_value p "bapt_place" (fun x -> name_incl x (sou base (get_baptism_place p))) empty_default_value in
+  let match_birth_place p empty_default_value = apply_to_field_value p "birth_place" (fun x -> name_incl x (sou base (get_birth_place p))) empty_default_value in
+  let match_death_place p empty_default_value = apply_to_field_value p "death_place" (fun x -> name_incl x (sou base (get_death_place p))) empty_default_value in
+  let match_burial_place p empty_default_value = apply_to_field_value p "burial_place" (fun x -> name_incl x (sou base (get_burial_place p))) empty_default_value in
+  let match_occupation p empty_default_value = apply_to_field_value p "occu" (fun x -> name_incl x (sou base (get_occupation p))) empty_default_value in
+  let match_first_name p empty_default_value = apply_to_field_value p "first_name" (fun x -> name_eq x (p_first_name base p)) empty_default_value in
+  let match_surname p empty_default_value = apply_to_field_value p "surname" (fun x -> name_eq x (p_surname base p)) empty_default_value in
+  let match_married p empty_default_value = apply_to_field_value p
+    "married"
+    (fun
+     [ "Y" -> get_family p <> [| |]
+     | "N" -> get_family p = [| |]
+     | _ -> True ])
+    empty_default_value
+  in
+  let match_marriage p x y empty_default_value =
     let (d1, d2) =
       try Hashtbl.find hd x with
       [ Not_found ->
@@ -170,7 +224,7 @@ value advanced_search conf base max_answers =
               if CheckItem.strictly_after d d2 then False else True
           | _ -> False ])
     | _ ->
-        if y = "" then True
+        if y = "" then empty_default_value
         else
           List.exists
             (fun ifam ->
@@ -184,51 +238,45 @@ value advanced_search conf base max_answers =
   in
   let list = ref [] in
   let len = ref 0 in
-  let test_person p =
-    if test "sex"
-         (fun
-          [ "M" -> get_sex p = Male
-          | "F" -> get_sex p = Female
-          | _ -> True ]) &&
-       test_date p "birth" (fun () -> Adef.od_of_codate (get_birth p)) &&
-       test_date p "bapt" (fun () -> Adef.od_of_codate (get_baptism p)) &&
-       test_auth p "death"
-         (fun d ->
-            match (d, get_death p) with
-            [ ("Dead", NotDead | DontKnowIfDead) -> False
-            | ("Dead", _) -> True
-            | ("NotDead", NotDead) -> True
-            | ("NotDead", _) -> False
-            | _ -> True ]) &&
-       test_date p "death"
-         (fun () ->
-            match get_death p with
-            [ Death _ cd -> Some (Adef.date_of_cdate cd)
-            | _ -> None ]) &&
-       test_date p "burial"
-         (fun () ->
-            match get_burial p with
-            [ Buried cod -> Adef.od_of_codate cod
-            | Cremated cod -> Adef.od_of_codate cod
-            | _ -> None ]) &&
-       test "first_name" (fun x -> name_eq x (p_first_name base p)) &&
-       test "surname" (fun x -> name_eq x (p_surname base p)) &&
-       test "married"
-         (fun
-          [ "Y" -> get_family p <> [| |]
-          | "N" -> get_family p = [| |]
-          | _ -> True ]) &&
-       test_marriage p "marriage" "marriage_place" &&
-       test_auth p "birth_place"
-         (fun x -> name_incl x (sou base (get_birth_place p))) &&
-       test_auth p "bapt_place"
-         (fun x -> name_incl x (sou base (get_baptism_place p))) &&
-       test_auth p "death_place"
-         (fun x -> name_incl x (sou base (get_death_place p))) &&
-       test_auth p "burial_place"
-         (fun x -> name_incl x (sou base (get_burial_place p))) &&
-       test_auth p "occu"
-         (fun x -> name_incl x (sou base (get_occupation p)))
+  (* Check the civil status. The test is the same for an AND or a OR search request. *)
+  let match_civil_status p =
+    match_sex p True &&
+    match_first_name p True &&
+    match_surname p True &&
+    match_married p True &&
+    match_occupation p True
+  in
+  let match_person p search_type =
+    if (search_type <> "OR") then
+        (* AND search. *)
+        if (match_civil_status p &&
+           match_baptism_date p True &&
+           match_baptism_place p True &&
+           match_birth_date p True &&
+           match_birth_place p True &&
+           match_burial_date p True &&
+           match_burial_place p True &&
+           match_death_date p True &&
+           match_death_place p True &&
+           match_marriage p "marriage" "marriage_place" True)
+        then do {
+          list.val := [p :: list.val]; incr len;
+        }
+        else ()
+    else
+    (* OR search. *)
+    if (match_civil_status p && (
+        (* For each block (baptism, birth, burial, death and marriage), the first part of the condition checks if one of the filled fields matches the person's ones.
+           The second part checks the filled fields for the case one of the fields is false (if a field is empty, it is considered valid).
+           e.g.: The place is right but the date is wrong, the condition has to return false.
+           e.g.: The place is not filled and the date is right, the condition has to return true.
+         *)
+        ((match_baptism_date p False || match_baptism_place p False) && (match_baptism_date p True && match_baptism_place p True)) ||
+        ((match_birth_date p False || match_birth_place p False) && (match_birth_date p True && match_birth_place p True)) ||
+        ((match_burial_date p False || match_burial_place p False) && (match_burial_date p True && match_burial_place p True)) ||
+        ((match_death_date p False || match_death_place p False) && (match_death_date p True && match_death_place p True)) ||
+        match_marriage p "marriage" "marriage_place" False
+        ))
     then do {
       list.val := [p :: list.val]; incr len;
     }
@@ -253,13 +301,14 @@ value advanced_search conf base max_answers =
         | [ip :: l] ->
             if len.val > max_answers then ()
             else do {
-              test_person (pget conf base ip);
+              match_person (pget conf base ip) search_type;
               loop l
             } ]
     else
       for i = 0 to nb_of_persons base - 1 do {
         if len.val > max_answers then ()
-        else test_person (pget conf base (Adef.iper_of_int i))
+        else
+          match_person (pget conf base (Adef.iper_of_int i)) search_type;
       };
     (List.rev list.val, len.val)
   }
