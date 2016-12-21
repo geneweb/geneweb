@@ -131,41 +131,48 @@ value advanced_search conf base max_answers =
      | _ -> True ])
     empty_default_value
   in
-  let match_baptism_date p empty_default_value = match_date p "bapt" (fun () -> Adef.od_of_codate (get_baptism p)) empty_default_value in
-  let match_birth_date p empty_default_value = match_date p "birth" (fun () -> Adef.od_of_codate (get_birth p)) empty_default_value in
-  let match_death_date p empty_default_value =
-    (apply_to_field_value p
-      "death"
-      (fun d ->
-        match (d, get_death p) with
-        [ ("Dead", NotDead | DontKnowIfDead) -> False
-        | ("Dead", _) -> True
-        | ("NotDead", NotDead) -> True
-        | ("NotDead", _) -> False
-        | _ -> empty_default_value ])
-      True
-    )
-    &&
-    (match_date p
-      "death"
-      (fun () ->
-       match get_death p with
-       [ Death _ cd -> Some (Adef.date_of_cdate cd)
-       | _ -> None ])
-      empty_default_value
-     )
+  (* Get the field name of an event criteria depending of the search type. *)
+  let get_event_field_name event_criteria event_name =
+    if (search_type <> "OR") then
+      event_name ^ "_" ^ event_criteria
+    else
+      if ("on" = gets ("event_" ^ event_name)) then
+        event_criteria
+      else
+        ""
   in
-  let match_burial_date p empty_default_value = match_date p "burial"
-        (fun () ->
-           match get_burial p with
-           [ Buried cod -> Adef.od_of_codate cod
-           | Cremated cod -> Adef.od_of_codate cod
-           | _ -> None ]) empty_default_value
+
+  let bapt_date_field_name = get_event_field_name "date" "bapt" in
+  let birth_date_field_name = get_event_field_name "date" "birth" in
+  let death_date_field_name = get_event_field_name "date" "death" in
+  let burial_date_field_name = get_event_field_name "date" "burial" in
+  let marriage_date_field_name = get_event_field_name "date" "marriage" in
+
+  let match_baptism_date p empty_default_value = match_date p bapt_date_field_name (fun () -> Adef.od_of_codate (get_baptism p)) empty_default_value in
+  let match_birth_date p empty_default_value = match_date p birth_date_field_name (fun () -> Adef.od_of_codate (get_birth p)) empty_default_value in
+  let match_death_date p empty_default_value = match_date p death_date_field_name (fun () ->
+    match get_death p with
+    [ Death _ cd -> Some (Adef.date_of_cdate cd)
+    | _ -> None ]) empty_default_value
   in
-  let match_baptism_place p empty_default_value = apply_to_field_value p "bapt_place" (fun x -> name_incl x (sou base (get_baptism_place p))) empty_default_value in
-  let match_birth_place p empty_default_value = apply_to_field_value p "birth_place" (fun x -> name_incl x (sou base (get_birth_place p))) empty_default_value in
-  let match_death_place p empty_default_value = apply_to_field_value p "death_place" (fun x -> name_incl x (sou base (get_death_place p))) empty_default_value in
-  let match_burial_place p empty_default_value = apply_to_field_value p "burial_place" (fun x -> name_incl x (sou base (get_burial_place p))) empty_default_value in
+  let match_burial_date p empty_default_value = match_date p burial_date_field_name
+    (fun () ->
+       match get_burial p with
+       [ Buried cod -> Adef.od_of_codate cod
+       | Cremated cod -> Adef.od_of_codate cod
+       | _ -> None ]) empty_default_value
+  in
+
+  let bapt_place_field_name = get_event_field_name "place" "bapt" in
+  let birth_place_field_name = get_event_field_name "place" "birth" in
+  let death_place_field_name = get_event_field_name "place" "death" in
+  let burial_place_field_name = get_event_field_name "place" "burial" in
+  let marriage_place_field_name = get_event_field_name "place" "marriage" in
+
+  let match_baptism_place p empty_default_value = apply_to_field_value p bapt_place_field_name (fun x -> name_incl x (sou base (get_baptism_place p))) empty_default_value in
+  let match_birth_place p empty_default_value = apply_to_field_value p birth_place_field_name (fun x -> name_incl x (sou base (get_birth_place p))) empty_default_value in
+  let match_death_place p empty_default_value = apply_to_field_value p death_place_field_name (fun x -> name_incl x (sou base (get_death_place p))) empty_default_value in
+  let match_burial_place p empty_default_value = apply_to_field_value p burial_place_field_name (fun x -> name_incl x (sou base (get_burial_place p))) empty_default_value in
   let match_occupation p empty_default_value = apply_to_field_value p "occu" (fun x -> name_incl x (sou base (get_occupation p))) empty_default_value in
   let match_first_name p empty_default_value = apply_to_field_value p "first_name" (fun x -> name_eq x (p_first_name base p)) empty_default_value in
   let match_surname p empty_default_value = apply_to_field_value p "surname" (fun x -> name_eq x (p_surname base p)) empty_default_value in
@@ -258,7 +265,7 @@ value advanced_search conf base max_answers =
            match_burial_place p True &&
            match_death_date p True &&
            match_death_place p True &&
-           match_marriage p "marriage" "marriage_place" True)
+           match_marriage p marriage_date_field_name marriage_place_field_name True)
         then do {
           list.val := [p :: list.val]; incr len;
         }
@@ -275,7 +282,7 @@ value advanced_search conf base max_answers =
         ((match_birth_date p False || match_birth_place p False) && (match_birth_date p True && match_birth_place p True)) ||
         ((match_burial_date p False || match_burial_place p False) && (match_burial_date p True && match_burial_place p True)) ||
         ((match_death_date p False || match_death_place p False) && (match_death_date p True && match_death_place p True)) ||
-        match_marriage p "marriage" "marriage_place" False
+        match_marriage p marriage_date_field_name marriage_place_field_name False
         ))
     then do {
       list.val := [p :: list.val]; incr len;
