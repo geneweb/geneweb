@@ -273,17 +273,19 @@ value advanced_search conf base max_answers =
     else
     (* OR search. *)
     if (match_civil_status p && (
+        (* For the case civil status is correct but the event fields are empty. *)
+        (gets "place" = "" && gets "date2_yyyy" = "" && gets "date1_yyyy" = "") ||
         (* For each block (baptism, birth, burial, death and marriage), the first part of the condition checks if one of the filled fields matches the person's ones.
            The second part checks the filled fields for the case one of the fields is false (if a field is empty, it is considered valid).
            e.g.: The place is right but the date is wrong, the condition has to return false.
            e.g.: The place is not filled and the date is right, the condition has to return true.
          *)
-        ((match_baptism_date p False || match_baptism_place p False) && (match_baptism_date p True && match_baptism_place p True)) ||
+        (((match_baptism_date p False || match_baptism_place p False) && (match_baptism_date p True && match_baptism_place p True)) ||
         ((match_birth_date p False || match_birth_place p False) && (match_birth_date p True && match_birth_place p True)) ||
         ((match_burial_date p False || match_burial_place p False) && (match_burial_date p True && match_burial_place p True)) ||
         ((match_death_date p False || match_death_place p False) && (match_death_date p True && match_death_place p True)) ||
         match_marriage p marriage_date_field_name marriage_place_field_name False
-        ))
+        )))
     then do {
       list.val := [p :: list.val]; incr len;
     }
@@ -423,7 +425,6 @@ value searching_fields conf base =
   let search = date_field "marriage_place" "marriage" "married" search in
   let search = date_field "death_place" "death" "died" search in
   let search = date_field "burial_place" "burial" "buried" search in
-  (* C'est vraiment pas très heureux ce test... *)
   let search =
     if not (test_string "marriage_place" || test_date "marriage") then
       let sep = if search <> "" then ", " else "" in
