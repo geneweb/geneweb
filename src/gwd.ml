@@ -1539,6 +1539,12 @@ value image_request script_name env =
 type misc_fname =
   [ Css of string
   | Js of string
+  | Otf of string
+  | Svg of string
+  | Woff of string
+  | Eot of string
+  | Ttf of string
+  | Woff2 of string
   | Other of string ]
 ;
 
@@ -1548,6 +1554,12 @@ value content_misc len misc_fname = do {
     match misc_fname with
     [ Css fname -> (fname, "text/css")
     | Js fname -> (fname, "text/javascript")
+    | Otf fname -> (fname, "application/font-otf")
+    | Svg fname -> (fname, "application/font-svg")
+    | Woff fname -> (fname, "application/font-woff")
+    | Eot fname -> (fname, "application/font-eot")
+    | Ttf fname -> (fname, "application/font-ttf")
+    | Woff2 fname -> (fname, "application/font-woff2")
     | Other fname -> (fname, "text/plain") ]
   in
   Wserver.header "Content-type: %s" t;
@@ -1559,7 +1571,8 @@ value content_misc len misc_fname = do {
 
 value print_misc_file misc_fname =
   match misc_fname with
-  [ Css fname | Js fname ->
+  [ Css fname | Js fname | Otf fname | Svg fname | Woff fname 
+  | Eot fname | Ttf fname | Woff2 fname ->
       match
         try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
       with
@@ -1591,6 +1604,12 @@ value misc_request fname =
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
       else if Filename.check_suffix fname ".js" then Js fname
+      else if Filename.check_suffix fname ".otf" then Otf fname
+      else if Filename.check_suffix fname ".svg" then Svg fname
+      else if Filename.check_suffix fname ".woff" then Woff fname
+      else if Filename.check_suffix fname ".eot" then Eot fname
+      else if Filename.check_suffix fname ".ttf" then Ttf fname
+      else if Filename.check_suffix fname ".woff2" then Woff2 fname
       else Other fname
     in
     print_misc_file misc_fname

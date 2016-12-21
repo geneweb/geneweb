@@ -56,5 +56,5 @@ li.female
 </style>
 <link rel="stylesheet" href="%bvar.static_path;css.css">
 <link rel="stylesheet" href="%bvar.static_path;bootstrap.min.css">
-<!-- <link rel="stylesheet" href="%bvar.static_path;font-awesome.min.css"> -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="%bvar.static_path;font-awesome.min.css">
+<!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> -->
