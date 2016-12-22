@@ -72,6 +72,17 @@ value name_incl x y =
   string_incl x y
 ;
 
+(* Get the field name of an event criteria depending of the search type. *)
+value get_event_field_name gets event_criteria event_name search_type =
+  if (search_type <> "OR") then
+    event_name ^ "_" ^ event_criteria
+  else
+    if ("on" = gets ("event_" ^ event_name)) then
+      event_criteria
+    else
+      ""
+;
+
 value advanced_search conf base max_answers =
   let hs = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
@@ -131,22 +142,18 @@ value advanced_search conf base max_answers =
      | _ -> True ])
     empty_default_value
   in
-  (* Get the field name of an event criteria depending of the search type. *)
-  let get_event_field_name event_criteria event_name =
-    if (search_type <> "OR") then
-      event_name ^ "_" ^ event_criteria
-    else
-      if ("on" = gets ("event_" ^ event_name)) then
-        event_criteria
-      else
-        ""
-  in
 
-  let bapt_date_field_name = get_event_field_name "date" "bapt" in
-  let birth_date_field_name = get_event_field_name "date" "birth" in
-  let death_date_field_name = get_event_field_name "date" "death" in
-  let burial_date_field_name = get_event_field_name "date" "burial" in
-  let marriage_date_field_name = get_event_field_name "date" "marriage" in
+  let bapt_date_field_name = get_event_field_name gets "date" "bapt" search_type in
+  let birth_date_field_name = get_event_field_name gets "date" "birth" search_type in
+  let death_date_field_name = get_event_field_name gets "date" "death" search_type in
+  let burial_date_field_name = get_event_field_name gets "date" "burial" search_type in
+  let marriage_date_field_name = get_event_field_name gets "date" "marriage" search_type in
+
+  let bapt_place_field_name = get_event_field_name gets "place" "bapt" search_type in
+  let birth_place_field_name = get_event_field_name gets "place" "birth" search_type in
+  let death_place_field_name = get_event_field_name gets "place" "death" search_type in
+  let burial_place_field_name = get_event_field_name gets "place" "burial" search_type in
+  let marriage_place_field_name = get_event_field_name gets "place" "marriage" search_type in
 
   let match_baptism_date p empty_default_value = match_date p bapt_date_field_name (fun () -> Adef.od_of_codate (get_baptism p)) empty_default_value in
   let match_birth_date p empty_default_value = match_date p birth_date_field_name (fun () -> Adef.od_of_codate (get_birth p)) empty_default_value in
@@ -162,12 +169,6 @@ value advanced_search conf base max_answers =
        | Cremated cod -> Adef.od_of_codate cod
        | _ -> None ]) empty_default_value
   in
-
-  let bapt_place_field_name = get_event_field_name "place" "bapt" in
-  let birth_place_field_name = get_event_field_name "place" "birth" in
-  let death_place_field_name = get_event_field_name "place" "death" in
-  let burial_place_field_name = get_event_field_name "place" "burial" in
-  let marriage_place_field_name = get_event_field_name "place" "marriage" in
 
   let match_baptism_place p empty_default_value = apply_to_field_value p bapt_place_field_name (fun x -> name_incl x (sou base (get_baptism_place p))) empty_default_value in
   let match_birth_place p empty_default_value = apply_to_field_value p birth_place_field_name (fun x -> name_incl x (sou base (get_birth_place p))) empty_default_value in
