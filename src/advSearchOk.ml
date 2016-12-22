@@ -72,6 +72,17 @@ value name_incl x y =
   string_incl x y
 ;
 
+(* Get the field name of an event criteria depending of the search type. *)
+value get_event_field_name gets event_criteria event_name search_type =
+  if (search_type <> "OR") then
+    event_name ^ "_" ^ event_criteria
+  else
+    if ("on" = gets ("event_" ^ event_name)) then
+      event_criteria
+    else
+      ""
+;
+
 value advanced_search conf base max_answers =
   let hs = Hashtbl.create 73 in
   let hd = Hashtbl.create 73 in
@@ -131,22 +142,18 @@ value advanced_search conf base max_answers =
      | _ -> True ])
     empty_default_value
   in
-  (* Get the field name of an event criteria depending of the search type. *)
-  let get_event_field_name event_criteria event_name =
-    if (search_type <> "OR") then
-      event_name ^ "_" ^ event_criteria
-    else
-      if ("on" = gets ("event_" ^ event_name)) then
-        event_criteria
-      else
-        ""
-  in
 
-  let bapt_date_field_name = get_event_field_name "date" "bapt" in
-  let birth_date_field_name = get_event_field_name "date" "birth" in
-  let death_date_field_name = get_event_field_name "date" "death" in
-  let burial_date_field_name = get_event_field_name "date" "burial" in
-  let marriage_date_field_name = get_event_field_name "date" "marriage" in
+  let bapt_date_field_name = get_event_field_name gets "date" "bapt" search_type in
+  let birth_date_field_name = get_event_field_name gets "date" "birth" search_type in
+  let death_date_field_name = get_event_field_name gets "date" "death" search_type in
+  let burial_date_field_name = get_event_field_name gets "date" "burial" search_type in
+  let marriage_date_field_name = get_event_field_name gets "date" "marriage" search_type in
+
+  let bapt_place_field_name = get_event_field_name gets "place" "bapt" search_type in
+  let birth_place_field_name = get_event_field_name gets "place" "birth" search_type in
+  let death_place_field_name = get_event_field_name gets "place" "death" search_type in
+  let burial_place_field_name = get_event_field_name gets "place" "burial" search_type in
+  let marriage_place_field_name = get_event_field_name gets "place" "marriage" search_type in
 
   let match_baptism_date p empty_default_value = match_date p bapt_date_field_name (fun () -> Adef.od_of_codate (get_baptism p)) empty_default_value in
   let match_birth_date p empty_default_value = match_date p birth_date_field_name (fun () -> Adef.od_of_codate (get_birth p)) empty_default_value in
@@ -162,12 +169,6 @@ value advanced_search conf base max_answers =
        | Cremated cod -> Adef.od_of_codate cod
        | _ -> None ]) empty_default_value
   in
-
-  let bapt_place_field_name = get_event_field_name "place" "bapt" in
-  let birth_place_field_name = get_event_field_name "place" "birth" in
-  let death_place_field_name = get_event_field_name "place" "death" in
-  let burial_place_field_name = get_event_field_name "place" "burial" in
-  let marriage_place_field_name = get_event_field_name "place" "marriage" in
 
   let match_baptism_place p empty_default_value = apply_to_field_value p bapt_place_field_name (fun x -> name_incl x (sou base (get_baptism_place p))) empty_default_value in
   let match_birth_place p empty_default_value = apply_to_field_value p birth_place_field_name (fun x -> name_incl x (sou base (get_birth_place p))) empty_default_value in
@@ -387,15 +388,16 @@ value searching_fields conf base =
     else search
   in
   (* Fonction pour tester un "bloc date" (e.g: birth, birth_place). *)
-  let date_field x y z search =
-    let sep = if search <> "" then ", " else "" in
+  let date_field place_prefix_field_name date_prefix_field_name event_name search search_type =
+    (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
+    let sep = if search <> "" then if (search_type <> "OR") then ", " else " / " else "" in
     let search =
-      if test_string x || test_date y then
-        search ^ sep ^ (transl_nth conf z sex)
+      if test_string place_prefix_field_name || test_date date_prefix_field_name then
+        search ^ sep ^ (transl_nth conf event_name sex)
       else search
     in
     let search =
-      match getd y with
+      match getd date_prefix_field_name with
       [ (Some d1, Some d2) ->
           Printf.sprintf "%s %s %s %s %s"
             search (transl conf "between (date)")
@@ -411,20 +413,34 @@ value searching_fields conf base =
       | _ -> search ]
     in
     let search =
-      if test_string x then
-        search ^ " " ^ transl conf "in (place)" ^ " " ^ gets x
+      if test_string place_prefix_field_name then
+        search ^ " " ^ transl conf "in (place)" ^ " " ^ gets place_prefix_field_name
       else search
     in
     search
   in
+  (* Search type can be AND or OR. *)
+  let search_type = gets "search_type" in
+
+  let bapt_date_field_name = get_event_field_name gets "date" "bapt" search_type in
+  let birth_date_field_name = get_event_field_name gets "date" "birth" search_type in
+  let death_date_field_name = get_event_field_name gets "date" "death" search_type in
+  let burial_date_field_name = get_event_field_name gets "date" "burial" search_type in
+  let marriage_date_field_name = get_event_field_name gets "date" "marriage" search_type in
+  let bapt_place_field_name = get_event_field_name gets "place" "bapt" search_type in
+  let birth_place_field_name = get_event_field_name gets "place" "birth" search_type in
+  let death_place_field_name = get_event_field_name gets "place" "death" search_type in
+  let burial_place_field_name = get_event_field_name gets "place" "burial" search_type in
+  let marriage_place_field_name = get_event_field_name gets "place" "marriage" search_type in
+
   let search = "" in
   let search = string_field "first_name" search in
   let search = string_field "surname" search in
-  let search = date_field "birth_place" "birth" "born" search in
-  let search = date_field "bapt_place" "bapt" "baptized" search in
-  let search = date_field "marriage_place" "marriage" "married" search in
-  let search = date_field "death_place" "death" "died" search in
-  let search = date_field "burial_place" "burial" "buried" search in
+  let search = date_field birth_place_field_name birth_date_field_name "born" search search_type in
+  let search = date_field bapt_place_field_name bapt_date_field_name "baptized" search search_type in
+  let search = date_field marriage_place_field_name marriage_date_field_name "married" search search_type in
+  let search = date_field death_place_field_name death_date_field_name "died" search search_type in
+  let search = date_field burial_place_field_name burial_date_field_name "buried" search search_type in
   let search =
     if not (test_string "marriage_place" || test_date "marriage") then
       let sep = if search <> "" then ", " else "" in
