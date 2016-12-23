@@ -447,12 +447,23 @@ value searching_fields conf base =
   let search = "" in
   let search = string_field "first_name" search in
   let search = string_field "surname" search in
-  let search = get_event_field_request birth_place_field_name birth_date_field_name "born" search search_type in
-  let search = get_event_field_request bapt_place_field_name bapt_date_field_name "baptized" search search_type in
-  let search = get_event_field_request marriage_place_field_name marriage_date_field_name "married" search search_type in
-  let search = get_event_field_request death_place_field_name death_date_field_name "died" search search_type in
-  let search = get_event_field_request burial_place_field_name burial_date_field_name "buried" search search_type in
 
+  let event_search = "" in
+  let event_search = get_event_field_request birth_place_field_name birth_date_field_name "born" event_search search_type in
+  let event_search = get_event_field_request bapt_place_field_name bapt_date_field_name "baptized" event_search search_type in
+  let event_search = get_event_field_request marriage_place_field_name marriage_date_field_name "married" event_search search_type in
+  let event_search = get_event_field_request death_place_field_name death_date_field_name "died" event_search search_type in
+  let event_search = get_event_field_request burial_place_field_name burial_date_field_name "buried" event_search search_type in
+
+  let search =
+    if (search = "") then
+      event_search
+    else
+      if (event_search = "") then
+        search
+      else
+        search ^ ", " ^ event_search
+  in
   (* Adding the place and date at the end for the OR request. *)
   let search =
     if (search_type = "OR" && (gets "place" != "" || gets "date2_yyyy" != "" || gets "date1_yyyy" != "")) then
