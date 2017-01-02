@@ -91,7 +91,7 @@ value advanced_search conf base max_answers =
   in
   let test_auth p x cmp =
     let y = gets x in
-    if y = "" then True else if fast_auth_age conf p then cmp y else False
+    if y = "" then True else if authorized_age conf base p then cmp y else False
   in
   let test_date p x df =
     let (d1, d2) =
@@ -106,19 +106,19 @@ value advanced_search conf base max_answers =
     match (d1, d2) with
     [ (Some d1, Some d2) ->
         match df () with
-        [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
+        [ Some (Dgreg _ _ as d) when authorized_age conf base p ->
             if CheckItem.strictly_before d d1 then False
             else if CheckItem.strictly_before d2 d then False
             else True
         | _ -> False ]
     | (Some d1, _) ->
         match df () with
-        [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
+        [ Some (Dgreg _ _ as d) when authorized_age conf base p ->
             if CheckItem.strictly_before d d1 then False else True
         | _ -> False ]
     | (_, Some d2) ->
         match df () with
-        [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
+        [ Some (Dgreg _ _ as d) when authorized_age conf base p ->
             if CheckItem.strictly_after d d2 then False else True
         | _ -> False ]
     | _ -> True ]
@@ -140,7 +140,7 @@ value advanced_search conf base max_answers =
            let fam = foi base ifam in
            let father = poi base (get_father fam) in
            let mother = poi base (get_mother fam) in
-           if fast_auth_age conf father && fast_auth_age conf mother then
+           if authorized_age conf base father && authorized_age conf base mother then
              if y = "" then df (Adef.od_of_codate (get_marriage fam))
              else
                name_incl y (sou base (get_marriage_place fam)) &&
@@ -160,13 +160,13 @@ value advanced_search conf base max_answers =
     | (Some d1, _) ->
         test_date_place
           (fun
-          [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
+          [ Some (Dgreg _ _ as d) when authorized_age conf base p ->
               if CheckItem.strictly_before d d1 then False else True
           | _ -> False ])
     | (_, Some d2) ->
         test_date_place
           (fun
-          [ Some (Dgreg _ _ as d) when fast_auth_age conf p ->
+          [ Some (Dgreg _ _ as d) when authorized_age conf base p ->
               if CheckItem.strictly_after d d2 then False else True
           | _ -> False ])
     | _ ->
@@ -177,7 +177,7 @@ value advanced_search conf base max_answers =
               let fam = foi base ifam in
               let father = poi base (get_father fam) in
               let mother = poi base (get_mother fam) in
-              if fast_auth_age conf father && fast_auth_age conf mother then
+              if authorized_age conf base father && authorized_age conf base mother then
                 name_incl y (sou base (get_marriage_place fam))
               else False )
             (Array.to_list (get_family p)) ]

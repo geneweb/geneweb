@@ -552,41 +552,6 @@ value fast_auth_age conf p =
   else is_old_person conf (gen_person_of_person p)
 ;
 
-value is_restricted (conf : config) base ip =
-  let fct p =
-    not (is_quest_string (get_surname p)) &&
-    not (is_quest_string (get_first_name p)) &&
-    not (fast_auth_age conf p)
-  in
-  if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
-  else False
-;
-
-value pget (conf : config) base ip =
-  if is_restricted conf base ip then Gwdb.empty_person base ip
-  else poi base ip
-;
-
-value string_gen_person base p =
-  Futil.map_person_ps (fun p -> p) (sou base) p
-;
-
-value string_gen_family base fam =
-  Futil.map_family_ps (fun p -> p) (sou base) fam
-;
-
-value parent_has_title conf base p =
-  match get_parents p with
-  [ Some ifam ->
-      let cpl = foi base ifam in
-      let fath = pget conf base (get_father cpl) in
-      let moth = pget conf base (get_mother cpl) in
-      get_access fath <> Private && nobtit conf base fath <> [] ||
-      get_access moth <> Private && nobtit conf base moth <> []
-  | _ -> False ]
-;
-
-
 (* ********************************************************************** *)
 (*  [Fonc] authorized_age : config -> base -> person -> bool              *)
 (** [Description] : Calcul les droits de visualisation d'une personne en
@@ -648,6 +613,40 @@ value authorized_age conf base p =
             | _ -> loop (i + 1) ]
         in
         loop 0 ]
+;
+
+value is_restricted (conf : config) base ip =
+  let fct p =
+    not (is_quest_string (get_surname p)) &&
+    not (is_quest_string (get_first_name p)) &&
+    not (authorized_age conf base p)
+  in
+  if conf.use_restrict then base_visible_get base fct (Adef.int_of_iper ip)
+  else False
+;
+
+value pget (conf : config) base ip =
+  if is_restricted conf base ip then Gwdb.empty_person base ip
+  else poi base ip
+;
+
+value string_gen_person base p =
+  Futil.map_person_ps (fun p -> p) (sou base) p
+;
+
+value string_gen_family base fam =
+  Futil.map_family_ps (fun p -> p) (sou base) fam
+;
+
+value parent_has_title conf base p =
+  match get_parents p with
+  [ Some ifam ->
+      let cpl = foi base ifam in
+      let fath = pget conf base (get_father cpl) in
+      let moth = pget conf base (get_mother cpl) in
+      get_access fath <> Private && nobtit conf base fath <> [] ||
+      get_access moth <> Private && nobtit conf base moth <> []
+  | _ -> False ]
 ;
 
 value is_hidden p = is_empty_string (get_surname p);
@@ -763,7 +762,7 @@ value restricted_txt conf = ".....";
 (* ************************************************************************** *)
 value gen_person_text (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
-  else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
+  else if (is_hide_names conf p) && not (authorized_age conf base p) then "x x"
   else
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
@@ -793,7 +792,7 @@ value gen_person_text (p_first_name, p_surname) conf base p =
 (* ************************************************************************** *)
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
-  else if (is_hide_names conf p) && not (fast_auth_age conf p) then "x x"
+  else if (is_hide_names conf p) && not (authorized_age conf base p) then "x x"
   else
     let beg =
       match (sou base (get_public_name p), get_qualifiers p) with
@@ -824,7 +823,7 @@ value gen_person_text_without_surname check_acc (p_first_name, p_surname) conf
     base p
 =
   if is_hidden p then restricted_txt conf
-  else if check_acc && (is_hide_names conf p) && not (fast_auth_age conf p) then
+  else if check_acc && (is_hide_names conf p) && not (authorized_age conf base p) then
     "x x"
   else
     let s =
@@ -1433,7 +1432,7 @@ value url_no_index conf base =
     [ Some i ->
         if i >= 0 && i < nb_of_persons base then
           let p = pget conf base (Adef.iper_of_int i) in
-          if ((is_hide_names conf p) && not (fast_auth_age conf p)) || is_hidden p
+          if ((is_hide_names conf p) && not (authorized_age conf base p)) || is_hidden p
           then None
           else
             let f = scratch (get_first_name p) in
@@ -2306,7 +2305,7 @@ value first_child conf base p =
       if Array.length ct > 0 then
         let enfant = pget conf base ct.(0) in
         let child =
-          if (is_hide_names conf enfant) && not (fast_auth_age conf enfant) then
+          if (is_hide_names conf enfant) && not (authorized_age conf base enfant) then
             "xx"
           else
             if not (eq_istr (get_surname p) (get_surname enfant)) then

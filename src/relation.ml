@@ -767,7 +767,7 @@ value print_link_name conf base n p1 p2 sol =
   let info = (reltab, list) in
   do {
     Wserver.printf "%s"
-      (if (is_hide_names conf p2) && not (fast_auth_age conf p2) then "x x"
+      (if (is_hide_names conf p2) && not (authorized_age conf base p2) then "x x"
        else person_title_text conf base p2);
     Wserver.printf " %s" (transl conf "is");
     if n > 1 then Wserver.printf " %s" (transl conf "also") else ();
@@ -852,7 +852,7 @@ value print_link_name conf base n p1 p2 sol =
     in
     let s1 = "<strong>" ^ std_color conf s ^ "</strong>" in
     let s2 =
-      if (is_hide_names conf p1) && not (fast_auth_age conf p1) then "x x"
+      if (is_hide_names conf p1) && not (authorized_age conf base p1) then "x x"
       else gen_person_title_text no_reference raw_access conf base p1
     in
     let s =
