@@ -10,11 +10,11 @@ case "$LANG" in
   *) LANG=en;;
 esac
 
-DIR=`dirname $0`/
-BASE=`dirname $0`/bases
+DIR=`dirname "$0"`/
+BASE=`dirname "$0"`/bases
 
-cd $DIR
-DIR=$PWD
+cd "$DIR"
+DIR="$PWD"
 export LANG
 
 # echo -n "]2;GeneWeb"
