@@ -765,11 +765,34 @@ value print_default_gwf_file conf =
       "long_date=no";
       "counter=no";
       "full_siblings=yes";
-      "hide_advanced_request=no" ]
+      "hide_advanced_request=no";
+      "perso_module_a=personnal_data";
+			"options_module_a=2";
+			"perso_module_b=parents";
+			"options_module_b=5";
+			"perso_module_c=unions";
+			"options_module_c=5";
+			"perso_module_d=siblings";
+			"options_module_d=3";
+			"perso_module_e=relations";
+			"options_module_e=2";
+			"perso_module_f=timeline";
+			"options_module_f=2";
+			"perso_module_g=notes";
+			"options_module_g=2";
+			"perso_module_h=sources";
+			"options_module_h=2";
+			"perso_module_i=trees";
+			"options_module_i=8";
+			"perso_module_j=gr_parents";
+			"options_module_j=2";
+			"perso_module_k=data_3col";
+			"perso_module_z=divider"
+    ]
   in
   let bname = try List.assoc "o" conf.env with [ Not_found -> "" ] in
   let dir = Sys.getcwd () in
-  let fname = Filename.concat dir (bname ^ ".gwf") in
+  let fname = Filename.concat dir (bname ^ ".gwb/params.gwf") in
   if Sys.file_exists fname then ()
   else do {
     let oc = open_out fname in
@@ -1410,7 +1433,7 @@ value rec cut_at_equal s =
 ;
 
 value read_base_env bname =
-  let fname = bname ^ ".gwf" in
+  let fname = bname ^ ".gwb/params.gwf" in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =
@@ -1496,7 +1519,7 @@ value gwf_1 conf =
   let benv = read_base_env in_base in
   let (vars, files) = variables "gwf_1.htm" in
   do {
-    let oc = open_out (in_base ^ ".gwf") in
+    let oc = open_out (in_base ^ ".gwb/params.gwf") in
     let body_prop =
       match p_getenv conf.env "proposed_body_prop" with
       [ Some "" | None -> s_getenv conf.env "body_prop"
