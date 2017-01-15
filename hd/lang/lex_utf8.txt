@@ -1184,7 +1184,7 @@ en: a grandson/a granddaughter/a grandchild
 eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
 et: poja- või tütrepoeg:g:--ja/poja- või tütretütar:g:--re/lapselaps:g:+e
-fi: pojan tai tyttären poika:g:---jan/pojan tai tyttären tytär:g:--tären/lapsenlapsi:g:-en
+fi: pojan tai tyttären poika:g:---jan/pojan tai tyttären tytär:g:---tären/lapsenlapsi:g:-en
 fr: un petit-fils/une petite-fille/un petit-enfant
 he:  נכד/ נכדה
 is: barnabarn/barnabarn/barnabarn
@@ -1242,7 +1242,7 @@ en: a great-grandson/a great-granddaughter/a great-grandchild
 eo: pranepo/pranepino/pranep(in)o
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
 et: lapselapse poeg:g:--ja/lapselapse tütar:g:--re/lapselapselaps:g:+e
-fi: lapsenlapsen poika:g:---jan/lapsenlapsen tytär:g:--tären/lapsenlapsen lapsi:g:-en
+fi: lapsenlapsen poika:g:---jan/lapsenlapsen tytär:g:---tären/lapsenlapsen lapsi:g:-en
 fr: un arrière-petit-fils/une arrière-petite-fille/un arrière-petit-enfant
 he:   נין/ נינה
 is: barnabarnabarn/barnabarnabarn/barnabarnabarn
@@ -1271,7 +1271,7 @@ en: a great-nephew/a great-niece
 eo: pranevo/pranevino
 es: un sobrino nieto/una sobrina nieta
 et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
-fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:--tären
+fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:---tären
 fr: un petit neveu/une petite nièce
 he:   בן האחיין/ בת האחיין
 is: frændi/frænka
@@ -1300,7 +1300,7 @@ en: a great-uncle/a great-aunt
 eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
 et: vanaonu/vanatädi
-fi: isosetä:g:--dän/isotäti:g:--din
+fi: isosetä:g:---dän/isotäti:g:--din
 fr: un grand-oncle/une grand-tante
 he:   דוד-סב/ דודה-סבה
 is: afa(ömmu)bróðir/afa(ömmu)systir
@@ -1358,7 +1358,7 @@ en: a nephew/a niece
 eo: nevo/nevino
 es: un sobrino/a sobrina
 et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
-fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:--tären
+fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:---tären
 fr: un neveu/une nièce
 he:   אחיין/ אחיינית
 is: bróður(systur)sonur/bróður(systur)dóttir
@@ -1416,7 +1416,7 @@ en: a son/a daughter/a child
 eo: filo/filino/ido
 es: un hijo/una hija/un(a) hijo(a)
 et: poeg:g:--ja/tütar:g:--re/laps:g:+e
-fi: poika:g:---jan/tytär:g:--tären/lapsi:g:-en
+fi: poika:g:---jan/tytär:g:---tären/lapsi:g:-en
 fr: un fils/une fille/un enfant
 he:   בן/ בת/ ילד
 is: sonur/dóttir/barn
@@ -2112,7 +2112,7 @@ en: an uncle/an aunt
 eo: onklo/onklino
 es: un tío/una tía
 et: onu/tädi
-fi: setä:g:--dän/täti:g:--din/eno:g:+n/täti:g:--din
+fi: setä:g:---dän/täti:g:--din/eno:g:+n/täti:g:--din
 fr: un oncle/une tante
 he:   דוד/ דודה
 is: föður(móður)bróðir/föður(móður)systir
@@ -3503,7 +3503,7 @@ oc: enfant/enfants
 pl: dziecko/dzieci
 pt: filho/filhos
 ro: copil/copii
-ru: ребенок:g:--ка:a:--ка/дети
+ru: ребенок:g:---ка:a:---ка/дети
 sk: dieťa/deti
 sl: otrok/otroci
 sv: barn/barn
@@ -5338,7 +5338,7 @@ oc: familha/familhas
 pl: rodzina:a:-ę/rodziny
 pt: família/famílias
 ro: familie/fmalilii
-ru: семья:a:-ю:g:-и/семьи
+ru: семья:a:--ю:g:--и/семьи
 sk: rodina:a:-u/rodiny
 sl: družina/družine
 sv: familj/familjer
@@ -11705,7 +11705,7 @@ pl: alias nazwiska
 pt: alias do apelido
 pt-br: apelido do sobrenome
 ro: alias de nume
-ru: новая:a:--ую фамилия:a:-ю
+ru: новая:a:---ую фамилия:a:--ю
 sk: alias priezviska
 sl: drug priimek
 sv: efternamns alias
@@ -12665,7 +12665,7 @@ sv: föräldrarna
 
     the spouse
 af: die eggenoot/die eggenote
-bg: съпругът:a:--а/съпругата
+bg: съпругът:a:---а/съпругата
 br: ar pried/ar bried
 ca: el marit/la muller
 cs: manžel/manželka
@@ -13729,7 +13729,7 @@ oc: testimòni/testimòni/testimònis
 pl: świadek:a:--ka/świadek:a:--ka/świadkowie
 pt: testemunha/testemunha/testemunhas
 ro: martor/martor/martori
-ru: свидетель:g:-я:a:-я/свидетель:g:-я:a:-я/свидетели
+ru: свидетель:g:--я:a:--я/свидетель:g:--я:a:--я/свидетели
 sk: svedok:g:--ka/svedok:g:--ka/svedkovia
 sl: priča/priča/priče
 sv: vittne/vittne/vittnen
