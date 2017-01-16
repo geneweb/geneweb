@@ -265,9 +265,10 @@ let print_config conf base =
           | `after -> (prec, transl conf "after (date)")
           | `oryear -> (prec, transl conf "or")
           | `yearint -> (prec, transl conf "between (date)")
+          | `yeardur -> (prec, transl conf "begin (date)")
         in
         Mwrite.Transl_precision.({pos = pos; sval = sval;}))
-      [ `sure; `about; `maybe; `before; `after; `oryear; `yearint ]
+      [ `sure; `about; `maybe; `before; `after; `oryear; `yearint; `yeardur ]
   in
   let transl_prec = Mwrite.Config_transl_precision.({msg = transl_prec;}) in
   let transl_death =

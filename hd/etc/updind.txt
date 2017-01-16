@@ -331,6 +331,7 @@ function changeCalendar(e,v,m,c) {
           <option value="after" %if;(xdt.prec = "after") selected="selected"%end;>[*after (date)]0</option>
           <option value="oryear" %if;(xdt.prec = "oryear") selected="selected"%end;>&lt;- [*or] -&gt;</option>
           <option value="yearint" %if;(xdt.prec = "yearint") selected="selected"%end;>&lt;- [*between (date)] -&gt;</option>
+          <option value="yeardur" %if;(xdt.prec = "yeardur") selected="selected"%end;>&lt;- [*fromto (date)] -&gt;</option>
         </select>
         %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
           <label>

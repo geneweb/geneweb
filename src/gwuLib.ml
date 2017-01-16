@@ -151,6 +151,13 @@ value print_date_dmy oc d =
           else fprintf oc "..%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
         else
           fprintf oc "..%s" (soy d2.year2)
+    | YearDur d2 ->
+        if not old_gw.val then
+          if (*d2.day2 = 0 &&*) d2.month2 = 0 then fprintf oc "<>%s" (soy d2.year2)
+          else if d2.day2 = 0 then fprintf oc "<>%d/%s" d2.month2 (soy d2.year2)
+          else fprintf oc "<>%d/%d/%s" d2.day2 d2.month2 (soy d2.year2)
+        else
+          fprintf oc "<>%s" (soy d2.year2)
     | _ -> () ]
   }
 ;

@@ -29,7 +29,7 @@ and dmy2 =
     year2 : int;
     delta2 : int }
 and precision =
-  [ Sure | About | Maybe | Before | After | OrYear of dmy2 | YearInt of dmy2 ]
+  [ Sure | About | Maybe | Before | After | OrYear of dmy2 | YearInt of dmy2 | YearDur of dmy2 ]
 ;
 
 value float_of_fix : fix -> float;

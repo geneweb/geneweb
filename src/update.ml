@@ -980,6 +980,12 @@ value reconstitute_date_dmy conf var =
                   let dmy2 = reconstitute_date_dmy2 conf var in
                   YearInt dmy2
               | None -> Sure ]
+          | Some "yeardur" ->
+              match get_number var "oryear" conf.env with
+              [ Some y ->
+                  let dmy2 = reconstitute_date_dmy2 conf var in
+                  YearDur dmy2
+              | None -> Sure ]
           | _ -> Sure ]
         in
         match m with

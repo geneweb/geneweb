@@ -26,7 +26,7 @@ open Api_util
 let short_prec_year_text conf d =
   let prec =
     match d.prec with
-    | About | OrYear _ | YearInt _ ->
+    | About | OrYear _ | YearInt _| YearDur _ ->
         (* On utilise le dictionnaire pour être sur *)
         (* que ce soit compréhensible de tous.      *)
         (match transl conf "about (short date)" with
@@ -133,7 +133,7 @@ let string_of_dmy conf d =
   let sy = encode_dmy conf d.day d.month d.year in
   let sy2 =
     match d.prec with
-    | OrYear d2 | YearInt d2 ->
+    | OrYear d2 | YearInt d2 | YearDur d2 ->
         let d2 = Date.dmy_of_dmy2 d2 in
         encode_dmy conf d2.day d2.month d2.year
     | _ -> ""
@@ -190,14 +190,14 @@ let string_of_date_and_conv conf d =
       let date = string_of_french_dmy conf d1 in
       (match d.prec with
       | Sure -> (gregorian_precision conf d, date, Some `french)
-      | About | Before | After | Maybe | OrYear _ | YearInt _ ->
+      | About | Before | After | Maybe | OrYear _ | YearInt _ | YearDur _ ->
           (date, "", Some `french))
   | Dgreg (d, Dhebrew) ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let date = string_of_hebrew_dmy conf d1 in
       (match d.prec with
       | Sure -> (gregorian_precision conf d, date, Some `hebrew)
-      | About | Before | After | Maybe | OrYear _ | YearInt _ ->
+      | About | Before | After | Maybe | OrYear _ | YearInt _ | YearDur _ ->
           (date, "", Some `hebrew))
   | Dtext t -> ("(" ^ string_with_macros conf [] t ^ ")", "", None)
 ;;

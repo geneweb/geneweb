@@ -502,7 +502,8 @@ value date_lexer =
 type range 'a =
   [ Begin of 'a
   | End of 'a
-  | BeginEnd of 'a and 'a ]
+  | BeginEndInt of 'a and 'a
+  | BeginEndDur of 'a and 'a ]
 ;
 
 value date_g = Grammar.gcreate date_lexer;
@@ -613,11 +614,11 @@ EXTEND
     [ [ ID "BEF"; dt = date_or_text; EOI -> End dt
       | ID "AFT"; dt = date_or_text; EOI -> Begin dt
       | ID "BET"; dt = date_or_text; ID "AND"; dt1 = date_or_text; EOI ->
-          BeginEnd dt dt1
+          BeginEndInt dt dt1
       | ID "TO"; dt = date_or_text; EOI -> End dt
       | ID "FROM"; dt = date_or_text; EOI -> Begin dt
       | ID "FROM"; dt = date_or_text; ID "TO"; dt1 = date_or_text; EOI ->
-          BeginEnd dt dt1
+          BeginEndDur dt dt1
       | dt = date_or_text; EOI -> Begin dt ] ]
   ;
   date_or_text:
@@ -625,7 +626,7 @@ EXTEND
           match dr with
           [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
           | End (d, cal) -> Dgreg {(d) with prec = Before} cal
-          | BeginEnd (d1, cal1) (d2, cal2) ->
+          | BeginEndInt (d1, cal1) (d2, cal2) ->
               let dmy2 =
                 match cal2 with
                 [ Dgregorian ->
@@ -644,17 +645,37 @@ EXTEND
                     {day2 = dmy2.day; month2 = dmy2.month;
                      year2 = dmy2.year; delta2 = 0} ]
               in
-              Dgreg {(d1) with prec = YearInt dmy2} cal1 ]
+              Dgreg {(d1) with prec = YearInt dmy2} cal1
+          | BeginEndDur (d1, cal1) (d2, cal2) ->
+              let dmy2 =
+                match cal2 with
+                [ Dgregorian ->
+                    {day2 = d2.day; month2 = d2.month;
+                     year2 = d2.year; delta2 = 0}
+                | Djulian ->
+                    let dmy2 = Calendar.julian_of_gregorian d2 in
+                    {day2 = dmy2.day; month2 = dmy2.month;
+                     year2 = dmy2.year; delta2 = 0}
+                | Dfrench ->
+                    let dmy2 = Calendar.french_of_gregorian d2 in
+                    {day2 = dmy2.day; month2 = dmy2.month;
+                     year2 = dmy2.year; delta2 = 0}
+                | Dhebrew ->
+                    let dmy2 = Calendar.hebrew_of_gregorian d2 in
+                    {day2 = dmy2.day; month2 = dmy2.month;
+                     year2 = dmy2.year; delta2 = 0} ]
+              in
+              Dgreg {(d1) with prec = YearDur dmy2} cal1 ]
       | (d, cal) = date -> Dgreg d cal
       | s = TEXT -> Dtext s ] ]
   ;
   date_range:
     [ [ ID "BEF"; dt = date -> End dt
       | ID "AFT"; dt = date -> Begin dt
-      | ID "BET"; dt = date; ID "AND"; dt1 = date -> BeginEnd dt dt1
+      | ID "BET"; dt = date; ID "AND"; dt1 = date -> BeginEndInt dt dt1
       | ID "TO"; dt = date -> End dt
       | ID "FROM"; dt = date -> Begin dt
-      | ID "FROM"; dt = date; ID "TO"; dt1 = date -> BeginEnd dt dt1 ] ]
+      | ID "FROM"; dt = date; ID "TO"; dt1 = date -> BeginEndDur dt dt1 ] ]
   ;
   date:
     [ [ ID "ABT"; (d, cal) = date_calendar -> ({(d) with prec = About}, cal)
@@ -1414,7 +1435,8 @@ value decode_date_interval pos s =
   let strm = Stream.of_string s in
   try
     match Grammar.Entry.parse date_interval strm with
-    [ BeginEnd d1 d2 -> (Some d1, Some d2)
+    [ BeginEndInt d1 d2 -> (Some d1, Some d2)
+    | BeginEndDur d1 d2 -> (Some d1, Some d2)
     | Begin d -> (Some d, None)
     | End d -> (None, Some d) ]
   with
