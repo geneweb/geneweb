@@ -8,11 +8,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
+%include.js;
 </head>
 <body>
 <div class="container">
-<h1>Address changed</h1>
-
+<h1>[
+en: Address changed
+fr: Changement d'adresse
+]
+</h1>
 <p>
 [
 en: The address of this service has changed.
@@ -27,7 +31,7 @@ it: L'indirizzo di questo service è cambiato.
 </ul>
 </p>
 
-%base_trailer;
+%include.trl;
 %include.copyr;
 </div>
 </body>
