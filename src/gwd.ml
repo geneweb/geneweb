@@ -356,6 +356,7 @@ value print_redirected conf from request new_addr =
     match Util.open_etc_file "redirect" with
     [ Some ic ->
         do {
+          let conf = {(conf) with template = False} in (* set to False so we can detect *)
           Util.html conf;
           Templ.copy_from_templ conf env ic;
         }
