@@ -8,9 +8,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
+%include.js;
 </head>
 <body>
 <div class="container">
+<h1>%bname; -&gt; %bvar.moved;</h1>
 <p>
 %apply;interp([
 en: The database "%bname;" has moved to:
