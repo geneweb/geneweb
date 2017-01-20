@@ -840,6 +840,7 @@ value print_moved conf base s =
   [ Some ic ->
       let env = [("bname", conf.bname)] in
       do {
+        let conf = {(conf) with template = False} in (* set to False so we can detect *)
         Util.html conf;
         Templ.copy_from_templ conf env ic;
       }
