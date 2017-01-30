@@ -387,15 +387,9 @@ value searching_fields conf base =
     if test_string x then search ^ " " ^ gets x
     else search
   in
-  (* Fonction pour tester un "bloc date" (e.g: birth, birth_place). *)
-  let date_field place_prefix_field_name date_prefix_field_name event_name search search_type =
-    (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
-    let sep = if search <> "" then if (search_type <> "OR") then ", " else " / " else "" in
-    let search =
-      if test_string place_prefix_field_name || test_date date_prefix_field_name then
-        search ^ sep ^ (transl_nth conf event_name sex)
-      else search
-    in
+
+  (* Returns the place and date request. (e.g.: ...in Paris between 1800 and 1900) *)
+  let get_place_date_request place_prefix_field_name date_prefix_field_name search =
     let search =
       match getd date_prefix_field_name with
       [ (Some d1, Some d2) ->
@@ -411,14 +405,31 @@ value searching_fields conf base =
           Printf.sprintf "%s %s %s"
             search (transl conf "before (date)") (Date.string_of_date conf d2)
       | _ -> search ]
-    in
-    let search =
+      in
       if test_string place_prefix_field_name then
         search ^ " " ^ transl conf "in (place)" ^ " " ^ gets place_prefix_field_name
       else search
+  in
+
+  (* Returns the event request. (e.g.: born in...) *)
+  let get_event_field_request place_prefix_field_name date_prefix_field_name event_name search search_type =
+    (* Separator character depends on search type operator, a comma for AND search, a slash for OR search. *)
+    let sep = if search <> "" then if (search_type <> "OR") then ", " else " / " else "" in
+    let search =
+      if test_string place_prefix_field_name || test_date date_prefix_field_name then
+        search ^ sep ^ (transl_nth conf event_name sex)
+      else search
+    in
+    let search =
+      (* The place and date have to be shown after each event only for the AND request. *)
+      if (search_type <> "OR") then
+        get_place_date_request place_prefix_field_name date_prefix_field_name search
+      else
+        search
     in
     search
   in
+
   (* Search type can be AND or OR. *)
   let search_type = gets "search_type" in
 
@@ -436,13 +447,31 @@ value searching_fields conf base =
   let search = "" in
   let search = string_field "first_name" search in
   let search = string_field "surname" search in
-  let search = date_field birth_place_field_name birth_date_field_name "born" search search_type in
-  let search = date_field bapt_place_field_name bapt_date_field_name "baptized" search search_type in
-  let search = date_field marriage_place_field_name marriage_date_field_name "married" search search_type in
-  let search = date_field death_place_field_name death_date_field_name "died" search search_type in
-  let search = date_field burial_place_field_name burial_date_field_name "buried" search search_type in
+
+  let event_search = "" in
+  let event_search = get_event_field_request birth_place_field_name birth_date_field_name "born" event_search search_type in
+  let event_search = get_event_field_request bapt_place_field_name bapt_date_field_name "baptized" event_search search_type in
+  let event_search = get_event_field_request marriage_place_field_name marriage_date_field_name "married" event_search search_type in
+  let event_search = get_event_field_request death_place_field_name death_date_field_name "died" event_search search_type in
+  let event_search = get_event_field_request burial_place_field_name burial_date_field_name "buried" event_search search_type in
+
   let search =
-    if not (test_string "marriage_place" || test_date "marriage") then
+    if (search = "") then
+      event_search
+    else
+      if (event_search = "") then
+        search
+      else
+        search ^ ", " ^ event_search
+  in
+  (* Adding the place and date at the end for the OR request. *)
+  let search =
+    if (search_type = "OR" && (gets "place" != "" || gets "date2_yyyy" != "" || gets "date1_yyyy" != "")) then
+      get_place_date_request "place" "date" search
+    else search in
+
+  let search =
+    if not (test_string marriage_place_field_name || test_date "marriage") then
       let sep = if search <> "" then ", " else "" in
       if gets "married" = "Y" then
         search ^ sep ^ transl conf "having a family"
