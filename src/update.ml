@@ -54,48 +54,76 @@ value restrict_to_small_list el =
       | [] -> List.rev rl ]
 ;
 
+
+(* ************************************************************************** *)
+(*  [Fonc] print_person_parents_and_spouses :
+             config -> base -> person -> string                               *)
+(** [Description] : Renvoie le nom d'un individu, celui de ses parents ainsi
+    que le nom de ses conjoints.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - p    : person
+    [Retour] : string
+    [Rem] : Exporté en clair hors de ce module.                               *)
+(* ************************************************************************** *)
+value print_person_parents_and_spouses conf base p =
+  do {
+    let print_person p link =
+    do {
+      if link then 
+        stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
+        begin
+          Wserver.printf "%s.%d %s" (p_first_name base p)
+            (get_occ p) (p_surname base p);
+        end
+      else
+        Wserver.printf "%s.%d %s" (p_first_name base p)      
+          (get_occ p) (p_surname base p);  
+      Wserver.printf "%s" (Date.short_dates_text conf base p) }
+    in
+    print_person p True;
+    let son_of = Util.child_of_parent conf base p in
+    if son_of != "" then 
+      Wserver.printf ", %s" son_of
+    else ();
+    let ifam = get_family p in
+    List.iter
+      (fun ifam -> do {
+        let fam = foi base ifam in
+        let sp = spouse (get_key_index p) fam in
+        let sp = poi base sp in
+        Wserver.printf ", &amp; ";
+        print_person sp False } )
+      (Array.to_list ifam)
+  }
+;
+
+
 value print_same_name conf base p =
   match Gutil.find_same_name base p with
   [ [_] -> ()
   | pl ->
-      let print_person p =
-        do {
-          stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
-          begin
-            Wserver.printf "%s.%d %s" (p_first_name base p)
-              (get_occ p) (p_surname base p);
-          end;
-          Wserver.printf "%s" (Date.short_dates_text conf base p)
-        }
-      in
       let pl = restrict_to_small_list pl in
       tag "p" begin
-        Wserver.printf "%s:\n"
-          (capitale (transl conf "persons having the same name"));
+        Wserver.printf "%s%s\n"
+          (capitale (transl conf "persons having the same name"))
+          (transl conf ":");
         tag "ul" begin
           List.iter
             (fun p ->
-             stag "li" begin
-               match p with
-               [ Some p -> do {
-                   print_person p;
-                   let ifam = get_family p in
-                   List.iter
-                     (fun ifam -> do {
-                       let fam = foi base ifam in
-                       let sp = spouse (get_key_index p) fam in
-                       let sp = poi base sp in
-                       Wserver.printf ", &amp; ";
-                       print_person sp } )
-                     (Array.to_list ifam);
-                   Wserver.printf "\n"
-                 }
-               | None -> Wserver.printf "...\n" ];
-             end)
+              stag "li" begin
+                match p with
+                  [ Some p -> do {
+                    print_person_parents_and_spouses conf base p;
+                    Wserver.printf "\n" }
+                  | None -> Wserver.printf "...\n" ]; 
+              end)
             pl;
         end;
       end ]
 ;
+
 
 (* ************************************************************************* *)
 (*  [Fonc] is_label_note : string -> bool                                    *)
@@ -149,16 +177,18 @@ value print_err_unknown conf base (f, s, o) = do {
   IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
-        Printf.sprintf "%s: <strong>%s.%d %s</strong>\n"
-        (capitale (transl conf "unknown person")) f o s
+        Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
+        (capitale (transl conf "unknown person"))
+        (transl conf ":") f o s
       in
       raise (ModErrApi err)
     else ()
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.printf "%s: <strong>%s.%d %s</strong>\n"
-    (capitale (transl conf "unknown person")) f o s;
+  Wserver.printf "%s%s <strong>%s.%d %s</strong>\n"
+    (capitale (transl conf "unknown person"))
+    (transl conf ":") f o s;
   print_return conf;
   trailer conf;
   raise ModErr
@@ -859,7 +889,8 @@ value bad_date conf d = do {
   IFDEF API THEN
     if Api_conf.mode_api.val then
       let err =
-        (Printf.sprintf "%s:\n" (capitale (transl conf "incorrect date"))) ^
+        (Printf.sprintf "%s%s\n" (capitale (transl conf "incorrect date"))
+        (transl conf ":")) ^
         (match d with
          [ {day = 0; month = 0; year = a} -> Printf.sprintf "%d" a
          | {day = 0; month = m; year = a} -> Printf.sprintf "%d/%d" m a
@@ -870,7 +901,8 @@ value bad_date conf d = do {
   ELSE () END;
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
-  Wserver.printf "%s:\n" (capitale (transl conf "incorrect date"));
+  Wserver.printf "%s%s\n" (capitale (transl conf "incorrect date"))
+    (transl conf ":");
   match d with
   [ {day = 0; month = 0; year = a} -> Wserver.printf "%d" a
   | {day = 0; month = m; year = a} -> Wserver.printf "%d/%d" m a
@@ -1104,8 +1136,9 @@ value print_create_conflict conf base p var = do {
    xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
    tag "ul" begin
      stag "li" begin
-       Wserver.printf "%s: %d. \n"
-         (capitale (transl conf "first free number")) free_n;
+       Wserver.printf "%s%s %d. \n"
+         (capitale (transl conf "first free number"))
+         (transl conf ":") free_n;
        Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
          (transl conf "create");
        Wserver.printf "%s." (transl conf " to try again with this number");

@@ -772,7 +772,10 @@ value gen_person_text (p_first_name, p_surname) conf base p =
       | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
       | (n, []) -> n ]
     in
-    beg ^ " " ^ p_surname base p
+    let surn = p_surname base p in
+    if surn = "" then 
+      beg
+    else beg ^ " " ^ surn
 ;
 
 
@@ -2259,7 +2262,6 @@ value child_of_parent conf base p =
         (transl_a_of_gr_eq_gen_lev conf
            (transl_nth conf "son/daughter/child" is) s) ]
 ;
-
 
 (* ************************************************************************** *)
 (*  [Fonc] husband_wife : config -> base -> person -> unit                    *)
