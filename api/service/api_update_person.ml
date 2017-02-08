@@ -551,7 +551,7 @@ let print_add conf base mod_p =
         History.record conf base changed "ap";
         *)
         let hr = [(fun () -> History.record conf base changed "ap")] in
-        Api_update_util.UpdateSuccess (wl, hr)
+        Api_update_util.UpdateSuccess (wl, [], hr)
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c
@@ -578,7 +578,7 @@ let print_del conf base ip =
   History.record conf base changed "dp";
   *)
   let hr = [(fun () -> History.record conf base changed "dp")] in
-  Api_update_util.UpdateSuccess ([], hr)
+  Api_update_util.UpdateSuccess ([], [], hr)
 ;;
 
 
@@ -669,7 +669,7 @@ let print_mod conf base mod_p =
              Update.delete_topological_sort_v conf base
            else ())]
       in
-      Api_update_util.UpdateSuccess (wl, hr)
+      Api_update_util.UpdateSuccess (wl, [], hr)
     end
   in
   print_mod_aux conf base ip mod_p callback
@@ -1215,7 +1215,7 @@ let print_add_nobase conf mod_p =
     (* on le fait plus haut, pour savoir si c'est un oubli ou si l'on   *)
     (* ne connait pas la personne.                                      *)
     (* On n'appelle pas CheckItem car ils ne sont pas révélateurs *)
-    Api_update_util.UpdateSuccess ([], [])
+    Api_update_util.UpdateSuccess ([], [], [])
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
   | Api_update_util.ModErrApiConflict c -> Api_update_util.UpdateErrorConflict c

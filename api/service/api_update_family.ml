@@ -532,7 +532,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
               [(fun () -> History.record conf base changed act);
                (fun () -> Update.delete_topological_sort conf base)]
             in
-            Api_update_util.UpdateSuccess ([], hr)
+            Api_update_util.UpdateSuccess ([], [], hr)
           end)
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
@@ -569,10 +569,10 @@ let print_del conf base ip ifam =
           [(fun () -> History.record conf base changed "df");
            (fun () -> Update.delete_topological_sort conf base)]
         in
-        Api_update_util.UpdateSuccess ([], hr)
+        Api_update_util.UpdateSuccess ([], [], hr)
       end
     else
-      Api_update_util.UpdateSuccess ([], [])
+      Api_update_util.UpdateSuccess ([], [], [])
   end
 ;;
 
@@ -656,7 +656,7 @@ let print_mod conf base ip mod_f =
         [(fun () -> History.record conf base changed "mf");
          (fun () -> Update.delete_topological_sort conf base)]
       in
-      Api_update_util.UpdateSuccess (wl, hr)
+      Api_update_util.UpdateSuccess (wl, ml, hr)
     end
   in
   print_mod_aux conf base ip mod_f callback

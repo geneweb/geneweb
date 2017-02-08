@@ -92,7 +92,7 @@ let api_find_free_occ base fn sn =
       directement traduite du côté GeneWeb.
 *)
 type update_base_status =
-  | UpdateSuccess of CheckItem.base_warning list * (unit -> unit) list
+  | UpdateSuccess of CheckItem.base_warning list * CheckItem.base_misc list * (unit -> unit) list
   | UpdateError of string
   | UpdateErrorConflict of Mwrite.Create_conflict.t
 ;;
@@ -1783,13 +1783,3 @@ let piqi_empty_family conf base ifam =
     old_witnesses = [];
   })
 ;;
-
-
-
-
-
-
-
-
-
-
