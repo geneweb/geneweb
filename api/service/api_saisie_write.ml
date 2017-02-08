@@ -1158,6 +1158,7 @@ let compute_modification_status conf base ip ifam resp =
     Mwrite.Modification_status.({
       is_base_updated = is_base_updated;
       base_warnings = warnings;
+      base_miscs = miscs;
       index_person = index_person;
       lastname = surname;
       firstname = first_name;
@@ -3018,6 +3019,7 @@ let print_add_first_fam conf =
     Mwrite.Modification_status.({
       is_base_updated = is_base_updated;
       base_warnings = warnings;
+      base_miscs = miscs;
       index_person = index_person;
       lastname = surname;
       firstname = first_name;

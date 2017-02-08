@@ -434,6 +434,7 @@ message CreateConflict {
 message ModificationStatus {
   required bool is_base_updated = 1;
   repeated string base_warnings = 2;
+  repeated string base_miscs = 13;
   optional int32 index_person = 3;
   required string lastname = 4;
   required string firstname = 5;
