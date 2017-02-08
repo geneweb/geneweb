@@ -488,8 +488,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
             in
             (* TODO ?? idem enfant/witness ? *)
             (* optim ? regarder que ceux dont index = 0 *)
-            (* TODO *)
-            let _ =
+            let (wl, ml) =
               UpdateFamOk.all_checks_family
                 conf base ifam fam cpl des (scpl, sdes, None)
             in
@@ -532,7 +531,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
               [(fun () -> History.record conf base changed act);
                (fun () -> Update.delete_topological_sort conf base)]
             in
-            Api_update_util.UpdateSuccess ([], [], hr)
+            Api_update_util.UpdateSuccess (wl, ml, hr)
           end)
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
