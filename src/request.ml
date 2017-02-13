@@ -627,6 +627,15 @@ value family_m conf base =
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print_source conf base f
       | _ -> Hutil.incorrect_request conf ]
+  | Some "TXT" ->
+      match p_getenv conf.env "s" with
+      [ Some f ->
+          let f =
+            if String.sub f (String.length f - 4) 4 = ".txt" then
+              String.sub f 0 (String.length f - 4)
+            else f
+          in
+          Srcfile.print_source conf base f ]
   | Some "STAT" -> BirthDeath.print_statistics conf base
   | Some "CHANGE_WIZ_VIS" when conf.wizard ->
       Wiznotes.change_wizard_visibility conf base
@@ -895,6 +904,7 @@ value treat_request conf base = do {
   [ (Some s, _, _) -> print_moved conf base s
   | (_, Some "no_index", _) -> print_no_index conf base
   | (_, _, Some "IM") -> Image.print conf base
+  | (_, _, Some "DOC") -> Image.print conf base
   | _ ->
       do {
         set_owner conf;
