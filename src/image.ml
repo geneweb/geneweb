@@ -15,10 +15,10 @@ open Config;
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value content t len fname =
+value content c_t len fname =
   do {
     Wserver.http HttpStatus.OK;
-    Wserver.header "Content-type: image/%s" t;
+    Wserver.header "Content-type: %s" c_t;
     Wserver.header "Content-length: %d" len;
     Wserver.header "Content-disposition: inline; filename=%s"
       (Filename.basename fname);
@@ -39,13 +39,13 @@ value content t len fname =
                HTTP.
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value print_image_type fname itype =
+value print_image_type fname c_type  =
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
       do {
-        content itype len fname;
+        content c_type len fname;
         let rec loop len =
           if len = 0 then ()
           else do {
@@ -67,12 +67,20 @@ value print_image_type fname itype =
 (* ************************************************************************** *)
 value print_image_file fname =
   List.exists
-    (fun (suff, itype) ->
+    (fun (suff, itype, c_type) ->
        if Filename.check_suffix fname suff ||
           Filename.check_suffix fname (String.uppercase suff) then
-         print_image_type fname itype
+         print_image_type fname c_type
        else False)
-    [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg"); (".gif", "gif")]
+    [(".png", "png", "image/png"); 
+     (".jpg", "jpeg", "image/jpeg");
+     (".jpeg", "jpeg", "image/jpeg"); 
+     (".pjpeg", "jpeg", "image/jpeg");
+     (".gif", "gif", "image/gif"); 
+     (".pdf", "pdf", "application/pdf"); 
+     (".htm", "html", "text/html"); 
+     (".html", "html", "text/html")
+    ]
 ;
 
 (* ************************************************************************** *)
@@ -106,10 +114,8 @@ value print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  if fname = Filename.basename fname then
-    let fname = Util.source_image_file_name conf.bname fname in
-    if print_image_file fname then () else Hutil.incorrect_request conf
-  else Hutil.incorrect_request conf
+  let fname = Util.source_image_file_name conf.bname fname in
+  if print_image_file fname then () else Hutil.incorrect_request conf
 ;
 
 (* ************************************************************************** *)
