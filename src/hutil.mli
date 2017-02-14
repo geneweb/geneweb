@@ -5,6 +5,7 @@ open Config;
 open Gwdb;
 
 value header : config -> (bool -> unit) -> unit;
+value header_fluid : config -> (bool -> unit) -> unit;
 value header_link_welcome : config -> (bool -> unit) -> unit;
 value print_link_to_welcome : config -> bool -> unit;
 value trailer : config -> unit;
