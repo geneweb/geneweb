@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: desmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
+  <!-- $Id: desmenu.txt v 7.00 23/02/2017 02:23:11 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -25,11 +25,11 @@
 <div class="container-fluid">
 %include.perso_header;
 <script><!--
-
-function long_display_options () {
+function no_options () {
   /* On décoche toutes les options. */
   $('input[type=checkbox]').prop('checked', false);
-
+}
+function long_display_options () {
   /* On ne coche que celle qu'on veut. */%nn;
   %if;(bvar.always_surname="yes")
     $('input[type=checkbox][id=ld_alwsurn]').prop('checked', true);
@@ -37,15 +37,14 @@ function long_display_options () {
   $('input[type=checkbox][id=ld_notes]').prop('checked', true);
   $('input[type=checkbox][id=ld_src]').prop('checked', true);
 }
-
 function table_options () {
-  /* On décoche toutes les options. */
-  $('input[type=checkbox]').prop('checked', false);
-
   /* On ne coche que celle qu'on veut. */
+  $('input[type=checkbox][id=t_num_table]').prop('checked', true);
   $('input[type=checkbox][id=t_birth]').prop('checked', true);
   $('input[type=checkbox][id=t_birth_place]').prop('checked', true);
+  $('input[type=checkbox][id=t_marr]').prop('disabled',false);
   $('input[type=checkbox][id=t_marr]').prop('checked', true);
+  $('input[type=hidden][id=t_marr_on]').val('');
   $('input[type=checkbox][id=t_marr_place]').prop('checked', true);
   $('input[type=checkbox][id=t_marr_date]').prop('checked', true);
   $('input[type=checkbox][id=t_child]').prop('checked', true);
@@ -54,14 +53,11 @@ function table_options () {
   $('input[type=checkbox][id=t_occu]').prop('checked', true);
   $('input[type=checkbox][id=t_gen]').prop('checked', true);
 }
-
-function no_options () {
-  /* On décoche toutes les options. */
-  $('input[type=checkbox]').prop('checked', false);
+function table_spouse_disabled () {
+  $('input[type=checkbox][id=t_marr]').prop('disabled',true);
+  $('input[type=hidden][id=t_marr_on]').val('on');
 }
-
 --></script>
-
 <h1 class="text-center my-3">%nn;
   %apply;a_of_b_gr_eq_lev%with;
     [*descendants]%nn;
@@ -94,7 +90,7 @@ function no_options () {
     </p>
     <div class="col-md-7">
       <label>
-        <input type="radio" name="t" value="L" checked="checked" onclick="long_display_options ()"%/>
+        <input type="radio" name="t" value="L" checked="checked" onclick="no_options ();long_display_options ()"%/>
          <span class="fa fa-share-alt fa-fw"></span> [*list/list (ancestors)]0
       </label>
       %if;(bvar.max_desc_level = "" and max_desc_level > 12)
@@ -104,12 +100,12 @@ function no_options () {
       %end;
       <br%/>
       <label>
-        <input type="radio" name="t" value="M" onclick="long_display_options ()"%/>
+        <input type="radio" name="t" value="M" onclick="no_options ();long_display_options ()"%/>
          <span class="fa fa-male fa-fw"></span> [*male line/female line]0
       </label>
       <br%/>
       <label>
-        <input type="radio" name="t" value="F" onclick="long_display_options ()"%/>
+        <input type="radio" name="t" value="F" onclick="no_options ();long_display_options ()"%/>
          <span class="fa fa-female fa-fw"></span> [*male line/female line]1
       </label>
       <div class="offset-1">
@@ -151,9 +147,19 @@ function no_options () {
           </label>
         </p>
       </div>
-      <label>
-        <input type="radio" name="t" value="H" onclick="table_options ()"%/>
+%(      <label>
+        <input type="radio" name="t" value="K" onclick="no_options ();table_options ()"%/>
          <span class="fa fa-table fa-fw"></span> [*table]
+      </label>
+      <br>%)
+      <label>
+        <input type="radio" name="t" value="H" onclick="no_options ();table_options ()"%/>
+         <span class="fa fa-table fa-fw"></span> [*table]
+      </label>
+      <br>
+      <label>
+        <input type="radio" name="t" value="I" onclick="no_options ();table_options ();table_spouse_disabled ()"%/>
+         <span class="fa fa-table fa-fw"></span> [*table] [with] [spouses info]
       </label>
       %if;(bvar.max_desc_level = "" and max_desc_level > 12)
         ([maximum] 12 [generation/generations]1)
@@ -162,6 +168,19 @@ function no_options () {
       %end;
       <div class="offset-1">
         <p>
+          <label>
+            <input type="checkbox" id="t_num_table" name="num" value="on"%/>
+            [*display Aboville number]
+          </label>
+          <label>
+            <input type="checkbox" id="t_nowrap" name="nowrap" value="on"%/>
+            No line break in names
+          </label>
+          <label>
+            <input type="checkbox" id="t_title" name="title" value="on"%/>
+            [*title/titles]0
+          </label>
+        </p>
           <label>
             <input type="checkbox" id="t_birth" name="birth" value="on"%/>
             [*date of birth]
@@ -176,6 +195,7 @@ function no_options () {
             <input type="checkbox" id="t_marr" name="marr" value="on"%/>
             [*spouse/spouses]1
           </label>
+          <input type="hidden" id="t_marr_on" name="marr" value=""%/>
           <label>
             <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>
             [*date of marriage]
@@ -199,8 +219,8 @@ function no_options () {
             [*where dead]
           </label>
           <label>
-            <input type="checkbox" id="t_death_age" name="death_age" value="on"%/>
-            [*age at death]
+            <input type="checkbox" id="t_age" name="age" value="on"%/>
+            [*age]
           </label>
         </p>
         <p>
@@ -208,8 +228,6 @@ function no_options () {
             <input type="checkbox" id="t_occu" name="occu" value="on"%/>
             [*occupation/occupations]1
           </label>
-        </p>
-        <p>
           <label>
             <input type="checkbox" id="t_gen" name="gen" value="on"%/>
             [*display generation]
@@ -311,8 +329,8 @@ function no_options () {
       <div class="form-inline">
         <select class="form-control" name="v">
           %foreach;descendant_level;
-            <option value="%level;"%if(level = 0) selected="selected"%end;>%nn;
-              %if;(level = 0)[*specify::generation/generations]0%nn;
+            <option value="%level;" %if;(level=0)disabled selected%end;>%nn;
+              %if;(level = 0) [*specify::generation/generations]0%nn;
               %elseif;(level = 1)[*to the children]%nn;
               %elseif;(level = 2)[*to the grandchildren]%nn;
               %elseif;(level = 3)[*to the great-grandchildren]%nn;
@@ -325,12 +343,11 @@ function no_options () {
             </option>
           %end;
         </select>
-        <button type="submit" class="btn btn-secondary">Ok</button>
+        <input type="submit" class="btn btn-secondary" value="Ok">
       </div>
     </div>
   </div>
 </form>
-
 %base_trailer;
 %include.copyr;
 </div>

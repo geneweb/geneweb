@@ -2909,7 +2909,7 @@ sv: Födelsedatum och -plats
 
     birth place
 de: Ort der Geburt
-en: Place of birth
+en: place of birth
 es: lugar de nacimiento
 fi: Syntymäpaikka
 fr: lieu de naissance
@@ -4278,7 +4278,7 @@ sv: Dödsdatum och dödsplats
 
     death place
 de: Sterbeort
-en: Place of death
+en: place of death
 es: lugar de defunción
 fi: Kuolinpaikka
 fr: lieu de décès
@@ -4645,7 +4645,7 @@ sv: Visa tom bild
 
     display generation
 de: Nummer der Generation anzeigen
-en: display generation
+en: display the generations
 es: editar el número de generación
 fi: näytä sukupolvinumero
 fr: afficher les générations
@@ -7717,7 +7717,7 @@ sv: äktenskap med %t före makens/makans födelse
 
     marriage place
 de: Ort der Eheschließung
-en: Place of marriage
+en: place of marriage
 es: lugar de matrimonio
 fi: Vihkipaikka
 fr: lieu de l’union
@@ -8630,7 +8630,7 @@ de: Zweige
 en: Lines
 es: núm. ramas
 fi: Sukulinjat
-fr: nb. branches
+fr: nombre de branches
 it: n° rami
 nl: aantal takken
 no: Grener
@@ -8643,7 +8643,7 @@ de: Kinder
 en: Children
 es: núm. hijos
 fi: Lapset
-fr: nb. enfants
+fr: nombre d’enfants
 it: n° figli
 nl: aantal kinderen
 no: Barn
@@ -8656,7 +8656,7 @@ de: Ereignisse
 en: nb events
 es: núm. eventos
 fi: Tapahtumat
-fr: nb. événements
+fr: nombre d’événements
 it: n° eventi
 nl: aantal evenementen
 no: Hendelser
@@ -8669,7 +8669,7 @@ de: Individuen
 en: Individuals
 es: núm. individuos
 fi: Henkilöiden lukumäärä
-fr: nb. individus
+fr: nombre d’individus
 it: n° individui
 nl: aantal personen
 no: Individer
@@ -9356,7 +9356,7 @@ sv: antal levande personer:
 
     n° d'Aboville
 de: Nr. Aboville
-en: d'Aboville System number
+en: d'Aboville number
 es: N° de Aboville
 fi: Numero
 fr: n° d’Aboville
@@ -9365,6 +9365,19 @@ nl: Abovillenummer
 no: nummer
 oc: n° d'Aboville
 pt: n° de Aboville
+sv: nummer
+
+    d'Aboville
+de: Aboville
+en: d'Aboville
+es: Aboville
+fi: Numero
+fr: d’Aboville
+it: d’Aboville
+nl: Abovillenummer
+no: nummer
+oc: d'Aboville
+pt: de Aboville
 sv: nummer
 
     n° Sosa
@@ -14277,3 +14290,7 @@ fr: affichage pleine largeur/affichage sur deux colonnes
     dd/mm/yyyy
 en: dd/mm/yyyy
 fr: jour/mois/année
+
+    spouses info
+en: spouses informations
+fr: informations conjoints

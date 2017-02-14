@@ -46,7 +46,7 @@ value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
 value header_without_http conf title = do {
   Wserver.printf "<!DOCTYPE html>\n";
   Wserver.printf "<head>\n";
-  Wserver.printf "  <title>\n";
+  Wserver.printf "  <title>";
   title True;
   Wserver.printf "</title>\n";
   Wserver.printf "  <meta name=\"robots\" content=\"none\">\n";
@@ -63,20 +63,19 @@ value header_without_http conf title = do {
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
   Templ.include_hed_trl conf "hed";
-  Wserver.printf "</head>\n";
+  Wserver.printf "\n</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
     [ Not_found -> "" ]
   in
-  let s = s ^ Util.body_prop conf in Wserver.printf "<body%s>" s;
-  Wserver.printf "<div class=\"container\">"; (* balancing </div> in gen_trailer *)
-  Wserver.printf "\n";
+  let s = s ^ Util.body_prop conf in Wserver.printf "<body%s>\n" s;
   Util.message_to_wizard conf;
 };
 
 value header_without_page_title conf title = do {
-  Util.html conf;
+  Util.html conf; (* semble inutile car la fonction header_without_http a maintenant un header HTML5, mauvais nom ? *)
   header_without_http conf title;
+  Wserver.printf "<div class=\"container\">"; (* balancing </div> in gen_trailer *)
 };
 
 value header_link_welcome conf title = do {
@@ -100,7 +99,15 @@ value header_no_page_title conf title = do {
 
 value header conf title = do {
   header_without_page_title conf title;
-  Wserver.printf "<h1>";
+  Wserver.printf "\n<h1>";
+  title False;
+  Wserver.printf "</h1>\n";
+};
+
+value header_fluid conf title = do {
+  header_without_http conf title;
+  Wserver.printf "<div class=\"container-fluid\">"; (* balancing </div> in gen_trailer *)
+  Wserver.printf "\n<h1>";
   title False;
   Wserver.printf "</h1>\n";
 };
@@ -116,14 +123,14 @@ value rheader conf title = do {
 
 value gen_trailer with_logo conf = do {
   let conf = {(conf) with template = False} in (* set to False so we can detect *)
-	Templ.include_hed_trl conf "trl";
+  Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
   Wserver.printf "</div>\n"; (* balances header_without_http *)
   match Util.open_templ conf "js" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
-  Wserver.printf  "</body>\n</html>\n"; 
+  Wserver.printf "</body>\n</html>\n";
 };
 
 value trailer = gen_trailer True;

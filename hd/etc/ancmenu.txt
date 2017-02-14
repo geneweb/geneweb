@@ -185,6 +185,10 @@ function no_options () {
       <div class="offset-1">
       <p>
         <label>
+          <input type="checkbox" id="t_title" name="title" value="on"%/>
+          [*title/titles]0
+        </label>
+        <label>
           <input type="checkbox" id="t_birth" name="birth" value="on"%/>
           [*date of birth]
         </label>

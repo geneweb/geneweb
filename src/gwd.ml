@@ -1296,7 +1296,7 @@ value make_conf from_addr (addr, request) script_name contents env = do {
        match p_getenv base_env "doctype" with
        [ Some "html-4.01" -> ""
        | _ -> " /" ];
-     charset = "utf-8";
+     charset = "UTF-8";
      is_rtl = is_rtl;
      left = if is_rtl then "right" else "left";
      right = if is_rtl then "left" else "right";
