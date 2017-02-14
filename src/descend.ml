@@ -1104,7 +1104,7 @@ value display_descendant_with_table conf base max_lev p =
         } ]
   in
   do {
-    header conf (descendants_title conf base p);
+    Hutil.header_fluid conf (descendants_title conf base p);
     tag "p" begin
       Wserver.printf "%s." (capitale (text_to conf max_lev));
     end;
