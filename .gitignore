@@ -23,6 +23,7 @@ distribution
 
 tools/Makefile.config
 tools/transitive_depend
+tools/transitive_depend.sh
 
 contrib/gwFix/gwFindCpl
 contrib/gwFix/gwFixBase
@@ -62,3 +63,4 @@ src/gwc2
 src/gwd
 src/gwu
 src/update_nldb
+src/mk_consang

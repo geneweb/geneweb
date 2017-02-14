@@ -510,5 +510,7 @@ if [[ $OS_TYPE == "Darwin" ]]; then
   if $CI_BREW; then
     brew install bash
   fi
-  sed -i.bak '1 s/^.*$/#!\/usr\/local\/bin\/bash -e/g' tools/transitive_depend.sh 
+  cp tools/transitive_depend_osx.sh tools/transitive_depend.sh
+else
+  cp tools/transitive_depend_linux.sh tools/transitive_depend.sh
 fi
