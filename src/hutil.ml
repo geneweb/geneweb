@@ -144,6 +144,7 @@ value incorrect_request conf = do {
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "incorrect request"))
   in
+  Wserver.http "400 Bad Request";
   header conf title;
   Wserver.wprint "<p>\n";
   print_link_to_welcome conf False;
