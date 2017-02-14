@@ -110,19 +110,17 @@
 %end;
 
 %define;image_MF(xx,wi_he)
-  %if;(xx != "x x")
-    %if;xx.is_male;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/male.png"%sp;
-           style="border: none" alt="[M/F]0"%/>%nn;
-    %elseif;xx.is_female;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
-           style="border: none" alt="[M/F]1"%/>%nn;
-    %else;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png"
-           style="border: none" alt="?" title="?"%/>%nn;
-    %end;
-    %sp;
+  %if;(wizard and not cancel_links)
+    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
+  %if;xx.is_male;
+    <i class="fa fa-mars male"></i>%nn;
+  %elseif;xx.is_female;
+    <i class="fa fa-venus female"></i>%nn;
+  %else;
+    <i class="fa fa-neuter neuter"></i>%nn;
+  %end;%nn;
+  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
 %end;
 
 %define;letter(xx)
