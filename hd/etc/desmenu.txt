@@ -152,6 +152,11 @@ function no_options () {
         </p>
       </div>
       <label>
+        <input type="radio" name="t" value="K" onclick="table_options ()"%/>
+         <span class="fa fa-table fa-fw"></span> [*table] (K)
+      </label>
+      <br>
+      <label>
         <input type="radio" name="t" value="H" onclick="table_options ()"%/>
          <span class="fa fa-table fa-fw"></span> [*table]
       </label>
@@ -175,6 +180,10 @@ function no_options () {
           <label>
             <input type="checkbox" id="t_marr" name="marr" value="on"%/>
             [*spouse/spouses]1
+          </label>
+          <label>
+            <input type="checkbox" id="t_spouse_date" name="spouse_date" value="on"%/>
+            [*date of birth]1
           </label>
           <label>
             <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>

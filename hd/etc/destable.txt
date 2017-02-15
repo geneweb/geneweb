@@ -3,24 +3,10 @@
 <head>
   <!-- $Id: destable.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
-  <title>%nn;
-    %if;(evar.t = "D")
-      [*ancestors] ... [up to] ...%nn;
-    %elseif;(evar.t = "N" and evar.only = "on")
-      [*generation/generations]0 %evar.v;
-    %else;
-      %apply;a_of_b%with;
-        %if;(evar.t = "M")
-          %if;(evar.evt = "on")[*missing events]%else;[*missing ancestors]%end;
-        %else;[*ancestors]
-        %end;
-      %and;
-        %if;(public_name != "")%public_name;%else;%first_name;%end;
-        %if;(qualifier != "") %qualifier;%end;
-        %sp;%surname;
-      %end;
-    %end;
-  </title>
+<title>%nn;
+  %apply;a_of_b%with;[*descendants]%and;%self;%end;
+     %sp;[up to] %evar.v; %if;(evar.v>1)[*generation/generations]1%else;[*generation/generations]0%end;
+</title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -33,7 +19,7 @@
 <div class="container-fluid">
 <h1>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
-  %if;(alias != "") <em>(%alias;)</em>%end;
+     %sp;[up to] %evar.v; %if;(evar.v>1)[*generation/generations]1%else;[*generation/generations]0%end;
 </h1>
 
 %if;not cancel_links;
@@ -67,14 +53,6 @@
   %end;
 %end;
 
-%define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
-%end;
-
-%define;thegen(xx)
-  [*the %s generation:::xx]%nn;
-%end;
-
 %define;togen(xx)
   %if;(xx = 1)[*specify::generation/generations]0%nn;
   %elseif;(xx = 2)[*to the parents]%nn;
@@ -100,19 +78,17 @@
 %end;
 
 %define;image_MF(xx,wi_he)
-  %if;(xx != "x x")
-    %if;xx.is_male;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/male.png"%sp;
-           style="border: none" alt="[M/F]0"%/>%nn;
-    %elseif;xx.is_female;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
-           style="border: none" alt="[M/F]1"%/>%nn;
-    %else;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png"
-           style="border: none" alt="?" title="?"%/>%nn;
-    %end;
-    %sp;
+  %if;(wizard and not cancel_links)
+    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
+  %if;xx.is_male;
+    <i class="fa fa-mars male"></i>%nn;
+  %elseif;xx.is_female;
+    <i class="fa fa-venus female"></i>%nn;
+  %else;
+    <i class="fa fa-neuter neuter"></i>%nn;
+  %end;%nn;
+  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
 %end;
 
 %define;letter(xx)
@@ -799,14 +775,15 @@
 %define;table_row(prefx, ch_cnt, fam_cnt, ch_count)
   %lazy_force;
   %let;famx;%if;(not has_families)1%else;fam_cnt%end;%in;
+  %let;zro;%if;("prefx"="-1")0%else;1%end;%in;
   %if;(famx=1)
   <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-    %if;("prefx"!="")prefx.%end;ch_count.
+    %if;(zro=1)%if;("prefx"!="")prefx.%end;ch_count.%end;
   </td>
   %end;
   %if;(famx=1)
   <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-    %apply;image_MF("child", "11")
+    %apply;image_MF("self", "11")
     %apply;link%with;%access;%and;
       %first_name; %surname;
     %end
@@ -1021,7 +998,7 @@
   %end;
 %end;
 
-%define;one_child(prefx, ch_cnt, fam_cnt)
+%define;one_child(prefx, ch_cnt)
   %incr_count;
   %let;prfx;prefx%in;
   %if;has_families;
@@ -1037,29 +1014,29 @@
   %end;
 %end;
 
-%define;one_family(prefx, ch_cnt, fam_cnt)
+%define;one_family(prefx, ch_cnt)
   %reset_count;
     %let;prfx;prefx%in;
     %foreach;family;
       %foreach;child;
-        %apply;one_child(prfx, ch_cnt, family_cnt)
+        %apply;one_child(prfx, ch_cnt)
       %end;
     %end;
 %end;
 
-%define;one_level(xx, lv, max_l, prefx, ch_cnt, fam_cnt)
+%define;one_level(xx, lv, max_l, prefx, ch_cnt)
   %let;npref;%if;("prefx"!="")prefx.%end;ch_cnt%in;
   %if;(lv<max_l)
     %if;xx.has_families;
       %foreach;family;
         %foreach;child;
-          %apply;one_level("child", lv+1, max_l, npref, child_cnt, family_cnt)
+          %apply;one_level("child", lv+1, max_l, npref, child_cnt)
         %end;
       %end;
     %else;
     %end
   %else;
-    %apply;one_family(npref, ch_cnt, fam_cnt)
+    %apply;one_family(npref, ch_cnt)
   %end;
 %end;
 
@@ -1067,50 +1044,17 @@
   %reset_count;
   <tr class="ascends_table_header">%apply;table_header()</tr>
   %let;nb_col;%count;%in;
-%(  %reset_count;
-  %foreach;family;
-    <tr>
-    %apply;table_row("", count, family_cnt, 0)
-    </tr>
-  %end;
-  %(foreach;descendant_level;%)
-  %if;(evar.gen = "on")
-    <tr>
-      <th align="left" colspan="%nb_col;">[*generation/generations]0 %expr(level+1)</th>
-    </tr>
-  %end;
+  %let;max;%evar.v;%in;
   %reset_count;
-  %let;prefx;0%in;
-  %apply;one_family(prefx, 0, 0)
-  %if;(evar.gen = "on")
-    <tr>
-      <th align="left" colspan="%nb_col;">[*generation/generations]0 %expr(level+2)</th>
-    </tr>
-  %end;
-  %foreach;family; %( mes enfants %)
-    %foreach;child; %( chaque enfant %)
-    %let;prefx;%child_cnt;%in;
-      %reset_count;
-      %if;has_families;
-        %apply;one_family(prefx, child_cnt, family_cnt)
-      %end;
-    %end;
-  %end;
-  %)
-  %reset_count;
-  %let;prefx;0%in;
-  %apply;one_child(prefx, 0, 0)
-  %for;lev;0;4;
+  %apply;one_child("-1", 0)
+  %for;lev;0;max;
     <tr>
       <th align="left" colspan="%nb_col;">[*generation/generations]0 %expr(lev+1)</th>
     </tr>
-    %apply;one_level("self", 0, lev, "", "", 0)
+    %apply;one_level("self", 0, lev, "", "")
   %end;
-  
-  
-  
 </table>
-<p>[*total]: %count; [[person/persons]1@(c)]</p>
+%(<p>[*total]: %count; [[person/persons]1@(c)]</p>%)
 
 %include.trl;
 %include.copyr;
