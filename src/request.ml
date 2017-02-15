@@ -36,6 +36,7 @@ value very_unknown conf =
           prenom nom
       in
       do {
+        Wserver.http "404 Not Found";
         rheader conf title; print_link_to_welcome conf False; trailer conf;
       }
   | _ -> incorrect_request conf ]
@@ -46,6 +47,7 @@ value unknown conf n =
     Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found")) n
   in
   do {
+    Wserver.http "404 Not Found";
     rheader conf title; print_link_to_welcome conf False; trailer conf;
   }
 ;
