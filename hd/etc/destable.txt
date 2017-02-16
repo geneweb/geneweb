@@ -851,7 +851,7 @@ si t=I on affiche pas les données
       %end;
     %end;
   %end;
-  %if;(evar.child = "on")
+  %if;(evar.child = "on" and famx=1)
     %if;(xx.nb_families = 0)
       <td></td>
     %else;
@@ -864,7 +864,9 @@ si t=I on affiche pas les données
           %end;
         %end;
       %else;
-        <td>%xx.nb_children;</td>
+        <td>%xx.nb_children_tot;
+          %if;(xx.nb_families>1) (%xx.nb_families; fam.)%end;
+        </td>
       %end;
     %end;
   %end;
@@ -958,10 +960,12 @@ si t=I on affiche pas les données
         <tr>
         %apply;table_row("xx", prfx, 1, count, "0")
         </tr>
-      %foreach;family;
-        <tr>
-        %apply;table_row("xx.spouse", prfx, 1, count, "1")
-        </tr>
+      %if;(evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")
+        %foreach;family;
+          <tr>
+          %apply;table_row("xx.spouse", prfx, 1, count, "1")
+          </tr>
+        %end;
       %end;
     %end;
   %else;

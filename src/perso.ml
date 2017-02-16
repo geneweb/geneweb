@@ -3728,6 +3728,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           "</ul>\n"
         else ""
       else ""
+  | "nb_children_tot" ->
+      let n =
+        List.fold_left
+          (fun n ifam ->
+             n + Array.length (get_children (foi base ifam)))
+          0 (Array.to_list (get_family p))
+      in
+      string_of_int n 
   | "nb_children" ->
       (* TODO ???
       let mode_local =
