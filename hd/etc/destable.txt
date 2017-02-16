@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: destable.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
+  <!-- $Id: destable.txt 16/02/2017 01:19:21 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
-     %sp;[up to] %evar.v; %if;(evar.v>1)[*generation/generations]1%else;[*generation/generations]0%end;
+     %sp;[up to] %evar.v; %if;(evar.v>1)[generation/generations]1%else;[generation/generations]0%end;
 </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -19,7 +19,7 @@
 <div class="container-fluid">
 <h1>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
-     %sp;[up to] %evar.v; %if;(evar.v>1)[*generation/generations]1%else;[*generation/generations]0%end;
+     %sp;[up to] %evar.v; %if;(evar.v>1)[generation/generations]1%else;[generation/generations]0%end;
 </h1>
 
 %if;not cancel_links;
@@ -41,43 +41,7 @@
   [*the %s generation:::xx]%nn;
 %end;
 
-%define;togena(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
-%define;togen(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
-%define;gen(xx)
-  %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(evar.xx = 2)[*the parents]%nn;
-  %elseif;(evar.xx = 3)[*the grandparents]%nn;
-  %elseif;(evar.xx = 4)[*the great-grandparents]%nn;
-  %else;
-    %apply;thegen%with;
-      %apply;nth([nth (generation)], evar.xx)
-    %end;
-  %end;
-%end;
-
-%define;image_MF(xx,wi_he)
+%define;image_MF(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
@@ -213,7 +177,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
+  <img src="%image_prefix;/sosa.png" class="border-0" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
 %end;
 
 %define;display_sosa(xx)
@@ -274,7 +238,7 @@
           <table>
             %foreach;child.event;
               <tr>
-                <td valign="top" style="white-space: nowrap;" width="1">
+                <td valign="top" class="text-nowrap" width="1">
                   <span class="edate">
                     %if;event.has_date;%event.date; :
                     %else;--- :
@@ -341,7 +305,7 @@
                 <table>
                   %foreach;ancestor.event;
                     <tr>
-                      <td valign="top" style="white-space: nowrap;" width="1">
+                      <td valign="top" class="text-no-wrap" width="1">
                         <span class="edate">
                           %if;event.has_date;%event.date; :
                           %else;--- :
@@ -716,10 +680,6 @@
   %else;true%end;
 %end;
 
-%(
-   Display ascend in table
-%)
-
 %define;table_header()
   %reset_count;
   <th>[*n° d'Aboville]</th>
@@ -783,7 +743,7 @@
   %end;
   %if;(famx=1)
   <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-    %apply;image_MF("self", "11")
+    %apply;image_MF("self")
     %apply;link%with;%access;%and;
       %first_name; %surname;
     %end
@@ -797,35 +757,29 @@
   </td>
   %end;
   %if;(famx=1)
-  %if;(evar.birth = "on")
-    <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-      %if;has_approx_birth_date;
-        %slash_approx_birth_date;
-      %else;
-        &nbsp;
-      %end;
-    </td>
-  %end;
-  %end;
-  %if;(famx=1)
-  %if;(evar.birth_place = "on")
-    <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-      %if;has_approx_birth_place;
-        %approx_birth_place;
-      %else;
-        &nbsp;
-      %end;
-    </td>
-  %end;
+    %if;(evar.birth = "on")
+      <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
+        %if;has_approx_birth_date;
+          %slash_approx_birth_date;
+        %end;
+      </td>
+    %end;
+    %if;(evar.birth_place = "on")
+      <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
+        %if;has_approx_birth_place;
+          %approx_birth_place;
+        %end;
+      </td>
+    %end;
   %end;
   %if;(evar.marr = "on")
     %if;(nb_families = 0)
-      <td>&nbsp;</td>
+      <td></td>
     %else;
       %foreach;family;
         %if;(family_cnt = fam_cnt)
-          <td %if;(nb_families > 1) style="border-bottom:none" %end;>
-            %apply;image_MF("spouse", "11")
+          <td class="%if;(nb_families > 1)border-bottom-0%end;">
+            %apply;image_MF("spouse")
             %apply;link%with;%spouse.access;%and;
               %spouse;
             %end;
@@ -836,15 +790,13 @@
   %end;
   %if;(evar.spouse_date = "on")
     %if;(nb_families = 0)
-      <td>&nbsp;</td>
+      <td></td>
     %else;
       %foreach;family;
         %if;(family_cnt = fam_cnt)
-          <td %if;(nb_families > 1) style="border-bottom:none" %end;>
+          <td class="%if;(nb_families > 1)border-bottom-0%end;">
           %if;spouse.has_approx_birth_date;
             %spouse.slash_approx_birth_date;
-          %else;
-            &nbsp;
           %end;
           </td>
         %end;
@@ -853,46 +805,47 @@
   %end;
   %if;(evar.marr_date = "on")
     %if;(nb_families = 0)
-      <td>&nbsp;</td>
+      <td></td>
     %else;
-    %foreach;family;
-      %if;(family_cnt = fam_cnt)
-        <td %if;(family_cnt > 1) style="border-bottom:none" %end;>
-          %if;(slash_marriage_date != "")
-            %slash_marriage_date;
-          %else;
-            &nbsp;
-          %end;
-        </td>
-      %end;
+      %foreach;family;
+        %if;(family_cnt = fam_cnt)
+          <td class="%if;(family_cnt > 1)border-bottom-0%end; text-nowrap">
+            %if;(slash_marriage_date != "")
+              %if;(wizard and not cancel_links)
+                <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;">
+                  <img class="ml-0 mr-1 mb-1" src="%image_prefix;/picto_molette.png" width="13" height="13" alt="[modify::family/families]0" title="[modify::family/families]0"%/>%nn;
+                </a>%nn;
+              %end;
+              %slash_marriage_date;
+            %end;
+          </td>
+        %end;
       %end;
     %end;
   %end;
   %if;(evar.marr_place = "on")
     %if;(nb_families = 0)
-      <td>&nbsp;</td>
+      <td></td>
     %else;
-    %foreach;family;
-      %if;(family_cnt = fam_cnt)
-        <td %if;(nb_families>1) style="border-bottom:none" %end;>
-          %if;(marriage_place != "")
-            %marriage_place;
-          %else;
-            &nbsp;
-          %end;
-        </td>
-      %end;
+      %foreach;family;
+        %if;(family_cnt = fam_cnt)
+          <td class="%if;(nb_families>1)border-bottom-0%end;">
+            %if;(marriage_place != "")
+              %marriage_place;
+            %end;
+          </td>
+        %end;
       %end;
     %end;
   %end;
   %if;(evar.child = "on")
     %if;(nb_families = 0)
-      <td>&nbsp;</td>
+      <td></td>
     %else;
       %if;(evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")
         %foreach;family;
           %if;(family_cnt = fam_cnt)
-            <td align="center" %if;(nb_families > 1) style="border-bottom:none" %end;>
+            <td align="center" class="%if;(nb_families > 1)border-bottom-0%end;">
               %nb_children;
             </td>
           %end;
@@ -903,44 +856,32 @@
     %end;
   %end;
   %if;(famx=1)
-  %if;(evar.death = "on")
-    <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-      %if;has_approx_death_date;
-        %slash_approx_death_date;
-      %else;
-        &nbsp;
-      %end;
-    </td>
-  %end;
-  %end;
-  %if;(famx=1)
-  %if;(evar.death_place = "on")
-    <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-      %if;has_approx_death_date;
-        %approx_death_place;
-      %else;
-        &nbsp;
-      %end;
-    </td>
-  %end;
-  %end;
-  %if;(famx=1)
-  %if;(evar.death_age = "on")
-    <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-      %death_age;
-    </td>
-  %end;
-  %end;
-  %if;(famx=1)
-  %if;(evar.occu = "on")
-    <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
-      %if;(has_occupation)
-        %occupation
-      %else;
-        &nbsp;
-      %end;
-    </td>
-  %end;
+    %if;(evar.death = "on")
+      <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
+        %if;has_approx_death_date;
+          %slash_approx_death_date;
+        %end;
+      </td>
+    %end;
+    %if;(evar.death_place = "on")
+      <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
+        %if;has_approx_death_date;
+          %approx_death_place;
+        %end;
+      </td>
+    %end;
+    %if;(evar.death_age = "on")
+      <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
+        %death_age;
+      </td>
+    %end;
+    %if;(evar.occu = "on")
+      <td %if;(nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%nb_families;"%end;>
+        %if;(has_occupation)
+          %occupation
+        %end;
+      </td>
+    %end;
   %end;
 %end;
 
@@ -951,33 +892,29 @@
       %if;(family_cnt != 1)
         <tr>
           %if;(evar.marr = "on")
-            <td style="border-top:none; %if;(ancestor.nb_families != family_cnt) border-bottom:none %end;">
-              %apply;image_MF("spouse", "11")
+            <td class="border-top-0 %if;(ancestor.nb_families != family_cnt)border-bottom-0%end;">
+              %apply;image_MF("spouse")
               %apply;link%with;%spouse.access;%and;
                 %spouse;
               %end;
             </td>
           %end;
           %if;(evar.marr_date = "on")
-            <td style="border-top:none; %if;(ancestor.nb_families != family_cnt) border-bottom:none %end;">
+            <td class="border-top-0 %if;(ancestor.nb_families != family_cnt)border-bottom-0%end;">
               %if;(slash_marriage_date != "")
                 %slash_marriage_date;
-              %else;
-                &nbsp;
               %end;
             </td>
           %end;
           %if;(evar.marr_place = "on")
-            <td style="border-top:none; %if;(ancestor.nb_families != family_cnt) border-bottom:none %end;">
+            <td class="border-top-0 %if;(ancestor.nb_families != family_cnt)border-bottom-0%end;">
               %if;(marriage_place != "")
                 %marriage_place;
-              %else;
-                &nbsp;
               %end;
             </td>
           %end;
           %if;(evar.child = "on")
-            <td align="center" style="border-top:none; %if;(ancestor.nb_families != family_cnt) border-bottom:none %end;">
+            <td class="border-top-0 %if;(ancestor.nb_families != family_cnt)border-bottom-0%end;">
               %nb_children;
             </td>
           %end;
@@ -987,9 +924,6 @@
   %end;
 %end;
 
-%(
-   Main
-%)
 %( initialise le compteur à/avec la valeur passée en paramètre %)
 %define;init_count(prev_count)
   %reset_count;

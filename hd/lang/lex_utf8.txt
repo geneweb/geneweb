@@ -9356,7 +9356,7 @@ sv: antal levande personer:
 
     n° d'Aboville
 de: Nr. Aboville
-en: d'Aboville System number
+en: d'Aboville number
 es: N° de Aboville
 fi: Numero
 fr: n° d’Aboville
