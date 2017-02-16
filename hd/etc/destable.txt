@@ -861,7 +861,8 @@ si t=I on affiche pas les données
         %foreach;xx.family;
           %if;(family_cnt = fam_cnt)
             <td align="center" class="%if;(xx.nb_families > 1)border-bottom-0%end;">
-              %if;("yy"="1" or evar.t="H")%xx.nb_children;%end;
+              %if;("yy"="1" or evar.t="H")%xx.nb_children;
+              %else;%xx.nb_children_tot;%end;
             </td>
           %end;
         %end;
