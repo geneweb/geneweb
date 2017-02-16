@@ -158,7 +158,12 @@ function no_options () {
       <br>
       <label>
         <input type="radio" name="t" value="H" onclick="table_options ()"%/>
-         <span class="fa fa-table fa-fw"></span> [*table]
+         <span class="fa fa-table fa-fw"></span> [*table] ([spouses on same line])
+      </label>
+      <br>
+      <label>
+        <input type="radio" name="t" value="I" onclick="table_options ()"%/>
+         <span class="fa fa-table fa-fw"></span> [*table] ([spouses on separate lines])
       </label>
       %if;(bvar.max_desc_level = "" and max_desc_level > 12)
         ([maximum] 12 [generation/generations]1)

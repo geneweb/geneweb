@@ -9367,6 +9367,19 @@ oc: n° d'Aboville
 pt: n° de Aboville
 sv: nummer
 
+    d'Aboville
+de: Aboville
+en: d'Aboville
+es: Aboville
+fi: Numero
+fr: d’Aboville
+it: d’Aboville
+nl: Abovillenummer
+no: nummer
+oc: d'Aboville
+pt: de Aboville
+sv: nummer
+
     n° Sosa
 de: Nr. Sosa
 en: Sosa No.
