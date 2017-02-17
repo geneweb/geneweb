@@ -47,11 +47,12 @@
 </h1>
 
 %if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
+  <div class="btn-group float-%right; mb-1">
     %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+      <a role="button" class="btn btn-link px-0" href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+    <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><span class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></span></a>%nn;
+    <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
   </div>
 %end;
 
@@ -1034,10 +1035,62 @@
   %end;
 %end;
 
+%define;rebuild_url(MMM,XXX,vvv)
+  %let;new_url;%prefix;m=MMM;%nn;
+  p=%first_name;;n=%surname;;oc=%occ;;t=XXX;%nn;
+  %if;(evar.birth = "on")
+    birth=on;%nn;
+  %end;
+  %if;(evar.birth_place = "on")
+    birth_place=on;%nn;
+  %end;
+  %if;(evar.marr= "on")
+    marr=on;%nn;
+  %end;
+  %if;(evar.marr_date = "on")
+    marr_date=on;%nn;
+  %end;
+  %if;(evar.marr_place = "on")
+    marr_place=on;%nn;
+  %end;
+  %if;(evar.child = "on")
+    child=on;%nn;
+  %end;
+  %if;(evar.death = "on")
+    death=on;%nn;
+  %end;
+  %if;(evar.death_place = "on")
+    death_place=on;%nn;
+  %end;
+  %if;(evar.age = "on")
+    age=on;%nn;
+  %end;
+  %if;(evar.occu = "on")
+    occu=on;%nn;
+  %end;
+  %if;(evar.gen = "on")
+    gen=on;%nn;
+  %end;
+  %if;(evar.cgl = "on")
+    cgl=on;%nn;
+  %end;
+  v=vvv;%in;
+  %new_url;
+%end;
 
 %(
    Main
 %)
+
+%if;(evar.t = "Z" and not cancel_links)
+  <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=A"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors] </a>
+  <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%apply;rebuild_url%with;D%and;I;%and;%evar.v;%end" class="btn btn-secondary"><span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]</a>
+  <div class="btn-group ml-3" role="group" aria-label="First group">
+    %if;(evar.v>=3)<a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v-1)%end" class="btn btn-secondary" title="-1 [generation/generations]0">-</a>%end;
+    <input class="form-control text-center" size="12" value="%evar.v; [generation/generations]1" disabled>
+    <a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v+1)%end" class="btn btn-secondary" title="+1 [generation/generations]0">+</a>
+  </div>
+%end;
 
 %if;(evar.t = "P")
   %include.perso_short;
@@ -1072,7 +1125,7 @@
         %end;
       %end;
     </ul>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "N")
     %( short display %)
@@ -1112,7 +1165,7 @@
         %end;
       %end;
     </ul>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "M" and evar.evt = "on")
     %include.miss_evt;
@@ -1256,7 +1309,7 @@
         </li>
       %end;
     </ul>
-    <p style="clear:both;">[*total]: %count; [[person/persons]1@(c)]</p>
+    <p style="clear:both;">[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "M")
     %( missing ancestors by generation %)
@@ -1364,7 +1417,7 @@
         %end;
       %end;
     </table>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "G" and evar.only= "on")
     %( long display; only the selected generation %)
@@ -1493,7 +1546,7 @@
         %end;
       %end;
     </table>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "Z")
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
@@ -1519,7 +1572,7 @@
         %end;
       %end;
     </table>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
   %end;
 %end;
 

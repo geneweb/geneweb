@@ -41,9 +41,9 @@ function table_options () {
   /* On ne coche que celle qu'on veut. */
   $('input[type=checkbox][id=t_birth]').prop('checked', true);
   $('input[type=checkbox][id=t_birth_place]').prop('checked', true);
-  $('input[type=checkbox][id=t_spouse]').prop('disabled',false);
-  $('input[type=checkbox][id=t_spouse]').prop('checked', true);
-  $('input[type=hidden][id=t_spouse2]').val('');
+  $('input[type=checkbox][id=t_marr]').prop('disabled',false);
+  $('input[type=checkbox][id=t_marr]').prop('checked', true);
+  $('input[type=hidden][id=t_marr_on]').val('');
   $('input[type=checkbox][id=t_marr_place]').prop('checked', true);
   $('input[type=checkbox][id=t_marr_date]').prop('checked', true);
   $('input[type=checkbox][id=t_child]').prop('checked', true);
@@ -53,8 +53,8 @@ function table_options () {
   $('input[type=checkbox][id=t_gen]').prop('checked', true);
 }
 function table_spouse_disabled () {
-  $('input[type=checkbox][id=t_spouse]').prop('disabled',true);
-  $('input[type=hidden][id=t_spouse2]').val('on');
+  $('input[type=checkbox][id=t_marr]').prop('disabled',true);
+  $('input[type=hidden][id=t_marr_on]').val('on');
 }
 --></script>
 <h1 class="text-center my-3">%nn;
@@ -178,10 +178,10 @@ function table_spouse_disabled () {
         </p>
         <p>
           <label>
-            <input type="checkbox" id="t_spouse" name="spouse" value="on"%/>
+            <input type="checkbox" id="t_marr" name="marr" value="on"%/>
             [*spouse/spouses]1
           </label>
-          <input type="hidden" id="t_spouse2" name="spouse" value=""%/>
+          <input type="hidden" id="t_marr_on" name="marr" value=""%/>
           <label>
             <input type="checkbox" id="t_marr_date" name="marr_date" value="on"%/>
             [*date of marriage]
