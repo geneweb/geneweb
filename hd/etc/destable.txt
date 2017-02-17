@@ -150,7 +150,7 @@
 si t=H on active rowspan pour les données de l’individu et du couple
 si t=I on affiche pas les données
 %)
-%define;table_row(xxx, prefx, fam_cnt, ch_count, yyy)
+%define;table_row(xxx, prefx, fam_cnt, ch_count, yyy, zzz)
   %let;famx;%if;(not has_families or evar.t="I")1%else;fam_cnt%end;%in;
   %let;zro;%if;("prefx"="-1")0%else;1%end;%in;
   %let;row_span;%if;(nb_families>1 and evar.t="H" and (evar.spouse = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%xxx.nb_families;"%end;%in;
@@ -222,18 +222,32 @@ si t=I on affiche pas les données
       <td></td>
     %else;
       %foreach;xxx.family;
-        %if;(family_cnt = fam_cnt)
-          <td class="align-middle text-right">
-            %if;("yyy"="1" or evar.t="H")
-              %if;(wizard and not cancel_links)
-                <a class="d-block" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[*modify::family/families]0">
-                %if;(slash_marriage_date != "")%slash_marriage_date;%else;<span class="fa fa-venus-mars 
-                %if;((xxx.is_male and spouse.xxx.is_female) or (xxx.is_female and xxx.spouse.is_female))venus-mars%elseif;(xxx.is_male and spouse.xxx.is_male)mars-double%else;(xxx.is_female and spouse.xxx.is_female)venus-double%end; fa-rotate-180 small"></span>%end;</a>%nn; %( WIP not working atm %)
-              %else;
-                %slash_marriage_date;
+        %if;(evar.t="H")
+          %if;(family_cnt = fam_cnt)
+            <td class="align-middle text-right">
+              %if;("yyy"="1" or evar.t="H")
+                %if;(wizard and not cancel_links)
+                  <a class="d-block" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[*modify::family/families]0">
+                  %if;(slash_marriage_date != "")%slash_marriage_date;%else;<span class="fa fa-venus-mars 
+                  %if;((xxx.is_male and spouse.xxx.is_female) or (xxx.is_female and xxx.spouse.is_female))venus-mars%elseif;(xxx.is_male and spouse.xxx.is_male)mars-double%else;(xxx.is_female and spouse.xxx.is_female)venus-double%end; fa-rotate-180 small"></span>%end;</a>%nn; %( WIP not working atm %)
+                %else;
+                  %slash_marriage_date;
+                %end;
               %end;
-            %end;
-          </td>
+            </td>
+          %end;
+        %else;
+          %if;(("yyy"="0" and family_cnt = fam_cnt) or xxx.spouse = zzz)
+            <td class="align-middle text-right">
+                %if;(wizard and not cancel_links)
+                  <a class="d-block" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[*modify::family/families]0">
+                  %if;(slash_marriage_date != "")%slash_marriage_date;%else;<span class="fa fa-venus-mars 
+                  %if;((xxx.is_male and spouse.xxx.is_female) or (xxx.is_female and xxx.spouse.is_female))venus-mars%elseif;(xxx.is_male and spouse.xxx.is_male)mars-double%else;(xxx.is_female and spouse.xxx.is_female)venus-double%end; fa-rotate-180 small"></span>%end;</a>%nn; %( WIP not working atm %)
+                %else;
+                  %slash_marriage_date;
+                %end;
+            </td>
+          %end;
         %end;
       %end;
     %end;
@@ -243,12 +257,22 @@ si t=I on affiche pas les données
       <td></td>
     %else;
       %foreach;xxx.family;
-        %if;(family_cnt = fam_cnt)
+        %if;(evar.t="H")
+          %if;(family_cnt = fam_cnt)
+            <td class="align-middle">
+              %if;(marriage_place != "")
+                %if;("yyy"="1" or evar.t="H")%marriage_place;%end;
+              %end;
+            </td>
+          %end;
+        %else;
+          %if;(("yyy"="0" and family_cnt = fam_cnt) or xxx.spouse = zzz)
           <td class="align-middle">
             %if;(marriage_place != "")
-              %if;("yyy"="1" or evar.t="H")%marriage_place;%end;
+              %marriage_place;
             %end;
           </td>
+          %end;
         %end;
       %end;
     %end;
@@ -359,24 +383,24 @@ si t=I on affiche pas les données
     %if;(evar.t="H")
       %foreach;family;
         <tr>
-        %apply;table_row("xxx", prfx, family_cnt, count, "0")
+        %apply;table_row("xxx", prfx, family_cnt, count, "0", "xxx")
         </tr>
       %end;
     %elseif;(evar.t="I")
         <tr>
-        %apply;table_row("xxx", prfx, 1, count, "0")
+        %apply;table_row("xxx", prfx, 1, count, "0", "xxx")
         </tr>
       %if;(evar.spouse = "on" or evar.marr_date = "on" or evar.marr_place = "on")
         %foreach;family;
           <tr>
-          %apply;table_row("xxx.spouse", prfx, 1, count, "1")
+          %apply;table_row("xxx.spouse", prfx, 1, count, "1", "xxx")
           </tr>
         %end;
       %end;
     %end;
   %else;
     <tr>
-      %apply;table_row("xxx", prfx, family_cnt, count, "0")
+      %apply;table_row("xxx", prfx, family_cnt, count, "0", "xxx")
     </tr>
   %end;
 %end;
@@ -411,9 +435,9 @@ si t=I on affiche pas les données
   %end;
 %end;
 
-%define;rebuild_url(X)
+%define;rebuild_url(XXX, vvv)
   %let;new_url;%prefix;m=D;
-  p=%first_name;;n=%surname;;t=X;
+  p=%first_name;;n=%surname;;oc=%occ;;t=XXX;
   %if;(evar.birth = "on")
     birth=on;
   %end;
@@ -450,19 +474,19 @@ si t=I on affiche pas les données
   %if;(evar.cgl = "on")
     cgl=on;
   %end;
-  v=%evar.v;%in;
+  v=vvv;%in;
   %new_url;
 %end;
 
 %if;(not cancel_links)
   %if;(evar.spouse="on" or evar.marr_place="on" or evar.marr_date="on")
-    <a role="button" class="btn btn-link mx-0 px-0 mb-1" href="%apply;rebuild_url%with;%if;(evar.t="H")I%elseif;(evar.t="I")H%end;%end;"><i class="fa fa-table fa-lg fa-fw" title="[*toggle table mode]"></i>%nn;
+    <a role="button" class="btn btn-link mx-0 px-0 mb-1" href="%apply;rebuild_url%with;%if;(evar.t="H")I%elseif;(evar.t="I")H%end;%and;%evar.v;%end;"><i class="fa fa-table fa-lg fa-fw" title="[*toggle table mode]"></i>%nn;
     %if;(evar.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]0</a>
   %end;
   <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=D"><i class="fa fa-cog fa-lg fa-fw" title="[*back to menu]"></i>[*options] [descendants] </a>
 %end;
 
-  v=!¡ %( TODO : input number to change v= upto max_desc_level %)
+  v=!¡ %( TODO : input number to change v= upto max_desc_level rebuild_url has now two parameters: H/I, evar.v%)
 
 <table class="table table-sm ascends_table mt-2">
   %reset_count;
@@ -479,11 +503,6 @@ si t=I on affiche pas les données
     %apply;one_level("self", 0, lev, "", 1)
   %end;
 </table>
-
-%( TODO 
-* la num. d'Aboville est incorrect pour les familles multiples à la génération 2 
-* en mode t=I le mariage donnés sont les premiers mariages des conjoints et noms les mariages de l'invidu
-%)
 
 %define;desc_count()
   %foreach;descendant_level;
