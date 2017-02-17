@@ -1035,7 +1035,8 @@ hr.full
 {
  border:1px solid black;
  vertical-align:top;
- padding:2px;
+ padding:4px;
+ empty-cells: show;
 }
 
 .ascends_table_header th,

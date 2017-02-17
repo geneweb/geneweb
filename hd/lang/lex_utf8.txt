@@ -14290,3 +14290,7 @@ fr: affichage pleine largeur/affichage sur deux colonnes
     dd/mm/yyyy
 en: dd/mm/yyyy
 fr: jour/mois/année
+
+    spouses info
+en: detailed informations about spouses
+fr: informations détaillées sur les conjoints
