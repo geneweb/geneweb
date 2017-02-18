@@ -1,14 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
   <!-- $Id: gwb2ged.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
-
-  <title>
+    <title>
 [
 de: GEDCOM-Datei extrahieren
 en: Extract a GEDCOM file
@@ -19,10 +14,12 @@ it: Estrazione di un file GEDCOM
 lv: Izveidot GEDCOM datni
 sv: Exportera en GEDCOM-fil
 ]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
+  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none"%/>
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
 </head>
-
 <body background="images/gwback.jpg">
-
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
@@ -47,7 +44,7 @@ de: W&auml;hle deine Datenbank:
 en: Select your database:
 es: Seleccione Ud. su base de datos :
 fi: Valitse tietokanta:
-fr: S&eacute;lectionnez votre base de donn&eacute;es:
+fr: S&eacute;lectionnez votre base de donn&eacute;es&nbsp;:
 it: Selezionate la vostra base di dati:
 lv: Izvçlieties datu bâzi:
 sv: Välj din databas:
@@ -58,14 +55,14 @@ sv: Välj din databas:
 <dl><dt><dd><table style="border:1px solid" cellspacing="0" cellpadding="1">
 
 %b{<tr align="left">
-<td><input type="radio" name="anon" value="%a" />&nbsp;&nbsp;&nbsp;</td>
-<td>%a</td></tr>|
+<td><input type="radio" name="anon" id="anon%a" value="%a" />&nbsp;&nbsp;&nbsp;
+<label for="anon%a">%a</label></td></tr>|
 <tr align="left"><td>- [
-de: keine Datenbank vorhanden
-en: there is no database at present
+de: Keine Datenbank vorhanden
+en: here is no database at present
 es: actualmente ninguna base de datos existente
 fi: ei tietokantaa saatavilla
-fr: il n'y a aucune base de donn&eacute;es actuellement
+fr: il n’y a aucune base de données actuellement
 it: attualmente non esiste nessuna base di dati
 lv: nav nevienas datu bâzes
 sv: det finns ingen databas för tillfället
@@ -100,7 +97,8 @@ sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver
 
 <p />
 
-<dl><dt><dd><input name="o" size="30" /></dl>
+<dl><dt><dd>-o<br>
+<input name="o" size="30" /></dl>
 
 <p />
 
@@ -119,9 +117,11 @@ sv: Välj de optioner du vill ha:
 
 <dl><dt><dd><table style="border:1px solid">
 
+<tr><td>-charset</td></tr>
+
 <tr align="left"><td>
-<input type="radio" name="charset" value="ASCII" />&nbsp;&nbsp;&nbsp;</td>
-<td>[
+<input type="radio" name="charset" value="ASCII" id="ASCII"/>&nbsp;&nbsp;&nbsp;
+<label for="ASCII">[
 de: Kodiere die Zeichen in ASCII.
 en: Encode the characters in ASCII.
 es: Codificar los car&aacute;cteres en ASCII.
@@ -130,12 +130,12 @@ fr: Coder les caract&egrave;res en ASCII.
 it: Codificare i caratteri in ASCII.
 lv: Burti ASCII kodçjumâ.
 sv: Koda tecknen i ASCII.
-]</td>
+]</label></td>
 </tr>
 
 <tr align="left"><td>
-<input type="radio" name="charset" value="UTF-8" checked="checked" />&nbsp;&nbsp;&nbsp;</td>
-<td>[
+<input type="radio" name="charset" value="UTF-8" id="UTF-8" checked="checked" />&nbsp;&nbsp;&nbsp;
+<label for="UTF-8">[
 de: Kodiere die Zeichen in UTF-8.
 en: Encode the characters in UTF-8.
 es: Codificar los car&aacute;cteres en UTF-8.
@@ -144,12 +144,12 @@ fr: Coder les caract&egrave;res en UTF-8.
 it: Codificare i caratteri in UTF-8.
 lv: Burti UTF-8 kodçjumâ.
 sv: Koda tecknen i UTF-8.
-]</td>
+]</label></td>
 </tr>
 
 <tr align="left"><td>
-<input type="radio" name="charset" value="ANSEL" />&nbsp;&nbsp;&nbsp;</td>
-<td>[
+<input type="radio" name="charset" value="ANSEL" id="ANSEL"/>&nbsp;&nbsp;&nbsp;
+<label for="ANSEL">[
 de: Kodiere die Zeichen in ANSEL.
 en: Encode the characters in ANSEL.
 es: Codificar los car&aacute;cteres en ANSEL.
@@ -157,40 +157,77 @@ fr: Coder les caract&egrave;res en ANSEL.
 it: Codificare i caratteri in ANSEL.
 lv: Burti ANSEL kodçjumâ.
 sv: Koda tecknen i ANSEL.
-]</td>
+]</label></td>
 </tr>
 
 </table></dl>
 
 <dl><dt><dd><table style="border:1px solid">
 <tr align=left>
-<td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
-<td>[
-de: W&auml;hrend der Operation sparsam mit dem Speicher umgehen
+<td><input type=checkbox name=mem value=on id=mem>&nbsp;&nbsp;&nbsp;
+<label for=mem>-mem</label>[
+de: : w&auml;hrend der Operation sparsam mit dem Speicher umgehen
     (ist aber langsamer).
-en: Save the memory space during the operation (but it will be slower).
-es: Economizar el espacio-memoria durante la operaci&oacute;n
+en: : Save the memory space during the operation (but it will be slower).
+es: : economizar el espacio-memoria durante la operaci&oacute;n
     (pero esta sera mas lenta).
-fr: &Eacute;conomiser l'espace m&eacute;moire pendant l'op&eacute;ration
+fr:  : &eacute;conomiser l'espace m&eacute;moire pendant l'op&eacute;ration
     (mais ce sera plus lent).
-it: Economizzare lo spazio-memoria durante l'operazione
+it: : economizzare lo spazio-memoria durante l'operazione
     (che per&ograve; sar&agrave; pi&ugrave; lenta)
-lv: Darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).
-sv: Spara minne under operationen (men det kommer att gå saktare).
+lv: : darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).
+sv: : spara minne under operationen (men det kommer att gå saktare).
 ]</td>
 </tr>
 </table></dl>
 
 <dl><dt><dd><table style="border:1px solid">
+<tr align=left>
+<td><input type=checkbox name=nn id=nn value=on>&nbsp;&nbsp;&nbsp;
+<label for=nn>-nn</label>[
+en: : Do not extract notes.
+fr:  : ne pas extraire les notes.
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table style="border:1px solid">
+<tr align=left>
+<td><input type=checkbox name=nopicture id=nopicture value=on>&nbsp;&nbsp;&nbsp;
+<label for=nopicture>-nopicture</label>[
+en: : Dont extract individual pictures (portraits).
+fr:  : ne pas extraire les images individuelles (portraits).
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table style="border:1px solid">
+<tr align=left>
+<td><input type=checkbox name=picture-path id=picture-path value=on>&nbsp;&nbsp;&nbsp;
+<label for=picture-path>-picture-path</label>[
+en: : Extract individual pictures path (portraits).
+fr:  : extraire le chemin des images individuelles (portraits).
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd>[
+en: In the boxes below, always enter a value in the Num entry (occurence) ("0" possibly).
+fr: Dans les cadres ci-dessous, toujours fournir une occurence pour le champs "Num" (&eacute;ventuellement "0").
+]</dl>
+
+
+<dl><dt><dd><table style="border:1px solid">
 <tr align=left><td>&nbsp;</td>
-<td colspan=3>[
-de: Nur die Vorfahren ausw&auml;hlen von...
-en: Extract only the ancestors of...
-es: Extraer solamente los antepasados de...
-fr: N'extraire que les anc&ecirc;tres de...
-it: Estrarre solamente gli antenati di...
-lv: Izmantot tikai...
-sv: Exportera endast anorna till...
+<td colspan=3>
+-a[
+de: : nur die Vorfahren ausw&auml;hlen von&hellip;
+en: : Extract only the ancestors of&hellip;
+es: : extraer solamente los antepasados de&hellip;
+fr:  : n'extraire que les anc&ecirc;tres de&hellip;
+it: : estrarre solamente gli antenati di&hellip;
+lv: : izmantot tikai&hellip;
+sv: : exportera endast anorna till&hellip;
 ]</td></tr>
 
 <tr align=left><td>[
@@ -234,18 +271,19 @@ en:
 es: 
 fr: 
 it: 
-lv: <tr align=left><td>&nbsp;</td><td colspan=3>...vecâkus</td></tr>
+lv: <tr align=left><td>&nbsp;</td><td colspan=3>&hellip;vecâkus</td></tr>
 sv: 
 ]</table></dl>
 
 <dl><dt><dd><table style="border:1px solid">
-<tr align=left><td>&nbsp;</td><td colspan=3>[
-de: Nur die Nachkommen ausw&auml;hlen von...
-en: Extract only the descendants of...
-es: Extraer solamente los descendientes de...
-fr: N'extraire que les descendants de...
-it: Estrarre solamente i discendenti di...
-lv: Izmantot tikai...
+<tr align=left><td>&nbsp;</td><td colspan=3>
+-d[
+de: : nur die Nachkommen ausw&auml;hlen von&hellip;
+en: : Extract only the descendants of&hellip;
+es: : extraer solamente los descendientes de&hellip;
+fr:  : n'extraire que les descendants de&hellip;
+it: : estrarre solamente i discendenti di&hellip;
+lv: : izmantot tikai&hellip;
 ]</td>
 </tr>
 
@@ -287,7 +325,7 @@ lv: Uzvârds
 de: Falls du oben beide Optionen gew&auml;hlt hast, wird die Schnittmenge
     extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
     einen und Nachkommen des anderen sind.
-en: If you use both above options, the intersection is assumed:
+en: If you use both above options, the intersection is assumed:<br>
     persons <em>at the same time</em> ancestors of the one and descendants
     of the other.
 es: Si Ud. utiliza las dos opciones indicadas m&aacute;s arriba, la
@@ -295,7 +333,7 @@ es: Si Ud. utiliza las dos opciones indicadas m&aacute;s arriba, la
     personas <em>al mismo tiempo</em>
     antepasados del uno y descendientes del otro.
 fr: Si vous utilisez les deux options ci-dessus, c'est
-    l'intersection qui comptera: personnes <em>&agrave; la fois</em>
+    l'intersection qui comptera :<br>personnes <em>&agrave; la fois</em>
     anc&ecirc;tres de l'un et descendants de l'autre.
 it: Se utilizzate insieme le due opzioni precedenti, &egrave;
     l'intersezione che sar&agrave; presa in considerazione; ossia le
@@ -308,13 +346,107 @@ sv: Om du väljer de båda valen ovan, kommer
     anor av den ena och ättlingar av den andra.
 ]</dl>
 
+<dl><dt><dd><table style="border:1px solid">
+<tr align=left><td>&nbsp;</td><td colspan=3>
+-aws[
+en: : Extract ancestors with siblings of&hellip;
+fr:  : extraire les anc&ecirc;tres avec fratries de&hellip;
+]</td>
+</tr>
+
+<tr align=left><td>[
+de: Vorname
+en: First name
+es: Nombre
+fr: Pr&eacute;nom
+it: Nome
+lv: Vârds
+]</td>
+<td><input name="aws1" size=30 maxlength=200></td>
+
+<td>[
+de: Nr
+en: Num
+es: N&uacute;m
+fr: Num
+it: Numero
+lv: Nr
+]</td>
+<td><input name="aws2" size=5 maxlength=8></td></tr>
+
+<tr align=left><td>[
+de: Nachname
+en: Surname
+es: Apellido
+fr: Nom
+it: Cognome
+lv: Uzvârds
+]
+</td>
+<td colspan=3><input name="aws3" size=40 maxlength=200></td>
+
+</tr>
+</table></dl>
+
+<dl><dt><dd><table style="border:1px solid">
+<tr align=left><td>&nbsp;</td><td colspan=3>
+-s[
+en: : extract surname (usable several times).
+fr:  : extraire un nom de famille (utilisable plusieurs fois).
+]</td>
+</tr>
+
+<tr align=left><td>[
+de: Nachname
+en: Surname
+es: Apellido
+fr: Nom
+it: Cognome
+lv: Uzvârds
+]
+</td>
+<td colspan=3><input name="s" size=40 maxlength=200></td>
+
+</tr>
+</table></dl>
+
+<dl><dt><dd><table style="border:1px solid">
+<tr align=left><td>&nbsp;</td><td colspan=3>
+-c[
+en: : When a person is born less than <num> years ago, it is not exported unless it is Public.<br> 
+    All the spouses and descendants are also censored.
+fr:  : quand une personne est n&eacute;e il y a moins de &hellip; ann&eacute;es, elle n'est pas export&eacute;e sauf<br>
+    si elle est "publique". La censure s'applique aux &eacute;poux et descendants. 
+]</td>
+</tr>
+
+<tr align=left><td>[
+en: Years
+fr: Ann&eacute;es
+]
+</td>
+<td colspan=3><input name="c" size=10 maxlength=200></td>
+
+</tr>
+</table></dl>
+
+<dl><dt><dd><table style="border:1px solid">
+<tr align=left>
+<td><input type=checkbox name=nsp id=nsp value=on>&nbsp;&nbsp;&nbsp;
+<label for=nsp>-nsp</label>[
+en: : Do not extract spouses' parents (for options -s and -d).
+fr:  : ne pas extraire les parents des &eacute;poux (pour les options -s et -d).
+]</td>
+</tr>
+</table></dl>
+
 <p>
 
 [
 de: Dann dr&uuml;cke diesen Knopf:
 en: Then push this button:
 es: Finalmente apoye en el bot&oacute;n:
-fr: Puis appuyez sur ce bouton:
+fr: Puis appuyez sur ce bouton :
 it: Poi cliccate su questo bottone:
 lv: Tad nospiediet ðo podziòu:
 sv: Tryck sedan på denna knapp:

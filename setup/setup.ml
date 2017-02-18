@@ -467,6 +467,9 @@ value rec copy_from_stream conf print strm =
           | 'r' ->
               print_specific_file conf print
                 (Filename.concat setup_dir.val "gwd.arg") strm
+          | 'R' ->
+              print_specific_file conf print
+                (Filename.concat (Filename.concat setup_dir.val "setup" ) "css.txt") strm
           | 's' -> for_all conf print (selected conf.env) strm
           | 't' ->
               print_if conf print (IFDEF UNIX THEN False ELSE True END) strm
