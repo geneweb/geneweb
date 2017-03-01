@@ -79,8 +79,7 @@ value print_image_file fname =
      (".gif", "gif", "image/gif"); 
      (".pdf", "pdf", "application/pdf"); 
      (".htm", "html", "text/html"); 
-     (".html", "html", "text/html")
-    ]
+     (".html", "html", "text/html")]
 ;
 
 (* ************************************************************************** *)

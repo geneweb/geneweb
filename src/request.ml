@@ -631,7 +631,8 @@ value family_m conf base =
       match p_getenv conf.env "s" with
       [ Some f -> 
         let f =
-          if String.sub f (String.length f - 4) 4 = ".txt" then String.sub f 0 (String.length f - 4)
+          if String.sub f (String.length f - 4) 4 = ".txt" then 
+          	String.sub f 0 (String.length f - 4)
           else f
         in
         Srcfile.print_source conf base f ]
