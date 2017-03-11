@@ -1,3 +1,7 @@
+p::first-letter {
+  text-transform : capitalize
+}
+
 /* Fix p_mod width in menubar dropdown */
 div.p_mod {
   width: 610px
@@ -823,13 +827,6 @@ div.summary ul ul
 .fp_source > li
 {
   padding: 2px;
-}
-
-/* ----------------------------- timeline.txt ----------------------------- */
-
-.edate {
- float: right;
- text-align: right;
 }
 
 /* ------------------ Display by branch/alphabetic order ------------------ */
