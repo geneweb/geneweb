@@ -8,7 +8,7 @@
 %end;
 %if;(bvar.use_cdn="yes")
   %if;(evar.templ="")
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
   %end;
@@ -42,5 +42,45 @@
       document.getElementById("reload_close").focus();
     }
   }
+  </script>
+%end;
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+
+%( build p_mod input by clicking on module buttons %)
+%if;(evar.p_mod!="" or evar.p!="" or evar.n!="");
+  <script>
+    %for;i;1;27;
+      %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
+      %if;(m_nam!="")
+        %let;m_ltr;%apply;letter(i)%in;
+        %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
+        %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
+        %for;j;0;m_opt_nb;
+          %let;k;%expr(j+1)%in;
+          %let;m_opt_nam;%apply;get_opt_nam(m_nam, k)%in;
+          $('#%m_ltr;%k;').on('click', function () {
+            var text = $('#p_mod');
+            text.val(text.val() + '%m_ltr;%k;');
+            var text = $('#p_mod_builder');
+            text.html(text.html() + '<img src="%image_prefix;/%m_nam;_%k;.jpg" width="300px">\n');
+          });
+        %end;
+      %end;
+    %end;
+    $('#zz').on('click', function () {
+      var text = $('#p_mod');
+      text.val('zz');
+    });
+    $('#p_mod-clear').on('click', function () {
+      var text = $('#p_mod');
+      text.val('');
+      var text = $('#p_mod_builder');
+      text.val('');
+      text.html('<img src="%image_prefix;/menubar_1.jpg">');
+    });
   </script>
 %end;

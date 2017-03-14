@@ -1,34 +1,56 @@
+/* Capitalization unavailable in note from Ocaml */
 p::first-letter {
-  text-transform : capitalize
+  text-transform: capitalize;
 }
 
-/* Fix p_mod width in menubar dropdown */
-div.p_mod {
-  width: 610px
+.pmod::first-letter {
+  font-weight: bold
 }
 
-/* Fixed mage width on small 3gen tree */
+/* Image popover in p_mod */
+img.image-popover {
+  width: 300px
+}
+
+/* “Center” p_mod dropdown in menubar */
+.p_mod-dropdown-menu {
+  left: 38%;
+  right: auto;
+  transform: translateX(-38%);
+}
+
+.p_mod-dropdown-menu-wizard {
+  left: 20%;
+  right: auto;
+  transform: translateX(-20%);
+}
+
+div.p_mod_builder {
+  width: 300px;
+}
+
+/* Fixed ancestors image width on perso_module/tree_3gen_photo */
 img.image_small_size {
-  height: 70px
+  height: 70px;
 }
 
-/* Fixed spouse/child image width on perso_module/unions c3 */
-img.spouse_width_c3 {
-  width: 8.5rem
-}
-
-img.child_width_c3 {
-  width: 4rem
-}
-
-span.spouse_width_c3 {
-  width: 8.5rem;
+span.image_small_size {
   border-style: solid;
-  border-width: thin
+  border-width: thin;
+  font-size: 2.7rem;
+  font-weight: 320
 }
 
-span.child_width_c3 {
+/* Fixed image size (width) on perso_module/parents and unions */
+.big_image{
+  width: 8.5rem;
+}
+
+.small_image{
   width: 4rem;
+}
+
+.noimage {
   border-style: solid;
   border-width: thin
 }
@@ -38,20 +60,26 @@ table#dag {
   line-height: 1.05
 }
 
-/* Sex symbol color and margin-right for alignement */
+/* Sex symbol color */
 .male {
   color: #318CE7;
-  margin-right: 4px
+}
+
+.male:hover {
+  color: #014c8c;
 }
 .female {
   color: #F653A6;
-  margin-right: 6px
+}
+.female:hover {
+  color: red;
 }
 .neuter{
   color: grey;
-  margin-right: 6px
 }
-
+.neuter:hover {
+  color: black;
+}
 /* Fixed width button in books indexes */
 /* not very nice > try to center with monospace font? */
 a.book-char{
@@ -91,7 +119,11 @@ dl {
   margin-left: 1.3rem;
 }
 
-/* Fix pre line-height */
+/* Fix tree and pre line-height */
+.tree-vert {
+  line-height: 1.2rem;
+}
+
 pre {
   line-height:0.9rem;
   zoom:100%;
@@ -1038,8 +1070,7 @@ hr.full
 /* --- Ascendants/Descendants table --- */
 .ascends_table, .descends_table
 {
- border-width:1px;
- border-style:solid;
+ border: 1px solid black;
  border-collapse:collapse;
 }
 
@@ -1059,7 +1090,6 @@ hr.full
 .list_eclair_table_header th
 {
  background-color: #e7edb3;
- vertical-align: middle;
 }
 
 /* --- Ascendants/Descendants liste rédigée --- */

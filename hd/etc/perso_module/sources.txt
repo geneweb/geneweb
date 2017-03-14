@@ -11,13 +11,13 @@
 %end;
 %if;(count>0 and (op_m=1 or op_m=2))
   %if;(count=1)
-    <h3 class="highlight">[*source/sources]0</h3>
+    <h2>[*source/sources]0</h2>
   %else;
-    <h3 class="highlight">[*source/sources]1</h3>
+    <h2>[*source/sources]1</h2>
   %end;
   <ul>
   %foreach;source;
-    <li><em>%apply;capitalize(source_type)[:] %source;</em></li>
+    <li>%apply;capitalize(source_type)[:] %source;.</li>
   %end;
   %if;(op_m=2)
     %reset_count;
@@ -27,11 +27,11 @@
           event.name!=[baptism] and
           event.name!=[marriage event] and
           event.name!=[death] and
-          event.name!=[burial]and
+          event.name!=[burial] and
           event.name!="special" and
           event.name!="special1" and
           event.name!="special2")
-          <li><em>%apply;capitalize(event.name)[:] %event.src;</em></li>
+          <li>%apply;capitalize(event.name)[:] %event.src;.</li>
         %end;
         %if;((event.name="special" or
              event.name="special1" or

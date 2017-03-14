@@ -1,4 +1,4 @@
-<!-- perso_module/timeline v7.00 11/03/2017 01:50:02 -->
+<!-- perso_module/chronologie v7.00 28/03/2017 19:53:22 -->
 
 %define;event_tree(z1)
   %reset_count;
@@ -131,11 +131,11 @@
 
 %if;(has_event)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h3 class="highlight my-1">[*time line]%nn;
+  <h2 class=" my-1">[*time line]%nn;
     %if;(not cancel_links)
       <a %apply;relations_tree(l_ref)><img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/></a>
     %end;
-  </h3>
+  </h2>
 
   %reset_count2;
   %empty_sorted_list;

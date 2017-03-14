@@ -30,10 +30,10 @@
 %if;(count>0 and op_m=1 and (wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
       (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
   <div class="d-flex justify-content-end">
-    <h3 class="highlight my-1 mr-auto ">[*note/notes]1</h3>
+    <h2 class="my-1 mr-auto">[*note/notes]1</h2>
     %apply;link_pages()
   </div>
-  <h5 class="highlight my-1">[*individual notes]</h5>
+  <h3 class="my-1">[*individual notes]</h3>
   %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
     <p>%apply;capitalize(linked_page.BNOTE).</p>
   %end;
@@ -49,9 +49,9 @@
       %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
         %if;((count=1) and ((wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
             (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))) 
-          <h5 class="highlight">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h5>
+          <h3>%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h3>
         %elseif;(count=1)
-          <h3 class="highlight">%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h3>
+          <h2>%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h3>
         %end;
         <dl> 
           <dt>
@@ -67,26 +67,26 @@
     <p>%apply;capitalize(linked_page.NOTE).</p>
   %end;
 %elseif;(count>0 and op_m=2)
-  <h3 id="notes" class="highlight mt-2">[*note/notes]1</h3>
+  <h3 id="notes" class="mt-2">[*note/notes]1</h3>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
       <blockquote>%apply;capitalize(linked_page.BNOTE).</blockquote>
     %end;
     %if;has_notes;
-      <h5 class="highlight">[*individual notes]</h5>
+      <h3>[*individual notes]</h3>
       <blockquote>%notes;</blockquote>
     %end;
     %if;has_birth_note;
-      <h5 class="highlight">[*birth]</h5>
+      <h3>[*birth]</h3>
       <blockquote>%birth_note;</blockquote>
     %end;
     %if;has_baptism_note;
-      <h5 class="highlight">[*baptism]</h5>
+      <h3>[*baptism]</h3>
       <blockquote>%baptism_note;</blockquote>
     %end;
     %foreach;family;
       %if;(has_comment or has_marriage_note)
-        <h5 class="highlight">[*marriage notes/marriages notes]0%sp;
-        [with] %spouse.first_name; %spouse.surname;</h5>
+        <h3>[*marriage notes/marriages notes]0%sp;
+        [with] %spouse.first_name; %spouse.surname;</h3>
       %end;
       <blockquote>%nn;
         %if;has_comment;%comment;%end;
@@ -95,11 +95,11 @@
       </blockquote>
     %end;
     %if;has_death_note;
-      <h5 class="highlight">[*death]</h5>
+      <h3>[*death]</h3>
       <blockquote>%death_note;</blockquote>
     %end;
     %if;has_burial_note;
-      <h5 class="highlight">[*burial]</h5>
+      <h3>[*burial]</h3>
       <blockquote>%burial_note;</blockquote>
     %end;
     %foreach;event;
@@ -109,7 +109,7 @@
              event.name!=[marriage event] and
              event.name!=[death] and
              event.name!=[burial])
-          <h5 class="highlight">%apply;capitalize(event.name)</h5>
+          <h3>%apply;capitalize(event.name)</h3>
           <blockquote>%event.note;</blockquote>
         %end;
       %end;

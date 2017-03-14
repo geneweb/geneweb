@@ -1,4 +1,4 @@
-<!--  Arbre 7 generations vertical xx -->
+<!-- arbre_7gen.txt 28/03/2017 20:02:13 Arbre 7 générations -->
 
 %define;descendants(curlev, maxlev, f_cnt)
 <ul>
@@ -60,7 +60,7 @@
 %let;gpcol;40%%%in;
 %let;sbcol;20%%%in;
 %let;chcol;40%%%in;
-<h3 class="highlight">[*preview family tree]</h3>
+<h2>[*preview family tree]</h2>
    <table style="border:0;width:100%%;cellspacing:0;cellpading:0"> %( Titres %)
      <tr>
        <td style="width:%gpcol;">

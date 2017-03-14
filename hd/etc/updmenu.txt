@@ -69,7 +69,7 @@
             <ul>
               %foreach;child;
                 <li>
-                  %apply;image_MF("child","13")
+                  %apply;image_MF("child")
                   %apply;short_display_person("child")
                 </li>
               %end;

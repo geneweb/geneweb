@@ -1,33 +1,24 @@
-<!-- data parents, siblings, perso, unions, timeline, 3cols -->
+<!-- template perso_module/data_3col.txt v7.00 28/03/2017 20:20:05 data parents, siblings, perso, unions (3 cols) -->
 %( options
 0: skip
 1: standard
 %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 <div class="row">
-	<div class="hidden-sm-down">
-		<div class="col-lg-3 push-6 push-md-0">
-			%let;op_m;1%in;%apply;show_templ("perso_module/parents")
-			%let;op_m;1%in;%apply;show_templ("perso_module/siblings")
-		</div>
-	</div>
-	<div class="col-lg-6 pull-3 pull-md-0">
-		%let;op_m;2%in;%apply;show_templ("perso_module/personnal_data")
-		%if;(nb_families > 3)
-			%let;op_m;1%in;%apply;show_templ("perso_module/unions")
-		%end;
-		%let;op_m;1%in;%apply;show_templ("perso_module/timeline")
-	</div>
-	<div class="hidden-sm-up">
-		<div class="col-lg-3">
-			%let;op_m;1%in;%apply;show_templ("perso_module/parents")
-			%let;op_m;1%in;%apply;show_templ("perso_module/siblings")
-		</div>
-	</div>
-	<div class="col-lg-3">
-		%if;(nb_families < 4)
-			%let;op_m;1%in;%apply;show_templ("perso_module/unions")
-			%let;op_m;1%in;%apply;show_templ("perso_module/relations")
-		%end;
-	</div>
+    <div class="col-md-3">
+      %let;op_m;1%in;%apply;show_templ("perso_module/parents")
+      %let;op_m;1%in;%apply;show_templ("perso_module/fratrie")
+    </div>
+  <div class="col-md-6">
+    %let;op_m;2%in;%apply;show_templ("perso_module/individu")
+    %if;(nb_families > 3)
+      %let;op_m;1%in;%apply;show_templ("perso_module/unions")
+    %end;
+  </div>
+  <div class="col-md-3">
+    %if;(nb_families < 4)
+      %let;op_m;1%in;%apply;show_templ("perso_module/unions")
+    %end;
+    %let;op_m;1%in;%apply;show_templ("perso_module/relations")
+  </div>
 </div>
