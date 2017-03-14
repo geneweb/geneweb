@@ -94,7 +94,7 @@ function no_options () {
 
 --></script>
 
-<h1 class="text-center my-3">%nn;
+<h1 class="text-center my-2">%nn;
   %apply;a_of_b%with;
     [*ancestors]%nn;
   %and;
@@ -110,7 +110,7 @@ function no_options () {
 %end;
 
 <form method="get" action="%action;">
-  <div class="row mx-5 mt-2">
+  <div class="d-flex justify-content-center mx-5 mt-2">
     <p>
       %hidden;
       <input type="hidden" name="m" value="A"%/>
@@ -125,7 +125,7 @@ function no_options () {
       %end;
       <input type="hidden" name="sosab" value="10"%/>
     </p>
-    <div class="col-md-5">
+    <div class="p-2">
       <div class="radio">
       <label>
         <input type="radio" name="t" value="N" checked onclick="no_options()"%/> <span class="fa fa-align-left fa-fw"></span> [*short display]*
@@ -245,9 +245,9 @@ function no_options () {
           [*display smallest sosa number relative to ancestor]
         </label>
       </p>
-      </div><br><br>
+      </div>
    </div>
-   <div class="col-md-4">
+   <div class="p-2">
       <label>
         <input type="radio" name="t" value="P" onclick="book_of_ascendants_options()"%/> <span class="fa fa-newspaper-o fa-fw"></span> [*book of ascendants]
       </label>
@@ -316,7 +316,7 @@ function no_options () {
       </p>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="p-2">
       <label>
         <input type="radio" name="t" value="T" onclick="no_options()"%/> <span class="fa fa-sitemap fa-rotate-180 fa-fw"></span> [*tree]
         %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
@@ -344,7 +344,7 @@ function no_options () {
           <input type="checkbox" name="marriage" value="on"%/>
           [*marriage/marriages]0
         </label>
-        <br%/>
+        %(<br%/>
         <label>
           [*border]
           <input name="bd" size="1" maxlength="2" value="0"%/>
@@ -375,7 +375,7 @@ function no_options () {
               <input type="radio" name="color" value="bg6"%/>
             </td>
           </tr>
-        </table>
+        </table>%)
       </div>
       <label class="mt-2">
         <input type="radio" name="t" value="L" onclick="no_options()"%/> <span class="fa fa-share-alt fa-fw"></span> [*list/list (ancestors)]1
@@ -455,7 +455,7 @@ function no_options () {
     </div>
   </div>
   <div class="row">
-    <div class="form-group  text-center mx-auto">
+    <div class="form-group text-center mx-auto">
       <label>
         <input type="checkbox" name="cgl"%/> [*cancel GeneWeb links]
       </label><br>

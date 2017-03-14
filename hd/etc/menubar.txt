@@ -9,29 +9,29 @@
 %let;laS;accesskey="S"%in;
 %let;laY;title="[tree] (Y)" accesskey="Y"%in;
 %let;acc;%if;access_by_key;ep=%first_name_key;;en=%surname_key;;%if;(occ!= "0")eoc=%occ;;%end;%else;ei=%index;;%end;%in;
-%let;sexcolor;text-%if;is_male;primary%elseif;is_female;danger%else;muted%end;%in;
+%let;sexcolor;%if;is_male;male%elseif;is_female;female%else;neuter%end;%in;
 %define;spousesexcolor()
   %foreach;family;
     %if;(family_cnt=1)
-      text-%if;(spouse.sex=0)primary%elseif;(spouse.sex=1)danger%else;muted%end;
+      %if;(spouse.sex=0)male%elseif;(spouse.sex=1)female%else;neuter%end;
      %end;
   %end;
 %end;
 %if;(not cancel_links)
   <div class="d-flex justify-content-between">
-    <div class="col-1 float-left mt-1">
-      %if;((p_mod="" or p_mod="zz") and has_parents and (father.has_parents or mother.has_parents))
+    <div class="float-left mt-3 btn-group">
+      %if;(not cancel_links and (evar.p!="" or evar.i!="") and (p_mod="" or p_mod="zz") and evar.m!="MOD_IND" and evar.m!="MOD_FAM" and has_parents and (father.has_parents or mother.has_parents))
           <a data-toggle="collapse" href="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 module">
-            <i class="fa fa-list"></i>
+            <i class="fa fa-list fa-fw ml-2 align-middle"></i>
           </a>
       %end;
     </div>
-    <nav class="navbar navbar-light  %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK")mt-4%end;" style="background-color: white">
+    <nav class="navbar navbar-light %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK")mt-4%end;" style="background-color: white">
       <ul class="nav nav-tabs">
         %if;(not(bvar.wizard_just_friend = "yes") and wizard)
           %if;(not has_parents and first_name != "?" and surname != "?")
             <li class="nav-item">
-              <a class="nav-link %if;(evar.m="ADD_PAR")active%end;" id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;><sup></span><span class="fa fa-user text-primary"></sup><sub><span class="fa fa-plus %sexcolor;"></span></sub><sup><span class="fa fa-user text-danger"></span></sup> </a>
+              <a class="nav-link %if;(evar.m="ADD_PAR")active%end;" id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;><sup></span><span class="fa fa-user male"></sup><sub><span class="fa fa-plus %sexcolor;"></span></sub><sup><span class="fa fa-user female"></span></sup> </a>
             </li>
           %end;
         %end;
@@ -39,73 +39,94 @@
           <a class="nav-link %if;(evar.m="")active%end;" href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;"><span class="fa fa-user fa-fw %sexcolor;"></span></a>
         </li>
         %( personnal modules selection menu %)
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
-          <div class="dropdown-menu p_mod">
-            <form name="upd_url" method="get" action="%action;">
-              <div class="dropdown-item">
-                <div class="form-inline input-group">
-                %if;(evar.b!="")
-                  <input type="hidden" name="b" value="%evar.b;">
-                %end;
-                %if;(evar.lang!="")
-                  <input type="hidden" name="lang" value="%evar.lang;">
-                %end;
-                <input type="text" name="p_mod" class="form-control" value="%if;(evar.p_mod!="")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod;%else;Personnal modules (p_mod)%end;">
-                <input type="hidden" name="p" value="%first_name;">
-                <input type="hidden" name="n" value="%surname;">
-                <input type="hidden" name="oc" value="%occ;">
-                <button type="submit" class="btn btn-secondary" title="[ok]0">OK</button>
-                </div>
-              </div>
-              <p class="mx-2 mt-2">
-              [
-en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear. For example: a1b1j1c1d1e1f1g1h1i3.
-fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules. Par exemple : a1b1j1c1d1e1f1g1h1i3.
-              ]
-              </p>
-                %reset_count;
-                %for;i;1;27;
-                  %let;modn;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
-                  %if;(modn!="")
-                    %incr_count;
-                  %end;
-                %end;
-                %let;p_m_n;%count;%in;
-                <table class="table table-sm mt-3">
-                  <thead class="thead-default"><tr>
-                    <th>[*module]</th>
-                    <th>[*options]</th>
-                  </tr></thead>
-                  %for;i;1;27;
-                    %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
-                    %if;(m_nam!="")
-                      %let;m_ltr;%apply;letter(i)%in;                   
-                      %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
-                      %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
-                      %if;(m_nam!="")
-                        <tr>
-                        <td>
-                          %m_ltr;[:]&nbsp;%m_nam;
-                        </td>
-                        <td><small><i>
-                        %for;j;0;m_opt_nb;
-                           %let;k;%expr(j+1)%in;
-                           %let;m_opt_nam;%apply;get_opt_nam(m_nam, k)%in;
-                           %k;%if;(m_opt_nam!="")[:]&nbsp;%m_opt_nam;%end;
-                           %if;(k<m_opt_nb), %end;
-                        %end;
-                        </i></small></td>
-                        </tr>
+        %if;(evar.m!="MOD_IND" and evar.m!="MOD_FAM")
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+            <div class="dropdown-menu p_mod-dropdown-menu%if;(wizard)-wizard%end;">
+              <div class="d-inline-flex">
+                <form class="form-control" name="upd_url" method="get" action="%action;">
+                  <div class="d-flex justify-content-start">
+                    <div class="input-group col-9 ">
+                      %if;(evar.b!="")
+                        <input type="hidden" name="b" value="%evar.b;">
                       %end;
+                      %if;(evar.lang!="")
+                        <input type="hidden" name="lang" value="%evar.lang;">
+                      %end;
+                      <input type="text" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (params.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
+                      <input type="hidden" name="p" value="%first_name;">
+                      <input type="hidden" name="n" value="%surname;">
+                      <input type="hidden" name="oc" value="%occ;">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-secondary" id="p_mod-clear" title="[*validate/delete]1 p_mod"><i class="fa fa-close text-danger"></i></button>
+                        <button type="submit" class="btn btn-secondary text-green" title="[*validate/delete]0 p_mod"><i class="fa fa-check text-success"></i></button>
+                      </span>
+                    </div>
+                    <button class="form-control ml-auto col-1" type="submit"
+                            value="X" id="zz" title="default"
+                            data-toggle="popover" data-trigger="hover" data-placement="bottom"
+                            data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/zz_1.jpg'>"><i class="fa fa-undo text-muted"></i></button>
+                  </div>
+                  <p class="mx-3 mt-2">
+                  [
+en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear (maximum 15 modules).
+fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules (maximum 15 modules).
+                  ]
+                  </p>
+                  %reset_count;
+                  %for;i;1;27;
+                    %let;modn;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
+                    %if;(modn!="")
+                      %incr_count;
                     %end;
                   %end;
-                </table>
-            </form>
-          </div>
-        </li>
+                  %let;p_m_n;%count;%in;
+                  <table class="table table-sm table-hover mt-2 mb-0 mx-2">
+                    <thead class="thead-default">
+                      <tr>
+                        <th>[*module]</th>
+                        <th>[*options]</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      %for;i;1;27;
+                        %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
+                        %if;(m_nam!="")
+                          %let;m_ltr;%apply;letter(i)%in;
+                          %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
+                          %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
+                          <tr>
+                            <td class="align-middle pmod">
+                              %m_nam;
+                            </td>
+                            <td>
+                              <div class="d-inline-flex font-italic small">
+                                %for;j;0;m_opt_nb;
+                                  %let;k;%expr(j+1)%in;
+                                  %let;m_opt_nam;%apply;get_opt_nam(m_nam, k)%in;
+                                  %if;(m_opt_nam!="")
+                                    <button class="btn btn-secondary btn-sm" type="button" id="%m_ltr;%k;" title="%m_nam; %m_opt_nam;"
+                                           data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"
+                                           data-html="true" data-content="<img class='w-100' src='%image_prefix;/%m_nam;_%k;.jpg'>">%m_opt_nam;</button>
+                                  %end;
+                                %end;
+                              </div>
+                            </td>
+                          </tr>
+                        %end;
+                      %end;
+                    </tbody>
+                  </table>
+                </form>
+                <div id="p_mod_builder" class="form-control" value="%if;(evar.p_mod!="")%p_mod;%end;">
+                  <img src="%image_prefix;/menubar_1.jpg">
+                </div>
+              </div>
+            </div>
+          </li>
+        %end;
         %(end personnal modules selection menu %)
-        %if;(not(bvar.wizard_just_friend = "yes") and wizard)
+        %if;(not (bvar.wizard_just_friend = "yes") and wizard)
           <li class="nav-item">
             <a class="nav-link %if;(evar.m="MOD_IND")active%end;" href="%prefix;m=MOD_IND;i=%index;" %laP;><span class="fa fa-user-plus fa-fw %sexcolor;"></span></a>
           </li>
@@ -284,6 +305,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         </li>
       </ul>
     </nav>
+    <div>
     <div class="btn-group mt-2 mr-0 push-right">
       %if;(evar.m !="MOD_IND" and referer != "")
         <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
@@ -292,8 +314,14 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
       %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
         <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
       %end;
-      %if;(not browsing_with_sosa_ref or sosa_ref.index!=central_index)
-        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;iz=%self.index;;%self.access;" %laS; title="%apply;nav_with_sosa_ref(self)"><i class="fa fa-dot-circle-o  fa-lg %sexcolor;"></i></a>%nn;
+      %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
+        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;;%suffix;" %laS; title="%apply;nav_with_sosa_ref(self)">
+          <i class="fa fa-dot-circle-o fa-lg %sexcolor;"></i>
+        </a>%nn;
+      %else;
+        <a role="button" class="btn btn-link ml-1 px-0" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
+          <i class="fa fa-stop-circle-o fa-lg %sexcolor;"></i>
+        </a>%nn;
       %end;
       <a role="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>%nn;
     </div>
@@ -322,6 +350,6 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
           </form>
         </div>
       </div>
-    </div>
+    </div></div>
   </div>
 %end;

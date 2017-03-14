@@ -1,0 +1,237 @@
+<!-- $Id: perso_module/arbre_vertical v7.00 28/03/2017 20:02:08 Arbre ascendant (vertical) -->
+
+%define;rebuild_url(aaa,vvv,iii,mmm,ttt)
+  %let;new_url;
+  %if;("aaa"="prefix_access")%prefix;%access;;%else;aaa%end;
+  %if;(evar.mar_sp_ch!="")mar_sp_ch=%evar.mar_sp_ch;;%end;
+  %if;(evar.evt_pr_sib!="")evt_pr_sib=%evar.evt_pr_sib;;%end;
+  %if;(evar.simple!="")simple=%evar.simple;;%end;
+  %if;(evar.m!="")m=%evar.m;;%end;
+  %if;(iii=1)image=on;%end;
+  %if;(mmm=1)marriage=on;%end;
+  %if;(evar.vh!="")vh=%evar.vh;;%end;
+  %if;(evart!="")t=ttt;%end;
+  %if;(vvv!=3)v=vvv%end;#a%in;
+  %new_url;
+%end;
+
+%define;a_tree_line()
+  %if;(not is_first)
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td class="text-center"><samp>&nbsp;</samp></td>
+      %end;
+      <td colspan="%cell.colspan;" class="text-center py-0 mx-0">%nn;
+        %if;(cell.is_empty or cell.is_top)<samp>&nbsp;</samp>%else;│%end;
+      </td>
+    %end;
+    </tr>
+  %end;
+  <tr>
+  
+  %foreach;cell;
+    %if;(not is_first)
+      <td class="text-center"><samp>&nbsp;</samp></td>
+    %end;
+    <td colspan="%cell.colspan;" class="text-center align-bottom py-0">%nn;
+      %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
+      %else;
+        %if;(evar.image = "on" and cell.person.has_image)
+          %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
+          <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
+           alt="[image/images]0" title="[image/images]0"%/>%nn;
+          %if;(evar.cgl != "on")</a>%end;<br>
+        %end;
+        %apply;short_display_person_tree("cell.person")%nn;
+        %if;cell.person.has_nobility_titles;<br>%cell.person.title;%end;
+      %end;
+    </td>
+  %end;
+  </tr>
+  %if;(not is_last)
+    <tr>
+    %foreach;cell;
+      %if;(not is_first)
+        <td class="text-center py-0">%nn;
+        %if;cell.is_right;
+          %if;(evar.marriage = "on")
+            %if;(wizard and not cancel_links)<a class="small font-weight-italic text-center text-nowrap" href="%prefix;m=MOD_FAM;i=%cell.family.index;;ip=%index;" title="%if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0%else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;">%end;
+              %if;(cell.family.marriage_date.year!= "")
+                %if;(cell.family.marriage_date.prec = "&lt;")
+                  /%cell.family.marriage_date.year;%nn;
+                %elseif;(cell.family.marriage_date.prec = "&gt;")
+                  %cell.family.marriage_date.year;/%nn;
+                %elseif;(cell.family.marriage_date.prec = "│" or cell.family.marriage_date.prec = "..")
+                  %cell.family.marriage_date.year;%nn;
+                %else;
+                  %cell.family.marriage_date.prec;%cell.family.marriage_date.year;%nn;
+                %end;
+              %elseif;(wizard and not cancel_links)-%nn;
+              %end;
+            %if;(wizard and not cancel_links)</a>%end;
+          %else;<samp>&nbsp;</samp>
+          %end;
+        %else;<samp>&nbsp;</samp>
+        %end;
+        </td>
+      %end;
+      <td colspan="%cell.colspan;" class="text-center py-0">%nn;
+        %if;cell.is_empty;<samp>&nbsp;</samp>%nn;
+        %elseif;(cancel_links)│%nn;
+        %else;
+          <a href="%cell.person.bname_prefix;%cell.person.access;%nn;
+            ;m=%if;(evar.m!="")%evar.m;%else;A%end;%nn;
+            ;t=%if;(evar.t!="")%evar.t;%else;T%end;%nn;
+            ;v=%if;(evar.v!="")%evar.v;%else;3%end;%nn;
+            %if;(evar.image = "on");image=on%end;%nn;
+            %if;(evar.marriage = "on");marriage=on%end;"
+            title="%if;(evar.m="")[*tree][:] [full width/columns]0%end;">│</a>%nn;
+        %end;
+      </td>
+    %end;
+    </tr>
+    <tr>
+      %foreach;cell;
+        %if;(not is_first)
+          <td colspan="1" class="text-center px-0 py-0">%nn;
+          %if;(cell.is_right)<hr class="full;"%/>%nn;
+          %else;%(<samp>&nbsp;</samp>%)%end;
+          </td>
+        %end;
+        <td colspan="%cell.colspan;" class="px-0 py-0 text-%nn;
+           %if;cell.is_left;%right;
+           %elseif;cell.is_right;%left;
+           %else;center%end;">%nn;
+          %if;cell.is_empty;%(<samp>&nbsp;</samp>%)%nn;
+          %elseif;cell.is_left;<hr class="%right;"%/>%nn;
+          %elseif;cell.is_right;<hr class="%left;"%/>%nn;
+          %else;%(│%)%end;
+        </td>
+      %end;
+    </tr>
+  %end;
+%end;
+
+%define;male_line(xx, yy)
+  %if;(yy > 0)
+    %if;(xx.has_parents)%apply;male_line("xx.father", yy - 1)%end;
+    <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
+    %if;(evar.image = "on" and xx.has_image)
+      <br>
+      %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
+      <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
+       alt="[image/images]0" title="[image/images]0"%/>
+      %if;(evar.cgl != "on")</a>%end;
+    %end;
+    %if;("xx" != "self")<br>│<br>%end;
+  %end;%nl;
+%end;
+
+%define;female_line(xx, yy)
+  %if;(yy > 0)
+    %if;(xx.has_parents)%apply;female_line("xx.mother", yy - 1)%end;
+    <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
+    %if;(evar.image = "on" and xx.has_image)
+      <br>
+      %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
+      <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
+       alt="[image/images]0" title="[image/images]0"%/>%nn;
+      %if;(evar.cgl != "on")</a>%end;
+    %end;
+    %if;("xx" != "self")<br>│<br>%end;
+  %end;%nl;
+%end;
+
+%if;(evar.t = "T")%nn;
+  <div class="text-%right">%nn;
+  <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
+  ;dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
+%end;
+
+%define;tree(xx)
+  %foreach;ancestor_tree_line(xx)
+    %apply;a_tree_line()
+  %end;
+%end;
+
+%if;has_parents;
+  %let;evarv;%if;(evar.v!="")%evar.v;%else;3%end;%in;
+  %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
+  %let;evarim;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
+  %let;evarma;%if;(evar.marriage!="" and evar.marriage="on")1%else;0%end;%in;
+  %let;maxlev;%apply;min%with;
+    %if;(bvar.max_anc_tree!="")%bvar.max_anc_tree;%else;120%end;%and;
+    %if;(bvar.max_anc_level!="")%bvar.max_anc_level;%else;120%end;%and;
+    %expr(static_max_anc_level)%end;%in;
+  %let;maxv;%if;(maxlev<10 or maxlev<evarv+5)%expr(maxlev+1)
+            %elseif;(maxlev>=evarv+5 and evarv>5)%expr(evarv+5)
+            %else;10%end;%in;
+  %let;minv;%if;(maxlev>9 and maxlev<evarv+5)%expr(maxv-9)
+            %elseif;(maxlev>9 and evarv>5)%expr(evarv-4)
+            %else;1%end;%in;
+  %(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
+  <div class="d-flex justify-content-between">
+    <h2 id="a">%if;(evar.t = "A")[*male line/female line]0%nn;
+    %elseif;(evar.t = "C")[*male line/female line]1%nn;
+    %else[*ascendants tree]%end;</h2>
+    %if;not cancel_links;
+      <div class="form-inline">
+        <div class="btn-group mx-2">
+          %if;(maxlev>9 and evarv>5)
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵</a>
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−</a>
+          %end;
+          %for;i;minv;maxv;
+            <a class="btn btn-secondary btn-sm %if;(evarv=i)disabled font-weight-bold%end;" %nn;
+              href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end" %nn;
+              title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
+              %end; %if;(i=maxlev)(max)%end;">%i;</a>
+          %end;
+          %if;(maxlev>9 and maxlev-evarv>=5)
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">+⁵</a>
+          %end;
+        </div>
+        %if;(evarv>1)
+          <div class="btn-group mx-2">
+            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"A")" class="btn btn-secondary btn-sm %if;(evart="A")disabled font-weight-bold%end;" title="[*male line/female line]1">A</a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"C")" class="btn btn-secondary btn-sm %if;(evart="C")disabled font-weight-bold%end;" title="[*male line/female line]0">C</a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"T")" class="btn btn-secondary btn-sm %if;(evart="T")disabled font-weight-bold%end;" title="[*tree]">T</a>
+          </div>
+        %end;
+        <div class="mx-2">
+          %if;(evarim=1)
+            <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+          %else;
+            <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+          %end;
+        </div>
+        %if;(evarv>1 and evart="T")
+          <div class="mx-2">
+            %if;(evarma=1)
+              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+            %else;
+              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            %end;
+          </div>
+        %end;
+      </div>
+    %end;
+  </div>
+  <table class="tree-vert mx-auto my-3" style="border-width:%border;">
+    %if;(evart = "T")
+      %apply;tree(evarv)
+    %else;
+      <tr>
+        <td class="text-center">
+          %if;(evart = "A")
+            %apply;male_line("self", evarv)
+          %elseif;(evart = "C")
+            %apply;female_line("self", evarv)
+          %end;
+        </td>
+      </tr>
+    %end;
+  </table>
+%end;

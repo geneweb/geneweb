@@ -222,6 +222,10 @@ sk:  skúsiť znovu s týmto číslom
 sl:  za ponoven poskus s to številko
 sv:  för att försöka igen med detta nummer
 
+    width
+en: width
+fr: largeur
+
     %1 of %2
 af: %1 van %2
 bg: %1 на :a:%2
@@ -2415,7 +2419,7 @@ sv: Postnummer
 
     ascendants tree
 de: Stammbaum der Vorfahren
-en: family tree
+en: ascending tree
 es: árbol de ascendencia
 fi: Esipolvitaulu
 fr: arbre d’ascendance
@@ -3458,7 +3462,7 @@ sv: ändrade ordningen för barnen
 de: ändern der Reihenfolge familiäre Ereignisse
 en: change order of family events
 es: cambio del orden de los acontecimientos familiares
-fr: changement de l’ordre des évènements familiaux
+fr: changement de l’ordre des événements familiaux
 it: modifica dell'ordine degli eventi di famiglia
 oc: cambiament de l'òrdre dels eveniments familials
 pt: modificar a ordem dos eventos familiares
@@ -3480,7 +3484,7 @@ sv: Utbytt ordning för bröllop
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
-fr: changement de l’ordre des évènements individu
+fr: changement de l’ordre des événements individu
 it: modifica dell'ordine degli eventi individuo
 oc: cambiament de l'òrdre dels eveniments d'un individú
 pt: modificar ordem dos eventos da pessoa
@@ -4165,7 +4169,7 @@ sv: dödsdatum
 
     date of marriage
 de: Hochzeitstag
-en: Date of marriage
+en: date of marriage
 es: fecha de matrimonio
 fi: vihkipäivämäärä
 fr: date de l’union
@@ -4565,7 +4569,7 @@ sv: logga ut
 
     display Aboville number
 de: Sosa/Kekule-Nummer anzeigen
-en: Display Sosa number
+en: Display d’Aboville number
 es: editar la numeración de Aboville
 fi: Näytä sosa-numero
 fr: afficher la numérotation d’Aboville
@@ -7525,7 +7529,7 @@ sv: manling/kvinnlig/neutral&#047;okänt
 
     marriage bann
 de: Aufgebot
-en: Marriage Bann
+en: marriage bann
 es: amonestaciones
 fi: Aviokielto
 fr: bans de mariage
@@ -7537,7 +7541,7 @@ sv: Förbjudet äktenskap
 
     marriage contract
 de: Ehevertrag
-en: Marriage Contract
+en: marriage contract
 es: contrato de matrimonio
 fi: Vihkitodistus
 fr: contrat de mariage
@@ -7549,7 +7553,7 @@ sv: Äktenskapförord
 
     marriage date
 de: Hochzeitstag
-en: Date of marriage
+en: date of marriage
 es: fecha de matrimonio
 fi: Vihkiaika
 fr: date de l’union
@@ -7562,7 +7566,7 @@ sv: Datum för giftermål
 
     marriage event
 de: Heirat
-en: Marriage
+en: marriage
 es: matrimonio
 fi: Avioliitto
 fr: mariage
@@ -14294,3 +14298,15 @@ fr: jour/mois/année
     spouses info
 en: spouses informations
 fr: informations conjoints
+
+    inline chronology
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
+
+    missing date
+en: no date
+fr: sans date
+
+    custom event
+en: custom event
+fr: événement personnalisé
