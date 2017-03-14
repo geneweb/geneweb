@@ -84,7 +84,7 @@
 
 %define;display_siblings(xx, count)
   <tr %if;(count != 1) class="table_content_siblings" %end;>
-    <td %if;(xx.nb_families > 1) rowspan="%xx.nb_families;" %end;>%apply;image_MF("xx", "11") %xx;</td>
+    <td %if;(xx.nb_families > 1) rowspan="%xx.nb_families;" %end;>%apply;image_MF("xx") %xx;</td>
     %apply;display_date("xx", 1)
     <td>
       %foreach;xx.family;
@@ -109,7 +109,7 @@
 %define;display_children(xx, count)
   <tr%if;(count % 2 = 0) class="table_content_odd"%end;>
     <td>
-      %apply;image_MF("xx", "11")
+      %apply;image_MF("xx")
       %xx;
     </td>
     %apply;display_date("xx", 0)
@@ -659,7 +659,7 @@
           <table>
             <tr>
               <td><h2><span class="highlight"><a name="ind_%xx.index;">%xx;</a></span></h2></td>
-              <td>%apply;image_MF("xx", "13")</td>
+              <td>%apply;image_MF("xx")</td>
             </tr>
           </table>
         </td>
@@ -883,14 +883,14 @@
           %if;(has_relation_him and has_relation_her)
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_him", "11") %relation_him; %sp;
+                %apply;image_MF("relation_him") %relation_him; %sp;
                 (%apply;relation_type_txt(relation_type, relation_him.sex))
               </td>
               %apply;display_date("relation_him", 0)
             </tr>
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_her", "11") %relation_her; %sp;
+                %apply;image_MF("relation_her") %relation_her; %sp;
                 (%apply;relation_type_txt(relation_type, relation_her.sex))
               </td>
               %apply;display_date("relation_her", 0)
@@ -898,7 +898,7 @@
           %elseif;has_relation_him;
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_him", "11") %relation_him; %sp;
+                %apply;image_MF("relation_him") %relation_him; %sp;
                 (%apply;capitalize(relation_type))
               </td>
               %apply;display_date("relation_him", 0)
@@ -906,7 +906,7 @@
           %elseif;has_relation_her;
             <tr class="table_content_relations">
               <td class="borderna">
-                %apply;image_MF("relation_her", "11") %relation_her; %sp;
+                %apply;image_MF("relation_her") %relation_her; %sp;
                 (%apply;capitalize(relation_type))
               </td>
               %apply;display_date("relation_her", 0)
@@ -916,7 +916,7 @@
         %foreach;xx.related;
           <tr class="table_content_relations">
             <td class="borderna">
-              %apply;image_MF("related", "11") %related;  %sp;
+              %apply;image_MF("related") %related;  %sp;
               %if;(related = [foster son/foster daughter/foster child]0)
                 (%apply;capitalize([foster son/foster daughter/foster child]2))
               %elseif;(related = [foster son/foster daughter/foster child]1)
@@ -934,7 +934,7 @@
               %foreach;witness;
                 <tr>
                   <td class="borderna">
-                    %apply;image_MF("witness", "11") %witness; %sp;
+                    %apply;image_MF("witness") %witness; %sp;
                     ([*witness/witnesses]0)
                   </td>
                   %apply;display_date("witness", 0)
@@ -946,10 +946,10 @@
         %foreach;xx.event_witness_relation;
           <tr class="table_content_relations">
             <td class="borderna">
-              %apply;image_MF("event_witness_relation.person", "11") %event_witness_relation.person; %sp;
+              %apply;image_MF("event_witness_relation.person") %event_witness_relation.person; %sp;
               %if;(event_witness_relation.event.spouse != "")
                 [and]
-                %apply;image_MF("event_witness_relation.event.spouse", "11") %event_witness_relation.event.spouse; %sp;
+                %apply;image_MF("event_witness_relation.event.spouse") %event_witness_relation.event.spouse; %sp;
               %end;
               (%apply;capitalize(event_witness_relation_kind) :%sp;
               %event_witness_relation.event.name;)

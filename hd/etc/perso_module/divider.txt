@@ -1,2 +1,0 @@
-<!-- Template perso_module/divider.txt v 7.00 20/11/2016 06:10:01 hg -->
-<hr />
