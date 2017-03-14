@@ -431,29 +431,28 @@ expand_env=no
 # Warning: no spaces or comments after module name!!!
 # The options_module_i= line defines the number of possible options (default is 1)
 
-perso_module_a=personnal_data
-options_module_a=2
-perso_module_b=parents
-options_module_b=5
-perso_module_c=unions
-options_module_c=5
-perso_module_d=siblings
-options_module_d=3
-perso_module_e=relations
-options_module_e=2
-perso_module_f=timeline
-options_module_f=2
-perso_module_g=notes
+perso_module_i=individu
+options_module_i=3
+perso_module_p=parents
+options_module_p=5
+perso_module_g=gr_parents
 options_module_g=2
-perso_module_h=sources
-options_module_h=2
-perso_module_i=trees
-options_module_i=8
-perso_module_j=gr_parents
-options_module_j=2
-perso_module_k=data_3col
-
-perso_module_z=divider
+perso_module_u=unions
+options_module_u=5
+perso_module_f=fratrie
+options_module_f=4
+perso_module_r=relations
+options_module_r=2
+perso_module_c=chronologie
+options_module_c=2
+perso_module_n=notes
+options_module_n=2
+perso_module_s=sources
+options_module_s=2
+perso_module_a=arbres
+options_module_a=4
+perso_module_d=data_3col
+perso_module_l=ligne
 
 # The display on perso pages will be governed by a vector defining
 # a selection of modules, and the order in which they are displayed
@@ -463,7 +462,8 @@ perso_module_z=divider
 # and the value of its display option
 # The modules are displayed in the order in which they appear in "p_mod"
 # In the example below, "gd_parents", "personnal_data", parents", "unions"…
-p_mod=j1a1b1c3d1e1f1g1h1i3
+
+#p_mod=
 
 # display the picto Sosa on the template perso.txt (individual page).
 #display_sosa=yes/no

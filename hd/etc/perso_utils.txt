@@ -49,14 +49,14 @@
     %if;xx.has_families;%if;(count!=0)square%else;disc%end;%else;circle%end;;">%nn;
 %end;
 
-%define;image_MF(xx,wi_he)
+%define;image_MF(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
   %if;xx.is_male;
-    <i class="fa fa-mars male"></i>%nn;
+    <i class="fa fa-mars male mr-1"></i>%nn;
   %elseif;xx.is_female;
-    <i class="fa fa-venus female"></i>%nn;
+    <i class="fa fa-venus female mr-1"></i>%nn;
   %else;
     <i class="fa fa-neuter neuter"></i>%nn;
   %end;%nn;
@@ -112,7 +112,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" style="border: none" alt="sosa" title="[direct ancestor of %s:::xxx], [*Sosa] yyy"%/>%nn;
+  <span class="fa fa-dot-circle-o text-success mr-1" style="font-size:1em" title="[*Sosa] yyy%if;(yyy!=1) – [*direct ancestor of %s:::xxx]%end;"></span>%nn;
 %end;
 
 %define;nav_with_sosa_ref(xxx)
@@ -127,7 +127,6 @@
   [age at %s birth date:::xxx]%sp;
 %end;
 
-
 %define;display_shared_parent(xxx)
   [*on %s's side:::xxx]
 %end;
@@ -135,13 +134,6 @@
 %define;nav_with_sosa_ref(xxx)
   [*navigation with %t as Sosa reference:::xxx]%nn;
 %end;
-
-%define;image_sosa(xxx,yyy)
-  <img src="%image_prefix;/sosa.png" width="10" height="10"%sp;
-    style="border: none" alt=""%sp;
-    title="%if;(yyy=1)%else;[direct ancestor of %s:::xxx], %end;[*Sosa] yyy"%/>%nn;
-%end;
-
 
 %define;thegen(xx)
   [*the %s generation:::xx]%nn;
@@ -199,19 +191,7 @@
     %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
     %sosa_ref.surname_key_strip;
     %and;%xx.sosa;%end;
-    %if;not cancel_links;</a>%end;%sp;
-  %end;
-%end;
-
-%define;display_sosa(xx)
-  %if;(bvar.display_sosa="" or bvar.display_sosa="yes")
-    %if;xx.has_sosa;
-      %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;
-      %apply;image_sosa%with;%sosa_ref.first_name_key_strip;%sp;
-                             %sosa_ref.surname_key_strip;
-                        %and;%xx.sosa;%end;
-      %if;not cancel_links;</a>%end;%sp;
-    %end;
+    %if;not cancel_links;</a>%end;%nn;
   %end;
 %end;
 
@@ -228,17 +208,26 @@
 %define;short_display_person_tree(xx)
   %if;(xx.has_sosa)%apply;display_sosa("xx")<br>%end;
   %if;(cancel_links or xx.is_restricted)<span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
-  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;"><span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
+  %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(evar.image="on")image=on;%end;%if;(evar.marriage="on")marriage=on;%end;"><span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;
-  <br>%if;(wizard and not cancel_links)
-  <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%end;<span class="text-nowrap font-italic">%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;
+  <br>%nn;
+  %if;(wizard and not cancel_links)
+    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
+  %end;
+  <span class="text-nowrap font-italic">%nn;
+    %if;(xx.dates!="")%xx.dates;%nn;
+    %elseif;(wizard and not cancel_links)-%nn;
+    %elseif;(cancel_links)<br>
+    %end;%nn;
+  </span>%nn;
+  %if;(wizard and not cancel_links)</a>%end;
 %end;
 
 %define;short_display_person_noname(xx,yy,zz,uu)
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
-    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="uu%if;(uu!=""). %end;%xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
+    %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="uu%if;("uu"!=""). %end;%xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
   %xx.title;%if;("yy"="br")<br>%end;%if;(wizard and not cancel_links)
@@ -330,7 +319,7 @@
     <ul>
       %if;(xx.index!=central_index)
         <li>
-          %apply;image_MF("xx","13")
+          %apply;image_MF("xx")
           %apply;display_sosa("xx")
           %if;(cancel_links or xx.is_restricted)%xx;
           %else;<a href="%prefix;%xx.access;">%xx;</a>%end;%sp;
@@ -472,7 +461,7 @@
 %define;married_to_f(UP_lo, m_f, date_place)
   %if;(wizard and not cancel_links)
     <a href="%prefix;;m=MOD_FAM;i=%family.index;;ip=%index;">%nn;
-      <img src="%image_prefix;/picto_molette.png"%sp;
+      <img class="mb-1" src="%image_prefix;/picto_molette.png"%sp;
            title="[*modify::family/families]0 [with]%sp;
            %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname;"%sp;
            height="13" width="13" alt="[*modify::family/families]0"%/>%nn;
@@ -502,15 +491,14 @@
   %apply;married_to%with;%xx.sex%and;
     %if;(marriage_place = "")
       %if;(on_marriage_date = "")
-      %else; <em>%on_marriage_date;
+      %else; %on_marriage_date;%nn;
         %if;wedding_birthday; ([happy birthday to them!])%end;
-        </em>
       %end;
     %else;
-      %if;(on_marriage_date = "")<em>, %marriage_place;, </em>
-      %else; <em>%on_marriage_date;
+      %if;(on_marriage_date = ""), %marriage_place;, 
+      %else; %on_marriage_date;
         %if;wedding_birthday; ([happy birthday to them!])%end;
-        , %marriage_place, </em>
+        , %marriage_place, 
       %end;
     %end;
   %end;
@@ -519,8 +507,8 @@
 %define;long_married_f(xx, UP_lo)
   %apply;married_to_f%with;UP_lo%and;%xx.sex%and;
     %if;(marriage_place="")
-      %if;(on_marriage_date="")
-      %else; <em> %on_marriage_date;
+      %if;(on_marriage_date="")%nn;
+      %else; <em>%on_marriage_date;
         %if;wedding_birthday; ([happy birthday to them!])%end;
         </em>%end;
     %else;
@@ -548,21 +536,21 @@
 
 %define;short_display_siblings()
   %apply;li_SDC("child")
-    %apply;image_MF("child","12")
+    %apply;image_MF("child")
     %apply;short_display_person("child")%nn;
   </li>
 %end;
 
 %define;short_display_siblings_noname()
   %apply;li_SDC("child")
-    %apply;image_MF("child","12")
+    %apply;image_MF("child")
     %apply;short_display_person_noname("child","","","")%nn;
   </li>
 %end;
 
 %define;long_display_siblings()
   %apply;li_SDC("child")
-    %apply;image_MF("child","12")
+    %apply;image_MF("child")
     %apply;short_display_person("child")%nn;
     %if;child.has_families;
       %foreach;child.family;
@@ -570,7 +558,7 @@
           <br><img src="%image_prefix;/1pixel.png" width="13" height="13" alt="1px"%/>
           <em>%child;%child.title;%child.dates;</em>
         %end;
-        <em>%apply;long_married_f("child", "lower")</em>
+        <span class="ml-1">%apply;long_married_f("child", "lower")</span>
         %apply;short_display_person("spouse")
       %end;
     %end;
@@ -589,7 +577,7 @@
           </td>
           <td style="vertical-align: middle">
     %end;
-    %apply;image_MF("child","13")
+    %apply;image_MF("child")
     %apply;short_display_person_f("child")
     %if;child.has_families;
       %foreach;child.family;
@@ -598,7 +586,7 @@
           <em>%child;%child.title;%child.dates;</em>
         %end;
         <em>%apply;long_married_f("child", "lower")</em>
-        %apply;image_MF("spouse","13")
+        %apply;image_MF("spouse")
         %apply;short_display_person_f("spouse")
       %end;
     %end;
@@ -619,7 +607,7 @@
           <tr>
             <td style="vertical-align: middle">
               [with]
-              %apply;image_MF("spouse","13")
+              %apply;image_MF("spouse")
               %apply;short_display_person("spouse")
             </td>
             <td style="vertical-align: middle">
@@ -630,7 +618,7 @@
         </table>
       %else;
         [with]
-        %apply;image_MF("spouse","13")
+        %apply;image_MF("spouse")
         %apply;short_display_person("spouse")
       %end;
       %if;has_children;
@@ -665,14 +653,14 @@
     <ul>
       %foreach;child;
         %apply;type_puce_desc("child")
-        %apply;image_MF("child","11")
+        %apply;image_MF("child")
         %apply;display_sosa("child")
         %apply;access_ind("child")
         %if;child.has_families;
           %foreach;child.family;
             <br>
             └ %apply;detail_wedding()%sp;
-            %apply;image_MF("spouse","13")
+            %apply;image_MF("spouse")
             %apply;short_display_person("spouse")
             %if;(nb_children!=0)<div class="float-right">%nb_children;</div>%end;
           %end;
@@ -690,7 +678,7 @@
     <li class="list-unstyled mb-2">
       <ul>
         %apply;type_puce_asc("mmm.father")
-        %apply;image_MF("mmm.father","13")
+        %apply;image_MF("mmm.father")
         %apply;display_sosa("mmm.father")
         %if;(spouse.access = mmm.mother.access)
           %apply;access_ind("mmm.father")
@@ -703,7 +691,7 @@
         %if(family.marriage_date.year != "")%family.marriage_date.year;%end;
         </li>
         %apply;type_puce_asc("spouse")
-        %apply;image_MF("spouse","13")
+        %apply;image_MF("spouse")
         %apply;display_sosa("spouse")
         %if;(spouse.access = self.access)
           <u><b>%spouse;</b></u>%spouse.title;%spouse.dates;
@@ -725,7 +713,7 @@
       <ul>
         %if;(spouse.access != mmm.father.access)
           %apply;type_puce_asc("mmm.mother")
-          %apply;image_MF("mmm.mother","13")
+          %apply;image_MF("mmm.mother")
           %apply;display_sosa("mmm.mother")
           %mmm.mother;%mmm.mother.title;%mmm.mother.dates;%nl;<br>
           </li>
@@ -734,7 +722,7 @@
           %if(family.marriage_date.year != "")%family.marriage_date.year;%end;
           </li>
           %apply;type_puce_asc("spouse")
-          %apply;image_MF("spouse","13")
+          %apply;image_MF("spouse")
           %apply;display_sosa("spouse")
           %if;(spouse.access = self.access)
             <u><b>%spouse;</b></u>%spouse.title;%spouse.dates;
@@ -816,31 +804,32 @@
 
 <!-- Liste of module options -->
 %(%)
-%let;option_personnal_data_1;standard%in;
-%let;option_personnal_data_2;centered%in;
-%let;option_personnal_data_3;two cols%in;
+%let;option_individu_1;standard%in;
+%let;option_individu_2;centered%in;
+%let;option_individu_3;two cols%in;
 %(%)
 %let;option_parents_1;simple%in;
-%let;option_parents_2;evolved%in;
-%let;option_parents_3;evolved+photos (2 cols)%in;
+%let;option_parents_2;simple + photos%in;
+%let;option_parents_3;evolved%in;
 %let;option_parents_4;complete%in;
-%let;option_parents_5;complete+photos (2 centered cols)%in;
+%let;option_parents_5;complete + photos%in;
 %(%)
 %let;option_unions_1;simple%in;
-%let;option_unions_2;simple+photo%in;
+%let;option_unions_2;simple + photos%in;
 %let;option_unions_3;evolved%in;
 %let;option_unions_4;complete%in;
-%let;option_unions_5;complete+photo%in;
+%let;option_unions_5;complete + photos%in;
 %(%)
-%let;option_siblings_1;simple%in;
-%let;option_siblings_2;complete%in;
-%let;option_siblings_3;complete+photos%in;
+%let;option_fratrie_1;simple%in;
+%let;option_fratrie_2;simple + photos%in;
+%let;option_fratrie_3;complete%in;
+%let;option_fratrie_4;complete + photos%in;
 %(%)
 %let;option_relations_1;simple%in;
 %let;option_relations_2;complete%in;
 %(%)
-%let;option_timeline_1;simple%in;
-%let;option_timeline_2;+events%in;
+%let;option_chronologie_1;simple%in;
+%let;option_chronologie_2;simple + events%in;
 %(%)
 %let;option_notes_1;simple%in;
 %let;option_notes_2;complete%in;
@@ -848,19 +837,15 @@
 %let;option_sources_1;simple%in;
 %let;option_sources_2;complete%in;
 %(%)
-%let;option_trees_1;three-g_v_ph_hdr%in;
-%let;option_trees_2;three-g_v_ph%in;
-%let;option_trees_3;three-g_v%in;
-%let;option_trees_4;four-g_v%in;
-%let;option_trees_5;five-g_h%in;
-%let;option_trees_6;none%in;
-%let;option_trees_7;seven-g_v%in;
-%let;option_trees_8;four-g_v_ph%in;
+%let;option_arbres_1;[ascendants tree]%in;
+%let;option_arbres_2;[horizontal tree]%in;
+%let;option_arbres_3;[compact tree]%in;
+%let;option_arbres_4;+3 -3 gen.%in;
 %(%)
 %let;option_gr_parents_1;standard%in;
 %let;option_gr_parents_2;three cols%in;
 %(%)
-%let;option_divider_1;standard%in;
+%let;option_ligne_1;standard%in;
 %let;option_data_3col_1;standard%in;
 
 %( options for new modules can be defined in base.gwf %)

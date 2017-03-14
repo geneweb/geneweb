@@ -74,43 +74,43 @@
   %foreach;event_witness_relation;%incr_count;%end;
   %let;cnt;%count;%in;
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h3 class="highlight">[*relation/relations]1%nn;
+  <h2>[*relation/relations]1%nn;
     %if;(not cancel_links and cnt>1)
       <a %apply;relations_tree(l_ref)>%nn;
         <img class="ml-2 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%/>%nn;
       </a>%nn;
     %end;
-  </h3>
+  </h2>
   <ul>
   %foreach;relation;
     %if;(has_relation_him and has_relation_her)
       <li>%apply;capitalize(relation_type)[:]%nl;
         <ul>
           %apply;li_SDC("relation_him")
-            %apply;image_MF("relation_him","13")
+            %apply;image_MF("relation_him")
             %apply;short_display_person("relation_him")
           </li>
           %apply;li_SDC("relation_her")
-            %apply;image_MF("relation_her","13")
+            %apply;image_MF("relation_her")
             %apply;short_display_person("relation_her")
           </li>
         </ul>
       </li>
     %elseif;has_relation_him;
       %apply;li_SDC("relation_him")%apply;capitalize(relation_type)[:]%sp;
-        %apply;image_MF("relation_him","13")
+        %apply;image_MF("relation_him")
         %apply;short_display_person("relation_him")
       </li>
     %elseif;has_relation_her;
       %apply;li_SDC("relation_her")%apply;capitalize(relation_type)[:]%sp;
-        %apply;image_MF("relation_her","13")
+        %apply;image_MF("relation_her")
         %apply;short_display_person("relation_her")
       </li>
     %end;
   %end;
   %foreach;related;
     %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
-      %apply;image_MF("related","13")
+      %apply;image_MF("related")
       %apply;short_display_person("related")
     </li>
   %end;
@@ -131,13 +131,13 @@
 %( not clear that relation_complete brings anything %)
 %elseif;(op_m=2 and rel_nbr>0)
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
-  <h3 id="relations" class="highlight">[*relation/relations]1
+  <h2 id="relations" >[*relation/relations]1
   %if;(not cancel_links)
     <a %apply;relations_tree(l_ref)>
     <img src="%image_prefix;/gui_create.png" height="20" alt="Tree"/>
     </a>
   %end;
-  </h3>
+  </h2>
   <small>Relations_complete</small>
 
   <ul>

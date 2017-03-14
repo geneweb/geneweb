@@ -110,16 +110,16 @@
   %end;
 %end;
 
-%define;image_MF(xx,wi_he)
+%define;image_MF(xx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
   %if;xx.is_male;
-    <i class="fa fa-mars male"></i>%nn;
+    <i class="fa fa-mars male mr-1"></i>%nn;
   %elseif;xx.is_female;
-    <i class="fa fa-venus female"></i>%nn;
+    <i class="fa fa-venus female mr-1"></i>%nn;
   %else;
-    <i class="fa fa-neuter neuter"></i>%nn;
+    <i class="fa fa-neuter neuter mr-1"></i>%nn;
   %end;%nn;
   %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
 %end;
@@ -182,7 +182,7 @@
           %foreach;xx.family;
             %if;(spouse.first_name != "?" and spouse.surname != "?")
               %if;(family_cnt > 1),%sp;%end;
-              %apply;image_MF("spouse", "11")
+              %apply;image_MF("spouse")
               %apply;link(spouse.access, spouse)
             %end;
           %end;
@@ -862,7 +862,7 @@
     %else;%ancestor.anc_sosa;%end;
   </td>
   <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
-    %apply;image_MF("ancestor", "11")
+    %apply;image_MF("ancestor")
     %apply;link%with;%ancestor.access;%and;
       %ancestor;
     %end
@@ -899,7 +899,7 @@
       %foreach;ancestor.family;
         %if;(family_cnt = 1)
           <td %if;(ancestor.nb_families > 1) style="border-bottom:none" %end;>
-            %apply;image_MF("spouse", "11")
+            %apply;image_MF("spouse")
             %apply;link%with;%spouse.access;%and;
               %spouse;
             %end;
@@ -1000,7 +1000,7 @@
         <tr>
           %if;(evar.marr = "on")
             <td style="border-top:none; %if;(ancestor.nb_families != family_cnt) border-bottom:none %end;">
-              %apply;image_MF("spouse", "11")
+              %apply;image_MF("spouse")
               %apply;link%with;%spouse.access;%and;
                 %spouse;
               %end;
@@ -1092,13 +1092,19 @@
 %)
 
 %if;(evar.t = "Z" and not cancel_links)
-  <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=A"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors] </a>
-  <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%apply;rebuild_url%with;D%and;I;%and;%max_desc_level;%end" class="btn btn-secondary"><span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]</a>
-  <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%prefix;m=A;t=T;%access;;v=%evar.v;;image=on;marriage=on"><span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]</a>
-  <div class="btn-group ml-3 mb-1" role="group" aria-label="First group">
-    %if;(evar.v>=3)<a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v-1)%end" class="btn btn-secondary" title="-1 [generation/generations]0">-</a>%end;
-    <input class="form-control text-center" size="12" value="%evar.v; [generation/generations]1" disabled>
-    <a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v+1)%end" class="btn btn-secondary" title="+1 [generation/generations]0">+</a>
+  <div class="form-inline">
+    <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=A"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors] </a>
+    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%apply;rebuild_url%with;D%and;I;%and;%max_desc_level;%end" class="btn btn-secondary"><span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]</a>
+    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%prefix;m=A;t=T;%access;;v=%evar.v;;image=on;marriage=on"><span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]</a>
+    <div class="input-group ml-3 mb-1">
+      <span class="input-group-btn">
+        %if;(evar.v>=3)<a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v-1)%end" class="btn btn-secondary" title="-1 [generation/generations]0">-</a>%end;
+      </span>
+      <input class="form-control text-center" size="12" value="%evar.v; [generation/generations]1" title="%apply;a_of_b%with;[*number]0%and;[generation/generations]1%end;" disabled>
+      <span class="input-group-btn">
+        <a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v+1)%end" class="btn btn-secondary" title="+1 [generation/generations]0">+</a>
+      </span>
+    </div>
   </div>
 %end;
 
@@ -1216,7 +1222,7 @@
                 %and;%ancestor.first_name;
                 %and;%ancestor.surname_begin;
                 %and;%ancestor.access;
-                %and;%apply;image_MF("ancestor", "11")
+                %and;%apply;image_MF("ancestor")
                 %and;%ancestor.nobility_title;
                 %and;%apply;ancestor_missing_birth("ancestor")
                 %and;%apply;ancestor_missing_death("ancestor")
@@ -1346,7 +1352,7 @@
 
     %reset_count;
     <table class="table missing_ancestors_table">
-      <tr class="missing_ancestors_table_header">
+      <tr class="missing_ancestors_table_header align-middle">
         <th>[*missing sosa]</th>
         <th>[*missing parents]</th>
         <th>[*missing spouse]</th>
@@ -1376,7 +1382,7 @@
                   <td align="center"> x </td>
                   <td> &nbsp; </td>
                   <td>
-                    %apply;image_MF("ancestor", "11")
+                    %apply;image_MF("ancestor")
                     %apply;link(ancestor.access, ancestor)
                     %ancestor.title;
                   </td>
@@ -1395,7 +1401,7 @@
                     <td> &nbsp; </td>
                     <td align="center"> x </td>
                     <td>
-                      %apply;image_MF("ancestor.mother", "11")
+                      %apply;image_MF("ancestor.mother")
                       %apply;link(ancestor.mother.access, ancestor.mother)
                       %ancestor.mother.title;
                     </td>
@@ -1414,7 +1420,7 @@
                     <td> &nbsp; </td>
                     <td align="center"> x </td>
                     <td>
-                      %apply;image_MF("ancestor.father", "11")
+                      %apply;image_MF("ancestor.father")
                       %apply;link(ancestor.father.access, ancestor.father)
                       %ancestor.father.title;
                     </td>
@@ -1534,8 +1540,8 @@
   %elseif;(evar.t = "Z" and evar.only = "on")
     <p>%apply;gen("v").</p>
     %reset_count;
-    <table class="table table-bordered ascends_table">
-      <tr class="ascends_table_header">%apply;table_header()</tr>
+    <table class="table table-hover ascends_table">
+      <tr class="ascends_table_header align-middle">%apply;table_header()</tr>
       %let;nb_col;%count;%in;
       %reset_count;
       %foreach;ancestor_level;
@@ -1562,8 +1568,8 @@
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togen(nb_gen).</p>
     %reset_count;
-    <table class="table table-bordered ascends_table">
-      <tr class="ascends_table_header">%apply;table_header()</tr>
+    <table class="table table-hover ascends_table">
+      <tr class="ascends_table_header align-middle">%apply;table_header()</tr>
       %let;nb_col;%count;%in;
       %reset_count;
       %foreach;ancestor_level(nb_gen)

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: perso.txt,v7.00 15/01/2017 06:06:34 $ -->
+  <!-- $Id: perso.txt,v7.00 31/03/2017 17:41:26 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -86,28 +86,20 @@
      </div>
   %end;
  <div class="row">
-    <div class="col-8 mx-auto">%(testing tree on 1st col%)
-      %if;has_parents;
-        <div class="collapse" id="collapseExample2">
-          %let;op_m;1%in;%apply;show_templ("perso_module/tree_3gen_v_photo_header")
-        </div>
-      %end;
-    </div>
     %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> is inside personnal_data %)
-      %let;op_m;3%in;%apply;show_templ("perso_module/personnal_data")
+      %let;op_m;3%in;%apply;show_templ("perso_module/individu")
       %let;op_m;2%in;%apply;show_templ("perso_module/unions")
-      %let;op_m;1%in;%apply;show_templ("perso_module/timeline")
+      %let;op_m;1%in;%apply;show_templ("perso_module/chronologie")
       %let;op_m;1%in;%apply;show_templ("perso_module/notes")
       %let;op_m;2%in;%apply;show_templ("perso_module/sources")
     %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from personnal_data %)
     <div class="col-4">
       %if;has_parents;
         <div class="collapse show" id="collapseExample2">
-          %let;op_m;2%in;%apply;show_templ("perso_module/tree_3gen_v_photo_header")
+          %let;op_m;2%in;%apply;show_templ("perso_module/arbre_3gen_photo")
         </div>
       %end;
-   %( %let;op_m;1%in;%apply;show_templ("perso_module/parents") %)
-      %let;op_m;1%in;%apply;show_templ("perso_module/siblings")
+      %let;op_m;1%in;%apply;show_templ("perso_module/fratrie")
       %let;op_m;1%in;%apply;show_templ("perso_module/relations")
     </div>
   </div>
