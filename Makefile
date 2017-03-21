@@ -50,6 +50,7 @@ install:
 		cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE); \
 		cp setup/setup $(PREFIX)/bin/gwsetup$(EXE); \
 		cp src/update_nldb $(PREFIX)/bin/update_nldb$(EXE); \
+		mkdir -p $(LANGDIR); \
 		cp -R hd/* $(LANGDIR)/.; \
 		mkdir -p $(MANDIR); \
 		cd man; cp $(MANPAGES) $(MANDIR)/.; \
