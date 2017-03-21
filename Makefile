@@ -35,7 +35,7 @@ install:
 	if test "$(OS_TYPE)" = "Darwin"; then \
 	    etc/macOS/install.command $(PWD) $(DESTDIR) etc/macOS; \
 	elif test "$(OS_TYPE)" = "Win"; then \
-		echo "No install for Window" \
+		echo "No install for Window"; \
 	else \
 		mkdir -p $(PREFIX)/bin; \
 		cp src/gwc1 $(PREFIX)/bin/gwc$(EXE); \
