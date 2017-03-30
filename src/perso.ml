@@ -2069,6 +2069,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "max_anc_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
+  | "static_max_anc_level" ->
+      match get_env "static_max_anc_level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
   | "max_cous_level" ->
       match get_env "max_cous_level" env with
       [ Vint i -> string_of_int i
@@ -5195,6 +5199,10 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     let mal () =
       Vint (max_ancestor_level conf base (get_key_index p) emal + 1)
     in
+    (* Static max ancestor level *)
+    let smal () =
+      Vint (max_ancestor_level conf base (get_key_index p) 120 + 1)
+    in
     let mcl () = Vint (max_cousin_level conf base p) in
     let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
     let nldb () =
@@ -5215,6 +5223,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
      ("sosa_ref", Vsosa_ref sosa_ref_l);
      ("t_sosa", Vt_sosa t_sosa);
      ("max_anc_level", Vlazy (Lazy.from_fun mal));
+     ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
      ("max_cous_level", Vlazy (Lazy.from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.from_fun mdl));
      ("desc_level_table", Vdesclevtab desc_level_table_l);
