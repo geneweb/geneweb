@@ -1095,7 +1095,7 @@ value build_list conf base =
   let reduce l =
     List.fold_left
       (fun acc (data, k) ->
-        let data_tmp =  Mutil.tr '_' ' ' data in
+        let data_tmp = remove_suburb (Mutil.tr '_' ' ' data) in
         if Mutil.start_with ini data_tmp || (data_tmp ^ " " = ini) then
           [ (data, k) :: acc ]
         else acc )
@@ -1135,6 +1135,7 @@ value build_list_short conf base list =
     let ini_list =
       List.rev_map
         (fun (s, _) ->
+          let s = remove_suburb s in
           if String.length s > len then
             String.sub s 0 (index_of_next_char s len)
           else s ^ String.make (len + 1 - String.length s) '_')
