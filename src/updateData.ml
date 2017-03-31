@@ -1027,6 +1027,25 @@ value print_mod_ok conf base = do {
 
 
 (* ********************************************************************* *)
+(*  [Fonc] remove_suburb : string -> string                              *)
+(** [Description] : Enlève le lieu-dit (de la forme
+      "[Lieu-dit] - Commune...") d'une chaîne de caractères.
+    [Args] :
+      - s : chaîne de caractères contenant le lieu-dit.
+    [Retour] : Retourne la chaîne de caractères dont le lieu-dit a été
+      enlevé.
+    [Rem] : Non exporté en clair hors de ce module.                      *)
+(* ********************************************************************* *)
+value remove_suburb s =
+  let re = Str.regexp "^\[.+\] - " in
+  let matched = Str.string_match re s 0 in
+  if matched then
+    let sub_start = Str.match_end() in
+    String.sub s sub_start (String.length s - sub_start)
+  else s
+;
+
+(* ********************************************************************* *)
 (*  [Fonc] build_list : config -> base ->
                           (string * (string * int) list) list            *)
 (** [Description] : Récupère la liste de toutes les "données" de la base.
