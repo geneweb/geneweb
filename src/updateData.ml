@@ -1069,7 +1069,23 @@ value build_list conf base =
   let list = List.rev_map (fun (istr, s, k) -> (sou base istr, s, k)) list in
   (* On tri la liste avant de la combiner *)
   (* sinon on n'élimine pas les doublons. *)
-  let list = List.sort (fun (s1, _, _) (s2, _, _) -> compare s1 s2) list in
+  let list = List.sort (fun (s1, _, _) (s2, _, _) -> (fun s1 s2 ->
+    let rss1 = remove_suburb s1 in
+    let rss2 = remove_suburb s2 in
+    (* Same place. *)
+    if rss1 = rss2 then
+        (* Place without suburb are before the same place with its suburb. *)
+        if s1 = rss2 then 1
+        else if rss1 = s2 then -1
+        (* Sort by suburb name. *)
+        else compare s1 s2
+    (* Sort by place name, without the suburb. *)
+    else if rss1 > rss2 then 1
+    else if rss1 < rss2 then -1
+    (* Should not happen. *)
+    else compare s1 s2
+  ) s1 s2) list
+  in
   (* On combine la liste parce qu'en gwc2, les données peuvent être à  *)
   (* des adresses différentes. NB: on pourrait rassembler les lieux et *)
   (* les sources dans un seul index pour de meilleures performances.   *)
@@ -1166,9 +1182,10 @@ value build_list_long conf base list =
   let list =
     List.map
       (fun (s, k) ->
+        let s1 = remove_suburb s in
         let ini =
-          if String.length s > String.length ini then
-            String.sub s 0 (index_of_next_char s (String.length ini))
+          if String.length s1 > String.length ini then
+            String.sub s1 0 (index_of_next_char s1 (String.length ini))
           else ini
         in (ini, s, k))
       list
@@ -1332,7 +1349,15 @@ value print_foreach conf base print_ast eval_expr =
     let list =
       match get_env "list_value" env with
       [ Vlist_value l ->
-          List.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic_order s1 s2) l
+          List.sort (fun (s1, _) (s2, _) ->
+            let rss1 = remove_suburb s1 in
+            let rss2 = remove_suburb s2 in
+            if rss1 = rss2 then
+                (* If suburbs of the same place, sort by suburb name. *)
+                Gutil.alphabetic_order s1 s2
+            else
+                (* Sort by place name (without the suburb). *)
+                Gutil.alphabetic_order rss1 rss2) l
       | _ -> [] ]
     in
     loop list where rec loop =
