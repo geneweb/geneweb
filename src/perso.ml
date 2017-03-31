@@ -111,6 +111,8 @@ value string_of_title conf base and_txt p (nth, name, title, places, dates) =
                [ Some (Dgreg d _) ->
                    if d.month <> 0 then Buffer.add_string b " - "
                    else Buffer.add_string b "-"
+               | Some (Dtext d) ->
+                   Buffer.add_string b " - "
                | _ -> () ];
                match date_end with
                [ Some (Dtext d ) ->
