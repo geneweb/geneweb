@@ -24,6 +24,8 @@ type create_info =
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 
+value string_of_key (a,b,n,_,c) = Printf.sprintf "(\"%s\" \"%s\" %d _ \"%s\")" a b n c;
+
 value infer_death conf birth bapt =
   match (birth, bapt) with
   [ (Some (Dgreg d _), _) ->
@@ -1141,6 +1143,7 @@ value add_misc_names_for_new_persons base new_persons =
     new_persons
 ;
 
+(* shows conflict description page if can't add *)
 value insert_person conf base src new_persons (f, s, o, create, var) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in

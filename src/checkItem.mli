@@ -43,6 +43,23 @@ value reduce_family :
 value sort_children :
   base -> array Adef.iper -> option (array Adef.iper * array Adef.iper);
 
+(* ************************************************************************************ *)
+(*  [Fun] insert_child :
+      base -> Adef.iper -> array Adef.iper -> array Adef.iper                           *)
+(** [Description] : Add new child to the current (sorted) children array. This function
+                    tries to keep children with born date at the beginning of array and
+                    and without it in the end.
+    [Args] :
+      - base     : base
+      - ip       : unique number if person to add
+      - children : the array of current children
+    [Returns]    : new array of children with length + 1
+                                                                                        *)
+(* ************************************************************************************ *)
+
+value insert_child :
+  base -> Adef.iper -> array Adef.iper -> array Adef.iper;
+
 value check_other_fields :
   base -> (base_misc -> unit) -> Def.ifam -> family -> unit;
 

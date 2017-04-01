@@ -20,6 +20,9 @@ external ifam_of_int : int -> ifam = "%identity";
 external int_of_istr : istr -> int = "%identity";
 external istr_of_int : int -> istr = "%identity";
 
+value string_of_ifam = string_of_int;
+value string_of_iper = string_of_int;
+
 type date =
   [ Dgreg of dmy and calendar
   | Dtext of string ]
