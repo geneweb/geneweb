@@ -113,6 +113,10 @@ value string_of_title conf base and_txt p (nth, name, title, places, dates) =
                    else Buffer.add_string b "-"
                | _ -> () ];
                match date_end with
+               [ Some (Dtext d ) ->
+                   Buffer.add_string b " - "
+               | _ -> () ];
+               match date_end with
                [ Some d -> Buffer.add_string b (Date.string_of_date conf d)
                | None -> () ];
                False

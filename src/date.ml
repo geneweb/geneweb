@@ -476,7 +476,7 @@ value string_of_ondate conf d =
 value string_of_date conf =
   fun
   [ Dgreg d _ -> string_of_dmy conf d
-  | Dtext t -> "(" ^ t ^ ")" ]
+  | Dtext t -> t ]
 ;
 
 value string_of_date_sorted conf =
@@ -492,7 +492,7 @@ value string_of_date_sorted conf =
         string_of_int d.year ^
         Printf.sprintf "%02d" d.month ^
         Printf.sprintf "%02d" d.day ] 
-  | Dtext t -> "(" ^ t ^ ")" ]
+  | Dtext t -> t ]
 ;
 
 value string_of_date_aux conf sep =
