@@ -40,7 +40,7 @@ and dmy2 =
     year2 : int;
     delta2 : int }
 and precision =
-  [ Sure | About | Maybe | Before | After | OrYear of dmy2 | YearInt of dmy2 ]
+  [ Sure | About | Maybe | Before | After | OrYear of dmy2 | YearInt of dmy2 | YearDur of dmy2 ]
 ;
 
 type cdate =
@@ -61,7 +61,7 @@ value compress d =
     [ Sure | About | Maybe | Before | After ->
         d.day >= 0 && d.month >= 0 && d.year > 0 && d.year < 2500 &&
         d.delta = 0
-    | OrYear _ | YearInt _ -> False ]
+    | OrYear _ | YearInt _ | YearDur _ -> False ]
   in
   if simple then
     let p =
@@ -70,7 +70,7 @@ value compress d =
       | Maybe -> 2
       | Before -> 3
       | After -> 4
-      | Sure | OrYear _ | YearInt _ -> 0 ]
+      | Sure | OrYear _ | YearInt _ | YearDur _ -> 0 ]
     in
     Some (((p * 32 + d.day) * 13 + d.month) * 2500 + d.year)
   else None

@@ -125,6 +125,7 @@ let string_of_prec_dmy conf d =
    | Maybe -> "?" ^ s
    | OrYear z -> s ^ "|" ^ string_of_int z
    | YearInt z -> s ^ ".." ^ string_of_int z
+   | YearDur z -> s ^ "<>" ^ string_of_int z
 ;;
 
 let string_of_date conf = function
@@ -154,6 +155,7 @@ let string_of_dmy d =
     match d.prec with
     | OrYear y -> Printf.sprintf "|%s" (soy y)
     | YearInt y -> Printf.sprintf "..%s" (soy y)
+    | YearDur y -> Printf.sprintf "<>%s" (soy y)
     | _ -> ""
   in
   prec ^ date ^ delta
@@ -250,6 +252,16 @@ let piqi_date_of_date date =
                 })
               in
               (`yearint, Some dmy2)
+          | YearDur y ->
+              let dmy2 =
+                Mapp.Dmy.({
+                  day = Int32.of_int 0;
+                  month = Int32.of_int 0;
+                  year = Int32.of_int y;
+                  delta = Int32.of_int 0;
+                })
+              in
+              (`yeardur, Some dmy2)
         in
         (prec, dmy1, dmy2)
       in
@@ -309,6 +321,12 @@ let date_of_piqi_date date =
                 let y = Int32.to_int dmy.Mapp.Dmy.year in
                 YearInt y
             | None -> YearInt 0 (* erreur*))
+        | Some `yeardur ->
+            (match date.Mapp.Date.dmy2 with
+            | Some dmy ->
+                let y = Int32.to_int dmy.Mapp.Dmy.year in
+                YearDur y
+            | None -> YearDur 0 (* erreur*))
         | _ -> Sure
       in
       let dmy =
@@ -364,6 +382,12 @@ let date_of_piqi_date2 date =
                 let y = Int32.to_int dmy.Mmod.Dmy.year in
                 YearInt y
             | None -> YearInt 0 (* erreur*))
+        | Some `yeardur ->
+            (match date.Mmod.Date.dmy2 with
+            | Some dmy ->
+                let y = Int32.to_int dmy.Mmod.Dmy.year in
+                YearDur y
+            | None -> YearDur 0 (* erreur*))
         | _ -> Sure
       in
       let dmy =

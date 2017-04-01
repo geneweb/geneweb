@@ -479,6 +479,13 @@ and conv_prec f f_max_month g g_max_month d =
         {day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0} 
       in
       YearInt dmy2
+  | YearDur d2 ->
+      let d = dmy_of_dmy2 d2 in
+      let d = conv f f_max_month g g_max_month d in
+      let dmy2 = 
+        {day2 = d.day; month2 = d.month; year2 = d.year; delta2 = 0} 
+      in
+      YearDur dmy2
   | prec -> prec ]
 ;
 

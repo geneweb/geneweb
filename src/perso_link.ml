@@ -115,6 +115,40 @@ value date_of_piqi_date date =
                                 YearInt dmy2
                             | None -> Sure ]
                       | None -> Sure (*YearInt {day2 = 0; month2 = 0; year2 = 0; delta2 = 0}*) (* erreur*) ]
+                  | Some `yeardur ->
+                      match date.MLink.Date.dmy2 with
+                      [ Some dmy ->
+                            match dmy.MLink.Dmy.year with
+                            [ Some _ ->
+                                let d =
+                                  match dmy.MLink.Dmy.day with
+                                  [ Some day -> Int32.to_int day
+                                  | None -> 0 ]
+                                in
+                                let m =
+                                  match dmy.MLink.Dmy.month with
+                                  [ Some month -> Int32.to_int month
+                                  | None -> 0 ]
+                                in
+                                let y =
+                                  match dmy.MLink.Dmy.year with
+                                  [ Some year -> Int32.to_int year
+                                  | None -> 0 (* erreur ! *) ]
+                                in
+                                (* gestion des erreurs. *)
+                                let (d, m, y) =
+                                  match dmy.MLink.Dmy.year with
+                                  [ Some _ ->
+                                      if m <= 0 then (0, 0, y)
+                                      else (d, m, y)
+                                  | None -> (0, 0, 0) (* should not happen ! *) ]
+                                in
+                                let dmy2 =
+                                  {day2 = d; month2 = m; year2 = y; delta2 = 0}
+                                in
+                                YearDur dmy2
+                            | None -> Sure ]
+                      | None -> Sure (*YearDur {day2 = 0; month2 = 0; year2 = 0; delta2 = 0}*) (* erreur*) ]
                   | _ -> Sure ]
                 in
                 let dmy =

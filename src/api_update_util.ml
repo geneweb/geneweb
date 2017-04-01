@@ -406,6 +406,15 @@ let piqi_date_of_date date =
                 Mwrite.Dmy.({day = d; month = m; year = y; delta = delta;})
               in
               (`yearint, Some dmy2)
+          | YearDur dmy2 ->
+              let d = Some (Int32.of_int dmy2.day2) in
+              let m = Some (Int32.of_int dmy2.month2) in
+              let y = Some (Int32.of_int dmy2.year2) in
+              let delta = Some (Int32.of_int dmy2.delta2) in
+              let dmy2 =
+                Mwrite.Dmy.({day = d; month = m; year = y; delta = delta;})
+              in
+              (`yeardur, Some dmy2)
         in
         (prec, dmy1, dmy2)
       in
@@ -560,7 +569,57 @@ let date_of_piqi_date conf date =
                                 YearInt dmy2
                             | None -> Sure
                           end
-                      | None -> Sure (*YearInt {day2 = 0; month2 = 0; year2 = 0; delta2 = 0}*) (* erreur*))
+                  | Some `yeardur ->
+                      (match date.Mwrite.Date.dmy2 with
+                      | Some dmy ->
+                          begin
+                            match dmy.Mwrite.Dmy.year with
+                            | Some _ ->
+                                let d =
+                                  match dmy.Mwrite.Dmy.day with
+                                  | Some day -> Int32.to_int day
+                                  | None -> 0
+                                in
+                                let m =
+                                  match dmy.Mwrite.Dmy.month with
+                                  | Some month -> Int32.to_int month
+                                  | None -> 0
+                                in
+                                let y =
+                                  match dmy.Mwrite.Dmy.year with
+                                  | Some year -> Int32.to_int year
+                                  | None -> 0 (* erreur ! *)
+                                in
+                                (* gestion des erreurs. *)
+                                let (d, m, y) =
+                                  match dmy.Mwrite.Dmy.year with
+                                  | Some _ ->
+                                      if m <= 0 then (0, 0, y)
+                                      else (d, m, y)
+                                  | None -> (0, 0, 0) (* should not happen ! *)
+                                in
+                                let dmy2 =
+                                  {day2 = d; month2 = m; year2 = y; delta2 = 0}
+                                in
+                                let _check_date =
+                                  (* pas de mois *)
+                                  if dmy2.month2 = 0 then ()
+                                  (* pas de jour *)
+                                  else if dmy2.day2 = 0 && dmy2.month2 >= 1 &&
+                                          dmy2.month2 <= 13
+                                  then ()
+                                  (* tous *)
+                                  else if dmy2.day2 >= 1 && dmy2.day2 <= 31 &&
+                                          dmy2.month2 >= 1 && dmy2.month2 <= 13
+                                  then ()
+                                  else
+                                    let d = Date.dmy_of_dmy2 dmy2 in
+                                    Update.bad_date conf d
+                                in
+                                YearDur dmy2
+                            | None -> Sure
+                          end
+                      | None -> Sure (*YearDur {day2 = 0; month2 = 0; year2 = 0; delta2 = 0}*) (* erreur*))
                   | _ -> Sure
                 in
                 let dmy =

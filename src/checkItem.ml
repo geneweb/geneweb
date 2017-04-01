@@ -836,6 +836,7 @@ value possible_father base warning x ifath =
       let a2 =
         match d2 with
         [ {prec = YearInt dmy2} -> dmy2.year2
+        | {prec = YearDur dmy2} -> dmy2.year2
         | {prec = OrYear dmy2} -> dmy2.year2
         | {year = a} -> a ]
       in

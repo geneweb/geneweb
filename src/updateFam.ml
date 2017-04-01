@@ -337,7 +337,7 @@ and eval_date_var_aux od =
       match eval_date_field od with
       [ Some d ->
           match d.prec with
-          [ OrYear d2 | YearInt d2 ->
+          [ OrYear d2 | YearInt d2 | YearDur d2 ->
               if d2.day2 = 0 then ""
               else string_of_int d2.day2
           | _ -> "" ]
@@ -346,7 +346,7 @@ and eval_date_var_aux od =
       match eval_date_field od with
       [ Some d ->
           match d.prec with
-          [ OrYear d2 | YearInt d2 ->
+          [ OrYear d2 | YearInt d2 | YearDur d2 ->
               if d2.month2 = 0 then ""
               else
                 match od with
@@ -358,7 +358,7 @@ and eval_date_var_aux od =
       match eval_date_field od with
       [ Some d ->
           match d.prec with
-          [ OrYear d2 | YearInt d2 -> string_of_int d2.year2
+          [ OrYear d2 | YearInt d2 | YearDur d2 -> string_of_int d2.year2
           | _ -> "" ]
       | None -> "" ]
   | "prec" ->
@@ -370,6 +370,7 @@ and eval_date_var_aux od =
       | Some (Dgreg {prec = After} _) -> "after"
       | Some (Dgreg {prec = OrYear _} _) -> "oryear"
       | Some (Dgreg {prec = YearInt _} _) -> "yearint"
+      | Some (Dgreg {prec = YearDur _} _) -> "yeardur"
       | _ -> "" ]
   | "text" ->
       match od with

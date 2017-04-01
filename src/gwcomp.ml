@@ -201,6 +201,13 @@ value date_of_string s i =
             {day2 = day2; month2 = month2; year2 = year2; delta2 = 0}
           in
           Some (Dgreg {(d) with prec = YearInt dmy2} cal, i)
+        else if i + 1 < String.length s && s.[i] = '<' && s.[i + 1] = '>' then
+          let (year2, i) = champ (i + 2) in
+          let ((day2, month2, year2), i) = dmy2 year2 i in
+          let dmy2 =
+            {day2 = day2; month2 = month2; year2 = year2; delta2 = 0}
+          in
+          Some (Dgreg {(d) with prec = YearDur dmy2} cal, i)
         else Some (dt, i)
     | Some ((Dtext _ as dt), i) -> Some (dt, i)
     | None -> None ]

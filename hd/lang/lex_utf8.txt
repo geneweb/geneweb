@@ -2738,6 +2738,18 @@ sk: pred
 sl: pred
 sv: före
 
+    begin (date)
+en: begin
+fr: début
+
+    end (date)
+en: end
+fr: fin
+
+    fromto (date)
+en: from-to
+fr: de-à
+
     begin
 af: begin
 bg: започване

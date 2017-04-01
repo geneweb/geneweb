@@ -236,7 +236,8 @@ value ged_date_dmy oc dt cal =
     | Before -> fprintf oc "BEF "
     | After -> fprintf oc "AFT "
     | OrYear i -> fprintf oc "BET "
-    | YearInt i -> fprintf oc "BET " ];
+    | YearInt i -> fprintf oc "BET "
+    | YearDur i -> fprintf oc "FROM " ];
     ged_calendar oc cal;
     if dt.day <> 0 then fprintf oc "%02d " dt.day else ();
     if dt.month <> 0 then fprintf oc "%s " (ged_month cal dt.month)
@@ -255,6 +256,15 @@ value ged_date_dmy oc dt cal =
     | YearInt dmy2 ->
         do {
           fprintf oc " AND ";
+          ged_calendar oc cal;
+          if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
+          if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
+          else ();
+          fprintf oc "%d" dmy2.year2;
+        }
+    | YearDur dmy2 ->
+        do {
+          fprintf oc " TO ";
           ged_calendar oc cal;
           if dmy2.day2 <> 0 then fprintf oc "%02d " dmy2.day2 else ();
           if dmy2.month2 <> 0 then fprintf oc "%s " (ged_month cal dmy2.month2)
