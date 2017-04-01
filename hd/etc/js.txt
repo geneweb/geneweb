@@ -55,7 +55,7 @@ $(document).ready(function(){
   <script>
     %for;i;1;27;
       %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
-      %if;(m_nam!="")
+      %if;("m_nam"!="" and m_nam!="")
         %let;m_ltr;%apply;letter(i)%in;
         %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
         %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
