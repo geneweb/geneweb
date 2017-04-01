@@ -354,6 +354,8 @@
                   </div>
                 %end;
               </div>
+            </div>
+            <div class="d-inline-flex justify-content-start flex-wrap">
               <div class="align-self-center ml-auto ">
                 %if;has_witnesses;
                   <div class="d-flex flex-wrap mb-1">
