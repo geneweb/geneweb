@@ -187,7 +187,7 @@
     <table class="fp_marriage_notes">
       <tr>
         <td>
-          <span class="textcolor">[*marriage notes]:</span> %comment;
+          <span class="textcolor">[*marriage notes/marriages notes]0:</span> %comment;
           %if;has_marriage_note;%marriage_note;%end;
         </td>
       </tr>

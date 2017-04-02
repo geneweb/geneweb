@@ -299,7 +299,7 @@ function no_options () {
         </label>
         <label>
           <input type="checkbox" name="comm" value="on"%/>
-          [*marriage notes]
+          [*marriage notes/*marriages notes]0
         </label>
       </p>
       <p class="ascends_menu_option_p">
