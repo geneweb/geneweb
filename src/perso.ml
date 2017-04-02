@@ -115,10 +115,6 @@ value string_of_title conf base and_txt p (nth, name, title, places, dates) =
                    Buffer.add_string b " - "
                | _ -> () ];
                match date_end with
-               [ Some (Dtext d ) ->
-                   Buffer.add_string b " - "
-               | _ -> () ];
-               match date_end with
                [ Some d -> Buffer.add_string b (Date.string_of_date conf d)
                | None -> () ];
                False
@@ -2961,6 +2957,10 @@ and eval_date_field_var conf d =
   [ ["prec"] ->
       match d with
       [ Dgreg dmy  _ -> VVstring (quote_escaped (Date.prec_text conf dmy))
+      | _ -> VVstring "" ]
+  | ["text"] ->
+      match d with
+      [ Dtext t -> VVstring t
       | _ -> VVstring "" ]
   | ["day"] ->
       match d with
