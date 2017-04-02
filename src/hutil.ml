@@ -18,7 +18,8 @@ value link_to_referer conf =
   let referer = Util.get_referer conf in
   let retour = Util.capitale (Util.transl conf "back") in
   if referer <> "" then
-    sprintf "<a href=\"%s\"><span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span></a>\n" referer retour
+    sprintf "<a href=\"%s\"><span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span></a>\n" 
+      referer retour
   else ""
 ;
 
@@ -73,7 +74,8 @@ value header_without_http conf title = do {
 };
 
 value header_without_page_title conf title = do {
-  Util.html conf; (* semble inutile car la fonction header_without_http a maintenant un header HTML5, mauvais nom ? *)
+  Util.html conf; (* semble inutile car la fonction header_without_http a 
+    maintenant un header HTML5, mauvais nom ? *)
   header_without_http conf title;
   Wserver.printf "<div class=\"container\">"; (* balancing </div> in gen_trailer *)
 };
@@ -84,10 +86,6 @@ value header_link_welcome conf title = do {
   Wserver.printf "<h1>";
   title False;
   Wserver.printf "</h1>\n";
-};
-
-value header_no_h1 conf title = do {
-  header_without_page_title conf title;
 };
 
 value header_no_page_title conf title = do {

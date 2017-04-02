@@ -510,7 +510,7 @@ value gen_print with_logo mode conf base fname =
   [ Some ic ->
       let title _ = Wserver.printf "%s" fname in
       do {
-        Hutil.header_no_h1 conf title;
+        Hutil.header_without_page_title conf title;
         copy_from_channel conf base ic mode;
         Hutil.gen_trailer with_logo conf;
       }
