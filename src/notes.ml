@@ -82,7 +82,7 @@ value print_whole_notes conf base fnotes title s ho = do {
       [ Some (case_sens, h) -> html_highlight case_sens h title
       | None -> title ]
     in
-      Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
+    Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
   else ();
   Wserver.printf "</div>\n";
   match Util.open_etc_file "summary" with
@@ -484,7 +484,6 @@ value print_misc_notes conf base =
   in
   do {
     header_link_welcome conf title;
-    (*print_link_to_welcome conf True;*)
     if db <> [] then
       tag "ul" begin
         if d <> "" then

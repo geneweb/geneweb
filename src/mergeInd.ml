@@ -17,11 +17,13 @@ value print_differences conf base branches p1 p2 =
       Wserver.printf "<h4>%s</h4>\n" (capitale title);
       tag "ul" begin
         tag "li" begin
-          xtag "input" "class=\"form-control\" type=\"radio\" name=\"%s\" value=\"1\"%s" name chk1;
+          xtag "input" "class=\"form-control\" type=\"radio\" name=\"%s\" 
+            value=\"1\"%s" name chk1;
           Wserver.printf "%s\n" x1;
         end;
         tag "li" begin
-          xtag "input" "class=\"form-control\" type=\"radio\" name=\"%s\" value=\"2\"%s" name chk2;
+          xtag "input" "class=\"form-control\" type=\"radio\" name=\"%s\" 
+            value=\"2\"%s" name chk2;
           Wserver.printf "%s\n" x2;
         end;
       end;
