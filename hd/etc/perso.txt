@@ -1,8 +1,8 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: perso.txt,v 5.15 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- $Id: perso.txt,v7.00 31/03/2017 17:41:26 $ -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
@@ -12,28 +12,21 @@
       %else;%first_name; %surname;%end;
     %end;
   </title>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
-  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png"%/>
-  %include.js;
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+  <link rel="apple-touch-icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
-%( Because Safari mobile is just a great browser that can't handle events... %)
-%( Added a div with an 'empty event' to handle the modify menu.              %)
-<div onclick="void(0);">
-
-
-%import;perso_utils
-
-
+<div class="container">
+%import;perso_utils;
+%include.menubar;
 %define;init_nb_asc(tplnum)
-  %let;templ;%bvar.module_perso_tplnum;%in
+  %let;templ;%bvar.perso_module_tplnum;%in
   %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
@@ -54,8 +47,8 @@
 %end
 
 %define;init_nb_desc(tplnum)
-  %let;templ;%bvar.module_perso_tplnum;%in
-  %if;(templ = "union_complet")
+  %let;templ;%bvar.perso_module_tplnum;%in
+  %if;(templ = "unions")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
     %end;
@@ -67,8 +60,8 @@
 %end
 
 %define;init_from_gen_desc(tplnum)
-  %let;templ;%bvar.module_perso_tplnum;%in
-  %if;(templ = "famille")
+  %let;templ;%bvar.perso_module_tplnum;%in
+  %if;(templ = "family")
     %if;(count < 3)
       %reset_count;%incr_count;%incr_count;%incr_count;
     %end;
@@ -83,55 +76,86 @@
   %init_cache.nb_asc.from_gen_desc.nb_desc;
 %end;
 
-%include.perso_header;
-
-
-%if;(bvar.module_perso_tplnb="" or bvar.module_perso_tplnb=0)
+%(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
+%if;(evar.p_mod="zz" or (bvar.p_mod="" and evar.p_mod="" and (bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)))
+  %(Statique%)
   %apply;init_cache(3, 2, 2)
-
-  %apply;show_templ("perso_module/etat_civil")
-  %apply;show_templ("perso_module/parent_simple")
-  %apply;show_templ("perso_module/union_simple")
-  %apply;show_templ("perso_module/freresoeur_simple")
-  %apply;show_templ("perso_module/relations")
-  %apply;show_templ("perso_module/timeline")
-  %apply;show_templ("perso_module/notes")
-  %apply;show_templ("perso_module/sources")
-  %apply;show_templ("perso_module/arbre_3gen_v_photo")
-%else;
+  %if;(has_parents and (father.has_parents or mother.has_parents))
+     <div class="collapse" id="collapseExample1">
+        %let;op_m;1%in;%apply;show_templ("perso_module/gr_parents")
+     </div>
+  %end;
+ <div class="row">
+    %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> is inside personnal_data %)
+      %let;op_m;3%in;%apply;show_templ("perso_module/individu")
+      %let;op_m;2%in;%apply;show_templ("perso_module/unions")
+      %let;op_m;1%in;%apply;show_templ("perso_module/chronologie")
+      %let;op_m;1%in;%apply;show_templ("perso_module/notes")
+      %let;op_m;2%in;%apply;show_templ("perso_module/sources")
+    %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from personnal_data %)
+    <div class="col-4">
+      %if;has_parents;
+        <div class="collapse show" id="collapseExample2">
+          %let;op_m;2%in;%apply;show_templ("perso_module/arbre_3gen_photo")
+        </div>
+      %end;
+      %let;op_m;1%in;%apply;show_templ("perso_module/fratrie")
+      %let;op_m;1%in;%apply;show_templ("perso_module/relations")
+    </div>
+  </div>
+%elseif;(bvar.perso_module_tplnb!="" and bvar.perso_module_tplnb>0)
+  %(Dynamique, perso_module_tplnb : %bvar.perso_module_tplnb;<br>%)
   %reset_count;
-  %for;i;0;bvar.module_perso_tplnb;
+  %for;i;0;bvar.perso_module_tplnb;
     %apply;init_nb_asc(i)
   %end;
   %let;nb_asc;%count;%in
 
   %reset_count;
-  %for;i;0;bvar.module_perso_tplnb;
+  %for;i;0;bvar.perso_module_tplnb;
     %apply;init_from_gen_desc(i)
   %end;
   %let;from_gen_desc;%count;%in
 
   %reset_count;
-  %for;i;0;bvar.module_perso_tplnb;
+  %for;i;0;bvar.perso_module_tplnb;
     %apply;init_nb_desc(i)
   %end;
   %let;nb_desc;%count;%in
 
   %apply;init_cache(nb_asc, from_gen_desc, nb_desc)
   %reset_count;
-
-  %for;i;0;bvar.module_perso_tplnb;
-    %apply;get_templ(i)
-  %end;
+  <div class="row">
+    <div class="col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+      %for;i;0;bvar.perso_module_tplnb;
+        %apply;get_templ(i)
+      %end;
+    </div>
+  </div>
+%elseif;((evar.p_mod!="" and evar.p_mod!="zz") or bvar.p_mod!="")
+  %(Dynamic %)
+  %apply;init_cache(3, 2, 2)
+  <div class="mt-2">
+    %for;i;0;p_mod_nbr;
+      %let;mmi;%apply;mm(i)%in;
+      %let;ooi;%apply;oo(i)%in;
+      %if;(mmi!="" and ooi!=0)
+        %apply;get_mod(mmi, ooi)
+      %end
+    %end;
+  </div>
+%else;
+%(Nothing %)
 %end;
 
-<p></p>
-
-%if;(evar.opt = "misc")%misc_names;<p>%end;
-
-%base_trailer;
-%include.copyr;
-
-</div> %( the magic Safari div %)
+%if;(evar.opt = "misc")
+  %misc_names;<p>
+%end;
+%if;(not cancel_links)
+  %include.trl;
+  %include.copyr;
+%end;
+</div>
+%include.js;
 </body>
 </html>

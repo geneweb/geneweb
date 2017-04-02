@@ -1,50 +1,71 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <title>Base</title>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 </head>
 <body%body_prop;>
-<h1>
-[
-en: Open a Tree
-fr: Ouvrir une généalogie
-]
-</h1>
+<div class="container text-center ">
+<h1 class="mt-5">[*choose a genealogy]</h1>
 
-<div style="text-align:center">
-<p>
-[
-en: Please, enter the name of the database you want to use:
-fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
-]
-</p>
+<div class="my-3">
+[*input database]
 
-<ul style="list-style-type: none">
-<li>
-<form method="get" action="%prefix;">
-<p>
-<input name="b" size="40"%/> =&gt;
-<input type="submit" value="Ok"%/>
-</p>
+<form class="form-inline d-flex justify-content-center my-2" method="get" action="%prefix;">
+  <input type="hidden" name="lang" value="%evar.lang;">
+  <input name="b" class="form-control col-4">
+  <button type="submit" class="btn btn-secondary ml-2" value="">Ok</button>
 </form>
-</li>
-</ul>
 
-<p>
-<a href="http://localhost:2316/gwsetup?v=list.htm">
-[
-en: Available Family Tree (use Gwsetup)
-fr: Listes des généalogies disponibles (utilise Gwsetup)
-]
-</a>
-</p>
+
+<a href="http://localhost:2316/gwsetup?v=list.htm">[*available genealogies]</a>
 </div>
 
-%copyright;
+<h3 class="text-center mt-5">[*select lang]</h3>
+<div class="d-flex flex-wrap justify-content-center col-11 mt-2 mx-auto">
+  <a class="btn btn-secondary" href="%prefix_base;lang=af%if;(evar.templ!="");templ=%evar.templ;;%end;" title="af">Afrikaans</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=bg%if;(evar.templ!="");templ=%evar.templ;;%end;" title="bg">български</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=br%if;(evar.templ!="");templ=%evar.templ;;%end;" title="br">brezhoneg</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=ca%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ca">català</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=cs%if;(evar.templ!="");templ=%evar.templ;;%end;" title="cs">čeština</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=da%if;(evar.templ!="");templ=%evar.templ;;%end;" title="da">dansk</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=de%if;(evar.templ!="");templ=%evar.templ;;%end;" title="de">Deutsch</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=en%if;(evar.templ!="");templ=%evar.templ;;%end;" title="en">English</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=eo%if;(evar.templ!="");templ=%evar.templ;;%end;" title="eo">esperanto</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=es%if;(evar.templ!="");templ=%evar.templ;;%end;" title="es">Español</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=et%if;(evar.templ!="");templ=%evar.templ;;%end;" title="et">eesti</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=fi%if;(evar.templ!="");templ=%evar.templ;;%end;" title="fi">suomi</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=fr%if;(evar.templ!="");templ=%evar.templ;;%end;" title="fr">français</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=he%if;(evar.templ!="");templ=%evar.templ;;%end;" title="he">עברית </a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=is%if;(evar.templ!="");templ=%evar.templ;;%end;" title="is">íslenska</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=it%if;(evar.templ!="");templ=%evar.templ;;%end;" title="it">italiano</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=lv%if;(evar.templ!="");templ=%evar.templ;;%end;" title="lv">Latviešu</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=nl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="nl">Nederlands</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=no%if;(evar.templ!="");templ=%evar.templ;;%end;" title="no">norsk</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=oc%if;(evar.templ!="");templ=%evar.templ;;%end;" title="oc">occitan</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=pl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pl">polski</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=pt%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pt">Português</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=pt-br%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pt-br">Português-do-Brasil</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=ro%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ro">romaneste</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=ru%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ru">русский</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=sk%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sk">slovenčina</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=sl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sl">slovenščina</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=sv%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sv">svenska</a>
+  <a class="btn btn-secondary" href="%prefix_base;lang=zh%if;(evar.templ!="");templ=%evar.templ;;%end;" title="zh">中文</a>
+</div>
+</div>
+  <div class="btn-group float-right mt-5 mr-5">
+    <span class="align-self-center">%version; %compilation_time;%sp;
+    &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017 %connections; %sq;</span>
+    <a href="https://github.com/geneweb/geneweb" class="ml-1" target="_blank" title="GeneWeb sources on GitHub">
+    <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
+    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" class="ml-1" target="_blank" title="GeneWeb documentation MediaWiki">
+    <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb Mediawiki"/></a>
+  </div>
+</div>
 </body>
 </html>

@@ -281,7 +281,7 @@ value strip_trailing_spaces s =
 ;
 
 value read_base_env bname =
-  let fname = Util.base_path [] (bname ^ ".gwf") in
+  let fname = Util.base_path [] (bname ^ ".gwb/params.gwf") in
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =
@@ -356,6 +356,7 @@ value print_redirected conf from request new_addr =
     match Util.open_etc_file "redirect" with
     [ Some ic ->
         do {
+          let conf = {(conf) with is_printed_by_ocaml = False} in 
           Util.html conf;
           Templ.copy_from_templ conf env ic;
         }
@@ -383,7 +384,9 @@ value propose_base conf =
       Wserver.printf "<form method=\"get\" action=\"%s\">\n"
         conf.indep_command;
       Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
-      Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+ 				Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+			end;
     end;
     Hutil.trailer conf;
   }
@@ -1211,11 +1214,13 @@ value make_conf from_addr (addr, request) script_name contents env = do {
     [ Not_found -> False ]
   in
   let wizard_just_friend = if manitou then False else wizard_just_friend in
+  let is_printed_by_ocaml = True in
   let conf =
     {from = from_addr;
      manitou = manitou;
      supervisor = supervisor;
      wizard = ar.ar_wizard && not wizard_just_friend;
+     is_printed_by_ocaml = is_printed_by_ocaml;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name;
@@ -1291,7 +1296,7 @@ value make_conf from_addr (addr, request) script_name contents env = do {
        match p_getenv base_env "doctype" with
        [ Some "html-4.01" -> ""
        | _ -> " /" ];
-     charset = "utf-8";
+     charset = "UTF-8";
      is_rtl = is_rtl;
      left = if is_rtl then "right" else "left";
      right = if is_rtl then "left" else "right";
@@ -1535,6 +1540,12 @@ value image_request script_name env =
 type misc_fname =
   [ Css of string
   | Js of string
+  | Otf of string
+  | Svg of string
+  | Woff of string
+  | Eot of string
+  | Ttf of string
+  | Woff2 of string
   | Other of string ]
 ;
 
@@ -1544,6 +1555,12 @@ value content_misc len misc_fname = do {
     match misc_fname with
     [ Css fname -> (fname, "text/css")
     | Js fname -> (fname, "text/javascript")
+    | Otf fname -> (fname, "application/font-otf")
+    | Svg fname -> (fname, "application/font-svg")
+    | Woff fname -> (fname, "application/font-woff")
+    | Eot fname -> (fname, "application/font-eot")
+    | Ttf fname -> (fname, "application/font-ttf")
+    | Woff2 fname -> (fname, "application/font-woff2")
     | Other fname -> (fname, "text/plain") ]
   in
   Wserver.header "Content-type: %s" t;
@@ -1555,7 +1572,8 @@ value content_misc len misc_fname = do {
 
 value print_misc_file misc_fname =
   match misc_fname with
-  [ Css fname | Js fname ->
+  [ Css fname | Js fname | Otf fname | Svg fname | Woff fname 
+  | Eot fname | Ttf fname | Woff2 fname ->
       match
         try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
       with
@@ -1587,6 +1605,12 @@ value misc_request fname =
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
       else if Filename.check_suffix fname ".js" then Js fname
+      else if Filename.check_suffix fname ".otf" then Otf fname
+      else if Filename.check_suffix fname ".svg" then Svg fname
+      else if Filename.check_suffix fname ".woff" then Woff fname
+      else if Filename.check_suffix fname ".eot" then Eot fname
+      else if Filename.check_suffix fname ".ttf" then Ttf fname
+      else if Filename.check_suffix fname ".woff2" then Woff2 fname
       else Other fname
     in
     print_misc_file misc_fname

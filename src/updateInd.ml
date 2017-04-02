@@ -349,6 +349,7 @@ and eval_simple_var conf base env p loc =
                   if i >= 0 && i < Array.length e.epers_witnesses then
                     match snd e.epers_witnesses.(i) with
                     [ Witness_GodParent -> str_val "godp"
+                    | Witness_Officer   -> str_val "offi"
                     | _ -> str_val "" ]
                   else if
                     i >= 0 && i < 2 && Array.length e.epers_witnesses < 2
@@ -774,7 +775,9 @@ value print_del1 conf base p =
         xtag "input" "type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"";
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
           (Adef.int_of_iper (get_key_index p));
-        xtag "input" "type=\"submit\" value=\"Ok\"";
+        tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+          Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+        end;
       end;
     end;
     trailer conf;

@@ -1002,6 +1002,7 @@ let pers_to_piqi_person conf base p =
                      match wk with
                      | Witness -> `witness
                      | Witness_GodParent -> `witness_godparent
+                     | Witness_Officer -> `witness_officer
                    in
                    let witness = poi base ip in
                    let witness =

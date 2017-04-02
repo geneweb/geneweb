@@ -17,11 +17,13 @@ value print_differences conf base branches p1 p2 =
       Wserver.printf "<h4>%s</h4>\n" (capitale title);
       tag "ul" begin
         tag "li" begin
-          xtag "input" "type=\"radio\" name=\"%s\" value=\"1\"%s" name chk1;
+          xtag "input" "class=\"form-control\" type=\"radio\" name=\"%s\" 
+            value=\"1\"%s" name chk1;
           Wserver.printf "%s\n" x1;
         end;
         tag "li" begin
-          xtag "input" "type=\"radio\" name=\"%s\" value=\"2\"%s" name chk2;
+          xtag "input" "class=\"form-control\" type=\"radio\" name=\"%s\" 
+            value=\"2\"%s" name chk2;
           Wserver.printf "%s\n" x2;
         end;
       end;
@@ -155,7 +157,9 @@ value print_differences conf base branches p1 p2 =
     string_field True (transl conf "burial" ^ " / " ^ transl conf "place")
       "burial_place" (fun p -> sou base (get_burial_place p));
     html_p conf;
-    Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
+    tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+      Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+    end;
   end
 ;
 

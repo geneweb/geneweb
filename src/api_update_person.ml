@@ -386,6 +386,7 @@ let reconstitute_person conf base mod_p =
                     match witness.Mwrite.Witness.witness_type with
                     | `witness -> Witness
                     | `witness_godparent -> Witness_GodParent
+                    | `witness_officer   -> Witness_Officer
                   in
                   let create_link = person.Mwrite.Person_link.create_link in
                   let wit =
@@ -1094,6 +1095,7 @@ let reconstitute_person_nobase conf mod_p =
                     match witness.Mwrite.Witness.witness_type with
                     | `witness -> Witness
                     | `witness_godparent -> Witness_GodParent
+                    | `witness_officer   -> Witness_Officer
                   in
                   let create_link = person.Mwrite.Person_link.create_link in
                   let wit =

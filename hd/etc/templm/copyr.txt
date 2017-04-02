@@ -20,27 +20,31 @@
       <div id="trl" style="clear:both;">
         <ul>
           <li><a href="%prefix_no_templ;templ=;%suffix;">default</a></li>
-          <li><a href="%prefix_no_templ;templ=templa;%suffix;">templa</a></li>
-          <li><a href="%prefix_no_templ;templ=templb;%suffix;">templb</a></li>
-          <li><a href="%prefix_no_templ;templ=templc;%suffix;">templc</a></li>
-          <li><a href="%prefix_no_templ;templ=templd;%suffix;">templd</a></li>
-          <li><a href="%prefix_no_templ;templ=templf;%suffix;">templf</a></li>
-          <li><a href="%prefix_no_templ;templ=templh;%suffix;">templh</a></li>
           <li><a href="%prefix_no_templ;templ=templm;%suffix;">templm</a></li>
         </ul>
       </div>
     %end;
   %end;
 %end;
+%define;lang(x)
+  %apply;nth%with;
+    /af/bg/br/ca/cs/da/de/en/eo/es/et/fi/fr/he/is/it/lv/nl/no/oc/pl/pt/pt-br/ro/ru/sk/sl/sv/zh/
+  %and;x%end;
+%end;
+%define;language_link()
+  %for;i;1;30;
+    %let;l1;%apply;lang(i)%in;
+    <a class="dropdown-item" href="%prefix_base;lang=%l1;;templ=%evar.templ;;%suffix;">%l1; %apply;language_name(l1)</a>
+  %end;
+%end;
+
 <div id="footer">
- <div>
-  <a href="http://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;"
-  title="Manual of GeneWeb on Mediawiki" target="_blank">
+  <a href="%prefix_no_templ;%suffix;"
+     title="Switch to %if(evar.templ!="templm")template m%else;defaut template%end;">Template -</a>
+  v. %version; %compilation_time;%sp;
+  &copy; INRIA 1998-2016 %connections;%sq;
+  <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
+  <img src="%image_prefix;/logo_bas.png"></a>
+  <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb MediaWiki">
   <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
-  <a href="http://opensource.geneanet.org/projects/geneweb/" 
-  title="GeneWeb version %version; %compilation_time;%sp;%nl;
-  &copy; INRIA 1998-2016" target="_blank">
-  <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
-  </div>
-  <div>%connections;</div>
 </div>

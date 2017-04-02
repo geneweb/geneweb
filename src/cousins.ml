@@ -295,8 +295,8 @@ value print_cousins conf base p lev1 lev2 =
     [ Not_found | Failure _ -> default_max_cnt ]
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    Perso.interp_notempl_with_menu title "perso_header" conf base p;
+    tag "h2" begin title False; end;
     cnt.val := 0;
     (* Construction de la table des sosa de la base *)
     let () = Perso.build_sosa_ht conf base in

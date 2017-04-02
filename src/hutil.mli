@@ -5,6 +5,8 @@ open Config;
 open Gwdb;
 
 value header : config -> (bool -> unit) -> unit;
+value header_fluid : config -> (bool -> unit) -> unit;
+value header_link_welcome : config -> (bool -> unit) -> unit;
 value print_link_to_welcome : config -> bool -> unit;
 value trailer : config -> unit;
 
@@ -17,6 +19,7 @@ value gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit;
 value gen_trailer : bool -> config -> unit;
 
 value incorrect_request : config -> unit;
+value error_cannot_access : config -> string -> unit;
 
 value interp :
   config -> string -> Templ.interp_fun 'a 'b -> Templ.env 'a -> 'b ->

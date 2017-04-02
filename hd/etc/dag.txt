@@ -1,34 +1,30 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: dag.txt,v 5.5 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.slices = "on")
       [*display by slices/slice width/overlap/total width]0%nn;
     %else;%head_title;%end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
+<div class="container">
 %if;not cancel_links;
-  <table style="float:%right;"><tr><td>
+  <div class="btn-group float-%right; mt-2">
     %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
   <hr style="clear:both; visibility:hidden;"%/>
 %end;
 
@@ -89,9 +85,8 @@
   </form>
 %else;
   %if;(evar.notab != "on")
-    <div style="text-align:%right;
-    "><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
-       notab=on;slices=on" accesskey="/"><tt>//</tt></a></div>
+    <div class="text-%right"><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
+       notab=on;slices=on" accesskey="/" title="[*display by slices/slice width/overlap/total width]0"><samp>//</sapm></a></div>
   %end;
   %if;(link_next != "")
     <p>
@@ -140,7 +135,7 @@
     %end;
     </pre>
   %else;
-    <table border="%border;" width="100%%"><tr><td align="center">
+    <table id="dag" border="%border;" width="100%%"><tr><td align="center">
     <table border="%border;" cellspacing="0" cellpadding="0">
     %foreach;dag_line;
       <tr align="left">
@@ -171,7 +166,9 @@
   %end;
 %end;
 
-%base_trailer;
+%include.trl;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

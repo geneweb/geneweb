@@ -309,7 +309,9 @@ value print_death conf base =
           xtag "input"
             "name=\"bd\" value=\"%s\" size=\"2\" maxlength=\"2\"" bd;
           Wserver.printf ")\n";
-          xtag "input" "type=\"submit\" value=\"Ok\"";
+          tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+            Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+          end;
         end;
       end;
     }

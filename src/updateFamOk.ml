@@ -251,6 +251,7 @@ value rec reconstitute_events conf ext cnt =
                         string_of_int i ^ "_kind")
                 with
                 [ Some "godp" -> (c, Witness_GodParent)
+                | Some "offi" -> (c, Witness_Officer)
                 | _ -> (c, Witness) ]
               in
               match

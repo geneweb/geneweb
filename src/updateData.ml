@@ -565,7 +565,9 @@ value print_long conf base list len =
                             else ();
                           end;
                           tag "td" begin
-                            xtag "input" "type=\"submit\" value=\"Ok\"" ;
+                            tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+                              Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+                            end;
                           end;
                         end;
                       end;
@@ -1090,7 +1092,9 @@ value print_mod_ok conf base = do {
             (quote_escaped (only_printable new_input));
           Wserver.printf
             "%s" (capitale (transl conf "continue correcting")) ;
-          xtag "input" "type=\"submit\" value=\"Ok\"" ;
+          tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+            Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+          end;
         end;
       end
       }

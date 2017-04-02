@@ -159,7 +159,7 @@
   </td>
 
   <td %if;(xx.same != "") colspan="8" %else; %apply;td_missing_events_rowspan("xx") bgcolor="#CCC3C6" %end;>
-    %apply;image_MF("xx", "11")
+    %apply;image_MF("xx")
     <a name="%xx.index;">
     %apply;short_display_person("xx")
     %if;(xx.same != "" and evar.repeat = "on")
@@ -227,7 +227,7 @@
         %foreach;xx.family;
           %if;(family_cnt = 1)
             <td %if;(xx.nb_families > 1) style="border-bottom:none" %end; bgcolor="#CCC3C6">
-              %apply;image_MF("spouse", "11")
+              %apply;image_MF("spouse")
               %apply;short_display_person("spouse")
             </td>
           %end;
@@ -238,7 +238,7 @@
     %else;
       <td bgcolor="#CCC3C6">
         %if;xx.has_families;
-          %apply;image_MF("xx.spouse", "11")
+          %apply;image_MF("xx.spouse")
           %apply;short_display_person("xx.spouse")
         %else;
           &nbsp;
@@ -391,7 +391,7 @@
     %if;(family_cnt != 1)
       <tr>
         <td %apply;td_family_missing_events2("xx") bgcolor="#CCC3C6">
-          %apply;image_MF("spouse", "11")
+          %apply;image_MF("spouse")
           %apply;short_display_person("spouse")
         </td>
 
@@ -426,7 +426,7 @@
 
 %let;nb_gena;%apply;min(evar.v, max_anc_level)%in;
 <p>%apply;togena(nb_gena).</p>
-<table class="ascends_table splitForPrint">
+<table class="table table-bordered ascends_table splitForPrint">
   <thead>
     <tr class="ascends_table_header">
       <th>[*Sosa]</th>
@@ -443,7 +443,7 @@
   <tbody>
     %foreach;ancestor_level(nb_gena)
       %if;(evar.gen = "on")
-		<tr>
+    <tr>
           <th align="left" colspan="9">[*generation/generations]0 %level;</th>
         </tr>
       %end;

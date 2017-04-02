@@ -1,3 +1,46 @@
+    choose a genealogy
+en: choose a genealogy
+fr: choisir une généalogie
+
+    input database
+en: Please, enter the name of the database you want to use:
+fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
+
+    available genealogies
+en: list of available genealogies (use gwsetup)
+fr: listes des généalogies disponibles (utilise gwsetup)
+
+    about (short date)
+de: ca.
+en: about
+es: alrededor de
+fr: vers
+he:   בערך
+it: circa
+pl: około
+ru: около
+
+    book of %s
+en: book of %s
+fr: dictionnaire des %s
+
+    presentation
+de: Präsentation
+en: Presentation
+fr: Présentation
+he: הצגה
+it: Presentazione
+pl: Prezentacja
+ru: представление
+
+    of
+en: of
+fr: de
+
+    officer/officer/officers
+en: officer/officer/officers
+fr: officiant/officiante/officiants
+
      !dates order
 af: yyyymmdd
 ar: ddmmyyyy
@@ -33,35 +76,35 @@ ar: rtl
 he: rtl
 
      !languages
-af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/nl=Nederlands/no=Noorweegs/oc=Oksitaans/pl=Pools/pt=Portugees/pt-br=Portugees-in-Brazilië/ru=Russies/sv=Sweeds/zh=Chinees
-bg: af=бурски/bg=български/br=бретонски/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/oc=окситански/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sl=словенски/sv=шведски/zh=китайски
-br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/oc=okitaneg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sl=sloveneg/sv=svedeg/zh=sinaeg
-ca: af=africà/ca=català/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/oc=occità/pl=polac/pt=portuguès/pt-br=brasiler/ru=rus/sl=eslovè/sv=suec/zh=Xinès
-cs: af=afrikánština/bg=bulharština/cs=čeština/da=dánština/de=němčina/en=angličtina/eo=esperanto/es=španělština/fi=finština/fr=francouzština/he=hebrejština/is=islandština/it=italština/lv=lotyšština/nl=holandština/no=norština/oc=okcitánština/pt=portugalština/pt-br=brasilština/ru=ruština/sv=švédština/zh=čínština
-da: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/oc=occitansk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rumænsk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
-de: af=Afrikaans/bg=Bulgarish/br=Bretonisch/ca=Katalanisch/cs=Tschechisch/da=Dänisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Französisch/he=Hebräisch/is=Isländisch/it=Italienisch/lv=Litauisch/nl=Holländisch/no=Norwegisch/oc=Okzitanisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ro=Rumänisch/ru=Russisch/sl=Slovenisch/sv=Schwedisch/zh=Chinesisch
-en: af=Afrikaans/bg=Bulgarian/br=Breton/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/oc=Occitan/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sl=Slovenian/sv=Swedish/zh=Chinese
-eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
-es: af=Afrikaans/bg=Búlgaro/br=Bretón/ca=Catalán/cs=Checo/da=Danés/de=Alemán/en=Inglés/eo=Esperanto/es=Español/et=Estonio/fi=Finés/fr=Francés/he=Hebreo/is=Islandés/it=Italiano/lv=Lituano/nl=Neerlandés/no=Noruego/oc=Occitano/pl=Polaco/pt=Portugés/pt-br=Portugés de Brasil/ro=Rumano/ru=Ruso/sl=Esloveno/sv=Sueco/zh=Chino
-et: af=afrikaani/bg=bulgaaria/br=bretooni/ca=katalaani/cs=tšehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/oc=oksitaani/pl=poola/pt=portugali/pt-br=brasiilia-portugali/ro=rumeenia/ru=vene/sl=sloveenia/sv=rootsi/zh=hiina
-fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pl=puola/oc=oksitaani/pt=portugali/pt-br=brasilianportugali/ru=venäjä/sv=ruotsi/zh=kiina
-fr: af=afrikaans/bg=bulgare/br=breton/ca=catalan/cs=tchèque/da=danois/de=allemand/en=anglais/eo=espéranto/es=espagnol/et=estonien/fi=finnois/fr=français/he=hébreu/is=islandais/it=italien/lv=letton/nl=néerlandais/no=norvégien/oc=occitan/pl=polonais/pt=portugais/pt-br=portugais du Brésil/ro=roumain/ru=russe/sl=slovène/sv=suédois/zh=chinois
-he: af=אפריקאנס /cs=צ'כית /da=דנית /de=גרמנית /en=אנגלית /eo=אספרנטו /es=ספרדית /fi=פינית /fr=צרפתית /he=עברית /is=איסלנדית /it=איטלקית /lv=לטווית /no=נורבגית /oc=אוקסיטנית /pt=פורטוגזית /ru=רוסית /sv=שוודית/zh=סינית
-is: af=afrikanska/cs=tékkneska/da=danska/de=þýska/en=enska/eo=esperanto/es=spænska/fi=finnska/fr=franska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/nl=hollenska/no=norska/oc=oksítanska/pt=portúgalska/pt-br=Brasil-portúgalska/ru=rússneska/sv=sænska/zh=kínverska
-it: af=afrikaans/bg=bulgaro/ca=catalano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/et=estone/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/oc=occitano/pl=polacco/pt=portoghese/pt-br=portoghese-brasiliano/ru=russo/sl=sloveno/sv=svedese/zh=cinese
-lv: cs=Čehu/da=Dāņu/de=Vācu/en=Angļu/eo=Esperanto/es=Spāņu/fi=Somu/fr=Franču/he=Ebreju/is=Islandiešū/it=Itāļu/lv=Latviešu/nl=Holandiešu/no=Norvēģu/oc=Oksitāņu/pt=Portugāļu/pt-br=Brasil-Portugāļu/ru=Krievu/sv=Zviedru/zh=Ķīniešu
-nl: af=Afrikaans/cs=Tsjechisch/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/nl=Nederlands/no=Noors/oc=Occitaans/pt=Portugees/pt-br=Brasil-Portugees/ru=Russisch/sv=Zweeds/zh=Chinees
-no: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/oc=oksitansk/pl=polsk/pt=portugisisk/pt-br=Brasil-portugisisk/ro=rumensk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
-oc=afrikaans/ca=catalan/cs=chèc/da=danés/de=alemand/en=anglés/eo=esperanto/es=espanhòl/et=estonian/fi=finnés/fr=francés/he=ebrieu/is=islandés/it=italian/lv=leton/nl=neerlandés/no=noruèc/oc=occitan/pl=polonés/pt=portugués/pt-br=portugués brasilièr/ru=rus/sl=eslovèn/sv=suèc/zh=chinés
-pl: af=afrikaans/bg=bułgarski/ca=kataloński/cs=czeski/da=duński/de=niemiecki/en=angielski/eo=esperanto/es=hiszpański/et=estoński/fi=fiński/fr=francuski/he=hebrajski/is=islandzki/it=włoski/lv=łotewski/nl=niderlandzki/no=norweski/oc=oksytański/pl=polski/pt=portugalski/pt-br=portugalski (Brazylia)/ru=rosyjski/sv=szwedzki/zh=chiński
-pt: af=Afrikaans/ca=Catalã/cs=Checo/da=Dinamarquês/de=Alemão/en=Inglês/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finlandês/fr=Francês/he=Hebreu/is=Islandês/it=Italiano/lv=Lituano/nl=Holandês/no=Norueguês/oc=Occitano/pl=Polonês/pt=Português/pt-br=Português-do-Brasil/ru=Russo/sv=Sueco/zh=Chinês
-pt-br: af=Afrikaner/ca=Catalão/cs=Checo/da=Dinamarquês/de=Alemão/en=Inglês/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finlandês/fr=Francês/he=Hebreu/is=Islandês/it=Italiano/lv=Lituano/nl=Holandês/no=Norueguês/oc=Occitano/pl=Polonês/pt=Português/pt-br=Português-do-Brasil/ru=Russo/sv=Sueco/zh=Chinês
-ro: af=africaans/ca=catalana/cs=checha/da=daneza/de=germana/en=engleza/eo=esperanto/es=spaniola/fi=finlandeza/fr=franceza/he=evreiasca/is=islandeza/it=italiana/nl=olandeza/no=norvegiana/oc=occitana/pl=poloneza/pt=potugeza/pt-br=portugeza-in-brazilia/ro=romaneste/ru=rusa/sv=suedeza/zh=chineza
-ru: af=африканский/bg=болгарский/ca=каталанский/cs=чешский/da=датский/de=немецкий/en=английский/eo=эсперанто/es=испанский/et=эстонский/fi=финский/fr=французский/he=иврит/is=исландский/it=итальянский/lv=латышский/nl=голландский/no=норвежский/oc=окситанский/pl=польский/pt=португальский/pt-br=бразильско-португальский/ru=русский/sl=славянский/sv=шведский/zh=китайский
-sk: af=afrikánčina/bg=bulharčina/cs=čeština/da=dánčina/de=nemčina/en=angličtina/eo=esperanto/es=španielčina/fi=fínština/fr=francúzština/he=hebrejčina/is=islandčina/it=taliančina/lv=lotyština/nl=holandčina/no=nórčina/oc=okcitánčina/pt=portugalčina/pt-br=brazílčina/ru=ruština/sv=švédčina/zh=čínština
-sl: af=afrikaanščina/ca=katalonščina/cs=češčina/da=danščina/de=nemščina/en=angleščina/eo=esperanto/es=španščina/et=estonščina/fi=finščina/fr=francoščina/he=hebrejščina/is=islandščina/it=italijanščina/lv=litvanščina/nl=nizozemščina/no=norveščina/oc=okcitanščina/pl=poljščina/pt=portugalščina/pt-br=brazilska-portugalščina/ru=ruščina/sl=slovenščina/sv=švedščina/zh=kitajščina
-sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/oc=occitanska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sl=slovenska/sv=svenska/zh=kinesiska
-zh: fr=法语/zh=中文/oc=奥克语
+af: af=Afrikaans/bg=Bulgaars/br=Bretons/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/et=Estnies/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/lv=Lets/nl=Nederlands/no=Noorweegs/oc=Oksitaans/pl=Pools/pt=Portugees/pt-br=Portugees-in-Brazilië/ro=Roemeens/ru=Russies/sk=Slowaaks/sl=Sloweens/sv=Sweeds/zh=Chinees
+bg: af=бурски/bg=български/br=бретонски/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/oc=окситански/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sk=Словашки език/sl=словенски/sv=шведски/zh=китайски
+br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/oc=okitaneg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sk=Slovakeg/sl=sloveneg/sv=svedeg/zh=sinaeg
+ca: af=africà/bg=búlgar/br=bretó/ca=català/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/oc=occità/pl=polac/pt=portuguès/pt-br=brasiler/ro=romanès/ru=rus/sk=Eslovac/sl=eslovè/sv=suec/zh=Xinès
+cs: af=afrikánština/bg=bulharština/br=bretonština/ca=katalánština/cs=čeština/da=dánština/de=němčina/en=angličtina/eo=esperanto/es=španělština/et=estonština/fi=finština/fr=francouzština/he=hebrejština/is=islandština/it=italština/lv=lotyšština/nl=holandština/no=norština/oc=okcitánština/pl=polština/pt=portugalština/pt-br=brasilština/ro=rumunština/ru=ruština/sk=slovenština/sl=slovinština/sv=švédština/zh=čínština
+da: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/oc=occitansk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rumænsk/ru=russisk/sk= Slovakisk/sl=slovensk/sv=svensk/zh=kinesisk
+de: af=Afrikaans/bg=Bulgarish/br=Bretonisch/ca=Katalanisch/cs=Tschechisch/da=Dänisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Französisch/he=Hebräisch/is=Isländisch/it=Italienisch/lv=Litauisch/nl=Holländisch/no=Norwegisch/oc=Okzitanisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ro=Rumänisch/ru=Russisch/sk=Slowakisch/sl=Slovenisch/sv=Schwedisch/zh=Chinesisch
+en: af=Afrikaans/bg=Bulgarian/br=Breton/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/oc=Occitan/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sk=Slovak/sl=Slovenian/sv=Swedish/zh=Chinese
+eo: af=afrikansa/bg=bulgara/br=bretona/ca=kataluna/cs=ĉeĥa/da=dana/de=germana/en=anglo/eo=esperanto/es=hispana/et=estona/fi=finna/fr=franco/he=hebrea/is=islanda/it=itala/lv=latva/nl=nederlanda/no=norvega/oc=okcitana/pl=pola/pt=portugala/pt-br=Brazila portugala/ro=rumana/ru=rusa/sk=slovaka/sl=slovena/sv=sveda/zh=ĉina
+es: af=Afrikaans/bg=Búlgaro/br=Bretón/ca=Catalán/cs=Checo/da=Danés/de=Alemán/en=Inglés/eo=Esperanto/es=Español/et=Estonio/fi=Finés/fr=Francés/he=Hebreo/is=Islandés/it=Italiano/lv=Lituano/nl=Neerlandés/no=Noruego/oc=Occitano/pl=Polaco/pt=Portugés/pt-br=Portugés de Brasil/ro=Rumano/ru=Ruso/sk=Eslovaco/sl=Esloveno/sv=Sueco/zh=Chino
+et: af=afrikaani/bg=bulgaaria/br=bretooni/ca=katalaani/cs=tšehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/oc=oksitaani/pl=poola/pt=portugali/pt-br=brasiilia-portugali/ro=rumeenia/ru=vene/sk=slovaki/sl=sloveenia/sv=rootsi/zh=hiina
+fi: af=afrikaans/bg=bulgaria/br=bretoni/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/oc=oksitaani/pl=puola/pt=portugali/pt-br=brasilianportugali/ro=romania/ru=venäjä/sk=slovakki/sl=sloveeni/sv=ruotsi/zh=kiina
+fr: af=afrikaans/bg=bulgare/br=breton/ca=catalan/cs=tchèque/da=danois/de=allemand/en=anglais/eo=espéranto/es=espagnol/et=estonien/fi=finnois/fr=français/he=hébreu/is=islandais/it=italien/lv=letton/nl=néerlandais/no=norvégien/oc=occitan/pl=polonais/pt=portugais/pt-br=portugais du Brésil/ro=roumain/ru=russe/sk=slovaque/sl=slovène/sv=suédois/zh=chinois
+he: af=אפריקאנס/bg=בולגרית/br=ברטונית/ca=קטלאנית/cs=צ'כית /da=דנית /de=גרמנית /en=אנגלית /eo=אספרנטו /es=ספרדית /et=אסטונית/fi=פינית /fr=צרפתית /he=עברית /is=איסלנדית /it=איטלקית /lv=לטווית /nl=הולנדית/no=נורבגית /oc=אוקסיטנית /pl=פולנית/pt=פורטוגזית /ru=רוסית /ro=רומנית/ru=רוסית/sk=סלובקית/sl=סלובנית/sv=שוודית/zh=סינית
+is: af=afrikanska/bg=búlgarska/br=bretónska/ca=katalónska/cs=tékkneska/da=danska/de=þýska/en=enska/eo=esperanto/es=spænska/et=eistneska/fi=finnska/fr=franska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/nl=hollenska/no=norska/oc=oksítanska/pl=Pólska/pt=portúgalska/pt-br=Brasil-portúgalska/ro=rúmenska/ru=rússneska/sk=slóvakíska/sl=slóvenska/sv=sænska/zh=kínverska
+it: af=afrikaans/bg=bulgaro/br=bretone/ca=catalano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/et=estone/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/oc=occitano/pl=polacco/pt=portoghese/pt-br=portoghese-brasiliano/ro=romeno/ru=russo/sk=slovacco/sl=sloveno/sv=svedese/zh=cinese
+lv: af=Afrikandu/bg=Bulgāru/br=Bretoņu/ca=Katalāņu/cs=Čehu/da=Dāņu/de=Vācu/en=Angļu/eo=Esperanto/es=Spāņu/et=Estone/fi=Somu/fr=Franču/he=Ebreju/is=Islandiešū/it=Itāļu/lv=Latviešu/nl=Holandiešu/no=Norvēģu/oc=Oksitāņu/pl=Poļu/pt=Portugāļu/pt-br=Brasil-Portugāļu/ro=Română/ru=Krievu/sk=Slovāku /sl=Slovēņu/sv=Zviedru/zh=Ķīniešu
+nl: af=Afrikaans/bg=Bulgaars/br=Bretons/ca=Catalaans/cs=Tsjechisch/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/et=Estisch/fi=Fins/fr=Frans/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/nl=Nederlands/no=Noors/oc=Occitaans/pl=Pools/pt=Portugees/pt-br=Brasil-Portugees/ro=Roemeens/ru=Russisch/sk=Slowaaks/sl=Sloveens/sv=Zweeds/zh=Chinees
+no: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/oc=oksitansk/pl=polsk/pt=portugisisk/pt-br=Brasil-portugisisk/ro=rumensk/ru=russisk/sk=Slovakisk/sl=slovensk/sv=svensk/zh=kinesisk
+oc: af=afrikaans/bg=bulgar/br=breton/ca=catalan/cs=chèc/da=danés/de=alemand/en=anglés/eo=esperanto/es=espanhòl/et=estonian/fi=finnés/fr=francés/he=ebrieu/is=islandés/it=italian/lv=leton/nl=neerlandés/no=noruèc/oc=occitan/pl=polonés/pt=portugués/pt-br=portugués brasilièr/ro=romanés/ru=rus/sk=eslovac/sl=eslovèn/sv=suèc/zh=chinés
+pl: af=afrikaans/bg=bułgarski/br=bretoński/ca=kataloński/cs=czeski/da=duński/de=niemiecki/en=angielski/eo=esperanto/es=hiszpański/et=estoński/fi=fiński/fr=francuski/he=hebrajski/is=islandzki/it=włoski/lv=łotewski/nl=niderlandzki/no=norweski/oc=oksytański/pl=polski/pt=portugalski/pt-br=portugalski (Brazylia)/ro=rumuński/ru=rosyjski/sk=słowacki/sl=słoweński/sv=szwedzki/zh=chiński
+pt: af=Afrikaans/bg=Búlgara/br=Bretão/ca=Catalã/cs=Checo/da=Dinamarquês/de=Alemão/en=Inglês/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finlandês/fr=Francês/he=Hebreu/is=Islandês/it=Italiano/lv=Lituano/nl=Holandês/no=Norueguês/oc=Occitano/pl=Polonês/pt=Português/pt-br=Português-do-Brasil/ro=Romeno/ru=Russo/sk=Eslovaco/sl=Esloveno/sv=Sueco/zh=Chinês
+pt-br: af=Afrikaner/bg=Búlgara/br=Bretão/ca=Catalão/cs=Checo/da=Dinamarquês/de=Alemão/en=Inglês/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finlandês/fr=Francês/he=Hebreu/is=Islandês/it=Italiano/lv=Lituano/nl=Holandês/no=Norueguês/oc=Occitano/pl=Polonês/pt=Português/pt-br=Português-do-Brasil/ro=Romeno/ru=Russo/sk=Eslovaco/sl=Esloveno/sv=Sueco/zh=Chinês
+ro: af=africaans/bg=bulgară/br=bretonă/ca=catalana/cs=checha/da=daneza/de=germana/en=engleza/eo=esperanto/es=spaniola/et=estonă/fi=finlandeza/fr=franceza/he=evreiasca/is=islandeza/it=italiana/lv=letonă/nl=olandeza/no=norvegiana/oc=occitana/pl=poloneza/pt=potugeza/pt-br=portugeza-in-brazilia/ro=romaneste/ru=rusa/sk=slovacă/sl=slovenă/sv=suedeza/zh=chineza
+ru: af=африканский/bg=болгарский/br=Бретонский/ca=каталанский/cs=чешский/da=датский/de=немецкий/en=английский/eo=эсперанто/es=испанский/et=эстонский/fi=финский/fr=французский/he=иврит/is=исландский/it=итальянский/lv=латышский/nl=голландский/no=норвежский/oc=окситанский/pl=польский/pt=португальский/pt-br=бразильско-португальский/ro=Румынский/ru=русский/sk=Словацкий/sl=славянский/sv=шведский/zh=китайский
+sk: af=afrikánčina/bg=bulharčina/br=bretónčina/ca=katalánčina/cs=čeština/da=dánčina/de=nemčina/en=angličtina/eo=esperanto/es=španielčina/et=estónčina/fi=fínština/fr=francúzština/he=hebrejčina/is=islandčina/it=taliančina/lv=lotyština/nl=holandčina/no=nórčina/oc=okcitánčina/pl=poľština/pt=portugalčina/pt-br=brazílčina/ro=rumunčina/ru=ruština/sk=slovenčina/sl=slovinčina/sv=švédčina/zh=čínština
+sl: af=afrikaanščina/bg=bolgarščina/br=bretonščina/ca=katalonščina/cs=češčina/da=danščina/de=nemščina/en=angleščina/eo=esperanto/es=španščina/et=estonščina/fi=finščina/fr=francoščina/he=hebrejščina/is=islandščina/it=italijanščina/lv=litvanščina/nl=nizozemščina/no=norveščina/oc=okcitanščina/pl=poljščina/pt=portugalščina/pt-br=brazilska-portugalščina/ro=romunščina/ru=ruščina/sk=slovaščina/sl=slovenščina/sv=švedščina/zh=kitajščina
+sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/oc=occitanska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sk=slovakiska/sl=slovenska/sv=svenska/zh=kinesiska
+zh: af=南非語/bg=保加利亚语/br=布列塔尼语/ca=加泰罗尼亚语/cs=捷克语/da=丹麦语/de=德语/en=英语/eo=世界语/es=西班牙语/et=爱沙尼亚语/fi=芬兰语/fr=法语/he=希伯来语/is=冰岛语/it=意大利语/lv=拉脱维亚语/nl=荷蘭語/no=挪威语/oc=奥克语/pl=波兰语/pt=葡萄牙語/pt-br= 巴西葡萄牙语/ro=羅馬尼亞語/ru=俄语/sk=斯洛伐克语/sl=斯洛文尼亚语/sv= 瑞典語/zh=中文
 
      the first branch
 af:  om die eerste staak te sien
@@ -178,6 +221,10 @@ ru:  для того, чтобы пытаться снова с этим чис�
 sk:  skúsiť znovu s týmto číslom
 sl:  za ponoven poskus s to številko
 sv:  för att försöka igen med detta nummer
+
+    width
+en: width
+fr: largeur
 
     %1 of %2
 af: %1 van %2
@@ -1148,7 +1195,7 @@ en: a grandson/a granddaughter/a grandchild
 eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
 et: poja- või tütrepoeg:g:--ja/poja- või tütretütar:g:--re/lapselaps:g:+e
-fi: pojan tai tyttären poika:g:---jan/pojan tai tyttären tytär:g:--tären/lapsenlapsi:g:-en
+fi: pojan tai tyttären poika:g:---jan/pojan tai tyttären tytär:g:---tären/lapsenlapsi:g:-en
 fr: un petit-fils/une petite-fille/un petit-enfant
 he:  נכד/ נכדה
 is: barnabarn/barnabarn/barnabarn
@@ -1206,7 +1253,7 @@ en: a great-grandson/a great-granddaughter/a great-grandchild
 eo: pranepo/pranepino/pranep(in)o
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
 et: lapselapse poeg:g:--ja/lapselapse tütar:g:--re/lapselapselaps:g:+e
-fi: lapsenlapsen poika:g:---jan/lapsenlapsen tytär:g:--tären/lapsenlapsen lapsi:g:-en
+fi: lapsenlapsen poika:g:---jan/lapsenlapsen tytär:g:---tären/lapsenlapsen lapsi:g:-en
 fr: un arrière-petit-fils/une arrière-petite-fille/un arrière-petit-enfant
 he:   נין/ נינה
 is: barnabarnabarn/barnabarnabarn/barnabarnabarn
@@ -1235,7 +1282,7 @@ en: a great-nephew/a great-niece
 eo: pranevo/pranevino
 es: un sobrino nieto/una sobrina nieta
 et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
-fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:--tären
+fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:---tären
 fr: un petit neveu/une petite nièce
 he:   בן האחיין/ בת האחיין
 is: frændi/frænka
@@ -1264,7 +1311,7 @@ en: a great-uncle/a great-aunt
 eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
 et: vanaonu/vanatädi
-fi: isosetä:g:--dän/isotäti:g:--din
+fi: isosetä:g:---dän/isotäti:g:--din
 fr: un grand-oncle/une grand-tante
 he:   דוד-סב/ דודה-סבה
 is: afa(ömmu)bróðir/afa(ömmu)systir
@@ -1322,7 +1369,7 @@ en: a nephew/a niece
 eo: nevo/nevino
 es: un sobrino/a sobrina
 et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
-fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:--tären
+fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:---tären
 fr: un neveu/une nièce
 he:   אחיין/ אחיינית
 is: bróður(systur)sonur/bróður(systur)dóttir
@@ -1380,7 +1427,7 @@ en: a son/a daughter/a child
 eo: filo/filino/ido
 es: un hijo/una hija/un(a) hijo(a)
 et: poeg:g:--ja/tütar:g:--re/laps:g:+e
-fi: poika:g:---jan/tytär:g:--tären/lapsi:g:-en
+fi: poika:g:---jan/tytär:g:---tären/lapsi:g:-en
 fr: un fils/une fille/un enfant
 he:   בן/ בת/ ילד
 is: sonur/dóttir/barn
@@ -1581,7 +1628,7 @@ eo: aldoni :a: bildo:a:+n
 es: agregar imagen
 et: lisa pilt
 fi: lisää kuva
-fr: ajouter un portrait
+fr: ajouter portrait
 he:  תמונה  הוספה
 is: bæta við mynd
 it: aggiungere immagine
@@ -1669,34 +1716,34 @@ sl: posvojenec/posvojenka/posvojeni otrok
 sv: adoptivson/adoptivdotter/adoptivbarn
 
     advanced request
-af: gevorderde versoek
-bg: разширена заявка
-br: klask araokaet
-ca: recerca avançada
-cs: rozšířený dotaz
-da: avanceret søgning
-de: Erweiterte Suche
-en: advanced request
-eo: serĉo pli preciza
-es: consulta avanzada
-et: laiendatud päring
-fi: erityishaku
-fr: requête évoluée
-he:   בקשה מתקדמת
-is: nákvæmari leit
-it: richiesta avanzata
-lv: paplašinātā meklēšana pēc:
-nl: gedetailleerd zoeken
-no: avansert søk
-oc: recèrca avançada
-pl: wyszukiwanie zaawansowane
-pt: pesquisa complexa
-ro: consultatie avansata
-ru: расширенный запрос
-sk: rozšírená požiadavka
-sl: napredno iskanje
-sv: avancerad sökning
-zh:  高级访问请求
+af: gevorderde versoek/gevorderde<br>versoek
+bg: разширена заявка/разширена<br>заявка
+br: klask araokaet/klask<br>araokaet
+ca: recerca avançada/recerca<br>avançada
+cs: rozšířený dotaz/rozšířený<br>dotaz
+da: avanceret søgning/avanceret<br>søgning
+de: Erweiterte Suche/Erweiterte<br>Suche
+en: advanced request/advanced<br>request
+eo: serĉo pli preciza/serĉo<br>pli preciza
+es: consulta avanzada/consulta<br>avanzada
+et: laiendatud päring/laiendatud<br>päring
+fi: erityishaku/erityishaku
+fr: requête évoluée/requête<br>évoluée
+he: בקשה מתקדמת/בקשה<br>מתקדמת
+is: nákvæmari leit/nákvæmari<br>leit
+it: richiesta avanzata/richiesta<br>avanzata
+lv: paplašinātā meklēšana pēc/paplašinātā<br>meklēšana pēc
+nl: gedetailleerd zoeken/gedetailleerd<br>zoeken
+no: avansert søk/avansert<br>søk
+oc: recèrca avançada/recèrca<br>avançada
+pl: wyszukiwanie zaawansowane/wyszukiwanie<br>zaawansowane
+pt: pesquisa complexa/pesquisa<br>complexa
+ro: consultatie avansata/consultatie<br>avansata
+ru: расширенный запрос/расширенный<br>запрос
+sk: rozšírená požiadavka/rozšírená<br>požiadavka
+sl: napredno iskanje/napredno<br>iskanje
+sv: avancerad sökning/avancerad<br>sökning
+zh: 高级访问请求/高级访问请求
 
     after
 af: na
@@ -2076,7 +2123,7 @@ en: an uncle/an aunt
 eo: onklo/onklino
 es: un tío/una tía
 et: onu/tädi
-fi: setä:g:--dän/täti:g:--din/eno:g:+n/täti:g:--din
+fi: setä:g:---dän/täti:g:--din/eno:g:+n/täti:g:--din
 fr: un oncle/une tante
 he:   דוד/ דודה
 is: föður(móður)bróðir/föður(móður)systir
@@ -2320,7 +2367,7 @@ de: jede beliebige Person im Stammbaum
 en: any individual in the base
 es: cualquier individuo del árbol
 fi: yksi henkilö sukupuussasi
-fr: n’importe quel individu de la base
+fr: un individu de la base
 it: un qualsiasi individuo dell’albero
 nl: om het even welk individu van de stamboom
 no: en person i ditt tre
@@ -2372,7 +2419,7 @@ sv: Postnummer
 
     ascendants tree
 de: Stammbaum der Vorfahren
-en: family tree
+en: ascending tree
 es: árbol de ascendencia
 fi: Esipolvitaulu
 fr: arbre d’ascendance
@@ -2866,7 +2913,7 @@ sv: Födelsedatum och -plats
 
     birth place
 de: Ort der Geburt
-en: Place of birth
+en: place of birth
 es: lugar de nacimiento
 fi: Syntymäpaikka
 fr: lieu de naissance
@@ -3467,7 +3514,7 @@ oc: enfant/enfants
 pl: dziecko/dzieci
 pt: filho/filhos
 ro: copil/copii
-ru: ребенок:g:--ка:a:--ка/дети
+ru: ребенок:g:---ка:a:---ка/дети
 sk: dieťa/deti
 sl: otrok/otroci
 sv: barn/barn
@@ -4023,7 +4070,7 @@ eo: datenbankforumo
 es: foro de la base de datos
 et: andmebaasi foorum
 fi: tietokantafoorumi
-fr: forum de la base de données
+fr: forum de la base
 he:  דייון על מאגר המידה התולדותי
 is: umræður
 it: forum della base di dati
@@ -4038,6 +4085,35 @@ ru: форум базы данных
 sk: databázové fórum
 sl: forum baze podatkov
 sv: databas forum
+
+    forum
+af: forum
+bg: форум на базата от данни
+br: forum
+ca: fòrum
+cs: fórum
+da: database-forum
+de: Forum
+en: forum
+eo: forumo
+es: foro
+et: foorum
+fi: foorumi
+fr: forum
+he:  דייון על מאגר המידה התולדותי
+is: umræður
+it: forum
+lv: datu bāzes "ziņojumu dēlis"
+nl: forum
+no: forum
+oc: fòrum
+pl: forum
+pt: fórum
+ro: forumul
+ru: форум базы данных
+sk: fórum
+sl: forum
+sv: forum
 
     date begin
 de: Anfangsdatum
@@ -4093,7 +4169,7 @@ sv: dödsdatum
 
     date of marriage
 de: Hochzeitstag
-en: Date of marriage
+en: date of marriage
 es: fecha de matrimonio
 fi: vihkipäivämäärä
 fr: date de l’union
@@ -4206,7 +4282,7 @@ sv: Dödsdatum och dödsplats
 
     death place
 de: Sterbeort
-en: Place of death
+en: place of death
 es: lugar de defunción
 fi: Kuolinpaikka
 fr: lieu de décès
@@ -4493,7 +4569,7 @@ sv: logga ut
 
     display Aboville number
 de: Sosa/Kekule-Nummer anzeigen
-en: Display Sosa number
+en: Display d’Aboville number
 es: editar la numeración de Aboville
 fi: Näytä sosa-numero
 fr: afficher la numérotation d’Aboville
@@ -4573,7 +4649,7 @@ sv: Visa tom bild
 
     display generation
 de: Nummer der Generation anzeigen
-en: display generation
+en: display the generations
 es: editar el número de generación
 fi: näytä sukupolvinumero
 fr: afficher les générations
@@ -5273,7 +5349,7 @@ oc: familha/familhas
 pl: rodzina:a:-ę/rodziny
 pt: família/famílias
 ro: familie/fmalilii
-ru: семья:a:-ю:g:-и/семьи
+ru: семья:a:--ю:g:--и/семьи
 sk: rodina:a:-u/rodiny
 sl: družina/družine
 sv: familj/familjer
@@ -5482,26 +5558,26 @@ af: voornaam/voorname
 ar: الإسم
 bg: собствено име/собствени имена
 br: raganv/raganvioù
-ca: nom/noms
+ca: nom/noms/nom·s
 cs: křestní jméno/křestní jména
 da: fornavn/fornavne
 de: Vorname/Vornamen
-en: first name/first names
+en: first name/first names/first name·s
 eo: propra nomo/propraj nomoj
-es: nombre/nombres
+es: nombre/nombres/nombre·s
 et: eesnimi/eesnimed
 fi: etunimi/etunimet
-fr: prénom/prénoms
+fr: prénom/prénoms/prénom(s)
 he:   שם פרטי/ שמות פרטיים
 is: fornafn/fornöfn
 it: nome/nomi
 lv: vārds/vārdi
 nl: voornaam/voornamen
 no: fornavn/fornavn
-oc: prenom/prenoms
+oc: prenom/prenoms/prenom·s
 pl: imię/imiona
 pt: nome/nomes
-pt-br: prenome/prenomes
+pt-br: prenome/prenomes/prenome·s
 ro: prenume
 ru: имя/имена
 sk: meno/mená
@@ -5706,6 +5782,10 @@ sk: generácia:a:-u/generácie
 sl: generacija/generacije
 sv: generation/generationer
 
+    godparent
+en: godparent
+fr: parrain ou marraine
+
     godfather/godmother/godparents
 af: peetpa/peetma/peetouers
 bg: кръстник/кръстница/кръстници
@@ -5714,12 +5794,12 @@ ca: padrí/padrina/padrins
 cs: kmotr/kmotra/kmotr a kmotra
 da: gudfader/gudmoder/gudfader og gudmoder
 de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
-en: godfather/godmother/godparents
+en: godfather/godmother/godparents/godparent
 eo: baptopatro/baptopatrino/gebaptopatroj
 es: padrino/madrina/padrinos
 et: ristiisa/ristiema/ristivanemad
 fi: kummisetä/kummitäti/kummit
-fr: parrain/marraine/parrain et marraine
+fr: parrain/marraine/parrain et marraine/parrain ou marraine
 he:  סנדק/ סנדקית/ סנדקים
 is: guðfaðir/guðmóðir/guðforeldrar
 it: padrino/madrina/padrini
@@ -5897,7 +5977,7 @@ de: halbbrüder und-schwestern
 en: half-siblings
 es: hermanastros y hermanastras
 fi: puolisisarukset
-fr: demi-frères et demi-sœurs
+fr: demi-frères et sœurs
 it: fratellastri e sorellastre
 nl: half broers en zusters
 no: halvbrødre/halvsøstre/halvsøsken
@@ -5907,10 +5987,10 @@ sv: halvbröder och halvsystrar
 
     half-siblings
 de: Halbgeschwister
-en: Half-siblings
+en: half-siblings
 es: hermanastros/as
 fi: Puolisisarukset
-fr: demi-frères et demi-sœurs
+fr: demi-fratrie
 it: fratellastri e sorellastre
 nl: half broers en zusters
 no: Halvsøsken
@@ -6018,7 +6098,7 @@ sv: Har ingen familj
 
     help modify data
 de: Klicken Sie auf das zu korrigierende "Listen-Element": alle Dateien Ihres Baumes werden sofort korrigiert.
-en: Click 'Update' to edit and your entire family tree will be automatically updated.
+en: Be carefull. Modifications that are made in the “book” update the corresponding element in the entire database.
 es: Pulse en "el elemento de la lista" que desee corregir: todas las fichas de su árbol se corregirán instantáneamente.
 fi: Napsauta 'Päivitä' ja koko sukupuusi päivitetään automaattisesti.
 fr: Attention ! Les corrections dans le dictionnaire modifient l’ensemble des données correspondantes dans la base.
@@ -6099,6 +6179,10 @@ ru: он/она
 sk: on/ona
 sl: on/ona
 sv: honom/henne
+
+    his/her
+en: his/her
+fr: son/sa
 
     history
 de: Verlauf
@@ -6250,7 +6334,7 @@ ca: si títols
 cs: jsou-li tituly
 da: hvis titler
 de: eingeschränkt
-en: if nobility titles
+en: if titles
 eo: se nobeltitoloj
 es: si títulos
 et: kui on tiitlid
@@ -6357,7 +6441,7 @@ ca: imatge/imatges
 cs: obrázek/obrázky
 da: billede/billeder
 de: Bild/Bilder
-en: a picture/pictures
+en: picture/pictures
 eo: bildo:a:+n/bildoj
 es: imagen/imágenes
 et: pilt/pildid
@@ -7216,6 +7300,7 @@ pt: listas e gráficos
 sv: Tavlor och listor
 
     lists of books
+en: lists of books
 fr: liste des dictionnaires
 oc: lista dels diccionaris
 
@@ -7444,7 +7529,7 @@ sv: manling/kvinnlig/neutral&#047;okänt
 
     marriage bann
 de: Aufgebot
-en: Marriage Bann
+en: marriage bann
 es: amonestaciones
 fi: Aviokielto
 fr: bans de mariage
@@ -7456,7 +7541,7 @@ sv: Förbjudet äktenskap
 
     marriage contract
 de: Ehevertrag
-en: Marriage Contract
+en: marriage contract
 es: contrato de matrimonio
 fi: Vihkitodistus
 fr: contrat de mariage
@@ -7468,7 +7553,7 @@ sv: Äktenskapförord
 
     marriage date
 de: Hochzeitstag
-en: Date of marriage
+en: date of marriage
 es: fecha de matrimonio
 fi: Vihkiaika
 fr: date de l’union
@@ -7481,7 +7566,7 @@ sv: Datum för giftermål
 
     marriage event
 de: Heirat
-en: Marriage
+en: marriage
 es: matrimonio
 fi: Avioliitto
 fr: mariage
@@ -7563,12 +7648,12 @@ no: Vielsesattest
 pt: licença de casamento
 sv: Äktenskapslicens
 
-    marriage notes
+    marriage notes/marriages notes
 de: notizen zu den Ehen
-en: marriage Notes
+en: marriage notes/marriages notes
 es: notas de matrionios
 fi: lisämerkintöjä vihkimisestä
-fr: notes concernant l’union
+fr: notes concernant l’union/notes concernant les unions
 it: note di matrimoni
 nl: Aantekeningen
 no: notater om ekteskapet
@@ -7636,7 +7721,7 @@ sv: äktenskap med %t före makens/makans födelse
 
     marriage place
 de: Ort der Eheschließung
-en: Place of marriage
+en: place of marriage
 es: lugar de matrimonio
 fi: Vihkipaikka
 fr: lieu de l’union
@@ -7662,7 +7747,7 @@ sv: Giftermål
 
     marriage with
 de: Eheschließung mit
-en: Marriage with
+en: marriage with
 es: casamiento(s)
 fi: aviopuoliso(t)
 fr: union avec
@@ -7796,7 +7881,7 @@ de: Großeltern mütterlicherseits
 en: Mother's parents
 es: abuelos maternos
 fi: äidin puolen isovanhemmat
-fr: grands parents maternels
+fr: grands-parents maternels
 it: nonni materni
 nl: grootouders langs moederszijde
 no: mormor og morfar
@@ -8288,6 +8373,10 @@ ru: изменить :a: картинку
 sl: spremeni slika
 sv: ändra bild
 
+    module
+en: module
+fr: module
+
     months old
 af: maande oud
 bg: месеца
@@ -8545,7 +8634,7 @@ de: Zweige
 en: Lines
 es: núm. ramas
 fi: Sukulinjat
-fr: nb. branches
+fr: nombre de branches
 it: n° rami
 nl: aantal takken
 no: Grener
@@ -8558,7 +8647,7 @@ de: Kinder
 en: Children
 es: núm. hijos
 fi: Lapset
-fr: nb. enfants
+fr: nombre d’enfants
 it: n° figli
 nl: aantal kinderen
 no: Barn
@@ -8571,7 +8660,7 @@ de: Ereignisse
 en: nb events
 es: núm. eventos
 fi: Tapahtumat
-fr: nb. événements
+fr: nombre d’événements
 it: n° eventi
 nl: aantal evenementen
 no: Hendelser
@@ -8584,7 +8673,7 @@ de: Individuen
 en: Individuals
 es: núm. individuos
 fi: Henkilöiden lukumäärä
-fr: nb. individus
+fr: nombre d’individus
 it: n° individui
 nl: aantal personen
 no: Individer
@@ -9271,7 +9360,7 @@ sv: antal levande personer:
 
     n° d'Aboville
 de: Nr. Aboville
-en: d'Aboville System number
+en: d'Aboville number
 es: N° de Aboville
 fi: Numero
 fr: n° d’Aboville
@@ -9282,16 +9371,29 @@ oc: n° d'Aboville
 pt: n° de Aboville
 sv: nummer
 
+    d'Aboville
+de: Aboville
+en: d'Aboville
+es: Aboville
+fi: Numero
+fr: d’Aboville
+it: d’Aboville
+nl: Abovillenummer
+no: nummer
+oc: d'Aboville
+pt: de Aboville
+sv: nummer
+
     n° Sosa
-de: Nr. SOSA
-en: Sosa
+de: Nr. Sosa
+en: Sosa No.
 es: nº Sosa
 fi: Sosa-viite
-fr: n° Sosa
-it: n° Sosa
+fr: nᵒ Sosa
+it: nᵒ Sosa
 nl: Sosa nr.
 no: Anenummer
-oc: n° de Sosa
+oc: nᵒ de Sosa
 sv: Annummer
 
     n° Sosa relative to
@@ -9366,7 +9468,7 @@ eo: mortinta
 es: fallecido/a (fecha desconocida)
 et: surnud
 fi: varmuudella kuollut
-fr: certainement décédé
+fr: certainement décédé(e)
 he:   נפטר
 is: dó
 it: sicuramente morto
@@ -9386,7 +9488,6 @@ zh:  死
 af: uit die %s geslag
 bg: от %s поколение
 br: eus an %s rummad
-ca: a la %s generació
 ca: a la %s generacion
 cs: %s. generace
 da: af den %s generation
@@ -9617,6 +9718,10 @@ sk: iba zvolená generácia
 sl: samo izbrana generacija
 sv: endast den valda generationen
 
+    options
+en: options
+fr: options
+
     optional
 af: opsioneel
 bg: по желание
@@ -9763,7 +9868,7 @@ de: Großeltern väterlicherseits
 en: Father's parents
 es: abuelos paternos
 fi: isän puolen isovanhemmat
-fr: grands parents paternels
+fr: grands-parents paternels
 it: nonni paterni
 nl: grootouders langs vaderszijde
 no: farmor og farfar
@@ -10225,7 +10330,7 @@ ca: nom públic
 cs: veřejné jméno
 da: officielt navn
 de: öffentlicher Name
-en: nickname
+en: public name
 eo: publika nomo
 es: sobrenombre
 et: esindusnimi
@@ -10254,7 +10359,7 @@ ca: qualificatiu
 cs: přívlastek
 da: tilnavn
 de: Beiname
-en: title
+en: sobriquet
 eo: kromnomo:a:+n
 es: calificativo
 et: lisanimi
@@ -10519,7 +10624,7 @@ de: anzeigeoptionen der Verwandtschafts-Bäume:
 en: options:
 es: opciones de edición de los árboles de parentesco:
 fi: näyttötapa:
-fr: options d’affichage des arbres de parenté :
+fr: options d’affichage des arbres :
 it: opzioni di visualizzazione degli alberi di parentela:
 nl: toonopties van de verwantschapsstambomen
 no: visningsmåte
@@ -10917,29 +11022,29 @@ pt: ver pessoa
 sv: Individ
 
     select
-de: auswählen :
-en: select:
-es: elegir:
-fi: valitse:
-fr: choisir :
-it: scegliere:
-nl: kiezen:
+de: auswählen
+en: select
+es: elegir
+fi: valitse
+fr: choisir
+it: scegliere
+nl: kiezen
 no: velg
-oc: causir:
-pt: selecionar:
+oc: causir
+pt: selecionar
 sv: välj
 
     select a letter
-de: wählen Sie einen Buchstaben
-en: Select a letter
-es: elija una letra
+de: wählen Sie einen Zeichen
+en: Select a character
+es: elija un carácter
 fi: valitse kirjain
-fr: choisissez une lettre
-it: scegli una lettera
-nl: kies een letter
-no: Velg en bokstav
-oc: causissètz-vos una letra
-pt: selecione uma letra
+fr: choisissez un caractère
+it: scegli un carattere
+nl: kies een teken
+no: Velg en karakter
+oc: causissètz-vos un caractèr
+pt: selecione um carácter
 sv: välj en bokstav
 
     select a month to see all the anniversaries
@@ -11632,7 +11737,7 @@ pl: alias nazwiska
 pt: alias do apelido
 pt-br: apelido do sobrenome
 ro: alias de nume
-ru: новая:a:--ую фамилия:a:-ю
+ru: новая:a:---ую фамилия:a:--ю
 sk: alias priezviska
 sl: drug priimek
 sv: efternamns alias
@@ -12207,6 +12312,15 @@ sk: svokor/svokra
 sl: tast/tašča
 sv: svärfadern/svärmodern
 
+    father-in-law/mother-in-law
+af: skoonpa/skoonma
+br: tad-kaer/vamm-gaer
+ca: sogre/sogra
+de: Schwiegervater/Schwiegermutter
+en: father-in-law/mother-in-law
+es: suegro/suegra
+fr: beau-père/belle-mère
+
     the father/the mother/a parent
 af: die pa/die ma/'n ouer
 bg: бащата/майката/родител
@@ -12583,7 +12697,7 @@ sv: föräldrarna
 
     the spouse
 af: die eggenoot/die eggenote
-bg: съпругът:a:--а/съпругата
+bg: съпругът:a:---а/съпругата
 br: ar pried/ar bried
 ca: el marit/la muller
 cs: manžel/manželka
@@ -13620,33 +13734,37 @@ sl: priča pri poroki med %s in %s
 sv: vittne vid äktenskap mellan %s och %s
 
     witness/witnesses
-af: getuie/getuies
-bg: свидетел/свидетели
-br: test/testoù
-ca: testimoni/testimonis
-cs: svědek/svědkové
-da: vidne/vidner
-de: Trauzeuge/Trauzeugen
 en: witness/witnesses
-eo: atestanto:a:+n/atestantoj
-es: testigo/testigos
-et: tunnistaja/tunnistajad
-fi: todistaja/todistajat
 fr: témoin/témoins
+
+    witness/witness/witnesses
+af: getuie/getuie/getuies
+bg: свидетел/свидетел/свидетели
+br: test/test/testoù
+ca: testimoni/testimoni/testimonis
+cs: svědek/svědek/svědkové
+da: vidne/vidne/vidner
+de: Trauzeuge/Trauzeuge/Trauzeugen
+en: witness/witness/witnesses
+eo: atestanto:a:+n/atestanto:a:+n/atestantoj
+es: testigo/testigo/testigos
+et: tunnistaja/tunnistaja/tunnistajad
+fi: todistaja/todistaja/todistajat
+fr: témoin/témoin/témoins
 he:  אד/ אדים
 is: vitni/vitni
-it: testimone/testimoni
-lv: liecinieks:a:-u/liecinieki
-nl: getuige/getuigen
-no: forlover/forlovere
-oc: testimòni/testimònis
-pl: świadek:a:--ka/świadkowie
-pt: testemunha/testemunhas
-ro: martor/martori
-ru: свидетель:g:-я:a:-я/свидетели
-sk: svedok:g:--ka/svedkovia
-sl: priča/priče
-sv: vittne/vittnen
+it: testimone/testimone/testimoni
+lv: liecinieks:a:-u/liecinieks:a:-u/liecinieki
+nl: getuige/getuige/getuigen
+no: forlover/forlover/forlovere
+oc: testimòni/testimòni/testimònis
+pl: świadek:a:--ka/świadek:a:--ka/świadkowie
+pt: testemunha/testemunha/testemunhas
+ro: martor/martor/martori
+ru: свидетель:g:--я:a:--я/свидетель:g:--я:a:--я/свидетели
+sk: svedok:g:--ka/svedok:g:--ka/svedkovia
+sl: priča/priča/priče
+sv: vittne/vittne/vittnen
 
     wizard/wizards/friend/friends/exterior
 af: Medewerkers/Medewerkers/vriend/vriend/exterior
@@ -13890,6 +14008,118 @@ ru: ваше сообщение ожидает проверки
 sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
 
+    database
+af: Stamboom
+ar: شجرة العائل
+bg: Cемейно дърво
+br: Bon roadoù
+ca: Base de dades
+cs: Rodokmen
+da: Family Tree
+de: Stammbaum
+en: Family Tree
+eo: Family Tree
+es: árbol genealógico
+et: Sugupuu
+fi: Sukupuu
+fr: Base généalogique
+he: אילן יוחסין
+is: Ættfræði gagnagrunnur
+it: Albero genealogico
+lv: ģimenes koks
+nl: Stamboom
+no: Family Tree
+pl: Drzewo genealogiczne
+pt: árvore genealógica
+ro: Arbore genealogic
+ru: генеалогическое дерево
+sl: družinsko drevo
+sv: Family Tree
+zh: 家譜
+
+    frequency
+af: frekwensie
+bg: честота на срещане
+br: stankted
+ca: freqüència
+cs: četnosti
+da: hyppighed
+de: nach Häufigkeit
+en: frequency
+eo: ofteco
+es: frecuencia
+et: sageduse
+fi: määräjärjestykseen
+fr: fréquence
+fr-cr: ça ki ka ruvini empile
+he:  השכיחות
+is: tíðni
+it: di frequenza
+lv: pēc sastopamības
+nl: aantal
+no: etter frekvens
+pl: według częstości występowania
+pt: frequência
+ro: dupa frecventa
+ru: по частоте
+sl: pogostosti
+sv: frekvensordning
+zh: 访问次数
+
+    by
+af: volgens
+bg: ,&nbsp; подредени по
+br: dre
+ca: per
+cs: seřazená podle
+da: sorteret efter
+de: durch
+en: by
+eo: laù
+es: por
+et: järjestatud
+fi: lajiteltuina
+fr: par
+fr-cr: zott pé trappé assou liste-la
+he: לפי
+is: eftir
+it: in ordine
+lv:
+nl: volgens
+no: sortert
+pl: ułożonych
+pt: por
+ro: in
+ru: упорядоченных
+sl: po
+sv: sorterade i
+zh: 根据
+
+    select lang
+af: Taalvoorkeur/Language preference:
+ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
+bg: Можете да изберете друг език за съобщения измежду следните:
+br: Dibab a c'hellit ur yezh all etre ar re-mañ:
+ca: Podeu seleccionar una altre llengua, hi ha disponibles les següents:
+cs: Zvolte jazyk pro prohlížení databáze:
+da: Du kan vælge fremstilling på et andet sprog blandt de følgende:
+de: Blick auf:
+en: View in:
+eo: Vi povas elekti alian lingvon inter la sekvantajn:
+es: Ver en:
+et: Võid valida ka mõne muu keele järgnevatest:
+fi: Näytä:
+fr: Afficher en :
+is: Þú getur valið milli eftirfarandi tungumála:
+it: Vista in:
+lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
+nl: Bekijk in het:
+no: Du kan velge sidevisning på et annet språk blant følgende:
+pl: Możesz wybrać inny język spośród następujących:
+ro: poti sa alegi una din urmatoarele limbi pentru afisaj
+sl: Lahko izberete drug jezik:
+sv: Du kan välja ett annat språk bland de följande:
+
     add the previous name as a first name alias
 en: add the previous name as a first name alias
 fr: ajouter le nom précédent comme un alias de prénom
@@ -13936,16 +14166,16 @@ fr: remonter/descendre/remonter le curseur/descendre le curseur
 de: einfügen
 en: insert
 es: insertar
-it: inserire
 fr: insérer
+it: inserire
 pt: inserir
 
     label
 de: Etikett
 en: label
 es: etiqueta
-it: etichetta
 fr: étiquette
+it: etichetta
 nl: etiketje
 pt: etiqueta
 
@@ -14021,6 +14251,10 @@ fr: témoin au %s de
 en: tree of relations
 fr: arbre des relations
 
+    witness tree
+en: tree of witnesses
+fr: arbre des témoins
+
     events tree
 en: tree of events
 fr: arbre des événements
@@ -14056,3 +14290,11 @@ fr: permuter les événements de la famille %s
     full width/columns
 en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
+
+    dd/mm/yyyy
+en: dd/mm/yyyy
+fr: jour/mois/année
+
+    spouses info
+en: spouses informations
+fr: informations conjoints

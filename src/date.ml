@@ -288,10 +288,15 @@ value string_of_prec_dmy conf s s2 d =
   | Before -> transl_decline conf "before (date)" s
   | After -> transl_decline conf "after (date)" s
   | Maybe -> transl_decline conf "possibly (date)" s
-  | OrYear d2 -> s ^ " " ^ transl conf "or" ^ " " ^ nominative s2
+  | OrYear d2 -> 
+      "<span class=\"text-nowrap\">" ^ s ^ "</span>" ^ " " ^
+      "<span class=\"text-nowrap\">" ^
+     transl conf "or" ^ " " ^ nominative s2 ^ "</span>"
   | YearInt d2 ->
-      transl conf "between (date)" ^ " " ^ s ^ " " ^
-        transl_nth conf "and" 0 ^ " " ^ nominative s2 ]
+      "<span class=\"text-nowrap\">" ^ transl conf "between (date)" ^
+        " " ^ s ^ "</span>" ^ " " ^
+      "<span class=\"text-nowrap\">" ^ transl_nth conf "and" 0 ^
+        " " ^ nominative s2 ^ "</span>"]
 ;
 
 value string_of_dmy conf d =
@@ -471,7 +476,23 @@ value string_of_ondate conf d =
 value string_of_date conf =
   fun
   [ Dgreg d _ -> string_of_dmy conf d
-  | Dtext t -> "(" ^ t ^ ")" ]
+  | Dtext t -> t ]
+;
+
+value string_of_date_sorted conf =
+  fun
+  [ Dgreg d _ ->  (* same as in decode_dmy *)
+      match (d.day, d.month, d.year) with
+      [ (0, 0, year) ->
+        string_of_int d.year ^ "1231"
+      | (0, month, year) ->
+        string_of_int d.year ^
+        Printf.sprintf "%02d" d.month ^ "31"
+      | (day, month, year) ->
+        string_of_int d.year ^
+        Printf.sprintf "%02d" d.month ^
+        Printf.sprintf "%02d" d.day ] 
+  | Dtext t -> t ]
 ;
 
 value string_of_date_aux conf sep =
@@ -584,8 +605,8 @@ value string_slash_of_date conf date =
         " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 1) ^ ")"
   | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
-      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench True) d1 ^
-        " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 2) ^ ")"
+      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench True) d1(* ^
+        " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 2) ^ ")" *)
   | Dgreg d Dhebrew ->
       let d1 = Calendar.french_of_gregorian d in
       slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew True) d1 ^

@@ -25,6 +25,7 @@ type config =
     manitou : bool;
     supervisor : bool;
     wizard : bool;
+    is_printed_by_ocaml : bool;
     friend : bool;
     just_friend_wizard : bool;
     user : string;
