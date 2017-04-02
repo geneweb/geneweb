@@ -1,21 +1,22 @@
 <!doctype html>
-<html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
 <!-- $Id: updind.txt,v 7.00 2016/03/21 15:22:41 a2 mr Exp$ -->
-<title>%nn;
-  %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
-    [*merge::person/persons]1 # %index;
-  %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
-    [*modify::person/persons]0 # %index;
-  %else;[*add::person/persons]0%end;
-</title>
-<meta name="robots" content="none"/>
-<meta charset=%charset;>
-<link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"/>
-%include.css;
-%import;js_upd
-%import;updind_updfam
-%base_header;
+  <title>%nn;
+    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
+      [*merge::person/persons]1 # %index;
+    %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK")
+      [*modify::person/persons]0 # %index;
+    %else;[*add::person/persons]0%end;
+  </title>
+  <meta name="robots" content="none"/>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"/>
+  %include.css;
+  %import;js_upd
+  %import;updind_updfam
+  %base_header;
+</head>
 %(<!-- Begin define -->%)
 %let;l_r_father; placeholder="M" %in;
 %let;l_r_mother; placeholder="F" %in;
@@ -82,8 +83,8 @@
     <td style="width:auto"><span id="%l1;_jq1"></span></td>
 %end;
 %(<!-- End define -->%)
-</head>
 <body%body_prop; id="upd" %apply;load_focus()>
+<div class="container-fluid">
 %message_to_wizard;
 <form name="upd" method="post" action="%action;">
 <div id="jq" style="display:none"> </div>
@@ -235,7 +236,9 @@
       <a style="display:none" id="accent0" href="javascript:accent0()" title="[visualize/show/hide/summary]2 [tools]"> – </a>
       <a id="accent1" href="javascript:accent1()" title="[full width/columns]0"> … </a>
     </div>
-    <div id="accent" style="display:none">%include.accent;</div>
+    <div id="accent" style="display:none">
+      %include.accent;
+    </div>
 </fieldset>
 <fieldset class="event">
   <legend style="display:inline-block">[*event/events]1 <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %lpaO; title="[*invert::event/events]1 (Alt+%lpcOk;)">⇳</a></legend>
@@ -288,7 +291,7 @@
 </form>
 %base_trailer;
 %include.copyr;
-<script src=%bvar.static_path;templm/autosize.min.js></script>
-<script>autosize(document.querySelectorAll('textarea'));</script>
+</div>
+%include.js;
 </body>
 </html>

@@ -1,8 +1,8 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: forum.txt,v 5.19 2008-01-07 13:29:47 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.m = "FORUM_ADD" or evar.m = "FORUM_ADD_OK")%nn;
       %if;can_post;
@@ -17,31 +17,37 @@
       %message.subject.cut.50;%nn;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
+<div class="container">
 
-%if;not cancel_links;
-  <table style="float:%right;"><tr><td>
-    %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
-    %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+%define;arrows()
+  %if;not cancel_links;
+    <div class="btn-group float-%right; mt-2">
+      %if;(referer != "")
+        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+      %end;
+      <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+    </div>
+  %end;
 %end;
 
 %define;search_form(main)
-  <table style="float:%right;"><tr><td align="%right;">
+  <table style="float:%right">
+  <tr><td style="text-align:%right;;vertical-align:top">
+    %if;(referer != "")
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+    %end;
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </td></tr>
+  <tr><td>
   <form method="get" action="%action;">
     <p>
     %hidden;
@@ -49,13 +55,18 @@
     %if;("main" != "true")
       <input type="hidden" name="p" value="%pos;"%/>
     %end;
-    <input name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br%/>
+    <div class="form-check">
+      <label class="form-check-label">
+        <input class="form-check-input" name="s" size="30" maxlength="40"%/>
+          %evar.s.ns;
+      </label>
+    </div>
     <label>
     <input type="checkbox" name="c" value="on"%nn;
      %if;("main" != "true" and evar.c = "on") checked="checked"%end;
      %/>[search/case sensitive]1
     </label>
-    <input type="submit" value="[*search/case sensitive]0"%/>
+    <button type="submit" class="btn btn-secondary btn-lg">[*search/case sensitive]0</button>
     </p>
   </form>
   </td></tr></table>
@@ -67,6 +78,7 @@
     <h1>%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
     </h1>
+    %apply;arrows()
     <table width="100%%"><tr><td align="center">
     <table border="1"><tr><td>
       <form method="POST" action="%action;">
@@ -92,7 +104,7 @@
       </table>
       <p>
       [*message/previous message/previous messages/next message]0
-      <br%/>
+      <br>
       <table>
         <tr>
           <td>
@@ -106,11 +118,11 @@
           </td>
         </tr>
       </table>
-      <br%/>
-      <input type="submit" name="visu"%sp;
-       value="[visualize/show/hide/summary]0"%/>
+      <br>
+      <button type="submit" name="visu" class="btn btn-secondary btn-lg">
+        [visualize/show/hide/summary]0</button>
       %if;is_moderated_forum;
-	<br%/>
+        <br>
         <span style="color:green">([this forum is moderated])</span>
       %end;
       </p>
@@ -128,18 +140,19 @@
     <h1>%nn;
       [*add::message/previous message/previous messages/next message]0%nn;
     </h1>
+    %apply;arrows()
     %if;(message.ident != "" and message.text != "")
       <b>%message.ident;</b>
       %if;(message.email != "")%nn;
         <a href="mailto:%message.email.v;">%message.email;</a>%end;
-      <br%/>
+      <br>
       %if;(message.subject != "")
         <b>[*ident/email/subject]2: %message.subject;</b>
-        <br%/>
+        <br>
       %end;
       %if;(message.access = "priv")
         <b>[*access]: [private]</b>
-        <br%/>
+        <br>
       %end;
       <i>%message.time;</i>
       <dl><dd>
@@ -174,7 +187,7 @@
       <p>
       <span%if;(message.text = "") style="color:red"%end;>
       [*message/previous message/previous messages/next message]0</span>
-      <br%/>
+      <br>
       <table>
         <tr>
           <td>
@@ -189,19 +202,19 @@
           </td>
         </tr>
       </table>
-      <br%/>
-      <input type="submit" name="visu"%sp;
-       value="[visualize/show/hide/summary]0"%/>
+      <br>
+      <button type="submit" name="visu" class="btn btn-secondary btn-lg">[visualize/show/hide/summary]0</button>
+
       %if;(message.ident != "" and message.text != "")
         %if;(wizard or friend)
-          <input type="submit" name="publ_acc" value="[public]"%/>
-          <input type="submit" name="priv_acc" value="[private]"%/>
+          <button type="submit" name="publ_acc" class="btn btn-secondary btn-lg">[public]0</button>
+          <button type="submit" name="priv_acc" class="btn btn-secondary btn-lg">[private]0</button>
         %else;
-          <input type="submit" value="ok">
+          <button type="submit" class="btn btn-secondary btn-lg">[*validate/delete]0</button>
         %end;
       %end;
       %if;is_moderated_forum;
-        <br%/>
+        <br>
         <span style="color:green">([this forum is moderated])</span>
       %end;
       </p>
@@ -215,8 +228,11 @@
   %end;
 %elseif;(pos != "")
   %( display a message %)
+  <h1>[*database forum]</h1>
   %if;(evar.m = "FORUM_SEARCH")
     %apply;search_form("false")
+  %else;
+    %apply;arrows()
   %end;
   <ul>
   <li>%nn;
@@ -243,8 +259,9 @@
       %hidden;
       <input type="hidden" name="m" value="FORUM_VAL"%/>
       <input type="hidden" name="p" value="%pos;"%/>
-      <input type="submit" name="v" value="%nn;[*validate/delete]0"%>
-      <input type="submit" name="d" value="%nn;[*validate/delete]1"%/>
+      <button type="submit" name="v" class="btn btn-secondary btn-lg">[*validate/delete]0</button>
+      <button type="submit" name="d" class="btn btn-secondary btn-lg">[*validate/delete]1</button>
+
       </p>
       </form>
     %else;
@@ -274,14 +291,14 @@
     %end;
     ... %message.from;</b>
   %end;
-  <br%/>
+  <br>
   %if;(message.subject != "")
     <b>[*ident/email/subject]2: %message.subject;</b>
-    <br%/>
+    <br>
   %end;
   %if;(message.access = "priv")
     <b>[*access]: [private]</b>
-    <br%/>
+    <br>
   %end;
   <i>%message.time;</i>
   </p>
@@ -299,14 +316,15 @@
     %hidden;
     <input type="hidden" name="m" value="FORUM_P_P"%/>
     <input type="hidden" name="p" value="%message.pos;"%/>
-    <input type="submit" value="[*public]/[*private]"%/>
+    <button type="submit" class="btn btn-secondary btn-lg">[*public]/[*private]</button>
+
     </form>
     <form method="POST" action="%action;">
     %hidden;
     <input type="hidden" name="m" value="FORUM_DEL"%/>
     <input type="hidden" name="p" value="%message.pos;"%/>
-    <input type="submit" value="%nn;
-       [*delete::message/previous message/previous messages/next message]0"%/>
+    <button type="submit" class="btn btn-secondary btn-lg">
+      [*delete::message/previous message/previous messages/next message]0</button>
     </form>
     </p>
   %end;
@@ -319,9 +337,8 @@
     <p>
     %hidden;
     <input type="hidden" name="m" value="FORUM_ADD"%/>
-    <input type="submit"%sp;
-     value="[*add::message/previous message/previous messages/next message]0"%/
-     >
+    <button type="submit" class="btn btn-secondary btn-lg">
+      [*add::message/previous message/previous messages/next message]0</button>
     </p>
     </form>
   %end;
@@ -338,12 +355,12 @@
       <tr align="%left;"><td colspan="4">%message.date;</td></tr>
     %end;
     <tr align="%left;"%col;>
-    <td><tt>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
-            &nbsp;</tt></td>
-    <td><tt>%message.hour;</tt></td>
+    <td><samp>&nbsp;%if;(message.access = "priv")*%else;&nbsp;%end;
+            &nbsp;</samp></td>
+    <td><samp>%message.hour;</samp></td>
     <td><a href="%prefix;m=FORUM;p=%message.pos;
          "%if;(message.prev_date = "") accesskey="1"%end;%col;
-	 ><b>%message.ident.cut.26;
+   ><b>%message.ident.cut.26;
         </b></a></td>
     <td>%nn;
        %if;(message.subject = "" or message.subject = "-")
@@ -363,7 +380,9 @@
   </table>
 %end;
 
-%base_trailer;
+%include.trl;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

@@ -1,26 +1,24 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: updmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>[*update]</title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.favicon;
-  %include.js;
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
-%import;perso_utils
-
+<div class="container">
 %include.perso_header;
 
 <h1>%nn;
-  [*update]:<br%/>
+  [*update]:<br>
   %first_name;
   .%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end; %surname;
 </h1>
@@ -101,7 +99,7 @@
                 </select>
               </form>
             </div>
-    	      <hr class="separateur"/>
+            <hr class="separateur"/>
           %end;
           <div>
             <ul>
@@ -135,7 +133,7 @@
   %end;
 </div>
 
-<script type="text/javascript">
+<script>
   function main(ifam) {
     var div_marr = $('div.one_marriage');
     /* Est-ce qu'il y a des familles à masquer ? */
@@ -167,47 +165,47 @@
       %if;(family_cnt != 1)
         <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;
          ">[*invert]</a>
-        <br%/>
+        <br>
         %if;(family.father.index = prev_family.father.index
          and family.mother.index = prev_family.mother.index)
           <a href=%nn;
           "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;
           ;ip=%index;">%nn;
           [*merge::]</a>
-          <br%/>
+          <br>
         %end;
       %end;
       <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
        "%if;(nb_families = 1) accesskey="F"%end;>%nn;
       [*modify::family/families]0%if;(nb_families = 1) %end;</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br%/>
+      <br>
       <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
       [*delete::family/families]0</a>
       <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br%/>
+      <br>
     %end;
-    <br%/>
+    <br>
     %if;((first_name = "?" or surname = "?") and
          (nb_families != 0 or has_parents))
     %elseif;(not is_male and not is_female)
       <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;
       [*add::marriage/marriages]0 ([M/F]0)</a>
-      <br%/>
+      <br>
       <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;
       [*add::marriage/marriages]0 ([M/F]1)</a>
-      <br%/>
+      <br>
     %else;
       <a href="%prefix;m=ADD_FAM;ip=%index;" accesskey="A">%nn;
       [*add::marriage/marriages]0 </a>
-      <br%/>
+      <br>
     %end;
     %if;(nb_children != 0)
-      <br%/>
+      <br>
       <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
     %end;      
     %if;has_possible_duplications;
-      <br%/>
+      <br>
       <a href="%prefix;m=MRG_DUP;ip=%index;">%sq;
       [*merge::possible duplications]</a>
     %end;      
@@ -222,11 +220,13 @@
 %if;(nb_families != 0)
   <p>
     %apply;hint([*modify::family/families]0)
-    <br%/>
+    <br>
   </p>
 %end;
 
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

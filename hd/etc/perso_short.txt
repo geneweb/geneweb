@@ -187,7 +187,7 @@
     <table class="fp_marriage_notes">
       <tr>
         <td>
-          <span class="textcolor">[*marriage notes]:</span> %comment;
+          <span class="textcolor">[*marriage notes/marriages notes]0:</span> %comment;
           %if;has_marriage_note;%marriage_note;%end;
         </td>
       </tr>
@@ -1070,9 +1070,9 @@
           %if;(ancestor.same = "")
             <li>
               <a href="#ind_%ancestor.index;" class="see-more">%ancestor;</a>
-    	        %if;(evar.sosa = "on" and ancestor.has_sosa)
+              %if;(evar.sosa = "on" and ancestor.has_sosa)
                 ([n° Sosa]&nbsp;:%sp;%ancestor.sosa;)
-    	        %end;
+              %end;
             </li>
           %end;
         %end;

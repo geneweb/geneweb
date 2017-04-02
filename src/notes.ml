@@ -54,8 +54,9 @@ value print_search_form conf from_note =
               Wserver.printf "%s\n"
                 (transl_nth conf "search/case sensitive" 1);
             end;
-            xtag "input" "type=\"submit\" value=\"%s\""
-              (capitale (transl_nth conf "search/case sensitive" 0));
+            tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+                Wserver.printf "%s" (capitale (transl_nth conf "search/case sensitive" 0));
+            end;
           end;
         end;
       end;
@@ -484,8 +485,8 @@ value print_misc_notes conf base =
       db []
   in
   do {
-    header conf title;
-    print_link_to_welcome conf True;
+    header_link_welcome conf title;
+    (*print_link_to_welcome conf True;*)
     if db <> [] then
       tag "ul" begin
         if d <> "" then

@@ -34,14 +34,14 @@ value print_child_person conf base p =
       end;
       tag "td" "colspan=\"3\"" begin
         xtag "input"
-          "name=\"%s_first_name\" size=\"23\" maxlength=\"200\" value=\"%s\""
+          "name=\"%s_first_name\" class=\"form-control\" size=\"23\" maxlength=\"200\" value=\"%s\""
           var (quote_escaped first_name);
       end;
       tag "td" "align=\"%s\"" conf.right begin
         let s = capitale (transl conf "number") in Wserver.printf "%s" s;
       end;
       tag "td" begin
-        xtag "input" "name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s" var
+        xtag "input" "class=\"form-control\" name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s" var
           (if occ = 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
       end;
     end;
@@ -51,7 +51,7 @@ value print_child_person conf base p =
       end;
       tag "td" "colspan=\"5\"" begin
         xtag "input"
-          "name=\"%s_surname\" size=\"40\" maxlength=\"200\" value=\"%s\"" var
+          "name=\"%s_surname\" class=\"form-control\" size=\"40\" maxlength=\"200\" value=\"%s\"" var
           surname;
       end;
     end;
@@ -129,8 +129,8 @@ value print_change conf base p =
       end;
       print_children conf base children;
       Wserver.printf "\n";
-      tag "p" begin
-        xtag "input" "type=\"submit\" value=\"Ok\"";
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+        Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
       end;
     end;
     Wserver.printf "\n";
@@ -217,10 +217,12 @@ value print_conflict conf base ip_var p =
       let var = "c" ^ string_of_int (Adef.int_of_iper ip_var) in
       xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
       xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
-      xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
-        (capitale (transl conf "create"));
-      xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
-        (capitale (transl conf "back"));
+      tag "button" "type=\"submit\" name=\"create\" class=\"btn btn-secondary btn-lg\"" begin 
+        Wserver.printf "%s" (capitale (transl conf "create"));
+      end;
+      tag "button" "type=\"submit\" name=\"return\" class=\"btn btn-secondary btn-lg\"" begin 
+        Wserver.printf "%s" (capitale (transl conf "back"));
+      end;
     end;
     Update.print_same_name conf base p;
     trailer conf;
@@ -257,7 +259,8 @@ value rename_image_file conf base p (nfn, nsn, noc) =
   match auto_image_file conf base p with
   [ Some old_f ->
       let s = default_image_name_of_key nfn nsn noc in
-      let f = Filename.concat (base_path ["images"] conf.bname) s in
+      (*let f = Filename.concat (base_path ["images"] conf.bname) s in*)
+      let f = Filename.concat (base_path [] (conf.bname ^ ".gwb/portraits")) s in
       let new_f =
         if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
       in

@@ -964,7 +964,9 @@ value print_slices_menu conf hts =
         end;
       end;
       html_p conf;
-      Wserver.printf "<input type=\"submit\" value=\"Ok\">\n";
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
+        Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+      end;
     end;
     Hutil.trailer conf
   }

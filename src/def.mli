@@ -66,7 +66,7 @@ type gen_title 'string =
 ;
 
 type witness_kind =
-  [ Witness | Witness_GodParent ]
+  [ Witness | Witness_GodParent | Witness_Officer ]
 ;
 
 type gen_pers_event_name 'string =

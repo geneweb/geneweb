@@ -1,8 +1,7 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: anclist.txt,v 5.5 2007-07-25 13:15:18 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames branch] -%nn;
     %else
@@ -15,14 +14,15 @@
       %end;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="content-style-type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
+<div class="container">
 %message_to_wizard;
 
 <h1>%nn;
@@ -30,13 +30,13 @@
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
+    %if;(alias != "") <em>(%alias;)</em>%end;<br>
     - [*surnames branch] -
   %elseif;(evar.t = "E")
     %if;(public_name != "")%public_name;%else;%first_name;%end;
     %if;(qualifier != "") <em>%qualifier;</em>%end;
     %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;<br%/>
+    %if;(alias != "") <em>(%alias;)</em>%end;<br>
     - [*list eclair] -
   %else;
     %apply;a_of_b%with;[*ancestors]%and;
@@ -49,17 +49,13 @@
   %end;
 </h1>
 
-%if;(evar.cgl != "on")
-  <table style="float:%right;"><tr><td>
+%if;not cancel_links;
+  <div class="btn-group float-%right; mt-2">
     %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png;
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png;
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
 %end;
 
 %define;tothegen(xx)
@@ -98,7 +94,7 @@
         "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
         "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
     %end;
-    <tt>ss2</tt><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br%/>
+    <samp>ss2</samp><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br>
     %if;(pp.has_parents)
       %apply;ancestors_horizontally(
         "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
@@ -519,7 +515,9 @@
   %end;
 %end;
 
-%base_trailer;
+%include.trl;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

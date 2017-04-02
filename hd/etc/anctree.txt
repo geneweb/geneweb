@@ -1,8 +1,8 @@
-%if;(evar.t = "T")%doctype_transitional;%else;%doctype;%end;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: anctree.txt,v 5.9 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
@@ -12,15 +12,16 @@
       %if;(qualifier != "") %qualifier;%end; %surname;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
+<div class="container-fluid">
 
 %define;init_cache(nb_asc, from_gen_desc, nb_desc)
   %init_cache.nb_asc.from_gen_desc.nb_desc;
@@ -37,10 +38,10 @@
     <tr>
     %foreach;cell;
       %if;(not is_first)
-        <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+        <td colspan="1" align="center"><samp>&nbsp;</samp></td>
       %end;
       <td colspan="%cell.colspan;" align="center">%nn;
-        %if;(cell.is_empty or cell.is_top)<tt>&nbsp;</tt>%else;|%end;
+        %if;(cell.is_empty or cell.is_top)<samp>&nbsp;</samp>%else;|%end;
       </td>
     %end;
     </tr>
@@ -48,10 +49,10 @@
   <tr>
   %foreach;cell;
     %if;(not is_first)
-      <td colspan="1" align="center"><tt>&nbsp;</tt></td>
+      <td colspan="1" align="center"><samp>&nbsp;</samp></td>
     %end;
     <td colspan="%cell.colspan;" align="center">%nn;
-    %if;(cell.is_empty)<tt>&nbsp;</tt>%nn;
+    %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
     %else;
       %if;(evar.bd != "" and evar.bd > 0 or evar.color != "")%nl;
         <table style="border:%evar.bd;"><tr>
@@ -102,15 +103,15 @@
               %end;
               &nbsp;-
             </i>
-          %else;<tt>&nbsp;</tt>%end;
-        %else;<tt>&nbsp;</tt>%end;
+          %else;<samp>&nbsp;</samp>%end;
+        %else;<samp>&nbsp;</samp>%end;
         </td>
       %end;
       <td colspan="%cell.colspan;" align="center">%nn;
-      %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+      %if;cell.is_empty;<samp>&nbsp;</samp>%nn;
       %elseif;(evar.cgl = "on")|%nn;
       %else;
-        <a href="%cell.person.bname_prefix;m=A;t=T;v=%evar.v;;%cell.person.access;%if;(evar.image = "on");image=on%end;%if;(evar.marriage = "on");marriage=on%end;"">|</a>%nn;
+        <a href="%cell.person.bname_prefix;m=A;t=T;v=%evar.v;;%cell.person.access;%if;(evar.image = "on");image=on%end;%if;(evar.marriage = "on");marriage=on%end;">|</a>%nn;
       %end;
       </td>
     %end;
@@ -120,14 +121,14 @@
         %if;(not is_first)
           <td colspan="1" align="center">%nn;
           %if;(cell.is_right)<hr class="full;"%/>%nn;
-          %else;<tt>&nbsp;</tt>%end;
+          %else;<samp>&nbsp;</samp>%end;
           </td>
         %end;
         <td colspan="%cell.colspan;" align="%nn;
            %if;cell.is_left;%right;
            %elseif;cell.is_right;%left;
            %else;center%end;">%nn;
-        %if;cell.is_empty;<tt>&nbsp;</tt>%nn;
+        %if;cell.is_empty;<samp>&nbsp;</samp>%nn;
         %elseif;cell.is_left;<hr class="%right;"%/>%nn;
         %elseif;cell.is_right;<hr class="%left;"%/>%nn;
         %else;|%end;
@@ -168,9 +169,9 @@
 %end;
 
 %if;(evar.t = "T")%nn;
-  <div style="text-align:%right;">%nn;
+  <div class="text-%right">%nn;
   <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
-  ;dag=on;notab=on;slices=on"><tt>//</tt></a></div>
+  ;dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
 %end;
 
 %define;tree(xx)
@@ -202,5 +203,7 @@
 
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

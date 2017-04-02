@@ -5,8 +5,6 @@
 open Config;
 open Printf;
 
-value up_fname conf = "up.png";
-
 value commd_no_params conf =
   conf.command ^ "?" ^
     List.fold_left
@@ -18,40 +16,25 @@ value commd_no_params conf =
 
 value link_to_referer conf =
   let referer = Util.get_referer conf in
+  let retour = Util.capitale (Util.transl conf "back") in
   if referer <> "" then
-    let fname = "left.png" in
-    let wid_hei =
-      match Util.image_size (Util.image_file_name fname) with
-      [ Some (wid, hei) ->
-          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
-          string_of_int hei ^ "\""
-      | None -> "" ]
-    in
-    sprintf "<a href=\"%s\"><img src=\"%s/%s\"%s alt=\"&lt;&lt;\" title=\"&lt;&lt;\"%s></a>\n"
-      referer (Util.image_prefix conf) fname wid_hei conf.xhs
+    sprintf "<a href=\"%s\"><span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span></a>\n" referer retour
   else ""
 ;
 
 value gen_print_link_to_welcome f conf right_aligned =
   if conf.cancel_links then ()
   else do {
-    let fname = up_fname conf in
-    let wid_hei =
-      match Util.image_size (Util.image_file_name fname) with
-      [ Some (wid, hei) ->
-          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
-          string_of_int hei ^ "\""
-      | None -> "" ]
-    in
     if right_aligned then
-      Wserver.printf "<div style=\"float:%s\">\n" conf.right
+      Wserver.printf "<div class=\"btn-group float-%s mt-2\">\n" conf.right
     else Wserver.printf "<p>\n";
     f ();
     let str = link_to_referer conf in
     if str = "" then () else Wserver.printf "%s" str;
     Wserver.printf "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.printf "<img src=\"%s/%s\"%s alt=\"^^\" title=\"^^\"%s>"
-      (Util.image_prefix conf) fname wid_hei conf.xhs;
+    Wserver.printf "<span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"";
+    Wserver.printf "%s" (Util.capitale (Util.transl conf "home"));
+    Wserver.printf "\"></span>";
     Wserver.printf "</a>\n";
     if right_aligned then Wserver.printf "</div>\n"
     else Wserver.printf "</p>\n"
@@ -61,42 +44,38 @@ value gen_print_link_to_welcome f conf right_aligned =
 value print_link_to_welcome = gen_print_link_to_welcome (fun () -> ());
 
 value header_without_http conf title = do {
-  Wserver.printf "%s\n" (Util.doctype conf);
-  Wserver.printf "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
+  Wserver.printf "<!DOCTYPE html>\n";
   Wserver.printf "<head>\n";
   Wserver.printf "  <title>";
   title True;
   Wserver.printf "</title>\n";
-  Wserver.printf "  <meta name=\"robots\" content=\"none\"%s>\n" conf.xhs;
-  Wserver.printf "  <meta http-equiv=\"Content-Type\" \
-                    content=\"text/html; charset=%s\"%s>\n"
-    conf.charset conf.xhs;
+  Wserver.printf "  <meta name=\"robots\" content=\"none\">\n";
+  Wserver.printf "  <meta charset=\"%s\">\n" conf.charset;
   Wserver.printf
-    "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
-    conf.xhs;
+    "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\">\n"
+    (Util.image_prefix conf);
   Wserver.printf
-    "  <link rel=\"shortcut icon\" href=\"%s/favicon_gwd.png\"%s>\n"
-    (Util.image_prefix conf) conf.xhs;
+    "  <link rel=\"apple-touch-icon\" href=\"%s/favicon_gwd.png\">\n"
+    (Util.image_prefix conf);
+  Wserver.printf "  <meta name=\"viewport\" content=\"width=device-width, \
+                    initial-scale=1, shrink-to-fit=no\">\n";
   match Util.open_templ conf "css" with
   [ Some ic -> Templ.copy_from_templ conf [] ic
   | None -> () ];
-  match Util.open_templ conf "js" with
-  [ Some ic -> Templ.copy_from_templ conf [] ic
-  | None -> () ];
   Templ.include_hed_trl conf "hed";
-  Wserver.printf "</head>\n";
+  Wserver.printf "\n</head>\n";
   let s =
     try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
     [ Not_found -> "" ]
   in
-  let s = s ^ Util.body_prop conf in Wserver.printf "<body%s>" s;
-  Wserver.printf "\n";
+  let s = s ^ Util.body_prop conf in Wserver.printf "<body%s>\n" s;
   Util.message_to_wizard conf;
 };
 
 value header_without_page_title conf title = do {
-  Util.html conf;
+  Util.html conf; (* semble inutile car la fonction header_without_http a maintenant un header HTML5, mauvais nom ? *)
   header_without_http conf title;
+  Wserver.printf "<div class=\"container\">"; (* balancing </div> in gen_trailer *)
 };
 
 value header_link_welcome conf title = do {
@@ -105,6 +84,10 @@ value header_link_welcome conf title = do {
   Wserver.printf "<h1>";
   title False;
   Wserver.printf "</h1>\n";
+};
+
+value header_no_h1 conf title = do {
+  header_without_page_title conf title;
 };
 
 value header_no_page_title conf title = do {
@@ -116,7 +99,15 @@ value header_no_page_title conf title = do {
 
 value header conf title = do {
   header_without_page_title conf title;
-  Wserver.printf "<h1>";
+  Wserver.printf "\n<h1>";
+  title False;
+  Wserver.printf "</h1>\n";
+};
+
+value header_fluid conf title = do {
+  header_without_http conf title;
+  Wserver.printf "<div class=\"container-fluid\">"; (* balancing </div> in gen_trailer *)
+  Wserver.printf "\n<h1>";
   title False;
   Wserver.printf "</h1>\n";
 };
@@ -131,9 +122,14 @@ value rheader conf title = do {
 };
 
 value gen_trailer with_logo conf = do {
+  let conf = {(conf) with template = False} in (* set to False so we can detect *)
   Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
+  Wserver.printf "</div>\n"; (* balances header_without_http *)
+  match Util.open_templ conf "js" with
+  [ Some ic -> Templ.copy_from_templ conf [] ic
+  | None -> () ];
   Wserver.printf "</body>\n</html>\n";
 };
 
@@ -155,7 +151,7 @@ value error_cannot_access conf fname = do {
   header conf title;
   tag "ul" begin
     tag "li" begin
-      Wserver.printf "Cannot access file \"%s.txt\".\n"
+      Wserver.printf "Cannot access (2) file \"%s\".\n"
         fname;
     end;
   end;

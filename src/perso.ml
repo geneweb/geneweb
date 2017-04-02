@@ -1961,6 +1961,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "count" env with
       [ Vcnt c -> string_of_int c.val
       | _ -> "" ]
+  | "count1" ->
+      match get_env "count1" env with
+      [ Vcnt c -> string_of_int c.val
+      | _ -> "" ]
   | "divorce_date" ->
       let mode_local =
         match get_env "fam_link" env with
@@ -2017,6 +2021,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       | _ -> "" ]
   | "incr_count" ->
       match get_env "count" env with
+      [ Vcnt c -> do { incr c; "" }
+      | _ -> "" ]
+  | "incr_count1" ->
+      match get_env "count1" env with
       [ Vcnt c -> do { incr c; "" }
       | _ -> "" ]
   | "lazy_force" ->
@@ -2156,6 +2164,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       | _ -> raise Not_found ]
   | "reset_count" ->
       match get_env "count" env with
+      [ Vcnt c -> do { c.val := 0; "" }
+      | _ -> "" ]
+  | "reset_count1" ->
+      match get_env "count1" env with
       [ Vcnt c -> do { c.val := 0; "" }
       | _ -> "" ]
   | "reset_desc_level" ->
@@ -3732,6 +3744,14 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           "</ul>\n"
         else ""
       else ""
+  | "nb_children_tot" ->
+      let n =
+        List.fold_left
+          (fun n ifam ->
+             n + Array.length (get_children (foi base ifam)))
+          0 (Array.to_list (get_family p))
+      in
+      string_of_int n 
   | "nb_children" ->
       (* TODO ???
       let mode_local =
@@ -5216,6 +5236,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     [("p", Vind p);
      ("p_auth", Vbool (authorized_age conf base p));
      ("count", Vcnt (ref 0));
+     ("count1", Vcnt (ref 0));
      ("list", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
      ("lazy_print", Vlazyp (ref None));

@@ -931,6 +931,7 @@ value templ_eval_var conf =
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool True
   | ["wizard"] -> VVbool conf.wizard
+  | ["template"] -> VVbool conf.template
   | _ -> raise Not_found ]
 ;
 
@@ -1386,6 +1387,12 @@ value rec interp_ast conf ifun env =
         | ("nth", [VVstring s1; VVstring s2]) ->
             let n = try int_of_string s2 with [ Failure _ -> 0 ] in
             Util.translate_eval (Util.nth_field s1 n)
+        | ("nth_c", [VVstring s1; VVstring s2]) ->
+            let n = try int_of_string s2 with [ Failure _ -> 0 ] in
+            try 
+              Char.escaped (String.get s1 n) 
+            with 
+            [ Invalid_argument _ -> "" ]
         | ("red_of_hsv", [VVstring h; VVstring s; VVstring v]) ->
             try
               let (r, g, b) = rgb_of_str_hsv h s v in

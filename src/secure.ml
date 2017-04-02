@@ -47,9 +47,10 @@ value suffix d df =
     | (d, []) -> None ]
 ;
 
-value check_open fname =
+value check_open fname s =
   try
     do {
+      (*Printf.eprintf "<!-- Check file %s: %s-->\n" s fname;*)
       if String.contains fname '\000' then raise Exit else ();
       let df = decompose fname in
       loop ok_path.val where rec loop =
@@ -81,17 +82,17 @@ value check_open fname =
 ;
 
 value open_in fname =
-  do { check_open fname; Pervasives.open_in fname }
+  do { check_open fname "in"; Pervasives.open_in fname }
 ;
 value open_in_bin fname =
-  do { check_open fname; Pervasives.open_in_bin fname }
+  do { check_open fname "in_bin"; Pervasives.open_in_bin fname }
 ;
 value open_out fname =
-  do { check_open fname; Pervasives.open_out fname }
+  do { check_open fname "out"; Pervasives.open_out fname }
 ;
 value open_out_bin fname =
-  do { check_open fname; Pervasives.open_out_bin fname }
+  do { check_open fname "out_bin"; Pervasives.open_out_bin fname }
 ;
 value open_out_gen mode perm fname =
-  do { check_open fname; Pervasives.open_out_gen mode perm fname }
+  do { check_open fname "out_gen"; Pervasives.open_out_gen mode perm fname }
 ;

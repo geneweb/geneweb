@@ -1,110 +1,115 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: upddata.txt,v 0.01 2012-10-29 11:42:30 flh Exp $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
+  <!-- $Id: upddata.txt,v 7 25/12/2016 07:20:32 Exp $ -->
+  <!-- Copyright (c) 2006-2017 INRIA -->
   <title>%title;</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
+<div class="container">
+<h1 class="text-center mt-1">%title;</h1>
 
 %if;not cancel_links;
-  <table style="float:%right;">
-    <tr><td>
-      %if;(referer != "")
-        <a href="%referer;">
-          <img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="&lt;&lt;"%/>
-        </a>
-      %end;
-      <a href="%prefix;">
-        <img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="^^"%/>
-      </a>
-    </td></tr>
-  </table>
+  <div class="btn-group float-%right; mt-2">
+    %if;(referer != "")
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+    %end;
+    <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
+  </div>
 %end;
 
-<h1>%title;</h1>
-
 %define;print_short()
-  <p>[*select a letter] :</p>
-  <p class="list_ini">
-    %foreach;initial;
-      <a href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
-    %end;
-  </p>
+  <div class="col-sm-10 offset-sm-1">
+    <p class="mt-2 font-weight-bold">%if;(evar.s="")[*select a letter]%else;[*select]%end;[:]</p>
+    <div class="flex-wrap" role="toolbar" aria-label="First character selection">
+      %foreach;initial;
+        <a class="btn btn-secondary btn-lg mb-1 %if;(evar.s="")book-char%else;book-2chars%end; text-center" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
+      %end;
+    </div>
+  </div>
 %end;
 
 %define;print_long()
-  <div class="tips">
-    <table><tr><td>[*help modify data]</td></tr></table>
+  <div class="alert alert-danger alert-dismissible fade show mx-auto mt-1" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    [*help modify data]%nn;
   </div>
-  <br%/>
-
-  <table class="display_search">
-    <tr>
-      %foreach;entry;
-        <td class="list_ini">
-          <a href="#%entry_ini;">%html_encode.entry_ini;</a>
-        </td>
-      %end;
-    </tr>
-  </table>
-  <br%/>
-
-  <form method="POST" action="%action;">
+  <div class="col-12 mb-1">
+    <div class="btn-group" role="toolbar" aria-label="Second character selection">
+      <div class="btn-group">
+        <a class="btn btn-secondary mr-1" href="%prefix;m=MOD_DATA;data=%evar.data;;s=" title="[*back] index"><span class="fa fa-book fa-fw" title=""></span></a>
+      </div>
+      <div class="btn-group">
+        %foreach;entry;
+          <a class="btn btn-secondary" href="#%entry_ini;">%html_encode.entry_ini;</a>
+        %end;
+      </div>
+    </div>
+  </div>
+  <form class="col-12" method="post" action="%action;">
     %hidden;
-    <ul>
+    <ul class="list-group">
       %foreach;entry;
-        <li><a id="%entry_ini;">%html_encode.entry_ini;</a></li>
-        <ul class="mod_data_ul">
-          %foreach;value;
-            <li>
-              %if;not is_modified;
-                <a href="%prefix;m=MOD_DATA;data=%evar.data;;%keys;s=%encode.evar.s;#mod">
-                  %escape.entry_value;
-                </a>
-              %else;
-                <a name="mod">&nbsp;</a>
-                %foreach;env_keys;
-                  <input type="hidden" name="%key_name;" value="%key_value;">
-                %end;
-                <input type="hidden" name="m" value="MOD_DATA_OK">
-                <input type="hidden" name="data" value="%evar.data;">
-                <input type="hidden" name="s" value="%evar.s;">
-                %if;(evar.data = "src")
-                  <input type="text" id="nx_input" name="nx_input" size="80" maxlength="300" value="%escape.printable.entry_value;">
+        <li class="list-group-item list-group-item-info mt-1 justify-content-between">
+          <strong><a id="%entry_ini;">%html_encode.entry_ini;</a></strong>
+          <a class="btn" href="#top" title="Return to top"><span class="fa fa-arrow-up fa-fw"></span></a>
+        </li>
+        <li style="list-style-type:none">
+          <ul class="list-group">
+            %foreach;value;
+              <li class="list-group-item">
+                %if;not is_modified;
+                  <a href="%prefix;m=MOD_DATA;data=%evar.data;;%keys;s=%encode.evar.s;">%escape.entry_value;</a>
                 %else;
-                  <input type="text" id="nx_input" name="nx_input" size="80" maxlength="200" value="%escape.printable.entry_value;">
+                  %foreach;env_keys;
+                    <input type="hidden" name="%key_name;" value="%key_value;">
+                  %end;
+                  <input type="hidden" name="m" value="MOD_DATA_OK">
+                  <input type="hidden" name="data" value="%evar.data;">
+                  <input type="hidden" name="s" value="%evar.s;">
+                  <div class="col-10 col-md-%if;(evar.data = "fn" or evar.data= "sn")6%else;11%end;">
+                    <input type="text" class="form-control" id="nx_input" name="nx_input" size="80" maxlength="%if;(evar.data = "src")300%else;200%end;" value="%escape.printable.entry_value;" autofocus onfocus="this.value = this.value;">
+                  </div>
+                  %if;(evar.data = "fn")
+                    <label>
+                      <input type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes"> [*add the previous name as a first name alias]
+                    </label>
+                  %end;
+                  %if;(evar.data = "sn")
+                    <label>
+                      <input type="checkbox" id="surname_aliases" name="surname_aliases" value="yes"> [*add the previous name as a surname alias]
+                    </label>
+                  %end;
+                  <button type="submit" class="btn btn-secondary">Ok</button>
                 %end;
-                %if;(evar.data = "fn")
-                  <input type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes">[*add the previous name as a first name alias]</input>
-                %end;
-                %if;(evar.data = "sn")
-                  <input type="checkbox" id="surname_aliases" name="surname_aliases" value="yes">[*add the previous name as a surname alias]</input>
-                %end;
-                <input type="submit" value="Ok">
-              %end;
-            </li>
-          %end;
-        </ul>
+              </li>
+            %end;
+          </ul>
+        </li>
       %end;
     </ul>
   </form>
 %end;
 
+<div class="row">
 %if;(nb_results > 1000)
   %apply;print_short()
 %else;
   %apply;print_long()
 %end;
+</div>
 
-%base_trailer;
+%include.trl;
 %include.copyr;
-
+</div>
+%include.js;
 </body>
 </html>

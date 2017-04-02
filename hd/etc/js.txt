@@ -1,2 +1,46 @@
-<script type="text/javascript" src="jquery-2.2.0.min.js"></script>
-<script type="text/javascript" src="jquery.placeholder.min.js"></script>
+%if;(evar.m="MOD_IND" or evar.m="MOD_FAM" or evar.m="MOD_NOTES")
+  %if;(bvar.use_cdn="yes")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/3.0.20/autosize.js" integrity="sha256-PO9BxwdQWhBkPajSnw0FKB/5Yb11OlMkocaqy5s7HHE=" crossorigin="anonymous"></script>
+  %else;
+   <script src=%if;(cgi)%bvar.static_path;%end;autosize.min.js></script>
+   %end;
+  <script>autosize(document.querySelectorAll('textarea'));</script>
+%end;
+%if;(bvar.use_cdn="yes")
+  %if;(evar.templ="")
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+  %end;
+%else;
+  %if;(evar.templ="")
+    <script src=%if;(cgi)%bvar.static_path;%end;jquery.min.js></script>
+    <script src=%if;(cgi)%bvar.static_path;%end;tether.min.js></script>
+    <script src=%if;(cgi)%bvar.static_path;%end;bootstrap.min.js></script>
+  %end;
+%end;
+%if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"))
+  <script>
+  function reloadClose()
+  {
+    window.opener.location.reload();
+    parent.close();
+  }
+  var htmlTitle = document.title;
+  if
+  (
+    htmlTitle == "[*person modified]" ||
+    htmlTitle == "[*family modified]" ||
+    htmlTitle == "[*person added]" ||
+    htmlTitle == "[*family added]"
+  )
+  {
+    if (window.opener && !window.opener.closed)
+    {
+      document.getElementById("x_trl").innerHTML ="<a class=\"btn btn-secondary\" id=\"reload_close\" href=\"javascript:reloadClose()\" role=\"button\" title=\"Close\">X</a>";
+      document.getElementById("copyr").innerHTML = ""; %( hide copyr on those pages temporary %)
+      document.getElementById("reload_close").focus();
+    }
+  }
+  </script>
+%end;

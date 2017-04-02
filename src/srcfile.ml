@@ -47,7 +47,7 @@ value input_int ic =
 ;
 
 value count conf =
-  let fname = cnt conf ".txt" in
+	let fname = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "counts.txt" in
   try
     let ic = Secure.open_in fname in
     let rd =
@@ -71,7 +71,7 @@ value count conf =
 ;
 
 value write_counter conf r =
-  let fname = cnt conf ".txt" in
+	let fname = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "counts.txt" in
   try
     let oc = Secure.open_out_bin fname in
     do {
@@ -100,7 +100,7 @@ value set_wizard_and_friend_traces conf =
       [ Not_found -> "" ]
     in
     if wpf <> "" then
-      let fname = adm_file (conf.bname ^ "_w.txt") in
+      let fname = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "trace_w.txt" in
       update_wf_trace conf fname
     else ()
   else if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
@@ -115,7 +115,7 @@ value set_wizard_and_friend_traces conf =
     if fpf <> "" &&
        is_that_user_and_password conf.auth_scheme conf.user fp = False
     then
-      let fname = adm_file (conf.bname ^ "_f.txt") in
+      let fname = Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "trace_f.txt" in
       update_wf_trace conf fname
     else ()
   else ()
@@ -177,13 +177,13 @@ value source_file_name conf fname =
   let bname = conf.bname in
   let lang = conf.lang in
   let fname1 =
-    List.fold_right Filename.concat [Util.base_path ["src"] bname; lang]
-      (Filename.basename fname ^ ".txt")
+    List.fold_right Filename.concat [Util.base_path [] (bname ^ ".gwb/documents"); lang] 
+      (fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
-    Filename.concat (Util.base_path ["src"] bname)
-      (Filename.basename fname ^ ".txt")
+    Filename.concat (Util.base_path [] (bname ^ ".gwb/documents")) 
+      (fname ^ ".txt")
 ;
 
 value digit =
@@ -508,8 +508,9 @@ value gen_print with_logo mode conf base fname =
   in
   match channel with
   [ Some ic ->
+      let title _ = Wserver.printf "%s" fname in
       do {
-        Util.html conf;
+        Hutil.header_no_h1 conf title;
         copy_from_channel conf base ic mode;
         Hutil.gen_trailer with_logo conf;
       }
@@ -519,7 +520,7 @@ value gen_print with_logo mode conf base fname =
         Hutil.header conf title;
         tag "ul" begin
           html_li conf;
-          Wserver.printf "Cannot access file \"%s.txt\".\n" fname;
+          Wserver.printf "Cannot access (1) file \"%s.txt\".\n" fname;
         end;
         Hutil.gen_trailer with_logo conf;
         raise Exit

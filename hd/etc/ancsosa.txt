@@ -1,8 +1,8 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: ancsosa.txt,v 5.15 2007-07-25 13:15:19 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2007 INRIA -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
       [*ancestors] ... [up to] ...%nn;
@@ -21,16 +21,16 @@
       %end;
     %end;
   </title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
-
+<div class="container-fluid">
 <h1>%nn;
   %apply;a_of_b%with;
     %if;(evar.t = "M")
@@ -46,17 +46,14 @@
   %if;(evar.t = "D") [up to] %pvar.1;%end;
 </h1>
 
-%if;(evar.cgl != "on")
-  <table style="float:%right;"><tr><td>
+%if;not cancel_links;
+  <div class="btn-group float-%right; mb-1">
     %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png;
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      <a role="button" class="btn btn-link px-0" href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png;
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+    <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><span class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></span></a>%nn;
+    <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
 %end;
 
 %let;central_index;%index;%in;
@@ -114,19 +111,17 @@
 %end;
 
 %define;image_MF(xx,wi_he)
-  %if;(xx != "x x")
-    %if;xx.is_male;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/male.png"%sp;
-           style="border: none" alt="[M/F]0"%/>%nn;
-    %elseif;xx.is_female;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/female.png"%sp;
-           style="border: none" alt="[M/F]1"%/>%nn;
-    %else;
-      <img width="wi_he" height="wi_he" src="%image_prefix;/sexunknown.png"
-           style="border: none" alt="?" title="?"%/>%nn;
-    %end;
-    %sp;
+  %if;(wizard and not cancel_links)
+    <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">
   %end;
+  %if;xx.is_male;
+    <i class="fa fa-mars male"></i>%nn;
+  %elseif;xx.is_female;
+    <i class="fa fa-venus female"></i>%nn;
+  %else;
+    <i class="fa fa-neuter neuter"></i>%nn;
+  %end;%nn;
+  %if;(wizard and not cancel_links and not xx.is_restricted)</a>%end;
 %end;
 
 %define;letter(xx)
@@ -393,15 +388,15 @@
           </table>
         %end;
       </td></tr></table>
-      <br%/>
+      <br>
     %end;
     %if;(evar.src = "on" and child.has_sources)
-      <em style="font-size:80%%">[*source/sources]1:<br%/>
+      <em style="font-size:80%%">[*source/sources]1:<br>
       %foreach;child.source;
-        - %source_type;: %source;<br%/>
+        - %source_type;: %source;<br>
       %end;
       </em>
-      <br%/>
+      <br>
     %end;
     </dd>
   %end;
@@ -460,20 +455,20 @@
                 </table>
               %end;
             </td></tr></table>
-            <br%/>
+            <br>
           %end;
           %if;(evar.src = "on" and ancestor.has_sources)
-            <em style="font-size:80%%">[*source/sources]1:<br%/>
+            <em style="font-size:80%%">[*source/sources]1:<br>
             %foreach;ancestor.source;
-              - %source_type;: %source;<br%/>
+              - %source_type;: %source;<br>
             %end;
             </em>
-            <br%/>
+            <br>
           %end;
           </dd>
         %end;
         %if;(evar.siblings = "on" and
-	     ancestor.is_female and ancestor.same = "")
+       ancestor.is_female and ancestor.same = "")
           %( siblings %)
           %if;(ancestor.index != self.index)
             %foreach;ancestor.family;
@@ -544,7 +539,7 @@
     <p class="asc_notes_src_inline">
       %if;(evar.notes = "on" and (ancestor.has_notes or ancestor.has_event))
         [*note/notes]0 : %apply;clean_html_tags(ancestor.notes)
-        <br%/>
+        <br>
         %if;ancestor.has_event;
           <table>
             %foreach;ancestor.event;
@@ -577,7 +572,7 @@
             %end;
           </table>
         %end;
-        <br%/>
+        <br>
       %end;
       %if;(evar.src = "on" and ancestor.has_sources)
         <em>
@@ -609,7 +604,7 @@
     %apply;somebody_extra_info("child").
     %foreach;child.family;
       %if;(evar.inline= "on" and (((child.has_notes or child.has_event) and evar.notes = "on") or (child.has_sources and evar.src = "on")))
-        <br%/>
+        <br>
       %end;
       %apply;capitalize%with;
         %apply;married_to%with;
@@ -637,7 +632,7 @@
       <p class="asc_notes_src_inline">
         %if;(evar.notes = "on" and (child.has_notes or child.has_event))
           [*note/notes]0 : %apply;clean_html_tags(child.notes)
-          <br%/>
+          <br>
           %if;child.has_event;
             <table>
               %foreach;child.event;
@@ -670,7 +665,7 @@
               %end;
             </table>
           %end;
-          <br%/>
+          <br>
         %end;
         %if;(evar.src = "on" and child.has_sources)
           <em>
@@ -1040,10 +1035,62 @@
   %end;
 %end;
 
+%define;rebuild_url(MMM,XXX,vvv)
+  %let;new_url;%prefix;m=MMM;%nn;
+  p=%first_name;;n=%surname;;oc=%occ;;t=XXX;%nn;
+  %if;(evar.birth = "on")
+    birth=on;%nn;
+  %end;
+  %if;(evar.birth_place = "on")
+    birth_place=on;%nn;
+  %end;
+  %if;(evar.marr= "on")
+    marr=on;%nn;
+  %end;
+  %if;(evar.marr_date = "on")
+    marr_date=on;%nn;
+  %end;
+  %if;(evar.marr_place = "on")
+    marr_place=on;%nn;
+  %end;
+  %if;(evar.child = "on")
+    child=on;%nn;
+  %end;
+  %if;(evar.death = "on")
+    death=on;%nn;
+  %end;
+  %if;(evar.death_place = "on")
+    death_place=on;%nn;
+  %end;
+  %if;(evar.age = "on")
+    age=on;%nn;
+  %end;
+  %if;(evar.occu = "on")
+    occu=on;%nn;
+  %end;
+  %if;(evar.gen = "on")
+    gen=on;%nn;
+  %end;
+  %if;(evar.cgl = "on")
+    cgl=on;%nn;
+  %end;
+  v=vvv;%in;
+  %new_url;
+%end;
 
 %(
    Main
 %)
+
+%if;(evar.t = "Z" and not cancel_links)
+  <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=A"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors] </a>
+  <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%apply;rebuild_url%with;D%and;I;%and;%evar.v;%end" class="btn btn-secondary"><span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]</a>
+  <div class="btn-group ml-3" role="group" aria-label="First group">
+    %if;(evar.v>=3)<a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v-1)%end" class="btn btn-secondary" title="-1 [generation/generations]0">-</a>%end;
+    <input class="form-control text-center" size="12" value="%evar.v; [generation/generations]1" disabled>
+    <a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v+1)%end" class="btn btn-secondary" title="+1 [generation/generations]0">+</a>
+  </div>
+%end;
 
 %if;(evar.t = "P")
   %include.perso_short;
@@ -1078,7 +1125,7 @@
         %end;
       %end;
     </ul>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "N")
     %( short display %)
@@ -1118,7 +1165,7 @@
         %end;
       %end;
     </ul>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "M" and evar.evt = "on")
     %include.miss_evt;
@@ -1262,7 +1309,7 @@
         </li>
       %end;
     </ul>
-    <p style="clear:both;">[*total]: %count; [[person/persons]1@(c)]</p>
+    <p style="clear:both;">[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "M")
     %( missing ancestors by generation %)
@@ -1288,7 +1335,7 @@
     </div>
 
     %reset_count;
-    <table class="missing_ancestors_table">
+    <table class="table missing_ancestors_table">
       <tr class="missing_ancestors_table_header">
         <th>[*missing sosa]</th>
         <th>[*missing parents]</th>
@@ -1370,7 +1417,7 @@
         %end;
       %end;
     </table>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "G" and evar.only= "on")
     %( long display; only the selected generation %)
@@ -1465,7 +1512,7 @@
               %lazy_force;
               <li>[Sosa] %ancestor.anc_sosa; -%sp;
                 <a href="%prefix;%ancestor.access;">%ancestor;</a>%nn;
-    	          %ancestor.title;%ancestor.dates;
+                %ancestor.title;%ancestor.dates;
               </li>
             %end;
           %end;
@@ -1477,7 +1524,7 @@
   %elseif;(evar.t = "Z" and evar.only = "on")
     <p>%apply;gen("v").</p>
     %reset_count;
-    <table class="ascends_table">
+    <table class="table table-bordered ascends_table">
       <tr class="ascends_table_header">%apply;table_header()</tr>
       %let;nb_col;%count;%in;
       %reset_count;
@@ -1499,13 +1546,13 @@
         %end;
       %end;
     </table>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
 
   %elseif;(evar.t = "Z")
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togen(nb_gen).</p>
     %reset_count;
-    <table class="ascends_table">
+    <table class="table table-bordered ascends_table">
       <tr class="ascends_table_header">%apply;table_header()</tr>
       %let;nb_col;%count;%in;
       %reset_count;
@@ -1525,11 +1572,13 @@
         %end;
       %end;
     </table>
-    <p>[*total]: %count; [[person/persons]1@(c)]</p>
+    <p>[*total][:] %count; [[person/persons]1@(c)]</p>
   %end;
 %end;
 
-%base_trailer;
+%include.trl;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

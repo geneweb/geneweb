@@ -584,8 +584,8 @@ value string_slash_of_date conf date =
         " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 1) ^ ")"
   | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
-      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench True) d1 ^
-        " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 2) ^ ")"
+      slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dfrench True) d1(* ^
+        " (" ^ (transl_nth conf "gregorian/julian/french/hebrew" 2) ^ ")" *)
   | Dgreg d Dhebrew ->
       let d1 = Calendar.french_of_gregorian d in
       slashify_dmy (translate_dmy conf (decode_dmy conf d1) Dhebrew True) d1 ^

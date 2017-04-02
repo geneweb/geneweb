@@ -1,148 +1,169 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <title>[*advanced request]</title>
-  <meta name="robots" content="none"%/>
-  <meta http-equiv="content-type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="content-style-type" content="text/css"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <title>[*advanced request]0</title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
 %base_header;
 </head>
 <body%body_prop;>
+<div class="container">
+<h1 class="display-5 my-2 text-center">[*advanced request]0</h1>
 
-<h1>[*advanced request]</h1>
-
-<form method="POST" action="%action;">
-%hidden;
-<input type="hidden" name="m" value="AS_OK"%/>
-
-<h4>[*first name/first names]0</h4>
-
-<table border="1">
-<tr align="left">
-<td>
-<input name="first_name" size="40" maxlength="200"%/>
-</td>
-</tr>
-</table>
-
-<h4>[*surname/surnames]0</h4>
-
-<table border="1">
-<tr align="left">
-<td>
-<input name="surname" size="40" maxlength="200"%/>
-</td>
-</tr>
-</table>
-
-%define;event(xx)
-<table border="1"><tr align="left">
-<td>[*place]</td>
-<td><input name="xx_place" size="40" maxlength="200"%/></td>
-</tr></table>
-<table border="1"><tr align="left">
-<td>[*after]</td>
-<td>
-  %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
-    [year/month/day]2<input name="xx1_dd" size="2" maxlength="2"%/>
-    [year/month/day]1<input name="xx1_mm" size="2" maxlength="2"%/>
-    [year/month/day]0<input name="xx1_yyyy" size="5" maxlength="5"%/>
-  %elseif;([ !dates order]0 = "mmddyyyy")
-    [year/month/day]1<input name="xx1_mm" size="2" maxlength="2"%/>
-    [year/month/day]2<input name="xx1_dd" size="2" maxlength="2"%/>
-    [year/month/day]0<input name="xx1_yyyy" size="5" maxlength="5"%/>
-  %else;
-    [year/month/day]0<input name="xx1_yyyy" size="5" maxlength="5"%/>
-    [year/month/day]1<input name="xx1_mm" size="2" maxlength="2"%/>
-    [year/month/day]2<input name="xx1_dd" size="2" maxlength="2"%/>
-  %end;
-</td>
-</tr>
-<tr align="left">
-<td>[*before]</td>
-<td>
-  %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
-    [year/month/day]2<input name="xx2_dd" size="2" maxlength="2"%/>
-    [year/month/day]1<input name="xx2_mm" size="2" maxlength="2"%/>
-    [year/month/day]0<input name="xx2_yyyy" size="5" maxlength="5"%/>
-  %elseif;([ !dates order]0 = "mmddyyyy")
-    [year/month/day]1<input name="xx2_mm" size="2" maxlength="2"%/>
-    [year/month/day]2<input name="xx2_dd" size="2" maxlength="2"%/>
-    [year/month/day]0<input name="xx2_yyyy" size="5" maxlength="5"%/>
-  %else;
-    [year/month/day]0<input name="xx2_yyyy" size="5" maxlength="5"%/>
-    [year/month/day]1<input name="xx2_mm" size="2" maxlength="2"%/>
-    [year/month/day]2<input name="xx2_dd" size="2" maxlength="2"%/>
-  %end;
-</td>
-</tr>
-</table>
+%if;not cancel_links;
+  <div class="btn-group float-%right; mt-2">
+    %if;(referer != "")
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+    %end;
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
 %end;
 
-<h4>[*birth]</h4>
-%apply;event("birth")
+%define;date(xx,zz)
+  %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
+    <label for="xxzz_dd" class="form-control-label">
+    <input type="number" class="form-control" name="xxzz_dd" id="xxzz_dd" maxlength="2" min="1" max="12"> [year/month/day]2 </label>
+    <label for="xxzz_mm" class="form-control-label">
+    <input type="number" class="form-control" name="xxzz_mm" id="xxzz_mm" min="1" max="31"> [year/month/day]1 </label>
+    <label for="xxzz_yyyy" class="form-control-label">
+    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" maxlength="4" size="4"> [year/month/day]0</label>
+  %elseif;([ !dates order]0 = "mmddyyyy")
+    <label for="xxzz_mm" class="form-control-label">
+    <input type="number" class="form-control" name="xxzz_mm" id="xxzz_mm" min="1" max="12"> [year/month/day]1 </label>
+    <label for="xxzz_dd" class="form-control-label">
+    <input type="number" class="form-control" name="xxzz_dd" id="xxzz_dd" min="1" max="31"> [year/month/day]2 </label>
+    <label for="xxzz_yyyy" class="form-control-label">
+    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" maxlength="4" size="4"> [year/month/day]0</label>
+  %else;
+    <label for="xxzz_yyyy" class="form-control-label">
+    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" maxlength="4" size="2"> [year/month/day]0 </label>
+    <label for="xxzz_mm" class="form-control-label">
+    <input type="number" class="form-control" name="xxzz_mm" id="xxzz_mm" min="1" max="12"> [year/month/day]1 </label>
+    <label for="xxzz_dd" class="form-control-label">
+    <input type="number" class="form-control" name="xxzz_dd" id="xxzz_dd" min="1" max="31"> [year/month/day]2</label>
+  %end;
+%end;
 
-<h4>[*baptism]</h4>
-%apply;event("bapt")
+%define;event(xx,yy)
+  <div class="col-6 mb-3">
+    <div class="row">
+      <div class="col-3">
+        <h4>[*yy]0</h4>
+        %if;("xx"="death")
+          </div>
+          <div class="col-4">
+            <select class="form-control" name="death">
+              <option value="Dead">[*died]2</option>
+              <option value="NotDead">[*alive]2</option>
+              <option value="" selected="selected">-</option>
+            </select>
+        %end;
+        %if;("xx"="marriage")
+          </div>
+          <div class="form-check form-check-inline col-8">
+            <span class="form-control-label mr-2">[*married][:]</span>
+            <label for="mY" class="form-check-label">
+              <input type="radio" class="form-check-input" name="married" id="mY" value="Y"> [Y/N]0%nn;
+            </label>
+            <label for="mN" class="form-check-label">
+              <input type="radio" class="form-check-input" name="married" id="mN" value="N"> [Y/N]1
+            </label>
+            <label for="mA" class="form-check-label">
+              <input type="radio" class="form-check-input" name="married" id="mA" value="A" checked> -%nn;
+            </label>
+        %end;
+      </div>
+    </div>
+    <div class="row">
+      <label for="xx_place" class="col-2 col-form-label">[*place]</label>
+      <div class="col-9">
+        <input type="text" class="form-control" name="xx_place" id="xx_place" placeholder="[*place]">
+      </div>
+    </div>
+    <div class="row">
+      <p class="col-2 col-form-label">[*after]</p>
+      <div class="col-9 form-inline">
+        %apply;date("xx",1)
+      </div>
+    </div>
+    <div class="row">
+      <p class="col-2 col-form-label">[*before]</p>
+      <div class="col-9 form-inline">
+        %apply;date("xx",2)
+      </div>
+    </div>
+  </div>
+%end;
 
-<h4>[*death]</h4>
-
-<table border="1">
-<tr align="left">
-<td>
-<select name="death">
-<option value="Dead">[*died]</option>
-<option value="NotDead">[*alive]</option>
-<option value="" selected="selected">-</option>
-</select>
-</td>
-</tr>
-</table>
-%apply;event("death")
-
-<h4>[*burial]</h4>
-%apply;event("burial")
-
-<h4>[*occupation/occupations]1</h4>
-
-<table border="1">
-<tr align="left">
-<td>
-<input name="occu" size="50" maxlength="200"%/>
-</td>
-</tr>
-</table>
-
-<h4>[*sex]</h4>
-
-<input type="radio" name="sex" id="sexM" value="M"%/><label for="sexM">[M/F]0</label>
-<input type="radio" name="sex" id="sexF" value="F"%/><label for="sexF">[M/F]1</label>
-<input type="radio" name="sex" id="sexU" value="N" checked="checked"%/><label for="sexU">-</label>
-
-<h4>[*marriage/marriages]0</h4>
-
-<table border="1">
-<tr align="left">
-<td>[*married]</td>
-<td>
-<input type="radio" name="married" id="mY" value="Y"%/><label for="mY">[Y/N]0</label>
-<input type="radio" name="married" id="mN" value="N"%/><label for="mN">[Y/N]1</label>
-<input type="radio" name="married" id="mA" value="A" checked="checked"%/><label for="mA">-</label>
-</td>
-</tr>
-</table>
-%apply;event("marriage")
-
-<p>
-[*maximum]: <input name="max" size="5" value="100" maxlength="5"%/> [person/persons]1
-<input type="submit" value="Ok"%/>
-</p>
-
+<form class="mx-2 mt-3" method="POST" action="%action;">
+  %hidden;
+  <input type="hidden" name="m" value="AS_OK">
+  <div class="row">
+    <div class="col-6">
+      <div class="row">
+        <div class="col-3">
+          <h4>[*person/persons]0</h4>
+        </div>
+        <div class="form-check form-check-inline col-9">
+          <span class="form-control-label">[*sex][:]</span>
+          <label for="sexM" class="form-check-label" title="[*male/female/neuter]0">
+            <input type="radio" class="form-check-input" name="sex" id="sexM" value="M"> [M/F]0
+          </label>
+          <label for="sexU" class="form-check-label" title="[*male/female/neuter]2">
+            <input type="radio" class="form-check-input" name="sex" id="sexU" value="N" checked> -
+          </label>
+          <label for="sexF" class="form-check-label" title="[*male/female/neuter]1">
+            <input type="radio" class="form-check-input" name="sex" id="sexF" value="F"> [M/F]1
+          </label>
+         </div>
+       </div>
+       <div class="row">
+        <label for="first_name" class="col-form-label col-3">[*first name/first names]0</label>
+        <div class="col-9">
+          <input type="text" class="form-control" name="first_name" id="first_name" placeholder="[*first name/first names]0">
+        </div>
+      </div>
+      <div class="row">
+        <label for="surname" class="col-form-label col-3">[*surname/surnames]0</label>
+        <div class="col-9">
+          <input type="text" class="form-control" name="surname" id="surname" placeholder="[*surname/surnames]0">
+        </div>
+      </div>
+      <div class="row mt-3">
+        <label for="occu" class="col-form-label col-3">[*occupation/occupations]1</label>
+        <div class="col-9">
+          <input type="text" class="form-control" name="occu" id="occu" placeholder="[*occupation/occupations]1">
+        </div>
+      </div>
+    </div>
+    %apply;event("marriage","marriage/marriages")
+  </div>
+  <div class="row my-2">
+    %apply;event("birth","birth")
+    %apply;event("bapt","baptism")
+  </div>
+  <div class="row my-2">
+    %apply;event("death","death")
+    %apply;event("burial","burial")
+  </div>
+  <div class="row">
+    <div class="col-4 form-inline">
+      <label for="max" class="col-3 col-form-label mb-2">[*maximum]</label>
+      <div class="col-9">
+        <input type="number" class="form-control" name="max" id="max" min="0" max="5000" value="150" step="50"><span class="ml-2">[person/persons]1</span>
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <button type="submit" class="btn btn-outline-primary btn-lg">[*search/case sensitive]0</button>
+    </div>
+  </div>
 </form>
-
 %base_trailer;
 %include.copyr;
+</div>
+%include.js;
 </body>
 </html>

@@ -1,48 +1,10 @@
-<style type="text/css">
+<style>
 /* Put here only properties that uses variables */
-
-html {
- background: url('%image_prefix;/gwback.jpg');
-}
-
-#menuBar {
- background-image:url('%image_prefix;/menubar_background.png');
-}
-
-#menuBar > li > a, #menuBar > li > div {
- background-image:url('%image_prefix;/menubar_sprite.png');
-}
-
-#menuBar li.hover, #menuBar li.on {
- background-image:url('%image_prefix;/menubar_background_hover.png');
-}
-
-#menuBar > li div > ul li span.fleche_droite {
- background-image:url('%image_prefix;/menubar_flechedroite.png');
-}
-
-#menuBar > li div > ul li.hover span.fleche_droite{
- background-image:url('%image_prefix;/menubar_flechedroite_selected.png');
-}
-
-div.menu_anc_des {
- background-image:url('%image_prefix;/ascdesc_bg.png');
-}
-
-div.menu_anc_des div.menu {
- background-image:url('%image_prefix;/ascdes_menu_bg.png');
-}
-
 div.tips {
  background-image:url('%image_prefix;/picto_ampoule.png');
 }
 
-div.select > span {
- background-image:url('%image_prefix;/picto_fleche_blanche.png');
-}
-
-/* --------------------------------- notes -------------------------------- */
-
+/* Notes */
 li.folder {
  list-style-type: disc;
  list-style-image: url('%image_prefix;/folder.png');
@@ -70,6 +32,14 @@ li.female
  list-style-type: circle;
  list-style-image: url('%image_prefix;/female.png');
 }
-
 </style>
-<link rel="stylesheet" type="text/css" href="css.css" %/>
+%if;(evar.templ="")
+  %if;(bvar.use_cdn="yes")
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  %else;
+    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;bootstrap.min.css">
+    <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;font-awesome.min.css">
+  %end;
+%end;
+<link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;css.css">

@@ -1,6 +1,5 @@
 <!-- $Id: toolbar.txt,v x.x 2011-08-31 16:17:36 flh Exp $ -->
-
-<script type="text/javascript"><!--
+<script><!--
 function insertTags (tagOpen, tagClose, sampleText) {
   var t = document.forms%[0].%name;;
 

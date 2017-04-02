@@ -1,32 +1,27 @@
-%doctype;
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
   <!-- $Id: annivmenu.txt,v 0.01 2012-05-31 147:40:30 flh Exp $ -->
-  <!-- Copyright (c) 2006-2007 INRIA -->
-  <title>[*anniversaries]</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png"%/>
+  <!-- Copyright (c) 2006-2017 INRIA -->
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
   %include.css;
   %base_header;
 </head>
 <body%body_prop;>
+<div class="container">
+<h1>[*anniversaries]</h1>
 
 %if;not cancel_links;
-  <table style="float:%right;"><tr><td>
+  <div class="btn-group float-%right; mt-2">
     %if;(referer != "")
-      <a href="%referer;"><img
-       src="%image_prefix;/left.png"%wid_hei;left.png; 
-       alt="&lt;&lt;" title="&lt;&lt;"%/></a>
+      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><img%sp;
-    src="%image_prefix;/up.png"%wid_hei;up.png; 
-    alt="^^" title="^^"%/></a>
-  </td></tr></table>
+    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  </div>
 %end;
-
-<h1>[*anniversaries]</h1>
 
 <p>
   <ul>
@@ -42,8 +37,9 @@
   </ul>
 </p>
 
-%base_trailer;
+%include.trl;
 %include.copyr;
-
+</div>
+%include.js;
 </body>
 </html>
