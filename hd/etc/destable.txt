@@ -452,8 +452,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end
       %xxx.spouse.title;
       %(&nbsp; (%xxx.nb_children;
-      %if;(1=0 or 1=0 and xxx.spouse.has_families and xxx.spouse.nb_children<xxx.spouse.nb_children_tot)
-        -%xxx.spouse.nb_children_tot;
+      %if;(1=0 or 1=0 and xxx.spouse.has_families and xxx.spouse.nb_children<xxx.spouse.nb_children_total)
+        -%xxx.spouse.nb_children_total;
         %foreach;xxx.spouse.family;
           %if;(is_first)%else;, %end;
           &nbsp;%xxx.spouse.spouse;

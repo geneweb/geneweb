@@ -3804,7 +3804,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           "</ul>\n"
         else ""
       else ""
-  | "nb_children_tot" ->
+  | "nb_children_total" ->
       let n =
         List.fold_left
           (fun n ifam ->
