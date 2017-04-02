@@ -142,7 +142,7 @@
       [*Sosa]
       %if;(sosa=1)%sosa;
       %else;<a href="%prefix;%sosa_link;">%sosa;</a> %apply;a_of_b%with;%and;
-        %if;(sosa_ref is_restricted)%sosa_ref;%else;<a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>%end;%end;
+        %if;(sosa_ref.is_restricted)%sosa_ref;%else;<a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>%end;%end;
       %end;
     </div>
   %end;
