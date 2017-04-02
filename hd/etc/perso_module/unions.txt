@@ -320,69 +320,65 @@
                 </div>
               %end;
             </div>
-            <div class="d-inline-flex justify-content-start flex-wrap">
-              <div class="align-self-center">
-                %if;has_children;
-                  %let;prev_count;%count;%in; %( On sauvegarde l'ancienne valeur de count %)
-                  <div class="d-inline-flex flex-row">
-                    %(<div class="align-self-center ml-2">%if;has_children;%sp;[having as children]0%end;</div>%)
-                    <div class="d-inline-flex flex-wrap justify-content-start mt-2 ml-1">
-                      %reset_count1;
-                      %foreach;child;
-                        %incr_count1;
-                        <div class="media mb-1">
-                          %if;child.has_image;
-                            <a href="%child.image_url;" class="align-self-center" target="_blank">
-                              <img class="small_image rounded ml-2" src="%child.image_url;" alt="[image/images]0" 
-                                title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)"%/>%nn;
-                            </a>
-                          %elseif;(bvar.default_image="yes")
-                            <img class="small_image align-self-center rounded ml-2" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"
-                              title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;"%/>
-                          %else;
-                            <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-2 pb-2">?</span>
-                          %end;
-                          <div class="ml-2 align-self-center">
-                            %if;(count2=0)<ul>%apply;li_SD("child")%end;%nn;
-                            %apply;short_display_person_noname%with;child%and;br%and;age%and;%count1;%end;%nn;
-                            %if;(count2=0)</li></ul>%end;
-                          </div>
-                        </div>
-                      %end;
-                    </div>
-                    %apply;init_count(prev_count) %( On rétablie l'ancienne valeur de count %)
-                  </div>
-                %end;
-              </div>
-            </div>
-            <div class="d-inline-flex justify-content-start flex-wrap">
-              <div class="align-self-center ml-auto ">
-                %if;has_witnesses;
-                  <div class="d-flex flex-wrap mb-1">
-                    <span class="align-self-center mr-2">[witness/witnesses]w</span>
-                    %foreach;witness;
-                      <div class="media d-inline-flex flex-row mr-2">
-                        %if;witness.has_image;
-                          <a href="%witness.image_url;" class="align-self-center" target="_blank">
-                            <img class="small_image rounded align-self-center" src="%witness.image_url;" alt="[image/images]0" title="%witness; ([witness/witnesses]0)"%/>
+            <div class="align-self-center">
+              %if;has_children;
+                %let;prev_count;%count;%in; %( On sauvegarde l'ancienne valeur de count %)
+                <div class="d-inline-flex flex-row">
+                  %(<div class="align-self-center ml-2">%if;has_children;%sp;[having as children]0%end;</div>%)
+                  <div class="d-inline-flex flex-wrap justify-content-start mt-2 ml-1">
+                    %reset_count1;
+                    %foreach;child;
+                      %incr_count1;
+                      <div class="media mb-1">
+                        %if;child.has_image;
+                          <a href="%child.image_url;" class="align-self-center" target="_blank">
+                            <img class="small_image rounded ml-2" src="%child.image_url;" alt="[image/images]0" 
+                              title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)"%/>%nn;
                           </a>
                         %elseif;(bvar.default_image="yes")
-                          <img class="small_image rounded align-self-center ml-2" src="%image_prefix;/img_unknown_%if;(witness.is_female)wo%elseif;(witness.is_male)%else;u_%end;man.png" alt="[missing image]" title="[witness/witnesses]0"%/>
+                          <img class="small_image align-self-center rounded ml-2" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"
+                            title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;"%/>
                         %else;
-                          <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+                          <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-2 pb-2">?</span>
                         %end;
-                        <div class="media-body ml-2 align-self-center">%nn;
-                          %apply;short_display_person_tree("witness")<br>
-                          %if;witness.computable_age;%sp;%witness.age;
-                          %elseif;witness.computable_death_age;%sp;%witness.death_age;
-                          %else;&#8203;
-                          %end;
+                        <div class="ml-2 align-self-center">
+                          %if;(count2=0)<ul>%apply;li_SD("child")%end;%nn;
+                          %apply;short_display_person_noname%with;child%and;br%and;age%and;%count1;%end;%nn;
+                          %if;(count2=0)</li></ul>%end;
                         </div>
                       </div>
-                     %end;
+                    %end;
                   </div>
-                %end;
-              </div>
+                  %apply;init_count(prev_count) %( On rétablie l'ancienne valeur de count %)
+                </div>
+              %end;
+            </div>
+            <div class="mt-2">
+              %if;has_witnesses;
+                <div class="d-flex flex-wrap mb-1">
+                  <span class="align-self-center mr-2">[witness/witnesses]w</span>
+                  %foreach;witness;
+                    <div class="media d-inline-flex flex-row mr-2">
+                      %if;witness.has_image;
+                        <a href="%witness.image_url;" class="align-self-center" target="_blank">
+                          <img class="small_image rounded align-self-center" src="%witness.image_url;" alt="[image/images]0" title="%witness; ([witness/witnesses]0)"%/>
+                        </a>
+                      %elseif;(bvar.default_image="yes")
+                        <img class="small_image rounded align-self-center ml-2" src="%image_prefix;/img_unknown_%if;(witness.is_female)wo%elseif;(witness.is_male)%else;u_%end;man.png" alt="[missing image]" title="[witness/witnesses]0"%/>
+                      %else;
+                        <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+                      %end;
+                      <div class="media-body ml-2 align-self-center">%nn;
+                        %apply;short_display_person_tree("witness")<br>
+                        %if;witness.computable_age;%sp;%witness.age;
+                        %elseif;witness.computable_death_age;%sp;%witness.death_age;
+                        %else;&#8203;
+                        %end;
+                      </div>
+                    </div>
+                   %end;
+                </div>
+              %end;
             </div>
           </div>
           %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
