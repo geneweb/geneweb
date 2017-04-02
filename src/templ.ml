@@ -931,7 +931,7 @@ value templ_eval_var conf =
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool True
   | ["wizard"] -> VVbool conf.wizard
-  | ["template"] -> VVbool conf.template
+  | ["is_printed_by_ocaml"] -> VVbool conf.is_printed_by_ocaml
   | _ -> raise Not_found ]
 ;
 

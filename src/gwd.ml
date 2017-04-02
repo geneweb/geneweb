@@ -356,7 +356,7 @@ value print_redirected conf from request new_addr =
     match Util.open_etc_file "redirect" with
     [ Some ic ->
         do {
-          let conf = {(conf) with template = False} in (* set to False so we can detect *)
+          let conf = {(conf) with is_printed_by_ocaml = False} in 
           Util.html conf;
           Templ.copy_from_templ conf env ic;
         }
@@ -1214,13 +1214,13 @@ value make_conf from_addr (addr, request) script_name contents env = do {
     [ Not_found -> False ]
   in
   let wizard_just_friend = if manitou then False else wizard_just_friend in
-  let template = True in
+  let is_printed_by_ocaml = True in
   let conf =
     {from = from_addr;
      manitou = manitou;
      supervisor = supervisor;
      wizard = ar.ar_wizard && not wizard_just_friend;
-     template = template;
+     is_printed_by_ocaml = is_printed_by_ocaml;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name;

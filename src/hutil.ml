@@ -120,7 +120,7 @@ value rheader conf title = do {
 };
 
 value gen_trailer with_logo conf = do {
-  let conf = {(conf) with template = False} in (* set to False so we can detect *)
+  let conf = {(conf) with is_printed_by_ocaml = False} in
   Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
