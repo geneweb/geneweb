@@ -52,11 +52,15 @@ value print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
       tag "ul" begin
         html_li conf;
         Wserver.printf
-          "<input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"1\" checked>\n"
+          "<input type=\"radio\" class=\"form-control\" name=\"%s\" \
+           value=\"1\" checked>\n"
           name;
         Wserver.printf "%s\n" x1;
         html_li conf;
-        Wserver.printf "<input type=\"radio\" class=\"form-control\" name=\"%s\" value=\"2\">\n" name;
+        Wserver.printf
+          "<input type=\"radio\" class=\"form-control\" \
+           name=\"%s\" value=\"2\">\n"
+          name;
         Wserver.printf "%s\n" x2;
       end;
     }

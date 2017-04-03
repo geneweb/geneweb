@@ -676,7 +676,6 @@ value print_del1 conf base ifam =
     in
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
     tag "h2" begin title False; end;
-    (*print_link_to_welcome conf True;*)
     Wserver.printf "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       tag "p" begin

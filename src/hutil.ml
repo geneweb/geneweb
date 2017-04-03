@@ -16,9 +16,13 @@ value commd_no_params conf =
 
 value link_to_referer conf =
   let referer = Util.get_referer conf in
-  let retour = Util.capitale (Util.transl conf "back") in
+  let back = Util.capitale (Util.transl conf "back") in
   if referer <> "" then
-    sprintf "<a href=\"%s\"><span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span></a>\n" referer retour
+    sprintf
+      "<a href=\"%s\">\
+         <span class=\"fa fa-arrow-left fa-lg\" title=\"%s\"></span>\
+       </a>\n"
+      referer back
   else ""
 ;
 
@@ -31,11 +35,12 @@ value gen_print_link_to_welcome f conf right_aligned =
     f ();
     let str = link_to_referer conf in
     if str = "" then () else Wserver.printf "%s" str;
-    Wserver.printf "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.printf "<span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"";
-    Wserver.printf "%s" (Util.capitale (Util.transl conf "home"));
-    Wserver.printf "\"></span>";
-    Wserver.printf "</a>\n";
+    Wserver.printf
+      "<a href=\"%s\">\
+         <span class=\"fa fa-home fa-lg ml-1 px-0\" title=\"%s\"></span>\
+       </a>\n"
+      (commd_no_params conf)
+      (Util.capitale (Util.transl conf "home"));
     if right_aligned then Wserver.printf "</div>\n"
     else Wserver.printf "</p>\n"
   }
@@ -73,9 +78,10 @@ value header_without_http conf title = do {
 };
 
 value header_without_page_title conf title = do {
-  Util.html conf; (* semble inutile car la fonction header_without_http a maintenant un header HTML5, mauvais nom ? *)
+  Util.html conf;
   header_without_http conf title;
-  Wserver.printf "<div class=\"container\">"; (* balancing </div> in gen_trailer *)
+  (* balancing </div> in gen_trailer *)
+  Wserver.printf "<div class=\"container\">";
 };
 
 value header_link_welcome conf title = do {
@@ -84,10 +90,6 @@ value header_link_welcome conf title = do {
   Wserver.printf "<h1>";
   title False;
   Wserver.printf "</h1>\n";
-};
-
-value header_no_h1 conf title = do {
-  header_without_page_title conf title;
 };
 
 value header_no_page_title conf title = do {
@@ -106,7 +108,8 @@ value header conf title = do {
 
 value header_fluid conf title = do {
   header_without_http conf title;
-  Wserver.printf "<div class=\"container-fluid\">"; (* balancing </div> in gen_trailer *)
+  (* balancing </div> in gen_trailer *)
+  Wserver.printf "<div class=\"container-fluid\">";
   Wserver.printf "\n<h1>";
   title False;
   Wserver.printf "</h1>\n";
@@ -122,7 +125,7 @@ value rheader conf title = do {
 };
 
 value gen_trailer with_logo conf = do {
-  let conf = {(conf) with template = False} in (* set to False so we can detect *)
+  let conf = {(conf) with is_printed_by_template = False} in
   Templ.include_hed_trl conf "trl";
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;

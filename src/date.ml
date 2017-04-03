@@ -479,22 +479,6 @@ value string_of_date conf =
   | Dtext t -> t ]
 ;
 
-value string_of_date_sorted conf =
-  fun
-  [ Dgreg d _ ->  (* same as in decode_dmy *)
-      match (d.day, d.month, d.year) with
-      [ (0, 0, year) ->
-        string_of_int d.year ^ "1231"
-      | (0, month, year) ->
-        string_of_int d.year ^
-        Printf.sprintf "%02d" d.month ^ "31"
-      | (day, month, year) ->
-        string_of_int d.year ^
-        Printf.sprintf "%02d" d.month ^
-        Printf.sprintf "%02d" d.day ] 
-  | Dtext t -> t ]
-;
-
 value string_of_date_aux conf sep =
   fun
   [ Dgreg d Dgregorian ->

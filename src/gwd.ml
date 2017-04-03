@@ -356,7 +356,7 @@ value print_redirected conf from request new_addr =
     match Util.open_etc_file "redirect" with
     [ Some ic ->
         do {
-          let conf = {(conf) with template = False} in (* set to False so we can detect *)
+          let conf = {(conf) with is_printed_by_template = False} in
           Util.html conf;
           Templ.copy_from_templ conf env ic;
         }
@@ -384,9 +384,9 @@ value propose_base conf =
       Wserver.printf "<form method=\"get\" action=\"%s\">\n"
         conf.indep_command;
       Wserver.printf "<input name=\"b\" size=\"40\"> =&gt;\n";
-      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
- 				Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
-			end;
+      tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin
+        Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+      end;
     end;
     Hutil.trailer conf;
   }
@@ -1214,13 +1214,12 @@ value make_conf from_addr (addr, request) script_name contents env = do {
     [ Not_found -> False ]
   in
   let wizard_just_friend = if manitou then False else wizard_just_friend in
-  let template = True in
   let conf =
     {from = from_addr;
      manitou = manitou;
      supervisor = supervisor;
      wizard = ar.ar_wizard && not wizard_just_friend;
-     template = template;
+     is_printed_by_template = True;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name;
