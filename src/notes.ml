@@ -55,7 +55,8 @@ value print_search_form conf from_note =
                 (transl_nth conf "search/case sensitive" 1);
             end;
             tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin 
-                Wserver.printf "%s" (capitale (transl_nth conf "search/case sensitive" 0));
+              Wserver.printf "%s"
+                (capitale (transl_nth conf "search/case sensitive" 0));
             end;
           end;
         end;
@@ -69,7 +70,8 @@ value print_whole_notes conf base fnotes title s ho = do {
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   let what_links_page () =
     if fnotes <> "" then
-      stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\" class=\"mx-2\"" (commd conf) fnotes begin
+      stagn "a" "href=\"%sm=NOTES;f=%s;ref=on\" class=\"mx-2\""
+        (commd conf) fnotes begin
         Wserver.printf "(%s)" (transl conf "linked pages");
       end
     else ()
@@ -82,7 +84,7 @@ value print_whole_notes conf base fnotes title s ho = do {
       [ Some (case_sens, h) -> html_highlight case_sens h title
       | None -> title ]
     in
-      Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
+    Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
   else ();
   Wserver.printf "</div>\n";
   match Util.open_etc_file "summary" with
@@ -279,8 +281,8 @@ value print_linked_list conf base pgl =
            | NotesLinks.PgMisc fnotes ->
                stagn "tt" begin
                  Wserver.printf "[";
-                 stag "a" "class=\"mx-2\" href=\"%sm=NOTES;f=%s\"" (commd conf) fnotes
-                 begin
+                 stag "a" "class=\"mx-2\" href=\"%sm=NOTES;f=%s\""
+                   (commd conf) fnotes begin
                    Wserver.printf "%s" fnotes;
                  end;
                  Wserver.printf "]";
@@ -484,7 +486,6 @@ value print_misc_notes conf base =
   in
   do {
     header_link_welcome conf title;
-    (*print_link_to_welcome conf True;*)
     if db <> [] then
       tag "ul" begin
         if d <> "" then

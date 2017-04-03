@@ -13,7 +13,6 @@ value trailer : config -> unit;
 value header_without_page_title : config -> (bool -> unit) -> unit;
 value header_without_http : config -> (bool -> unit) -> unit;
 value header_no_page_title : config -> (bool -> unit) -> unit;
-value header_no_h1 : config -> (bool -> unit) -> unit;
 value rheader : config -> (bool -> unit) -> unit;
 value link_to_referer : config -> string;
 value gen_print_link_to_welcome : (unit -> unit) -> config -> bool -> unit;

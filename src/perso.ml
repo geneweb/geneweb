@@ -115,10 +115,6 @@ value string_of_title conf base and_txt p (nth, name, title, places, dates) =
                    Buffer.add_string b " - "
                | _ -> () ];
                match date_end with
-               [ Some (Dtext d ) ->
-                   Buffer.add_string b " - "
-               | _ -> () ];
-               match date_end with
                [ Some d -> Buffer.add_string b (Date.string_of_date conf d)
                | None -> () ];
                False
@@ -2040,7 +2036,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
   | "incr_count2" ->
       match get_env "count2" env with
       [ Vcnt c -> do { incr c; "" }
-      | _ -> "" ]  
+      | _ -> "" ]
   | "lazy_force" ->
       match get_env "lazy_print" env with
       [ Vlazyp r ->
@@ -3807,11 +3803,10 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
   | "nb_children_total" ->
       let n =
         List.fold_left
-          (fun n ifam ->
-             n + Array.length (get_children (foi base ifam)))
+          (fun n ifam -> n + Array.length (get_children (foi base ifam)))
           0 (Array.to_list (get_family p))
       in
-      string_of_int n 
+      string_of_int n
   | "nb_children" ->
       (* TODO ???
       let mode_local =
