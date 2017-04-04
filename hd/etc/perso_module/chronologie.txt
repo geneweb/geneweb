@@ -138,26 +138,29 @@
   %ddd;, %yyyy;%m1;%d1;%nn;
 %end;
 
-%define;rebuild_url(aaa,iii,mmm)
+%define;rebuild_url(aaa,iii,mmm,lll)
   %let;new_url;
   %if;("aaa"="prefix_access")%prefix;%access;;%else;aaa%end;
   %if;(evar.m!="")m=%evar.m;;%end;
   %if;(iii=1)ma_c=on;%end;
   %if;(mmm=1)ev_p=on;%end;
+  %if;(lll=1)one_l=on;%end;
   %if;(evar.vh!="")vh=%evar.vh;;%end;%in;
-   %new_url;
+   %new_url;#chrono
 %end;
 
-%define;one_child(ccc,evm)
+%define;one_child(ccc,evm,labl)
   %( no test for his_birth_date <= my_death_date here %)
+  %let;dxprec;%if;(ccc.birth_date.prec="&lt;")1%elseif;(ccc.birth_date.prec="&gt;")3%else;2%end;%in;
   %apply;add_in_sorted_list%with;
     %dummy;%nn;
     %and;%ccc.birth_date.year;%nn;
-    %and;%ccc.birth_date.month;%nn;
-    %and;%ccc.birth_date.day;%nn;
+    %and;%dxprec;%nn;
+    %and;%apply;month(ccc.birth_date.month)%nn;
+    %and;%apply;day(ccc.birth_date.day)%nn;
     %and;%count2;
     %and;%if;(ccc.birth_date!="")%ccc.birth_date;%else;(no date)%end;%nn;
-    %and;%apply;a_of_b%with;[birth]%and;%if;ccc.is_male;[a brother/a sister/a sibling]0%elseif;ccc.is_female;[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%nn;
+    %and;%apply;a_of_b%with;[birth]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%nn;
     %and;%nn;
     %and;%nn;
     %and;%nn;
@@ -169,14 +172,16 @@
   %let;his_death_date_day;%if;(ccc.death_date.day!="")%if;(ccc.death_date.day<=9)0%end;%ccc.death_date.day;%else;00%end;%in;
   %let;his_death_date;%his_death_date_year;%his_death_date_month;%his_death_date_day%in;
   %if;(ccc.is_dead and his_death_date<=my_death_date)
+    %let;dxprec;%if;(ccc.death_date.prec="&lt;")1%elseif;(ccc.death_date.prec="&gt;")3%else;2%end;%in;
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
       %and;%ccc.death_date.year;%nn;
-      %and;%ccc.death_date.month;%nn;
-      %and;%ccc.death_date.day;%nn;
+      %and;%dxprec;%nn;
+      %and;%apply;month(ccc.death_date.month)%nn;
+      %and;%apply;day(ccc.death_date.day)%nn;
       %and;%count2;
       %and;%if;(ccc.death_date!="")%ccc.death_date;%else;(no date)%end;%nn;
-      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[a brother/a sister/a sibling]0%elseif;ccc.is_female;[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age;)%end;%nn;
+      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age;)%end;%nn;
       %and;%nn;
       %and;%nn;
       %and;%nn;
@@ -190,11 +195,13 @@
       %let;his_marriage_date_day;%if;(ccc.marriage_date.day!="")%if;(ccc.marriage_date.day<=9)0%end;%ccc.marriage_date.day;%else;00%end;%in;
       %let;his_marriage_date;%his_marriage_date_year;%his_marriage_date_month;%his_marriage_date_day%in;
       %if;(his_marriage_date<=my_death_date)
+      %let;dxprec;%if;(ccc.marriage_date.prec="&lt;")1%elseif;(ccc.marriage_date.prec="&gt;")3%else;2%end;%in;
         %apply;add_in_sorted_list%with;
           %dummy;%nn;
           %and;%ccc.marriage_date.year;%nn;
-          %and;%ccc.marriage_date.month;%nn;
-          %and;%ccc.marriage_date.day;%nn;
+          %and;%dxprec;%nn;
+          %and;%apply;month(ccc.marriage_date.month)%nn;
+          %and;%apply;day(ccc.marriage_date.day)%nn;
           %and;%count2;
           %and;%if;(ccc.marriage_date!="")%ccc.marriage_date;%else;(no date)%end;%nn;
           %and;%apply;a_of_b%with[marriage/marriages]0%and;%ccc.first_name; [with] %apply;short_display_person("ccc.spouse")%end;%nn;
@@ -208,38 +215,53 @@
   %end;
 %end;
 
+%define;month(mmm)
+  %if;(mmm.month="")%if;(mmm.prec=">")12%else;00%end;%else;%mmm.month;%end;
+%end;
+
+%define;day(ddd)
+  %if;(ddd.day="")%if;(ddd.prec=">")32%else;00%end;%else;%ddd.day;%end;
+%end;
+
 %if;(has_event)
   %let;evarmac;%if;(evar.ma_c!="" and evar.ma_c="on")1%else;0%end;%in; %(marriage child %)
   %let;evarmas;%if;(evar.ma_s!="" and evar.ma_s="on")1%else;0%end;%in; %(marriage siblings %)
   %let;evarevp;%if;(evar.ev_p!="" and evar.ev_p="on")1%else;0%end;%in; %(events parents %)
+  %let;oneline;%if;(evar.one_l!="" and evar.one_l="on")1%else;0%end;%in; %(one line %)
 
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
   <div class="d-flex justify-content-between">
-  %( #chronology marche pas %)
-  <h2 class=" my-1" name="chronology">[*time line]%nn;
+    <h2 class=" my-1" id="chrono">[*time line]%nn;
+      %if;(not cancel_links)
+        <a %apply;relations_tree(l_ref)><img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/></a>%nn;
+      %end;%nn;
+    </h2>%nn;
     %if;(not cancel_links)
-      <a %apply;relations_tree(l_ref)><img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/></a>%nn;
-    %end;%nn;
-  </h2>%nn;
-  %if;(1=1 and not cancel_links)
-    <div class="form-inline">
-      <div class="mx-2">
-        %if;(evarmac=1)
-          <a href="%apply;rebuild_url("prefix_access",0,evarevp)#chronology" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [*child/children]1 [marriage/marriages]1">[*child/children]1 [marriage/marriages]1 <i class="fa fa-toggle-on text-muted"></i></a>
-        %else;
-          <a href="%apply;rebuild_url("prefix_access",1,evarevp)#chronology" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [*child/children]1 [marriage/marriages]1">[*child/children]1 [marriage/marriages]1 <i class="fa fa-toggle-off text-muted"></i></a>
-        %end;
+      <div class="form-inline">
+        <div class="mx-2">
+          %if;(evarmac=1)
+            <a href="%apply;rebuild_url("prefix_access",0,evarevp,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [marriage/marriages]1 [*child/children]1">[*child/children]1 <i class="fa fa-toggle-on text-muted"></i></a>
+          %else;
+            <a href="%apply;rebuild_url("prefix_access",1,evarevp,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [marriage/marriages]1 [*child/children]1">[*child/children]1 <i class="fa fa-toggle-off text-muted"></i></a>
+          %end;
+        </div>
+        <div class="mx-2">
+          %if;(evarevp=1)
+            <a href="%apply;rebuild_url("prefix_access",evarmac,0,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [event/events]1 [*parents], [siblings] ">[*parents], [siblings] <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+          %else;
+            <a href="%apply;rebuild_url("prefix_access",evarmac,1,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [event/events]1 [*parents], [siblings]">[*parents], [siblings] <i class="fa fa-toggle-off text-muted"></i></a>
+          %end;
+        </div>
+        <div class="mx-2">
+          %if;(oneline=1)
+            <a href="%apply;rebuild_url("prefix_access",evarmac,evarevp,0)" class="btn btn-secondary btn-sm" title="[*one_line]">[*one_line] <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+          %else;
+            <a href="%apply;rebuild_url("prefix_access",evarmac,evarevp,1)" class="btn btn-secondary btn-sm" title="[*one_line]">[*one_line] <i class="fa fa-toggle-off text-muted"></i></a>
+          %end;
+        </div>
       </div>
-      <div class="mx-2">
-        %if;(evarevp=1)
-          <a href="%apply;rebuild_url("prefix_access",evarmac,0)#chronology" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [*parents]&[siblings] [event/events]1">[*parents]&[siblings] [event/events]1 <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
-        %else;
-          <a href="%apply;rebuild_url("prefix_access",evarmac,1)#chronology" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [*parents]&[siblings] [event/events]1">[*parents]&[siblings] [event/events]1 <i class="fa fa-toggle-off text-muted"></i></a>
-        %end;
-      </div>
-    </div>
+    %end;
   </div>
-%end;
 
   %(let;dummy;%apply;date_to_sort("self.birth_date")%in;
   Birth date : %self.birth_date; : %apply;date_to_sort("self.birth_date"), %dummy;;<br>
@@ -257,29 +279,33 @@
   %empty_sorted_list;
   %reset_count2;
   %foreach;event;
+    %let;dxprec;%if;(event.date.prec="&lt;")1%elseif;(event.date.prec="&gt;")3%else;2%end;%in;
     %incr_count2;
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
       %and;%event.date.year;%nn;
-      %and;%event.date.month;%nn;
-      %and;%event.date.day;%nn;
+      %and;%dxprec;%nn;
+      %and;%apply;month("event.date")%nn;
+      %and;%apply;day("event.date")%nn;
       %and;%count2;
       %and;%if;event.has_date;%event.date;%else;---%end;%nn;
       %and;new_event_sorted%( %if;(event.name=[death] and self.computable_death_age)%sp;(%self.death_age;)%end; %)%nn;
       %and;%event.place;%nn;
-      %and;godp and witn%nn;
+      %and;%nn;
       %and;%event.note;%nn;
       %and;%self;%nn;
     %end;
   %end;
 
   %foreach;related
+    %let;dxprec;%if;(related.baptism_date.prec="&lt;")1%elseif;(related.baptism_date.prec="&gt;")3%else;2%end;%in;
     %incr_count2;
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
       %and;%related.baptism_date.year;%nn;
-      %and;%related.baptism_date.month;%nn;
-      %and;%related.baptism_date.day;%nn;
+      %and;%dxprec;%nn;
+      %and;%apply;month("related.baptism_date")%nn;
+      %and;%apply;day("related.baptism_date")%nn;
       %and;%count2;
       %and;%if;(related.baptism_date!="")%related.baptism_date;%else;(no date)%end;%nn;
       %and;%related_type;[:]%sp;%apply;image_MF("related")%apply;short_display_person("related")%nn;
@@ -291,11 +317,12 @@
   %end;
 
   %foreach;relation;
-  %incr_count2;
+    %incr_count2;
     %if;(has_relation_him and has_relation_her and relation_type!=[godfather/godmother/godparents]2)
       %apply;add_in_sorted_list%with;
         %dummy;%nn;
         %and;0000%nn;
+        %and;2%nn;
         %and;00%nn;
         %and;00%nn;
         %and;%count2;
@@ -310,6 +337,7 @@
       %apply;add_in_sorted_list%with;
         %dummy;%nn;
         %and;0000%nn;
+        %and;2%nn;
         %and;00%nn;
         %and;00%nn;
         %and;%count2;
@@ -324,6 +352,7 @@
       %apply;add_in_sorted_list%with;
         %dummy;%nn;
         %and;0000%nn;
+        %and;2%nn;
         %and;00%nn;
         %and;00%nn;
         %and;%count2;
@@ -338,12 +367,14 @@
   %end;
 
   %foreach;event_witness_relation;
+    %let;dxprec;%if;(event_witness_relation.event.date.prec="&lt;")1%elseif;(event_witness_relation.event.date.prec="&gt;")3%else;2%end;%in;
     %incr_count2;
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
       %and;%event_witness_relation.event.date.year;%nn;
-      %and;event_witness_relation.event.date.month;%nn;
-      %and;event_witness_relation.event.date.day;%nn;
+      %and;%dxprec;%nn;
+      %and;%apply;month("event_witness_relation.event.date")%nn;
+      %and;%apply;day("event_witness_relation.event.date")%nn;
       %and;%count2;
       %and;%if;(event_witness_relation.event.date!="")%event_witness_relation.event.date;%else;(no date)%end;%nn;
       %and;%apply;a_of_b%with;%apply;a_of_b%with;%event_witness_relation_kind;%and;
@@ -361,11 +392,13 @@
   
   %if;(has_parents and evarevp=1)
     %if;father.is_dead;
+      %let;dxprec;%if;(father.death_date.prec="&lt;")1%elseif;(father.death_date.prec="&gt;")3%else;2%end;%in;
       %apply;add_in_sorted_list%with;
         %dummy;%nn;
         %and;%father.death_date.year;%nn;
-        %and;%father.death_date.month;%nn;
-        %and;%father.death_date.day;%nn;
+        %and;%dxprec;%nn;
+        %and;%apply;month("father.death_date")%nn;
+        %and;%apply;day("father.death_date")%nn;
         %and;%count2;
         %and;%if;(father.death_date!="")%father.death_date;%else;(no date)%end;%nn;
         %and;%apply;a_of_b%with;[death]%and;[father/mother]0%end;%apply;image_MF("father")%apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%father.death_age;)%end;%nn;%nn;
@@ -376,11 +409,13 @@
       %end;
     %end;
     %if;mother.is_dead;
+      %let;dxprec;%if;(mother.death_date.prec="&lt;")1%elseif;(mother.death_date.prec="&gt;")3%else;2%end;%in;
       %apply;add_in_sorted_list%with;
         %dummy;%nn;
         %and;%mother.death_date.year;%nn;
-        %and;%mother.death_date.month;%nn;
-        %and;%mother.death_date.day;%nn;
+        %and;%dxprec;%nn;
+        %and;%apply;month("mother.death_date")%nn;
+        %and;%apply;day("mother.death_date")%nn;
         %and;%count2;
         %and;%if;(mother.death_date!="")%mother.death_date;%else;(no date)%end;%nn;
         %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end;%apply;image_MF("mother")%apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age;)%end;%nn;%nn;
@@ -396,7 +431,7 @@
     %foreach;mother.family;
       %foreach;child;
         %if;(child!=central_person)
-          %apply;one_child("child","evarmas")
+          %apply;one_child("child","evarmas","a brother/a sister/a sibling")
         %end;
       %end;
     %end;
@@ -405,11 +440,13 @@
   %if;has_families;
     %foreach;family;
       %if;(spouse.is_dead)
+        %let;dxprec;%if;(spouse.death_date.prec="&lt;")1%elseif;(spouse.death_date.prec="&gt;")3%else;2%end;%in;
         %apply;add_in_sorted_list%with;
           %dummy;%nn;
           %and;%spouse.death_date.year;%nn;
-          %and;%spouse.death_date.month;%nn;
-          %and;%spouse.death_date.day;%nn;
+          %and;%dxprec;%nn;
+          %and;%apply;month("spouse.death_date")%nn;
+          %and;%apply;day("spouse.death_date")%nn;
           %and;%count2;
           %and;%if;(spouse.death_date!="")%spouse.death_date;%else;(no date)%end;%nn;
           %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end;%apply;image_MF("spouse")%apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age;)%end;%nn;%nn;
@@ -420,7 +457,7 @@
         %end;
       %end;
       %foreach;child;
-        %apply;one_child("child","evarmac")
+        %apply;one_child("child","evarmac","a son/a daughter/a child")
       %end;
     %end;
   %end;
@@ -429,16 +466,16 @@
     <tbody>
       %foreach;sorted_list_item;
         <tr class="align-top">
-          <td class="text-right w-25" %if;(item.8!="" or item.9!="")rowspan="2"%end;>
-            %item.6; %( date %)
+          <td class="text-right w-25" %if;(item.9!="" or item.10!="" or item.11!="")rowspan="2"%end;>
+            %item.7; %( date %)
           </td>
-          <td class="px-1" %if;(item.7!="" or item.8!="")rowspan="2"%end;>–</td>
+          <td class="px-1" %if;(item.9!="" or item.10!="" or item.11!="")rowspan="2"%end;>–</td>
           <td>
-            %if;(item.7="new_event_sorted")
+            %if;(item.8="new_event_sorted")
               %reset_count2;
               %foreach;event;
                 %incr_count2;
-                %if;(item.5=count2)
+                %if;(item.6=count2)
                   %apply;capitalize(event.name)
                   %if;event.has_spouse;%sp;[with] <span class="text-nowrap">%apply;short_display_person%with;event.spouse%end;</span>%end;
                   %if;(event.has_witnesses and not cancel_links)
@@ -449,21 +486,23 @@
                 %end;
               %end;
             %else;
-              %apply;capitalize(item.7) %( name %)
+              %apply;capitalize(item.8) %( name %)
             %end;
-            %if;(item.8!="")
-              <br><span class="text-muted">%item.8;</span> %( place %)
+            %if;(item.9!="")
+              %if;(oneline=0)<br>%else;%sp;–%sp;%end;
+              <span class="text-muted">%item.9;</span> %( place %)
             %end;
           </td>
         </tr>
+        %if;(oneline=0)
         <tr class="align-top">
           <td>
-            %if;(item.9!="")
-              %if;(item.7="new_event_sorted")
+            %if;(item.10!="")
+              %if;(item.8="new_event_sorted")
                 %reset_count2;
                 %foreach;event;
                   %incr_count2;
-                  %if;(item.5=count2)
+                  %if;(item.6=count2)
                     %if;(event.name=[baptism])
                       %if;has_relations;
                         %foreach;relation;
@@ -498,14 +537,19 @@
                   %end;
                 %end;
               %else;
-                %item.9; %( godparents and witness %)
+                %item.10; %( godparents and witness %)
               %end;
             %end;
-            %if;(item.10!="")
-             <span class="mt-1">%item.10;</span> %( note %)
+            %if;(item.11!="")
+             <span class="mt-1">%item.11;</span> %( note %)
             %end;
           </td>
         </tr>
+        %else;
+          %if;(item.9!="" or item.10!="" or item.11!="")
+            <tr></tr>
+          %end;
+        %end;
       %end;
     </tbody>
   </table>

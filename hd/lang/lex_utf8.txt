@@ -9602,6 +9602,10 @@ sl:
 sv:
 zh:
 
+    one_line
+en: single line
+fr: une ligne
+
     one day old
 af: een dag oud
 bg: на един ден
