@@ -643,7 +643,7 @@ value prec_text conf d =
   | After -> ">"
   | OrYear _ -> "|"
   | YearInt _ -> ".."
-  | _ -> "" ]
+  | Sure -> "" ]
 ;
 
 

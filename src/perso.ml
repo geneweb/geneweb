@@ -2926,15 +2926,43 @@ and eval_date_field_var conf d =
       | _ -> VVstring "" ]
   | ["day"] ->
       match d with
-      [ Dgreg dmy _ -> VVstring (Date.day_text dmy)
+      [ Dgreg dmy _ ->
+          if dmy.day = 0 then VVstring ""
+          else VVstring (string_of_int dmy.day)
+      | _ -> VVstring "" ]
+  | ["day2"] ->
+      match d with
+      [ Dgreg dmy _ ->
+          match dmy.prec with
+          [ OrYear dmy2 | YearInt dmy2 ->
+              if dmy2.day2 = 0 then VVstring ""
+              else VVstring (string_of_int dmy2.day2)
+          | _ -> VVstring "" ]
       | _ -> VVstring "" ]
   | ["month"] ->
       match d with
       [ Dgreg dmy _ -> VVstring (Date.month_text dmy)
       | _ -> VVstring "" ]
+  | ["month2"] ->
+      match d with
+      [ Dgreg dmy _ ->
+          match dmy.prec with
+          [ OrYear dmy2 | YearInt dmy2 ->
+              if dmy2.month2 = 0 then VVstring ""
+              else VVstring (string_of_int dmy2.month2)
+          | _ -> VVstring "" ]
+      | _ -> VVstring "" ]
   | ["year"] ->
       match d with
-      [ Dgreg dmy _ -> VVstring (Date.year_text dmy)
+      [ Dgreg dmy _ -> VVstring (string_of_int dmy.year)
+      | _ -> VVstring "" ]
+  | ["year2"] ->
+      match d with
+      [ Dgreg dmy _ ->
+          match dmy.prec with
+          [ OrYear dmy2 | YearInt dmy2 ->
+              VVstring (string_of_int dmy2.year2)
+          | _ -> VVstring "" ]
       | _ -> VVstring "" ]
   | [] -> VVstring (Date.string_of_date_sep conf "<br/>" d)
   | _ -> raise Not_found ]
