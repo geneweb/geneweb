@@ -356,7 +356,7 @@ value print_redirected conf from request new_addr =
     match Util.open_etc_file "redirect" with
     [ Some ic ->
         do {
-          let conf = {(conf) with is_printed_by_server = False} in
+          let conf = {(conf) with is_printed_by_template = False} in
           Util.html conf;
           Templ.copy_from_templ conf env ic;
         }
@@ -1219,7 +1219,7 @@ value make_conf from_addr (addr, request) script_name contents env = do {
      manitou = manitou;
      supervisor = supervisor;
      wizard = ar.ar_wizard && not wizard_just_friend;
-     is_printed_by_server = True;
+     is_printed_by_template = True;
      friend = ar.ar_friend || wizard_just_friend && ar.ar_wizard;
      just_friend_wizard = ar.ar_wizard && wizard_just_friend;
      user = ar.ar_user; username = ar.ar_name;

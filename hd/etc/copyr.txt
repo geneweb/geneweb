@@ -28,7 +28,7 @@
                 <span class="fa fa-language"></span>
                 <span class="caret"></span>
               </button>
-              %if;(not template)
+              %if;(not is_printed_by_template)
                 <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
                   <a class="dropdown-item" href="%prefix_base;lang=af;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">af</a>
                   <a class="dropdown-item" href="%prefix_base;lang=bg;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">bg</a>

@@ -931,7 +931,7 @@ value templ_eval_var conf =
   | ["supervisor"] -> VVbool conf.supervisor
   | ["true"] -> VVbool True
   | ["wizard"] -> VVbool conf.wizard
-  | ["is_printed_by_server"] -> VVbool conf.is_printed_by_server
+  | ["is_printed_by_template"] -> VVbool conf.is_printed_by_template
   | _ -> raise Not_found ]
 ;
 
