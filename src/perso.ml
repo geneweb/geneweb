@@ -2752,30 +2752,15 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
       match Adef.od_of_codate (get_baptism p) with
       [ Some d when p_auth -> eval_date_field_var conf d sl
       | _ -> VVstring "" ]
-  | ["baptism_date_sorted" :: sl] ->
-      match Adef.od_of_codate (get_baptism p) with
-      [ Some d when p_auth -> VVstring (Date.string_of_date_sorted conf d)
-      | _ -> VVstring "" ]
   | ["birth_date" :: sl] ->
       match Adef.od_of_codate (get_birth p) with
       [ Some d when p_auth -> eval_date_field_var conf d sl
-      | _ -> VVstring "" ]
-  | ["birth_date_sorted" :: sl] ->
-      match Adef.od_of_codate (get_birth p) with
-      [ Some d when p_auth -> VVstring (Date.string_of_date_sorted conf d)
       | _ -> VVstring "" ]
   | ["burial_date" :: sl] ->
       match get_burial p with
       [ Buried cod when p_auth ->
           match Adef.od_of_codate cod with
           [ Some d -> eval_date_field_var conf d sl
-          | None -> VVstring "" ]
-      | _ -> VVstring "" ]
-  | ["burial_date_sorted" :: sl] ->
-      match get_burial p with
-      [ Buried cod when p_auth ->
-          match Adef.od_of_codate cod with
-          [ Some d -> VVstring (Date.string_of_date_sorted conf d)
           | None -> VVstring "" ]
       | _ -> VVstring "" ]
   | ["cremated_date" :: sl] ->
@@ -2785,22 +2770,10 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           [ Some d -> eval_date_field_var conf d sl
           | None -> VVstring "" ]
       | _ -> VVstring "" ]
-  | ["cremated_date_sorted" :: sl] ->
-      match get_burial p with
-      [ Cremated cod when p_auth ->
-          match Adef.od_of_codate cod with
-          [ Some d -> VVstring (Date.string_of_date_sorted conf d)
-          | None -> VVstring "" ]
-      | _ -> VVstring "" ]
   | ["death_date" :: sl] ->
       match get_death p with
       [ Death _ cd when p_auth ->
           eval_date_field_var conf (Adef.date_of_cdate cd) sl
-      | _ -> VVstring "" ]
-  | ["death_date_sorted" :: sl] ->
-      match get_death p with
-      [ Death _ cd when p_auth ->
-          VVstring (Date.string_of_date_sorted conf (Adef.date_of_cdate cd))
       | _ -> VVstring "" ]
   | ["event" :: sl] ->
       match get_env "event" env with
@@ -2895,13 +2868,6 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
       [ Vfam _ fam _ True ->
           match Adef.od_of_codate (get_marriage fam) with
           [ Some d -> eval_date_field_var conf d sl
-          | None -> VVstring "" ]
-      | _ -> raise Not_found ]
-  | ["marriage_date_sorted" :: sl] ->
-      match get_env "fam" env with
-      [ Vfam _ fam _ True ->
-          match Adef.od_of_codate (get_marriage fam) with
-          [ Some d -> VVstring (Date.string_of_date_sorted conf d)
           | None -> VVstring "" ]
       | _ -> raise Not_found ]
   | ["mother" :: sl] ->
@@ -3068,10 +3034,6 @@ and eval_str_event_field
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> Date.string_of_date conf d
       | _ -> "" ]
-  | "date_sorted" ->
-      match (p_auth, Adef.od_of_codate date) with
-      [ (True, Some d) -> Date.string_of_date_sorted conf d
-      | _ -> "" ]
   | "on_date" ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) ->
@@ -3120,10 +3082,6 @@ and eval_event_field_var
   [ ["date" :: sl] when sl <> [] ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> eval_date_field_var conf d sl
-      | _ -> VVstring "" ]
-  | ["date_sorted" :: sl] when sl <> [] ->
-      match (p_auth, Adef.od_of_codate date) with
-      [ (True, Some d) -> VVstring (Date.string_of_date_sorted conf d)
       | _ -> VVstring "" ]
   | ["spouse" :: sl] ->
       match isp with
@@ -4068,10 +4026,6 @@ and eval_family_field_var conf base env
   | ["marriage_date" :: sl] ->
       match Adef.od_of_codate (get_marriage fam) with
       [ Some d when m_auth -> eval_date_field_var conf d sl
-      | _ -> VVstring "" ]
-  | ["marriage_date_sorted" :: sl] ->
-      match Adef.od_of_codate (get_marriage fam) with
-      [ Some d when m_auth -> VVstring (Date.string_of_date_sorted conf d)
       | _ -> VVstring "" ]
   | ["mother" :: sl] ->
       match get_env "f_link" env with
