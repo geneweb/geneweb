@@ -3,12 +3,15 @@
 %define;rebuild_url(aaa,vvv,iii,mmm,ttt)
   %let;new_url;
   %if;("aaa"="prefix_access")%prefix;%access;;%else;aaa%end;
+  %if;(evar.mar_sp_ch!="")mar_sp_ch=%evar.mar_sp_ch;;%end;
+  %if;(evar.evt_pr_sib!="")evt_pr_sib=%evar.evt_pr_sib;;%end;
+  %if;(evar.simple!="")simple=%evar.simple;;%end;
   %if;(evar.m!="")m=%evar.m;;%end;
   %if;(iii=1)image=on;%end;
   %if;(mmm=1)marriage=on;%end;
   %if;(evar.vh!="")vh=%evar.vh;;%end;
   %if;(evart!="")t=ttt;%end;
-  %if;(vvv!=3)v=vvv%end;%in;
+  %if;(vvv!=3)v=vvv%end;#a%in;
   %new_url;
 %end;
 
@@ -162,14 +165,14 @@
     %if;(bvar.max_anc_level!="")%bvar.max_anc_level;%else;120%end;%and;
     %expr(static_max_anc_level)%end;%in;
   %let;maxv;%if;(maxlev<10 or maxlev<evarv+5)%expr(maxlev+1)
-            %elseif;(maxlev>=evarv+5 and evarv>0)%expr(evarv+5)
+            %elseif;(maxlev>=evarv+5 and evarv>5)%expr(evarv+5)
             %else;10%end;%in;
   %let;minv;%if;(maxlev>9 and maxlev<evarv+5)%expr(maxv-9)
             %elseif;(maxlev>9 and evarv>5)%expr(evarv-4)
             %else;1%end;%in;
   %(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
   <div class="d-flex justify-content-between">
-    <h2>%if;(evar.t = "A")[*male line/female line]0%nn;
+    <h2 id="a">%if;(evar.t = "A")[*male line/female line]0%nn;
     %elseif;(evar.t = "C")[*male line/female line]1%nn;
     %else[*ascendants tree]%end;</h2>
     %if;not cancel_links;
@@ -199,17 +202,17 @@
         %end;
         <div class="mx-2">
           %if;(evarim=1)
-            <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0">[*image/images]0 <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0">[*image/images]0 <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
         %if;(evarv>1 and evart="T")
           <div class="mx-2">
             %if;(evarma=1)
-              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [date of marriage]">Marriage <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
             %else;
-              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [date of marriage]">Marriage <i class="fa fa-toggle-off text-muted"></i></a>
+              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
             %end;
           </div>
         %end;

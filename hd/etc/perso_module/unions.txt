@@ -262,7 +262,7 @@
       %end;
     </li></ul>
     %if;(count2>0)
-      <div class="media mb-1">
+      <div class="media mb-1 mt-2">
         <div class="d-flex flex-row">
           <div class="">
             %if;spouse.has_image;

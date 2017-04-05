@@ -20,12 +20,10 @@
 %if;(not cancel_links)
   <div class="d-flex justify-content-between">
     <div class="float-left mt-3 btn-group">
-      %if;not cancel_links;
-        %if;((p_mod="" or p_mod="zz") and has_parents and (father.has_parents or mother.has_parents))
+      %if;(not cancel_links and (evar.p!="" or evar.i!="") and (p_mod="" or p_mod="zz") and evar.m!="MOD_IND" and evar.m!="MOD_FAM" and has_parents and (father.has_parents or mother.has_parents))
           <a data-toggle="collapse" href="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 module">
             <i class="fa fa-list fa-fw ml-2 align-middle"></i>
           </a>
-        %end;
       %end;
     </div>
     <nav class="navbar navbar-light %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK")mt-4%end;" style="background-color: white">
@@ -41,90 +39,92 @@
           <a class="nav-link %if;(evar.m="")active%end;" href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;"><span class="fa fa-user fa-fw %sexcolor;"></span></a>
         </li>
         %( personnal modules selection menu %)
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
-          <div class="dropdown-menu p_mod-dropdown-menu%if;(wizard)-wizard%end;">
-            <div class="d-inline-flex">
-              <form class="form-control" name="upd_url" method="get" action="%action;">
-                <div class="d-flex justify-content-start">
-                  <div class="input-group col-9 ">
-                    %if;(evar.b!="")
-                      <input type="hidden" name="b" value="%evar.b;">
-                    %end;
-                    %if;(evar.lang!="")
-                      <input type="hidden" name="lang" value="%evar.lang;">
-                    %end;
-                    <input type="text" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (params.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
-                    <input type="hidden" name="p" value="%first_name;">
-                    <input type="hidden" name="n" value="%surname;">
-                    <input type="hidden" name="oc" value="%occ;">
-                    <span class="input-group-btn">
-                      <button type="button" class="btn btn-secondary" id="p_mod-clear" title="[*validate/delete]1 p_mod"><i class="fa fa-close text-danger"></i></button>
-                      <button type="submit" class="btn btn-secondary text-green" title="[*validate/delete]0 p_mod"><i class="fa fa-check text-success"></i></button>
-                    </span>
+        %if;(evar.m!="MOD_IND" and evar.m!="MOD_FAM")
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+            <div class="dropdown-menu p_mod-dropdown-menu%if;(wizard)-wizard%end;">
+              <div class="d-inline-flex">
+                <form class="form-control" name="upd_url" method="get" action="%action;">
+                  <div class="d-flex justify-content-start">
+                    <div class="input-group col-9 ">
+                      %if;(evar.b!="")
+                        <input type="hidden" name="b" value="%evar.b;">
+                      %end;
+                      %if;(evar.lang!="")
+                        <input type="hidden" name="lang" value="%evar.lang;">
+                      %end;
+                      <input type="text" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (params.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
+                      <input type="hidden" name="p" value="%first_name;">
+                      <input type="hidden" name="n" value="%surname;">
+                      <input type="hidden" name="oc" value="%occ;">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-secondary" id="p_mod-clear" title="[*validate/delete]1 p_mod"><i class="fa fa-close text-danger"></i></button>
+                        <button type="submit" class="btn btn-secondary text-green" title="[*validate/delete]0 p_mod"><i class="fa fa-check text-success"></i></button>
+                      </span>
+                    </div>
+                    <button class="form-control ml-auto col-1" type="submit"
+                            value="X" id="zz" title="default"
+                            data-toggle="popover" data-trigger="hover" data-placement="bottom"
+                            data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/zz_1.jpg'>"><i class="fa fa-undo text-muted"></i></button>
                   </div>
-                  <button class="form-control ml-auto col-1" type="submit"
-                          value="X" id="zz" title="default"
-                          data-toggle="popover" data-trigger="hover" data-placement="bottom"
-                          data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/zz_1.jpg'>"><i class="fa fa-undo text-muted"></i></button>
-                </div>
-                <p class="mx-3 mt-2">
-                [
+                  <p class="mx-3 mt-2">
+                  [
 en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear (maximum 15 modules).
 fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules (maximum 15 modules).
-                ]
-                </p>
-                %reset_count;
-                %for;i;1;27;
-                  %let;modn;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
-                  %if;(modn!="")
-                    %incr_count;
-                  %end;
-                %end;
-                %let;p_m_n;%count;%in;
-                <table class="table table-sm table-hover mt-2 mb-0 mx-2">
-                  <thead class="thead-default">
-                    <tr>
-                      <th>[*module]</th>
-                      <th>[*options]</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    %for;i;1;27;
-                      %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
-                      %if;(m_nam!="")
-                        %let;m_ltr;%apply;letter(i)%in;
-                        %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
-                        %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
-                        <tr>
-                          <td class="align-middle pmod">
-                            %m_nam;
-                          </td>
-                          <td>
-                            <div class="d-inline-flex font-italic small">
-                              %for;j;0;m_opt_nb;
-                                %let;k;%expr(j+1)%in;
-                                %let;m_opt_nam;%apply;get_opt_nam(m_nam, k)%in;
-                                %if;(m_opt_nam!="")
-                                  <button class="btn btn-secondary btn-sm" type="button" id="%m_ltr;%k;" title="%m_nam; %m_opt_nam;"
-                                         data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"
-                                         data-html="true" data-content="<img class='w-100' src='%image_prefix;/%m_nam;_%k;.jpg'>">%m_opt_nam;</button>
-                                %end;
-                              %end;
-                            </div>
-                          </td>
-                        </tr>
-                      %end;
+                  ]
+                  </p>
+                  %reset_count;
+                  %for;i;1;27;
+                    %let;modn;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
+                    %if;(modn!="")
+                      %incr_count;
                     %end;
-                  </tbody>
-                </table>
-              </form>
-              <div id="p_mod_builder" class="form-control" value="%if;(evar.p_mod!="")%p_mod;%end;">
-                <img src="%image_prefix;/menubar_1.jpg">
+                  %end;
+                  %let;p_m_n;%count;%in;
+                  <table class="table table-sm table-hover mt-2 mb-0 mx-2">
+                    <thead class="thead-default">
+                      <tr>
+                        <th>[*module]</th>
+                        <th>[*options]</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      %for;i;1;27;
+                        %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
+                        %if;(m_nam!="")
+                          %let;m_ltr;%apply;letter(i)%in;
+                          %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
+                          %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
+                          <tr>
+                            <td class="align-middle pmod">
+                              %m_nam;
+                            </td>
+                            <td>
+                              <div class="d-inline-flex font-italic small">
+                                %for;j;0;m_opt_nb;
+                                  %let;k;%expr(j+1)%in;
+                                  %let;m_opt_nam;%apply;get_opt_nam(m_nam, k)%in;
+                                  %if;(m_opt_nam!="")
+                                    <button class="btn btn-secondary btn-sm" type="button" id="%m_ltr;%k;" title="%m_nam; %m_opt_nam;"
+                                           data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"
+                                           data-html="true" data-content="<img class='w-100' src='%image_prefix;/%m_nam;_%k;.jpg'>">%m_opt_nam;</button>
+                                  %end;
+                                %end;
+                              </div>
+                            </td>
+                          </tr>
+                        %end;
+                      %end;
+                    </tbody>
+                  </table>
+                </form>
+                <div id="p_mod_builder" class="form-control" value="%if;(evar.p_mod!="")%p_mod;%end;">
+                  <img src="%image_prefix;/menubar_1.jpg">
+                </div>
               </div>
             </div>
-          </div>
-        </li>
+          </li>
+        %end;
         %(end personnal modules selection menu %)
         %if;(not (bvar.wizard_just_friend = "yes") and wizard)
           <li class="nav-item">

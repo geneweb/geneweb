@@ -225,8 +225,8 @@ function changeCalendar(e,v,m,c) {
   <div class="container fixed-top">
     <div class="form-inline">
       <div class="mx-auto text-center">
+        <button type="submit" class="btn btn-secondary btn-sm mr-sm-3 mr-md-0 mr-lg-5" title="[*validate/delete]0" aria-label="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1 text-success"></i>%(<span class="hidden-md-down ml-1 font-weight-bold">[*validate/delete]0</span>%)</button>
         <div class="btn-group btn-inline">
-          <button type="submit" class="btn btn-secondary btn-sm mr-sm-3 mr-md-0 mr-lg-5" title="[*validate/delete]0" aria-label="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 fa-fw" aria-hidden="true"></i><span class="hidden-md-down ml-1 font-weight-bold">[*validate/delete]0</span></button>
           <a class="btn btn-secondary btn-sm" href="#top" title="[*person/persons]0" aria-label="[*person/persons]0"><i class="fa fa-address-card fa-fw" aria-hidden="true"></i><span class="hidden-lg-down"> [*person/persons]0</span></a>
           <a class="btn btn-secondary btn-sm" href="#birth_" title="[*birth]"><i class="fa fa-child fa-fw"></i><span class="hidden-sm-down"> [*birth]</span></a>
           <a class="btn btn-secondary btn-sm" href="#baptism_"><i class="fa fa-child fa-fw"></i><span class="hidden-sm-down"> [*baptism]</span></a>
@@ -407,7 +407,8 @@ function changeCalendar(e,v,m,c) {
 
 %define;selector_pevent(xcnt)
   <select class="form-control font-weight-bold" id="pevent_selectxcnt" onchange="show_pevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
-    <option value="">- [Custom text event]</option>
+    <option value="">[*custom event]</option>
+    <option disabled>──────────</option>
     <option value="#acco" %if;(event.e_name = "#acco") selected%end;>[*accomplishment]</option>
     <option value="#acqu" %if;(event.e_name = "#acqu") selected%end;>[*acquisition]</option>
     <option value="#adhe" %if;(event.e_name = "#adhe") selected%end;>[*adhesion]</option>
@@ -446,6 +447,7 @@ function changeCalendar(e,v,m,c) {
     <option value="#reti" %if;(event.e_name = "#reti") selected%end;>[*retired]</option>
     <option value="#vteb" %if;(event.e_name = "#vteb") selected%end;>[*venteBien]</option>
     <option value="#will" %if;(event.e_name = "#will") selected%end;>[*will]</option>
+    <option disabled>──────────</option>
     <option value="#bapl" %if;(event.e_name = "#bapl") selected%end;>[*baptismLDS]</option>
     <option value="#conl" %if;(event.e_name = "#conl") selected%end;>[*confirmation LDS]</option>
     <option value="#dotl" %if;(event.e_name = "#dotl") selected%end;>[*dotationLDS]</option>
@@ -618,15 +620,13 @@ function changeCalendar(e,v,m,c) {
 %define;one_pevent(xcnt)
   %if;(event.e_name != "#birt" and event.e_name != "#bapt" and event.e_name != "#deat" and event.e_name != "#buri" and event.e_name != "#crem")
     <div class="row">
-      <h5 class="col-2 col-form-label"><label for="pevent_selectxcnt" class="mb-0">[*event/events]0 %expr(xcnt-2)</label></h5>
-      <div class="form-inline col-10">
-        <div class="mb-2 mb-sm-0">
-          %apply;selector_pevent(xcnt)
-        </div>
+      <h5 class="col-2 col-form-label"><label for="pevent_selectxcnt" class="mb-0">[*event/events]0 %(xcnt needs a count fonction%)</label></h5>
+      <div class="col-sm-3">
         <label id="pevent_label_selectorxcnt" class="sr-only">[or]0 [text]0</label>
-        <div class="col-8">
-        <b><input type="text" class="form-control" name="e_namexcnt" maxlength="280" value="%event.e_name;" id="e_namexcnt" placeholder="[*event/events]0"></b>
-        </div>
+        %apply;selector_pevent(xcnt)
+      </div>
+      <div class="col-7">
+        <input type="text" class="form-control font-weight-bold" name="e_namexcnt" value="%event.e_name;" id="e_namexcnt" placeholder="[*event/events]0">
       </div>
     </div>
     <div class="row">
@@ -1231,7 +1231,7 @@ function changeCalendar(e,v,m,c) {
       %end;
     </div>
   </div>
-
+  
   <div class="card">
     %apply;card_header("event/events")
     <div class="card-block">

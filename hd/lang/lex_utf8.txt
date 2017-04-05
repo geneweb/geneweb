@@ -3462,7 +3462,7 @@ sv: ändrade ordningen för barnen
 de: ändern der Reihenfolge familiäre Ereignisse
 en: change order of family events
 es: cambio del orden de los acontecimientos familiares
-fr: changement de l’ordre des évènements familiaux
+fr: changement de l’ordre des événements familiaux
 it: modifica dell'ordine degli eventi di famiglia
 oc: cambiament de l'òrdre dels eveniments familials
 pt: modificar a ordem dos eventos familiares
@@ -3484,7 +3484,7 @@ sv: Utbytt ordning för bröllop
 de: ändern der Reihenfolge bei Ereignissen des Individuums
 en: change order of individual events
 es: cambio del orden de los acontecimientos del individuo
-fr: changement de l’ordre des évènements individu
+fr: changement de l’ordre des événements individu
 it: modifica dell'ordine degli eventi individuo
 oc: cambiament de l'òrdre dels eveniments d'un individú
 pt: modificar ordem dos eventos da pessoa
@@ -14298,3 +14298,15 @@ fr: jour/mois/année
     spouses info
 en: spouses informations
 fr: informations conjoints
+
+    inline chronology
+en: simple chronology/detailed chronology
+fr: chronologie simple/chronologie détaillée
+
+    missing date
+en: no date
+fr: sans date
+
+    custom event
+en: custom event
+fr: événement personnalisé
