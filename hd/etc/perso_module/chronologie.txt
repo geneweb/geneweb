@@ -129,7 +129,7 @@
 %end;
 
 %define;date_to_sort(ddd)
-  %let;yyyy;%if;(ddd.year!="")%ddd.year;%else;0000%end;%in;
+  %let;yyyy;%if;(ddd.year1!="")%ddd.year1;%else;0000%end;%in;
   %let;mm;%if;(ddd.month!="")%ddd.month;%else;00%end;%in;
   %let;dd;%if;(ddd.day!="")%ddd.day;%else;00%end;%in;
   %let;m1;%if;(mm>0 and mm<10)0%mm;%else;%mm;%end;%in;
@@ -170,7 +170,7 @@
   %( no test for his_birth_date <= my_death_date here %)
   %apply;add_in_sorted_list%with;
     %dummy;%nn;
-    %and;%ccc.birth_date.year;%nn;
+    %and;%ccc.birth_date.year1;%nn;
     %and;%apply;month("ccc.birth_date")%nn;
     %and;%apply;day("ccc.birth_date")%nn;
     %and;%apply;dprec("ccc.birth_date")%nn;
@@ -179,19 +179,19 @@
     %and;%apply;a_of_b%with;[birth]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%nn;
     %and;%nn;
     %and;%nn;
-    %and;%(debug sort: %ccc.birth_date.year;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
+    %and;%(debug sort: %ccc.birth_date.year1;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
     %and;%ccc;%nn;
     %and;%ddd;%nn;
   %end;
-  %( what happens if date.year is yyy1..yyy2 ? %)
-  %let;his_death_date_year;%if;(ccc.death_date.year!="")%ccc.death_date.year;%else;0%end;%in;
+  %( what happens if date.year1 is yyy1..yyy2 ? %)
+  %let;his_death_date_year;%if;(ccc.death_date.year1!="")%ccc.death_date.year1;%else;0%end;%in;
   %let;his_death_date_month;%if;(ccc.death_date.month!="")%if;(ccc.death_date.month<=9)0%end;%ccc.death_date.month;%else;00%end;%in;
   %let;his_death_date_day;%if;(ccc.death_date.day!="")%if;(ccc.death_date.day<=9)0%end;%ccc.death_date.day;%else;00%end;%in;
   %let;his_death_date;%his_death_date_year;%his_death_date_month;%his_death_date_day%in;
   %if;(ccc.is_dead and his_death_date<=my_death_date)
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
-      %and;%ccc.death_date.year;%nn;
+      %and;%ccc.death_date.year1;%nn;
       %and;%apply;month("ccc.death_date")%nn;
       %and;%apply;day("ccc.death_date")%nn;
       %and;%apply;dprec("ccc.death_date")%nn;
@@ -200,21 +200,21 @@
       %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age;)%end;%nn;
       %and;%nn;
       %and;%nn;
-      %and;%(debug sort: %ccc.birth_date.year;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
+      %and;%(debug sort: %ccc.birth_date.year1;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
       %and;%ccc;%nn;
       %and;%ddd;%nn;
     %end;
   %end;
   %if;(ccc.has_families and evm=1)
     %foreach;family;
-      %let;his_marriage_date_year;%if;(ccc.marriage_date.year!="")%ccc.marriage_date.year;%else;0%end;%in;
+      %let;his_marriage_date_year;%if;(ccc.marriage_date.year1!="")%ccc.marriage_date.year1;%else;0%end;%in;
       %let;his_marriage_date_month;%if;(ccc.marriage_date.month!="")%if;(ccc.marriage_date.month<=9)0%end;%ccc.marriage_date.month;%else;00%end;%in;
       %let;his_marriage_date_day;%if;(ccc.marriage_date.day!="")%if;(ccc.marriage_date.day<=9)0%end;%ccc.marriage_date.day;%else;00%end;%in;
       %let;his_marriage_date;%his_marriage_date_year;%his_marriage_date_month;%his_marriage_date_day%in;
       %if;(his_marriage_date<=my_death_date)
         %apply;add_in_sorted_list%with;
           %dummy;%nn;
-          %and;%ccc.marriage_date.year;%nn;
+          %and;%ccc.marriage_date.year1;%nn;
           %and;%apply;month("ccc.marriage_date")%nn;
           %and;%apply;day("ccc.marriage_date")%nn;
           %and;%apply;dprec("ccc.marriage_date")%nn;
@@ -223,7 +223,7 @@
           %and;%apply;a_of_b%with[marriage/marriages]0%and;%ccc.first_name; [with] %apply;short_display_person("ccc.spouse")%end;%nn;
           %and;%nn;
           %and;%nn;
-          %and;%(debug sort: %ccc.birth_date.year;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
+          %and;%(debug sort: %ccc.birth_date.year1;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
           %and;%ccc;%nn;
           %and;%ddd;%nn;
         %end;
@@ -281,7 +281,7 @@
   %let;cas2;parent%in;
   %let;cas3;child%in;
   %let;cas4;sibling%in;
-  %let;my_death_date_year;%if;(self.death_date.year!="")%self.death_date.year;%else;00%end;%in;
+  %let;my_death_date_year;%if;(self.death_date.year1!="")%self.death_date.year1;%else;00%end;%in;
   %let;my_death_date_month;%if;(self.death_date.month!="")%if;(self.death_date.month<=9)0%end;%self.death_date.month;%else;00%end;%in;
   %let;my_death_date_day;%if;(self.death_date.day!="")%if;(self.death_date.day<=9)0%end;%self.death_date.day;%else;00%end;%in;
   %let;my_death_date;%my_death_date_year;%my_death_date_month;%my_death_date_day;%in;
@@ -293,7 +293,7 @@
     %incr_count2;
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
-      %and;%event.date.year;%nn;
+      %and;%event.date.year1;%nn;
       %and;%apply;month("event.date")%nn;
       %and;%apply;day("event.date")%nn;
       %and;%apply;dprec("event.date")%nn;
@@ -302,7 +302,7 @@
       %and;new_event_sorted%( %if;(event.name=[death] and self.computable_death_age)%sp;(%self.death_age;)%end; %)%nn;
       %and;%event.place;%nn;
       %and;%nn;
-      %and;%(debug sort: %event.date.year;%apply;month("event.date")%apply;day("event.date")%apply;dprec("event.date"), %)%event.note;%nn;
+      %and;%(debug sort: %event.date.year1;%apply;month("event.date")%apply;day("event.date")%apply;dprec("event.date"), %)%event.note;%nn;
       %and;%self;%nn;
       %and;%cas1;%nn;
     %end;
@@ -312,7 +312,7 @@
     %incr_count2;
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
-      %and;%related.baptism_date.year;%nn;
+      %and;%related.baptism_date.year1;%nn;
       %and;%apply;month("related.baptism_date")%nn;
       %and;%apply;day("related.baptism_date")%nn;
       %and;%apply;dprec("related.baptism_date")%nn;
@@ -384,7 +384,7 @@
     %incr_count2;
     %apply;add_in_sorted_list%with;
       %dummy;%nn;
-      %and;%event_witness_relation.event.date.year;%nn;
+      %and;%event_witness_relation.event.date.year1;%nn;
       %and;%apply;month("event_witness_relation.event.date")%nn;
       %and;%apply;day("event_witness_relation.event.date")%nn;
       %and;%apply;dprec("event_witness_relation.event.date")%nn;
@@ -408,7 +408,7 @@
     %if;father.is_dead;
       %apply;add_in_sorted_list%with;
         %dummy;%nn;
-        %and;%father.death_date.year;%nn;
+        %and;%father.death_date.year1;%nn;
         %and;%apply;month("father.death_date")%nn;
         %and;%apply;day("father.death_date")%nn;
         %and;%apply;dprec("father.death_date")%nn;
@@ -425,7 +425,7 @@
     %if;mother.is_dead;
       %apply;add_in_sorted_list%with;
         %dummy;%nn;
-        %and;%mother.death_date.year;%nn;
+        %and;%mother.death_date.year1;%nn;
         %and;%apply;month("mother.death_date")%nn;
         %and;%apply;day("mother.death_date")%nn;
         %and;%apply;dprec("mother.death_date")%nn;
@@ -456,7 +456,7 @@
       %if;(spouse.is_dead)
         %apply;add_in_sorted_list%with;
           %dummy;%nn;
-          %and;%spouse.death_date.year;%nn;
+          %and;%spouse.death_date.year1;%nn;
           %and;%apply;month("spouse.death_date")%nn;
           %and;%apply;day("spouse.death_date")%nn;
           %and;%apply;dprec("spouse.death_date")%nn;

@@ -689,6 +689,12 @@ value year_text d =
   | YearInt d2 -> string_of_int d.year ^ ".." ^ string_of_int d2.year2
   | _ -> string_of_int d.year ]
 ;
+value year_1_text d =
+  match d.prec with
+  [ OrYear d2 -> string_of_int d.year
+  | YearInt d2 -> string_of_int d.year
+  | _ -> string_of_int d.year ]
+;
 
 
 (* ************************************************************************ *)

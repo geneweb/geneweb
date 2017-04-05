@@ -2936,6 +2936,10 @@ and eval_date_field_var conf d =
       match d with
       [ Dgreg dmy _ -> VVstring (Date.year_text dmy)
       | _ -> VVstring "" ]
+  | ["year1"] ->
+      match d with
+      [ Dgreg dmy _ -> VVstring (Date.year_1_text dmy)
+      | _ -> VVstring "" ]
   | [] -> VVstring (Date.string_of_date_sep conf "<br/>" d)
   | _ -> raise Not_found ]
 and eval_place_field_var conf place =

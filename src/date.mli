@@ -17,6 +17,7 @@ value prec_text : config -> dmy -> string;
 value day_text : dmy -> string;
 value month_text : dmy -> string;
 value year_text : dmy -> string;
+value year_1_text : dmy -> string;
 value short_dates_text : config -> base -> person -> string;
 value short_marriage_date_text :
   config -> base -> family -> person -> person -> string;
