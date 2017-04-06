@@ -3676,6 +3676,10 @@ and eval_bool_person_field conf base env (p, p_auth) =
       match get_death p with
       [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
       | _ -> False ]
+  | "is_certainly_dead" ->
+      match get_death p with
+      [ OfCourseDead -> p_auth
+      | _ -> False ]
   | "is_descendant" ->
       match get_env "desc_mark" env with
       [ Vdmark r -> r.val.(Adef.int_of_iper (get_key_index p))
