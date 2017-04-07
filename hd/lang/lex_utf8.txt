@@ -14310,3 +14310,7 @@ fr: sans date
     custom event
 en: custom event
 fr: événement personnalisé
+
+    remove last module
+en: remove the last added module
+fr: retirer le dernier module ajouté

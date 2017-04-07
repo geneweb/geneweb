@@ -19,68 +19,28 @@
     <script src=%if;(cgi)%bvar.static_path;%end;bootstrap.min.js></script>
   %end;
 %end;
+<script>
+$('#load_once_p_mod').one('click', function() {
+  $.getScript('%if;(cgi)%bvar.static_path;%end;p_mod.js');
+});
+</script>
 %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"))
   <script>
   function reloadClose()
-  {
-    window.opener.location.reload();
+  { window.opener.location.reload();
     parent.close();
   }
   var htmlTitle = document.title;
   if
-  (
-    htmlTitle == "[*person modified]" ||
+  ( htmlTitle == "[*person modified]" ||
     htmlTitle == "[*family modified]" ||
     htmlTitle == "[*person added]" ||
     htmlTitle == "[*family added]"
   )
-  {
-    if (window.opener && !window.opener.closed)
-    {
-      document.getElementById("x_trl").innerHTML ="<a class=\"btn btn-secondary\" id=\"reload_close\" href=\"javascript:reloadClose()\" role=\"button\" title=\"Close\">X</a>";
-      document.getElementById("copyr").innerHTML = ""; %( hide copyr on those pages temporary %)
+  { if (window.opener && !window.opener.closed)
+    { document.getElementById("x_trl").innerHTML ="<a class=\"btn btn-secondary\" id=\"reload_close\" href=\"javascript:reloadClose()\" role=\"button\" title=\"Close\">X</a>";
       document.getElementById("reload_close").focus();
     }
   }
-  </script>
-%end;
-<script>
-$(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
-});
-</script>
-
-%( build p_mod input by clicking on module buttons %)
-%if;(evar.p_mod!="" or evar.p!="" or evar.n!="");
-  <script>
-    %for;i;1;27;
-      %let;m_nam;%apply;get_mod_nam%with;%apply;letter(i)%end;%in;
-      %if;("m_nam"!="" and m_nam!="")
-        %let;m_ltr;%apply;letter(i)%in;
-        %let;m_opt_nb;%apply;get_mod_opt(m_ltr)%in;
-        %let;m_opt_nb;%if;(m_opt_nb="")1%else;%m_opt_nb;%end;%in;
-        %for;j;0;m_opt_nb;
-          %let;k;%expr(j+1)%in;
-          %let;m_opt_nam;%apply;get_opt_nam(m_nam, k)%in;
-          $('#%m_ltr;%k;').on('click', function () {
-            var text = $('#p_mod');
-            text.val(text.val() + '%m_ltr;%k;');
-            var text = $('#p_mod_builder');
-            text.html(text.html() + '<img src="%image_prefix;/%m_nam;_%k;.jpg" width="300px">\n');
-          });
-        %end;
-      %end;
-    %end;
-    $('#zz').on('click', function () {
-      var text = $('#p_mod');
-      text.val('zz');
-    });
-    $('#p_mod-clear').on('click', function () {
-      var text = $('#p_mod');
-      text.val('');
-      var text = $('#p_mod_builder');
-      text.val('');
-      text.html('<img src="%image_prefix;/menubar_1.jpg">');
-    });
   </script>
 %end;

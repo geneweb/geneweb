@@ -14,12 +14,16 @@ img.image-popover {
 
 /* “Center” p_mod dropdown in menubar */
 .p_mod-dropdown-menu {
+  padding: 0px;
+  border: 0px;
   left: 38%;
   right: auto;
   transform: translateX(-38%);
 }
 
 .p_mod-dropdown-menu-wizard {
+  padding: 0px;
+  border: 0px;
   left: 20%;
   right: auto;
   transform: translateX(-20%);
