@@ -1,4 +1,4 @@
-<!-- perso.utils -->
+<!-- perso_utils v7.00 07/04/2017 03:18:52 -->
 %let;central_index;%index;%in;
 %let;central_person;%first_name_key_strip;%sp;%surname_key_strip;%in;
 
@@ -787,78 +787,13 @@
 
 %define;get_templ(tplnum)
   %let;templ;perso_module/%bvar.perso_module_tplnum;%in
-  %(Template : %templ;, tplnum<br>%)
   %apply;show_templ(templ)
 %end;
 
 %define;get_mod(modnum, optx)
   %let;modx;perso_module/%bvar.perso_module_modnum;%in;
   %let;op_m;optx%in;
-  %(Module : %modx;, %op_m;<br>%)
   %apply;show_templ(modx)
-%end;
-
-%define;get_mod_nam(modnum)
-  %bvar.perso_module_modnum;
-%end;
-
-<!-- Liste of module options -->
-%(%)
-%let;option_individu_1;standard%in;
-%let;option_individu_2;centered%in;
-%let;option_individu_3;two cols%in;
-%(%)
-%let;option_parents_1;simple%in;
-%let;option_parents_2;simple + photos%in;
-%let;option_parents_3;evolved%in;
-%let;option_parents_4;complete%in;
-%let;option_parents_5;complete + photos%in;
-%(%)
-%let;option_unions_1;simple%in;
-%let;option_unions_2;simple + photos%in;
-%let;option_unions_3;evolved%in;
-%let;option_unions_4;complete%in;
-%let;option_unions_5;complete + photos%in;
-%(%)
-%let;option_fratrie_1;simple%in;
-%let;option_fratrie_2;simple + photos%in;
-%let;option_fratrie_3;complete%in;
-%let;option_fratrie_4;complete + photos%in;
-%(%)
-%let;option_relations_1;simple%in;
-%let;option_relations_2;complete%in;
-%(%)
-%let;option_chronologie_1;simple%in;
-%let;option_chronologie_2;simple + events%in;
-%(%)
-%let;option_notes_1;simple%in;
-%let;option_notes_2;complete%in;
-%(%)
-%let;option_sources_1;simple%in;
-%let;option_sources_2;complete%in;
-%(%)
-%let;option_arbres_1;[ascendants tree]%in;
-%let;option_arbres_2;[horizontal tree]%in;
-%let;option_arbres_3;[compact tree]%in;
-%let;option_arbres_4;+3 -3 gen.%in;
-%(%)
-%let;option_gr_parents_1;standard%in;
-%let;option_gr_parents_2;three cols%in;
-%(%)
-%let;option_ligne_1;standard%in;
-%let;option_data_3col_1;standard%in;
-
-%( options for new modules can be defined in base.gwf %)
-%define;get_opt_nam(modnam, k)
-  %if;(bvar.option_modnam_k="" and option_modnam_k!="")
-    %option_modnam_k;
-  %else;
-    %bvar.option_modnam_k;
-  %end;
-%end;
-
-%define;get_mod_opt(ltr)
-  %bvar.options_module_ltr;
 %end;
 
 %define;test_templ(ix)
@@ -876,10 +811,3 @@
   %end;
 %end;
 %let;timeline;%if;(count>0)yes%else;no%end;%in;
-
-%(
-bvar.perso_module_tplnb : %bvar.perso_module_tplnb;<br>
-bvar.p_mod : %bvar.p_mod<br>
-evar.p_mod : %evar.p_mod<br>
-p_mod : %p_mod;<br>
-%)
