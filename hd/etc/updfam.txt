@@ -589,7 +589,7 @@ function changeCalendar(e,v,m,c) {
     </div>
   </div>
   <div class="row">
-    %if;has_fwitness;
+    %if;(evar.m!="ADD_FAM" and has_fwitness)
       %foreach;fwitness;
       <div class="col-10 push-1">
         %apply;one_witness(xcnt, wcnt)
