@@ -557,7 +557,7 @@ function changeCalendar(e,v,m,c) {
   </div>
 %end;
 
-%define;one_fevent(xcnt)
+%define;one_fevent(xcnt, has_fevents)
   <div class="row">
     <h5 class="col-form-label col-sm-2 mb-1"><label for="e_namexcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
     <div class="col-sm-3">
@@ -589,7 +589,7 @@ function changeCalendar(e,v,m,c) {
     </div>
   </div>
   <div class="row">
-    %if;has_fwitness;
+    %if;(has_fevents and has_fwitness)
       %foreach;fwitness;
       <div class="col-10 push-1">
         %apply;one_witness(xcnt, wcnt)
@@ -780,13 +780,13 @@ function changeCalendar(e,v,m,c) {
     </div>
       %if;has_fevents;
         %foreach;fevent;
-          %apply;one_fevent(cnt)
+          %apply;one_fevent(cnt, has_fevents)
           %if;is_last;
             %apply;insert_fevent(cnt)
           %end;
         %end;
       %else;
-        %apply;one_fevent("1")
+        %apply;one_fevent("1", has_fevents)
         %apply;insert_fevent("1")
       %end;
     </div>
