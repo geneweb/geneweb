@@ -2939,6 +2939,10 @@ and eval_date_field_var conf d =
               else VVstring (string_of_int dmy2.day2)
           | _ -> VVstring "" ]
       | _ -> VVstring "" ]
+  | ["julian_day"] ->
+      match d with
+      [ Dgreg dmy _ -> VVstring (string_of_int (Calendar.sdn_of_julian dmy))
+      | _ -> VVstring "" ]
   | ["month"] ->
       match d with
       [ Dgreg dmy _ -> VVstring (Date.month_text dmy)
