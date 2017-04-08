@@ -325,6 +325,10 @@ and eval_date_var_aux od =
       match eval_date_field od with
       [ Some d -> if d.day = 0 then "" else string_of_int d.day
       | None -> "" ]
+  | "julian_day" -> 
+      match eval_date_field od with
+      [ Some d ->  string_of_int (Calendar.sdn_of_julian d)
+      | None -> "" ]
   | "month" ->
       match eval_date_field od with
       [ Some d ->

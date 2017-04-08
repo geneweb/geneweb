@@ -2924,9 +2924,20 @@ and eval_date_field_var conf d =
       match d with
       [ Dgreg dmy  _ -> VVstring (quote_escaped (Date.prec_text conf dmy))
       | _ -> VVstring "" ]
+  | ["calendar"] ->
+      match d with
+      [ Dgreg _ Dgregorian -> VVstring "gregorian"
+      | Dgreg _ Djulian -> VVstring "julian"
+      | Dgreg _ Dfrench -> VVstring "french"
+      | Dgreg _ Dhebrew -> VVstring "hebrew"
+      | _ -> VVstring "" ]
   | ["day"] ->
       match d with
       [ Dgreg dmy _ -> VVstring (Date.day_text dmy)
+      | _ -> VVstring "" ]
+  | ["julian_day"] -> 
+      match d with
+      [ Dgreg dmy _ ->  VVstring (string_of_int (Calendar.sdn_of_julian dmy))
       | _ -> VVstring "" ]
   | ["month"] ->
       match d with
