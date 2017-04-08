@@ -70,7 +70,7 @@ var newHtml1 = '\
           <div class="d-inline-flex small">';
           for (var k=1; k<options[i].length; k++)
             { var image = "<img class='w-100' src='images/"+modules[i]+"_"+k+".jpg'>";
-              var html  = '<button class="btn btn-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+options[i][k]+'"\
+              var html  = '<button class="btn btn-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
                            data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"\
                            data-html="true" data-content="'+image+'">'+options[i][k]+'</button>';
               newHtml1 += html;

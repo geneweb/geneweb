@@ -52,7 +52,7 @@
                     %if;(evar.lang!="")
                       <input type="hidden" name="lang" value="%evar.lang;">
                     %end;
-                    <input type="text" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (params.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
+                    <input type="text" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (mybase.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
                     <input type="hidden" name="p" value="%first_name;">
                     <input type="hidden" name="n" value="%surname;">
                     <input type="hidden" name="oc" value="%occ;">
