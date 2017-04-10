@@ -640,7 +640,6 @@ value print_population_pyramid conf base = do {
       else Wserver.printf "&nbsp;";
     end
   in
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
   print_link_to_welcome conf True;
   let max_hum =

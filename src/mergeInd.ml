@@ -637,7 +637,6 @@ value rec try_merge conf base warning branches ip1 ip2 changes_done =
 
 value print_merged conf base wl p = do {
   let title _ = Wserver.printf "%s" (capitale (transl conf "merge done")) in
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   header conf title;
   print_link_to_welcome conf True;
   tag "ul" begin

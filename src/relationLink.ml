@@ -802,7 +802,6 @@ value print_relation conf base p1 p2 =
 ;
 
 value print conf base = do {
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   match
     (find_person_in_env conf base "1", find_person_in_env conf base "2")
   with

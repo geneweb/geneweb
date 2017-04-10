@@ -601,7 +601,6 @@ value print_all_places conf base = do {
 };
 
 value print conf base = do {
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   match
     (p_getenv conf.env "sm", p_getenv conf.env "t", p_getenv conf.env "p")
   with

@@ -591,7 +591,6 @@ value print_one_surname_by_branch conf base x xl (bhl, str) = do {
         (StrSet.elements xl)
   in
   let br = p_getint conf.env "br" in
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   header conf title;
   print_link_to_welcome conf True;
   (* Si on est dans un calcul de parenté, on affiche *)

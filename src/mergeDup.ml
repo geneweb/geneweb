@@ -24,7 +24,6 @@ value print_no_candidate conf base (ip, p) = do {
       (capitale
          (transl_decline conf "merge" (transl conf "possible duplications")))
   in
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   Hutil.header conf title;
   Hutil.print_link_to_welcome conf True;
   Wserver.printf "%s\n" (capitale (transl conf "not found"));
@@ -54,7 +53,6 @@ value print_cand_ind conf base (ip, p) (iexcl, fexcl) ip1 ip2 = do {
   let title _ =
     Wserver.printf "%s\n" (capitale (transl conf "merge"))
   in
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   tag "h2" begin title False; end;
   Hutil.print_link_to_welcome conf True;
@@ -90,7 +88,6 @@ value print_cand_fam conf base (ip, p) (iexcl, fexcl) ifam1 ifam2 = do {
       (capitale
          (transl_decline conf "merge" (transl_nth conf "family/families" 1)))
   in
-  Wserver.wrap_string.val := Util.xml_pretty_print;
   Perso.interp_notempl_with_menu title "perso_header" conf base p;
   tag "h2" begin title False; end;
   Hutil.print_link_to_welcome conf True;

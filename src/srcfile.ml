@@ -621,7 +621,6 @@ value print_start conf base =
       in
       [("sosa_ref", Vsosa_ref sosa_ref_l)]
     in
-    Wserver.wrap_string.val := Util.xml_pretty_print;
     Hutil.interp conf "welcome"
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl env = Templ.eval_transl conf;
@@ -643,7 +642,6 @@ value print_start conf base =
 (* code déplacé et modifié pour gérer advanced.txt *)
 value print conf base fname =
   if Sys.file_exists (Util.etc_file_name conf fname) then do {
-    Wserver.wrap_string.val := Util.xml_pretty_print;
     Hutil.interp conf fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl env = Templ.eval_transl conf;
