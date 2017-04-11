@@ -52,6 +52,7 @@ options[11][1] = "standard";
 modules[12] = "data_3col";
 options[12][1] = "standard";
 
+var img_prfx = $('#img_prfx').text();
 var p_mod_table = '\
 <table class="table table-sm table-hover mt-2 mb-0">\
   <thead class="thead-default">\
@@ -69,7 +70,7 @@ var p_mod_table = '\
         <td>\
           <div class="d-inline-flex small">';
           for (var k=1; k<options[i].length; k++)
-            { var image = "<img class='w-100' src='images/"+modules[i]+"_"+k+".jpg'>";
+            { var image = "<img class='w-100' src='"+img_prfx+"/"+modules[i]+"_"+k+".jpg'>";
               var button  = '<button class="btn btn-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
                            data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"\
                            data-html="true" data-content="'+image+'">'+options[i][k]+'</button>';
@@ -91,8 +92,8 @@ function upd_p_mod_build () {
     var mod = "";
     for(j=1;j<=12;j++){if (p_mod[i] == modules[j][0]){mod = modules[j];}};
     var opt = p_mod[i+1];
-    if(p_mod[0]=="z"){p_mod_build='<div id="p_mod_builder"><img id="rm" src="images/zz_1.jpg">\n';}
-    else if(opt>=1&&opt<=9){p_mod_build+='<img id="rm" src="images/'+mod+'_'+opt+'.jpg">\n';}
+    if(p_mod[0]=="z"){p_mod_build='<div id="p_mod_builder"><img id="rm" src="'+img_prfx+'/zz_1.jpg">\n';}
+    else if(opt>=1&&opt<=9){p_mod_build+='<img id="rm" src="'+img_prfx+'/'+mod+'_'+opt+'.jpg">\n';}
     else{i-=1};
   };
   p_mod_build += '</div>';
@@ -132,165 +133,165 @@ $('#p_mod_clear').on('click', function ()
 
 $('#i1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'i1');
-  $('#p_mod_builder').append('<img id="rm" src="images/individu_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_1.jpg">\n');
 });
 
 $('#i2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'i2');
-  $('#p_mod_builder').append('<img id="rm" src="images/individu_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_2.jpg">\n');
 });
 
 $('#i3').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'i3');
-  $('#p_mod_builder').append('<img id="rm" src="images/individu_3.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_3.jpg">\n');
 });
 
 $('#p1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'p1');
-  $('#p_mod_builder').append('<img id="rm" src="images/parents_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_1.jpg">\n');
 });
 
 $('#p2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'p2');
-  $('#p_mod_builder').append('<img id="rm" src="images/parents_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_2.jpg">\n');
 });
 
 $('#p3').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'p3');
-  $('#p_mod_builder').append('<img id="rm" src="images/parents_3.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_3.jpg">\n');
 });
 
 $('#p4').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'p4');
-  $('#p_mod_builder').append('<img id="rm" src="images/parents_4.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_4.jpg">\n');
 });
 
 $('#p5').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'p5');
-  $('#p_mod_builder').append('<img id="rm" src="images/parents_5.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/parents_5.jpg">\n');
 });
 
 $('#u1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'u1');
-  $('#p_mod_builder').append('<img id="rm" src="images/unions_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_1.jpg">\n');
 });
 
 $('#u2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'u2');
-  $('#p_mod_builder').append('<img id="rm" src="images/unions_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_2.jpg">\n');
 });
 
 $('#u3').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'u3');
-  $('#p_mod_builder').append('<img id="rm" src="images/unions_3.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_3.jpg">\n');
 });
 
 $('#u4').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'u4');
-  $('#p_mod_builder').append('<img id="rm" src="images/unions_4.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_4.jpg">\n');
 });
 
 $('#u5').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'u5');
-  $('#p_mod_builder').append('<img id="rm" src="images/unions_5.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/unions_5.jpg">\n');
 });
 
 $('#f1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'f1');
-  $('#p_mod_builder').append('<img id="rm" src="images/fratrie_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_1.jpg">\n');
 });
 
 $('#f2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'f2');
-  $('#p_mod_builder').append('<img id="rm" src="images/fratrie_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_2.jpg">\n');
 });
 
 $('#f3').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'f3');
-  $('#p_mod_builder').append('<img id="rm" src="images/fratrie_3.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_3.jpg">\n');
 });
 
 $('#f4').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'f4');
-  $('#p_mod_builder').append('<img id="rm" src="images/fratrie_4.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/fratrie_4.jpg">\n');
 });
 
 $('#r1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'r1');
-  $('#p_mod_builder').append('<img id="rm" src="images/relations_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/relations_1.jpg">\n');
 });
 
 $('#r2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'r2');
-  $('#p_mod_builder').append('<img id="rm" src="images/relations_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/relations_2.jpg">\n');
 });
 
 $('#c1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'c1');
-  $('#p_mod_builder').append('<img id="rm" src="images/chronologie_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/chronologie_1.jpg">\n');
 });
 
 $('#c2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'c2');
-  $('#p_mod_builder').append('<img id="rm" src="images/chronologie_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/chronologie_2.jpg">\n');
 });
 
 $('#n1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'n1');
-  $('#p_mod_builder').append('<img id="rm" src="images/notes_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/notes_1.jpg">\n');
 });
 
 $('#n2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'n2');
-  $('#p_mod_builder').append('<img id="rm" src="images/notes_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/notes_2.jpg">\n');
 });
 
 $('#s1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'s1');
-  $('#p_mod_builder').append('<img id="rm" src="images/sources_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/sources_1.jpg">\n');
 });
 
 $('#s2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'s2');
-  $('#p_mod_builder').append('<img id="rm" src="images/sources_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/sources_2.jpg">\n');
 });
 
 $('#a1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a1');
-  $('#p_mod_builder').append('<img id="rm" src="images/arbres_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_1.jpg">\n');
 });
 
 $('#a2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a2');
-  $('#p_mod_builder').append('<img id="rm" src="images/arbres_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_2.jpg">\n');
 });
 
 $('#a3').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a3');
-  $('#p_mod_builder').append('<img id="rm" src="images/arbres_3.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_3.jpg">\n');
 });
 
 $('#a4').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a4');
-  $('#p_mod_builder').append('<img id="rm" src="images/arbres_4.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_4.jpg">\n');
 });
 
 $('#g1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'g1');
-  $('#p_mod_builder').append('<img id="rm" src="images/gr_parents_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/gr_parents_1.jpg">\n');
 });
 
 $('#g2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'g2');
-  $('#p_mod_builder').append('<img id="rm" src="images/gr_parents_2.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/gr_parents_2.jpg">\n');
 });
 
 $('#l1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'l1');
-  $('#p_mod_builder').append('<img id="rm" src="images/ligne_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/ligne_1.jpg">\n');
 });
 
 $('#d1').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'d1');
-  $('#p_mod_builder').append('<img id="rm" src="images/data_3col_1.jpg">\n');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/data_3col_1.jpg">\n');
 });
