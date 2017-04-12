@@ -895,6 +895,14 @@ value treat_request conf base = do {
   [ (Some s, _, _) -> print_moved conf base s
   | (_, Some "no_index", _) -> print_no_index conf base
   | (_, _, Some "IM") -> Image.print conf base
+  | (_, _, Some "DOC") -> 
+    match p_getenv conf.env "s" with
+    [ Some f ->
+      if String.sub f (String.length f - 4) 4 = ".txt" then
+        (* remove the .txt ext as needed by Srcfile.print_source *)
+        let f = String.sub f 0 (String.length f - 4) in
+          Srcfile.print_source conf base f
+      else Image.print conf base ]  
   | _ ->
       do {
         set_owner conf;
