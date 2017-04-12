@@ -176,14 +176,15 @@ value any_lang_file_name fname =
 value source_file_name conf fname =
   let bname = conf.bname in
   let lang = conf.lang in
+  (* TODO deal with Filename.basename to handle sub_dirs *)
   let fname1 =
     List.fold_right Filename.concat [Util.base_path ["src"] bname; lang]
-      (fname ^ ".txt")
+      (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
     Filename.concat (Util.base_path ["src"] bname)
-      (fname ^ ".txt")
+      (Filename.basename fname ^ ".txt")
 ;
 
 value digit =
