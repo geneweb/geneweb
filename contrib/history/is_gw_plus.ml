@@ -21,7 +21,9 @@ value test_history fname pos =
             let _ = List.length v.gen_p.pevents in
             ()
           }
-        with [ End_of_file -> () ];
+        with
+          [ End_of_file -> ()
+          | Failure "input_value: truncated object" -> () ];
         close_in ic
       }
   | None -> () ]

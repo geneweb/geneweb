@@ -107,6 +107,7 @@ value load_old_person_history_both2 fname = do {
               }
             with 
             [ End_of_file -> raise End_of_file
+            | Failure "input_value: truncated object" -> raise End_of_file
             | x -> 
                 do {
                   seek_in ic last_pos;
@@ -117,7 +118,9 @@ value load_old_person_history_both2 fname = do {
                 }]
           in
           loop (pos_in ic)
-        with [ End_of_file -> () ];
+        with
+          [ End_of_file -> ()
+          | Failure "input_value: truncated object" -> () ];
         close_in ic
       }
   | None -> () ];

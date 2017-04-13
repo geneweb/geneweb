@@ -43,8 +43,10 @@ value next_family_fun_templ gwo_list fi = do {
         match ic_opt.val with
         [ Some ic ->
             match
-              try Some (input_value ic : gw_syntax) with
-              [ End_of_file -> None ]
+              try Some (input_value ic : gw_syntax)
+              with
+                [ End_of_file -> None
+                | Failure "input_value: truncated object" -> None ]
             with
             [ Some fam -> Some fam
             | None -> do {
