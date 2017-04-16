@@ -490,8 +490,18 @@ value family_m conf base =
   | Some "LD" when conf.wizard || conf.friend ->
       BirthDeath.print_death conf base
   | Some "LINKED" ->
+      let o_fn = match p_getenv conf.env "old_fn" with
+          [ Some v -> v
+          | None -> ""] in
+      let o_oc = int_of_string 
+        (match p_getenv conf.env "old_occ" with
+          [ Some v -> v
+          | None -> "0"]) in
+      let o_sn = match p_getenv conf.env "old_sn" with
+          [ Some v -> v
+          | None -> ""] in
       match find_person_in_env conf base "" with
-      [ Some p -> Perso.print_what_links conf base p
+      [ Some p -> Perso.print_what_links conf base p o_fn o_oc o_sn
       | _ -> very_unknown conf ]
   | Some "LL" -> BirthDeath.print_longest_lived conf base
   | Some "LM" when conf.wizard || conf.friend ->
