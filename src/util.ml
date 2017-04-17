@@ -41,8 +41,16 @@ value search_in_lang_path = search_in_path Secure.lang_path;
 
 value start_with_vowel s =
   if String.length s > 0 then
-    match Char.lowercase s.[0] with
-    [ 'a' | 'e' | 'i' | 'o' | 'u' -> True
+    let c = 
+      match s.[0] with
+        [ '<' -> let k = String.index_from s 0 '>' in
+                try String.get (fst (Name.unaccent_utf_8 True s (k+1))) 0
+                  with [ Invalid_argument "index out of bounds" -> ' ' ]
+        | _ ->  try String.get (fst (Name.unaccent_utf_8 True s 0 )) 0
+                  with [ Invalid_argument "index out of bounds" -> ' ' ]]
+    in
+    match c with
+    [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' -> True
     | _ -> False ]
   else False
 ;
@@ -243,13 +251,14 @@ value gen_decline2 wt s1 s2 =
             | None -> (":", i) ]
         | '[' ->
             try
+              let k = String.index_from wt i '|' in
               let j = String.index_from wt i ']' in
-              if j + 2 < len && wt.[j + 1] = '%' then
+              if k < j && j + 2 < len && wt.[j + 1] = '%' then
                 match string_of wt.[j + 2] with
                 [ Some s ->
                     let s =
-                      if start_with_vowel s then String.make 1 wt.[j - 1] ^ s
-                      else String.sub wt (i + 1) (j - i - 2) ^ " " ^ s
+                      if start_with_vowel s then String.sub wt (k+1) (j-k-1) ^ s (* [aa|bb]  *)
+                      else String.sub wt (i + 1) (k-i-1) ^ s                     (* i  k  j  *)
                     in
                     (s, j + 2)
                 | None -> raise Not_found ]
@@ -263,6 +272,9 @@ value gen_decline2 wt s1 s2 =
   (*surtout pas ! Translate.eval*) (loop 0)
 ;
 
+value transl_a_to_b conf x y =
+  gen_decline2 (transl_nth conf "%1 to %2" 0) x y
+;
 value transl_a_of_b conf x y =
   gen_decline2 (transl_nth conf "%1 of %2" 0) x y
 ;
@@ -662,7 +674,6 @@ value is_public conf base p =
   is_old_person conf (gen_person_of_person p)
 ;
 
-
 (* ********************************************************************** *)
 (*  [Fonc] accessible_by_key :
              config -> base -> person -> string -> string -> bool         *)
@@ -878,7 +889,7 @@ value main_title conf base p =
 
 (* *********************************************************************** *)
 (*  [Fonc] titled_person_text : config -> base -> person -> istr gen_title *)
-(** [Description] : Renvoie la chaÓne de caractère de la personne en
+(** [Description] : Renvoie la chaîne de caractère de la personne en
                     fonction de son titre.
     [Args] :
       - conf : configuration de la base
@@ -894,7 +905,7 @@ value titled_person_text conf base p t =
     let surname = p_surname base p in
     let elen = String.length estate in
     let slen = String.length surname in
-    (* Si le nom de l'individu est le mÍme que son domaine, on renvoie : *)
+    (* Si le nom de l'individu est le même que son domaine, on renvoie : *)
     (*   - le nom du titre                                               *)
     (*   - le nom du titre et le premier sobriquet                       *)
     (*   - le nom de la personne (donné par son nom de domaine) en       *)
@@ -937,7 +948,7 @@ value titled_person_text conf base p t =
 
 (* *********************************************************************** *)
 (*  [Fonc] one_title_text : config -> base -> person -> istr gen_title     *)
-(** [Description] : Renvoie la chaÓne de caractère du titre ainsi que le
+(** [Description] : Renvoie la chaîne de caractère du titre ainsi que le
                     domaine.
     [Args] :
       - conf : configuration de la base
@@ -950,7 +961,7 @@ value titled_person_text conf base p t =
 value one_title_text conf base p t =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
-  let s = if place = "" then s else s ^ " " ^ place in " <em>" ^ s ^ "</em>"
+  let s = if place = "" then s else s ^ " " ^ place in ", <em>" ^ s ^ "</em>"
 ;
 
 value geneweb_link conf href s =
@@ -1006,7 +1017,7 @@ value update_family_loop conf base p s =
     let res = loop [] list in
     if conf.wizard then
       (* Si il n'y a pas d'ambiguité, i.e. pas 2 boucles dans 2 familles *)
-      (* pour un mÍme individu, alors on renvoit le lien vers la mise à  *)
+      (* pour un même individu, alors on renvoit le lien vers la mise à  *)
       (* jour de la famille, sinon, un lien vers le menu de mise à jour. *)
       if List.length res = 1 then
         let iper = string_of_int (Adef.int_of_iper iper) in
@@ -1220,7 +1231,7 @@ value string_of_fevent_name conf base efam_name =
 
 value string_of_witness_kind conf p witness_kind =
   match witness_kind with
-  [ Witness -> transl_nth conf "witness/witness/witnesses" 0
+  [ Witness -> transl_nth conf "witness/witnesses" 0
   | Witness_Officer -> transl_nth conf "officer/officer/officers" 0
   | Witness_GodParent ->
       let n = index_of_sex (get_sex p) in
@@ -2330,13 +2341,13 @@ value first_child conf base p =
 (** [Description] : Permet d'afficher des informations supplémentaires sur la
       personne en cas d'homonymes (par exemple sur la recherche par ordre
       alphabétique).
-      L'affichage se fait de faÁon similaire à gen_person_text, i.e. en
+      L'affichage se fait de façon similaire à gen_person_text, i.e. en
       fonction du nom publique et sobriquet si on valorise le paramètre
       specify_public_name à True :
         * Louis VI le gros (nom publique sobriquet)
         * Louis le gros    (prénom sobriquet)
         * Louis VI         (nom publique)
-        * Louis Capétiens, fils de Philippe et Berthe, marié avec AdèlaÔde,
+        * Louis Capétiens, fils de Philippe et Berthe, marié avec Adélaïde,
             père de Philippe
     [Args] :
       - conf : configuration

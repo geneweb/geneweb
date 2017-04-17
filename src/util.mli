@@ -151,6 +151,7 @@ value transl : config -> string -> string;
 value transl_nth : config -> string -> int -> string;
 value transl_decline : config -> string -> string -> string;
 value transl_a_of_b : config -> string -> string -> string;
+value transl_a_to_b : config -> string -> string -> string;
 value transl_a_of_gr_eq_gen_lev : config -> string -> string -> string;
 value ftransl : config -> format2 'a 'b -> format2 'a 'b;
 value ftransl_nth : config -> format2 'a 'b -> int -> format2 'a 'b;
