@@ -17,7 +17,7 @@ changements par rapport aux versions precedentes.
 
      -----------------
 
-GeneWeb est Copyright (c) 1998-2016 INRIA.
+GeneWeb est Copyright (c) 1998-2017 INRIA.
 Créateur d'origine Daniel de Rauglaudre
 
 Remarques, suggestions, questions, rapports d'erreur sur:

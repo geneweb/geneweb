@@ -118,7 +118,7 @@ value trailer conf =
     Wserver.printf "<hr />\n";
     Wserver.printf "<div>\n";
     Wserver.printf "<em>\n";
-    Wserver.printf "<a href=\"https://github.com/geneweb/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2016\n</em>\n" Version.txt;
+    Wserver.printf "<a href=\"https://github.com/geneweb/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2017\n</em>\n" Version.txt;
     Wserver.printf "</div>\n" ;
     Wserver.printf "</div>\n" ;
     (* finish the html page *)
