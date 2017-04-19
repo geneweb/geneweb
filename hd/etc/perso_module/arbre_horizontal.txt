@@ -234,7 +234,7 @@
       <div class="form-inline">
         <div class="btn-group mx-2">
           %for;i;1;7;
-            <a class="btn btn-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
+            <a class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
               href="%apply;rebuild_url%with;%expr(i)%and;%twidth;%and;%evars;%end" %nn;
               title="%if;(evarvh!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end;">%i;</a>
@@ -242,18 +242,18 @@
         </div>
         <div class="mx-2">
           %if;(evars=1)
-            <a href="%apply;rebuild_url(evarvh,twidth,0)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [n° Sosa]">Sosa <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url(evarvh,twidth,0)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [n° Sosa]">Sosa <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url(evarvh,twidth,1)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [n° Sosa]">Sosa <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url(evarvh,twidth,1)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [n° Sosa]">Sosa <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
         <div class="input-group mx-2">
           <span class="input-group-btn">
-            %if;(evar.twidth>=6)<a href="%apply;rebuild_url%with;%expr(evarvh)%and;%expr(twidth-2)%and;%evars;%end" class="btn btn-secondary btn-sm" title="- 2 ([width])">-</a>%end;
+            %if;(evar.twidth>=6)<a href="%apply;rebuild_url%with;%expr(evarvh)%and;%expr(twidth-2)%and;%evars;%end" class="btn btn-outline-secondary btn-sm" title="- 2 ([width])">-</a>%end;
           </span>
           <input class="form-control form-control-sm text-center col-3" value="%twidth; ─" title="[*width]" disabled>
           <span class="input-group-btn">
-            <a href="%apply;rebuild_url%with;%expr(evarvh)%and;%expr(twidth+2)%and;%evars;%end" class="btn btn-secondary btn-sm" title="+ 2 ([width])">+</a>
+            <a href="%apply;rebuild_url%with;%expr(evarvh)%and;%expr(twidth+2)%and;%evars;%end" class="btn btn-outline-secondary btn-sm" title="+ 2 ([width])">+</a>
           </span>
         </div>
       </div>

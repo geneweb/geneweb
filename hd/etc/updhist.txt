@@ -17,7 +17,7 @@
 %define;search_form(xxx)
   %if;(wizard or friend)
     <form method="get" action="%action;">
-      <div class="col-6 form-group form-inline">
+      <div class="form-group form-inline">
         %hidden;
         <input type="hidden" name="m" value="HIST_SEARCH"%/>
         <input type="hidden" name="k" value="%evar.k;"%/>
@@ -26,15 +26,17 @@
         %end;
         <div class="input-group">
           <input type="text" class="form-control" placeholder="[*search/case sensitive]0" 
-           name="s" size="30" maxlength="40" value="%evar.s.ns;"%/><br>
+                 name="s" size="30" maxlength="40" value="%evar.s.ns;"%/>
           <span class="input-group-btn">
-            <button type="submit" class="btn btn-default">Ok</button>
+            <button type="submit" class="btn btn-outline-secondary" title="[*validate/delete]0">OK</button>
           </span>
         </div>
-        <div class="checkbox">
-        <label><input type="checkbox" name="c" value="on"%nn;
-         %if;("main" != "true" and evar.c = "on") checked="checked"%end;
-         %/>%sp;[search/case sensitive]1</label>
+        <div class="form-check ml-2">
+          <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" name="c" value="on"%nn;
+              %if;("main" != "true" and evar.c = "on")checked%end;>
+            [search/case sensitive]1
+          </label>
         </div>
       </div>
     </form>
@@ -44,27 +46,18 @@
 %let;kk;%if;(evar.k = "")3%else;%evar.k%end;%in;
 %let;wiz;%if;(evar.wiz != "" and evar.n = "")%evar.wiz;%end;%in;
 %define;table()
-  <table class="table table-hover">
+  <table class="table table-sm table-hover">
     <thead class="thead-default">
       <tr>
-        %if;(bvar.history_diff = "yes")<th>[*history]</th>%end
         <th>[*date/dates]0</th>
         <th>[*person/persons]0</th>
         <th>[*wizard/wizards/friend/friends/exterior]0</th>
         <th>[*update]</th>
+        %if;(bvar.history_diff = "yes")<th class="text-center"><i class="fa fa-history fa-fw text-dark" title="[*history]"></i></th>%end
       </tr>
     </thead>
     %foreach;history_line(kk, evar.pos, wiz)
       <tr>
-        %if;(bvar.history_diff = "yes")
-          <td>
-            %if;(first_name != "" and person.has_history)
-              <a href="%prefix;m=HIST_DIFF;t=SUM;f=%person.history_file;">[history]</a>
-            %else;
-              &nbsp;
-            %end;
-          </td>
-        %end;
         <td>%time;</td>
         <td>
           %if;(first_name != "")
@@ -98,6 +91,17 @@
           %end;
         </td>
         <td>%apply;update_text(update.var)</td>
+        %if;(bvar.history_diff = "yes")
+          <td class="text-center">
+            %if;(first_name != "" and person.has_history)
+              <a href="%prefix;m=HIST_DIFF;t=SUM;f=%person.history_file;">
+                <i class="fa fa-history fa-fw" aria-hidden="true" title="[*visualize/show/hide/summary]1 [history]"></i>
+                <span class="sr-only">[history]</span></a>
+            %else;
+              &nbsp;
+            %end;
+          </td>
+        %end;
       </tr>
     %end;
   </table>
@@ -129,13 +133,13 @@
 
 %define;nav()
   %if;(pos != "")
-   <div class="form-group form-inline push-right">
+   <div class="form-group form-inline">
      <form method="get" action="%action;">
          %hidden;
          <input type="hidden" name="m" value="HIST">
          <input type="number" class="form-control" name="k" min="10" max="1000" step="10" value="%kk;" title="number of rows">
          <input type="hidden" name="pos" value="%pos;">
-         <button type="submit" class="btn btn-secondary">&gt;&gt;</button>
+         <button type="submit" class="btn btn-outline-secondary" title="[validate]"><i class="fa fa-forward fa-fw"></i></button>
          %if;(wiz != "")
            <input type="hidden" name="wiz" value="%wiz;">([wizard/wizards/friend/friends/exterior]0[:] %wiz;)
          %end;
@@ -144,28 +148,32 @@
   %end;
 %end;
 
-<h1>[*history of updates]</h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-right mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
-  </div>
-%end;
+<div class="d-flex justify-content-between">
+  <h1>[*history of updates]</h1>
+  %if;not cancel_links;
+    <div class="btn-group float-right mt-3">
+      %if;(referer != "")
+        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
+      %end;
+      <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
+    </div>
+  %end;
+</div>
 
 %if;(not cancel_links and (evar.m != "HIST_SEARCH" or not found))
-  %apply;search_form("")
-  <div class="hidden-xs-up">%apply;table()</div>
-  %apply;nav()
+  <div class="d-flex justify-content-between mt-2 px-1">
+    <div class="order-1">%apply;search_form("")</div>
+    <div class="d-none order-3">%apply;table()</div>
+    <div class="order-2">%apply;nav()</div>
+  </div>
 %end;
-
-%apply;table()
+<div class="px-1">%apply;table()<div>
 
 %if;(evar.m = "HIST_SEARCH" and found)
-  %apply;search_form("left")
-  %apply;nav()
+  <div class="d-flex justify-content-between px-1">
+    %apply;search_form("left")
+    %apply;nav()
+  </div>
 %end;
 
 %include.trl;

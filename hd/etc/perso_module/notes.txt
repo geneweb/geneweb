@@ -1,7 +1,7 @@
 <!-- $Id: perso_module/notes.txt v 7.00 15/01/2017 20:07:23 hg -->
 %( op_m=1 Notes and marriage comments %)
 %( op_m=2 Notes and event notes (+comments for marriages) %)
-%let;op_m;%if;(has_families or bvar.display_timeline="yes")%if;(op_m!="")%op_m;%else;1%end;%else;2%end;%in;
+%let;op_m;%if;(op_m!="")%op_m;%else;%if;(has_families or bvar.display_timeline="yes")1%end;%else;2%end;%in;
 
 %reset_count;
 %if;has_linked_page.BNOTE;%incr_count;%end;
@@ -12,51 +12,50 @@
 %if;has_burial_note;%incr_count;%end;
 %if;has_linked_page.NOTE;%incr_count;%end;
 %foreach;event;
-    %if;event.has_note;%incr_count;%end;
+  %if;event.has_note;%incr_count;%end;
 %end;
+%reset_count2;
 %foreach;family;
-  %if;has_comment;%incr_count;%end;
-  %if;has_marriage_note;%incr_count;%end;
+  %if;has_comment;%incr_count2;%end;
+  %if;has_marriage_note;%incr_count2;%end;
 %end;
 
 %define;link_pages()
-  <div id ="link_pages">
   %if;(not cancel_links and has_linked_pages)
-    (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
+    <div id ="link_pages" class="ml-auto d-flex align-items-center">
+      (<a href="%prefix;m=LINKED;%access;">[linked pages]</a>)
+    </div>
   %end;
-  </div>
 %end;
 
-%if;(count>0 and op_m=1 and (wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
+%if;(op_m=1 and (wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
       (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
-  <div class="d-flex justify-content-end">
-    <h2 class="my-1 mr-auto">[*note/notes]1</h2>
-    %apply;link_pages()
-  </div>
-  <h3 class="my-1">[*individual notes]</h3>
-  %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
-    <p>%apply;capitalize(linked_page.BNOTE).</p>
+  %if;(count>0 or has_linked_page.BNOTE and linked_page.BNOTE!="")
+    <div class="d-flex justify-content-start">
+      <h2 class="mt-2">[*individual notes]</h2>
+      %apply;link_pages()
+    </div>
+    %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
+      <p>%apply;capitalize(linked_page.BNOTE).</p>
+    %end;
+    <div class="ml-3">
+      %notes;
+    </div>
   %end;
-  <div class="ml-4">
-    %notes;
- </div>
-
-  %if;has_families;
+  %if;(count2>0 and has_families)
     %( On remet les compteurs à zéro, on démarre à 1 - synchro avec unions.txt %)
     %reset_count;
     %foreach;family;
       %incr_count;
-      %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment) 
-        %if;((count=1) and ((wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
-            (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))) 
-          <h3>%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h3>
-        %elseif;(count=1)
-          <h2>%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h3>
+      %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
+        %if;(count=1 and (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
+          <h2>%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h2>
         %end;
-        <dl> 
+        <dl>
           <dt>
+            <a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0">^</a>
             %if;(nb_families>1)%apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end; %spouse.first_name; %spouse.surname;
-            [:]<a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0">^</a>
+            [:]
           </dt>
           <dd>%comment;</dd>
         </dl>
@@ -66,13 +65,13 @@
   %if;(has_linked_page.NOTE and linked_page.NOTE!="")
     <p>%apply;capitalize(linked_page.NOTE).</p>
   %end;
-%elseif;(count>0 and op_m=2)
+%elseif;(count>0 or count2>0 and op_m=2)
   <h3 id="notes" class="mt-2">[*note/notes]1</h3>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
       <blockquote>%apply;capitalize(linked_page.BNOTE).</blockquote>
     %end;
     %if;has_notes;
-      <h3>[*individual notes]</h3>
+      <h2>[*individual notes]</h2>
       <blockquote>%notes;</blockquote>
     %end;
     %if;has_birth_note;

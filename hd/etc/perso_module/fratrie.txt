@@ -42,7 +42,7 @@
 %end;
 
 %if;(has_parents and has_siblings)
-  <h2>
+  <h2 class="mt-2 mt-lg-0">
     %if;(bvar.full_siblings="yes")
       [*full siblings]%nn;
     %else;
@@ -57,11 +57,11 @@
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on"><img class="mx-1" src="%image_prefix;/gui_create.png" height="18" style="margin-bottom:6px" alt="Tree"
-        title="[*tree] ([with] [spouse/spouses]1)"/></a>%nn;
+      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on"><img class="ml-2" src="%image_prefix;/gui_create.png" height="18" style="margin-bottom:6px" alt="Tree"
+        title="[*tree] [siblings] ([with] [spouse/spouses]1)"/></a>%nn;
       %if;((p_mod="" or p_mod="zz") and has_parents)
         %if;(not cancel_links)
-          <a class="" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [ascendants tree]">%nn;
+          <a class="d-none d-inline d-lg-none ml-1 ml-lg-0" data-toggle="collapse" href="#collapse_3gen_photo" aria-expanded="false" aria-controls="collapseExample2" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [ascendants tree]">%nn;
             <sup><i class="fa fa-caret-up text-success"></i></sup></a>
         %end;
       %end;

@@ -131,8 +131,7 @@ function no_options () {
         <input type="radio" name="t" value="N" checked onclick="no_options()"%/> <span class="fa fa-align-left fa-fw"></span> [*short display]*
       </label>
       </div>
-%( Positionne directement l'affiche du numéro sosa en base 10 %)
-%(
+%( Positionne directement l'affiche du numéro sosa en base 10 
       <div>
         Sosa base
         <label><input type="radio" class="form-control" name="sosab" value="8"%/>8</label>
@@ -143,7 +142,7 @@ function no_options () {
       <label>
         <input type="radio" name="t" value="G" onclick="long_display_options()"%/> <span class="fa fa-align-justify fa-fw"></span> [*long display]*
       </label>
-      <div class="offset-1">
+      <div class="ml-4">
         <p>
           <label>
             <input type="checkbox" id="ld_siblings" name="siblings"/> [*siblings]
@@ -182,7 +181,7 @@ function no_options () {
       <label>
         <input type="radio" name="t" value="Z" onclick="table_options()"%/> <span class="fa fa-table fa-fw"></span> [*table]*
       </label>
-      <div class="offset-1">
+      <div class="ml-4">
       <p>
         <label>
           <input type="checkbox" id="t_title" name="title" value="on"%/>
@@ -253,7 +252,7 @@ function no_options () {
       <label>
         <input type="radio" name="t" value="P" onclick="book_of_ascendants_options()"%/> <span class="fa fa-newspaper-o fa-fw"></span> [*book of ascendants]
       </label>
-      <div class="offset-1">
+      <div class="ml-4">
       <p>
         <label>
           <input type="checkbox" id="boa_person"%/>
@@ -336,7 +335,7 @@ function no_options () {
         <input type="radio" name="t" value="C" onclick="no_options()"%/> <span class="fa fa-female fa-fw"></span> [*male line/female line]1
       </label>
       <br%/>
-      <div class="offset-1">
+      <div class="ml-4">
         <label>
           <input type="checkbox" name="image" value="on"%/>
           [*image/images]1
@@ -404,7 +403,7 @@ function no_options () {
       <label>
         <input type="radio" name="t" value="M" onclick="missing_ancestors_options()"%/> <span class="fa fa-question fa-fw"></span> [*missing ancestors]
       </label>
-      <div class="offset-1">
+      <div class="ml-4">
         <label>
           <input type="checkbox" id="ma_birth" name="birth" value="on"%/>
           [*birth date and birth place]
@@ -432,7 +431,7 @@ function no_options () {
       <label>
         <input type="radio" name="t" value="M" onclick="missing_events_options()"%/> <span class="fa fa-question fa-fw"></span> [*missing events]
       </label>
-      <div class="offset-1">
+      <div class="ml-4">
         <input type="hidden" name="evt" value="on"%/>
         <label>
           <input type="checkbox" name="marr" value="on"%/>
@@ -482,7 +481,7 @@ function no_options () {
             </option>
           %end;
         </select>
-        <button type="submit" class="btn btn-secondary">Ok</button>
+        <button type="submit" class="btn btn-outline-secondary">Ok</button>
       </div>
     </div>
   </div>

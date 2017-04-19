@@ -1,4 +1,4 @@
-<!-- $Id: menubar.txt,v 7.00 10/04/2017 01:29:49 -->
+<!-- $Id: menubar.txt v7.00 11/08/2017 15:35:40 -->
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*send::image/images]0 (I)" accesskey="I"%in;
@@ -23,307 +23,369 @@
   %end;
 %end;
 %if;(not cancel_links)
-  <div class="d-flex justify-content-between">
-    <div class="float-left mt-3 btn-group">
-      %if;(not cancel_links and (evar.p!="" or evar.i!="") and (p_mod="" or p_mod="zz") and evar.m!="MOD_IND" and evar.m!="MOD_FAM" and has_parents and (father.has_parents or mother.has_parents))
-          <a data-toggle="collapse" href="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 module">
-            <i class="fa fa-list fa-fw ml-2 align-middle"></i>
-          </a>
-      %end;
-    </div>
-    <nav class="navbar navbar-light %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK")mt-4%end;" style="background-color: white">
-      <ul class="nav nav-tabs">
-        %if;(not(bvar.wizard_just_friend = "yes") and wizard)
-          %if;(not has_parents and first_name != "?" and surname != "?")
-            <li class="nav-item">
-              <a class="nav-link %if;(evar.m="ADD_PAR")active%end;" id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;><sup></span><span class="fa fa-user male"></sup><sub><span class="fa fa-plus %sexcolor;"></span></sub><sup><span class="fa fa-user female"></span></sup> </a>
-            </li>
-          %end;
-        %end;
-        <li class="nav-item">
-          <a class="nav-link %if;(evar.m="")active%end;" href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;"><span class="fa fa-user fa-fw %sexcolor;"></span></a>
-        </li>
-        %( personnal modules selection menu %)
-        <li class="nav-item dropdown">
-          <a id="load_once_p_mod" class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
-          <div class="dropdown-menu p_mod-dropdown-menu%if;(wizard)-wizard%end;">
-            <div class="d-inline-flex">
-              <form class="form-control" name="upd_url" method="get" action="%action;">
-                <div class="invisible" id="img_prfx">%image_prefix;</div>
-                <div class="d-flex justify-content-start">
-                  %apply;input_hidden("evar.b","b")
-                  %apply;input_hidden("evar.lang","lang")
-                  <div class="input-group">
-                    <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (%base.name;.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
-                    <span class="input-group-btn">
-                      <button type="submit" class="btn btn-secondary" title="[*validate/delete]0"><i class="fa fa-check fa-lg text-success"></i></button>
-                    </span>
-                    <span class="input-group-btn">
-                      <button type="button" class="btn btn-secondary" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-close fa-lg text-danger"></i></button>
-                    </span>
-                  </div>
-                  %apply;input_hidden("first_name","p")
-                  %apply;input_hidden("surname","n")
-                  %if;(evar.oc!=0)
-                    %apply;input_hidden("occ","oc")
-                  %end;
-                  %apply;input_hidden("evar.v","v")
-                  %apply;input_hidden("evar.image","image")
-                  %apply;input_hidden("evar.marriage","marriage")
-                  %apply;input_hidden("evar.mar_sp_ch","mar_sp_ch")
-                  %apply;input_hidden("evar.evt_pr_sib","evt_pr_sib")
-                  %apply;input_hidden("evar.simple","simple")
-                  <button type="button" class="btn btn-secondary ml-2" id="p_mod_rm" title="[*remove last module]" value="%bvar.p_mod;"><i class="fa fa-backward text-danger"></i></button>
-                  %if;(bvar.p_mod!="")
-                    <button type="button" class="btn btn-secondary ml-2" id="p_mod_bvar" title="[*visualize/show/hide/summary]1/[modify] p_mod=%bvar.p_mod (%base.name;.gwf)" value="%bvar.p_mod;"><i class="fa fa-plus"></i></button>
-                  %end;
-                  <button type="submit" class="btn btn-secondary ml-2 mr-1"
-                          value="X" id="zz" title="default"
-                          data-toggle="popover" data-trigger="hover" data-placement="bottom"
-                          data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
-                </div>
-                <p class="mx-2 mt-2">
-                [
-en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear (maximum 15 modules).
-fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules (maximum 15 modules).
-                ]
-                </p>
-                <div id="p_mod_table"></div>
-              </form>
-              <div class="form-control">
-                <img src="%image_prefix;/menubar_1.jpg" alt="menubar_1" >
-                <div id="p_mod_builder">
-                  %if;(evar.p_mod="zz")
-                    <img src="%image_prefix;/zz_1.jpg" alt="zz_1">
-                  %end;
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        %(end personnal modules selection menu %)
-        %if;(not (bvar.wizard_just_friend = "yes") and wizard)
-          <li class="nav-item">
-            <a class="nav-link %if;(evar.m="MOD_IND")active%end;" href="%prefix;m=MOD_IND;i=%index;" %laP;><span class="fa fa-user-plus fa-fw %sexcolor;"></span></a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="SND_IMAGE" or evar.m="MRG" or evar.m="DEL_IND")active%end;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="[*tools] [person/persons]0"><span class="fa fa-cog"></span></a>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;></a>
-              <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-unsorted fa-fw"></span>  [*invert::event/events]1</a>
-              %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-                <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="fa fa-file-image-o fa-fw"></span>  %if;has_image;[*modify picture]%else;[*add picture]%end;</a>
-              %end;
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname;"><span class="fa fa-user-times fa-fw text-danger"></span>  [*merge::person/persons]0</a>
-              <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash fa-fw text-danger"></span>  [*delete::person/persons]0</a>
-              %if;has_possible_duplications;
-                <a class="dropdown-item" href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
-              %end;
-              %if;(bvar.history_diff="yes" and has_history)
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;"><span class="fa fa-archive fa-fw" aria-hidden="true"></span> [*revision history]</a>
-                <a class="dropdown-item" id="hist" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;><span class="fa fa-history fa-fw" aria-hidden="true"></span> [*last diff]</a>
-              %end;
-            </div>
-          </li>
-          %if;(nb_families = 0)
-            <li class="nav-item">
-              %if;(not is_male and not is_female)
-                  <a class="nav-link" href="%prefix;m=ADD_FAM;ip=%index;;sex=M" title="[*add::relation/relations]0 ([M/F]0)"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user male"></span> </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="%prefix;m=ADD_FAM;ip=%index;;sex=F" title="[*add::relation/relations]0 ([M/F]1)"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user female"></span></a>
-              %else;
-                <a class="nav-link  %if;(evar.m="ADD_FAM")active%end;" id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user %apply;spousesexcolor()"></span></a>
-              %end;
-           </li>
-          %else;
-            %foreach;family;
+  <div class="d-flex justify-content-center">
+    <nav class="navbar navbar-light navbar-expand-md
+      %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
+        or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
+        or (evar.ip!="" and (evar.m="ADD_FAM" or evar.m="ADD_FAM_OK")))mt-4%end;" role="navigation">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="nav nav-tabs">
+          %if;(not(bvar.wizard_just_friend = "yes") and wizard)
+            %if;(not has_parents and first_name != "?" and surname != "?")
               <li class="nav-item">
-                %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%else;%end;%in;
-                <a class="nav-link %if;(evar.m="MOD_FAM" and evar.i=family.index)active%end;" id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
-                  title="[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
-                  accesskey="%a_k;"><span class="fa fa-user-plus %sexcolor;"></span><span class="fa fa-user %apply;spousesexcolor()"></span><sup class="small">%if;(nb_families!=1)%family_cnt;%end;</sup></a>
+                <a class="nav-link %if;(evar.m="ADD_PAR")active%end;" id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;>
+                  <sup><span class="fa fa-user male" aria-hidden="true"></span></sup>%nn;
+                  <sub><span class="fa fa-plus %sexcolor;" aria-hidden="true"></span></sub>%nn;
+                  <sup><span class="fa fa-user female" aria-hidden="true"></span></sup>%nn;
+                  <span class="sr-only">[*add::parents] [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)</span>
+                </a>
               </li>
             %end;
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle %if;(evar.m="ADD_FAM" or evar.m="CHG_EVT_FAM_ORD" or evar.m="DEL_FAM" or evar.m="MRG_FAM" or evar.m="INV_FAM" or evar.m="CHG_CHN")active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;"><span class="fa fa-cog%if;(nb_families>1)s%end;"></span></a>
-              <div class="dropdown-menu">
-                %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
-                %elseif;(not is_male and not is_female)
-                  <a class="dropdown-item" href="%prefix;m=ADD_FAM;ip=%index;;sex=M"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]0)</a>
-                  <a class="dropdown-item" href="%prefix;m=ADD_FAM;ip=%index;;sex=F"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]1)</a>
-                %else;
-                  <a class="dropdown-item" id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;><span class="fa fa-plus fa-fw"></span> [*add::family/families]0</a>
-                %end;
-                %foreach;family;
-                  <div class="dropdown-divider"></div>
-                  %if;(family_cnt != 1)
-                    <a class="dropdown-item" href="%prefix;m=INV_FAM;i=%index;;f=%family.index;" title="[*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;"><span class="fa fa-arrow-up fa-fw"></span> [*invert::family/families]1</a>
-                    <div class="dropdown-divider"></div>
-                  %end;
-                  <h6 class="dropdown-header">[*marriage with] %spouse;</h6>
-                  <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;" title="[*changed order of family's events]"><span class="fa fa-unsorted fa-fw"></span> [*invert::event/events]1</a>
-                  <a class="dropdown-item" href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index"><span class="fa fa-trash fa-fw text-danger"></span> [*delete::family/families]0</a>
-                  %if;(family_cnt != 1)
-                    %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
-                      <a class="dropdown-item" href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;"><span class="fa fa-user-times fa-fw"> [*merge::family/families]1</a>
+          %end;
+          <li class="nav-item">
+            <a class="nav-link %if;(evar.m="")active%end;" id="self"
+              href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
+              <span class="fa fa-user fa-fw %sexcolor;" aria-hidden="true"></span>
+              <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span>
+            </a>
+          </li>
+          %( personnal modules selection menu %)
+          <li class="nav-item dropdown">
+            <a id="load_once_p_mod" class="nav-link dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
+            <div class="dropdown-menu p_mod-dropdown-menu%if;(wizard)-wizard%end;">
+              <div class="d-inline-flex">
+                <form class="form-control" name="upd_url" method="get" action="%action;">
+                  <div class="invisible" id="img_prfx">%image_prefix;</div>
+                  <div class="d-flex justify-content-start">
+                    %apply;input_hidden("evar.b","b")
+                    %apply;input_hidden("evar.lang","lang")
+                    <div class="input-group">
+                      <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (%base.name;.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
+                      <span class="input-group-btn">
+                        <button type="submit" class="btn btn-light-12" title="[*validate/delete]0"><i class="fa fa-check fa-lg text-success"></i></button>
+                      </span>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-light" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-close fa-lg text-danger"></i></button>
+                      </span>
+                    </div>
+                    %apply;input_hidden("first_name","p")
+                    %apply;input_hidden("surname","n")
+                    %if;(evar.oc!=0)
+                      %apply;input_hidden("occ","oc")
                     %end;
-                  %end;
+                    %apply;input_hidden("evar.v","v")
+                    %apply;input_hidden("evar.image","image")
+                    %apply;input_hidden("evar.marriage","marriage")
+                    %apply;input_hidden("evar.mar_sp_ch","mar_sp_ch")
+                    %apply;input_hidden("evar.evt_pr_sib","evt_pr_sib")
+                    %apply;input_hidden("evar.simple","simple")
+                    <button type="button" class="btn btn-light ml-2" id="p_mod_rm" title="[*remove last module]" value="%bvar.p_mod;"><i class="fa fa-backward text-danger"></i></button>
+                    %if;(bvar.p_mod!="")
+                      <button type="button" class="btn btn-light ml-2" id="p_mod_bvar" title="[*visualize/show/hide/summary]1/[modify] p_mod=%bvar.p_mod (%base.name;.gwf)" value="%bvar.p_mod;"><i class="fa fa-plus"></i></button>
+                    %end;
+                    <button type="submit" class="btn btn-light ml-2 mr-1"
+                            value="X" id="zz" title="default"
+                            data-toggle="popover" data-trigger="hover" data-placement="bottom"
+                            data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
+                  </div>
+                  <p class="mx-2 mt-2">
+                  [
+en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear (maximum 15 modules).
+fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules (maximum 15 modules).
+                  ]
+                  </p>
+                  <div id="p_mod_table"></div>
+                </form>
+                <div class="form-control d-none d-md-block">
+                  <img role="img" src="%image_prefix;/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
+                  <div id="p_mod_builder">
+                    %if;(evar.p_mod="zz")
+                      <img src="%image_prefix;/zz_1.jpg" alt="zz_1">
+                    %end;
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          %( end personnal modules selection menu %)
+          %if;(not (bvar.wizard_just_friend = "yes") and wizard)
+            <li class="nav-item">
+              <a class="nav-link %if;(evar.m="MOD_IND")active%end;" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;>
+                <span class="fa fa-user-plus fa-fw %sexcolor;" aria-hidden="true"></span>
+                <span class="sr-only">[*modify::person/persons]0 (P)</span>
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="SND_IMAGE" or evar.m="MRG" or evar.m="DEL_IND")active%end;"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" title="[*tools] [person/persons]0">%nn;
+                <span class="fa fa-cog" aria-hidden="true"></span>%nn;
+                <span class="sr-only">[*tools] [person/persons]0</span>%nn;
+              </a>
+              <div class="dropdown-menu">
+                %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
+                  <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;;%suffix;" %laS; title="%apply;nav_with_sosa_ref(self)">
+                    <i class="fa fa-dot-circle-o fa-lg fa-fw %sexcolor;"></i> %apply;nav_with_sosa_ref(self)
+                  </a>%nn;
+                %else;
+                  <a class="dropdown-item" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
+                    <i class="fa fa-stop-circle-o fa-lg fa-fw %sexcolor;"></i> [*user/password/cancel]2 [Sosa] [navigation]
+                  </a>%nn;
                 %end;
-                %if;(nb_children != 0)
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-unsorted fa-lg fa-fw mr-1"></span>[*invert::event/events]1</a>
+                %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
+                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="fa fa-file-image-o fa-lg fa-fw mr-1"></span>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
+                %end;
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname;"><span class="fa fa-user-times fa-lg fa-fw text-danger mr-1"></span>[*merge::person/persons]0</a>
+                <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash fa-lg fa-fw text-danger mr-1"></span>[*delete::person/persons]0</a>
+                %if;has_possible_duplications;
+                  <a class="dropdown-item" href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
+                %end;
+                %if;(bvar.history_diff="yes" and has_history)
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="%prefix;m=CHG_CHN;ip=%index;"><span class="fa fa-child fa-fw"></span> [*change children's names]</a>
+                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;"><span class="fa fa-archive fa-lg fa-fw mr-1"></span>[*revision history]</a>
+                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;><span class="fa fa-history fa-lg fa-fw mr-1"></span>[*last diff]</a>
+                %end;
+                <div class="dropdown-divider"></div>
+                %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
+                  <a class="dropdown-item" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg fa-fw" title="[*cancel GeneWeb links]"></i> [*cancel GeneWeb links]</a>%nn;
+                %end;
+                %foreach;father.child;
+                  %if;is_sibling_before;
+                    <a href="%prefix;%child.access;" id="previous_sibling" class="d-none"></a>
+                  %end;
+                  %if;is_sibling_after;
+                    <a href="%prefix;%child.access;" id="next_sibling" class="d-none"></a>
+                  %end;
                 %end;
               </div>
             </li>
+            %if;(nb_families = 0)
+              <li class="nav-item">
+                %if;(not is_male and not is_female)
+                    <a class="nav-link" href="%prefix;m=ADD_FAM;ip=%index;;sex=M" title="[*add::relation/relations]0 ([M/F]0)">%nn;
+                      <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user male"></span></span>%nn;
+                      <span class="sr-only">[*add::relation/relations]0 ([M/F]0)</span>%nn;
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="%prefix;m=ADD_FAM;ip=%index;;sex=F" title="[*add::relation/relations]0 ([M/F]1)">%nn;
+                      <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user female"></span></span>%nn;
+                      <span class="sr-only">[*add::relation/relations]0 ([M/F]1)</span>%nn;
+                    </a>
+                %else;
+                  <a class="nav-link %if;(evar.m="ADD_FAM")active%end;" id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;>%nn;
+                    <span aria-hidden="true"><span class="fa fa-plus %sexcolor;"></span><span class="fa fa-user %apply;spousesexcolor()"></span></span>%nn;
+                    <span class="sr-only">[*add::family/families]0 (A)</span>%nn;
+                  </a>
+                %end;
+             </li>
+            %else;
+              %foreach;family;
+                <li class="nav-item">
+                  %let;a_k;%if;(family_cnt = 1)F%elseif;(family_cnt = 2)G%elseif;(family_cnt = 3)H%else;%end;%in;
+                  <a class="nav-link %if;(evar.m="MOD_FAM" and evar.i=family.index)active%end;" id="mod_fam_%family_cnt;" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
+                    title="[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)"
+                    accesskey="%a_k;">%nn;
+                    <span class="fa fa-user-plus %sexcolor;" aria-hidden="true"></span><span class="fa fa-user %apply;spousesexcolor()" aria-hidden="true"></span>%if;(nb_families!=1)<span class="small align-top">%family_cnt;</span>%end;
+                    <span class="sr-only">%sp;[*modify::family/families]0 [with] %spouse.first_name;%if;(spouse.occ!=0).%spouse.occ;%end; %spouse.surname; (%a_k;)</span>
+                  </a>
+                </li>
+              %end;
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle 
+                   %if;(evar.m="ADD_FAM" or evar.m="CHG_EVT_FAM_ORD" or evar.m="DEL_FAM"
+                   or evar.m="MRG_FAM" or evar.m="INV_FAM" or evar.m="CHG_CHN")active%end;"
+                   data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+                   title="[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;">%nn;
+                   <span class="fa fa-cog%if;(nb_families>1)s%end;" aria-hidden="true"></span>%nn;
+                   <span class="sr-only">[*tools] %if;(nb_families>1)[family/families]1%else;[family/families]0%end;</span>%nn;
+                 </a>
+                <div class="dropdown-menu">
+                  %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
+                  %elseif;(not is_male and not is_female)
+                    <a class="dropdown-item" href="%prefix;m=ADD_FAM;ip=%index;;sex=M"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]0)</a>
+                    <a class="dropdown-item" href="%prefix;m=ADD_FAM;ip=%index;;sex=F"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]1)</a>
+                  %else;
+                    <a class="dropdown-item" id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;><span class="fa fa-plus fa-fw mr-1"></span>[*add::family/families]0</a>
+                  %end;
+                  %foreach;family;
+                    <div class="dropdown-divider"></div>
+                    %if;(family_cnt != 1)
+                      <a class="dropdown-item" href="%prefix;m=INV_FAM;i=%index;;f=%family.index;"
+                        title="[*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;">%nn;
+                        <span class="fa fa-arrow-up fa-fw"></span> [*invert::family/families]1%nn;
+                        <span class="sr-only"> %expr(family_cnt-1) [and] %family_cnt;</span>
+                      </a>
+                      <div class="dropdown-divider"></div>
+                    %end;
+                    <span class="dropdown-header">[*marriage with] %spouse;</span>
+                    <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;" title="[*changed order of family's events]"><span class="fa fa-unsorted fa-fw mr-1"></span>[*invert::event/events]1</a>
+                    <a class="dropdown-item" href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index"><span class="fa fa-trash fa-fw text-danger mr-1"></span>[*delete::family/families]0</a>
+                    %if;(family_cnt != 1)
+                      %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
+                        <a class="dropdown-item" href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;"><span class="fa fa-user-times fa-fw"> [*merge::family/families]1</a>
+                      %end;
+                    %end;
+                  %end;
+                  %if;(nb_children != 0)
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="%prefix;m=CHG_CHN;ip=%index;"><span class="fa fa-child fa-fw mr-1"></span>[*change children's names]</a>
+                  %end;
+                </div>
+              </li>
+            %end;
           %end;
-        %end;
-        %if;has_parents;
+          %if;has_parents;
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle %if;(evar.m="A")active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw fa-rotate-180" title="[*ancestors]"></span></a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="%prefix;m=A;%access;"><span class="fa fa-cog fa-fw mr-2"></span>[*ancestors]</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" id="anc_tree" href="%prefix;m=A;t=T;v=5;image=on;marriage=on;%access;" %laY;><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>[*ascendants tree]</a>
+                <a class="dropdown-item" href="%prefix;m=A;t=Z;v=7;maxv=%max_anc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;age=on;occu=on;gen=on;ns=on;image=on;%access;"></span>[*table] [ancestors]</a>
+                <a class="dropdown-item" href="%prefix;m=A;t=G;v=3;maxv=%max_anc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;%access;"><span class="fa fa-newspaper-o fa-fw mr-2"></span>[*long display]</a>
+                <a class="dropdown-item" href="%prefix;m=A;t=F;tf1=sb;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;"><span class="fa fa-reorder fa-fw mr-2"></span>[*surnames branch]</a>
+              </div>
+            </li>
+          %end;
+          %if;has_children;
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle %if;(evar.m="D")active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="[*descendants]"></span></a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="%prefix;m=D;%access;"><span class="fa fa-cog fa-fw mr-2"></span>[*descendants]</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
+                <a class="dropdown-item" href="%prefix;m=D;t=I;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;ns=on;image=on;%access;"></span>[*table] [descendants]</a>
+                <a class="dropdown-item" href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;%access;"><span class="fa fa-newspaper-o fa-fw mr-2"></span>[*long display]</a>
+                <a class="dropdown-item" href="%prefix;m=D;t=A;num=on;v=%max_desc_level;;%access"><span class="fa fa-code-fork fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
+              </div>
+            </li>
+          %end;
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle %if;(evar.m="A")active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw fa-rotate-180" title="[*ancestors]"></span></a>
+            <a class="nav-link dropdown-toggle %if;(evar.m="R" or (evar.m="C" and evar.t="AN"))active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-link fa-rotate-90"></span></a>
             <div class="dropdown-menu">
-              <a class="dropdown-item" href="%prefix;m=A;%access;"><span class="fa fa-cog fa-fw"></span>  [*ancestors]</a>
+              <a class="dropdown-item" href="%prefix;m=R;%access;" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship computing]</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" id="anc_tree" href="%prefix;m=A;t=T;v=5;image=on;marriage=on;%access;" %laY;><span class="fa fa-sitemap fa-rotate-180 fa-fw"></span>  [*ascendants tree]</a>
-              <a class="dropdown-item" href="%prefix;m=A;t=Z;v=7;maxv=%max_anc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;age=on;occu=on;gen=on;ns=on;image=on;%access;"><span class="fa fa-table fa-fw"></span>  [*table] [ancestors]</a>
-              <a class="dropdown-item" href="%prefix;m=A;t=G;v=3;maxv=%max_anc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;%access;"><span class="fa fa-newspaper-o fa-fw"></span>  [*long display]</a>%nn;
-              <a class="dropdown-item" href="%prefix;m=A;t=F;tf1=sb;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;"><span class="fa fa-reorder fa-fw"></span>  [*surnames branch]</a>
+              %if;(browsing_with_sosa_ref)
+                %if;(sosa_ref.index != "" and sosa_ref.index != index)
+                  <span class="dropdown-header">[*shortest path] [with]…</span>
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;image=on;et=S" title="[*shortest path] [with] %sosa_ref;">
+                    %sosa_ref; <i>(Sosa 1)</i>
+                  </a>
+                %end;
+              %end;
+              <span class="dropdown-header">[*relationship by marriage] [with]…</span>
+              %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;image=on;">
+                    %sosa_ref; <i>(sosa 1)</i>
+                </a>
+              %end;
+              %foreach;family;
+                %if;(spouse != "? ?")
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;image=on;">
+                      %spouse;
+                      %if;spouse.has_nobility_titles;,%sp;
+                      <em>%spouse.nobility_title;</em>%end;%nl;
+                      <i>([spouse/spouses]0)</i>%nl;
+                  </a>
+                %end;
+              %end;
+              %foreach;relation;
+                %if;has_relation_him;
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;image=on;">
+                      %relation_him;
+                      %if;relation_him.has_nobility_titles;,%sp;
+                      <em>%relation_him.nobility_title;</em>%end;%nl;
+                      <i>(%relation_him.type;)</i>%nl;
+                  </a>
+                %end;
+                %if;has_relation_her;
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;image=on;">
+                      %relation_her;
+                      %if;relation_her.has_nobility_titles;,%sp;
+                      <em>%relation_her.nobility_title;</em>%end;%nl;
+                      <i>(%relation_her.type;)</i>%nl;
+                  </a>
+                %end;
+              %end;
+              %foreach;related;
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;image=on;">
+                    %related;
+                    %if;related.has_nobility_titles;,%sp;
+                    <em>%related.nobility_title;</em>%end;%nl;
+                    <i>(%related.type;)</i>%nl;
+                </a>
+              %end;
+              %foreach;event_witness_relation;
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;image=on;">
+                    %event_witness_relation.person;%nl;
+                    <i>([witness/witnesses]0)</i>%nl;
+                </a>
+              %end;
+              %if;(has_parents and (father.has_siblings or mother.has_siblings))
+                  <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
+              %end;
+              %if;has_nephews_or_nieces;
+                <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
+              %end;
+              %if;(died = "" and (wizard or friend))
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="%prefix;%access;;m=C;t=AN"><span class="fa fa-birthday-cake fa-fw"></span> [*family birthday]</a>
+              %end;
             </div>
           </li>
-        %end;
-        %if;has_children;
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle %if;(evar.m="D")active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw" title="[*descendants]"></span></a>
-            <div class="dropdown-menu">
-              <a class="dropdown-item" href="%prefix;m=D;%access;"><span class="fa fa-cog fa-fw"></span>  [*descendants]</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw"></span>  [*descendants tree]</a>
-              <a class="dropdown-item" href="%prefix;m=D;t=I;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;ns=on;image=on;%access;"><span class="fa fa-table fa-fw"></span>  [*table] [descendants]</a>
-              <a class="dropdown-item" href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;%access;"><span class="fa fa-newspaper-o fa-fw"></span>  [*long display]</a>
-              <a class="dropdown-item" href="%prefix;m=D;t=A;num=on;v=%max_desc_level;;%access"><span class="fa fa-code-fork fa-flip-vertical fa-fw"></span>  D’Aboville</a>
-            </div>
-          </li>
-        %end;
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle %if;(evar.m="R" or (evar.m="C" and evar.t="AN"))active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-link fa-rotate-90"></span></a>
-          <div class="dropdown-menu">
-            <a class="dropdown-item " href="%prefix;m=R;%access;" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship computing]</a>
-            <div class="dropdown-divider"></div>
-            %if;(browsing_with_sosa_ref)
-              %if;(sosa_ref.index != "" and sosa_ref.index != index)
-                <h6 class="dropdown-header">[*shortest path] [with]…</h6>
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;image=on;et=S" title="[*shortest path] [with] %sosa_ref;">
-                  %sosa_ref; <i>(Sosa 1)</i>
-                </a>
-              %end;
-            %end;
-            <h6 class="dropdown-header">[*relationship by marriage] [with]…</h6>
-            %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
-              <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;image=on;">
-                  %sosa_ref; <i>(sosa 1)</i>
-              </a>
-            %end;
-            %foreach;family;
-              %if;(spouse != "? ?")
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;image=on;">
-                    %spouse;
-                    %if;spouse.has_nobility_titles;,%sp;
-                    <em>%spouse.nobility_title;</em>%end;%nl;
-                    <i>([spouse/spouses]0)</i>%nl;
-                </a>
-              %end;
-            %end;
-            %foreach;relation;
-              %if;has_relation_him;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;image=on;">
-                    %relation_him;
-                    %if;relation_him.has_nobility_titles;,%sp;
-                    <em>%relation_him.nobility_title;</em>%end;%nl;
-                    <i>(%relation_him.type;)</i>%nl;
-                </a>
-              %end;
-              %if;has_relation_her;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;image=on;">
-                    %relation_her;
-                    %if;relation_her.has_nobility_titles;,%sp;
-                    <em>%relation_her.nobility_title;</em>%end;%nl;
-                    <i>(%relation_her.type;)</i>%nl;
-                </a>
-              %end;
-            %end;
-            %foreach;related;
-              <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;image=on;">
-                  %related;
-                  %if;related.has_nobility_titles;,%sp;
-                  <em>%related.nobility_title;</em>%end;%nl;
-                  <i>(%related.type;)</i>%nl;
-              </a>
-            %end;
-            %foreach;event_witness_relation;
-              <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;image=on;">
-                  %event_witness_relation.person;%nl;
-                  <i>([witness/witnesses]0)</i>%nl;
-              </a>
-            %end;
-            %if;(has_parents and (father.has_siblings or mother.has_siblings))
-                <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
-            %end;
-            %if;has_nephews_or_nieces;
-              <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
-            %end;
-            %if;(died = "" and (wizard or friend))
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="%prefix;%access;;m=C;t=AN"><span class="fa fa-birthday-cake fa-fw"></span> [*family birthday]</a>
-            %end;
-          </div>
-        </li>
-      </ul>
+        </ul>
+      </div>
     </nav>
-    <div class="btn-group %if;(evar.m="MOD_IND")mt-4%else;mt-2%end; mr-0 push-right">
-      %if;(evar.m !="MOD_IND" and referer != "")
-        <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
-      %end;
-      <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><i class="fa fa-home fa-lg" title="[*home]"></i></a>%nn;
-      %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
-        <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
-      %end;
-      %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
-        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;;%suffix;" %laS; title="%apply;nav_with_sosa_ref(self)">
-          <i class="fa fa-dot-circle-o fa-lg %sexcolor;"></i>
-        </a>%nn;
-      %else;
-        <a role="button" class="btn btn-link ml-1 px-0" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
-          <i class="fa fa-stop-circle-o fa-lg %sexcolor;"></i>
+  </div>
+  <div class="float-right mt-2">
+    <div class="d-flex fixed_top_btn%if;(evar.m!="A")_col flex-column%end;">
+      <a role="button" class="btn btn-link text-muted ml-%if;(referer="")4%else;0%end; px-0 py-1" href="%prefix;">
+        <i class="fa fa-home fa-lg" title="[*home]" aria-hidden="true"></i>%nn;
+        <span class="sr-only">[*home]</span>%nn;
+      </a>%nn;
+      %if;(referer!="")
+        <a role="button" class="btn btn-link text-muted px-0 pt-0 pb-1" href="%referer;" title="Revenir en arrière">%nn;
+          <i class="fa fa-arrow-left fa-lg" title="[*back]" aria-hidden="true"></i>%nn;
+          <span class="sr-only">[*back]</span>%nn;
         </a>%nn;
       %end;
-      <a role="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>%nn;
+      %(<div class="ml-auto">
+        <a role="button" class="btn btn-link text-muted px-0 py-1" href="%prefix;;%access;;wide=%if;(evar.wide="on")%else;on%end;" title"switch to full screen"><i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-lg"></i></a>
+      </div>%)
+      <div class="ml-auto">
+        <a role="button" class="btn btn-link text-muted mx-0 px-0 py-0 mt-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>
+      </div>
     </div>
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="ModalSearch" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-body" id="ModalSearch">
-          <form id="collapse_search" method="get" action="%prefix;">
-            %hidden;
-            <input type="hidden" name="m" value="S">
-            <div class="row">
-              <div class="col-6 offset-3">
-              <h4 class="rounded modal-title my-3 bg-faded text-center">[*search/case sensitive]0 [person/persons]0</h4>
-              </div>
+  </div>
+  <div class="modal fade" id="myModal" role="dialog" aria-labelledby="ModalSearch" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-body" id="ModalSearch">
+        <form id="collapse_search" method="get" action="%prefix;">
+          %hidden;
+          <input type="hidden" name="m" value="S">
+          <div class="d-flex justify-content-center">
+            <div class="col-6">
+            <h4 class="rounded modal-title my-4 bg-light text-center">[*search/case sensitive]0 [person/persons]0</h4>
             </div>
-            <div class="row">
-              <div class="col-8 offset-2">
-                <label class="sr-only" for="p">Search firstname</label>
-                <input type="search" id="p" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]0">
-                <label class="sr-only" for="n">Search public name</label>
-                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
-              </div>
-              <div class="col-2 mt-2">
-                <button class="btn btn-primary" type="submit"><span class="fa fa-search fa-fw my-4"></span></button>
-              </div>
+          </div>
+          <div class="d-flex d-flex justify-content-center">
+            <div class="col-8">
+              <label class="sr-only" for="n">Search public name</label>
+              <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;" autofocus>
+              <label class="sr-only" for="p">Search firstname</label>
+              <input type="search" id="p" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]0">
             </div>
-          </form>
-        </div>
+            <div class="mt-2">
+              <button class="btn btn-primary" type="submit"><span class="fa fa-search fa-fw my-4"></span></button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>

@@ -33,7 +33,7 @@
     <div class="col-xl-9 ml-xl-3 col-lg-11 ml-lg-5">
       <div class="d-flex flex-wrap" role="toolbar" aria-label="First character selection">
         %foreach;initial;
-          <a class="btn btn-secondary btn-lg text-center book-char" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
+          <a class="btn btn-outline-secondary btn-lg text-center book-char" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
         %end;
       </div>
     </div>
@@ -94,7 +94,7 @@
                         </label>
                       </div>
                     %end;
-                    <button type="submit" class="btn btn-secondary ml-2">Ok</button>
+                    <button type="submit" class="btn btn-outline-secondary ml-2">Ok</button>
                   </form>
                 %end;
               </li>
