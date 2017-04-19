@@ -71,7 +71,7 @@ var p_mod_table = '\
           <div class="d-inline-flex small">';
           for (var k=1; k<options[i].length; k++)
             { var image = "<img class='w-100' src='"+img_prfx+"/"+modules[i]+"_"+k+".jpg'>";
-              var button  = '<button class="btn btn-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
+              var button  = '<button class="btn btn-outline-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
                            data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"\
                            data-html="true" data-content="'+image+'">'+options[i][k]+'</button>';
               p_mod_table += button;

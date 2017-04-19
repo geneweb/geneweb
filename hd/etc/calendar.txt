@@ -27,13 +27,13 @@
 %end;
 
 %define;fun_day(ccc, nnn)
-  <td><button class="btn btn-secondary" type="submit" name="dccc1">&lt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="dccc1">&lt;</button></td>
   <td><input type="number" class="form-control text-center" name="dccc" min="1" max="31" value="%date.nnn.day;"%/></td>
-  <td><button class="btn btn-secondary" type="submit" name="dccc2">&gt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="dccc2">&gt;</button></td>
 %end;
 
 %define;fun_month(ccc, nnn, vvv, lll)
-  <td><button class="btn btn-secondary" type="submit" name="mccc1">&lt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="mccc1">&lt;</button></td>
   <td><select class="form-control" style="width:150px;text-align-last:center;" name="mccc">
         %foreach;integer_range(1, vvv)
           <option value="%integer;"%nn;
@@ -42,13 +42,13 @@
           </option>
         %end;
       </select></td>
-  <td><button class="btn btn-secondary" type="submit" name="mccc2">&gt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="mccc2">&gt;</button></td>
 %end;
 
 %define;fun_year(ccc, nnn)
-  <td><button class="btn btn-secondary" type="submit" name="yccc1">&lt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
   <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%date.nnn.year;"%/></td>
-  <td><button class="btn btn-secondary" type="submit" name="yccc2">&gt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
 %end;
 
 %define;fun_julian_year(ccc, nnn)
@@ -58,9 +58,9 @@
       %expr(date.nnn.year - 1)/%expr(date.nnn.year % 10)
     %else;%date.nnn.year;%end;
   %in;
-  <td><button class="btn btn-secondary" type="submit" name="yccc1">&lt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc1">&lt;</button></td>
   <td><input class="form-control text-center" name="yccc" size="6" maxlength="6" value="%year;"%/></td>
-  <td><button class="btn btn-secondary" type="submit" name="yccc2">&gt;</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="yccc2">&gt;</button></td>
 %end;
 
 %define;calendar(ccc, nnn, vvv, lll, fun_yyy)
@@ -77,7 +77,7 @@
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_day("ccc", "nnn")
   %end;
-  <td><button class="btn btn-secondary" type="submit" name="tccc">=</button></td>
+  <td><button class="btn btn-outline-secondary" type="submit" name="tccc">=</button></td>
 %end;
 
 <div class="row mt-4">

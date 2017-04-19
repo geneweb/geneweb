@@ -248,23 +248,23 @@
       <div class="form-inline">
         <div class="mx-2">
           %if;(evarmac=1)
-            <a href="%apply;rebuild_url("prefix_access",0,evarevp,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [marriage/marriages]1 ([spouse/spouses]1 [and] [child/children]1)"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",0,evarevp,oneline)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [marriage/marriages]1 ([spouse/spouses]1 [and] [child/children]1)"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url("prefix_access",1,evarevp,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [marriage/marriages]1 ([spouse/spouses]1 [and] [child/children]1)"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",1,evarevp,oneline)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [marriage/marriages]1 ([spouse/spouses]1 [and] [child/children]1)"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
         <div class="mx-2">
           %if;(evarevp=1)
-            <a href="%apply;rebuild_url("prefix_access",evarmac,0,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [event/events]1 ([parents] [and] [siblings])"><i class="fa fa-graduation-cap fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarmac,0,oneline)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [event/events]1 ([parents] [and] [siblings])"><i class="fa fa-graduation-cap fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url("prefix_access",evarmac,1,oneline)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [event/events]1 ([parents] [and] [siblings])"><i class="fa fa-graduation-cap fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarmac,1,oneline)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [event/events]1 ([parents] [and] [siblings])"><i class="fa fa-graduation-cap fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
         <div class="mx-2">
           %if;(oneline=1)
-            <a href="%apply;rebuild_url("prefix_access",evarmac,evarevp,0)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [inline chronology]1"><i class="fa fa-align-justify fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarmac,evarevp,0)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [inline chronology]1"><i class="fa fa-align-justify fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url("prefix_access",evarmac,evarevp,1)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [inline chronology]0"><i class="fa fa-align-justify fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarmac,evarevp,1)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [inline chronology]0"><i class="fa fa-align-justify fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
       </div>
