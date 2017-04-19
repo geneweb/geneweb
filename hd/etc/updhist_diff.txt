@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: updhist_diff.txt,v 7 15/11/2016 20:14:59 flh a2 Exp $ -->
+  <!-- $Id: updhist_diff.txt, v. 7 12/07/2017 21:31:27 flh a2 Exp $ -->
   <!-- Copyright (c) 2006-2017 INRIA -->
   <title>[*revision history]</title>
   <meta name="robots" content="none">
@@ -36,7 +36,7 @@ function update_old () {
 }
 --></script>
 
-<h1 class="col-8 offset-2 text-center">
+<h1 class="text-center">
   <a href="%prefix;%acces;">%person;</a>%nn;
   %if;(evar.t = "SUM"), [revision history]
   %else;<br>[difference between the two revisions]
@@ -48,7 +48,7 @@ function update_old () {
     %if;(referer != "")
       <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+    <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
   </div>
 %end;
 
@@ -63,7 +63,7 @@ function update_old () {
     <input type="hidden" name="t" value="DIFF"%/>
     <input type="hidden" name="f" value="%evar.f;"%/>
     %if;(history_len >= 2)
-      <button type="submit" class="btn btn-secondary mb-2">[*compare selected revisions]</button>
+      <button type="submit" class="btn btn-outline-secondary mb-2">[*compare selected revisions]</button>
     %else;
       %apply;no_diff(person)
     %end;
@@ -306,16 +306,12 @@ function update_old () {
 %end;
 
 %define;print_diff()
-  %( ‡ transformer en 3 boutons†centrÈs %)
-  <table class="table-sm mx-auto">
-    <tr>
-      <td style="width:20%"><a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;;m=%evar.m;;t=%evar.t;;f=%evar.f;;new=%evar.old;;old=%expr(evar.old+1)" title="[*previous diff]"><span class="fa fa-arrow-left"></span> [previous/next diff]0</a> |</td>
-      <td style="width:250px:text-align:center"><a href="%prefix;;m=%evar.m;;t=SUM;f=%evar.f;">%if;(evar.old-evar.new>1)%expr(evar.old-evar.new-1) [intermediate revisions not shown]%else;[revision history]%end;</a></td>
-      <td style="width:20%"> | %if;(evar.new!=0)<a href="%prefix;;m=%evar.m;;t=%evar.t;;f=%evar.f;;new=%expr(evar.new-1);old=%evar.new;" title="[*next diff]"> [previous/next diff]1 <span class="fa fa-arrow-right"></span></a>%elseif;(evar.new=0)[last diff]%end; </td>
-    </tr>
-  </table>
-  <br>
-  <table class="table mb-0">
+  <div class="d-flex justify-content-center">
+    <a %if;(evar.old=history_len-1)class="invisible"%end; href="%prefix;;m=%evar.m;;t=%evar.t;;f=%evar.f;;new=%evar.old;;old=%expr(evar.old+1)" title="[*previous diff]"><span class="fa fa-arrow-left"></span> [previous/next diff]0</a> | 
+    <a href="%prefix;;m=%evar.m;;t=SUM;f=%evar.f;">%if;(evar.old-evar.new>1)%expr(evar.old-evar.new-1) [intermediate revisions not shown]%else;[revision history]%end;</a>
+     | %if;(evar.new!=0)<a href="%prefix;;m=%evar.m;;t=%evar.t;;f=%evar.f;;new=%expr(evar.new-1);old=%evar.new;" title="[*next diff]"> [previous/next diff]1 <span class="fa fa-arrow-right"></span></a>%elseif;(evar.new=0)[last diff]%end;
+  </div>
+  <table class="table mb-0 mt-3">
     <colgroup>
       <col style="width:8%%;border-right-style:inset">
       <col style="width:46%%;border-right-style:inset">
@@ -358,16 +354,11 @@ function update_old () {
     %end;
   </table>
 %end;
-
-<div class="row">
-  <div class="col-lg-10 offset-lg-1 col-xl-8 offset-xl-2">
-  %if;(evar.t = "SUM")
-    %apply;print_summary()
-  %else;
-    %apply;print_diff()
-  %end;
-  </div>
-</div>
+%if;(evar.t = "SUM")
+  %apply;print_summary()
+%else;
+  %apply;print_diff()
+%end;
 %include.trl;
 %include.copyr;
 </div>

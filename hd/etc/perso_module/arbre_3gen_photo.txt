@@ -1,4 +1,5 @@
-<!-- arbre_3gen_photo.txt 28/03/2017 20:02:17 Arbre 3 générations vertical avec photos ancêtres, sans individu principal -->
+<!-- arbre_3gen_photo.txt 28/03/2017 20:02:17 
+  Arbre 3 générations vertical avec photos ancêtres, sans individu principal si fratrie -->
 %(op 1 = small tree 85% size | 2 = normal size %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 %if;has_parents;
@@ -141,7 +142,7 @@
               <img class="rounded image_small_size" src="%image_prefix;/img_unknown_woman.png" alt="[missing image]"%/>
               <br>
             %else;
-              <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted"  %father.image_small_size;>?</span>
+              <span class="image_small_size rounded px-3 pt-1 pb-2 text-muted" %father.image_small_size;>?</span>
               <br><br>
             %end;
           %end;
@@ -171,6 +172,13 @@
       <tr>
         <td colspan="8"></td><td colspan="3"><span>│</span></td><td colspan="8"></td>
       </tr>
+      %if;(not has_siblings)
+        <tr>
+          <td colspan="5"></td><td colspan="9">%nn;
+            %apply;short_display_person_tree("self")</td>
+           <td colspan="5"></td>
+        </tr>
+      %end;
     </table>
   </div>
 %end;

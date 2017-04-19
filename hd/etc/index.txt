@@ -18,7 +18,7 @@
 <form class="form-inline d-flex justify-content-center my-2" method="get" action="%prefix;">
   <input type="hidden" name="lang" value="%evar.lang;">
   <input name="b" class="form-control col-4">
-  <button type="submit" class="btn btn-secondary ml-2" value="">Ok</button>
+  <button type="submit" class="btn btn-outline-secondary ml-2" value="">Ok</button>
 </form>
 
 
@@ -27,35 +27,35 @@
 
 <h3 class="text-center mt-5">[*select lang]</h3>
 <div class="d-flex flex-wrap justify-content-center col-11 mt-2 mx-auto">
-  <a class="btn btn-secondary" href="%prefix_base;lang=af%if;(evar.templ!="");templ=%evar.templ;;%end;" title="af">Afrikaans</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=bg%if;(evar.templ!="");templ=%evar.templ;;%end;" title="bg">български</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=br%if;(evar.templ!="");templ=%evar.templ;;%end;" title="br">brezhoneg</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=ca%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ca">català</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=cs%if;(evar.templ!="");templ=%evar.templ;;%end;" title="cs">čeština</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=da%if;(evar.templ!="");templ=%evar.templ;;%end;" title="da">dansk</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=de%if;(evar.templ!="");templ=%evar.templ;;%end;" title="de">Deutsch</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=en%if;(evar.templ!="");templ=%evar.templ;;%end;" title="en">English</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=eo%if;(evar.templ!="");templ=%evar.templ;;%end;" title="eo">esperanto</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=es%if;(evar.templ!="");templ=%evar.templ;;%end;" title="es">Español</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=et%if;(evar.templ!="");templ=%evar.templ;;%end;" title="et">eesti</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=fi%if;(evar.templ!="");templ=%evar.templ;;%end;" title="fi">suomi</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=fr%if;(evar.templ!="");templ=%evar.templ;;%end;" title="fr">français</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=he%if;(evar.templ!="");templ=%evar.templ;;%end;" title="he">עברית </a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=is%if;(evar.templ!="");templ=%evar.templ;;%end;" title="is">íslenska</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=it%if;(evar.templ!="");templ=%evar.templ;;%end;" title="it">italiano</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=lv%if;(evar.templ!="");templ=%evar.templ;;%end;" title="lv">Latviešu</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=nl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="nl">Nederlands</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=no%if;(evar.templ!="");templ=%evar.templ;;%end;" title="no">norsk</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=oc%if;(evar.templ!="");templ=%evar.templ;;%end;" title="oc">occitan</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=pl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pl">polski</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=pt%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pt">Português</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=pt-br%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pt-br">Português-do-Brasil</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=ro%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ro">romaneste</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=ru%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ru">русский</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=sk%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sk">slovenčina</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=sl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sl">slovenščina</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=sv%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sv">svenska</a>
-  <a class="btn btn-secondary" href="%prefix_base;lang=zh%if;(evar.templ!="");templ=%evar.templ;;%end;" title="zh">中文</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=af%if;(evar.templ!="");templ=%evar.templ;;%end;" title="af">Afrikaans</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=bg%if;(evar.templ!="");templ=%evar.templ;;%end;" title="bg">български</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=br%if;(evar.templ!="");templ=%evar.templ;;%end;" title="br">brezhoneg</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=ca%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ca">català</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=cs%if;(evar.templ!="");templ=%evar.templ;;%end;" title="cs">čeština</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=da%if;(evar.templ!="");templ=%evar.templ;;%end;" title="da">dansk</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=de%if;(evar.templ!="");templ=%evar.templ;;%end;" title="de">Deutsch</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=en%if;(evar.templ!="");templ=%evar.templ;;%end;" title="en">English</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=eo%if;(evar.templ!="");templ=%evar.templ;;%end;" title="eo">esperanto</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=es%if;(evar.templ!="");templ=%evar.templ;;%end;" title="es">Español</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=et%if;(evar.templ!="");templ=%evar.templ;;%end;" title="et">eesti</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=fi%if;(evar.templ!="");templ=%evar.templ;;%end;" title="fi">suomi</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=fr%if;(evar.templ!="");templ=%evar.templ;;%end;" title="fr">français</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=he%if;(evar.templ!="");templ=%evar.templ;;%end;" title="he">עברית </a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=is%if;(evar.templ!="");templ=%evar.templ;;%end;" title="is">íslenska</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=it%if;(evar.templ!="");templ=%evar.templ;;%end;" title="it">italiano</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=lv%if;(evar.templ!="");templ=%evar.templ;;%end;" title="lv">Latviešu</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=nl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="nl">Nederlands</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=no%if;(evar.templ!="");templ=%evar.templ;;%end;" title="no">norsk</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=oc%if;(evar.templ!="");templ=%evar.templ;;%end;" title="oc">occitan</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=pl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pl">polski</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=pt%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pt">Português</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=pt-br%if;(evar.templ!="");templ=%evar.templ;;%end;" title="pt-br">Português-do-Brasil</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=ro%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ro">romaneste</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=ru%if;(evar.templ!="");templ=%evar.templ;;%end;" title="ru">русский</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=sk%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sk">slovenčina</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=sl%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sl">slovenščina</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=sv%if;(evar.templ!="");templ=%evar.templ;;%end;" title="sv">svenska</a>
+  <a class="btn btn-outline-secondary" href="%prefix_base;lang=zh%if;(evar.templ!="");templ=%evar.templ;;%end;" title="zh">中文</a>
 </div>
 </div>
   <div class="btn-group float-right mt-5 mr-5">

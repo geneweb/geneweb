@@ -206,7 +206,7 @@
 %end;
 
 %define;short_display_person_tree(xx)
-  %if;(xx.has_sosa)%apply;display_sosa("xx")<br>%end;
+  %if;(xx.has_sosa)%apply;display_sosa("xx")%end;
   %if;(cancel_links or xx.is_restricted)<span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span>
   %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;;%if;(evar.t!="")t=%evar.t;;%end;%if;(evar.v!="")v=%evar.v;;%end;%if;(evar.image="on")image=on;%end;%if;(evar.marriage="on")marriage=on;%end;"><span class="text-nowrap">%if;(xx.public_name!="")%xx.public_name;</span>%else;%xx.first_name;</span>%end;<br><span class="text-nowrap">%xx.surname;</span></a>%nn;
   %end;

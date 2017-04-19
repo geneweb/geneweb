@@ -81,7 +81,6 @@
       <li>%apply;capitalize(nth([born],sex)) %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;
       %if;has_birth_place; - %birth_place;%end;</li>%nl;
-      %if;computable_age;<li>[*age][:] %age;</li>%end;
     %else;
       %if;has_birth_place;
         <li>%apply;capitalize(nth([born],sex)) - %birth_place;</li>%nl;
@@ -149,7 +148,7 @@
 %end;
 
 %if;(evar.m!="MOD_IND")
-  <h1 class="%if;(p_mod="" or p_mod="zz")col-12%end; %if;(op_m=2)text-center%end;">
+  <h1 class="%if;(p_mod="" or p_mod="zz")col-12%end; %if;(op_m=2)text-center%end; text-xs-center text-md-left">
     %if;has_public_name;
       %if;has_qualifiers;%public_name; <em>%qualifier;</em>
       %else;%public_name; %surname;%end;
@@ -163,16 +162,17 @@
         %end;
       %end;
     %end;
+    <br class="d-none d-sm-none">
     <span class="text-muted small mb-1">%dates;%(%birth_date.year;-%death_date.year; no italic?%)</span>
   </h1>
   %if;(op_m!=3)
     %apply;sosa()
   %end;
-  %if;(p_mod="" or p_mod="zz")<div class="col-8">%end;
-  %if;(op_m=3)
-    <div class="media d-inline-flex">
+  %if;(p_mod="" or p_mod="zz")<div class="col-12 col-lg-8">%end;
+    %if;(op_m=3)
+    <div class="d-inline-flex">
       %apply;portrait()
-      <div class="media-body">
+      <div>
         <div class="text-center mb-2 mx-2">
           %apply;detailed_names()
           %apply;sosa()

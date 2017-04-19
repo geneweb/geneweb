@@ -26,6 +26,23 @@
 <div class="container">
 %include_perso_header;
 
+%define;nav()
+  <div class="container fixed-top" role="navigation">
+    <div class="form-inline">
+      <div class="mx-auto text-center">
+        <button type="submit" class="btn btn-light border-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1 text-success" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>
+        <div class="btn-group btn-inline">
+          <a class="btn btn-light btn-sm" href="#top" title="[*parents]"><i class="fa fa-address-card fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
+          <a class="btn btn-light btn-sm" href="#event/events_" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
+          <a class="btn btn-light btn-sm" href="#child/children_" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
+          <a class="btn btn-light btn-sm" href="#comment" title="[*comment]1"><i class="fa fa-file-text fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
+          <a class="btn btn-light btn-sm" href="#source/sources_" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+%end;
+
 <script>
 <!--
 function changeCalendar(e,v,m,c) {
@@ -187,10 +204,38 @@ function changeCalendar(e,v,m,c) {
   });
 </script>
 
-%define;date(xlab,xvar,xdt,xcond)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" xcond%in;
-  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VR|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC)" size="1" maxlength="2" xcond%in;
-  %let;year_input;pattern="[?><~/]?-?\d*/?" size="4" maxlength="8" xcond%in;
+%define;pa_hide_script(xcnt)
+$(document).ready(function(){
+  $("#paxcnt_p").on('change',function() {
+      if(this.value == "link")
+        $("#paxcnt_div").hide();
+
+      else
+        $("#paxcnt_div").show();
+      %($("#paxcnt_occupation").prop('readonly', true);%)
+   }).change();
+});
+%end;
+
+%define;ch_hide_script(xcnt)
+$(document).ready(function(){
+  $("#chxcnt_p").on('change',function() {
+      if(this.value == "link"){
+        $("#chxcnt_div").hide();
+        $("#chxcnt_sex_div").hide();
+       }
+      else {
+        $("#chxcnt_div").show();
+        $("#chxcnt_sex_div").show();
+       }
+   }).change();
+});
+%end;
+
+%define;date(xlab,xvar,xdt)
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" %readonly;%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC)" size="1" maxlength="2" %readonly;%in;
+  %let;year_input;pattern="[?><~/]?-?\d*/?" size="4" maxlength="8" %readonly;%in;
   <div class="row justify-content-sm-between justify-content-md-start">
     <div class="col-sm-1 col-md-2 col-form-label">
       xlab
@@ -243,7 +288,7 @@ function changeCalendar(e,v,m,c) {
         </label>
       %end;
     </div>
-    <div class="col-10 col-lg offset-sm-2 offset-md-2 offset-lg-0 form-inline">
+    <div class="col-10 col-lg ml-auto form-inline">
       <label for="xvar_prec" class="sr-only col-form-label">[precision]0</label>
       <select class="form-control pl-lg-1 pr-lg-0 px-xl-2" name="xvar_prec" id="xvar_prec" xcond>
         %(<option value="-" %if;(xdt.prec = "") selected%end;>&nbsp;</option>%)
@@ -252,8 +297,8 @@ function changeCalendar(e,v,m,c) {
         <option value="maybe" %if;(xdt.prec = "maybe") selected%end;>[possibly (date)]0</option>
         <option value="before" %if;(xdt.prec = "before") selected%end;>[before (date)]0</option>
         <option value="after" %if;(xdt.prec = "after") selected%end;>[after (date)]0</option>
-        <option value="oryear" %if;(xdt.prec = "oryear") selected%end;>...[or]...</option>
-        <option value="yearint" %if;(xdt.prec = "yearint") selected%end;>...[between (date)]...</option>
+        <option value="oryear" %if;(xdt.prec = "oryear") selected%end;>…[or]…</option>
+        <option value="yearint" %if;(xdt.prec = "yearint") selected%end;>…[between (date)]…</option>
       </select>
       <label for="xvar_cal" class="sr-only col-form-label">[calendar/calendars]0</label>
       <select class="form-control pl-lg-1 pr-lg-0 px-xl-2 ml-sm-1 ml-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
@@ -277,7 +322,8 @@ function changeCalendar(e,v,m,c) {
     </div>
   </div>
   <div class="row justify-content-sm-end justify-content-md-start">
-    <div class="col col-sm-auto offset-sm-1 offset-md-2 form-inline">
+    <div class="col-sm-1 col-md-2"></div>
+    <div class="col col-sm-auto form-inline">
       %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
         <label>
           <input type="text" class="form-control" name="xvar_orday" value="%xdt.orday;" %day_input;%/>
@@ -285,7 +331,7 @@ function changeCalendar(e,v,m,c) {
         </label>
         <label>
           <span id="xvar_ormonth_sel">
-            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth"value="%xdt.ormonth;" %month_input;%/>
+            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;%/>
           </span>
           <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
@@ -325,7 +371,7 @@ function changeCalendar(e,v,m,c) {
         </label>
       %end;
     </div>
-    <div class="col-10 col-lg offset-sm-2 offset-lg-0">
+    <div class="col-10 col-lg">
       <label for="xvar_text" class="col-form-label sr-only"></label>
       <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0" xcond%/>
     </div>
@@ -351,9 +397,9 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;small_date(kind,xvar,xx,verbose)
-  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2"%in;
-  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VR|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC)" size="1" maxlength="2"%in;
-  %let;year_input;pattern="[?><~/]?-?\d*/?" size="4" maxlength="8"%in;
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" %readonly;%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC)" size="1" maxlength="2" %readonly;%in;
+  %let;year_input;pattern="[?><~/]?-?\d*/?" size="4" maxlength="8" %readonly;%in;
   <div class="row">
     <span class="col-sm-2 col-form-label">[*kind]</span>
     <div class="col-sm-3 form-inline">
@@ -382,7 +428,7 @@ function changeCalendar(e,v,m,c) {
     </div>
     <label for="xvar_pl" class="%if;(verbose=true)sr-only%end; col-sm-1 col-form-label">[place]</label>%nn;
     <div class="col-sm-4">
-      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[place]">
+      <input type="text" class="form-control" name="xvar_pl" value="%xx.create.kind_place;" id="xvar_pl" placeholder="[*place]" %readonly;>
     </div>
   </div>
 %end;
@@ -400,9 +446,9 @@ function changeCalendar(e,v,m,c) {
      %if;(bvar.multi_parents != "yes")
        <h5 class="col-form-label col-sm-2">%parent.himher;</h5>
        <div class="col-sm-2">
-         <select class="form-control" name="paxcnt_p">
-           <option value="create" %if;(xx.create = "create") selected%end;>[*create]0</option>
-           <option value="link" %if;(xx.create = "link") selected%end;>[*link]0</option>
+         <select class="form-control" id="paxcnt_p" name="paxcnt_p">
+           <option value="create" %if;(xx.create = "create")selected%end;>[*create]0</option>
+           <option value="link" %if;(xx.create = "link")selected%end;>[*link]0</option>
          </select>
         </div>
      %end;
@@ -417,12 +463,12 @@ function changeCalendar(e,v,m,c) {
        <input class="form-control" type="number" name="paxcnt_occ" min="0" max="99999999" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" placeholder="#" title="[*number]">
     </div>
     %if;(bvar.multi_parents = "yes")
-      <div class="col-sm-2 offset-sm-2">
-      <select class="form-control" name="paxcnt_p">
-        <option value="create" %if;(xx.create = "create")selected%end;>[*create]0</option>
-        <option value="link" %if;(xx.create = "link")selected%end;>[*link]0</option>
-      </select>
-    </div>
+      <div class="col-sm-2 ml-sm-auto">
+        <select class="form-control" id="paxcnt_p" name="paxcnt_p">
+          <option value="create" %if;(xx.create = "create")selected%end;>[*create]0</option>
+          <option value="link" %if;(xx.create = "link")selected%end;>[*link]0</option>
+        </select>
+      </div>
     %end;
   </div>
   <div class="row">
@@ -431,12 +477,14 @@ function changeCalendar(e,v,m,c) {
       <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0">
     </div>
   </div>
-      %apply;birth("paxcnt","xx","true")
-      %apply;death("paxcnt","xx","true")
-  <div class="row">
-    <label for="paxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-    <div class="col-sm-7">
-      <textarea class="form-control" name="paxcnt_occupation" id="paxcnt_occupation" rows="1" placeholder="[*occupation/occupations]0">%xx.create.occupation</textarea>
+  <div id="paxcnt_div">
+    %apply;birth("paxcnt","xx","true")
+    %apply;death("paxcnt","xx","true")
+    <div class="row">
+      <label for="paxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-sm-7">
+        <input class="form-control" name="paxcnt_occupation" id="paxcnt_occupation" maxlength="300" placeholder="[*occupation/occupations]0" value="%xx.create.occupation;">
+      </div>
     </div>
   </div>
 %end;
@@ -449,18 +497,19 @@ function changeCalendar(e,v,m,c) {
     </div>
       <div class="input-group">
         <span class="input-group-btn">
-        <label class="btn btn-secondary"> [parents]0(s)
+        <label class="btn btn-outline-secondary"> [parents]0(s)
           <input class="ml-1" type="checkbox" name="ins_paxcnt" value="on">
         </label>
       </span>
-      <button type="submit" class="btn btn-secondary" title="[*insert::parents]0(s)">OK</button>
+      <button type="submit" class="btn btn-outline-secondary" title="[*insert::parents]0(s)">OK</button>
     </div>
   </div>
 %end;
 
 %define;selector_fevent(xcnt)
   <select class="form-control custom-select font-weight-bold" id="fevent_selectxcnt" onchange="show_fevent_label($('#e_namexcnt').prop('defaultValue'), 'xcnt')">
-    <option value="">-</option>
+    <option value="">[*custom event]</option>
+    <option disabled>──────────</option>
     <option value="#marr" %if;(event.e_name = "#marr" or event.e_name="") selected %end;>[*marriage event]</option>
     <option value="#nmar" %if;(event.e_name = "#nmar") selected%end;>[*no marriage event]</option>
     <option value="#enga" %if;(event.e_name = "#enga") selected%end;>[*engage event]</option>
@@ -479,17 +528,17 @@ function changeCalendar(e,v,m,c) {
 %define;insert_fevent(xcnt)
   <div class="row mt-2">
     <label for="ins_eventxcnt_n" class="col-form-label col-2">[*insert]</label>
-    <div class="form-inline col-10 offset-col-2">
+    <div class="form-inline col-10 ml-auto">
       <select class="form-control" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
         %for;i;1;11;<option>%i;</option> %end;
       </select>
       <div class="input-group">
         <span class="input-group-btn">
-          <label class="btn btn-secondary"> [event/events]0/[event/events]1
+          <label class="btn btn-outline-secondary"> [event/events]0/[event/events]1
             <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
           </label>
         </span>
-        <button type="submit" class="btn btn-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
+        <button type="submit" class="btn btn-outline-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
       </div>
     </div>
   </div>
@@ -498,17 +547,17 @@ function changeCalendar(e,v,m,c) {
 %define;insert_witness(xcnt, wcnt)
   <div class="row mt-3 mb-1">
     <label for="excnt_ins_witnwcnt_n" class="col-form-label col-2">[*insert]</label>
-    <div class="form-inline col-10 offset-col-2">
+    <div class="form-inline col-10 ml-auto">
       <select class="form-control" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n" >
         %for;i;1;11;<option>%i;</option> %end;
       </select>
       <div class="input-group">
         <span class="input-group-btn">
-          <label class="btn btn-secondary"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
+          <label class="btn btn-outline-secondary"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
             <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
           </label>
         </span>
-        <button type="submit" class="btn btn-secondary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
+        <button type="submit" class="btn btn-outline-secondary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
       </div>
     </div>
   </div>
@@ -517,7 +566,7 @@ function changeCalendar(e,v,m,c) {
 %define;one_witness(xcnt, wcnt)
   <div class="row mt-3">
     <h5 class="col-md-2 col-form-label">[*witness/witness/witnesses]0 wcnt</h5>
-    <div class="col-md-3">
+    <div class="col-md-2">
       <select class="form-control" name="excnt_witnwcnt_p">
        <option value="link"%if;(fwitness.create = "link") selected%end;>[*link]0</option>
        <option value="create"%if;(fwitness.create = "create") selected%end;>[*create]0</option>
@@ -536,8 +585,8 @@ function changeCalendar(e,v,m,c) {
       <input type="text" class="form-control" name="excnt_witnwcnt_fn" value="%fwitness.first_name;" id="excnt_witnwcnt_fn" placeholder="[*first name/first names]0">
     </div>
     <label for="excnt_witnwcnt_occ" class="col-sm-1 col-form-label">[*number]0</label>
-    <div class="ml-2">
-      <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" max="9999999" value="%fwitness.occ;" id="excnt_witnwcnt_occ">
+    <div class="col-auto">
+      <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" max="9999999" value="%if;(fwitness.occ="")0%else;%fwitness.occ;%end;" id="excnt_witnwcnt_occ">
     </div>
   </div>
   <div class="row">
@@ -566,12 +615,12 @@ function changeCalendar(e,v,m,c) {
   <div class="row">
     <h5 class="col-form-label col-sm-2 mb-1"><label for="e_namexcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
     <div class="col-sm-3">
-      <label id="fevent_label_selectorxcnt" class="other_evts sr-only">
-      [or]0 [text]0</label>
       %apply;selector_fevent(xcnt)
     </div>
     <div class="col-sm-7">
-      <input class="form-control" type="text" name="e_namexcnt" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*custom] [event/events]0">
+      <label id="fevent_label_selectorxcnt" style="display:none" class="other_evt">
+        <input type="text" class="form-control" name="e_namexcnt" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
+      </label>
     </div>
   </div>
   <div class="row">
@@ -580,7 +629,7 @@ function changeCalendar(e,v,m,c) {
       <input class="form-control" type="text" name="e_placexcnt" value="%event.e_place;" id="e_placexcnt" placeholder="[*place]">
     </div>
   </div>
-  %apply;date([*date/dates]0, "e_datexcnt", "event_date", "")
+  %apply;date([*date/dates]0, "e_datexcnt", "event_date")
   <div class="row">
     <label for="e_notexcnt" class="col-sm-2 col-form-label">[*note/notes]1</label>
     <div class="col-sm-10">
@@ -590,13 +639,17 @@ function changeCalendar(e,v,m,c) {
   <div class="row">
     <label for="e_srcxcnt" class="col-sm-2 col-form-label">[*source/sources]0</label>
     <div class="col-sm-10">
-      <textarea class="form-control" name="e_srcxcnt" rows="1" id="e_srcxcnt" placeholder="[*source/sources]0">%event.e_src;</textarea>
+      %if;(event.e_src!="")
+        <textarea class="form-control" name="e_srcxcnt" rows="1" id="e_srcxcnt" placeholder="[*source/sources]0" %l_on1s;>%event.e_src;</textarea>
+      %else;
+        <input class="form-control" name="e_srcxcnt" maxlength="1000" id="e_srcxcnt" placeholder="[*source/sources]0" value="%event.e_src;"%/>
+      %end;
     </div>
   </div>
   <div class="row">
     %if;(has_fevents and has_fwitness)
       %foreach;fwitness;
-      <div class="col-10 push-1">
+      <div class="col-12">
         %apply;one_witness(xcnt, wcnt)
         %if;is_last;%apply;insert_witness(xcnt, wcnt)%end;
       </div>
@@ -611,10 +664,11 @@ function changeCalendar(e,v,m,c) {
 %end
 
 %define;card_header(xx)
-  <h3 class="card-header"><label for="xx_"><a id="xx_">[*xx]1</a></label></h3>
+  <div class="anchor_upd" id="xx_"></div>
+  <h3 class="card-header  pt-2 pb-1 text-center"><label for="xx_">[*xx]1</label></h3>
 %end;
 
-<h1>%nn;
+<h1 %if;(evar.m="ADD_FAM" or evar.m="ADD_FAM_OK")class="mt-4"%end;>%nn;
   %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
     [*add::family/families]0
   %elseif;(evar_m = "ADD_PAR")
@@ -626,8 +680,11 @@ function changeCalendar(e,v,m,c) {
     [*merge::family/families]1 # %evar_i;
   %end;
 </h1>
-
+%let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
 <form method="post" action="%action;">
+  <div class="row">
+    %apply;nav()
+  </div>
   <p>
     %hidden;
     <input type="hidden" name="digest" value="%digest;"%/>
@@ -658,7 +715,7 @@ function changeCalendar(e,v,m,c) {
 
   <div class="card">
     %apply;card_header("parents")
-    <div class="card-block">
+    <div class="card-body">
       %foreach;parent;
         %apply;parent(cnt, "parent")
         %if;(cnt=1)<hr class="w-100">%end;
@@ -669,7 +726,7 @@ function changeCalendar(e,v,m,c) {
 
   <div class="card">
     %apply;card_header("event/events")
-    <div class="card-block">
+    <div class="card-body">
   <div style="display:none;">
     <p>
       <label>
@@ -699,7 +756,7 @@ function changeCalendar(e,v,m,c) {
       </tr>
     </table>
 
-    %apply;date([*date/dates]0, "marr", "marriage", "")
+    %apply;date([*date/dates]0, "marr", "marriage")
     %apply;note("marr", "marriage")
     %apply;source("marr", "marriage")
 
@@ -774,7 +831,7 @@ function changeCalendar(e,v,m,c) {
         <input type="radio" name="div" value="separated" %if;(divorce = "separated") checked%end;%/>[*separated]
       </label>
     </p>
-    %apply;date([*date/dates]0, "div", "divorce", "")
+    %apply;date([*date/dates]0, "div", "divorce")
   </div>
   
     <div class="form-check">
@@ -805,25 +862,25 @@ function changeCalendar(e,v,m,c) {
     </select>
       <div class="input-group">
         <span class="input-group-btn">
-          <label class="btn btn-secondary"> [child/children]0/[child/children]1
+          <label class="btn btn-outline-secondary"> [child/children]0/[child/children]1
             <input class="ml-1" type="checkbox" name="ins_chxcnt" value="on">
           </label>
       </span>
-      <button type="submit" class="btn btn-secondary" title="[*insert::child/children]0/[child/children]1">OK</button>
+      <button type="submit" class="btn btn-outline-secondary" title="[*insert::child/children]0/[child/children]1">OK</button>
     </div>
   </div>
 %end;
 
 %define;invert_children(xcnt)
-    <div class="form-inline col-3 pull-8">
+    <div class="form-inline col-3">
        <div class="input-group">
          <span class="input-group-btn">
-            <label class="btn btn-secondary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="fa fa-user-o"></span> %expr(xcnt-1) <span class="fa fa-exchange"></span> <span class="fa fa-user-o"></span> xcnt
+            <label class="btn btn-outline-secondary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="fa fa-user-o"></span> %expr(xcnt-1) <span class="fa fa-exchange"></span> <span class="fa fa-user-o"></span> xcnt
               <input class="ml-1" type="checkbox" name="inv_chxcnt" value="on">
             </label>
           </span>
           <span class="input-group-btn">
-            <button type="submit" class="btn btn-secondary">OK</button>
+            <button type="submit" class="btn btn-outline-secondary">OK</button>
           </span>
         </div>
       </div>
@@ -834,7 +891,7 @@ function changeCalendar(e,v,m,c) {
     <hr class="w-100">
     <h5 class="col-form-label col-sm-2">[*child/children]0 %cnt;</h5>
     <div class="col-sm-2">
-      <select class="form-control" name="chxcnt_p">
+      <select class="form-control" name="chxcnt_p" id="chxcnt_p">
         <option value="link"%if;(child.create = "link") selected%end;>[*link]0</option>
         <option value="create"%if;(child.create = "create") selected%end;>[*create]0</option>
       </select>
@@ -847,47 +904,53 @@ function changeCalendar(e,v,m,c) {
     </div>
     <label for="chxcnt_occ" class="col-sm-1 col-form-label">[*number]</label>
     <div class="col-2">
-      <input class="form-control" type="number" name="chxcnt_occ" min="0" max="99999999" value="%child.occ;" id="chxcnt_occ">
+      <input class="form-control" type="number" name="chxcnt_occ" min="0" max="999999" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
     </div>
   </div>
   <div class="row">
     <label for="chxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
     <div class="col-sm-4">
-      <input class="form-control" type="text" name="chxcnt_sn" 
-         value="%nn;
-           %if;
-             ((evar_m = "ADD_FAM_OK" or
-               evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK" or
-               evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK") and
-              child.surname = father.surname)
-           %else;%child.surname;%end;" id="chxcnt_sn" placeholder="[*surname/surnames]0">
+      <input class="form-control" type="text" name="chxcnt_sn"
+         value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;">
     </div>
-    <span class="col-sm-1 col-form-label">[*sex]</span>
-    <div class="form check col-sm-2 mt-2 ml-2">
-      <label class="form-check-label">
-        <input class="form-check-input" type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex = "male") checked%end;%/> [M/F]0
-      </label>
-      <label class="form-check-label">
-        <input class="form-check-input" type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex = "neuter") checked%end;%/> ?
-      </label>
-      <label class="form-check-label">
-        <input class="form-check-input" type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex = "female") checked%end;%/> [M/F]1
-      </label>
+    <div id="chxcnt_sex_div" class="col-sm-6 px-0">
+      <div class="d-flex">
+        <span class="col-sm-2 col-form-label">[*sex]</span>
+        <div class="col-sm-auto ml-2 mt-1">
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex="male")checked%end;%/> [M/F]0
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex="neuter")checked%end;%/> ?
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex="female")checked%end;%/> [M/F]1
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  %apply;birth("chxcnt", "child", "true")
-  %apply;death("chxcnt", "child", "true")
-  <div class="row">
-    <label for="chxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
-    <div class="col-sm-7">
-       <input class="form-control" type="text" name="chxcnt_occupation" value="%child.create.occupation;" id="chxcnt_occupation" placeholder="[*occupation/occupations]0">
+  <div id="chxcnt_div">
+    %apply;birth("chxcnt", "child", "true")
+    %apply;death("chxcnt", "child", "true")
+    <div class="row">
+      <label for="chxcnt_occupation" class="col-sm-2 col-form-label">[*occupation/occupations]0</label>
+      <div class="col-sm-7">
+         <input class="form-control" type="text" name="chxcnt_occupation" value="%child.create.occupation;" id="chxcnt_occupation" placeholder="[*occupation/occupations]0" %readonly;>
+      </div>
     </div>
   </div>
 %end;
 
   <div class="card">
     %apply;card_header("child/children")
-    <div class="card-block">
+    <div class="card-body">
       <div class="row">
         %apply;insert_child("0")
         %foreach;child;
@@ -906,30 +969,34 @@ function changeCalendar(e,v,m,c) {
 
   <div class="card">
     %apply;card_header("comment")
-    <div class="card-block">
+    <div class="card-body">
       <textarea class="form-control" name="comment" id="comment" rows="4">%comment;</textarea>
     </div>
   </div>
   
   <div class="card">
     %apply;card_header("source/sources")
-    <div class="card-block">
+    <div class="card-body">
       <div class="row">
-        <label for="psrc" class="col-sm-1 col-form-label">[[*person/persons]1]</label>
-        <div class="col-sm-11">
+        <label for="psrc" class="col-sm-2 col-form-label">[[*person/persons]1]</label>
+        <div class="col-sm-10">
           <textarea class="form-control" rows="1" name="psrc" id="psrc" placeholder="[*source/sources]1 [person/persons]1">
             %if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;
           </textarea>
         </div>
       </div>
       <div class="row">
-        <label for="src" class="col-sm-1 col-form-label">[*family/families]0</label>
-        <div class="col-sm-10">
-          <textarea class="form-control" name="src" rows="1" id="src" placeholder="[*source/sources]1 [family/families]0">%fsources;</textarea>
+        <label for="src" class="col-sm-2 col-form-label">[*family/families]0</label>
+        <div class="col-sm-9">
+          %if;(fsources!="")
+            <textarea class="form-control" name="src" rows="1" id="src" placeholder="[*source/sources]1 [family/families]0" %l_on1s;>%fsources;</textarea>
+          %else;
+            <input class="form-control" name="src" maxlength="1000" id="src" placeholder="[*source/sources]1 [family/families]0" value="%fsources;"%/>
+          %end;
         </div>
         <div class="col-sm-1">
           <label class="form-check-label">
-            <input type="checkbox" name="rdsrc" value="on" %if;(evar_rdsrc = "on") checked%end;%/>
+            <input type="checkbox" name="rdsrc" value="on" %if;(evar_rdsrc = "on")checked%end;%/>
           </label>
         </div>
       </div>
@@ -940,13 +1007,22 @@ function changeCalendar(e,v,m,c) {
     <input type="text" name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
   %end;
   <div class="text-center">
-    <button type="submit" class="btn btn-secondary btn-lg mt-3" title="OK">[*validate/delete]0</button>
+    <button type="submit" class="btn btn-outline-secondary btn-lg mt-3" title="OK">[*validate/delete]0</button>
   </div>
 </form>
 
 %include.trl;
 %include.copyr;
 </div>
+
 %include.js;
+<script>
+%foreach;parent;
+  %apply;pa_hide_script(cnt)
+%end;
+%foreach;child;
+  %apply;ch_hide_script(cnt)
+%end;
+</script>
 </body>
 </html>
