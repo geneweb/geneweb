@@ -129,6 +129,61 @@ value unaccent_utf_8 lower s i =
           | 0xB9 | 0xBB | 0xBD -> f "Z"
           | 0xBA | 0xBC | 0xBE -> "z"
           | _ -> String.sub s i nbc ]
+      | 0xC6 ->
+          match Char.code s.[i+1] with
+          [ 0x86 | 0x9F | 0xA0 -> f "O"
+          | 0x90 -> f "E"
+          | 0x96 | 0x97 -> f "I"
+          | 0xA1 -> "o"
+          | 0xAF | 0xB1 -> f "U"
+          | 0xB0 -> "u"
+          | 0xB3 -> f "Y"
+          | 0xB4 -> "y"
+          | _ -> String.sub s i nbc ]
+      | 0xC7 ->
+          match Char.code s.[i+1] with
+          [ 0x8D | 0x9E | 0xA0 | 0xBA -> f "A"
+          | 0x8E | 0x9F | 0xA1 | 0xBB-> "a"
+          | 0x8F -> f "I"
+          | 0x90 -> "i"
+          | 0x91 | 0xAA | 0xAC | 0xBE -> f "O"
+          | 0x92 | 0xAB | 0xAD | 0xBF -> "o"
+          | 0x93 | 0x95 | 0x97 |0x99 | 0x9B -> f "U"
+          | 0x94 | 0x96 | 0x98 | 0x9A | 0x9C -> "u"
+          | 0xBC | 0xA2 -> f "AE"
+          | 0xBD | 0xA3 -> "ae"
+          | _ -> String.sub s i nbc ]
+      | 0xC8 ->
+          match Char.code s.[i+1] with
+          [ 0x80 | 0x82 | 0xA6 | 0xBA -> f "A"
+          | 0x81 | 0x83 | 0xA7 -> "a"
+          | 0x84 | 0x86 | 0xA8 -> f "E"
+          | 0x85 | 0x87 | 0xA9 -> "e"
+          | 0x88 | 0x8A -> f "I"
+          | 0x89 | 0x8B -> "i"
+          | 0x8C | 0x8E | 0xAA | 0xAC | 0xAE | 0xB0 -> f "O"
+          | 0x8D | 0x8F | 0xAB | 0xAD | 0xAF | 0xB1 -> "o"
+          | 0x94 | 0x96 -> f "U"
+          | 0x95 | 0x97 -> "u"
+          | 0xA2 -> f "OU"
+          | 0xA3 -> "ou"
+          | 0xB2 -> f "Y"
+          | 0xB3 -> "y"
+          | _ -> String.sub s i nbc ]
+      | 0xC9 ->
+          match Char.code s.[i+1] with
+          [ 0x84 -> f "U"
+          | 0x86 -> f "E"
+          | 0x87 | 0x9B -> "e"
+          | 0x8E -> f "Y"
+          | 0x8F -> "y"
+          | 0x94 -> "o"
+          | 0xA8 | 0xAE -> "i"
+          | _ -> String.sub s i nbc ]
+      | 0xCA ->
+          match Char.code s.[i+1] with
+          [ 0x84 -> "u"
+          | _ -> String.sub s i nbc ]
       | 0xCE ->
           (* Greek *)
           match Char.code s.[i+1] with
@@ -188,6 +243,7 @@ value unaccent_utf_8 lower s i =
           (* Cyrillic *)
           match Char.code s.[i+1] with
           [ 0x81 -> f "E"
+          | 0x86 -> f "I"
           | 0x90 -> f "A"
           | 0x91 -> f "B"
           | 0x92 -> f "V"
@@ -252,6 +308,11 @@ value unaccent_utf_8 lower s i =
           | 0x8E -> "you"
           | 0x8F -> "ya"
           | 0x91 -> "e"
+          | _ -> String.sub s i nbc ]
+      | 0xD3 ->
+          match Char.code s.[i+1] with
+          [ 0x80 -> f "I"
+          | 0x95 -> "ae"
           | _ -> String.sub s i nbc ]
       | 0xD4 ->
           (* Armenian *)
