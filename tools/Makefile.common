@@ -104,7 +104,7 @@ opt out:
 	$(OCAML_out_LINK) $(OCAMLI) $(LIBS:=$(LIB_out_EXT)) $(LINKFLAGS) $^ -o $@
 
 depend: $(DEPEND_DEPEND)
-	$(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- $(wildcard *.ml *.mli) > .depend
+	$(ROOT)/tools/camlp5_depend.sh $(CAMLP5F) $(OCAMLI) -- $(wildcard *.ml *.mli) | sed -e 's/\/\x0D/\\/g' -e 's/\x0D//g' > .depend
 
 .depend:
 	@if [ ! -e $@ ]; then $(MAKE) -o $@ depend; fi
