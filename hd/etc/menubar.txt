@@ -281,7 +281,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         </li>
       </ul>
     </nav>
-    <div class="btn-group mt-2 mr-0 push-right">
+    <div class="btn-group %if;(evar.m="MOD_IND")mt-4%else;mt-2%end; mr-0 push-right">
       %if;(evar.m !="MOD_IND" and referer != "")
         <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
       %end;

@@ -1,3 +1,8 @@
+div.anchor_updind {
+  position:absolute;
+  top:-25px;
+}
+
 /* Capitalization unavailable in note from Ocaml */
 p::first-letter {
   text-transform: capitalize;

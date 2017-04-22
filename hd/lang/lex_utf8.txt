@@ -14292,8 +14292,8 @@ en: full width display/columns display
 fr: affichage pleine largeur/affichage sur deux colonnes
 
     dd/mm/yyyy
-en: dd/mm/yyyy
-fr: jour/mois/année
+en: DD/MM/YYYY
+fr: JJ/MM/AAAA
 
     spouses info
 en: spouses informations
