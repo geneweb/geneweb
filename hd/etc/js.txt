@@ -21,24 +21,17 @@
     $.getScript('%if;(cgi)%bvar.static_path;%end;p_mod.js');
   });
   </script>
-%end;
-%if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"))
-  <script>
-  function reloadClose()
-  { window.opener.location.reload();
-    parent.close();
-  }
-  var htmlTitle = document.title;
-  if
-  ( htmlTitle == "[*person modified]" ||
-    htmlTitle == "[*family modified]" ||
-    htmlTitle == "[*person added]" ||
-    htmlTitle == "[*family added]"
-  )
-  { if (window.opener && !window.opener.closed)
-    { document.getElementById("x_trl").innerHTML ="<a class=\"btn btn-secondary\" id=\"reload_close\" href=\"javascript:reloadClose()\" role=\"button\" title=\"Close\">X</a>";
-      document.getElementById("reload_close").focus();
+  %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"))
+    <script>
+    var htmlTitle = document.title;
+    if
+    ( htmlTitle == "[*person modified]" ||
+      htmlTitle == "[*family modified]" ||
+      htmlTitle == "[*person added]" ||
+      htmlTitle == "[*family added]"
+    )
+    { document.getElementById("reference").focus();
     }
-  }
-  </script>
+    </script>
+  %end;
 %end;
