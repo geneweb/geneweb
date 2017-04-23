@@ -1,0 +1,25 @@
+%if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"))
+  <div id="trl"></div>
+  <script>
+  function reloadClose()
+  {
+    window.opener.location.reload();
+    parent.close();
+  }
+  var htmlTitle = document.title;
+  if
+  (
+    htmlTitle == "[*person modified]" ||
+    htmlTitle == "[*family modified]" ||
+    htmlTitle == "[*person added]" ||
+    htmlTitle == "[*family added]"
+  )
+  {
+    if (window.opener && !window.opener.closed)
+    {
+      document.getElementById("trl").innerHTML = "<p><a id=\"reload_close\" href=\"javascript:reloadClose()\">[X]</a></p>";
+      document.getElementById("reload_close").focus();
+    }
+  }
+  </script>
+%end;
