@@ -284,8 +284,8 @@
 %end;
 %define;link_dates(xx)
   %if;(not cancel_links)
-    <a id="xx_%xx.index;" %apply;a_title("xx") %l_ldates;%xx.index;"
-    >%if;(xx.dates != "")%xx.dates;%else; - %end;</a>%else;%xx.dates;%end;
+    <a id="xx_%xx.index;" %apply;a_title("xx") %l_ldates;%xx.index;">
+    %if;(xx.dates != "")%xx.dates;%else; - %end;</a>%else;%xx.dates;%end;
 %end;
 %define;link_marriage(xx)
   %if;(not cancel_links)
@@ -786,8 +786,8 @@
   %if;(not cancel_links)
     %reset_count;
     <a href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
-     %incr_count;i%count;=%himxx.index;;t%count;=%l_rt0;;%nn;
-     %if;("herxx" != "");%incr_count;i%count;=%herxx.index;;t%count;=%l_rt1;;%nn;%end;
+     %if;("himxx" != "")%incr_count;i%count;=%himxx.index;;t%count;=%l_rt0;;%nn;%end;
+     %if;("herxx" != "")%incr_count;i%count;=%herxx.index;;t%count;=%l_rt1;;%nn;%end;
      %if;(browsing_with_sosa_ref)%incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;%end;
      %incr_count;i%count;=%index;;t%count;=%l_hh;;%nn;
      " title="[*shortest path] ♆">•</a>%nn;
@@ -1193,13 +1193,18 @@
         <br/><span class="ch2">%if;(not cancel_links and cnt>1)%apply;relations_tree(l_ref)%end[*relation/relations]1%if;(not cancel_links and cnt>1)</a>%end;</span></div>
         %foreach;relation;
           <div class="tree" style="clear:both">
-          %apply;relation_computing("relation_him", "relation_her", "") %apply;capitalize(relation_type)[:]
-            %if;has_relation_him;
-              <span style="white-space: nowrap">%apply;somebody("relation_him")</span>
-              %if;has_relation_her; <span style="white-space: nowrap">[and] %end;
+            %if;(has_relation_him and has_relation_her)
+              %apply;relation_computing("relation_him", "relation_her", "") %apply;capitalize(relation_type)[:]
+              <span style="white-space: nowrap">%apply;somebody("relation_him")
+              %sp;[and]%sp;%apply;somebody("relation_her")</span>
             %end;
-            %if;has_relation_her;
-              %apply;somebody("relation_her")</span>.
+            %if;(has_relation_him and not has_relation_her)
+              %apply;relation_computing("relation_him", "", "") %apply;capitalize(relation_type)[:]
+              <span style="white-space: nowrap">%apply;somebody("relation_him")</span>.
+            %end;
+            %if;(not has_relation_him and has_relation_her)
+              %apply;relation_computing("", "relation_her", "") %apply;capitalize(relation_type)[:]
+              <span style="white-space: nowrap">%apply;somebody("relation_her")</span>.
             %end;
           </div>
         %end;
@@ -1351,7 +1356,6 @@
       </div>
     %end;
   %end;
-</div>
 %( <!-- End display ancestors/descendants --> %)
 %( <!-- Begin display menu --> %)
 %if;(not cancel_links and wizard and (evar.misc = "yes" or bvar.misc = "yes"))
@@ -1378,6 +1382,7 @@
   %include.trl;
   %include.copyr;
 %end;
+</div>
 </div>
 %include.js;
 </body>

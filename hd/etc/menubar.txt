@@ -90,11 +90,11 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                 </p>
                 <div id="p_mod_table"></div>
               </form>
-              <div class="form-control" value="%if;(evar.p_mod!="")%p_mod;%end;">
-                <img src="%image_prefix;/menubar_1.jpg">
+              <div class="form-control">
+                <img src="%image_prefix;/menubar_1.jpg" alt="menubar_1" >
                 <div id="p_mod_builder">
                   %if;(evar.p_mod="zz")
-                    <img src="%image_prefix;/zz_1.jpg">
+                    <img src="%image_prefix;/zz_1.jpg" alt="zz_1">
                   %end;
                 </div>
               </div>
