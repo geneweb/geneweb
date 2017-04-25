@@ -6,19 +6,20 @@ open Config;
 
 (* ************************************************************************** *)
 (*  [Fonc] content : string -> int -> string -> unit                          *)
-(** [Description] : Envoie les en-têtes de contenu et de cache pour une image
-                    sur le flux HTTP sortant de Wserver.
+(** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
+                    image, pdf ou html sur le flux HTTP sortant de Wserver.
     [Args] :
-      - t : le type MIME de l'image, par exemple "png", "jpeg" ou "gif"
-      - len : la taille en octet de l'image
-      - fname : le nom du fichier image
+      - ct : le content_type MIME du fichier, par exemple "image/png", 
+             "image/jpeg" ou "application/pdf"
+      - len : la taille en octet du fichier
+      - fname : le nom du fichier 
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value content t len fname =
+value content ct len fname =
   do {
     Wserver.http HttpStatus.OK;
-    Wserver.header "Content-type: image/%s" t;
+    Wserver.header "Content-type: %s" ct;
     Wserver.header "Content-length: %d" len;
     Wserver.header "Content-disposition: inline; filename=%s"
       (Filename.basename fname);
@@ -34,18 +35,19 @@ value content t len fname =
                     utilisant Wserver.
     [Args] :
       - fname : le chemin vers le fichier image
-      - itype : le type MIME de l'image, par exemple "png", "jpeg" ou "gif"
+      - ctype : le content_type MIME du fichier, par exemple "image/png", 
+                "image/jpeg" ou "application/pdf"
     [Retour] : True si le fichier image existe et qu'il a été servi en réponse
                HTTP.
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value print_image_type fname itype =
+value print_image_type fname ctype  =
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let buf = Bytes.create 1024 in
       let len = in_channel_length ic in
       do {
-        content itype len fname;
+        content ctype len fname;
         let rec loop len =
           if len = 0 then ()
           else do {
@@ -67,12 +69,19 @@ value print_image_type fname itype =
 (* ************************************************************************** *)
 value print_image_file fname =
   List.exists
-    (fun (suff, itype) ->
+    (fun (suff, itype, ctype) ->
        if Filename.check_suffix fname suff ||
           Filename.check_suffix fname (String.uppercase suff) then
-         print_image_type fname itype
+         print_image_type fname ctype
        else False)
-    [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg"); (".gif", "gif")]
+    [(".png", "png", "image/png"); 
+     (".jpg", "jpeg", "image/jpeg");
+     (".jpeg", "jpeg", "image/jpeg"); 
+     (".pjpeg", "jpeg", "image/jpeg");
+     (".gif", "gif", "image/gif"); 
+     (".pdf", "pdf", "application/pdf"); 
+     (".htm", "html", "text/html"); 
+     (".html", "html", "text/html")]
 ;
 
 (* ************************************************************************** *)
@@ -106,6 +115,7 @@ value print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
+  (* TODO remove Filename.basename to handle sub_dirs *)
   if fname = Filename.basename fname then
     let fname = Util.source_image_file_name conf.bname fname in
     if print_image_file fname then () else Hutil.incorrect_request conf
