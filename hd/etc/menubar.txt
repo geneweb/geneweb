@@ -26,7 +26,7 @@
   <div class="d-flex justify-content-between">
     <div class="float-left mt-3 btn-group">
       %if;(not cancel_links and (evar.p!="" or evar.i!="") and (p_mod="" or p_mod="zz") and evar.m!="MOD_IND" and evar.m!="MOD_FAM" and has_parents and (father.has_parents or mother.has_parents))
-          <a data-toggle="collapse" href="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 module">
+          <a id="toggle_gr-parents" data-toggle="collapse" href="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 module">
             <i class="fa fa-list fa-fw ml-2 align-middle"></i>
           </a>
       %end;
@@ -41,7 +41,7 @@
           %end;
         %end;
         <li class="nav-item">
-          <a class="nav-link %if;(evar.m="")active%end;" href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;"><span class="fa fa-user fa-fw %sexcolor;"></span></a>
+          <a class="nav-link %if;(evar.m="")active%end;" id="self" href="%prefix;%access;" title="%first_name;%if;(occ!=0).%occ%end; %surname;"><span class="fa fa-user fa-fw %sexcolor;"></span></a>
         </li>
         %( personnal modules selection menu %)
         <li class="nav-item dropdown">
@@ -110,13 +110,13 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
             <a class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="SND_IMAGE" or evar.m="MRG" or evar.m="DEL_IND")active%end;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="[*tools] [person/persons]0"><span class="fa fa-cog"></span></a>
             <div class="dropdown-menu">
               <a class="dropdown-item" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;></a>
-              <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-unsorted fa-fw"></span>  [*invert::event/events]1</a>
+              <a class="dropdown-item" id="sind_self" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-unsorted fa-fw"></span>  [*invert::event/events]1</a>
               %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-                <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="fa fa-file-image-o fa-fw"></span>  %if;has_image;[*modify picture]%else;[*add picture]%end;</a>
+                <a class="dropdown-item" id="aimg_self" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="fa fa-file-image-o fa-fw"></span>  %if;has_image;[*modify picture]%else;[*add picture]%end;</a>
               %end;
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname;"><span class="fa fa-user-times fa-fw text-danger"></span>  [*merge::person/persons]0</a>
-              <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash fa-fw text-danger"></span>  [*delete::person/persons]0</a>
+              <a class="dropdown-item" id="mrg" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname;"><span class="fa fa-user-times fa-fw text-danger"></span>  [*merge::person/persons]0</a>
+              <a class="dropdown-item" id="dind_self" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash fa-fw text-danger"></span>  [*delete::person/persons]0</a>
               %if;has_possible_duplications;
                 <a class="dropdown-item" href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
               %end;
@@ -209,7 +209,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle %if;(evar.m="R" or (evar.m="C" and evar.t="AN"))active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-link fa-rotate-90"></span></a>
           <div class="dropdown-menu">
-            <a class="dropdown-item " href="%prefix;m=R;%access;" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship computing]</a>
+            <a class="dropdown-item " id="search_relation" href="%prefix;m=R;%access;" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship computing]</a>
             <div class="dropdown-divider"></div>
             %if;(browsing_with_sosa_ref)
               %if;(sosa_ref.index != "" and sosa_ref.index != index)
@@ -283,22 +283,22 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
     </nav>
     <div class="btn-group %if;(evar.m="MOD_IND")mt-4%else;mt-2%end; mr-0 push-right">
       %if;(evar.m !="MOD_IND" and referer != "")
-        <a role="button" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
+        <a role="button" id="back_ref" class="btn btn-link px-0" href="%referer;"><i class="fa fa-arrow-left fa-lg" title="<<"></i></a>%nn;
       %end;
-      <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><i class="fa fa-home fa-lg" title="[*home]"></i></a>%nn;
+      <a role="button" id="home" class="btn btn-link ml-1 px-0" href="%prefix;"><i class="fa fa-home fa-lg" title="[*home]"></i></a>%nn;
       %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
-        <a role="button" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
+        <a role="button" id="cancel_links" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
       %end;
       %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
         <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;;%suffix;" %laS; title="%apply;nav_with_sosa_ref(self)">
           <i class="fa fa-dot-circle-o fa-lg %sexcolor;"></i>
         </a>%nn;
       %else;
-        <a role="button" class="btn btn-link ml-1 px-0" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
+        <a role="button" id="cancel_sosaref" class="btn btn-link ml-1 px-0" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
           <i class="fa fa-stop-circle-o fa-lg %sexcolor;"></i>
         </a>%nn;
       %end;
-      <a role="button" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>%nn;
+      <a role="button" id="search_modal" class="btn btn-link ml-1 px-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>%nn;
     </div>
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="ModalSearch" aria-hidden="true">
       <div class="modal-dialog modal-lg" role="document">
@@ -328,3 +328,26 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
     </div>
   </div>
 %end;
+<div class="d-none">
+  <a id="prefix" href="%prefix"></a>
+  %if;(browsing_with_sosa_ref)
+    <a id="sosaref" data-access="%sosa_ref.access;" data-index="%sosa_ref.index;"></a>
+  %end;
+  %foreach;ancestor_level;
+    %foreach;ancestor;
+      %if;(level<5)
+        <a id="s%ancestor.anc_sosa;" data-access="%ancestor.access;" data-index="%ancestor.index;"
+           %if;(ancestor.has_families)
+             %reset_count;
+             %incr_count;
+             %foreach;ancestor.family;%nn;
+               data-spouse%count;="%spouse.access;" data-family-index%count;="%family.index;"
+               %incr_count;
+             %end;
+           %end;%nn;
+           %if;(count>1)data-fam_count="%expr(count-1)"%nn;%end;
+         ></a>
+      %end;
+    %end;
+  %end;
+</div>

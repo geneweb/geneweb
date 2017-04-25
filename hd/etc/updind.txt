@@ -637,7 +637,7 @@ function changeCalendar(e,v,m,c) {
     <div class="row">
       <label for="e_placexcnt" class="col-2 col-form-label">[*place]</label>
       <div class="col-10">
-        <input type="text" class="form-control" name="e_placexcnt" maxlength="200" value="%event.e_place;" id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_burial_focus(xcnt)'%end; placeholder="[*place]">
+        <input type="text" class="form-control mousetrap" name="e_placexcnt" maxlength="200" value="%event.e_place;" id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_burial_focus(xcnt)'%end; placeholder="[*place]">
         <a class="astuce" onmouseover="show_explain('updind','place',event)" onmouseout="hide_explain('updind',event)"></a>
       </div>
     </div>
@@ -759,7 +759,7 @@ function changeCalendar(e,v,m,c) {
     <div class="row">
       <label for="e_placexcnt" class="col-sm-2 col-form-label">[*place]</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" name="e_placexcnt" maxlength="200" value="%event.e_place;"%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%end; placeholder="[*place]">
+        <input type="text" class="form-control mousetrap" name="e_placexcnt" maxlength="200" value="%event.e_place;"%sp; id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%end; placeholder="[*place]">
       </div>
     </div>
     %apply;date%with;[*date/dates]0%and;e_datexcnt%and;event_date%and;%if;("evt_name" = "#deat")onfocus='set_death_focus(xcnt)'%end;%end;
@@ -840,7 +840,7 @@ function changeCalendar(e,v,m,c) {
   <div class="row">
     <label for="e_placexcnt" class="col-sm-2 col-form-label">[*place]</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" name="e_placexcnt" maxlength="200" value="" id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_buri(xcnt)'%end; placeholder="[*place]">
+      <input type="text" class="form-control mousetrap" name="e_placexcnt" maxlength="200" value="" id="e_placexcnt" %if;("evt_name" = "#deat") onfocus='set_death_focus(xcnt)'%elseif;("evt_name" = "buri_or_crem") onfocus='set_buri(xcnt)'%end; placeholder="[*place]">
     </div>
   </div>
   %if;("evt_name"="#deat")
@@ -930,7 +930,7 @@ function changeCalendar(e,v,m,c) {
     <div class="row">
       <label for="first_name" class="col-sm-2 col-form-label">[*first name/first names]0</label>
       <div class="col-sm-6">
-        <input type="text" class="form-control" name="first_name" maxlength="200" value="%first_name;" id="first_name" placeholder="[*first name/first names]0">
+        <input type="text" class="form-control mousetrap" name="first_name" maxlength="200" value="%first_name;" id="first_name" placeholder="[*first name/first names]0">
       </div>
       <label for="occ" class="col-sm-1 col-form-label">[*number]0</label>
       <div class="col-sm-2">

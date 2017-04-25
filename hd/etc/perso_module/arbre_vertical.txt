@@ -180,17 +180,41 @@
         <div class="btn-group mx-2">
           %if;(maxlev>9 and evarv>5)
             <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵</a>
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−</a>
+            <a id="v--" href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−</a>
+          %else;
+            <a id="v--" class="invisible" href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%end"></a>
+          %end;
+          %for;i;1;evarv;
+              <a id="v-%i;" class="invisible" href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-i)%and;%evarim;%and;%evarma;%and;%evart;%end"></a>
+          %end;
+          %if;(minv<20)
+            %for;i;1;minv;
+              <a id="v%i;" class="invisible" href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end"></a>
+            %end;
           %end;
           %for;i;minv;maxv;
-            <a class="btn btn-secondary btn-sm %if;(evarv=i)disabled font-weight-bold%end;" %nn;
+            <a id="v%i;" class="btn btn-secondary btn-sm %if;(evarv=i)disabled font-weight-bold%end;" %nn;
               href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end" %nn;
               title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end; %if;(i=maxlev)(max)%end;">%i;</a>
           %end;
+          %if;(maxlev>19 and maxv<20)
+            %for;i;maxv;20;
+              <a id="v%i;" class="invisible" href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end"></a>
+            %end;
+          %else;
+            %for;i;maxv;maxlev;
+              <a id="v%i;" class="invisible" href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end"></a>
+            %end;
+          %end;
           %if;(maxlev>9 and maxlev-evarv>=5)
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
+            <a id="v++" href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
             <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">+⁵</a>
+          %else;
+            <a id="v++" class="invisible" href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%end"></a>
+          %end;
+          %for;i;1;10;
+            <a id="v+%i;" class="invisible" href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+i)%and;%evarim;%and;%evarma;%and;%evart;%end"></a>
           %end;
         </div>
         %if;(evarv>1)

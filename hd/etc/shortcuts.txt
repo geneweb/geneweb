@@ -1,0 +1,81 @@
+<!-- $Id: shortcuts.txt,v 7.00 01/05/2017 04:32:18 $ -->
+%( direct shortcuts included in js.txt, using mousetrap (https://craig.is/killing/mice)
+  1. single "'hotkey'", multiple "'hotkey', 'hotkey2'", sequences "'esc space'"
+  2. get element "id" in template
+  3. three functions: go to "url", "focus" or "click" on element %)
+%( menubar %)
+%if;(is_printed_by_template)
+  %apply;key("'esc'","home","url")
+%if;(evar.m!="A" and evar.m!="MOD_IND" and evar.m!="MOD_IND_OK" and evar.m!="MOD_FAM" and evar.m!="MOD_FAM_OK" and evar.m!="ADD_FAM" and evar.m!="ADD_FAM_OK")
+  %apply;key%with;'8'%and;toggle_gr-parents%and;click%end;
+  %apply;key%with;'backspace'%and;back_ref%and;click%end;
+  %if;(browsing_with_sosa_ref)%apply;key%with;'%sref;'%and;sosaref%and;showind%end;%end;
+  %apply;key%with;'%cgl;'%and;cancel_links%and;url%end;
+  %apply;key%with;'%lnkd;'%and;s1%and;linked%end;
+  %apply;key%with;'%afam;'%and;add_fam%and;url%end;
+  %apply;key%with;'%rela;'%and;search_relation%and;url%end;
+  %apply;key%with;'%xref; %xref;', '%xref; space'%and;%if;(not browsing_with_sosa_ref or sosa_ref.index!=index)nav_sosaref%elseif;(browsing_with_sosa_ref)cancel_sosaref%end;%and;url%end;
+  %apply;key%with;'%search;'%and;search_modal%and;click%end;
+  %apply;key%with;'%psib;'%and;previous_sibling%and;url%end;
+  %apply;key%with;'%nsib;'%and;next_sibling%and;url%end;
+%( Example for focus (not used atm):
+  %apply;key("'t'","editbox","focus") %)
+%( updind only few examples, not developped atm %)
+%elseif;(evar.m="MOD_IND")
+  %apply;key("'alt'","first_name","focus")
+  %apply;key("'F1'","e_place1","focus")
+  %apply;key("'F2'","e_place2","focus")
+  %apply;key("'alt+F3'","e_place3","focus")
+  %apply;key("'alt+F4'","e_place4","focus")
+  %apply;key("'up 4'","e_place5","focus")
+  %apply;key("'left enter'","notes","focus")
+%( change directly generation on asc. tree with numpad 
+   add or remove generation with +/- number
+   + + add one generation
+   - - remone one generation
+   + X adds X generations
+   - X removes X generations %)
+%elseif;(evar.m="A")
+  %apply;key("'0'","v1","url")
+  %apply;key("'2'","v2","url")
+  %apply;key("'3'","v3","url")
+  %apply;key("'4'","v4","url")
+  %apply;key("'5'","v5","url")
+  %apply;key("'6'","v6","url")
+  %apply;key("'7'","v7","url")
+  %apply;key("'8'","v8","url")
+  %apply;key("'9'","v9","url")
+  %apply;key("'1 0'","v10","url")
+  %apply;key("'1 1'","v11","url")
+  %apply;key("'1 2'","v12","url")
+  %apply;key("'1 3'","v13","url")
+  %apply;key("'1 4'","v14","url")
+  %apply;key("'1 5'","v15","url")
+  %apply;key("'1 6'","v16","url")
+  %apply;key("'1 7'","v17","url")
+  %apply;key("'1 8'","v18","url")
+  %apply;key("'1 9'","v19","url")
+%if;(evar.v>1)
+  %apply;key("'- -'","v--","url")
+%end;
+  %apply;key("'+ +'","v++","url")
+  %apply;key("'- 1'","v-1","url")
+  %apply;key("'- 2'","v-2","url")
+  %apply;key("'- 3'","v-3","url")
+  %apply;key("'- 4'","v-4","url")
+  %apply;key("'- 5'","v-5","url")
+  %apply;key("'- 6'","v-6","url")
+  %apply;key("'- 7'","v-7","url")
+  %apply;key("'- 8'","v-8","url")
+  %apply;key("'- 9'","v-9","url")
+  %apply;key("'+ 1'","v+1","url")
+  %apply;key("'+ 2'","v+2","url")
+  %apply;key("'+ 3'","v+3","url")
+  %apply;key("'+ 4'","v+4","url")
+  %apply;key("'+ 5'","v+5","url")
+  %apply;key("'+ 6'","v+6","url")
+  %apply;key("'+ 7'","v+7","url")
+  %apply;key("'+ 8'","v+8","url")
+  %apply;key("'+ 9'","v+9","url")
+%end;
+%end;

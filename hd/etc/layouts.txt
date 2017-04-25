@@ -1,0 +1,91 @@
+﻿%( Using hex scandodes as variables for Mousetrap
+┌────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────╔═════════╗
+│    │    │    │    │    │    │    │    │    │    │    │    │    ║         ║
+│ 29 │ 02 │ 03 │ 04 │ 05 │ 06 │ 07 │ 08 │ 09 │ 0A │ 0B │ 0C │ 0D ║   0E    ║
+╔════╧══╗─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─╚══╦══════╣
+║       ║    │    │    │    │    │    │    │    │    │    │    │    ║      ║
+║  0F   ║ 10 │ 11 │ 12 │ 13 │ 14 │ 15 │ 16 │ 17 │ 18 │ 19 │ 1A │ 1B ║  1C  ║
+╠═══════╩╗───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───╚╗     ║
+║        ║    │    │    │    │    │    │    │    │    │    │    │    ║     ║
+║  3A    ║ 1E │ 1F │ 20 │ 21 │ 22 │ 23 │ 24 │ 25 │ 26 │ 27 │ 28 │ 2B ║     ║
+╠══════╦═╝──┬─┴──┬─┴──┬─┴─══─┴──┬─┴──┬─┴─══─┴──┬─┴──┬─┴──┬─┴──╔═╧════╩═════╣
+║      ║    │    │    │    │    │    │    │    │    │    │    ║            ║
+║  2A  ║ 56 │ 2C │ 2D │ 2E │ 2F │ 30 │ 31 │ 32 │ 33 │ 34 │ 35 ║     36     ║
+╠══════╩╦═══╧══╦═╧═══╦╧════╧════╧════╧════╧════╧═╦══╧══╦═╧════╬═════╦══════╣
+║       ║      ║     ║                           ║     ║      ║     ║      ║
+║  1D   ║ E01F ║ 38  ║          39               ║E038 ║ E027 ║ E02F║ E01D ║
+╚═══════╩══════╩═════╩═══════════════════════════╩═════╩══════╩═════╩══════╝
+┌────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────┬────╔═════════╗
+│    │    │m=LI│#   │CHNG│    │#TOP│(7) │ 8  │ 9  │ 0  │    │    ║  DEL    ║
+│SRCH│ CGL│LINK│NOTE│CHLD│    │    │    │    │    │    │    │    ║   0E    ║
+╔════╧══╗─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─┴──┬─╚══╦══════╣
+║       ║ t=T│ m=A│ADD │ADD │    │    │ 4  │ 5  │ 6  │ 7  │    │    ║      ║ search + sosa number
+║  0F   ║TREE│ASCE│APAR│AFAM│    │    │FFS4│FMS5│MFS6│MMS7│    │    ║  1C  ║ go/edit ind/fam/spou/desc + number
+╠═══════╩╗───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───┴┬───╚╗     ║ nommenclature pour gd-parents/parents > 2-7?
+║        ║ t=I│ m=D│MOD │MOD │    │    │ 1  │ 2  │ 3  │G0  │switcxxxx║     ║ 7 en doublon pour plus de cohérence
+║  3A    ║TABL│DESC│MIND│MFAM│SPOU│DESC│SELF│FAS2│MOS3|SREF│XREF│xxxx║     ║ MFAM = AFAM si aucune famille
+╠══════╦═╝──┬─┴──┬─┴──┬─┴─══─┴──┬─┴──┬─┴─══─┴──┬─┴──┬─┴──┬─┴──╔═╧════╩═════╣ P/NSIB = previous/next sibling
+║      ║xxxx│ t=L│ m=R│ADD │MOD │MOD │ <  │ >  │    │    │    ║            ║ MENU ASC/DESC = ASCE/DESC×2
+║  2A  ║xxxx│LONG│RELA│AIMG│FAM2│FAM3│PSIB│NSIB│    │SORT│ MRG║     36     ║ SIND/FAM devraient être sur MIND/FAM comme templm (fctionne avec i=)
+╠══════╩╦═══╧══╦═╧═══╦╧════╧════╧════╧════╧════╧═╦══╧══╦═╧════╬═════╦══════╣ M/AFAM fctionnent avec i=… ;(
+║       ║      ║     ║                           ║     ║      ║     ║      ║
+║  1D   ║ E01F ║ 38  ║          39               ║E038 ║ E027 ║ E02F║ E01D ║ TODO = add QWERTZ and NEO for Deutsch
+╚═══════╩══════╩═════╩═══════════════════════════╩═════╩══════╩═════╩══════╝%)
+%(defaut keyboard = qwerty-us, alternative : colemak dvorak azerty bepo %)
+%let;colemak;%if;(bvar.keyboard="colemak")1%else;0%end;%in;
+%let;dvorak;%if;(bvar.keyboard="dvorak")1%else;0%end;%in;
+%let;azerty;%if;(bvar.keyboard="azerty")1%else;0%end;%in;
+%let;bepo;%if;(bvar.keyboard="bepo")1%else;0%end;%in;
+%( %let;;%if;(colemak=1)%elseif;(dvorak=1)%elseif;(azerty=1)%elseif;(bepo=1)%else;%end;%in; %)
+%(number_row%)
+%(29%)%let;search;%if;(colemak=1 or dvorak=1)`%elseif;(azerty=1)²%elseif;(bepo=1)$%else;~%end;%in;
+%(02%)%let;cgl;%if;(azerty=1)&%elseif;(bepo=1)"%else;1%end;%in;
+%(03%)%let;lnkd;%if;(azerty=1)é%elseif;(bepo=1)«%else;2%end;%in;
+%(04%)%let;note;%if;(azerty=1)"%elseif;(bepo=1)»%else;3%end;%in;
+%(05%)%let;chld;%if;(azerty=1)'%elseif;(bepo=1)(%else;4%end;%in;
+%(06%)%let;;%if;(azerty=1)(%elseif;(bepo=1))%else;5%end;%in;
+%(07%)%let;top;%if;(azerty=1)-%elseif;(bepo=1)@%else;6%end;%in;
+%(08%)%let;;%if;(azerty=1)è%elseif;(bepo=1)+%else;7%end;%in;
+%(09%)%let;;%if;(azerty=1)_%elseif;(bepo=1)-%else;8%end;%in;
+%(0A%)%let;;%if;(azerty=1)ç%elseif;(bepo=1)/%else;9%end;%in;
+%(0B%)%let;;%if;(azerty=1)à%elseif;(bepo=1)*%else;0%end;%in;
+%(0C%)%let;;%if;(dvorak=1)%[%elseif;(azerty=1)%%elseif;(bepo=1)=%else;-%end;%in;
+%(upper_row%)
+%(10%)%let;tree;%if;(dvorak=1)?%elseif;(azerty=1)a%elseif;(bepo=1)b%else;q%end;%in;
+%(11%)%let;asce;%if;(dvorak=1),%elseif;(azerty=1)z%elseif;(bepo=1)é%else;w%end;%in;
+%(12%)%let;apar;%if;(colemak=1)f%elseif;(dvorak=1).%elseif;(bepo=1)p%else;e%end;%in;
+%(13%)%let;afam;%if;(colemak=1)p%elseif;(dvorak=1)p%elseif;(bepo=1)o%else;r%end;%in;
+%(14%)%let;;%if;(colemak=1)g%elseif;(dvorak=1)y%elseif;(bepo=1)è%else;t%end;%in;
+%(15%)%let;;%if;(colemak=1)j%elseif;(dvorak=1)f%elseif;(bepo=1)^%else;y%end;%in;
+%(16%)%let;4;%if;(colemak=1)l%elseif;(dvorak=1)g%elseif;(bepo=1)v%else;u%end;%in;
+%(17%)%let;5;%if;(colemak=1)u%elseif;(dvorak=1)c%elseif;(bepo=1)d%else;i%end;%in;
+%(18%)%let;6;%if;(colemak=1)y%elseif;(dvorak=1)r%elseif;(bepo=1)l%else;o%end;%in;
+%(19%)%let;7;%if;(colemak=1);%elseif;(dvorak=1)l%elseif;(bepo=1)j%else;p%end;%in;
+%(1A%)%let;;%if;(dvorak=1)/%elseif;(azerty=1)^%elseif;(bepo=1)z%else;[%end;%in;
+%(1B%)%let;;%if;(dvorak=1)=%elseif;(azerty=1)$%elseif;(bepo=1)w%else;]%end;%in;
+%(homerow%)
+%(1E%)%let;tabl;%if;(azerty=1)q%else;a%end;%in;
+%(1F%)%let;desc;%if;(colemak=1)r%elseif;(dvorak=1)o%elseif;(bepo=1)u%else;s%end;%in;
+%(20%)%let;mind;%if;(colemak=1)s%elseif;(dvorak=1)e%elseif;(bepo=1)i%else;d%end;%in;
+%(21%)%let;mfam;%if;(colemak=1)t%elseif;(dvorak=1)u%elseif;(bepo=1)e%else;f%end;%in;
+%(22%)%let;spou;%if;(colemak=1)d%elseif;(dvorak=1)i%elseif;(bepo=1),%else;g%end;%in;
+%(23%)%let;desc;%if;(dvorak=1)d%elseif;(bepo=1)c%else;h%end;%in;
+%(24%)%let;1;%if;(colemak=1)n%elseif;(dvorak=1)h%elseif;(bepo=1)t%else;j%end;%in;
+%(25%)%let;2;%if;(colemak=1)e%elseif;(dvorak=1)t%elseif;(bepo=1)s%else;k%end;%in;
+%(26%)%let;3;%if;(colemak=1)i%elseif;(dvorak=1)n%elseif;(bepo=1)r%else;l%end;%in;
+%(27%)%let;sref;%if;(colemak=1)o%elseif;(dvorak=1)s%elseif;(azerty=1)m%elseif;(bepo=1)n%else;;%end;%in;
+%(28%)%let;xref;%if;(colemak=1)\x27%elseif;(dvorak=1)-%elseif;(azerty=1)ù%elseif;(bepo=1)m%else;\x27%end;%in;
+%( attention la touche 2B se ballade de clavier en clavier et la 56 est absente sur les 104 touches %)
+%(2B%)%let;;%if;(colemak=1)\%elseif;(dvorak=1)\%elseif;(azerty=1)*%elseif;(bepo=1)ç%else;\%end;%in;
+%(lower_row%)
+%( %let;56;%if;(colemak=1)%elseif;(dvorak=1)%elseif;(azerty=1)<%elseif;(bepo=1)ê%else;%end;%in; LSGT not present on 104 keys keyboards %)
+%(2C%)%let;long;%if;(dvorak=1);%elseif;(azerty=1)w%elseif;(bepo=1)à%else;z%end;%in;
+%(2D%)%let;rela;%if;(dvorak=1)q%elseif;(bepo=1)y%else;x%end;%in;
+%(2E%)%let;aimg;%if;(dvorak=1)j%elseif;(bepo=1)x%else;c%end;%in;
+%(2F%)%let;fam2;%if;(dvorak=1)k%elseif;(bepo=1).%else;v%end;%in;
+%(30%)%let;fam3;%if;(dvorak=1)x%elseif;(bepo=1)k%else;b%end;%in;
+%(31%)%let;psib;%if;(colemak=1)k%elseif;(dvorak=1)b%elseif;(bepo=1)\x27%else;n%end;%in;
+%(32%)%let;nsib;%if;(azerty=1),%elseif;(bepo=1)q%else;m%end;%in;
+%(33%)%let;;%if;(dvorak=1)w%elseif;(azerty=1);%elseif;(bepo=1)g%else;,%end;%in;
+%(34%)%let;sort;%if;(dvorak=1)v%elseif;(azerty=1):%elseif;(bepo=1)h%else;.%end;%in;
+%(35%)%let;mrg;%if;(dvorak=1)z%elseif;(azerty=1)!%elseif;(bepo=1)f%else;/%end;%in;

@@ -34,4 +34,90 @@
     }
     </script>
   %end;
+  %( Direct hotkeys/sequences using Mousetrap %)
+  <script src=%if;(cgi)%bvar.static_path;%end;mousetrap.min.js></script>
+  %if;(wizard and is_printed_by_template)
+    %define;key(hotkey,id,xxx)
+      Mousetrap.bind([hotkey], function() {
+        %if;("xxx"="url")
+          window.location = document.getElementById("id").href;
+        %elseif;("xxx"="showind" or "xxx"="linked")
+          var url_prefix = document.getElementById("prefix");
+          var data_access = $('#id').data('access');
+          window.location = url_prefix %if;("xxx"="linked")+ "m=LINKED;"%end; + data_access;
+        %elseif;("xxx"="click" or "xxx"="focus")
+          document.getElementById("id").%if;("xxx"="click")click%elseif;("xxx"="focus")focus%end;();
+        %else;
+          var url_prefix = document.getElementById("prefix");
+          var data_index = $('#id').data('index');
+          %if;("xxx"="modfam1" or "xxx"="sortfam1" or "xxx"="delfam1")
+            var famc =  $('#id').data('fam_count');
+            %( TODO : gérer les familles multiples… complexe! )
+            var pas;
+            for (pas = 1; pas <famc, pas++) {} %)
+            var data_family1 = $('#id').data('family-index1');
+          %end;
+          window.location = url_prefix + %if;("xxx"="modind")"m=MOD_IND"%nn;
+                                     %elseif;("xxx"="modfam1")"m=MOD_FAM"%nn;
+                                     %elseif;("xxx"="sortind")"m=CHG_EVT_IND_ORD"%nn;
+                                     %elseif;("xxx"="sortfam1")"m=CHG_EVT_FAM_ORD"%nn;
+                                     %elseif;("xxx"="delind")"m=DEL_IND"%nn;
+                                     %elseif;("xxx"="delfam1")"m=DEL_FAM"%nn;
+                                     %elseif;("xxx"="merge")"m=MRG"%nn;
+                                     %elseif;("xxx"="snd_image")"m=SND_IMAGE"%end; + ";i=" + %if;("xxx"="modfam1" or "xxx"="sortfam1" or "xxx"="delfam1")
+                                       data_family1 + ";ip=" + data_index%nn;
+                                     %else;
+                                       data_index%nn;
+                                     %end;;
+        %end;
+      });
+    %end;
+    <script>
+      Mousetrap.addKeycodes({
+          144: 'numlock'
+      });
+      %import;layouts;
+      %apply;key%with;'%mind; %mind;', '%mind; space'%and;s1%and;modind%end;
+      %apply;key%with;'%mind; %sref;'%and;sosaref%and;modind%end;
+      %apply;key%with;'%aimg; %aimg;, %aimg; space'%and;s1%and;snd_image%end;
+      %apply;key%with;'%aimg; %sref;'%and;sosaref%and;snd_image%end;
+   %( %apply;key%with;'%mfam; %mfam;', '%mfam; space'%and;mod_fam_1%and;url%end; %)
+      %apply;key%with;'%mfam; %mfam;', '%mfam; space'%and;s1%and;modfam1%end;
+   %(  %apply;key%with;'%mind; backspace'%and;s1%and;delind%end;
+      %apply;key%with;'%mfam; backspace'%and;s1%and;delfam1%end;%)
+      %apply;key%with;'%mind; %sort;'%and;s1%and;sortind%end;
+      %apply;key%with;'%mfam; %sort;'%and;s1%and;sortfam1%end;
+      %apply;key%with;'%mrg;'%and;s1%and;merge%end;
+%(    %foreach;ancestor_level;
+        %foreach;ancestor;
+          %if;(level<5)
+            %let;s;%ancestor.anc_sosa;%in;
+            %if;(s<16 and s!=1)
+              %let;d;%apply;nth_c%with;%s;%and;%expr(0)%end;%in;
+              %let;u;%apply;nth_c%with;%s;%and;%expr(1)%end;%in;
+              %let;s2;%if;(s=0)%0;%elseif;(s=1)%1;%elseif;(s=2)%2;%elseif;(s=3)%3;
+                                  %elseif;(s=4)%4;%elseif;(s=5)%5;%elseif;(s=6)%6;
+                                  %elseif;(s=7)%7;%elseif;(s=8)%8;%elseif;(s=9)%9;%end;%in;
+              %let;d2;%if;(d=0)%0;%elseif;(d=1)%1;%elseif;(d=2)%2;%elseif;(d=3)%3;
+                                  %elseif;(d=4)%4;%elseif;(d=5)%5;%elseif;(d=6)%6;
+                                  %elseif;(d=7)%7;%elseif;(d=8)%8;%elseif;(d=9)%9;%end;%in;
+              %let;u2;%if;(u=0)%0;%elseif;(u=1)%1;%elseif;(u=2)%2;%elseif;(u=3)%3;
+                                  %elseif;(u=4)%4;%elseif;(u=5)%5;%elseif;(u=6)%6;
+                                  %elseif;(u=7)%7;%elseif;(u=8)%8;%elseif;(u=9)%9;%end;%in;
+              %apply;key%with;'%if;(s<16 and s>9)%d2; %u2;%else;%s2;%end;'%and;s%s;%and;showind%end;
+              %apply;key%with;'%mind; %if;(s<16 and s>9)%d2; %u2;%else;%s2;%end;'%and;s%s;%and;modind%end;
+              %apply;key%with;'%aimg; %if;(s<16 and s>9)%d2; %u2;%else;%s2;%end;'%and;s%s;%and;snd_image%end;
+              %apply;key%with;'%mfam; %if;(s<16 and s>9)%d2; %u2;%else;%s2;%end;'%and;s%s;%and;modfam1%end;
+            %end;
+          %end;
+        %end;
+      %end;%nn;%)
+      %import;shortcuts;
+    </script>
+  %end;
 %end;
+%( todo/add:
+*search all sosa with m=S&n=%index;&p= Sosa >15?
+*manage edit/delete/sort of fam_>1 => ajouter simplement une touche modfam2/3 comme sur templm?
+*manage edit/delete spou_>1
+*manage all children%)

@@ -53,7 +53,7 @@
       %foreach;father.child;
         %if;is_sibling_before;
           %incr_count;
-          <a class="ml-2" href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))"><span class="fa fa-caret-left text-success"></span></a>%nn;
+          <a class="ml-2" href="%prefix;%child.access;" id="previous_sibling" title="%apply;capitalize(nth([previous sibling],sex))"><span class="fa fa-caret-left text-success"></span></a>%nn;
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
@@ -67,7 +67,7 @@
       %end;
       %foreach;father.child;
         %if;is_sibling_after;
-            <a href="%prefix;%child.access;" title="%apply;capitalize(nth([next sibling],sex))"><span class="fa fa-caret-right text-success"></span></a>
+            <a href="%prefix;%child.access;" id="next_sibling" title="%apply;capitalize(nth([next sibling],sex))"><span class="fa fa-caret-right text-success"></span></a>
         %end;
       %end;
     %end;
