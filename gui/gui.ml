@@ -21,6 +21,8 @@ value bin_dir =
   else path
 ;
 
+value share_dir = bin_dir;
+
 value trace = ref False;
 
 value default_lang =
@@ -35,9 +37,6 @@ value lexicon_mtime = ref 0.0;
 value lexicon_file = Filename.concat bin_dir "gui_lex.txt";
 
 value config_gui_file = Filename.concat bin_dir "config.txt";
-value config_gwd_file = Filename.concat bin_dir "gwd.arg";
-value config_only_file = Filename.concat bin_dir "only.txt";
-
 
 (**/**) (* Gestion du dictionnaire des langues pour GUI. *)
 
@@ -213,8 +212,7 @@ value write_base_env conf bname env =
 ;
 
 value write_config_file conf = do {
-  let fname = Filename.concat bin_dir "config.txt" in
-  match try Some (open_out fname) with [ Sys_error _ -> None] with
+  match try Some (open_out config_gui_file) with [ Sys_error _ -> None] with
   [ Some oc ->
       do {
         List.iter (fun (k, v) -> fprintf oc "%s=%s\n" k v) conf.gui_arg;
@@ -703,7 +701,7 @@ value rec show_main conf = do {
        packing = vbox#pack } () in
   let icon name =
     let file =
-      List.fold_left Filename.concat bin_dir ["images"; name]
+      List.fold_left Filename.concat share_dir ["images"; name]
     in
     let info = GDraw.pixmap_from_xpm ~{ file } () in
     (GMisc.pixmap info ())#coerce
@@ -1110,7 +1108,7 @@ and launch_server conf = do {
   try Sys.remove stop_server with [ Sys_error _ -> () ];
   let prog = Filename.concat bin_dir "gwd" in
   let args =
-    ["-hd"; bin_dir; "-bd"; conf.bases_dir; "-p"; sprintf "%d" conf.port]
+    ["-hd"; share_dir; "-bd"; conf.bases_dir; "-lang"; lang.val; "-p"; sprintf "%d" conf.port]
   in
   let server_pid = exec prog args gwd_log gwd_log in
   let (pid, ps) = Unix.waitpid [Unix.WNOHANG] server_pid in
@@ -1213,7 +1211,7 @@ value launch_config () =
                let page = assistant#nth_page num in
                assistant#set_page_complete page btn#active } })
     | None -> () ];
-    let page_4 = GMisc.label ~{ text = transl "save preferences" } () in
+    let page_4 = GMisc.label ~{ text = transl ("Your configuration file is:") ^ "\n" ^ config_gui_file; line_wrap = True } () in
     ignore
       (assistant#append_page
          ~{ title = transl "Introduction";

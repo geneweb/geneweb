@@ -123,7 +123,7 @@ fr: Configurez éventuellement le numéro de port
 
     select browser
 en: Select the browser you want to use
-fr: Selectionnez le navigateur que vous voulez utiliser
+fr: Selectionnez le navigateur à utiliser
 
     save preferences
 en: Save preference
@@ -200,3 +200,7 @@ fr: Consang
     Update_nldb
 en: Update_nldb
 fr: Update_nldb
+
+    Your configuration file is:
+en: Your configuration file is:
+fr: Votre fichier de configuration est:
