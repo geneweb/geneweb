@@ -1,4 +1,4 @@
-<!-- template perso_module/data_3col.txt v7.00 28/03/2017 20:20:05 data parents, siblings, perso, unions (3 cols) -->
+<!-- template perso_module/data_3col.txt v7.00 28/03/2017 20:20:05 data parents, siblings, perso, unions (3 cols) -->
 %( options
 0: skip
 1: standard
