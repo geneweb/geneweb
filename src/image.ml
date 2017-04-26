@@ -9,10 +9,10 @@ open Config;
 (** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
                     image, pdf ou html sur le flux HTTP sortant de Wserver.
     [Args] :
-      - ct : le content_type MIME du fichier, par exemple "image/png", 
+     - ct : le content_type MIME du fichier, par exemple "image/png",
              "image/jpeg" ou "application/pdf"
       - len : la taille en octet du fichier
-      - fname : le nom du fichier 
+      - fname : le nom du fichier
     [Retour] : aucun
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
@@ -35,13 +35,13 @@ value content ct len fname =
                     utilisant Wserver.
     [Args] :
       - fname : le chemin vers le fichier image
-      - ctype : le content_type MIME du fichier, par exemple "image/png", 
+      - ctype : le content_type MIME du fichier, par exemple "image/png",
                 "image/jpeg" ou "application/pdf"
     [Retour] : True si le fichier image existe et qu'il a été servi en réponse
                HTTP.
     [Rem] : Ne pas utiliser en dehors de ce module.                           *)
 (* ************************************************************************** *)
-value print_image_type fname ctype  =
+value print_image_type fname ctype =
   match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let buf = Bytes.create 1024 in
@@ -74,13 +74,13 @@ value print_image_file fname =
           Filename.check_suffix fname (String.uppercase suff) then
          print_image_type fname ctype
        else False)
-    [(".png", "png", "image/png"); 
+    [(".png", "png", "image/png");
      (".jpg", "jpeg", "image/jpeg");
-     (".jpeg", "jpeg", "image/jpeg"); 
+     (".jpeg", "jpeg", "image/jpeg");
      (".pjpeg", "jpeg", "image/jpeg");
-     (".gif", "gif", "image/gif"); 
-     (".pdf", "pdf", "application/pdf"); 
-     (".htm", "html", "text/html"); 
+     (".gif", "gif", "image/gif");
+     (".pdf", "pdf", "application/pdf");
+     (".htm", "html", "text/html");
      (".html", "html", "text/html")]
 ;
 

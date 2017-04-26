@@ -118,7 +118,7 @@ value trailer conf =
     Wserver.printf "<hr />\n";
     Wserver.printf "<div>\n";
     Wserver.printf "<em>\n";
-    Wserver.printf "<a href=\"https://github.com/geneweb/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2016\n</em>\n" Version.txt;
+    Wserver.printf "<a href=\"https://github.com/geneweb/geneweb/\"><img src=\"images/logo_bas.png\" align=\"absmiddle\" style = \"border: 0\" /></a> Version %s Copyright &copy 1998-2017\n</em>\n" Version.txt;
     Wserver.printf "</div>\n" ;
     Wserver.printf "</div>\n" ;
     (* finish the html page *)
@@ -783,9 +783,8 @@ value print_default_gwf_file conf =
   in
   let bname = try List.assoc "o" conf.env with [ Not_found -> "" ] in
   let dir = Sys.getcwd () in
-  let fname =
-    List.fold_left Filename.concat dir [(bname ^ ".gwb"); "params.gwf"]
-  in  if Sys.file_exists fname then ()
+  let fname = Filename.concat dir (bname ^ ".gwf") in
+  if Sys.file_exists fname then ()
   else do {
     let oc = open_out fname in
     List.iter (fun s -> fprintf oc "%s\n" s) gwf;
@@ -1425,7 +1424,7 @@ value rec cut_at_equal s =
 ;
 
 value read_base_env bname =
-  let fname = Filename.concat (bname ^ ".gwb") "params.gwf" in
+  let fname = bname ^ ".gwf" in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =
@@ -1511,7 +1510,7 @@ value gwf_1 conf =
   let benv = read_base_env in_base in
   let (vars, files) = variables "gwf_1.htm" in
   do {
-    let oc = open_out (Filename.concat (in_base ^ ".gwb") "params.gwf") in
+    let oc = open_out (in_base ^ ".gwf") in
     let body_prop =
       match p_getenv conf.env "proposed_body_prop" with
       [ Some "" | None -> s_getenv conf.env "body_prop"

@@ -1,4 +1,4 @@
-%if;(evar.m="MOD_IND" or evar.m="MOD_FAM" or evar.m="MOD_NOTES")
+%if;(evar.m="MOD_IND" or evar.m="MOD_FAM" or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/3.0.20/autosize.js" integrity="sha256-PO9BxwdQWhBkPajSnw0FKB/5Yb11OlMkocaqy5s7HHE=" crossorigin="anonymous"></script>
   %else;

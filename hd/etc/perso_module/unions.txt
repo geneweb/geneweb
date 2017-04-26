@@ -183,7 +183,7 @@
         %end;%)
         %apply;init_count(prev_count)
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
-          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;<sup></a>%nn;
+          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
         %if;are_divorced;, [divorced]0%divorce_date;%end;
         %if;are_separated;, [separated]0
@@ -235,11 +235,11 @@
         %if;spouse.has_parents; 
           ([parents][:]
             %apply;short_display_person("spouse.father")%sp;
-            & %apply;short_display_person("spouse.mother"))</em>%nn;
+            & %apply;short_display_person("spouse.mother"))%nn;
         %end;
       %end;
       %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
-        <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;<sup></a>%nn;
+        <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
       %end;
       <span class="align-self-center text-muted">
         %if;are_divorced;<br>[*divorced]0%divorce_date;.%nn;%end;
@@ -405,7 +405,7 @@
         %if;spouse.has_parents; 
           ([parents][:]
             %apply;short_display_person("spouse.father")%sp;
-            & %apply;short_display_person("spouse.mother"))</em>%nn;
+            & %apply;short_display_person("spouse.mother"))%nn;
         %end;
         %if;has_witnesses;
           &nbsp;([witness/witnesses]w[:]
@@ -415,7 +415,7 @@
           %end;)%nn;
         %end;
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
-          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;<sup></a>%nn;
+          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;%nn;
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
         %if;are_separated;, [separated]0
@@ -487,7 +487,7 @@
           %end;)
         %end;
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
-          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;<sup></a>%nn;
+          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
         %if;are_separated;, [separated]0

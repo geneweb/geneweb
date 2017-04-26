@@ -14,81 +14,88 @@
 <body%body_prop;>
 <div class="container">
 <h1 class="text-center mt-1">%title;</h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
-  </div>
-%end;
-
-%define;print_short()
-  <div class="col-sm-10 offset-sm-1">
-    <p class="mt-2 font-weight-bold">%if;(evar.s="")[*select a letter]%else;[*select]%end;[:]</p>
-    <div class="flex-wrap" role="toolbar" aria-label="First character selection">
-      %foreach;initial;
-        <a class="btn btn-secondary btn-lg mb-1 %if;(evar.s="")book-char%else;book-2chars%end; text-center" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
+%define;arrows()
+  %if;not cancel_links;
+    <div class="float-%right; btn-group mr-%if;(evar.s!="")3%else;2%end;">
+      %if;(referer != "")
+        <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
       %end;
+      <a href="%prefix;"><span class="fa fa-home fa-lg ml-1" title="[*home]"></span></a>
     </div>
-  </div>
+  %end;
 %end;
-
-%define;print_long()
-  <div class="alert alert-danger alert-dismissible fade show mx-auto mt-1" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-    [*help modify data]%nn;
+%define;print_short()
+  <div class="clearfix mt-3 mx-5">
+    <div class="float-%left; font-weight-bold">%if;(evar.s="")[*select a letter]%else;[*specify]%end;[:]</div>
+    %apply;arrows()
   </div>
-  <div class="col-12 mb-1">
-    <div class="btn-group" role="toolbar" aria-label="Second character selection">
-      <div class="btn-group">
-        <a class="btn btn-secondary mr-1" href="%prefix;m=MOD_DATA;data=%evar.data;;s=" title="[*back] index"><span class="fa fa-book fa-fw" title=""></span></a>
-      </div>
-      <div class="btn-group">
-        %foreach;entry;
-          <a class="btn btn-secondary" href="#%entry_ini;">%html_encode.entry_ini;</a>
+  <div class="row justify-content-center mt-3 mb-1">
+    <div class="col-xl-9 ml-xl-3 col-lg-11 ml-lg-5">
+      <div class="d-flex flex-wrap" role="toolbar" aria-label="First character selection">
+        %foreach;initial;
+          <a class="btn btn-secondary btn-lg text-center book-char" role="button" href="%prefix;m=MOD_DATA;data=%evar.data;;s=%encode.ini;">%html_encode.ini;</a>
         %end;
       </div>
     </div>
   </div>
-  <form class="col-12" method="post" action="%action;">
+%end;
+%define;print_long()
+  <div class="col-10 alert alert-danger alert-dismissible fade show mx-auto text-center mt-2" role="alert">[*help modify data]</div>
+  <div class="col-12 justify-content-between">
+    <div class="col-11 btn-group" role="toolbar" aria-label="Second character selection">
+      <a class="mr-2" href="%prefix;m=MOD_DATA;data=%evar.data;;s=" title="Index"><i class="fa fa-book fa-fw"></i></a>
+      <div class="btn-group d-flex align-content-around flex-wrap">
+        %foreach;entry;
+          <a class="book-char px-2" href="#%entry_ini;">%html_encode.entry_ini;</a>
+        %end;
+      </div>
+    </div>
+    %apply;arrows()
+  </div>
+  <div class="col-12 mt-1">
     %hidden;
     <ul class="list-group">
       %foreach;entry;
-        <li class="list-group-item list-group-item-info mt-1 justify-content-between">
+        <li class="list-group-item list-group-item-info mt-3 justify-content-between">
           <strong><a id="%entry_ini;">%html_encode.entry_ini;</a></strong>
           <a class="btn" href="#top" title="Return to top"><span class="fa fa-arrow-up fa-fw"></span></a>
         </li>
-        <li style="list-style-type:none">
+        <li class="list-unstyled mt-1">
           <ul class="list-group">
             %foreach;value;
-              <li class="list-group-item">
+              <li class="list-unstyled ml-4">
                 %if;not is_modified;
-                  <a href="%prefix;m=MOD_DATA;data=%evar.data;;%keys;s=%encode.evar.s;">%escape.entry_value;</a>
+                  <a href="%prefix;m=MOD_DATA;data=%evar.data;;%keys;s=%encode.evar.s;#mod">%escape.entry_value;</a>
                 %else;
-                  %foreach;env_keys;
-                    <input type="hidden" name="%key_name;" value="%key_value;">
-                  %end;
-                  <input type="hidden" name="m" value="MOD_DATA_OK">
-                  <input type="hidden" name="data" value="%evar.data;">
-                  <input type="hidden" name="s" value="%evar.s;">
-                  <div class="col-10 col-md-%if;(evar.data = "fn" or evar.data= "sn")6%else;11%end;">
-                    <input type="text" class="form-control" id="nx_input" name="nx_input" size="80" maxlength="%if;(evar.data = "src")300%else;200%end;" value="%escape.printable.entry_value;" autofocus onfocus="this.value = this.value;">
-                  </div>
-                  %if;(evar.data = "fn")
-                    <label>
-                      <input type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes"> [*add the previous name as a first name alias]
-                    </label>
-                  %end;
-                  %if;(evar.data = "sn")
-                    <label>
-                      <input type="checkbox" id="surname_aliases" name="surname_aliases" value="yes"> [*add the previous name as a surname alias]
-                    </label>
-                  %end;
-                  <button type="submit" class="btn btn-secondary">Ok</button>
+                  <form class="form-inline my-2" method="post" action="%action;" id="mod">
+                    <div class="text-muted w-100">%escape.entry_value;</div>
+                    %foreach;env_keys;
+                      <input type="hidden" name="%key_name;" value="%key_value;">
+                    %end;
+                    <input type="hidden" name="m" value="MOD_DATA_OK">
+                    <input type="hidden" name="data" value="%evar.data;">
+                    <input type="hidden" name="s" value="%evar.s;">
+                    %if;(bvar.notextarea="yes")
+                      <input type="text" class="form-control w-100 ml-1 my-1" id="nx_input" name="nx_input" maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;" value="%escape.printable.entry_value;" placeholder="%escape.printable.entry_value;" autofocus>
+                    %else;
+                      <textarea class="form-control w-100 ml-1 my-1" id="nx_input" name="nx_input" rows="1" maxlength="%if;(evar.data="src" or evar.data="occu" or evar.data="place")1000%else;200%end;" placeholder="%escape.printable.entry_value;" autofocus>%escape.printable.entry_value;</textarea>
+                    %end;
+                    %if;(evar.data = "fn")
+                      <div class="form-check form-check-inline ml-sm-2 ml-md-5">
+                        <label class="form-check-label">
+                          <input class="form-check-input" type="checkbox" id="first_name_aliases" name="first_name_aliases" value="yes"> [*add the previous name as a first name alias]
+                        </label>
+                      </div>
+                    %end;
+                    %if;(evar.data = "sn")
+                      <div class="form-check form-check-inline mt-2 ml-5">
+                        <label class="form-check-label">
+                          <input class="form-check-input" type="checkbox" id="surname_aliases" name="surname_aliases" value="yes"> [*add the previous name as a surname alias]
+                        </label>
+                      </div>
+                    %end;
+                    <button type="submit" class="btn btn-secondary ml-2">Ok</button>
+                  </form>
                 %end;
               </li>
             %end;
@@ -96,20 +103,72 @@
         </li>
       %end;
     </ul>
-  </form>
+  </div>
 %end;
-
-<div class="row">
-%if;(nb_results > 1000)
+%if;(nb_results > 1500)
   %apply;print_short()
 %else;
   %apply;print_long()
 %end;
-</div>
-
 %include.trl;
 %include.copyr;
 </div>
 %include.js;
+<script>
+$(document).ready(function() {
+jQuery.fn.putCursorAtEnd = function() {
+
+  return this.each(function() {
+    
+    // Cache references
+    var $el = $(this),
+        el = this;
+
+    // Only focus if input isn't already
+    if (!$el.is(":focus")) {
+     $el.focus();
+    }
+
+    // If this function exists... (IE 9+)
+    if (el.setSelectionRange) {
+
+      // Double the length because Opera is inconsistent about whether a carriage return is one character or two.
+      var len = $el.val().length * 2;
+      
+      // Timeout seems to be required for Blink
+      setTimeout(function() {
+        el.setSelectionRange(len, len);
+      }, 1);
+    
+    } else {
+      
+      // As a fallback, replace the contents with itself
+      // Doesn't work in Chrome, but Chrome supports setSelectionRange
+      $el.val($el.val());
+      
+    }
+
+    // Scroll to the bottom, in case we're in a tall textarea
+    // (Necessary for Firefox and Chrome)
+    this.scrollTop = 999999;
+
+  });
+
+};
+
+(function() {
+  
+  var searchInput = $("#nx_input");
+
+  searchInput
+    .putCursorAtEnd() // should be chainable
+    .on("focus", function() { // could be on any event
+      searchInput.putCursorAtEnd()
+    });
+  
+})();
+
+});
+</script>
 </body>
 </html>

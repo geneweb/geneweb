@@ -1,3 +1,8 @@
+div.anchor_updind {
+  position:absolute;
+  top:-25px;
+}
+
 /* Capitalization unavailable in note from Ocaml */
 p::first-letter {
   text-transform: capitalize;
@@ -84,14 +89,10 @@ table#dag {
 .neuter:hover {
   color: black;
 }
-/* Fixed width button in books indexes */
-/* not very nice > try to center with monospace font? */
-a.book-char{
-  width: 3.8rem
-}
 
-a.book-2chars{
-  width: 4.4rem
+/* Fixed width button in books indexes using monospace font */
+a.book-char{
+  font-family: monospace, monospace;
 }
 
 /* Fix noword-wrap on long a href */

@@ -17,5 +17,4 @@ install:
   - '%CYG_BASH% "opam depext -i lablgtk"'
 
 build_script:
-#  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make everything && make distrib"'
-  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make opt && make distrib"'
+  - '%CYG_BASH% "cd ${APPVEYOR_BUILD_FOLDER} && ./configure && make everything && make distrib"'

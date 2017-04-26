@@ -60,6 +60,9 @@ for FILE in $FILES; do
       COMMAND="camlp5r $CAMLP5_LOAD_OPTIONS -- $CAMLP5_OTHER_OPTIONS $FILE";;
     esac
     echo $COMMAND $FILE >&2
-    # camlp5 on Windows generates backslashes -> replace them with slashes
-    $COMMAND $FILE | sed "s/[\\\\]\(.\)/\/\\1/g"
+    # camlp5 on Windows generates backslashes and carriage returns
+    # the first sed command removes all carriage returns (\x0D)
+    # the second sed command replaces all single backslashes by slashes,
+    # except those located at the end of a line. $ is required for macOS
+    $COMMAND $FILE | sed -e $'s/\x0D//' -e 's/\\\(.\)/\/\1/g'
 done

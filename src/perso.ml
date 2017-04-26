@@ -1458,9 +1458,11 @@ value linked_page_text conf base p s key str (pg, (_, il)) =
                      with
                      [ Not_found -> ("", v, "") ]
                    in
-                   Printf.sprintf
-                     "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s" a
-                     (commd conf) pg text.NotesLinks.lnPos b c
+                   if conf.cancel_links then
+                     Printf.sprintf "%s" b
+                   else
+                     Printf.sprintf "%s<a href=\"%sm=NOTES;f=%s#p_%d\">%s</a>%s"
+                       a (commd conf) pg text.NotesLinks.lnPos b c
                  in
                  if str = "" then str1 else str ^ ", " ^ str1 ]
            with

@@ -44,7 +44,7 @@ function changeCalendar(e,v,m,c) {
   case 'G':
   case 'J':
     document.getElementById(e).innerHTML = '\
-<select class="form-control" name="' + v + '">\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
 <option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
 -</option>\
 <option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
@@ -76,7 +76,7 @@ function changeCalendar(e,v,m,c) {
     break;
   case 'F':
     document.getElementById(e).innerHTML = '\
-<select class="form-control"  name="' + v + '">\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
 <option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
 -</option>\
 <option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
@@ -110,7 +110,7 @@ function changeCalendar(e,v,m,c) {
     break;
   case 'H':
     document.getElementById(e).innerHTML = '\
-<select class="form-control" name="' + v + '">\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
 <option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
 -</option>\
 <option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
@@ -243,66 +243,69 @@ function changeCalendar(e,v,m,c) {
 %end;
 
 %define;card_header(xx)
-  <div id="xx_"></div>
-  <h4 class="card-header text-center"><label for="xx_"><br>[*xx]1</label></h4>
+  <div class="anchor_updind" id="xx_"></div>
+  <h4 class="card-header pt-2 pb-1 text-center"><label for="xx_">[*xx]1</label></h4>
 %end;
 
 %define;date(xlab,xvar,xdt,xcond)
-  <div class="row">
-    <div class="col-2 col-form-label">
+  %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" xcond%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VR|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC)" size="1" maxlength="2" xcond%in;
+  %let;year_input;pattern="[?><~/]?-?\d*/?" size="4" maxlength="8" xcond%in;
+  <div class="row justify-content-sm-between justify-content-md-start">
+    <div class="col-sm-1 col-md-2 col-form-label">
       xlab
     </div>
-    <div class="ml-3 form-inline ">
+    <div class="col col-sm-auto form-inline">
       %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
         <label>
-          <input type="number" class="form-control" name="xvar_dd" size="1" min="1" max="31" value="%xdt.day;" xcond%/>
-           [year/month/day]2 
+          <input type="text" class="form-control" name="xvar_dd" value="%xdt.day;" %day_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
           <span id="xvar_mm_sel">
-            <input type="number" class="form-control ml-2" name="xvar_mm" size="1" min="1" max="12" value="%xdt.month;" xcond%/>
+            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;%/>
           </span>
-           [year/month/day]1 
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-2" name="xvar_yyyy" size="4" maxlength="6" value="%xdt.year;" xcond%/>
-           [year/month/day]0 
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
       %elseif;([ !dates order]0 = "mmddyyyy")
         <label>
           <span id="xvar_mm_sel">
-            <input type="number" class="form-control" name="xvar_mm" size="1" min="1" max="12" value="%xdt.month;" xcond%/>
+            <input type="text" class="form-control" name="xvar_mm" value="%xdt.month;" %month_input;%/>
           </span>
-           [year/month/day]1 
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="number" class="form-control ml-2" name="xvar_dd" size="1" min="1" max="31" value="%xdt.day;" xcond%/>
-           [year/month/day]2 
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-2" name="xvar_yyyy" size="4" maxlength="6" value="%xdt.year;" xcond%/>
-           [year/month/day]0 
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_yyyy" value="%xdt.year;" %year_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
       %else;
         <label>
-          <input type="text" class="form-control" name="xvar_yyyy" size="4" maxlength="6" value="%xdt.year;" xcond%/>
-           [year/month/day]0 
+          <input type="text" class="form-control" name="xvar_yyyy" value="%xdt.year;" %year_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
         <label>
           <span id="xvar_mm_sel">
-            <input type="number" class="form-control ml-2" name="xvar_mm" size="2" min="1" max="12" value="%xdt.month;" xcond%/>
+            <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_mm" value="%xdt.month;" %month_input;%/>
           </span>
-           [year/month/day]1 
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="number" class="form-control ml-2" name="xvar_dd" size="2" min="1" max="31" value="%xdt.day;" xcond%/>
-           [year/month/day]2 
+          <input type="text" class="form-control ml-sm-2 ml-md-3" name="xvar_dd" value="%xdt.day;" %day_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
       %end;
     </div>
-    <div class="offset-1 form-inline">
+    <div class="col-10 col-lg offset-sm-2 offset-md-2 offset-lg-0 form-inline">
       <label for="xvar_prec" class="sr-only col-form-label">[precision]0</label>
-      <select class="form-control" name="xvar_prec" id="xvar_prec" xcond>
+      <select class="form-control pl-lg-1 pr-lg-0 px-xl-2" name="xvar_prec" id="xvar_prec" xcond>
         %(<option value="-" %if;(xdt.prec = "") selected%end;>&nbsp;</option>%)
         <option value="sure" %if;(xdt.prec = "sure") selected%end;>[exact]0</option>
         <option value="about" %if;(xdt.prec = "about") selected%end;>[about (date)]0</option>
@@ -313,8 +316,11 @@ function changeCalendar(e,v,m,c) {
         <option value="yearint" %if;(xdt.prec = "yearint") selected%end;>...[between (date)]...</option>
       </select>
       <label for="xvar_cal" class="sr-only col-form-label">[calendar/calendars]0</label>
-      <select class="form-control ml-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
+      <select class="form-control pl-lg-1 pr-lg-0 px-xl-2 ml-sm-1 ml-md-3" name="xvar_cal" id="xvar_cal" onchange="changeCalendar('xvar_mm_sel','xvar_mm','%xdt.month;',this),%nn;
                                         changeCalendar('xvar_ormonth_sel','xvar_ormonth','%xdt.ormonth;',this)" xcond>
+        <option value="" %if;(xdt.calendar = "") selected%end;>
+          -
+        </option>
         <option value="G" %if;(xdt.calendar = "gregorian") selected%end;>
           [*gregorian/julian/french/hebrew]0
         </option>
@@ -330,59 +336,58 @@ function changeCalendar(e,v,m,c) {
       </select>
     </div>
   </div>
-  <div class="row">
-    <div class="col-2"></div>
-    <div class="ml-3 form-inline">
+  <div class="row justify-content-sm-end justify-content-md-start">
+    <div class="col col-sm-auto offset-sm-1 offset-md-2 form-inline">
       %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
         <label>
-          <input type="number" class="form-control" name="xvar_orday" size="2" min="1" max="31" value="%xdt.orday;" xcond%/>
-           [year/month/day]2 
+          <input type="text" class="form-control" name="xvar_orday" value="%xdt.orday;" %day_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
           <span id="xvar_ormonth_sel">
-            <input type="number" class="form-control ml-2" name="xvar_ormonth" size="2" min="1" max="12" value="%xdt.ormonth;" xcond%/>
+            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth"value="%xdt.ormonth;" %month_input;%/>
           </span>
-           [year/month/day]1 
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-2" name="xvar_oryear" size="4" maxlength="6" value="%xdt.oryear;" xcond%/>
-           [year/month/day]0 
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
       %elseif;([ !dates order]0 = "mmddyyyy")
         <label>
           <span id="xvar_ormonth_sel">
-            <input type="number" class="form-control" name="xvar_ormonth" size="2" min="1" max="12" value="%xdt.ormonth;" xcond%/>
+            <input type="text" class="form-control" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;%/>
           </span>
-           [year/month/day]1 
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="number" class="form-control ml-2" name="xvar_orday" size="2" min="1" max="31" value="%xdt.orday;" xcond%/>
-           [year/month/day]2 
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
         <label>
-          <input type="text" class="form-control ml-2" name="xvar_oryear" size="4" maxlength="6" value="%xdt.oryear;" xcond%/>
-           [year/month/day]0 
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_oryear" value="%xdt.oryear;" %year_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
       %else;
         <label>
-          <input type="text" class="form-control" name="xvar_oryear" size="4" maxlength="6" value="%xdt.oryear;" xcond%/>
-           [year/month/day]0 
+          <input type="text" class="form-control" name="xvar_oryear" value="%xdt.oryear;" %year_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]0</span>
         </label>
         <label>
           <span id="xvar_ormonth_sel">
-            <input type="number" class="form-control ml-2" name="xvar_ormonth" size="2" min="1" max="12" value="%xdt.ormonth;" xcond%/>
+            <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_ormonth" value="%xdt.ormonth;" %month_input;%/>
           </span>
-           [year/month/day]1 
+          <span class="ml-sm-1 ml-md-2">[year/month/day]1</span>
         </label>
         <label>
-          <input type="number" class="form-control ml-2" name="xvar_orday" size="2" min="1" max="31" value="%xdt.orday;" xcond%/>
-           [year/month/day]2 
+          <input type="text" class="form-control ml-sm-1 ml-md-3" name="xvar_orday" value="%xdt.orday;" %day_input;%/>
+          <span class="ml-sm-1 ml-md-2">[year/month/day]2</span>
         </label>
       %end;
     </div>
-    <label for="xvar_text" class="ml-5 col-form-label">…[or]</label>
-    <div class="ml-3">
-      <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="[text]0" xcond%/>
+    <div class="col-10 col-lg offset-sm-2 offset-lg-0">
+      <label for="xvar_text" class="col-form-label sr-only"></label>
+      <input type="text" class="form-control" name="xvar_text" maxlength="100" value="%xdt.text;" id="xvar_text" placeholder="…[or] [text]0" xcond%/>
     </div>
   </div>
 %end;
@@ -785,8 +790,8 @@ function changeCalendar(e,v,m,c) {
   %if;("evt_name" = "#deat")
     <div class="row">
       <label for="death_selectxcnt" class="col-sm-2 col-form-label"></label>
-      <div class="ml-3">
-        <select class="form-control" name="death" id="death_selectxcnt" onchange="change_death('xcnt')">
+      <div class="col col-sm-auto">
+        <select class="form-control pr-0" name="death" id="death_selectxcnt" onchange="change_death('xcnt')">
           %if;(not has_birth_date and dont_know_if_dead)
             <option value="Auto" selected> -</option>
           %end;
@@ -797,7 +802,7 @@ function changeCalendar(e,v,m,c) {
           <option value="OfCourseDead" %if;of_course_dead; selected%end;>[*of course dead]</option>
         </select>
       </div>
-      <div class="form-check form-check-inline mt-1">
+      <div class="col form-check form-check-inline mt-1">
         <label class="form-check-label">
           <input type="radio" name="death_reason" value="Killed" %if;dr_killed;checked%end; onclick='set_death_focus(xcnt)'> [*killed (in action)]2
         </label><label class="form-check-label">
@@ -921,9 +926,7 @@ function changeCalendar(e,v,m,c) {
     %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
       <a href="%prefix;m=SND_IMAGE;i=%index;">[*modify::]/[delete::]/[add picture]</a>
     %end; | <a href="%prefix;m=MRG;i=%index;">[*merge::]</a> | <a href="%prefix;m=DEL_IND;i=%index;">[*delete::]</a></h5>
-</div>
-<div class="card-block">
-  <div class="form-group">
+  <div class="form-group mt-4">
     <div class="row">
       <label for="first_name" class="col-sm-2 col-form-label">[*first name/first names]0</label>
       <div class="col-sm-6">
@@ -1106,7 +1109,7 @@ function changeCalendar(e,v,m,c) {
     </div>
   </div>
 
-  <div class="card my-3">
+  <div class="card">
     %apply;card_header("baptism")
     <div class="card-block">
       <div style="display:none;">
