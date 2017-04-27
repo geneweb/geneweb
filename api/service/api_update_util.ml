@@ -1789,7 +1789,7 @@ let removed_string = ref [] ;;
 
 let reconstitute_somebody conf base person =
   let create_link = person.Mwrite.Person_link.create_link in
-  let (fn, sn, occ, create, var) = match create_link with
+  let (fn, sn, occ, create, var, force_create) = match create_link with
     | `link ->
       let ip = Int32.to_int person.Mwrite.Person_link.index in
       let p = poi base (Adef.iper_of_int ip) in
@@ -1800,7 +1800,7 @@ let reconstitute_somebody conf base person =
           Adef.int_of_iper (get_key_index p)
         else get_occ p
       in
-      (fn, sn, occ, Update.Link, "")
+      (fn, sn, occ, Update.Link, "", false)
     | _ ->
       let sex =
         match person.Mwrite.Person_link.sex with
@@ -1810,11 +1810,11 @@ let reconstitute_somebody conf base person =
       in
       let fn = person.Mwrite.Person_link.firstname in
       let sn = person.Mwrite.Person_link.lastname in
-      let occ = match create_link with
+      let (occ, force_create) = match create_link with
         | `create_default_occ ->
           (match person.Mwrite.Person_link.occ with
-            | Some occ -> Int32.to_int occ
-            | None -> 0)
+            | Some occ -> (Int32.to_int occ, false)
+            | None -> (0, false))
         | `create ->
           let occ = api_find_free_occ base fn sn in
           (* Update the person because if we want to find it, we have to know its occ. *)
@@ -1822,10 +1822,10 @@ let reconstitute_somebody conf base person =
             if occ = 0 then person.Mwrite.Person_link.occ <- None
             else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
           in
-          occ
-        | _ -> 0 (* Should not happen. *)
+          (occ, true)
+        | _ -> (0, false) (* Should not happen. *)
       in
-      (fn, sn, occ, Update.Create (sex, None), "")
+      (fn, sn, occ, Update.Create (sex, None), "", force_create)
   in
   let (fn, sn) =
     (* If there are forbidden characters, delete them. *)
@@ -1840,5 +1840,5 @@ let reconstitute_somebody conf base person =
       end
     else (fn, sn)
   in
-  (fn, sn, occ, create, var, false)
+  (fn, sn, occ, create, var, force_create)
 ;;
