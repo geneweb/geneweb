@@ -9,13 +9,7 @@ val add_lang_path : string -> unit
 val set_base_dir : string -> unit
 val cnt_dir : string ref
 val image_prefix : config -> string
-val base_path : string list -> string -> string
-
-val find_misc_file : string -> string
-
-val search_in_lang_path : string -> string
-
-val etc_file_name : config -> string -> string
+val base_path : string -> string
 
 val escache_value : base -> string
 val commit_patches : config -> base -> unit
@@ -114,9 +108,18 @@ val create_env : string -> (string * string) list
 val capitale : string -> string
 val index_of_next_char : string -> int -> int
 
-val open_etc_file : string -> in_channel option
-val open_hed_trl : config -> string -> in_channel option
-val open_templ : config -> string -> in_channel option
+(** Search file (template, image...) in gw. *)
+val open_gw_etc_file : string -> in_channel option
+
+val open_base_etc_file : config -> string -> in_channel option
+val base_etc_file : config -> string -> string
+
+val search_in_lang_path : string -> string
+val gw_etc_file : string -> string
+val open_etc_file : config -> string -> in_channel option
+(* summary, robot, toolbar, accent, renamed, redirect, index, moved *)
+val open_etc_file_name : config -> string -> in_channel option
+
 val string_with_macros :
   config -> (char * (unit -> string)) list -> string -> string
 val string_of_place : config -> string -> string
@@ -203,7 +206,7 @@ val sosa_of_branch : (iper * sex) list -> Sosa.t
 
 val has_image : config -> base -> person -> bool
 val image_file_name : string -> string
-val source_image_file_name : string -> string -> string
+val source_image_file_name : config -> string -> string
 
 val image_size : string -> (int * int) option
 val limited_image_size :

@@ -124,7 +124,7 @@ let log_passwd_failed ar oc tm from request base_file =
   if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer
 
 let copy_file fname =
-  match Util.open_etc_file fname with
+  match Util.open_gw_etc_file fname with
     Some ic ->
       begin try
         while true do let c = input_char ic in Wserver.printf "%c" c done
@@ -254,7 +254,9 @@ let strip_trailing_spaces s =
   String.sub s 0 len
 
 let read_base_env bname =
-  let fname = Util.base_path [] (bname ^ ".gwf") in
+  let fname = List.fold_right
+    Filename.concat [base_path bname; "etc"] bname ^ ".conf"
+  in
   try
     let ic = Secure.open_in fname in
     let env =
@@ -288,7 +290,7 @@ let print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf.request ^ new_req
   in
   let env = ["old", conf.bname; "new", new_n; "link", link] in
-  match Util.open_etc_file "renamed" with
+  match Util.open_etc_file_name conf "renamed" with
     Some ic -> Util.html conf; Templ.copy_from_templ conf env ic
   | None ->
       let title _ = Wserver.printf "%s -&gt; %s" conf.bname new_n in
@@ -319,7 +321,7 @@ let print_redirected conf from request new_addr =
   let link = "http://" ^ new_addr ^ req in
   let env = ["link", link] in
   log_redirect from request req;
-  match Util.open_etc_file "redirect" with
+  match Util.open_etc_file_name conf "redirect" with
     Some ic ->
       let conf = {conf with is_printed_by_template = false} in
       Util.html conf; Templ.copy_from_templ conf env ic
@@ -351,7 +353,7 @@ let propose_base conf =
   Hutil.trailer conf
 
 let general_welcome conf =
-  match Util.open_etc_file "index" with
+  match Util.open_etc_file_name conf "index" with
     Some ic -> Util.html conf; Templ.copy_from_templ conf [] ic
   | None -> propose_base conf
 
@@ -1281,7 +1283,7 @@ let make_conf from_addr request script_name env =
      auth_file =
        begin try
          let x = List.assoc "auth_file" base_env in
-         if x = "" then !auth_file else Util.base_path [] x
+         if x = "" then !auth_file else Filename.concat (Util.base_path base_file) x
        with Not_found -> !auth_file
        end;
      border =
@@ -1531,6 +1533,8 @@ let print_misc_file misc_fname =
   match misc_fname with
     Css fname | Js fname | Otf fname | Svg fname | Woff fname | Eot fname |
     Ttf fname | Woff2 fname ->
+      let _ = Printf.eprintf "Print_misc_file: %s\n" fname in
+      let _ = flush stderr in
       begin
         try
           let ic = Secure.open_in_bin fname in
@@ -1551,7 +1555,9 @@ let print_misc_file misc_fname =
   | Other _ -> false
 
 let misc_request fname =
-  let fname = Util.find_misc_file fname in
+  let fname = Util.gw_etc_file fname in
+  let _ = Printf.eprintf "Misc_request: %s\n" fname in
+  let _ = flush stderr in
   if fname <> "" then
     let misc_fname =
       if Filename.check_suffix fname ".css" then Css fname
@@ -1664,6 +1670,8 @@ let connection (addr, request) script_name contents =
       if not accept then only_log from
       else
         try
+          let _ = Printf.eprintf "Accept: %s\n" script_name in
+          let _ = flush stderr in
           let (contents, env) = build_env request contents in
           if image_request script_name env then ()
           else if misc_request script_name then ()

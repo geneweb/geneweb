@@ -503,7 +503,7 @@ let make_record_access ic ic_acc shift array_pos (plenr, patches) len name
               | None ->
                   Printf.eprintf "Sorry; I really need base.acc\n";
                   flush stderr;
-                  failwith "cannot access database"
+                  failwith "cannot access database xx"
   in
   let rec array () =
     match !tab with

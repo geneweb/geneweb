@@ -1872,7 +1872,7 @@ let get_sosa conf base env r p =
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
 let get_linked_page conf base p s =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bdir = Util.base_path conf.bname in
   let fname = Filename.concat bdir "notes_links" in
   let db = NotesLinks.read_db_from_file fname in
   let db = Notes.merge_possible_aliases conf db in
@@ -6050,7 +6050,7 @@ let gen_interp_templ menu title templ_fname conf base p =
       Vint (max_descendant_level desc_level_table_m)
     in
     let nldb () =
-      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+      let bdir = Util.base_path conf.bname in
       let fname = Filename.concat bdir "notes_links" in
       let db = NotesLinks.read_db_from_file fname in
       let db = Notes.merge_possible_aliases conf db in Vnldb db
@@ -6082,7 +6082,7 @@ let gen_interp_templ menu title templ_fname conf base p =
   in
   if menu then
     let size =
-      match Util.open_templ conf templ_fname with
+      match Util.open_etc_file_name conf templ_fname with
         Some ic ->
           let fd = Unix.descr_of_in_channel ic in
           let stats = Unix.fstat fd in close_in ic; stats.Unix.st_size
@@ -6186,7 +6186,7 @@ let print_what_links conf base p =
       let fn = Name.lower (sou base (get_first_name p)) in
       let sn = Name.lower (sou base (get_surname p)) in fn, sn, get_occ p
     in
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let bdir = Util.base_path conf.bname in
     let fname = Filename.concat bdir "notes_links" in
     let db = NotesLinks.read_db_from_file fname in
     let db = Notes.merge_possible_aliases conf db in

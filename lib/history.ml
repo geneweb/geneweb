@@ -8,11 +8,8 @@ open TemplAst
 open Util
 
 let file_name conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (Util.base_path [] bname) "history"
+  List.fold_right
+    Filename.concat [Util.base_path conf.bname; "history"] "history.txt"
 
 (* Record history when committing updates *)
 

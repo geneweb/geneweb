@@ -26,7 +26,7 @@ let content ct len fname =
   Wserver.wflush ()
 
 (* ************************************************************************** *)
-(*  [Fonc] print_image_type : string -> string -> bool                        *)
+(*  [Fonc] print_image_type : config -> string -> string -> bool                        *)
 (** [Description] : Affiche une image (avec ses en-têtes) en réponse HTTP en
                     utilisant Wserver.
     [Args] :
@@ -54,6 +54,37 @@ let print_image_type fname ctype =
       loop len; close_in ic; true
   | None -> false
 
+let print_image_type_2 conf fname ctype =
+  if Sys.file_exists fname then
+    match try Some (Secure.open_in_bin fname) with Sys_error _ -> None with
+      Some ic ->
+        let buf = Bytes.create 1024 in
+        let len = in_channel_length ic in
+        content ctype len fname;
+        let rec loop len =
+          if len = 0 then ()
+          else
+            let olen = min (Bytes.length buf) len in
+            really_input ic buf 0 olen;
+            Wserver.printf "%s" (Bytes.sub_string buf 0 olen);
+            loop (len - olen)
+        in
+        loop len; close_in ic; true
+    | None -> false
+  else
+    begin
+    let title _ = Wserver.printf "Error" in
+    Hutil.header conf title;
+    Wserver.printf "<ul>\n";
+    Wserver.printf "<li>\n";
+    Wserver.printf "Cannot access file \"%s\"\n" fname;
+    Wserver.printf "</li>\n";
+    Wserver.printf "</ul>\n";
+    Hutil.gen_trailer true conf;
+    raise Exit
+    end
+
+
 (* ************************************************************************** *)
 (*  [Fonc] print_image_file : string -> bool                                  *)
 (* ************************************************************************** *)
@@ -64,6 +95,19 @@ let print_image_file fname =
           Filename.check_suffix fname (String.uppercase_ascii suff)
        then
          print_image_type fname ctype
+       else false)
+    [(".png", "image/png"); (".jpg", "image/jpeg");
+     (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");
+     (".gif", "image/gif"); (".pdf", "application/pdf");
+     (".htm", "text/html"); (".html", "text/html")]
+
+let print_image_file_2 conf fname =
+  List.exists
+    (fun (suff, ctype) ->
+       if Filename.check_suffix fname suff ||
+          Filename.check_suffix fname (String.uppercase_ascii suff)
+       then
+         print_image_type_2 conf fname ctype
        else false)
     [(".png", "image/png"); (".jpg", "image/jpeg");
      (".jpeg", "image/jpeg"); (".pjpeg", "image/jpeg");
@@ -83,7 +127,7 @@ let print_image_file fname =
 let print_personal_image conf base p =
   match Util.image_and_size conf base p (fun _ _ -> Some (1, 1)) with
     Some (true, f, _) ->
-      if print_image_file f then () else Hutil.incorrect_request conf
+      if print_image_file_2 conf f then () else Hutil.incorrect_request conf
   | _ -> Hutil.incorrect_request conf
 
 (* ************************************************************************** *)
@@ -100,10 +144,10 @@ let print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
-  if fname = Filename.basename fname then
-    let fname = Util.source_image_file_name conf.bname fname in
-    if print_image_file fname then () else Hutil.incorrect_request conf
-  else Hutil.incorrect_request conf
+  (*if fname = Filename.basename fname then TODO clean if ok*)
+    let fname = Util.source_image_file_name conf fname in
+    if print_image_file_2 conf fname then () else Hutil.incorrect_request conf
+  (*else Hutil.incorrect_request conf*)
 
 (* ************************************************************************** *)
 (*  [Fonc] print : Config.config -> Gwdb.base -> unit                         *)
@@ -128,7 +172,7 @@ let print_html conf =
   Wserver.printf "<img src=\"%s" (Util.commd conf);
   Mutil.list_iter_first
     (fun first (k, v) ->
-       let v = if k = "m" then "IM" else v in
+       let v = if k = "m" then "DOC" else v in
        Wserver.printf "%s%s=%s" (if first then "" else "&") k v)
     conf.env;
   Wserver.printf "\"%s>\n</body>\n</html>" conf.xhs

@@ -8,9 +8,8 @@ open Util
 module StrSet = Mutil.StrSet
 
 let file_path conf base fname =
-  Util.base_path []
-    (List.fold_left Filename.concat (conf.bname ^ ".gwb")
-       [base_notes_dir base; fname ^ ".txt"])
+  List.fold_right Filename.concat
+    [Util.base_path conf.bname; base_notes_dir base] fname ^ ".txt"
 
 let path_of_fnotes fnotes =
   match NotesLinks.check_file_name fnotes with
@@ -85,7 +84,7 @@ let print_whole_notes conf base fnotes title s ho =
       Wserver.printf "<h1 class=\"my-3\">%s</h1>\n" title
     end;
   Wserver.printf "</div>\n";
-  begin match Util.open_etc_file "summary" with
+  begin match Util.open_etc_file_name conf "summary" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
@@ -117,7 +116,7 @@ let print_notes_part conf base fnotes title s cnt0 =
   Hutil.header_no_page_title conf
     (fun _ -> Wserver.printf "%s" (if title = "" then fnotes else title));
   Hutil.print_link_to_welcome conf true;
-  begin match Util.open_etc_file "summary" with
+  begin match Util.open_etc_file_name conf "summary" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
@@ -178,7 +177,7 @@ let merge_possible_aliases conf db =
     [] db
 
 let notes_links_db conf base eliminate_unlinked =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bdir = Util.base_path conf.bname in
   let fname = Filename.concat bdir "notes_links" in
   let db = NotesLinks.read_db_from_file fname in
   let db = merge_possible_aliases conf db in
@@ -429,7 +428,7 @@ let update_notes_links_db conf fnotes s =
     in
     loop [] [] 1 0
   in
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bdir = Util.base_path conf.bname in
   NotesLinks.update_db bdir fnotes (list_nt, list_ind)
 
 let commit_notes conf base fnotes s =
@@ -438,8 +437,8 @@ let commit_notes conf base fnotes s =
   in
   let fname = path_of_fnotes fnotes in
   let fpath =
-    List.fold_left Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
-      [base_notes_dir base; fname]
+    List.fold_right Filename.concat
+      [Util.base_path conf.bname; base_notes_dir base] fname
   in
   Mutil.mkdir_p (Filename.dirname fpath);
   begin try Gwdb.commit_notes base fname s with

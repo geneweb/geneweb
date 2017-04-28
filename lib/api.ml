@@ -1320,7 +1320,7 @@ module IntSet =
      - timestamp de la création de la base
 *)
 let print_export_info conf export_directory =
-  let bname = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bname = Util.base_path conf.bname in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1360,7 +1360,7 @@ let print_export_info conf export_directory =
      - liste des taille Person, Person (proto app)
 *)
 let print_export_person conf export_directory =
-  let bname = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bname = Util.base_path conf.bname in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1409,7 +1409,7 @@ let print_export_person conf export_directory =
      - liste des taille Family, Family (proto app)
 *)
 let print_export_family conf export_directory =
-  let bname = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bname = Util.base_path conf.bname in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1457,7 +1457,7 @@ let print_export_family conf export_directory =
      - liste des notes individuelles
 *)
 let print_person_note conf export_directory =
-  let bname = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bname = Util.base_path conf.bname in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1506,7 +1506,7 @@ let print_person_note conf export_directory =
      - liste des notes familiales
 *)
 let print_family_note conf export_directory =
-  let bname = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bname = Util.base_path conf.bname in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1621,7 +1621,7 @@ let build_relative_name base p =
 
 
 let print_index_search conf export_directory =
-  let bname = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bname = Util.base_path conf.bname in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1769,7 +1769,7 @@ let print_index_search conf export_directory =
     -
 *)
 let print_ascends_index conf export_directory =
-  let bname = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bname = Util.base_path conf.bname in
   let fork_base =
     match try Some (Gwdb.open_base bname) with _ -> None with
     | Some base -> base
@@ -1914,7 +1914,7 @@ let full_synchro conf synchro timestamp =
       let fname_synchro = Filename.concat bdir "synchro_patches" in
       let fname_cmd = Filename.concat bdir "command.txt" in
       (match
-         try Some (open_in (Util.base_path [] fname_cmd))
+         try Some (open_in (Filename.concat (Util.base_path conf.bname) fname_cmd))
          with Sys_error _ -> None
        with
        | Some ic ->
@@ -1930,7 +1930,7 @@ let full_synchro conf synchro timestamp =
   (* On clean le fichier synchro des trop vieilles modifs. *)
   (match !last_import with
   | Some last_mod ->
-      let bname = Util.base_path [] bdir in
+      let bname = Util.base_path conf.bname in
       let new_synchro = Database.input_synchro bname in
       let list =
         List.fold_right
@@ -1991,11 +1991,7 @@ let print_synchro_patch_mobile conf base =
   in
 
   (* Récupération du fichier synchro. *)
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  let bname = Util.base_path [] bname in
+  let bname = Util.base_path conf.bname in
   let synchro = Database.input_synchro bname in
   (* Toutes les dernières modifications. *)
   let timestamp = float_of_string timestamp in

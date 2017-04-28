@@ -467,7 +467,7 @@ let effective_mod_merge o_conf base o_p1 o_p2 sp =
   match p_getint o_conf.env "i2" with
     Some i2 ->
       let conf = Update.update_conf o_conf in
-      let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+      let bdir = Util.base_path conf.bname in
       let fname = Filename.concat bdir "notes_links" in
       let db = NotesLinks.read_db_from_file fname in
       let (ofn1, osn1, oocc1) = (o_p1.first_name, o_p1.surname, o_p1.occ) in

@@ -52,10 +52,9 @@ let section_level s len =
 let notes_aliases conf =
   let fname =
     match p_getenv conf.base_env "notes_alias_file" with
-      Some f -> Util.base_path [] f
+      Some f -> Filename.concat (Util.base_path conf.bname) f
     | None ->
-        Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
-          "notes.alias"
+        Filename.concat (Util.base_path conf.bname) "notes.alias"
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
     Some ic ->
@@ -705,7 +704,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Wserver.printf "<tr>\n";
   Wserver.printf "<td>\n";
   Wserver.printf "<table>\n";
-  begin match Util.open_etc_file "toolbar" with
+  begin match Util.open_etc_file_name conf "toolbar" with
     Some ic ->
       Wserver.printf "<tr>\n";
       Wserver.printf "<td>\n";
@@ -722,7 +721,7 @@ let print_mod_view_page conf can_edit mode fname title env s =
   Wserver.printf "</textarea>";
   Wserver.printf "</td>\n";
   Wserver.printf "</tr>\n";
-  begin match Util.open_etc_file "accent" with
+  begin match Util.open_etc_file_name conf "accent" with
     Some ic ->
       Wserver.printf "<tr>\n";
       Wserver.printf "<td>\n";

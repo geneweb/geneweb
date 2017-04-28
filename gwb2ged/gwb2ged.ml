@@ -699,7 +699,8 @@ let set_img_base_path bname =
     let () = Sys.chdir (Secure.base_dir ()) in
     let img_dir = Sys.getcwd () in
     let () = Sys.chdir old_dir in
-    let path = List.fold_left Filename.concat img_dir ["images"; bname] in
+    let path = List.fold_right
+      Filename.concat [img_dir; bname ^ ".gwb"; "documents"] "portraits" in
     img_base_path := path
 
 let gwb2ged base ifile ofile anc desc mem =

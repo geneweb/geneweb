@@ -480,7 +480,7 @@ let parse_templ conf strm =
         (* Protection pour ne pas inclure plusieurs fois un même template ? *)
         if not (List.mem file !included_files) then
           let al =
-            match Util.open_templ conf file with
+            match Util.open_etc_file_name conf file with
               Some ic ->
                 let () = included_files := file :: !included_files in
                 let strm2 = Stream.of_channel ic in
@@ -573,7 +573,7 @@ let parse_templ conf strm =
   strip_newlines_after_variables astl
 
 let input_templ conf fname =
-  match Util.open_templ conf fname with
+  match Util.open_etc_file_name conf fname with
     Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in
       close_in ic; Some astl
@@ -1059,7 +1059,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
 let line_of_loc conf fname (bp, ep) =
-  match Util.open_templ conf fname with
+  match Util.open_etc_file_name conf fname with
     Some ic ->
       let strm = Stream.of_channel ic in
       let rec loop lin =
@@ -1299,7 +1299,7 @@ let copy_from_templ_fwd =
 let copy_from_templ conf env ic = !copy_from_templ_fwd conf env ic
 
 let print_copyright conf =
-  match Util.open_etc_file "copyr" with
+  match Util.open_etc_file_name conf "copyr" with
     Some ic -> copy_from_templ conf [] ic
   | None ->
       Wserver.printf "<hr style=\"margin:0\"%s>\n" conf.xhs;
@@ -1315,7 +1315,7 @@ let print_copyright_with_logo conf =
   print_copyright conf
 
 let include_hed_trl conf name =
-  match Util.open_hed_trl conf name with
+  match Util.open_etc_file_name conf name with
     Some ic -> copy_from_templ conf [] ic
   | None -> ()
 

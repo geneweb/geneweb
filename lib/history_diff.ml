@@ -28,15 +28,10 @@ let history_d conf =
   let path =
     match p_getenv conf.base_env "history_path" with
     | Some path when path <> "" -> path
-    | _ -> "history_d"
+    | _ -> "history"
   in
   if Filename.is_relative path then
-    begin
-      let bname =
-        if Filename.check_suffix conf.bname ".gwb" then conf.bname else conf.bname ^ ".gwb"
-      in
-      Filename.concat (Util.base_path [] bname) path
-    end
+    Filename.concat (Util.base_path conf.bname) path
   else
     path
 
