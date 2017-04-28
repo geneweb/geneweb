@@ -211,8 +211,8 @@ let move_file_to_old conf fname bfname =
        let ext = extension_of_type typ in
        let new_file = fname ^ ext in
        if Sys.file_exists new_file then
-         let old_dir =
-           Filename.concat (Util.base_path ["images"] conf.bname) "old"
+         let old_dir = List.fold_right
+           Filename.concat [Util.base_path conf.bname; "documents"; "portraits"] "old"
          in
          let old_file = Filename.concat old_dir bfname ^ ext in
          if Sys.file_exists old_file then
@@ -300,11 +300,13 @@ let effective_send_ok conf base p file =
   in
   let bfname = default_image_name base p in
   let bfdir =
-    let bfdir = Util.base_path ["images"] conf.bname in
+    let bfdir = List.fold_right
+      Filename.concat [Util.base_path conf.bname; "documents"] "portraits"
+    in
     if Sys.file_exists bfdir then bfdir
     else
-      let d = Filename.concat (Secure.base_dir ()) "images" in
-      let d1 = Filename.concat d conf.bname in
+      let d = Filename.concat (Util.base_path conf.bname) "documents" in
+      let d1 = Filename.concat d "portraits" in
       (try Unix.mkdir d 0o777 with Unix.Unix_error (_, _, _) -> ());
       (try Unix.mkdir d1 0o777 with Unix.Unix_error (_, _, _) -> ());
       d1
@@ -346,7 +348,8 @@ let print_deleted conf base p =
 
 let effective_delete_ok conf base p =
   let bfname = default_image_name base p in
-  let fname = Filename.concat (Util.base_path ["images"] conf.bname) bfname in
+  let fname = List.fold_right
+    Filename.concat [Util.base_path conf.bname; "documents"; "portraits"] bfname in
   if move_file_to_old conf fname bfname = 0 then incorrect conf;
   let changed =
     U_Delete_image (Util.string_gen_person base (gen_person_of_person p))

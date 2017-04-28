@@ -282,7 +282,7 @@ let print_cousins_lev conf base max_cnt p lev1 lev2 =
   if lev1 > 1 then Wserver.printf "</ul>\n"
 
 let include_templ conf name =
-  match Util.open_hed_trl conf name with
+  match Util.open_etc_file_name conf name with
   | Some ic -> Templ.copy_from_templ conf [] ic (* no env -> problem!! *)
   | None -> (Wserver.printf "Failed to open: %s.txt" name)
 
@@ -299,13 +299,13 @@ let print_cousins conf base p lev1 lev2 =
       Wserver.printf "%s" (capitale (Util.translate_eval s))
     else if lev1 = 2 && lev2 = 1 then
       let s =
-        transl_a_of_gr_eq_gen_lev conf 
+        transl_a_of_gr_eq_gen_lev conf
           (transl_nth conf "an uncle/an aunt" 4) (txt_fun raw_access conf base p)
       in
       Wserver.printf "%s" (capitale (Util.translate_eval s))
     else if lev1 = 3 && lev2 = 1 then
       let s =
-        transl_a_of_gr_eq_gen_lev conf 
+        transl_a_of_gr_eq_gen_lev conf
           (transl_nth conf "a great-uncle/a great-aunt" 4) (txt_fun raw_access conf base p)
       in
       Wserver.printf "%s" (capitale (Util.translate_eval s))

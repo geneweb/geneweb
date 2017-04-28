@@ -21,7 +21,7 @@ let get_date conf =
 
 let adm_file f = List.fold_right Filename.concat [!(Util.cnt_dir); "cnt"] f
 
-let cnt conf ext = adm_file (conf.bname ^ ext)
+let cnt conf ext = adm_file (conf.bname ^ "_cnt" ^ ext)
 
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
@@ -112,31 +112,32 @@ let incr_request_counter =
 
 let lang_file_name conf fname =
   let fname1 =
-    Util.base_path ["lang"; conf.lang] (Filename.basename fname ^ ".txt")
+    List.fold_right Filename.concat
+      [Util.base_path conf.bname; "lang"] (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
     search_in_lang_path
       (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
 
-let any_lang_file_name fname =
-  let fname1 = Util.base_path ["lang"] (Filename.basename fname ^ ".txt") in
+let any_lang_file_name conf fname =
+  let fname1 = List.fold_right Filename.concat
+    [Util.base_path conf.bname; "lang"] (Filename.basename fname ^ ".txt") in
   if Sys.file_exists fname1 then fname1
   else
     search_in_lang_path
       (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
 
 let source_file_name conf fname =
-  let bname = conf.bname in
   let lang = conf.lang in
   let fname1 =
-    List.fold_right Filename.concat [Util.base_path ["src"] bname; lang]
-      (Filename.basename fname ^ ".txt")
+    List.fold_right Filename.concat [Util.base_path conf.bname; "src"; lang]
+      (fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
-    Filename.concat (Util.base_path ["src"] bname)
-      (Filename.basename fname ^ ".txt")
+    List.fold_right Filename.concat
+      [Util.base_path conf.bname; "src"] (fname ^ ".txt")
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y))
@@ -287,8 +288,7 @@ let rec stream_line (strm__ : _ Stream.t) =
 type src_mode = Lang | Source
 
 let notes_links conf =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
+  let fname = Filename.concat (Util.base_path conf.bname) "notes_links" in
   NotesLinks.read_db_from_file fname
 
 let rec copy_from_stream conf base strm mode =
@@ -411,7 +411,7 @@ and src_translate conf base nomin strm echo mode =
 and copy_from_file conf base name mode =
   let fname =
     match mode with
-      Lang -> any_lang_file_name name
+      Lang -> any_lang_file_name conf name
     | Source -> source_file_name conf name
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
@@ -430,7 +430,7 @@ let gen_print with_logo mode conf base fname =
       Lang ->
         begin try Some (Secure.open_in (lang_file_name conf fname)) with
           Sys_error _ ->
-            begin try Some (Secure.open_in (any_lang_file_name fname)) with
+            begin try Some (Secure.open_in (any_lang_file_name conf fname)) with
               Sys_error _ -> None
             end
         end
@@ -554,7 +554,7 @@ let print_start conf base =
 
 (* code déplacé et modifié pour gérer advanced.txt *)
 let print conf base fname =
-  if Sys.file_exists (Util.etc_file_name conf fname) then
+  if Sys.file_exists (Util.base_etc_file conf fname) then
     Hutil.interp conf fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = (fun _env -> Templ.eval_transl conf);

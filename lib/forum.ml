@@ -159,7 +159,7 @@ module MF : MF =
   end
 
 let forum_file conf =
-  let fn = Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum" in
+  let fn = Filename.concat (base_path conf.bname) "forum" in
   MF.filename_of_string fn
 
 (* Black list *)
@@ -181,7 +181,7 @@ let match_strings regexp s =
 let can_post conf =
   try
     let fname = List.assoc "forum_exclude_file" conf.base_env in
-    let fname = Util.base_path [] fname in
+    let fname = Filename.concat (Util.base_path conf.bname) fname in
     let ic = open_in fname in
     let rec loop () =
       match try Some (input_line ic) with End_of_file -> None with
@@ -354,7 +354,7 @@ let moderators conf =
   match p_getenv conf.base_env "moderator_file" with
     None | Some "" -> []
   | Some fname ->
-      let fname = Util.base_path [] fname in
+      let fname = Filename.concat (base_path conf.bname) fname in
       match try Some (Secure.open_in fname) with Sys_error _ -> None with
         Some ic ->
           let list =

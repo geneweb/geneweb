@@ -3,7 +3,16 @@
 open Geneweb
 
 let get_images_names bname =
-  let dh = Unix.opendir (Filename.concat "images" bname) in
+  let bname =
+    if Filename.check_suffix bname ".gwb" then
+      (Filename.chop_suffix bname ".gwb", bname)
+    else
+      bname
+  in
+  let imgdir = List.fold_right
+    [Filename.current_dir; bname ^ ".gwb"; "documents"] "portraits"
+  in
+  let dh = Unix.opendir imgdir in
   let list = ref [] in
   begin try while true do list := Unix.readdir dh :: !list done with
     End_of_file -> ()

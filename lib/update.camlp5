@@ -260,7 +260,7 @@ let update_misc_names_of_family base p_sex u =
   | _ -> ()
 
 let delete_topological_sort_v conf _base =
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bfile = Util.base_path conf.bname in
   let tstab_file = Filename.concat bfile "tstab_visitor" in
   (try Sys.remove tstab_file with Sys_error _ -> ());
   let tstab_file = Filename.concat bfile "restrict" in
@@ -268,7 +268,7 @@ let delete_topological_sort_v conf _base =
 
 let delete_topological_sort conf base =
   let _ = delete_topological_sort_v conf base in
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bfile = Util.base_path conf.bname in
   let tstab_file = Filename.concat bfile "tstab" in
   try Sys.remove tstab_file with Sys_error _ -> ()
 

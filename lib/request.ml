@@ -331,7 +331,7 @@ let extract_henv conf base =
 
 let set_owner conf =
   if Sys.unix then
-    let s = Unix.stat (Util.base_path [] (conf.bname ^ ".gwb")) in
+    let s = Unix.stat (Util.base_path conf.bname) in
     try Unix.setgid s.Unix.st_gid; Unix.setuid s.Unix.st_uid with
       Unix.Unix_error (_, _, _) -> ()
 
@@ -348,7 +348,7 @@ let log_count r =
   | None -> ()
 
 let print_moved conf s =
-  match Util.open_etc_file "moved" with
+  match Util.open_etc_file_name conf "moved" with
     Some ic ->
       let env = ["bname", conf.bname] in
       let conf = {conf with is_printed_by_template = false} in
@@ -446,7 +446,7 @@ let treat_request_on_possibly_locked_base conf bfile =
       Wserver.printf "<ul>";
       Util.html_li conf;
       Wserver.printf "%s" (Util.capitale (transl conf "cannot access base"));
-      Wserver.printf " \"%s\".</ul>\n" conf.bname;
+      Wserver.printf " \"%s, (%s)\".</ul>\n" conf.bname bfile;
       begin match e with
         Sys_error _ -> ()
       | _ ->
@@ -482,7 +482,7 @@ let this_request_updates_database conf =
   | _ -> false
 
 let treat_request_on_base conf =
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bfile = Util.base_path conf.bname in
   if this_request_updates_database conf then
     Lock.control (Mutil.lock_file bfile) false
       ~onerror:(fun () -> Update.error_locked conf)

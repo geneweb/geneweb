@@ -29,7 +29,7 @@ let robot_error conf cnt sec =
   Wserver.http HttpStatus.Forbidden;
   Wserver.header "Content-type: text/html; charset=iso-8859-1";
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
-  begin match open_etc_file "robot" with
+  begin match open_etc_file conf "robot" with
     Some ic -> Templ.copy_from_templ conf env ic
   | None ->
       let title _ = Wserver.printf "Access refused" in

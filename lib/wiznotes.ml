@@ -6,8 +6,7 @@ open Def
 open Util
 
 let dir conf base =
-  Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
-    (Gwdb.base_wiznotes_dir base)
+  Filename.concat (Util.base_path conf.bname) (Gwdb.base_wiznotes_dir base)
 
 let wzfile wddir wz = Filename.concat wddir (wz ^ ".txt")
 
@@ -338,7 +337,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   Wserver.printf "<h1>";
   title false;
   Wserver.printf "</h1>\n";
-  begin match Util.open_etc_file "summary" with
+  begin match Util.open_etc_file_name conf "summary" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;

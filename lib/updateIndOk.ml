@@ -905,7 +905,8 @@ let rename_image_file conf base op sp =
   match auto_image_file conf base op with
     Some old_f ->
       let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
-      let f = Filename.concat (Util.base_path ["images"] conf.bname) s in
+      let f = List.fold_right
+        Filename.concat [Util.base_path conf.bname; "documents"; "portraits"] s in
       let new_f =
         if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
       in
@@ -1386,7 +1387,7 @@ let print_mod o_conf base =
   let key = Name.lower ofn, Name.lower osn, oocc in
   let conf = Update.update_conf o_conf in
   let pgl =
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let bdir = Util.base_path conf.bname in
     let fname = Filename.concat bdir "notes_links" in
     let db = NotesLinks.read_db_from_file fname in
     let db = Notes.merge_possible_aliases conf db in
