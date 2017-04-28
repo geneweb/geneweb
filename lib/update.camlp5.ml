@@ -3,6 +3,7 @@
 
 
 open Config
+open Path
 open Def
 open Gwdb
 open Util
@@ -260,17 +261,12 @@ let update_misc_names_of_family base p_sex u =
   | _ -> ()
 
 let delete_topological_sort_v conf _base =
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  let tstab_file = Filename.concat bfile "tstab_visitor" in
-  Util.rm tstab_file ;
-  let tstab_file = Filename.concat bfile "restrict" in
-  Util.rm tstab_file
+  Mutil.rm conf.path.file_ts_visitor ;
+  Mutil.rm conf.path.file_restrict
 
 let delete_topological_sort conf base =
-  let _ = delete_topological_sort_v conf base in
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  let tstab_file = Filename.concat bfile "tstab" in
-  Util.rm tstab_file
+  delete_topological_sort_v conf base ;
+  Mutil.rm conf.path.file_ts
 
 let print_someone _conf base p =
   Wserver.printf "%s%s %s" (p_first_name base p)

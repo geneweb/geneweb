@@ -27,12 +27,12 @@ let get_all_versions ic =
 (**/**) (* Missing or unused translation. *)
 
 let get_ml_files repo =
-  Util.ls_r [repo]
+  Mutil.ls_r [repo]
   |> List.filter (fun x -> Filename.check_suffix x ".ml")
 ;;
 
 let get_tpl_files repo =
-  Util.ls_r [repo]
+  Mutil.ls_r [repo]
   |> List.filter (fun x -> Filename.check_suffix x ".txt")
 ;;
 

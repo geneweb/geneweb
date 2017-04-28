@@ -480,8 +480,9 @@ let parse_templ conf strm =
         (* Protection pour ne pas inclure plusieurs fois un même template ? *)
         if not (List.mem file !included_files) then
           let al =
-            match Util.open_templ_fname conf file with
-              Some (ic, fname) ->
+            (*match Util.open_etc_file_name conf file with*)
+            match Util.open_template conf file with
+              Some ic ->
                 let () = included_files := file :: !included_files in
                 let strm2 = Stream.of_channel ic in
                 let (al, _) = parse_astl [] false 0 [] strm2 in
@@ -580,7 +581,7 @@ let parse_templ conf strm =
   strip_newlines_after_variables astl
 
 let input_templ conf fname =
-  match Util.open_templ conf fname with
+  match Util.open_template conf fname with
     Some ic ->
       let astl = parse_templ conf (Stream.of_channel ic) in
       close_in ic; Some astl
@@ -735,6 +736,7 @@ and eval_simple_variable conf =
           else ""
       | None -> ""
       end
+  | "direct" -> if !Path.direct then "yes" else "no"
   | "doctype" -> Util.doctype conf ^ "\n"
   | "doctype_transitional" ->
       let doctype =
@@ -753,11 +755,8 @@ and eval_simple_variable conf =
   | "nl" -> "\n"
   | "nn" -> ""
   | "prefix" -> Util.commd conf
-  | "prefix_2" -> Util.commd_2 conf
   | "prefix_base" -> Util.prefix_base conf
-  | "prefix_base_2" -> Util.prefix_base_2 conf
   | "prefix_base_password" -> Util.prefix_base_password conf
-  | "prefix_base_password_2" -> Util.prefix_base_password_2 conf
   | "prefix_no_iz" ->
       let henv =
         List.fold_left (fun accu k -> List.remove_assoc k accu) conf.henv
@@ -1063,7 +1062,7 @@ let rec eval_expr (conf, eval_var, eval_apply as ceva) =
   | e -> raise_with_loc (loc_of_expr e) (Failure (not_impl "eval_expr" e))
 
 let line_of_loc conf fname (bp, ep) =
-  match Util.open_templ conf fname with
+  match Util.open_template conf fname with
     Some ic ->
       let strm = Stream.of_channel ic in
       let rec loop lin =
@@ -1303,7 +1302,7 @@ let copy_from_templ_fwd =
 let copy_from_templ conf env ic = !copy_from_templ_fwd conf env ic
 
 let print_copyright conf =
-  match Util.open_etc_file "copyr" with
+  match Util.open_template conf "copyr" with
     Some ic -> copy_from_templ conf [] ic
   | None ->
       Wserver.printf "<hr style=\"margin:0\"%s>\n" conf.xhs;
@@ -1319,7 +1318,7 @@ let print_copyright_with_logo conf =
   print_copyright conf
 
 let include_hed_trl conf name =
-  match Util.open_hed_trl conf name with
+  match Util.open_template conf name with
     Some ic -> copy_from_templ conf [] ic
   | None -> ()
 
@@ -1510,7 +1509,8 @@ and print_var print_ast_list conf ifun env ep loc sl =
       | VVother f -> print_var1 f []
     with Not_found ->
       match sl with
-        ["include"; templ] ->
+      | ["base"; "name"] -> Wserver.printf "%s" conf.bname
+      | ["include"; templ] ->
           begin match input_templ conf templ with
             Some astl -> print_ast_list env ep astl
           | None -> Wserver.printf " %%%s?" (String.concat "." sl)
@@ -1520,8 +1520,6 @@ and print_var print_ast_list conf ifun env ep loc sl =
   let eval_var = eval_var conf ifun env ep loc in print_var1 eval_var sl
 and print_simple_variable conf =
   function
-    "base_header" -> include_hed_trl conf "hed"
-  | "base_trailer" -> include_hed_trl conf "trl"
   | "body_prop" -> print_body_prop conf
   | "copyright" -> print_copyright_with_logo conf
   | "copyright_nologo" -> print_copyright conf

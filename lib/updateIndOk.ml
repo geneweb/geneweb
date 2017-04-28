@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Def
 open Gwdb
 open Util
@@ -898,16 +899,61 @@ let check_sex_married conf base sp op =
     in
     if not no_check then print_cannot_change_sex conf base op
 
+(* TODO find where conflicts are detected. *)
+(* signal different portraits *)
 let rename_image_file conf base op sp =
-  match auto_image_file conf base op with
-    Some old_f ->
+  let old_f = Opt.to_string (auto_image_file conf base op) in
+  let old_fs = Opt.to_string (auto_image_file ~bak:true conf base op) in
+  let old_d =
+    match keydir conf base op with
+    | Some old_d -> old_d
+    | None -> ""
+  in
+  (* REORG images, portraits *)
+  if old_f <> "" || old_fs <> "" || old_d <> "" then
       let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
-      let f = Filename.concat (Util.base_path ["images"] conf.bname) s in
-      let new_f =
-        if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
+      let f = String.concat
+        Filename.dir_sep
+          [conf.path.dir_root; "documents"; "portraits"; s]
       in
-      (try Sys.rename old_f new_f with Sys_error _ -> ())
-  | _ -> ()
+      let fs = String.concat
+        Filename.dir_sep
+          [conf.path.dir_root; "documents"; "portraits"; "saved"; s]
+      in
+      let ext = Filename.extension old_f in
+      (* only gif, png and jpf files are allowed there !! *)
+      let new_f = f ^ ext in
+      (try Sys.rename old_f new_f with Sys_error _ -> ());
+      let ext = Filename.extension old_fs in
+      let new_fs = fs ^ ext in
+      (try Sys.rename old_fs new_fs with Sys_error _ -> ());
+      let old_f = Filename.basename old_f in
+      let old_key = Filename.chop_suffix old_f ext in
+      let old_d =
+        String.concat
+          Filename.dir_sep
+            [conf.path.dir_root; "documents"; "images"; old_key]
+      in
+      let new_d =
+        String.concat
+          Filename.dir_sep
+            [conf.path.dir_root; "documents"; "images"; s]
+      in
+      let old_d1 =
+        String.concat
+          Filename.dir_sep
+            [conf.path.dir_root; "documents"; "images"; old_key; "saved"]
+      in
+      let new_d1 =
+        String.concat
+          Filename.dir_sep
+            [conf.path.dir_root; "documents"; "images"; s]
+      in
+      (* TODO check for pre-existing new_d *)
+      (try Sys.rename old_d new_d with Sys_error _ -> ());
+      (try Sys.rename old_d1 new_d1 with Sys_error _ -> ());
+  else
+      ()
 
 let rparents_of rparents =
   List.fold_left
@@ -1383,7 +1429,7 @@ let print_mod o_conf base =
   let key = Name.lower ofn, Name.lower osn, oocc in
   let conf = Update.update_conf o_conf in
   let pgl =
-    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let bdir = conf.path.dir_root in
     let fname = Filename.concat bdir "notes_links" in
     let db = NotesLinks.read_db_from_file fname in
     let db = Notes.merge_possible_aliases conf db in

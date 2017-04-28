@@ -1,7 +1,7 @@
-(* $Id: srcfile.ml,v 5.41 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Def
 open Gwdb
 open TemplAst
@@ -19,17 +19,12 @@ let get_date conf =
   Printf.sprintf "%02d/%02d/%d" conf.today.day conf.today.month
     conf.today.year
 
-let adm_file f = List.fold_right Filename.concat [!(Util.cnt_dir); "cnt"] f
-
-let cnt conf ext = adm_file (conf.bname ^ ext)
-
 let input_int ic =
   try int_of_string (input_line ic) with End_of_file | Failure _ -> 0
 
 let count conf =
-  let fname = cnt conf ".txt" in
   try
-    let ic = Secure.open_in fname in
+    let ic = Secure.open_in conf.path.file_counts in
     let rd =
       try
         let wc = int_of_string (input_line ic) in
@@ -41,6 +36,7 @@ let count conf =
         {welcome_cnt = wc; request_cnt = rc; start_date = d; wizard_cnt = wzc;
          friend_cnt = frc; normal_cnt = nrc}
       with _ ->
+        close_in ic ;
         {welcome_cnt = 0; request_cnt = 0; start_date = get_date conf;
          wizard_cnt = 0; friend_cnt = 0; normal_cnt = 0}
     in
@@ -50,9 +46,8 @@ let count conf =
      wizard_cnt = 0; friend_cnt = 0; normal_cnt = 0}
 
 let write_counter conf r =
-  let fname = cnt conf ".txt" in
   try
-    let oc = Secure.open_out_bin fname in
+    let oc = Secure.open_out_bin conf.path.file_counts in
     output_string oc (string_of_int r.welcome_cnt);
     output_string oc "\n";
     output_string oc (string_of_int r.request_cnt);
@@ -69,40 +64,26 @@ let write_counter conf r =
   with _ -> ()
 
 let set_wizard_and_friend_traces conf =
-  if conf.wizard && conf.user <> "" then
-    let wpf =
-      try List.assoc "wizard_passwd_file" conf.base_env with Not_found -> ""
-    in
-    (if wpf <> "" then
-       let fname = adm_file (conf.bname ^ "_w.txt") in
-       update_wf_trace conf fname)
-  else if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
-    let fpf =
-      try List.assoc "friend_passwd_file" conf.base_env with Not_found -> ""
-    in
-    let fp =
-      try List.assoc "friend_passwd" conf.base_env with Not_found -> ""
-    in
-    if fpf <> "" &&
-       is_that_user_and_password conf.auth_scheme conf.user fp = false
-    then
-      let fname = adm_file (conf.bname ^ "_f.txt") in
-      update_wf_trace conf fname
+  let getenv str = try List.assoc str conf.base_env with Not_found -> "" in
+  if conf.user <> "" then
+    if conf.wizard then
+      (if getenv "wizard_passwd_file" <> ""
+       then update_wf_trace conf conf.path.file_wizard_log)
+    else if conf.friend && not conf.just_friend_wizard then
+      if getenv "friend_passwd_file" <> ""
+      && not @@ is_that_user_and_password conf.auth_scheme conf.user (getenv "friend_passwd")
+      then update_wf_trace conf conf.path.file_friend_log
 
 let incr_counter f conf =
-  let lname = cnt conf ".lck" in
-  Lock.control lname true
-    ~onerror:(fun () -> None)
-    (fun () ->
-       let r = count conf in
-       f r ;
-       if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
-       else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
-       else r.normal_cnt <- r.normal_cnt + 1;
-       write_counter conf r;
-       set_wizard_and_friend_traces conf;
-       Some (r.welcome_cnt, r.request_cnt, r.start_date))
-
+  Lock.control conf.path.file_lock true ~onerror:(fun () -> None) (fun () ->
+      let r = count conf in
+      f r ;
+      if conf.wizard then r.wizard_cnt <- r.wizard_cnt + 1
+      else if conf.friend then r.friend_cnt <- r.friend_cnt + 1
+      else r.normal_cnt <- r.normal_cnt + 1;
+      write_counter conf r;
+      set_wizard_and_friend_traces conf;
+      Some (r.welcome_cnt, r.request_cnt, r.start_date))
 
 let incr_welcome_counter =
   incr_counter (fun r -> r.welcome_cnt <- r.welcome_cnt + 1)
@@ -110,33 +91,47 @@ let incr_welcome_counter =
 let incr_request_counter =
   incr_counter (fun r -> r.request_cnt <- r.request_cnt + 1)
 
+(* REORG lang_file_name *)
 let lang_file_name conf fname =
   let fname1 =
-    Util.base_path ["lang"; conf.lang] (Filename.basename fname ^ ".txt")
+    String.concat Filename.dir_sep
+      [conf.path.dir_root; "etc"; "lang"; (Filename.basename fname ^ ".txt")]
   in
   if Sys.file_exists fname1 then fname1
   else
     search_in_lang_path
-      (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
+      (String.concat Filename.dir_sep
+        [conf.lang; Filename.basename fname ^ ".txt"])
 
-let any_lang_file_name fname =
-  let fname1 = Util.base_path ["lang"] (Filename.basename fname ^ ".txt") in
+let any_lang_file_name conf fname =
+  let fname1 =
+    String.concat Filename.dir_sep
+      [conf.path.dir_root; "etc"; "lang"; Filename.basename fname ^ ".txt"]
+  in
   if Sys.file_exists fname1 then fname1
   else
     search_in_lang_path
-      (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
+      (String.concat Filename.dir_sep
+        ["lang"; Filename.basename fname ^ ".txt"])
 
+(* REORG src/lg *)
 let source_file_name conf fname =
-  let bname = conf.bname in
   let lang = conf.lang in
   let fname1 =
-    List.fold_right Filename.concat [Util.base_path ["src"] bname; lang]
-      (Filename.basename fname ^ ".txt")
+    String.concat Filename.dir_sep
+      [conf.path.dir_root; "documents"; fname ^ "_" ^ lang ^ ".txt"]
+  in
+  let fname2 =
+    String.concat Filename.dir_sep
+      [conf.path.dir_root; "documents"; fname ^ ".txt"]
+  in
+  let fname3 =
+    String.concat Filename.dir_sep
+      [conf.path.dir_root; "documents"; "src"; fname ^ ".txt"]
   in
   if Sys.file_exists fname1 then fname1
-  else
-    Filename.concat (Util.base_path ["src"] bname)
-      (Filename.basename fname ^ ".txt")
+  else if Sys.file_exists fname2 then fname2
+  else fname3
 
 let extract_date s =
   try Scanf.sscanf s "%d/%d/%d" (fun d m y -> Some (d, m, y))
@@ -280,8 +275,7 @@ let rec stream_line (strm__ : _ Stream.t) =
 type src_mode = Lang | Source
 
 let notes_links conf =
-  let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-  let fname = Filename.concat bdir "notes_links" in
+  let fname = Filename.concat conf.path.dir_root "notes_links" in
   NotesLinks.read_db_from_file fname
 
 let rec copy_from_stream conf base strm mode =
@@ -298,15 +292,15 @@ let rec copy_from_stream conf base strm mode =
   let rec if_expr =
     function
       'N' -> not (if_expr (Stream.next strm))
-    | 'a' -> conf.auth_file <> ""
+    (* | 'a' -> conf.auth_file <> "" *)
     | 'c' -> !(Wserver.cgi) || browser_cannot_handle_passwords conf
     | 'f' -> conf.friend
-    | 'h' -> Sys.file_exists (History.file_name conf)
+    | 'h' -> Sys.file_exists conf.path.Path.file_history
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
     | 'm' -> notes_links conf <> []
     | 'n' -> not (base_notes_are_empty base "")
-    | 'o' -> Sys.file_exists (Wiznotes.dir conf base)
+    | 'o' -> Sys.file_exists conf.path.Path.dir_wiznotes
     | 'p' ->
         begin match p_getenv conf.base_env (get_variable strm) with
           Some "" | None -> false
@@ -376,6 +370,22 @@ let rec copy_from_stream conf base strm mode =
                   Not_found -> ""
               in
               copy_from_string conf base txt mode
+          | 'X' ->
+              let var = (get_variable strm) in
+              let key = try List.assoc "k" conf.env with Not_found -> "" in
+              let (fn, oc, sn) =
+                match Gutil.rsplit_key key with
+                | Some (fn, oc, sn) -> (fn, oc, sn)
+                | None -> ("", 0, "")
+              in
+              let txt =
+                if var = "p" then fn
+                else if var = "o" then string_of_int oc
+                else if var = "n" then sn
+                else try List.assoc var conf.env with
+                  Not_found -> ""
+              in
+              copy_from_string conf base txt mode
           | c -> Wserver.printf "%s" (macro conf base c)
           end
       | c -> if !echo then Wserver.printf "%c" c
@@ -404,7 +414,7 @@ and src_translate conf base nomin strm echo mode =
 and copy_from_file conf base name mode =
   let fname =
     match mode with
-      Lang -> any_lang_file_name name
+      Lang -> any_lang_file_name conf name
     | Source -> source_file_name conf name
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
@@ -423,7 +433,7 @@ let gen_print with_logo mode conf base fname =
       Lang ->
         begin try Some (Secure.open_in (lang_file_name conf fname)) with
           Sys_error _ ->
-            begin try Some (Secure.open_in (any_lang_file_name fname)) with
+            begin try Some (Secure.open_in (any_lang_file_name conf fname)) with
               Sys_error _ -> None
             end
         end
@@ -480,7 +490,7 @@ let eval_var conf base env () _loc =
         Vsosa_ref v -> VVbool (Lazy.force v <> None)
       | _ -> raise Not_found
       end
-  | ["has_history"] -> VVbool (Sys.file_exists (History.file_name conf))
+  | ["has_history"] -> VVbool (Sys.file_exists conf.path.Path.file_history)
   | ["has_misc_notes"] -> VVbool (notes_links conf <> [])
   | ["nb_accesses"] ->
       let r = count conf in
@@ -512,7 +522,7 @@ let eval_var conf base env () _loc =
       end
   | ["start_date"] -> VVstring (string_of_start_date conf)
   | ["wiznotes_dir_exists"] ->
-      VVbool (Sys.file_exists (Wiznotes.dir conf base))
+      VVbool (Sys.file_exists conf.path.Path.dir_wiznotes)
   | _ -> raise Not_found
 
 let print_foreach _conf _print_ast _eval_expr = raise Not_found
@@ -536,7 +546,7 @@ let print_start conf base =
 
 (* code déplacé et modifié pour gérer advanced.txt *)
 let print conf base fname =
-  if Sys.file_exists (Util.etc_file_name conf fname) then
+  if Sys.file_exists (Util.template_file_path conf fname) then
     Hutil.interp conf fname
       {Templ.eval_var = eval_var conf base;
        Templ.eval_transl = (fun _env -> Templ.eval_transl conf);

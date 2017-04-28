@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config
+open Path
 open Util
 
 (* TLSW: Text Language Stolen to Wikipedia
@@ -51,11 +52,10 @@ let section_level s len =
 
 let notes_aliases conf =
   let fname =
-    match p_getenv conf.base_env "notes_alias_file" with
-      Some f -> Util.base_path [] f
-    | None ->
-        Filename.concat (Util.base_path [] (conf.bname ^ ".gwb"))
-          "notes.alias"
+    Opt.map_default
+      conf.path.file_notes_aliases
+      (Filename.concat conf.path.dir_root)
+      (p_getenv conf.base_env "notes_alias_file")
   in
   match try Some (Secure.open_in fname) with Sys_error _ -> None with
     Some ic ->
@@ -162,6 +162,7 @@ let syntax_links conf wi s =
           in
           let c =
             let f = wi.wi_file_path (fname_of_path fpath) in
+            let f = Filename.concat conf.path.dir_password f in
             if Sys.file_exists f then "" else " style=\"color:red\""
           in
           let t =

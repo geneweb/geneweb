@@ -374,16 +374,16 @@ let insert_pevents1 gen sb sex pevents =
        List.iter (fun (so, sex, _) -> insert_somebody1 gen sex so) wl)
     pevents
 
+(* REORG notes *)
 let insert_bnotes1 gen notesname str =
+  let nfname = if notesname = "" then "notes" else notesname in
   let nfname =
-    if notesname = "" then "notes"
-    else
       let f =
-        match NotesLinks.check_file_name notesname with
+        match NotesLinks.check_file_name nfname with
           Some (dl, f) -> List.fold_right Filename.concat dl f
         | None -> "bad"
       in
-      Filename.concat "notes_d" f
+      Filename.concat "notes" f
   in
   let fname =
     List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; nfname ^ ".txt"]
@@ -393,7 +393,7 @@ let insert_bnotes1 gen notesname str =
   output_string oc str;
   close_out oc;
   if notesname = "" then
-    let fname =
+    let fname = (* REORG TODO notes_of.txt ?*)
       List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "notes_of.txt"]
     in
     let oc = open_out fname in
@@ -404,7 +404,7 @@ let write_file_contents fname text =
 
 let insert_wiznotes1 gen wizid str =
   let wizdir =
-    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "wiznotes_d"]
+    List.fold_left Filename.concat gen.g_tmp_dir ["base_d"; "wiznotes"]
   in
   Mutil.mkdir_p wizdir;
   let fname = Filename.concat wizdir wizid ^ ".txt" in
@@ -1061,7 +1061,7 @@ let compress_fields nper nfam tmp_dir =
        List.iter
          (fun n ->
             let f = Filename.concat field_d n in
-            Mutil.remove_file f;
+            Mutil.rm f;
             Sys.rename (Filename.concat field_d (n ^ "2")) f)
          ["data"; "access"];
        if !(Mutil.verbose) then begin Printf.eprintf "\n"; flush stderr end)
@@ -1139,7 +1139,7 @@ let reorder_fields tmp_dir nper =
   List.iter
     (fun n ->
        let f = Filename.concat field_d n in
-       Mutil.remove_file f;
+       Mutil.rm f;
        Sys.rename (Filename.concat field_d (n ^ "2")) f)
     ["data"; "access"];
   if !(Mutil.verbose) then (Printf.eprintf "\n"; flush stderr)
@@ -1204,7 +1204,7 @@ let mkdir_and_open_out_field_unknown_size tmp_dir (name, valu) =
 (* ******************************************************************** *)
 let link next_family_fun bdir =
   let tmp_dir = Filename.concat "gw_tmp" bdir in
-  Mutil.remove_dir tmp_dir;
+  Mutil.rm_rf tmp_dir;
   (try Mutil.mkdir_p tmp_dir with _ -> ());
   let person_d =
     List.fold_left Filename.concat tmp_dir ["base_d"; "person"]
@@ -1348,10 +1348,10 @@ let link next_family_fun bdir =
       Mutil.mkdir_p bdir;
       let dir = Filename.concat bdir "base_d" in
       let old_dir = Filename.concat bdir "base_d~" in
-      Mutil.remove_dir old_dir;
+      Mutil.rm_rf old_dir;
       (try Sys.rename dir old_dir with Sys_error _ -> ());
       Sys.rename (Filename.concat tmp_dir "base_d") dir;
-      Mutil.remove_dir old_dir;
+      Mutil.rm_rf old_dir;
       (try Unix.rmdir tmp_dir with Unix.Unix_error (_, _, _) -> ());
       (try Unix.rmdir "gw_tmp" with Unix.Unix_error (_, _, _) -> ());
       output_command_line bdir;

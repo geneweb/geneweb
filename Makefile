@@ -1,4 +1,4 @@
-Makefile.config: configure
+SMakefile.config: configure
 	@if [ -e "$@" ]; then \
 	  echo "configure file has changed. Please rerun ./configure"; exit 1; \
 	else \
@@ -120,7 +120,9 @@ lib/gwlib.ml:
 	echo "  with Not_found -> \"$(PREFIX)\"" | sed -e 's|\\|/|g' >> $@
 
 %/dune: %/dune.in
-	sed -e "s/%%%API%%%/$(API)/g" -e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
+	sed \
+	-e "s/%%%API%%%/$(API)/g" \
+	-e "s/%%%API_DEP%%%/$(API_DEP)/g" $< > $@
 
 hd/etc/version.txt:
 	echo "GeneWeb[:] [compiled on %s from commit %s:::" > $@

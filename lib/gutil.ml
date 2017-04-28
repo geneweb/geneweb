@@ -52,7 +52,11 @@ let split_key s i =
       match find_num s (i + 1) with
         Some (occ, j) ->
           let first_name = String.sub s 0 i in
-          let surname = String.sub s j (String.length s - j) in
+          let s0 = String.sub s j (String.length s - j) in
+          let surname =
+            if s0.[0] = '.' then String.sub s0 1 (String.length s0 - 1)
+            else s0
+          in
           Some (i, first_name, occ, surname)
       | None -> loop (i + 1)
     else loop (i + 1)
@@ -78,7 +82,11 @@ let rsplit_key s =
       match find_num s (i + 1) with
         Some (occ, j) ->
           let first_name = String.sub s 0 i in
-          let surname = String.sub s j (String.length s - j) in
+          let s0 = String.sub s j (String.length s - j) in
+          let surname =
+            if s0.[0] = '.' then String.sub s0 1 (String.length s0 - 1)
+            else s0
+          in
           Some (first_name, occ, surname)
       | None -> loop (i - 1)
     else loop (i - 1)

@@ -695,12 +695,7 @@ let with_siblings = ref false
 
 let set_img_base_path bname =
   if not !no_picture && !picture_path then
-    let old_dir = Sys.getcwd () in
-    let () = Sys.chdir (Secure.base_dir ()) in
-    let img_dir = Sys.getcwd () in
-    let () = Sys.chdir old_dir in
-    let path = List.fold_left Filename.concat img_dir ["images"; bname] in
-    img_base_path := path
+    img_base_path := (Path.path_from_bname bname).Path.dir_portraits
 
 let gwb2ged base ifile ofile anc desc mem =
   let anc =

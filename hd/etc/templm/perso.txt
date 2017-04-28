@@ -127,7 +127,7 @@
             <a href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;" style="display:inline-block;width:125px" title="[*revision history]">∴ [*history]</a>
           %end;
           %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-          <a href="%prefix;m=SND_IMAGE;i=%index;" style="display:inline-block;width:125px" %laI; >🎴 [*send::image/images]0</a>%nn;
+          <a href="%prefix;m=IMAGE;i=%index;" style="display:inline-block;width:125px" %laI; >🎴 [*send::image/images]0</a>%nn;
             %if;(auto_image_file_name != "")<a href="%prefix;m=DEL_IMAGE;i=%index;" style="color:red;display:inline-block;width:125px"><small>[*delete::image/images]0</small></a>%end;
           %end;
           %if;has_possible_duplications;

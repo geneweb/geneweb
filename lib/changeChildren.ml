@@ -2,6 +2,7 @@
 (* Copyright (c) 1998-2018 INRIA *)
 
 open Config
+open Path
 open Def
 open Gwdb
 open Util
@@ -34,6 +35,7 @@ let print_child_person conf base p =
   Wserver.printf "<input name=\"%s_first_name\" class=\"form-control\" \
 size=\"23\" maxlength=\"200\" id=\"%s_fn\" value=\"%s\">\n" var var 
 (Util.escape_html first_name);
+>>>>>>> Porting Fabien's reorg work to current master. Allow sub-folders
   Wserver.printf "</td>\n";
   Wserver.printf "<td align=\"%s\">" conf.right;
   Wserver.printf "<label for=\"%s_occ\" class=\"mx-2 mb-0\">%s</label>"
@@ -227,15 +229,14 @@ let error_person conf err =
   raise Update.ModErr
 
 let rename_image_file conf base p (nfn, nsn, noc) =
-  match auto_image_file conf base p with
-    Some old_f ->
+  Opt.iter
+    begin fun old_f ->
       let s = default_image_name_of_key nfn nsn noc in
-      let f = Filename.concat (base_path ["images"] conf.bname) s in
-      let new_f =
-        if Filename.check_suffix old_f ".gif" then f ^ ".gif" else f ^ ".jpg"
-      in
-      (try Sys.rename old_f new_f with Sys_error _ -> ())
-  | _ -> ()
+      let f = Filename.concat conf.path.dir_portraits s in
+      let new_f = f ^ Filename.extension old_f in
+      Sys.rename old_f new_f
+    end
+    (auto_image_file conf base p)
 
 exception FirstNameMissing of iper
 

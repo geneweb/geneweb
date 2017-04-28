@@ -767,7 +767,7 @@ let search_auto_complete conf base mode place_mode max_res n =
                       if mode_dico && len_place_format > 0 then
                         let expl_data = String.split_on_char ',' data |> List.rev in
                         String.concat ", " @@
-                        Util.filter_map
+                        Mutil.filter_map
                           (function
                             | `town -> List.nth_opt expl_data 4
                             | `area_code -> List.nth_opt expl_data 3

@@ -12,5 +12,4 @@ val incr_request_counter : config -> (int * int * string) option
 
 val print_lexicon : config -> base -> unit
 
-val adm_file : string -> string
 val source_file_name : config -> string -> string

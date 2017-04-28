@@ -82,8 +82,6 @@ let nominative s =
     Some _ -> decline 'n' s
   | _ -> s
 
-let remove_file f = try Sys.remove f with Sys_error _ -> ()
-
 let mkdir_p x =
   let rec loop x =
     let y = Filename.dirname x in
@@ -91,17 +89,6 @@ let mkdir_p x =
     try Unix.mkdir x 0o755 with Unix.Unix_error (_, _, _) -> ()
   in
   loop x
-
-let rec remove_dir d =
-  begin try
-    let files = Sys.readdir d in
-    for i = 0 to Array.length files - 1 do
-      remove_dir (Filename.concat d files.(i));
-      remove_file (Filename.concat d files.(i))
-    done
-  with Sys_error _ -> ()
-  end;
-  try Unix.rmdir d with Unix.Unix_error (_, _, _) -> ()
 
 let lock_file bname =
   let bname =
@@ -393,3 +380,41 @@ let array_to_list_map fn a =
     else loop (fn (Array.unsafe_get a i) :: acc) (i - 1)
   in
   loop [] (Array.length a - 1)
+
+let rec filter_map fn = function
+  | [] -> []
+  | hd :: tl ->
+    match fn hd with
+    | Some x -> x :: filter_map fn tl
+    | None -> filter_map fn tl
+
+let rec rev_iter fn = function
+  | [] -> ()
+  | hd :: tl -> let () = rev_iter fn tl in fn hd
+
+let ls_r dirs =
+  let rec loop result = function
+    | f :: fs when Sys.is_directory f ->
+      Sys.readdir f
+      |> Array.to_list
+      |> List.rev_map (Filename.concat f)
+      |> List.rev_append fs
+      |> loop (f :: result)
+    | f :: fs -> loop (f :: result) fs
+    | [] -> result
+  in
+  loop [] dirs
+
+let rm fname =
+  if Sys.file_exists fname then Sys.remove fname
+
+let rn fname s =
+  if Sys.file_exists fname then Sys.rename fname s
+
+let rm_rf dir =
+  if Sys.file_exists dir then
+    begin
+      let (directories, files) = ls_r [dir] |> List.partition Sys.is_directory in
+      List.iter Unix.unlink files ;
+      List.iter Unix.rmdir directories
+    end

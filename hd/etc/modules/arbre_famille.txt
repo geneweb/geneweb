@@ -61,9 +61,9 @@
         %if;not cancel_links;</a>%end;
       %elseif;(bvar.default_image="yes")
         %if;(wizard and not cancel_links)
-          <a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" %nn;
+          <a href="%xxx.bname_prefix;m=IMAGE;i=%xxx.index;" %nn;
             class="normal_anchor" target="_blank" %nn;
-            title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">%nn;
+            title="%apply;a_of_b%with;[*add picture]0%and;%xxx;%end;%personinfo;">%nn;
         %end;
         <img class="small_image align-self-center rounded ml-0"
           src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png"
@@ -144,14 +144,14 @@
             %if;(ancestor.anc_sosa.v=8 or ancestor.anc_sosa.v=12)border-right-0%end;%sp;
             %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-left-0%end;">%nn;
             %if;(not ancestor.is_restricted)
-              <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;" 
+              <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;"
                 href="%ancestor.bname_prefix;%ancestor.access;;%evm;"
                 title="[*navigation] %ancestor;
                        &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;
                        %if;(ancestor.has_sosa and self!=sosa_ref)
                          &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.sosa;%and;%sosa_ref; (*)%end;%nn;
                        %end;"></a>
-              <a class="normal_anchor" href="%prefix;%ancestor.access;" 
+              <a class="normal_anchor" href="%prefix;%ancestor.access;"
                 title="%apply;a_of_b%with;[*vital record]%and;%if;(ancestor="? ?")[unknown person]%else;%ancestor;%end;%end;
                 &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;">%nn;
             %end;
@@ -495,7 +495,7 @@
                   [*a half-brother/a half-sister/a half-sibling]2
                 %else;
                   %apply;in_full(count,1) [half-brothers/half-sisters/half-siblings]2
-                %end; 
+                %end;
                 %apply;on_side%with;%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; [with] %mother.spouse;%end;
               </div>
             %end;

@@ -13,7 +13,8 @@ val person_of_string_key : base -> string -> iper option
 val find_same_name : base -> person -> person list
 (* Pour les personnes avec plein de '.' dans le prénom ou le nom. *)
 val person_of_string_dot_key : base -> string -> iper option
-
+(* Supprime le . qui pourrait être au début du nom *)
+val rsplit_key : string -> (string * int * string) option
 val designation : base -> person -> string
 
 val trim_trailing_spaces : string -> string
