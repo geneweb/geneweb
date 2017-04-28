@@ -298,7 +298,7 @@ let convert_wiki_notes_to_html_notes conf base env wiki_notes separator_string =
     let wi =
         {Api_wiki.wi_mode = "NOTES";
         Api_wiki.wi_cancel_links = conf.cancel_links;
-        Api_wiki.wi_file_path = Notes.file_path conf base;
+        Api_wiki.wi_file_path = Notes.file_path conf;
         Api_wiki.wi_person_exists = person_exists conf base;
         Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
     in
@@ -766,7 +766,7 @@ let fam_to_piqi_family_link conf base ifath imoth sp ifam fam fam_link spouse_to
         let wi =
           {Api_wiki.wi_mode = "NOTES";
            Api_wiki.wi_cancel_links = conf.cancel_links;
-           Api_wiki.wi_file_path = Notes.file_path conf base;
+           Api_wiki.wi_file_path = Notes.file_path conf;
            Api_wiki.wi_person_exists = person_exists conf base;
            Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -838,7 +838,7 @@ let fill_events conf base p base_prefix p_auth pers_to_piqi_callback witness_con
             let wi =
               {Api_wiki.wi_mode = "NOTES";
                Api_wiki.wi_cancel_links = conf.cancel_links;
-               Api_wiki.wi_file_path = Notes.file_path conf base;
+               Api_wiki.wi_file_path = Notes.file_path conf;
                Api_wiki.wi_person_exists = person_exists conf base;
                Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
@@ -1035,7 +1035,7 @@ let get_family_piqi base conf ifam p base_prefix spouse_to_piqi_callback witness
         let wi =
           {Api_wiki.wi_mode = "NOTES";
            Api_wiki.wi_cancel_links = conf.cancel_links;
-           Api_wiki.wi_file_path = Notes.file_path conf base;
+           Api_wiki.wi_file_path = Notes.file_path conf;
            Api_wiki.wi_person_exists = person_exists conf base;
            Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
@@ -1413,7 +1413,7 @@ let fill_occupation conf base p_auth gen_p =
         let s =
           let wi =
             {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
-             Wiki.wi_file_path = Notes.file_path conf base;
+             Wiki.wi_file_path = Notes.file_path conf;
              Wiki.wi_person_exists = person_exists conf base;
              Wiki.wi_always_show_link = conf.wizard || conf.friend}
           in
@@ -1437,7 +1437,7 @@ let fill_sources conf base p p_auth gen_p is_main_person =
       let wi =
         {Api_wiki.wi_mode = "NOTES";
          Api_wiki.wi_cancel_links = conf.cancel_links;
-         Api_wiki.wi_file_path = Notes.file_path conf base;
+         Api_wiki.wi_file_path = Notes.file_path conf;
          Api_wiki.wi_person_exists = person_exists conf base;
          Api_wiki.wi_always_show_link = conf.wizard || conf.friend}
       in

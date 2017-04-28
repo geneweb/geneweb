@@ -57,7 +57,7 @@ let header_without_http conf title =
     (Util.image_prefix conf);
   Wserver.printf "  <meta name=\"viewport\" content=\"width=device-width, \
                     initial-scale=1, shrink-to-fit=no\">\n";
-  begin match Util.open_templ conf "css" with
+  begin match Util.open_template conf "css" with
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
@@ -115,6 +115,7 @@ let gen_trailer with_logo conf =
   if with_logo then Templ.print_copyright_with_logo conf
   else Templ.print_copyright conf;
   begin match Util.open_templ conf "js" with
+  (* FIXME ?? balances header_without_http *)
     Some ic -> Templ.copy_from_templ conf [] ic
   | None -> ()
   end;
@@ -133,15 +134,18 @@ let incorrect_request conf =
   Wserver.printf "</p>\n";
   trailer conf
 
-let error_cannot_access conf fname =
+let error_message conf mess =
   let title _ = Wserver.printf "Error" in
   header conf title;
   Wserver.printf "<ul>\n";
   Wserver.printf "<li>\n";
-  Wserver.printf "Cannot access file \"%s.txt\".\n" fname;
+  Wserver.printf "%s\n" mess;
   Wserver.printf "</li>\n";
   Wserver.printf "</ul>\n";
   trailer conf
+
+let error_cannot_access conf fname =
+  error_message conf (Printf.sprintf "Cannot access file \"%s.txt\".\n" fname)
 
 let gen_interp header conf fname ifun env ep =
   let v = !(Templ.template_file) in

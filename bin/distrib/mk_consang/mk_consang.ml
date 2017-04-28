@@ -364,7 +364,7 @@ let rebuild_fields2 db2 =
   in
   Db2out.make_indexes new_d nb_per particles;
   let old_d = Filename.concat db2.Db2disk.bdir2 "old_d" in
-  Mutil.remove_dir old_d;
+  Mutil.rm_rf old_d;
   Mutil.mkdir_p old_d;
   List.iter
     (fun f ->

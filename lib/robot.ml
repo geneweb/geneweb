@@ -29,7 +29,7 @@ let robot_error conf cnt sec =
   Wserver.http HttpStatus.Forbidden;
   Wserver.header "Content-type: text/html; charset=iso-8859-1";
   let env = ["cnt", string_of_int cnt; "sec", string_of_int sec] in
-  begin match open_etc_file "robot" with
+  begin match open_template conf "robot" with
     Some ic -> Templ.copy_from_templ conf env ic
   | None ->
       let title _ = Wserver.printf "Access refused" in
@@ -61,7 +61,7 @@ let output_excl oc xcl =
   output_string oc magic_robot; output_value oc (xcl : excl)
 
 let robot_excl () =
-  let fname = Srcfile.adm_file "robot" in
+  let fname = Filename.concat !Path.cnt "robot" in
   let xcl =
     match try Some (Secure.open_in_bin fname) with _ -> None with
       Some ic ->

@@ -191,23 +191,23 @@ let image_txt conf base p =
   | Some "on" ->
       if has_image conf base p then
         match image_and_size conf base p (limited_image_size 100 75) with
-          Some (true, f, Some (wid, hei)) ->
+          Some (`File f, Some (wid, hei)) ->
             "<br" ^ conf.xhs ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f wid hei ^
             "</td></tr></table></center>\n"
-        | Some (true, f, None) ->
+        | Some (`File f, None) ->
             "<br" ^ conf.xhs ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f 0 75 ^
             "</td></tr></table></center>\n"
-        | Some (false, url, Some (wid, hei)) ->
+        | Some (`Url url, Some (wid, hei)) ->
             let url_p = commd conf ^ acces conf base p in
             "<br" ^ conf.xhs ^
             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt_with_size conf url_p url wid hei ^
             "</td></tr></table></center>\n"
-        | Some (false, url, None) ->
+        | Some (`Url url, None) ->
             let url_p = commd conf ^ acces conf base p in
             let height = 75 in
             "<br" ^ conf.xhs ^

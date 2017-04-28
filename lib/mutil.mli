@@ -1,5 +1,6 @@
-(* $Id: mutil.mli,v 5.16 2007-02-24 16:16:57 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
+
+(** Misc utilities independants from any other Geneweb module. *)
 
 val int_size : int
 val verbose : bool ref
@@ -10,9 +11,6 @@ val strip_all_trailing_spaces : string -> string
 val decline : char -> string -> string
 val nominative : string -> string
 
-val remove_file : string -> unit
-val mkdir_p : string -> unit
-val remove_dir : string -> unit
 val lock_file : string -> string
 
 val output_value_no_sharing : out_channel -> _ -> unit
@@ -57,6 +55,16 @@ val unsafe_tr : char -> char -> string -> string
  *)
 val array_to_list_map : ('a -> 'b) -> 'a array -> 'b list
 
+(** [filter_map fn list] is a combination of map and filter.
+    Not tail-recursive.
+*)
+val filter_map : ('a -> 'b option) -> 'a list -> 'b list
+
+(** [rev_iter fn list] is like [List.iter fn (List.rev list)].
+    Not tail-recursive.
+*)
+val rev_iter : ('a -> unit) -> 'a list -> unit
+
 (** [start_with ?wildcard prefix off str]
     Test if [str] starts with [prefix] (at offset [off]).
     If [wildcard] is set to [true], occurences of ['_'] in [prefix]
@@ -81,3 +89,28 @@ val get_particle : string list -> string -> string
 (** [string_of_int_sep "," 1000000] is ["1,000,000"]
 *)
 val string_of_int_sep : string -> int -> string
+(** [ls_rs dirs]
+    List directories (and subdirectories) contents of [dirs], including [dirs] themselves.
+*)
+val ls_r : string list -> string list
+
+(** [rm_rf dir]
+    Remove directory [dir] and everything inside [dir].
+*)
+val rm_rf : string -> unit
+
+(** [rm fname]
+    Remove [fname]. If [fname] does not exists, do nothing.
+*)
+val rm : string -> unit
+
+(** [rn fname s]
+    Rename [fname] to [s]. If [fname] does not exists, do nothing.
+*)
+val rn : string -> string -> unit
+
+(** [mkdir_p d]
+    Create [d] directory.
+    No error if existing, make parent directories as needed
+*)
+val mkdir_p : string -> unit

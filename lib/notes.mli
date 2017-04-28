@@ -4,7 +4,7 @@ open Config
 open Gwdb
 open NotesLinks
 
-val file_path : config -> base -> string -> string
+val file_path : config -> string -> string
 val read_notes : base -> string -> (string * string) list * string
 
 val print : config -> base -> unit

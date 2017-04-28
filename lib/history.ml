@@ -7,13 +7,6 @@ open Gwdb
 open TemplAst
 open Util
 
-let file_name conf =
-  let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
-  in
-  Filename.concat (Util.base_path [] bname) "history"
-
 (* Record history when committing updates *)
 
 let ext_flags =
@@ -214,7 +207,7 @@ let gen_record conf base changed action =
             if file = "" then s else file ^ "/" ^ s
         | U_Notes (None, file) -> file
       in
-      let fname = file_name conf in
+      let fname = conf.path.Path.file_history in
       begin match
         begin try Some (Secure.open_out_gen ext_flags 0o644 fname) with
           Sys_error _ -> None
@@ -522,7 +515,7 @@ let print_foreach conf base print_ast eval_expr =
     | _, _ -> raise Not_found
   and print_foreach_history_line env xx el al =
     match
-      try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
+      try Some (Secure.open_in_bin conf.path.Path.file_history) with Sys_error _ -> None
     with
       Some ic ->
         begin try
@@ -638,7 +631,7 @@ let search_text conf base s =
   let case_sens = p_getenv conf.env "c" = Some "on" in
   let found =
     match
-      try Some (Secure.open_in_bin (file_name conf)) with Sys_error _ -> None
+      try Some (Secure.open_in_bin conf.path.Path.file_history) with Sys_error _ -> None
     with
       Some ic ->
         let pos =

@@ -1,4 +1,4 @@
-Makefile.config: configure
+SMakefile.config: configure
 	@if [ -e "$@" ]; then \
 	  echo "configure file has changed. Please rerun ./configure"; exit 1; \
 	else \

@@ -31,7 +31,7 @@
     %end;
     %if;(evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
        or evar.m="ADD_FAM_OK" or evar.m="DEL_FAM_OK"
-       or evar.m="SND_IMAGE_OK" or evar.m="DEL_IMAGE_OK"
+       or evar.m="IMAGE_OK" or evar.m="DEL_IMAGE_OK"
        or evar.m="CHG_EVT_IND_ORD_OK" or evar.m="CHG_EVT_FAM_ORD_OK"
        or evar.m="CHG_CHN_OK"
        or (evar.m="MOD_DATA_OK" and evar.data=""))
@@ -61,7 +61,8 @@
 %end;
 %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
     or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
-    or evar.m="ADD_FAM" or evar.m="ADD_PAR" or evar.m="ADD_FAM_OK" or evar.m="MOD_NOTES" or (evar.m="MOD_DATA" and evar.data="source"))
+    or evar.m="ADD_FAM" or evar.m="ADD_PAR" or evar.m="ADD_FAM_OK"
+    or evar.m="MOD_NOTES" or (evar.m="MOD_DATA" and evar.data="source"))
   %if;(bvar.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
       integrity="sha384-gqYjRLBp7SeF6PCEz2XeqqNyvtxuzI3DuEepcrNHbrO+KG3woVNa/ISn/i8gGtW8" crossorigin="anonymous"></script>

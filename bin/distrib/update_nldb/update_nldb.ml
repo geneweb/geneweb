@@ -46,28 +46,25 @@ let read_file_contents fname =
       end
   | None -> ""
 
-let compute base bdir =
-  let bdir =
-    if Filename.check_suffix bdir ".gwb" then bdir else bdir ^ ".gwb"
-  in
+let compute base bname =
+  let open Path in
+  let path = path_from_bname bname in
   let nb_ind = nb_of_persons base in
   let nb_fam = nb_of_families base in
   Printf.eprintf "--- database notes\n";
   flush stderr;
   let list = notes_links (base_notes_read base "") in
   if list = ([], []) then ()
-  else (let pg = NotesLinks.PgNotes in NotesLinks.update_db bdir pg list);
+  else (let pg = NotesLinks.PgNotes in NotesLinks.update_db path.dir_root pg list);
   Printf.eprintf "--- wizard notes\n";
   flush stderr;
   begin try
-    let files = Sys.readdir (Filename.concat bdir (base_wiznotes_dir base)) in
+    let files = Sys.readdir path.dir_wiznotes in
     for i = 0 to Array.length files - 1 do
       let file = files.(i) in
       if Filename.check_suffix file ".txt" then
         let wizid = Filename.chop_suffix file ".txt" in
-        let wfile =
-          List.fold_left Filename.concat bdir [base_wiznotes_dir base; file]
-        in
+        let wfile = Filename.concat path.dir_wiznotes file in
         let list = notes_links (read_file_contents wfile) in
         if list = ([], []) then ()
         else
@@ -75,17 +72,17 @@ let compute base bdir =
             Printf.eprintf "%s... " wizid;
             flush stderr;
             let pg = NotesLinks.PgWizard wizid in
-            NotesLinks.update_db bdir pg list
+            NotesLinks.update_db path.dir_root pg list
           end
     done;
     Printf.eprintf "\n";
     flush stderr
   with Sys_error _ -> ()
   end;
-  let db = ref (NotesLinks.read_db bdir) in
+  let db = ref (NotesLinks.read_db path.dir_root) in
   Printf.eprintf "--- misc notes\n";
   flush stderr;
-  let ndir = Filename.concat bdir (base_notes_dir base) in
+  let ndir = path.dir_notes in
   let rec loop dir name =
     try
       let cdir = Filename.concat ndir dir in
@@ -177,23 +174,32 @@ let compute base bdir =
     ProgrBar.run i nb_fam
   done;
   ProgrBar.finish ();
-  NotesLinks.write_db bdir !db
+  NotesLinks.write_db path.dir_root !db
 
 let main () =
+  let bname = ref "" in
+  let errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>" in
+  let speclist =
+    [ "-version", Arg.Unit Util.print_version_commit, " print version and commit numbers" ]
+  in
+  let anonfun s =
+    if !bname = "" then bname := s
+    else raise (Arg.Bad "Cannot treat several databases")
+  in
   Argl.parse speclist anonfun errmsg;
-  if !fname = "" then
+  if !bname = "" then
     begin
       Printf.eprintf "Missing database name\n";
       Printf.eprintf "Use option -help for usage\n";
       flush stderr;
       exit 2
     end;
-  Secure.set_base_dir (Filename.dirname !fname);
-  let base = Gwdb.open_base !fname in
+  Secure.set_base_dir (Filename.dirname !bname);
+  let base = Gwdb.open_base !bname in
   Sys.catch_break true;
   let () = load_strings_array base in
   let () = load_unions_array base in
-  try compute base !fname with
+  try compute base !bname with
     Sys.Break -> Printf.eprintf "\n"; flush stderr; ()
 
 let _ = Printexc.print main ()

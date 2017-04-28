@@ -74,7 +74,7 @@ type config =
     is_rtl : bool;
     left : string;
     right : string;
-    auth_file : string;
+    (* auth_file : string; *)
     border : int;
     mutable n_connect : (int * int * int * (string * float) list) option;
     today : dmy;
@@ -90,4 +90,8 @@ type config =
 
     (* if true, the base name is in the b argument of the query string: ?b=BASE&...
        if false, the base name is the last element of the uri path: .../base?... *)
-    b_arg_for_basename : bool }
+    b_arg_for_basename : bool
+
+  ; path : Path.t
+
+ }

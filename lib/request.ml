@@ -13,6 +13,7 @@ end
 module Make (H : MakeIn) : MakeOut = struct
 
 open Config
+open Path
 open Def
 open Gwdb
 open Util
@@ -104,6 +105,7 @@ let family_m conf base =
       | "DEL_FAM_OK" -> handler.del_fam_ok
       | "DEL_IMAGE" -> handler.del_image
       | "DEL_IMAGE_OK" -> handler.del_image_ok
+      | "DEL_IMAGE_C_OK" -> handler.del_image_c_ok
       | "DEL_IND" -> handler.del_ind
       | "DEL_IND_OK" -> handler.del_ind_ok
       | "F" -> handler.f
@@ -121,6 +123,7 @@ let family_m conf base =
       | "HIST_CLEAN_OK" -> handler.hist_clean_ok
       | "HIST_DIFF" -> handler.hist_diff
       | "HIST_SEARCH" -> handler.hist_search
+      | "IMAGE_C" -> handler.image_c
       | "IMH" -> handler.imh
       | "INV_FAM" -> handler.inv_fam
       | "INV_FAM_OK" -> handler.inv_fam_ok
@@ -164,10 +167,12 @@ let family_m conf base =
       | "R" -> handler.r
       | "REQUEST" -> handler.request
       | "RL" -> handler.rl
+      | "RESET_IMAGE_C_OK" -> handler.reset_image_c_ok
       | "RLM" -> handler.rlm
       | "S" -> handler.s
       | "SND_IMAGE" -> handler.snd_image
       | "SND_IMAGE_OK" -> handler.snd_image_ok
+      | "SND_IMAGE_C_OK" -> handler.snd_image_c_ok
       | "SRC" -> handler.src
       | "STAT" -> handler.stat
       | "CHANGE_WIZ_VIS" -> handler.change_wiz_vis
@@ -330,7 +335,7 @@ let extract_henv conf base =
 
 let set_owner conf =
   if Sys.unix then
-    let s = Unix.stat (Util.base_path [] (conf.bname ^ ".gwb")) in
+    let s = Unix.stat conf.path.dir_root in
     try Unix.setgid s.Unix.st_gid; Unix.setuid s.Unix.st_uid with
       Unix.Unix_error (_, _, _) -> ()
 
@@ -346,7 +351,7 @@ let log_count r =
   | None -> ()
 
 let print_moved conf s =
-  match Util.open_etc_file "moved" with
+  match Util.open_template conf "moved" with
     Some ic ->
       let env = ["bname", conf.bname] in
       let conf = {conf with is_printed_by_template = false} in
@@ -378,53 +383,45 @@ let print_no_index conf base =
   Hutil.trailer conf
 
 let treat_request conf base =
-  begin match
-    p_getenv conf.base_env "moved", p_getenv conf.env "opt",
-    p_getenv conf.env "m"
-  with
-    Some s, _, _ -> print_moved conf s
-  | _, Some "no_index", _ -> print_no_index conf base
-  | _, _, Some "IM" -> Image.print conf base
-  | _, _, Some "DOC" ->
-      begin match p_getenv conf.env "s" with
-        Some f ->
-          if Filename.check_suffix f ".txt" then
-            let f = Filename.chop_suffix f ".txt" in
-            Srcfile.print_source conf base f
-          else Image.print conf base
-      | None -> Hutil.incorrect_request conf
-      end
-  | _ ->
-      set_owner conf;
-      extract_henv conf base;
-      make_senv conf base;
-      let conf =
-        match Util.default_sosa_ref conf base with
-          Some p -> {conf with default_sosa_ref = get_key_index p, Some p}
-        | None -> conf
-      in
-      if only_special_env conf.env then
-        begin
-          begin match p_getenv conf.base_env "counter" with
-            Some "no" -> ()
-          | _ -> let r = Srcfile.incr_welcome_counter conf in log_count r
-          end;
-          Srcfile.print_start conf base
-        end
-      else
-        begin
-          begin match p_getenv conf.base_env "counter" with
-            Some "no" -> ()
-          | _ -> let r = Srcfile.incr_request_counter conf in log_count r
-          end;
-          match p_getenv conf.env "ptempl" with
-            Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
+  begin match p_getenv conf.base_env "moved" with
+    | Some s -> print_moved conf s
+    | None -> match p_getenv conf.env "opt" with
+      | Some "no_index" -> print_no_index conf base
+      | _ -> match p_getenv conf.env "m" with
+        | Some "IM" -> Image.print conf base
+        | Some "IMS" -> Image.print_saved conf base
+        | Some "DOC" ->
+          begin match p_getenv conf.env "s" with
+            | Some f ->
+              if Filename.check_suffix f ".txt"
+              then Srcfile.print_source conf base (Filename.chop_suffix f ".txt")
+              else Image.print conf base
+            | None -> Hutil.incorrect_request conf
+          end
+        | _ ->
+          set_owner conf;
+          extract_henv conf base;
+          make_senv conf base;
+          let conf =
+            Opt.map_default conf
+              (fun p -> {conf with default_sosa_ref = get_key_index p, Some p})
+              (Util.default_sosa_ref conf base)
+          in
+          if only_special_env conf.env then begin
+            if p_getenv conf.base_env "counter" <> Some "no"
+            then log_count (Srcfile.incr_welcome_counter conf) ;
+            Srcfile.print_start conf base
+          end else begin
+            if p_getenv conf.base_env "counter" <> Some "no"
+            then log_count (Srcfile.incr_request_counter conf) ;
+            match p_getenv conf.env "ptempl" with
+            | Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->
               begin match find_person_in_env conf base "" with
-                Some p -> Perso.interp_templ tname conf base p
-              | None -> family_m conf base
+                | Some p -> Perso.interp_templ tname conf base p
+                | None -> family_m conf base
               end
-          | _ -> family_m conf base
-        end
+            | _ -> family_m conf base
+          end
   end;
   Wserver.wflush ()
 
@@ -444,7 +441,7 @@ let treat_request_on_possibly_locked_base conf bfile =
       Wserver.printf "<ul>";
       Util.html_li conf;
       Wserver.printf "%s" (Util.capitale (transl conf "cannot access base"));
-      Wserver.printf " \"%s\".</ul>\n" conf.bname;
+      Wserver.printf " \"%s, (%s)\".</ul>\n" conf.bname bfile;
       begin match e with
         Sys_error _ -> ()
       | _ ->
@@ -480,7 +477,7 @@ let this_request_updates_database conf =
   | _ -> false
 
 let treat_request_on_base conf =
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  let bfile = conf.path.dir_root in
   if this_request_updates_database conf then
     Lock.control (Mutil.lock_file bfile) false
       ~onerror:(fun () -> Update.error_locked conf)

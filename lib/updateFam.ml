@@ -587,20 +587,22 @@ and eval_relation_kind =
   | Residence ->"residence"
 and eval_special_var conf base =
   function
-    ["include_perso_header"] -> (* TODO merge with mainstream includes ?? *)
-      begin match p_getint conf.env "ip" with
+    ["include"; "perso_header"] ->
+      (* TODO merge with mainstream includes ?? *)
+      (* for perso_header, we need a person! *)
+      begin match p_getint conf.env "i" with
         Some i ->
           let has_base_loop =
             try let _ = Util.create_topological_sort conf base in false with
               Consang.TopologicalSortError _ -> true
           in
-          if has_base_loop then VVstring ""
+          if has_base_loop then str_val (Printf.sprintf "has base loop")
           else
             let p = poi base (Adef.iper_of_int i) in
             Perso.interp_templ_with_menu (fun _ -> ()) "perso_header" conf
               base p;
-            VVstring ""
-      | None -> VVstring ""
+            str_val ""
+      | None -> str_val (Printf.sprintf "cannot include perso_header")
       end
   | _ -> raise Not_found
 and eval_int_env var env =

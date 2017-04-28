@@ -1,5 +1,5 @@
 <!-- $Id: menubar.txt,v 1.0 2015/03/25 12:32:46 mr Exp $ -->
-%if;(evar.m!="SND_IMAGE" and evar.m!="MRG")
+%if;(evar.m!="IMAGE" and evar.m!="MRG")
 %define;navsosa(xx)
   [*navigation with %t as Sosa reference:::xx].
 %end;
@@ -62,7 +62,7 @@
         %if;(not has_parents and first_name != "?" and surname != "?")
           <a id="add_par" href="%prefix;m=ADD_PAR;ip=%index;" %laL;>[add::parents]</a>%nn;
         %end;
-        <a id="snd_image" href="%prefix;m=SND_IMAGE;i=%index;" %laI;>[send::image/images]0</a>%nn;
+        <a id="snd_image" href="%prefix;m=IMAGE;i=%index;" %laI;>[send::image/images]0</a>%nn;
         <a href="%prefix;m=MRG;i=%index;">[merge]0 (oc=%occ;)</a>%nn;
         <a href="%prefix;%access;;i=%index;;m=DEL_IND;">[delete::person/persons]0</a>%nn;
       </span>

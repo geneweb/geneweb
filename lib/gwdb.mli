@@ -174,8 +174,6 @@ val base_notes_read : base -> string -> string
 val base_notes_read_first_line : base -> string -> string
 val base_notes_are_empty : base -> string -> bool
 val base_notes_origin_file : base -> string
-val base_notes_dir : base -> string
-val base_wiznotes_dir : base -> string
 
 val gen_person_misc_names :
   base -> (iper, istr) Def.gen_person ->

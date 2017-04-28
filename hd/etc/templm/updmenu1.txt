@@ -37,7 +37,7 @@
     <br%/>
     %if;(bvar.can_send_image != "no" and image = "" and first_name != "?"
          and surname != "?")
-      <a href="%prefix;m=SND_IMAGE;i=%index;">[*send::image/images]0</a>
+      <a href="%prefix;m=IMAGE;i=%index;">[*send::image/images]0</a>
       <br%/>
       %if;(auto_image_file_name != "")
         <a href="%prefix;m=DEL_IMAGE;i=%index;">[*delete::image/images]0</a>

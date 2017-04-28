@@ -937,8 +937,6 @@ type base =
     base_notes_read_first_line : string -> string;
     base_notes_are_empty : string -> bool;
     base_notes_origin_file : unit -> string;
-    base_notes_dir : unit -> string;
-    base_wiznotes_dir : unit -> string;
     nobtit : string list Lazy.t -> string list Lazy.t -> person -> title list;
     p_first_name : person -> string;
     p_surname : person -> string;
@@ -1126,8 +1124,6 @@ let base1 base =
      base_notes_are_empty =
        (fun fnotes -> base.data.bnotes.nread fnotes RnDeg = "");
      base_notes_origin_file = (fun () -> base.data.bnotes.norigin_file);
-     base_notes_dir = (fun () -> "notes_d");
-     base_wiznotes_dir = (fun () -> "wiznotes");
      nobtit = (fun conf p -> C_base.nobtit self conf p);
      p_first_name = (fun p -> C_base.p_first_name self p);
      p_surname = (fun p -> C_base.p_surname self p);
@@ -1358,8 +1354,6 @@ let base2 db2 =
             close_in ic;
             r
           with Sys_error _ -> "");
-     base_notes_dir = (fun () -> Filename.concat "base_d" "notes_d");
-     base_wiznotes_dir = (fun () -> Filename.concat "base_d" "wiznotes_d");
      nobtit = (fun conf p -> C_base.nobtit self conf p);
      p_first_name = (fun p -> C_base.p_first_name self p);
      p_surname = (fun p -> C_base.p_surname self p);
@@ -1439,8 +1433,6 @@ let base_notes_read (b : base) = b.base_notes_read
 let base_notes_read_first_line (b : base) = b.base_notes_read_first_line
 let base_notes_are_empty (b : base) = b.base_notes_are_empty
 let base_notes_origin_file (b : base) = b.base_notes_origin_file ()
-let base_notes_dir (b : base) = b.base_notes_dir ()
-let base_wiznotes_dir (b : base) = b.base_wiznotes_dir ()
 let nobtit (b : base) = b.nobtit
 let p_first_name (b : base) = b.p_first_name
 let p_surname (b : base) = b.p_surname

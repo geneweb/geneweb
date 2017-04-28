@@ -96,7 +96,7 @@ let output_value_array_compress bdir e _ pad f =
       let _ = (Iovalue.patch_output_value_header oc header_pos : int) in
       close_out oc;
       close_in ic;
-      Mutil.remove_file fname;
+      Mutil.rm fname;
       Sys.rename (fname ^ "2") fname;
       Printf.eprintf " ok";
       flush stderr;

@@ -21,6 +21,7 @@
   %include;hed
 </head>
 <body%body_prop;>
+<div class="container">
 %message_to_wizard;
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
