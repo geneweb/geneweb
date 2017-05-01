@@ -197,7 +197,6 @@
           <ul>
             %foreach;child;
               %apply;li_SDC("child")
-                %apply;image_MF("child")
                 %if;(bvar.always_surname="yes")
                   %apply;short_display_person("child")
                 %else;
@@ -429,7 +428,6 @@
           <ul>
             %foreach;child;
               %apply;li_SDC("child")
-                %apply;image_MF("child")
                 %if;(bvar.always_surname="yes")
                   %apply;short_display_person("child")
                 %else;
@@ -472,9 +470,7 @@
         %apply;long_display_person("spouse")
         %if;spouse.has_parents;
           <span style="font-size: 90%%"><em> ([parents][:]
-            %apply;image_MF("spouse.father")
-            %apply;short_display_person("spouse.father")%sp;
-            & %apply;image_MF("spouse.mother")
+            %apply;short_display_person("spouse.father") &%sp;
             %apply;short_display_person("spouse.mother"))</em>%nn;
           </span>%nn;
         %end;
@@ -482,7 +478,6 @@
           &nbsp;([witness/witnesses]w[:]
           %foreach;witness;
             %if;not is_first;, %end;
-            %apply;image_MF("witness")
             %apply;short_display_person("witness")
           %end;)
         %end;
@@ -501,7 +496,6 @@
           <ul>
             %foreach;child;
               %apply;li_SDC("child")
-                %apply;image_MF("child")
                 %apply;short_display_person("child")
                 %if;child.has_families;
                   %foreach;child.family;
@@ -517,7 +511,6 @@
                         <ul>
                           %foreach;child;
                             %apply;li_SDC("child")
-                              %apply;image_MF("child")
                               %apply;short_display_person("child")
                               %if;child.has_families;
                                 %foreach;child.family;
@@ -533,7 +526,6 @@
                                       <ul>
                                         %foreach;child;
                                           %apply;li_SDC("child")
-                                            %apply;image_MF("child")
                                             %apply;short_display_person("child")
                                           </li>
                                         %end;
@@ -577,13 +569,10 @@
               <td style="vertical-align: middle">
         %end;
         %apply;long_married_f("self", "UPPER")%sp;
-        %apply;image_MF("spouse")
         %apply;display_horizontal("spouse")
         <span style="font-size: 90%%">
           %if;spouse.has_parents;<em> ([parents][:]
-            %apply;image_MF("spouse.father")
-            %apply;short_display_person_f("spouse.father")%sp;
-            & %apply;image_MF("spouse.mother")
+            %apply;short_display_person_f("spouse.father") &%sp;
             %apply;short_display_person_f("spouse.mother"))</em>%nn;
           %end;
         </span>%nn;
@@ -610,7 +599,6 @@
                       </td>
                       <td style="vertical-align: middle">
                 %end;
-                %apply;image_MF("child")
                 %apply;short_display_person_f("child")
                 %if;child.has_families;
                   %foreach;child.family;
@@ -619,7 +607,6 @@
                         src="%image_prefix;/1pixel.png" alt="1px" title=""%/>%sp;
                       <em>%child;%child.title;%child.dates;</em>%end;
                     <em>&nbsp;%apply;long_married_f("child", "lower")</em>
-                    %apply;image_MF("spouse")
                     %apply;short_display_person_f("spouse")%nn;
                     %if;are_divorced; [divorced]0%divorce_date;%end;
                     %if;are_separated; [separated]0%end;
@@ -630,7 +617,6 @@
                         <ul>
                           %foreach;child;
                             %apply;li_SDC("child")
-                              %apply;image_MF("child")
                               %apply;short_display_person_f("child")
                               %if;child.has_families;
                                 %foreach;child.family;
@@ -639,7 +625,6 @@
                                             src="%image_prefix;/1pixel.png" alt="1px" title=""%/>
                                     <em>%child;%child.title;%child.dates;</em>%nl;%end;
                                   <em>&nbsp;%apply;long_married_f("child", "lower")</em>
-                                  %apply;image_MF("spouse")
                                   %apply;short_display_person_f("spouse")
                                   %if;are_divorced; [divorced]0%divorce_date;%end;
                                   %if;are_separated; [separated]0%end;
@@ -648,7 +633,6 @@
                                     <div style="font-size: 90%%">%nn;
                                       %foreach;child;
                                         %if;(child_cnt!=1) , %end;
-                                          %apply;image_MF("child")
                                           %apply;short_display_person_f("child")
                                       %end;
                                     </div>

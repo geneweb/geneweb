@@ -247,7 +247,6 @@
         %if;(parent.nb_families>1)
           <td style="width:47%%">
             %apply;display_shared_parent%with;
-            %apply;image_MF("parent")
             %apply;short_display_person("parent")%end;
           </td>
         %end;

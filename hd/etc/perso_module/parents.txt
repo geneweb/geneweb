@@ -44,7 +44,6 @@
     %if;(op_m=4)
       %apply;long_display_person("mother")%sp;
     %elseif;(op_m=5)
-      %apply;image_MF("mother")
       %apply;display_horizontal("mother")
     %end;
     %foreach;father.family;
