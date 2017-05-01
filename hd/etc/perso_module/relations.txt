@@ -87,30 +87,25 @@
       <li>%apply;capitalize(relation_type)[:]%nl;
         <ul>
           %apply;li_SDC("relation_him")
-            %apply;image_MF("relation_him")
             %apply;short_display_person("relation_him")
           </li>
           %apply;li_SDC("relation_her")
-            %apply;image_MF("relation_her")
             %apply;short_display_person("relation_her")
           </li>
         </ul>
       </li>
     %elseif;has_relation_him;
       %apply;li_SDC("relation_him")%apply;capitalize(relation_type)[:]%sp;
-        %apply;image_MF("relation_him")
         %apply;short_display_person("relation_him")
       </li>
     %elseif;has_relation_her;
       %apply;li_SDC("relation_her")%apply;capitalize(relation_type)[:]%sp;
-        %apply;image_MF("relation_her")
         %apply;short_display_person("relation_her")
       </li>
     %end;
   %end;
   %foreach;related;
     %apply;li_SDC("related")%apply;capitalize(related_type)[:]%sp;
-      %apply;image_MF("related")
       %apply;short_display_person("related")
     </li>
   %end;
