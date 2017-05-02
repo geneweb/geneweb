@@ -30,14 +30,12 @@ value infer_death conf birth bapt =
   match (birth, bapt) with
   [ (Some (Dgreg d _), _) ->
       let a = (CheckItem.time_elapsed d conf.today).year in
-      if a > 150 then DeadDontKnowWhen
-      else if a > 120 then OfCourseDead
+      if a > 120 then OfCourseDead
       else if a <= 80 then NotDead
       else DontKnowIfDead
   | (_, Some (Dgreg d _)) ->
       let a = (CheckItem.time_elapsed d conf.today).year in
-      if a > 150 then DeadDontKnowWhen
-      else if a > 120 then OfCourseDead
+      if a > 120 then OfCourseDead
       else if a <= 80 then NotDead
       else DontKnowIfDead
   | _ -> DontKnowIfDead ]
