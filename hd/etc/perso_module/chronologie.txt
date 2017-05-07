@@ -430,7 +430,7 @@
         %and;%apply;dprec("mother.death_date")%nn;
         %and;%count2;
         %and;%if;(mother.death_date!="")%mother.death_date;%else;([missing date]0)%end;%nn;
-        %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end;%if;(mother.computable_death_age)%sp;(%mother.death_age;)%end;%nn;%nn;
+        %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end;%apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age;)%end;%nn;%nn;
         %and;%nn;
         %and;%nn;
         %and;%nn;
