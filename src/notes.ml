@@ -258,55 +258,61 @@ value print_linked_list conf base pgl =
   tag "ul" begin
     List.iter
       (fun pg ->
-         stagn "li" begin
-           match pg with
-           [ NotesLinks.PgInd ip ->
-               let p = pget conf base ip in
-               Wserver.printf "%s%s"
-                 (Util.referenced_person_title_text conf base p)
-                 (Date.short_dates_text conf base p)
-           | NotesLinks.PgFam ifam ->
-               let fam = foi base ifam in
-               let fath = pget conf base (get_father fam) in
-               let moth = pget conf base (get_mother fam) in
-               Wserver.printf "%s%s &amp; %s %s"
-                 (Util.referenced_person_title_text conf base fath)
-                 (Date.short_dates_text conf base fath)
-                 (Util.referenced_person_title_text conf base moth)
-                 (Date.short_dates_text conf base moth)
-           | NotesLinks.PgNotes ->
-               stagn "a" "href=\"%sm=NOTES\"" (commd conf) begin
-                 Wserver.printf "%s" (transl_nth conf "note/notes" 1);
-               end
-           | NotesLinks.PgMisc fnotes ->
-               stagn "tt" begin
-                 Wserver.printf "[";
-                 stag "a" "class=\"mx-2\" href=\"%sm=NOTES;f=%s\""
-                   (commd conf) fnotes begin
-                   Wserver.printf "%s" fnotes;
-                 end;
-                 Wserver.printf "]";
-               end
-           | NotesLinks.PgWizard wizname ->
-               stagn "tt" begin
-                 stag "i" begin
-                   Wserver.printf "%s"
-                     (transl_nth conf
-                        "wizard/wizards/friend/friends/exterior" 0);
-                 end;
-                 Wserver.printf " ";
-                 stag "a" "href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
-                   (code_varenv wizname)
-                 begin
-                   Wserver.printf "%s" wizname;
-                 end;
-               end ];
-         end)
+        stagn "li" begin
+          match pg with
+          [ NotesLinks.PgInd ip ->
+            let p = pget conf base ip in
+            Wserver.printf "%s%s"
+              (Util.referenced_person_title_text conf base p)
+              (Date.short_dates_text conf base p)
+          | NotesLinks.PgFam ifam ->
+            let fam = foi base ifam in
+            let fath = pget conf base (get_father fam) in
+            let moth = pget conf base (get_mother fam) in
+            Wserver.printf "%s%s &amp; %s %s"
+              (Util.referenced_person_title_text conf base fath)
+              (Date.short_dates_text conf base fath)
+              (Util.referenced_person_title_text conf base moth)
+              (Date.short_dates_text conf base moth)
+          | NotesLinks.PgNotes ->
+            stagn "a" "href=\"%sm=NOTES\"" (commd conf) begin
+              Wserver.printf "%s" (transl_nth conf "note/notes" 1);
+            end
+          | NotesLinks.PgMisc fnotes ->
+            let (nenv, s) = read_notes base fnotes in
+            let title = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in
+              stagn "tt" begin
+                stag "a" "class=\"mx-2\" href=\"%sm=MOD_NOTES;f=%s\""
+                  (commd conf) fnotes begin
+                  Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+                end;
+                stag "a" "class=\"mx-2\" href=\"%sm=NOTES;f=%s\""
+                  (commd conf) fnotes begin
+                  Wserver.printf "%s" fnotes;
+                end;
+                if title <> "" then
+                  Wserver.printf "(%s)" title
+                else ();
+              end
+          | NotesLinks.PgWizard wizname ->
+            stagn "tt" begin
+              stag "i" begin
+                Wserver.printf "%s"
+                  (transl_nth conf "wizard/wizards/friend/friends/exterior" 0);
+              end;
+              Wserver.printf " ";
+              stag "a" "href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
+                (code_varenv wizname)
+              begin
+                Wserver.printf "%s" wizname;
+              end;
+            end ];
+        end)
       pgl;
   end
 ;
 
-value print_what_links conf base fnotes =  do {
+value print_what_links_loc conf base fnotes =  do {
   let title h =
     do {
       Wserver.printf "%s " (capitale (transl conf "linked pages"));
@@ -337,7 +343,7 @@ value print conf base =
     | None -> "" ]
   in
   match p_getenv conf.env "ref" with
-  [ Some "on" -> print_what_links conf base fnotes
+  [ Some "on" -> print_what_links_loc conf base fnotes
   | _ ->
       let (nenv, s) = read_notes base fnotes in
       let title = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in

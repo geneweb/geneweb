@@ -1,28 +1,18 @@
+    notes pointing to the new name
+en: notes already pointing to the new name
+fr: notes pointant déjà vers le nouveau nom
+
     choose a genealogy
 en: choose a genealogy
 fr: choisir une généalogie
 
     input database
-en: Please, enter the name of the database you want to use:
-fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
+en: please, enter the name of the database you want to use:
+fr: tapez à l'identique le nom de la généalogie que vous voulez utiliser :
 
     available genealogies
 en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
-
-    about (short date)
-de: ca.
-en: about
-es: alrededor de
-fr: vers
-he:   בערך
-it: circa
-pl: około
-ru: около
-
-    book of %s
-en: book of %s
-fr: dictionnaire des %s
 
     presentation
 de: Präsentation
@@ -40,6 +30,18 @@ fr: de
     officer/officer/officers
 en: officer/officer/officers
 fr: officiant/officiante/officiants
+
+    name changed. update %s to old key
+fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les %s à l’ancienne clé.
+en: The first name, name or occurrence of this person has changed. Please update %s to the old key.
+
+    new name
+en: new name
+fr: nouveau nom
+    
+    old name
+en: old name
+fr: ancien nom
 
      !dates order
 af: yyyymmdd
@@ -7205,6 +7207,10 @@ fr: lien à utiliser
 it: link da usare
 oc: ligam d'utilizar
 
+    linked-pages
+en: pages linked
+fr: pages liées    
+    
     linked pages
 bg: свързани страници
 ca: enllaços

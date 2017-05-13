@@ -1188,6 +1188,32 @@ value effective_del conf base warning p = do {
    notes = empty; psources = empty; key_index = ip}
 };
 
+(* TODO: code pulled from perso.ml! could be factorized *)
+value links_to_ind conf base db key =
+  let list =
+    List.fold_left
+      (fun pgl (pg, (_, il)) ->
+         let record_it =
+           match pg with
+           [ NotesLinks.PgInd ip -> authorized_age conf base (pget conf base ip)
+           | NotesLinks.PgFam ifam ->
+               let fam = foi base ifam in
+               if is_deleted_family fam then False
+               else authorized_age conf base (pget conf base (get_father fam))
+           | NotesLinks.PgNotes | NotesLinks.PgMisc _
+           | NotesLinks.PgWizard _ -> True ]
+         in
+         if record_it then
+           List.fold_left
+             (fun pgl (k, _) -> if k = key then [pg :: pgl] else pgl)
+             pgl il
+         else pgl)
+      [] db
+  in
+  list_uniq (List.sort compare list)
+;
+
+
 value print_mod_ok conf base wl p =
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "person modified"))
@@ -1227,9 +1253,29 @@ value print_mod_ok conf base wl p =
                   deleted_relation.val;
               end;
             end; } ] ;
+            
     Wserver.printf "\n<p>%s</p>"
       (referenced_person_text conf base (poi base p.key_index));
-    Wserver.printf "\n";
+    let first_name = no_html_tags (only_printable (get conf "first_name")) in
+    let surname = no_html_tags (only_printable (get conf "surname")) in
+    let occ = try int_of_string (strip_spaces (get conf "occ")) with [ Failure _ -> 0 ] in
+    let old_fn  = Printf.sprintf "%s" (try get conf "old_fn" with [ Failure _ -> "" ] ) in
+    let old_sn  = Printf.sprintf "%s" (try get conf "old_sn" with [ Failure _ -> "" ] ) in
+    let old_occ = try int_of_string (strip_spaces (get conf "old_occ")) with [ Failure _ -> -1 ] in
+    let index   = Printf.sprintf "%s" (try get conf "i" with [ Failure _ -> "0" ]) in
+    let key = (Name.lower old_fn, Name.lower old_sn, old_occ) in
+    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let fname = Filename.concat bdir "notes_links" in
+    let db = NotesLinks.read_db_from_file fname in
+    let db = Notes.merge_possible_aliases conf db in
+    if (old_occ <> -1) && links_to_ind conf base db key <> [] &&
+      (old_fn <> first_name || old_sn <> surname || old_occ <> occ) then do {
+      Wserver.printf "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
+      let link = Printf.sprintf "<a href='%sm=LINKED;old_fn=%s;old_sn=%s;old_occ=%d;i=%s;'>%s</a>"
+        (Util.commd conf) old_fn old_sn old_occ index (transl conf "linked-pages") in
+      Wserver.printf (ftransl conf "name changed. update %s to old key") link;
+      Wserver.printf "</div>\n"
+    } else ();
     Update.print_warnings conf base wl;
     trailer conf;
   }

@@ -884,6 +884,9 @@ function changeCalendar(e,v,m,c) {
     %hidden;
     <input type="hidden" name="digest" value="%digest;"%/>
     <input type="hidden" name="i" value="%index;"%/>
+    <input type="hidden" name="old_fn"  value="%first_name;">
+    <input type="hidden" name="old_sn"  value="%surname;">
+    <input type="hidden" name="old_occ" value="%if;(occ="")0%else;%occ;%end;">
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK")
       %if;(evar_i2 != "")
         <input type="hidden" name="i2" value="%evar_i2;">
