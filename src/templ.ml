@@ -705,7 +705,9 @@ and eval_simple_variable conf =
   [ "action" -> conf.command
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
-  | "compilation_time" -> Util.compilation_time conf
+  | "compilation_time" -> Util.get_compilation_time ()
+  | "commit" -> Util.get_commit ()
+  | "commit_date" -> Util.get_commit_date ()
   | "connections" ->
       match conf.n_connect with
       [ Some (c, cw, cf, _) ->

@@ -238,8 +238,12 @@ value print_pre_right : int -> string -> unit;
 
 value short_f_month : int -> string;
 
-value compilation_time_hook : ref string;
-value compilation_time : config -> string;
+value get_compilation_time : unit -> string;
+value set_compilation_time : string -> unit;
+value get_commit : unit -> string;
+value set_commit : string -> unit;
+value get_commit_date : unit -> string;
+value set_commit_date : string -> unit;
 
 (* Reading password file *)
 
