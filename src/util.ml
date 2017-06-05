@@ -585,34 +585,47 @@ value authorized_age conf base p =
     nobtit conf base p <> [] then
     True
   else
-    match
-      (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
-       get_death p, CheckItem.date_of_death (get_death p))
-    with
-    [ (_, _, NotDead, _) when conf.private_years > 0 -> False
-    | (Some (Dgreg d _), _, _, _) ->
-        let a = CheckItem.time_elapsed d conf.today in
-        strictly_after_private_years conf a
-    | (_, Some (Dgreg d _), _, _) ->
-        let a = CheckItem.time_elapsed d conf.today in
-        strictly_after_private_years conf a
-    | (_, _, _, Some (Dgreg d _)) ->
-        let a = CheckItem.time_elapsed d conf.today in
-        strictly_after_private_years conf a
-    | (None, None, DontKnowIfDead, None) ->
-        get_access p <> Private && conf.public_if_no_date
-    | _ ->
-        let rec loop i =
-          if i >= Array.length (get_family p) then False
-          else
-            let fam = foi base (get_family p).(i) in
-            match Adef.od_of_codate (get_marriage fam) with
-            [ Some (Dgreg d _) ->
-                let a = CheckItem.time_elapsed d conf.today in
-                strictly_after_private_years conf a
-            | _ -> loop (i + 1) ]
-        in
-        loop 0 ]
+    let authorized p =
+      match
+        (Adef.od_of_codate (get_birth p), Adef.od_of_codate (get_baptism p),
+         get_death p, CheckItem.date_of_death (get_death p))
+      with
+      [ (_, _, NotDead, _) when conf.private_years > 0 -> False
+      | (Some (Dgreg d _), _, _, _) ->
+          let a = CheckItem.time_elapsed d conf.today in
+          strictly_after_private_years conf a
+      | (_, Some (Dgreg d _), _, _) ->
+          let a = CheckItem.time_elapsed d conf.today in
+          strictly_after_private_years conf a
+      | (_, _, _, Some (Dgreg d _)) ->
+          let a = CheckItem.time_elapsed d conf.today in
+          strictly_after_private_years conf a
+      | (None, None, DontKnowIfDead, None) ->
+          get_access p <> Private && conf.public_if_no_date 
+      | _ -> False ]
+    in
+    if authorized p then True
+    else
+      let rec loop i =
+        if i >= Array.length (get_family p) then False
+        else
+          let fam = foi base (get_family p).(i) in
+          match Adef.od_of_codate (get_marriage fam) with
+          [ Some (Dgreg d _) ->
+              let a = CheckItem.time_elapsed d conf.today in
+              strictly_after_private_years conf a
+          | _ -> 
+              let rec loop_child j =
+                if j >= Array.length (get_children fam) then False
+                else
+                  let child = poi base (get_children fam).(j) in
+                  if authorized child then True
+                  else loop_child (j + 1)
+              in
+              if loop_child 0 then True
+              else loop (i + 1) ]
+      in
+      loop 0 
 ;
 
 value is_restricted (conf : config) base ip =
