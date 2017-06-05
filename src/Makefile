@@ -12,7 +12,9 @@ LINKFLAGS = -I $(CAMLP5D)
 include $(ROOT)/tools/Makefile.common
 
 compilation.ml: always
-	echo "Util.compilation_time_hook.val := \" ($$(date "+%Y-%m-%d %T %Z"))\";" > $@
+	echo "Util.compilation_time_hook.val := \" $$(date "+%Y-%m-%d %T %Z")\";" > $@
+	echo "Util.commit_nbr_hook.val := \"$$(git show -s --pretty=format:%h)\";" >> $@
+	echo "Util.commit_date_hook.val := \"$$(git show -s --pretty=format:%ci)\";" >> $@
 
 gwlib.ml:
 	echo "value prefix =" > $@

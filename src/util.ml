@@ -2104,11 +2104,11 @@ value check_xhtml s =
 (* There is a hook to avoid a dependency on compilation.ml which is
    recompiled every time *)
 value compilation_time_hook = ref "";
-value compilation_time conf =
-  match p_getenv conf.base_env "display_compilation_time" with
-  [ Some "on" -> compilation_time_hook.val
-  | _ -> "" ]
-;
+value compilation_time conf = compilation_time_hook.val;
+value commit_nbr_hook = ref "";
+value commit_nbr conf = commit_nbr_hook.val;
+value commit_date_hook = ref "";
+value commit_date conf = commit_date_hook.val;
 
 value menu_threshold = 20;
 

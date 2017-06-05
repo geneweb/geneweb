@@ -706,6 +706,8 @@ and eval_simple_variable conf =
   | "border" -> string_of_int conf.border
   | "charset" -> conf.charset
   | "compilation_time" -> Util.compilation_time conf
+  | "commit_nbr" -> Util.commit_nbr conf
+  | "commit_date" -> Util.commit_date conf
   | "connections" ->
       match conf.n_connect with
       [ Some (c, cw, cf, _) ->
@@ -1302,7 +1304,7 @@ value print_copyright conf =
       tag "div" "style=\"font-size: 80%%\"" begin
         stag "em" begin
           Wserver.printf
-            "Copyright (c) 1998-2007 INRIA - GeneWeb %s" Version.txt;
+            "Copyright (c) 1998-2017 INRIA - GeneWeb %s" Version.txt;
         end;
       end;
       xtag "br";

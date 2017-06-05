@@ -240,6 +240,10 @@ value short_f_month : int -> string;
 
 value compilation_time_hook : ref string;
 value compilation_time : config -> string;
+value commit_nbr_hook : ref string;
+value commit_nbr : config -> string;
+value commit_date_hook : ref string;
+value commit_date : config -> string;
 
 (* Reading password file *)
 
