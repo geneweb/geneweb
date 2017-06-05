@@ -23,6 +23,7 @@
           <div class="btn-inline">
             <a class="btn btn-secondary" role="button" href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"
              title="%if(evar.templ!="templm")templm%else;defaut template%end;"><span class="fa fa-id-card"></span></a>
+            %if;(evar.templ="")
             <div class="btn-group dropup">
               <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="%if;(evar.lang!="")%apply;capitalize%with;%apply;language_name(evar.lang)%end;%end;">
                 <span class="fa fa-language"></span>
@@ -66,6 +67,7 @@
                 </div>
               %end;
             </div>
+            %end;
           </div>
         </div>
         <div class="col-9">

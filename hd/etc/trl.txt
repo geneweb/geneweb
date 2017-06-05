@@ -1,3 +1,0 @@
-%if;(evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK")
-  <div id="x_trl" tabindex="0"></div>
-%end;

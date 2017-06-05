@@ -1,4 +1,4 @@
-﻿%doctype;
+%doctype;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: dag.txt,v 7.00 2015/04/30 11:14:09 mr Exp $ -->

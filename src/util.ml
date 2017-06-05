@@ -964,7 +964,10 @@ value wprint_geneweb_link conf href s =
 
 value reference conf base p s =
   if conf.cancel_links || is_hidden p then s
-  else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
+  else
+    String.concat ""
+      [ "<a href=\""; commd conf; acces conf base p;
+        "\" id=\"reference\">"; s; "</a>" ]
 ;
 
 

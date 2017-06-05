@@ -2,7 +2,7 @@
 %(
 Options
 1: arbre vertical
-2: arbre horizontal (jusque 6 gen.)
+2: arbre horizontal (jusque 6 gen.)
 3: generation 2 et 3 avec photos
 4: 7 gen : 3 asc et 3 desc.
 %)
@@ -19,4 +19,3 @@ Options
   %apply;show_templ("perso_module/arbre_7gen")
 %else;
 %end;
-
