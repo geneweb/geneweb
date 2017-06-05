@@ -181,6 +181,8 @@ value compatible_deaths d1 d2 =
     [ (Death dr1 cd1, Death dr2 cd2) ->
         compatible_death_reasons dr1 dr2 && compatible_cdates cd1 cd2
     | (Death _ _, NotDead) -> False
+    | (Death _ _, OfCourseDead) -> False
+    | (OfCourseDead, Death _ _) -> False
     | (Death _ _, _) -> True
     | (_, DontKnowIfDead) -> True
     | (DontKnowIfDead, _) -> True

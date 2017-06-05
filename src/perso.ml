@@ -3546,7 +3546,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       | _ -> False ]
   | "is_dead" ->
       match get_death p with
-      [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
+      [ Death _ _ | DeadYoung | DeadDontKnowWhen | OfCourseDead -> p_auth
       | _ -> False ]
   | "is_descendant" ->
       match get_env "desc_mark" env with
@@ -4107,6 +4107,7 @@ and string_of_died conf base env p p_auth =
         | Disappeared -> transl_nth conf "disappeared" is ]
     | DeadYoung -> transl_nth conf "died young" is
     | DeadDontKnowWhen -> transl_nth conf "died" is
+    | OfCourseDead -> transl_nth conf "died" is
     | _ -> "" ]
   else ""
 and string_of_image_url conf base env (p, p_auth) html =
