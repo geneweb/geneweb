@@ -24,6 +24,10 @@ ru: около
 en: book of %s
 fr: dictionnaire des %s
 
+    compiled on
+en: compiled on
+fr: compilé le
+
     presentation
 de: Präsentation
 en: Presentation
