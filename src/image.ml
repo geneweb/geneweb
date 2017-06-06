@@ -9,7 +9,7 @@ open Config;
 (** [Description] : Envoie les en-têtes de contenu et de cache pour un fichier
                     image, pdf ou html sur le flux HTTP sortant de Wserver.
     [Args] :
-      - ct : le content_type MIME du fichier, par exemple "image/png",
+     - ct : le content_type MIME du fichier, par exemple "image/png",
              "image/jpeg" ou "application/pdf"
       - len : la taille en octet du fichier
       - fname : le nom du fichier
@@ -115,6 +115,7 @@ value print_source_image conf f =
   let fname =
     if f.[0] = '/' then String.sub f 1 (String.length f - 1) else f
   in
+  (* TODO remove Filename.basename to handle sub_dirs *)
   if fname = Filename.basename fname then
     let fname = Util.source_image_file_name conf.bname fname in
     if print_image_file fname then () else Hutil.incorrect_request conf

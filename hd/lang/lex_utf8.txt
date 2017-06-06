@@ -28,6 +28,10 @@ fr: dictionnaire des %s
 en: compiled on
 fr: compilé le
 
+    commited on
+en: commit date
+fr: commit du
+
     presentation
 de: Präsentation
 en: Presentation
