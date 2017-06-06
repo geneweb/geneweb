@@ -24,9 +24,9 @@ ru: около
 en: book of %s
 fr: dictionnaire des %s
 
-    compiled on
-en: compiled on
-fr: compilé le
+    compiled on %s from commit %s
+en: compiled on %s from commit %s
+fr: compilé le %s à partir du commit %s
 
     presentation
 de: Präsentation
