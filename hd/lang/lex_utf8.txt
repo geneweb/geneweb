@@ -57,6 +57,18 @@ fr: de
 en: officer/officer/officers
 fr: officiant/officiante/officiants
 
+    name changed. update linked pages
+fr: Le prénom, nom ou occurrence de cette personne a changé. Pensez à mettre à jour les pages liées à l’ancienne clé ci-dessous.
+en: The first name, name or occurrence of this person has changed. Please update the pages linked to the old key listed below.
+
+    old name
+en: old name
+fr: ancien nom
+
+    new name
+en: new name
+fr: nouveau nom
+
      !dates order
 af: yyyymmdd
 ar: ddmmyyyy

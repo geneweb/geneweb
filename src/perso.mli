@@ -16,6 +16,10 @@ value print : config -> base -> person -> unit;
 value print_ascend : config -> base -> person -> unit;
 value print_what_links : config -> base -> person -> unit;
 
+value links_to_ind :
+  config -> base -> list (NotesLinks.page * ('a * list ('b * 'c))) ->
+    'b -> list NotesLinks.page;
+
 value build_sosa_ht : config -> base -> unit;
 value get_sosa_person : config -> base -> person -> Sosa.t;
 value get_single_sosa : config -> base -> person -> Sosa.t;
