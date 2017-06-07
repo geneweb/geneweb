@@ -1188,7 +1188,7 @@ value effective_del conf base warning p = do {
    notes = empty; psources = empty; key_index = ip}
 };
 
-value print_mod_ok conf base wl p =
+value print_mod_ok conf base wl pgl p ofn osn oocc=
   let title _ =
     Wserver.printf "%s" (capitale (transl conf "person modified"))
   in
@@ -1231,6 +1231,26 @@ value print_mod_ok conf base wl p =
       (referenced_person_text conf base (poi base p.key_index));
     Wserver.printf "\n";
     Update.print_warnings conf base wl;
+    let pi = p.key_index in
+    let np = poi base pi in
+    let nfn = p_first_name base np in
+    let nsn = p_surname base np in
+    let nocc = get_occ np in
+    if pgl <> [] && (ofn <> nfn || osn <> nsn || oocc <> nocc) then do {
+      Wserver.printf "<div class='alert alert-danger mx-auto mt-1' role='alert'>\n";
+      Wserver.printf (ftransl conf "name changed. update linked pages");
+      Wserver.printf "</div>\n";
+      let soocc = if oocc <> 0 then Printf.sprintf "/%d" oocc else "" in
+      let snocc = if nocc <> 0 then Printf.sprintf "/%d" nocc else "" in
+      Wserver.printf "<span class=\"unselectable float-left\">%s%s</span>
+                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
+        (capitale (transl conf "old name")) (transl conf ":") ofn osn soocc;
+      Wserver.printf "<span class=\"unselectable float-left\">%s%s</span>
+                      <span class=\"float-left ml-1\">%s/%s%s</span>\n<br>"
+        (capitale (transl conf "new name")) (transl conf ":") nfn nsn snocc;
+      Wserver.printf "<span>%s%s</span>"
+        (capitale (transl conf "linked pages")) (transl conf ":");
+      Notes.print_linked_list conf base pgl;    } else ();
     trailer conf;
   }
 ;
@@ -1446,7 +1466,19 @@ value print_mod o_conf base =
           base
           (gen_person_of_person (poi base (Adef.iper_of_int (-1)))) ]
   in
+  let ofn = o_p.first_name in
+  let osn = o_p.surname in
+  let oocc = o_p.occ in
+  let key = (Name.lower ofn, Name.lower osn, oocc) in
   let conf = Update.update_conf o_conf in
+  let pgl =
+    let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
+    let fname = Filename.concat bdir "notes_links" in
+    let db = NotesLinks.read_db_from_file fname in
+    let db = Notes.merge_possible_aliases conf db in
+    let pgl = Perso.links_to_ind conf base db key in
+    pgl
+  in
   let callback sp = do {
     let p = effective_mod conf base sp in
     let op = poi base p.key_index in
@@ -1487,7 +1519,7 @@ value print_mod o_conf base =
     then
       Update.delete_topological_sort_v conf base
     else ();
-    print_mod_ok conf base wl p;
+    print_mod_ok conf base wl pgl p ofn osn oocc;
   }
   in
   print_mod_aux conf base callback
