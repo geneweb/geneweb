@@ -261,44 +261,84 @@ value print_linked_list conf base pgl =
          stagn "li" begin
            match pg with
            [ NotesLinks.PgInd ip ->
-               let p = pget conf base ip in
-               Wserver.printf "%s%s"
-                 (Util.referenced_person_title_text conf base p)
-                 (Date.short_dates_text conf base p)
+               stagn "tt" begin
+                 if conf.wizard then
+                   stag "a" "class=\"mx-2\" href=\"%s;i=%d;\""
+                     (commd conf) (Adef.int_of_iper ip) begin
+                     Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+                   end
+                 else ();
+                 let p = pget conf base ip in
+                 Wserver.printf "%s%s"
+                   (Util.referenced_person_title_text conf base p)
+                   (Date.short_dates_text conf base p);
+               end
            | NotesLinks.PgFam ifam ->
                let fam = foi base ifam in
                let fath = pget conf base (get_father fam) in
                let moth = pget conf base (get_mother fam) in
-               Wserver.printf "%s%s &amp; %s %s"
-                 (Util.referenced_person_title_text conf base fath)
-                 (Date.short_dates_text conf base fath)
-                 (Util.referenced_person_title_text conf base moth)
-                 (Date.short_dates_text conf base moth)
+               stagn "tt" begin
+               if conf.wizard then
+                 stag "a" "class=\"mx-2\" href=\"%sm=MOD_FAM;i=%d;ip=%d;\""
+                   (commd conf) (Adef.int_of_ifam ifam) 
+                   (Adef.int_of_iper (Gwdb.get_key_index fath)) begin
+                   Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+                 end
+                 else ();
+                 stag "span" "class=\"mx-2\"" begin
+                   Wserver.printf "%s%s &amp; %s %s"
+                     (Util.referenced_person_title_text conf base fath)
+                     (Date.short_dates_text conf base fath)
+                     (Util.referenced_person_title_text conf base moth)
+                     (Date.short_dates_text conf base moth);
+                 end;
+               end
            | NotesLinks.PgNotes ->
-               stagn "a" "href=\"%sm=NOTES\"" (commd conf) begin
-                 Wserver.printf "%s" (transl_nth conf "note/notes" 1);
+               stagn "tt" begin
+                 if conf.wizard then
+                    stag "a" "class=\"mx-2\" href=\"%sm=MOD_NOTES;\""
+                      (commd conf) begin
+                      Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+                    end
+                 else ();
+                 stagn "a" "class=\"mx-2\" href=\"%sm=NOTES\"" (commd conf) begin
+                   Wserver.printf "%s" (transl_nth conf "note/notes" 1);
+                 end;
                end
            | NotesLinks.PgMisc fnotes ->
+               let (nenv, s) = read_notes base fnotes in
+               let title = try List.assoc "TITLE" nenv with [ Not_found -> "" ] in
                stagn "tt" begin
-                 Wserver.printf "[";
-                 stag "a" "class=\"mx-2\" href=\"%sm=NOTES;f=%s\""
+                 if conf.wizard then
+                   stag "a" "class=\"mx-2\" href=\"%sm=MOD_NOTES;f=%s;\""
+                     (commd conf) fnotes begin
+                     Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+                   end
+                 else ();
+                 stag "a" "class=\"mx-2\" href=\"%sm=NOTES;f=%s;\""
                    (commd conf) fnotes begin
                    Wserver.printf "%s" fnotes;
                  end;
-                 Wserver.printf "]";
+                 if title <> "" then
+                   Wserver.printf "(%s)" title
+                 else ();
                end
            | NotesLinks.PgWizard wizname ->
                stagn "tt" begin
-                 stag "i" begin
-                   Wserver.printf "%s"
-                     (transl_nth conf
-                        "wizard/wizards/friend/friends/exterior" 0);
-                 end;
-                 Wserver.printf " ";
-                 stag "a" "href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
+                 if conf.wizard then
+                   stag "a" "class=\"mx-2\" href=\"%sm=MOD_WIZNOTES;f=%s;\""
+                     (commd conf) (code_varenv wizname) begin
+                     Wserver.printf "</sup><i class=\"fa fa-cog\"></i></sup>";
+                   end
+                 else ();
+                 stag "a" "class=\"mx-2\" href=\"%sm=WIZNOTES;v=%s\"" (commd conf)
                    (code_varenv wizname)
                  begin
                    Wserver.printf "%s" wizname;
+                 end;
+                 stag "i" begin
+                   Wserver.printf "(%s)"
+                     (transl_nth conf "wizard/wizards/friend/friends/exterior" 0);
                  end;
                end ];
          end)
