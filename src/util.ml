@@ -41,16 +41,9 @@ value search_in_lang_path = search_in_path Secure.lang_path;
 
 value start_with_vowel s =
   if String.length s > 0 then
-    let c = 
-      match s.[0] with
-        [ '<' -> let k = String.index_from s 0 '>' in
-                try String.get (fst (Name.unaccent_utf_8 True s (k+1))) 0
-                  with [ Invalid_argument "index out of bounds" -> ' ' ]
-        | _ ->  try String.get (fst (Name.unaccent_utf_8 True s 0 )) 0
-                  with [ Invalid_argument "index out of bounds" -> ' ' ]]
-    in
-    match c with
-    [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' -> True
+    let (s, i) = Name.unaccent_utf_8 True s 0 in
+    match s.[0] with
+    [ 'a' | 'e' | 'i' | 'o' | 'u' -> True
     | _ -> False ]
   else False
 ;
@@ -227,7 +220,7 @@ value transl_decline conf w s =
   Translate.eval (gen_decline (transl conf w) s)
 ;
 
-value gen_decline2 wt s1 s2 =
+value gen_decline2 wt s1 s2 alt=
   let string_of =
     fun
     [ '1' -> Some s1
@@ -257,8 +250,8 @@ value gen_decline2 wt s1 s2 =
                 match string_of wt.[j + 2] with
                 [ Some s ->
                     let s =
-                      if start_with_vowel s then String.sub wt (k+1) (j-k-1) ^ s (* [aa|bb]  *)
-                      else String.sub wt (i + 1) (k-i-1) ^ s                     (* i  k  j  *)
+                      if alt then String.sub wt (k+1) (j-k-1) ^ s (* [aa|bb]  *)
+                      else String.sub wt (i + 1) (k-i-1) ^ s      (* i  k  j  *)
                     in
                     (s, j + 2)
                 | None -> raise Not_found ]
@@ -272,14 +265,17 @@ value gen_decline2 wt s1 s2 =
   (*surtout pas ! Translate.eval*) (loop 0)
 ;
 
-value transl_a_to_b conf x y =
-  gen_decline2 (transl_nth conf "%1 to %2" 0) x y
+value transl_a_to_b conf x y1 y2 =
+  gen_decline2 (transl_nth conf "%1 to %2" 0) x y1 (start_with_vowel y2)
 ;
 value transl_a_of_b conf x y =
-  gen_decline2 (transl_nth conf "%1 of %2" 0) x y
+  gen_decline2 (transl_nth conf "%1 of %2" 0) x y (start_with_vowel y)
+;
+value transl_a_of_b2 conf x y1 y2 =
+  gen_decline2 (transl_nth conf "%1 of %2" 0) x y1 (start_with_vowel y2)
 ;
 value transl_a_of_gr_eq_gen_lev conf x y =
-  gen_decline2 (transl_nth conf "%1 of %2" 1) x y
+  gen_decline2 (transl_nth conf "%1 of %2" 1) x y (start_with_vowel y)
 ;
 
 value check_format ini_fmt (r : string) =

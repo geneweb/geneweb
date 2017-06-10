@@ -117,15 +117,22 @@
           %if;(event_witness_relation.event.date.year != "")
             %apply;a_to_b%with;
               %apply;capitalize(event_witness_relation_kind)
-              %sp;[in (month year)]%sp;%event_witness_relation.event.date.year;
-            %and;%event_witness_relation.event.name;%end;
+                %sp;[in (month year)]%sp;%event_witness_relation.event.date.year;
+              %and;%event_witness_relation.event.name;
+              %and;%event_witness_relation.event.name;
+            %end;
           %else;
             %apply;a_to_b%with;
-            %apply;capitalize(event_witness_relation_kind)%and;
-            %event_witness_relation.event.name;%end;
+              %apply;capitalize(event_witness_relation_kind)
+              %and;%event_witness_relation.event.name;
+              %and;%event_witness_relation.event.name;
+            %end;
           %end;
           %if;(event_witness_relation.person.index!=central_index)
-            %sp;%apply;a_of_b%with;%and;%apply;short_display_person("event_witness_relation.person")%end;
+            %sp;%apply;a_of_b2%with;
+              %and;%apply;short_display_person("event_witness_relation.person")
+              %and;%event_witness_relation.person;
+            %end;
             %if;(event_witness_relation.event.spouse != "")
               %sp;[and]
               %apply;short_display_person("event_witness_relation.event.spouse")
@@ -190,8 +197,9 @@
                related_type=[godson/goddaughter/godchild]1 or
                related_type=[godson/goddaughter/godchild]2)
             %if;(count>0)%if;(count=g_cnt-1)%sp;[and]%sp;%else;,%sp;%end;%end;
-            %apply;a_of_b%with;%and;
-            %apply;short_display_person("related")%end;
+            %apply;a_of_b%with;
+              %and;%apply;short_display_person("related")
+            %end;
             %incr_count;
           %end;
         %end;
@@ -204,15 +212,22 @@
           %if;(event_witness_relation.event.date.year != "")
             %apply;a_to_b%with;
               %apply;capitalize(event_witness_relation_kind)
-              %sp;[in (month year)]%sp;%event_witness_relation.event.date.year;
-            %and;%event_witness_relation.event.name;%end;
+                %sp;[in (month year)]%sp;%event_witness_relation.event.date.year;
+              %and;%event_witness_relation.event.name;
+              %and;%event_witness_relation.event.name;
+            %end;
           %else;
             %apply;a_to_b%with;
-            %apply;capitalize(event_witness_relation_kind)%and;
-            %event_witness_relation.event.name;%end;
+            %apply;capitalize(event_witness_relation_kind)
+              %and;%event_witness_relation.event.name;
+              %and;%event_witness_relation.event.name;
+            %end;
           %end;
           %if;(event_witness_relation.person.index!=central_index)
-            %sp;%apply;a_of_b%with;%and;%apply;short_display_person("event_witness_relation.person")%end;
+            %sp;%apply;a_of_b2%with;
+              %and;%apply;short_display_person("event_witness_relation.person")
+              %and;%event_witness_relation.person;
+            %end;
             %if;(event_witness_relation.event.spouse != "")
               %sp;[and]
               %apply;short_display_person("event_witness_relation.event.spouse")

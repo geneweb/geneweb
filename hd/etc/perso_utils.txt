@@ -813,7 +813,6 @@
 %let;timeline;%if;(count>0)yes%else;no%end;%in;
 
 %define;his_her(lg, event, sex)
-  %if;("lg"="fr")
     %if;(event.e_name="#deat" or event.e_name="#birt" or 
          event.e_name="#marl" or event.e_name="#resi" or
          event.e_name="#crem" or event.e_name="#circ" or
@@ -828,14 +827,11 @@
          event.e_name="#natu" or event.e_name="#prop" or
          event.e_name="#resi" or event.e_name="#vteb" or
          event.e_name="#sep"
-        )sa
+        )[his/her/his]1 %( sa %)
     %elseif;(event.e_name="#enga" or event.e_name="#marb" or
              event.e_name="#fune"
-            )ses
-    %else;son
+            )[his/her/his]2 %( ses %)
+    %else;%if;(sex=0)[his2/her]0%else;[his2/her]1%end; %( son or his/her %)
     %end;
-  %elseif;("lg"="en")%if;(sex=1)her%else;his%end;
-  %else;%if;(sex=1)her%else;his%end;
-  %end;
 %end;
 

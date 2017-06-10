@@ -18,6 +18,24 @@ fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
 en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 
+    about (short date)
+de: ca.
+en: about
+es: alrededor de
+fr: vers
+he:   בערך
+it: circa
+pl: około
+ru: около
+
+    book of %s
+en: book of %s
+fr: dictionnaire des %s
+
+    compiled on %s from commit %s
+en: compiled on %s from commit %s
+fr: compilé le %s à partir du commit %s
+
     presentation
 de: Präsentation
 en: Presentation
@@ -30,6 +48,14 @@ ru: представление
     of
 en: of
 fr: de
+
+    his/her/his
+en: his/her/his
+fr: son/sa/ses
+
+    his2/her
+en: his/her
+fr: son/son
 
     officer/officer/officers
 en: officer/officer/officers
