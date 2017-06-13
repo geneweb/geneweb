@@ -2,7 +2,7 @@
 %let;laA;title="[*add::family/families]0 (A)" accesskey="A"%in;
 %let;laD;title="[*difference between the two revisions] (D)" accesskey="D"%in;
 %let;laI;title="[*send::image/images]0 (I)" accesskey="I"%in;
-%let;laL;title="[*add::parents] [of] %first_name;%if;(occ!=0).%occ%end; %surname; (L)" accesskey="L"%in;
+%let;laL;title="[*add::parents] %apply;a_of_b%with;%and;%first_name;%end;%if;(occ!=0).%occ%end; %surname; (L)" accesskey="L"%in;
 %let;laP;title="[*modify::person/persons]0 %first_name;%if;(occ!=0).%occ%end; %surname; (P)" accesskey="P"%in;
 %let;laR;title="[*relationship computing] (R)" accesskey="R"%in;
 %let;laU;title="[*update] (U)" accesskey="U"%in;
