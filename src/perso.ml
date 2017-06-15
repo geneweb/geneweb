@@ -3107,6 +3107,77 @@ and eval_str_event_field
       [ (True, Pevent name) -> Util.string_of_pevent_name conf base name
       | (True, Fevent name) -> Util.string_of_fevent_name conf base name
       | _ -> "" ]
+  | "e_name" ->
+      match (p_auth, name) with
+      [ (True, Pevent name) ->
+          match name with
+          [ Epers_Birth -> "#birt"
+          | Epers_Baptism -> "#bapt"
+          | Epers_Death -> "#deat"
+          | Epers_Burial -> "#buri"
+          | Epers_Cremation -> "#crem"
+          | Epers_Accomplishment -> "#acco"
+          | Epers_Acquisition -> "#acqu"
+          | Epers_Adhesion -> "#adhe"
+          | Epers_BaptismLDS -> "#bapl"
+          | Epers_BarMitzvah -> "#barm"
+          | Epers_BatMitzvah -> "#basm"
+          | Epers_Benediction -> "#bles"
+          | Epers_ChangeName -> "#chgn"
+          | Epers_Circumcision -> "#circ"
+          | Epers_ConfirmationLDS -> "#conl"
+          | Epers_Confirmation -> "#conf"
+          | Epers_Decoration -> "#awar"
+          | Epers_DemobilisationMilitaire -> "#demm"
+          | Epers_Diploma -> "#degr"
+          | Epers_Distinction -> "#dist"
+          | Epers_DotationLDS -> "#dotl"
+          | Epers_Dotation -> "#endl"
+          | Epers_Education -> "#educ"
+          | Epers_Election -> "#elec"
+          | Epers_Emigration -> "#emig"
+          | Epers_Excommunication -> "#exco"
+          | Epers_FamilyLinkLDS -> "#flkl"
+          | Epers_FirstCommunion -> "#fcom"
+          | Epers_Funeral -> "#fune"
+          | Epers_Graduate -> "#grad"
+          | Epers_Hospitalisation -> "#hosp"
+          | Epers_Illness -> "#illn"
+          | Epers_Immigration -> "#immi"
+          | Epers_ListePassenger -> "#lpas"
+          | Epers_MilitaryDistinction -> "#mdis"
+          | Epers_MilitaryPromotion -> "#mpro"
+          | Epers_MilitaryService -> "#mser"
+          | Epers_MobilisationMilitaire -> "#mobm"
+          | Epers_Naturalisation -> "#natu"
+          | Epers_Occupation -> "#occu"
+          | Epers_Ordination -> "#ordn"
+          | Epers_Property -> "#prop"
+          | Epers_Recensement -> "#cens"
+          | Epers_Residence-> "#resi"
+          | Epers_Retired -> "#reti"
+          | Epers_ScellentChildLDS -> "#slgc"
+          | Epers_ScellentParentLDS -> "#slgp"
+          | Epers_ScellentSpouseLDS -> "#slgs"
+          | Epers_VenteBien -> "#vteb"
+          | Epers_Will -> "#will"
+          | _ -> "#unkn" ]
+      | (True, Fevent name) ->
+          match name with
+          [ Efam_Marriage -> "#marr"
+          | Efam_NoMarriage -> "#nmar"
+          | Efam_NoMention -> "#nmen"
+          | Efam_Engage -> "#enga"
+          | Efam_Divorce -> "#div"
+          | Efam_Separated -> "#sep"
+          | Efam_Annulation -> "#anul"
+          | Efam_MarriageBann -> "#marb"
+          | Efam_MarriageContract -> "#marc"
+          | Efam_MarriageLicense -> "#marl"
+          | Efam_PACS -> "#pacs"
+          | Efam_Residence -> "#resi"
+          | _ -> "#unkn" ]
+      | _ -> "" ]
   | "date" ->
       match (p_auth, Adef.od_of_codate date) with
       [ (True, Some d) -> Date.string_of_date conf d
@@ -5278,6 +5349,8 @@ value eval_predefined_apply conf env f vl =
   let vl = List.map (fun [ VVstring s -> s | _ -> raise Not_found ]) vl in
   match (f, vl) with
   [ ("a_of_b", [s1; s2]) -> Util.translate_eval (transl_a_of_b conf s1 s2)
+  | ("a_of_b2", [s1; s2; s3]) -> Util.translate_eval (transl_a_of_b2 conf s1 s2 s3)
+  | ("a_to_b", [s1; s2; s3]) -> Util.translate_eval (transl_a_to_b conf s1 s2 s3)
   | ("a_of_b_gr_eq_lev", [s1; s2]) ->
        Util.translate_eval (transl_a_of_gr_eq_gen_lev conf s1 s2)
   | ("add_in_sorted_list", sl) ->
