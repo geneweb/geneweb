@@ -352,19 +352,20 @@ message FichePerson {
   required bool has_history = 13;
   required bool has_possible_duplications = 14;
   optional int32 ref_index = 15;
-  required string linked_page_biblio = 16;
-  required string linked_page_bnote = 17;
-  required string linked_page_death = 18;
-  required string linked_page_head = 19;
-  required string linked_page_occu = 20;
-  required bool visible_for_visitors = 21;
-  optional Person father = 22;
-  optional Person mother = 23;
-  repeated FicheFamily families = 24;
-  repeated RelationFichePerson related = 25;
-  repeated RelationFichePerson rparents = 26;
-  repeated EventFicheWitness events_witnesses = 27;
-  repeated FicheEvent events = 28;
+  optional Person ref_person = 16;
+  required string linked_page_biblio = 17;
+  required string linked_page_bnote = 18;
+  required string linked_page_death = 19;
+  required string linked_page_head = 20;
+  required string linked_page_occu = 21;
+  required bool visible_for_visitors = 22;
+  optional Person father = 23;
+  optional Person mother = 24;
+  repeated FicheFamily families = 25;
+  repeated RelationFichePerson related = 26;
+  repeated RelationFichePerson rparents = 27;
+  repeated EventFicheWitness events_witnesses = 28;
+  repeated FicheEvent events = 29;
 }
 
 message Family {
