@@ -744,6 +744,7 @@ and eval_simple_variable conf =
       Util.doctype conf ^ "\n"
   | "highlight" -> conf.highlight
   | "image_prefix" -> Util.image_prefix conf
+  | "lang" -> conf.lang
   | "left" -> conf.left
   | "nl" -> "\n"
   | "nn" -> ""
