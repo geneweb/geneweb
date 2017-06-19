@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: forum.txt,v 5.19 2008-01-07 13:29:47 ddr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
