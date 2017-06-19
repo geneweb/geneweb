@@ -14,14 +14,6 @@
 %let;ltm; title="[year/month/day]1" class="m" size="2" maxlength="2" %in;
 %let;lty; title="[year/month/day]0" class="y" size="5" maxlength="5" %in;
 %let;ltp; size="40" maxlength="200" %in;
-%let;lang;
-  %if;(evar.lang != "")
-    %evar.lang;
-  %elseif;(bvar.default_lang != "")
-    %bvar.default_lang;
-  %else;en%nn;
-  %end;
-%in;
 %let;wikiplace;%evar.marriage_place;,%evar.birth_place;,%evar.bapt_place;,%evar.death_place;,%evar.burial_place;%in;
 %let;ol1;%if;(wikiplace != ",,,,")wikiPlace('wikiplace','%lang;','%wikiplace');%end;%in;
 

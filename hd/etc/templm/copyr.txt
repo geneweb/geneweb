@@ -45,6 +45,7 @@
   &copy; INRIA 1998-2016 %connections;%sq;
   <a href="https://github.com/geneweb/geneweb" target="_blank" title="GeneWeb sources on GitHub">
   <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb bas"></a>
-  <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb MediaWiki">
+  %let;suffx;%if;(lang!="en")/%lang;%else;%end;%in;
+  <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%suffx;" target="_blank" title="GeneWeb documentation MediaWiki">
   <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
 </div>

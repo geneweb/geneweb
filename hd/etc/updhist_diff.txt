@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: updhist_diff.txt, v. 7 12/07/2017 21:31:27 flh a2 Exp $ -->
   <!-- Copyright (c) 2006-2017 INRIA -->

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: updind.txt,v 7 10/11/2016 09:44:53 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
