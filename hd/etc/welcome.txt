@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
 <!-- $Id: welcome.txt, v.7 20/07/2017 03:58:15 $ -->
   <title>GeneWeb – %base.name;</title>
@@ -399,7 +399,7 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     </div>
   </div>
   %else;
-    %let;lg;%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;%in;
+    %let;lg;%lang;%in;
     <div class="text-center alert alert-danger font-weight-bold" role="alert">
       <span class="fa fa-warning fa-fw mr-2"></span><span>%apply;get_visitor_access_msg(lg)</span><span class="fa fa-warning fa-fw"></span>
     </div>
