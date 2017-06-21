@@ -1972,15 +1972,6 @@ let has_duplication_if_is_main_person conf base p is_main_person nb_asc nb_asc_m
       false
 ;;
 
-let fill_ref_index_if_is_main_person conf base is_main_person =
-  if is_main_person == true then
-    match Util.find_sosa_ref conf base with
-      | Some ref -> Some (Int32.of_int (Adef.int_of_iper (get_key_index ref)))
-      | None -> None
-  else
-    None
-;;
-
 let fill_linked_page_if_is_main_person conf base p is_main_person =
   if is_main_person == true then
     (
@@ -2085,6 +2076,15 @@ let pers_to_piqi_person conf base p base_prefix is_main_person =
     })
 ;;
 
+let fill_ref_if_is_main_person conf base is_main_person =
+  if is_main_person == true then
+    match Util.find_sosa_ref conf base with
+      | Some ref -> (Some (Int32.of_int (Adef.int_of_iper (get_key_index ref))), Some (pers_to_piqi_person conf base ref conf.command false))
+      | None -> (None, None)
+  else
+    (None, None)
+;;
+
 (* ************************************************************************** *)
 (*  [Fonc] pers_to_piqi_fiche_person :
     config -> base -> person -> base_prefix -> bool -> int -> int -> int
@@ -2131,6 +2131,7 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix is_main_person nb_asc 
       let has_relations = if is_main_person == true then has_relations conf base p base_prefix p_auth is_main_person else false in
       (* Returns simple person attributes only when nb of desc is 0. *)
       let return_simple_attributes = (nb_desc_max == 0) in
+      let (ref_index, ref_person) = fill_ref_if_is_main_person conf base is_main_person in
       let piqi_fiche_person =
         (* Fields shared by all the members of the family. *)
         piqi_fiche_person.Mread.Fiche_person.birth_date_raw <- transform_empty_string_to_None (fill_birth_date_raw conf base p p_auth gen_p);
@@ -2152,7 +2153,8 @@ let rec pers_to_piqi_fiche_person conf base p base_prefix is_main_person nb_asc 
         piqi_fiche_person.Mread.Fiche_person.baptism_date_raw <- if is_main_person == true then transform_empty_string_to_None (fill_baptism_date_raw conf base p p_auth gen_p) else None;
         piqi_fiche_person.Mread.Fiche_person.baptism_text <- if is_main_person == true then transform_empty_string_to_None (fill_baptism_text conf base p p_auth) else None;
         piqi_fiche_person.Mread.Fiche_person.has_possible_duplications <- has_duplication_if_is_main_person conf base p is_main_person nb_asc nb_asc_max;
-        piqi_fiche_person.Mread.Fiche_person.ref_index <- fill_ref_index_if_is_main_person conf base is_main_person;
+        piqi_fiche_person.Mread.Fiche_person.ref_index <- ref_index;
+        piqi_fiche_person.Mread.Fiche_person.ref_person <- ref_person;
         piqi_fiche_person.Mread.Fiche_person.has_history <- has_history_if_is_main_person conf base p p_auth is_main_person;
         piqi_fiche_person.Mread.Fiche_person.linked_page_biblio <- linked_page_biblio;
         piqi_fiche_person.Mread.Fiche_person.linked_page_bnote <- linked_page_bnote;
