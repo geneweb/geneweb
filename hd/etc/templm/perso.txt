@@ -670,7 +670,7 @@
         %if;(spouse.index != mother.index)
           %if;has_children;
             <ol>
-              <li>[*on %s's side:::] %father; [and] %apply;somebody("spouse")[:]</li>
+              <li>%apply;on_side(father) [and] %apply;somebody("spouse")[:]</li>
               %foreach;child;
                 <li class="li_%sex; li_%has_families;%has_sosa;">
                   %if;is_self;<em>%end;
@@ -691,7 +691,7 @@
         %if;(spouse.index != father.index)
           %if;has_children;
             <ol>
-              <li>[*on %s's side:::] %mother; [and] %apply;somebody("spouse")[:]</li>
+              <li>%apply;on_side(mother) [and] %apply;somebody("spouse")[:]</li>
               %foreach;child;
                 <li class="li_%sex; li_%has_families;%has_sosa;">
                   %if;is_self;<em>%end;
