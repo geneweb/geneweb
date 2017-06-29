@@ -185,6 +185,10 @@
   %end;
 %end;
 
+%define;on_side(xx)
+  [*on %s's side:::xx]
+%end;
+
 %define;display_sosa(xx)
   %if;(xx.has_sosa and bvar.display_sosa="yes")
     %if;not cancel_links;<a href="%prefix;%xx.sosa_link;">%end;

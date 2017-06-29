@@ -166,13 +166,13 @@
 %if;(op_m=1 and has_parents and (half_father != 0 or half_mother != 0))
   <h2>[*half siblings]</h2>
   %if;(half_father != 0)
-        [*on %s's side:::] %apply;short_display_person("father")
+      %apply;on_side%with;%apply;very_short_display_person("father")%end;
       %if;(father.nb_families > 1 and half_father != 0)
         %foreach;father.family;
           %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
             <ul>
               %apply;li_SD("spouse")
-                [with] %apply;short_display_person("spouse")
+                [with] %apply;very_short_display_person("spouse")
                 %if;has_children;
                   <ul>
                     %foreach;child;
@@ -191,13 +191,13 @@
       %end;
   %end;
   %if;(half_mother != 0)
-        [*on %s's side:::] %apply;short_display_person("mother")
+      %apply;on_side%with;%apply;very_short_display_person("mother")%end;
       %if;(mother.nb_families > 1 and half_mother != 0)
         %foreach;mother.family;
           %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
             <ul>
               %apply;li_SD("spouse")
-                [with] %apply;short_display_person("spouse")
+                [with] %apply;very_short_display_person("spouse")
                 %if;has_children;
                   <ul>
                     %foreach;child;
@@ -213,17 +213,18 @@
     %end;
 <!--  perso_module/freresoeur_complet (deux listes de demi frères côte à côte) -->
 %elseif;(op_m=3 and has_parents and (half_father != 0 or half_mother != 0))
+  <h2>[*half siblings]</h2>
   <table style="border:%border;;width:100%">
       <tr>
         %if;(half_father != 0)
           <td style="width:47%%;vertical-align: top">
-            [*on %s's side:::] %apply;long_display_person("father")
+            %apply;on_side%with;%apply;very_short_display_person("father")%end;
           </td>
           <td style="width:6%%;vertical-align: top">&nbsp;</td>
         %end;
         %if;(half_mother != 0)
           <td style="width:47%%;vertical-align: top">
-            [*on %s's side:::] %apply;long_display_person("mother")
+            %apply;on_side%with;%apply;very_short_display_person("mother")%end;
           </td>
         %end;
       </tr>
@@ -234,7 +235,7 @@
               %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
                 <ul>
                   %apply;li_SD("spouse")
-                    [with] %apply;long_display_person("spouse")
+                    [with] %apply;very_short_display_person("spouse")
                   </li>
                   %if;has_children;
                     <li class="list-unstyled"><ul>
@@ -255,7 +256,7 @@
               %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
                 <ul>
                   %apply;li_SD("spouse")
-                    [with] %apply;long_display_person("spouse")
+                    [with] %apply;very_short_display_person("spouse")
                   </li>
                   %if;has_children;
                     <li class="list-unstyled"><ul>
