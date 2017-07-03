@@ -110,13 +110,16 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
             <a class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="SND_IMAGE" or evar.m="MRG" or evar.m="DEL_IND")active%end;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="[*tools] [person/persons]0"><span class="fa fa-cog"></span></a>
             <div class="dropdown-menu">
               <a class="dropdown-item" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;></a>
-              <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-unsorted fa-fw"></span>  [*invert::event/events]1</a>
+              <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-unsorted fa-fw"></span> [*invert::event/events]1</a>
               %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-                <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="fa fa-file-image-o fa-fw"></span>  %if;has_image;[*modify picture]%else;[*add picture]%end;</a>
+                <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="fa fa-file-image-o fa-fw"></span> %if;has_image;[*modify picture]%else;[*add picture]%end;</a>
               %end;
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname;"><span class="fa fa-user-times fa-fw text-danger"></span>  [*merge::person/persons]0</a>
-              <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash fa-fw text-danger"></span>  [*delete::person/persons]0</a>
+              <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname;"><span class="fa fa-user-times fa-fw text-danger"></span> [*merge::person/persons]0</a>
+              <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash fa-fw text-danger"></span> [*delete::person/persons]0</a>
+              %if;(bvar.can_kill_ancestors="yes")
+                <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=KILL_ANC;" title="%apply;a_of_b%with;[*delete/deleted]0 [ancestors]%and;%self;%end;"><span class="fa fa-trash fa-fw text-danger"></span> [*delete/deleted]0 [ancestors]</a>
+              %end;
               %if;has_possible_duplications;
                 <a class="dropdown-item" href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
               %end;

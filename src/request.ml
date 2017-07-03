@@ -484,6 +484,8 @@ value family_m conf base =
   | Some "INV_FAM" when conf.wizard -> UpdateFam.print_inv conf base
   | Some "INV_FAM_OK" when conf.wizard -> UpdateFamOk.print_inv conf base
   | Some "KILL_ANC" when conf.wizard ->
+      MergeInd.print_count_ancestors conf base
+  | Some "KILL_ANC_OK" when conf.wizard ->
       MergeInd.print_kill_ancestors conf base
   | Some "LB" when conf.wizard || conf.friend ->
       BirthDeath.print_birth conf base
