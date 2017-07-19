@@ -2427,6 +2427,18 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
               VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
+  | ["number_of_descendants_at_level" :: sl] ->
+      match get_env "level" env with
+      [ Vint i ->
+          match get_env "desc_level_table" env with
+          [ Vdesclevtab t ->
+              let cnt =
+                Array.fold_left (fun cnt v -> if v = i then cnt + 1 else cnt)
+                  0 (fst (Lazy.force t))
+              in
+              VVstring (eval_num conf (Sosa.of_int (cnt)) sl)
+          | _ -> raise Not_found ]
+      | _ -> raise Not_found ]
   | ["parent" :: sl] ->
       match get_env "parent" env with
       [ Vind p ->

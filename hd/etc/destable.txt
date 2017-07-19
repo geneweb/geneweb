@@ -216,7 +216,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %end;"
         %end;
         >
-        %incr_count1;
+        %apply;add_in_sorted_list(xxx.index)
         <div class="d-flex justify-content-between">
           <div class="align-self-center mr-2">
             %apply;image_MF("xxx")
@@ -250,7 +250,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %end;"
         %end;
         >
-        %incr_count1;
+        %apply;add_in_sorted_list(xxx.index)
         <div class="d-flex justify-content-between">
           %if;(evar.image="on" and xxx.has_image)
             <img src="%xxx.image_url;" class="rounded align-self-center"
@@ -351,7 +351,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                   %end;'
           %end;
           >
-            %incr_count1;
+            %apply;add_in_sorted_list(spouse.index)
             %if;(zzz.nb_families>1)%apply;letter(family_cnt)%end;
             %apply;image_MF("spouse")
             %apply;link%with;%spouse.access;%and;
@@ -879,6 +879,19 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
   </div>
 %end;
+
+%define;desc_count(xxx)
+  %foreach;descendant_level;
+    %if;(level=xxx)%number_of_descendants;%end;
+  %end;
+%end;
+
+%define;desc_count_l(xxx)
+  %foreach;descendant_level;
+    %if;(level=xxx)%number_of_descendants_at_level;%end;
+  %end;
+%end;
+
 %( Main %)
 <table class="table table-sm table-hover descends_table mt-1">
   %if;(evar.t="A")
@@ -890,12 +903,14 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %let;nb_col;%expr(count+1)%in;
     %let;max;%evar.v;%in;
     %reset_count;
-    %reset_count1;
+    %empty_sorted_list;
     %apply;one_child("self", "-1", "", 1)
     %for;lev;0;max;
       %if;(evar.gen="on")
         <tr>
-          <th colspan="%nb_col;">[*generation/generations]0 %expr(lev+1)</th>
+          <th colspan="%nb_col;">[*generation/generations]0 %expr(lev+1)
+          <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1)">%apply;desc_count_l(lev+1)</span>
+          </th>
         </tr>
       %end;
       %apply;one_level("self", 0, lev, "", "", 1)
@@ -903,15 +918,12 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
 </table>
 
-%define;desc_count()
-  %foreach;descendant_level;
-    %if;(level=max_desc_level)%number_of_descendants;%end;
-  %end;
+%reset_count;
+%foreach;sorted_list_item;
+  %incr_count;
 %end;
 
-%if;(has_children)
-  <p>[*total][:] %apply;desc_count() [descendants] %if;(evar.marr="on" or evar.t="I")(%count1; [person/persons]1 [with] [spouse/spouses]1)%end;</p>
-%end;
+<p>[*total][:] %apply;desc_count(max_desc_level) [descendants] %if;(evar.marr="on" or evar.t="I")(%count; [person/persons]1 [with root, spouses and unknowns])</p>
 
 %import;trl;
 %import;copyr;
