@@ -2388,11 +2388,11 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
       if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
       print_result_from_ip conf base ip
   | None ->
-    match (identifier_person.Mread.Identifier_person.oc)  with
+    match (identifier_person.Mread.Identifier_person.oc) with
     | (Some oc) ->
       let result =
       (
-      match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n)  with
+      match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n) with
       | (Some fn, Some sn) ->
         (* Retourne une personne en fonction de son npoc *)
           (
@@ -2416,27 +2416,22 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
     (* Fait une recherche par mots-clé *)
     let result =
     (
-      match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n)  with
+      match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n) with
       | (Some fn, Some sn) ->
-        let order = [ Key; ApproxKey; PartialKey ] in
+        let (an, order) =
+          if fn = "" then
+             (sn, [ Sosa; Key; Surname; ApproxKey; PartialKey ])
+          else
+            (fn ^ " " ^ sn, [ Key; ApproxKey; PartialKey ])
+        in
         (
-        match search_index conf base (fn ^ " " ^ sn) order with
+        match search_index conf base an order with
         | Some ip ->
           if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
           print_result_from_ip conf base ip
         | None -> print_error conf `not_found
         )
-      | (None, Some sn) ->
-        let order = [ Sosa; Key; Surname; ApproxKey; PartialKey ] in
-        (
-        match search_index conf base sn order with
-        | Some ip ->
-            if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-            print_result_from_ip conf base ip
-        | None -> print_error conf `not_found
-        )
-      | (Some fn, None) -> print_error conf `not_found
-      | (None, None) -> print_error conf `bad_request
+      | _ -> print_error conf `bad_request
     )
     in
     result
