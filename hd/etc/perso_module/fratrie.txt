@@ -41,7 +41,7 @@
   %end;
 %end;
 
-%if;has_siblings;
+%if;(has_parents and has_siblings)
   <h2>
     %if;(bvar.full_siblings="yes")
       [*full siblings]%nn;
@@ -116,22 +116,26 @@
 
 %(aaa %father.nb_families;, %mother.nb_families;<br>%)
 %reset_count;
-%foreach;father.family;
-    %if;(spouse.index!=mother.index)
-        %if;(nb_children>0)%incr_count;%end;
-    %end;
+%if;has_parents;
+  %foreach;father.family;
+      %if;(spouse.index!=mother.index)
+          %if;(nb_children>0)%incr_count;%end;
+      %end;
+  %end;
 %end;
 %let;half_father;%count;%in;
 %reset_count;
-%foreach;mother.family;
-    %if;(spouse.index!=father.index)
-        %if;(nb_children>0)%incr_count;%end;
-    %end;
+%if;has_parents;
+  %foreach;mother.family;
+      %if;(spouse.index!=father.index)
+          %if;(nb_children>0)%incr_count;%end;
+      %end;
+  %end;
 %end;
 %let;half_mother;%count;%in;
 %(aaa2 %half_father;, %half_mother;<br>%)
 
-%if;(op_m=1 and (half_father != 0 or half_mother != 0))
+%if;(op_m=1 and has_parents and (half_father != 0 or half_mother != 0))
   <h2>[*half siblings]</h2>
   %if;(half_father != 0)
         [*on %s's side:::] %apply;short_display_person("father")
@@ -180,7 +184,7 @@
       %end;
     %end;
 <!--  perso_module/freresoeur_complet (deux listes de demi frères côte à côte) -->
-%elseif;(op_m=3 and (half_father != 0 or half_mother != 0))
+%elseif;(op_m=3 and has_parents and (half_father != 0 or half_mother != 0))
   <table style="border:%border;;width:100%">
       <tr>
         %if;(half_father != 0)
@@ -240,7 +244,7 @@
       </tr>
     </table>
 <!--  Freres et soeurs complet photo (from templf) -->
-%elseif;(op_m=4 and (half_father != 0 or half_mother != 0))
+%elseif;(op_m=4 and has_parents and (half_father != 0 or half_mother != 0))
   <table style="border-width:%border;;width:100%%">
     <tr>
       %foreach;parent;
