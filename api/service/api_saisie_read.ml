@@ -2271,7 +2271,7 @@ let print_person_tree conf base =
     [Retour] : index|None
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
-type search_index_type =  Sosa | Key | Surname | ApproxKey | PartialKey;;
+type search_index_type =  Sosa | Key | Surname | FirstName | ApproxKey | PartialKey;;
 let search_index conf base an search_order =
   let rec loop l =
   (
@@ -2294,6 +2294,13 @@ let search_index conf base an search_order =
         )
     | Surname::le ->
         let pl = Some.search_surname conf base an in
+        (
+        match pl with
+        | [] ->  loop le
+        | pl -> None
+        )
+    | FirstName::le ->
+        let pl = Some.search_first_name conf base an in
         (
         match pl with
         | [] ->  loop le
@@ -2414,26 +2421,28 @@ let print_from_identifier_person conf base print_result_from_ip identifier_perso
       in result
     | None ->
     (* Fait une recherche par mots-clé *)
-    let result =
-    (
+    let (fn, sn) = (
       match (identifier_person.Mread.Identifier_person.p, identifier_person.Mread.Identifier_person.n) with
-      | (Some fn, Some sn) ->
-        let (an, order) =
-          if fn = "" then
-             (sn, [ Sosa; Key; Surname; ApproxKey; PartialKey ])
-          else
-            (fn ^ " " ^ sn, [ Key; ApproxKey; PartialKey ])
-        in
-        (
-        match search_index conf base an order with
-        | Some ip ->
-          if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
-          print_result_from_ip conf base ip
-        | None -> print_error conf `not_found
-        )
-      | _ -> print_error conf `bad_request
-    )
-    in
+      | (Some fn, Some sn) -> (fn, sn)
+      | (None, Some sn) -> ("", sn)
+      | (Some fn, None) -> (fn, "")
+      | _ -> print_error conf `bad_request; ("", "")
+    ) in
+    let result =
+      let (an, order) =
+        if fn = "" then
+          (sn, [ Sosa; Key; Surname; ApproxKey; PartialKey ])
+        else if sn = "" then
+          (fn, [ FirstName ])
+        else
+          (fn ^ " " ^ sn, [ Key; ApproxKey; PartialKey ])
+      in (
+      match search_index conf base an order with
+      | Some ip ->
+        if identifier_person.Mread.Identifier_person.track_visit = Some true then record_visited conf ip;
+        print_result_from_ip conf base ip
+      | None -> print_error conf `not_found
+    ) in
     result
   in
   result
