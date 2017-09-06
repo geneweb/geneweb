@@ -141,6 +141,12 @@ value http answer = do {
   nl ()
 };
 
+value http_redirect_temporarily url = do {
+  http "302 Moved Temporarily";
+  wprint "Location: %s" url;
+  nl()
+};
+
 value print_exc exc =
   let () = match exc with
   [ Unix.Unix_error err fun_name arg -> do {
