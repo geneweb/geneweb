@@ -38,8 +38,6 @@ value html_li : config -> unit;
 value unauthorized : config -> string -> unit;
 value string_of_ctime : config -> string;
 
-value redirect_HTML : config -> string -> string -> unit;
-
 value commd : config -> string;
 value code_varenv : string -> string;
 value decode_varenv : string -> string;

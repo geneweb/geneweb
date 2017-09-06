@@ -428,34 +428,6 @@ value unauthorized conf auth_type =
   }
 ;
 
-
-(* ************************************************************************** *)
-(*  [Fonc] redirect_HTML : config -> string -> string -> unit                 *)
-(** [Description] : Effecture une redirection HTML. C'est le navigateur qui
-                    fait la redirection en interprétant directement le header
-                    envoyé et pas le serveur qui fait la redirection.
-                    La redirection est faite sur la page url.
-    [Args] :
-      - conf : configuration de la base
-      - status_code : code de redirection
-      - url : url de redirection
-    [Retour] : string
-    [Rem] : Exporté en clair hors de ce module.                               *)
-(* ************************************************************************** *)
-value redirect_HTML conf status_code url =
-  (* TODO, passer un type pour la redirection et un
-     mecanisme pour éviter les boucles de redirection *)
-  match status_code with
-  [ "303" ->
-    do {
-      Wserver.wprint "HTTP/1.1 303 See Other";
-      nl ();
-      Wserver.wprint "Location: %s" url;
-      nl ();
-    }
-  | _ -> failwith "Util.redirect_HTML: code redirection not implemented" ]
-;
-
 value commd conf =
   let c = conf.command ^ "?" in
   List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
