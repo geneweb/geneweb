@@ -76,7 +76,17 @@ value person_selected conf base p =
   | Some mode -> incorrect_request conf
   | None -> do {
       record_visited conf (get_key_index p);
-      Perso.print conf base p } ]
+      Perso.print conf base p }]
+;
+
+
+value person_selected_with_redirect conf base p =
+  match p_getenv conf.senv "em" with
+  [ Some "R" -> relation_print conf base p
+  | Some mode -> incorrect_request conf
+  | None -> do {
+      Wserver.http_redirect_temporarily (commd conf ^ Util.acces conf base p)
+  }]
 ;
 
 value compact_list conf base xl =
@@ -567,7 +577,7 @@ value family_m conf base =
                    Gutil.person_of_string_key base n <> None ||
                    person_is_std_key conf base p n
                 then
-                  person_selected conf base p
+                  person_selected_with_redirect conf base p
                 else specify conf base n pl
             | pl -> specify conf base n pl ]
           in
