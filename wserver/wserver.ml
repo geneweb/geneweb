@@ -141,8 +141,14 @@ value http answer = do {
   nl ()
 };
 
+value http_redirect_temporarily url = do {
+  http "302 Moved Temporarily";
+  wprint "Location: %s" url;
+  nl()
+};
+
 value print_exc exc =
-  match exc with
+  let () = match exc with
   [ Unix.Unix_error err fun_name arg -> do {
       prerr_string "\"";
       prerr_string fun_name;
@@ -196,7 +202,12 @@ value print_exc exc =
       }
       else ();
       prerr_char '\n'
-    } ]
+    } ] in
+
+  let () = if Printexc.backtrace_status () then do {
+    prerr_string "Backtrace:\n";
+    Printexc.print_backtrace stderr;
+  } else () in ()
 ;
 
 value print_err_exc exc = do { print_exc exc; flush stderr };

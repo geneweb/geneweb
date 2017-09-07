@@ -809,6 +809,9 @@ value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
   (* Construit un tableau d'index dont chaque valeur est False *)
   let mark = Array.create (nb_of_persons base) False in
+  (* Charge le cache des LIA. *)
+  (* On limite à 10 le nombre de générations ascendantes à charger pour les LIA. *)
+  let () = Perso_link.init_cache conf base ip 10 0 0 in
   let rec loop level ip =
     (* Ne traite pas l'index s'il a déjà été traité. *)
     (* Pose surement probleme pour des implexes. *)
@@ -828,8 +831,6 @@ value max_ancestor_level conf base ip max_lev =
             }
         | _ ->
             (* lia *)
-            (* Charge le cache *)
-            let () = Perso_link.init_cache conf base ip max_lev 0 0 in
             let rec loop_lia level (ip, base_prefix) = do {
               x.val := max x.val level;
               if x.val = max_lev then ()
@@ -3675,6 +3676,10 @@ and eval_bool_person_field conf base env (p, p_auth) =
       match get_death p with
       [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
       | _ -> False ]
+  | "is_certainly_dead" ->
+      match get_death p with
+      [ OfCourseDead -> p_auth
+      | _ -> False ]
   | "is_descendant" ->
       match get_env "desc_mark" env with
       [ Vdmark r -> r.val.(Adef.int_of_iper (get_key_index p))
@@ -5005,9 +5010,10 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_first_name_alias env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      List.iter
-        (fun s ->
+      list_iter_first
+        (fun first s ->
            let env = [("first_name_alias", Vstring (sou base s)) :: env] in
+           let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_first_names_aliases p)
   and print_foreach_level max_lev env al ((p, _) as ep) =
@@ -5201,9 +5207,10 @@ value print_foreach conf base print_ast eval_expr =
   and print_foreach_surname_alias env al ((p, p_auth) as ep) =
     if not p_auth && (is_hide_names conf p) then ()
     else
-      List.iter
-        (fun s ->
+      list_iter_first
+        (fun first s ->
            let env = [("surname_alias", Vstring (sou base s)) :: env] in
+           let env = [("first", Vbool first) :: env] in
            List.iter (print_ast env ep) al)
         (get_surnames_aliases p)
   and print_foreach_witness env al ep =
@@ -5341,8 +5348,8 @@ value gen_interp_templ menu title templ_fname conf base p = do {
       Vint (max_ancestor_level conf base (get_key_index p) emal + 1)
     in
     let mcl () = Vint (max_cousin_level conf base p) in
-    (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres. *)
-    let mdl () = Vint (max (max_descendant_level conf base desc_level_table_l) (Perso_link.max_interlinks_descendancy_level conf base (get_key_index p) emal)) in
+    (* Récupère le nombre maximal de niveaux de descendance en prenant en compte les liens inter-arbres (limité à 10 générations car problématique en terme de perf). *)
+    let mdl () = Vint (max (max_descendant_level conf base desc_level_table_l) (Perso_link.max_interlinks_descendancy_level conf base (get_key_index p) 10)) in
     let nldb () =
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
       let fname = Filename.concat bdir "notes_links" in

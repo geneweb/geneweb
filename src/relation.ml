@@ -1100,7 +1100,7 @@ value print_dag_links conf base p1 p2 rl =
            Wserver.wprint ";%s" (acces_n conf base "1" dp1);
            Wserver.wprint ";%s" (acces_n conf base "2" dp2);
            if pp1 = None then ()
-           else Wserver.wprint ";%s" (acces_n conf base "2" p1);
+           else Wserver.wprint ";%s" (acces_n conf base "3" p1);
            if pp2 = None then ()
            else Wserver.wprint ";%s" (acces_n conf base "4" p2);
            let (l1, l2) =
