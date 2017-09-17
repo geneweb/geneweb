@@ -1865,6 +1865,11 @@ and eval_simple_bool_var conf base env (p, p_auth) =
       [ Vfam _ fam _ m_auth ->
           m_auth && not conf.no_note && sou base (get_marriage_note fam) <> ""
       | _ -> raise Not_found ]
+  | "has_marriage_source" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          m_auth && sou base (get_marriage_src fam) <> ""
+      | _ -> raise Not_found ]
   | "has_relation_her" ->
       match get_env "rel" env with
       [ Vrel {r_moth = Some _} None -> True
@@ -2073,6 +2078,23 @@ and eval_simple_str_var conf base env (_, p_auth) =
       [ Vfam _ fam _ m_auth ->
           if m_auth && not conf.no_note then
             let s = sou base (get_marriage_note fam) in
+            let s = string_with_macros conf [] s in
+            let lines = Wiki.html_of_tlsw conf s in
+            let wi =
+              {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_person_exists = person_exists conf base;
+               Wiki.wi_always_show_link = conf.wizard || conf.friend}
+            in
+            let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+            if conf.pure_xhtml then Util.check_xhtml s else s
+          else ""
+      | _ -> raise Not_found ]
+  | "marriage_source" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          if m_auth then
+            let s = sou base (get_marriage_src fam) in
             let s = string_with_macros conf [] s in
             let lines = Wiki.html_of_tlsw conf s in
             let wi =
@@ -3232,6 +3254,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else get_aliases p <> []
   | "has_baptism_date" -> p_auth && get_baptism p <> Adef.codate_None
   | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
+  | "has_baptism_source" -> p_auth && sou base (get_baptism_src p) <> ""
   | "has_baptism_note" ->
       p_auth && not conf.no_note && sou base (get_baptism_note p) <> ""
   | "has_baptism_witnesses" ->
@@ -3245,6 +3268,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             else loop events ]
   | "has_birth_date" -> p_auth && get_birth p <> Adef.codate_None
   | "has_birth_place" -> p_auth && sou base (get_birth_place p) <> ""
+  | "has_birth_source" -> p_auth && sou base (get_birth_src p) <> ""
   | "has_birth_note" ->
       p_auth && not conf.no_note && sou base (get_birth_note p) <> ""
   | "has_birth_witnesses" ->
@@ -3263,6 +3287,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | _ -> False ]
       else False
   | "has_burial_place" -> p_auth && sou base (get_burial_place p) <> ""
+  | "has_burial_source" -> p_auth && sou base (get_burial_src p) <> ""
   | "has_burial_note" ->
       p_auth && not conf.no_note && sou base (get_burial_note p) <> ""
   | "has_burial_witnesses" ->
@@ -3371,6 +3396,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       [ Death _ _ -> p_auth
       | _ -> False ]
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
+  | "has_death_source" -> p_auth && sou base (get_death_src p) <> ""
   | "has_death_note" ->
       p_auth && not conf.no_note && sou base (get_death_note p) <> ""
   | "has_death_witnesses" ->

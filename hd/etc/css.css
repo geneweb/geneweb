@@ -1196,3 +1196,30 @@ ul.missing_ancestors_sort > li
   border-left: 1px solid;
   padding-left: 10px;
 }
+
+.note, .source, .notesource {
+    position: relative;
+}
+.note:after, .source:after, .notesource:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0; 
+    height: 0; 
+    display: block;
+    border-left: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+}
+
+/* adjust also colors in destable.txt */
+.note:after {
+    border-top: 12px solid #FFA07A;
+}
+.source:after {
+    border-top: 12px solid #90EE90;
+}
+.notesource:after {
+    border-top: 12px solid #87CEFA;
+}
+
