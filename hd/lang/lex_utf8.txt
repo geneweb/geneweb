@@ -28,6 +28,18 @@ fr: dictionnaire des %s
 en: compiled on %s from commit %s
 fr: compilé le %s à partir du commit %s
 
+    indicators
+en: markers for
+fr: les indicateurs de
+
+    link to children
+en: link to children
+fr: lien vers les enfants
+
+    link back to parents
+en: link back to parents
+fr: lien retour vers les parents
+
     presentation
 de: Präsentation
 en: Presentation
