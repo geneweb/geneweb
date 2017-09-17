@@ -3,10 +3,12 @@ div.anchor_updind {
   top:-25px;
 }
 
-/* Capitalization unavailable in note from Ocaml */
+/* Capitalization unavailable in note from Ocaml 
+> temporary disactivated: too intrusive for notes in popovers, but needed for note in timeline...
 p::first-letter {
   text-transform: capitalize;
 }
+*/
 
 .pmod::first-letter {
   font-weight: bold
@@ -1082,10 +1084,10 @@ hr.full
 .ascends_table th, .ascends_table td,
 .descends_table th, .descends_table td
 {
- border:1px solid black;
- vertical-align:top;
- padding:4px;
- empty-cells: show;
+  border: 1px solid black;
+  vertical-align: top;
+  padding: 4px;
+  empty-cells: show;
 }
 
 .ascends_table_header th,
@@ -1195,4 +1197,61 @@ ul.missing_ancestors_sort > li
 {
   border-left: 1px solid;
   padding-left: 10px;
+}
+
+/* adjust also colors in destable.txt */
+.note, .source, .notesource, .notespouse, .sourcespouse, .notesourcespouse {
+    position: relative;
+}
+.note:after, .source:after, .notesource:after, .notespouse:after, .sourcespouse:after, .notesourcespouse:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 0;
+    display: block;
+    border-bottom: 12px solid transparent;
+}
+.note:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #87CEFA;
+}
+.source:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #FFD700;
+}
+.notesource:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #90EE90;
+}
+.notespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #87CEFA; 
+}
+.sourcespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #FFD700;
+}
+.notesourcespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #90EE90;
+}
+span.notecolor {
+    color: #87CEFA;
+}
+span.sourcecolor {
+    color: #FFD700;
+}
+span.notesourcecolor {
+    color: #90EE90;
+}
+.popover{
+    word-wrap: break-word;
+    max-width: 40%;
 }
