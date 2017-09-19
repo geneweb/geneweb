@@ -47,7 +47,7 @@
     <a role="button" class="btn btn-link ml-1 px-0"
       href="%url;cgl=on" target="_blank">
       <span class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></span>
-    </a>%nn;
+    </a>
     <a role="button" class="btn btn-link ml-1 px-0"
       href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span>
     </a>
@@ -88,7 +88,7 @@
       <th class="pl-2" rowspan="2" title="[*n° d'Aboville]">№</th>
       %incr_count;
     %end;
-    <th class="pl-2" rowspan="2" colspan="2">[*person/persons]0</th>
+    <th class="pl-2" rowspan="2">[*person/persons]0</th>
     %incr_count;
     %if;(evar.birth="on" and evar.birth_place="on")
       <th class="text-center" colspan="2">[*birth]</th>
@@ -205,26 +205,24 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     %end;
   %end;
-
+%( attention has_sources vérifie toutes les sources, manque un simple has_person_source %)
   %if;(famx=1)
     %if;("yyy"="desc")
-      <td class='align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2
+      <td class='align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2%nn;
         %if;(evar.notes="on")
-          %if;(has_notes and not has_sources)note
-          %elseif;(not has_notes and has_sources)source
-          %elseif;(has_notes and has_sources)notesource
+          %if;(has_notes and not has_sources) note%nn;
+          %elseif;(not has_notes and has_sources) source%nn;
+          %elseif;(has_notes and has_sources) notesource%nn;
           %end;
         %end;'
-        %rowspan; colspan="2"
+        %rowspan;
         %if;(evar.notes="on" and (has_notes or has_sources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
           data-content='%if;(has_notes)%notes;%end;
-                        %if;(has_sources)
-                          %if;(has_notes)<hr>%end;
-                          %foreach;source;
-                            %if;(source_type=[person/persons]0)
-                              <li>%apply;capitalize(source_type)[:] %source;.</li>
-                            %end;
+                        %foreach;source;
+                          %if;(source_type=[person/persons]0)
+                            %if;(has_notes)<hr>%end;
+                              %apply;capitalize(source).
                           %end;
                         %end;'
           title="%if;(has_notes)[*note/notes]1%if;(has_sources) [and] [source/sources]1%end;
@@ -239,42 +237,46 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %if;(evar.title="on")%xxx.title;%end
       </td>
    %elseif;(evar.t="I")
-      <td class="align-middle border-right-0 pl-1"></td>
-      <td class='align-middle text-right border-left-0 pr-2 %if;(evar.nowrap="on")text-nowrap%end;
+      <td class='align-middle text-right%if;(evar.nowrap="on") text-nowrap%end;%nn;
         %if;(evar.notes="on")
-          %if;(xxx.has_notes and not xxx.has_sources)note%elseif;(not xxx.has_notes and
-               xxx.has_sources)source%elseif;(xxx.has_notes and xxx.has_sources)notesource
+          %if;("yyy"="desc")
+            %if;(xxx.has_notes and not xxx.has_sources) note%nn;
+            %elseif;(not xxx.has_notes and xxx.has_sources) source%nn;
+            %elseif;(xxx.has_notes and xxx.has_sources) notesource%nn;
+            %end;
+          %elseif;("yyy"="spous")
+            %if;(xxx.has_notes and not xxx.has_sources) notespouse%nn;
+            %elseif;(not xxx.has_notes and xxx.has_sources) sourcespouse%nn;
+            %elseif;(xxx.has_notes and xxx.has_sources) notesourcespouse%nn;
+            %end;
           %end;
         %end;'
         %if;(evar.notes="on" and "yyy"="desc" and (has_notes or has_sources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;("yyy"="desc" and has_notes)%notes;%end;
-                        %if;("yyy"="desc" and has_sources)
-                          %if;("yyy"="desc" and has_notes)<hr>%end;
-                          %foreach;source;
-                            %if;(source_type=[person/persons]0)
-                              <li>%apply;capitalize(source_type)[:] %source;.</li>
-                            %end;
+                        %foreach;source;
+                          %if;(source_type="[person/persons]0")
+                            %if;("yyy"="desc" and has_notes)<hr>%end;
+                              %apply;capitalize(source).
                           %end;
                         %end;'
-          title="%if;(has_notes and not has_sources)[*note/notes]1
-                %elseif;(not has_notes and has_sources)[source/sources]1
+          title="%if;(has_notes and not has_sources)[*note/notes]1 %has_person_source;
+                %elseif;(not has_notes and has_sources)[*source/sources]1
                 %elseif;(has_notes and has_sources)[*note/notes]1 [and] [source/sources]1
                 %end;"
         %end;
         %if;(evar.notes="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_sources))
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
-                        %if;(xxx.has_sources)
-                          %if;(xxx.has_notes)<hr>%end;
-                          %foreach;xxx.source;
-                            %if;(source_type=[person/persons]0)
-                              <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
-                            %end;
+                        %foreach;xxx.source;
+                          %if;(source_type="[person/persons]0")
+                            %if;(xxx.has_notes)<hr>%end;
+                              %apply;capitalize(xxx.source).
+                          %else;
                           %end;
                         %end;'
           title="%if;(xxx.has_notes and not xxx.has_sources)[*note/notes]1
-                %elseif;(not xxx.has_notes and xxx.has_sources)[source/sources]1
+                %elseif;(not xxx.has_notes and xxx.has_sources)[*source/sources]1
                 %elseif;(xxx.has_notes and xxx.has_sources)[*note/notes]1 [and] [source/sources]1
                 %end;"
         %end;
@@ -283,8 +285,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %apply;image_MF("xxx")
         %apply;link%with;%xxx.access;%and;
           %xxx;
-        %end
-        %if;(evar.title="on")%xxx.title;%end
+        %end;
+        %if;(evar.title="on")%xxx.title;%end;
       </td>
     %end;
   %end;
@@ -305,26 +307,26 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 
   %if;(evar.birth_place="on" and famx=1)
     %if;("yyy"="desc")
-      <td class='align-middle
+      <td class='align-middle%nn;
         %if;(evar.notes="on")
           %if;((has_birth_note or has_baptism_note) and not
-               (has_birth_source or has_baptism_source)) note
+               (has_birth_source or has_baptism_source)) note%nn;
           %elseif;(not (has_birth_note or has_baptism_note) and
-               (has_birth_source or has_baptism_source)) source
+               (has_birth_source or has_baptism_source)) source%nn;
           %elseif;((has_birth_note or has_baptism_note) and
-               (has_birth_source or has_baptism_source)) notesource
+               (has_birth_source or has_baptism_source)) notesource%nn;
           %end;
         %end;'
         %rowspan;
     %else;
-      <td class='align-middle
+      <td class='align-middle%nn;
         %if;(evar.notes="on")
           %if;((xxx.has_birth_note or xxx.has_baptism_note) and not
-               (xxx.has_birth_source or xxx.has_baptism_source)) note
+               (xxx.has_birth_source or xxx.has_baptism_source)) note%nn;
           %elseif;(not (xxx.has_birth_note or xxx.has_baptism_note) and
-               (xxx.has_birth_source or xxx.has_baptism_source)) source
+               (xxx.has_birth_source or xxx.has_baptism_source)) source%nn;
           %elseif;((xxx.has_birth_note or xxx.has_baptism_note) and
-               (xxx.has_birth_source or xxx.has_baptism_source)) notesource
+               (xxx.has_birth_source or xxx.has_baptism_source)) notesource%nn;
           %end;
         %end;'
         %rowspan;
@@ -345,7 +347,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                           %end;
                           %foreach;source;
                             %let;birthbaptism;[birth], [baptism]%in;
-                            %if;(source_type=[birth] or source_type=[baptism] or source_type=birthbaptism)
+                            %if;(not has_baptism_note and not has_baptism_source) and (source_type=[birth] or source_type=birthbaptism))
+                              %apply;capitalize(source).
+                            %elseif;((has_baptism_note or has_baptism_source) and (source_type=[birth] or source_type=[baptism]))
                               <li>%apply;capitalize(source_type)[:] %source;.</li>
                             %end;
                           %end;
@@ -435,9 +439,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 (xxx=zzz and family_cnt=fam_cnt and evar.t="H"))))
           <td class='align-middle%nn;
             %if;(evar.notes="on")
-              %if;(has_marriage_note and not has_marriage_source) note
-              %elseif;(not has_marriage_note and has_marriage_source) source
-              %elseif;(has_marriage_note and has_marriage_source) notesource
+              %if;(has_marriage_note and not has_marriage_source) note%nn;
+              %elseif;(not has_marriage_note and has_marriage_source) source%nn;
+              %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
               %end;
             %end;'
             %rowspan;
@@ -448,17 +452,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                             %end;
                             %if;(has_marriage_source)
                               %if;(has_marriage_note)<hr>%end;
-                              %foreach;source;
-                                %let;mevt;[marriage event] %fam_cnt;%in;
-                                %if;(fam_cnt="1" and (source_type=mevt or source_type=[marriage event]) 
-                                     or (fam_cnt>1 and source_type=mevt))
-                                  %if;(not has_marriage_note)
-                                    %apply;capitalize(source).
-                                  %else;
-                                    <li>%apply;capitalize(source).</li>
-                                  %end;
-                                %end;
-                              %end;
+                              %apply;capitalize(marriage_source).
                             %end;'
               title='%if;(has_marriage_source or has_marriage_note)
                        %if;(has_marriage_note and not has_marriage_source)[*note/notes]1
@@ -558,13 +552,12 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %if;("yyy"="desc")
       <td class='align-middle
         %if;(evar.notes="on")
-          %if;((has_death_note or has_burial_note) and not
-              (has_death_source or has_burial_source))note
-          %elseif;(not (has_death_note or has_burial_note) and
-              (has_death_source or has_burial_source))source
-          %elseif;((has_death_note or has_burial_note) and
-              (has_death_source or has_burial_source))notesource
-          %end;
+        %if;((has_death_note or has_burial_note) and not
+            (has_death_source or has_burial_source))note%elseif;
+            (not (has_death_note or has_burial_note) and
+            (has_death_source or has_burial_source))source%elseif;
+            ((has_death_note or has_burial_note) and
+            (has_death_source or has_burial_source))notesource%end;
         %end;'
         %rowspan;
         %if;(evar.notes="on")
@@ -840,18 +833,6 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 
 %if;(not cancel_links)
   <div class="form-inline">
-    %if;(evar.marr="on" or evar.marr_place="on" or evar.marr_date="on")
-      <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-         href="%apply;rebuild_url%with;D
-                %and;%if;(evar.t="H")I%elseif;(evar.t="I")H%end;
-                %and;%evar.v;
-                %and;%if;(evar.notes="on")on%else;off%end;
-                %and;%if;(evar.cgl="on")on%else;off%end;
-                %end;">
-                <i class="fa fa-table fa-lg fa-fw mr-1"></i>%nn;
-        %if;(evar.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]0
-      </a>
-    %end;
     <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"
       href="%prefix;m=D;%access;"><i class="fa fa-cog fa-lg fa-fw mr-1">
       </i>[*options] [descendants]
@@ -876,7 +857,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %and;%expr(evar.v-1)
                 %and;%if;(evar.notes="on")on%else;off%end;
                 %and;%if;(evar.cgl="on")on%else;off%end;
-                %end" class="btn btn-secondary" title="-1 [generation/generations]0">-</a>%end;
+                %end" class="btn" title="-1 [generation/generations]0">-</a>%end;
       </span>
       <input class="form-control text-center" size="12"
         value="%if;(evar.v="")0%else;%evar.v;%end;%sp;
@@ -888,13 +869,24 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                  %and;%expr(evar.v+1)
                  %and;%if;(evar.notes="on")on%else;off%end;
                  %and;%if;(evar.cgl="on")on%else;off%end;
-                 %end" class="btn btn-secondary" title="+1 [generation/generations]0">+</a>
+                 %end" class="btn" title="+1 [generation/generations]0">+</a>
       </span>
     </div>
   </div>
 
-%( Check colors with note, source, notesource in css.css %)
   <div class="form-inline">
+    %if;(evar.marr="on" or evar.marr_place="on" or evar.marr_date="on")
+      <a role="button" class="btn btn-link ml-2 px-0 mb-1"
+         href="%apply;rebuild_url%with;D
+                %and;%if;(evar.t="H")I%elseif;(evar.t="I")H%end;
+                %and;%evar.v;
+                %and;%if;(evar.notes="on")on%else;off%end;
+                %and;%if;(evar.cgl="on")on%else;off%end;
+                %end;">
+                <i class="fa fa-table fa-lg fa-fw mr-1"></i>%nn;
+        %if;(evar.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]0
+      </a>
+    %end;
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
       href="%apply;rebuild_url%with;D
             %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
@@ -905,20 +897,19 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             title="small arrow in corner shows existence of note or source">
              <i class="fa fa-cog fa-lg fa-fw mr-1"></i>%nn;
       %if;(evar.notes="off" or evar.notes="")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end;%sp;
-        [indicators] <span style="color:#FFA07A">[note/notes]1</span>, <span style="color:#90EE90">[source/sources]1</span>,
-        <span style="color:#87CEFA">[note/notes]1 [and] [source/sources]1</span>
+        <span class="notecolor">[note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>
     </a>
     %if;(evar.cgl="" or evar.cgl="off")
-    <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-      href="%apply;rebuild_url%with;D
-            %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
-            %and;%evar.v;
-            %and;off
-            %and;%if;(evar.cgl="on")off%else;on%end;
-            %end;"
-            title="Cancel url links in whole page">
-      <i class="fa fa-cog fa-lg fa-fw mr-1"></i> [*cancel GeneWeb links]
-    </a>
+      <a role="button" class="btn btn-link ml-2 px-0 mb-1"
+        href="%apply;rebuild_url%with;D
+              %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
+              %and;%evar.v;
+              %and;off
+              %and;%if;(evar.cgl="on")off%else;on%end;
+              %end;"
+              title="Cancel url links in whole page">
+        <i class="fa fa-cog fa-lg fa-fw mr-1"></i>%nn;[*cancel GeneWeb links]
+      </a>
     %end;
   </div>
 %end;
