@@ -217,7 +217,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %end;'
         %rowspan;
         %if;(evar.notes="on" and (has_notes or has_psources))
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
+          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(has_notes)%notes;%end;
                         %if;(has_notes and has_psources)<hr>%end;
                         %if;(has_psources)%apply;capitalize(psources)%end;'
@@ -261,7 +261,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %end;"
         %end;
         %if;(evar.notes="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_psources))
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
+          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
                         %if;(xxx.has_psources)%apply;capitalize(xxx.psource)%end;'
@@ -505,21 +505,21 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
              (xxx=zzz and family_cnt=fam_cnt and evar.t="H"))))
           <td class='align-middle text-center %if;(evar.nowrap="on")text-nowrap%end; px-1
             %if;(evar.notes="on")
-              %if;(has_comment and fsources="") note%nn;
-              %elseif;(not has_comment and fsources!="") source%nn;
-              %elseif;(has_comment and fsources!="") notesource%nn;
+              %if;(has_comment and not has_fsources) note%nn;
+              %elseif;(not has_comment and has_fsources) source%nn;
+              %elseif;(has_comment and has_fsources) notesource%nn;
               %end;
             %end;'
             %rowspan;
             %if;(evar.notes="on")
               tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(has_comment)%comment;%end;
-                            %if;(has_comment and fsources!="")<hr>%end;
-                            %if;(fsources!="")%apply;capitalize(fsources)%end;'
-              title='%if;(has_comment or fsources!="")
-                      %if;(has_comment and fsources="")[*note/notes]1%nn;
-                      %elseif;(not has_comment and fsources!="")[*source/sources]1%nn;
-                      %elseif;(has_comment and fsources!="")[*note/notes]1 [and] [*source/sources]1%nn;
+                            %if;(has_comment and has_fsources)<hr>%end;
+                            %if;(has_fsources)%apply;capitalize(fsources)%end;'
+              title='%if;(has_comment or has_fsources)
+                      %if;(has_comment and not has_fsources)[*note/notes]1%nn;
+                      %elseif;(not has_comment and has_fsources)[*source/sources]1%nn;
+                      %elseif;(has_comment and has_fsources)[*note/notes]1 [and] [*source/sources]1%nn;
                       %end;
                      %end;'
             %end;
@@ -743,9 +743,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
       </span>
       %apply;image_MF("xxx.spouse")
-      %apply;link%with;%xxx.spouse.access;%and;               %end;'
-
-        %xxx.spouse.first_name; %xxx.spouse.surname;
+      %apply;link%with;%xxx.spouse.access;
+      %and;%xxx.spouse.first_name; %xxx.spouse.surname;
       %end
       %xxx.spouse.title;
       %(&nbsp; (%xxx.nb_children;

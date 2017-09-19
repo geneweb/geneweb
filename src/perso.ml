@@ -3480,6 +3480,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_first_names_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
       else get_first_names_aliases p <> []
+  | "has_fsources" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+        m_auth && sou base (get_fsources fam) <> ""
+      | _ -> False ]
   | "has_history" ->
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
