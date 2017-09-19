@@ -3940,6 +3940,21 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
               | _ -> Date.string_of_ondate conf d ]
           | _ -> "" ]
       | _ -> raise Not_found ]
+  | "psources" ->
+      if p_auth && not conf.no_note then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let s = sou base (get_psources p) in
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
+        in
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
+      else ""
   | "slash_burial_date" ->
       match get_burial p with
       [ Buried cod ->
