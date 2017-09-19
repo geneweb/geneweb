@@ -210,8 +210,10 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %if;("yyy"="desc")
       <td class='align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2
         %if;(evar.notes="on")
-          %if;(has_notes and not has_sources)note%elseif;(not has_notes and
-              has_sources)source%elseif;(has_notes and has_sources)notesource%end;
+          %if;(has_notes and not has_sources)note
+          %elseif;(not has_notes and has_sources)source
+          %elseif;(has_notes and has_sources)notesource
+          %end;
         %end;'
         %rowspan; colspan="2"
         %if;(evar.notes="on" and (has_notes or has_sources))
@@ -244,7 +246,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                xxx.has_sources)source%elseif;(xxx.has_notes and xxx.has_sources)notesource
           %end;
         %end;'
-        %if;("yyy"="desc" and (has_notes or has_sources))
+        %if;(evar.notes="on" and "yyy"="desc" and (has_notes or has_sources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;("yyy"="desc" and has_notes)%notes;%end;
                         %if;("yyy"="desc" and has_sources)
@@ -260,7 +262,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %elseif;(has_notes and has_sources)[*note/notes]1 [and] [source/sources]1
                 %end;"
         %end;
-        %if;("yyy"="spous" and (xxx.has_notes or xxx.has_sources))
+        %if;(evar.notes="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_sources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
                         %if;(xxx.has_sources)
@@ -556,12 +558,13 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %if;("yyy"="desc")
       <td class='align-middle
         %if;(evar.notes="on")
-        %if;((has_death_note or has_burial_note) and not
-            (has_death_source or has_burial_source))note%elseif;
-            (not (has_death_note or has_burial_note) and
-            (has_death_source or has_burial_source))source%elseif;
-            ((has_death_note or has_burial_note) and
-            (has_death_source or has_burial_source))notesource%end;
+          %if;((has_death_note or has_burial_note) and not
+              (has_death_source or has_burial_source))note
+          %elseif;(not (has_death_note or has_burial_note) and
+              (has_death_source or has_burial_source))source
+          %elseif;((has_death_note or has_burial_note) and
+              (has_death_source or has_burial_source))notesource
+          %end;
         %end;'
         %rowspan;
         %if;(evar.notes="on")
