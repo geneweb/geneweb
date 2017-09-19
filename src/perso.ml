@@ -2107,6 +2107,11 @@ and eval_simple_str_var conf base env (_, p_auth) =
             if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
       | _ -> raise Not_found ]
+  | "fsources" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+        sou base (get_fsources fam)
+      | _ -> "" ]
   | "max_anc_level" ->
       match get_env "max_anc_level" env with
       [ Vint i -> string_of_int i
@@ -3502,14 +3507,6 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_psources" ->
       if (is_hide_names conf p) && not p_auth then False
       else sou base (get_psources p) <> ""
-  | "has_fsources" ->
-      if (is_hide_names conf p) && not p_auth then False
-      else
-        List.exists
-          (fun ifam ->
-             let fam = foi base ifam in
-             p_auth && sou base (get_fsources fam) <> "")
-          (Array.to_list (get_family p))
   | "has_public_name" ->
       if not p_auth && (is_hide_names conf p) then False
       else sou base (get_public_name p) <> ""
