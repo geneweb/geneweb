@@ -1847,7 +1847,7 @@ and eval_simple_bool_var conf base env (p, p_auth) =
       match get_env "sosa_ref" env with
       [ Vsosa_ref v -> Lazy.force v <> None
       | _ -> raise Not_found ]
-  | "has_comment" ->
+  | "has_comment" | "has_fnotes" ->
       let mode_local =
         match get_env "fam_link" env with
         [ Vfam ifam _ (_, _, ip) _ -> False
@@ -1948,7 +1948,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
       [ Vstring s -> s
       | _ -> raise Not_found ]
   | "child_cnt" -> string_of_int_env "child_cnt" env
-  | "comment" ->
+  | "comment" | "fnotes" ->
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           if m_auth && not conf.no_note then
@@ -3494,7 +3494,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
-  | "has_notes" -> p_auth && not conf.no_note && sou base (get_notes p) <> ""
+  | "has_notes" | "has_pnotes" -> p_auth && not conf.no_note && sou base (get_notes p) <> ""
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
   | "has_parents" ->
       IFDEF API THEN
@@ -3874,7 +3874,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
                    conf.command (get_key_index p)))
           ELSE "0" END
       | _ -> string_of_int (Array.length (get_family p)) ]
-  | "notes" ->
+  | "notes" | "pnotes" ->
       if p_auth && not conf.no_note then
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = sou base (get_notes p) in
