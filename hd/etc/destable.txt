@@ -210,23 +210,21 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %if;("yyy"="desc")
       <td class='align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2%nn;
         %if;(evar.notes="on")
-          %if;(has_notes and not has_sources) note%nn;
-          %elseif;(not has_notes and has_sources) source%nn;
-          %elseif;(has_notes and has_sources) notesource%nn;
+          %if;(has_notes and not has_psources) note%nn;
+          %elseif;(not has_notes and has_psources) source%nn;
+          %elseif;(has_notes and has_psources) notesource%nn;
           %end;
         %end;'
         %rowspan;
-        %if;(evar.notes="on" and (has_notes or has_sources))
+        %if;(evar.notes="on" and (has_notes or has_psources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
           data-content='%if;(has_notes)%notes;%end;
-                        %foreach;source;
-                          %if;(source_type=[person/persons]0)
-                            %if;(has_notes)<hr>%end;
-                              %apply;capitalize(source).
-                          %end;
-                        %end;'
-          title="%if;(has_notes)[*note/notes]1%if;(has_sources) [and] [source/sources]1%end;
-                 %elseif;(not has_notes and has_sources)[*source/sources]1%end;"
+                        %if;(has_notes and has_psources)<hr>%end;
+                        %if;(has_psources)%apply;capitalize(psources)%end;'
+          title="%if;(has_notes and not has_psources)[*note/notes]1%nn;
+                %elseif;(not has_notes and has_psources)[source/sources]1%nn;
+                %elseif;(has_notes and has_psources)[*note/notes]1 [and] [*source/sources]1%nn;
+                %end;"
         %end;
         >
         %incr_count1;
@@ -240,44 +238,35 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <td class='align-middle text-right%if;(evar.nowrap="on") text-nowrap%end;%nn;
         %if;(evar.notes="on")
           %if;("yyy"="desc")
-            %if;(xxx.has_notes and not xxx.has_sources) note%nn;
-            %elseif;(not xxx.has_notes and xxx.has_sources) source%nn;
-            %elseif;(xxx.has_notes and xxx.has_sources) notesource%nn;
+            %if;(xxx.has_notes and not xxx.has_psources) note%nn;
+            %elseif;(not xxx.has_notes and xxx.has_psources) source%nn;
+            %elseif;(xxx.has_notes and xxx.has_psources) notesource%nn;
             %end;
           %elseif;("yyy"="spous")
-            %if;(xxx.has_notes and not xxx.has_sources) notespouse%nn;
-            %elseif;(not xxx.has_notes and xxx.has_sources) sourcespouse%nn;
-            %elseif;(xxx.has_notes and xxx.has_sources) notesourcespouse%nn;
+            %if;(xxx.has_notes and not xxx.has_psources) notes%nn;
+            %elseif;(not xxx.has_notes and xxx.has_psources) sources%nn;
+            %elseif;(xxx.has_notes and xxx.has_psources) notesources%nn;
             %end;
           %end;
         %end;'
-        %if;(evar.notes="on" and "yyy"="desc" and (has_notes or has_sources))
+        %if;(evar.notes="on" and "yyy"="desc" and (has_notes or has_psources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-          data-content='%if;("yyy"="desc" and has_notes)%notes;%end;
-                        %foreach;source;
-                          %if;(source_type="[person/persons]0")
-                            %if;("yyy"="desc" and has_notes)<hr>%end;
-                              %apply;capitalize(source).
-                          %end;
-                        %end;'
-          title="%if;(has_notes and not has_sources)[*note/notes]1 %has_person_source;
-                %elseif;(not has_notes and has_sources)[*source/sources]1
-                %elseif;(has_notes and has_sources)[*note/notes]1 [and] [source/sources]1
+          data-content='%if;(has_notes)%notes;%end;
+                        %if;(has_notes and has_psources)<hr>%end;
+                        %if;(has_psources)%apply;capitalize(source)%end;'
+          title="%if;(has_notes and not has_psources)[*note/notes]1%nn;
+                %elseif;(not has_notes and has_psources)[*source/sources]1%nn;
+                %elseif;(has_notes and has_psources)[*note/notes]1 [and] [source/sources]1%nn;
                 %end;"
         %end;
-        %if;(evar.notes="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_sources))
+        %if;(evar.notes="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_psources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
-                        %foreach;xxx.source;
-                          %if;(source_type="[person/persons]0")
-                            %if;(xxx.has_notes)<hr>%end;
-                              %apply;capitalize(xxx.source).
-                          %else;
-                          %end;
-                        %end;'
-          title="%if;(xxx.has_notes and not xxx.has_sources)[*note/notes]1
-                %elseif;(not xxx.has_notes and xxx.has_sources)[*source/sources]1
-                %elseif;(xxx.has_notes and xxx.has_sources)[*note/notes]1 [and] [source/sources]1
+                        %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
+                        %if;(xxx.has_psources)%apply;capitalize(xxx.psource)%end;'
+          title="%if;(xxx.has_notes and not xxx.has_psources)[*note/notes]11%nn;
+                %elseif;(not xxx.has_notes and xxx.has_psources)[*source/sources]11%nn;
+                %elseif;(xxx.has_notes and xxx.has_psources)[*note/notes]1 [and] [source/sources]11%nn;
                 %end;"
         %end;
         >
@@ -447,13 +436,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %rowspan;
             %if;(evar.notes="on")
               tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-              data-content='%if;(has_marriage_note)
-                              %marriage_note;
-                            %end;
-                            %if;(has_marriage_source)
-                              %if;(has_marriage_note)<hr>%end;
-                              %apply;capitalize(marriage_source).
-                            %end;'
+              data-content='%if;(has_marriage_note)%marriage_note;%end;
+                            %if;(has_marriage_note and has_marriage_source)<hr>%end;
+                            %if;(has_marriage_source)%apply;capitalize(marriage_source)%end;'
               title='%if;(has_marriage_source or has_marriage_note)
                        %if;(has_marriage_note and not has_marriage_source)[*note/notes]1
                        %elseif;(not has_marriage_note and has_marriage_source)[*source/sources]1
