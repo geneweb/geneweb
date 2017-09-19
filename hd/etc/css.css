@@ -1,7 +1,19 @@
-div.anchor_updind {
-  position:absolute;
-  top:-25px;
+.fixed_top_btn {
+  position: fixed;
+  top: 0px;
+  transform: translateX(8px);
 }
+
+div.anchor_upd {
+  position:absolute;
+  top:-34px;
+}
+
+/* hide placeholder on input focus */
+input:focus::-webkit-input-placeholder { color:transparent; }
+input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
+input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
+input:focus:-ms-input-placeholder { color:transparent; }
 
 /* Capitalization unavailable in note from Ocaml */
 p::first-letter {
@@ -29,9 +41,9 @@ img.image-popover {
 .p_mod-dropdown-menu-wizard {
   padding: 0px;
   border: 0px;
-  left: 20%;
+  left: 25%;
   right: auto;
-  transform: translateX(-20%);
+  transform: translateX(-25%);
 }
 
 div.p_mod_builder {
@@ -1082,10 +1094,10 @@ hr.full
 .ascends_table th, .ascends_table td,
 .descends_table th, .descends_table td
 {
- border:1px solid black;
- vertical-align:top;
- padding:4px;
- empty-cells: show;
+  border: 1px solid black;
+  vertical-align: top;
+  padding: 4px;
+  empty-cells: show;
 }
 
 .ascends_table_header th,
@@ -1197,29 +1209,55 @@ ul.missing_ancestors_sort > li
   padding-left: 10px;
 }
 
-.note, .source, .notesource {
+/* adjust also colors in destable.txt */
+.note, .source, .notesource, .notespouse, .sourcespouse, .notesourcespouse {
     position: relative;
 }
-.note:after, .source:after, .notesource:after {
+.note:after, .source:after, .notesource:after, .notespouse:after, .sourcespouse:after, .notesourcespouse:after {
     content: "";
     position: absolute;
     top: 0;
-    right: 0;
-    width: 0; 
-    height: 0; 
+    width: 0;
+    height: 0;
     display: block;
-    border-left: 12px solid transparent;
     border-bottom: 12px solid transparent;
 }
-
-/* adjust also colors in destable.txt */
 .note:after {
-    border-top: 12px solid #FFA07A;
-}
-.source:after {
-    border-top: 12px solid #90EE90;
-}
-.notesource:after {
+    right: 0;
+    border-left: 12px solid transparent;
     border-top: 12px solid #87CEFA;
 }
-
+.source:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #FFD700;
+}
+.notesource:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #90EE90;
+}
+.notespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #87CEFA; 
+}
+.sourcespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #FFD700;
+}
+.notesourcespouse:after {
+    left: 0;
+    border-right: 12px solid transparent;
+    border-top: 12px solid #90EE90;
+}
+span.notecolor {
+    color: #87CEFA;
+}
+span.sourcecolor {
+    color: #FFD700;
+}
+span.notesourcecolor {
+    color: #90EE90;
+}

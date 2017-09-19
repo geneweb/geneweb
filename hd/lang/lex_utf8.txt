@@ -28,10 +28,6 @@ fr: dictionnaire des %s
 en: compiled on %s from commit %s
 fr: compilé le %s à partir du commit %s
 
-    indicators
-en: markers for
-fr: les indicateurs de
-
     link to children
 en: link to children
 fr: lien vers les enfants
@@ -14120,12 +14116,12 @@ ca: Podeu seleccionar una altre llengua, hi ha disponibles les següents:
 cs: Zvolte jazyk pro prohlížení databáze:
 da: Du kan vælge fremstilling på et andet sprog blandt de følgende:
 de: Blick auf:
-en: View in:
+en: view in:
 eo: Vi povas elekti alian lingvon inter la sekvantajn:
 es: Ver en:
 et: Võid valida ka mõne muu keele järgnevatest:
 fi: Näytä:
-fr: Afficher en :
+fr: afficher en :
 is: Þú getur valið milli eftirfarandi tungumála:
 it: Vista in:
 lv: Jūs variet apskatīt datu bāzi arī citās sekojošās valodās:
