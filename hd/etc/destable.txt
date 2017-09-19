@@ -504,7 +504,27 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %if;((nb_families=1 and "yyy"="desc") or (nb_families>1 and
             ((xxx.spouse=zzz and (ddd=family.index)) or
              (xxx=zzz and family_cnt=fam_cnt and evar.t="H"))))
-          <td class="align-middle text-center %if;(evar.nowrap="on")text-nowrap%end; px-1" %rowspan;>
+          <td class='align-middle text-center %if;(evar.nowrap="on")text-nowrap%end; px-1
+            %if;(evar.notes="on")
+              %if;(has_comment and fsources="") note%nn;
+              %elseif;(not has_comment and fsources!="") source%nn;
+              %elseif;(has_comment and fsources!="") notesource%nn;
+              %end;
+            %end;'
+            %rowspan;
+            %if;(evar.notes="on")
+              tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+              data-content='%if;(has_comment)%comment;%end;
+                            %if;(has_comment and fsources!="")<hr>%end;
+                            %if;(fsources!="")%apply;capitalize(fsources)%end;'
+              title='%if;(has_fsources!="")
+                      %if;(has_comment and fsources="")[*note/notes]1%nn;
+                      %elseif;(not has_comment and fsources!="")[*source/sources]1%nn;
+                      %elseif;(has_comment and fsources!="")[*note/notes]1 [and] [*source/sources]1%nn;
+                      %end;
+                     %end;'
+            %end;
+            >            
             %if;(nb_children>0 and not cancel_links)<a href="#%labl0;%if;(nb_families>1)%apply;letter(fam_cnt)%end;.1" title="[*link to children]">%end;
             %if;("yyy"="desc" and evar.t="I")
               %nb_ch_tot_desc;%if;(nb_ch_tot_desc!=nb_ch_tot_spous)/%nb_ch_tot_spous;%(!! nb_ch_tot_spous is wrong: gives father total of children?! %)%end;
