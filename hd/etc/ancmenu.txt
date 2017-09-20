@@ -245,6 +245,8 @@ function no_options () {
           [*display smallest sosa number relative to ancestor]
         </label>
       </p>
+      <input type="hidden" name="ns" value="on"%/>
+      <input type="hidden" name="image" value="on"%/>
       </div>
    </div>
    <div class="p-2">

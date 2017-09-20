@@ -35,8 +35,8 @@
 %end;
 
 <h1 class="d-inline-block">%nn;
-  %if;(evar.v!=0)%apply;a_of_b%with;[*descendants]%and;%self;%end;%else;%self;%end;
-   %if;(cancel_links) %apply;togend(evar.v)%end;
+  %if;(evar.v!=0)%apply;a_of_b%with;[*descendants]%and;%self;%end;%else;%self; ([no descendants])%end;
+   %if;(cancel_links and evar.v!=0) %apply;togend(evar.v)%end;
 </h1>
 
 %if;not cancel_links;
@@ -218,8 +218,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                         %if;(has_notes and has_psources)<hr>%end;
                         %if;(has_psources)%apply;capitalize(psources)%end;'
           title="%if;(has_notes and not has_psources)[*note/notes]1%nn;
-                %elseif;(not has_notes and has_psources)[source/sources]1%nn;
-                %elseif;(has_notes and has_psources)[*note/notes]1 [and] [*source/sources]1%nn;
+                %elseif;(not has_notes and has_psources)[*source/sources]1%nn;
+                %elseif;(has_notes and has_psources)[*note/notes]1 [and] [source/sources]1%nn;
                 %end;"
         %end;
         >
@@ -361,12 +361,12 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                     %end;'
         title='%if;("yyy"="desc" and (has_birth_source or has_baptism_source or has_birth_note or has_baptism_note))
                  %if;((has_birth_note or has_baptism_note) and not (has_birth_source or has_baptism_source))[*note/notes]1%nn;
-                 %elseif;(not (has_birth_note or has_baptism_note) and (has_birth_source or has_baptism_source))[source/sources]1%nn;
+                 %elseif;(not (has_birth_note or has_baptism_note) and (has_birth_source or has_baptism_source))[*source/sources]1%nn;
                  %elseif;((has_birth_note or has_baptism_note) and (has_birth_source or has_baptism_source))[*source/sources]1 [and] [source/sources]1%nn;
                  %end;
                %elseif;(xxx.has_birth_source or xxx.has_baptism_source or xxx.has_birth_note or xxx.has_baptism_note)
                  %if;((xxx.has_birth_note or xxx.has_baptism_note) and not (xxx.has_birth_source or xxx.has_baptism_source))[*note/notes]1%nn;
-                 %elseif;(not (xxx.has_birth_note or xxx.has_baptism_note) and (xxx.has_birth_source or xxx.has_baptism_source))[source/sources]1%nn;
+                 %elseif;(not (xxx.has_birth_note or xxx.has_baptism_note) and (xxx.has_birth_source or xxx.has_baptism_source))[*source/sources]1%nn;
                  %elseif;((xxx.has_birth_note or xxx.has_baptism_note) and (xxx.has_birth_source or xxx.has_baptism_source))[*note/notes]1 [and] [source/sources]1%nn;
                  %end;
                %end;'
@@ -1033,7 +1033,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
 %end;
 
-<p>[*total][:] %apply;desc_count() [descendants] %if;(evar.marr="on" or evar.t="I")(%count1; [person/persons]1 [with] [spouse/spouses]1)%end;</p>
+%if;(has_children)
+  <p>[*total][:] %apply;desc_count() [descendants] %if;(evar.marr="on" or evar.t="I")(%count1; [person/persons]1 [with] [spouse/spouses]1)%end;</p>
+%end;
 
 %import;trl;
 %import;copyr;
