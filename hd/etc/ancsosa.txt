@@ -19,6 +19,10 @@
         %if;(qualifier != "") %qualifier;%end;
         %sp;%surname;
       %end;
+      %if;(evar.cgl="on")
+        %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
+        %apply;togen(nb_gen).
+      %end;
     %end;
   </title>
   <meta name="robots" content="none">
@@ -31,20 +35,6 @@
 <body%body_prop;>
 %message_to_wizard;
 <div class="container-fluid">
-<h1>%nn;
-  %apply;a_of_b%with;
-    %if;(evar.t = "M")
-      %if;(evar.evt = "on")[*missing events]%else;[*missing ancestors]%end;
-    %else;[*ancestors]
-    %end;
-  %and;
-    %if;(public_name != "")%public_name;%else;%first_name;%end;
-    %if;(qualifier != "") <em>%qualifier;</em>%end;
-    %sp;%surname;
-    %if;(alias != "") <em>(%alias;)</em>%end;
-  %end;
-  %if;(evar.t = "D") [up to] %pvar.1;%end;
-</h1>
 
 %if;not cancel_links;
   <div class="btn-group float-%right; mb-1">
@@ -58,7 +48,7 @@
 %let;central_index;%index;%in;
 
 %define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
+  [to the %s generation:::xx]%nn;
 %end;
 
 %define;thegen(xx)
@@ -66,10 +56,10 @@
 %end;
 
 %define;togena(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+  %if;(xx = 1)[specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[to the parents]%nn;
+  %elseif;(xx = 3)[to the grandparents]%nn;
+  %elseif;(xx = 4)[to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
@@ -77,19 +67,11 @@
   %end;
 %end;
 
-%define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
-%end;
-
-%define;thegen(xx)
-  [*the %s generation:::xx]%nn;
-%end;
-
 %define;togen(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
+  %if;(xx = 1)[specify::generation/generations]0%nn;
+  %elseif;(xx = 2)[to the parents]%nn;
+  %elseif;(xx = 3)[to the grandparents]%nn;
+  %elseif;(xx = 4)[to the great-grandparents]%nn;
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
@@ -1285,11 +1267,31 @@
    Main
 %)
 
+<h1>%nn;
+  %apply;a_of_b%with;
+    %if;(evar.t = "M")
+      %if;(evar.evt = "on")[*missing events]%else;[*missing ancestors]%end;
+    %else;[*ancestors]
+    %end;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;
+  %end;
+  %if;(evar.t = "D") [up to] %pvar.1;
+  %else;
+     %if;(cancel_links) %apply;togena(evar.v)%end;
+  %end;
+</h1>
+
 %if;(evar.t = "Z" and not cancel_links)
   <div class="form-inline">
-    <a role="button" class="btn btn-link my-0 px-0 mb-1" 
+    <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"
       href="%prefix;p=%first_name;;n=%surname;;m=A">
-        <i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors] </a>
+        <i class="fa fa-cog fa-lg fa-fw mr-1">
+        </i>[*options] [ancestors] 
+    </a>
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" 
       href="%apply;rebuild_url%with;D
             %and;I
@@ -1302,7 +1304,6 @@
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" 
       href="%prefix;m=A;t=T;%access;;v=%evar.v;;image=on;marriage=on">
         <span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]</a>
-    
     <div class="input-group ml-3 mb-1">
       <span class="input-group-btn">
         %if;(evar.v>=3)<a 
@@ -1839,7 +1840,6 @@
 
   %elseif;(evar.t = "Z")
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togen(nb_gen).</p>
     %reset_count;
     <table class="table table-hover ascends_table">
       <tr class="ascends_table_header align-middle">%apply;table_header()</tr>
