@@ -1306,14 +1306,22 @@
     <div class="input-group ml-3 mb-1">
       <span class="input-group-btn">
         %if;(evar.v>=3)<a 
-          href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v-1)%end;%if;(evar.ns="on")ns=on;%end;" 
+          href="%apply;rebuild_url%with;A
+            %and;%evar.t;
+            %and;%expr(evar.v-1)
+            %end;
+            %if;(evar.ns="on")ns=on;%end;%if;(evar.image="on")image=on;%end;" 
             class="btn btn-secondary" title="-1 [generation/generations]0">-</a>%end;
       </span>
       <input class="form-control text-center" size="12" 
         value="%evar.v; [generation/generations]1" 
         title="%apply;a_of_b%with;[*number]0%and;[generation/generations]1%end;" disabled>
       <span class="input-group-btn">
-        <a href="%apply;rebuild_url%with;A%and;%evar.t;%and;%expr(evar.v+1)%end;%if;(evar.ns="on")ns=on;%end;" 
+        <a href="%apply;rebuild_url%with;A
+          %and;%evar.t;
+          %and;%expr(evar.v+1)
+          %end;
+          %if;(evar.ns="on")ns=on;%end;%if;(evar.image="on")image=on;%end;" 
           class="btn btn-secondary" title="+1 [generation/generations]0">+</a>
       </span>
     </div>
