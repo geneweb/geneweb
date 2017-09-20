@@ -1094,7 +1094,7 @@
 %if;(evar.t = "Z" and not cancel_links)
   <div class="form-inline">
     <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=A"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors] </a>
-    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%apply;rebuild_url%with;D%and;I;%and;%max_desc_level;%end" class="btn btn-secondary"><span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]</a>
+    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%apply;rebuild_url%with;D%and;I;%and;%max_desc_level;%end;%if;(evar.notes="on")notes=on;%end;%if;(evar.image="on")image=on;%end;" class="btn btn-secondary"><span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]</a>
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%prefix;m=A;t=T;%access;;v=%evar.v;;image=on;marriage=on"><span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]</a>
     <div class="input-group ml-3 mb-1">
       <span class="input-group-btn">
