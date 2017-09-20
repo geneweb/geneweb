@@ -268,7 +268,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
-                        %if;(xxx.has_psources)%apply;capitalize(xxx.psource)%end;'
+                        %if;(xxx.has_psources)%apply;capitalize(xxx.psources)%end;'
           title="%if;(xxx.has_notes and not xxx.has_psources)[*note/notes]1%nn;
                 %elseif;(not xxx.has_notes and xxx.has_psources)[*source/sources]1%nn;
                 %elseif;(xxx.has_notes and xxx.has_psources)[*note/notes]1 [and] [source/sources]1%nn;
@@ -383,7 +383,24 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %else;
       %foreach;xxx.family;
         %if;(family_cnt=fam_cnt)
-          <td class="%if;(xxx.nb_families > 1)border-bottom-0%end; align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2">
+          <td class='%if;(xxx.nb_families > 1)border-bottom-0%end; align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2
+          %if;(evar.notes="on")
+              %if;(spouse.has_notes and not spouse.has_psources) notespouse%nn;
+              %elseif;(not spouse.has_notes and spouse.has_psources) sourcespouse%nn;
+              %elseif;(spouse.has_notes and spouse.has_psources) notesourcespouse%nn;
+              %end;
+          %end;'
+          %if;(evar.notes="on" and (spouse.has_notes or spouse.has_psources))
+            tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+            data-content='%if;(spouse.has_notes)%spouse.notes;%end;
+                          %if;(spouse.has_notes and spouse.has_psources)<hr>%end;
+                          %if;(spouse.has_psources)%apply;capitalize(spouse.psources)%end;'
+            title='%if;(spouse.has_notes and not spouse.has_psources)[*note/notes]1%nn;
+                  %elseif;(not spouse.has_notes and spouse.has_psources)[*source/sources]1%nn;
+                  %elseif;(spouse.has_notes and spouse.has_psources)[*note/notes]1 [and] [source/sources]1%nn;
+                  %end;'
+          %end;
+          >
             %incr_count1;
             %if;(zzz.nb_families>1)%apply;letter(family_cnt).%end;
             %apply;image_MF("spouse")
@@ -593,7 +610,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %rowspan;
     %if;(evar.notes="on")
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-      data-content='%if;("yyy"="desc" (and has_death_note or has_burial_note))
+      data-content='%if;("yyy"="desc" and (has_death_note or has_burial_note))
                       %if;(has_death_note)%if;(has_burial_note)[*death][:] %end;%death_note;%end;
                       %if;(has_burial_note)[*burial][:] %burial_note;%end;
                     %elseif;(xxx.has_death_note or xxx.has_burial_note)
@@ -717,7 +734,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     %end;
   %else;
-      %apply;table_row("xxx", prfx, fff, family_cnt, "ch_cnt", count, "desc", "xxx", 0, 0)
+      %apply;table_row("xxx", prfx, fff, "", "ch_cnt", count, "desc", "xxx", 0, 0)
   %end;
 %end;
 
