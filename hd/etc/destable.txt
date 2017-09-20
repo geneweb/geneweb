@@ -185,7 +185,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                     or evar.child="on"))rowspan="%xxx.nb_families;"%end;%in;
 
   <tr id="%labl0">
-
+%( numéro d'Aboville %)
   %if;(evar.num="on" and famx=1)
     %if;("yyy"="desc")
       <td class="border-left-0 text-center align-middle" %rowspan;>
@@ -201,17 +201,18 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     %end;
   %end;
+%( Descendant et son conjoint en mode I %)  
   %if;(famx=1)
     %if;("yyy"="desc")
       <td class='align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2%nn;
-        %if;(evar.notes="on")
+        %if;(evar.ns="on")
           %if;(has_notes and not has_psources) note%nn;
           %elseif;(not has_notes and has_psources) source%nn;
           %elseif;(has_notes and has_psources) notesource%nn;
           %end;
         %end;'
         %rowspan;
-        %if;(evar.notes="on" and (has_notes or has_psources))
+        %if;(evar.ns="on" and (has_notes or has_psources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(has_notes)%notes;%end;
                         %if;(has_notes and has_psources)<hr>%end;
@@ -241,7 +242,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       </td>
     %elseif;(evar.t="I")
       <td class='align-middle text-right%if;(evar.nowrap="on") text-nowrap%end;%nn;
-        %if;(evar.notes="on")
+        %if;(evar.ns="on")
           %if;("yyy"="desc")
             %if;(xxx.has_notes and not xxx.has_psources) notespouse%nn;
             %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
@@ -254,7 +255,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %end;
           %end;
         %end;'
-        %if;(evar.notes="on" and "yyy"="desc" and (has_notes or has_psources))
+        %if;(evar.ns="on" and "yyy"="desc" and (has_notes or has_psources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(has_notes)%notes;%end;
                         %if;(has_notes and has_psources)<hr>%end;
@@ -264,7 +265,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %elseif;(has_notes and has_psources)[*note/notes]1 [and] [source/sources]1%nn;
                 %end;"
         %end;
-        %if;(evar.notes="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_psources))
+        %if;(evar.ns="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_psources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
@@ -295,7 +296,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       </td>
     %end;
   %end;
-
+%( Date de naissance %)
   %if;(evar.birth="on" and famx=1)
     <td class="align-middle text-right" %rowspan;>
       %if;(wizard and not cancel_links)
@@ -309,11 +310,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     </td>
   %end;
-
+%( Lieu de naissance %)
   %if;(evar.birth_place="on" and famx=1)
     %if;("yyy"="desc")
       <td class='align-middle%nn;
-        %if;(evar.notes="on")
+        %if;(evar.ns="on")
           %if;((has_birth_note or has_baptism_note) and not
                (has_birth_source or has_baptism_source)) note%nn;
           %elseif;(not (has_birth_note or has_baptism_note) and
@@ -324,7 +325,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %end;'
     %else;
       <td class='align-middle%nn;
-        %if;(evar.notes="on")
+        %if;(evar.ns="on")
           %if;((xxx.has_birth_note or xxx.has_baptism_note) and not
                (xxx.has_birth_source or xxx.has_baptism_source)) note%nn;
           %elseif;(not (xxx.has_birth_note or xxx.has_baptism_note) and
@@ -335,7 +336,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %end;'
     %end;
     %rowspan;
-    %if;(evar.notes="on")
+    %if;(evar.ns="on")
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
       data-content='%if;("yyy"="desc" and (has_birth_note or has_baptism_note))
                       %if;(has_birth_note)%if;(has_baptism_note)[*birth][:] %end;%birth_note;%end;
@@ -376,7 +377,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
     </td>
   %end;
-
+%( En mode H, conjoints %)
   %if;(evar.marr="on" and evar.t="H")
     %if;(xxx.nb_families=0)
       <td></td>
@@ -384,13 +385,13 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %foreach;xxx.family;
         %if;(family_cnt=fam_cnt)
           <td class='%if;(xxx.nb_families > 1)border-bottom-0%end; align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2
-          %if;(evar.notes="on")
+          %if;(evar.ns="on")
               %if;(spouse.has_notes and not spouse.has_psources) notespouse%nn;
               %elseif;(not spouse.has_notes and spouse.has_psources) sourcespouse%nn;
               %elseif;(spouse.has_notes and spouse.has_psources) notesourcespouse%nn;
               %end;
           %end;'
-          %if;(evar.notes="on" and (spouse.has_notes or spouse.has_psources))
+          %if;(evar.ns="on" and (spouse.has_notes or spouse.has_psources))
             tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
             data-content='%if;(spouse.has_notes)%spouse.notes;%end;
                           %if;(spouse.has_notes and spouse.has_psources)<hr>%end;
@@ -412,7 +413,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     %end;
   %end;
-
+%( Date de mariage %)
   %if;(evar.marr_date="on")
     %if;(xxx.nb_families=0)
       <td></td>
@@ -445,7 +446,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     %end;
   %end;
-
+%( Lieu de mariage %)
   %if;(evar.marr_place="on")
     %if;(xxx.nb_families=0)
       <td></td>
@@ -457,14 +458,14 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
               ((xxx.spouse=zzz and ddd=family.index) or
                 (xxx=zzz and family_cnt=fam_cnt and evar.t="H"))))
           <td class='align-middle%nn;
-            %if;(evar.notes="on")
+            %if;(evar.ns="on")
               %if;(has_marriage_note and not has_marriage_source) note%nn;
               %elseif;(not has_marriage_note and has_marriage_source) source%nn;
               %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
               %end;
             %end;'
             %rowspan;
-            %if;(evar.notes="on")
+            %if;(evar.ns="on")
               tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(has_marriage_note)%marriage_note;%end;
                             %if;(has_marriage_note and has_marriage_source)<hr>%end;
@@ -489,7 +490,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
   %end;
   %reset_count2;
-
+%( Calcul nombre total d'enfants %)
   %if;(zzz.has_families)
     %foreach;zzz.family;
       %if;zzz.has_children;
@@ -501,7 +502,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
   %let;nb_ch_tot_desc;%count2;%in;
   %reset_count2;
-
+%( Calcul nombre d'enfants de l'époux %)
   %if;(evar.t="I")
     %if;(xxx.has_families)
       %foreach;xxx.family;
@@ -524,7 +525,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
   %end;
   %let;nb_ch_tot_spous;%count2;%in;
-
+%( Nombre d'enfants %)
   %if;(evar.child="on")
     %if;(xxx.nb_families=0)
       <td></td>
@@ -535,14 +536,14 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             ((xxx.spouse=zzz and (ddd=family.index)) or
              (xxx=zzz and family_cnt=fam_cnt and evar.t="H"))))
           <td class='align-middle text-center %if;(evar.nowrap="on")text-nowrap%end; px-1
-            %if;(evar.notes="on")
+            %if;(evar.ns="on")
               %if;(has_fnotes and not has_fsources) note%nn;
               %elseif;(not has_fnotes and has_fsources) source%nn;
               %elseif;(has_fnotes and has_fsources) notesource%nn;
               %end;
             %end;'
             %rowspan;
-            %if;(evar.notes="on")
+            %if;(evar.ns="on")
               tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(has_fnotes)%fnotes;%end;
                             %if;(has_fnotes and has_fsources)<hr>%end;
@@ -570,7 +571,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     %end;
   %end;
-
+%( Date de décès %)
   %if;(evar.death="on" and famx=1)
     <td class="align-middle text-right" %rowspan;>
       %if;(wizard and not cancel_links)
@@ -582,11 +583,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     </td>
   %end;
-
+%( Lieu de décès %)
   %if;(evar.death_place="on" and famx=1)
     %if;("yyy"="desc")
       <td class='align-middle
-        %if;(evar.notes="on")
+        %if;(evar.ns="on")
           %if;((has_death_note or has_burial_note) and not
               (has_death_source or has_burial_source))note
           %elseif;(not (has_death_note or has_burial_note) and
@@ -597,7 +598,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %end;'
     %else;
       <td class='align-middle
-        %if;(evar.notes="on")
+        %if;(evar.ns="on")
           %if;((xxx.has_death_note or xxx.has_burial_note) and not
               (xxx.has_death_source or xxx.has_burial_source))note
           %elseif;(not (xxx.has_death_note or xxx.has_burial_note) and
@@ -608,7 +609,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %end;'
     %end;
     %rowspan;
-    %if;(evar.notes="on")
+    %if;(evar.ns="on")
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
       data-content='%if;("yyy"="desc" and (has_death_note or has_burial_note))
                       %if;(has_death_note)%if;(has_burial_note)[*death][:] %end;%death_note;%end;
@@ -645,7 +646,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                   %end;
                %end;'
     %end;
-    %if;(evar.notes="on")
+    %if;(evar.ns="on")
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
       data-content='%if;(xxx.has_death_note or xxx.has_burial_note)
                       %if;(xxx.has_death_note)%if;(xxx.has_burial_note)[*death][:] %end;%xxx.death_note;%end;
@@ -677,14 +678,14 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
       </td>
   %end;
-
+%( Age %)
   %if;(evar.age="on" and famx=1)
     <td class="align-middle" %rowspan;>
       %if;xxx.computable_death_age;%xxx.death_age;%end;
       %if;xxx.computable_age;%xxx.age;%end;
     </td>
   %end;
-
+%( Profession %)
   %if;(evar.occu="on" and famx=1)
     <td class="align-middle" %rowspan;>
       %if;(xxx.has_occupation)
@@ -696,7 +697,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %end;
 
 %define;one_child(xxx, prefx, fff, ch_cnt)
-  %incr_count;
+  %incr_count; 
+  %( Les enfants d'une personne sont numérotés de 1 à n indépendamment du nombre de mariages %)
   %let;prfx;%if;("prefx"="-1")%else;prefx%end;%in;
   %if;(evar.t="A")
     <br>%prfx; %apply;image_MF("xxx")
@@ -738,7 +740,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
 %end;
 
-%define;one_family(xxx, prefx)
+%define;families_of_one_p(xxx, prefx)
   %reset_count;
     %foreach;family;
       %let;fam;%if;(evar.num="on" and nb_families>1)%apply;letter(family_cnt)%end;%in;
@@ -756,8 +758,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %apply;image_MF("xxx")
   %apply;link%with;%xxx.access;%and;
       %xxx.first_name; %xxx.surname;%nn;
-      %end;%nn;
-  %xxx.title;%nn;
+      %end;
+  %if;(xxx.title!="")&nbsp;%xxx.title;%nn;%end;
   %if;(has_families)
     %foreach;family;
       <span class="text-nowrap mx-1">&%if;(nb_families>1)%apply;letter(family_cnt)%end;
@@ -790,7 +792,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
 %end;
 
-%( Tree traversal vertical/ascendant %)
+%( Parcours de l'arbre ascendant, niveau par niveau %)
 %define;one_person(xxx, lv, max_l, prefx, fam_cnt, ch_cnt)
   %let;npref;prefx%in;
   %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
@@ -814,9 +816,10 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
 %end;
 
-%(Tree traversal horizontal/descendant %)
-%define;one_level(xxx, lv, max_l, prefx, fff, ch_cnt)
-  %let;npref;%if;("prefx"!="")prefxfff.%end;ch_cnt%nn;%in;
+%( Parcours de l'arbre, horizontal, niveau par niveau descendant %)
+%( A chaque niveau, prefx et faml (lettre) définissent le préfixe d'Aboville %)
+%define;one_level(xxx, lv, max_l, prefx, faml, ch_cnt)
+  %let;npref;%if;("prefx"!="")prefxfaml.%end;ch_cnt%nn;%in;
   %if;(lv<max_l)
     %if;xxx.has_families;
       %foreach;family;
@@ -827,7 +830,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
     %end;
   %else;
-    %apply;one_family("self", npref)
+    %apply;families_of_one_p("self", npref)
   %end;
 %end;
 
@@ -879,7 +882,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   vvvnnnccciiippp%in;
   %new_url;
 %end;
-
+%( Boutons de configurations et d'options %)
 %if;(not cancel_links)
   <div class="form-inline">
     <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"
@@ -890,7 +893,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       href="%apply;rebuild_url%with;A
             %and;Z;
             %and;%if;(evar.v="" or evar.v<=2)v=2;%else;v=%evar.v;;%end;
-            %and;%if;(evar.notes="on")notes=on;%end;
+            %and;%if;(evar.ns="on")ns=on;%end;
             %and;%if;(evar.cgl="on")cgl=on;%end;
             %and;%if;(evar.image="on")image=on;%end;
             %and;%if;(evar.px!="")px=%evar.px;%end;
@@ -906,7 +909,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           href="%apply;rebuild_url%with;D
                 %and;%evar.t;
                 %and;v=%expr(evar.v-1);
-                %and;%if;(evar.notes="on")notes=on;%end;
+                %and;%if;(evar.ns="on")ns=on;%end;
                 %and;%if;(evar.cgl="on")cgl=on;%end;
                 %and;%if;(evar.image="on")image=on;%end;
                 %and;%if;(evar.px!="")px=%evar.px;%end;
@@ -920,7 +923,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         <a href="%apply;rebuild_url%with;D
                  %and;%evar.t;
                  %and;v=%expr(evar.v+1);
-                 %and;%if;(evar.notes="on")notes=on;%end;
+                 %and;%if;(evar.ns="on")ns=on;%end;
                  %and;%if;(evar.cgl="on")cgl=on;%end;
                  %and;%if;(evar.image="on")image=on;%end;
                  %and;%if;(evar.px!="")px=%evar.px;%end;
@@ -935,7 +938,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
          href="%apply;rebuild_url%with;D
                 %and;%if;(evar.t="H")I%elseif;(evar.t="I")H%end;
                 %and;v=%evar.v;;
-                %and;%if;(evar.notes="on")notes=on;%end;
+                %and;%if;(evar.ns="on")ns=on;%end;
                 %and;%if;(evar.cgl="on")cgl=on;%end;
                 %and;%if;(evar.image="on")image=on;%end;
                 %and;%if;(evar.px!="")px=%evar.px;%end;
@@ -944,23 +947,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         %if;(evar.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]0
       </a>
     %end;
-    %if;(evar.image="on")
-      <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-       href="%apply;rebuild_url%with;D
-             %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
-             %and;v=%evar.v;;
-             %and;%if;(evar.notes="on")notes=on;%end;
-             %and;%if;(evar.cgl="on")cgl=on;%end;
-             %and;%if;(evar.image="on")image=on;%end;
-             %and;%if;(evar.px="")px=90;%elseif;(evar.px="90")px=120;%end;
-             %end;"
-       title="%if;(evar.px="120")60%elseif;(evar.px!="")120%else;90%end; px"><i class="fa %if;(evar.px="120")fa-compress%else;fa-expand%end; fa-lg fa-fw mr-1"></i>[*modify] [image/images]1</a>
-    %end;
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
      href="%apply;rebuild_url%with;D
            %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
            %and;v=%evar.v;;
-           %and;%if;(evar.notes="on")notes=on;%end;
+           %and;%if;(evar.ns="on")ns=on;%end;
            %and;%if;(evar.cgl="on")cgl=on;%end;
            %and;%if;(evar.image!="on")image=on;%end;
            %and;%if;(evar.px!="")px=%evar.px;%end;
@@ -969,19 +960,31 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
              %if;(evar.image="on")text-danger%end; mr-1"></i>%nn;
      %if;(evar.image="" or evar.image!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [image/images]1
     </a>
+    %if;(evar.image="on")
+      <a role="button" class="btn btn-link ml-2 px-0 mb-1"
+       href="%apply;rebuild_url%with;D
+             %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
+             %and;v=%evar.v;;
+             %and;%if;(evar.ns="on")ns=on;%end;
+             %and;%if;(evar.cgl="on")cgl=on;%end;
+             %and;%if;(evar.image="on")image=on;%end;
+             %and;%if;(evar.px="")px=90;%elseif;(evar.px="90")px=120;%end;
+             %end;"
+       title="%if;(evar.px="120")60%elseif;(evar.px!="")120%else;90%end; px"><i class="fa %if;(evar.px="120")fa-compress%else;fa-expand%end; fa-lg fa-fw mr-1"></i>[*modify] [image/images]1</a>
+    %end;
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
       href="%apply;rebuild_url%with;D
             %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
             %and;v=%evar.v;;
-            %and;%if;(evar.notes!="on")notes=on;%end;
+            %and;%if;(evar.ns!="on")ns=on;%end;
             %and;%if;(evar.cgl="on")cgl=on;%end;
             %and;%if;(evar.image="on")image=on;%end;
             %and;%if;(evar.px!="")px=%evar.px;%end;
             %end;"
             title="small arrow in corner shows existence of note or source">
               <i class="fa fa-file-text-o fa-lg fa-fw
-               %if;(evar.notes="on")text-danger%end; mr-1"></i>%nn;
-      %if;(evar.notes="" or evar.notes!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end;%sp;
+               %if;(evar.ns="on")text-danger%end; mr-1"></i>%nn;
+      %if;(evar.ns="" or evar.ns!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end;%sp;
         <span class="notecolor">[note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>
     </a>
     %if;(evar.cgl="" or evar.cgl!="on")
@@ -1000,7 +1003,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
   </div>
 %end;
-
+%( Main %)
 <table class="table table-sm table-hover descends_table mt-1">
   %if;(evar.t="A")
     %let;nb_col;1%in;
