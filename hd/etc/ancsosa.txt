@@ -1324,12 +1324,13 @@
             %and;%if;(evar.px!="")px=%evar.px;%end;
             %end;"
             class="btn btn-secondary" title="[*delete] 1 [generation/generations]0">
-          <i class="fa fa-minus fa-lg "></i>
+          <i class="fa fa-minus fa-lg"></i>
         </a>
       %else;
-           <i class="fa fa-lg ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>
+        <span class="btn btn-secondary disabled" aria-disabled="true" title="[*delete] 1 [generation/generations]0">
+          <i class="fa fa-minus fa-lg" ></i>
+        </span>
       %end;
-      <span class="text-primary mt-2">%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;</span>
       <a role="button" class="btn"
         href="%apply;rebuild_url%with;A
               %and;%evar.t;
@@ -1342,6 +1343,7 @@
               class="btn btn-secondary" title="[*add] 1 [generation/generations]0">
               <i class="fa fa-plus fa-lg"></i>
         </a>
+      <span class="text-primary mt-2">%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;</span>
     </div>
   </div>
   <div class="d-flex">
