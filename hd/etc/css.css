@@ -15,10 +15,12 @@ input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
 input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
 input:focus:-ms-input-placeholder { color:transparent; }
 
-/* Capitalization unavailable in note from Ocaml */
+/* Capitalization unavailable in note from Ocaml 
+> temporary disactivated: too intrusive for notes in popovers, but needed for note in timeline...
 p::first-letter {
   text-transform: capitalize;
 }
+*/
 
 .pmod::first-letter {
   font-weight: bold
@@ -1260,4 +1262,8 @@ span.sourcecolor {
 }
 span.notesourcecolor {
     color: #90EE90;
+}
+.popover{
+    word-wrap: break-word;
+    max-width: 40%;
 }

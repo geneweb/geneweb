@@ -225,7 +225,7 @@ function no_options () {
           [*where dead]
         </label>
         <label>
-          <input type="checkbox" id="t_death_age" name="death_age" value="on"%/>
+          <input type="checkbox" id="t_death_age" name="age" value="on"%/>
           [*age at death]
         </label>
       </p>
