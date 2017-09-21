@@ -195,7 +195,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       </td>
     %elseif;(evar.t="I")
       %if;(has_families and nb_families>1)
-        <td class="border-left-0 text-center align-middle">%labl0;%if;(nb_families>1)%apply;letter(family_cnt).%end;</td>
+        <td class="border-left-0 text-center align-middle">%apply;letter(family_cnt)</td>
       %else;
         <td></td>
       %end;
@@ -410,7 +410,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           %end;
           >
             %incr_count1;
-            %if;(zzz.nb_families>1)%apply;letter(family_cnt).%end;
+            %if;(zzz.nb_families>1)%apply;letter(family_cnt)%end;
             %apply;image_MF("spouse")
             %apply;link%with;%spouse.access;%and;
               %spouse;
