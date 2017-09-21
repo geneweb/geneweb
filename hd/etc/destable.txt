@@ -131,7 +131,7 @@
       %incr_count;
     %end;
     %if;(evar.age="on")
-      <th rowspan="2">[*age]</th>
+      <th class="align-middle text-center" rowspan="2">[*age]</th>
       %incr_count;
     %end;
     %if;(evar.occu="on")
