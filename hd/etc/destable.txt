@@ -826,49 +826,21 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %define;rebuild_url(mmm,xxx,vvv,nnn,ccc,iii,ppp)
   %let;new_url;%prefix;m=mmm;%nn;
   %access;;t=xxx;%nn;
-  %if;(evar.num="on")
-    num=on;%nn;
-  %end;
-  %if;(evar.nowrap="on")
-    nowrap=on;%nn;
-  %end;
-  %if;(evar.title="on")
-    title=on;%nn;
-  %end;
-  %if;(evar.birth="on")
-    birth=on;%nn;
-  %end;
-  %if;(evar.birth_place="on")
-    birth_place=on;%nn;
-  %end;
-  %if;(evar.marr= "on")
-    marr=on;%nn;
-  %end;
-  %if;(evar.marr_date="on")
-    marr_date=on;%nn;
-  %end;
-  %if;(evar.marr_place="on")
-    marr_place=on;%nn;
-  %end;
-  %if;(evar.child="on")
-    child=on;%nn;
-  %end;
-  %if;(evar.death="on")
-    death=on;%nn;
-  %end;
-  %if;(evar.death_place="on")
-    death_place=on;%nn;
-  %end;
-  %if;(evar.age="on")
-    age=on;%nn;
-  %end;
-  %if;(evar.occu="on")
-    occu=on;%nn;
-  %end;
-  %if;(evar.gen="on")
-    gen=on;%nn;
-  %end;
-  vvvnnnccciiippp%in;
+  %if;(evar.num="on")num=on;%nn;%end;
+  %if;(evar.nowrap="on")nowrap=on;%nn;%end;
+  %if;(evar.title="on")title=on;%nn;%end;
+  %if;(evar.birth="on")birth=on;%nn;%end;
+  %if;(evar.birth_place="on")birth_place=on;%nn;%end;
+  %if;(evar.marr= "on")marr=on;%nn;%end;
+  %if;(evar.marr_date="on")marr_date=on;%nn;%end;
+  %if;(evar.marr_place="on")marr_place=on;%nn;%end;
+  %if;(evar.child="on")child=on;%nn;%end;
+  %if;(evar.death="on")death=on;%nn;%end;
+  %if;(evar.death_place="on")death_place=on;%nn;%end;
+  %if;(evar.age="on")age=on;%nn;%end;
+  %if;(evar.occu="on")occu=on;%nn;%end;
+  %if;(evar.gen="on")gen=on;%nn;%end;
+  vvv;nnn;ccc;iii;ppp;%in;
   %new_url;
 %end;
 %( Boutons de configurations et d'options %)
@@ -880,8 +852,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     </a>
     %if;(evar.t!="A")<a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"
       href="%apply;rebuild_url%with;A
-            %and;Z;
-            %and;%if;(evar.v="" or evar.v<=2)v=2;%else;v=%evar.v;;%end;
+            %and;Z
+            %and;%if;(evar.v="" or evar.v<=2)v=2;%else;v=%evar.v;%end;
             %and;%if;(evar.ns="on")ns=on;%end;
             %and;%if;(evar.cgl="on")cgl=on;%end;
             %and;%if;(evar.image="on")image=on;%end;
@@ -902,7 +874,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %and;%if;(evar.cgl="on")cgl=on;%end;
                 %and;%if;(evar.image="on")image=on;%end;
                 %and;%if;(evar.px!="")px=%evar.px;%end;
-                %end;" class="btn btn-secondary" title="[*delete] 1 [generation/generations]0">%nn;
+                %end;" 
+                class="btn btn-secondary" title="[*delete] 1 [generation/generations]0">%nn;
           <i class="fa fa-minus fa-lg"></i>%nn;
         </a>
       %end;
@@ -916,7 +889,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %and;%if;(evar.cgl="on")cgl=on;%end;
                 %and;%if;(evar.image="on")image=on;%end;
                 %and;%if;(evar.px!="")px=%evar.px;%end;
-                %end;" class="btn btn-secondary" title="[*add] 1 [generation/generations]0">%nn;
+                %end;" 
+                class="btn btn-secondary" title="[*add] 1 [generation/generations]0">%nn;
          <i class="fa fa-plus fa-lg"></i>%nn;
        </a>
       %end;
@@ -924,34 +898,34 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   </div>
   <div class="d-flex">
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-     href="%apply;rebuild_url%with;D
-           %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
-           %and;v=%evar.v;;
-           %and;%if;(evar.ns="on")ns=on;%end;
-           %and;%if;(evar.cgl="on")cgl=on;%end;
-           %and;%if;(evar.image!="on")image=on;%end;
-           %and;%if;(evar.px!="")px=%evar.px;%end;
-           %end;">
+      href="%apply;rebuild_url%with;D
+            %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
+            %and;v=%evar.v;
+            %and;%if;(evar.ns="on")ns=on;%end;
+            %and;%if;(evar.cgl="on")cgl=on;%end;
+            %and;%if;(evar.image!="on")image=on;%end;
+            %and;%if;(evar.px!="")px=%evar.px;%end;
+            %end;">
             <i class="fa fa-picture-o fa-lg fa-fw
              %if;(evar.image="on")text-danger%end; mr-1"></i>%nn;
      %if;(evar.image="" or evar.image!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [image/images]1
     </a>
     %if;(evar.image="on")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-       href="%apply;rebuild_url%with;D
-             %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
-             %and;v=%evar.v;;
-             %and;%if;(evar.ns="on")ns=on;%end;
-             %and;%if;(evar.cgl="on")cgl=on;%end;
-             %and;%if;(evar.image="on")image=on;%end;
-             %and;%if;(evar.px="")px=90;%elseif;(evar.px="90")px=120;%end;
-             %end;"
+        href="%apply;rebuild_url%with;D
+              %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
+              %and;v=%evar.v;
+              %and;%if;(evar.ns="on")ns=on;%end;
+              %and;%if;(evar.cgl="on")cgl=on;%end;
+              %and;%if;(evar.image="on")image=on;%end;
+              %and;%if;(evar.px="")px=90;%elseif;(evar.px="90")px=120;%end;
+              %end;"
        title="%if;(evar.px="120")60%elseif;(evar.px!="")120%else;90%end; px"><i class="fa %if;(evar.px="120")fa-compress%else;fa-expand%end; fa-lg fa-fw mr-1"></i>[*modify] [image/images]1</a>
     %end;
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
       href="%apply;rebuild_url%with;D
             %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
-            %and;v=%evar.v;;
+            %and;v=%evar.v;
             %and;%if;(evar.ns!="on")ns=on;%end;
             %and;%if;(evar.cgl="on")cgl=on;%end;
             %and;%if;(evar.image="on")image=on;%end;
@@ -967,11 +941,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"
         href="%apply;rebuild_url%with;D
               %and;%if;(evar.t="H")H%elseif;(evar.t="I")I%end;
-              %and;v=%evar.v;;
-              %and;
+              %and;v=%evar.v;
+              %and;ns=off
               %and;%if;(evar.cgl!="on")cgl=on;%end;
               %and;%if;(evar.image="on")image=on;%end;
-              %and;
+              %and;%if;(evar.px!="")px=%evar.px;%end;
               %end;"
               title="Cancel url links in whole page">
         <i class="fa fa-chain-broken fa-lg fa-fw mr-1"></i>%nn;[*cancel GeneWeb links]
@@ -979,15 +953,15 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
     %if;(evar.marr="on" or evar.marr_place="on" or evar.marr_date="on")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-         href="%apply;rebuild_url%with;D
-                %and;%if;(evar.t="H")I%elseif;(evar.t="I")H%end;
-                %and;v=%evar.v;;
-                %and;%if;(evar.ns="on")ns=on;%end;
-                %and;%if;(evar.cgl="on")cgl=on;%end;
-                %and;%if;(evar.image="on")image=on;%end;
-                %and;%if;(evar.px!="")px=%evar.px;%end;
-                %end;">
-                <i class="fa fa-th%if;(evar.t="I")-large%end; fa-lg fa-fw mr-1"></i>%nn;
+        href="%apply;rebuild_url%with;D
+              %and;%if;(evar.t="H")I%elseif;(evar.t="I")H%end;
+              %and;v=%evar.v;
+              %and;%if;(evar.ns="on")ns=on;%end;
+              %and;%if;(evar.cgl="on")cgl=on;%end;
+              %and;%if;(evar.image="on")image=on;%end;
+              %and;%if;(evar.px!="")px=%evar.px;%end;
+              %end;">
+              <i class="fa fa-th%if;(evar.t="I")-large%end; fa-lg fa-fw mr-1"></i>%nn;
         %if;(evar.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]0
       </a>
     %end;
