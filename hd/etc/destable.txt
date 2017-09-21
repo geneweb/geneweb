@@ -865,41 +865,32 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       href="%prefix;m=D;t=T;%access;;v=%evar.v;;image=on;">
       <span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*descendants tree]
     </a>
-    <div class="mr-5">
-      %if;(evar.v>=1)
-        <a role="button" class="btn"
-          href="%apply;rebuild_url%with;D
-                %and;%evar.t;
-                %and;v=%expr(evar.v-1);
-                %and;%if;(evar.ns="on")ns=on;%end;
-                %and;%if;(evar.cgl="on")cgl=on;%end;
-                %and;%if;(evar.image="on")image=on;%end;
-                %and;%if;(evar.px!="")px=%evar.px;%end;
-                %end;" 
-                class="btn btn-secondary" title="[*delete] 1 [generation/generations]0">%nn;
-          <i class="fa fa-minus fa-lg"></i>%nn;
-        </a>
-      %else;
-        <span class="btn btn-secondary disabled" aria-disabled="true" title="[*delete] 1 [generation/generations]0">
-          <i class="fa fa-minus fa-lg" ></i>
-        </span>
-      %end;
-      %(if;((evar.v="" or evar.v="0") and evar.v<desc_level%)
-        <a role="button" class="btn"
-          href="%apply;rebuild_url%with;D
-                %and;%evar.t;
-                %and;v=%expr(evar.v+1);
-                %and;%if;(evar.ns="on")ns=on;%end;
-                %and;%if;(evar.cgl="on")cgl=on;%end;
-                %and;%if;(evar.image="on")image=on;%end;
-                %and;%if;(evar.px!="")px=%evar.px;%end;
-                %end;" 
-                class="btn btn-secondary" title="[*add] 1 [generation/generations]0">%nn;
-         <i class="fa fa-plus fa-lg"></i>%nn;
-       </a>
-      %(end;%)
-      <span class="text-primary mt-2">%apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;</span>
-    </div>
+    <a role="button" class="btn pl-3
+      %if;(evar.v="" or evar.v="0")disabled" aria-disabled="true"%else;"%end;
+      href="%apply;rebuild_url%with;D
+            %and;%evar.t;
+            %and;%if;(evar.v>1)v=%expr(evar.v-1);%else;v=0;%end;
+            %and;%if;(evar.ns="on")ns=on;%end;
+            %and;%if;(evar.cgl="on")cgl=on;%end;
+            %and;%if;(evar.image="on")image=on;%end;
+            %and;%if;(evar.px!="")px=%evar.px;%end;
+            %end;" title="[*delete] 1 [generation/generations]0">%nn;
+      <i class="fa fa-minus fa-lg"></i>%nn;
+    </a>
+    <a role="button" class="btn pl-2"
+      href="%apply;rebuild_url%with;D
+            %and;%evar.t;
+            %and;v=%expr(evar.v+1);
+            %and;%if;(evar.ns="on")ns=on;%end;
+            %and;%if;(evar.cgl="on")cgl=on;%end;
+            %and;%if;(evar.image="on")image=on;%end;
+            %and;%if;(evar.px!="")px=%evar.px;%end;
+            %end;" title="[*add] 1 [generation/generations]0">%nn;
+      <i class="fa fa-plus fa-lg"></i>%nn;
+    </a>
+    <span class="text-primary pl-1 mt-2">
+      %apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
+    </span>
   </div>
   <div class="d-flex">
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
