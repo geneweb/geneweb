@@ -37,12 +37,7 @@
 <div class="container-fluid">
 
 %if;not cancel_links;
-  <div class="btn-group float-%right; mb-1">
-    %if;(referer != "")
-      <a role="button" class="btn btn-link px-0" href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a role="button" class="btn btn-link ml-1 px-0" href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
-  </div>
+  %import;menubar;
 %end;
 
 %let;central_index;%index;%in;
@@ -1104,7 +1099,11 @@
                           %if;(not ancestor.has_burial_note and ((not ancestor.has_burial_source and source_type=[death]) or source_type=deathburial))
                             %apply;capitalize(ancestor.source).
                           %elseif;((ancestor.has_burial_note or ancestor.has_burial_source) and (source_type=[death] or source_type=[burial]))
-                            <li>%apply;capitalize(source_type)[:] %ancestor.source;.</li>
+                            %if;(source_type=[burial] and ancestor.is_cremated)
+                               <li>%apply;capitalize([cremation])[:] %ancestor.source;.</li>
+                            %else;
+                              <li>%apply;capitalize(source_type)[:] %ancestor.source;.</li>
+                            %end;
                           %end;
                         %end;'
             title='%if;(ancestor.has_death_source or ancestor.has_burial_source or ancestor.has_death_note or ancestor.has_burial_note)
