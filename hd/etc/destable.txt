@@ -165,7 +165,7 @@
 %(
 si t=H on active rowspan pour les données de l’individu et du couple
 si t=I on affiche pas les données
-xxx est la personne concernée
+xxx est la personne concernée (self)
 zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %)
 %define;table_row(xxx, prefx, fff, fam_cnt, ch_cnt, ch_count, yyy, zzz, ddd, nb_ch_desc)
@@ -234,29 +234,12 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %elseif;(evar.t="I")
       <td class='align-middle text-right%if;(evar.nowrap="on") text-nowrap%end;%nn;
         %if;(evar.ns="on")
-          %if;("yyy"="desc")
-            %if;(xxx.has_notes and not xxx.has_psources) notespouse%nn;
-            %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
-            %elseif;(xxx.has_notes and xxx.has_psources) notesourcespouse%nn;
-            %end;
-          %elseif;("yyy"="spous")
-            %if;(xxx.has_notes and not xxx.has_psources) notespouse%nn;
-            %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
-            %elseif;(xxx.has_notes and xxx.has_psources) notesourcespouse%nn;
-            %end;
+          %if;(xxx.has_notes and not xxx.has_psources) notespouse%nn;
+          %elseif;(not xxx.has_notes and xxx.has_psources) sourcespouse%nn;
+          %elseif;(xxx.has_notes and xxx.has_psources) notesourcespouse%nn;
           %end;
         %end;'
-        %if;(evar.ns="on" and "yyy"="desc" and (has_notes or has_psources))
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
-          data-content='%if;(has_notes)%notes;%end;
-                        %if;(has_notes and has_psources)<hr>%end;
-                        %if;(has_psources)%apply;capitalize(source)%end;'
-          title="%if;(has_notes and not has_psources)[*note/notes]1%nn;
-                %elseif;(not has_notes and has_psources)[*source/sources]1%nn;
-                %elseif;(has_notes and has_psources)[*note/notes]1 [and] [source/sources]1%nn;
-                %end;"
-        %end;
-        %if;(evar.ns="on" and "yyy"="spous" and (xxx.has_notes or xxx.has_psources))
+        %if;(evar.ns="on" and (xxx.has_notes or xxx.has_psources))
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
@@ -281,7 +264,6 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %end;
             %if;(evar.title="on")%xxx.title;%end;
           </div>
-
         </div>
       </td>
     %end;
@@ -302,18 +284,6 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
 %( Lieu de naissance %)
   %if;(evar.birth_place="on" and famx=1)
-    %if;("yyy"="desc")
-      <td class='align-middle%nn;
-        %if;(evar.ns="on")
-          %if;((has_birth_note or has_baptism_note) and not
-               (has_birth_source or has_baptism_source)) note%nn;
-          %elseif;(not (has_birth_note or has_baptism_note) and
-               (has_birth_source or has_baptism_source)) source%nn;
-          %elseif;((has_birth_note or has_baptism_note) and
-               (has_birth_source or has_baptism_source)) notesource%nn;
-          %end;
-        %end;'
-    %else;
       <td class='align-middle%nn;
         %if;(evar.ns="on")
           %if;((xxx.has_birth_note or xxx.has_baptism_note) and not
@@ -324,47 +294,25 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                (xxx.has_birth_source or xxx.has_baptism_source)) notesource%nn;
           %end;
         %end;'
-    %end;
     %rowspan;
     %if;(evar.ns="on")
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-      data-content='%if;("yyy"="desc" and (has_birth_note or has_baptism_note))
-                      %if;(has_birth_note)%if;(has_baptism_note)[*birth][:] %end;%birth_note;%end;
-                      %if;(has_baptism_note)[*baptism][:] %baptism_note;%end;
-                    %elseif;(xxx.has_birth_note or xxx.has_baptism_note)
+      data-content='%if;(xxx.has_birth_note or xxx.has_baptism_note)
                       %if;(xxx.has_birth_note)%if;(xxx.has_baptism_note)[*birth][:] %end;%xxx.birth_note;%end;
                       %if;(xxx.has_baptism_note)[*baptism][:] %xxx.baptism_note;%end;
                     %end;
-                    %if;(("yyy"="desc" and (has_birth_source or has_baptism_source))
-                           or (xxx.has_birth_source or xxx.has_baptism_source))
-                      %if;(("yyy"="desc" and (has_birth_note or has_baptism_note))
-                          or (xxx.has_birth_note or xxx.has_baptism_note))<hr>
-                      %end;
+                    %if;(xxx.has_birth_source or xxx.has_baptism_source)
+                      %if;(xxx.has_birth_note or xxx.has_baptism_note)<hr>%end;
                       %let;birthbaptism;[birth], [baptism]%in;
-                      %if;("yyy"="desc")
-                        %foreach;source;
-                          %if;(not has_baptism_note and ((not has_baptism_source and source_type=[birth]) or source_type=birthbaptism))
-                            %apply;capitalize(source).
-                          %elseif;((has_baptism_note or has_baptism_source) and (source_type=[birth] or source_type=[baptism]))
-                            <li>%apply;capitalize(source_type)[:] %source;.</li>
-                          %end;
-                        %end;
-                      %else;
-                        %foreach;xxx.source;
-                          %if;(not xxx.has_baptism_note and ((not xxx.has_baptism_source and source_type=[birth]) or source_type=birthbaptism))
-                            %apply;capitalize(xxx.source).
-                          %elseif;((xxx.has_baptism_note or xxx.has_baptism_source) and (source_type=[birth] or source_type=[baptism]))
-                            <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
-                          %end;
+                      %foreach;xxx.source;
+                        %if;(not xxx.has_baptism_note and ((not xxx.has_baptism_source and source_type=[birth]) or source_type=birthbaptism))
+                          %apply;capitalize(xxx.source).
+                        %elseif;((xxx.has_baptism_note or xxx.has_baptism_source) and (source_type=[birth] or source_type=[baptism]))
+                          <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
                         %end;
                       %end;
                     %end;'
-        title='%if;("yyy"="desc" and (has_birth_source or has_baptism_source or has_birth_note or has_baptism_note))
-                 %if;((has_birth_note or has_baptism_note) and not (has_birth_source or has_baptism_source))[*note/notes]1%nn;
-                 %elseif;(not (has_birth_note or has_baptism_note) and (has_birth_source or has_baptism_source))[*source/sources]1%nn;
-                 %elseif;((has_birth_note or has_baptism_note) and (has_birth_source or has_baptism_source))[*source/sources]1 [and] [source/sources]1%nn;
-                 %end;
-               %elseif;(xxx.has_birth_source or xxx.has_baptism_source or xxx.has_birth_note or xxx.has_baptism_note)
+        title='%if;(xxx.has_birth_source or xxx.has_baptism_source or xxx.has_birth_note or xxx.has_baptism_note)
                  %if;((xxx.has_birth_note or xxx.has_baptism_note) and not (xxx.has_birth_source or xxx.has_baptism_source))[*note/notes]1%nn;
                  %elseif;(not (xxx.has_birth_note or xxx.has_baptism_note) and (xxx.has_birth_source or xxx.has_baptism_source))[*source/sources]1%nn;
                  %elseif;((xxx.has_birth_note or xxx.has_baptism_note) and (xxx.has_birth_source or xxx.has_baptism_source))[*note/notes]1 [and] [source/sources]1%nn;
@@ -585,18 +533,6 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %end;
 %( Lieu de décès %)
   %if;(evar.death_place="on" and famx=1)
-    %if;("yyy"="desc")
-      <td class='align-middle
-        %if;(evar.ns="on")
-          %if;((has_death_note or has_burial_note) and not
-              (has_death_source or has_burial_source))note
-          %elseif;(not (has_death_note or has_burial_note) and
-              (has_death_source or has_burial_source))source
-          %elseif;((has_death_note or has_burial_note) and
-              (has_death_source or has_burial_source))notesource
-          %end;
-        %end;'
-    %else;
       <td class='align-middle
         %if;(evar.ns="on")
           %if;((xxx.has_death_note or xxx.has_burial_note) and not
@@ -607,55 +543,29 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
               (xxx.has_death_source or xxx.has_burial_source))notesource
           %end;
         %end;'
-    %end;
     %rowspan;
     %if;(evar.ns="on")
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
-      data-content='%if;("yyy"="desc" and (has_death_note or has_burial_note))
-                      %if;(has_death_note)[*death][:] %death_note;%end;
-                      %if;(has_burial_note)[*burial][:] %burial_note;%end;
-                    %elseif;(xxx.has_death_note or xxx.has_burial_note)
+      data-content='%if;(xxx.has_death_note or xxx.has_burial_note)
                       %if;(xxx.has_death_note)%if;(xxx.has_burial_note)[*death][:] %end;%xxx.death_note;%end;
                       %if;(xxx.has_burial_note)[*burial][:] %xxx.burial_note;%end;
                     %end;
-                    %if;(("yyy"="desc" and (has_death_source or has_burial_source))
-                          or (xxx.has_death_source or xxx.has_burial_source))
-                      %if;(("yyy"="desc" and (has_death_note or has_burial_note))
-                          or (xxx.has_death_note or xxx.has_burial_note))<hr>
-                      %end;
+                    %if;(xxx.has_death_source or xxx.has_burial_source)
+                      %if;(xxx.has_death_note or xxx.has_burial_note)<hr>%end;
                       %let;deathburial;[death], [burial]%in;
-                      %if;("yyy"="desc")
-                        %foreach;source;
-                          %if;(not has_burial_note and ((not has_burial_source and source_type=[death]) or source_type=deathburial))
-                            %apply;capitalize(source).
-                          %elseif;((has_burial_note or has_burial_source) and (source_type=[death] or source_type=[burial]))
-                            %if;(source_type=[burial] and is_cremated)
-                               <li>%apply;capitalize([cremation])[:] %source;.</li>
-                            %else;
-                              <li>%apply;capitalize(source_type)[:] %source;.</li>
-                            %end;
-                          %end;
-                        %end;
-                      %else;
-                        %foreach;xxx.source;
-                          %if;(not xxx.has_burial_note and ((not xxx.has_burial_source and source_type=[death]) or source_type=deathburial))
-                            %apply;capitalize(xxx.source).
-                          %elseif;((xxx.has_burial_note or xxx.has_burial_source) and (source_type=[death] or source_type=[burial]))
-                            %if;(source_type=[burial] and xxx.is_cremated)
-                               <li>%apply;capitalize([cremation])[:] %xxx.source;.</li>
-                            %else;
-                              <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
-                            %end;
+                      %foreach;xxx.source;
+                        %if;(not xxx.has_burial_note and ((not xxx.has_burial_source and source_type=[death]) or source_type=deathburial))
+                          %apply;capitalize(xxx.source).
+                        %elseif;((xxx.has_burial_note or xxx.has_burial_source) and (source_type=[death] or source_type=[burial]))
+                          %if;(source_type=[burial] and xxx.is_cremated)
+                             <li>%apply;capitalize([cremation])[:] %xxx.source;.</li>
+                          %else;
+                            <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
                           %end;
                         %end;
                       %end;
                     %end;'
-        title='%if;("yyy"="desc" and (has_death_source or has_burial_source or has_death_note or has_burial_note))
-                 %if;((has_death_note or has_burial_note) and not (has_death_source or has_burial_source))[*note/notes]1
-                 %elseif;(not (has_death_note or has_burial_note) and (has_death_source or has_burial_source))[*source/sources]1
-                 %elseif;((has_death_note or has_burial_note) and (has_death_source or has_burial_source))[*note/notes]1 [and] [source/sources]1
-                 %end;
-               %elseif;(xxx.has_death_source or xxx.has_burial_source or xxx.has_death_note or xxx.has_burial_note)
+        title='%if;(xxx.has_death_source or xxx.has_burial_source or xxx.has_death_note or xxx.has_burial_note)
                   %if;((xxx.has_death_note or xxx.has_burial_note) and not (xxx.has_death_source or xxx.has_burial_source))[*note/notes]1
                   %elseif;(not (xxx.has_death_note or xxx.has_burial_note) and (xxx.has_death_source or xxx.has_burial_source))[*source/sources]1
                   %elseif;((xxx.has_death_note or xxx.has_burial_note) and (xxx.has_death_source or xxx.has_burial_source))[*note/notes]1 [and] [source/sources]1
