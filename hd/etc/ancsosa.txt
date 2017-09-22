@@ -953,7 +953,8 @@
                         %end;
                         %foreach;ancestor.source;
                           %let;birthbaptism;[birth], [baptism]%in;
-                          %if;(not ancestor.has_baptism_note and ((not ancestor.has_baptism_source and source_type=[birth]) or source_type=birthbaptism))
+                          %let;birthdeath;[birth], [death]%in;
+                          %if;(not ancestor.has_baptism_note and ((not ancestor.has_baptism_source and source_type=[birth]) or source_type=birthbaptism or source_type=birthdeath))
                             %apply;capitalize(ancestor.source).
                           %elseif;((ancestor.has_baptism_note or ancestor.has_baptism_source) and (source_type=[birth] or source_type=[baptism]))
                             <li>%apply;capitalize(source_type)[:] %ancestor.source;.</li>
@@ -1096,7 +1097,8 @@
                         %end;
                         %foreach;ancestor.source;
                           %let;deathburial;[death], [burial]%in;
-                          %if;(not ancestor.has_burial_note and ((not ancestor.has_burial_source and source_type=[death]) or source_type=deathburial))
+                          %let;birthdeath;[birth], [death]%in;
+                          %if;(not ancestor.has_burial_note and ((not ancestor.has_burial_source and source_type=[death]) or source_type=deathburial or source_type=birthdeath))
                             %apply;capitalize(ancestor.source).
                           %elseif;((ancestor.has_burial_note or ancestor.has_burial_source) and (source_type=[death] or source_type=[burial]))
                             %if;(source_type=[burial] and ancestor.is_cremated)

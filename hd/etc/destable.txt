@@ -304,8 +304,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                     %if;(xxx.has_birth_source or xxx.has_baptism_source)
                       %if;(xxx.has_birth_note or xxx.has_baptism_note)<hr>%end;
                       %let;birthbaptism;[birth], [baptism]%in;
+                      %let;birthdeath;[birth], [death]%in;
                       %foreach;xxx.source;
-                        %if;(not xxx.has_baptism_note and ((not xxx.has_baptism_source and source_type=[birth]) or source_type=birthbaptism))
+                        %if;(not xxx.has_baptism_note and ((not xxx.has_baptism_source and source_type=[birth]) or source_type=birthbaptism or source_type=birthdeath))
                           %apply;capitalize(xxx.source).
                         %elseif;((xxx.has_baptism_note or xxx.has_baptism_source) and (source_type=[birth] or source_type=[baptism]))
                           <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
@@ -553,8 +554,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                     %if;(xxx.has_death_source or xxx.has_burial_source)
                       %if;(xxx.has_death_note or xxx.has_burial_note)<hr>%end;
                       %let;deathburial;[death], [burial]%in;
+                      %let;birthdeath;[birth], [death]%in;
                       %foreach;xxx.source;
-                        %if;(not xxx.has_burial_note and ((not xxx.has_burial_source and source_type=[death]) or source_type=deathburial))
+                        %if;(not xxx.has_burial_note and ((not xxx.has_burial_source and source_type=[death]) or source_type=deathburial or source_type=birthdeath))
                           %apply;capitalize(xxx.source).
                         %elseif;((xxx.has_burial_note or xxx.has_burial_source) and (source_type=[death] or source_type=[burial]))
                           %if;(source_type=[burial] and xxx.is_cremated)
