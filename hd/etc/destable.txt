@@ -34,21 +34,14 @@
   %end;
 %end;
 
+%if;not cancel_links;
+  %import;menubar;
+%end;
+
 <h1 class="d-inline-block">%nn;
   %if;(evar.v!=0)%apply;a_of_b%with;[*descendants]%and;%self;%end;%else;%self; ([no descendants])%end;
    %if;(cancel_links and evar.v!=0) %apply;togend(evar.v)%end;
 </h1>
-
-%if;not cancel_links;
-  <div class="btn-group float-%right; mt-2 mr-2">
-    %if;(referer != "")
-      <a role="button" class="btn btn-link px-0" href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a role="button" class="btn btn-link ml-1 px-0"
-      href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span>
-    </a>
-  </div>
-%end;
 
 %let;central_index;%index;%in;
 
@@ -619,7 +612,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %if;(evar.ns="on")
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
       data-content='%if;("yyy"="desc" and (has_death_note or has_burial_note))
-                      %if;(has_death_note)%if;(has_burial_note)[*death][:] %end;%death_note;%end;
+                      %if;(has_death_note)[*death][:] %death_note;%end;
                       %if;(has_burial_note)[*burial][:] %burial_note;%end;
                     %elseif;(xxx.has_death_note or xxx.has_burial_note)
                       %if;(xxx.has_death_note)%if;(xxx.has_burial_note)[*death][:] %end;%xxx.death_note;%end;
@@ -636,7 +629,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                           %if;(not has_burial_note and ((not has_burial_source and source_type=[death]) or source_type=deathburial))
                             %apply;capitalize(source).
                           %elseif;((has_burial_note or has_burial_source) and (source_type=[death] or source_type=[burial]))
-                            <li>%apply;capitalize(source_type)[:] %source;.</li>
+                            %if;(source_type=[burial] and is_cremated)
+                               <li>%apply;capitalize([cremation])[:] %source;.</li>
+                            %else;
+                              <li>%apply;capitalize(source_type)[:] %source;.</li>
+                            %end;
                           %end;
                         %end;
                       %else;
@@ -644,7 +641,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                           %if;(not xxx.has_burial_note and ((not xxx.has_burial_source and source_type=[death]) or source_type=deathburial))
                             %apply;capitalize(xxx.source).
                           %elseif;((xxx.has_burial_note or xxx.has_burial_source) and (source_type=[death] or source_type=[burial]))
-                            <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
+                            %if;(source_type=[burial] and xxx.is_cremated)
+                               <li>%apply;capitalize([cremation])[:] %xxx.source;.</li>
+                            %else;
+                              <li>%apply;capitalize(source_type)[:] %xxx.source;.</li>
+                            %end;
                           %end;
                         %end;
                       %end;
