@@ -4163,7 +4163,7 @@ and obsolete_eval conf base env (p, p_auth) loc =
 
 value eval_transl conf env upp s c =
   match c with
-  [ "n" | "s" | "w" ->
+  [ "n" | "s" | "w" | "f" | "c" ->
       let n =
         match c with
         [ "n" ->
@@ -4182,6 +4182,25 @@ value eval_transl conf env upp s c =
             match get_env "fam" env with
             [ Vfam _ fam _ _ ->
                 if Array.length (get_witnesses fam) = 1 then 0 else 1
+            | _ -> 0 ]
+        | "f" ->
+            match get_env "p" env with
+            [ Vind p ->
+                if Array.length (get_family p) <= 1 then 0 else 1
+            | _ -> 0 ]
+        | "c" ->
+            match get_env "fam" env with
+            [ Vfam _ fam _ _ ->
+                if Array.length (get_children fam) <= 1 then 0 else 1
+            (* le paramètre base n'est pas défini dans ce contexte, dommage
+            | _ ->
+                let n =
+                  List.fold_left
+                    (fun n ifam ->
+                      n + Array.length (get_children (foi base ifam)))
+                    0 (Array.to_list (get_family p))
+                in
+                if n <= 1 then 0 else 1 *)
             | _ -> 0 ]
         | _ -> assert False ]
       in
