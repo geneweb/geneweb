@@ -4161,7 +4161,7 @@ and obsolete_eval conf base env (p, p_auth) loc =
   | _ -> raise Not_found ]
 ;
 
-value eval_transl conf env upp s c =
+value eval_transl_b conf base env upp s c =
   match c with
   [ "n" | "s" | "w" | "f" | "c" ->
       let n =
@@ -4181,7 +4181,7 @@ value eval_transl conf env upp s c =
         | "w" ->
             match get_env "fam" env with
             [ Vfam _ fam _ _ ->
-                if Array.length (get_witnesses fam) = 1 then 0 else 1
+                if Array.length (get_witnesses fam) <= 1 then 0 else 1
             | _ -> 0 ]
         | "f" ->
             match get_env "p" env with
@@ -4192,15 +4192,17 @@ value eval_transl conf env upp s c =
             match get_env "fam" env with
             [ Vfam _ fam _ _ ->
                 if Array.length (get_children fam) <= 1 then 0 else 1
-            (* le paramètre base n'est pas défini dans ce contexte, dommage
             | _ ->
-                let n =
-                  List.fold_left
-                    (fun n ifam ->
-                      n + Array.length (get_children (foi base ifam)))
-                    0 (Array.to_list (get_family p))
-                in
-                if n <= 1 then 0 else 1 *)
+                match get_env "p" env with
+                [ Vind p ->
+                  let n =
+                    List.fold_left
+                      (fun n ifam ->
+                        n + Array.length (get_children (foi base ifam)))
+                      0 (Array.to_list (get_family p))
+                  in
+                  if n <= 1 then 0 else 1
+                | _ -> 0 ]
             | _ -> 0 ]
         | _ -> assert False ]
       in
@@ -5336,7 +5338,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     else
       Hutil.interp_no_header conf templ_fname
         {Templ.eval_var = eval_var conf base;
-         Templ.eval_transl = eval_transl conf;
+         Templ.eval_transl = eval_transl_b conf base;
          Templ.eval_predefined_apply = eval_predefined_apply conf;
          Templ.get_vother = get_vother; Templ.set_vother = set_vother;
          Templ.print_foreach = print_foreach conf base}
@@ -5344,7 +5346,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
   else
     Hutil.interp conf templ_fname
       {Templ.eval_var = eval_var conf base;
-       Templ.eval_transl = eval_transl conf;
+       Templ.eval_transl = eval_transl_b conf base;
        Templ.eval_predefined_apply = eval_predefined_apply conf;
        Templ.get_vother = get_vother; Templ.set_vother = set_vother;
        Templ.print_foreach = print_foreach conf base}
