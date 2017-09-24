@@ -1,19 +1,7 @@
-.fixed_top_btn {
-  position: fixed;
-  top: 0px;
-  transform: translateX(8px);
-}
-
-div.anchor_upd {
+div.anchor_updind {
   position:absolute;
-  top:-34px;
+  top:-25px;
 }
-
-/* hide placeholder on input focus */
-input:focus::-webkit-input-placeholder { color:transparent; }
-input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
-input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
-input:focus:-ms-input-placeholder { color:transparent; }
 
 /* Capitalization unavailable in note from Ocaml 
 > temporary disactivated: too intrusive for notes in popovers, but needed for note in timeline...
@@ -43,9 +31,9 @@ img.image-popover {
 .p_mod-dropdown-menu-wizard {
   padding: 0px;
   border: 0px;
-  left: 25%;
+  left: 20%;
   right: auto;
-  transform: translateX(-25%);
+  transform: translateX(-20%);
 }
 
 div.p_mod_builder {
