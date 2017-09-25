@@ -116,8 +116,3 @@
     </script>
   %end;
 %end;
-%( todo/add:
-*search all sosa with m=S&n=%index;&p= Sosa >15?
-*manage edit/delete/sort of fam_>1 => ajouter simplement une touche modfam2/3 comme sur templm?
-*manage edit/delete spou_>1
-*manage all children%)

@@ -29,7 +29,7 @@
 ║  2A  ║xxxx│LONG│RELA│AIMG│FAM2│FAM3│PSIB│NSIB│    │SORT│ MRG║     36     ║ SIND/FAM devraient être sur MIND/FAM comme templm (fctionne avec i=)
 ╠══════╩╦═══╧══╦═╧═══╦╧════╧════╧════╧════╧════╧═╦══╧══╦═╧════╬═════╦══════╣ M/AFAM fctionnent avec i=… ;(
 ║       ║      ║     ║                           ║     ║      ║     ║      ║
-║  1D   ║ E01F ║ 38  ║          39               ║E038 ║ E027 ║ E02F║ E01D ║ TODO = add QWERTZ and NEO for Deutsch
+║  1D   ║ E01F ║ 38  ║          39               ║E038 ║ E027 ║ E02F║ E01D ║
 ╚═══════╩══════╩═════╩═══════════════════════════╩═════╩══════╩═════╩══════╝%)
 %(defaut keyboard = qwerty-us, alternative : colemak dvorak azerty bepo %)
 %let;colemak;%if;(bvar.keyboard="colemak")1%else;0%end;%in;
