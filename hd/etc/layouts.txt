@@ -46,9 +46,9 @@
 %(06%)%let;;%if;(azerty=1)(%elseif;(bepo=1))%else;5%end;%in;
 %(07%)%let;top;%if;(azerty=1)-%elseif;(bepo=1)@%else;6%end;%in;
 %(08%)%let;;%if;(azerty=1)è%elseif;(bepo=1)+%else;7%end;%in;
-%(09%)%let;;%if;(azerty=1)_%elseif;(bepo=1)-%else;8%end;%in;
-%(0A%)%let;;%if;(azerty=1)ç%elseif;(bepo=1)/%else;9%end;%in;
-%(0B%)%let;;%if;(azerty=1)à%elseif;(bepo=1)*%else;0%end;%in;
+%(09%)%let;8;%if;(azerty=1)_%elseif;(bepo=1)-%else;8%end;%in;
+%(0A%)%let;9;%if;(azerty=1)ç%elseif;(bepo=1)/%else;9%end;%in;
+%(0B%)%let;0;%if;(azerty=1)à%elseif;(bepo=1)*%else;0%end;%in;
 %(0C%)%let;;%if;(dvorak=1)%[%elseif;(azerty=1)%%elseif;(bepo=1)=%else;-%end;%in;
 %(upper_row%)
 %(10%)%let;tree;%if;(dvorak=1)?%elseif;(azerty=1)a%elseif;(bepo=1)b%else;q%end;%in;

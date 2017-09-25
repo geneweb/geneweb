@@ -14,7 +14,7 @@
   %apply;key%with;'%lnkd;'%and;s1%and;linked%end;
   %apply;key%with;'%afam;'%and;add_fam%and;url%end;
   %apply;key%with;'%rela;'%and;search_relation%and;url%end;
-  %apply;key%with;'%xref; %xref;', '%xref; space'%and;%if;(not browsing_with_sosa_ref or sosa_ref.index!=index)nav_sosaref%elseif;(browsing_with_sosa_ref)cancel_sosaref%end;%and;url%end;
+  %apply;key%with;'%xref;'%and;%if;(not browsing_with_sosa_ref or sosa_ref.index!=index)nav_sosaref%elseif;(browsing_with_sosa_ref)cancel_sosaref%end;%and;url%end;
   %apply;key%with;'%search;'%and;search_modal%and;click%end;
   %apply;key%with;'%psib;'%and;previous_sibling%and;url%end;
   %apply;key%with;'%nsib;'%and;next_sibling%and;url%end;

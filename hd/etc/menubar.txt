@@ -290,7 +290,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         <a role="button" id="cancel_links" class="btn btn-link ml-1 px-0" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg" title="[*cancel GeneWeb links]"></i></a>%nn;
       %end;
       %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
-        <a role="button" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;;%suffix;" %laS; title="%apply;nav_with_sosa_ref(self)">
+        <a role="button" id="nav_sosaref" class="btn btn-link ml-1 px-0 %sexcolor;" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;;%suffix;" %laS; title="%apply;nav_with_sosa_ref(self)">
           <i class="fa fa-dot-circle-o fa-lg %sexcolor;"></i>
         </a>%nn;
       %else;

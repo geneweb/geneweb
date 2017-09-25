@@ -79,16 +79,16 @@
       %import;layouts;
       %apply;key%with;'%mind; %mind;', '%mind; space'%and;s1%and;modind%end;
       %apply;key%with;'%mind; %sref;'%and;sosaref%and;modind%end;
-      %apply;key%with;'%aimg; %aimg;, %aimg; space'%and;s1%and;snd_image%end;
+      %apply;key%with;'%aimg; %aimg;', '%aimg; space'%and;s1%and;snd_image%end;
       %apply;key%with;'%aimg; %sref;'%and;sosaref%and;snd_image%end;
    %( %apply;key%with;'%mfam; %mfam;', '%mfam; space'%and;mod_fam_1%and;url%end; %)
       %apply;key%with;'%mfam; %mfam;', '%mfam; space'%and;s1%and;modfam1%end;
-   %(  %apply;key%with;'%mind; backspace'%and;s1%and;delind%end;
-      %apply;key%with;'%mfam; backspace'%and;s1%and;delfam1%end;%)
+      %apply;key%with;'%mind; backspace'%and;s1%and;delind%end;
+      %apply;key%with;'%mfam; backspace'%and;s1%and;delfam1%end;
       %apply;key%with;'%mind; %sort;'%and;s1%and;sortind%end;
       %apply;key%with;'%mfam; %sort;'%and;s1%and;sortfam1%end;
       %apply;key%with;'%mrg;'%and;s1%and;merge%end;
-%(    %foreach;ancestor_level;
+      %foreach;ancestor_level;
         %foreach;ancestor;
           %if;(level<5)
             %let;s;%ancestor.anc_sosa;%in;
@@ -111,7 +111,7 @@
             %end;
           %end;
         %end;
-      %end;%nn;%)
+      %end;%nn;
       %import;shortcuts;
     </script>
   %end;
