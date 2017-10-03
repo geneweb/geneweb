@@ -7,6 +7,58 @@
 %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 
+%define;rebuild_url_hg(vvv)
+  %let;new_url;%prefix;%nn;
+  %access;;%nn;
+  %if;(evar.num="on")
+    num=on;%nn;
+  %end;
+  %if;(evar.nowrap="on")
+    nowrap=on;%nn;
+  %end;
+  %if;(evar.title="on")
+    title=on;%nn;
+  %end;
+  %if;(evar.birth="on")
+    birth=on;%nn;
+  %end;
+  %if;(evar.birth_place="on")
+    birth_place=on;%nn;
+  %end;
+  %if;(evar.marr= "on")
+    marr=on;%nn;
+  %end;
+  %if;(evar.marr_date="on")
+    marr_date=on;%nn;
+  %end;
+  %if;(evar.marr_place="on")
+    marr_place=on;%nn;
+  %end;
+  %if;(evar.child="on")
+    child=on;%nn;
+  %end;
+  %if;(evar.death="on")
+    death=on;%nn;
+  %end;
+  %if;(evar.death_place="on")
+    death_place=on;%nn;
+  %end;
+  %if;(evar.age="on")
+    age=on;%nn;
+  %end;
+  %if;(evar.occu="on")
+    occu=on;%nn;
+  %end;
+  %if;(evar.gen="on")
+    gen=on;%nn;
+  %end;
+  %if;(evar.cgl="on")
+    cgl=on;%nn;
+  %end;
+  fam=vvv;%in;
+  %new_url;
+%end;
+
 %define;link(xxx,zzz)
   %if;(not cancel_links)<a href="%prefix;m=zzz;v=%sq;
     %if;("xxx"=first_name)%first_name_key;%sq;
@@ -16,6 +68,35 @@
     %end;">%sq;
   %end;xxx%if;(not cancel_links)</a>%end;
 %end;
+
+%define;short_display_person_image(xxx,yyy)
+  <div class="media">
+  %if;(evar.images="on" and ("yyy"="yes" or "yyy"="force"))
+    <div class="media-left">
+    %if;xxx.has_image;
+      <a href="%xxx.image_url;" class="align-self-center" target="_blank">
+        <img class="small_image rounded ml-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
+      </a>
+    %elseif;(bvar.default_image="yes")
+      <img class="small_image align-self-center rounded ml-0" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"%/>
+    %else;
+      <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-0 pb-2">?</span>
+    %end;
+  </div>
+  %end;
+  <div class="media-body">
+  %apply;image_MF("xxx")
+  %apply;display_sosa("xxx")
+  %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;
+    %if;(cancel_links or xxx.is_restricted)%xxx;
+    %else;<a href="%xxx.bname_prefix;%xxx.access;">%xxx;</a>%nn;
+    %end;
+  %end;
+  %xxx.title; %xxx.dates;</span>%nn;
+  </div>
+  </div>
+%end;
+
 
 %define;detailed_names()
   %if;(has_qualifiers or has_aliases or has_nobility_titles or
@@ -148,6 +229,8 @@
 %end;
 
 %if;(evar.m!="MOD_IND")
+  <div class="row">
+  <div class="col">
   <h1 class="%if;(p_mod="" or p_mod="zz")col-12%end; %if;(op_m=2)text-center%end; text-xs-center text-md-left">
     %if;has_public_name;
       %if;has_qualifiers;%public_name; <em>%qualifier;</em>
@@ -165,6 +248,20 @@
     <br class="d-none d-sm-none">
     <span class="text-muted small mb-1">%dates;%(%birth_date.year;-%death_date.year; no italic?%)</span>
   </h1>
+  </div>
+  %let;evfam;%if;(evar.fam="")1%else;%evar.fam;%end;%in;
+  <div class="col text-right">
+    <div class="input-group mb-1">
+      <span class="input-group-btn">
+        <a href="%apply;rebuild_url_hg%with;%expr(evfam-1)%end" class="btn btn-outline-secondary" >-</a>
+      </span>
+      <input class="form-control text-center" value="Familles" disabled>
+      <span class="input-group-btn">
+        <a href="%apply;rebuild_url_hg%with;%expr(evfam+1)%end" class="btn btn-outline-secondary">+</a>
+      </span>
+    </div>
+  </div>
+  </div>
   %if;(op_m!=3)
     %apply;sosa()
   %end;
@@ -179,6 +276,195 @@
         </div>
         %apply;etat_civil()
       </div>
+    </div>
+  %elseif;(op_m=4)
+    %let;fam_cnt;%evar.fam;%in;
+    
+    <div class="container">
+      <div class="row">
+        <div class="col border rounded mr-1 border-dark">
+        %if;(has_parents)
+          %if;(father.has_parents)
+            %apply;short_display_person_image("father.father", "no")<br>
+            %apply;short_display_person_image("father.mother", "no")
+          %else; ?<br>?
+          %end;
+        %else; ?<br>?
+        %end
+        </div>
+
+        <div class="col border rounded ml-1 mr-1 border-dark">
+        %if;(has_parents)
+          %if;(mother.has_parents)
+            %apply;short_display_person_image("mother.father", "no")<br>
+            %apply;short_display_person_image("mother.mother", "no")
+          %else; ?<br>?
+          %end;
+        %else; ?<br>?
+        %end
+        </div>
+
+        <div class="col border rounded ml-1 mr-1 border-dark">
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+            %if;(spouse!="")
+              %if;(spouse.father.has_parents)
+                %apply;short_display_person_image("spouse.father.father", "no")<br>
+                %apply;short_display_person_image("spouse.father.mother", "no")
+              %end;
+            %end;
+          %end;
+        %end;
+        </div>
+
+        <div class="col border rounded ml-1 border-dark">
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+            %if;(spouse!="")
+              %if;(spouse.mother.has_parents)
+                %apply;short_display_person_image("spouse.mother.father", "no")<br>
+                %apply;short_display_person_image("spouse.mother.mother", "no")
+              %end;
+            %end;
+          %end;
+        %end;
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col" style="text-align:center">
+        |
+        </div>
+        <div class="col" style="text-align:center">
+        |
+        </div>
+        <div class="col" style="text-align:center">
+        |
+        </div>
+        <div class="col" style="text-align:center">
+        |
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col border rounded mr-1 border-dark">
+        %if;(has_parents)
+          %apply;short_display_person_image("father", "yes")
+        %else; ?<br>?
+        %end
+        </div>
+        <div class="col border rounded ml-1 mr-1 border-dark">
+
+        %if;(has_parents)
+          %apply;short_display_person_image("mother", "yes")
+        %else; ?<br>?
+        %end
+        </div>
+
+        <div class="col border rounded ml-1 mr-1 border-dark">
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+            %if;(spouse!="")
+              %if;(spouse.has_parents)
+                %apply;short_display_person_image("spouse.father", "yes")
+              %end;
+            %end;
+          %end;
+        %end;
+        </div>
+
+        <div class="col border rounded ml-1 border-dark">
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+            %if;(spouse!="")
+              %if;(spouse.has_parents)
+                %apply;short_display_person_image("spouse.mother", "yes")
+              %end;
+            %end;
+          %end;
+        %end;
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col" style="text-align:center">
+        |
+        </div>
+        <div class="col" style="text-align:center">
+        |
+        </div>
+      </div>
+
+      %foreach;family;
+        <div class="row">
+          <div class="col border rounded mr-1 border-dark">
+            %apply;short_display_person_image("self", "force")
+          </div>
+          <div class="col border rounded ml-1 border-dark">
+            %if;(family_cnt=fam_cnt)
+              %if;(spouse!="")
+                %apply;short_display_person_image("spouse", "yes")
+              %end;
+            %else;
+              <a href="%apply;rebuild_url_hg%with;%family_cnt;%end">%spouse;</a>
+            %end;
+          </div>
+       </div>
+     %end;
+
+      <div class="row">
+        <div class="col" style="text-align:center">
+        |
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+        %if;(has_parents)
+          %foreach;father.family;
+            <div class="border rounded border-dark %if;(family_cnt>1)mt-3%end; mb-2">
+            %if;(family_cnt=1)Frères et soeurs%else;1/2 frères et soeurs avec %father.spouse;%end;
+            </div>
+            %foreach;child;
+              <div class="border rounded border-dark">
+                %apply;short_display_person_image("child", "yes")
+              </div>
+            %end;
+          %end;
+        %end;
+        </div>
+        <div class="col">
+        <div class="border rounded border-dark  %if;(family_cnt>1)mt-3%end; mb-2">
+        Enfants
+        </div>
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+            %foreach;child
+              <div class="border rounded border-dark">
+                %apply;short_display_person_image("child", "yes")
+              </div>
+            %end;
+          %end;
+        %end;
+        </div>
+        <div class="col">
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+          %foreach;spouse.father.family;
+            <div class="border rounded border-dark %if;(family_cnt>1)mt-3%end; mb-2">
+            %if;(family_cnt=1)Frères et soeurs%else;1/2 frères et soeurs with %spouse;%end;
+            </div>
+            %foreach;child;
+              <div class="border rounded border-dark">
+                %apply;short_display_person_image("child", "yes")
+              </div>
+            %end;
+          %end;
+          %end;
+        %end;
+        </div>
+      </div>
+
     </div>
   %else;
     %apply;portrait()
