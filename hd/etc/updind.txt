@@ -248,7 +248,7 @@ function changeCalendar(e,v,m,c) {
 
 %define;date(xlab,xvar,xdt,xcond)
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" xcond%in;
-  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC)" size="1" maxlength="2" xcond%in;
+  %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" xcond%in;
   %let;year_input;pattern="[?><~/]?-?\d*/?" size="4" maxlength="8" xcond%in;
   <div class="row justify-content-sm-between justify-content-md-start">
     <div class="col-sm-1 col-md-2 col-form-label">
