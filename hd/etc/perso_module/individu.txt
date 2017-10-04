@@ -70,33 +70,31 @@
 %end;
 
 %define;short_display_person_image(xxx,yyy)
-  <div class="media">
-  %if;(evar.images="on" and ("yyy"="yes" or "yyy"="force"))
-    <div class="media-left">
-    %if;xxx.has_image;
-      <a href="%xxx.image_url;" class="align-self-center" target="_blank">
-        <img class="small_image rounded ml-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
-      </a>
-    %elseif;(bvar.default_image="yes")
-      <img class="small_image align-self-center rounded ml-0" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"%/>
-    %else;
-      <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-0 pb-2">?</span>
-    %end;
-  </div>
-  %end;
-  <div class="media-body">
-  %apply;image_MF("xxx")
-  %apply;display_sosa("xxx")
-  %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;
-    %if;(cancel_links or xxx.is_restricted)%xxx;
-    %else;<a href="%xxx.bname_prefix;%xxx.access;">%xxx;</a>%nn;
-    %end;
-  %end;
-  %xxx.title; %xxx.dates;</span>%nn;
-  </div>
-  </div>
+  
+  <a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;%xxx.access;"%end;
+    class="list-group-item flex-column align-items-start pl-0 pr-2 py-0
+      list-group-item-%if;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end;">
+    <div class="d-flex w-100 justify-content-start">
+      %if;(evar.images="on" and ("yyy"="yes" or "yyy"="force"))
+        %if;xxx.has_image;
+          %(<a href="%xxx.image_url;" class="align-self-center" target="_blank">%)
+            <img class="small_image align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
+          %(</a>%)
+        %elseif;(bvar.default_image="yes")
+          <img class="small_image align-self-center rounded ml-0" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"%/>
+        %else;
+          <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-0 pb-2">?</span>
+        %end;
+      %end;
+      <span class="align-self-center ml-2">
+        %apply;display_sosa("xxx")
+        %(%apply;image_MF("xxx")%)
+        %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;%xxx;%end;
+        %xxx.title; %xxx.dates;
+      </span>
+    </div>
+  </a>
 %end;
-
 
 %define;detailed_names()
   %if;(has_qualifiers or has_aliases or has_nobility_titles or
@@ -228,6 +226,10 @@
   %end;
 %end;
 
+%define;border()
+  <div class="w-50 h-100 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
+%end;
+
 %if;(evar.m!="MOD_IND")
   <div class="row">
   <div class="col">
@@ -250,7 +252,7 @@
   </h1>
   </div>
   %let;evfam;%if;(evar.fam="")1%else;%evar.fam;%end;%in;
-  <div class="col text-right">
+  <div class="col-2 text-right mr-2">
     <div class="input-group mb-1">
       <span class="input-group-btn">
         <a href="%apply;rebuild_url_hg%with;%expr(evfam-1)%end" class="btn btn-outline-secondary" >-</a>
@@ -278,129 +280,98 @@
       </div>
     </div>
   %elseif;(op_m=4)
-    %let;fam_cnt;%evar.fam;%in;
-    
-    <div class="container">
-      <div class="row">
-        <div class="col border rounded mr-1 border-dark">
+    %let;fam_cnt;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
+    <div class="row">
+      <div class="d-flex align-items-end w-50">
         %if;(has_parents)
-          %if;(father.has_parents)
-            %apply;short_display_person_image("father.father", "no")<br>
-            %apply;short_display_person_image("father.mother", "no")
-          %else; ?<br>?
-          %end;
-        %else; ?<br>?
-        %end
-        </div>
-
-        <div class="col border rounded ml-1 mr-1 border-dark">
-        %if;(has_parents)
-          %if;(mother.has_parents)
-            %apply;short_display_person_image("mother.father", "no")<br>
-            %apply;short_display_person_image("mother.mother", "no")
-          %else; ?<br>?
-          %end;
-        %else; ?<br>?
-        %end
-        </div>
-
-        <div class="col border rounded ml-1 mr-1 border-dark">
-        %foreach;family;
-          %if;(family_cnt=fam_cnt)
-            %if;(spouse!="")
-              %if;(spouse.father.has_parents)
-                %apply;short_display_person_image("spouse.father.father", "no")<br>
-                %apply;short_display_person_image("spouse.father.mother", "no")
+          <div class="d-flex flex-column">
+            <div class="d-flex align-items-stretch">
+              %if;father.has_parents;
+                <div class="d-flex flex-column w-50">
+                  <div class="list-group px-1">
+                   %apply;short_display_person_image("father.father", "no")
+                    %apply;short_display_person_image("father.mother", "no")
+                  </div>
+                  %apply;border()
+                </div>
+              %else; bouton create father.parent (#todo#)
               %end;
-            %end;
-          %end;
-        %end;
-        </div>
-
-        <div class="col border rounded ml-1 border-dark">
-        %foreach;family;
-          %if;(family_cnt=fam_cnt)
-            %if;(spouse!="")
-              %if;(spouse.mother.has_parents)
-                %apply;short_display_person_image("spouse.mother.father", "no")<br>
-                %apply;short_display_person_image("spouse.mother.mother", "no")
+              %if;mother.has_parents;
+                <div class="d-flex flex-column w-50">
+                  <div class="list-group px-2">
+                    %apply;short_display_person_image("mother.father", "no")
+                    %apply;short_display_person_image("mother.mother", "no")
+                  </div>
+                  %apply;border()
+                </div>
+              %else; bouton create mother.parent (#todo#)
               %end;
-            %end;
-          %end;
-        %end;
-        </div>
-
-      </div>
-      <div class="row">
-        <div class="col" style="text-align:center">
-        |
-        </div>
-        <div class="col" style="text-align:center">
-        |
-        </div>
-        <div class="col" style="text-align:center">
-        |
-        </div>
-        <div class="col" style="text-align:center">
-        |
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col border rounded mr-1 border-dark">
-        %if;(has_parents)
-          %apply;short_display_person_image("father", "yes")
-        %else; ?<br>?
-        %end
-        </div>
-        <div class="col border rounded ml-1 mr-1 border-dark">
-
-        %if;(has_parents)
-          %apply;short_display_person_image("mother", "yes")
-        %else; ?<br>?
-        %end
-        </div>
-
-        <div class="col border rounded ml-1 mr-1 border-dark">
-        %foreach;family;
-          %if;(family_cnt=fam_cnt)
-            %if;(spouse!="")
-              %if;(spouse.has_parents)
-                %apply;short_display_person_image("spouse.father", "yes")
-              %end;
-            %end;
-          %end;
-        %end;
-        </div>
-
-        <div class="col border rounded ml-1 border-dark">
-        %foreach;family;
-          %if;(family_cnt=fam_cnt)
-            %if;(spouse!="")
-              %if;(spouse.has_parents)
-                %apply;short_display_person_image("spouse.mother", "yes")
-              %end;
-            %end;
-          %end;
-        %end;
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col" style="text-align:center">
-        |
-        </div>
-        <div class="col" style="text-align:center">
-        |
-        </div>
-      </div>
-
-      %foreach;family;
-        <div class="row">
-          <div class="col border rounded mr-1 border-dark">
-            %apply;short_display_person_image("self", "force")
+            </div>
+            <div class="d-flex flex-column h-100">
+              <div class="d-flex">
+                <div class="list-group pl-1 w-50">
+                  %apply;short_display_person_image("father", "yes")
+                </div>
+                <div class="list-group pr-1 w-50">
+                  %apply;short_display_person_image("mother", "yes")
+                </div>
+              </div>
+              %apply;border()
+            </div>
           </div>
-          <div class="col border rounded ml-1 border-dark">
+        %else; bouton create parent (#todo#)
+        %end;
+      </div>
+      <div class="d-flex align-items-end w-50">
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+            %if;(spouse!="" and spouse.has_parents)
+              <div class="d-flex flex-column">
+                <div class="d-flex align-items-stretch">
+                  %if;spouse.father.has_parents;
+                    <div class="d-flex flex-column w-50">
+                      <div class="list-group px-1">
+                        %apply;short_display_person_image("spouse.father.father", "no")
+                        %apply;short_display_person_image("spouse.father.mother", "no")
+                      </div>
+                      %apply;border()
+                    </div>
+                  %else; button create spouse.father.parent (#todo)
+                  %end;
+                  %if;spouse.mother.has_parents;
+                    <div class="d-flex flex-column w-50">
+                      <div class="list-group px-1">
+                        %apply;short_display_person_image("spouse.mother.father", "no")
+                        %apply;short_display_person_image("spouse.mother.mother", "no")
+                      </div>
+                      %apply;border()
+                    </div>
+                  %else; button create spouse.mother.parent (#todo)
+                  %end;
+                </div>
+                <div class="d-flex flex-column">
+                  <div class="d-flex">
+                    <div class="list-group pl-1 w-50">
+                      %apply;short_display_person_image("spouse.father", "yes")
+                    </div>
+                    <div class="list-group pr-1 w-50">
+                      %apply;short_display_person_image("spouse.mother", "yes")
+                    </div>
+                  </div>
+                  %apply;border()
+                </div>
+              </div>
+            %else; bouton create spouse.parents (#todo)
+            %end;
+          %end;
+        %end;
+      </div>
+      <div class="d-flex w-100">
+        <div class="list-group w-50 ml-5">
+          %apply;short_display_person_image("self", "force")
+        </div>
+        %foreach;family;
+          <div class="list-group w-50 mr-5">
             %if;(family_cnt=fam_cnt)
               %if;(spouse!="")
                 %apply;short_display_person_image("spouse", "yes")
@@ -409,62 +380,57 @@
               <a href="%apply;rebuild_url_hg%with;%family_cnt;%end">%spouse;</a>
             %end;
           </div>
-       </div>
-     %end;
-
-      <div class="row">
-        <div class="col" style="text-align:center">
-        |
-        </div>
+        %end;
       </div>
-
-      <div class="row">
-        <div class="col">
+      %apply;border()
+    </div>
+    <div class="row">
+      <div class="col">
         %if;(has_parents)
           %foreach;father.family;
-            <div class="border rounded border-dark %if;(family_cnt>1)mt-3%end; mb-2">
-            %if;(family_cnt=1)Frères et soeurs%else;1/2 frères et soeurs avec %father.spouse;%end;
+            <div class="list-group %if;(family_cnt>1)mt-2%end;">
+            %if;(family_cnt=1)Frères et sœurs%else;½ frères et sœurs avec %father.spouse;%end;
             </div>
             %foreach;child;
-              <div class="border rounded border-dark">
+              <div class="list-group">
                 %apply;short_display_person_image("child", "yes")
               </div>
             %end;
           %end;
         %end;
-        </div>
-        <div class="col">
-        <div class="border rounded border-dark  %if;(family_cnt>1)mt-3%end; mb-2">
-        Enfants
-        </div>
-        %foreach;family;
-          %if;(family_cnt=fam_cnt)
-            %foreach;child
-              <div class="border rounded border-dark">
-                %apply;short_display_person_image("child", "yes")
-              </div>
-            %end;
-          %end;
-        %end;
-        </div>
-        <div class="col">
-        %foreach;family;
-          %if;(family_cnt=fam_cnt)
-          %foreach;spouse.father.family;
-            <div class="border rounded border-dark %if;(family_cnt>1)mt-3%end; mb-2">
-            %if;(family_cnt=1)Frères et soeurs%else;1/2 frères et soeurs with %spouse;%end;
+      </div>
+      
+      <div class="col">
+        <div class="list-group">
+          <div class"list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="%if;(family_cnt>1)mt-3%end; mb-2">[*child/children]1</h5>
+              <small class="align-self-center mr-1">%nb_children;</small>
             </div>
-            %foreach;child;
-              <div class="border rounded border-dark">
+          </div>
+          %foreach;family;
+            %if;(family_cnt=fam_cnt)
+              %foreach;child
                 %apply;short_display_person_image("child", "yes")
-              </div>
+              %end;
             %end;
           %end;
-          %end;
-        %end;
         </div>
       </div>
-
+      <div class="col">
+        %foreach;family;
+          %if;(family_cnt=fam_cnt)
+            %foreach;spouse.father.family;
+              <div class="list-group %if;(family_cnt>1)mt-3%end; mb-2">
+                %if;(family_cnt=1)Frères et soeurs%else;1/2 frères et soeurs with %spouse;%end;
+                %foreach;child;
+                  %apply;short_display_person_image("child", "yes")
+                %end;
+              </div>
+            %end;
+          %end;
+        %end;
+      </div>
     </div>
   %else;
     %apply;portrait()
