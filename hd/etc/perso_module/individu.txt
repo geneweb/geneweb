@@ -7,7 +7,7 @@
 %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 
-%define;rebuild_url_hg(vvv)
+%define;rebuild_url(iii,fff)
   %let;new_url;%prefix;%nn;
   %access;;%nn;
   %if;(evar.num="on")
@@ -55,8 +55,11 @@
   %if;(evar.cgl="on")
     cgl=on;%nn;
   %end;
-  %if;("vvv"="img")
+  %if;("iii"="img")
     image=on;%nn;
+  %end;
+  %if;(fff!="")
+    fam=fff;%nn;
   %end;%in;
   %new_url;
 %end;
@@ -254,21 +257,22 @@
   </h1>
   </div>
   %let;evfam;%if;(evar.fam="")1%else;%evar.fam;%end;%in;
+  %let;evimage;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
   <div class="col-2 text-right mr-2">
     %(<div class="input-group mb-1">
       <span class="input-group-btn">
-        <a href="%apply;rebuild_url_hg%with;%expr(evfam-1)%end" class="btn btn-outline-secondary" >-</a>
+        <a href="%apply;rebuild_url%with;%if;(evar.image="on")img%end;%and;%expr(evfam-1)%end" class="btn btn-outline-secondary" >-</a>
       </span>
       <input class="form-control text-center" value="Familles" disabled>
       <span class="input-group-btn">
-        <a href="%apply;rebuild_url_hg%with;%expr(evfam+1)%end" class="btn btn-outline-secondary">+</a>
+        <a href="%apply;rebuild_url%with;%if;(evar.image="on")img%end;%and;%expr(evfam+1)%end" class="btn btn-outline-secondary">+</a>
       </span>
     </div>%)
         <div class="mx-2">
           %if;(evar.image="on")
-            <a href="%apply;rebuild_url_hg("")" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+           ee <a href="%apply;rebuild_url%with;%and;%if;(evar.fam!="")%evar.fam;%end;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url_hg("img")" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url%with;img%and;%if;(evar.fam!="")%evar.fam;%end;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
   </div>
@@ -392,7 +396,7 @@
                                        %(%if;spouse.is_male)primary
                                        %elseif;(spouse.is_female)danger
                                        %else;dark%end;%)"
-             href="%apply;rebuild_url_hg%with;%evar.image;%end">
+             href="%apply;rebuild_url%with;%if;(evar.image="on")img%end;%and;%if;(family_cnt!="1")%family_cnt;%end;%end;">
              <span class="ml-2">%spouse; (%family_cnt;)</span></a>
              %end;
            %end;
