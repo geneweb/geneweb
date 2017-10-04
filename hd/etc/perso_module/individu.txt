@@ -203,56 +203,52 @@
 
 %if;(evar.m!="MOD_IND")
   <div class="row">
-  <div class="col">
-  <h1 class="%if;(p_mod="" or p_mod="zz")col-12%end; %if;(op_m=2)text-center%end; text-xs-center text-md-left">
-    %if;has_public_name;
-      %if;has_qualifiers;%public_name; <em>%qualifier;</em>
-      %else;%public_name; %surname;%end;
-    %else;
-      %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+    <div class="col">
+    <h1 class="%if;(p_mod="" or p_mod="zz")col-12%end; %if;(op_m=2)text-center%end; text-xs-center text-md-left">
+      %if;has_public_name;
+        %if;has_qualifiers;%public_name; <em>%qualifier;</em>
+        %else;%public_name; %surname;%end;
       %else;
-        %if;cancel_links;%first_name; %surname;
+        %if;has_qualifiers;%first_name; <em>%qualifier;</em>
         %else;
-          <a href="%prefix;m=P;v=%first_name_key;#i%index;">%first_name;</a>
-          <a href="%prefix;m=N;v=%surname_key;#i%index;">%surname;</a>
+          %if;cancel_links;%first_name; %surname;
+          %else;
+            <a href="%prefix;m=P;v=%first_name_key;#i%index;">%first_name;</a>
+            <a href="%prefix;m=N;v=%surname_key;#i%index;">%surname;</a>
+          %end;
         %end;
       %end;
-    %end;
-    <br class="d-none d-sm-none">
-    <span class="text-muted small mb-1">%dates;%(%birth_date.year;-%death_date.year; no italic?%)</span>
-  </h1>
-  </div>
-  %let;evfam;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
-  %let;evimg;%if;(evar.image!="")%evar.image;%end;%in;
-  %let;evsemi;%if;(evar.semi!="")%evar.semi;%end;%in;
-  <div class="col-2 text-right mr-2">
-    %(<div class="input-group mb-1">
-      <span class="input-group-btn">
-        <a href="%apply;rebuild_url%with;%if;(evar.image="on")img%end;%and;%expr(evfam-1)%end" class="btn btn-outline-secondary" >-</a>
-      </span>
-      <input class="form-control text-center" value="Familles" disabled>
-      <span class="input-group-btn">
-        <a href="%apply;rebuild_url%with;%if;(evar.image="on")img%end;%and;%expr(evfam+1)%end" class="btn btn-outline-secondary">+</a>
-      </span>
-    </div>%)
+      <br class="d-none d-sm-none">
+      <span class="text-muted small mb-1">%dates;%(%birth_date.year;-%death_date.year; no italic?%)</span>
+    </h1>
+    </div>
+    %if;(op_m=4)
+      %let;evfam;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
+      %let;evimg;%if;(evar.image!="")%evar.image;%end;%in;
+      %let;evsemi;%if;(evar.semi!="")%evar.semi;%end;%in;
+      <div class="col-2 text-right mr-2">
         <div class="mx-2">
           %if;(evar.image="on")
             <a href="%apply;rebuild_url%with;%and;%evfam;%and;%evsemi;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
             <a href="%apply;rebuild_url%with;on%and;%evfam;%and;%evsemi;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
-        </div>
-        <div class="mx-2">
           %if;(evar.semi="on")
             <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [semi]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
             <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;on%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [semi]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
-  </div>
+      </div>
+      <div class="text-center mb-2 mx-2">
+      %apply;detailed_names()
+      </div>
+    %end;
   </div>
   %if;(op_m!=3)
-    %apply;sosa()
+    <div class="text-center mb-2 mx-2">
+      %apply;sosa()
+    </div>
   %end;
   %if;(p_mod="" or p_mod="zz")<div class="col-12 col-lg-8">%end;
     %if;(op_m=3)
@@ -269,7 +265,7 @@
   %elseif;(op_m=4)
     %let;fam_cnt;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
     <div class="row">
-      <div class="d-flex align-items-end w-50">
+      <div class="col d-flex align-items-end w-50">
         %if;(has_parents)
           <div class="d-flex flex-column">
             <div class="d-flex align-items-end">
@@ -285,7 +281,7 @@
               %end;
               %if;mother.has_parents;
                 <div class="d-flex flex-column w-50">
-                  <div class="list-group px-2">
+                  <div class="list-group px-1">
                     %apply;short_display_person_image("mother.father", "no")
                     %apply;short_display_person_image("mother.mother", "no")
                   </div>
@@ -294,7 +290,7 @@
               %else; bouton create mother.parent (#todo#)
               %end;
             </div>
-            <div class="d-flex flex-column h-100">
+            <div class="d-flex flex-column">
               <div class="d-flex">
                 <div class="list-group pl-1 w-50">
                   %apply;short_display_person_image("father", "yes")
@@ -309,7 +305,7 @@
         %else; bouton create parent (#todo#)
         %end;
       </div>
-      <div class="d-flex align-items-end w-50">
+      <div class="col d-flex align-items-end w-50">
         %foreach;family;
           %if;(family_cnt=fam_cnt)
             %if;(spouse!="" and spouse.has_parents)
@@ -368,7 +364,10 @@
             %if;(spouse!="" and family_cnt!=fam_cnt)
              <a class="list-group-item list-group-item-dark pl-0 pr-2 py-0"
              href="%apply;rebuild_url%with;%if;(evar.image="on")on%end;%and;%family_cnt;%and;%if;(evar.semi="on")on%end;%end;">
-             <span class="ml-2">%spouse; (%family_cnt;)</span></a>
+             <span class="ml-2">(%family_cnt;) %spouse;%sp; 
+             %if;(nb_children>0)(%nb_children; %if;(nb_children>1)[child/children]1%else;[child/children]0%end;)%end;
+             </span>
+             </a>
              %end;
            %end;
         </div>
