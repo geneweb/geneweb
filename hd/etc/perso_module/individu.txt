@@ -55,7 +55,9 @@
   %if;(evar.cgl="on")
     cgl=on;%nn;
   %end;
-  fam=vvv;%in;
+  %if;("vvv"="img")
+    image=on;%nn;
+  %end;%in;
   %new_url;
 %end;
 
@@ -75,7 +77,7 @@
     class="list-group-item flex-column align-items-start pl-0 pr-2 py-0
       list-group-item-%if;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end;">
     <div class="d-flex w-100 justify-content-start">
-      %if;(evar.images="on" and ("yyy"="yes" or "yyy"="force"))
+      %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
         %if;xxx.has_image;
           %(<a href="%xxx.image_url;" class="align-self-center" target="_blank">%)
             <img class="small_image align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
@@ -253,7 +255,7 @@
   </div>
   %let;evfam;%if;(evar.fam="")1%else;%evar.fam;%end;%in;
   <div class="col-2 text-right mr-2">
-    <div class="input-group mb-1">
+    %(<div class="input-group mb-1">
       <span class="input-group-btn">
         <a href="%apply;rebuild_url_hg%with;%expr(evfam-1)%end" class="btn btn-outline-secondary" >-</a>
       </span>
@@ -261,7 +263,14 @@
       <span class="input-group-btn">
         <a href="%apply;rebuild_url_hg%with;%expr(evfam+1)%end" class="btn btn-outline-secondary">+</a>
       </span>
-    </div>
+    </div>%)
+        <div class="mx-2">
+          %if;(evar.image="on")
+            <a href="%apply;rebuild_url_hg("")" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+          %else;
+            <a href="%apply;rebuild_url_hg("img")" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+          %end;
+        </div>
   </div>
   </div>
   %if;(op_m!=3)
@@ -289,8 +298,8 @@
               %if;father.has_parents;
                 <div class="d-flex flex-column w-50">
                   <div class="list-group px-1">
-                   %apply;short_display_person_image("father.father", "no")
-                    %apply;short_display_person_image("father.mother", "no")
+                   %apply;short_display_person_image("father.father", "yes")
+                    %apply;short_display_person_image("father.mother", "yes")
                   </div>
                   %apply;border()
                 </div>
@@ -299,8 +308,8 @@
               %if;mother.has_parents;
                 <div class="d-flex flex-column w-50">
                   <div class="list-group px-2">
-                    %apply;short_display_person_image("mother.father", "no")
-                    %apply;short_display_person_image("mother.mother", "no")
+                    %apply;short_display_person_image("mother.father", "yes")
+                    %apply;short_display_person_image("mother.mother", "yes")
                   </div>
                   %apply;border()
                 </div>
@@ -370,17 +379,24 @@
         <div class="list-group w-50 ml-5">
           %apply;short_display_person_image("self", "force")
         </div>
-        %foreach;family;
-          <div class="list-group w-50 mr-5">
-            %if;(family_cnt=fam_cnt)
-              %if;(spouse!="")
+        <div class="list-group w-50 mr-5">
+          %foreach;family;
+            %if;(spouse!="" and family_cnt=fam_cnt)
                 %apply;short_display_person_image("spouse", "yes")
-              %end;
-            %else;
-              <a href="%apply;rebuild_url_hg%with;%family_cnt;%end">%spouse;</a>
             %end;
-          </div>
-        %end;
+          %end;
+          %foreach;family;
+            %if;(spouse!="" and family_cnt!=fam_cnt)
+             <a class="list-group-item pl-0 pr-2 py-0
+                       list-group-item-dark
+                                       %(%if;spouse.is_male)primary
+                                       %elseif;(spouse.is_female)danger
+                                       %else;dark%end;%)"
+             href="%apply;rebuild_url_hg%with;%evar.image;%end">
+             <span class="ml-2">%spouse; (%family_cnt;)</span></a>
+             %end;
+           %end;
+        </div>
       </div>
       %apply;border()
     </div>
@@ -388,18 +404,19 @@
       <div class="col">
         %if;(has_parents)
           %foreach;father.family;
-            <div class="list-group %if;(family_cnt>1)mt-2%end;">
-            %if;(family_cnt=1)Frères et sœurs%else;½ frères et sœurs avec %father.spouse;%end;
-            </div>
-            %foreach;child;
-              <div class="list-group">
-                %apply;short_display_person_image("child", "yes")
+            <div class="list-group">
+              <div class="d-flex w-100 %if;(family_cnt>1)mt-1%end;">
+              %if;(family_cnt=1)Frères et sœurs%else;½ frères et sœurs avec %father.spouse;%end;
               </div>
-            %end;
+              %foreach;child;
+                %apply;short_display_person_image("child", "yes")
+              %end;
+            </div>
           %end;
         %end;
       </div>
       
+      %( masquer ce bloc si pas d'enfants, afficher le nombre d'enfant par famille pas le total!%)
       <div class="col">
         <div class="list-group">
           <div class"list-group-item">
