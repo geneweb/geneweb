@@ -7,60 +7,27 @@
 %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 
-%define;rebuild_url(iii,fff)
+%define;rebuild_url(iii,fff,sss)
   %let;new_url;%prefix;%nn;
   %access;;%nn;
-  %if;(evar.num="on")
-    num=on;%nn;
-  %end;
-  %if;(evar.nowrap="on")
-    nowrap=on;%nn;
-  %end;
-  %if;(evar.title="on")
-    title=on;%nn;
-  %end;
-  %if;(evar.birth="on")
-    birth=on;%nn;
-  %end;
-  %if;(evar.birth_place="on")
-    birth_place=on;%nn;
-  %end;
-  %if;(evar.marr= "on")
-    marr=on;%nn;
-  %end;
-  %if;(evar.marr_date="on")
-    marr_date=on;%nn;
-  %end;
-  %if;(evar.marr_place="on")
-    marr_place=on;%nn;
-  %end;
-  %if;(evar.child="on")
-    child=on;%nn;
-  %end;
-  %if;(evar.death="on")
-    death=on;%nn;
-  %end;
-  %if;(evar.death_place="on")
-    death_place=on;%nn;
-  %end;
-  %if;(evar.age="on")
-    age=on;%nn;
-  %end;
-  %if;(evar.occu="on")
-    occu=on;%nn;
-  %end;
-  %if;(evar.gen="on")
-    gen=on;%nn;
-  %end;
-  %if;(evar.cgl="on")
-    cgl=on;%nn;
-  %end;
-  %if;("iii"="img")
-    image=on;%nn;
-  %end;
-  %if;(fff!="")
-    fam=fff;%nn;
-  %end;%in;
+  %if;(evar.num="on")num=on;%nn;%end;
+  %if;(evar.nowrap="on")nowrap=on;%nn;%end;
+  %if;(evar.title="on")title=on;%nn;%end;
+  %if;(evar.birth="on")birth=on;%nn;%end;
+  %if;(evar.birth_place="on")birth_place=on;%nn;%end;
+  %if;(evar.marr= "on")marr=on;%nn;%end;
+  %if;(evar.marr_date="on")marr_date=on;%nn;%end;
+  %if;(evar.marr_place="on")marr_place=on;%nn;%end;
+  %if;(evar.child="on")child=on;%nn;%end;
+  %if;(evar.death="on")death=on;%nn;%end;
+  %if;(evar.death_place="on")death_place=on;%nn;%end;
+  %if;(evar.age="on")age=on;%nn;%end;
+  %if;(evar.occu="on")occu=on;%nn;%end;
+  %if;(evar.gen="on")gen=on;%nn;%end;
+  %if;("iii"="on")image=on;%nn;%end;
+  %if;("fff"!="")fam=fff;%nn;%end;
+  %if;("sss"="on")semi=on;%nn;%end;
+  %in;
   %new_url;
 %end;
 
@@ -75,8 +42,7 @@
 %end;
 
 %define;short_display_person_image(xxx,yyy)
-
-  <a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;%xxx.access;%if;(evar.image="on")image=on;%end;"%end;
+  <a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;%xxx.access;;%if;(evar.image="on")image=on;%end;"%end;
     class="list-group-item flex-column align-items-start pl-0 pr-2 py-0
       list-group-item-%if;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end;">
     <div class="d-flex w-100 justify-content-start">
@@ -256,7 +222,9 @@
     <span class="text-muted small mb-1">%dates;%(%birth_date.year;-%death_date.year; no italic?%)</span>
   </h1>
   </div>
-  %let;evfam;%if;(evar.fam="")1%else;%evar.fam;%end;%in;
+  %let;evfam;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
+  %let;evimg;%if;(evar.image!="")%evar.image;%end;%in;
+  %let;evsemi;%if;(evar.semi!="")%evar.semi;%end;%in;
   <div class="col-2 text-right mr-2">
     %(<div class="input-group mb-1">
       <span class="input-group-btn">
@@ -269,9 +237,16 @@
     </div>%)
         <div class="mx-2">
           %if;(evar.image="on")
-            <a href="%apply;rebuild_url%with;%and;%if;(evar.fam!="")%evar.fam;%end;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url%with;%and;%evfam;%and;%evsemi;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url%with;img%and;%if;(evar.fam!="")%evar.fam;%end;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url%with;on%and;%evfam;%and;%evsemi;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+          %end;
+        </div>
+        <div class="mx-2">
+          %if;(evar.semi="on")
+            <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [semi]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+          %else;
+            <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;on%end;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [semi]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
   </div>
@@ -378,11 +353,12 @@
           %end;
         %end;
       </div>
+
       <div class="d-flex justify-content-around w-100">
-        <div class="w-25 list-group mx-4">
+        <div class="w-50 list-group">
           %apply;short_display_person_image("self", "force")
         </div>
-        <div class="w-25 list-group mx-4">
+        <div class="w-50 list-group">
           %foreach;family;
             %if;(spouse!="" and family_cnt=fam_cnt)
                 %apply;short_display_person_image("spouse", "yes")
@@ -391,20 +367,46 @@
           %foreach;family;
             %if;(spouse!="" and family_cnt!=fam_cnt)
              <a class="list-group-item list-group-item-dark pl-0 pr-2 py-0"
-             href="%apply;rebuild_url%with;%if;(evar.image="on")img%end;%and;%if;(family_cnt!="1")%family_cnt;%end;%end;">
+             href="%apply;rebuild_url%with;%if;(evar.image="on")on%end;%and;%family_cnt;%and;%if;(evar.semi="on")on%end;%end;">
              <span class="ml-2">%spouse; (%family_cnt;)</span></a>
              %end;
            %end;
         </div>
       </div>
+
       %apply;border()
     </div>
     <div class="row">
       <div class="col">
         %if;(has_parents)
+          %let;fath;%father.index;%in;
+          %let;moth;%mother.index;%in;
           %foreach;father.family;
             <div class="d-flex w-100 %if;(family_cnt>1)mt-1%end;">
-            %if;(family_cnt=1)Frères et sœurs%else;½ frères et sœurs avec %father.spouse;%end;
+            %if;(father.spouse.index=moth)Frères et sœurs
+            %elseif;(evar.semi="on")½ frères et sœurs (%father.first_name; & %father.spouse;)
+            %end;
+            </div>
+            %if;(father.spouse.index=moth or evar.semi="on")
+              <div class="list-group">
+              %foreach;child;
+                %if;(child.index=central_index)
+                  %(</div>%)
+                  <div class="d-flex justify-content-center">
+                    <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                  </div>
+                  %(<div class="list-group">%)
+                %else;
+                  %apply;short_display_person_image("child", "yes")
+                %end;
+              %end;
+              </div>
+            %end;
+          %end;
+          %foreach;mother.family;
+            %if;(mother.spouse.index!=fath and evar.semi="on")
+            <div class="d-flex w-100 %if;(family_cnt>1)mt-1%end;">
+              ½ frères et sœurs (%mother.first_name; & %mother.spouse;)
             </div>
             <div class="list-group">
               %foreach;child;
@@ -419,6 +421,7 @@
                 %end;
               %end;
             </div>
+            %end;
           %end;
         %end;
       </div>
@@ -441,14 +444,21 @@
           %end;
         </div>
       </div>
-      
+
       <div class="col">
         %foreach;family;
           %if;(family_cnt=fam_cnt)
             %let;selfspouse;%self.spouse;%in;
+            %let;spfath;%self.spouse.father;%in;
+            %let;spfathfn;%self.spouse.father.first_name;%in;
+            %let;spmoth;%self.spouse.mother;%in;
+            %let;spmothfn;%self.spouse.mother.first_name;%in;
             %foreach;spouse.father.family;
-              <div class="list-group %if;(family_cnt>1)mt-3%end; mb-2">
-                %if;(family_cnt=1)Beaux-frères et belles-soeurs%else;½ beaux-frères et belles-soeurs with %spouse;%end;
+              %if;(spouse=spfath or spouse=spmoth)Beaux-frères et belles-soeurs
+              %elseif (evar.semi="on");½ beaux-frères et belles-soeurs (%spfathfn; & %spouse;)
+              %end;
+              %if;(spouse=spfath or spouse=spmoth or evar.semi="on")
+                <div class="list-group %if;(family_cnt>1)mt-3%end; mb-2">
                 %foreach;child;
                   %if;(child=selfspouse)
                     <div class="d-flex justify-content-center">
@@ -458,7 +468,23 @@
                     %apply;short_display_person_image("child", "yes")
                   %end;
                 %end;
-              </div>
+                </div>
+              %end;
+            %end;
+            %foreach;spouse.mother.family;
+                %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")½ beaux-frères et belles-soeurs (%spouse; & %spmothfn;)
+                  <div class="list-group %if;(family_cnt>1)mt-3%end; mb-2">
+                  %foreach;child;
+                    %if;(child=selfspouse)
+                      <div class="d-flex justify-content-center">
+                        <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                      </div>
+                    %else;
+                      %apply;short_display_person_image("child", "yes")
+                    %end;
+                  %end;
+                </div>
+              %end;
             %end;
           %end;
         %end;
