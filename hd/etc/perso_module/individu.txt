@@ -387,7 +387,7 @@
             %end;
             </div>
             %if;(father.spouse.index=moth or evar.semi="on")
-              <div class="list-group">
+              <div class="list-group mb-2">
               %foreach;child;
                 %if;(child.index=central_index)
                   %(</div>%)
@@ -407,7 +407,7 @@
             <div class="d-flex w-100 %if;(family_cnt>1)mt-1%end;">
               ½ frères et sœurs (%mother.first_name; & %mother.spouse;)
             </div>
-            <div class="list-group">
+            <div class="list-group mb-2">
               %foreach;child;
                 %if;(child.index=central_index)
                   %(</div>%)
@@ -457,7 +457,7 @@
               %elseif (evar.semi="on");½ beaux-frères et belles-soeurs (%spfathfn; & %spouse;)
               %end;
               %if;(spouse=spfath or spouse=spmoth or evar.semi="on")
-                <div class="list-group %if;(family_cnt>1)mt-3%end; mb-2">
+                <div class="list-group mb-2">
                 %foreach;child;
                   %if;(child=selfspouse)
                     <div class="d-flex justify-content-center">
@@ -472,7 +472,7 @@
             %end;
             %foreach;spouse.mother.family;
                 %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")½ beaux-frères et belles-soeurs (%spouse; & %spmothfn;)
-                  <div class="list-group %if;(family_cnt>1)mt-3%end; mb-2">
+                  <div class="list-group mb-2">
                   %foreach;child;
                     %if;(child=selfspouse)
                       <div class="d-flex justify-content-center">
