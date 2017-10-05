@@ -24,10 +24,10 @@
 %end;
 %if;(not cancel_links)
   <div class="d-flex justify-content-center">
-    <nav class="navbar navbar-light navbar-expand-md
+    <nav class="navbar navbar-light navbar-expand-md%nn;
       %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
         or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
-        or (evar.ip!="" and (evar.m="ADD_FAM" or evar.m="ADD_FAM_OK")))mt-4%end;" role="navigation">
+        or (evar.ip!="" and (evar.m="ADD_FAM" or evar.m="ADD_FAM_OK"))) mt-4%end;">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -100,7 +100,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                   <div id="p_mod_table"></div>
                 </form>
                 <div class="form-control d-none d-md-block">
-                  <img role="img" src="%image_prefix;/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
+                  <img src="%image_prefix;/menubar_1.jpg" alt="menubar for p_mod_builder" aria-hidden="true">
                   <div id="p_mod_builder">
                     %if;(evar.p_mod="zz")
                       <img src="%image_prefix;/zz_1.jpg" alt="zz_1">
