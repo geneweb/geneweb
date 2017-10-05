@@ -8,7 +8,7 @@
   %for;i;1;30;
     %let;l1;%apply;lang(i)%in;
     %if;(l1!=evar.lang)
-      <a class="dropdown-item" id="lang_%if;(l1!="pt-br")%l1;%else;br%end;"
+      <a class="dropdown-item" id="lang_%l1;"
        href="%prefix_base;%nn;
              %if;(l1!=bvar.default_lang)lang=%l1;;%end;%nn;
              %if;(evar.pz!="")pz=%evar.pz;;%end;%nn;
@@ -103,7 +103,6 @@
           <a href="https://github.com/geneweb/geneweb/commit/%commit;"
             title="GeneWeb %version %apply;compil%with;%compilation_time;%and;%commit;%end; %if;(compilation_time!=commit_date)(%commit_date;)%end;">v.&nbsp;%version;</a>
           &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017%if;(connections!="") %connections;%end;%nn;</span>
-          <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" target="_blank" title="GeneWeb documentation MediaWiki">
           <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb documentation MediaWiki">
           <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb wiki"/></a>
           </div>
