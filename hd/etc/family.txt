@@ -26,7 +26,7 @@
 %let;op_m;4%in;
 
 %define;rebuild_url(iii,fff,sss)
-  %let;new_url;%prefix;%nn;
+  %let;new_url;%prefix;m=F;%nn;
   %access;;%nn;
   %if;(evar.num="on")num=on;%nn;%end;
   %if;(evar.nowrap="on")nowrap=on;%nn;%end;
@@ -60,13 +60,12 @@
 %end;
 
 %define;short_display_person_image(xxx,yyy)
-  %(<a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;%xxx.access;;%if;(evar.image="on")image=on;%end;"%end;%sp;%)
-  <div class="list-group-item flex-column align-items-start pl-0 pr-1 %if;(evar.image="on")py-0%end;%sp;
-      list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end;">
+  <div class="d-flex list-group-item list-group-item-action flex-column align-items-start pl-0 pr-1 %if;(evar.image="on")py-0%end; list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end;">
     <div class="d-flex w-100 justify-content-start">
+      <a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;m=F;%xxx.access;;%if;(evar.image="on")image=on;%end;%if;(evar.fam!="")fam=%evar.fam;;%end;%if;(evar.semi="on")semi=on;%end;"%end; class="big_anchor" ></a>
       %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
         %if;xxx.has_image;
-          <a href="%xxx.image_url;" class="align-self-center" target="_blank">
+          <a href="%xxx.image_url;" class="normal_anchor align-self-center" target="_blank">
             <img class="small_image align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
           </a>
         %elseif;(bvar.default_image="yes")
@@ -79,13 +78,13 @@
         %(%apply;display_sosa("xxx")
           %apply;image_MF("xxx")%)
         %if;(not (cancel_links or xxx.is_restricted))
-        <a href="%prefix_no_pmod;%xxx.access;;%if;(evar.image="on")image=on;;%end;;">%end;
+        <a class="normal_anchor" href="%prefix_no_pmod;%xxx.access;;%if;(evar.image="on")image=on;%end;">%end;
         %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;%xxx;%end;
         %if;(not (cancel_links or xxx.is_restricted))
         </a>
         %end;
         %if;(wizard and not cancel_links)
-          <a href="%prefix;m=MOD_IND;i=%xxx.index;" title="[*modify::] %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
+          <a class="normal_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;" title="[*modify::] %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
         %end;
         <span class="text-nowrap font-italic">%nn;
           %if;(xxx.dates!="")%xxx.dates;%nn;
@@ -94,15 +93,6 @@
           %end;%nn;
         </span>%nn;
         %if;(wizard and not cancel_links)</a>%end;
-      </span>
-      <span class="align-self-right ml-4">
-        %if;(not (cancel_links))
-          <a href="%xxx.bname_prefix;m=F;%xxx.access;;%if;(evar.image="on")image=on;%end;">
-        %end;
-        &nbsp;&nbsp;&nbsp;
-        %if;(not (cancel_links))
-          </a>
-        %end;
       </span>
     </div>
   </div>
@@ -239,7 +229,7 @@
 %end;
 
 %define;border()
-  <div class="w-50 h-100 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
+  <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
 %end;
 
 
@@ -430,15 +420,15 @@
     %( Enfants %)
     <div class="col">
       <div class="d-flex flex-column">
-        <div class="h-25">
+        <div class="">
           %foreach;family;
             %if;(family_cnt=1)
               %if;(spouse!="")
-                <div class="border border-dark border-top-0 border-left-0 border-right-0 h-50">&#8203; </div>
+                <div class="border border-dark border-top-0 border-left-0 border-right-0">&#8203; </div>
               %end;
               %if;has_children;
                 %foreach;family;
-                  <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50 h-50">&#8203;</div>
+                  <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;</div>
                 %end;
               %end;
             %end;

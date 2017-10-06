@@ -4,6 +4,21 @@
   -ms-user-select: none;
 }
 
+.big_anchor {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.normal_anchor {
+  position: relative;
+  z-index: 1;
+}
+
 .fixed_top_btn_col {
   position: fixed;
   top: 0px;
@@ -17,7 +32,6 @@
 
 div.anchor_upd {
   position:absolute;
-  top:-25px;
   top:-34px;
 }
 
