@@ -65,18 +65,20 @@
       <a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;m=F;%xxx.access;;%if;(evar.image="on")image=on;%end;%if;(evar.fam!="")fam=%evar.fam;;%end;%if;(evar.semi="on")semi=on;%end;"%end; class="big_anchor" ></a>
       %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
         %if;xxx.has_image;
-          <a href="%xxx.image_url;" class="normal_anchor align-self-center" target="_blank">
-            <img class="small_image fade align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
-          </a>
+          %if;not cancel_links;<a href="%xxx.image_url;" class="normal_anchor" target="_blank" title="[*image/images]0 %xxx;">%end;
+            <img class="small_image %if;not cancel_links;fade%end; align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
+          %if;not cancel_links;</a>%end;
         %elseif;(bvar.default_image="yes")
+          %if;(wizard and not cancel_links)<a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" class="normal_anchor" target="_blank" title="[*add image] %xxx;">%end;
           <img class="small_image align-self-center rounded ml-0" src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png" alt="[missing image]"%/>
+          %if;(wizard and not cancel_links)</a>%end;
         %else;
           <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-0 pb-2">?</span>
         %end;
       %end;
       <span class="align-self-center ml-2">
-        %(%apply;display_sosa("xxx")
-          %apply;image_MF("xxx")%)
+        %if;(xxx.has_sosa)%apply;display_sosa("xxx")%end;
+        %(%apply;image_MF("xxx")%)
         %if;(not (cancel_links or xxx.is_restricted))
         <a class="normal_anchor" href="%prefix_no_pmod;%xxx.access;;%if;(evar.image="on")image=on;%end;">%end;
         %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;%xxx;%end;
