@@ -240,6 +240,11 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               </li>
             %end;
           %end;
+          <li class="nav-item">
+            <a class="nav-link" href="%prefix;m=F;i=%index;">
+              <span>[i4]</span>
+            </a>
+          </li>
           %if;has_parents;
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle %if;(evar.m="A")active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw fa-rotate-180" title="[*ancestors]"></span></a>
