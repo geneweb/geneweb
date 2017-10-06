@@ -60,43 +60,41 @@
 %end;
 
 %define;short_display_person_image(xxx,yyy)
-  <div class="d-flex list-group-item list-group-item-action flex-column align-items-start pl-0 pr-1 %if;(evar.image="on")py-0%end; list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end;">
-    <div class="d-flex w-100 justify-content-start">
-      <a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;m=F;%xxx.access;;%if;(evar.image="on")image=on;%end;%if;(evar.semi="on")semi=on;%end;"%end; class="big_anchor" title="[*navigation] %xxx;"></a>
-      %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
-        %if;xxx.has_image;
-          %if;not cancel_links;<a href="%xxx.image_url;" class="normal_anchor" target="_blank" title="[*image/images]0 %xxx;">%end;
-            <img class="small_image %if;not cancel_links;fade%end; align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
-          %if;not cancel_links;</a>%end;
-        %elseif;(bvar.default_image="yes")
-          %if;(wizard and not cancel_links)<a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" class="normal_anchor" target="_blank" title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%end;
-          <img class="small_image align-self-center rounded ml-0" src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png" alt="[missing image]"%/>
-          %if;(wizard and not cancel_links)</a>%end;
-        %else;
-          <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-0 pb-2">?</span>
-        %end;
-      %end;
-      <span class="align-self-center ml-2">
-        %if;(xxx.has_sosa)%apply;display_sosa("xxx")%end;
-        %(%apply;image_MF("xxx")%)
-        %if;(not (cancel_links or xxx.is_restricted))
-        <a class="normal_anchor" href="%prefix_no_pmod;%xxx.access;;%if;(evar.image="on")image=on;%end;" title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx;%end;%end;">%end;
-        %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;%xxx;%end;
-        %if;(not (cancel_links or xxx.is_restricted))
-        </a>
-        %end;
-        %if;(wizard and not cancel_links)
-          <a class="normal_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;" title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;">
-        %end;
-        <span class="text-nowrap font-italic">%nn;
-          %if;(xxx.dates!="")%xxx.dates;%nn;
-          %elseif;(wizard and not cancel_links)-%nn;
-          %elseif;(cancel_links)<br>
-          %end;%nn;
-        </span>%nn;
+  <div class="d-flex pl-0 pr-0 %if;(evar.image="on")py-0%end; w-100 justify-content-start list-group-item list-group-item-action list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
+    <a %if;(not (cancel_links or xxx.is_restricted))href="%xxx.bname_prefix;m=F;%xxx.access;;%if;(evar.image="on")image=on;%end;%if;(evar.semi="on")semi=on;%end;"%end; class="big_anchor" title="[*navigation] %xxx;"></a>
+    %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
+      %if;xxx.has_image;
+        %if;not cancel_links;<a href="%xxx.image_url;" class="normal_anchor" target="_blank" title="[*image/images]0 %xxx;">%end;
+          <img class="small_image %if;not cancel_links;fade%end; align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
+        %if;not cancel_links;</a>%end;
+      %elseif;(bvar.default_image="yes")
+        %if;(wizard and not cancel_links)<a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" class="normal_anchor" target="_blank" title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">%end;
+        <img class="small_image align-self-center rounded ml-0" src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png" alt="[missing image]"%/>
         %if;(wizard and not cancel_links)</a>%end;
-      </span>
-    </div>
+      %else;
+        <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-0 pb-2">?</span>
+      %end;
+    %end;
+    <span class="align-self-center ml-2">
+      %if;(xxx.has_sosa)%apply;display_sosa("xxx")%end;
+      %(%apply;image_MF("xxx")%)
+      %if;(not (cancel_links or xxx.is_restricted))
+      <a class="normal_anchor" href="%prefix_no_pmod;%xxx.access;;%if;(evar.image="on")image=on;%end;" title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx;%end;%end;">%end;
+      %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;%xxx;%end;
+      %if;(not (cancel_links or xxx.is_restricted))
+      </a>
+      %end;
+      %if;(wizard and not cancel_links)
+        <a class="normal_anchor" href="%prefix;m=MOD_IND;i=%xxx.index;" title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;">
+      %end;
+      <span class="text-nowrap font-italic">%nn;
+        %if;(xxx.dates!="")%xxx.dates;%nn;
+        %elseif;(wizard and not cancel_links)-%nn;
+        %elseif;(cancel_links)<br>
+        %end;%nn;
+      </span>%nn;
+      %if;(wizard and not cancel_links)</a>%end;
+    </span>
   </div>
 %end;
 
@@ -275,8 +273,7 @@
   </div>
   %let;fam_cnt;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
   <div class="row">
-    <div class="col"
-    <div class="d-row d-flex align-items-end w-50">
+    <div class="d-flex justify-content-end align-items-end w-50">
       %( Grand-parents et parents individu %)
       %if;(has_parents)
         <div class="d-flex flex-column w-100 mr-1">
@@ -284,13 +281,13 @@
             <div class="d-flex flex-column align-self-end w-100">
               %if;father.has_parents;
                 <div class="list-group pr-1">
-                 %apply;short_display_person_image("father.father", "yes")
                   %apply;short_display_person_image("father.mother", "yes")
+                  %apply;short_display_person_image("father.father", "yes")
                 </div>
                 %apply;border()
               %end;
-              <div class="d-flex justify-content-center align-self-center">
-                <div class="list-group">
+              <div class="d-flex justify-content-end">
+                <div class="list-group w-100">
                   %apply;short_display_person_image("father", "yes")
                 </div>
               </div>
@@ -298,13 +295,13 @@
             <div class="d-flex flex-column align-self-end w-100">
               %if;mother.has_parents;
                 <div class="list-group w-100 pl-1">
-                  %apply;short_display_person_image("mother.father", "yes")
                   %apply;short_display_person_image("mother.mother", "yes")
+                  %apply;short_display_person_image("mother.father", "yes")
                 </div>
                 %apply;border()
               %end;
-              <div class="d-flex justify-content-center align-self-center">
-                <div class="list-group">
+              <div class="d-flex justify-content-start">
+                <div class="list-group w-100">
                   %apply;short_display_person_image("mother", "yes")
                 </div>
               </div>
@@ -325,13 +322,13 @@
                 <div class="d-flex flex-column align-self-end w-100">
                   %if;spouse.father.has_parents;
                     <div class="list-group pr-1">
-                      %apply;short_display_person_image("spouse.father.father", "yes")
                       %apply;short_display_person_image("spouse.father.mother", "yes")
+                      %apply;short_display_person_image("spouse.father.father", "yes")
                     </div>
                     %apply;border()
                   %end;
-                  <div class="d-flex justify-content-center w-100 align-self-center">
-                    <div class="list-group">
+                  <div class="d-flex justify-content-end">
+                    <div class="list-group w-100 ">
                       %apply;short_display_person_image("spouse.father", "yes")
                     </div>
                   </div>
@@ -339,13 +336,13 @@
                 <div class="d-flex flex-column w-100 align-self-end">
                   %if;spouse.mother.has_parents;
                     <div class="list-group pl-1">
-                      %apply;short_display_person_image("spouse.mother.father", "yes")
                       %apply;short_display_person_image("spouse.mother.mother", "yes")
+                      %apply;short_display_person_image("spouse.mother.father", "yes")
                     </div>
                     %apply;border()
                   %end;
-                  <div class="d-flex justify-content-center w-100 align-self-center">
-                     <div class="list-group">
+                  <div class="d-flex justify-content-start">
+                     <div class="list-group w-100">
                        %apply;short_display_person_image("spouse.mother", "yes")
                      </div>
                   </div>
