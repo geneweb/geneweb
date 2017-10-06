@@ -420,15 +420,14 @@
     <div class="col">
       <div class="d-flex flex-column">
         <div class="">
+          %let;nb_ch_tot;%nb_children;%in;
           %foreach;family;
-            %if;(family_cnt=1)
-              %if;(spouse!="")
+            %if;(family_cnt=fam_cnt)
+              %if;(spouse!="" or (evar.semi="on" and nb_ch_tot>0))
                 <div class="border border-dark border-top-0 border-left-0 border-right-0">&#8203; </div>
               %end;
-              %if;has_children;
-                %foreach;family;
-                  <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;</div>
-                %end;
+              %if;(has_children or (evar.semi="on" and nb_ch_tot>0))
+                <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;</div>
               %end;
             %end;
           %end;
