@@ -240,11 +240,6 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               </li>
             %end;
           %end;
-          <li class="nav-item">
-            <a class="nav-link" href="%prefix;m=F;i=%index;">
-              <span>[i4]</span>
-            </a>
-          </li>
           %if;has_parents;
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle %if;(evar.m="A")active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="fa fa-sitemap fa-fw fa-rotate-180" title="[*ancestors]"></span></a>
@@ -274,6 +269,8 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle %if;(evar.m="R" or (evar.m="C" and evar.t="AN"))active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-link fa-rotate-90"></span></a>
             <div class="dropdown-menu">
+              <a class="dropdown-item" href="%prefix;m=F;i=%index;;image=on;semi=on"><span class="fa fa-users fa-fw"></span> [*family/families]1</a>
+              <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="%prefix;m=R;%access;" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship computing]</a>
               <div class="dropdown-divider"></div>
               %if;(browsing_with_sosa_ref)
