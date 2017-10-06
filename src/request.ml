@@ -438,6 +438,10 @@ value family_m conf base =
       SendImage.print_del_ok conf base
   | Some "DEL_IND" when conf.wizard -> UpdateInd.print_del conf base
   | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
+  | Some "F" ->
+      match find_person_in_env conf base "" with
+      [ Some p ->   Perso.interp_templ "family" conf base p
+      | _ -> very_unknown conf ]
   | Some "FORUM" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
