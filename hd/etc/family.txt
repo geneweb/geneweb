@@ -66,7 +66,7 @@
       %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
         %if;xxx.has_image;
           <a href="%xxx.image_url;" class="normal_anchor align-self-center" target="_blank">
-            <img class="small_image align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
+            <img class="small_image fade align-self-center rounded ml-0 pr-0" src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
           </a>
         %elseif;(bvar.default_image="yes")
           <img class="small_image align-self-center rounded ml-0" src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png" alt="[missing image]"%/>
