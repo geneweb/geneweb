@@ -511,7 +511,7 @@
               %end;
             %end;
             %foreach;spouse.mother.family;
-                %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")½ beaux-frères et belles-soeurs (%spouse; & %spmothfn;)
+                %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")½ beaux-frères et belles-soeurs (%spmothfn; & %spouse;)
                   <div class="list-group mb-2">
                   %foreach;child;
                     %if;(child=selfspouse)
