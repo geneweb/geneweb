@@ -23,7 +23,7 @@
 <body%body_prop;>
 %import;perso_utils;
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
-<div class="container">
+<div class="container%if;(evar.wide="on")-fluid%end;">
   %include.menubar;
 </div>
 %message_to_wizard;
@@ -80,7 +80,7 @@
 %end;
 
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
-%if;(evar.p_mod="zz" or (bvar.p_mod="" and evar.p_mod="" and (bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)))
+%if;(p_mod="zz" or p_mod="")
   %(Statique%)
   %apply;init_cache(3, 2, 2)
   %( two columns if screen_width>=992px but full width for tablets/phone < 992px %)
@@ -93,51 +93,17 @@
       %(be carefull h1 is full width then an opening <div class="col-8"> in individu module %)
       %let;op_m;3%in;%apply;show_templ("perso_module/individu")
       %let;op_m;2%in;%apply;show_templ("perso_module/unions")
-      <div class="d-none d-block d-lg-none col-12">
-        %let;op_m;1%in;%apply;show_templ("perso_module/parents")
-        %let;op_m;2%in;%apply;show_templ("perso_module/fratrie")
-        %let;op_m;3%in;%apply;show_templ("perso_module/relations")
-      </div>
       %let;op_m;1%in;%apply;show_templ("perso_module/chronologie")
       %let;op_m;1%in;%apply;show_templ("perso_module/notes")
       %let;op_m;2%in;%apply;show_templ("perso_module/sources")
-      %if;(p_mod="" or p_mod="zz")</div>%end;
+      </div> %( closing the <div class="col-8"> in module individu %)
       <div class="d-none d-lg-block col-lg-4">%(second column above lg%)
         %let;op_m;2%in;%apply;show_templ("perso_module/arbre_3gen_photo")
         %let;op_m;1%in;%apply;show_templ("perso_module/fratrie")
         %let;op_m;1%in;%apply;show_templ("perso_module/relations")
       </div>
     </div>
-%elseif;(bvar.perso_module_tplnb!="" and bvar.perso_module_tplnb>0)
-  %(Dynamique, perso_module_tplnb : %bvar.perso_module_tplnb;<br>%)
-  %reset_count;
-  %for;i;0;bvar.perso_module_tplnb;
-    %apply;init_nb_asc(i)
-  %end;
-  %let;nb_asc;%count;%in
-
-  %reset_count;
-  %for;i;0;bvar.perso_module_tplnb;
-    %apply;init_from_gen_desc(i)
-  %end;
-  %let;from_gen_desc;%count;%in
-
-  %reset_count;
-  %for;i;0;bvar.perso_module_tplnb;
-    %apply;init_nb_desc(i)
-  %end;
-  %let;nb_desc;%count;%in
-
-  %apply;init_cache(nb_asc, from_gen_desc, nb_desc)
-  %reset_count;
-  <div class="row">
-    <div class="col-md-8 col-xl-6 mx-auto">
-      %for;i;0;bvar.perso_module_tplnb;
-        %apply;get_templ(i)
-      %end;
-    </div>
-  </div>
-%elseif;((evar.p_mod!="" and evar.p_mod!="zz") or bvar.p_mod!="")
+%else;
   %(Dynamic %)
   %apply;init_cache(3, 2, 2)
   <div class="mt-2">
@@ -149,8 +115,6 @@
       %end
     %end;
   </div>
-%else;
-%(Nothing %)
 %end;
 
 %if;(evar.opt = "misc")
