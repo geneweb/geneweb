@@ -408,9 +408,9 @@ perso_module_l=ligne
 # Each pair "letter, digit" identifies a module amongst the list above,
 # and the value of its display option
 # The modules are displayed in the order in which they appear in "p_mod"
-# In the example below, "gd_parents", "personnal_data", parents", "unions"…
+# In the example below, "gr_parents", "individu", parents", "unions"…
 
-#p_mod=
+#p_mod=g1i2p1u3
 
 # display the picto Sosa on the template perso.txt (individual page).
 #display_sosa=yes/no
