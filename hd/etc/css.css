@@ -35,6 +35,9 @@
   top: 0px;
   transform: translateX(8px);
 }
+.fixed_top_btn_wide {
+  transform: translateX(-12px);
+}
 .fixed_top_btn {
   position: fixed;
   top: 0px;

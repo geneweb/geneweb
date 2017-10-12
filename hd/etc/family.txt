@@ -19,14 +19,12 @@
 <body%body_prop;>
 %import;perso_utils;
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
-<div class="container">
+<div class="container%if;(evar.wide="on")-fluid%end;">
   %include.menubar;
-</div>
-
-%message_to_wizard;
-<div class="container%if;(evar.wide="on")-fluid%end;" id="content" tabindex="-1">
-  %let;op_m;4%in;
-  %apply;show_templ("perso_module/individu")
+  %message_to_wizard;
+  <div id="content" tabindex="-1">
+    %let;op_m;4%in;%apply;show_templ("perso_module/individu")
+  </div>
   %if;(not cancel_links)
     %include.trl;
     %include.copyr;
