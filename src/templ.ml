@@ -774,6 +774,15 @@ and eval_simple_variable conf =
       let c = conf.command ^ "?" in
       List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
         (henv @ conf.senv)
+  | "prefix_no_wide" ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "wide" then henv else [(k, v) :: henv])
+          conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
+        (henv @ conf.senv)
   | "referer" -> Util.get_referer conf
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
