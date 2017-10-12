@@ -24,6 +24,7 @@
   %if;(evar.age="on")age=on;%nn;%end;
   %if;(evar.occu="on")occu=on;%nn;%end;
   %if;(evar.gen="on")gen=on;%nn;%end;
+  %if;(evar.wide="on")wide=on;%nn;%end;
   %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%nn;%end;
   %if;("iii"="on")image=on;%nn;%end;
   %if;("fff"!="")fam=fff;%nn;%end;
@@ -93,7 +94,7 @@
       %end;
       %if;(wizard and not cancel_links)
         <a class="normal_anchor" 
-          href="%prefix;m=MOD_IND;i=%xxx.index;%nn;
+          href="%prefix;m=MOD_IND;i=%xxx.index;;%nn;
             %if;(evar.wide="on")wide=on;%end;"
           title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;">
       %end;
@@ -245,7 +246,8 @@
 %let;evm;%if;(evar.m="F")m=F;%end;%in;
 %let;prefx;%if;(evar.m="F")%prefix_no_pmod;%else;%prefix;%end;%in;
 %if;(evar.m!="MOD_IND")
-  <div class="row"><h1 class="col-12 %if;(op_m=2) text-center%else; text-xs-center text-md-left%end;">
+  <div class="row w-100 d-flex justify-content-between">
+  <h1 class="%if;(op_m=2) text-center%else; text-xs-center text-md-left%end;">
     %if;has_public_name;
       %if;has_qualifiers;%public_name; <em>%qualifier;</em>
       %else;%public_name; %surname;%end;
@@ -262,7 +264,6 @@
     <br class="d-none d-sm-none">
     <span class="text-muted small mb-1">%dates;%(%birth_date.year;-%death_date.year; no italic?%)</span>
   </h1>
-  </div>
   %if;(op_m=4)
     %let;evfam;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
     %let;evimg;%if;(evar.image!="")%evar.image;%end;%in;
@@ -279,6 +280,8 @@
         <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;on%end;%evm;" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [semi]0"><i class="fa fa-users fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
       %end;
     </div>
+  </div>
+  <div class="row w-100">
     <div class="text-center mb-2 mx-2">
       %apply;detailed_names()
     </div>
@@ -288,6 +291,8 @@
       %apply;sosa()
     </div>
   %end;
+  </div> %( closing div just before h1 %)
+
   %if;((p_mod="zz" or p_mod="") and evar.m!="F")<div class="col-12%if;(evar.wide!="on") col-lg-8%end;">
   %end;
   %if;(op_m=3)
@@ -303,7 +308,7 @@
   </div>
   %elseif;(op_m=4)
     %let;fam_cnt;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
-    <div class="d-flex">
+    <div class="d-flex w-100">
       %( Grand-parents et parents individu %)
       <div class="d-flex justify-content-end align-items-end w-50">
         %if;(has_parents)
@@ -349,7 +354,7 @@
           %if;(family_cnt=fam_cnt)
             %if;(spouse!="" and spouse.has_parents)
               <div class="d-flex flex-column w-100 ml-1">
-                <div class="d-flex">
+                <div class="d-flex w-100">
                   <div class="d-flex flex-column align-self-end w-100">
                     %if;spouse.father.has_parents;
                       <div class="list-group pr-1">
@@ -503,8 +508,7 @@
                   href="%apply;rebuild_url%with;%if;(evar.image="on")on%end;%nn;
                     %and;%family_cnt;%nn;
                     %and;%if;(evar.semi="on")on%end;
-                    %end;%evm;%nn;
-                    %if;(evar.wide="on")wide=on%end">
+                    %end;%evm;;">
                   <span class="ml-2">(%family_cnt;)</span>
                   <span class="ml-1">%spouse;</span>
                   %if;(nb_children>0)<span class="ml-1">(%nb_children; %if;(nb_children>1)[child/children]1%else;[child/children]0%end;)</span>%end;
