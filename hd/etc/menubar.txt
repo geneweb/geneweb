@@ -139,7 +139,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               </a>
               <div class="dropdown-menu">
                 %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
-                  <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;;%suffix;" %laS; title="%apply;nav_with_sosa_ref(self)">
+                  <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;" %laS; title="%apply;nav_with_sosa_ref(self)">
                     <i class="fa fa-dot-circle-o fa-lg fa-fw %sexcolor;"></i> %apply;nav_with_sosa_ref(self)
                   </a>%nn;
                 %else;
@@ -369,7 +369,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         </a>%nn;
       %end;
       <div class="ml-auto">
-        <a role="button" class="btn btn-link text-muted px-0 py-1" href="%prefix;;%if;(evar.m="F")m=F;%end;%access;;%if;(evar.wide="on")%else;wide=on;%end;" title"switch to full screen"><i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-lg"></i></a>
+        <a role="button" class="btn btn-link text-muted px-0 py-1" href="%prefix_no_wide;;%if;(evar.m="F")m=F;%end;%access;;%if;(evar.wide="on")%else;wide=on;%end;" title"switch to full screen"><i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-lg"></i></a>
       </div>
       <div class="ml-auto">
         <a role="button" class="btn btn-link text-muted mx-0 px-0 py-0 mt-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>

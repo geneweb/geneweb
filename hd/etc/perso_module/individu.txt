@@ -24,7 +24,6 @@
   %if;(evar.age="on")age=on;%nn;%end;
   %if;(evar.occu="on")occu=on;%nn;%end;
   %if;(evar.gen="on")gen=on;%nn;%end;
-  %if;(evar.wide="on")wide=on;%nn;%end;
   %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%nn;%end;
   %if;("iii"="on")image=on;%nn;%end;
   %if;("fff"!="")fam=fff;%nn;%end;
@@ -47,7 +46,6 @@
   <div class="d-flex pl-0 pr-0 %if;(evar.image="on")py-0%end; w-100 justify-content-start list-group-item list-group-item-action list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
     <a %if;(not (cancel_links or xxx.is_restricted))
       href="%xxx.bname_prefix;%evm;%xxx.access;;%nn;
-        %if;(evar.wide="on")wide=on;%end;%nn;
         %if;(evar.image="on")image=on;%end;%nn;
         %if;(evar.semi="on")semi=on;%end;"%end; 
       class="big_anchor" title="[*navigation] %xxx;">
@@ -82,9 +80,8 @@
       %(%apply;image_MF("xxx")%)
       %if;(not (cancel_links or xxx.is_restricted))
       <a class="normal_anchor" 
-        href="%prefx;;%xxx.access;;
+        href="%prefx;%xxx.access;;
           %if;(evar.image="on")image=on;%end;%nn;
-          %if;(evar.wide="on")wide=on;%end;%nn;
           %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;"
         title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx;%end;%end;">
       %end;
@@ -94,8 +91,7 @@
       %end;
       %if;(wizard and not cancel_links)
         <a class="normal_anchor" 
-          href="%prefix;m=MOD_IND;i=%xxx.index;;%nn;
-            %if;(evar.wide="on")wide=on;%end;"
+          href="%prefix;m=MOD_IND;i=%xxx.index;;"
           title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;">
       %end;
       <span class="text-nowrap font-italic">%nn;
