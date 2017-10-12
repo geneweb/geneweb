@@ -369,7 +369,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         </a>%nn;
       %end;
       <div class="ml-auto">
-        <a role="button" class="btn btn-link text-muted px-0 py-1" href="%prefix;;%access;;%if;(evar.wide="on")%else;wide=on;%end;" title"switch to full screen"><i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-lg"></i></a>
+        <a role="button" class="btn btn-link text-muted px-0 py-1" href="%prefix;;%if;(evar.m="F")m=F;%end;%access;;%if;(evar.wide="on")%else;wide=on;%end;" title"switch to full screen"><i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-lg"></i></a>
       </div>
       <div class="ml-auto">
         <a role="button" class="btn btn-link text-muted mx-0 px-0 py-0 mt-0" data-toggle="modal" data-target="#myModal"><i class="fa fa-search fa-lg" title="[*search/case sensitive]0"></i></a>
