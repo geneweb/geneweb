@@ -236,13 +236,13 @@
 %end;
 
 %define;border()
-  <div class="w-50 h-100 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
+  <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
 %end;
 
 %let;evm;%if;(evar.m="F")m=F;%end;%in;
 %let;prefx;%if;(evar.m="F")%prefix_no_pmod;%else;%prefix;%end;%in;
 %if;(evar.m!="MOD_IND")
-  <div class="row w-100 d-flex justify-content-between">
+  <div class="col-12 d-flex justify-content-between">
   <h1 class="%if;(op_m=2) text-center%else; text-xs-center text-md-left%end;">
     %if;has_public_name;
       %if;has_qualifiers;%public_name; <em>%qualifier;</em>
@@ -277,7 +277,7 @@
       %end;
     </div>
   </div>
-  <div class="row w-100">
+  <div class="col-12">
     <div class="text-center mb-2 mx-2">
       %apply;detailed_names()
     </div>
@@ -304,105 +304,97 @@
   </div>
   %elseif;(op_m=4)
     %let;fam_cnt;%if;(evar.fam!="")%evar.fam;%else;1%end;%in;
-    <div class="d-flex w-100">
+    <div class="col-12 d-flex">
       %( Grand-parents et parents individu %)
-      <div class="d-flex justify-content-end align-items-end w-50">
+      <div class="col-6 px-0 mr-1 align-self-end">
         %if;(has_parents)
-          <div class="d-flex flex-column w-100 mr-1">
-            <div class="d-flex justify-content-center">
-              <div class="d-flex flex-column align-self-end w-100">
+          <div class="d-flex">
+            <div class="col-6 px-0 align-self-end">
+              <div class="d-flex flex-column">
                 %if;father.has_parents;
-                  <div class="list-group pr-1">
+                  <div class="list-group mr-1">
                     %apply;short_display_person_image("father.mother", "yes")
                     %apply;short_display_person_image("father.father", "yes")
                   </div>
                   %apply;border()
                 %end;
-                <div class="d-flex justify-content-end">
-                  <div class="list-group w-100">
-                    %apply;short_display_person_image("father", "yes")
-                  </div>
+                <div class="list-group">
+                  %apply;short_display_person_image("father", "yes")
                 </div>
               </div>
-              <div class="d-flex flex-column align-self-end w-100">
+            </div>
+            <div class="col-6 px-0 align-self-end">
+              <div class="d-flex flex-column">
                 %if;mother.has_parents;
-                  <div class="list-group w-100 pl-1">
+                  <div class="list-group">
                     %apply;short_display_person_image("mother.mother", "yes")
                     %apply;short_display_person_image("mother.father", "yes")
                   </div>
                   %apply;border()
                 %end;
-                <div class="d-flex justify-content-start">
-                  <div class="list-group w-100">
-                    %apply;short_display_person_image("mother", "yes")
-                  </div>
+                <div class="list-group">
+                  %apply;short_display_person_image("mother", "yes")
                 </div>
               </div>
             </div>
-            %apply;border()
           </div>
+          %apply;border()
         %end;
       </div>
-    
+
       %( Grand-parents et parents conjoint %)
-      <div class="d-flex justify-content-end align-items-end w-50">
+      <div class="col-6 px-0 ml-1 align-self-end">
         %foreach;family;
           %if;(family_cnt=fam_cnt)
             %if;(spouse!="" and spouse.has_parents)
-              <div class="d-flex flex-column w-100 ml-1">
-                <div class="d-flex w-100">
-                  <div class="d-flex flex-column align-self-end w-100">
+              <div class="d-flex">
+                <div class="col-6 px-0 align-self-end">
+                  <div class="d-flex flex-column">
                     %if;spouse.father.has_parents;
-                      <div class="list-group pr-1">
+                      <div class="list-group">
                         %apply;short_display_person_image("spouse.father.mother", "yes")
                         %apply;short_display_person_image("spouse.father.father", "yes")
                       </div>
                       %apply;border()
                     %end;
-                    <div class="d-flex justify-content-end">
-                      <div class="list-group w-100 ">
-                        %apply;short_display_person_image("spouse.father", "yes")
-                      </div>
+                    <div class="list-group">
+                      %apply;short_display_person_image("spouse.father", "yes")
                     </div>
                   </div>
-                  <div class="d-flex flex-column w-100 align-self-end">
+                </div>
+                <div class="col-6 px-0 align-self-end">
+                  <div class="d-flex flex-column">
                     %if;spouse.mother.has_parents;
-                      <div class="list-group pl-1">
+                      <div class="list-group">
                         %apply;short_display_person_image("spouse.mother.mother", "yes")
                         %apply;short_display_person_image("spouse.mother.father", "yes")
                       </div>
                       %apply;border()
                     %end;
-                    <div class="d-flex justify-content-start">
-                       <div class="list-group w-100">
-                         %apply;short_display_person_image("spouse.mother", "yes")
-                       </div>
+                    <div class="list-group">
+                      %apply;short_display_person_image("spouse.mother", "yes")
                     </div>
                   </div>
                 </div>
-                %apply;border()
-              </div>
+             </div>
+             %apply;border()
             %end;
           %end;
         %end;
       </div>
     </div>
 
-    <div class="d-flex justify-content-center align-self-center w-100">
+    <div class="col-12 d-flex px-1">
       %( Individu et sa fratrie %)
-      <div class="col">
-        %( Individu %)
-        <div class="d-flex ml-3">
-          <div class="list-group w-100">
-            %apply;short_display_person_image("self", "force")
-          </div>
+      <div class="col%if;not has_families;-6%end; pr-0 pl-2">
+        <div class="%if;not has_families;d-flex justify-content-center mx-5%else;ml-3%end;">
+          %apply;short_display_person_image("self", "force")
         </div>
-        %( Fratrie·s individu %)
         %if;(has_parents)
           %let;fath;%father.index;%in;
           %let;moth;%mother.index;%in;
           %foreach;father.family;
-            <div class="d-flex w-100 mt-1">
+            <div class="mt-1">
               %if;(father.spouse.index=moth)%if;self.has_siblings;Frères et sœurs%end;
               %elseif;(evar.semi="on")½ frères et sœurs (%father.first_name; & %father.spouse;)
               %end;
@@ -449,9 +441,9 @@
       </div>
     
       %( Enfants %)
-      <div class="col">
+      <div class="%if;not has_families;d-none%else;col%end; px-0">
         <div class="d-flex flex-column">
-          <div class="">
+          <div class="%if;not has_children;align-self-center%end; col-12 px-0">
             %let;nb_ch_tot;%nb_children;%in;
             %foreach;family;
               %if;(family_cnt=fam_cnt)
@@ -459,12 +451,12 @@
                   <div class="border border-dark border-top-0 border-left-0 border-right-0">&#8203; </div>
                 %end;
                 %if;(has_children or (evar.semi="on" and nb_ch_tot>0))
-                  <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;</div>
+                  <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;<br>&#8203;</div>
                 %end;
               %end;
             %end;
           </div>
-          <div class="list-group">
+          <div class="list-group px-2">
             %foreach;family;
               %if;(family_cnt=fam_cnt and nb_children>0)
                 <div class="list-group mb-2">
@@ -489,10 +481,9 @@
       </div>
 
       %( Conjoint et sa fratrie %)
-      <div class="col">
+      <div class="%if;not has_families;d-none%else;col%end; px-0">
         %( Conjoint·s %)
-        <div class="d-flex mr-3">
-          <div class="list-group align-self-center w-100">
+          <div class="list-group mr-3">
             %foreach;family;
               %if;(spouse!="" and family_cnt=fam_cnt)
                 %apply;short_display_person_image("spouse", "yes")
@@ -511,7 +502,6 @@
                 </a>
               %end;
             %end;
-          </div>
         </div>
         %( Fratrie·s conjoint·s %)
         %foreach;family;
