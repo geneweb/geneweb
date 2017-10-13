@@ -53,19 +53,19 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link %if;(evar.m="F")active%end;" 
-              href="%prefix;m=F;i=%index;;
-                %if;(bvar.default_fnav_images="")image=on;%else;image=%bvar.default_fnav_images;%end;;
-                %if;(bvar.default_fnav_semi="")semi=on;%else;semi=%bvar.default_fnav_semi;%end;;">
-              <span class="fa fa-plus fa-users fa-fw %sexcolor;" aria-hidden="true" title="[*family/families]0"></span>
+            <a class="nav-link %if;(evar.m="F")active%end;"
+              href="%prefix;m=F;%access;;
+                %if;(bvar.default_fnav_images="")image=on;%else;image=%bvar.default_fnav_images;%end;
+                %if;(bvar.default_fnav_semi="")semi=on;%else;semi=%bvar.default_fnav_semi;%end;" title="[*family/families]0">
+              <span class="fa fa-plus fa-users fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">[*family/families]0</span>
             </a>
           </li>
           %( personnal modules selection menu %)
           <li class="nav-item dropdown">
             <a id="load_once_p_mod" class="nav-link dropdown-toggle dropdown-toggle-split" 
-              data-toggle="dropdown" aria-haspopup="true">
-              <span class="fa fa-vcard-o" aria-hidden="true"></span>%nn;
+              data-toggle="dropdown" aria-haspopup="true" title="[*module]">
+              <span class="fa fa-vcard-o fa-fw" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*module]</span>%nn;
             </a>
             <div class="dropdown-menu p_mod-dropdown-menu%if;(wizard)-wizard%end;">
