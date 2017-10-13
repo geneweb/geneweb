@@ -134,7 +134,7 @@
 %if;(evar.opt = "misc")
   %misc_names;<p>
 %end;
-</div>
+
 %if;(not cancel_links)
   %include.trl;
   %include.copyr;
