@@ -235,6 +235,10 @@
   %end;
 %end;
 
+%define;on_side(xx)
+  [on %s's side:::xx]
+%end;
+
 %define;border()
   <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
 %end;
@@ -365,7 +369,7 @@
                 <div class="col-6 px-0 align-self-end">
                   <div class="d-flex flex-column">
                     %if;spouse.mother.has_parents;
-                      <div class="list-group">
+                      <div class="list-group ml-1">
                         %apply;short_display_person_image("spouse.mother.mother", "yes")
                         %apply;short_display_person_image("spouse.mother.father", "yes")
                       </div>
@@ -395,8 +399,8 @@
           %let;moth;%mother.index;%in;
           %foreach;father.family;
             <div class="mt-1">
-              %if;(father.spouse.index=moth)%if;self.has_siblings;Frères et sœurs%end;
-              %elseif;(evar.semi="on")½ frères et sœurs (%father.first_name; & %father.spouse;)
+              %if;(father.spouse.index=moth)%if;self.has_siblings;[*siblings]%end;
+              %elseif;(evar.semi="on")[*half siblings] %apply;on_side%with;%father.first_name; & %father.spouse;%end;
               %end;
             </div>
             %if;(father.spouse.index=moth or evar.semi="on")
@@ -420,7 +424,7 @@
           %foreach;mother.family;
             %if;(mother.spouse.index!=fath and evar.semi="on")
             <div class="d-flex w-100 %if;(family_cnt>1)mt-1%end;">
-              ½ frères et sœurs (%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; & %mother.spouse;)
+              [*half siblings] %apply;on_side%with;%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; & %mother.spouse;%end;
             </div>
             <div class="list-group mb-2">
               %foreach;child;
@@ -443,12 +447,14 @@
       %( Enfants %)
       <div class="%if;not has_families;d-none%else;col%end; px-0">
         <div class="d-flex flex-column">
-          <div class="%if;not has_children;align-self-center%end; col-12 px-0">
+          <div class="px-0">
             %let;nb_ch_tot;%nb_children;%in;
             %foreach;family;
               %if;(family_cnt=fam_cnt)
                 %if;(spouse!="" or (evar.semi="on" and nb_ch_tot>0))
-                  <div class="border border-dark border-top-0 border-left-0 border-right-0">&#8203; </div>
+                  <div class="border border-dark border-top-0 border-left-0 border-right-0 text-center">
+                    %if;(marriage_date.year != "")&%marriage_date.year;%end;
+                  </div>
                 %end;
                 %if;(has_children or (evar.semi="on" and nb_ch_tot>0))
                   <div class="border border-dark border-bottom-0 border-top-0 border-left-0 w-50">&#8203;<br>&#8203;</div>
@@ -456,7 +462,7 @@
               %end;
             %end;
           </div>
-          <div class="list-group px-2">
+          <div class="px-2">
             %foreach;family;
               %if;(family_cnt=fam_cnt and nb_children>0)
                 <div class="list-group mb-2">
@@ -468,8 +474,8 @@
             %end;
             %foreach;family;
               %if;(family_cnt!=fam_cnt and nb_children>0 and evar.semi="on")
-              <div class="list-group mb-2">
               Enfant·s avec %spouse; %( TODO [child/children]c %)
+              <div class="list-group mb-2">
                 %foreach;child
                   %apply;short_display_person_image("child", "yes")
                 %end;
@@ -511,11 +517,11 @@
               %let;spfath;%self.spouse.father;%in;
               %let;spfathfn;%if;(self.spouse.father.public_name!="")%self.spouse.father.public_name;%else;%self.spouse.father.first_name;%end;%in;
               %let;spmoth;%self.spouse.mother;%in;
-              %let;spmothfn;%if;(self.spouse.mother.public_name!="")self.spouse.mother.public_name%else;%self.spouse.mother.first_name;%end;%in;
+              %let;spmothfn;%if;(self.spouse.mother.public_name!="")%self.spouse.mother.public_name%else;%self.spouse.mother.first_name;%end;%in;
               %foreach;spouse.father.family;
                 <div class="d-flex w-100 mt-1">
                   %if;(spouse=spfath or spouse=spmoth)Beaux-frères et belles-soeurs
-                  %elseif;(evar.semi="on")½ beaux-frères et belles-soeurs (%spfathfn; & %spouse;)
+                  %elseif;(evar.semi="on")½ beaux-frères et belles-soeurs %apply;on_side%with;%spfathfn; & %spouse;%end;
                   %end;
                 </div>
                 %if;(spouse=spfath or spouse=spmoth or evar.semi="on")
@@ -533,7 +539,7 @@
                 %end;
               %end;
               %foreach;spouse.mother.family;
-                  %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")½ beaux-frères et belles-soeurs (%spmothfn; & %spouse;)
+                  %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")½ beaux-frères et belles-soeurs %apply;on_side%with;%spmothfn; & %spouse;%end;
                     <div class="list-group mb-2">
                     %foreach;child;
                       %if;(child=selfspouse)
