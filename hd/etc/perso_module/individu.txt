@@ -398,48 +398,87 @@
           %let;fath;%father.index;%in;
           %let;moth;%mother.index;%in;
           %foreach;father.family;
-            <div class="mt-1">
-              %if;(father.spouse.index=moth)%if;self.has_siblings;[*siblings]%end;
-              %elseif;(evar.semi="on")[*half siblings] %apply;on_side%with;%father.first_name; & %father.spouse;%end;
+            <div class="row px-0 ml-1">
+              %if;(father.spouse.index=moth or evar.semi="on")
+                <div class="col list-group order-2">
+                  %reset_count;%reset_count1;%reset_count2;
+                  %foreach;child;
+                    %if;(child.index=central_index)
+                      %if;child.has_siblings;
+                        <div class="d-flex justify-content-center">
+                          <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                        </div>
+                      %end;
+                    %else;
+                      %incr_count;
+                      %if;child.is_male;%incr_count1;%end;
+                      %if;child.is_female;%incr_count2;%end;
+                      %apply;short_display_person_image("child", "yes")
+                    %end;
+                  %end;
+                </div>
+                <div class="col-12 order-1 mt-1">
+                  %if;(father.spouse.index=moth)
+                    %if;self.has_siblings;
+                      %if;(count2=0 and count1!=0)
+                        %if;(count1=1)[*a brother/a sister/a sibling]0
+                        %elseif;(count1>1)%count1 [brother/brothers/sister/sisters]1
+                        %end;
+                      %elseif;(count1=0 and count2!=0)
+                        %if;(count2=1)[*a brother/a sister/a sibling]1
+                        %elseif;(count2>1)%count2 [brother/brothers/sister/sisters]3
+                        %end;
+                      %else;[*siblings]
+                      %end;
+                    %end;
+                  %elseif;(count>0 and evar.semi="on")
+                    %if;(count1=1 and count2=0)
+                      [*a half-brother/a half-sister/a half-sibling]0
+                    %elseif;(count1=0 and count2=1)
+                      [*a half-brother/a half-sister/a half-sibling]0
+                    %else;
+                      [*half siblings]
+                    %end; %apply;on_side%with;%father.first_name; & %father.spouse;%end;
+                  %end;
+                </div>
               %end;
             </div>
-            %if;(father.spouse.index=moth or evar.semi="on")
-              <div class="list-group">
-              %foreach;child;
-                %if;(child.index=central_index)
-                  %if;child.has_siblings;
-                  %(</div>%)
-                  <div class="d-flex justify-content-center">
-                    <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
-                  </div>
-                  %(<div class="list-group">%)
-                  %end;
-                %else;
-                  %apply;short_display_person_image("child", "yes")
-                %end;
-              %end;
-              </div>
-            %end;
           %end;
           %foreach;mother.family;
-            %if;(mother.spouse.index!=fath and evar.semi="on")
-            <div class="d-flex w-100 %if;(family_cnt>1)mt-1%end;">
-              [*half siblings] %apply;on_side%with;%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; & %mother.spouse;%end;
-            </div>
-            <div class="list-group mb-2">
-              %foreach;child;
-                %if;(child.index=central_index)
-                  %(</div>%)
-                  <div class="d-flex justify-content-center">
-                    <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+            <div class="row mt-1 ml-1">
+              %if;(mother.spouse.index!=fath and evar.semi="on")
+                <div class="col list-group order-2">
+                  %reset_count;%reset_count1;%reset_count2;
+                  %foreach;child;
+                    %if;(child.index=central_index)
+                      <div class="d-flex justify-content-center">
+                        <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                      </div>
+                    %else;
+                      %incr_count;
+                      %if;child.is_male;%incr_count1;%end;
+                      %if;child.is_female;%incr_count2;%end;
+                      %apply;short_display_person_image("child", "yes")
+                    %end;
+                  %end;
+                </div>
+                %if;(count>0)
+                  <div class="col-12 %if;(family_cnt>1)mt-1%end; order-1">
+                    %if;(count2=0 and count1!=0)
+                      %if;(count1=1)[*a half-brother/a half-sister/a half-sibling]0
+                      %elseif;(count1>1)%count1 [half-brother/brothers/sister/sisters]1
+                      %end;
+                    %elseif;(count1=0 and count2!=0)
+                      %if;(count2=1)[*a half-brother/a half-sister/a half-sibling]0
+                      %elseif;(count2>1)%count2 [half-brother/brothers/sister/sisters]3
+                      %end;
+                    %else;
+                      [*half siblings]
+                    %end; %apply;on_side%with;%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; & %mother.spouse;%end;
                   </div>
-                  %(<div class="list-group">%)
-                %else;
-                  %apply;short_display_person_image("child", "yes")
                 %end;
               %end;
             </div>
-            %end;
           %end;
         %end;
       </div>
@@ -447,13 +486,13 @@
       %( Enfants %)
       <div class="%if;not has_families;d-none%else;col%end; px-0">
         <div class="d-flex flex-column">
-          <div class="px-0">
+          <div class="%if;(evar.image="on")mt-3%end; px-0">
             %let;nb_ch_tot;%nb_children;%in;
             %foreach;family;
               %if;(family_cnt=fam_cnt)
                 %if;(spouse!="" or (evar.semi="on" and nb_ch_tot>0))
                   <div class="border border-dark border-top-0 border-left-0 border-right-0 text-center">
-                    %if;(marriage_date.year != "")&%marriage_date.year;%end;
+                    %if;(marriage_date.year != "")&%marriage_date.year;%else;&#8203;%end;
                   </div>
                 %end;
                 %if;(has_children or (evar.semi="on" and nb_ch_tot>0))
@@ -487,9 +526,9 @@
       </div>
 
       %( Conjoint et sa fratrie %)
-      <div class="%if;not has_families;d-none%else;col%end; px-0">
+      <div class="%if;not has_families;d-none%else;col%end; pl-0 pr-2">
         %( Conjoint·s %)
-          <div class="list-group mr-3">
+          <div class="mr-3">
             %foreach;family;
               %if;(spouse!="" and family_cnt=fam_cnt)
                 %apply;short_display_person_image("spouse", "yes")
@@ -511,55 +550,89 @@
         </div>
         %( Fratrie·s conjoint·s %)
         %foreach;family;
-          %if;spouse.has_siblings;
-            %if;(family_cnt=fam_cnt)
-              %let;selfspouse;%self.spouse;%in;
-              %let;spfath;%self.spouse.father;%in;
-              %let;spfathfn;%if;(self.spouse.father.public_name!="")%self.spouse.father.public_name;%else;%self.spouse.father.first_name;%end;%in;
-              %let;spmoth;%self.spouse.mother;%in;
-              %let;spmothfn;%if;(self.spouse.mother.public_name!="")%self.spouse.mother.public_name%else;%self.spouse.mother.first_name;%end;%in;
-              %foreach;spouse.father.family;
-                <div class="d-flex w-100 mt-1">
-                  %if;(spouse=spfath or spouse=spmoth)Beaux-frères et belles-soeurs
-                  %elseif;(evar.semi="on")½ beaux-frères et belles-soeurs %apply;on_side%with;%spfathfn; & %spouse;%end;
-                  %end;
-                </div>
+          %if;(family_cnt=fam_cnt)
+            %let;selfspouse;%self.spouse;%in;
+            %let;spfath;%self.spouse.father;%in;
+            %let;spfathfn;%if;(self.spouse.father.public_name!="")%self.spouse.father.public_name;%else;%self.spouse.father.first_name;%end;%in;
+            %let;spmoth;%self.spouse.mother;%in;
+            %let;spmothfn;%if;(self.spouse.mother.public_name!="")%self.spouse.mother.public_name%else;%self.spouse.mother.first_name;%end;%in;
+            %foreach;spouse.father.family;
+              <div class="row ml-1">
                 %if;(spouse=spfath or spouse=spmoth or evar.semi="on")
-                  <div class="list-group mb-2">
-                  %foreach;child;
-                    %if;(child=selfspouse)
-                      <div class="d-flex justify-content-center">
-                        <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
-                      </div>
-                    %else;
-                      %apply;short_display_person_image("child", "yes")
-                    %end;
-                  %end;
-                  </div>
-                %end;
-              %end;
-              %foreach;spouse.mother.family;
-                  %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")½ beaux-frères et belles-soeurs %apply;on_side%with;%spmothfn; & %spouse;%end;
-                    <div class="list-group mb-2">
+                  <div class="col list-group order-2">
+                    %reset_count;%reset_count1;%reset_count2;
                     %foreach;child;
                       %if;(child=selfspouse)
-                        %if;child.has_siblings;
-                          <div class="d-flex justify-content-center">
-                            <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
-                          </div>
-                        %end;
+                        <div class="d-flex justify-content-center">
+                          <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                        </div>
                       %else;
+                        %incr_count;
+                        %if;child.is_male;%incr_count1;%end;
+                        %if;child.is_female;%incr_count2;%end;
                         %apply;short_display_person_image("child", "yes")
                       %end;
                     %end;
                   </div>
                 %end;
-              %end;
+                <div class="col-12 order-1 mt-1">
+                  %if;(spouse=spfath or spouse=spmoth)
+                    %if;(count2=0 and count1!=0)
+                      %if;(count1=1)[*a brother-in-law/a sister-in-law]0
+                      %elseif;(count1>1)%count1 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]1
+                      %end;
+                    %elseif;(count1=0 and count2!=0)
+                      %if;(count2=1)[*a brother-in-law/a sister-in-law]0
+                      %elseif;(count2>1)%count2 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]3
+                      %end;
+                    %elseif;(count!=0)%count; [sibling-in-law/siblings-in-law]1
+                    %end;
+                  %elseif;(evar.semi="on")%count; [half sibling-in-law/half siblings-in-law]1 %apply;on_side%with;%spfathfn; & %spouse;%end;
+                  %end;
+                </div>
+              </div>
+            %end;
+            %foreach;spouse.mother.family;
+              <div class="row mt-1 ml-1">
+                %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")
+                  <div class="col list-group order-2">
+                    %reset_count;%reset_count1;%reset_count2;
+                    %foreach;child;
+                      %if;(child=selfspouse)
+                        <div class="d-flex justify-content-center">
+                          <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                        </div>
+                      %else;
+                        %incr_count;
+                        %if;child.is_male;%incr_count1;%end;
+                        %if;child.is_female;%incr_count2;%end;
+                        %apply;short_display_person_image("child", "yes")
+                      %end;
+                    %end;
+                  </div>
+                  %if;(count>0 and evar.semi="on")
+                    <div class="col-12 mt-1 order-1">
+                      %if;(not (spouse=spfath or spouse=spmoth))
+                        %if;(count2=0 and count1!=0)
+                          %if;(count1=1)[*a half brother-in-law/a half sister-in-law]0
+                          %elseif;(count1>1)%count1 [half brother-in-law/half brothers-in-law/half sister-in-law/half sisters-in-law]1
+                          %end;
+                        %elseif;(count1=0 and count2!=0)
+                          %if;(count2=1)[*a brother-in-law/a sister-in-law]0
+                          %elseif;(count2>1)%count2 [half brother-in-law/half brothers-in-law/half sister-in-law/half sisters-in-law]3
+                          %end;
+                        %else;%count [half sibling-in-law/half siblings-in-law]1
+                        %end;
+                        %apply;on_side%with;%spmothfn; & %spouse;%end;
+                      %end;
+                    </div>
+                  %end;
+                %end;
+              </div>
             %end;
           %end;
         %end;
       </div>
-
     </div>
   %else;
     %if;(op_m=2)
