@@ -89,6 +89,7 @@
                     %if;(evar.oc!=0)
                       %apply;input_hidden("occ","oc")
                     %end;
+                    <input type="hidden" id="a6_wide" name="wide" value="%evar.wide;">
                     %apply;input_hidden("evar.v","v")
                     %apply;input_hidden("evar.image","image")
                     %apply;input_hidden("evar.marriage","marriage")

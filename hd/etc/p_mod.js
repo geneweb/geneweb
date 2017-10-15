@@ -285,6 +285,7 @@ $('#a5').on('click', function ()
 
 $('#a6').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a6');
+  $('#a6_wide').val('on');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_6.jpg">\n');
 });
 
