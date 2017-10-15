@@ -40,11 +40,12 @@ modules[8] = "sources";
 options[8][1] = "simple";
 options[8][2] = "complete";
 modules[9] = "arbres";
-options[9][1] = "ascendants tree";
-options[9][2] = "horizontal tree";
-options[9][3] = "compact tree";
-options[9][4] = "+3 -3 gen.";
+options[9][1] = "ascendants";
+options[9][2] = "horizontal";
+options[9][3] = "compact";
+options[9][4] = "+3-3 gen.";
 options[9][5] = "famille";
+options[9][6] = "h-tree";
 modules[10] = "gr_parents";
 options[10][1] = "standard";
 options[10][2] = "three cols";
@@ -280,6 +281,11 @@ $('#a4').on('click', function ()
 $('#a5').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a5');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_5.jpg">\n');
+});
+
+$('#a6').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a6');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_6.jpg">\n');
 });
 
 $('#g1').on('click', function ()

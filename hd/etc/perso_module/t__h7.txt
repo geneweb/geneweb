@@ -1,0 +1,148 @@
+  <!-- $Id: t__h7.txt,v 7.00 2016/05/02 23:28:26 mr Exp $ -->
+  <link type="text/css" href="%bvar.static_path;/perso_module/t__h7%bvar.css;.css" media="all" rel="stylesheet" %/>
+
+  %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;
+  %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
+  %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
+  %let;l_sosa_ref;%if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)on%end;%in;
+  %let;l_prefix;%prefix;t=h7;image=%evar.image;;siblings=%evar.siblings;;sosa=%evar.sosa;;fs=%l_fs;;wi=%l_wi;;he=%l_he;;bp=%evar.bp;;%in;
+  <style id="s" type="text/css">
+    #htree{font-size:%l_fs;px;width:%l_wi;px;height:%l_he;px}
+  </style>
+  <style type="text/css">
+    #tools p input{text-align:right;width:40px;}
+  </style>
+  <script type="text/javascript">
+  <!--
+  
+    function over1(xx)
+    { 
+     document.getElementById(xx).style.outline="#00F solid 4px";
+     return false;
+    }
+    function out1(xx)
+    {
+     document.getElementById(xx).style.outline="none";
+     return false;
+    }
+  
+    function ob()
+    {
+      var a = new Array(3)
+      for (var i=0; i < a.length; ++i)
+      {
+        a[i] = document.getElementById("e" + i).value;
+      }
+      document.getElementById("s").outerHTML = '\
+      <style id="s" type="text\/css">\n\
+        @page{size:'+a[1]+'px '+a[2]+'px;}\n\
+        #htree{position:relative;font-size:'+a[0]+'px;width:'+a[1]+'px;height:'+a[2]+'px;margin:3em}\n\
+      <\/style>';
+    }
+   -->
+  </script>
+</head>
+
+%define;tools()
+  <hr %/>
+  <form id="tools" name="tools" method="get" action="%action;">
+    <fieldset>
+      <legend>[*tools]0 <input type="submit" value="Ok"%/></legend>
+      %hidden;
+      <input type="hidden" name="t" value="h7" %/>
+      %if;(evar.p != "" or evar.n != "" or evar.oc != "")
+        <input type="hidden" name="p" value="%evar.p;"%/>
+        <input type="hidden" name="n" value="%evar.n;"%/>
+        <input type="hidden" name="oc" value="%evar.oc;"%/>
+      %end;
+      %if;(evar.i != "")
+        <input type="hidden" name="i" value="%evar.i;"%/>
+      %end;
+      <p>
+        <label><input type="checkbox" name="cgl" value="on"
+               %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
+        %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+          <label><input type="checkbox" name="image" value="on" %l_on;
+                 %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
+        %end;
+        <label><input type="checkbox" name="siblings" value="on" %l_on;
+                 %if;(evar.siblings = "on") checked="checked"%end;%/>[full siblings]</label>
+        <label><input type="checkbox" name="sosa" value="on" %l_on;
+                 %if;(evar.sosa = "on") checked="checked"%end;%/>[n° Sosa]</label>
+        <label><input type="checkbox" name="bp" value="on" %l_on;
+           %if;(evar.bp = "on") checked="checked"%end;%/>[birth place]</label>
+      </p>
+      <p style="text-align:right;font-family:monospace;">
+        <label>taille<input id="e0" name="fs" value="%l_fs;" onchange="ob()"%/>px</label>
+        <label>largeur<input id="e1" name="wi" value="%l_wi;" onchange="ob()"%/>px</label>
+        <label>hauteur<input id="e2" name="he" value="%l_he;" onchange="ob()"%/>px</label>
+      </p>
+    </fieldset>
+  </form>
+%end;
+
+%define;somebody()
+  <a href="%prefix;%access;" class="s%sex; nc%has_children;">
+    %if;(evar.image = "on" and has_image)
+      <img src="%image_url;"%/><br%/>
+    %end;
+    %if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)
+      &middot; %sosa; &middot;<br%/>
+    %end;
+    %first_name;<br%/>%dates;
+    %if;(evar.bp = "on" and has_birth_place)<br%/>%birth_place;%end;
+  </a>
+%end;
+
+<div id="htree">
+  %foreach;ancestor_level(7)
+    <div id="l%level;">
+      %if;(evar.image = "on" and level > 1 and level < 5)
+        %foreach;ancestor;
+          %if;ancestor.has_image;
+            <p id="pi%ancestor.anc_sosa.v;"><img src="%ancestor.image_url;"%/></p>
+          %end;
+        %end;
+      %end;
+      %if;(level = 1)
+        <table id="pc1"><tr><td>
+          %if;(evar.siblings = "on" and has_parents)
+            %foreach;father.child;
+              %apply;somebody()
+            %end;
+          %else;
+            %apply;somebody()
+          %end;
+        </td></tr></table>
+      %else;
+        %foreach;ancestor;
+          <a id="p%ancestor.anc_sosa.v;" href="%l_prefix;%ancestor.access;"
+          %if;(ancestor.same != "") 
+            onmouseover="over1('p%ancestor.same.v;')"
+            onmouseout="out1('p%ancestor.same.v;')"
+            >= %if;(l_sosa_ref = "on")%ancestor.sosa;%else;%ancestor.same;%end; =</a>
+          %else;
+            >
+            %if;(l_sosa_ref = "on")
+              &middot; %ancestor.sosa; &middot;<br%/>
+            %elseif;(evar.sosa = "on")
+              &middot; %ancestor.anc_sosa;
+              %if;(browsing_with_sosa_ref and ancestor.has_sosa) ~ %ancestor.sosa;%end;
+              %sp;&middot;<br%/>
+            %end;
+            %ancestor;<br%/>
+            %ancestor.dates;
+            %if;(evar.bp = "on" and ancestor.has_birth_place)
+              <br%/>%ancestor.birth_place;
+            %end;
+            </a>
+          %end;
+          %if;(level < 6)<div id="ps%ancestor.anc_sosa.v;"></div>%end;
+        %end;
+      %end;
+    </div>
+  %end;
+</div>
+%if;(not cancel_links)
+  %apply;tools()
+%end;
