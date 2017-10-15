@@ -30,18 +30,23 @@
       opacity: 0.7;
       }
 
+/* Fix navigation buttons to top right corner */
 .fixed_top_btn_col {
   position: fixed;
   top: 0px;
   transform: translateX(8px);
+  z-index: 1030;
 }
+
 .fixed_top_btn_wide {
   transform: translateX(-24px);
 }
+
 .fixed_top_btn {
   position: fixed;
   top: 0px;
   transform: translateX(-58px);
+  z-index: 1030;
 }
 
 div.anchor_upd {
@@ -152,14 +157,6 @@ a.book-char{
 /* Fix noword-wrap on long a href */
 a {
   word-wrap: break-word
-}
-
-/* Fix navigation buttons to top right corner */
-.fixed-top-right {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: $zindex-navbar-fixed;
 }
 
 /* Welcome language dropdown scrollable */
