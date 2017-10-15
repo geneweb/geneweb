@@ -224,15 +224,15 @@
   %if;(wizard and not cancel_links)</a>%end;
 %end;
 
-%define;short_display_person_noname(xx,yy,zz,uu)
-  %apply;image_MF("xx")
+%define;short_display_person_noname(xx,yy,zz,uu,ii)
+  %if;("ii"="MF")%apply;image_MF("xx")%end;
   %apply;display_sosa("xx")
   %if;(xx.index=central_index)<b>%if;(xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</b>%else;
     %if;(cancel_links or xx.is_restricted)%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;%nn;
     %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;" title="uu%if;("uu"!=""). %end;%xx;">%if;(bvar.always_surname!="yes" and xx.surname=father.surname)%if;(xx.public_name!="")%xx.public_name;%else;%xx.first_name;%end;%else;%xx;%end;</a>%nn;
     %end;
   %end;
-  %xx.title;%if;("yy"="br")<br>%end;%if;(wizard and not cancel_links)
+  %if;("yy"="br")<br>%end;%if;(wizard and not cancel_links)
   <a href="%prefix;m=MOD_IND;i=%xx.index;" title="[*modify::] %xx.first_name;%if;(xx.occ!="0").%xx.occ;%end; %xx.surname;">%end;<span class="text-nowrap font-italic">%xx.dates;</span>%if;(wizard and not cancel_links)</a>%end;%nn;
   %if;("zz"="age")<br> <span class="text-nowrap">%xx.age;%xx.death_age;</span>%nn;%end;
 %end;
@@ -549,7 +549,7 @@
 
 %define;short_display_siblings_noname()
   %apply;li_SDC("child")
-    %apply;short_display_person_noname("child","","","")%nn;
+    %apply;short_display_person_noname("child","","","","MF")%nn;
   </li>
 %end;
 
