@@ -57,7 +57,7 @@
             class="normal_anchor" 
             target="_blank" title="[*image/images]0 %xxx;">
         %end;
-          <img class="small_image %if;not cancel_links;fade%end; align-self-center rounded ml-0 pr-0"
+          <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0"
             src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
         %if;not cancel_links;</a>%end;
       %elseif;(bvar.default_image="yes")
