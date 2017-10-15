@@ -91,7 +91,7 @@
       %if;(evar.wide="on")
         <div class="col-6">
       %end;
-    %(<div… be carefull h1 is full width then an opening <div class="col-8"> in individu module %)
+    %(<divï¿½ be carefull h1 is full width then an opening <div class="col-8"> in individu module %)
         %let;op_m;3%in;%apply;show_templ("perso_module/individu")
         %let;op_m;2%in;%apply;show_templ("perso_module/unions")
         %let;op_m;1%in;%apply;show_templ("perso_module/chronologie")
@@ -113,7 +113,7 @@
       %if;(evar.wide="on")
         </div>
         <div class="col-6">
-          %let;op_m;4%in;%apply;show_templ("perso_module/individu")
+          %apply;show_templ("perso_module/arbre_famille")
         </div>
       %end;
     </div>

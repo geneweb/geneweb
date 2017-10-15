@@ -10,7 +10,6 @@ modules[1] = "individu";
 options[1][1] = "standard";
 options[1][2] = "centered";
 options[1][3] = "two cols";
-options[1][4] = "4 gen tree";
 modules[2] = "parents";
 options[2][1] = "simple";
 options[2][2] = "simple + photos";
@@ -45,6 +44,7 @@ options[9][1] = "ascendants tree";
 options[9][2] = "horizontal tree";
 options[9][3] = "compact tree";
 options[9][4] = "+3 -3 gen.";
+options[9][5] = "famille";
 modules[10] = "gr_parents";
 options[10][1] = "standard";
 options[10][2] = "three cols";
@@ -145,11 +145,6 @@ $('#i2').on('click', function ()
 $('#i3').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'i3');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_3.jpg">\n');
-});
-
-$('#i4').on('click', function ()
-{ $('#p_mod').val($('#p_mod').val()+'i4');
-  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/individu_4.jpg">\n');
 });
 
 $('#p1').on('click', function ()
@@ -280,6 +275,11 @@ $('#a3').on('click', function ()
 $('#a4').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a4');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_4.jpg">\n');
+});
+
+$('#a5').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a5');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_5.jpg">\n');
 });
 
 $('#g1').on('click', function ()

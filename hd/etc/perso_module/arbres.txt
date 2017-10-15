@@ -17,5 +17,7 @@ Options
   %apply;show_templ("perso_module/arbre_3gen_photo")
 %elseif;(op_m=4)
   %apply;show_templ("perso_module/arbre_7gen")
+%elseif;(op_m=5)
+  %apply;show_templ("perso_module/arbre_famille")
 %else;
 %end;
