@@ -21,7 +21,7 @@
               </a>
             %elseif;(bvar.default_image="yes")
               <img class="small_image rounded align-self-center ml-2" src="%image_prefix;/img_unknown_%if;(child.is_female)wo%elseif;(child.is_male)%else;u_%end;man.png" alt="[missing image]" 
-                title="%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;"%/>
+                title="%if;(child.is_male)[*a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;"%/>
             %else;
               <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
             %end;
@@ -29,7 +29,7 @@
               %if;(bvar.full_siblings="yes")
                 %apply;short_display_person_tree("child")
               %else;
-                %apply;short_display_person_noname("child","br","","")
+                %apply;short_display_person_noname("child","br","","","")
               %end;
               %if;child.computable_age;<br>%sp;%child.age;%end;
               %if;child.computable_death_age;<br>%sp;%child.death_age;%end;
@@ -42,7 +42,7 @@
 %end;
 
 %if;(has_parents and has_siblings)
-  <h2 class="mt-2 mt-lg-0">
+  <h2 class="mt-2 mt-lg-0 w-100">
     %if;(bvar.full_siblings="yes")
       [*full siblings]%nn;
     %else;
@@ -53,21 +53,21 @@
       %foreach;father.child;
         %if;is_sibling_before;
           %incr_count;
-          <a class="ml-2" href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))"><span class="fa fa-caret-left text-success"></span></a>%nn;
+          <a class="ml-2 %if;not is_sibling_before;invisible%end;" href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))"><span class="fa fa-caret-left text-success"></span></a>%nn;
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on"><img class="ml-2" src="%image_prefix;/gui_create.png" height="18" style="margin-bottom:6px" alt="Tree"
+      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on"><img class="px-1 mb-2" src="%image_prefix;/gui_create.png" height="18" alt="Tree"
         title="[*tree] [siblings] ([with] [spouse/spouses]1)"/></a>%nn;
-      %if;((p_mod="" or p_mod="zz") and has_parents)
+      %(%if;((p_mod="" or p_mod="zz") and has_parents)
         %if;(not cancel_links)
           <a class="d-none d-inline d-lg-none ml-1 ml-lg-0" data-toggle="collapse" href="#collapse_3gen_photo" aria-expanded="false" aria-controls="collapseExample2" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [ascendants tree]">%nn;
             <sup><i class="fa fa-caret-up text-success"></i></sup></a>
         %end;
-      %end;
+      %end;%)
       %foreach;father.child;
         %if;is_sibling_after;
-            <a href="%prefix;%child.access;" title="%apply;capitalize(nth([next sibling],sex))"><span class="fa fa-caret-right text-success"></span></a>
+          <a class="%if;not is_sibling_after;invisible%end;" href="%prefix;%child.access;" title="%apply;capitalize(nth([next sibling],sex))"><span class="fa fa-caret-right text-success"></span></a>
         %end;
       %end;
     %end;
