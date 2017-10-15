@@ -118,7 +118,7 @@
       %incr_count2;
     %end
   %end;
-  <h2 class="mt-2">
+  <h2 class="mt-2 w-100">
     %if;(op_m!=1)
       %if;(count2>0)
         %if(nb_families>1)[*marriage/marriages]1%else;[*marriage/marriages]0%end;%nn;
@@ -195,7 +195,7 @@
                 %if;(bvar.always_surname="yes")
                   %apply;short_display_person("child")
                 %else;
-                  %apply;short_display_person_noname("child","","","")
+                  %apply;short_display_person_noname("child","","","","MF")
                 %end;
               </li>
             %end;
@@ -217,7 +217,7 @@
     %foreach;child;
       %if;(child.has_image)%incr_count2;%end;
     %end;
-    <ul class="my-1">%apply;li_SD("spouse")
+    <ul class="mr-1">%apply;li_SD("spouse")
       %apply;long_married("self")%sp
       %if;(count2=0)
         %apply;short_display_person("spouse")
@@ -244,13 +244,14 @@
             %if;(bvar.always_surname="yes")
               %apply;short_display_person("child")
             %else;
-              %apply;short_display_person_noname("child","","","")
+              %apply;short_display_person_noname("child","","","","MF")
             %end;
           </li></ul>
         %end;
       %end;
+    </li></ul>
     %if;(count2>0)
-      <br>%apply;short_display_person("spouse")
+      %apply;short_display_person("spouse")
       %if;spouse.computable_age;<span class="ml-1">, %spouse.age;</span>
       %elseif;spouse.computable_death_age;<span class="ml-1">, %spouse.death_age;</span>
       %else;, &#8203;
@@ -258,7 +259,7 @@
       <div class="d-inline-flex justify-content-start mt-1">
         %if;spouse.has_image;
           <a href="%spouse.image_url;" target="_blank">
-            <img class="big_image mx-1 rounded" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)"%/>%nn;
+            <img class="big_image fade_image mx-1 rounded" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)"%/>%nn;
           </a>
         %elseif;(bvar.default_image="yes")
           <img class="align-items-start mx-1 my-4" src="%image_prefix;/img_unknown_%if;(spouse.is_female)wo%elseif;(spouse.is_male)%else;u_%end;man.png" alt="[missing image]"%/>
@@ -287,7 +288,7 @@
                   <div class="d-inline-flex col %if;(parent.is_male)mb-1%end; px-1">
                     %if;parent.has_image;
                       <a href="%parent.image_url;" class="align-self-center" target="_blank">
-                        <img class="small_image rounded align-self-center" src="%parent.image_url;"
+                        <img class="small_image fade_image rounded align-self-center" src="%parent.image_url;"
                          alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)"%/>
                       </a>
                     %elseif;(bvar.default_image="yes")
@@ -318,7 +319,7 @@
               <div class="d-inline-flex flex-row  mt-1">
                 %if;child.has_image;
                   <a href="%child.image_url;" class="align-self-center" target="_blank">
-                    <img class="small_image rounded ml-2" src="%child.image_url;" alt="[image/images]0" 
+                    <img class="small_image fade_image rounded ml-2" src="%child.image_url;" alt="[image/images]0" 
                       title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)"%/>%nn;
                   </a>
                 %elseif;(bvar.default_image="yes")
@@ -329,7 +330,7 @@
                 %end;
                 <div class="ml-2 align-self-center">
                   %if;(count2=0)<ul>%apply;li_SD("child")%end;%nn;
-                  %apply;short_display_person_noname%with;child%and;br%and;age%and;%count1;%end;%nn;
+                  %apply;short_display_person_noname%with;child%and;br%and;age%and;%count1;%and;%end;%nn;
                   %if;(count2=0)</li></ul>%end;
                 </div>
               </div>
@@ -366,8 +367,6 @@
       %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
     %end;
     %reset_count2;
-        </li></ul>
-
   %end;
 
 %elseif;(op_m=3 and has_families)
@@ -409,7 +408,7 @@
                 %if;(bvar.always_surname="yes")
                   %apply;short_display_person("child")
                 %else;
-                  %apply;short_display_person_noname("child","","","")
+                  %apply;short_display_person_noname("child","","","","MF")
                 %end;
                 %if;child.has_families;
                   %foreach;child.family;
