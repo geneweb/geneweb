@@ -249,8 +249,12 @@
           </li></ul>
         %end;
       %end;
-    </li></ul>
     %if;(count2>0)
+      <br>%apply;short_display_person("spouse")
+      %if;spouse.computable_age;<span class="ml-1">, %spouse.age;</span>
+      %elseif;spouse.computable_death_age;<span class="ml-1">, %spouse.death_age;</span>
+      %else;, &#8203;
+      %end;
       <div class="d-inline-flex justify-content-start mt-1">
         %if;spouse.has_image;
           <a href="%spouse.image_url;" target="_blank">
@@ -263,11 +267,11 @@
         %end;
         <div class="flex-column">
           <div class="ml-2 mr-1">
-            %apply;short_display_person_tree("spouse")<br>
+            %(apply;short_display_person_tree("spouse")<br>
             %if;spouse.computable_age;<span class="ml-1">%spouse.age;</span>
             %elseif;spouse.computable_death_age;<span class="ml-1">%spouse.death_age;</span>
             %else;&#8203;
-            %end;
+            %end;%)
           </div>
           %if;(spouse.has_parents)
             <div class="d-inline-flex mt-1 align-self-center">
@@ -280,7 +284,7 @@
               <div class="flex-wrap">
                 %foreach;spouse.parent;
                   %(%if;(father!="" and parent.is_female)<div class="ml-2 mr-1 align-self-center text-center">[and]<div class="invisible"><br>&#8203;</div></div>%end;%)
-                  <div class="d-inline-flex flex-row %if;(parent.is_male)mb-1%end; px-1">
+                  <div class="d-inline-flex col %if;(parent.is_male)mb-1%end; px-1">
                     %if;parent.has_image;
                       <a href="%parent.image_url;" class="align-self-center" target="_blank">
                         <img class="small_image rounded align-self-center" src="%parent.image_url;"
@@ -311,7 +315,7 @@
             %reset_count1;
             %foreach;child;
               %incr_count1;
-              <div class="d-inline-flex flex-row %if;(nb_children>2)w-50%end; mt-1">
+              <div class="d-inline-flex flex-row  mt-1">
                 %if;child.has_image;
                   <a href="%child.image_url;" class="align-self-center" target="_blank">
                     <img class="small_image rounded ml-2" src="%child.image_url;" alt="[image/images]0" 
@@ -362,6 +366,8 @@
       %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
     %end;
     %reset_count2;
+        </li></ul>
+
   %end;
 
 %elseif;(op_m=3 and has_families)
