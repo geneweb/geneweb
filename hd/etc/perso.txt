@@ -125,7 +125,9 @@
       %let;mmi;%apply;mm(i)%in;
       %let;ooi;%apply;oo(i)%in;
       %if;(mmi!="" and ooi!=0)
-        %apply;get_mod(mmi, ooi)
+        <div class="col-12">
+          %apply;get_mod(mmi, ooi)
+        </div>
       %end
     %end;
   </div>
