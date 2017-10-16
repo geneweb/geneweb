@@ -1369,7 +1369,7 @@ eo: duonfrato/duonfratino/duonfrat(in)o
 es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
 et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
 fi: velipuoli:g:-en/sisarpuoli:g:-en/isä- tai äitipuolen lapsi:g:-en
-fr: un demi-frère/une demi-sœur/un demi-frère ou une demi-sœur
+fr: un demi-frère/une demi-sœur/un demi-frère ou sœur
 he:   חצי אח/ חצי אחות/ חצי אח(ות)
 is: hálfbróðir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
@@ -1387,7 +1387,7 @@ sv: en halvbror/en halvsyster/ett halvsyskon
 
     half-brothers/half-sisters/half-siblings
 en: half-brothers/half-sisters/half-siblings
-fr: demi-frères/demi-sœurs/demi-frères et demi-sœurs
+fr: demi-frères/demi-sœurs/demi-frères et sœurs
 
     brothers/sisters/siblings
 en: brothers/sisters/siblings
@@ -11466,6 +11466,10 @@ ru: сын/дочь/дети
 sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: son/dotter/barn
+
+    sons/daughters/children
+en: sons/daughters/children
+fr: fils/filles/enfants
 
     sort by/branch/alphabetic order
 de: sortieren nach: /Zweige/Alphabet
