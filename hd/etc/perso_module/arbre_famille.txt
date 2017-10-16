@@ -337,7 +337,33 @@
         %end;
         %foreach;family;
           %if;(family_cnt!=fam_cnt and nb_children>0 and evar.semi="on")
-          Enfant·s avec %spouse; %( TODO [child/children]c %)
+            %reset_count;%reset_count1;%reset_count2;
+            %foreach;child;
+              %incr_count;
+              %if;child.is_male;%incr_count1;%end;
+              %if;child.is_female;%incr_count2;%end;
+            %end;
+            %if;(nb_children=1)
+              %foreach;child;
+                %if;child.is_male;[*a son/a daughter/a child]0
+                %elseif;child.is_female;[*a son/a daughter/a child]1
+                %else;[*a son/a daughter/a child]2
+                %end;
+              %end;
+            %else;
+              %if;(count2=0 and count1!=0)
+                %if;(count1=1)[*a son/a daughter/a child]0
+                %elseif;(count1>1)%apply;in_full(count1,1) [sons/daughters/children]0
+                %end;
+              %elseif;(count1=0 and count2!=0)
+                %if;(count2=1)[*a son/a daughter/a child]1
+                %elseif;(count2>1)%apply;in_full(count2,1); [sons/daughters/children]1
+                %end;
+              %else;
+                %apply;in_full(count,1) [sons/daughters/children]2
+              %end;
+            %end;
+          [with] %spouse;
           <div class="list-group mb-2">
             %foreach;child;
               %apply;short_display_person_image("child", "yes")
@@ -419,7 +445,7 @@
                     %if;(count=1)
                       [a sibling-in-law/siblings-in-law]0
                     %else;
-                      %count [a sibling-in-law/siblings-in-law]1
+                      %apply;in_full(count,1) [a sibling-in-law/siblings-in-law]1
                     %end;
                   %end;
                 %elseif;(evar.semi="on")
@@ -435,7 +461,7 @@
                     %if;(count=1)
                       [a half sibling-in-law/half siblings-in-law]0
                     %else;
-                      %count [a half sibling-in-law/half siblings-in-law]1
+                      in_full(count,1); [a half sibling-in-law/half siblings-in-law]1
                     %end;
                   %end;
                   %apply;on_side%with;%spfathfn; [and] %spouse;%end;
@@ -477,7 +503,7 @@
                       %if;(count=1)
                         [*a half sibling-in-law/half siblings-in-law]0
                       %else;
-                        %count [a half sibling-in-law/half siblings-in-law]1
+                        in_full(count,1); [a half sibling-in-law/half siblings-in-law]1
                       %end;
                     %end;
                     %apply;on_side%with;%spmothfn; [and] %spouse;%end;

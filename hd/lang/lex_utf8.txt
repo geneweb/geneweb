@@ -1387,11 +1387,11 @@ sv: en halvbror/en halvsyster/ett halvsyskon
 
     half-brothers/half-sisters/half-siblings
 en: half-brothers/half-sisters/half-siblings
-fr: demi-frères/demi-soeurs/demi-frères et demi-soeurs
+fr: demi-frères/demi-sœurs/demi-frères et demi-sœurs
 
     brothers/sisters/siblings
 en: brothers/sisters/siblings
-fr: frères/soeurs/frères et soeurs
+fr: frères/sœurs/frères et sœurs
 
     a nephew/a niece
 af: 'n broerskind/'n susterskind
@@ -12364,19 +12364,19 @@ fr: beau-père/belle-mère
 
     a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
 en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
-fr: un beau-frère/beaux-frères/une belle-soeur/belles-soeurs
+fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœur
 
     a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
 en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
-fr: un demi beau-frère/demi beaux-frères/une demi belle-soeur/demi belles-soeurs
+fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
 
     a sibling-in-law/siblings-in-law
 en: one sibling-in-law/siblings-in-law
-fr: un beau-frère ou belle-soeur/beaux-frères et belles-soeurs
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
 
     a half sibling-in-law/half siblings-in-law
 en: one half sibling-in-law/half siblings-in-law
-fr: un demi beau-frère ou belle-soeur/demi beaux-frères et belles-soeurs
+fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
 
     the father/the mother/a parent
 af: die pa/die ma/'n ouer
