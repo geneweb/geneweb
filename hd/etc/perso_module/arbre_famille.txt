@@ -31,7 +31,16 @@
 %define;short_display_person_image(xxx,yyy)%(xxx=person,%)
   %let;personinfo;%if;(childrank!="")%childrank;%nn;
                   %elseif;(spouserank!="")%spouserank;%nn;
-                  %elseif;(selfsex!="")%selfsex;%end;%in;
+                  %elseif;(selfsex!="")%selfsex;%nn;
+                  %elseif;("xxx"="father") ([father/mother]0)%nn;
+                  %elseif;("xxx"="mother") ([father/mother]1)
+                  %elseif;("xxx"="spouse.father") ([father-in-law/mother-in-law]0)%nn;
+                  %elseif;("xxx"="spouse.mother") ([father-in-law/mother-in-law]1)%nn;
+                  %elseif;("xxx"="father.father" or "xxx"="mother.father"
+                        or "xxx"="spouse.father.father" or "xxx"="spouse.mother.father") ([a grandfather/a grandmother/a grandparent]0)%nn;
+                  %elseif;("xxx"="father.mother" or "xxx"="mother.mother"
+                        or "xxx"="spouse.father.mother" or "xxx"="spouse.mother.mother") ([a grandfather/a grandmother/a grandparent]1)%nn;
+                  %end;%in;
   <div class="d-flex pl-0 pr-0 %if;(evar.image="on")py-0%end; w-100 justify-content-start list-group-item %if;(not cancel_links)list-group-item-action%end; list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
     %if;(not (cancel_links or xxx.is_restricted))
       <a href="%xxx.bname_prefix;%evm;%xxx.access;;%nn;
@@ -214,8 +223,9 @@
   %( Individu et sa fratrie %)
   <div class="col%if;not has_families;-6%end; pr-0 pl-2">
     <div class="%if;not has_families;d-flex justify-content-center mx-5%else;ml-3%end;">
-      %let;selfsex; (%if;(self.is_male)[him/her]0*%else;[him/her]1%end;)%in;
+      %let;selfsex; (%if;(self.is_male)[him/her]0%else;[him/her]1%end;)%in;
       %apply;short_display_person_image("self", "force")
+      %let;selfsex;%in;
     </div>
     %if;(has_parents)
       %let;fath;%father.index;%in;
@@ -243,18 +253,21 @@
             <div class="col-12 order-1 mt-1">
               %if;(father.spouse.index=moth)
                 %if;self.has_siblings;
-                  %if;(count1!=0 and count2=0)
-                    %if;(count1=1)[*a brother/a sister/a sibling]0
-                    %elseif;(count1>1)%apply;in_full(count1,1) [brothers/sisters/siblings]0
-                    %end;
-                  %elseif;(count1=0 and count2!=0)
+                  %if;(count1=0)
                     %if;(count2=1)[*a brother/a sister/a sibling]1
-                    %elseif;(count2>1)%apply;in_full(count2,1); [brothers/sisters/siblings]1
+                    %elseif;(count2>1)%apply;in_full(count2,1) [brothers/sisters/siblings]1
                     %end;
-                  %elseif;(count=1)
-                    [*a brother/a sister/a sibling]2
-                  %else;
+                  %elseif;(count1>=1)
+                    %if;(count1>1)%apply;in_full(count1,1) [brothers/sisters/siblings]0
+                    %elseif;(count1=1)[*a brother/a sister/a sibling]0
+                    %end;
+                    %if;(count2>1) [and] %apply;in_full(count2,0) [brothers/sisters/siblings]1
+                    %elseif;(count2=1) [and] [a brother/a sister/a sibling]1
+                    %end;
+                  %elseif;(count!=1)
                     %apply;in_full(count,1) [brothers/sisters/siblings]2
+                  %else;
+                    [*a brother/a sister/a sibling]2
                   %end;
                 %end;
               %elseif;(count>0 and evar.semi="on")
@@ -264,7 +277,7 @@
                   %end;
                 %elseif;(count1=0 and count2!=0)
                   %if;(count2=1)[*a half-brother/a half-sister/a half-sibling]1
-                  %elseif;(count2>1)%apply;in_full(count2,1); [half-brothers/half-sisters/half-siblings]1
+                  %elseif;(count2>1)%apply;in_full(count2,1) [half-brothers/half-sisters/half-siblings]1
                   %end;
                 %elseif;(count=1)
                   [*a half-brother/a half-sister/a half-sibling]2
@@ -303,7 +316,7 @@
                   %end;
                 %elseif;(count1=0 and count2!=0)
                   %if;(count2=1)[*a half-brother/a half-sister/a half-sibling]1
-                  %elseif;(count2>1)%apply;in_full(count2,1); [half-brothers/half-sisters/half-siblings]1
+                  %elseif;(count2>1)%apply;in_full(count2,1) [half-brothers/half-sisters/half-siblings]1
                   %end;
                 %elseif;(count=1)
                   [*a half-brother/a half-sister/a half-sibling]2
@@ -372,7 +385,7 @@
                 %end;
               %elseif;(count1=0 and count2!=0)
                 %if;(count2=1)[*a son/a daughter/a child]1
-                %elseif;(count2>1)%apply;in_full(count2,1); [sons/daughters/children]1
+                %elseif;(count2>1)%apply;in_full(count2,1) [sons/daughters/children]1
                 %end;
               %elseif;(count=1)
                 [*a son/a daughter/a child]2
@@ -403,7 +416,7 @@
             %if;(family_cnt=fam_cnt)
               %apply;short_display_person_image("spouse", "yes")
             %else;
-              <a class="list-group-item list-group-item-dark ml-2 pl-0 pr-2 py-0"
+              <a class="d-flex list-group-item list-group-item-dark ml-2 pl-0 pr-2 py-0"
                 href="%apply;rebuild_url%with;%if;(evar.image="on")on%end;%nn;
                   %and;%family_cnt;%nn;
                   %and;%if;(evar.semi="on")on%end;
@@ -417,20 +430,19 @@
                     %if;child.is_male;%incr_count1;%end;
                     %if;child.is_female;%incr_count2;%end;
                   %end;
-                  <span class="ml-1">(
-                  %if;(count2=0 and count1!=0)
-                    %if;(count1=1)[*a son/a daughter/a child]0
-                    %elseif;(count1>1)%apply;in_full(count1,1) [sons/daughters/children]0
+                  <span class="ml-auto">%nn;
+                  (%if;(count2=0 and count1!=0)
+                    %if;(count1=1)[a son/a daughter/a child]0%nn;
+                    %elseif;(count1>1)%apply;in_full(count1,0) [sons/daughters/children]0%nn;
                     %end;
                   %elseif;(count1=0 and count2!=0)
-                    %if;(count2=1)[*a son/a daughter/a child]1
-                    %elseif;(count2>1)%apply;in_full(count2,1) [sons/daughters/children]1
-                    %end;
+                    %if;(count2=1)[a son/a daughter/a child]1%nn;
+                    %elseif;(count2>1)%apply;in_full(count2,0) [sons/daughters/children]1%nn;
+                    %end;%nn;
                   %elseif;(count=1)
-                    [*a son/a daughter/a child]2
-                  %else;
-                    %apply;in_full(count,1) [sons/daughters/children]2
-                  %end;</span>)
+                    [*a son/a daughter/a child]2%nn;
+                  %else;%apply;in_full(count,0) [sons/daughters/children]2%nn;
+                  %end;)</span>
                 %end;
               </a>
             %end;
@@ -529,7 +541,7 @@
                       %end;
                     %elseif;(count1=0 and count2!=0)
                       %if;(count2=1)[*a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]2
-                      %elseif;(count2>1)%apply;in_full(count2,1); [a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]3
+                      %elseif;(count2>1)%apply;in_full(count2,1) [a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]3
                       %end;
                     %elseif;(count=1)
                       [*a half sibling-in-law/half siblings-in-law]0
