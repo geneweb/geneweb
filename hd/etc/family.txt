@@ -1,4 +1,4 @@
-<!-- $Id: family.txt v 7.00 28/03/2017 20:05:52 hg -->
+<!-- $Id: family.txt v 7.00 exp 15/10/2017 21:03:04 hg -->
 <title>%nn;
   %if;has_public_name;
     %if;has_qualifiers;%public_name; %qualifier;
@@ -23,7 +23,7 @@
   %include.menubar;
   %message_to_wizard;
   <div id="content" tabindex="-1">
-    %let;op_m;4%in;%apply;show_templ("perso_module/individu")
+    %apply;show_templ("perso_module/arbre_famille")
   </div>
   %if;(not cancel_links)
     %include.trl;
