@@ -43,19 +43,20 @@
 %end;
 
 %define;short_display_person_image(xxx,yyy)
+  %let;personinfo;%if;(childrank!="")%childrank;%elseif;(spouserank!="")%spouserank;%end;%in;
   <div class="d-flex pl-0 pr-0 %if;(evar.image="on")py-0%end; w-100 justify-content-start list-group-item list-group-item-action list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
     <a %if;(not (cancel_links or xxx.is_restricted))
       href="%xxx.bname_prefix;%evm;%xxx.access;;%nn;
         %if;(evar.image="on")image=on;%end;%nn;
         %if;(evar.semi="on")semi=on;%end;"%end; 
-      class="big_anchor" title="[*navigation] %xxx;">
+      class="big_anchor" title="[*navigation] %xxx;%personinfo;">
     </a>
     %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
       %if;xxx.has_image;
         %if;not cancel_links;
           <a href="%xxx.image_url;" 
             class="normal_anchor" 
-            target="_blank" title="[*image/images]0 %xxx;">
+            target="_blank" title="[*image/images]0 %xxx;%personinfo;">
         %end;
           <img class="small_image %if;not cancel_links;fade_image%end; align-self-center rounded ml-0 pr-0"
             src="%xxx.image_url;" alt="[image/images]0"%/>%nn;
@@ -65,7 +66,7 @@
           <a href="%xxx.bname_prefix;m=SND_IMAGE;i=%xxx.index;" 
             class="normal_anchor" 
             target="_blank" 
-            title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;">
+            title="%apply;a_of_b%with;[*add picture]%and;%xxx;%end;%personinfo;">
         %end;
         <img class="small_image align-self-center rounded ml-0" 
           src="%image_prefix;/img_unknown_%if;(xxx.is_female)wo%elseif;(xxx.is_male)%else;u_%end;man.png" 
@@ -83,7 +84,7 @@
         href="%prefx;%xxx.access;;
           %if;(evar.image="on")image=on;%end;%nn;
           %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;"
-        title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx;%end;%end;">
+        title="%apply;a_of_b%with;[*vital record]%and;%if;(xxx="? ?")[unknown person]%else;%xxx;%end;%end;%personinfo;">
       %end;
       %if;(xxx.index=central_index and "yyy"!="force")<b>%xxx;</b>%else;%xxx;%end;
       %if;(not (cancel_links or xxx.is_restricted))
@@ -92,7 +93,7 @@
       %if;(wizard and not cancel_links)
         <a class="normal_anchor" 
           href="%prefix;m=MOD_IND;i=%xxx.index;;"
-          title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;">
+          title="[*modify::] %if;(xxx="? ?")[unknown person]%else;%xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;%end;%personinfo;">
       %end;
       <span class="text-nowrap font-italic">%nn;
         %if;(xxx.dates!="")%xxx.dates;%nn;
@@ -380,7 +381,7 @@
                     %if;(count1=1 and count2=0)
                       [*a half-brother/a half-sister/a half-sibling]0
                     %elseif;(count1=0 and count2=1)
-                      [*a half-brother/a half-sister/a half-sibling]0
+                      [*a half-brother/a half-sister/a half-sibling]1
                     %else;
                       [*half siblings]
                     %end; %apply;on_side%with;%father.first_name; & %father.spouse;%end;
@@ -414,7 +415,7 @@
                       %elseif;(count1>1)%count1 [half-brother/brothers/sister/sisters]1
                       %end;
                     %elseif;(count1=0 and count2!=0)
-                      %if;(count2=1)[*a half-brother/a half-sister/a half-sibling]0
+                      %if;(count2=1)[*a half-brother/a half-sister/a half-sibling]1
                       %elseif;(count2>1)%count2 [half-brother/brothers/sister/sisters]3
                       %end;
                     %else;
@@ -450,7 +451,10 @@
             %foreach;family;
               %if;(family_cnt=fam_cnt and nb_children>0)
                 <div class="list-group mb-2">
+                  %reset_count;
                   %foreach;child;
+                    %incr_count;
+                    %let;childrank; (%apply;nth%with;[nth (cousin)]%and;%count;%end; [child/children]0)%in;
                     %apply;short_display_person_image("child", "yes")
                   %end;
                 </div>
@@ -474,22 +478,24 @@
       <div class="%if;not has_families;d-none%else;col%end; pl-0 pr-2">
         %( Conjoint·s %)
           <div class="mr-3">
+            %reset_count;
             %foreach;family;
-              %if;(spouse!="" and family_cnt=fam_cnt)
-                %apply;short_display_person_image("spouse", "yes")
-              %end;
-            %end;
-            %foreach;family;
-              %if;(spouse!="" and family_cnt!=fam_cnt)
-                <a class="list-group-item list-group-item-dark ml-2 pl-0 pr-2 py-0"
-                  href="%apply;rebuild_url%with;%if;(evar.image="on")on%end;%nn;
-                    %and;%family_cnt;%nn;
-                    %and;%if;(evar.semi="on")on%end;
-                    %end;%evm;;">
-                  <span class="ml-2">(%family_cnt;)</span>
-                  <span class="ml-1">%spouse;</span>
-                  %if;(nb_children>0)<span class="ml-1">(%nb_children; %if;(nb_children>1)[child/children]1%else;[child/children]0%end;)</span>%end;
-                </a>
+              %if;(spouse!="")
+                %incr_count;
+                %let;spouserank; (%apply;nth%with;[nth (cousin)]%and;%count;%end; [spouse/spouses]0)%in;
+                %if;(family_cnt=fam_cnt)
+                  %apply;short_display_person_image("spouse", "yes")
+                %else;
+                  <a class="list-group-item list-group-item-dark ml-2 pl-0 pr-2 py-0"
+                    href="%apply;rebuild_url%with;%if;(evar.image="on")on%end;%nn;
+                      %and;%family_cnt;%nn;
+                      %and;%if;(evar.semi="on")on%end;
+                      %end;%evm;;" title="[*visualize/show/hide/summary]1 %spouse; %spouserank;">
+                    <span class="ml-2">(%family_cnt;)</span>
+                    <span class="ml-1">%spouse;</span>
+                    %if;(nb_children>0)<span class="ml-1">(%nb_children; %if;(nb_children>1)[child/children]1%else;[child/children]0%end;)</span>%end;
+                  </a>
+                %end;
               %end;
             %end;
         </div>
@@ -508,9 +514,11 @@
                     %reset_count;%reset_count1;%reset_count2;
                     %foreach;child;
                       %if;(child=selfspouse)
-                        <div class="d-flex justify-content-center">
-                          <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
-                        </div>
+                        %if;(child.has_siblings)
+                          <div class="d-flex justify-content-center">
+                            <div class="col-11 border border-%if;(child.is_male)secondary%else;danger%end; border-right-0 border-left-0"></div>
+                          </div>
+                        %end;
                       %else;
                         %incr_count;
                         %if;child.is_male;%incr_count1;%end;
@@ -521,24 +529,26 @@
                   </div>
                 %end;
                 <div class="col-12 order-1 mt-1">
-                  %if;(spouse=spfath or spouse=spmoth)
-                    %if;(count2=0 and count1!=0)
-                      %if;(count1=1)[*a brother-in-law/a sister-in-law]0
-                      %elseif;(count1>1)%count1 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]1
+                  %if;(count>0)
+                    %if;(spouse=spfath or spouse=spmoth)
+                      %if;(count2=0 and count1!=0)
+                        %if;(count1=1)[*a brother-in-law/a sister-in-law]0
+                        %elseif;(count1>1)%count1 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]1
+                        %end;
+                      %elseif;(count1=0 and count2!=0)
+                        %if;(count2=1)[*a brother-in-law/a sister-in-law]1
+                        %elseif;(count2>1)%count2 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]3
+                        %end;
+                      %else;%count; [sibling-in-law/siblings-in-law]1
                       %end;
-                    %elseif;(count1=0 and count2!=0)
-                      %if;(count2=1)[*a brother-in-law/a sister-in-law]0
-                      %elseif;(count2>1)%count2 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]3
-                      %end;
-                    %elseif;(count!=0)%count; [sibling-in-law/siblings-in-law]1
+                    %elseif;(evar.semi="on")%count; [half sibling-in-law/half siblings-in-law]1 %apply;on_side%with;%spfathfn; & %spouse;%end;
                     %end;
-                  %elseif;(evar.semi="on")%count; [half sibling-in-law/half siblings-in-law]1 %apply;on_side%with;%spfathfn; & %spouse;%end;
                   %end;
                 </div>
               </div>
             %end;
             %foreach;spouse.mother.family;
-              <div class="row mt-1 ml-1">
+              <div class="row ml-1">
                 %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")
                   <div class="col list-group order-2">
                     %reset_count;%reset_count1;%reset_count2;
@@ -563,7 +573,7 @@
                           %elseif;(count1>1)%count1 [half brother-in-law/half brothers-in-law/half sister-in-law/half sisters-in-law]1
                           %end;
                         %elseif;(count1=0 and count2!=0)
-                          %if;(count2=1)[*a brother-in-law/a sister-in-law]0
+                          %if;(count2=1)[*a brother-in-law/a sister-in-law]1
                           %elseif;(count2>1)%count2 [half brother-in-law/half brothers-in-law/half sister-in-law/half sisters-in-law]3
                           %end;
                         %else;%count [half sibling-in-law/half siblings-in-law]1
@@ -579,4 +589,3 @@
         %end;
       </div>
     </div>
-
