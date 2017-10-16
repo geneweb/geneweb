@@ -53,9 +53,9 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link %if;(evar.m="F")active%end;"
-              href="%prefix;m=F;%access;;
-                %if;(bvar.default_fnav_images="")image=on;%else;image=%bvar.default_fnav_images;%end;
+            <a class="nav-link %if;(evar.m="F")active%end;" %nn;
+              href="%prefix;m=F;%access;;%nn;
+                %if;(bvar.default_fnav_images="")image=on;%else;image=%bvar.default_fnav_images;%end;%nn;
                 %if;(bvar.default_fnav_semi="")semi=on;%else;semi=%bvar.default_fnav_semi;%end;" title="[*family/families]0">
               <span class="fa fa-plus fa-users fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">[*family/families]0</span>
