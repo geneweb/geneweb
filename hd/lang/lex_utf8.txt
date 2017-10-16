@@ -9272,6 +9272,11 @@ sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
 
+    n (number)
+de: kein/eins/zwei/drei/vier/fünf/sechs/sieben/acht/neun/zehn/elf/zwölf/dreizehn/vierzehn/füfnzehn/sechzehn/siebzehn/achtzehn/neunzehn/zwanzig/einundzwanzig/zweiundzwanzig/dreiundzwanzig/vierundzwanzig/fünfundzwanzig/sechsundzwanzig/siebenundzwanzig/achtundzwanzig/neunundzwanzig/dreißig/einunddreißig
+en: none/one/two/three/four/five/six/seven/eight/nine/ten/eleven/twelve/thirteen/fourteen/fifteen/sixteen/seventeen/eighteen/nineteen/twenty/twenty-one/twenty-two/twenty-two//twenty-three//twenty-four//twenty-five//twenty-six//twenty-seven//twenty-eight//twenty-nine/thirty/thirty-one
+fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/quartorze/quinze/seize/dix-sept/dix-huit/dix-neuf/vingt/vingt-et-un/vingt-deux/vingt-trois/vingt-quatre/vingt-cinq/vingt-six/vingt-sept/vingt-huit/vingt-neuf/trente/trente-un
+
     number
 af: nommer
 bg: номер
