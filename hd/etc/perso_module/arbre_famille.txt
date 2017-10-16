@@ -370,13 +370,14 @@
                     %if;self.has_siblings;
                       %if;(count2=0 and count1!=0)
                         %if;(count1=1)[*a brother/a sister/a sibling]0
-                        %elseif;(count1>1)%count1 [brother/brothers/sister/sisters]1
+                        %elseif;(count1>1)%count1 [brothers/sisters/siblings]0
                         %end;
                       %elseif;(count1=0 and count2!=0)
                         %if;(count2=1)[*a brother/a sister/a sibling]1
-                        %elseif;(count2>1)%count2 [brother/brothers/sister/sisters]3
+                        %elseif;(count2>1)%count2 [brothers/sisters/siblings]1
                         %end;
-                      %else;[*siblings]
+                      %else;
+                        %count; [brothers/sisters/siblings]2
                       %end;
                     %end;
                   %elseif;(count>0 and evar.semi="on")
@@ -385,7 +386,7 @@
                     %elseif;(count1=0 and count2=1)
                       [*a half-brother/a half-sister/a half-sibling]1
                     %else;
-                      [*half siblings]
+                      %count; [half siblings]
                     %end; %apply;on_side%with;%father.first_name; & %father.spouse;%end;
                   %end;
                 </div>
@@ -414,14 +415,14 @@
                   <div class="col-12 %if;(family_cnt>1)mt-1%end; order-1">
                     %if;(count2=0 and count1!=0)
                       %if;(count1=1)[*a half-brother/a half-sister/a half-sibling]0
-                      %elseif;(count1>1)%count1 [half-brother/brothers/sister/sisters]1
+                      %elseif;(count1>1)%count1 [half-brothers/half-sisters/half-siblings]0
                       %end;
                     %elseif;(count1=0 and count2!=0)
                       %if;(count2=1)[*a half-brother/a half-sister/a half-sibling]1
-                      %elseif;(count2>1)%count2 [half-brother/brothers/sister/sisters]3
+                      %elseif;(count2>1)%count2 [half-brothers/half-sisters/half-siblings]1
                       %end;
                     %else;
-                      [*half siblings]
+                      %count; [half-brothers/half-sisters/half-siblings]2
                     %end; %apply;on_side%with;%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; & %mother.spouse;%end;
                   </div>
                 %end;
@@ -534,16 +535,37 @@
                   %if;(count>0)
                     %if;(spouse=spfath or spouse=spmoth)
                       %if;(count2=0 and count1!=0)
-                        %if;(count1=1)[*a brother-in-law/a sister-in-law]0
-                        %elseif;(count1>1)%count1 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]1
+                        %if;(count1=1)[*a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law]0
+                        %elseif;(count1>1)%count1 [a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law]1
                         %end;
                       %elseif;(count1=0 and count2!=0)
-                        %if;(count2=1)[*a brother-in-law/a sister-in-law]1
-                        %elseif;(count2>1)%count2 [brother-in-law/brothers-in-law/sister-in-law/sisters-in-law]3
+                        %if;(count2=1)[*a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law]2
+                        %elseif;(count2>1)%count2 [a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law]3
                         %end;
-                      %else;%count; [sibling-in-law/siblings-in-law]1
+                      %else;
+                        %if;(count=1)
+                          [a sibling-in-law/siblings-in-law]0
+                        %else;
+                          %count [a sibling-in-law/siblings-in-law]1
+                        %end;
                       %end;
-                    %elseif;(evar.semi="on")%count; [half sibling-in-law/half siblings-in-law]1 %apply;on_side%with;%spfathfn; & %spouse;%end;
+                    %elseif;(evar.semi="on")
+                      %if;(count2=0 and count1!=0)
+                        %if;(count1=1)[*a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]0
+                        %elseif;(count1>1)%count1 [a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]1
+                        %end;
+                      %elseif;(count1=0 and count2!=0)
+                        %if;(count2=1)[*a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]2
+                        %elseif;(count2>1)%count2 [a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]3
+                        %end;
+                      %else;
+                        %if;(count=1)
+                          [a half sibling-in-law/half siblings-in-law]0
+                        %else;
+                          %count [a half sibling-in-law/half siblings-in-law]1
+                        %end;
+                      %end;
+                      %apply;on_side%with;%spfathfn; & %spouse;%end;
                     %end;
                   %end;
                 </div>
@@ -552,6 +574,7 @@
             %foreach;spouse.mother.family;
               <div class="row ml-1">
                 %if;(not (spouse=spfath or spouse=spmoth) and evar.semi="on")
+                %( on a déjà compté les frangin·e·s, on recommence pas %)
                   <div class="col list-group order-2">
                     %reset_count;%reset_count1;%reset_count2;
                     %foreach;child;
@@ -571,14 +594,19 @@
                     <div class="col-12 mt-1 order-1">
                       %if;(not (spouse=spfath or spouse=spmoth))
                         %if;(count2=0 and count1!=0)
-                          %if;(count1=1)[*a half brother-in-law/a half sister-in-law]0
-                          %elseif;(count1>1)%count1 [half brother-in-law/half brothers-in-law/half sister-in-law/half sisters-in-law]1
+                          %if;(count1=1)[*a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]0
+                          %elseif;(count1>1)%count1 [a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]1
                           %end;
                         %elseif;(count1=0 and count2!=0)
-                          %if;(count2=1)[*a brother-in-law/a sister-in-law]1
-                          %elseif;(count2>1)%count2 [half brother-in-law/half brothers-in-law/half sister-in-law/half sisters-in-law]3
+                          %if;(count2=1)[*a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]2
+                          %elseif;(count2>1)%count2 [a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law]3
                           %end;
-                        %else;%count [half sibling-in-law/half siblings-in-law]1
+                        %else;
+                          %if;(count=1)
+                            [*a half sibling-in-law/half siblings-in-law]0
+                          %else;
+                            %count [a half sibling-in-law/half siblings-in-law]1
+                          %end;
                         %end;
                         %apply;on_side%with;%spmothfn; & %spouse;%end;
                       %end;
