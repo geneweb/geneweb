@@ -1,10 +1,5 @@
 <style>
 /* Put here only properties that uses variables */
-div.tips {
- background-image:url('%image_prefix;/picto_ampoule.png');
-}
-
-/* Notes */
 li.folder {
  list-style-type: disc;
  list-style-image: url('%image_prefix;/folder.png');
