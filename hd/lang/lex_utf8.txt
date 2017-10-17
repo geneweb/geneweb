@@ -13353,6 +13353,10 @@ sk: strýkovia a tety
 sl: strici in tete
 sv: farbröder-morbröder och fastrar-mostrar
 
+    uncheck
+en: uncheck
+fr: décocher
+
     undefined sex for %t
 af: geslag onbekend vir %t
 bg: не е определен полът на %t

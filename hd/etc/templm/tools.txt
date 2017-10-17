@@ -1,6 +1,7 @@
 <!-- $Id: tools.txt,v 2016/02/04 21:27:03 A2 Exp $ -->
 %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
 %let;l_emaxv;%if;(evar.t != "T")%evar.maxv;%elseif;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;%in;
+
 %define;checkbox(cc,xx,yy,uu)
   <label title="uu"> cc<input type="checkbox" name="xx" value="on" %l_on1; %l_on;
   %if;(evar.xx = "on") checked="checked"%end;%/>yy</label>
@@ -41,7 +42,7 @@
   %apply;checkbox("├","marriage2",[marriage date],[display marriage date])
   %apply;checkbox("├","sosa",[n° Sosa],"")
   %apply;checkbox("└","xy",[by couple],"")
-  %apply;checkbox("    ├","siblings",[siblings],"")
+  %apply;checkbox("    ├","siblings",[child/children]1,"")
   %apply;checkbox("    ├","timeline",[time line],"")
   <label>     └ [scale] <input title="[year/month/day]0s/[generation/generations]0 (default 40, [maximum] 50)" type="number" style="width:2.8em" min="0" max="50" name="gen" class="number" value="%evar.gen;"
          size="1" placeholder="40" %/></label>
@@ -146,12 +147,12 @@
         %apply;radio("t1","C",[*male line/female line]1,"")
         %apply;radio("t1","T",[*full tree],[*ascendants tree])
         %apply;checkbox("├","marriage",[marriage date],[display marriage date])
-        %apply;image("├")
+        %apply;image(   "├")
         %apply;checkbox("├","dag",[dag],"")
          %if;(evar.t = "T")
-            ├ <a href="%prefix;m=A;t=T;v=%l_v;;%access;;dag=on;notab=on" accesskey="/"
-           title="[display by slices/slice width/overlap/total width]0 (/)"
-           >[display by slices/slice width/overlap/total width]0</a>
+                         ├ <a href="%prefix;m=A;t=T;v=%l_v;;%access;;dag=on;notab=on" accesskey="/"
+                              title="[display by slices/slice width/overlap/total width]0 (/)"
+                          >[display by slices/slice width/overlap/total width]0</a>
          %end;<br%/>
         %apply;border_color()
       </fieldset>
@@ -165,22 +166,36 @@
       </fieldset>
       <fieldset style="border:0">
       %let;l_on1;onchange="valid('t1CT')"%in;
-        %apply;radio("t1","CT",[*compact tree],[htree])
-        %apply;checkbox("├","it",[itree],"")
+        %let;msg1;[*compact tree] (>= 5 gen)%in;
+        %apply;radio("t1","CT",msg1,"[itree] [or] [htree]")
+        %(apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
+        <label title=""> ├ orientation 
+            <input type="radio" id="itIH" name="it" value="on" %_on1; %l_on;
+              %if;(evar.it = "on") checked="checked"%end;%/> I 
+            <input type="radio" id="itIH" name="it" value="off" %_on1; %l_on;
+              %if;(evar.it = "off" or evar.it = "") checked="checked"%end;%/> H</label>
         %apply;checkbox("├","cpl",[by couple],"")
         %apply;checkbox("├","sosa2",[n° Sosa],[visualize/show/hide/summary]1)
-        %apply;checkbox("├","implx",[implex links],"")
+        %let;msg2;[implex links] ([uncheck] [by couple])%in;
+        %apply;checkbox("├","implx",msg2,"")
         %apply;checkbox("├","nav",[navigate on tree],"")
-        <label title="[create] [family/families]0"> └<input type="checkbox" name="sms" value="on" %l_on;
-          %if;(evar.sms = "on") checked="checked"%end;%/>[visualize/show/hide/summary]1 [missing sosa]</label>
-        <label title="[*full tree] [with] 15 [person/persons]1 + [compact tree] [with] 256 [n° Sosa] + extra [generation/generations]0 = 9 [generation/generations]1"
-         style="display:inline"><input  type="radio" name="t1" value="m" %l_on;
-          %if;(evar.t1 = "m") checked="checked"%end;%/>[*mtree]</label>
-        <label style="display:inline"><input type="number" id="fs" name="fs" style="width:2.4em"
-          value="%if;(evar.fs!="")%evar.fs;%end;" placeholder="14" min="8" max="16"
-          autocomplete="off" title="[font size] ([maximum] 16)" />px</label>
-        <label title="7 [generation/generations]1, [by couple]"><input type="radio" name="t1" value="h" %l_on;
-          %if;(evar.t1 = "h") checked="checked"%end;%/>[*htree] [with] [n° Sosa] CSS</label>
+        <label title="[create] [family/families]0">
+                         └<input type="checkbox" name="sms" value="on" %l_on;
+                        %if;(evar.sms = "on") checked="checked"%end;%/>
+                        [visualize/show/hide/summary]1 [missing sosa]</label>
+        <label title="[*full tree] [with] 15 [person/persons]1 + [compact tree]
+                      [with] 256 [n° Sosa] + extra [generation/generations]0
+                      = 9 [generation/generations]1"
+              style="display:inline">
+              <input  type="radio" name="t1" value="m" %l_on;
+              %if;(evar.t1 = "m") checked="checked"%end;%/>
+              [*mtree]</label>
+        <label style="display:inline">
+          <input type="number" id="fs" name="fs" style="width:2.4em"
+                value="%if;(evar.fs!="")%evar.fs;%end;" placeholder="14" min="8" max="16"
+                autocomplete="off" title="[font size] ([maximum] 16)" />px</label>
+        %(<label title="7 [generation/generations]1, [by couple]"><input type="radio" name="t1" value="h" %l_on;
+          %if;(evar.t1 = "h") checked="checked"%end;%/>[*htree] [with] [n° Sosa] CSS</label>%)
       </fieldset>
     </fieldset>
   </form>
