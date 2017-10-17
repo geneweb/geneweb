@@ -250,7 +250,7 @@
       </legend>
       <label title="">
       <input type="hidden" name="p_mod" value="a6">
-            <input  type="radio" id="tT" name="t1" value="a6" %l_on; %l_on1;
+            <input  type="radio" id="tT" name="t1" value="h7" %l_on; %l_on1;
             %if;(evar.t1 = "m") checked="checked"%end;%/>
             [*h-tree]</label>
     </fieldset>
