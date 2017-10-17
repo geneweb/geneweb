@@ -197,7 +197,7 @@
           %if;(evar.t1 = "h") checked="checked"%end;%/>[*htree] [with] [n° Sosa] CSS</label>%)
         <label title="">
               <input type="hidden" name="p_mod" value="a6">
-              <input  type="radio" name="t1" value="a6" %l_on;
+              <input  type="radio" name="t1" value="h7" %l_on;
               %if;(evar.p_mod = "a6") checked="checked"%end;%/>
               [*h-tree]</label>
       </fieldset>
