@@ -166,8 +166,7 @@
       </fieldset>
       <fieldset style="border:0">
       %let;l_on1;onchange="valid('t1CT')"%in;
-        %let;msg1;[*compact tree] (>= 5 gen)%in;
-        %apply;radio("t1","CT",msg1,"[itree] [or] [htree]")
+        %apply;radio("t1","CT",[*compact tree],"[itree] [or] [htree]")
         %(apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
         <label title=""> ├ orientation 
             <input type="radio" id="itIH" name="it" value="on" %_on1; %l_on;
@@ -176,8 +175,8 @@
               %if;(evar.it = "off" or evar.it = "") checked="checked"%end;%/> H</label>
         %apply;checkbox("├","cpl",[by couple],"")
         %apply;checkbox("├","sosa2",[n° Sosa],[visualize/show/hide/summary]1)
-        %let;msg2;[implex links] ([uncheck] [by couple])%in;
-        %apply;checkbox("├","implx",msg2,"")
+        %let;msg;[implex links] ([uncheck] [by couple])%in;
+        %apply;checkbox("├","implx",msg,"")
         %apply;checkbox("├","nav",[navigate on tree],"")
         <label title="[create] [family/families]0">
                          └<input type="checkbox" name="sms" value="on" %l_on;
@@ -196,6 +195,11 @@
                 autocomplete="off" title="[font size] ([maximum] 16)" />px</label>
         %(<label title="7 [generation/generations]1, [by couple]"><input type="radio" name="t1" value="h" %l_on;
           %if;(evar.t1 = "h") checked="checked"%end;%/>[*htree] [with] [n° Sosa] CSS</label>%)
+        <label title="">
+              <input type="hidden" name="p_mod" value="a6">
+              <input  type="radio" name="t1" value="a6" %l_on;
+              %if;(evar.p_mod = "a6") checked="checked"%end;%/>
+              [*h-tree]</label>
       </fieldset>
     </fieldset>
   </form>
