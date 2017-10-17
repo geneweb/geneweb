@@ -506,7 +506,7 @@
                   %elseif;(count=1)
                     [a half sibling-in-law/half siblings-in-law]0
                   %else;
-                    in_full(count,1) [a half sibling-in-law/half siblings-in-law]1
+                    %apply;in_full(count,1) [a half sibling-in-law/half siblings-in-law]1
                   %end;
                   %apply;on_side%with;%spfathfn; [and] %spouse;%end;
                 %end;
