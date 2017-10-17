@@ -20,6 +20,16 @@
   %base_header;
 </head>
 
+%define;checkbox(cc,xx,yy,uu)
+  <label title="uu"> cc<input type="checkbox" name="xx" value="on" %l_on1; %l_on;
+  %if;(evar.xx = "on") checked="checked"%end;%/>yy</label>
+%end;
+
+%define;radio(xx,yy,zz,uu, vv)
+  <label title="uu"><input type="radio" id="vv" name="xx" value="yy" %_on1; %l_on;
+  %if;(evar.xx = "yy") checked="checked"%end;%/>zz</label>
+%end;
+
 %let;l_maxtgen;
   %if;(bvar.max_anc_tree != "" and max_anc_level > bvar.max_anc_tree)
     ([maximum] %bvar.max_anc_tree; [generation/generations]1)%nn;
@@ -159,23 +169,26 @@
   </fieldset>
   <fieldset>
     <legend>
-      <label>
-        <input type="radio" id="tT" name="t" value="T" %l_on;%/>
-        [*tree]
-        %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
-          ([maximum] 7 [generation/generations]1)
-        %elseif;(bvar.max_anc_tree != "" and max_anc_level >= bvar.max_anc_tree)
-          ([maximum] %bvar.max_anc_tree; [generation/generations]1)
-        %end;
-      </label>
+      %let;l_on1;onchange="valid('tT')"%in;
+      <label><input type="radio" id="tT" name="t" value="T" %l_on;%/>
+          [*tree]</label>
     </legend>
     <fieldset>
-      %let;l_on1;onchange="valid('tT')"%in;
+      <legend>
+        <label>
+          [*tree]
+          %if;(bvar.max_anc_tree = "" and max_anc_level >= 7)
+            ([maximum] 7 [generation/generations]1)
+          %elseif;(bvar.max_anc_tree != "" and max_anc_level >= bvar.max_anc_tree)
+            ([maximum] %bvar.max_anc_tree; [generation/generations]1)
+          %end;
+        </label>
+      </legend>
       <label><input type="radio" name="t1" value="T" %l_on; %l_on1;
              %if;(evar.t1 = "T") checked="checked"%end;%/>[full tree]</label><br%/>
-      <label><input type="radio" name="t" value="A" %l_on;
+      <label><input type="radio" name="t1" value="A" %l_on; %l_on1
              %/>[male line/female line]0</label><br%/>
-      <label><input type="radio" name="t" value="C" %l_on;
+      <label><input type="radio" name="t1" value="C" %l_on; %l_on1
              %/>[male line/female line]1</label><br%/>
       <label>     <input type="checkbox" name="dag" value="on" %l_on1; %l_on;
              %/>[dag]</label><br%/>
@@ -195,20 +208,51 @@
       </table>
     </fieldset>
     <fieldset>
-      <legend><label>[*compact tree]</label></legend>
-        <label><input type="radio" name="t1" value="m" %l_on; %l_on1;
-          %if;(evar.t1 = "m") checked="checked"%end;%/>[mtree] 9 gen.</label><br%/>
-        <label><input type="radio" id="t1m" name="t1" value="T" %l_on; %l_on1;
-          %if;(evar.t1 = "h") checked="checked"%end;%/>[htree]</label><br%/>
-        <label><input type="radio" name="t2" value="i" %l_on; %l_on2;
-          %if;(evar.t2 = "i") checked="checked"%end;%/>[itree]</label><br%/>
-        <label>          <input type="checkbox" name="sosa2" value="on" %l_on; %l_on1;
-          %if;(evar.sosa2 = "on") checked="checked"%end;%/>[n° Sosa]</label><br%/>
-        <label>          <input type="checkbox" name="cpl" value="on" %l_on; %l_on1;
-          %if;(evar.cpl = "on") checked="checked"%end;%/>mode couple</label><br%/>
-        <label><input type="radio" name="t1" value="h" %l_on; %l_on1;
-          %if;(evar.t1 = "h") checked="checked"%end;%/>[htree] [with] [n° Sosa] [by couple] (7 gen.)</label>
-
+      %let;l_on2;onchange="valid('t1CT')"%in;
+      <legend>
+        <input type="radio" id="t1CT" name="t1" value="CT" %l_on; %l_on1;%/>
+        [*compact tree] (> 5 gen)
+      </legend>
+      %(apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
+      <label title="">orientation 
+          <input type="radio" id="itIH" name="it" value="on" %l_on1; %l_on;
+            %if;(evar.it = "on") checked="checked"%end;%/> I 
+          <input type="radio" id="itIH" name="it" value="off" %l_on1; %l_on;
+            %if;(evar.it = "off" or evar.it = "") checked="checked"%end;%/> H</label>
+      <br>
+      %apply;checkbox("","cpl",[by couple],"")<br>
+      %apply;checkbox("","sosa2",[n° Sosa],[visualize/show/hide/summary]1)<br>
+      %let;msg2;[implex links] ([uncheck] [by couple])%in;
+      %apply;checkbox("","implx",msg2,"")<br>
+      %apply;checkbox("","nav",[navigate on tree],"")<br>
+      %let;msg3;[visualize/show/hide/summary]1 [missing sosa]%in;
+      %let;tit3;[create] [family/families]0%in;
+      %apply;checkbox("","sms",msg3,"")<br>
+    </fieldset>
+    <fieldset>
+      <legend>
+      <label>[*mtree]</label>
+      </legend>
+      <label title="[*full tree] [with] 15 [person/persons]1 + [compact tree]
+                    [with] 256 [n° Sosa] + extra [generation/generations]0
+                    = 9 [generation/generations]1">
+            <input  type="radio" id="tT" name="t1" value="m" %l_on; %l_on1;
+            %if;(evar.t1 = "m") checked="checked"%end;%/>
+            [*mtree]</label>
+      <label style="display:inline">
+        <input type="number" id="fs" name="fs" style="width:2.4em"
+              value="%if;(evar.fs!="")%evar.fs;%end;" placeholder="14" min="8" max="16"
+              autocomplete="off" title="[font size] ([maximum] 16)" />px</label>
+    </fieldset>
+    <fieldset>
+      <legend>
+      <label>[*h-tree]</label>
+      </legend>
+      <label title="">
+      <input type="hidden" name="p_mod" value="a6">
+            <input  type="radio" id="tT" name="t1" value="a6" %l_on; %l_on1;
+            %if;(evar.t1 = "m") checked="checked"%end;%/>
+            [*h-tree]</label>
     </fieldset>
   </fieldset>
   <fieldset>
