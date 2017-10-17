@@ -1379,6 +1379,7 @@
     %apply;menu()
     %apply;buttons()
   </div>
+  <br clear="all">
   %include.trl;
   %include.copyr;
 %end;

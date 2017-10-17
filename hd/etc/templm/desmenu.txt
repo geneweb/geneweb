@@ -220,6 +220,7 @@
     </ul>
   </fieldset>
 </form>
+<br clear="all">
   %base_trailer;
   %include.copyr;
 </body>
