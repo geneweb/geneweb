@@ -20,6 +20,6 @@ Options
 %elseif;(op_m=5)
   %apply;show_templ("perso_module/arbre_famille")
 %elseif;(op_m=6)
-  %apply;show_templ("perso_module/t__h7")
+  %apply;show_templ("perso_module/arbre_h7")
 %else;
 %end;
