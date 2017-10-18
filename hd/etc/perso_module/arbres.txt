@@ -21,5 +21,7 @@ Options
   %apply;show_templ("perso_module/arbre_famille")
 %elseif;(op_m=6)
   %apply;show_templ("perso_module/arbre_h7")
+%elseif;(op_m=7)
+  %apply;show_templ("perso_module/arbre_9gen")
 %else;
 %end;

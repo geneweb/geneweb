@@ -45,7 +45,8 @@ options[9][2] = "horizontal";
 options[9][3] = "compact";
 options[9][4] = "+3-3 gen.";
 options[9][5] = "famille";
-options[9][6] = "h-tree";
+options[9][6] = "7 gen";
+options[9][7] = "9 gen";
 modules[10] = "gr_parents";
 options[10][1] = "standard";
 options[10][2] = "three cols";
@@ -287,6 +288,11 @@ $('#a6').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a6');
   $('#a6_wide').val('on');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_6.jpg">\n');
+});
+
+$('#a7').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a7');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_7.jpg">\n');
 });
 
 $('#g1').on('click', function ()
