@@ -69,6 +69,14 @@ fr: ancien nom
 en: new name
 fr: nouveau nom
 
+    h7-tree
+en: 7 generations tree
+fr: arbre 7 générations
+
+    scale
+en: years by generation
+fr: années par génération
+
      !dates order
 af: yyyymmdd
 ar: ddmmyyyy
@@ -14273,8 +14281,8 @@ en: I-Tree
 fr: arbre en I
 
     mtree
-en: mixed tree
-fr: arbre mixte
+en: 9 generations H tree
+fr: arbre en H 9 générations
 
     descendants tree
 en: descendants tree

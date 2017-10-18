@@ -1,4 +1,4 @@
-%if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = "CT"))%doctype_transitional;%else;%doctype;%end;
+﻿%if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = "CT"))%doctype_transitional;%else;%doctype;%end;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: anctree.txt,v 7.00 2015/12/10 21:34:32 mr Exp $ -->
@@ -239,6 +239,7 @@
   %apply;show_templ(evar.t1)
 %end;
 
+<br clear="all">
 %if;not cancel_links;
   %import;tools;
   %apply;tools_anctree()

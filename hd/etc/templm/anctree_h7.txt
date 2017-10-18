@@ -1,4 +1,4 @@
-  <!-- $Id: t__h7.txt,v 7.00 2016/05/02 23:28:26 mr Exp $ -->
+  <!-- $Id: anctree_h7.txt,v 7.00 2016/05/02 23:28:26 mr Exp $ -->
   <link type="text/css" href="%bvar.static_path;/perso_module/arbre_h7%bvar.css;.css" media="all" rel="stylesheet" %/>
 
   %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;
@@ -143,6 +143,6 @@
     </div>
   %end;
 </div>
-%if;(not cancel_links)
+%if;(not cancel_links and evar.templ!="templm")
   %apply;tools()
 %end;
