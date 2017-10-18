@@ -143,6 +143,6 @@
     </div>
   %end;
 </div>
-%if;(not cancel_links)
+%if;(not cancel_links and evar.templ="templm")
   %apply;tools()
 %end;
