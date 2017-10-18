@@ -158,6 +158,7 @@
 %if;has_parents;
   %let;evarv;%if;(evar.v!="")%evar.v;%else;3%end;%in;
   %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
+  %let;evart1;%if;(evar.t1!="")%evar.t1;%end;%in;
   %let;evarim;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
   %let;evarma;%if;(evar.marriage!="" and evar.marriage="on")1%else;0%end;%in;
   %let;maxlev;%apply;min%with;
@@ -220,7 +221,9 @@
     %end;
   </div>
   <table class="tree-vert mx-auto my-3" style="border-width:%border;">
-    %if;(evart = "T")
+    %if;(evart="T" and evart1="m")
+      %include;perso_module/arbre_9gen;
+    %elseif;(evart="T")
       %apply;tree(evarv)
     %else;
       <tr>

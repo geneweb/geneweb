@@ -326,6 +326,12 @@ function no_options () {
           ([maximum] %bvar.max_anc_tree; [generation/generations]1)
         %end;
       </label>
+      <label>
+            <input type="radio" name="t1" value="x" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
+      </label>
+      <label>
+            <input type="radio" name="t1" value="m" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
+      </label>
       <br%/>
       <label>
         <input type="radio" name="t" value="A" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
