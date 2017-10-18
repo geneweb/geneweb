@@ -1,4 +1,48 @@
 <!-- $Id: tools.txt,v 2016/02/04 21:27:03 A2 Exp $ -->
+
+  %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;
+  %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
+  %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
+  %let;l_sosa_ref;%if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)on%end;%in;
+  %let;l_prefix;%prefix;t=h7;image=%evar.image;;siblings=%evar.siblings;;sosa=%evar.sosa;;fs=%l_fs;;wi=%l_wi;;he=%l_he;;bp=%evar.bp;;%in;
+  <style id="s" type="text/css">
+    #htree{font-size:%l_fs;px;width:%l_wi;px;height:%l_he;px}
+  </style>
+  <style type="text/css">
+    #tools p input{text-align:right;width:40px;}
+  </style>
+  <script type="text/javascript">
+  <!--
+  
+    function over1(xx)
+    { 
+     document.getElementById(xx).style.outline="#00F solid 4px";
+     return false;
+    }
+    function out1(xx)
+    {
+     document.getElementById(xx).style.outline="none";
+     return false;
+    }
+  
+    function ob()
+    {
+      var a = new Array(3)
+      for (var i=0; i < a.length; ++i)
+      {
+        a[i] = document.getElementById("e" + i).value;
+      }
+      document.getElementById("s").outerHTML = '\
+      <style id="s" type="text\/css">\n\
+        @page{size:'+a[1]+'px '+a[2]+'px;}\n\
+        #htree{position:relative;font-size:'+a[0]+'px;width:'+a[1]+'px;height:'+a[2]+'px;margin:3em}\n\
+      <\/style>';
+    }
+   -->
+  </script>
+
+
+
 %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
 %let;l_emaxv;%if;(evar.t != "T")%evar.maxv;%elseif;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;%in;
 
@@ -129,7 +173,15 @@
     <fieldset style="border:0">
       <input type="hidden" name="t" value="T" %l_on;
          %if;(evar.t = "T") checked="checked"%end;%/>
-      <legend style="font-weight:bold"><a href="%prefix;%access;;m=A">⏎</a>  [*tools]0 [ascendants tree]  <input type="submit" title="[*validate/delete]0" style="align=center;valign=center;font-weight:bold;height:24px" value="Ok"/>  %apply;generation()</legend>
+      <legend style="font-weight:bold">
+        <a href="%prefix;%access;;m=A">⏎</a>
+          [*tools]0 [ascendants tree]
+            <input type="submit"%nn;
+                title="[*validate/delete]0"%nn;
+                style="align=center;valign=center;font-weight:bold;height:24px"%nn;
+                value="Ok"%nn;
+            />
+            %apply;generation()</legend>
       %hidden;
       <input type="hidden" name="m" value="A"/>
       %if;(evar.p != "" or evar.n != "" or evar.oc != "")
@@ -146,8 +198,6 @@
         %apply;radio("t1","A",[*male line/female line]0,"")
         %apply;radio("t1","C",[*male line/female line]1,"")
         %apply;radio("t1","T",[*full tree],[*ascendants tree])
-        %apply;checkbox("├","marriage",[marriage date],[display marriage date])
-        %apply;image(   "├")
         %apply;checkbox("├","dag",[dag],"")
          %if;(evar.t = "T")
                          ├ <a href="%prefix;m=A;t=T;v=%l_v;;%access;;dag=on;notab=on" accesskey="/"
@@ -156,13 +206,31 @@
          %end;<br%/>
         %apply;border_color()
       </fieldset>
+      
       <fieldset style="float:left;border:0">
       %let;l_on1;onchange="valid('t1HT')"%in;
         %apply;radio("t1","HT",[*horizontal tree],"")
-        %apply;anc_hrztl()
-        <br%/>
+        %apply;checkbox("└","xy",[by couple],"")
+        %apply;checkbox("    ├","timeline",[time line],"")
+        <label>     └ [scale]
+          <input title="[year/month/day]0s/[generation/generations]0 (default 40, [maximum] 50)" 
+            type="number" style="width:2.8em" min="0" max="50" 
+            name="gen" class="number" value="%evar.gen;"
+            size="1" placeholder="40"
+          %/></label>
+        <br%/><br%/>
         %let;l_on1;%in;
         %apply;checkbox("  ","cgl",[*cancel GeneWeb links],"")
+        %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
+          %apply;checkbox("  ","image",[image/images]1,"")
+        %end;
+        %apply;checkbox("  ","marriage",[marriage date],[display marriage date])
+        %apply;checkbox("  ","siblings",[full siblings],"")
+        %apply;checkbox("  ","sosa",[n° Sosa],[visualize/show/hide/summary]1)
+        <label>    [*font size]
+          <input type="number" class="number" style="width:3em"
+            id="e0" name="fs" value="%l_fs;" size="2" onchange="ob()"
+          %/>px</label>
       </fieldset>
       <fieldset style="border:0">
       %let;l_on1;onchange="valid('t1CT')"%in;
@@ -174,7 +242,6 @@
             <input type="radio" id="itIH" name="it" value="off" %_on1; %l_on;
               %if;(evar.it = "off" or evar.it = "") checked="checked"%end;%/> H</label>
         %apply;checkbox("├","cpl",[by couple],"")
-        %apply;checkbox("├","sosa2",[n° Sosa],[visualize/show/hide/summary]1)
         %let;msg;[implex links] ([uncheck] [by couple])%in;
         %apply;checkbox("├","implx",msg,"")
         %apply;checkbox("├","nav",[navigate on tree],"")
@@ -182,24 +249,25 @@
                          └<input type="checkbox" name="sms" value="on" %l_on;
                         %if;(evar.sms = "on") checked="checked"%end;%/>
                         [visualize/show/hide/summary]1 [missing sosa]</label>
-        <label title="[*full tree] [with] 15 [person/persons]1 + [compact tree]
-                      [with] 256 [n° Sosa] + extra [generation/generations]0
-                      = 9 [generation/generations]1"
-              style="display:inline">
+        <br%/>
+        <label title="[*full tree] [with] 256 [n° Sosa] + extra [generation/generations]0
+                      = 9 [generation/generations]1">
               <input  type="radio" name="t1" value="m" %l_on;
-              %if;(evar.t1 = "m") checked="checked"%end;%/>
+                %if;(evar.t1 = "m") checked="checked"%end;
+              %/>
               [*mtree]</label>
-        <label style="display:inline">
-          <input type="number" id="fs" name="fs" style="width:2.4em"
-                value="%if;(evar.fs!="")%evar.fs;%end;" placeholder="14" min="8" max="16"
-                autocomplete="off" title="[font size] ([maximum] 16)" />px</label>
-        %(<label title="7 [generation/generations]1, [by couple]"><input type="radio" name="t1" value="h" %l_on;
-          %if;(evar.t1 = "h") checked="checked"%end;%/>[*htree] [with] [n° Sosa] CSS</label>%)
+        <br%/>
         <label title="">
               <input type="hidden" name="p_mod" value="a6">
               <input  type="radio" name="t1" value="h7" %l_on;
-              %if;(evar.p_mod = "a6") checked="checked"%end;%/>
-              [*h-tree]</label>
+              %if;(evar.t1 = "h7") checked="checked"%end;%/>
+              [*h7-tree]</label>
+        <label> ├<input type="checkbox" name="bp" value="on" %l_on;
+           %if;(evar.bp = "on") checked="checked"%end;%/>[birth place]</label>
+        <label> ├ largeur<input type="number" class="number" style="width:5em"
+                          id="e1" name="wi" value="%l_wi;" onchange="ob()"%/>px</label>
+        <label> └ hauteur<input type="number" class="number" style="width:5em"
+                          id="e2" name="he" value="%l_he;" onchange="ob()"%/>px</label>
       </fieldset>
     </fieldset>
   </form>
@@ -318,7 +386,16 @@
         %end;
         %apply;checkbox("├","cgl",[cancel GeneWeb links],"")
         %if;(evar.t = "H")
-          %apply;anc_hrztl()
+          %apply;checkbox("├","marriage2",[marriage date],[display marriage date])
+          %apply;checkbox("├","sosa",[n° Sosa],"")
+          %apply;checkbox("├","xy",[by couple],"")
+          %apply;checkbox("├","siblings",[child/children]1,"")
+          %apply;checkbox("├","timeline",[time line],"")
+          <label> └ [scale]
+            <input title="[year/month/day]0s/[generation/generations]0 (default 40, [maximum] 50)"%nn;
+            type="number" style="width:2.8em" min="0" max="50"%nn;
+            name="gen" class="number" value="%evar.gen;"%nn;
+            size="1" placeholder="40" %/></label>
         %end;
       %if;(evar.fam7 = "on")
           <input type="hidden" name="fam7" value="on"%/>
