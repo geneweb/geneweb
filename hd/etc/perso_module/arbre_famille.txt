@@ -47,12 +47,12 @@
                   %elseif;("xxx"="father.mother" or "xxx"="mother.mother"
                         or "xxx"="spouse.father.mother" or "xxx"="spouse.mother.mother") ([a grandfather/a grandmother/a grandparent]1)%nn;
                   %end;%in;
-  <div class="d-flex pl-0 pr-0 %if;(evar.image="on")py-0%end; w-100 justify-content-start list-group-item %if;(not cancel_links)list-group-item-action%end; list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
+  <div class="d-flex pl-0 pr-0 %if;(evar.image="on")py-0%end; w-100 justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
     %if;(not (cancel_links or xxx.is_restricted))
       <a href="%xxx.bname_prefix;%evm;%xxx.access;;%nn;
         %if;(evar.image="on")image=on;%end;%nn;
         %if;(evar.semi="on")semi=on;%end;" %nn;
-        class="big_anchor" title="[*navigation] %xxx;%personinfo;">
+        class="big_anchor list-group-item-action" title="[*navigation] %xxx;%personinfo;">
       </a>
     %end;
     %if;(evar.image="on" and ("yyy"="yes" or "yyy"="force"))
@@ -130,9 +130,11 @@
     %if;(level=4)
       %foreach;ancestor
         %if;(ancestor.anc_sosa.v=ww or ancestor.anc_sosa.v=xx or ancestor.anc_sosa.v=yy or ancestor.anc_sosa.v=zz)
-          <div class="col-3 border border-bottom-0 border-left-0 border-right-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center align-self-center 
-            list-group-item list-group-item-action py-1 list-group-item-%if;(ancestor.is_male)primary%else;danger%end; ">%nn;
-            <a class="big_anchor" href="%ancestor.bname_prefix;%evm;%ancestor.access;;%nn;
+          <div class="col-3 py-1 border border-bottom-0 border-left-0 border-right-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center align-self-center
+             list-group-item-%if;(ancestor.is_male)primary%else;danger%end;%sp;
+            %if;(ancestor.anc_sosa.v=10 or ancestor.anc_sosa.v=14)ml-1%end;%sp;
+            %if;(ancestor.anc_sosa.v=9 or ancestor.anc_sosa.v=13)mr-1%end;">%nn;
+            <a class="big_anchor list-group-item-action" href="%ancestor.bname_prefix;%evm;%ancestor.access;;%nn;
               %if;(evar.image="on")image=on;%end;%nn;
               %if;(evar.semi="on")semi=on;%end;" %nn;
               title="[*navigation] %ancestor; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("ppp"="spouse.")%spouse;%else;%self;%end;%end;)"></a>
@@ -140,7 +142,6 @@
              title="%apply;a_of_b%with;[*vital record]%and;%if;(ancestor="? ?")[unknown person]%else;%ancestor;%end;%end; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("ppp"="spouse.")%spouse;%else;%self;%end;%end;)">%nn;
                %ancestor.anc_sosa.v;%(<i class="fa fa-%if;(ancestor.is_male)mars%else;venus%end;"></i>%)</a>
           </div>
-          <div class="list-group-item d-none"></div>
         %end;
       %end;
     %end;
@@ -184,7 +185,7 @@
           <div class="d-flex flex-column">
             %if;father.has_parents;
               %if;(not cancel_links)
-                <div class="d-flex mr-1">
+                <div class="d-flex justify-content-around px-2 mr-1">
                   %apply;ancestorlv4("",8,9,10,11)
                 </div>
               %end;
@@ -203,7 +204,7 @@
           <div class="d-flex flex-column">
             %if;mother.has_parents;
               %if;(not cancel_links)
-                <div class="d-flex">
+                <div class="d-flex justify-content-around px-2">
                   %apply;ancestorlv4("",12,13,14,15)
                 </div>
               %end;
@@ -233,7 +234,7 @@
               <div class="d-flex flex-column">
                 %if;spouse.father.has_parents;
                   %if;(not cancel_links)
-                    <div class="d-flex">
+                    <div class="d-flex justify-content-around px-2">
                       %apply;ancestorlv4("spouse.",8,9,10,11)
                     </div>
                   %end;
@@ -252,7 +253,7 @@
               <div class="d-flex flex-column">
                 %if;spouse.mother.has_parents;
                   %if;(not cancel_links)
-                    <div class="d-flex ml-1">
+                    <div class="d-flex justify-content-around px-2 ml-1">
                       %apply;ancestorlv4("spouse.",12,13,14,15)
                     </div>
                   %end;
