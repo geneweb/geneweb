@@ -131,12 +131,12 @@
       %foreach;ancestor
         %if;(ancestor.anc_sosa.v=ww or ancestor.anc_sosa.v=xx or ancestor.anc_sosa.v=yy or ancestor.anc_sosa.v=zz)
           <div class="col-3 border border-bottom-0 border-left-0 border-right-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center align-self-center 
-            list-group-item py-1 list-group-item-%if;(ancestor.is_male)primary%else;danger%end;">%nn;
+            list-group-item list-group-item-action py-1 list-group-item-%if;(ancestor.is_male)primary%else;danger%end; ">%nn;
             <a class="big_anchor" href="%ancestor.bname_prefix;%evm;%ancestor.access;;%nn;
               %if;(evar.image="on")image=on;%end;%nn;
               %if;(evar.semi="on")semi=on;%end;" %nn;
               title="[*navigation] %ancestor; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("ppp"="spouse.")%spouse;%else;%self;%end;%end;)"></a>
-            <a class="normal_anchor" href="%prefix;;%ancestor.access;" 
+            <a class="normal_anchor" href="%prefix;%ancestor.access;" 
              title="%apply;a_of_b%with;[*vital record]%and;%if;(ancestor="? ?")[unknown person]%else;%ancestor;%end;%end; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("ppp"="spouse.")%spouse;%else;%self;%end;%end;)">%nn;
                %ancestor.anc_sosa.v;%(<i class="fa fa-%if;(ancestor.is_male)mars%else;venus%end;"></i>%)</a>
           </div>
