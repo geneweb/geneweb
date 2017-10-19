@@ -126,17 +126,14 @@
 %end;
 
 %define;addpar(ttt,uuu)
-  %if;("ttt"="spo" or "ttt"="self")<div class="row">%end;
-    %if;(ttt=spouse)<div class="col-4"></div>%end;
-    <div class="%if;("ttt"="spo" or "ttt"="self")col-8
-                %elseif;("ttt"="father" or "ttt"="mother" or "ttt"="spouse.father" or "ttt"="spouse.mother")col-10%elseif;(ttt=ancestor)col-6 mx-1%end; align-self-center text-center rounded-top list-group-item-warning">
-      <a href="%prefix;m=ADD_PAR;ip=uuu;"
-        title="%apply;a_of_b%with;[*add] [missing parents]%and;%if;("ttt"="spo")%spouse;%else;%ttt;%end;%end;">
+  <div class="%if;("ttt"="spo" or "ttt"="self")col-7
+    %elseif;("ttt"="father" or "ttt"="mother" or "ttt"="spouse.father" or "ttt"="spouse.mother")col-10%elseif;(ttt=ancestor)col-6 mx-1%end;
+    %if;("ttt"="spo")ml-auto mr-4%elseif;("ttt"="self")mr-auto ml-4%end; align-self-center text-center rounded-top list-group-item-warning">
+    <a href="%prefix;m=ADD_PAR;ip=uuu;"
+      title="%apply;a_of_b%with;[*add] [missing parents]%and;%if;("ttt"="spo")%spouse;%else;%ttt;%end;%end;">
        %if;(ancestor.anc_sosa.v>8)<span>%expr(ancestor.anc_sosa.v*2)</span><i class="fa fa-plus mx-2 text-danger"></i><span>%expr(ancestor.anc_sosa.v*2+1)</span>%else;<i class="fa fa-plus mx-2 text-danger"></i>%end;
-      </a>
-    </div>
-    %if;("ttt"="self")<div class="col-4"></div>%end;
-  %if;("ttt"="spo" or "ttt"="self")</div>%end;
+    </a>
+  </div>
 %end;
 
 %define;ancestorlv4(aaa,bbb,ccc,ddd,eee)
