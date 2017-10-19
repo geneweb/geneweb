@@ -125,28 +125,67 @@
   [on %s's side:::xx]
 %end;
 
-%define;ancestorlv4(ppp,ww,xx,yy,zz)
-  %foreach;pppancestor_level
+%define;addpar(ttt,uuu)
+  %if;("ttt"="spo" or "ttt"="self")<div class="row">%end;
+    %if;(ttt=spouse)<div class="col-4"></div>%end;
+    <div class="%if;("ttt"="spo" or "ttt"="self")col-8
+                %elseif;("ttt"="father" or "ttt"="mother" or "ttt"="spouse.father" or "ttt"="spouse.mother")col-10%elseif;(ttt=ancestor)col-6 mx-1%end; align-self-center text-center rounded-top list-group-item-warning">
+      <a href="%prefix;m=ADD_PAR;ip=uuu;"
+        title="%apply;a_of_b%with;[*add] [missing parents]%and;%if;("ttt"="spo")%spouse;%else;%ttt;%end;%end;">
+       %if;(ancestor.anc_sosa.v>8)<span>%expr(ancestor.anc_sosa.v*2)</span><i class="fa fa-plus mx-2 text-danger"></i><span>%expr(ancestor.anc_sosa.v*2+1)</span>%else;<i class="fa fa-plus mx-2 text-danger"></i>%end;
+      </a>
+    </div>
+    %if;("ttt"="self")<div class="col-4"></div>%end;
+  %if;("ttt"="spo" or "ttt"="self")</div>%end;
+%end;
+
+%define;ancestorlv4(aaa,bbb,ccc,ddd,eee)
+  %apply;ancestorlv42%with;%if;("aaa"="spo")spouse.%end;%and;bbb%and;ccc%and;ddd%and;eee%end;
+%end;
+
+%define;ancestorlv42(ppp,ww,xx,yy,zz)
+  %foreach;pppancestor_level;
+    %if;(level=3)
+      %foreach;ancestor;
+        %if;(not ancestor.has_parents
+             and ((ancestor.anc_sosa.v=4 and ww=8) or (ancestor.anc_sosa.v=6 and ww=12)))
+          %apply;addpar("ancestor",ancestor.index)
+        %end;
+      %end;
+    %end;
     %if;(level=4)
-      %foreach;ancestor
+      %foreach;ancestor;
         %if;(ancestor.anc_sosa.v=ww or ancestor.anc_sosa.v=xx or ancestor.anc_sosa.v=yy or ancestor.anc_sosa.v=zz)
-          <div class="col-3 py-1 border border-bottom-0 border-left-0 border-right-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center align-self-center
-             list-group-item-%if;(ancestor.is_male)primary%else;danger%end;%sp;
-            %if;(ancestor.anc_sosa.v=10 or ancestor.anc_sosa.v=14)ml-1%end;%sp;
-            %if;(ancestor.anc_sosa.v=9 or ancestor.anc_sosa.v=13)mr-1%end;">%nn;
-            <a class="big_anchor list-group-item-action" href="%ancestor.bname_prefix;%evm;%ancestor.access;;%nn;
+          <div class="col-3 border border-bottom-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center align-self-center
+            list-group-item-%if;ancestor.is_male;primary%else;danger%end;%sp;
+            %if;(ancestor.anc_sosa.v=10 or ancestor.anc_sosa.v=14)border-right-0 ml-1%end;%sp;
+            %if;(ancestor.anc_sosa.v=9 or ancestor.anc_sosa.v=13)border-left-0  mr-1%end;
+            %if;(ancestor.anc_sosa.v=8 or ancestor.anc_sosa.v=12)border-right-0%end;%sp;
+            %if;(ancestor.anc_sosa.v=11 or ancestor.anc_sosa.v=15)border-left-0%end;">%nn;
+            <a class="big_anchor list-group-item-action rounded-%if;ancestor.is_male;left%else;right%end;" href="%ancestor.bname_prefix;%evm;%ancestor.access;;%nn;
               %if;(evar.image="on")image=on;%end;%nn;
               %if;(evar.semi="on")semi=on;%end;" %nn;
               title="[*navigation] %ancestor; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("ppp"="spouse.")%spouse;%else;%self;%end;%end;)"></a>
             <a class="normal_anchor" href="%prefix;%ancestor.access;" 
-             title="%apply;a_of_b%with;[*vital record]%and;%if;(ancestor="? ?")[unknown person]%else;%ancestor;%end;%end; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("ppp"="spouse.")%spouse;%else;%self;%end;%end;)">%nn;
-               %ancestor.anc_sosa.v;%(<i class="fa fa-%if;(ancestor.is_male)mars%else;venus%end;"></i>%)</a>
+              title="%apply;a_of_b%with;[*vital record]%and;%if;(ancestor="? ?")[unknown person]%else;%ancestor;%end;%end; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("ppp"="spouse.")%spouse;%else;%self;%end;%end;)">%nn;
+               <span>%ancestor.anc_sosa.v;</span></a>
           </div>
         %end;
       %end;
     %end;
   %end;
+  %foreach;pppancestor_level;
+    %if;(level=3)
+      %foreach;ancestor;
+        %if;(not ancestor.has_parents
+             and ((ancestor.anc_sosa.v=5 and ww=8) or (ancestor.anc_sosa.v=7 and ww=12)))
+          %apply;addpar("ancestor",ancestor.index)
+        %end;
+      %end;
+    %end;
+  %end;
 %end;
+
 
 %define;border()
   <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
@@ -194,6 +233,8 @@
                 %apply;short_display_person_image("father.mother", "yes")
               </div>
               %apply;border()
+            %else;
+              %apply;addpar("father",father.index)
             %end;
             <div class="list-group">
               %apply;short_display_person_image("father", "yes")
@@ -204,15 +245,17 @@
           <div class="d-flex flex-column">
             %if;mother.has_parents;
               %if;(not cancel_links)
-                <div class="d-flex justify-content-around px-2">
+                <div class="d-flex justify-content-around px-2 ml-1">
                   %apply;ancestorlv4("",12,13,14,15)
                 </div>
               %end;
-              <div class="list-group">
+              <div class="list-group ml-1">
                 %apply;short_display_person_image("mother.father", "yes")
                 %apply;short_display_person_image("mother.mother", "yes")
               </div>
               %apply;border()
+            %else;
+              %apply;addpar("mother",mother.index)
             %end;
             <div class="list-group">
               %apply;short_display_person_image("mother", "yes")
@@ -221,6 +264,8 @@
         </div>
       </div>
       %apply;border()
+    %else;
+      %apply;addpar("self",self.index)
     %end;
   </div>
 
@@ -234,15 +279,17 @@
               <div class="d-flex flex-column">
                 %if;spouse.father.has_parents;
                   %if;(not cancel_links)
-                    <div class="d-flex justify-content-around px-2">
-                      %apply;ancestorlv4("spouse.",8,9,10,11)
+                    <div class="d-flex justify-content-around px-2 mr-1">
+                      %apply;ancestorlv4("spo",8,9,10,11)
                     </div>
                   %end;
-                  <div class="list-group">
+                  <div class="list-group mr-1">
                     %apply;short_display_person_image("spouse.father.father", "yes")
                     %apply;short_display_person_image("spouse.father.mother", "yes")
                   </div>
                   %apply;border()
+                %else;
+                  %apply;addpar("spouse.father",spouse.father.index)
                 %end;
                 <div class="list-group">
                   %apply;short_display_person_image("spouse.father", "yes")
@@ -254,7 +301,7 @@
                 %if;spouse.mother.has_parents;
                   %if;(not cancel_links)
                     <div class="d-flex justify-content-around px-2 ml-1">
-                      %apply;ancestorlv4("spouse.",12,13,14,15)
+                      %apply;ancestorlv4("spo",12,13,14,15)
                     </div>
                   %end;
                   <div class="list-group ml-1">
@@ -262,14 +309,18 @@
                     %apply;short_display_person_image("spouse.mother.mother", "yes")
                   </div>
                   %apply;border()
+                %else;
+                  %apply;addpar("spouse.mother",spouse.mother.index)
                 %end;
                 <div class="list-group">
                   %apply;short_display_person_image("spouse.mother", "yes")
                 </div>
               </div>
             </div>
-         </div>
-         %apply;border()
+          </div>
+          %apply;border()
+        %else;
+          %apply;addpar("spo",spouse.index)
         %end;
       %end;
     %end;
