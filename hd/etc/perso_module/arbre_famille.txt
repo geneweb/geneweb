@@ -126,7 +126,7 @@
 %end;
 
 %define;addpar(xx,yy)
-    %if;("xx"="spouse")<div class="col-4 p-2"></div>%end;
+  %if;("xx"="spouse")<div class="col-4 p-2"></div>%end;
     <div class="%if;("xx"="spouse" or "xx"="" or "xx"="ancestor")col-6 mx-1
       %elseif;("xx"="father" or "xx"="mother" or "xx"="spouse.father" or "xx"="spouse.mother")w-75 align-self-center mx-1%end;
       %if;("xx"="spouse")mr-5 ml-auto%elseif;("xx"="")mr-auto ml-5%end; text-center rounded-top list-group-item-warning">
@@ -135,22 +135,18 @@
         %if;(ancestor.anc_sosa.v>8)<span>%expr(ancestor.anc_sosa.v*2)</span><i class="fa fa-plus mx-2 text-danger"></i><span>%expr(ancestor.anc_sosa.v*2+1)</span>%else;<i class="fa fa-plus mx-2 text-danger"></i>%end;
     </a>
     </div>
-    %if;("xx"="")<div class="col-4 p-2"></div>%end;
+  %if;("xx"="")<div class="col-4 p-2"></div>%end;
 %end;
 
-
 %define;ancestorlv4(vv,ww,xx,yy,zz)
-  %foreach;vvancestor_level
-    %if;(level=3)
-      %foreach;ancestor;
-        %if;(not ancestor.has_parents
-             and ((ancestor.anc_sosa.v=4 and ww=8) or (ancestor.anc_sosa.v=6 and ww=12)))
+  %foreach;vv_level(4)
+    %foreach;ancestor
+      %if;(level=3)
+        %if;(not ancestor.has_parents and ((ancestor.anc_sosa.v=4 and ww=8) or (ancestor.anc_sosa.v=6 and ww=12)))
           %apply;addpar("ancestor",ancestor.index)
         %end;
       %end;
-    %end;
-    %if;(level=4)
-      %foreach;ancestor;
+      %if;(level=4)
         %if;(ancestor.anc_sosa.v=ww or ancestor.anc_sosa.v=xx or ancestor.anc_sosa.v=yy or ancestor.anc_sosa.v=zz)
           <div class="col-3 border border-bottom-0 border-%if;(not ancestor.has_parents)light%else;%if;(ancestor.is_male)primary%else;danger%end;%end; rounded-top text-center align-self-center
             list-group-item-%if;ancestor.is_male;primary%else;danger%end;%sp;
@@ -168,20 +164,14 @@
           </div>
         %end;
       %end;
-    %end;
-  %end;
-  %foreach;vvancestor_level;
-    %if;(level=3)
-      %foreach;ancestor;
-        %if;(not ancestor.has_parents
-             and ((ancestor.anc_sosa.v=5 and ww=8) or (ancestor.anc_sosa.v=7 and ww=12)))
-          %apply;addpar("ancestor",ancestor.index)
+      %if;(level=3)
+        %if;(not ancestor.has_parents and ((ancestor.anc_sosa.v=5 and ww=8) or (ancestor.anc_sosa.v=7 and ww=12)))
+         %apply;addpar("ancestor",ancestor.index)
         %end;
       %end;
     %end;
   %end;
 %end;
-
 
 %define;border()
   <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
@@ -221,7 +211,7 @@
             %if;father.has_parents;
               %if;(not cancel_links)
                 <div class="d-flex justify-content-around px-2 mr-1">
-                  %apply;ancestorlv4("self.",8,9,10,11)
+                  %apply;ancestorlv4("ancestor",8,9,10,11)
                 </div>
               %end;
               <div class="list-group mr-1">
@@ -242,7 +232,7 @@
             %if;mother.has_parents;
               %if;(not cancel_links)
                 <div class="d-flex justify-content-around px-2 ml-1">
-                  %apply;ancestorlv4("self.",12,13,14,15)
+                  %apply;ancestorlv4("ancestor",12,13,14,15)
                 </div>
               %end;
               <div class="list-group ml-1">
@@ -278,7 +268,7 @@
                 %if;spouse.father.has_parents;
                   %if;(not cancel_links)
                     <div class="d-flex justify-content-around px-2 mr-1">
-                      %apply;ancestorlv4("spouse.",8,9,10,11)
+                      %apply;ancestorlv4("spouse.ancestor",8,9,10,11)
                     </div>
                   %end;
                   <div class="list-group mr-1">
@@ -299,7 +289,7 @@
                 %if;spouse.mother.has_parents;
                   %if;(not cancel_links)
                     <div class="d-flex justify-content-around px-2 ml-1">
-                      %apply;ancestorlv4("spouse.",12,13,14,15)
+                      %apply;ancestorlv4("spouse.ancestor",12,13,14,15)
                     </div>
                   %end;
                   <div class="list-group ml-1">
