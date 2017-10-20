@@ -23,8 +23,8 @@
 </script>
 
 %if;(evar.implx = "on")
-<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.min.js"></script>
-<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
+  <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.min.js"></script>
+  <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
 %end;
 
 %define;implex()
@@ -50,11 +50,12 @@
   onmouseover="over1('sxx')" onmouseout="out1('sxx')" %nn;
 %end;
 
+%( dimensions des boites %)
 %let;hbc;13%in;
 %let;wbc;8%in;
-%let;hbs;15%in;
+%let;hbs;15%in; %( espacement des boites en mode sosa  dimension + marge %)
 %let;wbs;21%in;
-%let;hb1;12%in;
+%let;hb1;12%in; %( dimensions de la boite sosa %)
 %let;wb1;18%in;
 
 %define;bg(xx)
@@ -91,60 +92,58 @@
   <div id="boxsosa" style="%nn;
     width:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(wb1*2)%else;%wb1;%end;px;%nn;
     height:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(hb1*2)%else;%hb1;%end;px;%nn;
-    background-color:#bg;font-size:%if;(ss>999)5%elseif;(ll>10)7%else;9%end;px;">ss</div>
+    background-color:#bg;font-size:%if;(ss>999)5%elseif;(ll>10)7%else;9%end;px;"%nn;
+  >ss</div>
 %end;
 
 %define;linesosa(ss0, ll, yy, x0, y0)
-%let;ss;%if(evar.cpl="on")%expr(ss0/2)%else;ss0%end;%in;
-%if;(ss!=1)
-%let;lev;
-  %if;(ss>=1 and ss<2)1%nn;
-  %elseif;(ss>=2 and ss<4)2%nn;
-  %elseif;(ss>=4 and ss<8)3%nn;
-  %elseif;(ss>=8 and ss<16)4%nn;
-  %elseif;(ss>=16 and ss<32)5%nn;
-  %elseif;(ss>=32 and ss<64)6%nn;
-  %elseif;(ss>=64 and ss<128)7%nn;
-  %elseif;(ss>=128 and ss<256)8%nn;
-  %elseif;(ss>=256 and ss<512)9%nn;
-  %elseif;(ss>=512 and ss<1024)10%nn;
-  %elseif;(ss>=1024 and ss<2048)11%nn;
-  %elseif;(ss>=2048 and ss<4096)12%nn;
-  %elseif;(ss>=4096 and ss<8192)13%nn;
-  %else;14%end;
-%in;
-
-   %( ss=sosa, ll=level, yy=orientation I or H, x0, y0=coordinates of box %)
-  %let;www;%apply;nth%with;///4/4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
-  %let;hhh;%apply;nth%with;///4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
-  %let;ddd;%apply;nth%with;/1/2/4/4/8/8/16/16/256/512/1024/2048/4096/8192%and;%if;("yy"="H")%lev;%else;%expr(lev-1)%end;%end;%in;
-  %let;or;%nn;
-    %if;("yy"="H")%apply;nth%with;/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/%and;%lev;%end;%nn;
-    %else;%apply;nth%with;/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/%and;%lev;%end;%nn;
-    %end;%nn;
-  %in;
-  %let;twid0;%expr(www*wbs)%in;
-  %let;twid;%if("yy"="H")%expr(twid0*2)%else;%expr(twid0)%end;%in;
-  %let;thig;%expr(hhh*hbs)%in;
-  %let;len;%if;(or="h")%expr(twid/ddd)%else;%expr(thig/ddd)%end;%in;
-  %let;len2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%len;%else;%expr(len/2)%end;%in;
-  %( manque sens du trait x croissant ou x décroissant, ...pair impair  %)
-  %let;wb2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%wb1;%else;%expr(wb1/2)%end;%in;
-  %let;hb2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%hb1;%else;%expr(hb1/2)%end;%in;
-  %let;x1;%expr(x0+wb2)%in; %( 2* to position on side instead of center%)
-  %let;y1;%expr(y0+hb2)%in;
-  
-  %let;x2;%if(or="h")%if;(ss%2=0)%expr(x1+len2)%else;%expr(x1-len2)%end;%else;%x1;%end;%in;
-  %let;y2;%if(or="v")%if;(ss%2=0)%expr(y1+len2)%else;%expr(y1-len2)%end;%else;%y1;%end;%in;
-  %apply;line(x1, y1, x2, y2)
-%(xy: yy, %ss;, %or;, %len;, %x1;, %y1;, %x2;, %y2;%)
-%end;
+  %( ss=sosa, ll=level, yy=orientation I or H, x0, y0=coordinates of top left corner of box %)
+  %( x axis to the right, y axis to bottom %)
+  %let;ss;%if(evar.cpl="on")%expr(ss0/2)%else;ss0%end;%in;
+  %if;(ss!=1)
+    %let;lev;
+      %if;(ss>=1 and ss<2)1%nn;
+      %elseif;(ss>=2 and ss<4)2%nn;
+      %elseif;(ss>=4 and ss<8)3%nn;
+      %elseif;(ss>=8 and ss<16)4%nn;
+      %elseif;(ss>=16 and ss<32)5%nn;
+      %elseif;(ss>=32 and ss<64)6%nn;
+      %elseif;(ss>=64 and ss<128)7%nn;
+      %elseif;(ss>=128 and ss<256)8%nn;
+      %elseif;(ss>=256 and ss<512)9%nn;
+      %elseif;(ss>=512 and ss<1024)10%nn;
+      %elseif;(ss>=1024 and ss<2048)11%nn;
+      %elseif;(ss>=2048 and ss<4096)12%nn;
+      %elseif;(ss>=4096 and ss<8192)13%nn;
+      %else;14%end;
+    %in;
+    %let;www;%apply;nth%with;///4/4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
+    %let;hhh;%apply;nth%with;///4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
+    %let;ddd;%apply;nth%with;/1/2/4/4/8/8/16/16/256/512/1024/2048/4096/8192%and;%if;("yy"="H")%lev;%else;%expr(lev-1)%end;%end;%in;
+    %let;or;%nn;
+      %if;("yy"="H")%apply;nth%with;/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/%and;%lev;%end;%nn;
+      %else;%apply;nth%with;/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/v/h/%and;%lev;%end;%nn;
+      %end;%nn;
+    %in;
+    %let;twid0;%expr(www*wbs)%in;
+    %let;twid;%if("yy"="H")%expr(twid0*2)%else;%expr(twid0)%end;%in;
+    %let;thig;%expr(hhh*hbs)%in;
+    %let;len;%if;(or="h")%expr(twid/ddd)%else;%expr(thig/ddd)%end;%in;
+    %let;len2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%len;%else;%expr(len/2)%end;%in;
+    %let;wb2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%wb1;%else;%expr(wb1/2)%end;%in;
+    %let;hb2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%hb1;%else;%expr(hb1/2)%end;%in;
+    %let;x1;%expr(x0+wb2)%in;
+    %let;y1;%expr(y0+hb2)%in;
+    %let;x2;%if(or="h")%if;(ss%2=0)%expr(x1+len2)%else;%expr(x1-len2)%end;%else;%x1;%end;%in;
+    %let;y2;%if(or="v")%if;(ss%2=0)%expr(y1+len2)%else;%expr(y1-len2)%end;%else;%y1;%end;%in;
+    %apply;line(x1, y1, x2, y2)
+  %end;
 %end;
 
 %define;boxchar(x,y)
   %if;(x=1)┼
   %elseif;((x>1 and x<4) or (x>7 and x<16) or (x>31 and x<64) or (x>127 and x<256) or (x>511 and x<1024)or (x>2047 and x<4096))
-    %if;(y=0)
+    %if;("y"="H")
       %if;(x%2=0)
         %if;(evar.cpl="on" and not ancestor.spouse.has_parents and ancestor.has_parents)┐
         %elseif;(evar.cpl="on" and not ancestor.has_parents and ancestor.spouse.has_parents)┌
@@ -170,7 +169,7 @@
        %end;
     %end;
   %elseif;((x>3 and x<8) or (x>15 and x<32) or (x>63 and x<128) or (x>255 and x<512) or (x>1023 and x<2048) or (x>4095 and x<8192))
-    %if;(y=0)
+    %if;("y"="H")
       %if;(x%2=0)
         %if;(evar.cpl="on" and not ancestor.spouse.has_parents and ancestor.has_parents)└
         %elseif;(evar.cpl="on" and not ancestor.has_parents and ancestor.spouse.has_parents)┌
@@ -196,6 +195,18 @@
       %end;
     %end;
   %end;
+%end;
+
+%define;linechar(nn,yy,oo) %( nn #linechar, yy I ou H, oo orientation %)
+  %if;(evar.sosa="on")<span%else;<tt%end; style="top:%top_;px;left:%left_;px">
+  %for;i;0;nn;
+    %if;(oo=0)
+      %if;("yy"="H")│<br%/>%else;─%if;(evar.sosa="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa="on" and nn!=1)─%end;%end;
+    %elseif;(oo=1)
+      %if;("yy"="H")─%if;(evar.sosa="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa="on" and nn!=1)─%end;%else;│<br%/>%end;
+    %end;
+  %end;
+  </%if;(evar.sosa="on")span%else;tt%end;>
 %end;
 
 %define;graph(xx,yy,zz) %( xx gen ; yy mode I ou H; zz 1=single 2=couple %)
@@ -233,10 +244,13 @@
             >
             %if;(evar.sosa != "on")
               %if;(ancestor.same != "")x %apply;implex()
-              %else;%apply;boxchar(anc_sosahalf,yy)%end;</a></tt>
+              %else;%apply;boxchar(anc_sosahalf,"yy")
+              %end;
+              </a></tt>
             %else;
               %if;(ancestor.same != "")%apply;implex()%end;
-              %apply;boxsosa(ancestor.anc_sosa.v,xx,yy,level,bg)</a>
+              %apply;boxsosa(ancestor.anc_sosa.v,xx,"yy",level,bg)
+              </a>
               %apply;linesosa(ancestor.anc_sosa.v,xx+1,"yy",left,top)
             %end;
         %end;
@@ -281,12 +295,15 @@
             %if;(not ancestor.has_parents) [*missing parents].%end; (%left;-%top;)"%nn;
         >
         %if;(evar.sosa != "on")
-            %if;(ancestor.same != "")x %apply;implex()
-            %else;%apply;boxchar(ancestor.anc_sosa.v,yy)%end;</a></tt>
+          %if;(ancestor.same != "")x %apply;implex()
+          %else;%apply;boxchar(ancestor.anc_sosa.v,"yy")
+          %end;
+          </a></tt>
         %else;
           %if;(ancestor.same != "")%apply;implex()%end;
-            %apply;boxsosa(ancestor.anc_sosa.v,xx,yy,level,bg)</a>
-            %apply;linesosa(ancestor.anc_sosa.v,xx+1,"yy",left,top)
+          %apply;boxsosa(ancestor.anc_sosa.v,xx,"yy",level,bg)
+          </a>
+          %apply;linesosa(ancestor.anc_sosa.v,xx+1,"yy",left,top)
         %end;
       %end;
     %end;
@@ -309,30 +326,18 @@
             title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;%nn;
             [*add] %apply;a_of_b%with;[the parents]%and;%ancestor; Sosa %ancestor.anc_sosa.v;%end; (%left3;-%top3;)"%nn;
           >
-          %if;(evar.sms="on")·%else; %end;</a>
+          %if;(evar.sms="on")·%else; %end;
+          </a>
         %end;
       %end;
     %end;
   %end;
 %end;
 
-%define;links(nn,yy,oo) %( nn #links, yy I ou H, oo orientation %)
-  %if;(evar.sosa!="on")
-  %if;(evar.sosa="on")<span%else;<tt%end; style="top:%top_;px;left:%left_;px">
-    %for;i;0;nn;
-      %if;(oo=0)
-        %if;("yy"="H")│<br%/>%else;─%if;(evar.sosa="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa="on" and nn!=1)─%end;%end;
-      %elseif;(oo=1)
-        %if;("yy"="H")─%if;(evar.sosa="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa="on" and nn!=1)─%end;%else;│<br%/>%end;
-      %end;
-    %end;
-  </%if;(evar.sosa="on")span%else;tt%end;>
-  %end;
-%end;
-
 %define;graphlinks(xx,yy) %( xx level -1, yy mode : I ou H %)
   %let;hb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(hbs*2)%elseif;(evar.sosa = "on")%hbs;%else;%hbc;%end;%in;
   %let;wb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(wbs*2)%elseif;(evar.sosa = "on")%wbs;%else;%wbc;%end;%in;
+  %if;(evar.sosa!="on")
   %foreach;ancestor_level(xx-2)
     %foreach;ancestor;
       %let;top_;%expr(topxx_yy_(ancestor.anc_sosa.v)*hb)%in;
@@ -341,51 +346,52 @@
       %let;bbb;%if;("yy"="H")0%else;1%end;%in;
       %if;((evar.cpl="on" and ancestor.has_parents) or (evar.cpl!="on" and ancestor!=""))
         %if;(ancestor.anc_sosa.v=2 or ancestor.anc_sosa.v=3)
-          %if;(xx=4 or xx=5)       %apply;links(1,yy,aaa)
-          %elseif;(xx=6 or xx=7)   %apply;links(3,yy,aaa)
-          %elseif;(xx=8 or xx=9)   %apply;links(7,yy,aaa)
-          %elseif;(xx=10 or xx=11) %apply;links(15,yy,aaa)
-          %elseif;(xx=12)          %apply;links(31,yy,aaa)
+          %if;(xx=4 or xx=5)       %apply;linechar(1,yy,aaa)
+          %elseif;(xx=6 or xx=7)   %apply;linechar(3,yy,aaa)
+          %elseif;(xx=8 or xx=9)   %apply;linechar(7,yy,aaa)
+          %elseif;(xx=10 or xx=11) %apply;linechar(15,yy,aaa)
+          %elseif;(xx=12)          %apply;linechar(31,yy,aaa)
           %end;
         %elseif;(ancestor.anc_sosa.v>3 and ancestor.anc_sosa.v<8)
-          %if;(xx=5 or xx=6)       %apply;links(1,yy,bbb)
-          %elseif;(xx=7 or xx=8)   %apply;links(3,yy,bbb)
-          %elseif;(xx=9 or xx=10)  %apply;links(7,yy,bbb)
-          %elseif;(xx=11 or xx=12) %apply;links(15,yy,bbb)
+          %if;(xx=5 or xx=6)       %apply;linechar(1,yy,bbb)
+          %elseif;(xx=7 or xx=8)   %apply;linechar(3,yy,bbb)
+          %elseif;(xx=9 or xx=10)  %apply;linechar(7,yy,bbb)
+          %elseif;(xx=11 or xx=12) %apply;linechar(15,yy,bbb)
           %end;
         %elseif;(ancestor.anc_sosa.v>7 and ancestor.anc_sosa.v<16)
-          %if;(xx=6 or xx=7)       %apply;links(1,yy,aaa)
-          %elseif;(xx=8 or xx=9)   %apply;links(3,yy,aaa)
-          %elseif;(xx=10 or xx=11) %apply;links(7,yy,aaa)
-          %elseif;(xx=12)          %apply;links(15,yy,aaa)
+          %if;(xx=6 or xx=7)       %apply;linechar(1,yy,aaa)
+          %elseif;(xx=8 or xx=9)   %apply;linechar(3,yy,aaa)
+          %elseif;(xx=10 or xx=11) %apply;linechar(7,yy,aaa)
+          %elseif;(xx=12)          %apply;linechar(15,yy,aaa)
           %end;
         %elseif;(ancestor.anc_sosa.v>15 and ancestor.anc_sosa.v<32)
-          %if;(xx=7 or xx=8)       %apply;links(1,yy,bbb)
-          %elseif;(xx=9 or xx=10)  %apply;links(3,yy,bbb)
-          %elseif;(xx=11 or xx=12) %apply;links(7,yy,bbb)
+          %if;(xx=7 or xx=8)       %apply;linechar(1,yy,bbb)
+          %elseif;(xx=9 or xx=10)  %apply;linechar(3,yy,bbb)
+          %elseif;(xx=11 or xx=12) %apply;linechar(7,yy,bbb)
           %end;
         %elseif;(ancestor.anc_sosa.v>31 and ancestor.anc_sosa.v<64)
-          %if;(xx=8 or xx=9)       %apply;links(1,yy,aaa)
-          %elseif;(xx=10 or xx=11) %apply;links(3,yy,aaa)
-          %elseif;(xx=12)          %apply;links(7,yy,aaa)
+          %if;(xx=8 or xx=9)       %apply;linechar(1,yy,aaa)
+          %elseif;(xx=10 or xx=11) %apply;linechar(3,yy,aaa)
+          %elseif;(xx=12)          %apply;linechar(7,yy,aaa)
           %end;
         %elseif;(ancestor.anc_sosa.v>63 and ancestor.anc_sosa.v<128)
-          %if;(xx=9 or xx=10)      %apply;links(1,yy,bbb)
-          %elseif(xx=11 or xx=12)  %apply;links(3,yy,bbb)
+          %if;(xx=9 or xx=10)      %apply;linechar(1,yy,bbb)
+          %elseif(xx=11 or xx=12)  %apply;linechar(3,yy,bbb)
           %end;
         %elseif;(ancestor.anc_sosa.v>127 and ancestor.anc_sosa.v<256)
-          %if;(xx=10 or xx=11)     %apply;links(1,yy,aaa)
-          %elseif;(xx=12)          %apply;links(3,yy,aaa)
+          %if;(xx=10 or xx=11)     %apply;linechar(1,yy,aaa)
+          %elseif;(xx=12)          %apply;linechar(3,yy,aaa)
           %end;
         %elseif;(ancestor.anc_sosa.v>255 and ancestor.anc_sosa.v<512)
-          %if;(xx=11 or xx=12)     %apply;links(1,yy,bbb)
+          %if;(xx=11 or xx=12)     %apply;linechar(1,yy,bbb)
           %end;
         %elseif;(ancestor.anc_sosa.v>511 and ancestor.anc_sosa.v<1024)
-          %if;(xx=12)              %apply;links(1,yy,aaa)
+          %if;(xx=12)              %apply;linechar(1,yy,aaa)
           %end;
         %end;
       %end;
     %end;
+  %end;
   %end;
 %end;
 
