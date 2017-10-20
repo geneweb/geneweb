@@ -40,7 +40,7 @@
 %define;line(x0,y0,x1,y1)
     <script type="text/javascript">
     $(function() {
-      $('#ih-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
+      $('#ih-tree1').line(x0, y0, x1, y1, {color:"red", stroke:2, opacity:0.3, zindex:-1});
       });
     </script>
     %(xy: x0, y0, x1, y1%)
@@ -87,11 +87,11 @@
 
 %import;anctree_hi_indexes
 
-%define;boxsosa(xx, yy, ll, bg) %( x = sosa, y = level max, l = level %)
+%define;boxsosa(ss, xx, yy, ll, bg) %( x = sosa, y = level max, l = level %)
   <div id="boxsosa" style="%nn;
     width:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(wb1*2)%else;%wb1;%end;px;%nn;
     height:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(hb1*2)%else;%hb1;%end;px;%nn;
-    background-color:#bg;font-size:%if;(xx>999)5%elseif;(ll>10)7%else;9%end;px;">xx</div>
+    background-color:#bg;font-size:%if;(ss>999)5%elseif;(ll>10)7%else;9%end;px;">ss</div>
 %end;
 
 %define;linesosa(ss, ll, yy, x0, y0)
@@ -210,6 +210,7 @@
           %let;top;%expr(topxx_yy(anc_sosahalf)*hb)%in;
           %let;left;%expr(leftxx_yy(anc_sosahalf)*wb)%in;
           %let;bg;%if;(ancestor.same != "")CBFECE;%else;%apply;bg(level)%end;%in;
+          %if;(evar.sosa!="on")<tt>%end;
           <a id="s%ancestor.anc_sosa.v;" 
             style="top:%top;px;left:%left;px;" %nn;
             %if;(ancestor.same != "")%apply;implex1(ancestor.same.v)%end;%nn;
@@ -228,9 +229,14 @@
                 %if;(not ancestor.spouse.has_parents) [*missing parents].%end;%nn;
               %end; (%left;-%top;)"
             >
-            %if;(ancestor.same != "")%apply;implex()%end;
-            %apply;boxsosa(ancestor.anc_sosa.v,xx,yy,level,bg)</a>
-            %apply;linesosa(ancestor.anc_sosa.v,xx+1,"yy",left,top)
+            %if;(evar.sosa != "on")
+              %if;(ancestor.same != "")x %apply;implex()
+              %else;%apply;boxchar(anc_sosahalf,yy)%end;</a></tt>
+            %else;
+              %if;(ancestor.same != "")%apply;implex()%end;
+              %apply;boxsosa(ancestor.anc_sosa.v,xx,yy,level,bg)</a>
+              %apply;linesosa(ancestor.anc_sosa.v,xx+1,"yy",left,top)
+            %end;
         %end;
       %end;
     %end;
@@ -259,6 +265,7 @@
         %let;top2;%expr(topxx_yy(ancestor.same.v)*hb+6)%in;
         %let;left2;%expr(leftxx_yy(ancestor.same.v)*wb+4)%in;
         %let;bg;%if;(ancestor.same != "")CBFECE;%else;%apply;bg(level)%end;%in;
+        %if;(evar.sosa!="on")<tt>%end;
         <a id="s%ancestor.anc_sosa.v;"%nn;
           style="top:%top;px;left:%left;px;" %nn;
           %if;(ancestor.same != "")%apply;implex1(ancestor.same.v)%end;%nn;
@@ -271,9 +278,14 @@
             %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#013;%nn;
             %if;(not ancestor.has_parents) [*missing parents].%end; (%left;-%top;)"%nn;
         >
-        %if;(ancestor.same != "")%apply;implex()%end;
-        %apply;boxsosa(ancestor.anc_sosa.v,yy,level,bg)</a>
-        %apply;linesosa(ancestor.anc_sosa.v,xx+1,"yy",left,top)
+        %if;(evar.sosa != "on")
+            %if;(ancestor.same != "")x %apply;implex()
+            %else;%apply;boxchar(ancestor.anc_sosa.v,yy)%end;</a></tt>
+        %else;
+          %if;(ancestor.same != "")%apply;implex()%end;
+            %apply;boxsosa(ancestor.anc_sosa.v,xx,yy,level,bg)</a>
+            %apply;linesosa(ancestor.anc_sosa.v,xx+1,"yy",left,top)
+        %end;
       %end;
     %end;
      %foreach;ancestor_level(leveldown)
@@ -302,6 +314,79 @@
   %end;
 %end;
 
+%define;links(nn,yy,oo) %( nn #links, yy I ou H, oo orientation %)
+  %if;(evar.sosa!="on")
+  %if;(evar.sosa="on")<span%else;<tt%end; style="top:%top_;px;left:%left_;px">
+    %for;i;0;nn;
+      %if;(oo=0)
+        %if;("yy"="H")│<br%/>%else;─%if;(evar.sosa="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa="on" and nn!=1)─%end;%end;
+      %elseif;(oo=1)
+        %if;("yy"="H")─%if;(evar.sosa="on" and (evar.v<9 and evar.cpl!="on") or (evar.v<8 and evar.cpl="on") and nn!=1)───%elseif;(evar.sosa="on" and nn!=1)─%end;%else;│<br%/>%end;
+      %end;
+    %end;
+  </%if;(evar.sosa="on")span%else;tt%end;>
+  %end;
+%end;
+
+%define;graphlinks(xx,yy) %( xx level -1, yy mode : I ou H %)
+  %let;hb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(hbs*2)%elseif;(evar.sosa = "on")%hbs;%else;%hbc;%end;%in;
+  %let;wb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(wbs*2)%elseif;(evar.sosa = "on")%wbs;%else;%wbc;%end;%in;
+  %foreach;ancestor_level(xx-2)
+    %foreach;ancestor;
+      %let;top_;%expr(topxx_yy_(ancestor.anc_sosa.v)*hb)%in;
+      %let;left_;%expr(leftxx_yy_(ancestor.anc_sosa.v)*wb)%in;
+      %let;aaa;%if;("yy"="H")1%else;0%end;%in;
+      %let;bbb;%if;("yy"="H")0%else;1%end;%in;
+      %if;((evar.cpl="on" and ancestor.has_parents) or (evar.cpl!="on" and ancestor!=""))
+        %if;(ancestor.anc_sosa.v=2 or ancestor.anc_sosa.v=3)
+          %if;(xx=4 or xx=5)       %apply;links(1,yy,aaa)
+          %elseif;(xx=6 or xx=7)   %apply;links(3,yy,aaa)
+          %elseif;(xx=8 or xx=9)   %apply;links(7,yy,aaa)
+          %elseif;(xx=10 or xx=11) %apply;links(15,yy,aaa)
+          %elseif;(xx=12)          %apply;links(31,yy,aaa)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>3 and ancestor.anc_sosa.v<8)
+          %if;(xx=5 or xx=6)       %apply;links(1,yy,bbb)
+          %elseif;(xx=7 or xx=8)   %apply;links(3,yy,bbb)
+          %elseif;(xx=9 or xx=10)  %apply;links(7,yy,bbb)
+          %elseif;(xx=11 or xx=12) %apply;links(15,yy,bbb)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>7 and ancestor.anc_sosa.v<16)
+          %if;(xx=6 or xx=7)       %apply;links(1,yy,aaa)
+          %elseif;(xx=8 or xx=9)   %apply;links(3,yy,aaa)
+          %elseif;(xx=10 or xx=11) %apply;links(7,yy,aaa)
+          %elseif;(xx=12)          %apply;links(15,yy,aaa)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>15 and ancestor.anc_sosa.v<32)
+          %if;(xx=7 or xx=8)       %apply;links(1,yy,bbb)
+          %elseif;(xx=9 or xx=10)  %apply;links(3,yy,bbb)
+          %elseif;(xx=11 or xx=12) %apply;links(7,yy,bbb)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>31 and ancestor.anc_sosa.v<64)
+          %if;(xx=8 or xx=9)       %apply;links(1,yy,aaa)
+          %elseif;(xx=10 or xx=11) %apply;links(3,yy,aaa)
+          %elseif;(xx=12)          %apply;links(7,yy,aaa)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>63 and ancestor.anc_sosa.v<128)
+          %if;(xx=9 or xx=10)      %apply;links(1,yy,bbb)
+          %elseif(xx=11 or xx=12)  %apply;links(3,yy,bbb)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>127 and ancestor.anc_sosa.v<256)
+          %if;(xx=10 or xx=11)     %apply;links(1,yy,aaa)
+          %elseif;(xx=12)          %apply;links(3,yy,aaa)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>255 and ancestor.anc_sosa.v<512)
+          %if;(xx=11 or xx=12)     %apply;links(1,yy,bbb)
+          %end;
+        %elseif;(ancestor.anc_sosa.v>511 and ancestor.anc_sosa.v<1024)
+          %if;(xx=12)              %apply;links(1,yy,aaa)
+          %end;
+        %end;
+      %end;
+    %end;
+  %end;
+%end;
+
 %if;(evar.v < 5)
   [*compact tree][:] [specify::generation/generations]0 >= 5.
 %else;
@@ -315,20 +400,24 @@
         %if;(evar.v < 14 and evar.cpl = "on")
           <div id="ih-tree1" style="width:%size2;px;height:%size2;px">
           %apply;graph(evar.v-2,"I",2)
+          %apply;graphlinks(evar.v-2,"I")
           </div>
         %elseif;(evar.v < 13 and evar.cpl != "on")
           <div id="ih-tree1" style="width:%size1;px;height:%size1;px">
           %apply;graph(evar.v-1,"I",1)
+          %apply;graphlinks(evar.v-1,"I")
           </div>
         %end;
       %elseif;(evar.sosa != "on")
         %if;(evar.v < 15 and evar.cpl = "on")
           <div id="ih-tree1" style="width:%size2;px;height:%size3;px">
           %apply;graph(evar.v-2,"I",2)
+          %apply;graphlinks(evar.v-2,"I")
           </div>
         %elseif;(evar.v < 14 and evar.cpl != "on")
           <div id="ih-tree1" style="width:%size1;px;height:%size2;px">
           %apply;graph(evar.v-1,"I",1)
+          %apply;graphlinks(evar.v-1,"I")
           </div>
         %end;
       %end;
@@ -337,20 +426,24 @@
         %if;(evar.v < 14 and evar.cpl = "on")
           <div id="ih-tree1" style="width:%size1;px;height:%size1;px">
           %apply;graph(evar.v-2,"H",2)
+          %apply;graphlinks(evar.v-2,"H")
           </div>
         %elseif;(evar.v < 13 and evar.cpl != "on")
           <div id="ih-tree1" style="width:%size0;px;height:%size0;px">
           %apply;graph(evar.v-1,"H",1)
+          %apply;graphlinks(evar.v-1,"H")
           </div>
         %end;
       %elseif;(evar.sosa != "on")
         %if;(evar.v < 15 and evar.cpl = "on")
           <div id="ih-tree1" style="width:%size2;px;height:%size2;px">
           %apply;graph(evar.v-2,"H",2)
+          %apply;graphlinks(evar.v-2,"H")
           </div>
         %elseif;(evar.v < 14 and evar.cpl != "on")
           <div id="ih-tree1" style="width:%size1;px;height:%size1;px">
           %apply;graph(evar.v-1,"H",1)
+          %apply;graphlinks(evar.v-1,"H")
           </div>
         %end;
       %end;
