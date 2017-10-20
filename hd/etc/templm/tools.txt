@@ -226,7 +226,8 @@
         %end;
         %apply;checkbox("  ","marriage",[marriage date],[display marriage date])
         %apply;checkbox("  ","siblings",[full siblings],"")
-        %apply;checkbox("  ","sosa",[n° Sosa],[visualize/show/hide/summary]1)
+        %(apply;checkbox("  ","sosa",[n° Sosa],[visualize/show/hide/summary]1%)
+        <input type="hidden" name="sosa" value="on">
         <label>    [*font size]
           <input type="number" class="number" style="width:3em"
             id="e0" name="fs" value="%l_fs;" size="2" onchange="ob()"
@@ -235,12 +236,12 @@
       <fieldset style="border:0">
       %let;l_on1;onchange="valid('t1CT')"%in;
         %apply;radio("t1","CT",[*compact tree],"[itree] [or] [htree]")
-        %(apply;checkbox("├","it","Orientation I (on) [or] H (off)",""%)
+        %(apply;checkbox("├","ih","Orientation I (on) [or] H (off)",""%)
         <label title=""> ├ orientation 
-            <input type="radio" id="itIH" name="it" value="on" %_on1; %l_on;
-              %if;(evar.it = "on") checked="checked"%end;%/> I 
-            <input type="radio" id="itIH" name="it" value="off" %_on1; %l_on;
-              %if;(evar.it = "off" or evar.it = "") checked="checked"%end;%/> H</label>
+            <input type="radio" id="itIH" name="ih" value="I" %_on1; %l_on;
+              %if;(evar.ih = "I") checked="checked"%end;%/> I 
+            <input type="radio" id="itIH" name="ih" value="H" %_on1; %l_on;
+              %if;(evar.ih = "H" or evar.ih = "") checked="checked"%end;%/> H</label>
         %apply;checkbox("├","cpl",[by couple],"")
         %let;msg;[implex links] ([uncheck] [by couple])%in;
         %apply;checkbox("├","implx",msg,"")

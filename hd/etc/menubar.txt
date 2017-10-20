@@ -91,6 +91,7 @@
                     %end;
                     <input type="hidden" id="a6_wide" name="wide" value="%evar.wide;">
                     %apply;input_hidden("evar.v","v")
+                    %apply;input_hidden("evar.t","")
                     %apply;input_hidden("evar.image","image")
                     %apply;input_hidden("evar.marriage","marriage")
                     %apply;input_hidden("evar.mar_sp_ch","mar_sp_ch")
