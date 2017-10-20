@@ -40,7 +40,7 @@
 %define;line(x0,y0,x1,y1)
     <script type="text/javascript">
     $(function() {
-      $('#ih-tree1').line(x0, y0, x1, y1, {color:"red", stroke:2, opacity:0.3, zindex:-1});
+      $('#ih-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
       });
     </script>
     %(xy: x0, y0, x1, y1%)
@@ -94,7 +94,8 @@
     background-color:#bg;font-size:%if;(ss>999)5%elseif;(ll>10)7%else;9%end;px;">ss</div>
 %end;
 
-%define;linesosa(ss, ll, yy, x0, y0)
+%define;linesosa(ss0, ll, yy, x0, y0)
+%let;ss;%if(evar.cpl="on")%expr(ss0/2)%else;ss0%end;%in;
 %if;(ss!=1)
 %let;lev;
   %if;(ss>=1 and ss<2)1%nn;
@@ -112,6 +113,7 @@
   %elseif;(ss>=4096 and ss<8192)13%nn;
   %else;14%end;
 %in;
+
    %( ss=sosa, ll=level, yy=orientation I or H, x0, y0=coordinates of box %)
   %let;www;%apply;nth%with;///4/4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
   %let;hhh;%apply;nth%with;///4/8/8/16/16/32/32/64/64/128%and;ll%end;%in;
