@@ -1,9 +1,9 @@
   <!-- $Id: anctree_hi.txt -->
 <style type="text/css">
-  #ih-tree1 {position:relative;left:10px;}
-  #ih-tree1 tt{position:absolute;font-size:10pt;line-height:10pt;}
-  #ih-tree1 span{position:absolute;font-size:9pt;line-height:10pt;margin:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))8px 12px%else;0px 4px%end;}
-  #ih-tree1 a{position:absolute;font-size:10pt;line-height:10pt;}
+  #hi-tree1 {position:relative;left:10px;}
+  #hi-tree1 tt{position:absolute;font-size:10pt;line-height:10pt;}
+  #hi-tree1 span{position:absolute;font-size:9pt;line-height:10pt;margin:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))8px 12px%else;0px 4px%end;}
+  #hi-tree1 a{position:absolute;font-size:10pt;line-height:10pt;}
   #boxsosa {position:relative;border:solid 1px;text-align:center}
 </style>
 
@@ -11,7 +11,7 @@
   <!--
   function over1(xx)
   {
-   document.getElementById(xx).style.%if;(evar.sosa="on")outline="#CBFECE solid 6px"%else;backgroundColor="#CBFECE"%end;;
+   document.getElementById(xx).style.%if;(evar.sosa="on")outline="#C0FEFF solid 6px"%else;backgroundColor="#CBFECE"%end;;
    return false;
   }
   function out1(xx)
@@ -22,16 +22,14 @@
   -->
 </script>
 
-%if;(evar.implx = "on")
   <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.min.js"></script>
   <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
-%end;
 
 %define;implex()
   %if;(evar.implx="on")
     <script type="text/javascript">
     $(function() {
-      $('#ih-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.5, zindex:1});
+      $('#hi-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.5, zindex:1});
       });
     </script>
   %end;
@@ -40,10 +38,9 @@
 %define;line(x0,y0,x1,y1)
     <script type="text/javascript">
     $(function() {
-      $('#ih-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
+      $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
       });
     </script>
-    %(xy: x0, y0, x1, y1%)
 %end;
 
 %define;implex1(xx)
@@ -210,7 +207,7 @@
 %end;
 
 %define;graph(xx,yy,zz) %( xx gen ; yy mode I ou H; zz 1=single 2=couple %)
-  %let;nav;;m=A;v=%evar.v;;t=T;t1=%evar.t1;;ih=%evar.ih;;%if;(evar.sosa != "")sosa=%evar.sosa;;%end;nav=on;%if;(evar.cpl != "")cpl=%evar.cpl;;%end;%if;(evar.implx != "")implx=%evar.implx;;%end;%if;(evar.sms != "")sms=%evar.sms;;%end;%in;
+  %let;nav;;m=A;v=%evar.v;;t=T;t1=%evar.t1;;hi=%evar.hi;;%if;(evar.sosa != "")sosa=%evar.sosa;;%end;nav=on;%if;(evar.cpl != "")cpl=%evar.cpl;;%end;%if;(evar.implx != "")implx=%evar.implx;;%end;%if;(evar.sms != "")sms=%evar.sms;;%end;%in;
   %let;levelup;%expr(xx+1)%in;
   %let;leveldown;%expr(xx-1)%in;
   %let;hb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(hbs*2)%elseif;(evar.sosa = "on")%hbs;%else;%hbc;%end;%in;
@@ -403,58 +400,59 @@
   %let;size2;%apply;size(evar.v-2)%in;
   %let;size3;%apply;size(evar.v-3)%in;
   %if;(evar.t = "T" and evar.v > 3)
-    %if;(evar.t1 = "CT" and evar.ih = "H")
+    %if;(evar.t1 = "CT" and (evar.hi = "H" or evar.hi=""))
       %if;(evar.sosa = "on")
         %if;(evar.v < 14 and evar.cpl = "on")
-          <div id="ih-tree1" style="width:%size2;px;height:%size2;px">
+          <div id="hi-tree1" style="width:%size2;px;height:%size2;px">
           %apply;graph(evar.v-2,"I",2)
           %apply;graphlinks(evar.v-2,"I")
           </div>
         %elseif;(evar.v < 13 and evar.cpl != "on")
-          <div id="ih-tree1" style="width:%size1;px;height:%size1;px">
+          <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
           %apply;graph(evar.v-1,"I",1)
           %apply;graphlinks(evar.v-1,"I")
           </div>
         %end;
       %elseif;(evar.sosa != "on")
         %if;(evar.v < 15 and evar.cpl = "on")
-          <div id="ih-tree1" style="width:%size2;px;height:%size3;px">
+          <div id="hi-tree1" style="width:%size2;px;height:%size3;px">
           %apply;graph(evar.v-2,"I",2)
           %apply;graphlinks(evar.v-2,"I")
           </div>
         %elseif;(evar.v < 14 and evar.cpl != "on")
-          <div id="ih-tree1" style="width:%size1;px;height:%size2;px">
+          <div id="hi-tree1" style="width:%size1;px;height:%size2;px">
           %apply;graph(evar.v-1,"I",1)
           %apply;graphlinks(evar.v-1,"I")
           </div>
         %end;
       %end;
-    %elseif;(evar.t1 = "CT" and evar.ih = "I")
+    %elseif;(evar.t1 = "CT" and evar.hi = "I")
       %if;(evar.sosa = "on")
         %if;(evar.v < 14 and evar.cpl = "on")
-          <div id="ih-tree1" style="width:%size1;px;height:%size1;px">
+          <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
           %apply;graph(evar.v-2,"H",2)
           %apply;graphlinks(evar.v-2,"H")
           </div>
         %elseif;(evar.v < 13 and evar.cpl != "on")
-          <div id="ih-tree1" style="width:%size0;px;height:%size0;px">
+          <div id="hi-tree1" style="width:%size0;px;height:%size0;px">
           %apply;graph(evar.v-1,"H",1)
           %apply;graphlinks(evar.v-1,"H")
           </div>
         %end;
       %elseif;(evar.sosa != "on")
         %if;(evar.v < 15 and evar.cpl = "on")
-          <div id="ih-tree1" style="width:%size2;px;height:%size2;px">
+          <div id="hi-tree1" style="width:%size2;px;height:%size2;px">
           %apply;graph(evar.v-2,"H",2)
           %apply;graphlinks(evar.v-2,"H")
           </div>
         %elseif;(evar.v < 14 and evar.cpl != "on")
-          <div id="ih-tree1" style="width:%size1;px;height:%size1;px">
+          <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
           %apply;graph(evar.v-1,"H",1)
           %apply;graphlinks(evar.v-1,"H")
           </div>
         %end;
       %end;
+    %else;no CT
     %end;
   %end;
 %end;

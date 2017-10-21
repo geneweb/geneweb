@@ -47,6 +47,7 @@ options[9][4] = "+3-3 gen.";
 options[9][5] = "famille";
 options[9][6] = "7 gen";
 options[9][7] = "9 gen";
+options[9][8] = "HI";
 modules[10] = "gr_parents";
 options[10][1] = "standard";
 options[10][2] = "three cols";
@@ -293,6 +294,14 @@ $('#a6').on('click', function ()
 $('#a7').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a7');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_7.jpg">\n');
+});
+
+$('#a8').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a8');
+  $('#a8_v').val('5');
+  $('#a8_t').val('T');
+  $('#a8_t1').val('CT');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_8.jpg">\n');
 });
 
 $('#g1').on('click', function ()
