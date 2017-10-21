@@ -23,5 +23,9 @@ Options
   %apply;show_templ("perso_module/arbre_h7")
 %elseif;(op_m=7)
   %apply;show_templ("perso_module/arbre_9gen")
+%elseif;(op_m=8)
+  %import;perso_module/arbre_hi_tools
+  %import;templm/anctree_hi_indexes
+  %apply;show_templ("templm/anctree_hi")
 %else;
 %end;

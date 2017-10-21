@@ -235,12 +235,12 @@
       <fieldset style="border:0">
       %let;l_on1;onchange="valid('t1CT')"%in;
         %apply;radio("t1","CT",[*compact tree],"[itree] [or] [htree]")
-        %(apply;checkbox("├","ih","Orientation I (on) [or] H (off)",""%)
+        %(apply;checkbox("├","hi","Orientation I (on) [or] H (off)",""%)
         <label title=""> ├ orientation 
-            <input type="radio" id="itIH" name="ih" value="I" %_on1; %l_on;
-              %if;(evar.ih = "I") checked="checked"%end;%/> I 
-            <input type="radio" id="itIH" name="ih" value="H" %_on1; %l_on;
-              %if;(evar.ih = "H" or evar.ih = "") checked="checked"%end;%/> H</label>
+            <input type="radio" id="itIH" name="hi" value="I" %_on1; %l_on;
+              %if;(evar.hi = "I") checked="checked"%end;%/> I 
+            <input type="radio" id="itIH" name="hi" value="H" %_on1; %l_on;
+              %if;(evar.hi = "H" or evar.hi = "") checked="checked"%end;%/> H</label>
         %apply;checkbox("├","cpl",[by couple],"")
         %let;msg;[implex links] ([uncheck] [by couple])%in;
         %apply;checkbox("├","implx",msg,"")
