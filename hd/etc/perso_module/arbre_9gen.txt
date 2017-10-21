@@ -93,16 +93,16 @@
 </script>
 
 <style type="text/css">
-  #ih-tree1 {position:relative;left:10px;}
-  #ih-tree1 tt{position:absolute;font-family:monospace;font-size:10pt;line-height:10pt;%if;(evar.sosa="on")margin:2px 6px;%end;}
-  #ih-tree1 a{position:absolute;font-family:monospace;font-size:10pt;line-height:10pt;}
+  #hi-tree1 {position:relative;left:10px;}
+  #hi-tree1 tt{position:absolute;font-family:monospace;font-size:10pt;line-height:10pt;%if;(evar.sosa="on")margin:2px 6px;%end;}
+  #hi-tree1 a{position:absolute;font-family:monospace;font-size:10pt;line-height:10pt;}
 </style>
 
 %define;implex()
   %if;(evar.implx="on")
     <script type="text/javascript">
     $(function() {
-      $('#ih-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.3, zindex:1});
+      $('#hi-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.3, zindex:1});
       });
     </script>
   %end;

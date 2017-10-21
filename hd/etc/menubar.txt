@@ -90,8 +90,10 @@
                       %apply;input_hidden("occ","oc")
                     %end;
                     <input type="hidden" id="a6_wide" name="wide" value="%evar.wide;">
+                    <input type="hidden" id="a8_t" name="t" value="">
+                    <input type="hidden" id="a8_t1" name="t1" value="">
                     %apply;input_hidden("evar.v","v")
-                    %apply;input_hidden("evar.t","")
+                    <input type="hidden" id="a8_v" name="v" value="">
                     %apply;input_hidden("evar.image","image")
                     %apply;input_hidden("evar.marriage","marriage")
                     %apply;input_hidden("evar.mar_sp_ch","mar_sp_ch")
