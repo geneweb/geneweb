@@ -105,11 +105,11 @@
   <label style="display:inline"><input type="number" id="v" name="v" style="font-weight:bold;text-align:right;font-size:14px;width:2.4em;height:16px" value="%evar.v;"
   autocomplete="off" 
   min="%if;(evar.m = "A" or evar.m = "D")
-         %if;(evar.t1="CT" and evar.cpl="on")5%elseif;(evar.t1="CT" and evar.cpl="")4%else;2%end;
+         %if;(evar.t1="CT" and evar.cpl="on")4%elseif;(evar.t1="CT" and evar.cpl="")3%else;2%end;
        %else;1
        %end;"
   max="%if;(evar.m = "A")
-         %if;(evar.t1="CT" and evar.cpl="on")14%elseif;(evar.t1="CT" and evar.cpl="")13%else;%l_emaxv;%end;"
+         %if;(evar.t1="CT" and evar.cpl="on")13%elseif;(evar.t1="CT" and evar.cpl="")12%else;%l_emaxv;%end;"
        %end;
   title="%if;(evar.m = "A" and evar.t = "T")[*maximum][:]%nl;[*full tree] %l_emaxv; [generation/generations]1%nl;[*compact tree] H [or] I  13 [generation/generations]1&#013;     [by couple] 14 [generation/generations]1%end;%nl;[*with] [n° Sosa] 12 [generation/generations]1%nl;    [by couple] 13 [generation/generations]1"
         accesskey="X"/>[generation/generations]1 <code>(X)</code></label><br/>
@@ -241,7 +241,8 @@
               %if;(evar.hi = "I") checked="checked"%end;%/> I 
             <input type="radio" id="itIH" name="hi" value="H" %_on1; %l_on;
               %if;(evar.hi = "H" or evar.hi = "") checked="checked"%end;%/> H</label>
-        %apply;checkbox("├","cpl",[by couple],"")
+        %let;msg;[by couple] ([one additional generation])%in;
+        %apply;checkbox("├","cpl",msg,"")
         %let;msg;[implex links] ([uncheck] [by couple])%in;
         %apply;checkbox("├","implx",msg,"")
         %apply;checkbox("├","nav",[navigate on tree],"")
