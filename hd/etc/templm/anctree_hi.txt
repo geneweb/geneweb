@@ -392,64 +392,72 @@
   %end;
 %end;
 
-%if;(evar.v < 5)
-  [*compact tree][:] [specify::generation/generations]0 >= 5.
+%if;((evar.cpl="on" and evar.v < 4) or (evar.cpl!="on" and evar.v < 3))
+  [*compact tree][:] [specify::generation/generations]0 > 3.
 %else;
-  %let;size0;%apply;size(evar.v)%in;
-  %let;size1;%apply;size(evar.v-1)%in;
-  %let;size2;%apply;size(evar.v-2)%in;
-  %let;size3;%apply;size(evar.v-3)%in;
-  %if;(evar.t = "T" and evar.v > 3)
+  %let;size0;%apply;size(evar.v+1)%in;
+  %let;size1;%apply;size(evar.v)%in;
+  %let;size2;%apply;size(evar.v-1)%in;
+  %let;size3;%apply;size(evar.v-2)%in;
+  %if;(evar.t = "T" and evar.v >= 3)
     %if;(evar.t1 = "CT" and (evar.hi = "H" or evar.hi=""))
       %if;(evar.sosa = "on")
-        %if;(evar.v < 14 and evar.cpl = "on")
+        %if;(evar.v < 13 and evar.cpl = "on")
           <div id="hi-tree1" style="width:%size2;px;height:%size2;px">
-          %apply;graph(evar.v-2,"I",2)
-          %apply;graphlinks(evar.v-2,"I")
-          </div>
-        %elseif;(evar.v < 13 and evar.cpl != "on")
-          <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
-          %apply;graph(evar.v-1,"I",1)
+          %apply;graph(evar.v-1,"I",2)
           %apply;graphlinks(evar.v-1,"I")
           </div>
+        %elseif;(evar.v < 12 and evar.cpl != "on")
+          <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
+          %apply;graph(evar.v,"I",1)
+          %apply;graphlinks(evar.v,"I")
+          </div>
+        %else;
+          [*compact tree][:] [specify::generation/generations]0 %if;(evar.cpl = "on")< 13.%else;< 12.%end;
         %end;
       %elseif;(evar.sosa != "on")
-        %if;(evar.v < 15 and evar.cpl = "on")
+        %if;(evar.v < 14 and evar.cpl = "on")
           <div id="hi-tree1" style="width:%size2;px;height:%size3;px">
-          %apply;graph(evar.v-2,"I",2)
-          %apply;graphlinks(evar.v-2,"I")
-          </div>
-        %elseif;(evar.v < 14 and evar.cpl != "on")
-          <div id="hi-tree1" style="width:%size1;px;height:%size2;px">
-          %apply;graph(evar.v-1,"I",1)
+          %apply;graph(evar.v-1,"I",2)
           %apply;graphlinks(evar.v-1,"I")
           </div>
+        %elseif;(evar.v < 13 and evar.cpl != "on")
+          <div id="hi-tree1" style="width:%size1;px;height:%size2;px">
+          %apply;graph(evar.v,"I",1)
+          %apply;graphlinks(evar.v,"I")
+          </div>
+        %else;
+          [*compact tree][couples][:] [specify::generation/generations]0%if;(evar.cpl = "on")< 14.%else;< 13.%end;
         %end;
       %end;
     %elseif;(evar.t1 = "CT" and evar.hi = "I")
       %if;(evar.sosa = "on")
-        %if;(evar.v < 14 and evar.cpl = "on")
+        %if;(evar.v < 13 and evar.cpl = "on")
           <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
-          %apply;graph(evar.v-2,"H",2)
-          %apply;graphlinks(evar.v-2,"H")
-          </div>
-        %elseif;(evar.v < 13 and evar.cpl != "on")
-          <div id="hi-tree1" style="width:%size0;px;height:%size0;px">
-          %apply;graph(evar.v-1,"H",1)
+          %apply;graph(evar.v-1,"H",2)
           %apply;graphlinks(evar.v-1,"H")
           </div>
+        %elseif;(evar.v < 12 and evar.cpl != "on")
+          <div id="hi-tree1" style="width:%size0;px;height:%size0;px">
+          %apply;graph(evar.v,"H",1)
+          %apply;graphlinks(evar.v,"H")
+          </div>
+        %else;
+          [*compact tree][:] [specify::generation/generations]0%if;(evar.cpl = "on")< 13.%else;< 12.%end;
         %end;
       %elseif;(evar.sosa != "on")
-        %if;(evar.v < 15 and evar.cpl = "on")
+        %if;(evar.v < 14 and evar.cpl = "on")
           <div id="hi-tree1" style="width:%size2;px;height:%size2;px">
-          %apply;graph(evar.v-2,"H",2)
-          %apply;graphlinks(evar.v-2,"H")
-          </div>
-        %elseif;(evar.v < 14 and evar.cpl != "on")
-          <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
-          %apply;graph(evar.v-1,"H",1)
+          %apply;graph(evar.v-1,"H",2)
           %apply;graphlinks(evar.v-1,"H")
           </div>
+        %elseif;(evar.v < 13 and evar.cpl != "on")
+          <div id="hi-tree1" style="width:%size1;px;height:%size1;px">
+          %apply;graph(evar.v,"H",1)
+          %apply;graphlinks(evar.v,"H")
+          </div>
+        %else;
+          [*compact tree][:] [specify::generation/generations]0%if;(evar.cpl = "on")< 14.%else;< 13.%end;
         %end;
       %end;
     %else;no CT
