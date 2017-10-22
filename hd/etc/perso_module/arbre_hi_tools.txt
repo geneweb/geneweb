@@ -4,7 +4,7 @@
 
 %define;rebuild_url(vvv,hhh,iii,xxx,sss,mmm)
   %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
-  %let;nv;%if;(nv0<5)5%else;%nv0;%end;%in;
+  %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
   %let;new_url;%nn;
     %prefix;%access;;t=T;t1=CT;fs=9;wi=980;he=600;%nn;
     %if;(evar.m!="")m=%evar.m;;%end;%nn;
@@ -25,10 +25,8 @@
 %let;evarix;%if;(evar.implx!="" and evar.implx="on")1%else;0%end;%in;
 %let;evarso;%if;(evar.sosa!="" and evar.sosa="on")1%else;0%end;%in;
 %let;evarma;%if;(evar.cpl!="" and evar.cpl="on")1%else;0%end;%in;
-%let;maxlev;%apply;min%with;%nn;
-  %if;(bvar.max_anc_tree!="")%bvar.max_anc_tree;%else;120%end;%and;%nn;
-  %if;(bvar.max_anc_level!="")%bvar.max_anc_level;%else;120%end;%and;%nn;
-  %expr(static_max_anc_level)%end;%nn;
+%let;maxlev;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;%evarv;%end;%nn;
+  ;%nn;
 %in;
 
 %(evarv;, %evarih;, %evarim;, %evarso;, %evarma;<br>%)
@@ -37,22 +35,26 @@
   %if;not cancel_links;
     <div class="form-inline">
       <div class="btn-group mx-2 mb-2">
-        %if;(maxlev>9 and evarv>=5)
+        %if;(evarv>=8)
           <a href="%apply;rebuild_url%with;%expr(evarv-5)%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%end;"
             class="btn btn-secondary btn-sm font-weight-bold"
             title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵</a>
+        %end;
+        %if;(evarv>=4)
           <a href="%apply;rebuild_url%with;%expr(evarv-1)%and;%evarih;%and;%nn;
             %evarim;;%and;%evarix;%and;%evarso;%and;%evarma;%end;"
             class="btn btn-secondary btn-sm small"
             title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−</a>
         %end;
         <span class="btn btn-outline-secondary btn-sm font-weight-bold">%evarv;</span>
-        %if;(maxlev>9 and maxlev-evarv>=5)
+        %if;(evarv<=12)
           <a href="%apply;rebuild_url%with;%expr(evarv+1)%and;%evarih;%and;%nn;
             %evarim;;%and;%evarix;%and;%evarso;%and;%evarma;%end;"
             class="btn btn-secondary btn-sm small"
             title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
+        %end;
+        %if;(evarv<=8)
           <a href="%apply;rebuild_url%with;%expr(evarv+5)%and;%evarih;%and;%nn;
             %evarim;;%and;%evarix;%and;%evarso;%and;%evarma;%end;"
             class="btn btn-secondary btn-sm font-weight-bold"

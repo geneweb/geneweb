@@ -28,6 +28,10 @@ ru: около
 en: book of %s
 fr: dictionnaire des %s
 
+    one additional generation
+en: one additional generation
+fr: une génération en plus
+    
     compiled on %s from commit %s
 en: compiled on %s from commit %s
 fr: compilé le %s à partir du commit %s
