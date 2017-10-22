@@ -243,7 +243,7 @@
               %if;(evar.hi = "H" or evar.hi = "") checked="checked"%end;%/> H</label>
         %let;msg;[by couple] ([one additional generation])%in;
         %apply;checkbox("├","cpl",msg,"")
-        %let;msg;[implex links] ([uncheck] [by couple])%in;
+        %let;msg;[implex links]%in;
         %apply;checkbox("├","implx",msg,"")
         %apply;checkbox("├","nav",[navigate on tree],"")
         <label title="[create] [family/families]0">

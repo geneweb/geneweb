@@ -217,8 +217,13 @@
       %foreach;ancestor;
         %if;(ancestor.anc_sosa.v %2 = 0)
           %let;anc_sosahalf;%expr(ancestor.anc_sosa.v/2)%in;
+          %let;anc_sosasamehalf;%expr(ancestor.same/2)%in;
           %let;top;%expr(topxx_yy(anc_sosahalf)*hb)%in;
           %let;left;%expr(leftxx_yy(anc_sosahalf)*wb)%in;
+          %let;top1;%expr(topxx_yy(anc_sosahalf)*hb+6)%in;
+          %let;left1;%expr(leftxx_yy(anc_sosahalf)*wb+4)%in;
+          %let;top2;%expr(topxx_yy(anc_sosasamehalf)*hb+6)%in;
+          %let;left2;%expr(leftxx_yy(anc_sosasamehalf)*wb+4)%in;
           %let;bg;%if;(ancestor.same != "")CBFECE;%else;%apply;bg(level)%end;%in;
           %if;(evar.sosa!="on")<tt>%end;
           <a id="s%ancestor.anc_sosa.v;" 
