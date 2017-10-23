@@ -7,6 +7,7 @@
   #boxsosa {position:relative;border:solid 1px;text-align:center}
 </style>
 
+<script>$.noConflict();</script>
 <script type="text/javascript">
   <!--
   function over1(xx)
@@ -28,8 +29,10 @@
 %define;implex()
   %if;(evar.implx="on")
     <script type="text/javascript">
-    $(function() {
-      $('#hi-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.5, zindex:1});
+      jQuery( document ).ready(function( $ ) {
+        $(function() {
+          $('#hi-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.5, zindex:1});
+        });
       });
     </script>
   %end;
@@ -37,8 +40,10 @@
 
 %define;line(x0,y0,x1,y1)
     <script type="text/javascript">
-    $(function() {
-      $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
+      jQuery( document ).ready(function( $ ) {
+      $(function() {
+        $('#hi-tree1').line(x0, y0, x1, y1, {stroke:2, opacity:0.3, zindex:-1});
+        });
       });
     </script>
 %end;
