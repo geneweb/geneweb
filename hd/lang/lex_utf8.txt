@@ -28,6 +28,26 @@ ru: около
 en: book of %s
 fr: dictionnaire des %s
 
+    reduce/increase
+en: reduce/increase
+fr: réduire/augmenter
+
+    do not
+en: do not
+fr: ne pas
+
+    size
+en: scale
+fr: echelle
+
+    couples
+en: couples
+fr: couples
+
+    missing %s
+en: missing %s
+fr: %s manquant
+
     one additional generation
 en: one additional generation
 fr: une génération en plus
