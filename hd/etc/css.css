@@ -14,6 +14,66 @@
   z-index: 0;
 }
 
+.big_anchor_1 {
+  display: block;
+  width: 100%;
+  height: 60%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_1m {
+  display: block;
+  width: 100%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_him {
+  display: block;
+  width: 50%;
+  height: 60%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_her {
+  display: block;
+  width: 50%;
+  height: 60%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 0;
+}
+
+.big_anchor_him_m {
+  display: block;
+  width: 50%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_her_m {
+  display: block;
+  width: 50%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  z-index: 0;
+}
+
 .normal_anchor {
   position: relative;
   z-index: 1;

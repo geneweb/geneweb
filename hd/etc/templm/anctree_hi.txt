@@ -1,9 +1,9 @@
   <!-- $Id: anctree_hi.txt -->
 <style type="text/css">
-  #hi-tree1 {position:relative;left:10px;}
-  #hi-tree1 tt{position:absolute;line-height:10pt;}
-  #hi-tree1 span{position:absolute;line-height:10pt;margin:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))8px 12px%else;0px 4px%end;}
-  #hi-tree1 a{position:absolute;line-height:10pt;}
+#hi-tree1 {position:relative;left:10px;}
+#hi-tree1 tt{position:absolute;line-height:10pt;}
+#hi-tree1 span{position:absolute;line-height:10pt;margin:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))8px 12px%else;0px 4px%end;}
+#hi-tree1 a{position:absolute;line-height:10pt;}
 </style>
 
 <script>$.noConflict();</script>
@@ -101,6 +101,37 @@
 
 %import;anctree_hi_indexes
 
+%let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
+%let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
+%let;evart1;%if;(evar.t1!="")%evar.t1;%end;%in;
+%let;evarih;%if;(evar.hi!="")%evar.hi;%else;H%end;%in;
+%let;evarim;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
+%let;evarix;%if;(evar.implx!="" and evar.implx="on")1%else;0%end;%in;
+%let;evarso;%if;(evar.sosa!="" and evar.sosa="on")1%else;0%end;%in;
+%let;evarma;%if;(evar.cpl!="" and evar.cpl="on")1%else;0%end;%in;
+%let;evarsms;%if;(evar.sms!="" and evar.sms="on")1%else;0%end;%in;
+%let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
+%let;evarfs;%if;(evar.fs!="")%evar.fs;%else;9%end;%in;
+
+%define;rebuild_url_2(vvv,hhh,iii,xxx,sss,mmm,yyy,zzz,fff)
+  %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
+  %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
+  %let;new_url;%nn;
+    %prefix;t=T;t1=CT;%nn;
+    %if;(evar.m!="")m=%evar.m;;%end;%nn;
+    %if;("vvv"!="")v=%nv;;%end;%nn;
+    %if;("hhh"="I")hi=I;%else;hi=H;%end;%nn;
+    %if;(iii=1)image=on;%end;%nn;
+    %if;(xxx=1)implx=on;%end;%nn;
+    %if;(sss=1)sosa=on;%end;%nn;
+    %if;(mmm=1)cpl=on;%end;%nn;
+    %if;(yyy=1)sms=on;%end;%nn;
+    %if;(zzz!="")scale=zzz;%end;%nn;
+    %if;(fff!="")fs=fff;%end;%nn;
+  %in;
+  %new_url;
+%end;
+
 %(s=sosa, p=has_parents, x=toplevel, lvl=level, bg=background, t=top, l=left  %)
 %define;boxsosa(aaa, sss, ppp, xxx, lvl, bgg, lll, ttt)
     <div id="s%aaa.anc_sosa.v;"
@@ -113,9 +144,42 @@
       %end;
       width:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(wb1*2)%else;%wb1;%end;px;%nn;
       height:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(hb1*2)%else;%hb1;%end;px;%nn;
-      background-color:#bgg;'>
-      <div>
-        <a href='%prefix;%aaa.access;;%if;(evar.nav="on")%nav;%end;'%nn;
+      background-color:#bgg;'
+      >
+      %if;(evar.cpl!="on")
+        <a class="big_anchor_1 list-group-item-action"
+          href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
+            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.access;;"
+          title="Naviguer vers %aaa;">
+        </a>
+        <a class="big_anchor_1m list-group-item-action"
+          href="%prefix;m=MOD_IND;i=%aaa.index;;"
+          title="Modifier %aaa;">
+        </a>
+      %else;
+        <a class="big_anchor_him list-group-item-action"
+          href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
+            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.access;;"
+          title="Naviguer vers %aaa;">
+        </a>
+        <a class="big_anchor_her list-group-item-action"
+          href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
+            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.spouse.access;;"
+          title="Naviguer vers %aaa.spouse;">
+        </a>
+        <a class="big_anchor_him_m list-group-item-action"
+          href="%prefix;m=MOD_IND;i=%aaa.index;;"
+          title="Modifier %aaa;">
+        </a>
+        <a class="big_anchor_her_m list-group-item-action"
+          href="%prefix;m=MOD_IND;i=%aaa.spouse.index;;"
+          title="Modifier %aaa.spouse;">
+        </a>
+      %end;
+      
+      <span>
+        <a class="normal_anchor" 
+          href='%prefix_no_pmod;;%aaa.access;;%if;(evar.nav="on")%nav;%end;'%nn;
           %if;(aaa.same != "")%apply;implex1(aaa.same.v)%end;%nn;
           title='[*generation/generations]0 %level; – Sosa %if;("aaa.interval" != "") = Sosa %aaa.interval;;%else;%aaa.anc_sosa; & %expr(aaa.anc_sosa+1)%end;&#013;%nn;%nn;
             %if;(aaa.is_male) ♂%else; ♀%end; %aaa; (%aaa.occ;)&#013;%nn;
@@ -134,7 +198,7 @@
           %aaa.anc_sosa;
         </span>
         </a>
-      </div>
+      </span>
     </div>
 %end;
 
@@ -454,6 +518,7 @@
   %end;
 %end;
 
+<h2>Arbre des ancêtres de %first_name; %surname; %dates;</h2>
 %if;((evar.cpl="on" and evar.v < 4) or (evar.cpl!="on" and evar.v < 3))
   [*compact tree][:] [specify::generation/generations]0 > 3.
 %else;
