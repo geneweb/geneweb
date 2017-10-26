@@ -62,14 +62,14 @@
 %end;
 
 %let;scf;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
-%let;fs;%if;(evar.fs!="")%evar.fs;%else;9%end;%in;
+%let;fs;%if;(evar.fs!="")%evar.fs;%else;17%end;%in;
 %( dimensions des boites %)
 %let;hbc;13%in; %( mode caractère %)
 %let;wbc;8%in;
-%let;hbs;%if;(evar.templ="templm")%expr(17*scf/100)%else;%expr(19*scf/100)%end;%in; %( espacement des boites en mode sosa  dimension + marge %)
-%let;wbs;%if;(evar.templ="templm")%expr(21*scf/100)%else;%expr(26*scf/100)%end;%in;
-%let;hb1;%if;(evar.templ="templm")%expr(14*scf/100)%else;%expr(16*scf/100)%end;%in; %( dimensions de la boite sosa %)
-%let;wb1;%if;(evar.templ="templm")%expr(18*scf/100)%else;%expr(24*scf/100)%end;%in;
+%let;hbs;%if;(evar.templ="templm")%expr(17*scf/100)%else;%expr(24*scf/100)%end;%in; %( espacement des boites en mode sosa  dimension + marge %)
+%let;wbs;%if;(evar.templ="templm")%expr(21*scf/100)%else;%expr(40*scf/100)%end;%in;
+%let;hb1;%if;(evar.templ="templm")%expr(14*scf/100)%else;%expr(22*scf/100)%end;%in; %( dimensions de la boite sosa %)
+%let;wb1;%if;(evar.templ="templm")%expr(18*scf/100)%else;%expr(38*scf/100)%end;%in;
 
 %define;bg(xx)
   %apply;nth%with;
@@ -111,7 +111,7 @@
 %let;evarma;%if;(evar.cpl!="" and evar.cpl="on")1%else;0%end;%in;
 %let;evarsms;%if;(evar.sms!="" and evar.sms="on")1%else;0%end;%in;
 %let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
-%let;evarfs;%if;(evar.fs!="")%evar.fs;%else;9%end;%in;
+%let;evarfs;%if;(evar.fs!="")%evar.fs;%else;%fs;%end;%in;
 
 %define;rebuild_url_2(vvv,hhh,iii,xxx,sss,mmm,yyy,zzz,fff)
   %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
@@ -133,7 +133,7 @@
 %end;
 
 %(s=sosa, p=has_parents, x=toplevel, lvl=level, bg=background, t=top, l=left  %)
-%define;boxsosa(aaa, sss, ppp, xxx, lvl, bgg, lll, ttt)
+%define;boxsosa(aaa, sss, ppp, bgg, lll, ttt)
     <div id="s%aaa.anc_sosa.v;"
       style='position:absolute;border:solid 1px;top:tttpx;left:lllpx;%nn;
       %if;(evar.cpl="on")
@@ -177,8 +177,8 @@
         </a>
       %end;
       
-      <span>
-        <a class="normal_anchor" 
+      <div>
+        <a style="width:100%%;zindex:2;"
           href='%prefix_no_pmod;;%aaa.access;;%if;(evar.nav="on")%nav;%end;'%nn;
           %if;(aaa.same != "")%apply;implex1(aaa.same.v)%end;%nn;
           title='[*generation/generations]0 %level; – Sosa %if;("aaa.interval" != "") = Sosa %aaa.interval;;%else;%aaa.anc_sosa; & %expr(aaa.anc_sosa+1)%end;&#013;%nn;%nn;
@@ -194,11 +194,13 @@
               %if;(aaa.spouse.birth_date.year = "" and aaa.spouse.death_date.year != "")†%else;%aaa.spouse.death_date.year;%end;&#013;%nn;
               %if;(not aaa.spouse.has_parents) [*missing parents].%end;%nn;
             %end;'>
-        <span style="font-size:%if;(sss>999)%expr(fs-4)%elseif;(lvl>10)%expr(fs-2)%else;%fs;%end;px;">
+        %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(evar.v>9)%expr(fs-5)%else;%fs;%end;%in;
+        %let;tm;%if;(sss>999 or evar.v>9)2%else;8%end;%in;
+        <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
           %aaa.anc_sosa;
         </span>
         </a>
-      </span>
+      </div>
     </div>
 %end;
 
@@ -368,7 +370,7 @@
             %end;
           %else;
             %if;(ancestor.same != "" and evar.implx="on")%apply;implexs()%end;
-            %apply;boxsosa("ancestor", ancestor.anc_sosa.v, ancestor.has_parents, xx, level, bg, left, top)
+            %apply;boxsosa("ancestor", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
             %apply;linesosa(ancestor.anc_sosa.v, xx+1, "yy", left, top)
           %end;
         %end;
@@ -416,7 +418,7 @@
           %end;
         %else;
           %if;(ancestor.same != "" and evar.implx="on")%apply;implexs()%end;
-          %apply;boxsosa("ancestor", ancestor.anc_sosa.v, ancestor.has_parents, xx, level, bg, left, top)
+          %apply;boxsosa("ancestor", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
           %apply;linesosa(ancestor.anc_sosa.v, xx+1, "yy", left, top)
         %end;
       %end;
