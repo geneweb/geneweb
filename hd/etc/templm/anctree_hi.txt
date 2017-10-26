@@ -513,7 +513,7 @@
 
 <h2>Arbre des ancêtres de %first_name; %surname; %dates;</h2>
 %if;((evar.cpl="on" and evar.v < 4) or (evar.cpl!="on" and evar.v < 3))
-  [*compact tree][:] [specify::generation/generations]0 > 3.
+  [*compact tree][:] [specify::generation/generations]0 > 3
 %else;
   %let;vvv;%if;(evar.cpl="on")%evar.v;%else;%expr(evar.v+1)%end;%in;
   %let;mmm;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))2%else;1%end;%in;
@@ -527,8 +527,8 @@
   %let;higs;%expr(mmm*nbl*hbs)%in;
   %let;size0;%apply;size(evar.v+1)%in;
   %let;size1;%apply;size(evar.v)%in;
-  %let;size2;%apply;size(evar.v-1)%in;
-  %let;size3;%apply;size(evar.v-2)%in;
+  %let;size2;%if;(evar.v>1)%apply;size(evar.v-1)%end;%in;
+  %let;size3;%if;(evar.v>2)%apply;size(evar.v-2)%end;%in;
   %if;(evar.t = "T" and evar.v >= 3)
     %if;(evar.t1 = "CT" and (evar.hi = "H" or evar.hi=""))
       %if;(evar.sosa = "on")
