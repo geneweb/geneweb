@@ -385,7 +385,7 @@
         %if;(not ancestor.has_parents and evar.sms="on")
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top4;px;left:%left4;px;
-              width:%wb2;px;height:%hb2;px;background-color:#FFFFFF;">
+              width:%wb2;px;height:%hb2;px;">
             <a href="%prefix;m=ADD_PAR;ip=%ancestor.index;"%nn;
               target="_blank"%nn;
               title="[missing:::sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013; %nn;
@@ -427,7 +427,7 @@
           %let;left2;%expr(leftxx_yy(ancestor.anc_sosa.v*2)*wb)%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top2;px;left:%left2;px;
-              width:%wb2;px;height:%hb2;px;background-color:#FFFFFF;">
+              width:%wb2;px;height:%hb2;px;">
             <a href="%prefix;m=ADD_PAR;ip=%ancestor.index;"%nn;
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;%nn;
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end; (%left2;-%top2;)"%nn;
@@ -437,7 +437,7 @@
           %let;left3;%expr(leftxx_yy(ancestor.anc_sosa.v*2+1)*wb)%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top3;px;left:%left3;px;
-              width:%wb2;px;height:%hb2;px;background-color:#FFFFFF;">
+              width:%wb2;px;height:%hb2;px;">
             <a href="%prefix;m=ADD_PAR;ip=%ancestor.index;"%nn;
               target="_blank"%nn;
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;%nn;
