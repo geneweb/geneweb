@@ -396,7 +396,7 @@
         %let;top4;%expr(topxx_yy(ancestor.anc_sosa.v)*hb)%in;
         %let;left4;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb)%in;
         %let;hb4;%expr(hb/2)%in;
-        %let;bb;%if;(evar.sosa="on")1%else;0;%end;%in;
+        %let;bb;%if;(evar.sosa="on")1%else;0%end;%in;
         %if;(not ancestor.has_parents and evar.sms="on")
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top4;px;left:%left4;px;
@@ -420,7 +420,7 @@
         %let;left1;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb+4)%in;
         %let;top2;%expr(topxx_yy(ancestor.same.v)*hb+6)%in;
         %let;left2;%expr(leftxx_yy(ancestor.same.v)*wb+4)%in;
-        %let;bb;%if;(evar.sosa="on")1%else;0;%end;%in;
+        %let;bb;%if;(evar.sosa="on")1%else;0%end;%in;
         %let;bg;%if;(ancestor.same != "")CBFECE;%elseif(evar.cpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
         %if;(evar.sosa != "on")
           %if;(ancestor.same != "" and evar.implx="on")
@@ -441,7 +441,7 @@
           %let;top2;%expr(topxx_yy(ancestor.anc_sosa.v*2)*hb)%in;
           %let;left2;%expr(leftxx_yy(ancestor.anc_sosa.v*2)*wb)%in;
           %let;hb4;%expr(hb/2)%in;
-          %let;bb;%if;(evar.sosa="on")1%else;0;%end;%in;
+          %let;bb;%if;(evar.sosa="on")1%else;0%end;%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top2;px;left:%left2;px;
               width:%wb2;px;height:%hb4;px;">
