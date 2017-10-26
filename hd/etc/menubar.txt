@@ -89,11 +89,7 @@
                     %if;(evar.oc!=0)
                       %apply;input_hidden("occ","oc")
                     %end;
-                    <input type="hidden" id="a6_wide" name="wide" value="%evar.wide;">
-                    <input type="hidden" id="a8_t" name="t" value="%evar.t;">
-                    <input type="hidden" id="a8_t1" name="t1" value="%evar.t1;">
-                    %apply;input_hidden("evar.v","v")
-                    <input type="hidden" id="a8_v" name="v" value="">
+                    <input type="hidden" id="v" name="v" value="">
                     %apply;input_hidden("evar.image","image")
                     %apply;input_hidden("evar.marriage","marriage")
                     %apply;input_hidden("evar.mar_sp_ch","mar_sp_ch")
@@ -373,7 +369,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         </a>%nn;
       %end;
       <a role="button" class="btn btn-link text-muted"
-        href="%prefix_no_wide;;%if;(evar.m="F")m=F;%end;%access;;%if;(evar.wide="on")%else;wide=on;%end;"
+        href="%prefix_no_wide;;%if;(evar.wide="on")%else;wide=on;%end;%suffix;"
         title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
         <i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-fw" aria-hidden="true"></i>%nn;
         <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
