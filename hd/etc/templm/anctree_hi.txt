@@ -22,7 +22,7 @@
   -->
 </script>
 
-  <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.min.js"></script>
+  <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;jquery.min.js"></script>
   <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
 
 %define;implexc()
