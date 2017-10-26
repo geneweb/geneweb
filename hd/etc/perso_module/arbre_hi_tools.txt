@@ -30,7 +30,7 @@
 %let;evarma;%if;(evar.cpl!="" and evar.cpl="on")1%else;0%end;%in;
 %let;evarsms;%if;(evar.sms!="" and evar.sms="on")1%else;0%end;%in;
 %let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
-%let;evarfs;%if;(evar.fs!="")%evar.fs;%else;9%end;%in;
+%let;evarfs;%if;(evar.fs!="")%evar.fs;%else;17%end;%in;
 %let;maxlev;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;%evarv;%end;%nn;
   ;%nn;
 %in;
@@ -146,14 +146,14 @@
       <div class="btn-group mx-2 mb-2">
         %if;(evarscl>0)
           <a href="%apply;rebuild_url%with;%evarv;%and;%evarih;%and;%nn;
-            %evarim;;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl-5)%and;%expr(evarfs-1)%end;"
+            %evarim;;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl-20)%and;%expr(evarfs-1)%end;"
             class="btn btn-secondary btn-sm small"
             title="[reduce/increase]0 [size]0 (-20%%)">−</a>
         %end;
         <span class="btn btn-outline-secondary btn-sm font-weight-bold">Scl: %evarscl;&#37;</span>
         %if;(evarscl<200)
           <a href="%apply;rebuild_url%with;%evarv;%and;%evarih;%and;%nn;
-            %evarim;;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl+5)%and;%expr(evarfs+1)%end;"
+            %evarim;;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl+20)%and;%expr(evarfs+1)%end;"
             class="btn btn-secondary btn-sm small"
             title="[reduce/increase]1 [size]1 (+20%%)">+</a>
         %end;
