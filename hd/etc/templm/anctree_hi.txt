@@ -142,9 +142,9 @@
   %new_url;
 %end;
 
-%(s=sosa, p=has_parents, x=toplevel, lvl=level, bg=background, t=top, l=left  %)
+%(a=ancestor, s=sosa, p=has_parents, bg=background, t=top, l=left  %)
 %define;boxsosa(aaa, sss, ppp, bgg, lll, ttt)
-    <div id="s%aaa.anc_sosa.v;"
+    <div id="s%aaa.sosa.v;"
       style='position:absolute;border:solid 1px;top:tttpx;left:lllpx;%nn;
       %if;(evar.cpl="on")
         %if;(not aaa.has_parents)border-left: 2px solid;%end;
@@ -197,23 +197,26 @@
             href='%prefix_no_pmod;;%aaa.access;;'%nn;
           %end;%nn;
           %if;(aaa.same != "")%apply;implex1(aaa.same.v)%end;%nn;
-          title='[*generation/generations]0 %level; – Sosa %if;("aaa.interval" != "") = Sosa %aaa.interval;;%else;%aaa.anc_sosa; & %expr(aaa.anc_sosa+1)%end;&#013;%nn;%nn;
-            %if;(aaa.is_male) ♂%else; ♀%end; %aaa; (%aaa.occ;)&#013;%nn;
-            %if;(aaa.birth_date.year != "")° %aaa.birth_date.year;%end;%nn;
-            %if;(aaa.birth_date.year != "" and aaa.is_dead) – %end;%nn;
-            %if;(aaa.birth_date.year = "" and aaa.death_date.year != "")†%else;%aaa.death_date.year;%end;&#013;%nn;
-            %if;(not aaa.has_parents) [*missing parents].&#013;%end;%nn;
-            %if;(aaa.same = "")%nn;
-              %if;(aaa.spouse.is_male) ♂%else; ♀%end; %aaa.spouse; (%aaa.spouse.occ;)&#013;%nn;
-              %if;(aaa.spouse.birth_date.year != "")° %aaa.spouse.birth_date.year;%end;%nn;
-              %if;(aaa.spouse.birth_date.year != "" and aaa.spouse.is_dead) – %end;%nn;
-              %if;(aaa.spouse.birth_date.year = "" and aaa.spouse.death_date.year != "")†%else;%aaa.spouse.death_date.year;%end;&#013;%nn;
-              %if;(not aaa.spouse.has_parents) [*missing parents].%end;%nn;
-            %end;'>
+            title='[*generation/generations]0 %level; – Sosa %nn;
+              %if;(evar.cpl = "")%aaa.anc_sosa; %if;(ancestor.same != "") = Sosa %ancestor.same;%end;
+              %else;%aaa.anc_sosa; & %expr(aaa.anc_sosa+1)
+              %end;&#013;%nn;%nn;
+              %if;(aaa.is_male) ♂%else; ♀%end; %aaa; (%aaa.occ;)&#013;%nn;
+              %if;(aaa.birth_date.year != "")° %aaa.birth_date.year;%end;%nn;
+              %if;(aaa.birth_date.year != "" and aaa.is_dead) – %end;%nn;
+              %if;(aaa.birth_date.year = "" and aaa.death_date.year != "")†%else;%aaa.death_date.year;%end;&#013;%nn;
+              %if;(not aaa.has_parents) [*missing parents].&#013;%end;%nn;
+              %if;(aaa.same = "" and evar.cpl="on")%nn;
+                %if;(aaa.spouse.is_male) ♂%else; ♀%end; %aaa.spouse; (%aaa.spouse.occ;)&#013;%nn;
+                %if;(aaa.spouse.birth_date.year != "")° %aaa.spouse.birth_date.year;%end;%nn;
+                %if;(aaa.spouse.birth_date.year != "" and aaa.spouse.is_dead) – %end;%nn;
+                %if;(aaa.spouse.birth_date.year = "" and aaa.spouse.death_date.year != "")†%else;%aaa.spouse.death_date.year;%end;&#013;%nn;
+                %if;(not aaa.spouse.has_parents) [*missing parents].%end;%nn;
+              %end;'>
         %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;((evar.v>8 and evar.cpl!="on") or (evar.v>9 and evar.cpl="on"))%expr(fs-5)%else;%fs;%end;%in;
         %let;tm;%if;(sss>999 or evar.v>9)2%else;8%end;%in;
         <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
-          %aaa.anc_sosa;
+          %if;(aaa.anc_sosa!="")%aaa.anc_sosa;%else;1%end;
         </span>
         </a>
       </div>
