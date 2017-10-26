@@ -2,11 +2,17 @@
 
 %let;zzz;t=T;t1=CT;%in;
 
+%define;prefix_all()
+  %if;(evar.templ!="")templ=%evar.templ;;%end;%nn;
+  %if;(evar.wide!="")wide=%evar.wide;;%end;%nn;
+  %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%nn;
+%end;
+
 %define;rebuild_url(vvv,hhh,iii,xxx,sss,mmm,yyy,zzz,fff)
   %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
   %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
   %let;new_url;%nn;
-    %prefix;%access;;t=T;t1=CT;%nn;
+    %prefix_no_all;%apply;prefix_all()%access;;t=T;t1=CT;%nn;
     %if;(evar.m!="")m=%evar.m;;%end;%nn;
     %if;("vvv"!="")v=%nv;;%end;%nn;
     %if;("hhh"="I")hi=I;%else;hi=H;%end;%nn;
