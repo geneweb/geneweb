@@ -113,11 +113,17 @@
 %let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
 %let;evarfs;%if;(evar.fs!="")%evar.fs;%else;%fs;%end;%in;
 
+%define;prefix_all()
+  %if;(evar.templ!="")templ=%evar.templ;;%end;%nn;
+  %if;(evar.wide!="")wide=%evar.wide;;%end;%nn;
+  %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%nn;
+%end;
+
 %define;rebuild_url_2(vvv,hhh,iii,xxx,sss,mmm,yyy,zzz,fff)
   %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
   %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
   %let;new_url;%nn;
-    %prefix;t=T;t1=CT;%nn;
+    %prefix_no_all;%apply;prefix_all()t=T;t1=CT;%nn;
     %if;(evar.m!="")m=%evar.m;;%end;%nn;
     %if;("vvv"!="")v=%nv;;%end;%nn;
     %if;("hhh"="I")hi=I;%else;hi=H;%end;%nn;
@@ -153,7 +159,7 @@
           title="Naviguer vers %aaa;">
         </a>
         <a class="big_anchor_1m list-group-item-action"
-          href="%prefix;m=MOD_IND;i=%aaa.index;;"
+          href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaa.index;;"
           title="Modifier %aaa;">
         </a>
       %else;
@@ -168,11 +174,11 @@
           title="Naviguer vers %aaa.spouse;">
         </a>
         <a class="big_anchor_him_m list-group-item-action"
-          href="%prefix;m=MOD_IND;i=%aaa.index;;"
+          href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaa.index;;"
           title="Modifier %aaa;">
         </a>
         <a class="big_anchor_her_m list-group-item-action"
-          href="%prefix;m=MOD_IND;i=%aaa.spouse.index;;"
+          href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaa.spouse.index;;"
           title="Modifier %aaa.spouse;">
         </a>
       %end;
@@ -194,7 +200,7 @@
               %if;(aaa.spouse.birth_date.year = "" and aaa.spouse.death_date.year != "")†%else;%aaa.spouse.death_date.year;%end;&#013;%nn;
               %if;(not aaa.spouse.has_parents) [*missing parents].%end;%nn;
             %end;'>
-        %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(evar.v>9)%expr(fs-5)%else;%fs;%end;%in;
+        %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;((evar.v>8 and evar.cpl!="on") or (evar.v>9 and evar.cpl="on"))%expr(fs-5)%else;%fs;%end;%in;
         %let;tm;%if;(sss>999 or evar.v>9)2%else;8%end;%in;
         <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
           %aaa.anc_sosa;
@@ -253,7 +259,7 @@
   <tt>
   <div id="s%aaa.anc_sosa.v;">
     <a style="top:tttpx;left:lllpx;"%nn;
-      href='%prefix;%aaa.access;;%if;(evar.nav="on")%nav;%end;'%nn;
+      href='%prefix_no_all;%apply;prefix_all();%aaa.access;;%if;(evar.nav="on")%nav;%end;'%nn;
       %if;(aaa.same != "")%apply;implex1(aaa.same.v)%end;%nn;
       title='[*generation/generations]0 %level; – Sosa %if;("aaa.interval" != "") = Sosa %aaa.interval;;%else;%aaa.anc_sosa; & %expr(aaa.anc_sosa+1)%end;&#013;%nn;
         %if;(aaa.is_male) ♂%else; ♀%end; %aaa; (%aaa.occ;)&#013;%nn;
@@ -380,13 +386,13 @@
       %foreach;ancestor;
         %let;top4;%expr(topxx_yy(ancestor.anc_sosa.v)*hb)%in;
         %let;left4;%expr(leftxx_yy(ancestor.anc_sosa.v)*wb)%in;
-        %let;hb2;%expr(hb/2)%in;
+        %let;hb4;%expr(hb/2)%in;
         %let;bb;%if;(evar.sosa="on")1%else;0;%end;%in;
         %if;(not ancestor.has_parents and evar.sms="on")
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top4;px;left:%left4;px;
-              width:%wb2;px;height:%hb2;px;">
-            <a href="%prefix;m=ADD_PAR;ip=%ancestor.index;"%nn;
+              width:%wb2;px;height:%hb4;px;">
+            <a href="%prefix_no_all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"%nn;
               target="_blank"%nn;
               title="[missing:::sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013; %nn;
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v;%end; %ancestor; (%left4;-%top4;)"%nn;
@@ -425,10 +431,12 @@
         %if;(not ancestor.has_parents and evar.sms="on")
           %let;top2;%expr(topxx_yy(ancestor.anc_sosa.v*2)*hb)%in;
           %let;left2;%expr(leftxx_yy(ancestor.anc_sosa.v*2)*wb)%in;
+          %let;hb4;%expr(hb/2)%in;
+          %let;bb;%if;(evar.sosa="on")1%else;0;%end;%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top2;px;left:%left2;px;
-              width:%wb2;px;height:%hb2;px;">
-            <a href="%prefix;m=ADD_PAR;ip=%ancestor.index;"%nn;
+              width:%wb2;px;height:%hb4;px;">
+            <a href="%prefix_no_all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"%nn;
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;%nn;
               [*add] %apply;a_of_b%with;[the parents]%and;Sosa %ancestor.anc_sosa.v; %ancestor;%end; (%left2;-%top2;)"%nn;
             >%if;(evar.sosa="on")•%else;·%end;</a>
@@ -437,8 +445,8 @@
           %let;left3;%expr(leftxx_yy(ancestor.anc_sosa.v*2+1)*wb)%in;
           <div id="s%ancestor.anc_sosa.v;"
             style="position:absolute;text-align:center;border:solid %bb;px;top:%top3;px;left:%left3;px;
-              width:%wb2;px;height:%hb2;px;">
-            <a href="%prefix;m=ADD_PAR;ip=%ancestor.index;"%nn;
+              width:%wb2;px;height:%hb4;px;">
+            <a href="%prefix_no_all;%apply;prefix_all();m=ADD_PAR;ip=%ancestor.index;"%nn;
               target="_blank"%nn;
               title="[missing sosa] %expr(ancestor.anc_sosa.v*2) & %expr(ancestor.anc_sosa.v*2+1) – [*generation/generations]0 %expr(level+1)&#013;%nn;
               [*add] %apply;a_of_b%with;[the parents]%and;%ancestor; Sosa %ancestor.anc_sosa.v;%end; (%left3;-%top3;)"%nn;
@@ -513,7 +521,7 @@
 
 <h2>Arbre des ancêtres de %first_name; %surname; %dates;</h2>
 %if;((evar.cpl="on" and evar.v < 4) or (evar.cpl!="on" and evar.v < 3))
-  [*compact tree][:] [specify::generation/generations]0 > 3
+  [*compact tree][:] [specify::generation/generations]0 > 3.
 %else;
   %let;vvv;%if;(evar.cpl="on")%evar.v;%else;%expr(evar.v+1)%end;%in;
   %let;mmm;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))2%else;1%end;%in;
@@ -527,8 +535,8 @@
   %let;higs;%expr(mmm*nbl*hbs)%in;
   %let;size0;%apply;size(evar.v+1)%in;
   %let;size1;%apply;size(evar.v)%in;
-  %let;size2;%if;(evar.v>1)%apply;size(evar.v-1)%end;%in;
-  %let;size3;%if;(evar.v>2)%apply;size(evar.v-2)%end;%in;
+  %let;size2;%apply;size(evar.v-1)%in;
+  %let;size3;%apply;size(evar.v-2)%in;
   %if;(evar.t = "T" and evar.v >= 3)
     %if;(evar.t1 = "CT" and (evar.hi = "H" or evar.hi=""))
       %if;(evar.sosa = "on")
