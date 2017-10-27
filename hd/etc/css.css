@@ -49,6 +49,7 @@
   width: 50%;
   height: 60%;
   position: absolute;
+  text-align: right;
   top: 0;
   left: 50%;
   z-index: 0;
