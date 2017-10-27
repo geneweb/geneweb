@@ -54,9 +54,10 @@
           </li>
           <li class="nav-item">
             <a class="nav-link %if;(evar.m="F")active%end;" %nn;
-              href="%prefix;m=F;%access;;%nn;
-                %if;(bvar.default_fnav_images="")image=on;%else;image=%bvar.default_fnav_images;%end;%nn;
-                %if;(bvar.default_fnav_semi="")semi=on;%else;semi=%bvar.default_fnav_semi;%end;" title="[*family/families]0">
+              href="%prefix;m=F;%access;%nn;
+                %if;(bvar.default_a5_image="off");image=off%end;%nn;
+                %if;(bvar.default_a5_semi="off");semi=off%end;%nn;
+                %if;(bvar.default_a5_spouse="off");spouse=off%end;" title="[*family/families]0">
               <span class="fa fa-plus fa-users fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">[*family/families]0</span>
             </a>
@@ -84,12 +85,12 @@
                         <button type="button" class="btn btn-light" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-close fa-lg text-danger"></i></button>
                       </span>
                     </div>
-                    %apply;input_hidden("first_name","p")
-                    %apply;input_hidden("surname","n")
-                    %if;(evar.oc!=0)
+                    %apply;input_hidden("first_name_key","p")
+                    %apply;input_hidden("surname_key","n")
+                    %if;(occ!=0)
                       %apply;input_hidden("occ","oc")
                     %end;
-                    <input type="hidden" id="v" name="v" value="">
+                    %apply;input_hidden("evar.v","v")
                     %apply;input_hidden("evar.image","image")
                     %apply;input_hidden("evar.marriage","marriage")
                     %apply;input_hidden("evar.mar_sp_ch","mar_sp_ch")
@@ -139,7 +140,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               </a>
               <div class="dropdown-menu">
                 %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
-                  <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(occ!=0)ocz=%occ;;%end;" %laS; title="%apply;nav_with_sosa_ref(self)">
+                  <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(evar.oc!="" and evar.oc!=0)ocz=%occ;;%end;%access;" %laS; title="%apply;nav_with_sosa_ref(self)">
                     <i class="fa fa-dot-circle-o fa-lg fa-fw %sexcolor;"></i> %apply;nav_with_sosa_ref(self)
                   </a>%nn;
                 %else;
