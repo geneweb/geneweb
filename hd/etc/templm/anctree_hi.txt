@@ -156,11 +156,15 @@
       height:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(hb1*2)%else;%hb1;%end;px;%nn;
       background-color:#bgg;'
       >
+      %let;imsz;%if;(sss>999)%expr(fs-10)%elseif;((evar.v>8 and evar.cpl!="on") or (evar.v>9 and evar.cpl="on"))10%else;15%end;%in;
       %if;(evar.cpl!="on")
         <a class="big_anchor_1 list-group-item-action"
           href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.access;;%apply;sfx_tplm()"
           title="Naviguer vers %aaa;">
+          %if;(aaa.has_image)
+            <img style="width:%imsz;px" src="%aaa.image_url;" alt="[image/images]0"%/></a>%nn;
+          %end;
         </a>
         <a class="big_anchor_1m list-group-item-action"
           href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaa.index;;"
@@ -171,11 +175,17 @@
           href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.access;;%apply;sfx_tplm()"
           title="Naviguer vers %aaa;">
+          %if;(aaa.has_image)
+          <img style="width:%imsz;px" src="%aaa.image_url;" alt="[image/images]0"%/></a>%nn;
+          %end;
         </a>
         <a class="big_anchor_her list-group-item-action"
           href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.spouse.access;;%apply;sfx_tplm()"
           title="Naviguer vers %aaa.spouse;">
+          %if;(aaa.spouse.has_image)
+          <img style="width:%imsz;px" src="%aaa.spouse.image_url;" alt="[image/images]0"%/></a>%nn;
+          %end;
         </a>
         <a class="big_anchor_him_m list-group-item-action"
           href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaa.index;;"
