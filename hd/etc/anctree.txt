@@ -24,7 +24,30 @@
 <div class="container-fluid">
 %import;perso_utils;
 %import;menubar;
-%apply;show_templ("perso_module/arbre_vertical")
+
+%if;(evar.t="T" and evar.t1!="7" and evar.t1!="h7" and evar.t1!="m" and evar.t1!="CT")
+  %import;perso_module/arbre_vertical;
+%elseif;(evar.t="A" and evar.t1!="7" and evar.t1!="h7" and evar.t1!="m" and evar.t1!="CT")
+  %import;perso_module/arbre_vertical;
+%elseif;(evar.t="C" and evar.t1!="7" and evar.t1!="h7" and evar.t1!="m" and evar.t1!="CT")
+  %import;perso_module/arbre_vertical;
+%elseif;(evar.t="T" and evar.t1="7")
+  %import;perso_module/arbre_7gen;
+%elseif;(evar.t="T" and evar.t1="h7")
+  %import;perso_module/arbre_h7;
+%elseif;(evar.t="T" and evar.t1="m") %(m for compatibility with existing arbre_9gen %)
+  %import;perso_module/arbre_9gen;
+%elseif;(evar.t="T" and evar.t1="CT") %(CT for compatibility with templm %)
+  %import;perso_module/arbre_hi_tools;
+  %import;templm/tools;
+  %import;templm/anctree_hi_indexes
+  %import;templm/anctree_hi;
+%else;
+  bad values for evar.t and evar.t1
+%end;
+<br clear="all">
+
+<div>
 %base_trailer;
 %include.copyr;
 </div>

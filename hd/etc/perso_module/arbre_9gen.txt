@@ -119,6 +119,7 @@
   %if;(evar.evt_pr_sib!="")evt_pr_sib=%evar.evt_pr_sib;;%end;
   %if;(evar.simple!="")simple=%evar.simple;;%end;
   %if;(evar.m!="")m=%evar.m;;%end;
+  %if;(evar.t1!="")t1=%evar.t1;;%end;
   %if;(iii=1)image=on;%end;
   %if;(mmm=1)marriage=on;%end;
   %if;(evar.vh!="")vh=%evar.vh;;%end;
