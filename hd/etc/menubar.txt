@@ -45,22 +45,39 @@
               </li>
             %end;
           %end;
+          %( individu %)
           <li class="nav-item">
             <a class="nav-link %if;(evar.m="")active%end;" id="self"
-              href="%prefix;%access;%if;(evar.image="on");image=on%end;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
+              href="%prefix_no_all;%if;(evar.templ!="")templ=%evar.templ;;%end;%access;%if;(evar.image="on");image=on%end;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
               <span class="fa fa-user fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link %if;(evar.m="F")active%end;" %nn;
-              href="%prefix;m=F;%access;%nn;
-                %if;(bvar.default_a5_image="off");image=off%end;%nn;
-                %if;(bvar.default_a5_semi="off");semi=off%end;%nn;
-                %if;(bvar.default_a5_spouse="off");spouse=off%end;" title="[*family/families]0">
-              <span class="fa fa-plus fa-users fa-fw %sexcolor;" aria-hidden="true"></span>
-              <span class="sr-only">[*family/families]0</span>
-            </a>
+          %( Arbres familiaux divers %)
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
+            title="[*trees]"><span class="fa fa-plus fa-users fa-fw" aria-hidden="true"></span></a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item ml-1"
+                href="%prefix;m=F;%access;%nn;
+                  %if;(bvar.default_a5_image="off");image=off%end;%nn;
+                  %if;(bvar.default_a5_semi="off");semi=off%end;%nn;
+                  %if;(bvar.default_a5_spouse="off");spouse=off%end;"
+                  title="[*family/families]0"
+              >Famille</a>
+              <a class="dropdown-item ml-1"
+                href="%prefix_no_pmod;p_mod=a6;%access;;wide=on;"
+                title="[Arbre 7 gen]"
+              >Arbre 7 générations</a>
+              <a class="dropdown-item ml-1"
+                href="%prefix_no_pmod;p_mod=a7;%access;;images=on;"
+                title="[Arbre 9 gen]"
+              >Arbre 9 générations</a>
+              <a class="dropdown-item ml-1"
+                href="%prefix_no_pmod;p_mod=a8;%access;;hi=H;sosa=on;v=5;scale=100;fs=17;soas=on;"
+                title="[Arbre HI] [with] %sosa_ref;"
+              >Arbres HI</a>
+            </div>
           </li>
           %( personnal modules selection menu %)
           <li class="nav-item dropdown">
