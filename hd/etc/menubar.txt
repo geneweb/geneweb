@@ -27,7 +27,7 @@
     <nav class="navbar navbar-light navbar-expand-md%nn;
       %if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
         or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
-        or (evar.ip!="" and (evar.m="ADD_FAM" or evar.m="ADD_FAM_OK"))) mt-4%end;">
+        or (evar.ip!="" and (evar.m="ADD_FAM" or evar.m="ADD_FAM_OK" or evar.m="ADD_PAR"))) mt-4%end;">
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
