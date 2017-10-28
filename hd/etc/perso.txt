@@ -91,13 +91,17 @@
       %if;(evar.wide="on")
         <div class="col-6">
       %end;
-    %(<div� be carefull h1 is full width then an opening <div class="col-8"> in individu module %)
+    %(<div be carefull h1 is full width then an opening <div class="col-8"> in individu module %)
         %let;op_m;3%in;%apply;show_templ("perso_module/individu")
-        %let;op_m;2%in;%apply;show_templ("perso_module/unions")
+        %if;(evar.wide="on")
+          %let;op_m;4%in;%apply;show_templ("perso_module/unions")
+        %else;
+          %let;op_m;2%in;%apply;show_templ("perso_module/unions")
+        %end;
         %let;op_m;1%in;%apply;show_templ("perso_module/chronologie")
         %let;op_m;1%in;%apply;show_templ("perso_module/notes")
         %let;op_m;2%in;%apply;show_templ("perso_module/sources")
-        <div class="%if;(evar.wide!="on")d-none d-block d-lg-none%end; col-12">
+        <div class="%if;(evar.wide="on")d-none%else;d-none d-block d-lg-none%end; col-12">
           %let;op_m;1%in;%apply;show_templ("perso_module/parents")
           %let;op_m;2%in;%apply;show_templ("perso_module/fratrie")
           %let;op_m;3%in;%apply;show_templ("perso_module/relations")
