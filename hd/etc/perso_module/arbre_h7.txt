@@ -5,7 +5,8 @@
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
   %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
   %let;l_sosa_ref;%if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)on%end;%in;
-  %let;l_prefix;%prefix;t=h7;image=%evar.image;;siblings=%evar.siblings;;sosa=%evar.sosa;;fs=%l_fs;;wi=%l_wi;;he=%l_he;;bp=%evar.bp;;%in;
+  %let;l_prefix;%prefix;m=A;t=T;t1=h7;image=%evar.image;;siblings=%evar.siblings;;%nn;
+        sosa=%evar.sosa;;fs=%l_fs;;wi=%l_wi;;he=%l_he;;bp=%evar.bp;;nav=%evar.nav;;%in;
   <style id="s" type="text/css">
     #htree{font-size:%l_fs;px;width:%l_wi;px;height:%l_he;px}
   </style>
@@ -42,6 +43,58 @@
    -->
   </script>
 </head>
+
+%define;rebuild_url(iii,fff,sss,bbb,nnn)
+  %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
+  %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
+  %let;new_url;%nn;
+    %prefix;%access;;m=A;t=T;t1=h7;%if;(evar.wide="on")wide=on;%end;%nn;
+    %if;("iii"="on")image=on;%end;%nn;
+    %if;("fff"="on")siblings=on;%end;%nn;
+    %if;("sss"="on")sosa=on;%end;%nn;
+    %if;("bbb"="on")bp=on;%end;%nn;
+    %if;("nnn"="on")nav=on;%end;%nn;
+      %in;
+  %new_url;
+%end;
+
+%if;(not cancel_links)
+  <div class="col-12 d-flex justify-content-end">
+    %let;evimg;%if;(evar.image!="")%evar.image;%end;%in;
+    %let;evsib;%if;(evar.siblings!="")%evar.siblings;%end;%in;
+    %let;evsosa;%if;(evar.sosa!="")%evar.sosa;%end;%in;
+    %let;evbp;%if;(evar.bp!="")%evar.bp;%end;%in;
+    %let;evnav;%if;(evar.nav!="")%evar.nav;%end;%in;
+    %( repenser la nav en cliquant sur le fond de cellule !! %)
+    <div class="text-right mr-3">
+      %if;(evar.image="on")
+        <a href="%apply;rebuild_url%with;%and;%evsib;%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo mx-1"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+      %else;
+        <a href="%apply;rebuild_url%with;on%and;%evsib;%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo mx-1"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+      %end;
+      %if;(evar.siblings="on")
+        <a href="%apply;rebuild_url%with;%evimg;%and;%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [siblings]"><i class="fa fa-users mx-1"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+      %else;
+        <a href="%apply;rebuild_url%with;%evimg;%and;on%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [siblings]"><i class="fa fa-users mx-1"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+      %end;
+      %if;(evar.sosa="on")
+        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%and;%evbp;%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [Sosa]"><span class="mx-1">So</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-on text-muted"></i></a>
+      %else;
+        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;on%and;%evbp;%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [Sosa]"><span class="mx-1">So</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-off text-muted"></i></a>
+      %end;
+      %if;(evar.bp="on")
+        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [birth place]"><span class="mx-1">Bp</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-on text-muted"></i></a>
+      %else;
+        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;on%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [birth place]"><span class="mx-1">Bp</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-off text-muted"></i></a>
+      %end;
+      %if;(evar.nav="on")
+        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;%evbp;%and;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*activate/suppress]0 [navigation]"><span class="mx-1">Nav</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-on text-muted"></i></a>
+      %else;
+        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;%evbp;%and;on%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*activate/suppress]1 [navigation]"><span class="mx-1">Nav</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-off text-muted"></i></a>
+      %end;
+    </div>
+  </div>
+%end;
 
 %define;tools()
   <hr %/>
@@ -82,7 +135,9 @@
 %end;
 
 %define;somebody()
-  <a href="%prefix;%access;" class="s%sex; nc%has_children;">
+  <a %if;(evar.nav="on")href="%l_prefix;%access;"
+    %else;href="%prefix;%access;" class="s%sex; nc%has_children;"
+    %end;>
     %if;(evar.image = "on" and has_image)
       <img src="%image_url;"%/><br%/>
     %end;
@@ -116,7 +171,10 @@
         </td></tr></table>
       %else;
         %foreach;ancestor;
-          <a id="p%ancestor.anc_sosa.v;" href="%l_prefix;%ancestor.access;"
+          <a id="p%ancestor.anc_sosa.v;" 
+          %if;(evar.nav="on")href="%l_prefix;%ancestor.access;"
+          %else;href="%prefix;%ancestor.access;"
+          %end;
           %if;(ancestor.same != "") 
             onmouseover="over1('p%ancestor.same.v;')"
             onmouseout="out1('p%ancestor.same.v;')"
