@@ -113,10 +113,6 @@
 %let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
 %let;evarfs;%if;(evar.fs!="")%evar.fs;%else;%fs;%end;%in;
 
-%define;sfx_tplm()
-  %if;(evar.templ="templm")t=T;t1=CT;%end;
-%end;
-
 %define;prefix_all()
   %if;(evar.templ!="")templ=%evar.templ;;%end;%nn;
   %if;(evar.wide!="")wide=%evar.wide;;%end;%nn;
@@ -152,18 +148,17 @@
       %elseif;(not aaa.has_parents)
          border-top:2px solid;
       %end;
-      width:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(wb1*2)%else;%wb1;%end;px;%nn;
-      height:%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%expr(hb1*2)%else;%hb1;%end;px;%nn;
+      width:%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;px;%nn;
+      height:%if;(boxsize=2)%expr(hb1*2)%else;%hb1;%end;px;%nn;
       background-color:#bgg;'
-      >
-      %let;imsz;%if;(sss>999)%expr(fs-10)%elseif;((evar.v>8 and evar.cpl!="on") or (evar.v>9 and evar.cpl="on"))10%else;15%end;%in;
+    >
+      %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
       %if;(evar.cpl!="on")
         <a class="big_anchor_1 list-group-item-action"
-          href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.access;;%apply;sfx_tplm()"
-          title="Naviguer vers %aaa;">
+          href='%prefix;%aaa.access;'%nn;
+          title="%aaa;">
           %if;(aaa.has_image)
-            <img style="width:%imsz;px" src="%aaa.image_url;" alt="[image/images]0"%/></a>%nn;
+            <img style="width:%imsz;px" src="%aaa.image_url;" alt="[image/images]0"%/>
           %end;
         </a>
         <a class="big_anchor_1m list-group-item-action"
@@ -172,19 +167,17 @@
         </a>
       %else;
         <a class="big_anchor_him list-group-item-action"
-          href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.access;;%apply;sfx_tplm()"
-          title="Naviguer vers %aaa;">
+          href='%prefix;%aaa.access;'%nn;
+          title="%aaa;">
           %if;(aaa.has_image)
-          <img style="width:%imsz;px" src="%aaa.image_url;" alt="[image/images]0"%/></a>%nn;
+          <img style="width:%imsz;px" src="%aaa.image_url;" alt="[image/images]0"%/>
           %end;
         </a>
         <a class="big_anchor_her list-group-item-action"
-          href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;;%aaa.spouse.access;;%apply;sfx_tplm()"
-          title="Naviguer vers %aaa.spouse;">
+          href='%prefix;%aaa.spouse.access;'%nn;
+          title="%aaa.spouse;">
           %if;(aaa.spouse.has_image)
-          <img style="width:%imsz;px" src="%aaa.spouse.image_url;" alt="[image/images]0"%/></a>%nn;
+          <img style="width:%imsz;px" src="%aaa.spouse.image_url;" alt="[image/images]0"%/>
           %end;
         </a>
         <a class="big_anchor_him_m list-group-item-action"
@@ -196,38 +189,34 @@
           title="Modifier %aaa.spouse;">
         </a>
       %end;
-      
       <div>
-        %let;tm;%if;(sss>999 or evar.v>9)2%else;8%end;%in;
-        <a style="margin:%tm;px 0 2px 0;width:100%%;zindex:2;"
-          %if;(evar.nav="on" and evar.templ="templm")%nn;
-            href='%prefix;p=%aaa.first_name;;n=%aaa.surname;;occ=%aaa.occ;;m=A;t=T;t1=CT;v=%evar.v;;hi=%evar.hi;;%nn;
-                  sosa=%evar.sosa;;cpl=%evar.cpl;;fs=%evar.fs;;implx=%evar.implx;;nav=%evar.nav;;%nn;
-                  marriage=%evar.marriage;;'%nn;
-          %else;%nn;
-            href='%prefix_no_pmod;;%aaa.access;;'%nn;
-          %end;%nn;
+        <a style="width:100%%;zindex:2;"
+          href="%apply;rebuild_url_2%with;%evarv;%and;%evarih;%and;%nn;
+                  %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%nn;
+                %end;%aaa.access;;t=T;t1=CT;"
           %if;(aaa.same != "")%apply;implex1(aaa.same.v)%end;%nn;
-            title='[*generation/generations]0 %level; – Sosa %nn;
-              %if;(evar.cpl = "")%aaa.anc_sosa; %if;(ancestor.same != "") = Sosa %ancestor.same;%end;
-              %else;%aaa.anc_sosa; & %expr(aaa.anc_sosa+1)
-              %end;&#013;%nn;%nn;
-              %if;(aaa.is_male) ♂%else; ♀%end; %aaa; (%aaa.occ;)&#013;%nn;
-              %if;(aaa.birth_date.year != "")° %aaa.birth_date.year;%end;%nn;
-              %if;(aaa.birth_date.year != "" and aaa.is_dead) – %end;%nn;
-              %if;(aaa.birth_date.year = "" and aaa.death_date.year != "")†%else;%aaa.death_date.year;%end;&#013;%nn;
-              %if;(not aaa.has_parents) [*missing parents].&#013;%end;%nn;
-              %if;(aaa.same = "" and evar.cpl="on")%nn;
-                %if;(aaa.spouse.is_male) ♂%else; ♀%end; %aaa.spouse; (%aaa.spouse.occ;)&#013;%nn;
-                %if;(aaa.spouse.birth_date.year != "")° %aaa.spouse.birth_date.year;%end;%nn;
-                %if;(aaa.spouse.birth_date.year != "" and aaa.spouse.is_dead) – %end;%nn;
-                %if;(aaa.spouse.birth_date.year = "" and aaa.spouse.death_date.year != "")†%else;%aaa.spouse.death_date.year;%end;&#013;%nn;
-                %if;(not aaa.spouse.has_parents) [*missing parents].%end;%nn;
-              %end;'>
-        %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;((evar.v>8 and evar.cpl!="on") or (evar.v>9 and evar.cpl="on"))%expr(fs-5)%else;%fs;%end;%in;
-        <span style="text-align:center;width:100%%;font-size:%fs1;px;">
-          %if;(aaa.anc_sosa!="")%aaa.anc_sosa;%else;1%end;
-        </span>
+          title='[*generation/generations]0 %level; – Sosa %nn;
+            %if;(evar.cpl = "")%aaa.anc_sosa; %if;(ancestor.same != "") = Sosa %ancestor.same;%end;
+            %else;%aaa.anc_sosa; & %expr(aaa.anc_sosa+1)
+            %end;&#013;%nn;%nn;
+            %if;(aaa.is_male) ♂%else; ♀%end; %aaa; (%aaa.occ;)&#013;%nn;
+            %if;(aaa.birth_date.year != "")° %aaa.birth_date.year;%end;%nn;
+            %if;(aaa.birth_date.year != "" and aaa.is_dead) – %end;%nn;
+            %if;(aaa.birth_date.year = "" and aaa.death_date.year != "")†%else;%aaa.death_date.year;%end;&#013;%nn;
+            %if;(not aaa.has_parents) [*missing parents].&#013;%end;%nn;
+            %if;(aaa.same = "" and evar.cpl="on")%nn;
+              %if;(aaa.spouse.is_male) ♂%else; ♀%end; %aaa.spouse; (%aaa.spouse.occ;)&#013;%nn;
+              %if;(aaa.spouse.birth_date.year != "")° %aaa.spouse.birth_date.year;%end;%nn;
+              %if;(aaa.spouse.birth_date.year != "" and aaa.spouse.is_dead) – %end;%nn;
+              %if;(aaa.spouse.birth_date.year = "" and aaa.spouse.death_date.year != "")†%else;%aaa.spouse.death_date.year;%end;&#013;%nn;
+              %if;(not aaa.spouse.has_parents) [*missing parents].%end;%nn;
+            %end;'
+        >
+          %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(boxsize=2)%fs;%else;%expr(fs-5)%end;%in;
+          %let;tm;%if;(boxsize=2)8%else;2%end;%in;
+          <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
+            %if;(aaa.anc_sosa!="")%aaa.anc_sosa;%else;1%end;
+          </span>
         </a>
       </div>
     </div>
@@ -266,9 +255,9 @@
     %let;twid;%if("yy"="H")%expr(twid0*2)%else;%expr(twid0)%end;%in;
     %let;thig;%expr(hhh*hbs)%in;
     %let;len;%if;(or="h")%expr(twid/ddd)%else;%expr(thig/ddd)%end;%in;
-    %let;len2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%len;%else;%expr(len/2)%end;%in;
-    %let;wb2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%wb1;%else;%expr(wb1/2)%end;%in;
-    %let;hb2;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))%hb1;%else;%expr(hb1/2)%end;%in;
+    %let;len2;%if;(boxsize=2)%len;%else;%expr(len/2)%end;%in;
+    %let;wb2;%if;(boxsize=2)%wb1;%else;%expr(wb1/2)%end;%in;
+    %let;hb2;%if;(boxsize=2)%hb1;%else;%expr(hb1/2)%end;%in;
     %let;x1;%expr(x0+wb2)%in;
     %let;y1;%expr(y0+hb2)%in;
     %let;x2;%if(or="h")%if;(ss%2=0)%expr(x1+len2)%else;%expr(x1-len2)%end;%else;%x1;%end;%in;
@@ -374,9 +363,9 @@
 %define;graph(xx,yy,zz) %( xx gen ; yy mode I ou H; zz 1=single 2=couple %)
   %let;levelup;%expr(xx+1)%in;
   %let;leveldown;%expr(xx-1)%in;
-  %let;hb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(hbs*2)%elseif;(evar.sosa = "on")%hbs;%else;%hbc;%end;%in;
-  %let;wb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(wbs*2)%elseif;(evar.sosa = "on")%wbs;%else;%wbc;%end;%in;
-  %let;wb2;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(wb1*2)%elseif;(evar.sosa = "on")%wb1;%else;%wbc;%end;%in;
+  %let;hb;%if;(evar.sosa = "on" and boxsize=2)%expr(hbs*2)%elseif;(evar.sosa = "on")%hbs;%else;%hbc;%end;%in;
+  %let;wb;%if;(evar.sosa = "on" and boxsize=2)%expr(wbs*2)%elseif;(evar.sosa = "on")%wbs;%else;%wbc;%end;%in;
+  %let;wb2;%if;(evar.sosa = "on" and boxsize=2))%expr(wb1*2)%elseif;(evar.sosa = "on")%wb1;%else;%wbc;%end;%in;
   %if;(zz=2)  %( par couple %)
     %foreach;ancestor_level(levelup)
       %foreach;ancestor;
@@ -481,8 +470,8 @@
 %end;
 
 %define;graphlinks(xx,yy) %( xx level -1, yy mode : I ou H %)
-  %let;hb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(hbs*2)%elseif;(evar.sosa = "on")%hbs;%else;%hbc;%end;%in;
-  %let;wb;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))%expr(wbs*2)%elseif;(evar.sosa = "on")%wbs;%else;%wbc;%end;%in;
+  %let;hb;%if;(evar.sosa = "on" and boxsize=2)%expr(hbs*2)%elseif;(evar.sosa = "on")%hbs;%else;%hbc;%end;%in;
+  %let;wb;%if;(evar.sosa = "on" and boxsize=2)%expr(wbs*2)%elseif;(evar.sosa = "on")%wbs;%else;%wbc;%end;%in;
   %if;(evar.sosa!="on")
   %foreach;ancestor_level(xx-2)
     %foreach;ancestor;
@@ -542,11 +531,12 @@
 %end;
 
 Arbre des ancêtres de %first_name; %surname; %dates;
+  %let;boxsize;%if;((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on"))2%else;1%end;%in;
 %if;((evar.cpl="on" and evar.v < 4) or (evar.cpl!="on" and evar.v < 3))
   [*compact tree][:] [specify::generation/generations]0 > 3.
 %else;
   %let;vvv;%if;(evar.cpl="on")%evar.v;%else;%expr(evar.v+1)%end;%in;
-  %let;mmm;%if;(evar.sosa = "on" and ((evar.v<9 and evar.cpl!="on") or (evar.v<10 and evar.cpl="on")))2%else;1%end;%in;
+  %let;mmm;%if;(evar.sosa = "on" and boxsize=2)2%else;1%end;%in;
   %let;nbc;%apply;nth%with;/0/1/1/3/3/7/7/15/15/31/31/63/63/127/127/255/255/%and;%nn;
     %if;(evar.hi="H")%expr(vvv+1)%else;%expr(vvv)%end;%end;%in;
   %let;nbl;%apply;nth%with;/0/1/1/3/3/7/7/15/15/31/31/63/63/127/127/255/255/%and;%nn;

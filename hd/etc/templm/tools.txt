@@ -245,7 +245,6 @@
         %apply;checkbox("├","cpl",msg,"")
         %let;msg;[implex links]%in;
         %apply;checkbox("├","implx",msg,"")
-        %apply;checkbox("├","nav",[navigate on tree],"")
         <label title="[create] [family/families]0">
                          └<input type="checkbox" name="sms" value="on" %l_on;
                         %if;(evar.sms = "on") checked="checked"%end;%/>
