@@ -45,39 +45,39 @@
   %if;not cancel_links;
     <div class="form-inline">
       <div class="btn-group mx-2 mb-2">
-        %if;(evarv>=8)
+        %(if;(evarv>=8)
           <a href="%apply;rebuild_url%with;%expr(evarv-5)%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
-            class="btn btn-secondary btn-sm font-weight-bold"
+            class="btn btn-secondary btn-sm font-weight-bold border-0 px-0"
             title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵</a>
-        %end;
+        %end;%)
         %if;(evarv>=4)
           <a href="%apply;rebuild_url%with;%expr(evarv-1)%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
-            class="btn btn-secondary btn-sm small"
-            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−</a>
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">&nbsp;−</a>
         %end;
-        <span class="btn btn-outline-secondary btn-sm font-weight-bold">%evarv;</span>
+        <span class="btn btn-outline btn-sm  border-0 font-weight-bold text-muted">%evarv; gen</span>
         %if;(evarv<maxlev-1)
           <a href="%apply;rebuild_url%with;%expr(evarv+1)%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
-            class="btn btn-secondary btn-sm small"
-            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+&nbsp;</a>
         %end;
-        %if;(evarv<maxlev-5)
+        %(if;(evarv<maxlev-5)
           <a href="%apply;rebuild_url%with;%expr(evarv+5)%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
-            class="btn btn-secondary btn-sm font-weight-bold"
+            class="btn btn-secondary btn-sm font-weight-bold border-0 px-0"
             title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">+⁵</a>
-        %end;
+        %end;%)
       </div>
-      <div class="btn-group mx-1 mb-2">
+      <div class="btn-group mx-1 mb-2 ml-2">
         <a href='%apply;rebuild_url(evarv,"H",evarim,evarix,evarso,evarma,evarsms,evarscl,evarfs)'
-          class="btn btn-outline-secondary btn-sm %if;(evarih="H")disabled font-weight-bold%end;"
-          title="[*mode H/mode I]0">H</a>
+          class="btn btn-outline-secondary btn-sm %if;(evarih="H")disabled font-weight-bold%end; border-0 px-0"
+          title="[*mode H/mode I]0">&nbsp;H&nbsp;</a>
         <a href='%apply;rebuild_url(evarv,"I",evarim,evarix,evarso,evarma,evarsms,evarscl,evarfs)'
-          class="btn btn-outline-secondary btn-sm %if;(evarih="I")disabled font-weight-bold%end;"
-          title="[*mode H/mode I]1">I</a>
+          class="btn btn-outline-secondary btn-sm %if;(evarih="I")disabled font-weight-bold%end; border-0 px-0"
+          title="[*mode H/mode I]1">&nbsp;I&nbsp;</a>
       </div>
       <div class="btn-group mx-1 mb-2">
       %(if;(evarim=1)
@@ -92,90 +92,90 @@
           <i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
       %end;%)
       </div>
-      <div class="btn-group mx-1 mb-2">
+      <div class="btn-group mx-1 mb-2 ml-2">
       %if;(evarso=1)
         <a href="%apply;rebuild_url(evarv,evarih,evarim,evarix,0,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*visualize/show/hide/summary]2 [Sosa]0">
           S <i class="fa fa-toggle-on text-muted"></i></a>
       %else;
         <a href="%apply;rebuild_url(evarv,evarih,evarim,evarix,1,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*visualize/show/hide/summary]1 [Sosa]0">
           S <i class="fa fa-toggle-off text-muted"></i></a>
       %end;
       </div>
-      <div class="btn-group mx-1 mb-2">
+      <div class="btn-group mx-1 mb-2 ml-2">
       %if;(evarsms=1)
         <a href="%apply;rebuild_url(evarv,evarih,evarim,evarix,evarso,evarma,0,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*visualize/show/hide/summary]2 [missing %s:::Sosa]0">
           Sx <i class="fa fa-toggle-on text-muted"></i></a>
       %else;
         <a href="%apply;rebuild_url(evarv,evarih,evarim,evarix,evarso,evarma,1,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*visualize/show/hide/summary]1 [missing %s:::Sosa]0">
           Sx <i class="fa fa-toggle-off text-muted"></i></a>
       %end;
       </div>      
-      <div class="btn-group mx-1 mb-2">
+      <div class="btn-group mx-1 mb-2 ml-2">
       %if;(evarma=1)
         <a href="%apply;rebuild_url(evarv,evarih,evarim,evarix,evarso,0,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*visualize/show/hide/summary]2 [couples]">
           <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
           <span class="fa fa-user" aria-hidden="true"></span>
           <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
       %else;
         <a href="%apply;rebuild_url(evarv,evarih,evarim,evarix,evarso,1,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*visualize/show/hide/summary]1 [couples]">
           <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
           <span class="fa fa-user" aria-hidden="true"></span>
           <i class="fa fa-toggle-off text-muted"></i></a>
       %end;
       </div>
-      <div class="btn-group mx-1 mb-2">
+      <div class="btn-group mx-1 mb-2 ml-2">
       %if;(evarix=1)
         <a href="%apply;rebuild_url(evarv,evarih,evarim,0,evarso,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*do not] [implex links]">
-          <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+          <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%) mr-1"></i></a>
       %else;
         <a href="%apply;rebuild_url(evarv,evarih,evarim,1,evarso,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
           title="[*implex links]">
           <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
       %end;
       </div>
-      <div class="btn-group mx-2 mb-2">
+      <div class="btn-group mx-2 mb-2 ml-2">
         %if;(evarscl>0)
           <a href="%apply;rebuild_url%with;%evarv;%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl-20)%and;%expr(evarfs-1)%end;"
-            class="btn btn-secondary btn-sm small"
-            title="[reduce/increase]0 [size]0 (-20%%)">−</a>
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="[reduce/increase]0 [size]0 (-20%%)">&nbsp;−</a>
         %end;
-        <span class="btn btn-outline-secondary btn-sm font-weight-bold">Scl: %evarscl;&#37;</span>
+        <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Scl: %evarscl;&#37;</span>
         %if;(evarscl<200)
           <a href="%apply;rebuild_url%with;%evarv;%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl+20)%and;%expr(evarfs+1)%end;"
-            class="btn btn-secondary btn-sm small"
-            title="[reduce/increase]1 [size]1 (+20%%)">+</a>
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="[reduce/increase]1 [size]1 (+20%%)">+&nbsp;</a>
         %end;
       </div>
-      <div class="btn-group mx-2 mb-2">
+      <div class="btn-group mx-2 mb-2 ml-2">
         %if;(evarfs>5)
           <a href="%apply;rebuild_url%with;%evarv;%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%expr(evarfs-1)%end;"
-            class="btn btn-secondary btn-sm small"
-            title="[reduce/increase]0 [font size]">−</a>
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="[reduce/increase]0 [font size]">&nbsp;−</a>
         %end;
-        <span class="btn btn-outline-secondary btn-sm font-weight-bold">Fs: %evarfs;</span>
+        <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Fs: %evarfs;</span>
         %if;(evarfs<20)
           <a href="%apply;rebuild_url%with;%evarv;%and;%evarih;%and;%nn;
             %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%expr(evarfs+1)%end;"
-            class="btn btn-secondary btn-sm small"
-            title="[reduce/increase]1 [font size]">+</a>
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="[reduce/increase]1 [font size]">+&nbsp;</a>
         %end;
       </div>
     </div>
