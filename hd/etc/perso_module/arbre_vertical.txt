@@ -180,40 +180,66 @@
       <div class="form-inline">
         <div class="btn-group mx-2">
           %if;(maxlev>9 and evarv>5)
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵</a>
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−</a>
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-5)%and;%evarim;%and;%evarma;%and;%evart;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 font-weight-bold"%nn;
+            title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵&nbsp;</a>
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 small"%nn;
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−&nbsp;</a>
           %end;
           %for;i;minv;maxv;
-            <a id="v%i;" class="btn btn-outline-secondary btn-sm %if;(evarv=i)disabled font-weight-bold%end;" %nn;
-              href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end" %nn;
+            <a id="v%i;" class="btn btn-outline-secondary btn-sm border-0 px-1 %if;(evarv=i)disabled font-weight-bold%end;"%nn; 
+              href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end"%nn;
               title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end; %if;(i=maxlev)(max)%end;">%i;</a>
           %end;
           %if;(maxlev>9 and maxlev-evarv>=5)
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">+⁵</a>
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 small"%nn;
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">&nbsp;+</a>
+            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+5)%and;%evarim;%and;%evarma;%and;%evart;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 font-weight-bold"%nn;
+            title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">&nbsp;+⁵</a>
           %end;
         </div>
         %if;(evarv>1)
-          <div class="btn-group mx-2">
-            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"A")" class="btn btn-outline-secondary btn-sm %if;(evart="A")disabled font-weight-bold%end;" title="[*male line/female line]1">A</a>
-            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"C")" class="btn btn-outline-secondary btn-sm %if;(evart="C")disabled font-weight-bold%end;" title="[*male line/female line]0">C</a>
-            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"T")" class="btn btn-outline-secondary btn-sm %if;(evart="T")disabled font-weight-bold%end;" title="[*tree]">T</a>
+          <div class="btn-group mx-2 ml-2">
+            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"A")"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 %if;(evart="A")disabled font-weight-bold%end;"%nn;
+            title="[*male line/female line]1">A</a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"C")"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 %if;(evart="C")disabled font-weight-bold%end; ml-2"%nn;
+            title="[*male line/female line]0">C</a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"T")"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 %if;(evart="T")disabled font-weight-bold%end; ml-2"%nn;
+            title="[*tree]">T</a>
           </div>
         %end;
-        <div class="mx-2">
+        <div class="mx-2 ml-2">
           %if;(evarim=1)
-            <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+            title="[*visualize/show/hide/summary]2 [image/images]0">
+            <i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+            title="[*visualize/show/hide/summary]1 [image/images]0">
+            <i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
         %if;(evarv>1 and evart="T")
-          <div class="mx-2">
+          <div class="mx-2 ml-2">
             %if;(evarma=1)
-              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)"%nn;
+              class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+              title="[*visualize/show/hide/summary]2 [date of marriage]">
+              <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
             %else;
-              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)"%nn;
+              class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+              title="[*visualize/show/hide/summary]1 [date of marriage]">
+              <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
             %end;
           </div>
         %end;
