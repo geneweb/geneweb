@@ -142,17 +142,17 @@
   <div class="form-inline">
     <div class="mx-2">
       %if;(evarim=1)
-        <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+        <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
       %else;
-        <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+        <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
       %end;
     </div>
     %if;(evarv>1 and evart="T")
       <div class="mx-2">
         %if;(evarma=1)
-          <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+          <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]2 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
         %else;
-          <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+          <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]1 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
         %end;
       </div>
     %end;
