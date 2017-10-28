@@ -32,6 +32,10 @@ fr: dictionnaire des %s
 en: reduce/increase
 fr: réduire/augmenter
 
+    activate/suppress
+en: activate/suppress
+fr: activer/supprimer
+
     do not
 en: do not
 fr: ne pas

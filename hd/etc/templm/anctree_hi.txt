@@ -66,10 +66,10 @@
 %( dimensions des boites %)
 %let;hbc;13%in; %( mode caractère %)
 %let;wbc;8%in;
-%let;hbs;%if;(evar.templ="templm")%expr(17*scf/100)%else;%expr(24*scf/100)%end;%in; %( espacement des boites en mode sosa  dimension + marge %)
-%let;wbs;%if;(evar.templ="templm")%expr(21*scf/100)%else;%expr(40*scf/100)%end;%in;
-%let;hb1;%if;(evar.templ="templm")%expr(14*scf/100)%else;%expr(22*scf/100)%end;%in; %( dimensions de la boite sosa %)
-%let;wb1;%if;(evar.templ="templm")%expr(18*scf/100)%else;%expr(38*scf/100)%end;%in;
+%let;hbs;%if;(evar.templ="templm")%expr(24*scf/100)%else;%expr(24*scf/100)%end;%in; %( espacement des boites en mode sosa  dimension + marge %)
+%let;wbs;%if;(evar.templ="templm")%expr(40*scf/100)%else;%expr(40*scf/100)%end;%in;
+%let;hb1;%if;(evar.templ="templm")%expr(22*scf/100)%else;%expr(22*scf/100)%end;%in; %( dimensions de la boite sosa %)
+%let;wb1;%if;(evar.templ="templm")%expr(38*scf/100)%else;%expr(38*scf/100)%end;%in;
 
 %define;bg(xx)
   %apply;nth%with;
@@ -140,7 +140,7 @@
 
 %(a=ancestor, s=sosa, p=has_parents, bg=background, t=top, l=left  %)
 %define;boxsosa(aaa, sss, ppp, bgg, lll, ttt)
-    <div id="s%aaa.sosa.v;"
+    <div id="s%aaa.anc_sosa.v;"
       style='position:absolute;border:solid 1px;top:tttpx;left:lllpx;%nn;
       %if;(evar.cpl="on")
         %if;(not aaa.has_parents)border-left: 2px solid;%end;

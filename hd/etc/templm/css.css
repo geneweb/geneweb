@@ -6,6 +6,14 @@ html{color:#000;background-color:#EEE;}
 ::-webkit-input-placeholder {color:#aaa;}
 ::-moz-placeholder {color:#aaa;}
 :-ms-input-placeholder {color:#aaa;}
+/* added for anctree_hi */
+.big_anchor {display: block;width: 100%;height: 100%;position: absolute;top: 0;left: 0;z-index: 0;}
+.big_anchor_1 {display: block;width: 100%;height: 60%;position: absolute;top: 0;left: 0;z-index: 0;}
+.big_anchor_1m {display: block;width: 100%;height: 40%;position: absolute;top: 60%;left: 0;z-index: 0;}
+.big_anchor_him {display: block;width: 50%;height: 60%;position: absolute;top: 0;left: 0;z-index: 0;}
+.big_anchor_her {display: block;width: 50%;height: 60%;position: absolute;text-align: right;top: 0;left: 50%;z-index: 0;}
+.big_anchor_him_m {display: block;width: 50%;height: 40%;position: absolute;top: 60%;left: 0;z-index: 0;}
+.big_anchor_her_m {display: block;width: 50%;height: 40%;position: absolute;top: 60%;left: 50%;z-index: }
 /* Properties of all html pages */
 textarea{width:99%;padding:10px;vertical-align:top;min-height:1em;}
 tr,div,p,li,img{page-break-inside:avoid;}

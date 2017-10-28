@@ -21,7 +21,7 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container-fluid">
+<div class="container%if;(evar.wide="on")-fluid%end;">
 %import;perso_utils;
 %import;menubar;
 
