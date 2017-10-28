@@ -17,14 +17,26 @@
 %base_header;
 </head>
 <body%body_prop;>
+
+%define;imp_templ(zzz)
+  %apply;show_templ("perso_module/page_zzz")
+%end;
+
 %import;perso_utils;
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
   %include.menubar;
   %message_to_wizard;
-  <div id="content" tabindex="-1">
-    %apply;show_templ("perso_module/arbre_famille")
-  </div>
+  %if;(evar.t1!="")
+    <div id="content" tabindex="-1">
+      %apply;imp_templ(evar.t1)
+    </div>
+  %else;
+    <div id="content" tabindex="-1">
+      %import;perso_module/arbre_famille;
+    </div>
+  %end;
+  <br clear="all">
   %if;(not cancel_links)
     %include.trl;
     %include.copyr;

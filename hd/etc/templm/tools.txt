@@ -1,6 +1,6 @@
 <!-- $Id: tools.txt,v 2016/02/04 21:27:03 A2 Exp $ -->
 
-  %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;9%end;%in;
+  %let;l_fs;%if;(evar.fs != "")%evar.fs;%else;15%end;%in;
   %let;l_wi;%if;(evar.wi != "")%evar.wi;%else;980%end;%in;
   %let;l_he;%if;(evar.he != "")%evar.he;%else;600%end;%in;
   %let;l_sosa_ref;%if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)on%end;%in;
