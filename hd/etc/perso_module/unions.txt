@@ -231,12 +231,13 @@
         <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
       %end;
       <span class="align-self-center text-muted">
-        %if;are_divorced;<br>[*divorced]0%divorce_date;.%nn;%end;
-        %if;are_separated;<br>[*separated]0
+        %if;are_divorced;<br>[*divorced]0%divorce_date;%nn;%end;
+        %if;are_separated;<br>[*separated]0%nn;
+        %( todo: [separated]0%event.date n’ajoute pas la préposition à la date comme [divorced]0%divorce_date; %)
           %foreach;event;
-            %if;(event.name=[separate event]0) %event.date;.%end;
+            %if;(event.name=[separate event]0 and event.has_date) %event.date;%end;%nn;
           %end;
-        %end;
+        %end;.
       </span>
       %if;(count2=0)
         %foreach;child;
