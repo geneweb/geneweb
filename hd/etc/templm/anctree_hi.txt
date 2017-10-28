@@ -198,7 +198,8 @@
       %end;
       
       <div>
-        <a style="width:100%%;zindex:2;"
+        %let;tm;%if;(sss>999 or evar.v>9)2%else;8%end;%in;
+        <a style="margin:%tm;px 0 2px 0;width:100%%;zindex:2;"
           %if;(evar.nav="on" and evar.templ="templm")%nn;
             href='%prefix;p=%aaa.first_name;;n=%aaa.surname;;occ=%aaa.occ;;m=A;t=T;t1=CT;v=%evar.v;;hi=%evar.hi;;%nn;
                   sosa=%evar.sosa;;cpl=%evar.cpl;;fs=%evar.fs;;implx=%evar.implx;;nav=%evar.nav;;%nn;
@@ -224,8 +225,7 @@
                 %if;(not aaa.spouse.has_parents) [*missing parents].%end;%nn;
               %end;'>
         %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;((evar.v>8 and evar.cpl!="on") or (evar.v>9 and evar.cpl="on"))%expr(fs-5)%else;%fs;%end;%in;
-        %let;tm;%if;(sss>999 or evar.v>9)2%else;8%end;%in;
-        <span style="margin:%tm;px 0 2px 0;text-align:center;width:100%%;font-size:%fs1;px;">
+        <span style="text-align:center;width:100%%;font-size:%fs1;px;">
           %if;(aaa.anc_sosa!="")%aaa.anc_sosa;%else;1%end;
         </span>
         </a>
