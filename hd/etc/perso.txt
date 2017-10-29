@@ -80,8 +80,8 @@
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
 %if;(evar.test="on")
 %( hook for regression test! do not remove %)
+La variable evar.test est réservée aux tests!!
 %elseif(p_mod="zz" or p_mod="")
-%if;(p_mod="zz" or p_mod="")
   %(Statique%)
   %apply;init_cache(3, 2, 2)
   %( two columns if screen_width>=992px but full width for tablets/phone < 992px %)
@@ -125,7 +125,7 @@
       %end;
     </div>
 %else;
-  %(Dynamic %)
+  %(Dynamic%) 
   %apply;init_cache(3, 2, 2)
   <div class="row mt-2" id="content" tabindex="-1">
     %for;i;0;p_mod_nbr;

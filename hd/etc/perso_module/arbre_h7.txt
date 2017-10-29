@@ -45,8 +45,6 @@
 </head>
 
 %define;rebuild_url(iii,fff,sss,bbb,nnn)
-  %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
-  %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
   %let;new_url;%nn;
     %prefix;%access;;m=A;t=T;t1=h7;%if;(evar.wide="on")wide=on;%end;%nn;
     %if;("iii"="on")image=on;%end;%nn;
