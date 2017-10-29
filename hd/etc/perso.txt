@@ -78,6 +78,9 @@
 %end;
 
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
+%if;(evar.test="on")
+%( hook for regression test! do not remove %)
+%elseif(p_mod="zz" or p_mod="")
 %if;(p_mod="zz" or p_mod="")
   %(Statique%)
   %apply;init_cache(3, 2, 2)
@@ -146,6 +149,7 @@
   %include.copyr;
 %end;
 </div>
-%let;page;perso%in;%include.js;
+%let;page;perso%in;
+%include.js;
 </body>
 </html>

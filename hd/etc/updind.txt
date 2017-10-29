@@ -1427,7 +1427,9 @@ function changeCalendar(e,v,m,c) {
       %include.toolbar;
       <textarea class="form-control" name="notes" id="notes" rows="16">%notes;</textarea>%sq;
       <button type="submit" class="btn btn-light border-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0" aria-label="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 fa-fw text-success" aria-hidden="true"></i><span class="d-none d-md-flex ml-1 font-weight-bold"></span></button>
-      <div class="ml-1 text-center"> %include.accent;</div>
+      <div class="ml-1 text-center"> 
+        %include.accent;
+      </div>
     </div>
   </div>
 </form>

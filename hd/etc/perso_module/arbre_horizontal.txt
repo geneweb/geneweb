@@ -218,16 +218,16 @@
 
 %define;rebuild_url(vvv, www, num)
   %let;new_url;%prefix;%access;;%nn;
-  %if;(num=0)sosa=off;%nn;%end;
-  %if;(evar.v!="")v=%evar.v;;%nn;%end;
-  twidth=%www;;vh=vvv;%in;
+  %if;(num=0)sosa=off;%end;%nn;
+  %if;(evar.v!="")v=%evar.v;;%end;%nn;
+  twidth=www;vh=vvv;%in;
   %new_url;
 %end;
 
 %if;has_parents;
   %let;evarvh;%if;(evar.vh!="")%evar.vh;%else;3%end;%in;
-  %let;twidth;%if;(evar.twidth!="")%evar.twidth;%else;10%end;%in;
-  %let;evars;%if;(evar.sosa!="" and evar.sosa="off")0%else;1%end;%in;
+  %let;evartw;%if;(evar.twidth!="")%evar.twidth;%else;10%end;%in;
+  %let;evars;%if;(evar.sosa="on")1%else;0%end;%in;
   <div class="d-flex justify-content-between">
     <h2>[*preview family tree]</h2>
     %if;not cancel_links;
@@ -235,25 +235,26 @@
         <div class="btn-group mx-2">
           %for;i;1;7;
             <a class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
-              href="%apply;rebuild_url%with;%expr(i)%and;%twidth;%and;%evars;%end" %nn;
+              href="%apply;rebuild_url%with;%expr(i)%and;%evartw;%and;%evars;%end" %nn;
               title="%if;(evarvh!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end;">%i;</a>
           %end;
         </div>
         <div class="mx-2">
           %if;(evars=1)
-            <a href="%apply;rebuild_url(evarvh,twidth,0)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [n° Sosa]">Sosa <i class="fa fa-toggle-on text-muted"></i></a>
+            <a href="%apply;rebuild_url(evarvh,evartw,0)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [n° Sosa]">Sosa <i class="fa fa-toggle-on text-muted"></i></a>
           %else;
-            <a href="%apply;rebuild_url(evarvh,twidth,1)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [n° Sosa]">Sosa <i class="fa fa-toggle-off text-muted"></i></a>
+            <a href="%apply;rebuild_url(evarvh,evartw,1)" class="btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [n° Sosa]">Sosa <i class="fa fa-toggle-off text-muted"></i></a>
           %end;
         </div>
         <div class="input-group mx-2">
           <span class="input-group-btn">
-            %if;(evar.twidth>=6)<a href="%apply;rebuild_url%with;%expr(evarvh)%and;%expr(twidth-2)%and;%evars;%end" class="btn btn-outline-secondary btn-sm" title="- 2 ([width])">-</a>%end;
+            %if;(evartw>=6)
+              <a href="%apply;rebuild_url%with;%evarvh;%and;%expr(evartw-2)%and;%evars;%end;" class="btn btn-outline-secondary btn-sm" title="- 2 ([width])">-</a>%end;
           </span>
-          <input class="form-control form-control-sm text-center col-3" value="%twidth; ─" title="[*width]" disabled>
+          <input class="form-control form-control-sm text-center col-3" value="%evartw; ─" title="[*width]" disabled>
           <span class="input-group-btn">
-            <a href="%apply;rebuild_url%with;%expr(evarvh)%and;%expr(twidth+2)%and;%evars;%end" class="btn btn-outline-secondary btn-sm" title="+ 2 ([width])">+</a>
+              <a href="%apply;rebuild_url%with;%evarvh;%and;%expr(evartw+2)%and;%evars;%end;" class="btn btn-outline-secondary btn-sm" title="+ 2 ([width])">+</a>
           </span>
         </div>
       </div>
@@ -261,7 +262,7 @@
   </div>
   <pre class="my-4">
     %if;(evarvh>0)
-      %apply;displ_parent(evarvh, 1, "self", 1, twidth)
+      %apply;displ_parent(evarvh, 1, "self", 1, evartw)
     %else;
       %apply;access(1, "self")%nn; 
     %end;
