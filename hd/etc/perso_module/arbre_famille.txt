@@ -484,7 +484,7 @@
           %if;(family_cnt=fam_cnt)
             %if;(spouse!="" or (evar.semi!="off" and nb_ch_tot>0))
               <div class="border border-dark border-top-0 border-left-0 border-right-0 text-center">
-                %if;(marriage_date.year != "")&%marriage_date.year;%else;&#8203;%end;
+                %if;(on_marriage_date!="" and marriage_date.year != "")&%marriage_date.year;%else;&#8203;%end;
               </div>
             %end;
             %if;(has_children or (evar.semi!="off" and nb_ch_tot>0))
