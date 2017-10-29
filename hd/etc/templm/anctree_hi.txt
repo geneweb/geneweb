@@ -204,7 +204,7 @@
             %if;(aaabirth_date.year != "" and aaais_dead) – %end;%nn;
             %if;(aaabirth_date.year = "" and aaadeath_date.year != "")†%else;%aaadeath_date.year;%end;&#013;%nn;
             %if;(not aaahas_parents) [*missing parents].&#013;%end;%nn;
-            %if;(aaasame = "" and evar.cpl="on")%nn;
+            %if;(aaasame = ""  and aaahas_families and evar.cpl="on")%nn;
               %if;(aaaspouse.is_male) ♂%else; ♀%end; %aaaspouse; (%aaaspouse.occ;)&#013;%nn;
               %if;(aaaspouse.birth_date.year != "")° %aaaspouse.birth_date.year;%end;%nn;
               %if;(aaaspouse.birth_date.year != "" and aaaspouse.is_dead) – %end;%nn;
@@ -279,7 +279,7 @@
         %if;(aaabirth_date.year != "" and aaais_dead) – %end;%nn;
         %if;(aaabirth_date.year = "" and aaadeath_date.year != "")†%else;%aaadeath_date.year;%end;&#013;%nn;
         %if;(not aaahas_parents) [*missing parents].&#013;%end;%nn;
-        %if;(aaasame = "")%nn;
+        %if;(aaasame = "" and aaahas_families  and evar.cpl="on")%nn;
           %if;(aaaspouse.is_male) ♂%else; ♀%end; %aaaspouse; (%aaaspouse.occ;)&#013;%nn;
           %if;(aaaspouse.birth_date.year != "")° %aaaspouse.birth_date.year;%end;%nn;
           %if;(aaaspouse.birth_date.year != "" and aaaspouse.is_dead) – %end;%nn;
@@ -383,7 +383,7 @@
             %if;(ancestor.same != "" and evar.implx="on")
               %apply;implexc()
             %else;
-              %if;(ancestor.anc_sosa.v!="")
+              %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
                 %apply;boxchar("ancestor.", "yy", left, top)
               %else;
                 %apply;boxchar("", "yy", left, top)
@@ -391,7 +391,7 @@
             %end;
           %else;
             %if;(ancestor.same != "" and evar.implx="on")%apply;implexs()%end;
-              %if;(ancestor.anc_sosa.v!="")
+              %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
                 %apply;boxsosa("ancestor.", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
               %else;
                 %apply;boxsosa("", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
@@ -436,7 +436,7 @@
           %if;(ancestor.same != "" and evar.implx="on")
             %apply;implexc()
           %else;
-            %if;(ancestor.anc_sosa.v!="")
+            %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
               %apply;boxchar("ancestor.", "yy", left, top)
             %else;
               %apply;boxchar("", "yy", left, top)
@@ -444,7 +444,7 @@
           %end;
         %else;
           %if;(ancestor.same != "" and evar.implx="on")%apply;implexs()%end;
-            %if;(ancestor.anc_sosa.v!="")
+            %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
               %apply;boxsosa("ancestor.", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
             %else;
               %apply;boxsosa("", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
