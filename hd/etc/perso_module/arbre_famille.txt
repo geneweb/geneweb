@@ -21,8 +21,8 @@
                   %elseif;("xxx"="father.mother" or "xxx"="mother.mother"
                         or "xxx"="spouse.father.mother" or "xxx"="spouse.mother.mother") ([a grandfather/a grandmother/a grandparent]1)%nn;
                   %end;
-                  %if;xxx.has_sosa;
-                    &#013%apply;a_of_b%with;[*n° Sosa] %xxx.sosa;%and;%sosa_ref;%end;%nn;
+                  %if;(xxx.has_sosa and self!=sosa_ref)
+                    &#010;%apply;a_of_b%with;[*n° Sosa] %xxx.sosa;%and;%sosa_ref;%end;%nn;
                   %end;
   %in;
   <div class="d-flex pl-0 pr-0 %if;(evar.image!="off")py-0%end; w-100 justify-content-start list-group-item list-group-item-%if;(xxx.has_sosa)warning%elseif;(xxx.is_male)primary%elseif;(xxx.is_female)danger%else;dark%end; ">
@@ -137,14 +137,15 @@
                 %if;(evar.image="off")image=off;%end;%nn;
                 %if;(evar.semi="off")semi=off;%end;" %nn;
                 title="[*navigation] %ancestor;
-                       &#013%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;
-                       %if;ancestor.has_sosa;
-                         &#013%apply;a_of_b%with;[*n° Sosa] %ancestor.sosa;%and;%sosa_ref; (*)%end;%nn;
+                       &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;
+                       %if;(ancestor.has_sosa and self!=sosa_ref)
+                         &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.sosa;%and;%sosa_ref; (*)%end;%nn;
                        %end;"></a>
             %end;
             %if;(not ancestor.is_restricted)
               <a class="normal_anchor" href="%prefix;%ancestor.access;" 
-                title="%apply;a_of_b%with;[*vital record]%and;%if;(ancestor="? ?")[unknown person]%else;%ancestor;%end;%end; (%apply;a_of_b%with;[n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;)">%nn;
+                title="%apply;a_of_b%with;[*vital record]%and;%if;(ancestor="? ?")[unknown person]%else;%ancestor;%end;%end;
+                &#010;%apply;a_of_b%with;[*n° Sosa] %ancestor.anc_sosa.v;%and;%if;("vv"="spouse")%spouse;%else;%self;%end;%end;">%nn;
             %end;
                %ancestor.anc_sosa.v;
             %if;(not ancestor.is_restricted)
@@ -173,21 +174,25 @@
       <div class="d-flex flex-row">
         <div class="%if;(evar.image!="off")d-flex flex-column%else;align-self-center%end;">
           %if;(evar.image!="off")%apply;border()%end;
-          <span class="align-self-center %if;(child.marriage_date.year="")mx-4%else;ml-1 mr-2%end;  text-nowrap">&%if;(child.marriage_date.year!="")%child.marriage_date.year;%end;</span>
+          <span class="align-self-center %if;(child.marriage_date.year="")mx-4%else;ml-1 mr-2%end;  text-nowrap">&%if;(child.marriage_date.year!="")<a title="&%sp;%marriage_date;%sp;%marriage_place;">%child.marriage_date.year;%end;</a></span>
           %if;(evar.image!="off" and nb_children>0)
             <div class="text-center">
               %if;(not cancel_links)
                 <a title="%nn;
                       %apply;lazy_print("")
                       %foreach;child;
-                        %if;(lazy_printed)/%end;
+                        %if;(lazy_printed)&#010;%end;
                         %lazy_force;
                         %if;(child.surname=child.father.surname)
-                          %if;(child.public_name!="")%child.public_name;
-                          %else;%child.first_name;
+                          %if;(child.public_name!="")%child.public_name;%nn;
+                          %else;%child.first_name;%nn;
                           %end;
-                        %else;%child;
+                        %else;%child;%nn;
                         %end;
+                        %if;(child.birth_date!="")%sp;°%child.birth_date;%nn;%end;
+                        %if;(child.birth_place!="")%sp;%child.birth_place;%nn;%end;
+                        %if;child.is_dead;%sp;†%end;%if;(child.death_date!="")%child.death_date;%nn;%end;
+                        %if;(child.death_place!="")%sp;%child.death_place;%nn;%end;
                       %end;">%nn;
                %end;
                  %nb_children;<i class="fa fa-child mb-1"></i>
