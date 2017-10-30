@@ -94,19 +94,21 @@
 /* Fix navigation buttons to top right corner */
 .fixed_top_btn_col {
   position: fixed;
+  right: 0px;
   top: 0px;
-  transform: translateX(8px);
+  transform: translateX(-10px);
   z-index: 1030;
 }
 
 .fixed_top_btn_wide {
-  transform: translateX(-34px);
+  transform: translateX(-10px);
 }
 
 .fixed_top_btn {
   position: fixed;
+  right: 0px;
   top: 0px;
-  transform: translateX(-58px);
+  transform: translateX(-18px);
   z-index: 1030;
 }
 
