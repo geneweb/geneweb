@@ -188,7 +188,7 @@
             title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−&nbsp;</a>
           %end;
           %for;i;minv;maxv;
-            <a id="v%i;" class="btn btn-outline-secondary btn-sm border-0 px-1 %if;(evarv=i)disabled font-weight-bold%end;"%nn; 
+            <a id="v%i;" class="btn btn-outline-%if;(evarv=i)dark font-weight-bold disabled%else;secondary%end; btn-sm border-0 px-1"%nn; 
               href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end"%nn;
               title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end; %if;(i=maxlev)(max)%end;">%i;</a>
@@ -203,19 +203,19 @@
           %end;
         </div>
         %if;(evarv>1)
-          <div class="btn-group mx-2 ml-2">
+          <div class="btn-group mx-2">
             <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"A")"%nn;
-            class="btn btn-outline-secondary btn-sm border-0 px-0 %if;(evart="A")disabled font-weight-bold%end;"%nn;
+            class="btn btn-outline-%if;(evart="A")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0"%nn;
             title="[*male line/female line]1">A</a>
             <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"C")"%nn;
-            class="btn btn-outline-secondary btn-sm border-0 px-0 %if;(evart="C")disabled font-weight-bold%end; ml-2"%nn;
+            class="btn btn-outline-%if;(evart="C")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"%nn;
             title="[*male line/female line]0">C</a>
             <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"T")"%nn;
-            class="btn btn-outline-secondary btn-sm border-0 px-0 %if;(evart="T")disabled font-weight-bold%end; ml-2"%nn;
+            class="btn btn-outline-%if;(evart="T")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"%nn;
             title="[*tree]">T</a>
           </div>
         %end;
-        <div class="mx-2 ml-2">
+        <div class="mx-2">
           %if;(evarim=1)
             <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)"%nn;
             class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
@@ -229,7 +229,7 @@
           %end;
         </div>
         %if;(evarv>1 and evart="T")
-          <div class="mx-2 ml-2">
+          <div class="mx-2">
             %if;(evarma=1)
               <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)"%nn;
               class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
