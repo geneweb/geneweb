@@ -361,27 +361,29 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         </ul>
       </div>
     </nav>
-    <div class="d-flex float-right">
-      <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%prefix;">
-        <i class="fa fa-home fa-lg fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
-        <span class="sr-only">[*home]</span>%nn;
-      </a>%nn;
-      %if;(referer!="")
-        <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%referer;" title="Revenir en arrière">%nn;
-          <i class="fa fa-arrow-left fa-lg fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
-          <span class="sr-only">[*back]</span>%nn;
+    <div class="float-left">
+      <div class="d-flex fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
+        <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%prefix;">
+          <i class="fa fa-home fa-lg fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
+          <span class="sr-only">[*home]</span>%nn;
         </a>%nn;
-      %end;
-      <a role="button" class="btn btn-link text-muted ml-%if;(referer="")4%else;0%end; p-1"
-        href="%prefix_no_wide;;%if;(evar.wide="on")%else;wide=on;%end;%suffix;"
-        title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
-        <i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-fw" aria-hidden="true"></i>%nn;
-        <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
-      </a>
-      <a role="button" class="btn btn-link text-muted ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
-        <i class="fa fa-search fa-lg" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
-        <span class="sr-only">[*search/case sensitive]0</span>%nn;
-      </a>
+        <a role="button" class="btn btn-link text-muted %(ml-%if;(referer="")4%else;0%end;%) p-1"
+          href="%prefix_no_wide;%if;(evar.wide="on")%else;wide=on;%end;%suffix;"
+          title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
+          <i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-fw" aria-hidden="true"></i>%nn;
+          <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
+        </a>
+        <a role="button" class="btn btn-link text-muted ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
+          <i class="fa fa-search fa-lg" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
+          <span class="sr-only">[*search/case sensitive]0</span>%nn;
+        </a>
+        %if;(referer!="")
+          <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%referer;" title="Revenir en arrière">%nn;
+            <i class="fa fa-arrow-left fa-lg fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
+            <span class="sr-only">[*back]</span>%nn;
+          </a>%nn;
+        %end;
+      </div>
     </div>
   </div>
   <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
