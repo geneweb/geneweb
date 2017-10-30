@@ -783,6 +783,15 @@ and eval_simple_variable conf =
       let c = conf.command ^ "?" in
       List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
         (henv @ conf.senv)
+  | "prefix_no_lang" ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "lang" then henv else [(k, v) :: henv])
+          conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
+        (henv @ conf.senv)
   | "prefix_no_all" ->
       let henv =
         List.fold_right
