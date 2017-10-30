@@ -1467,7 +1467,7 @@ eo: bofilo/bofilino
 es: un yerno/una nuera
 et: väimees:g:--he/minia
 fi: vävy:g:+n/miniä:g:+n
-fr: un beau-fils/une belle-fille
+fr: un beau-fils&#047;gendre/une belle-fille&#047;bru
 he:  חתן/ כלה
 is: tengdasonur/tengdadóttir
 it: un genero/una nuora
@@ -12398,9 +12398,17 @@ en: father-in-law/mother-in-law
 es: suegro/suegra
 fr: beau-père/belle-mère
 
+    a stepson/stepsons/a stepdaughter/stepdaughters
+en: one stepson/stepsons/one stepdaughter/stepdaughters
+fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
+
+    a stepchild/stepchildren
+en: a stepchild/stepchildren
+fr: un bel-enfant/beaux-enfants
+
     a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
 en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
-fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœur
+fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
 
     a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
 en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
@@ -12413,6 +12421,10 @@ fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
     a half sibling-in-law/half siblings-in-law
 en: one half sibling-in-law/half siblings-in-law
 fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
+
+    a child-in-law/children-in-law
+en: one child-in-law/children-in-law
+fr: un bel-enfant/beaux-enfants
 
     the father/the mother/a parent
 af: die pa/die ma/'n ouer
