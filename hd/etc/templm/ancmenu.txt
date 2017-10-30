@@ -313,8 +313,8 @@
     </fieldset>
   </fieldset>
 </form>
-<br clear="all">
-  %base_trailer;
-  %include.copyr;
+<div style="clear:both;"></div>
+%include.trl;
+%include.copyr;
 </body>
 </html>
