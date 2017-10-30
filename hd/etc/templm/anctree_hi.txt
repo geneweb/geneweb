@@ -154,42 +154,77 @@
       background-color:#bgg;'
     >
       %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
-      %if;(evarcpl!="on")
-        <a class="big_anchor_1 list-group-item-action"
-          href='%prefix;%aaaaccess;'
-          title="%aaafirst_name; %aaasurname; (%aaaocc;)">
+      %if;(evar.cgl!="on")
+        %if;(evarcpl!="on")
+          <a class="big_anchor_1 list-group-item-action"
+            href='%prefix;%aaaaccess;'
+            title="%aaafirst_name; %aaasurname; (%aaaocc;)">
+            %if;(aaahas_image)
+              <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+            %end;
+          </a>
+          <a class="big_anchor_1m list-group-item-action"
+            href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaindex;;"
+            title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
+          </a>
+        %else;
+          <a class="big_anchor_him list-group-item-action"
+            href='%prefix;%aaaaccess;'
+            title="%aaafirst_name; %aaasurname; (%aaaocc;)">
+            %if;(aaahas_image)
+            <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
+            %end;
+          </a>
+          <a class="big_anchor_her list-group-item-action"
+            href='%prefix;%aaaspouse.access;'
+            title="%aaaspouse;">
+            %if;(aaaspouse.has_image)
+            <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"%/>
+            %end;
+          </a>
+          <a class="big_anchor_him_m list-group-item-action"
+            href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaindex;;"
+            title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
+          </a>
+          <a class="big_anchor_her_m list-group-item-action"
+            href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaspouse.index;;"
+            title="Modifier %aaaspouse;">
+          </a>
+        %end;
+      %else;
+        %let;width;%if;(boxsize=2)%expr(wb1*2)%else;%wb1;%end;%in;
+        %let;imsz;%if;(boxsize=2)15%else;8%end;%in;
+        %let;fs1;%if;(sss>999)%expr(fs-10)%elseif;(boxsize=2)%fs;%else;%expr(fs-5)%end;%in;
+        %let;tm;%if;(boxsize=2)8%else;2%end;%in;
+        %let;dw1;%expr(width-imsz)%in;
+        %let;dw2;%expr(width-2*imsz)%in;
+        %let;dm;%if;(aaahas_image)%imsz;%end;%in;
+        %if;(evarcpl!="on")
+          <div class="d-flex">
           %if;(aaahas_image)
             <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
           %end;
-        </a>
-        <a class="big_anchor_1m list-group-item-action"
-          href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaindex;;"
-          title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
-        </a>
-      %else;
-        <a class="big_anchor_him list-group-item-action"
-          href='%prefix;%aaaaccess;'
-          title="%aaafirst_name; %aaasurname; (%aaaocc;)">
-          %if;(aaahas_image)
-          <img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/>
-          %end;
-        </a>
-        <a class="big_anchor_her list-group-item-action"
-          href='%prefix;%aaaspouse.access;'
-          title="%aaaspouse;">
-          %if;(aaaspouse.has_image)
-          <img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"%/>
-          %end;
-        </a>
-        <a class="big_anchor_him_m list-group-item-action"
-          href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaindex;;"
-          title="Modifier %aaafirst_name; %aaasurname; (%aaaocc;)">
-        </a>
-        <a class="big_anchor_her_m list-group-item-action"
-          href="%prefix_no_all;%apply;prefix_all();m=MOD_IND;i=%aaaspouse.index;;"
-          title="Modifier %aaaspouse;">
-        </a>
+          <span style="margin:0 0 2px 0;text-align:center;width:%dw1;px;font-size:%fs1;px;">
+            %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;
+          </span>
+          </div>
+        %else;
+          <div class="d-flex justify-content-between">
+          %if;(aaahas_image)%nn;
+            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaimage_url;" alt="[image/images]0"%/></div>%nn;
+          %else;
+            <div style="margin:0 0 2px 0;width:%imsz;px"></div>
+          %end;%nn;
+          <div style="margin:0 0 2px 0;text-align:center;width:%dw2;px;font-size:%fs1;px;">%nn;
+            %if;(aaaanc_sosa!="")%aaaanc_sosa;%else;1%end;%nn;
+          </div>%nn;
+          %if;(aaaspouse.has_image)%nn;
+            <div style="margin:0 0 2px 0"><img style="width:%imsz;px" src="%aaaspouse.image_url;" alt="[image/images]0"%/></div>%nn;
+          %end;%nn;
+          </div>
+        %end;
       %end;
+      %if;(evar.cgl!="on")
       <div>
         <a style="width:100%%;zindex:2;"
           href="%apply;rebuild_url_2%with;%evarv;%and;%evarhi;%and;%nn;
@@ -220,6 +255,7 @@
           </span>
         </a>
       </div>
+      %end;
     </div>
 %end;
 
@@ -269,7 +305,7 @@
 
 %define;boxchar(aaa,yyy,lll,ttt) %( ttt and lll seem to be inversed in boxsosa%)
   %let;xxx;%if;(evarcpl="on")%expr(aaaanc_sosa.v/2)%else;%aaaanc_sosa.v;%end;%in;
-  <div id="s%aaaanc_sosa.v;font-family:monospace;">
+  <div id="s%aaaanc_sosa.v;" style="font-family:monospace;margin:0">
     <a style="top:tttpx;left:lllpx;"
       href='%prefix_no_all;%apply;prefix_all();%aaaaccess;;'
       %if;(aaasame!="")%apply;implex1(aaasame.v)%end;
@@ -352,7 +388,7 @@
 %end;
 
 %define;linechar(nn,yy,oo) %( nn #linechar, yy I ou H, oo orientation %)
-  <span style="top:%top_;px;left:%left_;px;font-family:monospace;">
+  <span style="top:%top_;px;left:%left_;px;font-family:monospace;margin:0">
   %for;i;0;nn;
     %if;(oo=0)
       %if;("yy"="H")│<br%/>%else;─%if;(evarso="on" and (evarv<9 and evarcpl!="on") or (evarv<8 and evarcpl="on") and nn!=1)───%elseif;(evarso="on" and nn!=1)─%end;%end;
