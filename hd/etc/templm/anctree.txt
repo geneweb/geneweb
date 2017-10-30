@@ -224,7 +224,7 @@
 %define;show_templ(z1)
   %include.anctree_z1;
 %end;
-
+<div class="container" style="all:unset">
 %if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = ""))
   %apply;tree(l_v)
 %elseif;(evar.t = "A" or evar.t1 = "A")
@@ -238,12 +238,13 @@
 %elseif;(evar.t1 != "")
   %apply;show_templ(evar.t1)
 %end;
+</div>
 
-<br clear="all">
 %if;not cancel_links;
   %import;tools;
   %apply;tools_anctree()
-  %base_trailer;
+  <div style="clear:both;"></div>
+  %include.trl;
   %include.copyr;
 %end;
 </body>

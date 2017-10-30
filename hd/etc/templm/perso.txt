@@ -11,8 +11,8 @@
   %import;js_perso_accesskey;
   <style type="text/css">
     %let;lwide1;%bvar.wide;.%evar.wide;%in;
-    %let;lwide;%if;(lwide1 = "yes." or lwide1 = ".yes" or lwide1 = "yes.yes" or lwide1 = "no.yes")yes%else;no%end;%in;
-    %if;(lwide = "yes")
+    %let;lwide;%if;(lwide1 = "on." or lwide1 = ".on" or lwide1 = "on.on" or lwide1 = "off.on")on%else;off%end;%in;
+    %if;(lwide = "on")
       .col1,.col2{width:99%%;}
       .image_sheet{font-size:89%%;}
     %else;
@@ -93,7 +93,7 @@
   [*modify family %s event order:::xx]0
 %end;
 %define;menu()
-  <div class="menu%bvar.menu;" style="left:0px;top:0px;height:17px">
+  <div class="menu%bvar.menu;" style="left:10px;top:0px;height:17px">
     %if;wizard;
       <span style="width:270px">⟔%(⇱%)
         <span class="s_menu">
@@ -176,8 +176,8 @@
 %end;
 %define;buttons()
   <div id="button">
-    <span style="position:absolute;top:%if;(evar.wide="yes" or bvar.wide="yes")82%else;30%end;px;right:3px;">%apply;sosainfo()</span>
-    <span style="position:absolute;right:0px;top:%if;(evar.wide="yes" or bvar.wide="yes")100%else;48%end;px">
+    <span style="position:absolute;top:%if;(evar.wide="on" or bvar.wide="on")82%else;30%end;px;right:13px;">%apply;sosainfo()</span>
+    <span style="position:absolute;right:13px;top:%if;(evar.wide="on" or bvar.wide="on")100%else;48%end;px">
      %if;((bvar.access_by_key!="yes" and evar.iz!="") or (bvar.access_by_key="yes" and evar.nz!="" and evar.pz!=""))
        <a href="%prefix_no_iz;%self.access;%l_url;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;"> X</a> <br/>
      %end;
@@ -191,9 +191,9 @@
         title="%if;(evar.image!="on")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [image/images]1" style="%if;(evar.image="on")color:red;%end;">🎴</a>
       %end;
     %end;
-    %if;(bvar.wide!="yes")
-      <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="yes");wide=yes%else;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
-      title="%if;(evar.wide="yes")[full width/columns]1%else;[full width/columns]0%end;">%if;(evar.wide!="yes")⚊%else;⚋%end;</a>
+    %if;(bvar.wide!="on")
+      <br/><a href="%prefix_no_wide;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="on");wide=on%else;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
+      title="%if;(evar.wide="on")[full width/columns]1%else;[full width/columns]0%end;">%if;(evar.wide!="on")⚊%else;⚋%end;</a>
     %end;
     %if;(wizard and bvar.misc!="yes")
       <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="yes");misc=yes%else;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
@@ -1100,7 +1100,7 @@
 %end;
 <div class="col1">
   <div class="person"> %( <!-- Begin display image, person --> %)
-    <h1 class="ch1 h1_%sex; h1_%has_families;%has_sosa;" style="margin-top:%if;(evar.wide!="yes")15%else;30%end;px">
+    <h1 class="ch1 h1_%sex; h1_%has_families;%has_sosa;" style="margin-top:%if;(evar.wide!="on")15%else;30%end;px">
       %if;(has_public_name)
         %apply;link_s("n",public_name)
       %else;
@@ -1286,7 +1286,7 @@
 %( <!-- End display relations, notes, sources --> %)
 %( <!-- Begin display ancestors /descendants --> %)
 <div class="col2">
-  <hr %if;(lwide = "no")style="display:none"%end; %/>
+  <hr %if;(lwide = "off")style="display:none"%end; %/>
   <br/><br/>
   %apply;anc_families()
   %if;has_families;
@@ -1379,7 +1379,7 @@
     %apply;menu()
     %apply;buttons()
   </div>
-  <br clear="all">
+  <div style="clear:both;"></div>
   %include.trl;
   %include.copyr;
 %end;

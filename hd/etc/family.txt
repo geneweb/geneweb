@@ -36,7 +36,7 @@
       %import;perso_module/arbre_famille;
     </div>
   %end;
-  <br clear="all">
+  <div style="clear:both;"></div>
   %if;(not cancel_links)
     %include.trl;
     %include.copyr;
