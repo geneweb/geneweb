@@ -9,14 +9,7 @@
     %let;l1;%apply;lang(i)%in;
     %if;(l1!=evar.lang)
       <a class="dropdown-item" id="lang_%l1;"
-       href="%prefix_base;%nn;
-             %if;(l1!=bvar.default_lang)lang=%l1;;%end;%nn;
-             %if;(evar.pz!="")pz=%evar.pz;;%end;%nn;
-             %if;(evar.nz!="")nz=%evar.nz;;%end;%nn;
-             %if;(evar.ocz!="" and evar.ocz!="0")ocz=%evar.ocz;;%end;%nn;
-             %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%nn;
-             %if;(evar.templ!="")templ=%evar.templ;;%end;%nn;
-             %suffix;">%nn;
+        href="%prefix_no_lang;%if;(l1!=bvar.default_lang)lang=%l1;;%end;%suffix;">%nn;
        <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
     %end;
@@ -55,35 +48,35 @@
           </button>
           %if;(not is_printed_by_template)
             <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
-              <a class="dropdown-item" href="%prefix_base;lang=af;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">af</a>
-              <a class="dropdown-item" href="%prefix_base;lang=bg;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">bg</a>
-              <a class="dropdown-item" href="%prefix_base;lang=br;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">br</a>
-              <a class="dropdown-item" href="%prefix_base;lang=ca;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">ca</a>
-              <a class="dropdown-item" href="%prefix_base;lang=cs;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">cs</a>
-              <a class="dropdown-item" href="%prefix_base;lang=da;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">da</a>
-              <a class="dropdown-item" href="%prefix_base;lang=de;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">de</a>
-              <a class="dropdown-item" href="%prefix_base;lang=en;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">en</a>
-              <a class="dropdown-item" href="%prefix_base;lang=eo;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">eo</a>
-              <a class="dropdown-item" href="%prefix_base;lang=es;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">es</a>
-              <a class="dropdown-item" href="%prefix_base;lang=et;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">et</a>
-              <a class="dropdown-item" href="%prefix_base;lang=fi;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">fi</a>
-              <a class="dropdown-item" href="%prefix_base;lang=fr;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">fr</a>
-              <a class="dropdown-item" href="%prefix_base;lang=he;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">he</a>
-              <a class="dropdown-item" href="%prefix_base;lang=is;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">is</a>
-              <a class="dropdown-item" href="%prefix_base;lang=it;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">it</a>
-              <a class="dropdown-item" href="%prefix_base;lang=lv;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">lv</a>
-              <a class="dropdown-item" href="%prefix_base;lang=nl;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">nl</a>
-              <a class="dropdown-item" href="%prefix_base;lang=no;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">no</a>
-              <a class="dropdown-item" href="%prefix_base;lang=oc;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">oc</a>
-              <a class="dropdown-item" href="%prefix_base;lang=pl;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">pl</a>
-              <a class="dropdown-item" href="%prefix_base;lang=pt;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">pt</a>
-              <a class="dropdown-item" href="%prefix_base;lang=pt-br;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">pt-br</a>
-              <a class="dropdown-item" href="%prefix_base;lang=ro;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">ro</a>
-              <a class="dropdown-item" href="%prefix_base;lang=ru;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">ru</a>
-              <a class="dropdown-item" href="%prefix_base;lang=sk;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">sk</a>
-              <a class="dropdown-item" href="%prefix_base;lang=sl;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">sl</a>
-              <a class="dropdown-item" href="%prefix_base;lang=sv;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">sv</a>
-              <a class="dropdown-item" href="%prefix_base;lang=zh;%if;(evar.pz!="")pz=%evar.pz;;%end;%if;(evar.nz!="")nz=%evar.nz;;%end;%if;(evar.ocz!="" or evar.ocz!="0")ocz=%evar.ocz;;%end;%if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%if;(evar.templ!="")templ=%evar.templ;;%end;%suffix;">zh</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=af;%suffix;">af</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=bg;%suffix;">bg</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=br;%suffix;">br</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=ca;%suffix;">ca</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=cs;%suffix;">cs</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=da;%suffix;">da</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=de;%suffix;">de</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=en;%suffix;">en</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=eo;%suffix;">eo</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=es;%suffix;">es</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=et;%suffix;">et</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=fi;%suffix;">fi</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=fr;%suffix;">fr</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=he;%suffix;">he</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=is;%suffix;">is</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=it;%suffix;">it</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=lv;%suffix;">lv</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=nl;%suffix;">nl</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=no;%suffix;">no</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=oc;%suffix;">oc</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=pl;%suffix;">pl</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=pt;%suffix;">pt</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=pt-br;%suffix;">pt-br</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=ro;%suffix;">ro</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=ru;%suffix;">ru</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=sk;%suffix;">sk</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=sl;%suffix;">sl</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=sv;%suffix;">sv</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=zh;%suffix;">zh</a>
             </div>
           %else;
             <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
