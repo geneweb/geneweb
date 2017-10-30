@@ -21,7 +21,7 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container%if;(evar.wide="on")-fluid%end;">
+<div class="container%if;(evar.wide="on")-fluid%end; clearfix">
 %import;perso_utils;
 %import;menubar;
 
@@ -45,7 +45,7 @@
 %else;
   bad values for evar.t and evar.t1
 %end;
-<br clear="all">
+</div>
 
 <div>
 %base_trailer;
