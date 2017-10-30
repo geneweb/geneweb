@@ -295,4 +295,3 @@
     %end;
   %end;
 </div>
-<br clear="all">
