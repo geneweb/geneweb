@@ -1,4 +1,7 @@
-<!-- $Id: family.txt v 7.00 exp 15/10/2017 21:03:04 hg -->
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<head>
+  <!-- $Id: family.txt v 7.00 exp 30/10/2017 13:28:29 hg -->
 <title>%nn;
   %if;has_public_name;
     %if;has_qualifiers;%public_name; %qualifier;
@@ -17,26 +20,14 @@
 %base_header;
 </head>
 <body%body_prop;>
-
-%define;imp_templ(zzz)
-  %apply;show_templ("perso_module/page_zzz")
-%end;
-
 %import;perso_utils;
 <a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
 <div class="container%if;(evar.wide="on")-fluid%end;">
   %include.menubar;
   %message_to_wizard;
-  %if;(evar.t1!="")
-    <div id="content" tabindex="-1">
-      %apply;imp_templ(evar.t1)
-    </div>
-  %else;
-    <div id="content" tabindex="-1">
-      %import;perso_module/arbre_famille;
-    </div>
-  %end;
-  <div style="clear:both;"></div>
+  <div id="content" tabindex="-1">
+    %apply;show_templ("perso_module/arbre_famille")
+  </div>
   %if;(not cancel_links)
     %include.trl;
     %include.copyr;
