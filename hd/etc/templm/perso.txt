@@ -101,6 +101,9 @@
           <a id="chg_evt_ind" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" %l_on1;>⇳ [*invert::event/events]1%(<br/>[*modify person event order]0%)</a>
           %if;(is_male or is_female)
             <a id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA; %l_on1;>👫 [*add::family/families]0</a>%nn;
+          %else;
+            <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M" %l_on1;>👫 [*add::family/families]0 ([male/female/neuter]0)</a>%nn;
+            <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F" %l_on1;>👫 [*add::family/families]0 ([male/female/neuter]1)</a>%nn;
           %end;
           %foreach;family;
             %if;(family_cnt>1)
