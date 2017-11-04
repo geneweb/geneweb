@@ -125,9 +125,13 @@
 %define;portrait()
   %if;(has_image or bvar.default_image="yes")
     %if;has_image;
-      <a href="%image_url;" target="_blank">
+      %if;(evar.cgl!="on") 
+        <a href="%image_url;" target="_blank">
+          <img src="%image_url;"%image_size; class="%if;(op_m=3)align-self-center mx-1%end; rounded" alt="[image/images]0"%/>%nn;
+        </a>%nn;
+      %else;
         <img src="%image_url;"%image_size; class="%if;(op_m=3)align-self-center mx-1%end; rounded" alt="[image/images]0"%/>%nn;
-      </a>%nn;
+      %end;
     %elseif;(bvar.default_image="yes")
       <img class="%if;(op_m=3)d-flex align-self-center mx-1%end; rounded" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png"%image_size; alt="[missing image]"%/>
     %end;
