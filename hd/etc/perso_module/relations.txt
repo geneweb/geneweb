@@ -4,41 +4,37 @@
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 
 %define;relations_tree(z1)
-	%( relations, related, witness at his event %)
+  %( relations, related, witness at his event %)
   %reset_count;
   href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
-  %foreach;relation;
-    %if;(has_relation_him)
-      %incr_count;i%count;=%relation_him.index;;t%count;=%relation_him.type;;%nn;
-      %incr_count;%nn;
-      i%count;=z1;%nn;
+    %foreach;relation;
+      %if;(has_relation_him)
+        %incr_count;i%count;=%relation_him.index;;%nn;
+        t%count;=%relation_him.type;;%nn;
+        %incr_count;i%count;=z1;%nn;
+      %end;
+      %if;(has_relation_her)
+        %incr_count;i%count;=%relation_her.index;;%nn;
+        t%count;=%relation_her.type;;%nn;
+        %incr_count;i%count;=z1;%nn;
+      %end;
     %end;
-    %if;(has_relation_her)
-      %incr_count;i%count;=%relation_her.index;;t%count;=%relation_her.type;;%nn;
-      %incr_count;%nn;
-      i%count;=z1;%nn;
+    %foreach;related;
+      %incr_count;i%count;=%related.index;;%nn;
+      t%count;=%related_type;;%nn;
+      %incr_count;i%count;=z1;%nn;
     %end;
-  %end;
-  %foreach;related;
-    %incr_count;i%count;=%related.index;;t%count;=%related_type;;%nn;
-    %incr_count;%nn;
-    i%count;=z1;%nn;
-  %end;
-  %foreach;event_witness_relation;
-    %incr_count;%nn;
-    i%count;=%event_witness_relation.person.index;;%nn;
-    t%count;=%event_witness_relation.event.name;;%nn;
-    %incr_count;%nn;
-    i%count;=z1;%nn;
-  %end;
-  %incr_count;%nn;
-  i%count;=%index;;%nn;
-  t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
-  %if;browsing_with_sosa_ref;
-    %incr_count;%nn;
-    i%count;=%sosa_ref.index;;%nn;
-    t%count;=sosa_1;%nn;
-  %end;
+    %foreach;event_witness_relation;
+      %incr_count;i%count;=%event_witness_relation.person.index;;%nn;
+      t%count;=%event_witness_relation.event.name;;%nn;
+      %incr_count;i%count;=z1;%nn;
+    %end;
+    %incr_count;i%count;=%index;;%nn;
+    t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;;%nn;
+    %if;browsing_with_sosa_ref;
+      %incr_count;i%count;=%sosa_ref.index;;%nn;
+      t%count;=sosa_1;%nn;
+    %end;
   " title="[*relations tree] (and witness at his event)"
   %reset_count;
 %end;
@@ -75,10 +71,14 @@
   %let;cnt;%count;%in;
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
   <h2>[*relation/relations]1%nn;
-    %if;(not cancel_links and cnt>1)
-      <a %apply;relations_tree(l_ref)>%nn;
+    %if;(cnt>1)
+      %if;(not cancel_links)
+        <a %apply;relations_tree(l_ref)>%nn;
+          <img class="ml-2 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%/>%nn;
+        </a>%nn;
+      %else;
         <img class="ml-2 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%/>%nn;
-      </a>%nn;
+      %end;
     %end;
   </h2>
   <ul>

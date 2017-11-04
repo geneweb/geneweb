@@ -11,32 +11,32 @@
                     %event.name;
                   %end;
       %in;
-      %incr_count;i%count;=%event_witness.index;;t%count;=%enamex;;%nn;
-      %incr_count;%nn;
-      i%count;=z1;%nn;
+      %incr_count;i%count;=%event_witness.index;;%nn;
+      t%count;=%enamex;;%nn;
+      %incr_count;i%count;=z1;%nn;
     %end;
     %if;has_relations;
       %foreach;relation;
         %if;(has_relation_him and has_relation_her)
           %if;(relation_type=[godfather/godmother/godparents]2 and event.name=[baptism])
-            %incr_count;i%count;=%relation_him.index;;t%count;=[godfather/godmother/godparents]0;%nn;
-            %incr_count;%nn;
-            i%count;=z1;%nn;
-            %incr_count;i%count;=%relation_her.index;;t%count;=[godfather/godmother/godparents]1;%nn;
-            %incr_count;%nn;
-            i%count;=z1;%nn;
+            %incr_count;i%count;=%relation_him.index;;%nn;
+            t%count;=[godfather/godmother/godparents]0;%nn;
+            %incr_count;i%count;=z1;%nn;
+            %incr_count;i%count;=%relation_her.index;;%nn;
+            t%count;=[godfather/godmother/godparents]1;%nn;
+            %incr_count;i%count;=z1;%nn;
           %end;
         %elseif;has_relation_him;
           %if;(relation_type=[godfather/godmother/godparents]0 and event.name=[baptism])
-            %incr_count;i%count;=%relation_him.index;;t%count;=[godfather/godmother/godparents]0;%nn;
-            %incr_count;%nn;
-            i%count;=z1;%nn;
+            %incr_count;i%count;=%relation_him.index;;%nn;
+            t%count;=[godfather/godmother/godparents]0;%nn;
+            %incr_count;i%count;=z1;%nn;
           %end;
         %elseif;has_relation_her;
           %if;(relation_type=[godfather/godmother/godparents]1 and event.name=[baptism])
-            %incr_count;i%count;=%relation_him.index;;t%count;=[godfather/godmother/godparents]1;%nn;
-            %incr_count;%nn;
-            i%count;=z1;%nn;
+            %incr_count;i%count;=%relation_him.index;;%nn;
+            t%count;=[godfather/godmother/godparents]1;%nn;
+            %incr_count;i%count;=z1;%nn;
           %end;
         %end;
       %end;
@@ -45,8 +45,7 @@
   i%count;=%index;;%nn;
   t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;;%nn;
   %if;browsing_with_sosa_ref;
-    %incr_count;%nn;
-    i%count;=%sosa_ref.index;;%nn;
+    %incr_count;i%count;=%sosa_ref.index;;%nn;
     t%count;=sosa_1;%nn;
   %end;
   "%if;(count < 3) style="display:none;"%end; title="[*witness tree] (witness to my events and godparents)"%nn;
@@ -56,36 +55,40 @@
 %define;relations_tree(z1)
   %reset_count;
   href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
-  %foreach;relation;
-    %if;(has_relation_him)
-      %incr_count;i%count;=%relation_him.index;;t%count;=%relation_him.type;;%nn;
-      %incr_count;%nn;
-      i%count;=z1;%nn;
+    %foreach;relation;
+      %if;(has_relation_him)
+        %incr_count;i%count;=%relation_him.index;;%nn;
+        t%count;=%relation_him.type;;%nn;
+        %incr_count;i%count;=z1;%nn;
+      %end;
+      %if;(has_relation_her)
+        %incr_count;i%count;=%relation_her.index;;%nn;
+        t%count;=%relation_her.type;;%nn;
+        %incr_count;%nn;i%count;=z1;%nn;
+      %end;
     %end;
-    %if;(has_relation_her)
-      %incr_count;i%count;=%relation_her.index;;t%count;=%relation_her.type;;%nn;
-      %incr_count;%nn;
-      i%count;=z1;%nn;
-    %end;
-  %end;
-  %foreach;related;
-    %incr_count;i%count;=%related.index;;t%count;=%related_type;;%nn;
-    %incr_count;i%count;=z1;%nn;
-  %end;
-  %foreach;event_witness_relation;
-    %incr_count;i%count;=%event_witness_relation.person.index;;t%count;=%event_witness_relation.event.name;;%nn;
-    %incr_count;i%count;=z1;%nn;
-  %end;
-  %foreach;event;
-    %foreach;event_witness;
-      %incr_count;i%count;=%event_witness.index;;t%count;=%event.name;;%nn;
+    %foreach;related;
+      %incr_count;i%count;=%related.index;;%nn;
+      t%count;=%related_type;;%nn;
       %incr_count;i%count;=z1;%nn;
     %end;
-  %end;
-  %incr_count;i%count;=%index;;t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
-  %if;browsing_with_sosa_ref;
-    %incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;
-  %end;
+    %foreach;event_witness_relation;
+      %incr_count;i%count;=%event_witness_relation.person.index;;%nn;
+      t%count;=%event_witness_relation.event.name;;%nn;
+      %incr_count;i%count;=z1;%nn;
+    %end;
+    %foreach;event;
+      %foreach;event_witness;
+        %incr_count;i%count;=%event_witness.index;;%nn;
+        t%count;=%event.name;;%nn;
+        %incr_count;i%count;=z1;%nn;
+      %end;
+    %end;
+    %incr_count;i%count;=%index;;%nn;
+    t%count;=%if;(sex=0)[him/her]0%elseif;(sex=1)[him/her]1%else;0%end;%nn;
+    %if;browsing_with_sosa_ref;
+      %incr_count;i%count;=%sosa_ref.index;;t%count;=sosa_1;%nn;
+    %end;
   " class="ml-2" title="[*relations tree] (all)"
    %reset_count;
 %end;
@@ -240,7 +243,11 @@
   <div class="d-flex justify-content-between">
     <h2 class="my-1" id="c">[*time line]%nn;
       %if;(not cancel_links)
-        <a %apply;relations_tree(l_ref)><img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/></a>%nn;
+        <a %apply;relations_tree(l_ref)>
+          <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/>
+        </a>%nn;
+      %else;
+        <img src="%image_prefix;/gui_create.png" class="ml-1 mb-1" height="18" alt="Tree"/>
       %end;%nn;
     </h2>%nn;
     %if;(not cancel_links)
@@ -498,10 +505,14 @@
                 %if;(item.6=count2)
                   %apply;capitalize(event.name)
                   %if;event.has_spouse;%sp;[with] <span class="text-nowrap">%apply;short_display_person%with;event.spouse%end;</span>%end;
-                  %if;(event.has_witnesses and not cancel_links)
-                    <a class="" %apply;event_tree(index)>%nn;
+                  %if;(event.has_witnesses)
+                    %if;(not cancel_links)
+                      <a class="" %apply;event_tree(index)>%nn;
+                        <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"/>
+                      </a>
+                    %else;
                       <img src="%image_prefix;/gui_create.png" class="ml-2 mb-1" height="16" alt="Tree"/>
-                    </a>
+                    %end;
                   %end;
                 %end;
               %end;

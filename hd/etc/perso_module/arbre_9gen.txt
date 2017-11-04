@@ -263,18 +263,19 @@
       </tr></table>
         %if;(evar.cgl!="on") 
           %if;(evar.nav="on")
-        <a href="%prefix_no_pmod;m=A;p=%ancestor.spouse.first_name;;n=%ancestor.spouse.surname;;oc=%ancestor.spouse.occ;;%nn;
-               maxv=;v=7;t=T;marriage=on;image=on;bd=;color=on;t1=m;nav=on"%nn;
-        title="Sosa %expr(ancestor.anc_sosa+1)[:] ♀%nn;
-      %ancestor.spouse.first_name; %ancestor.spouse.surname; (%ancestor.spouse.occ) – [*generation/generations]0 %level;">
-      %else;
-        <a href="%prefix_no_pmod;%ancestor.spouse.access;">
-      %end;
-    %end;
-      %ancestor.spouse.first_name; %ancestor.spouse.surname;%if;(evar.cgl!="on")</a>%end;<br>
-      %if;(ancestor.spouse.birth_date.year != "")%ancestor.spouse.birth_date.year;%end
-          %if;(ancestor.spouse.birth_date.year != "" and ancestor.spouse.is_dead) – %end;
-          %if;(ancestor.spouse.birth_date.year = "" and ancestor.spouse.death_date.year != "")†%else;%ancestor.spouse.death_date.year;%end;&#013;
+            <a href="%prefix_no_pmod;m=A;p=%ancestor.spouse.first_name;;n=%ancestor.spouse.surname;;oc=%ancestor.spouse.occ;;%nn;
+              maxv=;v=7;t=T;marriage=on;image=on;bd=;color=on;t1=m;nav=on"%nn;
+              title="Sosa %expr(ancestor.anc_sosa+1)[:] ♀%nn;
+              %ancestor.spouse.first_name; %ancestor.spouse.surname; (%ancestor.spouse.occ) – [*generation/generations]0 %level;">
+          %else;
+            <a href="%prefix_no_pmod;%ancestor.spouse.access;">
+          %end;
+        %end;
+        %ancestor.spouse.first_name; %ancestor.spouse.surname;
+        %if;(evar.cgl!="on")</a>%end;<br>
+        %if;(ancestor.spouse.birth_date.year != "")%ancestor.spouse.birth_date.year;%end
+        %if;(ancestor.spouse.birth_date.year != "" and ancestor.spouse.is_dead) – %end;
+        %if;(ancestor.spouse.birth_date.year = "" and ancestor.spouse.death_date.year != "")†%else;%ancestor.spouse.death_date.year;%end;&#013;
       %end;
       %if;(level> 4)
         %if;(evar.cgl!="on") 
