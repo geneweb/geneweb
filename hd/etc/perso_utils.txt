@@ -576,8 +576,15 @@
       <table>
         <tr>
           <td style="vertical-align: middle">
-            <a href="%child.image_html_url;"><img src="%child.image_url;"%sp;
-              %child.image_small_size; style="border: none" alt="" title="[image/images]0"%/></a>
+            %if;(evar.cgl!="on")
+              <a href="%child.image_html_url;">
+                <img src="%child.image_url;"%sp;
+                  %child.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+              </a>
+            %else;
+              <img src="%child.image_url;"%sp;
+                %child.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+            %end;
           </td>
           <td style="vertical-align: middle">
     %end;
@@ -612,8 +619,15 @@
               %apply;short_display_person("spouse")
             </td>
             <td style="vertical-align: middle">
-              <a href="%spouse.image_html_url;"><img src="%spouse.image_url;"%sp;
-                %spouse.image_small_size; style="border: none" alt="" title="[image/images]0"%/></a>
+              %if;(evar.cgl!="on")
+                <a href="%spouse.image_html_url;">
+                  <img src="%spouse.image_url;"%sp;
+                    %spouse.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+                </a>
+              %else;
+                <img src="%spouse.image_url;"%sp;
+                  %spouse.image_small_size; style="border: none" alt="" title="[image/images]0"%/>
+              %end;
             </td>
           </tr>
         </table>
@@ -648,14 +662,18 @@
 %end;
 
 %( note that type_puce_desc add a <li> that need to be closed %)
-%define;desc_seq(yyy)
+%define;desc_seq(yyy, bi)
   <li class="list-unstyled">
     <ul>
       %foreach;child;
         %apply;type_puce_desc("child")
         %apply;image_MF("child")
         %apply;display_sosa("child")
-        %apply;access_ind("child")
+        %if;(child.index!=bi)
+          %apply;access_ind("child")
+        %else;
+          %child.first_name; %child.surname; %child.dates;
+        %end;
         %if;child.has_families;
           %foreach;child.family;
             <br>
@@ -673,18 +691,14 @@
   </li>
 %end;
 
-%define;descendancy_grand_fathers(mmm,yyy)
+%define;descendancy_grand_fathers(mmm,yyy, bi)
   %foreach;mmm.father.family;
     <li class="list-unstyled mb-2">
       <ul>
         %apply;type_puce_asc("mmm.father")
         %apply;image_MF("mmm.father")
         %apply;display_sosa("mmm.father")
-        %if;(spouse.access = mmm.mother.access)
-          %apply;access_ind("mmm.father")
-        %else;
-          %mmm.father;%mmm.father.title;%mmm.father.dates;%nl;<br>
-        %end;
+        %apply;access_ind("mmm.father")
         </li>
         <li class="list-unstyled">
         %apply;type_wedding()
@@ -700,14 +714,14 @@
         %else;
           %apply;access_ind("spouse")
           </li>
-          %apply;desc_seq("yyy")
+          %apply;desc_seq("yyy", bi)
         %end;
       </ul>
     </li>
   %end;
 %end;
 
-%define;descendancy_grand_mothers(mmm,yyy)
+%define;descendancy_grand_mothers(mmm,yyy, bi)
   %foreach;mmm.mother.family;
     <li class="list-unstyled mb-2">
       <ul>
@@ -715,7 +729,7 @@
           %apply;type_puce_asc("mmm.mother")
           %apply;image_MF("mmm.mother")
           %apply;display_sosa("mmm.mother")
-          %mmm.mother;%mmm.mother.title;%mmm.mother.dates;%nl;<br>
+          %apply;access_ind("mmm.mother")
           </li>
           <li class="list-unstyled">
           %apply;type_wedding()
@@ -731,7 +745,7 @@
           %else;
             %apply;access_ind("spouse")
             </li>
-            %apply;desc_seq("yyy")
+            %apply;desc_seq("yyy", bi)
           %end;
         %end;
       </ul>

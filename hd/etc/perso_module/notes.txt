@@ -53,7 +53,11 @@
         %end;
         <dl>
           <dt>
-            <a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0">^</a>
+            %if;(not cancel_links)
+              <a href="#wed-callnote-%count;" id="note-wed-%count;" style="text-decoration:none" title="[see] [marriage/marriages]0">^
+              </a>
+            %else;^
+            %end;
             %if;(nb_families>1)%apply;nth([nth (generation)], count) [marriage with]%else;[*marriage with]%end; %spouse.first_name; %spouse.surname;
             [:]
           </dt>
