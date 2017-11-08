@@ -23,17 +23,22 @@ module Pset =
 ;
 
 (* input dag *)
+(* collect in a set the elements of a dag *)
 
 value get_dag_elems conf base =
   loop None Pset.empty 1 where rec loop prev_po set i =
     let s = string_of_int i in
+    (* find "person origin" in env  (p=;n=; or i=;) *)
     let po = Util.find_person_in_env conf base s in
     let po =
       match po with
+      (* if None, use prev_po (Who is this?? *)
       [ None -> prev_po
       | x -> x ]
     in
+    (* find other person in env (ss=index;) until first missing integer 1 to n *)
     let so = Util.p_getenv conf.env ("s" ^ s) in
+    (* for each pair po, sp, collect in set branch_of_sosa *)
     match (po, so) with
     [ (Some p, Some s) ->
         let set =
