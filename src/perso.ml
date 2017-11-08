@@ -2421,6 +2421,13 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
           let ep = make_ep conf base (get_key_index p) in
           eval_person_field_var conf base env ep loc sl
       | None -> raise Not_found ]
+  | ["qvar"; v :: sl] ->
+      let v0 = int_of_string v in
+      if v0 >= 0 && v0 < nb_of_persons base then
+        let ep = make_ep conf base (Adef.iper_of_int v0) in
+        if is_hidden (fst ep) then raise Not_found
+        else eval_person_field_var conf base env ep loc sl
+      else raise Not_found
   | ["related" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_type = rt} (Some p) ->
