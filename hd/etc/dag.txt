@@ -261,7 +261,7 @@
   %elseif;(evar.m="RLM")
     <h2 class="mt-2 mb-4">[*multi relations graph]</h2>
   %else;
-    <h2>Tree</h2>
+    <h2>[*tree]</h2>
   %end; %( evar.m="A" %)
 %end; %( if not cancel_links %)
 
