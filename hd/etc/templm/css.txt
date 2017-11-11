@@ -1,4 +1,4 @@
-<!-- $Id: css.txt, v7.00 08/02/2016 05:46:40 $ -->
+<!-- $Id: templm/css.txt, v7.00 2017/11/11 hg 05:46:40 $ -->
 <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;templm/css%bvar.css;.css" media="all" title="css%bvar.css;"%/>
 
 <script src=%if;(cgi)%bvar.static_path;%end;templm/js.js></script>
