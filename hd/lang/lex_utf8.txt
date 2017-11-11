@@ -28,6 +28,10 @@ ru: около
 en: book of %s
 fr: dictionnaire des %s
 
+    multi relations graph
+en: multi relations graph
+fr: graphe multi relations
+
     edit tree
 en: edit tree
 fr: modifier l'arbre
@@ -39,6 +43,10 @@ fr: réduire/augmenter
     activate/suppress
 en: activate/suppress
 fr: activer/supprimer
+
+    dag on/dag off
+en: dag on/dag off
+fr: mode dag actif/mode dag inactif
 
     do not
 en: do not
