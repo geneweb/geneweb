@@ -17,83 +17,256 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container">
+%(import;menubar; %index, %foreach;family, ... do not work in this context %)
+
+%define;rebuild_url(aaa,vvv,iii,mmm,ttt,ddd)
+  %let;new_url;
+  aaa;%nn;
+  %if;(evar.mar_sp_ch!="")mar_sp_ch=%evar.mar_sp_ch;;%end;%nn;
+  %if;(evar.evt_pr_sib!="")evt_pr_sib=%evar.evt_pr_sib;;%end;%nn;
+  %if;(evar.simple!="")simple=%evar.simple;;%end;%nn;
+  %if;(evar.m!="")m=%evar.m;;%end;%nn;
+  %if;(iii=1)image=on;%end;%nn;
+  %if;(mmm=1)marriage=on;%end;%nn;
+  %if;(evar.vh!="")vh=%evar.vh;;%end;%nn;
+  %if;(evart!="")t=ttt;%end;%nn;
+  %if;(ddd=1)dag=on;%end;%nn;
+  %if;(vvv!=3)v=vvv%end;#a%in;
+  %new_url;
+%end;
+
+<div class="container%if;(evar.wide="on")-fluid%end;">
+
 %if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+  <div class="d-flex fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;"> 
+    %if;(evar.m="RLM")
     <a href="%prefix;m=U;et=S;upddag=on;i=0;
       %foreach;env_binding;
         %if;(env.key != "m")
           %env.key=%env.val;;%nn;
         %end;
-      %end;"><span class="fa fa-plus fa-lg" title="[*edit tree]"></span></a>
+      %end;"><span class="fa fa-plus fa-lg" title="[*edit tree]"></span>
+    </a>
+    %(elseif;(evar.m="A" and evar.t="T")
+      %reset_count;%incr_count;
+      %let;indices;i0=%index;;%nn;
+        %foreach;ancestor_level(evar.v)
+          %foreach;ancestor;
+            %if;(not ancestor.has_parents);
+              i%count;%ancestor.index;;%nn;
+            %end;
+          %end;
+        %end;
+      %in;
+      <a href="%prefix;m=U;et=S;upddag=on;i=0;%indices;">
+        <span class="fa fa-plus fa-lg" title="[*edit tree]"></span>
+      </a>%)
+    %end;
+    <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%prefix;">
+      <i class="fa fa-home fa-lg fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
+      <span class="sr-only">[*home]</span>%nn;
+    </a>%nn;
+    <a role="button" class="btn btn-link text-muted %(ml-%if;(referer="")4%else;0%end;%) p-1"
+      href="%prefix_no_wide;%if;(evar.wide="on")%else;wide=on;%end;%suffix;"
+      title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
+      <i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-fw" aria-hidden="true"></i>%nn;
+      <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
+    </a>
+    <a role="button" class="btn btn-link text-muted ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
+      <i class="fa fa-search fa-lg" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
+      <span class="sr-only">[*search/case sensitive]0</span>%nn;
+    </a>
+    %if;(referer!="")
+      <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%referer;" title="Revenir en arrière">%nn;
+        <i class="fa fa-arrow-left fa-lg fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
+        <span class="sr-only">[*back]</span>%nn;
+      </a>%nn;
+    %end;
   </div>
-  <hr style="clear:both; visibility:hidden;"%/>
-%end;
-
-<a href="%prefix;" accesskey="T"></a>
-
-%if;(evar.slices = "on")
-  <h1>%nn;
-    [*display by slices/slice width/overlap/total width]0%nn;
-  </h1>
-  <form method="GET" action="%action;">
-  <p>
-  %hidden;
-  %foreach;env_binding;
-    %if;(env.key != "slices")
-      <input type="hidden" name="%env.key;" value="%env.val.decoded;"%/>
+  
+  %if;(evar.m="A")
+  %if;(evar.slices = "on")
+    <h1>%nn;
+      [*display by slices/slice width/overlap/total width]0%nn;
+    </h1>
+    <form method="GET" action="%action;">
+    <p>
+    %hidden;
+    %foreach;env_binding;
+      %if;(env.key != "slices")
+        <input type="hidden" name="%env.key;" value="%env.val.decoded;"%/>
+      %end;
+    %end;
+    </p>
+    <table>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*don't group the common branches together]
+        <input type="checkbox" name="nogroup" value="on"%/>
+        </label>
+      </td>
+    </tr>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*display by slices/slice width/overlap/total width]1
+        <input name="dpos" size="5" value="78"%/>
+        </label>
+      </td>
+    </tr>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*display by slices/slice width/overlap/total width]2
+        <input name="overlap" size="5" value="10"%/>
+        </label>
+      </td>
+    </tr>
+    <tr align="%left;">
+      <td align="%right;">
+        <label>
+        [*display by slices/slice width/overlap/total width]3
+        (%dag.min_wid;-%dag.max_wid;)
+        <input name="width" size="5" value="%nn;
+          %if;(dag.max_wid <= 78)%dag.max_wid;
+          %elseif;(dag.min_wid >= 78)%dag.min_wid;
+          %else;78%end;"%/>
+        </label>
+      </td>
+    </tr>
+    </table>
+    <p><input type="submit" value="Ok"%/></p>
+    </form>
+  %else;
+    %if;(evar.notab != "on")
+      <div class="text-%right">
+        <a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
+              notab=on;slices=on" accesskey="/" 
+          title="[*display by slices/slice width/overlap/total width]0">
+          <samp>//</sapm>
+        </a>
+      </div>
     %end;
   %end;
-  </p>
-  <table>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*don't group the common branches together]
-      <input type="checkbox" name="nogroup" value="on"%/>
-      </label>
-    </td>
-  </tr>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*display by slices/slice width/overlap/total width]1
-      <input name="dpos" size="5" value="78"%/>
-      </label>
-    </td>
-  </tr>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*display by slices/slice width/overlap/total width]2
-      <input name="overlap" size="5" value="10"%/>
-      </label>
-    </td>
-  </tr>
-  <tr align="%left;">
-    <td align="%right;">
-      <label>
-      [*display by slices/slice width/overlap/total width]3
-      (%dag.min_wid;-%dag.max_wid;)
-      <input name="width" size="5" value="%nn;
-        %if;(dag.max_wid <= 78)%dag.max_wid;
-        %elseif;(dag.min_wid >= 78)%dag.min_wid;
-        %else;78%end;"%/>
-      </label>
-    </td>
-  </tr>
-  </table>
-  <p><input type="submit" value="Ok"%/></p>
-  </form>
-%else;
-  %if;(evar.notab != "on")
-    <div class="text-%right"><a href="%prefix;%foreach;env_binding;%env.key;=%env.val;;%end;
-       notab=on;slices=on" accesskey="/" title="[*display by slices/slice width/overlap/total width]0"><samp>//</sapm></a></div>
-  %end;
+  
+  <hr style="clear:both; visibility:hidden;"%/>
+  <br> %( to adjust vertical pisiyionning (no menubar %)
+  %let;evard;%if;(evar.dag!="")1%else;0%end;%in;
+  %let;evarv;%if;(evar.v!="")%evar.v;%else;3%end;%in;
+  %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
+  %let;evart1;%if;(evar.t1!="")%evar.t1;%end;%in;
+  %let;evarim;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
+  %let;evarma;%if;(evar.marriage!="" and evar.marriage="on")1%else;0%end;%in;
+  %let;maxlev;%apply;min%with;
+    %if;(bvar.max_anc_tree!="")%bvar.max_anc_tree;%else;120%end;%and;
+    %if;(bvar.max_anc_level!="")%bvar.max_anc_level;%else;120%end;%and;
+    %expr(static_max_anc_level)%end;%in;
+  %let;maxv;%if;(maxlev<10 or maxlev<evarv+5)%expr(maxlev+1)
+            %elseif;(maxlev>=evarv+5 and evarv>5)%expr(evarv+5)
+            %else;10%end;%in;
+  %let;minv;%if;(maxlev>9 and maxlev<evarv+5)%expr(maxv-9)
+            %elseif;(maxlev>9 and evarv>5)%expr(evarv-4)
+            %else;1%end;%in;
+  %(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
+  <div class="d-flex justify-content-between">
+    <h2 id="a">%if;(evar.t = "A")[*male line/female line]0%nn;
+    %elseif;(evar.t = "C")[*male line/female line]1%nn;
+    %else[*ascendants tree]%end;</h2>
+    %let;prefix_a;%prefix;p=%evar.p;;n=%evar.n;%in; %(%access does not work %)
+    %if;not cancel_links;
+      <div class="form-inline">
+        <div class="btn-group mx-2">
+          %if;(maxlev>9 and evarv>5)
+            <a href="%apply;rebuild_url%with;%prefix_a;%and;%expr(evarv-5)%and;%evarim;%and;%evarma;%and;%evart;%and;%evard;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 font-weight-bold"%nn;
+            title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵&nbsp;</a>
+            <a href="%apply;rebuild_url%with;%prefix_a;%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%and;%evard;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 small"%nn;
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−&nbsp;</a>
+          %end;
+          %for;i;minv;maxv;
+            <a id="v%i;" class="btn btn-outline-%if;(evarv=i)dark font-weight-bold disabled%else;secondary%end; btn-sm border-0 px-1"%nn; 
+              href="%apply;rebuild_url%with;%prefix_a;%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%and;%evard;%end"%nn;
+              title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
+              %end; %if;(i=maxlev)(max)%end;">%i;</a>
+          %end;
+          %if;(maxlev>9 and maxlev-evarv>=5)
+            <a href="%apply;rebuild_url%with;%prefix_a;%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%and;%evard;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 small"%nn;
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">&nbsp;+</a>
+            <a href="%apply;rebuild_url%with;%prefix_a;%and;%expr(evarv+5)%and;%evarim;%and;%evarma;%and;%evart;%and;%evard;%end"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0 font-weight-bold"%nn;
+            title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">&nbsp;+⁵</a>
+          %end;
+        </div>
+        %if;(evarv>1)
+          <div class="btn-group mx-2">
+            <a href="%apply;rebuild_url(prefix_a,evarv,evarim,evarma,"A",evard)"%nn;
+            class="btn btn-outline-%if;(evart="A")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0"%nn;
+            title="[*male line/female line]1">A</a>
+            <a href="%apply;rebuild_url(prefix_a,evarv,evarim,evarma,"C",evard)"%nn;
+            class="btn btn-outline-%if;(evart="C")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"%nn;
+            title="[*male line/female line]0">C</a>
+            <a href="%apply;rebuild_url(prefix_a,evarv,evarim,evarma,"T",evard)"%nn;
+            class="btn btn-outline-%if;(evart="T")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"%nn;
+            title="[*tree]">T</a>
+          </div>
+        %end;
+        <div class="mx-2">
+          %if;(evarim=1)
+            <a href="%apply;rebuild_url(prefix_a,evarv,0,evarma,evart,evard)"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+            title="[*visualize/show/hide/summary]2 [image/images]0">
+            <i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
+          %else;
+            <a href="%apply;rebuild_url(prefix_a,evarv,1,evarma,evart,evard)"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+            title="[*visualize/show/hide/summary]1 [image/images]0">
+            <i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+          %end;
+        </div>
+        %if;(evarv>1 and evart="T")
+          <div class="mx-2">
+            %if;(evarma=1)
+              <a href="%apply;rebuild_url(prefix_a,evarv,evarim,0,evart,evard)"%nn;
+              class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+              title="[*visualize/show/hide/summary]2 [date of marriage]">
+              <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
+            %else;
+              <a href="%apply;rebuild_url(prefix_a,evarv,evarim,1,evart,evard)"%nn;
+              class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+              title="[*visualize/show/hide/summary]1 [date of marriage]">
+              <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
+            %end;
+          </div>
+        %end;
+        <div class="mx-2">
+          %if;(evard=1)
+            <a href="%apply;rebuild_url(prefix_a,evarv,evarim,evarma,evart,0)"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+            title="[*dag on/dag off]1">
+            <i class="fa fa-minus fa-fw"></i></a>
+          %else;
+            <a href="%apply;rebuild_url(prefix_a,evarv,evarim,evarma,evart,1)"%nn;
+            class="btn btn-outline-secondary btn-sm border-0 px-0"%nn;
+            title="[*dag on/dag on]0">
+            <i class="fa fa-plus fa-fw"></i></a>
+          %end;
+        </div>
+      </div>
+    %end;
+  </div>
+  <a href="%prefix;" accesskey="T"></a>
+  %elseif;(evar.m="RLM")
+    <h2 class="mt-2 mb-4">[*multi relations graph]</h2>
+  %else;
+    <h2>Tree</h2>
+  %end; %( evar.m="A" %)
+%end; %( if not cancel_links %)
+
+
+%if;(evar.slices != "on")
   %if;(link_next != "")
     <p>
       <img src="%image_prefix;/picto_parente.png" alt="&gt;&gt;" %/>
