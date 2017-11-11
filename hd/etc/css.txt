@@ -1,3 +1,4 @@
+<!-- $Id: css.txt, v7.00 2017/11/11 hg 05:46:40 $ -->
 <style>
 /* Put here only properties that uses variables */
 li.folder {

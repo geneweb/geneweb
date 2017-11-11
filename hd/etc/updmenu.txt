@@ -1,232 +1,87 @@
-<!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
-<head>
-  <!-- $Id: updmenu.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
-  <!-- Copyright (c) 1998-2017 INRIA -->
-  <title>[*update]</title>
-  <meta name="robots" content="none">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
-  %include.favicon;
-  %include.css;
-  %base_header;
-</head>
-<body%body_prop;>
-%message_to_wizard;
-<div class="container">
-%include.perso_header;
-
-<h1>%nn;
-  [*update]:<br>
-  %first_name;
-  .%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end; %surname;
-</h1>
-
-
-%(
-<div class="page_max">
-  <h2>[*update family]</h2>
-  <div class="new-form">
-    %if;(has_families and nb_families > 1)
-      <p class="rub_expl etiquette">[*select a spouse]</p>
-      <select onchange="main($(this).val());" style="margin-right:10px;">
-        %foreach;family;
-          <option value="%family_cnt;">%spouse;</option>
-        %end;
-      </select>
+%(<!-- $Id: updmenu.txt,v 7.00 2017/11/11 22:06:07 mr hg Exp $ -->%)
+%( used for jquery. old updmenu.txt is in updmenu1.txt %)
+%( track modifications made in templm/updmenu.txt  %)
+%define;jq1()
+  <div id="jql">
+  %if;has_birth_date; %slash_birth_date;
+  %elseif;has_baptism_date; %slash_baptism_date;
+  %end;
+   - %nn;
+  %if;has_death_date;%slash_death_date; 
+  %elseif;has_burial_date;%slash_burial_date; 
+  %elseif;has_cremation_date;%slash_cremation_date; 
+  %end;
+  </div>
+  <div id="jq7">%if;(first_name = "?" or surname = "?")%index;%else;%occ;%end;</div>
+  <div id="jq8">%first_name;</div>
+  <div id="jq9">%surname;</div>
+  <div id="jq10">%index;</div>
+  <div id="jq11">%sex;</div>
+%end;
+%define;jq1a(z1,z2)
+  %let;lbp;
+    %if;z1.has_birth_place;%z1.birth_place;
+    %elseif;z1.has_baptism_place;%z1.baptism_place;
     %end;
-    %if;((first_name = "?" or surname = "?") and (nb_families != 0 or has_parents))
-    %elseif;(not is_male and not is_female)
-      <span><a href="%prefix;m=ADD_FAM;ip=%index;;sex=M" class="button adder hiddeable">[*add mariage(s)] ([M/F]0)</a></span>
-      <span><a href="%prefix;m=ADD_FAM;ip=%index;;sex=F" class="button adder hiddeable">[*add mariage(s)] ([M/F]1)</a></span>
-    %else;
-      <span><a href="%prefix;m=ADD_FAM;ip=%index;" class="button adder hiddeable">[*add mariage(s)]</a></span>
+  %in;
+  %let;ldp;
+    %if;z1.is_dead;
+      %if;z1.has_death_place;%z1.death_place;
+      %elseif;z1.has_burial_place;%z1.burial_place;
+      %elseif;z1.has_cremation_place;%z1.cremation_place;
+      %end;
+    %end;
+  %in;
+  <div id="jql"> </div>
+  <div id="z2jq2">
+    %if;z1.has_birth_date; %z1.slash_birth_date;
+    %elseif;z1.has_baptism_date; %z1.slash_baptism_date;
+    %end;
+     · %lbp;%nn;
+  </div>
+  <div id="z2jq3">
+    %if;z1.is_dead;
+      %if;z1.has_death_date; %z1.slash_death_date;
+      %elseif;z1.has_burial_date; %z1.slash_burial_date;
+      %elseif;z1.has_cremation_date; %z1.slash_cremation_date;
+      %end;
+       · %ldp;%nn;
     %end;
   </div>
-
-  %foreach;family;
-    <div id="fam_%family_cnt;" class="one_marriage">
-      <table width="100%%" cellspacing="0" cellpadding="0"><tr><td width="100%%">
-      <div class="marriage_info">
-        <span style="margin-bottom:100px;">%apply;marriage_with_txt%with;%spouse;%end;</span>
-        <p style="margin-top:5px;">
-        %apply;married_to%with;%self.sex;%and;
-          %if;(marriage_place = "")
-            %if;(on_marriage_date = "")
-            %else;%on_marriage_date;
-            %end;
-          %else;
-            %if;(on_marriage_date = "")%marriage_place;
-            %else;%on_marriage_date;, %marriage_place
-            %end;
-          %end;
-        %end;
-        </p>
+  <div id="z2jq4"> %z1.occupation; </div>
+  <div id="z2jq5">%lbp; </div>
+  <div id="z2jq6">%ldp; </div>
+  <div id="z2jq7">%if;(z1.first_name = "?" or z1.surname = "?")%z1.index;%else;%z1.occ;%end;</div>
+  <div id="z2jq8">%z1.first_name;</div>
+  <div id="z2jq9">%z1.surname;</div>
+  <div id="z2jq11">%z1.sex;</div>
+%end;
+%define;jq1b()
+  %apply;jq1a("self","pa1")
+  %if;has_families;
+    %foreach;family()
+      %if;(family.index = evar.ifam)
+        %apply;jq1a("spouse","pa2")
         %if;has_children;
-          <div>
-            <h3>[*child/children]1 :</h3>
-            <ul>
-              %foreach;child;
-                <li>
-                  %apply;image_MF("child")
-                  %apply;short_display_person("child")
-                </li>
-              %end;
-            </ul>
-          </div>
-        %end;
-      </div>
-      </td>
-
-      <td>
-        <div class="marriage_mod new-form" style="white-space:nowrap;">
-          %if;(has_families and nb_families > 1)
-            <div class="fam_order">
-              <span>[*display this marriage in this order]</span>
-              <form id="marriage_mod_form%family_cnt;" method="get" action="%action;" target="_self">
-                  %hidden;
-                  <input type="hidden" name="m" value="CHG_FAM_ORD"%/>
-                  <input type="hidden" name="i" value="%index;"%/>
-                  <input type="hidden" name="f" value="%family.index;"%/>
-                %let;curr_fam_cnt;%family_cnt;%in;
-                <select onchange="$('#marriage_mod_form%family_cnt;').submit();" name="n">
-                  %foreach;family;
-                    <option %if(family_cnt = curr_fam_cnt) selected="selected" %end; value="%family_cnt;">
-                      %family_cnt;
-                    </option>
-                  %end;
-                </select>
-              </form>
-            </div>
-            <hr class="separateur"/>
+          %foreach;child;
+            %let;l1;ch%child_cnt;%in;
+            %apply;jq1a("child",l1)
           %end;
-          <div>
-            <ul>
-              <li>
-                <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;">[*modify::family/families]0</a>
-              </li>
-              <li>
-                <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;#child">[*add::child/children]0</a>
-              </li>
-              <li>
-                %if;(nb_children != 0)
-                  <a href="%prefix;m=CHG_CHN;i=%family.index;;ip=%index;">[*change children's names]</a>
-                %end;
-              </li>
-              <li>
-                %if;(family_cnt != 1)
-                  %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
-                    <a href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;">[*merge::]</a>
-                  %end;
-                %end;
-              </li>
-              <li>
-                <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">[*delete::family/families]0</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </td>
-      </tr></table>
-    </div>
-  %end;
-</div>
-
-<script>
-  function main(ifam) {
-    var div_marr = $('div.one_marriage');
-    /* Est-ce qu'il y a des familles à masquer ? */
-    if (div_marr.length) {
-      div_marr.hide();
-      $('div[id=fam_'+ifam+']').show();
-    }
-  }
-
-  $(document).ready(function(){
-    main(1);
-  });
-</script>
-
-%)
-
-
-
-
-
-
-<table border="%border;" width="90%%">
-<tr align="%left;">
-  <th align="%left;" style="color:%highlight;">[*family/families]1</th>
-</tr>
-<tr align="%left;">
-  <td valign="top">
-    %foreach;family;
-      %if;(family_cnt != 1)
-        <a href="%prefix;m=INV_FAM;i=%index;;f=%family.index;
-         ">[*invert]</a>
-        <br>
-        %if;(family.father.index = prev_family.father.index
-         and family.mother.index = prev_family.mother.index)
-          <a href=%nn;
-          "%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;
-          ;ip=%index;">%nn;
-          [*merge::]</a>
-          <br>
         %end;
       %end;
-      <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;
-       "%if;(nb_families = 1) accesskey="F"%end;>%nn;
-      [*modify::family/families]0%if;(nb_families = 1) %end;</a>
-      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br>
-      <a href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index">%nn;
-      [*delete::family/families]0</a>
-      <em>[with] %spouse.first_name;.%spouse.occ; %spouse.surname;</em>
-      <br>
     %end;
-    <br>
-    %if;((first_name = "?" or surname = "?") and
-         (nb_families != 0 or has_parents))
-    %elseif;(not is_male and not is_female)
-      <a href="%prefix;m=ADD_FAM;ip=%index;;sex=M">%nn;
-      [*add::marriage/marriages]0 ([M/F]0)</a>
-      <br>
-      <a href="%prefix;m=ADD_FAM;ip=%index;;sex=F">%nn;
-      [*add::marriage/marriages]0 ([M/F]1)</a>
-      <br>
-    %else;
-      <a href="%prefix;m=ADD_FAM;ip=%index;" accesskey="A">%nn;
-      [*add::marriage/marriages]0 </a>
-      <br>
-    %end;
-    %if;(nb_children != 0)
-      <br>
-      <a href="%prefix;m=CHG_CHN;ip=%index;">[*change children's names]</a>
-    %end;      
-    %if;has_possible_duplications;
-      <br>
-      <a href="%prefix;m=MRG_DUP;ip=%index;">%sq;
-      [*merge::possible duplications]</a>
-    %end;      
-  </td>
-</tr>
-</table>
-
-%define;hint(xx)
-  [*to add a child to a family, use "%s":::xx]
+  %end;
 %end;
-
-%if;(nb_families != 0)
-  <p>
-    %apply;hint([*modify::family/families]0)
-    <br>
-  </p>
+%if;(evar.jq1 = "on")
+  %apply;jq1()
+%elseif(evar.jq1a = "on")
+  %apply;jq1a("self","")
+%elseif(evar.jq1b = "on")
+  %apply;jq1b()
+%elseif(evar.upddag = "on")
+  <div class="container">
+    %import;templm/upddag
+  </div>
+%else;
+  %include.updmenu1
 %end;
-
-%base_trailer;
-%include.copyr;
-</div>
-%include.js;
-</body>
-</html>
