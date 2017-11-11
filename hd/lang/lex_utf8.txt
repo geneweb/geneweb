@@ -28,6 +28,10 @@ ru: около
 en: book of %s
 fr: dictionnaire des %s
 
+    edit tree
+en: edit tree
+fr: modifier l'arbre
+
     reduce/increase
 en: reduce/increase
 fr: réduire/augmenter

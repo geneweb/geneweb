@@ -1,3 +1,4 @@
+<!-- $Id: js.txt, v7.00 2017/11/11 hg 05:46:40 $ -->
 %if;(evar.m="MOD_IND" or evar.m="MOD_FAM" or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
   %if;(bvar.use_cdn="yes")
     <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.0/autosize.min.js" 
