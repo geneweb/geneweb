@@ -246,13 +246,13 @@
     </fieldset>
     <fieldset>
       <legend>
-      <label>[*h-tree]</label>
+      <label>[*h7-tree]</label>
       </legend>
       <label title="">
       <input type="hidden" name="p_mod" value="a6">
             <input  type="radio" id="tT" name="t1" value="h7" %l_on; %l_on1;
             %if;(evar.t1 = "m") checked="checked"%end;%/>
-            [*h-tree]</label>
+            [*h7-tree]</label>
     </fieldset>
   </fieldset>
   <fieldset>
