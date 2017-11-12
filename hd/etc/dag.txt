@@ -38,50 +38,8 @@
 <div class="container%if;(evar.wide="on")-fluid%end;">
 
 %if;not cancel_links;
-  <div class="d-flex fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;"> 
-    %if;(evar.m="RLM")
-    <a href="%prefix;m=U;et=S;upddag=on;i=0;
-      %foreach;env_binding;
-        %if;(env.key != "m")
-          %env.key=%env.val;;%nn;
-        %end;
-      %end;"><span class="fa fa-plus fa-lg" title="[*edit tree]"></span>
-    </a>
-    %(elseif;(evar.m="A" and evar.t="T")
-      %reset_count;%incr_count;
-      %let;indices;i0=%index;;%nn;
-        %foreach;ancestor_level(evar.v)
-          %foreach;ancestor;
-            %if;(not ancestor.has_parents);
-              i%count;%ancestor.index;;%nn;
-            %end;
-          %end;
-        %end;
-      %in;
-      <a href="%prefix;m=U;et=S;upddag=on;i=0;%indices;">
-        <span class="fa fa-plus fa-lg" title="[*edit tree]"></span>
-      </a>%)
-    %end;
-    <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%prefix;">
-      <i class="fa fa-home fa-lg fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
-      <span class="sr-only">[*home]</span>%nn;
-    </a>%nn;
-    <a role="button" class="btn btn-link text-muted %(ml-%if;(referer="")4%else;0%end;%) p-1"
-      href="%prefix_no_wide;%if;(evar.wide="on")%else;wide=on;%end;%suffix;"
-      title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
-      <i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-fw" aria-hidden="true"></i>%nn;
-      <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
-    </a>
-    <a role="button" class="btn btn-link text-muted ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
-      <i class="fa fa-search fa-lg" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
-      <span class="sr-only">[*search/case sensitive]0</span>%nn;
-    </a>
-    %if;(referer!="")
-      <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%referer;" title="Revenir en arrière">%nn;
-        <i class="fa fa-arrow-left fa-lg fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
-        <span class="sr-only">[*back]</span>%nn;
-      </a>%nn;
-    %end;
+  <div class="d-flex justify-content-center">
+    %import;home
   </div>
   
   %if;(evar.m="A")
@@ -259,8 +217,33 @@
   </div>
   <a href="%prefix;" accesskey="T"></a>
   %elseif;(evar.m="RLM")
-    <h2 class="mt-2 mb-4">[*multi relations graph]</h2>
-  %else;
+    <div class="d-flex justify-content-between">
+      <h2 class="mt-2 mb-4">[*multi relations graph]</h2>
+      <div class="form-inline" style="transform:translateX(-40px)">
+        <a href="%prefix;m=U;et=S;upddag=on;i=0;
+          %foreach;env_binding;
+            %if;(env.key != "m")
+              %env.key=%env.val;;%nn;
+            %end;
+          %end;"><span class="fa fa-plus fa-lg" title="[*edit tree]"></span>
+        </a>
+        %(elseif;(evar.m="A" and evar.t="T")
+          %reset_count;%incr_count;
+          %let;indices;i0=%index;;%nn;
+            %foreach;ancestor_level(evar.v)
+              %foreach;ancestor;
+                %if;(not ancestor.has_parents);
+                  i%count;%ancestor.index;;%nn;
+                %end;
+              %end;
+            %end;
+          %in;
+          <a href="%prefix;m=U;et=S;upddag=on;i=0;%indices;">
+            <span class="fa fa-plus fa-lg" title="[*edit tree]"></span>
+          </a>%)
+        </div>
+      </div>
+    %else;
     <h2>[*tree]</h2>
   %end; %( evar.m="A" %)
 %end; %( if not cancel_links %)
