@@ -60,9 +60,14 @@
     <input type="hidden" name="new" value="%evar.new;" %/>
   </p>
   <fieldset>
-    <legend>[*modify::tree] <input type="submit" value="ok" %/></legend>
+    <div class="d-flex justify-content-between">
+      <h2 class="mt-2 mb-4">[*edit tree]</h2>
+      <div class="form-inline">
+        <input type="submit" value="ok" %/>
+      </div>
+    </div>
     <table id="upddag" summary="pvar" cellspacing=0 cellpadding=0>
-      <tr>
+      <tr style="font-weight:bold;text-align:center">
         <td class="b1"><abbr title="[add::]">+</abbr></td>
         <td class="bg7"><abbr %lt4;>#</abbr></td>
         <td class="b1"><abbr title="[delete::]">x</abbr></td>
