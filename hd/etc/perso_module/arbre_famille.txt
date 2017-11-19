@@ -1,13 +1,5 @@
 <!-- $Id: perso_module/arbre_famille.txt v 7.00 30/10/2017 22:03:29 hg/a2 -->
 
-%define;rebuild_url(iii,fff,sss,ppp)
-  %prefix;%evm;%access;%nn;
-  %if;("iii"="off");image=off%nn;%end;
-  %if;("fff"!="" and "fff"!="1");fam=fff%nn;%end;
-  %if;("sss"="off");semi=off%nn;%end;
-  %if;("ppp"="off");spouse=off%nn;%end;
-%end;
-
 %define;short_display_person_image(xxx,yyy,zzz)
   %let;personinfo;%if;("xxx"="child")%sp;(%childrank;)%nn;
                   %elseif;("xxx"="child.spouse")
@@ -242,21 +234,30 @@
     %let;evsemi;%if;(evar.semi!="")%evar.semi;%end;%in;
     %let;evspou;%if;(evar.spouse!="")%evar.spouse;%end;%in;
     <div class="text-right mr-3">
-      %if;(evar.image!="off")
-        <a href="%apply;rebuild_url%with;off%and;%evfam;%and;%evsemi;%and;%evspou;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo mx-1"></i> <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;%and;%evfam;%and;%evsemi;%and;%evspou;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo mx-1"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
-      %if;(evar.semi!="off")
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;off%and;%evspou;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [half siblings]"><span class="mx-1">½</span> <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;%and;%evspou;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [half siblings]"><span class="mx-1">½</span> <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
-      %if;(evar.spouse!="off")
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;%evsemi;%and;off%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [spouse/spouses]1"><span class="mx-1">&</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evfam;%and;%evsemi;%and;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [spouse/spouses]1"><span class="mx-1">&</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
+      <a href="%prefix_base;%if;(evar.image!="on")image=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="image")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.image!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [image/images]0"
+      ><i class="fa fa-photo fa-fw"></i>
+        <i class="fa fa-toggle-%if;(evar.image!="on")off%else;on%end; text-muted"></i>
+      </a>
+      <a href="%prefix_base;%if;(evar.semi!="on")image=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="semi")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.semi!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [half siblings]"
+      ><span class="mx-1">½</span>
+        <i class="fa fa-toggle-%if;(evar.semi!="on")off%else;on%end; text-muted"></i>
+      </a>
+      <a href="%prefix_base;%if;(evar.spouse!="on")spouse=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="spouse")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.spouse!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [spouse/spouses]1"
+      ><span class="mx-1">&</span>
+        <i class="fa fa-toggle-%if;(evar.spouse!="on")off%else;on%end; text-muted"></i>
+      </a>
     </div>
   </div>
 %end;
@@ -615,11 +616,9 @@
                %apply;short_display_person_image("spouse", "yes", "")
              %else;
               <a class="d-flex list-group-item list-group-item-dark ml-2 pl-0 pr-2 py-0"
-                href="%apply;rebuild_url%with;%if;(evar.image="off")off%end;%nn;
-                  %and;%if;(family_cnt!=1)%family_cnt;%end;
-                  %and;%if;(evar.semi="off")off%end;
-                  %and;%if;(evar.spouse="off")off%end;
-                  %end;" title="[*visualize/show/hide/summary]1 %spouse;%spouserank;">
+                href="%prefix_base;%if;(family_cnt!=1)fam=%family_cnt;;%end;
+                  %foreach;env_binding;%if;(env.key!="fam")%env.key=%env.val;;%end;%end;"
+                title="[*visualize/show/hide/summary]1 %spouse;%spouserank;">
                 <span class="ml-2">(%family_cnt;)</span>
                 <span class="ml-1">%spouse;</span>
                 %if;(nb_children>0)

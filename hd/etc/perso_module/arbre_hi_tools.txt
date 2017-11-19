@@ -1,40 +1,6 @@
-<!-- $Id: perso_module/arbre_hi_tools.txt v7.00 28/03/2017 20:02:08 Arbre ascendant (vertical) -->
+<!-- $Id: perso_module/arbre_hi_tools.txt v7.00 2017/11/18 20:02:08 Arbre ascendant (vertical) -->
 
-%let;zzz;t=T;t1=CT;%in;
-
-%define;prefix_all()
-  %if;(evar.templ!="")templ=%evar.templ;;%end;%nn;
-  %if;(evar.wide!="")wide=%evar.wide;;%end;%nn;
-  %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%nn;
-%end;
-
-%define;rebuild_url(vvv,hhh,iii,xxx,sss,mmm,yyy,zzz,fff)
-  %let;nv0;%apply;min%with;%if;(evar.cpl = "on")13%else;12%end;%and;vvv%end;%in;
-  %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
-  %let;new_url;%nn;
-    %prefix_no_all;%apply;prefix_all()%access;;t=T;t1=CT;%nn;
-    %if;(evar.m!="")m=%evar.m;;%end;%nn;
-    %if;("vvv"!="")v=%nv;;%end;%nn;
-    %if;("hhh"="I")hi=I;%else;hi=H;%end;%nn;
-    %if;(iii=1)image=on;%end;%nn;
-    %if;(xxx=1)implx=on;%end;%nn;
-    %if;(sss=1)sosa=on;%end;%nn;
-    %if;(mmm=1)cpl=on;%end;%nn;
-    %if;(yyy=1)sms=on;%end;%nn;
-    %if;(zzz!="")scale=zzz;%end;%nn;
-    %if;(fff!="")fs=fff;%end;%nn;
-  %in;
-  %new_url;
-%end;
 %let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
-%let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
-%let;evart1;%if;(evar.t1!="")%evar.t1;%end;%in;
-%let;evarhi;%if;(evar.hi!="")%evar.hi;%else;H%end;%in;
-%let;evarim;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
-%let;evarix;%if;(evar.implx!="" and evar.implx="on")1%else;0%end;%in;
-%let;evarso;%if;(evar.sosa!="" and evar.sosa="on")1%else;0%end;%in;
-%let;evarma;%if;(evar.cpl!="" and evar.cpl="on")1%else;0%end;%in;
-%let;evarsms;%if;(evar.sms!="" and evar.sms="on")1%else;0%end;%in;
 %let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
 %let;evarfs;%if;(evar.fs!="")%evar.fs;%else;17%end;%in;
 %let;maxlev;%if;(evar.cpl = "on")13%else;12%end;%nn;%in;
@@ -45,140 +11,100 @@
   %if;not cancel_links;
     <div class="form-inline">
       <div class="btn-group mx-2 mb-2">
-        %(if;(evarv>=8)
-          <a href="%apply;rebuild_url%with;%expr(evarv-5)%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
-            class="btn btn-secondary btn-sm font-weight-bold border-0 px-0"
-            title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵</a>
-        %end;%)
         %if;(evarv>=4)
-          <a href="%apply;rebuild_url%with;%expr(evarv-1)%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
+          <a href="%prefix_base;v=%expr(evarv-1);%nn;
+            %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
             class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">&nbsp;−</a>
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0"
+          >&nbsp;−</a>
         %end;
         <span class="btn btn-outline btn-sm  border-0 font-weight-bold text-muted">%evarv; gen</span>
         %if;(evarv<maxlev-1)
-          <a href="%apply;rebuild_url%with;%expr(evarv+1)%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
+          <a href="%prefix_base;v=%expr(evarv+1);%nn;
+            %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
             class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+&nbsp;</a>
-        %end;
-        %(if;(evarv<maxlev-5)
-          <a href="%apply;rebuild_url%with;%expr(evarv+5)%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%evarfs;%end;"
-            class="btn btn-secondary btn-sm font-weight-bold border-0 px-0"
-            title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">+⁵</a>
-        %end;%)
-      </div>
-      <div class="btn-group mx-1 mb-2 ml-2">
-        %if;(evarhi="I")
-        <a href='%apply;rebuild_url(evarv,"H",evarim,evarix,evarso,evarma,evarsms,evarscl,evarfs)'
-          class="btn btn-outline-secondary btn-sm %if;(evarhi="H")disabled font-weight-bold%end; border-0 px-0"
-          title="[*mode H/mode I]0">&nbsp;H&nbsp;</a>
-        %else;
-        <a href='%apply;rebuild_url(evarv,"I",evarim,evarix,evarso,evarma,evarsms,evarscl,evarfs)'
-          class="btn btn-outline-secondary btn-sm %if;(evarhi="I")disabled font-weight-bold%end; border-0 px-0"
-          title="[*mode H/mode I]1">&nbsp;I&nbsp;</a>
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)"
+          >+&nbsp;</a>
         %end;
       </div>
-      <div class="btn-group mx-1 mb-2">
-      %(if;(evarim=1)
-        <a href="%apply;rebuild_url(evarv,evarhi,0,evarix,evarso,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
-          title="[*visualize/show/hide/summary]2 [image/images]0">
-          <i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url(evarv,evarhi,1,evarix,evarso,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm"
-          title="[*visualize/show/hide/summary]1 [image/images]0">
-          <i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;%)
+      <div class="btn-group mx-1 mb-2 ml-2">
+        <a href="%prefix_base;%if;(evar.hi!="H")hi=H;%else;hi=I;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="hi")%env.key=%env.val;;%end;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
+          title="%if;(evar.hi!="H")[*mode H/mode I]0%else;[*mode H/mode I]1%end;"
+        >&nbsp;%if;(evar.hi!="H")H%else;I%end;&nbsp;
+        </a>
       </div>
       <div class="btn-group mx-1 mb-2 ml-2">
-      %if;(evarso=1)
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,evarix,0,evarma,evarsms,evarscl,evarfs)"
+        <a href="%prefix_base;%if;(evar.sosa!="on")sosa=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;;%end;%end;"
           class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*visualize/show/hide/summary]2 [Sosa]0">
-          S <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,evarix,1,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*visualize/show/hide/summary]1 [Sosa]0">
-          S <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
+          title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%nn; 
+            %else;[*visualize/show/hide/summary]2%end; [Sosa]0"
+        >S <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
+        </a>
       </div>
       <div class="btn-group mx-1 mb-2 ml-2">
-      %if;(evarsms=1)
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,evarix,evarso,evarma,0,evarscl,evarfs)"
+        <a href="%prefix_base;%if;(evar.sms!="on")sms=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="sms")%env.key=%env.val;;%end;%end;"
           class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*visualize/show/hide/summary]2 [missing %s:::Sosa]0">
-          Sx <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,evarix,evarso,evarma,1,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*visualize/show/hide/summary]1 [missing %s:::Sosa]0">
-          Sx <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
-      </div>      
+          title="%if;(evar.sms!="on")[*visualize/show/hide/summary]1%nn; 
+            %else;[*visualize/show/hide/summary]2%end; [missing %s:::Sosa]0"
+        >S <i class="fa fa-toggle-%if;(evar.sms!="on")off%else;on%end; text-muted"></i>
+        </a>
+      </div>
       <div class="btn-group mx-1 mb-2 ml-2">
-      %if;(evarma=1)
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,evarix,evarso,0,evarsms,evarscl,evarfs)"
+        <a href="%prefix_base;%if;(evar.cpl!="on")cpl=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="cpl")%env.key=%env.val;;%end;%end;"
           class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*visualize/show/hide/summary]2 [couples]">
-          <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
+          title="%if;(evar.cpl!="on")[*visualize/show/hide/summary]1%nn; 
+            %else;[*visualize/show/hide/summary]2%end; [couples]"
+        ><span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
           <span class="fa fa-user" aria-hidden="true"></span>
-          <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
-      %else;
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,evarix,evarso,1,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*visualize/show/hide/summary]1 [couples]">
-          <span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
-          <span class="fa fa-user" aria-hidden="true"></span>
-          <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
+          <i class="fa fa-toggle-%if;(evar.cpl!="on")off%else;on%end; text-muted"></i>
+        </a>
       </div>
       <div class="btn-group mx-1 mb-2 ml-2">
-      %if;(evarix=1)
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,0,evarso,evarma,evarsms,evarscl,evarfs)"
+        <a href="%prefix_base;%if;(evar.implx!="on")implx=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="implx")%env.key=%env.val;;%end;%end;"
           class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*do not] [implex links]">
-          <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%) mr-1"></i></a>
-      %else;
-        <a href="%apply;rebuild_url(evarv,evarhi,evarim,1,evarso,evarma,evarsms,evarscl,evarfs)"
-          class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="[*implex links]">
-          <i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
+          title="%if;(evar.implx!="on")[*do not] [implex links]%else;[*implex links]%end;"
+        ><i class="fa fa-random fa-fw"></i>
+          <i class="fa fa-toggle-%if;(evar.implx!="on")off%else;on%end; text-muted"></i>
+        </a>
       </div>
       <div class="btn-group mx-2 mb-2 ml-2">
         %if;(evarscl>0)
-          <a href="%apply;rebuild_url%with;%evarv;%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl-20)%and;%expr(evarfs-1)%end;"
-            class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="[reduce/increase]0 [size]0 (-20%%)">&nbsp;−</a>
+          <a href="%prefix_base;%if;(evar.scale!="on")scale=%expr(evarscl-20);fs=%expr(evarfs-1);%end;%nn;
+            %foreach;env_binding;%if;(not (env.key="scale" or env.key="fs"))%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]0 [size]0 (-20%% )"
+          >&nbsp;−</a>
         %end;
         <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Scl: %evarscl;&#37;</span>
         %if;(evarscl<200)
-          <a href="%apply;rebuild_url%with;%evarv;%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%expr(evarscl+20)%and;%expr(evarfs+1)%end;"
-            class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="[reduce/increase]1 [size]1 (+20%%)">+&nbsp;</a>
+          <a href="%prefix_base;%if;(evar.scale!="on")scale=%expr(evarscl+20);fs=%expr(evarfs+1);%end;%nn;
+            %foreach;env_binding;%if;(not (env.key="scale" or env.key="fs"))%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]1 [size]0 (+20%% )"
+          >&nbsp;+</a>
         %end;
       </div>
       <div class="btn-group mx-2 mb-2 ml-2">
         %if;(evarfs>5)
-          <a href="%apply;rebuild_url%with;%evarv;%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%expr(evarfs-1)%end;"
-            class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="[reduce/increase]0 [font size]">&nbsp;−</a>
+          <a href="%prefix_base;%if;(evar.fs!="on")fs=%expr(evarfs-1);%end;%nn;
+            %foreach;env_binding;%if;(env.key!="fs")%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]0 [font size]"
+          >&nbsp;−</a>
         %end;
         <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Fs: %evarfs;</span>
         %if;(evarfs<20)
-          <a href="%apply;rebuild_url%with;%evarv;%and;%evarhi;%and;%nn;
-            %evarim;%and;%evarix;%and;%evarso;%and;%evarma;%and;%evarsms;%and;%evarscl;%and;%expr(evarfs+1)%end;"
-            class="btn btn-outline-secondary btn-sm small border-0 px-0"
-            title="[reduce/increase]1 [font size]">+&nbsp;</a>
+          <a href="%prefix_base;%if;(evar.fs!="on")fs=%expr(evarfs+1);%end;%nn;
+            %foreach;env_binding;%if;(env.key!="fs")%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]1 [font size]"
+          >&nbsp;+</a>
         %end;
       </div>
     </div>

@@ -44,18 +44,6 @@
   </script>
 </head>
 
-%define;rebuild_url(iii,fff,sss,bbb,nnn)
-  %let;new_url;%nn;
-    %prefix;%access;;m=A;t=T;t1=h7;%if;(evar.wide="on")wide=on;%end;%nn;
-    %if;("iii"="on")image=on;%end;%nn;
-    %if;("fff"="on")siblings=on;%end;%nn;
-    %if;("sss"="on")sosa=on;%end;%nn;
-    %if;("bbb"="on")bp=on;%end;%nn;
-    %if;("nnn"="on")nav=on;%end;%nn;
-      %in;
-  %new_url;
-%end;
-
 %if;(not cancel_links)
   <div class="col-12 d-flex justify-content-end">
     %let;evimg;%if;(evar.image!="")%evar.image;%end;%in;
@@ -65,31 +53,46 @@
     %let;evnav;%if;(evar.nav!="")%evar.nav;%end;%in;
     %( repenser la nav en cliquant sur le fond de cellule !! %)
     <div class="text-right mr-3">
-      %if;(evar.image="on")
-        <a href="%apply;rebuild_url%with;%and;%evsib;%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo mx-1"></i> <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;on%and;%evsib;%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo mx-1"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
-      %if;(evar.siblings="on")
-        <a href="%apply;rebuild_url%with;%evimg;%and;%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [siblings]"><i class="fa fa-users mx-1"></i> <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;%evimg;%and;on%and;%evsosa;%and;%evbp;%and;%evnav;%end;" class="px-0 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [siblings]"><i class="fa fa-users mx-1"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
-      %if;(evar.sosa="on")
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%and;%evbp;%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [Sosa]"><span class="mx-1">So</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;on%and;%evbp;%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [Sosa]"><span class="mx-1">So</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
-      %if;(evar.bp="on")
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]2 [birth place]"><span class="mx-1">Bp</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;on%and;%evnav;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*visualize/show/hide/summary]1 [birth place]"><span class="mx-1">Bp</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
-      %if;(evar.nav="on")
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;%evbp;%and;%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*activate/suppress]0 [navigation]"><span class="mx-1">Nav</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url%with;%evimg;%and;%evsib;%and;%evsosa;%and;%evbp;%and;on%end;" class="px-1 border-0 btn btn-outline-secondary btn-sm" title="[*activate/suppress]1 [navigation]"><span class="mx-1">Nav</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%) <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
+      <a href="%prefix_base;%if;(evar.image!="on")image=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="image")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.image!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [image/images]0"
+      ><i class="fa fa-photo fa-fw"></i>
+        <i class="fa fa-toggle-%if;(evar.image!="on")off%else;on%end; text-muted"></i>
+      </a>
+      <a href="%prefix_base;%if;(evar.siblings!="on")siblings=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="siblings")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.siblings!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [siblings]"
+      ><i class="fa fa-users mx-1"></i>
+        <i class="fa fa-toggle-%if;(evar.siblings!="on")off%else;on%end; text-muted"></i>
+      </a>
+      <a href="%prefix_base;%if;(evar.sosa!="on")sosa=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [Sosa]"
+      ><span class="mx-1">So</span>
+        <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
+      </a>
+      <a href="%prefix_base;%if;(evar.bp!="on")bp=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="bp")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.bp!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [birth place]"
+      ><span class="mx-1">Bp</span>
+        <i class="fa fa-toggle-%if;(evar.bp!="on")off%else;on%end; text-muted"></i>
+      </a>
+      <a href="%prefix_base;%if;(evar.nav!="on")nav=on;%end;%nn;
+        %foreach;env_binding;%if;(env.key!="nav")%env.key=%env.val;;%end;%end;"
+        class="btn btn-outline-secondary btn-sm border-0 px-0"
+        title="%if;(evar.nav!="on")[*visualize/show/hide/summary]1%else;%nn;
+           [*visualize/show/hide/summary]2%end; [navigation]"
+      ><span class="mx-1">Nav</span>%(<i class="fa fa-plus"></i><i class="fa fa-user"></i>%)
+        <i class="fa fa-toggle-%if;(evar.nav!="on")off%else;on%end; text-muted"></i>
+      </a>
     </div>
   </div>
 %end;
