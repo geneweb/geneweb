@@ -1248,33 +1248,6 @@
   %end;
 %end;
 
-%define;rebuild_url(mmm,xxx,vvv,nnn,ccc,iii,ppp)
-  %let;new_url;%prefix;m=mmm;%nn;
-  %access;;t=xxx;%nn;
-  %if;(evar.num="on")num=on;%nn;%end;
-  %if;(evar.nowrap="on")nowrap=on;%nn;%end;
-  %if;(evar.title="on")title=on;%nn;%end;
-  %if;(evar.birth="on")birth=on;%nn;%end;
-  %if;(evar.birth_place="on")birth_place=on;%nn;%end;
-  %if;(evar.marr= "on")marr=on;%nn;%end;
-  %if;(evar.marr_date="on")marr_date=on;%nn;%end;
-  %if;(evar.marr_place="on")marr_place=on;%nn;%end;
-  %if;(evar.child="on")child=on;%nn;%end;
-  %if;(evar.death="on")death=on;%nn;%end;
-  %if;(evar.death_place="on")death_place=on;%nn;%end;
-  %if;(evar.age="on")age=on;%nn;%end;
-  %if;(evar.occu="on")occu=on;%nn;%end;
-  %if;(evar.gen="on")gen=on;%nn;%end;
-  %if;(evar.notes="on")notes=on;%nn;%end;
-  %if;(evar.src="on")src=on;%nn;%end;
-  %if;("vvv"!="")vvv;%end;
-  %if;("nnn"!="")nnn;%end;
-  %if;("ccc"!="")ccc;%end;
-  %if;("iii"!="")iii;%end;
-  %if;("ppp"!="")ppp;%end;
-  %in;
-  %new_url;
-%end;
 
 %(
    Main
@@ -1299,51 +1272,30 @@
 </h1>
 
 %if;(evar.t = "Z" and not cancel_links)
-  <div class="d-flex">
-    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"
-      href="%prefix;p=%first_name;;n=%surname;;m=A">
-        <i class="fa fa-cog fa-lg fa-fw mr-1">
-        </i>[*options] [ancestors] 
+  <div class="form-inline">
+    <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=A"
+    ><i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors]
     </a>
-    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"
-      href="%apply;rebuild_url%with;D
-            %and;I
-            %and;v=%max_desc_level;
-            %and;%if;(evar.ns="on")ns=on%end;
-            %and;%if;(evar.cgl="on")cgl=on%end;
-            %and;%if;(evar.image="on")image=on%end;
-            %and;%if;(evar.px!="")px=%evar.px;%end;
-            %end;"
-      class="btn btn-secondary">
-      <span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]
+    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" 
+      href="%prefix_base;m=D;t=I;v=%max_desc_level;;%nn;
+        %foreach;env_binding;%if;(not (env.key="m" or env.key="v" or env.key="t"))%env.key=%env.val;;%end;%end;"
+      class="btn btn-outline-secondary"
+    ><span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]
     </a>
-    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"
-      href="%prefix;m=A;t=T;%access;;v=%evar.v;;image=on;marriage=on">
-      <span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]
+    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%prefix;m=A;t=T;%access;;v=%evar.v;;image=on;marriage=on"
+    ><span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]
     </a>
-    <div class="mr-5">
-      <a role="button" class="btn pl-3
-      %if;(evar.v<"3")disabled" aria-disabled="true"%else;"%end;
-        href="%apply;rebuild_url%with;A
-            %and;%evar.t;
-            %and;v=%expr(evar.v-1)
-            %and;%if;(evar.ns="on")ns=on%end;
-            %and;%if;(evar.cgl="on")cgl=on%end;
-            %and;%if;(evar.image="on")image=on%end;
-            %and;%if;(evar.px!="")px=%evar.px;%end;
-            %end;"
+    <div class="input-group ml-3 mb-1">
+            <a role="button" class="btn pl-3
+      %if;(evar.v<3)disabled" aria-disabled="true"%else;"%end;
+        href="%prefix_base;m=A;v=%expr(evar.v-1);;%nn;
+            %foreach;env_binding;%if;(not (env.key="m" or env.key="v"))%env.key=%env.val;;%end;%end;"
         class="btn btn-secondary" title="[*delete] 1 [generation/generations]0">
         <i class="fa fa-minus fa-lg"></i>
       </a>
       <a role="button" class="btn"
-        href="%apply;rebuild_url%with;A
-              %and;%evar.t;
-              %and;v=%expr(evar.v+1)
-              %and;%if;(evar.ns="on")ns=on%end;
-              %and;%if;(evar.cgl="on")cgl=on%end;
-              %and;%if;(evar.image="on")image=on%end;
-              %and;%if;(evar.px!="")px=%evar.px;%end;
-              %end;"
+        href="%prefix_base;m=A;v=%expr(evar.v+1);;%nn;
+          %foreach;env_binding;%if;(not (env.key="m" or env.key="v"))%env.key=%env.val;;%end;%end;"
           class="btn btn-secondary" title="[*add] 1 [generation/generations]0">
           <i class="fa fa-plus fa-lg"></i>
         </a>
@@ -1352,41 +1304,26 @@
   </div>
   <div class="d-flex">
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-      href="%apply;rebuild_url%with;A
-            %and;Z
-            %and;v=%evar.v;
-            %and;%if;(evar.ns="on")ns=on%end;
-            %and;%if;(evar.cgl="on")cgl=on%end;
-            %and;%if;(evar.image="" or evar.image!="on")image=on%else;image=off%end;
-            %and;px=%evar.px;
-            %end;">
+      href="%prefix_base;m=A;%nn;
+            %foreach;env_binding;%if;(not (env.key="m" or env.key="image"))%env.key=%env.val;;%end;%end;%nn;
+            %if;(evar.image!="on")image=on%end;">
       <i class="fa fa-picture-o fa-lg fa-fw %if;(evar.image="on")text-danger%end; mr-1"></i>%nn;
       %if;(evar.image="" or evar.image!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [image/images]1
     </a>
     %if;(evar.image="on")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-        href="%apply;rebuild_url%with;A
-              %and;Z
-              %and;v=%evar.v;
-              %and;%if;(evar.ns="on")ns=on%end;
-              %and;%if;(evar.cgl="on")cgl=on%end;
-              %and;%if;(evar.image="on")image=on%end;
-              %and;%if;(evar.px="")px=90%elseif;(evar.px="90")px=120%end;
-              %end;"
+         href="%prefix_base;m=A;%nn;
+               %foreach;env_binding;%if;(not (env.key="m" or env.key="px"))%env.key=%env.val;;%end;%end;%nn;
+               %if;(evar.px="")px=90%elseif;(evar.px="90")px=120%end;"
         title="%if;(evar.px="120")60%elseif;(evar.px!="")120%else;90%end; px">
         <i class="fa %if;(evar.px="120")fa-compress%else;fa-expand%end; fa-lg fa-fw mr-1"></i>[*modify] [image/images]1
       </a>
     %end;
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-      href="%apply;rebuild_url%with;A
-            %and;Z
-            %and;v=%evar.v;
-            %and;%if;(evar.ns="on")ns=off%else;ns=on%end;
-            %and;%if;(evar.cgl="on")cgl=on%end;
-            %and;%if;(evar.image="on")image=on%end;
-            %and;%if;(evar.px!="")%evar.px;%end;
-            %end;"
-      title="small arrow in corner shows existence of note or source">
+      href="%prefix_base;m=A;%nn;
+            %foreach;env_binding;%if;(not (env.key="m" or env.key="ns"))%env.key=%env.val;;%end;%end;%nn;
+            %if;(evar.ns!="on")ns=on%end;"
+      title="Small arrow in corner shows existence of note or source">
       <i class="fa fa-file-text-o fa-lg fa-fw %if;(evar.ns="on")text-danger%end; mr-1"></i>%nn;
       %if;(evar.ns="" or evar.ns!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end;%sp;
       <span class="notecolor">[note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1
@@ -1394,15 +1331,9 @@
     </a>
     %if;(evar.cgl="" or evar.cgl!="on")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"
-        href="%apply;rebuild_url%with;A
-              %and;Z
-              %and;v=%evar.v;
-              %and;ns=off
-              %and;cgl=on
-              %and;%if;(evar.image="on")image=on%end;
-              %and;%if;(evar.px="")px=%evar.px;%end;
-              %end;"
-        title="Cancel url links in whole page">
+        href="%prefix_base;m=A;cgl=on;%nn;
+            %foreach;env_binding;%if;(env.key!="m")%env.key=%env.val;;%end;%end;"
+        title="Cancel URL links in whole page">
         <i class="fa fa-chain-broken fa-lg fa-fw mr-1"></i>%nn;[*cancel GeneWeb links]
       </a>
     %end;
@@ -1500,8 +1431,9 @@
           <td><b>[*sort by/generation/alphabetic order]0</b></td>
           <td><img src="%image_prefix;/picto_branch.png"%/></td>
           <td>
-            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;&amp;birth=%evar.birth;&amp;death=%evar.death;&amp;spouse=%evar.spouse;&amp;al=">
-              [sort by/generation/alphabetic order]1
+            <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;%nn;
+              &amp;t=%evar.t;&amp;v=%evar.v;&amp;birth=%evar.birth;&amp;death=%evar.death;&amp;spouse=%evar.spouse;&amp;al="
+            >[sort by/generation/alphabetic order]1
             </a>
           </td>
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
