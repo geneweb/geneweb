@@ -112,27 +112,7 @@
   onmouseover="over1('sxx')" onmouseout="out1('sxx')" %nn;
 %end;
 
-%define;rebuild_url(aaa,vvv,iii,mmm,ttt)
-  %let;new_url;
-  %if;("aaa"="prefix_access")%prefix;%access;;%else;aaa%end;
-  %if;(evar.mar_sp_ch!="")mar_sp_ch=%evar.mar_sp_ch;;%end;
-  %if;(evar.evt_pr_sib!="")evt_pr_sib=%evar.evt_pr_sib;;%end;
-  %if;(evar.simple!="")simple=%evar.simple;;%end;
-  %if;(evar.m!="")m=%evar.m;;%end;
-  %if;(evar.t1!="")t1=%evar.t1;;%end;
-  %if;(iii=1)image=on;%end;
-  %if;(mmm=1)marriage=on;%end;
-  %if;(evar.vh!="")vh=%evar.vh;;%end;
-  %if;(evart!="")t=ttt;%end;
-  %if;(vvv!=3)v=vvv%end;#a%in;
-  %new_url;
-%end;
-
 %let;evarv;%if;(evar.v!="")%evar.v;%else;3%end;%in;
-%let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
-%let;evart1;%if;(evar.t1!="")%evar.t1;%end;%in;
-%let;evarim;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
-%let;evarma;%if;(evar.marriage!="" and evar.marriage="on")1%else;0%end;%in;
 
 <div class="d-flex justify-content-between">
 <h2 id="a">
@@ -141,19 +121,25 @@
 %if;not cancel_links;
   <div class="form-inline">
     <div class="mx-2">
-      %if;(evarim=1)
-        <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
-      %else;
-        <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-      %end;
+        <a href="%prefix_base;%if;(evar.image!="on")image=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="image")%env.key=%env.val;;%end;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
+          title="%if;(evar.image!="on")[*visualize/show/hide/summary]1%else;%nn;
+             [*visualize/show/hide/summary]2%end; [image/images]0"
+        ><i class="fa fa-photo fa-fw"></i>
+          <i class="fa fa-toggle-%if;(evar.image!="on")off%else;on%end; text-muted"></i>
+        </a>
     </div>
-    %if;(evarv>1 and evart="T")
+    %if;(evarv>1 and evar.t="T")
       <div class="mx-2">
-        %if;(evarma=1)
-          <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]2 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
-        %else;
-          <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-outline-secondary btn-sm border-0 px-0" title="[*visualize/show/hide/summary]1 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-        %end;
+          <a href="%prefix_base;%if;(evar.marriage!="on")marriage=on;%end;%nn;
+            %foreach;env_binding;%if;(env.key!="marriage")%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="%if;(evar.marriage!="on")[*visualize/show/hide/summary]1%else;%nn;
+               [*visualize/show/hide/summary]2%end; [date of marriage]"
+          ><i class="fa fa-photo fa-fw"></i>
+            <i class="fa fa-toggle-%if;(evar.marriage!="on")off%else;on%end; text-muted"></i>
+          </a>
       </div>
     %end;
   </div>

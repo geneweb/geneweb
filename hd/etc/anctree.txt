@@ -26,21 +26,18 @@
 %import;menubar
 
 %if;(evar.t="T" and evar.t1="7")
-  %apply;show_templ("perso_module/arbre_7gen")
+  %import;perso_module/arbre_7gen;
 %elseif;(evar.t="T" and evar.t1="h7")
-  %apply;show_templ("perso_module/arbre_h7")
+  %import;perso_module/arbre_h7;
 %elseif;(evar.t="T" and evar.t1="m") %(m for compatibility with existing arbre_9gen %)
-  %apply;show_templ("perso_module/arbre_9gen")
+  %import;perso_module/arbre_9gen;
 %elseif;(evar.t="T" and evar.t1="CT") %(CT for compatibility with templm %)
-  %apply;show_templ("templm/tools")
-  %apply;show_templ("templm/anctree_hi_indexes")
-  %apply;show_templ("templm/anctree_hi")
-%elseif;(evar.t="T")
-  %apply;show_templ("perso_module/arbre_vertical")
-%elseif;(evar.t="A")
-  %apply;show_templ("perso_module/arbre_vertical")
-%elseif;(evar.t="C")
-  %apply;show_templ("perso_module/arbre_vertical")
+  %import;perso_module/arbre_hi_tools;
+  %import;templm/tools;
+  %import;templm/anctree_hi_indexes
+  %import;templm/anctree_hi;
+%elseif;(evar.t="A" or evar.t="C" or evar.t="T")
+  %import;perso_module/arbre_vertical;
 %else;
   bad values for evar.t and evar.t1
 %end;

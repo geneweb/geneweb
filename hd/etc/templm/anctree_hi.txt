@@ -227,9 +227,8 @@
       %if;(evar.cgl!="on")
       <div>
         <a style="width:100%%;zindex:2;"
-          href="%apply;rebuild_url_2%with;%evarv;%and;%evarhi;%and;%nn;
-                  %evarim;%and;%evarix;%and;%evarso;%and;%evarcpl;%and;%evarsms;%and;%evarscl;%and;%evarfs;%nn;
-                %end;%aaaaccess;;t=T;t1=CT;"
+          href="%prefix_base;%aaaaccess;;t=T;t1=CT;
+            %foreach;env_binding;%if;(not (env.key="t" or env.key="t1" or env.key="p" or env.key="n"))%env.key=%env.val;;%end;%end;"
           %if;(aaasame!="")%apply;implex1(aaasame.v)%end;%nn;
           title='[*generation/generations]0 %level; – Sosa %nn;
             %if;(evarcpl="")%aaaanc_sosa; %if;(aaasame!="")=Sosa %aaasame;%end;
@@ -586,7 +585,7 @@
 %end;
 
 Arbre des ancêtres de %first_name; %surname; %dates;
-  %let;boxsize;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))2%else;1%end;%in;
+%let;boxsize;%if;((evarv<9 and evarcpl!="on") or (evarv<10 and evarcpl="on"))2%else;1%end;%in;
 %if;((evarcpl="on" and evarv < 4) or (evarcpl!="on" and evarv < 3))
   [*compact tree][:] [specify::generation/generations]0 > 3.
 %else;
