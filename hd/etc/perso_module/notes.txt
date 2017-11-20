@@ -69,7 +69,7 @@
   %if;(has_linked_page.NOTE and linked_page.NOTE!="")
     <p>%apply;capitalize(linked_page.NOTE).</p>
   %end;
-%elseif;(count>0 or count2>0 and op_m=2)
+%elseif;((count>0 or count2>0) and op_m=2)
   <h3 id="notes" class="mt-2">[*note/notes]1</h3>
     %if;(has_linked_page.BNOTE and linked_page.BNOTE!="")
       <blockquote>%apply;capitalize(linked_page.BNOTE).</blockquote>
