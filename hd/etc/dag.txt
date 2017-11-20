@@ -88,7 +88,7 @@
           <a href="%prefix_base;%foreach;env_binding;%env.key;=%env.val;;%end;%nn;
                 notab=on;slices=on" accesskey="/" 
             title="[*display by slices/slice width/overlap/total width]0">
-            <samp>//</sapm>
+            <span>//</span>
           </a>
         </div>
       %end;

@@ -120,25 +120,6 @@
   %if;(evar.p_mod!="")p_mod=%evar.p_mod;;%end;%nn;
 %end;
 
-%define;rebuild_url_2(vvv,hhh,iii,xxx,sss,mmm,yyy,zzz,fff)
-  %let;nv0;%apply;min%with;%if;(evarcpl="on")13%else;12%end;%and;vvv%end;%in;
-  %let;nv;%if;(nv0<3)3%else;%nv0;%end;%in;
-  %let;new_url;%nn;
-    %prefix_no_all;%apply;prefix_all()%nn;
-    %if;(evar.m!="")m=%evar.m;;%end;%nn;
-    %if;("vvv"!="")v=%nv;;%end;%nn;
-    %if;("hhh"="I")hi=I;%else;hi=H;%end;%nn;
-    %if;("iii"="on")image=on;%end;%nn;
-    %if;("xxx"="on")implx=on;%end;%nn;
-    %if;("sss"="on")sosa=on;%end;%nn;
-    %if;("mmm"="on")cpl=on;%end;%nn;
-    %if;("yyy"="on")sms=on;%end;%nn;
-    %if;("zzz"!="")scale=zzz;%end;%nn;
-    %if;("fff"!="")fs=fff;%end;%nn;
-  %in;
-  %new_url;
-%end;
-
 %(a=ancestor, s=sosa, p=has_parents, bg=background, t=top, l=left  %)
 %define;boxsosa(aaa, sss, ppp, bgg, lll, ttt)
     <div id="s%aaaanc_sosa.v;"
