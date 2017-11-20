@@ -195,8 +195,10 @@
       %end;
     %end;
     %if;(bvar.wide!="on")
-      <br/><a href="%prefix_no_wide;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="on");wide=on%else;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
-      title="%if;(evar.wide="on")[full width/columns]1%else;[full width/columns]0%end;">%if;(evar.wide!="on")⚊%else;⚋%end;</a>
+      <br/><a href="%prefix_base;%if;(evar.wide!="on")wide=on;%end;%nn;
+              %foreach;env_binding;%if;(env.key!="wide")%env.key=%env.val;;%end;%end;"
+              title="%if;(evar.wide="on")[full width/columns]1%else;[full width/columns]0%end;">%if;(evar.wide!="on")⚊%else;⚋%end;
+           </a>
     %end;
     %if;(wizard and bvar.misc!="yes")
       <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="");image=%evar.image;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="yes");misc=yes%else;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
