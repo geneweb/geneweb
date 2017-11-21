@@ -361,54 +361,6 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
         </ul>
       </div>
     </nav>
-    <div class="float-left">
-      <div class="d-flex fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
-        <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%prefix;">
-          <i class="fa fa-home fa-lg fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
-          <span class="sr-only">[*home]</span>%nn;
-        </a>%nn;
-        <a role="button" class="btn btn-link text-muted %(ml-%if;(referer="")4%else;0%end;%) p-1"
-          href="%prefix_base;%if;(evar.wide!="on")wide=on;%end;%nn;
-            %foreach;env_binding;%if;(env.key!="wide")%env.key=%env.val;;%end;%end;"
-          title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
-          <i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-fw" aria-hidden="true"></i>%nn;
-          <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
-        </a>
-        <a role="button" class="btn btn-link text-muted ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
-          <i class="fa fa-search fa-lg" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
-          <span class="sr-only">[*search/case sensitive]0</span>%nn;
-        </a>
-        %if;(referer!="")
-          <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%referer;" title="Revenir en arrière">%nn;
-            <i class="fa fa-arrow-left fa-lg fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
-            <span class="sr-only">[*back]</span>%nn;
-          </a>%nn;
-        %end;
-      </div>
-    </div>
-  </div>
-  <div class="modal" id="searchmodal" role="dialog" aria-labelledby="searchpopup" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-body" id="ModalSearch">
-          <form id="collapse_search" method="get" action="%prefix;">
-            %hidden;
-            <input type="hidden" name="m" value="S">
-            <div class="d-flex justify-content-center ">
-              <h5 class="rounded modal-title my-2 text-center w-50 align-self-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h5>
-              <div class="col-8">
-                <label class="sr-only" for="n">Search public name</label>
-                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;" autofocus>
-                <label class="sr-only" for="p">Search firstname</label>
-                <input type="search" id="p" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]0">
-              </div>
-              <div class="mt-2">
-                <button class="btn btn-primary" type="submit" title="[*validate/delete]0"><span class="fa fa-search fa-fw my-4"></span></button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+  %import;home
   </div>
 %end;
