@@ -130,8 +130,8 @@
 
 %if;(evar.t = "T")%nn;
   <div class="text-%right">%nn;
-  <a href="%prefix_base;m=A;t=T;v=%evar.v;;%access;%nn;
-  ;dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
+  <a href="%prefix_base;%foreach;env_binding;%env.key=%env.val;;%end;%nn;
+  dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
 %end;
 
 %define;tree(xx)
@@ -161,14 +161,14 @@
       <div class="form-inline">
         <div class="btn-group mx-2">
           %if;(maxlev>9 and evarv>5)
-            <a href="%prefix_base;v=%expr(evarv-5);%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv-5);%end;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(-5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]1 (max %maxlev;)"
             >&nbsp;-⁵
             </a>
-            <a href="%prefix_base;v=%expr(evarv-1);%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv-1);%end;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(-1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)"
             >&nbsp;-
@@ -176,22 +176,23 @@
           %end;
           %for;i;minv;maxv;
             <a id="v%i;" class="btn btn-outline-%if;(evarv=i)dark font-weight-bold disabled%else;secondary%end; btn-sm border-0 px-1"
-              href="%prefix_base;v=%expr(i);;%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
+              href="%prefix_base;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(i);%end;%end;"
               title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end; %if;(i=maxlev)(max)%end;"
             >%i;
             </a>
           %end;
           %if;(maxlev>9 and maxlev-evarv>=5)
-            <a href="%prefix_base;v=%expr(evarv+1);%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%nn;
+                %foreach;env_binding;
+                %if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv+1);%end;%end;%nn;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)"
             >&nbsp;+
             </a>
-            <a href="%prefix_base;v=%expr(evarv+5);%nn;
-                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv+5);%end;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)"
             >&nbsp;+⁵
@@ -200,20 +201,17 @@
         </div>
         %if;(evarv>1)
           <div class="btn-group mx-2">
-            <a href="%prefix_base;t=A;%nn;
-                %foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%else;t=A;%end;%end;"
               class="btn btn-outline-%if;(evar.t="A")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0"
               title="[*male line/female line]1"
             >A
             </a>
-            <a href="%prefix_base;t=C;%nn;
-                %foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%else;t=C;%end;%end;"
               class="btn btn-outline-%if;(evar.t="C")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
               title="[*male line/female line]1"
             >C
             </a>
-            <a href="%prefix_base;t=T;%nn;
-                %foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%else;t=T;%end;%end;"
               class="btn btn-outline-%if;(evar.t="T")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
               title="[*male line/female line]1"
             >T
@@ -221,8 +219,9 @@
           </div>
         %end;
         <div class="mx-2">
-          <a href="%prefix_base;%if;(evar.image!="on")image=on;%end;%nn;
-              %foreach;env_binding;%if;(env.key != "image")%env.key=%env.val;;%end;%end;"
+          <a href="%prefix_base;%nn;
+            %foreach;env_binding;%if;(env.key != "image")%env.key=%env.val;;%end;%end;%nn;
+            %if;(evar.image!="on")image=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
             title="%if;(evar.image="on")[*visualize/show/hide/summary]2%else;%nn;
               [*visualize/show/hide/summary]1%end; [image/images]1"
@@ -232,8 +231,9 @@
         </div>
         %if;(evarv>1 and evar.t="T")
           <div class="mx-2">
-            <a href="%prefix_base;%if;(evar.marriage!="on")marriage=on;%end;%nn;
-              %foreach;env_binding;%if;(env.key!="marriage")%env.key=%env.val;;%end;%end;"
+            <a href="%prefix_base;%nn;
+              %foreach;env_binding;%if;(env.key!="marriage")%env.key=%env.val;;%end;%end;%nn;
+              %if;(evar.marriage!="on")marriage=on;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0"
               title="%if;(evar.marriage!="on")[*visualize/show/hide/summary]1%else;
                   [*visualize/show/hide/summary]2%end; [date of marriage]"
@@ -243,8 +243,9 @@
           </div>
         %end;
         <div class="mx-2">
-          <a href="%prefix_base;%if;(evar.dag!="on")dag=on;%end;%nn;
-              %foreach;env_binding;%if;(env.key!="dag")%env.key=%env.val;;%end;%end;"
+          <a href="%prefix_base;%nn;
+              %foreach;env_binding;%if;(env.key!="dag")%env.key=%env.val;;%end;%end;%nn;
+              %if;(evar.dag!="on")dag=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
             title="%if;(evar.dag="on")[*dag on/dag off]1%else;[*dag on/dag off]0%end;"
           ><i class="fa fa-%if;(evar.dag="on")minus%else;plus%end; fa-fw"></i>
