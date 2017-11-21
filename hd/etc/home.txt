@@ -33,11 +33,12 @@
           <form id="collapse_search" method="get" action="%prefix;">
             %hidden;
             <input type="hidden" name="m" value="S">
-            <div class="d-flex justify-content-center ">
+            <div class="d-flex justify-content-center">
               <h5 class="rounded modal-title my-2 text-center w-50 align-self-center" id="searchpopup">[*search/case sensitive]0 [person/persons]0</h5>
               <div class="col-8">
                 <label class="sr-only" for="n">Search public name</label>
-                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa relative to] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;" autofocus>
+                <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]"
+                  autofocus>
                 <label class="sr-only" for="p">Search firstname</label>
                 <input type="search" id="p" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]0">
               </div>
