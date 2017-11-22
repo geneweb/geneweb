@@ -4,7 +4,7 @@
 %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
 %let;evart1;%if;(evar.t1!="")%evar.t1;%else;CT%end;%in;
 %let;evarhi;%if;(evar.hi!="")%evar.hi;%else;H%end;%in;
-%let;evarim;%if;(evar.image!="" and evar.image="on")on%end;%in;
+%let;evarim;%if;(evar.image!="" and evar.image!="off")on%end;%in;
 %let;evarix;%if;(evar.implx!="" and evar.implx="on")on%end;%in;
 %let;evarso;%if;(evar.sosa!="" and evar.sosa="on")on%end;%in;
 %let;evarcpl;%if;(evar.cpl!="" and evar.cpl="on")on%end;%in;

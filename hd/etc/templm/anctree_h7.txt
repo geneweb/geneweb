@@ -63,7 +63,7 @@
                %if;(evar.cgl = "on") checked="checked"%end;%/>[cancel GeneWeb links]</label>
         %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
           <label><input type="checkbox" name="image" value="on" %l_on;
-                 %if;(evar.image = "on") checked="checked"%end;%/>[image/images]1</label>
+                 %if;(evar.image!="off") checked="checked"%end;%/>[image/images]1</label>
         %end;
         <label><input type="checkbox" name="siblings" value="on" %l_on;
                  %if;(evar.siblings = "on") checked="checked"%end;%/>[full siblings]</label>
@@ -83,7 +83,7 @@
 
 %define;somebody()
   <a href="%prefix;%access;" class="s%sex; nc%has_children;">
-    %if;(evar.image = "on" and has_image)
+    %if;(evar.image!="off" and has_image)
       <img src="%image_url;"%/><br%/>
     %end;
     %if;(evar.sosa = "on" and browsing_with_sosa_ref and has_sosa)
@@ -97,7 +97,7 @@
 <div id="htree">
   %foreach;ancestor_level(7)
     <div id="l%level;">
-      %if;(evar.image = "on" and level > 1 and level < 5)
+      %if;(evar.image!="off" and level > 1 and level < 5)
         %foreach;ancestor;
           %if;ancestor.has_image;
             <p id="pi%ancestor.anc_sosa.v;"><img src="%ancestor.image_url;"%/></p>

@@ -197,7 +197,8 @@ value image_url_txt_with_size conf base url_p url width height =
 
 value image_txt conf base p =
   match p_getenv conf.env "image" with
-  [ Some "on" ->
+  [ Some "off" -> ""
+  | _ ->
       match image_and_size conf base p (limited_image_size 100 75) with
       [ Some (True, f, Some (wid, hei)) ->
           "<br" ^ conf.xhs ^
@@ -219,7 +220,7 @@ value image_txt conf base p =
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt conf base url_p url 75 ^ "</td></tr></table></center>\n"
       | _ -> "" ]
-  | _ -> "" ]
+    ]
 ;
 
 (* *)

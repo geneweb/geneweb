@@ -3655,7 +3655,7 @@ value print_image_sex conf p size =
 (* ********************************************************************** *)
 value display_options conf =
   let s =
-    if p_getenv conf.env "image" = Some "on" then ";image=on"
+    if p_getenv conf.env "image" = Some "off" then ";image=off"
     else ""
   in
   let s =
