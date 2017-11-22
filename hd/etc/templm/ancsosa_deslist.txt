@@ -161,7 +161,7 @@
 %define;somebody_info2(z1)
   %if;(not cancel_links)  <a href="javascript:;" onclick="javascript:dsp01('d%count;');this.focus();"> … </a>%end;
   <div id="d%count;" class="%ldsp;">
-    %if;(evar.image="on" and z1.has_image)
+    %if;(evar.image!="off" and z1.has_image)
       <img class="image" src="%z1.image_url;" alt="[image/images]0" title="%z1;"%/>%nn;
     %end;
   <dl class="inot">
@@ -251,7 +251,7 @@
     %end;
     %if;lazy_printed;</p>%else;%apply;lazy_print("")%end;
   %end;
-  %if;(evar.image = "on" and z1.has_image)<div style="clear:both;"></div>%end;
+  %if;(evar.image!="off" and z1.has_image)<div style="clear:both;"></div>%end;
   </div>
 %end;
 

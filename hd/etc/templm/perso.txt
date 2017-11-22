@@ -190,8 +190,8 @@
       title="%if;(evar.age!="on")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [age]/[event/events]1" style="%if;(evar.age="on")color:red;%end;">🎂</a>
     %if;(bvar.event_age!="on")
       %if;(bvar.no_image_for_visitor != "yes" or friend or wizard)
-        <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="on" or evar.image="");image=on%else;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
-        title="%if;(evar.image!="on")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [image/images]1" style="%if;(evar.image="on")color:red;%end;">🎴</a>
+        <br/><a href="%prefix;%access;%if;(evar.spouse!="");spouse=%evar.spouse;%end;%if;(evar.age!="");age=%evar.age;%end;%if;(evar.image!="off");image=off%else;%end;%if;(evar.wide!="");wide=%evar.wide;%end;%if;(evar.misc!="")misc=%evar.misc;%end;%if;(evar.maxlev!="");maxlev=%evar.maxlev;%end;%if;(evar.asclev!="");asclev=%evar.asclev;%end;"
+        title="%if;(evar.image="off")[visualize/show/hide/summary]1%else;[visualize/show/hide/summary]2%end; [image/images]1" style="%if;(evar.image!="off")color:red;%end;">🎴</a>
       %end;
     %end;
     %if;(bvar.wide!="on")
@@ -395,7 +395,7 @@
     %end;
   %end;
   %if;(has_families)
-    %if;(evar.image="on")
+    %if;(evar.image!="off")
       %foreach;family;
           %if;(evar.spouse != "off")
             <div class="image_sheet" style="font-size: 80%%;">
@@ -441,7 +441,7 @@
 %end;
 %define;children_list()
   %if;has_children;
-    %if;(evar.image="on")
+    %if;(evar.image!="off")
       %foreach;child;
         <div class="image_sheet">
           %if;(has_image)%apply;link_image("self")<br%/>%end;
@@ -470,7 +470,7 @@
   %end;
 %end;
 %define;content_family(xx,yy)
-  %if;(evar.image="on")
+  %if;(evar.image!="off")
     <div class="image_sheet">
       %if;(xx.has_image)%apply;link_image("xx")<br%/>%end;
       %xx;%xx.title; %xx.dates;
@@ -1347,7 +1347,7 @@
          style="border:0px;font-size:17px" title="[*invert::event/events]1 [family/families]0">⇳</a></span>%)
         %apply;content_family("self","spouse")
         %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em>%nl;%end;
-        %if;(evar.image = "on" and nb_families > 1)<hr style="clear:both;"%/>%end;
+        %if;(evar.image!="off" and nb_families > 1)<hr style="clear:both;"%/>%end;
       </div>
     %end;
   %else;

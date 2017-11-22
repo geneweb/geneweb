@@ -334,7 +334,7 @@ value set_senv conf vm vi =
   do {
     conf.senv := [("em", vm); ("ei", vi)];
     match p_getenv conf.env "image" with
-    [ Some "on" -> conf.senv := conf.senv @ [("image", "on")]
+    [ Some "off" -> conf.senv := conf.senv @ [("image", "off")]
     | _ -> () ];
     match p_getenv conf.env "long" with
     [ Some "on" -> conf.senv := conf.senv @ [("long", "on")]

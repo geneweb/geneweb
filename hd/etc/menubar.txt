@@ -48,7 +48,7 @@
           %( individu %)
           <li class="nav-item">
             <a class="nav-link %if;(evar.m="")active%end;" id="self"
-              href="%prefix_no_all;%if;(evar.templ!="")templ=%evar.templ;;%end;%access;%if;(evar.image="on");image=on%end;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
+              href="%prefix_no_all;%if;(evar.templ!="")templ=%evar.templ;;%end;%access;%if;(evar.image="off");image=off%end;" title="%first_name;%if;(occ!=0).%occ%end; %surname;">
               <span class="fa fa-user fa-fw %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">%first_name;%if;(occ!=0).%occ%end; %surname;</span>
             </a>
@@ -57,7 +57,7 @@
           <li class="nav-item">
             <a class="nav-link %if;(evar.m="F")active%end;" %nn;
               href="%prefix;m=F;%access;;%nn;
-                %if;(bvar.default_fnav_images="on")image=on;%end;%nn;
+                %if;(bvar.default_fnav_images="off")image=off;%end;%nn;
                 %if;(bvar.default_fnav_semi="on")semi=on;%end;%nn;
                 %if;(bvar.default_fnav_spouse="on")spouse=on;%end;" title="[*family/families]0">
               <span class="fa fa-plus fa-users fa-fw %sexcolor;" aria-hidden="true"></span>
@@ -262,11 +262,11 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="%prefix;%access;;m=A;"><span class="fa fa-cog fa-fw mr-2"></span>[*ancestors]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" id="anc_tree" href="%prefix;%access;;m=A;t=T;v=5;image=on;marriage=on;" %laY;><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>[*ascendants tree]</a>
+                <a class="dropdown-item" id="anc_tree" href="%prefix;%access;;m=A;t=T;v=5;marriage=on;" %laY;><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>[*ascendants tree]</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=h7;wide=on;" title="[Arbre 7 gen]"><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>7 [generation/generations]1</a>
-                <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=m;images=on;" title="[Arbre 9 gen]"><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>9 [generation/generations]1</a>
+                <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=m;" title="[Arbre 9 gen]"><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>9 [generation/generations]1</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=CT;hi=H;sosa=on;v=5;scale=100;fs=17;sosa=on;" title="[Arbre HI] [with] %sosa_ref;"><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>HI</a>
-                <a class="dropdown-item" href="%prefix;%access;;m=A;t=Z;image=%evar.image;;v=7;maxv=%max_anc_level;;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;age=on;occu=on;gen=on;;ns=on;image=on;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestors]</a>
+                <a class="dropdown-item" href="%prefix;%access;;m=A;t=Z;v=7;maxv=%max_anc_level;;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;ns=on;%if;(evar.image="off")image=off;%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestors]</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=G;v=3;maxv=%max_anc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;"><span class="fa fa-newspaper-o fa-fw mr-2"></span>[*long display]</a>
                 <a class="dropdown-item" href="%prefix;i=%index;;m=A;t=F;tf1=sb;v=%max_anc_level;;maxv=%max_anc_level;;"><span class="fa fa-reorder fa-fw mr-2"></span>[*surnames branch]</a>
               </div>
@@ -278,8 +278,8 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="%prefix;m=D;%access;"><span class="fa fa-cog fa-fw mr-2"></span>[*descendants]</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
-                <a class="dropdown-item" href="%prefix;m=D;t=I;%access;;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;age=on;occu=on;gen=on;ns=on;image=on;"></span><span class="fa fa-table fa-fw mr-2"></span>[*table] [descendants]</a>
+                <a class="dropdown-item" href="%prefix;m=D;t=T;v=4;%access"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
+                <a class="dropdown-item" href="%prefix;m=D;t=H;%access;;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;ns=on;%if;(evar.image="off")image=off;%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [descendants]</a>
                 <a class="dropdown-item" href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;%access;"><span class="fa fa-newspaper-o fa-fw mr-2"></span>[*long display]</a>
                 <a class="dropdown-item" href="%prefix;m=D;t=A;num=on;v=%max_desc_level;;%access"><span class="fa fa-code-fork fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
               </div>
@@ -293,20 +293,20 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               %if;(browsing_with_sosa_ref)
                 %if;(sosa_ref.index != "" and sosa_ref.index != index)
                   <span class="dropdown-header">[*shortest path] [with]…</span>
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;image=on;et=S" title="[*shortest path] [with] %sosa_ref;">
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;et=S" title="[*shortest path] [with] %sosa_ref;">
                     %sosa_ref; <i>(Sosa 1)</i>
                   </a>
                 %end;
               %end;
               <span class="dropdown-header">[*relationship by marriage] [with]…</span>
               %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;image=on;">
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;">
                     %sosa_ref; <i>(sosa 1)</i>
                 </a>
               %end;
               %foreach;family;
                 %if;(spouse != "? ?")
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;image=on;">
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;">
                       %spouse;
                       %if;spouse.has_nobility_titles;,%sp;
                       <em>%spouse.nobility_title;</em>%end;%nl;
@@ -316,7 +316,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               %end;
               %foreach;relation;
                 %if;has_relation_him;
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;image=on;">
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;">
                       %relation_him;
                       %if;relation_him.has_nobility_titles;,%sp;
                       <em>%relation_him.nobility_title;</em>%end;%nl;
@@ -324,7 +324,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                   </a>
                 %end;
                 %if;has_relation_her;
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;image=on;">
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;">
                       %relation_her;
                       %if;relation_her.has_nobility_titles;,%sp;
                       <em>%relation_her.nobility_title;</em>%end;%nl;
@@ -333,7 +333,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                 %end;
               %end;
               %foreach;related;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;image=on;">
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;">
                     %related;
                     %if;related.has_nobility_titles;,%sp;
                     <em>%related.nobility_title;</em>%end;%nl;
@@ -341,7 +341,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                 </a>
               %end;
               %foreach;event_witness_relation;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;image=on;">
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;">
                     %event_witness_relation.person;%nl;
                     <i>([witness/witnesses]0)</i>%nl;
                 </a>

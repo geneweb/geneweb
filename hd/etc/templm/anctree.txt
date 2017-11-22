@@ -62,7 +62,7 @@
         <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
       %end;
       %cell.person.title;%cell.person.dates;
-      %if;(evar.image = "on" and cell.person.has_image)
+      %if;(evar.image!="off" and cell.person.has_image)
         <br%/>
         %if;(evar.cgl != "on")
           <a href="%cell.person.image_html_url;"

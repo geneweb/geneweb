@@ -22,7 +22,7 @@
     <td colspan="%cell.colspan;" class="text-center align-bottom py-0">%nn;
       %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
       %else;
-        %if;(evar.image = "on" and cell.person.has_image)
+        %if;(evar.image!="off" and cell.person.has_image)
           %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
           <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
            alt="[image/images]0" title="[image/images]0"%/>%nn;
@@ -69,7 +69,7 @@
             ;m=%if;(evar.m!="")%evar.m;%else;A%end;%nn;
             ;t=%if;(evar.t!="")%evar.t;%else;T%end;%nn;
             ;v=%if;(evar.v!="")%evar.v;%else;3%end;%nn;
-            %if;(evar.image = "on");image=on%end;%nn;
+            %if;(evar.image!="off");image=on%end;%nn;
             %if;(evar.marriage = "on");marriage=on%end;"
             title="%if;(evar.m="")[*tree][:] [full width/columns]0%end;">│</a>%nn;
         %end;
@@ -102,7 +102,7 @@
   %if;(yy > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", yy - 1)%end;
     <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(evar.image = "on" and xx.has_image)
+    %if;(evar.image!="off" and xx.has_image)
       <br>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
@@ -117,7 +117,7 @@
   %if;(yy > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", yy - 1)%end;
     <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(evar.image = "on" and xx.has_image)
+    %if;(evar.image!="off" and xx.has_image)
       <br>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
@@ -221,12 +221,12 @@
         <div class="mx-2">
           <a href="%prefix_base;%nn;
             %foreach;env_binding;%if;(env.key != "image")%env.key=%env.val;;%end;%end;%nn;
-            %if;(evar.image!="on")image=on;%end;"
+            %if;(evar.image!="off")image=off;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
-            title="%if;(evar.image="on")[*visualize/show/hide/summary]2%else;%nn;
-              [*visualize/show/hide/summary]1%end; [image/images]1"
+            title="%if;(evar.image="off")[*visualize/show/hide/summary]1%else;%nn;
+              [*visualize/show/hide/summary]2%end; [image/images]1"
           ><i class="fa fa-photo fa-fw"></i>
-            <i class="fa fa-toggle-%if;(evar.image="on")on%else;off%end; text-muted"></i>
+            <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-muted"></i>
           </a>
         </div>
         %if;(evarv>1 and evar.t="T")
