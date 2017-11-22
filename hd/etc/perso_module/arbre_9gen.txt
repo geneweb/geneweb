@@ -121,13 +121,13 @@
 %if;not cancel_links;
   <div class="form-inline">
     <div class="mx-2">
-        <a href="%prefix_base;%if;(evar.image!="on")image=on;%end;%nn;
+        <a href="%prefix_base;%if;(evar.image!="off")image=off;%end;%nn;
           %foreach;env_binding;%if;(env.key!="image")%env.key=%env.val;;%end;%end;"
           class="btn btn-outline-secondary btn-sm border-0 px-0"
-          title="%if;(evar.image!="on")[*visualize/show/hide/summary]1%else;%nn;
+          title="%if;(evar.image="off")[*visualize/show/hide/summary]1%else;%nn;
              [*visualize/show/hide/summary]2%end; [image/images]0"
         ><i class="fa fa-photo fa-fw"></i>
-          <i class="fa fa-toggle-%if;(evar.image!="on")off%else;on%end; text-muted"></i>
+          <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-muted"></i>
         </a>
     </div>
     %if;(evarv>1 and evar.t="T")
@@ -239,11 +239,11 @@
           %if;(ancestor.birth_date.year != "" and ancestor.is_dead) – %end;
           %if;(ancestor.birth_date.year = "" and ancestor.death_date.year != "")†%else;%ancestor.death_date.year;%end;&#013;<br>
       <table style="width:%wid;px; align:center"><tr>
-      <td style="width:35%%">%if;(evar.image="on")
+      <td style="width:35%%">%if;(evar.image!="off")
         %if;(ancestor.has_image)<img src="%ancestor.image_url;" height="50px"%/>%end;
       %end;</td>
       <td style="width:30%%">&nbsp;&amp;%if;(evar.marriage="on")%ancestor.family.marriage_date.year;%end;&nbsp;</td>
-      <td style="width:35%%">%if;(evar.image="on")
+      <td style="width:35%%">%if;(evar.image!="off")
         %if;(ancestor.spouse.has_image)<img src="%ancestor.spouse.image_url;" height="50px"%/>%end;
       %end;</td>
       </tr></table>

@@ -74,7 +74,7 @@
 %end;
 
 %define;imgtdz(xx)
-  %if;(evar.image="on" and xx.has_image)
+  %if;(evar.image!="off" and xx.has_image)
     <img class="imgtdz" src="%xx.image_url;" %lai; title="%xx;"%/>%nn;
   %end;
 %end;
