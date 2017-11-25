@@ -45,7 +45,7 @@ git clone https://github.com/geneweb/geneweb
 3. Compil GeneWeb
 ```
 ./configure
-make
+make opt
 make distrib
 ```
 
