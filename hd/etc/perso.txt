@@ -6,10 +6,10 @@
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
-      %else;%public_name; %surname;%end;
+      %else;%public_name; %surname;%if;(occ!="") (%occ;)%end;%end;
     %else;
       %if;has_qualifiers;%first_name; %qualifier;
-      %else;%first_name; %surname;%end;
+      %else;%first_name; %surname;%if;(occ!="") (%occ;)%end;%end;
     %end;
   </title>
   <meta name="robots" content="none">
@@ -21,11 +21,10 @@
   %base_header;
 </head>
 <body%body_prop;>
-%import;perso_utils;
-<a href="#content" class="sr-only sr-only-focusable">Skip navigation menu</a>
-<div class="container%if;(evar.wide="on")-fluid%end;">
-  %include.menubar;
 %message_to_wizard;
+<div class="container">
+%import;perso_utils;
+%include.menubar;
 %define;init_nb_asc(tplnum)
   %let;templ;%bvar.perso_module_tplnum;%in
   %if;(templ = "famille" or templ = "arbre_3gen_v" or templ = "arbre_3gen_v_photo")
@@ -78,78 +77,85 @@
 %end;
 
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
-%if;(evar.test="on")
-%( hook for regression test! do not remove %)
-La variable evar.test est réservée aux tests!!
-%elseif(p_mod="zz" or p_mod="")
+%if;(evar.p_mod="zz" or (bvar.p_mod="" and evar.p_mod="" and (bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)))
   %(Statique%)
   %apply;init_cache(3, 2, 2)
-  %( two columns if screen_width>=992px but full width for tablets/phone < 992px %)
-    %if;(has_parents and (father.has_parents or mother.has_parents))
-       <div class="collapse" id="collapseExample1">
-          %let;op_m;1%in;%apply;show_templ("perso_module/gr_parents")
-       </div>
-    %end;
-    <div class="row mx-1" tabindex="-1">
-      %if;(evar.wide="on")
-        <div class="col-6">
-      %end;
-    %(<div be carefull h1 is full width then an opening <div class="col-8"> in individu module %)
-        %let;op_m;3%in;%apply;show_templ("perso_module/individu")
-        %if;(evar.wide="on")
-          %let;op_m;4%in;%apply;show_templ("perso_module/unions")
-        %else;
-          %let;op_m;2%in;%apply;show_templ("perso_module/unions")
-        %end;
-        %let;op_m;1%in;%apply;show_templ("perso_module/chronologie")
-        %let;op_m;1%in;%apply;show_templ("perso_module/notes")
-        %let;op_m;2%in;%apply;show_templ("perso_module/sources")
-        <div class="%if;(evar.wide="on")d-none%else;d-none d-block d-lg-none%end; col-12">
-          %let;op_m;1%in;%apply;show_templ("perso_module/parents")
-          %let;op_m;2%in;%apply;show_templ("perso_module/fratrie")
-          %let;op_m;3%in;%apply;show_templ("perso_module/relations")
-        </div>
-      </div> %( closing the <div class="col-8"> in module individu %)
-      %if;(evar.wide!="on")
-        <div class="d-none d-lg-block col-lg-4">%(second column above lg%)
+  %if;(has_parents and (father.has_parents or mother.has_parents))
+     <div class="collapse" id="collapseExample1">
+        %let;op_m;1%in;%apply;show_templ("perso_module/gr_parents")
+     </div>
+  %end;
+ <div class="row">
+    %(be carefull h1 is col-12 for full width then an opening <div class="col-8"> is inside personnal_data %)
+      %let;op_m;3%in;%apply;show_templ("perso_module/individu")
+      %let;op_m;2%in;%apply;show_templ("perso_module/unions")
+      %let;op_m;1%in;%apply;show_templ("perso_module/chronologie")
+      %let;op_m;1%in;%apply;show_templ("perso_module/notes")
+      %let;op_m;2%in;%apply;show_templ("perso_module/sources")
+    %if;(p_mod="" or p_mod="zz")</div>%end; %( end of <div class="col-8"> from personnal_data %)
+    <div class="col-4">
+      %if;has_parents;
+        <div class="collapse show" id="collapseExample2">
           %let;op_m;2%in;%apply;show_templ("perso_module/arbre_3gen_photo")
-          %let;op_m;1%in;%apply;show_templ("perso_module/fratrie")
-          %let;op_m;1%in;%apply;show_templ("perso_module/relations")
         </div>
       %end;
-      %if;(evar.wide="on")
-        </div>
-        <div class="col-6">
-          %apply;show_templ("perso_module/arbre_famille")
-        </div>
+      %let;op_m;1%in;%apply;show_templ("perso_module/fratrie")
+      %let;op_m;1%in;%apply;show_templ("perso_module/relations")
+    </div>
+  </div>
+%elseif;(bvar.perso_module_tplnb!="" and bvar.perso_module_tplnb>0)
+  %(Dynamique, perso_module_tplnb : %bvar.perso_module_tplnb;<br>%)
+  %reset_count;
+  %for;i;0;bvar.perso_module_tplnb;
+    %apply;init_nb_asc(i)
+  %end;
+  %let;nb_asc;%count;%in
+
+  %reset_count;
+  %for;i;0;bvar.perso_module_tplnb;
+    %apply;init_from_gen_desc(i)
+  %end;
+  %let;from_gen_desc;%count;%in
+
+  %reset_count;
+  %for;i;0;bvar.perso_module_tplnb;
+    %apply;init_nb_desc(i)
+  %end;
+  %let;nb_desc;%count;%in
+
+  %apply;init_cache(nb_asc, from_gen_desc, nb_desc)
+  %reset_count;
+  <div class="row">
+    <div class="col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+      %for;i;0;bvar.perso_module_tplnb;
+        %apply;get_templ(i)
       %end;
     </div>
-%else;
-  %(Dynamic%) 
+  </div>
+%elseif;((evar.p_mod!="" and evar.p_mod!="zz") or bvar.p_mod!="")
+  %(Dynamic %)
   %apply;init_cache(3, 2, 2)
-  <div class="row mt-2" id="content" tabindex="-1">
+  <div class="mt-2">
     %for;i;0;p_mod_nbr;
       %let;mmi;%apply;mm(i)%in;
       %let;ooi;%apply;oo(i)%in;
       %if;(mmi!="" and ooi!=0)
-        <div class="col-12">
-          %apply;get_mod(mmi, ooi)
-        </div>
+        %apply;get_mod(mmi, ooi)
       %end
     %end;
   </div>
+%else;
+%(Nothing %)
 %end;
 
 %if;(evar.opt = "misc")
   %misc_names;<p>
 %end;
-
 %if;(not cancel_links)
   %include.trl;
   %include.copyr;
 %end;
 </div>
-%let;page;perso%in;
 %include.js;
 </body>
 </html>
