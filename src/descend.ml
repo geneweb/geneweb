@@ -1471,6 +1471,7 @@ value print conf base p =
     match p_getenv conf.env "t" with
     [ Some ("F" | "L" | "M") -> "deslist"
     | Some ("H" | "I" | "A") -> "destable"
+    | Some "V" -> "destree"
     | Some _ -> ""
     | _ -> "desmenu" ]
   in

@@ -1,4 +1,4 @@
-/* $Id: p_mod.js, v 7.00 10/04/2017 01:29:45 hg a2 $ */
+/* $Id: p_mod.js, v 7.00 2017/12/05 01:29:45 hg a2 $ */
 
 var modules = [];
 var options = [];
@@ -48,6 +48,7 @@ options[9][5] = "famille";
 options[9][6] = "7 gen";
 options[9][7] = "9 gen";
 options[9][8] = "HI";
+options[9][9] = "descendants";
 modules[10] = "gr_parents";
 options[10][1] = "standard";
 options[10][2] = "three cols";
@@ -298,6 +299,11 @@ $('#a7').on('click', function ()
 $('#a8').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a8');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_8.jpg">\n');
+});
+
+$('#a9').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a9');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_9.jpg">\n');
 });
 
 $('#g1').on('click', function ()
