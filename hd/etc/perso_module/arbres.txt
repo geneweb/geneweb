@@ -27,5 +27,7 @@ Options
   %import;perso_module/arbre_hi_tools
   %import;templm/anctree_hi_indexes
   %apply;show_templ("templm/anctree_hi")
+%elseif;(op_m=9)
+  %apply;show_templ("perso_module/arbre_descendants")
 %else;
 %end;

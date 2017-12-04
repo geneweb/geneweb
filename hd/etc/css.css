@@ -4,6 +4,11 @@
   -ms-user-select: none;
 }
 
+.destree_table table, th, td {
+  border-spacing: 0;
+  padding: 0;
+}
+
 .big_anchor {
   display: block;
   width: 100%;
