@@ -116,7 +116,7 @@ Person:            Child1     Child2          Child3
   %(one level of descendants (%xxx.first_name;,lll,nnn,ttt,fff,www)<br>%)
   %(compute family position %)
   %let;fmpos;%nn;
-    %if;(nb_families>1)%nn;
+    %if;(has_families and nb_families>1)%nn;
       %if;(family_cnt=1)right%nn;
       %elseif;(family_cnt=nb_families)left%nn;
       %else;full%nn;
@@ -145,9 +145,8 @@ Person:            Child1     Child2          Child3
         %end;
       %elseif;("ttt"="person" and "xxx"!="")
         <td colspan="www" class="text-center" style="vertical-align:top">
-        %(xxx.first_name; %xxx.surname;%if;(xxx.occ!="0") (%xxx.occ;)%end;%)
-        %(www<br>%)%if;(xxx.index!=baseindex)|%end;%apply;display_person("xxx")
-        %if;(has_families and nb_families>1 and nnn<evarv-1)|%end;
+        %if;(xxx.index!=baseindex)|%end;%apply;display_person("xxx")
+        %if;(has_families and evar.spouse!="on" and nnn<evarv-1)|%end;
         </td><td>&nbsp;</td>
       %elseif;("ttt"="skip")
         <td></td><td></td>
@@ -168,30 +167,28 @@ Person:            Child1     Child2          Child3
           %in;
           %if;("ttt"="hbars")
             %let;vbar;%if;(evar.spouse="on")&%else;|%end;%in;
-            %let;marr;%nn;
-              %if;(not cancel_links)
-                <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;"
-                  title="[*update::family/families]0 of %first_name; %surname; (%occ;)
-                    [and] %spouse.first_name; %spouse.surname; (%spouse.occ;)"
-                >&</a>
-              %else;&
-              %end;
-            %in;
+            %let;marre;%in;
             <td colspan="%fcount;" class="text-center">
               %if;(fmpos="right")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
-              %marr;%if(evar.marriage="on")%if;(marriage_date.year!="")<br>%marriage_date.year;%else;<br>-%end;%end;
               %elseif;(fmpos="center")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
-              %marr;%if(evar.marriage="on")%if;(marriage_date.year!="")<br>%marriage_date.year;%else;<br>-%end;%end;
               %elseif;(fmpos="left")<hr class="%fmpos;" style="valign:top;border-top: 2px dashed">
-              %marr;%if(evar.marriage="on")%if;(marriage_date.year!="")<br>%marriage_date.year;%else;<br>-%end;%end;
-              %elseif;(fmpos="none")%marr;%if(evar.marriage="on")%if;(marriage_date.year!="")<br>%marriage_date.year;%else;<br>-%end;%end;
+              %elseif;(fmpos="none")
               %end;
+              <span class="text-nowrap">
+                %if;(not cancel_links)
+                  <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;"
+                    title="[*update::family/families]0 of %first_name; %surname; (%occ;)
+                      [and] %spouse.first_name; %spouse.surname; (%spouse.occ;)"
+                  >&</a>
+                %else;&
+                %end;
+                %if(evar.marriage="on")%if;(marriage_date.year!="") %marriage_date.year;%else; -%end;%end;
+              </span>
             </td>
             <td>&nbsp;</td>
           %elseif;("ttt"="spouse")
             <td colspan="%fcount;" class="text-center" style="vertical-align:top">
-              %(spouse.first_name; %spouse.surname;%if;(spouse.occ!="0") (%spouse.occ;)%end;%)
-              %(fcount;<br>%)%apply;display_person("spouse")
+              %apply;display_person("spouse")
               %if;(has_children)|%end;
             </td><td>&nbsp;</td>
           %elseif;("ttt"="vbars")
@@ -255,7 +252,8 @@ Person:            Child1     Child2          Child3
           %if;(evar.v="")v=%expr(evarv-1);%end;"
         class="btn btn-outline-secondary border-0"
         title="(-1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1">-</a>
-      <a class"=btn disabled" title="%evarv%if;(evarv>1)[generation/generations]1%else;[generation/generations]0%end;">%evarv;</a>
+      <a class"=btn disabled"
+        title="%evarv; %if;(evarv>1)[generation/generations]1%else;[generation/generations]0%end;">%evarv;</a>
       <a href="%prefix_no_pmod;%nn;
           %foreach;env_binding;%if;(env.key!="v")%env.key;=%env.val;;%else;v=%expr(evarv+1);%end;%end;%nn;
           %if;(evar.v="")v=%expr(evarv+1);%end;"
