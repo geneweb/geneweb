@@ -18,7 +18,8 @@
     <a style="zindex:10;" class="normal_anchor"
       href="%prefix_no_pmod;%xxx.access;;%foreach;env_binding;%nn;
       %if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="m" or env.key="t"))%nn;
-        %env.key;=%env.val;;%end;%end;">
+        %env.key;=%env.val;;%end;%end;"
+      title=" %xxx.first_name;%if;(xxx.occ!="0").%xxx.occ;%end; %xxx.surname;">
       %if;(xxx.public_name!="")%xxx.public_name;
       %else;%xxx.first_name;
       %end; <span class="text-nowrap">%xxx.surname;</span>
@@ -278,7 +279,9 @@ Person:            Child1     Child2          Child3
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.spouse!="on")[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [spouse/spouses]1">
-        <span class="mx-1">&</span>
+        <span class="mx-1">
+          <span class="fa fa-user-plus"></span><span class="fa fa-user"></span>
+        </span>
         <i class="fa fa-toggle-%if;(evar.spouse!="on")off%else;on%end; text-muted"></i>
       </a>
     </div>
@@ -325,7 +328,8 @@ Person:            Child1     Child2          Child3
           %foreach;env_binding;%nn;
             %if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="m" or env.key="t"))%nn;
               %env.key;=%env.val;;%end;%nn;
-            %end;" class="mx-1">&lt;</a>
+            %end;" class="mx-1"
+            title="[*descendants tree] [of] %child.first_name; %child.surname;">&lt;</a>
       %end;
     %end;
       [*siblings]
@@ -335,7 +339,9 @@ Person:            Child1     Child2          Child3
           %foreach;env_binding;%nn;
             %if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="m" or env.key="t"))%nn;
               %env.key;=%env.val;;%end;%nn;
-            %end;" class="mx-1">&gt;</a>%nn;
+            %end;" class="mx-1"
+            title="[*descendants tree] [of] %child.first_name; %child.surname;">&gt;</a>
+
       %end;
     %end;
   %end;
