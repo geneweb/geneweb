@@ -158,9 +158,11 @@ Person:            Child1     Child2          Child3
         <td></td><td></td>
       %end;
       %if;has_families;
+        %reset_count2;
         %reset_count1;
         %foreach;family;%if;(nb_children>1)%incr_count1;%end;%end;
         %foreach;family;
+          %incr_count2;
           %reset_count;
           %apply;fam_nb_column(0,evarv+1)
           %let;fcount;%expr(2*count-1)%in;
@@ -187,7 +189,7 @@ Person:            Child1     Child2          Child3
                     <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;;"
                       title="[*update::family/families]0 of %first_name; %surname; (%occ;)
                         [and] %spouse.first_name; %spouse.surname; (%spouse.occ;)"
-                    >&</a>
+                    >&%if;(nb_families>1)<sup>%count2;</sup>%end;</a>
                   %else;&
                   %end;
                 %end;
@@ -301,7 +303,7 @@ Person:            Child1     Child2          Child3
         title="%if;(evar.marriage!="on")[*visualize/show/hide/summary]1%else;
             [*visualize/show/hide/summary]2%end; [date of marriage]">
         <i class="fa fa-calendar fa-fw"></i>
-        <i class="fa fa-toggle-%if;(evar.marriage!="on")on%else;off%end; text-muted%(success ?%)"></i>
+        <i class="fa fa-toggle-%if;(evar.marriage="on")on%else;off%end; text-muted%(success ?%)"></i>
       </a>
     </div>
     <div class="ml-2 mr-4">
