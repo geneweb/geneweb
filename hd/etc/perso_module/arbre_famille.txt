@@ -255,7 +255,8 @@
         class="btn btn-outline-secondary btn-sm border-0 px-0"
         title="%if;(evar.spouse!="on")[*visualize/show/hide/summary]1%else;%nn;
            [*visualize/show/hide/summary]2%end; [spouse/spouses]1"
-      ><span class="mx-1">&</span>
+      ><span class="mx-1"><span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
+           <span class="fa fa-user" aria-hidden="true"></span></span>
         <i class="fa fa-toggle-%if;(evar.spouse!="on")off%else;on%end; text-muted"></i>
       </a>
     </div>
