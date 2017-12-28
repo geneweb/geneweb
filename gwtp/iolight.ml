@@ -13,18 +13,14 @@ type descend = dsk_descend;
 
 value magic_gwb = "GnWb0020";
 
-value check_magic =
-  let b = Bytes.create (String.length magic_gwb) in
-  fun ic ->
-    do {
-      really_input ic b 0 (String.length b);
-      if b <> magic_gwb then
-        if String.sub magic_gwb 0 4 = String.sub b 0 4 then
-          failwith "this is a GeneWeb base, but not compatible"
-        else
-          failwith "this is not a GeneWeb base, or it is a very old version"
-      else ()
-    }
+value check_magic ic =
+  let b = really_input_string ic (String.length magic_gwb) in
+  if b <> magic_gwb then
+    if String.sub magic_gwb 0 4 = String.sub b 0 4 then
+      failwith "this is a GeneWeb base, but not compatible"
+    else
+      failwith "this is not a GeneWeb base, or it is a very old version"
+  else ()
 ;
 
 type patches =

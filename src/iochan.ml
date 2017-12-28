@@ -11,14 +11,14 @@ value openfile fname trunc =
   {iofd = fd; iopos = 0}
 ;
 
-value ib = String.make 4 ' ';
+value ib = Bytes.make 4 ' ';
 
 value input_byte ioc =
   let ret = Unix.read ioc.iofd ib 0 1 in
   if ret <> 1 then failwith "Iochan.input_byte"
   else do {
     ioc.iopos := ioc.iopos + 1;
-    Char.code ib.[0]
+    Char.code (Bytes.get ib 0)
   }
 ;
 
@@ -27,10 +27,10 @@ value input_binary_int ioc = do {
   if ret <> 4 then failwith "Iochan.input_binary_int" else ();
   ioc.iopos := ioc.iopos + 4;
   let r =
-    Iovalue.sign_extend (Char.code ib.[0]) lsl 24 +
-  Char.code ib.[1] lsl 16 +
-  Char.code ib.[2] lsl 8 +
-  Char.code ib.[3]
+    Iovalue.sign_extend (Char.code (Bytes.get ib 0)) lsl 24 +
+  Char.code (Bytes.get ib 1) lsl 16 +
+  Char.code (Bytes.get ib 2) lsl 8 +
+  Char.code (Bytes.get ib 3)
   in
   assert (r >= -0x40000000);
   assert (r <= 0x3fffffff);
@@ -69,7 +69,7 @@ value output_binary_int ioc w = do {
 };
 
 value output ioc buff start len =
-  let ret = Unix.write ioc.iofd buff start len in
+  let ret = Unix.write_substring ioc.iofd buff start len in
   if ret <> len then failwith "Iochan.output"
   else ioc.iopos := ioc.iopos + len
 ;

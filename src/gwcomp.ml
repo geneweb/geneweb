@@ -30,8 +30,11 @@ value copy_decode s i1 i2 =
       else loop (len + 1) (i + 1)
   in
   let rec loop_copy t i j =
-    if i >= i2 then t
-    else if i = i2 - 1 && s.[i] <> '_' then do { Bytes.set t j s.[i]; t }
+    if i >= i2 then Bytes.unsafe_to_string t
+    else if i = i2 - 1 && s.[i] <> '_' then do {
+      Bytes.set t j s.[i];
+      Bytes.unsafe_to_string t
+    }
     else do {
       let (c, i) =
         match s.[i] with

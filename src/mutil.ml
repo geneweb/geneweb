@@ -264,13 +264,9 @@ value surnames_pieces surname =
 value tr c1 c2 s =
   match rindex s c1 with
   [ Some _ ->
-      let s' = Bytes.create (String.length s) in
-      do {
-        for i = 0 to String.length s - 1 do {
-          Bytes.set s' i (if s.[i] = c1 then c2 else s.[i])
-        };
-        s'
-      }
+      String.init (String.length s) convert_char
+        where convert_char i =
+          if s.[i] = c1 then c2 else s.[i]
   | None -> s ]
 ;
 

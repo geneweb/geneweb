@@ -317,27 +317,27 @@ value notify conf base action =
 exception Begin_of_file;
 
 value buff_get_rev len =
-  let s = Bytes.create len in
-  do { for i = 0 to len - 1 do { Bytes.set s i Buff.buff.val.[len - 1 - i] }; s }
+  String.init len get
+    where get i = Bytes.get Buff.buff.val (len - 1 - i)
 ;
 
 value rev_input_char ic (rbuff, rpos) pos =
   do {
     if rpos.val = 0 then do {
-      if String.length rbuff.val < 65536 then
+      if Bytes.length rbuff.val < 65536 then
         let len =
-          if rbuff.val = "" then 1024 else 2 * String.length rbuff.val
+          if Bytes.length rbuff.val = 0 then 1024 else 2 * Bytes.length rbuff.val
         in
         rbuff.val := Bytes.create len
       else ();
-      let ppos = max (pos - String.length rbuff.val) 0 in
+      let ppos = max (pos - Bytes.length rbuff.val) 0 in
       seek_in ic ppos;
       really_input ic rbuff.val 0 (pos - ppos);
       rpos.val := pos - ppos;
     }
     else ();
     decr rpos;
-    rbuff.val.[rpos.val]
+    Bytes.get rbuff.val rpos.val
   }
 ;
 
@@ -550,7 +550,7 @@ value print_foreach conf base print_ast eval_expr =
             | _ -> raise Not_found ]
           in
           let (pos, n) =
-            let vv = (ref "", ref 0) in
+            let vv = (ref (Bytes.create 0), ref 0) in
             let rec loop pos i =
               if i >= k then (pos, i)
               else
@@ -650,7 +650,7 @@ value search_text conf base s =
           [ Some pos -> pos
           | None -> in_channel_length ic ]
         in
-        let vv = (ref "", ref 0) in
+        let vv = (ref (Bytes.create 0), ref 0) in
         loop pos where rec loop pos =
           match
             try Some (rev_input_line ic pos vv) with

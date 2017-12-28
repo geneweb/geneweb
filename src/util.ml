@@ -484,7 +484,7 @@ value quote_escaped s =
         | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
@@ -2082,7 +2082,7 @@ value hexa_string s =
       Bytes.set s' (2*i) "0123456789ABCDEF".[Char.code s.[i] / 16];
       Bytes.set s' (2*i+1) "0123456789ABCDEF".[Char.code s.[i] mod 16];
     };
-    s'
+    Bytes.unsafe_to_string s'
   }
 ;
 
@@ -2375,7 +2375,7 @@ value image_file_name str =
 ;
 
 value png_image_size ic =
-  let magic = let s = Bytes.create 4 in do { really_input ic s 0 4; s } in
+  let magic = really_input_string ic 4 in
   if magic = "\137PNG" then do {
     seek_in ic 16;
     let wid = input_binary_int ic in
@@ -2386,7 +2386,7 @@ value png_image_size ic =
 ;
 
 value gif_image_size ic =
-  let magic = let s = Bytes.create 4 in do { really_input ic s 0 4; s } in
+  let magic = really_input_string ic 4 in
   if magic = "GIF8" then do {
     seek_in ic 6;
     let wid = let x = input_byte ic in input_byte ic * 256 + x in
@@ -2397,9 +2397,7 @@ value gif_image_size ic =
 ;
 
 value jpeg_image_size ic =
-  let magic =
-    let str = Bytes.create 10 in do { really_input ic str 0 10; str }
-  in
+  let magic = really_input_string ic 10 in
   if Char.code magic.[0] = 0xff && Char.code magic.[1] = 0xd8 &&
      (let m = String.sub magic 6 4 in m = "JFIF" || m = "Exif") then
     let exif_type = String.sub magic 6 4 = "Exif" in
@@ -2770,19 +2768,15 @@ value has_image conf base p =
 ;
 
 value gen_only_printable or_nl s =
-  let s' = Bytes.create (String.length s) in
-  do {
-    for i = 0 to String.length s - 1 do {
-      Bytes.set s' i
-        (if Mutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
-         else
-           match s.[i] with
-           [ ' '..'~' | '\160'..'\255' -> s.[i]
-           | '\n' -> if or_nl then '\n' else ' '
-           | _ -> ' ' ])
-    };
-    strip_spaces s'
-  }
+  let s' = String.init (String.length s) conv_char
+    where conv_char i =
+      if Mutil.utf_8_db.val && Char.code s.[i] > 127 then s.[i]
+      else
+        match s.[i] with
+          [ ' '..'~' | '\160'..'\255' -> s.[i]
+          | '\n' -> if or_nl then '\n' else ' '
+          | _ -> ' ' ] in
+  strip_spaces s'
 ;
 
 value only_printable_or_nl = gen_only_printable True;

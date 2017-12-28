@@ -35,9 +35,11 @@ value combine_by_ini ini list =
               String.sub k 0 (index_of_next_char k (String.length ini))
             else k ^ String.make (String.length ini + 1 - String.length k) '_'
           in
-          for i = 0 to String.length ini_k - 1 do {
-            if ini_k.[i] = ' ' then Bytes.set ini_k i '_' else ()
+          let ini_k = Bytes.unsafe_of_string ini_k in
+          for i = 0 to Bytes.length ini_k - 1 do {
+            if Bytes.get ini_k i = ' ' then Bytes.set ini_k i '_' else ()
           };
+          let ini_k = Bytes.unsafe_to_string ini_k in
           let new_list =
             if ini_k = "_" then new_list
             else

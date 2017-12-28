@@ -746,12 +746,8 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
 ;
 
 value magic_patch = "GnPa0001";
-value check_patch_magic =
-  let b = Bytes.create (String.length magic_patch) in
-  fun ic -> do {
-    really_input ic b 0 (String.length b);
-    b = magic_patch
-  }
+value check_patch_magic ic =
+  really_input_string ic (String.length magic_patch) = magic_patch
 ;
 
 value input_patches bname =
