@@ -36,7 +36,7 @@ value decode s =
     let cut =
       if s.[len - 1] = '=' then if s.[len - 2] = '=' then 2 else 1 else 0
     in
-    String.sub res 0 (String.length res - cut)
+    Bytes.sub_string res 0 (Bytes.length res - cut)
   }
 ;
 
@@ -76,7 +76,7 @@ value encode s =
       rpos.val := rpos.val + 3;
       wpos.val := wpos.val + 4
     };
-    for i = 1 to len - origlen do { Bytes.set res (String.length res - i) '=' };
+    for i = 1 to len - origlen do { Bytes.set res (Bytes.length res - i) '=' };
     res
   }
 ;

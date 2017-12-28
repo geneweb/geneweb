@@ -25,16 +25,15 @@ value filename_basename str =
 (* Get CGI contents *)
 
 value read_input len =
-  if len >= 0 then do {
-    let buff = Bytes.create len in really_input stdin buff 0 len; buff
-  }
+  if len >= 0 then
+    really_input_string stdin len
   else do {
-    let buff = ref "" in
+    let buff = Buffer.create 0 in
     try
-      while True do { let l = input_line stdin in buff.val := buff.val ^ l }
+      while True do { let l = input_line stdin in Buffer.add_string buff l }
     with
     [ End_of_file -> () ];
-    buff.val
+    Buffer.contents buff
   }
 ;
 
@@ -71,7 +70,7 @@ value cgi_from () =
 value crlf () =
   do {
     flush stdout;
-    let _ : int = Unix.write Unix.stdout "\013\n" 0 2 in
+    let _ : int = Unix.write_substring Unix.stdout "\013\n" 0 2 in
     ()
   }
 ;
@@ -112,7 +111,7 @@ value quote_escaped s =
         | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0
@@ -630,7 +629,7 @@ value insert_file env bdir name =
       let len = String.length contents - j - 3 in
       if len > 0 then do {
         let oc = open_out (Filename.concat bdir name) in
-        output oc contents (j + 1) len;
+        output_substring oc contents (j + 1) len;
         flush oc;
         printf "File \"%s\" transfered.\n" name;
         close_out oc;

@@ -11,16 +11,11 @@ value lang_param = ref "";
 value only_file = ref "";
 
 value slashify s =
-  let s1 = Bytes.copy s in
-  do {
-    for i = 0 to String.length s - 1 do {
-      Bytes.set s1 i
-        (match s.[i] with
-         [ '\\' -> '/'
-         | x -> x ])
-    };
-    s1
-  }
+  String.init (String.length s) conv_char
+    where conv_char i =
+      match s.[i] with
+      [ '\\' -> '/'
+      | x -> x ]
 ;
 
 value quote_escaped s =
@@ -54,7 +49,7 @@ value quote_escaped s =
         | c -> do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0

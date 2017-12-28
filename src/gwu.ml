@@ -37,15 +37,6 @@ value is_printable =
   | _ -> True ]
 ;
 
-value spaces_to_underscore s =
-  do {
-    for i = 0 to String.length s - 1 do {
-      if s.[i] = ' ' then Bytes.set s i '_' else ()
-    };
-    s
-  }
-;
-
 value starting_char no_num s =
   match s.[0] with
   [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' -> True
@@ -55,16 +46,11 @@ value starting_char no_num s =
 ;
 
 value no_newlines s =
-  let s' = Bytes.create (String.length s) in
-  do {
-    for i = 0 to String.length s - 1 do {
-      Bytes.set s' i
-        (match s.[i] with
-         [ '\n' | '\r' -> ' '
-         | _ -> s.[i] ])
-    };
-    s'
-  }
+  String.init (String.length s) conv_char
+    where conv_char i =
+      match s.[i] with
+      [ '\n' | '\r' -> ' '
+      | _ -> s.[i] ]
 ;
 
 value raw_output = ref False;

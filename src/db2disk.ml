@@ -542,8 +542,7 @@ value read_notes db2 fnotes rn_mode =
 ;
 
 value check_magic ic magic id = do {
-  let b = Bytes.create (String.length magic) in
-  really_input ic b 0 (String.length b);
+  let b = really_input_string ic (String.length magic) in
   if b <> magic then failwith (sprintf "bad %s magic number" id)
   else ();
 };

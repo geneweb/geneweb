@@ -41,7 +41,7 @@ value decode s =
         | x -> do { Bytes.set s1 i1 x; succ i } ]
       in
       copy_decode_in s1 i (succ i1)
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   let rec strip_heading_and_trailing_spaces s =
     if String.length s > 0 then
@@ -104,7 +104,7 @@ value encode s =
             else do { Bytes.set s1 i1 c; succ i1 } ]
       in
       copy_code_in s1 (succ i) i1
-    else s1
+    else Bytes.unsafe_to_string s1
   in
   if need_code 0 then
     let len = compute_len 0 0 in copy_code_in (Bytes.create len) 0 0

@@ -13,7 +13,7 @@ value sign_extend x = (x lsl sign_extend_shift) asr sign_extend_shift;
 type in_funs 'a =
   { input_byte : 'a -> int;
     input_binary_int : 'a -> int;
-    input : 'a -> string -> int -> int -> unit }
+    input : 'a -> bytes -> int -> int -> unit }
 ;
 
 value input_binary_int64 ifuns ic =
@@ -185,7 +185,7 @@ value rec output_loop ofuns oc x =
 value out_channel_funs =
   {output_byte = output_byte;
    output_binary_int = output_binary_int;
-   output = output}
+   output = output_substring}
 ;
 
 value output oc x = output_loop out_channel_funs oc (Obj.repr x);
@@ -212,10 +212,8 @@ value dbuf = ref (Bytes.create 256);
 value dlen = ref 0;
 value dput_char c =
   do {
-    if dlen.val = String.length dbuf.val then do {
-      let nlen = 2 * dlen.val in
-      let ndbuf = Bytes.create nlen in
-      String.blit dbuf.val 0 ndbuf 0 dlen.val; dbuf.val := ndbuf;
+    if dlen.val = Bytes.length dbuf.val then do {
+      dbuf.val := Bytes.extend dbuf.val 0 dlen.val;
     }
     else ();
     Bytes.set dbuf.val dlen.val c;

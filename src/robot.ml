@@ -69,13 +69,9 @@ value fprintf_date oc tm =
     tm.Unix.tm_sec
 ;
 
-value input_excl =
-  let b = Bytes.create (String.length magic_robot) in
-  fun ic ->
-    do {
-      really_input ic b 0 (String.length b);
-      if b <> magic_robot then raise Not_found else (input_value ic : excl)
-    }
+value input_excl ic =
+  let b = really_input_string ic (String.length magic_robot) in
+  if b <> magic_robot then raise Not_found else (input_value ic : excl)
 ;
 
 value output_excl oc xcl =
