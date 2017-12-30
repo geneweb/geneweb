@@ -85,13 +85,13 @@ value channel_redirector channel callback = do {
   Unix.dup2 cin channel ;
   let chan = GMain.Io.channel_of_descr cout in
   let len = 80 in
-  let buf = String.make len ' ' in
+  let buf = Bytes.create len in
   GMain.Io.add_watch chan ~{ prio = 0; cond = [`IN; `HUP; `ERR]; callback cond =
       try
         if List.mem `IN cond then do {
 	        (* On Windows, you must use Io.read *)
 	        let len = GMain.Io.read chan ~{ buf; pos = 0; len } in
-	        len >= 1 && (callback (String.sub buf 0 len))
+	        len >= 1 && (callback (String.sub (Bytes.unsafe_to_string buf) 0 len))
         }
         else False
       with [ _ -> False ]
