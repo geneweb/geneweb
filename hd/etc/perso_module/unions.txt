@@ -182,7 +182,7 @@
           %else;
             <img class="ml-1 mb-1" src="%image_prefix;/gui_create.png" height="16" alt="tree"/>
           %end;
-        %end;)%nn;
+        %end;%nn;
         %apply;init_count(prev_count)
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
           %if;(not cancel_links)
