@@ -10,11 +10,11 @@ case "$LANG" in
   *) LANG=en;;
 esac
 
-DIR=`dirname $0`/
-BASE=`dirname $0`/bases
+DIR=`dirname "$0"`/
+BASE=`dirname "$0"`/bases
 
-cd $DIR
-DIR=$PWD
+cd "$DIR"
+DIR="$PWD"
 export LANG
 
 # echo -n "]2;GeneWeb"
@@ -22,6 +22,8 @@ export LANG
 
 pids=""
 trap 'kill $pids' 1 2
+killall gwd
+killall gwsetup
 
 if [ -f gwsetup.log ]; then
   mv gwsetup.log gwseup.log.old
@@ -44,7 +46,7 @@ fi
 pid=$!
 sleep 1
 if test "`ps $pid | wc -l`" -ne 2; then
-  if test "$LANG" = "fr"; then echo Echec; else echo Failed; fi
+  if test "$LANG" = "fr"; then echo Echec gwsetup; else echo Failed gwsetup; fi
   cat
   exit 1
 fi
@@ -56,7 +58,14 @@ else
   echo "Starting gwd..."
 fi
 "$DIR/gw/gwd" -hd "$DIR/gw" > gwd.log 2>&1 &
-pids="$pids $!"
+pid=$!
+sleep 1
+if test "`ps $pid | wc -l`" -ne 2; then
+  if test "$LANG" = "fr"; then echo Echec gwd; else echo Failed gwd; fi
+  cat
+  exit 1
+fi
+pids="$pids $pid"
 
 echo
 if test "$LANG" = "fr"; then
@@ -69,5 +78,7 @@ else
 fi
 
 open "$DIR/START.htm"
+
+/usr/bin/osascript -e 'tell application "Terminal" to set miniaturized of first window whose name contains "GeneWeb" to true'
 
 cat
