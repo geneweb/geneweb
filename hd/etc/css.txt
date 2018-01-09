@@ -1,4 +1,4 @@
-<!-- $Id: css.txt, v7.00 2017/11/11 hg 05:46:40 $ -->
+<!-- $Id: css.txt, v7.00 09/01/2018 03:21:57 $ -->
 <style>
 /* Put here only properties that uses variables */
 li.folder {
@@ -31,7 +31,7 @@ li.female
 </style>
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.3/css/all.css">
   %else;
     <link rel="stylesheet" href="%if;(cgi)%bvar.static_path;%end;bootstrap.min.css">
