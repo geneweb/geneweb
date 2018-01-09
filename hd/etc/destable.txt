@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
 <head>
-  <!-- $Id: destable.txt v7.00 01/05/2017 14:59:57 $ -->
+  <!-- $Id: destable.txt v7.00 09/01/2018 03:22:19 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
