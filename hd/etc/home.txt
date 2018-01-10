@@ -1,10 +1,9 @@
-<!-- $Id: home.txt,v 2017/11/12 13:15:19 hg Exp $ -->
-<!-- Copyright (c) 1998-2017 INRIA -->
+<!-- $Id: home.txt,v7.00-exp 10/01/2018 20:11:37 $ -->
 %if;(not cancel_links)
   <div class="float-left">
-    <div class="d-flex fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
+    <div class="d-flex mt-2 fixed_top_btn%if;(evar.m!="A")_col flex-column%end; %if;(evar.wide="on")fixed_top_btn_wide%end;">
       <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%prefix;">
-        <i class="fa fa-home fa-lg fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
+        <i class="fa fa-home fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*home]</span>%nn;
       </a>%nn;
       <a role="button" class="btn btn-link text-muted %(ml-%if;(referer="")4%else;0%end;%) p-1"
@@ -16,12 +15,12 @@
         <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
       </a>
       <a role="button" class="btn btn-link text-muted ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
-        <i class="fa fa-search fa-lg" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
+        <i class="fa fa-search fa-fw" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*search/case sensitive]0</span>%nn;
       </a>
       %if;(referer!="")
         <a role="button" class="btn btn-link text-muted ml-0 p-1" href="%referer;" title="Revenir en arrière">%nn;
-          <i class="fa fa-arrow-left fa-lg fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
+          <i class="fa fa-arrow-left fa-fw" title="[*back]" aria-hidden="true"></i>%nn;
           <span class="sr-only">[*back]</span>%nn;
         </a>%nn;
       %end;
@@ -44,7 +43,7 @@
                 <input type="search" id="p" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]0">
               </div>
               <div class="mt-2">
-                <button class="btn btn-primary" type="submit" title="[*validate/delete]0"><span class="fa fa-search fa-fw my-4"></span></button>
+                <button class="btn btn-primary" type="submit" title="[*validate/delete]0"><span class="fa fa-search my-4"></span></button>
               </div>
             </div>
           </form>

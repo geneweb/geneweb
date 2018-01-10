@@ -73,7 +73,7 @@ var p_mod_table = '\
         <td class="align-middle pmod">'+modules[i]+'\
         </td>\
         <td>\
-          <div class="d-inline-flex small">';
+          <div class="btn-group small">';
           for (var k=1; k<options[i].length; k++)
             { var image = "<img class='w-100' src='"+img_prfx+"/"+modules[i]+"_"+k+".jpg'>";
               var button  = '<button class="btn btn-outline-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
