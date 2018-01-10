@@ -60,7 +60,7 @@
                 %if;(bvar.default_fnav_images="off")image=off;%end;%nn;
                 %if;(bvar.default_fnav_semi="on")semi=on;%end;%nn;
                 %if;(bvar.default_fnav_spouse="on")spouse=on;%end;" title="[*family/families]0">
-              <span class="fa fa-plus fa-users fa-fw %sexcolor;" aria-hidden="true"></span>
+              <span class="fa fa-users fa-lg %sexcolor;" aria-hidden="true"></span>
               <span class="sr-only">[*family/families]0</span>
             </a>
           </li>
@@ -68,7 +68,7 @@
           <li class="nav-item dropdown">
             <a id="load_once_p_mod" class="nav-link dropdown-toggle dropdown-toggle-split" 
               data-toggle="dropdown" aria-haspopup="true" title="[*module]">
-              <span class="fa fa-vcard-o fa-fw" aria-hidden="true"></span>%nn;
+              <span class="far fa-address-card fa-lg fa-fw pr-1" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*module]</span>%nn;
             </a>
             <div class="dropdown-menu p_mod-dropdown-menu%if;(wizard)-wizard%end;">
@@ -80,12 +80,10 @@
                     %apply;input_hidden("evar.lang","lang")
                     <div class="input-group">
                       <input type="text" pattern="^((?:([a-z][0-9]){1,15})|zz)" name="p_mod" id="p_mod" class="form-control" value="%if;(evar.p_mod!="" and evar.p_mod!="zz")%p_mod;%end;" placeholder="%if;(bvar.p_mod!="")%bvar.p_mod; (%base.name;.gwf)%else;Personnal modules (p_mod)%end;" maxlength="30">
-                      <span class="input-group-btn">
-                        <button type="submit" class="btn btn-light-12" title="[*validate/delete]0"><i class="fa fa-check fa-lg text-success"></i></button>
-                      </span>
-                      <span class="input-group-btn">
-                        <button type="button" class="btn btn-light" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-close fa-lg text-danger"></i></button>
-                      </span>
+                      <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-success" title="[*validate/delete]0"><i class="fa fa-check fa-lg"></i></button>
+                        <button type="button" class="btn btn-outline-danger" id="p_mod_clear" title="[*validate/delete]1"><i class="fa fa-times fa-lg mx-1"></i></button>
+                      </div>
                     </div>
                     %apply;input_hidden("first_name_key","p")
                     %apply;input_hidden("surname_key","n")
@@ -98,11 +96,11 @@
                     %apply;input_hidden("evar.mar_sp_ch","mar_sp_ch")
                     %apply;input_hidden("evar.evt_pr_sib","evt_pr_sib")
                     %apply;input_hidden("evar.simple","simple")
-                    <button type="button" class="btn btn-light ml-2" id="p_mod_rm" title="[*remove last module]" value="%bvar.p_mod;"><i class="fa fa-backward text-danger"></i></button>
+                    <button type="button" class="btn btn-outline-danger ml-2" id="p_mod_rm" title="[*remove last module]" value="%bvar.p_mod;"><i class="fa fa-backward"></i></button>
                     %if;(bvar.p_mod!="")
-                      <button type="button" class="btn btn-light ml-2" id="p_mod_bvar" title="[*visualize/show/hide/summary]1/[modify] p_mod=%bvar.p_mod (%base.name;.gwf)" value="%bvar.p_mod;"><i class="fa fa-plus"></i></button>
+                      <button type="button" class="btn btn-outline-secondary ml-2" id="p_mod_bvar" title="[*visualize/show/hide/summary]1/[modify] p_mod=%bvar.p_mod (%base.name;.gwf)" value="%bvar.p_mod;"><i class="fa fa-plus"></i></button>
                     %end;
-                    <button type="submit" class="btn btn-light ml-2 mr-1"
+                    <button type="submit" class="btn btn-outline-secondary ml-2 mr-1"
                             value="X" id="zz" title="default"
                             data-toggle="popover" data-trigger="hover" data-placement="bottom"
                             data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
@@ -130,7 +128,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
           %if;(not (bvar.wizard_just_friend = "yes") and wizard)
             <li class="nav-item">
               <a class="nav-link %if;(evar.m="MOD_IND")active%end;" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;>
-                <span class="fa fa-user-plus fa-fw %sexcolor;" aria-hidden="true"></span>
+                <span class="fa fa-user-plus %sexcolor;" aria-hidden="true"></span>
                 <span class="sr-only">[*modify::person/persons]0 (P)</span>
               </a>
             </li>
@@ -143,32 +141,32 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               <div class="dropdown-menu">
                 %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
                   <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(evar.oc!="" and evar.oc!=0)ocz=%occ;;%end;%access;" %laS; title="%apply;nav_with_sosa_ref(self)">
-                    <i class="fa fa-dot-circle-o fa-lg fa-fw %sexcolor;"></i> %apply;nav_with_sosa_ref(self)
+                    <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify] [n° Sosa] 1
                   </a>%nn;
                 %else;
                   <a class="dropdown-item" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
-                    <i class="fa fa-stop-circle-o fa-lg fa-fw %sexcolor;"></i> [*user/password/cancel]2 [Sosa] [navigation]
+                    <i class="far fa-stop-circle fa-fw %sexcolor; mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]
                   </a>%nn;
                 %end;
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-unsorted fa-lg fa-fw mr-1"></span>[*invert::event/events]1</a>
+                <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
                 %if;(bvar.can_send_image != "no" and image = "" and first_name != "?" and surname != "?")
-                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="fa fa-file-image-o fa-lg fa-fw mr-1"></span>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
+                  <a class="dropdown-item" href="%prefix;m=SND_IMAGE;i=%index;" %laI;><span class="far fa-file-image fa-fw mr-2"></span>%if;has_image;[*modify picture]%else;[*add picture]%end;</a>
                 %end;
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname;"><span class="fa fa-user-times fa-lg fa-fw text-danger mr-1"></span>[*merge::person/persons]0</a>
-                <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash fa-lg fa-fw text-danger mr-1"></span>[*delete::person/persons]0</a>
+                <a class="dropdown-item" href="%prefix;m=MRG;i=%index;" title="[*merge] %first_name;.%occ; %surname; [with]…"><span class="fa fa-compress fa-fw text-danger mr-2"></span>[*merge::person/persons]1</a>
+                <a class="dropdown-item" href="%prefix;%access;;i=%index;;m=DEL_IND;" title="[*delete] %self;"><span class="fa fa-trash-alt fa-fw text-danger mr-2"></span>[*delete::person/persons]0</a>
                 %if;has_possible_duplications;
                   <a class="dropdown-item" href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications]</a>
                 %end;
                 %if;(bvar.history_diff="yes" and has_history)
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;"><span class="fa fa-archive fa-lg fa-fw mr-1"></span>[*revision history]</a>
-                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;><span class="fa fa-history fa-lg fa-fw mr-1"></span>[*last diff]</a>
+                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=SUM;f=%history_file;"><span class="fa fa-archive fa-fw mr-2"></span>[*revision history]</a>
+                  <a class="dropdown-item" href="%prefix;m=HIST_DIFF;t=DIFF;f=%history_file;&new=0;old=1" %laD;><span class="fa fa-history fa-fw mr-2"></span>[*last diff]</a>
                 %end;
                 <div class="dropdown-divider"></div>
                 %if;(evar.m!="ADD_FAM" and evar.m!="MOD_FAM" and evar.m!="MOD_IND" and evar.m!="R" and evar.m!="U")
-                  <a class="dropdown-item" href="%url;cgl=on" target="_blank"><i class="fa fa-chain-broken fa-lg fa-fw" title="[*cancel GeneWeb links]"></i> [*cancel GeneWeb links]</a>%nn;
+                  <a class="dropdown-item" href="%url;cgl=on" target="_blank"><i class="fa fa-unlink fa-fw mr-2" title="[*cancel GeneWeb links]"></i>[*cancel GeneWeb links]</a>%nn;
                 %end;
                 %foreach;father.child;
                   %if;is_sibling_before;
@@ -227,30 +225,30 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                     <a class="dropdown-item" href="%prefix;m=ADD_FAM;ip=%index;;sex=M"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]0)</a>
                     <a class="dropdown-item" href="%prefix;m=ADD_FAM;ip=%index;;sex=F"><span class="fa fa-plus"></span> [*add::relation/relations]0 ([M/F]1)</a>
                   %else;
-                    <a class="dropdown-item" id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;><span class="fa fa-plus fa-fw mr-1"></span>[*add::family/families]0</a>
+                    <a class="dropdown-item" id="add_fam" href="%prefix;m=ADD_FAM;ip=%index;" %laA;><span class="fa fa-plus fa-fw mr-2"></span>[*add::family/families]0</a>
                   %end;
                   %foreach;family;
                     <div class="dropdown-divider"></div>
                     %if;(family_cnt != 1)
                       <a class="dropdown-item" href="%prefix;m=INV_FAM;i=%index;;f=%family.index;"
                         title="[*invert::family/families]1 %expr(family_cnt-1) [and] %family_cnt;">%nn;
-                        <span class="fa fa-arrow-up fa-fw"></span> [*invert::family/families]1%nn;
+                        <span class="fa fa-exchange-alt fa-rotate-90 fa-fw mr-1"></span> [*invert::family/families]1%nn;
                         <span class="sr-only"> %expr(family_cnt-1) [and] %family_cnt;</span>
                       </a>
                       <div class="dropdown-divider"></div>
                     %end;
                     <span class="dropdown-header">[*marriage with] %spouse;</span>
-                    <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;" title="[*changed order of family's events]"><span class="fa fa-unsorted fa-fw mr-1"></span>[*invert::event/events]1</a>
-                    <a class="dropdown-item" href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index"><span class="fa fa-trash fa-fw text-danger mr-1"></span>[*delete::family/families]0</a>
+                    <a class="dropdown-item" href="%prefix;m=CHG_EVT_FAM_ORD;i=%family.index;;ip=%index;" title="[*changed order of family's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
+                    <a class="dropdown-item" href="%prefix;m=DEL_FAM;i=%family.index;;ip=%index"><span class="fa fa-trash fa-fw text-danger mr-2"></span>[*delete::family/families]0</a>
                     %if;(family_cnt != 1)
                       %if;(family.father.index = prev_family.father.index and family.mother.index = prev_family.mother.index)
-                        <a class="dropdown-item" href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;"><span class="fa fa-user-times fa-fw"> [*merge::family/families]1</a>
+                        <a class="dropdown-item" href="%prefix;m=MRG_FAM;i=%prev_family.index;;i2=%family.index;;ip=%index;"><span class="fa fa-user-times fa-fw mr-1">[*merge::family/families]1</a>
                       %end;
                     %end;
                   %end;
                   %if;(nb_children != 0)
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="%prefix;m=CHG_CHN;ip=%index;"><span class="fa fa-child fa-fw mr-1"></span>[*change children's names]</a>
+                    <a class="dropdown-item" href="%prefix;m=CHG_CHN;ip=%index;"><span class="fa fa-child fa-fw mr-1"></span> [*change children's names]</a>
                   %end;
                 </div>
               </li>
