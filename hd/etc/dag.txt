@@ -181,7 +181,7 @@
             class="btn btn-outline-secondary btn-sm border-0 px-0"
             title="%if;(evar.image!="off")[*visualize/show/hide/summary]2%else;%nn;
               [*visualize/show/hide/summary]1%end; [image/images]1"
-          ><i class="fa fa-photo fa-fw"></i>
+          ><i class="fa fa-image fa-fw"></i>
             <i class="fa fa-toggle-%if;(evar.image!="off")on%else;off%end; text-muted"></i>
           </a>
         </div>
@@ -230,7 +230,7 @@
             class="btn btn-outline-secondary btn-sm border-0 px-0"
             title="%if;(evar.image!="off")[*visualize/show/hide/summary]2%else;%nn;
               [*visualize/show/hide/summary]1%end; [image/images]1"
-          ><i class="fa fa-photo fa-fw"></i>
+          ><i class="fa fa-image fa-fw"></i>
             <i class="fa fa-toggle-%if;(evar.image!="off")on%else;off%end; text-muted"></i>
           </a>
         </div>
