@@ -550,12 +550,12 @@ function changeCalendar(e,v,m,c) {
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex = "female") checked%end; title="[*male/female/neuter]1"%/>[M/F]1
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex = "neuter") checked%end; title="[*male/female/neuter]2"%/>?
           </label>
         </div>
         <div class="form-check form-check-inline">
           <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex = "neuter") checked%end; title="[*male/female/neuter]2"%/>?
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex = "female") checked%end; title="[*male/female/neuter]1"%/>[M/F]1
           </label>
         </div>
       </div>
@@ -586,11 +586,11 @@ function changeCalendar(e,v,m,c) {
             </td>
             <td>
               <label>
-              <input type="radio" name="excnt_witnwcnt_sex" value="N"%nn;
-               %if;(witness.create.sex = "neuter") checked%end;%/>?
-              </label><label>
               <input type="radio" name="excnt_witnwcnt_sex" value="M"%nn;
                %if;(witness.create.sex = "male") checked%end;%/>[M/F]0
+              </label><label>
+              <input type="radio" name="excnt_witnwcnt_sex" value="N"%nn;
+               %if;(witness.create.sex = "neuter") checked%end;%/>?
               </label><label>
               <input type="radio" name="excnt_witnwcnt_sex" value="F"%nn;
                %if;(witness.create.sex = "female") checked%end;%/>[M/F]1
@@ -978,12 +978,12 @@ function changeCalendar(e,v,m,c) {
           <label class="form-check-label" for="sexM">[M/F]0</label>
         </div>
         <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="sex" value="F" id="sexF" %if;is_female;checked%end; title="[*male/female/neuter]1"%/>
-          <label class="form-check-label" for="sexF">[M/F]1</label>
-        </div>
-        <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="sex" value="N" id="sexU" %if;not(is_male or is_female)checked%end; title="[*male/female/neuter]2"%/>
           <label class="form-check-label" for="sexU">?</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" value="F" id="sexF" %if;is_female;checked%end; title="[*male/female/neuter]1"%/>
+          <label class="form-check-label" for="sexF">[M/F]1</label>
         </div>
       </div>
     </div>
