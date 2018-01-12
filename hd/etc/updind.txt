@@ -221,20 +221,20 @@ function changeCalendar(e,v,m,c) {
 %include_perso_header;
 
 %define;nav()
-  <div class="container fixed-top bg-yellow" role="navigation">
+  <div class="container fixed-top bg-white" role="navigation">
     <div class="form-inline">
       <div class="mx-auto text-center">
-        <button type="submit" class="btn btn-light btn-sm border-success mr-xs-0 mr-sm-3 mr-xl-5 px-md-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1 text-success" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>
+        <button type="submit" class="btn btn-outline-success btn-sm mr-xs-0 mr-sm-3 mr-xl-5 px-md-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>
         <div class="btn-group btn-inline">
-          <a class="btn btn-light btn-sm" href="#top" title="[*person/persons]0"><i class="fa fa-address-card fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
-          <a class="btn btn-light btn-sm" href="#birth_" title="[*birth]"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
-          <a class="btn btn-light btn-sm" href="#baptism_" title="[*baptism]"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
-          <a class="btn btn-light btn-sm" href="#death_" title="[*death]"><i class="fa fa-flash fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
-          <a class="btn btn-light btn-sm" href="#burial_" title="[*burial]"><i class="fa fa-hotel fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
+          <a class="btn btn-light btn-sm" href="#top" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
+          <a class="btn btn-light btn-sm" href="#birth_" title="[*birth]"><i class="far fa-circle fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
+          <a class="btn btn-light btn-sm" href="#baptism_" title="[*baptism]"><i class="fa fa-child fa-fw text-secondary" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
+          <a class="btn btn-light btn-sm" href="#death_" title="[*death]"><i class="fa fa-plus fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
+          <a class="btn btn-light btn-sm" href="#burial_" title="[*burial]"><i class="fa fa-child fa-rotate-180 fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
           <a class="btn btn-light btn-sm" href="#event/events_" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
-          <a class="btn btn-light btn-sm" href="#relation/relations_" title="[*relation/relations]1"><i class="fa fa-group fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
+          <a class="btn btn-light btn-sm" href="#relation/relations_" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
           <a class="btn btn-light btn-sm" href="#title/titles_" title="[*title/titles]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
-          <a class="btn btn-light btn-sm" href="#notes" title="[*note/notes]1"><i class="fa fa-file-text fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
+          <a class="btn btn-light btn-sm" href="#notes" title="[*note/notes]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
         </div>
       </div>
     </div>
@@ -466,16 +466,14 @@ function changeCalendar(e,v,m,c) {
 %define;insert_pevent(xcnt)
   <div class="row my-1">
     <label for="ins_eventxcnt_n" class="col-2 col-form-label">[*insert]</label>
-    <div class="form-inline col-10">
-      <select class="form-control" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
+    <div class="input-group col-10">
+      <select class="custom-select col-1 border border-dark" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
         %for;i;1;11;<option>%i;</option> %end;
       </select>
-      <div class="input-group">
-        <span class="input-group-btn">
-          <label class="btn btn-outline-secondary"> [event/events]0/[event/events]1
-            <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
-          </label>
-        </span>
+      <div class="input-group-append">
+        <label class="btn btn-outline-secondary mb-0"> [event/events]0/[event/events]1
+          <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
+        </label>
         <button type="submit" class="btn btn-outline-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
       </div>
     </div>
@@ -485,16 +483,14 @@ function changeCalendar(e,v,m,c) {
 %define;insert_witness(xcnt, wcnt, evt_name)
   <div class="row my-2">
     <label for="excnt_ins_witnwcnt_n" class="col-2 col-form-label">[*insert]</label>
-    <div class="form-inline col-10">
-      <select class="form-control" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n">
+    <div class="input-group col-10">
+      <select class="custom-select border border-dark col-1" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n">
         %for;i;1;11;<option>%i;</option> %end;
       </select>
-      <div class="input-group">
-        <span class="input-group-btn">
-          <label class="btn btn-outline-secondary"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
-            <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
-          </label>
-        </span>
+      <div class="input-group-append">
+        <label class="btn btn-outline-secondary mb-0"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
+          <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
+        </label>
         <button type="submit" class="btn btn-outline-secondary" title="[*insert::witness/witness/witnesses]0(s)">OK</button>
       </div>
     </div>
@@ -535,8 +531,8 @@ function changeCalendar(e,v,m,c) {
       <div class="col-5">
         <input type="text" class="form-control" name="excnt_witnwcnt_fn" maxlength="200" value="%witness.first_name;" id="excnt_witnwcnt_fn" placeholder="[*first name/first names]0">
       </div>
-      <label for="excnt_witnwcnt_occ" class="col-1 col-form-label">[*number]0</label>
-      <div class="ml-2">
+      <label for="excnt_witnwcnt_occ" class="col col-form-label">[*number]0</label>
+      <div class="col">
         <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" max="9999999" value="%witness.occ;" id="excnt_witnwcnt_occ" placeholder="#">
       </div>
     </div>
@@ -545,17 +541,23 @@ function changeCalendar(e,v,m,c) {
       <div class="col-5">
         <input type="text" class="form-control" name="excnt_witnwcnt_sn" maxlength="200" value="%witness.surname;" id="excnt_witnwcnt_sn" placeholder="[*surname/surnames]0">
       </div>
-      <span class="col-1 col-form-label">[*sex]</span>
-      <div class="form-check form-check-inline col-4 mt-2">
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex = "male") checked%end; title="[*male/female/neuter]0"%/> [M/F]0
-        </label>
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex = "female") checked%end; title="[*male/female/neuter]1"%/> [M/F]1
-        </label>
-        <label class="form-check-label">
-          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex = "neuter") checked%end; title="[*male/female/neuter]2"%/> ?
-        </label>
+      <span class="col col-form-label">[*sex]</span>
+      <div class="col mt-2">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex = "male") checked%end; title="[*male/female/neuter]0"%/>[M/F]0
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex = "female") checked%end; title="[*male/female/neuter]1"%/>[M/F]1
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex = "neuter") checked%end; title="[*male/female/neuter]2"%/>?
+          </label>
+        </div>
       </div>
     </div>
   </div>
@@ -726,18 +728,27 @@ function changeCalendar(e,v,m,c) {
             <option value="OfCourseDead" %if;of_course_dead; selected%end;>[*of course dead]</option>
           </select>
         </div>
-        <div class="form-check form-check-inline ml-4 mt-1">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="death_reason" value="Killed" %if;dr_killed;checked%end; onclick='set_death_focus(xcnt)'%/> [*killed (in action)]2
-          </label><label class="form-check-label">
-            <input class="form-check-input" type="radio" name="death_reason" value="Murdered" %if;dr_murdered;checked%end; onclick='set_death_focus(xcnt)'%/> [*murdered]2
-          </label><label class="form-check-label">
-            <input class="form-check-input" type="radio" name="death_reason" value="Executed" %if;dr_executed;checked%end; onclick='set_death_focus(xcnt)'%/> [*executed (legally killed)]2
-          </label><label class="form-check-label">
-            <input class="form-check-input" type="radio" name="death_reason" value="Disappeared" %if;dr_disappeared;checked%end; onclick='set_death_focus(xcnt)'%/> [*disappeared]2
-          </label><label class="form-check-label">
-            <input class="form-check-input" type="radio" name="death_reason" value="Unspecified" %if;dr_unspecified;checked%end; onclick='set_death_focus(xcnt)'%/> [*unspecified]2
-          </label>
+        <div class="ml-4 mt-1">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="death_reason" value="Killed" id="Killed" %if;dr_killed;checked%end; onclick='set_death_focus(xcnt)'>
+            <label class="form-check-label" for="Killed">[*killed (in action)]2</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="death_reason" value="Murdered" id="Murdered" %if;dr_murdered;checked%end; onclick='set_death_focus(xcnt)'>
+            <label class="form-check-label" for="Murdered">[*murdered]2</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="death_reason" value="Executed" id="Executed" %if;dr_executed;checked%end; onclick='set_death_focus(xcnt)'>
+            <label class="form-check-label" for="Executed">[*executed (legally killed)]2</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="death_reason" value="Disappeared" id="Disappeared" %if;dr_disappeared;checked%end; onclick='set_death_focus(xcnt)'>
+            <label class="form-check-label" for="Disappeared">[*disappeared]2</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="death_reason" value="Unspecified" id="Unspecified" %if;dr_unspecified;checked%end; onclick='set_death_focus(xcnt)'>
+            <label class="form-check-label" for="Unspecified">[*unspecified]2</label>
+          </div>
         </div>
       </div>
     %end;
@@ -793,7 +804,7 @@ function changeCalendar(e,v,m,c) {
       %apply;insert_witness(xcnt, "0", "evt_name")
     %end;
   %end;
-%end
+%end;
 
 %define;one_empty_specific_pevent(xcnt, evt_name)
   %if;("evt_name" = "#deat")
@@ -811,18 +822,27 @@ function changeCalendar(e,v,m,c) {
           <option value="OfCourseDead" %if;of_course_dead; selected%end;>[*of course dead]</option>
         </select>
       </div>
-      <div class="col form-check form-check-inline mt-1">
-        <label class="form-check-label">
-          <input type="radio" name="death_reason" value="Killed" %if;dr_killed;checked%end; onclick='set_death_focus(xcnt)'> [*killed (in action)]2
-        </label><label class="form-check-label">
-          <input type="radio" name="death_reason" value="Murdered" %if;dr_murdered;checked%end; onclick='set_death_focus(xcnt)'> [*murdered]2
-        </label><label class="form-check-label">
-          <input type="radio" name="death_reason" value="Executed" %if;dr_executed;checked%end; onclick='set_death_focus(xcnt)'> [*executed (legally killed)]2
-        </label><label class="form-check-label">
-          <input type="radio" name="death_reason" value="Disappeared" %if;dr_disappeared;checked%end; onclick='set_death_focus(xcnt)'> [*disappeared]2
-        </label><label class="form-check-label">
-          <input type="radio" name="death_reason" value="Unspecified" %if;dr_unspecified;checked%end; onclick='set_death_focus(xcnt)'> [*unspecified]2
-        </label>
+      <div class="col mt-1">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="death_reason" value="Killed" id="Killed" %if;dr_killed;checked%end; onclick='set_death_focus(xcnt)'>
+          <label class="form-check-label" for="Killed">[*killed (in action)]2</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="death_reason" value="Murdered" id="Murdered" %if;dr_murdered;checked%end; onclick='set_death_focus(xcnt)'>
+          <label class="form-check-label" for="Murdered">[*murdered]2</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="death_reason" value="Executed" id="Executed" %if;dr_executed;checked%end; onclick='set_death_focus(xcnt)'>
+          <label class="form-check-label" for="Executed">[*executed (legally killed)]2</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="death_reason" value="Disappeared" id="Disappeared" %if;dr_disappeared;checked%end; onclick='set_death_focus(xcnt)'>
+          <label class="form-check-label" for="Disappeared">[*disappeared]2</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="death_reason" value="Unspecified" id="Unspecified" %if;dr_unspecified;checked%end; onclick='set_death_focus(xcnt)'>
+          <label class="form-check-label" for="Unspecified">[*unspecified]2</label>
+        </div>
       </div>
     </div>
   %end;
@@ -941,8 +961,8 @@ function changeCalendar(e,v,m,c) {
       <div class="col-sm-6">
         <input type="text" class="form-control" name="first_name" maxlength="200" value="%first_name;" id="first_name" placeholder="[*first name/first names]0">
       </div>
-      <label for="occ" class="col-sm-1 col-form-label">[*number]0</label>
-      <div class="col-sm-2">
+      <label for="occ" class="col col-form-label">[*number]0</label>
+      <div class="col">
         <input type="number" class="form-control" name="occ" min="0" max="99999999" value="%if;(occ="")0%else;%occ;%end;" id="occ">
       </div>
     </div>
@@ -951,35 +971,51 @@ function changeCalendar(e,v,m,c) {
       <div class="col-sm-6">
         <input type="text" class="form-control" name="surname" maxlength="200" value="%surname;" id="surname" placeholder="[*surname/surnames]0">
       </div>
-      <span class="col-sm-1 col-form-label">[*sex]</span>
-      <div class="col-2 mt-2">
-        <label class="form-check-label" for="sexM">
-          <input class="form-check-input" type="radio" name="sex" value="M" id="sexM" %if;is_male;checked%end; title="[*male/female/neuter]0"%/> [M/F]0
-        </label>
-        <label class="form-check-label" for="sexF">
-          <input class="form-check-input" type="radio" name="sex" value="F" id="sexF" %if;is_female;checked%end; title="[*male/female/neuter]1"%/> [M/F]1
-        </label>
-        <label class="form-check-label" for="sexU">
-          <input class="form-check-input" type="radio" name="sex" value="N" id="sexU" %if;not(is_male or is_female)checked%end; title="[*male/female/neuter]2"%/> ?
-        </label>
+      <span class="col col-form-label">[*sex]</span>
+      <div class="col mt-2">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" value="M" id="sexM" %if;is_male;checked%end; title="[*male/female/neuter]0"%/>
+          <label class="form-check-label" for="sexM">[M/F]0</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" value="F" id="sexF" %if;is_female;checked%end; title="[*male/female/neuter]1"%/>
+          <label class="form-check-label" for="sexF">[M/F]1</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" value="N" id="sexU" %if;not(is_male or is_female)checked%end; title="[*male/female/neuter]2"%/>
+          <label class="form-check-label" for="sexU">?</label>
+        </div>
       </div>
     </div>
     <div class="row">
-      <label for="public_name" class="col-sm-2 col-form-label">[*public name]</label>
-      <div class="col-sm-6">
-        <input type="text" class="form-control" name="public_name" value="%public_name;" id="public_name" placeholder="[*public name]">
+      <div class="col-8">
+        <div class="row">
+        <label for="public_name" class="col-sm-3 col-form-label">[*public name]</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" name="public_name" value="%public_name;" id="public_name" placeholder="[*public name]">
+        </div>
+        <label for="image" class="col-sm-3 col-form-label mt-3">[*image/images]0</label>
+        <div class="col-sm-9 mt-3">
+          <input type="text" class="form-control" name="image" value="%image;" id="image" placeholder="[*image/images]0">
+        </div>
+        </div>
       </div>
-      <span class="col-sm-1 col-form-label">[*access]0</span>
-      <div class="col-sm-3 mt-2">
-        <label class="form-check-label"><input class="form-check-input" type="radio" name="access" value="IfTitles"%if;acc_if_titles; checked%end;> [*if titles]0</label>
-        <label class="form-check-label"><input class="form-check-input" type="radio" name="access" value="Public"%if;acc_public; checked%end;> [*public]0</label>
-        <label class="form-check-label"><input class="form-check-input" type="radio" name="access" value="Private"%if;acc_private; checked%end;> [*private]0</label>
-      </div>
-    </div>
-    <div class="row">
-      <label for="image" class="col-sm-2 col-form-label">[*image/images]0</label>
-      <div class="col-sm-6">
-        <input type="text" class="form-control" name="image" value="%image;" id="image" placeholder="[*image/images]0">
+      <div class="col-4 d-flex px-0">
+        <span class="col col-form-label">[*access]0</span>
+        <div class="col mt-2">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="access" value="IfTitles" id="IfTitles" %if;acc_if_titles; checked%end;>
+            <label class="form-check-label" for="IfTitles">[*if titles]0</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="access" value="Public" id="Public" %if;acc_public; checked%end;>
+            <label class="form-check-label" for="Public">[*public]0</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="access" value="Private" id="Private" %if;acc_private; checked%end;>
+            <label class="form-check-label" for="Private">[*private]0</label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1271,15 +1307,11 @@ function changeCalendar(e,v,m,c) {
 %define;insert_relation(xx)
   <div class="row">
     <span class="col-form-label col-2">[*insert]</span>
-    <div class="form-inline col-10">
-      <div class="input-group">
-        <span class="input-group-btn">
-          <label class="btn btn-outline-secondary">[*relation/relations]0
-            <input class="ml-1" type="checkbox" name="add_relationxx" value="on">
-          </label>
-        </span>
-        <button type="submit" class="btn btn-outline-secondary" title="[*insert::relation/relations]0">OK</button>
-      </div>
+    <div class="btn-group col-10">
+      <label class="btn btn-outline-secondary mb-0">1 [relation/relations]0
+        <input class="ml-1" type="checkbox" name="add_relationxx" value="on">
+      </label>
+      <button type="submit" class="btn btn-outline-secondary" title="[*insert::relation/relations]0">OK</button>
     </div>
   </div>
 %end;
@@ -1307,8 +1339,8 @@ function changeCalendar(e,v,m,c) {
       <div class="col-sm-5">
         <input type="text" class="form-control" name="rxcnt_xvar_fn" maxlength="200" value="%relation.xrel.first_name;" id="rxcnt_xvar_fn" placeholder="[*first name/first names]0">
       </div>
-      <label for="rxcnt_xvar_occ" class="col-sm-1 col-form-label">[*number]0</label>
-      <div class="col-sm-2">
+      <label for="rxcnt_xvar_occ" class="col-sm col-form-label">[*number]0</label>
+      <div class="col-sm">
         <input type="number" class="form-control" name="rxcnt_xvar_occ" min="0" max="99999999" value="%relation.xrel.occ;" id="rxcnt_xvar_occ" placeholder="">
       </div>
       <div class="col-sm-2">
@@ -1323,7 +1355,7 @@ function changeCalendar(e,v,m,c) {
       <div class="col-sm-5">
         <input type="text" class="form-control" name="rxcnt_xvar_sn" maxlength="200" value="%relation.xrel.surname;" id="rxcnt_xvar_sn" placeholder="[*surname/surnames]0">
       </div>
-      <p class="col-sm-2">([sex]0 xsex)</p>
+      <p class="col-sm-2 mt-1">([sex]0 xsex)</p>
     </div>
   </div>
 %end;
@@ -1355,16 +1387,14 @@ function changeCalendar(e,v,m,c) {
 %define;insert_title(xcnt)
   <div class="row">
     <label for="ins_titlexcnt_n" class="col-form-label col-2">[*insert]</label>
-    <div class="form-inline col-10">
-      <select class="form-control" id="ins_titlexcnt_n" name="ins_titlexcnt_n">
+    <div class="input-group col-10">
+      <select class="custom-select border border-dark col-1" id="ins_titlexcnt_n" name="ins_titlexcnt_n">
         %for;i;1;11;<option>%i;</option> %end;
       </select>
-      <div class="input-group">
-        <span class="input-group-btn">
-          <label class="btn btn-outline-secondary"> [title/titles]0/[title/titles]1
-            <input class="ml-1" type="checkbox" name="ins_titlexcnt" value="on">
-          </label>
-        </span>
+      <div class="input-group-append">
+        <label class="btn btn-outline-secondary mb-0"> [title/titles]0/[title/titles]1
+          <input class="ml-1" type="checkbox" name="ins_titlexcnt" value="on">
+        </label>
         <button type="submit" class="btn btn-outline-secondary" title="[*insert::title/titles]0/[title/titles]1">OK</button>
       </div>
     </div>
@@ -1393,9 +1423,10 @@ function changeCalendar(e,v,m,c) {
       <div class="col-sm-1">
         <input type="text" class="form-control" name="t_nthxcnt" size="3" value="%title.t_nth;" id="t_nthxcnt" placeholder="#">
       </div>
-        <label class="col-form-label">
-          <input type="checkbox" name="t_main_titlexcnt" value="on" %if;title.t_main; checked%end;> [*main title]0
-        </label>
+      <div class="form-inline form-check">
+        <input class="form-check-input" id="maintitle" type="checkbox" name="t_main_titlexcnt" value="on" %if;title.t_main; checked%end;>
+        <label class="form-check-label" for="maintitle">[*main title]0</label>
+      </div>
     </div>
   </div>
   %apply;date([*begin]0, "t_date_startxcnt", "title_date_start", "")
@@ -1426,7 +1457,7 @@ function changeCalendar(e,v,m,c) {
       %let;name;notes%in;
       %include.toolbar;
       <textarea class="form-control" name="notes" id="notes" rows="16">%notes;</textarea>%sq;
-      <button type="submit" class="btn btn-light border-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0" aria-label="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 fa-fw text-success" aria-hidden="true"></i><span class="d-none d-md-flex ml-1 font-weight-bold"></span></button>
+      <button type="submit" class="btn btn-outline-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0" aria-label="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 fa-fw" aria-hidden="true"></i><span class="d-none d-md-flex ml-1 font-weight-bold"></span></button>
       <div class="ml-1 text-center"> 
         %include.accent;
       </div>
