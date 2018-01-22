@@ -1100,7 +1100,8 @@ value print_mod_ok conf base = do {
       }
     else ();
     tag "p" begin
-      stag "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\"" (commd conf) data ini begin
+      stag "a" "href=\"%sm=MOD_DATA;data=%s;s=%s\" id=\"reference\""
+        (commd conf) data ini begin
         Wserver.printf "%s" (capitale (transl conf "new modification"));
       end;
     end;

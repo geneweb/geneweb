@@ -28,17 +28,16 @@
     $.getScript('%if;(cgi)%bvar.static_path;%end;p_mod.js');
   });
   </script>
-  %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK" or evar.m="ADD_FAM_OK"))
+  %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
+       or evar.m="ADD_FAM_OK" or evar.m="MOD_DATA_OK"))
     <script>
-    var htmlTitle = document.title;
-    if
-    ( htmlTitle == "[*person modified]" ||
-      htmlTitle == "[*family modified]" ||
-      htmlTitle == "[*person added]" ||
-      htmlTitle == "[*family added]"
-    )
-    { document.getElementById("i%evar.i;").focus();
-    }
+      var htmlTitle = document.title;
+      if ( htmlTitle == "[*person modified]" ||
+           htmlTitle == "[*family modified]" ||
+           htmlTitle == "[*person added]" ||
+           htmlTitle == "[*family added]" ||
+           htmlTitle == "[*modification successful]" )
+      { document.getElementById("i%evar.i;").focus(); }
     </script>
   %end;
 %end;
