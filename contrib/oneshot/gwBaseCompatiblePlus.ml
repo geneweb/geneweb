@@ -1,8 +1,6 @@
 (* camlp4r *)
 
-open Def;
 open Gwdb;
-open Printf;
 
 
 value bname = ref "";

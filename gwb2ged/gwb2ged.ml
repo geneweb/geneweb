@@ -2,7 +2,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
 open Mutil;
 open Printf;

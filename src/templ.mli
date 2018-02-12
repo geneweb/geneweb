@@ -2,7 +2,6 @@
 (* $Id: templ.mli,v 5.8 2007-09-12 09:58:44 ddr Exp $ *)
 
 open Config;
-open Gwdb;
 open TemplAst;
 
 type vother 'a = 'abstract;

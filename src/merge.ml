@@ -3,8 +3,6 @@
 (* Copyright (c) 1998-2007 INRIA *)
 
 open Config;
-open Def;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Util;

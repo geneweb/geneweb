@@ -1,7 +1,6 @@
 (* camlp5r ../../src/pa_lock.cmo *)
 (* $Id: gw_fix_base.ml,v 0.01 2014-02-21 16:26:45 flh Exp $ *)
 
-open Def;
 open Gwdb;
 open Printf;
 

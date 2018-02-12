@@ -5,7 +5,6 @@
 open Config;
 open Def;
 open Util;
-open Gutil;
 open Gwdb;
 open Mutil;
 open Printf;

@@ -2,7 +2,6 @@
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
-open Gutil;
 open Gwdb;
 
 value all = ref False;

@@ -1,8 +1,6 @@
 (* $Id: chkimg.ml,v 4.9 2007-09-04 03:06:50 deraugla Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
-open Gutil;
-open Def;
 open Printf;
 
 value get_images_names bname =

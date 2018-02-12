@@ -1,7 +1,6 @@
 (* $Id: hist.ml,v 4.7 2006-10-30 09:37:58 deraugla Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
-open Def;
 open Gutil;
 open Gwdb;
 open Printf;

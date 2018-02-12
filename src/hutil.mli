@@ -2,7 +2,6 @@
 (* Copyright (c) 2007 INRIA *)
 
 open Config;
-open Gwdb;
 
 value header : config -> (bool -> unit) -> unit;
 value header_fluid : config -> (bool -> unit) -> unit;

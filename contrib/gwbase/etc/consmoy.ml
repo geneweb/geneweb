@@ -1,7 +1,6 @@
 (* $Id: consmoy.ml,v 4.7 2006-10-04 10:51:20 deraugla Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
-open Def;
 open Gwdb;
 open Printf;
 

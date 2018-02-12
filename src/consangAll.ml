@@ -1,7 +1,6 @@
 (* $Id: consangAll.ml,v 5.35 2007/02/21 18:14:01 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-open Def;
 open Gwdb;
 
 value designation base p =

@@ -1,9 +1,7 @@
 (* camlp4r *)
 (* $Id: gwExportAscCSV.ml.ml,v 0.01 2014-04-16 10:05:38 flh Exp $ *)
 
-open Def;
 open Gwdb;
-open Printf;
 
 
 value is_printable =

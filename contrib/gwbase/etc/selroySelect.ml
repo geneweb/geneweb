@@ -3,7 +3,6 @@
 (* *)
 
 open Def;
-open Gutil;
 open Gwdb;
 
 value select_ancestors base per_tab fam_tab flag =

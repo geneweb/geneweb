@@ -3,7 +3,6 @@
 
 open Config;
 open Def;
-open Gutil;
 open Gwdb;
 open Hutil;
 open Util;
