@@ -90,7 +90,7 @@ value nameize _ =
     | _ -> Buff.mstore len c5 ]
   in
   let len = Buff.mstore len (char6 ()) in
-  String.uppercase (Buff.get len)
+  String.uppercase_ascii (Buff.get len)
 ;
 
 value h_fn n =

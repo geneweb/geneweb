@@ -77,7 +77,7 @@ value crlf () =
 
 value lowercase_start_with s s_ini =
   let len = String.length s_ini in
-  String.length s >= len && String.lowercase (String.sub s 0 len) = s_ini
+  String.length s >= len && String.lowercase_ascii (String.sub s 0 len) = s_ini
 ;
 
 value quote_escaped s =
@@ -358,7 +358,7 @@ value gwtp_error txt =
 <h1><font color=red>Error</font></h1>
 %s
 </body>
-" (String.capitalize txt);
+" (String.capitalize_ascii txt);
   }
 ;
 
@@ -975,7 +975,7 @@ value secure_html s =
                 | _ -> (tag, i) ]
           in
           let len =
-            if List.mem (String.lowercase tag) acceptable_tags then
+            if List.mem (String.lowercase_ascii tag) acceptable_tags then
               Buff.store len '<'
             else Buff.mstore len "&lt;"
           in

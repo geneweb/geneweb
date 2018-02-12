@@ -147,7 +147,7 @@ value is_multipart_form =
     let rec loop i =
       if i >= String.length content_type then False
       else if i >= String.length s then True
-      else if content_type.[i] = Char.lowercase s.[i] then loop (i + 1)
+      else if content_type.[i] = Char.lowercase_ascii s.[i] then loop (i + 1)
       else False
     in
     loop 0
@@ -189,7 +189,7 @@ value extract_multipart boundary str =
       let (s, i) = next_line i in
       if s = boundary then
         let (s, i) = next_line i in
-        let s = String.lowercase s in
+        let s = String.lowercase_ascii s in
         let env = create_env s in
         match (getenv env "name", getenv env "filename") with
         [ (Some var, Some filename) ->

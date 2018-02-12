@@ -250,7 +250,7 @@ check_optimized_ocaml() {
 
 check_ocaml_version() {
 # depends on check_ocaml and check_optimized_ocaml
-  local OCAML_MIN_VER="4.02"
+  local OCAML_MIN_VER="4.05.0"
   local OCAML_VER="`$OCAMLC -version`"
   if testversion "$OCAML_VER" ">=" "$OCAML_MIN_VER"; then
     print_check_ok \

@@ -52,7 +52,7 @@ let double_metaphone sstring =
   let last     = length - 1 in
   let original = sstring ^ "     " in
 
-  let original = String.uppercase original in
+  let original = String.uppercase_ascii original in
 
 (*    // skip this at beginning of word*)
 

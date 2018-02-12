@@ -886,7 +886,7 @@ value int_of_field s =
 value reconstitute_date_dmy2 conf var =
   let m =
     let m = get var "ormonth" conf.env in
-    match String.uppercase m with
+    match String.uppercase_ascii m with
     [ "VD" -> Some 1
     | "BR" -> Some 2
     | "FM" -> Some 3
@@ -943,7 +943,7 @@ value reconstitute_date_dmy conf var =
   in
   let (force_f_cal, m) =
     let m = get var "mm" conf.env in
-    match String.uppercase m with
+    match String.uppercase_ascii m with
     [ "VD" -> (True, Some 1)
     | "BR" -> (True, Some 2)
     | "FM" -> (True, Some 3)

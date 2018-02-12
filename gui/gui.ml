@@ -74,7 +74,7 @@ value transl w =
   | None -> w ]
 ;
 
-value capitale w = String.capitalize w ;
+value capitale w = String.capitalize_ascii w ;
 
 
 (**/**) (* Fonctions utiles. *)
@@ -554,7 +554,7 @@ value create_base conf bname src_file =
   else do {
     if src_file = "" then gwc2 conf bname src_file
     else
-      let fname = String.lowercase src_file in
+      let fname = String.lowercase_ascii src_file in
       if Filename.check_suffix fname ".gw" then
         gwc2 conf bname src_file
       else if Filename.check_suffix fname ".ged" then

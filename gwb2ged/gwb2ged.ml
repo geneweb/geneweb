@@ -93,7 +93,7 @@ value rec display_note_aux oc tagn s len i =
     let c = if s.[i] = '\n' then ' ' else s.[i] in
     let br = find_br s i in
     if i <= String.length s - String.length br &&
-       String.lowercase (String.sub s i (String.length br)) = br then
+       String.lowercase_ascii (String.sub s i (String.length br)) = br then
        do {
       fprintf oc "\n%d CONT " (succ tagn);
       let i = i + String.length br in

@@ -90,8 +90,8 @@ value compare_names_1 s1 s2 =
       else if i1 = e1 then -1
       else if i2 = e2 then 1
       else
-        let c1 = unaccent (Char.lowercase s1.[i1]) in
-        let c2 = unaccent (Char.lowercase s2.[i2]) in
+        let c1 = unaccent (Char.lowercase_ascii s1.[i1]) in
+        let c2 = unaccent (Char.lowercase_ascii s2.[i2]) in
         match (c1, c2) with
         [ ('a'..'z', 'a'..'z') ->
             if c1 < c2 then -1

@@ -246,7 +246,9 @@ let missing_or_unused_msg lexicon repo log =
   let msg_tpl = get_msg_tpl repo_tpl in
   let msg =
     sort_uniq
-      (fun x y -> Pervasives.compare (String.lowercase x) (String.lowercase y))
+      (fun x y ->
+        Pervasives.compare
+          (String.lowercase_ascii x) (String.lowercase_ascii y))
       (List.rev_append msg_src msg_tpl)
   in
 
@@ -341,7 +343,8 @@ let missing_translation lexicon languages =
 module Lex_map = Map.Make
   (struct
     type t = string
-    let compare x y = compare (String.lowercase x) (String.lowercase y)
+    let compare x y =
+      compare (String.lowercase_ascii x) (String.lowercase_ascii y)
    end)
 ;;
 

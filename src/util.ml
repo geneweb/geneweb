@@ -41,7 +41,7 @@ value search_in_lang_path = search_in_path Secure.lang_path;
 
 value start_with_vowel s =
   if String.length s > 0 then
-    match Char.lowercase s.[0] with
+    match Char.lowercase_ascii s.[0] with
     [ 'a' | 'e' | 'i' | 'o' | 'u' -> True
     | _ -> False ]
   else False
@@ -49,7 +49,7 @@ value start_with_vowel s =
 
 value start_with_hi_i s =
   if String.length s > 0 then
-    match Char.lowercase s.[0] with
+    match Char.lowercase_ascii s.[0] with
     [ 'i' -> True
     | 'h' -> String.length s > 1 && s.[1] = 'i'
     | _ -> False ]
@@ -106,12 +106,12 @@ value rec capitale_utf_8 s =
           let s1 = String.sub s (i + 1) (String.length s - i - 1) in
           String.sub s 0 (i + 1) ^ capitale_utf_8 s1
         else loop (i + 1)
-    else if Char.code c < 0b10000000 then String.capitalize s
+    else if Char.code c < 0b10000000 then String.capitalize_ascii s
     else if String.length s = 1 then s
     else
       match Char.code c with
       [ 0xC3 ->
-          let c1 = Char.uppercase (Char.chr (Char.code s.[1] + 0x40)) in
+          let c1 = Char.uppercase_ascii (Char.chr (Char.code s.[1] + 0x40)) in
           sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
             (String.sub s 2 (String.length s - 2))
       | 0xC5 when Char.code s.[1] = 0x93 -> (* oe *)
@@ -1088,7 +1088,7 @@ value old_surname_end n =
 
 value start_with s i p =
   i + String.length p <= String.length s &&
-  String.lowercase (String.sub s i (String.length p)) = p
+  String.lowercase_ascii (String.sub s i (String.length p)) = p
 ;
 
 value start_with2 s i p =
@@ -1654,7 +1654,7 @@ value tag_id s i =
     else
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '!' | '-' ->
-          loop (i + 1) (Buff.store len (Char.lowercase s.[i]))
+          loop (i + 1) (Buff.store len (Char.lowercase_ascii s.[i]))
       | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
 ;
 
@@ -1675,7 +1675,7 @@ value good_tag_list_fun () =
     [ Some ic ->
         loop [] where rec loop tags =
           match try Some (input_line ic) with [ End_of_file -> None ] with
-          [ Some tg -> loop [String.lowercase tg :: tags]
+          [ Some tg -> loop [String.lowercase_ascii tg :: tags]
           | None -> do { close_in ic; tags } ]
     | None -> default_good_tag_list ]
   else default_good_tag_list
@@ -2970,7 +2970,7 @@ value is_that_user_and_password auth_scheme user passwd =
 
 value browser_doesnt_have_tables conf =
   let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
-  String.lowercase user_agent = "lynx"
+  String.lowercase_ascii user_agent = "lynx"
 ;
 
 (* Printing for browsers without tables *)

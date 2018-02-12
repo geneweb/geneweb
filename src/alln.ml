@@ -87,11 +87,11 @@ value lower_if_not_utf8 s =
 ;
 
 value capitalize_if_not_utf8 s =
-  if Mutil.utf_8_db.val then s else String.capitalize s
+  if Mutil.utf_8_db.val then s else String.capitalize_ascii s
 ;
 
 value lowercase_if_not_utf8 s =
-  if Mutil.utf_8_db.val then s else String.lowercase s
+  if Mutil.utf_8_db.val then s else String.lowercase_ascii s
 ;
 
 value new_name_key base s =
@@ -135,7 +135,7 @@ value displayify s =
         if nbc < 0 || i + nbc > String.length s then
           Buff.get (Buff.mstore len "...")
         else loop (i + nbc) (Buff.gstore len s i nbc)
-  else String.capitalize s
+  else String.capitalize_ascii s
 ;
 
 value tr c1 s2 s =

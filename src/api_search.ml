@@ -58,7 +58,7 @@ let kmp p s =
 ;;
 
 let capitalize_if_not_utf8 s =
-  if !Mutil.utf_8_db then s else String.capitalize s
+  if !Mutil.utf_8_db then s else String.capitalize_ascii s
 ;;
 
 let new_name_key base s =
@@ -153,8 +153,8 @@ let select_both_start_with conf base ini_n ini_p need_whole_list =
         in loop istr_n accu
     | None -> accu
   in
-  let list = search String.uppercase [] in
-  search String.lowercase list
+  let list = search String.uppercase_ascii [] in
+  search String.lowercase_ascii list
 ;;
 
 
@@ -315,8 +315,8 @@ let select_start_with conf base is_surnames ini need_whole_list =
         in loop istr accu
      | None -> accu
   in
-  let list = search String.uppercase [] in
-  search String.lowercase list
+  let list = search String.uppercase_ascii [] in
+  search String.lowercase_ascii list
 ;;
 
 
@@ -584,7 +584,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
         | `source -> failwith "cannot use select_start_with_auto_complete"
       in
       let start_k = Mutil.tr '_' ' ' ini in
-      let letter = String.uppercase (String.sub start_k 0 1) in
+      let letter = String.uppercase_ascii (String.sub start_k 0 1) in
       match
         try Some (spi_first name letter) with
           Not_found -> None
@@ -627,7 +627,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
           | `source -> failwith "cannot use select_start_with_auto_complete"
         in
         let start_k = Mutil.tr '_' ' ' ini in
-        let letter = String.lowercase (String.sub start_k 0 1) in
+        let letter = String.lowercase_ascii (String.sub start_k 0 1) in
         match
           try Some (spi_first name letter) with
             Not_found -> None
@@ -666,7 +666,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
     begin
       (* On commence à ? comme ça on fait MAJ et MIN. *)
       let start_k = Mutil.tr '_' ' ' "?" in
-      let letter = String.uppercase (String.sub start_k 0 1) in
+      let letter = String.uppercase_ascii (String.sub start_k 0 1) in
       match
         try Some (spi_first name letter) with
           Not_found -> None
@@ -1225,7 +1225,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
         (*    let start_k = Mutil.tr '_' ' ' ini in*)
             (* On commence à ? comme ça on fait MAJ et MIN. *)
             let start_k = Mutil.tr '_' ' ' "?" in
-            let letter = String.uppercase (String.sub start_k 0 1) in
+            let letter = String.uppercase_ascii (String.sub start_k 0 1) in
             match
               try Some (spi_first name letter) with
                Not_found -> None
@@ -1294,7 +1294,7 @@ let select_start_with_auto_complete conf base mode get_field max_res ini =
         (*
           let () =
             let start_k = Mutil.tr '_' ' ' ini in
-            let letter = String.lowercase (String.sub start_k 0 1) in
+            let letter = String.lowercase_ascii (String.sub start_k 0 1) in
             match
               try Some (spi_first name letter) with
                Not_found -> None

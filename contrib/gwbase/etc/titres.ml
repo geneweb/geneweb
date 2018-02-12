@@ -12,7 +12,7 @@ value lower_utf_8 s =
     if i >= String.length s then Buff.get len
     else
       let c =
-        if Name.nbc s.[i] = 1 then Char.lowercase s.[i]
+        if Name.nbc s.[i] = 1 then Char.lowercase_ascii s.[i]
 	else s.[i]
       in
       loop (i + 1) (Buff.store len c)

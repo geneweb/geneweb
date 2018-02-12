@@ -548,7 +548,7 @@ value strip_troublemakers s =
             loop j where rec loop k =
               match s.[k] with
               [ 'a'..'z' | 'A'..'Z' -> loop (k + 1)
-              | _ -> (String.lowercase (String.sub s j (k - j)), k) ]
+              | _ -> (String.lowercase_ascii (String.sub s j (k - j)), k) ]
           in
           let j =
             loop j where rec loop j =

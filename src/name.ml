@@ -36,7 +36,7 @@ value nbc c =
 ;
 
 value unaccent_utf_8 lower s i =
-  let f s = if lower then String.lowercase s else s in
+  let f s = if lower then String.lowercase_ascii s else s in
   let nbc = nbc s.[i] in
   if nbc = 1 || nbc < 0 || i + nbc > String.length s then
     (f (String.make 1 s.[i]), i + 1)
@@ -76,7 +76,9 @@ value unaccent_utf_8 lower s i =
                  alors on ignore le caratère. Cela peut se produire
                  si l'entrée est mauvaise, ex: JÃ©rÃÃ¶me /FOO/ *)
               try
-                let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
+                let c =
+                  Char.lowercase_ascii (Char.chr (Char.code s.[i+1] + 0x40))
+                in
                 String.make 1 c
               with Invalid_argument "Char.chr" -> "" ]
       | 0xC4 ->
@@ -424,8 +426,8 @@ value next_chars_if_equiv s i t j =
     if s1 = t1 then Some (i1, j1) else None
   else if s.[i] = t.[j] then Some (i + 1, j + 1)
   else if
-    unaccent_iso_8859_1 (Char.lowercase s.[i]) =
-    unaccent_iso_8859_1 (Char.lowercase t.[j])
+    unaccent_iso_8859_1 (Char.lowercase_ascii s.[i]) =
+    unaccent_iso_8859_1 (Char.lowercase_ascii t.[j])
   then Some (i + 1, j + 1)
   else None
 ;
@@ -438,7 +440,7 @@ value lower s =
       [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c
         ->
           let len = if special then Buff.store len ' ' else len in
-          let c = unaccent_iso_8859_1 (Char.lowercase c) in
+          let c = unaccent_iso_8859_1 (Char.lowercase_ascii c) in
           copy False (i + 1) (Buff.store len c)
       | c ->
           copy (len <> 0) (i + 1) len ]

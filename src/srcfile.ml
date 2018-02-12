@@ -337,7 +337,7 @@ value rec lexicon_translate conf base nomin strm first_c =
 
 value browser_cannot_handle_passwords conf =
   let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
-  String.lowercase user_agent = "konqueror"
+  String.lowercase_ascii user_agent = "konqueror"
 ;
 
 value get_variable strm =

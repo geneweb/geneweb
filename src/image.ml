@@ -71,7 +71,7 @@ value print_image_file fname =
   List.exists
     (fun (suff, itype, ctype) ->
        if Filename.check_suffix fname suff ||
-          Filename.check_suffix fname (String.uppercase suff) then
+          Filename.check_suffix fname (String.uppercase_ascii suff) then
          print_image_type fname ctype
        else False)
     [(".png", "png", "image/png");

@@ -241,7 +241,8 @@ value print_exc exc =
 
 value print_err_exc exc = do { print_exc exc; flush stderr };
 
-value case_unsensitive_eq s1 s2 = String.lowercase s1 = String.lowercase s2;
+value case_unsensitive_eq s1 s2 =
+  String.lowercase_ascii s1 = String.lowercase_ascii s2;
 
 value rec extract_param name stop_char =
   fun
