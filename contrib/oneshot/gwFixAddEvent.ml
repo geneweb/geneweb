@@ -42,7 +42,7 @@ value read_file fname =
     [ [sn; fn; occ] ->
         let occ =
           try int_of_string occ
-          with [ Failure "int_of_string" ->
+          with [ Failure _ ->
             do {
               eprintf "*** Error int_of_string: %s" occ;
               flush stderr;

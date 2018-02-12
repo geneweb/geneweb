@@ -19,11 +19,11 @@ value action_arg s sl =
         match sl with
         [ [s :: sl] ->
             try do { f (int_of_string s); Some sl } with
-            [ Failure "int_of_string" -> None ]
+            [ Failure _ -> None ]
         | [] -> None ]
       else
         try do { f (int_of_string s); Some sl } with
-        [ Failure "int_of_string" -> None ]
+        [ Failure _ -> None ]
   | Arg.Float f ->
       if s = "" then
         match sl with
@@ -42,11 +42,11 @@ value action_arg s sl =
       match sl with
       [ [s :: sl] ->
         try do { r.val := (int_of_string s); Some sl } with
-        [ Failure "int_of_string" -> None ]
+        [ Failure _ -> None ]
       | [] -> None ]
     else
       try do { r.val := (int_of_string s); Some sl } with
-      [ Failure "int_of_string" -> None ]
+      [ Failure _ -> None ]
   | Arg.Set_float r ->
     if s = "" then
       match sl with

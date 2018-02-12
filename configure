@@ -314,6 +314,7 @@ check_flags() {
   fi
   if $WARNERROR; then
     OCAMLFLAGS+=" -warn-error A"
+    OCAMLFLAGS+=" -w +a-4-6-9-27-32-33-35-37-38-39-41-44-48"
   fi
 }
 

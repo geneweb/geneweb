@@ -1540,7 +1540,7 @@ value eval_predefined_apply conf env f vl =
         in
         let time = String.sub date_txt 11 8 in
         Date.string_of_date conf date ^ ", " ^ time
-      with [ Failure "int_of_string" -> date_txt ]
+      with [ Failure _ -> date_txt ]
   | _ -> raise Not_found ]
 ;
 
