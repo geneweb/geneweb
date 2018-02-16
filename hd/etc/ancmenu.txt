@@ -326,12 +326,12 @@ function no_options () {
           ([maximum] %bvar.max_anc_tree; [generation/generations]1)
         %end;
       </label>
-      <label>
+      %(<label>
             <input type="radio" name="t1" value="x" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
       </label>
       <label>
             <input type="radio" name="t1" value="m" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
-      </label>
+      </label>%)
       <br%/>
       <label>
         <input type="radio" name="t" value="A" onclick="no_options()"%/> <span class="fa fa-male fa-fw"></span> [*male line/female line]0
@@ -343,13 +343,13 @@ function no_options () {
       <br%/>
       <div class="ml-4">
         <label>
-          <input type="checkbox" name="image" value="on"%/>
-          [*image/images]1
+          <input type="checkbox" name="image" value="off"%/>
+          [*hide portraits]
         </label>
         <br%/>
         <label>
           <input type="checkbox" name="marriage" value="on"%/>
-          [*marriage/marriages]0
+          [*display marriage date]
         </label>
         %(<br%/>
         <label>

@@ -2,6 +2,10 @@
 en: with root ancestor, spouses and unknowns
 fr: avec l'ancêtre racine, les conjoints et les inconnus
 
+    hide portraits
+en: hide portraits
+fr: ne pas afficher les portraits
+
     choose a genealogy
 en: choose a genealogy
 fr: choisir une généalogie
@@ -4742,7 +4746,7 @@ sv: visa generations nummer
 
     display marriage date
 de: Hochzeitstag anzeigen
-en: Display date of marriage
+en: display marriage date
 es: editar la fecha de casamiento
 fr: afficher la date de mariage
 it: visualizzare la data del matrimonio
