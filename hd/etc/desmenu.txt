@@ -288,7 +288,7 @@ function table_spouse_disabled () {
       </div>
       <label class="mt-2">
         <input type="radio" name="t" value="S" onclick="no_options ()"%/>
-         <span class="fa fa-sort-alpha-asc fa-fw"></span> [*descendants at the generation]
+         <span class="fa fa-sort-alpha-down fa-fw"></span> [*descendants at the generation]
       </label>
       <br%/>
       <label>
