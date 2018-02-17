@@ -152,8 +152,8 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                     <div class="input-group">
                       <input type="search" id="firstname" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]2" maxlength="200" tabindex=1>
                       <span class="d-flex flex-column input-group-btn">
-                        <a class="btn btn-outline-secondary" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=4><span class="fa fa-sort-alpha-asc fa-fw"></span></a>
-                        <a class="btn btn-outline-secondary" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=5><span class="fa fa-sort-amount-desc fa-fw"></span></a>
+                        <a class="btn btn-outline-secondary" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=4><span class="fa fa-sort-alpha-down fa-fw"></span></a>
+                        <a class="btn btn-outline-secondary" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=5><span class="fa fa-sort-amount-down fa-fw"></span></a>
                       </span>
                     </div>
                   </div>
@@ -162,8 +162,8 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                     <div class="input-group">
                       <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" maxlength="200" tabindex=2 autofocus>
                       <span class="d-flex flex-column input-group-btn">
-                        <a class="btn btn-outline-secondary" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=6><span class="fa fa-sort-alpha-asc fa-fw"></span></a>
-                        <a class="btn btn-outline-secondary" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=7><span class="fa fa-sort-amount-desc fa-fw"></span></a>
+                        <a class="btn btn-outline-secondary" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=6><span class="fa fa-sort-alpha-down fa-fw"></span></a>
+                        <a class="btn btn-outline-secondary" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=7><span class="fa fa-sort-amount-down fa-fw"></span></a>
                       </span>
                     </div>
                   </div>

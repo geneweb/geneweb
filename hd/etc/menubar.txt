@@ -265,8 +265,8 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=m;" title="[Arbre 9 gen]"><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>9 [generation/generations]1</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=T;t1=CT;hi=H;sosa=on;v=5;scale=100;fs=17;sosa=on;" title="[Arbre HI] [with] %sosa_ref;"><span class="fa fa-sitemap fa-rotate-180 fa-fw mr-2"></span>HI</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=A;t=Z;v=7;maxv=%max_anc_level;;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;ns=on;%if;(evar.image="off")image=off;%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [ancestors]</a>
-                <a class="dropdown-item" href="%prefix;%access;;m=A;t=G;v=3;maxv=%max_anc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;"><span class="fa fa-newspaper-o fa-fw mr-2"></span>[*long display]</a>
-                <a class="dropdown-item" href="%prefix;i=%index;;m=A;t=F;tf1=sb;v=%max_anc_level;;maxv=%max_anc_level;;"><span class="fa fa-reorder fa-fw mr-2"></span>[*surnames branch]</a>
+                <a class="dropdown-item" href="%prefix;%access;;m=A;t=G;v=3;maxv=%max_anc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
+                <a class="dropdown-item" href="%prefix;i=%index;;m=A;t=F;tf1=sb;v=%max_anc_level;;maxv=%max_anc_level;;"><span class="fa fa-align-justify fa-fw mr-2"></span>[*surnames branch]</a>
               </div>
             </li>
           %end;
@@ -279,8 +279,8 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                 <a class="dropdown-item" href="%prefix;m=D;t=T;v=4;%access;;"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree]</a>
                 <a class="dropdown-item" href="%prefix;m=D;t=V;%access;;%if;(evar.v!="")v=%evar.v;%else;v=3%end;;spouse=on;marriage=on;"%if;(not has_parents) %laY;%end;><span class="fa fa-sitemap fa-fw mr-2"></span>[*descendants tree] (new)</a>
                 <a class="dropdown-item" href="%prefix;m=D;t=H;%access;;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;ns=on;%if;(evar.image="off")image=off;%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [descendants]</a>
-                <a class="dropdown-item" href="%prefix;m=D;t=L;%access;;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;"><span class="fa fa-newspaper-o fa-fw mr-2"></span>[*long display]</a>
-                <a class="dropdown-item" href="%prefix;m=D;t=A;%access;;num=on;v=%max_desc_level;;"><span class="fa fa-code-fork fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
+                <a class="dropdown-item" href="%prefix;m=D;t=L;%access;;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
+                <a class="dropdown-item" href="%prefix;m=D;t=A;%access;;num=on;v=%max_desc_level;;"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
               </div>
             </li>
           %end;
