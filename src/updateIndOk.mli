@@ -36,8 +36,6 @@ value check_person :
   config -> base -> Def.gen_person (string * string * 'b * 'c * 'd) string -> option string;
 value error_person : config -> base -> 'a -> string -> unit;
 value update_relations_of_related : base -> iper -> list iper -> unit;
-value reconstitute_death :
-  config -> option Def.date -> option Def.date -> string -> Def.burial -> string -> Def.death;
 value reconstitute_from_pevents :
   list (Def.gen_pers_event 'a string) -> bool ->
   (Def.codate * string * string * string) ->

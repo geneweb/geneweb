@@ -716,7 +716,7 @@ function changeCalendar(e,v,m,c) {
             %end;
             <option value="NotDead" %if;not_dead; selected%end;>[*alive]</option>
             <option value="DontKnowIfDead" %if;(dont_know_if_dead and has_birth_date)%sp;selected%end;>[*don't know]0%nl;</option>
-            <option value="Death" %if;(death.year != "" or death.text != "" or dead_dont_know_when) selected%end;>[*died]2...</option>
+            <option value="Death" %if;(has_pevent_death or dead_dont_know_when) selected%end;>[*died]2...</option>
             <option value="DeadYoung" %if;died_young; selected%end;>[*died young]2</option>
             <option value="OfCourseDead" %if;of_course_dead; selected%end;>[*of course dead]</option>
           </select>
@@ -797,7 +797,7 @@ function changeCalendar(e,v,m,c) {
           %end;
           <option value="NotDead" %if;not_dead;selected%end;>[*alive]2</option>
           <option value="DontKnowIfDead" %if;(dont_know_if_dead and has_birth_date)%sp;selected%end;>[*don't know]0%nl;</option>
-          <option value="Death" %if;(death.year != "" or death.text != "" or dead_dont_know_when) selected%end;>[*died]2</option>
+          <option value="Death" %if;(has_pevent_death or dead_dont_know_when) selected%end;>[*died]2</option>
           <option value="DeadYoung" %if;died_young; selected%end;>[*died young]2</option>
           <option value="OfCourseDead" %if;of_course_dead; selected%end;>[*of course dead]</option>
         </select>
@@ -1084,20 +1084,6 @@ function changeCalendar(e,v,m,c) {
   <div class="card">
     %apply;card_header("birth")
     <div class="card-block">
-      <div style="display:none;">
-        <table style="border-width:1;width:700">
-          <tr>
-            <td>[*born]2...</td>
-            <td><label for="birth_place">[*place]</label></td>
-            <td>
-              <input type="text" name="birth_place" size="90" maxlength="200" value="%birth_place;" id="birth_place"%/>
-            </td>
-          </tr>
-        </table>
-        %apply;date([*date/dates]0, "birth", "birth", "")
-        %apply;note("birth")
-        %apply;source("birth")
-      </div>
       %if;has_pevent_birth;
         %foreach;pevent;
           %apply;one_specific_pevent(cnt, "#birt")
@@ -1112,20 +1098,6 @@ function changeCalendar(e,v,m,c) {
   <div class="card">
     %apply;card_header("baptism")
     <div class="card-block">
-      <div style="display:none;">
-        <table style="border-width:1;width:700">
-          <tr>
-            <td>[*baptized]2...</td>
-            <td><label for="bapt_place">[*place]</label></td>
-            <td>
-              <input type="text" name="bapt_place" size="90" maxlength="200" value="%bapt_place;" id="bapt_place"%/>
-            </td>
-          </tr>
-        </table>
-        %apply;date([*date/dates]0, "bapt", "bapt", "")
-        %apply;note("bapt")
-        %apply;source("bapt")
-      </div>
       %if;has_pevent_baptism;
         %foreach;pevent;
           %apply;one_specific_pevent(cnt, "#bapt")
@@ -1140,48 +1112,6 @@ function changeCalendar(e,v,m,c) {
   <div class="card">
     %apply;card_header("death")
     <div class="card-block">
-      <div style="display:none;">
-        <table style="border-width:1;width:700">
-          <tr>
-            <td>
-              <select name="old_death" id="death_selectxcnt" onchange="change_death('xcnt')">
-                %if;(not has_birth_date and dont_know_if_dead)
-                  <option value="Auto" selected> -</option>
-                %end;
-                <option value="NotDead" %if;not_dead; selected%end;>[*alive]2</option>
-                <option value="DontKnowIfDead" %if;(dont_know_if_dead and has_birth_date)%sp;selected%end;>[*don't know]0%nl;</option>
-                <option value="Death" %if;(death.year != "" or death.text != "" or dead_dont_know_when) selected%end;>[*died]2</option>
-                <option value="DeadYoung" %if;died_young; selected%end;>[*died young]2</option>
-                <option value="OfCourseDead" %if;of_course_dead; selected%end;>[*of course dead]</option>
-              </select>
-            </td>
-            <td>
-              <label>[*place]0
-                <input type="text" name="death_place" size="90" maxlength="200" value="%death_place;" onfocus='setDead()'%/></label>
-            </td>
-          </tr>
-        </table>
-        %apply;date([*date/dates]0, "death", "death", "onfocus='setDead()'")
-        <table style="border-width:1;width:700">
-          <tr>
-            <td>
-              <label>
-                <input type="radio" name="death_reason" value="Killed"%if;dr_killed; checked%end; onclick='set_death_focus(xcnt)'%/>[*killed (in action)]2
-              </label><label>
-                <input type="radio" name="death_reason" value="Murdered"%if;dr_murdered; checked%end; onclick='set_death_focus(xcnt)'%/>[*murdered]2
-              </label><label>
-                <input type="radio" name="death_reason" value="Executed"%if;dr_executed; checked%end; onclick='set_death_focus(xcnt)'%/>[*executed (legally killed)]2
-              </label><label>
-                <input type="radio" name="death_reason" value="Disappeared"%if;dr_disappeared; checked%end; onclick='set_death_focus(xcnt)'%/>[*disappeared]2
-              </label><label>
-                <input type="radio" name="death_reason" value="Unspecified"%if;dr_unspecified; checked%end; onclick='set_death_focus(xcnt)'%/>[*unspecified]2
-              </label>
-            </td>
-          </tr>
-        </table>
-        %apply;note("death")
-        %apply;source("death")
-      </div>
       %if;has_pevent_death;
         %foreach;pevent;
           %apply;one_specific_pevent(cnt, "#deat")
@@ -1196,27 +1126,6 @@ function changeCalendar(e,v,m,c) {
   <div class="card">
     %apply;card_header("burial")
     <div class="card-block">
-      <div style="display:none;">
-        <table style="border-width:1;width:700">
-          <tr>
-            <td>
-              <select name="burial">
-                <option value="UnknownBurial"%if;bt_unknown_burial; selected%end;>-</option>
-                <option value="Buried"%if;bt_buried; selected%end;>[*buried]2</option>
-                <option value="Cremated"%if;bt_cremated; selected%end;>[*cremated]2</option>
-              </select>
-            </td>
-            <td>
-              <label>[*place]0
-                <input type="text" name="burial_place" size="90" maxlength="200" value="%burial_place;"%/>
-              </label>
-            </td>
-          </tr>
-        </table>
-        %apply;date([*date/dates]0, "burial", "burial", "")
-        %apply;note("burial")
-        %apply;source("burial")
-      </div>
       %if;has_pevent_burial;
         %foreach;pevent;
           %apply;one_specific_pevent(cnt, "#buri")

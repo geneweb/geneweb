@@ -410,8 +410,7 @@ value rec reconstitute_relations conf ext cnt =
   | _ -> ([], ext) ]
 ;
 
-value reconstitute_death conf birth baptism death_place burial burial_place =
-  let d = Update.reconstitute_date conf "death" in
+value reconstitute_death conf =
   let dr =
     match p_getenv conf.env "death_reason" with
     [ Some "Killed" -> Killed
@@ -422,31 +421,14 @@ value reconstitute_death conf birth baptism death_place burial burial_place =
     | Some x -> failwith ("bad death reason type " ^ x) ]
   in
   match get conf "death" with
-  [ "Auto" when d = None ->
-      if death_place <> "" || burial <> UnknownBurial || burial_place <> "" ||
-         dr <> Unspecified then
-        DeadDontKnowWhen
-      else Update.infer_death conf birth baptism
-  | "DeadYoung" when d = None -> DeadYoung
-  | "DontKnowIfDead" when d = None -> DontKnowIfDead
+  [ "DeadYoung" -> DeadYoung
+  | "OfCourseDead" -> OfCourseDead
+  | "DontKnowIfDead" -> DontKnowIfDead
   | "NotDead" -> NotDead
-  | "OfCourseDead" when d = None -> OfCourseDead
-  | _ ->
-      match d with
-      [ Some d -> Death dr (Adef.cdate_of_date d)
-      | _ -> DeadDontKnowWhen ] ]
-;
-
-value reconstitute_burial conf burial_place =
-  let d = Update.reconstitute_date conf "burial" in
-  match p_getenv conf.env "burial" with
-  [ Some "UnknownBurial" | None ->
-      match (d, burial_place) with
-      [ (None, "") -> UnknownBurial
-      | _ -> Buried (Adef.codate_of_od d) ]
-  | Some "Buried" -> Buried (Adef.codate_of_od d)
-  | Some "Cremated" -> Cremated (Adef.codate_of_od d)
-  | Some x -> failwith ("bad burial type " ^ x) ]
+  | "Auto" ->
+      if dr <> Unspecified then DeadDontKnowWhen
+      else DontKnowIfDead
+  | _ -> Death dr (Adef.cdate_of_date (Dtext "X")) ]
 ;
 
 value reconstitute_from_pevents pevents ext bi bp de bu =
@@ -650,42 +632,22 @@ value reconstitute_person conf =
     | Some "F" -> Female
     | _ -> Neuter ]
   in
-  let birth = Update.reconstitute_date conf "birth" in
-  let birth_place = no_html_tags (only_printable (get conf "birth_place")) in
-  let birth_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "birth_note"))
-  in
-  let birth_src = only_printable (get conf "birth_src") in
-  let bapt = Update.reconstitute_date conf "bapt" in
-  let bapt_place = no_html_tags (only_printable (get conf "bapt_place")) in
-  let bapt_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "bapt_note"))
-  in
-  let bapt_src = only_printable (get conf "bapt_src") in
-  let burial_place = no_html_tags (only_printable (get conf "burial_place")) in
-  let burial_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "burial_note"))
-  in
-  let burial_src = only_printable (get conf "burial_src") in
-  let burial = reconstitute_burial conf burial_place in
-  let death_place = no_html_tags (only_printable (get conf "death_place")) in
-  let death_note =
-    only_printable_or_nl (strip_all_trailing_spaces (get conf "death_note"))
-  in
-  let death_src = only_printable (get conf "death_src") in
-  let death =
-    reconstitute_death conf birth bapt death_place burial burial_place
-  in
-  let death_place =
-    match death with
-    [ Death _ _ | DeadYoung | DeadDontKnowWhen -> death_place
-    | _ -> "" ]
-  in
-  let death =
-    match (death, burial) with
-    [ (NotDead | DontKnowIfDead, Buried _ | Cremated _) -> DeadDontKnowWhen
-    | _ -> death ]
-  in
+  let birth = None in
+  let birth_place = "" in
+  let birth_note = "" in
+  let birth_src = "" in
+  let bapt = None in
+  let bapt_place = "" in
+  let bapt_note = "" in
+  let bapt_src = "" in
+  let burial_place = "" in
+  let burial_note = "" in
+  let burial_src = "" in
+  let burial = UnknownBurial in
+  let death_place = "" in
+  let death_note = "" in
+  let death_src = "" in
+  let death = reconstitute_death conf in
   let (pevents, ext) = reconstitute_pevents conf ext 1 in
   let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
   let notes =
@@ -705,6 +667,11 @@ value reconstitute_person conf =
   let (bapt, bapt_place, bapt_note, bapt_src) = bp in
   let (death, death_place, death_note, death_src) = de in
   let (burial, burial_place, burial_note, burial_src) = bu in
+  let death =
+    match (death, burial) with
+    [ (NotDead | DontKnowIfDead, Buried _ | Cremated _) -> DeadDontKnowWhen
+    | _ -> death ]
+  in
   (* Maintenant qu'on a propagé les evèenements, on a *)
   (* peut-être besoin de refaire un infer_death.      *)
   let death =
