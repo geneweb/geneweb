@@ -5105,7 +5105,12 @@ value print_foreach conf base print_ast eval_expr =
           insert (transl_nth conf "death" 0) (sou base (get_death_src p)) srcl
         in
         let srcl =
-          insert (transl_nth conf "burial" 0) (sou base (get_burial_src p)) srcl
+          let burial_or_cremation =
+            match get_burial p with
+            [ Cremated _ -> "cremation"
+            | _ -> "burial" ]
+          in
+          insert (transl_nth conf burial_or_cremation 0) (sou base (get_burial_src p)) srcl
         in
         srcl
       else []
