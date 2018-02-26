@@ -117,7 +117,6 @@
     %if;(event_witness_kind = [kindx]0)
       %incr_count;
       <span class="text-nowrap">%nn;
-      %apply;image_MF("event_witness")%nn;
       %apply;short_display_person("event_witness")%nn;
       </span>%nn;
       %if;(count=k_cnt).
@@ -176,7 +175,7 @@
     %and;%apply;dprec("ccc.birth_date")%nn;
     %and;%count2;
     %and;%if;(ccc.birth_date!="")%ccc.birth_date;%else;([missing date]0)%end;%nn;
-    %and;%apply;a_of_b%with;[birth]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%nn;
+    %and;%apply;a_of_b%with;[birth]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;short_display_person("ccc")%nn;
     %and;%nn;
     %and;%nn;
     %and;%(debug sort: %ccc.birth_date.year;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
@@ -197,7 +196,7 @@
       %and;%apply;dprec("ccc.death_date")%nn;
       %and;%count2;
       %and;%if;(ccc.death_date!="")%ccc.death_date;%else;([missing date]0)%end;%nn;
-      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;image_MF("ccc")%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age;)%end;%nn;
+      %and;%apply;a_of_b%with;[death]%and;%if;ccc.is_male;[labl]0%elseif;ccc.is_female;[labl]1%else;[labl]2%end;%end;%sp;%apply;short_display_person("ccc")%if;(ccc.computable_death_age)%sp;(%ccc.death_age;)%end;%nn;
       %and;%nn;
       %and;%nn;
       %and;%(debug sort: %ccc.birth_date.year;%apply;month("ccc.birth_date")%apply;day("ccc.birth_date")%apply;dprec("ccc.birth_date"),%)%nn;
@@ -318,7 +317,7 @@
       %and;%apply;dprec("related.baptism_date")%nn;
       %and;%count2;
       %and;%if;(related.baptism_date!="")%related.baptism_date;%else;([missing date]0)%end;%nn;
-      %and;%related_type;[:]%sp;%apply;image_MF("related")%apply;short_display_person("related")%nn;
+      %and;%related_type;[:]%sp;%apply;short_display_person("related")%nn;
       %and;%related.baptism_place;%nn;
       %and;%nn;
       %and;%related.baptism_note;%nn;
@@ -338,7 +337,7 @@
         %and;2%nn;
         %and;%count2;
         %and;([missing date]0)%nn;
-        %and;%relation_type;[:]%sp;%apply;image_MF("relation_him")%apply;short_display_person("relation_him")%sp;%apply;image_MF("relation_her")%apply;short_display_person("relation_her")%nn;
+        %and;%relation_type;[:]%sp;%apply;short_display_person("relation_him")%sp;%apply;short_display_person("relation_her")%nn;
         %and;%nn;
         %and;%nn;
         %and;%nn;
@@ -354,7 +353,7 @@
         %and;2%nn;
         %and;%count2;
         %and;([missing date]0)%nn;
-        %and;%relation_type;[:]%sp;%apply;image_MF("relation_him")%apply;short_display_person("relation_him")%nn;
+        %and;%relation_type;[:]%sp;%apply;short_display_person("relation_him")%nn;
         %and;%nn;
         %and;%nn;
         %and;%nn;
@@ -370,7 +369,7 @@
         %and;2%nn;
         %and;%count2;
         %and;([missing date]0)%nn;
-        %and;%relation_type;[:]%sp;%apply;image_MF("relation_her")%apply;short_display_person("relation_her")%nn;
+        %and;%relation_type;[:]%sp;%apply;short_display_person("relation_her")%nn;
         %and;%nn;
         %and;%nn;
         %and;%nn;
@@ -392,9 +391,9 @@
       %and;%if;(event_witness_relation.event.date!="")%event_witness_relation.event.date;%else;([missing date]0)%end;%nn;
       %and;%apply;a_of_b%with;%apply;a_of_b%with;%event_witness_relation_kind;%and;
         %sp;%event_witness_relation.event.name;%end;%and;
-          %apply;image_MF("event_witness_relation.person")%apply;short_display_person("event_witness_relation.person")%sp;
+          %apply;short_display_person("event_witness_relation.person")%sp;
           %if;(event_witness_relation.event.spouse != "")
-            %sp;[and]%sp;%apply;image_MF("event_witness_relation.event.spouse")%apply;short_display_person("event_witness_relation.event.spouse")%nn;
+            %sp;[and]%sp;%apply;short_display_person("event_witness_relation.event.spouse")%nn;
           %end;%end;%nn;
       %and;%nn;
       %and;%nn;
@@ -414,7 +413,7 @@
         %and;%apply;dprec("father.death_date")%nn;
         %and;%count2;
         %and;%if;(father.death_date!="")%father.death_date;%else;([missing date]0)%end;%nn;
-        %and;%apply;a_of_b%with;[death]%and;[father/mother]0%end;%apply;image_MF("father")%apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%father.death_age;)%end;%nn;%nn;
+        %and;%apply;a_of_b%with;[death]%and;[father/mother]0%end;%apply;short_display_person("father")%if;(father.computable_death_age)%sp;(%father.death_age;)%end;%nn;%nn;
         %and;%nn;
         %and;%nn;
         %and;%nn;
@@ -431,7 +430,7 @@
         %and;%apply;dprec("mother.death_date")%nn;
         %and;%count2;
         %and;%if;(mother.death_date!="")%mother.death_date;%else;([missing date]0)%end;%nn;
-        %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end;%apply;image_MF("mother")%apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age;)%end;%nn;%nn;
+        %and;%apply;a_of_b%with;[death]%and;[father/mother]1%end;%apply;short_display_person("mother")%if;(mother.computable_death_age)%sp;(%mother.death_age;)%end;%nn;%nn;
         %and;%nn;
         %and;%nn;
         %and;%nn;
@@ -462,7 +461,7 @@
           %and;%apply;dprec("spouse.death_date")%nn;
           %and;%count2;
           %and;%if;(spouse.death_date!="")%spouse.death_date;%else;([missing date]0)%end;%nn;
-          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end;%apply;image_MF("spouse")%apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age;)%end;%nn;
+          %and;%apply;a_of_b%with;[death]%and;%if;spouse.is_male;[the spouse]0%else;[the spouse]1%end;%end;%apply;short_display_person("spouse")%if;(spouse.computable_death_age)%sp;(%spouse.death_age;)%end;%nn;
           %and;%nn;
           %and;%nn;
           %and;%nn;
@@ -529,19 +528,19 @@
                         %foreach;relation;
                           %if;(has_relation_him and has_relation_her)
                             %if;(relation_type=[godfather/godmother/godparents]2)
-                              <span class="text-nowrap">[*godfather/godmother/godparents]0[:]%apply;image_MF("relation_him")%nn;
+                              <span class="text-nowrap">[*godfather/godmother/godparents]0[:]%nn;
                               %apply;short_display_person("relation_him").</span><br>
-                              <span class="text-nowrap">[*godfather/godmother/godparents]1[:]%apply;image_MF("relation_her")%nn;
+                              <span class="text-nowrap">[*godfather/godmother/godparents]1[:]%nn;
                               %apply;short_display_person("relation_her").</span>
                             %end;
                           %elseif;has_relation_him;
                             %if;(relation_type=[godfather/godmother/godparents]0)
-                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]%apply;image_MF("relation_him")%nn;
+                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]%nn;
                               %apply;short_display_person("relation_him").</span>
                             %end;
                           %elseif;has_relation_her;
                             %if;(relation_type=[godfather/godmother/godparents]1)
-                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]%apply;image_MF("relation_her")%nn;
+                              <span class="text-nowrap">%apply;capitalize(relation_type)[:]%nn;
                               %apply;short_display_person("relation_her").</span>
                             %end;
                           %end;

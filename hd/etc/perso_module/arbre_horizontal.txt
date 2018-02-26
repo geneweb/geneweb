@@ -10,6 +10,7 @@
 %end;
 
 %define;access(num,nnn)
+  %apply;image_MF("nnn")
   %if;(evars=1)num%end; %apply;display_sosa("nnn")%nn;
   %if;("num" = 1)
     %nnn;%nnn.title;%nnn.dates;<br>
