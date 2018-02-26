@@ -1847,7 +1847,7 @@ and eval_simple_bool_var conf base env (p, p_auth) =
       match get_env "sosa_ref" env with
       [ Vsosa_ref v -> Lazy.force v <> None
       | _ -> raise Not_found ]
-  | "has_comment" ->
+  | "has_comment" | "has_fnotes" ->
       let mode_local =
         match get_env "fam_link" env with
         [ Vfam ifam _ (_, _, ip) _ -> False
@@ -1864,6 +1864,11 @@ and eval_simple_bool_var conf base env (p, p_auth) =
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           m_auth && not conf.no_note && sou base (get_marriage_note fam) <> ""
+      | _ -> raise Not_found ]
+  | "has_marriage_source" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          m_auth && sou base (get_marriage_src fam) <> ""
       | _ -> raise Not_found ]
   | "has_relation_her" ->
       match get_env "rel" env with
@@ -1943,7 +1948,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
       [ Vstring s -> s
       | _ -> raise Not_found ]
   | "child_cnt" -> string_of_int_env "child_cnt" env
-  | "comment" ->
+  | "comment" | "fnotes" ->
       match get_env "fam" env with
       [ Vfam _ fam _ m_auth ->
           if m_auth && not conf.no_note then
@@ -2085,6 +2090,28 @@ and eval_simple_str_var conf base env (_, p_auth) =
             if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
       | _ -> raise Not_found ]
+  | "marriage_source" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+          if m_auth then
+            let s = sou base (get_marriage_src fam) in
+            let s = string_with_macros conf [] s in
+            let lines = Wiki.html_of_tlsw conf s in
+            let wi =
+              {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+               Wiki.wi_file_path = Notes.file_path conf base;
+               Wiki.wi_person_exists = person_exists conf base;
+               Wiki.wi_always_show_link = conf.wizard || conf.friend}
+            in
+            let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+            if conf.pure_xhtml then Util.check_xhtml s else s
+          else ""
+      | _ -> raise Not_found ]
+  | "fsources" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+        sou base (get_fsources fam)
+      | _ -> "" ]
   | "max_anc_level" ->
       match get_env "max_anc_level" env with
       [ Vint i -> string_of_int i
@@ -2398,6 +2425,18 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
                   0 (fst (Lazy.force t))
               in
               VVstring (eval_num conf (Sosa.of_int (cnt - 1)) sl)
+          | _ -> raise Not_found ]
+      | _ -> raise Not_found ]
+  | ["number_of_descendants_at_level" :: sl] ->
+      match get_env "level" env with
+      [ Vint i ->
+          match get_env "desc_level_table" env with
+          [ Vdesclevtab t ->
+              let cnt =
+                Array.fold_left (fun cnt v -> if v = i then cnt + 1 else cnt)
+                  0 (fst (Lazy.force t))
+              in
+              VVstring (eval_num conf (Sosa.of_int (cnt)) sl)
           | _ -> raise Not_found ]
       | _ -> raise Not_found ]
   | ["parent" :: sl] ->
@@ -3232,6 +3271,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       else get_aliases p <> []
   | "has_baptism_date" -> p_auth && get_baptism p <> Adef.codate_None
   | "has_baptism_place" -> p_auth && sou base (get_baptism_place p) <> ""
+  | "has_baptism_source" -> p_auth && sou base (get_baptism_src p) <> ""
   | "has_baptism_note" ->
       p_auth && not conf.no_note && sou base (get_baptism_note p) <> ""
   | "has_baptism_witnesses" ->
@@ -3245,6 +3285,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
             else loop events ]
   | "has_birth_date" -> p_auth && get_birth p <> Adef.codate_None
   | "has_birth_place" -> p_auth && sou base (get_birth_place p) <> ""
+  | "has_birth_source" -> p_auth && sou base (get_birth_src p) <> ""
   | "has_birth_note" ->
       p_auth && not conf.no_note && sou base (get_birth_note p) <> ""
   | "has_birth_witnesses" ->
@@ -3263,6 +3304,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
         | _ -> False ]
       else False
   | "has_burial_place" -> p_auth && sou base (get_burial_place p) <> ""
+  | "has_burial_source" -> p_auth && sou base (get_burial_src p) <> ""
   | "has_burial_note" ->
       p_auth && not conf.no_note && sou base (get_burial_note p) <> ""
   | "has_burial_witnesses" ->
@@ -3371,6 +3413,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
       [ Death _ _ -> p_auth
       | _ -> False ]
   | "has_death_place" -> p_auth && sou base (get_death_place p) <> ""
+  | "has_death_source" -> p_auth && sou base (get_death_src p) <> ""
   | "has_death_note" ->
       p_auth && not conf.no_note && sou base (get_death_note p) <> ""
   | "has_death_witnesses" ->
@@ -3449,6 +3492,11 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_first_names_aliases" ->
       if not p_auth && (is_hide_names conf p) then False
       else get_first_names_aliases p <> []
+  | "has_fsources" ->
+      match get_env "fam" env with
+      [ Vfam _ fam _ m_auth ->
+        m_auth && sou base (get_fsources fam) <> ""
+      | _ -> False ]
   | "has_history" ->
       let fn = sou base (get_first_name p) in
       let sn = sou base (get_surname p) in
@@ -3458,7 +3506,7 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_image" -> Util.has_image conf base p
   | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && nobtit conf base p <> []
-  | "has_notes" -> p_auth && not conf.no_note && sou base (get_notes p) <> ""
+  | "has_notes" | "has_pnotes" -> p_auth && not conf.no_note && sou base (get_notes p) <> ""
   | "has_occupation" -> p_auth && sou base (get_occupation p) <> ""
   | "has_parents" ->
       IFDEF API THEN
@@ -3476,14 +3524,6 @@ and eval_bool_person_field conf base env (p, p_auth) =
   | "has_psources" ->
       if (is_hide_names conf p) && not p_auth then False
       else sou base (get_psources p) <> ""
-  | "has_fsources" ->
-      if (is_hide_names conf p) && not p_auth then False
-      else
-        List.exists
-          (fun ifam ->
-             let fam = foi base ifam in
-             p_auth && sou base (get_fsources fam) <> "")
-          (Array.to_list (get_family p))
   | "has_public_name" ->
       if not p_auth && (is_hide_names conf p) then False
       else sou base (get_public_name p) <> ""
@@ -3846,7 +3886,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
                    conf.command (get_key_index p)))
           ELSE "0" END
       | _ -> string_of_int (Array.length (get_family p)) ]
-  | "notes" ->
+  | "notes" | "pnotes" ->
       if p_auth && not conf.no_note then
         let env = [('i', fun () -> Util.default_image_name base p)] in
         let s = sou base (get_notes p) in
@@ -3914,6 +3954,21 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
               | _ -> Date.string_of_ondate conf d ]
           | _ -> "" ]
       | _ -> raise Not_found ]
+  | "psources" ->
+      if p_auth && not conf.no_note then
+        let env = [('i', fun () -> Util.default_image_name base p)] in
+        let s = sou base (get_psources p) in
+        let s = string_with_macros conf env s in
+        let lines = Wiki.html_of_tlsw conf s in
+        let wi =
+          {Wiki.wi_mode = "NOTES"; Wiki.wi_cancel_links = conf.cancel_links;
+           Wiki.wi_file_path = Notes.file_path conf base;
+           Wiki.wi_person_exists = person_exists conf base;
+           Wiki.wi_always_show_link = conf.wizard || conf.friend}
+        in
+        let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        if conf.pure_xhtml then Util.check_xhtml s else s
+      else ""
   | "slash_burial_date" ->
       match get_burial p with
       [ Buried cod ->

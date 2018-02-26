@@ -11,7 +11,7 @@
   %if;(mmm=1)marriage=on;%end;
   %if;(evar.vh!="")vh=%evar.vh;;%end;
   %if;(evart!="")t=ttt;%end;
-  %if;(vvv!=3)v=vvv%end;#a%in;
+  %if;(vvv!=3)v=vvv%end;%if;(evar.m!="A")#a%end;%in;
   %new_url;
 %end;
 
