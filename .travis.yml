@@ -6,7 +6,6 @@ install:
 script: bash -ex .travis-ocaml.sh && bash -ex .travis-ci.sh
 env:
    - OCAML_VERSION=4.05
-   - OCAML_VERSION=latest
 os:
   - linux
   - osx
