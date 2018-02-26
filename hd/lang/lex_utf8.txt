@@ -1,3 +1,7 @@
+    with root, spouses and unknowns
+en: with root ancestor, spouses and unknowns
+fr: avec l'ancêtre racine, les conjoints et les inconnus
+
     choose a genealogy
 en: choose a genealogy
 fr: choisir une généalogie
