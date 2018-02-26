@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: annivmenu.txt,v 0.01 2012-05-31 147:40:30 flh Exp $ -->
   <!-- Copyright (c) 2006-2017 INRIA -->

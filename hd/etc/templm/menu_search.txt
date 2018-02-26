@@ -14,10 +14,7 @@
        %l1; %apply;language_name(l1)</a>
   %end;
 %end;
-%let;lg;
-  %if;(evar.lang != "")%evar.lang;
-  %elseif;(bvar.default_lang != "")%bvar.default_lang;
-  %else;en%end;
+%let;lg;%lang;%end;
 %in;
 %define;bg(xx)
   %if;(evar.templ="xx")style="background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;"%end;
@@ -136,7 +133,7 @@
     </span>
     <span class="r_btn">
       <a href="%if;(evar.i !="" or evar.n!="")%url;cgl=on%end;" 
-      title="%if;(evar.i !="" or evar.n!="")[*cancel GeneWeb links] %nl;%nl;%end;[*select] %nl;%lg; %apply;language_name(lg)">%if;(evar.i !="" or evar.n!="")⇨%else;%lg;%end;</a>
+      title="%if;(evar.i !="" or evar.n!="")[*cancel GeneWeb links] %nl;%nl;%end;[*select] %nl;%lang; %apply;language_name(lang)">%if;(evar.i !="" or evar.n!="")⇨%else;%lang;%end;</a>
       <span class="s_menu" id="lang">%apply;link_lang()</span>
     </span>
   </div>

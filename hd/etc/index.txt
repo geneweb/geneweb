@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <title>Base</title>
   <meta name="robots" content="none">
@@ -63,7 +63,8 @@
     &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017 %connections; %sq;</span>
     <a href="https://github.com/geneweb/geneweb" class="ml-1" target="_blank" title="GeneWeb sources on GitHub">
     <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb"/></a>
-    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(bvar.default_lang = "fr" or evar.lang = "fr")/fr%end;" class="ml-1" target="_blank" title="GeneWeb documentation MediaWiki">
+    %let;suffx;%if;(lang!="en")/%lang;%else;%end;%in;
+    <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%suffx;" target="_blank" title="GeneWeb documentation MediaWiki">
     <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb Mediawiki"/></a>
   </div>
 </div>
