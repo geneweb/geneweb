@@ -833,7 +833,7 @@
                   %if;(spouse.index != xx.mother.index and half_father!=0 and spouse.has_children)
                     %if;has_children;
                       <tr class="fp_half_siblings">
-                        <td colspan="6">[*on %s's side:::] %xx.father; [with] %spouse;</td>
+                        <td colspan="6">%apply;on_side%with;%xx.father;%end;%sp;[with] %spouse;</td>
                       </tr>
                       %foreach;child;
                         %apply;display_siblings("child", family_cnt)
@@ -847,7 +847,7 @@
                   %if;(spouse.index != xx.father.index and half_mother!=0 and spouse.has_children)
                     %if;has_children;
                       <tr class="fp_half_siblings">
-                        <td colspan="6">[*on %s's side:::] %xx.mother; [with] %spouse;</td>
+                        <td colspan="6">%apply;on_side%with;%xx.mother;%end;%sp;[with] %spouse;</td>
                       </tr>
                       %foreach;child;
                         %apply;display_siblings("child", family_cnt)
