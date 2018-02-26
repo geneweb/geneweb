@@ -1,7 +1,10 @@
-<!-- $Id: js.txt, v7.00 09/01/2018 03:21:33 $ -->
-%if;(evar.m="MOD_IND" or evar.m="MOD_FAM" or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
+<!-- $Id: js.txt, v7.00 26/02/2018 02:32:23 $ -->
+%if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
+  or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
+  or evar.m="ADD_FAM" or evar.m="ADD_FAM_OK"
+  or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
   %if;(bvar.use_cdn="yes")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.0/autosize.min.js" 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.0/autosize.min.js"
       integrity="sha256-F7Bbc+3hGv34D+obsHHsSm3ZKRBudWR7e2H0fS0beok=" crossorigin="anonymous"></script>
   %else;
    <script src=%if;(cgi)%bvar.static_path;%end;autosize.min.js></script>
@@ -10,10 +13,8 @@
 %end;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-%(  <script src="https://code.jquery.com/jquery-3.2.1.min.js"
-      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>%)
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
       integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
