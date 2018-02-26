@@ -728,25 +728,30 @@ value print conf base =
 
 (* Undocumented feature... Kill someone's ancestors *)
 
-value rec kill_ancestors conf base included_self p nb_ind nb_fam =
+value rec kill_ancestors conf base do_it included_self p nb_ind nb_fam =
   do {
     match get_parents p with
     [ Some ifam ->
         let cpl = foi base ifam in
         do {
-          kill_ancestors conf base True (poi base (get_father cpl)) nb_ind
+          kill_ancestors conf base do_it True (poi base (get_father cpl)) nb_ind
             nb_fam;
-          kill_ancestors conf base True (poi base (get_mother cpl)) nb_ind
+          kill_ancestors conf base do_it True (poi base (get_mother cpl)) nb_ind
             nb_fam;
-          UpdateFamOk.effective_del conf base (ifam, foi base ifam);
+          if do_it then
+            UpdateFamOk.effective_del conf base (ifam, foi base ifam)
+          else ();
           incr nb_fam;
         }
     | None -> () ];
     if included_self then do {
-      let ip = get_key_index p in
-      let warning _ = () in
-      let p = UpdateIndOk.effective_del conf base warning p in
-      patch_person base ip p;
+      if do_it then do {
+        let ip = get_key_index p in
+        let warning _ = () in
+        let p = UpdateIndOk.effective_del conf base warning p in
+        patch_person base ip p;
+      }
+      else ();
       incr nb_ind;
     }
     else ();
@@ -754,14 +759,66 @@ value rec kill_ancestors conf base included_self p nb_ind nb_fam =
 ;
 
 value print_killed conf base p nb_ind nb_fam =
-  let title _ = Wserver.printf "Ancestors killed" in
+  let title _ = Wserver.printf "%s" 
+    (capitale (transl_nth conf "delete ancestors/deleted ancestors" 1))
+  in
   do {
     Hutil.header conf title;
-    Wserver.printf "%s's ancestors killed.<br>\n"
-      (referenced_person_title_text conf base p);
-    Wserver.printf "%d persons and %d families deleted<p>\n" nb_ind nb_fam;
+    Wserver.printf "%s<br>\n"
+      (transl_a_of_b conf
+      (capitale (transl_nth conf "delete ancestors/deleted ancestors" 1))
+      (referenced_person_title_text conf base p));
+    Wserver.printf "%d %s %s %d %s %s<p>\n" 
+      nb_ind (transl_nth conf "person/persons" 1) (transl conf "and") 
+      nb_fam (transl_nth conf "family/families" 1) 
+      (transl_nth conf "delete/deleted" 1);
     Hutil.trailer conf;
   }
+;
+
+value print_count_ancestors conf base =
+  match p_getenv conf.base_env "can_kill_ancestors" with
+  [ Some "yes" ->
+      match find_person_in_env conf base "" with
+      [ Some p ->
+          let nb_ind = ref 0 in
+          let nb_fam = ref 0 in
+          do {
+            kill_ancestors conf base False False p nb_ind nb_fam;
+            let title _ = Wserver.printf "%s %s" 
+              (capitale (transl conf "confirm killing")) (transl conf "ancestors")
+            in
+            do {
+              Hutil.header conf title;
+              Wserver.printf "%s?<br>\n"
+                (transl_a_of_b conf
+                ((capitale (transl conf "do you really want to kill the")) ^ " " ^
+                (transl conf "ancestors"))
+                (referenced_person_title_text conf base p));
+              Wserver.printf "%s%s<br>\n" 
+                (capitale (transl conf "this will delete")) (transl conf ":");
+              Wserver.printf "%d %s %s %d %s.<br>\n" 
+                nb_ind.val (transl_nth conf "person/persons" 1) (transl conf "and")
+                nb_fam.val (transl_nth conf "family/families" 1);
+              Wserver.printf "<p>%s.\n" 
+                (capitale (transl conf "note about orphaned brothers and sisters"));
+              Util.hidden_env conf;
+              tag "form" "method=\"post\" action=\"%s\"" conf.command begin
+                tag "p" begin
+                  Util.hidden_env conf;
+                  xtag "input" "type=\"hidden\" name=\"m\" value=\"KILL_ANC_OK\"";
+                  xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
+                    (Adef.int_of_iper (get_key_index p));
+                  tag "button" "type=\"submit\" class=\"btn btn-secondary btn-lg\"" begin
+                    Wserver.printf "%s" (capitale (transl_nth conf "validate/delete" 0));
+                  end;
+                end;
+              end;
+              Hutil.trailer conf;
+            }
+          }
+      | None -> incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
 
 value print_kill_ancestors conf base =
@@ -772,7 +829,7 @@ value print_kill_ancestors conf base =
           let nb_ind = ref 0 in
           let nb_fam = ref 0 in
           do {
-            kill_ancestors conf base False p nb_ind nb_fam;
+            kill_ancestors conf base True False p nb_ind nb_fam;
             Util.commit_patches conf base;
             let changed =
               U_Kill_ancestors

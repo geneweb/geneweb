@@ -1,3 +1,28 @@
+
+    delete/deleted
+en: delete/deleted
+fr: suppression des/supprimés
+
+    delete ancestors/deleted ancestors
+en: delete ancestors/deleted ancestors
+fr: suppression des ascendants/ascendants supprimés
+
+    confirm killing
+en: confirm killing
+fr: confirmation de la suppression des
+
+    do you really want to kill the
+en: do you really want to kill the
+fr: voulez-vous vraiment supprimer les
+
+    this will delete
+en: this will delete
+fr: ceci supprimera
+
+    note about orphaned brothers and sisters
+en: note that brothers and sisters of the person and of its ancestors will stay in the base, but orphaned
+fr: notez que les frères et soeurs de la personne et de ses ascendants resteront dans la base, mais orphelins
+
     choose a genealogy
 en: choose a genealogy
 fr: choisir une généalogie
