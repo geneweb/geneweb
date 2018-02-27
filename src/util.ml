@@ -772,7 +772,8 @@ value gen_person_text (p_first_name, p_surname) conf base p =
       | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
       | (n, []) -> n ]
     in
-    beg ^ " " ^ p_surname base p
+    let sn = p_surname base p in
+    if sn = "" then beg else beg ^ " " ^ sn
 ;
 
 
