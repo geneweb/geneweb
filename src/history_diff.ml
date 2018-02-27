@@ -28,17 +28,16 @@ value history_file fn sn occ =
 
 (* Le chemin du dossier history_d. *)
 value history_d conf =
-  let path =
-    match p_getenv conf.base_env "history_path" with
-    [ Some path -> path
-    | None -> "" ]
-  in
   let bname =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
     else conf.bname ^ ".gwb"
   in
-  List.fold_left
-    Filename.concat path [Util.base_path [] bname; "history_d"]
+  let path =
+    match p_getenv conf.base_env "history_path" with
+    [ Some path when path <> "" -> Filename.concat path bname
+    | _ -> Util.base_path [] bname ]
+  in
+  Filename.concat path "history_d"
 ;
 
 (* Le chemin du fichier historique dans le dossier history_d. *)
