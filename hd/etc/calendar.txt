@@ -77,12 +77,12 @@
     %apply;fun_month("ccc", "nnn", "vvv", "lll")
     %apply;fun_day("ccc", "nnn")
   %end;
-  <td><button class="btn btn-outline-secondary" type="submit" name="tccc">=</button></td>
+  <td><button class="btn btn-outline-success" type="submit" name="tccc">=</button></td>
 %end;
 
 <div class="row mt-4">
   <div class="mx-auto text-center">
-    <h1><span class="fa fa-calendar"></span> [*calendar/calendars]1</h1>
+    <h1><span class="fa fa-calendar-alt"></span> [*calendar/calendars]1</h1>
     <h3 class="mt-4">%apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
     %if;(date.julian_day = today.julian_day) - <samp>%time;</samp>%end;</h3>
   </div>
