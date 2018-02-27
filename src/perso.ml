@@ -3013,7 +3013,7 @@ and eval_date_field_var conf d =
               VVstring (string_of_int dmy2.year2)
           | _ -> VVstring "" ]
       | _ -> VVstring "" ]
-  | [] -> VVstring (Date.string_of_date_sep conf "<br/>" d)
+  | [] -> VVstring (Date.string_of_date_sep conf "&#010;  " d)
   | _ -> raise Not_found ]
 and eval_place_field_var conf place =
   fun

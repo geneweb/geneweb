@@ -925,10 +925,14 @@
   </td>
   %if;(evar.birth = "on")
     <td class="align-middle text-right" %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
-      %if;ancestor.has_approx_birth_date;
-        %ancestor.slash_approx_birth_date;
+      %if;(wizard and not cancel_links)
+        <a class="d-block" href="%prefix;m=MOD_IND;i=%ancestor.index;#birth_"
+          title="%if;(ancestor.has_approx_birth_date)[*update::birth]%else;[*add::birth]%end;&#010;
+           %ancestor.first_name; %ancestor.surname; %if;(ancestor.occ!="0")(%ancestor.occ;)%end;&#010;%if;(ancestor.has_birth_date and ancestor.birth_date.prec="" or ancestor.birth_date.prec="?")° %ancestor.birth_date;%end;">
+        %if;(ancestor.has_approx_birth_date)%ancestor.slash_approx_birth_date;%else;°%end;
+        </a>
       %else;
-        &nbsp;
+        %ancestor.slash_approx_birth_date;
       %end;
     </td>
   %end;
@@ -982,7 +986,7 @@
     %else;
       %foreach;ancestor.family;
         %if;(family_cnt = 1)
-          <td class="align-middle" %if;(ancestor.nb_families > 1) %end;>
+          <td class="align-middle">
             %apply;image_MF("spouse")
             %apply;link%with;%spouse.access;%and;
               %spouse;
@@ -999,11 +1003,21 @@
     %else;
       %foreach;ancestor.family;
         %if;(family_cnt = 1)
-          <td class="align-middle text-right" %if;(ancestor.nb_families > 1) %end;>
-            %if;(slash_marriage_date != "")
-              %slash_marriage_date;
+          <td class="align-middle text-right">
+            %if;(wizard and not cancel_links)
+              <a class="d-block" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
+                title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
+                [*update::family/families]0%end;&#010;
+                %ancestor; [and] %spouse;&#010;%if;(marriage_date!="" and marriage_date.prec="" or marriage_date.prec="?")& %marriage_date;%end;">
+                %if;(slash_marriage_date != "")%slash_marriage_date;%else;<span class="fa fa-%nn;
+                  %if;(ancestor.sex!=spouse.sex)venus-mars%elseif;
+                    (ancestor.is_male and ancestor.sex=spouse.sex)mars-double text-secondary%else;
+                    venus-double text-danger
+                  %end;"></span>
+                %end;
+              </a>%nn;
             %else;
-              &nbsp;
+              %slash_marriage_date;
             %end;
           </td>
         %end;
@@ -1069,10 +1083,14 @@
 %( Date du décès %)
   %if;(evar.death = "on")
     <td class="align-middle text-right" %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
-      %if;ancestor.has_approx_death_date;
-        %ancestor.slash_approx_death_date;
+      %if;(wizard and not cancel_links)
+        <a class="d-block" href="%prefix;m=MOD_IND;i=%ancestor.index;#death_"
+           title="%if;(ancestor.has_approx_death_date)[*update::death]%else;[*add::death]%end;&#010;
+           %ancestor.first_name; %ancestor.surname; %if;(ancestor.occ!="0")(%ancestor.occ;)%end;&#010;%if;(ancestor.has_death_date and ancestor.death_date.prec="" or ancestor.death_date.prec="?")† %ancestor.death_date;%end;">
+        %if;ancestor.has_approx_death_date;%ancestor.slash_approx_death_date;%elseif;ancestor.is_dead;†%end;
+        </a>
       %else;
-        &nbsp;
+        %if;ancestor.has_approx_death_date;%ancestor.slash_approx_death_date;%elseif;ancestor.is_dead;†%end;
       %end;
     </td>
   %end;
@@ -1177,11 +1195,21 @@
             </td>
           %end;
           %if;(evar.marr_date = "on")
-            <td class="border-top-0">
-              %if;(slash_marriage_date != "")
-                %slash_marriage_date;
+            <td class="align-middle text-right">
+              %if;(wizard and not cancel_links)
+                <a class="d-block" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
+                  title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
+                  [*update::family/families]0%end;&#010;
+                  %ancestor; [and] %spouse;&#010;%if;(marriage_date!="" and marriage_date.prec="" or marriage_date.prec="?")& %marriage_date;%end;">
+                  %if;(slash_marriage_date != "")%slash_marriage_date;%else;<span class="fa fa-%nn;
+                    %if;(ancestor.sex!=spouse.sex)venus-mars%elseif;
+                      (ancestor.is_male and ancestor.sex=spouse.sex)mars-double text-secondary%else;
+                      venus-double text-danger
+                    %end;"></span>
+                  %end;
+                </a>%nn;
               %else;
-                &nbsp;
+                %slash_marriage_date;
               %end;
             </td>
           %end;
