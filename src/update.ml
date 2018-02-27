@@ -80,12 +80,17 @@ value print_same_name conf base p =
                [ Some p -> do {
                    print_person p;
                    let ifam = get_family p in
-                   List.iter
-                     (fun ifam -> do {
+                   let nbfam = Array.length ifam in
+                   List.iteri
+                     (fun i ifam -> do {
                        let fam = foi base ifam in
                        let sp = spouse (get_key_index p) fam in
                        let sp = poi base sp in
-                       Wserver.printf ", &amp; ";
+                       Wserver.printf ", &amp;";
+                       if nbfam > 1 then 
+                          Wserver.printf "%d" ( i + 1 )
+                       else ();
+                       Wserver.printf " ";
                        print_person sp } )
                      (Array.to_list ifam);
                    Wserver.printf "\n"
