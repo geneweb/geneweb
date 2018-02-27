@@ -67,28 +67,7 @@ type=\"radio\" class=\"form-control\" name=\"select\" value=\"input\" checked";
                  (Adef.int_of_iper (get_key_index p));
              end;
              tag "td" begin
-               stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-                 Wserver.printf "%s.%d %s" (sou base (get_first_name p))
-                   (get_occ p) (sou base (get_surname p));
-               end;
-               Wserver.printf "%s" (Date.short_dates_text conf base p);
-               match main_title conf base p with
-               [ Some t -> Wserver.printf "%s" (one_title_text conf base p t)
-               | None -> () ];
-               match get_parents p with
-               [ Some ifam ->
-                   let cpl = foi base ifam in
-                   Wserver.printf ",\n%s"
-                     (Util.translate_eval
-                       (transl_a_of_b conf
-                          (transl_nth conf "son/daughter/child"
-                             (index_of_sex (get_sex p)))
-                          (person_title_text conf base
-                             (poi base (get_father cpl)) ^
-                             " " ^ transl_nth conf "and" 0 ^ " " ^
-                             person_title_text conf base
-                               (poi base (get_mother cpl)))))
-               | None -> () ];
+               Update.print_person_parents_and_spouses conf base p;
                xtag "br";
              end;
            end)

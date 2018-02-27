@@ -95,6 +95,8 @@ value one_title_text : config -> base -> person -> title -> string;
 value person_title_text : config -> base -> person -> string;
 value person_title : config -> base -> person -> string;
 
+value child_of_parent : config -> base -> person -> string;
+
 value reference : config -> base -> person -> string -> string;
 value no_reference : config -> base -> person -> string -> string;
 value referenced_person_title_text : config -> base -> person -> string;

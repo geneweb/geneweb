@@ -54,20 +54,51 @@ value restrict_to_small_list el =
       | [] -> List.rev rl ]
 ;
 
+
+(* ************************************************************************** *)
+(*  [Fonc] print_person_parents_and_spouses :
+             config -> base -> person -> unit                                 *)
+(** [Description] : Print several information to distinguish homonyms. The
+      information includes name of the person, name of the parents,
+      name of the spouse.
+    [Args] :
+      - conf : configuration of the base
+      - base : base
+      - p    : person
+    [Retour] : unit
+    [Rem] : Not visible.                                                      *)
+(* ************************************************************************** *)
+value print_person_parents_and_spouses conf base p = do {
+  stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
+  begin
+    Wserver.printf "%s.%d %s" (p_first_name base p)
+      (get_occ p) (p_surname base p);
+  end;
+  Wserver.printf "%s" (Date.short_dates_text conf base p);
+  let cop = Util.child_of_parent conf base p in
+  if cop != "" then Wserver.printf ", %s" cop else ();
+  let ifam = get_family p in
+  let nbfam = Array.length ifam in
+  List.iteri
+    (fun i ifam -> do {
+      let fam = foi base ifam in
+      let sp = spouse (get_key_index p) fam in
+      let sp = poi base sp in
+      Wserver.printf ", &amp;";
+      if nbfam > 1 then Wserver.printf "%d" (i + 1) else ();
+      Wserver.printf " ";
+      Wserver.printf "%s.%d %s" (p_first_name base sp)
+        (get_occ sp) (p_surname base sp);
+      Wserver.printf "%s" (Date.short_dates_text conf base sp)} )
+    (Array.to_list ifam);
+  Wserver.printf "\n";
+};
+
+
 value print_same_name conf base p =
   match Gutil.find_same_name base p with
   [ [_] -> ()
   | pl ->
-      let print_person p =
-        do {
-          stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
-          begin
-            Wserver.printf "%s.%d %s" (p_first_name base p)
-              (get_occ p) (p_surname base p);
-          end;
-          Wserver.printf "%s" (Date.short_dates_text conf base p)
-        }
-      in
       let pl = restrict_to_small_list pl in
       tag "p" begin
         Wserver.printf "%s%s\n"
@@ -76,27 +107,16 @@ value print_same_name conf base p =
         tag "ul" begin
           List.iter
             (fun p ->
-             stag "li" begin
-               match p with
-               [ Some p -> do {
-                   print_person p;
-                   let ifam = get_family p in
-                   List.iter
-                     (fun ifam -> do {
-                       let fam = foi base ifam in
-                       let sp = spouse (get_key_index p) fam in
-                       let sp = poi base sp in
-                       Wserver.printf ", &amp; ";
-                       print_person sp } )
-                     (Array.to_list ifam);
-                   Wserver.printf "\n"
-                 }
-               | None -> Wserver.printf "...\n" ];
-             end)
+              stag "li" begin
+                match p with
+                [ Some p -> print_person_parents_and_spouses conf base p
+                | None -> Wserver.printf "...\n" ];
+              end)
             pl;
         end;
       end ]
 ;
+
 
 (* ************************************************************************* *)
 (*  [Fonc] is_label_note : string -> bool                                    *)

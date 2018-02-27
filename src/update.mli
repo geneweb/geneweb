@@ -21,6 +21,7 @@ type key = (string * string * int * create * string);
 
 value infer_death : config -> option date -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
+value print_person_parents_and_spouses : config -> base -> person -> unit;
 
 value insert_person :
   config -> base -> string -> ref (list (gen_person iper istr)) -> key ->
