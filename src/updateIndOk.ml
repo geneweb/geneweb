@@ -823,60 +823,6 @@ value strip_person p =
      List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents}
 ;
 
-value print_conflict conf base p = do {
-  IFDEF API THEN
-    if Api_conf.mode_api.val then
-      let err =
-        Printf.sprintf
-          (fcapitale (ftransl conf "name %s already used by %tthis person%t"))
-          ("\"" ^ p_first_name base p ^ "." ^ string_of_int (get_occ p) ^ " " ^
-             p_surname base p ^ "\"")
-          (fun _ ->
-             Printf.sprintf "%s %s" (sou base (get_first_name p))
-               (sou base (get_surname p)))
-          (fun _ -> ".")
-      in
-      raise (Update.ModErrApi err)
-    else ()
-  ELSE () END;
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  rheader conf title;
-  Update.print_error conf base (AlreadyDefined p);
-  let free_n =
-    Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
-  in
-  tag "ul" begin
-    stag "li" begin
-      Wserver.printf "%s: %d.\n" (capitale (transl conf "first free number"))
-        free_n;
-      Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
-        (transl conf "create");
-      Wserver.printf "%s.\n" (transl conf " to try again with this number");
-    end;
-    stag "li" begin
-      Wserver.printf "%s " (capitale (transl conf "or"));
-      Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-      Wserver.printf " %s %s." (transl_nth conf "and" 0)
-        (transl conf "change it (the number) yourself");
-    end;
-  end;
-  tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-    List.iter
-      (fun (x, v) ->
-         xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-           (quote_escaped (decode_varenv v)))
-      (conf.henv @ conf.env);
-    xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\""
-      free_n;
-    xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
-      (capitale (transl conf "create"));
-    xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
-      (capitale (transl conf "back"));
-  end;
-  Update.print_same_name conf base p;
-  trailer conf;
-  raise Update.ModErr
-};
 
 value print_cannot_change_sex conf base p = do {
   IFDEF API THEN
@@ -910,7 +856,7 @@ value check_conflict conf base sp ipl =
           Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1) =
             name &&
           get_occ p1 = sp.occ then
-         print_conflict conf base p1
+         Update.print_create_conflict conf base p1 ""
        else ())
     ipl
 ;

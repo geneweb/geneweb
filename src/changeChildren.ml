@@ -185,50 +185,6 @@ value print_change_done conf base p =
   }
 ;
 
-value print_conflict conf base ip_var p =
-  let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
-  do {
-    rheader conf title;
-    Update.print_error conf base (AlreadyDefined p);
-    let free_n =
-      Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0
-    in
-    tag "ul" begin
-      stag "li" begin
-        Wserver.printf "%s: %d.\n" (capitale (transl conf "first free number"))
-          free_n;
-        Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
-          (transl conf "create");
-        Wserver.printf "%s.\n" (transl conf " to try again with this number");
-      end;
-      stag "li" begin
-        Wserver.printf "%s " (capitale (transl conf "or"));
-        Wserver.printf (ftransl conf "click on \"%s\"") (transl conf "back");
-        Wserver.printf " %s %s." (transl_nth conf "and" 0)
-          (transl conf "change it (the number) yourself");
-      end;
-    end;
-    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      List.iter
-        (fun (x, v) ->
-          xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
-            (quote_escaped (decode_varenv v)))
-        (conf.henv @ conf.env);
-      let var = "c" ^ string_of_int (Adef.int_of_iper ip_var) in
-      xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
-      xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
-      tag "button" "type=\"submit\" name=\"create\" class=\"btn btn-secondary btn-lg\"" begin 
-        Wserver.printf "%s" (capitale (transl conf "create"));
-      end;
-      tag "button" "type=\"submit\" name=\"return\" class=\"btn btn-secondary btn-lg\"" begin 
-        Wserver.printf "%s" (capitale (transl conf "back"));
-      end;
-    end;
-    Update.print_same_name conf base p;
-    trailer conf;
-  }
-;
-
 value check_conflict conf base p key new_occ ipl =
   let name = Name.lower key in
   List.iter
@@ -239,7 +195,9 @@ value check_conflict conf base p key new_occ ipl =
             name &&
           get_occ p1 = new_occ then
           do {
-         print_conflict conf base (get_key_index p) p1; raise Update.ModErr
+         Update.print_create_conflict conf base p1 
+         	(string_of_int (Adef.int_of_iper (get_key_index p))); 
+         	raise Update.ModErr
        }
        else ())
     ipl

@@ -4,6 +4,7 @@
 open Config;
 open Def;
 open Gwdb;
+open Date;
 
 value add_lang_path : string -> unit;
 value set_base_dir : string -> unit;
@@ -94,6 +95,8 @@ value titled_person_text : config -> base -> person -> title -> string;
 value one_title_text : config -> base -> person -> title -> string;
 value person_title_text : config -> base -> person -> string;
 value person_title : config -> base -> person -> string;
+
+value child_of_parent : config -> base -> person -> string;
 
 value reference : config -> base -> person -> string -> string;
 value no_reference : config -> base -> person -> string -> string;
