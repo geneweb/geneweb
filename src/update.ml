@@ -88,12 +88,17 @@ value print_person_parents_and_spouses conf base p =
       Wserver.printf ", %s" son_of
     else ();
     let ifam = get_family p in
-    List.iter
-      (fun ifam -> do {
+    let nbfam = Array.length ifam in
+    List.iteri
+      (fun i ifam -> do {
         let fam = foi base ifam in
         let sp = spouse (get_key_index p) fam in
         let sp = poi base sp in
-        Wserver.printf ", &amp; ";
+        Wserver.printf ", &amp;";
+        if nbfam > 1 then 
+          Wserver.printf "%d" ( i + 1 )
+        else ();
+        Wserver.printf " ";
         print_person sp False } )
       (Array.to_list ifam)
   }
