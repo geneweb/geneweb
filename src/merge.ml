@@ -18,7 +18,10 @@ value print conf base p =
     do {
       Wserver.printf "%s" (capitale (transl_decline conf "merge" ""));
       if h then ()
-      else do { Wserver.printf ": "; print_someone conf base p; };
+      else do {
+        Wserver.printf "%s " (transl conf ":");
+        print_someone conf base p;
+      }
     }
   in
   let list = Gutil.find_same_name base p in
@@ -40,15 +43,15 @@ value print conf base p =
           (Adef.int_of_iper (get_key_index p));
         Wserver.printf "%s " (capitale (transl_decline conf "with" ""));
         if list <> [] then do {
-          Wserver.printf ":";
+          Wserver.printf "%s" (transl conf ":");
           xtag "br";
           xtag "input" "\
 type=\"radio\" class=\"form-control\" name=\"select\" value=\"input\" checked";
         }
         else ();
-        Wserver.printf "(%s.%s %s):\n"
+        Wserver.printf "(%s.%s %s)%s\n"
           (transl_nth conf "first name/first names" 0) (transl conf "number")
-          (transl_nth conf "surname/surnames" 0);
+          (transl_nth conf "surname/surnames" 0) (transl conf ":");
         xtag "input" "class=\"form-control\" name=\"n\" size=\"30\" maxlength=\"200\"";
         xtag "br";
       end;

@@ -269,7 +269,8 @@ value propose_merge_ind conf base branches p1 p2 =
   do {
     header conf title;
     if branches <> [] then do {
-      Wserver.printf "%s:\n" (capitale (transl conf "you must first merge"));
+      Wserver.printf "%s%s\n" (capitale (transl conf "you must first merge"))
+        (transl conf ":");
       tag "ul" begin
         html_li conf;
         stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
@@ -289,7 +290,8 @@ value propose_merge_ind conf base branches p1 p2 =
       html_p conf;
       xtag "hr";
       html_p conf;
-      Wserver.printf "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
+      Wserver.printf "%s%s\n" (capitale (transl_nth conf "branch/branches" 1))
+        (transl conf ":");
       html_p conf;
       tag "table" begin
         List.iter
@@ -496,8 +498,9 @@ value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   in
   do {
     header conf title;
-    Wserver.printf "%s:\n"
-      (capitale (transl conf "you must first merge the 2 families"));
+    Wserver.printf "%s%s\n"
+      (capitale (transl conf "you must first merge the 2 families"))
+      (transl conf ":");
     tag "ul" begin
       html_li conf;
       stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
