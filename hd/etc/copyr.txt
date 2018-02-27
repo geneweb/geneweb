@@ -9,19 +9,16 @@
     %let;l1;%apply;lang(i)%in;
     %if;(l1!=evar.lang)
       <a class="dropdown-item" id="lang_%l1;"
-        href="%prefix_no_lang;%if;(l1!=bvar.default_lang)lang=%l1;;%end;%suffix;">%nn;
+        href="%prefix_no_lang;%if;(l1!=bvar.default_lang)lang=%l1;;%end;%nn;
+              %foreach;env_binding;%if;(env.key!="lang" and env.key!="p_mod")%env.key=%env.val;;%end;%end;">%nn;
        <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
     %end;
   %end;
 %end;
-%define;template_link(xx,yy)
-  <a class="dropdown-item" href="%prefix_no_templ;templ=xx;%suffix;">yy</a>
-%end;
 %define;compil(xx,yy)
   [compiled on %s from commit %s:::xx:yy]
 %end;
-
 %if;(not cancel_links and evar.m != "MOD_DATA_OK" and evar.m != "DEL_IND_OK" and evar.m != "DEL_FAM_OK")
   <div class="col col-md-11 col-lg-10 mx-auto mb-1" id="copyr">
     <div class="d-none d-flex justify-content-sm-between">
@@ -101,7 +98,3 @@
     </div>
   </div>
 %end;
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-.
