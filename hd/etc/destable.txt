@@ -225,7 +225,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %end;
             %if;(evar.title="on")%xxx.title;%end;
           </div>
-          %if;(evar.image="on" and xxx.has_image)
+          %if;(evar.image!="off" and xxx.has_image)
             <img src="%xxx.image_url;" class="rounded align-self-center"
              height="%if;(evar.px!="")%evar.px;%else;60%end;px">
           %end;
@@ -252,7 +252,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         >
         %apply;add_in_sorted_list(xxx.index)
         <div class="d-flex justify-content-between">
-          %if;(evar.image="on" and xxx.has_image)
+          %if;(evar.image!="off" and xxx.has_image)
             <img src="%xxx.image_url;" class="rounded align-self-center"
              height="%if;(evar.px!="")%evar.px;%else;60%end;px">
           %else;<div></div>
@@ -776,11 +776,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"
       href="%prefix_base;m=D;%nn;
             %foreach;env_binding;%if;(not (env.key="m" or env.key="image"))%env.key=%env.val;;%end;%end;%nn;
-            %if;(evar.image!="on")image=on%end;">
-      <i class="fa fa-picture-o fa-lg fa-fw %if;(evar.image="on")text-danger%end; mr-1"></i>%nn;
-      %if;(evar.image="" or evar.image!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [image/images]1
+            %if;(evar.image!="off")image=off%end;">
+      <i class="fa fa-image fa-lg fa-fw %if;(evar.image!="off")text-danger%end; mr-1"></i>%nn;
+      %if;(evar.image="off")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [image/images]1
     </a>
-    %if;(evar.image="on")
+    %if;(evar.image!="off")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"
          href="%prefix_base;m=D;%nn;
                %foreach;env_binding;%if;(not (env.key="m" or env.key="px"))%env.key=%env.val;;%end;%end;%nn;
@@ -792,7 +792,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %foreach;env_binding;%if;(not (env.key="m" or env.key="ns"))%env.key=%env.val;;%end;%end;%nn;
             %if;(evar.ns!="on")ns=on%end;"
       title="Small arrow in corner shows existence of note or source.">
-      <i class="fa fa-file-text-o fa-lg fa-fw %if;(evar.ns="on")text-danger%end; mr-1"></i>%nn;
+      <i class="far fa-sticky-note fa-flip-vertical  fa-lg fa-fw %if;(evar.ns="on")text-danger%end; mr-1"></i>%nn;
       %if;(evar.ns="" or evar.ns!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end;%sp;
         <span class="notecolor">[note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>
     </a>
@@ -800,8 +800,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"
         href="%prefix_base;m=D;cgl=on;%nn;
             %foreach;env_binding;%if;(env.key!="m")%env.key=%env.val;;%end;%end;"
-        title="Cancel url links in whole page">
-        <i class="fa fa-chain-broken fa-lg fa-fw mr-1"></i>%nn;[*cancel GeneWeb links]
+        title="Cancel all URL links">
+        <i class="fa fa-unlink fa-fw mr-1"></i>%nn;[*cancel GeneWeb links]
       </a>
     %end;
     %if;(evar.marr="on" or evar.marr_place="on" or evar.marr_date="on")
