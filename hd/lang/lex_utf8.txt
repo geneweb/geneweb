@@ -745,7 +745,7 @@ eo: 1an de %m %y/%da de %m %y/%m %y/%y
 es: 1 de %m %y/%d de %m %y/%m %y/%y
 et: 1. %m %y/%d. %m %y/%m %y/%y
 fi: 1. %mta %y/%d. %mta %y/%mssa %y/%y
-fr: 1er %m %y/%d %m %y/%m %y/%y
+fr: 1ᵉʳ %m %y/%d %m %y/%m %y/%y
 he: 1 %m %y/%d %m %y/%m %y/%y
 is: 1 %m %y/%d %m %y/%m %y/%y
 it: 1º %m %y/%d %m %y/%m %y/%y
