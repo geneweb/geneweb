@@ -177,11 +177,11 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                    (evar.marr="on" or evar.marr_date="on" or evar.marr_place="on"
                     or evar.child="on"))rowspan="%xxx.nb_families;"%end;%in;
 
-  <tr id="%labl0">
+  <tr>
 %( numéro d'Aboville %)
   %if;(evar.num="on" and famx=1)
     %if;("yyy"="desc")
-      <td class="border-left-0 text-center align-middle" %rowspan;>
+      <td  id="%labl0" class="border-left-0 text-center align-middle" %rowspan;>
       %if;("ch_cnt"="1" and not cancel_links)<a href="#prefx" title="[*link back to parents]">%end;
       %labl;
       %if;("ch_cnt"="1" and not cancel_links)</a>%end;
@@ -205,8 +205,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           %end;
         %end;'
         %rowspan;
-        %if;(evar.ns="on" and (has_notes or has_psources))
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
+        %if;(evar.ns="on" and (has_notes or has_psources)) tabindex="0"
+          data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
           data-content='%if;(has_notes)%notes;%end;
                         %if;(has_notes and has_psources)<hr>%end;
                         %if;(has_psources)%apply;capitalize(psources)%end;'
@@ -227,7 +227,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           </div>
           %if;(evar.image!="off" and xxx.has_image)
             <img src="%xxx.image_url;" class="rounded align-self-center"
-             height="%if;(evar.px!="")%evar.px;%else;60%end;px">
+             height="%if;(evar.px!="")%evar.px;%else;60%end;" alt="xxx">
           %end;
         </div>
       </td>
@@ -239,8 +239,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           %elseif;(xxx.has_notes and xxx.has_psources) notesourcespouse%nn;
           %end;
         %end;'
-        %if;(evar.ns="on" and (xxx.has_notes or xxx.has_psources))
-          tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
+        %if;(evar.ns="on" and (xxx.has_notes or xxx.has_psources)) tabindex="0"
+          data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
           data-content='%if;(xxx.has_notes)%xxx.notes;%end;
                         %if;(xxx.has_notes and xxx.has_psources)<hr>%end;
                         %if;(xxx.has_psources)%apply;capitalize(xxx.psources)%end;'
@@ -254,7 +254,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
         <div class="d-flex justify-content-between">
           %if;(evar.image!="off" and xxx.has_image)
             <img src="%xxx.image_url;" class="rounded align-self-center"
-             height="%if;(evar.px!="")%evar.px;%else;60%end;px">
+             height="%if;(evar.px!="")%evar.px;%else;60%end;" alt="xxx">
           %else;<div></div>
           %end;
           <div class="align-self-center px-1">
@@ -295,8 +295,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           %end;
         %end;'
     %rowspan;
-    %if;(evar.ns="on")
-      tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+    %if;(evar.ns="on") tabindex="0"
+      data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
       data-content='%if;(xxx.has_birth_note or xxx.has_baptism_note)
                       %if;(xxx.has_birth_note)%if;(xxx.has_baptism_note)[*birth][:] %end;%xxx.birth_note;%end;
                       %if;(xxx.has_baptism_note)[*baptism][:] %xxx.baptism_note;%end;
@@ -340,8 +340,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
               %elseif;(spouse.has_notes and spouse.has_psources) notesource%nn;
               %end;
           %end;'
-          %if;(evar.ns="on" and (spouse.has_notes or spouse.has_psources))
-            tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+          %if;(evar.ns="on" and (spouse.has_notes or spouse.has_psources)) tabindex="0"
+            data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
             data-content='%if;(spouse.has_notes)%spouse.notes;%end;
                           %if;(spouse.has_notes and spouse.has_psources)<hr>%end;
                           %if;(spouse.has_psources)%apply;capitalize(spouse.psources)%end;'
@@ -415,8 +415,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
               %end;
             %end;'
             %rowspan;
-            %if;(evar.ns="on")
-              tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+            %if;(evar.ns="on") tabindex="0"
+              data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(has_marriage_note)%marriage_note;%end;
                             %if;(has_marriage_note and has_marriage_source)<hr>%end;
                             %if;(has_marriage_source)%apply;capitalize(marriage_source)%end;'
@@ -493,8 +493,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
               %end;
             %end;'
             %rowspan;
-            %if;(evar.ns="on")
-              tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+            %if;(evar.ns="on") tabindex="0"
+              data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(has_fnotes)%fnotes;%end;
                             %if;(has_fnotes and has_fsources)<hr>%end;
                             %if;(has_fsources)%apply;capitalize(fsources)%end;'
@@ -548,8 +548,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
           %end;
         %end;'
     %rowspan;
-    %if;(evar.ns="on")
-      tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
+    %if;(evar.ns="on") tabindex="0"
+      data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
       data-content='%if;(xxx.has_death_note or xxx.has_burial_note)
                       %if;(xxx.has_death_note)%if;(xxx.has_burial_note)[*death][:] %end;%xxx.death_note;%end;
                       %if;(xxx.has_burial_note)[*burial][:] %xxx.burial_note;%end;
