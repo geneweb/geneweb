@@ -125,6 +125,7 @@ value body_prop : config -> string;
 value url_no_index : config -> base -> string;
 value message_to_wizard : config -> unit;
 value check_xhtml : string -> string;
+value replace_quotes : string -> string;
 
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;
