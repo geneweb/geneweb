@@ -883,23 +883,23 @@
     %else;%ancestor.anc_sosa;%end;
   </td>
 %( Ancêtre %)
-  <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;
-      class='%if;(ancestor.nb_families > 1)border-bottom-0%end; align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2
+  <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;%sp;
+      class="%if;(ancestor.nb_families > 1)border-bottom-0%end; align-middle %if;(evar.nowrap="on")text-nowrap%end; pl-2
     %if;(evar.ns="on")
         %if;(ancestor.has_notes and not ancestor.has_psources) note%nn;
         %elseif;(not ancestor.has_notes and ancestor.has_psources) source%nn;
         %elseif;(ancestor.has_notes and ancestor.has_psources) notesource%nn;
         %end;
-    %end;'
+    %end;"
     %if;(evar.ns="on" and (ancestor.has_notes or ancestor.has_psources))
       tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"
       data-content='%if;(ancestor.has_notes)%ancestor.notes;%end;
                     %if;(ancestor.has_notes and ancestor.has_psources)<hr>%end;
                     %if;(ancestor.has_psources)%apply;capitalize(ancestor.psources)%end;'
-      title='%if;(ancestor.has_notes and not ancestor.has_psources)[*note/notes]1%nn;
+      title="%if;(ancestor.has_notes and not ancestor.has_psources)[*note/notes]1%nn;
             %elseif;(not ancestor.has_notes and ancestor.has_psources)[*source/sources]1%nn;
             %elseif;(ancestor.has_notes and ancestor.has_psources)[*note/notes]1 [and] [source/sources]1%nn;
-            %end;'
+            %end;"
     %end;
     >
     <div class="d-flex justify-content-between">
@@ -918,7 +918,7 @@
         %end;
       </div>
       %if;(evar.image!="off" and ancestor.has_image)
-        <img src="%ancestor.image_url;" class="rounded align-self-center" height="%if;(evar.px!="")%evar.px;%else;60%end;px">
+        <img src="%ancestor.image_url;" class="rounded align-self-center" height="%if;(evar.px!="")%evar.px;%else;60%end;" alt="%ancestor;">
       %end;
     </div>
 %( Date de naissance %)
@@ -938,8 +938,8 @@
   %end;
 %( Lieu de naissance %)
   %if;(evar.birth_place = "on")
-    <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;
-      class='align-middle%nn;
+    <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;%sp;
+      class="align-middle%nn;
         %if;(evar.ns="on")
           %if;((ancestor.has_birth_note or ancestor.has_baptism_note) and not
                (ancestor.has_birth_source or ancestor.has_baptism_source)) note%nn;
@@ -948,7 +948,7 @@
           %elseif;((ancestor.has_birth_note or ancestor.has_baptism_note) and
                (ancestor.has_birth_source or ancestor.has_baptism_source)) notesource%nn;
           %end;
-        %end;'
+        %end;"
         %if;(evar.ns="on")
           tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
           data-content='%if;(ancestor.has_birth_note or ancestor.has_baptism_note)
@@ -1031,14 +1031,13 @@
     %else;
       %foreach;ancestor.family;
         %if;(family_cnt = 1)
-          <td %if;(ancestor.nb_families>1) %end;
-            class='align-middle%nn;
+          <td class="align-middle
             %if;(evar.ns="on")
               %if;(has_marriage_note and not has_marriage_source) note%nn;
               %elseif;(not has_marriage_note and has_marriage_source) source%nn;
               %elseif;(has_marriage_note and has_marriage_source) notesource%nn;
               %end;
-            %end;'
+            %end;"
             %if;(evar.ns="on")
               tabindex="0" data-trigger="focus" data-toggle="popover" data-placement="bottom" data-html="true"
               data-content='%if;(has_marriage_note)%marriage_note;%end;
@@ -1096,7 +1095,7 @@
   %end;
 %( Lieu du décès %)
   %if;(evar.death_place = "on")
-    <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;
+    <td %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;%sp;
       class='align-middle%nn;
         %if;(evar.ns="on")
           %if;((ancestor.has_death_note or ancestor.has_burial_note) and not
@@ -1166,7 +1165,7 @@
       %if;(family_cnt != 1)
         <tr>
           %if;(evar.marr = "on")
-            <td class='border-top-0 align-middle%nn;
+            <td class='border-top-0 align-middle
                 %if;(evar.ns="on")
                   %if;(spouse.has_pnotes and not spouse.has_psources) note%nn;
                   %elseif;(not spouse.has_pnotes and spouse.has_psources) source%nn;
@@ -1214,7 +1213,7 @@
             </td>
           %end;
           %if;(evar.marr_place = "on")
-            <td class='border-top-0 align-middle%nn;
+            <td class='border-top-0 align-middle
               %if;(evar.ns="on")
                 %if;(has_marriage_note and not has_marriage_source) note%nn;
                 %elseif;(not has_marriage_note and has_marriage_source) source%nn;
@@ -1244,8 +1243,7 @@
             </td>
           %end;
           %if;(evar.child = "on")
-            <td align="center" style="border-top:none; %if;(ancestor.nb_families != family_cnt) %end;"
-              class='align-middle%nn;
+            <td class='text-center align-middle%nn;
               %if;(evar.ns="on")
                 %if;(has_fnotes and not has_fsources) note%nn;
                 %elseif;(not has_fnotes and has_fsources) source%nn;
@@ -1301,30 +1299,28 @@
 
 %if;(evar.t = "Z" and not cancel_links)
   <div class="form-inline">
-    <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name;;n=%surname;;m=A">
+    <a role="button" class="btn btn-link my-0 px-0 mb-1" href="%prefix;p=%first_name_key;;n=%surname_key;;m=A">
       <i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors]
     </a>
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" 
       href="%prefix_base;m=D;t=I;v=%max_desc_level;;num=on;%nn;
-        %foreach;env_binding;%if;(not (env.key="m" or env.key="v" or env.key="t"))%env.key=%env.val;;%end;%end;"
-      class="btn btn-outline-secondary">
+        %foreach;env_binding;%if;(not (env.key="m" or env.key="v" or env.key="t"))%env.key=%env.val;;%end;%end;">
       <span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*table] [descendants]
     </a>
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%prefix;m=A;t=T;%access;;v=%evar.v;;image=on;marriage=on">
       <span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]
     </a>
     <div class="input-group ml-3 mb-1">
-            <a role="button" class="btn pl-3
-      %if;(evar.v<3)disabled" aria-disabled="true"%else;"%end;
+      <a role="button" class="btn pl-3%if;(evar.v<3) disabled" aria-disabled="true"%else;"%end;%sp;
         href="%prefix_base;m=A;v=%expr(evar.v-1);;%nn;
             %foreach;env_binding;%if;(not (env.key="m" or env.key="v"))%env.key=%env.val;;%end;%end;"
-        class="btn btn-secondary" title="[*delete] 1 [generation/generations]0">
+        title="[*delete] 1 [generation/generations]0">
         <i class="fa fa-minus fa-lg"></i>
       </a>
       <a role="button" class="btn"
         href="%prefix_base;m=A;v=%expr(evar.v+1);;%nn;
           %foreach;env_binding;%if;(not (env.key="m" or env.key="v"))%env.key=%env.val;;%end;%end;"
-          class="btn btn-secondary" title="[*add] 1 [generation/generations]0">
+          title="[*add] 1 [generation/generations]0">
           <i class="fa fa-plus fa-lg"></i>
         </a>
       <span class="text-primary mt-2">%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;</span>
@@ -1802,7 +1798,7 @@
     <p>%apply;gen("v").</p>
     %reset_count;
     <table class="table table-hover ascends_table mt-1">
-      <tr class="ascends_table_header align-middle">%apply;table_header()</tr>
+      %apply;table_header()
       %let;nb_col;%count;%in;
       %reset_count;
       %foreach;ancestor_level;
@@ -1829,7 +1825,7 @@
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     %reset_count;
     <table class="table table-hover ascends_table mt-1">
-      <tr class="ascends_table_header align-middle">%apply;table_header()</tr>
+      %apply;table_header()
       %let;nb_col;%count;%in;
       %reset_count;
       %foreach;ancestor_level(nb_gen)
