@@ -224,6 +224,20 @@ value ind_set_of_relation_path conf base path =
   set
 ;
 
+(*****************************************************************************)
+(** [Fonc] : print_relationship_dag -> config -> base -> Item -> string 
+            -> list -> string
+    [Args] :
+      - conf : configuration
+      - base : base
+      - elem_txt : person and associated string
+      - vbar_txt : ??
+      - path : list of paths
+      - next_txt : url for the computation of the next batch of lim persons
+      
+    [Rem] : Not exported                                                      *)
+(* ************************************************************************** *)
+
 value print_relationship_dag conf base elem_txt vbar_txt path next_txt =
   if p_getenv conf.env "new" <> Some "on" then
     old_print_relationship_dag conf base elem_txt vbar_txt path next_txt
@@ -245,6 +259,7 @@ value print_relationship_dag conf base elem_txt vbar_txt path next_txt =
     next_txt
 ;
 
+(* one relation path between two persons *)
 value next_relation_link_txt conf ip1 ip2 excl_faml =
   let bd =
     match p_getenv conf.env "bd" with
@@ -257,6 +272,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
     | Some x -> ";color=" ^ code_varenv x ]
   in
   let (sl, _) =
+    (* build up in sl the list of excluded families *)
     List.fold_left
       (fun (sl, i) ifam ->
          ([";ef"; string_of_int i; "=";
@@ -265,7 +281,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
   in
   let sl =
     [commd conf; "em=R;ei=";
-     string_of_int (Adef.int_of_iper ip1); ";i=";
+     string_of_int (Adef.int_of_iper ip1);";i=";
      string_of_int (Adef.int_of_iper ip2);
      if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "";
      if conf.cancel_links then ";cgl=on" else ""; bd; color; ";et=S" :: sl]
@@ -1527,6 +1543,11 @@ value print_main_relationship conf base long p1 p2 rel =
   }
 ;
 
+(* multi_relation_next builds the url for a graph between the 
+   persons in the evar.in=index; list. 
+   Each entry may have a evar.tn=text; value associated
+*)
+   
 value multi_relation_next_txt conf pl2 lim assoc_txt =
   match pl2 with
   [ [] -> ""
@@ -1567,6 +1588,21 @@ value print_no_relationship conf base pl =
     trailer conf
   }
 ;
+
+(* ************************************************************************** *)
+(*  [Fonc] print_multi_relation : config -> base -> list -> int -> unit       *)
+(** [Description] : Collects person pairs up to lim (a link will propose to
+        compute the tree for the next batch of lim persons)
+        (not sure I understant the pl1, pl2 logic). 
+                    
+    [Args] :
+      - conf : configuration
+      - base : base
+      - list : list of persons
+      - lim : limit
+      - unit : text associated to each person
+    [Rem] : Not exported                                                      *)
+(* ************************************************************************** *)
 
 value print_multi_relation conf base pl lim assoc_txt =
   let (pl1, pl2) =
@@ -1615,6 +1651,10 @@ value print_multi_relation conf base pl lim assoc_txt =
     in
     let vbar_txt ip = "" in
     let next_txt = multi_relation_next_txt conf pl2 lim assoc_txt in
+    (* elem_txt is the dag item value (person and string) *)
+    (* what is vbar_txt ?? *)
+    (* path is the list of path between the listed pairs *)
+    (* next_txt is the text or the url that will be used by %next_link; *)
     print_relationship_dag conf base elem_txt vbar_txt path next_txt
 ;
 
@@ -1654,8 +1694,53 @@ value print conf base p =
   | None -> relmenu_print conf base p ]
 ;
 
-value print_multi conf base =
-  let assoc_txt = Hashtbl.create 53 in
+(* ************************************************************************** *)
+(*  [Fonc] build_pl : config -> base -> unit                                  *)
+(** [Description] : Construction of a list of persons found in evar.ik
+                    in the url
+    [Args] :
+      - conf : configuration
+      - base : base
+      - assoc_txt : 
+    [Retour] : list of persons
+    [Rem] : Not exported                                                      *)
+(* ************************************************************************** *)
+
+value build_pl conf base assoc_txt =
+  let pl =
+    loop [] 1 where rec loop pl i =
+      let k = string_of_int i in
+      (* k varies from 1 to first missing integer *)
+      match find_person_in_env conf base k with
+      [ Some p ->
+          do {
+            (* for each person, collect in an associative table a piece of *)
+            (* text found in evar.tk *)
+            match p_getenv conf.env ("t" ^ k) with
+            [ Some x -> Hashtbl.add assoc_txt (get_key_index p) x
+            | None -> () ];
+            loop [p :: pl] (i + 1)
+          }
+      | None -> List.rev pl ]
+  in
+  pl
+;
+
+(* ************************************************************************** *)
+(*  [Fonc] build_pl_r : config -> base -> person -> unit                        *)
+(** [Description] : Construction of a list of persons found in evar.ik
+                    in the url. The person p0 in inserted between
+                    each person found in the url
+    [Args] :
+      - conf : configuration
+      - base : base
+      - p0 : person
+      - assoc_txt : 
+    [Retour] : list of persons
+    [Rem] : Not exported                                                      *)
+(* ************************************************************************** *)
+
+value build_pl_r conf base p0 assoc_txt =
   let pl =
     loop [] 1 where rec loop pl i =
       let k = string_of_int i in
@@ -1665,9 +1750,38 @@ value print_multi conf base =
             match p_getenv conf.env ("t" ^ k) with
             [ Some x -> Hashtbl.add assoc_txt (get_key_index p) x
             | None -> () ];
+            let pl = [p0 :: pl] in
             loop [p :: pl] (i + 1)
           }
       | None -> List.rev pl ]
+  in
+  pl
+;
+
+(* ************************************************************************** *)
+(*  [Fonc] print_multi : config -> base                                       *)
+(** [Description] : Construction of a list of persons found in evar.ik 
+                    (k=1 to n) in the url.
+                    Passes this list to print_multi_relation
+                    If evar.i0 is present, insert this pivot person
+                    between each person of the evar.ik list
+    [Args] :
+      - conf : configuration
+      - base : base
+    [Rem] : Not exported                                                      *)
+(* ************************************************************************** *)
+
+value print_multi conf base =
+  let assoc_txt = Hashtbl.create 53 in
+  let pl = match find_person_in_env conf base "0" with
+    [ Some p ->
+        do {
+          match p_getenv conf.env "t0" with
+            [ Some x -> Hashtbl.add assoc_txt (get_key_index p) x
+            | None -> () ];
+          build_pl_r conf base p assoc_txt
+        }
+    | None -> build_pl conf base assoc_txt ]
   in
   let lim =
     match p_getint conf.env "lim" with
