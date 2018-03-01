@@ -2428,6 +2428,56 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
         if is_hidden (fst ep) then raise Not_found
         else eval_person_field_var conf base env ep loc sl
       else raise Not_found
+  | ["svar"; i :: sl] ->
+      (* http://localhost:2317/HenriT_w?m=DAG;p1=henri;n1=duchmol;s1=243;s2=245
+         access to sosa si=n of a person pi ni
+         find_base_p will scan down starting from i such that multiple sosa of
+         the same person can be listed
+      *) 
+      let rec find_base_p j =
+        let s = string_of_int j in
+        let po = Util.find_person_in_env conf base s in
+        match po with
+        [ Some p -> p
+        | None -> if j = 0 then raise Not_found else find_base_p (j-1) ]
+      in
+      let p0 = find_base_p (int_of_string i) in
+      (* find sosa identified by si= of that person *)
+      match p_getint conf.env ("s" ^ i) with
+        [ Some s ->
+            let s0 = Sosa.of_int s in
+            let ip0 = get_key_index p0 in
+            match Util.branch_of_sosa conf base ip0 s0 with
+            [ Some [(ip, sp) :: —] ->
+                let p = poi base ip in
+                let p_auth = authorized_age conf base p in
+                eval_person_field_var conf base env (p, p_auth) loc sl
+            | _ -> raise Not_found ]
+        | None -> raise Not_found ]
+(* on hold! triggers Warning 11: this match case is unused. for "related" below!!
+  | ["tvar"; i :: [ s :: sl]] ->
+      (* %tsvar.index_i.sosa_s.first_name;
+         person is directly identified by its index
+         get first_name of sosa_s of person index_i
+      *) 
+      let i0 = int_of_string i in
+      if i0 < 0 || i0 >= nb_of_persons base then raise Not_found
+      else
+        let p0 = pget conf base (Adef.iper_of_int i0) in
+        let s0 = Sosa.of_string s in
+        let ip0 = get_key_index p0 in
+        match Util.branch_of_sosa conf base ip0 s0 with
+        [ Some [(ip, sp) :: —] ->
+            let p = poi base ip in
+            let p_auth = authorized_age conf base p in
+            eval_person_field_var conf base env (p, p_auth) loc sl
+        | _ -> raise Not_found ]  | ["related" :: sl] ->
+      match get_env "rel" env with
+      [ Vrel {r_type = rt} (Some p) ->
+          eval_relation_field_var conf base env
+            (index_of_sex (get_sex p), rt, get_key_index p, False) loc sl
+      | _ -> raise Not_found ]
+*)
   | ["related" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_type = rt} (Some p) ->
