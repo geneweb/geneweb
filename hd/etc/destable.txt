@@ -168,6 +168,7 @@ si t=I on affiche pas les données
 xxx est la personne concernée (self)
 zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %)
+
 %define;table_row(xxx, prefx, fff, fam_cnt, ch_cnt, ch_count, yyy, zzz, ddd, nb_ch_desc)
   %let;famx;%if;(not has_families or evar.t="I")1%else;fam_cnt%end;%in;
   %let;zro;%if;("prefx"="-1")0%else;1%end;%in;
@@ -181,17 +182,17 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %( numéro d'Aboville %)
   %if;(evar.num="on" and famx=1)
     %if;("yyy"="desc")
-      <td  id="%labl0" class="border-left-0 text-center align-middle" %rowspan;>
-      %if;("ch_cnt"="1" and not cancel_links)<a href="#prefx" title="[*link back to parents]">%end;
-      %labl;
+      <td id="%labl0" class="text-center align-middle" %rowspan;>
+        %if;(labl!=1)<a title="[*navigation] [with] %xxx" href="%prefix_base;p=%xxx.first_name_key;;n=%xxx.surname_key;;%if;(xxx.occ!=0)oc=%xxx.occ;;%end;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc")%env.key;=%env.val;;%end;%end;"><i class="fa fa-angle-down"></i> </a>%end;
+      %if;("ch_cnt"="1" and not cancel_links)<a href="#prefx" class="nav_anchor" title="[*link back to parents]">%end;
+        %labl;
       %if;("ch_cnt"="1" and not cancel_links)</a>%end;
       </td>
     %elseif;(evar.t="I")
-      %if;(has_families and nb_families>1)
-        <td class="border-left-0 text-center align-middle">%apply;letter(family_cnt)</td>
-      %else;
-        <td></td>
-      %end;
+      <td class="text-center align-middle">
+        <a title="[*navigation] [with] %xxx" href="%prefix_base;p=%xxx.first_name_key;;n=%xxx.surname_key;;%if;(xxx.occ!=0)oc=%xxx.occ;;%end;%foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc")%env.key;=%env.val;;%end;%end;"><i class="fa fa-angle-down"></i> </a>
+        %if;(has_families and nb_families>1)%apply;letter(family_cnt)%end;
+      </td>
     %end;
   %end;
 %( Descendant et son conjoint en mode I %)
