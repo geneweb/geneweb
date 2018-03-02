@@ -1305,7 +1305,7 @@
       href="%prefix_base;%access;;m=A">
       <i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors]
     </a>
-    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"%sp;
+    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1%if;(not has_children) disabled%end;"%sp;
       href="%prefix_base;%nn;
             %foreach;env_binding;
               %if;(env.key="m")m=D;%nn;
@@ -1313,14 +1313,14 @@
               %elseif;(env.key="v")v=%max_desc_level;;%nn;
               %else;%env.key=%env.val;;%nn;
               %end;%nn;
-            %end;">
+            %end;" >
       <span class="fa fa-table fa-lg fa-fw mr-1"></span>[*table] [descendants]%nn;
     </a>
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1" href="%prefix_base;%access;;m=A;t=T;v=%evar.v;;marriage=on;%if;(evar.image="off")image=off%end;">
       <span class="fa fa-sitemap fa-rotate-180 fa-lg fa-fw mr-1"></span>[*ascendants tree]
     </a>
     <div class="input-group ml-3 mb-1">
-      <a role="button" class="btn pl-3%if;(evar.v<3) disabled" aria-disabled="true"%else;"%end;%sp;
+      <a role="button" class="btn btn-link pl-3%if;(evar.v<3) disabled" aria-disabled="true"%else;"%end;%sp;
         title="[*delete] 1 [generation/generations]0"%sp;
         href="%prefix_base;%nn;
               %foreach;env_binding;
