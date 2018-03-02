@@ -877,15 +877,13 @@
   %lazy_force;
   %if;(ancestor.same = "")%incr_count;%end;
 %( Sosa %)
-  <td class="align-middle text-center num_cell"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
+  <td class="align-middle text-center table_big_cell"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
     %if;(ancestor.anc_sosa!=1)
-      <a class="num_anchor" title="[*navigation] [with] %ancestor;"%sp;
-            href="%prefix_base;%nn;
+      <a class="table_big_anchor" title="[*navigation] [with] %ancestor;%nn;
+        %if;(ancestor.occ!="" and ancestor.occ!=0) (%ancestor.occ;)%end;"%sp;
+            href="%prefix_base;%ancestor.access;;%nn;
               %foreach;env_binding;
-                %if;(env.key="p")p=%ancestor.first_name_key;;%nn;
-                %elseif;(env.key="n")n=%ancestor.surname_key;;%nn;
-                %elseif;(env.key="oc")%if;(ancestor.occ!=0)oc=%ancestor.occ;;%end;%nn;
-                %else;%env.key;=%env.val;;%nn;
+                %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;
                 %end;
               %end;">%nn;
     %end;
@@ -938,9 +936,9 @@
 %( Date de naissance %)
   </td>
   %if;(evar.birth = "on")
-    <td class="align-middle text-right"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>
+    <td class="align-middle text-right table_big_cell"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>
       %if;(wizard and not cancel_links)
-        <a class="d-block" href="%prefix;m=MOD_IND;i=%ancestor.index;#birth_"%sp;
+        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND;i=%ancestor.index;#birth_"%sp;
           title="%if;(ancestor.has_approx_birth_date)[*update::birth]%else;[*add::birth]%end;&#010;
            %ancestor.first_name; %ancestor.surname; %if;(ancestor.occ!="0")(%ancestor.occ;)%end;&#010;%if;(ancestor.has_birth_date and ancestor.birth_date.prec="" or ancestor.birth_date.prec="?")° %ancestor.birth_date;%end;">%nn;
         %if;(ancestor.has_approx_birth_date)%ancestor.slash_approx_birth_date;%else;°%end;%nn;
@@ -1016,9 +1014,9 @@
     %else;
       %foreach;ancestor.family;
         %if;(family_cnt = 1)
-          <td class="align-middle text-right">
+          <td class="align-middle text-right table_big_cell">
             %if;(wizard and not cancel_links)
-              <a class="d-block" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"%sp;
+              <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"%sp;
                 title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
                 [*update::family/families]0%end;&#010;
                 %ancestor; [and] %spouse;&#010;%if;(marriage_date!="" and marriage_date.prec="" or marriage_date.prec="?")& %marriage_date;%end;">%nn;
@@ -1091,9 +1089,9 @@
   %end;
 %( Date du décès %)
   %if;(evar.death = "on")
-    <td class="align-middle text-right" %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
+    <td class="align-middle text-right table_big_cell" %if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on"))rowspan="%ancestor.nb_families;"%end;>
       %if;(wizard and not cancel_links)
-        <a class="d-block" href="%prefix;m=MOD_IND;i=%ancestor.index;#death_"%sp;
+        <a class="d-block table_big_anchor" href="%prefix;m=MOD_IND;i=%ancestor.index;#death_"%sp;
            title="%if;(ancestor.has_approx_death_date)[*update::death]%else;[*add::death]%end;&#010;
            %ancestor.first_name; %ancestor.surname; %if;(ancestor.occ!="0")(%ancestor.occ;)%end;&#010;%if;(ancestor.has_death_date and ancestor.death_date.prec="" or ancestor.death_date.prec="?")† %ancestor.death_date;%end;">%nn;
         %if;ancestor.has_approx_death_date;%ancestor.slash_approx_death_date;%elseif;ancestor.is_dead;†%end;%nn;
@@ -1202,9 +1200,9 @@
             </td>
           %end;
           %if;(evar.marr_date = "on")
-            <td class="align-middle text-right">
+            <td class="align-middle text-right table_big_cell">
               %if;(wizard and not cancel_links)
-                <a class="d-block" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
+                <a class="d-block table_big_anchor" href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;"
                   title="%if;(slash_marriage_date="")[*add::marriage/marriages]0%else;
                   [*update::family/families]0%end;&#010;
                   %ancestor; [and] %spouse;&#010;%if;(marriage_date!="" and marriage_date.prec="" or marriage_date.prec="?")& %marriage_date;%end;">
