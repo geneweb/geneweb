@@ -4,19 +4,49 @@
   -ms-user-select: none;
 }
 
-.num_cell {
+/* --- Ascendants/Descendants table --- */
+.ascends_table, .descends_table
+{
+ border: 1px solid black;
+ }
+
+.ascends_table th, .ascends_table td,
+.descends_table th, .descends_table td
+{
+  border: 1px solid black;
+  vertical-align: top;
+  padding: 4px;
+  empty-cells: show;
+}
+
+.ascends_table_header th,
+.descends_table_header th,
+.missing_ancestors_table_header th,
+.surname_branch_table_header th,
+.list_eclair_table_header th {
+  background-color: Khaki;
+}
+.table-hover tbody tr:hover {
+  background-color: LightGoldenrodYellow;
+  border:1px;
+}
+.table_big_cell:hover {
+  background-color: ivory;
+}
+
+.table_big_cell {
   overflow: hidden;
 }
 
-.num_anchor {
+.table_big_anchor {
   display: block;
   margin: -10em;
   padding: 10em;
   z-index: 0;
 }
 
-.num_click_through {
- pointer-events: none;
+.click_through {
+  pointer-events: none;
 }
 
 .big_anchor {
@@ -1199,30 +1229,6 @@ hr.full
 {
   margin-left: 0;
   margin-right: 0;
-}
-
-/* --- Ascendants/Descendants table --- */
-.ascends_table, .descends_table
-{
- border: 1px solid black;
- }
-
-.ascends_table th, .ascends_table td,
-.descends_table th, .descends_table td
-{
-  border: 1px solid black;
-  vertical-align: top;
-  padding: 4px;
-  empty-cells: show;
-}
-
-.ascends_table_header th,
-.descends_table_header th,
-.missing_ancestors_table_header th,
-.surname_branch_table_header th,
-.list_eclair_table_header th
-{
- background-color: #e7edb3;
 }
 
 /* --- Ascendants/Descendants liste rédigée --- */
