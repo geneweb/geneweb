@@ -4,9 +4,19 @@
   -ms-user-select: none;
 }
 
-.destree_table table, th, td {
-  border-spacing: 0;
-  padding: 0;
+.num_cell {
+  overflow: hidden;
+}
+
+.num_anchor {
+  display: block;
+  margin: -10em;
+  padding: 10em;
+  z-index: 0;
+}
+
+.num_click_through {
+ pointer-events: none;
 }
 
 .big_anchor {
@@ -1195,8 +1205,7 @@ hr.full
 .ascends_table, .descends_table
 {
  border: 1px solid black;
- border-collapse:collapse;
-}
+ }
 
 .ascends_table th, .ascends_table td,
 .descends_table th, .descends_table td

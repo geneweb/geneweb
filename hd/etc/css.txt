@@ -1,33 +1,11 @@
 <!-- $Id: css.txt, v7.00 09/01/2018 03:21:57 $ -->
-<style>
-/* Put here only properties that uses variables */
-li.folder {
- list-style-type: disc;
- list-style-image: url('%image_prefix;/folder.png');
-}
-
-li.file {
- list-style-type: circle;
- list-style-image: url('%image_prefix;/file.png');
-}
-
-li.parent {
- list-style-type: disc;
- list-style-image: url('%image_prefix;/left.png');
-}
-
-/* Pour affichage ascendance par liste m=A;t=L */
-li.male
-{
- list-style-type: square;
- list-style-image: url('%image_prefix;/male.png');
-}
-
-li.female
-{
- list-style-type: circle;
- list-style-image: url('%image_prefix;/female.png');
-}
+<style>/* Put here only properties that uses variables */
+li.folder { list-style-type: disc; list-style-image: url('%image_prefix;/folder.png'); }
+li.file { list-style-type: circle; list-style-image: url('%image_prefix;/file.png'); }
+li.parent { list-style-type: disc; list-style-image: url('%image_prefix;/left.png'); }
+/* Ascendance par liste m=A;t=L */
+li.male { list-style-type: square; list-style-image: url('%image_prefix;/male.png'); }
+li.female { list-style-type: circle; list-style-image: url('%image_prefix;/female.png'); }
 </style>
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
