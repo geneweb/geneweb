@@ -882,7 +882,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %empty_sorted_list;
     %apply;one_child("self", "-1", "", 1)
     %for;lev;0;max;
-      %if;(evar.gen="on")
+      %if;(evar.gen="on" and lev<max_desc_level)
         <tr>
           <th scope="row" colspan="%nb_col;">[*generation/generations]0 %expr(lev+1)
           <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1)">%apply;desc_count_l(lev+1)</span>
