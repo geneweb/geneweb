@@ -127,9 +127,9 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
           %( end personnal modules selection menu %)
           %if;(not (bvar.wizard_just_friend = "yes") and wizard)
             <li class="nav-item">
-              <a class="nav-link %if;(evar.m="MOD_IND")active%end;" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;>
-                <span class="fa fa-user-plus %sexcolor;" aria-hidden="true"></span>
-                <span class="sr-only">[*modify::person/persons]0 (P)</span>
+              <a class="nav-link %if;(evar.m="MOD_IND")active%end;" id="mod_ind" href="%prefix;m=MOD_IND;i=%index;" %laP;>%nn;
+                <span class="fa fa-user-plus %sexcolor;" aria-hidden="true"></span>%nn;
+                <span class="sr-only">[*modify::person/persons]0 (P)</span>%nn;
               </a>
             </li>
             <li class="nav-item dropdown">
@@ -140,13 +140,13 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               </a>
               <div class="dropdown-menu">
                 %if;(not browsing_with_sosa_ref or sosa_ref.index!=index)%( !=central_index ? %)
-                  <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(evar.oc!="" and evar.oc!=0)ocz=%occ;;%end;%access;" %laS; title="%apply;nav_with_sosa_ref(self)">
-                    <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify] [n° Sosa] 1
-                  </a>%nn;
+                  <a class="dropdown-item" href="%prefix_no_iz;%(iz=%self.index;;%)pz=%first_name_key;;nz=%surname_key;;%if;(evar.oc!="" and evar.oc!=0)ocz=%occ;;%end;%access;" %laS; title="%apply;nav_with_sosa_ref(self)">%nn;
+                    <i class="far fa-dot-circle fa-fw %sexcolor; mr-1"></i> [*modify] [n° Sosa] 1%nn;
+                  </a>
                 %else;
-                  <a class="dropdown-item" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">
-                    <i class="far fa-stop-circle fa-fw %sexcolor; mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]
-                  </a>%nn;
+                  <a class="dropdown-item" href="%prefix_no_iz;%suffix;" title="%if;(bvar.default_sosa_ref!="")%nl;[back to default sosa reference] %bvar.default_sosa_ref;%else;[*user/password/cancel]2 [navigation] [with] %sosa_ref.first_name_key_strip; %sosa_ref.surname_key_strip;%end;">%nn;
+                    <i class="far fa-stop-circle fa-fw %sexcolor; mr-1"></i> [*user/password/cancel]2 [navigation] [Sosa]%nn;
+                  </a>
                 %end;
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;m=CHG_EVT_IND_ORD;i=%index;" title="[*changed order of person's events]"><span class="fa fa-sort fa-fw mr-2"></span>[*invert::event/events]1</a>
@@ -292,57 +292,57 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
               %if;(browsing_with_sosa_ref)
                 %if;(sosa_ref.index != "" and sosa_ref.index != index)
                   <span class="dropdown-header">[*shortest path] [with]…</span>
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;et=S" title="[*shortest path] [with] %sosa_ref;">
-                    %sosa_ref; <i>(Sosa 1)</i>
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;et=S" title="[*shortest path] [with] %sosa_ref;">%nn;
+                    %sosa_ref; <i>(Sosa 1)</i>%nn;
                   </a>
                 %end;
               %end;
               <span class="dropdown-header">[*relationship by marriage] [with]…</span>
               %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;">
-                    %sosa_ref; <i>(sosa 1)</i>
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;">%nn;
+                    %sosa_ref; <i>(sosa 1)</i>%nn;
                 </a>
               %end;
               %foreach;family;
                 %if;(spouse != "? ?")
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;">
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;">%nn;
                       %spouse;
                       %if;spouse.has_nobility_titles;,%sp;
-                      <em>%spouse.nobility_title;</em>%end;%nl;
-                      <i>([spouse/spouses]0)</i>%nl;
+                      <em>%spouse.nobility_title;</em>%end;%nn;
+                      <i>([spouse/spouses]0)</i>%nn;
                   </a>
                 %end;
               %end;
               %foreach;relation;
                 %if;has_relation_him;
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;">
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;">%nn;
                       %relation_him;
                       %if;relation_him.has_nobility_titles;,%sp;
-                      <em>%relation_him.nobility_title;</em>%end;%nl;
-                      <i>(%relation_him.type;)</i>%nl;
+                      <em>%relation_him.nobility_title;</em>%end;%nn;
+                      <i>(%relation_him.type;)</i>%nn;
                   </a>
                 %end;
                 %if;has_relation_her;
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;">
+                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;">%nn;
                       %relation_her;
                       %if;relation_her.has_nobility_titles;,%sp;
-                      <em>%relation_her.nobility_title;</em>%end;%nl;
-                      <i>(%relation_her.type;)</i>%nl;
+                      <em>%relation_her.nobility_title;</em>%end;%nn;
+                      <i>(%relation_her.type;)</i>%nn;
                   </a>
                 %end;
               %end;
               %foreach;related;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;">
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;">%nn;
                     %related;
                     %if;related.has_nobility_titles;,%sp;
-                    <em>%related.nobility_title;</em>%end;%nl;
-                    <i>(%related.type;)</i>%nl;
+                    <em>%related.nobility_title;</em>%end;%nn;
+                    <i>(%related.type;)</i>%nn;
                 </a>
               %end;
               %foreach;event_witness_relation;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;">
-                    %event_witness_relation.person;%nl;
-                    <i>([witness/witnesses]0)</i>%nl;
+                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;">%nn;
+                    %event_witness_relation.person;%nn;
+                    <i>([witness/witnesses]0)</i>%nn;
                 </a>
               %end;
               %if;(has_parents and (father.has_siblings or mother.has_siblings))

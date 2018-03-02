@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: perso.txt,v7.00 31/03/2017 17:41:26 $ -->
+  <!-- $Id: perso.txt,v7.00 01/03/2018 11:44:53 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;has_public_name;
       %if;has_qualifiers;%public_name; %qualifier;
-      %else;%public_name; %surname;%if;(occ!="") (%occ;)%end;%end;
+      %else;%public_name; %surname;%if;(occ!="" and occ!=0) (%occ;)%end;%end;
     %else;
       %if;has_qualifiers;%first_name; %qualifier;
-      %else;%first_name; %surname;%if;(occ!="") (%occ;)%end;%end;
+      %else;%first_name; %surname;%if;(occ!="" and occ!=0) (%occ;)%end;%end;
     %end;
   </title>
   <meta name="robots" content="none">
