@@ -33,6 +33,24 @@ type loc_token = [ Tok of loc and token ];
 
 exception Exc_located of loc and exn;
 
+(* copied from Util.ml *)
+value match_begin s t k =
+  loop k 0 where rec loop i j =
+    if j >= String.length t then True
+    else if s.[i] = t.[j] then 
+      if i < String.length s then loop (i + 1) (j + 1) else False
+    else False
+;
+
+(* t is a substring of s *)
+value match_in s t =
+  loop 0 where rec loop i =
+    if i >= ( String.length s - String.length t +1 ) then False
+    else if s.[i] = t.[0] then 
+      if (match_begin s t i) then True else loop (i+1)
+    else loop (i+1)
+;
+
 value raise_with_loc loc exc =
   match exc with
   [ Exc_located _ _ -> raise exc
@@ -204,11 +222,20 @@ and parse_expr_or =
       a
 and parse_expr_and =
   parser
-    [: e = parse_expr_3;
+    [: e = parse_expr_in;
        a =
          parser
          [ [: `Tok loc (IDENT "and"); s :] ->
              Aop2 loc "and" e (parse_expr_and s)
+         | [: :] -> e ] :] ->
+      a
+and parse_expr_in =
+  parser
+    [: e = parse_expr_3;
+       a =
+         parser
+         [ [: `Tok loc (IDENT "in"); s :] ->
+             Aop2 loc "in" e (parse_expr_in s)
          | [: :] -> e ] :] ->
       a
 and parse_expr_3 =
@@ -1010,9 +1037,11 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
       let int e = int_of e (eval_expr ceva e) in
       let num e = num_of e (eval_expr ceva e) in
       let bool e = bool_of e (eval_expr ceva e) in
+      let string e = string_of e (eval_expr ceva e) in
       match op with
       [ "and" -> VVbool (if bool e1 then bool e2 else False)
       | "or" -> VVbool (if bool e1 then True else bool e2)
+      | "in" -> VVbool (match_in (string e2) (string e1)) (* e1 is contained in e2 *)
       | "=" -> VVbool (eval_expr ceva e1 = eval_expr ceva e2)
       | "<" -> VVbool (int e1 < int e2)
       | ">" -> VVbool (int e1 > int e2)
