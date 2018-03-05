@@ -22,9 +22,7 @@ value setup_link = ref False;
 value choose_browser_lang = ref False;
 value images_dir = ref "";
 value images_url = ref "";
-IFDEF UNIX THEN
 value max_clients = ref None;
-END;
 value robot_xcl = ref None;
 value auth_file = ref "";
 value daemon = ref False;
@@ -1731,12 +1729,12 @@ value connection (addr, request) script_name contents =
 ;
 
 value null_reopen flags fd =
-  IFDEF UNIX THEN do {
+  if Sys.unix then do {
     let fd2 = Unix.openfile "/dev/null" flags 0 in
     Unix.dup2 fd2 fd;
     Unix.close fd2;
   }
-  ELSE () END
+  else ()
 ;
 
 value geneweb_server () =
@@ -1778,11 +1776,10 @@ Type %s to stop the service
     }
     else ();
     Wserver.f selected_addr.val selected_port.val conn_timeout.val
-      (IFDEF UNIX THEN max_clients.val ELSE None END) connection
+      (if Sys.unix then max_clients.val else None) connection
   }
 ;
 
-IFDEF UNIX THEN
 value cgi_timeout tmout _ =
   do {
     Wserver.header "Content-type: text/html; charset=iso-8859-1";
@@ -1794,9 +1791,7 @@ value cgi_timeout tmout _ =
     exit 0;
   }
 ;
-END;
 
-IFDEF UNIX THEN
 value manage_cgi_timeout tmout =
   if tmout > 0 then
     let _ = Sys.signal Sys.sigalrm (Sys.Signal_handle (cgi_timeout tmout)) in
@@ -1804,12 +1799,11 @@ value manage_cgi_timeout tmout =
     ()
   else ()
 ;
-END;
 
 value geneweb_cgi addr script_name contents =
   do {
     Log.fallback_to_stderr.val := False;
-    IFDEF UNIX THEN manage_cgi_timeout conn_timeout.val ELSE () END;
+    if Sys.unix then manage_cgi_timeout conn_timeout.val else ();
     try Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755 with
     [ Unix.Unix_error _ _ _ -> () ];
     let add k x request =
@@ -1906,22 +1900,22 @@ value slashify s =
 value make_cnt_dir x =
   do {
     mkdir_p x;
-    IFDEF WINDOWS THEN do {
+    if Sys.unix then ()
+    else do {
       Wserver.sock_in.val := Filename.concat x "gwd.sin";
       Wserver.sock_out.val := Filename.concat x "gwd.sou";
-    }
-    ELSE () END;
+    };
     Util.cnt_dir.val := x;
   }
 ;
 
 value main () =
   do {
-    IFDEF WINDOWS THEN do {
+    if Sys.unix then ()
+    else do {
       Wserver.sock_in.val := "gwd.sin";
       Wserver.sock_out.val := "gwd.sou";
-    }
-    ELSE () END;
+    };
     let usage =
       "Usage: " ^ Filename.basename Sys.argv.(0) ^
       " [options] where options are:"
@@ -1996,7 +1990,7 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
 Print the failed passwords in log (except if option -digest is set) ");
        ("-nolock", Arg.Set Lock.no_lock_flag,
         "\n       Do not lock files before writing.") ::
-       IFDEF UNIX THEN
+       if Sys.unix then
          [("-max_clients", Arg.Int (fun x -> max_clients.val := Some x), "\
 <num>
        Max number of clients treated at the same time (default: no limit)
@@ -2005,10 +1999,10 @@ Print the failed passwords in log (except if option -digest is set) ");
            "<sec>\n       Connection timeout (default " ^
              string_of_int conn_timeout.val ^ "s; 0 means no limit)");
           ("-daemon", Arg.Set daemon, "\n       Unix daemon mode.")]
-       ELSE
+       else
          [("-noproc", Arg.Set Wserver.noproc,
            "\n       Do not launch a process at each request.")]
-       END ]
+       ]
     in
     let speclist =
       IFDEF API THEN
@@ -2060,7 +2054,7 @@ Print the failed passwords in log (except if option -digest is set) ");
       ELSE speclist END
     in
     let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-    IFDEF UNIX THEN
+    if Sys.unix then
       default_lang.val :=
         let s = try Sys.getenv "LANG" with [ Not_found -> "" ] in
         if List.mem s Version.available_languages then s
@@ -2070,7 +2064,7 @@ Print the failed passwords in log (except if option -digest is set) ");
             let s = String.sub s 0 2 in
             if List.mem s Version.available_languages then s else "en"
           else "en"
-    ELSE () END;
+    else ();
     arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun
       usage;
     Argl.parse speclist anonfun usage;
@@ -2125,7 +2119,7 @@ Print the failed passwords in log (except if option -digest is set) ");
 ;
 
 value test_eacces_bind err fun_name =
-  IFDEF UNIX THEN
+  if Sys.unix then
     if err = Unix.EACCES && fun_name = "bind" then
       try
         do {
@@ -2140,7 +2134,7 @@ number greater than 1024.
       with
       [ Not_found -> False ]
     else False
-  ELSE False END
+  else False
 ;
 
 value print_exc exc =

@@ -159,7 +159,7 @@ value diff_person conf base changed =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 value notify_change conf base changed action =
-  IFDEF UNIX THEN
+  if Sys.unix then
     match p_getenv conf.base_env "notify_change" with
     [ Some comm ->
         let base_args =
@@ -186,7 +186,7 @@ value notify_change conf base changed action =
             }
         | id -> ignore (Unix.waitpid [] id) ]
     | None -> () ]
-  ELSE () END
+  else ()
 ;
 
 

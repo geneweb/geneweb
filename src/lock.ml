@@ -7,7 +7,7 @@ value no_lock_flag = ref False;
 
 value control lname wait f =
   if no_lock_flag.val then Some (f ())
-  else IFDEF UNIX THEN
+  else if Sys.unix then
     match
       try Some (Unix.openfile lname [Unix.O_RDWR; Unix.O_CREAT] 0o666) with
       [ Unix.Unix_error _ _ _ -> None ]
@@ -33,7 +33,7 @@ value control lname wait f =
           | Right exc -> do { Unix.close fd; raise exc } ]
         }
     | None -> None ]
-  ELSE
+  else
     let r =
       try
         Left (Unix.openfile lname [Unix.O_RDWR; Unix.O_CREAT] 0o666)
@@ -46,5 +46,4 @@ value control lname wait f =
         do { Unix.close fd; Some r }
     | Right (Unix.Unix_error _ _ _) -> None
     | Right exc -> raise exc ]
-  END
 ;

@@ -1234,13 +1234,13 @@ value string_of_witness_kind conf p witness_kind =
 value base_path pref bname =
   let pref = [Secure.base_dir () :: pref] in
   let bfile = List.fold_right Filename.concat pref bname in
-  IFDEF WINDOWS THEN bfile
-  ELSE if Sys.file_exists bfile then bfile
-  else if String.length bname >= 6 then
-    let dirs = pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]] in
-    List.fold_right Filename.concat dirs bname
+  if Sys.unix then
+    if Sys.file_exists bfile then bfile
+    else if String.length bname >= 6 then
+      let dirs = pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]] in
+      List.fold_right Filename.concat dirs bname
+    else bfile
   else bfile
-  END
 ;
 
 value explode s c =

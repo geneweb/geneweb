@@ -509,13 +509,13 @@ value make_visible_record_access bname persons =
       match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
       [ Some ic ->
           do {
-            IFDEF UNIX THEN
+            if Sys.unix then
               if verbose.val then do {
                 Printf.eprintf "*** read restrict file\n";
                 flush stderr;
               }
               else ()
-            ELSE () END;
+            else ();
             let visible = input_value ic in
             close_in ic;
             visible
@@ -529,13 +529,13 @@ value make_visible_record_access bname persons =
     [ Some visible ->
         try do {
           let oc = Secure.open_out fname in
-          IFDEF UNIX THEN
+          if Sys.unix then
             if verbose.val then do {
               Printf.eprintf "*** write restrict file\n";
               flush stderr;
             }
             else ()
-          ELSE () END;
+          else ();
           output_value oc visible;
           close_out oc
         }
@@ -672,7 +672,7 @@ value array_ext phony fa =
     let alen = Array.length (Obj.magic phony) in
     if rlen = alen then fa
     else if rlen < alen then do {
-      IFDEF UNIX THEN
+      if Sys.unix then
         if verbose.val then do {
           Printf.eprintf
             "*** extending records from size %d to size %d\n"
@@ -680,7 +680,7 @@ value array_ext phony fa =
           flush stderr;
         }
         else ()
-      ELSE () END;
+      else ();
       for i = 0 to Array.length a - 1 do {
         let x = Array.copy (Obj.magic phony) in
         Array.blit a.(i) 0 x 0 rlen;
@@ -737,14 +737,14 @@ value make_record_access ic ic_acc shift array_pos (plenr, patches) len name
     match tab.val with
     [ Some x -> x
     | None -> do {
-        IFDEF UNIX THEN
+        if Sys.unix then
           if verbose.val then do {
             Printf.eprintf "*** read %s%s\n" name
               (if cleared.val then " (again)" else "");
             flush stderr;
           }
           else ()
-        ELSE () END;
+        else ();
         seek_in ic array_pos;
         let v = input_array ic in
         let v = v_arr_ext v in
