@@ -16,28 +16,26 @@
 <div class="container">
 %define;search_form(xxx)
   %if;(wizard or friend)
-    <form method="get" action="%action;">
-      <div class="form-group form-inline">
-        %hidden;
-        <input type="hidden" name="m" value="HIST_SEARCH"%/>
-        <input type="hidden" name="k" value="%evar.k;"%/>
-        %if;(evar.m = "HIST_SEARCH" and found)
-          <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;"%/>
-        %end;
-        <div class="input-group">
-          <input type="text" class="form-control" placeholder="[*search/case sensitive]0" 
-                 name="s" size="30" maxlength="40" value="%evar.s.ns;"%/>
-          <span class="input-group-btn">
-            <button type="submit" class="btn btn-outline-secondary" title="[*validate/delete]0">OK</button>
-          </span>
+    <form class="form-inline mb-2" method="get" action="%action;">
+      %hidden;
+      <input type="hidden" name="m" value="HIST_SEARCH"%/>
+      <input type="hidden" name="k" value="%evar.k;"%/>
+      %if;(evar.m = "HIST_SEARCH" and found)
+        <input type="hidden" name="pos" value="%if;found;%pos;%else;0%end;"%/>
+      %end;
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="[*search/case sensitive]0" 
+               name="s" size="30" maxlength="40" value="%evar.s.ns;"%/>
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-outline-secondary" title="[*validate/delete]0">OK</button>
         </div>
-        <div class="form-check ml-2">
-          <label class="form-check-label">
-            <input class="form-check-input" type="checkbox" name="c" value="on"%nn;
-              %if;("main" != "true" and evar.c = "on")checked%end;>
-            [search/case sensitive]1
-          </label>
-        </div>
+      </div>
+      <div class="form-check ml-2">
+        <label class="form-check-label">
+          <input class="form-check-input" type="checkbox" name="c" value="on"%nn;
+            %if;("main" != "true" and evar.c = "on")checked%end;>
+          [search/case sensitive]1
+        </label>
       </div>
     </form>
   %end;
@@ -46,7 +44,7 @@
 %let;kk;%if;(evar.k = "")3%else;%evar.k%end;%in;
 %let;wiz;%if;(evar.wiz != "" and evar.n = "")%evar.wiz;%end;%in;
 %define;table()
-  <table class="table table-sm table-hover">
+  <table class="table table-sm table-hover px-1">
     <thead class="thead-default">
       <tr>
         <th>[*date/dates]0</th>
@@ -133,18 +131,20 @@
 
 %define;nav()
   %if;(pos != "")
-   <div class="form-group form-inline">
-     <form method="get" action="%action;">
-         %hidden;
-         <input type="hidden" name="m" value="HIST">
-         <input type="number" class="form-control" name="k" min="10" max="1000" step="10" value="%kk;" title="number of rows">
-         <input type="hidden" name="pos" value="%pos;">
-         <button type="submit" class="btn btn-outline-secondary" title="[validate]"><i class="fa fa-forward fa-fw"></i></button>
-         %if;(wiz != "")
-           <input type="hidden" name="wiz" value="%wiz;">([wizard/wizards/friend/friends/exterior]0[:] %wiz;)
-         %end;
-     </form>
-   </div>
+   <form class="form-inline" method="get" action="%action;">
+     %hidden;
+     <input type="hidden" name="m" value="HIST">
+     <input type="hidden" name="pos" value="%pos;">
+     <div class="input-group">
+       <input type="number" class="form-control" name="k" min="10" max="1000" step="10" value="%kk;" title="number of rows">
+       <div class="input-group-append">
+         <button type="submit" class="btn btn-outline-secondary" title="[*validate/delete]0"><i class="fa fa-forward fa-fw"></i></button>
+       </div>
+       %if;(wiz != "")
+         <input type="hidden" name="wiz" value="%wiz;">([wizard/wizards/friend/friends/exterior]0[:] %wiz;)
+       %end;
+     </div>
+   </form>
   %end;
 %end;
 
@@ -167,7 +167,7 @@
     <div class="order-2">%apply;nav()</div>
   </div>
 %end;
-<div class="px-1">%apply;table()<div>
+%apply;table()
 
 %if;(evar.m = "HIST_SEARCH" and found)
   <div class="d-flex justify-content-between px-1">

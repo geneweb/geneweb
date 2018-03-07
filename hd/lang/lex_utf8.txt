@@ -28,9 +28,10 @@ it: circa
 pl: około
 ru: около
 
-    book of %s
-en: book of %s
-fr: dictionnaire des %s
+    books
+en: books
+fr: dictionnaires
+oc: diccionaris
 
     reduce/increase
 en: reduce/increase
