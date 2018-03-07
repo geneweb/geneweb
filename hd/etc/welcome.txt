@@ -86,7 +86,7 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
         %end;
       </div>
     </div>
-    <div class="col-auto order-md-2 mt-1">
+    <div class="col order-md-2 mt-1">
       %if;just_friend_wizard;
         <div class="text-center alert alert-danger alert-dismissible fade show" role="alert">
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -100,7 +100,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <span>
         </div>
       %end;
-      <div class="mt-md-1 mt-md-4 mx-auto text-center">
+      <div class="mt-xl-1 mt-md-3 mx-auto text-center">
         %if;(bvar.welcome_logo!="")
           <img src="%prefix;m=IM;v=%bvar.welcome_logo;"
              style="%if;(bvar.welcome_logo_style!="")%bvar.welcome_logo_style;%end;"
@@ -111,7 +111,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         <h1>[database] %base.name;%if;(bvar.visitor_access!="no")<br><small>%base.nb_persons; [person/persons]1%end;</small></h1>
         %if;(browsing_with_sosa_ref and bvar.visitor_access!="no")%apply;display_sosa_ref%with;%sosa_ref;%end;%end;
         %if;(bvar.motd != "")
-          <p>%apply;interp(bvar.motd)</p>
+          <div>%apply;interp(bvar.motd)</div>
         %end;
       </div>
     </div>
@@ -136,74 +136,79 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
                    and bvar.authorized_wizards_notes = "yes")
                  <a class="btn btn-outline-success" href="%prefix;m=WIZNOTES">[*base wizard notes]</a>
               %end;
-              <a class="btn btn-outline-primary mt-2" href="%prefix;m=CAL"><span class="fa fa-calendar"></span> [*calendar/calendars]1</a>
+              <a class="btn btn-outline-primary mt-2" href="%prefix;m=CAL"><i class="fa fa-calendar"></i> [*calendar/calendars]1</a>
               <a class="btn btn-outline-primary mt-2" href="%prefix;m=STAT">[*statistics]</a>
               <a class="btn btn-outline-primary mt-2" href="%prefix;m=ANM">[*anniversaries]</a>
             </div>
           </div>
-          <div class="col-md-8 align-self-center">
-            <form method="get" action="%prefix;">
+          <div class="col-md-8">
+            <div class="text-center h5">[*search/case sensitive]0</div>
+            <form class="col d-flex justify-content-center" method="get" action="%prefix;">
               %hidden;
               <input type="hidden" name="m" value="S">
-              <div class="d-flex justify-content-center">
-                <div class="col-9">
-                  <div class="row">
-                    <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
-                    <div class="input-group">
-                      <input type="search" id="firstname" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]2" maxlength="200" tabindex=1>
-                      <span class="d-flex flex-column input-group-btn">
-                        <a class="btn btn-outline-secondary" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=4><span class="fa fa-sort-alpha-down fa-fw"></span></a>
-                        <a class="btn btn-outline-secondary" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=5><span class="fa fa-sort-amount-down fa-fw"></span></a>
-                      </span>
+              <div class="col">
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <div class="btn-group-vertical">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=7><i class="fa fa-sort-alpha-down fa-fw"></i></a>
+                        </div>
+                      </div>
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=8><i class="fa fa-sort-amount-down fa-fw"></i></a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="row">
-                    <label for="n" class="sr-only col-form-label col-sm-2">[*person/persons]0</label>
-                    <div class="input-group">
-                      <input type="search" id="n" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" maxlength="200" tabindex=2 autofocus>
-                      <span class="d-flex flex-column input-group-btn">
-                        <a class="btn btn-outline-secondary" href="%prefix;m=N;tri=A" title="[*surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=6><span class="fa fa-sort-alpha-down fa-fw"></span></a>
-                        <a class="btn btn-outline-secondary" href="%prefix;m=N;tri=F" title="[*frequency] [surname/surnames]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=7><span class="fa fa-sort-amount-down fa-fw"></span></a>
-                      </span>
-                    </div>
-                  </div>
+                  <label for="surname" class="sr-only col-form-label col-sm-2">[*surname/surnames]0</label>
+                  <input type="search" id="surname" class="form-control form-control-lg" name="n" placeholder="[*surname/surnames]0, [public name], [alias]%if;browsing_with_sosa_ref;, [n° Sosa]%end;" autofocus tabindex=1>
                 </div>
-                <div class="col-1 align-self-center">
-                  <button type="submit" class="btn btn-outline-primary align-middle" title="[*search/case sensitive]0 [person/persons]0" tabindex=3><span class="fa fa-search fa-fw my-3"></span></button>
-                </div>
-              </div>
-            </form>
-          %if;(bvar.propose_titles != "no")
-            <form class="mt-3" method="get" action="%action;">
-              %hidden;
-              <input type="hidden" name="m" value="TT">
-              <div class="d-flex justify-content-center">
-                <div class="col-9">
-                  <div class="row">
-                    <label for="titles" class="sr-only col-form-label col-sm-2">[*title/titles]0</label>
-                    <div class="input-group">
-                      <input type="search" class="form-control" name="t" id="titles" placeholder="[*title/titles]0" maxlength="200" tabindex=7>
-                      <span class="input-group-btn">
-                        <a class="btn btn-outline-secondary" href="%prefix;m=TT;t=" tabindex=10 title="[*all the titles]"><span class="fa fa-list-ul fa-fw"></span></a>
-                      </span>
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <div class="btn-group-vertical">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=P;tri=A" title="[*first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [display by/branch/alphabetic order]2" tabindex=9><i class="fa fa-sort-alpha-down fa-fw"></i></a>
+                        </div>
+                      </div>
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <a class="btn btn-lg btn-outline-secondary" href="%prefix;m=P;tri=F" title="[*frequency] [first name/first names]1, [sort by/date begin/alphabetic order/nb individuals/nb events]0 [sort by/date begin/alphabetic order/nb individuals/nb events]3" tabindex=10><i class="fa fa-sort-amount-down fa-fw"></i></a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div class="row">
-                    <label for="estates" class="sr-only col-form-label col-sm-2" >[*estate]0</label>
-                    <div class="input-group">
-                      <input type="search" class="form-control" name="p" id="estates" placeholder="[*estate]0" maxlength="200" tabindex=8>
-                      <span class="input-group-btn">
-                        <a class="btn btn-outline-secondary" href="%prefix;m=TT;p=*" tabindex=11 title="[*all the estates]"><span class="fa fa-list-ul fa-fw"></span></a>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-1 align-self-center">
-                  <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0 [title/titles]0/[estate]" tabindex=9><span class="fa fa-search fa-fw my-1"></span></button>
+                  <label for="firstname" class="sr-only col-form-label col-sm-2">[*first name/first names]2</label>
+                  <input type="search" id="firstname" class="form-control form-control-lg" name="p" placeholder="[*first name/first names]2" tabindex=2>
                 </div>
               </div>
+              <button type="submit" class="btn btn-lg btn-outline-primary" title="[*search/case sensitive]0 [person/persons]0" tabindex=3><i class="fa fa-search fa-fw"></i></button>
             </form>
-           %end;
+            %if;(bvar.propose_titles != "no")
+              <form class="d-flex mt-4 justify-content-center" method="get" action="%action;">
+                %hidden;
+                <input type="hidden" name="m" value="TT">
+                <div class="col-8">
+                  <label for="titles" class="sr-only col-form-label col-sm-2">[*title/titles]0</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <a class="btn btn-outline-secondary" href="%prefix;m=TT;t=" tabindex=10 title="[*all the titles]"><i class="fa fa-list-ul fa-fw"></i></a>
+                    </div>
+                    <input type="search" class="form-control" name="t" id="titles" placeholder="[*title/titles]0" maxlength="200" tabindex=4>
+                  </div>
+                  <label for="estates" class="sr-only col-form-label col-sm-2" >[*estate]0</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <a class="btn btn-outline-secondary" href="%prefix;m=TT;p=*" tabindex=11 title="[*all the estates]"><i class="fa fa-list-ul fa-fw"></i></a>
+                    </div>
+                    <input type="search" class="form-control" name="p" id="estates" placeholder="[*estate]0" maxlength="200" tabindex=5>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-outline-primary" title="[*search/case sensitive]0 [title/titles]0/[estate]" tabindex=6><i class="fa fa-search fa-fw my-1"></i></button>
+              </form>
+             %end;
           </div>
           <div class="col-md-2 align-self-center">
             <div class="btn-group-vertical">
@@ -225,43 +230,43 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
       </div>
     </div>
     %if;(bvar.propose_place_surnames != "no")%nl;
-      <div class="d-flex">
-        <div class="mx-auto">
-          <form class="mt-md-1 mt-xl-3" id="form-place" method="get" action="%prefix;">
-              %hidden;
-              <input type="hidden" name="m" value="PS"%/>
-              <div class="text-center">[*place] / [surname/surnames]0</div>
-              <div class="input-group">
-                <label class="btn btn-outline-secondary my-1"><input type="checkbox" name="bi" value="on"> [*birth]</label>
-                <label class="btn btn-outline-secondary my-1"><input type="checkbox" name="bp" value="on"> [*baptism]</label>
-                <label class="btn btn-outline-secondary my-1"><input type="checkbox" name="ma" value="on"> [*marriage/marriages]0</label>
-                <label class="btn btn-outline-secondary my-1"><input type="checkbox" name="de" value="on"> [*death]</label>
-                <label class="btn btn-outline-secondary my-1"><input type="checkbox" name="bu" value="on"> [*burial]</label>
-                <button type="submit" class="btn btn-outline-secondary my-1 text-muted" title="[*search/case sensitive]0 [place] / [surname/surnames]0"><span class="fa fa-search"></span></button>
-              </div>
-          </form>
-        </div>
+      <div class="d-flex justify-content-center mt-xl-3">
+        <form id="form-place" method="get" action="%prefix;">
+          %hidden;
+          <input type="hidden" name="m" value="PS"%/>
+          <div class="text-center h5 mb-0">[*places] / [surname/surnames]0</div>
+          <div class="input-group">
+            <div class="btn-group input-group-prepend">
+              <label class="btn btn-outline-secondary my-1" title="[*birth place]"><input type="checkbox" name="bi" value="on"> [*birth]</label>
+              <label class="btn btn-outline-secondary my-1" title="[*baptism place]"><input type="checkbox" name="bp" value="on"> [*baptism]</label>
+              <label class="btn btn-outline-secondary my-1" title="[*marriage place]"><input type="checkbox" name="ma" value="on"> [*marriage/marriages]0</label>
+              <label class="btn btn-outline-secondary my-1" title="[*death place]"><input type="checkbox" name="de" value="on"> [*death]</label>
+              <label class="btn btn-outline-secondary my-1" title="[*burial place]"><input type="checkbox" name="bu" value="on"> [*burial]</label>
+            </div>
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-outline-secondary my-1 text-muted" title="[*search/case sensitive]0 [places] / [surname/surnames]0"><i class="fa fa-search"></i></button>
+            </div>
+          </div>
+        </form>
       </div>
     %end;
     %if;(wizard)
-      <div class="d-flex">
-        <div class="mx-auto">
-          <div class="mt-md-1 mt-xl-3">
-            <div class="text-success text-center">%apply;capitalize%with;%apply;book_of("")%end;</div>
-            <div class="btn-group mt-1">
-              <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=fn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([first name/first names]1)">[*first name/first names]1</a>
-              <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=sn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([surname/surnames]1)">[*surname/surnames]1</a>
-              <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=occu" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([occupation/occupations]1)">[*occupation/occupations]1</a>
-              <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=src" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([source/sources]1)">[*source/sources]1</a>
-              <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=place" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([places])">[*places]</a>
-            </div>
+      <div class="d-flex justify-content-center">
+        <div class="mt-md-1 mt-xl-3">
+          <div class="text-success h5 mb-0 text-center">[*books]</div>
+          <div class="btn-group">
+            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=fn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([first name/first names]1)">[*first name/first names]1</a>
+            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=sn" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([surname/surnames]1)">[*surname/surnames]1</a>
+            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=occu" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([occupation/occupations]1)">[*occupation/occupations]1</a>
+            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=src" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([source/sources]1)">[*source/sources]1</a>
+            <a class="btn btn-outline-success" role="button" href="%prefix;m=MOD_DATA;data=place" title="([*wizard/wizards/friend/friends/exterior]0) [*modify] %apply;book_of([places])">[*places]</a>
           </div>
         </div>
       </div>
     %end;
   <div class="row">
-    <div class="col-9 mx-auto mt-md-1 mt-xl-5">
-    %if;(bvar.counter != "no")<p class="text-muted">%apply;interp([
+    <div class="col my-md-3 text-center">
+      %if;(bvar.counter != "no")%apply;interp([
 af: Daar was %nb_accesses; besoeke, %nb_accesses_to_welcome; van hulle
     aan hierdie blad, sedert %start_date;.
 bg: От %start_date; насам е имало %nb_accesses; посещения, от които
@@ -316,7 +321,7 @@ sv: Det har varit %nb_accesses; åtkomster, %nb_accesses_to_welcome;
     av dem till den här sidan, sedan %start_date;.
 zh: 已经有 %nb_accesses; 次访问数据库，其中 %nb_accesses_to_welcome;
     次访问本主页， 自从 %start_date;。
-])<br>%end;%apply;interp([
+])<br>%end;(%apply;interp([
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
     href="%prefix;escache=0">link</a>.
@@ -357,9 +362,8 @@ fi: Mikäli selaimesi ei automaattisesti päivitä muutettuja
     sivuja (jolloin sinun täytyy "ladata uudelleen nykyinen
     dokumentti") kokeile <a href="%prefix;escache=0">tätä
     linkkiä</a>.
-fr: Si votre navigateur ne met pas à jour automatiquement
-    les pages modifiées, essayez la navigation à partir de
-    <a href="%prefix;escache=0">ce lien</a>.
+fr: Si les pages modifiées ne se mettent pas à jour automatiquement,
+    naviguez avec <a href="%prefix;escache=0">ce lien</a>.
 is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
     <a href="%prefix;escache=0">þetta</a>.
 it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
@@ -395,19 +399,20 @@ sl: Če vaš brskalnik ne more obnavljati strani avtomatično (morate
 sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%prefix;escache=0">härifrån</a>.
-])
+]))
     </div>
   </div>
   %else;
     %let;lg;%lang;%in;
     <div class="text-center alert alert-danger font-weight-bold" role="alert">
-      <span class="fa fa-warning fa-fw mr-2"></span><span>%apply;get_visitor_access_msg(lg)</span><span class="fa fa-warning fa-fw"></span>
+      <i class="fa fa-warning fa-fw mr-2"></i><span>%apply;get_visitor_access_msg(lg)</span><span class="fa fa-warning fa-fw"></span>
     </div>
   %end;
 %base_trailer;
+
 %include.copyr;
+
 </div>
-%let;page;welcome%in;
 %include.js;
 </body>
 </html>

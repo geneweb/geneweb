@@ -15,11 +15,11 @@
 <h1>[*anniversaries]</h1>
 
 %if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
+  <div class="btn-group float-%right;">
     %if;(referer != "")
       <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+    <a href="%prefix;"><span class="fa fa-home fa-lg pl-1" title="[*home]"></span></a>
   </div>
 %end;
 
