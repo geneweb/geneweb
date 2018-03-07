@@ -17,11 +17,11 @@
 
 %define;arrows()
   %if;not cancel_links;
-    <div class="btn-group float-%right; mt-2">
+    <div class="btn-group float-%right;">
       %if;(referer != "")
         <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
       %end;
-      <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+      <a href="%prefix;"><span class="fa fa-home fa-lg pl-1" title="[*home]"></span></a>
     </div>
   %end;
 %end;
@@ -34,11 +34,14 @@
 
 %define;fun_month(ccc, nnn, vvv, lll)
   <td><button class="btn btn-outline-secondary" type="submit" name="mccc1">&lt;</button></td>
-  <td><select class="form-control" style="width:150px;text-align-last:center;" name="mccc">
+  <td><select class="form-control h-100 w-100" style="text-align-last:center;" name="mccc">
         %foreach;integer_range(1, vvv)
           <option value="%integer;"%nn;
            %if;(integer = date.nnn.month) selected="selected"%end;>%nn;
+             %if;(lang="fr")%apply;nth("lll", integer-1)
+           %else;
              %apply;capitalize%with;%apply;nth("lll", integer-1)%end;
+           %end;
           </option>
         %end;
       </select></td>
@@ -82,9 +85,9 @@
 
 <div class="row mt-4">
   <div class="mx-auto text-center">
-    <h1><span class="fa fa-calendar-alt"></span> [*calendar/calendars]1</h1>
+    <h1>[*calendar/calendars]1</h1>
     <h3 class="mt-4">%apply;capitalize%with;%apply;nth([(week day)], date.week_day)%end;
-    %if;(date.julian_day = today.julian_day) - <samp>%time;</samp>%end;</h3>
+    %if;(date.julian_day = today.julian_day) - %time;%end;</h3>
   </div>
     %apply;arrows()
 </div>
@@ -94,10 +97,10 @@
       <div class="form-inline">
         %hidden;
         <input type="hidden" name="m" value="CAL"%/>
-        <table class="table-bordered mx-auto">
+        <table class="table-sm table-bordered mx-auto">
           <thead>
             <tr>
-              <th></th>
+              <th class="py-2">&nbsp;</th>
             %if;([ !dates order] = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
               <th class="text-center" colspan="3">[*year/month/day]2</th>
               <th class="text-center" colspan="3">[*year/month/day]1</th>
@@ -116,19 +119,19 @@
           </thead>
           <tbody>
             <tr>
-              <th scope="row">[*gregorian/julian/french/hebrew]0</th>
+              <th class="px-2" class="mx-1" scope="row">[*gregorian/julian/french/hebrew]0</th>
               %apply;calendar("g", "gregorian", 12, [(month)], "fun_year")
             </tr>
             <tr>
-              <th scope="row">[*gregorian/julian/french/hebrew]1</th>
+              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]1</th>
               %apply;calendar("j", "julian", 12, [(month)], "fun_julian_year")
             </tr>
             <tr>
-              <th scope="row">[*gregorian/julian/french/hebrew]2</th>
+              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]2</th>
               %apply;calendar("f", "french", 13, [(french revolution month)], "fun_year")
             </tr>
             <tr>
-              <th scope="row">[*gregorian/julian/french/hebrew]3</th>
+              <th class="px-2" scope="row">[*gregorian/julian/french/hebrew]3</th>
               %apply;calendar("h", "hebrew", 13, [(hebrew month)], "fun_year")
             </tr>
           </tbody>

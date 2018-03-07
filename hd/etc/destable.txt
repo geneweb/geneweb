@@ -872,7 +872,6 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %let;max;%evar.v;%in;
     %reset_count;
     %empty_sorted_list;
-    <tbody>
     %apply;one_child("self", "-1", "", 1)
     %for;lev;0;max;
       %if;(evar.gen="on" and lev<max_desc_level)
@@ -884,7 +883,6 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
       %apply;one_level("self", 0, lev, "", "", 1)
     %end;
-    </tbody>
   %end;
 </table>
 
@@ -893,7 +891,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %incr_count;
 %end;
 
-<p>[*total][:] %apply;desc_count(max_desc_level) [descendants] %if;(evar.marr="on" or evar.t="I")(%count; [person/persons]1 [with root, spouses and unknowns])</p>
+<p>[*total][:] %apply;desc_count(max_desc_level) [descendants] %if;(evar.marr="on" or evar.t="I")(%count; [person/persons]1 [with root, spouses and unknowns])%end;</p>
 
 %import;trl;
 %import;copyr;

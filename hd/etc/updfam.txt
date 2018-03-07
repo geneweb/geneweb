@@ -529,16 +529,16 @@ $(document).ready(function(){
   <div class="row mt-2">
     <label for="ins_eventxcnt_n" class="col-form-label col-2">[*insert]</label>
     <div class="form-inline col-10 ml-auto">
-      <select class="form-control" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
-        %for;i;1;11;<option>%i;</option> %end;
-      </select>
       <div class="input-group">
-        <span class="input-group-btn">
+        <select class="custom-select form-control" id="ins_eventxcnt_n" name="ins_eventxcnt_n">
+          %for;i;1;11;<option>%i;</option> %end;
+        </select>
+        <div class="input-group-append">
           <label class="btn btn-outline-secondary"> [event/events]0/[event/events]1
             <input class="ml-1" type="checkbox" name="ins_eventxcnt" value="on">
           </label>
-        </span>
-        <button type="submit" class="btn btn-outline-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
+          <button type="submit" class="btn btn-outline-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
+        </div>
       </div>
     </div>
   </div>
@@ -548,16 +548,16 @@ $(document).ready(function(){
   <div class="row mt-3 mb-1">
     <label for="excnt_ins_witnwcnt_n" class="col-form-label col-2">[*insert]</label>
     <div class="form-inline col-10 ml-auto">
-      <select class="form-control" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n" >
-        %for;i;1;11;<option>%i;</option> %end;
-      </select>
       <div class="input-group">
-        <span class="input-group-btn">
+        <select class="form-control" id="excnt_ins_witnwcnt_n" name="excnt_ins_witnwcnt_n" >
+          %for;i;1;11;<option>%i;</option> %end;
+        </select>
+        <div class="input-group-append">
           <label class="btn btn-outline-secondary"> [witness/witness/witnesses]0/[witness/witness/witnesses]2
             <input class="ml-1" type="checkbox" name="excnt_ins_witnwcnt" value="on">
           </label>
-        </span>
         <button type="submit" class="btn btn-outline-secondary" title="[*insert::witness/witness/witnesses]0/[witness/witness/witnesses]2">OK</button>
+        </div>
       </div>
     </div>
   </div>
@@ -857,33 +857,31 @@ $(document).ready(function(){
 %define;insert_child(xcnt)
   <label for="ins_chxcnt_n" class="col-form-label col-2">[*insert]</label>
   <div class="form-inline col-5">
-    <select class="form-control" id="ins_chxcnt_n" name="ins_chxcnt_n">
-      %for;i;1;11;<option>%i;</option> %end;
-    </select>
-      <div class="input-group">
-        <span class="input-group-btn">
-          <label class="btn btn-outline-secondary"> [child/children]0/[child/children]1
-            <input class="ml-1" type="checkbox" name="ins_chxcnt" value="on">
-          </label>
-      </span>
-      <button type="submit" class="btn btn-outline-secondary" title="[*insert::child/children]0/[child/children]1">OK</button>
+    <div class="input-group">
+      <select class="form-control" id="ins_chxcnt_n" name="ins_chxcnt_n">
+        %for;i;1;11;<option>%i;</option>%end;
+      </select>
+      <div class="input-group-append">
+        <label class="btn btn-outline-secondary"> [child/children]0/[child/children]1
+          <input class="ml-1" type="checkbox" name="ins_chxcnt" value="on">
+        </label>
+        <button type="submit" class="btn btn-outline-secondary" title="[*insert::child/children]0/[child/children]1">OK</button>
+      </div>
     </div>
   </div>
 %end;
 
 %define;invert_children(xcnt)
-    <div class="form-inline col-3">
-       <div class="input-group">
-         <span class="input-group-btn">
-            <label class="btn btn-outline-secondary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="fa fa-user-o"></span> %expr(xcnt-1) <span class="fa fa-exchange"></span> <span class="fa fa-user-o"></span> xcnt
-              <input class="ml-1" type="checkbox" name="inv_chxcnt" value="on">
-            </label>
-          </span>
-          <span class="input-group-btn">
-            <button type="submit" class="btn btn-outline-secondary">OK</button>
-          </span>
-        </div>
+  <div class="form-inline col-3">
+    <div class="input-group">
+      <label class="btn btn-outline-secondary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="fa fa-user-o"></span> %expr(xcnt-1) <span class="fa fa-exchange-alt"></span> <span class="fa fa-user-o"></span> xcnt
+        <input class="ml-1" type="checkbox" name="inv_chxcnt" value="on">
+      </label>
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-outline-secondary">OK</button>
       </div>
+    </div>
+  </div>
 %end;
 
 %define;child(xcnt)

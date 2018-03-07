@@ -28,12 +28,10 @@
 }
 .table-hover tbody tr:hover {
   background-color: LightGoldenrodYellow;
-  border:1px;
 }
 .table_big_cell:hover {
   background-color: ivory;
 }
-
 .table_big_cell {
   overflow: hidden;
 }
@@ -162,11 +160,11 @@ div.anchor_upd {
   top:-34px;
 }
 
-/* hide placeholder on input focus */
-input:focus::-webkit-input-placeholder { color:transparent; }
-input:focus:-moz-placeholder { color:transparent; } /* FF 4-18 */
-input:focus::-moz-placeholder { color:transparent; } /* FF 19+ */
-input:focus:-ms-input-placeholder { color:transparent; }
+/* slowly hide placeholder on input focus */
+[placeholder]:focus::-webkit-input-placeholder {
+  transition: opacity 0.5s 0.5s ease;
+  opacity: 0;
+}
 
 /* Capitalization unavailable in note from Ocaml 
 > temporary disactivated: too intrusive for notes in popovers, but needed for note in timeline...
@@ -277,6 +275,7 @@ a {
 .scrollable-lang.short {
   max-height: 160px;
 }
+
 
 /* Cancel empty margin-left of Bootstrap <dl> */
 dl {
@@ -1282,7 +1281,7 @@ ul.surname_branch_sort > li
 {
   border:1px solid black;
   vertical-align:top;
-  padding:2px;
+  padding:2px 4px;
 }
 
 .missing_ancestors_sort

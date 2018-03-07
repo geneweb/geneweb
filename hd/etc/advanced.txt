@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="%lang;">
 <head>
   <title>[*advanced request]0</title>
@@ -25,21 +25,21 @@
 %define;date(xx,zz)
   %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
     <label for="xxzz_dd" class="form-control-label">
-    <input type="number" class="form-control" name="xxzz_dd" id="xxzz_dd" maxlength="2" min="1" max="12"> [year/month/day]2 </label>
+    <input type="number" class="form-control" name="xxzz_dd" id="xxzz_dd" min="1" max="12"> [year/month/day]2 </label>
     <label for="xxzz_mm" class="form-control-label">
     <input type="number" class="form-control" name="xxzz_mm" id="xxzz_mm" min="1" max="31"> [year/month/day]1 </label>
     <label for="xxzz_yyyy" class="form-control-label">
-    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" maxlength="4" size="4"> [year/month/day]0</label>
+    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" size="4"> [year/month/day]0</label>
   %elseif;([ !dates order]0 = "mmddyyyy")
     <label for="xxzz_mm" class="form-control-label">
     <input type="number" class="form-control" name="xxzz_mm" id="xxzz_mm" min="1" max="12"> [year/month/day]1 </label>
     <label for="xxzz_dd" class="form-control-label">
     <input type="number" class="form-control" name="xxzz_dd" id="xxzz_dd" min="1" max="31"> [year/month/day]2 </label>
     <label for="xxzz_yyyy" class="form-control-label">
-    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" maxlength="4" size="4"> [year/month/day]0</label>
+    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" size="4"> [year/month/day]0</label>
   %else;
     <label for="xxzz_yyyy" class="form-control-label">
-    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" maxlength="4" size="2"> [year/month/day]0 </label>
+    <input type="text" class="form-control" name="xxzz_yyyy" id="xxzz_yyyy" size="2"> [year/month/day]0 </label>
     <label for="xxzz_mm" class="form-control-label">
     <input type="number" class="form-control" name="xxzz_mm" id="xxzz_mm" min="1" max="12"> [year/month/day]1 </label>
     <label for="xxzz_dd" class="form-control-label">
@@ -63,17 +63,20 @@
         %end;
         %if;("xx"="marriage")
           </div>
-          <div class="form-check form-check-inline col-8">
+          <div class="form-inline col-8">
             <span class="form-control-label mr-2">[*married][:]</span>
-            <label for="mY" class="form-check-label">
-              <input type="radio" class="form-check-input" name="married" id="mY" value="Y"> [Y/N]0%nn;
-            </label>
-            <label for="mN" class="form-check-label">
-              <input type="radio" class="form-check-input" name="married" id="mN" value="N"> [Y/N]1
-            </label>
-            <label for="mA" class="form-check-label">
-              <input type="radio" class="form-check-input" name="married" id="mA" value="A" checked> -%nn;
-            </label>
+            <div class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" name="married" id="mY" value="Y">
+              <label class="form-check-label" for="mY" >[Y/N]0</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" name="married" id="mN" value="N">
+              <label class="form-check-label" for="mN" >[Y/N]1</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input type="radio" class="form-check-input" name="married" id="mA" value="A" checked>
+              <label class="form-check-label" for="mA" >-</label>
+            </div>
         %end;
       </div>
     </div>
@@ -107,17 +110,20 @@
         <div class="col-3">
           <h4>[*person/persons]0</h4>
         </div>
-        <div class="form-check form-check-inline col-9">
-          <span class="form-control-label">[*sex][:]</span>
-          <label for="sexM" class="form-check-label" title="[*male/female/neuter]0">
-            <input type="radio" class="form-check-input" name="sex" id="sexM" value="M"> [M/F]0
-          </label>
-          <label for="sexU" class="form-check-label" title="[*male/female/neuter]2">
-            <input type="radio" class="form-check-input" name="sex" id="sexU" value="N" checked> -
-          </label>
-          <label for="sexF" class="form-check-label" title="[*male/female/neuter]1">
-            <input type="radio" class="form-check-input" name="sex" id="sexF" value="F"> [M/F]1
-          </label>
+        <div class="form-inline col-9">
+          <span class="form-control-label mr-2">[*sex][:]</span>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="sex" id="sexM" value="M">
+            <label class="form-check-label" for="sexM" title="[male/female/neuter]0">[M/F]0</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="sex" id="sexU" value="N" checked>
+            <label class="form-check-label" for="sexU" title="[male/female/neuter]2">-</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input" name="sex" id="sexF" value="F">
+            <label class="form-check-label" for="sexF" title="[male/female/neuter]1">[M/F]1</label>
+          </div>
          </div>
        </div>
        <div class="row">

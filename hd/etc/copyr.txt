@@ -7,11 +7,11 @@
 %define;language_link()
   %for;i;1;30;
     %let;l1;%apply;lang(i)%in;
-    %if;(l1!=evar.lang)
+    %if;(lang!=l1)
       <a class="dropdown-item" id="lang_%l1;"%sp;
         href="%prefix_no_lang;%if;(l1!=bvar.default_lang)lang=%l1;;%end;%nn;
               %foreach;env_binding;%if;(env.key!="lang" and env.key!="p_mod")%env.key=%env.val;;%end;%end;">%nn;
-       <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1%end;%sp;</code>%nn;
+       <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1;%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
     %end;
   %end;
@@ -35,12 +35,7 @@
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"%sp;
             title="%if;(evar.lang!="")%apply;capitalize%with;%apply;language_name(evar.lang)%end;%end;">%nn;
             <span class="sr-only">lang</span>%nn;
-            <span class="text-uppercase">%if;(bvar.default_lang!="" and evar.lang="")
-                                           %bvar.default_lang;
-                                         %elseif;(evar.lang!="")
-                                           %evar.lang;
-                                         %else;en%end;
-            </span>%nn;
+            <span class="text-uppercase">%lang;</span>%nn;
             <span class="sr-only">, [select lang]</span>%nn;
           </button>
           %if;(not is_printed_by_template)
