@@ -75,7 +75,7 @@ type config =
 
 (* prefix for image urls:
    the value of argument -images_url if specified, otherwise
-   command ^ "?m=IM;v=" in CGI mode
+   command ^ "?m=IM&v=" in CGI mode
    "images" otherwise *)
     image_prefix : string;
 

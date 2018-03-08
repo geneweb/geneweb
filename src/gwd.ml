@@ -1316,7 +1316,7 @@ value make_conf from_addr (addr, request) script_name contents env = do {
      ctime = utm;
      image_prefix =
        if images_url.val <> "" then images_url.val
-       else if Wserver.cgi.val then ar.ar_command ^ "?m=IM;v="
+       else if Wserver.cgi.val then ar.ar_command ^ "?m=IM&v="
        else "images";
      b_arg_for_basename = b_arg_for_basename}
   in

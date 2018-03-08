@@ -4174,7 +4174,7 @@ and string_of_image_url conf base env (p, p_auth) html =
         let s = Unix.stat fname in
         let b = acces conf base p in
         let k = default_image_name base p in
-        Format.sprintf "%sm=IM%s;d=%d;%s;k=/%s" (commd conf)
+        Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s" (commd conf)
           (if html then "H" else "")
           (int_of_float
              (mod_float s.Unix.st_mtime (float_of_int max_int)))

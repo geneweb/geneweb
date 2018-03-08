@@ -702,17 +702,17 @@ value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
   if surname = "" then ""
-  (* pX=fn;nX=sn;ocX=occ *)
+  (* pX=fn&nX=sn&ocX=occ *)
   else if accessible_by_key conf base x first_name surname then
-    "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
+    "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ "&n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
-      (if get_occ x > 0 then ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
+      (if get_occ x > 0 then "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
        else "")
-  (* iX=index;ocX=occ *)
+  (* iX=index&ocX=occ *)
   else
     "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_key_index x)) ^
     (if conf.wizard && get_occ x > 0 then
-       ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
+       "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
 ;
 
