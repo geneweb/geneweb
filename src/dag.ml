@@ -163,7 +163,7 @@ value image_normal_txt conf base p fname width height =
   let k = default_image_name base p in
   let r =
     sprintf "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\"%s%s alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
+<img src=\"%sm=IM&d=%d&%s&k=/%s\"%s%s alt=\"%s\" title=\"%s\" style=\"%s %s\" />"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
       (if width = 0 then "" else " width=\"" ^ string_of_int width ^ "\"")
@@ -173,7 +173,7 @@ value image_normal_txt conf base p fname width height =
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;")
   in
   if conf.cancel_links then r
-  else sprintf "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k ^ r ^ "</a>"
+  else sprintf "<a href=\"%sm=IM&%s&k=/%s\">" (commd conf) b k ^ r ^ "</a>"
 ;
 
 value image_url_txt conf base url_p url height =
