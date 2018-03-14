@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="%lang;">
 <head>
   <title>[*advanced request]0</title>
