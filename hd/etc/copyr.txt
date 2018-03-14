@@ -19,12 +19,12 @@
 %define;compil(xx,yy)
   [compiled on %s from commit %s:::xx:yy]
 %end;
-%if;(not cancel_links and evar.m != "MOD_DATA_OK" and evar.m != "DEL_IND_OK" and evar.m != "DEL_FAM_OK")
+%if;(not cancel_links)
   <div class="col col-md-11 col-lg-10 mx-auto mb-1" id="copyr">
     <div class="d-none d-flex justify-content-sm-between">
       <div class="d-flex d-sm-inline-flex p-2">
         <a class="btn btn-outline-secondary" role="button"%sp;
-           href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%suffix;"%sp;
+           href="%prefix_no_templ;%if(evar.templ!="templm")templ=templm;%end;%if;(evar.digest="")%suffix;%end;"%sp;
            title="%if(evar.templ!="templm")templm%else;defaut template%end;">%nn;
            <span class="fa fa-id-card" aria-hidden="true"></span>%nn;
            <span class="sr-only">switch to %if(evar.templ!="templm")templm%else;defaut template%end;</span>%nn;
@@ -40,35 +40,35 @@
           </button>
           %if;(not is_printed_by_template)
             <div class="dropdown-menu scrollable-lang short" aria-labelledby="dropdownMenu1">
-              <a class="dropdown-item" href="%prefix_no_lang;lang=af;%suffix;">af</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=bg;%suffix;">bg</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=br;%suffix;">br</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=ca;%suffix;">ca</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=cs;%suffix;">cs</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=da;%suffix;">da</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=de;%suffix;">de</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=en;%suffix;">en</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=eo;%suffix;">eo</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=es;%suffix;">es</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=et;%suffix;">et</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=fi;%suffix;">fi</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=fr;%suffix;">fr</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=he;%suffix;">he</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=is;%suffix;">is</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=it;%suffix;">it</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=lv;%suffix;">lv</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=nl;%suffix;">nl</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=no;%suffix;">no</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=oc;%suffix;">oc</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=pl;%suffix;">pl</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=pt;%suffix;">pt</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=pt-br;%suffix;">pt-br</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=ro;%suffix;">ro</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=ru;%suffix;">ru</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=sk;%suffix;">sk</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=sl;%suffix;">sl</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=sv;%suffix;">sv</a>
-              <a class="dropdown-item" href="%prefix_no_lang;lang=zh;%suffix;">zh</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=af;%if;(evar.digest="")%suffix;%end;">af</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=bg;%if;(evar.digest="")%suffix;%end;">bg</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=br;%if;(evar.digest="")%suffix;%end;">br</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=ca;%if;(evar.digest="")%suffix;%end;">ca</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=cs;%if;(evar.digest="")%suffix;%end;">cs</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=da;%if;(evar.digest="")%suffix;%end;">da</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=de;%if;(evar.digest="")%suffix;%end;">de</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=en;%if;(evar.digest="")%suffix;%end;">en</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=eo;%if;(evar.digest="")%suffix;%end;">eo</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=es;%if;(evar.digest="")%suffix;%end;">es</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=et;%if;(evar.digest="")%suffix;%end;">et</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=fi;%if;(evar.digest="")%suffix;%end;">fi</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=fr;%if;(evar.digest="")%suffix;%end;">fr</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=he;%if;(evar.digest="")%suffix;%end;">he</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=is;%if;(evar.digest="")%suffix;%end;">is</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=it;%if;(evar.digest="")%suffix;%end;">it</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=lv;%if;(evar.digest="")%suffix;%end;">lv</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=nl;%if;(evar.digest="")%suffix;%end;">nl</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=no;%if;(evar.digest="")%suffix;%end;">no</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=oc;%if;(evar.digest="")%suffix;%end;">oc</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=pl;%if;(evar.digest="")%suffix;%end;">pl</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=pt;%if;(evar.digest="")%suffix;%end;">pt</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=pt-br;%if;(evar.digest="")%suffix;%end;">pt-br</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=ro;%if;(evar.digest="")%suffix;%end;">ro</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=ru;%if;(evar.digest="")%suffix;%end;">ru</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=sk;%if;(evar.digest="")%suffix;%end;">sk</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=sl;%if;(evar.digest="")%suffix;%end;">sl</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=sv;%if;(evar.digest="")%suffix;%end;">sv</a>
+              <a class="dropdown-item" href="%prefix_no_lang;lang=zh;%if;(evar.digest="")%suffix;%end;">zh</a>
             </div>
           %else;
             <div class="dropdown-menu scrollable-lang" aria-labelledby="dropdownMenu1">
