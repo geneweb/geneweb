@@ -47,12 +47,12 @@ fr: Accès réservé aux amis et magiciens de la base de donnée !
             <form class="form-inline" method="post" action="%action;">
               %hidden;
               <div class="input-group mt-1">
-                <label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>
+                %(<label for="w" class="sr-only">[user/password/cancel]0:[user/password/cancel]1</label>%)
                 <input type="text" class="form-control" name="w" title="[wizard/wizards/friend/friends/exterior]2/[wizard/wizards/friend/friends/exterior]0"
-                placeholder="[user/password/cancel]0:[user/password/cancel]1" autofocus>
-                <span class="input-group-btn">
-                  <button type="submit" class="btn btn-primary">Ok</button>
-                </span>
+                placeholder="[user/password/cancel]0:[user/password/cancel]1" aria-label="password input" aria-describedby="username:password" autofocus>
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-primary">OK</button>
+                </div>
               </div>
             </form>
           %end;
@@ -109,11 +109,15 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
           <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb"/>
         %end;
         <h1>[database] %base.name;%if;(bvar.visitor_access!="no")<br><small>%base.nb_persons; [person/persons]1%end;</small></h1>
-        %if;(browsing_with_sosa_ref and bvar.visitor_access!="no")%apply;display_sosa_ref%with;%sosa_ref;%end;%end;
-        %if;(bvar.motd != "")
-          <div>%apply;interp(bvar.motd)</div>
-        %end;
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col mx-md-auto text-center">
+      %if;(browsing_with_sosa_ref and bvar.visitor_access!="no")%apply;display_sosa_ref%with;%sosa_ref;%end;%end;
+      %if;(bvar.motd != "")
+        <div>%apply;interp(bvar.motd)</div>
+      %end;
     </div>
   </div>
   %if;(wizard or friend or bvar.visitor_access!="no")
