@@ -236,7 +236,7 @@ $(document).ready(function(){
   %let;day_input;pattern="(?:0?[1-9]|1[0-9]|2[0-9]|3[0-1])" size="1" maxlength="2" %readonly;%in;
   %let;month_input;pattern="(?:0?[1-9]|1[0-2]|VD|BR|FM|NI|PL|VT|GE|FL|PR|ME|TH|FT|JC|vd|br|fm|ni|pl|vt|ge|fl|pr|me|th|ft|jc)" size="1" maxlength="2" %readonly;%in;
   %let;year_input;pattern="[?><~/]?-?\d*/?" size="4" maxlength="8" %readonly;%in;
-  <div class="row justify-content-sm-between justify-content-md-start">
+  <div class="row">
     <div class="col-sm-1 col-md-2 col-form-label">
       xlab
     </div>
@@ -321,7 +321,7 @@ $(document).ready(function(){
       </select>
     </div>
   </div>
-  <div class="row justify-content-sm-end justify-content-md-start">
+  <div class="row">
     <div class="col-sm-1 col-md-2"></div>
     <div class="col col-sm-auto form-inline">
       %if;([ !dates order]0 = "ddmmyy" or [ !dates order]0 = "ddmmyyyy" or [ !dates order]0 = "dmyyyy")
@@ -458,9 +458,9 @@ $(document).ready(function(){
     <div class="col-sm-4">
       <input class="form-control" type="text" name="paxcnt_fn" value="%xx.first_name;" id="paxcnt_fn" placeholder="[*first name/first names]0">
     </div>
-    <label for="paxcnt_occ" class="col-sm-1 col-form-label">[*number]</label>
+    <label for="paxcnt_occ" class="col-auto col-form-label">[*number]</label>
     <div class="col-sm-2">
-       <input class="form-control" type="number" name="paxcnt_occ" min="0" max="99999999" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" placeholder="#" title="[*number]">
+       <input class="form-control" type="number" name="paxcnt_occ" min="0" max="9999" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" placeholder="#" title="[*number]">
     </div>
     %if;(bvar.multi_parents = "yes")
       <div class="col-sm-2 ml-sm-auto">
@@ -584,9 +584,9 @@ $(document).ready(function(){
     <div class="col-sm-5">
       <input type="text" class="form-control" name="excnt_witnwcnt_fn" value="%fwitness.first_name;" id="excnt_witnwcnt_fn" placeholder="[*first name/first names]0">
     </div>
-    <label for="excnt_witnwcnt_occ" class="col-sm-1 col-form-label">[*number]0</label>
-    <div class="col-auto">
-      <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" max="9999999" value="%if;(fwitness.occ="")0%else;%fwitness.occ;%end;" id="excnt_witnwcnt_occ">
+    <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
+    <div class="col-sm-auto">
+      <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" max="99999" value="%if;(fwitness.occ="")0%else;%fwitness.occ;%end;" id="excnt_witnwcnt_occ">
     </div>
   </div>
   <div class="row">
@@ -594,17 +594,21 @@ $(document).ready(function(){
     <div class="col-sm-5">
       <input type="text" class="form-control" name="excnt_witnwcnt_sn" maxlength="200" value="%fwitness.surname;" id="excnt_witnwcnt_sn" placeholder="[*surname/surnames]0">
     </div>
-    <label class="col-sm-1 mt-1">[*sex]</label>
-    <div class="col-sm-2 mt-1 ml-1">
-      <div class="radio-inline">
-        <label>
-          <input type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex = "male") checked%end;%/> [M/F]0
+    <span class="col-sm-auto col-form-label">[*sex]</span>
+    <div class="col-sm-auto mt-2">
+      <div class="form-check form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="M" %if;(witness.create.sex="male")checked%end;%/> [M/F]0
         </label>
-        <label>
-          <input type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex = "neuter") checked%end;%/> ?
+      </div>
+      <div class="form-check form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="N" %if;(witness.create.sex="neuter")checked%end;%/> ?
         </label>
-        <label>
-          <input type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex = "female") checked%end;%/> [M/F]1
+      </div>
+      <div class="form-check form-check-inline">
+        <label class="form-check-label">
+          <input class="form-check-input" type="radio" name="excnt_witnwcnt_sex" value="F" %if;(witness.create.sex="female")checked%end;%/> [M/F]1
         </label>
       </div>
     </div>
@@ -900,36 +904,33 @@ $(document).ready(function(){
     <div class="col-sm-4">
         <input class="form-control" type="text" name="chxcnt_fn" value="%child.first_name;" id="chxcnt_fn" placeholder="[*first name/first names]0">
     </div>
-    <label for="chxcnt_occ" class="col-sm-1 col-form-label">[*number]</label>
-    <div class="col-2">
-      <input class="form-control" type="number" name="chxcnt_occ" min="0" max="999999" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
+    <label for="chxcnt_occ" class="col-sm-auto col-form-label">[*number]</label>
+    <div class="col-sm-auto">
+      <input class="form-control" type="number" name="chxcnt_occ" min="0" max="99999" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
     </div>
   </div>
   <div class="row">
     <label for="chxcnt_sn" class="col-sm-2 col-form-label">[*surname/surnames]0</label>
     <div class="col-sm-4">
-      <input class="form-control" type="text" name="chxcnt_sn"
-         value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;">
+      <input class="form-control" type="text" name="chxcnt_sn" value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;">
     </div>
-    <div id="chxcnt_sex_div" class="col-sm-6 px-0">
-      <div class="d-flex">
-        <span class="col-sm-2 col-form-label">[*sex]</span>
-        <div class="col-sm-auto ml-2 mt-1">
-          <div class="form-check form-check-inline">
-            <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex="male")checked%end;%/> [M/F]0
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex="neuter")checked%end;%/> ?
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <label class="form-check-label">
-              <input class="form-check-input" type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex="female")checked%end;%/> [M/F]1
-            </label>
-          </div>
+    <div id="chxcnt_sex_div" class="d-inline-flex">
+      <span class="col-sm-auto col-form-label">[*sex]</span>
+      <div class="col-sm-auto mt-2">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex="male")checked%end;%/> [M/F]0
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex="neuter")checked%end;%/> ?
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input class="form-check-input" type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex="female")checked%end;%/> [M/F]1
+          </label>
         </div>
       </div>
     </div>
