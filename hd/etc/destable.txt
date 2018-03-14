@@ -196,7 +196,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %elseif;(evar.t="I")
       <td class="text-center align-middle table_big_cell">
         <a class="table_big_anchor" title="[*navigation] [with] %xxx"%sp;
-          href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%access;;%nn;
+          href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%spouse.access;;%nn;
             %foreach;env_binding;
               %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;%end;
             %end;">%nn;
