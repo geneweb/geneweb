@@ -84,12 +84,12 @@
 %define;type_puce_asc(nnn)
   %if;nnn.has_parents;
     %if;(nnn.father != "? ?" and nnn.mother != "? ?" and nnn.mother != "de l'une de ses épouses")
-      <li style=" list-unstyled list-style-type:square">
+      <li class="list-unstyled" style="list-style-type:square">
     %else;
-      <li style=" list-unstyledlist-style-type:disc">
+      <li class="list-unstyled" style="list-style-type:disc">
     %end;
   %else;
-    <li style=" list-unstyledlist-style-type:circle">
+    <li class="list-unstyled" style="list-style-type:circle">
   %end;
 %end;
 
