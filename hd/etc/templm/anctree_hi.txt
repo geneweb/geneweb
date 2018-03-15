@@ -207,7 +207,7 @@
       %if;(evar.cgl!="on")
       <div>
         <a style="width:100%%;zindex:2;"
-          href="%prefix_base;%aaaaccess;;t=T;t1=CT;
+          href="%prefix_base_password;%aaaaccess;;t=T;t1=CT;
             %foreach;env_binding;%if;(not (env.key="t" or env.key="t1" or env.key="p" or env.key="n"))%env.key=%env.val;;%end;%end;"
           %if;(aaasame!="")%apply;implex1(aaasame.v)%end;%nn;
           title='[*generation/generations]0 %level; – Sosa %nn;

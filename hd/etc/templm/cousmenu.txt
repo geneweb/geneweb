@@ -35,7 +35,7 @@
 
 %apply;list()
 
-<div class="menu" style="position:relative"><a %l1; href="%prefix_base;%if;(evar.lang != "")lang=%evar.lang;;%end;
+<div class="menu" style="position:relative"><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;;%end;
   %foreach;env_binding;
     %if;(env.key = "m")m=RLM;%else;%env.key;=%env.val.decoded;;%end;
   %end;

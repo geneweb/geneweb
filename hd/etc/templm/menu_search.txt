@@ -8,7 +8,7 @@
 %define;link_lang()
   %for;i;1;30;
     %let;l1;%apply;lang(i)%in;
-    <a href="%prefix_base;templ=%evar.templ;;lang=%l1;;%suffix;" title="%apply;language_name(l1)" 
+    <a href="%prefix_base_password;templ=%evar.templ;;lang=%l1;;%suffix;" title="%apply;language_name(l1)" 
       style="%if;((bvar.default_lang=l1 and evar.lang="") or evar.lang=l1)background-color:%if;(bvar.css=1)#666;%else;#EEE;%end;%end;">
        %if;(bvar.show_flag = "yes")<img src="%image_prefix;/flags/l-%l1;.jpg" width="20" height="11" alt="flag" id="i%tt;" style="border:0"%/> %end;
        %l1; %apply;language_name(l1)</a>
