@@ -49,53 +49,34 @@
 %end;
 
 %if;(has_parents and has_siblings)
-  <h2 class="mt-2 mt-lg-0 w-100">
+  <h2 class="mt-2 mt-lg-0 w-100">%nn;
     %if;(bvar.full_siblings="yes")
       [*full siblings]%nn;
     %else;
       [*siblings]%nn;
     %end;
     %reset_count;
-    %if;(op_fl=1)
+    %if;(op_fl=1 and evar.cgl!="on")
       %foreach;father.child;
         %if;is_sibling_before;
           %incr_count;
-          %if;(evar.cgl!="on")
-            <a class="ml-2 %if;not is_sibling_before;invisible%end;"%nn;
-              href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))">%nn;
-            <span class="fa fa-caret-left text-success"></span>%nn;
-            </a>%nn;
-          %else;
-            <span class="fa fa-caret-left text-success"></span>%nn;
-          %end;
+          <a class="ml-2%if;not is_sibling_before; invisible%end;"
+            href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))">%nn;
+          <i class="fa fa-caret-left fa-sm text-success"></i>%nn;
+          </a>%nn;
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      %if;(evar.cgl!="on")
-        <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on">%nn;
-        <img class="px-1 mb-2" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%nn;
+      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on">%nn;
+      <img class="px-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="Tree"
         title="[*tree] [siblings] ([with] [spouse/spouses]1)"/>%nn;
-        </a>%nn;
-      %else;
-        <img class="px-1 mb-2" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%nn;
-        title="[*tree] [siblings] ([with] [spouse/spouses]1)"/>
-      %end;
-      %(%if;((p_mod="" or p_mod="zz") and has_parents)
-        %if;(not cancel_links)
-          <a class="d-none d-inline d-lg-none ml-1 ml-lg-0" data-toggle="collapse" href="#collapse_3gen_photo" aria-expanded="false" aria-controls="collapseExample2" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [ascendants tree]">%nn;
-            <sup><i class="fa fa-caret-up text-success"></i></sup></a>
-        %end;
-      %end;%)
+      </a>%nn;
       %foreach;father.child;
         %if;is_sibling_after;
-          %if;(evar.cgl!="on")
-            <a class="%if;not is_sibling_after;invisible%end;" href="%prefix;%child.access;"%nn; 
-              title="%apply;capitalize(nth([next sibling],sex))">%nn;
-            <span class="fa fa-caret-right text-success"></span>%nn;
-            </a>
-          %else;
-            <span class="fa fa-caret-right text-success"></span>
-          %end;
+          <a%if;not is_sibling_after; class="invisible"%end; href="%prefix;%child.access;" 
+            title="%apply;capitalize(nth([next sibling],sex))">%nn;
+          <i class="fa fa-caret-right fa-sm text-success"></i>%nn;
+          </a>
         %end;
       %end;
     %end;
