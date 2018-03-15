@@ -1,5 +1,4 @@
   <!-- $Id: anctree_hi.txt -->
-
 %let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
 %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
 %let;evart1;%if;(evar.t1!="")%evar.t1;%else;CT%end;%in;
@@ -16,10 +15,11 @@
 %( dimensions des boites %)
 %let;hbc;13%in; %( mode caractère %)
 %let;wbc;8%in;
-%let;hbs;%if;(evar.templ="templm")%expr(24*evarscl/100)%else;%expr(24*evarscl/100)%end;%in; %( espacement des boites en mode sosa  dimension + marge %)
-%let;wbs;%if;(evar.templ="templm")%expr(40*evarscl/100)%else;%expr(40*evarscl/100)%end;%in;
-%let;hb1;%if;(evar.templ="templm")%expr(22*evarscl/100)%else;%expr(22*evarscl/100)%end;%in; %( dimensions de la boite sosa %)
-%let;wb1;%if;(evar.templ="templm")%expr(38*evarscl/100)%else;%expr(38*evarscl/100)%end;%in;
+%( bug avec %expr en cgi, evar.scale désactivée temporairement %)
+%let;hbs;%if;cgi;24%else;%expr(24*evarscl/100)%end;%in; %( espacement des boites en mode sosa  dimension + marge %)
+%let;wbs;%if;cgi;40%else;%expr(40*evarscl/100)%end;%in;
+%let;hb1;%if;cgi;22%else;%expr(22*evarscl/100)%end;%in; %( dimensions de la boite sosa %)
+%let;wb1;%if;cgi;38%else;%expr(38*evarscl/100)%end;%in;
 
 <style type="text/css">
 #hi-tree1 {position:relative;left:10px;}
@@ -28,7 +28,6 @@
 #hi-tree1 a{position:absolute;line-height:10pt;}
 </style>
 
-<script>$.noConflict();</script>
 <script type="text/javascript">
   <!--
   function over1(xx)
@@ -44,8 +43,8 @@
   -->
 </script>
 
-  <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;jquery.min.js"></script>
-  <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
+<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;jquery.min.js"></script>
+<script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
 
 %define;implexc()
   <span style="top:%top;px;left:%left;px;font-family:monospace;">x
