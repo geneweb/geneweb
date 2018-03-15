@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: upddata.txt,v 7 25/12/2016 07:20:32 Exp $ -->
+  <!-- $Id: upddata.txt,v 7 15/03/2018 12:14:42 Exp $ -->
   <!-- Copyright (c) 2006-2017 INRIA -->
   <title>%title;</title>
   <meta name="robots" content="none">
@@ -53,7 +53,6 @@
     %apply;arrows()
   </div>
   <div class="col-12 mt-1">
-    %hidden;
     <ul class="list-group">
       %foreach;entry;
         <li class="list-group-item list-group-item-info mt-3 justify-content-between">
@@ -69,6 +68,7 @@
                 %else;
                   <form class="form-inline my-2" method="post" action="%action;" id="mod">
                     <div class="text-muted w-100">%escape.entry_value;</div>
+                    %hidden;
                     %foreach;env_keys;
                       <input type="hidden" name="%key_name;" value="%key_value;">
                     %end;
