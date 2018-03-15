@@ -278,7 +278,7 @@
       %end;
     %end;
     %if;(count2>0)
-      <div class="d-inline-flex justify-content-start mt-1">
+      <div class="d-flex justify-content-start mt-1">
         %if;spouse.has_image;
           %if;(not cancel_links)
             <a href="%spouse.image_url;" class="align-self-start" target="_blank">
@@ -406,18 +406,19 @@
       %end;
       %if;(evar.opt = "from" and wizard)<em>(%origin_file;)</em><br%/>%nl;%end;
     %end;
-    </li></ul>
     %if;(are_divorced or are_separated)
       <div class="ml-4 mb-1 text-muted">
-        %if;are_divorced;<br>[*divorced]0%divorce_date;%nn;%end;
-        %if;are_separated;<br>[*separated]0%nn;
-        %( todo: [separated]0%event.date n’ajoute pas la préposition à la date comme [divorced]0%divorce_date; %)
+        %if;(are_separated)[*separated]%nn;
           %foreach;event;
-            %if;(event.name=[separate event]0 and event.has_date) %event.date;.%end;%nn;
+            %if;(event.name=[separate event]0 and event.has_date and spouse=event.spouse)
+              %sp;[in (month year)]0 %event.date;%nn;
+            %end;
           %end;
         %end;
+        %if;not are_divorced;.%else;%if;are_separated;, [divorced]%else;[*divorced]%end;%divorce_date;.%end;
       </div>
     %end;
+    </li></ul>
     %reset_count2;
   %end;
 
