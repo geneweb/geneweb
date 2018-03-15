@@ -15,7 +15,7 @@
   <table style="border:%border;;width:100%%">
     <tr>
       %if;father.has_parents;
-      <td style="vertical-align:top;text-align=left;width:50%%">
+      <td style="vertical-align:top;text-align:left;width:50%%">
         %if;mother.has_parents;
           <h2>[*paternal grand-parents],&nbsp;[uncles and aunts]1</h2>
         %end;
@@ -25,7 +25,7 @@
         </ul>
       </td>
       %end;
-      <td style="vertical-align:top;text-align=left;width:50%%">
+      <td style="vertical-align:top;text-align:left;width:50%%">
       %if;mother.has_parents;
         %if;father.has_parents;
           <h2>[*maternal grand-parents],&nbsp;[uncles and aunts]1</h2>
@@ -37,7 +37,7 @@
       %end;
       </td>
       %if;(not mother.has_parents)
-        <td style="vertical-align=top;text-align=left;width:50%%"></td>
+        <td style="vertical-align:top;text-align:left;width:50%%"></td>
       %end;
     </tr>
   </table>
