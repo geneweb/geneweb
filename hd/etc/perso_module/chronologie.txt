@@ -238,7 +238,7 @@
     %if;(not cancel_links)
       <div class="form-inline">
         <div class="mx-2">
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%if;(env.key!="mar_sp_ch")%env.key=%env.val;;%end;%end;%nn;
             %if;(evar.mar_sp_ch!="on")mar_sp_ch=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
@@ -249,7 +249,7 @@
           </a>
         </div>
         <div class="mx-2 ml-2">
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%if;(env.key!="evt_pr_sib")%env.key=%env.val;;%end;%end;%nn;
             %if;(evar.evt_pr_sib!="on")evt_pr_sib=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
@@ -260,7 +260,7 @@
           </a>
         </div>
         <div class="mx-2 ml-2">
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%if;(env.key!="simple")%env.key=%env.val;;%end;%end;%nn;
             %if;(evar.simple!="on")simple=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"

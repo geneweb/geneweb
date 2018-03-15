@@ -226,7 +226,7 @@
       <div class="form-inline">
         <div class="btn-group mx-2">
           %for;i;1;7;
-            <a href="%prefix_base;vh=%i;;%nn;
+            <a href="%prefix_base_password;vh=%i;;%nn;
               %foreach;env_binding;%if;(env.key!="vh")%env.key=%env.val;;%end;%end;"
               class="btn btn-outline-secondary btn-sm %if;(evarvh=i)disabled font-weight-bold%end;" %nn;
               title="%if;(evarvh!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
@@ -234,7 +234,7 @@
           %end;
         </div>
         <div class="mx-2">
-          <a href="%prefix_base;%if;(evar.sosa!="on")sosa=on;%end;%nn;
+          <a href="%prefix_base_password;%if;(evar.sosa!="on")sosa=on;%end;%nn;
             %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;;%end;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
             title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%else;%nn;
@@ -243,24 +243,24 @@
             <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
           </a>
         </div>
-        <div class="input-group mx-2">
-          <span class="input-group-btn">
+        <div class="input-group input-group-sm ">
+          <div class="input-group-prepend">
             %if;(evartw>=6)
-              <a href="%prefix_base;twidth=%expr(evartw-2);%nn;
+              <a href="%prefix_base_password;twidth=%expr(evartw-2);%nn;
                 %foreach;env_binding;%if;(env.key!="twidth")%env.key=%env.val;;%end;%end;"
-                class="btn btn-outline-secondary btn-sm border-0 px-0 small"
+                class="btn btn-outline-secondary"
                 title="- 2 ([width])"
               >&nbsp;-</a>
             %end;
-          </span>
-          <input class="form-control form-control-sm text-center col-3" value="%evartw; ─" title="[*width]" disabled>
-          <span class="input-group-btn">
-              <a href="%prefix_base;twidth=%expr(evartw+2);%nn;
+          </div>
+          <input class="col-3 text-center" title="[*width]" value="%evartw; ─" disabled></input>
+          <div class="input-group-append">
+              <a href="%prefix_base_password;twidth=%expr(evartw+2);%nn;
                 %foreach;env_binding;%if;(env.key!="twidth")%env.key=%env.val;;%end;%end;"
-                class="btn btn-outline-secondary btn-sm border-0 px-0 small"
+                class="btn btn-outline-secondary"
                 title="+ 2 ([width])"
               >&nbsp;+</a>
-          </span>
+          </div>
         </div>
       </div>
     %end;

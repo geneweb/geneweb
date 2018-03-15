@@ -21,7 +21,7 @@
 
 <div class="container%if;(evar.wide="on")-fluid%end;">
 
-%let;prefix_a;%prefix_base;p=%evar.p;;n=%evar.n;%in; %(%access does not work %)
+%let;prefix_a;%prefix_base_password;p=%evar.p;;n=%evar.n;%in; %(%access does not work %)
 
 %if;not cancel_links;
   <div class="d-flex justify-content-center">
@@ -85,7 +85,7 @@
     %else;
       %if;(evar.notab != "on")
         <div class="text-%right">
-          <a href="%prefix_base;%foreach;env_binding;%env.key;=%env.val;;%end;%nn;
+          <a href="%prefix_base_password;%foreach;env_binding;%env.key;=%env.val;;%end;%nn;
                 notab=on;slices=on" accesskey="/" 
             title="[*display by slices/slice width/overlap/total width]0">
             <span>//</span>
@@ -115,13 +115,13 @@
       <div class="form-inline">
         <div class="btn-group mx-2">
           %if;(maxlev>9 and evarv>5)
-            <a href="%prefix_base;%nn;
+            <a href="%prefix_base_password;%nn;
                 %foreach;env_binding;%if;(env.key!="v")%env.key;=%env.val;;%else;v=%expr(evarv-5);%end;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(+1) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]1 (max %maxlev;)"
             >&nbsp;-⁵
             </a>
-            <a href="%prefix_base;%nn;
+            <a href="%prefix_base_password;%nn;
                 %foreach;env_binding;%if;(env.key!="v")%env.key;=%env.val;;%else;v=%expr(evarv-1);%end;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(+5) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)"
@@ -130,7 +130,7 @@
           %end;
           %for;i;minv;maxv;
             <a id="v%i;" class="btn btn-outline-%if;(evarv=i)dark font-weight-bold disabled%else;secondary%end; btn-sm border-0 px-1" 
-              href="%prefix_base;%nn;
+              href="%prefix_base_password;%nn;
                 %foreach;env_binding;%if;(env.key!="v")%env.key;=%env.val;;%else;v=%expr(i);%end;%end;"
               title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
               %end; %if;(i=maxlev)(max)%end;"
@@ -138,13 +138,13 @@
             </a>
           %end;
           %if;(maxlev>9 and maxlev-evarv>=5)
-            <a href="%prefix_base;%nn;
+            <a href="%prefix_base_password;%nn;
                 %foreach;env_binding;%if;(env.key!="v")%env.key;=%env.val;;%else;v=%expr(evarv+1);%end;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)"
             >&nbsp;+
             </a>
-            <a href="%prefix_base;%nn;
+            <a href="%prefix_base_password;%nn;
                 %foreach;env_binding;%if;(env.key!="v")%env.key;=%env.val;;%else;v=%expr(evarv+5);%end;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0 small"
               title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)"
@@ -154,19 +154,19 @@
         </div>
         %if;(evarv>1)
           <div class="btn-group mx-2">
-            <a href="%prefix_base;t=A;%nn;
+            <a href="%prefix_base_password;t=A;%nn;
                 %foreach;env_binding;%if;(env.key!="t")%env.key;=%env.val;;%end;%end;"
               class="btn btn-outline-%if;(evar.t="A")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0"
               title="[*male line/female line]1"
             >A
             </a>
-            <a href="%prefix_base;t=C;%nn;
+            <a href="%prefix_base_password;t=C;%nn;
                 %foreach;env_binding;%if;(env.key!="t")%env.key;=%env.val;;%end;%end;"
               class="btn btn-outline-%if;(evar.t="C")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
               title="[*male line/female line]1"
             >C
             </a>
-            <a href="%prefix_base;t=T;%nn;
+            <a href="%prefix_base_password;t=T;%nn;
                 %foreach;env_binding;%if;(env.key!="t")%env.key;=%env.val;;%end;%end;"
               class="btn btn-outline-%if;(evar.t="T")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
               title="[*male line/female line]1"
@@ -175,7 +175,7 @@
           </div>
         %end;
         <div class="mx-2">
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
               %foreach;env_binding;%if;(env.key != "image")%env.key;=%env.val;;%end;%end;%nn;
               %if;(evar.image="off")image=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
@@ -187,7 +187,7 @@
         </div>
         %if;(evarv>1 and evar.t="T")
           <div class="mx-2">
-            <a href="%prefix_base;%nn;
+            <a href="%prefix_base_password;%nn;
               %foreach;env_binding;%if;(env.key!="marriage")%env.key;=%env.val;;%end;%end;%nn;
               %if;(evar.marriage!="on")marriage=on;%end;"
               class="btn btn-outline-secondary btn-sm border-0 px-0"
@@ -199,7 +199,7 @@
           </div>
         %end;
         <div class="mx-2">
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
               %foreach;env_binding;%if;(env.key!="dag")%env.key;=%env.val;;%end;%end;%nn;
               %if;(evar.dag!="on")dag=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
@@ -209,13 +209,13 @@
         </div>
       </div>
     </div>
-    <a href="%prefix_base;" accesskey="T"></a>
+    <a href="%prefix_base_password;" accesskey="T"></a>
   %elseif;(evar.m="RLM" or evar.m="DAG")
     <div class="d-flex justify-content-between">
       <h2 class="mt-2 mb-4">[*multi relations graph]</h2>
       <div class="d-flex mt-4" style='%if;(evar.wide="on")transform:translateX(-40px)%end;'>
         <div class="mx-2">
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
               %foreach;env_binding;%if;(env.key!="dag")%env.key;=%env.val;;%end;%end;%nn;
               %if;(evar.dag!="on")dag=on;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
@@ -224,7 +224,7 @@
           </a>
         </div>
         <div class="mx-2">
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
               %foreach;env_binding;%if;(env.key!="image")%env.key;=%env.val;;%end;%end;%nn;
               %if;(evar.image!="off")image=off;%end;"
             class="btn btn-outline-secondary btn-sm border-0 px-0"
@@ -235,7 +235,7 @@
           </a>
         </div>
         <div class="form-inline mb-3">
-          <a href="%prefix_base;m=U;et=S;i=0;%nn;
+          <a href="%prefix_base_password;m=U;et=S;i=0;%nn;
             %foreach;env_binding;%if;(env.key!="m")%env.key;=%env.val;;%end;%end;%nn;
             mode=%evar.m;;upddag=on;"
           ><span class="fa fa-plus fa-lg" title="[*edit tree]"></span>
@@ -265,7 +265,7 @@
       <div style="text-align:right">
         %if;(pos1 = 0)&nbsp;%nn;
         %else;
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%nn;
               %if;(env.key != "pos1" and env.key != "pos2")%env.key;=%env.val;;%end;%nn;
             %end;%nn;
@@ -274,7 +274,7 @@
         %end;%nl
         %if;(pos2 >= dag.ncol)&nbsp;%nn;
         %else;
-          <a href="%prefix_base;%nn;
+          <a href="%prefix_base_password;%nn;
             %foreach;env_binding;%nn;
               %if;(env.key != "pos1" and env.key != "pos2")%env.key;=%env.val;;%end;%nn;
             %end;%nn;
