@@ -10,7 +10,7 @@
     %if;(lang!=l1)
       <a class="dropdown-item" id="lang_%l1;"%sp;
         href="%prefix_no_lang;%if;(l1!=bvar.default_lang)lang=%l1;;%end;%nn;
-              %foreach;env_binding;%if;(env.key!="lang" and env.key!="p_mod")%env.key=%env.val;;%end;%end;">%nn;
+              %foreach;env_binding;%if;(env.key!="lang" and env.key!="p_mod" and env.key!="pz" and env.key!="nz" and env.key!="ocz")%env.key=%env.val;;%end;%end;">%nn;
        <code>%if;(l1!="pt-br")%l1;&nbsp;&nbsp;&nbsp;%else;%l1;%end;%sp;</code>%nn;
        %apply;capitalize%with;%apply;language_name(l1)%end;</a>
     %end;
