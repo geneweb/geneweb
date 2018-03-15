@@ -41,14 +41,14 @@
     <span><a href="javascript:;" onclick="javascript:dsp()">…</a></span>
     %if;(evar.i1 = "" and evar.p1 = "")
       %if;(evar.m = "D" and has_parents)
-        <span><a %l1; href="%prefix_base;%if;(evar.lang != "")lang=%evar.lang;;%end;
+        <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;;%end;
           %foreach;env_binding;
             %if;(env.key = "m")m=A;%elseif;(env.key = "t")t=G;%else;%env.key;=%env.val.decoded;;%end;
           %end;
         ">[*ancestors]0</a></span>
       %end;
       %if;(evar.m = "A" and has_children)
-        <span><a %l1; href="%prefix_base;%if;(evar.lang != "")lang=%evar.lang;;%end;
+        <span><a %l1; href="%prefix_base_password;%if;(evar.lang != "")lang=%evar.lang;;%end;
           %foreach;env_binding;
             %if;(env.key = "m")m=D;%elseif;(env.key = "t")t=L;%else;%env.key;=%env.val.decoded;;%end;
           %end;

@@ -183,7 +183,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <td id="%labl0" class="text-center align-middle table_big_cell"%rowspan;>
         %if;(labl!=1)
           <a class="table_big_anchor" title="[*navigation] [with] %xxx"%sp;
-            href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%access;;%nn;
+            href="%prefix_base_password;%access;;%nn;
               %foreach;env_binding;
                 %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;%end;
               %end;">%nn;
@@ -196,7 +196,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %elseif;(evar.t="I")
       <td class="text-center align-middle table_big_cell">
         <a class="table_big_anchor" title="[*navigation] [with] %xxx"%sp;
-          href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%spouse.access;;%nn;
+          href="%prefix_base_password;%spouse.access;;%nn;
             %foreach;env_binding;
               %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;%end;
             %end;">%nn;
@@ -748,12 +748,12 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %if;(not cancel_links)
   <div class="d-flex">
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"%sp;
-      href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%access;;m=D"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>%nn;
+      href="%prefix_base_password;%access;;m=D"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>%nn;
       [*options] [descendants]%nn;
     </a>
     %if;(evar.t!="A")
       <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+      href="%prefix_base_password;%nn;
             %foreach;env_binding;
               %if;(env.key="m")m=A;%nn;
               %elseif;(env.key="t")t=Z;%nn;
@@ -764,14 +764,14 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <span class="fa fa-table fa-lg fa-fw mr-1"></span>[*table] [ancestors]</a>
     %end;
     <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%access;;m=D;t=T;v=%evar.v;;%if;(evar.image="off")image=off%end;">%nn;
+      href="%prefix_base_password;%access;;m=D;t=T;v=%evar.v;;%if;(evar.image="off")image=off%end;">%nn;
       <span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*descendants tree]%nn;
     </a>
     <div class="input-group mx-2 mb-1">
       %if;(evar.v>=1)
         <a role="button" class="btn pl-3"%sp;
           title="[*delete] 1 [generation/generations]0"%sp;
-          href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+          href="%prefix_base_password;%nn;
                 %foreach;env_binding;
                   %if;(env.key="v")v=%expr(evar.v-1);%nn;
                   %else;%env.key=%env.val;;%nn;
@@ -780,7 +780,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       %end;
       <a role="button" class="btn pl-2"%sp;
         title="[*add] 1 [generation/generations]0"%sp;
-        href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+        href="%prefix_base_password;%nn;
               %foreach;env_binding;
                 %if;(env.key="v")v=%expr(evar.v+1);%nn;
                 %else;%env.key=%env.val;;%nn;
@@ -793,7 +793,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   </div>
   <div class="d-flex">
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-      href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+      href="%prefix_base_password;%nn;
             %foreach;env_binding;
               %if;(env.key!="image")%env.key=%env.val;;%end;
             %end;
@@ -804,7 +804,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %if;(evar.image!="off")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
         title="%if;(evar.px="120")60%elseif;(evar.px!="")120%else;90%end; px"%sp;
-        href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+        href="%prefix_base_password;%nn;
                %foreach;env_binding;
                  %if;(env.key!="px")%env.key=%env.val;;%end;%nn;
                %end;
@@ -815,7 +815,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
        title="Small arrow in corner shows existence of note or source."%sp;
-       href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+       href="%prefix_base_password;%nn;
              %foreach;env_binding;
                %if;(env.key!="ns")%env.key=%env.val;;%end;%nn;
              %end;
@@ -827,7 +827,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %if;(evar.cgl="" or evar.cgl!="on")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
         title="Cancel all URL links"%sp;
-        href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+        href="%prefix_base_password;%nn;
               %foreach;env_binding;
                 %env.key=%env.val;;%nn;
               %end;cgl=on;">%nn;
@@ -836,7 +836,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
     %if;(evar.marr="on" or evar.marr_place="on" or evar.marr_date="on")
       <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-         href="%if;(not cgi)%base.name;_%if;(wizard)w%elseif;(friend)f%end;%end;?%if;(evar.b!="")b=%evar.b;;%end;%nn;
+         href="%prefix_base_password;%nn;
                %foreach;env_binding;
                  %if;(env.key="t")t=%if;(evar.t="H")I%elseif;(evar.t="I")H%end;;%nn;
                  %else;%env.key=%env.val;;%end;%nn;

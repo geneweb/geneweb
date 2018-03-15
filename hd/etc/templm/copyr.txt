@@ -34,7 +34,7 @@
 %define;language_link()
   %for;i;1;30;
     %let;l1;%apply;lang(i)%in;
-    <a class="dropdown-item" href="%prefix_base;lang=%l1;;templ=%evar.templ;;%suffix;">%l1; %apply;language_name(l1)</a>
+    <a class="dropdown-item" href="%prefix_base_password;lang=%l1;;templ=%evar.templ;;%suffix;">%l1; %apply;language_name(l1)</a>
   %end;
 %end;
 
