@@ -35,6 +35,7 @@ value string_of_ctime : config -> string;
 
 value commd : config -> string;
 value prefix_base : config -> string;
+value prefix_base_password : config -> string;
 value code_varenv : string -> string;
 value decode_varenv : string -> string;
 value hidden_env : config -> unit;

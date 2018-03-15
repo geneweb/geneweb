@@ -421,6 +421,16 @@ value prefix_base conf =
     conf.command ^ "?"
 ;
 
+value prefix_base_password conf =
+  if conf.b_arg_for_basename then
+    if conf.cgi_passwd = "" then
+      conf.command ^ "?b=" ^ conf.bname ^ ";"
+    else
+      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ ";"
+  else
+    conf.command ^ "?"
+;
+
 value code_varenv = Wserver.encode;
 value decode_varenv = Wserver.decode;
 

@@ -750,6 +750,7 @@ and eval_simple_variable conf =
   | "nn" -> ""
   | "prefix" -> Util.commd conf
   | "prefix_base" -> Util.prefix_base conf
+  | "prefix_base_password" -> Util.prefix_base_password conf
   | "prefix_no_iz" ->
       let henv =
         List.fold_left

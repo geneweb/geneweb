@@ -1279,6 +1279,7 @@ value make_conf from_addr (addr, request) script_name contents env = do {
          try List.assoc "no_note_for_visitor" base_env = "yes" with
          [ Not_found -> False ];
      bname = base_file; env = env; senv = [];
+     cgi_passwd = ar.ar_passwd;
      henv =
        (if not Wserver.cgi.val then []
         else if ar.ar_passwd = "" then [("b", base_file)]
