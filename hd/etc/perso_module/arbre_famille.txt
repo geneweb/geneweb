@@ -106,10 +106,6 @@
   %end;
 %end;
 
-%define;on_side(xx)
-  [on %s's side:::xx]
-%end;
-
 %define;addpar(xx,yy)
   %if;("xx"="spouse")<div class="col-4 p-2"></div>%end;
     <div class="%if;("xx"="spouse" or "xx"="" or "xx"="ancestor")col-6 mx-1
@@ -454,7 +450,7 @@
                 %else;
                   %apply;in_full(count,1) [half-brothers/half-sisters/half-siblings]2
                 %end;
-                %apply;on_side%with;%father.first_name; [and] %father.spouse;%end;
+                %apply;on_side%with;%father.first_name; [with] %father.spouse;%end;
               %end;
             </div>
           %end;
@@ -500,7 +496,7 @@
                 %else;
                   %apply;in_full(count,1) [half-brothers/half-sisters/half-siblings]2
                 %end; 
-                %apply;on_side%with;%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; [and] %mother.spouse;%end;
+                %apply;on_side%with;%if;(mother.public_name!="")%mother.public_name;%else;%mother.first_name;%end; [with] %mother.spouse;%end;
               </div>
             %end;
           %end;
@@ -715,7 +711,7 @@
                   %else;
                     %apply;in_full(count,1) [a half sibling-in-law/half siblings-in-law]1
                   %end;
-                  %apply;on_side%with;%spfathfn; [and] %spouse;%end;
+                  %apply;on_side%with;%spfathfn; [with] %spouse;%end;
                 %end;
               %end;
             </div>
@@ -762,7 +758,7 @@
                     %else;
                       %apply;in_full(count,1) [a half sibling-in-law/half siblings-in-law]1
                     %end;
-                    %apply;on_side%with;%spmothfn; [and] %spouse;%end;
+                    %apply;on_side%with;%spmothfn; [with] %spouse;%end;
                   %end;
                 </div>
               %end;
