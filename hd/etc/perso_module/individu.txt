@@ -151,10 +151,6 @@
   %end;
 %end;
 
-%define;on_side(xx)
-  [on %s's side:::xx]
-%end;
-
 %define;border()
   <div class="w-50 border border-dark border-left-0 border-top-0 border-bottom-0">&#8203;</div>
 %end;
