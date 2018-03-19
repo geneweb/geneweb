@@ -202,10 +202,10 @@
         %if;are_divorced;, [divorced]0%divorce_date;%end;
         %if;are_separated;, [separated]0
           %foreach;event;
-            %if;(event.name=[separate event]0) %event.date;.%end;
+            %if;(event.name=[separate event]0)%event.date;%end;
           %end;
-        %end;
-        %if;has_children;,%sp;[having as children]0[:]
+        %end;%nn;
+        %if;has_children;, [having as children]0[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
           <ul>
@@ -449,10 +449,10 @@
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
         %if;are_separated;, [separated]0
           %foreach;event;
-            %if;(event.name=[separate event]0) %event.date;.%end;
+            %if;(event.name=[separate event]0)%event.date;%end;
           %end;
-        %end;
-        %if;has_children;%sp;[having as children]0[:]
+        %end;%nn;
+        %if;has_children;, [having as children]0[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
           <ul>
@@ -512,10 +512,10 @@
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
         %if;are_separated;, [separated]0
           %foreach;event;
-            %if;(event.name=[separate event]0) %event.date;.%end;
+            %if;(event.name=[separate event]0)%event.date;%end;
           %end;
-        %end;
-        %if;has_children;%sp;[having as children]0[:]
+        %end;%nn;
+        %if;has_children;, [having as children]0[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
           <ul>
@@ -618,7 +618,7 @@
         %end;
         %if;has_children;
           %nl;
-          [having as children]0
+          , [having as children]0[:]
           <ul>
             %foreach;child;
               %apply;li_SDC("child")
@@ -650,7 +650,7 @@
                     <em>&nbsp;%apply;long_married_f("child", "lower")</em>
                     %apply;short_display_person_f("spouse")%nn;
                     %if;are_divorced; [divorced]0%divorce_date;%end;
-                    %if;are_separated; [separated]0%end;
+                    %if;are_separated; [separated]0%end;%nn;
                     %if;(nb_children!=0)
                       &nbsp;[having as children]0
                       %if;(child.has_image and family_cnt=1)</td></tr></table>%end;%nl;
@@ -673,7 +673,7 @@
                                     &nbsp;[having as children]0[:]
                                     <div style="font-size: 90%%">%nn;
                                       %foreach;child;
-                                        %if;(child_cnt!=1) , %end;
+                                        %if;(child_cnt!=1), %end;
                                           %apply;short_display_person_f("child")
                                       %end;
                                     </div>
