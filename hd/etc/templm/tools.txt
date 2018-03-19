@@ -46,6 +46,10 @@
 %let;l_on;onclick="this.focus()" onkeydown="if (event.keyCode == 13) javascript:document.tools.submit();"%in;
 %let;l_emaxv;%if;(evar.t != "T")%evar.maxv;%elseif;(bvar.max_anc_tree = "")7%else;%bvar.max_anc_tree;%end;%in;
 
+%define;on_side(xx)
+  [*on %s's side:::xx]
+%end;
+
 %define;checkbox(cc,xx,yy,uu)
   <label title="uu"> cc<input type="checkbox" name="xx" value="on" %l_on1; %l_on;
   %if;(evar.xx = "on") checked="checked"%end;%/>yy</label>
