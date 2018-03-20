@@ -1,4 +1,4 @@
-<!-- $Id: perso_module/unions.txt v 7.00 20/11/2016 06:10:01 hg -->
+<!-- $Id: perso_module/unions.txt v 7.00 19/03/2018 07:46:01 hg -->
 %( op_m=1 simple: name %)
 %( op_m=2 photos: simple with photo %)
 %( op_m=3 evolved: spouse parents and children's spouse %)
@@ -182,18 +182,18 @@
             %apply;short_display_person("witness")
           %end;
           %if;(not cancel_links)
-            <a %apply;relations_tree(index)>
-              <img class="ml-1 mb-1" src="%image_prefix;/gui_create.png" height="16" alt="tree"/>
+            <a %apply;relations_tree(index)>%nn;
+              <img class="ml-1 mb-1" src="%image_prefix;/gui_create.png" height="16" alt="tree"/>%nn;
             </a>%nn;
           %else;
-            <img class="ml-1 mb-1" src="%image_prefix;/gui_create.png" height="16" alt="tree"/>
+            <img class="ml-1 mb-1" src="%image_prefix;/gui_create.png" height="16" alt="tree"/>%nn;
           %end;
         %end;%nn;
         %apply;init_count(prev_count)
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
           %if;(not cancel_links)
-            <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count">
-              <sup>%count;</sup>
+            <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count">%nn;
+              <sup>%count;</sup>%nn;
             </a>%nn;
           %else;
             <sup>%count;</sup>
@@ -251,7 +251,7 @@
           <sup>%count;</sup>%nn;
         </a>%nn;
       %else;
-        <sup>%count;</sup>
+        <sup>%count;</sup>%nn;
       %end;
     %end;
     %if;(count2=0)
@@ -281,16 +281,16 @@
       <div class="d-flex justify-content-start mt-1">
         %if;spouse.has_image;
           %if;(not cancel_links)
-            <a href="%spouse.image_url;" class="align-self-start" target="_blank">
+            <a href="%spouse.image_url;" class="align-self-start" target="_blank">%nn;
               <img class="big_image fade_image mx-1 rounded" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)"%/>%nn;
-            </a>
+            </a>%nn;
           %else;
             <img class="big_image fade_image mx-1 rounded align-self-start" src="%spouse.image_url;" alt="[image/images]0" title="%spouse; ([spouse/spouses]0)"%/>%nn;
           %end;
         %elseif;(bvar.default_image="yes")
-          <img class="align-self-start mx-1 my-4" src="%image_prefix;/img_unknown_%if;(spouse.is_female)wo%elseif;(spouse.is_male)%else;u_%end;man.png" alt="[missing image]"%/>
+          <img class="align-self-start mx-1 my-4" src="%image_prefix;/img_unknown_%if;(spouse.is_female)wo%elseif;(spouse.is_male)%else;u_%end;man.png" alt="[missing image]"%/>%nn;
         %else;
-          <div class="big_image noimage rounded align-text-center display-1 text-center text-muted px-5 mx-2 pt-1 pb-4">?</div>
+          <div class="big_image noimage rounded align-text-center display-1 text-center text-muted px-5 mx-2 pt-1 pb-4">?</div>%nn;
         %end;
         <div class="flex-column">
           %(<div class="ml-2 mr-1">
@@ -314,18 +314,18 @@
                   <div class="d-inline-flex col %if;(parent.is_male)mb-1%end; px-1">
                     %if;parent.has_image;
                       %if;(not cancel_links)
-                        <a href="%parent.image_url;" class="align-self-center" target="_blank">
+                        <a href="%parent.image_url;" class="align-self-center" target="_blank">%nn;
                           <img class="small_image fade_image rounded align-self-center" src="%parent.image_url;"
-                            alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)"%/>
-                        </a>
+                            alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)"%/>%nn;
+                        </a>%nn;
                       %else;
                         <img class="small_image fade_image rounded align-self-center" src="%parent.image_url;"
-                         alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)"%/>
+                         alt="[image/images]0 %if;(parent.is_male)[father/mother]0%else;[father/mother]1 %end;" title="%parent; (%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;)"%/>%nn;
                       %end;
                     %elseif;(bvar.default_image="yes")
-                      <img class="small_image rounded align-self-center" src="%image_prefix;/img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]" title="%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;"%/>
+                      <img class="small_image rounded align-self-center" src="%image_prefix;/img_unknown_%if;(parent.is_female)wo%elseif;(parent.is_male)%else;u_%end;man.png" alt="[missing image]" title="%if;(parent.is_male)[father-in-law/mother-in-law]0%else;[father-in-law/mother-in-law]1%end;"%/>%nn;
                     %else;
-                      <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
+                      <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>%nn;
                     %end;
                     <div class="ml-2 align-self-center">
                       %apply;short_display_person_tree("parent")<br>
@@ -350,17 +350,17 @@
               <div class="d-inline-flex flex-row  mt-1">
                 %if;child.has_image;
                   %if;(not cancel_links)
-                    <a href="%child.image_url;" class="align-self-center" target="_blank">
+                    <a href="%child.image_url;" class="align-self-center" target="_blank">%nn;
                       <img class="small_image fade_image rounded ml-2" src="%child.image_url;" alt="[image/images]0" 
                         title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)"%/>%nn;
-                    </a>
+                    </a>%nn;
                   %else;
                     <img class="small_image fade_image rounded ml-2 align-self-center" src="%child.image_url;" alt="[image/images]0" 
                       title="%count1;. %child; (%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;)"%/>%nn;
                   %end;
                 %elseif;(bvar.default_image="yes")
                   <img class="small_image align-self-center rounded ml-2" src="%image_prefix;/img_unknown_%if;(is_female)wo%elseif;(is_male)%else;u_%end;man.png" alt="[missing image]"
-                    title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;"%/>
+                    title="%if;child.is_male;[son/daughter/child]0%elseif;child.is_female;[son/daughter/child]1%else;[son/daughter/child]2%end;"%/>%nn;
                 %else;
                   <span class="small_image noimage align-self-center rounded display-3 text-center text-muted ml-2 pb-2">?</span>
                 %end;
@@ -618,7 +618,7 @@
         %end;
         %if;has_children;
           %nl;
-          , [having as children]0[:]
+          [having as children]0[:]
           <ul>
             %foreach;child;
               %apply;li_SDC("child")
