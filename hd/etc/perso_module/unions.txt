@@ -192,7 +192,7 @@
         %apply;init_count(prev_count)
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
           %if;(not cancel_links)
-            <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count">%nn;
+            <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count">%nn;
               <sup>%count;</sup>%nn;
             </a>%nn;
           %else;
@@ -247,7 +247,7 @@
     %end;
     %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
       %if;(not cancel_links)
-        <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[see] [note/notes]0 %count">%nn;
+        <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[see] [note/notes]0 %count">%nn;
           <sup>%count;</sup>%nn;
         </a>%nn;
       %else;
@@ -444,7 +444,7 @@
           %end;)%nn;
         %end;
         %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
-          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
+          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;%nn;
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
         %if;are_separated;, [separated]0
@@ -504,17 +504,17 @@
           %foreach;witness;
             %if;not is_first;, %end;
             %apply;short_display_person("witness")
-          %end;)
-        %end;
-        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
-          <a class="ml-1" href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
+          %end;)%nn;
+        %end;%nn;
+        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)%nn;
+          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
         %end;
         %if;are_divorced;, [divorced]0%divorce_date;%sp;%end;
         %if;are_separated;, [separated]0
           %foreach;event;
             %if;(event.name=[separate event]0)%event.date;%end;
           %end;
-        %end;%nn;
+        %end;
         %if;has_children;, [having as children]0[:]
           %( On sauvegarde l'ancienne valeur de count %)
           %let;prev_count;%count;%in;
