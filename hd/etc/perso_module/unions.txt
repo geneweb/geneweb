@@ -468,8 +468,8 @@
                     %if;(family_cnt!=1)
                       <img width="13" height="13"%sp; src="%image_prefix;/1pixel.png" alt="1px"%/>%sp;
                       <em>%child;%child.title;%child.dates;</em>
-                    %end;%sp;
-                    %sp;%apply;loc_long_married("child")%sp;
+                    %end;%nn;
+                    , %apply;loc_long_married("child")%sp;
                     %apply;short_display_person("spouse")<br%/>
                   %end;
                 %end;
@@ -528,10 +528,10 @@
                       <img width="13" height="13" src="%image_prefix;/1pixel.png" alt="1px"/>
                       <em>%child;%child.title;%child.dates;</em>%nn;
                     %end;
-                    <em>&nbsp;%apply;loc_long_married("child")</em>
+                    <em>, %apply;loc_long_married("child")</em>
                     %apply;short_display_person("spouse")
                     %if;(nb_children!=0)
-                      %sp;[having as children]0[:]
+                      , [having as children]0[:]
                       <div style="font-size: 90%%">
                         <ul>
                           %foreach;child;
@@ -581,7 +581,9 @@
 
 %elseif;(op_m=5 and has_families)
   <ul>
+    %reset_count;
     %foreach;family;
+      %incr_count;
       %apply;li_SD("spouse")
         %if;spouse.has_image;
           <table style="border-width:%border;">
@@ -609,13 +611,17 @@
             %apply;short_display_person_f("spouse.mother"))</em>%nn;
           %end;
         </span>%nn;
+        %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)%nn;
+          <a href="#note-wed-%count;" id="wed-callnote-%count;" title="[*see] [note/notes]0 %count"><sup>%count;</sup></a>%nn;
+        %end;
+
         %if;are_divorced;, [divorced]0%divorce_date;%end;
         %if;are_separated;, [separated]0%end;
         %if;spouse.has_image;
               </td>
             </tr>
           </table>
-        %end;
+        %end;%nn;
         %if;has_children;
           %nl;
           [having as children]0[:]
