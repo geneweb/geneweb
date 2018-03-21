@@ -877,15 +877,20 @@
   %lazy_force;
   %if;(ancestor.same = "")%incr_count;%end;
 %( Sosa %)
-  <td class="align-middle text-center table_big_cell"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
+  <td class="align-middle text-center table_big_cell%if;(ancestor.has_parents) text-alert%end;"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
     %if;(ancestor.anc_sosa!=1)
-      <a class="table_big_anchor" title="[*navigation] [with] %ancestor;%nn;
-        %if;(ancestor.occ!="" and ancestor.occ!=0) (%ancestor.occ;)%end;"%sp;
-            href="%prefix_base_password;%ancestor.access;;%nn;
-              %foreach;env_binding;
-                %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;
-                %end;
-              %end;">%nn;
+      %if;ancestor.has_parents;
+        <a class="table_big_anchor" title="[*navigation] [with] %ancestor;%nn;
+          %if;(ancestor.occ!="" and ancestor.occ!=0) (%ancestor.occ;)%end;"%sp;
+              href="%prefix_base_password;%ancestor.access;;%nn;
+                %foreach;env_binding;
+                  %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;
+                  %end;
+                %end;">%nn;
+       %else;
+        <a class="table_big_anchor text-danger" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%nn;
+         href="%prefix_base_password;ip=%ancestor.index;;m=ADD_PAR">%nn;
+       %end;
     %end;
         %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;%nn;
         %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;%nn;
@@ -1298,8 +1303,8 @@
 </h1>
 
 %if;(evar.t = "Z" and not cancel_links)
-  <div class="form-inline">
-    <a role="button" class="btn btn-link my-0 px-0 mb-1"%sp;
+  <div class="d-flex">
+    <a role="button" class="btn btn-link my-0 px-0 mb-1 ml-2"%sp;
       href="%prefix_base_password;%access;;m=A">
       <i class="fa fa-cog fa-lg fa-fw mr-1"></i>[*options] [ancestors]
     </a>
