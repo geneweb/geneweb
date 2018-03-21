@@ -676,7 +676,7 @@ $(document).ready(function(){
   %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
     [*add::family/families]0
   %elseif;(evar_m = "ADD_PAR")
-    [*add::parents]
+    [*add::parents] %foreach;child;%child.first_name;%if;(child.occ!="").%child.occ;%end; %child.surname;%end;
   %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
     [*modify::family/families]0 # %evar_i;
   %elseif;(evar_m = "MRG_DUP_FAM_Y_N" or evar_m = "MRG_FAM" or
@@ -914,23 +914,25 @@ $(document).ready(function(){
     <div class="col-sm-4">
       <input class="form-control" type="text" name="chxcnt_sn" value="%child.surname;" id="chxcnt_sn" placeholder="%father.surname;">
     </div>
-    <div id="chxcnt_sex_div" class="d-inline-flex">
-      <span class="col-sm-auto col-form-label">[*sex]</span>
-      <div class="col-sm-auto mt-2">
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex="male")checked%end;%/> [M/F]0
-          </label>
-        </div>
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex="neuter")checked%end;%/> ?
-          </label>
-        </div>
-        <div class="form-check form-check-inline">
-          <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex="female")checked%end;%/> [M/F]1
-          </label>
+    <div id="chxcnt_sex_div">
+      <div class="d-inline-flex">
+        <span class="col-sm-auto col-form-label">[*sex]</span>
+        <div class="col-sm-auto mt-2">
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex" value="M" %if;(child.create.sex="male")checked%end;%/> [M/F]0
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex" value="N" %if;(child.create.sex="neuter")checked%end;%/> ?
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input class="form-check-input" type="radio" name="chxcnt_sex" value="F" %if;(child.create.sex="female")checked%end;%/> [M/F]1
+            </label>
+          </div>
         </div>
       </div>
     </div>
