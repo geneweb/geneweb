@@ -24,8 +24,7 @@
       %else;%xxx.first_name;
       %end; <span class="text-nowrap">%xxx.surname;</span>
     </a>
-  %end;
-  <br>%nn;
+  %end;%nn;
   %if;(wizard and not cancel_links)
     <a class="normal_anchor"
       href="%prefix;m=MOD_IND;i=%xxx.index;"
