@@ -77,7 +77,8 @@
 %end;
 
 %(note that p_mod= (b)%bvar.p_mod; or (e)%evar.p_mod;%)
-%if;(evar.p_mod="zz" or (bvar.p_mod="" and evar.p_mod="" and (bvar.perso_module_tplnb="" or bvar.perso_module_tplnb=0)))
+%if;(evar.p_mod="zz" or (bvar.p_mod="zz" and evar.p_mod="") or 
+    (bvar.p_mod="" and evar.p_mod=""))
   %(Statique%)
   %apply;init_cache(3, 2, 2)
   %if;(has_parents and (father.has_parents or mother.has_parents))
@@ -103,36 +104,7 @@
       %let;op_m;1%in;%apply;show_templ("perso_module/relations")
     </div>
   </div>
-%elseif;(bvar.perso_module_tplnb!="" and bvar.perso_module_tplnb>0)
-  %(Dynamique, perso_module_tplnb : %bvar.perso_module_tplnb;<br>%)
-  %reset_count;
-  %for;i;0;bvar.perso_module_tplnb;
-    %apply;init_nb_asc(i)
-  %end;
-  %let;nb_asc;%count;%in
-
-  %reset_count;
-  %for;i;0;bvar.perso_module_tplnb;
-    %apply;init_from_gen_desc(i)
-  %end;
-  %let;from_gen_desc;%count;%in
-
-  %reset_count;
-  %for;i;0;bvar.perso_module_tplnb;
-    %apply;init_nb_desc(i)
-  %end;
-  %let;nb_desc;%count;%in
-
-  %apply;init_cache(nb_asc, from_gen_desc, nb_desc)
-  %reset_count;
-  <div class="row">
-    <div class="col-md-8 offset-md-2 col-xl-6 offset-xl-3">
-      %for;i;0;bvar.perso_module_tplnb;
-        %apply;get_templ(i)
-      %end;
-    </div>
-  </div>
-%elseif;((evar.p_mod!="" and evar.p_mod!="zz") or bvar.p_mod!="")
+%else;
   %(Dynamic %)
   %apply;init_cache(3, 2, 2)
   <div class="mt-2">
@@ -144,8 +116,6 @@
       %end
     %end;
   </div>
-%else;
-%(Nothing %)
 %end;
 
 %if;(evar.opt = "misc")
