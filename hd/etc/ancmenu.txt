@@ -41,6 +41,7 @@ function table_options () {
   $('input[type=checkbox]').prop('checked', false);
 
   /* On ne coche que celle qu'on veut. */
+  $('input[type=checkbox][id=t_num_table]').prop('checked', true);
   $('input[type=checkbox][id=t_birth]').prop('checked', true);
   $('input[type=checkbox][id=t_birth_place]').prop('checked', true);
   $('input[type=checkbox][id=t_marr]').prop('checked', true);
@@ -183,6 +184,10 @@ function no_options () {
       </label>
       <div class="ml-4">
       <p>
+        <label>
+          <input type="checkbox" id="t_num_table" name="num" value="on"%/>
+          [*n° Sosa]
+        </label>
         <label>
           <input type="checkbox" id="t_title" name="title" value="on"%/>
           [*title/titles]0
