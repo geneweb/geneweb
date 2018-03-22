@@ -877,29 +877,31 @@
   %lazy_force;
   %if;(ancestor.same = "")%incr_count;%end;
 %( Sosa %)
-  <td class="align-middle text-center table_big_cell%if;(ancestor.has_parents) text-alert%end;"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
-    %if;(ancestor.anc_sosa!=1)
-      %if;ancestor.has_parents;
-        <a class="table_big_anchor" title="[*navigation] [with] %ancestor;%nn;
-          %if;(ancestor.occ!="" and ancestor.occ!=0) (%ancestor.occ;)%end;"%sp;
-              href="%prefix_base_password;%ancestor.access;;%nn;
-                %foreach;env_binding;
-                  %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;
-                  %end;
-                %end;">%nn;
-       %else;
-        <a class="table_big_anchor text-danger" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%nn;
-         href="%prefix_base_password;ip=%ancestor.index;;m=ADD_PAR">%nn;
-       %end;
-    %end;
-        %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;%nn;
-        %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;%nn;
-        %else;%ancestor.anc_sosa;%nn;
-        %end;
-    %if;(ancestor.anc_sosa!=1)
-      </a>
-    %end;
-  </td>
+  %if;(evar.num="on")
+    <td class="align-middle text-center table_big_cell%if;(ancestor.has_parents) text-alert%end;"%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;>%nn;
+      %if;(ancestor.anc_sosa!=1 and not cancel_links)
+        %if;ancestor.has_parents;
+          <a class="table_big_anchor" title="[*navigation] [with] %ancestor;%nn;
+            %if;(ancestor.occ!="" and ancestor.occ!=0) (%ancestor.occ;)%end;"%sp;
+                href="%prefix_base_password;%ancestor.access;;%nn;
+                  %foreach;env_binding;
+                    %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;
+                    %end;
+                  %end;">%nn;
+         %else;
+          <a class="table_big_anchor text-danger" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%nn;
+           href="%prefix_base_password;ip=%ancestor.index;;m=ADD_PAR">%nn;
+         %end;
+      %end;
+          %if;(evar.sosab = 16)%ancestor.anc_sosa.hexa;%nn;
+          %elseif;(evar.sosab = 8)%ancestor.anc_sosa.octal;%nn;
+          %else;%ancestor.anc_sosa;%nn;
+          %end;
+      %if;(ancestor.anc_sosa!=1 and not cancel_links)
+        </a>
+      %end;
+    </td>
+  %end;
 %( Ancêtre %)
   <td%if;(ancestor.nb_families>1 and (evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")) rowspan="%ancestor.nb_families;"%end;%sp;
       class="align-middle%if;(ancestor.nb_families > 1) border-bottom-0%end;%if;(evar.nowrap="on") text-nowrap%end; pl-2%nn;
