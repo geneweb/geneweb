@@ -1,7 +1,7 @@
 <!-- $Id: perso_module/arbre_descendants v7.00 2017/12/04 20:02:08 hg -->
 %define;display_person(xxx)
   %if;(not cancel_links)
-  <div class="list-group-item" style="zindex:0;">
+  <div class="list-group-item py-0 my-0" style="zindex:0;">
     <a href="%prefix_no_pmod;%xxx.access;;m=D;t=V;%foreach;env_binding;%nn;
         %if;(not (env.key="p" or env.key="n" or env.key="oc" or env.key="m" or env.key="t"))%nn;
           %env.key;=%env.val;;%nn;
