@@ -3499,15 +3499,16 @@ and eval_bool_person_field conf base env (p, p_auth) =
             else loop events ]
   | "has_event" ->
       if p_auth then
-        match p_getenv conf.base_env "display_timeline" with
-        [ Some "no" -> False
-        | Some "yes" -> True
+        let events = events_list conf base p in
+        let nb_fam = Array.length (get_family p) in
+        match p_getenv conf.base_env "has_events" with
+        [ Some "never" -> False
+        | Some "always" -> 
+          if nb_fam > 0 || (List.length events) > 0 then True else False
         | _ ->
             (* Renvoie vrai que si il y a des informations supplémentaires *)
             (* par rapport aux évènements principaux, i.e. témoins (mais   *)
             (* on ne prend pas en compte les notes).                       *)
-            let events = events_list conf base p in
-            let nb_fam = Array.length (get_family p) in
             let rec loop events nb_birth nb_bapt nb_deat nb_buri nb_marr =
               match events with
               [ [] -> False
@@ -5573,7 +5574,8 @@ value print_what_links conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h = do {
-      Wserver.printf "%s: " (capitale (transl conf "linked pages"));
+      Wserver.printf "%s%s " (capitale (transl conf "linked pages"))
+        (Util.transl conf ":");
       if h then Wserver.printf "%s" (simple_person_text conf base p True)
       else
         Wserver.printf "<a href=\"%s%s\">%s</a>" (commd conf)

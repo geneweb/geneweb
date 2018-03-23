@@ -1084,7 +1084,7 @@ value print_dag_links conf base p1 p2 rl =
            let a = pget conf base ip in
            if is_anc then () else Wserver.printf "<li>\n";
            if not is_anc then
-             Wserver.printf "%s:\n" (person_title_text conf base a)
+             Wserver.printf "%s%s\n" (person_title_text conf base a) (Util.transl conf ":")
            else ();
            Wserver.printf "<a href=\"%sm=RL" (commd conf);
            Wserver.printf ";%s" (acces conf base a);
@@ -1513,8 +1513,8 @@ value print_main_relationship conf base long p1 p2 rel =
              get_consang a2 != Adef.fix (-1)
           then
             tag "p" begin
-              Wserver.printf "<em>%s: %s%%</em>"
-                (capitale (transl conf "relationship"))
+              Wserver.printf "<em>%s%s %s%%</em>"
+                (capitale (transl conf "relationship")) (Util.transl conf ":")
                 (string_of_decimal_num conf
                    (round_2_dec
                       (Adef.float_of_fix (Adef.fix_of_float relationship) *.
