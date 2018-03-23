@@ -328,17 +328,16 @@
       var sel = document.getElementById("sel_C");
       var uncles = document.getElementById("uncles");
       var gruncles = document.getElementById("gruncles");
-      var grgruncles = document.getElementById("ggrruncles");
+      var grgruncles = document.getElementById("grgruncles");
       var nephew = document.getElementById("nephew");
       var parcousins = document.getElementById("parcousins");
+      var v2 = document.getElementById("v2");
       if (uncles.selected == true || gruncles.selected == true || grgruncles.selected == true) {
-        document.getElementById("v2").value = "1";
-      }
-      else if (nephew.selected == true || parcousins.selected == true) {
-        document.getElementById("v2").value = "2";
-      }
-      else {
-        document.getElementById("v2").value = "";
+          v2.value = "1";
+      } else if (nephew.selected == true || parcousins.selected == true) {
+          v2.value = "2";
+      } else {
+          v2.value = "";
       }
     }
     %( raccourcis %)
