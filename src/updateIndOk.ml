@@ -847,8 +847,8 @@ value print_conflict conf base p = do {
   in
   tag "ul" begin
     stag "li" begin
-      Wserver.printf "%s: %d.\n" (capitale (transl conf "first free number"))
-        free_n;
+      Wserver.printf "%s%s %d.\n" (capitale (transl conf "first free number"))
+        (Util.transl conf ":") free_n;
       Wserver.printf (fcapitale (ftransl conf "click on \"%s\""))
         (transl conf "create");
       Wserver.printf "%s.\n" (transl conf " to try again with this number");

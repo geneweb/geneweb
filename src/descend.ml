@@ -464,7 +464,8 @@ value display_descendants_with_numbers conf base max_level ancestor =
     print_families conf base marks paths max_level ancestor;
     if total.val > 1 then do {
       html_p conf;
-      Wserver.printf "%s: %d %s" (capitale (transl conf "total")) total.val
+      Wserver.printf "%s%s %d %s" (capitale (transl conf "total"))
+        (Util.transl conf ":") total.val
         (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
       if max_level > 1 then
         Wserver.printf " (%s)" (transl conf "spouses not included")
@@ -1115,8 +1116,8 @@ value display_descendant_with_table conf base max_lev p =
       loop 0 nb_col True [(p, "")] [(p, "")];
     end;
     tag "p" begin
-      Wserver.printf "%s: %d %s"
-        (capitale (transl conf "total"))
+      Wserver.printf "%s%s %d %s"
+        (capitale (transl conf "total")) (Util.transl conf ":")
         nb_pers.val
         (transl_nth conf "person/persons" 1);
     end;

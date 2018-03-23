@@ -1063,8 +1063,9 @@ value print_mod_ok conf base = do {
     print_link_to_welcome conf True;
     tag "p" begin
       (* En attendant mieux ... *)
-      Wserver.printf "%s: %d "
+      Wserver.printf "%s%s %d "
         (capitale (transl conf "modification successful"))
+        (Util.transl conf ":")
         (min nb_pers max_updates);
       if p_getenv conf.base_env "history" = Some "yes" then
         stag "a" "href=\"%sm=HIST;k=20\"" (commd conf) begin

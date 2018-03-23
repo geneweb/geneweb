@@ -304,7 +304,7 @@ value print_cousins conf base p lev1 lev2 =
     tag "p" begin
       if cnt.val >= max_cnt then Wserver.printf "etc...\n"
       else if cnt.val > 1 then
-        Wserver.printf "%s%s %d %s.\n" (capitale (transl conf "total")) 
+        Wserver.printf "%s%s %d %s.\n" (capitale (transl conf "total"))
           (Util.transl conf ":") cnt.val
           (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
       else ();
