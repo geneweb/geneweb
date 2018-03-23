@@ -294,69 +294,6 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
             <a class="nav-link dropdown-toggle %if;(evar.m="R" or (evar.m="C" and evar.t="AN"))active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-link fa-rotate-90"></span></a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="%prefix;m=R;%access;" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship computing]</a>
-              <div class="dropdown-divider"></div>
-              %if;(browsing_with_sosa_ref)
-                %if;(sosa_ref.index != "" and sosa_ref.index != index)
-                  <span class="dropdown-header">[*shortest path] [with]…</span>
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;i=%sosa_ref.index;;m=NG;n=1;t=PN;spouse=on;et=S" title="[*shortest path] [with] %sosa_ref;">%nn;
-                    %sosa_ref; <i>(Sosa 1)</i>%nn;
-                  </a>
-                %end;
-              %end;
-              <span class="dropdown-header">[*relationship by marriage] [with]…</span>
-              %if;(browsing_with_sosa_ref and sosa_ref.index != central_index)
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%sosa_ref.index;;et=M;">%nn;
-                    %sosa_ref; <i>(sosa 1)</i>%nn;
-                </a>
-              %end;
-              %foreach;family;
-                %if;(spouse != "? ?")
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%spouse.index;;et=M;">%nn;
-                      %spouse;
-                      %if;spouse.has_nobility_titles;,%sp;
-                      <em>%spouse.nobility_title;</em>%end;%nn;
-                      <i>([spouse/spouses]0)</i>%nn;
-                  </a>
-                %end;
-              %end;
-              %foreach;relation;
-                %if;has_relation_him;
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_him.index;;et=M;">%nn;
-                      %relation_him;
-                      %if;relation_him.has_nobility_titles;,%sp;
-                      <em>%relation_him.nobility_title;</em>%end;%nn;
-                      <i>(%relation_him.type;)</i>%nn;
-                  </a>
-                %end;
-                %if;has_relation_her;
-                  <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%relation_her.index;;et=M;">%nn;
-                      %relation_her;
-                      %if;relation_her.has_nobility_titles;,%sp;
-                      <em>%relation_her.nobility_title;</em>%end;%nn;
-                      <i>(%relation_her.type;)</i>%nn;
-                  </a>
-                %end;
-              %end;
-              %foreach;related;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%related.index;;et=M;">%nn;
-                    %related;
-                    %if;related.has_nobility_titles;,%sp;
-                    <em>%related.nobility_title;</em>%end;%nn;
-                    <i>(%related.type;)</i>%nn;
-                </a>
-              %end;
-              %foreach;event_witness_relation;
-                <a class="dropdown-item ml-1" href="%prefix;em=R;%acc;;m=NG;n=;t=N;select=%event_witness_relation.person.index;;et=M;">%nn;
-                    %event_witness_relation.person;%nn;
-                    <i>([witness/witnesses]0)</i>%nn;
-                </a>
-              %end;
-              %if;(has_parents and (father.has_siblings or mother.has_siblings))
-                  <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=2;v2=1">[*uncles and aunts]</a>
-              %end;
-              %if;has_nephews_or_nieces;
-                <a class="dropdown-item ml-1" href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
-              %end;
               %if;(died = "" and (wizard or friend))
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;;m=C;t=AN"><span class="fa fa-birthday-cake fa-fw"></span> [*family birthday]</a>

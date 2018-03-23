@@ -166,24 +166,34 @@
             </label>
             <div id="rel_cousin_content">
               <select id="sel_C" class="form-control" name="v1" onfocus="document.getElementById('radio_C').checked=true; main()" onchange="main()">
-                <option value = "0" selected = "selected">--</option>
+                %if;has_siblings;
+                  <option id="siblings" value="1">[*siblings]</option>
+                %end;
+                %if;(father.has_siblings or mother.has_siblings)
+                  <option id="uncles" value="2">[*uncles and aunts]</option>
+                %end;
+                %if;(father.father.has_siblings or mother.father.has_siblings or father.mother.has_siblings or mother.mother.has_siblings)
+                  <option id="gruncles" value="3">[*siblings of the grandparents]0</option>
+                %end;
+                <option id="grgruncles" value="4">[*siblings of the great-grandparents]0</option>
+                %if;has_nephews_or_nieces;
+                  <option id="nephew" value="1">[*nephews and nieces]</option>
+                %end;
+                <option id="parcousins" value="3">Cousins des parents (oncles/tantes à la mode de Bretagne)</option>
+                <option value="0" selected>--</option>
                 %foreach;cousin_level;
+                  %if;(level!="0" and level!="1")%level;
                   <option value="%level;">%nn;
-                    %if;(level = 1)[*siblings]%nn;
-                    %elseif;(level = 2)[*cousins]%nn;
-                    %elseif;(level = 3)[*2nd cousins]%nn;
-                    %elseif;(level = 4)[*3rd cousins]%nn;
+                    %if;(level=2)[*cousins]%nn;
+                    %elseif;(level=3)[*2nd cousins]%nn;
+                    %elseif;(level=4)[*3rd cousins]%nn;
                     %else;
                       %apply;nth_cousins%with;
                         %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
                       %end;
                     %end;
                   </option>
-                %end;
-                %( Attention, il faut que ces deux options soient bien les dernières %)
-                <option id="uncle" value="2">[*uncles and aunts]</option>
-                %if;has_nephews_or_nieces;
-                  <option id="nephew" value="1">[*nephews and nieces]</option>
+                  %end;
                 %end;
               </select>
               <input type="hidden" id="v2" name="v2" value=""/>
@@ -232,15 +242,15 @@
               <div class="input-group-addon">px</div>
             </div>
           </div>
-          <span class="ml-1">[*color][:]</span>
-            <div class="form-check form-check-inline">
-            <label class="form-check-label"><input type="radio" class="form-check-input" name="color" value="" checked%/> 0</label>
-            <label class="form-check-label bg1"><input type="radio" class="form-check-input" name="color" value="bg1"%/> 1</label>
-            <label class="form-check-label bg2"><input type="radio" class="form-check-input" name="color" value="bg2"%/> 2</label>
-            <label class="form-check-label bg3"><input type="radio" class="form-check-input" name="color" value="bg3"%/> 3</label>
-            <label class="form-check-label bg4"><input type="radio" class="form-check-input" name="color" value="bg4"%/> 4</label>
-            <label class="form-check-label bg5"><input type="radio" class="form-check-input" name="color" value="bg5"%/> 5</label>
-            <label class="form-check-label bg6"><input type="radio" class="form-check-input" name="color" value="bg6"%/> 6</label>
+          <span>[*color][:]</span>
+          <div class="form-check form-check-inline ml-1">
+            <label class="form-check-label"><input type="radio" class="form-check-input mx-1" name="color" value="" checked%/>0</label>
+            <label class="form-check-label bg1"><input type="radio" class="form-check-input mx-1" name="color" value="bg1"%/>1</label>
+            <label class="form-check-label bg2"><input type="radio" class="form-check-input mx-1" name="color" value="bg2"%/>2</label>
+            <label class="form-check-label bg3"><input type="radio" class="form-check-input mx-1" name="color" value="bg3"%/>3</label>
+            <label class="form-check-label bg4"><input type="radio" class="form-check-input mx-1" name="color" value="bg4"%/>4</label>
+            <label class="form-check-label bg5"><input type="radio" class="form-check-input mx-1" name="color" value="bg5"%/>5</label>
+            <label class="form-check-label bg6"><input type="radio" class="form-check-input mx-1" name="color" value="bg6"%/>6</label>
           </div>
         </div>
       </div>
@@ -316,20 +326,17 @@
       hide_mode();
       enable("rel_form_cousin");
       var sel = document.getElementById("sel_C");
-      var uncle = document.getElementById("uncle");
-      var nephew = "";
-      if (document.getElementById("nephew")) {
-          nephew = document.getElementById("nephew");
-      }
-      %( On recherche les oncles et tantes %)
-      if (uncle.selected == true) {
+      var uncles = document.getElementById("uncles");
+      var gruncles = document.getElementById("gruncles");
+      var grgruncles = document.getElementById("ggrruncles");
+      var nephew = document.getElementById("nephew");
+      var parcousins = document.getElementById("parcousins");
+      if (uncles.selected == true || gruncles.selected == true || grgruncles.selected == true) {
         document.getElementById("v2").value = "1";
       }
-      %( On recherche les neveux et nièces %)
-      else if (nephew != '' && nephew.selected == true) {
+      else if (nephew.selected == true || parcousins.selected == true) {
         document.getElementById("v2").value = "2";
       }
-      %( On recherche les frères ou cousins %)
       else {
         document.getElementById("v2").value = "";
       }

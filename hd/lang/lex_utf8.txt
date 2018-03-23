@@ -13414,6 +13414,16 @@ sk: strýkovia a tety
 sl: strici in tete
 sv: farbröder-morbröder och fastrar-mostrar
 
+    siblings of the great-grandparents
+en: great-granduncles and great-grandaunts
+fr: arrières-grands-oncles et arrières-grands-tantes
+
+    siblings of the grandparents
+de: Großonkel und Großtanten
+en: granduncles and grandaunts
+fr: grands-oncles et grands-tantes
+it: prozii e prozie
+
     uncheck
 en: uncheck
 fr: décocher
