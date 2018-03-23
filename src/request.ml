@@ -32,8 +32,8 @@ value very_unknown conf =
   match (p_getenv conf.env "n", p_getenv conf.env "p") with
   [ (Some nom, Some prenom) ->
       let title _ =
-        Wserver.printf "%s: \"%s %s\"" (capitale (transl conf "not found"))
-          prenom nom
+        Wserver.printf "%s%s \"%s %s\"" (capitale (transl conf "not found"))
+          (Util.transl conf ":") prenom nom
       in
       do {
         rheader conf title; print_link_to_welcome conf False; trailer conf;
@@ -43,7 +43,8 @@ value very_unknown conf =
 
 value unknown conf n =
   let title _ =
-    Wserver.printf "%s: \"%s\"" (capitale (transl conf "not found")) n
+    Wserver.printf "%s%s \"%s\"" (capitale (transl conf "not found"))
+      (Util.transl conf ":") n
   in
   do {
     rheader conf title; print_link_to_welcome conf False; trailer conf;
