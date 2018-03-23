@@ -187,8 +187,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    (transl_nth conf "child/children" 1)
                    (person_title_text conf base p)
                in
-               Wserver.printf "%s" (capitale (Util.translate_eval s));
-               Wserver.printf ":"
+               Wserver.printf "%s%s" (capitale (Util.translate_eval s)) (Util.transl conf ":")
              }
            }
            else ();
@@ -220,10 +219,11 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
     else ();
     if lev1 > 1 then do {
       Wserver.printf "<li>\n";
-      Wserver.printf "%s:\n"
+      Wserver.printf "%s%s\n"
         (capitale
            (cftransl conf "on %s's side"
               [gen_person_title_text no_reference raw_access conf base a]))
+        (Util.transl conf ":")
     }
     else ();
     let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
@@ -304,7 +304,8 @@ value print_cousins conf base p lev1 lev2 =
     tag "p" begin
       if cnt.val >= max_cnt then Wserver.printf "etc...\n"
       else if cnt.val > 1 then
-        Wserver.printf "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val
+        Wserver.printf "%s%s %d %s.\n" (capitale (transl conf "total")) 
+          (Util.transl conf ":") cnt.val
           (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
       else ();
     end;
