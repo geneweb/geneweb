@@ -46,23 +46,23 @@
 <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;jquery.min.js"></script>
 <script type="text/javascript" src="%if;(cgi)%bvar.static_path;%end;templm/jquery.line.js"></script>
 
-%define;implexc()
+%define;implexc(x0,y0,x1,y1)
   <span style="top:%top;px;left:%left;px;font-family:monospace;">x
     <script type="text/javascript">
       jQuery( document ).ready(function( $ ) {
         $(function() {
-          $('#hi-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.5, zindex:1});
+          $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
         });
       });
     </script>
   </span>
 %end;
 
-%define;implexs()
+%define;implexs(x0,y0,x1,y1)
   <script type="text/javascript">
     jQuery( document ).ready(function( $ ) {
       $(function() {
-        $('#hi-tree1').line(%left1;, %top1;, %left2;, %top2;, {color:"red", stroke:1, opacity:0.5, zindex:1});
+        $('#hi-tree1').line(x0, y0, x1, y1, {color:"red", stroke:1, opacity:0.5, zindex:1});
       });
     });
   </script>
@@ -399,7 +399,7 @@
           %let;bg;%if;(ancestor.same!="")CBFECE;%elseif(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
           %if;(evarso!="on")
             %if;(ancestor.same!="" and evarix="on")
-              %apply;implexc()
+              %apply;implexc(left1, top1, left2, top2)
             %else;
               %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
                 %apply;boxchar("ancestor.", "yy", left, top)
@@ -408,7 +408,7 @@
               %end;
             %end;
           %else;
-            %if;(ancestor.same!="" and evarix="on")%apply;implexs()%end;
+            %if;(ancestor.same!="" and evarix="on")%apply;implexs(left1, top1, left2, top2)%end;
               %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
                 %apply;boxsosa("ancestor.", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
               %else;
@@ -452,7 +452,7 @@
         %let;bg;%if;(ancestor.same!="")CBFECE;%elseif(evarcpl="on")%apply;bg(level-1)%else;%apply;bg(level)%end;%in;
         %if;(evarso!="on")
           %if;(ancestor.same!="" and evarix="on")
-            %apply;implexc()
+            %apply;implexc(left1, top1, left2, top2)
           %else;
             %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
               %apply;boxchar("ancestor.", "yy", left, top)
@@ -461,7 +461,7 @@
             %end;
           %end;
         %else;
-          %if;(ancestor.same!="" and evarix="on")%apply;implexs()%end;
+          %if;(ancestor.same!="" and evarix="on")%apply;implexs(left1, top1, left2, top2)%end;
             %if;(ancestor.anc_sosa.v!="" or ancestor.anc_sosa.v=1)
               %apply;boxsosa("ancestor.", ancestor.anc_sosa.v, ancestor.has_parents, bg, left, top)
             %else;
