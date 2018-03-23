@@ -112,19 +112,11 @@
     </form>
     <span class="r_btn">
     <a href="%if;(bvar.hide_advanced_request != "yes")%prefix;m=H;v=advanced%else;#%end;" 
-    title="[*advanced request]%nl;%nl;[*select]%nl;%if;(evar.templ != "")%evar.templ;%else;templ%end;">%if;(bvar.hide_advanced_request != "yes")🔍%else;templ%end;</a>
+    title="[*advanced request]0%nl;%nl;[*select]%nl;%if;(evar.templ != "")%evar.templ;%else;templ%end;">%if;(bvar.hide_advanced_request != "yes")🔍%else;templ%end;</a>
     %if;(evar.digest = "")
       <span class="s_menu" id="tpl">
         <a href="%prefix_no_all;templ=;%suffix;" %apply;bg("")>default</a>
-        <a href="%prefix_no_all;templ=templ502;%suffix;" %apply;bg("templ502")>templ502</a>
-        <a href="%prefix_no_all;templ=templa;%suffix;" %apply;bg("templa")>templa</a>
-        <a href="%prefix_no_all;templ=templb;%suffix;" %apply;bg("templb")>templb</a>
-        <a href="%prefix_no_all;templ=templc;%suffix;" %apply;bg("templc")>templc</a>
-        <a href="%prefix_no_all;templ=templd;%suffix;" %apply;bg("templd")>templd</a>
-        <a href="%prefix_no_all;templ=templf;%suffix;" %apply;bg("templf")>templf</a>
-        <a href="%prefix_no_all;templ=templh;%suffix;" %apply;bg("templh")>templh</a>
-        %( <a href="%prefix_no_all;templ=templ_cpl;%suffix;" %apply;bg("templ_cpl")>templ_cpl</a> %)
-        <a href="%prefix_no_all;templ=templm;%suffix;" %apply;bg("templm")>templm</a>
+        %( <a href="%prefix_no_all;templ=templa;%suffix;" %apply;bg("templa")>templa</a> %)
         %if;(wizard or bvar.wizard_passwd = "")
           <small><a href="%prefix;m=H;v=doc_templm">doc templm</a></small>
         %end;
