@@ -283,7 +283,7 @@ value print_cousins conf base p lev1 lev2 =
     else if lev1 = 1 && lev2 = 2 then
       let s =
         transl_a_of_gr_eq_gen_lev conf
-          (transl conf "nephews and nieces") (txt_fun raw_access conf base p)
+          (transl_nth conf "a nephew/a niece" 4) (txt_fun raw_access conf base p)
       in
       Wserver.printf "%s" (capitale (Util.translate_eval s))
     else
