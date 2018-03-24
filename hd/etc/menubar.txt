@@ -305,4 +305,5 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
     </nav>
   %import;home
   </div>
+  %if;(evar.m="C" and not cancel_links)%import;cousins_tools;%end;
 %end;

@@ -38,6 +38,11 @@ value children_of base u =
     (Array.to_list (get_family u)) []
 ;
 
+value children_of_fam base u ifam =
+  let des = foi base ifam in
+  Array.to_list (get_children des)
+;
+
 value siblings_by conf base iparent ip =
   let list = children_of base (pget conf base iparent) in
   except ip list
@@ -94,26 +99,26 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   let reference _ _ p s =
     if is_hidden p then s
     else
-    "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p1 ^ ";b1=" ^
-      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ ";" ^
-      acces_n conf base "2" p2 ^ ";b2=" ^
-      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ ";spouse=" ^
-      (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^
-      ";image=" ^ (if p_getenv conf.env "image" = Some "off" then "off" else "") ^
-      ";bd=" ^ (match p_getenv conf.env "bd" with [Some x -> x | None -> "0"]) ^
+    "<a href=\"" ^ commd conf ^ "m=RL&" ^ acces_n conf base "1" p1 ^ "&b1=" ^
+      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ "&" ^
+      acces_n conf base "2" p2 ^ "&b2=" ^
+      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^
+      (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "") ^
+      (if p_getenv conf.env "image" = Some "off" then "&image=off" else "") ^
+      "&bd=" ^ (match p_getenv conf.env "bd" with [Some x -> x | None -> "0"]) ^
       "\">" ^ s ^ "</a>"
   in
   let reference_sp p3 _ _ p s =
     if is_hidden p then s
     else
-    "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p1 ^ ";b1=" ^
-      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ ";" ^
-      acces_n conf base "2" p2 ^ ";b2=" ^
-      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ ";" ^
-      acces_n conf base "4" p3 ^ ";spouse=" ^
-      (if p_getenv conf.env "spouse" = Some "on" then "on" else "") ^
-      ";image=" ^ (if p_getenv conf.env "image" = Some "off" then "off" else "") ^
-      ";bd=" ^ (match p_getenv conf.env "bd" with [Some x -> x | None -> "0"]) ^
+    "<a href=\"" ^ commd conf ^ "m=RL&" ^ acces_n conf base "1" p1 ^ "&b1=" ^
+      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ "&" ^
+      acces_n conf base "2" p2 ^ "&b2=" ^
+      Sosa.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ "&" ^
+      acces_n conf base "4" p3 ^
+      (if p_getenv conf.env "spouse" = Some "on" then "&spouse=on" else "") ^
+      (if p_getenv conf.env "image" = Some "off" then "&image=off" else "") ^
+      "&bd=" ^ (match p_getenv conf.env "bd" with [Some x -> x | None -> "0"]) ^
       "\">" ^ s ^ "</a>"
   in
   let print_nospouse _ =
@@ -168,16 +173,35 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
 
 value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
   if lev > 0 && cnt.val < max_cnt then do {
-    if lev <= 2 then Wserver.printf "<ul>\n" else ();
+    Wserver.printf "<ul>\n";
     List.iter
       (fun (ip, ia_asex, rev_br) ->
          let p = pget conf base ip in
+         (* détecter l'époux de p, parent des enfants qui seront listés *)
+         let get_spouse base iper ifam =
+         let f = foi base ifam in
+           if iper = get_father f then poi base (get_mother f)
+           else poi base (get_father f)
+         in
+         (* if more than one spouse, this will be split on multiple lines *)
+         (* we ignore the case where two spouses, but only one with descendants! *)
+         let with_sp =
+          if (Array.length (get_family p)) = 1 then
+            let sp = get_spouse base ip (get_family p).(0) in
+            Printf.sprintf " %s %s" (Util.transl conf "with") (person_title_text conf base sp)
+          else ""
+         in
          let br = List.rev [(ip, get_sex p) :: rev_br] in
          let is_valid_rel = br_inter_is_empty ini_br br in
          if is_valid_rel && cnt.val < max_cnt && has_desc_lev conf base lev p
          then do {
+           if lev > 2 then Wserver.printf "<li> %s %s %s %s%s%s\n"
+              (capitale (Util.transl_nth conf "child/children" 1)) (Util.transl conf "of")
+              (person_title_text conf base p) 
+              with_sp (Util.transl conf ":") (if with_sp = "" then "<br>\n" else "")
+           else ();
            if lev <= 2 then do {
-             Wserver.printf "<li>\n";
+             Wserver.printf "<li>";
              if lev = 1 then do {
                give_access conf base ia_asex ini_p ini_br p br; incr cnt
              }
@@ -187,36 +211,50 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    (transl_nth conf "child/children" 1)
                    (person_title_text conf base p)
                in
-               Wserver.printf "%s%s" (capitale (Util.translate_eval s)) (Util.transl conf ":")
+               Wserver.printf "%s%s%s%s\n" (capitale (Util.translate_eval s)) with_sp 
+                (Util.transl conf ":") (if with_sp = "" then "<br>" else "")
              }
            }
            else ();
-           let children =
-             List.map
-               (fun ip ->
-                  (ip, ia_asex, [(get_key_index p, get_sex p) :: rev_br]))
-               (children_of base p)
-           in
-           print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
-             children;
-           if lev <= 2 then Wserver.printf "</li>\n" else ()
+           (* the function children_of returns *all* the children of ip *)
+            List.iter
+              (fun ifam ->
+                let children =
+                  List.map
+                    (fun ip ->
+                        (ip, ia_asex, [(get_key_index p, get_sex p) :: rev_br]))
+                    (children_of_fam base p ifam)
+                in
+                let sp = get_spouse base ip ifam in
+                do {
+                  if (Array.length (get_family p)) > 1 && lev >= 2 &&
+                  ((List.length children) > 0) && (has_desc_lev conf base lev sp)
+                  then
+                    Wserver.printf "%s %s%s\n" (Util.transl conf "with") 
+                      (person_title_text conf base sp) (Util.transl conf ":")
+                  else ();
+                  print_descend_upto conf base max_cnt ini_p ini_br (lev - 1) children;
+                }
+              )
+              (Array.to_list (get_family p))
+            ;
+            if lev <= 2 then Wserver.printf "</li>\n" else ()
          }
          else ())
       children;
-    if lev <= 2 then Wserver.printf "</ul>\n" else ()
+    Wserver.printf "</ul>\n"
   }
   else ()
 ;
+
 
 value sibling_has_desc_lev conf base lev (ip, _) =
   has_desc_lev conf base lev (pget conf base ip)
 ;
 
-value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 tips =
+value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
   let sib = siblings conf base (get_key_index a) in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then do {
-    if tips then Util.print_tips_relationship conf
-    else ();
     if lev1 > 1 then do {
       Wserver.printf "<li>\n";
       Wserver.printf "%s%s\n"
@@ -241,19 +279,22 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
   in
   let last_sosa = Sosa.twice first_sosa in
   do {
+    Wserver.printf "<div>\n";
+    Util.print_tips_relationship conf;
+    Wserver.printf "</div>\n";
     if lev1 > 1 then Wserver.printf "<ul>\n" else ();
     let some =
-      loop first_sosa False True where rec loop sosa some print_tips =
+      loop first_sosa False where rec loop sosa some =
         if cnt.val < max_cnt && Sosa.gt last_sosa sosa then
           let some =
             match Util.branch_of_sosa conf base (get_key_index p) sosa with
             [ Some ([(ia, _) :: _] as br) ->
                 print_cousins_side_of conf base max_cnt (pget conf base ia) p
-                  br lev1 lev2 print_tips ||
+                  br lev1 lev2 ||
                 some
             | _ -> some ]
           in
-          loop (Sosa.inc sosa 1) some False
+          loop (Sosa.inc sosa 1) some
         else some
     in
     if some then ()
@@ -261,6 +302,12 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
       Wserver.printf "%s.\n" (capitale (transl conf "no match"));
     if lev1 > 1 then Wserver.printf "</ul>\n" else ()
   }
+;
+
+value include_templ conf name =
+  match Util.open_hed_trl conf name with
+  [ Some ic -> Templ.copy_from_templ conf [] ic (* no env -> problem!! *)
+  | None -> (Wserver.printf "Failed to open: %s.txt" name) ]
 ;
 
 (* HTML main *)
@@ -276,14 +323,26 @@ value print_cousins conf base p lev1 lev2 =
       Wserver.printf "%s" (capitale (Util.translate_eval s))
     else if lev1 = 2 && lev2 = 1 then
       let s =
-        transl_a_of_b conf (transl conf "uncles and aunts")
-          (txt_fun raw_access conf base p)
+        transl_a_of_gr_eq_gen_lev conf 
+          (transl_nth conf "an uncle/an aunt" 4) (txt_fun raw_access conf base p)
+      in
+      Wserver.printf "%s" (capitale (Util.translate_eval s))
+    else if lev1 = 3 && lev2 = 1 then
+      let s =
+        transl_a_of_gr_eq_gen_lev conf 
+          (transl_nth conf "a great-uncle/a great-aunt" 4) (txt_fun raw_access conf base p)
       in
       Wserver.printf "%s" (capitale (Util.translate_eval s))
     else if lev1 = 1 && lev2 = 2 then
       let s =
         transl_a_of_gr_eq_gen_lev conf
           (transl_nth conf "a nephew/a niece" 4) (txt_fun raw_access conf base p)
+      in
+      Wserver.printf "%s" (capitale (Util.translate_eval s))
+    else if lev1 = 1 && lev2 = 3 then
+      let s =
+        transl_a_of_gr_eq_gen_lev conf
+          (transl_nth conf "a great-nephew/a great-niece" 4) (txt_fun raw_access conf base p)
       in
       Wserver.printf "%s" (capitale (Util.translate_eval s))
     else
@@ -296,11 +355,15 @@ value print_cousins conf base p lev1 lev2 =
   in
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
-    tag "h2" begin title False; end;
+    Wserver.printf "<div>\n";
+    (*include_templ conf "cousins_tools";*)
+    tag "h3" begin title False; end;
+    Wserver.printf "</div>\n";
     cnt.val := 0;
     (* Construction de la table des sosa de la base *)
     let () = Perso.build_sosa_ht conf base in
     print_cousins_lev conf base max_cnt p lev1 lev2;
+    Wserver.printf "<div>\n";
     tag "p" begin
       if cnt.val >= max_cnt then Wserver.printf "etc...\n"
       else if cnt.val > 1 then
@@ -309,6 +372,7 @@ value print_cousins conf base p lev1 lev2 =
           (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
       else ();
     end;
+    Wserver.printf "</div>\n";
     trailer conf
   }
 ;
