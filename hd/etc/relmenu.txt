@@ -33,7 +33,20 @@
   %if;(alias != "") <em>(%alias;)</em>%end;
   %sp;[and]0...%nn;
 </h1>
-<form name="relationship" method="get" action="%action;">
+%define;ancestor_siblings(lll,ttt)
+  %reset_count;
+  %foreach;ancestor_level;
+    %if;(level=lll)
+      %foreach;ancestor;
+        %if;(ancestor.has_siblings)%incr_count;%end;
+      %end;
+    %end;
+  %end;
+  %if;(count>0)
+    <option id="uncleslll" value="lll">lll. [*ttt]</option>
+  %end;
+%end;
+<form name="relationship" method="submit" action="%action;">
   <div class="row">
     <div class="col-9">
       <div class="row">
@@ -122,7 +135,7 @@
             </div>
           </div>
         </div>
-        <div id="rel_search" class="col-6">
+        <div id="rel_search" class="col mr-4">
           <p>%hidden;</p>
           <div id="rel_form_search" onclick="document.getElementById('radio_R').checked = 'checked'; main();">
             <input type="hidden" name="em" value="R"%/>
@@ -161,38 +174,47 @@
               <input type="hidden" name="i" value="%index;"%/>
             %end;
             <label id="rel_cousin_title">
-              <input type="radio" id="radio_C" name="select" onclick="main()"%/>
+              <input type="radio" id="radio_C" name="select" onclick="main()" value=""%/>
               [*select] [close family][:]<br>
             </label>
             <div id="rel_cousin_content">
               <select id="sel_C" class="form-control" name="v1" onfocus="document.getElementById('radio_C').checked=true; main()" onchange="main()">
                 %if;has_siblings;
-                  <option id="siblings" value="1">[*siblings]</option>
+                  <option id="siblings" value="1">1. [*siblings]</option>
+                %end;
+                %if;has_nephews_or_nieces;
+                  <option id="nephew" value="1">     ↳  [*a nephew/a niece]4</option>
+                  <option id="grnephew" value="1">          ↳  [*a great-nephew/a great-niece]4</option>
                 %end;
                 %if;(father.has_siblings or mother.has_siblings)
-                  <option id="uncles" value="2">[*uncles and aunts]</option>
+                  <option id="uncles" value="2">2. [*uncles and aunts]</option>
                 %end;
-                %if;(father.father.has_siblings or mother.father.has_siblings or father.mother.has_siblings or mother.mother.has_siblings)
-                  <option id="gruncles" value="3">[*siblings of the grandparents]0</option>
-                %end;
-                <option id="grgruncles" value="4">[*siblings of the great-grandparents]0</option>
-                %if;has_nephews_or_nieces;
-                  <option id="nephew" value="1">[*nephews and nieces]</option>
-                %end;
-                <option id="parcousins" value="3">Cousins des parents (oncles/tantes à la mode de Bretagne)</option>
-                <option value="0" selected>--</option>
                 %foreach;cousin_level;
-                  %if;(level!="0" and level!="1")%level;
-                  <option value="%level;">%nn;
-                    %if;(level=2)[*cousins]%nn;
-                    %elseif;(level=3)[*2nd cousins]%nn;
-                    %elseif;(level=4)[*3rd cousins]%nn;
-                    %else;
-                      %apply;nth_cousins%with;
-                        %apply;nth%with;zero/[nth (cousin)]%and;%level;%end;
-                      %end;
-                    %end;
-                  </option>
+                  %if;(level=2)
+                    <option value="2">     ↳  [*cousins]</option>
+                    %( <option id="childcous" value="2">     ↳  [*children of cousins]</option>%)
+                  %end;
+                %end;
+                %apply;ancestor_siblings(3,"siblings of the grandparents")
+                <option id="parcousins" value="3">      ↳  [*cousins of the parents]</option>
+                %foreach;cousin_level;
+                  %if;(level=3)
+                    <option value="3">            ↳ [*2nd cousins]</option>
+                  %end;
+                %end;
+                %apply;ancestor_siblings(4,"siblings of the great-grandparents")
+                <option id="grparcousins" value="4">      ↳  [*cousins of the grandparents]</option>
+                <option disabled>            ↳ </option>
+                %foreach;cousin_level;
+                  %if;(level=4)
+                    <option value="4">                ↳ [*3rd cousins]</option>
+                  %end;
+                %end;
+                %apply;ancestor_siblings(5,"siblings of the great-great-grandparents")
+                <option class="text-uppercase" selected disabled>--</option>
+                %foreach;cousin_level;
+                  %if;(level>4)
+                    <option value="%level;">%level;. %apply;nth_cousins%with;%apply;nth%with;zero/[nth (cousin)]%and;%level;%end;%end;</option>
                   %end;
                 %end;
               </select>
@@ -205,7 +227,7 @@
         </div>
       </div>
     </div>
-    <div class="col-3  mt-3">
+    <div class="col mt-3">
       <div class="row" id="rel_mode">
         <span class="font-weight-bold">[*relationship computing mode][:]</span>
         <div class="ml-2 mt-1">
@@ -238,7 +260,7 @@
           <div class="form-inline d-flex">
             <label class="col-form-label" for="bd">[*border][:]</label>
             <div class="input-group input-group-sm ml-2 mt-1 ">
-              <input type="number" class="form-control form-control-sm" id="bd" name="bd" min="0" max="15" placeholder="0" value="0"/>
+              <input type="number" class="form-control form-control-sm" id="bd" name="bd" min="0" max="15" placeholder="0" value=""/>
               <div class="input-group-addon">px</div>
             </div>
           </div>
@@ -308,10 +330,8 @@
   }
 
   function main() {
-    var s = document.getElementById("radio_R");
-    var c = document.getElementById("radio_C");
     %( recherche individu %)
-    if (s.checked == true) {
+    if (radio_R.checked == true) {
       disable("rel_form_cousin");
       disable("rel_form_shortcut");
       enable("rel_form_search");
@@ -319,24 +339,25 @@
       show_mode();
     }
     %( recherche d'un proche %)
-    else if (c.checked == true) {
+    else if (radio_C.checked == true) {
       disable("rel_form_search");
       disable("rel_form_shortcut");
       disable("rel_mode");
       hide_mode();
       enable("rel_form_cousin");
-      var sel = document.getElementById("sel_C");
-      var uncles = document.getElementById("uncles");
-      var gruncles = document.getElementById("gruncles");
-      var grgruncles = document.getElementById("grgruncles");
-      var nephew = document.getElementById("nephew");
-      var parcousins = document.getElementById("parcousins");
-      var v2 = document.getElementById("v2");
-      if (uncles.selected == true || gruncles.selected == true || grgruncles.selected == true) {
+      if ( uncles!=null && uncles.selected == true ||
+          uncles3!=null && uncles3.selected == true ||
+          uncles4!=null && uncles4.selected == true ||
+          uncles5!=null && uncles5.selected == true ) {
           v2.value = "1";
-      } else if (nephew.selected == true || parcousins.selected == true) {
+      } else if ( nephew!=null && nephew.selected == true ||
+                 parcousins.selected == true ||
+               grparcousins.selected == true ) {
           v2.value = "2";
-      } else {
+      } else if ( grnephew.selected == true ) {
+          v2.value = "3";
+      }
+        else {
           v2.value = "";
       }
     }

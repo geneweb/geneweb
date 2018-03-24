@@ -1186,7 +1186,7 @@ eo: kuzo/kuzino
 es: un primo/una prima
 et: nõbu:g:--o
 fi: serkku:g:--un
-fr: un cousin/une cousine
+fr: un cousin/une cousine/cousins/cousines/cousins et cousines
 he:  בן-דוד/ בת-דוד
 is: systkynabarn
 it: un cugino/una cugina
@@ -1354,13 +1354,13 @@ br: un niz bihan/ur verc'h vihan
 ca: un besnebot/una besneboda
 cs: prasynovec/praneteř
 da: en grandnevø/en grandniece
-de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte
-en: a great-nephew/a great-niece
+de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte/Großneffen/Großnichten/Großneffen und Großnichten
+en: a great-nephew/a great-niece/great-nephew/great-niece/great-nephews and great-nieces
 eo: pranevo/pranevino
 es: un sobrino nieto/una sobrina nieta
 et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
 fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:---tären
-fr: un petit neveu/une petite nièce
+fr: un petit-neveu/une petite-nièce/petits-neveux/petites-nièces/petits-neveux et petites-nièces
 he:   בן האחיין/ בת האחיין
 is: frændi/frænka
 it: un pronipote/una pronipote
@@ -1443,33 +1443,33 @@ en: brothers/sisters/siblings
 fr: frères/sœurs/frères et sœurs
 
     a nephew/a niece
-af: 'n broerskind/'n susterskind
-bg: племенник/племенница
-br: un niz/un nizez
-ca: un nebot/una neboda
-cs: synovec/neteř
-da: en nevø/en niece
-de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte
-en: a nephew/a niece
-eo: nevo/nevino
-es: un sobrino/a sobrina
-et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
-fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:---tären
-fr: un neveu/une nièce
-he:   אחיין/ אחיינית
-is: bróður(systur)sonur/bróður(systur)dóttir
-it: un nipote/una nipote
+af: 'n broerskind/'n susterskind///broers- en susterskinders
+bg: племенник/племенница/племенници/племеннички/племенници и племеннички
+br: un niz/un nizez/nized/nizezed/nized ha nizezed
+ca: un nebot/una neboda/nebots/nebodes/nebots i nebodes
+cs: synovec/neteř/synovci/neteře/synovci a neteře
+da: en nevø/en niece/nevøer/niecer/nevøer og niecer
+de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte/Neffen/Nichten/Neffen und Nichten
+en: a nephew/a niece/nephews/nieces/nephews and nieces
+eo: nevo/nevino/nevoj/nevinoj/nevoj kaj nevinoj
+es: un sobrino/a sobrina/sobrinos/sobrinas/sobrinos y sobrinas
+et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re///venna- ja õelapsed
+fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:---tären///sisarusten lapset
+fr: un neveu/une nièce/neveux/nièces/neveux et nièces
+he:   אחיין/ אחיינית///אחיינים
+is: bróður(systur)sonur/bróður(systur)dóttir///bræðra og systrabörn
+it: un nipote/una nipote/nipoti/nipoti/nipoti
 lv: brāļa/māsas dēls/meita
-nl: een neef/een nicht (oom- of tantezegger)
-no: nevø/niese
-oc: un nebot/una neboda
-pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
-pt: um sobrinho/uma sobrinha
-ro: nepot/nepoata/nepoti
-ru: племянник/племянница
-sk: synovec/neter
-sl: nečak/nečakinja/nečak ali nečakinja
-sv: en nevö/en niece
+nl: een neef/een nicht (oom- of tantezegger)///neven en nichten (oom-, tantezegger)
+no: nevø/niese/nevøer/nieser/nevøer og nieser
+oc: un nebot/una neboda/nebots/nebodas/nebots e nebodas
+pl: bratanek lub siostrzeniec/bratanica lub siostrzenica/bratankowie lub siostrzeńcy/bratanice lub siostrzenice/
+pt: um sobrinho/uma sobrinha/sobrinhos/sobrinhas/sobrinhos e sobrinhas
+ro: nepot/nepoata/nepoti/nepoate/nepoti si nepoate
+ru: племянник/племянница/племянники/племянницы/племянники и племянницы
+sk: synovec/neter/synovci/netere/synovci a netere
+sl: nečak/nečakinja/nečaki/nečakinje/nečak in nečakinja
+sv: en nevö/en niece/nevöer/niecer/nevöer och niecer
 
     a son-in-law/a daughter-in-law
 af: 'n skoonseun/'n skoondogter
@@ -4027,7 +4027,7 @@ eo: gekuzoj
 es: primos
 et: nõod
 fi: serkut
-fr: cousins
+fr: cousins germains
 he:   בני דודים
 is: systkynabörn
 it: cugini
@@ -8778,35 +8778,6 @@ no: velg en annen utregningsmåte og beregn påny
 oc: podètz ensajar amb un autre metòde de calcul de relacion
 sv: välj ett annat uträkningssätt och räkna ut igen
 
-    nephews and nieces
-af: broers- en susterskinders
-bg: племенници и племеннички
-br: nized ha nizezed
-ca: nebots i nebodes
-cs: synovci a neteře
-da: nevøer og niecer
-de: Neffen und Nichten
-en: nephews and nieces
-eo: nevoj kaj nevinoj
-es: sobrinos y sobrinas
-et: venna- ja õelapsed
-fi: sisarusten lapset
-fr: neveux et nièces
-he:  אחיינים
-is: bræðra og systrabörn
-it: nipoti
-lv: brāļadēli/māsasdēli un brāļameitas/māsasmeitas
-nl: neven en nichten (oom-, tantezegger)
-no: nevøer og nieser
-oc: nebots e nebodas
-pl: bratankowie lub siostrzeńcy/bratanice lub siostrzenice
-pt: sobrinhos e sobrinhas
-ro: nepoti si nepoate
-ru: племянники и племянницы
-sk: synovci a netere
-sl: nečaki in nečakinje
-sv: nevöer och niecer
-
     new modification
 de: hier klicken um eine neue Korrektion durchzuführen
 en: Continue edit
@@ -12557,7 +12528,7 @@ eo: la genepoj
 es: los nietos
 et: lapselapsed
 fi: lapsenlapset
-fr: les petits enfants
+fr: les petits-enfants
 he:  הנכדים
 is: barnabörnin
 it: i nipoti

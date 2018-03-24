@@ -91,7 +91,7 @@
   </li>
   %if;has_nephews_or_nieces;
     <li>
-      <a href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
+      <a href="%prefix;%access;;m=C;v1=1;v2=2">[*a nephew/a niece]</a>
     </li>
   %end;
 </ul>
