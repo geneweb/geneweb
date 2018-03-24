@@ -345,7 +345,8 @@
       disable("rel_mode");
       hide_mode();
       enable("rel_form_cousin");
-      if ( uncles!=null && uncles.selected == true ||
+      if (siblings!=null && siblings.selected == true ||
+          uncles!=null && uncles.selected == true ||
           uncles3!=null && uncles3.selected == true ||
           uncles4!=null && uncles4.selected == true ||
           uncles5!=null && uncles5.selected == true ) {

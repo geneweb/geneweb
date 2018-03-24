@@ -28,6 +28,10 @@ it: circa
 pl: około
 ru: около
 
+    both
+en: both
+fr: les deux
+
     books
 en: books
 fr: dictionnaires
@@ -1389,7 +1393,7 @@ eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
 et: vanaonu/vanatädi
 fi: isosetä:g:---dän/isotäti:g:--din
-fr: un grand-oncle/une grand-tante
+fr: un grand-oncle/une grand-tante/grand-oncles/grand-tantes/grand-oncles et grand-tantes
 he:   דוד-סב/ דודה-סבה
 is: afa(ömmu)bróðir/afa(ömmu)systir
 it: un prozio/una prozia
@@ -2204,12 +2208,12 @@ ca: un oncle/una tia
 cs: strýc/teta
 da: en onkel/en tante
 de: ein:d:+em Onkel/eine:d:+r Tante
-en: an uncle/an aunt
+en: an uncle/an aunt/uncles/aunts/uncles and aunts
 eo: onklo/onklino
 es: un tío/una tía
 et: onu/tädi
 fi: setä:g:---dän/täti:g:--din/eno:g:+n/täti:g:--din
-fr: un oncle/une tante
+fr: un oncle/une tante/oncles/tantes/oncles et tantes
 he:   דוד/ דודה
 is: föður(móður)bróðir/föður(móður)systir
 it: uno zio/una zia
