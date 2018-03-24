@@ -2506,9 +2506,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
                 eval_person_field_var conf base env (p, p_auth) loc sl
             | _ -> raise Not_found ]
         | None -> raise Not_found ]
-(* on hold! triggers Warning 11: this match case is unused. for "related" below!!
   | ["tvar"; i :: [ s :: sl]] ->
-      (* %tsvar.index_i.sosa_s.first_name;
+      (* %tvar.index_i.sosa_s.first_name;
          person is directly identified by its index
          get first_name of sosa_s of person index_i
       *) 
@@ -2523,13 +2522,7 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
             let p = poi base ip in
             let p_auth = authorized_age conf base p in
             eval_person_field_var conf base env (p, p_auth) loc sl
-        | _ -> raise Not_found ]  | ["related" :: sl] ->
-      match get_env "rel" env with
-      [ Vrel {r_type = rt} (Some p) ->
-          eval_relation_field_var conf base env
-            (index_of_sex (get_sex p), rt, get_key_index p, False) loc sl
-      | _ -> raise Not_found ]
-*)
+        | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_type = rt} (Some p) ->
