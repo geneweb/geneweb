@@ -150,7 +150,7 @@
       %end;
       %if;has_nephews_or_nieces;
         %lazy_force;
-        <a href="%prefix;%access;;m=C;v1=1;v2=2">[nephews and nieces]</a>%nn;
+        <a href="%prefix;%access;;m=C;v1=1;v2=2">[a nephew/a niece]4</a>%nn;
       %end;
     %if;lazy_printed;</span>%else;%apply;lazy_print("")%end;
   </span>
