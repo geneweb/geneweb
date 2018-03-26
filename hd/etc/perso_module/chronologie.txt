@@ -284,7 +284,8 @@
   %let;cas2;parent%in;
   %let;cas3;child%in;
   %let;cas4;sibling%in;
-  %let;my_death_date_year;%if;(self.death_date.year!="")%self.death_date.year;%else;00%end;%in;
+  %let;my_death_date_year;%if;(self.death_date.year!="")%self.death_date.year;%else;
+    %if;is_dead;0000%else;9999%end;%end;%in;
   %let;my_death_date_month;%if;(self.death_date.month!="")%if;(self.death_date.month<=9)0%end;%self.death_date.month;%else;00%end;%in;
   %let;my_death_date_day;%if;(self.death_date.day!="")%if;(self.death_date.day<=9)0%end;%self.death_date.day;%else;00%end;%in;
   %let;my_death_date;%my_death_date_year;%my_death_date_month;%my_death_date_day;%in;
