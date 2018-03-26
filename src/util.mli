@@ -34,8 +34,11 @@ value unauthorized : config -> string -> unit;
 value string_of_ctime : config -> string;
 
 value commd : config -> string;
+value commd_2 : config -> string;
 value prefix_base : config -> string;
 value prefix_base_password : config -> string;
+value prefix_base_2 : config -> string;
+value prefix_base_password_2 : config -> string;
 value code_varenv : string -> string;
 value decode_varenv : string -> string;
 value hidden_env : config -> unit;
