@@ -87,8 +87,7 @@
             title="GeneWeb %version %apply;compil%with;%compilation_time;%and;%commit;%end;%if;(compilation_time!=commit_date) (%commit_date;)%end;">v.&nbsp;%version;</a>%nn;
           &copy; <a href="https://www.inria.fr/">INRIA</a> 1998-2017%if;(connections!="") %connections;%end;%nn;
         </span>
-        %let;suffx;%if;(lang!="en")/%lang;%else;%end;%in;
-        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%suffx;" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb documentation MediaWiki">%nn;
+        <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%if;(lang!="en")/%lang;%end;" class="ml-1 mt-sm-2 mt-md-0" target="_blank" title="GeneWeb documentation MediaWiki">%nn;
         <img src="%image_prefix;/logo_bas_mw.png" alt="Logo GeneWeb wiki"/></a>
         </div>
       </div>
