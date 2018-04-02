@@ -192,6 +192,8 @@ function no_options () {
           <input type="checkbox" id="t_title" name="title" value="on"%/>
           [*title/titles]0
         </label>
+      </p>
+      <p>
         <label>
           <input type="checkbox" id="t_birth" name="birth" value="on"%/>
           [*date of birth]
@@ -228,12 +230,12 @@ function no_options () {
           <input type="checkbox" id="t_death_place" name="death_place" value="on"%/>
           [*where dead]
         </label>
-        <label>
-          <input type="checkbox" id="t_death_age" name="age" value="on"%/>
-          [*age at death]
-        </label>
       </p>
       <p>
+        <label>
+          <input type="checkbox" id="t_death_age" name="age" value="on"%/>
+          [*age]/[age at death]
+        </label>
         <label>
           <input type="checkbox" id="t_occu" name="occu" value="on"%/>
           [*occupation/occupations]1

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: destable.txt v7.00 02/03/2018 05:15:53 $ -->
+  <!-- $Id: destable.txt v7.00 02/04/2018 13:42:12 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
 <title>%nn;
   %apply;a_of_b%with;[*descendants]%and;%self;%end;
@@ -29,6 +29,22 @@
   %else;
     %apply;tothegen%with;
       %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+
+%define;thegen(xx)
+  [the %s generation:::xx]%nn;
+%end;
+
+%define;gend(xx)
+  %if;(evar.xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(evar.xx = 1)[the children]%nn;
+  %elseif;(evar.xx = 2)[the grandchildren]%nn;
+  %elseif;(evar.xx = 3)[the great-grandchildren]%nn;
+  %else;
+    %apply;thegen%with;
+      %apply;nth([nth (generation)], evar.xx)
     %end;
   %end;
 %end;
@@ -772,16 +788,14 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*descendants tree]%nn;
     </a>
     <div class="input-group mx-2 mb-1">
-      %if;(evar.v>=1)
-        <a role="button" class="btn pl-3"%sp;
-          title="[*delete] 1 [generation/generations]0"%sp;
-          href="%prefix_base_password;%nn;
-                %foreach;env_binding;
-                  %if;(env.key="v")v=%expr(evar.v-1);%nn;
-                  %else;%env.key=%env.val;;%nn;
-                  %end;
-                %end;"><i class="fa fa-minus fa-lg"></i></a>
-      %end;
+      <a role="button" class="btn pl-3%if;(evar.v=0) disabled text-muted%end;"%sp;
+        title="[*delete] 1 [generation/generations]0"%sp;
+        href="%prefix_base_password;%nn;
+              %foreach;env_binding;
+                %if;(env.key="v" and evar.v>0)v=%expr(evar.v-1);%nn;
+                %else;%env.key=%env.val;;%nn;
+                %end;
+              %end;"><i class="fa fa-minus fa-lg"></i></a>
       <a role="button" class="btn pl-2"%sp;
         title="[*add] 1 [generation/generations]0"%sp;
         href="%prefix_base_password;%nn;
@@ -790,9 +804,22 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %else;%env.key=%env.val;;%nn;
                 %end;
               %end;"><i class="fa fa-plus fa-lg"></i></a>
-      <span class="text-primary pl-1 mt-2">
-        %apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
-      </span>
+      %if;(evar.v!=0)
+        <a role="button" class="btn pl-0"
+          href="%prefix_base_password;%nn;
+                %foreach;env_binding;
+                  %if;(env.key!="only")%env.key=%env.val;;%nn;%end;
+                %end;
+                %if;(evar.only!="on")only=on%end;"
+          title="%if;(evar.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
+                 %else;[*visualize/show/hide/summary]1 %apply;togend("v")%end;">%nn;
+              %if;(evar.only!="on")%apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
+              %else;%if;(evar.v!=0)[only] %end;%apply;gend("v")
+              %end;
+         </a>
+      %else;
+        <span class="text-primary pl-0 mt-2">[specify::generation/generations]0</span>
+      %end;
     </div>
   </div>
   <div class="d-flex">
@@ -876,16 +903,24 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %let;max;%evar.v;%in;
     %reset_count;
     %empty_sorted_list;
-    %apply;one_child("self", "-1", "", 1)
-    %for;lev;0;max;
-      %if;(evar.gen="on" and lev<max_desc_level)
-        <tr>
-          <th scope="row" colspan="%nb_col;">[*generation/generations]0 %expr(lev+1)
-          <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1)">%apply;desc_count_l(lev+1)</span>
-          </th>
-        </tr>
+    %if;(evar.only!="on")
+      %apply;one_child("self", "-1", "", 1)
+      %for;lev;0;max;
+        %if;(evar.gen="on" and lev<max_desc_level)
+          <tr>
+            <th scope="row" colspan="%nb_col;">[*generation/generations]0 %expr(lev+1)
+            <span class="float-right mr-1" title="[*nb individuals] [descendants at the generation] %expr(lev+1)">%apply;desc_count_l(lev+1)</span>
+            </th>
+          </tr>
+        %end;
+        %apply;one_level("self", 0, lev, "", "", 1)
       %end;
-      %apply;one_level("self", 0, lev, "", "", 1)
+    %else;
+      %if;(evar.v=0)
+        %apply;one_child("self", "-1", "", 1)
+      %else;
+        %apply;one_level("self", 0, evar.v-1, "", "", 1)
+      %end;
     %end;
   %end;
 </table>
@@ -895,7 +930,9 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %incr_count;
 %end;
 
-<p>[*total][:] %apply;desc_count(max_desc_level) [descendants] %if;(evar.marr="on" or evar.t="I")(%count; [person/persons]1 [with root, spouses and unknowns])%end;</p>
+<p>[*total][:] %if;(evar.only="on")%apply;desc_count_l%with;%evar.v;%end; [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
+               %else;%apply;desc_count(max_desc_level) [descendants] %if;(evar.marr="on" or evar.t="I")(%count; [person/persons]1 [with root, spouses and unknowns])%end;</p>
+               %end;
 
 %import;trl;
 %import;copyr;
