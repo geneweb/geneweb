@@ -513,8 +513,10 @@ value print conf base p =
     try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
     [ Not_found | Failure _ -> Perso.default_max_cousin_lev ]
   in
-  match (p_getint conf.env "v1", p_getenv conf.env "t") with
-  [ (Some lev1, _) ->
+  match (p_getint conf.env "v1", p_getint conf.env "v2", p_getenv conf.env "t") with
+  [ (Some 1, Some 1, _) | (Some 0, _, _)  | (_, Some 0, _)->
+      Perso.interp_templ "cousins" conf base p
+  | (Some lev1, _, _) ->
       let lev1 = min (max 1 lev1) max_lev in
       let lev2 =
         match p_getint conf.env "v2" with
@@ -522,8 +524,10 @@ value print conf base p =
         | None -> lev1 ]
       in
       print_cousins conf base p lev1 lev2
-  | (_, Some (("AN" | "AD") as t)) when conf.wizard || conf.friend ->
+  | (_, _, Some (("AN" | "AD") as t)) when conf.wizard || conf.friend ->
       print_anniv conf base p (t = "AD") max_lev
   | _ ->
       cousmenu_print conf base p ]
 ;
+
+
