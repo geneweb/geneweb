@@ -1,15 +1,20 @@
-<!-- $Id: perso_module/sources.txt v 7.00 20/11/2016 06:10:01 hg -->
+<!-- $Id: perso_module/sources.txt v 7.00 02/04/2018 08:52:26 hg -->
 %( op_m=1 Sources  %)
 %( op_m=2 Sources complete (events) %)
 %let;op_m;%if;(op_m!="")%op_m;%else;1%end;%in;
 
+%if;(has_linked_page.BIBLIO and linked_page.BIBLIO!="")
+  <h2>[*bibliography]</h2>
+  <ul>
+    <li>%apply;capitalize(linked_page.BIBLIO)</li>
+  </ul>
+%end;
 %reset_count;
 %if;has_sources;%incr_count;%end;
-%if;has_linked_page.BIBLIO;%incr_count;%end;
 %foreach;event;
   %if;event.has_src;%incr_count;%end;
 %end;
-%if;(count>0 and (op_m=1 or op_m=2))
+%if;(count>0)
   %if;(count=1)
     <h2>[*source/sources]0</h2>
   %else;
@@ -43,11 +48,4 @@
     %end;
   %end;
   </ul>
-  %if;(has_linked_page.BIBLIO and linked_page.BIBLIO!="") - [*bibliography]
-    <p>
-    %apply;capitalize(linked_page.BIBLIO)
-    </p>
-  %end;
-  %nl;
-  %reset_count;
 %end;
