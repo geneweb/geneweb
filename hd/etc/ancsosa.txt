@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancsosa.txt,v7.00 02/03/2018 05:16:40 $ -->
+  <!-- $Id: ancsosa.txt,v7.00 02/04/2018 13:42:27 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -47,7 +47,7 @@
 %end;
 
 %define;thegen(xx)
-  [*the %s generation:::xx]%nn;
+  [the %s generation:::xx]%nn;
 %end;
 
 %define;togena(xx)
@@ -76,9 +76,9 @@
 
 %define;gen(xx)
   %if;(evar.xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(evar.xx = 2)[*the parents]%nn;
-  %elseif;(evar.xx = 3)[*the grandparents]%nn;
-  %elseif;(evar.xx = 4)[*the great-grandparents]%nn;
+  %elseif;(evar.xx = 2)[the parents]%nn;
+  %elseif;(evar.xx = 3)[the grandparents]%nn;
+  %elseif;(evar.xx = 4)[the great-grandparents]%nn;
   %else;
     %apply;thegen%with;
       %apply;nth([nth (generation)], evar.xx)
@@ -1342,8 +1342,19 @@
                 %else;%env.key=%env.val;;%nn;
                 %end;
               %end;"><i class="fa fa-plus fa-lg"></i>%nn;
-        </a>
-      <span class="text-primary mt-2">%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;</span>
+      </a>
+      <a role="button" class="btn pl-0"       
+        href="%prefix_base_password;%nn;
+              %foreach;env_binding;
+                %if;(env.key!="only")%env.key=%env.val;;%nn;%end;
+              %end;
+              %if;(evar.only!="on")only=on%end;"
+        title="%if;(evar.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
+               %else;[*visualize/show/hide/summary]1 %apply;togen("v")%end;">%nn;
+              %if;(evar.only!="on")%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
+              %else;[only] %apply;gen("v")
+              %end;
+      </a>
     </div>
   </div>
   <div class="d-flex">
@@ -1402,7 +1413,7 @@
     <ul>
       %foreach;ancestor_level2;
         %if;(evar.v != "" and level = evar.v)
-          <li>%nl;<b>%apply;gen("v")</b>%nl;
+          <li>%nl;<b>%apply;capitalize%with;%apply;gen("v")%end;</b>%nl;
             <ul>%nl;
               %foreach;ancestor;
                 <li>%sp;
@@ -1730,7 +1741,7 @@
       </p>
     %end;
     <h3>
-      <em>%apply;gen("v").</em>
+      <em>%apply;capitalize%with;%apply;gen("v")%end;.</em>
       <a name="asc">&nbsp;</a>
     </h3>
     %foreach;ancestor_level;
@@ -1822,7 +1833,6 @@
     </ul>
 
   %elseif;(evar.t = "Z" and evar.only = "on")
-    <p>%apply;gen("v").</p>
     %reset_count;
     <table class="table table-hover ascends_table mt-1">
       %apply;table_header()

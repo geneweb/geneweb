@@ -9783,6 +9783,11 @@ sk: iba zvolená generácia
 sl: samo izbrana generacija
 sv: endast den valda generationen
 
+    only
+de: nur
+en: only
+fr: uniquement
+
     options
 en: options
 fr: options

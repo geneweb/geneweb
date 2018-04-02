@@ -233,6 +233,12 @@ function table_spouse_disabled () {
             <input type="checkbox" id="t_gen" name="gen" value="on"%/>
             [*display generation]
           </label>
+        </p>
+        <p>
+          <label>
+            <input type="checkbox" id="only" name="only" value="on"%/>
+              [*only the generation selected]
+            </label>
           <input type="hidden" name="ns" value="on"%/>
           <input type="hidden" name="image" value="on"%/>
         </p>
