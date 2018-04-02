@@ -16,8 +16,8 @@
       .col1,.col2{width:99%%;}
       .image_sheet{font-size:89%%;}
     %else;
-       .col1{width:57%%;min-width:290px;}
-       .col2{width:40%%;min-width:290px;}
+       .col1{width:50%%;min-width:290px;}
+       .col2{width:47%%;min-width:290px;}
        .image_sheet {font-size: 71%%;}
     %end;
   </style>
@@ -567,7 +567,7 @@
 %end;
 %define;anc_families()
   %if;has_parents;
-    <div>
+    <div><div>
       <span class="menu" style="display:inline;position:relative;background-color:#AAA;">
         <span style="margin-left:20px"><small>[up to] %apply;ascmax()%apply;implex()</small></span><br/>
         %let;l1;%apply;min(max_anc_level,5)%in;
@@ -620,8 +620,8 @@
           </small>
         %end;
       %end;
-    </div>
-    <div style="clear:both">
+    </div></div>
+    <div><div>
     <span class="menu" style="display:inline;position:relative;">
     <span style="margin-left:15px;"><small>%apply;consang()</small></span><br/>
       <span>
@@ -670,7 +670,7 @@
         %if;(spouse.index != mother.index)
           %if;has_children;
             <ol>
-              <li>%apply;on_side(father) [with] %apply;somebody("spouse")[:]</li>
+              <li>%apply;on_side(father)<br>[with] %apply;somebody("spouse")[:]</li>
               %foreach;child;
                 <li class="li_%sex; li_%has_families;%has_sosa;">
                   %if;is_self;<em>%end;
@@ -691,7 +691,7 @@
         %if;(spouse.index != father.index)
           %if;has_children;
             <ol>
-              <li>%apply;on_side(mother) [with] %apply;somebody("spouse")[:]</li>
+              <li>%apply;on_side(mother)<br>[with] %apply;somebody("spouse")[:]</li>
               %foreach;child;
                 <li class="li_%sex; li_%has_families;%has_sosa;">
                   %if;is_self;<em>%end;
@@ -708,7 +708,7 @@
           %end;
         %end;
       %end;
-    </div>
+    </div></div>
     %end;
   %elseif;(wizard and not cancel_links and first_name != "?" and surname != "?")
      <div class="fam2 button">
@@ -722,7 +722,7 @@
 %end;
 %define;relations_tree(z1)
     %reset_count;
-     <a href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
+     <a class="ch2" href="%prefix;spouse=on;m=RLM;image=%evar.image;;%nn;
       %foreach;relation;
         %if;(has_relation_him)
           %incr_count;i%count;=%relation_him.index;;t%count;=%relation_him.type;;%nn;
@@ -755,7 +755,7 @@
         i%count;=%sosa_ref.index;;%nn;
         t%count;=sosa_1;%nn;
       %end;
-    " title="[*relations tree]" style="color:#060;font-size:22px">
+    " title="[*relations tree]">
      %reset_count;
 %end;
 %define;relation_computing(himxx, herxx, typexx)
@@ -1195,7 +1195,7 @@
         %foreach;related;%incr_count;%end;
         %foreach;event_witness_relation;%incr_count;%end;
         %let;cnt;%count;%in;
-        <br/><span class="ch2">%if;(not cancel_links and cnt>1)%apply;relations_tree(l_ref)%end[*relation/relations]1%if;(not cancel_links and cnt>1)</a>%end;</span></div>
+        <br/><span>%if;(not cancel_links and cnt>1)%apply;relations_tree(l_ref)%end[*relation/relations]1%if;(not cancel_links and cnt>1)</a>%end;</span></div>
         %foreach;relation;
           <div class="tree" style="clear:both">
             %if;(has_relation_him and has_relation_her)
@@ -1295,12 +1295,12 @@
   <br/><br/>
   %apply;anc_families()
   %if;has_families;
-    <div style="clear:both">
+    <div style="clear:both"><div>
     %if;not has_children;
       <h2 class="ch2">%if;(nb_families>1)[*spouse/spouses]1%else;[*spouse/spouses]0%end;</h2>
     %elseif;has_children;
-      <div><span class="menu" style="position:relative;margin-top:2em;margin-left:20px;"><small>%apply;descmax()</small></span></div>
-      <div style="display:inline-block;">
+      <span class="menu" style="position:relative;margin-top:2em;margin-left:20px;"><small>%apply;descmax()</small></span>
+      <br>
         <span class="menu" style="position:relative;">
           %let;lv;%if;(evar.maxlev!="")%evar.maxlev;%elseif(bvar.maxlev!="")%bvar.maxlev;%else;1%end;%in;
           <span>
@@ -1325,11 +1325,10 @@
           %end;
           </span>
         </span>
-      </div>
     %end;
     </div>
     %foreach;family;
-      <div class="fam">
+      <div class="fam" style="clear:both">
         %if;(wizard and not cancel_links and family_cnt != 1)
           %if;(family_cnt != 1)
             <span class="button">
@@ -1350,6 +1349,7 @@
         %if;(evar.image!="off" and nb_families > 1)<hr style="clear:both;"%/>%end;
       </div>
     %end;
+    </div>
   %else;
     %if;(wizard and not cancel_links)
       <div class="button" style="clear:both">
@@ -1384,12 +1384,14 @@
     %apply;menu()
     %apply;buttons()
   </div>
-  <div style="clear:both;"></div>
+  <div style="clear:both;">
   %include.trl;
-  %include.copyr;
+%include.copyr;
+  </div>
 %end;
+ </div> 
 </div>
-</div>
+
 %include.js;
 </body>
 </html>
