@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<head>
+  <!-- $Id: cousins.txt,v 5.9 2018/04/02 13:15:19 hg Exp $ -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
+  <title>%nn;
+    %first_name; %surname; %if;(occ!="0")(%occ;)%end;[:] [cousins]
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
+%include.css;
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+<div class="container%if;(evar.wide="on")-fluid%end;">
+%import;perso_utils;
+%import;menubar;
+
+%define;title(xxx)
+  <h3>[*xxx]</h3>
+  <div class="tips">
+    <table><tr><td>[*select person to compute relationship]</td></tr></table>
+  </div>
+  <br />
+%end;
+
+%reset_count;
+%if;(evar.v1=1 and evar.v2=1)
+  %apply;title("siblings")
+  %if;(has_parents)
+    %let;my_father;%self.father;%in;
+    %let;my_mother;%self.mother;%in;
+    %let;my_first_name_key;%first_name_key;%in;
+    %let;my_surname_key;%surname_key;%in;
+    %if;father.has_children;
+    <ul>
+      %foreach;father.family;
+        %if;(has_children and father.spouse = my_mother)
+          <li>From %father; and %father.spouse;
+            <ul>
+              %foreach;child;
+                %incr_count;
+                <li>
+                  %( what is the logic of b1 and b2 ?? sosa_of_branche? %)
+                  <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
+                    &p2=%child.first_name_key;&n2=%child.surname_key;&b2=2%nn;
+                    %if;(evar.image=\"off\")&image=off;%end;%nn;
+                    %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
+                    %if;(evar.long!=\"\")&long=%evar.long;%end;">
+                %child;</a>
+              %end;
+            </ul>
+        %end;
+      %end;
+      %foreach;father.family;
+        %if;(has_children and father.spouse != my_mother)
+          <li>From %father; and %father.spouse;
+            <ul>
+              %foreach;child;
+                %incr_count;
+                <li>
+                  <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
+                    &p2=%child.first_name_key;&n2=%child.surname_key;&b2=2%nn;
+                    %if;(evar.image=\"off\")&image=off;%end;%nn;
+                    %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
+                    %if;(evar.long!=\"\")&long=%evar.long;%end;">
+                %child;</a>
+              %end;
+            </ul>
+        %end;
+      %end;
+      </ul>
+    %end;
+    %if;mother.has_children;
+    <ul>
+      %foreach;mother.family;
+        %if;(has_children and mother.spouse != my_father)
+          <li>From %mother; and %mother.spouse;
+            <ul>
+              %foreach;child;
+                %incr_count;
+                <li>
+                  <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=3%nn;
+                    &p2=%child.first_name_key;&n2=%child.surname_key;&b2=3%nn;
+                    %if;(evar.image=\"off\")&image=off;%end;%nn;
+                    %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
+                    %if;(evar.long!=\"\")&long=%evar.long;%end;">
+                %child;</a>
+              %end;
+            </ul>
+        %end;
+      %end;
+    </ul>
+    %end;
+  %end;
+%elseif;(evar.v1=0)
+  %if;(evar.v2=0 or evar.v2="")
+    %apply;title("self")
+    Self: %self;
+  %else;
+    %apply;title("children")
+    children!
+  %end;
+%elseif;(evar.v2=0)
+  %apply;title("parents")
+  parents!
+%else;
+ Should not happen!!
+%end;
+
+Total: %count; [persons]<br>
+
+%base_trailer;
+%include.copyr;
+</div>
+%include.js;
+</body>
+</html>
