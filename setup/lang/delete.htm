@@ -1,37 +1,37 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html>
+<html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: delete.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <!-- $Id: delete.htm,v 7.00 2018-04-20 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[
-de: Datenbanken l&ouml;schen
+de: Datenbanken lÃ¶schen
 en: Delete
-es: Supresi&oacute;n
+es: SupresiÃ³n
 fi: Poista
 fr: Suppression
 it: Soppressione
-lv: Dzçst
+lv: DzÃ§st
 sv: Radera
 ]</title>
+%fsetup.css;
 </head>
 
-<body background="images/gwback.jpg">
+<body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;">
 [
-de: Datenbanken l&ouml;schen
+de: Datenbanken lÃ¶schen
 en: Deletion of databases
-es: Supresi&oacute;n de bases de datos
+es: SupresiÃ³n de bases de datos
 fi: Tietokantojen poistaminen
-fr: Suppression de bases de donn&eacute;es
+fr: Suppression de bases de donnÃ©es
 it: Soppressione di basi di dati
-lv: Datu bâşu dzçğana
+lv: Datu bÃ¢Ã¾u dzÃ§Ã°ana
 sv: Radering av databaser
 ]
 </h1>
@@ -39,31 +39,31 @@ sv: Radering av databaser
 
 <form method="get" action="delete">
 <input type="hidden" name="lang" value="%l" />
-
+<ul><li>
 [
-de: W&auml;hle die Datenbanken, die du l&ouml;schen m&ouml;chtest, mit
-    dem zugeh&ouml;rigen Schalter.
+de: WÃ¤hle die Datenbanken, die du lÃ¶schen mÃ¶chtest, mit
+    dem zugehÃ¶rigen Schalter.
 en: Select the database or databases you want to delete, by clicking on the
     associated buttons.
 es: Seleccione  la o las  bases que Ud desea destruir cliqueando 
     en el, o los, botones asociados:
 fi: Valitse tietokanta tai tietokannat jotka haluat poistaa, klikkaamalla
     sille kuuluvaa nappia.
-fr: S&eacute;lectionnez la ou les bases que vous voulez d&eacute;truire
-    en cliquant sur le ou les boutons associ&eacute;s:
+fr: SÃ©lectionnez la ou les bases que vous voulez dÃ©truire
+    en cliquant sur le ou les boutons associÃ©s:
 it: Selezionate la o le basi di dati che volete sopprimere
     cliccando su il o i bottoni associati:
-lv: Iezîmçjiet datu bâzi vai datu bâzes, kuras Jûs vçlaties dzçst.
-sv: Välj den databas eller de databaser du vill radera, genom att klicka på
+lv: IezÃ®mÃ§jiet datu bÃ¢zi vai datu bÃ¢zes, kuras JÃ»s vÃ§laties dzÃ§st.
+sv: VÃ¤lj den databas eller de databaser du vill radera, genom att klicka pÃ¥
     motsvarande knappar.
 ]
 
 <p>
 
-<dl><dt><dd><table style="border:1px solid" cellspacing="0" cellpadding="1">
+<table class="setup">
 %b{
 <tr align="left">
-<td><a href="http://%m:2317/%a">%a</a></td>
+<td><a href="http://%m:%P/%a">%a</a></td>
 <td><input type="checkbox" name="%a" value="on" /></td>
 </tr>|
 <tr align="left"><td>- [
@@ -71,37 +71,34 @@ de: keine Datenbank vorhanden
 en: there is no database at present
 es: actualmente no existe ninguna base de datos 
 fi: ei tietokantaa saatavilla
-fr: il n'y a aucune base de donn&eacute;es actuellement
+fr: il nâ€™y a aucune base de donnÃ©es actuellement
 it: attualmente non esiste nessuna base di dati
-lv: patreiz nav nevienas datubâzes
-sv: det finns ingen databas för tillfället
+lv: patreiz nav nevienas datubÃ¢zes
+sv: det finns ingen databas fÃ¶r tillfÃ¤llet
 ]</tr></td>}
-</table></dl>
-
-<p />
-
+</table>
+<p>
+<li>
 [
-de: Dann dr&uuml;cke diesen Knopf:
+de: Dann drÃ¼cke diesen Knopf:
 en: Then push this button:
-es: Luego apoye en este bot&oacute;n:
-fi: Sitten paina tätä nappia:
-fr: Puis appuyez sur ce bouton:
+es: Luego apoye en este botÃ³n:
+fi: Sitten paina tÃ¤tÃ¤ nappia:
+fr: Puis appuyez sur ce boutonâ€¯:
 it: Poi cliccate su questo bottone:
-lv: Tad nospiediet ğo podziòu:
-sv: Tryck sedan på denna knapp:
+lv: Tad nospiediet Ã°o podziÃ²u:
+sv: Tryck sedan pÃ¥ denna knapp:
 ]
-
-<p />
-
+<p>
 <input type="submit" value="[
-de: Pr&uuml;fen
+de: PrÃ¼fen
 en: Check
 es: Verificar
 fi: Tarkista
-fr: V&eacute;rifier
+fr: VÃ©rifier
 it: Verificare
-lv: Pârbaudît
+lv: PÃ¢rbaudÃ®t
 sv: Radera
 ]">
-
+</ul>
 </form>

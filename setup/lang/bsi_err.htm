@@ -1,17 +1,17 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE html>
+<html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: bsi_err.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
-  <meta http-equiv="Content-Type" content="text/html; charset=[ !charset]"%/>
-  <meta http-equiv="Content-Style-Type" content="text/css"%/>
-  <meta name="robots" content="none"%/>
-  <link rel="shortcut icon" href="images/favicon_gwsetup.png"%/>
+  <!-- $Id: bsi_err.htm,v 7.00 2018-01-01 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
 
   <title>[error]</title>
+%fsetup.css;
 </head>
 
-<body background="images/gwback.jpg">
+<body %Vbody_prop;>
 
 <div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
 <h1 style="margin:0;"><font color=red>[error]</font></h1>
@@ -20,38 +20,38 @@
 
 [
 de: Das Kommando "%d" hat beim Beenden einen Fehler geliefert.
-    Die Operation wurde m&ouml;glicherweise nicht durchgef&uuml;hrt.
+    Die Operation wurde mÃ¶glicherweise nicht durchgefÃ¼hrt.
 en: The command "%d" exited with an error code. This operation may have not
     been done.
-es: El comado "%d" ha terminado con un c&oacute;digo de error. Es posible
-    que esta operaci&oacute;n no haya podido efectuarse.
-fi: Komento "%d" keskeytyi virheeseen. Toimintoa ei välttämättä viety
+es: El comado "%d" ha terminado con un cÃ³digo de error. Es posible
+    que esta operaciÃ³n no haya podido efectuarse.
+fi: Komento "%d" keskeytyi virheeseen. Toimintoa ei vÃ¤lttÃ¤mÃ¤ttÃ¤ viety
     loppuun asti.
-fr: La commande "%d" s'est termin&eacute;e avec un code d'erreur. Il se
-    peut que cette op&eacute;ration n'ait pas pu &ecirc;tre faite.
-it: Il comando "%d"si &egrave; terminato con un codice d'errore.
-    Forse l'operazione non &egrave; stata portata a termine.
-lv: Komanda "%d" beidza savu adrbu ar kïudas kodue. Iespçjams, ka ğî
-    darbîba nav veikta.
+fr: La commande "%d" sâ€™est terminÃ©e avec un code dâ€™erreur. Il se
+    peut que cette opÃ©ration nâ€™ait pas pu Ãªtre faite.
+it: Il comando "%d"si Ã¨ terminato con un codice d'errore.
+    Forse l'operazione non Ã¨ stata portata a termine.
+lv: Komanda "%d" beidza savu adrbu ar kÃ¯udas kodue. IespÃ§jams, ka Ã°Ã®
+    darbÃ®ba nav veikta.
 sv: Kommandot "%d" avslutades med en felkod. Operationen kanske inte
-    har blivit utförd.
+    har blivit utfÃ¶rd.
 ]
 
 <p />
 
 [
 de: Hier sind die Trace-Ausgaben des Kommandos, vielleicht kannst du
-    die Erkl&auml;rung f&uuml;r das Problem erkennen:
+    die ErklÃ¤rung fÃ¼r das Problem erkennen:
 en: Here are the traces of the command, maybe you can find an explanation:
 es: Los indicios dejados por el comando son las siguientes, pueda ser que Ud. 
-    encuentre all&iacute; una explicaci&oacute;n:
-fi: Tässä on komennon jäljitys, ehkä löydät selityksen:
-fr: Voici les traces de la commande, peut-&ecirc;tre y trouverez-vous une
+    encuentre allÃ­ una explicaciÃ³n:
+fi: TÃ¤ssÃ¤ on komennon jÃ¤ljitys, ehkÃ¤ lÃ¶ydÃ¤t selityksen:
+fr: Voici les traces de la commande, peut-Ãªtre y trouverez-vous une
     explication:
 it: Ecco le tracce del comando; forse vi troverete una spiegazione:
-lv: Ğeit ir programmas darbîbas pçdas, iespçjams, ka Jûs varat atrast
+lv: Ãeit ir programmas darbÃ®bas pÃ§das, iespÃ§jams, ka JÃ»s varat atrast
     izskaidrojumu:
-sv: Här är utskriften från kommandot, kanske du kan finna en förklaring:
+sv: HÃ¤r Ã¤r utskriften frÃ¥n kommandot, kanske du kan finna en fÃ¶rklaring:
 ]
 
 <p />
@@ -61,8 +61,31 @@ sv: Här är utskriften från kommandot, kanske du kan finna en förklaring:
 %g{- [
 de: no traces
 en: no traces
-es: ning&uacute;n indicio
-fi: ei jälkiä
+es: ningÃºn indicio
+fi: ei jÃ¤lkiÃ¤
+fr: pas de traces
+it: nessuna traccia
+lv: no traces
+sv: ingen utskrift
+] -}
+</pre>
+</dl>
+
+<p />
+[
+en: And the content of gwsetup.log
+fr: Et le contenu de gwsetup.log
+]
+
+<p />
+
+<dl><dt><dd>
+<pre>
+%G{- [
+de: no traces
+en: no traces
+es: ningÃºn indicio
+fi: ei jÃ¤lkiÃ¤
 fr: pas de traces
 it: nessuna traccia
 lv: no traces
@@ -74,18 +97,18 @@ sv: ingen utskrift
 <p />
 
 [
-de: Zur&uuml;ck zum <a href="gwsetup?lang=%l;v=welcome.htm">Hauptmen&uuml;</a>.
+de: ZurÃ¼ck zum <a href="gwsetup?lang=%l;v=welcome.htm">HauptmenÃ¼</a>.
 en: Or you can return to the <a href="gwsetup?lang=%l;v=welcome.htm">main
     menu</a>.
 es: Si no Ud. puede regresar al
-    <a href="gwsetup?lang=%l;v=welcome.htm">men&uacute; principal</a>.
-fi: Tai voit palata <a href="gwsetup?lang=%l;v=welcome.htm">päävalikkoon</a>.
+    <a href="gwsetup?lang=%l;v=welcome.htm">menÃº principal</a>.
+fi: Tai voit palata <a href="gwsetup?lang=%l;v=welcome.htm">pÃ¤Ã¤valikkoon</a>.
 fr: Ou vous pouvez revenir au <a href="gwsetup?lang=%l;v=welcome.htm">menu
     principal</a>.
 it: Potete tornare al <a href="gwsetup?lang=%l;v=welcome.htm">menu
     principale</a>.
-lv: Vai Jûs varat atgriezties uz <a href="gwsetup?lang=%l;v=welcome.htm">galveno
-    izvçlni</a>.
-sv: Eller du kan återvända till
+lv: Vai JÃ»s varat atgriezties uz <a href="gwsetup?lang=%l;v=welcome.htm">galveno
+    izvÃ§lni</a>.
+sv: Eller du kan Ã¥tervÃ¤nda till
     <a href="gwsetup?lang=%l;v=welcome.htm">huvudmenyn</a>.
 ]

@@ -2,7 +2,7 @@
 <html lang="%l">
 <head>
   <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
-  <!-- $Id: bsi.htm,v 5.1 2006-01-01 05:35:06 ddr Exp $ -->
+  <!-- $Id: bsi_connex.htm,v 7.00 2018_04_10 05:35:06 hg Exp $ -->
   <meta charset="utf-8">
   <meta name="robots" content="none">
   <link rel="shortcut icon" href="images/favicon_gwsetup.png">
@@ -62,7 +62,12 @@ sv: Operationen "%d" kommer att appliceras på din databas "%a". Varning: det
 ]
 
 <p />
+[
+en: <span style="color:#FF0000;">WARNING</span>: the -del command suppresses irreversibly some families. It may be prudent to have a backup archive.
+fr: <span style="color:#FF0000;">ATTENTION</span> : la commande -del supprime des familles de façon irréversible. Il peut être prudent d'avoir une archive de sauvegarde.
+]
 
+<p />
 [
 de: Drücke diesen Knopf um zu starten:
 en: Push the button below to start:
@@ -98,11 +103,5 @@ sv: Denna operation motsvarar de följande kommandona:
 ]
 
 <pre>
-     $ cd "%w"
-     $ %x%/%d%p > comm.log
+     $ %x%/%d %Q
 </pre>
-
-[
-en: <span style="color:#FF0000;">WARNING</span>: The content of file %o will be overwritten.
-fr: <span style="color:#FF0000;">ATTENTION</span> : Le contenu du fichier %o sera écrasé.
-]
