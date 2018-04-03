@@ -99,14 +99,32 @@
 %elseif;(evar.v1=0)
   %if;(evar.v2=0 or evar.v2="")
     %apply;title("self")
-    Self: %self;
+    <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
+              &p2=%my_first_name_key;&n2=%my_surname_key;&b2=2%nn;
+              %if;(evar.image=\"off\")&image=off;%end;%nn;
+              %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
+              %if;(evar.long!=\"\")&long=%evar.long;%end;">%self;</a>
   %else;
-    %apply;title("children")
-    children!
+    %if;(evar.v2=1)%apply;title("children")
+    %elseif;(evar.v2=2)%apply;title("grandchildren")
+    %elseif;(evar.v2=3)%apply;title("great-grandchildren")
+    %elseif;(evar.v2=4)%apply;title("great-great-grandchildren")
+    %else;
+      %let;lev_dn;%evar.v2; generations below%in
+      %apply;title(lev_dn)
+    %end;
+    descendants: tbd<br>
   %end;
 %elseif;(evar.v2=0)
-  %apply;title("parents")
-  parents!
+  %if;(evar.v1=1)%apply;title("parents")
+  %elseif;(evar.v1=2)%apply;title("grandparents")
+  %elseif;(evar.v1=3)%apply;title("great-grandparents")
+  %elseif;(evar.v1=4)%apply;title("great-great-grandparents")
+  %else;
+    %let;lev_up;%evar.v1; generations above%in
+    %apply;title(lev_up)
+  %end;
+  ascendants: tbd<br>
 %else;
  Should not happen!!
 %end;
