@@ -13,6 +13,7 @@ value in_file2 = ref "";
 value html = ref False;
 value root = ref "";
 value cr = ref "";
+value output = ref [];
 
 type messages =
   [ MsgBadChild of iper
@@ -558,7 +559,10 @@ value speclist =
     ": checks descendants (default)");
    ("-html", Arg.String (fun s -> do { html.val := True; root.val := s }),
     "<root>: HTML format used for report");
-   ("-mem", Arg.Set mem, ": save memory space, but slower") ]
+   ("-mem", Arg.Set mem, ": save memory space, but slower");
+   ("-o", Arg.String (fun x -> output.val := [x :: output.val]),
+    "<file> : output to this file")
+]
 ;
 
 value anonfun s =

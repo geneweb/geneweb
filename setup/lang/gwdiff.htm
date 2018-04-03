@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="%l">
+<head>
+  <!-- Copyright (c) 1998-2006 INRIA - GeneWeb -->
+  <!-- $Id: gwdiff.htm,v 7.00 2018-04-19 05:35:06 ddr Exp $ -->
+  <meta charset="utf-8">
+  <meta name="robots" content="none">
+  <link rel="shortcut icon" href="images/favicon_gwsetup.png">
+
+  <title>[
+en: Compute the difference between two bases
+fr: Détection des différences entre deux bases
+]</title>
+%fsetup.css;
+</head>
+
+<body %Vbody_prop;>
+
+<div style="background:url('images/gwlogo.png') no-repeat left top; text-align:center; height:95px; line-height:95px; color:#2f6400;">
+<h1 style="margin:0;">
+[
+en: Compute the difference between two bases
+fr: Détection des différences entre deux bases
+]
+</h1>
+</div>
+
+<form method=GET action="gwdiff">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=%l>
+
+<table>
+<tr>
+<td>
+<ul><li>
+[
+en: Select your first database:
+fr: Sélectionnez la première base de données :
+]
+
+<p>
+<table class="setup">
+%b{<tr align=left>
+<td><input type=radio name=anon1 value="%a">   </td>
+<td>%a</td></tr>|
+<tr align=left><td>- [
+de: keine Datenbank vorhanden
+en: there is no database at present
+es: actualmente ninguna base de datos existe
+fr: il n’y a aucune base de données actuellement
+it: attualmente non esiste nessuna base di dati
+lv: nav nevienas datu bâzes
+sv: det finns ingen databas för tillfället
+]</tr></td>}
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>[
+en: Starting person in first base.
+fr: Personne racine dans la première base.
+]</td></tr>
+
+<tr align=left><td>[
+de: Vorname
+en: First name
+es: Nombre
+fr: Prénom
+it: Nome
+lv: Vârds
+sv: Förnamn
+]</td>
+<td><input name="a1" size=30 maxlength=200></td>
+
+<td>[
+de: Nr
+en: Num
+es: Núm
+fr: Num
+it: Numero
+lv: Num
+sv: Nummer
+]</td>
+<td><input name="a2" size=5 maxlength=8></td></tr>
+
+<tr align=left><td>[
+de: Nachname
+en: Surname
+es: Apellido
+fr: Nom
+it: Cognome
+lv: Uzvârds
+sv: Efternamn
+]</td>
+<td colspan=3><input name="a3" size=40 maxlength=200></td></tr>
+</table>
+</ul>
+</td>
+<td>&nbsp;&nbsp;&nbsp;</td>
+<td>
+<ul><li>
+[
+en: Select your second database:
+fr: Sélectionnez la seconde base de données :
+]
+<p>
+<table class="setup">
+%b{<tr align=left>
+<td><input type=radio name=anon2 value="%a">   </td>
+<td>%a</td></tr>|
+}
+</table>
+<p>
+<table class="setup">
+<tr align=left><td> </td><td colspan=3>[
+en: Starting person in second base.
+fr: Personne racine dans la seconde base.
+]</td></tr>
+
+<tr align=left><td>[
+de: Vorname
+en: First name
+es: Nombre
+fr: Prénom
+it: Nome
+lv: Vârds
+sv: Förnamn
+]</td>
+<td><input name="b1" size=30 maxlength=200></td>
+
+<td>[
+de: Nr
+en: Num
+es: Núm
+fr: Num
+it: Num
+lv: Num
+sv: Nummer
+]</td>
+<td><input name="b2" size=5 maxlength=8></td></tr>
+
+<tr align=left><td>[
+de: Nachname
+en: Surname
+es: Apellido
+fr: Nom
+it: Cognome
+lv: Uzvârds
+sv: Efternamn
+]</td>
+<td colspan=3><input name="b3" size=40 maxlength=200></td></tr>
+</table>
+</ul>
+</td>
+</tr>
+</table>
+<p>
+<li>
+[
+de: Wähle die gewünschten Optionen:
+en: Select the options you want:
+es: Seleccione las opciones que Ud. desee:
+fr: Sélectionnez les options que vous désirez :
+it: Selezionate le opzioni desiderate:
+lv: Iezîmçjiet atbilstoðos datnes izveides parametrus:
+sv: Välj de optioner du vill ha:
+]
+<p>
+<dl><dt><dd><table class="setup">
+<tr align=left>
+<td><input type=checkbox name=ad value=on>-ad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td>[
+en: Checks descendants of all ascendants .
+fr: Vérifier tous les descendants des ascendants.
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table class="setup">
+<tr align=left>
+<td><input type=checkbox name=d value=on>-d &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td>[
+en: Checks descendants (default).
+fr: Vérifier les descendants (par défaut).
+]</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table class="setup">
+<tr align=left>
+<td><input type=checkbox name=mem value=on>-mem &nbsp;</td>
+<td>[
+de: Während der Operation sparsam mit dem Speicher umgehen
+    (ist aber langsamer).
+en: Save memory space during operation (but it will be slower).
+es: Economizar el espacio memoria durante la operación
+    (pero esta será mas lenta).
+fr: Économiser l’espace mémoire pendant l’opération
+    (mais ce sera plus lent).
+it: Economizzare lo spazio-memoria durante l'operazione
+    (che però sarà più lenta).
+lv: Taupît operatîvo atmiòu (process notiks lçnâk).
+sv: Spara minne under operationen (men det kommer att gå saktare).
+]</td>
+</tr>
+</table></dl>
+
+<p>
+<dl><dt><dd><table class="setup">
+<tr align="left">
+<td>
+<label for="o">-o&nbsp;
+<input type="input" name="o" size="20" maxlength="50" style="padding-left:4px"></label>&nbsp;&nbsp;[
+en: Output results to this file.
+fr: Rediriger les résultats vers ce fichier.
+]</td>
+</tr>
+</table></dl>
+<p>
+<li>
+[
+de: Dann drücke diesen Knopf:
+en: Then push this button:
+es: Apoye luego en este botón:
+fr: Puis appuyez sur ce bouton :
+it: Poi cliccate su questo bottone:
+lv: Beigâs nospiediet ðo podziòu:
+sv: Tryck sedan på denna knapp:
+]
+
+<p>
+<input type=submit value="[
+[
+en: Compare
+fr: Comparer
+]">
+</ul>
+</form>

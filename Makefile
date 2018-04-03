@@ -5,7 +5,7 @@ include $(ROOT)/tools/Makefile.common
 # ALL: directories needed to make distribution
 ALL_TARGETS := wserver dag2html src ged2gwb gwb2ged setup gwtp
 # EVERYTHING: any other maintained project
-EVERYTHING_TARGETS := gui contrib/gwpublic contrib/oneshot contrib/misc contrib/gwFix contrib/history contrib/gwdiff contrib/gwbase/etc contrib/lex
+EVERYTHING_TARGETS := contrib/gwpublic contrib/oneshot contrib/misc contrib/gwFix contrib/history contrib/gwdiff contrib/gwbase/etc contrib/lex
 
 suffixed_TARGETS := $(foreach suffix,all clean depend everything opt out,$(ALL_TARGETS:=?$(suffix)) $(EVERYTHING_TARGETS:=?$(suffix)) tools?$(suffix))
 
@@ -109,6 +109,8 @@ distrib:
 	cp ged2gwb/ged2gwb $(DESTDIR)/gw/ged2gwb$(EXE)
 	cp ged2gwb/ged2gwb2 $(DESTDIR)/gw/ged2gwb2$(EXE)
 	cp gwb2ged/gwb2ged $(DESTDIR)/gw/gwb2ged$(EXE)
+	cp contrib/gwbase/etc/connex.out $(DESTDIR)/gw/connex$(EXE)
+	cp contrib/gwdiff/gwdiff.out $(DESTDIR)/gw/gwdiff$(EXE)
 	cp setup/setup $(DESTDIR)/gw/gwsetup$(EXE)
 	mkdir $(DESTDIR)/gw/gwtp_tmp
 	mkdir $(DESTDIR)/gw/gwtp_tmp/lang
@@ -118,13 +120,11 @@ distrib:
 	mkdir $(DESTDIR)/gw/setup
 	cp setup/intro.txt $(DESTDIR)/gw/setup/.
 	mkdir $(DESTDIR)/gw/setup/lang
-	if test $(OS_TYPE) = "Win"; then \
-	  cp setup/lang/intro.txt.dos $(DESTDIR)/gw/setup/lang/intro.txt; \
-	else \
-	  cp setup/lang/intro.txt $(DESTDIR)/gw/setup/lang/intro.txt; \
-	fi
+	cp setup/setup.gwf $(DESTDIR)/gw/setup/.
+	cp setup/setup.css $(DESTDIR)/gw/setup/.
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
+	cp setup/lang/intro.txt $(DESTDIR)/gw/setup/lang/.
 	cp -R hd/* $(DESTDIR)/gw/.
 	rm -f $(DESTDIR)/exe-version.txt
 	echo "Commit: `git log  -1 | grep commit | cut -c8-15`, `date`"      > $(DESTDIR)/commit.txt
