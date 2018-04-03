@@ -1,4 +1,4 @@
-<!-- $Id: cousins_tools.txt, v7.00-exp 26/03/2018 20:04:31 $ -->
+<!-- $Id: cousins_tools.txt, v7.00 03/04/2018 14:04:31 $ -->
 %define;url(vvv,ttt)
   %prefix_base_password_2;
   %foreach;env_binding;
@@ -8,23 +8,24 @@
   %end;
   %if;(evar.vvv="")ttt%end;
 %end;
+
 %define;url2(vvv,ttt,www,uuu)
   %prefix_base_password_2;
   %foreach;env_binding;
-    %if;(env.key="vvv" or env.key="www")
-      %if;(env.key="vvv")ttt%else;uuu%end;
-    %elseif;(env.val!="")&%env.key;=%env.val;
+    %if;(env.key="vvv")ttt%nn;
+    %elseif;(env.key="www")uuu%nn;
+    %elseif;(env.val!="" and env.key!="vvv" and env.key!="www")&%env.key;=%env.val;
     %end;
   %end;
-  %if;(evar.vvv="")ttt%end;
-  %if;(evar.www="")uuu%end;
+  %( no need to test for ="" %)
+  
 %end;
 <div class="row">
   <div class="form-inline">
     <span class="align-self-center">[*ancestors]</span>
     <div class="input-group mx-1">       
-      <a href="%apply;url%with;v1%and;%if;(evar.v1>1)&v1=%expr(evar.v1-1)%end;%end;"
-        class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v1<2) disabled%end;">-</a>
+      <a href="%apply;url%with;v1%and;%if;(evar.v1>=1)&v1=%expr(evar.v1-1)%end;%end;"
+        class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v1<1) disabled%end;">-</a>
       <div class="align-self-center">%if;(evar.v1!="")%evar.v1;%end;</div>
       <a href="%apply;url%with;v1%and;&v1=%expr(evar.v1+1)%end;"
         class="btn btn-sm btn-outline-secondary border-0 input-group-append%if;(evar.v1=bvar.max_cousins_level) disabled%end;">+</a>
@@ -32,10 +33,10 @@
     <div class="input-group mx-2">
       <a href="%apply;url2%with;v1%and;%if;(evar.v1>1)&v1=%expr(evar.v1-1)%end;
                 %and;v2%and;
-                  %if;(evar.v2!="")
+                  %if;(evar.v2!=\"\")
                     %if;(evar.v2>1)&v2=%expr(evar.v2-1)%end;
                   %else;
-                    %if;(evar.v1>1)&v1=%expr(evar.v1-1)%end;
+                    %if;(evar.v1>1)&v2=%expr(evar.v1-1)%end;
                   %end;
                 %end;"
          class="btn btn-sm btn-outline-secondary border-0 input-group-prepend
@@ -54,16 +55,15 @@
     <div class="input-group mx-1">
       <a href="%apply;url%with;v2%and;
                   %if;(evar.v2!="")
-                    %if;(evar.v2>1)&v2=%expr(evar.v2-1)%end;
+                    %if;(evar.v2>=1)&v2=%expr(evar.v2-1)%end;
                   %else;
-                    %if;(evar.v1>1)&v2=%expr(evar.v1-1)%end;
+                    %if;(evar.v1>=1)&v2=%expr(evar.v1-1)%end;
                   %end;
                 %end;"
-        class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v2<2) disabled%end;">-</a>
+        class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v2<1) disabled%end;">-</a>
       <span class="align-self-center">%if;(evar.v2!="")%evar.v2;%else;%evar.v1;%end;</span>
       <a href="%apply;url%with;v2%and;
-                  %if;(evar.v2!="")
-                    %if;(evar.v2!="")&v2=%expr(evar.v2+1)%else;%expr(evar.v1+1)%end;
+                  %if;(evar.v2!="")&v2=%expr(evar.v2+1)
                   %else;&v2=%expr(evar.v1+1)%end;
                 %end;"
         class="btn btn-sm btn-outline-secondary border-0 input-group-append%if;(evar.v2=bvar.max_cousins_level) disabled%end;">+</a>
