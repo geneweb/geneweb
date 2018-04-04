@@ -53,7 +53,11 @@
   %import;menubar;
 %end;
 <h1 class="d-inline-block">%nn;
-  %if;(evar.v!=0)%apply;a_of_b%with;[*descendants]%and;%self;%end;%else;%self; ([no descendants])%end;
+  %if;(evar.v!=0)%apply;a_of_b%with;
+    %if;(evar.only!="on" and evar.v!=0)[*descendants]%else;
+      %apply;capitalize%with%apply;gend("v")%end;
+    %end;%and;
+    %self;%end;%else;%self; ([no descendants])%end;
    %if;(cancel_links and evar.v!=0) %apply;togend(evar.v)%end;
 </h1>
 
@@ -813,8 +817,8 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %if;(evar.only!="on")only=on%end;"
           title="%if;(evar.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
                  %else;[*visualize/show/hide/summary]1 %apply;togend("v")%end;">%nn;
-              %if;(evar.only!="on")%apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
-              %else;%if;(evar.v!=0)[only] %end;%apply;gend("v")
+              %if;(evar.only!="on")%if;(evar.v!=0)[only] %end;%apply;gend("v")
+              %else;%apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
               %end;
          </a>
       %else;
