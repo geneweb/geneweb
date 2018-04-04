@@ -1290,7 +1290,10 @@
   %apply;a_of_b%with;
     %if;(evar.t = "M")
       %if;(evar.evt = "on")[*missing events]%else;[*missing ancestors]%end;%nn;
-    %else;[*ancestors]%nn;
+    %else;
+      %if;(evar.only="on" and evar.v<5)%apply;capitalize%with;%apply;gen("v")%end;
+      %else;[*ancestors]%nn;
+      %end;
     %end;
   %and;
     %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -1351,8 +1354,8 @@
               %if;(evar.only!="on")only=on%end;"
         title="%if;(evar.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
                %else;[*visualize/show/hide/summary]1 %apply;togen("v")%end;">%nn;
-              %if;(evar.only!="on")%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
-              %else;[only] %apply;gen("v")
+              %if;(evar.only!="on")[only] %apply;gen("v")
+              %else;%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
               %end;
       </a>
     </div>
