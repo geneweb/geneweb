@@ -29,7 +29,7 @@
 %end;
 
 %if;(op_m=1 and (wizard or friend or bvar.no_note_for_visitor = "" or bvar.no_note_for_visitor = "no") and
-      (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
+      (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE or count2>0))
   %if;(count>0 or has_linked_page.BNOTE and linked_page.BNOTE!="")
     <div class="d-flex justify-content-start">
       <h2 class="mt-2">[*individual notes]</h2>
@@ -48,7 +48,7 @@
     %foreach;family;
       %incr_count;
       %if;((wizard or friend or bvar.no_note_for_visitor="" or bvar.no_note_for_visitor="no") and has_comment)
-        %if;(count=1 and (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
+        %if;(count=1 or count2=1 and (has_notes or has_linked_page.BNOTE or has_linked_page.NOTE))
           <h2>%if;(nb_families>1)[*marriage notes/marriages notes]1%else;[*marriage notes/marriages notes]0%end;</h2>
         %end;
         <dl>
