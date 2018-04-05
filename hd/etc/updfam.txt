@@ -30,7 +30,6 @@
   <div class="container fixed-top" role="navigation">
     <nav class="navbar navbar-light bg-white  justify-content-center py-0" id="banner">
       <nav class="nav nav-pills nav-fill">
-        <button type="submit" class="btn btn-light border-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1 text-success" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>
         <a class="nav-item nav-link" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
         <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
         <a class="nav-item nav-link" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
@@ -474,6 +473,12 @@ $(document).ready(function(){
     <div class="col-sm-7">
       <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0">
     </div>
+    %if;(parent.himher=[*him/her]1)
+        <button type="submit" class="btn btn-outline-success col-2" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+          <span class="font-weight-bold text-uppercase sr-only">[*validate/delete]0</span>
+          <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
+        </button>
+    %end;
   </div>
   <div id="paxcnt_div">
     %apply;birth("paxcnt","xx","true")
@@ -838,7 +843,7 @@ $(document).ready(function(){
   
     <div class="form-check">
       <label class="form-check-label">
-        <input type="checkbox" class="form-check-input" name="nsck" value="on "%if;(mrel = "nsck" or mrel = "nsckm")checked%end;%/>
+        <input type="checkbox" class="form-check-input" name="nsck" value="on"%if;(mrel="nsck" or mrel="nsckm") checked%end;%/>
         [*no sexes check]
       </label>
     </div>
@@ -1006,7 +1011,9 @@ $(document).ready(function(){
     <input type="text" name="origin_file" size="50" maxlength="200" value="%origin_file;"%/>
   %end;
   <div class="text-center">
-    <button type="submit" class="btn btn-outline-secondary btn-lg mt-3" title="OK">[*validate/delete]0</button>
+    <button type="submit" class="btn btn-outline-success btn-lg col-4 py-3 mt-2 mb-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+      <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+    </button>
   </div>
 </form>
 

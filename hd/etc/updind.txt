@@ -223,8 +223,7 @@ function changeCalendar(e,v,m,c) {
 %define;nav()
   <div class="container fixed-top" role="navigation">
     <nav class="navbar navbar-light bg-white justify-content-center py-0" id="banner">
-      <nav class="nav nav-pills nav-fill">
-        %(<button type="submit" class="btn btn-outline-success btn-sm mr-xs-0 mr-sm-3 mr-xl-5 px-md-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>%)
+      <nav class="nav nav-pills nav-fill">    
         <a class="nav-item nav-link" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
         <a class="nav-item nav-link" href="#birth" title="[*birth]"><i class="far fa-circle fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
         <a class="nav-item nav-link" href="#baptism" title="[*baptism]"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
@@ -1113,7 +1112,7 @@ function changeCalendar(e,v,m,c) {
   </div>
   <div class="form-group row">
     <label for="occu" class="col-sm-2 col-form-label">[*occupation/occupations]1</label>
-    <div class="col-sm-10">
+    <div class="col-sm-8">
       %if;(occupation!="")
         <textarea class="form-control" name="occu" rows="1" id="occu" placeholder="[*occupation/occupations]1" %l_on1s;>%occupation;</textarea>
       %else;
@@ -1123,14 +1122,16 @@ function changeCalendar(e,v,m,c) {
   </div>
   <div class="row">
     <label for="src" class="col-sm-2 col-form-label">[*source/sources]0</label>
-    <div class="col-sm-10">
+    <div class="col-sm-8">
       %if;(sources!="")
         <textarea class="form-control" name="src" rows="1" id="src" placeholder="[*source/sources]0" %l_on1s;>%sources;</textarea>
       %else;
         <input class="form-control" name="src" id="src" placeholder="[*source/sources]0" value="%sources;"/>
       %end;
     </div>
+    <button type="submit" class="btn btn-outline-success btn-sm col-2" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>
   </div>
+  
 </div></div>
   <div class="card">
     %apply;card_header("birth","birth")
@@ -1453,12 +1454,16 @@ function changeCalendar(e,v,m,c) {
     %apply;card_header("notes","note/notes")
     <div class="card-body">
       %let;name;notes%in;
-      %include.toolbar;
+      %(!!broken to repair!! %include.toolbar;%)
       <textarea class="form-control" name="notes" rows="16">%notes;</textarea>%sq;
-      <button type="submit" class="btn btn-outline-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0" aria-label="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 fa-fw" aria-hidden="true"></i><span class="d-none d-md-flex ml-1 font-weight-bold"></span></button>
-      <div class="ml-1 text-center"> 
-        %include.accent;
+      <div class="text-center">
+        <button type="submit" class="btn btn-outline-success btn-lg col-4 py-3 mt-2 mb-3" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+          <span class="font-weight-bold text-uppercase">[*validate/delete]0</span><i class="fa fa-share fa-rotate-180 fa-fw ml-2" aria-hidden="true"></i>
+        </button>
       </div>
+      %(!!broken to repair!! <div class="ml-1 text-center"> 
+        %include.accent;
+      </div>%)
     </div>
   </div>
 </form>
