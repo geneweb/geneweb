@@ -457,7 +457,7 @@ $(document).ready(function(){
     </div>
     <label for="paxcnt_occ" class="col-auto col-form-label">[*number]</label>
     <div class="col-sm-2">
-       <input class="form-control" type="number" name="paxcnt_occ" min="0" max="9999" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" placeholder="#" title="[*number]">
+       <input class="form-control" type="number" name="paxcnt_occ" min="0" value="%if;(xx.occ="")0%else;%xx.occ;%end;" id="paxcnt_occ" placeholder="#" title="[*number]">
     </div>
     %if;(bvar.multi_parents = "yes")
       <div class="col-sm-2 ml-sm-auto">
@@ -589,7 +589,7 @@ $(document).ready(function(){
     </div>
     <label for="excnt_witnwcnt_occ" class="col-sm-auto col-form-label">[*number]0</label>
     <div class="col-sm-auto">
-      <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" max="99999" value="%if;(fwitness.occ="")0%else;%fwitness.occ;%end;" id="excnt_witnwcnt_occ">
+      <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0"  value="%if;(fwitness.occ="")0%else;%fwitness.occ;%end;" id="excnt_witnwcnt_occ">
     </div>
   </div>
   <div class="row">
@@ -909,7 +909,7 @@ $(document).ready(function(){
     </div>
     <label for="chxcnt_occ" class="col-sm-auto col-form-label">[*number]</label>
     <div class="col-sm-auto">
-      <input class="form-control" type="number" name="chxcnt_occ" min="0" max="99999" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
+      <input class="form-control" type="number" name="chxcnt_occ" min="0" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
     </div>
   </div>
   <div class="row">
