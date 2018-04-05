@@ -530,7 +530,7 @@ function changeCalendar(e,v,m,c) {
       </div>
       <label for="excnt_witnwcnt_occ" class="col col-form-label">[*number]0</label>
       <div class="col">
-        <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" max="9999999" value="%witness.occ;" id="excnt_witnwcnt_occ" placeholder="#">
+        <input type="number" class="form-control" name="excnt_witnwcnt_occ" min="0" value="%witness.occ;" id="excnt_witnwcnt_occ" placeholder="#">
       </div>
     </div>
     <div class="row">
@@ -960,7 +960,7 @@ function changeCalendar(e,v,m,c) {
       </div>
       <label for="occ" class="col col-form-label">[*number]0</label>
       <div class="col">
-        <input type="number" class="form-control" name="occ" min="0" max="99999999" value="%if;(occ="")0%else;%occ;%end;" id="occ">
+        <input type="number" class="form-control" name="occ" min="0" value="%if;(occ="")0%else;%occ;%end;" id="occ">
       </div>
     </div>
     <div class="row">
@@ -1340,7 +1340,7 @@ function changeCalendar(e,v,m,c) {
       </div>
       <label for="rxcnt_xvar_occ" class="col-sm col-form-label">[*number]0</label>
       <div class="col-sm">
-        <input type="number" class="form-control" name="rxcnt_xvar_occ" min="0" max="99999999" value="%relation.xrel.occ;" id="rxcnt_xvar_occ" placeholder="">
+        <input type="number" class="form-control" name="rxcnt_xvar_occ" min="0" value="%relation.xrel.occ;" id="rxcnt_xvar_occ" placeholder="">
       </div>
       <div class="col-sm-2">
         <select class="form-control" name="rxcnt_xvar_p">
