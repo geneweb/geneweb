@@ -21,25 +21,23 @@
   %include.css;
   %base_header;
 </head>
-<body%body_prop;>
+<body%body_prop; id="family">
 %message_to_wizard;
 <div class="container">
 %include_perso_header;
 
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <div class="form-inline">
-      <div class="mx-auto text-center">
+    <nav class="navbar navbar-light bg-white  justify-content-center py-0" id="banner">
+      <nav class="nav nav-pills nav-fill">
         <button type="submit" class="btn btn-light border-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1 text-success" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>
-        <div class="btn-group btn-inline">
-          <a class="btn btn-light btn-sm" href="#top" title="[*parents]"><i class="fa fa-address-card fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
-          <a class="btn btn-light btn-sm" href="#event/events_" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
-          <a class="btn btn-light btn-sm" href="#child/children_" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
-          <a class="btn btn-light btn-sm" href="#comment" title="[*comment]1"><i class="fa fa-file-text fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
-          <a class="btn btn-light btn-sm" href="#source/sources_" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
-        </div>
-      </div>
-    </div>
+        <a class="nav-item nav-link" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
+        <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link" href="#children" title="[*child/children]1"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*child/children]1</span></a>
+        <a class="nav-item nav-link" href="#comments" title="[*comment]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*comment]</span></a>
+        <a class="nav-item nav-link" href="#sources" title="[*source/sources]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*source/sources]1</span></a>
+      </nav>
+    </nav>
   </div>
 %end;
 
@@ -667,9 +665,9 @@ $(document).ready(function(){
   <hr class="w-100">
 %end
 
-%define;card_header(xx)
-  <div class="anchor_upd" id="xx_"></div>
-  <h3 class="card-header  pt-2 pb-1 text-center"><label for="xx_">[*xx]1</label></h3>
+%define;card_header(xx,yy)
+  <div class="anchor_upd" id="xx"> </div>
+  <h3 class="card-header pt-2 pb-1 text-center"><label for="xx">[*yy]1</label></h3>
 %end;
 
 <h1 %if;(evar.m="ADD_FAM" or evar.m="ADD_FAM_OK")class="mt-4"%end;>%nn;
@@ -718,7 +716,7 @@ $(document).ready(function(){
   </p>
 
   <div class="card">
-    %apply;card_header("parents")
+    %apply;card_header("parents","parents")
     <div class="card-body">
       %foreach;parent;
         %apply;parent(cnt, "parent")
@@ -729,7 +727,7 @@ $(document).ready(function(){
   </div>
 
   <div class="card">
-    %apply;card_header("event/events")
+    %apply;card_header("events","event/events")
     <div class="card-body">
   <div style="display:none;">
     <p>
@@ -950,7 +948,7 @@ $(document).ready(function(){
 %end;
 
   <div class="card">
-    %apply;card_header("child/children")
+    %apply;card_header("children","child/children")
     <div class="card-body">
       <div class="row">
         %apply;insert_child("0")
@@ -969,14 +967,14 @@ $(document).ready(function(){
   </div>
 
   <div class="card">
-    %apply;card_header("comment")
+    %apply;card_header("comments","comment")
     <div class="card-body">
       <textarea class="form-control" name="comment" id="comment" rows="4">%comment;</textarea>
     </div>
   </div>
   
   <div class="card">
-    %apply;card_header("source/sources")
+    %apply;card_header("sources","source/sources")
     <div class="card-body">
       <div class="row">
         <label for="psrc" class="col-sm-2 col-form-label">[[*person/persons]1]</label>
