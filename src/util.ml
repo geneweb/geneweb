@@ -111,8 +111,8 @@ value rec capitale_utf_8 s =
     else
       match Char.code c with
       [ 0xC3 ->
-          let c1 = Char.uppercase_ascii (Char.chr (Char.code s.[1] + 0x40)) in
-          sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
+          let c1 = (Char.chr (Char.code s.[1] - 0xA0 + 0x80)) in
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xC5 when Char.code s.[1] = 0x93 -> (* oe *)
           sprintf "%c%c%s" c (Char.chr 0x92)
