@@ -17,7 +17,7 @@
   %include.css;
   %base_header;
 </head>
-<body%body_prop; id="upd">
+<body%body_prop; id="person">
 <div class="container">
 %message_to_wizard;
 
@@ -221,29 +221,27 @@ function changeCalendar(e,v,m,c) {
 %include_perso_header;
 
 %define;nav()
-  <div class="container fixed-top bg-white" role="navigation">
-    <div class="form-inline">
-      <div class="mx-auto text-center">
-        <button type="submit" class="btn btn-outline-success btn-sm mr-xs-0 mr-sm-3 mr-xl-5 px-md-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>
-        <div class="btn-group btn-inline">
-          <a class="btn btn-light btn-sm" href="#top" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
-          <a class="btn btn-light btn-sm" href="#birth_" title="[*birth]"><i class="far fa-circle fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
-          <a class="btn btn-light btn-sm" href="#baptism_" title="[*baptism]"><i class="fa fa-child fa-fw text-secondary" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
-          <a class="btn btn-light btn-sm" href="#death_" title="[*death]"><i class="fa fa-plus fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
-          <a class="btn btn-light btn-sm" href="#burial_" title="[*burial]"><i class="fa fa-child fa-rotate-180 fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
-          <a class="btn btn-light btn-sm" href="#event/events_" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
-          <a class="btn btn-light btn-sm" href="#relation/relations_" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
-          <a class="btn btn-light btn-sm" href="#title/titles_" title="[*title/titles]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
-          <a class="btn btn-light btn-sm" href="#notes" title="[*note/notes]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
-        </div>
-      </div>
-    </div>
+  <div class="container fixed-top" role="navigation">
+    <nav class="navbar navbar-light bg-white justify-content-center py-0" id="banner">
+      <nav class="nav nav-pills nav-fill">
+        %(<button type="submit" class="btn btn-outline-success btn-sm mr-xs-0 mr-sm-3 mr-xl-5 px-md-3" title="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 mx-1" aria-hidden="true"></i><span class="sr-only font-weight-bold">[*validate/delete]0</span></button>%)
+        <a class="nav-item nav-link" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
+        <a class="nav-item nav-link" href="#birth" title="[*birth]"><i class="far fa-circle fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
+        <a class="nav-item nav-link" href="#baptism" title="[*baptism]"><i class="fa fa-child fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*baptism]</span></a>
+        <a class="nav-item nav-link" href="#death" title="[*death]"><i class="fa fa-plus fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*death]</span></a>
+        <a class="nav-item nav-link" href="#burial" title="[*burial]"><i class="fa fa-child fa-rotate-270 fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*burial]</span></a>
+        <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*event/events]1</span></a>
+        <a class="nav-item nav-link" href="#relations" title="[*relation/relations]1"><i class="fa fa-users fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*relation/relations]1</span></a>
+        <a class="nav-item nav-link" href="#titles" title="[*title/titles]1"><i class="fa fa-star fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*title/titles]1</span></a>
+        <a class="nav-item nav-link" href="#notes" title="[*note/notes]1"><i class="fa fa-file-alt fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*note/notes]1</span></a>
+      </nav>
+    </nav>
   </div>
 %end;
 
-%define;card_header(xx)
-  <div class="anchor_upd" id="xx_"></div>
-  <h3 class="card-header pt-2 pb-1 text-center"><label for="xx_">[*xx]1</label></h3>
+%define;card_header(xx,yy)
+  <div class="anchor_upd" id="xx"> </div>
+  <h3 class="card-header pt-2 pb-1 text-center"><label for="xx">[*yy]1</label></h3>
 %end;
 
 %define;date(xlab,xvar,xdt,xcond)
@@ -907,7 +905,7 @@ function changeCalendar(e,v,m,c) {
 %let;l_on1s;onkeydown="if (event.keyCode == 13) if (!event.shiftKey) javascript:document.upd.submit()"%in;
 <form name="upd" method="post" action="%action;">
   <div class="row">
-  %apply;nav()
+    %apply;nav()
   </div>
   <div class="row">
     %hidden;
@@ -1135,7 +1133,7 @@ function changeCalendar(e,v,m,c) {
   </div>
 </div></div>
   <div class="card">
-    %apply;card_header("birth")
+    %apply;card_header("birth","birth")
     <div class="card-body">
       <div class="d-none">
         <table style="border-width:1;width:700">
@@ -1163,7 +1161,7 @@ function changeCalendar(e,v,m,c) {
   </div>
 
   <div class="card">
-    %apply;card_header("baptism")
+    %apply;card_header("baptism","baptism")
     <div class="card-body">
       <div class="d-none">
         <table style="border-width:1;width:700">
@@ -1191,7 +1189,7 @@ function changeCalendar(e,v,m,c) {
   </div>
 
   <div class="card">
-    %apply;card_header("death")
+    %apply;card_header("death","death")
     <div class="card-body">
       <div class="d-none">
         <table style="border-width:1;width:700">
@@ -1247,7 +1245,7 @@ function changeCalendar(e,v,m,c) {
   </div>
 
   <div class="card">
-    %apply;card_header("burial")
+    %apply;card_header("burial","burial")
     <div class="card-body">
       <div class="d-none">
         <table style="border-width:1;width:700">
@@ -1289,7 +1287,7 @@ function changeCalendar(e,v,m,c) {
   </div>
   
   <div class="card">
-    %apply;card_header("event/events")
+    %apply;card_header("events","event/events")
     <div class="card-body">
       %if;has_secondary_pevents;
         %foreach;pevent;
@@ -1361,7 +1359,7 @@ function changeCalendar(e,v,m,c) {
 %end;
 
   <div class="card">
-    %apply;card_header("relation/relations")
+    %apply;card_header("relations","relation/relations")
     <div class="card-body">
       %apply;insert_relation("0")
       %if;has_relations;
@@ -1434,7 +1432,7 @@ function changeCalendar(e,v,m,c) {
 %end
 
   <div class="card">
-    %apply;card_header("title/titles")
+    %apply;card_header("titles","title/titles")
     <div class="card-body">
       %apply;insert_title("0")
       %if;has_titles;
@@ -1452,11 +1450,11 @@ function changeCalendar(e,v,m,c) {
   </div>
 
   <div class="card">
-    %apply;card_header("note/notes")
+    %apply;card_header("notes","note/notes")
     <div class="card-body">
       %let;name;notes%in;
       %include.toolbar;
-      <textarea class="form-control" name="notes" id="notes" rows="16">%notes;</textarea>%sq;
+      <textarea class="form-control" name="notes" rows="16">%notes;</textarea>%sq;
       <button type="submit" class="btn btn-outline-success btn-sm mr-sm-3 mr-md-0 mr-lg-5 px-3" title="[*validate/delete]0" aria-label="[*validate/delete]0"><i class="fa fa-share fa-rotate-180 fa-fw" aria-hidden="true"></i><span class="d-none d-md-flex ml-1 font-weight-bold"></span></button>
       <div class="ml-1 text-center"> 
         %include.accent;

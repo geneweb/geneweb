@@ -1,16 +1,4 @@
 <!-- $Id: js.txt, v7.00 26/02/2018 02:32:23 $ -->
-%if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
-  or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
-  or evar.m="ADD_FAM" or evar.m="ADD_FAM_OK"
-  or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
-  %if;(bvar.use_cdn="yes")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.1/autosize.min.js" 
-      integrity="sha256-LvH1uk7+nsqZRyBQPIRxNZNWUb8p982y6d12xJ9WUUo=" crossorigin="anonymous"></script>
-  %else;
-   <script src=%if;(cgi)%bvar.static_path;%end;autosize.min.js></script>
-   %end;
-  <script>autosize(document.querySelectorAll('textarea'));</script>
-%end;
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -41,4 +29,17 @@
       { document.getElementById("i%evar.i;").focus(); }
     </script>
   %end;
+%end;
+%if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
+  or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
+  or evar.m="ADD_FAM" or evar.m="ADD_FAM_OK"
+  or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
+  %if;(bvar.use_cdn="yes")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.1/autosize.min.js"
+      integrity="sha256-LvH1uk7+nsqZRyBQPIRxNZNWUb8p982y6d12xJ9WUUo=" crossorigin="anonymous"></script>
+  %else;
+   <script src=%if;(cgi)%bvar.static_path;%end;autosize.min.js></script>
+   %end;
+  <script>autosize(document.querySelectorAll('textarea'));</script>
+  <script>$('body').scrollspy({ target: '#banner' })</script>
 %end;
