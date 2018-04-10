@@ -112,7 +112,7 @@
 %end;
 
 %define;image_sosa(xxx,yyy)
-  <span class="fa fa-dot-circle-o text-success mr-1" style="font-size:1em" title="[*Sosa] yyy%if;(yyy!=1) – [*direct ancestor of %s:::xxx]%end;"></span>%nn;
+  <span class="far fa-dot-circle text-success mr-1" title="%if;(yyy!=1)[*direct ancestor of %s:::xxx] – [*Sosa] yyy%end;"></span>%nn;
 %end;
 
 %define;nav_with_sosa_ref(xxx)
@@ -207,7 +207,7 @@
     %else;<a %apply;ext_link("xx") href="%xx.bname_prefix;%xx.access;">%xx;</a>%nn;
     %end;
   %end;
-  %xx.title;<span class="text-nowrap">%xx.dates;</span>%nn;
+  <span class="text-nowrap">%xx.dates;</span>%if;(xx.title!=""), %xx.title;%end;%nn;
 %end;
 
 %define;short_display_person_tree(xx)
