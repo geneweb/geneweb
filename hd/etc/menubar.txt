@@ -294,6 +294,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
             <a class="nav-link dropdown-toggle %if;(evar.m="R" or (evar.m="C" and evar.t="AN"))active%end;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" title="[*relationship]"><span class="fa fa-link fa-rotate-90"></span></a>
             <div class="dropdown-menu">
               <a class="dropdown-item" href="%prefix;m=R;%access;" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship computing]</a>
+              <a class="dropdown-item" href="%prefix;%access;;m=C;v1=2;v2=2" %laR;><span class="fa fa-cog fa-fw"></span> [*relationship] [with] [close family]/[a cousin]0</a>
               %if;(died = "" and (wizard or friend))
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="%prefix;%access;;m=C;t=AN"><span class="fa fa-birthday-cake fa-fw"></span> [*family birthday]</a>

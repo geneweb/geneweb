@@ -1032,6 +1032,10 @@ sk: <em>"Sosa" číslo</em> vo vzťahu k %t
 sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
 
+    degree of kinship
+en: degree of kinship
+fr: degré de parenté
+
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
 bg: %sи братовчед/%sа братовчедка
