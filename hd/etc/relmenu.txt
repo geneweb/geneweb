@@ -5,7 +5,7 @@
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>[*link between]%sp;
     %if;(public_name != "")%public_name;
-    %else;%first_name; %surname;%end; [and]0...%nn;
+    %else;%first_name; %surname;%end; [and]0…%nn;
   </title>
   <meta name="robots" content="none">
   <meta charset="UTF-8">
@@ -196,15 +196,15 @@
                   %end;
                 %end;
                 %apply;ancestor_siblings(3,"siblings of the grandparents")
-                <option id="parcousins" value="3">      ↳  [*cousins of the parents]</option>
+                <option id="parcousins" value="3">      ↳  %apply;a_of_b%with;[*cousins]3%and;[the father/the mother/a parent]2%end;</option>
                 %foreach;cousin_level;
                   %if;(level=3)
                     <option value="3">            ↳ [*2nd cousins]</option>
                   %end;
                 %end;
                 %apply;ancestor_siblings(4,"siblings of the great-grandparents")
-                <option id="grparcousins" value="4">      ↳  [*cousins of the grandparents]</option>
-                <option disabled>            ↳ </option>
+                <option id="grparcousins" value="4">      ↳  %apply;a_of_b%with;[*cousins]3%and;[a grandfather/a grandmother/a grandparent]2%end;</option>
+                <option id="parcousins2" value="4">            ↳  %apply;a_of_b%with;[*2nd cousins]3%and;[the father/the mother/a parent]2%end;</option>
                 %foreach;cousin_level;
                   %if;(level=4)
                     <option value="4">                ↳ [*3rd cousins]</option>
@@ -346,16 +346,17 @@
       hide_mode();
       enable("rel_form_cousin");
       if (siblings!=null && siblings.selected == true ||
-          uncles!=null && uncles.selected == true ||
-          uncles3!=null && uncles3.selected == true ||
-          uncles4!=null && uncles4.selected == true ||
-          uncles5!=null && uncles5.selected == true ) {
+            uncles!=null && uncles.selected == true ||
+           uncles3!=null && uncles3.selected == true ||
+           uncles4!=null && uncles4.selected == true ||
+           uncles5!=null && uncles5.selected == true ) {
           v2.value = "1";
       } else if ( nephew!=null && nephew.selected == true ||
-                 parcousins.selected == true ||
+                 parcousins!=null && parcousins.selected == true ||
                grparcousins.selected == true ) {
           v2.value = "2";
-      } else if ( grnephew.selected == true ) {
+      } else if ( grnephew.selected == true ||
+               parcousins2.selected == true ) {
           v2.value = "3";
       }
         else {

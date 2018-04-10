@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: cousins.txt,v 5.9 2018/04/02 13:15:19 hg Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
@@ -47,10 +47,10 @@
                   %( what is the logic of b1 and b2 ?? sosa_of_branche? %)
                   <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
                     &p2=%child.first_name_key;&n2=%child.surname_key;&b2=2%nn;
-                    %if;(evar.image=\"off\")&image=off;%end;%nn;
-                    %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
-                    %if;(evar.long!=\"\")&long=%evar.long;%end;">
-                %child;</a>
+                    %if;(evar.image="off")&image=off;%end;%nn;
+                    %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+                    %if;(evar.long!="")&long=%evar.long;%end;">
+                    %(test if not self manqunt%)%child;</a>
               %end;
             </ul>
         %end;
@@ -64,10 +64,10 @@
                 <li>
                   <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
                     &p2=%child.first_name_key;&n2=%child.surname_key;&b2=2%nn;
-                    %if;(evar.image=\"off\")&image=off;%end;%nn;
-                    %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
-                    %if;(evar.long!=\"\")&long=%evar.long;%end;">
-                %child;</a>
+                    %if;(evar.image="off")&image=off;%end;%nn;
+                    %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+                    %if;(evar.long!="")&long=%evar.long;%end;">
+                    %child;</a>
               %end;
             </ul>
         %end;
@@ -85,9 +85,9 @@
                 <li>
                   <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=3%nn;
                     &p2=%child.first_name_key;&n2=%child.surname_key;&b2=3%nn;
-                    %if;(evar.image=\"off\")&image=off;%end;%nn;
-                    %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
-                    %if;(evar.long!=\"\")&long=%evar.long;%end;">
+                    %if;(evar.image="off")&image=off;%end;%nn;
+                    %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+                    %if;(evar.long!="")&long=%evar.long;%end;">
                 %child;</a>
               %end;
             </ul>
@@ -101,9 +101,9 @@
     %apply;title("self")
     <a href="%prefix;;m=RL&p1=%my_first_name_key;&n1=%my_surname_key;&b1=2%nn;
               &p2=%my_first_name_key;&n2=%my_surname_key;&b2=2%nn;
-              %if;(evar.image=\"off\")&image=off;%end;%nn;
-              %if;(evar.spouse!=\"\")&spouse=%evar.spouse;%end;%nn;
-              %if;(evar.long!=\"\")&long=%evar.long;%end;">%self;</a>
+              %if;(evar.image="off")&image=off;%end;%nn;
+              %if;(evar.spouse!="")&spouse=%evar.spouse;%end;%nn;
+              %if;(evar.long!="")&long=%evar.long;%end;">%self;</a>
   %else;
     %if;(evar.v2=1)%apply;title("children")
     %elseif;(evar.v2=2)%apply;title("grandchildren")
@@ -129,7 +129,7 @@
  Should not happen!!
 %end;
 
-Total: %count; [persons]<br>
+<div class="my-3">Total[:] %count; %if;(count=1)[person/persons]0%else;[person/persons]1%end;.</div>
 
 %base_trailer;
 %include.copyr;
