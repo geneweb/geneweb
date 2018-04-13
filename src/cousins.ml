@@ -94,6 +94,7 @@ value br_inter_is_empty b1 b2 =
 (* Algorithms *)
 
 value cnt = ref 0;
+value cnt_sp = ref 0;
 
 value give_access conf base ia_asex p1 b1 p2 b2 =
   let reference _ _ p s =
@@ -131,6 +132,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   in
   let print_spouse sp first =
     do {
+      incr cnt_sp;
       if first then do {
         Perso.print_sosa conf base p2 True;
         Wserver.printf "%s"
@@ -366,10 +368,15 @@ value print_cousins conf base p lev1 lev2 =
     Wserver.printf "<div>\n";
     tag "p" begin
       if cnt.val >= max_cnt then Wserver.printf "etc...\n"
-      else if cnt.val > 1 then
-        Wserver.printf "%s%s %d %s.\n" (capitale (transl conf "total"))
+      else if cnt.val > 1 then do {
+        Wserver.printf "%s%s %d %s" (capitale (transl conf "total"))
           (Util.transl conf ":") cnt.val
-          (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1))
+          (Util.translate_eval ("@(c)" ^ transl_nth conf "person/persons" 1));
+          if p_getenv conf.env "spouse" = Some "on" then
+            Wserver.printf " %s %d %s.\n" (transl conf "and") cnt_sp.val
+            (Util.translate_eval ("@(c)" ^ transl_nth conf "spouse/spouses" 1))
+          else Wserver.printf ".\n"
+          }
       else ();
     end;
     Wserver.printf "</div>\n";
