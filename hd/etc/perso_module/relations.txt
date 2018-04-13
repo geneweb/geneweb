@@ -71,13 +71,11 @@
   %let;cnt;%count;%in;
   %let;l_ref;%if;browsing_with_sosa_ref;%sosa_ref.index;%else;%index;%end;%in;
   <h2>[*relation/relations]1%nn;
-    %if;(cnt>1)
+    %if;(cnt>0)
       %if;(not cancel_links)
         <a %apply;relations_tree(l_ref)>%nn;
           <img class="ml-2 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%/>%nn;
         </a>%nn;
-      %else;
-        <img class="ml-2 mb-1" src="%image_prefix;/gui_create.png" height="18" alt="Tree"%/>%nn;
       %end;
     %end;
   </h2>
