@@ -40,173 +40,11 @@
   </div>
 %end;
 
-<script>
-<!--
-function changeCalendar(e,v,m,c) {
-  var mv = m;
-  switch (m) {
-  case "VD": mv = 1; break;
-  case "BR": mv = 2; break;
-  case "FM": mv = 3; break;
-  case "NI": mv = 4; break;
-  case "PL": mv = 5; break;
-  case "VT": mv = 6; break;
-  case "GE": mv = 7; break;
-  case "FL": mv = 8; break;
-  case "PR": mv = 9; break;
-  case "ME": mv = 10; break;
-  case "TH": mv = 11; break;
-  case "FT": mv = 12; break;
-  case "JC": mv = 13; break;
-  }
-  switch(c.options%[c.selectedIndex%].value) {
-  case 'G':
-  case 'J':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(month)]11</option>\
-</select>\
-';
-    break;
-  case 'F':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(french revolution month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(french revolution month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(french revolution month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(french revolution month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(french revolution month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(french revolution month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(french revolution month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(french revolution month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(french revolution month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(french revolution month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(french revolution month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(french revolution month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(french revolution month)]12</option>\
-</select>\
-';
-    break;
-  case 'H':
-    document.getElementById(e).innerHTML = '\
-<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
-<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
--</option>\
-<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
-[(hebrew month)]0</option>\
-<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
-[(hebrew month)]1</option>\
-<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
-[(hebrew month)]2</option>\
-<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
-[(hebrew month)]3</option>\
-<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
-[(hebrew month)]4</option>\
-<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
-[(hebrew month)]5</option>\
-<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
-[(hebrew month)]6</option>\
-<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
-[(hebrew month)]7</option>\
-<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
-[(hebrew month)]8</option>\
-<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
-[(hebrew month)]9</option>\
-<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
-[(hebrew month)]10</option>\
-<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
-[(hebrew month)]11</option>\
-<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
-[(hebrew month)]12</option>\
-</select>\
-';
-    break;
-  }
-}
--->
-</script>
-
-<script>
-  function show_fevent_label(xxname, xcnt) {
-    var selector = document.getElementById('fevent_select' + xcnt);
-    var label = document.getElementById('fevent_label_selector' + xcnt);
-    var input = document.getElementById('e_name' + xcnt);
-    if (selector.value == "") {
-      if (xxname.charAt(0) == "#") {
-        input.value = "";
-      }
-      else {
-        input.value = xxname;
-      }
-    }
-    else {
-      input.value = selector.value;
-    }
-    if (selector.value == "" || selector.value.charAt(0) != "#") {
-      label.style.display = 'inline';
-    }
-    else {
-      label.style.display = 'none';
-    }
-  }
-
-  $(document).ready(function(){
-     //show evt perso
-     $(".other_evts").each(function(){
-       var inp = $(this).find("input").first();
-       if(inp.val().charAt(0) != "#" && inp.val() != ""){
-         $(this).show();
-       }
-     });
-  });
-</script>
-
 %define;pa_hide_script(xcnt)
 $(document).ready(function(){
   $("#paxcnt_p").on('change',function() {
       if(this.value == "link")
         $("#paxcnt_div").hide();
-
       else
         $("#paxcnt_div").show();
       %($("#paxcnt_occupation").prop('readonly', true);%)
@@ -625,8 +463,8 @@ $(document).ready(function(){
       %apply;selector_fevent(xcnt)
     </div>
     <div class="col-sm-7">
-      <label id="fevent_label_selectorxcnt" style="display:none" class="other_evt">
-        <input type="text" class="form-control" name="e_namexcnt" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
+      <label id="fevent_label_selectorxcnt" style="display:none" class="other_evts w-100">
+        <input type="text" class="form-control font-weight-bold" name="e_namexcnt" value="%if;(event.e_name = "")#marr%else;%event.e_name;%end;" id="e_namexcnt" placeholder="[*event/events]0">
       </label>
     </div>
   </div>
@@ -881,8 +719,8 @@ $(document).ready(function(){
 %define;invert_children(xcnt)
   <div class="form-inline col-3">
     <div class="input-group">
-      <label class="btn btn-outline-secondary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="fa fa-user-o"></span> %expr(xcnt-1) <span class="fa fa-exchange-alt"></span> <span class="fa fa-user-o"></span> xcnt
-        <input class="ml-1" type="checkbox" name="inv_chxcnt" value="on">
+      <label class="btn btn-outline-secondary" title="[*invert] [child/children]0 %expr(xcnt-1) [and] xcnt"><span class="far fa-user"></span> %expr(xcnt-1) <span class="fa fa-exchange-alt mx-2"></span> <span class="far fa-user"></span> xcnt
+        <input class="ml-2" type="checkbox" name="inv_chxcnt" value="on">
       </label>
       <div class="input-group-append">
         <button type="submit" class="btn btn-outline-secondary">OK</button>
@@ -1020,8 +858,166 @@ $(document).ready(function(){
 %include.trl;
 %include.copyr;
 </div>
-
 %include.js;
+<script>
+<!--
+function changeCalendar(e,v,m,c) {
+  var mv = m;
+  switch (m) {
+  case "VD": mv = 1; break;
+  case "BR": mv = 2; break;
+  case "FM": mv = 3; break;
+  case "NI": mv = 4; break;
+  case "PL": mv = 5; break;
+  case "VT": mv = 6; break;
+  case "GE": mv = 7; break;
+  case "FL": mv = 8; break;
+  case "PR": mv = 9; break;
+  case "ME": mv = 10; break;
+  case "TH": mv = 11; break;
+  case "FT": mv = 12; break;
+  case "JC": mv = 13; break;
+  }
+  switch(c.options%[c.selectedIndex%].value) {
+  case 'G':
+  case 'J':
+    document.getElementById(e).innerHTML = '\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
+-</option>\
+<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
+[(month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
+[(month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
+[(month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
+[(month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
+[(month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
+[(month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
+[(month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
+[(month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
+[(month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
+[(month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
+[(month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
+[(month)]11</option>\
+</select>\
+';
+    break;
+  case 'F':
+    document.getElementById(e).innerHTML = '\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
+-</option>\
+<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
+[(french revolution month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
+[(french revolution month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
+[(french revolution month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
+[(french revolution month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
+[(french revolution month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
+[(french revolution month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
+[(french revolution month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
+[(french revolution month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
+[(french revolution month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
+[(french revolution month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
+[(french revolution month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
+[(french revolution month)]11</option>\
+<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
+[(french revolution month)]12</option>\
+</select>\
+';
+    break;
+  case 'H':
+    document.getElementById(e).innerHTML = '\
+<select class="form-control pl-sm-1 pr-lg-0 px-xl-2 %if;([ !dates order]0 != "mmddyyyy")ml-sm-2 ml-md-3%end;" name="' + v + '">\
+<option value=""' + (mv == 0 ? ' selected' : '') + '>%nn;
+-</option>\
+<option value="1"' + (mv == 1 ? ' selected' : '') + '>%nn;
+[(hebrew month)]0</option>\
+<option value="2"' + (mv == 2 ? ' selected' : '') + '>%nn;
+[(hebrew month)]1</option>\
+<option value="3"' + (mv == 3 ? ' selected' : '') + '>%nn;
+[(hebrew month)]2</option>\
+<option value="4"' + (mv == 4 ? ' selected' : '') + '>%nn;
+[(hebrew month)]3</option>\
+<option value="5"' + (mv == 5 ? ' selected' : '') + '>%nn;
+[(hebrew month)]4</option>\
+<option value="6"' + (mv == 6 ? ' selected' : '') + '>%nn;
+[(hebrew month)]5</option>\
+<option value="7"' + (mv == 7 ? ' selected' : '') + '>%nn;
+[(hebrew month)]6</option>\
+<option value="8"' + (mv == 8 ? ' selected' : '') + '>%nn;
+[(hebrew month)]7</option>\
+<option value="9"' + (mv == 9 ? ' selected' : '') + '>%nn;
+[(hebrew month)]8</option>\
+<option value="10"' + (mv == 10 ? ' selected' : '') + '>%nn;
+[(hebrew month)]9</option>\
+<option value="11"' + (mv == 11 ? ' selected' : '') + '>%nn;
+[(hebrew month)]10</option>\
+<option value="12"' + (mv == 12 ? ' selected' : '') + '>%nn;
+[(hebrew month)]11</option>\
+<option value="13"' + (mv == 13 ? ' selected' : '') + '>%nn;
+[(hebrew month)]12</option>\
+</select>\
+';
+    break;
+  }
+}
+-->
+</script>
+<script>
+  function show_fevent_label(xxname, xcnt) {
+    var selector = document.getElementById('fevent_select' + xcnt);
+    var label = document.getElementById('fevent_label_selector' + xcnt);
+    var input = document.getElementById('e_name' + xcnt);
+    if (selector.value == "") {
+      if (xxname.charAt(0) == "#") {
+        input.value = "";
+      }
+      else {
+        input.value = xxname;
+      }
+    }
+    else {
+      input.value = selector.value;
+    }
+    if (selector.value == "" || selector.value.charAt(0) != "#") {
+      label.style.display = 'inline';
+    }
+    else {
+      label.style.display = 'none';
+    }
+  }
+
+  $(document).ready(function(){
+     //show evt perso
+     $(".other_evts").each(function(){
+       var inp = $(this).find("input").first();
+       if(inp.val().charAt(0) != "#" && inp.val() != ""){
+         $(this).show();
+       }
+     });
+  });
+</script>
 <script>
 %foreach;parent;
   %apply;pa_hide_script(cnt)
