@@ -18,13 +18,19 @@
   });
   </script>
   %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
-       or evar.m="ADD_FAM_OK" or evar.m="MOD_DATA_OK"))
+       or evar.m="ADD_FAM_OK" or evar.m="DEL_FAM_OK"
+       or evar.m="SND_IMAGE_OK" or evar.m="DEL_IMAGE_OK"
+       or evar.m="CHG_EVT_IND_ORD_OK" or evar.m="CHG_EVT_FAM_ORD_OK"
+       or evar.m="MOD_DATA_OK"))
     <script>
       var htmlTitle = document.title;
       if ( htmlTitle == "[*person modified]" ||
            htmlTitle == "[*family modified]" ||
            htmlTitle == "[*person added]" ||
            htmlTitle == "[*family added]" ||
+           htmlTitle == "[*family deleted]" ||
+           htmlTitle == "[*image received]" ||
+           htmlTitle == "[*image deleted]" ||
            htmlTitle == "[*modification successful]" )
       { document.getElementById("i%evar.i;").focus(); }
     </script>
