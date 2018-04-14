@@ -458,7 +458,7 @@ $(document).ready(function(){
 
 %define;one_fevent(xcnt, has_fevents)
   <div class="row">
-    <h5 class="col-form-label col-sm-2 mb-1"><label for="e_namexcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
+    <h5 class="col-form-label col-sm-2 mb-1 text-uppercase"><label for="e_namexcnt" class="mb-0">[*event/events]0 xcnt</label></h5>
     <div class="col-sm-3">
       %apply;selector_fevent(xcnt)
     </div>
@@ -732,7 +732,7 @@ $(document).ready(function(){
 %define;child(xcnt)
   <div class="row">
     <hr class="w-100">
-    <h5 class="col-form-label col-sm-2">[*child/children]0 %cnt;</h5>
+    <h5 class="col-form-label col-sm-2 text-uppercase">%apply;nth%with;[nth]%and;%cnt;%end; [*child/children]0</h5>
     <div class="col-sm-2">
       <select class="form-control" name="chxcnt_p" id="chxcnt_p">
         <option value="link"%if;(child.create = "link") selected%end;>[*link]0</option>
@@ -746,7 +746,7 @@ $(document).ready(function(){
         <input class="form-control" type="text" name="chxcnt_fn" value="%child.first_name;" id="chxcnt_fn" placeholder="[*first name/first names]0">
     </div>
     <label for="chxcnt_occ" class="col-sm-auto col-form-label">[*number]</label>
-    <div class="col-sm-auto">
+    <div class="col-sm-2">
       <input class="form-control" type="number" name="chxcnt_occ" min="0" value="%if;(child.occ="")0%else;%child.occ;%end;" id="chxcnt_occ">
     </div>
   </div>
