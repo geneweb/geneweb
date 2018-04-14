@@ -467,9 +467,10 @@ value print_marriage conf base =
   let (list, len) =
     select_family conf base
       (fun ifam fam ->
-         if get_relation fam = Married then
-           Adef.od_of_codate (get_marriage fam)
-         else None)
+          let rel = get_relation fam in
+          if rel = Married || rel = NoSexesCheckMarried then
+            Adef.od_of_codate (get_marriage fam)
+          else None)
       False
   in
   let title _ =
