@@ -311,12 +311,6 @@ $(document).ready(function(){
     <div class="col-sm-7">
       <input class="form-control" type="text" name="paxcnt_sn" value="%xx.surname" id="paxcnt_sn" placeholder="[*surname/surnames]0">
     </div>
-    %if;(parent.himher=[*him/her]1)
-        <button type="submit" class="btn btn-outline-success col-2" title="[*validate/delete]0" aria-label="[*validate/delete]0">
-          <span class="font-weight-bold text-uppercase sr-only">[*validate/delete]0</span>
-          <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
-        </button>
-    %end;
   </div>
   <div id="paxcnt_div">
     %apply;birth("paxcnt","xx","true")
@@ -331,18 +325,20 @@ $(document).ready(function(){
 %end;
 
 %define;insert_parent(xcnt)
-  <div class="row form-group">
-    <label for="ins_paxcnt_n" class="col-form-label col-sm-1">[*insert]</label>
-    <div class="col-sm-1">
-      <input type="number" class="form-control" name="ins_eventxcnt_n" value="1" id="ins_paxcnt_n">
-    </div>
+  <div class="row mt-2">
+    <label for="ins_paxcnt_n" class="col-form-label col-2">[*insert]</label>
+    <div class="form-inline col-10 ml-auto">
       <div class="input-group">
-        <span class="input-group-btn">
-        <label class="btn btn-outline-secondary"> [parents]0(s)
-          <input class="ml-1" type="checkbox" name="ins_paxcnt" value="on">
-        </label>
-      </span>
-      <button type="submit" class="btn btn-outline-secondary" title="[*insert::parents]0(s)">OK</button>
+        <select class="custom-select form-control" id="ins_paxcnt_n" name="ins_paxcnt_n">
+          %for;i;1;2;<option>%i;</option> %end;
+        </select>
+        <div class="input-group-append">
+          <label class="btn btn-outline-secondary"> [parents]0
+            <input class="ml-1" type="checkbox" name="ins_paxcnt" value="on">
+          </label>
+          <button type="submit" class="btn btn-outline-secondary" title="[*insert::event/events]0/[event/events]1">OK</button>
+        </div>
+      </div>
     </div>
   </div>
 %end;
@@ -563,9 +559,15 @@ $(document).ready(function(){
     <div class="card-body">
       %foreach;parent;
         %apply;parent(cnt, "parent")
-        %if;(cnt=1)<hr class="w-100">%end;
         %if;(bvar.multi_parents = "yes")%apply;insert_parent(cnt)%end;
+        %if;(cnt>=1)<hr class="w-100">%end;
       %end;
+        <div class="text-right">
+        <button type="submit" class="btn btn-outline-success col-2" title="[*validate/delete]0" aria-label="[*validate/delete]0">
+          <span class="font-weight-bold text-uppercase sr-only">[*validate/delete]0</span>
+          <i class="fa fa-share fa-rotate-180 fa-fw ml-1" aria-hidden="true"></i>
+        </button>
+        </div>
     </div>
   </div>
 
