@@ -305,7 +305,7 @@
       %and;%if;event.has_date;%event.date;%else;---%end;%nn;
       %and;new_event_sorted%( %if;(event.name=[death] and self.computable_death_age)%sp;(%self.death_age;)%end; %)%nn;
       %and;%event.place;%nn;
-      %and;%nn;
+      %and;force event witnesses%nn;
       %and;%(debug sort: %event.date.year;%apply;month("event.date")%apply;day("event.date")%apply;dprec("event.date"), %)%event.note;%nn;
       %and;%self;%nn;
       %and;%cas1;%nn;
