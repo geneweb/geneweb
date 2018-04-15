@@ -37,6 +37,14 @@ value check_file_name s =
           else None ]
 ;
 
+type wiki_info =
+  { wi_mode : string;
+    wi_file_path : string -> string;
+    wi_cancel_links : bool;
+    wi_person_exists : (string * string * int) -> bool;
+    wi_always_show_link : bool }
+;
+
 type wiki_link =
   [ WLpage of int and (list string * string) and string and string and string
   | WLperson of int and key and string and option string
@@ -126,8 +134,12 @@ value misc_notes_link s i =
                 [ Not_found ->
                     ("", String.sub b (l + 1) (String.length b - l - 1)) ]
               in
+              let oc1 = try int_of_string name with [ Failure _ -> 0 ] in
               let oc = try int_of_string oc with [ Failure _ -> 0 ] in
-              (fn, sn, oc, name)
+              if oc1 = 0 then (fn, sn, oc, name)
+              else (*if Wiki.wi_person_exists (fn, sn, oc1) then (fn, sn, oc1, fn ^ " " ^ sn)
+                   else (fn, sn, oc, name)*)
+                (fn, sn, oc1, fn ^ " " ^ sn)
             with
             [ Not_found ->
                 let sn = String.sub b k (String.length b - k) in
