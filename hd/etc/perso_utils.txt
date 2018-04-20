@@ -811,3 +811,26 @@
   %end;
 %end;
 %let;timeline;%if;(count>0)yes%else;no%end;%in;
+
+%define;his_her(lg, event, sex)
+    %if;(event.e_name="#deat" or event.e_name="#birt" or
+         event.e_name="#marl" or event.e_name="#resi" or
+         event.e_name="#crem" or event.e_name="#circ" or
+         event.e_name="#conl" or event.e_name="#conf" or
+         event.e_name="#awar" or event.e_name="#demm" or
+         event.e_name="#dist" or event.e_name="#dotl" or
+         event.e_name="#marl" or event.e_name="#resi" or
+         event.e_name="#fcom" or event.e_name="#grad" or
+         event.e_name="#illn" or event.e_name="#lpas" or
+         event.e_name="#mdis" or event.e_name="#mpro" or
+         event.e_name="#mser" or event.e_name="#mobm" or
+         event.e_name="#natu" or event.e_name="#prop" or
+         event.e_name="#resi" or event.e_name="#vteb" or
+         event.e_name="#sep"
+        )[his/her/his]1 %( sa %)
+    %elseif;(event.e_name="#enga" or event.e_name="#marb" or
+             event.e_name="#fune"
+            )[his/her/his]2 %( ses %)
+    %else;%if;(sex=0)[his2/her]0%else;[his2/her]1%end; %( son or his/her %)
+    %end;
+%end;

@@ -41,7 +41,8 @@ value search_in_lang_path = search_in_path Secure.lang_path;
 
 value start_with_vowel s =
   if String.length s > 0 then
-    match Char.lowercase_ascii s.[0] with
+    let (s, i) = Name.unaccent_utf_8 True s 0 in
+    match s.[0] with
     [ 'a' | 'e' | 'i' | 'o' | 'u' -> True
     | _ -> False ]
   else False
@@ -219,7 +220,7 @@ value transl_decline conf w s =
   Translate.eval (gen_decline (transl conf w) s)
 ;
 
-value gen_decline2 wt s1 s2 =
+value gen_decline2 wt s1 s2 alt=
   let string_of =
     fun
     [ '1' -> Some s1
@@ -243,13 +244,14 @@ value gen_decline2 wt s1 s2 =
             | None -> (":", i) ]
         | '[' ->
             try
+              let k = String.index_from wt i '|' in
               let j = String.index_from wt i ']' in
-              if j + 2 < len && wt.[j + 1] = '%' then
+              if k < j && j + 2 < len && wt.[j + 1] = '%' then
                 match string_of wt.[j + 2] with
                 [ Some s ->
                     let s =
-                      if start_with_vowel s then String.make 1 wt.[j - 1] ^ s
-                      else String.sub wt (i + 1) (j - i - 2) ^ " " ^ s
+                      if alt then String.sub wt (k+1) (j-k-1) ^ s (* [aa|bb]  *)
+                      else String.sub wt (i + 1) (k-i-1) ^ s      (* i  k  j  *)
                     in
                     (s, j + 2)
                 | None -> raise Not_found ]
@@ -263,11 +265,17 @@ value gen_decline2 wt s1 s2 =
   (*surtout pas ! Translate.eval*) (loop 0)
 ;
 
+value transl_a_to_b conf x y1 y2 =
+  gen_decline2 (transl_nth conf "%1 to %2" 0) x y1 (start_with_vowel y2)
+;
 value transl_a_of_b conf x y =
-  gen_decline2 (transl_nth conf "%1 of %2" 0) x y
+  gen_decline2 (transl_nth conf "%1 of %2" 0) x y (start_with_vowel y)
+;
+value transl_a_of_b2 conf x y1 y2 =
+  gen_decline2 (transl_nth conf "%1 of %2" 0) x y1 (start_with_vowel y2)
 ;
 value transl_a_of_gr_eq_gen_lev conf x y =
-  gen_decline2 (transl_nth conf "%1 of %2" 1) x y
+  gen_decline2 (transl_nth conf "%1 of %2" 1) x y (start_with_vowel y)
 ;
 
 value check_format ini_fmt (r : string) =
@@ -662,7 +670,6 @@ value is_public conf base p =
   is_old_person conf (gen_person_of_person p)
 ;
 
-
 (* ********************************************************************** *)
 (*  [Fonc] accessible_by_key :
              config -> base -> person -> string -> string -> bool         *)
@@ -951,7 +958,7 @@ value titled_person_text conf base p t =
 value one_title_text conf base p t =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
-  let s = if place = "" then s else s ^ " " ^ place in " <em>" ^ s ^ "</em>"
+  let s = if place = "" then s else s ^ " " ^ place in ", <em>" ^ s ^ "</em>"
 ;
 
 value geneweb_link conf href s =
@@ -965,10 +972,7 @@ value wprint_geneweb_link conf href s =
 
 value reference conf base p s =
   if conf.cancel_links || is_hidden p then s
-  else
-    String.concat ""
-      [ "<a href=\""; commd conf; acces conf base p;
-        "\" id=\"reference\">"; s; "</a>" ]
+  else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
 
@@ -1224,7 +1228,7 @@ value string_of_fevent_name conf base efam_name =
 
 value string_of_witness_kind conf p witness_kind =
   match witness_kind with
-  [ Witness -> transl_nth conf "witness/witness/witnesses" 0
+  [ Witness -> transl_nth conf "witness/witnesses" 0
   | Witness_Officer -> transl_nth conf "officer/officer/officers" 0
   | Witness_GodParent ->
       let n = index_of_sex (get_sex p) in

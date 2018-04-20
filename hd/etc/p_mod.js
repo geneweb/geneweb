@@ -30,6 +30,7 @@ options[4][4] = "complete + photos";
 modules[5] = "relations";
 options[5][1] = "simple";
 options[5][2] = "complete";
+options[5][3] = "complete + all events";
 modules[6] = "chronologie";
 options[6][1] = "simple";
 options[6][2] = "simple + events";
@@ -224,6 +225,11 @@ $('#r1').on('click', function ()
 $('#r2').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'r2');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/relations_2.jpg">\n');
+});
+
+$('#r3').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'r3');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/relations_3.jpg">\n');
 });
 
 $('#c1').on('click', function ()
