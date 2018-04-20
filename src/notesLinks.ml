@@ -37,14 +37,6 @@ value check_file_name s =
           else None ]
 ;
 
-type wiki_info =
-  { wi_mode : string;
-    wi_file_path : string -> string;
-    wi_cancel_links : bool;
-    wi_person_exists : (string * string * int) -> bool;
-    wi_always_show_link : bool }
-;
-
 type wiki_link =
   [ WLpage of int and (list string * string) and string and string and string
   | WLperson of int and key and string and option string
