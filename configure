@@ -60,9 +60,6 @@ INTERACTIVE=false
 TRY_NATIVE=true
 TRY_OCAMLFIND=true
 
-# Temporary.
-CI_BREW=false
-
 while [[ $# -ne 0 ]]; do
   case $1 in
     -h|-help|--help)
@@ -77,8 +74,6 @@ while [[ $# -ne 0 ]]; do
       STATIC=true ;;
     -we|--warn-error)
       WARNERROR=true ;;
-    -cibrew)
-      CI_BREW=true ;;
     *)
       echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
   esac
@@ -407,9 +402,28 @@ check_re() {
   fi
 }
 
+check_bash() {
+  if ! bash -version >/dev/null 2>&1; then
+    print_check_err "Checking bash" "\
+      bash needed."
+  else
+    local BASH_MIN_VER="4"
+    local BASH_VER=`bash -version|sed -n -E -e '1s|.*version (.*) .*|\1|p'`
+    if testversion "$BASH_VER" ">=" "$BASH_MIN_VER"; then
+      print_check_ok \
+        "Checking bash version $BASH_VER >= $BASH_MIN_VER"
+    else
+      print_check_err \
+        "Checking bash version $BASH_VER" \
+        "$BASH_MIN_VER needed."
+    fi
+  fi
+}
+
 check_environment() {
   check_os
   check_make
+  check_bash
   check_ocamlfind
   check_ocaml
   check_optimized_ocaml
@@ -506,11 +520,7 @@ check_environment
 # Print Makefile
 print_makefile
 
-# Temporary.
 if [[ $OS_TYPE == "Darwin" ]]; then
-  if $CI_BREW; then
-    brew install bash
-  fi
   cp tools/transitive_depend_osx.sh tools/transitive_depend.sh
 else
   cp tools/transitive_depend_linux.sh tools/transitive_depend.sh
