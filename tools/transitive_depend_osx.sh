@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash -e
+#!/usr/bin/env bash -e
 
 usage() {
   PROG_NAME=${0##*/}
