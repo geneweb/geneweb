@@ -14129,32 +14129,32 @@ sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
 
     database
-af: Stamboom
+af: stamboom
 ar: شجرة العائل
-bg: Cемейно дърво
-br: Bon roadoù
-ca: Base de dades
-cs: Rodokmen
-da: Family Tree
-de: Stammbaum
-en: Family Tree
-eo: Family Tree
+bg: семейно дърво
+br: bon roadoù
+ca: base de dades
+cs: rodokmen
+da: family Tree
+de: stammbaum
+en: family Tree
+eo: family Tree
 es: árbol genealógico
-et: Sugupuu
-fi: Sukupuu
-fr: Base généalogique
+et: sugupuu
+fi: sukupuu
+fr: base généalogique
 he: אילן יוחסין
-is: Ættfræði gagnagrunnur
-it: Albero genealogico
+is: ættfræði gagnagrunnur
+it: albero genealogico
 lv: ģimenes koks
-nl: Stamboom
-no: Family Tree
-pl: Drzewo genealogiczne
+nl: stamboom
+no: family Tree
+pl: drzewo genealogiczne
 pt: árvore genealógica
-ro: Arbore genealogic
+ro: arbore genealogic
 ru: генеалогическое дерево
 sl: družinsko drevo
-sv: Family Tree
+sv: family Tree
 zh: 家譜
 
     frequency

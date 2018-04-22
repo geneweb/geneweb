@@ -108,7 +108,7 @@ fr: Les <strong>droits des magiciens</strong> sont actuellement <strong>suspendu
         %else;
           <img src="%image_prefix;/gwlogo.png" alt="GeneWeb" title="GeneWeb"/>
         %end;
-        <h1>[database] %base.name;%if;(bvar.visitor_access!="no")<br><small>%base.nb_persons; [person/persons]1%end;</small></h1>
+        <h1>%apply;capitalize%with;[database]%end; %base.name;%if;(bvar.visitor_access!="no")<br><small>%base.nb_persons; [person/persons]1%end;</small></h1>
       </div>
     </div>
   </div>
