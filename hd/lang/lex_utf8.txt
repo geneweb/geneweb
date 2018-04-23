@@ -14136,7 +14136,7 @@ br: bon roadoù
 ca: base de dades
 cs: rodokmen
 da: family Tree
-de: stammbaum
+de: Stammbaum
 en: family Tree
 eo: family Tree
 es: árbol genealógico
