@@ -70,6 +70,10 @@ value next_char_pair_overflows s len i =
     else True
 ;
 
+value utf_char_wont_fit s len i =
+  (Mutil.utf_8_db.val && (Char.code s.[i] >= 0xC2) && (len > (max_len - 5)))
+;
+
 value br = "<br>";
 value find_br s ini_i =
   let ini = "<br" in
@@ -105,7 +109,7 @@ value rec display_note_aux oc tagn s len i =
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     else if
-      len = max_len || c <> ' ' && next_char_pair_overflows s len i
+      len = max_len || c <> ' ' && next_char_pair_overflows s len i || utf_char_wont_fit s len i
     then do {
       fprintf oc "\n%d CONC %c" (succ tagn) c;
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC .")) (i + 1)
