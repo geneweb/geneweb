@@ -71,12 +71,7 @@ value next_char_pair_overflows s len i =
 ;
 
 value utf_char_wont_fit s len i =
-  if Mutil.utf_8_db.val then
-    match Char.code s.[i] with
-      [ 0xC2 | 0xC3 -> (len > (max_len - 5))
-        (* I dont understand why max_len - 4 and more does not work *)
-      | _ -> False ] 
-  else False
+  (Mutil.utf_8_db.val && (Char.code s.[i] >= 0xC2) && (len > (max_len - 5)))
 ;
 
 value br = "<br>";
