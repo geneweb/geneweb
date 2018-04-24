@@ -95,18 +95,22 @@
   %end;
 %end;
 
-%define;ancestors_horizontally(pp, xx, ss1, ss2, ss3)
+%define;ancestors_horizontally(pp, xx, ss1, ss2, ss3, zz)
   %if;(xx > 0)
-    %if;(pp.has_parents)
-      %apply;ancestors_horizontally(
-        "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
-        "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;")
-    %end;
-    <samp>ss2</samp><a href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br>
-    %if;(pp.has_parents)
-      %apply;ancestors_horizontally(
-        "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
-        "ss3&nbsp;+--&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
+    %if;(pp.sosa=zz or (not browsing_with_sosa_ref))
+      %if;(pp.has_parents)
+        %apply;ancestors_horizontally(
+          "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
+          "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;", zz*2)
+      %end;
+      <samp>ss2</samp><a id="sosa_%pp.sosa;" href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br>
+      %if;(pp.has_parents)
+        %apply;ancestors_horizontally(
+          "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
+          "ss3&nbsp;+--&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", zz*2+1)
+      %end;
+    %else;
+      <samp>ss2</samp>See <a href="%prefix;%pp.access;">%pp;</a> => <a href="#sosa_%pp.sosa;">above</a><br>
     %end;
   %end;
 %end;
@@ -136,7 +140,7 @@
     </p>
     <table><tr><td style="white-space:nowrap">
     %apply;ancestors_horizontally(
-      "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;")
+      "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;", 1)
     </td></tr></table>
 
   %elseif;(evar.t = "E" and evar.sort != "")
