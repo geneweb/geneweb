@@ -395,7 +395,7 @@
     %end;
   %end;
   %if;(has_families)
-    %if;(evar.image!="off")
+    %(%if;(evar.image!="off")
       %foreach;family;
           %if;(evar.spouse != "off")
             <div class="image_sheet" style="font-size: 80%%;">
@@ -415,25 +415,25 @@
           %end;
       %end;
     %else;
-      %foreach;family;
-        %if;(evar.spouse != "off")
-          <small>
-            %if;(self.sex = 0)
-              %apply;link_marriage("self")
-            %else;
-              %apply;link_marriage("self.spouse")
-            %end;
-            %sp;%apply;somebody("spouse")
-          </small>
-        %end;
-        %if;(curlev < maxlev)
-          %if;(has_children)
-            <ol>
-            %foreach;child;
-              <li class="li_%sex; li_%has_families;%has_sosa;">%apply;child_long_info(curlev+1,maxlev)</li>
-            %end;
-            </ol>
+    %end;%)
+    %foreach;family;
+      %if;(evar.spouse != "off")
+        <small>
+          %if;(self.sex = 0)
+            %apply;link_marriage("self")
+          %else;
+            %apply;link_marriage("self.spouse")
           %end;
+          %sp;%apply;somebody("spouse")
+        </small>
+      %end;
+      %if;(curlev < maxlev)
+        %if;(has_children)
+          <ol>
+          %foreach;child;
+            <li class="li_%sex; li_%has_families;%has_sosa;">%apply;child_long_info(curlev+1,maxlev)</li>
+          %end;
+          </ol>
         %end;
       %end;
     %end;
@@ -441,7 +441,7 @@
 %end;
 %define;children_list()
   %if;has_children;
-    %if;(evar.image!="off")
+    %(%if;(evar.image!="off")
       %foreach;child;
         <div class="image_sheet">
           %if;(has_image)%apply;link_image("self")<br%/>%end;
@@ -449,14 +449,14 @@
         </div>
       %end;
     %else;
-      <ol>
-      %foreach;child;
-        <li class="li_%sex; li_%has_families;%has_sosa;">
-          %apply;child_long_info(1,l_maxlev)
-        </li>
-      %end;
-      </ol>
+    %end;%)
+    <ol>
+    %foreach;child;
+      <li class="li_%sex; li_%has_families;%has_sosa;">
+        %apply;child_long_info(1,l_maxlev)
+      </li>
     %end;
+    </ol>
   %end;
 %end;
 %define;advanced(z1,z2)
@@ -470,7 +470,7 @@
   %end;
 %end;
 %define;content_family(xx,yy)
-  %if;(evar.image!="off")
+  %(%if;(evar.image!="off")
     <div class="image_sheet">
       %if;(xx.has_image)%apply;link_image("xx")<br%/>%end;
       %xx;%xx.title; %xx.dates;
@@ -487,6 +487,7 @@
       %apply;somebody1%with;yy%and;yy%and;%end;
     </div>
   %else;
+  %end;%)
     %let;next_spo;spo_%if;(nb_families != family_cnt)%expr(family_cnt + 1)%else;1%end;%in;
     %if;(xx.sex = 0)
       %apply;link_marriage("xx")
@@ -499,7 +500,6 @@
       id="spo_%family_cnt;"
       onkeypress="javascript:return acc_key(this,event,'sib_1','%next_spo;','chi_%family_cnt;_1','spouse_%spouse.index;','0','0','f%family.index;');"
     %end;
-  %end;
   %apply;children_list()
 %end;
 %define;parents(z1,z2,z3)
@@ -1118,7 +1118,7 @@
       %end;
       <small>%apply;link_dates("self")</small>
     </h1>
-    %if;has_image;
+    %if;(has_image and evar.image!="off")
     <div>
      <a href="%image_html_url;" %l_on1;>
        <img class="person_img" src="%image_url;" alt="[image/images]0"%/>
