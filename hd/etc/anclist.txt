@@ -101,16 +101,16 @@
       %if;(pp.has_parents)
         %apply;ancestors_horizontally(
           "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
-          "ss1&nbsp;+--&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;", zz*2)
+          "ss1&nbsp;┌──&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;", zz*2)
       %end;
       <samp>ss2</samp><a id="sosa_%pp.sosa;" href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br>
       %if;(pp.has_parents)
         %apply;ancestors_horizontally(
           "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
-          "ss3&nbsp;+--&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", zz*2+1)
+          "ss3&nbsp;└──&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", zz*2+1)
       %end;
     %else;
-      <samp>ss2</samp>See <a href="%prefix;%pp.access;">%pp;</a> => <a href="#sosa_%pp.sosa;">above</a><br>
+      <samp>ss2</samp><a href="%prefix;%pp.access;">%pp;</a> (<a href="#sosa_%pp.sosa;" title="[implex/implexes]0, [see above]">↑</a>)<br>
     %end;
   %end;
 %end;
@@ -138,9 +138,9 @@
     <p>
     %apply;togen(xx).
     </p>
-    <table><tr><td style="white-space:nowrap">
+    <table><tr><td style="font-family:monospace;white-space:nowrap;line-height:1.2em;">
     %apply;ancestors_horizontally(
-      "self", xx, "&nbsp;&nbsp;&nbsp;", "--&nbsp;", "&nbsp;&nbsp;&nbsp;", 1)
+      "self", xx, "&nbsp;&nbsp;&nbsp;", "──&nbsp;", "&nbsp;&nbsp;&nbsp;", 1)
     </td></tr></table>
 
   %elseif;(evar.t = "E" and evar.sort != "")
