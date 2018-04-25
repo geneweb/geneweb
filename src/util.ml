@@ -964,11 +964,12 @@ value wprint_geneweb_link conf href s =
 ;
 
 value reference conf base p s =
+  let iper = get_key_index p in
   if conf.cancel_links || is_hidden p then s
   else
     String.concat ""
       [ "<a href=\""; commd conf; acces conf base p;
-        "\" id=\"reference\">"; s; "</a>" ]
+        "\" id=\"i"; (string_of_int (Adef.int_of_iper iper))  ;"\">"; s; "</a>" ]
 ;
 
 
@@ -2148,7 +2149,7 @@ value print_alphab_list conf crit print_elem liste = do {
              in
              do {
                if not same_than_last then
-                 Wserver.printf "<a href=\"#i%s\">%s</a>\n" (hexa_string t) t
+                 Wserver.printf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t
                else ();
                Some t
              })
@@ -2175,7 +2176,7 @@ value print_alphab_list conf crit print_elem liste = do {
              | _ -> () ];
              if not same_than_last then do {
                Wserver.printf "<li>\n";
-               Wserver.printf "<a id=\"i%s\">%s</a>\n" (hexa_string t) t;
+               Wserver.printf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
                Wserver.printf "<ul>\n";
              }
              else ();
