@@ -136,7 +136,7 @@ hr.full{margin-left:0;margin-right:0;}
 #perso{padding-top:0}
 #perso h1{margin:20px 10px 10px 0px;padding:5px;}
 #perso .ch1{font-size:1.5em;}
-#perso .ch2, .ch2 a, span.ch2{font-size:22px;color:#060;font-weight:bold;margin-top:1em;}
+#perso .ch2, .ch2 a, span.ch2{font-size:22px;color:#060;font-weight:bold;margin-bottom:0;}
 #perso .relations ul,#perso .sources ul{margin-left:-15px;margin-top:0;margin-bottom:0;}
 #perso .relations li,#perso .sources li{padding:0px;}
 #perso li{margin:2px 0 0 0;padding:0 0 0 10px;}
