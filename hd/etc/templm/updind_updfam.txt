@@ -183,9 +183,9 @@
   <!--
     var g_prefix = "%prefix;";
     %apply;g_oku("fn",bvar.uppercase,"tUC1")
-    %apply;g_oku("occu","no","")
-    %apply;g_oku("place","no","")
     %apply;g_oku("sn",bvar.uppercase,"tUC")
+    %apply;g_oku("place","no","")
+    %apply;g_oku("occu","no","")
     %apply;g_oku("src","no","")
   -->
 </script>
