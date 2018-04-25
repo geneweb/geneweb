@@ -193,7 +193,7 @@ value print_alphabetic_all conf base is_surnames ini list len = do {
     List.iter
       (fun (ini_k, _) ->
          let ini = capitalize_if_not_utf8 ini_k in
-         stagn "a" "href=\"#%s\"" ini begin
+         stagn "a" "href=\"#a%s\"" ini begin
            Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
          end)
     list;
@@ -203,7 +203,7 @@ value print_alphabetic_all conf base is_surnames ini list len = do {
       (fun (ini_k, l) ->
          let ini = capitalize_if_not_utf8 ini_k in
          tag "li" begin
-           stagn "a" "id=\"%s\"" ini_k begin
+           stagn "a" "id=\"a%s\"" ini_k begin
              Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
            end;
            tag "ul" begin
@@ -430,7 +430,7 @@ value print_alphabetic_short conf base is_surnames ini list len = do {
       List.iter
         (fun (ini_k, _) ->
            let ini = capitalize_if_not_utf8 ini_k in
-           stagn "a" "href=\"#%s\"" ini begin
+           stagn "a" "href=\"#a%s\"" ini begin
              Wserver.printf "%s" (Mutil.tr '_' ' ' ini);
            end)
       list;
@@ -449,7 +449,7 @@ value print_alphabetic_short conf base is_surnames ini list len = do {
                 else ""
               in
               let name =
-                if first && need_ref then " id=\"" ^ ini ^ "\"" else ""
+                if first && need_ref then " id=\"a" ^ ini ^ "\"" else ""
               in
               if not first then Wserver.printf ",\n" else ();
               if href <> "" || name <> "" then

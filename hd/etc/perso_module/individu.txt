@@ -158,8 +158,8 @@
       %else;
         %if;cancel_links;%first_name; %surname;
         %else;
-          <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
-          <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+          <a href="%prefix;m=P;v=%first_name_key;#i%index;">%first_name;</a>
+          <a href="%prefix;m=N;v=%surname_key;#i%index;">%surname;</a>
         %end;
       %end;
     %end;
