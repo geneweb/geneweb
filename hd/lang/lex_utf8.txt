@@ -18,15 +18,7 @@ fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
 en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 
-    about (short date)
-de: ca.
-en: about
-es: alrededor de
-fr: vers
-he:   בערך
-it: circa
-pl: około
-ru: около
+
 
     both
 en: both
