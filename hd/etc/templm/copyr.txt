@@ -7,11 +7,11 @@
         left;left:10px;%else;right;right:10px;%end;">
         <tr><td>
           %if;(referer != "")
-            <a href="%referer;"><img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="[*back]"%/></a>
+            <a href="%referer;"><img src="%image_prefix;/left.png" %wid_hei;left.png; alt="&lt;&lt;" title="[*back]"></a>
           %end;
-          <a href="%prefix;"><img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="[*home]"%/></a>
+          <a href="%prefix;"><img src="%image_prefix;/up.png" %wid_hei;up.pnd; alt="^^" title="[*home]"></a>
           <a href="%url;cgl=on" target="_blank"><img style="border-width: thin"%sp;
-            src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[*cancel GeneWeb links]"%/></a>
+            src="%image_prefix;/right.png"%wid_hei;right.png; alt="" title="[*cancel GeneWeb links]"></a>
         </td></tr>
       </table>
     %end;
@@ -47,5 +47,5 @@
   <img src="%image_prefix;/logo_bas.png" alt="Logo GeneWeb bas"></a>
   %let;suffx;%if;(lang!="en")/%lang;%else;%end;%in;
   <a href="https://geneweb.tuxfamily.org/wiki/GeneWeb%suffx;" target="_blank" title="GeneWeb documentation MediaWiki">
-  <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"/></a>
+  <img src="%image_prefix;/logo_bas_mw.png" alt="Manual of GeneWeb on Mediawiki"></a>
 </div>
