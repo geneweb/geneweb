@@ -134,7 +134,10 @@
             <a href="%prefix;m=MRG_DUP;ip=%index;">[*merge::possible duplications] (oc=%occ;)</a>
           %end;
           <a href="%prefix;m=MRG;i=%index;" style="display:inline-block;width:125px">⨇ [*merge]0</a>%nn;
-          <a href="%prefix;%access;%l_url;i=%index;;del=on;" style="color:red;display:inline-block;float:right;width:125px" title="[*delete::person/persons]1/[family/families]1%nl;[click on dates]">＋ <small>[*delete::person/persons]0</small></a>%nn;
+          <a href="%prefix;%access;%l_url;i=%index;;%if;(evar.del!="on")del=on;%end;"
+            style="%if;(evar.del!="on")color:red;%end;display:inline-block;float:right;width:125px"
+            title="%if;(evar.del="on")[*user/password/cancel]2 [delete::person/persons]0%else;[*delete::person/persons]0%end;/[family/families]0%nl;[click on dates]">%nn;
+            <small>%if;(evar.del="on")[*user/password/cancel]2 [delete]%else;[*delete]%end;</small></a>%nn;
         </span>
       </span>
       %if;(bvar.setup_link != "no")
@@ -1093,7 +1096,7 @@
 <body%body_prop; id="perso">
 <div class="container" onclick="void(0);">
 %message_to_wizard;
-%if;(evar.del = "on")<h1 class="del">[*delete::]… [person/persons]1… [family/families]1…</h1>
+%if;(evar.del = "on")<h1 class="del">[*delete::] [person/persons]0 (-) [or] [family/families]0 (&)</h1>
   %if;(wizard and bvar.can_kill_ancestors="yes")
     <p><strong>/!\ can_kill_ancestors=yes   </strong>
        <a class="del" href="%prefix;m=KILL_ANC;i=%index;" target="ifr"
@@ -1318,7 +1321,7 @@
             <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[*descendants tree]</a>%nn;
             %let;l1;%apply;min(max_desc_level,5)%in;
             <a href="%prefix;m=D;t=L;tl1=hrztl;v=%l1;;maxv=%max_desc_level;;i=%index;">[*descendant tree view]</a>%nn;
-            <a href="%prefix;m=D;t=H;v=%max_desc_level;;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;%access;">[*table] [descendants]</a>%nn;
+            <a href="%prefix;m=D;t=H;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;%access;">[*table] [descendants]</a>%nn;
             <a href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;upd=on;hide=on;%access;">[*long display]</a>%nn;
             <a href="%prefix;m=D;%access;">Menu [tools] [descendants]</a>%nn;
             </span>
@@ -1391,7 +1394,6 @@
 %end;
  </div> 
 </div>
-
 %include.js;
 </body>
 </html>
