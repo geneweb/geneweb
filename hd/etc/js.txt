@@ -30,7 +30,7 @@
       htmlTitle == "[*person added]" ||
       htmlTitle == "[*family added]"
     )
-    { document.getElementById("reference").focus();
+    { document.getElementById("i%evar.i;").focus();
     }
     </script>
   %end;
