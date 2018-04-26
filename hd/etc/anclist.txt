@@ -66,6 +66,23 @@
   </div>
 %end;
 
+%define;buttons()
+  <div class="form-inline ml-5 mt-1 mb-2">
+    <div class="mx-2">
+      <a href="%prefix_no_iz;%nn;
+               %foreach;env_binding;%if;(env.key!="repeat")%env.key;=%env.val;;%end;%end;
+               %if;(evar.repeat!="on")repeat=on;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0 small"
+          title="%if;(evar.repeat="on")[*visualize/show/hide/summary]2%else;%nn;
+          [*visualize/show/hide/summary]1%end; [implex/implexes]1">
+        <i class="fa fa-random fa-fw"></i>
+        <i class="fa fa-toggle-%if;(evar.repeat="on")on%else;off%end; text-muted"></i>
+      </a>
+    </div>
+  </div>
+%end;
+
+
 %define;tothegen(xx)
   [*to the %s generation:::xx]%nn;
 %end;
@@ -97,7 +114,7 @@
 
 %define;ancestors_horizontally(pp, xx, ss1, ss2, ss3, zz)
   %if;(xx > 0)
-    %if;(pp.sosa=zz or (not browsing_with_sosa_ref))
+    %if;(pp.sosa=zz or (not browsing_with_sosa_ref) or evar.repeat="on")
       %if;(pp.has_parents)
         %apply;ancestors_horizontally(
           "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
@@ -135,9 +152,11 @@
       %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
       %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
     %in;
+    <div class="row">
+      <span>%apply;togen(xx).</span>
+      %apply;buttons()
+    </div>
     <p>
-    %apply;togen(xx).
-    </p>
     <table><tr><td style="font-family:monospace;white-space:nowrap;line-height:1.2em;">
     %apply;ancestors_horizontally(
       "self", xx, "&nbsp;&nbsp;&nbsp;", "──&nbsp;", "&nbsp;&nbsp;&nbsp;", 1)
