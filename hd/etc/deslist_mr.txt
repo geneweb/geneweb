@@ -1,0 +1,164 @@
+<!-- $Id: deslist_mr.txt,v 7.00 2018/04/19 12:17:57 mr Exp $ -->
+
+%include.css;
+
+%let;l_url;%prefix;m=D;t=L;tl1=hrztl;v=%l_v;;maxv=%evar.maxv;;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
+%let;l_url1;%prefix;m=A;t=T;t1=HT;v=5;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
+
+%let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
+%let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
+%let;l_v0;%if;(evar.v > max_desc_level)%max_desc_level;%else;%evar.v;%end;%in;
+%let;l_v;%if;(bvar.max_desc_level = "")%l_v0;%elseif;(bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
+%let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
+
+%define;tothegen(xx)
+  [*to the %s generation:::xx]%nn;
+%end;
+
+%define;togen1(xx)
+  %if;(xx = 0)[*specify::generation/generations]0%nn;
+  %elseif;(xx = 1)[*to the children]%nn;
+  %elseif;(xx = 2)[*to the grandchildren]%nn;
+  %elseif;(xx = 3)[*to the great-grandchildren]%nn;
+  %else;
+    %apply;tothegen%with;
+      %apply;nth([nth (generation)], xx)
+    %end;
+  %end;
+%end;
+
+%define;togen()
+  <p>
+    %if;(evar.only != "on")
+      %apply;togen1(l_v)
+    %else;
+      [*generation/generations]0 %l_v;
+    %end;
+  </p>
+%end;
+
+%define;letter(z1)
+  %apply;nth%with;
+    /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
+  %and;z1%end;
+%end;
+
+%define;desc1(z1,z2,z3,z4,curlev,maxlev)
+  %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
+  %let;l2;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)%l1;┗%elseif;(z4 = 0)%l1;┣%end;%if;(child_cnt < 10)━%end;%nn;
+      %else;
+        %if;(z4 = 1)%l1;└%elseif;(z4 = 0)%l1;├%end;%if;(child_cnt < 10)─%end;%nn;
+      %end;
+    %end;
+  %in;
+  %let;zl1;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)z1%l1; %else;z1%l1;┃%end;
+      %else;
+        %if;(z4 = 1)z1%l1; %else;z1%l1;│%end;
+      %end;
+    %end;
+  %in;
+  %let;zl2;%sex;%in;
+  %if;(has_families)
+    %let;l21;
+      %if;(curlev != 0)
+        %if;(not cancel_links)
+          <a href="%l_url;i=%index;">%child_cnt;</a>%nn;
+        %else;
+          %child_cnt;%nn;
+        %end;
+      %end;
+    %in;
+    %let;l22;
+      %if;(browsing_with_sosa_ref and has_sosa)
+        %if;(has_siblings)▶%else;▷%end;
+      %end;
+    %in;
+    %foreach;family;
+      %let;zl3;%if;(family_cnt = nb_families)1%else;0%end;%in;
+      %if;(nb_families > 1)
+        %let;l3;
+          %if;(curlev != 0 and family_cnt > 1)
+            %if;(z2 = 0)
+              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;┃%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
+            %else;
+              %if;(z4 = 1)%l1; %elseif;(z4 = 0)%l1;│%end;%if;(child_cnt <10) %end;%child_cnt;%nn;
+            %end;
+          %else;
+            %l2;%l21;%nn;
+          %end;
+        %in;
+        <span style="border:px solid #008CD2;"><tt style="background-color:">z1%l3;%apply;letter(family_cnt)%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt></span>
+      %else;
+        <tt style="background-color:">z1%l2;%l21;%if;(is_male)━%if;(curlev < maxlev and has_children)┳%else;━%end;%else;─%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt>
+      %end;
+      %if;(family_cnt > 1)
+        %self;%nn;
+      %elseif;(not cancel_links)
+        <a href="%prefix;;i=%index;">%self;</a>%self.title; %dates;%nn;
+      %else;
+        %self; %self.title; %dates;%nn;
+      %end;
+      %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small> %end;
+      %if;(not cancel_links)
+        <a href="%prefix;;i=%spouse.index;">%spouse;</a> %spouse.dates;
+      %else;
+        %spouse; %spouse.dates;
+      %end;
+      %if;(spouse.is_descendant and spouse.index < index and 0) See above/below <br%/>
+      %else;
+      <br%/>
+        %if;(curlev < maxlev)
+          %if;has_children;
+            %foreach;child;
+              %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
+              %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev)
+            %end;
+          %end;
+        %end;
+      %end;
+    %end;
+  %else;
+    %let;l23;
+      %if;(curlev != 0)
+        %if;(not cancel_links)
+          <a href="%l_url1;i=%index;">%child_cnt;</a>%nn;
+        %else;
+          %child_cnt;%nn;
+        %end;
+      %end;
+    %in;
+    %let;l24;
+      %if;(browsing_with_sosa_ref and has_sosa)
+        %if;(has_siblings)◀%else;◁%end;
+      %end;
+    %in;
+    <tt>z1%l2;%l23;%if;(is_male)━━%elseif(is_female)──%else;┈┈%end;%l24;</tt>
+    %if;(not cancel_links)
+      <a href="%prefix;;i=%index;">%self;</a> %dates;<br%/>
+    %else;
+      %self; %dates;<br%/>
+    %end;
+  %end;
+%end;
+
+<div class="container-fluid">
+%if;(not cancel_links and has_parents)
+  <div class="menu">
+    <span>
+      <a href="%l_url1;i=%index;" title="(Y)" accesskey="Y">[*horizontal tree]0</a>
+    </span>
+    <span>
+      <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[*descendants tree]</a>%nn;
+    </span>
+  </div>
+%end;
+%self.mark_descendants;
+%apply;togen()
+<p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>
+</div>
