@@ -159,7 +159,7 @@
             %if;(spouse.first_name != "?" and spouse.surname != "?")
               %if;(family_cnt > 1),%sp;%end;
               %apply;image_MF("spouse")
-              %apply;link(spouse.access, spouse)
+              %apply;link("spouse")
             %end;
           %end;
         %end;
@@ -207,17 +207,40 @@
   %end;
 %end;
 
-%define;link(aa, xx)
-  %if;(evar.cgl = "on")xx%else;<a href="%prefix;aa">xx</a>%end;
+%define;link(xx)
+    %if;(evar.cgl = "on")%xx;%else;<a id="i%xx.index;" href="%prefix;%xx.access;">%xx;</a>%end;
+%end;
+
+%define;link0(xx)
+  %let;bb;
+    %if;(xx.same!="")
+      %ancestor.same;
+    %else;%ancestor;%end;
+  %in;
+  %if;(evar.cgl = "on")%bb;%else;<a id="i%xx.index;" href="%prefix;%xx.access;">%bb;</a>%end;
+%end;
+
+%define;link1(xx)
+  %let;bb;
+    %if;(xx.same!="")
+      %if(evar.sosab = 16)%xx.same.hexa;
+      %elseif(evar.sosab = 8)%xx.same.octal;
+      %else;%xx.same;
+      %end;
+    %else;
+      %xx;
+    %end;
+  %in;
+  %if;(evar.cgl = "on")%bb;%else;<a id="i%xx.index;" href="%prefix;%xx.access;">%bb;</a>%end;
 %end;
 
 %define;link2(xx)
-  %if;(evar.cgl = "on")%xx;%else;<a href="%prefix;%xx.access;">%xx;</a>%end;
+  %if;(evar.cgl = "on")%xx;%else;<a id="i%xx.index;" href="%prefix;%xx.access;">%xx;</a>%end;
   %xx.title;%xx.dates;
 %end;
 
-%define;my_link(aa, xx, rr)
-  %if;(evar.cgl = "on" or rr)xx%else;<a href="%prefix;aa">xx</a>%end;
+%define;my_link(xx)
+  %if;(evar.cgl = "on" or xx.is_restricted)%xx;%else;<a id="i%xx.index" href="%prefix;%xx.access;">%xx;</a>%end;
 %end;
 
 %define;somebody_extra_info(xx)
@@ -226,7 +249,7 @@
     %foreach;xx.relation;%nl;
       (%relation_type;:
       %if;has_relation_him;
-        %apply;link2(relation_him.var)
+        %apply;link2("relation_him")
         %if;(relation_him.sosa_in_list != ""),
           [see] <a href="#%relation_him.sosa_in_list;">%nn;
           %relation_him.sosa_in_list;</a>%nn;
@@ -234,7 +257,7 @@
       %end;
       %if;has_relation_her;
         %if;has_relation_him;,%nl;%end;
-        %apply;link2(relation_her.var)
+        %apply;link2("relation_her")
         %if;(relation_her.sosa_in_list != ""),
           [see] <a href="#%relation_her.sosa_in_list;">%nn;
           %relation_her.sosa_in_list;</a>%nn;
@@ -243,7 +266,7 @@
     %end;
     %foreach;xx.related;%nl;
       (%related_type;:
-       %apply;link2(related.var)
+       %apply;link2("related")
        %if;(related.sosa_in_list != ""),
          [see] <a href="#%related.sosa_in_list;">%nn;
          %related.sosa_in_list;</a>%nn;
@@ -253,13 +276,13 @@
 %end;
 
 %define;somebody(xx)
-  <b>%apply;my_link(xx.access, xx, xx.is_restricted)</b>%nn;
+  <b>%apply;my_link(xx.access, xx, xx.is_restricted, xx.index)</b>%nn;
   %apply;somebody_long_info("xx")
   %apply;somebody_extra_info("xx")
 %end;
 
 %define;somebody_spouse_parent(xx)
-  <b>%apply;my_link(spouse.xx.access, spouse.xx, spouse.is_restricted)</b>%nn;
+  <b>%apply;my_link(spouse.xx.access, spouse.xx, spouse.is_restricted, spouse.index)</b>%nn;
   %if;spouse.xx.has_nobility_titles;,
     <a href="%prefix;m=TT;sm=S;t=%spouse.xx.nobility_title.ident_key;
     ;p=%spouse.xx.nobility_title.place_key;">%nn;
@@ -570,7 +593,7 @@
 %end;
 
 %define;child_long_info(spec)
-  <b>%apply;my_link(child.access, child.child_name, child.is_restricted)%nn;</b>%nn;
+  <b>%apply;my_link(child.access, child.child_name, child.is_restricted, child.index)%nn;</b>%nn;
   %apply;somebody_long_info("child")
   %if;(child.sosa_in_list != "").
     %if;(evar.only != "on")[*see]%sp;
@@ -687,7 +710,7 @@
         %if;(evar.witn = "on" and has_witnesses)([witness/witnesses]1:
           %foreach;witness;
             %if;(not is_first),%nl;%end;
-            %apply;link2(witness.var)
+            %apply;link2("witness")
           %end;),
         %end;
         %if;(evar.comm = "on" and (has_comment or has_marriage_note))
@@ -905,9 +928,7 @@
     <div class="d-flex justify-content-between">
       <div class="align-self-center mr-2">
         %apply;image_MF("ancestor")
-        %apply;link%with;%ancestor.access;%and;
-          %ancestor;
-        %end;
+        %apply;link("ancestor")
         %if;(evar.title="on")%ancestor.title;%end;
         %if;(ancestor.same != "" and evar.repeat = "on")
           %sp;→
@@ -984,9 +1005,7 @@
         %if;(family_cnt = 1)
           <td class="align-middle" %if;(ancestor.nb_families > 1) %end;>
             %apply;image_MF("spouse")
-            %apply;link%with;%spouse.access;%and;
-              %spouse;
-            %end;
+            %apply;link("spouse")
           </td>
         %end;
       %end;
@@ -1171,9 +1190,7 @@
               %end;
               >
               %apply;image_MF("spouse")
-              %apply;link%with;%spouse.access;%and;
-                %spouse;
-              %end;
+              %apply;link("spouse")
             </td>
           %end;
           %if;(evar.marr_date = "on")
@@ -1429,11 +1446,11 @@
                     %if;(ancestor.same = "")%incr_count;%end;
                     %ancestor.anc_sosa;%sp;
                     %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-                    %apply;link%with;%ancestor.access;%and;
-                      %if;(ancestor.same != "")%ancestor.same;
-                      %else;%ancestor;%end;
+                    %apply;link0("ancestor")
+                    %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;
+                    %else;
+                      %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)
                     %end;
-                    %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
                   %end;
                 </li>%nl;
               %end;
@@ -1464,14 +1481,9 @@
             %else;%ancestor.anc_sosa;
             %end;%sp;
             %if;(ancestor.same != "")=&gt;%else;-%end;%sp;
-            %apply;link%with;%ancestor.access;%and;
-               %if;(ancestor.same != "")%nn;
-                 %if(evar.sosab = 16)%ancestor.same.hexa;
-                 %elseif(evar.sosab = 8)%ancestor.same.octal;
-                 %else;%ancestor.same;
-                 %end;
-               %else;%ancestor;
-               %end;
+            %apply;link1("ancestor")
+            %if;(ancestor.same != "")
+              %sp;(<a href="#i%ancestor.index;" title="[implex/implexes]0, [see above]">↑</a>)<br>
             %end;
             %if;(ancestor.same = "")%ancestor.title;%ancestor.dates;%end;
           </li>%nl;
@@ -1684,7 +1696,7 @@
                   <td> &nbsp; </td>
                   <td>
                     %apply;image_MF("ancestor")
-                    %apply;link(ancestor.access, ancestor)
+                    %apply;link("ancestor")
                     %ancestor.title;
                   </td>
                   %apply;display_missing_ancestor_info("ancestor")
@@ -1703,7 +1715,7 @@
                     <td align="center"> x </td>
                     <td>
                       %apply;image_MF("ancestor.mother")
-                      %apply;link(ancestor.mother.access, ancestor.mother)
+                      %apply;link("ancestor.mother")
                       %ancestor.mother.title;
                     </td>
                     %apply;display_missing_ancestor_info("ancestor.mother")
@@ -1722,7 +1734,7 @@
                     <td align="center"> x </td>
                     <td>
                       %apply;image_MF("ancestor.father")
-                      %apply;link(ancestor.father.access, ancestor.father)
+                      %apply;link("ancestor.father")
                       %ancestor.father.title;
                     </td>
                     %apply;display_missing_ancestor_info("ancestor.father")
