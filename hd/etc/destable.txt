@@ -796,7 +796,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
       <span class="fa fa-list fa-lg fa-fw mr-1"></span>[*descendants tree]%nn;
     </a>
     <div class="input-group mx-2 mb-1">
-      <a role="button" class="btn pl-3%if;(evar.v=0) disabled text-muted%end;"%sp;
+      <a role="button" class="btn pl-3%if;(evar.v=1) disabled text-muted%end;"%sp;
         title="[*delete] 1 [generation/generations]0"%sp;
         href="%prefix_base_password;%nn;
               %foreach;env_binding;
@@ -804,7 +804,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
                 %else;%env.key=%env.val;;%nn;
                 %end;
               %end;"><i class="fa fa-minus fa-lg"></i></a>
-      <a role="button" class="btn pl-2"%sp;
+      <a role="button" class="btn pl-2%if;(evar.v=max_desc_level) disabled text-muted%end;"%sp;
         title="[*add] 1 [generation/generations]0"%sp;
         href="%prefix_base_password;%nn;
               %foreach;env_binding;
