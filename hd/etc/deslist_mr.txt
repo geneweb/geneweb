@@ -58,7 +58,7 @@
 %end;
 
 %define;desc1(z1,z2,z3,z4,curlev,maxlev)
-  %incr_count;
+  %apply;add_in_sorted_list(index)
   %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
   %let;l2;
     %if;(curlev != 0)
@@ -125,9 +125,11 @@
       %else;
        %spouse; %spouse.dates;
       %end;
-      %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)%incr_count;%end;
-      %if;(spouse.is_descendant and spouse.index < index and 0) See above/below <br%/>
-      %else;
+      %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
+        %apply;add_in_sorted_list(spouse.index)
+      %end;
+      %if;(spouse.is_descendant and evar.implx="on") ([*implex/implexes]0)
+      %end;
       <br%/>
         %if;(curlev < maxlev)
           %if;has_children;
@@ -137,7 +139,6 @@
             %end;
           %end;
         %end;
-      %end;
     %end;
   %else;
     %let;l23;
@@ -214,7 +215,7 @@
       <i class="fa fa-sitemap fa-lg fa-fw mr-1" aria-hidden="true"></i>[*descendants tree]%nn;
     </a>
     <span class="sr-only">— [*generation/generations]0</span>
-    <a role="button" class="btn pl-3%if;(evar.v=1) disabled text-muted%end;"%sp;
+    <a role="button" class="btn pl-3%if;(evar.v=0) disabled text-muted%end;"%sp;
       title="[*delete] 1 [generation/generations]0"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
@@ -225,7 +226,7 @@
       <i class="fa fa-minus fa-lg" aria-hidden="true"></i>
       <span class="sr-only">-1</span>
     </a>
-    <a role="button" class="btn pl-2%if;(evar.v=max_desc_level) disabled text-muted%end;"%sp;
+    <a role="button" class="btn pl-2%if;(evar.v=100) disabled text-muted%end;"%sp;
       title="[*add] 1 [generation/generations]0"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
@@ -235,6 +236,18 @@
             %end;">%nn;
       <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
       <span class="sr-only">+1</span>
+    </a>
+  </div>
+  <div class="d-flex">
+    
+    <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
+      href="%prefix_base_password;%nn;
+            %foreach;env_binding;
+              %if;(env.key!="implx")%env.key=%env.val;;%end;
+            %end;
+            %if;(evar.implx!="on")implx=on%end;">%nn;
+      <i class="fa fa-random fa-lg fa-fw mr-1"></i>%nn;
+      %if;(evar.implx!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [implex/implexes]1%nn;
     </a>
     %if;(evar.cgl="" or evar.cgl!="on")
       <span class="sr-only">—</span>
@@ -252,13 +265,19 @@
 
 <div class="container-fluid">
 %mark_descendants;
-%reset_count;
+%empty_sorted_list;
+
 %apply;togen()
 <p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>
 </div>
 
-<p>[*total][:] %apply;desc_count%with;%evar.v;%end; [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
-               
+%reset_count;
+%foreach;sorted_list_item;
+  %incr_count;
+%end;
+
+<p>[*total][:] %apply;desc_count%with;%apply;min(evar.v,max_desc_level)%end; [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
+
 
 %import;trl;
 %import;copyr;
