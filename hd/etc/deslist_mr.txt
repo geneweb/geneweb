@@ -226,7 +226,7 @@
       <i class="fa fa-minus fa-lg" aria-hidden="true"></i>
       <span class="sr-only">-1</span>
     </a>
-    <a role="button" class="btn pl-2%if;(evar.v=100) disabled text-muted%end;"%sp;
+    <a role="button" class="btn pl-2%if;(evar.v>static_max_desc_level) disabled text-muted%end;"%sp;
       title="[*add] 1 [generation/generations]0"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
@@ -276,7 +276,7 @@
   %incr_count;
 %end;
 
-<p>[*total][:] %apply;desc_count%with;%apply;min(evar.v,max_desc_level)%end; [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
+<p>[*total][:] %apply;desc_count(max_desc_level) [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
 
 
 %import;trl;
