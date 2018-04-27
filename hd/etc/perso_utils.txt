@@ -185,6 +185,30 @@
   %end;
 %end;
 
+%define;gend(xx)
+  %if;(evar.xx = 0)[specify::generation/generations]0%nn;
+  %elseif;(evar.xx = 1)[the children]%nn;
+  %elseif;(evar.xx = 2)[the grandchildren]%nn;
+  %elseif;(evar.xx = 3)[the great-grandchildren]%nn;
+  %else;
+    %apply;thegen%with;
+      %apply;nth([nth (generation)], evar.xx)
+    %end;
+  %end;
+%end;
+
+%define;desc_count(xxx)
+  %foreach;descendant_level;
+    %if;(level=xxx)%number_of_descendants;%end;
+  %end;
+%end;
+
+%define;desc_count_l(xxx)
+  %foreach;descendant_level;
+    %if;(level=xxx)%number_of_descendants_at_level;%end;
+  %end;
+%end;
+
 %define;on_side(xx)
   [*on %s's side:::xx]
 %end;
