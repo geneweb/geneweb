@@ -1471,7 +1471,7 @@ value print conf base p =
   let templ =
     match p_getenv conf.env "t" with
     [ Some ("F" | "L" | "M") -> "deslist"
-    | Some "D" -> "deslist_mr"
+    | Some "D" -> "deslist_hr"
     | Some ("H" | "I" | "A") -> "destable"
     | Some "V" -> "destree"
     | Some _ -> ""
