@@ -287,7 +287,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                 <a class="dropdown-item" href="%prefix;%access;;m=D;t=H;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;age=on;occu=on;gen=on;ns=on;%if;(evar.image="off")image=off;%end;"><span class="fa fa-table fa-fw mr-2"></span>[*table] [descendants]</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;"><span class="fa fa-newspaper fa-fw mr-2"></span>[*long display]</a>
                 <a class="dropdown-item" href="%prefix;%access;;m=D;t=A;num=on;v=%max_desc_level;;"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D’Aboville</a>
-                <a class="dropdown-item" href="%prefix;%access;;m=D;t=D;num=on;v=%max_desc_level;;"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D'Aboville tree</a>
+                <a class="dropdown-item" href="%prefix;%access;;m=D;t=D;v=%max_desc_level;;"><span class="fa fa-code-branch fa-flip-vertical fa-fw mr-2"></span>D’Aboville tree</a>
               </div>
             </li>
           %end;
