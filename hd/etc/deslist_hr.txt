@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: deslist_mr.txt,v 7.00 2018-04-27 13:15:19 ddr Exp $ -->
+  <!-- $Id: deslist_hr.txt,v 7.00 2018-04-27 13:15:19 gwmr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %apply;a_of_b_gr_eq_lev%with;
@@ -44,8 +44,8 @@
 %let;l_v;%if;(bvar.max_desc_level = "" or bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
 %let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
 
-%let;l_url;%prefix;m=D;t=D;v=%l_v;;maxv=%evar.maxv;;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
-%let;l_url1;%prefix;m=A;t=T;t1=HT;v=5;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
+%let;l_url;%prefix;m=D&t=D&v=%l_v;&maxv=%evar.maxv;&marriage=%evar.marriage;&sosa=%evar.sosa;&xy=%evar.xy;&sib=%evar.sib;&%in;
+%let;l_url1;%prefix;m=A&t=T&t1=HT&v=5;marriage=%evar.marriage;&sosa=%evar.sosa;&xy=%evar.xy;&sib=%evar.sib;&%in;
 
 %define;togen()
   <p>
@@ -83,7 +83,7 @@
     %let;l21;
       %if;(curlev != 0)
         %if;(not cancel_links)
-          <a href="%l_url;i=%index;">%child_cnt;</a>%nn;
+          <a href="%l_url;i=%index&">%child_cnt;</a>%nn;
         %else;
           %child_cnt;%nn;
         %end;
@@ -115,13 +115,13 @@
       %if;(family_cnt > 1)
         %self;%nn;
       %elseif;(not cancel_links)
-        <a href="%prefix;;i=%index;">%self;</a>%self.title; %dates;%nn;
+        <a href="%prefix;&i=%index;">%self;</a>%self.title; %dates;%nn;
       %else;
         %self; %self.title; %dates;%nn;
       %end;
       %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small>%end;%sp;
       %if;(not cancel_links)
-        <a href="%prefix;;i=%spouse.index;">%spouse;</a> %spouse.dates;
+        <a href="%prefix;&i=%spouse.index;">%spouse;</a> %spouse.dates;
       %else;
        %spouse; %spouse.dates;
       %end;
@@ -157,7 +157,7 @@
     %in;
     <tt>z1%l2;%l23;%if;(is_male)━━%elseif(is_female)──%else;┈┈%end;%l24;</tt>
     %if;(not cancel_links)
-      <a href="%prefix;;i=%index;">%self;</a> %dates;<br%/>
+      <a href="%prefix;&i=%index;">%self;</a> %dates;<br%/>
     %else;
       %self; %dates;<br%/>
     %end;
@@ -168,7 +168,7 @@
 %if;(not cancel_links)
   <div class="d-flex">
     <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%access;;m=D"><i class="fa fa-cog fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
+      href="%prefix_base_password;%access;&m=D"><i class="fa fa-cog fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
       [*options] [descendants]%nn;
     </a>
     %if;(evar.t!="")
@@ -176,42 +176,42 @@
       <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
-              %if;(env.key="m")m=A;%nn;
-              %elseif;(env.key="t")t=Z;%nn;
-              %elseif;(env.key="v")v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;;%nn;
-              %else;%env.key=%env.val;;%nn;
+              %if;(env.key="m")&m=A%nn;
+              %elseif;(env.key="t")&t=Z%nn;
+              %elseif;(env.key="v")&v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;%nn;
+              %elseif;(env.key!="")&%env.key=%env.val;%nn;
               %end;%nn;
             %end;
-            %if;(evar.num="")num=on;%end;%if;(evar.birth_place="")birth_place=on;%end;%nn;
-            %if;(evar.birth_place="")birth_place=on;%end;%nn;
-            %if;(evar.marr="")marr=on;%end;%if;(evar.marr_date="")marr_date=on;%end;%nn;
-            %if;(evar.marr_place="")marr_place=on;%end;%if;(evar.child="")child=on;%end;%nn;
-            %if;(evar.death="")death=on;%end;%if;(evar.death_place="")death_place=on;%end;%nn;
-            %if;(evar.age="")age=on;%end;%if;(evar.occu="")occu=on;%end;%nn;
-            %if;(evar.gen="")gen=on;%end;%if;(evar.ns="")ns=on;%end;%nn;">%nn;
+            %if;(evar.num="")&num=on%end;%if;(evar.birth_place="")&birth_place=on%end;%nn;
+            %if;(evar.birth_place="")&birth_place=on%end;%nn;
+            %if;(evar.marr="")&marr=on%end;%if;(evar.marr_date="")&marr_date=on%end;%nn;
+            %if;(evar.marr_place="")&marr_place=on%end;%if;(evar.child="")&child=on%end;%nn;
+            %if;(evar.death="")&death=on%end;%if;(evar.death_place="")&death_place=on%end;%nn;
+            %if;(evar.age="")&age=on%end;%if;(evar.occu="")&occu=on%end;%nn;
+            %if;(evar.gen="")&gen=on%end;%if;(evar.ns="")&ns=on%end;%nn;">%nn;
       <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>[*table] [ancestors]</a>
       <span class="sr-only">—</span>
       <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
-              %if;(env.key="m")m=D&%nn;
-              %elseif;(env.key="t")t=H&%nn;
-              %elseif;(env.key="v")v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;&%nn;
-              %else;%env.key=%env.val;&%nn;
+              %if;(env.key="m")&m=D%nn;
+              %elseif;(env.key="t")&t=H%nn;
+              %elseif;(env.key="v")&v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;%nn;
+              %elseif;(env.key!="")&%env.key=%env.val;%nn;
               %end;
             %end;%nn;
-            %if;(evar.num="")num=on;%end;%nn;
-            %if;(evar.birth="")birth=on;%end;%if;(evar.birth_place="")birth_place=on;%end;%nn;
-            %if;(evar.marr="")marr=on;%end;%if;(evar.marr_date="")marr_date=on;%end;%nn;
-            %if;(evar.marr_place="")marr_place=on;%end;%if;(evar.child="")child=on;%end;%nn;
-            %if;(evar.death="")death=on;%end;%if;(evar.death_place="")death_place=on;%end;%nn;
-            %if;(evar.age="")age=on;%end;%if;(evar.occu="")occu=on;%end;%nn;
-            %if;(evar.gen="")gen=on;%end;%if;(evar.ns="")ns=on;%end;%nn;">%nn;
+            %if;(evar.num="")&num=on%end;%nn;
+            %if;(evar.birth="")&birth=on%end;%if;(evar.birth_place="")&birth_place=on%end;%nn;
+            %if;(evar.marr="")&marr=on%end;%if;(evar.marr_date="")&marr_date=on%end;%nn;
+            %if;(evar.marr_place="")&marr_place=on%end;%if;(evar.child="")&child=on%end;%nn;
+            %if;(evar.death="")&death=on%end;%if;(evar.death_place="")&death_place=on%end;%nn;
+            %if;(evar.age="")&age=on%end;%if;(evar.occu="")&occu=on%end;%nn;
+            %if;(evar.gen="")&gen=on%end;%if;(evar.ns="")&ns=on%end;%nn;">%nn;
       <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>[*table] [descendants]</a>
     %end;
     <span class="sr-only">—</span>
     <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%access;;m=D;t=T;v=%evar.v;;%if;(evar.image="off")image=off%end;">%nn;
+      href="%prefix_base_password;%access;&m=D&t=T&v=%evar.v;&%if;(evar.image="off")image=off&%end;">%nn;
       <i class="fa fa-sitemap fa-lg fa-fw mr-1" aria-hidden="true"></i>[*descendants tree]%nn;
     </a>
     <span class="sr-only">— [*generation/generations]0</span>
@@ -219,8 +219,8 @@
       title="[*delete] 1 [generation/generations]0"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
-              %if;(env.key="v" and evar.v>0)v=%expr(evar.v-1);%nn;
-              %else;%env.key=%env.val;;%nn;
+              %if;(env.key="v" and evar.v>0)&v=%expr(evar.v-1)%nn;
+              %elseif;(env.key!="")&%env.key=%env.val;%nn;
               %end;
             %end;">%nn;
       <i class="fa fa-minus fa-lg" aria-hidden="true"></i>
@@ -230,8 +230,8 @@
       title="[*add] 1 [generation/generations]0"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
-              %if;(env.key="v")v=%expr(evar.v+1);%nn;
-              %else;%env.key=%env.val;;%nn;
+              %if;(env.key="v")&v=%expr(evar.v+1)%nn;
+              %elseif;(env.key!="")&%env.key=%env.val;%nn;
               %end;
             %end;">%nn;
       <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
@@ -243,9 +243,9 @@
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
-              %if;(env.key!="implx")%env.key=%env.val;;%end;
+              %if;(env.key!="implx" and env.key!="")&%env.key=%env.val;%end;
             %end;
-            %if;(evar.implx!="on")implx=on%end;">%nn;
+            %if;(evar.implx!="on")&implx=on%end;">%nn;
       <i class="fa fa-random fa-lg fa-fw mr-1"></i>%nn;
       %if;(evar.implx!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [implex/implexes]1%nn;
     </a>
@@ -255,8 +255,8 @@
         title="Cancel all URL links"%sp;
         href="%prefix_base_password;%nn;
               %foreach;env_binding;
-                %env.key=%env.val;;%nn;
-              %end;cgl=on;">%nn;
+                %if;(env.key!="")&%env.key=%env.val;%end;%nn;
+              %end;&cgl=on">%nn;
         <i class="fa fa-unlink fa-fw mr-1" aria-hidden="true"></i>[*cancel GeneWeb links]%nn;
       </a>
     %end;
