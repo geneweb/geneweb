@@ -2134,6 +2134,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "max_desc_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
+  | "static_max_desc_level" ->
+      match get_env "static_max_desc_level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
   | "nobility_title" ->
       match get_env "nobility_title" env with
       [ Vtitle p t ->
@@ -5404,6 +5408,10 @@ value gen_interp_templ menu title templ_fname conf base p = do {
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
     in
+    let desc_level_table_m =
+      let dlt () = make_desc_level_table conf base 120 p in
+      Lazy.from_fun dlt
+    in
     let desc_level_table_l_save =
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
@@ -5417,6 +5425,10 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     in
     let mcl () = Vint (max_cousin_level conf base p) in
     let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
+    (* Static max descendant level *)
+    let smdl () =
+      Vint (max_descendant_level conf base desc_level_table_m)
+    in
     let nldb () =
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
       let fname = Filename.concat bdir "notes_links" in
@@ -5440,6 +5452,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
      ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
      ("max_cous_level", Vlazy (Lazy.from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.from_fun mdl));
+     ("static_max_desc_level", Vlazy (Lazy.from_fun smdl));
      ("desc_level_table", Vdesclevtab desc_level_table_l);
      ("desc_level_table_save", Vdesclevtab desc_level_table_l_save);
      ("nldb", Vlazy (Lazy.from_fun nldb));
