@@ -1,9 +1,42 @@
-<!-- $Id: deslist_mr.txt,v 7.00 2018/04/19 12:17:57 mr Exp $ -->
-
+<!DOCTYPE html>
+<html lang="%lang;">
+<head>
+  <!-- $Id: deslist_mr.txt,v 7.00 2018-04-27 13:15:19 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2017 INRIA -->
+  <title>%nn;
+    %apply;a_of_b_gr_eq_lev%with;
+      [*descendants]%nn;
+    %and;
+      %if;(public_name != "")%public_name;%else;%first_name;%end;
+      %if;(qualifier != "") %qualifier;%end;
+      %sp;%surname;
+    %end;
+  </title>
+  <meta name="robots" content="none">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="%image_prefix;/favicon_gwd.png">
 %include.css;
+%base_header;
+</head>
+<body%body_prop;>
+%message_to_wizard;
+<div class="container-fluid">
+%import;perso_utils
+%if;not cancel_links;
+  %import;menubar;
+%end;
 
-%let;l_url;%prefix;m=D;t=L;tl1=hrztl;v=%l_v;;maxv=%evar.maxv;;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
-%let;l_url1;%prefix;m=A;t=T;t1=HT;v=5;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
+<h1>%nn;
+  %apply;a_of_b_gr_eq_lev%with;
+    [*descendants]%nn;
+  %and;
+    %if;(public_name != "")%public_name;%else;%first_name;%end;
+    %if;(qualifier != "") <em>%qualifier;</em>%end;
+    %sp;%surname;
+    %if;(alias != "") <em>(%alias;)</em>%end;
+  %end;
+</h1>
 
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
@@ -11,39 +44,21 @@
 %let;l_v;%if;(bvar.max_desc_level = "" or bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
 %let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
 
-%define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
-%end;
-
-%define;togen1(xx)
-  %if;(xx = 0)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 1)[*to the children]%nn;
-  %elseif;(xx = 2)[*to the grandchildren]%nn;
-  %elseif;(xx = 3)[*to the great-grandchildren]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
+%let;l_url;%prefix;m=D;t=D;v=%l_v;;maxv=%evar.maxv;;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
+%let;l_url1;%prefix;m=A;t=T;t1=HT;v=5;marriage=%evar.marriage;;sosa=%evar.sosa;;xy=%evar.xy;;sib=%evar.sib;;%in;
 
 %define;togen()
   <p>
     %if;(evar.only != "on")
-      %apply;togen1(l_v)
+      %apply;togend(l_v)
     %else;
       [*generation/generations]0 %l_v;
     %end; %if;(evar.v>l_v)%sp;(max)%end;
   </p>
 %end;
 
-%define;letter(z1)
-  %apply;nth%with;
-    /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
-  %and;z1%end;
-%end;
-
 %define;desc1(z1,z2,z3,z4,curlev,maxlev)
+  %incr_count;
   %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
   %let;l2;
     %if;(curlev != 0)
@@ -110,6 +125,7 @@
       %else;
        %spouse; %spouse.dates;
       %end;
+      %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)%incr_count;%end;
       %if;(spouse.is_descendant and spouse.index < index and 0) See above/below <br%/>
       %else;
       <br%/>
@@ -147,18 +163,110 @@
   %end;
 %end;
 
-<div class="container-fluid">
-%if;(not cancel_links and has_parents)
-  <div class="menu">
-    <span>
-      <a href="%l_url1;i=%index;" title="(Y)" accesskey="Y">[*horizontal tree]0</a>
-    </span>
-    <span>
-      <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[*descendants tree]</a>%nn;
-    </span>
+%( Boutons de configurations et d'options %)
+%if;(not cancel_links)
+  <div class="d-flex">
+    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"%sp;
+      href="%prefix_base_password;%access;;m=D"><i class="fa fa-cog fa-lg fa-fw mr-1"></i>%nn;
+      [*options] [descendants]%nn;
+    </a>
+    %if;(evar.t!="A")
+      <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
+      href="%prefix_base_password;%nn;
+            %foreach;env_binding;
+              %if;(env.key="m")m=A;%nn;
+              %elseif;(env.key="t")t=Z;%nn;
+              %elseif;(env.key="v")v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;;%nn;
+              %else;%env.key=%env.val;;%nn;
+              %end;%nn;
+              %if;(evar.num="")num=on;%end;%if;(evar.birth=on;%end;%nn;
+              %if;(evar.birth_place="")birth_place=on;%end;%nn;
+              %if;(evar.marr="")marr=on;%end;%if;(evar.marr_date="")marr_date=on;%end;%nn;
+              %if;(evar.marr_place="")marr_place=on;%end;%if;(evar.child="")child=on;%end;%nn;
+              %if;(evar.death="")death=on;%end;%if;(evar.death_place="")death_place=on;%end;%nn;
+              %if;(evar.age="")age=on;%end;%if;(evar.occu="")occu=on;%end;%nn;
+              %if;(evar.gen="")gen=on;%end;%if;(evar.ns="")ns=on;%end;%nn;
+            %end;">%nn;
+      <span class="fa fa-table fa-lg fa-fw mr-1"></span>[*table] [ancestors]</a>
+      <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
+      href="%prefix_base_password;%nn;
+            %foreach;env_binding;
+              %if;(env.key="m")m=D;%nn;
+              %elseif;(env.key="t")t=H;%nn;
+              %elseif;(env.key="v")v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;;%nn;
+              %else;%env.key=%env.val;;%nn;
+              %end;%nn;
+              %if;(evar.num="")num=on;%end;%if;(evar.birth=on;%end;%nn;
+              %if;(evar.birth_place="")birth_place=on;%end;%nn;
+              %if;(evar.marr="")marr=on;%end;%if;(evar.marr_date="")marr_date=on;%end;%nn;
+              %if;(evar.marr_place="")marr_place=on;%end;%if;(evar.child="")child=on;%end;%nn;
+              %if;(evar.death="")death=on;%end;%if;(evar.death_place="")death_place=on;%end;%nn;
+              %if;(evar.age="")age=on;%end;%if;(evar.occu="")occu=on;%end;%nn;
+              %if;(evar.gen="")gen=on;%end;%if;(evar.ns="")ns=on;%end;%nn;
+            %end;">%nn;
+      <span class="fa fa-table fa-lg fa-fw mr-1"></span>[*table] [descendants]</a>
+    %end;
+    <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
+      href="%prefix_base_password;%access;;m=D;t=T;v=%evar.v;;%if;(evar.image="off")image=off%end;">%nn;
+      <span class="fa fa-sitemap fa-lg fa-fw mr-1"></span>[*descendants tree]%nn;
+    </a>
+    <a role="button" class="btn pl-3%if;(evar.v=0) disabled text-muted%end;"%sp;
+      title="[*delete] 1 [generation/generations]0"%sp;
+      href="%prefix_base_password;%nn;
+            %foreach;env_binding;
+              %if;(env.key="v" and evar.v>0)v=%expr(evar.v-1);%nn;
+              %else;%env.key=%env.val;;%nn;
+              %end;
+            %end;"><i class="fa fa-minus fa-lg"></i>
+    </a>
+    <a role="button" class="btn pl-2"%sp;
+      title="[*add] 1 [generation/generations]0"%sp;
+      href="%prefix_base_password;%nn;
+            %foreach;env_binding;
+              %if;(env.key="v")v=%expr(evar.v+1);%nn;
+              %else;%env.key=%env.val;;%nn;
+              %end;
+            %end;"><i class="fa fa-plus fa-lg"></i>
+    </a>
+    %if;(evar.cgl="" or evar.cgl!="on")
+      <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
+        title="Cancel all URL links"%sp;
+        href="%prefix_base_password;%nn;
+              %foreach;env_binding;
+                %env.key=%env.val;;%nn;
+              %end;cgl=on;">%nn;
+       <i class="fa fa-unlink fa-fw mr-1"></i>[*cancel GeneWeb links]%nn;
+      </a>
+    %end;
   </div>
 %end;
+
+<div class="container-fluid">
 %mark_descendants;
+%reset_count;
 %apply;togen()
 <p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>
 </div>
+
+<p>[*total][:] %apply;desc_count%with;%evar.v;%end; [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
+               
+
+%import;trl;
+%import;copyr;
+</div>
+%import;js;
+<script>
+// Initialize Bootstrap tooltip and popover component, dismiss on next click function
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
+$('.popover-dismiss').popover({
+  trigger: 'focus'
+})
+</script>
+
+</body>
+</html>
