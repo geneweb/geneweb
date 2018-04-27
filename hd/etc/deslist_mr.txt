@@ -7,8 +7,8 @@
 
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
-%let;l_v0;%if;(evar.v > max_desc_level)%max_desc_level;%else;%evar.v;%end;%in;
-%let;l_v;%if;(bvar.max_desc_level = "")%l_v0;%elseif;(bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
+%let;l_v0;%if;(evar.v > max_desc_level+1)%expr(max_desc_level + 1)%else;%evar.v;%end;%in;
+%let;l_v;%if;(bvar.max_desc_level = "" or bvar.max_desc_level > l_v0)%l_v0;%else;%bvar.max_desc_level;%end;%in;
 %let;l_max_dates;%if;(bvar.max_dates != "")%bvar.max_dates;%else;200%end;%in;
 
 %define;tothegen(xx)
@@ -33,7 +33,7 @@
       %apply;togen1(l_v)
     %else;
       [*generation/generations]0 %l_v;
-    %end;
+    %end; %if;(evar.v>l_v)%sp;(max)%end;
   </p>
 %end;
 
@@ -93,9 +93,9 @@
             %l2;%l21;%nn;
           %end;
         %in;
-        <span style="border:px solid #008CD2;"><tt style="background-color:">z1%l3;%apply;letter(family_cnt)%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt></span>
+        <span style="border:px solid #008CD2;"><tt>z1%l3;%apply;letter(family_cnt)%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt></span>
       %else;
-        <tt style="background-color:">z1%l2;%l21;%if;(is_male)━%if;(curlev < maxlev and has_children)┳%else;━%end;%else;─%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt>
+        <tt>z1%l2;%l21;%if;(is_male)━%if;(curlev < maxlev and has_children)┳%else;━%end;%else;─%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt>
       %end;
       %if;(family_cnt > 1)
         %self;%nn;
@@ -104,11 +104,11 @@
       %else;
         %self; %self.title; %dates;%nn;
       %end;
-      %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small> %end;
+      %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small>%end;%sp;
       %if;(not cancel_links)
         <a href="%prefix;;i=%spouse.index;">%spouse;</a> %spouse.dates;
       %else;
-        %spouse; %spouse.dates;
+       %spouse; %spouse.dates;
       %end;
       %if;(spouse.is_descendant and spouse.index < index and 0) See above/below <br%/>
       %else;
@@ -158,7 +158,7 @@
     </span>
   </div>
 %end;
-%self.mark_descendants;
+%mark_descendants;
 %apply;togen()
 <p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>
 </div>
