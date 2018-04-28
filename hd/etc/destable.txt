@@ -15,38 +15,11 @@
 %base_header;
 </head>
 <body%body_prop;>
+%import;perso_utils;
 %message_to_wizard;
 <div class="container-fluid">
 %define;tothegen(xxx)
   %if;(evar.v>0)[to the %s generation:::xxx]%nn;%end;
-%end;
-
-%define;togend(xx)
-  %if;(xx=0)[specify::generation/generations]0%nn;
-  %elseif;(xx=1)[to the children]%nn;
-  %elseif;(xx=2)[to the grandchildren]%nn;
-  %elseif;(xx=3)[to the great-grandchildren]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
-%define;thegen(xx)
-  [the %s generation:::xx]%nn;
-%end;
-
-%define;gend(xx)
-  %if;(evar.xx = 0)[specify::generation/generations]0%nn;
-  %elseif;(evar.xx = 1)[the children]%nn;
-  %elseif;(evar.xx = 2)[the grandchildren]%nn;
-  %elseif;(evar.xx = 3)[the great-grandchildren]%nn;
-  %else;
-    %apply;thegen%with;
-      %apply;nth([nth (generation)], evar.xx)
-    %end;
-  %end;
 %end;
 
 %if;not cancel_links;
@@ -65,6 +38,7 @@
 %end;
 %let;central_index;%index;%in;
 
+
 %define;image_MF(xxx)
   %if;(wizard and not cancel_links)
     <a href="%prefix;m=MOD_IND;i=%xxx.index;"%sp;
@@ -78,12 +52,6 @@
     <i class="fa fa-neuter neuter mr-1"></i>%nn;
   %end;
   %if;(wizard and not cancel_links)</a>%end;
-%end;
-
-%define;letter(xxx)
-  %apply;nth%with;
-    /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
-  %and;xxx%end;
 %end;
 
 %define;link(aa, xxx)
