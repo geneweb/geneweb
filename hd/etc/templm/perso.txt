@@ -1320,7 +1320,7 @@
             %end;
             <a href="%prefix;m=D;t=T;v=4;image=on;%access"%if;(not has_parents) %laY;%end;>[*descendants tree]</a>%nn;
             %let;l1;%apply;min(max_desc_level,5)%in;
-            <a href="%prefix;m=D;t=L;tl1=hrztl;v=%l1;;maxv=%max_desc_level;;i=%index;">[*descendant tree view]</a>%nn;
+            <a href="%prefix;m=D;t=D;v=%l1;;maxv=%max_desc_level;;i=%index;">[*descendant tree view]</a>%nn;
             <a href="%prefix;m=D;t=H;v=%max_desc_level;;num=on;birth=on;birth_place=on;marr=on;marr_date=on;marr_place=on;child=on;death=on;death_place=on;death_age=on;occu=on;gen=on;%access;">[*table] [descendants]</a>%nn;
             <a href="%prefix;m=D;t=L;v=3;maxv=%max_desc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;upd=on;hide=on;%access;">[*long display]</a>%nn;
             <a href="%prefix;m=D;%access;">Menu [tools] [descendants]</a>%nn;
