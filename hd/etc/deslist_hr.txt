@@ -131,7 +131,7 @@
       %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
         %apply;add_in_sorted_list(spouse.index)
       %end;
-      %if;(spouse.is_descendant and evar.implx="on") ([*implex/implexes]0)
+      %if;(spouse.is_descendant and evar.implx="on") (<i class="fa fa-random fa-fw mr-1"></i>)
       %end;
       <br%/>
         %if;(curlev < maxlev)

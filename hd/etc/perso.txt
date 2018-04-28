@@ -22,7 +22,7 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container">
+<div class="container%if;(evar.wide="on")-fluid%end;" id="content" tabindex="-1">
 %import;perso_utils;
 %include.menubar;
 %define;init_nb_asc(tplnum)

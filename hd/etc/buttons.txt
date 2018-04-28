@@ -147,15 +147,29 @@
       </a>
     %end;
   %end;
-  %if;(evar.m="D" and evar.t="D")
+  %if;((evar.m="D" and evar.t="D") or (evar.m="A" and evar.t="H"))
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
       href="%prefix_base_password;%nn;
+            %if(not browsing_with_sosa_ref and (evar.m="A" and evar.t="H"))
+              &pz=%first_name_key;&nz=%surname_key;%if;(occ!=0)&oc=%occ;%end;
+            %end;
             %foreach;env_binding;
               %if;(env.key!="implx" and env.key!="")&%env.key=%env.val;%end;
             %end;
-            %if;(evar.implx!="on")&implx=on%end;">%nn;
+            %( if (evar.m="A" and evar.t="H") implex=on means display full implex %)
+            %if;(evar.implx!="on")
+              %if;(not browsing_with_sosa_ref and (evar.m="A" and evar.t="H"))
+              %else;
+                &implx=on%nn;
+              %end;
+            %end;">%nn;
       <i class="fa fa-random fa-lg fa-fw mr-1"></i>%nn;
-      %if;(evar.implx!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [implex/implexes]1%nn;
+      %if;(evar.m="D" and evar.t="D")
+        %if;(evar.implx!="on")[*show implex]%else;[*ignore implex]%end;%nn;
+      %elseif;(evar.m="A" and evar.t="H")
+        %if;(not browsing_with_sosa_ref)[*collapse implex]%elseif;(evar.implx!="on")[*display implex]%else;[*collapse implex]%end;%nn;
+      %end;
+
     </a>
   %end;
   <span class="sr-only">—</span>
