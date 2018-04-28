@@ -46,6 +46,7 @@
   [to the %s generation:::xx]%nn;
 %end;
 
+%( recopié de perso_utils.txt %)
 %define;thegen(xx)
   [the %s generation:::xx]%nn;
 %end;
@@ -105,6 +106,7 @@
     /a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z
   %and;xx%end;
 %end;
+%( fin recopie eprso_utils %)
 
 %define;living_interval_dates(xxx, yyy)
   %if;(evar.after != "" and evar.before != "")
