@@ -29,6 +29,25 @@
   %import;menubar;
 %end;
 
+<script type="text/javascript">
+  <!--
+  function over1(xx)
+  {
+   document.getElementById(xx).style.backgroundColor="#CBFECE";
+   return false;
+  }
+  function out1(xx)
+  {
+   document.getElementById(xx).style.backgroundColor="";
+   return false;
+  }
+  -->
+</script>
+
+%define;implex1(xx)
+  onmouseover="over1('xx')" onmouseout="out1('xx')" %nn;
+%end;
+
 <h1>%nn;
   %if;(evar.t = "F")
     %if;(public_name != "")%public_name;%else;%first_name;%end;
@@ -110,8 +129,10 @@
           "ss3&nbsp;└──&nbsp;", "ss3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", zz*2+1)
       %end;
     %else;
+      %let;sss;sosa_%pp.sosa;%in;
       <samp>ss2</samp><a href="%prefix;%pp.access;">%pp;</a>
-      (<a href="#sosa_%pp.sosa;" title="[implex/implexes]0, [see above]">%nn;
+      (<a href="#%sss;" %apply;implex1(sss)
+        title="[implex/implexes]0, [see above] zz">%nn;
       <i class="fa fa-random fa-lg fa-fw mx-0"></i></a>)<br>
     %end;
   %end;
