@@ -60,7 +60,9 @@
     %self;%end;%else;%self; ([no descendants])%end;
    %if;(cancel_links and evar.v!=0) %apply;togend(evar.v)%end;
 </h1>
-
+%if;not cancel_links;
+    %import;buttons;
+%end;
 %let;central_index;%index;%in;
 
 %define;image_MF(xxx)
@@ -766,140 +768,6 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %else;
     %apply;families_of_one_p("self", npref)
   %end;
-%end;
-
-%( Boutons de configurations et d'options %)
-%if;(not cancel_links)
-  <div class="d-flex">
-    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=D"><i class="fa fa-cog fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
-      [*options] [descendants]%nn;
-    </a>
-    %if;(evar.t!="A")
-      <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key="m")&m=A%nn;
-              %elseif;(env.key="t")&t=Z%nn;
-              %elseif;(env.key="v")&v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;%nn;
-              %elseif;(env.key!="")&%env.key=%env.val;%nn;
-              %end;%nn;
-            %end;">%nn;
-      <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>[*table] [ancestors]</a>
-    %end;
-    <span class="sr-only">—</span>
-    <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=D&t=T&v=%evar.v;%if;(evar.image="off")&image=off%end;">%nn;
-      <i class="fa fa-sitemap fa-lg fa-fw mr-1" aria-hidden="true"></i>[*descendants tree]%nn;
-    </a>
-    <span class="sr-only">—</span>
-    <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=D&t=D&v=%evar.v;">%nn;
-      <i class="fa fa-list fa-lg fa-fw mr-1" aria-hidden="true"></i>[*horizontal tree]%nn;
-    </a>
-    <span class="input-group mx-2 mb-1">
-      <span class="sr-only">— [*generation/generations]0</span>
-      <a role="button" class="btn pl-3%if;(evar.v=1) disabled text-muted%end;"%sp;
-        title="[*delete] 1 [generation/generations]0"%sp;
-        href="%prefix_base_password;%nn;
-              %foreach;env_binding;
-                %if;(env.key="v" and evar.v>0)&v=%expr(evar.v-1);%nn;
-                %elseif;(env.key!="")&%env.key=%env.val;;%nn;
-                %end;
-              %end;"><i class="fa fa-minus fa-lg"></i>
-              <span class="sr-only font-weight-bold">−</span></a>
-      <span class="sr-only">/</span>
-      <a role="button" class="btn pl-2%if;(evar.v>static_max_desc_level) disabled text-muted%end;"%sp;
-        title="[*add] 1 [generation/generations]0"%sp;
-        href="%prefix_base_password;%nn;
-              %foreach;env_binding;
-                %if;(env.key="v")&v=%expr(evar.v+1);%nn;
-                %elseif;(env.key!="")&%env.key=%env.val;%nn;
-                %end;
-              %end;">%nn;
-        <i class="fa fa-plus fa-lg"></i>%nn;
-        <span class="sr-only">+</span></a>%nn;
-      <span class="sr-only"> —</span>
-      %if;(evar.v!=0)
-        <a role="button" class="btn btn-link my-0 px-0 pl-0"
-          href="%prefix_base_password;%nn;
-                %foreach;env_binding;
-                  %if;(env.key!="only" and env.key!="")&%env.key=%env.val;%end;%nn;
-                %end;
-                %if;(evar.only!="on")&only=on%end;"
-          title="%if;(evar.only!="on")[*visualize/show/hide/summary]1 [only the generation selected]
-                 %else;[*visualize/show/hide/summary]1 %apply;togend("v")%end;">%nn;
-              <i class="fa fa-level-up-alt fa-flip-vertical fa-fw%if;(evar.only!="on") text-danger%end;" aria-hidden="true"></i>%nn;
-              %if;(evar.only!="on")%if;(evar.v!=0)[*only] %end;%apply;gend("v")
-              %else;%apply;capitalize%with;%apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;%end;
-              %end;
-         </a>
-      %else;
-        <span class="btn disabled text-primary pl-0">[*specify::generation/generations]0</span>
-      %end;
-    </span>
-  </div>
-  <div class="d-flex">
-    <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key!="image" and env.key!="")&%env.key=%env.val;%end;
-            %end;
-            %if;(evar.image!="off")&image=off%end;">%nn;
-      <i class="fa fa-image fa-lg fa-fw%if;(evar.image!="off") text-danger%end; mr-1" aria-hidden="true"></i>%nn;
-      %if;(evar.image="off")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [image/images]1%nn;
-    </a>
-    %if;(evar.image!="off")
-      <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-        title="%if;(evar.px="120")60%elseif;(evar.px!="")120%else;90%end; px"%sp;
-        href="%prefix_base_password;%nn;
-               %foreach;env_binding;
-                 %if;(env.key!="px" and env.key!="")&%env.key=%env.val;%end;%nn;
-               %end;
-               %if;(evar.px="")&px=90%elseif;(evar.px="90")&px=120%end;">%nn;
-        <i class="fa %if;(evar.px="120")fa-compress%else;fa-expand%end; fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
-        [*modify] [image/images]1%nn;
-      </a>
-    %end;
-    %if;(evar.templ="")
-      <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-        title="Small arrow in corner shows existence of note or source."%sp;
-        href="%prefix_base_password;%nn;
-              %foreach;env_binding;
-                %if;(env.key!="ns" and env.key!="")&%env.key=%env.val;%end;%nn;
-              %end;
-              %if;(evar.ns!="on")&ns=on%end;">
-        <i class="far fa-sticky-note fa-flip-vertical fa-lg fa-fw%if;(evar.ns="on") text-danger%end; mr-1" aria-hidden="true"></i>%nn;
-        %if;(evar.ns="" or evar.ns!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end;%sp;
-        <span class="notecolor">[note/notes]1</span> <span class="notesourcecolor">[and]</span> <span class="sourcecolor">[source/sources]1</span>%nn;
-      </a>
-    %end;
-    <span class="sr-only">—</span>
-    <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-      title="Cancel all URL links"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key!="")&%env.key=%env.val;%end;%nn;
-            %end;&cgl=on">%nn;
-     <i class="fa fa-unlink fa-fw mr-1" aria-hidden="true"></i>[*cancel GeneWeb links]%nn;
-    </a>
-    %if;(evar.marr="on" or evar.marr_place="on" or evar.marr_date="on")
-      <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-         href="%prefix_base_password;%nn;
-               %foreach;env_binding;
-                 %if;(env.key="t")&t=%if;(evar.t="H")I%elseif;(evar.t="I")H%end;%nn;
-                 %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
-               %end;">%nn;
-        <i class="fa fa-th%if;(evar.t="I")-large%end; fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
-        %if;(evar.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]0%nn;
-      </a>
-    %end;
-  </div>
-  <div class="sr-only"><br></div>
 %end;
 
 %define;desc_count(xxx)
