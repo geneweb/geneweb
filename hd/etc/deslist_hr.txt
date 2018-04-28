@@ -38,6 +38,9 @@
   %end;
 </h1>
 
+%if;not cancel_links;
+  %import;buttons;
+%end;
 %let;birth_symbol;%if;(bvar.birth_symbol != "")%bvar.birth_symbol;%else;&deg;%end;%in;
 %let;death_symbol;%if;(bvar.death_symbol != "")%bvar.death_symbol;%else;&dagger;%end;%in;
 %let;l_v0;%if;(evar.v > max_desc_level+1)%expr(max_desc_level + 1)%else;%evar.v;%end;%in;
@@ -164,137 +167,24 @@
   %end;
 %end;
 
-%( Boutons de configurations et d'options %)
-%if;(not cancel_links)
-  <div class="d-flex">
-    <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%access;&m=D"><i class="fa fa-cog fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
-      [*options] [descendants]%nn;
-    </a>
-    %if;(evar.t!="")
-      <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key="m")&m=A%nn;
-              %elseif;(env.key="t")&t=Z%nn;
-              %elseif;(env.key="v")&v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;%nn;
-              %elseif;(env.key!="")&%env.key=%env.val;%nn;
-              %end;%nn;
-            %end;
-            %if;(evar.num="")&num=on%end;%if;(evar.birth_place="")&birth_place=on%end;%nn;
-            %if;(evar.birth_place="")&birth_place=on%end;%nn;
-            %if;(evar.marr="")&marr=on%end;%if;(evar.marr_date="")&marr_date=on%end;%nn;
-            %if;(evar.marr_place="")&marr_place=on%end;%if;(evar.child="")&child=on%end;%nn;
-            %if;(evar.death="")&death=on%end;%if;(evar.death_place="")&death_place=on%end;%nn;
-            %if;(evar.age="")&age=on%end;%if;(evar.occu="")&occu=on%end;%nn;
-            %if;(evar.gen="")&gen=on%end;%if;(evar.ns="")&ns=on%end;%nn;">%nn;
-      <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>[*table] [ancestors]</a>
-      <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key="m")&m=D%nn;
-              %elseif;(env.key="t")&t=H%nn;
-              %elseif;(env.key="v")&v=%if;(evar.v="" or evar.v<=2)2%else;%evar.v;%end;%nn;
-              %elseif;(env.key!="")&%env.key=%env.val;%nn;
-              %end;
-            %end;%nn;
-            %if;(evar.num="")&num=on%end;%nn;
-            %if;(evar.birth="")&birth=on%end;%if;(evar.birth_place="")&birth_place=on%end;%nn;
-            %if;(evar.marr="")&marr=on%end;%if;(evar.marr_date="")&marr_date=on%end;%nn;
-            %if;(evar.marr_place="")&marr_place=on%end;%if;(evar.child="")&child=on%end;%nn;
-            %if;(evar.death="")&death=on%end;%if;(evar.death_place="")&death_place=on%end;%nn;
-            %if;(evar.age="")&age=on%end;%if;(evar.occu="")&occu=on%end;%nn;
-            %if;(evar.gen="")&gen=on%end;%if;(evar.ns="")&ns=on%end;%nn;">%nn;
-      <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>[*table] [descendants]</a>
-    %end;
-    <span class="sr-only">—</span>
-    <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
-      href="%prefix_base_password;%access;&m=D&t=T&v=%evar.v;&%if;(evar.image="off")image=off&%end;">%nn;
-      <i class="fa fa-sitemap fa-lg fa-fw mr-1" aria-hidden="true"></i>[*descendants tree]%nn;
-    </a>
-    <span class="sr-only">— [*generation/generations]0</span>
-    <a role="button" class="btn pl-3%if;(evar.v=0) disabled text-muted%end;"%sp;
-      title="[*delete] 1 [generation/generations]0"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key="v" and evar.v>0)&v=%expr(evar.v-1)%nn;
-              %elseif;(env.key!="")&%env.key=%env.val;%nn;
-              %end;
-            %end;">%nn;
-      <i class="fa fa-minus fa-lg" aria-hidden="true"></i>
-      <span class="sr-only">-1</span>
-    </a>
-    <a role="button" class="btn pl-2%if;(evar.v>static_max_desc_level) disabled text-muted%end;"%sp;
-      title="[*add] 1 [generation/generations]0"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key="v")&v=%expr(evar.v+1)%nn;
-              %elseif;(env.key!="")&%env.key=%env.val;%nn;
-              %end;
-            %end;">%nn;
-      <i class="fa fa-plus fa-lg" aria-hidden="true"></i>
-      <span class="sr-only">+1</span>
-    </a>
-  </div>
-  <div class="d-flex">
-    
-    <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-      href="%prefix_base_password;%nn;
-            %foreach;env_binding;
-              %if;(env.key!="implx" and env.key!="")&%env.key=%env.val;%end;
-            %end;
-            %if;(evar.implx!="on")&implx=on%end;">%nn;
-      <i class="fa fa-random fa-lg fa-fw mr-1"></i>%nn;
-      %if;(evar.implx!="on")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [implex/implexes]1%nn;
-    </a>
-    %if;(evar.cgl="" or evar.cgl!="on")
-      <span class="sr-only">—</span>
-      <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
-        title="Cancel all URL links"%sp;
-        href="%prefix_base_password;%nn;
-              %foreach;env_binding;
-                %if;(env.key!="")&%env.key=%env.val;%end;%nn;
-              %end;&cgl=on">%nn;
-        <i class="fa fa-unlink fa-fw mr-1" aria-hidden="true"></i>[*cancel GeneWeb links]%nn;
-      </a>
-    %end;
-  </div>
-%end;
-
-<div class="container-fluid">
 %mark_descendants;
 %empty_sorted_list;
 
-%apply;togen()
-<p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>
+<div class="container-fluid">
+  %apply;togen()
+  <p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>
 </div>
 
 %reset_count;
 %foreach;sorted_list_item;
   %incr_count;
 %end;
-
 <p>[*total][:] %apply;desc_count(max_desc_level) [descendants] (%count; [person/persons]1 [with] [spouse/spouses]1)
-
 
 %import;trl;
 %import;copyr;
 </div>
 %import;js;
-<script>
-// Initialize Bootstrap tooltip and popover component, dismiss on next click function
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
-$(function () {
-  $('[data-toggle="popover"]').popover()
-})
-$('.popover-dismiss').popover({
-  trigger: 'focus'
-})
-</script>
 
 </body>
 </html>
