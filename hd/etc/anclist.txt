@@ -1,7 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: anclist.txt,v 5.5 2007-07-25 13:15:18 ddr Exp $ -->
+  <!-- $Id: anclist.txt,v 7.00 2018-04-28 13:15:18 ddr Exp $ -->
   <title>%nn;
     %if;(evar.t = "F")- [*surnames branch] -%nn;
     %else
@@ -22,8 +22,12 @@
 %base_header;
 </head>
 <body%body_prop;>
-<div class="container">
 %message_to_wizard;
+<div class="container-fluid">
+%import;perso_utils
+%if;not cancel_links;
+  %import;menubar;
+%end;
 
 <h1>%nn;
   %if;(evar.t = "F")
@@ -48,6 +52,10 @@
     %if;(evar.t = "D") [up to] %pvar.1;%end;
   %end;
 </h1>
+
+%if;not cancel_links;
+  %import;buttons;
+%end;
 
 %if;not cancel_links;
   <div class="btn-group float-%right; mt-2">
