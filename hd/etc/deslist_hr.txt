@@ -27,6 +27,25 @@
   %import;menubar;
 %end;
 
+<script type="text/javascript">
+  <!--
+  function over1(xx)
+  {
+   document.getElementById(xx).style.backgroundColor="#CBFECE";
+   return false;
+  }
+  function out1(xx)
+  {
+   document.getElementById(xx).style.backgroundColor="";
+   return false;
+  }
+  -->
+</script>
+
+%define;implex1(xx)
+  onmouseover="over1('xx')" onmouseout="out1('xx')" %nn;
+%end;
+
 <h1>%nn;
   %apply;a_of_b_gr_eq_lev%with;
     [*descendants]%nn;
@@ -61,7 +80,6 @@
 %end;
 
 %define;desc1(z1,z2,z3,z4,curlev,maxlev)
-  %apply;add_in_sorted_list(index)
   %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
   %let;l2;
     %if;(curlev != 0)
@@ -115,10 +133,17 @@
       %else;
         <tt>z1%l2;%l21;%if;(is_male)━%if;(curlev < maxlev and has_children)┳%else;━%end;%else;─%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt>
       %end;
+      %foreach;sorted_list_item;
+        %if;(item.1=index)
+          %let;sss;i_%index;%in;
+          (<a href="#%sss;" %apply;implex1(sss)>*</a>)
+        %end;
+      %end;
+      %apply;add_in_sorted_list(index)
       %if;(family_cnt > 1)
         %self;%nn;
       %elseif;(not cancel_links)
-        <a href="%prefix;&i=%index;">%self;</a>%self.title; %dates;%nn;
+        <a id="i_%index;" href="%prefix;&i=%index;">%self;</a>%self.title; %dates;%nn;
       %else;
         %self; %self.title; %dates;%nn;
       %end;
@@ -128,20 +153,23 @@
       %else;
        %spouse; %spouse.dates;
       %end;
+      %let;in_list;%apply;index_in_list(index)%in;
       %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
         %apply;add_in_sorted_list(spouse.index)
       %end;
-      %if;(spouse.is_descendant and evar.implx="on") (<i class="fa fa-random fa-fw mr-1"></i>)
+      %if;(spouse.is_descendant and evar.implx="on")
+        %let;sss;i_%spouse.index;%in;
+        (<a href="#%sss;" %apply;implex1(sss)><i class="fa fa-random fa-fw mr-1"></i></a>)
       %end;
       <br%/>
-        %if;(curlev < maxlev)
-          %if;has_children;
-            %foreach;child;
-              %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
-              %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev)
-            %end;
+      %if;(curlev < maxlev)
+        %if;has_children;
+          %foreach;child;
+            %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
+            %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev)
           %end;
         %end;
+      %end;
     %end;
   %else;
     %let;l23;
@@ -159,11 +187,19 @@
       %end;
     %in;
     <tt>z1%l2;%l23;%if;(is_male)━━%elseif(is_female)──%else;┈┈%end;%l24;</tt>
-    %if;(not cancel_links)
-      <a href="%prefix;&i=%index;">%self;</a> %dates;<br%/>
-    %else;
-      %self; %dates;<br%/>
+    %foreach;sorted_list_item;
+      %if;(item.1=index)
+        %let;sss;i_%index;%in;
+        (<a href="#%sss;" %apply;implex1(sss)>*</a>)
+      %end;
     %end;
+    %apply;add_in_sorted_list(index)
+    %if;(not cancel_links)
+      <a id="i_%index;" href="%prefix;&i=%index;">%self;</a> %dates;%nn;
+    %else;
+      %self; %dates;%nn;
+    %end;
+    <br>
   %end;
 %end;
 
