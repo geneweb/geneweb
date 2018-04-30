@@ -110,14 +110,14 @@
         %end;
       %end;
     %in;
-    %let;l211;%if;(is_male)━%else;─%end;%in;
-    %let;l212;%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%in;
     %let;l22;
       %if;(browsing_with_sosa_ref and has_sosa)
         %if;(has_siblings)▶%else;▷%end;
       %end;
     %in;
     %foreach;family;
+      %let;l211;%if;(is_male)━%else;─%end;%in;
+      %let;l212;%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%in;
       %let;ifam;%family.index;%in;
       %let;zl3;%if;(family_cnt = nb_families)1%else;0%end;%in;
       %if;(nb_families > 1)
@@ -179,7 +179,11 @@
       %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
         %apply;add_in_sorted_list(spouse.index)
       %end;
-      <br%/>
+      %if;(spouse.is_descendant and evar.implx="")
+        %let;sss;i_%spouse.index;%in;
+        <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
+      %end;
+      <br>
       %if;(curlev < maxlev)
         %reset_count; 
         %foreach;sorted_listb_item;
