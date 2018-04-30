@@ -134,6 +134,10 @@
       opacity: 0.7;
       }
 
+.lh_implex{
+	line-height: 1;
+}
+
 /* Fix navigation buttons to top right corner */
 .fixed_top_btn_col {
   position: fixed;

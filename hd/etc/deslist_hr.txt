@@ -159,7 +159,7 @@
       %end;
       %if;(spouse.is_descendant and evar.implx="on")
         %let;sss;i_%spouse.index;%in;
-        (<a href="#%sss;" %apply;implex1(sss)><i class="fa fa-random fa-fw mr-1"></i></a>)
+        <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
       %end;
       <br%/>
       %if;(curlev < maxlev)

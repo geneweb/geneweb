@@ -9,7 +9,7 @@
   </a>
   %let;cond;%if;((evar.m="A" and evar.t="Z") or (evar.m="D" and evar.t="D" or evar.t="T"))1%end;%in;
   <span class="sr-only">—</span>
-  <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1%if;(evar.m="D" and not has_children) disabled%end;"%sp;
+  <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1%if;(cond=1 and not has_children) disabled%end;"%sp;
   href="%prefix_base_password;%nn;
         %foreach;env_binding;
           %if;(env.key="m")&m=%if;(cond=1)D%else;A%end;%nn;
@@ -19,13 +19,14 @@
           %end;%nn;
         %end;
         %if;(istable!=1)
-          %if;(evar.num="")&num=on%end;%if;(evar.birth_place="")&birth_place=on%end;%nn;
+          %if;(evar.num="")&num=on%end;%if;(evar.birth="")&birth=on%end;%nn;
           %if;(evar.birth_place="")&birth_place=on%end;%nn;
           %if;(evar.marr="")&marr=on%end;%if;(evar.marr_date="")&marr_date=on%end;%nn;
           %if;(evar.marr_place="")&marr_place=on%end;%if;(evar.child="")&child=on%end;%nn;
           %if;(evar.death="")&death=on%end;%if;(evar.death_place="")&death_place=on%end;%nn;
           %if;(evar.age="")&age=on%end;%if;(evar.occu="")&occu=on%end;%nn;
-          %if;(evar.gen="")&gen=on%end;%if;(evar.ns="")&ns=on%end;%nn;
+          %if;(evar.gen="")&gen=on%end;%if;(evar.repeat="" and evar.m="A")&repeat=on%end;
+          %if;(evar.ns="")&ns=on%end;%nn;
         %end;
         ">%nn;
   <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>[*table] %if;(cond=1)[descendants]%else;[ancestors]%end;</a>
@@ -35,13 +36,14 @@
     <i class="fa fa-sitemap%if;(evar.m="A") fa-rotate-180%end; fa-fw mr-1" aria-hidden="true"></i>%if;(evar.m="D")[*descendants tree]%elseif;(evar.m="A")[*ascendants tree]%end;%nn;
   </a>
   <span class="sr-only">—</span>
-  <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1"%sp;
+  %let;cond2;%if;((evar.m="A" and evar.t!="H") or (evar.m="D" and evar.t="D"))1%end;%in;
+  <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1%if;(cond2!=1 and not has_children) disabled%end;"%sp;
     href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;%nn;
-          %if;((evar.m="A" and evar.t!="H") or (evar.m="D" and evar.t="D"))&m=A&t=H%nn;
+          %if;(cond2=1)&m=A&t=H%nn;
           %else;&m=D&t=D%nn;
           %end;&v=%evar.v;">%nn;
     <i class="fa fa-list fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
-    %if;((evar.m="A" and evar.t!="H") or (evar.m="D" and evar.t="D"))[*horizontal tree]%nn;
+    %if;(cond2=1)[*horizontal tree]%nn;
     %else;[*descendant tree view]%nn;
     %end;%nn;
   </a>
@@ -98,8 +100,8 @@
               %else;%apply;capitalize%with;%apply;togend%with;%if;(evar.v="")0%else;%evar.v;%end;%end;%end;
               %end;
             %elseif;(evar.m="A")
-              %if;(evar.only!="on")[only] %apply;gen("v")
-              %else;%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;
+              %if;(evar.only!="on")[*only] %apply;gen("v")
+              %else;%apply;capitalize%with;%apply;togena%with;%if;(evar.v="")0%else;%evar.v;%end;%end;%end;
               %end;
             %end;
        </a>
