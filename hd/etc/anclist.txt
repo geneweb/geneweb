@@ -116,7 +116,7 @@
 
 %define;ancestors_horizontally(pp, xx, ss1, ss2, ss3, zz)
   %if;(xx > 0)
-    %if;(pp.sosa=zz or (not browsing_with_sosa_ref) or evar.implx="on")
+    %if;(pp.sosa=zz or (not browsing_with_sosa_ref) or evar.implx="")
       %if;(pp.has_parents)
         %apply;ancestors_horizontally(
           "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
