@@ -118,6 +118,7 @@
       %end;
     %in;
     %foreach;family;
+      %let;ifam;%family.index;%in;
       %let;zl3;%if;(family_cnt = nb_families)1%else;0%end;%in;
       %if;(nb_families > 1)
         %let;l3;
@@ -175,23 +176,29 @@
       %else;
        %spouse; %spouse.dates;
       %end;
-      %let;in_list;%apply;index_in_list(index)%in;
       %if;(spouse.first_name!="?" and spouse.surname!="?" and not spouse.is_descendant)
         %apply;add_in_sorted_list(spouse.index)
       %end;
-      %if;(spouse.is_descendant and evar.implx="on")
-        %let;sss;i_%spouse.index;%in;
-        <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
-      %end;
       <br%/>
       %if;(curlev < maxlev)
-        %if;has_children;
-          %foreach;child;
-            %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
-            %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev)
+        %reset_count; 
+        %foreach;sorted_listb_item;
+          %if;(item.1=ifam)
+            %incr_count;
           %end;
         %end;
+        %if;(count=0 or evar.implx="")
+          %if;has_children;
+            %foreach;child;
+              %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
+              %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev)
+            %end;
+          %end;
+        %else;
+          %apply;desc2(zl1,zl2,zl3,zl4,curlev+1,maxlev,spouse.index)
+        %end;
       %end;
+      %apply;add_in_sorted_listb(ifam)
     %end;
   %else;
     %let;l23;
@@ -231,6 +238,34 @@
     %end;
     <br>
   %end;
+%end;
+
+%define;desc2(z1,z2,z3,z4,curlev,maxlev,index)
+  %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
+  %let;l2;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)%l1;┗%elseif;(z4 = 0)%l1;┣%end;%if;(child_cnt < 10)━%end;%nn;
+      %else;
+        %if;(z4 = 1)%l1;└%elseif;(z4 = 0)%l1;├%end;%if;(child_cnt < 10)─%end;%nn;
+      %end;
+    %end;
+  %in;
+  %let;zl1;
+    %if;(curlev != 0)
+      %if;(z2 = 0)
+        %if;(z4 = 1)z1%l1; %else;z1%l1;┃%end;
+      %else;
+        %if;(z4 = 1)z1%l1; %else;z1%l1;│%end;
+      %end;
+    %end;
+  %in;
+  %let;zl2;%sex;%in;
+  %let;l231;%if;(is_male)━%elseif(is_female)─%else;┈%end;%in;
+  <tt>z1%l2;</tt>
+  %let;sss;i_%index;%in;
+  <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
+  <br>
 %end;
 
 %mark_descendants;
