@@ -136,7 +136,7 @@
 %end;
 
 %define;thegen(xx)
-  [*the %s generation:::xx]%nn;
+  [the %s generation:::xx]%nn;
 %end;
 
 %define;gena(xx)
