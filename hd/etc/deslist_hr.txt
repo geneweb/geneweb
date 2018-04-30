@@ -110,6 +110,8 @@
         %end;
       %end;
     %in;
+    %let;l211;%if;(is_male)━%else;─%end;%in;
+    %let;l212;%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%in;
     %let;l22;
       %if;(browsing_with_sosa_ref and has_sosa)
         %if;(has_siblings)▶%else;▷%end;
@@ -129,15 +131,35 @@
             %l2;%l21;%nn;
           %end;
         %in;
-        <span style="border:px solid #008CD2;"><tt>z1%l3;%apply;letter(family_cnt)%if;(is_male)%if;(curlev < maxlev and has_children)┳%else;━%end;%else;%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt></span>
+        <span style="border:px solid #008CD2;"><tt>z1%l3;%nn;
+          %if;(not cancel_links and family_cnt>1)
+            %foreach;sorted_list_item;
+              %if;(item.1=index)
+                %let;sss;i_%index;%in;
+                <a href="#%sss;" %apply;implex1(sss)>%apply;letter(family_cnt)</a>%nn;
+              %end;
+            %end;
+          %else;
+            %apply;letter(family_cnt)
+          %end;
+          %l212;%l22;</tt>%nn;
+        </span>
       %else;
-        <tt>z1%l2;%l21;%if;(is_male)━%if;(curlev < maxlev and has_children)┳%else;━%end;%else;─%if;(curlev < maxlev and has_children)┬%else;─%end;%end;%l22;</tt>
-      %end;
-      %foreach;sorted_list_item;
-        %if;(item.1=index)
-          %let;sss;i_%index;%in;
-          (<a href="#%sss;" %apply;implex1(sss)>*</a>)
-        %end;
+        <tt>z1%l2;%l21;%l211;%nn;
+          %if;(not cancel_links and nb_families = 1)
+            %reset_count;
+            %foreach;sorted_list_item;
+              %if;(item.1=index)
+                %incr_count;
+                %let;sss;i_%index;%in;
+                <a href="#%sss;" %apply;implex1(sss)>%l212;%nn;</a>%nn;
+              %end;
+            %end;
+            %if;(count=0)%l212;%end;
+          %else;
+            %l212;%nn;
+          %end;
+        %l22;</tt>
       %end;
       %apply;add_in_sorted_list(index)
       %if;(family_cnt > 1)
@@ -181,18 +203,26 @@
         %end;
       %end;
     %in;
+    %let;l231;%if;(is_male)━%elseif(is_female)─%else;┈%end;%in;
     %let;l24;
       %if;(browsing_with_sosa_ref and has_sosa)
         %if;(has_siblings)◀%else;◁%end;
       %end;
     %in;
-    <tt>z1%l2;%l23;%if;(is_male)━━%elseif(is_female)──%else;┈┈%end;%l24;</tt>
-    %foreach;sorted_list_item;
-      %if;(item.1=index)
-        %let;sss;i_%index;%in;
-        (<a href="#%sss;" %apply;implex1(sss)>*</a>)
+    <tt>z1%l2;%l23;%l231;%l24;%nn;
+    %if;(not cancel_links)
+      %reset_count;
+      %foreach;sorted_list_item;
+        %if;(item.1=index)
+          %incr_count;
+          %let;sss;i_%index;%in;
+          <a href="#%sss;" %apply;implex1(sss)>%l231;</a>
+        %end;
       %end;
-    %end;
+      %if;(count=0)%l231;%end;
+    %else;
+      %l231;
+    %end;</tt>
     %apply;add_in_sorted_list(index)
     %if;(not cancel_links)
       <a id="i_%index;" href="%prefix;&i=%index;">%self;</a> %dates;%nn;
