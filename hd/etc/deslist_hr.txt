@@ -79,7 +79,7 @@
   </p>
 %end;
 
-%define;desc1(z1,z2,z3,z4,curlev,maxlev)
+%define;desc1(z1,z2,z3,z4,curlev,maxlev,sp_index)
   %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
   %let;l2;
     %if;(curlev != 0)
@@ -172,7 +172,7 @@
       %end;
       %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small>%end;%sp;
       %if;(not cancel_links)
-        <a href="%prefix;&i=%spouse.index;">%spouse;</a> %spouse.dates;
+        <a id="is_%spouse.index;" href="%prefix;&i=%spouse.index;">%spouse;</a> %spouse.dates;
       %else;
        %spouse; %spouse.dates;
       %end;
@@ -180,7 +180,7 @@
         %apply;add_in_sorted_list(spouse.index)
       %end;
       %if;(spouse.is_descendant and evar.implx="")
-        %let;sss;i_%spouse.index;%in;
+        %let;sss;is_%index;%in;
         <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
       %end;
       <br>
@@ -195,7 +195,7 @@
           %if;has_children;
             %foreach;child;
               %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
-              %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev)
+              %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev,spouse.index)
             %end;
           %end;
         %else;
@@ -234,6 +234,10 @@
     %else;
       %l231;
     %end;</tt>
+    %if;(next=0)
+      %let;sss;i_%index;%in;
+      <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
+    %end;
     %apply;add_in_sorted_list(index)
     %if;(not cancel_links)
       <a id="i_%index;" href="%prefix;&i=%index;">%self;</a> %dates;%nn;
@@ -244,7 +248,7 @@
   %end;
 %end;
 
-%define;desc2(z1,z2,z3,z4,curlev,maxlev,index)
+%define;desc2(z1,z2,z3,z4,curlev,maxlev,sp_index)
   %let;l1;%if;(z3z4 = "00" or z3z4 = "01")  ┊%else;   %end;%in;
   %let;l2;
     %if;(curlev != 0)
@@ -267,7 +271,10 @@
   %let;zl2;%sex;%in;
   %let;l231;%if;(is_male)━%elseif(is_female)─%else;┈%end;%in;
   <tt>z1%l2;</tt>
-  %let;sss;i_%index;%in;
+  %( when there is an offset between implex generations, some descendants may be missing %)
+  %( case: first occurence at generation n is married to generation n-1 spouse and has children %)
+  %( these children will not appear even though asking for desc up to generation n %)
+  %let;sss;i_sp_index%in;
   <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
   <br>
 %end;
@@ -277,7 +284,7 @@
 
 <div class="container-fluid">
   %apply;togen()
-  <p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v)</p>
+  <p style="line-height:12pt;font-size:12pt;">%apply;desc1(" 0",sex,"0","0","0",l_v,0)</p>
 </div>
 
 %reset_count;
