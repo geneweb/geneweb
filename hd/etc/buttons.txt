@@ -166,12 +166,7 @@
               %end;
             %end;">%nn;
       <i class="fa fa-random fa-lg fa-fw mr-1"></i>%nn;
-      %if;(evar.m="D" and evar.t="D")
-        %if;(evar.implx!="on")[*show implex]%else;[*ignore implex]%end;%nn;
-      %elseif;(evar.m="A" and evar.t="H")
-        %if;(not browsing_with_sosa_ref)[*collapse implex]%elseif;(evar.implx!="on")[*display implex]%else;[*collapse implex]%end;%nn;
-      %end;
-
+      %if;(evar.implx!="on")[*collapse implex]%else;[*display implex]%end;%nn;
     </a>
   %end;
   <span class="sr-only">—</span>
