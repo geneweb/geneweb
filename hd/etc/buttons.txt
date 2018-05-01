@@ -149,7 +149,7 @@
       </a>
     %end;
   %end;
-  %if;((evar.m="D" and evar.t="D") or (evar.m="A" and evar.t="H"))
+  %if;((evar.m="D" and (evar.t="D" or evar.t="I" or evar.t="H")) or (evar.m="A" and evar.t="H"))
     <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
       href="%prefix_base_password;%nn;
             %if(not browsing_with_sosa_ref and (evar.m="A" and evar.t="H"))

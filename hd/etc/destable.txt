@@ -55,7 +55,7 @@
 %end;
 
 %define;link(aa, xxx)
-  %if;(evar.cgl="on")xxx%else;<a href="%prefix;aa">xxx</a>%end;
+  %if;(evar.cgl="on")xxx%else;<a id="i_%xxx.index;" href="%prefix;aa">xxx</a>%end;
 %end;
 
 %define;table_header()
@@ -629,18 +629,56 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
   %elseif;xxx.has_families;
     %if;(evar.t="H")
       %foreach;family;
-        %apply;table_row("xxx", prfx, fff, family_cnt, "ch_cnt", count, "desc", "xxx", family.index, nb_children)
+        %let;ifam;%family.index;%in;
+        %reset_count; 
+        %foreach;sorted_listb_item;
+          %if;(item.1=ifam)
+            %incr_count;
+          %end;
+        %end;
+        %if;(count=0 or evar.implx="")
+          %apply;table_row("xxx", prfx, fff, family_cnt, "ch_cnt", count, "desc", "xxx", family.index, nb_children)
+        %end;
+        %apply;add_in_sorted_listb(ifam)
       %end;
     %elseif;(evar.t="I")
+      %reset_count; 
+      %foreach;sorted_list_item;
+        %if;(item.1=index)
+          %incr_count;
+        %end;
+      %end;
+      %if;(count=0 or evar.implx="")
         %apply;table_row("xxx", prfx, fff, family_cnt, "ch_cnt", count, "desc", "xxx", 0, nb_children)
+      %end;
+      %apply;add_in_sorted_list(index)
       %if;(evar.marr="on" or evar.marr_date="on" or evar.marr_place="on" or evar.child="on")
         %foreach;family;
-          %apply;table_row("xxx.spouse", prfx, fff, family_cnt, "ch_cnt", count, "spous", "xxx", family.index, nb_children)
+          %let;ifam;%family.index;%in;
+          %reset_count; 
+          %foreach;sorted_listb_item;
+            %if;(item.1=ifam)
+              %incr_count;
+            %end;
+          %end;
+          %if;(count=0 or evar.implx="")
+            %apply;table_row("xxx.spouse", prfx, fff, family_cnt, "ch_cnt", count, "spous", "xxx", family.index, nb_children)
+          %end;
+          %apply;add_in_sorted_listb(ifam)
         %end;
       %end;
     %end;
   %else;
+    %reset_count; 
+    %foreach;sorted_list_item;
+      %if;(item.1=xxx.index)
+        %incr_count;
+      %end;
+    %end;
+    %if;(count=0 or evar.implx="")
       %apply;table_row("xxx", prfx, fff, "", "ch_cnt", count, "desc", "xxx", 0, 0)
+    %end;
+    %apply;add_in_sorted_list(xxx.index)
   %end;
 %end;
 
@@ -762,6 +800,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %let;max;%evar.v;%in;
     %reset_count;
     %empty_sorted_list;
+    %empty_sorted_listb;
     %if;(evar.only!="on")
       %apply;one_child("self", "-1", "", 1)
       %for;lev;0;max;
