@@ -1335,10 +1335,10 @@ ul.missing_ancestors_sort > li
 }
 
 /* adjust also colors in destable.txt */
-.note, .source, .notesource, .notespouse, .sourcespouse, .notesourcespouse {
+.note, .implex, .source, .notesource, .notespouse, .sourcespouse, .notesourcespouse {
     position: relative;
 }
-.note:after, .source:after, .notesource:after, .notespouse:after, .sourcespouse:after, .notesourcespouse:after {
+.note:after, .implex:after, .source:after, .notesource:after, .notespouse:after, .sourcespouse:after, .notesourcespouse:after {
     content: "";
     position: absolute;
     top: 0;
@@ -1346,6 +1346,11 @@ ul.missing_ancestors_sort > li
     height: 0;
     display: block;
     border-bottom: 12px solid transparent;
+}
+.implex:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #87CEFA;
 }
 .note:after {
     right: 0;
