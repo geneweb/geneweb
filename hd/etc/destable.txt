@@ -170,42 +170,32 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
 %( numéro d'Aboville %)
   %if;(evar.num="on" and famx=1)
     %if;("yyy"="desc")
-      <td id="%labl0" class="text-center align-middle table_big_cell%if;(implx!=0) implex%end;"%rowspan;
-        %if;(implx!=0) tabindex="0"%sp;
-          data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"%sp;
-          data-content='détails'%sp;
-          title="%if;(implx!=0)[*implex/implexes]0%end;"%nn;
-        %end;>
+      <td id="%labl0" class="text-center align-middle table_big_cell%if;(implx!=0) implex%end;"%rowspan;>
         %if;(labl!=1 and not cancel_links)
           <a class="table_big_anchor" title="[*navigation] [with] %xxx"%sp;
             href="%prefix_base_password;%access;;%nn;
               %foreach;env_binding;
                 %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;%end;
               %end;">%nn;
-           </a>
+          </a>
         %end;
         %if;("ch_cnt"="1" and not cancel_links)<a class="normal_anchor" href="#prefx" title="[*link back to parents]">%end;
           <div%if;("ch_cnt"!="1") class="click_through"%end;>%labl;</div>
         %if;("ch_cnt"="1" and not cancel_links)</a>%end;
       </td>
     %elseif;(evar.t="I")
-      <td class="text-center align-middle table_big_cell%if;(implx!=0) implex%end;"
-        %if;(implx!=0) tabindex="0"%sp;
-          data-trigger="focus" data-toggle="popover" data-placement="right" data-html="true"%sp;
-          data-content='détails'%sp;
-          title="%if;(implx!=0)[*implex/implexes]0%end;"%nn;
-        %end;>
-       %if;(not cancel_links)
+      <td class="text-center align-middle table_big_cell%if;(implx!=0) implex%end;">
+      %if;(not cancel_links)
         <a class="table_big_anchor" title="[*navigation] [with] %xxx"%sp;
           href="%prefix_base_password;%spouse.access;;%nn;
             %foreach;env_binding;
               %if;(not (env.key="p" or env.key="n" or env.key="oc"))%env.key;=%env.val;;%nn;%end;
             %end;">%nn;
-       %end;
-          %if;(has_families and nb_families>1)%apply;letter(family_cnt)%else; %end;%nn;
-       %if;(not cancel_links)
+      %end;
+        %if;(has_families and nb_families>1)%apply;letter(family_cnt)%else; %end;%nn;
+      %if;(not cancel_links)
         </a>
-       %end;
+      %end;
       </td>
     %end;
   %end;
