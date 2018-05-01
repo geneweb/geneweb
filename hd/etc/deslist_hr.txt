@@ -234,10 +234,6 @@
     %else;
       %l231;
     %end;</tt>
-    %if;(next=0)
-      %let;sss;i_%index;%in;
-      <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
-    %end;
     %apply;add_in_sorted_list(index)
     %if;(not cancel_links)
       <a id="i_%index;" href="%prefix;&i=%index;">%self;</a> %dates;%nn;
