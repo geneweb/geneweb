@@ -180,8 +180,12 @@
         %apply;add_in_sorted_list(spouse.index)
       %end;
       %if;(spouse.is_descendant and evar.implx="")
-        %let;sss;is_%index;%in;
-        <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
+        %if;(not cancel_links)
+          %let;sss;is_%index;%in;
+          <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
+        %else
+          <i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span>
+        %end;
       %end;
       <br>
       %if;(curlev < maxlev)
@@ -270,8 +274,12 @@
   %( when there is an offset between implex generations, some descendants may be missing %)
   %( case: first occurence at generation n is married to generation n-1 spouse and has children %)
   %( these children will not appear even though asking for desc up to generation n %)
-  %let;sss;i_sp_index%in;
-  <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
+  %if;(not cancel_links)
+    %let;sss;i_sp_index%in;
+    <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
+  %else;
+    <i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span>
+  %end;
   <br>
 %end;
 
