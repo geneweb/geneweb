@@ -19,8 +19,8 @@ en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 
     collapse implex
-en: collapse implexes
-fr: réduire les implex
+en: collapse implex
+fr: réduire les implexes
 
     display implex
 en: display implex
