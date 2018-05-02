@@ -1096,7 +1096,7 @@
                     %end;
                   %end;">%nn;
          %else;
-          <a class="table_big_anchor text-danger" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%nn;
+          <a class="table_big_anchor text-danger" title="%apply;a_of_b%with;[*add::parents]%and;%ancestor;%end;"%sp;
            href="%prefix_base_password;ip=%ancestor.index;;m=ADD_PAR">%nn;
          %end;
       %end;
@@ -1523,6 +1523,7 @@
 %end;
 
 %( Main %)
+%if;(evar.templ!="templm")
 <h1>%nn;
   %apply;a_of_b%with;
     %if;(evar.t = "M")
@@ -1543,6 +1544,7 @@
      %if;(cancel_links) %apply;togena(evar.v)%end;
   %end;
 </h1>
+%end;
 
 %if;((evar.t="Z" or evar.t="Y" or evar.t="X") and not cancel_links)
   %import;buttons;
