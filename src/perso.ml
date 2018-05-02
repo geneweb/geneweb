@@ -2036,6 +2036,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "listb" env with
       [ Vslist l -> do { l.val := SortedList.empty; "" }
       | _ -> raise Not_found ]
+  | "empty_sorted_listc" ->
+      match get_env "listc" env with
+      [ Vslist l -> do { l.val := SortedList.empty; "" }
+      | _ -> raise Not_found ]
   | "family_cnt" -> string_of_int_env "family_cnt" env
   | "first_name_alias" ->
       match get_env "first_name_alias" env with
@@ -4533,6 +4537,7 @@ value print_foreach conf base print_ast eval_expr =
     | "relation" -> print_foreach_relation env al ep
     | "sorted_list_item" -> print_foreach_sorted_list_item env al ep
     | "sorted_listb_item" -> print_foreach_sorted_listb_item env al ep
+    | "sorted_listc_item" -> print_foreach_sorted_listc_item env al ep
     | "source" -> print_foreach_source env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep efam
@@ -5221,6 +5226,22 @@ value print_foreach conf base print_ast eval_expr =
              loop item sll
            }
       | [] -> () ]
+  and print_foreach_sorted_listc_item env al ep =
+    let list =
+      match get_env "listc" env with
+      [ Vslist l -> SortedList.elements l.val
+      | _ -> [] ]
+    in
+    loop (Vslistlm []) list where rec loop prev_item =
+      fun
+      [ [_ :: sll] as gsll ->
+           let item = Vslistlm gsll in
+           let env = [("item", item); ("prev_item", prev_item) :: env] in
+           do {
+             List.iter (print_ast env ep) al;
+             loop item sll
+           }
+      | [] -> () ]
   and print_foreach_source env al ((p, p_auth) as ep) =
     let rec insert_loop typ src =
       fun
@@ -5383,6 +5404,10 @@ value eval_predefined_apply conf env f vl =
       match get_env "listb" env with
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
       | _ -> raise Not_found ]
+  | ("add_in_sorted_listc", sl) ->
+      match get_env "listc" env with
+      [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
+      | _ -> raise Not_found ]
   | ("hexa", [s]) -> Util.hexa_string s
   | ("initial", [s]) ->
       if String.length s = 0 then ""
@@ -5469,6 +5494,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
      ("count2", Vcnt (ref 0));
      ("list", Vslist (ref SortedList.empty));
      ("listb", Vslist (ref SortedList.empty));
+     ("listc", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vsosa (ref []));
