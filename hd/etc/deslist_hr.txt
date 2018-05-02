@@ -133,36 +133,39 @@
           %end;
         %in;
         <span style="border:px solid #008CD2;"><tt>z1%l3;%nn;
-          %if;(not cancel_links and family_cnt>1)
-            %foreach;sorted_list_item;
-              %if;(item.1=index)
-                %let;sss;i_%index;%in;
-                <a href="#%sss;" %apply;implex1(sss)>%apply;letter(family_cnt)</a>%nn;
-              %end;
+          %if;(not cancel_links and family_cnt>0)
+            %foreach;sorted_listc_item;
+              %if;(item.1=index)%incr_count;%end;
             %end;
-          %else;
-            %apply;letter(family_cnt)
+            %if;(count>0)
+              %let;sss;i_%index;%in;
+              <a href="#%sss;" %apply;implex1(sss)>%apply;letter(family_cnt)</a>%nn;
+            %else;
+              %apply;letter(family_cnt)
+            %end;
+            %if;(spouse.is_descendant)
+              %let;sss;is_%index;%in;
+              <a href="#%sss;" %apply;implex1(sss)>%l212;%nn;</a>%nn;
+            %else;
+              %l212;%nn;
+            %end;            
+            %l22;%nn;
           %end;
-          %l212;%l22;</tt>%nn;
-        </span>
+        </tt></span>
       %else;
         <tt>z1%l2;%l21;%l211;%nn;
-          %if;(not cancel_links and nb_families = 1)
-            %reset_count;
-            %foreach;sorted_list_item;
-              %if;(item.1=index)
-                %incr_count;
-                %let;sss;i_%index;%in;
-                <a href="#%sss;" %apply;implex1(sss)>%l212;%nn;</a>%nn;
-              %end;
+          %if;(not cancel_links)
+            %if;(spouse.is_descendant)
+              %let;sss;is_%index;%in;
+              <a href="#%sss;" %apply;implex1(sss)>%l212;%nn;</a>%nn;
+            %else;
+              %l212;%nn;
             %end;
-            %if;(count=0)%l212;%end;
-          %else;
-            %l212;%nn;
           %end;
         %l22;</tt>
       %end;
       %apply;add_in_sorted_list(index)
+      %apply;add_in_sorted_listc(index)
       %if;(family_cnt > 1)
         %self;%nn;
       %elseif;(not cancel_links)
@@ -183,7 +186,7 @@
         %if;(not cancel_links)
           %let;sss;is_%index;%in;
           <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
-        %else
+        %else;
           <i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span>
         %end;
       %end;
@@ -191,19 +194,26 @@
       %if;(curlev < maxlev)
         %reset_count; 
         %foreach;sorted_listb_item;
-          %if;(item.1=ifam)
-            %incr_count;
-          %end;
+          %if;(item.1=ifam)%incr_count;%end;
         %end;
-        %if;(count=0 or evar.implx="")
-          %if;has_children;
-            %foreach;child;
+        %reset_count1; 
+        %foreach;sorted_listc_item;
+          %if;(item.1=index)%incr_count1;%end;
+        %end;
+        %if;has_children;
+          %foreach;child;
+            %reset_count2;
+            %foreach;sorted_listc_item;
+              %if;(item.1=child.index)%incr_count2;%end;
+            %end;
+            %if;(count=0 or count1=0 or count2=0 or evar.implx="")
               %let;zl4;%if;(child_cnt = nb_children)1%else;0%end;%in;
               %apply;desc1(zl1,zl2,zl3,zl4,curlev+1,maxlev,spouse.index)
+            %else;
+              %apply;desc2(zl1,zl2,zl3,zl4,curlev+1,maxlev,spouse.index)
             %end;
           %end;
-        %else;
-          %apply;desc2(zl1,zl2,zl3,zl4,curlev+1,maxlev,spouse.index)
+
         %end;
       %end;
       %apply;add_in_sorted_listb(ifam)
@@ -227,18 +237,18 @@
     <tt>z1%l2;%l23;%l231;%l24;%nn;
     %if;(not cancel_links)
       %reset_count;
-      %foreach;sorted_list_item;
-        %if;(item.1=index)
-          %incr_count;
-          %let;sss;i_%index;%in;
-          <a href="#%sss;" %apply;implex1(sss)>%l231;</a>
-        %end;
+      %foreach;sorted_listc_item;
+        %if;(item.1=index)%incr_count;%end;
       %end;
-      %if;(count=0)%l231;%end;
-    %else;
-      %l231;
+      %if;(count>0)
+        %let;sss;i_%index;%in;
+        <a href="#%sss;" %apply;implex1(sss)>%l231;</a>%nn;
+      %else;
+        %l231;%nn;
+      %end;
     %end;</tt>
     %apply;add_in_sorted_list(index)
+    %apply;add_in_sorted_listc(index)
     %if;(not cancel_links)
       <a id="i_%index;" href="%prefix;&i=%index;">%self;</a> %dates;%nn;
     %else;
@@ -284,7 +294,9 @@
 %end;
 
 %mark_descendants;
-%empty_sorted_list;
+%empty_sorted_list; %(persons %)
+%empty_sorted_listb; %( families %)
+%empty_sorted_listc; %( descendnats %)
 
 <div class="container-fluid">
   %apply;togen()
