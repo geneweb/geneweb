@@ -144,7 +144,7 @@
               %apply;letter(family_cnt)
             %end;
             %if;(spouse.is_descendant)
-              %let;sss;is_%index;%in;
+              %let;sss;is_%index;_%family.index;%in;
               <a href="#%sss;" %apply;implex1(sss)>%l212;%nn;</a>%nn;
             %else;
               %l212;%nn;
@@ -156,7 +156,7 @@
         <tt>z1%l2;%l21;%l211;%nn;
           %if;(not cancel_links)
             %if;(spouse.is_descendant)
-              %let;sss;is_%index;%in;
+              %let;sss;is_%index;_%family.index;%in;
               <a href="#%sss;" %apply;implex1(sss)>%l212;%nn;</a>%nn;
             %else;
               %l212;%nn;
@@ -175,7 +175,7 @@
       %end;
       %sp;&amp;%if;(on_marriage_date != "")<small>%marriage_date.prec;%marriage_date.year;</small>%end;%sp;
       %if;(not cancel_links)
-        <a id="is_%spouse.index;" href="%prefix;&i=%spouse.index;">%spouse;</a> %spouse.dates;
+        <a id="is_%spouse.index;_%family.index;" href="%prefix;&i=%spouse.index;">%spouse;</a> %spouse.dates;
       %else;
        %spouse; %spouse.dates;
       %end;
@@ -184,7 +184,7 @@
       %end;
       %if;(spouse.is_descendant and evar.implx="")
         %if;(not cancel_links)
-          %let;sss;is_%index;%in;
+          %let;sss;is_%index;_%family.index;%in;
           <a href="#%sss;" class="mr-1" %apply;implex1(sss)><i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span></a>
         %else;
           <i class="fa fa-random fa-fw ml-1" aria-hidden="true"></i><span class="sr-only">%sp;(==)%sp;</span>
