@@ -100,12 +100,13 @@
 
 %if;(evar.t = "G")
   %include.ancsosa_tg;
+  %elseif;(evar.t = "X" or evar.t = "Y")
+  %include.ancsosa_tdz;
 %elseif;(evar.t = "N" and evar.same != "")
   %include.ancsosa_same;
 %elseif;(evar.t = "M")
   %include.ancsosa_miss;
-%elseif;(evar.t = "D" or evar.t = "Z")
-  %include.ancsosa_tdz;
+
 %end;
 %if;not cancel_links;
   %import;tools;
