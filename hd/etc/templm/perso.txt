@@ -591,7 +591,7 @@
               %end;
               <a id="anc_tree" href="%prefix;m=A;t=T;v=4;image=on;marriage=on;%access;" %laY;>[*ascendants tree]</a>%nn;
               <a href="%prefix;m=A;t=H;v=%l1;;maxv=%max_anc_level;;i=%index;">[*horizontal tree]</a>%nn;
-              <a href="%prefix;m=A;t=Z;image=%evar.image;;v=7;maxv=%max_anc_level;;%access;">[*table] [ancestors]</a>%nn;
+              <a href="%prefix;m=A;t=Y;image=%evar.image;;v=7;maxv=%max_anc_level;;%access;">[*table] [ancestors]</a>%nn;
               <a href="%prefix;m=A;t=G;v=3;maxv=%max_anc_level;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;upd=on;hide=on;%access;">[*long display]</a>%nn;
               <a href="%prefix;m=A;t=F;tf1=aad;v=%max_anc_level;;maxv=%max_anc_level;;i=%index;">[*age at death]</a>%nn;
               <a href="%prefix;m=A;t=F;tf1=sb;v=5;maxv=%max_anc_level;;i=%index;">[*surnames branch]</a>%nn;

@@ -1,13 +1,13 @@
 <!-- $Id: buttons.txt v7.00 28/04/2018 00:36:31 $ -->
 <!-- Copyright (c) 1998-2017 INRIA -->
 %( Boutons de configurations et d'options %)
-%let;istable;%if;((evar.m="D" and (evar.t="H" or evar.t="I")) or (evar.m="A" and evar.t="Z"))1%end;%in;
+%let;istable;%if;((evar.m="D" and (evar.t="H" or evar.t="I")) or (evar.m="A" and (evar.t="Z" or evar.t="Y")))1%end;%in;
 <div class="d-flex">
   <a role="button" class="btn btn-link ml-2 my-0 px-0 mb-1"%sp;
     href="%prefix_base_password;%if;(evar.templ!="")&templ=%evar.templ;%end;&%access;&m=%evar.m;"><i class="fa fa-cog fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
     [*options] %if;(evar.m="D")[descendants]%elseif;(evar.m="A")[ancestors]%end;%nn;
   </a>
-  %let;cond;%if;((evar.m="A" and evar.t="Z") or (evar.m="D" and evar.t="D" or evar.t="T"))1%end;%in;
+  %let;cond;%if;((evar.m="A" and (evar.t="Z" or evar.t="X" or evar.t="Y")) or (evar.m="D" and evar.t="D" or evar.t="T"))1%end;%in;
   <span class="sr-only">—</span>
   <a role="button" class="btn btn-link ml-1 my-0 px-0 mb-1%if;(cond=1 and not has_children) disabled%end;"%sp;
   href="%prefix_base_password;%nn;
@@ -48,6 +48,7 @@
     %end;%nn;
   </a>
   <span class="input-group ml-1 mb-1">
+    %if;(evar.v!="")
     <span class="sr-only">— [*generation/generations]0</span>
     <a role="button" class="btn pl-3%if;(evar.m="D")%if;(evar.v<2) disabled text-muted%end;
                                     %elseif;(evar.m="A")%if;(evar.v<3) disabled text-muted%end;
@@ -79,6 +80,7 @@
       <span class="sr-only">+</span>%nn;
     </a>
     <span class="sr-only"> —</span>
+    %end;
     %if;(evar.v!=0 and istable=1)
       <a role="button" class="btn btn-link my-0 px-0 pl-0"
         href="%prefix_base_password;%nn;
@@ -188,6 +190,18 @@
              %end;">%nn;
       <i class="fa fa-th%if;(evar.t="I")-large%end; fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
       %if;(evar.t="H")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [spouses info]0%nn;
+    </a>
+  %end;
+  %if;(evar.m="A" and evar.t="Z" or evar.t="Y")
+    <span class="sr-only">—</span>
+    <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
+      href="%prefix_base_password;%nn;
+               %foreach;env_binding;
+                 %if;(env.key="t")&t=%if;(evar.t!="Y")Y%else;Z%end;%nn;
+                 %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
+               %end;">%nn;
+        <i class="fa fa-th fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
+        %if;(evar.t!="Y")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [table] [by couple]0%nn;
     </a>
   %end;
 </div>

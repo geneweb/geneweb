@@ -187,7 +187,7 @@
   %end;
 %end;
 
-%define;tD()
+%define;tX()
   %( ancestors up to somebody %)
   %pvar.1.mark_descendants;
   %foreach;ancestor_level;
@@ -206,7 +206,7 @@
   %end;
 %end;
 
-%define;tZ()
+%define;tY()
   %foreach;ancestor_level(l_v)
     %if;(level > 1 and (evar.only != "on" or level = l_v))
       <tr><th colspan="7" >%nl;[*generation/generations]0 %level;%nl;</th></tr>
@@ -220,14 +220,14 @@
 %end;
 
 %( main %)
-%if;(evar.only != "on" and evar.t != "D")
+%if;(evar.only != "on" and evar.t != "X")
   %apply;togen()
 %end;
-%if;(evar.t = "D")
+%if;(evar.t = "X")
   <p>[*up to] %pvar.1; %pvar.1.dates;</p>
   %if;(not cancel_links)
     <div class="menu">
-      %if;(has_sosa)<span><a href="%prefix;m=D;t=L;t1=1;i=%evar.i1;;i1=%index;;siblings=on;alias=on;spouse=on;parents=on;rel=on;notes=on;src=on;hide=on;witn=on;v=%evar.l;;maxv=%evar.l;;l=%evar.l;">[*descendants]0</a></span>%end;
+      %if;(has_sosa)<span><a href="%prefix;m=X;t=X;t1=1;i=%evar.i1;;i1=%index;;siblings=on;alias=on;spouse=on;parents=on;rel=on;notes=on;src=on;hide=on;witn=on;v=%evar.l;;maxv=%evar.l;;l=%evar.l;">[*descendants]0</a></span>%end;
       <span><a href="%prefix;m=A;t=G;i=%index;;i1=%evar.i1;;siblings=on;alias=on;spouse=on;parents=on;rel=on;witn=on;notes=on;src=on;hide=on;l=%evar.l;">[*ancestors]0</a></span>
     </div>
   %end;
@@ -243,9 +243,9 @@
     <col width="400"%/>
     <col width="10"%/>
   </colgroup>
-  %if;(evar.t = "D")
-    %apply;tD()
+  %if;(evar.t = "X")
+    %apply;tX()
   %else;
-    %apply;tZ()
+    %apply;tY()
   %end;
 </table>
