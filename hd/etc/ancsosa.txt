@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="%lang;">
 <head>
-  <!-- $Id: ancsosa.txt,v7.00 02/04/2018 13:42:27 $ -->
+  <!-- $Id: ancsosa.txt,v7.00 02/05/2018 09:05:52 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
   <title>%nn;
     %if;(evar.t = "D")
@@ -32,7 +32,7 @@
 %include.css;
 %base_header;
 </head>
-<body%body_prop;>
+<body%body_prop; id="ancsosa"
 %message_to_wizard;
 <div class="container-fluid">
 
@@ -396,7 +396,7 @@
 
 %define;imgtdz(xx)
   %if;(evar.image!="off" and xx.has_image)
-    <img class="imgtdz img-fluid" src="%xx.image_url;" %lai; title="%xx;"%/>%nn;
+    <img class="imgtdz img-fluid w-50" src="%xx.image_url;" %lai; title="%xx;"%/>%nn;
   %end;
 %end;
 
@@ -468,7 +468,7 @@
       %apply;link_parents()
       %apply;nb_fam("xx")
     </td>
-    <td z1>
+    <td z1 class="align-middle">
       %apply;imgtdz("xx")
       <div>%apply;link3(xx.access, xx)</div>
       %apply;info3("xx")
