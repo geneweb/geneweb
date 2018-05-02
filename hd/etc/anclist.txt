@@ -76,31 +76,6 @@
   %import;buttons;
 %end;
 
-%if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
-    %if;(referer != "")
-      <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
-    %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
-  </div>
-%end;
-
-%define;tothegen(xx)
-  [*to the %s generation:::xx]%nn;
-%end;
-
-%define;togen(xx)
-  %if;(xx = 1)[*specify::generation/generations]0%nn;
-  %elseif;(xx = 2)[*to the parents]%nn;
-  %elseif;(xx = 3)[*to the grandparents]%nn;
-  %elseif;(xx = 4)[*to the great-grandparents]%nn;
-  %else;
-    %apply;tothegen%with;
-      %apply;nth([nth (generation)], xx)
-    %end;
-  %end;
-%end;
-
 %define;ancestors_by_list(xx, nnn)
   %if;(xx.has_parents and nnn > 1)
     <ul>
@@ -148,9 +123,7 @@
       %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
       %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
     %in;
-    <p>
-    %apply;togen(xx).
-    </p>
+    <p>%apply;togena(xx).</p>
     %apply;ancestors_by_list("self", xx)
 
   %elseif;(evar.t = "H")
@@ -159,10 +132,7 @@
       %if;(bvar.max_anc_level = "")%apply;min(evar.v, max_anc_level, 7)
       %else;%apply;min(evar.v, max_anc_level, bvar.max_anc_level)%end;
     %in;
-    <div class="row">
-      <span>%apply;togen(xx).</span>
-    </div>
-    <p>
+    <p>%apply;togena(xx).</p>
     <table><tr><td style="font-family:monospace;white-space:nowrap;line-height:1.2em;">
     %apply;ancestors_horizontally(
       "self", xx, "&nbsp;&nbsp;&nbsp;", "──&nbsp;", "&nbsp;&nbsp;&nbsp;", 1)
@@ -193,7 +163,7 @@
     %end;
 
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togen(nb_gen).</p>
+    <p>%apply;togena(nb_gen).</p>
     <div class="not_printable" style="margin-bottom:15px;">
       <table class="display_search">
         <tr>
@@ -284,7 +254,7 @@
   %elseif;(evar.t = "E")
     %( list eclair by alphabetic order %)
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togen(nb_gen).</p>
+    <p>%apply;togena(nb_gen).</p>
     <div class="not_printable" style="margin-bottom:15px;">
       <table class="display_search">
         <tr>
@@ -379,7 +349,7 @@
     %end;
 
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togen(nb_gen).</p>
+    <p>%apply;togena(nb_gen).</p>
 
     %if;(count > 100)
       <p>
@@ -482,7 +452,7 @@
   %elseif;(evar.t = "F")
     %( surnames branch %)
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
-    <p>%apply;togen(nb_gen).</p>
+    <p>%apply;togena(nb_gen).</p>
     <p>[*help surname branch].</p>
     <div class="not_printable" style="margin-bottom:25px;">
       <table class="display_search">
