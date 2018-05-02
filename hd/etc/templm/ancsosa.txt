@@ -106,9 +106,11 @@
   %include.ancsosa_same;
 %elseif;(evar.t = "M")
   %include.ancsosa_miss;
+%elseif;(evar.t = "Z")
+  %include.ancsosa_tab;
 
 %end;
-%if;not cancel_links;
+%if;(not cancel_links and evar.t!="Z")
   %import;tools;
   %apply;tools_ancsosa()
   %base_trailer;
