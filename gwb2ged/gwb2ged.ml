@@ -58,18 +58,6 @@ value encode s =
 
 value max_len = 78;
 
-value next_char_pair_overflows s len i =
-  loop False (len + 1) (i + 1) where rec loop prec_was_space len i =
-    if len < max_len then
-      if i < String.length s then
-        match s.[i] with
-        [ ' ' | '\n' -> loop True (len + 1) (i + 1)
-        | _ ->
-            if prec_was_space then loop False (len + 1) (i + 1) else False ]
-      else False
-    else True
-;
-
 value br = "<br>";
 value find_br s ini_i =
   let ini = "<br" in
@@ -104,11 +92,21 @@ value rec display_note_aux oc tagn s len i =
       let i = if i < String.length s then i + 1 else i in
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
-    else if
-      len = max_len || c <> ' ' && next_char_pair_overflows s len i
-    then do {
-      fprintf oc "\n%d CONC %c" (succ tagn) c;
-      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC .")) (i + 1)
+    else if len = max_len then do {
+      let rec display_until_space i =
+        let c = if s.[i] = '\n' then ' ' else s.[i] in
+        if c = ' ' then do {
+          fprintf oc "\n%d CONC " (succ tagn);
+          i
+        }
+        else do {
+          output_char oc c;
+          display_until_space (i + 1)
+        }
+      in
+      let i = display_until_space i in
+      let i = if i < String.length s then i + 1 else i in
+      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
     }
     else do { output_char oc c; display_note_aux oc tagn s (len + 1) (i + 1) }
 ;
