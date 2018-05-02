@@ -68,7 +68,7 @@
                                       %if;(evar.v>static_max_desc_level) disabled text-muted%end;
                                     %elseif;(evar.m="A")
                                       %if;(evar.v>static_max_anc_level) disabled text-muted%end;
-                                    %end;%sp;
+                                    %end;"%sp;
       title="[*add] 1 [generation/generations]0"%sp;
       href="%prefix_base_password;%nn;
             %foreach;env_binding;
