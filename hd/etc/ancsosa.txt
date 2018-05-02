@@ -338,8 +338,8 @@
   %end;
   %apply;lazy_print(birth_symbol)
   %if;(xx.has_birth_date or xx.has_baptism_date)
-    %if;(xx.birth_date.year != "")<tt>%lazy_force;</tt>%xx.slash_birth_date;%nn;
-    %elseif;(xx.baptism_date.year != "")<tt>%lazy_force;</tt>%xx.slash_baptism_date;%nn;
+    %if;(xx.birth_date.year != "")<span class="text-monospace">%lazy_force;</span>%xx.slash_birth_date;%nn;
+    %elseif;(xx.baptism_date.year != "")<span class="text-monospace">%lazy_force;</span>%xx.slash_baptism_date;%nn;
     %end;
   %end;
   %if;(xx.has_birth_place or xx.has_baptism_place)
@@ -350,8 +350,8 @@
     %l1;
     %apply;lazy_print(death_symbol)
     %if;(xx.has_death_date or xx.has_burial_date)
-      %if;(xx.death_date.year != "")<tt>%lazy_force;</tt>%xx.slash_death_date;%nn;
-      %elseif;(xx.burial_date.year != "")<tt>%lazy_force;</tt>%xx.slash_burial_date;%nn;
+      %if;(xx.death_date.year != "")<span class="text-monospace">%lazy_force;</span>%xx.slash_death_date;%nn;
+      %elseif;(xx.burial_date.year != "")<span class="text-monospace">%lazy_force;</span>%xx.slash_burial_date;%nn;
       %end;
     %end;
     %if;(xx.has_death_place or xx.has_burial_place)
@@ -1519,7 +1519,7 @@
       %end;
     %end;
   %end;
-  <tr><td colspan="9">[*total] : %count; [[person/persons]1@(c)]</td></tr>
+  <tr><td colspan="7">[*total] : %count; [[person/persons]1@(c)]</td></tr>
 %end;
 
 %( Main %)
