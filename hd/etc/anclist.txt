@@ -97,7 +97,13 @@
           "pp.father", xx - 1, "ss1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
           "ss1&nbsp;┌──&nbsp;", "ss1&nbsp;|&nbsp;&nbsp;&nbsp;", zz*2)
       %end;
-      <samp>ss2</samp><a id="sosa_%pp.sosa;" href="%prefix;%pp.access;">%pp;</a>%pp.title;%pp.dates;<br>
+      <samp>ss2</samp>%nn;
+      %if;(not cancel_links)
+        <a id="sosa_%pp.sosa;" href="%prefix;%pp.access;">%pp;</a>
+      %else;
+        %pp;%nn;
+      %end;
+      %pp.title;%pp.dates;<br>
       %if;(pp.has_parents)
         %apply;ancestors_horizontally(
           "pp.mother", xx - 1, "ss3&nbsp;|&nbsp;&nbsp;&nbsp;",
@@ -105,11 +111,17 @@
       %end;
     %else;
       %let;sss;sosa_%pp.sosa;%in;
-      <samp>ss2</samp><a href="%prefix;%pp.access;">%pp;</a>
-      <a href="#%sss;" %apply;implex1(sss)
-        title="[implex/implexes]0, [see above] zz">%nn;
-      <i class="fa fa-random  fa-fw mx-0" aria-hidden="true"></i>
-      <span class="sr-only">%sp;(==)%sp;</span></a><br>
+      <samp>ss2</samp>%nn;
+      %if;(not cancel_links)
+        <a href="%prefix;%pp.access;">%pp;</a>
+        <a href="#%sss;" %apply;implex1(sss)
+          title="[implex/implexes]0, [see above] zz">%nn;
+        <i class="fa fa-random  fa-fw mx-0" aria-hidden="true"></i>
+        <span class="sr-only">%sp;(==)%sp;</span></a><br>
+      %else;
+        %pp;<i class="fa fa-random  fa-fw mx-0" aria-hidden="true"></i>%nn;
+        <span class="sr-only">%sp;(==)%sp;</span><br>
+      %end;
     %end;
   %end;
 %end;
@@ -165,6 +177,7 @@
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togena(nb_gen).</p>
     <div class="not_printable" style="margin-bottom:15px;">
+      %if;(not cancel_links)
       <table class="display_search">
         <tr>
           <td><b>[*sort by/date begin/alphabetic order/nb individuals/nb events]0</b></td>
@@ -181,7 +194,7 @@
           <td><img src="%image_prefix;/picto_alphabetic_order.png"%/></td>
           <td>
             <a href="%prefix;&amp;m=A&amp;p=%first_name_key;&amp;n=%surname_key;&amp;oc=%evar.oc;&amp;t=%evar.t;&amp;v=%evar.v;">
-              [sort by/date begin/alphabetic order/nb individuals/nb events]2
+            [sort by/date begin/alphabetic order/nb individuals/nb events]2
             </a>
           </td>
           <td><img src="%image_prefix;/picto_numeric_order.png"%/></td>
@@ -204,6 +217,7 @@
           </td>
         </tr>
       </table>
+      %end;
     </div>
 
     <table class="list_eclair_table">
@@ -256,6 +270,7 @@
     %let;nb_gen;%apply;min(evar.v, max_anc_level)%in;
     <p>%apply;togena(nb_gen).</p>
     <div class="not_printable" style="margin-bottom:15px;">
+      %if;(not cancel_links)
       <table class="display_search">
         <tr>
           <td><b>[*sort by/date begin/alphabetic order/nb individuals/nb events]0</b></td>
@@ -279,6 +294,7 @@
           </td>
         </tr>
       </table>
+      %end;
     </div>
 
     <table class="list_eclair_table">
@@ -364,6 +380,7 @@
 
     <p>[*help surname branch].</p>
     <div class="not_printable">
+      %if;(not cancel_links)
       <table class="display_search">
         <tr>
           <td><b>[*sort by/branch/alphabetic order]0</b></td>
@@ -377,6 +394,7 @@
           </td>
         </tr>
       </table>
+      %end;
     </div>
     <ul class="surname_branch_sort">
       %if;(count <= 100)
@@ -455,6 +473,7 @@
     <p>%apply;togena(nb_gen).</p>
     <p>[*help surname branch].</p>
     <div class="not_printable" style="margin-bottom:25px;">
+      %if;(not cancel_links)
       <table class="display_search">
         <tr>
           <td><b>[*sort by/branch/alphabetic order]0</b></td>
@@ -468,6 +487,7 @@
           <td>[sort by/branch/alphabetic order]2</td>
         </tr>
       </table>
+      %end;
     </div>
     <table class="surname_branch_table">
       <thead>
