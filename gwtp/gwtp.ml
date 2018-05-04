@@ -935,7 +935,7 @@ value gwtp_receive str env b tok =
       do {
         printf "content-type: bin/geneweb";
         crlf ();
-        printf "content-disposition: attachement; filename=%s" fname;
+        printf "content-disposition: attachment; filename=%s" fname;
         crlf ();
         crlf ();
         let ic = open_in (Filename.concat bdir fname) in
