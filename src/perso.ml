@@ -2518,23 +2518,24 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
                 eval_person_field_var conf base env (p, p_auth) loc sl
             | _ -> raise Not_found ]
         | None -> raise Not_found ]
-  | ["tvar"; i :: [ s :: sl]] ->
-      (* %tvar.index_i.sosa_s.first_name;
-         person is directly identified by its index
-         get first_name of sosa_s of person index_i
-      *) 
-      let i0 = int_of_string i in
-      if i0 < 0 || i0 >= nb_of_persons base then raise Not_found
-      else
-        let p0 = pget conf base (Adef.iper_of_int i0) in
-        let s0 = Sosa.of_string s in
-        let ip0 = get_key_index p0 in
-        match Util.branch_of_sosa conf base ip0 s0 with
-        [ Some [(ip, sp) :: —] ->
-            let p = poi base ip in
-            let p_auth = authorized_age conf base p in
-            eval_person_field_var conf base env (p, p_auth) loc sl
-        | _ -> raise Not_found ]
+  | ["tvar"; s :: sl] ->
+      (* %tvar.sosa.first_name;
+         direct access to a person whose sosa relative to sosa_ref is s
+      *)
+      match get_env "sosa_ref" env with
+      [ Vsosa_ref v ->
+          match Lazy.force v with
+          [ Some p ->
+              let ip = get_key_index p in
+              let s0 = Sosa.of_string s in
+              match Util.branch_of_sosa conf base ip s0 with
+              [ Some [(ip, sp) :: —] ->
+                  let p = poi base ip in
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl
+              | _ -> VVstring "" ]
+          | None -> raise Not_found ]
+      | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_type = rt} (Some p) ->
