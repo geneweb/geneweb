@@ -32,25 +32,25 @@
       </div>
     </div>
     <div class="align-items-center ml-1">
-      <a href="%apply;url2%with;v1%and;%if;(evar.v1>1)&v1=%expr(evar.v1-1)%end;
+      <a href="%apply;url2%with;v1%and;%if;(evar.v1!="" and evar.v1>1)&v1=%expr(evar.v1-1)%end;
                 %and;v2%and;
                   %if;(evar.v2!="")
                     %if;(evar.v2>1)&v2=%expr(evar.v2-1)%end;
                   %else;
-                    %if;(evar.v1>1)&v2=%expr(evar.v1-1)%end;
+                    %if;(evar.v1!="" and evar.v1>1)&v2=%expr(evar.v1-1)%end;
                   %end;
                 %end;"
          class="btn btn-sm btn-outline-secondary border-0
-            %if;(evar.v1<2 or evar.v2<2) disabled%end;" title="[both] -1">-</a>
+            %if;(evar.v1!="" and evar.v2!="" and (evar.v1<2 or evar.v2<2)) disabled%end;" title="[both] -1">-</a>
     </div>
     <div class="d-inline-flex flex-column">
       <div class="form-inline">
         <div class="input-group">
-          <a href="%apply;url%with;v1%and;%if;(evar.v1>=1)&v1=%expr(evar.v1-1)%end;%end;"
-            class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v1<1) disabled%end;">-</a>
+          <a href="%apply;url%with;v1%and;%if;(evar.v1!="" and evar.v1>=1)&v1=%expr(evar.v1-1)%end;%end;"
+            class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v1!="" and evar.v1<1) disabled%end;">-</a>
           <div class="align-self-center">%if;(evar.v1!="")%evar.v1;%end;</div>
           <a href="%apply;url%with;v1%and;&v1=%expr(evar.v1+1)%end;"
-            class="btn btn-sm btn-outline-secondary border-0 input-group-append%if;(evar.v1=bvar.max_cousins_level) disabled%end;">+</a>
+            class="btn btn-sm btn-outline-secondary border-0 input-group-append%if;(evar.v1!="" and evar.v1=bvar.max_cousins_level) disabled%end;">+</a>
         </div>
       </div>
       <div class="form-inline">
@@ -59,16 +59,16 @@
                       %if;(evar.v2!="")
                         %if;(evar.v2>=1)&v2=%expr(evar.v2-1)%end;
                       %else;
-                        %if;(evar.v1>=1)&v2=%expr(evar.v1-1)%end;
+                        %if;(evar.v1!="" and evar.v1>=1)&v2=%expr(evar.v1-1)%end;
                       %end;
                     %end;"
-            class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v2<1) disabled%end;">-</a>
+            class="btn btn-sm btn-outline-secondary border-0 input-group-prepend%if;(evar.v2!="" and evar.v2<1) disabled%end;">-</a>
           <span class="align-self-center">%if;(evar.v2!="")%evar.v2;%else;%evar.v1;%end;</span>
           <a href="%apply;url%with;v2%and;
                       %if;(evar.v2!="")&v2=%expr(evar.v2+1)
                       %else;&v2=%expr(evar.v1+1)%end;
                     %end;"
-            class="btn btn-sm btn-outline-secondary border-0 input-group-append%if;(evar.v2=bvar.max_cousins_level) disabled%end;">+</a>
+            class="btn btn-sm btn-outline-secondary border-0 input-group-append%if;(evar.v2!="" and evar.v2=bvar.max_cousins_level) disabled%end;">+</a>
         </div>
       </div>
     </div>
@@ -80,7 +80,7 @@
                   %end;
                 %end;"
          class="btn btn-sm btn-outline-secondary border-0
-            %if;(evar.v1=bvar.max_cousins_level or evar.v2=bvar.max_cousins_level) disabled%end;"
+            %if;((evar.v1!="" and evar.v1=bvar.max_cousins_level) or (evar.v2!="" and evar.v2=bvar.max_cousins_level)) disabled%end;"
             title="[both] +1">+</a>
     </div>
     <div class="mx-2">
