@@ -1019,7 +1019,7 @@ value rec is_a_public_name s i =
     if j > i then
       let w = String.sub s i (j - i) in
       if look_like_a_number w then True
-      else if is_roman_int w then True
+      else if is_roman_int w && s.[j] <> '.' then True
       else if List.mem w public_name_word then True
       else is_a_public_name s j
     else False
