@@ -115,15 +115,6 @@ Person:            Child1     Child2          Child3
 %define;descendants_at_level(xxx,lll,nnn,ttt,fff,www)
   %(one level of descendants (%xxx.first_name;,lll,nnn,ttt,fff,www)<br>%)
   %(compute family position %)
-  %let;fmpos;%nn;
-    %if;(has_families and nb_families>1)%nn;
-      %if;(family_cnt=1)right%nn;
-      %elseif;(family_cnt=nb_families)left%nn;
-      %else;full%nn;
-      %end;%nn;
-    %else;full%nn;
-    %end;%nn;
-  %in;
   %if;(lll>evarv)
   %( we are done %)
   %elseif;(lll<=nnn)
@@ -192,7 +183,9 @@ Person:            Child1     Child2          Child3
                   %else;&
                   %end;
                 %end;
-                %if(evar.marriage="on" and (evar.spouse="on" or count1>0))%if;(marriage_date.year!="") %marriage_date.year;%else; -%end;%end;
+                %if(evar.marriage="on" and (evar.spouse="on" or count1>0))
+                  %if;(family.marriage_date.year!="") %marriage_date.year;%else; -%end;
+                %end;
               </span>
             </td>
             <td>&nbsp;</td>
