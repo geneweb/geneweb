@@ -126,12 +126,11 @@ value misc_notes_link s i =
                 [ Not_found ->
                     ("", String.sub b (l + 1) (String.length b - l - 1)) ]
               in
-              let oc1 = try int_of_string name with [ Failure _ -> 0 ] in
+              let oc1 = try int_of_string name with [ Failure _ -> -1 ] in
               let oc = try int_of_string oc with [ Failure _ -> 0 ] in
-              if oc1 = 0 then (fn, sn, oc, name)
-              else (*if Wiki.wi_person_exists (fn, sn, oc1) then (fn, sn, oc1, fn ^ " " ^ sn)
-                   else (fn, sn, oc, name)*)
-                (fn, sn, oc1, fn ^ " " ^ sn)
+              if oc1 = -1 then (fn, sn, oc, name)
+              else (*if not Wiki.wi_person_exists (fn, sn, oc1) then (fn, sn, oc, fn ^ " " ^ sn)
+                   else*) (fn, sn, oc1, fn ^ " " ^ sn)
             with
             [ Not_found ->
                 let sn = String.sub b k (String.length b - k) in
