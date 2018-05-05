@@ -93,20 +93,26 @@ value rec display_note_aux oc tagn s len i =
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     else if len = max_len then do {
-      let rec display_until_space i =
-        let c = if s.[i] = '\n' then ' ' else s.[i] in
-        if c = ' ' then do {
-          fprintf oc "\n%d CONC " (succ tagn);
-          i
-        }
-        else do {
-          output_char oc c;
-          display_until_space (i + 1)
-        }
+      let j = ref i in
+      let rec display_until_space () =
+        if j.val = String.length s then ()
+        else
+          let c = if s.[j.val] = '\n' then ' ' else s.[j.val] in
+          if c = ' ' then
+            fprintf oc "\n%d CONC " (succ tagn)
+          else do {
+            output_char oc c;
+            incr j;
+            display_until_space ()
+          }
       in
-      let i = display_until_space i in
-      let i = if i < String.length s then i + 1 else i in
-      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
+      display_until_space ();
+      if j.val = String.length s then
+        fprintf oc "\n"
+      else
+        display_note_aux oc tagn s
+          (String.length ((string_of_int (succ tagn)) ^ " CONC "))
+          (j.val + 1)
     }
     else do { output_char oc c; display_note_aux oc tagn s (len + 1) (i + 1) }
 ;
