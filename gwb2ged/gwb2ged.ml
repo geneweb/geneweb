@@ -94,19 +94,24 @@ value rec display_note_aux oc tagn s len i =
     }
     else if len = max_len then do {
       let j = ref i in
-      let rec display_until_space () =
+      let rec display_and_break () =
         if j.val = String.length s then ()
         else
           let c = if s.[j.val] = '\n' then ' ' else s.[j.val] in
-          if c = ' ' then
-            fprintf oc "\n%d CONC " (succ tagn)
+          if c = ' ' || Name.nbc c = 1 then do {
+            (* new line, the char will be printed by the next call to
+               display_note_aux *)
+            fprintf oc "\n%d CONC " (succ tagn);
+            decr j;
+          }
           else do {
+            (* multi-byte char *)
             output_char oc c;
             incr j;
-            display_until_space ()
+            display_and_break ()
           }
       in
-      display_until_space ();
+      display_and_break ();
       if j.val = String.length s then
         fprintf oc "\n"
       else
