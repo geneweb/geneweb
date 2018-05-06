@@ -30,7 +30,7 @@ it: L'indirizzo di questo service è cambiato.
 </ul>
 </p>
 
-%include.trl;
+%base_trailer;
 %include.copyr;
 </div>
 </body>

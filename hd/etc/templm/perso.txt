@@ -1388,7 +1388,7 @@
     %apply;buttons()
   </div>
   <div style="clear:both;">
-  %include.trl;
+  %base_trailer;
 %include.copyr;
   </div>
 %end;

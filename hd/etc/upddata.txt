@@ -110,7 +110,7 @@
 %else;
   %apply;print_long()
 %end;
-%include.trl;
+%base_trailer;
 %include.copyr;
 </div>
 %include.js;
