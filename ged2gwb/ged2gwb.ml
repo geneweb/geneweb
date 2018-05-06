@@ -878,11 +878,11 @@ END;
 value date_of_field pos d =
   if d = "" then None
   else do {
-    let s = Stream.of_string (String.uppercase_ascii d) in
+    let s = Stream.of_string (d) in
     date_str.val := d;
     try Some (Grammar.Entry.parse date_value s) with
     [ Ploc.Exc loc (Stream.Error _) ->
-        let s = Stream.of_string (String.uppercase_ascii d) in
+        let s = Stream.of_string (d) in
         try Some (Grammar.Entry.parse date_value_recover s) with
         [ Ploc.Exc loc (Stream.Error _) -> Some (Dtext d) ] ]
   }
@@ -2069,7 +2069,7 @@ value add_indi gen r =
     match name_sons with
     [ Some n ->
         let (f, s) = parse_name (Stream.of_string n.rval) in
-        let pn = "" in
+        let pn = givn in
         let fal = if givn = f then [] else [givn] in
         let (f, fal) =
           match first_names_brackets.val with
