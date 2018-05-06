@@ -9,7 +9,7 @@ far it needs your help to know what to compare. Two modes are available:
 
  - descendants of all ascendants (option -ad): it will found ascendants of the 
     person you have found in both databases that are available in both data
-    bases. For each top person identified, it will compare its decendants in
+    bases. For each top person identified, it will compare its descendants in
     both databases.
 
 USAGE:

@@ -669,7 +669,7 @@ GeneWeb Version 3.05
     is missing in all languages! Used "bsi_err.htm" instead.
 
 * GeneWeb daemon/CGI (gwd)
-  - [04 Jun 00] Check about titles dates no more done agains the death date,
+  - [04 Jun 00] Check about titles dates no more done against the death date,
     since titles can be given after death.
   - [19 May 00] Added a small + in display ancestors horizontally. Seems
     more pretty :-)
@@ -757,7 +757,7 @@ GeneWeb Version 3.03
     even for persons having only the year in their date (fixed by testing
     the field "delta" in the date record).
   - [01 Feb 00] Added indentation in forum to make it more readable.
-  - [25 Jan 00] Display the number of persons in some more pages. Dont
+  - [25 Jan 00] Display the number of persons in some more pages. Don't
     display it when number <= 1.
   - [25 Jan 00] Changed the limit for public persons to 150 years instead
     of 100 years: persons must have been born and dead before 150 years
@@ -852,7 +852,7 @@ GeneWeb Version 3.00
   - [Nov 1, 99] Print relations only for friends and wizards.
   - [Oct 31, 99] Added macro %k for images in order to have the same request
     for any database in any language. And several changes to make the DOC
-    request independant from the database.
+    request independent from the database.
   - [Oct 25, 99] Modified the treatment of nth (overflowing after 100)
     to display the number itself (better than just "n-th").
   - [Oct 25, 99] Commented the loading of the whole persons and families
@@ -1024,7 +1024,7 @@ GeneWeb Version 2.02
     is corrupted for some reason, this was not a good error message!
   - [Apr 28, 99] Added the ability to add a file named "refuse.txt" to
     explain reasons of gwd exclusion.
-  - [Apr 24, 99] Dont print "+" in short dates for died person if there is
+  - [Apr 24, 99] Don't print "+" in short dates for died person if there is
     no death date and if the person is older than 120 years, as it was
     done in 2.01 for long dates displaying.
 
@@ -1053,7 +1053,7 @@ GeneWeb Version 2.01
     parts, using cmxa files, because Windows 98 (or maybe Cygnus) does not
     work with this too long line, I don't know why. No difference in Unix.
   - [Apr 6, 99] Big cleanup about titles (hopefully not introducing bugs).
-  - [Apr 3, 99] Dont print "died" in personal page if this is the only
+  - [Apr 3, 99] Don't print "died" in personal page if this is the only
     information (no date, no place) and if it is older than 120 years.
   - [Mar 22, 99] Ability to put "*" (to match any characters) in lines in
     exclude file.
@@ -1128,7 +1128,7 @@ GeneWeb Version 1.10
     many accesses to the base (unnecessary accesses to "persons").
   - [13/12/98] In src/num.ml, display at least "0" when number is 0!
   - [12/12/98] Fixed horrible programming of base patches applying, which
-    resulted in much memory allocation and time loosing for bases having many
+    resulted in much memory allocation and time losing for bases having many
     added "things" (persons, families, strings). Now the code is cleaner.
     Consequence: saved speed and memory allocation in such bases in gwd,
     gwu, gwb2ged.
@@ -1169,7 +1169,7 @@ GeneWeb Version 1.09
        base?em=R;ei=31440&m=NG&n=somebody&t=PN
      and ability to write in a direct link:
        base?em=R;ep=jack;en=nicholson;eoc=3&m=NG&n=somebody&t=PN
-     to be somewhat independant from the index of "jack nicholson" in
+     to be somewhat independent from the index of "jack nicholson" in
      the base.
   - Hidden options in requests:
        ";opt=from" in personal pages, gives the .gw origin file (if any)
@@ -1305,7 +1305,7 @@ GeneWeb Version 1.03
 --------------------
 
 * gwd:
-  - ascend.ml & relation.ml: print upto faster thanks to maxlen added (l=...)
+  - ascend.ml & relation.ml: print up to faster thanks to maxlen added (l=...)
   - capitalization of all letters with accents is now ok
   - added "gwd.xcl" to exclude connexions
 

@@ -395,13 +395,13 @@ value print_warning conf base =
         (print_someone_strong conf base anc)
   | MarriageDateAfterDeath p ->
       Wserver.wprint
-        (fcapitale (ftransl conf "marriage had occured after the death of %t"))
+        (fcapitale (ftransl conf "marriage had occurred after the death of %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
   | MarriageDateBeforeBirth p ->
       Wserver.wprint
-        (fcapitale (ftransl conf "marriage had occured before the birth of %t"))
+        (fcapitale (ftransl conf "marriage had occurred before the birth of %t"))
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))

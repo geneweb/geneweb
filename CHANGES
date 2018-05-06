@@ -63,7 +63,7 @@ GeneWeb version 6.06
   relatives outputs. Add a few new options in the ascendants/descendants 
   list/tree.
 * The way a date is displayed is now completely depedant of the "date order"
-  in the language dictionnary. For exemple, if your date order is dd/mm/yyyy,
+  in the language dictionary. For example, if your date order is dd/mm/yyyy,
   your date will be 01/02/1880. If instead it's d/m/yyyy, it will be displayed
   as 1/2/1880. Format accepted now are : 
   - dmyyyy
@@ -168,7 +168,7 @@ GeneWeb version 6.04
 * Added an option in the ged2gwb tool. It behaves like previously, i.e. default
   relation for a couple is Married. If someone prefer, one can use the option
   -rs_no_mention to set the relation status to NoMention.
-* Added a new intruction in the template langage : FOR.
+* Added a new instruction in the template langage : FOR.
   It is a simple instruction, and could be improved later but for now it works
   like this :
   for (i=MIN; i<MAX; i++) => in template language : %for;i;MIN;MAX .... %end;
@@ -184,7 +184,7 @@ GeneWeb version 6.04
 * Added an option to *not* try a getHostByName. Could slow down on windows. 
   One should add -no_host_address to gwd to use this feature.
 * New implementation of the fonction that calculate if a person has a sosa 
-  number or not. Much more efficent than the previous one !
+  number or not. Much more efficient than the previous one !
 * It is now NOT possible to add or modify a family in which the first
   name or the surname of a person is not specify. => It can break the 
   generation of the gw file.
@@ -194,9 +194,9 @@ GeneWeb version 6.04
 * Added an "happy birthday" for the wedding anniversary in the
   individual page
 * Added the operator '/' (DIV) in the template language
-* Fix the calculs in case there is more than a thousand number in templm
+* Fix the calculus in case there is more than a thousand number in templm
 * Fix the duplicates of adresse in gwc2. Now the book of places if
-  working completly in gwc1 and gwc2
+  working completely in gwc1 and gwc2
 
 Daniel de Rauglaudre:
 * Fix bug (limitation of the int size in OCaml). Now in 64 bits architecture,
@@ -237,7 +237,7 @@ GeneWeb version 6.03
   many results"
 * Added a book of places (see a.gwf to specify the maximum number of
   event that can be corrected in one pass. 
-  !!! Beware !!! This functionnality is not completly functionnal when
+  !!! Beware !!! This functionality is not completely functional when
   using gwc2. You can not edit twice the same place. If you want to
   edit more than one time one place, you have to do a consang between
   each modifications (because it will recalculate the indexs).
@@ -349,7 +349,7 @@ GeneWeb version 5.02
   messages not yet validated (in red) to allow them to possibly delete
   them.
 * ... other things added, modified or fixed. These changes were not recorded
-  here, because lazyness...
+  here, because laziness...
 
 GeneWeb version 5.01
 --------------------
@@ -382,7 +382,7 @@ The new version number (5.00) is in honour of this new encoding.
     and HTML syntax can be both used in the same page. The Wiki syntax is:
     - Lines starting with from 1 to 6 '=' and ending with the same number
       of '=' are section titles (1 = most important.. 6 = less important).
-      If the text is modifiable, they can be independantly editable (a
+      If the text is modifiable, they can be independently editable (a
       link "(modify)" is displayed to allow it).
     - An empty line makes a new paragraph.
     - Group of at least 2 lines starting with space and with an empty
@@ -405,7 +405,7 @@ The new version number (5.00) is in honour of this new encoding.
       Simplified syntaxes: if oc = 0, [[fn/sn/t]] can be used, and
       [[fn/sn]] is equivalent to [[fn/sn/0/fn sn]].
     - The syntax [[[name/text]]] makes a link to a "miscelleneous note"
-      (new feature), an independant page which can be edited (if updating
+      (new feature), an independent page which can be edited (if updating
       allowed), and using Wiki syntax also. The page name is 'name' (only
       letters, digits and '_' allowed) and 'text' is displayed as link. If
       the page does not exist, the link is displayed in red. These new
@@ -990,7 +990,7 @@ GeneWeb version 4.01
   - [17 Mar 01] Fixed problem of displaying of history of updates: it
     was sometimes very very slow.
   - [15 Mar 01] Fixed bug: when merging two men (the problem did not
-    happen for women), the witnesses of mariage of the second man were
+    happen for women), the witnesses of marriage of the second man were
     incompletely reported to the first one (they are indicated as witness
     in the first man page, but not in their own personal page in the
     "relation" section).
@@ -1025,7 +1025,7 @@ GeneWeb version 4.01
   - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
     one only file lang/start.txt, easier to manipulate (at least for me!)
   - [14 Mar 01] Changed the French translation of "nth cousin":
-    indeed, in French, the "nth cousin" is translated, litterally, by
+    indeed, in French, the "nth cousin" is translated, literally, by
     "cousin of the pth degree" where "p" is "n+1": e.g. a "4th cousin" is
     "a cousin of the 5th degree". Perhaps the same thing has to be done
     in other languages...
@@ -1158,7 +1158,7 @@ GeneWeb version 3.11
     wide for printers. In tree displaying, a link is proposed in the upper
     right corner of the page. When clicking on it, a page is proposed for
     a parametrizable display of the tree by slices.
-  - [29 Jan 01] For GeneWeb sites accomodating many databases: to
+  - [29 Jan 01] For GeneWeb sites accommodating many databases: to
     avoid the creation of too many files in the same directories, added
     the ability to put them in sub-sub-directories. A database file can
     be installed in a sub-directory of its first character,
@@ -1252,7 +1252,7 @@ GeneWeb version 3.11
   - [26 Jan 01] Added two macros usable in header or trailer files: %p
     which is replaced by the prefix of the current URL (the whole address
     up to the question mark) and %s by its suffix (after the question
-    mark). In personal pages, this suffix is independant from the index:
+    mark). In personal pages, this suffix is independent from the index:
     can therefore be used to specify a bookmarkable address.
 
 * Lexicon (lang/lexicon.txt)
@@ -1383,7 +1383,7 @@ GeneWeb version 3.09
   - [11 Oct 00] Important improvement: added a system of template
     files for the personal pages. It is therefore possible to change the
     displaying of the personal pages, by editing the template. It is also
-    possible, for a site accomodating several databases, to have a
+    possible, for a site accommodating several databases, to have a
     personal template file specific to each database.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
@@ -1564,7 +1564,7 @@ GeneWeb version 3.07
 
 * New feature
   - [18 Aug 00] Added a program "gwtp" (CGI) to upload and download GeneWeb
-    databases in a site which accomodate some (undocumented program for the
+    databases in a site which accommodate some (undocumented program for the
     moment).
 
 * Distribution
@@ -1873,7 +1873,7 @@ GeneWeb version 3.03
     not use cookies.
   - [12 Mar 00] In ancestors page, added male and female lines.
   - [11 Mar 00] In personal pages, the images defined by external URL (i.e.
-    accomodated in other Web sites) are now reduced as are local images.
+    accommodated in other Web sites) are now reduced as are local images.
   - [11 Mar 00] The information "relationship to" is no more transformed
     into "married to" when "non-friend" browsing (it was supposed to protect
     private life, but seems to have more drawbacks than advantages).
@@ -2056,7 +2056,7 @@ GeneWeb version 3.01
   - [Nov 5, 99] Accept roman digits in years of French Republican dates.
 
 * GeneWeb to Gedcom (gwb2ged)
-  - [Nov 18, 99] Prints a space before the slash preceeding the surname
+  - [Nov 18, 99] Prints a space before the slash preceding the surname
     in the NAME tag.
 
 * Documentation
@@ -2168,7 +2168,7 @@ GeneWeb version 2.07
   - [Sep 9, 99] Added Swedish version (Lars Gustavsson).
   - [Sep 8, 99] Fixed lot of typos and errors in English version
     (thanks to Lars Gustavsson).
-  - [Sep 6, 99] Fixed problem in Windows: if the user choosed a
+  - [Sep 6, 99] Fixed problem in Windows: if the user chose a
     language by writing it in uppercase letters, some phrases where
     displayed in English language between brackets (no matter which
     language was selected), indicating that the language was not found
@@ -2457,7 +2457,7 @@ GeneWeb version 2.03
 * Setup program
   - [Jun 7, 99] Added a Spanish version (Luis Castro Guzman).
   - [Jun 1, 99] The location to open is now always "http://localhost:2316/",
-    independant from the selected language (no more need to end the location
+    independent from the selected language (no more need to end the location
     with "fr" or "en"): the page is displayed in the selected language.
   - [May 15, 99] Added deletion of ".gwo" file after then "gwc" operation.
   - [May 9, 99] Added predefined palette combination in "database parameters";
@@ -2877,7 +2877,7 @@ GeneWeb Version 1.09
 
 * Gedcom to GeneWeb (ged2gwb)
   - Delete of duplicated FAMS which sometimes happen in erroneous Gedcoms.
-  - Delete families from GEDCOM when parents dont have the good sex.
+  - Delete families from GEDCOM when parents don't have the good sex.
   - Added displaying of line number when syntax errors and unrecognized dates.
   - Get sources if defined by pointer (but just the 1st line).
   - Added option "-no_nd" (no negative dates), not to interpret years preceded
@@ -2907,7 +2907,7 @@ GeneWeb Version 1.09
   - In "search", added ability to write "I" instead of "Ier" (french form).
     Ex: "Charles I" or "Charles Ier" are both accepted.
   - Added ability to add ";opt=no_index" at end of requests to get an
-    equivalent link independant from the persons' index number (useful
+    equivalent link independent from the persons' index number (useful
     to put direct links in Web pages).
   - Added text "Parents of" in top of pages of missing ancestors.
   - Fixed still several bugs (accents) due to new ANSEL encoding.
@@ -3181,7 +3181,7 @@ GeneWeb Version 1.0 beta.8
 
 * gwd:
   - added cgi mode (option -cgi)
-  - Less general for acces by approximative spelling: ex: first name "agns"
+  - Less general for access by approximative spelling: ex: first name "agns"
     will not yet answer: "Agnes" and "Gunza", but just "Agnes".
   - Unix version: time out limited to 120 seconds instead of 60
   - Descendants by list limited to 8 instead of 5

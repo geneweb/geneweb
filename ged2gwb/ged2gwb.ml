@@ -3090,7 +3090,7 @@ be - First names enclosed -
        names, the first of this names becomes the person \"first name\" and
        the complete GEDCOM first name part a \"first name alias\".");
    ("-no_efn", Arg.Clear extract_first_names, "  \
-- Dont extract first names - [default]
+- Don't extract first names - [default]
        Cancels the previous option.");
    ("-epn", Arg.Set extract_public_names, "  \
 - Extract public names - [default]

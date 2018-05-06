@@ -7050,14 +7050,14 @@ oc: data del maridatge
 pt: data de casamento
 sv: Datum för giftermål
 
-    marriage had occured after the death of %t
+    marriage had occurred after the death of %t
 af: huwelik plaasgevind het nadat %t dood
 bg: е сключен бракът място след смъртта на %t
 ca: el matrimoni es va dur a terme després de la mort de %t
 cs: manželství se konalo po smrti %t
 da: ægteskabet fandt sted efter %t død
 de: die Ehe wurde nach dem Tod von %t geschlossen
-en: marriage had occured after the death of %t
+en: marriage had occurred after the death of %t
 eo: geedzeco okazis post %t morto
 es: matrimonio después de la muerte de %t
 et: abiellusid pärast %t surma
@@ -7080,14 +7080,14 @@ sl: poroka je potekala po smrti %t
 sv: äktenskapet ägde rum efter %t döden
 zh: 結婚後%t死亡的地方
 
-    marriage had occured before the birth of %t
+    marriage had occurred before the birth of %t
 af: huwelik plaasgevind het voor %t geboorte
 bg: е сключен бракът преди раждането на %t
 ca: el matrimoni es va dur a terme abans del naixement de %t
 cs: manželství bylo uzavřeno před narozením %t
 da: Ægteskabet fandt sted før %t fødslen
 de: die Ehe wurde vor der Geburt von %t geschlossen
-en: marriage had occured before the birth of %t
+en: marriage had occurred before the birth of %t
 eo: geedzeco okazis antaŭ ol %t naskiĝo
 es: matrimonio antes del nacimiento de %t
 et: abielu toimus enne %t sündi

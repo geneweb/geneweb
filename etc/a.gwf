@@ -98,14 +98,14 @@ supervisor=
 
 # Notify change program (e.g. shell script) to be executed for each
 # database change. First argument is the name of the base, then the
-# individual and finaly the action performed.
+# individual and finally the action performed.
 # If you want to test a specific change, such as, delete an individual,
 # you should test the fourth argument as equal to dp (delete person).
 # You can check the list of possible modifications in the updhist.txt file
 # (see update_text).
 # notify_change=
 
-# Wizard loosing his powers, becoming just a "friend"
+# Wizard losing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
 wizard_just_friend=no
 
@@ -339,7 +339,7 @@ expand_env=no
 #    var_foo=my home is ${HOME}, guys!
 # the customized variable %vfoo; is expanded into:
 #    my home is /home/smith, guys!
-# The default is "no" because it may be a security hole to allow accomodated
+# The default is "no" because it may be a security hole to allow accommodated
 # databases in a Web site to show the environment variables of the command
 # gwd. Check that before putting "expand_env" to "yes".
 

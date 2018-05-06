@@ -1,6 +1,6 @@
 What is gwtp?
 
-Gwtp is a CGI program allowing owners of databases accomodated in a
+Gwtp is a CGI program allowing owners of databases accommodated in a
 GeneWeb site to upload and download their databases on the site and
 change their configuration parameters.
 
@@ -38,7 +38,7 @@ enter a database name and a password.
 
 Adding an user
 
-To add a new accomodated database, just add a line in the passwd file
+To add a new accommodated database, just add a line in the passwd file
 of the directory $tmp above, holding:
     base:passwd
 
