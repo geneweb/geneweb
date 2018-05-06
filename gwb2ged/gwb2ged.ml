@@ -8,6 +8,7 @@ open Printf;
 
 type charset =
   [ Ansel
+  | Ansi
   | Ascii
   | Utf8 ]
 ;
@@ -50,7 +51,7 @@ value encode s =
   [ Ansel ->
       let s = if Mutil.utf_8_db.val then Mutil.iso_8859_1_of_utf_8 s else s in
       Ansel.of_iso_8859_1 s
-  | Ascii ->
+  | Ascii | Ansi ->
       if Mutil.utf_8_db.val then Mutil.iso_8859_1_of_utf_8 s else s
   | Utf8 ->
       if Mutil.utf_8_db.val then s else Mutil.utf_8_of_iso_8859_1 s ]
@@ -171,11 +172,12 @@ value ged_header base oc ifile ofile =
     else ();
     fprintf oc "1 GEDC\n";
     match charset.val with
-    [ Ansel | Ascii -> fprintf oc "2 VERS 5.5\n"
+    [ Ansel | Ansi | Ascii -> fprintf oc "2 VERS 5.5\n"
     | Utf8 -> fprintf oc "2 VERS 5.5.1\n" ];
     fprintf oc "2 FORM LINEAGE-LINKED\n";
     match charset.val with
     [ Ansel -> fprintf oc "1 CHAR ANSEL\n"
+    | Ansi -> fprintf oc "1 CHAR ANSI\n"
     | Ascii -> fprintf oc "1 CHAR ASCII\n"
     | Utf8 -> fprintf oc "1 CHAR UTF-8\n" ];
     if no_notes.val then ()
@@ -415,7 +417,7 @@ value ged_pevent base oc per per_sel evt =
            match wk with
            [ Witness -> fprintf oc "3 RELA witness\n"
            | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
-           | Witness_Officer   -> fprintf oc "3 ROLE OFFI\n" ]
+           | Witness_Officer   -> fprintf oc "3 RELA officer\n" ]
          }
          else ())
       evt.epers_witnesses
@@ -701,7 +703,7 @@ value ged_fevent base oc ifam fam_sel evt =
            match wk with
            [ Witness -> fprintf oc "3 RELA witness\n"
            | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
-           | Witness_Officer   -> fprintf oc "3 ROLE OFFI\n" ]
+           | Witness_Officer   -> fprintf oc "3 RELA officer\n" ]
          }
          else ())
       evt.efam_witnesses
@@ -885,10 +887,11 @@ value speclist =
            match x with
            [ "ASCII" -> charset.val := Ascii
            | "ANSEL" -> charset.val := Ansel
+           | "ANSI" -> charset.val := Ansi
            | "UTF-8" -> charset.val := Utf8
            | _ -> raise (Arg.Bad "bad -charset value") ]
          }),
-    "[ASCII|ANSEL|UTF-8]: set charset; default is UTF-8.");
+    "[ASCII|ANSEL|ANSI|UTF-8]: set charset; default is UTF-8.");
    ("-o",
     Arg.String (fun x -> do { ofile.val := x; arg_state.val := ASnone }),
     "<ged>: output file name (default: a.ged)");
