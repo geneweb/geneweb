@@ -154,7 +154,7 @@
       %else;%date.julian_day.sep1000;%end;
   </div>
 </div>
-%include.trl;
+%base_trailer;
 %include.copyr;
 </div>
 %include.js;

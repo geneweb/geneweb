@@ -359,7 +359,7 @@ function update_old () {
 %else;
   %apply;print_diff()
 %end;
-%include.trl;
+%base_trailer;
 %include.copyr;
 </div>
 %include.js;

@@ -51,7 +51,7 @@
   </ul>
 </p>
 
-%include.trl;
+%base_trailer;
 %include.copyr;
 </div>
 %include.js;
