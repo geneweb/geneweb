@@ -2134,6 +2134,10 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "static_max_anc_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
+  | "sosa_ref_max_anc_level" ->
+      match get_env "sosa_ref_max_anc_level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
   | "max_cous_level" ->
       match get_env "max_cous_level" env with
       [ Vint i -> string_of_int i
@@ -5475,6 +5479,13 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     let smal () =
       Vint (max_ancestor_level conf base (get_key_index p) 120 + 1)
     in
+    (* Sosa_ref max ancestor level *)
+    let srmal () =
+      match Util.find_sosa_ref conf base with
+      [ Some sosa_ref ->
+        Vint (max_ancestor_level conf base (get_key_index sosa_ref) 120 + 1)
+      | _ -> Vint 0 ]
+    in
     let mcl () = Vint (max_cousin_level conf base p) in
     let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
     (* Static max descendant level *)
@@ -5504,6 +5515,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
      ("t_sosa", Vt_sosa t_sosa);
      ("max_anc_level", Vlazy (Lazy.from_fun mal));
      ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
+     ("sosa_ref_max_anc_level", Vlazy (Lazy.from_fun srmal));
      ("max_cous_level", Vlazy (Lazy.from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.from_fun mdl));
      ("static_max_desc_level", Vlazy (Lazy.from_fun smdl));
