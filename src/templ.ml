@@ -23,6 +23,7 @@ type token =
   | PLUS
   | RPAREN
   | STAR
+  | EXP
   | IDENT of string
   | STRING of string
   | INT of string
@@ -143,6 +144,7 @@ value rec get_token =
   | [: `'+' :] ep -> Tok (bp, ep) PLUS
   | [: `'-' :] ep -> Tok (bp, ep) MINUS
   | [: `'*' :] ep -> Tok (bp, ep) STAR
+  | [: `'^' :] ep -> Tok (bp, ep) EXP
   | [: `'/' :] ep -> Tok (bp, ep) DIV
   | [: `'%';
        a =
@@ -241,6 +243,8 @@ and parse_expr_5_kont e =
   parser
   [ [: `Tok loc STAR; e2 = parse_simple_expr;
        a = parse_expr_5_kont (Aop2 loc "*" e e2) :] -> a
+  | [: `Tok loc EXP; e2 = parse_simple_expr;
+       a = parse_expr_5_kont (Aop2 loc "^" e e2) :] -> a
   | [: `Tok loc DIV; e2 = parse_simple_expr;
        a = parse_expr_5_kont (Aop2 loc "/" e e2) :] -> a
   | [: `Tok loc PERCENT; e2 = parse_simple_expr;
@@ -1069,6 +1073,7 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
       | "+" -> VVstring (Sosa.to_string (Sosa.add (num e1) (num e2)))
       | "-" -> VVstring (Sosa.to_string (Sosa.sub (num e1) (num e2)))
       | "*" -> VVstring (Sosa.to_string (Sosa.mul (num e1) (int e2)))
+      | "^" -> VVstring (Sosa.to_string (Sosa.exp (num e1) (int e2)))
       | "/" -> VVstring (Sosa.to_string (Sosa.div (num e1) (int e2)))
       | "%" -> VVstring (string_of_int (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\"")) ]

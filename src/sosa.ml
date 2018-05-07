@@ -139,12 +139,28 @@ value modl x n =
   let r = sub x (mul0 (div x n) n) in
   if Array.length r = 0 then 0 else r.(0)
 ;
-
 value of_int i =
   if i < 0 then invalid_arg "Sosa.of_int"
   else if i = 0 then zero
   else if i < base then [| i |]
   else [| i mod base; i / base |]
+;
+value to_int x =
+  let n =
+    loop 0 0 where rec loop i r =
+      if i = Array.length x then r
+      else
+        let xi = if i >= Array.length x then 0 else x.(i) in
+        r * base + xi
+  in
+  n
+;
+value rec exp_gen x1 x2 n =
+  if n = 1 then x1
+  else exp_gen (mul x1 (to_int x2)) x2 (n-1)
+;
+value exp x n =
+  exp_gen x x n
 ;
 value print f sep x =
   if eq x zero then f "0"
