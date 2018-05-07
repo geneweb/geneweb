@@ -2518,8 +2518,8 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
                 eval_person_field_var conf base env (p, p_auth) loc sl
             | _ -> raise Not_found ]
         | None -> raise Not_found ]
-  | ["tvar"; s :: sl] ->
-      (* %tvar.sosa.first_name;
+  | ["sosa_anc"; s :: sl] ->
+      (* %sosa_anc.sosa.first_name;
          direct access to a person whose sosa relative to sosa_ref is s
       *)
       match get_env "sosa_ref" env with
