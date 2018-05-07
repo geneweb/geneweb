@@ -138,14 +138,18 @@
   %end;
 %end;
 
-%define;sosa_anc(rrr)
+%define;sosa_anc_i(rrr)
   %sosa_anc.rrr.index;
+%end;
+
+%define;sosa_anc_s(rrr)
+  %sosa_anc.rrr.sosa.v;
 %end;
 
 %define;prev_sosa(xxx, lll)
   %if;(xxx!=sosa_ref.sosa)
     %incr_count;
-    %let;nsp;%apply;sosa_anc(xxx-1)%in;
+    %let;nsp;%apply;sosa_anc_i(xxx-1)%in;
     %if;(nsp="" and lll<=sosa_ref_max_anc_level)
       %let;ns;%expr(xxx-1)%in;
       %apply;prev_sosa(ns, lll)
@@ -156,21 +160,26 @@
   %end;
 %end;
 
-%define;next_sosa(xxx, lll)
+%define;next_sosa(xxx, lll, ccc)
   %incr_count;
-  %let;nsp;%apply;sosa_anc(xxx+1)%in;
-  %if;(nsp="" and lll<=sosa_ref_max_anc_level)
+  %let;nspi;%apply;sosa_anc_i(xxx+1)%in;
+  %let;nsps;%apply;sosa_anc_s(xxx+1)%in;
+  %if;(nspi="" and lll<=sosa_ref_max_anc_level)
     %let;ns;%expr(xxx+1)%in;
-    %apply;next_sosa(ns, lll)
+    %apply;next_sosa(ns, lll, ccc)
+  %elseif;(nsps<=ccc)
+    %let;ns;%expr(xxx+1)%in;
+    %apply;next_sosa(ns, lll, ccc)
+  %else;
+    %nspi;
   %end;
-  %nsp;
 %end;
 
 %define;sosa()
   %reset_count;
   %if;(has_sosa and not cancel_links)
     <div class="%if;(op_m=2 or op_m=3)text-center%end;">
-      %if;((self.index!=sosa_ref.index))<a href="%prefix;&i=%apply;prev_sosa(sosa.v, sosa.lvl)"><</a>%end;
+      %if;((self.index!=sosa_ref.index))<a href="%prefix;&i=%apply;prev_sosa(sosa.v, sosa.lvl)" class="ml-1"><</a>%end;
       <span class="fa fa-dot-circle-o text-success mr-1"></span>%nn;
       [*Sosa]
       %if;(sosa=1)%sosa;
@@ -178,7 +187,7 @@
         %if;(sosa_ref.is_restricted)%sosa_ref;%else;<a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>%end;%end;
       %end;
       %if(sosa.lvl<sosa_ref_max_anc_level)
-        <a href="%prefix;&i=%apply;next_sosa(sosa.v, sosa.lvl)" class="ml-1">></a>
+        <a href="%prefix;&i=%apply;next_sosa(sosa.v, sosa.lvl, sosa.v)" class="ml-1">></a>
       %else;
         %sp;[last sosa level not navigable]
       %end;
