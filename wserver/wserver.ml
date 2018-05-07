@@ -332,7 +332,7 @@ value treat_connection tmout callback addr fd = do {
   in
   try callback (addr, request) script_name contents with
   [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
-  | Sys_error "Broken pipe" -> ()
+  | Sys_error msg when msg = "Broken pipe" -> ()
   | exc -> print_err_exc exc ];
   try wflush () with _ -> ();
   try flush stderr with _ -> ();
@@ -661,7 +661,7 @@ value f addr_opt port tmout max_clients g =
           [ Unix.Unix_error Unix.ECONNRESET "accept" _ -> ()
           | Unix.Unix_error (Unix.EBADF | Unix.ENOTSOCK) "accept" _ as x ->
               (* oops! *) raise x
-          | Sys_error "Broken pipe" -> ()
+          | Sys_error msg when msg = "Broken pipe" -> ()
           | exc -> print_err_exc exc ];
           try wflush () with [ Sys_error _ -> () ];
           try flush stdout with [ Sys_error _ -> () ];

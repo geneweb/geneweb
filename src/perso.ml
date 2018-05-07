@@ -355,7 +355,7 @@ value find_sosa_aux conf base a p t_sosa =
       (* Dans le cas ou le fichier tstab n'est plus à jour, on supprime *)
       (* le fichier pour qu'il se régénère la prochaine fois.           *)
       try gene_find zil with
-      [ Invalid_argument "index out of bounds" ->
+      [ Invalid_argument msg when msg = "index out of bounds" ->
           do {
             Update.delete_topological_sort conf base;
             Left []
@@ -1413,7 +1413,7 @@ value rec compare_ls sl1 sl2 =
       (* les performances à cause du try..with.                *)
       let c =
         try Pervasives.compare (int_of_string s1) (int_of_string s2)
-        with [ Failure "int_of_string" -> Gutil.alphabetic_order s1 s2 ]
+        with [ Failure _ -> Gutil.alphabetic_order s1 s2 ]
       in
       if c = 0 then compare_ls sl1 sl2 else c
   | ([_ :: _], []) -> 1

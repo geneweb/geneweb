@@ -290,7 +290,7 @@ value load_person_history conf fname = do {
             let v : gen_record = input_value ic in
             history.val := [v :: history.val]
           }
-        with [ End_of_file -> () | Failure "input_value: truncated object" -> () ]; (* https://caml.inria.fr/mantis/view.php?id=7142 *)
+        with [ End_of_file -> () ];
         close_in ic
       }
   | None -> () ];
@@ -1177,7 +1177,7 @@ value eval_predefined_apply conf env f vl =
         in
         let time = String.sub date_txt 11 8 in
         Date.string_of_date conf date ^ ", " ^ time
-      with [ Failure "int_of_string" -> date_txt ]
+      with [ Failure _ -> date_txt ]
   | _ -> raise Not_found ]
 ;
 
