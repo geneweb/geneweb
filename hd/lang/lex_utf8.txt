@@ -1,3 +1,7 @@
+    last sosa level not navigable
+en: last sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des sosa n'est pas navigable. Utilisez la liste des ancêtres.
+
     with root, spouses and unknowns
 en: with root ancestor, spouses and unknowns
 fr: avec l'ancêtre racine, les conjoints et les inconnus
