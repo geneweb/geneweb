@@ -138,14 +138,14 @@
   %end;
 %end;
 
-%define;p_of_s(nnn, rrr)
-  %tvar.rrr.nnn.index;
+%define;p_of_s(rrr)
+  %tvar.rrr.index;
 %end;
 
 %define;prev_sosa(xxx)
   %if;(xxx!=sosa_ref.sosa)
     %incr_count;
-    %let;nsp;%apply;p_of_s(xxx-1, sosa_ref.index)%in;
+    %let;nsp;%apply;p_of_s(xxx-1)%in;
     %if;(nsp="" and count<100000)
       %let;ns;%expr(xxx-1)%in;
       %apply;prev_sosa(ns)
@@ -158,8 +158,8 @@
 
 %define;next_sosa(xxx)
   %incr_count;
-  %let;nsp;%apply;p_of_s(xxx+1, sosa_ref.index)%in;
-  %if;(nsp="" and count<100000)
+  %let;nsp;%apply;p_of_s(xxx+1)%in;
+  %if;(nsp="" and count<1024)
     %let;ns;%expr(xxx+1)%in;
     %apply;next_sosa(ns)
   %end;
@@ -167,16 +167,17 @@
 %end;
 
 %define;sosa()
+  %reset_count;
   %if;(has_sosa and not cancel_links)
     <div class="%if;(op_m=2 or op_m=3)text-center%end;">
-      %if;(self!=sosa_ref)<a href="%prefix;&i=%apply;prev_sosa(sosa)"><</a>%end;
+      %if;(self!=sosa_ref)<a href="%prefix;&i=%apply;prev_sosa(sosa.v)"><</a>%end;
       <span class="fa fa-dot-circle-o text-success mr-1"></span>%nn;
       [*Sosa]
       %if;(sosa=1)%sosa;
       %else;<a href="%prefix;%sosa_link;">%sosa;</a> %apply;a_of_b%with;%and;
         %if;(sosa_ref.is_restricted)%sosa_ref;%else;<a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>%end;%end;
       %end;
-      <a href="%prefix;&i=%apply;next_sosa(sosa)" class="ml-1">></a>
+      <a href="%prefix;&i=%apply;next_sosa(sosa.v)" class="ml-1">></a>
     </div>
   %end;
 %end;

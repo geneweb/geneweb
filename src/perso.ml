@@ -2860,6 +2860,7 @@ and eval_num conf n =
   fun
   [ ["hexa"] -> "0x" ^ Sosa.to_string_sep_base "" 16 n
   | ["octal"] -> "0o" ^ Sosa.to_string_sep_base "" 8 n
+  | ["lvl"] -> string_of_int (String.length (Sosa.to_string_sep_base "" 2 n))
   | ["v"] -> Sosa.to_string n
   | [] -> Sosa.to_string_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found ]
