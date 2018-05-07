@@ -138,14 +138,14 @@
   %end;
 %end;
 
-%define;p_of_s(rrr)
-  %tvar.rrr.index;
+%define;sosa_anc(rrr)
+  %sosa_anc.rrr.index;
 %end;
 
 %define;prev_sosa(xxx)
   %if;(xxx!=sosa_ref.sosa)
     %incr_count;
-    %let;nsp;%apply;p_of_s(xxx-1)%in;
+    %let;nsp;%apply;sosa_anc(xxx-1)%in;
     %if;(nsp="" and count<100000)
       %let;ns;%expr(xxx-1)%in;
       %apply;prev_sosa(ns)
@@ -158,7 +158,7 @@
 
 %define;next_sosa(xxx)
   %incr_count;
-  %let;nsp;%apply;p_of_s(xxx+1)%in;
+  %let;nsp;%apply;sosa_anc(xxx+1)%in;
   %if;(nsp="" and count<1024)
     %let;ns;%expr(xxx+1)%in;
     %apply;next_sosa(ns)
