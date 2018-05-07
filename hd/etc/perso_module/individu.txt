@@ -170,7 +170,7 @@
   %reset_count;
   %if;(has_sosa and not cancel_links)
     <div class="%if;(op_m=2 or op_m=3)text-center%end;">
-      %if;(self!=sosa_ref)<a href="%prefix;&i=%apply;prev_sosa(sosa.v)"><</a>%end;
+      %if;((self.index!=sosa_ref.index))<a href="%prefix;&i=%apply;prev_sosa(sosa.v)"><</a>%end;
       <span class="fa fa-dot-circle-o text-success mr-1"></span>%nn;
       [*Sosa]
       %if;(sosa=1)%sosa;
