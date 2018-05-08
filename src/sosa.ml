@@ -156,7 +156,8 @@ value to_int x =
   n
 ;
 value rec exp_gen x1 x2 n =
-  if n = 1 then x1
+  if n = 0 || x1 = zero then one
+  else if n = 1 then x1
   else exp_gen (mul x1 (to_int x2)) x2 (n-1)
 ;
 value exp x n =
