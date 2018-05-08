@@ -481,6 +481,49 @@ value build_sosa_ht conf base =
 
 
 (* ******************************************************************** *)
+(*  [Fonc] next_sosa : config -> base -> Sosa.t -> Sosa.t               *)
+(** [Description] : Recherche le sosa suivant
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - s    : sosa
+    [Retour] :
+      - Sosa.t : retourne Sosa.zero s'il n'y a pas de sosa suivant
+    [Rem] : Exporté en clair hors de ce module.                         *)
+(* ******************************************************************** *)
+value next_sosa conf base s =
+  (* La clé de la table est l'iper de la personne et on lui associe son numéro
+    de sosa. On inverse pour trier sur les sosa *)
+  let sosa_list = Hashtbl.fold (fun k v acc -> [(v, k) :: acc]) sosa_ht [] in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let rec find_n x lst = match lst with
+    [ [] -> (Sosa.zero, Adef.iper_of_int 0)
+    | [(so, ip) :: tl] ->
+        if (Sosa.eq so x) then
+          if tl = [] then (Sosa.zero, Adef.iper_of_int 0) else List.hd tl
+        else find_n x tl ]
+  in
+  let (so, ip) = find_n s sosa_list in
+  (so, ip)
+;
+
+value prev_sosa conf base s =
+  let sosa_list = Hashtbl.fold (fun k v acc -> [(v, k) :: acc]) sosa_ht [] in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let sosa_list = List.rev sosa_list in
+  let rec find_n x lst = match lst with
+    [ [] -> (Sosa.zero, Adef.iper_of_int 0)
+    | [(so, ip) :: tl] ->
+        if (Sosa.eq so x) then
+          if tl = [] then (Sosa.zero, Adef.iper_of_int 0) else List.hd tl
+        else find_n x tl ]
+  in
+  let (so, ip) = find_n s sosa_list in
+  (so, ip)
+;
+
+
+(* ******************************************************************** *)
 (*  [Fonc] get_sosa_person : config -> base -> person -> Sosa.t          *)
 (** [Description] : Recherche si la personne passée en argument a un
                     numéro de sosa.
@@ -3024,6 +3067,34 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           [ Some (n, p) -> VVstring (eval_num conf n sl)
           | None -> VVstring "" ]
       | _ -> raise Not_found ]
+  | ["sosa_next" :: sl] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match get_sosa conf base env x p with
+          [ Some (n, p) -> 
+              match next_sosa conf base n with
+              [ (so, ip) ->
+                if so = Sosa.zero then VVstring ""
+                else
+                  let p = poi base ip in
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl ]
+          | None -> VVstring "" ]
+      | _ -> raise Not_found ]
+  | ["sosa_prev" :: sl] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match get_sosa conf base env x p with
+          [ Some (n, p) -> 
+              match prev_sosa conf base n with
+              [ (so, ip) ->
+                if so = Sosa.zero then VVstring "" 
+                else 
+                  let p = poi base ip in
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl ]
+          | None -> VVstring "" ]
+      | _ -> raise Not_found ]
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam ifam fam _ _ ->
@@ -5446,6 +5517,7 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     | None -> 120 ]
   in
   let env =
+    let () = build_sosa_ht conf base in
     let sosa_ref = Util.find_sosa_ref conf base in
     let sosa_ref_l =
       let sosa_ref () = sosa_ref in
