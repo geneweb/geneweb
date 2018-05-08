@@ -138,40 +138,45 @@
   %end;
 %end;
 
-%define;sosa_anc_i(rrr)
-  %sosa_anc.rrr.index;
+%define;sosa_anc_a(xxx)
+  %sosa_anc.xxx.access;
 %end;
 
-%define;sosa_anc_s(rrr)
-  %sosa_anc.rrr.sosa.v;
+%define;sosa_anc_i(xxx)
+  %sosa_anc.xxx.index;
 %end;
 
-%define;prev_sosa(xxx, lll)
+%define;sosa_anc_s(xxx)
+  %sosa_anc.xxx.sosa.v;
+%end;
+
+%define;prev_sosa(xxx)
   %if;(xxx!=sosa_ref.sosa)
-    %incr_count;
-    %let;nsp;%apply;sosa_anc_i(xxx-1)%in;
-    %if;(nsp="" and lll<=sosa_ref_max_anc_level)
-      %let;ns;%expr(xxx-1)%in;
-      %apply;prev_sosa(ns, lll)
+    %let;ps;%expr(xxx-1)%in;
+    %let;psa;%apply;sosa_anc_a(ps)%in;
+    %let;psi;%apply;sosa_anc_i(ps)%in;
+    %let;min;%if;(sosa.lvl>2)%expr(sosa.v-2^(sosa.lvl-2))%else;%expr(sosa.v-1)%end;%in;
+    %if;(psi="" and min<=ps)
+      %apply;prev_sosa(ps)
+    %else;
+      <a href="%prefix;%if;(bvar.access_by_key="yes")%psa;%else;i=%psi;%end;"><</a>%nn;
     %end;
-    %nsp;
   %else;
     %sosa_ref.index;
   %end;
 %end;
 
-%define;next_sosa(xxx, lll, ccc)
-  %incr_count;
-  %let;nspi;%apply;sosa_anc_i(xxx+1)%in;
-  %let;nsps;%apply;sosa_anc_s(xxx+1)%in;
-  %if;(nspi="" and lll<=sosa_ref_max_anc_level)
-    %let;ns;%expr(xxx+1)%in;
-    %apply;next_sosa(ns, lll, ccc)
-  %elseif;(nsps<=ccc)
-    %let;ns;%expr(xxx+1)%in;
-    %apply;next_sosa(ns, lll, ccc)
+%define;next_sosa(xxx)
+  %let;ns;%expr(xxx+1)%in;
+  %let;nsa;%apply;sosa_anc_a(ns)%in;
+  %let;nsi;%apply;sosa_anc_i(ns)%in;
+  %let;nss;%apply;sosa_anc_s(ns)%in;
+  %let;max;%expr(2^(sosa.lvl+1)-1-sosa.v)%in;
+  %if;((nsi="" and ns<=max and sosa.lvl<=sosa_ref_max_anc_level) or (nss!="" and nss<=sosa.v))
+    %apply;next_sosa(ns)
+  %elseif;(nsi="")
   %else;
-    %nspi;
+    <a href="%prefix;%if;(bvar.access_by_key="yes")%nsa;%else;i=%nsi;%end;" class="ml-1">></a>
   %end;
 %end;
 
@@ -179,17 +184,15 @@
   %reset_count;
   %if;(has_sosa and not cancel_links)
     <div class="%if;(op_m=2 or op_m=3)text-center%end;">
-      %if;((self.index!=sosa_ref.index))<a href="%prefix;&i=%apply;prev_sosa(sosa.v, sosa.lvl)" class="ml-1"><</a>%end;
-      <span class="fa fa-dot-circle-o text-success mr-1"></span>%nn;
+      %if;(self.index!=sosa_ref.index)%apply;prev_sosa(sosa.v)%end;
+      <i class="fa fa-dot-circle-o text-success mr-1"></i>%nn;
       [*Sosa]
       %if;(sosa=1)%sosa;
       %else;<a href="%prefix;%sosa_link;">%sosa;</a> %apply;a_of_b%with;%and;
         %if;(sosa_ref.is_restricted)%sosa_ref;%else;<a href="%prefix;%sosa_ref.access;">%sosa_ref;</a>%end;%end;
       %end;
-      %if(sosa.lvl<sosa_ref_max_anc_level)
-        <a href="%prefix;&i=%apply;next_sosa(sosa.v, sosa.lvl, sosa.v)" class="ml-1">></a>
-      %else;
-        %sp;[last sosa level not navigable]
+      %if(sosa.lvl<=sosa_ref_max_anc_level)%apply;next_sosa(sosa.v)
+      %else;%sp;[last sosa level not navigable]
       %end;
     </div>
   %end;
