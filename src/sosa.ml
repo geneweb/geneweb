@@ -228,7 +228,7 @@ value of_string s =
 ;
 value gen x =
   let s = to_string_sep_base "" 2 x in
-  String.length s - 1
+  String.length s (* coherent with %sosa.lvl *)
 ;
 value branch x =
   let s = to_string_sep_base "" 2 x in
