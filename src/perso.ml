@@ -409,6 +409,20 @@ value find_sosa conf base a sosa_ref_l t_sosa =
   | None -> None ]
 ;
 
+value rec get_p_of_sosa conf base s p =
+  if Sosa.eq s Sosa.one then (Some p)
+  else
+    let ns = Sosa.sosa_gen_up s in
+    let c = Sosa.branch s in
+    match get_parents p with
+      [ Some ifam ->
+          let cpl = foi base ifam in
+          let pm = pget conf base (get_mother cpl) in
+          let pf = pget conf base (get_father cpl) in
+          if c = '0' then get_p_of_sosa conf base ns pf
+          else get_p_of_sosa conf base ns pm
+      | None -> None ]
+;
 
 (* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
 value sosa_ht = Hashtbl.create 5003;
@@ -2580,8 +2594,17 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
                   let p = poi base ip in
                   let p_auth = authorized_age conf base p in
                   eval_person_field_var conf base env (p, p_auth) loc sl
-              | _ -> VVstring "" ]
-          | None -> raise Not_found ]
+              | _ -> raise Not_found ]
+          | _ -> raise Not_found ] 
+      | _ -> raise Not_found ]
+  | ["sosa_anc_p"; s :: sl] ->
+      (* %sosa_anc_p.sosa.first_name;
+         direct access to a person whose sosa relative to current person
+      *)
+      match get_p_of_sosa conf base (Sosa.of_string s) a with
+      [ Some np ->
+        let np_auth = authorized_age conf base np in
+        eval_person_field_var conf base env (np, np_auth) loc sl
       | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "rel" env with
@@ -5517,7 +5540,12 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     | None -> 120 ]
   in
   let env =
-    let () = build_sosa_ht conf base in
+    let () =
+      match Util.find_sosa_ref conf base with
+      [ Some sosa_ref ->
+        build_sosa_ht conf base
+      | _ -> () ]
+    in
     let sosa_ref = Util.find_sosa_ref conf base in
     let sosa_ref_l =
       let sosa_ref () = sosa_ref in
