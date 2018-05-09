@@ -226,3 +226,22 @@ value of_string s =
           loop (inc (mul0 n 10) (Char.code s.[i] - Char.code '0')) (i + 1)
       | _ -> failwith "Sosa.of_string" ]
 ;
+value gen x =
+  let s = to_string_sep_base "" 2 x in
+  String.length s - 1
+;
+value branch x =
+  let s = to_string_sep_base "" 2 x in
+  if (String.length s) > 1 then s.[1] else '0'
+;
+value sosa_gen_up x =
+  if eq x one then zero
+  else
+    let s = to_string_sep_base "" 2 x in
+    let s = if String.length s > 2 then
+            "0b" ^ (String.sub s 0 1) ^ (String.sub s 2 (String.length s -2))
+            else "0b1"
+    in
+    let is = int_of_string s in
+    of_int is
+;
