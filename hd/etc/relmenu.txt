@@ -65,13 +65,12 @@
             <input type="hidden" name="m" value="NG"%/>
             <span>[*relationship shortcut]</span>
             <div class="mt-1 ml-2">
-              %if;browsing_with_sosa_ref;
+              %if;(browsing_with_sosa_ref and self.index!=sosa_ref.index)
                 <div class="form-check">
                   <label class="form-check-label">
                     <input type="radio" class="form-check-input" name="select" value="%sosa_ref.index;" onclick="main()"%/>
-                    <i class="fa fa-dot-circle-o text-success"></i>
-                    <b>%sosa_ref;</b>
-                    (Sosa 1)
+                    <i class="fa fa-dot-circle-o text-success"></i>%nn;
+                    <b>%sosa_ref;</b> ([Sosa] 1)
                   </label>
                 </div>
               %end;
