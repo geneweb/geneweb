@@ -117,7 +117,12 @@
       <li>%apply;capitalize(linked_page.OCCU)</li>%nl;
     %end;
     %if;(has_consanguinity and bvar.show_consang!="no")
-      <li>[*consanguinity][:] %consanguinity;</li>%nl;
+      %if;(cancel_links)
+        <li>[*consanguinity][:] %consanguinity;</li>%nl;
+      %else;
+        <li><a href="%prefix;m=NG;em=R;et=A;ei=%mother.index;;select=%father.index;;spouse=on%if;(evar.image!="");image=%evar.image;%end;"
+           title="[*relationship computing] [father/mother]0/[father/mother]1">[*consanguinity][:] %consanguinity;</a></li>
+      %end;
     %end;
   </ul>
 %end;
