@@ -283,7 +283,6 @@ value get_request strm =
   loop 0 strm
 ;
 
-IFDEF UNIX THEN
 value timeout tmout spid _ =
   do {
     Unix.kill spid Sys.sigkill;
@@ -307,7 +306,6 @@ value timeout tmout spid _ =
     exit 2
   }
 ;
-END;
 
 value get_request_and_content strm =
   let request = get_request strm in
@@ -332,7 +330,7 @@ value string_of_sockaddr =
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr fd = do {
-  IFDEF UNIX THEN
+  if Sys.unix then
     if tmout > 0 then
       let spid = Unix.fork () in
       if spid > 0 then do {
@@ -349,7 +347,7 @@ value treat_connection tmout callback addr fd = do {
       }
       else ()
     else ()
-  ELSE () END;
+  else ();
   let (request, script_name, contents) =
     let (request, contents) =
       let strm =
@@ -380,7 +378,6 @@ value treat_connection tmout callback addr fd = do {
   try flush stderr with _ -> ();
 };
 
-IFDEF WINDOWS THEN
 value buff = Bytes.create 1024;
 
 value copy_what_necessary t oc =
@@ -403,7 +400,6 @@ value copy_what_necessary t oc =
   let _ = get_request_and_content strm in
   ()
 ;
-END;
 
 value rec list_remove x =
   fun
@@ -514,7 +510,7 @@ value accept_connection tmout max_clients callback s =
     let (t, addr) = Unix.accept s in
     check_stopping ();
     Unix.setsockopt t Unix.SO_KEEPALIVE True;
-    IFDEF UNIX THEN
+    if Sys.unix then
       match try Some (Unix.fork ()) with _ -> None with
       [ Some 0 ->
           do {
@@ -549,7 +545,7 @@ value accept_connection tmout max_clients callback s =
           }
       | None ->
           do { Unix.close t; eprintf "Fork failed\n"; flush stderr } ]
-    ELSE do {
+    else do {
       let oc = open_out_bin sock_in.val in
       let cleanup () = try close_out oc with _ -> () in
       try copy_what_necessary t oc with
@@ -614,18 +610,18 @@ let args = Sys.argv in
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
     }
-    END
   }
 ;
 
 value f addr_opt port tmout max_clients g =
   match
-    IFDEF WINDOWS THEN
+    if Sys.unix then None
+    else
       try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
-    ELSE None END
   with
   [ Some s ->
-      IFDEF WINDOWS THEN do {
+      if Sys.unix then ()
+      else do {
         let addr = sockaddr_of_string s in
         let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
         let oc = open_out_bin sock_out.val in
@@ -633,7 +629,6 @@ value f addr_opt port tmout max_clients g =
         ignore (treat_connection tmout g addr fd);
         exit 0
       }
-      ELSE () END
   | None ->
       do {
         check_stopping ();
@@ -648,8 +643,8 @@ value f addr_opt port tmout max_clients g =
         Unix.setsockopt s Unix.SO_REUSEADDR True;
         Unix.bind s (Unix.ADDR_INET addr port);
         Unix.listen s 4;
-        IFDEF UNIX THEN let _ = Unix.nice 1 in ()
-        ELSE () END;
+        if Sys.unix then let _ = Unix.nice 1 in ()
+        else ();
         let tm = Unix.localtime (Unix.time ()) in
         eprintf "Ready %4d-%02d-%02d %02d:%02d port"
           (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday

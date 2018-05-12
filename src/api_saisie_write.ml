@@ -994,14 +994,14 @@ let compute_warnings conf base resp =
             | MarriageDateAfterDeath p ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "marriage had occured after the death of %t"))
+                  (fcapitale (ftransl conf "marriage had occurred after the death of %t"))
                   (fun _ -> print_someone_dates p)
                 in
                 w :: wl
             | MarriageDateBeforeBirth p ->
                 let w =
                 Printf.sprintf
-                  (fcapitale (ftransl conf "marriage had occured before the birth of %t"))
+                  (fcapitale (ftransl conf "marriage had occurred before the birth of %t"))
                   (fun _ -> print_someone_dates p)
                 in
                 w :: wl

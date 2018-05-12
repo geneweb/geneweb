@@ -702,17 +702,17 @@ value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
   if surname = "" then ""
-  (* pX=fn;nX=sn;ocX=occ *)
+  (* pX=fn&nX=sn&ocX=occ *)
   else if accessible_by_key conf base x first_name surname then
-    "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
+    "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ "&n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
-      (if get_occ x > 0 then ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
+      (if get_occ x > 0 then "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
        else "")
-  (* iX=index;ocX=occ *)
+  (* iX=index&ocX=occ *)
   else
     "i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper (get_key_index x)) ^
     (if conf.wizard && get_occ x > 0 then
-       ";oc" ^ n ^ "=" ^ string_of_int (get_occ x)
+       "&oc" ^ n ^ "=" ^ string_of_int (get_occ x)
      else "")
 ;
 
@@ -964,11 +964,12 @@ value wprint_geneweb_link conf href s =
 ;
 
 value reference conf base p s =
+  let iper = get_key_index p in
   if conf.cancel_links || is_hidden p then s
   else
     String.concat ""
       [ "<a href=\""; commd conf; acces conf base p;
-        "\" id=\"reference\">"; s; "</a>" ]
+        "\" id=\"i"; (string_of_int (Adef.int_of_iper iper))  ;"\">"; s; "</a>" ]
 ;
 
 
@@ -1234,13 +1235,13 @@ value string_of_witness_kind conf p witness_kind =
 value base_path pref bname =
   let pref = [Secure.base_dir () :: pref] in
   let bfile = List.fold_right Filename.concat pref bname in
-  IFDEF WINDOWS THEN bfile
-  ELSE if Sys.file_exists bfile then bfile
-  else if String.length bname >= 6 then
-    let dirs = pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]] in
-    List.fold_right Filename.concat dirs bname
+  if Sys.unix then
+    if Sys.file_exists bfile then bfile
+    else if String.length bname >= 6 then
+      let dirs = pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]] in
+      List.fold_right Filename.concat dirs bname
+    else bfile
   else bfile
-  END
 ;
 
 value explode s c =
@@ -2148,7 +2149,7 @@ value print_alphab_list conf crit print_elem liste = do {
              in
              do {
                if not same_than_last then
-                 Wserver.printf "<a href=\"#i%s\">%s</a>\n" (hexa_string t) t
+                 Wserver.printf "<a href=\"#ai%s\">%s</a>\n" (hexa_string t) t
                else ();
                Some t
              })
@@ -2175,7 +2176,7 @@ value print_alphab_list conf crit print_elem liste = do {
              | _ -> () ];
              if not same_than_last then do {
                Wserver.printf "<li>\n";
-               Wserver.printf "<a id=\"i%s\">%s</a>\n" (hexa_string t) t;
+               Wserver.printf "<a id=\"ai%s\">%s</a>\n" (hexa_string t) t;
                Wserver.printf "<ul>\n";
              }
              else ();

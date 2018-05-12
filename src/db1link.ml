@@ -1481,10 +1481,10 @@ value link next_family_fun bdir = do {
   let istr_quest = unique_string gen "?" in
   assert (istr_empty = Adef.istr_of_int 0);
   assert (istr_quest = Adef.istr_of_int 1);
-  IFDEF UNIX THEN Sys.remove tmp_per_index ELSE () END;
-  IFDEF UNIX THEN Sys.remove tmp_per ELSE () END;
-  IFDEF UNIX THEN Sys.remove tmp_fam_index ELSE () END;
-  IFDEF UNIX THEN Sys.remove tmp_fam ELSE () END;
+  if Sys.unix then Sys.remove tmp_per_index else ();
+  if Sys.unix then Sys.remove tmp_per else ();
+  if Sys.unix then Sys.remove tmp_fam_index else ();
+  if Sys.unix then Sys.remove tmp_fam else ();
   let next_family = next_family_fun fi in
   loop () where rec loop () =
     match next_family () with

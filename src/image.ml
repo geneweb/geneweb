@@ -147,7 +147,7 @@ value print_html conf base =
     Mutil.list_iter_first
       (fun first (k, v) ->
          let v = if k = "m" then "IM" else v in
-         Wserver.printf "%s%s=%s" (if first then "" else ";") k v)
+         Wserver.printf "%s%s=%s" (if first then "" else "&") k v)
       conf.env;
     Wserver.printf "\"%s>\n</body>\n</html>" conf.xhs;
   }

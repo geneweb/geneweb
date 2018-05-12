@@ -194,9 +194,11 @@ value print_elem conf base is_surname (p, xl) =
   list_iter_first
     (fun first x ->
        do {
+         let iper = get_key_index x in
          if not first then Wserver.printf "</li>\n<li>\n  " else ();
          Perso.print_sosa conf base x True;
-         Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base x);
+         Wserver.printf "<a href=\"%s%s\" id=\"i%s\">" (commd conf) (acces conf base x)
+            (string_of_int (Adef.int_of_iper iper));
          if is_surname then
            Wserver.printf "%s%s" (surname_end base p) (surname_begin base p)
          else Wserver.printf "%s" (if p = "" then "?" else p);

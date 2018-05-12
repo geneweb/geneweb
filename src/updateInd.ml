@@ -46,7 +46,7 @@ value obsolete_list = ref [];
 
 value obsolete version var new_var r =
   if List.mem var obsolete_list.val then r
-  else IFDEF UNIX THEN do {
+  else if Sys.unix then do {
     Printf.eprintf "*** <W> updind.txt: \"%s\" obsolete since v%s%s\n"
       var version
       (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
@@ -54,7 +54,7 @@ value obsolete version var new_var r =
     obsolete_list.val := [var :: obsolete_list.val];
     r
   }
-  ELSE r END
+  else r
 ;
 
 value bool_val x = VVbool x;

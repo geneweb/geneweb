@@ -69,13 +69,13 @@ value check_open fname =
   with
   [ Exit ->
       do {
-        IFDEF UNIX THEN
+        if Sys.unix then
           do {
             Printf.eprintf "*** secure rejects open %s\n"
               (String.escaped fname);
             flush stderr;
           }
-        ELSE () END;
+        else ();
         raise (Sys_error "invalid access")
       } ]
 ;

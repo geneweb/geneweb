@@ -816,11 +816,11 @@ value extract_henv conf base =
 ;
 
 value set_owner conf =
-  IFDEF UNIX THEN
+  if Sys.unix then
     let s = Unix.stat (Util.base_path [] (conf.bname ^ ".gwb")) in
     try do { Unix.setgid s.Unix.st_gid; Unix.setuid s.Unix.st_uid; } with
     [ Unix.Unix_error _ _ _ -> () ]
-  ELSE () END
+  else ()
 ;
 
 value thousand oc x = Sosa.print (output_string oc) "," (Sosa.of_int x);

@@ -605,38 +605,25 @@ value eval_var conf base env () loc =
   | _ -> raise Not_found ]
 ;
 
+value print_foreach conf print_ast eval_expr = raise Not_found;
+
 value eval_predefined_apply conf env f vl = raise Not_found;
 
 value print_start conf base =
-  let new_welcome =
-    match p_getenv conf.base_env "old_welcome" with
-    [ Some "yes" -> False
-    | Some _ | None -> Mutil.utf_8_db.val ]
+  let env =
+    let sosa_ref_l =
+      let sosa_ref () = Util.find_sosa_ref conf base in
+      Lazy.from_fun sosa_ref
+    in
+    [("sosa_ref", Vsosa_ref sosa_ref_l)]
   in
-  if new_welcome then do {
-    let env =
-      let sosa_ref_l =
-        let sosa_ref () = Util.find_sosa_ref conf base in
-        Lazy.from_fun sosa_ref
-      in
-      [("sosa_ref", Vsosa_ref sosa_ref_l)]
-    in
-    Hutil.interp conf "welcome"
-      {Templ.eval_var = eval_var conf base;
-       Templ.eval_transl env = Templ.eval_transl conf;
-       Templ.eval_predefined_apply = eval_predefined_apply conf;
-       Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-       Templ.print_foreach = fun []}
-      env ()
-  }
-  else
-    let fname =
-      if Sys.file_exists (lang_file_name conf conf.bname) then conf.bname
-      else if Sys.file_exists (any_lang_file_name conf.bname) then conf.bname
-      else if Mutil.utf_8_db.val then "start_utf8"
-      else "start"
-    in
-    gen_print False Lang conf base fname
+  Hutil.interp conf "welcome"
+    {Templ.eval_var = eval_var conf base;
+     Templ.eval_transl env = Templ.eval_transl conf;
+     Templ.eval_predefined_apply = eval_predefined_apply conf;
+     Templ.get_vother = get_vother; Templ.set_vother = set_vother;
+     Templ.print_foreach = print_foreach conf}
+    env ()
 ;
 
 (* code déplacé et modifié pour gérer advanced.txt *)
@@ -647,7 +634,7 @@ value print conf base fname =
        Templ.eval_transl env = Templ.eval_transl conf;
        Templ.eval_predefined_apply = eval_predefined_apply conf;
        Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-       Templ.print_foreach = fun []}
+       Templ.print_foreach = print_foreach conf}
       [] ()
   }
   else gen_print True Lang conf base fname

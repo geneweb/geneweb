@@ -1612,7 +1612,7 @@ value extract_var sini s =
 value template_file = ref "perso.txt";
 
 value warning_use_has_parents_before_parent (bp, ep) var r =
-  IFDEF UNIX THEN do {
+  if Sys.unix then do {
     Printf.eprintf "*** <W> %s" template_file.val;
     Printf.eprintf ", chars %d-%d" bp ep;
     Printf.eprintf "\
@@ -1621,14 +1621,14 @@ value warning_use_has_parents_before_parent (bp, ep) var r =
     flush stderr;
     r
   }
-  ELSE r END
+  else r
 ;
 
 value obsolete_list = ref [];
 
 value obsolete (bp, ep) version var new_var r =
   if List.mem var obsolete_list.val then r
-  else IFDEF UNIX THEN do {
+  else if Sys.unix then do {
     Printf.eprintf "*** <W> %s, chars %d-%d:" template_file.val bp ep;
     Printf.eprintf " \"%s\" obsolete since v%s%s\n" var version
       (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
@@ -1636,7 +1636,7 @@ value obsolete (bp, ep) version var new_var r =
     obsolete_list.val := [var :: obsolete_list.val];
     r
   }
-  ELSE r END
+  else r
 ;
 
 
@@ -4174,7 +4174,7 @@ and string_of_image_url conf base env (p, p_auth) html =
         let s = Unix.stat fname in
         let b = acces conf base p in
         let k = default_image_name base p in
-        Format.sprintf "%sm=IM%s;d=%d;%s;k=/%s" (commd conf)
+        Format.sprintf "%sm=IM%s&d=%d&%s&k=/%s" (commd conf)
           (if html then "H" else "")
           (int_of_float
              (mod_float s.Unix.st_mtime (float_of_int max_int)))
