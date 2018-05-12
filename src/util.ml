@@ -110,12 +110,18 @@ value rec capitale_utf_8 s =
     else if String.length s = 1 then s
     else
       match Char.code c with
-      [ 0xC3 ->
-          let c1 = Char.uppercase_ascii (Char.chr (Char.code s.[1] + 0x40)) in
-          sprintf "%c%c%s" c (Char.chr (Char.code c1 - 0x40))
+      [ 0xC3 when Char.code s.[1] <> 0xBF ->
+          let c1 = (Char.chr (Char.code s.[1] - 0xA0 + 0x80)) in
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
-      | 0xC5 when Char.code s.[1] = 0x93 -> (* oe *)
-          sprintf "%c%c%s" c (Char.chr 0x92)
+      | 0xC3 when Char.code s.[1] = 0xBF -> (* ÿ *)
+          let c = (Char.chr 0xC5) in
+          let c1 = (Char.chr 0xB8) in
+          sprintf "%c%c%s" c c1
+            (String.sub s 2 (String.length s - 2))
+      | 0xC4 | 0xC5 | 0xC6 | 0xC7 -> 
+          let c1 = (Char.chr (Char.code s.[1] - 1)) in
+          sprintf "%c%c%s" c c1
             (String.sub s 2 (String.length s - 2))
       | 0xD0 when Char.code s.[1] >= 0xB0 -> (* cyrillic lowercase *)
           let c1 = Char.chr (Char.code s.[1] - 0xB0 + 0x90) in
@@ -409,13 +415,48 @@ value unauthorized conf auth_type =
 
 value commd conf =
   let c = conf.command ^ "?" in
-  List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
-    (conf.henv @ conf.senv)
+  List.fold_left (fun c (k, v) ->
+    if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
+      c else c ^ k ^ "=" ^ v ^ ";") c (conf.henv @ conf.senv)
+;
+
+value commd_2 conf =
+  let c = conf.command ^ "?" in
+  List.fold_left (fun c (k, v) ->
+    if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
+      c else c ^ "&" ^ k ^ "=" ^ v ) c (conf.henv @ conf.senv)
 ;
 
 value prefix_base conf =
   if conf.b_arg_for_basename then
     conf.command ^ "?b=" ^ conf.bname ^ ";"
+  else
+    conf.command ^ "?"
+;
+
+value prefix_base_2 conf =
+  if conf.b_arg_for_basename then
+    conf.command ^ "?b=" ^ conf.bname
+  else
+    conf.command ^ "?"
+;
+
+value prefix_base_password conf =
+  if conf.b_arg_for_basename then
+    if conf.cgi_passwd = "" then
+      conf.command ^ "?b=" ^ conf.bname ^ ";"
+    else
+      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd ^ ";"
+  else
+    conf.command ^ "?"
+;
+
+value prefix_base_password_2 conf =
+  if conf.b_arg_for_basename then
+    if conf.cgi_passwd = "" then
+      conf.command ^ "?b=" ^ conf.bname
+    else
+      conf.command ^ "?b=" ^ conf.bname ^ "_" ^ conf.cgi_passwd
   else
     conf.command ^ "?"
 ;
@@ -2027,6 +2068,39 @@ value check_ampersands s =
       | c -> do {
           Buffer.add_char b c;
           loop error (i + 1)
+        } ]
+;
+
+value replace_quotes s =
+  let b = Buffer.create (String.length s + 100) in (* hack: +100 to account for quote -> &#34; *)
+  loop 0 where rec loop i =
+    if i = String.length s then
+      Buffer.contents b
+    else
+      match s.[i] with
+      [ '<' -> do {
+            let tag_content =
+              loop "" (i+1) where rec loop str j =
+              if j = String.length s then str
+              else
+                match s.[j] with
+                  [ '>' -> str
+                  | c -> loop ( str ^ ( String.make 1 c )) (j + 1) ]
+            in
+            Buffer.add_string b ( "<" ^ tag_content ^ ">" );
+            loop (i + ( String.length tag_content + 2 ))
+        }
+      | '"' -> do {
+            Buffer.add_string b "&#34;";
+            loop (i + 1)
+        }
+      | '\'' -> do {
+            Buffer.add_string b "&#39;";
+            loop (i + 1)
+        }
+      | c -> do {
+            Buffer.add_char b c;
+            loop (i + 1)
         } ]
 ;
 
@@ -3654,7 +3728,7 @@ value print_image_sex conf p size =
 (* ********************************************************************** *)
 value display_options conf =
   let s =
-    if p_getenv conf.env "image" = Some "on" then ";image=on"
+    if p_getenv conf.env "image" = Some "off" then ";image=off"
     else ""
   in
   let s =

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: cousmenu.txt,v 5.6 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
@@ -91,7 +91,7 @@
   </li>
   %if;has_nephews_or_nieces;
     <li>
-      <a href="%prefix;%access;;m=C;v1=1;v2=2">[*nephews and nieces]</a>
+      <a href="%prefix;%access;;m=C;v1=1;v2=2">[*a nephew/a niece]</a>
     </li>
   %end;
 </ul>

@@ -1,19 +1,15 @@
-%if;(evar.m="MOD_IND" or evar.m="MOD_FAM" or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
-  %if;(bvar.use_cdn="yes")
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/3.0.20/autosize.js" integrity="sha256-PO9BxwdQWhBkPajSnw0FKB/5Yb11OlMkocaqy5s7HHE=" crossorigin="anonymous"></script>
-  %else;
-   <script src=%if;(cgi)%bvar.static_path;%end;autosize.min.js></script>
-   %end;
-  <script>autosize(document.querySelectorAll('textarea'));</script>
-%end;
+<!-- $Id: js.txt, v7.00 10/04/2018 08:57:17 $ -->
 %if;(evar.templ="")
   %if;(bvar.use_cdn="yes")
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+      integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
   %else;
     <script src=%if;(cgi)%bvar.static_path;%end;jquery.min.js></script>
-    <script src=%if;(cgi)%bvar.static_path;%end;tether.min.js></script>
+    <script src=%if;(cgi)%bvar.static_path;%end;popper.min.js></script>
     <script src=%if;(cgi)%bvar.static_path;%end;bootstrap.min.js></script>
   %end;
   <script>
@@ -21,17 +17,37 @@
     $.getScript('%if;(cgi)%bvar.static_path;%end;p_mod.js');
   });
   </script>
-  %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"))
+  %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
+       or evar.m="ADD_FAM_OK" or evar.m="DEL_FAM_OK"
+       or evar.m="SND_IMAGE_OK" or evar.m="DEL_IMAGE_OK"
+       or evar.m="CHG_EVT_IND_ORD_OK" or evar.m="CHG_EVT_FAM_ORD_OK"
+       or evar.m="MOD_DATA_OK"))
     <script>
-    var htmlTitle = document.title;
-    if
-    ( htmlTitle == "[*person modified]" ||
-      htmlTitle == "[*family modified]" ||
-      htmlTitle == "[*person added]" ||
-      htmlTitle == "[*family added]"
-    )
-    { document.getElementById("i%evar.i;").focus();
-    }
+      var htmlTitle = document.title;
+      if ( htmlTitle == "[*person modified]" ||
+           htmlTitle == "[*family modified]" ||
+           htmlTitle == "[*person added]" ||
+           htmlTitle == "[*family added]" ||
+           htmlTitle == "[*family deleted]" ||
+           htmlTitle == "[*image received]" ||
+           htmlTitle == "[*image deleted]" ||
+           htmlTitle == "[*modification successful]" )
+      { document.getElementById("i%evar.i;").focus(); }
     </script>
+  %end;
+%end;
+%if;(evar.m="MOD_IND" or evar.m="MOD_IND_OK"
+  or evar.m="MOD_FAM" or evar.m="MOD_FAM_OK"
+  or evar.m="ADD_FAM" or evar.m="ADD_FAM_OK"
+  or evar.m="MOD_NOTES" or evar.m="MOD_DATA")
+  %if;(bvar.use_cdn="yes")
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/4.0.2/autosize.min.js" 
+      integrity="sha256-dW8u4dvEKDThJpWRwLgGugbARnA3O2wqBcVerlg9LMc=" crossorigin="anonymous"></script>
+  %else;
+     <script src=%if;(cgi)%bvar.static_path;%end;autosize.min.js></script>
+   %end;
+  <script>autosize(document.querySelectorAll('textarea'));</script>
+  %if;(evar.templ="")
+    <script>$('body').scrollspy({ target: '#banner' })</script>
   %end;
 %end;

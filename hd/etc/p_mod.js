@@ -1,4 +1,4 @@
-/* $Id: p_mod.js, v 7.00 10/04/2017 01:29:45 hg a2 $ */
+/* $Id: p_mod.js, v 7.00 2017/12/05 01:29:45 hg a2 $ */
 
 var modules = [];
 var options = [];
@@ -40,10 +40,15 @@ modules[8] = "sources";
 options[8][1] = "simple";
 options[8][2] = "complete";
 modules[9] = "arbres";
-options[9][1] = "ascendants tree";
-options[9][2] = "horizontal tree";
-options[9][3] = "compact tree";
-options[9][4] = "+3 -3 gen.";
+options[9][1] = "ascendants";
+options[9][2] = "horizontal";
+options[9][3] = "compact";
+options[9][4] = "+3-3 gen.";
+options[9][5] = "famille";
+options[9][6] = "7 gen";
+options[9][7] = "9 gen";
+options[9][8] = "HI";
+options[9][9] = "descendants";
 modules[10] = "gr_parents";
 options[10][1] = "standard";
 options[10][2] = "three cols";
@@ -68,10 +73,10 @@ var p_mod_table = '\
         <td class="align-middle pmod">'+modules[i]+'\
         </td>\
         <td>\
-          <div class="d-inline-flex small">';
+          <div class="btn-group small">';
           for (var k=1; k<options[i].length; k++)
             { var image = "<img class='w-100' src='"+img_prfx+"/"+modules[i]+"_"+k+".jpg'>";
-              var button  = '<button class="btn btn-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
+              var button  = '<button class="btn btn-outline-secondary btn-sm" type="button" id="'+modules[i][0]+k+'" title="'+modules[i]+" "+options[i][k]+'"\
                            data-toggle="popover" data-trigger="hover" data-container="body" data-placement="bottom"\
                            data-html="true" data-content="'+image+'">'+options[i][k]+'</button>';
               p_mod_table += button;
@@ -274,6 +279,31 @@ $('#a3').on('click', function ()
 $('#a4').on('click', function ()
 { $('#p_mod').val($('#p_mod').val()+'a4');
   $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_4.jpg">\n');
+});
+
+$('#a5').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a5');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_5.jpg">\n');
+});
+
+$('#a6').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a6');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_6.jpg">\n');
+});
+
+$('#a7').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a7');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_7.jpg">\n');
+});
+
+$('#a8').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a8');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_8.jpg">\n');
+});
+
+$('#a9').on('click', function ()
+{ $('#p_mod').val($('#p_mod').val()+'a9');
+  $('#p_mod_builder').append('<img id="rm" src="'+img_prfx+'/arbres_9.jpg">\n');
 });
 
 $('#g1').on('click', function ()

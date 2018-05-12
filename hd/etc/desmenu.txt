@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: desmenu.txt v 7.00 23/02/2017 02:23:11 $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
@@ -108,7 +108,7 @@ function table_spouse_disabled () {
         <input type="radio" name="t" value="F" onclick="no_options ();long_display_options ()"%/>
          <span class="fa fa-female fa-fw"></span> [*male line/female line]1
       </label>
-      <div class="offset-1">
+      <div class="ml-4">
         <p>
           <label>
             <input type="checkbox" id="ld_alwsurn" name="alwsurn" value="yes"%nn;
@@ -166,7 +166,7 @@ function table_spouse_disabled () {
       %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
         ([maximum] %bvar.max_desc_level; [generation/generations]1)
       %end;
-      <div class="offset-1">
+      <div class="ml-4">
         <p>
           <label>
             <input type="checkbox" id="t_num_table" name="num" value="on"%/>
@@ -181,6 +181,7 @@ function table_spouse_disabled () {
             [*title/titles]0
           </label>
         </p>
+        <p>
           <label>
             <input type="checkbox" id="t_birth" name="birth" value="on"%/>
             [*date of birth]
@@ -232,6 +233,12 @@ function table_spouse_disabled () {
             <input type="checkbox" id="t_gen" name="gen" value="on"%/>
             [*display generation]
           </label>
+        </p>
+        <p>
+          <label>
+            <input type="checkbox" id="only" name="only" value="on"%/>
+              [*only the generation selected]
+            </label>
           <input type="hidden" name="ns" value="on"%/>
           <input type="hidden" name="image" value="on"%/>
         </p>
@@ -247,7 +254,7 @@ function table_spouse_disabled () {
           ([maximum] %bvar.max_desc_tree; [generation/generations]1)
         %end;
       </label>
-      <div class="offset-1">
+      <div class="ml-4">
         <label>
           <input type="checkbox" name="image" value="on"%/>
           [*image/images]1
@@ -287,7 +294,7 @@ function table_spouse_disabled () {
       </div>
       <label class="mt-2">
         <input type="radio" name="t" value="S" onclick="no_options ()"%/>
-         <span class="fa fa-sort-alpha-asc fa-fw"></span> [*descendants at the generation]
+         <span class="fa fa-sort-alpha-down fa-fw"></span> [*descendants at the generation]
       </label>
       <br%/>
       <label>
@@ -314,7 +321,7 @@ function table_spouse_disabled () {
       %elseif;(bvar.max_desc_level != "" and max_desc_level > bvar.max_desc_level)
         ([maximum] %bvar.max_desc_level; [generation/generations]1)
       %end;
-      <div class="offset-1">
+      <div class="ml-4">
         <label>
           <input type="checkbox" name="num" value="on"%/>
           [display Aboville number]
@@ -345,7 +352,7 @@ function table_spouse_disabled () {
             </option>
           %end;
         </select>
-        <input type="submit" class="btn btn-secondary" value="Ok">
+        <input type="submit" class="btn btn-outline-secondary" value="Ok">
       </div>
     </div>
   </div>

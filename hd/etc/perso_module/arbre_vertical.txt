@@ -1,19 +1,4 @@
-<!-- $Id: perso_module/arbre_vertical v7.00 28/03/2017 20:02:08 Arbre ascendant (vertical) -->
-
-%define;rebuild_url(aaa,vvv,iii,mmm,ttt)
-  %let;new_url;
-  %if;("aaa"="prefix_access")%prefix;%access;;%else;aaa%end;
-  %if;(evar.mar_sp_ch!="")mar_sp_ch=%evar.mar_sp_ch;;%end;
-  %if;(evar.evt_pr_sib!="")evt_pr_sib=%evar.evt_pr_sib;;%end;
-  %if;(evar.simple!="")simple=%evar.simple;;%end;
-  %if;(evar.m!="")m=%evar.m;;%end;
-  %if;(iii=1)image=on;%end;
-  %if;(mmm=1)marriage=on;%end;
-  %if;(evar.vh!="")vh=%evar.vh;;%end;
-  %if;(evart!="")t=ttt;%end;
-  %if;(vvv!=3)v=vvv%end;%if;(evar.m!="A")#a%end;%in;
-  %new_url;
-%end;
+<!-- $Id: perso_module/arbre_vertical v7.00 18/11/2017 20:02:08 Arbre ascendant (vertical) -->
 
 %define;a_tree_line()
   %if;(not is_first)
@@ -37,7 +22,7 @@
     <td colspan="%cell.colspan;" class="text-center align-bottom py-0">%nn;
       %if;(cell.is_empty)<samp>&nbsp;</samp>%nn;
       %else;
-        %if;(evar.image = "on" and cell.person.has_image)
+        %if;(evar.image!="off" and cell.person.has_image)
           %if;(evar.cgl != "on")<a href="%cell.person.image_html_url;">%end;
           <img class="rounded mb-1" src="%cell.person.image_url;"%cell.person.image_small_size;%sp;%nn;
            alt="[image/images]0" title="[image/images]0"%/>%nn;
@@ -56,7 +41,7 @@
         <td class="text-center py-0">%nn;
         %if;cell.is_right;
           %if;(evar.marriage = "on")
-            %if;(wizard and not cancel_links)<a class="small font-weight-italic text-center text-nowrap" href="%prefix;m=MOD_FAM;i=%cell.family.index;;ip=%index;" title="%if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0%else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;">%end;
+            %if;(wizard and not cancel_links)<a class="small font-weight-italic text-center text-nowrap" href="%prefix_base_password;m=MOD_FAM;i=%cell.family.index;;ip=%index;" title="%if;(cell.family.marriage_date.year="")[*add::marriage/marriages]0%else;[*update::family/families]0%end; %cell.family.father; [and] %cell.family.mother;">%end;
               %if;(cell.family.marriage_date.year!= "")
                 %if;(cell.family.marriage_date.prec = "&lt;")
                   /%cell.family.marriage_date.year;%nn;
@@ -84,7 +69,7 @@
             ;m=%if;(evar.m!="")%evar.m;%else;A%end;%nn;
             ;t=%if;(evar.t!="")%evar.t;%else;T%end;%nn;
             ;v=%if;(evar.v!="")%evar.v;%else;3%end;%nn;
-            %if;(evar.image = "on");image=on%end;%nn;
+            %if;(evar.image!="off");image=on%end;%nn;
             %if;(evar.marriage = "on");marriage=on%end;"
             title="%if;(evar.m="")[*tree][:] [full width/columns]0%end;">│</a>%nn;
         %end;
@@ -117,7 +102,7 @@
   %if;(yy > 0)
     %if;(xx.has_parents)%apply;male_line("xx.father", yy - 1)%end;
     <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(evar.image = "on" and xx.has_image)
+    %if;(evar.image!="off" and xx.has_image)
       <br>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
@@ -132,7 +117,7 @@
   %if;(yy > 0)
     %if;(xx.has_parents)%apply;female_line("xx.mother", yy - 1)%end;
     <a href="%xx.bname_prefix;%xx.access">%xx;</a>%xx.title;%xx.dates;
-    %if;(evar.image = "on" and xx.has_image)
+    %if;(evar.image!="off" and xx.has_image)
       <br>
       %if;(evar.cgl != "on")<a href="%xx.image_html_url;">%end;
       <img class="rounded" src="%xx.image_url;"%xx.image_small_size;%sp;%nn;
@@ -145,8 +130,8 @@
 
 %if;(evar.t = "T")%nn;
   <div class="text-%right">%nn;
-  <a href="%prefix;m=A;t=T;v=%evar.v;;%access;
-  ;dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
+  <a href="%prefix_base_password;%foreach;env_binding;%env.key=%env.val;;%end;%nn;
+  dag=on;notab=on;slices=on" title="[*display by slices/slice width/overlap/total width]0"><samp>//</samp></a></div>
 %end;
 
 %define;tree(xx)
@@ -157,9 +142,6 @@
 
 %if;has_parents;
   %let;evarv;%if;(evar.v!="")%evar.v;%else;3%end;%in;
-  %let;evart;%if;(evar.t!="")%evar.t;%else;T%end;%in;
-  %let;evarim;%if;(evar.image!="" and evar.image="on")1%else;0%end;%in;
-  %let;evarma;%if;(evar.marriage!="" and evar.marriage="on")1%else;0%end;%in;
   %let;maxlev;%apply;min%with;
     %if;(bvar.max_anc_tree!="")%bvar.max_anc_tree;%else;120%end;%and;
     %if;(bvar.max_anc_level!="")%bvar.max_anc_level;%else;120%end;%and;
@@ -179,55 +161,110 @@
       <div class="form-inline">
         <div class="btn-group mx-2">
           %if;(maxlev>9 and evarv>5)
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(−5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]0">−⁵</a>
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv-1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0">−</a>
+            <a href="%prefix_base_password;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv-5);%end;%end;"
+              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
+              title="(-5) [visualize/show/hide/summary]1 %expr(evarv-5) [generation/generations]1 (max %maxlev;)"
+            >&nbsp;-⁵
+            </a>
+            <a href="%prefix_base_password;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv-1);%end;%end;"
+              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
+              title="(-1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]1 (max %maxlev;)"
+            >&nbsp;-
+            </a>
           %end;
           %for;i;minv;maxv;
-            <a class="btn btn-secondary btn-sm %if;(evarv=i)disabled font-weight-bold%end;" %nn;
-              href="%apply;rebuild_url%with;prefix_access%and;%expr(i)%and;%evarim;%and;%evarma;%and;%evart;%end" %nn;
+            <a id="v%i;" class="btn btn-outline-%if;(evarv=i)dark font-weight-bold disabled%else;secondary%end; btn-sm border-0 px-1"
+              href="%prefix_base_password;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(i);%end;%end;"
               title="%if;(evarv!=i)[*visualize/show/hide/summary]1 %i; %if;(i=1)[generation/generations]0%else;[generation/generations]1%end;
-              %end; %if;(i=maxlev)(max)%end;">%i;</a>
+              %end; %if;(i=maxlev)(max)%end;"
+            >%i;
+            </a>
           %end;
           %if;(maxlev>9 and maxlev-evarv>=5)
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+1)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm small" title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)">+</a>
-            <a href="%apply;rebuild_url%with;prefix_access%and;%expr(evarv+5)%and;%evarim;%and;%evarma;%and;%evart;%end" class="btn btn-secondary btn-sm font-weight-bold" title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)">+⁵</a>
+            <a href="%prefix_base_password;%nn;
+                %foreach;env_binding;
+                %if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv+1);%end;%end;%nn;"
+              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
+              title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)"
+            >&nbsp;+
+            </a>
+            <a href="%prefix_base_password;%nn;
+                %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%else;v=%expr(evarv+5);%end;%end;"
+              class="btn btn-outline-secondary btn-sm border-0 px-0 small"
+              title="(+5) [visualize/show/hide/summary]1 %expr(evarv+5) [generation/generations]1 (max %maxlev;)"
+            >&nbsp;+⁵
+            </a>
           %end;
         </div>
         %if;(evarv>1)
           <div class="btn-group mx-2">
-            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"A")" class="btn btn-secondary btn-sm %if;(evart="A")disabled font-weight-bold%end;" title="[*male line/female line]1">A</a>
-            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"C")" class="btn btn-secondary btn-sm %if;(evart="C")disabled font-weight-bold%end;" title="[*male line/female line]0">C</a>
-            <a href="%apply;rebuild_url("prefix_access",evarv,evarim,evarma,"T")" class="btn btn-secondary btn-sm %if;(evart="T")disabled font-weight-bold%end;" title="[*tree]">T</a>
+            <a href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%else;t=A;%end;%end;"
+              class="btn btn-outline-%if;(evar.t="A")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0"
+              title="[*male line/female line]1"
+            >A
+            </a>
+            <a href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%else;t=C;%end;%end;"
+              class="btn btn-outline-%if;(evar.t="C")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
+              title="[*male line/female line]1"
+            >C
+            </a>
+            <a href="%prefix_base_password;%foreach;env_binding;%if;(env.key!="t")%env.key=%env.val;;%else;t=T;%end;%end;"
+              class="btn btn-outline-%if;(evar.t="T")dark disabled font-weight-bold%else;secondary%end; btn-sm border-0 px-0 ml-2"
+              title="[*male line/female line]1"
+            >T
+            </a>
           </div>
         %end;
         <div class="mx-2">
-          %if;(evarim=1)
-            <a href="%apply;rebuild_url("prefix_access",evarv,0,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-on text-muted"></i></a>
-          %else;
-            <a href="%apply;rebuild_url("prefix_access",evarv,1,evarma,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [image/images]0"><i class="fa fa-photo fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-          %end;
+          <a href="%prefix_base_password;%nn;
+            %foreach;env_binding;%if;(env.key != "image")%env.key=%env.val;;%end;%end;%nn;
+            %if;(evar.image!="off")image=off;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="%if;(evar.image="off")[*visualize/show/hide/summary]1%else;%nn;
+              [*visualize/show/hide/summary]2%end; [image/images]1"
+          ><i class="fa fa-image fa-fw"></i>
+            <i class="fa fa-toggle-%if;(evar.image="off")off%else;on%end; text-muted"></i>
+          </a>
         </div>
-        %if;(evarv>1 and evart="T")
+        %if;(evarv>1 and evar.t="T")
           <div class="mx-2">
-            %if;(evarma=1)
-              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,0,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]2 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-on text-muted%(success ?%)"></i></a>
-            %else;
-              <a href="%apply;rebuild_url("prefix_access",evarv,evarim,1,evart)" class="btn btn-secondary btn-sm" title="[*visualize/show/hide/summary]1 [date of marriage]"><i class="fa fa-random fa-fw"></i> <i class="fa fa-toggle-off text-muted"></i></a>
-            %end;
+            <a href="%prefix_base_password;%nn;
+              %foreach;env_binding;%if;(env.key!="marriage")%env.key=%env.val;;%end;%end;%nn;
+              %if;(evar.marriage!="on")marriage=on;%end;"
+              class="btn btn-outline-secondary btn-sm border-0 px-0"
+              title="%if;(evar.marriage!="on")[*visualize/show/hide/summary]1%else;
+                  [*visualize/show/hide/summary]2%end; [date of marriage]"
+            ><i class="fa fa-random fa-fw"></i>
+              <i class="fa fa-toggle-%if;(evar.marriage!="on")on%else;off%end; text-muted%(success ?%)"></i>
+            </a>
           </div>
         %end;
+        <div class="mx-2">
+          <a href="%prefix_base_password;%nn;
+              %foreach;env_binding;%if;(env.key!="dag")%env.key=%env.val;;%end;%end;%nn;
+              %if;(evar.dag!="on")dag=on;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="%if;(evar.dag="on")[*dag on/dag off]1%else;[*dag on/dag off]0%end;"
+          ><i class="fa fa-%if;(evar.dag="on")minus%else;plus%end; fa-fw"></i>
+          </a>
+        </div>
       </div>
     %end;
   </div>
   <table class="tree-vert mx-auto my-3" style="border-width:%border;">
-    %if;(evart = "T")
+    %if;(evar.t="T" and evar.t1="m")
+      %include;perso_module/arbre_9gen;
+    %elseif;(evar.t="T")
       %apply;tree(evarv)
     %else;
       <tr>
         <td class="text-center">
-          %if;(evart = "A")
+          %if;(evar.t = "A")
             %apply;male_line("self", evarv)
-          %elseif;(evart = "C")
+          %elseif;(evar.t = "C")
             %apply;female_line("self", evarv)
           %end;
         </td>

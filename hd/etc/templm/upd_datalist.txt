@@ -8,9 +8,9 @@
   </datalist>
 %end;
 %apply;dlist("fn")
-%apply;dlist("occu")
-%apply;dlist("place")
 %apply;dlist("sn")
+%apply;dlist("place")
+%apply;dlist("occu")
 %apply;dlist("src")
 <datalist id="dlmonth">
   <option value=VD label="[(french revolution month)]0 VD">

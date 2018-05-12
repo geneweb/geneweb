@@ -706,8 +706,9 @@ value print_inv1 conf base p ifam1 ifam2 =
   let cpl2 = foi base ifam2 in
   do {
     Perso.interp_notempl_with_menu title "perso_header" conf base p;
-    Wserver.printf "%s:"
-      (capitale (transl conf "invert the order of the following families"));
+    Wserver.printf "%s%s"
+      (capitale (transl conf "invert the order of the following families"))
+      (Util.transl conf ":");
     tag "ul" begin
       tag "li" begin
         Update.print_someone conf base (poi base (get_father cpl1));
@@ -885,8 +886,9 @@ value print_change_order conf base =
       in
       Perso.interp_templ_with_menu title "perso_header" conf base p;
       tag "h2" begin title False; end;
-      Wserver.printf "%s:"
-        (capitale (transl conf "invert the order of the following families"));
+      Wserver.printf "%s%s"
+        (capitale (transl conf "invert the order of the following families"))
+        (Util.transl conf ":");
       tag "table" "style=\"margin:1em\"" begin
         tag "tr" begin
           tag "td" begin
