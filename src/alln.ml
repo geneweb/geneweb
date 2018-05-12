@@ -159,7 +159,8 @@ value print_alphabetic_big conf base is_surnames ini list len too_big = do {
   end;
   if len <= default_max_cnt && not too_big then do {
     stagn "p" begin
-      Wserver.printf "%s:" (capitale (transl conf "the whole list"));
+      Wserver.printf "%s%s" (capitale (transl conf "the whole list"))
+        (Util.transl conf ":");
     end;
     tag "ul" begin
       stagn "li" begin

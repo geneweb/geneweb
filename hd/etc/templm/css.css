@@ -6,12 +6,20 @@ html{color:#000;background-color:#EEE;}
 ::-webkit-input-placeholder {color:#aaa;}
 ::-moz-placeholder {color:#aaa;}
 :-ms-input-placeholder {color:#aaa;}
+/* added for anctree_hi */
+.big_anchor {display: block;width: 100%;height: 100%;position: absolute;top: 0;left: 0;z-index: 0;}
+.big_anchor_1 {display: block;width: 100%;height: 60%;position: absolute;top: 0;left: 0;z-index: 0;}
+.big_anchor_1m {display: block;width: 100%;height: 40%;position: absolute;top: 60%;left: 0;z-index: 0;}
+.big_anchor_him {display: block;width: 50%;height: 60%;position: absolute;top: 0;left: 0;z-index: 0;}
+.big_anchor_her {display: block;width: 50%;height: 60%;position: absolute;text-align: right;top: 0;left: 50%;z-index: 0;}
+.big_anchor_him_m {display: block;width: 50%;height: 40%;position: absolute;top: 60%;left: 0;z-index: 0;}
+.big_anchor_her_m {display: block;width: 50%;height: 40%;position: absolute;top: 60%;left: 50%;z-index: }
 /* Properties of all html pages */
 textarea{width:99%;padding:10px;vertical-align:top;min-height:1em;}
 tr,div,p,li,img{page-break-inside:avoid;}
 body{word-wrap:break-word;}
 table{word-wrap:normal;}
-body,td,th,form,input,select,legend{font-family:Arial,sans-serif;}
+body,td,th,form,input,select,legend{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";}
 legend{margin-left:10px;line-height:25px;height:25px;}
 dt{font-weight:500;}
 dt:first-letter{font-size:120%;font-family:serif;}
@@ -57,13 +65,13 @@ a:hover{z-index:100;}
 h1{text-align:center;margin-top:28px}
 /* Properties of the menu2. All pages. */
 .menu2{position:absolute;top:0px;right:1px;z-index:10000}
-.menu2,.menu2 form,.menu2 form input{font-family:Arial;font-size:17px;}
+.menu2,.menu2 form,.menu2 form input{font-size:17px;}
 .menu2 a,.menu2 .s_menu{float:left;background-color:#CCC;border:solid 1px #DDD;margin:0 -1px -1px 0;padding:3px;color:#000;}
 .menu2 div{position:relative;display:block;float:left;}
 .menu2 .s_menu{display:none;float:left;width:350px;padding:5px;}
 .menu2 div:hover > .s_menu{display:block;position:absolute;right:0px;top:23px;z-index:10000;}
 /* Properties of the menu_search + login input on welcome */
-.menu3{position:absolute;top:0px;right:3px;font-family:Arial;font-size:14px;}
+.menu3{position:absolute;top:0px;right:3px;font-size:14px;}
 .login input[type="password"],.menu3 input[type="text"]{line-height:15px;padding:4px;transition:box-shadow 0.3s,border 0.3s;}
 .login input[type="password"]:focus,.login input[type="password"].focus,.menu3 input[type="text"]:focus,.menu3 input[type="search"].focus{border:solid 1px #707070;box-shadow:0 0 5px 1px #969696;}
 .menu3 a{float:none;margin:0 -1px -1px 0;color:#000;}
@@ -128,7 +136,7 @@ hr.full{margin-left:0;margin-right:0;}
 #perso{padding-top:0}
 #perso h1{margin:20px 10px 10px 0px;padding:5px;}
 #perso .ch1{font-size:1.5em;}
-#perso .ch2, .ch2 a, span.ch2{font-size:22px;color:#060;font-weight:bold;margin-top:1em;}
+#perso .ch2, .ch2 a, span.ch2{font-size:22px;color:#060;font-weight:bold;margin-bottom:0;}
 #perso .relations ul,#perso .sources ul{margin-left:-15px;margin-top:0;margin-bottom:0;}
 #perso .relations li,#perso .sources li{padding:0px;}
 #perso li{margin:2px 0 0 0;padding:0 0 0 10px;}

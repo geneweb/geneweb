@@ -1,4 +1,4 @@
-%if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = "CT"))%doctype_transitional;%else;%doctype;%end;
+﻿%if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = "CT"))%doctype_transitional;%else;%doctype;%end;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <!-- $Id: anctree.txt,v 7.00 2015/12/10 21:34:32 mr Exp $ -->
@@ -62,7 +62,7 @@
         <a href="%prefix;%cell.person.access;">%cell.person;</a>%nn;
       %end;
       %cell.person.title;%cell.person.dates;
-      %if;(evar.image = "on" and cell.person.has_image)
+      %if;(evar.image!="off" and cell.person.has_image)
         <br%/>
         %if;(evar.cgl != "on")
           <a href="%cell.person.image_html_url;"
@@ -224,7 +224,7 @@
 %define;show_templ(z1)
   %include.anctree_z1;
 %end;
-
+<div class="container" style="all:unset">
 %if;(evar.t = "T" and (evar.t1 = "T" or evar.t1 = ""))
   %apply;tree(l_v)
 %elseif;(evar.t = "A" or evar.t1 = "A")
@@ -238,11 +238,13 @@
 %elseif;(evar.t1 != "")
   %apply;show_templ(evar.t1)
 %end;
+</div>
 
 %if;not cancel_links;
   %import;tools;
   %apply;tools_anctree()
-  %base_trailer;
+  <div style="clear:both;"></div>
+  %include.trl;
   %include.copyr;
 %end;
 </body>

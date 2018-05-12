@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: stats.txt,v 5.10 2007-07-25 15:01:02 ddr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
@@ -17,11 +17,11 @@
 <h1>[*statistics]</h1>
 
 %if;not cancel_links;
-  <div class="btn-group float-%right; mt-2">
+  <div class="btn-group float-%right;">
     %if;(referer != "")
       <a href="%referer;"><span class="fa fa-arrow-left fa-lg" title="<<"></span></a>
     %end;
-    <a href="%prefix;"><span class="fa fa-home fa-lg" title="[*home]"></span></a>
+    <a href="%prefix;"><span class="fa fa-home fa-lg pl-1" title="[*home]"></span></a>
   </div>
 %end;
 

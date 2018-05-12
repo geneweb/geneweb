@@ -15,13 +15,20 @@
         %if;(index!=cond)
           <div class="media d-inline-flex flex-row mr-2 mb-1">
             %if;child.has_image;
-              <a href="%child.image_url;" class="align-self-center" target="_blank">
-                <img class="small_image rounded align-self-center" src="%child.image_url;" alt="[image/images]0" 
-                  title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)"%/>
+              %if;(evar.cgl!="on")
+                <a href="%child.image_url;" class="align-self-center" target="_blank">
+                  <img class="small_image rounded align-self-center" src="%child.image_url;" alt="[image/images]0" 
+                    title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)"%/>
               </a>
+              %else;
+                <img class="small_image rounded align-self-center"%nn;
+                  src="%child.image_url;" alt="[image/images]0"%nn;
+                  title="%child; (%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;)"%/>
+              %end;
             %elseif;(bvar.default_image="yes")
-              <img class="small_image rounded align-self-center ml-2" src="%image_prefix;/img_unknown_%if;(child.is_female)wo%elseif;(child.is_male)%else;u_%end;man.png" alt="[missing image]" 
-                title="%if;(child.is_male)[a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[a brother/a sister/a sibling]2%end;"%/>
+              <img class="small_image rounded align-self-center ml-2"%nn;
+                src="%image_prefix;/img_unknown_%if;(child.is_female)wo%elseif;(child.is_male)%else;u_%end;man.png" alt="[missing image]"%nn;
+                title="%if;(child.is_male)[*a brother/a sister/a sibling]0%elseif;(child.is_female)[a brother/a sister/a sibling]1%else;[*a brother/a sister/a sibling]2%end;"%/>
             %else;
               <span class="small_image noimage rounded align-self-center display-3 text-center text-muted ml-2 pb-2">?</span>
             %end;
@@ -29,7 +36,7 @@
               %if;(bvar.full_siblings="yes")
                 %apply;short_display_person_tree("child")
               %else;
-                %apply;short_display_person_noname("child","br","","")
+                %apply;short_display_person_noname("child","br","","","")
               %end;
               %if;child.computable_age;<br>%sp;%child.age;%end;
               %if;child.computable_death_age;<br>%sp;%child.death_age;%end;
@@ -42,7 +49,7 @@
 %end;
 
 %if;(has_parents and has_siblings)
-  <h2>
+  <h2 class="mt-2 mt-lg-0 w-100">%nn;
     %if;(bvar.full_siblings="yes")
       [*full siblings]%nn;
     %else;
@@ -53,21 +60,23 @@
       %foreach;father.child;
         %if;is_sibling_before;
           %incr_count;
-          <a class="ml-2" href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))"><span class="fa fa-caret-left text-success"></span></a>%nn;
+          <a class="ml-2%if;not is_sibling_before; invisible%end;"
+            href="%prefix;%child.access;" title="%apply;capitalize(nth([previous sibling],sex))">%nn;
+          <i class="fa fa-caret-left fa-sm text-success"></i>%nn;
+          </a>%nn;
         %end;
       %end;
       %if;(count=0)<span class="fa fa-caret-left invisible"></span>%end;
-      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on"><img class="mx-1" src="%image_prefix;/gui_create.png" height="18" style="margin-bottom:6px" alt="Tree"
-        title="[*tree] ([with] [spouse/spouses]1)"/></a>%nn;
-      %if;((p_mod="" or p_mod="zz") and has_parents)
-        %if;(not cancel_links)
-          <a class="" data-toggle="collapse" href="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2" title="[*visualize/show/hide/summary]1/[visualize/show/hide/summary]2 [ascendants tree]">%nn;
-            <sup><i class="fa fa-caret-up text-success"></i></sup></a>
-        %end;
-      %end;
+      <a href="%prefix;i=%father.index;;m=D;t=T;v=1;image=on">%nn;
+      <img class="px-1 mb-1" src="%image_prefix;/gui_create.png" height="20" alt="Tree"
+        title="[*tree] [siblings] ([with] [spouse/spouses]1)"/>%nn;
+      </a>%nn;
       %foreach;father.child;
         %if;is_sibling_after;
-            <a href="%prefix;%child.access;" title="%apply;capitalize(nth([next sibling],sex))"><span class="fa fa-caret-right text-success"></span></a>
+          <a%if;not is_sibling_after; class="invisible"%end; href="%prefix;%child.access;" 
+            title="%apply;capitalize(nth([next sibling],sex))">%nn;
+          <i class="fa fa-caret-right fa-sm text-success"></i>%nn;
+          </a>
         %end;
       %end;
     %end;
@@ -138,13 +147,13 @@
 %if;(op_m=1 and has_parents and (half_father != 0 or half_mother != 0))
   <h2>[*half siblings]</h2>
   %if;(half_father != 0)
-        [*on %s's side:::] %apply;short_display_person("father")
+      %apply;on_side%with;%apply;very_short_display_person("father")%end;
       %if;(father.nb_families > 1 and half_father != 0)
         %foreach;father.family;
           %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
             <ul>
               %apply;li_SD("spouse")
-                [with] %apply;short_display_person("spouse")
+                [with] %apply;very_short_display_person("spouse")
                 %if;has_children;
                   <ul>
                     %foreach;child;
@@ -163,13 +172,13 @@
       %end;
   %end;
   %if;(half_mother != 0)
-        [*on %s's side:::] %apply;short_display_person("mother")
+      %apply;on_side%with;%apply;very_short_display_person("mother")%end;
       %if;(mother.nb_families > 1 and half_mother != 0)
         %foreach;mother.family;
           %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
             <ul>
               %apply;li_SD("spouse")
-                [with] %apply;short_display_person("spouse")
+                [with] %apply;very_short_display_person("spouse")
                 %if;has_children;
                   <ul>
                     %foreach;child;
@@ -185,17 +194,18 @@
     %end;
 <!--  perso_module/freresoeur_complet (deux listes de demi frères côte à côte) -->
 %elseif;(op_m=3 and has_parents and (half_father != 0 or half_mother != 0))
+  <h2>[*half siblings]</h2>
   <table style="border:%border;;width:100%">
       <tr>
         %if;(half_father != 0)
           <td style="width:47%%;vertical-align: top">
-            [*on %s's side:::] %apply;long_display_person("father")
+            %apply;on_side%with;%apply;very_short_display_person("father")%end;
           </td>
           <td style="width:6%%;vertical-align: top">&nbsp;</td>
         %end;
         %if;(half_mother != 0)
           <td style="width:47%%;vertical-align: top">
-            [*on %s's side:::] %apply;long_display_person("mother")
+            %apply;on_side%with;%apply;very_short_display_person("mother")%end;
           </td>
         %end;
       </tr>
@@ -206,7 +216,7 @@
               %if;(spouse.index!=mother.index and half_father!=0 and spouse.has_children)
                 <ul>
                   %apply;li_SD("spouse")
-                    [with] %apply;long_display_person("spouse")
+                    [with] %apply;very_short_display_person("spouse")
                   </li>
                   %if;has_children;
                     <li class="list-unstyled"><ul>
@@ -227,7 +237,7 @@
               %if;(spouse.index!=father.index and half_mother!=0 and spouse.has_children)
                 <ul>
                   %apply;li_SD("spouse")
-                    [with] %apply;long_display_person("spouse")
+                    [with] %apply;very_short_display_person("spouse")
                   </li>
                   %if;has_children;
                     <li class="list-unstyled"><ul>
@@ -251,7 +261,6 @@
         %if;(parent.nb_families>1)
           <td style="width:47%%">
             %apply;display_shared_parent%with;
-            %apply;image_MF("parent")
             %apply;short_display_person("parent")%end;
           </td>
         %end;
