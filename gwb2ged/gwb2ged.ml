@@ -56,8 +56,6 @@ value encode s =
       if Mutil.utf_8_db.val then s else Mutil.utf_8_of_iso_8859_1 s ]
 ;
 
-value max_len = 78;
-
 value br = "<br>";
 value find_br s ini_i =
   let ini = "<br" in
@@ -74,14 +72,37 @@ value find_br s ini_i =
     else br
 ;
 
+(* out text s to gedcom file, split lines in GEDCOM syntax (CONT/CONC tag) *)
+(* 11/05/2018 : solved issue #611 and previous issues about UTF-8          *)
+(* Parameters : 
+- oc   : output base stream to gedcom file
+- tagn : current gedcom tag level (0, 1, ...)
+- s    : string already encode with gedcom charset (see encode function)
+- len  : number of characters (char or wide char) already outputed in gedcom file 
+- i    : last char index (index to s -- one byte char)
+*)
 value rec display_note_aux oc tagn s len i =
-  if i = String.length s then fprintf oc "\n"
+  let j = ref i in
+  (* read wide char (case charset UTF-8) or char (other charset) in s string*)
+  let rec output_onechar () = 
+    if j.val = String.length s then do { decr j; }
+   (* non wide char / UTF-8 char *)
+    else if charset.val <> Utf8 then output_char oc s.[i]
+   (* 1 to 4 bytes UTF-8 wide char *)
+    else if i = j.val || Name.nbc s.[j.val] = -1 then do {
+      output_char oc s.[j.val];
+      incr j;
+      output_onechar ()
+    }
+    else do { decr j; }
+  in
+  if j.val = String.length s then fprintf oc "\n"
   else
-    let c = if s.[i] = '\n' then ' ' else s.[i] in
+    (* \n, <br>, <br \> : cut text for CONTinuate with new gedcom line *)
     let br = find_br s i in
     if i <= String.length s - String.length br &&
        String.lowercase_ascii (String.sub s i (String.length br)) = br then
-       do {
+      do {
       fprintf oc "\n%d CONT " (succ tagn);
       let i = i + String.length br in
       let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
@@ -92,34 +113,16 @@ value rec display_note_aux oc tagn s len i =
       let i = if i < String.length s then i + 1 else i in
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
-    else if len = max_len then do {
-      let j = ref i in
-      let rec display_and_break () =
-        if j.val = String.length s then ()
-        else
-          let c = if s.[j.val] = '\n' then ' ' else s.[j.val] in
-          if c = ' ' || Name.nbc c = 1 then do {
-            (* new line, the char will be printed by the next call to
-               display_note_aux *)
-            fprintf oc "\n%d CONC " (succ tagn);
-            decr j;
-          }
-          else do {
-            (* multi-byte char *)
-            output_char oc c;
-            incr j;
-            display_and_break ()
-          }
-      in
-      display_and_break ();
-      if j.val = String.length s then
-        fprintf oc "\n"
-      else
-        display_note_aux oc tagn s
-          (String.length ((string_of_int (succ tagn)) ^ " CONC "))
-          (j.val + 1)
+    (* cut text at max length for CONCat with next gedcom line *)
+    else if len = 78 then do {
+      fprintf oc "\n%d CONC " (succ tagn);
+      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
     }
-    else do { output_char oc c; display_note_aux oc tagn s (len + 1) (i + 1) }
+    (* continue same gedcom line *) 
+    else do {
+      output_onechar ();
+      display_note_aux oc tagn s (len + 1) (j.val + 1)
+    }
 ;
 
 value display_note oc tagn s =
