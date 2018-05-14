@@ -358,6 +358,11 @@ function no_options () {
           <input type="checkbox" name="marriage" value="on"%/>
           [*display marriage date]
         </label>
+        <br%/>
+        <label>
+          <input type="checkbox" name="dag" value="on"%/>
+          [*dag]
+        </label>
         %(<br%/>
         <label>
           [*border]
