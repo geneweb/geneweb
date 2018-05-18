@@ -8477,8 +8477,8 @@ sl: spremeni slika
 sv: ändra bild
 
     module
-en: module
-fr: module
+en: module/modules
+fr: module/modules
 
     months old
 af: maande oud

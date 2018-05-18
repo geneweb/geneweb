@@ -25,7 +25,7 @@
 
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <nav class="navbar navbar-light bg-white justify-content-center py-0" id="banner">
+    <nav class="navbar navbar-light bg-white justify-content-end" id="banner">
       <nav class="nav nav-pills nav-fill">    
         <a class="nav-item nav-link" href="#person" title="[*person/persons]0"><i class="fa fa-user fa-fw" aria-hidden="true"></i><span class="d-none d-lg-inline-flex ml-1">[*person/persons]0</span></a>
         <a class="nav-item nav-link" href="#birth" title="[*birth]"><i class="far fa-circle fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*birth]</span></a>
