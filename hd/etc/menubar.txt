@@ -98,14 +98,14 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
             %if;(sosa_prev.index!="")
               <li class="nav-item">
                 <a class="nav-link" href="%prefix_base_password;%if;(bvar.access_by_key="yes")%sosa_prev.access;%else;i=%sosa_prev.index;%end;;%nn;
-                  %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc")%env.key=%env.val;;%end;%end;"
+                  %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i")%env.key=%env.val;;%end;%end;"
                   title="[Sosa] %sosa_prev.sosa;[:] %sosa_prev;"><span class="fa fa-chevron-left" aria-hidden="true"></span><span class="sr-only"><</span></a>%nn;
               </li>
             %end;
             %if(sosa_next.index!="")
               <li class="nav-item">
                 <a class="nav-link" href="%prefix_base_password;%if;(bvar.access_by_key="yes")%sosa_next.access;%else;i=%sosa_next.index;%end;;%nn;
-                  %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc")%env.key=%env.val;;%end;%end;"
+                  %foreach;env_binding;%if;(env.key!="p" and env.key!="n" and env.key!="oc" and env.key!="i")%env.key=%env.val;;%end;%end;"
                   title="[Sosa] %sosa_next.sosa;[:] %sosa_next;"><span class="fa fa-chevron-right" aria-hidden="true"></span><span class="sr-only">></span></a>
               </li>
             %end;
