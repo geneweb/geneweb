@@ -186,23 +186,6 @@ img.image-popover {
   width: 300px
 }
 
-/* “Center” p_mod dropdown in menubar */
-.p_mod-dropdown-menu {
-  padding: 0px;
-  border: 0px;
-  left: 38%;
-  right: auto;
-  transform: translateX(-38%);
-}
-
-.p_mod-dropdown-menu-wizard {
-  padding: 0px;
-  border: 0px;
-  left: 25%;
-  right: auto;
-  transform: translateX(-25%);
-}
-
 div.p_mod_builder {
   width: 300px;
 }

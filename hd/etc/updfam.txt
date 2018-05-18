@@ -28,7 +28,7 @@
 
 %define;nav()
   <div class="container fixed-top" role="navigation">
-    <nav class="navbar navbar-light bg-white  justify-content-center py-0" id="banner">
+    <nav class="navbar navbar-light bg-white justify-content-end" id="banner">
       <nav class="nav nav-pills nav-fill">
         <a class="nav-item nav-link" href="#family" title="[*parents]"><i class="fa fa-male fa-fw" aria-hidden="true"></i><i class="fa fa-female" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*parents]</span></a>
         <a class="nav-item nav-link" href="#events" title="[*event/events]1"><i class="fa fa-graduation-cap fa-fw" aria-hidden="true"></i><span class="d-none d-md-inline-flex ml-1">[*event/events]1</span></a>
