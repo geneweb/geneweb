@@ -14448,3 +14448,7 @@ fr: événement personnalisé
     remove last module
 en: remove the last added module
 fr: retirer le dernier module ajouté
+
+    copy link
+en: copy the link to the clipboard
+fr: copier le lien dans le presse-papier

@@ -177,6 +177,9 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                     <a href="%prefix;%child.access;" id="next_sibling" class="d-none"></a>
                   %end;
                 %end;
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item js-copy-simple-btn" title="[*copy link]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</a>
+                <a class="dropdown-item js-copy-full-btn" title="[*copy link]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;/%if;(occ!="")%occ;%else;0%end;/%first_name; %surname;%]%]</a>
               </div>
             </li>
           %else;
