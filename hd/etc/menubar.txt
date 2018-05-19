@@ -138,7 +138,7 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
             </li>
           %end;
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="SND_IMAGE" or evar.m="MRG" or evar.m="DEL_IND")active%end;"
+            <a id="load_once_copylink" class="nav-link dropdown-toggle %if;(evar.m="CHG_EVT_IND_ORD" or evar.m="SND_IMAGE" or evar.m="MRG" or evar.m="DEL_IND")active%end;"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" title="[*tools] [person/persons]0">%nn;
               <span class="fa fa-user-cog" aria-hidden="true"></span>%nn;
               <span class="sr-only">[*tools] [person/persons]0</span>%nn;
@@ -182,8 +182,8 @@ fr: Saisissez une succession de lettres de module avec son chiffre d’option da
                   %end;
                 %end;
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item js-copy-simple-btn" title="[*copy link]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</a>
-                <a class="dropdown-item js-copy-full-btn" title="[*copy link]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;/%if;(occ!="")%occ;%else;0%end;/%first_name; %surname;%]%]</a>
+                <a class="dropdown-item simple-copy" title="[*copy link]" data-wikilink="%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]</a>
+                <a class="dropdown-item full-copy" title="[*copy link]" data-wikilink="%[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]"><i class="far fa-clipboard fa-fw"></i> %[%[%first_name;/%surname;/%occ;/%first_name; %surname;%]%]</a>
               </div>
             </li>
           %else;
