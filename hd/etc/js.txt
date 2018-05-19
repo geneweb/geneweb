@@ -13,9 +13,13 @@
     <script src=%if;(cgi)%bvar.static_path;%end;bootstrap.min.js></script>
   %end;
   <script>
-  $('#load_once_p_mod').one('click', function() {
-    $.getScript('%if;(cgi)%bvar.static_path;%end;p_mod.js');
-  });
+    $('#load_once_p_mod').one('click', function() {
+      $.getScript('%if;(cgi)%bvar.static_path;%end;p_mod.js');
+    });
+
+    $('#load_once_copylink').one('click', function() {
+      $.getScript('%if;(cgi)%bvar.static_path;%end;copylink.js');
+    });
   </script>
   %if;(wizard and (evar.m="MOD_IND_OK" or evar.m="MOD_FAM_OK"
        or evar.m="ADD_FAM_OK" or evar.m="DEL_FAM_OK"
@@ -51,48 +55,3 @@
     <script>$('body').scrollspy({ target: '#banner' })</script>
   %end;
 %end;
-<script>
-function fallbackCopyTextToClipboard(text) {
-  var textArea = document.createElement("textarea");
-  textArea.value = text;
-  document.body.appendChild(textArea);
-  textArea.focus();
-  textArea.select();
-
-  try {
-    var successful = document.execCommand("copy");
-    var msg = successful ? "successful" : "unsuccessful";
-    console.log("Fallback: Copying text command was " + msg);
-  } catch (err) {
-    console.error("Fallback: Oops, unable to copy", err);
-  }
-
-  document.body.removeChild(textArea);
-}
-function copyTextToClipboard(text) {
-  if (!navigator.clipboard) {
-    fallbackCopyTextToClipboard(text);
-    return;
-  }
-  navigator.clipboard.writeText(text).then(
-    function() {
-      console.log("Async: Copying to clipboard was successful!");
-    },
-    function(err) {
-      console.error("Async: Could not copy text: ", err);
-    }
-  );
-}
-
-var copySimpleBtn = document.querySelector(".js-copy-simple-btn"),
-  copyFullBtn = document.querySelector(".js-copy-full-btn");
-
-copySimpleBtn.addEventListener("click", function(event) {
-  copyTextToClipboard("%[%[%first_name;/%surname;%if;(occ!="0")/%occ;%end;%]%]");
-});
-
-copyFullBtn.addEventListener("click", function(event) {
-  copyTextToClipboard("%[%[%first_name;/%surname;/%if;(occ!="")%occ;%else;0%end;/%first_name; %surname;%]%]");
-});
- 
-</script>
