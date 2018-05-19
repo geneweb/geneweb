@@ -73,12 +73,22 @@
                             data-toggle="popover" data-trigger="hover" data-placement="bottom"
                             data-html="true" data-content="<img class='w-100' id='zz' src='%image_prefix;/zz_1.jpg'>"><i class="fa fa-undo"></i></button>
                   </div>
-                  <p class="mx-2 mt-2">
-                  [
+                  <div class="d-flex justify-content-between">
+                    <div class="mx-2 mt-2">
+                    [
 en: Enter the succession of module letters with its option digit according to the order in which you want the modules to appear (maximum 15 modules).
 fr: Saisissez une succession de lettres de module avec son chiffre d’option dans l’ordre où vous voulez voir apparaître les modules (maximum 15 modules).
-                  ]
-                  </p>
+                    ]
+                    </div>
+                    <a role="button" class="btn btn-outline-%if;(evar.wide="on")danger%else;primary%end; my-3"%sp;
+                      href="%prefix_base_password;%nn;
+                            %foreach;env_binding;%if;(env.key!="wide")%env.key=%env.val;;%end;%end;%nn;
+                            %if;(evar.wide!="on")wide=on;%end;"%sp;
+                      title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
+                      <i class="fa fa-desktop fa-fw" aria-hidden="true"></i>%nn;
+                      <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
+                    </a>
+                  </div>
                   <div id="p_mod_table"></div>
                 </form>
                 <div class="form-control d-none d-md-block">

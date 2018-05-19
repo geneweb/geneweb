@@ -6,14 +6,6 @@
         <i class="fa fa-home fa-fw" title="[*home]" aria-hidden="true"></i>%nn;
         <i class="sr-only">[*home]</i>%nn;
       </a>
-      <a role="button" class="btn btn-link %(ml-%if;(referer="")4%else;0%end;%) p-1"%sp;
-        href="%prefix_base_password;%nn;
-          %foreach;env_binding;%if;(env.key!="wide")%env.key=%env.val;;%end;%end;%nn;
-          %if;(evar.wide!="on")wide=on;%end;"%sp;
-        title="%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;">%nn;
-        <i class="fa fa-window-%if;(evar.wide="on")mini%else;maxi%end;mize fa-fw" aria-hidden="true"></i>%nn;
-        <span class="sr-only">%if;(evar.wide="on")[*user/password/cancel]2 [full width/columns]0 %else;[*full width/columns]0%end;</span>%nn;
-      </a>
       <a role="button" class="btn btn-link  text-primary ml-0 p-1" data-toggle="modal" data-target="#searchmodal">%nn;
         <i class="fa fa-search fa-fw" title="[*search/case sensitive]0" aria-hidden="true"></i>%nn;
         <span class="sr-only">[*search/case sensitive]0</span>%nn;
