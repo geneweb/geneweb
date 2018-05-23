@@ -12,6 +12,8 @@ open Util;
 value green_color = "#2f6400";
 value selected_addr = ref None;
 value selected_port = ref 2317;
+value selected_api_host = ref "127.0.0.1";
+value selected_api_port = ref 2322;
 value redirected_addr = ref None;
 value wizard_passwd = ref "";
 value friend_passwd = ref "";
@@ -1214,6 +1216,8 @@ value make_conf from_addr (addr, request) script_name contents env = do {
   let wizard_just_friend = if manitou then False else wizard_just_friend in
   let conf =
     {from = from_addr;
+     api_host = selected_api_host.val;
+     api_port = selected_api_port.val;
      manitou = manitou;
      supervisor = supervisor;
      wizard = ar.ar_wizard && not wizard_just_friend;
@@ -1923,7 +1927,11 @@ value main () =
     in
     let force_cgi = ref False in
     let speclist =
-      [("-hd", Arg.String Util.add_lang_path,
+      [(* links tree*)
+       ("-api_url", Arg.String (fun x -> Link.api_url.val := x),
+        "Url api for links tree");
+       (* normales... *)
+       ("-hd", Arg.String Util.add_lang_path,
         "<dir>\n       Directory where the directory lang is installed.");
        ("-bd", Arg.String Util.set_base_dir,
         "<dir>\n       Directory where the databases are installed.");
@@ -1942,6 +1950,12 @@ value main () =
        ("-p", Arg.Int (fun x -> selected_port.val := x),
         "<number>\n       Select a port number (default = " ^
           string_of_int selected_port.val ^ "); > 1024 for normal users.");
+      ("-api_h", Arg.String (fun x -> selected_api_host.val := x),
+       "<host>\n       Host for Geneweb API (default = " ^
+         selected_api_host.val ^ ")");
+      ("-api_p", Arg.Int (fun x -> selected_api_port.val := x),
+       "<number>\n       Port number for Geneweb API (default = " ^
+         string_of_int selected_api_port.val ^ "); > 1024 for normal users.");
        ("-setup_link", Arg.Set setup_link,
         "\n       Display a link to local gwsetup in bottom of pages.");
        ("-allowed_tags",

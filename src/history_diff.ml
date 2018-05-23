@@ -33,12 +33,13 @@ value history_d conf =
     [ Some path -> path
     | None -> "" ]
   in
+  let bname = Util.base_path [] conf.bname in
   let bname =
-    if Filename.check_suffix conf.bname ".gwb" then conf.bname
-    else conf.bname ^ ".gwb"
+    if Filename.check_suffix bname ".gwb" then bname
+    else bname ^ ".gwb"
   in
   List.fold_left
-    Filename.concat path [Util.base_path [] bname; "history_d"]
+    Filename.concat "" [path; (Util.base_path [] bname); "history_d"]
 ;
 
 (* Le chemin du fichier historique dans le dossier history_d. *)

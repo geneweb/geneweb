@@ -935,12 +935,12 @@ value infer_death birth bapt =
   [ (Some (Dgreg d _), _) ->
       let a = this_year - d.year in
       if a > dead_years.val then DeadDontKnowWhen
-      else if a <= alive_years.val then NotDead
+      else if a < alive_years.val then NotDead
       else DontKnowIfDead
   | (_, Some (Dgreg d _)) ->
       let a = this_year - d.year in
       if a > dead_years.val then DeadDontKnowWhen
-      else if a <= alive_years.val then NotDead
+      else if a < alive_years.val then NotDead
       else DontKnowIfDead
   | _ -> DontKnowIfDead ]
 ;

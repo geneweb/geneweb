@@ -4,6 +4,8 @@ module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
 
 
+open Config
+
 let api_url = ref "127.0.0.1:2322" ;;
 
 
@@ -90,6 +92,7 @@ let showInfo connection =
 
 let getContent connection url =
   Curl.set_url connection url;
+  Curl.set_timeoutms connection 1000;
   Curl.perform connection
 ;;
 
@@ -98,7 +101,7 @@ let getContent connection url =
 
 
 (* ************************************************************************** *)
-(*  [Fonc] init_cache : base -> string list -> string -> iper ->
+(*  [Fonc] init_cache : conf -> base -> string list -> string -> iper ->
                           int -> int -> int -> unit                           *)
 (** [Description] : Effecture les appels CURL afin d'initialiser le cache.
        Une fois que le cache est créé, on ne fait appel que à lui, ce qui veut
@@ -106,6 +109,7 @@ let getContent connection url =
        n'existe pas. Ex: si on ne trouve pas de parents dans le cache, ça veut
        dire que la personne n'a pas de parents.
     [Args] :
+      - conf : configuration de la base
       - base : base de donnée
       - request : la requete actuelle
       - base_prefix : le nom de la base locale
@@ -116,7 +120,7 @@ let getContent connection url =
     [Retour] : Néant
     [Rem] : Exporté en clair hors de ce module.                               *)
 (* ************************************************************************** *)
-let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
+let init_cache conf base request base_prefix ip nb_asc from_gen_desc nb_desc =
   let index = Some (Int32.of_int (Adef.int_of_iper ip)) in
   let base_prefix = chop_base_prefix base_prefix in
   let data =
@@ -133,8 +137,8 @@ let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
   let data = MLinkext.gen_link_tree_params data `pb in
   let url =
     Printf.sprintf
-      "http://127.0.0.1:2322/%s?m=API_LINK_TREE&input=pb&output=pb&sig=azerty&data=%s"
-      base_prefix (Wserver.encode data)
+      "http://%s:%d/%s?m=API_LINK_TREE&input=pb&output=pb&sig=azerty&data=%s"
+      conf.api_host conf.api_port base_prefix (Wserver.encode data)
   in
   let res = ref "" in
   Curl.global_init Curl.CURLINIT_GLOBALALL;
@@ -153,12 +157,12 @@ let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
         else headers
       in
       let headers =
-        (* On ajoute dans les headers la base redis que l'on veut utiliser. *)
-        let redis_moderate =
-          Wserver.extract_param "redis-moderate: " '\r' request
+        (* On ajoute dans les headers l'inclusion des not validated. *)
+        let include_not_validated =
+          Wserver.extract_param "inter-tree-links-include-not-validated: " '\r' request
         in
-        if redis_moderate <> "" then
-          ("Redis-Moderate: " ^ redis_moderate) :: headers
+        if include_not_validated <> "" then
+          ("Inter-Tree-Links-Include-Not-Validated: " ^ include_not_validated) :: headers
         else headers
       in
       Curl.set_httpheader connection headers;
@@ -166,6 +170,7 @@ let init_cache base request base_prefix ip nb_asc from_gen_desc nb_desc =
       Curl.set_writefunction connection (writer result);
       Curl.set_followlocation connection true;
       Curl.set_url connection url;
+      Curl.set_timeoutms connection 1000;
       Curl.perform connection;
       (*
         showContent result;

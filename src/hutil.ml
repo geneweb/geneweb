@@ -142,6 +142,7 @@ value incorrect_request conf = do {
   let title _ =
     Wserver.printf "%s" (Util.capitale (Util.transl conf "incorrect request"))
   in
+  Wserver.http HttpStatus.Bad_Request;
   header conf title;
   Wserver.printf "<p>\n";
   print_link_to_welcome conf False;

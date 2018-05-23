@@ -16,5 +16,6 @@ class FilterNbResults extends Filter {
 
 	public function __construct(){
 	}
+
 }
 ?>

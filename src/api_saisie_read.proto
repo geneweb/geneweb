@@ -1,9 +1,9 @@
 package geneweb.api.saisie_read.object;
 
 enum Sosa {
+  NO_SOSA = 2;
   SOSA_REF = 0;
   SOSA = 1;
-  NO_SOSA = 2;
 }
 
 enum Calendar {
@@ -39,26 +39,32 @@ message Date {
 }
 
 enum Sex {
+  UNKNOWN = 2;
   MALE = 0;
   FEMALE = 1;
-  UNKNOWN = 2;
 }
 
 enum DeathType {
+  DONT_KNOW_IF_DEAD = 4;
   NOT_DEAD = 0;
   DEAD = 1;
   DEAD_YOUNG = 2;
   DEAD_DONT_KNOW_WHEN = 3;
-  DONT_KNOW_IF_DEAD = 4;
   OF_COURSE_DEAD = 5;
 }
 
+enum BurialType {
+  DONT_KNOW = 0;
+  BURIED = 1;
+  CREMATED = 2;
+}
+
 enum MarriageType {
+  NO_MENTION = 4;
   MARRIED = 0;
   NOT_MARRIED = 1;
   ENGAGED = 2;
   NO_SEXES_CHECK_NOT_MARRIED = 3;
-  NO_MENTION = 4;
   NO_SEXES_CHECK_MARRIED = 5;
 }
 
@@ -84,24 +90,126 @@ enum RelationType {
 enum WitnessType {
   WITNESS = 0;
   WITNESS_GODPARENT = 1;
+  WITNESS_OFFICER = 2;
+}
+
+enum EventType {
+  EPERS_BIRTH = 0;
+  EPERS_BAPTISM = 1;
+  EPERS_DEATH = 2;
+  EPERS_BURIAL = 3;
+  EPERS_CREMATION = 4;
+  EPERS_ACCOMPLISHMENT = 5;
+  EPERS_ACQUISITION = 6;
+  EPERS_ADHESION = 7;
+  EPERS_BAPTISMLDS = 8;
+  EPERS_BARMITZVAH = 9;
+  EPERS_BATMITZVAH = 10;
+  EPERS_BENEDICTION = 11;
+  EPERS_CHANGENAME = 12;
+  EPERS_CIRCUMCISION = 13;
+  EPERS_CONFIRMATION = 14;
+  EPERS_CONFIRMATIONLDS = 15;
+  EPERS_DECORATION = 16;
+  EPERS_DEMOBILISATIONMILITAIRE = 17;
+  EPERS_DIPLOMA = 18;
+  EPERS_DISTINCTION = 19;
+  EPERS_DOTATION = 20;
+  EPERS_DOTATIONLDS = 21;
+  EPERS_EDUCATION = 22;
+  EPERS_ELECTION = 23;
+  EPERS_EMIGRATION = 24;
+  EPERS_EXCOMMUNICATION = 25;
+  EPERS_FAMILYLINKLDS = 26;
+  EPERS_FIRSTCOMMUNION = 27;
+  EPERS_FUNERAL = 28;
+  EPERS_GRADUATE = 29;
+  EPERS_HOSPITALISATION = 30;
+  EPERS_ILLNESS = 31;
+  EPERS_IMMIGRATION = 32;
+  EPERS_LISTEPASSENGER = 33;
+  EPERS_MILITARYDISTINCTION = 34;
+  EPERS_MILITARYPROMOTION = 35;
+  EPERS_MILITARYSERVICE = 36;
+  EPERS_MOBILISATIONMILITAIRE = 37;
+  EPERS_NATURALISATION = 38;
+  EPERS_OCCUPATION = 39;
+  EPERS_ORDINATION = 40;
+  EPERS_PROPERTY = 41;
+  EPERS_RECENSEMENT = 42;
+  EPERS_RESIDENCE = 43;
+  EPERS_RETIRED = 44;
+  EPERS_SCELLENTCHILDLDS = 45;
+  EPERS_SCELLENTPARENTLDS = 46;
+  EPERS_SCELLENTSPOUSELDS = 47;
+  EPERS_VENTEBIEN = 48;
+  EPERS_WILL = 49;
+  EPERS_CUSTOM = 50;
+
+  EFAM_MARRIAGE = 100;
+  EFAM_NO_MARRIAGE = 101;
+  EFAM_NO_MENTION = 102;
+  EFAM_ENGAGE = 103;
+  EFAM_DIVORCE = 104;
+  EFAM_SEPARATED = 105;
+  EFAM_ANNULATION = 106;
+  EFAM_MARRIAGE_BANN = 107;
+  EFAM_MARRIAGE_CONTRACT = 108;
+  EFAM_MARRIAGE_LICENSE = 109;
+  EFAM_PACS = 110;
+  EFAM_RESIDENCE = 111;
+  EFAM_CUSTOM = 112;
+}
+
+message FicheParameters {
+  required IdentifierPerson identifier_person = 1;
+  optional int32 nb_asc_max = 2;
+  optional int32 nb_desc_max = 3;
+  optional bool simple_graph_info = 4;
+  optional bool no_event = 5;
 }
 
 message WitnessEvent {
   required WitnessType witness_type = 1;
   required SimplePerson witness = 2;
 }
+message WitnessFicheEvent {
+  required WitnessType witness_type = 1;
+  required Person witness = 2;
+}
 
 message Event {
   required string name = 1;
-  optional string date = 2;
-  optional string date_conv = 3;
-  optional Calendar date_cal = 4;
-  optional string place = 5;
-  optional string reason = 6;
-  optional string note = 7;
-  optional string src = 8;
-  optional SimplePerson spouse = 9;
-  repeated WitnessEvent witnesses = 10;
+  required EventType type = 2;
+  optional string date = 3;
+  optional string date_long = 4;
+  optional string date_raw = 13;
+  optional string date_conv = 5;
+  optional string date_conv_long = 14;
+  optional Calendar date_cal = 6;
+  optional string place = 7;
+  optional string reason = 8;
+  optional string note = 9;
+  optional string src = 10;
+  optional SimplePerson spouse = 11;
+  repeated WitnessEvent witnesses = 12;
+}
+
+message FicheEvent {
+  required string name = 1;
+  required EventType type = 2;
+  optional string date = 3;
+  optional string date_long = 4;
+  optional string date_raw = 13;
+  optional string date_conv = 5;
+  optional string date_conv_long = 14;
+  optional Calendar date_cal = 6;
+  optional string place = 7;
+  optional string reason = 8;
+  optional string note = 9;
+  optional string src = 10;
+  optional Person spouse = 11;
+  repeated WitnessFicheEvent witnesses = 12;
 }
 
 message PersonTree {
@@ -128,17 +236,28 @@ message SimplePerson {
   required string p = 6;
   required int32 occ = 7;
   optional string birth_short_date = 8;
+  optional string birth_date_raw = 15;
   optional string birth_place = 9;
   optional string death_short_date = 10;
+  optional string death_date_raw = 16;
   optional string death_place = 11;
   optional string image = 12;
   required Sosa sosa = 13;
   required string baseprefix = 14;
+  optional string sosa_nb = 17;
+  required bool visible_for_visitors = 18;
+  required bool has_parent = 19;
+  required bool has_spouse = 20;
+  required bool has_child = 21;
 }
 
 message RelationPerson {
   required RelationType r_type = 1;
   required SimplePerson person = 2;
+}
+message RelationFichePerson {
+  required RelationType r_type = 1;
+  required Person person = 2;
 }
 
 message EventWitness {
@@ -147,77 +266,164 @@ message EventWitness {
   optional SimplePerson wife = 3;
 }
 
+message EventFicheWitness {
+  required string event_witness_type = 1;
+  required Person husband = 2;
+  optional Person wife = 3;
+}
+
 message Person {
-  required int32 index = 1;
-  required Sex sex = 2;
-  required string lastname = 3;
-  required string firstname = 4;
-  required string n = 5;
-  required string p = 6;
-  required int32 occ = 7;
-  optional string public_name = 8;
-  repeated string aliases = 9;
-  repeated string qualifiers = 10;
-  repeated string firstname_aliases = 11;
-  repeated string surname_aliases = 12;
-  optional string image = 13;
-  optional string birth_date = 14;
-  optional string birth_date_conv = 15;
-  optional Calendar birth_date_cal = 16;
-  optional string birth_place = 17;
-  optional string birth_src = 18;
-  optional string baptism_date = 19;
-  optional string baptism_date_conv = 20;
-  optional Calendar baptism_date_cal = 21;
-  optional string baptism_place = 22;
-  optional string baptism_src = 23;
-  optional string death_date = 24;
-  optional string death_date_conv = 25;
-  optional Calendar death_date_cal = 26;
-  optional string death_place = 27;
-  optional string death_src = 28;
-  required DeathType death_type = 29;
-  optional string burial_date = 30;
-  optional string burial_date_conv = 31;
-  optional Calendar burial_date_cal = 32;
-  optional string burial_place = 33;
-  optional string burial_src = 34;
-  optional string occupation = 35;
-  optional string notes = 36;
-  optional string psources = 37;
-  required bool has_sources = 38;
-  repeated string titles = 39;
-  repeated RelationPerson related = 40;
-  repeated RelationPerson rparents = 41;
-  optional SimplePerson father = 42;
-  optional SimplePerson mother = 43;
-  repeated Family families = 44;
-  required Sosa sosa = 45;
-  repeated Event events = 46;
-  repeated EventWitness events_witnesses = 47;
+  extensions 100 to 150;
+
+  enum Type {
+    SIMPLE = 1;
+    FULL = 2;
+    FICHE = 3;
+  }
+
+  required Type type = 1;
+
+  required int32 index = 2;
+  required Sex sex = 3;
+  required string lastname = 4;
+  required string firstname = 5;
+  required string n = 6;
+  required string p = 7;
+  required int32 occ = 8;
+  optional string public_name = 9;
+  repeated string aliases = 10;
+  repeated string qualifiers = 11;
+  repeated string firstname_aliases = 12;
+  repeated string surname_aliases = 13;
+  optional string image = 14;
+  optional string birth_date = 15;
+  optional string birth_date_conv = 16;
+  optional Calendar birth_date_cal = 17;
+  optional string birth_place = 18;
+  optional string birth_src = 19;
+  optional string baptism_date = 20;
+  optional string baptism_date_conv = 21;
+  optional Calendar baptism_date_cal = 22;
+  optional string baptism_place = 23;
+  optional string baptism_src = 24;
+  optional string death_date = 25;
+  optional string death_date_conv = 26;
+  optional Calendar death_date_cal = 27;
+  optional string death_place = 28;
+  optional string death_src = 29;
+  required DeathType death_type = 30;
+  optional string burial_date = 31;
+  optional string burial_date_conv = 32;
+  optional Calendar burial_date_cal = 33;
+  optional string burial_place = 34;
+  optional string burial_src = 35;
+  optional string occupation = 36;
+  optional string notes = 37;
+  optional string psources = 38;
+  required bool has_sources = 39;
+  repeated string titles = 40;
+  repeated RelationPerson related = 41;
+  repeated RelationPerson rparents = 42;
+  optional SimplePerson father = 43;
+  optional SimplePerson mother = 44;
+  repeated Family families = 45;
+  required Sosa sosa = 46;
+  repeated Event events = 47;
+  repeated EventWitness events_witnesses = 48;
+  required string baseprefix = 49;
+}
+
+message FichePerson {
+  extend Person {
+    optional FichePerson person = 103;
+  }
+
+  optional string birth_date_raw = 1;
+  optional string birth_text = 2;
+  optional string baptism_date_raw = 3;
+  optional string baptism_text = 4;
+  optional string death_date_raw = 5;
+  optional string death_text = 6;
+  optional string burial_date_raw = 7;
+  optional string burial_text = 8;
+  optional string cremation_text = 9;
+  required BurialType burial_type = 10;
+  repeated string titles_links = 11;
+  optional string sosa_nb = 12;
+  required bool has_history = 13;
+  required bool has_possible_duplications = 14;
+  optional int32 ref_index = 15;
+  optional Person ref_person = 16;
+  required string linked_page_biblio = 17;
+  required string linked_page_bnote = 18;
+  required string linked_page_death = 19;
+  required string linked_page_head = 20;
+  required string linked_page_occu = 21;
+  required bool visible_for_visitors = 22;
+  optional Person father = 23;
+  optional Person mother = 24;
+  repeated FicheFamily families = 25;
+  repeated RelationFichePerson related = 26;
+  repeated RelationFichePerson rparents = 27;
+  repeated EventFicheWitness events_witnesses = 28;
+  repeated FicheEvent events = 29;
 }
 
 message Family {
   required int32 index = 1;
   required SimplePerson spouse = 2;
   optional string marriage_date = 3;
-  optional string marriage_date_conv = 4;
-  optional Calendar marriage_date_cal = 5;
-  optional string marriage_place = 6;
-  optional string marriage_src = 7;
-  required MarriageType marriage_type = 8;
-  required DivorceType divorce_type = 9;
-  optional string divorce_date = 10;
-  optional string divorce_date_conv = 11;
-  optional Calendar divorce_date_cal = 12;
-  repeated SimplePerson witnesses = 13;
-  optional string notes = 14;
-  optional string fsources = 15;
-  repeated SimplePerson children = 16;
+  optional string marriage_date_long = 4;
+  optional string marriage_date_raw = 19;
+  optional string marriage_date_conv = 5;
+  optional string marriage_date_conv_long = 21;
+  optional string marriage_date_text = 23;
+  optional Calendar marriage_date_cal = 6;
+  optional string marriage_place = 7;
+  optional string marriage_src = 8;
+  required MarriageType marriage_type = 9;
+  required DivorceType divorce_type = 10;
+  optional string divorce_date = 11;
+  optional string divorce_date_long = 12;
+  optional string divorce_date_raw = 20;
+  optional string divorce_date_conv = 13;
+  optional string divorce_date_conv_long = 22;
+  optional Calendar divorce_date_cal = 14;
+  repeated SimplePerson witnesses = 15;
+  optional string notes = 16;
+  optional string fsources = 17;
+  repeated SimplePerson children = 18;
+}
+
+message FicheFamily {
+  required int32 index = 1;
+  required Person spouse = 2;
+  optional string marriage_date = 3;
+  optional string marriage_date_long = 4;
+  optional string marriage_date_raw = 19;
+  optional string marriage_date_conv = 5;
+  optional string marriage_date_conv_long = 21;
+  optional string marriage_date_text = 23;
+  optional Calendar marriage_date_cal = 6;
+  optional string marriage_place = 7;
+  optional string marriage_src = 8;
+  required MarriageType marriage_type = 9;
+  required DivorceType divorce_type = 10;
+  optional string divorce_date = 11;
+  optional string divorce_date_long = 12;
+  optional string divorce_date_raw = 20;
+  optional string divorce_date_conv = 13;
+  optional string divorce_date_conv_long = 22;
+  optional Calendar divorce_date_cal = 14;
+  repeated Person witnesses = 15;
+  optional string notes = 16;
+  optional string fsources = 17;
+  repeated Person children = 18;
 }
 
 message IndexPerson {
   required int32 index = 1;
+  optional int32 indexz = 2;
 }
 
 message Node {
@@ -250,11 +456,11 @@ message GraphTreeNew {
 }
 
 message GraphTreeParams {
-  required int32 index = 1;
+  required IdentifierPerson identifier_person = 1;
   optional int32 nb_asc = 2;
   optional int32 nb_desc = 3;
+  optional int32 indexz = 4;
 }
-
 
 // ***************************************************************************
 // Version identique mais avec des personnes full
@@ -340,4 +546,27 @@ message GraphTreeFull {
   repeated NodeFull nodes_siblings = 7;
   repeated NodeFull nodes_siblings_before = 8;
   repeated NodeFull nodes_siblings_after = 9;
+}
+
+message IdentifierPerson {
+  optional int32 index = 1;
+  optional string n = 2;
+  optional string p = 3;
+  optional int32 oc = 4;
+  optional bool track_visit = 5;
+}
+
+message Error {
+  enum Code {
+    BAD_REQUEST = 400;
+    UNAUTHORIZED = 401;
+    FORBIDDEN = 403;
+    NOT_FOUND = 404;
+  }
+  required Code code = 998;
+  optional string message = 999;
+}
+
+message NbAncestors {
+  required int32 nb = 1;
 }

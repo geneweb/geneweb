@@ -11,8 +11,7 @@ open Def
 open Util
 open Api_def
 open Api_util
-
-
+open Api_update_util
 
 let reconstitute_family conf base mod_f =
   (* Valeurs par défaut qui seront écrasées par reconstitute_from_fevents. *)
@@ -98,66 +97,7 @@ let reconstitute_family conf base mod_f =
                     | `witness_godparent -> Witness_GodParent
                     | `witness_officer   -> Witness_Officer
                   in
-                  let create_link = person.Mwrite.Person_link.create_link in
-                  let wit =
-                    (match create_link with
-                     | `create_default_occ ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | ` unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ =
-                           match person.Mwrite.Person_link.occ with
-                           | Some occ -> Int32.to_int occ
-                           | None -> 0
-                         in
-                         ((fn, sn, occ, Update.Create (sex, None), "", false), wk)
-                     | `create ->
-                         let sex =
-                           match person.Mwrite.Person_link.sex with
-                           | `male -> Male
-                           | `female -> Female
-                           | ` unknown -> Neuter
-                         in
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ = Api_update_util.api_find_free_occ base fn sn in
-                         (*
-                         let occ = Api_update_util.find_free_occ base fn sn in
-                         (* On met à jour parce que si on veut le rechercher, *)
-                         (* il faut qu'on connaisse son occ.                  *)
-                         let () =
-                           if occ = 0 then person.Mwrite.Person_link.occ <- None
-                           else person.Mwrite.Person_link.occ <- Some (Int32.of_int occ)
-                         in
-                         *)
-                         ((fn, sn, occ, Update.Create (sex, None), "", true), wk)
-                     | `link ->
-                         let ip = Int32.to_int person.Mwrite.Person_link.index in
-                         let p = poi base (Adef.iper_of_int ip) in
-                         let fn = sou base (get_first_name p) in
-                         let sn = sou base (get_surname p) in
-                         let occ =
-                           if fn = "?" || sn = "?" then
-                             Adef.int_of_iper (get_key_index p)
-                           else get_occ p
-                         in
-                         (*
-                         let fn = person.Mwrite.Person_link.firstname in
-                         let sn = person.Mwrite.Person_link.lastname in
-                         let occ =
-                           get_occ
-                             (poi base
-                                (Adef.iper_of_int
-                                   (Int32.to_int person.Mwrite.Person_link.index)))
-                         in
-                         *)
-                         ((fn, sn, occ, Update.Link, "", false), wk))
-                  in
+                  let wit = (reconstitute_somebody conf base person, wk) in
                   wit :: accu
               | None -> accu)
             evt.Mwrite.Fevent.witnesses []
@@ -490,8 +430,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
             in
             (* TODO ?? idem enfant/witness ? *)
             (* optim ? regarder que ceux dont index = 0 *)
-            (* TODO *)
-            let _ =
+            let (wl, ml) =
               UpdateFamOk.all_checks_family
                 conf base ifam fam cpl des (scpl, sdes, None)
             in
@@ -534,7 +473,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
               [(fun () -> History.record conf base changed act);
                (fun () -> Update.delete_topological_sort conf base)]
             in
-            Api_update_util.UpdateSuccess ([], hr)
+            Api_update_util.UpdateSuccess (wl, ml, hr)
           end)
   with
   | Update.ModErrApi s -> Api_update_util.UpdateError s
@@ -571,10 +510,10 @@ let print_del conf base ip ifam =
           [(fun () -> History.record conf base changed "df");
            (fun () -> Update.delete_topological_sort conf base)]
         in
-        Api_update_util.UpdateSuccess ([], hr)
+        Api_update_util.UpdateSuccess ([], [], hr)
       end
     else
-      Api_update_util.UpdateSuccess ([], [])
+      Api_update_util.UpdateSuccess ([], [], [])
   end
 ;;
 
@@ -658,7 +597,7 @@ let print_mod conf base ip mod_f =
         [(fun () -> History.record conf base changed "mf");
          (fun () -> Update.delete_topological_sort conf base)]
       in
-      Api_update_util.UpdateSuccess (wl, hr)
+      Api_update_util.UpdateSuccess (wl, ml, hr)
     end
   in
   print_mod_aux conf base ip mod_f callback

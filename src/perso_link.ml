@@ -702,7 +702,6 @@ value can_merge_child base_prefix children c_link =
         with [ Not_found -> loop children ] ]
 ;
 
-
 (**/**)
 
 
@@ -724,7 +723,60 @@ value init_cache conf base ip nb_asc from_gen_desc nb_desc =
   (* Option pour activer/desactiver totalement le cache. *)
   let init = Wserver.extract_param "links-tree: " '\n' conf.request in
   if init = "1" then
-    Link.init_cache base conf.request conf.bname ip
+    Link.init_cache conf base conf.request conf.bname ip
       nb_asc from_gen_desc nb_desc
   else ()
+;
+
+(* ***************************************************************************** *)
+(*  [Fonc] max_interlinks_descendancy_level : config -> base -> ip -> int -> int *)
+(** [Description] : Retourne le nombre maximal de niveaux de descendance
+                    en prenant en compte les liens inter-arbres.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - ip   : l'index de la personne
+      - max_lev : limite du nombre d'ascendants
+    [Retour] :
+      - int
+                                                                                *)
+(* **************************************************************************** *)
+value max_interlinks_descendancy_level conf base ip max_lev =
+  let x = ref 0 in
+  (* Charge le cache *)
+  let () = init_cache conf base ip 10 1 max_lev in
+  (* Itère sur chaque personne de l'arbre *)
+  let rec loop level (ip, base_prefix) = do {
+    (* Met à jour x.val avec la valeur la plus haute du niveau trouvé. *)
+    x.val := max x.val level;
+    (* Sort de la boucle si le nombre de descendants est suffisamment haut. *)
+    if (x.val = max_lev)
+        then ()
+    else
+      (* Récupère les différentes familles déclarées dans d'autres arbres de la personne. *)
+      let families_link = get_family_link base_prefix ip in
+      do {
+      (* Itère sur chaque famille. *)
+      List.iter
+        (fun family_link ->
+          do {
+            (* Itère sur chaque enfant de la famille. *)
+            List.iter
+              (fun child_link ->
+                (* Prend le nom de l'arbre de la famille en cours. *)
+                let baseprefix = child_link.MLink.Person_link.baseprefix in
+                (* Prend l'index de l'enfant. *)
+                let ip_child =  Adef.iper_of_int (Int32.to_int child_link.MLink.Person_link.ip) in
+                 do {
+                     (* Recherche à nouveau des descendants sur l'enfant en incrémentant le niveau de descendance. *)
+                     loop (succ level) (ip_child, baseprefix)
+                 }
+              ) family_link.MLink.Family.children
+          }
+        ) families_link
+     }
+  }
+  in
+  (* Lance une première fois la recherche de descendants sur la personne de l'arbre d'origine. *)
+  do { loop 0 (ip, conf.command); x.val }
 ;

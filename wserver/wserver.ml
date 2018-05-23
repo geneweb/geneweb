@@ -179,8 +179,13 @@ value encode s =
   else s
 ;
 
+value http_redirect_temporarily url = do {
+  http HttpStatus.Moved_Temporarily ;
+  printnl "Location: %s" url
+};
+
 value print_exc exc =
-  match exc with
+  let () = match exc with
   [ Unix.Unix_error err fun_name arg -> do {
       prerr_string "\"";
       prerr_string fun_name;
@@ -233,10 +238,13 @@ value print_exc exc =
         prerr_char ')';
       }
       else ();
-      prerr_char '\n';
-      prerr_string "Wserver: full backtrace: ";
-      Printexc.print_backtrace stderr;
-    } ]
+      prerr_char '\n'
+    } ] in
+
+  let () = if Printexc.backtrace_status () then do {
+    prerr_string "Backtrace:\n";
+    Printexc.print_backtrace stderr;
+  } else () in ()
 ;
 
 value print_err_exc exc = do { print_exc exc; flush stderr };
