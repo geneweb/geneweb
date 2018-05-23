@@ -22,16 +22,10 @@ gwlib.ml:
 	echo "  [ Not_found -> \"$(PREFIX)\" ]" | sed -e 's|\\|/|g' >> $@
 	echo ";" >> $@
 
-api_link.cmx api_link.cmo: OCAMLFLAGS += -I $(OCURL) -I $(LREDIS) -package yojson -package redis
+api_link.cmx api_link.cmo: OCAMLFLAGS += -package yojson -package redis-sync
 
-ifeq ($(WITH_API),y)
-gwd.out gwd.opt: OCAMLFLAGS += -package piqirun.ext -package curl -package redis
-gwd.out gwd.opt: LIBS = re_emacs re_str redis_sync #removes unix
-gwd.out gwd.opt: LINKFLAGS += -I $(OCURL) -I $(RE) -I $(LREDIS) \
-	-package re -package uuidm -package yojson -package redis
-endif
-
-gwd.out gwd.opt: LIBS += str gramlib
+gwd.out gwd.opt: OCAMLFLAGS += -package piqirun.ext -package curl -package redis-sync -package yojson
+gwd.out gwd.opt: LIBS = str gramlib #removes unix
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out

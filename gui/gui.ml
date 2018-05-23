@@ -91,7 +91,7 @@ value channel_redirector channel callback = do {
         if List.mem `IN cond then do {
           (* On Windows, you must use Io.read *)
           let len =
-            GMain.Io.read chan ~{ buf = Bytes.to_string buf; pos = 0; len }
+            GMain.Io.read chan ~{ buf = Bytes.to_string buf ; pos = 0; len }
           in
           len >= 1 && (callback (Bytes.sub  buf 0 len))
         }

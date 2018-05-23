@@ -147,7 +147,9 @@ value merge_fam1 conf base fam1 fam2 =
 value merge_fam conf base (ifam1, fam1) (ifam2, fam2) =
   let cpl1 = foi base ifam1 in
   let cpl2 = foi base ifam2 in
-  if get_father cpl1 = get_father cpl2 && get_mother cpl1 = get_mother cpl2
+  (* Vérifie que les deux couples sont identiques. Il est possible dans certains cas (couple de même sexe) que les personnes soient inversées dans l'union. *)
+  if (get_father cpl1 = get_father cpl2 && get_mother cpl1 = get_mother cpl2) ||
+     (get_father cpl1 = get_mother cpl2 && get_mother cpl1 = get_father cpl2)
   then
     if need_differences_selection conf base fam1 fam2 &&
        compatible_fevents (get_fevents fam1) (get_fevents fam2)

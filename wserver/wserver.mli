@@ -37,6 +37,10 @@ value http : HttpStatus.t -> unit;
     (* [Wserver.http answer] sends the http header where [answer]
        represents the answer status. If empty string, "200 OK" is assumed. *)
 
+value http_redirect_temporarily : string -> unit;
+    (* [Wserver.http_redirect url] sends the http header where [url]
+       represents the Location where the request needs to be redirected. *)
+
 value encode : string -> string;
     (* [Wserver.encode s] encodes the string [s] in another string
        where spaces and special characters are coded. This allows

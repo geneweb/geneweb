@@ -55,7 +55,7 @@ class GenewebAPI {
 
     protected static $instances = array();
 
-	public    $lastUrl;
+    public    $lastUrl;
 
     /**
      * Constructeur privé

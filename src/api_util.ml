@@ -1,6 +1,5 @@
 (* nocamlp5 *)
 
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
@@ -761,6 +760,7 @@ let print_result conf data =
   in
   let data = data output in
   Util.html conf ;
+  Util.nl ();
   Wserver.printf "%s" data
 ;;
 
@@ -827,6 +827,7 @@ let empty_piqi_person_light conf ref_person base_loop =
     ascend = false;
     descend = false;
     visible_for_visitors = false;
+    baseprefix = conf.command;
   })
 ;;
 
@@ -881,6 +882,7 @@ let empty_piqi_person_full conf ref_person base_loop =
     visible_for_visitors = false;
     parents = None;
     families = [];
+    baseprefix = conf.command;
   })
 ;;
 
@@ -964,8 +966,7 @@ let spouse_to_piqi_spouse conf base p fam base_loop compute_sosa load_img =
   let occ = Int32.of_int (get_occ p) in
   let publicname = if gen_p.public_name = "" then None else Some gen_p.public_name in
   let image =
-    if conf.no_image then ""
-    else if p_auth then
+    if has_image conf base p then
       begin
         if not (gen_p.image = "") then gen_p.image
         else
@@ -1123,8 +1124,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
   let occ = Int32.of_int (get_occ p) in
   let publicname = if gen_p.public_name = "" then None else Some gen_p.public_name in
   let image =
-    if conf.no_image then ""
-    else if p_auth then
+    if has_image conf base p then
       begin
         if not (gen_p.image = "") then gen_p.image
         else
@@ -1214,6 +1214,8 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
       (fun c -> Array.length (get_children c) > 0)
       (List.map (foi base) faml)
   in
+  let baseprefix = conf.command
+  in
   let visible = is_visible conf base p in
   M.Person.({
     sosa = sosa_p;
@@ -1238,6 +1240,7 @@ let pers_to_piqi_person_light conf base p base_loop compute_sosa load_img =
     ascend = ascend;
     descend = descend;
     visible_for_visitors = visible;
+    baseprefix = baseprefix;
   })
 ;;
 
@@ -1291,12 +1294,14 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
   let index = Int32.of_int (Adef.int_of_iper gen_p.key_index) in
   let publicname = if gen_p.public_name = "" then None else Some gen_p.public_name in
   let aliases = gen_p.aliases in
-  let qualifiers = gen_p.qualifiers in
+  let qualifiers =
+    if not p_auth && (is_hide_names conf p) then []
+    else gen_p.qualifiers
+  in
   let firstname_aliases = gen_p.first_names_aliases in
   let surname_aliases = gen_p.surnames_aliases in
   let image =
-    if conf.no_image then ""
-    else if p_auth then
+    if has_image conf base p then
       begin
         if not (gen_p.image = "") then gen_p.image
         else
@@ -1464,6 +1469,8 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
      | Some ifam -> Some (Int32.of_int (Adef.int_of_ifam ifam))
      | None -> None
   in
+  let baseprefix = conf.command
+  in
   let visible = is_visible conf base p in
   M.Full_person.({
     sosa = sosa_p;
@@ -1501,6 +1508,7 @@ let pers_to_piqi_person_full conf base p base_loop compute_sosa load_img =
     visible_for_visitors = visible;
     parents = parents;
     families = families;
+    baseprefix = baseprefix;
   })
 ;;
 
@@ -1938,7 +1946,7 @@ let pers_to_piqi_app_person conf base p =
                  match wk with
                  | Witness -> `witness
                  | Witness_GodParent -> `witness_godparent
-                 | Witness_Officer   -> `witness_officer
+                 | Witness_Officer -> `witness_officer
                in
                let index = Int32.of_int (Adef.int_of_iper ip) in
                Mapp.Witness_event.({

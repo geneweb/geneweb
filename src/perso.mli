@@ -20,12 +20,20 @@ value links_to_ind :
   config -> base -> list (NotesLinks.page * ('a * list ('b * 'c))) ->
     'b -> list NotesLinks.page;
 
+value build_sosa_tree_ht : config -> base -> person -> unit;
 value build_sosa_ht : config -> base -> unit;
 value get_sosa_person : config -> base -> person -> Sosa.t;
 value get_single_sosa : config -> base -> person -> Sosa.t;
 value print_sosa : config -> base -> person -> bool -> unit;
 
 value string_of_num : string -> Sosa.t -> string;
+value get_linked_page : config -> base -> person -> string -> string;
+value get_birth_text : config -> base -> person -> bool -> string;
+value get_baptism_text : config -> base -> person -> bool -> string;
+value get_death_text : config -> base -> person -> bool -> string;
+value get_burial_text : config -> base -> person -> bool -> string;
+value get_cremation_text : config -> base -> person -> bool -> string;
+value get_marriage_date_text : config -> base -> family -> bool -> string;
 
 (**)
 
@@ -52,6 +60,9 @@ value nobility_titles_list :
   config -> base -> person -> 
     list (int * Def.gen_title_name istr * istr * list istr *
        list (option Adef.date * option Adef.date));
+
+value has_history : config -> base -> person -> bool -> bool;
+value has_possible_duplications : config -> base -> person -> bool;
 
 value string_of_title : 
   config -> base -> string -> person -> 

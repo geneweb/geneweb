@@ -9,6 +9,7 @@ class ProtobufEnum {
 			return self::$_values[$value];
 		return 'UNKNOWN';
 	}
+
 }
 
 class ProtobufMessage {
@@ -27,6 +28,7 @@ class ProtobufMessage {
 				fclose($fp);
 		}
 	}
+
 }
 
 /**
@@ -311,5 +313,6 @@ class Protobuf {
 		}
 		return $ret;
 	}
+
 }
 ?>

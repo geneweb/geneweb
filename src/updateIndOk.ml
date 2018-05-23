@@ -227,7 +227,7 @@ value rec reconstitute_pevents conf ext cnt =
       in
       let epers_note =
         match get_nth conf "e_note" cnt with
-        [ Some note -> only_printable_or_nl (strip_all_trailing_spaces note)
+        [ Some note -> Util.sanitize_html (only_printable_or_nl (strip_all_trailing_spaces note))
         | _ -> "" ]
       in
       let epers_src =
@@ -690,7 +690,8 @@ value reconstitute_person conf =
   let (pevents, ext) = reconstitute_insert_pevent conf ext 0 pevents in
   let notes =
     if first_name = "?" || surname = "?" then ""
-    else only_printable_or_nl (strip_all_trailing_spaces (get conf "notes"))
+    else
+      Util.sanitize_html (only_printable_or_nl (strip_all_trailing_spaces (get conf "notes")))
   in
   let psources = only_printable (get conf "src") in
   (* Mise à jour des évènements principaux. *)

@@ -36,6 +36,7 @@ value very_unknown conf =
           (Util.transl conf ":") prenom nom
       in
       do {
+        Wserver.http HttpStatus.Not_Found;
         rheader conf title; print_link_to_welcome conf False; trailer conf;
       }
   | _ -> incorrect_request conf ]
@@ -47,6 +48,7 @@ value unknown conf n =
       (Util.transl conf ":") n
   in
   do {
+    Wserver.http  HttpStatus.Not_Found;
     rheader conf title; print_link_to_welcome conf False; trailer conf;
   }
 ;
@@ -76,6 +78,15 @@ value person_selected conf base p =
   | None -> do {
       record_visited conf (get_key_index p);
       Perso.print conf base p } ]
+;
+
+value person_selected_with_redirect conf base p =
+  match p_getenv conf.senv "em" with
+  [ Some "R" -> relation_print conf base p
+  | Some mode -> incorrect_request conf
+  | None -> do {
+      Wserver.http_redirect_temporarily (commd conf ^ Util.acces conf base p)
+  } ]
 ;
 
 value compact_list conf base xl =
@@ -545,7 +556,7 @@ value family_m conf base =
             match p_getenv conf.env "t" with
             [ Some "P" -> [("fn", n) :: conf.env]
             | Some "N" -> [("sn", n) :: conf.env]
-            | _ -> [("n", n) :: conf.env] ]
+            | _ -> [("v", n) :: conf.env] ]
         | None -> conf.env ]
       in
       let conf = {(conf) with env = env} in
@@ -573,11 +584,11 @@ value family_m conf base =
                    Gutil.person_of_string_key base n <> None ||
                    person_is_std_key conf base p n
                 then
-                  person_selected conf base p
+                  person_selected_with_redirect conf base p
                 else specify conf base n pl
             | pl -> specify conf base n pl ]
           in
-          match real_input "n" with
+          match real_input "v" with
           [ Some n -> search n
           | None ->
               match (real_input "fn", real_input "sn") with
@@ -683,6 +694,7 @@ IFDEF API THEN
   | Some "API_LIST_PERSONS" -> Api.print_list_ref_person conf base
   | Some "API_LOOP_BASE" -> Api.print_loop conf base
   | Some "API_MAX_ANCESTORS" when conf.wizard -> Api.print_max_ancestors conf base
+  | Some "API_NB_ANCESTORS" -> Api_saisie_read.print_nb_ancestors conf base
   | Some "API_NOTIFICATION_BIRTHDAY" -> Api.print_notification_birthday conf base
   | Some "API_PRINT_INDEX" -> Api.print_all_full_person conf base
   | Some "API_PRINT_EXPORT" -> Api.print_export conf base
@@ -696,11 +708,9 @@ IFDEF API THEN
   | Some "API_UPDATE_PERSON" -> Api_update_person.print_mod conf base
   | Some "API_UPDATE_FAMILY" -> Api_update_family.print_mod conf base
 *)
-  | Some "API_GRAPH_TREE" -> Api_saisie_read.print_graph_tree conf base
   | Some "API_GRAPH_TREE_V2" -> Api_saisie_read.print_graph_tree_v2 conf base
-  | Some "API_GRAPH_TREE_FULL" -> Api_saisie_read.print_graph_tree_full conf base
   | Some "API_PERSON_TREE" -> Api_saisie_read.print_person_tree conf base
-
+  | Some "API_FICHE_PERSON" -> Api_saisie_read.print_fiche_person conf base
   | Some "API_AUTO_COMPLETE" when conf.wizard -> Api_saisie_write.print_auto_complete conf base
   | Some "API_GET_CONFIG" when conf.wizard -> Api_saisie_write.print_config conf base
   | Some "API_PERSON_SEARCH_LIST" when conf.wizard -> Api_saisie_write.print_person_search_list conf base

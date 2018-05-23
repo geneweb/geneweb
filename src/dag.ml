@@ -179,8 +179,8 @@ value image_normal_txt conf base p fname width height =
 value image_url_txt conf base url_p url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url_p ^
-    sprintf "<img src=\"%s\"\nheight=%d alt=\"%s\" title=\"%s\" style=\"%s\" />"
-      url height image_txt image_txt
+    sprintf "<img src=\"%s\"\n alt=\"%s\" title=\"%s\" style=\"%s\" />"
+      url image_txt image_txt
       (if height = 0 then "" else " max-height:" ^ string_of_int height ^ "px;") ^
     "</a>\n"
 ;
@@ -199,28 +199,34 @@ value image_txt conf base p =
   match p_getenv conf.env "image" with
   [ Some "off" -> ""
   | _ ->
-      match image_and_size conf base p (limited_image_size 100 75) with
-      [ Some (True, f, Some (wid, hei)) ->
-          "<br" ^ conf.xhs ^
-           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f wid hei ^ "</td></tr></table></center>\n"
-      | Some (True, f, None) ->
-          "<br" ^ conf.xhs ^
-          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_normal_txt conf base p f 0 75 ^ "</td></tr></table></center>\n"
-      | Some (False, url, Some (wid, hei)) ->
-          let url_p = (commd conf) ^ (acces conf base p) in
-          "<br" ^ conf.xhs ^
-          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt_with_size conf base url_p url wid hei ^
-            "</td></tr></table></center>\n"
-      | Some (False, url, None) ->
-          let url_p = (commd conf) ^ (acces conf base p) in
-          "<br" ^ conf.xhs ^
-          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
-            image_url_txt conf base url_p url 75 ^ "</td></tr></table></center>\n"
-      | _ -> "" ]
-    ]
+      if (has_image conf base p) then
+        match image_and_size conf base p (limited_image_size 100 75) with
+        [ Some (True, f, Some (wid, hei)) ->
+            "<br" ^ conf.xhs ^
+             ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
+              image_normal_txt conf base p f wid hei ^ "</td></tr></table></center>\n"
+        | Some (True, f, None) ->
+            "<br" ^ conf.xhs ^
+            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
+              image_normal_txt conf base p f 0 75 ^ "</td></tr></table></center>\n"
+        | Some (False, url, Some (wid, hei)) ->
+            let url_p = (commd conf) ^ (acces conf base p) in
+            "<br" ^ conf.xhs ^
+            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
+              image_url_txt_with_size conf base url_p url wid hei ^
+              "</td></tr></table></center>\n"
+        | Some (False, url, None) ->
+            let url_p = (commd conf) ^ (acces conf base p) in
+            let height = 75 in
+            "<br" ^ conf.xhs ^
+            (* La hauteur est ajoutée à la table pour que les textes soient alignés. *)
+            ">\n<center><table border=\"0\" style=\"height: " ^ string_of_int height ^
+            "px\"><tr align=\"left\"><td>\n" ^
+              image_url_txt conf base url_p url height ^ "</td></tr></table></center>\n"
+        | _ -> "" ]
+      else
+        ""
+  ]
 ;
 
 (* *)

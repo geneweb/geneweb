@@ -360,6 +360,8 @@ value html_p conf = do { Wserver.printf "<p>"; Wserver.printf "\n"; };
 
 value html_li conf = do { Wserver.printf "<li>"; Wserver.printf "\n"; };
 
+value nl () = Wserver.printf "\013\010";
+
 value week_day_txt =
   let txt = [| "Sun"; "Mon"; "Tue"; "Wed"; "Thu"; "Fri"; "Sat" |] in
   fun i ->
@@ -376,6 +378,18 @@ value month_txt =
     txt.(i)
 ;
 
+(* Returns true if sub is a substring of str or false otherwise. *)
+value string_exists str sub =
+  let re = Str.regexp_string sub in
+  try
+    do {
+      ignore (Str.search_forward re str 0);
+      True
+    }
+  with
+    Not_found -> False
+;
+
 value string_of_ctime conf =
   let lt = Unix.gmtime conf.ctime in
   sprintf "%s, %d %s %d %02d:%02d:%02d GMT"
@@ -386,7 +400,6 @@ value string_of_ctime conf =
 value html conf =
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
   do {
-    Wserver.http HttpStatus.OK;
     if not Wserver.cgi.val then
       Wserver.header "Server: GeneWeb/%s" Version.txt
     else ();
@@ -411,7 +424,6 @@ value unauthorized conf auth_type =
     Wserver.printf "</body>\n";
   }
 ;
-
 
 value commd conf =
   let c = conf.command ^ "?" in
@@ -531,6 +543,20 @@ value clean_html_tags s l =
   List.fold_left
     (fun s html_tag -> Str.global_replace (Str.regexp html_tag) "&nbsp;" s)
     s l
+;
+
+(* ********************************************************************* *)
+(*  [Fonc] value sanitize_html : string -> string                        *)
+(*  [Description] : Assainit une chaîne de caractères HTML en enlevant
+                    les éléments dangereux.
+    [Args] :
+      - html_str : Chaîne de caractères à assainir.
+    [Retour] : La chaîne de caractères assainie.                         *)
+(* ********************************************************************* *)
+value sanitize_html html_str =
+  (* Enlève les évènements DOM. *)
+  let regexp_dom_events = Str.regexp "on[a-zA-Z]+=\"[^\"]*\"" in
+  Str.global_replace regexp_dom_events "" html_str
 ;
 
 value hidden_env conf =
@@ -2870,6 +2896,20 @@ value auto_image_file conf base p =
   else None
 ;
 
+(* ********************************************************************** *)
+(*  [Fonc] image_and_size : config -> base -> person -> image_size        *)
+(** [Description] : Renvoie la source de l'image ainsi que sa taille.
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnÃ©es
+      - p    : personne
+      [Retour] :
+        - is_filename : indique si la source de l'image est un nom de
+                        fichier ou une URL.
+        - source
+        - image_size
+    [Rem] : ExportÃ© en clair hors de ce module.                            *)
+(* *********************************************************************** *)
 value image_and_size conf base p image_size =
   if not conf.no_image && authorized_age conf base p then
     match sou base (get_image p) with
@@ -2914,7 +2954,6 @@ value image_and_size conf base p image_size =
   else None
 ;
 
-
 (* ********************************************************************** *)
 (*  [Fonc] has_image : config -> base -> person -> bool                   *)
 (** [Description] : Renvoie Vrai si la personne a une photo et qu'on a les
@@ -2928,8 +2967,12 @@ value image_and_size conf base p image_size =
 (* ********************************************************************** *)
 value has_image conf base p =
   if not conf.no_image && authorized_age conf base p then
-    not (is_empty_string (get_image p)) || auto_image_file conf base p <> None
-  else False
+    (not (is_empty_string (get_image p)) &&
+    (* Gestion des médias privés (contenant "private" dans leur URL) dans le cas du mode visiteur. *)
+     (conf.wizard || conf.friend || not (string_exists (sou base (get_image p)) "/private/"))
+    ) || auto_image_file conf base p <> None
+  else
+    False
 ;
 
 value gen_only_printable or_nl s =
@@ -3886,12 +3929,12 @@ value init_cache_info conf base = do {
 
 (* ************************************************************************ *)
 (*  [Fonc] real_nb_of_persons conf : config -> int                          *)
-(** [Description] : Renvoie le nombre de personnes rÃ©elles (sans ? ?) d'une
-                    base, Ã  partir du fichier de cache.
+(** [Description] : Renvoie le nombre de personnes réelles (sans ? ?) d'une
+                    base, à partir du fichier de cache.
     [Args] :
       - conf : configuration de la base
     [Retour] : nombre de personne sans ? ?
-    [Rem] : ExportÃ© en clair hors de ce module.                             *)
+    [Rem] : Exporté en clair hors de ce module.                             *)
 (* ************************************************************************ *)
 value real_nb_of_persons conf base =
   let real_nb_person () =

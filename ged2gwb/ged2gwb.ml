@@ -160,6 +160,7 @@ type case =
 ;
 
 value lowercase_first_names = ref False;
+value track_ged2gw_id = ref False;
 value case_surnames = ref NoCase;
 value extract_first_names = ref False;
 value extract_public_names = ref True;
@@ -875,17 +876,36 @@ EXTEND
   ;
 END;
 
+(* Perform a regular expression match. *)
+value preg_match pattern subject =
+  let re = Str.regexp pattern in
+  try
+    do {
+      ignore (Str.search_forward re subject 0);
+      True
+    }
+  with
+    Not_found -> False
+;
+
 value date_of_field pos d =
   if d = "" then None
-  else do {
-    let s = Stream.of_string (d) in
-    date_str.val := d;
-    try Some (Grammar.Entry.parse date_value s) with
-    [ Ploc.Exc loc (Stream.Error _) ->
-        let s = Stream.of_string (d) in
-        try Some (Grammar.Entry.parse date_value_recover s) with
-        [ Ploc.Exc loc (Stream.Error _) -> Some (Dtext d) ] ]
-  }
+  else
+    (* Vérifie si la date ne dépasse pas 8 caractères (DDMMYYYY) *)
+    if (preg_match "^[0-9]+$" d && (String.length d) > 8)
+    then
+        (* Passe la date en saisie libre txt *)
+        Some (Dtext d)
+    else do {
+        let s = Stream.of_string d in
+        date_str.val := d;
+        try Some (Grammar.Entry.parse date_value s) with
+        [ Ploc.Exc loc (Stream.Error _) ->
+            let s = Stream.of_string d in
+            try Some (Grammar.Entry.parse date_value_recover s) with
+            [ Ploc.Exc loc (Stream.Error _) -> Some (Dtext d) ]
+        ]
+    }
 ;
 
 (* Creating base *)
@@ -944,6 +964,14 @@ value extract_addr addr =
   else addr
 ;
 
+(* Output Pindex in file *)
+value output_pindex i str =
+    if track_ged2gw_id.val then
+        Printf.printf "IDGED2IDPERS %i %s\n" i str
+    else
+        ()
+;
+
 value per_index gen lab =
   let lab = extract_addr lab in
   try Hashtbl.find gen.g_hper lab with
@@ -954,6 +982,7 @@ value per_index gen lab =
         gen.g_per.arr.(i) := Left3 lab;
         gen.g_per.tlen := gen.g_per.tlen + 1;
         Hashtbl.add gen.g_hper lab (Adef.iper_of_int i);
+        output_pindex i lab;
         Adef.iper_of_int i
       } ]
 ;
@@ -1045,12 +1074,12 @@ value infer_death birth bapt =
   [ (Some (Dgreg d _), _) ->
       let a = this_year - d.year in
       if a > dead_years.val then DeadDontKnowWhen
-      else if a <= alive_years.val then NotDead
+      else if a < alive_years.val then NotDead
       else DontKnowIfDead
   | (_, Some (Dgreg d _)) ->
       let a = this_year - d.year in
       if a > dead_years.val then DeadDontKnowWhen
-      else if a <= alive_years.val then NotDead
+      else if a < alive_years.val then NotDead
       else DontKnowIfDead
   | _ -> DontKnowIfDead ]
 ;
@@ -2562,6 +2591,11 @@ value primary_fevents =
     "MARB"; "MARC"; "MARL"; "RESI"; "SEP" ]
 ;
 
+(* Types d'évènement présents seulement dans les tags de niveau 2 (2 TYPE). *)
+value secondary_fevent_types =
+  [ Efam_NoMarriage; Efam_NoMention ]
+;
+
 value treat_fam_fevent gen ifath imoth r =
   let check_place_unmarried efam_name place r =
     match find_all_fields "PLAC" r.rsons with
@@ -2709,15 +2743,16 @@ value treat_fam_fevent gen ifath imoth r =
                   efam_src = add_string gen src;
                   efam_witnesses = witnesses}
                in
-               (* On ajoute que les évènements non vides, *)
-               (* sauf si évènement personnalisé !        *)
+               (* On n'ajoute que les évènements non vides,        *)
+               (* sauf si évènement personnalisé et les évènements *)
+               (* des tags de niveau 2 (qui peuvent être vides).   *)
                let has_efam_name =
                  match name with
                  [ Efam_Name n -> n <> string_empty
                  | _ -> False ]
                in
                if has_efam_name || date <> None || place <> "" || note <> "" ||
-                  src <> "" || witnesses <> [| |]
+                  src <> "" || witnesses <> [| |] || List.mem name secondary_fevent_types
                then
                  [ evt :: events ]
                else events
@@ -3906,6 +3941,9 @@ value speclist =
 - Lowercase first names -
        Convert first names to lowercase letters, with initials in
        uppercase.");
+    ("-trackid", Arg.Set track_ged2gw_id, "   \
+- Keep track of gedcom ids -
+       Print gedcom id to gw id matches.");
    ("-ls", Arg.Unit (fun () -> case_surnames.val := LowerCase), "   \
 - Lowercase surnames -
        Convert surnames to lowercase letters, with initials in
