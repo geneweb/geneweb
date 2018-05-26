@@ -72,15 +72,18 @@ value find_br s ini_i =
     else br
 ;
 
-(* out text s to gedcom file, split lines in GEDCOM syntax (CONT/CONC tag) *)
-(* 11/05/2018 : solved issue #611 and previous issues about UTF-8          *)
-(* Parameters : 
-- oc   : output base stream to gedcom file
-- tagn : current gedcom tag level (0, 1, ...)
-- s    : string already encode with gedcom charset (see encode function)
-- len  : number of characters (char or wide char) already outputed in gedcom file 
-- i    : last char index (index to s -- one byte char)
-*)
+value max_len = 78; 
+
+(** output text, with CONT/CONC tag using a gedcom file stream
+    GEDCOM lines are limited to 255 characters. 
+    However, the CONCatenation or CONTinuation tags can be used to expand a field beyond this limit.
+    lines are cut and align with max_len characters for easy display/printing
+    @see <https://www.familysearch.org/developers/docs/gedcom/> GEDCOM STANDARD 5.5, Appendix A CONC and CONT tag
+    @param oc specifies output base stream (gedcom file)
+    @param tagn specifies the current gedcom tag level (0, 1, ...)
+    @param s specifies text to output already encode with gedcom charset (see encode function)
+    @param len specifies the number of characters (char or wide char) already outputed in gedcom file 
+    @param i specifies the last char index (index to s -- one byte char) *)
 value rec display_note_aux oc tagn s len i =
   let j = ref i in
   (* read wide char (case charset UTF-8) or char (other charset) in s string*)
@@ -101,8 +104,8 @@ value rec display_note_aux oc tagn s len i =
     (* \n, <br>, <br \> : cut text for CONTinuate with new gedcom line *)
     let br = find_br s i in
     if i <= String.length s - String.length br &&
-       String.lowercase_ascii (String.sub s i (String.length br)) = br then
-      do {
+       String.lowercase_ascii (String.sub s i (String.length br)) = br 
+    then do {
       fprintf oc "\n%d CONT " (succ tagn);
       let i = i + String.length br in
       let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
@@ -114,7 +117,7 @@ value rec display_note_aux oc tagn s len i =
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     (* cut text at max length for CONCat with next gedcom line *)
-    else if len = 78 then do {
+    else if len = max_len then do {
       fprintf oc "\n%d CONC " (succ tagn);
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
     }
