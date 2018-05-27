@@ -71,9 +71,7 @@ value rec parse_arg s sl =
   fun
   [ [(name, action, _) :: spec_list] ->
       let i = common_start s name in
-      if i = String.length name then
-        try action_arg (String.sub s i (String.length s - i)) sl action with
-        [ Arg.Bad _ -> parse_arg s sl spec_list ]
+      if i = String.length name then action_arg (String.sub s i (String.length s - i)) sl action
       else parse_arg s sl spec_list
   | [] -> None ]
 ;
