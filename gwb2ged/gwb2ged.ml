@@ -72,56 +72,81 @@ value find_br s ini_i =
     else br
 ;
 
-value max_len = 78; 
 
-(** output text, with CONT/CONC tag using a gedcom file stream
-    GEDCOM lines are limited to 255 characters. 
-    However, the CONCatenation or CONTinuation tags can be used to expand a field beyond this limit.
-    lines are cut and align with max_len characters for easy display/printing
-    @see <https://www.familysearch.org/developers/docs/gedcom/> GEDCOM STANDARD 5.5, Appendix A CONC and CONT tag
-    @param oc specifies output base stream (gedcom file)
+value max_len = 78;
+
+value br = "<br>";
+value find_br s ini_i =
+  let ini = "<br" in
+  loop 0 ini_i where rec loop i j =
+    if i = String.length ini then
+      (* Trouvé, maintenant, on regarde comment se ferme la balise. *)
+      loop2 j where rec loop2 j =
+        if j = String.length s then br
+        else if s.[j] = '>' then String.sub s ini_i (j - ini_i + 1)
+        else loop2 (j + 1)
+    else if j = String.length s then br
+    else if String.unsafe_get ini i = String.unsafe_get s j then
+      loop (i + 1) (j + 1)
+    else br
+;
+
+(** [display_note_aux oc tagn s len i] outputs text [s] with CONT/CONC
+    tag. GEDCOM lines are limited to 255 characters. However, the
+    CONCatenation or CONTinuation tags can be used to expand a field
+    beyond this limit. Lines are cut and align with [max_len]
+    characters for easy display/printing.
+    @see <https://www.familysearch.org/developers/docs/gedcom/> GEDCOM
+    STANDARD 5.5, Appendix A CONC and CONT tag
+    @param oc specifies output channel
     @param tagn specifies the current gedcom tag level (0, 1, ...)
-    @param s specifies text to output already encode with gedcom charset (see encode function)
-    @param len specifies the number of characters (char or wide char) already outputed in gedcom file 
-    @param i specifies the last char index (index to s -- one byte char) *)
+    @param s specifies text to print to the output channel (already
+    encode with gedcom charset)
+    @param len specifies the number of characters (char or wide char)
+    already printed
+    @param i specifies the last char index (index to s -- one byte
+    char) *)
 value rec display_note_aux oc tagn s len i =
   let j = ref i in
   (* read wide char (case charset UTF-8) or char (other charset) in s string*)
-  let rec output_onechar () = 
-    if j.val = String.length s then do { decr j; }
-   (* non wide char / UTF-8 char *)
+  let rec output_onechar () =
+    if j.val = String.length s then decr j
+    (* non wide char / UTF-8 char *)
     else if charset.val <> Utf8 then output_char oc s.[i]
-   (* 1 to 4 bytes UTF-8 wide char *)
+    (* 1 to 4 bytes UTF-8 wide char *)
     else if i = j.val || Name.nbc s.[j.val] = -1 then do {
       output_char oc s.[j.val];
       incr j;
       output_onechar ()
     }
-    else do { decr j; }
+    else decr j
   in
   if j.val = String.length s then fprintf oc "\n"
   else
     (* \n, <br>, <br \> : cut text for CONTinuate with new gedcom line *)
     let br = find_br s i in
     if i <= String.length s - String.length br &&
-       String.lowercase_ascii (String.sub s i (String.length br)) = br 
+       String.lowercase_ascii (String.sub s i (String.length br)) = br
     then do {
       fprintf oc "\n%d CONT " (succ tagn);
       let i = i + String.length br in
       let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
-      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
+      display_note_aux
+        oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     else if s.[i] = '\n' then do {
       fprintf oc "\n%d CONT " (succ tagn);
       let i = if i < String.length s then i + 1 else i in
-      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
+      display_note_aux
+        oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
     (* cut text at max length for CONCat with next gedcom line *)
     else if len = max_len then do {
       fprintf oc "\n%d CONC " (succ tagn);
-      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
+      display_note_aux
+        oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
     }
-    (* continue same gedcom line *) 
+    (* continue same gedcom line *)
     else do {
       output_onechar ();
       display_note_aux oc tagn s (len + 1) (j.val + 1)
