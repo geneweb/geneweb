@@ -117,7 +117,7 @@ value print_send_image conf base p =
         xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
           (Adef.int_of_iper (get_key_index p));
         xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
-        Wserver.printf "%s:\n" (capitale (transl conf "file"));
+        Wserver.printf "%s%s\n" (capitale (transl conf "file")) (Util.transl conf ":");
         xtag "input" "\
 type=\"file\" class=\"form-control\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
       end;

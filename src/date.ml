@@ -600,21 +600,21 @@ value string_slash_of_date conf date =
 value string_of_age conf a =
   match a with
   [ {day = 0; month = 0; year = y} ->
-      if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
+      if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
       else if y = 1 then transl conf "one year old"
       else transl conf "birth"
   | {day = 0; month = m; year = y} ->
-      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
+      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
-        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
       else if m = 1 then transl conf "one month old"
       else transl conf "less than one month old"
   | {day = d; month = m; year = y} ->
-      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
+      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
-        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
       else if m = 1 then transl conf "one month old"
-      else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
+      else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
       else if d = 1 then transl conf "one day old"
       else "0" ]
 ;

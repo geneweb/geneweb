@@ -1,49 +1,65 @@
 <!-- arbre_7gen.txt 28/03/2017 20:02:13 Arbre 7 generations -->
 
 %define;descendants(curlev, maxlev, f_cnt)
-<ul>
- %if;(has_families)
-   %foreach;family;
-   <li>
-     %if(f_cnt>0)x%f_cnt;&nbsp;%end;
-     %if;(family_cnt > 1)X%family_cnt; %end;
-     <a href="%prefix;%access;">%first_name;</a> %dates; &nbsp;&amp;%marriage_date.year;&nbsp;<br>
-     <a href="%prefix;%spouse.access;">%spouse;</a> %spouse.dates;
-   </li>
-   %if;(curlev < maxlev)
-     %if;(has_children)
-     %foreach;child;
-       %apply;descendants(curlev+1, maxlev, 0)
-     %end;
-     %end;
-   %end;
-   %end;
- %else;
-
-   <li>%if(f_cnt>0)x%f_cnt;&nbsp;%end;<a href="%prefix;%access;">%first_name;</a> %dates;</li>
- %end;
- </ul>
+  <ul>
+  %if;(has_families)
+    %foreach;family;
+    <li>
+      %if(f_cnt>0)x%f_cnt;&nbsp;%end;
+      %if;(family_cnt > 1)X%family_cnt; %end;
+      %if;(not cancel_links)
+        <a href="%prefix;%access;">%first_name;</a>
+      %else;%first_name;
+      %end;
+      %dates; &nbsp;&amp;%marriage_date.year;&nbsp;<br>
+      %if;(not cancel_links)
+        <a href="%prefix;%spouse.access;">%spouse;</a>
+      %else;%spouse;
+      %end;
+      %spouse.dates;
+      </li>
+      %if;(curlev < maxlev)
+        %if;(has_children)
+          %foreach;child;
+            %apply;descendants(curlev+1, maxlev, 0)
+          %end;
+        %end;
+      %end;
+    %end;
+  %else;
+    <li>%if(f_cnt>0)x%f_cnt;&nbsp;%end;
+    %if;(not cancel_links)
+      <a href="%prefix;%access;">%first_name;</a>
+    %else;%first_name;
+    %end;
+    %dates;</li>
+  %end;
+  </ul>
 %end;
 
 %define;tothegen(xx)
- [*to the %s generation:::xx]
+  [*to the %s generation:::xx]
 %end;
 
 %define;one_ancestor(xx, coln, bull)
   <tr>
    <td colspan="coln" align="right" valign="middle">
   %xx.dates;&nbsp;
-  <a href="%prefix;%xx.access;">%xx;</a></td>
-   <td width=1></td>
-   <td width=1 align=center valign=middle><b><small>bull</small></b></td>
+  %if;(not cancel_links)
+    <a href="%prefix;%xx.access;">%xx;</a>
+  %else;%xx;
+  %end;
+  </td>
+    <td width=1></td>
+    <td width=1 align=center valign=middle><b><small>bull</small></b></td>
   </tr>
 %end
 
 %define;one_heading(xx, coln, bull)
-    <td colspan=coln align=right valign=middle>
-       <span class="highlight_hg"><b>%apply;capitalize([xx])</b></span>
-    <small>bull</small>
-    </td>
+  <td colspan=coln align=right valign=middle>
+    <span class="highlight_hg"><b>%apply;capitalize([xx])</b></span>
+  <small>bull</small>
+  </td>
 %end;
 
 %define;short_display_person_v(xx)
@@ -206,9 +222,12 @@
                <!-- ajouter mariage en dessous -->
              %else;
                <td style="width:1"></td>
-               <td style="align:center;valign:middle"><a
-                href="%prefix;%child.access;">%child.child_name;</a>
-                <br>%child.dates;&nbsp;</td>
+               <td style="align:center;valign:middle">
+               %if;(not cancel_links)
+                 <a href="%prefix;%child.access;">%child.child_name;</a>
+               %else;%child.child_name;
+               %end;
+               <br>%child.dates;&nbsp;</td>
                <td style="width:1"></td>
              %end;
            </tr>

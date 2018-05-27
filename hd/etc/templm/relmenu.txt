@@ -131,7 +131,7 @@
               %if;(level = 1)
                 %if;has_siblings;<li><a href="%prefix;%access;;m=C;v1=%level;;spouse=on">[*siblings]</a></li>%end;
                 %if;has_nephews_or_nieces;
-                  <li><a href="%prefix;%access;;m=C;v1=1;v2=2;spouse=on;">[*nephews and nieces]</a></li>
+                  <li><a href="%prefix;%access;;m=C;v1=1;v2=2;spouse=on;">[*a nephew/a niece]4</a></li>
                 %end;
               %elseif;(level = 2)
                 %if;(father.has_siblings or mother.has_siblings)

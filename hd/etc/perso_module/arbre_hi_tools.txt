@@ -1,0 +1,112 @@
+<!-- $Id: perso_module/arbre_hi_tools.txt v7.00 2017/11/18 20:02:08 Arbre ascendant (vertical) -->
+
+%let;evarv;%if;(evar.v!="")%evar.v;%else;5%end;%in;
+%let;evarscl;%if;(evar.scale!="")%evar.scale;%else;100%end;%in;
+%let;evarfs;%if;(evar.fs!="")%evar.fs;%else;17%end;%in;
+%let;maxlev;%if;(evar.cpl = "on")13%else;12%end;%nn;%in;
+
+%(evarv;, %evarhi;, %evarim;, %evarso;, %evarma;<br>%)
+%(minv %minv; < evarv %evarv; < maxv %maxv; (maxlev %maxlev;)%)
+<div class="d-flex justify-content-between">
+  %if;not cancel_links;
+    <div class="form-inline">
+      <div class="btn-group mx-2 mb-2">
+        %if;(evarv>=4)
+          <a href="%prefix_base_password;v=%expr(evarv-1);%nn;
+            %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="(−1) [visualize/show/hide/summary]1 %expr(evarv-1) [generation/generations]0"
+          >&nbsp;−</a>
+        %end;
+        <span class="btn btn-outline btn-sm  border-0 font-weight-bold text-muted">%evarv; gen</span>
+        %if;(evarv<maxlev-1)
+          <a href="%prefix_base_password;v=%expr(evarv+1);%nn;
+            %foreach;env_binding;%if;(env.key!="v")%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm small border-0 px-0"
+            title="(+1) [visualize/show/hide/summary]1 %expr(evarv+1) [generation/generations]1 (max %maxlev;)"
+          >+&nbsp;</a>
+        %end;
+      </div>
+      <div class="btn-group mx-1 mb-2 ml-2">
+        <a href="%prefix_base_password;%if;(evar.hi!="H")hi=H;%else;hi=I;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="hi")%env.key=%env.val;;%end;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
+          title="%if;(evar.hi!="H")[*mode H/mode I]0%else;[*mode H/mode I]1%end;"
+        >&nbsp;%if;(evar.hi!="H")H%else;I%end;&nbsp;
+        </a>
+      </div>
+      <div class="btn-group mx-1 mb-2 ml-2">
+        <a href="%prefix_base_password;%if;(evar.sosa!="on")sosa=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="sosa")%env.key=%env.val;;%end;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
+          title="%if;(evar.sosa!="on")[*visualize/show/hide/summary]1%nn; 
+            %else;[*visualize/show/hide/summary]2%end; [Sosa]0"
+        >S <i class="fa fa-toggle-%if;(evar.sosa!="on")off%else;on%end; text-muted"></i>
+        </a>
+      </div>
+      <div class="btn-group mx-1 mb-2 ml-2">
+        <a href="%prefix_base_password;%if;(evar.sms!="on")sms=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="sms")%env.key=%env.val;;%end;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
+          title="%if;(evar.sms!="on")[*visualize/show/hide/summary]1%nn; 
+            %else;[*visualize/show/hide/summary]2%end; [missing %s:::Sosa]0"
+        >S <i class="fa fa-toggle-%if;(evar.sms!="on")off%else;on%end; text-muted"></i>
+        </a>
+      </div>
+      <div class="btn-group mx-1 mb-2 ml-2">
+        <a href="%prefix_base_password;%if;(evar.cpl!="on")cpl=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="cpl")%env.key=%env.val;;%end;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
+          title="%if;(evar.cpl!="on")[*visualize/show/hide/summary]1%nn; 
+            %else;[*visualize/show/hide/summary]2%end; [couples]"
+        ><span class="fa fa-user-plus" aria-hidden="true"></span>%nn;
+          <span class="fa fa-user" aria-hidden="true"></span>
+          <i class="fa fa-toggle-%if;(evar.cpl!="on")off%else;on%end; text-muted"></i>
+        </a>
+      </div>
+      <div class="btn-group mx-1 mb-2 ml-2">
+        <a href="%prefix_base_password;%if;(evar.implx!="on")implx=on;%end;%nn;
+          %foreach;env_binding;%if;(env.key!="implx")%env.key=%env.val;;%end;%end;"
+          class="btn btn-outline-secondary btn-sm border-0 px-0"
+          title="%if;(evar.implx!="on")[implex links]%else;[*do not] [*implex links]%end;"
+        ><i class="fa fa-random fa-fw"></i>
+          <i class="fa fa-toggle-%if;(evar.implx!="on")off%else;on%end; text-muted"></i>
+        </a>
+      </div>
+      <div class="btn-group mx-2 mb-2 ml-2">
+        %if;(evarscl>0)
+          <a href="%prefix_base_password;%if;(evar.scale!="on")scale=%expr(evarscl-20);fs=%expr(evarfs-1);%end;%nn;
+            %foreach;env_binding;%if;(not (env.key="scale" or env.key="fs"))%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]0 [size]0 (-20%% )"
+          >&nbsp;−</a>
+        %end;
+        <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Scl: %evarscl;&#37;</span>
+        %if;(evarscl<200)
+          <a href="%prefix_base_password;%if;(evar.scale!="on")scale=%expr(evarscl+20);fs=%expr(evarfs+1);%end;%nn;
+            %foreach;env_binding;%if;(not (env.key="scale" or env.key="fs"))%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]1 [size]0 (+20%% )"
+          >&nbsp;+</a>
+        %end;
+      </div>
+      <div class="btn-group mx-2 mb-2 ml-2">
+        %if;(evarfs>5)
+          <a href="%prefix_base_password;%if;(evar.fs!="on")fs=%expr(evarfs-1);%end;%nn;
+            %foreach;env_binding;%if;(env.key!="fs")%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]0 [font size]"
+          >&nbsp;−</a>
+        %end;
+        <span class="btn btn-outline btn-sm border-0 font-weight-bold text-muted">Fs: %evarfs;</span>
+        %if;(evarfs<20)
+          <a href="%prefix_base_password;%if;(evar.fs!="on")fs=%expr(evarfs+1);%end;%nn;
+            %foreach;env_binding;%if;(env.key!="fs")%env.key=%env.val;;%end;%end;"
+            class="btn btn-outline-secondary btn-sm border-0 px-0"
+            title="[reduce/increase]1 [font size]"
+          >&nbsp;+</a>
+        %end;
+      </div>
+    </div>
+  %end;
+</div>

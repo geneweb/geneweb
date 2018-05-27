@@ -767,7 +767,8 @@ value print_err_parents conf base p = do {
   html_p conf;
   tag "ul" begin
     html_li conf;
-    Wserver.printf "%s: %d" (capitale (transl conf "first free number"))
+    Wserver.printf "%s%s %d" (capitale (transl conf "first free number"))
+      (Util.transl conf ":")
       (Gutil.find_free_occ base (p_first_name base p) (p_surname base p)
          0);
   end;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: anctree.txt,v 5.9 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
@@ -21,10 +21,29 @@
 </head>
 <body%body_prop;>
 %message_to_wizard;
-<div class="container-fluid">
-%import;perso_utils;
-%import;menubar;
-%apply;show_templ("perso_module/arbre_vertical")
+<div class="container%if;(evar.wide="on")-fluid%end; clearfix">
+%import;perso_utils
+%import;menubar
+
+%if;(evar.t="T" and evar.t1="7")
+  %import;perso_module/arbre_7gen;
+%elseif;(evar.t="T" and evar.t1="h7")
+  %import;perso_module/arbre_h7;
+%elseif;(evar.t="T" and evar.t1="m") %(m for compatibility with existing arbre_9gen %)
+  %import;perso_module/arbre_9gen;
+%elseif;(evar.t="T" and evar.t1="CT") %(CT for compatibility with templm %)
+  %import;perso_module/arbre_hi_tools;
+  %import;templm/tools;
+  %import;templm/anctree_hi_indexes
+  %import;templm/anctree_hi;
+%elseif;(evar.t="A" or evar.t="C" or evar.t="T")
+  %import;perso_module/arbre_vertical;
+%else;
+  bad values for evar.t and evar.t1
+%end;
+</div>
+
+<div>
 %base_trailer;
 %include.copyr;
 </div>

@@ -126,6 +126,11 @@ distrib:
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
 	cp -R hd/* $(DESTDIR)/gw/.
+	rm -f $(DESTDIR)/exe-version.txt
+	echo "Commit: `git log  -1 | grep commit | cut -c8-15`, `date`"      > $(DESTDIR)/commit.txt
+	echo "`ocaml  -version`"      >> $(DESTDIR)/commit.txt
+	echo "`camlp5 -v 2>&1`"       >> $(DESTDIR)/commit.txt
+	echo "-----"                  >> $(DESTDIR)/commit.txt
 
 .merlin:
 	echo "PKG $(PACKAGES)" > $@

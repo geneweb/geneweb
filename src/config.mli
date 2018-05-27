@@ -52,6 +52,7 @@ type config =
     no_image : bool;
     no_note : bool;
     bname : string;
+    cgi_passwd : string;
     env : list (string * string);
     senv : mutable list (string * string);
     henv : mutable list (string * string);

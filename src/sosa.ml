@@ -139,12 +139,29 @@ value modl x n =
   let r = sub x (mul0 (div x n) n) in
   if Array.length r = 0 then 0 else r.(0)
 ;
-
 value of_int i =
   if i < 0 then invalid_arg "Sosa.of_int"
   else if i = 0 then zero
   else if i < base then [| i |]
   else [| i mod base; i / base |]
+;
+value to_int x =
+  let n =
+    loop 0 0 where rec loop i r =
+      if i = Array.length x then r
+      else
+        let xi = if i >= Array.length x then 0 else x.(i) in
+        r * base + xi
+  in
+  n
+;
+value rec exp_gen x1 x2 n =
+  if n = 0 || x1 = zero then one
+  else if n = 1 then x1
+  else exp_gen (mul x1 (to_int x2)) x2 (n-1)
+;
+value exp x n =
+  exp_gen x x n
 ;
 value print f sep x =
   if eq x zero then f "0"
@@ -208,4 +225,23 @@ value of_string s =
       [ '0'..'9' ->
           loop (inc (mul0 n 10) (Char.code s.[i] - Char.code '0')) (i + 1)
       | _ -> failwith "Sosa.of_string" ]
+;
+value gen x =
+  let s = to_string_sep_base "" 2 x in
+  String.length s (* coherent with %sosa.lvl *)
+;
+value branch x =
+  let s = to_string_sep_base "" 2 x in
+  if (String.length s) > 1 then s.[1] else '0'
+;
+value sosa_gen_up x =
+  if eq x one then zero
+  else
+    let s = to_string_sep_base "" 2 x in
+    let s = if String.length s > 2 then
+            "0b" ^ (String.sub s 0 1) ^ (String.sub s 2 (String.length s -2))
+            else "0b1"
+    in
+    let is = int_of_string s in
+    of_int is
 ;

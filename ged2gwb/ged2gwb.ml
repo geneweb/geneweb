@@ -146,6 +146,7 @@ type month_number_dates =
 
 type charset =
   [ Ansel
+  | Ansi
   | Ascii
   | Msdos
   | MacIntosh
@@ -375,6 +376,7 @@ value ascii_of_macintosh s =
 value utf8_of_string s =
   match charset.val with
   [ Ansel -> utf_8_of_iso_8859_1 (Ansel.to_iso_8859_1 s)
+  | Ansi -> Mutil.utf_8_of_iso_8859_1 s
   | Ascii -> Mutil.utf_8_of_iso_8859_1 s
   | Msdos -> Mutil.utf_8_of_iso_8859_1 (ascii_of_msdos s)
   | MacIntosh -> Mutil.utf_8_of_iso_8859_1 (ascii_of_macintosh s)
@@ -876,11 +878,11 @@ END;
 value date_of_field pos d =
   if d = "" then None
   else do {
-    let s = Stream.of_string (String.uppercase_ascii d) in
+    let s = Stream.of_string (d) in
     date_str.val := d;
     try Some (Grammar.Entry.parse date_value s) with
     [ Ploc.Exc loc (Stream.Error _) ->
-        let s = Stream.of_string (String.uppercase_ascii d) in
+        let s = Stream.of_string (d) in
         try Some (Grammar.Entry.parse date_value_recover s) with
         [ Ploc.Exc loc (Stream.Error _) -> Some (Dtext d) ] ]
   }
@@ -1697,6 +1699,7 @@ value find_event_witness gen tag ip r =
             match find_field "RELA" r.rsons with
             [ Some rr ->
                 if rr.rval = "GODP" then Witness_GodParent
+                else if rr.rval = "officer" then Witness_Officer
                 else Witness
             | _ -> Witness ]
           in
@@ -1707,6 +1710,7 @@ value find_event_witness gen tag ip r =
             match find_field "RELA" r.rsons with
             [ Some rr ->
                 if rr.rval = "GODP" then Witness_GodParent
+                else if rr.rval = "officer" then Witness_Officer
                 else Witness
             | _ -> Witness ]
           in
@@ -1732,6 +1736,7 @@ value find_fevent_witness gen tag ifath imoth r =
             match find_field "RELA" r.rsons with
             [ Some rr ->
                 if rr.rval = "GODP" then Witness_GodParent
+                else if rr.rval = "officer" then Witness_Officer
                 else Witness
             | _ -> Witness ]
           in
@@ -1742,6 +1747,7 @@ value find_fevent_witness gen tag ifath imoth r =
             match find_field "RELA" r.rsons with
             [ Some rr ->
                 if rr.rval = "GODP" then Witness_GodParent
+                else if rr.rval = "officer" then Witness_Officer
                 else Witness
             | _ -> Witness ]
           in
@@ -2063,7 +2069,7 @@ value add_indi gen r =
     match name_sons with
     [ Some n ->
         let (f, s) = parse_name (Stream.of_string n.rval) in
-        let pn = "" in
+        let pn = givn in
         let fal = if givn = f then [] else [givn] in
         let (f, fal) =
           match first_names_brackets.val with
@@ -3082,7 +3088,9 @@ value treat_header2 gen r = do {
       [ Some r ->
           match r.rval with
           [ "ANSEL" -> charset.val := Ansel
+          | "ANSI" -> charset.val := Ansi
           | "ASCII" | "IBMPC" -> charset.val := Ascii
+          | "MSDOS"-> charset.val := Msdos
           | "MACINTOSH" -> charset.val := MacIntosh
           | "UTF-8" -> charset.val := Utf8
           | _ -> charset.val := Ascii ]
@@ -3974,11 +3982,14 @@ x-y   - Undefined death interval -
     Arg.String
       (fun
        [ "ANSEL" -> charset_option.val := Some Ansel
-       | "ASCII" -> charset_option.val := Some Ascii
+       | "ANSI" -> charset_option.val := Some Ansi
+       | "ASCII" | "IBMPC" -> charset_option.val := Some Ascii
        | "MSDOS" -> charset_option.val := Some Msdos
+       | "MACINTOSH" -> charset_option.val := Some MacIntosh
+       | "UTF-8" -> charset_option.val := Some Utf8
        | _ -> raise (Arg.Bad "bad -charset value") ]),
     "\
-[ANSEL|ASCII|MSDOS] - charset decoding -
+[ANSEL|ANSI|ASCII|MSDOS|MACINTOSH|UTF-8] - charset decoding -
        Force given charset decoding, overriding the possible setting in
        GEDCOM")]
 ;

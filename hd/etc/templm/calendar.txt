@@ -249,14 +249,6 @@
       <input type="submit" value="OK" %/>
       </p>
     </form>
-    %let;lang;
-      %if;(evar.lang != "")
-        %evar.lang;
-      %elseif;(bvar.default_lang != "")
-        %bvar.default_lang;
-      %else;en%nn;
-      %end;
-    %in;
     <ul>
       <li>
         <a href="%prefix;m=POP_PYR;int=5;lim=0;y=%date.gregorian.year;">
