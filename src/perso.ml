@@ -409,6 +409,20 @@ value find_sosa conf base a sosa_ref_l t_sosa =
   | None -> None ]
 ;
 
+value rec get_p_of_sosa conf base s p =
+  if Sosa.eq s Sosa.one then (Some p)
+  else
+    let ns = Sosa.sosa_gen_up s in
+    let c = Sosa.branch s in
+    match get_parents p with
+      [ Some ifam ->
+          let cpl = foi base ifam in
+          let pm = pget conf base (get_mother cpl) in
+          let pf = pget conf base (get_father cpl) in
+          if c = '0' then get_p_of_sosa conf base ns pf
+          else get_p_of_sosa conf base ns pm
+      | None -> None ]
+;
 
 (* [Type]: (Def.iper, Sosa.t) Hashtbl.t *)
 value sosa_ht = Hashtbl.create 5003;
@@ -477,6 +491,49 @@ value build_sosa_ht conf base =
       in
       loop 1 1
    | None -> () ]
+;
+
+
+(* ******************************************************************** *)
+(*  [Fonc] next_sosa : config -> base -> Sosa.t -> Sosa.t               *)
+(** [Description] : Recherche le sosa suivant
+    [Args] :
+      - conf : configuration de la base
+      - base : base de donnée
+      - s    : sosa
+    [Retour] :
+      - Sosa.t : retourne Sosa.zero s'il n'y a pas de sosa suivant
+    [Rem] : Exporté en clair hors de ce module.                         *)
+(* ******************************************************************** *)
+value next_sosa conf base s =
+  (* La clé de la table est l'iper de la personne et on lui associe son numéro
+    de sosa. On inverse pour trier sur les sosa *)
+  let sosa_list = Hashtbl.fold (fun k v acc -> [(v, k) :: acc]) sosa_ht [] in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let rec find_n x lst = match lst with
+    [ [] -> (Sosa.zero, Adef.iper_of_int 0)
+    | [(so, ip) :: tl] ->
+        if (Sosa.eq so x) then
+          if tl = [] then (Sosa.zero, Adef.iper_of_int 0) else List.hd tl
+        else find_n x tl ]
+  in
+  let (so, ip) = find_n s sosa_list in
+  (so, ip)
+;
+
+value prev_sosa conf base s =
+  let sosa_list = Hashtbl.fold (fun k v acc -> [(v, k) :: acc]) sosa_ht [] in
+  let sosa_list = List.sort (fun (s1, _) (s2, _) -> compare s1 s2) sosa_list in
+  let sosa_list = List.rev sosa_list in
+  let rec find_n x lst = match lst with
+    [ [] -> (Sosa.zero, Adef.iper_of_int 0)
+    | [(so, ip) :: tl] ->
+        if (Sosa.eq so x) then
+          if tl = [] then (Sosa.zero, Adef.iper_of_int 0) else List.hd tl
+        else find_n x tl ]
+  in
+  let (so, ip) = find_n s sosa_list in
+  (so, ip)
 ;
 
 
@@ -1967,6 +2024,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
             let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+            let s = Util.replace_quotes s in
             if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
       | _ -> raise Not_found ]
@@ -2029,6 +2087,14 @@ and eval_simple_str_var conf base env (_, p_auth) =
       | _ -> raise Not_found ]
   | "empty_sorted_list" ->
       match get_env "list" env with
+      [ Vslist l -> do { l.val := SortedList.empty; "" }
+      | _ -> raise Not_found ]
+  | "empty_sorted_listb" ->
+      match get_env "listb" env with
+      [ Vslist l -> do { l.val := SortedList.empty; "" }
+      | _ -> raise Not_found ]
+  | "empty_sorted_listc" ->
+      match get_env "listc" env with
       [ Vslist l -> do { l.val := SortedList.empty; "" }
       | _ -> raise Not_found ]
   | "family_cnt" -> string_of_int_env "family_cnt" env
@@ -2095,6 +2161,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
             let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+            let s = Util.replace_quotes s in
             if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
       | _ -> raise Not_found ]
@@ -2112,6 +2179,7 @@ and eval_simple_str_var conf base env (_, p_auth) =
                Wiki.wi_always_show_link = conf.wizard || conf.friend}
             in
             let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+            let s = Util.replace_quotes s in
             if conf.pure_xhtml then Util.check_xhtml s else s
           else ""
       | _ -> raise Not_found ]
@@ -2123,12 +2191,20 @@ and eval_simple_str_var conf base env (_, p_auth) =
       match get_env "static_max_anc_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
+  | "sosa_ref_max_anc_level" ->
+      match get_env "sosa_ref_max_anc_level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
   | "max_cous_level" ->
       match get_env "max_cous_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
   | "max_desc_level" ->
       match get_env "max_desc_level" env with
+      [ Vint i -> string_of_int i
+      | _ -> "" ]
+  | "static_max_desc_level" ->
+      match get_env "static_max_desc_level" env with
       [ Vint i -> string_of_int i
       | _ -> "" ]
   | "nobility_title" ->
@@ -2459,11 +2535,77 @@ and eval_compound_var conf base env ((a, _) as ep) loc =
           eval_family_field_var conf base env (i, f, c, m) loc sl
       | _ -> raise Not_found ]
   | ["pvar"; v :: sl] ->
+      (* %pvar.v.surname;
+         person is identified by iv=index in the url
+      *)
       match find_person_in_env conf base v with
       [ Some p ->
           let ep = make_ep conf base (get_key_index p) in
           eval_person_field_var conf base env ep loc sl
       | None -> raise Not_found ]
+  | ["qvar"; v :: sl] ->
+      (* %qvar.index_v.surname;
+         direct access to a person whose index value is v
+      *)
+      let v0 = int_of_string v in
+      if v0 >= 0 && v0 < nb_of_persons base then
+        let ep = make_ep conf base (Adef.iper_of_int v0) in
+        if is_hidden (fst ep) then raise Not_found
+        else eval_person_field_var conf base env ep loc sl
+      else raise Not_found
+  | ["svar"; i :: sl] ->
+      (* http://localhost:2317/HenriT_w?m=DAG;p1=henri;n1=duchmol;s1=243;s2=245
+         access to sosa si=n of a person pi ni
+         find_base_p will scan down starting from i such that multiple sosa of
+         the same person can be listed
+      *) 
+      let rec find_base_p j =
+        let s = string_of_int j in
+        let po = Util.find_person_in_env conf base s in
+        match po with
+        [ Some p -> p
+        | None -> if j = 0 then raise Not_found else find_base_p (j-1) ]
+      in
+      let p0 = find_base_p (int_of_string i) in
+      (* find sosa identified by si= of that person *)
+      match p_getint conf.env ("s" ^ i) with
+        [ Some s ->
+            let s0 = Sosa.of_int s in
+            let ip0 = get_key_index p0 in
+            match Util.branch_of_sosa conf base ip0 s0 with
+            [ Some [(ip, sp) :: —] ->
+                let p = poi base ip in
+                let p_auth = authorized_age conf base p in
+                eval_person_field_var conf base env (p, p_auth) loc sl
+            | _ -> raise Not_found ]
+        | None -> raise Not_found ]
+  | ["sosa_anc"; s :: sl] ->
+      (* %sosa_anc.sosa.first_name;
+         direct access to a person whose sosa relative to sosa_ref is s
+      *)
+      match get_env "sosa_ref" env with
+      [ Vsosa_ref v ->
+          match Lazy.force v with
+          [ Some p ->
+              let ip = get_key_index p in
+              let s0 = Sosa.of_string s in
+              match Util.branch_of_sosa conf base ip s0 with
+              [ Some [(ip, sp) :: —] ->
+                  let p = poi base ip in
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl
+              | _ -> raise Not_found ]
+          | _ -> raise Not_found ] 
+      | _ -> raise Not_found ]
+  | ["sosa_anc_p"; s :: sl] ->
+      (* %sosa_anc_p.sosa.first_name;
+         direct access to a person whose sosa relative to current person
+      *)
+      match get_p_of_sosa conf base (Sosa.of_string s) a with
+      [ Some np ->
+        let np_auth = authorized_age conf base np in
+        eval_person_field_var conf base env (np, np_auth) loc sl
+      | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_type = rt} (Some p) ->
@@ -2788,6 +2930,7 @@ and eval_num conf n =
   fun
   [ ["hexa"] -> "0x" ^ Sosa.to_string_sep_base "" 16 n
   | ["octal"] -> "0o" ^ Sosa.to_string_sep_base "" 8 n
+  | ["lvl"] -> string_of_int (String.length (Sosa.to_string_sep_base "" 2 n))
   | ["v"] -> Sosa.to_string n
   | [] -> Sosa.to_string_sep (transl conf "(thousand separator)") n
   | _ -> raise Not_found ]
@@ -2947,6 +3090,34 @@ and eval_person_field_var conf base env ((p, p_auth) as ep) loc =
           [ Some (n, p) -> VVstring (eval_num conf n sl)
           | None -> VVstring "" ]
       | _ -> raise Not_found ]
+  | ["sosa_next" :: sl] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match get_sosa conf base env x p with
+          [ Some (n, p) -> 
+              match next_sosa conf base n with
+              [ (so, ip) ->
+                if so = Sosa.zero then VVstring ""
+                else
+                  let p = poi base ip in
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl ]
+          | None -> VVstring "" ]
+      | _ -> raise Not_found ]
+  | ["sosa_prev" :: sl] ->
+      match get_env "sosa" env with
+      [ Vsosa x ->
+          match get_sosa conf base env x p with
+          [ Some (n, p) -> 
+              match prev_sosa conf base n with
+              [ (so, ip) ->
+                if so = Sosa.zero then VVstring "" 
+                else 
+                  let p = poi base ip in
+                  let p_auth = authorized_age conf base p in
+                  eval_person_field_var conf base env (p, p_auth) loc sl ]
+          | None -> VVstring "" ]
+      | _ -> raise Not_found ]
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam ifam fam _ _ ->
@@ -3013,7 +3184,7 @@ and eval_date_field_var conf d =
               VVstring (string_of_int dmy2.year2)
           | _ -> VVstring "" ]
       | _ -> VVstring "" ]
-  | [] -> VVstring (Date.string_of_date_sep conf "<br/>" d)
+  | [] -> VVstring (Date.string_of_date_sep conf "&#010;  " d)
   | _ -> raise Not_found ]
 and eval_place_field_var conf place =
   fun
@@ -3135,6 +3306,7 @@ and eval_str_event_field
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Util.replace_quotes s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "src" ->
@@ -3150,6 +3322,7 @@ and eval_str_event_field
           in
           Wiki.syntax_links conf wi (sou base src)
         in
+        let src = Util.replace_quotes src in
         string_with_macros conf env src
       else ""
   | _ -> raise Not_found ]
@@ -3431,15 +3604,16 @@ and eval_bool_person_field conf base env (p, p_auth) =
             else loop events ]
   | "has_event" ->
       if p_auth then
-        match p_getenv conf.base_env "display_timeline" with
-        [ Some "no" -> False
-        | Some "yes" -> True
+        let events = events_list conf base p in
+        let nb_fam = Array.length (get_family p) in
+        match p_getenv conf.base_env "has_events" with
+        [ Some "never" -> False
+        | Some "always" -> 
+          if nb_fam > 0 || (List.length events) > 0 then True else False
         | _ ->
             (* Renvoie vrai que si il y a des informations supplémentaires *)
             (* par rapport aux évènements principaux, i.e. témoins (mais   *)
             (* on ne prend pas en compte les notes).                       *)
-            let events = events_list conf base p in
-            let nb_fam = Array.length (get_family p) in
             let rec loop events nb_birth nb_bapt nb_deat nb_buri nb_marr =
               match events with
               [ [] -> False
@@ -3645,6 +3819,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Util.replace_quotes s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "baptism_place" ->
@@ -3663,6 +3838,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Util.replace_quotes s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "burial_place" ->
@@ -3681,6 +3857,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Util.replace_quotes s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "child_name" ->
@@ -3734,6 +3911,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Util.replace_quotes s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "died" -> string_of_died conf base env p p_auth
@@ -3899,6 +4077,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Util.replace_quotes s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "occ" ->
@@ -3916,6 +4095,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
           in
           Wiki.syntax_links conf wi s
         in
+        let s = Util.replace_quotes s in
         string_with_macros conf [] s
       else ""
   | "on_baptism_date" ->
@@ -3967,6 +4147,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
            Wiki.wi_always_show_link = conf.wizard || conf.friend}
         in
         let s = Wiki.syntax_links conf wi (String.concat "\n" lines) in
+        let s = Util.replace_quotes s in
         if conf.pure_xhtml then Util.check_xhtml s else s
       else ""
   | "slash_burial_date" ->
@@ -4067,6 +4248,7 @@ and eval_str_person_field conf base env ((p, p_auth) as ep) =
             in
             Wiki.syntax_links conf wi s
           in
+          let s = Util.replace_quotes s in
           string_with_macros conf env s
       | _ -> raise Not_found ]
   | "surname" ->
@@ -4454,6 +4636,8 @@ value print_foreach conf base print_ast eval_expr =
     | "related" -> print_foreach_related env al ep
     | "relation" -> print_foreach_relation env al ep
     | "sorted_list_item" -> print_foreach_sorted_list_item env al ep
+    | "sorted_listb_item" -> print_foreach_sorted_listb_item env al ep
+    | "sorted_listc_item" -> print_foreach_sorted_listc_item env al ep
     | "source" -> print_foreach_source env al ep
     | "surname_alias" -> print_foreach_surname_alias env al ep
     | "witness" -> print_foreach_witness env al ep efam
@@ -5126,6 +5310,38 @@ value print_foreach conf base print_ast eval_expr =
              loop item sll
            }
       | [] -> () ]
+  and print_foreach_sorted_listb_item env al ep =
+    let list =
+      match get_env "listb" env with
+      [ Vslist l -> SortedList.elements l.val
+      | _ -> [] ]
+    in
+    loop (Vslistlm []) list where rec loop prev_item =
+      fun
+      [ [_ :: sll] as gsll ->
+           let item = Vslistlm gsll in
+           let env = [("item", item); ("prev_item", prev_item) :: env] in
+           do {
+             List.iter (print_ast env ep) al;
+             loop item sll
+           }
+      | [] -> () ]
+  and print_foreach_sorted_listc_item env al ep =
+    let list =
+      match get_env "listc" env with
+      [ Vslist l -> SortedList.elements l.val
+      | _ -> [] ]
+    in
+    loop (Vslistlm []) list where rec loop prev_item =
+      fun
+      [ [_ :: sll] as gsll ->
+           let item = Vslistlm gsll in
+           let env = [("item", item); ("prev_item", prev_item) :: env] in
+           do {
+             List.iter (print_ast env ep) al;
+             loop item sll
+           }
+      | [] -> () ]
   and print_foreach_source env al ((p, p_auth) as ep) =
     let rec insert_loop typ src =
       fun
@@ -5284,6 +5500,14 @@ value eval_predefined_apply conf env f vl =
       match get_env "list" env with
       [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
       | _ -> raise Not_found ]
+  | ("add_in_sorted_listb", sl) ->
+      match get_env "listb" env with
+      [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
+      | _ -> raise Not_found ]
+  | ("add_in_sorted_listc", sl) ->
+      match get_env "listc" env with
+      [ Vslist l -> do { l.val := SortedList.add sl l.val; "" }
+      | _ -> raise Not_found ]
   | ("hexa", [s]) -> Util.hexa_string s
   | ("initial", [s]) ->
       if String.length s = 0 then ""
@@ -5316,6 +5540,12 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     | None -> 120 ]
   in
   let env =
+    let () =
+      match Util.find_sosa_ref conf base with
+      [ Some sosa_ref ->
+        build_sosa_ht conf base
+      | _ -> () ]
+    in
     let sosa_ref = Util.find_sosa_ref conf base in
     let sosa_ref_l =
       let sosa_ref () = sosa_ref in
@@ -5334,6 +5564,10 @@ value gen_interp_templ menu title templ_fname conf base p = do {
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
     in
+    let desc_level_table_m =
+      let dlt () = make_desc_level_table conf base 120 p in
+      Lazy.from_fun dlt
+    in
     let desc_level_table_l_save =
       let dlt () = make_desc_level_table conf base emal p in
       Lazy.from_fun dlt
@@ -5345,8 +5579,19 @@ value gen_interp_templ menu title templ_fname conf base p = do {
     let smal () =
       Vint (max_ancestor_level conf base (get_key_index p) 120 + 1)
     in
+    (* Sosa_ref max ancestor level *)
+    let srmal () =
+      match Util.find_sosa_ref conf base with
+      [ Some sosa_ref ->
+        Vint (max_ancestor_level conf base (get_key_index sosa_ref) 120 + 1)
+      | _ -> Vint 0 ]
+    in
     let mcl () = Vint (max_cousin_level conf base p) in
     let mdl () = Vint (max_descendant_level conf base desc_level_table_l) in
+    (* Static max descendant level *)
+    let smdl () =
+      Vint (max_descendant_level conf base desc_level_table_m)
+    in
     let nldb () =
       let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
       let fname = Filename.concat bdir "notes_links" in
@@ -5361,6 +5606,8 @@ value gen_interp_templ menu title templ_fname conf base p = do {
      ("count1", Vcnt (ref 0));
      ("count2", Vcnt (ref 0));
      ("list", Vslist (ref SortedList.empty));
+     ("listb", Vslist (ref SortedList.empty));
+     ("listc", Vslist (ref SortedList.empty));
      ("desc_mark", Vdmark (ref [| |]));
      ("lazy_print", Vlazyp (ref None));
      ("sosa",  Vsosa (ref []));
@@ -5368,8 +5615,10 @@ value gen_interp_templ menu title templ_fname conf base p = do {
      ("t_sosa", Vt_sosa t_sosa);
      ("max_anc_level", Vlazy (Lazy.from_fun mal));
      ("static_max_anc_level", Vlazy (Lazy.from_fun smal));
+     ("sosa_ref_max_anc_level", Vlazy (Lazy.from_fun srmal));
      ("max_cous_level", Vlazy (Lazy.from_fun mcl));
      ("max_desc_level", Vlazy (Lazy.from_fun mdl));
+     ("static_max_desc_level", Vlazy (Lazy.from_fun smdl));
      ("desc_level_table", Vdesclevtab desc_level_table_l);
      ("desc_level_table_save", Vdesclevtab desc_level_table_l_save);
      ("nldb", Vlazy (Lazy.from_fun nldb));
@@ -5477,7 +5726,7 @@ value print_ascend conf base p =
       let templ =
         match p_getenv conf.env "t" with
         [ Some ("E" | "F" | "H" | "L") -> "anclist"
-        | Some ("D" | "G" | "M" | "N" | "P" | "Z") -> "ancsosa"
+        | Some ("D" | "G" | "M" | "N" | "P" | "X" | "Y" | "Z") -> "ancsosa"
         | Some ("A" | "C" | "T") -> "anctree"
         | _ -> "ancmenu" ]
       in
@@ -5497,7 +5746,8 @@ value print_what_links conf base p =
     let db = Notes.merge_possible_aliases conf db in
     let pgl = links_to_ind conf base db key in
     let title h = do {
-      Wserver.printf "%s: " (capitale (transl conf "linked pages"));
+      Wserver.printf "%s%s " (capitale (transl conf "linked pages"))
+        (Util.transl conf ":");
       if h then Wserver.printf "%s" (simple_person_text conf base p True)
       else
         Wserver.printf "<a href=\"%s%s\">%s</a>" (commd conf)

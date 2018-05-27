@@ -89,8 +89,8 @@
     %include.ancdes_ars;
   %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "tag")
     %include.ancdes_tag;
-  %elseif;(evar.m = "D" and evar.t = "L" and evar.tl1 = "hrztl")
-    %include.deslist_hrztl;
+  %elseif;(evar.m = "D" and evar.t = "D")
+    %include.deslist_mr;
   %else;
     %include.deslist_list;
   %end;

@@ -1,6 +1,14 @@
+    last sosa level not navigable
+en: last sosa level not navigable. Use ancestors list.
+fr: le dernier niveau des sosa n'est pas navigable. Utilisez la liste des ancêtres.
+
     with root, spouses and unknowns
 en: with root ancestor, spouses and unknowns
 fr: avec l'ancêtre racine, les conjoints et les inconnus
+
+    hide portraits
+en: hide portraits
+fr: ne pas afficher les portraits
 
     choose a genealogy
 en: choose a genealogy
@@ -14,20 +22,59 @@ fr: Tapez à l'identique le nom de la généalogie que vous voulez utiliser :
 en: list of available genealogies (use gwsetup)
 fr: listes des généalogies disponibles (utilise gwsetup)
 
-    about (short date)
-de: ca.
-en: about
-es: alrededor de
-fr: vers
-he:   בערך
-it: circa
-pl: około
-ru: около
+    collapse implex
+en: collapse implex
+fr: réduire les implexes
 
-    book of %s
-en: book of %s
-fr: dictionnaire des %s
+    display implex
+en: display implex
+fr: afficher les implexes
 
+    show implex
+en: show implex
+fr: identifier les implexes
+
+    ignore implex
+en: ignore implex
+fr: ignorer les implexes
+    
+    both
+en: both
+fr: les deux
+
+    books
+en: books
+fr: dictionnaires
+oc: diccionaris
+
+    reduce/increase
+en: reduce/increase
+fr: réduire/augmenter
+
+    activate/suppress
+en: activate/suppress
+fr: activer/supprimer
+
+    do not
+en: do not
+fr: ne pas
+
+    size
+en: scale
+fr: echelle
+
+    couples
+en: couples
+fr: couples
+
+    missing %s
+en: missing %s
+fr: %s manquant
+
+    one additional generation
+en: one additional generation
+fr: une génération en plus
+    
     compiled on %s from commit %s
 en: compiled on %s from commit %s
 fr: compilé le %s à partir du commit %s
@@ -68,6 +115,22 @@ fr: ancien nom
     new name
 en: new name
 fr: nouveau nom
+
+    scale
+en: years by generation
+fr: années par génération
+
+    multi relations graph
+en: multi relations graph
+fr: graphe de relations multiples
+
+    edit tree
+en: edit the graph
+fr: editer le graphe
+
+    dag on/dag off
+en: dag on/dag off
+fr: dag actif/dag inactif
 
      !dates order
 af: yyyymmdd
@@ -697,10 +760,10 @@ eo: 1an de %m %y/%da de %m %y/%m %y/%y
 es: 1 de %m %y/%d de %m %y/%m %y/%y
 et: 1. %m %y/%d. %m %y/%m %y/%y
 fi: 1. %mta %y/%d. %mta %y/%mssa %y/%y
-fr: 1er %m %y/%d %m %y/%m %y/%y
+fr: 1ᵉʳ %m %y/%d %m %y/%m %y/%y
 he: 1 %m %y/%d %m %y/%m %y/%y
 is: 1 %m %y/%d %m %y/%m %y/%y
-it: 1<sup>o</sup> %m %y/%d %m %y/%m %y/%y
+it: 1º %m %y/%d %m %y/%m %y/%y
 lv: 1. %m %y/%y.gada %d.%m/%y %m/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
 no: 1. %m %y/%d. %m %y/%m %y/%y
@@ -979,6 +1042,10 @@ sk: <em>"Sosa" číslo</em> vo vzťahu k %t
 sl: <em>številka"Sosa"</em>, v odnosu z %t
 sv: <em>annummer</em> med %t som proband (Kekules system)
 
+    degree of kinship
+en: degree of kinship
+fr: degré de parenté
+
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
 bg: %sи братовчед/%sа братовчедка
@@ -1137,7 +1204,7 @@ eo: kuzo/kuzino
 es: un primo/una prima
 et: nõbu:g:--o
 fi: serkku:g:--un
-fr: un cousin/une cousine
+fr: un cousin/une cousine/cousins/cousines/cousins et cousines
 he:  בן-דוד/ בת-דוד
 is: systkynabarn
 it: un cugino/una cugina
@@ -1305,13 +1372,13 @@ br: un niz bihan/ur verc'h vihan
 ca: un besnebot/una besneboda
 cs: prasynovec/praneteř
 da: en grandnevø/en grandniece
-de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte
-en: a great-nephew/a great-niece
+de: ein:d:+em Großneffe:d:+n/eine:d:+r Großnichte/Großneffen/Großnichten/Großneffen und Großnichten
+en: a great-nephew/a great-niece/great-nephew/great-niece/great-nephews and great-nieces
 eo: pranevo/pranevino
 es: un sobrino nieto/una sobrina nieta
 et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
 fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tytär:g:---tären
-fr: un petit neveu/une petite nièce
+fr: un petit-neveu/une petite-nièce/petits-neveux/petites-nièces/petits-neveux et petites-nièces
 he:   בן האחיין/ בת האחיין
 is: frændi/frænka
 it: un pronipote/una pronipote
@@ -1340,7 +1407,7 @@ eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
 et: vanaonu/vanatädi
 fi: isosetä:g:---dän/isotäti:g:--din
-fr: un grand-oncle/une grand-tante
+fr: un grand-oncle/une grand-tante/grand-oncles/grand-tantes/grand-oncles et grand-tantes
 he:   דוד-סב/ דודה-סבה
 is: afa(ömmu)bróðir/afa(ömmu)systir
 it: un prozio/una prozia
@@ -1369,7 +1436,7 @@ eo: duonfrato/duonfratino/duonfrat(in)o
 es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
 et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
 fi: velipuoli:g:-en/sisarpuoli:g:-en/isä- tai äitipuolen lapsi:g:-en
-fr: un demi-frère/une demi-sœur/un demi-frère ou une demi-sœur
+fr: un demi-frère/une demi-sœur/un demi-frère ou sœur
 he:   חצי אח/ חצי אחות/ חצי אח(ות)
 is: hálfbróðir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
@@ -1385,34 +1452,42 @@ sk: nevlastný brat/nevlastná sestra/ nevlastný súrodenec
 sl: polbrata/polsestra/polbrat ali polsestra
 sv: en halvbror/en halvsyster/ett halvsyskon
 
+    half-brothers/half-sisters/half-siblings
+en: half-brothers/half-sisters/half-siblings
+fr: demi-frères/demi-sœurs/demi-frères et sœurs
+
+    brothers/sisters/siblings
+en: brothers/sisters/siblings
+fr: frères/sœurs/frères et sœurs
+
     a nephew/a niece
-af: 'n broerskind/'n susterskind
-bg: племенник/племенница
-br: un niz/un nizez
-ca: un nebot/una neboda
-cs: synovec/neteř
-da: en nevø/en niece
-de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte
-en: a nephew/a niece
-eo: nevo/nevino
-es: un sobrino/a sobrina
-et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
-fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:---tären
-fr: un neveu/une nièce
-he:   אחיין/ אחיינית
-is: bróður(systur)sonur/bróður(systur)dóttir
-it: un nipote/una nipote
+af: 'n broerskind/'n susterskind///broers- en susterskinders
+bg: племенник/племенница/племенници/племеннички/племенници и племеннички
+br: un niz/un nizez/nized/nizezed/nized ha nizezed
+ca: un nebot/una neboda/nebots/nebodes/nebots i nebodes
+cs: synovec/neteř/synovci/neteře/synovci a neteře
+da: en nevø/en niece/nevøer/niecer/nevøer og niecer
+de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte/Neffen/Nichten/Neffen und Nichten
+en: a nephew/a niece/nephews/nieces/nephews and nieces
+eo: nevo/nevino/nevoj/nevinoj/nevoj kaj nevinoj
+es: un sobrino/a sobrina/sobrinos/sobrinas/sobrinos y sobrinas
+et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re///venna- ja õelapsed
+fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentytär:g:---tären///sisarusten lapset
+fr: un neveu/une nièce/neveux/nièces/neveux et nièces
+he:   אחיין/ אחיינית///אחיינים
+is: bróður(systur)sonur/bróður(systur)dóttir///bræðra og systrabörn
+it: un nipote/una nipote/nipoti/nipoti/nipoti
 lv: brāļa/māsas dēls/meita
-nl: een neef/een nicht (oom- of tantezegger)
-no: nevø/niese
-oc: un nebot/una neboda
-pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
-pt: um sobrinho/uma sobrinha
-ro: nepot/nepoata/nepoti
-ru: племянник/племянница
-sk: synovec/neter
-sl: nečak/nečakinja/nečak ali nečakinja
-sv: en nevö/en niece
+nl: een neef/een nicht (oom- of tantezegger)///neven en nichten (oom-, tantezegger)
+no: nevø/niese/nevøer/nieser/nevøer og nieser
+oc: un nebot/una neboda/nebots/nebodas/nebots e nebodas
+pl: bratanek lub siostrzeniec/bratanica lub siostrzenica/bratankowie lub siostrzeńcy/bratanice lub siostrzenice/
+pt: um sobrinho/uma sobrinha/sobrinhos/sobrinhas/sobrinhos e sobrinhas
+ro: nepot/nepoata/nepoti/nepoate/nepoti si nepoate
+ru: племянник/племянница/племянники/племянницы/племянники и племянницы
+sk: synovec/neter/synovci/netere/synovci a netere
+sl: nečak/nečakinja/nečaki/nečakinje/nečak in nečakinja
+sv: en nevö/en niece/nevöer/niecer/nevöer och niecer
 
     a son-in-law/a daughter-in-law
 af: 'n skoonseun/'n skoondogter
@@ -1427,7 +1502,7 @@ eo: bofilo/bofilino
 es: un yerno/una nuera
 et: väimees:g:--he/minia
 fi: vävy:g:+n/miniä:g:+n
-fr: un beau-fils/une belle-fille
+fr: un beau-fils&#047;gendre/une belle-fille&#047;bru
 he:  חתן/ כלה
 is: tengdasonur/tengdadóttir
 it: un genero/una nuora
@@ -2147,12 +2222,12 @@ ca: un oncle/una tia
 cs: strýc/teta
 da: en onkel/en tante
 de: ein:d:+em Onkel/eine:d:+r Tante
-en: an uncle/an aunt
+en: an uncle/an aunt/uncles/aunts/uncles and aunts
 eo: onklo/onklino
 es: un tío/una tía
 et: onu/tädi
 fi: setä:g:---dän/täti:g:--din/eno:g:+n/täti:g:--din
-fr: un oncle/une tante
+fr: un oncle/une tante/oncles/tantes/oncles et tantes
 he:   דוד/ דודה
 is: föður(móður)bróðir/föður(móður)systir
 it: uno zio/una zia
@@ -3970,7 +4045,7 @@ eo: gekuzoj
 es: primos
 et: nõod
 fi: serkut
-fr: cousins
+fr: cousins germains
 he:   בני דודים
 is: systkynabörn
 it: cugini
@@ -4690,7 +4765,7 @@ sv: visa generations nummer
 
     display marriage date
 de: Hochzeitstag anzeigen
-en: Display date of marriage
+en: display marriage date
 es: editar la fecha de casamiento
 fr: afficher la date de mariage
 it: visualizzare la data del matrimonio
@@ -8721,35 +8796,6 @@ no: velg en annen utregningsmåte og beregn påny
 oc: podètz ensajar amb un autre metòde de calcul de relacion
 sv: välj ett annat uträkningssätt och räkna ut igen
 
-    nephews and nieces
-af: broers- en susterskinders
-bg: племенници и племеннички
-br: nized ha nizezed
-ca: nebots i nebodes
-cs: synovci a neteře
-da: nevøer og niecer
-de: Neffen und Nichten
-en: nephews and nieces
-eo: nevoj kaj nevinoj
-es: sobrinos y sobrinas
-et: venna- ja õelapsed
-fi: sisarusten lapset
-fr: neveux et nièces
-he:  אחיינים
-is: bræðra og systrabörn
-it: nipoti
-lv: brāļadēli/māsasdēli un brāļameitas/māsasmeitas
-nl: neven en nichten (oom-, tantezegger)
-no: nevøer og nieser
-oc: nebots e nebodas
-pl: bratankowie lub siostrzeńcy/bratanice lub siostrzenice
-pt: sobrinhos e sobrinhas
-ro: nepoti si nepoate
-ru: племянники и племянницы
-sk: synovci a netere
-sl: nečaki in nečakinje
-sv: nevöer och niecer
-
     new modification
 de: hier klicken um eine neue Korrektion durchzuführen
 en: Continue edit
@@ -9187,7 +9233,7 @@ eo: n-a/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/2
 es: n-ésimo/1ro/2ndo/3ro/4to/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14to/15to/16to/17mo/18vo/19no/20mo/21ro/22ndo/23ro/24to/25to/26to/27mo/28vo/29no/30mo/31ro/32ndo/33ro/34to/35to/36to/37mo/38vo/39no/40mo/41ro/42ndo/43ro/44to/45to/46to/47mo/48vo/49no/50mo/51ro/52ndo/53ro/54to/55to/56to/57mo/58vo/59no/60mo/61ro/62ndo/63ro/64to/65to/66to/67mo/68vo/69no/70mo/71ro/72ndo/73ro/74to/75to/76to/77mo/78vo/79no/80mo/81ro/82ndo/83ro/84to/85to/86to/87mo/88vo/89no/90mo/91ro/92ndo/93ro/94to/95to/96to/97mo/98vo/99na
 et: n-s/esimene/teine/kolmas/neljas/viies/kuues/seitsmes/kaheksas/üheksas/kümnes/üheteistkümnes/kaheteistkümnes/kolmeteistkümnes/neljateistkümnes/viieteistkümnes/kuueteistkümnes/seitsmeteistkümnes/kaheksateistkümnes/üheksateistkümnes/kahekümnes/kahekümne esimene/22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 fi: n./ensimmäinen/toinen/kolmas/neljäs/viides/kuudes/seitsemäs/kahdeksas/yhdeksäs/kymmenes/yhdestoista/kahdestoista/kolmastoista/neljästoista/viidestoista/kuudestoista/seitsämästoista/kahdeksastoista/yhdeksästoista/kahdeskymmenes/kahdeskymmenesensimmäinen/22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
-fr: n<sup>ième</sup>/1<sup>er</sup>/2<sup>e</sup>/3<sup>e</sup>/4<sup>e</sup>/5<sup>e</sup>/6<sup>e</sup>/7<sup>e</sup>/8<sup>e</sup>/9<sup>e</sup>/10<sup>e</sup>/11<sup>e</sup>/12<sup>e</sup>/13<sup>e</sup>/14<sup>e</sup>/15<sup>e</sup>/16<sup>e</sup>/17<sup>e</sup>/18<sup>e</sup>/19<sup>e</sup>/20<sup>e</sup>/21<sup>e</sup>/22<sup>e</sup>/23<sup>e</sup>/24<sup>e</sup>/25<sup>e</sup>/26<sup>e</sup>/27<sup>e</sup>/28<sup>e</sup>/29<sup>e</sup>/30<sup>e</sup>/31<sup>e</sup>/32<sup>e</sup>/33<sup>e</sup>/34<sup>e</sup>/35<sup>e</sup>/36<sup>e</sup>/37<sup>e</sup>/38<sup>e</sup>/39<sup>e</sup>/40<sup>e</sup>/41<sup>e</sup>/42<sup>e</sup>/43<sup>e</sup>/44<sup>e</sup>/45<sup>e</sup>/46<sup>e</sup>/47<sup>e</sup>/48<sup>e</sup>/49<sup>e</sup>/50<sup>e</sup>/51<sup>e</sup>/52<sup>e</sup>/53<sup>e</sup>/54<sup>e</sup>/55<sup>e</sup>/56<sup>e</sup>/57<sup>e</sup>/58<sup>e</sup>/59<sup>e</sup>/60<sup>e</sup>/61<sup>e</sup>/62<sup>e</sup>/63<sup>e</sup>/64<sup>e</sup>/65<sup>e</sup>/66<sup>e</sup>/67<sup>e</sup>/68<sup>e</sup>/69<sup>e</sup>/70<sup>e</sup>/71<sup>e</sup>/72<sup>e</sup>/73<sup>e</sup>/74<sup>e</sup>/75<sup>e</sup>/76<sup>e</sup>/77<sup>e</sup>/78<sup>e</sup>/79<sup>e</sup>/80<sup>e</sup>/81<sup>e</sup>/82<sup>e</sup>/83<sup>e</sup>/84<sup>e</sup>/85<sup>e</sup>/86<sup>e</sup>/87<sup>e</sup>/88<sup>e</sup>/89<sup>e</sup>/90<sup>e</sup>/91<sup>e</sup>/92<sup>e</sup>/93<sup>e</sup>/94<sup>e</sup>/95<sup>e</sup>/96<sup>e</sup>/97<sup>e</sup>/98<sup>e</sup>/99<sup>e</sup>/100<sup>e</sup>/101<sup>e</sup>/102<sup>e</sup>/103<sup>e</sup>/104<sup>e</sup>
+fr: nⁱᵉᵐᵉ/1ᵉʳ/2ᵉ/3ᵉ/4ᵉ/5ᵉ/6ᵉ/7ᵉ/8ᵉ/9ᵉ/10ᵉ/11ᵉ/12ᵉ/13ᵉ/14ᵉ/15ᵉ/16ᵉ/17ᵉ/18ᵉ/19ᵉ/20ᵉ/21ᵉ/22ᵉ/23ᵉ/24ᵉ/25ᵉ/26ᵉ/27ᵉ/28ᵉ/29ᵉ/30ᵉ/31ᵉ/32ᵉ/33ᵉ/34ᵉ/35ᵉ/36ᵉ/37ᵉ/38ᵉ/39ᵉ/40ᵉ/41ᵉ/42ᵉ/43ᵉ/44ᵉ/45ᵉ/46ᵉ/47ᵉ/48ᵉ/49ᵉ/50ᵉ/51ᵉ/52ᵉ/53ᵉ/54ᵉ/55ᵉ/56ᵉ/57ᵉ/58ᵉ/59ᵉ/60ᵉ/61ᵉ/62ᵉ/63ᵉ/64ᵉ/65ᵉ/66ᵉ/67ᵉ/68ᵉ/69ᵉ/70ᵉ/71ᵉ/72ᵉ/73ᵉ/74ᵉ/75ᵉ/76ᵉ/77ᵉ/78ᵉ/79ᵉ/80ᵉ/81ᵉ/82ᵉ/83ᵉ/84ᵉ/85ᵉ/86ᵉ/87ᵉ/88ᵉ/89ᵉ/90ᵉ/91ᵉ/92ᵉ/93ᵉ/94ᵉ/95ᵉ/96ᵉ/97ᵉ/98ᵉ/99ᵉ/100ᵉ/101ᵉ/102ᵉ/103ᵉ/104ᵉ
 he:  הn/ראשון/ שני/ שלישי/ רביעי/ חמשי/ שישי/ שביעי/ שמיני/ תשיעי/ עשירי/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/8/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 is: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/20o/21o/22o/23o/24o/25o/26o/27o/28o/29o/30o/31o/32o/33o/34o/35o/36o/37o/38o/39o/40o/41o/42o/43o/44o/45o/46o/47o/48o/49o/50o/51o/52o/53o/54o/55o/56o/57o/58o/59o/60o/61o/62o/63o/64o/65o/66o/67o/68o/69o/70o/71o/72o/73o/74o/75o/76o/77o/78o/79o/80o/81o/82o/83o/84o/85o/86o/87o/88o/89o/90o/91o/92o/93o/94o/95o/96o/97o/98o/99o
@@ -9217,7 +9263,7 @@ eo: n-a/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/2
 es: n-ésima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 et: n-s/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 fi: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
-fr: n<sup>ième</sup>/1<sup>er</sup>/2<sup>e</sup>/3<sup>e</sup>/4<sup>e</sup>/5<sup>e</sup>/6<sup>e</sup>/7<sup>e</sup>/8<sup>e</sup>/9<sup>e</sup>/10<sup>e</sup>/11<sup>e</sup>/12<sup>e</sup>/13<sup>e</sup>/14<sup>e</sup>/15<sup>e</sup>/16<sup>e</sup>/17<sup>e</sup>/18<sup>e</sup>/19<sup>e</sup>/20<sup>e</sup>/21<sup>e</sup>/22<sup>e</sup>/23<sup>e</sup>/24<sup>e</sup>/25<sup>e</sup>/26<sup>e</sup>/27<sup>e</sup>/28<sup>e</sup>/29<sup>e</sup>/30<sup>e</sup>/31<sup>e</sup>/32<sup>e</sup>/33<sup>e</sup>/34<sup>e</sup>/35<sup>e</sup>/36<sup>e</sup>/37<sup>e</sup>/38<sup>e</sup>/39<sup>e</sup>/40<sup>e</sup>/41<sup>e</sup>/42<sup>e</sup>/43<sup>e</sup>/44<sup>e</sup>/45<sup>e</sup>/46<sup>e</sup>/47<sup>e</sup>/48<sup>e</sup>/49<sup>e</sup>/50<sup>e</sup>/51<sup>e</sup>/52<sup>e</sup>/53<sup>e</sup>/54<sup>e</sup>/55<sup>e</sup>/56<sup>e</sup>/57<sup>e</sup>/58<sup>e</sup>/59<sup>e</sup>/60<sup>e</sup>/61<sup>e</sup>/62<sup>e</sup>/63<sup>e</sup>/64<sup>e</sup>/65<sup>e</sup>/66<sup>e</sup>/67<sup>e</sup>/68<sup>e</sup>/69<sup>e</sup>/70<sup>e</sup>/71<sup>e</sup>/72<sup>e</sup>/73<sup>e</sup>/74<sup>e</sup>/75<sup>e</sup>/76<sup>e</sup>/77<sup>e</sup>/78<sup>e</sup>/79<sup>e</sup>/80<sup>e</sup>/81<sup>e</sup>/82<sup>e</sup>/83<sup>e</sup>/84<sup>e</sup>/85<sup>e</sup>/86<sup>e</sup>/87<sup>e</sup>/88<sup>e</sup>/89<sup>e</sup>/90<sup>e</sup>/91<sup>e</sup>/92<sup>e</sup>/93<sup>e</sup>/94<sup>e</sup>/95<sup>e</sup>/96<sup>e</sup>/97<sup>e</sup>/98<sup>e</sup>/99<sup>e</sup>
+fr: nⁱᵉᵐᵉ/1ᵉʳ/2ᵉ/3ᵉ/4ᵉ/5ᵉ/6ᵉ/7ᵉ/8ᵉ/9ᵉ/10ᵉ/11ᵉ/12ᵉ/13ᵉ/14ᵉ/15ᵉ/16ᵉ/17ᵉ/18ᵉ/19ᵉ/20ᵉ/21ᵉ/22ᵉ/23ᵉ/24ᵉ/25ᵉ/26ᵉ/27ᵉ/28ᵉ/29ᵉ/30ᵉ/31ᵉ/32ᵉ/33ᵉ/34ᵉ/35ᵉ/36ᵉ/37ᵉ/38ᵉ/39ᵉ/40ᵉ/41ᵉ/42ᵉ/43ᵉ/44ᵉ/45ᵉ/46ᵉ/47ᵉ/48ᵉ/49ᵉ/50ᵉ/51ᵉ/52ᵉ/53ᵉ/54ᵉ/55ᵉ/56ᵉ/57ᵉ/58ᵉ/59ᵉ/60ᵉ/61ᵉ/62ᵉ/63ᵉ/64ᵉ/65ᵉ/66ᵉ/67ᵉ/68ᵉ/69ᵉ/70ᵉ/71ᵉ/72ᵉ/73ᵉ/74ᵉ/75ᵉ/76ᵉ/77ᵉ/78ᵉ/79ᵉ/80ᵉ/81ᵉ/82ᵉ/83ᵉ/84ᵉ/85ᵉ/86ᵉ/87ᵉ/88ᵉ/89ᵉ/90ᵉ/91ᵉ/92ᵉ/93ᵉ/94ᵉ/95ᵉ/96ᵉ/97ᵉ/98ᵉ/99ᵉ
 he:  הn/ראשונה/ שנית/ שלישית/ רביעית/ חמשית/ שישית/ שביעית/ שמינית/ תשיעית/ עשירית/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/8/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 is: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/20o/21o/22o/23o/24o/25o/26o/27o/28o/29o/30o/31o/32o/33o/34o/35o/36o/37o/38o/39o/40o/41o/42o/43o/44o/45o/46o/47o/48o/49o/50o/51o/52o/53o/54o/55o/56o/57o/58o/59o/60o/61o/62o/63o/64o/65o/66o/67o/68o/69o/70o/71o/72o/73o/74o/75o/76o/77o/78o/79o/80o/81o/82o/83o/84o/85o/86o/87o/88o/89o/90o/91o/92o/93o/94o/95o/96o/97o/98o/99o
@@ -9247,7 +9293,7 @@ eo: n-a/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/2
 es: n-ésima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 et: n-s/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 fi: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
-fr: n<sup>ième</sup>/1<sup>re</sup>/2<sup>e</sup>/3<sup>e</sup>/4<sup>e</sup>/5<sup>e</sup>/6<sup>e</sup>/7<sup>e</sup>/8<sup>e</sup>/9<sup>e</sup>/10<sup>e</sup>/11<sup>e</sup>/12<sup>e</sup>/13<sup>e</sup>/14<sup>e</sup>/15<sup>e</sup>/16<sup>e</sup>/17<sup>e</sup>/18<sup>e</sup>/19<sup>e</sup>/20<sup>e</sup>/21<sup>e</sup>/22<sup>e</sup>/23<sup>e</sup>/24<sup>e</sup>/25<sup>e</sup>/26<sup>e</sup>/27<sup>e</sup>/28<sup>e</sup>/29<sup>e</sup>/30<sup>e</sup>/31<sup>e</sup>/32<sup>e</sup>/33<sup>e</sup>/34<sup>e</sup>/35<sup>e</sup>/36<sup>e</sup>/37<sup>e</sup>/38<sup>e</sup>/39<sup>e</sup>/40<sup>e</sup>/41<sup>e</sup>/42<sup>e</sup>/43<sup>e</sup>/44<sup>e</sup>/45<sup>e</sup>/46<sup>e</sup>/47<sup>e</sup>/48<sup>e</sup>/49<sup>e</sup>/50<sup>e</sup>/51<sup>e</sup>/52<sup>e</sup>/53<sup>e</sup>/54<sup>e</sup>/55<sup>e</sup>/56<sup>e</sup>/57<sup>e</sup>/58<sup>e</sup>/59<sup>e</sup>/60<sup>e</sup>/61<sup>e</sup>/62<sup>e</sup>/63<sup>e</sup>/64<sup>e</sup>/65<sup>e</sup>/66<sup>e</sup>/67<sup>e</sup>/68<sup>e</sup>/69<sup>e</sup>/70<sup>e</sup>/71<sup>e</sup>/72<sup>e</sup>/73<sup>e</sup>/74<sup>e</sup>/75<sup>e</sup>/76<sup>e</sup>/77<sup>e</sup>/78<sup>e</sup>/79<sup>e</sup>/80<sup>e</sup>/81<sup>e</sup>/82<sup>e</sup>/83<sup>e</sup>/84<sup>e</sup>/85<sup>e</sup>/86<sup>e</sup>/87<sup>e</sup>/88<sup>e</sup>/89<sup>e</sup>/90<sup>e</sup>/91<sup>e</sup>/92<sup>e</sup>/93<sup>e</sup>/94<sup>e</sup>/95<sup>e</sup>/96<sup>e</sup>/97<sup>e</sup>/98<sup>e</sup>/99<sup>e</sup>/100<sup>e</sup>/101<sup>e</sup>/102<sup>e</sup>/103<sup>e</sup>/104<sup>e</sup>/105<sup>e</sup>/106<sup>e</sup>/107<sup>e</sup>/108<sup>e</sup>/109<sup>e</sup>/110<sup>e</sup>/111<sup>e</sup>/112<sup>e</sup>/113<sup>e</sup>/114<sup>e</sup>/115<sup>e</sup>/116<sup>e</sup>/117<sup>e</sup>/118<sup>e</sup>/119<sup>e</sup>/120<sup>e</sup>/121<sup>e</sup>/122<sup>e</sup>/123<sup>e</sup>/124<sup>e</sup>/125<sup>e</sup>
+fr: nⁱᵉᵐᵉ/1ʳᵉ/2ᵉ/3ᵉ/4ᵉ/5ᵉ/6ᵉ/7ᵉ/8ᵉ/9ᵉ/10ᵉ/11ᵉ/12ᵉ/13ᵉ/14ᵉ/15ᵉ/16ᵉ/17ᵉ/18ᵉ/19ᵉ/20ᵉ/21ᵉ/22ᵉ/23ᵉ/24ᵉ/25ᵉ/26ᵉ/27ᵉ/28ᵉ/29ᵉ/30ᵉ/31ᵉ/32ᵉ/33ᵉ/34ᵉ/35ᵉ/36ᵉ/37ᵉ/38ᵉ/39ᵉ/40ᵉ/41ᵉ/42ᵉ/43ᵉ/44ᵉ/45ᵉ/46ᵉ/47ᵉ/48ᵉ/49ᵉ/50ᵉ/51ᵉ/52ᵉ/53ᵉ/54ᵉ/55ᵉ/56ᵉ/57ᵉ/58ᵉ/59ᵉ/60ᵉ/61ᵉ/62ᵉ/63ᵉ/64ᵉ/65ᵉ/66ᵉ/67ᵉ/68ᵉ/69ᵉ/70ᵉ/71ᵉ/72ᵉ/73ᵉ/74ᵉ/75ᵉ/76ᵉ/77ᵉ/78ᵉ/79ᵉ/80ᵉ/81ᵉ/82ᵉ/83ᵉ/84ᵉ/85ᵉ/86ᵉ/87ᵉ/88ᵉ/89ᵉ/90ᵉ/91ᵉ/92ᵉ/93ᵉ/94ᵉ/95ᵉ/96ᵉ/97ᵉ/98ᵉ/99ᵉ/100ᵉ/101ᵉ/102ᵉ/103ᵉ/104ᵉ/105ᵉ/106ᵉ/107ᵉ/108ᵉ/109ᵉ/110ᵉ/111ᵉ/112ᵉ/113ᵉ/114ᵉ/115ᵉ/116ᵉ/117ᵉ/118ᵉ/119ᵉ/120ᵉ/121ᵉ/122ᵉ/123ᵉ/124ᵉ/125ᵉ
 he:  הn/ראשון/ שני/ שלישי/ רביעי/ חמשי/ שישי/ שביעי/ שמיני/ תשיעי/ עשירי/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/8/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 is: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 it: n-esima/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
@@ -9263,6 +9309,11 @@ ru: энного/1-го/2-го/3-го/4-го/5-го/6-го/7-го/8-го/9-го/
 sk: n-tý/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
+
+    n (number)
+de: kein/eins/zwei/drei/vier/fünf/sechs/sieben/acht/neun/zehn/elf/zwölf/dreizehn/vierzehn/füfnzehn/sechzehn/siebzehn/achtzehn/neunzehn/zwanzig/einundzwanzig/zweiundzwanzig/dreiundzwanzig/vierundzwanzig/fünfundzwanzig/sechsundzwanzig/siebenundzwanzig/achtundzwanzig/neunundzwanzig/dreißig/einunddreißig
+en: none/one/two/three/four/five/six/seven/eight/nine/ten/eleven/twelve/thirteen/fourteen/fifteen/sixteen/seventeen/eighteen/nineteen/twenty/twenty-one/twenty-two/twenty-two//twenty-three//twenty-four//twenty-five//twenty-six//twenty-seven//twenty-eight//twenty-nine/thirty/thirty-one
+fr: aucun/un/deux/trois/quatre/cinq/six/sept/huit/neuf/dix/onze/douze/treize/quartorze/quinze/seize/dix-sept/dix-huit/dix-neuf/vingt/vingt-et-un/vingt-deux/vingt-trois/vingt-quatre/vingt-cinq/vingt-six/vingt-sept/vingt-huit/vingt-neuf/trente/trente-un
 
     number
 af: nommer
@@ -9745,6 +9796,11 @@ ru: только выбранное поколение
 sk: iba zvolená generácia
 sl: samo izbrana generacija
 sv: endast den valda generationen
+
+    only
+de: nur
+en: only
+fr: uniquement
 
     options
 en: options
@@ -11454,6 +11510,10 @@ sk: syn/dcéra/dieťa
 sl: sin/hčerka/otrok
 sv: son/dotter/barn
 
+    sons/daughters/children
+en: sons/daughters/children
+fr: fils/filles/enfants
+
     sort by/branch/alphabetic order
 de: sortieren nach: /Zweige/Alphabet
 en: sort by/line/alphabetical order
@@ -12349,6 +12409,34 @@ en: father-in-law/mother-in-law
 es: suegro/suegra
 fr: beau-père/belle-mère
 
+    a stepson/stepsons/a stepdaughter/stepdaughters
+en: one stepson/stepsons/one stepdaughter/stepdaughters
+fr: un beau-fils/beaux-fils/une belle-fille/belles-filles
+
+    a stepchild/stepchildren
+en: a stepchild/stepchildren
+fr: un bel-enfant/beaux-enfants
+
+    a brother-in-law/brothers-in-law/a sister-in-law/sisters-in-law
+en: one brother-in-law/brothers-in-law/one sister-in-law/sisters-in-law
+fr: un beau-frère/beaux-frères/une belle-sœur/belles-sœurs
+
+    a half brother-in-law/half brothers-in-law/a half sister-in-law/half sisters-in-law
+en: one half brother-in-law/half brothers-in-law/one half sister-in-law/half sisters-in-law
+fr: un demi beau-frère/demi beaux-frères/une demi belle-sœur/demi belles-sœurs
+
+    a sibling-in-law/siblings-in-law
+en: one sibling-in-law/siblings-in-law
+fr: un beau-frère ou belle-sœur/beaux-frères et belles-sœurs
+
+    a half sibling-in-law/half siblings-in-law
+en: one half sibling-in-law/half siblings-in-law
+fr: un demi beau-frère ou belle-sœur/demi beaux-frères et belles-sœurs
+
+    a child-in-law/children-in-law
+en: one child-in-law/children-in-law
+fr: un bel-enfant/beaux-enfants
+
     the father/the mother/a parent
 af: die pa/die ma/'n ouer
 bg: бащата/майката/родител
@@ -12463,7 +12551,7 @@ eo: la genepoj
 es: los nietos
 et: lapselapsed
 fi: lapsenlapset
-fr: les petits enfants
+fr: les petits-enfants
 he:  הנכדים
 is: barnabörnin
 it: i nipoti
@@ -13320,6 +13408,20 @@ sk: strýkovia a tety
 sl: strici in tete
 sv: farbröder-morbröder och fastrar-mostrar
 
+    siblings of the great-grandparents
+en: great-granduncles and great-grandaunts
+fr: arrières-grands-oncles et arrières-grands-tantes
+
+    siblings of the grandparents
+de: Großonkel und Großtanten
+en: granduncles and grandaunts
+fr: grands-oncles et grands-tantes
+it: prozii e prozie
+
+    uncheck
+en: uncheck
+fr: décocher
+
     undefined sex for %t
 af: geslag onbekend vir %t
 bg: не е определен полът на %t
@@ -14037,32 +14139,32 @@ sk: tvoja správa čaká na potvrdenie
 sv: ditt meddelande väntar på giltighet
 
     database
-af: Stamboom
+af: stamboom
 ar: شجرة العائل
-bg: Cемейно дърво
-br: Bon roadoù
-ca: Base de dades
-cs: Rodokmen
-da: Family Tree
+bg: семейно дърво
+br: bon roadoù
+ca: base de dades
+cs: rodokmen
+da: family Tree
 de: Stammbaum
-en: Family Tree
-eo: Family Tree
+en: family Tree
+eo: family Tree
 es: árbol genealógico
-et: Sugupuu
-fi: Sukupuu
-fr: Base généalogique
+et: sugupuu
+fi: sukupuu
+fr: base généalogique
 he: אילן יוחסין
-is: Ættfræði gagnagrunnur
-it: Albero genealogico
+is: ættfræði gagnagrunnur
+it: albero genealogico
 lv: ģimenes koks
-nl: Stamboom
-no: Family Tree
-pl: Drzewo genealogiczne
+nl: stamboom
+no: family Tree
+pl: drzewo genealogiczne
 pt: árvore genealógica
-ro: Arbore genealogic
+ro: arbore genealogic
 ru: генеалогическое дерево
 sl: družinsko drevo
-sv: Family Tree
+sv: family Tree
 zh: 家譜
 
     frequency
@@ -14236,8 +14338,12 @@ en: I-Tree
 fr: arbre en I
 
     mtree
-en: mixed tree
-fr: arbre mixte
+en: 9 generations H tree
+fr: arbre en H 9 générations
+
+    h7-tree
+en: 7 generation H tree
+fr: arbre en H 7 générations
 
     descendants tree
 en: descendants tree

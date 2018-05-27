@@ -32,8 +32,8 @@ value very_unknown conf =
   match (p_getenv conf.env "n", p_getenv conf.env "p") with
   [ (Some nom, Some prenom) ->
       let title _ =
-        Wserver.printf "%s: \"%s %s\"" (capitale (transl conf "not found"))
-          prenom nom
+        Wserver.printf "%s%s \"%s %s\"" (capitale (transl conf "not found"))
+          (Util.transl conf ":") prenom nom
       in
       do {
         rheader conf title; print_link_to_welcome conf False; trailer conf;
@@ -43,7 +43,8 @@ value very_unknown conf =
 
 value unknown conf n =
   let title _ =
-    Wserver.printf "%s: \"%s\"" (capitale (transl conf "not found")) n
+    Wserver.printf "%s%s \"%s\"" (capitale (transl conf "not found"))
+      (Util.transl conf ":") n
   in
   do {
     rheader conf title; print_link_to_welcome conf False; trailer conf;
@@ -334,7 +335,7 @@ value set_senv conf vm vi =
   do {
     conf.senv := [("em", vm); ("ei", vi)];
     match p_getenv conf.env "image" with
-    [ Some "on" -> conf.senv := conf.senv @ [("image", "on")]
+    [ Some "off" -> conf.senv := conf.senv @ [("image", "off")]
     | _ -> () ];
     match p_getenv conf.env "long" with
     [ Some "on" -> conf.senv := conf.senv @ [("long", "on")]
@@ -438,6 +439,10 @@ value family_m conf base =
       SendImage.print_del_ok conf base
   | Some "DEL_IND" when conf.wizard -> UpdateInd.print_del conf base
   | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
+  | Some "F" ->
+      match find_person_in_env conf base "" with
+      [ Some p ->   Perso.interp_templ "family" conf base p
+      | _ -> very_unknown conf ]
   | Some "FORUM" ->
       match p_getenv conf.base_env "disable_forum" with
       [ Some "yes" -> incorrect_request conf
@@ -766,7 +771,7 @@ END
 value special_vars =
   ["alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
    "iz"; "log_cnl"; "log_pwd"; "log_uid"; "long"; "manitou"; "nz"; "ocz";
-   "pz"; "pure_xhtml"; "size"; "spouse"; "templ"; "p_mod"]
+   "pz"; "pure_xhtml"; "size"; "spouse"; "templ"; "p_mod"; "wide"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);
@@ -811,6 +816,9 @@ value extract_henv conf base =
     | Some _ | None -> () ];
     match p_getenv conf.env "p_mod" with
     [ Some x -> conf.henv := conf.henv @ [("p_mod", x)]
+    | None -> () ];
+    match p_getenv conf.env "wide" with
+    [ Some x -> conf.henv := conf.henv @ [("wide", x)]
     | None -> () ];
   }
 ;

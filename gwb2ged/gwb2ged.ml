@@ -8,6 +8,7 @@ open Printf;
 
 type charset =
   [ Ansel
+  | Ansi
   | Ascii
   | Utf8 ]
 ;
@@ -50,13 +51,11 @@ value encode s =
   [ Ansel ->
       let s = if Mutil.utf_8_db.val then Mutil.iso_8859_1_of_utf_8 s else s in
       Ansel.of_iso_8859_1 s
-  | Ascii ->
+  | Ascii | Ansi ->
       if Mutil.utf_8_db.val then Mutil.iso_8859_1_of_utf_8 s else s
   | Utf8 ->
       if Mutil.utf_8_db.val then s else Mutil.utf_8_of_iso_8859_1 s ]
 ;
-
-value max_len = 78;
 
 value br = "<br>";
 value find_br s ini_i =
@@ -74,14 +73,26 @@ value find_br s ini_i =
     else br
 ;
 
+value max_len = 78; 
+
+(** output text, with CONT/CONC tag using a gedcom file stream
+    GEDCOM lines are limited to 255 characters. 
+    However, the CONCatenation or CONTinuation tags can be used to expand a field beyond this limit.
+    lines are cut and align with max_len characters for easy display/printing
+    @see <https://www.familysearch.org/developers/docs/gedcom/> GEDCOM STANDARD 5.5, Appendix A CONC and CONT tag
+    @param oc specifies output base stream (gedcom file)
+    @param tagn specifies the current gedcom tag level (0, 1, ...)
+    @param s specifies text to output already encode with gedcom charset (see encode function)
+    @param len specifies the number of characters (char or wide char) already outputed in gedcom file 
+    @param i specifies the last char index (index to s -- one byte char) *)
 value rec display_note_aux oc tagn s len i =
   if i = String.length s then fprintf oc "\n"
   else
     let c = if s.[i] = '\n' then ' ' else s.[i] in
     let br = find_br s i in
     if i <= String.length s - String.length br &&
-       String.lowercase_ascii (String.sub s i (String.length br)) = br then
-       do {
+       String.lowercase_ascii (String.sub s i (String.length br)) = br 
+    then do {
       fprintf oc "\n%d CONT " (succ tagn);
       let i = i + String.length br in
       let i = if i < String.length s && s.[i] = '\n' then i + 1 else i in
@@ -92,32 +103,15 @@ value rec display_note_aux oc tagn s len i =
       let i = if i < String.length s then i + 1 else i in
       display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONT ")) i
     }
+    (* cut text at max length for CONCat with next gedcom line *)
     else if len = max_len then do {
-      let j = ref i in
-      let rec display_and_break () =
-        if j.val = String.length s then ()
-        else
-          let c = if s.[j.val] = '\n' then ' ' else s.[j.val] in
-          if c = ' ' || Name.nbc c = 1 then do {
-            (* new line, the char will be printed by the next call to
-               display_note_aux *)
-            fprintf oc "\n%d CONC " (succ tagn);
-            decr j;
-          }
-          else do {
-            (* multi-byte char *)
-            output_char oc c;
-            incr j;
-            display_and_break ()
-          }
-      in
-      display_and_break ();
-      if j.val = String.length s then
-        fprintf oc "\n"
-      else
-        display_note_aux oc tagn s
-          (String.length ((string_of_int (succ tagn)) ^ " CONC "))
-          (j.val + 1)
+      fprintf oc "\n%d CONC " (succ tagn);
+      display_note_aux oc tagn s (String.length ((string_of_int (succ tagn)) ^ " CONC ")) i
+    }
+    (* continue same gedcom line *) 
+    else do {
+      output_onechar ();
+      display_note_aux oc tagn s (len + 1) (j.val + 1)
     }
     else do { output_char oc c; display_note_aux oc tagn s (len + 1) (i + 1) }
 ;
@@ -157,11 +151,12 @@ value ged_header base oc ifile ofile =
     else ();
     fprintf oc "1 GEDC\n";
     match charset.val with
-    [ Ansel | Ascii -> fprintf oc "2 VERS 5.5\n"
+    [ Ansel | Ansi | Ascii -> fprintf oc "2 VERS 5.5\n"
     | Utf8 -> fprintf oc "2 VERS 5.5.1\n" ];
     fprintf oc "2 FORM LINEAGE-LINKED\n";
     match charset.val with
     [ Ansel -> fprintf oc "1 CHAR ANSEL\n"
+    | Ansi -> fprintf oc "1 CHAR ANSI\n"
     | Ascii -> fprintf oc "1 CHAR ASCII\n"
     | Utf8 -> fprintf oc "1 CHAR UTF-8\n" ];
     if no_notes.val then ()
@@ -401,7 +396,7 @@ value ged_pevent base oc per per_sel evt =
            match wk with
            [ Witness -> fprintf oc "3 RELA witness\n"
            | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
-           | Witness_Officer   -> fprintf oc "3 ROLE OFFI\n" ]
+           | Witness_Officer   -> fprintf oc "3 RELA officer\n" ]
          }
          else ())
       evt.epers_witnesses
@@ -687,7 +682,7 @@ value ged_fevent base oc ifam fam_sel evt =
            match wk with
            [ Witness -> fprintf oc "3 RELA witness\n"
            | Witness_GodParent -> fprintf oc "3 RELA GODP\n"
-           | Witness_Officer   -> fprintf oc "3 ROLE OFFI\n" ]
+           | Witness_Officer   -> fprintf oc "3 RELA officer\n" ]
          }
          else ())
       evt.efam_witnesses
@@ -871,10 +866,11 @@ value speclist =
            match x with
            [ "ASCII" -> charset.val := Ascii
            | "ANSEL" -> charset.val := Ansel
+           | "ANSI" -> charset.val := Ansi
            | "UTF-8" -> charset.val := Utf8
            | _ -> raise (Arg.Bad "bad -charset value") ]
          }),
-    "[ASCII|ANSEL|UTF-8]: set charset; default is UTF-8.");
+    "[ASCII|ANSEL|ANSI|UTF-8]: set charset; default is UTF-8.");
    ("-o",
     Arg.String (fun x -> do { ofile.val := x; arg_state.val := ASnone }),
     "<ged>: output file name (default: a.ged)");

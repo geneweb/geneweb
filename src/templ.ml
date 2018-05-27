@@ -23,6 +23,7 @@ type token =
   | PLUS
   | RPAREN
   | STAR
+  | EXP
   | IDENT of string
   | STRING of string
   | INT of string
@@ -143,6 +144,7 @@ value rec get_token =
   | [: `'+' :] ep -> Tok (bp, ep) PLUS
   | [: `'-' :] ep -> Tok (bp, ep) MINUS
   | [: `'*' :] ep -> Tok (bp, ep) STAR
+  | [: `'^' :] ep -> Tok (bp, ep) EXP
   | [: `'/' :] ep -> Tok (bp, ep) DIV
   | [: `'%';
        a =
@@ -241,6 +243,8 @@ and parse_expr_5_kont e =
   parser
   [ [: `Tok loc STAR; e2 = parse_simple_expr;
        a = parse_expr_5_kont (Aop2 loc "*" e e2) :] -> a
+  | [: `Tok loc EXP; e2 = parse_simple_expr;
+       a = parse_expr_5_kont (Aop2 loc "^" e e2) :] -> a
   | [: `Tok loc DIV; e2 = parse_simple_expr;
        a = parse_expr_5_kont (Aop2 loc "/" e e2) :] -> a
   | [: `Tok loc PERCENT; e2 = parse_simple_expr;
@@ -744,11 +748,16 @@ and eval_simple_variable conf =
       Util.doctype conf ^ "\n"
   | "highlight" -> conf.highlight
   | "image_prefix" -> Util.image_prefix conf
+  | "lang" -> conf.lang
   | "left" -> conf.left
   | "nl" -> "\n"
   | "nn" -> ""
   | "prefix" -> Util.commd conf
+  | "prefix_2" -> Util.commd_2 conf
   | "prefix_base" -> Util.prefix_base conf
+  | "prefix_base_2" -> Util.prefix_base_2 conf
+  | "prefix_base_password" -> Util.prefix_base_password conf
+  | "prefix_base_password_2" -> Util.prefix_base_password_2 conf
   | "prefix_no_iz" ->
       let henv =
         List.fold_left
@@ -763,8 +772,49 @@ and eval_simple_variable conf =
           conf.henv []
       in
       let c = conf.command ^ "?" in
-      List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
-        (henv @ conf.senv)
+      List.fold_left (fun c (k, v) ->
+        if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
+          c else c ^ k ^ "=" ^ v ^ ";") c (henv @ conf.senv)
+  | "prefix_no_pmod" ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "p_mod" then henv else [(k, v) :: henv])
+          conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) ->
+        if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
+          c else c ^ k ^ "=" ^ v ^ ";") c (henv @ conf.senv)
+  | "prefix_no_wide" ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "wide" then henv else [(k, v) :: henv])
+          conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) ->
+        if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
+          c else c ^ k ^ "=" ^ v ^ ";") c (henv @ conf.senv)
+  | "prefix_no_lang" ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "lang" then henv else [(k, v) :: henv])
+          conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) -> 
+        if ( k = "oc" || k = "ocz" && v = "" || v = "0" ) || v = "" then
+          c else c ^ k ^ "=" ^ v ^ ";") c (henv @ conf.senv)
+  | "prefix_no_all" ->
+      let henv =
+        List.fold_right
+          (fun (k, v) henv -> if k = "templ" || k = "p_mod" || k = "wide" then
+            henv else [(k, v) :: henv]) conf.henv []
+      in
+      let c = conf.command ^ "?" in
+      List.fold_left (fun c (k, v) ->
+        if (( k = "oc" && (v = "" || v = "0" )) || ( k = "ocz" && (v = "" || v = "0" ))) then c
+        else c ^ k ^ "=" ^ v ^ ";") c (henv @ conf.senv)
   | "referer" -> Util.get_referer conf
   | "right" -> conf.right
   | "setup_link" -> if conf.setup_link then " - " ^ setup_link conf else ""
@@ -777,8 +827,9 @@ and eval_simple_variable conf =
           conf.env (conf.henv @ conf.senv)
       in
       List.fold_left
-        (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";")
-        "" l
+        (fun c (k, v) ->
+          if (( k = "oc" && (v = "" || v = "0" )) || ( k = "ocz" && (v = "" || v = "0" ))) then c 
+          else c ^ k ^ "=" ^ v ^ ";") "" l
   | "url" ->
       let c = Util.commd conf in
       (* On supprime de env toutes les paires qui sont dans (henv @ senv) *)
@@ -1022,6 +1073,7 @@ value rec eval_expr ((conf, eval_var, eval_apply) as ceva) =
       | "+" -> VVstring (Sosa.to_string (Sosa.add (num e1) (num e2)))
       | "-" -> VVstring (Sosa.to_string (Sosa.sub (num e1) (num e2)))
       | "*" -> VVstring (Sosa.to_string (Sosa.mul (num e1) (int e2)))
+      | "^" -> VVstring (Sosa.to_string (Sosa.exp (num e1) (int e2)))
       | "/" -> VVstring (Sosa.to_string (Sosa.div (num e1) (int e2)))
       | "%" -> VVstring (string_of_int (Sosa.modl (num e1) (int e2)))
       | _ -> raise_with_loc loc (Failure ("op \"" ^ op ^ "\"")) ]

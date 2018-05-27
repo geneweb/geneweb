@@ -4,9 +4,170 @@
   -ms-user-select: none;
 }
 
-div.anchor_updind {
+/* --- Ascendants/Descendants table --- */
+.ascends_table, .descends_table
+{
+ border: 1px solid black;
+ }
+
+.ascends_table th, .ascends_table td,
+.descends_table th, .descends_table td
+{
+  border: 1px solid black;
+  vertical-align: top;
+  padding: 4px;
+  empty-cells: show;
+}
+
+.ascends_table_header th,
+.descends_table_header th,
+.missing_ancestors_table_header th,
+.surname_branch_table_header th,
+.list_eclair_table_header th {
+  background-color: Khaki;
+}
+.table-hover tbody tr:hover {
+  background-color: LightGoldenrodYellow;
+}
+.table_big_cell:hover {
+  background-color: ivory;
+}
+.table_big_cell {
+  overflow: hidden;
+}
+
+.table_big_anchor {
+  display: block;
+  margin: -10em;
+  padding: 10em;
+  z-index: 0;
+}
+
+.click_through {
+  pointer-events: none;
+}
+
+.big_anchor {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_1 {
+  display: block;
+  width: 100%;
+  height: 60%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_1m {
+  display: block;
+  width: 100%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_him {
+  display: block;
+  width: 50%;
+  height: 60%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_her {
+  display: block;
+  width: 50%;
+  height: 60%;
+  position: absolute;
+  text-align: right;
+  top: 0;
+  left: 50%;
+  z-index: 0;
+}
+
+.big_anchor_him_m {
+  display: block;
+  width: 50%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 0;
+  z-index: 0;
+}
+
+.big_anchor_her_m {
+  display: block;
+  width: 50%;
+  height: 40%;
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  z-index: 0;
+}
+
+.normal_anchor {
+  position: relative;
+  z-index: 1;
+}
+
+.fade_image {
+   opacity: 1;
+   transition: opacity .25s ease-in-out;
+   -moz-transition: opacity .25s ease-in-out;
+   -webkit-transition: opacity .25s ease-in-out;
+   }
+
+   .fade_image:hover {
+      opacity: 0.7;
+      }
+
+.lh_implex{
+	line-height: 1;
+}
+
+/* Fix navigation buttons to top right corner */
+.fixed_top_btn_col {
+  position: fixed;
+  right: 0px;
+  top: 0px;
+  transform: translateX(-10px);
+  z-index: 1030;
+}
+
+.fixed_top_btn_wide {
+  transform: translateX(-10px);
+}
+
+.fixed_top_btn {
+  position: fixed;
+  right: 0px;
+  top: 0px;
+  transform: translateX(-18px);
+  z-index: 1030;
+}
+
+div.anchor_upd {
   position:absolute;
-  top:-25px;
+  top:-40px;
+}
+
+/* slowly hide placeholder on input focus */
+[placeholder]:focus::-webkit-input-placeholder {
+  transition: opacity 0.5s 0.5s ease;
+  opacity: 0;
 }
 
 /* Capitalization unavailable in note from Ocaml 
@@ -37,9 +198,9 @@ img.image-popover {
 .p_mod-dropdown-menu-wizard {
   padding: 0px;
   border: 0px;
-  left: 20%;
+  left: 25%;
   right: auto;
-  transform: translateX(-20%);
+  transform: translateX(-25%);
 }
 
 div.p_mod_builder {
@@ -108,14 +269,6 @@ a {
   word-wrap: break-word
 }
 
-/* Fix navigation buttons to top right corner */
-.fixed-top-right {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: $zindex-navbar-fixed;
-}
-
 /* Welcome language dropdown scrollable */
 .scrollable-lang {
   height: auto;
@@ -126,6 +279,7 @@ a {
 .scrollable-lang.short {
   max-height: 160px;
 }
+
 
 /* Cancel empty margin-left of Bootstrap <dl> */
 dl {
@@ -1080,31 +1234,6 @@ hr.full
   margin-right: 0;
 }
 
-/* --- Ascendants/Descendants table --- */
-.ascends_table, .descends_table
-{
- border: 1px solid black;
- border-collapse:collapse;
-}
-
-.ascends_table th, .ascends_table td,
-.descends_table th, .descends_table td
-{
-  border: 1px solid black;
-  vertical-align: top;
-  padding: 4px;
-  empty-cells: show;
-}
-
-.ascends_table_header th,
-.descends_table_header th,
-.missing_ancestors_table_header th,
-.surname_branch_table_header th,
-.list_eclair_table_header th
-{
- background-color: #e7edb3;
-}
-
 /* --- Ascendants/Descendants liste rédigée --- */
 .asc_notes_src_inline, .desc_notes_src_inline
 {
@@ -1156,7 +1285,7 @@ ul.surname_branch_sort > li
 {
   border:1px solid black;
   vertical-align:top;
-  padding:2px;
+  padding:2px 4px;
 }
 
 .missing_ancestors_sort
@@ -1206,10 +1335,10 @@ ul.missing_ancestors_sort > li
 }
 
 /* adjust also colors in destable.txt */
-.note, .source, .notesource, .notespouse, .sourcespouse, .notesourcespouse {
+.note, .implex, .source, .notesource, .notespouse, .sourcespouse, .notesourcespouse {
     position: relative;
 }
-.note:after, .source:after, .notesource:after, .notespouse:after, .sourcespouse:after, .notesourcespouse:after {
+.note:after, .implex:after, .source:after, .notesource:after, .notespouse:after, .sourcespouse:after, .notesourcespouse:after {
     content: "";
     position: absolute;
     top: 0;
@@ -1217,6 +1346,11 @@ ul.missing_ancestors_sort > li
     height: 0;
     display: block;
     border-bottom: 12px solid transparent;
+}
+.implex:after {
+    right: 0;
+    border-left: 12px solid transparent;
+    border-top: 12px solid #87CEFA;
 }
 .note:after {
     right: 0;

@@ -24,6 +24,8 @@
                     y2 = temp;
                   }
                   var line = document.createElement("div");
+
+                  line.className = options.class;
                   
                   // Formula for the distance between two points
                   // http://www.mathopenref.com/coorddist.html
@@ -75,5 +77,6 @@
                           color : '#000000',
                           stroke: "1",
                           style: "solid",
+                          class: "line",
                         };
 })(jQuery);

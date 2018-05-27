@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="%if;(bvar.default_lang!="" and evar.lang="")%bvar.default_lang;%elseif;(evar.lang!="")%evar.lang;%else;en%end;">
+<html lang="%lang;">
 <head>
   <!-- $Id: deslist.txt,v 5.19 2007-07-25 13:15:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2017 INRIA -->
