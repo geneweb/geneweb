@@ -657,7 +657,11 @@ value family_m conf base =
       Wiznotes.print conf base
   | Some "WIZNOTES_SEARCH" when conf.authorized_wizards_notes ->
       Wiznotes.print_search conf base
-  | Some mode when Util.start_with mode 0 "API_" ->
+  | Some mode when (try String.get mode 0 = 'A'
+                        && String.get mode 1 = 'P'
+                        && String.get mode 2 = 'I'
+                        && String.get mode 3 = '_'
+                    with _ -> False) ->
 IFDEF API THEN
     (* On passe en mode API, i.e. que les exceptions API sont levées. *)
     let () = Api_conf.set_mode_api () in
