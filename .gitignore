@@ -16,6 +16,9 @@
 .objs
 .merlin
 
+Makefile.local
+src/Makefile.local
+
 src/compilation.ml
 src/gwlib.ml
 
