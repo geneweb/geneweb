@@ -10,6 +10,7 @@ LIBS = unix
 LINKFLAGS = -I $(CAMLP5D)
 
 include $(ROOT)/tools/Makefile.common
+-include $(ROOT)/src/Makefile.local
 
 compilation.ml: always
 	echo "Util.set_compilation_time \"$$(date "+%d %B %Y")\";" > $@

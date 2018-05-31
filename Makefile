@@ -1,6 +1,7 @@
 ROOT := .
 
 include $(ROOT)/tools/Makefile.common
+-include $(ROOT)/Makefile.local
 
 # ALL: directories needed to make distribution
 ALL_TARGETS := wserver dag2html src ged2gwb gwb2ged setup gwtp
