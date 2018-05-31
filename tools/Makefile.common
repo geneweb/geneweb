@@ -117,7 +117,7 @@ depend: $(DEPEND_DEPEND)
 	  \n$(exe).opt: \$$($(exe)_OBJS:=.cmx)\
 	  \n$(exe).out: \$$($(exe)_OBJS:=.cmo)\n" >> $@$(\n))
 
-ifneq ($(filter-out clean depend $(DEPEND_DEPEND_NAMES),$(MAKECMDGOALS)),)
+ifneq ($(filter-out clean depend piqi $(DEPEND_DEPEND_NAMES),$(MAKECMDGOALS)),)
   include .depend
   include .objs
 endif

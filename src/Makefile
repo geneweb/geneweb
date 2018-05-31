@@ -45,6 +45,7 @@ i18n: pr_transl.cmo always
 	sort | uniq | grep -v '^$$' > i18n
 
 # Generation of *_piqi.ml files
+.PHONY: piqi
 piqi:
 	piqi of-proto --normalize api.proto
 	piqic-ocaml --ext api.proto.piqi
