@@ -200,8 +200,20 @@
                  %if;(env.key="t")&t=%if;(evar.t!="Y")Y%else;Z%end;%nn;
                  %elseif;(env.key!="")&%env.key=%env.val;%end;%nn;
                %end;">%nn;
-        <i class="fa fa-th fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
+        <i class="fa fa-table fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
         %if;(evar.t!="Y")[*visualize/show/hide/summary]1%else;[*visualize/show/hide/summary]2%end; [table] [by couple]0%nn;
+    </a>
+  %end;
+  %if;(evar.m="A" and evar.t="Z")
+    <span class="sr-only">—</span>
+    <a role="button" class="btn btn-link ml-2 px-0 mb-1"%sp;
+      href="%prefix_base_password;%nn;
+               %foreach;env_binding;
+                 %if;(env.key!="csv" and env.key!="")&%env.key=%env.val;%end;%nn;
+               %end;
+               %if;(evar.csv!="on")&csv=on%end;">%nn;
+        <i class="%if;(evar.csv="on")fa fa-table%else;far fa-file-alt%end; fa-lg fa-fw mr-1" aria-hidden="true"></i>%nn;
+        [*visualize/show/hide/summary]1 %if;(evar.csv="on")table%else;CSV%end;%nn;
     </a>
   %end;
 </div>
