@@ -751,15 +751,15 @@ let get_filters conf =
     [Rem] : Non exporté en clair hors de ce module.                      *)
 (* ********************************************************************* *)
 let print_result conf data =
-  let output =
+  let (content_type, output) =
     match p_getenvbin conf.env "output" with
-     | Some "pb" -> `pb
-     | Some "json" -> `json
-     | Some "xml" -> `xml
+     | Some "pb" -> ("application/octet-stream", `pb)
+     | Some "json" -> ("application/json", `json)
+     | Some "xml" -> ("application/xml", `xml)
      | _ -> exit (-2)
   in
   let data = data output in
-  Util.html conf ;
+  Util.html ~content_type conf ;
   Util.nl ();
   Wserver.printf "%s" data
 ;;

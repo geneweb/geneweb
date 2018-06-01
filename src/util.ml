@@ -397,7 +397,13 @@ value string_of_ctime conf =
     (1900 + lt.Unix.tm_year) lt.Unix.tm_hour lt.Unix.tm_min lt.Unix.tm_sec
 ;
 
-value html conf =
+value html ?content_type conf =
+  let content_type =
+    match content_type with
+    [ Some x -> x
+    | None -> if conf.pure_xhtml then "application/xhtml+xml" else "text/html"
+    ]
+  in
   let charset = if conf.charset = "" then "utf-8" else conf.charset in
   do {
     if not Wserver.cgi.val then
@@ -405,9 +411,7 @@ value html conf =
     else ();
     Wserver.header "Date: %s" (string_of_ctime conf);
     Wserver.header "Connection: close";
-    Wserver.header "Content-type: %s; charset=%s"
-      (if conf.pure_xhtml then "application/xhtml+xml" else "text/html")
-      charset;
+    Wserver.header "Content-type: %s; charset=%s" content_type charset;
   }
 ;
 
