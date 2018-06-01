@@ -760,7 +760,6 @@ let print_result conf data =
   in
   let data = data output in
   Util.html ~content_type conf ;
-  Util.nl ();
   Wserver.printf "%s" data
 ;;
 
