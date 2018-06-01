@@ -28,7 +28,7 @@ value clean_html_tags : string -> list string -> string;
 value sanitize_html : string -> string;
 
 value nl : unit -> unit;
-value html : config -> unit;
+value html : ?content_type:string -> config -> unit;
 value html_br : config -> unit;
 value html_p : config -> unit;
 value html_li : config -> unit;
