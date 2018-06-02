@@ -1137,7 +1137,7 @@
         %apply;link%with;%ancestor.access;%and;
           %ancestor;%and;%ancestor.index;
         %end;
-        %if;(evar.title="on")%ancestor.title;%end;
+        %if;(evar.title="on" and ancestor.title!=""), %ancestor.title;%end;
         %if;(ancestor.same != "" and evar.repeat = "on" and evar.num!="on")
           %apply;implex()
         %end;
@@ -1379,42 +1379,6 @@
   %end;
 %end;
 
-%define;csv_row(xx)
-  %(todo: manage .death_date.prec | between and .. or %)
-  %foreach;xx.family;
-     %if;(xx!=self)%xx.anc_sosa;%else;1%end;
-    ;%xx.first_name;
-    ;%xx.surname;
-    ;%xx.occ;
-    ;%xx.birth_date.day;
-    ;%xx.birth_date.month;
-    ;%if;(xx.birth_date.prec="ca " or xx.birth_date.prec="<")/%end;%nn;
-     %xx.birth_date.year;%nn;
-     %if;(xx.birth_date.prec="ca " or xx.birth_date.prec=">")/%end;
-    ;%xx.birth_place;
-    ;%xx.death_date.day;
-    ;%xx.death_date.month;
-    ;%if;(xx.death_date.prec="ca " or xx.death_date.prec = "<")/%end;%nn;
-     %xx.death_date.year;%nn;
-     %if;(xx.death_date.prec="ca " or xx.death_date.prec = ">")/%end;
-    ;%xx.death_place;
-    ;%xx.occupation;
-    ;%spouse.first_name;
-    ;%spouse.surname;
-    ;%spouse.occ;
-    ;%marriage_date.day;
-    ;%marriage_date.month;
-    ;%if;(xx.marriage_date.prec="ca " or xx.marriage_date.prec="<")/%end;%nn;
-     %xx.marriage_date.year;%nn;
-     %if;(xx.marriage_date.prec="ca " or xx.marriage_date.prec=">")/%end;
-    ;%marriage_place;
-    ;%xx.nb_children;
-    ;%family_cnt;
-    ;%family.index;
-    <br>
-  %end;
-%end;
-
 %define;table_family()
   %if;(evar.marr = "on" or evar.marr_date = "on" or evar.marr_place = "on")
     %foreach;ancestor.family;
@@ -1556,6 +1520,46 @@
     %end;
   %end;
   <tr><td colspan="7">[*total] : %count; [[person/persons]1@(c)]</td></tr>
+%end;
+
+%( Précision des dates intégrée à l’année en utilisant la syntaxe pour leur saisie dans les formulaires
+TODO: obtenir les secondes valeurs valeurs jj/mm/aaaa pour les cas « ou | » et « entre .. » %)
+%define;date_prec_year(xx)
+  %let;dp;%xx_date.prec%in;
+  %if;(dp="<" or dp="ca ")/%elseif;(dp="?")?%end;%nn;
+  %xx_date.year;%nn;
+  %if;(dp=">" or dp="ca ")/%(%elseif;(dp="|" or dp="..")%dp;%)%end;%nn;
+%end;
+
+%( Ligne du tableau ascendant au format CSV %)
+%define;csv_row(xx)
+  %foreach;xx.family;
+     %if;(xx!=self)%xx.anc_sosa;%else;1%end;
+    ;%xx.first_name;
+    ;%xx.surname;
+    ;%xx.occ;
+    ;%xx.title;
+    ;%xx.birth_date.day;
+    ;%xx.birth_date.month;
+    ;%apply;date_prec_year("xx.birth")
+    ;%xx.birth_place;
+    ;%xx.death_date.day;
+    ;%xx.death_date.month;
+    ;%apply;date_prec_year("xx.death")
+    ;%xx.death_place;
+    ;%xx.occupation;
+    ;%spouse.first_name;
+    ;%spouse.surname;
+    ;%spouse.occ;
+    ;%marriage_date.day;
+    ;%marriage_date.month;
+    ;%apply;date_prec_year("xx.marriage")
+    ;%marriage_place;
+    ;%xx.nb_children;
+    ;%family_cnt;
+    ;%family.index;
+    <br>
+  %end;
 %end;
 
 %( Main %)
@@ -2084,6 +2088,7 @@
       ;[first name/first names]0%nn;
       ;[surname/surnames]0%nn;
       ;occ%nn;
+      ;[title/titles]0%nn;
       ;[birth]_[year/month/day]2%nn;
       ;[birth]_[year/month/day]1%nn;
       ;[birth]_[year/month/day]0%nn;
@@ -2093,14 +2098,14 @@
       ;[death]_[year/month/day]0%nn;
       ;[death]_[place]%nn;
       ;[occupation/occupations]1%nn;
-      ;[marriage/marriages]0_[first name/first names]0%nn;
-      ;[marriage/marriages]0_[surname/surnames]0%nn;
-      ;[marriage/marriages]0_occ%nn;
+      ;[first name/first names]0_[spouse/spouses]0%nn;
+      ;[surname/surnames]0_[spouse/spouses]0%nn;
+      ;occ_[spouse/spouses]0%nn;
       ;[marriage/marriages]0_[year/month/day]2%nn;
       ;[marriage/marriages]0_[year/month/day]1%nn;
       ;[marriage/marriages]0_[year/month/day]0%nn;
       ;[marriage/marriages]0_[place]%nn;
-      ;[child/children]0_[number]%nn;
+      ;[nb children]%nn;
       ;family_count%nn;
       ;family_index%nn;<br>
       %reset_count;
