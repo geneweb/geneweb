@@ -228,7 +228,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %apply;link%with;%xxx.access;%and;
               %xxx;
             %end;
-            %if;(evar.title="on")%xxx.title;%end;
+            %if;(evar.title="on" and xxx.title!=""), %xxx.title;%end;
           </div>
           %if;(evar.image!="off" and xxx.has_image)
             <img src="%xxx.image_url;" class="rounded align-self-center"
@@ -267,7 +267,7 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
             %apply;link%with;%xxx.access;%and;
               %xxx;
             %end;
-            %if;(evar.title="on")%xxx.title;%end;
+            %if;(evar.title="on" and xxx.title!=""), %xxx.title;%end;
           </div>
         </div>
       </td>
@@ -707,35 +707,37 @@ zzz est lui même si yyy="desc", ou son conjoint si yyy="spous"
     %end;
 %end;
 
+%( d’Aboville %)
 %define;list_row(xxx, prefx, fam_cnt, ch_cnt)
-  <br>
   %let;fam;%if;(fam_cnt>0)%apply;letter(fam_cnt)%end;%in;
-  %if;("prefx"!="")prefx.%end;
-  %apply;image_MF("xxx")
+  %if;("prefx"!="")<br>prefx.%end;
+  %sp;%apply;image_MF("xxx")
   %apply;link%with;%xxx.access;%and;
       %xxx.first_name; %xxx.surname;%nn;
       %end;
-  %if;(xxx.title!="")&nbsp;%xxx.title;%nn;%end;
+  %if;(xxx.title!=""), %xxx.title;%end;
   %if;(has_families)
     %foreach;family;
-      <span class="text-nowrap mx-1">&%if;(nb_families>1)%apply;letter(family_cnt)%end;
-      %if;(wizard and not cancel_links)
-        <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">
-        %if;(slash_marriage_date != "")<span class="nowrap">%slash_marriage_date;</span>%else;<span class="fa fa-venus-mars
-          %if;((xxx.is_male and spouse.xxx.is_female) or
-              (xxx.is_female and xxx.spouse.is_female))venus-mars%nn;
-          %elseif;(xxx.is_male and spouse.xxx.is_male)mars-double%nn;
-          %else;(xxx.is_female and spouse.xxx.is_female)venus-double%nn;
-          %end; fa-rotate-180 small"></span>%end;</a>%nn;
-      %else;
-        %slash_marriage_date;%nn;
-      %end;
+      <span class="text-nowrap">%sp;&%if;(nb_families>1)%apply;letter(family_cnt)%end;
+        %if;(wizard and not cancel_links)
+          <a href="%prefix;m=MOD_FAM;i=%family.index;;ip=%index;" title="[*modify::family/families]0 %xxx; [and] %xxx.spouse;">
+          %if;(marriage_date.year != "")<span class="nowrap">%marriage_date.year;</span>%else;<span class="fa fa-venus-mars
+            %if;((xxx.is_male and spouse.xxx.is_female) or
+                (xxx.is_female and xxx.spouse.is_female))venus-mars%nn;
+            %elseif;(xxx.is_male and spouse.xxx.is_male)mars-double%nn;
+            %else;(xxx.is_female and spouse.xxx.is_female)venus-double%nn;
+            %end; fa-rotate-180 small"></span>%end;</a>%nn;
+        %else;
+          %marriage_date.year;%nn;
+        %end;
       </span>
-      %apply;image_MF("xxx.spouse")
-      %apply;link%with;%xxx.spouse.access;
-      %and;%xxx.spouse.first_name; %xxx.spouse.surname;
-      %end;
-      %xxx.spouse.title;
+      <span>
+        %sp;%apply;image_MF("xxx.spouse")
+        %apply;link%with;%xxx.spouse.access;
+        %and;%xxx.spouse.first_name; %xxx.spouse.surname;
+        %end;
+        %if;(xxx.spouse.title!=""), %xxx.spouse.title;%end;
+      </span>
       %(&nbsp; (%xxx.nb_children;
       %if;(1=0 or 1=0 and xxx.spouse.has_families and xxx.spouse.nb_children<xxx.spouse.nb_children_total)
         -%xxx.spouse.nb_children_total;

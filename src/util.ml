@@ -992,7 +992,7 @@ value titled_person_text conf base p t =
 value one_title_text conf base p t =
   let place = sou base t.t_place in
   let s = sou base t.t_ident in
-  let s = if place = "" then s else s ^ " " ^ place in " <em>" ^ s ^ "</em>"
+  let s = if place = "" then s else s ^ " " ^ place in "<em>" ^ s ^ "</em>"
 ;
 
 value geneweb_link conf href s =
