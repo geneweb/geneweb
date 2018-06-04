@@ -502,10 +502,10 @@ let print_close_person_relations conf base =
             if apply_filters_p conf base filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_full conf base p base_loop Perso.get_sosa_person true in
               let p =
-                M.Full_person_relation.({
-                  person = p;
+                {
+                  M.Full_person_relation.person = p;
                   relation = r_type;
-                })
+                }
               in
               p :: accu
             else accu )
@@ -532,10 +532,10 @@ let print_close_person_relations conf base =
             if apply_filters_p conf base filters Perso.get_sosa_person p then
               let p = pers_to_piqi_person_light conf base p base_loop Perso.get_sosa_person true in
               let p =
-                M.Person_relation.({
-                  person = p;
+                {
+                  M.Person_relation.person = p;
                   relation = r_type;
-                })
+                }
               in
               p :: accu
             else accu )

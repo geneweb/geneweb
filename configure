@@ -1,89 +1,16 @@
 #!/bin/bash
 
+# TODO? re-enable interactive and configure options
+
 PROG_NAME=${0##*/}
 
 # Output for the generated file
-MAKEFILE=tools/Makefile.config
+MAKEFILE=Makefile.config
 
-help() {
-  cat << EOF
-$PROG_NAME generates $MAKEFILE.
-usage: $PROG_NAME [<options>]
-
-options:
-  -h|--help
-      show this help
-  --api
-      build the API
-  -d|--debug
-      add debugging symbols to the build command
-  -i|--interactive
-      run $PROG_NAME interactively
-  -s|--static
-      statically link libraries
-  -we|--warn-error
-      treat warnings as errors
-EOF
-}
-
-# Parse options
-# Options for Makefile
-OCAMLFIND=false
-OCAMLC=
-OCAMLOPT=
-OCAMLFLAGS="-safe-string"
-NATIVE=false
-
-CAMLP5F=
-CAMLP5D=
-CURL=
-PIQI=
-YOJSON=
-LABLGTK2D=+lablgtk2
-LREDIS=
-RE=
-PACKAGES=
-
-WARNERROR=false
 STRIP=true
 RM=
 EXE=
-LINKSTATIC_opt=
-LINKSTATIC_out=
 OS_TYPE=
-
-# Options for configure
-STATIC=false
-API=false
-DEBUG=false
-INTERACTIVE=false
-TRY_NATIVE=true
-TRY_OCAMLFIND=true
-
-# Temporary.
-CI_BREW=false
-
-while [[ $# -ne 0 ]]; do
-  case $1 in
-    -h|-help|--help)
-      help; exit ;;
-    --api)
-      API=true ;;
-    -d|--debug)
-      DEBUG=true ;;
-    -i|--interactive)
-      INTERACTIVE=true ;;
-    -s|--static)
-      STATIC=true ;;
-    -we|--warn-error)
-      WARNERROR=true ;;
-    -cibrew)
-      CI_BREW=true ;;
-    *)
-      echo -e "\\x1b[33m[WARNING]\\x1b[0m Option $1 unknown and ignored.";;
-  esac
-  [[ $# -gt 0 ]] && shift
-done
 
 # Functions that print the checked information
 
@@ -102,71 +29,12 @@ print_check_ok() {
   print_check_gen "32" "$1" "${2:-OK}"
 }
 
-print_check_warn() {
-  print_check_gen "33" "$1" "$2"
-}
-
-print_check_err() {
-  print_check_gen "31" "$1" "ERROR"
-  echo "$2"
-  echo "Configuration script failed!"
-  exit 1
-}
-
-# Helpers functions to compare version numbers
-
-cmpversion() {
-# 0: A = B, 1: A < B, 2: A > B, 3: err
-  [ -n "$1" ] && [ -n "$2" ] && [ -z "$4" ] || return 3
-  [ -z "$3" ] || [ "$3" = "V" ] || return 3
-  [ "$3" != "V" ] || local IFS=.-
-  local A=($1) B=($2)
-  local i n=${#A[@]} a b
-  [ ${#B[@]} -ge $n ] || n=${#B[@]}
-  for (( i=0; i<n; i++ )); do
-    a="${A[$i]}"; b="${B[$i]}"
-    if [[ "$a" =~ ^[0-9] ]]; then
-      [[ "$b" =~ ^[0-9] ]] || return 1
-      if [ "$3" = "V" ]; then
-        [ "$a" -lt "$b" ] && return 1
-        [ "$a" -gt "$b" ] && return 2
-      else
-        cmpversion "$a" "$b" "V" || return $?
-      fi
-    else
-        [[ "$b" =~ ^[0-9] ]] && return 2
-        [[ "$a" < "$b" ]] && return 1
-        [[ "$a" > "$b" ]] && return 2
-    fi
-  done
-  [ ${#A[@]} -le $n ] || return 2
-  [ ${#B[@]} -le $n ] || return 1
-  return 0
-}
-
-testversion() {
-# 0: true, 1: false, 2: err
-  [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -z "$4" ] || return 2
-  cmpversion "$1" "$3"; local c=$?
-  [ $c -lt 3 ] || return 2
-  case $2 in
-  "<"|"-lt") return $(($c != 1));;
-  "<="|"-le") return $(($c == 2));;
-  ">"|"-gt") return $(($c != 2));;
-  ">="|"-ge") return $(($c == 1));;
-  "="|"=="|"-eq") return $(($c != 0));;
-  "!="|"-ne") return $(($c == 0));;
-  esac
-  return 2
-}
-
 # Functions to check the environment
 
 check_os() {
   OS_TYPE=`uname -s`
   if [[ $OS_TYPE == "Darwin" ]] || [[ $OS_TYPE == "Linux" ]] ; then
     print_check_ok "Checking OS type" "UNIX"
-    CAMLP5F+=" -D UNIX"
     EXE=
     RM="/bin/rm -f"
     STRIP=strip
@@ -180,338 +48,29 @@ check_os() {
   fi
 }
 
-check_make() {
-  if ! make -v >/dev/null 2>&1; then
-    print_check_err "Checking make" "\
-      make needed."
-  else
-    local MAKE_MIN_VER="GNU Make 3.81"
-    local MAKE_VER=`make -v|head -n 1`
-    if testversion "$MAKE_VER" ">=" "$MAKE_MIN_VER"; then
-      print_check_ok \
-        "Checking make version $MAKE_VER >= $MAKE_MIN_VER"
-    else
-      print_check_warn \
-        "Checking make version $MAKE_VER" \
-        "$MAKE_MIN_VER or compatible needed."
-    fi
-  fi
-}
-
-check_ocaml() {
-# depends on check_ocamlfind
-  if $OCAMLFIND; then
-    OCAMLC="ocamlfind ocamlc"
-    OCAMLOPT="ocamlfind ocamlopt"
-  else
-    OCAMLC=ocamlc
-    OCAMLOPT=ocamlopt
-  fi
-  if $OCAMLC -v >/dev/null 2>&1; then
-    print_check_ok "Checking OCaml compiler ($OCAMLC)"
-  else
-    print_check_err "Checking OCaml compiler ($OCAMLC)" \
-        "You need the command ocamlc accessible in the path!"
-  fi
-  if $TRY_NATIVE && $OCAMLOPT -v >/dev/null 2>&1; then
-    print_check_ok "Checking OCaml native compiler ($OCAMLOPT)"
-    NATIVE=true
-  elif $TRY_NATIVE; then
-    print_check_warn "Checking OCaml native compiler ($OCAMLOPT)" "NOT FOUND"
-  else
-    print_check_ok "Checking OCaml native compiler" "SKIPPED"
-  fi
-}
-
-check_optimized_ocaml() {
-# depends on check_ocamlfind and check_ocaml
-  if ! $OCAMLFIND; then
-    local TRYOCAMLC=ocamlc.opt
-    local TRYOCAMLOPT=ocamlopt.opt
-    if $TRYOCAMLC -v >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml optimized compiler ($TRYOCAMLC)"
-      OCAMLC=$TRYOCAMLC
-    else
-      print_check_warn "Checking OCaml optimized compiler ($TRYOCAMLC)" "NOT FOUND"
-    fi
-    if $TRY_NATIVE && $TRYOCAMLOPT -v >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml optimized native compiler ($TRYOCAMLOPT)"
-      OCAMLOPT=$TRYOCAMLOPT
-      NATIVE=true
-    elif $TRY_NATIVE; then
-      print_check_warn "Checking OCaml optimized native compiler ($TRYOCAMLOPT)" "NOT FOUND"
-    else
-      print_check_ok "Checking OCaml optimized native compiler" "SKIPPED"
-    fi
-  else
-    print_check_ok "Check OCaml optimized compilers" "SKIPPED"
-  fi
-}
-
-check_ocaml_version() {
-# depends on check_ocaml and check_optimized_ocaml
-  local OCAML_MIN_VER="4.05.0"
-  local OCAML_VER="`$OCAMLC -version`"
-  if testversion "$OCAML_VER" ">=" "$OCAML_MIN_VER"; then
-    print_check_ok \
-      "Checking OCaml compiler version $OCAML_VER >= $OCAML_MIN_VER"
-  else
-    print_check_err "Checking OCaml compiler version $OCAML_VER" \
-        "OCaml version $OCAML_MIN_VER or newer needed."
-  fi
-  if $NATIVE; then
-    OCAML_VER="`$OCAMLOPT -version`"
-    if testversion "$OCAML_VER" ">=" "$OCAML_MIN_VER"; then
-      print_check_ok \
-        "Checking OCaml native compiler version $OCAML_VER >= $OCAML_MIN_VER"
-    else
-      print_check_warn "Checking Ocaml compiler version $OCAML_VER" \
-          "OCaml version $OCAML_MIN_VER or newer needed."
-      NATIVE=false
-    fi
-  fi
-}
-
-check_camlp5() {
-  if camlp5 -v >/dev/null 2>&1; then
-    print_check_ok "Checking Camlp5"
-    CAMLP5D=`camlp5 -where`
-  else
-    print_check_err "Checking Camlp5" \
-        "You need the command camlp5 accessible in the path!"
-  fi
-}
-
-check_ocamlfind() {
-  if $TRY_OCAMLFIND && ocamlfind printconf >/dev/null 2>&1; then
-    print_check_ok "Checking ocamlfind" "FOUND"
-    OCAMLFIND=true
-    OCAMLFLAGS+=" -linkpkg"
-  elif $API; then
-    print_check_err "Checking ocamlfind" \
-        "You need the command ocamlfind accessible in the path!"
-  elif $TRY_OCAMLFIND; then
-    print_check_warn "Checking ocamlfind" "NOT FOUND"
-  else
-    print_check_ok "Checking ocamlfind" "SKIPPED"
-  fi
-}
-
-check_api() {
-  if $API; then
-    CAMLP5F+=" -DAPI"
-    PACKAGES+=" curl piqirun.ext re uuidm yojson redis"
-  fi
-}
-
-check_flags() {
-  if $STATIC; then
-    LINKSTATIC_out+=" -ccopt -static -custom"
-    LINKSTATIC_opt+=" -ccopt -static"
-  fi
-  if $DEBUG; then
-    OCAMLFLAGS+=" -g -annot -bin-annot -keep-locs"
-  fi
-  if $WARNERROR; then
-    OCAMLFLAGS+=" -warn-error A"
-    OCAMLFLAGS+=" -w +a-4-6-9-27-32-33-35-37-38-39-41-44-48"
-  fi
-}
-
-check_lablgtk2() {
-  if $OCAMLFIND; then
-    if ocamlfind query lablgtk2 >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml lablgtk2 (only needed to build gui)"
-      LABLGTK2D=`ocamlfind query lablgtk2`
-    else
-      print_check_warn "Checking OCaml lablgtk2" "NOT FOUND"
-    fi
-  else
-    print_check_warn "Checking OCaml lablgtk2" "SKIPPED"
-  fi
-}
-
-check_curl() {
-  if $API; then
-    if ocamlfind query curl >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml curl"
-      CURL=`ocamlfind query curl`
-    else
-      print_check_err "Checking OCaml curl" \
-          "You need the OCaml dependency curl!"
-    fi
-  fi
-}
-
-check_piqi() {
-  if $API; then
-    if ocamlfind query piqirun >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml piqi"
-      PIQI=`ocamlfind query piqirun`
-    else
-      print_check_err "Checking OCaml piqi" \
-          "You need the OCaml dependency piqi!"
-    fi
-  fi
-}
-
-check_yojson() {
-  if $API; then
-    if ocamlfind query yojson >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml yojson"
-      YOJSON=`ocamlfind query yojson`
-    else
-      print_check_err "Checking OCaml yojson" \
-          "You need the OCaml dependency yojson!"
-    fi
-  fi
-}
-
-absdirpath() {
-  (
-    cd $1 || return 1
-    echo "$PWD"
-  ) 2> /dev/null
-}
-
-check_redis() {
-  if $API; then
-    if ocamlfind query redis >/dev/null 2>&1; then
-      local REDIS_MIN_VER="0.3.3"
-      local REDIS_VER=`opam show -f version redis`
-      if testversion "$REDIS_VER" ">=" "$REDIS_MIN_VER"; then
-        print_check_ok \
-          "Checking Ocaml redis version $REDIS_VER >= $REDIS_MIN_VER"
-        LREDIS=`ocamlfind query redis`
-      else
-        print_check_warn \
-          "Checking ocaml redis version $REDIS_VER" \
-          "$REDIS_MIN_VER or compatible needed."
-      fi
-    else
-      print_check_err "Checking OCaml redis" \
-          "You need the OCaml dependency redis!"
-    fi
-  fi
-}
-
-check_re() {
-  if $API; then
-    if ocamlfind query re >/dev/null 2>&1; then
-      print_check_ok "Checking OCaml re"
-      RE=`ocamlfind query re`
-    else
-      print_check_err "Checking OCaml re" \
-          "You need the OCaml dependency re!"
-    fi
-  fi
-}
-
-check_environment() {
-  check_os
-  check_make
-  check_ocamlfind
-  check_ocaml
-  check_optimized_ocaml
-  check_ocaml_version
-  check_camlp5
-  check_lablgtk2
-  check_api
-  check_flags
-  check_curl
-  check_piqi
-  check_yojson
-  check_redis
-  check_re
-}
-
 # Functions to print Makefile.config.
 
 # Print common options, should be called first.
 print_common_header() {
-   echo "# This file is generated by $0."
-   echo
-   echo "OS_TYPE=${OS_TYPE}"
+  echo "# This file is generated by $0."
+  echo
+  echo "OS_TYPE=${OS_TYPE}"
 }
 
 print_tools() {
-   echo
-   echo "# Tools"
-   echo "STRIP=${STRIP}"
-   echo "RM=${RM}"
-   echo "EXE=${EXE}"
-}
-
-print_compiler() {
-   echo
-   echo "# Compiler options."
-   echo "OCAMLFLAGS=${OCAMLFLAGS}"
-   echo "OCAMLC_PATH=${OCAMLC}"
-   echo "OCAMLOPT_PATH=${OCAMLOPT}"
-   echo "CAMLP5F=${CAMLP5F}"
-   echo "LINKSTATIC_opt=${LINKSTATIC_opt}"
-   echo "LINKSTATIC_out=${LINKSTATIC_out}"
-   if $NATIVE; then
-     echo "NATIVE=y"
-   fi
-   echo
-   echo "# Compiler dependencies."
-   echo "CAMLP5D=${CAMLP5D}"
-   echo "LABLGTK2D=${LABLGTK2D}"
-   if $API; then
-     echo "OCURL=${CURL}"
-     echo "RE=${RE}"
-     echo "LREDIS=${LREDIS}"
-     echo "WITH_API=y"
-     echo "PACKAGES=${PACKAGES}"
-   fi
+  echo
+  echo "# Tools"
+  echo "STRIP=${STRIP}"
+  echo "RM=${RM}"
+  echo "EXE=${EXE}"
 }
 
 print_makefile() {
   (print_common_header
    print_tools
-   print_compiler
   ) > $MAKEFILE
 }
 
-# main
-
-echo -e "\\x1b[36m=-=-\\x1b[0m Configure GeneWeb \\x1b[36m\
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\\x1b[0m"
-
-if $INTERACTIVE; then
-  echo "Do you want to build the API (default = no)? [y/N]"
-  read -re answer
-  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    API=true
-  fi
-  echo "Do you want to treat compilation warnings as errors (default = no)? [y/N]"
-  read -re answer
-  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    WARNERROR=true
-  fi
-  echo "Do you want compilation debugging symbols (default = no)? [y/N]"
-  read -re answer
-  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    DEBUG=true
-  fi
-  echo "Do you want to statically link libraries (default = no)? [y/N]"
-  read -re answer
-  if [[ $answer =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    STATIC=true
-  fi
-fi
-# Check the environment
-check_environment
 # Print Makefile
+check_os
 print_makefile
-
-# Temporary.
-if [[ $OS_TYPE == "Darwin" ]]; then
-  if $CI_BREW; then
-    brew install bash
-  fi
-  cp tools/transitive_depend_osx.sh tools/transitive_depend.sh
-else
-  cp tools/transitive_depend_linux.sh tools/transitive_depend.sh
-fi

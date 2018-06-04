@@ -1,0 +1,13 @@
+(executables
+ ((names (gwFixBase
+          gwFixFromFile
+          gwFixFromFileDomicile
+          gwFixFromFileAlias
+          gwFixBurial
+          gwFixEvtSrc
+          gwFixColon
+          gwFindCpl
+          gwFixY))
+  (libraries (str geneweb.lib))
+ )
+)

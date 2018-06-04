@@ -510,7 +510,7 @@ let print_mod conf base mod_p =
           let rec loop l accu =
             match l with
             | [] -> accu
-            | evt :: l -> loop l (evt.epers_note; evt.epers_src :: accu)
+            | evt :: l -> loop l (evt.epers_note :: evt.epers_src :: accu)
           in
           loop (p.pevents) sl
         in

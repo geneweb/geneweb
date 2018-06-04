@@ -3,10 +3,9 @@
 
 (* module [Wserver]: elementary web service *)
 
-value f :
-  option string -> int -> int -> option int ->
-    ((Unix.sockaddr * list string) -> string -> string -> unit) -> unit
-;
+val f :
+  string option -> int -> int -> int option ->
+    (Unix.sockaddr * string list -> string -> string -> unit) -> unit
    (* [Wserver.f addr port tmout maxc g] starts an elementary
        httpd server at port [port] in the current machine. The variable
        [addr] is [Some the-address-to-use] or [None] for any of the
@@ -20,43 +19,43 @@ value f :
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)
 
-value printf : format4 'a unit string unit -> 'a;
+val printf : ('a, unit, string, unit) format4 -> 'a
     (* To be called to print page contents. *)
 
-value header : format4 'a unit string unit -> 'a;
+val header : ('a, unit, string, unit) format4 -> 'a
     (* To print an http header line *)
 
-value wflush : unit -> unit;
+val wflush : unit -> unit
     (* To flush page contents print. *)
 
-value wrap_string : ref (string -> string);
+val wrap_string : (string -> string) ref
     (* To specify a function which may transform the string printed by
        [sprint] below. *)
 
-value http : HttpStatus.t -> unit;
+val http : HttpStatus.t -> unit
     (* [Wserver.http answer] sends the http header where [answer]
        represents the answer status. If empty string, "200 OK" is assumed. *)
 
-value http_redirect_temporarily : string -> unit;
+val http_redirect_temporarily : string -> unit
     (* [Wserver.http_redirect url] sends the http header where [url]
        represents the Location where the request needs to be redirected. *)
 
-value encode : string -> string;
+val encode : string -> string
     (* [Wserver.encode s] encodes the string [s] in another string
        where spaces and special characters are coded. This allows
        to put such strings in html links <a href=...>. This is
        the same encoding done by Web browsers in forms. *)
 
-value decode : string -> string;
+val decode : string -> string
     (* [Wserver.decode s] does the inverse job than [Wserver.code],
        restoring the initial string. The heading and trailing spaces
        are stripped. *)
 
-value gen_decode : bool -> string -> string;
+val gen_decode : bool -> string -> string
     (* Like above but heading and trailing spaces are stripped
        only if bool parameter is True. [decode] = [gen_decode True]. *)
 
-value extract_param : string -> char -> list string -> string;
+val extract_param : string -> char -> string list -> string
     (* [extract_param name stopc request] can be used to extract some
        parameter from a browser [request] (list of strings); [name]
        is a string which should match the beginning of a request line,
@@ -64,22 +63,22 @@ value extract_param : string -> char -> list string -> string;
        string request has been obtained by: [extract_param "GET /" ' '].
        Answers the empty string if the parameter is not found. *)
 
-value get_request_and_content : Stream.t char -> (list string * string);
+val get_request_and_content : char Stream.t -> string list * string
 
-value wsocket : unit -> Unix.file_descr;
+val wsocket : unit -> Unix.file_descr
 
-value sock_in : ref string;
-value sock_out : ref string;
+val sock_in : string ref
+val sock_out : string ref
     (* Names of the files used in windows implementation to communicate
        http requests and html answers. Default "wserver.sin" and
        "wserver.sou". Can have relative or absolute paths. *)
-value stop_server : ref string;
+val stop_server : string ref
     (* Name of the file whose presence tells the server to stop (at least
        one request is necessary to unfreeze the server to make it check
        that this file exits. Default "STOP_SERVER". Can have relative
        or absolute path. *)
-value noproc : ref bool;
-value cgi : ref bool;
+val noproc : bool ref
+val cgi : bool ref
 
 (* Example:
 

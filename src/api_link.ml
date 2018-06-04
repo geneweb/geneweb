@@ -25,7 +25,6 @@ let api_servers = ref [] ;;
 let create_redis_connection () =
   let connection_spec = {RC.host = !redis_host; RC.port = !redis_port} in
   RC.IO.run (RC.connect connection_spec)
-;;
 
 let redis_p_key conf base ip =
   let p = poi base ip in
@@ -33,7 +32,6 @@ let redis_p_key conf base ip =
   let fn = Name.lower (sou base (get_first_name p)) in
   let occ = get_occ p in
   sn ^ "|" ^ fn ^ "|" ^ if occ > 0 then string_of_int occ else ""
-;;
 
 let filter_bulk l =
   List.fold_right
@@ -47,7 +45,6 @@ let filter_bulk l =
           end
       | _ -> accu)
     l []
-;;
 
 let filter_string l =
   List.fold_right
@@ -56,12 +53,10 @@ let filter_string l =
       | Some s -> s :: accu
       | None -> accu)
     l []
-;;
 
 (* Trouve une key en fonction de l'utilisateur et d'une référence GW *)
 let findKeyBySourcenameAndRef redis bname geneweb_key =
   RC.IO.run (RC.zscore redis ("lia.keys." ^ bname) geneweb_key)
-;;
 
 let findBridgesBySourcenameAndIdGlinks redis bname fb =
   let l = RC.zrangebyscore redis ("lia.bridges." ^ bname) fb fb in
@@ -69,24 +64,20 @@ let findBridgesBySourcenameAndIdGlinks redis bname fb =
 
 let findLinksBySourcenameAndBridge redis bname s =
   RC.IO.run (RC.hget redis ("lia.links." ^ bname) s)
-;;
 
 let findKeyBySourcenameAndIdGlinks redis bname fb =
   let l = RC.zrangebyscore redis ("lia.keys." ^ bname) fb fb in
   filter_bulk (RC.IO.run l)
-;;
 
 (* connection -> string -> string -> string option *)
 (* Cherche les données d'un bridge en fonction du sourcename et de l'ID du bridge. *)
 let findBridgeDataBySourcenameAndBridgeId redis bname bridge_id =
   RC.IO.run (RC.hget redis ("lia.bridges_data." ^ bname) bridge_id)
-;;
 
 let json_list_of_string s =
   Yojson.Basic.Util.filter_string
     (Yojson.Basic.Util.to_list
        (Yojson.Basic.from_string s))
-;;
 
 (* conf -> base -> connection -> ip -> bool *)
 (* Permet de récupérer les ponts d'une personne (en utilisant son index). *)
@@ -123,7 +114,6 @@ let get_bridges conf base redis ip include_not_validated =
            | None -> accu)
         [] bridge_ids
   | None -> []
-;;
 
 (* conf -> base -> connection -> ip -> bool *)
 (* Permet de récupérer les liens d'une personne (en utilisant son index). *)
@@ -138,7 +128,6 @@ let get_links conf base redis ip include_not_validated =
       let list = List.map (findLinksBySourcenameAndBridge redis conf.bname) l in
       let list = filter_string list in
       list
-;;
 
 
 (**/**) (* CURL. *)
@@ -147,24 +136,20 @@ let get_links conf base redis ip include_not_validated =
 let writer accum data =
   Buffer.add_string accum data;
   String.length data
-;;
 
 let showContent content =
   Printf.printf "%s" (Buffer.contents content);
   flush stdout
-;;
 
 let showInfo connection =
   Printf.printf "Time: %f\nURL: %s\n"
     (Curl.get_totaltime connection)
     (Curl.get_effectiveurl connection)
-;;
 
 let getContent connection url =
   Curl.set_url connection url;
   Curl.set_timeoutms connection 1000;
   Curl.perform connection
-;;
 
 
 (**/**) (* Convertion d'une date, personne, famille. *)
@@ -193,7 +178,7 @@ let piqi_date_of_date date =
         let m = Some (Int32.of_int dmy.month) in
         let y = Some (Int32.of_int dmy.year) in
         let delta = Some (Int32.of_int dmy.delta) in
-        let dmy1 = MLink.Dmy.({day = d; month = m; year = y; delta = delta;}) in
+        let dmy1 = {MLink.Dmy.day = d; month = m; year = y; delta = delta;} in
         let (prec, dmy2) =
           match dmy.prec with
           | Sure -> (`sure, None)
@@ -207,7 +192,7 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                MLink.Dmy.({day = d; month = m; year = y; delta = delta;})
+                {MLink.Dmy.day = d; month = m; year = y; delta = delta;}
               in
               (`oryear, Some dmy2)
           | YearInt dmy2 ->
@@ -216,28 +201,27 @@ let piqi_date_of_date date =
               let y = Some (Int32.of_int dmy2.year2) in
               let delta = Some (Int32.of_int dmy2.delta2) in
               let dmy2 =
-                MLink.Dmy.({day = d; month = m; year = y; delta = delta;})
+                {MLink.Dmy.day = d; month = m; year = y; delta = delta;}
               in
               (`yearint, Some dmy2)
         in
         (prec, dmy1, dmy2)
       in
-      MLink.Date.({
-        cal = cal;
+      {
+        MLink.Date.cal = cal;
         prec = Some prec;
         dmy = Some dmy;
         dmy2 = dmy2;
         text = None;
-      })
+      }
   | Dtext txt ->
-      MLink.Date.({
-        cal = None;
+      {
+        MLink.Date.cal = None;
         prec = None;
         dmy = None;
         dmy2 = None;
         text = Some txt;
-      })
-;;
+      }
 
 let p_to_piqi_full_person conf base ip ip_spouse =
   let baseprefix = conf.command in
@@ -344,8 +328,8 @@ let p_to_piqi_full_person conf base ip ip_spouse =
         else accu)
       (Array.to_list (get_family p)) []
   in
-  MLink.Person.({
-    baseprefix = baseprefix;
+  {
+    MLink.Person.baseprefix = baseprefix;
     ip = index;
     n = sn;
     p = fn;
@@ -369,8 +353,7 @@ let p_to_piqi_full_person conf base ip ip_spouse =
     burial_date = burial;
     burial_place = burial_place;
     families = families;
-  })
-;;
+  }
 
 let fam_to_piqi_full_family conf base ip ifam add_children =
   let baseprefix = conf.command in
@@ -434,8 +417,8 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
       in
       [pl]
   in
-  MLink.Family.({
-    baseprefix = baseprefix;
+  {
+    MLink.Family.baseprefix = baseprefix;
     ifam = index;
     ifath = ifath;
     imoth = imoth;
@@ -445,8 +428,7 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
     divorce_type = divorce_type;
     divorce_date = divorce_date;
     children = children;
-  })
-;;
+  }
 
 
 (**/**)
@@ -469,7 +451,6 @@ let get_families_asc conf base ip nb_asc from_gen_desc =
       | None -> loop_asc parents families
   in
   loop_asc [(ip, 0)] []
-;;
 
 let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
   if from_gen_desc <= 0 then []
@@ -533,7 +514,6 @@ let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
           loop_desc pl accu
     in
     loop_desc ipl []
-;;
 
 
 
@@ -621,7 +601,6 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
      | _ -> exit (-2)
   in
   MLinkext.parse_link_tree !res output_encoding
-;;
 
 
 let print_link_tree conf base =
@@ -986,4 +965,3 @@ let print_link_tree conf base =
   in
   let data = MLinkext.gen_link_tree data in
   Api_util.print_result conf data
-;;

@@ -1,6 +1,6 @@
 #!/bin/sh
 #cd (*
-exec ocaml camlp5r.cma $0
+exec ocaml camlp5.cma $0
 *) ".";
 (* $Id: utf8-to-iso.sh,v 1.1 2006-11-03 11:09:42 deraugla Exp $ *)
 

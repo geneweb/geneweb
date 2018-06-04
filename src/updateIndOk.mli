@@ -1,53 +1,56 @@
 (* $Id: updateIndOk.mli,v 5.6 2008-01-21 13:28:12 ddr Exp $ *)
 
-open Config;
-open Def;
-open Gwdb;
+open Config
+open Def
+open Gwdb
 
-value effective_del :
+val effective_del :
   config -> base -> (CheckItem.base_warning -> unit) -> person ->
-    gen_person iper istr;
-value effective_mod :
-  config -> base -> gen_person Update.key string -> gen_person iper istr;
-value all_checks_person :
-  config -> base -> gen_person iper istr -> gen_ascend ifam ->
-    gen_union ifam -> list CheckItem.base_warning;
-value print_mod_aux :
-  config -> base -> (gen_person Update.key string -> unit) -> unit;
+    (iper, istr) gen_person
+val effective_mod :
+  config -> base -> (Update.key, string) gen_person -> (iper, istr) gen_person
+val all_checks_person :
+  config -> base -> (iper, istr) gen_person -> ifam gen_ascend ->
+    ifam gen_union -> CheckItem.base_warning list
+val print_mod_aux :
+  config -> base -> ((Update.key, string) gen_person -> unit) -> unit
 
-value rename_image_file : config -> base -> person -> gen_person iper string -> unit;
+val rename_image_file :
+  config -> base -> person -> (iper, string) gen_person -> unit
 
-value print_add : config -> base -> unit;
-value print_del : config -> base -> unit;
-value print_mod : config -> base -> unit;
-value print_change_event_order : config -> base -> unit;
+val print_add : config -> base -> unit
+val print_del : config -> base -> unit
+val print_mod : config -> base -> unit
+val print_change_event_order : config -> base -> unit
 
 
 
 (* Ajout pour l'API *)
-value effective_add :
-  config -> base -> Def.gen_person Update.key string ->
-    (Def.gen_person iper istr * Def.gen_ascend 'a);
-value raw_get : config -> string -> string;
-value strip_person :
-  Def.gen_person (string * 'a * 'b * 'c * 'd) string ->
-    Def.gen_person (string * 'a * 'b * 'c * 'd) string;
-value check_person :
-  config -> base -> Def.gen_person (string * string * 'b * 'c * 'd) string -> option string;
-value error_person : config -> base -> 'a -> string -> unit;
-value update_relations_of_related : base -> iper -> list iper -> unit;
-value reconstitute_death :
-  config -> option Def.date -> option Def.date -> string -> Def.burial -> string -> Def.death;
-value reconstitute_from_pevents :
-  list (Def.gen_pers_event 'a string) -> bool ->
-  (Def.codate * string * string * string) ->
-  (Def.codate * string * string * string) ->
-  (Def.death * string * string * string) ->
-  (Def.burial * string * string * string) ->
-  ((Def.codate * string * string * string) *
-  (Def.codate * string * string * string) *
-  (Def.death * string * string * string) *
-  (Def.burial * string * string * string) *
-  list (Def.gen_pers_event 'a string));
-value check_conflict :
-  config -> base -> Def.gen_person 'a string -> list iper -> unit;
+val effective_add :
+  config -> base -> (Update.key, string) Def.gen_person ->
+    (iper, istr) Def.gen_person * 'a Def.gen_ascend
+val raw_get : config -> string -> string
+val strip_person :
+  (string * 'a * 'b * 'c * 'd, string) Def.gen_person ->
+    (string * 'a * 'b * 'c * 'd, string) Def.gen_person
+val check_person :
+  config -> base -> (string * string * 'b * 'c * 'd, string) Def.gen_person ->
+    string option
+val error_person : config -> base -> 'a -> string -> unit
+val update_relations_of_related : base -> iper -> iper list -> unit
+val reconstitute_death :
+  config -> Def.date option -> Def.date option -> string -> Def.burial ->
+    string -> Def.death
+val reconstitute_from_pevents :
+  ('a, string) Def.gen_pers_event list -> bool ->
+    Def.codate * string * string * string ->
+    Def.codate * string * string * string ->
+    Def.death * string * string * string ->
+    Def.burial * string * string * string ->
+    (Def.codate * string * string * string) *
+      (Def.codate * string * string * string) *
+      (Def.death * string * string * string) *
+      (Def.burial * string * string * string) *
+      ('a, string) Def.gen_pers_event list
+val check_conflict :
+  config -> base -> ('a, string) Def.gen_person -> iper list -> unit
