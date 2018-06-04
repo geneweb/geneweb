@@ -9,7 +9,7 @@ open Hutil
 open Util
 
 let print_differences conf base branches p1 p2 =
-  let gen_string_field chk1 chk2 str_orig title name proj =
+  let gen_string_field chk1 chk2 title name proj =
     let x1 = proj p1 in
     let x2 = proj p2 in
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
@@ -78,9 +78,9 @@ let print_differences conf base branches p1 p2 =
   end;
   Wserver.printf "</p>\n";
   html_p conf;
-  string_field true (transl_nth conf "first name/first names" 0) "first_name"
+  string_field (transl_nth conf "first name/first names" 0) "first_name"
     (fun p -> p_first_name base p);
-  string_field true (transl_nth conf "surname/surnames" 0) "surname"
+  string_field (transl_nth conf "surname/surnames" 0) "surname"
     (fun p -> p_surname base p);
   begin let select_smallest_num =
     p_first_name base p1 = p_first_name base p2
@@ -90,10 +90,10 @@ let print_differences conf base branches p1 p2 =
        else "")
       (if get_occ p1 > get_occ p2 && select_smallest_num then " checked"
        else "")
-      false (transl conf "number") "number"
+      (transl conf "number") "number"
       (fun p -> string_of_int (get_occ p))
   end;
-  string_field true (transl_nth conf "image/images" 0) "image"
+  string_field (transl_nth conf "image/images" 0) "image"
     (fun p ->
        let v = image_and_size conf base p (limited_image_size 75 100) in
        match v with
@@ -101,11 +101,11 @@ let print_differences conf base branches p1 p2 =
            "<img src=\"" ^ link ^
            "\" style=\"max-width:75px; max-height:100px\" />"
        | _ -> sou base (get_image p));
-  string_field true (transl conf "public name") "public_name"
+  string_field (transl conf "public name") "public_name"
     (fun p -> sou base (get_public_name p));
-  string_field true (transl_nth conf "occupation/occupations" 0) "occupation"
+  string_field (transl_nth conf "occupation/occupations" 0) "occupation"
     (fun p -> sou base (get_occupation p));
-  string_field false (transl conf "sex") "sex"
+  string_field (transl conf "sex") "sex"
     (fun p ->
        match get_sex p with
          Male -> "M"
@@ -119,21 +119,21 @@ let print_differences conf base branches p1 p2 =
            | Private -> "private"
            | Public -> "public" ]);
   *)
-  string_field false (transl conf "birth") "birth"
+  string_field (transl conf "birth") "birth"
     (fun p ->
        match Adef.od_of_codate (get_birth p) with
          None -> ""
        | Some d -> Date.string_of_ondate conf d);
-  string_field true (transl conf "birth" ^ " / " ^ transl conf "place")
+  string_field (transl conf "birth" ^ " / " ^ transl conf "place")
     "birth_place" (fun p -> sou base (get_birth_place p));
-  string_field false (transl conf "baptism") "baptism"
+  string_field (transl conf "baptism") "baptism"
     (fun p ->
        match Adef.od_of_codate (get_baptism p) with
          None -> ""
        | Some d -> Date.string_of_ondate conf d);
-  string_field true (transl conf "baptism" ^ " / " ^ transl conf "place")
+  string_field (transl conf "baptism" ^ " / " ^ transl conf "place")
     "baptism_place" (fun p -> sou base (get_baptism_place p));
-  string_field false (transl conf "death") "death"
+  string_field (transl conf "death") "death"
     (fun p ->
        let is = 2 in
        match get_death p with
@@ -151,9 +151,9 @@ let print_differences conf base branches p1 p2 =
        | DeadYoung -> transl_nth conf "died young" is
        | DeadDontKnowWhen -> transl_nth conf "died" is
        | DontKnowIfDead | OfCourseDead -> "");
-  string_field true (transl conf "death" ^ " / " ^ transl conf "place")
+  string_field (transl conf "death" ^ " / " ^ transl conf "place")
     "death_place" (fun p -> sou base (get_death_place p));
-  string_field false (transl conf "burial") "burial"
+  string_field (transl conf "burial") "burial"
     (fun p ->
        let is = 2 in
        match get_burial p with
@@ -168,7 +168,7 @@ let print_differences conf base branches p1 p2 =
            (match Adef.od_of_codate cod with
               None -> ""
             | Some d -> " " ^ Date.string_of_ondate conf d));
-  string_field true (transl conf "burial" ^ " / " ^ transl conf "place")
+  string_field (transl conf "burial" ^ " / " ^ transl conf "place")
     "burial_place" (fun p -> sou base (get_burial_place p));
   html_p conf;
   Wserver.printf
@@ -213,8 +213,6 @@ let compatible_divorces d1 d2 = d1 = d2
 
 let compatible_relation_kinds rk1 rk2 = rk1 = rk2
 
-let compatible_accesses a1 a2 = (*a1 = a2*)true
-
 let compatible_titles t1 t2 =
   Futil.eq_lists (Futil.eq_titles eq_istr) t1 t2 || t2 = []
 
@@ -243,7 +241,6 @@ let compatible_ind base p1 p2 =
   compatible_pevents (get_pevents p1) (get_pevents p2) &&
   get_rparents p2 = [] && get_related p2 = [] &&
   compatible_strings (get_occupation p1) (get_occupation p2) &&
-  compatible_accesses (get_access p1) (get_access p2) &&
   compatible_codates (get_birth p1) (get_birth p2) &&
   compatible_strings (get_birth_place p1) (get_birth_place p2) &&
   compatible_codates (get_baptism p1) (get_baptism p2) &&
@@ -254,7 +251,7 @@ let compatible_ind base p1 p2 =
   compatible_strings (get_burial_place p1) (get_burial_place p2) &&
   compatible_notes base (get_notes p1) (get_notes p2)
 
-let compatible_fam base fam1 fam2 =
+let compatible_fam fam1 fam2 =
   compatible_codates (get_marriage fam1) (get_marriage fam2) &&
   compatible_strings (get_marriage_place fam1) (get_marriage_place fam2) &&
   Array.length (get_witnesses fam2) = 0 &&
@@ -264,7 +261,7 @@ let compatible_fam base fam1 fam2 =
   compatible_strings (get_fsources fam1) (get_fsources fam2)
 
 let propose_merge_ind conf base branches p1 p2 =
-  let title h =
+  let title _ =
     let s = transl_nth conf "person/persons" 1 in
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
@@ -279,14 +276,14 @@ let propose_merge_ind conf base branches p1 p2 =
         begin
           Wserver.printf "<a href=\"%s%s\">" (commd conf)
             (acces conf base p1);
-          Merge.print_someone conf base p1;
+          Merge.print_someone base p1;
           Wserver.printf "</a>"
         end;
         Wserver.printf "\n%s\n" (transl_nth conf "and" 0);
         begin
           Wserver.printf "<a href=\"%s%s\">" (commd conf)
             (acces conf base p2);
-          Merge.print_someone conf base p2;
+          Merge.print_someone base p2;
           Wserver.printf "</a>"
         end;
         Wserver.printf "\n";
@@ -416,7 +413,7 @@ let effective_merge_ind conf base warning p1 p2 =
   reparent_ind base warning p1.key_index (get_key_index p2);
   delete_key base (sou base (get_first_name p2)) (sou base (get_surname p2))
     (get_occ p2);
-  let p2 = UpdateIndOk.effective_del conf base warning p2 in
+  let p2 = UpdateIndOk.effective_del base warning p2 in
   patch_person base p2.key_index p2;
   let s =
     let sl =
@@ -477,7 +474,7 @@ let merge_ind conf base warning branches ip1 ip2 changes_done =
     begin propose_merge_ind conf base branches p1 p2; false, changes_done end
 
 let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
-  let title h =
+  let title _ =
     let s = transl_nth conf "family/families" 1 in
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in
@@ -488,11 +485,11 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   Wserver.printf "<ul>\n";
   html_li conf;
   Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base p1);
-  Merge.print_someone conf base p1;
+  Merge.print_someone base p1;
   Wserver.printf "</a>";
   Wserver.printf "\n%s\n" (transl conf "with");
   Wserver.printf "<a href=\"%s%s\">" (commd conf) (acces conf base p2);
-  Merge.print_someone conf base p2;
+  Merge.print_someone base p2;
   Wserver.printf "</a>";
   Wserver.printf "\n";
   Wserver.printf "</ul>\n";
@@ -500,7 +497,7 @@ let propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   MergeFam.print_differences conf base branches fam1 fam2;
   trailer conf
 
-let effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 =
+let effective_merge_fam base ifam1 fam1 ifam2 fam2 =
   let des1 = fam1 in
   let des2 = fam2 in
   let fam1 =
@@ -523,7 +520,7 @@ let effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2 =
     let _ = (CheckItem.sort_children base children : _ option) in
     {children = children}
   in
-  UpdateFamOk.effective_del conf base (ifam2, fam2);
+  UpdateFamOk.effective_del base ifam2 fam2;
   for i = 0 to Array.length (get_children des2) - 1 do
     let ip = (get_children des2).(i) in
     let a = {parents = Some ifam1; consang = Adef.fix (-1)} in
@@ -537,9 +534,9 @@ let merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
   let p2 = poi base ip2 in
   let fam1 = foi base ifam1 in
   let fam2 = foi base ifam2 in
-  if compatible_fam base fam1 fam2 then
+  if compatible_fam fam1 fam2 then
     begin
-      effective_merge_fam conf base (ifam1, fam1) (ifam2, fam2) p1 p2;
+      effective_merge_fam base ifam1 fam1 ifam2 fam2 ;
       true, true
     end
   else
@@ -703,14 +700,14 @@ let rec kill_ancestors conf base included_self p nb_ind nb_fam =
       let cpl = foi base ifam in
       kill_ancestors conf base true (poi base (get_father cpl)) nb_ind nb_fam;
       kill_ancestors conf base true (poi base (get_mother cpl)) nb_ind nb_fam;
-      UpdateFamOk.effective_del conf base (ifam, foi base ifam);
+      UpdateFamOk.effective_del base ifam (foi base ifam);
       incr nb_fam
   | None -> ()
   end;
   if included_self then
     let ip = get_key_index p in
     let warning _ = () in
-    let p = UpdateIndOk.effective_del conf base warning p in
+    let p = UpdateIndOk.effective_del base warning p in
     patch_person base ip p; incr nb_ind
 
 let print_killed conf base p nb_ind nb_fam =

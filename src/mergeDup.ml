@@ -13,10 +13,10 @@ let print_link conf base p =
   Wserver.printf "</a>";
   Wserver.printf "%s" (Date.short_dates_text conf base p);
   match main_title conf base p with
-    Some t -> Wserver.printf "%s" (one_title_text conf base p t)
+    Some t -> Wserver.printf "%s" (one_title_text base t)
   | None -> ()
 
-let print_no_candidate conf base (ip, p) =
+let print_no_candidate conf base p =
   let title _ =
     Wserver.printf "%s\n"
       (capitale
@@ -149,7 +149,7 @@ let main_page conf base =
           print_cand_ind conf base (ip, p) excl ip1 ip2
       | Perso.DupFam (ifam1, ifam2) ->
           print_cand_fam conf base (ip, p) excl ifam1 ifam2
-      | Perso.NoDup -> print_no_candidate conf base (ip, p)
+      | Perso.NoDup -> print_no_candidate conf base p
       end
   | None -> incorrect_request conf
 

@@ -65,17 +65,17 @@ let relation_print conf base p =
 let person_selected conf base p =
   match p_getenv conf.senv "em" with
     Some "R" -> relation_print conf base p
-  | Some mode -> incorrect_request conf
+  | Some _ -> incorrect_request conf
   | None -> record_visited conf (get_key_index p); Perso.print conf base p
 
 let person_selected_with_redirect conf base p =
   match p_getenv conf.senv "em" with
     Some "R" -> relation_print conf base p
-  | Some mode -> incorrect_request conf
+  | Some _ -> incorrect_request conf
   | None ->
       Wserver.http_redirect_temporarily (commd conf ^ Util.acces conf base p)
 
-let compact_list conf base xl =
+let compact_list base xl =
   let pl = sort_person_list base xl in
   let pl =
     List.fold_right
@@ -102,7 +102,7 @@ let cut_words str =
 
 let try_find_with_one_first_name conf base n =
   let n1 = Name.abbrev (Name.lower n) in
-  match Mutil.lindex n1 ' ' with
+  match String.index_opt n1 ' ' with
     Some i ->
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
@@ -214,7 +214,7 @@ let find_all conf base an =
                 pl []
             else pl
           in
-          compact_list conf base pl, false
+          compact_list base pl, false
 
 let specify conf base n pl =
   let title _ = Wserver.printf "%s : %s" n (transl conf "specify") in
@@ -279,7 +279,7 @@ let specify conf base n pl =
            Wserver.printf "%s" (titled_person_text conf base p t);
            Wserver.printf "</a>\n";
            List.iter
-             (fun t -> Wserver.printf "%s" (one_title_text conf base p t)) tl
+             (fun t -> Wserver.printf "%s" (one_title_text base t)) tl
        end;
        Wserver.printf "%s" (Date.short_dates_text conf base p);
        if authorized_age conf base p then
@@ -486,12 +486,12 @@ let family_m conf base =
       | None -> Hutil.incorrect_request conf
       end
   | Some "HIST" -> History.print conf base
-  | Some "HIST_CLEAN" when conf.wizard -> History_diff.print_clean conf base
+  | Some "HIST_CLEAN" when conf.wizard -> History_diff.print_clean conf
   | Some "HIST_CLEAN_OK" when conf.wizard ->
-      History_diff.print_clean_ok conf base
+      History_diff.print_clean_ok conf
   | Some "HIST_DIFF" -> History_diff.print conf base
   | Some "HIST_SEARCH" -> History.print_search conf base
-  | Some "IMH" -> Image.print_html conf base
+  | Some "IMH" -> Image.print_html conf
   | Some "INV_FAM" when conf.wizard -> UpdateFam.print_inv conf base
   | Some "INV_FAM_OK" when conf.wizard -> UpdateFamOk.print_inv conf base
   | Some "KILL_ANC" when conf.wizard ->
@@ -635,7 +635,7 @@ let family_m conf base =
         Some f -> Srcfile.print_source conf base f
       | _ -> Hutil.incorrect_request conf
       end
-  | Some "STAT" -> BirthDeath.print_statistics conf base
+  | Some "STAT" -> BirthDeath.print_statistics conf
   | Some "CHANGE_WIZ_VIS" when conf.wizard ->
       Wiznotes.change_wizard_visibility conf base
   | Some "TT" -> Title.print conf base
@@ -702,9 +702,9 @@ let family_m conf base =
       | Some "API_REF_PERSON_FROM_ID" ->
           Api.print_ref_person_from_ip conf base
       | Some "API_REMOVE_IMAGE_EXT" when conf.wizard ->
-          Api.print_remove_image_ext conf base
+          Api.print_remove_image_ext base
       | Some "API_REMOVE_IMAGE_EXT_ALL" when conf.wizard ->
-          Api.print_remove_image_ext_all conf base
+          Api.print_remove_image_ext_all base
       | Some "API_SEARCH" -> Api_search.print_search conf base
       | Some "API_GRAPH_TREE_V2" ->
           Api_saisie_read.print_graph_tree_v2 conf base
@@ -757,10 +757,10 @@ let family_m conf base =
           Api_saisie_write.print_del_ind_ok conf base
       | Some "API_LINK_TREE" -> Api_link.print_link_tree conf base
       | Some "API_STATS" -> Api_stats.print_stats conf base
-      | Some mode -> ()
+      | Some _ -> incorrect_request conf
       | None -> ()
       end
-  | Some mode -> incorrect_request conf
+  | Some _ -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with
         Some p -> person_selected conf base p
@@ -786,8 +786,7 @@ let family_m_nobase conf =
   let () = Api_conf.set_mode_api () in
   match p_getenv conf.env "m" with
     Some "API_ADD_FIRST_FAM" -> Api_saisie_write.print_add_first_fam conf
-  | Some mode -> ()
-  | None -> ()
+  | Some _ | None -> ()
 
 let special_vars =
   ["alwsurn"; "cgl"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
@@ -857,7 +856,7 @@ let set_owner conf =
 
 let thousand oc x = Sosa.print (output_string oc) "," (Sosa.of_int x)
 
-let log_count conf r =
+let log_count r =
   match r with
     Some (welcome_cnt, request_cnt, start_date) ->
       Log.with_log
@@ -867,7 +866,7 @@ let log_count conf r =
              start_date)
   | None -> ()
 
-let print_moved conf base s =
+let print_moved conf s =
   match Util.open_etc_file "moved" with
     Some ic ->
       let env = ["bname", conf.bname] in
@@ -884,41 +883,12 @@ let print_moved conf base s =
       Wserver.printf "\n</dd></dt></dl>\n";
       Hutil.trailer conf
 
-let cnt_trace = ref 50
-let trace_keys base (fn, sn, occ) ipo =
-  if !cnt_trace < 0 then ()
-  else
-    match ipo with
-      None ->
-        Printf.eprintf "(\"%s\", \"%s\", \"%d\") deleted\n" fn sn occ;
-        flush stderr
-    | Some ip ->
-        decr cnt_trace;
-        let p = poi base ip in
-        let fn1 = sou base (get_first_name p) in
-        let sn1 = sou base (get_surname p) in
-        let occ1 = get_occ p in
-        if Name.lower (Mutil.nominative fn1) = fn &&
-           Name.lower (Mutil.nominative sn1) = sn && occ1 = occ
-        then
-          begin
-            Printf.eprintf "(\"%s\", \"%s\", \"%d\") ok\n" fn sn occ;
-            flush stderr
-          end
-        else
-          begin
-            Printf.eprintf
-              "Error %s.%d %s with key = (\"%s\", \"%s\", \"%d\")\n" fn1 occ1
-              sn1 fn sn occ;
-            flush stderr
-          end
-
 let treat_request conf base =
   begin match
     p_getenv conf.base_env "moved", p_getenv conf.env "opt",
     p_getenv conf.env "m"
   with
-    Some s, _, _ -> print_moved conf base s
+    Some s, _, _ -> print_moved conf s
   | _, Some "no_index", _ -> print_no_index conf base
   | _, _, Some "IM" -> Image.print conf base
   | _, _, Some "DOC" ->
@@ -943,7 +913,7 @@ let treat_request conf base =
         begin
           begin match p_getenv conf.base_env "counter" with
             Some "no" -> ()
-          | _ -> let r = Srcfile.incr_welcome_counter conf in log_count conf r
+          | _ -> let r = Srcfile.incr_welcome_counter conf in log_count r
           end;
           Srcfile.print_start conf base
         end
@@ -951,7 +921,7 @@ let treat_request conf base =
         begin
           begin match p_getenv conf.base_env "counter" with
             Some "no" -> ()
-          | _ -> let r = Srcfile.incr_request_counter conf in log_count conf r
+          | _ -> let r = Srcfile.incr_request_counter conf in log_count r
           end;
           match p_getenv conf.env "ptempl" with
             Some tname when p_getenv conf.base_env "ptempl" = Some "yes" ->

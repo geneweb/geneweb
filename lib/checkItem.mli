@@ -32,12 +32,10 @@ val person :
     (Adef.iper * person * Def.sex option * relation list option) list option
 
 val family :
-  base -> (base_error -> unit) -> (base_warning -> unit) -> Def.ifam ->
-    family -> unit
+  base -> (base_warning -> unit) -> Def.ifam -> family -> unit
 
 val reduce_family :
-  base -> (base_error -> unit) -> (base_warning -> unit) -> Def.ifam ->
-    family -> unit
+  base -> (base_warning -> unit) -> Def.ifam -> family -> unit
 
 val sort_children :
   base -> Adef.iper array -> (Adef.iper array * Adef.iper array) option

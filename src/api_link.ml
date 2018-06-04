@@ -26,7 +26,7 @@ let create_redis_connection () =
   let connection_spec = {RC.host = !redis_host; RC.port = !redis_port} in
   RC.IO.run (RC.connect connection_spec)
 
-let redis_p_key conf base ip =
+let redis_p_key base ip =
   let p = poi base ip in
   let sn = Name.lower (sou base (get_surname p)) in
   let fn = Name.lower (sou base (get_first_name p)) in
@@ -85,7 +85,7 @@ let json_list_of_string s =
 let get_bridges conf base redis ip include_not_validated =
   (* on récupère la clé *)
   match
-    findKeyBySourcenameAndRef redis conf.bname (redis_p_key conf base ip)
+    findKeyBySourcenameAndRef redis conf.bname (redis_p_key base ip)
   with
   | Some f ->
       (* Récupère tous les IDs de ponts. *)
@@ -434,7 +434,7 @@ let fam_to_piqi_full_family conf base ip ifam add_children =
 (**/**)
 
 
-let get_families_asc conf base ip nb_asc from_gen_desc =
+let get_families_asc base ip nb_asc =
   let rec loop_asc parents families =
     match parents with
     | [] -> families
@@ -452,7 +452,7 @@ let get_families_asc conf base ip nb_asc from_gen_desc =
   in
   loop_asc [(ip, 0)] []
 
-let get_families_desc conf base ip ip_spouse from_gen_desc nb_desc =
+let get_families_desc base ip ip_spouse from_gen_desc nb_desc =
   if from_gen_desc <= 0 then []
   else
     let rec loop_asc pl accu =
@@ -586,7 +586,7 @@ let get_link_tree_curl conf request basename bname ip s s2 nb_asc from_gen_desc 
       Curl.cleanup connection;
       res := Buffer.contents result
     with
-    | Curl.CurlException (reason, code, str) ->
+    | Curl.CurlException _ ->
         Printf.fprintf stderr "Error: %s\n" !errorBuffer
     | Failure s ->
         Printf.fprintf stderr "Caught exception: %s\n" s
@@ -668,7 +668,7 @@ let print_link_tree conf base =
 
   (* La liste de toutes les personnes à renvoyer. *)
   let pl =
-    get_families_desc conf base ip_local ip_local_spouse from_gen_desc nb_desc
+    get_families_desc base ip_local ip_local_spouse from_gen_desc nb_desc
   in
   (* On dédoublonne la liste. *)
   let pl =
@@ -686,7 +686,7 @@ let print_link_tree conf base =
        ip_local <> Adef.iper_of_int (-1) &&
        ip_distant <> Adef.iper_of_int (-1)
     then
-      let families = get_families_asc conf base ip_local nb_asc from_gen_desc in
+      let families = get_families_asc base ip_local nb_asc in
       List.map
         (fun (ip, ifam, gen) ->
           let add_children = gen < from_gen_desc in
@@ -764,7 +764,7 @@ let print_link_tree conf base =
   let all_persons =
     let ht = Hashtbl.create 101 in
     List.fold_left
-      (fun accu (_, ifam, gen) ->
+      (fun accu (_, ifam, _) ->
          let fam = foi base ifam in
          let ifath = get_father fam in
          let imoth = get_mother fam in
@@ -812,7 +812,7 @@ let print_link_tree conf base =
                        (RC.FloatBound.Inclusive (float_of_string id_link))
                    with
                    | [s] ->
-                       let from_ref = redis_p_key conf base ip in
+                       let from_ref = redis_p_key base ip in
                        let corresp =
                          MLink.Connection.({
                            from_baseprefix = conf.bname;
@@ -838,7 +838,7 @@ let print_link_tree conf base =
     in
     let ht_request = Hashtbl.create 101 in
     List.fold_left
-      (fun (accu_fam, accu_pers, accu_conn) (ip, ifam, gen) ->
+      (fun (accu_fam, accu_pers, accu_conn) (ip, _, gen) ->
         if Hashtbl.mem ht_request ip then (accu_fam, accu_pers, accu_conn)
         else
           begin
@@ -866,7 +866,7 @@ let print_link_tree conf base =
                                   bname_link ip s s2 0 1 (nb_desc + gen)
                               in
                               let corr =
-                                let from_ref = redis_p_key conf base ip in
+                                let from_ref = redis_p_key base ip in
                                 MLink.Connection.({
                                   from_baseprefix = conf.bname;
                                   from_ref = from_ref;
@@ -929,7 +929,7 @@ let print_link_tree conf base =
                                    (if conf.bname <> basename then gen + nb_desc else gen)
                                in
                                let corr =
-                                 let from_ref = redis_p_key conf base ip in
+                                 let from_ref = redis_p_key base ip in
                                  MLink.Connection.({
                                    from_baseprefix = conf.bname;
                                    from_ref = from_ref;

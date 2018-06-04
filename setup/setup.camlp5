@@ -22,7 +22,7 @@ let quote_escaped s =
     if i < String.length s then
       match s.[i] with
         '"' | '&' | '<' | '>' -> true
-      | x -> need_code (succ i)
+      | _ -> need_code (succ i)
     else false
   in
   let rec compute_len i i1 =
@@ -97,7 +97,7 @@ let abs_setup_dir () =
     Filename.concat (Sys.getcwd ()) !setup_dir
   else !setup_dir
 
-let trailer conf =
+let trailer _conf =
   Wserver.printf "\n<br />\n";
   Wserver.printf "<div id=\"footer\">\n";
   Wserver.printf "<hr />\n";
@@ -237,7 +237,7 @@ let parameters =
 let rec list_replace k v =
   function
     [] -> [k, v]
-  | (k1, v1) :: env when k1 = k -> (k1, v) :: env
+  | (k1, _) :: env when k1 = k -> (k1, v) :: env
   | kv :: env -> kv :: list_replace k v env
 
 let conf_with_env conf k v = {conf with env = list_replace k v conf.env}
@@ -363,7 +363,7 @@ let nth_field s n =
   in
   loop 0 0
 
-let translate_phrase lang lexicon s n =
+let translate_phrase lexicon s n =
   let n =
     match n with
       Some n -> n
@@ -397,7 +397,7 @@ let rec copy_from_stream conf print strm =
                   [< ''0'..'9' as c >] -> Some (Char.code c - Char.code '0')
                 | [< >] -> None
               in
-              print (translate_phrase conf.lang conf.lexicon s n)
+              print (translate_phrase conf.lexicon s n)
           end
       | '%' ->
           let c = Stream.next strm in
@@ -1265,7 +1265,7 @@ let merge_1 conf =
   if rc > 1 then print_file conf "bso_err.htm"
   else print_file conf "bso_ok.htm"
 
-let rec cut_at_equal s =
+let cut_at_equal s =
   try
     let i = String.index s '=' in
     String.sub s 0 i, String.sub s (succ i) (String.length s - succ i)
@@ -1355,7 +1355,7 @@ let gwf_1 conf =
     | None -> ""
   in
   let benv = read_base_env in_base in
-  let (vars, files) = variables "gwf_1.htm" in
+  let (vars, _) = variables "gwf_1.htm" in
   let oc = open_out (in_base ^ ".gwf") in
   let body_prop =
     match p_getenv conf.env "proposed_body_prop" with
@@ -1404,10 +1404,8 @@ let gwd_1 conf =
       Some v when v <> "" -> fprintf oc "-%s\n%s\n" k v
     | _ -> ()
   in
-  begin match p_getenv conf.env "setup_link" with
-    Some v -> fprintf oc "-setup_link\n"
-  | _ -> ()
-  end;
+  if  p_getenv conf.env "setup_link" <> None
+  then fprintf oc "-setup_link\n" ;
   print_param "only";
   begin match p_getenv conf.env "default_lang" with
     Some v when v <> "" -> fprintf oc "-lang\n%s\n" v

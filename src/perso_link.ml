@@ -1,16 +1,12 @@
 (* $Id: perso_link.ml,v 0.01 2015-02-19 15:29:32 flh Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-
 module MLink = Api_link_tree_piqi
 module MLinkext = Api_link_tree_piqi_ext
 
 
 open Config
 open Def
-open Gwdb
-
-
 
 (**/**)
 
@@ -167,7 +163,7 @@ let date_of_piqi_date date =
           end
       | None -> None
 
-let make_ep_link conf base p_link =
+let make_ep_link base p_link =
   let empty_union = {family = [| |]} in
   let empty_ascend = {parents = None; consang = Adef.fix (-1)} in
   let empty_p = Gwdb.empty_person base (Adef.iper_of_int (-1)) in
@@ -269,7 +265,7 @@ let make_ep_link conf base p_link =
   let p = Gwdb.person_of_gen_person base (gen_p, empty_ascend, empty_union) in
   p, true
 
-let make_efam_link conf base ip fam_link =
+let make_efam_link conf base fam_link =
   let empty_string = Gwdb.insert_string base "" in
   let children =
     List.map (fun p -> Adef.iper_of_int (Int32.to_int p.MLink.Person_link.ip))

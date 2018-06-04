@@ -8,7 +8,6 @@ open Config
 open Def
 open Gwdb
 open Util
-open Api_def
 open Api_util
 
 
@@ -96,7 +95,7 @@ type update_base_status =
 (* Exception qui gère les conflits de création de personnes. *)
 exception ModErrApiConflict of Mwrite.Create_conflict.t ;;
 
-let error_conflict_person_link conf base (f, s, o, create, var, force_create) =
+let error_conflict_person_link base (f, s, o, create, _, force_create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
@@ -106,9 +105,9 @@ let error_conflict_person_link conf base (f, s, o, create, var, force_create) =
           (* On a dit qu'on voulait forcer la création, donc on a *)
           (* calculer un occ de libre, si c'est pas le cas, c'est *)
           (* une erreur, et on doit quitter.                      *)
-          match Gwdb.person_of_key base f s o with
-          | Some ip -> failwith "error_conflict_person_link"
-          | None -> false
+          if Gwdb.person_of_key base f s o <> None
+          then failwith "error_conflict_person_link"
+          else false
         else
           match Gwdb.persons_of_name base (f ^ " " ^ s) with
          | [] -> false
@@ -200,7 +199,7 @@ let check_person_conflict conf base sp =
             match (r.r_fath, r.r_moth) with
             | (Some (f, s, o, create, var, force_create), None) |
               (None, Some (f, s, o, create, var, force_create)) ->
-                if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
+                if error_conflict_person_link base (f, s, o, create, var, force_create) then
                   let form = Some `person_form1 in
                   let conflict =
                     {
@@ -232,7 +231,7 @@ let check_person_conflict conf base sp =
               match witnesses with
               | [] -> ()
               | ((f, s, o, create, var, force_create), _) :: l ->
-                  if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
+                  if error_conflict_person_link base (f, s, o, create, var, force_create) then
                     let form = Some `person_form1 in
                     let conflict =
                       {
@@ -257,13 +256,13 @@ let check_person_conflict conf base sp =
       loop sp.pevents 0
     end
 
-let check_family_conflict conf base sfam scpl sdes =
+let check_family_conflict base sfam scpl sdes =
   (* Vérification des parents. *)
   let rec loop parents i =
     match parents with
     | [] -> ()
     | (f, s, o, create, var, force_create) :: l ->
-        if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
+        if error_conflict_person_link base (f, s, o, create, var, force_create) then
           let form =
             if i = 0 then Some `person_form1
             else  Some `person_form2
@@ -295,7 +294,7 @@ let check_family_conflict conf base sfam scpl sdes =
           match witnesses with
           | [] -> ()
           | ((f, s, o, create, var, force_create), _) :: l ->
-              if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
+              if error_conflict_person_link base (f, s, o, create, var, force_create) then
                 let form = Some `family_form in
                 let conflict =
                   {
@@ -323,7 +322,7 @@ let check_family_conflict conf base sfam scpl sdes =
     match children with
     | [] -> ()
     | (f, s, o, create, var, force_create) :: l ->
-        if error_conflict_person_link conf base (f, s, o, create, var, force_create) then
+        if error_conflict_person_link base (f, s, o, create, var, force_create) then
           let form = Some `person_form1 in
           let conflict =
             {
@@ -443,7 +442,7 @@ let date_of_piqi_date conf date =
                   | Some `hebrew -> Dhebrew
                   | _ -> Dgregorian
                 in
-                let get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal prec delta =
+                let get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal prec =
                   let day =
                     match dmy.Mwrite.Dmy.day with
                     | Some day -> Int32.to_int day
@@ -524,7 +523,7 @@ let date_of_piqi_date conf date =
                           begin
                             match dmy.Mwrite.Dmy.year with
                             | Some _ ->
-                              let adef_dmy = get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal Sure delta2 in
+                              let adef_dmy = get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal Sure in
                               OrYear {day2 = adef_dmy.day; month2 = adef_dmy.month; year2 = adef_dmy.year; delta2 = delta2}
                             | None -> Sure
                           end
@@ -535,7 +534,7 @@ let date_of_piqi_date conf date =
                           begin
                             match dmy.Mwrite.Dmy.year with
                             | Some _ ->
-                              let adef_dmy = get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal Sure delta2 in
+                              let adef_dmy = get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal Sure in
                               YearInt {day2 = adef_dmy.day; month2 = adef_dmy.month; year2 = adef_dmy.year; delta2 = delta2}
                             | None -> Sure
                           end
@@ -545,12 +544,7 @@ let date_of_piqi_date conf date =
                 let dmy =
                   match date.Mwrite.Date.dmy with
                   | Some dmy ->
-                      let delta =
-                        match dmy.Mwrite.Dmy.delta with
-                        | Some delta -> Int32.to_int delta
-                        | None -> 0
-                      in
-                      get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal prec delta
+                      get_adef_dmy_from_saisie_write_dmy_if_valid conf dmy cal prec
                   | None -> (* erreur*)
                       {day = 0; month = 0; year = 0; prec = Sure; delta = 0}
                 in
@@ -663,7 +657,7 @@ let pers_to_piqi_simple_person conf base p =
     else `sosa
   in
   let (first_name, surname) =
-    Api_saisie_read.person_firstname_surname_txt conf base p
+    Api_saisie_read.person_firstname_surname_txt base p
   in
   let (birth_short, birth_place, death_short, death_place) =
     let (birth, death, _) = Date.get_birth_death_date p in
@@ -738,13 +732,13 @@ let pers_to_piqi_person_search conf base p =
     | Neuter -> `unknown
   in
   let sosa =
-    let sosa_nb = Perso.get_sosa_person conf base p in
+    let sosa_nb = Perso.get_sosa_person p in
     if Sosa.eq sosa_nb Sosa.zero then `no_sosa
     else if Sosa.eq sosa_nb Sosa.one then `sosa_ref
     else `sosa
   in
   let (first_name, surname) =
-    Api_saisie_read.person_firstname_surname_txt conf base p
+    Api_saisie_read.person_firstname_surname_txt base p
   in
   let dates = Api_saisie_read.short_dates_text conf base p in
   let image =
@@ -1091,7 +1085,7 @@ let pers_to_piqi_person_search_info conf base p =
         list
     in
     List.map
-      (fun (ifam, fam) ->
+      (fun (_, fam) ->
          let ifath = get_father fam in
          let imoth = get_mother fam in
          let father = poi base ifath in
@@ -1773,7 +1767,7 @@ let piqi_empty_family conf base ifam =
 (* List of strings in which some characters were removed. *)
 let removed_string = ref [] ;;
 
-let reconstitute_somebody conf base person =
+let reconstitute_somebody base person =
   let create_link = person.Mwrite.Person_link.create_link in
   let (fn, sn, occ, create, var, force_create) = match create_link with
     | `link ->

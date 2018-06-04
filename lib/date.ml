@@ -39,21 +39,12 @@ let get_wday conf d =
   in
   if jd <> -1 then " (" ^ transl_nth conf "(week day)" wday ^ ")" else ""
 
-let nbsp = "&nbsp;"
-
 let death_symbol conf =
   match
     try Some (List.assoc "death_symbol" conf.base_env) with Not_found -> None
   with
     Some x -> x
   | None -> if !utf_8_db then "†" else "+"
-
-let birth_symbol conf =
-  match
-    try Some (List.assoc "birth_symbol" conf.base_env) with Not_found -> None
-  with
-    Some x -> x
-  | None -> if !utf_8_db then "°" else "°"
 
 let before_date d d1 =
   if d1.year < d.year then true
@@ -123,8 +114,6 @@ let code_dmy conf d =
   in
   code_date conf encoding d.day d.month d.year
 
-let code_year conf y = code_date conf (transl_nth conf "(date)" 3) 0 0 y
-
 let default_french_month =
   let tab =
     [| "Vendemiaire"; "Brumaire"; "Frimaire"; "Nivose"; "Pluviose"; "Ventose";
@@ -172,7 +161,7 @@ let code_hebrew_date conf d m y =
   in
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 
-let string_of_on_prec_dmy_aux conf code_year sy sy2 d =
+let string_of_on_prec_dmy_aux conf sy sy2 d =
   match d.prec with
     Sure ->
       if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
@@ -225,8 +214,8 @@ let replace_spaces_by_nbsp s =
   in
   loop 0 0
 
-let string_of_on_prec_dmy conf code_dmy sy sy2 d =
-  let r = string_of_on_prec_dmy_aux conf code_dmy sy sy2 d in
+let string_of_on_prec_dmy conf sy sy2 d =
+  let r = string_of_on_prec_dmy_aux conf sy sy2 d in
   replace_spaces_by_nbsp r
 
 let string_of_on_dmy conf d =
@@ -236,7 +225,7 @@ let string_of_on_dmy conf d =
       OrYear d2 | YearInt d2 -> code_dmy conf (dmy_of_dmy2 d2)
     | _ -> ""
   in
-  string_of_on_prec_dmy conf code_year sy sy2 d
+  string_of_on_prec_dmy conf sy sy2 d
 
 let string_of_on_french_dmy conf d =
   let sy = code_french_date conf d.day d.month d.year in
@@ -246,7 +235,7 @@ let string_of_on_french_dmy conf d =
         code_french_date conf d2.day2 d2.month2 d2.year2
     | _ -> ""
   in
-  string_of_on_prec_dmy conf code_french_year sy sy2 d
+  string_of_on_prec_dmy conf sy sy2 d
 
 let string_of_on_hebrew_dmy conf d =
   let sy = code_hebrew_date conf d.day d.month d.year in
@@ -256,7 +245,7 @@ let string_of_on_hebrew_dmy conf d =
         code_hebrew_date conf d2.day2 d2.month2 d2.year2
     | _ -> ""
   in
-  string_of_on_prec_dmy conf code_year sy sy2 d
+  string_of_on_prec_dmy conf sy sy2 d
 
 let string_of_prec_dmy conf s s2 d =
   match d.prec with
@@ -265,11 +254,11 @@ let string_of_prec_dmy conf s s2 d =
   | Before -> transl_decline conf "before (date)" s
   | After -> transl_decline conf "after (date)" s
   | Maybe -> transl_decline conf "possibly (date)" s
-  | OrYear d2 ->
+  | OrYear _ ->
       "<span class=\"text-nowrap\">" ^ s ^ "</span>" ^ " " ^
       "<span class=\"text-nowrap\">" ^ transl conf "or" ^ " " ^
       nominative s2 ^ "</span>"
-  | YearInt d2 ->
+  | YearInt _ ->
       "<span class=\"text-nowrap\">" ^ transl conf "between (date)" ^ " " ^
       s ^ "</span>" ^ " " ^ "<span class=\"text-nowrap\">" ^
       transl_nth conf "and" 0 ^ " " ^ nominative s2 ^ "</span>"
@@ -544,7 +533,7 @@ let string_slash_of_date conf date =
         let sy2 = slashify_dmy (decode_dmy conf d2) d2 in
         transl conf "between (date)" ^ " " ^ sy ^ " " ^
         transl_nth conf "and" 0 ^ " " ^ sy2
-    | prec -> let sy = code fst snd trd in string_of_prec_dmy conf sy "" d
+    | _ -> let sy = code fst snd trd in string_of_prec_dmy conf sy "" d
   in
   match date with
     Dgreg (d, Dgregorian) -> slashify_dmy (decode_dmy conf d) d
@@ -894,8 +883,8 @@ let compare_date d1 d2 =
           end
       | x -> x
       end
-  | Dgreg (dmy1, _), Dtext _ -> 1
-  | Dtext _, Dgreg (dmy2, _) -> -1
+  | Dgreg (_, _), Dtext _ -> 1
+  | Dtext _, Dgreg (_, _) -> -1
   | Dtext _, Dtext _ -> 0
 
 
@@ -976,7 +965,7 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 
-let eval_var conf env jd loc =
+let eval_var conf env jd _loc =
   function
     ["integer"] ->
       begin match get_env "integer" env with
@@ -988,12 +977,12 @@ let eval_var conf env jd loc =
       TemplDate.eval_date_var conf (Calendar.sdn_of_gregorian conf.today) sl
   | _ -> raise Not_found
 
-let print_foreach conf print_ast eval_expr =
+let print_foreach print_ast eval_expr =
   let eval_int_expr env jd e =
     let s = eval_expr env jd e in
     try int_of_string s with Failure _ -> raise Not_found
   in
-  let rec print_foreach env jd loc s sl el al =
+  let rec print_foreach env jd _loc s sl el al =
     match s, sl with
       "integer_range", [] -> print_integer_range env jd el al
     | _ -> raise Not_found
@@ -1015,5 +1004,5 @@ let print_calendar conf =
      Templ.eval_transl = (fun _ -> Templ.eval_transl conf);
      Templ.eval_predefined_apply = (fun _ -> raise Not_found);
      Templ.get_vother = get_vother; Templ.set_vother = set_vother;
-     Templ.print_foreach = print_foreach conf}
+     Templ.print_foreach = print_foreach }
     [] (eval_julian_day conf)

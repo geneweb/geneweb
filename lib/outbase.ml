@@ -1,8 +1,6 @@
 (* $Id: outbase.ml,v 5.21 2007-01-19 01:53:16 ddr Exp $ *)
 (* Copyright (c) 2006-2007 INRIA *)
 
-module type HACK_FOR_DEPEND = sig open Btree end
-
 open Dbdisk
 open Dutil
 open Def
@@ -95,7 +93,7 @@ let make_name_index base =
   let add_name key valu =
     let key = Name.crush (Name.abbrev key) in
     let i = Hashtbl.hash key mod Array.length t in
-    if array_mem valu t.(i) then ()
+    if Array.mem valu t.(i) then ()
     else t.(i) <- Array.append [| valu |] t.(i)
   in
   let rec add_names ip =
@@ -129,7 +127,7 @@ let create_name_index oc_inx oc_inx_acc base =
 let add_name t key valu =
   let key = Name.crush_lower key in
   let i = Hashtbl.hash key mod Array.length t in
-  if array_mem valu t.(i) then () else t.(i) <- Array.append [| valu |] t.(i)
+  if Array.mem valu t.(i) then () else t.(i) <- Array.append [| valu |] t.(i)
 
 let make_strings_of_fsname base =
   let t = Array.make table_size [| |] in

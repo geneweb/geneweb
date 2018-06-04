@@ -1,56 +1,49 @@
-(* nocamlp5 *)
-
-
 module M = Api_piqi
 module Mext = Api_piqi_ext
 
-open Config
 open Def
 open Gwdb
-open Api_def
 open Api_util
 
-
-
-let set_list l v = l := v :: !l ;;
+let set_list l v = l := v :: !l
 
 (* Listes des erreurs *)
-let already_defined = ref [] ;;
-let own_ancestor = ref [] ;;
+let already_defined = ref []
+let own_ancestor = ref []
 let bad_sex_of_married_person = ref [];;
 
 (* Listes des warnings *)
-let big_age_between_spouses = ref [] ;;
-let birth_after_death = ref [] ;;
-let incoherent_sex = ref [] ;;
-let changed_order_of_children = ref [] ;;
-let changed_order_of_marriages = ref [] ;;
-let changed_order_of_family_events = ref [] ;;
-let changed_order_of_person_events = ref [] ;;
-let children_not_in_order = ref [] ;;
-let close_children = ref [] ;;
-let dead_old = ref [] ;;
-let dead_too_early_to_be_father = ref [] ;;
-let fevent_order = ref [] ;;
-let fevent_witness_after_death = ref [] ;;
-let fevent_witness_before_birth = ref [] ;;
-let incoherent_ancestor_date = ref [] ;;
-let marriage_date_after_death = ref [] ;;
-let marriage_date_before_birth = ref [] ;;
+let big_age_between_spouses = ref []
+let birth_after_death = ref []
+let incoherent_sex = ref []
+let changed_order_of_children = ref []
+let changed_order_of_marriages = ref []
+let changed_order_of_family_events = ref []
+let changed_order_of_person_events = ref []
+let children_not_in_order = ref []
+let close_children = ref []
+let dead_old = ref []
+let dead_too_early_to_be_father = ref []
+let fevent_order = ref []
+let fevent_witness_after_death = ref []
+let fevent_witness_before_birth = ref []
+let incoherent_ancestor_date = ref []
+let marriage_date_after_death = ref []
+let marriage_date_before_birth = ref []
 (* Renommage : MotherDeadAfterChildBirth => mother_dead_before_child_birth *)
-let mother_dead_before_child_birth = ref [] ;;
-let parent_born_after_child = ref [] ;;
-let parent_too_old = ref [] ;;
-let parent_too_young = ref [] ;;
-let pevent_order = ref [] ;;
-let pevent_witness_after_death = ref [] ;;
-let pevent_witness_before_birth = ref [] ;;
-let title_dates_error = ref [] ;;
-let undefined_sex = ref [] ;;
-let witness_date_after_death = ref [] ;;
-let witness_date_before_birth = ref [] ;;
-let young_for_marriage = ref [] ;;
-let old_individual = ref [] ;;
+let mother_dead_before_child_birth = ref []
+let parent_born_after_child = ref []
+let parent_too_old = ref []
+let parent_too_young = ref []
+let pevent_order = ref []
+let pevent_witness_after_death = ref []
+let pevent_witness_before_birth = ref []
+let title_dates_error = ref []
+let undefined_sex = ref []
+let witness_date_after_death = ref []
+let witness_date_before_birth = ref []
+let young_for_marriage = ref []
+let old_individual = ref []
 
 
 
@@ -112,7 +105,7 @@ let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img w
       let mother =
         pers_to_piqi_person_full conf base moth base_loop compute_sosa load_img
       in
-      let date = string_of_prec_dmy conf dmy in
+      let date = string_of_prec_dmy dmy in
       let w =
         M.Warning_big_age_between_spouses.({
           father = father;
@@ -231,7 +224,7 @@ let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img w
       set_list close_children w
   | DeadOld (p, dmy) ->
       let p = pers_to_piqi_person_full conf base p base_loop compute_sosa load_img in
-      let date = string_of_prec_dmy conf dmy in
+      let date = string_of_prec_dmy dmy in
       let w =
         M.Warning_dead_old.({
           person = p;
@@ -349,7 +342,7 @@ let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img w
       let p =
         pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
       in
-      let date = string_of_prec_dmy conf dmy in
+      let date = string_of_prec_dmy dmy in
       let w =
         M.Warning_parent_too_old.({
           parent = p;
@@ -361,7 +354,7 @@ let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img w
       let p =
         pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
       in
-      let date = string_of_prec_dmy conf dmy in
+      let date = string_of_prec_dmy dmy in
       let w =
         M.Warning_parent_too_young.({
           parent = p;
@@ -433,7 +426,7 @@ let add_warning_to_piqi_warning_list conf base base_loop compute_sosa load_img w
       let p =
         pers_to_piqi_person_full conf base p base_loop compute_sosa load_img
       in
-      let date = string_of_prec_dmy conf dmy in
+      let date = string_of_prec_dmy dmy in
       let w =
         M.Warning_young_for_marriage.({
           person = p;

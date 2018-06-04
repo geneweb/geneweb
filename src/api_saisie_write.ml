@@ -8,7 +8,6 @@ open Config
 open Def
 open Gwdb
 open Util
-open Api_def
 open Api_util
 
 
@@ -45,7 +44,6 @@ let print_auto_complete conf base =
   in
   let data = Mext_write.gen_auto_complete_result result in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -64,7 +62,7 @@ let print_person_search_list conf base =
   let first_name = params.Mwrite.Person_search_list_params.firstname in
   let max_res = Int32.to_int params.Mwrite.Person_search_list_params.limit in
   let list =
-    Api_search.search_person_list conf base max_res surname first_name
+    Api_search.search_person_list base surname first_name
   in
   let list =
     List.sort
@@ -86,8 +84,8 @@ let print_person_search_list conf base =
              | (Some d1, Some d2) ->
                  if CheckItem.strictly_before d1 d2 then -1
                  else 1
-             | (Some d1, _) -> -1
-             | (_, Some d2) -> 1
+             | (Some _, _) -> -1
+             | (_, Some _) -> 1
              | (_, _) -> 0)
           else cmp_fn
         else cmp_sn)
@@ -106,7 +104,6 @@ let print_person_search_list conf base =
   let result = Mwrite.Person_search_list.({ persons = list; }) in
   let data = Mext_write.gen_person_search_list result in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -126,7 +123,6 @@ let print_person_search_info conf base =
   let pers = Api_update_util.pers_to_piqi_person_search_info conf base p in
   let data = Mext_write.gen_person_search_info pers in
   print_result conf data
-;;
 
 
 (**/**) (* Configuration pour la saisie. *)
@@ -146,7 +142,6 @@ let piqi_event_of_fevent evt_name =
   | Efam_PACS -> `efam_pacs
   | Efam_Residence -> `efam_residence
   | _ -> failwith "print_config"
-;;
 
 let piqi_event_of_pevent evt_name =
   match evt_name with
@@ -201,7 +196,6 @@ let piqi_event_of_pevent evt_name =
   | Epers_VenteBien -> `epers_ventebien
   | Epers_Will -> `epers_will
   | _ -> failwith "print_config"
-;;
 
 
 (* ************************************************************************ *)
@@ -552,7 +546,7 @@ let print_config conf base =
         (* On ajoute les lieux-dit. *)
         let placeholder =
           match List.rev expl_placeholder with
-          | "Subdivision" :: l ->
+          | "Subdivision" :: _ ->
               "[" ^ (transl conf "subdivision") ^ "] - " ^ placeholder
           | _ -> placeholder
         in
@@ -579,7 +573,6 @@ let print_config conf base =
   in
   let data = Mext_write.gen_config config in
   print_result conf data
-;;
 
 
 (**/**) (* Fonctions qui calcul "l'inférence" du nom de famille. *)
@@ -619,7 +612,7 @@ let rec infer_surname conf base p ifam =
             begin
               let all_children_surname =
                 List.fold_left
-                  (fun acc ifam ->
+                  (fun acc _ ->
                     let fam = foi base fam.(0) in
                     let names =
                       List.fold_left
@@ -778,14 +771,12 @@ let rec infer_surname conf base p ifam =
                 else ""
             end
           else ""
-;;
 
 
 type compute_death =
   | Compute_dead
   | Compute_not_dead
   | Compute_dont_know_if_dead
-;;
 
 (* ************************************************************************ *)
 (*  [Fonc] compute_infer_death : config -> base -> person -> compute_death  *)
@@ -838,7 +829,6 @@ let compute_infer_death conf base p =
             loop_c all_children_dead (Array.to_list (get_children fam))
       in
       loop false (Array.to_list (get_family p))
-;;
 
 
 (**/**) (* Fonctions qui renvoie le ModificationStatus. *)
@@ -877,7 +867,7 @@ let compute_warnings conf base resp =
                   (fun _ -> print_someone_dates p)
                 in
                 w :: wl
-            | ChangedOrderOfChildren (ifam, des, before, after) -> wl
+            | ChangedOrderOfChildren _ -> wl
                 (* On ignore les messages de changement d'ordre. *)
                 (*
                 let cpl = foi base ifam in
@@ -887,22 +877,22 @@ let compute_warnings conf base resp =
                 (Gutil.designation base fath ^ "\n" ^ transl_nth conf "and" 0 ^
                      " " ^ Gutil.designation base moth ^ "\n")
                 *)
-            | ChangedOrderOfMarriages (p, before, after) -> wl
+            | ChangedOrderOfMarriages _ -> wl
                 (* On ignore les messages de changement d'ordre. *)
                 (*
                 (capitale (transl conf "changed order of marriages"))
                 *)
-            | ChangedOrderOfFamilyEvents (ifam, before, after) -> wl
+            | ChangedOrderOfFamilyEvents _ -> wl
                 (* On ignore les messages de changement d'ordre. *)
                 (*
                 (capitale (transl conf "changed order of family's events"))
                 *)
-            | ChangedOrderOfPersonEvents (p, before, after) -> wl
+            | ChangedOrderOfPersonEvents _ -> wl
                 (* On ignore les messages de changement d'ordre. *)
                 (*
                 (capitale (transl conf "changed order of person's events"))
                 *)
-            | ChildrenNotInOrder (ifam, des, elder, x) -> wl
+            | ChildrenNotInOrder _ -> wl
                 (* On ignore les messages de changement d'ordre. *)
                 (*
                 let cpl = foi base ifam in
@@ -918,7 +908,7 @@ let compute_warnings conf base resp =
                 Gutil.designation base elder ^ (Date.short_dates_text conf base elder) ^
                 Gutil.designation base x ^ (Date.short_dates_text conf base x)
                 *)
-            | CloseChildren (ifam, des, elder, x) ->
+            | CloseChildren (ifam, _, elder, x) ->
                 let cpl = foi base ifam in
                 let w =
                 (Printf.sprintf
@@ -1115,7 +1105,6 @@ let compute_warnings conf base resp =
           ml []
       in
       (true, warning, misc, None, hr)
-;;
 
 let compute_modification_status conf base ip ifam resp =
   let (surname, first_name, occ, index_person, surname_str, first_name_str) =
@@ -1171,7 +1160,6 @@ let compute_modification_status conf base ip ifam resp =
   in
   let data = Mext_write.gen_modification_status response in
   data
-;;
 
 
 (**/**) (* Fonctions d'ajout de la première personne. *)
@@ -1217,7 +1205,6 @@ let print_add_ind_start_ok conf base =
   in
   let data = Mext.gen_reference_person ref_p in
   print_result conf data
-;;
 
 
 (**/**) (* Fonctions de modification individu. *)
@@ -1241,7 +1228,6 @@ let print_mod_ind conf base =
   let mod_p = Api_update_util.pers_to_piqi_mod_person conf base p in
   let data = Mext_write.gen_person mod_p in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -1260,7 +1246,6 @@ let print_mod_ind_ok conf base =
   let ip = Int32.to_int mod_p.Mwrite.Person.index in
   let data = compute_modification_status conf base ip (-1) resp in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -1279,7 +1264,6 @@ let print_add_ind_ok conf base =
   let ip = Int32.to_int mod_p.Mwrite.Person.index in
   let data = compute_modification_status conf base ip (-1) resp in
   print_result conf data
-;;
 
 
 (* Fonction qui calcule la personne sur laquelle on va faire la redirection. *)
@@ -1318,7 +1302,6 @@ let compute_redirect_person conf base ip =
               | None -> Adef.iper_of_int (-1)
             else ipz
         | None -> Adef.iper_of_int (-1)
-;;
 
 
 (* ************************************************************************ *)
@@ -1380,7 +1363,6 @@ let print_del_ind_ok conf base =
       conf base (Adef.int_of_iper ip_redirect) 0 resp
   in
   print_result conf data
-;;
 
 
 (**/**) (* Fonctions de modification famille. *)
@@ -1409,7 +1391,6 @@ let print_del_fam_ok conf base =
     compute_modification_status conf base (Adef.int_of_iper ip) (-1) resp
   in
   print_result conf data
-;;
 
 
 (* ************************************************************************ *)
@@ -1511,7 +1492,6 @@ let compute_add_family conf base p =
           father.Mwrite.Person.death_type <- `not_dead
   in
   family
-;;
 
 
 (* ************************************************************************ *)
@@ -1556,7 +1536,7 @@ let print_add_family conf base =
       - UpdateStatus
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-let compute_add_family_ok conf base ip mod_family =
+let compute_add_family_ok conf base mod_family =
   let mod_father = mod_family.Mwrite.Family.father in
   let mod_mother = mod_family.Mwrite.Family.mother in
   (* Il faut mettre à jour les clés. *)
@@ -1610,7 +1590,7 @@ let compute_add_family_ok conf base ip mod_family =
           in
           let (all_wl, all_ml, all_hr) =
             match Api_update_family.print_add
-                    conf base ip mod_family mod_father mod_mother
+                    conf base mod_family mod_father mod_mother
             with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -1653,8 +1633,9 @@ let compute_add_family_ok conf base ip mod_family =
                 raise (Api_update_util.ModErrApiConflict c)
           in
           let (all_wl, all_ml, all_hr) =
-            match Api_update_family.print_add
-              conf base ip mod_family mod_father mod_mother
+            match
+              Api_update_family.print_add
+                conf base mod_family mod_father mod_mother
             with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -1665,8 +1646,8 @@ let compute_add_family_ok conf base ip mod_family =
           (* le parent créé vaut ??, donc on ne pourra JAMAIS lui   *)
           (* apporter de modifications.                             *)
           let (all_wl, all_ml, all_hr) =
-            if mod_father.Mwrite.Person.lastname = "" ||
-               mod_father.Mwrite.Person.firstname = ""
+            if mod_father.Mwrite.Person.lastname = ""
+            || mod_father.Mwrite.Person.firstname = ""
             then
               (all_wl, all_ml, all_hr)
             else
@@ -1696,7 +1677,7 @@ let compute_add_family_ok conf base ip mod_family =
           in
           let (all_wl, all_ml, all_hr) =
             match Api_update_family.print_add
-                    conf base ip mod_family mod_father mod_mother
+                    conf base mod_family mod_father mod_mother
             with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -1707,7 +1688,7 @@ let compute_add_family_ok conf base ip mod_family =
       | ((`create | `create_default_occ), (`create | `create_default_occ)) ->
           let (all_wl, all_ml, all_hr) =
             match Api_update_family.print_add
-                    conf base ip mod_family mod_father mod_mother
+                    conf base mod_family mod_father mod_mother
             with
             | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
             | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -1766,7 +1747,7 @@ let print_add_family_ok conf base =
   let add_family_ok = get_params conf Mext_write.parse_add_family_ok in
   let ip = Int32.to_int add_family_ok.Mwrite.Add_family_ok.index_person in
   let mod_family = add_family_ok.Mwrite.Add_family_ok.family in
-  let resp = compute_add_family_ok conf base ip mod_family in
+  let resp = compute_add_family_ok conf base mod_family in
   let ifam = Int32.to_int mod_family.Mwrite.Family.index in
   let data = compute_modification_status conf base ip ifam resp in
   print_result conf data
@@ -1807,10 +1788,9 @@ let print_mod_family_request conf base =
          let image =
            let img = sou base (get_image sp) in
            if img <> "" then img
-           else
-           match Api_util.find_image_file conf base sp with
-           | Some s -> "1"
-           | None -> ""
+           else if Api_util.find_image_file conf base sp <> None
+           then "1"
+           else ""
          in
          let sosa =
            let sosa_nb = Perso.get_single_sosa conf base sp in
@@ -1836,7 +1816,7 @@ let print_mod_family_request conf base =
   let first_family =
     match (Array.to_list (get_family p)) with
     | [] -> None
-    | ifam :: l ->
+    | ifam :: _ ->
         let fam = foi base ifam in
         let surname = sou base (get_surname p) in
         let first_name = sou base (get_first_name p) in
@@ -2149,7 +2129,7 @@ let print_add_parents_ok conf base =
         let (all_wl, all_ml, all_hr) =
           match
             Api_update_family.print_add
-              conf base ip mod_family mod_father mod_mother
+              conf base mod_family mod_father mod_mother
           with
           | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
           | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
@@ -2234,10 +2214,9 @@ let print_add_child conf base =
          let image =
            let img = sou base (get_image sp) in
            if img <> "" then img
-           else
-           match Api_util.find_image_file conf base sp with
-           | Some s -> "1"
-           | None -> ""
+           else if Api_util.find_image_file conf base sp <> None
+           then "1"
+           else ""
          in
          let sosa =
            let sosa_nb = Perso.get_single_sosa conf base sp in
@@ -2397,7 +2376,7 @@ let print_add_child_ok conf base =
             mod_f.Mwrite.Family.children @ [create_child];
           (* On ajoute la famille : ADD_FAM *)
           let (all_wl, all_ml, all_hr) =
-            match compute_add_family_ok conf base ip mod_f with
+            match compute_add_family_ok conf base mod_f with
             | Api_update_util.UpdateSuccess (wl, ml, hr) ->
                 (* On ajoute une famille donc l'ifam est nouveau *)
                 let () = new_ifam := Int32.to_int mod_f.Mwrite.Family.index in
@@ -2655,8 +2634,7 @@ let print_add_sibling_ok conf base =
             (* On ajoute la famille : ADD_FAM *)
             let (all_wl, all_ml, all_hr) =
               match
-                Api_update_family.print_add
-                  conf base ip family father mother
+                Api_update_family.print_add conf base family father mother
               with
               | Api_update_util.UpdateSuccess (wl, ml, hr) ->
                   (* On ajoute une famille donc l'ifam est nouveau *)
@@ -2992,11 +2970,11 @@ let print_add_first_fam conf =
   let sn = if surname = "" then None else Some (Name.lower surname) in
   let fn = if first_name = "" then None else Some (Name.lower first_name) in
   let index_family = None in
-  let (is_base_updated, warnings, miscs, conflict, history_records) =
+  let (is_base_updated, warnings, miscs, conflict, _) =
     match resp with
     | Api_update_util.UpdateErrorConflict c -> (false, [], [], Some c, [])
     | Api_update_util.UpdateError s -> (false, [s], [], None, [])
-    | Api_update_util.UpdateSuccess (wl, ml, hr) -> (true, [], [], None, [])
+    | Api_update_util.UpdateSuccess _ -> (true, [], [], None, [])
   in
   let response =
     {
@@ -3034,7 +3012,7 @@ let print_add_first_fam conf =
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
 let print_add_first_fam_ok conf base =
-  let (add_first_fam, resp) = compute_add_first_fam conf in
+  let (add_first_fam, _) = compute_add_first_fam conf in
   let mod_p = add_first_fam.Mwrite.Add_first_fam.sosa in
   let mod_father = add_first_fam.Mwrite.Add_first_fam.father in
   let mod_mother = add_first_fam.Mwrite.Add_first_fam.mother in
@@ -3134,7 +3112,7 @@ let print_add_first_fam_ok conf base =
           else
             (* On ajoute la famille avec les parents. *)
             let (all_wl, all_ml, all_hr) =
-              match compute_add_family_ok conf base !ip fam_asc with
+              match compute_add_family_ok conf base fam_asc with
               | Api_update_util.UpdateSuccess (wl, ml, hr) -> (wl, ml, hr)
               | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
               | Api_update_util.UpdateErrorConflict c ->
@@ -3267,7 +3245,7 @@ let print_add_first_fam_ok conf base =
           then (all_wl, all_ml, all_hr)
           else
             let (all_wl, all_ml, all_hr) =
-              match compute_add_family_ok conf base ip fam_desc with
+              match compute_add_family_ok conf base fam_desc with
               | Api_update_util.UpdateSuccess (wl, ml, hr) -> (all_wl @ wl, all_ml @ ml, all_hr @ hr)
               | Api_update_util.UpdateError s -> raise (Update.ModErrApi s)
               | Api_update_util.UpdateErrorConflict c ->

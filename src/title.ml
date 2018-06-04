@@ -411,7 +411,7 @@ let print_all_with_place_list conf base p list =
   Wserver.printf "<ul>\n";
   let _ =
     List.fold_left
-      (fun list (p, t as x) ->
+      (fun list (_, t as x) ->
          html_li conf;
          give_access_someone conf base x [];
          Wserver.printf ", %s\n" (sou base t.t_ident);

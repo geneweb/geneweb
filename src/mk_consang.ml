@@ -50,7 +50,7 @@ let init_cache_info bname base =
     Some oc -> output_value oc ht; close_out oc
   | None -> ()
 
-let rebuild_field_array db2 len pad bdir compress f =
+let rebuild_field_array len pad bdir compress f =
   if !(Mutil.verbose) then
     begin
       eprintf "rebuilding %s..." (Filename.basename bdir);
@@ -72,7 +72,7 @@ let rebuild_any_field_array db2 fi pad compress (f2, get) =
     List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
   in
   Mutil.mkdir_p bdir;
-  rebuild_field_array db2 fi.fi_nb pad bdir compress
+  rebuild_field_array fi.fi_nb pad bdir compress
     (fun oc_acc output_item ->
        (* put pad as 1st elem; not necessary, just for beauty *)
        if compress then ignore (output_item pad : int);
@@ -92,7 +92,7 @@ let rebuild_option_field_array db2 fi pad (f2, get) =
     List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
   in
   Mutil.mkdir_p bdir;
-  rebuild_field_array db2 fi.fi_nb pad bdir true
+  rebuild_field_array fi.fi_nb pad bdir true
     (fun oc_acc output_item ->
        for i = 0 to fi.fi_nb - 1 do
          let x =
@@ -195,7 +195,7 @@ let rebuild_string_field db2 fi (f2, get) =
     List.fold_left Filename.concat db2.Db2disk.bdir2 ["new_d"; f1; f2]
   in
   Mutil.mkdir_p bdir;
-  rebuild_field_array db2 fi.fi_nb "" bdir true
+  rebuild_field_array fi.fi_nb "" bdir true
     (fun oc_acc output_item ->
        for i = 0 to fi.fi_nb - 1 do
          let s =
@@ -214,7 +214,7 @@ let rebuild_list_with_string_field_array g h db2 fi (f2, get) =
   in
   Mutil.mkdir_p bdir;
   let oc_ext = open_out_bin (Filename.concat bdir "data2.ext") in
-  rebuild_field_array db2 fi.fi_nb "" bdir true
+  rebuild_field_array fi.fi_nb "" bdir true
     (fun oc_acc output_item ->
        for i = 0 to fi.fi_nb - 1 do
          let sl =

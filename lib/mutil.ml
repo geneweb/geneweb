@@ -5,28 +5,6 @@ let int_size = 4
 let verbose = ref true
 let utf_8_db = Name.utf_8_db
 
-let lindex s c =
-  let rec pos i =
-    if i = String.length s then None
-    else if s.[i] = c then Some i
-    else pos (i + 1)
-  in
-  pos 0
-
-let rindex s c =
-  let rec pos i =
-    if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
-  in
-  pos (String.length s - 1)
-
-let array_mem x a =
-  let rec loop i =
-    if i = Array.length a then false
-    else if x = a.(i) then true
-    else loop (i + 1)
-  in
-  loop 0
-
 let list_iter_first f al =
   let _ =
     List.fold_left (fun first a -> let () = f first a in false) true al
@@ -81,7 +59,7 @@ let colon_to_at_word s ibeg iend =
               loop 1 (i + 1)
             else String.sub s i (j - i), iendroot - ibeg
           in
-          loop ((s.[i+1], e, d) :: list) (max d maxd) inext
+          loop ((s.[i+1], e) :: list) (max d maxd) inext
       in
       loop [] 0 iendroot
     in
@@ -89,7 +67,7 @@ let colon_to_at_word s ibeg iend =
     let root = String.sub s ibeg len in
     let s =
       List.fold_left
-        (fun t (c, e, d) ->
+        (fun t (c, e) ->
            Printf.sprintf "%c?%s%s" c e (if t = "" then "" else ":" ^ t))
         (String.sub s (ibeg + len) (iendroot - ibeg - len)) listdecl
     in
@@ -114,7 +92,7 @@ let decline case s =
 (* end compatibility code *)
 
 let nominative s =
-  match rindex s ':' with
+  match String.rindex_opt s ':' with
     Some _ -> decline 'n' s
   | _ -> s
 
@@ -205,7 +183,7 @@ let surnames_pieces surname =
   loop 0 0 0
 
 let tr c1 c2 s =
-  match rindex s c1 with
+  match String.rindex_opt s c1 with
     Some _ ->
       let convert_char i = if s.[i] = c1 then c2 else s.[i] in
       String.init (String.length s) convert_char
@@ -351,15 +329,15 @@ let input_lexicon lang ht open_fname =
   try
     let ic = open_fname () in
     let lang =
-      match lindex lang '.' with
+      match String.index_opt lang '.' with
         Some i -> String.sub lang 0 i
       | None -> lang
     in
     let derived_lang =
-      match lindex lang '-' with
+      match String.index_opt lang '-' with
         Some i -> String.sub lang 0 i
       | None ->
-          match lindex lang '_' with
+          match String.index_opt lang '_' with
             Some i -> String.sub lang 0 i
           | None -> ""
     in
@@ -377,7 +355,7 @@ let input_lexicon lang ht open_fname =
           in
           let k = String.sub k 4 (String.length k - 4) in
           let rec loop line =
-            match lindex line ':' with
+            match String.index_opt line ':' with
               Some i ->
                 let line_lang = String.sub line 0 i in
                 if line_lang = lang ||

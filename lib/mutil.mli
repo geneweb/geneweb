@@ -5,9 +5,6 @@ val int_size : int
 val verbose : bool ref
 val utf_8_db : bool ref
 
-val lindex : string -> char -> int option
-val rindex : string -> char -> int option
-val array_mem : 'a -> 'a array -> bool
 val list_iter_first : (bool -> 'a -> unit) -> 'a list -> unit
 val list_uniq : 'a list -> 'a list
 val tr : char -> char -> string -> string

@@ -605,7 +605,7 @@ let strip_events fevents =
   let strip_array_witness pl =
     let pl =
       List.fold_right
-        (fun ((f, s, o, c, _), k as p) pl -> if f = "" then pl else p :: pl)
+        (fun ((f, _, _, _, _), _ as p) pl -> if f = "" then pl else p :: pl)
         (Array.to_list pl) []
     in
     Array.of_list pl
@@ -626,12 +626,12 @@ let strip_events fevents =
 let strip_array_persons pl =
   let pl =
     List.fold_right
-      (fun (f, s, o, c, _ as p) pl -> if f = "" then pl else p :: pl)
+      (fun (f, _, _, _, _ as p) pl -> if f = "" then pl else p :: pl)
       (Array.to_list pl) []
   in
   Array.of_list pl
 
-let error_family conf base err =
+let error_family conf err =
   if !(Api_conf.mode_api) then
     begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
@@ -643,7 +643,7 @@ let error_family conf base err =
   trailer conf;
   raise Update.ModErr
 
-let check_event_witnesses conf base witnesses =
+let check_event_witnesses conf witnesses =
   let wl = Array.to_list witnesses in
   let rec loop wl =
     match wl with
@@ -662,7 +662,7 @@ let check_event_witnesses conf base witnesses =
   in
   loop wl
 
-let check_witnesses conf base fam =
+let check_witnesses conf fam =
   let wl = Array.to_list fam.witnesses in
   let rec loop wl =
     match wl with
@@ -681,7 +681,7 @@ let check_witnesses conf base fam =
   in
   loop wl
 
-let check_parents conf base cpl =
+let check_parents conf cpl =
   let (fa_fn, fa_sn, _, _, _) = father cpl in
   let (mo_fn, mo_sn, _, _, _) = mother cpl in
   match (fa_fn = "", fa_sn = ""), (mo_fn = "", mo_sn = "") with
@@ -705,17 +705,17 @@ let check_parents conf base cpl =
         (transl_nth conf "father/mother" 1 ^ " : " ^
          transl conf "first name missing")
 
-let check_family conf base fam cpl =
+let check_family conf fam cpl =
   (* N'est plus nécessaire avec les évènements. Est fait dans fevents. *)
   (*let err_witness = check_witnesses conf base fam in*)
-  let err_parents = check_parents conf base cpl in
+  let err_parents = check_parents conf cpl in
   let err_fevent_witness =
     (* On regarde si les témoins sont bien renseignés. *)
     let rec loop fevents =
       match fevents with
         [] -> None
       | evt :: l ->
-          match check_event_witnesses conf base evt.efam_witnesses with
+          match check_event_witnesses conf evt.efam_witnesses with
             Some err -> Some err
           | _ -> loop l
     in
@@ -795,7 +795,7 @@ let print_err_mother_sex conf base p =
   trailer conf;
   raise Update.ModErr
 
-let print_err conf base =
+let print_err conf =
   if !(Api_conf.mode_api) then
     begin let err = Printf.sprintf "%s" (capitale (transl conf "error")) in
       raise (Update.ModErrApi err)
@@ -827,7 +827,7 @@ let family_exclude pfams efam =
   in
   Array.of_list pfaml
 
-let infer_origin_file_from_other_marriages conf base ifam ip =
+let infer_origin_file_from_other_marriages base ifam ip =
   let u = poi base ip in
   let ufams = get_family u in
   let rec loop i =
@@ -841,11 +841,11 @@ let infer_origin_file_from_other_marriages conf base ifam ip =
 
 let infer_origin_file conf base ifam ncpl ndes =
   let r =
-    infer_origin_file_from_other_marriages conf base ifam (Adef.father ncpl)
+    infer_origin_file_from_other_marriages base ifam (Adef.father ncpl)
   in
   let r =
     if r = None then
-      infer_origin_file_from_other_marriages conf base ifam (Adef.mother ncpl)
+      infer_origin_file_from_other_marriages base ifam (Adef.mother ncpl)
     else r
   in
   let r =
@@ -893,86 +893,53 @@ let patch_person_with_pevents base ip =
   let p = poi base ip in
   let p = gen_person_of_person p in
   let empty_string = Gwdb.insert_string base "" in
+  let evt ~name ?(date = Adef.codate_None) ~place ~src ~note () =
+    {epers_name = name; epers_date = date;
+     epers_place = place; epers_reason = empty_string;
+     epers_note = note; epers_src = src;
+     epers_witnesses = [| |]}
+  in
   let evt_birth =
-    match Adef.od_of_codate p.birth, p.birth_place with
-      Some d, _ ->
-        let evt =
-          {epers_name = Epers_Birth; epers_date = p.birth;
-           epers_place = p.birth_place; epers_reason = empty_string;
-           epers_note = p.birth_note; epers_src = p.birth_src;
-           epers_witnesses = [| |]}
-        in
-        Some evt
-    | _, place ->
-        if sou base place = "" then None
-        else
-          let evt =
-            {epers_name = Epers_Birth; epers_date = Adef.codate_None;
-             epers_place = p.birth_place; epers_reason = empty_string;
-             epers_note = p.birth_note; epers_src = p.birth_src;
-             epers_witnesses = [| |]}
-          in
-          Some evt
+    let evt ?date () =
+      let name = Epers_Birth in
+      let place = p.birth_place in
+      let note = p.birth_note in
+      let src = p.birth_src in
+      Some (evt ~name ?date ~place ~note ~src ())
+    in
+    if Adef.od_of_codate p.birth <> None
+    then evt ~date:p.birth ()
+    else if sou base p.birth_place = "" then None
+    else evt ()
   in
   let evt_baptism =
-    match Adef.od_of_codate p.baptism, p.baptism_place with
-      Some d, _ ->
-        let evt =
-          {epers_name = Epers_Baptism; epers_date = p.baptism;
-           epers_place = p.baptism_place; epers_reason = empty_string;
-           epers_note = p.baptism_note; epers_src = p.baptism_src;
-           epers_witnesses = [| |]}
-        in
-        Some evt
-    | _, place ->
-        if sou base place = "" then None
-        else
-          let evt =
-            {epers_name = Epers_Baptism; epers_date = Adef.codate_None;
-             epers_place = p.baptism_place; epers_reason = empty_string;
-             epers_note = p.baptism_note; epers_src = p.baptism_src;
-             epers_witnesses = [| |]}
-          in
-          Some evt
+    let evt ?date () =
+      let name = Epers_Baptism in
+      let place = p.baptism_place in
+      let note = p.baptism_note in
+      let src = p.baptism_src in
+      Some (evt ~name ?date ~place ~note ~src ())
+    in
+    if Adef.od_of_codate p.baptism <> None
+    then evt ~date:p.baptism ()
+    else if sou base p.baptism_place = "" then None
+    else evt ()
   in
-  (*
   let evt_death =
+    let evt ?date () =
+      let name = Epers_Death in
+      let place = p.death_place in
+      let note = p.death_note in
+      let src = p.death_src in
+      Some (evt ~name ?date ~place ~note ~src ())
+    in
     match p.death with
-    [ NotDead | DontKnowIfDead -> None
-    | Death death_reason cd ->
+    | Death (_, cd) ->
         let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
-        let evt =
-          { epers_name = Epers_Death; epers_date = date;
-            epers_place = p.death_place; epers_reason = empty_string;
-            epers_note = p.death_note; epers_src = p.death_src;
-            epers_witnesses = [| |] }
-        in
-        Some evt
-    | DeadYoung | DeadDontKnowWhen | OfCourseDead -> None ]
-  in
-  *)
-  let evt_death =
-    match p.death, p.death_place with
-      Death (death_reason, cd), _ ->
-        let date = Adef.codate_of_od (Some (Adef.date_of_cdate cd)) in
-        let evt =
-          {epers_name = Epers_Death; epers_date = date;
-           epers_place = p.death_place; epers_reason = empty_string;
-           epers_note = p.death_note; epers_src = p.death_src;
-           epers_witnesses = [| |]}
-        in
-        Some evt
-    | _, place ->
-        if sou base place = "" then None
-        else
-          let date = Adef.codate_of_od None in
-          let evt =
-            {epers_name = Epers_Death; epers_date = date;
-             epers_place = p.death_place; epers_reason = empty_string;
-             epers_note = p.death_note; epers_src = p.death_src;
-             epers_witnesses = [| |]}
-          in
-          Some evt
+        evt ~date ()
+    | _ ->
+        if sou base p.death_place = "" then None
+        else evt ()
   in
   (* Attention, on prend aussi les autres évènements sinon,  *)
   (* on va tout effacer et ne garder que naissance et décès. *)
@@ -1225,7 +1192,7 @@ let effective_mod conf base sfam scpl sdes =
           let nmoth = {(gen_person_of_person nmoth) with sex = Female} in
           patch_person base nmoth.key_index nmoth
     end;
-  if Adef.father ncpl = Adef.mother ncpl then print_err conf base;
+  if Adef.father ncpl = Adef.mother ncpl then print_err conf ;
   let nfam =
     let origin_file =
       if sfam.origin_file = "" then
@@ -1240,13 +1207,13 @@ let effective_mod conf base sfam scpl sdes =
   patch_descend base fi ndes;
   let narr = Adef.parent_array ncpl in
   for i = 0 to Array.length oarr - 1 do
-    if not (array_mem oarr.(i) narr) then
+    if not (Array.mem oarr.(i) narr) then
       let ou = poi base oarr.(i) in
       let ou = {family = family_exclude (get_family ou) fi} in
       patch_union base oarr.(i) ou
   done;
   for i = 0 to Array.length narr - 1 do
-    if not (array_mem narr.(i) oarr) then
+    if not (Array.mem narr.(i) oarr) then
       let nu = poi base narr.(i) in
       let nu = {family = Array.append (get_family nu) [| fi |]} in
       patch_union base narr.(i) nu
@@ -1268,7 +1235,7 @@ let effective_mod conf base sfam scpl sdes =
        let a =
          {parents = None;
           consang =
-            if not (array_mem ip ndes.children) then Adef.fix (-1)
+            if not (Array.mem ip ndes.children) then Adef.fix (-1)
             else a.consang}
        in
        Hashtbl.replace cache ip a)
@@ -1282,7 +1249,7 @@ let effective_mod conf base sfam scpl sdes =
            let a =
              {parents = Some fi;
               consang =
-                if not (array_mem ip ochildren) || not same_parents then
+                if not (Array.mem ip ochildren) || not same_parents then
                   Adef.fix (-1)
                 else a.consang}
            in
@@ -1290,12 +1257,12 @@ let effective_mod conf base sfam scpl sdes =
     ndes.children;
   Array.iter
     (fun ip ->
-       if not (array_mem ip ndes.children) then
+       if not (Array.mem ip ndes.children) then
          patch_ascend base ip (find_asc ip))
     ochildren;
   Array.iter
     (fun ip ->
-       if not (array_mem ip ochildren) || not same_parents then
+       if not (Array.mem ip ochildren) || not same_parents then
          patch_ascend base ip (find_asc ip))
     ndes.children;
   Update.add_misc_names_for_new_persons base !created_p;
@@ -1356,7 +1323,7 @@ let effective_add conf base sfam scpl sdes =
           let nmoth_p = {(gen_person_of_person nmoth_p) with sex = Female} in
           patch_person base nmoth_p.key_index nmoth_p
     end
-  else if Adef.father ncpl = Adef.mother ncpl then print_err conf base;
+  else if Adef.father ncpl = Adef.mother ncpl then print_err conf;
   let nfam = {nfam with origin_file = origin_file; fam_index = fi} in
   patch_family base fi nfam;
   patch_couple base fi ncpl;
@@ -1395,12 +1362,10 @@ let effective_inv conf base ip u ifam =
 
 
 (* ************************************************************************ *)
-(*  [Fonc] effective_chg_order :
-             config -> base -> iper -> person -> ifam -> int -> unit        *)
+(*  [Fonc] effective_chg_order : base -> iper -> person -> ifam -> int -> unit        *)
 (** [Description] : Modifie l'ordre de la famille en positionnant la famille
       ifam à la position n. Exemple : [f1 f2 f3 f4] f1 3 => [f2 f3 f1 f4].
     [Args] :
-      - conf : configuration de la base
       - base : base de donnée
       - ip   : iper
       - u    : person
@@ -1409,8 +1374,8 @@ let effective_inv conf base ip u ifam =
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-let effective_chg_order conf base ip u ifam n =
-  let fam = UpdateFam.change_order conf base ip u ifam n in
+let effective_chg_order base ip u ifam n =
+  let fam = UpdateFam.change_order u ifam n in
   let u = {family = Array.of_list fam} in patch_union base ip u
 
 let kill_family base ifam1 ip =
@@ -1425,7 +1390,7 @@ let kill_family base ifam1 ip =
 let kill_parents base ip =
   let a = {parents = None; consang = Adef.fix (-1)} in patch_ascend base ip a
 
-let effective_del conf base (ifam, fam) =
+let effective_del base ifam fam =
   kill_family base ifam (get_father fam);
   kill_family base ifam (get_mother fam);
   Array.iter (kill_parents base) (get_children fam);
@@ -1455,7 +1420,7 @@ let is_a_link =
   | _ -> false
 
 let is_created_or_already_there ochil_arr nchil schil =
-  not (is_a_link schil) || array_mem nchil ochil_arr
+  not (is_a_link schil) || Array.mem nchil ochil_arr
 
 (* need_check_noloop: optimization
      The no-loop check being a big work on large databases, this
@@ -1494,7 +1459,7 @@ let all_checks_family conf base ifam gen_fam cpl des scdo =
     Consang.check_noloop_for_person_list base error
       (Array.to_list (Adef.parent_array cpl));
   let fam = family_of_gen_family base (gen_fam, cpl, des) in
-  CheckItem.family base error warning ifam fam;
+  CheckItem.family base warning ifam fam;
   CheckItem.check_other_fields base misc ifam fam;
   let (wl, ml) = CheckItem.list_uniq !wl, CheckItem.list_uniq !ml in
   List.iter
@@ -1616,7 +1581,7 @@ let print_inv_ok conf base p =
 
 let get_create (_, _, _, create, _) = create
 
-let forbidden_disconnected conf sfam scpl sdes =
+let forbidden_disconnected conf scpl sdes =
   let no_dec =
     try List.assoc "propose_add_family" conf.base_env = "no" with
       Not_found -> false
@@ -1655,11 +1620,11 @@ let print_add o_conf base =
       Update.error_digest conf
     else if ext || redisp then
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
-    else if forbidden_disconnected conf sfam scpl sdes then
+    else if forbidden_disconnected conf scpl sdes then
       print_error_disconnected conf
     else
-      match check_family conf base sfam scpl with
-        Some err, _ | _, Some err -> error_family conf base err
+      match check_family conf sfam scpl with
+        Some err, _ | _, Some err -> error_family conf err
       | None, None ->
           let (sfam, sdes) = strip_family sfam sdes in
           let (ifam, fam, cpl, des) =
@@ -1712,7 +1677,7 @@ let print_del conf base =
       let fam = foi base ifam in
       if not (is_deleted_family fam) then
         begin
-          effective_del conf base (ifam, fam);
+          effective_del base ifam fam;
           Util.commit_patches conf base;
           let changed =
             let gen_p =
@@ -1751,15 +1716,15 @@ let print_mod_aux conf base callback =
       if ext || redisp then
         UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
       else
-        match check_family conf base sfam scpl with
-          Some err, _ | _, Some err -> error_family conf base err
+        match check_family conf sfam scpl with
+          Some err, _ | _, Some err -> error_family conf err
         | None, None ->
             let (sfam, sdes) = strip_family sfam sdes in
             callback sfam scpl sdes
     else Update.error_digest conf
   with Update.ModErr -> ()
 
-let family_structure conf base ifam =
+let family_structure base ifam =
   let fam = foi base ifam in get_parent_array fam, get_children fam
 
 let print_mod o_conf base =
@@ -1776,7 +1741,7 @@ let print_mod o_conf base =
   in
   let conf = Update.update_conf o_conf in
   let callback sfam scpl sdes =
-    let ofs = family_structure conf base sfam.fam_index in
+    let ofs = family_structure base sfam.fam_index in
     let (ifam, fam, cpl, des) = effective_mod conf base sfam scpl sdes in
     let () = patch_parent_with_pevents base cpl in
     let () = patch_children_with_pevents base des in
@@ -1842,7 +1807,7 @@ let print_change_order_ok conf base =
     Some ip, Some ifam, Some n ->
       let p = poi base (Adef.iper_of_int ip) in
       begin try
-        effective_chg_order conf base (get_key_index p) p
+        effective_chg_order base (get_key_index p) p
           (Adef.ifam_of_int ifam) n;
         Util.commit_patches conf base;
         let changed =
@@ -1885,10 +1850,9 @@ let print_change_event_order conf base =
         let des = {children = get_children a} in
         let wl =
           let wl = ref [] in
-          let error = Update.error conf base in
           let warning w = wl := w :: !wl in
           let nfam = family_of_gen_family base (fam, cpl, des) in
-          CheckItem.family base error warning fam.fam_index nfam;
+          CheckItem.family base warning fam.fam_index nfam;
           List.iter
             (function
                ChangedOrderOfFamilyEvents (ifam, _, after) ->

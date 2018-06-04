@@ -10,7 +10,7 @@ let forbidden_char = [':'; '@'; '#'; '='; '$']
 
 let unaccent_iso_8859_1 =
   function
-    'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
+  | 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
   | 'ç' -> 'c'
   | 'è' | 'é' | 'ê' | 'ë' -> 'e'
   | 'ì' | 'í' | 'î' | 'ï' -> 'i'
@@ -415,7 +415,7 @@ let unaccent_utf_8 lower s i =
           | 0x86 -> "f"
           | _ -> String.sub s i nbc
           end
-      | c -> String.sub s i nbc
+      | _ -> String.sub s i nbc
     in
     s, i + nbc
 
@@ -442,7 +442,7 @@ let lower s =
           let len = if special then Buff.store len ' ' else len in
           let c = unaccent_iso_8859_1 (Char.lowercase_ascii c) in
           copy false (i + 1) (Buff.store len c)
-      | c -> copy (len <> 0) (i + 1) len
+      | _ -> copy (len <> 0) (i + 1) len
     else
       let len = if special then Buff.store len ' ' else len in
       let (t, j) = unaccent_utf_8 true s i in copy false j (Buff.mstore len t)

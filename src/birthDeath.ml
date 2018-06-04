@@ -1,8 +1,6 @@
 (* $Id: birthDeath.ml,v 5.40 2008-11-03 15:40:10 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-module type HACK_FOR_DEPEND = sig open Pqueue end
-
 open Config
 open Def
 open Gwdb
@@ -370,7 +368,7 @@ let print_longest_lived conf base =
   print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
   List.iter
-    (fun (p, d, cal) ->
+    (fun (p, d, _) ->
        Wserver.printf "<li>\n";
        Wserver.printf "<strong>\n";
        Wserver.printf "%s" (referenced_person_text conf base p);
@@ -382,7 +380,7 @@ let print_longest_lived conf base =
   Wserver.printf "</ul>\n\n";
   trailer conf
 
-let print_marr_or_eng conf base title list len =
+let print_marr_or_eng conf base title list =
   header conf title;
   print_link_to_welcome conf true;
   Wserver.printf "<ul>\n";
@@ -442,7 +440,7 @@ let print_marr_or_eng conf base title list len =
 let print_marriage conf base =
   let (list, len) =
     select_family conf base
-      (fun ifam fam ->
+      (fun _ fam ->
           let rel = get_relation fam in
           if rel = Married || rel = NoSexesCheckMarried then
             Adef.od_of_codate (get_marriage fam)
@@ -452,12 +450,12 @@ let print_marriage conf base =
   let title _ =
     Wserver.printf (fcapitale (ftransl conf "the latest %d marriages")) len
   in
-  print_marr_or_eng conf base title list len
+  print_marr_or_eng conf base title list
 
 let print_oldest_engagements conf base =
   let (list, len) =
     select_family conf base
-      (fun ifam fam ->
+      (fun _ fam ->
          if get_relation fam = Engaged then
            let husb = pget conf base (get_father fam) in
            let wife = pget conf base (get_mother fam) in
@@ -475,9 +473,9 @@ let print_oldest_engagements conf base =
             "the %d oldest couples perhaps still alive and engaged"))
       len
   in
-  print_marr_or_eng conf base title list len
+  print_marr_or_eng conf base title list
 
-let old_print_statistics conf base =
+let old_print_statistics conf =
   let title _ = Wserver.printf "%s" (capitale (transl conf "statistics")) in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env) with
@@ -548,8 +546,8 @@ let get_vother =
   | _ -> None
 let set_vother x = Vother x
 
-let print_statistics conf base =
-  if p_getenv conf.env "old" = Some "on" then old_print_statistics conf base
+let print_statistics conf =
+  if p_getenv conf.env "old" = Some "on" then old_print_statistics conf
   else
     Hutil.interp conf "stats"
       {Templ.eval_var = (fun _ -> raise Not_found);

@@ -72,7 +72,7 @@ module Make (Select : Select) =
         loop (List.rev l1) l2
       in
       Hashtbl.iter
-        (fun ip occ ->
+        (fun ip _ ->
            let p = poi base ip in
            let sn = sou base (get_surname p) in
            let fn = sou base (get_first_name p) in
@@ -136,7 +136,7 @@ module Make (Select : Select) =
       | _ -> true
     let starting_char no_num s =
       match s.[0] with
-        'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' -> true
+        'a'..'z' | 'A'..'Z' (* | 'à'..'ý' | 'À'..'Ý' *) -> true
       | '0'..'9' -> not no_num
       | '?' -> if s = "?" then true else false
       | _ -> false
@@ -239,7 +239,7 @@ module Make (Select : Select) =
       fprintf oc " #nick %s" (correct_string base is)
     let print_alias oc base is =
       fprintf oc " #alias %s" (correct_string base is)
-    let print_burial oc base b =
+    let print_burial oc b =
       match b with
         Buried cod ->
           fprintf oc " #buri";
@@ -350,7 +350,7 @@ module Make (Select : Select) =
       end;
       print_if_no_empty oc base "#dp" (get_death_place p);
       print_if_no_empty oc base "#ds" (get_death_src p);
-      print_burial oc base (get_burial p);
+      print_burial oc (get_burial p);
       print_if_no_empty oc base "#rp" (get_burial_place p);
       print_if_no_empty oc base "#rs" (get_burial_src p)
     type gen =
@@ -403,7 +403,7 @@ module Make (Select : Select) =
         else loop new_linked_files (i + 1)
       in
       loop some_linked_files 0
-    let find_free_occ base f s i =
+    let find_free_occ base f s =
       let ipl = persons_of_name base (f ^ " " ^ s) in
       let first_name = f in
       let surname = s in
@@ -429,7 +429,7 @@ module Make (Select : Select) =
         | [] -> cnt1
       in
       loop 0 list_occ
-    let print_parent oc base gen fam p =
+    let print_parent oc base gen p =
       let has_printed_parents =
         match get_parents p with
           Some ifam -> gen.fam_sel ifam
@@ -610,7 +610,7 @@ module Make (Select : Select) =
       if note <> "" then
         List.iter (fun line -> fprintf oc "note %s\n" line)
           (lines_list_of_string note)
-    let get_persons_with_pevents base m list =
+    let get_persons_with_pevents m list =
       let fath = m.m_fath in
       let moth = m.m_moth in
       let list =
@@ -650,7 +650,7 @@ module Make (Select : Select) =
     let eq_key_fst (p1, _) (p2, _) = get_key_index p1 = get_key_index p2
     let print_pevents oc base gen ml =
       let pl =
-        List.fold_right (get_persons_with_pevents base) ml gen.pevents_pl_p
+        List.fold_right get_persons_with_pevents ml gen.pevents_pl_p
       in
       let pl =
         List.fold_right
@@ -754,7 +754,7 @@ module Make (Select : Select) =
     let print_family oc base gen m =
       let fam = m.m_fam in
       fprintf oc "fam ";
-      print_parent oc base gen fam m.m_fath;
+      print_parent oc base gen m.m_fath;
       fprintf oc " +";
       print_date_option oc (Adef.od_of_codate (get_marriage fam));
       begin match get_relation fam with
@@ -789,7 +789,7 @@ module Make (Select : Select) =
           fprintf oc " -"; print_date_option oc d
       end;
       fprintf oc " ";
-      print_parent oc base gen fam m.m_moth;
+      print_parent oc base gen m.m_moth;
       fprintf oc "\n";
       Array.iter
         (fun ip ->
@@ -806,10 +806,8 @@ module Make (Select : Select) =
              fprintf oc "\n")
         (get_witnesses fam);
       let fsources = sou base (get_fsources fam) in
-      begin match fsources with
-        "" -> ()
-      | s -> fprintf oc "src %s\n" (correct_string base (get_fsources fam))
-      end;
+      if fsources <> ""
+      then fprintf oc "src %s\n" (correct_string base (get_fsources fam));
       let csrc =
         match common_children_sources base m.m_chil with
           Some s -> fprintf oc "csrc %s\n" (s_correct_string s); s
@@ -972,7 +970,7 @@ module Make (Select : Select) =
                       if notes <> "" then fprintf oc "%s: %s\n" name notes;
                       print_witness_in_notes evt.epers_witnesses;
                       loop events
-                  | name -> print_pevent oc base gen evt; loop events
+                  | _ -> print_pevent oc base gen evt; loop events
             in
               loop (get_pevents p)
             end;
@@ -1016,11 +1014,11 @@ module Make (Select : Select) =
            if gen.per_sel (get_key_index p) then
              print_notes_for_person oc base gen p)
         pl
-    let is_isolated base p =
+    let is_isolated p =
       match get_parents p with
         Some _ -> false
       | None -> Array.length (get_family p) = 0
-    let is_definition_for_parent base p =
+    let is_definition_for_parent p =
       match get_parents p with
         Some _ -> false
       | None -> true
@@ -1028,7 +1026,7 @@ module Make (Select : Select) =
       let concat_isolated p_relation ip list =
         let p = poi base ip in
         if List.mem_assq p list then list
-        else if is_isolated base p then
+        else if is_isolated p then
           match get_rparents p with
             {r_fath = Some x} :: _ when x = get_key_index p_relation ->
               list @ [p, true]
@@ -1039,13 +1037,13 @@ module Make (Select : Select) =
         else list
       in
       let list =
-        if is_definition_for_parent base m.m_fath then
+        if is_definition_for_parent m.m_fath then
           List.fold_right (concat_isolated m.m_fath) (get_related m.m_fath)
             list
         else list
       in
       let list =
-        if is_definition_for_parent base m.m_moth then
+        if is_definition_for_parent m.m_moth then
           List.fold_right (concat_isolated m.m_moth) (get_related m.m_moth)
             list
         else list
@@ -1101,7 +1099,7 @@ module Make (Select : Select) =
           else fprintf oc " 0";
           defined_p := p :: !defined_p
         end
-    let print_relation_for_person oc base gen def_p p r =
+    let print_relation_for_person oc base gen def_p r =
       let fath =
         match r.r_fath with
           Some ip ->
@@ -1232,7 +1230,7 @@ module Make (Select : Select) =
             end;
           fprintf oc "\n";
           fprintf oc "beg\n";
-          List.iter (print_relation_for_person oc base gen def_p p)
+          List.iter (print_relation_for_person oc base gen def_p)
             (get_rparents p);
           fprintf oc "end\n"
         end
@@ -1481,7 +1479,7 @@ module Make (Select : Select) =
           set_mark Scanned
         end
     let mark_connex_components base mark ifam =
-      let test_action loop len ifam =
+      let test_action _loop _len ifam =
         if mark.(Adef.int_of_ifam ifam) = NotScanned then
           mark_one_connex_component base mark ifam
       in

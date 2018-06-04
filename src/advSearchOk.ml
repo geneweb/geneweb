@@ -376,20 +376,15 @@ let print_result conf base max_answers (list, len) =
     if len > max_answers then begin html_li conf; Wserver.printf "...\n" end;
     Wserver.printf "</ul>\n"
 
-let searching_fields conf base =
+let searching_fields conf =
   let test_string x =
     match p_getenv conf.env x with
       Some v -> if v <> "" then true else false
     | None -> false
   in
   let test_date x =
-    match
-      reconstitute_date conf (x ^ "1"), reconstitute_date conf (x ^ "2")
-    with
-      Some d1, Some d2 -> true
-    | Some d1, _ -> true
-    | _, Some d2 -> true
-    | _ -> false
+    reconstitute_date conf (x ^ "1") <> None
+    || reconstitute_date conf (x ^ "2") <> None
   in
   let gets x =
     match p_getenv conf.env x with
@@ -553,7 +548,7 @@ let print conf base =
   header conf title;
   Wserver.printf "<p>\n";
   Wserver.printf "%s %s." (capitale (transl conf "searching all"))
-    (searching_fields conf base);
+    (searching_fields conf);
   Wserver.printf "</p>\n";
   let list = advanced_search conf base max_answers in
   print_result conf base max_answers list; trailer conf

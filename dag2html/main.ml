@@ -126,7 +126,7 @@ let map_dag f d =
 let tag_dag d =
   let c = ref 'A' in
   map_dag
-    (fun v ->
+    (fun _ ->
        let v = !c in
        c :=
          if !c = 'Z' then 'a'
@@ -139,13 +139,13 @@ let tag_dag d =
 
 let phony _ = false
 let indi_txt n = n.valu
-let vbar_txt n = ""
+let vbar_txt _ = ""
 
 let print_char_table d t =
   let print_elem =
     function
       Elem e -> Printf.eprintf "  %s" d.dag.(int_of_idag e).valu
-    | Ghost x -> Printf.eprintf "  |"
+    | Ghost _ -> Printf.eprintf "  |"
     | Nothing -> Printf.eprintf "   "
   in
   let print_span i j r =

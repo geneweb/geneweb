@@ -322,7 +322,7 @@ let print_main conf base auth_file =
     begin print_old_wizards conf old_list; print_search_form conf "" end;
   trailer conf
 
-let wizard_page_title conf wz wizname h = Wserver.printf "%s" wizname
+let wizard_page_title wizname _ = Wserver.printf "%s" wizname
 
 let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
   let wizname =
@@ -333,7 +333,7 @@ let print_whole_wiznote conf base auth_file wz wfile (s, date) ho =
     let can_edit = conf.wizard && conf.user = wz || conf.manitou in
     Some (can_edit, "WIZNOTES", code_varenv wz)
   in
-  let title = wizard_page_title conf wz wizname in
+  let title = wizard_page_title wizname in
   header_no_page_title conf title;
   print_link_to_welcome conf true;
   Wserver.printf "<h1>";
@@ -449,7 +449,7 @@ let print_mod conf base =
         let wz = Filename.basename wz in
         let can_edit = conf.wizard && conf.user = wz || conf.manitou in
         if can_edit then
-          let title = wizard_page_title conf wz wz in
+          let title = wizard_page_title wz in
           let wfile = wzfile (dir conf base) wz in
           let (s, _) = read_wizard_notes wfile in
           Wiki.print_mod_view_page conf true "WIZNOTES" wz title [] s
@@ -471,7 +471,7 @@ let print_view conf base =
     match p_getenv conf.env "f" with
       Some wz ->
         let wz = Filename.basename wz in
-        let title = wizard_page_title conf wz wz in
+        let title = wizard_page_title wz in
         let wfile = wzfile (dir conf base) wz in
         let (s, _) = read_wizard_notes wfile in
         Wiki.print_mod_view_page conf false "WIZNOTES" wz title [] s

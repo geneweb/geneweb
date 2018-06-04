@@ -73,7 +73,7 @@ let combine_by_count list =
   in
   List.fold_left (fun new_l (cnt, l) -> (cnt, List.rev l) :: new_l) [] list
 
-let alphab_string conf base is_surname s =
+let alphab_string base is_surname s =
   if is_surname then
     if !(Mutil.utf_8_db) then surname_end base s ^ surname_begin base s
     else old_surname_end s ^ old_surname_begin s
@@ -224,7 +224,7 @@ let print_alphabetic_all conf base is_surnames ini list len =
               "m=" ^ mode ^ ";v=" ^ code_varenv (lower_if_not_utf8 s) ^ ";t=A"
             in
               wprint_geneweb_link conf href
-                (alphab_string conf base is_surnames s)
+                (alphab_string base is_surnames s)
             end;
             Wserver.printf " (%d)" cnt;
             Wserver.printf "</li>\n")
@@ -248,7 +248,7 @@ let print_alphabetic_small conf base is_surnames ini list len =
            Wserver.printf "<li>";
            Wserver.printf "<a href=\"%sm=%s;v=%s;t=A\">" (commd conf) mode
              (code_varenv (lower_if_not_utf8 s));
-           Wserver.printf "%s" (alphab_string conf base is_surnames s);
+           Wserver.printf "%s" (alphab_string base is_surnames s);
            Wserver.printf "</a>";
            Wserver.printf " (%d)" cnt;
            Wserver.printf "</li>\n")
@@ -277,7 +277,7 @@ let print_frequency_any conf base is_surnames list len =
                   Wserver.printf "<li>";
                   Wserver.printf "<a href=\"%sm=%s;v=%s\">" (commd conf) mode
                     (code_varenv (Name.lower s));
-                  Wserver.printf "%s" (alphab_string conf base is_surnames s);
+                  Wserver.printf "%s" (alphab_string base is_surnames s);
                   Wserver.printf "</a>";
                   incr n;
                   Wserver.printf "</li>\n")
@@ -462,7 +462,7 @@ let print_alphabetic_short conf base is_surnames ini list len =
             if not first then Wserver.printf ",\n";
             if href <> "" || name <> "" then
               Wserver.printf "<a%s%s>" href name;
-            Wserver.printf "%s" (alphab_string conf base is_surnames s);
+            Wserver.printf "%s" (alphab_string base is_surnames s);
             if href <> "" || name <> "" then Wserver.printf "</a>";
             Wserver.printf " (%d)" cnt)
          l;

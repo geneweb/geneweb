@@ -70,7 +70,7 @@ let quote_escaped s =
     if i < String.length s then
       match s.[i] with
         '"' | '&' | '<' | '>' -> true
-      | x -> need_code (succ i)
+      | _ -> need_code (succ i)
     else false
   in
   let rec compute_len i i1 =
@@ -131,7 +131,7 @@ let get_binding ic =
   in
   loop 0
 
-let template_fname env fname =
+let template_fname fname =
   List.fold_right Filename.concat [!gwtp_etc; "lang"] (fname ^ ".txt")
 
 let lindex s c =
@@ -176,7 +176,7 @@ let copy_template genv (varenv, filenv) env if_env fname =
          x :: l -> stack := l; echo := x
        | [] -> echo := true)
   in
-  let ic = open_in (template_fname env fname) in
+  let ic = open_in (template_fname fname) in
   let rec if_expr =
     function
       'N' -> not (if_expr (input_char ic))
@@ -245,8 +245,8 @@ let copy_template genv (varenv, filenv) env if_env fname =
   end;
   close_in ic
 
-let variables env =
-  let ic = open_in (template_fname env "conf") in
+let variables () =
+  let ic = open_in (template_fname "conf") in
   let vlist = ref [] in
   let flist = ref [] in
   begin try
@@ -320,7 +320,7 @@ let gwtp_error txt =
           </body>"
     (String.capitalize_ascii txt)
 
-let gwtp_invalid_request str env = gwtp_error "Invalid request"
+let gwtp_invalid_request () = gwtp_error "Invalid request"
 
 let random_self_init () =
   let seed = int_of_float (mod_float (Unix.time ()) (float max_int)) in
@@ -344,11 +344,11 @@ let mk_passwd size =
 
 (* Base configuration *)
 
-let get_base_conf env b =
+let get_base_conf b =
   let fname = Filename.concat !gwtp_dst (b ^ ".gwf") in
   match try Some (open_in fname) with Sys_error _ -> None with
     Some ic ->
-      let (variables, files) = variables env in
+      let (variables, files) = variables () in
       let varenv =
         let varenv = ref [] in
         let rec record line =
@@ -650,7 +650,7 @@ let move_gedcom_to_old b =
   let fname = Filename.concat !gwtp_tmp (b ^ ".ged") in
   Sys.rename fname fname_old
 
-let send_gedcom_file str env b tok f fname =
+let send_gedcom_file env b tok fname =
   let fname = filename_basename fname in
   if Filename.check_suffix fname ".ged" || Filename.check_suffix fname ".GED"
   then
@@ -682,15 +682,15 @@ let send_gedcom_file str env b tok f fname =
     end
   else gwtp_error "This is not a gedcom file (not ending with .GED)"
 
-let gwtp_send_gedcom str env b t =
+let gwtp_send_gedcom env b t =
   match HttpEnv.getenv env "gedcom", HttpEnv.getenv env "gedcom_name" with
-    Some f, Some fname ->
-      send_gedcom_file str env b t f (HttpEnv.decode fname)
-  | Some f, None ->
+    Some _, Some fname ->
+      send_gedcom_file env b t (HttpEnv.decode fname)
+  | Some _, None ->
       gwtp_error "Sorry, your browser seems not be able to send files."
-  | _ -> gwtp_invalid_request str env
+  | _ -> gwtp_invalid_request ()
 
-let gwtp_upload_gedcom str env b tok =
+let gwtp_upload_gedcom env b tok =
   let bcnf = Filename.concat !gwtp_dst (b ^ ".gwf") in
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
@@ -701,7 +701,7 @@ let gwtp_upload_gedcom str env b tok =
       copy_template env ([], []) ['b', Val b; 't', Val tok] [] "send_gedcom"
     end
 
-let gwtp_print_log str env b tok =
+let gwtp_print_log env b tok =
   printf "content-type: text/html";
   crlf ();
   crlf ();
@@ -720,7 +720,7 @@ let gwtp_print_log str env b tok =
   printf_link_to_main env b tok;
   printf "</body>\n"
 
-let gwtp_print_accesses of_wizards str env b tok =
+let gwtp_print_accesses of_wizards env b tok =
   printf "content-type: text/html";
   crlf ();
   crlf ();
@@ -728,7 +728,7 @@ let gwtp_print_accesses of_wizards str env b tok =
           <body>\n\
           <h1 align=center>Gwtp - %s</h1>\n"
     b b;
-  let (varenv, filenv) = get_base_conf env b in
+  let (varenv, _) = get_base_conf b in
   let fname =
     try
       List.assoc
@@ -759,7 +759,7 @@ let gwtp_print_accesses of_wizards str env b tok =
 
 (* Actions *)
 
-let send_file str env b tok f fname =
+let send_file env b tok fname =
   let fname = filename_basename fname in
   let lockf = Filename.concat !gwtp_tmp (b ^ ".lck") in
   if fname = "base" then
@@ -808,14 +808,14 @@ let send_file str env b tok f fname =
       printf_link_to_main env b tok
     end
 
-let gwtp_send str env b t =
+let gwtp_send env b t =
   match HttpEnv.getenv env "base", HttpEnv.getenv env "base_name" with
-    Some f, Some fname -> send_file str env b t f (HttpEnv.decode fname)
-  | Some f, None ->
+    Some _, Some fname -> send_file env b t (HttpEnv.decode fname)
+  | Some _, None ->
       gwtp_error "Sorry, your browser seems not be able to send files."
-  | _ -> gwtp_invalid_request str env
+  | _ -> gwtp_invalid_request ()
 
-let gwtp_receive str env b tok =
+let gwtp_receive env b _ =
   match HttpEnv.getenv env "f" with
     Some fname ->
       let fname = filename_basename fname in
@@ -831,7 +831,7 @@ let gwtp_receive str env b tok =
       with End_of_file -> ()
       end;
       close_in ic
-  | _ -> gwtp_invalid_request str env
+  | _ -> gwtp_invalid_request ()
 
 let acceptable_tags =
   ["!--"; "a"; "b"; "br"; "em"; "font"; "hr"; "i"; "img"; "li"; "ol"; "p";
@@ -871,8 +871,8 @@ let secure_html s =
   in
   loop 0 0
 
-let gwtp_setconf str env b tok =
-  let (variables, files) = variables env in
+let gwtp_setconf env b tok =
+  let (variables, files) = variables () in
   let varenv =
     List.fold_right
       (fun k varenv ->
@@ -902,7 +902,7 @@ let gwtp_setconf str env b tok =
   printf_link_to_main env b tok;
   printf "</body>\n"
 
-let gwtp_upload str env b tok =
+let gwtp_upload env b tok =
   let bcnf = Filename.concat !gwtp_dst (b ^ ".gwf") in
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
   else
@@ -913,7 +913,7 @@ let gwtp_upload str env b tok =
       copy_template env ([], []) ['b', Val b; 't', Val tok] [] "send"
     end
 
-let gwtp_download str env b tok =
+let gwtp_download env b tok =
   let bcnf = Filename.concat !gwtp_dst (b ^ ".gwf") in
   let bdir = Filename.concat !gwtp_dst (b ^ ".gwb") in
   if not (Sys.file_exists bcnf) then gwtp_error "no configuration file"
@@ -965,14 +965,14 @@ let gwtp_download str env b tok =
         end
     end
 
-let gwtp_config str env b tok =
-  let (varenv, filenv) = get_base_conf env b in
+let gwtp_config env b tok =
+  let (varenv, filenv) = get_base_conf b in
   printf "content-type: text/html";
   crlf ();
   crlf ();
   copy_template env (varenv, filenv) ['b', Val b; 't', Val tok] [] "conf"
 
-let gwtp_main str env b tok =
+let gwtp_main env b tok =
   printf "content-type: text/html";
   crlf ();
   crlf ();
@@ -982,7 +982,7 @@ let gwtp_main str env b tok =
      'w', !gw_site <> ""]
     "main"
 
-let gwtp_login str env =
+let gwtp_login () =
   printf "content-type: text/html";
   crlf ();
   crlf ();
@@ -1000,28 +1000,28 @@ let gwtp_login str env =
 
 (* Wrappers *)
 
-let gwtp_check_login from str env gwtp_fun =
+let gwtp_check_login from env gwtp_fun =
   match HttpEnv.getenv env "b", HttpEnv.getenv env "p" with
     Some b, Some p ->
       begin match check_login b p with
-        Some tok -> set_token from b tok; gwtp_fun str env b tok
+        Some tok -> set_token from b tok; gwtp_fun env b tok
       | None -> gwtp_error "Invalid login"
       end
-  | _ -> gwtp_invalid_request str env
+  | _ -> gwtp_invalid_request ()
 
-let gwtp_logged from str env gwtp_fun =
+let gwtp_logged from env gwtp_fun =
   match HttpEnv.getenv env "b", HttpEnv.getenv env "t" with
     Some b, Some t ->
       let fname = tokens_file_name () in
       if check_token fname from b t then
         begin
-          begin try gwtp_fun str env b t with
+          begin try gwtp_fun env b t with
             e -> update_tokens fname from b t; raise e
           end;
           update_tokens fname from b t
         end
       else gwtp_error "Login expired"
-  | _ -> gwtp_invalid_request str env
+  | _ -> gwtp_invalid_request ()
 
 (* Main *)
 
@@ -1051,23 +1051,21 @@ let gwtp () =
   flush oc_log;
   Unix.dup2 (Unix.descr_of_out_channel oc_log) Unix.stderr;
   begin match HttpEnv.getenv env "m" with
-    Some "LOGIN" -> gwtp_check_login from str env gwtp_main
-  | Some "MAIN" -> gwtp_logged from str env gwtp_main
-  | Some "DNL" -> gwtp_logged from str env gwtp_download
-  | Some "CNF" -> gwtp_logged from str env gwtp_config
-  | Some "RECV" -> gwtp_logged from str env gwtp_receive
-  | Some "SCNF" -> gwtp_logged from str env gwtp_setconf
-  | Some "LOG" -> gwtp_logged from str env gwtp_print_log
-  | Some "ACCW" -> gwtp_logged from str env (gwtp_print_accesses true)
-  | Some "ACCF" -> gwtp_logged from str env (gwtp_print_accesses false)
-  | Some "UPL" when not !no_upload -> gwtp_logged from str env gwtp_upload
-  | Some "UPG" when not !no_upload ->
-      gwtp_logged from str env gwtp_upload_gedcom
-  | Some "SEND" when not !no_upload -> gwtp_logged from str env gwtp_send
-  | Some "SEND_GEDCOM" when not !no_upload ->
-      gwtp_logged from str env gwtp_send_gedcom
-  | Some _ -> gwtp_invalid_request str env
-  | None -> gwtp_login str env
+    Some "LOGIN" -> gwtp_check_login from env gwtp_main
+  | Some "MAIN" -> gwtp_logged from env gwtp_main
+  | Some "DNL" -> gwtp_logged from env gwtp_download
+  | Some "CNF" -> gwtp_logged from env gwtp_config
+  | Some "RECV" -> gwtp_logged from env gwtp_receive
+  | Some "SCNF" -> gwtp_logged from env gwtp_setconf
+  | Some "LOG" -> gwtp_logged from env gwtp_print_log
+  | Some "ACCW" -> gwtp_logged from env (gwtp_print_accesses true)
+  | Some "ACCF" -> gwtp_logged from env (gwtp_print_accesses false)
+  | Some "UPL" when not !no_upload -> gwtp_logged from env gwtp_upload
+  | Some "UPG" when not !no_upload -> gwtp_logged from env gwtp_upload_gedcom
+  | Some "SEND" when not !no_upload -> gwtp_logged from env gwtp_send
+  | Some "SEND_GEDCOM" when not !no_upload -> gwtp_logged from env gwtp_send_gedcom
+  | Some _ -> gwtp_invalid_request ()
+  | None -> gwtp_login ()
   end;
   flush stdout;
   flush oc_log;

@@ -5,12 +5,12 @@ open Def
 open Gwdb
 
 val effective_del :
-  config -> base -> (CheckItem.base_warning -> unit) -> person ->
+  base -> (CheckItem.base_warning -> unit) -> person ->
     (iper, istr) gen_person
 val effective_mod :
   config -> base -> (Update.key, string) gen_person -> (iper, istr) gen_person
 val all_checks_person :
-  config -> base -> (iper, istr) gen_person -> ifam gen_ascend ->
+  base -> (iper, istr) gen_person -> ifam gen_ascend ->
     ifam gen_union -> CheckItem.base_warning list
 val print_mod_aux :
   config -> base -> ((Update.key, string) gen_person -> unit) -> unit
@@ -34,9 +34,9 @@ val strip_person :
   (string * 'a * 'b * 'c * 'd, string) Def.gen_person ->
     (string * 'a * 'b * 'c * 'd, string) Def.gen_person
 val check_person :
-  config -> base -> (string * string * 'b * 'c * 'd, string) Def.gen_person ->
+  config -> (string * string * 'b * 'c * 'd, string) Def.gen_person ->
     string option
-val error_person : config -> base -> 'a -> string -> unit
+val error_person : config -> string -> unit
 val update_relations_of_related : base -> iper -> iper list -> unit
 val reconstitute_death :
   config -> Def.date option -> Def.date option -> string -> Def.burial ->

@@ -24,7 +24,7 @@ open Api_def
     [Retour] : unit
     [Rem] : Non exporté en clair hors de ce module.                         *)
 (* ************************************************************************ *)
-let print_cache conf base mode cache_file =
+let print_cache base mode cache_file =
   let string_cache get_field =
     let cache = ref StringSetAutoComplete.empty in
     for i = 0 to nb_of_persons base - 1 do
@@ -147,7 +147,7 @@ let get_list_from_cache conf base s max_res mode =
          let stats = Unix.stat cache_file in
          let last_mod = conf.ctime -. stats.Unix.st_mtime in
          if stats.Unix.st_size = 0 || last_mod > 3600. then
-           print_cache conf base mode cache_file;
+           print_cache base mode cache_file;
          match
            try Some (Secure.open_in_bin cache_file) with Sys_error _ -> None
          with

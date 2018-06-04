@@ -34,7 +34,7 @@ let suffix d df =
     function
       x :: xl, y :: yl -> if x = y then loop (xl, yl) else None
     | [], df -> Some df
-    | d, [] -> None
+    | _, [] -> None
   in
   loop (d, df)
 

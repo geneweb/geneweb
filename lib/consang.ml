@@ -170,7 +170,7 @@ let rec insert_branch_len_rec (len, n, ip as x) =
         (len1, n2, ip :: ipl1) :: lens
       else y :: insert_branch_len_rec x lens
 
-let insert_branch_len ip lens (len, n, ipl) =
+let insert_branch_len ip lens (len, n, _ipl) =
   insert_branch_len_rec (succ len, n, ip) lens
 
 let consang_of p =

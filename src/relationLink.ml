@@ -1,8 +1,6 @@
 (* $Id: relationLink.ml,v 5.20 2007-09-12 09:58:44 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
-module type HACK_FOR_DEPEND = sig open Pqueue end
-
 open Config
 open Def
 open Gwdb
@@ -245,19 +243,13 @@ let rec print_both_branches conf base info pl1 pl2 =
     in
     Wserver.printf "<tr align=\"%s\">\n" conf.left;
     Wserver.printf "<td align=\"center\">";
-    begin match p1 with
-      Some p1 -> Wserver.printf "|"
-    | None -> Wserver.printf "&nbsp;"
-    end;
+    Wserver.printf (if p1 <> None then "|" else "&nbsp;") ;
     Wserver.printf "</td>";
     Wserver.printf "<td>";
     Wserver.printf "&nbsp;";
     Wserver.printf "</td>";
     Wserver.printf "<td align=\"center\">";
-    begin match p2 with
-      Some p2 -> Wserver.printf "|"
-    | None -> Wserver.printf "&nbsp;"
-    end;
+    Wserver.printf (if p2 <> None then "|" else "&nbsp;") ;
     Wserver.printf "</td>";
     Wserver.printf "\n";
     Wserver.printf "</tr>\n";
@@ -293,16 +285,8 @@ let rec print_both_branches_pre conf base info sz pl1 pl2 =
         (p2, _) :: pl2 -> Some p2, pl2
       | [] -> None, []
     in
-    let s1 =
-      match p1 with
-        Some p1 -> "|"
-      | None -> " "
-    in
-    let s2 =
-      match p2 with
-        Some p2 -> "|"
-      | None -> " "
-    in
+    let s1 = if p1 <> None then "|" else " " in
+    let s2 = if p2 <> None then "|" else " " in
     print_pre_center sz (s1 ^ String.make (sz / 2) ' ' ^ s2);
     begin match p1 with
       Some p1 ->
@@ -499,7 +483,7 @@ let print_two_branches_with_pre conf base info =
   Wserver.printf "<pre>\n";
   print_pre_center sz (someone_text conf base info.ip);
   begin match other_parent_text_if_same conf base info with
-    Some (s, ip) -> print_pre_center sz s
+    Some (s, _) -> print_pre_center sz s
   | None -> ()
   end;
   print_pre_center sz "|";
@@ -644,7 +628,7 @@ let print_relation_no_dag conf base po ip1 ip2 =
             begin match
               branch_of_sosa conf base ip1 n1, branch_of_sosa conf base ip2 n2
             with
-              Some ((ia1, sa1) :: b1), Some ((ia2, sa2) :: b2) ->
+              Some ((ia1, sa1) :: b1), Some ((ia2, _) :: b2) ->
                 if ia1 = ia2 then
                   let c1 =
                     match p_getint conf.env "c1" with
@@ -733,7 +717,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
              (fun set l2 ->
                 let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
                 let (set, n) = add_branches dist set 0 ip1 l1 in
-                let (set, n) = add_branches dist set n ip2 l2 in set)
+                let (set, _) = add_branches dist set n ip2 l2 in set)
              set l2)
         (Dag.Pset.add ia Dag.Pset.empty) l1
     in
@@ -746,7 +730,7 @@ let print_relation_dag conf base a ip1 ip2 l1 l2 =
         [ip1, "3"; ip2, "4"] []
     in
     let elem_txt p = Dag.Item (p, "") in
-    let vbar_txt ip = "" in
+    let vbar_txt _ = "" in
     let invert =
       match Util.p_getenv conf.env "invert" with
         Some "on" -> true

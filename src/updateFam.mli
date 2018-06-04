@@ -19,12 +19,10 @@ val print_del : config -> base -> unit
 val print_inv : config -> base -> unit
 val print_add_parents : config -> base -> unit
 
-val change_order :
-  config -> base -> iper -> person -> ifam -> int -> ifam list
+val change_order : person -> ifam -> int -> ifam list
 val print_change_order : config -> base -> unit
 val print_change_event_order : config -> base -> unit
 
-val person_key : base -> iper -> Update.key
 val string_family_of :
   config -> base -> ifam ->
     (Update.key, string) gen_family * Update.key gen_couple *

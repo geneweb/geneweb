@@ -60,7 +60,7 @@ let next_family_fun_templ gwo_list fi =
         Some fam -> Some fam
       | None ->
           match !gwo_list with
-            (x, separate, shift) :: rest ->
+            (x, separate, _) :: rest ->
               run ();
               gwo_list := rest;
               let ic = open_in_bin x in

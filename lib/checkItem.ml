@@ -70,7 +70,7 @@ let time_elapsed d1 d2 =
           in
           let year = a2 - a1 - r in
           {day = 0; month = month; year = year; prec = prec; delta = 0}
-      | {day = j2; month = m2; year = a2} ->
+      | {month = m2; year = a2} ->
           let r = 0 in
           let (month, r) =
             if m1 + r <= m2 then m2 - m1 - r, 0 else m2 - m1 - r + 12, 1
@@ -101,7 +101,7 @@ let time_elapsed d1 d2 =
           {day = day; month = month; year = year; prec = prec; delta = 0}
 
 let strictly_before_dmy d1 d2 =
-  let {day = d; month = m; year = y; prec = p} = time_elapsed d2 d1 in
+  let {day = d; month = m; year = y} = time_elapsed d2 d1 in
   if y < 0 then true
   else if y > 0 then false
   else if m < 0 then true
@@ -118,7 +118,7 @@ let strictly_before d1 d2 =
   | _ -> false
 
 let strictly_after_dmy d1 d2 =
-  let {day = d; month = m; year = y; prec = p} = time_elapsed d1 d2 in
+  let {day = d; month = m; year = y} = time_elapsed d1 d2 in
   if y < 0 then true
   else if y > 0 then false
   else if m < 0 then true
@@ -162,8 +162,8 @@ let compare_date d1 d2 =
           end
       | x -> x
       end
-  | Dgreg (dmy1, _), Dtext _ -> 1
-  | Dtext _, Dgreg (dmy2, _) -> -1
+  | Dgreg (_, _), Dtext _ -> 1
+  | Dtext _, Dgreg (_, _) -> -1
   | Dtext _, Dtext _ -> 0
 
 let date_of_death =
@@ -254,7 +254,7 @@ let sort_events (get_name, get_date) events =
 let merge_events (get_name, get_date) l1 l2 =
   List.merge (fun e1 e2 -> cmp_events (get_name, get_date) e1 e2) l1 l2
 
-let sort_pevents base warning p =
+let sort_pevents warning p =
   let a =
     sort_events
       ((fun evt -> Psort evt.epers_name), (fun evt -> evt.epers_date))
@@ -263,7 +263,7 @@ let sort_pevents base warning p =
   let b = get_pevents p in
   if compare b a <> 0 then warning (ChangedOrderOfPersonEvents (p, b, a))
 
-let sort_fevents base warning (ifam, fam) =
+let sort_fevents warning (ifam, fam) =
   let a =
     sort_events ((fun evt -> Fsort evt.efam_name), (fun evt -> evt.efam_date))
       (get_fevents fam)
@@ -271,15 +271,7 @@ let sort_fevents base warning (ifam, fam) =
   let b = get_fevents fam in
   if compare b a <> 0 then warning (ChangedOrderOfFamilyEvents (ifam, b, a))
 
-(* Deprecated avec les pevents. *)
-let birth_before_death base warning p =
-  match Adef.od_of_codate (get_birth p), get_death p with
-    Some d1, Death (_, d2) ->
-      let d2 = Adef.date_of_cdate d2 in
-      if strictly_after d1 d2 then warning (BirthAfterDeath p)
-  | _ -> ()
-
-let titles_after_birth base warning p t =
+let titles_after_birth warning p t =
   let t_date_start = Adef.od_of_codate t.t_date_start in
   let t_date_end = Adef.od_of_codate t.t_date_end in
   begin match t_date_start, t_date_end with
@@ -299,12 +291,6 @@ let titles_after_birth base warning p t =
       end;
       ()
   | _ -> ()
-
-let today =
-  let utm = Unix.time () in
-  let tm = Unix.localtime utm in
-  {day = tm.Unix.tm_mday; month = succ tm.Unix.tm_mon;
-   year = tm.Unix.tm_year + 1900; prec = Sure; delta = 0}
 
 let check_person_age base warning p =
   (* On pourrait faire un calcul sur la descendance ou l'ascendance si  *)
@@ -463,7 +449,7 @@ let check_difference_age_between_cpl base warning ifath imoth =
 
 let year_of d = d.year
 
-let check_normal_marriage_date_for_someone base error warning witn fam ip =
+let check_normal_marriage_date_for_someone base warning witn fam ip =
   let p = poi base ip in
   match Adef.od_of_codate (get_marriage fam) with
     Some (Dgreg (g2, _) as d2) ->
@@ -492,47 +478,45 @@ let check_normal_marriage_date_for_someone base error warning witn fam ip =
 
 (* ************************************************************************* *)
 (*  [Fonc] check_normal_marriage_date_for_witness :
-      base -> (Def.error -> unit) -> (Def.warning -> unit) ->
+      base -> (Def.warning -> unit) ->
         (ifam * family) -> unit                                              *)
 (** [Description] : Vérifie les dates des témoins par rapport à la date du
                     mariage.
     [Args] :
       - base    : base
-      - error   : fonction qui ajoute une erreur à la liste des erreurs
       - warning : fonction qui ajoute un warning à la liste des warnings
       - ifam    : ifam
       - family  : family
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let check_normal_marriage_date_for_witness base error warning (ifam, fam) =
+let check_normal_marriage_date_for_witness base warning (ifam, fam) =
   let wl = foi base ifam in
   List.iter
     (fun ip ->
-       check_normal_marriage_date_for_someone base error warning true fam ip)
+       check_normal_marriage_date_for_someone base warning true fam ip)
     (Array.to_list (get_witnesses wl))
 
 
 (* ************************************************************************* *)
 (*  [Fonc] check_normal_marriage_date_for_parent :
-      base -> (Def.error -> unit) -> (Def.warning -> unit) ->
+      base -> (Def.warning -> unit) ->
         (ifam * family) -> unit                                              *)
 (** [Description] : Vérifie les dates du conjoint1 et du conjoint2 par
                     rapport à la date du mariage.
     [Args] :
       - base    : base
-      - error   : fonction qui ajoute une erreur à la liste des erreurs
       - warning : fonction qui ajoute un warning à la liste des warnings
       - ifam    : ifam
       - family  : family
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let check_normal_marriage_date_for_parent base error warning (ifam, fam) =
+let check_normal_marriage_date_for_parent base warning (ifam, fam) =
   let cpl = foi base ifam in
-  check_normal_marriage_date_for_someone base error warning false fam
+  check_normal_marriage_date_for_someone base warning false fam
     (get_father cpl);
-  check_normal_marriage_date_for_someone base error warning false fam
+  check_normal_marriage_date_for_someone base warning false fam
     (get_mother cpl);
   check_difference_age_between_cpl base warning (get_father cpl)
     (get_mother cpl)
@@ -683,7 +667,7 @@ let check_marriages_order base warning p =
       (None, [| |]) (get_family p)
   in
   Array.stable_sort
-    (fun (f1, d1) (f2, d2) ->
+    (fun (_f1, d1) (_f2, d2) ->
        match d1, d2 with
          Some d1, Some d2 -> compare_date d1 d2
        | _ -> 0)
@@ -699,7 +683,7 @@ let check_marriages_order base warning p =
       loop 0 (get_family p)
     end
 
-let close_siblings base error warning x np ifam des =
+let close_siblings warning x np ifam des =
   match np, Adef.od_of_codate (get_birth x) with
     None, _ -> ()
   | Some (elder, d1), Some d2 ->
@@ -714,7 +698,7 @@ let close_siblings base error warning x np ifam des =
       end
   | _ -> ()
 
-let born_after_his_elder_sibling base error warning x np ifam des =
+let born_after_his_elder_sibling warning x np ifam des =
   match np, Adef.od_of_codate (get_birth x), get_death x with
     None, _, _ -> ()
   | Some (elder, d1), Some d2, _ ->
@@ -726,7 +710,7 @@ let born_after_his_elder_sibling base error warning x np ifam des =
         warning (ChildrenNotInOrder (ifam, des, elder, x))
   | _ -> ()
 
-let child_born_after_his_parent base error warning x iparent =
+let child_born_after_his_parent base warning x iparent =
   let parent = poi base iparent in
   match
     Adef.od_of_codate (get_birth parent), Adef.od_of_codate (get_birth x),
@@ -779,37 +763,35 @@ let possible_father base warning x ifath =
 let child_has_sex warning child =
   if get_sex child = Neuter then warning (UndefinedSex child)
 
-let check_order_pevents base warning p =
-  (* On tri les évènements pour utiliser la fonction de tri comme astuce. *)
-  let pevents =
-    sort_events
-      ((fun evt -> Psort evt.epers_name), (fun evt -> evt.epers_date))
-      (get_pevents p)
+let check_order_pfevents get_name get_date warning p events =
+  let events = sort_events (get_name, get_date) events in
+  let rec loop = function
+    | e1 :: e2 :: events ->
+      if compare_event_name (get_name e1) (get_name e2) = 1
+      then warning p e1 e2 ;
+      loop (e2 :: events)
+    | _ -> ()
   in
-  let rec loop pevents =
-    match pevents with
-      [] -> ()
-    | [e] -> ()
-    | e1 :: e2 :: pevents ->
-        let cmp =
-          compare_event_name (Psort e1.epers_name) (Psort e2.epers_name)
-        in
-        if cmp = 1 then
-          begin warning (PEventOrder (p, e1, e2)); loop (e2 :: pevents) end
-        else loop (e2 :: pevents)
-  in
-  loop pevents
+  loop events
+
+let check_order_pevents warning p =
+  check_order_pfevents
+    (fun evt -> Psort evt.epers_name)
+    (fun evt -> evt.epers_date)
+    (fun p e1 e2 -> warning (PEventOrder (p, e1, e2)))
+    (p)
+    (get_pevents p)
 
 let check_witness_pevents base warning p =
   List.iter
     (fun evt ->
        match Adef.od_of_codate evt.epers_date with
-         Some (Dgreg (g2, _) as d2) ->
+         Some (Dgreg (_, _) as d2) ->
            Array.iter
              (fun (iw, _) ->
                 let p = poi base iw in
                 begin match Adef.od_of_codate (get_birth p) with
-                  Some (Dgreg (g1, _) as d1) ->
+                  Some (Dgreg (_, _) as d1) ->
                     if strictly_before d2 d1 then
                       warning (PWitnessEventBeforeBirth (p, evt))
                 | _ -> ()
@@ -825,65 +807,22 @@ let check_witness_pevents base warning p =
     (get_pevents p)
 
 let check_pevents base warning p =
-  check_order_pevents base warning p; check_witness_pevents base warning p
-
-
-(* ************************************************************************* *)
-(*  [Fonc] check_marriage_sex :
-      base -> (Def.error -> unit) -> (Def.warning -> unit) ->
-        (ifam * family) -> unit                                              *)
-(** [Description] : Vérifie le sex du couple et s'il est correct la date de
-                    naissance par rapport à la date de décès.
-    [Args] :
-      - base    : base
-      - error   : fonction qui ajoute une erreur à la liste des erreurs
-      - warning : fonction qui ajoute un warning à la liste des warnings
-      - family  : family
-    [Retour] : Néant
-    [Rem] : Non exporté en clair hors de ce module.                          *)
-(* ************************************************************************* *)
-let check_marriage_sex base error warning fam =
-  let cpl = fam in
-  let fath = poi base (get_father cpl) in
-  let moth = poi base (get_mother cpl) in
-  begin match get_sex fath with
-    Male ->
-      (*birth_before_death base warning fath*)
-      check_pevents base warning fath
-  | Female | Neuter ->
-      if get_relation fam = NoSexesCheckNotMarried ||
-         get_relation fam = NoSexesCheckMarried
-      then
-        ()
-      else error (BadSexOfMarriedPerson fath)
-  end;
-  match get_sex moth with
-    Female ->
-      (*birth_before_death base warning moth*)
-      check_pevents base warning moth
-  | Male | Neuter ->
-      if get_relation fam = NoSexesCheckNotMarried ||
-         get_relation fam = NoSexesCheckMarried
-      then
-        ()
-      else error (BadSexOfMarriedPerson moth)
-
+  check_order_pevents warning p; check_witness_pevents base warning p
 
 (* ************************************************************************* *)
 (*  [Fonc] check_children :
-      base -> (Def.error -> unit) -> (Def.warning -> unit) ->
+      base -> (Def.warning -> unit) ->
         (ifam * family) -> unit                                              *)
 (** [Description] : Vérifie toutes les informations des enfants d'une famille.
     [Args] :
       - base    : base
-      - error   : fonction qui ajoute une erreur à la liste des erreurs
       - warning : fonction qui ajoute un warning à la liste des warnings
       - ifam    : ifam
       - family  : family
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let check_children base error warning (ifam, fam) =
+let check_children base warning (ifam, fam) =
   let cpl = fam in
   let des = fam in
   let after = sort_children2 base warning ifam des in
@@ -891,13 +830,12 @@ let check_children base error warning (ifam, fam) =
     List.fold_left
       (fun np child ->
          let child = poi base child in
-         (*birth_before_death base warning child;*)
          check_pevents base warning child;
-         born_after_his_elder_sibling base error warning child np ifam des;
-         close_siblings base error warning child np ifam des;
-         child_born_after_his_parent base error warning child
+         born_after_his_elder_sibling warning child np ifam des;
+         close_siblings warning child np ifam des;
+         child_born_after_his_parent base warning child
            (get_father cpl);
-         child_born_after_his_parent base error warning child
+         child_born_after_his_parent base warning child
            (get_mother cpl);
          child_born_before_mother_death base warning child (get_mother cpl);
          possible_father base warning child (get_father cpl);
@@ -945,37 +883,25 @@ let check_sources base misc ifam fam =
     if has_person_sources fath && has_person_sources moth then ()
     else misc MissingSources
 
-let check_order_fevents base warning (ifam, fam) =
-  (* On tri les évènements pour utiliser la fonction de tri comme astuce. *)
+let check_order_fevents base warning (_ifam, fam) =
   let p = poi base (get_father fam) in
-  let fevents =
-    sort_events ((fun evt -> Fsort evt.efam_name), (fun evt -> evt.efam_date))
-      (get_fevents fam)
-  in
-  let rec loop fevents =
-    match fevents with
-      [] -> ()
-    | [e] -> ()
-    | e1 :: e2 :: fevents ->
-        let cmp =
-          compare_event_name (Fsort e1.efam_name) (Fsort e2.efam_name)
-        in
-        if cmp = 1 then
-          begin warning (FEventOrder (p, e1, e2)); loop (e2 :: fevents) end
-        else loop (e2 :: fevents)
-  in
-  loop fevents
+  check_order_pfevents
+    (fun evt -> Fsort evt.efam_name)
+    (fun evt -> evt.efam_date)
+    (fun p e1 e2 -> warning (FEventOrder (p, e1, e2)))
+    (p)
+    (get_fevents fam)
 
-let check_witness_fevents base warning (ifam, fam) =
+let check_witness_fevents base warning (_ifam, fam) =
   List.iter
     (fun evt ->
        match Adef.od_of_codate evt.efam_date with
-         Some (Dgreg (g2, _) as d2) ->
+         Some (Dgreg (_, _) as d2) ->
            Array.iter
              (fun (iw, _) ->
                 let p = poi base iw in
                 begin match Adef.od_of_codate (get_birth p) with
-                  Some (Dgreg (g1, _) as d1) ->
+                  Some (Dgreg (_, _) as d1) ->
                     if strictly_before d2 d1 then
                       warning (FWitnessEventBeforeBirth (p, evt))
                 | _ -> ()
@@ -990,7 +916,7 @@ let check_witness_fevents base warning (ifam, fam) =
        | _ -> ())
     (get_fevents fam)
 
-let check_marriage_age base warning (ifam, fam) ip =
+let check_marriage_age base warning (_ifam, fam) ip =
   let p = poi base ip in
   let rec loop fevents =
     match fevents with
@@ -1016,7 +942,7 @@ let check_marriage_age base warning (ifam, fam) ip =
   loop (get_fevents fam)
 
 
-let check_reduce_fevents base error warning (ifam, fam) =
+let check_reduce_fevents base warning (ifam, fam) =
   let cpl = foi base ifam in
   check_order_fevents base warning (ifam, fam);
   check_marriage_age base warning (ifam, fam) (get_father cpl);
@@ -1024,7 +950,7 @@ let check_reduce_fevents base error warning (ifam, fam) =
   check_difference_age_between_cpl base warning (get_father cpl)
     (get_mother cpl)
 
-let check_fevents base error warning (ifam, fam) =
+let check_fevents base warning (ifam, fam) =
   let cpl = foi base ifam in
   check_order_fevents base warning (ifam, fam);
   check_witness_fevents base warning (ifam, fam);
@@ -1049,18 +975,16 @@ let check_fevents base error warning (ifam, fam) =
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
 let person base warning p =
-  (*birth_before_death base warning p;*)
   check_pevents base warning p;
   check_person_age base warning p;
-  List.iter (titles_after_birth base warning p) (get_titles p);
-  sort_pevents base warning p;
+  List.iter (titles_after_birth warning p) (get_titles p);
+  sort_pevents warning p;
   related_sex_is_coherent base warning p
 
 
 (* ************************************************************************* *)
 (*  [Fonc] family :
-      base -> (Def.error -> unit) -> (Def.warning -> unit) ->
-        ifam -> family -> unit                                               *)
+      base -> (Def.warning -> unit) -> ifam -> family -> unit                *)
 (** [Description] : En cas de modification d'une famille, on vérifie toutes
                     les personnes accessibles après la validation du
                     formulaire (famille).
@@ -1069,21 +993,18 @@ let person base warning p =
                     du couple.
     [Args] :
       - base    : base
-      - error   : fonction qui ajoute une erreur à la liste des erreurs
       - warning : fonction qui ajoute un warning à la liste des warnings
       - ifam    : ifam
       - fam     : family
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let family base error warning ifam fam =
-  (* Il faudrait faire mieux que pas tester le sex des marraiges. *)
-  (*check_marriage_sex base error warning fam;*)
-  check_normal_marriage_date_for_parent base error warning (ifam, fam);
-  check_normal_marriage_date_for_witness base error warning (ifam, fam);
-  check_fevents base error warning (ifam, fam);
-  check_children base error warning (ifam, fam);
-  sort_fevents base warning (ifam, fam);
+let family base warning ifam fam =
+  check_normal_marriage_date_for_parent base warning (ifam, fam);
+  check_normal_marriage_date_for_witness base warning (ifam, fam);
+  check_fevents base warning (ifam, fam);
+  check_children base warning (ifam, fam);
+  sort_fevents warning (ifam, fam);
   let father = poi base (get_father fam) in
   let mother = poi base (get_mother fam) in
   check_marriages_order base warning father;
@@ -1092,8 +1013,7 @@ let family base error warning ifam fam =
 
 (* ************************************************************************* *)
 (*  [Fonc] reduce_family :
-      base -> (Def.error -> unit) -> (Def.warning -> unit) ->
-        ifam -> family -> unit                                               *)
+      base -> (Def.warning -> unit) -> ifam -> family -> unit                *)
 (** [Description] : En cas de modification d'une personne, on ne vérifie que
                     les personnes accessibles après la validation du
                     formulaire (individu).
@@ -1101,19 +1021,16 @@ let family base error warning ifam fam =
                     couple, les parents du couple et les enfants du couple.
     [Args] :
       - base    : base
-      - error   : fonction qui ajoute une erreur à la liste des erreurs
       - warning : fonction qui ajoute un warning à la liste des warnings
       - ifam    : ifam
       - fam     : family
     [Retour] : Néant
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let reduce_family base error warning ifam fam =
-  (* Il faudrait faire mieux que pas tester le sex des marraiges. *)
-  (*check_marriage_sex base error warning fam;*)
-  check_normal_marriage_date_for_parent base error warning (ifam, fam);
-  check_reduce_fevents base error warning (ifam, fam);
-  check_children base error warning (ifam, fam)
+let reduce_family base warning ifam fam =
+  check_normal_marriage_date_for_parent base warning (ifam, fam);
+  check_reduce_fevents base warning (ifam, fam);
+  check_children base warning (ifam, fam)
 
 
 (* ************************************************************************* *)

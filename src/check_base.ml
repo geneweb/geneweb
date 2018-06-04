@@ -15,7 +15,7 @@ let set_list l v = l := v :: !l
 let check_base bname =
   Secure.set_base_dir (Filename.dirname bname);
   let base = Gwdb.open_base bname in
-  let changed_p (ip, p, o_sex, o_rpar) =
+  let changed_p (_, p, _, _) =
     let fn = Gwdb.p_first_name base p in
     let sn = Gwdb.p_surname base p in
     printf "%s.%d %s not changed" fn (Gwdb.get_occ p) sn

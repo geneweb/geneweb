@@ -35,7 +35,7 @@ let merge_witnesses base wit1 wit2 =
   in
   Array.of_list list
 
-let merge_event_witnesses base wit1 wit2 =
+let merge_event_witnesses wit1 wit2 =
   let list =
     List.fold_right
       (fun wit list -> if List.mem wit list then list else wit :: list)
@@ -45,17 +45,16 @@ let merge_event_witnesses base wit1 wit2 =
 
 
 (* ********************************************************************** *)
-(*  [Fonc] merge_events : config -> base -> list -> list -> list          *)
+(*  [Fonc] merge_events : config -> list -> list -> list                  *)
 (** [Description] : Essaye de merger le plus possible d'evenement famille
                     a partir des deux listes d'evenements famille.
     [Args] :
-      - base : base
       - l1   : fevents de fam1
       - l2   : fevents de fam2
     [Retour] : la fusion des fevents
     [Rem] : Non exporté en clair hors de ce module.                       *)
 (* ********************************************************************** *)
-let merge_events conf base l1 l2 =
+let merge_events conf l1 l2 =
   let merge_strings s1 sep s2 =
     if s1 = s2 then s1
     else if s1 = "" then s2
@@ -100,8 +99,7 @@ let merge_events conf base l1 l2 =
                      in
                      let src = merge_strings e.efam_src ", " e1.efam_src in
                      let witnesses =
-                       merge_event_witnesses base e1.efam_witnesses
-                         e.efam_witnesses
+                       merge_event_witnesses e1.efam_witnesses e.efam_witnesses
                      in
                      let e1 =
                        {e1 with efam_date = date; efam_place = place;
@@ -124,8 +122,7 @@ let merge_events conf base l1 l2 =
                      in
                      let src = merge_strings e.efam_src ", " e1.efam_src in
                      let witnesses =
-                       merge_event_witnesses base e1.efam_witnesses
-                         e.efam_witnesses
+                       merge_event_witnesses e1.efam_witnesses e.efam_witnesses
                      in
                      let e1 =
                        {e1 with efam_date = date; efam_place = place;
@@ -160,7 +157,7 @@ let reconstitute conf base ifam1 fam1 fam2 =
   in
   let merge_possible_event conv proj =
     let l1 = List.map conv (proj fam1) in
-    let l2 = List.map conv (proj fam2) in merge_events conf base l1 l2
+    let l2 = List.map conv (proj fam2) in merge_events conf l1 l2
   in
   let fam =
     {marriage = field "marriage" get_marriage ((=) Adef.codate_None);
@@ -224,7 +221,7 @@ let effective_mod_merge conf base o_f1 o_f2 sfam scpl sdes =
     Some i2 ->
       let ifam2 = Adef.ifam_of_int i2 in
       let fam2 = foi base ifam2 in
-      UpdateFamOk.effective_del conf base (ifam2, fam2);
+      UpdateFamOk.effective_del base ifam2 fam2;
       let (ifam, fam, cpl, des) =
         UpdateFamOk.effective_mod conf base sfam scpl sdes
       in

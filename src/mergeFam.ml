@@ -127,7 +127,7 @@ let print_differences conf base branches (ifam1, fam1) (ifam2, fam2) =
   Wserver.printf "</form>\n"
 
 let merge_fam1 conf base fam1 fam2 =
-  let title h =
+  let title _ =
     let s = transl_nth conf "family/families" 1 in
     Wserver.printf "%s" (capitale (transl_decline conf "merge" s))
   in

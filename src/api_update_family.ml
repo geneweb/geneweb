@@ -9,8 +9,6 @@ open Config
 open Gwdb
 open Def
 open Util
-open Api_def
-open Api_util
 open Api_update_util
 
 let reconstitute_family conf base mod_f =
@@ -97,7 +95,7 @@ let reconstitute_family conf base mod_f =
                     | `witness_godparent -> Witness_GodParent
                     | `witness_officer   -> Witness_Officer
                   in
-                  let wit = (reconstitute_somebody conf base person, wk) in
+                  let wit = (reconstitute_somebody base person, wk) in
                   wit :: accu
               | None -> accu)
             evt.Mwrite.Fevent.witnesses []
@@ -330,7 +328,7 @@ let reconstitute_family conf base mod_f =
   (* Normalement, il ne doit plus y avoir de lever *)
   (* de conflits par les autres modules : update,  *)
   (* updateIndOk et updateFamOk.                   *)
-  let _err = Api_update_util.check_family_conflict conf base fam cpl des in
+  let _err = Api_update_util.check_family_conflict base fam cpl des in
   (* Maintenant qu'on a fini les conflit, on remet l'objet person *)
   (* tel que pour GeneWeb, c'est à dire qu'on supprime l'option   *)
   (* force_create.                                                *)
@@ -373,7 +371,7 @@ let reconstitute_family conf base mod_f =
 (**/**)
 
 
-let print_add conf base ip mod_f mod_fath mod_moth =
+let print_add conf base mod_f mod_fath mod_moth =
   (try
     let (sfam, scpl, sdes) = reconstitute_family conf base mod_f in
     (*
@@ -388,7 +386,7 @@ let print_add conf base ip mod_f mod_fath mod_moth =
       Api_update_util.UpdateError "BaseChanged"
     else
     *)
-      (match UpdateFamOk.check_family conf base sfam scpl with
+      (match UpdateFamOk.check_family conf sfam scpl with
       | (Some err, _) | (_, Some err) ->
           (* Correspond au cas ou fn/sn = ""/"?" *)
           (* => ne devrait pas se produire       *)
@@ -486,7 +484,7 @@ let print_del conf base ip ifam =
   begin
     if not (is_deleted_family fam) then
       begin
-        UpdateFamOk.effective_del conf base (ifam, fam);
+        UpdateFamOk.effective_del base ifam fam;
         (* Déplacé dans Api_saisie_write.compute_modification_status *)
         (*Util.commit_patches conf base;*)
         let changed =
@@ -518,7 +516,7 @@ let print_del conf base ip ifam =
 ;;
 
 
-let print_mod_aux conf base ip mod_f callback =
+let print_mod_aux conf base mod_f callback =
   try
     let (sfam, scpl, sdes) = reconstitute_family conf base mod_f in
     (*
@@ -528,7 +526,7 @@ let print_mod_aux conf base ip mod_f callback =
     in
     if digest = mod_f.Mwrite.Family.digest then
     *)
-      match UpdateFamOk.check_family conf base sfam scpl with
+      match UpdateFamOk.check_family conf sfam scpl with
       | (Some err, _) | (_, Some err) ->
           (* Correspond au cas ou fn/sn = "" ou "?" *)
           (* => ne devrait pas se produire *)
@@ -554,7 +552,7 @@ let print_mod conf base ip mod_f =
   in
   let callback sfam scpl sdes =
     begin
-      let ofs = UpdateFamOk.family_structure conf base sfam.fam_index in
+      let ofs = UpdateFamOk.family_structure base sfam.fam_index in
       let (ifam, fam, cpl, des) =
         UpdateFamOk.effective_mod conf base sfam scpl sdes
       in
@@ -600,7 +598,7 @@ let print_mod conf base ip mod_f =
       Api_update_util.UpdateSuccess (wl, ml, hr)
     end
   in
-  print_mod_aux conf base ip mod_f callback
+  print_mod_aux conf base mod_f callback
 ;;
 
 

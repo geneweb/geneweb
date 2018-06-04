@@ -75,7 +75,7 @@ let digest_children base ipl =
   in
   Iovalue.digest l
 
-let check_digest conf base digest =
+let check_digest conf digest =
   match p_getenv conf.env "digest" with
     Some ini_digest -> if digest <> ini_digest then Update.error_digest conf
   | None -> ()
@@ -230,7 +230,7 @@ let check_conflict conf base p key new_occ ipl =
          end)
     ipl
 
-let error_person conf base p err =
+let error_person conf err =
   let title _ = Wserver.printf "%s" (capitale (transl conf "error")) in
   rheader conf title;
   Wserver.printf "%s\n" (capitale err);
@@ -268,7 +268,7 @@ let change_child conf base parent_surname changed ip =
     | _ -> 0
   in
   if new_first_name = "" then
-    error_person conf base p (transl conf "first name missing")
+    error_person conf (transl conf "first name missing")
   else if
     new_first_name <> p_first_name base p ||
     new_surname <> p_surname base p || new_occ <> get_occ p
@@ -294,7 +294,7 @@ let change_child conf base parent_surname changed ip =
     let np_misc_names = gen_person_misc_names base p (fun p -> p.titles) in
     List.iter (fun key -> person_ht_add base key p.key_index) np_misc_names
 
-let print_update_child conf base p digest =
+let print_update_child conf base =
   match p_getenv conf.env "m" with
     Some "CHG_CHN_OK" -> print conf base
   | _ -> incorrect_request conf
@@ -309,10 +309,10 @@ let print_change_ok conf base p =
         Some _ -> true
       | _ -> false
     in
-    if redisp then print_update_child conf base p ""
+    if redisp then print_update_child conf base
     else
       begin
-        check_digest conf base (digest_children base ipl);
+        check_digest conf (digest_children base ipl);
         List.iter (change_child conf base parent_surname changed) ipl;
         Util.commit_patches conf base;
         let changed =

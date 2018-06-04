@@ -1,6 +1,7 @@
 (* $Id: update.ml,v 5.48 2008-01-08 11:58:46 ddr Exp $ *)
 (* Copyright (c) 1998-2007 INRIA *)
 
+
 open Config
 open Def
 open Gutil
@@ -167,7 +168,7 @@ let print_return conf =
   Wserver.printf "</form>\n";
   Wserver.printf "</p>\n"
 
-let print_err_unknown conf base (f, s, o) =
+let print_err_unknown conf _base (f, s, o) =
   if !(Api_conf.mode_api) then
     begin let err =
       Printf.sprintf "%s%s <strong>%s.%d %s</strong>\n"
@@ -200,7 +201,7 @@ let update_misc_names_of_family base p_sex u =
         (Array.to_list u.family)
   | _ -> ()
 
-let delete_topological_sort_v conf base =
+let delete_topological_sort_v conf _base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab_visitor" in
   (try Sys.remove tstab_file with Sys_error _ -> ());
@@ -213,21 +214,21 @@ let delete_topological_sort conf base =
   let tstab_file = Filename.concat bfile "tstab" in
   try Sys.remove tstab_file with Sys_error _ -> ()
 
-let print_someone conf base p =
+let print_someone _conf base p =
   Wserver.printf "%s%s %s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 
-let print_first_name conf base p =
+let print_first_name _conf base p =
   Wserver.printf "%s%s" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
-let print_someone_strong conf base p =
+let print_someone_strong _conf base p =
   Printf.sprintf "<strong>%s%s %s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
     (p_surname base p)
 
-let print_first_name_strong conf base p =
+let print_first_name_strong _conf base p =
   Wserver.printf "<strong>%s%s</strong>" (p_first_name base p)
     (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
 
@@ -245,24 +246,15 @@ let print_error conf base =
   | OwnAncestor p ->
       Wserver.printf "%s\n%s" (print_someone_strong conf base p)
         (transl conf "would be his/her own ancestor")
-  | BadSexOfMarriedPerson p ->
+  | BadSexOfMarriedPerson _ ->
       Wserver.printf "%s."
         (capitale (transl conf "cannot change sex of a married person"))
-
-let print_someone_ref conf base p =
-  Wserver.printf "<a href=\"%s%s\">\n%s%s %s</a>" (commd conf)
-    (acces conf base p) (p_first_name base p)
-    (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p))
-    (p_surname base p)
 
 let someone_ref_text conf base p =
   "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">\n" ^
   p_first_name base p ^
   (if get_occ p = 0 then "" else "." ^ string_of_int (get_occ p)) ^ " " ^
   p_surname base p ^ "</a>"
-
-let print_first_name_ref conf base p =
-  Wserver.printf "%s" (someone_ref_text conf base p)
 
 let print_warning conf base =
   function
@@ -279,7 +271,7 @@ let print_warning conf base =
         (fun _ ->
            Printf.sprintf "%s%s" (print_someone_strong conf base p)
              (Date.short_dates_text conf base p))
-  | ChangedOrderOfChildren (ifam, des, before, after) ->
+  | ChangedOrderOfChildren (ifam, _, before, after) ->
       let cpl = foi base ifam in
       let fath = poi base (get_father cpl) in
       let moth = poi base (get_mother cpl) in
@@ -318,7 +310,7 @@ let print_warning conf base =
       Wserver.printf "</td>\n";
       Wserver.printf "</tr>\n";
       Wserver.printf "</table>\n"
-  | ChildrenNotInOrder (ifam, des, elder, x) ->
+  | ChildrenNotInOrder (ifam, _, elder, x) ->
       let cpl = foi base ifam in
       Wserver.printf
         (fcapitale
@@ -373,7 +365,7 @@ let print_warning conf base =
       Wserver.printf "</td>\n";
       Wserver.printf "</tr>\n";
       Wserver.printf "</table>\n"
-  | ChangedOrderOfFamilyEvents (ifam, before, after) ->
+  | ChangedOrderOfFamilyEvents (_, before, after) ->
       Wserver.printf "%s\n"
         (capitale (transl conf "changed order of family's events"));
       Wserver.printf "-&gt;\n";
@@ -404,7 +396,7 @@ let print_warning conf base =
       Wserver.printf "</td>\n";
       Wserver.printf "</tr>\n";
       Wserver.printf "</table>\n"
-  | ChangedOrderOfPersonEvents (p, before, after) ->
+  | ChangedOrderOfPersonEvents (_, before, after) ->
       Wserver.printf "%s\n"
         (capitale (transl conf "changed order of person's events"));
       Wserver.printf "-&gt;\n";
@@ -435,7 +427,7 @@ let print_warning conf base =
       Wserver.printf "</td>\n";
       Wserver.printf "</tr>\n";
       Wserver.printf "</table>\n"
-  | CloseChildren (ifam, des, elder, x) ->
+  | CloseChildren (ifam, _, elder, x) ->
       let cpl = foi base ifam in
       Wserver.printf
         (fcapitale
@@ -631,7 +623,7 @@ let print_warnings conf base wl =
       - unit
     [Rem] : Non exporté en clair hors de ce module.                          *)
 (* ************************************************************************* *)
-let print_misc conf base =
+let print_misc conf _base =
   function
     MissingSources ->
       Wserver.printf "<em>";
@@ -715,7 +707,7 @@ let error conf base x =
       | OwnAncestor p ->
           Printf.sprintf "%s\n%s" (print_someone_strong conf base p)
             (transl conf "would be his/her own ancestor")
-      | BadSexOfMarriedPerson p ->
+      | BadSexOfMarriedPerson _ ->
           Printf.sprintf "%s."
             (capitale (transl conf "cannot change sex of a married person"))
     in
@@ -934,13 +926,13 @@ let reconstitute_date_dmy conf var =
           | Some "after" -> After
           | Some "oryear" ->
               begin match get_number var "oryear" conf.env with
-                Some y ->
+                Some _ ->
                   let dmy2 = reconstitute_date_dmy2 conf var in OrYear dmy2
               | None -> Sure
               end
           | Some "yearint" ->
               begin match get_number var "oryear" conf.env with
-                Some y ->
+                Some _ ->
                   let dmy2 = reconstitute_date_dmy2 conf var in YearInt dmy2
               | None -> Sure
               end
@@ -988,7 +980,7 @@ let reconstitute_date conf var =
   | Some d, true -> Some (Dgreg (Calendar.gregorian_of_french d, Dfrench))
   | None, _ ->
       match p_getenv conf.env (var ^ "_text") with
-        Some txt ->
+        Some _ ->
           let txt = only_printable (get var "text" conf.env) in
           if txt = "" then None else Some (Dtext txt)
       | _ -> None
@@ -1212,11 +1204,9 @@ let insert_person conf base src new_persons (f, s, o, create, var) =
         | None -> print_err_unknown conf base (f, s, o)
 
 let rec update_conf_env field p occ o_env n_env =
-  let get_name (n, v) = n in
   match o_env with
     [] -> n_env
-  | head :: rest ->
-      let name = get_name head in
+  | ((name, _) as head) :: rest ->
       if name = field ^ "p" then
         update_conf_env field p occ rest ((name, p) :: n_env)
       else if name = field ^ "occ" then

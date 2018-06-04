@@ -55,12 +55,7 @@ let person_is_misc_name conf base p k =
     true
   else false
 
-let select_misc_name conf base pl k =
-  List.fold_right
-    (fun p pl -> if person_is_misc_name conf base p k then p :: pl else pl) pl
-    []
-
-let person_is_approx_key conf base p k =
+let person_is_approx_key base p k =
   let k = Name.strip_lower k in
   let fn = Name.strip_lower (p_first_name base p) in
   let sn = Name.strip_lower (p_surname base p) in
@@ -69,7 +64,7 @@ let person_is_approx_key conf base p k =
 let select_approx_key conf base pl k =
   List.fold_right
     (fun p pl ->
-       if person_is_approx_key conf base p k then p :: pl
+       if person_is_approx_key base p k then p :: pl
        else if person_is_misc_name conf base p k then p :: pl
        else pl)
     pl []
@@ -89,7 +84,7 @@ let cut_words str =
 
 let try_find_with_one_first_name conf base n =
   let n1 = Name.abbrev (Name.lower n) in
-  match Mutil.lindex n1 ' ' with
+  match String.index_opt n1 ' ' with
     Some i ->
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
@@ -113,7 +108,7 @@ let try_find_with_one_first_name conf base n =
       pl
   | None -> []
 
-let compact_list conf base xl =
+let compact_list base xl =
   let pl = sort_person_list base xl in
   let pl =
     List.fold_right
@@ -236,7 +231,7 @@ let search_partial_key conf base an =
         pl []
     else pl
   in
-  compact_list conf base pl
+  compact_list base pl
 
 let search_approx_key conf base an =
   let ipl = person_not_a_key_find_all base an in
@@ -272,7 +267,7 @@ let search_approx_key conf base an =
       (fun p pl -> if empty_surname_or_firsntame base p then pl else p :: pl)
       pl []
   in
-  compact_list conf base pl
+  compact_list base pl
 
 (* recherche par clé, i.e. prenom.occ nom *)
 let search_by_key conf base an =
@@ -290,10 +285,6 @@ let search_by_key conf base an =
       else pl
   | None -> []
 
-let search_approx_surname conf base an = []
-
-let search_approx_first_name conf base an = []
-
 (* main *)
 
 type search_type =
@@ -302,8 +293,6 @@ type search_type =
   | Surname
   | FirstName
   | ApproxKey
-  | ApproxSurname
-  | ApproxFirstName
   | PartialKey
   | DefaultSurname
 
@@ -330,7 +319,7 @@ let search conf base an search_order specify unknown =
         let pl = Some.search_surname conf base an in
         begin match pl with
           [] -> loop l
-        | pl ->
+        | _ ->
             conf.cancel_links <- false;
             Some.search_surname_print conf base unknown an
         end
@@ -338,7 +327,7 @@ let search conf base an search_order specify unknown =
         let pl = Some.search_first_name conf base an in
         begin match pl with
           [] -> loop l
-        | pl ->
+        | _ ->
             conf.cancel_links <- false;
             Some.search_first_name_print conf base an
         end
@@ -350,18 +339,6 @@ let search conf base an search_order specify unknown =
             record_visited conf (get_key_index p); Perso.print conf base p
         | pl -> specify conf base an pl
         end
-    | ApproxSurname :: l ->
-        let pl = search_approx_surname conf base an in
-        begin match pl with
-          [] -> loop l
-        | pl -> specify conf base an pl
-        end
-    | ApproxFirstName :: l ->
-        let pl = search_approx_first_name conf base an in
-        begin match pl with
-          [] -> loop l
-        | pl -> specify conf base an pl
-        end
     | PartialKey :: l ->
         let pl = search_partial_key conf base an in
         begin match pl with
@@ -370,7 +347,7 @@ let search conf base an search_order specify unknown =
             record_visited conf (get_key_index p); Perso.print conf base p
         | pl -> specify conf base an pl
         end
-    | DefaultSurname :: l ->
+    | DefaultSurname :: _ ->
         conf.cancel_links <- false;
         Some.search_surname_print conf base unknown an
   in

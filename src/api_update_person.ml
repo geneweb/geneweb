@@ -5,12 +5,9 @@
 module Mwrite = Api_saisie_write_piqi
 module Mext_write = Api_saisie_write_piqi_ext
 
-open Config
 open Gwdb
 open Def
 open Util
-open Api_def
-open Api_util
 open Api_update_util
 
 let reconstitute_person conf base mod_p =
@@ -147,8 +144,8 @@ let reconstitute_person conf base mod_p =
             in
             let (r_fath, r_moth) =
               match person.Mwrite.Person_link.sex with
-                | `female -> (None, Some (reconstitute_somebody conf base person))
-                | _ -> (Some (reconstitute_somebody conf base person), None)
+                | `female -> (None, Some (reconstitute_somebody base person))
+                | _ -> (Some (reconstitute_somebody base person), None)
             in
             let r_sources =
               match r.Mwrite.Relation_parent.source with
@@ -306,7 +303,7 @@ let reconstitute_person conf base mod_p =
                     | `witness_godparent -> Witness_GodParent
                     | `witness_officer -> Witness_Officer
                   in
-                  let wit = (reconstitute_somebody conf base person, wk) in
+                  let wit = (reconstitute_somebody base person, wk) in
                   wit :: accu
               | None -> accu)
             evt.Mwrite.Pevent.witnesses []
@@ -418,7 +415,7 @@ let print_add conf base mod_p =
     (* On met à jour les occ. *)
     if sp.occ <> 0 then mod_p.Mwrite.Person.occ <- Some (Int32.of_int sp.occ);
     let sp = UpdateIndOk.strip_person sp in
-    match UpdateIndOk.check_person conf base sp with
+    match UpdateIndOk.check_person conf sp with
     | Some err ->
         (* Correspond au cas ou fn/sn = ""/"?" *)
         (* => ne devrait pas se produire       *)
@@ -426,7 +423,7 @@ let print_add conf base mod_p =
     | None ->
         let (p, a) = UpdateIndOk.effective_add conf base sp in
         let u = {family = get_family (poi base p.key_index)} in
-        let wl = UpdateIndOk.all_checks_person conf base p a u in
+        let wl = UpdateIndOk.all_checks_person base p a u in
         (* Déplacé dans Api_saisie_write.compute_modification_status *)
         (*Util.commit_patches conf base;*)
         let changed = U_Add_person (Util.string_gen_person base p) in
@@ -450,7 +447,7 @@ let print_del conf base ip =
   let op = Util.string_gen_person base (gen_person_of_person p) in
   UpdateIndOk.update_relations_of_related base ip old_related;
   let warning _ = () in
-  let p = UpdateIndOk.effective_del conf base warning p in
+  let p = UpdateIndOk.effective_del base warning p in
   patch_person base ip p;
   delete_key base fn sn occ;
   Notes.update_notes_links_db conf (NotesLinks.PgInd p.key_index) "";
@@ -465,14 +462,14 @@ let print_del conf base ip =
 ;;
 
 
-let print_mod_aux conf base ip mod_p callback =
+let print_mod_aux conf base mod_p callback =
   try
     let p = reconstitute_person conf base mod_p in
     let p = UpdateIndOk.strip_person p in
     let ini_ps = UpdateInd.string_person_of base (poi base p.key_index) in
     let digest = Update.digest_person ini_ps in
     if digest = mod_p.Mwrite.Person.digest then
-      match UpdateIndOk.check_person conf base p with
+      match UpdateIndOk.check_person conf p with
       | Some err ->
           (* Correspond au cas ou fn/sn = ""/"?" *)
           (* => ne devrait pas se produire       *)
@@ -526,7 +523,7 @@ let print_mod conf base mod_p =
       let wl =
         let a = poi base p.key_index in
         let a = {parents = get_parents a; consang = get_consang a} in
-        UpdateIndOk.all_checks_person conf base p a u
+        UpdateIndOk.all_checks_person base p a u
       in
       (* Déplacé dans Api_saisie_write.compute_modification_status *)
       (*Util.commit_patches conf base;*)
@@ -555,7 +552,7 @@ let print_mod conf base mod_p =
       Api_update_util.UpdateSuccess (wl, [], hr)
     end
   in
-  print_mod_aux conf base ip mod_p callback
+  print_mod_aux conf base mod_p callback
 ;;
 
 
